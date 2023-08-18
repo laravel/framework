@@ -219,7 +219,7 @@ class Message
      */
     public function forgetReplyTo()
     {
-        if ($header = $this->message->getHeaders()->get('ReplyTo')) {
+        if ($header = $this->message->getHeaders()->get('Reply-To')) {
             $this->addAddressDebugHeader('X-Reply-To', $this->message->getReplyTo());
 
             $header->setAddresses([]);
