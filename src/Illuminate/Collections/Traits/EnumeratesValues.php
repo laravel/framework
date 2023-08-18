@@ -46,6 +46,7 @@ use UnitEnum;
  * @property-read HigherOrderCollectionProxy $sum
  * @property-read HigherOrderCollectionProxy $takeUntil
  * @property-read HigherOrderCollectionProxy $takeWhile
+ * @property-read HigherOrderCollectionProxy $tryEach
  * @property-read HigherOrderCollectionProxy $unique
  * @property-read HigherOrderCollectionProxy $unless
  * @property-read HigherOrderCollectionProxy $until
@@ -92,6 +93,7 @@ trait EnumeratesValues
         'sum',
         'takeUntil',
         'takeWhile',
+        'tryEach',
         'unique',
         'unless',
         'until',
@@ -248,7 +250,7 @@ trait EnumeratesValues
      * @oaram  bool  $report
      * @return $this
      */
-    public function tryEach(callable $callback, bool $report = true)
+    public function tryEach(callable $callback, bool $report = false)
     {
         foreach ($this as $key => $item) {
             try {

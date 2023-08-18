@@ -1677,9 +1677,25 @@ class SupportCollectionTest extends TestCase
             }
 
             $result[] = $item;
-        }, false);
+        });
 
         $this->assertEquals([1, 3], $result);
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testProxiedTryEach($collection)
+    {
+        $c = new $collection([
+            new Collection(),
+            null,
+            new Collection(),
+        ]);
+
+        $c->tryEach->push(3);
+
+        $this->assertEquals([[3],  null, [3]], $c->toArray());
     }
 
     /**
