@@ -7,6 +7,7 @@ use ArrayIterator;
 use ArrayObject;
 use CachingIterator;
 use Exception;
+use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Support\Collection;
@@ -15,6 +16,7 @@ use Illuminate\Support\ItemNotFoundException;
 use Illuminate\Support\LazyCollection;
 use Illuminate\Support\MultipleItemsFoundException;
 use Illuminate\Support\Str;
+use Illuminate\Tests\Integration\Foundation\FakeHandler;
 use InvalidArgumentException;
 use IteratorAggregate;
 use JsonSerializable;
@@ -1659,6 +1661,25 @@ class SupportCollectionTest extends TestCase
             }
         });
         $this->assertEquals([1, 2, 'foo' => 'bar'], $result);
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testTryEach($collection)
+    {
+        $c = new $collection([1, 2, 3, 4]);
+
+        $result = [];
+        $c->tryEach(function ($item) use (&$result) {
+            if ($item % 2 === 0) {
+                throw new Exception();
+            }
+
+            $result[] = $item;
+        }, false);
+
+        $this->assertEquals([1, 3], $result);
     }
 
     /**
