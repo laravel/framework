@@ -1223,8 +1223,8 @@ class TestResponseTest extends TestCase
     {
         $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceStub));
 
-        $response->assertJsonPathCanonicalizing('*.foo', ['foo 0' , 'foo 1', 'foo 2', 'foo 3']);
-        $response->assertJsonPathCanonicalizing('*.foo', ['foo 1' , 'foo 0', 'foo 3', 'foo 2']);
+        $response->assertJsonPathCanonicalizing('*.foo', ['foo 0', 'foo 1', 'foo 2', 'foo 3']);
+        $response->assertJsonPathCanonicalizing('*.foo', ['foo 1', 'foo 0', 'foo 3', 'foo 2']);
 
         $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceWithIntegersStub));
 
