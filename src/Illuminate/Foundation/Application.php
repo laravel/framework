@@ -529,8 +529,8 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function storagePath($path = '')
     {
-        if ($customStoragePath = Env::get('STORAGE_PATH')) {
-            return $this->joinPaths($this->storagePath ?: $customStoragePath, $path);
+        if ($storagePath = Env::get('LARAVEL_STORAGE_PATH')) {
+            return $this->joinPaths($this->storagePath ?: $storagePath, $path);
         }
 
         return $this->joinPaths($this->storagePath ?: $this->basePath('storage'), $path);
