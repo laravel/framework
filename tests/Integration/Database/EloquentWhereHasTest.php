@@ -68,6 +68,46 @@ class EloquentWhereHasTest extends DatabaseTestCase
     }
 
     /**
+     * Check that the 'whereRelationIn' callback function works.
+     *
+     * @dataProvider dataProviderWhereRelationInCallback
+     */
+    public function testWhereRelationInCallback($callbackEloquent, $callbackQuery)
+    {
+        $userWhereRelationIn = User::whereRelationIn('posts', $callbackEloquent);
+        $userWhereHas = User::whereHas('posts', $callbackEloquent);
+        $query = DB::table('users')->whereExists($callbackQuery);
+
+        $this->assertEquals($userWhereRelationIn->getQuery()->toSql(), $query->toSql());
+        $this->assertEquals($userWhereRelationIn->getQuery()->toSql(), $userWhereHas->toSql());
+        $this->assertEquals($userWhereHas->getQuery()->toSql(), $query->toSql());
+
+        $this->assertEquals($userWhereRelationIn->first()->id, $query->first()->id);
+        $this->assertEquals($userWhereRelationIn->first()->id, $userWhereHas->first()->id);
+        $this->assertEquals($userWhereHas->first()->id, $query->first()->id);
+    }
+
+    /**
+     * Check that the 'orWhereRelationIn' callback function works.
+     *
+     * @dataProvider dataProviderWhereRelationInCallback
+     */
+    public function testOrWhereRelationInCallback($callbackEloquent, $callbackQuery)
+    {
+        $userOrWhereRelationIn = User::orWhereRelationIn('posts', $callbackEloquent);
+        $userOrWhereHas = User::orWhereHas('posts', $callbackEloquent);
+        $query = DB::table('users')->orWhereExists($callbackQuery);
+
+        $this->assertEquals($userOrWhereRelationIn->getQuery()->toSql(), $query->toSql());
+        $this->assertEquals($userOrWhereRelationIn->getQuery()->toSql(), $userOrWhereHas->toSql());
+        $this->assertEquals($userOrWhereHas->getQuery()->toSql(), $query->toSql());
+
+        $this->assertEquals($userOrWhereRelationIn->first()->id, $query->first()->id);
+        $this->assertEquals($userOrWhereRelationIn->first()->id, $userOrWhereHas->first()->id);
+        $this->assertEquals($userOrWhereHas->first()->id, $query->first()->id);
+    }
+
+    /**
      * Check that the 'orWhereRelation' callback function works.
      *
      * @dataProvider dataProviderWhereRelationCallback
@@ -85,6 +125,34 @@ class EloquentWhereHasTest extends DatabaseTestCase
         $this->assertEquals($userOrWhereRelation->first()->id, $query->first()->id);
         $this->assertEquals($userOrWhereRelation->first()->id, $userOrWhereHas->first()->id);
         $this->assertEquals($userOrWhereHas->first()->id, $query->first()->id);
+    }
+
+    public static function dataProviderWhereRelationInCallback()
+    {
+        $callbackArray = function ($value) {
+            $callbackEloquent = function (EloquentBuilder $builder) use ($value) {
+                $builder->selectRaw('id')->whereIn('public', $value);
+            };
+
+            $callbackQuery = function (QueryBuilder $builder) use ($value) {
+                $hasMany = app()->make(User::class)->posts();
+
+                $builder->from('posts')->addSelect(['*'])->whereColumn(
+                    $hasMany->getQualifiedParentKeyName(),
+                    '=',
+                    $hasMany->getQualifiedForeignKeyName()
+                );
+
+                $builder->selectRaw('id')->whereIn('public', $value);
+            };
+
+            return [$callbackEloquent, $callbackQuery];
+        };
+
+        return [
+            'Find user with post.public in (true)' => $callbackArray([true]),
+            'Find user with post.public in (false)' => $callbackArray([false]),
+        ];
     }
 
     public static function dataProviderWhereRelationCallback()
