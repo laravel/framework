@@ -46,22 +46,18 @@ class Composer
      * @param  \Closure|\Symfony\Component\Console\Output\OutputInterface|null  $output
      * @return bool
      */
-    protected function requirePackages(array $packages, bool $dev = false, Closure|OutputInterface $output = null)
+    public function requirePackages(array $packages, bool $dev = false, Closure|OutputInterface $output = null)
     {
-        $composer = $this->findComposer();
+        $command = collect([
+            ...$this->findComposer(),
+            'require',
+            ...$packages,
+        ])
+        ->when($dev, function ($command) {
+            $command->push('--dev');
+        })->all();
 
-        $command = explode(' ', $composer);
-
-        array_push($command, 'require');
-
-        $command = array_merge(
-            $command,
-            $packages,
-            $dev ? ['--dev'] : [],
-        );
-
-        return 0 === (new Process($command, cwd: $this->workingPath, env: ['COMPOSER_MEMORY_LIMIT' => '-1']))
-            ->setTimeout(null)
+        return 0 === $this->getProcess($command, ['COMPOSER_MEMORY_LIMIT' => '-1'])
             ->run(
                 $output instanceof OutputInterface
                     ? function ($type, $line) use ($output) {
@@ -78,22 +74,18 @@ class Composer
      * @param  \Closure|\Symfony\Component\Console\Output\OutputInterface|null  $output
      * @return bool
      */
-    protected function removePackages(array $packages, bool $dev = false, Closure|OutputInterface $output = null)
+    public function removePackages(array $packages, bool $dev = false, Closure|OutputInterface $output = null)
     {
-        $composer = $this->findComposer();
+        $command = collect([
+            ...$this->findComposer(),
+            'remove',
+            ...$packages,
+        ])
+        ->when($dev, function ($command) {
+            $command->push('--dev');
+        })->all();
 
-        $command = explode(' ', $composer);
-
-        array_push($command, 'remove');
-
-        $command = array_merge(
-            $command,
-            $packages,
-            $dev ? ['--dev'] : [],
-        );
-
-        return 0 === (new Process($command, cwd: $this->workingPath, env: ['COMPOSER_MEMORY_LIMIT' => '-1']))
-            ->setTimeout(null)
+        return 0 === $this->getProcess($command, ['COMPOSER_MEMORY_LIMIT' => '-1'])
             ->run(
                 $output instanceof OutputInterface
                     ? function ($type, $line) use ($output) {
@@ -182,11 +174,12 @@ class Composer
      * Get a new Symfony process instance.
      *
      * @param  array  $command
+     * @param  array  $env
      * @return \Symfony\Component\Process\Process
      */
-    protected function getProcess(array $command)
+    protected function getProcess(array $command, array $env = [])
     {
-        return (new Process($command, $this->workingPath))->setTimeout(null);
+        return (new Process($command, $this->workingPath, $env))->setTimeout(null);
     }
 
     /**
