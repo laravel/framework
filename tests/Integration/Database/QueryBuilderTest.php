@@ -259,6 +259,10 @@ class QueryBuilderTest extends DatabaseTestCase
         $this->assertTrue(DB::table('posts')->where($subQuery, 'Sub query value')->exists());
         $this->assertFalse(DB::table('posts')->where($subQuery, 'Does not match')->exists());
         $this->assertTrue(DB::table('posts')->where($subQuery, '!=', 'Does not match')->exists());
+
+        $this->assertTrue(DB::table('posts')->where(DB::raw('\'Sub query value\''), $subQuery)->exists());
+        $this->assertFalse(DB::table('posts')->where(DB::raw('\'Does not match\''), $subQuery)->exists());
+        $this->assertTrue(DB::table('posts')->where(DB::raw('\'Does not match\''), '!=', $subQuery)->exists());
     }
 
     public function testWhereNot()
