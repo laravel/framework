@@ -20,13 +20,6 @@ class TaggedCache extends Repository
     protected $tags;
 
     /**
-     * List of keys within this namespace.
-     *
-     * @var array
-     */
-    protected $itemKeys = [];
-
-    /**
      * Create a new tagged cache instance.
      *
      * @param  \Illuminate\Contracts\Cache\Store  $store
@@ -124,25 +117,41 @@ class TaggedCache extends Repository
     protected function event($event)
     {
         $itemKey = $this->itemKey($event->key);
-        if ($itemKey !== $this->getMetadataKey() && ($event instanceof KeyWritten || $event instanceof KeyForgotten)) {
-            $itemKeys = $this->getItemKeys();
-            if ($event instanceof KeyWritten && ! in_array($itemKey, $itemKeys)) {
-                $itemKeys[] = $itemKey;
-            } elseif ($event instanceof KeyForgotten && in_array($itemKey, $this->itemKeys)) {
-                $itemKeys = array_values(
-                    array_filter($itemKeys, function ($k) use ($itemKey) {
-                        return $k !== $itemKey;
-                    })
-                );
+        if ($itemKey !== $this->getMetadataKey()) {
+            if ($event instanceof KeyWritten) {
+                $this->onKeyWritten($itemKey);
+            } elseif ($event instanceof KeyForgotten) {
+                $this->onKeyForgotten($itemKey);
             }
-            $this->putItemKeys($itemKeys);
         }
         parent::event($event->setTags($this->tags->getNames()));
     }
 
+    protected function onKeyWritten(string $key): void
+    {
+        $itemKeys = $this->getItemKeys();
+        if (! in_array($key, $itemKeys)) {
+            $itemKeys[] = $key;
+            $this->putItemKeys($itemKeys);
+        }
+    }
+
+    protected function onKeyForgotten(string $key): void
+    {
+        $itemKeys = $this->getItemKeys();
+        if (in_array($key, $itemKeys)) {
+            $itemKeys = array_values(
+                array_filter($itemKeys, function ($k) use ($key) {
+                    return $k !== $key;
+                })
+            );
+            $this->putItemKeys($itemKeys);
+        }
+    }
+
     private function getMetadataKey(): string
     {
-        return $this->taggedItemKey('meta:keys');
+        return $this->itemKey('meta:entries');
     }
 
     private function getItemKeys(): array

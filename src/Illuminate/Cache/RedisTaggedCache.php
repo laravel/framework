@@ -126,4 +126,14 @@ class RedisTaggedCache extends TaggedCache
 
         return true;
     }
+
+    protected function onKeyWritten(string $key): void
+    {
+        // No need to do anything as the Redis store manages the entry list internally.
+    }
+
+    protected function onKeyForgotten(string $key): void
+    {
+        // No need to do anything as the Redis store manages the entry list internally.
+    }
 }
