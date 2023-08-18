@@ -21,7 +21,7 @@ class ConvertEmptyStringsToNullTest extends TestCase
 
         $middleware->handle($request, function (Request $request) {
             $this->assertSame('bar', $request->get('foo'));
-            $this->assertNull($request->get('bar'));
+            $this->assertNull($request->get('baz'));
         });
     }
 }
