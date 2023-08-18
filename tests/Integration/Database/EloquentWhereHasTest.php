@@ -122,9 +122,23 @@ class EloquentWhereHasTest extends DatabaseTestCase
         $this->assertEquals([1], $users->pluck('id')->all());
     }
 
+    public function testWhereRelationIn()
+    {
+        $users = User::whereRelationIn('posts', 'public', [true, false])->get();
+
+        $this->assertEquals([1, 2], $users->pluck('id')->all());
+    }
+
     public function testOrWhereRelation()
     {
         $users = User::whereRelation('posts', 'public', true)->orWhereRelation('posts', 'public', false)->get();
+
+        $this->assertEquals([1, 2], $users->pluck('id')->all());
+    }
+
+    public function testOrWhereRelationIn()
+    {
+        $users = User::whereRelationIn('posts', 'public', [true])->orWhereRelationIn('posts', 'public', [false])->get();
 
         $this->assertEquals([1, 2], $users->pluck('id')->all());
     }
@@ -136,9 +150,23 @@ class EloquentWhereHasTest extends DatabaseTestCase
         $this->assertEquals([1], $texts->pluck('id')->all());
     }
 
+    public function testNestedWhereRelationIn()
+    {
+        $texts = User::whereRelationIn('posts.texts', 'content', ['test', 'test2'])->get();
+
+        $this->assertEquals([1, 2], $texts->pluck('id')->all());
+    }
+
     public function testNestedOrWhereRelation()
     {
         $texts = User::whereRelation('posts.texts', 'content', 'test')->orWhereRelation('posts.texts', 'content', 'test2')->get();
+
+        $this->assertEquals([1, 2], $texts->pluck('id')->all());
+    }
+
+    public function testNestedOrWhereRelationIn()
+    {
+        $texts = User::whereRelationIn('posts.texts', 'content', ['test'])->orWhereRelationIn('posts.texts', 'content', ['test2'])->get();
 
         $this->assertEquals([1, 2], $texts->pluck('id')->all());
     }
