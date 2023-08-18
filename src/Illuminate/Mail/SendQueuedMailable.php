@@ -2,6 +2,7 @@
 
 namespace Illuminate\Mail;
 
+use Illuminate\Bus\Batchable;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Mail\Factory as MailFactory;
 use Illuminate\Contracts\Mail\Mailable as MailableContract;
@@ -10,7 +11,7 @@ use Illuminate\Queue\InteractsWithQueue;
 
 class SendQueuedMailable
 {
-    use Queueable, InteractsWithQueue;
+    use InteractsWithQueue, Queueable, Batchable;
 
     /**
      * The mailable message instance.
@@ -74,6 +75,10 @@ class SendQueuedMailable
      */
     public function handle(MailFactory $factory)
     {
+        if ($this->batch()?->cancelled()) {
+            return;
+        }
+
         $this->mailable->send($factory);
     }
 

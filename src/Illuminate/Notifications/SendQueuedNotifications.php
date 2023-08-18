@@ -2,6 +2,7 @@
 
 namespace Illuminate\Notifications;
 
+use Illuminate\Bus\Batchable;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeEncrypted;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -13,7 +14,7 @@ use Illuminate\Support\Collection;
 
 class SendQueuedNotifications implements ShouldQueue
 {
-    use InteractsWithQueue, Queueable, SerializesModels;
+    use InteractsWithQueue, Queueable, Batchable, SerializesModels;
 
     /**
      * The notifiable entities that should receive the notification.
@@ -109,6 +110,10 @@ class SendQueuedNotifications implements ShouldQueue
      */
     public function handle(ChannelManager $manager)
     {
+        if ($this->batch()?->cancelled()) {
+            return;
+        }
+
         $manager->sendNow($this->notifiables, $this->notification, $this->channels);
     }
 
