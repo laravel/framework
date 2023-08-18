@@ -79,4 +79,3 @@ enum CacheTTL: int
         return $years * self::year();
     }
 }
-
