@@ -213,6 +213,22 @@ class Message
     }
 
     /**
+     * Remove all of the reply-to addresses from the message.
+     *
+     * @return $this
+     */
+    public function forgetReplyTo()
+    {
+        if ($header = $this->message->getHeaders()->get('ReplyTo')) {
+            $this->addAddressDebugHeader('X-Reply-To', $this->message->getReplyTo());
+
+            $header->setAddresses([]);
+        }
+
+        return $this;
+    }
+
+    /**
      * Add a recipient to the message.
      *
      * @param  string|array  $address
