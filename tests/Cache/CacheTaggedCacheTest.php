@@ -208,8 +208,11 @@ class CacheTaggedCacheTest extends TestCase
         $store = new ArrayStore;
         $tags = ['bop'];
         $before = memory_get_usage(true);
+        // Store a 5MB cache value then flush it 100 times, then verify the overall memory usage did not increase
         for ($i = 0; $i < 100; $i++) {
-            $store->tags($tags)->forever('foo', 'bar');
+            $key = str_replace('.', '', uniqid());
+            $value = bin2hex(random_bytes(1024 * 5));
+            $store->tags($tags)->forever($key, $value);
             $store->tags($tags)->flush();
         }
         $after = memory_get_usage(true);
