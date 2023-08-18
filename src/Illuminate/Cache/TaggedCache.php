@@ -161,6 +161,7 @@ class TaggedCache extends Repository
         if (! is_array($keys)) {
             $keys = [];
         }
+
         return $keys;
     }
 
