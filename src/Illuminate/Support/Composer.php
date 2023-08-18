@@ -51,7 +51,7 @@ class Composer
         $command = collect([
             ...$this->findComposer(),
             'require',
-            ...$packages
+            ...$packages,
         ])
         ->when($dev, function ($command) {
             $command->push('--dev');
@@ -79,7 +79,7 @@ class Composer
         $command = collect([
             ...$this->findComposer(),
             'remove',
-            ...$packages
+            ...$packages,
         ])
         ->when($dev, function ($command) {
             $command->push('--dev');
