@@ -247,7 +247,7 @@ trait EnumeratesValues
      * Execute a callback over each item, but not stopping at an exception.
      *
      * @param  callable(TValue, TKey): mixed  $callback
-     * @oaram  bool  $report
+     * @param  bool  $report
      * @return $this
      */
     public function tryEach(callable $callback, bool $report = false)
