@@ -241,6 +241,19 @@ class PendingResourceRegistration
     }
 
     /**
+     * Define a route group with shared options.
+     *
+     * @param  \Closure|array|string  $routes
+     * @return \Illuminate\Routing\PendingResourceRegistration
+     */
+    public function group($routes)
+    {
+        $this->options['group'] = $routes;
+
+        return $this;
+    }
+
+    /**
      * Register the resource route.
      *
      * @return \Illuminate\Routing\RouteCollection

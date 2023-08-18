@@ -891,6 +891,514 @@ class RouteRegistrarTest extends TestCase
         }
     }
 
+    public function testResourceCanGroupRoutes()
+    {
+        $this->router->resource('users', UserControllerStub::class)->group(function (Router $router) {
+            $router->get('me', 'me')->name('me');
+            $router->post('invite', 'invite')->name('invite');
+        });
+
+        $this->router->getRoutes()->refreshNameLookups();
+
+        $me = $this->router->getRoutes()->getByName('users.me');
+        $invite = $this->router->getRoutes()->getByName('users.invite');
+
+        $meRequest = Request::create('users/me', 'GET');
+        $inviteRequest = Request::create('users/invite', 'POST');
+
+        $this->assertNotNull($me);
+        $this->assertSame('users/me', $me->uri());
+        $this->assertSame('users', $me->getPrefix());
+        $this->assertSame('users.me', $me->getName());
+        $this->assertSame(['GET', 'HEAD'], $me->methods());
+        $this->assertSame(UserControllerStub::class.'@me', $me->getAction('controller'));
+        $this->assertTrue($me->matches($meRequest));
+        $this->assertEquals('me', $me->bind($meRequest)->run());
+
+        $this->assertNotNull($invite);
+        $this->assertSame('users/invite', $invite->uri());
+        $this->assertSame('users', $invite->getPrefix());
+        $this->assertSame('users.invite', $invite->getName());
+        $this->assertSame(['POST'], $invite->methods());
+        $this->assertSame(UserControllerStub::class.'@invite', $invite->getAction('controller'));
+        $this->assertTrue($invite->matches($inviteRequest));
+        $this->assertEquals('invite', $invite->bind($inviteRequest)->run());
+    }
+
+    public function testResourceGroupInheritsActionAttributes()
+    {
+        $this->router->middleware('foo')->where(['test' => '[a-z]+'])->group(function () {
+            $this->router->resource('users', UserControllerStub::class)
+                ->middleware('bar')
+                ->withoutMiddleware('foo')
+                ->where(['user' => '\d+'])
+                ->group(function (Router $router) {
+                    $router->get('me', 'me')->name('me');
+                });
+        });
+
+        $this->router->getRoutes()->refreshNameLookups();
+
+        $me = $this->router->getRoutes()->getByName('users.me');
+        $meRequest = Request::create('users/me', 'GET');
+
+        $this->assertNotNull($me);
+        $this->assertSame('users/me', $me->uri());
+        $this->assertSame('/users', $me->getPrefix());
+        $this->assertSame('users.me', $me->getName());
+        $this->assertSame(['GET', 'HEAD'], $me->methods());
+        $this->assertSame(UserControllerStub::class.'@me', $me->getAction('controller'));
+        $this->assertContains('bar', $me->getAction('middleware'));
+        $this->assertSame(['foo'], $me->getAction('excluded_middleware'));
+        $this->assertSame(['test' => '[a-z]+', 'user' => '\d+'], $me->getAction('where'));
+        $this->assertTrue($me->matches($meRequest));
+        $this->assertEquals('me', $me->bind($meRequest)->run());
+    }
+
+    public function testNestedResourceCanGroupRoutes()
+    {
+        $this->router->resource('users.posts', UserPostControllerStub::class)->group(function (Router $router) {
+            $router->get('review', 'review')->name('review');
+            $router->post('archive', 'archive')->name('archive');
+        });
+
+        $this->router->getRoutes()->refreshNameLookups();
+
+        $review = $this->router->getRoutes()->getByName('users.posts.review');
+        $archive = $this->router->getRoutes()->getByName('users.posts.archive');
+
+        $reviewRequest = Request::create('users/{user}/posts/review', 'GET');
+        $archiveRequest = Request::create('users/{user}/posts/archive', 'POST');
+
+        $this->assertNotNull($review);
+        $this->assertSame('users/{user}/posts/review', $review->uri());
+        $this->assertSame('users/{user}/posts', $review->getPrefix());
+        $this->assertSame('users.posts.review', $review->getName());
+        $this->assertSame(['GET', 'HEAD'], $review->methods());
+        $this->assertSame(UserPostControllerStub::class.'@review', $review->getAction('controller'));
+        $this->assertTrue($review->matches($reviewRequest));
+        $this->assertEquals('review', $review->bind($reviewRequest)->run());
+
+        $this->assertNotNull($archive);
+        $this->assertSame('users/{user}/posts/archive', $archive->uri());
+        $this->assertSame('users/{user}/posts', $archive->getPrefix());
+        $this->assertSame('users.posts.archive', $archive->getName());
+        $this->assertSame(['POST'], $archive->methods());
+        $this->assertSame(UserPostControllerStub::class.'@archive', $archive->getAction('controller'));
+        $this->assertTrue($archive->matches($archiveRequest));
+        $this->assertEquals('archive', $archive->bind($archiveRequest)->run());
+    }
+
+    public function testNestedResourceGroupInheritsActionAttributes()
+    {
+        $this->router->middleware('foo')->where(['test' => '[a-z]+'])->group(function () {
+            $this->router->resource('users.posts', UserPostControllerStub::class)
+                ->middleware('bar')
+                ->withoutMiddleware('foo')
+                ->where(['user' => '\d+'])
+                ->group(function (Router $router) {
+                    $router->get('review', 'review')->name('review');
+                });
+        });
+
+        $this->router->getRoutes()->refreshNameLookups();
+
+        $review = $this->router->getRoutes()->getByName('users.posts.review');
+        $reviewRequest = Request::create('users/{user}/posts/review', 'GET');
+
+        $this->assertNotNull($review);
+        $this->assertSame('users/{user}/posts/review', $review->uri());
+        $this->assertSame('/users/{user}/posts', $review->getPrefix());
+        $this->assertSame('users.posts.review', $review->getName());
+        $this->assertSame(['GET', 'HEAD'], $review->methods());
+        $this->assertSame(UserPostControllerStub::class.'@review', $review->getAction('controller'));
+        $this->assertContains('bar', $review->getAction('middleware'));
+        $this->assertSame(['foo'], $review->getAction('excluded_middleware'));
+        $this->assertSame(['test' => '[a-z]+', 'user' => '\d+'], $review->getAction('where'));
+        $this->assertEquals('review', $review->bind($reviewRequest)->run());
+    }
+
+    public function testApiResourceCanGroupRoutes()
+    {
+        $this->router->apiResource('users', UserControllerStub::class)->group(function (Router $router) {
+            $router->get('me', 'me')->name('me');
+            $router->post('invite', 'invite')->name('invite');
+        });
+
+        $this->router->getRoutes()->refreshNameLookups();
+
+        $me = $this->router->getRoutes()->getByName('users.me');
+        $invite = $this->router->getRoutes()->getByName('users.invite');
+
+        $meRequest = Request::create('users/me', 'GET');
+        $inviteRequest = Request::create('users/invite', 'POST');
+
+        $this->assertNotNull($me);
+        $this->assertSame('users/me', $me->uri());
+        $this->assertSame('users', $me->getPrefix());
+        $this->assertSame('users.me', $me->getName());
+        $this->assertSame(['GET', 'HEAD'], $me->methods());
+        $this->assertSame(UserControllerStub::class.'@me', $me->getAction('controller'));
+        $this->assertTrue($me->matches($meRequest));
+        $this->assertEquals('me', $me->bind($meRequest)->run());
+
+        $this->assertNotNull($invite);
+        $this->assertSame('users/invite', $invite->uri());
+        $this->assertSame('users', $invite->getPrefix());
+        $this->assertSame('users.invite', $invite->getName());
+        $this->assertSame(['POST'], $invite->methods());
+        $this->assertSame(UserControllerStub::class.'@invite', $invite->getAction('controller'));
+        $this->assertTrue($invite->matches($inviteRequest));
+        $this->assertEquals('invite', $invite->bind($inviteRequest)->run());
+    }
+
+    public function testApiResourceGroupInheritsActionAttributes()
+    {
+        $this->router->middleware('foo')->where(['test' => '[a-z]+'])->group(function () {
+            $this->router->apiResource('users', UserControllerStub::class)
+                ->middleware('bar')
+                ->withoutMiddleware('foo')
+                ->where(['user' => '\d+'])
+                ->group(function (Router $router) {
+                    $router->get('me', 'me')->name('me');
+                });
+        });
+
+        $this->router->getRoutes()->refreshNameLookups();
+
+        $me = $this->router->getRoutes()->getByName('users.me');
+        $meRequest = Request::create('users/me', 'GET');
+
+        $this->assertNotNull($me);
+        $this->assertSame('users/me', $me->uri());
+        $this->assertSame('/users', $me->getPrefix());
+        $this->assertSame('users.me', $me->getName());
+        $this->assertSame(['GET', 'HEAD'], $me->methods());
+        $this->assertSame(UserControllerStub::class.'@me', $me->getAction('controller'));
+        $this->assertContains('bar', $me->getAction('middleware'));
+        $this->assertSame(['foo'], $me->getAction('excluded_middleware'));
+        $this->assertSame(['test' => '[a-z]+', 'user' => '\d+'], $me->getAction('where'));
+        $this->assertTrue($me->matches($meRequest));
+        $this->assertEquals('me', $me->bind($meRequest)->run());
+    }
+
+    public function testNestedApiResourceCanGroupRoutes()
+    {
+        $this->router->apiResource('users.posts', UserPostControllerStub::class)->group(function (Router $router) {
+            $router->get('review', 'review')->name('review');
+            $router->post('archive', 'archive')->name('archive');
+        });
+
+        $this->router->getRoutes()->refreshNameLookups();
+
+        $review = $this->router->getRoutes()->getByName('users.posts.review');
+        $archive = $this->router->getRoutes()->getByName('users.posts.archive');
+
+        $reviewRequest = Request::create('users/{user}/posts/review', 'GET');
+        $archiveRequest = Request::create('users/{user}/posts/archive', 'POST');
+
+        $this->assertNotNull($review);
+        $this->assertSame('users/{user}/posts/review', $review->uri());
+        $this->assertSame('users/{user}/posts', $review->getPrefix());
+        $this->assertSame('users.posts.review', $review->getName());
+        $this->assertSame(['GET', 'HEAD'], $review->methods());
+        $this->assertSame(UserPostControllerStub::class.'@review', $review->getAction('controller'));
+        $this->assertTrue($review->matches($reviewRequest));
+        $this->assertEquals('review', $review->bind($reviewRequest)->run());
+
+        $this->assertNotNull($archive);
+        $this->assertSame('users/{user}/posts/archive', $archive->uri());
+        $this->assertSame('users/{user}/posts', $archive->getPrefix());
+        $this->assertSame('users.posts.archive', $archive->getName());
+        $this->assertSame(['POST'], $archive->methods());
+        $this->assertSame(UserPostControllerStub::class.'@archive', $archive->getAction('controller'));
+        $this->assertTrue($archive->matches($archiveRequest));
+        $this->assertEquals('archive', $archive->bind($archiveRequest)->run());
+    }
+
+    public function testNestedApiResourceGroupInheritsActionAttributes()
+    {
+        $this->router->middleware('foo')->where(['test' => '[a-z]+'])->group(function () {
+            $this->router->apiResource('users.posts', UserPostControllerStub::class)
+                ->middleware('bar')
+                ->withoutMiddleware('foo')
+                ->where(['user' => '\d+'])
+                ->group(function (Router $router) {
+                    $router->get('review', 'review')->name('review');
+                });
+        });
+
+        $this->router->getRoutes()->refreshNameLookups();
+
+        $review = $this->router->getRoutes()->getByName('users.posts.review');
+        $reviewRequest = Request::create('users/{user}/posts/review', 'GET');
+
+        $this->assertNotNull($review);
+        $this->assertSame('users/{user}/posts/review', $review->uri());
+        $this->assertSame('/users/{user}/posts', $review->getPrefix());
+        $this->assertSame('users.posts.review', $review->getName());
+        $this->assertSame(['GET', 'HEAD'], $review->methods());
+        $this->assertSame(UserPostControllerStub::class.'@review', $review->getAction('controller'));
+        $this->assertContains('bar', $review->getAction('middleware'));
+        $this->assertSame(['foo'], $review->getAction('excluded_middleware'));
+        $this->assertSame(['test' => '[a-z]+', 'user' => '\d+'], $review->getAction('where'));
+        $this->assertEquals('review', $review->bind($reviewRequest)->run());
+    }
+
+    public function testSingletonCanGroupRoutes()
+    {
+        $this->router->singleton('users', UserControllerStub::class)->group(function (Router $router) {
+            $router->get('me', 'me')->name('me');
+            $router->post('invite', 'invite')->name('invite');
+        });
+
+        $this->router->getRoutes()->refreshNameLookups();
+
+        $me = $this->router->getRoutes()->getByName('users.me');
+        $invite = $this->router->getRoutes()->getByName('users.invite');
+
+        $meRequest = Request::create('users/me', 'GET');
+        $inviteRequest = Request::create('users/invite', 'POST');
+
+        $this->assertNotNull($me);
+        $this->assertSame('users/me', $me->uri());
+        $this->assertSame('users', $me->getPrefix());
+        $this->assertSame('users.me', $me->getName());
+        $this->assertSame(['GET', 'HEAD'], $me->methods());
+        $this->assertSame(UserControllerStub::class.'@me', $me->getAction('controller'));
+        $this->assertTrue($me->matches($meRequest));
+        $this->assertEquals('me', $me->bind($meRequest)->run());
+
+        $this->assertNotNull($invite);
+        $this->assertSame('users/invite', $invite->uri());
+        $this->assertSame('users', $invite->getPrefix());
+        $this->assertSame('users.invite', $invite->getName());
+        $this->assertSame(['POST'], $invite->methods());
+        $this->assertSame(UserControllerStub::class.'@invite', $invite->getAction('controller'));
+        $this->assertTrue($invite->matches($inviteRequest));
+        $this->assertEquals('invite', $invite->bind($inviteRequest)->run());
+    }
+
+    public function testSingletonGroupInheritsActionAttributes()
+    {
+        $this->router->middleware('foo')->where(['test' => '[a-z]+'])->group(function () {
+            $this->router->singleton('users', UserControllerStub::class)
+                ->middleware('bar')
+                ->withoutMiddleware('foo')
+                ->where(['user' => '\d+'])
+                ->group(function (Router $router) {
+                    $router->get('me', 'me')->name('me');
+                });
+        });
+
+        $this->router->getRoutes()->refreshNameLookups();
+
+        $me = $this->router->getRoutes()->getByName('users.me');
+        $meRequest = Request::create('users/me', 'GET');
+
+        $this->assertNotNull($me);
+        $this->assertSame('users/me', $me->uri());
+        $this->assertSame('/users', $me->getPrefix());
+        $this->assertSame('users.me', $me->getName());
+        $this->assertSame(['GET', 'HEAD'], $me->methods());
+        $this->assertSame(UserControllerStub::class.'@me', $me->getAction('controller'));
+        $this->assertContains('bar', $me->getAction('middleware'));
+        $this->assertSame(['foo'], $me->getAction('excluded_middleware'));
+        $this->assertSame(['test' => '[a-z]+', 'user' => '\d+'], $me->getAction('where'));
+        $this->assertTrue($me->matches($meRequest));
+        $this->assertEquals('me', $me->bind($meRequest)->run());
+    }
+
+    public function testNestedSingletonCanGroupRoutes()
+    {
+        $this->router->singleton('users.posts', UserPostControllerStub::class)->group(function (Router $router) {
+            $router->get('review', 'review')->name('review');
+            $router->post('archive', 'archive')->name('archive');
+        });
+
+        $this->router->getRoutes()->refreshNameLookups();
+
+        $review = $this->router->getRoutes()->getByName('users.posts.review');
+        $archive = $this->router->getRoutes()->getByName('users.posts.archive');
+
+        $reviewRequest = Request::create('users/{user}/posts/review', 'GET');
+        $archiveRequest = Request::create('users/{user}/posts/archive', 'POST');
+
+        $this->assertNotNull($review);
+        $this->assertSame('users/{user}/posts/review', $review->uri());
+        $this->assertSame('users/{user}/posts', $review->getPrefix());
+        $this->assertSame('users.posts.review', $review->getName());
+        $this->assertSame(['GET', 'HEAD'], $review->methods());
+        $this->assertSame(UserPostControllerStub::class.'@review', $review->getAction('controller'));
+        $this->assertTrue($review->matches($reviewRequest));
+        $this->assertEquals('review', $review->bind($reviewRequest)->run());
+
+        $this->assertNotNull($archive);
+        $this->assertSame('users/{user}/posts/archive', $archive->uri());
+        $this->assertSame('users/{user}/posts', $archive->getPrefix());
+        $this->assertSame('users.posts.archive', $archive->getName());
+        $this->assertSame(['POST'], $archive->methods());
+        $this->assertSame(UserPostControllerStub::class.'@archive', $archive->getAction('controller'));
+        $this->assertTrue($archive->matches($archiveRequest));
+        $this->assertEquals('archive', $archive->bind($archiveRequest)->run());
+    }
+
+    public function testNestedSingletonGroupInheritsActionAttributes()
+    {
+        $this->router->middleware('foo')->where(['test' => '[a-z]+'])->group(function () {
+            $this->router->singleton('users.posts', UserPostControllerStub::class)
+                ->middleware('bar')
+                ->withoutMiddleware('foo')
+                ->where(['user' => '\d+'])
+                ->group(function (Router $router) {
+                    $router->get('review', 'review')->name('review');
+                });
+        });
+
+        $this->router->getRoutes()->refreshNameLookups();
+
+        $review = $this->router->getRoutes()->getByName('users.posts.review');
+        $reviewRequest = Request::create('users/{user}/posts/review', 'GET');
+
+        $this->assertNotNull($review);
+        $this->assertSame('users/{user}/posts/review', $review->uri());
+        $this->assertSame('/users/{user}/posts', $review->getPrefix());
+        $this->assertSame('users.posts.review', $review->getName());
+        $this->assertSame(['GET', 'HEAD'], $review->methods());
+        $this->assertSame(UserPostControllerStub::class.'@review', $review->getAction('controller'));
+        $this->assertContains('bar', $review->getAction('middleware'));
+        $this->assertSame(['foo'], $review->getAction('excluded_middleware'));
+        $this->assertSame(['test' => '[a-z]+', 'user' => '\d+'], $review->getAction('where'));
+        $this->assertEquals('review', $review->bind($reviewRequest)->run());
+    }
+
+    public function testApiSingletonCanGroupRoutes()
+    {
+        $this->router->apiSingleton('users', UserControllerStub::class)->group(function (Router $router) {
+            $router->get('me', 'me')->name('me');
+            $router->post('invite', 'invite')->name('invite');
+        });
+
+        $this->router->getRoutes()->refreshNameLookups();
+
+        $me = $this->router->getRoutes()->getByName('users.me');
+        $invite = $this->router->getRoutes()->getByName('users.invite');
+
+        $meRequest = Request::create('users/me', 'GET');
+        $inviteRequest = Request::create('users/invite', 'POST');
+
+        $this->assertNotNull($me);
+        $this->assertSame('users/me', $me->uri());
+        $this->assertSame('users', $me->getPrefix());
+        $this->assertSame('users.me', $me->getName());
+        $this->assertSame(['GET', 'HEAD'], $me->methods());
+        $this->assertSame(UserControllerStub::class.'@me', $me->getAction('controller'));
+        $this->assertTrue($me->matches($meRequest));
+        $this->assertEquals('me', $me->bind($meRequest)->run());
+
+        $this->assertNotNull($invite);
+        $this->assertSame('users/invite', $invite->uri());
+        $this->assertSame('users', $invite->getPrefix());
+        $this->assertSame('users.invite', $invite->getName());
+        $this->assertSame(['POST'], $invite->methods());
+        $this->assertSame(UserControllerStub::class.'@invite', $invite->getAction('controller'));
+        $this->assertTrue($invite->matches($inviteRequest));
+        $this->assertEquals('invite', $invite->bind($inviteRequest)->run());
+    }
+
+    public function testApiSingletonGroupInheritsActionAttributes()
+    {
+        $this->router->middleware('foo')->where(['test' => '[a-z]+'])->group(function () {
+            $this->router->apiSingleton('users', UserControllerStub::class)
+                ->middleware('bar')
+                ->withoutMiddleware('foo')
+                ->where(['user' => '\d+'])
+                ->group(function (Router $router) {
+                    $router->get('me', 'me')->name('me');
+                });
+        });
+
+        $this->router->getRoutes()->refreshNameLookups();
+
+        $me = $this->router->getRoutes()->getByName('users.me');
+        $meRequest = Request::create('users/me', 'GET');
+
+        $this->assertNotNull($me);
+        $this->assertSame('users/me', $me->uri());
+        $this->assertSame('/users', $me->getPrefix());
+        $this->assertSame('users.me', $me->getName());
+        $this->assertSame(['GET', 'HEAD'], $me->methods());
+        $this->assertSame(UserControllerStub::class.'@me', $me->getAction('controller'));
+        $this->assertContains('bar', $me->getAction('middleware'));
+        $this->assertSame(['foo'], $me->getAction('excluded_middleware'));
+        $this->assertSame(['test' => '[a-z]+', 'user' => '\d+'], $me->getAction('where'));
+        $this->assertTrue($me->matches($meRequest));
+        $this->assertEquals('me', $me->bind($meRequest)->run());
+    }
+
+    public function testNestedApiSingletonCanGroupRoutes()
+    {
+        $this->router->apiSingleton('users.posts', UserPostControllerStub::class)->group(function (Router $router) {
+            $router->get('review', 'review')->name('review');
+            $router->post('archive', 'archive')->name('archive');
+        });
+
+        $this->router->getRoutes()->refreshNameLookups();
+
+        $review = $this->router->getRoutes()->getByName('users.posts.review');
+        $archive = $this->router->getRoutes()->getByName('users.posts.archive');
+
+        $reviewRequest = Request::create('users/{user}/posts/review', 'GET');
+        $archiveRequest = Request::create('users/{user}/posts/archive', 'POST');
+
+        $this->assertNotNull($review);
+        $this->assertSame('users/{user}/posts/review', $review->uri());
+        $this->assertSame('users/{user}/posts', $review->getPrefix());
+        $this->assertSame('users.posts.review', $review->getName());
+        $this->assertSame(['GET', 'HEAD'], $review->methods());
+        $this->assertSame(UserPostControllerStub::class.'@review', $review->getAction('controller'));
+        $this->assertTrue($review->matches($reviewRequest));
+        $this->assertEquals('review', $review->bind($reviewRequest)->run());
+
+        $this->assertNotNull($archive);
+        $this->assertSame('users/{user}/posts/archive', $archive->uri());
+        $this->assertSame('users/{user}/posts', $archive->getPrefix());
+        $this->assertSame('users.posts.archive', $archive->getName());
+        $this->assertSame(['POST'], $archive->methods());
+        $this->assertSame(UserPostControllerStub::class.'@archive', $archive->getAction('controller'));
+        $this->assertTrue($archive->matches($archiveRequest));
+        $this->assertEquals('archive', $archive->bind($archiveRequest)->run());
+    }
+
+    public function testNestedApiSingletonGroupInheritsActionAttributes()
+    {
+        $this->router->middleware('foo')->where(['test' => '[a-z]+'])->group(function () {
+            $this->router->apiSingleton('users.posts', UserPostControllerStub::class)
+                ->middleware('bar')
+                ->withoutMiddleware('foo')
+                ->where(['user' => '\d+'])
+                ->group(function (Router $router) {
+                    $router->get('review', 'review')->name('review');
+                });
+        });
+
+        $this->router->getRoutes()->refreshNameLookups();
+
+        $review = $this->router->getRoutes()->getByName('users.posts.review');
+        $reviewRequest = Request::create('users/{user}/posts/review', 'GET');
+
+        $this->assertNotNull($review);
+        $this->assertSame('users/{user}/posts/review', $review->uri());
+        $this->assertSame('/users/{user}/posts', $review->getPrefix());
+        $this->assertSame('users.posts.review', $review->getName());
+        $this->assertSame(['GET', 'HEAD'], $review->methods());
+        $this->assertSame(UserPostControllerStub::class.'@review', $review->getAction('controller'));
+        $this->assertContains('bar', $review->getAction('middleware'));
+        $this->assertSame(['foo'], $review->getAction('excluded_middleware'));
+        $this->assertSame(['test' => '[a-z]+', 'user' => '\d+'], $review->getAction('where'));
+        $this->assertEquals('review', $review->bind($reviewRequest)->run());
+    }
+
     public function testWhereNumberRegistration()
     {
         $wheres = ['foo' => '[0-9]+', 'bar' => '[0-9]+'];
@@ -1357,4 +1865,30 @@ class InvokableRouteRegistrarControllerStub
 class RouteRegistrarMiddlewareStub
 {
     //
+}
+
+class UserControllerStub
+{
+    public function me()
+    {
+        return 'me';
+    }
+
+    public function invite()
+    {
+        return 'invite';
+    }
+}
+
+class UserPostControllerStub
+{
+    public function review()
+    {
+        return 'review';
+    }
+
+    public function archive()
+    {
+        return 'archive';
+    }
 }

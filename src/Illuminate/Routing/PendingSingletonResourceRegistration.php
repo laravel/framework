@@ -213,6 +213,19 @@ class PendingSingletonResourceRegistration
     }
 
     /**
+     * Define a route group with shared options.
+     *
+     * @param  \Closure|array|string  $routes
+     * @return \Illuminate\Routing\PendingSingletonResourceRegistration
+     */
+    public function group($routes)
+    {
+        $this->options['group'] = $routes;
+
+        return $this;
+    }
+
+    /**
      * Register the singleton resource route.
      *
      * @return \Illuminate\Routing\RouteCollection

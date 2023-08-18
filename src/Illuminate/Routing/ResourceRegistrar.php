@@ -83,6 +83,8 @@ class ResourceRegistrar
             $this->parameters = $options['parameters'];
         }
 
+        $this->registerGroup($name, $controller, $options);
+
         // If the resource name contains a slash, we will assume the developer wishes to
         // register these resource routes with a prefix so we will set that up out of
         // the box so they don't have to mess with it. Otherwise, we will continue.
@@ -136,6 +138,8 @@ class ResourceRegistrar
         if (isset($options['parameters']) && ! isset($this->parameters)) {
             $this->parameters = $options['parameters'];
         }
+
+        $this->registerGroup($name, $controller, $options);
 
         // If the resource name contains a slash, we will assume the developer wishes to
         // register these singleton routes with a prefix so we will set that up out of
@@ -663,6 +667,30 @@ class ResourceRegistrar
         $prefix = isset($options['as']) ? $options['as'].'.' : '';
 
         return trim(sprintf('%s%s.%s', $prefix, $name, $method), '.');
+    }
+
+    /**
+     * Register the resource group by sharing common options.
+     *
+     * @param  string  $name
+     * @param  string  $controller
+     * @param  array  $options
+     * @return void
+     */
+    protected function registerGroup($name, $controller, $options)
+    {
+        if (! isset($options['group'])) {
+            return;
+        }
+
+        $attributes = $this->getResourceAction($name, $controller, '', $options);
+
+        $attributes['as'] .= '.';
+        $attributes['prefix'] = $this->getResourceUri($name);
+        $attributes['controller'] = $controller;
+        unset($attributes['uses']);
+
+        $this->router->group($attributes, $options['group']);
     }
 
     /**
