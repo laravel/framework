@@ -8199,7 +8199,7 @@ class ValidationValidatorTest extends TestCase
         $this->assertSame($expectedValidatedData, $validator->validated());
     }
 
-    public function testExcludeBeforeRequiredIf( )
+    public function testExcludeBeforeRequiredIf()
     {
         $validator = new Validator(
             $this->getIlluminateArrayTranslator(),
