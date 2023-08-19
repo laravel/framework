@@ -50,7 +50,7 @@ class Authenticate implements AuthenticatesRequests
      *
      * @throws \Illuminate\Auth\AuthenticationException
      */
-    public function handle($request, Closure $next, ...$guards)
+    public function handle(Request $request, Closure $next, ...$guards)
     {
         $this->authenticate($request, $guards);
 

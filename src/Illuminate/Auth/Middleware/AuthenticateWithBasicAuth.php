@@ -4,6 +4,7 @@ namespace Illuminate\Auth\Middleware;
 
 use Closure;
 use Illuminate\Contracts\Auth\Factory as AuthFactory;
+use Illuminate\Http\Request;
 
 class AuthenticateWithBasicAuth
 {
@@ -50,7 +51,7 @@ class AuthenticateWithBasicAuth
      *
      * @throws \Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException
      */
-    public function handle($request, Closure $next, $guard = null, $field = null)
+    public function handle(Request $request, Closure $next, $guard = null, $field = null)
     {
         $this->auth->guard($guard)->basic($field ?: 'email');
 
