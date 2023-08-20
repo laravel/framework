@@ -104,11 +104,7 @@ class Composer
      */
     protected function hasPackage($package)
     {
-        $composerFile = "{$this->workingPath}/composer.json";
-
-        if (! file_exists($composerFile)) {
-            throw new RuntimeException("Unable to locate `composer.json` file at [{$this->workingPath}].");
-        }
+        $composerFile = $this->findComposerFile();
 
         $composer = json_decode(file_get_contents($composerFile), true);
 
@@ -126,11 +122,7 @@ class Composer
      */
     public function modify(callable $callback)
     {
-        $composerFile = "{$this->workingPath}/composer.json";
-
-        if (! file_exists($composerFile)) {
-            throw new RuntimeException("Unable to locate `composer.json` file at [{$this->workingPath}].");
-        }
+        $composerFile = $this->findComposerFile();
 
         $composer = json_decode(file_get_contents($composerFile), true, 512, JSON_THROW_ON_ERROR);
 
@@ -141,6 +133,24 @@ class Composer
                 JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
             )
         );
+    }
+
+    /**
+     * Get the path to the "composer.json" file.
+     *
+     * @return string
+     *
+     * @throw \RuntimeException
+     */
+    public function findComposerFile()
+    {
+        $composerFile = "{$this->workingPath}/composer.json";
+
+        if (! file_exists($composerFile)) {
+            throw new RuntimeException("Unable to locate `composer.json` file at [{$this->workingPath}].");
+        }
+
+        return $composerFile;
     }
 
     /**
