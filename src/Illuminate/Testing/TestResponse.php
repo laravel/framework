@@ -663,7 +663,7 @@ class TestResponse implements ArrayAccess
     }
 
     /**
-     * Assert that the given path in the response contains all the expected values without looking at the order.
+     * Assert that the given path in the response contains all of the expected values without looking at the order.
      *
      * @param  string  $path
      * @param  array  $expect
