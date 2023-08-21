@@ -787,6 +787,26 @@ class SupportLazyCollectionIsLazyTest extends TestCase
         });
     }
 
+    public function testOnlyDoesNotCloseGenerators()
+    {
+        $generator = function () {
+            yield 'foo' => 1;
+            yield 'bar' => 2;
+            yield 'baz' => 3;
+        };
+
+        $actual = LazyCollection::times(2, fn () => new LazyCollection(fn () => yield from $generator()))
+            ->map(fn (LazyCollection $nestedCollection) => $nestedCollection->only('foo', 'bar'))
+            ->toArray();
+
+        $expected = [
+            ['foo' => 1, 'bar' => 2],
+            ['foo' => 1, 'bar' => 2],
+        ];
+
+        $this->assertSame($expected, $actual);
+    }
+
     public function testPadIsLazy()
     {
         $this->assertDoesNotEnumerate(function ($collection) {

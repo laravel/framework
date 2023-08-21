@@ -943,10 +943,6 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
                         yield $key => $value;
 
                         unset($keys[$key]);
-
-                        if (empty($keys)) {
-                            break;
-                        }
                     }
                 }
             }
