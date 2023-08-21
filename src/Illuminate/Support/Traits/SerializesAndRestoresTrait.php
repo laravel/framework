@@ -2,8 +2,6 @@
 
 namespace Illuminate\Support\Traits;
 
-use Illuminate\Support\Testing\Fakes\QueueFake;
-
 trait SerializesAndRestoresTrait
 {
     /**
@@ -19,7 +17,7 @@ trait SerializesAndRestoresTrait
      * @param  bool  $serializeAndRestore
      * @return $this
      */
-    public function serializeAndRestoreJobs(bool $serializeAndRestore = true): static
+    public function serializeAndRestoreItems(bool $serializeAndRestore = true): static
     {
         $this->serializeAndRestore = $serializeAndRestore;
 
@@ -27,13 +25,13 @@ trait SerializesAndRestoresTrait
     }
 
     /**
-     * Serialize and then unserialize the job to simulate the queueing process.
+     * Serialize and then unserialize the item to simulate the queueing process.
      *
-     * @param  mixed  $job
+     * @param  mixed  $queueable
      * @return mixed
      */
-    protected function serializeAndRestore($job)
+    protected function serializeAndRestoreQueueable($queueable)
     {
-        return unserialize(serialize($job));
+        return unserialize(serialize($queueable));
     }
 }
