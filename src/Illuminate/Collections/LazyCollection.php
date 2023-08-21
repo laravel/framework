@@ -511,6 +511,25 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     }
 
     /**
+     * Replicates the items in the collection and returns the new collection.
+     *
+     * @param int $times
+     * @return static<TValue, TKey>
+     */
+    public function replicate(int $times): static
+    {
+        return new static(function () use ($times) {
+            for ($i = 0; $i < $times; $i++)
+            {
+                foreach ($this as $item)
+                {
+                    yield $item;
+                }
+            }
+        });
+    }
+
+    /**
      * Get an item by key.
      *
      * @template TGetDefault

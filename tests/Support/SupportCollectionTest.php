@@ -2135,6 +2135,16 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testReplicate($collection)
+    {
+        $data = new $collection([1, 2, 3]);
+        $copiedData = $data->replicate(3);
+        $this->assertEquals([1, 2, 3, 1, 2, 3, 1, 2, 3], $copiedData->toArray());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testChunk($collection)
     {
         $data = new $collection([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);

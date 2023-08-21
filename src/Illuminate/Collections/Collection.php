@@ -426,6 +426,26 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     }
 
     /**
+     * Replicates the items in the collection and returns the new collection.
+     *
+     * @param int $times
+     * @return static<TValue, TKey>
+     */
+    public function replicate(int $times): static
+    {
+        $result = [];
+        for ($i = 0; $i < $times; $i++)
+        {
+            foreach ($this->items as $item)
+            {
+                $result[] = $item;
+            }
+        }
+
+        return new static($result);
+    }
+
+    /**
      * Remove an item from the collection by key.
      *
      * \Illuminate\Contracts\Support\Arrayable<array-key, TValue>|iterable<array-key, TKey>|TKey  $keys
