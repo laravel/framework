@@ -782,7 +782,7 @@ class SupportLazyCollectionIsLazyTest extends TestCase
             $collection->only(5, 6, 7);
         });
 
-        $this->assertEnumerates(8, function ($collection) {
+        $this->assertEnumeratesOnce(function ($collection) {
             $collection->only(5, 6, 7)->all();
         });
     }
