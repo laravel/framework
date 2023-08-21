@@ -39,6 +39,22 @@ class Composer
     }
 
     /**
+     * Determine if the given Composer package is installed.
+     *
+     * @param  string  $package
+     * @return bool
+     *
+     * @throw \RuntimeException
+     */
+    protected function hasPackage($package)
+    {
+        $composer = json_decode(file_get_contents($this->findComposerFile()), true);
+
+        return array_key_exists($package, $composer['require'] ?? [])
+            || array_key_exists($package, $composer['require-dev'] ?? []);
+    }
+
+    /**
      * Install the given Composer packages into the application.
      *
      * @param  array<int, string>  $packages
@@ -104,11 +120,7 @@ class Composer
      */
     public function modify(callable $callback)
     {
-        $composerFile = "{$this->workingPath}/composer.json";
-
-        if (! file_exists($composerFile)) {
-            throw new RuntimeException("Unable to locate `composer.json` file at [{$this->workingPath}].");
-        }
+        $composerFile = $this->findComposerFile();
 
         $composer = json_decode(file_get_contents($composerFile), true, 512, JSON_THROW_ON_ERROR);
 
@@ -147,7 +159,7 @@ class Composer
     }
 
     /**
-     * Get the composer command for the environment.
+     * Get the Composer binary / command for the environment.
      *
      * @return array
      */
@@ -158,6 +170,24 @@ class Composer
         }
 
         return ['composer'];
+    }
+
+    /**
+     * Get the path to the "composer.json" file.
+     *
+     * @return string
+     *
+     * @throw \RuntimeException
+     */
+    protected function findComposerFile()
+    {
+        $composerFile = "{$this->workingPath}/composer.json";
+
+        if (! file_exists($composerFile)) {
+            throw new RuntimeException("Unable to locate `composer.json` file at [{$this->workingPath}].");
+        }
+
+        return $composerFile;
     }
 
     /**
