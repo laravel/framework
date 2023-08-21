@@ -9,11 +9,12 @@ use Illuminate\Queue\CallQueuedClosure;
 use Illuminate\Queue\QueueManager;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Traits\ReflectsClosures;
+use Illuminate\Support\Traits\SerializesAndRestoresTrait;
 use PHPUnit\Framework\Assert as PHPUnit;
 
 class QueueFake extends QueueManager implements Fake, Queue
 {
-    use ReflectsClosures;
+    use ReflectsClosures, SerializesAndRestoresTrait;
 
     /**
      * The original queue manager.
@@ -44,13 +45,6 @@ class QueueFake extends QueueManager implements Fake, Queue
     protected $jobs = [];
 
     /**
-     * Whether jobs should be serialized and then restored before checking assertions.
-     *
-     * @var bool
-     */
-    protected bool $serializeAndRestore = false;
-
-    /**
      * Create a new fake queue instance.
      *
      * @param  \Illuminate\Contracts\Foundation\Application  $app
@@ -65,19 +59,6 @@ class QueueFake extends QueueManager implements Fake, Queue
         $this->jobsToFake = Collection::wrap($jobsToFake);
         $this->jobsToBeQueued = Collection::make();
         $this->queue = $queue;
-    }
-
-    /**
-     * Set if the job should serialize and restore before checking assertions.
-     *
-     * @param  bool  $serializeAndRestore
-     * @return $this
-     */
-    public function serializeAndRestoreJobs(bool $serializeAndRestore = true): self
-    {
-        $this->serializeAndRestore = $serializeAndRestore;
-
-        return $this;
     }
 
     /**
@@ -381,17 +362,6 @@ class QueueFake extends QueueManager implements Fake, Queue
                 ? $this->queue->connection($job->connection)->push($job, $data, $queue)
                 : $this->queue->push($job, $data, $queue);
         }
-    }
-
-    /**
-     * Serialize and then unserialize the job to simulate the queueing process.
-     *
-     * @param $job
-     * @return mixed
-     */
-    protected function serializeAndRestore($job)
-    {
-        return unserialize(serialize($job));
     }
 
     /**
