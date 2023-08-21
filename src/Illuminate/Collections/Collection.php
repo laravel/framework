@@ -426,7 +426,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     }
 
     /**
-     * Replicates the items in the collection and returns the new collection.
+     * Replicate the items in the collection and returns the new collection.
      *
      * @param int $times
      * @return static<TValue, TKey>
