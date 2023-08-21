@@ -236,28 +236,26 @@ if (! function_exists('retry')) {
 
         if (is_array($times)) {
             $backoff = $times;
-
             $times = count($times) + 1;
         }
 
-        beginning:
-        $attempts++;
-        $times--;
+        while ($times > 0) {
+            $attempts++;
+            $times--;
 
-        try {
-            return $callback($attempts);
-        } catch (Exception $e) {
-            if ($times < 1 || ($when && ! $when($e))) {
-                throw $e;
+            try {
+                return $callback($attempts);
+            } catch (Exception $e) {
+                if ($times < 1 || ($when && ! $when($e))) {
+                    throw $e;
+                }
+
+                $sleepMilliseconds = $backoff[$attempts - 1] ?? $sleepMilliseconds;
+
+                if ($sleepMilliseconds) {
+                    Sleep::usleep(value($sleepMilliseconds, $attempts, $e) * 1000);
+                }
             }
-
-            $sleepMilliseconds = $backoff[$attempts - 1] ?? $sleepMilliseconds;
-
-            if ($sleepMilliseconds) {
-                Sleep::usleep(value($sleepMilliseconds, $attempts, $e) * 1000);
-            }
-
-            goto beginning;
         }
     }
 }
