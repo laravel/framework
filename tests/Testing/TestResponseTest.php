@@ -1219,6 +1219,29 @@ class TestResponseTest extends TestCase
         $response->assertJsonPath('data.foo', fn ($value) => $value === null);
     }
 
+    public function testAssertJsonPathCanonicalizing()
+    {
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceStub));
+
+        $response->assertJsonPathCanonicalizing('*.foo', ['foo 0', 'foo 1', 'foo 2', 'foo 3']);
+        $response->assertJsonPathCanonicalizing('*.foo', ['foo 1', 'foo 0', 'foo 3', 'foo 2']);
+
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceWithIntegersStub));
+
+        $response->assertJsonPathCanonicalizing('*.id', [10, 20, 30]);
+        $response->assertJsonPathCanonicalizing('*.id', [30, 10, 20]);
+    }
+
+    public function testAssertJsonPathCanonicalizingCanFail()
+    {
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceStub));
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Failed asserting that two arrays are equal.');
+
+        $response->assertJsonPathCanonicalizing('*.foo', ['foo 0', 'foo 2', 'foo 3']);
+    }
+
     public function testAssertJsonFragment()
     {
         $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceStub));
