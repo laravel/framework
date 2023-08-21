@@ -7,6 +7,7 @@ use ArrayIterator;
 use Illuminate\Contracts\Support\CanBeEscapedWhenCastToString;
 use Illuminate\Support\Traits\EnumeratesValues;
 use Illuminate\Support\Traits\Macroable;
+use NumberFormatter;
 use stdClass;
 use Traversable;
 
@@ -147,6 +148,20 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
 
         return $sorted->filter(fn ($value) => $value == $highestValue)
             ->sort()->keys()->all();
+    }
+
+    /**
+     * Get the ordinal number of the given items.
+     *
+     * @param string|null $locale
+     * @return self
+    */
+    public function ordinal($locale = null)
+    {
+        return $this
+            ->filter(fn ($item) => ! is_null($item))
+            ->map(fn ($value) => (new NumberFormatter($locale ?? Carbon::getLocale(), NumberFormatter::ORDINAL))->format($value))
+            ->values();
     }
 
     /**

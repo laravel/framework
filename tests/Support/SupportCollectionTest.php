@@ -24,6 +24,7 @@ use ReflectionClass;
 use stdClass;
 use Symfony\Component\VarDumper\VarDumper;
 use Traversable;
+use TypeError;
 use UnexpectedValueException;
 
 if (PHP_VERSION_ID >= 80100) {
@@ -4606,6 +4607,35 @@ class SupportCollectionTest extends TestCase
     {
         $data = new $collection;
         $this->assertNull($data->mode());
+    }
+
+    /**
+    * @dataProvider collectionClassProvider
+    */
+    public function testOrdinalNumberOnEmptyCollectionReturnsEmpty($collection)
+    {
+        $data = new $collection;
+        $this->assertSame([], $data->ordinal()->toArray());
+    }
+
+    /**
+    * @dataProvider collectionClassProvider
+    */
+    public function testOrdinalNumber($collection)
+    {
+        $data = new $collection([1,2,3]);
+        $this->assertEquals(['1st', '2nd', '3rd'], $data->ordinal()->toArray());
+    }
+
+    /**
+    * @dataProvider collectionClassProvider
+    */
+    public function testItThrowsExceptionWhenPasstheStringItems($collection)
+    {
+        $data = new $collection(['first', 'second', 'third']);
+        $this->expectException(TypeError::class);
+        $this->expectExceptionMessage('NumberFormatter::format(): Argument #1 ($num) must be of type int|float, string given');
+        $data->ordinal();
     }
 
     /**

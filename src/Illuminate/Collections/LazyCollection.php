@@ -188,6 +188,17 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     }
 
     /**
+     * Get the ordinal number of the given items.
+     *
+     * @param  string|null  $locale
+     * @return self
+     */
+    public function ordinal($locale = null)
+    {
+        return $this->collect()->ordinal($locale);
+    }
+
+    /**
      * Collapse the collection of items into a single array.
      *
      * @return static<int, mixed>
