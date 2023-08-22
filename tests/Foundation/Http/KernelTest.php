@@ -10,6 +10,13 @@ use PHPUnit\Framework\TestCase;
 
 class KernelTest extends TestCase
 {
+    public function testGetMiddleware()
+    {
+        $kernel = new Kernel($this->getApplication(), $this->getRouter());
+
+        $this->assertEquals([], $kernel->getMiddleware());
+    }
+
     public function testGetMiddlewareGroups()
     {
         $kernel = new Kernel($this->getApplication(), $this->getRouter());

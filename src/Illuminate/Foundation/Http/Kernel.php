@@ -510,6 +510,16 @@ class Kernel implements KernelContract
     }
 
     /**
+     * Get the application's middleware.
+     *
+     * @return array
+     */
+    public function getMiddleware()
+    {
+        return $this->middleware;
+    }
+
+    /**
      * Get the application's route middleware groups.
      *
      * @return array
