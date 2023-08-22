@@ -1035,6 +1035,32 @@ class TestResponseTest extends TestCase
         $response->assertHeaderMissing('Location');
     }
 
+    public function testAssertPrecognitionSuccessfulWithMissingHeader()
+    {
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Precognition-Success Header not present on response.');
+
+        $baseResponse = new Response();
+
+        $response = TestResponse::fromBaseResponse($baseResponse);
+
+        $response->assertPrecognitionSuccess();
+    }
+
+    public function testAssertPrecognitionSuccessfulWithIncorrectValue()
+    {
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Precognition-Success Header was found, but the value is not `True`.');
+
+        $baseResponse = tap(new Response, function ($response) {
+            $response->header('Precognition-Success', '');
+        });
+
+        $response = TestResponse::fromBaseResponse($baseResponse);
+
+        $response->assertPrecognitionSuccess();
+    }
+
     public function testAssertJsonWithArray()
     {
         $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceStub));

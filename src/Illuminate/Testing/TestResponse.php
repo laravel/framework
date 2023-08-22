@@ -1418,6 +1418,25 @@ class TestResponse implements ArrayAccess
     }
 
     /**
+     * Assert that the Precognition request was successful
+     *
+     * @return $this
+     */
+    public function assertPrecognitionSuccess()
+    {
+        PHPUnit::assertTrue(
+            $this->headers->has('Precognition-Success'), 'Precognition-Success Header not present on response.'
+        );
+
+        PHPUnit::assertSame(
+            'True', $this->headers->get('Precognition-Success'),
+            'Precognition-Success Header was found, but the value is not `True`.'
+        );
+
+        return $this;
+    }
+
+    /**
      * Get the current session store.
      *
      * @return \Illuminate\Session\Store

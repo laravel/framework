@@ -186,6 +186,13 @@ class MakesHttpRequestsTest extends TestCase
 
         $this->assertEquals(['from', 'to'], $callOrder);
     }
+
+    public function testUsingPrecognition()
+    {
+        $this->usingPrecognition();
+
+        $this->assertSame('true', $this->defaultHeaders['Precognition']);
+    }
 }
 
 class MyMiddleware
