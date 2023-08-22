@@ -130,6 +130,6 @@ class BroadcastNotificationCreated implements ShouldBroadcast
     {
         return method_exists($this->notification, 'broadcastAs')
         ? $this->notification->broadcastAs()
-        : get_class($this->notification);;
+        : get_class($this->notification);
     }
 }
