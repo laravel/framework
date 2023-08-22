@@ -5,14 +5,14 @@ namespace Illuminate\Support\Traits;
 trait SerializesAndRestoresTrait
 {
     /**
-     * Whether jobs should be serialized and then restored before checking assertions.
+     * Whether items should be serialized and then restored before checking assertions.
      *
      * @var bool
      */
     protected bool $serializeAndRestore = false;
 
     /**
-     * Set if the job should serialize and restore before checking assertions.
+     * Set if items should serialize and restore before checking assertions.
      *
      * @param  bool  $serializeAndRestore
      * @return $this
