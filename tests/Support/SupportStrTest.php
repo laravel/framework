@@ -1131,6 +1131,23 @@ class SupportStrTest extends TestCase
     public function testPasswordCreation()
     {
         $this->assertTrue(strlen(Str::password()) === 32);
+
+        $rules = ['letters', 'numbers', 'symbols', 'spaces'];
+        $password = Str::password(16, true, true, true, true, $rules);
+
+        $this->assertTrue(strlen($password) === 16);
+
+        # contains letter
+        $this->assertTrue(preg_match('/[a-zA-Z]/', $password) === 1);
+
+        # contains number
+        $this->assertTrue(preg_match('/[0-9]/', $password) === 1);
+
+        # contains symbol
+        $this->assertTrue(preg_match('/[~!#\$%\^&\*\(\)\-_.,<>\?\/\\\{\}\[\]\|:;]/', $password) === 1);
+
+        # contains space
+        $this->assertTrue(strpos($password, ' ') > -1);
     }
 }
 
