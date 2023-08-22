@@ -90,7 +90,7 @@ class ClosureCommand extends Command
     /**
      * Creates a new scheduled event for the command.
      *
-     * @param  array $parameters
+     * @param  array  $parameters
      * @return \Illuminate\Console\Scheduling\Event
      */
     public function schedule($parameters = [])

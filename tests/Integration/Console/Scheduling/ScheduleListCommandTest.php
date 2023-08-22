@@ -132,7 +132,8 @@ class ScheduleListCommandTest extends TestCase
 
     public function testClosureCommandsMayBeScheduled()
     {
-        $closure = function () {};
+        $closure = function () {
+        };
 
         Artisan::command('one', $closure)->weekly()->everySecond();
         Artisan::command('two', $closure)->everyTwoSeconds();
