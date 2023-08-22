@@ -498,7 +498,7 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
                     'Factory' => 'E.g. PostFactory',
                     'Job' => 'E.g. ProcessPodcast',
                     'Listener' => 'E.g. SendPodcastNotification',
-                    'Mail' => 'E.g. OrderShipped',
+                    'Mailable' => 'E.g. OrderShipped',
                     'Middleware' => 'E.g. EnsureTokenIsValid',
                     'Model' => 'E.g. Flight',
                     'Notification' => 'E.g. InvoicePaid',
