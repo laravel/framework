@@ -1068,25 +1068,14 @@ class Connection implements ConnectionInterface
      */
     public function escape($value, $binary = false)
     {
-        if ($value === null) {
-            return 'null';
-        } elseif ($binary) {
-            return $this->escapeBinary($value);
-        } elseif (is_int($value) || is_float($value)) {
-            return (string) $value;
-        } elseif (is_bool($value)) {
-            return $this->escapeBool($value);
-        } else {
-            if (str_contains($value, "\00")) {
-                throw new RuntimeException('Strings with null bytes cannot be escaped. Use the binary escape option.');
-            }
-
-            if (preg_match('//u', $value) === false) {
-                throw new RuntimeException('Strings with invalid UTF-8 byte sequences cannot be escaped.');
-            }
-
-            return $this->escapeString($value);
-        }
+        return $value ?? match (true) {
+            $binary => $this->escapeBinary($value),
+            is_int($value) || is_float($value) => (string) $value,
+            is_bool($value) => $this->escapeBool($value),
+            str_contains($value, "\00") => throw new RuntimeException('Strings with null bytes cannot be escaped. Use the binary escape option.'),
+            preg_match('//u', $value) === false => throw new RuntimeException('Strings with invalid UTF-8 byte sequences cannot be escaped.'),
+            default => $this->escapeString($value)
+        };
     }
 
     /**
