@@ -2033,11 +2033,11 @@ class Builder implements BuilderContract
     }
 
     /**
-     * Wraps the given Closure with a Transaction savepoint if needed.
+     * Wraps the given Closure with a transaction savepoint if needed.
      *
      * @template TModelValue
      *
-     * @param  \Closure(): TModelValue  $default
+     * @param  \Closure(): TModelValue  $scope
      * @return TModelValue
      */
     public function withSavepointIfNeeded(Closure $scope): mixed
