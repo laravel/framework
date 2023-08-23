@@ -643,8 +643,7 @@ class BelongsToMany extends Relation
     public function createOrFirst(array $attributes = [], array $values = [], array $joining = [], $touch = true)
     {
         try {
-            return $this->getQuery()->withSavePointIfNeeded(fn () =>
-                $this->create(array_merge($attributes, $values), $joining, $touch)
+            return $this->getQuery()->withSavePointIfNeeded(fn () => $this->create(array_merge($attributes, $values), $joining, $touch)
             );
         } catch (UniqueConstraintViolationException $exception) {
             // ...
@@ -652,8 +651,7 @@ class BelongsToMany extends Relation
 
         try {
             return tap($this->related->where($attributes)->first(), function ($instance) use ($joining, $touch) {
-                $this->getQuery()->withSavepointIfNeeded(fn () =>
-                    $this->attach($instance, $joining, $touch)
+                $this->getQuery()->withSavepointIfNeeded(fn () => $this->attach($instance, $joining, $touch)
                 );
             });
         } catch (UniqueConstraintViolationException $exception) {
