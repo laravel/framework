@@ -580,7 +580,9 @@ class Builder implements BuilderContract
     public function createOrFirst(array $attributes = [], array $values = [])
     {
         try {
-            return $this->create(array_merge($attributes, $values));
+            return $this->withSavepointIfNeeded(function () use ($attributes, $values) {
+                return $this->create(array_merge($attributes, $values));
+            });
         } catch (UniqueConstraintViolationException $exception) {
             return $this->where($attributes)->first();
         }
@@ -2028,5 +2030,20 @@ class Builder implements BuilderContract
     public function __clone()
     {
         $this->query = clone $this->query;
+    }
+
+    /**
+     * Wraps the given Closure with a Transaction savepoint if needed.
+     *
+     * @template TModelValue
+     *
+     * @param  \Closure(): TModelValue  $default
+     * @return TModelValue
+     */
+    protected function withSavepointIfNeeded(Closure $scope): mixed
+    {
+        return $this->getQuery()->getConnection()->transactionLevel() > 0
+            ? $this->getQuery()->getConnection()->transaction($scope)
+            : $scope();
     }
 }

@@ -552,6 +552,22 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertSame('Nuno Maduro', $user4->name);
     }
 
+    public function testCreateOrFirstWithinTransaction()
+    {
+        $user1 = EloquentTestUniqueUser::create(['email' => 'taylorotwell@gmail.com']);
+
+        DB::transaction(function () use ($user1) {
+            $user2 = EloquentTestUniqueUser::createOrFirst(
+                ['email' => 'taylorotwell@gmail.com'],
+                ['name' => 'Taylor Otwell']
+            );
+
+            $this->assertEquals($user1->id, $user2->id);
+            $this->assertSame('taylorotwell@gmail.com', $user2->email);
+            $this->assertNull($user2->name);
+        });
+    }
+
     public function testUpdateOrCreate()
     {
         $user1 = EloquentTestUser::create(['email' => 'taylorotwell@gmail.com']);
