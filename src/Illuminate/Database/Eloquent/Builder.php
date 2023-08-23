@@ -580,8 +580,7 @@ class Builder implements BuilderContract
     public function createOrFirst(array $attributes = [], array $values = [])
     {
         try {
-            return $this->withSavepointIfNeeded(fn () => $this->create(array_merge($attributes, $values))
-            );
+            return $this->withSavepointIfNeeded(fn () => $this->create(array_merge($attributes, $values)));
         } catch (UniqueConstraintViolationException $exception) {
             return $this->where($attributes)->first();
         }
