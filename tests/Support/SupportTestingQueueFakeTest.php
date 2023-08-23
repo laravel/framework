@@ -384,7 +384,7 @@ class SupportTestingQueueFakeTest extends TestCase
         $job = new JobWithSerialization('hello');
 
         $fake = new QueueFake(new Application);
-        $fake->serializeAndRestoreItems();
+        $fake->serializeAndRestore();
         $fake->push($job);
 
         $fake->assertPushed(

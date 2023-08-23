@@ -9,12 +9,11 @@ use Illuminate\Queue\CallQueuedClosure;
 use Illuminate\Queue\QueueManager;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Traits\ReflectsClosures;
-use Illuminate\Support\Traits\SerializesAndRestoresTrait;
 use PHPUnit\Framework\Assert as PHPUnit;
 
 class QueueFake extends QueueManager implements Fake, Queue
 {
-    use ReflectsClosures, SerializesAndRestoresTrait;
+    use ReflectsClosures;
 
     /**
      * The original queue manager.
@@ -43,6 +42,13 @@ class QueueFake extends QueueManager implements Fake, Queue
      * @var array
      */
     protected $jobs = [];
+
+    /**
+     * Indicates if items should be serialized and restored before checking assertions.
+     *
+     * @var bool
+     */
+    protected bool $serializeAndRestore = false;
 
     /**
      * Create a new fake queue instance.
@@ -490,6 +496,30 @@ class QueueFake extends QueueManager implements Fake, Queue
     public function pushedJobs()
     {
         return $this->jobs;
+    }
+
+    /**
+     * Specify if jobs should be serialized and restored before assertions are evaluated.
+     *
+     * @param  bool  $serializeAndRestore
+     * @return $this
+     */
+    public function serializeAndRestore(bool $serializeAndRestore = true): static
+    {
+        $this->serializeAndRestore = $serializeAndRestore;
+
+        return $this;
+    }
+
+    /**
+     * Serialize and unserialize the item to simulate the queueing process.
+     *
+     * @param  mixed  $queueable
+     * @return mixed
+     */
+    protected function serializeAndRestoreQueueable($queueable)
+    {
+        return unserialize(serialize($queueable));
     }
 
     /**
