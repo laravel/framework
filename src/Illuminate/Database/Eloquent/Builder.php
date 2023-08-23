@@ -580,9 +580,9 @@ class Builder implements BuilderContract
     public function createOrFirst(array $attributes = [], array $values = [])
     {
         try {
-            return $this->withSavepointIfNeeded(function () use ($attributes, $values) {
-                return $this->create(array_merge($attributes, $values));
-            });
+            return $this->withSavepointIfNeeded(fn () =>
+                $this->create(array_merge($attributes, $values))
+            );
         } catch (UniqueConstraintViolationException $exception) {
             return $this->where($attributes)->first();
         }
@@ -1712,6 +1712,21 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Execute the given Closure within a transaction savepoint if needed.
+     *
+     * @template TModelValue
+     *
+     * @param  \Closure(): TModelValue  $scope
+     * @return TModelValue
+     */
+    public function withSavepointIfNeeded(Closure $scope): mixed
+    {
+        return $this->getQuery()->getConnection()->transactionLevel() > 0
+            ? $this->getQuery()->getConnection()->transaction($scope)
+            : $scope();
+    }
+
+    /**
      * Get the underlying query builder instance.
      *
      * @return \Illuminate\Database\Query\Builder
@@ -2030,20 +2045,5 @@ class Builder implements BuilderContract
     public function __clone()
     {
         $this->query = clone $this->query;
-    }
-
-    /**
-     * Wraps the given Closure with a transaction savepoint if needed.
-     *
-     * @template TModelValue
-     *
-     * @param  \Closure(): TModelValue  $scope
-     * @return TModelValue
-     */
-    public function withSavepointIfNeeded(Closure $scope): mixed
-    {
-        return $this->getQuery()->getConnection()->transactionLevel() > 0
-            ? $this->getQuery()->getConnection()->transaction($scope)
-            : $scope();
     }
 }
