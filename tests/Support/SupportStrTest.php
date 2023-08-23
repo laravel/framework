@@ -336,13 +336,6 @@ class SupportStrTest extends TestCase
         $this->assertSame('/test/string', Str::start('//test/string', '/'));
     }
 
-    public function testPruneStart()
-    {
-        $this->assertSame('test/string', Str::pruneStart('/test/string', '/'));
-        $this->assertSame('/string', Str::pruneStart('/test/string', '/test'));
-        $this->assertSame('/test/string', Str::pruneStart('//test/string', '/'));
-    }
-
     public function testFlushCache()
     {
         $reflection = new ReflectionClass(Str::class);
@@ -363,13 +356,6 @@ class SupportStrTest extends TestCase
         $this->assertSame('abbc', Str::finish('ab', 'bc'));
         $this->assertSame('abbc', Str::finish('abbcbc', 'bc'));
         $this->assertSame('abcbbc', Str::finish('abcbbcbc', 'bc'));
-    }
-
-    public function testPruneEnd()
-    {
-        $this->assertSame('ab', Str::pruneEnd('abbc', 'bc'));
-        $this->assertSame('abbc', Str::pruneEnd('abbcbc', 'bc'));
-        $this->assertSame('abcbbc', Str::pruneEnd('abcbbcbc', 'bc'));
     }
 
     public function testWrap()

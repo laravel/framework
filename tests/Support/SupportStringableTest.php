@@ -744,25 +744,11 @@ class SupportStringableTest extends TestCase
         $this->assertSame('/test/string', (string) $this->stringable('//test/string')->start('/'));
     }
 
-    public function testPruneStart()
-    {
-        $this->assertSame('test/string', (string) $this->stringable('/test/string')->pruneStart('/'));
-        $this->assertSame('/string', (string) $this->stringable('/test/string')->pruneStart('/test'));
-        $this->assertSame('/test/string', (string) $this->stringable('//test/string')->pruneStart('/'));
-    }
-
     public function testFinish()
     {
         $this->assertSame('abbc', (string) $this->stringable('ab')->finish('bc'));
         $this->assertSame('abbc', (string) $this->stringable('abbcbc')->finish('bc'));
         $this->assertSame('abcbbc', (string) $this->stringable('abcbbcbc')->finish('bc'));
-    }
-
-    public function testPruneEnd()
-    {
-        $this->assertSame('ab', (string) $this->stringable('abbc')->pruneEnd('bc'));
-        $this->assertSame('abbc', (string) $this->stringable('abbcbc')->pruneEnd('bc'));
-        $this->assertSame('abcbbc', (string) $this->stringable('abcbbcbc')->pruneEnd('bc'));
     }
 
     public function testIs()

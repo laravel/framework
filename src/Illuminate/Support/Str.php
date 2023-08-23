@@ -357,18 +357,6 @@ class Str
     }
 
     /**
-     * Prune the last occurrence of the given suffix if it exists at the end of the value.
-     *
-     * @param  string  $value
-     * @param  string  $suffix
-     * @return string
-     */
-    public static function pruneEnd($value, $suffix)
-    {
-        return static::replaceEnd($suffix, '', $value);
-    }
-
-    /**
      * Wrap the string with the given strings.
      *
      * @param  string  $value
@@ -1132,18 +1120,6 @@ class Str
         $quoted = preg_quote($prefix, '/');
 
         return $prefix.preg_replace('/^(?:'.$quoted.')+/u', '', $value);
-    }
-
-    /**
-     * Prune the first occurrence of the given prefix if it exists at the start of the value.
-     *
-     * @param  string  $value
-     * @param  string  $prefix
-     * @return string
-     */
-    public static function pruneStart($value, $prefix)
-    {
-        return static::replaceStart($prefix, '', $value);
     }
 
     /**
