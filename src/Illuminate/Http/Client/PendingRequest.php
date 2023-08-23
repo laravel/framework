@@ -13,6 +13,7 @@ use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
 use GuzzleHttp\UriTemplate\UriTemplate;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Events\NullDispatcher;
 use Illuminate\Http\Client\Events\ConnectionFailed;
 use Illuminate\Http\Client\Events\RequestSending;
 use Illuminate\Http\Client\Events\ResponseReceived;
@@ -1345,6 +1346,20 @@ class PendingRequest
     public function getPromise()
     {
         return $this->promise;
+    }
+
+    /**
+     * Send the request without raising any events.
+     *
+     * @return $this
+     */
+    public function quietly()
+    {
+        if ($dispatcher = $this->getDispatcher()) {
+            $this->factory->setDispatcher(new NullDispatcher($dispatcher));
+        }
+
+        return $this;
     }
 
     /**

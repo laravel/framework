@@ -79,7 +79,7 @@ class Factory
      */
     public function __construct(Dispatcher $dispatcher = null)
     {
-        $this->dispatcher = $dispatcher;
+        $this->setDispatcher($dispatcher);
 
         $this->stubCallbacks = collect();
     }
@@ -411,6 +411,19 @@ class Factory
     public function getDispatcher()
     {
         return $this->dispatcher;
+    }
+
+    /**
+     * Set the current event dispatcher implementation.
+     *
+     * @param  \Illuminate\Contracts\Events\Dispatcher|null  $dispatcher
+     * @return $this
+     */
+    public function setDispatcher(Dispatcher $dispatcher = null)
+    {
+        $this->dispatcher = $dispatcher;
+
+        return $this;
     }
 
     /**
