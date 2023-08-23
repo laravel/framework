@@ -50,7 +50,7 @@ use Illuminate\Http\Client\Factory;
  * @method static \Illuminate\Http\Client\PendingRequest withoutVerifying()
  * @method static \Illuminate\Http\Client\PendingRequest sink(string|resource $to)
  * @method static \Illuminate\Http\Client\PendingRequest timeout(int $seconds)
- * @method static \Illuminate\Http\Client\PendingRequest quietly(bool $quite = true)
+ * @method static \Illuminate\Http\Client\PendingRequest quietly()
  * @method static \Illuminate\Http\Client\PendingRequest connectTimeout(int $seconds)
  * @method static \Illuminate\Http\Client\PendingRequest retry(int $times, \Closure|int $sleepMilliseconds = 0, callable|null $when = null, bool $throw = true)
  * @method static \Illuminate\Http\Client\PendingRequest withOptions(array $options)
