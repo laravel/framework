@@ -730,11 +730,6 @@ class Builder
         });
     }
 
-    public function lists($column, $key = null)
-    {
-        return $this->pluck($column, $key);
-    }
-
     /**
      * Paginate the given query.
      *

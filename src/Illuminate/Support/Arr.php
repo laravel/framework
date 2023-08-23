@@ -404,10 +404,6 @@ class Arr
 
         return $results;
     }
-    public static function lists($array, $value, $key = null)
-    {
-        return self::pluck($array, $value, $key);
-    }
 
     /**
      * Explode the "value" and "key" arguments passed to "pluck".

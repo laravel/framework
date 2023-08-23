@@ -103,6 +103,10 @@ class Str
      */
     public static function contains($haystack, $needles)
     {
+        if ($haystack === null) {
+            return false;
+        }
+        
         foreach ((array) $needles as $needle) {
             if ($needle !== '' && mb_strpos($haystack, $needle) !== false) {
                 return true;
