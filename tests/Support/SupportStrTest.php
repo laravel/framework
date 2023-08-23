@@ -609,6 +609,19 @@ class SupportStrTest extends TestCase
         $this->assertSame('Jönköping Malmö', Str::replaceFirst('', 'yyy', 'Jönköping Malmö'));
     }
 
+    public function testReplaceStart()
+    {
+        $this->assertSame('foobar foobar', Str::replaceStart('bar', 'qux', 'foobar foobar'));
+        $this->assertSame('foo/bar? foo/bar?', Str::replaceStart('bar?', 'qux?', 'foo/bar? foo/bar?'));
+        $this->assertSame('quxbar foobar', Str::replaceStart('foo', 'qux', 'foobar foobar'));
+        $this->assertSame('qux? foo/bar?', Str::replaceStart('foo/bar?', 'qux?', 'foo/bar? foo/bar?'));
+        $this->assertSame('bar foobar', Str::replaceStart('foo', '', 'foobar foobar'));
+        $this->assertSame('1', Str::replaceStart(0, '1', '0'));
+        // Test for multibyte string support
+        $this->assertSame('xxxnköping Malmö', Str::replaceStart('Jö', 'xxx', 'Jönköping Malmö'));
+        $this->assertSame('Jönköping Malmö', Str::replaceStart('', 'yyy', 'Jönköping Malmö'));
+    }
+
     public function testReplaceLast()
     {
         $this->assertSame('foobar fooqux', Str::replaceLast('bar', 'qux', 'foobar foobar'));
@@ -619,6 +632,20 @@ class SupportStrTest extends TestCase
         // Test for multibyte string support
         $this->assertSame('Malmö Jönkxxxping', Str::replaceLast('ö', 'xxx', 'Malmö Jönköping'));
         $this->assertSame('Malmö Jönköping', Str::replaceLast('', 'yyy', 'Malmö Jönköping'));
+    }
+
+    public function testReplaceEnd()
+    {
+        $this->assertSame('foobar fooqux', Str::replaceEnd('bar', 'qux', 'foobar foobar'));
+        $this->assertSame('foo/bar? foo/qux?', Str::replaceEnd('bar?', 'qux?', 'foo/bar? foo/bar?'));
+        $this->assertSame('foobar foo', Str::replaceEnd('bar', '', 'foobar foobar'));
+        $this->assertSame('foobar foobar', Str::replaceEnd('xxx', 'yyy', 'foobar foobar'));
+        $this->assertSame('foobar foobar', Str::replaceEnd('', 'yyy', 'foobar foobar'));
+        $this->assertSame('fooxxx foobar', Str::replaceEnd('xxx', 'yyy', 'fooxxx foobar'));
+
+        // // Test for multibyte string support
+        $this->assertSame('Malmö Jönköping', Str::replaceEnd('ö', 'xxx', 'Malmö Jönköping'));
+        $this->assertSame('Malmö Jönkyyy', Str::replaceEnd('öping', 'yyy', 'Malmö Jönköping'));
     }
 
     public function testRemove()

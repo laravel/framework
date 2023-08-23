@@ -863,6 +863,19 @@ class SupportStringableTest extends TestCase
         $this->assertSame('Jönköping Malmö', (string) $this->stringable('Jönköping Malmö')->replaceFirst('', 'yyy'));
     }
 
+    public function testReplaceStart()
+    {
+        $this->assertSame('foobar foobar', (string) $this->stringable('foobar foobar')->replaceStart('bar', 'qux'));
+        $this->assertSame('foo/bar? foo/bar?', (string) $this->stringable('foo/bar? foo/bar?')->replaceStart('bar?', 'qux?'));
+        $this->assertSame('quxbar foobar', (string) $this->stringable('foobar foobar')->replaceStart('foo', 'qux'));
+        $this->assertSame('qux? foo/bar?', (string) $this->stringable('foo/bar? foo/bar?')->replaceStart('foo/bar?', 'qux?'));
+        $this->assertSame('bar foobar', (string) $this->stringable('foobar foobar')->replaceStart('foo', ''));
+        $this->assertSame('1', (string) $this->stringable('0')->replaceStart(0, '1'));
+        // Test for multibyte string support
+        $this->assertSame('xxxnköping Malmö', (string) $this->stringable('Jönköping Malmö')->replaceStart('Jö', 'xxx'));
+        $this->assertSame('Jönköping Malmö', (string) $this->stringable('Jönköping Malmö')->replaceStart('', 'yyy'));
+    }
+
     public function testReplaceLast()
     {
         $this->assertSame('foobar fooqux', (string) $this->stringable('foobar foobar')->replaceLast('bar', 'qux'));
@@ -873,6 +886,20 @@ class SupportStringableTest extends TestCase
         // Test for multibyte string support
         $this->assertSame('Malmö Jönkxxxping', (string) $this->stringable('Malmö Jönköping')->replaceLast('ö', 'xxx'));
         $this->assertSame('Malmö Jönköping', (string) $this->stringable('Malmö Jönköping')->replaceLast('', 'yyy'));
+    }
+
+    public function testReplaceEnd()
+    {
+        $this->assertSame('foobar fooqux', (string) $this->stringable('foobar foobar')->replaceEnd('bar', 'qux'));
+        $this->assertSame('foo/bar? foo/qux?', (string) $this->stringable('foo/bar? foo/bar?')->replaceEnd('bar?', 'qux?'));
+        $this->assertSame('foobar foo', (string) $this->stringable('foobar foobar')->replaceEnd('bar', ''));
+        $this->assertSame('foobar foobar', (string) $this->stringable('foobar foobar')->replaceLast('xxx', 'yyy'));
+        $this->assertSame('foobar foobar', (string) $this->stringable('foobar foobar')->replaceEnd('', 'yyy'));
+        $this->assertSame('fooxxx foobar', (string) $this->stringable('fooxxx foobar')->replaceEnd('xxx', 'yyy'));
+
+        // // Test for multibyte string support
+        $this->assertSame('Malmö Jönköping', (string) $this->stringable('Malmö Jönköping')->replaceEnd('ö', 'xxx'));
+        $this->assertSame('Malmö Jönkyyy', (string) $this->stringable('Malmö Jönköping')->replaceEnd('öping', 'yyy'));
     }
 
     public function testRemove()
