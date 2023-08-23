@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Integration\Database;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
@@ -68,6 +69,21 @@ class EloquentHasManyTest extends DatabaseTestCase
         $post2 = $user->posts()->createOrFirst(['title' => $post1->title]);
 
         $this->assertTrue($post1->is($post2));
+        $this->assertCount(1, $user->posts()->get());
+    }
+
+    public function testCreateOrFirstWithinTransaction()
+    {
+        $user = EloquentHasManyTestUser::create();
+
+        $post1 = $user->posts()->create(['title' => Str::random()]);
+
+        DB::transaction(function () use ($user, $post1) {
+            $post2 = $user->posts()->createOrFirst(['title' => $post1->title]);
+
+            $this->assertTrue($post1->is($post2));
+        });
+
         $this->assertCount(1, $user->posts()->get());
     }
 }
