@@ -12,7 +12,6 @@ use Illuminate\Database\Concerns\BuildsQueries;
 use Illuminate\Database\Eloquent\Concerns\QueriesRelationships;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\Relation;
-use Illuminate\Database\PostgresConnection;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\RecordsNotFoundException;
 use Illuminate\Database\UniqueConstraintViolationException;
@@ -2043,17 +2042,8 @@ class Builder implements BuilderContract
      */
     public function withSavepointIfNeeded(Closure $scope): mixed
     {
-        return $this->needsSavepoint()
+        return $this->getQuery()->getConnection()->transactionLevel() > 0
             ? $this->getQuery()->getConnection()->transaction($scope)
             : $scope();
-    }
-
-    protected function needsSavePoint(): bool
-    {
-        if (! $this->getQuery()->getConnection() instanceof PostgresConnection) {
-            return false;
-        }
-
-        return $this->getQuery()->getConnection()->transactionLevel() > 0;
     }
 }
