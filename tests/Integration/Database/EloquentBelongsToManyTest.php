@@ -629,6 +629,19 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         $this->assertTrue($tag->is($post->tagsUnique()->first()));
     }
 
+    public function testCreateOrFirstWithinTransaction()
+    {
+        $post = Post::create(['title' => Str::random()]);
+
+        $tag = UniqueTag::create(['name' => Str::random()]);
+
+        $post->tagsUnique()->attach(UniqueTag::all());
+
+        DB::transaction(function () use ($tag, $post) {
+            $this->assertEquals($tag->id, $post->tagsUnique()->createOrFirst(['name' => $tag->name])->id);
+        });
+    }
+
     public function testFirstOrNewMethodWithValues()
     {
         $post = Post::create(['title' => Str::random()]);

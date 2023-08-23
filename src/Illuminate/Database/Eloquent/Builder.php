@@ -2040,7 +2040,7 @@ class Builder implements BuilderContract
      * @param  \Closure(): TModelValue  $default
      * @return TModelValue
      */
-    protected function withSavepointIfNeeded(Closure $scope): mixed
+    public function withSavepointIfNeeded(Closure $scope): mixed
     {
         return $this->getQuery()->getConnection()->transactionLevel() > 0
             ? $this->getQuery()->getConnection()->transaction($scope)
