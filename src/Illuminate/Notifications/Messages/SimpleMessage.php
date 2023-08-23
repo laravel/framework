@@ -4,6 +4,7 @@ namespace Illuminate\Notifications\Messages;
 
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Notifications\Action;
+use Illuminate\Support\HtmlString;
 
 class SimpleMessage
 {
@@ -229,6 +230,20 @@ class SimpleMessage
      * @param  \Illuminate\Contracts\Support\Htmlable|string|array  $line
      * @return \Illuminate\Contracts\Support\Htmlable|string
      */
+
+    /**
+     * Add html to the notification.
+     *
+     * @param  mixed  $html
+     * @return $this
+     */
+    public function html($html)
+    {
+        $this->outroLines[] = new HtmlString($html);
+
+        return $this;
+    }
+    
     protected function formatLine($line)
     {
         if ($line instanceof Htmlable) {
