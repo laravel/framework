@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Integration\Database\Postgres;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 class DatabaseEloquentPostgresIntegrationTest extends PostgresTestCase
@@ -56,6 +57,22 @@ class DatabaseEloquentPostgresIntegrationTest extends PostgresTestCase
         );
 
         $this->assertSame('Nuno Maduro', $user4->name);
+    }
+
+    public function testCreateOrFirstWithinTransaction()
+    {
+        $user1 = DatabaseEloquentPostgresIntegrationUser::create(['email' => 'taylor@laravel.com']);
+
+        DB::transaction(function () use ($user1) {
+            $user2 = DatabaseEloquentPostgresIntegrationUser::createOrFirst(
+                ['email' => 'taylor@laravel.com'],
+                ['name' => 'Taylor Otwell']
+            );
+
+            $this->assertEquals($user1->id, $user2->id);
+            $this->assertSame('taylor@laravel.com', $user2->email);
+            $this->assertNull($user2->name);
+        });
     }
 }
 

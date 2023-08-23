@@ -181,6 +181,9 @@ class DatabaseEloquentHasManyTest extends TestCase
             );
         }));
 
+        $relation->getQuery()->shouldReceive('withSavepointIfNeeded')->once()->andReturnUsing(function ($scope) {
+            return $scope();
+        });
         $relation->getQuery()->shouldReceive('where')->once()->with(['foo' => 'bar'])->andReturn($relation->getQuery());
         $relation->getQuery()->shouldReceive('first')->once()->with()->andReturn($model = m::mock(stdClass::class));
 
@@ -192,6 +195,9 @@ class DatabaseEloquentHasManyTest extends TestCase
     {
         $relation = $this->getRelation();
 
+        $relation->getQuery()->shouldReceive('withSavepointIfNeeded')->once()->andReturnUsing(function ($scope) {
+            return $scope();
+        });
         $relation->getQuery()->shouldReceive('where')->never();
         $relation->getQuery()->shouldReceive('first')->never();
         $model = $this->expectCreatedModel($relation, ['foo']);
@@ -202,6 +208,9 @@ class DatabaseEloquentHasManyTest extends TestCase
     public function testCreateOrFirstMethodWithValuesCreatesNewModelWithForeignKeySet()
     {
         $relation = $this->getRelation();
+        $relation->getQuery()->shouldReceive('withSavepointIfNeeded')->once()->andReturnUsing(function ($scope) {
+            return $scope();
+        });
         $relation->getQuery()->shouldReceive('where')->never();
         $relation->getQuery()->shouldReceive('first')->never();
         $model = $this->expectCreatedModel($relation, ['foo' => 'bar', 'baz' => 'qux']);

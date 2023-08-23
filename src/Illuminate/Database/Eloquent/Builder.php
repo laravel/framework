@@ -580,7 +580,7 @@ class Builder implements BuilderContract
     public function createOrFirst(array $attributes = [], array $values = [])
     {
         try {
-            return $this->create(array_merge($attributes, $values));
+            return $this->withSavepointIfNeeded(fn () => $this->create(array_merge($attributes, $values)));
         } catch (UniqueConstraintViolationException $exception) {
             return $this->where($attributes)->first();
         }
@@ -1707,6 +1707,21 @@ class Builder implements BuilderContract
         $this->model->mergeCasts($casts);
 
         return $this;
+    }
+
+    /**
+     * Execute the given Closure within a transaction savepoint if needed.
+     *
+     * @template TModelValue
+     *
+     * @param  \Closure(): TModelValue  $scope
+     * @return TModelValue
+     */
+    public function withSavepointIfNeeded(Closure $scope): mixed
+    {
+        return $this->getQuery()->getConnection()->transactionLevel() > 0
+            ? $this->getQuery()->getConnection()->transaction($scope)
+            : $scope();
     }
 
     /**
