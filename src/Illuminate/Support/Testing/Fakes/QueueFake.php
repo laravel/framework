@@ -359,7 +359,7 @@ class QueueFake extends QueueManager implements Fake, Queue
             }
 
             $this->jobs[is_object($job) ? get_class($job) : $job][] = [
-                'job' =>  $this->serializeAndRestore ? $this->serializeAndRestoreQueueable($job) : $job,
+                'job' =>  $this->serializeAndRestore ? $this->serializeAndRestoreJob($job) : $job,
                 'queue' => $queue,
                 'data' => $data,
             ];
@@ -512,14 +512,14 @@ class QueueFake extends QueueManager implements Fake, Queue
     }
 
     /**
-     * Serialize and unserialize the item to simulate the queueing process.
+     * Serialize and unserialize the job to simulate the queueing process.
      *
-     * @param  mixed  $queueable
+     * @param  mixed  $job
      * @return mixed
      */
-    protected function serializeAndRestoreQueueable($queueable)
+    protected function serializeAndRestoreJob($job)
     {
-        return unserialize(serialize($queueable));
+        return unserialize(serialize($job));
     }
 
     /**
