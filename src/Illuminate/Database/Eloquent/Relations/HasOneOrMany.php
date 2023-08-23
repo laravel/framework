@@ -265,7 +265,7 @@ abstract class HasOneOrMany extends Relation
      * @param  array  $values
      * @return \Illuminate\Database\Eloquent\Model
      */
-    public function updateOrCreate(array $attributes, array $values = [])
+    public function updateOrCreate(array $attributes = [], array $values = [])
     {
         return tap($this->firstOrNew($attributes), function ($instance) use ($values) {
             $instance->fill($values);
