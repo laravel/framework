@@ -9,6 +9,8 @@ use Illuminate\Support\Str;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Finder\Finder;
 
+use function Laravel\Prompts\text;
+
 abstract class GeneratorCommand extends Command implements PromptsForMissingInput
 {
     /**
@@ -148,15 +150,6 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
      */
     public function handle()
     {
-        // First we need to ensure that the given name is not a reserved word within the PHP
-        // language and that the class name will actually be valid. If it is not valid we
-        // can error now and prevent from polluting the filesystem using invalid files.
-        if ($this->isReservedName($this->getNameInput())) {
-            $this->components->error('The name "'.$this->getNameInput().'" is reserved by PHP.');
-
-            return false;
-        }
-
         $name = $this->qualifyClass($this->getNameInput());
 
         $path = $this->getPath($name);
@@ -480,40 +473,45 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
     /**
      * Prompt for missing input arguments using the returned questions.
      *
-     * @return array
+     * @return Closure
      */
     protected function promptForMissingArgumentsUsing()
     {
-        return [
-            'name' => [
-                'What should the '.strtolower($this->type).' be named?',
-                match ($this->type) {
-                    'Cast' => 'E.g. Json',
-                    'Channel' => 'E.g. OrderChannel',
-                    'Console command' => 'E.g. SendEmails',
-                    'Component' => 'E.g. Alert',
-                    'Controller' => 'E.g. UserController',
-                    'Event' => 'E.g. PodcastProcessed',
-                    'Exception' => 'E.g. InvalidOrderException',
-                    'Factory' => 'E.g. PostFactory',
-                    'Job' => 'E.g. ProcessPodcast',
-                    'Listener' => 'E.g. SendPodcastNotification',
-                    'Mailable' => 'E.g. OrderShipped',
-                    'Middleware' => 'E.g. EnsureTokenIsValid',
-                    'Model' => 'E.g. Flight',
-                    'Notification' => 'E.g. InvoicePaid',
-                    'Observer' => 'E.g. UserObserver',
-                    'Policy' => 'E.g. PostPolicy',
-                    'Provider' => 'E.g. ElasticServiceProvider',
-                    'Request' => 'E.g. StorePodcastRequest',
-                    'Resource' => 'E.g. UserResource',
-                    'Rule' => 'E.g. Uppercase',
-                    'Scope' => 'E.g. TrendingScope',
-                    'Seeder' => 'E.g. UserSeeder',
-                    'Test' => 'E.g. UserTest',
-                    default => '',
-                },
-            ],
-        ];
+        return fn () => text(
+            label: 'What should the '.strtolower($this->type).' be named?',
+            placeholder: match ($this->type) {
+                'Cast' => 'E.g. Json',
+                'Channel' => 'E.g. OrderChannel',
+                'Console command' => 'E.g. SendEmails',
+                'Component' => 'E.g. Alert',
+                'Controller' => 'E.g. UserController',
+                'Event' => 'E.g. PodcastProcessed',
+                'Exception' => 'E.g. InvalidOrderException',
+                'Factory' => 'E.g. PostFactory',
+                'Job' => 'E.g. ProcessPodcast',
+                'Listener' => 'E.g. SendPodcastNotification',
+                'Mailable' => 'E.g. OrderShipped',
+                'Middleware' => 'E.g. EnsureTokenIsValid',
+                'Model' => 'E.g. Flight',
+                'Notification' => 'E.g. InvoicePaid',
+                'Observer' => 'E.g. UserObserver',
+                'Policy' => 'E.g. PostPolicy',
+                'Provider' => 'E.g. ElasticServiceProvider',
+                'Request' => 'E.g. StorePodcastRequest',
+                'Resource' => 'E.g. UserResource',
+                'Rule' => 'E.g. Uppercase',
+                'Scope' => 'E.g. TrendingScope',
+                'Seeder' => 'E.g. UserSeeder',
+                'Test' => 'E.g. UserTest',
+                default => '',
+            },
+            validate: fn (string $value) => match (true) {
+                // First we need to ensure that the given name is not a reserved word within the PHP
+                // language and that the class name will actually be valid. If it is not valid we
+                // can error now and prevent from polluting the filesystem using invalid files.
+                $this->isReservedName($value) => 'The name "'.$this->getNameInput().'" is reserved by PHP.',
+                default => null,
+            }
+        );
     }
 }
