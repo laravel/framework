@@ -504,7 +504,7 @@ class QueueFake extends QueueManager implements Fake, Queue
      * @param  bool  $serializeAndRestore
      * @return $this
      */
-    public function serializeAndRestore(bool $serializeAndRestore = true): static
+    public function serializeAndRestore(bool $serializeAndRestore = true)
     {
         $this->serializeAndRestore = $serializeAndRestore;
 
