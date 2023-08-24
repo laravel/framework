@@ -792,10 +792,27 @@ class Connection implements ConnectionInterface
         // message to include the bindings with SQL, which will make this exception a
         // lot more helpful to the developer instead of just the database's errors.
         catch (Exception $e) {
+            if ($this->isUniqueConstraintError($e)) {
+                throw new UniqueConstraintViolationException(
+                    $this->getName(), $query, $this->prepareBindings($bindings), $e
+                );
+            }
+
             throw new QueryException(
                 $this->getName(), $query, $this->prepareBindings($bindings), $e
             );
         }
+    }
+
+    /**
+     * Determine if the given database exception was caused by a unique constraint violation.
+     *
+     * @param  \Exception  $exception
+     * @return bool
+     */
+    protected function isUniqueConstraintError(Exception $exception)
+    {
+        return false;
     }
 
     /**
@@ -1080,7 +1097,7 @@ class Connection implements ConnectionInterface
      */
     protected function escapeString($value)
     {
-        return $this->getPdo()->quote($value);
+        return $this->getReadPdo()->quote($value);
     }
 
     /**
