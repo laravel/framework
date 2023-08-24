@@ -12,8 +12,6 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\CanBeEscapedWhenCastToString;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
-use Illuminate\Database\Eloquent\Attributes\Cast;
-use Illuminate\Database\Eloquent\Attributes\Increment;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\Concerns\AsPivot;
@@ -63,8 +61,21 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      *
      * @var string
      */
-    #[Increment('int')]
     protected $primaryKey = 'id';
+
+    /**
+     * The "type" of the primary key ID.
+     *
+     * @var string
+     */
+    protected $keyType = 'int';
+
+    /**
+     * Indicates if the IDs are auto-incrementing.
+     *
+     * @var bool
+     */
+    public $incrementing = true;
 
     /**
      * The relations to eager load on every query.
@@ -93,7 +104,6 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      * @var int
      */
     protected $perPage = 15;
-
 
     /**
      * Indicates if the model exists.
@@ -2015,7 +2025,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function getKeyType()
     {
-        return $this->getAttributeInstance('primaryKey', Increment::class, 'property')->type;
+        return $this->keyType;
     }
 
     /**
@@ -2035,11 +2045,10 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      * Get the value indicating whether the IDs are incrementing.
      *
      * @return bool
-     * @throws \ReflectionException
      */
     public function getIncrementing()
     {
-        return $this->hasAttribute('primaryKey', Increment::class, 'property');
+        return $this->incrementing;
     }
 
     /**

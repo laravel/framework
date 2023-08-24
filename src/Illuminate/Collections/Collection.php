@@ -5,7 +5,6 @@ namespace Illuminate\Support;
 use ArrayAccess;
 use ArrayIterator;
 use Illuminate\Contracts\Support\CanBeEscapedWhenCastToString;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Traits\EnumeratesValues;
 use Illuminate\Support\Traits\Macroable;
 use stdClass;
@@ -175,10 +174,6 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
                 $placeholder = new stdClass;
 
                 return $this->first($key, $placeholder) !== $placeholder;
-            }
-
-            if($key instanceof Model){
-                return (bool) $this->whereInstanceOf(Model::class)->first(fn(Model $model) => $model->is($key));
             }
 
             return in_array($key, $this->items);
