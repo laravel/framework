@@ -1050,7 +1050,7 @@ class TestResponseTest extends TestCase
     public function testAssertPrecognitionSuccessfulWithIncorrectValue()
     {
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Precognition-Success Header was found, but the value is not `True`.');
+        $this->expectExceptionMessage('Precognition-Success Header was found, but the value is not `true`.');
 
         $baseResponse = tap(new Response, function ($response) {
             $response->header('Precognition-Success', '');

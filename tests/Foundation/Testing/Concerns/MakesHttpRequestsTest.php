@@ -187,9 +187,9 @@ class MakesHttpRequestsTest extends TestCase
         $this->assertEquals(['from', 'to'], $callOrder);
     }
 
-    public function testUsingPrecognition()
+    public function testWithPrecognition()
     {
-        $this->usingPrecognition();
+        $this->withPrecognition();
 
         $this->assertSame('true', $this->defaultHeaders['Precognition']);
     }

@@ -314,7 +314,7 @@ trait MakesHttpRequests
      *
      * @return $this
      */
-    public function usingPrecognition()
+    public function withPrecognition()
     {
         return $this->withHeader('Precognition', 'true');
     }

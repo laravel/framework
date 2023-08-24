@@ -1429,8 +1429,8 @@ class TestResponse implements ArrayAccess
         );
 
         PHPUnit::assertSame(
-            'True', $this->headers->get('Precognition-Success'),
-            'Precognition-Success Header was found, but the value is not `True`.'
+            'true', $this->headers->get('Precognition-Success'),
+            'Precognition-Success Header was found, but the value is not `true`.'
         );
 
         return $this;
