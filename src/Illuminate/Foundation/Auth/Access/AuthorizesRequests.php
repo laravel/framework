@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation\Auth\Access;
 
 use Illuminate\Contracts\Auth\Access\Gate;
+use Illuminate\Foundation\Http\Controllers\AbilityMapper;
 use Illuminate\Support\Str;
 
 trait AuthorizesRequests
@@ -108,15 +109,7 @@ trait AuthorizesRequests
      */
     protected function resourceAbilityMap()
     {
-        return [
-            'index' => 'viewAny',
-            'show' => 'view',
-            'create' => 'create',
-            'store' => 'create',
-            'edit' => 'update',
-            'update' => 'update',
-            'destroy' => 'delete',
-        ];
+        return (new AbilityMapper())->mapAbilitiesForClass(static::class);
     }
 
     /**
