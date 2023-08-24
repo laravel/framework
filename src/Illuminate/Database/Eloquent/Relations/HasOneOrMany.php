@@ -254,7 +254,7 @@ abstract class HasOneOrMany extends Relation
         try {
             return $this->getQuery()->withSavepointIfNeeded(fn () => $this->create(array_merge($attributes, $values)));
         } catch (UniqueConstraintViolationException $exception) {
-            return $this->where($attributes)->first();
+            return $this->useWritePdo()->where($attributes)->first();
         }
     }
 
