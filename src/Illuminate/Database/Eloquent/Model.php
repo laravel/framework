@@ -3,7 +3,6 @@
 namespace Illuminate\Database\Eloquent;
 
 use ArrayAccess;
-use Exception;
 use Illuminate\Contracts\Broadcasting\HasBroadcastChannel;
 use Illuminate\Contracts\Queue\QueueableCollection;
 use Illuminate\Contracts\Queue\QueueableEntity;
@@ -12,7 +11,6 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\CanBeEscapedWhenCastToString;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
-use Illuminate\Database\Eloquent\Attributes\Cast;
 use Illuminate\Database\Eloquent\Attributes\Increment;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -20,17 +18,13 @@ use Illuminate\Database\Eloquent\Relations\Concerns\AsPivot;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Eloquent\Validations\FieldsValidationException;
-use Illuminate\Database\Eloquent\Validations\OnCreateRules;
-use Illuminate\Database\Eloquent\Validations\OnUpdateRules;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection as BaseCollection;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ForwardsCalls;
 use Illuminate\Validation\ValidationException;
 use JsonSerializable;
 use LogicException;
-use ReflectionClass;
 use Stringable;
 
 abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToString, HasBroadcastChannel, Jsonable, JsonSerializable, QueueableEntity, Stringable, UrlRoutable
@@ -337,112 +331,8 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     protected static function booted()
     {
-       static::updating(function (self $model){
-           $model->getModelRules();
-           $model->getPropertyRules();
-           $model->validate();
-       });
-        static::creating(function (self $model){
-            $model->getModelRules(useOnCreateRules: false);
-            $model->getPropertyRules(useOnCreateRules: false);
-            $model->validate();
-        });
 
     }
-
-    /**
-     * Validate the model's data before saving or updating.
-     *
-     * @param callable|null $callback
-     *
-     * @return Model
-     * @throws ValidationException
-     * @throws FieldsValidationException
-     * @throws \Throwable
-     */
-    public function validate(callable $callback = null): static
-    {
-        $rules = $this->rules;
-
-        if (!is_null($callback)) {
-            $modifiedRules = $callback($rules);
-            throw_unless(is_array($modifiedRules), new Exception('The validate callback should return an array'));
-        } else {
-            $this->getModelRules();
-            $this->getPropertyRules();
-
-            $validator = Validator::make($this->attributesToArray(), $rules);
-
-            if ($validator->fails()) {
-                $rules = $validator->errors()->all();
-                throw new FieldsValidationException($rules);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * Get the validation rules for the model fields decorator.
-     *
-     * @param bool $useCreateRules
-     *
-     * @return Model
-     */
-    public function getModelRules(bool $useOnCreateRules = true): Model
-    {
-        $decorator = new ReflectionClass($this);
-        $class = $useOnCreateRules ? OnCreateRules::class : OnUpdateRules::class;
-        $attributes = $decorator->getAttributes($class);
-
-        if (!empty($attributes)) {
-            $modelRules = $attributes[0]->newInstance();
-
-            $rules = $modelRules->rules;
-            foreach ($rules as $field => $rule){
-
-                $this->rules[$field] = $rule;
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * Get the validation rules for the model properties decorated with OnUpdateRules attribute.
-     *
-     * @param bool $useCreateRules
-     *
-     * @return Model
-     */
-    public function getPropertyRules(bool $useOnCreateRules = true): Model
-    {
-        $class = new ReflectionClass($this);
-        $properties = $class->getProperties();
-        foreach ($properties as $property) {
-            $class = $useOnCreateRules ? OnCreateRules::class : OnUpdateRules::class;
-            $attributes = $property->getAttributes($class);
-            if (!empty($attributes)) {
-                $propertyName = $property->getName();
-                $rules = $attributes[0]->newInstance()->rules;
-                if(is_array($rules) && Arr::isAssoc($rules)){
-                    if(!Arr::has($rules, $propertyName)){
-                       throw new \InvalidArgumentException("Invalid rules used on property $propertyName");
-                    }else{
-                        $rules = $rules[$propertyName];
-                    }
-                }elseif(is_string($rules)){
-                    $this->rules[$propertyName] =  [$rules];
-                }else{
-                    $this->rules[$propertyName] =  $rules;
-                }
-
-            }
-        }
-
-        return $this;
-    }
-
     /**
      * Clear the list of booted models so they will be re-booted.
      *
@@ -2461,9 +2351,6 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public static function __callStatic($method, $parameters)
     {
-        if($method === 'validateUsing'){
-             return (new static)->validate(...$parameters);
-        }
         return (new static)->$method(...$parameters);
     }
 
