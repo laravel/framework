@@ -4,6 +4,7 @@ namespace Illuminate\Database\Connectors;
 
 use Illuminate\Support\Arr;
 use PDO;
+use PDOException;
 
 class SqlServerConnector extends Connector implements ConnectorInterface
 {
@@ -34,6 +35,38 @@ class SqlServerConnector extends Connector implements ConnectorInterface
         $this->configureIsolationLevel($connection, $config);
 
         return $connection;
+    }
+
+    /**
+     * Create a new PDO connection instance.
+     *
+     * @param  string  $dsn
+     * @param  string  $username
+     * @param  string  $password
+     * @param  array  $options
+     * @return \PDO
+     */
+    protected function createPdoConnection($dsn, $username, $password, $options)
+    {
+        // The MSSQL extension is throwing an exception saying the attribute
+        // `PDO::ATTR_STRINGIFY_FETCHES` is unknown. This wasn't the case
+        // before. We'll ignore the error until the hotfix is released.
+
+        if (! is_null($stringifyFetches = $options[PDO::ATTR_STRINGIFY_FETCHES] ?? null)) {
+            unset($options[PDO::ATTR_STRINGIFY_FETCHES]);
+        }
+
+        $pdo = parent::createPdoConnection($dsn, $username, $password, $options);
+
+        if (! is_null($stringifyFetches)) {
+            try {
+                $pdo->setAttribute(PDO::ATTR_STRINGIFY_FETCHES, $stringifyFetches);
+            } catch (PDOException $e) {
+                //
+            }
+        }
+
+        return $pdo;
     }
 
     /**
