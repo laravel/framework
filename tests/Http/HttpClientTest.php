@@ -267,6 +267,26 @@ class HttpClientTest extends TestCase
         $this->assertSame(['foo' => 'bar'], $response['result']);
     }
 
+    public function testResponseOnlyGetter()
+    {
+        $response = $this->factory
+            ->fake(['*' => ['name' => 'Taylor', 'age' => null]])
+            ->get('http://foo.com/api');
+
+        $this->assertEquals(['name' => 'Taylor', 'age' => null], $response->only('name', 'age', 'email'));
+    }
+
+    public function testResponseOnlyGetterWithObjectSubkey()
+    {
+        $response = $this->factory
+            ->fake(['*' => ['developer' => ['name' => 'Taylor', 'age' => null]]])
+            ->get('http://foo.com/api');
+
+        $this->assertEquals(['developer' => ['name' => 'Taylor']], $response->only('developer.name', 'developer.skills'));
+        $this->assertEquals(['developer' => ['age' => null]], $response->only('developer.age'));
+        $this->assertEquals([], $response->only('developer.skills'));
+    }
+
     public function testResponseObjectAsArray()
     {
         $this->factory->fake([
