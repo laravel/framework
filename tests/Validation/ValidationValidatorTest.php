@@ -7850,6 +7850,23 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
     }
 
+    public function testValidateWithValidEncoding()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => 'é'], ['foo' => 'encoding:UTF-8']);
+        $this->assertTrue($v->passes());
+    }
+
+    public function testValidateWithInvalidEncoding()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => 'é'], ['foo' => 'encoding:ASCII']);
+        $this->assertFalse($v->passes());
+        //"\xE9" is é in ISO-8859-1
+        $v = new Validator($trans, ['foo' => "\xE9"], ['foo' => 'encoding:UTF-8']);
+        $this->assertFalse($v->passes());
+    }
+
     public function testValidateWithValidUlid()
     {
         $trans = $this->getIlluminateArrayTranslator();

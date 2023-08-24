@@ -161,6 +161,21 @@ trait ValidatesAttributes
     }
 
     /**
+     * Validate that an attribute is valid in a specific encoding.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  array<int, int|string>  $parameters
+     * @return bool
+     */
+    public function validateEncoding($attribute, $value, $parameters)
+    {
+        $this->requireParameterCount(1, $parameters, 'encoding');
+
+        return Str::isEncoding((string) $value, $parameters[0]);
+    }
+
+    /**
      * "Break" on first validation fail.
      *
      * Always returns true, just lets us put "bail" in rules.

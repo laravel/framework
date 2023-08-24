@@ -871,6 +871,31 @@ class SupportStrTest extends TestCase
         $this->assertSame('', Str::slug(null));
     }
 
+    public function testIsEncoding()
+    {
+        $isoe = "\xE9"; //é in ISO-8859-1
+        $utf8e = "\xC3\xA9"; //é in UTF-8
+        $this->assertTrue(Str::isEncoding('e', 'ASCII'));
+        $this->assertFalse(Str::isEncoding('é', 'ASCII'));
+        $this->assertTrue(Str::isEncoding('é'));
+        $this->assertTrue(Str::isEncoding('é', 'UTF-8'));
+        $this->assertTrue(Str::isEncoding($isoe, 'ISO-8859-1'));
+        //This is unfortunately sad but true
+        $this->assertTrue(Str::isEncoding($utf8e, 'ISO-8859-1'));
+        $this->assertTrue(Str::isEncoding($isoe, 'Windows-1252'));
+        $this->assertFalse(Str::isEncoding($isoe, 'UTF-8'));
+        $this->assertFalse(Str::isEncoding($isoe));
+        $this->assertFalse(Str::isEncoding('e', 'invalid encoding'));
+        $this->assertFalse(Str::isEncoding('e', ''));
+        $this->assertFalse(Str::isEncoding('é', '7bit'));
+    }
+
+    public function testIsEncodingNull()
+    {
+        $this->expectException(\TypeError::class);
+        $this->assertFalse(Str::isEncoding(null));
+    }
+
     public function testPadBoth()
     {
         $this->assertSame('__Alien___', Str::padBoth('Alien', 10, '_'));

@@ -421,6 +421,26 @@ class Str
     }
 
     /**
+     * Determine if a given string is valid in a specified encoding.
+     *
+     * @param  string  $value
+     * @param  string  $encoding
+     * @return bool
+     */
+    public static function isEncoding(string $value, string $encoding = 'UTF-8'): bool
+    {
+        if ($value === '') {
+            return true;
+        }
+        if (! in_array($encoding, mb_list_encodings(), true)) {
+            //Non-existent encoding
+            return false;
+        }
+
+        return mb_check_encoding($value, $encoding);
+    }
+
+    /**
      * Determine if a given value is valid JSON.
      *
      * @param  mixed  $value
