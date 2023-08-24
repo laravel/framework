@@ -202,12 +202,6 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     protected static $isBroadcasting = true;
 
-    /**
-     * Model validation rules
-     *
-     * @var  array
-     */
-    protected array $rules = [];
 
     /**
      * The name of the "created at" column.
