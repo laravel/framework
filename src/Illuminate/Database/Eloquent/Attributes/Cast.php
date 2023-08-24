@@ -96,7 +96,7 @@ class Cast implements AttributesContract
             return $this->getEnumCastableAttributeValue($value);
         }
 
-        if ($this->isClassCastable($this->key)) {
+        if ($this->isClassCastable()) {
             return $this->getClassCastableAttributeValue($value);
         }
 
@@ -129,7 +129,7 @@ class Cast implements AttributesContract
         return ($this->model::$encrypter ?? Crypt::getFacadeRoot())->decrypt($value, false);
     }
 
-    protected function isEnumCastable($key): bool
+    protected function isEnumCastable(): bool
     {
 
         if (in_array($this->castType, $this->model::$primitiveCastTypes)) {
@@ -190,8 +190,9 @@ class Cast implements AttributesContract
      * @return mixed
      * @throws ReflectionException
      */
-    public function castAttribute($key, $value)
+    public function castAttribute($value): mixed
     {
+        $key = $this->key;
         if($this->model->hasAttribute($key, Cast::class, 'property')){
             $instance = $this->model->getAttributeInstance($key, Cast::class, 'property');
             if($instance instanceof Cast){
@@ -215,6 +216,38 @@ class Cast implements AttributesContract
         return $caster->getCastedValue($value);
     }
 
+    /**
+     * Get the type of cast for a model attribute.
+     *
+     * @param string $key
+     *
+     * @return string
+     * @throws ReflectionException
+     */
+    protected function getCastType(): string
+    {
+        $key = $this->key;
+        $castType = $this->model->getCasts()[$key];
+
+        if (isset($this->model::$castTypeCache[$castType])) {
+            return $this->model::$castTypeCache[$castType];
+        }
+
+        if ($this->isCustomDateTimeCast($castType)) {
+            $convertedCastType = 'custom_datetime';
+        } elseif ($this->isImmutableCustomDateTimeCast($castType)) {
+            $convertedCastType = 'immutable_custom_datetime';
+        } elseif ($this->isDecimalCast($castType)) {
+            $convertedCastType = 'decimal';
+        } elseif (class_exists($castType)) {
+            $convertedCastType = $castType;
+        } else {
+            $convertedCastType = trim(strtolower($castType));
+        }
+
+        return static::$castTypeCache[$castType] = $convertedCastType;
+    }
+
 
     /**
      * Determine if the key is serializable using a custom class.
@@ -224,11 +257,12 @@ class Cast implements AttributesContract
      * @return bool
      * @throws InvalidCastException
      */
-    protected function isClassSerializable($key)
+    protected function isClassSerializable()
     {
+        $key = $this->key;
         return ! $this->isEnumCastable($key) &&
             $this->isClassCastable($key) &&
-            method_exists($this->resolveCasterClass($key), 'serialize');
+            method_exists($this->resolveCasterClass(), 'serialize');
     }
 
 
@@ -257,6 +291,21 @@ class Cast implements AttributesContract
 
             return $value;
         }
+    }
+
+    /**
+     * Serialize the given attribute using the custom cast class.
+     *
+     * @param  string  $key
+     * @param  mixed  $value
+     * @return mixed
+     */
+    public function serializeClassCastableAttribute($value)
+    {
+        $caster = $this->getCasterInstance($this->key);
+        return $caster->serialize(
+            $this, $this->key, $value, $this->model->attributes
+        );
     }
 
     protected function resolveCasterClass()

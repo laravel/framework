@@ -43,6 +43,7 @@ use ReflectionClass;
 use ReflectionException;
 use ReflectionMethod;
 use ReflectionNamedType;
+use ReflectionProperty;
 
 trait HasAttributes
 {
@@ -272,9 +273,11 @@ trait HasAttributes
     /**
      * Add the casted attributes to the attributes array.
      *
-     * @param  array  $attributes
-     * @param  array  $mutatedAttributes
+     * @param array $attributes
+     * @param array $mutatedAttributes
+     *
      * @return array
+     * @throws ReflectionException
      */
     protected function addCastAttributesToArray(array $attributes, array $mutatedAttributes)
     {
@@ -289,8 +292,7 @@ trait HasAttributes
             // Here we will cast the attribute. Then, if the cast is a date or datetime cast
             // then we will serialize the date for the array. This will convert the dates
             // to strings based on the date format specified for these Eloquent models.
-            $attributes[$key] = $this->castAttribute(
-                $key, $attributes[$key]
+            $attributes[$key] = $caster->castAttribute($attributes[$key]
             );
 
             // If the attribute cast was a date or a datetime, we will serialize the date as
@@ -300,21 +302,21 @@ trait HasAttributes
                 $attributes[$key] = $this->serializeDate($attributes[$key]);
             }
 
-            if (isset($attributes[$key]) && ($this->isCustomDateTimeCast($value) ||
-                $this->isImmutableCustomDateTimeCast($value))) {
+            if (isset($attributes[$key]) && ($caster->isCustomDateTimeCast($value) ||
+                    $caster->isImmutableCustomDateTimeCast($value))) {
                 $attributes[$key] = $attributes[$key]->format(explode(':', $value, 2)[1]);
             }
 
             if ($attributes[$key] instanceof DateTimeInterface &&
-                $this->isClassCastable($key)) {
+                $caster->isClassCastable()) {
                 $attributes[$key] = $this->serializeDate($attributes[$key]);
             }
 
-            if (isset($attributes[$key]) && $this->isClassSerializable($key)) {
-                $attributes[$key] = $this->serializeClassCastableAttribute($key, $attributes[$key]);
+            if (isset($attributes[$key]) && $caster->isClassSerializable()) {
+                $attributes[$key] = $caster->serializeClassCastableAttribute($attributes[$key]);
             }
 
-            if ($this->isEnumCastable($key) && (! ($attributes[$key] ?? null) instanceof Arrayable)) {
+            if ($caster->isEnumCastable() && (! ($attributes[$key] ?? null) instanceof Arrayable)) {
                 $attributes[$key] = isset($attributes[$key]) ? $this->getStorableEnumValue($attributes[$key]) : null;
             }
 
@@ -331,7 +333,7 @@ trait HasAttributes
      *
      * @return array
      */
-    protected function getArrayableAttributes()
+    protected function getArrayableAttributes(): array
     {
         return $this->getArrayableItems($this->getAttributes());
     }
@@ -511,6 +513,7 @@ trait HasAttributes
             return;
         }
 
+        $caster = $this->getCasterInstance($key);
 
         // If the attribute exists in the attribute array or has a "get" mutator we will
         // get the attribute's value. Otherwise, we will proceed as if the developers
@@ -519,7 +522,7 @@ trait HasAttributes
             array_key_exists($key, $this->casts) ||
             $this->hasGetMutator($key) ||
             $this->hasAttributeMutator($key) ||
-            $this->isClassCastable($key)) {
+            $caster->isClassCastable()) {
             return $this->getAttributeValue($key);
         }
 
@@ -780,130 +783,6 @@ trait HasAttributes
     }
 
     /**
-<<<<<<< Updated upstream
-     * Cast an attribute to a native PHP type.
-     *
-     * @param  string  $key
-     * @param  mixed  $value
-     * @return mixed
-     */
-    protected function castAttribute($key, $value)
-    {
-        $castType = $this->getCastType($key);
-
-        if (is_null($value) && in_array($castType, static::$primitiveCastTypes)) {
-            return $value;
-        }
-
-        // If the key is one of the encrypted castable types, we'll first decrypt
-        // the value and update the cast type so we may leverage the following
-        // logic for casting this value to any additionally specified types.
-        if ($this->isEncryptedCastable($key)) {
-            $value = $this->fromEncryptedString($value);
-
-            $castType = Str::after($castType, 'encrypted:');
-        }
-
-        switch ($castType) {
-            case 'int':
-            case 'integer':
-                return (int) $value;
-            case 'real':
-            case 'float':
-            case 'double':
-                return $this->fromFloat($value);
-            case 'decimal':
-                return $this->asDecimal($value, explode(':', $this->getCasts()[$key], 2)[1]);
-            case 'string':
-                return (string) $value;
-            case 'bool':
-            case 'boolean':
-                return (bool) $value;
-            case 'object':
-                return $this->fromJson($value, true);
-            case 'array':
-            case 'json':
-                return $this->fromJson($value);
-            case 'collection':
-                return new BaseCollection($this->fromJson($value));
-            case 'date':
-                return $this->asDate($value);
-            case 'datetime':
-            case 'custom_datetime':
-                return $this->asDateTime($value);
-            case 'immutable_date':
-                return $this->asDate($value)->toImmutable();
-            case 'immutable_custom_datetime':
-            case 'immutable_datetime':
-                return $this->asDateTime($value)->toImmutable();
-            case 'timestamp':
-                return $this->asTimestamp($value);
-        }
-
-        if ($this->isEnumCastable($key)) {
-            return $this->getEnumCastableAttributeValue($key, $value);
-        }
-
-        if ($this->isClassCastable($key)) {
-            return $this->getClassCastableAttributeValue($key, $value);
-        }
-
-        return $value;
-    }
-
-    /**
-     * Cast the given attribute using a custom cast class.
-     *
-     * @param  string  $key
-     * @param  mixed  $value
-     * @return mixed
-     */
-    protected function getClassCastableAttributeValue($key, $value)
-    {
-        $caster = $this->resolveCasterClass($key);
-
-        $objectCachingDisabled = $caster->withoutObjectCaching ?? false;
-
-        if (isset($this->classCastCache[$key]) && ! $objectCachingDisabled) {
-            return $this->classCastCache[$key];
-        } else {
-            $value = $caster instanceof CastsInboundAttributes
-                ? $value
-                : $caster->get($this, $key, $value, $this->attributes);
-
-            if ($caster instanceof CastsInboundAttributes ||
-                ! is_object($value) ||
-                $objectCachingDisabled) {
-                unset($this->classCastCache[$key]);
-            } else {
-                $this->classCastCache[$key] = $value;
-            }
-
-            return $value;
-        }
-    }
-
-    /**
-     * Cast the given attribute to an enum.
-     *
-     * @param  string  $key
-     * @param  mixed  $value
-     * @return mixed
-     */
-    protected function getEnumCastableAttributeValue($key, $value)
-    {
-        if (is_null($value)) {
-            return;
-        }
-
-        $castType = $this->getCasts()[$key];
-
-        if ($value instanceof $castType) {
-            return $value;
-        }
-
-        return $this->getEnumCaseFromValue($castType, $value);
-=======
      * Ensure that the given casts are strings.
      *
      * @param  array  $casts
@@ -927,37 +806,9 @@ trait HasAttributes
         }
 
         return $casts;
->>>>>>> Stashed changes
     }
 
-    /**
-     * Get the type of cast for a model attribute.
-     *
-     * @param  string  $key
-     * @return string
-     */
-    protected function getCastType($key)
-    {
-        $castType = $this->getCasts()[$key];
 
-        if (isset(static::$castTypeCache[$castType])) {
-            return static::$castTypeCache[$castType];
-        }
-
-        if ($this->isCustomDateTimeCast($castType)) {
-            $convertedCastType = 'custom_datetime';
-        } elseif ($this->isImmutableCustomDateTimeCast($castType)) {
-            $convertedCastType = 'immutable_custom_datetime';
-        } elseif ($this->isDecimalCast($castType)) {
-            $convertedCastType = 'decimal';
-        } elseif (class_exists($castType)) {
-            $convertedCastType = $castType;
-        } else {
-            $convertedCastType = trim(strtolower($castType));
-        }
-
-        return static::$castTypeCache[$castType] = $convertedCastType;
-    }
 
     /**
      * Increment or decrement the given attribute using the custom cast class.
@@ -974,19 +825,6 @@ trait HasAttributes
         );
     }
 
-    /**
-     * Serialize the given attribute using the custom cast class.
-     *
-     * @param  string  $key
-     * @param  mixed  $value
-     * @return mixed
-     */
-    protected function serializeClassCastableAttribute($key, $value)
-    {
-        return $this->resolveCasterClass($key)->serialize(
-            $this, $key, $value, $this->attributes
-        );
-    }
 
     /**
      * Set a given attribute on the model.
@@ -1497,50 +1335,6 @@ trait HasAttributes
     }
 
     /**
-<<<<<<< Updated upstream
-     * Determine whether a value is Date / DateTime castable for inbound manipulation.
-     *
-     * @param  string  $key
-     * @return bool
-     */
-    protected function isDateCastable($key)
-    {
-        return $this->hasCast($key, ['date', 'datetime', 'immutable_date', 'immutable_datetime']);
-    }
-
-    /**
-     * Determine whether a value is Date / DateTime custom-castable for inbound manipulation.
-     *
-     * @param  string  $key
-     * @return bool
-     */
-    protected function isDateCastableWithCustomFormat($key)
-    {
-        return $this->hasCast($key, ['custom_datetime', 'immutable_custom_datetime']);
-    }
-
-    /**
-     * Determine whether a value is JSON castable for inbound manipulation.
-     *
-     * @param  string  $key
-     * @return bool
-     */
-    protected function isJsonCastable($key)
-    {
-        return $this->hasCast($key, ['array', 'json', 'object', 'collection', 'encrypted:array', 'encrypted:collection', 'encrypted:json', 'encrypted:object']);
-    }
-
-    /**
-     * Determine whether a value is an encrypted castable for inbound manipulation.
-     *
-     * @param  string  $key
-     * @return bool
-     */
-    protected function isEncryptedCastable($key)
-    {
-        return $this->hasCast($key, ['encrypted', 'encrypted:array', 'encrypted:collection', 'encrypted:json', 'encrypted:object']);
-    }
-=======
      * Get the attributes that should be cast.
      *
      * @return array
@@ -1550,128 +1344,7 @@ trait HasAttributes
         return [];
     }
 
->>>>>>> Stashed changes
 
-    /**
-     * Determine if the given key is cast using a custom class.
-     *
-     * @param string $key
-     *
-     * @return bool
-     * @throws InvalidCastException
-     * @throws ReflectionException
-     */
-    protected function isClassCastable($key)
-    {
-        $casts = $this->getCasts();
-        $hasAttribute = $this->hasAttribute($key, Cast::class, 'property');
-        if (! array_key_exists($key, $casts) && ! $hasAttribute) {
-            return false;
-        }
-
-        if($hasAttribute){
-
-        }
-
-        $castType = $this->parseCasterClass($casts[$key]);
-
-        if (in_array($castType, static::$primitiveCastTypes)) {
-            return false;
-        }
-
-        if (class_exists($castType)) {
-            return true;
-        }
-
-        throw new InvalidCastException($this->getModel(), $key, $castType);
-    }
-
-    /**
-     * Determine if the given key is cast using an enum.
-     *
-     * @param  string  $key
-     * @return bool
-     */
-    protected function isEnumCastable($key)
-    {
-        $casts = $this->getCasts();
-
-        if (! array_key_exists($key, $casts)) {
-            return false;
-        }
-
-        $castType = $casts[$key];
-
-        if (in_array($castType, static::$primitiveCastTypes)) {
-            return false;
-        }
-
-        return enum_exists($castType);
-    }
-
-    /**
-     * Determine if the key is deviable using a custom class.
-     *
-     * @param  string  $key
-     *
-     * @return bool
-     * @throws InvalidCastException
-     */
-    protected function isClassDeviable($key)
-    {
-        if (! $this->isClassCastable($key)) {
-            return false;
-        }
-
-        $castType = $this->resolveCasterClass($key);
-
-        return method_exists($castType::class, 'increment') && method_exists($castType::class, 'decrement');
-    }
-
-
-
-    /**
-     * Resolve the custom caster class for a given key.
-     *
-     * @param  string  $key
-     * @return mixed
-     */
-    protected function resolveCasterClass($key)
-    {
-        $castType = $this->getCasts()[$key];
-
-        $arguments = [];
-
-        if (is_string($castType) && str_contains($castType, ':')) {
-            $segments = explode(':', $castType, 2);
-
-            $castType = $segments[0];
-            $arguments = explode(',', $segments[1]);
-        }
-
-        if (is_subclass_of($castType, Castable::class)) {
-            $castType = $castType::castUsing($arguments);
-        }
-
-        if (is_object($castType)) {
-            return $castType;
-        }
-
-        return new $castType(...$arguments);
-    }
-
-    /**
-     * Parse the given caster class, removing any arguments.
-     *
-     * @param  string  $class
-     * @return string
-     */
-    protected function parseCasterClass($class)
-    {
-        return ! str_contains($class, ':')
-            ? $class
-            : explode(':', $class, 2)[0];
-    }
 
     /**
      * Merge the cast class and attribute cast attributes back into the model.
