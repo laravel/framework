@@ -1418,7 +1418,7 @@ class TestResponse implements ArrayAccess
     }
 
     /**
-     * Assert that the Precognition request was successful
+     * Assert that the Precognition request was successful.
      *
      * @return $this
      */
