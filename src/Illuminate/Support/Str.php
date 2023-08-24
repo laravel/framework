@@ -812,67 +812,65 @@ class Str
      * @param  bool  $numbers
      * @param  bool  $symbols
      * @param  bool  $spaces
-     * @param  array $rules
+     * @param  bool  $enforce
      * @return string
      */
-    public static function password($length = 32, $letters = true, $numbers = true, $symbols = true, $spaces = false, $rules = [])
+    public static function password($length = 32, $letters = true, $numbers = true, $symbols = true, $spaces = false, $enforce = false)
     {
-        $letters_collection = collect([
+        $lettersCollection = (new Collection([
             'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k',
             'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v',
             'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G',
             'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R',
             'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
-        ]);
+        ]));
 
-        $numbers_collection = collect([
+        $numbersCollection = (new Collection([
             '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
-        ]);
+        ]));
 
-        $symbols_collection = collect([
+        $symbolsCollection = (new Collection([
             '~', '!', '#', '$', '%', '^', '&', '*', '(', ')', '-',
             '_', '.', ',', '<', '>', '?', '/', '\\', '{', '}', '[',
             ']', '|', ':', ';',
-        ]);
+        ]));
 
-        $all_collections = [
-            'letters' => $letters_collection,
-            'numbers' => $numbers_collection,
-            'symbols' => $symbols_collection,
-            'spaces' => [' '],
-        ];
+        $enforcedCollections = (new Collection)
+                ->when($letters && $enforce, fn ($c) => $c->push($lettersCollection))
+                ->when($numbers && $enforce, fn ($c) => $c->push($numbersCollection))
+                ->when($symbols && $enforce, fn($c) => $c->push($symbolsCollection))
+                ->when($spaces && $enforce, fn($c) => $c->push([' ']));
 
-        $initial_values = [];
-        $initial_keys = [];
-
-        for ($i = 0; $i < count($rules); $i++){
-            $initial_keys[] = $i;
+        $excess = $enforcedCollections->count() - $length;
+        for($i = 0; $i < $excess; $i++) {
+            $enforcedCollections->pop();
         }
 
-        foreach ($all_collections as $rule => $collection) {
-            if (in_array($rule, $rules)) {
-                $random_value = $collection[random_int(0, count($collection) - 1)];
-                $key = random_int(0, count($initial_keys) - 1);
-                $initial_values[$initial_keys[$key]] = $random_value;
+        $initialValues = [];
+        $initialKeys = [];
 
-                unset($initial_keys[$key]);
-                $initial_keys = array_values($initial_keys);
-            }
+        for ($i = 0; $i < $enforcedCollections->count(); $i++){
+            $initialKeys[] = $i;
         }
 
-        $length = $length - count($initial_values);
+        $enforcedCollections->each(function($collection) use (&$initialKeys, &$initialValues) {
+            $randomValue = $collection[random_int(0, count($collection) - 1)];
+            $key = random_int(0, count($initialKeys) - 1);
+            $initialValues[$initialKeys[$key]] = $randomValue;
 
-        $password_chars = (new Collection)
-                ->when($letters, fn ($c) => $c->merge($letters_collection))
-                ->when($numbers, fn ($c) => $c->merge($numbers_collection))
-                ->when($symbols, fn($c) => $c->merge($symbols_collection))
+            unset($initialKeys[$key]);
+            $initialKeys = array_values($initialKeys);
+        });
+
+        return (new Collection)
+                ->when($letters, fn ($c) => $c->merge($lettersCollection))
+                ->when($numbers, fn ($c) => $c->merge($numbersCollection))
+                ->when($symbols, fn($c) => $c->merge($symbolsCollection))
                 ->when($spaces, fn($c) => $c->merge([' ']))
-                ->pipe(fn ($c) => Collection::times($length, fn () => $c[random_int(0, $c->count() - 1)]))
-                ->merge($initial_values)
-                ->toArray();
-
-        usort($password_chars, fn() => random_int(-1, 1));
-        return collect($password_chars)->implode('');
+                ->pipe(fn ($c) => Collection::times($length - count($initialValues), fn () => $c[random_int(0, $c->count() - 1)]))
+                ->merge($initialValues)
+                ->shuffle()
+                ->implode('');
     }
 
     /**

@@ -1132,8 +1132,7 @@ class SupportStrTest extends TestCase
     {
         $this->assertTrue(strlen(Str::password()) === 32);
 
-        $rules = ['letters', 'numbers', 'symbols', 'spaces'];
-        $password = Str::password(16, true, true, true, true, $rules);
+        $password = Str::password(16, true, true, true, true, true);
 
         $this->assertTrue(strlen($password) === 16);
 
