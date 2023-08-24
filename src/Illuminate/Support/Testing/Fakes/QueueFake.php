@@ -44,7 +44,7 @@ class QueueFake extends QueueManager implements Fake, Queue
     protected $jobs = [];
 
     /**
-     * Indicates if items should be serialized and restored before checking assertions.
+     * Indicates if items should be serialized and restored when pushed to the queue.
      *
      * @var bool
      */
@@ -499,7 +499,7 @@ class QueueFake extends QueueManager implements Fake, Queue
     }
 
     /**
-     * Specify if jobs should be serialized and restored before assertions are evaluated.
+     * Specify if jobs should be serialized and restored when being "pushed" to the queue.
      *
      * @param  bool  $serializeAndRestore
      * @return $this
