@@ -378,7 +378,7 @@ class Repository implements ArrayAccess, CacheContract
      *
      * @template TCacheValue
      *
-     * @param  string  $key
+     * @param  array|string  $key
      * @param  \Closure|\DateTimeInterface|\DateInterval|int|null  $ttl
      * @param  \Closure(): TCacheValue  $callback
      * @return TCacheValue
