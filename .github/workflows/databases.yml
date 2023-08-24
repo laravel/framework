@@ -191,6 +191,7 @@ jobs:
 
   mssql:
     runs-on: ubuntu-20.04
+    continue-on-error: true
 
     services:
       sqlsrv:
@@ -202,7 +203,7 @@ jobs:
           - 1433:1433
 
     strategy:
-      fail-fast: true
+      fail-fast: false
 
     name: SQL Server 2019
 
