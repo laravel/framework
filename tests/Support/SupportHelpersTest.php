@@ -847,7 +847,7 @@ class SupportHelpersTest extends TestCase
 
         Sleep::assertSequence([
             Sleep::usleep(100_000),
-        ]) ;
+        ]);
     }
 
     public function testRetryWithFailingWhenCallback()
