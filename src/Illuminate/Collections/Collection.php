@@ -176,11 +176,6 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
 
                 return $this->first($key, $placeholder) !== $placeholder;
             }
-
-            if($key instanceof Model){
-                return (bool) $this->whereInstanceOf(Model::class)->first(fn(Model $model) => $model->is($key));
-            }
-
             return in_array($key, $this->items);
         }
 
