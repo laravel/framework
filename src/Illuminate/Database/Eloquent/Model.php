@@ -362,13 +362,17 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function validate(callable $callback = null): static
     {
-        $this->getModelRules();
-        $this->getPropertyRules();
+        $rules = $this->rules;
+
         if (!is_null($callback)) {
-            $rules = $callback($this->rules);
-            $this->rules = tap($rules, fn($value) => throw_unless(is_array($value), new Exception('The validate callback should return an array')));
+            $modifiedRules = $callback($rules);
+            throw_unless(is_array($modifiedRules), new Exception('The validate callback should return an array'));
         } else {
-            $validator = Validator::make($this->attributesToArray(), $this->rules);
+            $this->getModelRules();
+            $this->getPropertyRules();
+
+            $validator = Validator::make($this->attributesToArray(), $rules);
+
             if ($validator->fails()) {
                 $rules = $validator->errors()->all();
                 throw new FieldsValidationException($rules);
