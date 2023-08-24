@@ -6,12 +6,6 @@ use Illuminate\Contracts\Auth\Authenticatable as UserContract;
 
 class GenericUser implements UserContract
 {
-    /**
-     * All of the user's attributes.
-     *
-     * @var array
-     */
-    protected $attributes;
 
     /**
      * Create a new generic User object.
@@ -19,9 +13,8 @@ class GenericUser implements UserContract
      * @param  array  $attributes
      * @return void
      */
-    public function __construct(array $attributes)
+    public function __construct(protected array $attributes)
     {
-        $this->attributes = $attributes;
     }
 
     /**
