@@ -184,7 +184,7 @@ class DynamoDbFailedJobProviderTest extends TestCase
         ])->andReturn([
             'Table' => [
                 'ItemCount' => 5,
-            ]
+            ],
         ]);
         $provider = new DynamoDbFailedJobProvider($dynamoDbClient, 'application', 'table');
 
