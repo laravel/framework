@@ -2341,6 +2341,10 @@ class Builder
                     ? $this->pluckFromArrayColumn($queryResult, $column, $key)
                     : $this->pluckFromObjectColumn($queryResult, $column, $key);
     }
+    public function lists($column, $key = null)
+    {
+        return $this->pluck($column, $key);
+    }
 
     /**
      * Strip off the table name or alias from a column identifier.
