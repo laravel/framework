@@ -3,10 +3,11 @@
 namespace Illuminate\Queue\Failed;
 
 use Closure;
+use Countable;
 use DateTimeInterface;
 use Illuminate\Support\Facades\Date;
 
-class FileFailedJobProvider implements FailedJobProviderInterface, PrunableFailedJobProvider
+class FileFailedJobProvider implements FailedJobProviderInterface, PrunableFailedJobProvider, Countable
 {
     /**
      * The file path where the failed job file should be stored.
@@ -146,6 +147,16 @@ class FileFailedJobProvider implements FailedJobProviderInterface, PrunableFaile
 
             return count($jobs) - count($prunedJobs);
         });
+    }
+
+    /**
+     * Count the failed jobs.
+     *
+     * @return int
+     */
+    public function count()
+    {
+        return count($this->read());
     }
 
     /**
