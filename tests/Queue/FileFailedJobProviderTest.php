@@ -140,7 +140,7 @@ class FileFailedJobProviderTest extends TestCase
         $this->assertEmpty($failedJobs);
     }
 
-    public function testCountFailedJobs()
+    public function testJobsCanBeCounted()
     {
         $this->assertCount(0, $this->provider);
 

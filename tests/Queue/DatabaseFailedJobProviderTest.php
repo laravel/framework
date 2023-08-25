@@ -73,7 +73,7 @@ class DatabaseFailedJobProviderTest extends TestCase
         $this->assertSame($exception, $db->getConnection()->table('failed_jobs')->first()->exception);
     }
 
-    public function testCountFailedJobs()
+    public function testJobsCanBeCounted()
     {
         $db = new DB;
         $db->addConnection([

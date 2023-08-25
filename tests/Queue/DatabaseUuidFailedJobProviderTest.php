@@ -14,7 +14,7 @@ use RuntimeException;
 
 class DatabaseUuidFailedJobProviderTest extends TestCase
 {
-    public function testCountFailedJobs()
+    public function testJobsCanBeCounted()
     {
         $db = new DB;
         $db->addConnection([
@@ -41,6 +41,3 @@ class DatabaseUuidFailedJobProviderTest extends TestCase
         $this->assertCount(3, $provider);
     }
 }
-
-
-
