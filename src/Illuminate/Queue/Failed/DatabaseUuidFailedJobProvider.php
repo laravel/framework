@@ -2,11 +2,12 @@
 
 namespace Illuminate\Queue\Failed;
 
+use Countable;
 use DateTimeInterface;
 use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Support\Facades\Date;
 
-class DatabaseUuidFailedJobProvider implements FailedJobProviderInterface, PrunableFailedJobProvider
+class DatabaseUuidFailedJobProvider implements Countable, FailedJobProviderInterface, PrunableFailedJobProvider
 {
     /**
      * The connection resolver implementation.
@@ -141,6 +142,14 @@ class DatabaseUuidFailedJobProvider implements FailedJobProviderInterface, Pruna
         } while ($deleted !== 0);
 
         return $totalDeleted;
+    }
+
+    /**
+     * Count the failed jobs.
+     */
+    public function count(): int
+    {
+        return $this->getTable()->count();
     }
 
     /**
