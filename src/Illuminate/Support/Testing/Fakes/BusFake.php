@@ -788,7 +788,7 @@ class BusFake implements Fake, QueueingDispatcher
     /**
      * Return the command representation that should be stored.
      *
-     * @param  mixed $command
+     * @param  mixed  $command
      * @return mixed
      */
     protected function getCommandRepresentation($command)

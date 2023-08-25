@@ -676,13 +676,13 @@ class SupportTestingBusFakeTest extends TestCase
 
         // without setting the serialization, the job should return the value passed in
         $this->fake->{$commandFunctionName}(new BusFakeJobWithSerialization('hello'));
-        $this->fake->{$assertionFunctionName}(BusFakeJobWithSerialization::class, fn($command) => $command->value === 'hello');
+        $this->fake->{$assertionFunctionName}(BusFakeJobWithSerialization::class, fn ($command) => $command->value === 'hello');
 
         // when enabling the serializeAndRestore property, job has value modified
         $serializingBusFake->{$commandFunctionName}(new BusFakeJobWithSerialization('hello'));
         $serializingBusFake->{$assertionFunctionName}(
             BusFakeJobWithSerialization::class,
-            fn($command) => $command->value === 'hello-serialized-unserialized'
+            fn ($command) => $command->value === 'hello-serialized-unserialized'
         );
     }
 
@@ -704,7 +704,7 @@ class SupportTestingBusFakeTest extends TestCase
         $this->fake->batch([
             new BusFakeJobWithSerialization('hello'),
         ])->dispatch();
-        $this->fake->assertBatched(function(PendingBatchFake $batchedCollection) {
+        $this->fake->assertBatched(function (PendingBatchFake $batchedCollection) {
             return $batchedCollection->jobs->count() === 1 && $batchedCollection->jobs->first()->value === 'hello';
         });
 
@@ -713,7 +713,7 @@ class SupportTestingBusFakeTest extends TestCase
             new BusFakeJobWithSerialization('hello'),
         ])->dispatch();
 
-        $serializingBusFake->assertBatched(function(PendingBatchFake $batchedCollection) {
+        $serializingBusFake->assertBatched(function (PendingBatchFake $batchedCollection) {
             return $batchedCollection->jobs->count() === 1 && $batchedCollection->jobs->first()->value === 'hello';
         });
     }
@@ -744,7 +744,6 @@ class ThirdJob
     //
 }
 
-
 class BusFakeJobWithSerialization
 {
     use Queueable;
@@ -755,11 +754,11 @@ class BusFakeJobWithSerialization
 
     public function __serialize(): array
     {
-        return ['value' => $this->value .'-serialized'];
+        return ['value' => $this->value.'-serialized'];
     }
 
     public function __unserialize(array $data): void
     {
-        $this->value = $data['value'] .'-unserialized';
+        $this->value = $data['value'].'-unserialized';
     }
 }
