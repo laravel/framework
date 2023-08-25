@@ -184,6 +184,7 @@ class DatabaseEloquentHasManyTest extends TestCase
         $relation->getQuery()->shouldReceive('withSavepointIfNeeded')->once()->andReturnUsing(function ($scope) {
             return $scope();
         });
+        $relation->getQuery()->shouldReceive('useWritePdo')->once()->andReturn($relation->getQuery());
         $relation->getQuery()->shouldReceive('where')->once()->with(['foo' => 'bar'])->andReturn($relation->getQuery());
         $relation->getQuery()->shouldReceive('first')->once()->with()->andReturn($model = m::mock(stdClass::class));
 
