@@ -258,7 +258,7 @@ class QueueDatabaseQueueIntegrationTest extends TestCase
         });
 
         $this->queue->push('MyJob', [
-            'laravel' => 'Framework'
+            'laravel' => 'Framework',
         ]);
 
         $this->assertIsArray($event->payload());
