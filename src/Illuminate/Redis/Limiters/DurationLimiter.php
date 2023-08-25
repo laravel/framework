@@ -160,11 +160,16 @@ if redis.call('EXISTS', KEYS[1]) == 0 then
     return {reset(), ARGV[2] + ARGV[3], ARGV[4] - 1}
 end
 
+local currentCount = tonumber(redis.call('HGET', KEYS[1], 'count'))
 if ARGV[1] >= redis.call('HGET', KEYS[1], 'start') and ARGV[1] <= redis.call('HGET', KEYS[1], 'end') then
+    if currentCount <= tonumber(ARGV[4]) then
+        redis.call('HINCRBY', KEYS[1], 'count', 1)
+        currentCount = currentCount + 1
+    end
     return {
-        tonumber(redis.call('HINCRBY', KEYS[1], 'count', 1)) <= tonumber(ARGV[4]),
+        currentCount <= tonumber(ARGV[4]),
         redis.call('HGET', KEYS[1], 'end'),
-        ARGV[4] - redis.call('HGET', KEYS[1], 'count')
+        ARGV[4] - currentCount
     }
 end
 
