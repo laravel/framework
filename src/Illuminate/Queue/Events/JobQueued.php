@@ -52,7 +52,7 @@ class JobQueued
     }
 
     /**
-     * The decoded payload.
+     * Get the decoded job payload.
      *
      * @return array
      */
