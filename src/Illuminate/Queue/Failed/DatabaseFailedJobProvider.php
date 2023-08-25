@@ -133,10 +133,8 @@ class DatabaseFailedJobProvider implements FailedJobProviderInterface, PrunableF
 
     /**
      * Count the failed jobs.
-     *
-     * @return int
      */
-    public function count()
+    public function count(): int
     {
         return $this->getTable()->count();
     }

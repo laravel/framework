@@ -151,10 +151,8 @@ class FileFailedJobProvider implements FailedJobProviderInterface, PrunableFaile
 
     /**
      * Count the failed jobs.
-     *
-     * @return int
      */
-    public function count()
+    public function count(): int
     {
         return count($this->read());
     }

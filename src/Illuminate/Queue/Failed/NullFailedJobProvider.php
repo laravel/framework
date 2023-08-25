@@ -65,10 +65,8 @@ class NullFailedJobProvider implements FailedJobProviderInterface, Countable
 
     /**
      * Count the failed jobs.
-     *
-     * @return int
      */
-    public function count()
+    public function count(): int
     {
         return 0;
     }
