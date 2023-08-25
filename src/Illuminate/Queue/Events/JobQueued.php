@@ -30,7 +30,7 @@ class JobQueued
     /**
      * The job payload.
      *
-     * @var ?string
+     * @var string|null
      */
     public $payload;
 
