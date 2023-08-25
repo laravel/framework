@@ -7,7 +7,7 @@ use Countable;
 use DateTimeInterface;
 use Illuminate\Support\Facades\Date;
 
-class FileFailedJobProvider implements FailedJobProviderInterface, PrunableFailedJobProvider, Countable
+class FileFailedJobProvider implements Countable, FailedJobProviderInterface, PrunableFailedJobProvider
 {
     /**
      * The file path where the failed job file should be stored.
@@ -150,14 +150,6 @@ class FileFailedJobProvider implements FailedJobProviderInterface, PrunableFaile
     }
 
     /**
-     * Count the failed jobs.
-     */
-    public function count(): int
-    {
-        return count($this->read());
-    }
-
-    /**
      * Execute the given callback while holding a lock.
      *
      * @param  \Closure  $callback
@@ -210,5 +202,13 @@ class FileFailedJobProvider implements FailedJobProviderInterface, PrunableFaile
             $this->path,
             json_encode($jobs, JSON_PRETTY_PRINT)
         );
+    }
+
+    /**
+     * Count the failed jobs.
+     */
+    public function count(): int
+    {
+        return count($this->read());
     }
 }
