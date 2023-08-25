@@ -88,7 +88,7 @@ class ClosureCommand extends Command
     }
 
     /**
-     * Creates a new scheduled event for the command.
+     * Create a new scheduled event for the command.
      *
      * @param  array  $parameters
      * @return \Illuminate\Console\Scheduling\Event
@@ -99,7 +99,7 @@ class ClosureCommand extends Command
     }
 
     /**
-     * Dynamically handle calls into a new scheduled event.
+     * Dynamically proxy calls to a new scheduled event.
      *
      * @param  string  $method
      * @param  array  $parameters
