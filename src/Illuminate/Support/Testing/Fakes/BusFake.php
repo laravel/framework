@@ -698,41 +698,6 @@ class BusFake implements Fake, QueueingDispatcher
     }
 
     /**
-     * Specify if commands should be serialized and restored when being batched.
-     *
-     * @param  bool  $serializeAndRestore
-     * @return $this
-     */
-    public function serializeAndRestore(bool $serializeAndRestore = true)
-    {
-        $this->serializeAndRestore = $serializeAndRestore;
-
-        return $this;
-    }
-
-    /**
-     * Serialize and unserialize the command to simulate the queueing process.
-     *
-     * @param  mixed  $command
-     * @return mixed
-     */
-    protected function serializeAndRestoreCommand($command)
-    {
-        return unserialize(serialize($command));
-    }
-
-    /**
-     * Return the command representation that should be stored.
-     *
-     * @param  mixed $command
-     * @return mixed
-     */
-    protected function getCommandRepresentation($command)
-    {
-        return $this->serializeAndRestore ? $this->serializeAndRestoreCommand($command) : $command;
-    }
-
-    /**
      * Dispatch an empty job batch for testing.
      *
      * @param  string  $name
@@ -794,6 +759,41 @@ class BusFake implements Fake, QueueingDispatcher
                     ? $job($command)
                     : $job === get_class($command);
             })->isNotEmpty();
+    }
+
+    /**
+     * Specify if commands should be serialized and restored when being batched.
+     *
+     * @param  bool  $serializeAndRestore
+     * @return $this
+     */
+    public function serializeAndRestore(bool $serializeAndRestore = true)
+    {
+        $this->serializeAndRestore = $serializeAndRestore;
+
+        return $this;
+    }
+
+    /**
+     * Serialize and unserialize the command to simulate the queueing process.
+     *
+     * @param  mixed  $command
+     * @return mixed
+     */
+    protected function serializeAndRestoreCommand($command)
+    {
+        return unserialize(serialize($command));
+    }
+
+    /**
+     * Return the command representation that should be stored.
+     *
+     * @param  mixed $command
+     * @return mixed
+     */
+    protected function getCommandRepresentation($command)
+    {
+        return $this->serializeAndRestore ? $this->serializeAndRestoreCommand($command) : $command;
     }
 
     /**
