@@ -4,12 +4,19 @@ namespace Illuminate\Foundation\Console;
 
 use Closure;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Schedule;
+use Illuminate\Support\Traits\ForwardsCalls;
 use ReflectionFunction;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
+/**
+ * @mixin \Illuminate\Console\Scheduling\Event
+ */
 class ClosureCommand extends Command
 {
+    use ForwardsCalls;
+
     /**
      * The command callback.
      *
@@ -78,5 +85,30 @@ class ClosureCommand extends Command
         $this->setDescription($description);
 
         return $this;
+    }
+
+    /**
+     * Create a new scheduled event for the command.
+     *
+     * @param  array  $parameters
+     * @return \Illuminate\Console\Scheduling\Event
+     */
+    public function schedule($parameters = [])
+    {
+        return Schedule::command($this->name, $parameters);
+    }
+
+    /**
+     * Dynamically proxy calls to a new scheduled event.
+     *
+     * @param  string  $method
+     * @param  array  $parameters
+     * @return mixed
+     *
+     * @throws \BadMethodCallException
+     */
+    public function __call($method, $parameters)
+    {
+        return $this->forwardCallTo($this->schedule(), $method, $parameters);
     }
 }
