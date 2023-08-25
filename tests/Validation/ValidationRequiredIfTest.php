@@ -51,4 +51,17 @@ class ValidationRequiredIfTest extends TestCase
             return true;
         }));
     }
+
+    public function testThatNoArrayToStringErrorExceptionIsThrownWhenDealingWithDependantBooleanField()
+    {
+        $validator = \Illuminate\Support\Facades\Validator::make([
+            'boolean_input' => ['test'],
+            'dependant_input' => null,
+        ], [
+            'boolean_input' => 'required|boolean',
+            'dependant_input' => 'required_if:boolean_input,true',
+        ]);
+
+        $this->assertIsBool($validator->fails());
+    }
 }
