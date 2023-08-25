@@ -19,6 +19,7 @@ use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Queue\CallQueuedClosure;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Date;
+use Illuminate\Support\Facades\Pipeline;
 use Illuminate\Support\HtmlString;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -556,6 +557,19 @@ if (! function_exists('now')) {
     function now($tz = null)
     {
         return Date::now($tz);
+    }
+}
+
+if (! function_exists('pipe')) {
+    /**
+     * Create a new instance of Pipeline.
+     *
+     * @param  mixed  $passable
+     * @return \Illuminate\Pipeline\Pipeline
+     */
+    function pipe($passable)
+    {
+        return Pipeline::send($passable);
     }
 }
 
