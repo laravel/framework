@@ -175,4 +175,19 @@ class DynamoDbFailedJobProviderTest extends TestCase
 
         $provider->forget('id');
     }
+
+    public function testJobsCanBeCounted()
+    {
+        $dynamoDbClient = m::mock(DynamoDbClient::class);
+        $dynamoDbClient->shouldReceive('describeTable')->once()->with([
+            'TableName' => 'table',
+        ])->andReturn([
+            'Table' => [
+                'ItemCount' => 5,
+            ]
+        ]);
+        $provider = new DynamoDbFailedJobProvider($dynamoDbClient, 'application', 'table');
+
+        $this->assertCount(5, $provider);
+    }
 }

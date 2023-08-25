@@ -3,12 +3,13 @@
 namespace Illuminate\Queue\Failed;
 
 use Aws\DynamoDb\DynamoDbClient;
+use Countable;
 use DateTimeInterface;
 use Exception;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Date;
 
-class DynamoDbFailedJobProvider implements FailedJobProviderInterface
+class DynamoDbFailedJobProvider implements FailedJobProviderInterface, Countable
 {
     /**
      * The DynamoDB client instance.
@@ -160,6 +161,16 @@ class DynamoDbFailedJobProvider implements FailedJobProviderInterface
         ]);
 
         return true;
+    }
+
+    /**
+     * Count the failed jobs.
+     */
+    public function count(): int
+    {
+        return $this->dynamo->describeTable([
+            'TableName' => $this->table,
+        ])['Table']['ItemCount'];
     }
 
     /**
