@@ -516,6 +516,23 @@ class RedisQueueIntegrationTest extends TestCase
         ]);
     }
 
+    public function testUnsettingCompressionAndSerializer()
+    {
+        $this->redis['phpredis']->connection()->setOption(\Redis::OPT_SERIALIZER, 1);
+        $this->redis['phpredis']->connection()->setOption(\Redis::OPT_COMPRESSION, 1);
+
+        $queue = new RedisQueue($this->redis['phpredis']);
+
+        $cleanConnection = $queue->getConnection();
+
+        $this->assertEquals(0, $cleanConnection->getOption(\Redis::OPT_SERIALIZER));
+        $this->assertEquals(0, $cleanConnection->getOption(\Redis::OPT_COMPRESSION));
+
+        // don't change the original connection so cache can still use compression or serialization
+        $this->assertEquals(1, $this->redis['phpredis']->connection()->getOption(\Redis::OPT_SERIALIZER));
+        $this->assertEquals(1, $this->redis['phpredis']->connection()->getOption(\Redis::OPT_COMPRESSION));
+    }
+
     /**
      * @param  string  $driver
      * @param  string  $default
