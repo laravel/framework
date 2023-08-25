@@ -60,7 +60,7 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
      *
      * @var \Illuminate\Redis\Connections\Connection
      */
-    protected  $redisConnection;
+    protected $redisConnection;
 
     /**
      * Create a new Redis queue instance.
@@ -375,19 +375,19 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
      */
     public function getConnection()
     {
-        if(isset($this->redisConnection)){
+        if (isset($this->redisConnection)) {
             return $this->redisConnection;
         }
 
         $this->redisConnection = $this->redis->connection($this->connection);
 
-        if($this->redisConnection instanceof PhpRedisConnection){
+        if ($this->redisConnection instanceof PhpRedisConnection) {
             $this->redisConnection = $this->redis->resolve($this->connection);
 
-            if(defined('\Redis::OPT_COMPRESSION') && $this->redisConnection->client()->getOption(\Redis::OPT_COMPRESSION) !== \Redis::COMPRESSION_NONE) {
+            if (defined('\Redis::OPT_COMPRESSION') && $this->redisConnection->client()->getOption(\Redis::OPT_COMPRESSION) !== \Redis::COMPRESSION_NONE) {
                 $this->redisConnection->client()->setOption(\Redis::OPT_COMPRESSION, \Redis::COMPRESSION_NONE);
             }
-            if(defined('\Redis::OPT_SERIALIZER') && $this->redisConnection->client()->getOption(\Redis::OPT_SERIALIZER) !== \Redis::SERIALIZER_NONE) {
+            if (defined('\Redis::OPT_SERIALIZER') && $this->redisConnection->client()->getOption(\Redis::OPT_SERIALIZER) !== \Redis::SERIALIZER_NONE) {
                 $this->redisConnection->client()->setOption(\Redis::OPT_SERIALIZER, \Redis::SERIALIZER_NONE);
             }
         }
