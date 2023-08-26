@@ -179,3 +179,8 @@ assertType('Illuminate\Support\Collection<int, string|User>', $collection->pad(2
 assertType('array<int, mixed>', $collection->getQueueableIds());
 
 assertType('array<int, string>', $collection->getQueueableRelations());
+
+assertType('array<int, User>', $collection->toArray());
+assertType('array<int, string>', $collection->map(function ($item){
+    return 'string';
+})->toArray());

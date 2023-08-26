@@ -1046,9 +1046,9 @@ assertType('User', $collection[0] = new User);
 $collection->offsetUnset(0);
 unset($collection[0]);
 
-assertType('array<int, mixed>', $collection->toArray());
-assertType('array<string, mixed>', collect(['string' => 'string'])->toArray());
-assertType('array<int, mixed>', collect([1, 2])->toArray());
+assertType('array<int, User>', $collection->toArray());
+assertType('array<string, string>', collect(['string' => 'string'])->toArray());
+assertType('array<int, int>', collect([1, 2])->toArray());
 
 assertType('ArrayIterator<int, User>', $collection->getIterator());
 foreach ($collection as $int => $user) {

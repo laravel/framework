@@ -846,9 +846,9 @@ class CustomLazyCollection extends LazyCollection
 
 // assertType('CustomLazyCollection<int, User>', CustomLazyCollection::make([new User]));
 
-assertType('array<int, mixed>', $collection->toArray());
-assertType('array<string, mixed>', LazyCollection::make(['string' => 'string'])->toArray());
-assertType('array<int, mixed>', LazyCollection::make([1, 2])->toArray());
+assertType('array<int, User>', $collection->toArray());
+assertType('array<string, string>', LazyCollection::make(['string' => 'string'])->toArray());
+assertType('array<int, int>', LazyCollection::make([1, 2])->toArray());
 
 assertType('Traversable<int, User>', $collection->getIterator());
 foreach ($collection as $int => $user) {

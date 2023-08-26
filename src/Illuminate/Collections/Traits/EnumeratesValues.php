@@ -902,7 +902,7 @@ trait EnumeratesValues
     /**
      * Get the collection of items as a plain array.
      *
-     * @return array<TKey, mixed>
+     * @return array<TKey, TValue>
      */
     public function toArray()
     {
