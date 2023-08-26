@@ -56,6 +56,7 @@ class VerifyCsrfToken
     {
         $this->app = $app;
         $this->encrypter = $encrypter;
+        $this->except = array_merge($this->except, $this->addExceptUrls());
     }
 
     /**
@@ -213,6 +214,16 @@ class VerifyCsrfToken
             false,
             $config['same_site'] ?? null
         );
+    }
+
+    /**
+     * Add set of URIs to exclude from CSRF protection.
+     *
+     * @return array
+     */
+    protected function addExceptUrls(): array
+    {
+        return [];
     }
 
     /**
