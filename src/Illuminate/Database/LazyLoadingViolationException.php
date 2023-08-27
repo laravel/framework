@@ -29,7 +29,7 @@ class LazyLoadingViolationException extends RuntimeException
      */
     public function __construct($model, $relation)
     {
-        $class = get_class($model);
+        $class = $model::class;
 
         parent::__construct("Attempted to lazy load [{$relation}] on model [{$class}] but lazy loading is disabled.");
 

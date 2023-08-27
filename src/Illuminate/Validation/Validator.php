@@ -837,8 +837,8 @@ class Validator implements ValidatorContract
 
         if (! $rule->passes($attribute, $value)) {
             $ruleClass = $rule instanceof InvokableValidationRule ?
-                get_class($rule->invokable()) :
-                get_class($rule);
+                $rule->invokable()::class :
+                $rule::class;
 
             $this->failedRules[$attribute][$ruleClass] = [];
 

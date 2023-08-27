@@ -472,7 +472,7 @@ class Gate implements GateContract
         }
 
         if (is_array($class)) {
-            $className = is_string($class[0]) ? $class[0] : get_class($class[0]);
+            $className = is_string($class[0]) ? $class[0] : $class[0]::class;
 
             return $this->methodAllowsGuests($className, $class[1]);
         }
@@ -654,7 +654,7 @@ class Gate implements GateContract
     public function getPolicyFor($class)
     {
         if (is_object($class)) {
-            $class = get_class($class);
+            $class = $class::class;
         }
 
         if (! is_string($class)) {

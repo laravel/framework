@@ -162,7 +162,7 @@ class Schedule
             } else {
                 $this->dispatchNow($job);
             }
-        })->name(is_string($job) ? $job : get_class($job));
+        })->name(is_string($job) ? $job : $job::class);
     }
 
     /**

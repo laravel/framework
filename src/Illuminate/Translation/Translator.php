@@ -244,8 +244,8 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
         $shouldReplace = [];
 
         foreach ($replace as $key => $value) {
-            if (is_object($value) && isset($this->stringableHandlers[get_class($value)])) {
-                $value = call_user_func($this->stringableHandlers[get_class($value)], $value);
+            if (is_object($value) && isset($this->stringableHandlers[$value::class])) {
+                $value = call_user_func($this->stringableHandlers[$value::class], $value);
             }
 
             $shouldReplace[':'.Str::ucfirst($key ?? '')] = Str::ucfirst($value ?? '');

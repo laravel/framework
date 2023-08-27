@@ -159,7 +159,7 @@ abstract class Queue
 
         return array_merge($payload, [
             'data' => array_merge($payload['data'], [
-                'commandName' => get_class($job),
+                'commandName' => $job::class,
                 'command' => $command,
             ]),
         ]);
@@ -174,7 +174,7 @@ abstract class Queue
     protected function getDisplayName($job)
     {
         return method_exists($job, 'displayName')
-                        ? $job->displayName() : get_class($job);
+                        ? $job->displayName() : $job::class;
     }
 
     /**

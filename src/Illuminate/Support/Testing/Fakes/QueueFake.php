@@ -215,7 +215,7 @@ class QueueFake extends QueueManager implements Fake, Queue
     {
         $matching = $this->pushed($job, $callback)->map->chained->map(function ($chain) {
             return collect($chain)->map(function ($job) {
-                return get_class(unserialize($job));
+                return unserialize($job)::class;
             });
         })->filter(function ($chain) use ($expectedChain) {
             return $chain->all() === $expectedChain;
@@ -358,7 +358,7 @@ class QueueFake extends QueueManager implements Fake, Queue
                 $job = CallQueuedClosure::create($job);
             }
 
-            $this->jobs[is_object($job) ? get_class($job) : $job][] = [
+            $this->jobs[is_object($job) ? $job::class : $job][] = [
                 'job' =>  $this->serializeAndRestore ? $this->serializeAndRestoreJob($job) : $job,
                 'queue' => $queue,
                 'data' => $data,

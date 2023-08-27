@@ -746,7 +746,7 @@ class Handler implements ExceptionHandlerContract
     {
         return config('app.debug') ? [
             'message' => $e->getMessage(),
-            'exception' => get_class($e),
+            'exception' => $e::class,
             'file' => $e->getFile(),
             'line' => $e->getLine(),
             'trace' => collect($e->getTrace())->map(fn ($trace) => Arr::except($trace, ['args']))->all(),

@@ -56,10 +56,10 @@ class ImplicitRouteBinding
                 if (! $model = $parent->{$childRouteBindingMethod}(
                     $parameterName, $parameterValue, $route->bindingFieldFor($parameterName)
                 )) {
-                    throw (new ModelNotFoundException)->setModel(get_class($instance), [$parameterValue]);
+                    throw (new ModelNotFoundException)->setModel($instance::class, [$parameterValue]);
                 }
             } elseif (! $model = $instance->{$routeBindingMethod}($parameterValue, $route->bindingFieldFor($parameterName))) {
-                throw (new ModelNotFoundException)->setModel(get_class($instance), [$parameterValue]);
+                throw (new ModelNotFoundException)->setModel($instance::class, [$parameterValue]);
             }
 
             $route->setParameter($parameterName, $model);

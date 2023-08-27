@@ -336,7 +336,7 @@ class BusFake implements Fake, QueueingDispatcher
         } elseif (! is_string($command)) {
             $instance = $command;
 
-            $command = get_class($instance);
+            $command = $instance::class;
 
             $callback = function ($job) use ($instance) {
                 return serialize($this->resetChainPropertiesToDefaults($job)) === serialize($instance);
@@ -422,7 +422,7 @@ class BusFake implements Fake, QueueingDispatcher
     {
         $matching = $this->dispatched($command, $callback)->map->chained->map(function ($chain) {
             return collect($chain)->map(
-                fn ($job) => get_class(unserialize($job))
+                fn ($job) => unserialize($job)::class
             );
         })->filter(
             fn ($chain) => $chain->all() === $expectedChain
@@ -592,7 +592,7 @@ class BusFake implements Fake, QueueingDispatcher
     public function dispatch($command)
     {
         if ($this->shouldFakeJob($command)) {
-            $this->commands[get_class($command)][] = $this->getCommandRepresentation($command);
+            $this->commands[$command::class][] = $this->getCommandRepresentation($command);
         } else {
             return $this->dispatcher->dispatch($command);
         }
@@ -610,7 +610,7 @@ class BusFake implements Fake, QueueingDispatcher
     public function dispatchSync($command, $handler = null)
     {
         if ($this->shouldFakeJob($command)) {
-            $this->commandsSync[get_class($command)][] = $this->getCommandRepresentation($command);
+            $this->commandsSync[$command::class][] = $this->getCommandRepresentation($command);
         } else {
             return $this->dispatcher->dispatchSync($command, $handler);
         }
@@ -626,7 +626,7 @@ class BusFake implements Fake, QueueingDispatcher
     public function dispatchNow($command, $handler = null)
     {
         if ($this->shouldFakeJob($command)) {
-            $this->commands[get_class($command)][] = $this->getCommandRepresentation($command);
+            $this->commands[$command::class][] = $this->getCommandRepresentation($command);
         } else {
             return $this->dispatcher->dispatchNow($command, $handler);
         }
@@ -641,7 +641,7 @@ class BusFake implements Fake, QueueingDispatcher
     public function dispatchToQueue($command)
     {
         if ($this->shouldFakeJob($command)) {
-            $this->commands[get_class($command)][] = $this->getCommandRepresentation($command);
+            $this->commands[$command::class][] = $this->getCommandRepresentation($command);
         } else {
             return $this->dispatcher->dispatchToQueue($command);
         }
@@ -656,7 +656,7 @@ class BusFake implements Fake, QueueingDispatcher
     public function dispatchAfterResponse($command)
     {
         if ($this->shouldFakeJob($command)) {
-            $this->commandsAfterResponse[get_class($command)][] = $this->getCommandRepresentation($command);
+            $this->commandsAfterResponse[$command::class][] = $this->getCommandRepresentation($command);
         } else {
             return $this->dispatcher->dispatch($command);
         }
@@ -741,7 +741,7 @@ class BusFake implements Fake, QueueingDispatcher
             ->filter(function ($job) use ($command) {
                 return $job instanceof Closure
                             ? $job($command)
-                            : $job === get_class($command);
+                            : $job === $command::class;
             })->isNotEmpty();
     }
 
@@ -757,7 +757,7 @@ class BusFake implements Fake, QueueingDispatcher
             ->filter(function ($job) use ($command) {
                 return $job instanceof Closure
                     ? $job($command)
-                    : $job === get_class($command);
+                    : $job === $command::class;
             })->isNotEmpty();
     }
 

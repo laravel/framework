@@ -101,7 +101,7 @@ class BoundMethod
      */
     protected static function normalizeMethod($callback)
     {
-        $class = is_string($callback[0]) ? $callback[0] : get_class($callback[0]);
+        $class = is_string($callback[0]) ? $callback[0] : $callback[0]::class;
 
         return "{$class}@{$callback[1]}";
     }

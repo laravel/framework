@@ -182,7 +182,7 @@ abstract class Relation implements BuilderContract
         $count = $result->count();
 
         if ($count === 0) {
-            throw (new ModelNotFoundException)->setModel(get_class($this->related));
+            throw (new ModelNotFoundException)->setModel($this->related::class);
         }
 
         if ($count > 1) {

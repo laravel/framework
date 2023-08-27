@@ -22,7 +22,7 @@ trait SerializesModels
         $reflectionClass = new ReflectionClass($this);
 
         [$class, $properties, $classLevelWithoutRelations] = [
-            get_class($this),
+            $this::class,
             $reflectionClass->getProperties(),
             ! empty($reflectionClass->getAttributes(WithoutRelations::class)),
         ];
@@ -70,7 +70,7 @@ trait SerializesModels
     {
         $properties = (new ReflectionClass($this))->getProperties();
 
-        $class = get_class($this);
+        $class = $this::class;
 
         foreach ($properties as $property) {
             if ($property->isStatic()) {

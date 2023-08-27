@@ -689,7 +689,7 @@ class Container implements ArrayAccess, ContainerContract
             return false;
         }
 
-        return is_string($callback[0]) ? $callback[0] : get_class($callback[0]);
+        return is_string($callback[0]) ? $callback[0] : $callback[0]::class;
     }
 
     /**

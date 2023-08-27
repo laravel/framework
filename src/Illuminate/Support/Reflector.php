@@ -33,7 +33,7 @@ class Reflector
             return true;
         }
 
-        $class = is_object($var[0]) ? get_class($var[0]) : $var[0];
+        $class = is_object($var[0]) ? $var[0]::class : $var[0];
 
         $method = $var[1];
 

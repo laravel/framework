@@ -611,17 +611,17 @@ trait HasAttributes
      */
     public function hasAttributeMutator($key)
     {
-        if (isset(static::$attributeMutatorCache[get_class($this)][$key])) {
-            return static::$attributeMutatorCache[get_class($this)][$key];
+        if (isset(static::$attributeMutatorCache[$this::class][$key])) {
+            return static::$attributeMutatorCache[$this::class][$key];
         }
 
         if (! method_exists($this, $method = Str::camel($key))) {
-            return static::$attributeMutatorCache[get_class($this)][$key] = false;
+            return static::$attributeMutatorCache[$this::class][$key] = false;
         }
 
         $returnType = (new ReflectionMethod($this, $method))->getReturnType();
 
-        return static::$attributeMutatorCache[get_class($this)][$key] =
+        return static::$attributeMutatorCache[$this::class][$key] =
                     $returnType instanceof ReflectionNamedType &&
                     $returnType->getName() === Attribute::class;
     }
@@ -634,15 +634,15 @@ trait HasAttributes
      */
     public function hasAttributeGetMutator($key)
     {
-        if (isset(static::$getAttributeMutatorCache[get_class($this)][$key])) {
-            return static::$getAttributeMutatorCache[get_class($this)][$key];
+        if (isset(static::$getAttributeMutatorCache[$this::class][$key])) {
+            return static::$getAttributeMutatorCache[$this::class][$key];
         }
 
         if (! $this->hasAttributeMutator($key)) {
-            return static::$getAttributeMutatorCache[get_class($this)][$key] = false;
+            return static::$getAttributeMutatorCache[$this::class][$key] = false;
         }
 
-        return static::$getAttributeMutatorCache[get_class($this)][$key] = is_callable($this->{Str::camel($key)}()->get);
+        return static::$getAttributeMutatorCache[$this::class][$key] = is_callable($this->{Str::camel($key)}()->get);
     }
 
     /**
@@ -696,8 +696,8 @@ trait HasAttributes
     {
         if ($this->isClassCastable($key)) {
             $value = $this->getClassCastableAttributeValue($key, $value);
-        } elseif (isset(static::$getAttributeMutatorCache[get_class($this)][$key]) &&
-                  static::$getAttributeMutatorCache[get_class($this)][$key] === true) {
+        } elseif (isset(static::$getAttributeMutatorCache[$this::class][$key]) &&
+                  static::$getAttributeMutatorCache[$this::class][$key] === true) {
             $value = $this->mutateAttributeMarkedAttribute($key, $value);
 
             $value = $value instanceof DateTimeInterface
@@ -1021,7 +1021,7 @@ trait HasAttributes
      */
     public function hasAttributeSetMutator($key)
     {
-        $class = get_class($this);
+        $class = $this::class;
 
         if (isset(static::$setAttributeMutatorCache[$class][$key])) {
             return static::$setAttributeMutatorCache[$class][$key];

@@ -815,7 +815,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function getProviders($provider)
     {
-        $name = is_string($provider) ? $provider : get_class($provider);
+        $name = is_string($provider) ? $provider : $provider::class;
 
         return Arr::where($this->serviceProviders, fn ($value) => $value instanceof $name);
     }
@@ -841,7 +841,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
     {
         $this->serviceProviders[] = $provider;
 
-        $this->loadedProviders[get_class($provider)] = true;
+        $this->loadedProviders[$provider::class] = true;
     }
 
     /**

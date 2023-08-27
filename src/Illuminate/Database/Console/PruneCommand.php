@@ -179,7 +179,7 @@ class PruneCommand extends Command
         $instance = new $model;
 
         $count = $instance->prunable()
-            ->when(in_array(SoftDeletes::class, class_uses_recursive(get_class($instance))), function ($query) {
+            ->when(in_array(SoftDeletes::class, class_uses_recursive($instance::class)), function ($query) {
                 $query->withTrashed();
             })->count();
 

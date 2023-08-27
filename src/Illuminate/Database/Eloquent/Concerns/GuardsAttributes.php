@@ -214,7 +214,7 @@ trait GuardsAttributes
      */
     protected function isGuardableColumn($key)
     {
-        if (! isset(static::$guardableColumns[get_class($this)])) {
+        if (! isset(static::$guardableColumns[$this::class])) {
             $columns = $this->getConnection()
                         ->getSchemaBuilder()
                         ->getColumnListing($this->getTable());
@@ -222,10 +222,10 @@ trait GuardsAttributes
             if (empty($columns)) {
                 return true;
             }
-            static::$guardableColumns[get_class($this)] = $columns;
+            static::$guardableColumns[$this::class] = $columns;
         }
 
-        return in_array($key, static::$guardableColumns[get_class($this)]);
+        return in_array($key, static::$guardableColumns[$this::class]);
     }
 
     /**

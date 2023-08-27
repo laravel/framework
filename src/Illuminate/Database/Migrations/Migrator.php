@@ -429,7 +429,7 @@ class Migrator
     protected function pretendToRun($migration, $method)
     {
         try {
-            $name = get_class($migration);
+            $name = $migration::class;
 
             $reflectionClass = new ReflectionClass($migration);
 
@@ -443,7 +443,7 @@ class Migrator
                 return $query['query'];
             }));
         } catch (SchemaException) {
-            $name = get_class($migration);
+            $name = $migration::class;
 
             $this->write(Error::class, sprintf(
                 '[%s] failed to dump queries. This may be due to changing database columns using Doctrine, which is not supported while pretending to run migrations.',

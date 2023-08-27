@@ -647,7 +647,7 @@ abstract class Factory
                 ->merge(
                     Collection::wrap($model instanceof Model ? func_get_args() : $model)
                         ->flatten()
-                )->groupBy(fn ($model) => get_class($model)),
+                )->groupBy(fn ($model) => $model::class),
         ]);
     }
 
@@ -779,7 +779,7 @@ abstract class Factory
     {
         $resolver = static::$modelNameResolver ?? function (self $factory) {
             $namespacedFactoryBasename = Str::replaceLast(
-                'Factory', '', Str::replaceFirst(static::$namespace, '', get_class($factory))
+                'Factory', '', Str::replaceFirst(static::$namespace, '', $factory::class)
             );
 
             $factoryBasename = Str::replaceLast('Factory', '', class_basename($factory));
@@ -912,7 +912,7 @@ abstract class Factory
 
         $relationship = Str::camel(Str::substr($method, 3));
 
-        $relatedModel = get_class($this->newModel()->{$relationship}()->getRelated());
+        $relatedModel = $this->newModel()->{$relationship}()->getRelated()::class;
 
         if (method_exists($relatedModel, 'newFactory')) {
             $factory = $relatedModel::newFactory() ?? static::factoryForModel($relatedModel);

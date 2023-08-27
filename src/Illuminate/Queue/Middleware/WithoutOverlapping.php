@@ -157,6 +157,6 @@ class WithoutOverlapping
     {
         return $this->shareKey
             ? $this->prefix.$this->key
-            : $this->prefix.get_class($job).':'.$this->key;
+            : $this->prefix.$job::class.':'.$this->key;
     }
 }

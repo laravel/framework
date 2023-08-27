@@ -116,7 +116,7 @@ class ConfigShowCommand extends Command
             is_null($value) => '<fg=#ef8414;options=bold>null</>',
             is_numeric($value) => "<fg=#ef8414;options=bold>{$value}</>",
             is_array($value) => '[]',
-            is_object($value) => get_class($value),
+            is_object($value) => $value::class,
             is_string($value) => $value,
             default => print_r($value, true),
         };

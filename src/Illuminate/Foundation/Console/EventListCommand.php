@@ -91,7 +91,7 @@ class EventListCommand extends Command
                     $events[$event][] = $this->stringifyClosure($rawListener);
                 } elseif (is_array($rawListener) && count($rawListener) === 2) {
                     if (is_object($rawListener[0])) {
-                        $rawListener[0] = get_class($rawListener[0]);
+                        $rawListener[0] = $rawListener[0]::class;
                     }
 
                     $events[$event][] = $this->appendListenerInterfaces(implode('@', $rawListener));

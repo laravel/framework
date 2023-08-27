@@ -78,7 +78,7 @@ class ShowModelCommand extends DatabaseInspectionCommand
         try {
             $model = $this->laravel->make($class);
 
-            $class = get_class($model);
+            $class = $model::class;
         } catch (BindingResolutionException $e) {
             return $this->components->error($e->getMessage());
         }
@@ -158,7 +158,7 @@ class ShowModelCommand extends DatabaseInspectionCommand
             ->reject(
                 fn (ReflectionMethod $method) => $method->isStatic()
                     || $method->isAbstract()
-                    || $method->getDeclaringClass()->getName() !== get_class($model)
+                    || $method->getDeclaringClass()->getName() !== $model::class
             )
             ->mapWithKeys(function (ReflectionMethod $method) use ($model) {
                 if (preg_match('/^get(.+)Attribute$/', $method->getName(), $matches) === 1) {
@@ -198,7 +198,7 @@ class ShowModelCommand extends DatabaseInspectionCommand
             ->reject(
                 fn (ReflectionMethod $method) => $method->isStatic()
                     || $method->isAbstract()
-                    || $method->getDeclaringClass()->getName() !== get_class($model)
+                    || $method->getDeclaringClass()->getName() !== $model::class
             )
             ->filter(function (ReflectionMethod $method) {
                 $file = new SplFileObject($method->getFileName());
@@ -221,8 +221,8 @@ class ShowModelCommand extends DatabaseInspectionCommand
 
                 return [
                     'name' => $method->getName(),
-                    'type' => Str::afterLast(get_class($relation), '\\'),
-                    'related' => get_class($relation->getRelated()),
+                    'type' => Str::afterLast($relation::class, '\\'),
+                    'related' => $relation->getRelated()::class,
                 ];
             })
             ->filter()
@@ -439,7 +439,7 @@ class ShowModelCommand extends DatabaseInspectionCommand
 
         $unsigned = $column->getUnsigned() ? ' unsigned' : '';
 
-        $details = match (get_class($column->getType())) {
+        $details = match ($column->getType()::class) {
             DecimalType::class => $column->getPrecision().','.$column->getScale(),
             default => $column->getLength(),
         };

@@ -220,7 +220,7 @@ abstract class Component
      */
     protected function extractPublicProperties()
     {
-        $class = get_class($this);
+        $class = $this::class;
 
         if (! isset(static::$propertyCache[$class])) {
             $reflection = new ReflectionClass($this);
@@ -253,7 +253,7 @@ abstract class Component
      */
     protected function extractPublicMethods()
     {
-        $class = get_class($this);
+        $class = $this::class;
 
         if (! isset(static::$methodCache[$class])) {
             $reflection = new ReflectionClass($this);

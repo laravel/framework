@@ -184,7 +184,7 @@ class Dispatcher implements DispatcherContract
             foreach ($events as $event => $listeners) {
                 foreach (Arr::wrap($listeners) as $listener) {
                     if (is_string($listener) && method_exists($subscriber, $listener)) {
-                        $this->listen($event, [get_class($subscriber), $listener]);
+                        $this->listen($event, [$subscriber::class, $listener]);
 
                         continue;
                     }
@@ -278,7 +278,7 @@ class Dispatcher implements DispatcherContract
     protected function parseEventAndPayload($event, $payload)
     {
         if (is_object($event)) {
-            [$payload, $event] = [[$event], get_class($event)];
+            [$payload, $event] = [[$event], $event::class];
         }
 
         return [$event, Arr::wrap($payload)];

@@ -30,7 +30,7 @@ class UniqueBroadcastEvent extends BroadcastEvent implements ShouldBeUnique
      */
     public function __construct($event)
     {
-        $this->uniqueId = get_class($event);
+        $this->uniqueId = $event::class;
 
         if (method_exists($event, 'uniqueId')) {
             $this->uniqueId .= $event->uniqueId();

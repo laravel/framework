@@ -160,7 +160,7 @@ class ThrottlesExceptions
             return $this->prefix.$job->job->uuid();
         }
 
-        return $this->prefix.md5(get_class($job));
+        return $this->prefix.md5($job::class);
     }
 
     /**

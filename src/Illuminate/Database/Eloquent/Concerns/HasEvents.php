@@ -77,7 +77,7 @@ trait HasEvents
     private function resolveObserverClassName($class)
     {
         if (is_object($class)) {
-            return get_class($class);
+            return $class::class;
         }
 
         if (class_exists($class)) {

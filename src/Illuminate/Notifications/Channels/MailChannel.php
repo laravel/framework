@@ -154,7 +154,7 @@ class MailChannel
     {
         return [
             '__laravel_notification_id' => $notification->id,
-            '__laravel_notification' => get_class($notification),
+            '__laravel_notification' => $notification::class,
             '__laravel_notification_queued' => in_array(
                 ShouldQueue::class,
                 class_implements($notification)
