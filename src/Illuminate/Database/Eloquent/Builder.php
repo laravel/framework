@@ -444,9 +444,8 @@ class Builder implements BuilderContract
             $results = $this->findMany($id, $columns);
 
             if ($results instanceof Arrayable) {
-                return (new Collection(
-                    $results->sortBy(fn (Model $model) => array_search($model->getKey(), $id instanceof Arrayable ? $id->toArray() : $id))
-                ))->values();
+                return $results->sortBy(fn (Model $model) => array_search($model->getKey(), $id instanceof Arrayable ? $id->toArray() : $id))
+                    ->values();
             }
 
             return $results;
