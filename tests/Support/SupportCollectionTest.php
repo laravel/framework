@@ -3147,6 +3147,34 @@ class SupportCollectionTest extends TestCase
         );
     }
 
+    public function testMapWith()
+    {
+        $data = new Collection([
+            ['name' => 'Foo', 'age' => 30],
+            ['name' => 'Bar', 'age' => 40],
+        ]);
+
+        $data = $data->mapWith(function ($fake, $baz) {
+            $fake['age'] += $baz;
+
+            return $fake;
+        }, [10, 20]);
+
+        $this->assertEquals(
+            [
+                [
+                    'name' => 'Foo',
+                    'age' => 40,
+                ],
+                [
+                    'name' => 'Bar',
+                    'age' => 60,
+                ],
+            ],
+            $data->all()
+        );
+    }
+
     /**
      * @dataProvider collectionClassProvider
      */

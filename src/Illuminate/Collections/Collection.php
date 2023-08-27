@@ -810,6 +810,23 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     }
 
     /**
+     * Run an associative map over each of the items with another set of items.
+     *
+     * The callback should return an associative array with a single key/value pair.
+     *
+     * @template TMapWithKey of array-key
+     * @template TMapWithValue
+     *
+     * @param  callable(TValue, TKey): array<TMapWithKey, TMapWithValue>  $callback
+     * @param  \Illuminate\Contracts\Support\Arrayable<array-key, TMapWithKey>|iterable<array-key, TMapWithKey>  ...$arrays
+     * @return static<TMapWithKey, TMapWithValue>
+     */
+    public function mapWith(callable $callback, ...$arrays)
+    {
+        return new static(array_map($callback, $this->items, ...$arrays));
+    }
+
+    /**
      * Run an associative map over each of the items.
      *
      * The callback should return an associative array with a single key/value pair.
