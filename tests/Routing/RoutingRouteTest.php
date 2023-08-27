@@ -2340,7 +2340,7 @@ class RouteTestControllerMiddleware
     {
         $_SERVER['route.test.controller.middleware'] = true;
         $response = $next($request);
-        $_SERVER['route.test.controller.middleware.class'] = get_class($response);
+        $_SERVER['route.test.controller.middleware.class'] = $response::class;
 
         return $response;
     }

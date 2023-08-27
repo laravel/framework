@@ -34,41 +34,41 @@ class DateFacadeTest extends TestCase
     public function testUseClosure()
     {
         $start = Carbon::now()->getTimestamp();
-        $this->assertSame(Carbon::class, get_class(Date::now()));
+        $this->assertSame(Carbon::class, Date::now()::class);
         $this->assertBetweenStartAndNow($start, Date::now()->getTimestamp());
         DateFactory::use(function (Carbon $date) {
             return new DateTime($date->format('Y-m-d H:i:s.u'), $date->getTimezone());
         });
         $start = Carbon::now()->getTimestamp();
-        $this->assertSame(DateTime::class, get_class(Date::now()));
+        $this->assertSame(DateTime::class, Date::now()::class);
         $this->assertBetweenStartAndNow($start, Date::now()->getTimestamp());
     }
 
     public function testUseClassName()
     {
         $start = Carbon::now()->getTimestamp();
-        $this->assertSame(Carbon::class, get_class(Date::now()));
+        $this->assertSame(Carbon::class, Date::now()::class);
         $this->assertBetweenStartAndNow($start, Date::now()->getTimestamp());
         DateFactory::use(DateTime::class);
         $start = Carbon::now()->getTimestamp();
-        $this->assertSame(DateTime::class, get_class(Date::now()));
+        $this->assertSame(DateTime::class, Date::now()::class);
         $this->assertBetweenStartAndNow($start, Date::now()->getTimestamp());
     }
 
     public function testCarbonImmutable()
     {
         DateFactory::use(CarbonImmutable::class);
-        $this->assertSame(CarbonImmutable::class, get_class(Date::now()));
+        $this->assertSame(CarbonImmutable::class, Date::now()::class);
         DateFactory::use(Carbon::class);
-        $this->assertSame(Carbon::class, get_class(Date::now()));
+        $this->assertSame(Carbon::class, Date::now()::class);
         DateFactory::use(function (Carbon $date) {
             return $date->toImmutable();
         });
-        $this->assertSame(CarbonImmutable::class, get_class(Date::now()));
+        $this->assertSame(CarbonImmutable::class, Date::now()::class);
         DateFactory::use(function ($date) {
             return $date;
         });
-        $this->assertSame(Carbon::class, get_class(Date::now()));
+        $this->assertSame(Carbon::class, Date::now()::class);
 
         DateFactory::use(new Factory([
             'locale' => 'fr',

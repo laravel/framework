@@ -34,7 +34,7 @@ class InteractsWithViewsTest extends TestCase
             }
         };
 
-        $component = $this->component(get_class($exampleComponent));
+        $component = $this->component($exampleComponent::class);
 
         $this->assertSame('bar', $component->foo);
         $this->assertSame('hello', $component->speak());

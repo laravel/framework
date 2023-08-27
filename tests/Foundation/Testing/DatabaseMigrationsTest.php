@@ -34,7 +34,7 @@ class DatabaseMigrationsTest extends TestCase
     private function __reflectAndSetupAccessibleForProtectedTraitMethod($methodName)
     {
         $migrateFreshUsingReflection = new ReflectionMethod(
-            get_class($this->traitObject),
+            $this->traitObject::class,
             $methodName
         );
 

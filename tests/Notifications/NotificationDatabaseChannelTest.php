@@ -23,7 +23,7 @@ class NotificationDatabaseChannelTest extends TestCase
 
         $notifiable->shouldReceive('routeNotificationFor->create')->with([
             'id' => 1,
-            'type' => get_class($notification),
+            'type' => $notification::class,
             'data' => ['invoice_id' => 1],
             'read_at' => null,
         ]);
@@ -40,7 +40,7 @@ class NotificationDatabaseChannelTest extends TestCase
 
         $notifiable->shouldReceive('routeNotificationFor->create')->with([
             'id' => 1,
-            'type' => get_class($notification),
+            'type' => $notification::class,
             'data' => ['invoice_id' => 1],
             'read_at' => null,
             'something' => 'else',

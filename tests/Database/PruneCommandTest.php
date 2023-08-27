@@ -201,13 +201,13 @@ class PruneCommandTest extends TestCase
         $dispatcher = m::mock(DispatcherContract::class);
 
         $dispatcher->shouldReceive('dispatch')->once()->withArgs(function ($event) {
-            return get_class($event) === ModelPruningStarting::class &&
+            return $event instanceof \Illuminate\Database\Events\ModelPruningStarting &&
                 $event->models === [PrunableTestModelWithPrunableRecords::class];
         });
         $dispatcher->shouldReceive('listen')->once()->with(ModelsPruned::class, m::type(Closure::class));
         $dispatcher->shouldReceive('dispatch')->twice()->with(m::type(ModelsPruned::class));
         $dispatcher->shouldReceive('dispatch')->once()->withArgs(function ($event) {
-            return get_class($event) === ModelPruningFinished::class &&
+            return $event instanceof \Illuminate\Database\Events\ModelPruningFinished &&
                 $event->models === [PrunableTestModelWithPrunableRecords::class];
         });
         $dispatcher->shouldReceive('forget')->once()->with(ModelsPruned::class);

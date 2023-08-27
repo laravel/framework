@@ -323,7 +323,7 @@ class SupportTestingQueueFakeTest extends TestCase
             $this->fake->undefinedMethod();
         } catch (BadMethodCallException $e) {
             $this->assertSame(sprintf(
-                'Call to undefined method %s::%s()', get_class($this->fake), 'undefinedMethod'
+                'Call to undefined method %s::%s()', $this->fake::class, 'undefinedMethod'
             ), $e->getMessage());
         }
     }

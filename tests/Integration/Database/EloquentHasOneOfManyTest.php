@@ -27,7 +27,7 @@ class EloquentHasOneOfManyTest extends DatabaseTestCase
         $this->retrievedLogins = 0;
         User::getEventDispatcher()->listen('eloquent.retrieved:*', function ($event, $models) {
             foreach ($models as $model) {
-                if (get_class($model) == Login::class) {
+                if ($model::class == Login::class) {
                     $this->retrievedLogins++;
                 }
             }
