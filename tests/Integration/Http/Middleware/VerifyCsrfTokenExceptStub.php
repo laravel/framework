@@ -20,6 +20,9 @@ class VerifyCsrfTokenExceptStub extends VerifyCsrfToken
 
     protected function addExcept(): array
     {
-        return ['/foo/baz'];
+        return [
+            '/foo/baz',
+            'http://example.com/foo/baz',
+        ];
     }
 }

@@ -32,6 +32,10 @@ class VerifyCsrfTokenExceptTest extends TestCase
         $this->assertMatchingExcept(['/foo/baz']);
         $this->assertMatchingExcept(['foo/baz']);
         $this->assertNonMatchingExcept(['/baz/foo']);
+
+        $this->assertMatchingExcept(['http://example.com/foo/baz']);
+        $this->assertMatchingExcept(['http://example.com/foo/baz/']);
+        $this->assertNonMatchingExcept(['http://example.co/foo/baz/']);
     }
 
     public function testItCanExceptWildcardPaths()
