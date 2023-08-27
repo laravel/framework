@@ -438,8 +438,7 @@ class Validator implements ValidatorContract
                 }
             }
         }
-        // Only remove attributes after having looped through all the rules, so that
-        // the order of the attributes with applied "exclude" rule doesn't matter.
+
         foreach ($this->rules as $attribute => $rules) {
             if ($this->shouldBeExcluded($attribute)) {
                 $this->removeAttribute($attribute);
