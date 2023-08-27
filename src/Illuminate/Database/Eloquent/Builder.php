@@ -581,7 +581,7 @@ class Builder implements BuilderContract
     {
         try {
             return $this->withSavepointIfNeeded(fn () => $this->create(array_merge($attributes, $values)));
-        } catch (UniqueConstraintViolationException $exception) {
+        } catch (UniqueConstraintViolationException) {
             return $this->useWritePdo()->where($attributes)->first();
         }
     }

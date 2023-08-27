@@ -626,7 +626,7 @@ class BelongsToMany extends Relation
             } else {
                 try {
                     $this->getQuery()->withSavepointIfNeeded(fn () => $this->attach($instance, $joining, $touch));
-                } catch (UniqueConstraintViolationException $exception) {
+                } catch (UniqueConstraintViolationException) {
                     // Nothing to do, the model was already attached...
                 }
             }
@@ -656,7 +656,7 @@ class BelongsToMany extends Relation
             return tap($this->related->where($attributes)->first(), function ($instance) use ($joining, $touch) {
                 $this->getQuery()->withSavepointIfNeeded(fn () => $this->attach($instance, $joining, $touch));
             });
-        } catch (UniqueConstraintViolationException $exception) {
+        } catch (UniqueConstraintViolationException) {
             return (clone $this)->useWritePdo()->where($attributes)->first();
         }
     }
