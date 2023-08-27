@@ -46,6 +46,19 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertSame('baz', $result);
     }
 
+    public function testFindMethodOrdered()
+    {
+        $builder = m::mock(Builder::class.'[get]', [$this->getMockQueryBuilder()]);
+        $model = $this->getMockModel();
+        $model->shouldReceive('getKeyType')->andReturn('int');
+        $builder->setModel($model);
+        $builder->getQuery()->shouldReceive('whereIntegerInRaw')->once()->with('foo_table.foo', [10,5]);
+        $builder->shouldReceive('get')->with(['column'])->andReturn([10,5]);
+
+        $result = $builder->find([10,5], ['column']);
+        $this->assertEquals([10,5], $result);
+    }
+
     public function testFindManyMethod()
     {
         // ids are not empty
