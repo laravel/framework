@@ -380,6 +380,19 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     }
 
     /**
+     * Removes a parameter from the current request's input array.
+     *
+     * @param  string  $key
+     * @return $this
+     */
+    public function remove(string $key)
+    {
+        $this->getInputSource()->remove($key);
+
+        return $this;
+    }
+
+    /**
      * This method belongs to Symfony HttpFoundation and is not usually needed when using Laravel.
      *
      * Instead, you may use the "input" method.
