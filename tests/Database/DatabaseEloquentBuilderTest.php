@@ -52,11 +52,11 @@ class DatabaseEloquentBuilderTest extends TestCase
         $model = $this->getMockModel();
         $model->shouldReceive('getKeyType')->andReturn('int');
         $builder->setModel($model);
-        $builder->getQuery()->shouldReceive('whereIntegerInRaw')->once()->with('foo_table.foo', [10,5]);
-        $builder->shouldReceive('get')->with(['column'])->andReturn([10,5]);
+        $builder->getQuery()->shouldReceive('whereIntegerInRaw')->once()->with('foo_table.foo', [10, 5]);
+        $builder->shouldReceive('get')->with(['column'])->andReturn([10, 5]);
 
-        $result = $builder->find([10,5], ['column']);
-        $this->assertEquals([10,5], $result);
+        $result = $builder->find([10, 5], ['column']);
+        $this->assertEquals([10, 5], $result);
     }
 
     public function testFindManyMethod()
