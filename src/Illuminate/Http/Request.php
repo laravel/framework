@@ -390,7 +390,13 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      */
     public function get(string $key, mixed $default = null): mixed
     {
-        return parent::get($key, $default);
+        $get = parent::get($key, $default);
+
+        if (blank($get)) {
+            return value($default);
+        }
+
+        return $get;
     }
 
     /**

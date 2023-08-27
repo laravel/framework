@@ -300,9 +300,15 @@ trait InteractsWithInput
      */
     public function input($key = null, $default = null)
     {
-        return data_get(
+        $input = data_get(
             $this->getInputSource()->all() + $this->query->all(), $key, $default
         );
+
+        if (blank($input)) {
+            return value($default);
+        }
+
+        return $input;
     }
 
     /**
