@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\Concerns\AsPivot;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\Pivot;
+use Illuminate\Database\Eloquent\Scopes\Scope;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Support\Str;
@@ -1616,6 +1617,11 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function hasNamedScope($scope)
     {
+        if (method_exists($this, $scope)) {
+            $reflectedMethod = new \ReflectionMethod($this, $scope);
+            $returnType = $reflectedMethod->getReturnType();
+            return $returnType && $returnType->getName() === Scope::class;
+        }
         return method_exists($this, 'scope'.ucfirst($scope));
     }
 
@@ -1628,7 +1634,9 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function callNamedScope($scope, array $parameters = [])
     {
-        return $this->{'scope'.ucfirst($scope)}(...$parameters);
+        return method_exists($this, $scope)
+            ? $this->{$scope}(...$parameters)
+            : $this->{'scope'.ucfirst($scope)}(...$parameters);
     }
 
     /**
