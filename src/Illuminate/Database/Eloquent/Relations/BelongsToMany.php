@@ -653,7 +653,7 @@ class BelongsToMany extends Relation
                 $this->getQuery()->withSavepointIfNeeded(fn () => $this->attach($instance, $joining, $touch));
             });
         } catch (UniqueConstraintViolationException $exception) {
-            return (clone $this)->where($attributes)->first();
+            return (clone $this)->useWritePdo()->where($attributes)->first();
         }
     }
 
