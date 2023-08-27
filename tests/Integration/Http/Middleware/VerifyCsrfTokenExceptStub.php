@@ -17,4 +17,9 @@ class VerifyCsrfTokenExceptStub extends VerifyCsrfToken
 
         return $this;
     }
+
+    protected function addExcept(): array
+    {
+        return ['/foo/baz'];
+    }
 }

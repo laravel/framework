@@ -56,7 +56,7 @@ class VerifyCsrfToken
     {
         $this->app = $app;
         $this->encrypter = $encrypter;
-        $this->except = array_merge($this->except, $this->addExcept());
+        $this->except = array_merge($this->except, array_values(array_unique($this->addExcept())));
     }
 
     /**

@@ -26,6 +26,14 @@ class VerifyCsrfTokenExceptTest extends TestCase
         $this->assertNonMatchingExcept(['/bar/foo']);
     }
 
+    public function testItCanExceptAddedPaths()
+    {
+        $this->request = Request::create('http://example.com/foo/baz', 'POST');
+        $this->assertMatchingExcept(['/foo/baz']);
+        $this->assertMatchingExcept(['foo/baz']);
+        $this->assertNonMatchingExcept(['/baz/foo']);
+    }
+
     public function testItCanExceptWildcardPaths()
     {
         $this->assertMatchingExcept(['/foo/*']);
