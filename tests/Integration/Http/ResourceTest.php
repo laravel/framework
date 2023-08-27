@@ -1598,6 +1598,29 @@ class ResourceTest extends TestCase
         ], $results);
     }
 
+    public function testMergeValuesMayFallbackToDefaults()
+    {
+        $filter = new class
+        {
+            use ConditionallyLoadsAttributes;
+
+            public function work()
+            {
+                return $this->filter([
+                    $this->mergeUnless(false, ['Taylor', 'Mohamed'], ['First', 'Second']),
+                    $this->mergeWhen(false, ['Adam', 'Matt'], ['Abigail', 'Lydia']),
+                    'Jeffrey',
+                ]);
+            }
+        };
+
+        $results = $filter->work();
+
+        $this->assertEquals([
+            'Taylor', 'Mohamed', 'Abigail', 'Lydia', 'Jeffrey',
+        ], $results);
+    }
+
     public function testNestedMerges()
     {
         $filter = new class

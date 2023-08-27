@@ -332,6 +332,26 @@ class ModelSerializationTest extends TestCase
         );
     }
 
+    public function test_it_respects_without_relations_attribute_applied_to_class()
+    {
+        $user = User::create([
+            'email' => 'taylor@laravel.com',
+        ])->load(['roles']);
+
+        $serialized = serialize(new ModelSerializationAttributeTargetsClassTestClass($user, new DataValueObject('hello')));
+
+        $this->assertSame(
+            'O:83:"Illuminate\Tests\Integration\Queue\ModelSerializationAttributeTargetsClassTestClass":2:{s:4:"user";O:45:"Illuminate\Contracts\Database\ModelIdentifier":5:{s:5:"class";s:39:"Illuminate\Tests\Integration\Queue\User";s:2:"id";i:1;s:9:"relations";a:0:{}s:10:"connection";s:7:"testing";s:15:"collectionClass";N;}s:5:"value";O:50:"Illuminate\Tests\Integration\Queue\DataValueObject":1:{s:5:"value";s:5:"hello";}}',
+            $serialized
+        );
+
+        /** @var ModelSerializationAttributeTargetsClassTestClass $unserialized */
+        $unserialized = unserialize($serialized);
+
+        $this->assertFalse($unserialized->user->relationLoaded('roles'));
+        $this->assertEquals('hello', $unserialized->value->value);
+    }
+
     public function test_serialization_types_empty_custom_eloquent_collection()
     {
         $class = new ModelSerializationTypedCustomCollectionTestClass(
@@ -526,6 +546,16 @@ class ModelSerializationWithoutRelations
     }
 }
 
+#[WithoutRelations]
+class ModelSerializationAttributeTargetsClassTestClass
+{
+    use SerializesModels;
+
+    public function __construct(public User $user, public DataValueObject $value)
+    {
+    }
+}
+
 class ModelRelationSerializationTestClass
 {
     use SerializesModels;
@@ -547,5 +577,12 @@ class CollectionSerializationTestClass
     public function __construct($users)
     {
         $this->users = $users;
+    }
+}
+
+class DataValueObject
+{
+    public function __construct(public $value = 1)
+    {
     }
 }

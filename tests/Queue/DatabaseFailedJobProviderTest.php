@@ -9,6 +9,7 @@ use Illuminate\Queue\Failed\DatabaseFailedJobProvider;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Str;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 
 class DatabaseFailedJobProviderTest extends TestCase
 {
@@ -70,5 +71,32 @@ class DatabaseFailedJobProviderTest extends TestCase
 
         $this->assertSame(1, $db->getConnection()->table('failed_jobs')->count());
         $this->assertSame($exception, $db->getConnection()->table('failed_jobs')->first()->exception);
+    }
+
+    public function testJobsCanBeCounted()
+    {
+        $db = new DB;
+        $db->addConnection([
+            'driver' => 'sqlite',
+            'database' => ':memory:',
+        ]);
+        $db->getConnection()->getSchemaBuilder()->create('failed_jobs', function (Blueprint $table) {
+            $table->id();
+            $table->text('connection');
+            $table->text('queue');
+            $table->longText('payload');
+            $table->longText('exception');
+            $table->timestamp('failed_at')->useCurrent();
+        });
+        $provider = new DatabaseFailedJobProvider($db->getDatabaseManager(), 'default', 'failed_jobs');
+
+        $this->assertCount(0, $provider);
+
+        $provider->log('database', 'default', json_encode(['uuid' => (string) Str::uuid()]), new RuntimeException());
+        $this->assertCount(1, $provider);
+
+        $provider->log('database', 'default', json_encode(['uuid' => (string) Str::uuid()]), new RuntimeException());
+        $provider->log('database', 'default', json_encode(['uuid' => (string) Str::uuid()]), new RuntimeException());
+        $this->assertCount(3, $provider);
     }
 }

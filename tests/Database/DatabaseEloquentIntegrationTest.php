@@ -88,6 +88,14 @@ class DatabaseEloquentIntegrationTest extends TestCase
                 $table->timestamps();
             });
 
+            $this->schema($connection)->create('unique_users', function ($table) {
+                $table->increments('id');
+                $table->string('name')->nullable();
+                $table->string('email')->unique();
+                $table->timestamp('birthday', 6)->nullable();
+                $table->timestamps();
+            });
+
             $this->schema($connection)->create('friends', function ($table) {
                 $table->integer('user_id');
                 $table->integer('friend_id');
@@ -509,6 +517,55 @@ class DatabaseEloquentIntegrationTest extends TestCase
         );
 
         $this->assertSame('Nuno Maduro', $user4->name);
+    }
+
+    public function testCreateOrFirst()
+    {
+        $user1 = EloquentTestUniqueUser::createOrFirst(['email' => 'taylorotwell@gmail.com']);
+
+        $this->assertSame('taylorotwell@gmail.com', $user1->email);
+        $this->assertNull($user1->name);
+
+        $user2 = EloquentTestUniqueUser::createOrFirst(
+            ['email' => 'taylorotwell@gmail.com'],
+            ['name' => 'Taylor Otwell']
+        );
+
+        $this->assertEquals($user1->id, $user2->id);
+        $this->assertSame('taylorotwell@gmail.com', $user2->email);
+        $this->assertNull($user2->name);
+
+        $user3 = EloquentTestUniqueUser::createOrFirst(
+            ['email' => 'abigailotwell@gmail.com'],
+            ['name' => 'Abigail Otwell']
+        );
+
+        $this->assertNotEquals($user3->id, $user1->id);
+        $this->assertSame('abigailotwell@gmail.com', $user3->email);
+        $this->assertSame('Abigail Otwell', $user3->name);
+
+        $user4 = EloquentTestUniqueUser::createOrFirst(
+            ['name' => 'Dries Vints'],
+            ['name' => 'Nuno Maduro', 'email' => 'nuno@laravel.com']
+        );
+
+        $this->assertSame('Nuno Maduro', $user4->name);
+    }
+
+    public function testCreateOrFirstWithinTransaction()
+    {
+        $user1 = EloquentTestUniqueUser::create(['email' => 'taylorotwell@gmail.com']);
+
+        DB::transaction(function () use ($user1) {
+            $user2 = EloquentTestUniqueUser::createOrFirst(
+                ['email' => 'taylorotwell@gmail.com'],
+                ['name' => 'Taylor Otwell']
+            );
+
+            $this->assertEquals($user1->id, $user2->id);
+            $this->assertSame('taylorotwell@gmail.com', $user2->email);
+            $this->assertNull($user2->name);
+        });
     }
 
     public function testUpdateOrCreate()
@@ -2241,6 +2298,13 @@ class EloquentTestUserWithGlobalScopeRemovingOtherScope extends Eloquent
 
         parent::boot();
     }
+}
+
+class EloquentTestUniqueUser extends Eloquent
+{
+    protected $table = 'unique_users';
+    protected $casts = ['birthday' => 'datetime'];
+    protected $guarded = [];
 }
 
 class EloquentTestPost extends Eloquent

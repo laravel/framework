@@ -247,6 +247,20 @@ class AssertableJsonString implements ArrayAccess, Countable
     }
 
     /**
+     * Assert that the given path in the response contains all of the expected values without looking at the order.
+     *
+     * @param  string  $path
+     * @param  array  $expect
+     * @return $this
+     */
+    public function assertPathCanonicalizing($path, $expect)
+    {
+        PHPUnit::assertEqualsCanonicalizing($expect, $this->json($path));
+
+        return $this;
+    }
+
+    /**
      * Assert that the response has a given JSON structure.
      *
      * @param  array|null  $structure

@@ -32,6 +32,12 @@ class DatabaseEloquentWithCastsTest extends TestCase
             $table->time('time');
             $table->timestamps();
         });
+
+        $this->schema()->create('unique_times', function ($table) {
+            $table->increments('id');
+            $table->time('time')->unique();
+            $table->timestamps();
+        });
     }
 
     public function testWithFirstOrNew()
@@ -59,6 +65,17 @@ class DatabaseEloquentWithCastsTest extends TestCase
         $this->assertSame($time1->id, $time2->id);
     }
 
+    public function testWithCreateOrFirst()
+    {
+        $time1 = UniqueTime::query()->withCasts(['time' => 'string'])
+            ->createOrFirst(['time' => '07:30']);
+
+        $time2 = UniqueTime::query()->withCasts(['time' => 'string'])
+            ->createOrFirst(['time' => '07:30']);
+
+        $this->assertSame($time1->id, $time2->id);
+    }
+
     /**
      * Get a database connection instance.
      *
@@ -81,6 +98,15 @@ class DatabaseEloquentWithCastsTest extends TestCase
 }
 
 class Time extends Eloquent
+{
+    protected $guarded = [];
+
+    protected $casts = [
+        'time' => 'datetime',
+    ];
+}
+
+class UniqueTime extends Eloquent
 {
     protected $guarded = [];
 
