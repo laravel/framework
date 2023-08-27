@@ -499,11 +499,7 @@ class Route
      */
     public function parameterNames()
     {
-        if (isset($this->parameterNames)) {
-            return $this->parameterNames;
-        }
-
-        return $this->parameterNames = $this->compileParameterNames();
+        return $this->parameterNames ??= $this->compileParameterNames();
     }
 
     /**
@@ -1255,14 +1251,10 @@ class Route
      */
     public static function getValidators()
     {
-        if (isset(static::$validators)) {
-            return static::$validators;
-        }
-
         // To match the route, we will use a chain of responsibility pattern with the
         // validator implementations. We will spin through each one making sure it
         // passes and then we will know if the route as a whole matches request.
-        return static::$validators = [
+        return static::$validators ??= [
             new UriValidator, new MethodValidator,
             new SchemeValidator, new HostValidator,
         ];

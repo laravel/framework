@@ -123,9 +123,7 @@ trait RunsInParallel
             });
         }
 
-        return $potentialExitCode === null
-            ? $this->getExitCode()
-            : $potentialExitCode;
+        return $potentialExitCode ?? $this->getExitCode();
     }
 
     /**

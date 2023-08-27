@@ -149,10 +149,6 @@ class HttpTestingFileFactoryTest extends TestCase
     {
         $gdInfo = gd_info();
 
-        if (isset($gdInfo[$driver])) {
-            return $gdInfo[$driver];
-        }
-
-        return false;
+        return $gdInfo[$driver] ?? false;
     }
 }

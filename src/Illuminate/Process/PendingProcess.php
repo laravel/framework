@@ -291,7 +291,7 @@ class PendingProcess
      */
     protected function toSymfonyProcess(array|string|null $command)
     {
-        $command = $command ?? $this->command;
+        $command ??= $this->command;
 
         $process = is_iterable($command)
                 ? new Process($command, null, $this->environment)
