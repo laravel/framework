@@ -56,7 +56,7 @@ class VerifyCsrfToken
     {
         $this->app = $app;
         $this->encrypter = $encrypter;
-        $this->except = array_merge($this->except, $this->addExceptUrls());
+        $this->except = array_merge($this->except, $this->addExcept());
     }
 
     /**
@@ -221,7 +221,7 @@ class VerifyCsrfToken
      *
      * @return array
      */
-    protected function addExceptUrls(): array
+    protected function addExcept(): array
     {
         return [];
     }
