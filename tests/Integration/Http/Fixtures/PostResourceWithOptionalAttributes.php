@@ -6,7 +6,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class PostResourceWithOptionalAttributes extends JsonResource
 {
-    public function toArray($request)
+    public function toArray()
     {
         return [
             'id' => $this->whenNotNull($this->id),

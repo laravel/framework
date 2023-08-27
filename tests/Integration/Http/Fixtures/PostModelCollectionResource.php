@@ -8,7 +8,7 @@ class PostModelCollectionResource extends ResourceCollection
 {
     public $collects = Post::class;
 
-    public function toArray($request)
+    public function toArray()
     {
         return ['data' => $this->collection];
     }

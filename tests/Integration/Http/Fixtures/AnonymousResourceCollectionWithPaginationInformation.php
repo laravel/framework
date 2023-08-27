@@ -6,7 +6,7 @@ use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class AnonymousResourceCollectionWithPaginationInformation extends AnonymousResourceCollection
 {
-    public function paginationInformation($request)
+    public function paginationInformation()
     {
         $paginated = $this->resource->toArray();
 

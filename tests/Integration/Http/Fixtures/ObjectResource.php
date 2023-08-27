@@ -6,7 +6,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class ObjectResource extends JsonResource
 {
-    public function toArray($request)
+    public function toArray()
     {
         return [
             'name' => $this->first_name,

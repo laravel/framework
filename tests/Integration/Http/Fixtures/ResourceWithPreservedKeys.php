@@ -6,7 +6,7 @@ class ResourceWithPreservedKeys extends PostResource
 {
     protected $preserveKeys = true;
 
-    public function toArray($request)
+    public function toArray()
     {
         return $this->resource;
     }

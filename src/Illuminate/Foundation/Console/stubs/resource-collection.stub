@@ -2,7 +2,6 @@
 
 namespace {{ namespace }};
 
-use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 
 class {{ class }} extends ResourceCollection
@@ -12,8 +11,8 @@ class {{ class }} extends ResourceCollection
      *
      * @return array<int|string, mixed>
      */
-    public function toArray(Request $request): array
+    public function toArray(): array
     {
-        return parent::toArray($request);
+        return parent::toArray();
     }
 }

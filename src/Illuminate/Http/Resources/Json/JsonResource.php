@@ -99,14 +99,11 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
     /**
      * Resolve the resource to an array.
      *
-     * @param  \Illuminate\Http\Request|null  $request
      * @return array
      */
     public function resolve($request = null)
     {
-        $data = $this->toArray(
-            $request = $request ?: Container::getInstance()->make('request')
-        );
+        $data = $this->toArray();
 
         if ($data instanceof Arrayable) {
             $data = $data->toArray();
@@ -120,10 +117,9 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
     /**
      * Transform the resource into an array.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return array|\Illuminate\Contracts\Support\Arrayable|\JsonSerializable
      */
-    public function toArray(Request $request)
+    public function toArray()
     {
         if (is_null($this->resource)) {
             return [];

@@ -11,7 +11,7 @@ class PostResourceWithJsonOptionsAndTypeHints extends JsonResource
         parent::__construct($resource);
     }
 
-    public function toArray($request)
+    public function toArray()
     {
         return [
             'id' => $this->id,

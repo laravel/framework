@@ -4,7 +4,7 @@ namespace Illuminate\Tests\Integration\Http\Fixtures;
 
 class PostResourceWithOptionalRelationship extends PostResource
 {
-    public function toArray($request)
+    public function toArray()
     {
         return [
             'id' => $this->id,

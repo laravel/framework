@@ -4,7 +4,7 @@ namespace Illuminate\Tests\Integration\Http\Fixtures;
 
 class AuthorResourceWithOptionalRelationship extends PostResource
 {
-    public function toArray($request)
+    public function toArray()
     {
         return [
             'name' => $this->name,
