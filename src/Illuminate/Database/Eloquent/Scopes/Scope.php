@@ -6,9 +6,8 @@ use Illuminate\Database\Eloquent\Builder;
 
 class Scope
 {
-
     /**
-     * The scope apply callback.
+     * Apply callback.
      *
      * @var callable
      */
@@ -41,6 +40,7 @@ class Scope
     public function __invoke(Builder $builder): static
     {
         $this->builder = $builder;
+
         return $this;
     }
 
@@ -55,9 +55,10 @@ class Scope
      */
     public function __call($method, $parameters)
     {
-        if (!$this->builder) {
+        if (! $this->builder) {
             $this->__invoke($this->apply->__invoke());
         }
+
         return $this->builder->$method(...$parameters);
     }
 
@@ -71,5 +72,4 @@ class Scope
     {
         return new static($apply);
     }
-
 }

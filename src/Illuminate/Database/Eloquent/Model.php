@@ -164,6 +164,13 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     protected static $ignoreOnTouch = [];
 
     /**
+     * The array of checked scope existence.
+     *
+     * @var array
+     */
+    protected static $scopeCache = [];
+
+    /**
      * Indicates whether lazy loading should be restricted on all models.
      *
      * @var bool
@@ -1617,12 +1624,23 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function hasNamedScope($scope)
     {
+        if (isset($this->scopeCache[$scope])) {
+            return $this->scopeCache[$scope];
+        }
+
         if (method_exists($this, $scope)) {
             $reflectedMethod = new \ReflectionMethod($this, $scope);
             $returnType = $reflectedMethod->getReturnType();
-            return $returnType && $returnType->getName() === Scope::class;
+            $returnTypeName = $returnType->getName();
+
+            $isScope = $returnTypeName === Scope::class || is_subclass_of($returnTypeName, Scope::class);
+        } else {
+            $isScope = method_exists($this, 'scope'.ucfirst($scope));
         }
-        return method_exists($this, 'scope'.ucfirst($scope));
+
+        $this->scopeCache[$scope] = $isScope;
+
+        return $isScope;
     }
 
     /**

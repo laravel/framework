@@ -3,9 +3,9 @@
 namespace Illuminate\Tests\Database;
 
 use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Scopes\Scope;
-use Illuminate\Database\Eloquent\Builder;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentLocalScopesTest extends TestCase
@@ -91,6 +91,27 @@ class DatabaseEloquentLocalScopesTest extends TestCase
         $this->assertEquals(['2020-01-01', true], $query->getBindings());
     }
 
+    public function testWorksWithStandardStaticSyntax()
+    {
+        $query = EloquentLocalScopesTestModel::active()->newerThan('2020-01-01');
+        $this->assertSame('select * from "table" where "active" = ? and "created_at" > ?', $query->toSql());
+        $this->assertEquals([true, '2020-01-01'], $query->getBindings());
+    }
+
+    public function testAllowsClassExtension()
+    {
+        $model = new EloquentLocalScopesTestModel;
+        $query = $model->newQuery()->otherScope('2020-01-01')->where('extended', true);
+
+        $this->assertSame('select * from "table" where "created_at" > ? and "extended" = ?', $query->toSql());
+        $this->assertEquals(['2020-01-01', true], $query->getBindings());
+    }
+
+}
+
+class ExtendedScope extends Scope
+{
+    // inherits all the methods from Scope
 }
 
 class EloquentLocalScopesTestModel extends Model
@@ -107,23 +128,30 @@ class EloquentLocalScopesTestModel extends Model
         $query->where('type', $type);
     }
 
-   public function newerThan(Builder $query, $date): Scope
-   {
+    public function newerThan(Builder $query, $date): Scope
+    {
         return Scope::make(
             apply: function () use ($query, $date) {
                 return $query->where('created_at', '>', $date);
             },
         );
-   }
+    }
 
+    public function otherScope(Builder $query, $date): ExtendedScope
+    {
+        return ExtendedScope::make(
+            function () use ($query, $date) {
+                return $query->where('created_at', '>', $date);
+            },
+        );
+    }
 
-   public function greaterThan(Builder $query, int $int): Scope
-   {
+    public function greaterThan(Builder $query, int $int): Scope
+    {
         return Scope::make(
             apply: function () use ($query, $int) {
                 return $query->where('number', '>', $int);
             },
         );
-   }
-
+    }
 }
