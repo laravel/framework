@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation\Http\Middleware;
 
 use Closure;
+use Illuminate\Support\Str;
 
 class TrimStrings extends TransformsRequest
 {
@@ -49,7 +50,9 @@ class TrimStrings extends TransformsRequest
      */
     protected function transform($key, $value)
     {
-        if (in_array($key, $this->except, true) || ! is_string($value)) {
+        $attribute = Str::afterLast($key, '.');
+
+        if (in_array($key, $this->except, true) || in_array($attribute, $this->except, true) || ! is_string($value)) {
             return $value;
         }
 
