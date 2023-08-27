@@ -470,8 +470,6 @@ class Builder implements BuilderContract
             return $this->model->newCollection();
         }
 
-        #dd($ids, $columns);
-
         return $this->whereKey($ids)->get($columns);
     }
 
