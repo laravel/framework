@@ -61,6 +61,32 @@ class EloquentHasManyTest extends DatabaseTestCase
         $this->assertEquals($latestLogin->id, $user->latestLogin->id);
     }
 
+    public function testFirstOrCreate()
+    {
+        $user = EloquentHasManyTestUser::create();
+
+        $post1 = $user->posts()->create(['title' => Str::random()]);
+        $post2 = $user->posts()->firstOrCreate(['title' => $post1->title]);
+
+        $this->assertTrue($post1->is($post2));
+        $this->assertCount(1, $user->posts()->get());
+    }
+
+    public function testFirstOrCreateWithinTransaction()
+    {
+        $user = EloquentHasManyTestUser::create();
+
+        $post1 = $user->posts()->create(['title' => Str::random()]);
+
+        DB::transaction(function () use ($user, $post1) {
+            $post2 = $user->posts()->firstOrCreate(['title' => $post1->title]);
+
+            $this->assertTrue($post1->is($post2));
+        });
+
+        $this->assertCount(1, $user->posts()->get());
+    }
+
     public function testCreateOrFirst()
     {
         $user = EloquentHasManyTestUser::create();
