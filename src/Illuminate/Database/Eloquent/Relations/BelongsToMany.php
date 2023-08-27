@@ -627,7 +627,7 @@ class BelongsToMany extends Relation
                 try {
                     $this->getQuery()->withSavepointIfNeeded(fn () => $this->attach($instance, $joining, $touch));
                 } catch (UniqueConstraintViolationException $exception) {
-                    // Nothing to do, the model was already attached.
+                    // Nothing to do, the model was already attached...
                 }
             }
         }
