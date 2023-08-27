@@ -534,7 +534,7 @@ class Handler implements ExceptionHandlerContract
     protected function invalid($request, ValidationException $exception)
     {
         return redirect($exception->redirectTo ?? url()->previous())
-                    ->withInput(Arr::except($request->input(), $this->dontFlash))
+                    ->withInput(Arr::except($request->input() ?? [], $this->dontFlash))
                     ->withErrors($exception->errors(), $request->input('_error_bag', $exception->errorBag));
     }
 

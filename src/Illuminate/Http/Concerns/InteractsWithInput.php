@@ -265,7 +265,7 @@ trait InteractsWithInput
      */
     public function keys()
     {
-        return array_merge(array_keys($this->input()), $this->files->keys());
+        return array_merge(array_keys($this->input() ?? []), $this->files->keys());
     }
 
     /**
@@ -276,7 +276,7 @@ trait InteractsWithInput
      */
     public function all($keys = null)
     {
-        $input = array_replace_recursive($this->input(), $this->allFiles());
+        $input = array_replace_recursive($this->input() ?? [], $this->allFiles());
 
         if (! $keys) {
             return $input;
