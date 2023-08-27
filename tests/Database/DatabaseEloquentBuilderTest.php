@@ -182,7 +182,9 @@ class DatabaseEloquentBuilderTest extends TestCase
         $model1 = $this->getMockModel();
         $model2 = $this->getMockModel();
         $model1->shouldReceive('getKeyType')->andReturn('int');
+        $model1->shouldReceive('getKey')->andReturn(1);
         $model2->shouldReceive('getKeyType')->andReturn('int');
+        $model2->shouldReceive('getKey')->andReturn(2);
         $builder->setModel($model1);
         $builder->getQuery()->shouldReceive('whereIntegerInRaw')->with('foo_table.foo', [1, 2])->twice();
         $builder->getQuery()->shouldReceive('whereIntegerInRaw')->with('foo_table.foo', [1, 2, 3])->once();
@@ -210,7 +212,9 @@ class DatabaseEloquentBuilderTest extends TestCase
         $model1 = $this->getMockModel();
         $model2 = $this->getMockModel();
         $model1->shouldReceive('getKeyType')->andReturn('int');
+        $model1->shouldReceive('getKey')->andReturn(1);
         $model2->shouldReceive('getKeyType')->andReturn('int');
+        $model2->shouldReceive('getKey')->andReturn(2);
         $builder->setModel($model1);
         $builder->getQuery()->shouldReceive('whereIntegerInRaw')->with('foo_table.foo', [1, 2])->twice();
         $builder->getQuery()->shouldReceive('whereIntegerInRaw')->with('foo_table.foo', [1, 2, 3])->once();
@@ -247,6 +251,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder = m::mock(Builder::class.'[get]', [$this->getMockQueryBuilder()]);
         $model = $this->getMockModel();
         $model->shouldReceive('getKeyType')->andReturn('int');
+        $model->shouldReceive('getKey')->andReturn(1);
         $builder->getQuery()->shouldReceive('whereIntegerInRaw')->once()->with('foo_table.foo', [1, 2]);
         $builder->setModel($model);
         $builder->shouldReceive('get')->with(['column'])->andReturn('baz');

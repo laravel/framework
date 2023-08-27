@@ -441,7 +441,13 @@ class Builder implements BuilderContract
     public function find($id, $columns = ['*'])
     {
         if (is_array($id) || $id instanceof Arrayable) {
-            return $this->findMany($id, $columns);
+            $results = $this->findMany($id, $columns);
+
+            if ($results instanceof Arrayable) {
+                return $results->sortBy(fn (Model $model) => array_search($model->getKey(), $id instanceof Arrayable ? $id->toArray() : $id));
+            }
+
+            return $results;
         }
 
         return $this->whereKey($id)->first($columns);
