@@ -581,7 +581,7 @@ class Builder implements BuilderContract
     {
         try {
             return $this->withSavepointIfNeeded(fn () => $this->create(array_merge($attributes, $values)));
-        } catch (UniqueConstraintViolationException $exception) {
+        } catch (UniqueConstraintViolationException) {
             return $this->useWritePdo()->where($attributes)->first();
         }
     }
@@ -595,8 +595,10 @@ class Builder implements BuilderContract
      */
     public function updateOrCreate(array $attributes, array $values = [])
     {
-        return tap($this->firstOrNew($attributes), function ($instance) use ($values) {
-            $instance->fill($values)->save();
+        return tap($this->firstOrCreate($attributes, $values), function ($instance) use ($values) {
+            if (! $instance->wasRecentlyCreated) {
+                $instance->fill($values)->save();
+            }
         });
     }
 

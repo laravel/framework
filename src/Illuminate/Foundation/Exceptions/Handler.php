@@ -273,7 +273,7 @@ class Handler implements ExceptionHandlerContract
 
         try {
             $logger = $this->container->make(LoggerInterface::class);
-        } catch (Exception $ex) {
+        } catch (Exception) {
             throw $e;
         }
 
@@ -370,7 +370,7 @@ class Handler implements ExceptionHandlerContract
             return array_filter([
                 'userId' => Auth::id(),
             ]);
-        } catch (Throwable $e) {
+        } catch (Throwable) {
             return [];
         }
     }

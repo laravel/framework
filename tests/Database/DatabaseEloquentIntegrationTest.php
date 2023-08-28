@@ -1460,7 +1460,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
             try {
                 $user->email = 'otwell@laravel.com';
                 $user->saveOrFail();
-            } catch (Exception $e) {
+            } catch (Exception) {
                 // ignore the exception
             }
 
