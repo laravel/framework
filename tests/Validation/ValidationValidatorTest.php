@@ -1419,23 +1419,23 @@ class ValidationValidatorTest extends TestCase
     public function testRequiredIfArrayToStringConversationErrorException()
     {
         $trans = $this->getIlluminateArrayTranslator();
-        $v = new Validator( $trans, [
+        $v = new Validator($trans, [
             'is_customer' => 1,
             'fullname' => null,
         ], [
             'is_customer' => 'required|boolean',
-            'fullname' => 'required_if:is_customer,true'
-        ] );
+            'fullname' => 'required_if:is_customer,true',
+        ]);
         $this->assertTrue($v->fails());
 
         $trans = $this->getIlluminateArrayTranslator();
-        $v = new Validator( $trans, [
+        $v = new Validator($trans, [
             'is_customer' => ['test'],
             'fullname' => null,
         ], [
             'is_customer' => 'required|boolean',
-            'fullname' => 'required_if:is_customer,true'
-        ] );
+            'fullname' => 'required_if:is_customer,true',
+        ]);
         $this->assertTrue($v->fails());
     }
 

@@ -442,7 +442,7 @@ trait FormatsMessages
             return $this->customValues[$attribute][$value];
         }
 
-        if ( is_array( $value ) ) {
+        if (is_array($value)) {
             return 'array';
         }
 
