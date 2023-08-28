@@ -75,7 +75,7 @@ class Str
      * @param  string  $search
      * @return string
      */
-    public static function after(string $subject, string $search)
+    public static function after($subject, string $search)
     {
         return $search === '' ? $subject : array_reverse(explode($search, $subject, 2))[0];
     }
@@ -109,7 +109,7 @@ class Str
      * @param  string  $language
      * @return string
      */
-    public static function ascii(string $value, string $language = 'en')
+    public static function ascii($value, $language = 'en')
     {
         return ASCII::to_ascii($value, $language);
     }
@@ -215,7 +215,7 @@ class Str
      * @param  int  $index
      * @return string|false
      */
-    public static function charAt(string $subject, int $index)
+    public static function charAt(string $subject, $index)
     {
         $length = mb_strlen($subject);
 
@@ -306,7 +306,7 @@ class Str
      * @param  array  $options
      * @return string|null
      */
-    public static function excerpt(string $text, string $phrase = '', array $options = [])
+    public static function excerpt($text, string $phrase = '', array $options = [])
     {
         $radius = $options['radius'] ?? 100;
         $omission = $options['omission'] ?? '...';
@@ -368,7 +368,7 @@ class Str
      * @param  string  $value
      * @return bool
      */
-    public static function is($pattern, string $value)
+    public static function is($pattern, $value)
     {
         if (! is_iterable($pattern)) {
             $pattern = [$pattern];
