@@ -188,7 +188,7 @@ class DatabaseEloquentHasManyTest extends TestCase
         });
         $relation->getQuery()->shouldReceive('useWritePdo')->once()->andReturn($relation->getQuery());
         $relation->getQuery()->shouldReceive('where')->once()->with(['foo' => 'bar'])->andReturn($relation->getQuery());
-        $relation->getQuery()->shouldReceive('first')->once()->with()->andReturn($model = m::mock(stdClass::class));
+        $relation->getQuery()->shouldReceive('firstOrFail')->once()->with()->andReturn($model = m::mock(stdClass::class));
 
         $this->assertInstanceOf(stdClass::class, $found = $relation->createOrFirst(['foo' => 'bar'], ['baz' => 'qux']));
         $this->assertSame($model, $found);

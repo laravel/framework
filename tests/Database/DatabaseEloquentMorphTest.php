@@ -234,7 +234,7 @@ class DatabaseEloquentMorphTest extends TestCase
         });
         $relation->getQuery()->shouldReceive('useWritePdo')->once()->andReturn($relation->getQuery());
         $relation->getQuery()->shouldReceive('where')->once()->with(['foo'])->andReturn($relation->getQuery());
-        $relation->getQuery()->shouldReceive('first')->once()->with()->andReturn($model = m::mock(Model::class));
+        $relation->getQuery()->shouldReceive('firstOrFail')->once()->with()->andReturn($model = m::mock(Model::class));
 
         $this->assertInstanceOf(Model::class, $relation->createOrFirst(['foo']));
     }
@@ -255,7 +255,7 @@ class DatabaseEloquentMorphTest extends TestCase
         });
         $relation->getQuery()->shouldReceive('useWritePdo')->once()->andReturn($relation->getQuery());
         $relation->getQuery()->shouldReceive('where')->once()->with(['foo' => 'bar'])->andReturn($relation->getQuery());
-        $relation->getQuery()->shouldReceive('first')->once()->with()->andReturn($model = m::mock(Model::class));
+        $relation->getQuery()->shouldReceive('firstOrFail')->once()->with()->andReturn($model = m::mock(Model::class));
 
         $this->assertInstanceOf(Model::class, $relation->createOrFirst(['foo' => 'bar'], ['baz' => 'qux']));
     }
