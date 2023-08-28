@@ -1548,4 +1548,19 @@ class Str
         static::$camelCache = [];
         static::$studlyCache = [];
     }
+
+    /**
+     * Convert the case of a string using multibyte support.
+     *
+     * @param string $string The input string to convert.
+     * @param int $mode The conversion mode (default: MB_CASE_FOLD).
+     * @param string $encoding The character encoding (default: null, which uses the internal encoding).
+     * @return string The converted string.
+     */
+    public static function convertCase(string $string, int $mode = MB_CASE_FOLD, ?string $encoding = 'UTF-8')
+    {
+        // Use mb_convert_case to perform the case conversion.
+        // If $encoding is not provided, the internal encoding is used.
+        return mb_convert_case($string, $mode, $encoding);
+    }
 }
