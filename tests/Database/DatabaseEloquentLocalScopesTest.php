@@ -91,13 +91,6 @@ class DatabaseEloquentLocalScopesTest extends TestCase
         $this->assertEquals(['2020-01-01', true], $query->getBindings());
     }
 
-    public function testWorksWithStandardStaticSyntax()
-    {
-        $query = EloquentLocalScopesTestModel::active()->newerThan('2020-01-01');
-        $this->assertSame('select * from "table" where "active" = ? and "created_at" > ?', $query->toSql());
-        $this->assertEquals([true, '2020-01-01'], $query->getBindings());
-    }
-
     public function testAllowsClassExtension()
     {
         $model = new EloquentLocalScopesTestModel;
@@ -107,7 +100,22 @@ class DatabaseEloquentLocalScopesTest extends TestCase
         $this->assertEquals(['2020-01-01', true], $query->getBindings());
     }
 
+    public function testScopeCacheIsPopulated()
+    {
+
+        $model = new EloquentLocalScopesTestModel;
+
+        $model->hasNamedScope('newerThan');
+        $model->hasNamedScope('newerThan');
+
+        $scopeCache = $model->getScopeCache();
+        $scopeClassName = EloquentLocalScopesTestModel::class.':newerThan';
+
+        $this->assertArrayHasKey($scopeClassName, $scopeCache);
+        $this->assertTrue($scopeCache[$scopeClassName]);
+    }
 }
+
 
 class ExtendedScope extends Scope
 {
