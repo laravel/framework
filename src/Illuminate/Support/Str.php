@@ -421,14 +421,14 @@ class Str
         if (! is_string($value)) {
             return false;
         }
-
+        
         try {
             json_decode($value, true, 512, JSON_THROW_ON_ERROR);
-            
-            return true;
         } catch (JsonException $e) {
             return false;
         }
+
+        return true;
     }
 
     /**
@@ -699,7 +699,7 @@ class Str
         if ($currentLength >= $length) {
             return $value;
         }
-        
+
         $short = max(0, $length - $currentLength);
         $shortLeft = floor($short / 2);
         $shortRight = ceil($short / 2);
