@@ -32,8 +32,6 @@ class RateLimitedWithRedisTest extends TestCase
         parent::tearDown();
 
         $this->tearDownRedis();
-
-        m::close();
     }
 
     public function testUnlimitedJobsAreExecuted()

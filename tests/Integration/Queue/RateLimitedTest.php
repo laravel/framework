@@ -16,13 +16,6 @@ use Orchestra\Testbench\TestCase;
 
 class RateLimitedTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        parent::tearDown();
-
-        m::close();
-    }
-
     public function testUnlimitedJobsAreExecuted()
     {
         $rateLimiter = $this->app->make(RateLimiter::class);

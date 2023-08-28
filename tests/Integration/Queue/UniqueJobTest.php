@@ -16,25 +16,9 @@ use Orchestra\Testbench\TestCase;
 
 class UniqueJobTest extends TestCase
 {
-    protected function getEnvironmentSetUp($app)
+    protected function defineDatabaseMigrations()
     {
-        $app['db']->connection()->getSchemaBuilder()->create('jobs', function (Blueprint $table) {
-            $table->bigIncrements('id');
-            $table->string('queue');
-            $table->longText('payload');
-            $table->tinyInteger('attempts')->unsigned();
-            $table->unsignedInteger('reserved_at')->nullable();
-            $table->unsignedInteger('available_at');
-            $table->unsignedInteger('created_at');
-            $table->index(['queue', 'reserved_at']);
-        });
-    }
-
-    protected function tearDown(): void
-    {
-        $this->app['db']->connection()->getSchemaBuilder()->drop('jobs');
-
-        parent::tearDown();
+        $this->loadLaravelMigrations();
     }
 
     public function testUniqueJobsAreNotDispatched()
