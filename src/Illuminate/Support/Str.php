@@ -111,7 +111,7 @@ class Str
      */
     public static function ascii($value, $language = 'en')
     {
-        return ASCII::to_ascii($value, $language);
+        return ASCII::to_ascii((string) $value, $language);
     }
 
     /**
@@ -306,7 +306,7 @@ class Str
      * @param  array  $options
      * @return string|null
      */
-    public static function excerpt($text, string $phrase = '', array $options = [])
+    public static function excerpt($text, $phrase = '', $options = [])
     {
         $radius = $options['radius'] ?? 100;
         $omission = $options['omission'] ?? '...';
