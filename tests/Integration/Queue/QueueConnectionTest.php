@@ -13,17 +13,21 @@ use Throwable;
 
 class QueueConnectionTest extends TestCase
 {
-    protected function getEnvironmentSetUp($app)
+    protected function setUp(): void
     {
-        $app['config']->set('queue.default', 'sqs');
-        $app['config']->set('queue.connections.sqs.after_commit', true);
+        $this->beforeApplicationDestroyed(function () {
+            QueueConnectionTestJob::$ran = false;
+        });
+
+        parent::setUp();
     }
 
-    protected function tearDown(): void
+    protected function defineEnvironment($app)
     {
-        QueueConnectionTestJob::$ran = false;
-
-        m::close();
+        $app['config']->set([
+            'queue.default' => 'sqs',
+            'queue.connections.sqs.after_commit' => true,
+        ]);
     }
 
     public function testJobWontGetDispatchedInsideATransaction()

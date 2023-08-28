@@ -12,10 +12,14 @@ use Orchestra\Testbench\TestCase;
 
 class JobDispatchingTest extends TestCase
 {
-    protected function tearDown(): void
+    protected function setUp(): void
     {
-        Job::$ran = false;
-        Job::$value = null;
+        $this->beforeApplicationDestroyed(function () {
+            Job::$ran = false;
+            Job::$value = null;
+        });
+
+        parent::setUp();
     }
 
     public function testJobCanUseCustomMethodsAfterDispatch()

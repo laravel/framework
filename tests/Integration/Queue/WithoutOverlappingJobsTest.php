@@ -15,13 +15,6 @@ use Orchestra\Testbench\TestCase;
 
 class WithoutOverlappingJobsTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        parent::tearDown();
-
-        m::close();
-    }
-
     public function testNonOverlappingJobsAreExecuted()
     {
         OverlappingTestJob::$handled = false;
