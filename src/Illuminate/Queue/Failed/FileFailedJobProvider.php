@@ -206,9 +206,19 @@ class FileFailedJobProvider implements Countable, FailedJobProviderInterface, Pr
 
     /**
      * Count the failed jobs.
+     *
+     * @param  string|null  $connection
+     * @param  string|null  $queue
+     * @return int
      */
-    public function count(): int
+    public function count($connection = null, $queue = null)
     {
-        return count($this->read());
+        if (($connection ?? $queue) === null) {
+            return count($this->read());
+        }
+
+        return collect($this->read())
+            ->filter(fn ($job) => $job->connection === ($connection ?? $job->connection) && $job->queue === ($queue ?? $job->queue))
+            ->count();
     }
 }
