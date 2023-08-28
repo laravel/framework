@@ -177,7 +177,7 @@ class Str
      */
     public static function between(string $subject, string $from, string $to)
     {
-        return ($from === '' || $to === '') ? $subjec : static::beforeLast(static::after($subject, $from), $to);
+        return ($from === '' || $to === '') ? $subject : static::beforeLast(static::after($subject, $from), $to);
     }
 
     /**
@@ -1522,7 +1522,7 @@ class Str
      *
      * @return string The converted string.
      */
-    public static function convertCase(string $string, int $mode = MB_CASE_FOLD, ?string $encoding = null)
+    public static function convertCase(string $string, int $mode = MB_CASE_FOLD, ?string $encoding = "UTF-8")
     {
         // Use mb_convert_case to perform the case conversion.
         // If $encoding is not provided, the internal encoding is used.
