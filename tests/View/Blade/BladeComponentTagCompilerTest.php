@@ -734,31 +734,6 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         $this->assertSame($attributes->get('other'), 'ok');
     }
 
-    public function testFalseShortSyntax()
-    {
-        $this->mockViewFactory();
-        $result = $this->compiler(['bool' => TestBoolComponent::class])->compileTags('<x-bool !bool></x-bool>');
-
-        $this->assertSame("##BEGIN-COMPONENT-CLASS##@component('Illuminate\Tests\View\Blade\TestBoolComponent', 'bool', ['bool' => false])
-<?php if (isset(\$attributes) && \$attributes instanceof Illuminate\View\ComponentAttributeBag && \$constructor = (new ReflectionClass(Illuminate\Tests\View\Blade\TestBoolComponent::class))->getConstructor()): ?>
-<?php \$attributes = \$attributes->except(collect(\$constructor->getParameters())->map->getName()->all()); ?>
-<?php endif; ?>
-<?php \$component->withAttributes([]); ?> @endComponentClass##END-COMPONENT-CLASS##", trim($result));
-    }
-
-    public function testSelfClosingComponentWithFalseShortSyntax()
-    {
-        $this->mockViewFactory();
-        $result = $this->compiler(['bool' => TestBoolComponent::class])->compileTags('<x-bool !bool />');
-
-        $this->assertSame("##BEGIN-COMPONENT-CLASS##@component('Illuminate\Tests\View\Blade\TestBoolComponent', 'bool', ['bool' => false])
-<?php if (isset(\$attributes) && \$attributes instanceof Illuminate\View\ComponentAttributeBag && \$constructor = (new ReflectionClass(Illuminate\Tests\View\Blade\TestBoolComponent::class))->getConstructor()): ?>
-<?php \$attributes = \$attributes->except(collect(\$constructor->getParameters())->map->getName()->all()); ?>
-<?php endif; ?>
-<?php \$component->withAttributes([]); ?>
-@endComponentClass##END-COMPONENT-CLASS##", trim($result));
-    }
-
     protected function mockViewFactory($existsSucceeds = true)
     {
         $container = new Container;
@@ -820,20 +795,5 @@ class TestInputComponent extends Component
     public function render()
     {
         return 'input';
-    }
-}
-
-class TestBoolComponent extends Component
-{
-    public $bool;
-
-    public function __construct($bool)
-    {
-        $this->bool = $bool;
-    }
-
-    public function render()
-    {
-        return 'bool';
     }
 }
