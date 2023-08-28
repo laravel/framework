@@ -405,9 +405,9 @@ class Str
      * @param  string  $value
      * @return bool
      */
-    public static function isAscii(string $value)
+    public static function isAscii($value)
     {
-        return ASCII::is_ascii($value);
+        return ASCII::is_ascii((string) $value);
     }
 
     /**
