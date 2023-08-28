@@ -7,7 +7,7 @@ use Countable;
 use DateTimeInterface;
 use Illuminate\Support\Facades\Date;
 
-class FileFailedJobProvider implements Countable, FailedJobProviderInterface, PrunableFailedJobProvider
+class FileFailedJobProvider implements CountableFailedJobProvider, FailedJobProviderInterface, PrunableFailedJobProvider
 {
     /**
      * The file path where the failed job file should be stored.

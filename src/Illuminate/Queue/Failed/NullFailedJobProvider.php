@@ -4,7 +4,7 @@ namespace Illuminate\Queue\Failed;
 
 use Countable;
 
-class NullFailedJobProvider implements Countable, FailedJobProviderInterface
+class NullFailedJobProvider implements CountableFailedJobProvider, FailedJobProviderInterface
 {
     /**
      * Log a failed job into storage.
