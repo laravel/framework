@@ -116,7 +116,6 @@ class DatabaseEloquentLocalScopesTest extends TestCase
     }
 }
 
-
 class ExtendedScope extends Scope
 {
     // inherits all the methods from Scope

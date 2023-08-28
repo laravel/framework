@@ -1631,23 +1631,37 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     public function hasNamedScope($scope)
     {
 
-        $cacheKey = get_class($this).':'.$scope;
+        $cacheKey = get_class($this) . ':' . $scope;
 
         if (isset(static::$scopeCache[$cacheKey])) {
             return static::$scopeCache[$cacheKey];
         }
 
-        if (method_exists($this, $scope)) {
-            $reflectedMethod = new \ReflectionMethod($this, $scope);
-            $returnType = $reflectedMethod->getReturnType();
-            $returnTypeName = $returnType->getName();
+        return static::$scopeCache[$cacheKey] = $this->checkScope($scope);
+    }
 
-            $isScope = $returnTypeName === Scope::class || is_subclass_of($returnTypeName, Scope::class);
-        } else {
-            $isScope = method_exists($this, 'scope' . ucfirst($scope));
+    /**
+     * Check the scope for existence.
+     *
+     * @param  string  $scope
+     * @return bool
+     */
+    protected function checkScope($scope)
+    {
+        if (! method_exists($this, $scope)) {
+            return method_exists($this, 'scope' . ucfirst($scope));
         }
 
-        return static::$scopeCache[$cacheKey] = $isScope;
+        $reflectedMethod = new \ReflectionMethod($this, $scope);
+        $returnType = $reflectedMethod->getReturnType();
+
+        if ($returnType === null) {
+            return false;
+        }
+
+        $returnTypeName = $returnType->getName();
+
+        return $returnTypeName === Scope::class || is_subclass_of($returnTypeName, Scope::class);
     }
 
     /**
