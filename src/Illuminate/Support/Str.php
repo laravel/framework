@@ -424,11 +424,11 @@ class Str
 
         try {
             json_decode($value, true, 512, JSON_THROW_ON_ERROR);
+            
             return true;
         } catch (JsonException $e) {
             return false;
         }
-
     }
 
     /**
@@ -1516,13 +1516,12 @@ class Str
     /**
      * Convert the case of a string using multibyte support.
      *
-     * @param string $string   The input string to convert.
-     * @param int    $mode     The mode of conversion (default: MB_CASE_FOLD).
-     * @param string $encoding The character encoding (default: null, which uses the internal encoding).
-     *
+     * @param  string  $string  The input string to convert.
+     * @param  int  $mode  The mode of conversion (default: MB_CASE_FOLD).
+     * @param  string  $encoding  The character encoding (default: null, which uses the internal encoding).
      * @return string The converted string.
      */
-    public static function convertCase(string $string, int $mode = MB_CASE_FOLD, ?string $encoding = "UTF-8")
+    public static function convertCase(string $string, int $mode = MB_CASE_FOLD, ?string $encoding = 'UTF-8')
     {
         // Use mb_convert_case to perform the case conversion.
         // If $encoding is not provided, the internal encoding is used.
