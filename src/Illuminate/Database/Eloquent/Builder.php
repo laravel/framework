@@ -1166,8 +1166,7 @@ class Builder implements BuilderContract
             ) {
                 $timestamp = $this->model->newInstance()
                     ->forceFill([$column => $timestamp])
-                    ->getAttributes()[$column];
-                    // ->getAttributes()[$column] ?? $timestamp;
+                    ->getAttributes()[$column] ?? $timestamp;
             }
 
             $values = array_merge([$column => $timestamp], $values);
