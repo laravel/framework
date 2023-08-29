@@ -22,7 +22,7 @@ class ApiAuthenticationWithEloquentTest extends TestCase
 
         $app['config']->set('database.connections.testbench', [
             'driver' => 'mysql',
-            'host' => getenv('DB_HOST', '127.0.0.1'),
+            'host' => env('DB_HOST', '127.0.0.1'),
             'username' => 'root',
             'password' => 'invalid-credentials',
             'database' => 'forge',
