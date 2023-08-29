@@ -20,6 +20,13 @@ class EloquentCastTest extends MySqlTestCase
             $table->integer('created_at');
             $table->integer('updated_at');
         });
+
+        Schema::create('users_nullable_timestamps', function ($table) {
+            $table->increments('id');
+            $table->string('email')->unique();
+            $table->timestamp('created_at')->nullable();
+            $table->timestamp('updated_at')->nullable();
+        });
     }
 
     protected function destroyDatabaseMigrations()
@@ -115,6 +122,27 @@ class EloquentCastTest extends MySqlTestCase
         $this->assertSame($updatedAt, $mutatorUser->updated_at->timestamp);
         $this->assertSame($updatedAt, $mutatorUser->fresh()->updated_at->timestamp);
     }
+
+    public function testItCastTimestampsUpdatedByAMutator()
+    {
+        Carbon::setTestNow(now());
+
+        $mutatorUser = UserWithUpdatedAtViaMutator::create([
+            'email' => fake()->unique()->email,
+        ]);
+
+        $this->assertNull($mutatorUser->updated_at);
+
+        Carbon::setTestNow(now()->addSecond());
+        $updatedAt = now()->timestamp;
+
+        $mutatorUser->update([
+            'email' => fake()->unique()->email,
+        ]);
+
+        $this->assertSame($updatedAt, $mutatorUser->updated_at->timestamp);
+        $this->assertSame($updatedAt, $mutatorUser->fresh()->updated_at->timestamp);
+    }
 }
 
 class UserWithIntTimestampsViaCasts extends Model
@@ -189,5 +217,21 @@ class UserWithIntTimestampsViaMutator extends Model
     protected function setCreatedAtAttribute($value)
     {
         $this->attributes['created_at'] = Carbon::parse($value)->timestamp;
+    }
+}
+
+class UserWithUpdatedAtViaMutator extends Model
+{
+    protected $table = 'users_nullable_timestamps';
+
+    protected $fillable = ['email', 'updated_at'];
+
+    public function setUpdatedAtAttribute($value)
+    {
+        if (! $this->id) {
+            return;
+        }
+
+        $this->updated_at = $value;
     }
 }
