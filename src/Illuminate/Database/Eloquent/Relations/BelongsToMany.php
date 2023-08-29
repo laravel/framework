@@ -672,11 +672,11 @@ class BelongsToMany extends Relation
      */
     public function updateOrCreate(array $attributes, array $values = [], array $joining = [], $touch = true)
     {
-        return tap($this->firstOrCreate($attributes, $values), function ($instance) use ($values) {
+        return tap($this->firstOrCreate($attributes, $values, $joining, $touch), function ($instance) use ($values, $touch) {
             if (! $instance->wasRecentlyCreated) {
                 $instance->fill($values);
 
-                $instance->save(['touch' => false]);
+                $instance->save(compact('touch'));
             }
         });
     }
