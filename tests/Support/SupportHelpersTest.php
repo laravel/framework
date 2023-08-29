@@ -566,80 +566,80 @@ class SupportHelpersTest extends TestCase
     public function testEnv()
     {
         $_SERVER['foo'] = 'bar';
-        $this->assertSame('bar', env('foo'));
+        $this->assertSame('bar', getenv('foo'));
     }
 
     public function testEnvTrue()
     {
         $_SERVER['foo'] = 'true';
-        $this->assertTrue(env('foo'));
+        $this->assertTrue(getenv('foo'));
 
         $_SERVER['foo'] = '(true)';
-        $this->assertTrue(env('foo'));
+        $this->assertTrue(getenv('foo'));
     }
 
     public function testEnvFalse()
     {
         $_SERVER['foo'] = 'false';
-        $this->assertFalse(env('foo'));
+        $this->assertFalse(getenv('foo'));
 
         $_SERVER['foo'] = '(false)';
-        $this->assertFalse(env('foo'));
+        $this->assertFalse(getenv('foo'));
     }
 
     public function testEnvEmpty()
     {
         $_SERVER['foo'] = '';
-        $this->assertSame('', env('foo'));
+        $this->assertSame('', getenv('foo'));
 
         $_SERVER['foo'] = 'empty';
-        $this->assertSame('', env('foo'));
+        $this->assertSame('', getenv('foo'));
 
         $_SERVER['foo'] = '(empty)';
-        $this->assertSame('', env('foo'));
+        $this->assertSame('', getenv('foo'));
     }
 
     public function testEnvNull()
     {
         $_SERVER['foo'] = 'null';
-        $this->assertNull(env('foo'));
+        $this->assertNull(getenv('foo'));
 
         $_SERVER['foo'] = '(null)';
-        $this->assertNull(env('foo'));
+        $this->assertNull(getenv('foo'));
     }
 
     public function testEnvDefault()
     {
         $_SERVER['foo'] = 'bar';
-        $this->assertEquals('bar', env('foo', 'default'));
+        $this->assertEquals('bar', getenv('foo', 'default'));
 
         $_SERVER['foo'] = '';
-        $this->assertEquals('', env('foo', 'default'));
+        $this->assertEquals('', getenv('foo', 'default'));
 
         unset($_SERVER['foo']);
-        $this->assertEquals('default', env('foo', 'default'));
+        $this->assertEquals('default', getenv('foo', 'default'));
 
         $_SERVER['foo'] = null;
-        $this->assertEquals('default', env('foo', 'default'));
+        $this->assertEquals('default', getenv('foo', 'default'));
     }
 
     public function testEnvEscapedString()
     {
         $_SERVER['foo'] = '"null"';
-        $this->assertSame('null', env('foo'));
+        $this->assertSame('null', getenv('foo'));
 
         $_SERVER['foo'] = "'null'";
-        $this->assertSame('null', env('foo'));
+        $this->assertSame('null', getenv('foo'));
 
         $_SERVER['foo'] = 'x"null"x'; // this should not be unquoted
-        $this->assertSame('x"null"x', env('foo'));
+        $this->assertSame('x"null"x', getenv('foo'));
     }
 
     public function testGetFromENVFirst()
     {
         $_ENV['foo'] = 'From $_ENV';
         $_SERVER['foo'] = 'From $_SERVER';
-        $this->assertSame('From $_ENV', env('foo'));
+        $this->assertSame('From $_ENV', getenv('foo'));
     }
 }
 

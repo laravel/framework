@@ -51,12 +51,12 @@ class LoadEnvironmentVariables
             }
         }
 
-        if (! env('APP_ENV')) {
+        if (! getenv('APP_ENV')) {
             return;
         }
 
         $this->setEnvironmentFilePath(
-            $app, $app->environmentFile().'.'.env('APP_ENV')
+            $app, $app->environmentFile().'.'.getenv('APP_ENV')
         );
     }
 
