@@ -8,10 +8,13 @@ use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
+use Orchestra\Testbench\Concerns\WithLaravelMigrations;
 use Orchestra\Testbench\TestCase;
 
 class JobDispatchingTest extends TestCase
 {
+    use WithLaravelMigrations;
+
     protected function setUp(): void
     {
         $this->beforeApplicationDestroyed(function () {
@@ -20,6 +23,11 @@ class JobDispatchingTest extends TestCase
         });
 
         parent::setUp();
+    }
+
+    protected function defineEnvironment($app)
+    {
+        $app['config']->set(['queue.default' => 'sync']);
     }
 
     public function testJobCanUseCustomMethodsAfterDispatch()

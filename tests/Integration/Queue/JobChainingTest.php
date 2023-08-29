@@ -15,23 +15,25 @@ class JobChainingTest extends TestCase
 {
     public static $catchCallbackRan = false;
 
-    protected function getEnvironmentSetUp($app)
+    protected function setUp(): void
     {
-        $app['config']->set('queue.connections.sync1', [
-            'driver' => 'sync',
-        ]);
+        $this->beforeApplicationDestroyed(function () {
+            JobChainingTestFirstJob::$ran = false;
+            JobChainingTestSecondJob::$ran = false;
+            JobChainingTestThirdJob::$ran = false;
+            static::$catchCallbackRan = false;
+        });
 
-        $app['config']->set('queue.connections.sync2', [
-            'driver' => 'sync',
-        ]);
+        parent::setUp();
     }
 
-    protected function tearDown(): void
+    protected function defineEnvironment($app)
     {
-        JobChainingTestFirstJob::$ran = false;
-        JobChainingTestSecondJob::$ran = false;
-        JobChainingTestThirdJob::$ran = false;
-        static::$catchCallbackRan = false;
+        $app['config']->set([
+            'queue.default' => 'sync',
+            'queue.connections.sync1' => ['driver' => 'sync'],
+            'queue.connections.sync2' => ['driver' => 'sync'],
+        ]);
     }
 
     public function testJobsCanBeChainedOnSuccess()

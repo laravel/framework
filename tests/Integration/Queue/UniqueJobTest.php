@@ -11,13 +11,16 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Bus;
+use Orchestra\Testbench\Concerns\WithLaravelMigrations;
 use Orchestra\Testbench\TestCase;
 
 class UniqueJobTest extends TestCase
 {
-    protected function defineDatabaseMigrations()
+    use WithLaravelMigrations;
+
+    protected function defineEnvironment($app)
     {
-        $this->loadLaravelMigrations();
+        $app['config']->set(['queue.default' => 'database']);
     }
 
     public function testUniqueJobsAreNotDispatched()
@@ -43,7 +46,7 @@ class UniqueJobTest extends TestCase
     public function testLockIsReleasedForSuccessfulJobs()
     {
         UniqueTestJob::$handled = false;
-        dispatch($job = new UniqueTestJob);
+        dispatch_sync($job = new UniqueTestJob);
 
         $this->assertTrue($job::$handled);
         $this->assertTrue($this->app->get(Cache::class)->lock($this->getLockKey($job), 10)->get());
@@ -56,7 +59,7 @@ class UniqueJobTest extends TestCase
         $this->expectException(Exception::class);
 
         try {
-            dispatch($job = new UniqueTestFailJob);
+            dispatch_sync($job = new UniqueTestFailJob);
         } finally {
             $this->assertTrue($job::$handled);
             $this->assertTrue($this->app->get(Cache::class)->lock($this->getLockKey($job), 10)->get());
