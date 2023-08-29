@@ -211,6 +211,13 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     protected static $isBroadcasting = true;
 
     /**
+     * The actual columns that exist on the database.
+     *
+     * @var array<string>
+     */
+    protected static $validColumns = [];
+
+    /**
      * The name of the "created at" column.
      *
      * @var string|null
@@ -1772,6 +1779,25 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     public function isNot($model)
     {
         return ! $this->is($model);
+    }
+
+    /**
+     * Determine if the given column is a valid database column.
+     */
+    public function isValidColumn(string $column): bool
+    {
+        if (! isset(static::$validColumns[get_class($this)])) {
+            $columns = $this->getConnection()
+                        ->getSchemaBuilder()
+                        ->getColumnListing($this->getTable());
+
+            if (empty($columns)) {
+                return true;
+            }
+            static::$validColumns[get_class($this)] = $columns;
+        }
+
+        return in_array($column, static::$validColumns[get_class($this)]);
     }
 
     /**
