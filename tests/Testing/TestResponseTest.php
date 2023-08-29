@@ -1040,7 +1040,7 @@ class TestResponseTest extends TestCase
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('Precognition-Success Header not present on response.');
 
-        $baseResponse = new Response();
+        $baseResponse = new Response('', 204);
 
         $response = TestResponse::fromBaseResponse($baseResponse);
 
@@ -1052,7 +1052,7 @@ class TestResponseTest extends TestCase
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('Precognition-Success Header was found, but the value is not `true`.');
 
-        $baseResponse = tap(new Response, function ($response) {
+        $baseResponse = tap(new Response('', 204), function ($response) {
             $response->header('Precognition-Success', '');
         });
 
