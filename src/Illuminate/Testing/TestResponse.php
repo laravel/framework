@@ -1424,6 +1424,8 @@ class TestResponse implements ArrayAccess
      */
     public function assertPrecognitionSuccess()
     {
+        $this->assertNoContent();
+        
         PHPUnit::assertTrue(
             $this->headers->has('Precognition-Success'), 'Precognition-Success Header not present on response.'
         );
