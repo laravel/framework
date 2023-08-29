@@ -2,8 +2,6 @@
 
 namespace Illuminate\Queue\Failed;
 
-use Countable;
-
 class NullFailedJobProvider implements CountableFailedJobProvider, FailedJobProviderInterface
 {
     /**

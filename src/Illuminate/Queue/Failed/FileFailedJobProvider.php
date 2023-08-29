@@ -3,7 +3,6 @@
 namespace Illuminate\Queue\Failed;
 
 use Closure;
-use Countable;
 use DateTimeInterface;
 use Illuminate\Support\Facades\Date;
 
