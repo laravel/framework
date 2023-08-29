@@ -2,8 +2,10 @@
 
 namespace Illuminate\Tests\Cache;
 
+use Carbon\Carbon;
 use Illuminate\Cache\RateLimiter;
 use Illuminate\Contracts\Cache\Repository as Cache;
+use Illuminate\Http\Exceptions\ThrottleRequestsException;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
@@ -170,5 +172,41 @@ class CacheRateLimiterTest extends TestCase
         $cache->shouldReceive('add')->never();
 
         $this->assertTrue($rateLimiter->tooManyAttempts($key, 1));
+    }
+
+    public function testAbortIfExhaustedExpectCorrectHeaders()
+    {
+        Carbon::setTestNow(Carbon::now());
+
+        $cache = m::mock(Cache::class);
+        $cache->shouldReceive('get')->twice()->with('key', 0)->andReturn(1);
+        $cache->shouldReceive('has')->once()->with('key:timer')->andReturn(true);
+        $cache->shouldReceive('get')->once()->with('key:timer')->andReturn($reset = Carbon::now()->addSeconds(60)->getTimestamp());
+        $cache->shouldReceive('add')->never();
+        $rateLimiter = new RateLimiter($cache);
+
+        try {
+            $rateLimiter->abortIfExhausted('key', 1);
+        } catch (ThrottleRequestsException $e) {
+            $this->assertSame('Too many attempts.', $e->getMessage());
+            $this->assertSame(1, $e->getHeaders()['X-RateLimit-Limit']);
+            $this->assertSame(0, $e->getHeaders()['X-RateLimit-Remaining']);
+            $this->assertSame(60, $e->getHeaders()['Retry-After']);
+            $this->assertSame($reset, $e->getHeaders()['X-RateLimit-Reset']);
+        }
+    }
+
+    public function testAbortIfExhaustedWhenRemaining()
+    {
+        Carbon::setTestNow(Carbon::now());
+
+        $cache = m::mock(Cache::class);
+        $cache->shouldReceive('get')->once()->with('key', 0)->andReturn(1);
+        $cache->shouldReceive('add')->once()->with('key', 0, 60);
+        $cache->shouldReceive('add')->once()->with('key:timer', now()->addMinute()->getTimestamp(), 60);
+        $cache->shouldReceive('increment')->once()->with('key')->andReturn(2);
+        $rateLimiter = new RateLimiter($cache);
+
+        $rateLimiter->abortIfExhausted('key', 2);
     }
 }

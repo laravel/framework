@@ -4,6 +4,7 @@ namespace Illuminate\Cache;
 
 use Closure;
 use Illuminate\Contracts\Cache\Repository as Cache;
+use Illuminate\Http\Exceptions\ThrottleRequestsException;
 use Illuminate\Support\InteractsWithTime;
 
 class RateLimiter
@@ -102,6 +103,33 @@ class RateLimiter
         }
 
         return false;
+    }
+
+    /**
+     * Throw an exception if the given key has been exhausted.
+     *
+     * @param  string  $key
+     * @param  int  $maxAttempts
+     * @param  int  $decaySeconds
+     * @param  string  $message
+     * @return void
+     */
+    public function abortIfExhausted($key, $maxAttempts, $decaySeconds = 60, $message = 'Too many attempts.')
+    {
+        if ($this->attempt($key, $maxAttempts, fn () => true, $decaySeconds) === false) {
+            $retryAfter = $this->availableIn($key);
+
+            throw new ThrottleRequestsException(
+                $message,
+                null,
+                [
+                    'X-RateLimit-Limit' => $maxAttempts,
+                    'X-RateLimit-Remaining' => $this->remaining($key, $maxAttempts),
+                    'X-RateLimit-Reset' => $this->availableAt($retryAfter),
+                    'Retry-After' => $retryAfter,
+                ]
+            );
+        }
     }
 
     /**
