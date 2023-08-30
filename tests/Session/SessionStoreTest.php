@@ -13,6 +13,11 @@ use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use SessionHandlerInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Stringable;
+use InvalidArgumentException;
+use Illuminate\Tests\Session\TestEnum;
 
 class SessionStoreTest extends TestCase
 {
