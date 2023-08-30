@@ -96,6 +96,29 @@ class TestResponse implements ArrayAccess
     }
 
     /**
+     * Assert that the Precognition request was successful.
+     *
+     * @return $this
+     */
+    public function assertSuccessfulPrecognition()
+    {
+        $this->assertNoContent();
+
+        PHPUnit::assertTrue(
+            $this->headers->has('Precognition-Success'),
+            'Header [Precognition-Success] not present on response.'
+        );
+
+        PHPUnit::assertSame(
+            'true',
+            $this->headers->get('Precognition-Success'),
+            'The Precognition-Success header was found, but the value is not `true`.'
+        );
+
+        return $this;
+    }
+
+    /**
      * Assert that the response is a server error.
      *
      * @return $this
