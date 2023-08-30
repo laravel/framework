@@ -1416,6 +1416,29 @@ class ValidationValidatorTest extends TestCase
         $this->assertSame('The baz field is required when foo is empty.', $v->messages()->first('baz'));
     }
 
+    public function testRequiredIfArrayToStringConversationErrorException()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, [
+            'is_customer' => 1,
+            'fullname' => null,
+        ], [
+            'is_customer' => 'required|boolean',
+            'fullname' => 'required_if:is_customer,true',
+        ]);
+        $this->assertTrue($v->fails());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, [
+            'is_customer' => ['test'],
+            'fullname' => null,
+        ], [
+            'is_customer' => 'required|boolean',
+            'fullname' => 'required_if:is_customer,true',
+        ]);
+        $this->assertTrue($v->fails());
+    }
+
     public function testRequiredUnless()
     {
         $trans = $this->getIlluminateArrayTranslator();

@@ -11,11 +11,19 @@ use Illuminate\Foundation\Http\Middleware\PreventRequestsDuringMaintenance;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Route;
+use Orchestra\Testbench\Http\Middleware\PreventRequestsDuringMaintenance as TestbenchPreventRequestsDuringMaintenance;
 use Orchestra\Testbench\TestCase;
 use Symfony\Component\HttpFoundation\Cookie;
 
 class MaintenanceModeTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->withoutMiddleware(TestbenchPreventRequestsDuringMaintenance::class);
+    }
+
     protected function tearDown(): void
     {
         @unlink(storage_path('framework/down'));
@@ -108,6 +116,25 @@ class MaintenanceModeTest extends TestCase
         $response = $this->withUnencryptedCookies([
             'laravel_maintenance' => $cookie->getValue(),
         ])->get('/test');
+
+        $response->assertStatus(200);
+        $this->assertSame('Hello World', $response->original);
+    }
+
+    public function testMaintenanceModeCanBeBypassedOnExcludedUrls()
+    {
+        $this->app->instance(PreventRequestsDuringMaintenance::class, new class($this->app) extends PreventRequestsDuringMaintenance
+        {
+            protected $except = ['/test'];
+        });
+
+        file_put_contents(storage_path('framework/down'), json_encode([
+            'retry' => 60,
+        ]));
+
+        Route::get('/test', fn () => 'Hello World')->middleware(PreventRequestsDuringMaintenance::class);
+
+        $response = $this->get('/test');
 
         $response->assertStatus(200);
         $this->assertSame('Hello World', $response->original);
