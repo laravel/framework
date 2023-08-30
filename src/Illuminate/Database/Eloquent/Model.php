@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Eloquent;
 
 use ArrayAccess;
+use Exception;
 use Illuminate\Contracts\Broadcasting\HasBroadcastChannel;
 use Illuminate\Contracts\Queue\QueueableCollection;
 use Illuminate\Contracts\Queue\QueueableEntity;
@@ -11,6 +12,8 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\CanBeEscapedWhenCastToString;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
+use Illuminate\Database\Eloquent\Attributes\Cast;
+use Illuminate\Database\Eloquent\Attributes\Increment;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\Concerns\AsPivot;
@@ -22,6 +25,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ForwardsCalls;
 use JsonSerializable;
 use LogicException;
+use ReflectionClass;
 use Stringable;
 
 abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToString, HasBroadcastChannel, Jsonable, JsonSerializable, QueueableEntity, Stringable, UrlRoutable
@@ -55,21 +59,8 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      *
      * @var string
      */
+    #[Increment('int')]
     protected $primaryKey = 'id';
-
-    /**
-     * The "type" of the primary key ID.
-     *
-     * @var string
-     */
-    protected $keyType = 'int';
-
-    /**
-     * Indicates if the IDs are auto-incrementing.
-     *
-     * @var bool
-     */
-    public $incrementing = true;
 
     /**
      * The relations to eager load on every query.
@@ -98,6 +89,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      * @var int
      */
     protected $perPage = 15;
+
 
     /**
      * Indicates if the model exists.
@@ -210,6 +202,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      * @var bool
      */
     protected static $isBroadcasting = true;
+
 
     /**
      * The name of the "created at" column.
@@ -333,9 +326,8 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     protected static function booted()
     {
-        //
-    }
 
+    }
     /**
      * Clear the list of booted models so they will be re-booted.
      *
@@ -1117,7 +1109,6 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     public function save(array $options = [])
     {
         $this->mergeAttributesFromCachedCasts();
-
         $query = $this->newModelQuery();
 
         // If the "saving" event returns false we'll bail out of the save and return
@@ -1917,7 +1908,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function getKeyType()
     {
-        return $this->keyType;
+        return $this->getAttributeInstance('primaryKey', Increment::class, 'property')->type;
     }
 
     /**
@@ -1937,10 +1928,11 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      * Get the value indicating whether the IDs are incrementing.
      *
      * @return bool
+     * @throws \ReflectionException
      */
     public function getIncrementing()
     {
-        return $this->incrementing;
+        return $this->hasAttribute('primaryKey', Increment::class, 'property');
     }
 
     /**
