@@ -297,6 +297,30 @@ class Store implements Session
     }
 
     /**
+     * Retrieve an item from the session as a Stringable instance.
+     *
+     * @param  string  $key
+     * @param  mixed  $default
+     * @return \Illuminate\Support\Stringable
+     */
+    public function str($key, $default = null)
+    {
+        return $this->string($key, $default);
+    }
+
+    /**
+     * Retrieve an item from the session as a Stringable instance.
+     *
+     * @param  string  $key
+     * @param  mixed  $default
+     * @return \Illuminate\Support\Stringable
+     */
+    public function string($key, $default = null)
+    {
+        return str($this->get($key, $default));
+    }
+
+    /**
      * Get the value of a given key and then forget it.
      *
      * @param  string  $key
