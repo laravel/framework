@@ -1033,6 +1033,15 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertEquals(['foo', 'bar'], $query->getBindings());
     }
 
+    public function testSearch()
+    {
+        $model = new EloquentBuilderTestStub();
+        $this->mockConnectionForModel($model, 'SQLite');
+        $query = $model->newQuery()->search('name', 'foo')->search('username', 'bar');
+        $this->assertEquals('select * from "table" where "name" like ? or "username" like ?', $query->toSql());
+        $this->assertEquals(['foo%', 'bar%'], $query->getBindings());
+    }
+
     public function testWhereNot()
     {
         $nestedQuery = m::mock(Builder::class);
