@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Database\QueryException;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Pagination\AbstractPaginator as Paginator;
 use Illuminate\Pagination\Cursor;
 use Illuminate\Pagination\CursorPaginator;
@@ -91,6 +92,8 @@ class DatabaseEloquentIntegrationTest extends TestCase
             $this->schema($connection)->create('unique_users', function ($table) {
                 $table->increments('id');
                 $table->string('name')->nullable();
+                // Unique constraint will be applied only for non-null values
+                $table->string('screen_name')->nullable()->unique();
                 $table->string('email')->unique();
                 $table->timestamp('birthday', 6)->nullable();
                 $table->timestamps();
@@ -550,6 +553,27 @@ class DatabaseEloquentIntegrationTest extends TestCase
         );
 
         $this->assertSame('Nuno Maduro', $user4->name);
+    }
+
+    public function testCreateOrFirstNonAttributeFieldViolation()
+    {
+        // 'email' and 'screen_name' are unique and independent of each other.
+        EloquentTestUniqueUser::create([
+            'email' => 'taylorotwell+foo@gmail.com',
+            'screen_name' => '@taylorotwell',
+        ]);
+
+        $this->expectException(UniqueConstraintViolationException::class);
+
+        // Although 'email' is expected to be unique and is passed as $attributes,
+        // if the 'screen_name' attribute listed in non-unique $values causes a violation,
+        // a UniqueConstraintViolationException should be thrown.
+        EloquentTestUniqueUser::createOrFirst(
+            ['email' => 'taylorotwell+bar@gmail.com'],
+            [
+                'screen_name' => '@taylorotwell',
+            ]
+        );
     }
 
     public function testCreateOrFirstWithinTransaction()
