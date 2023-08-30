@@ -5,6 +5,7 @@ namespace Illuminate\Foundation\Console;
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Env;
+use Illuminate\Console\Concerns\HandleUrl;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Process\PhpExecutableFinder;
@@ -15,6 +16,8 @@ use function Termwind\terminal;
 #[AsCommand(name: 'serve')]
 class ServeCommand extends Command
 {
+    use HandleUrl;
+
     /**
      * The console command name.
      *
@@ -241,6 +244,13 @@ class ServeCommand extends Command
                 }
 
                 $this->components->info("Server running on [http://{$this->host()}:{$this->port()}].");
+
+                if ($this->option('open')) {
+                    $this->comment('  Opening the application in the browser...');
+                    $this->newLine();
+                    $this->open("http://{$this->host()}:{$this->port()}");
+                }
+
                 $this->comment('  <fg=yellow;options=bold>Press Ctrl+C to stop the server</>');
 
                 $this->newLine();
@@ -337,6 +347,7 @@ class ServeCommand extends Command
             ['port', null, InputOption::VALUE_OPTIONAL, 'The port to serve the application on', Env::get('SERVER_PORT')],
             ['tries', null, InputOption::VALUE_OPTIONAL, 'The max number of ports to attempt to serve from', 10],
             ['no-reload', null, InputOption::VALUE_NONE, 'Do not reload the development server on .env file changes'],
+            ['open', null, InputOption::VALUE_NONE, 'Open the application in your browser'],
         ];
     }
 }
