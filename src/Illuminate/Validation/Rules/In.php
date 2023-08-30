@@ -39,6 +39,14 @@ class In
     public function __toString()
     {
         $values = array_map(function ($value) {
+            if ($value instanceof \BackedEnum) {
+                $value = $value->value;
+            }
+
+            if ($value instanceof \UnitEnum) {
+                $value = $value->name;
+            }
+
             return '"'.str_replace('"', '""', $value).'"';
         }, $this->values);
 
