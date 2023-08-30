@@ -564,6 +564,196 @@ class SessionStoreTest extends TestCase
         $this->assertSame('foo', $result);
     }
 
+    public function testStringMethod()
+    {
+        $session = $this->getSession();
+        $session->put('test_string', [
+            'int' => 123,
+            'int_str' => '456',
+            'float' => 123.456,
+            'float_str' => '123.456',
+            'float_zero' => 0.000,
+            'float_str_zero' => '0.000',
+            'str' => 'abc',
+            'empty_str' => '',
+            'null' => null,
+        ]);
+        $this->assertTrue($session->string('test_string.int') instanceof Stringable);
+        $this->assertTrue($session->string('test_string.unknown_key') instanceof Stringable);
+        $this->assertSame('123', $session->string('test_string.int')->value());
+        $this->assertSame('456', $session->string('test_string.int_str')->value());
+        $this->assertSame('123.456', $session->string('test_string.float')->value());
+        $this->assertSame('123.456', $session->string('test_string.float_str')->value());
+        $this->assertSame('0', $session->string('test_string.float_zero')->value());
+        $this->assertSame('0.000', $session->string('test_string.float_str_zero')->value());
+        $this->assertSame('', $session->string('test_string.empty_str')->value());
+        $this->assertSame('', $session->string('test_string.null')->value());
+        $this->assertSame('', $session->string('test_string.unknown_key')->value());
+    }
+
+    public function testBooleanMethod()
+    {
+        $session = $this->getSession();
+        $session->put('test_boolean', ['with_trashed' => 'false', 'download' => true, 'checked' => 1, 'unchecked' => '0', 'with_on' => 'on', 'with_yes' => 'yes']);
+        $this->assertTrue($session->boolean('test_boolean.checked'));
+        $this->assertTrue($session->boolean('test_boolean.download'));
+        $this->assertFalse($session->boolean('test_boolean.unchecked'));
+        $this->assertFalse($session->boolean('test_boolean.with_trashed'));
+        $this->assertFalse($session->boolean('test_boolean.some_undefined_key'));
+        $this->assertTrue($session->boolean('test_boolean.with_on'));
+        $this->assertTrue($session->boolean('test_boolean.with_yes'));
+    }
+
+    public function testIntegerMethod()
+    {
+        $session = $this->getSession();
+        $session->put('test_integer', [
+            'int' => '123',
+            'raw_int' => 456,
+            'zero_padded' => '078',
+            'space_padded' => ' 901',
+            'nan' => 'nan',
+            'mixed' => '1ab',
+            'underscore_notation' => '2_000',
+            'null' => null,
+        ]);
+        $this->assertSame(123, $session->integer('test_integer.int'));
+        $this->assertSame(456, $session->integer('test_integer.raw_int'));
+        $this->assertSame(78, $session->integer('test_integer.zero_padded'));
+        $this->assertSame(901, $session->integer('test_integer.space_padded'));
+        $this->assertSame(0, $session->integer('test_integer.nan'));
+        $this->assertSame(1, $session->integer('test_integer.mixed'));
+        $this->assertSame(2, $session->integer('test_integer.underscore_notation'));
+        $this->assertSame(123456, $session->integer('test_integer.unknown_key', 123456));
+        $this->assertSame(0, $session->integer('test_integer.null'));
+        $this->assertSame(0, $session->integer('test_integer.null', 123456));
+    }
+
+    public function testFloatMethod()
+    {
+        $session = $this->getSession();
+        $session->put('test_float', [
+            'float' => '1.23',
+            'raw_float' => 45.6,
+            'decimal_only' => '.6',
+            'zero_padded' => '0.78',
+            'space_padded' => ' 90.1',
+            'nan' => 'nan',
+            'mixed' => '1.ab',
+            'scientific_notation' => '1e3',
+            'null' => null,
+        ]);
+        $this->assertSame(1.23, $session->float('test_float.float'));
+        $this->assertSame(45.6, $session->float('test_float.raw_float'));
+        $this->assertSame(.6, $session->float('test_float.decimal_only'));
+        $this->assertSame(0.78, $session->float('test_float.zero_padded'));
+        $this->assertSame(90.1, $session->float('test_float.space_padded'));
+        $this->assertSame(0.0, $session->float('test_float.nan'));
+        $this->assertSame(1.0, $session->float('test_float.mixed'));
+        $this->assertSame(1e3, $session->float('test_float.scientific_notation'));
+        $this->assertSame(123.456, $session->float('test_float.unknown_key', 123.456));
+        $this->assertSame(0.0, $session->float('test_float.null'));
+        $this->assertSame(0.0, $session->float('test_float.null', 123.456));
+    }
+
+    public function testCollectMethod()
+    {
+        $session = $this->getSession();
+        $session->put('test_collect', ['users' => [1, 2, 3]]);
+
+        $this->assertInstanceOf(Collection::class, $session->collect('test_collect.users'));
+        $this->assertTrue($session->collect('test_collect.developers')->isEmpty());
+        $this->assertEquals([1, 2, 3], $session->collect('test_collect.users')->all());
+        $this->assertEquals(['users' => [1, 2, 3]], $session->collect('test_collect')->all());
+
+        $session->put('test_collect', ['text-payload']);
+        $request = Request::create('/', 'GET', ['text-payload']);
+        $this->assertEquals(['text-payload'], $session->collect('test_collect')->all());
+
+        $session->put('test_collect', ['email' => 'test@example.com']);
+        $this->assertEquals(['test@example.com'], $session->collect('test_collect.email')->all());
+
+        $session->put('test_collect', []);
+        $request = Request::create('/', 'GET', []);
+        $this->assertInstanceOf(Collection::class, $session->collect('test_collect'));
+        $this->assertTrue($session->collect()->isEmpty());
+
+        $session->put('users', [1, 2, 3]);
+        $session->put('roles', [4, 5, 6]);
+        $session->put('foo', ['bar', 'baz']);
+        $session->put('email', ['test@example.com']);
+        $this->assertInstanceOf(Collection::class, $session->collect(['users']));
+        $this->assertTrue($session->collect(['developers'])->isEmpty());
+        $this->assertTrue($session->collect(['roles'])->isNotEmpty());
+        $this->assertEquals(['roles' => [4, 5, 6]], $session->collect(['roles'])->all());
+        $this->assertEquals(['users' => [1, 2, 3], 'email' => 'test@example.com'], $session->collect(['users', 'email'])->all());
+        $this->assertEquals(collect(['roles' => [4, 5, 6], 'foo' => ['bar', 'baz']]), $session->collect(['roles', 'foo']));
+        $this->assertEquals(['users' => [1, 2, 3], 'roles' => [4, 5, 6], 'foo' => ['bar', 'baz'], 'email' => 'test@example.com'], $session->collect()->all());
+    }
+
+    public function testDateMethod()
+    {
+        $session = $this->getSession();
+        $session->put('test_date', [
+            'as_null' => null,
+            'as_invalid' => 'invalid',
+
+            'as_datetime' => '20-01-01 16:30:25',
+            'as_format' => '1577896225',
+            'as_timezone' => '20-01-01 13:30:25',
+
+            'as_date' => '2020-01-01',
+            'as_time' => '16:30:25',
+        ]);
+
+        $current = Carbon::create(2020, 1, 1, 16, 30, 25);
+
+        $this->assertNull($session->date('test_date.as_null'));
+        $this->assertNull($session->date('test_date.doesnt_exists'));
+
+        $this->assertEquals($current, $session->date('test_date.as_datetime'));
+        $this->assertEquals($current->format('Y-m-d H:i:s P'), $session->date('test_date.as_format', 'U')->format('Y-m-d H:i:s P'));
+        $this->assertEquals($current, $session->date('test_date.as_timezone', null, 'America/Santiago'));
+
+        $this->assertTrue($session->date('test_date.as_date')->isSameDay($current));
+        $this->assertTrue($session->date('test_date.as_time')->isSameSecond('16:30:25'));
+    }
+
+    public function testDateMethodExceptionWhenValueInvalid()
+    {
+        $this->expectException(InvalidArgumentException::class);
+
+        $session = $this->getSession();
+        $session->put('date', 'invalid');
+
+        $session->date('date');
+    }
+
+    public function testDateMethodExceptionWhenFormatInvalid()
+    {
+        $this->expectException(InvalidArgumentException::class);
+
+        $session = $this->getSession();
+        $session->put('date', '20-01-01 16:30:25');
+
+        $session->date('date', 'invalid_format');
+    }
+
+    public function testEnumMethod()
+    {
+        $session = $this->getSession();
+        $session->put('test_enum', [
+            'valid_enum_value' => 'test',
+            'invalid_enum_value' => 'invalid',
+        ]);
+
+        $this->assertNull($session->enum('test_enum.doesnt_exists', TestEnum::class));
+
+        $this->assertEquals(TestEnum::test, $session->enum('test_enum.valid_enum_value', TestEnum::class));
+
+        $this->assertNull($session->enum('test_enum.invalid_enum_value', TestEnum::class));
+    }
+
     public function testValidationErrorsCanBeSerializedAsJson()
     {
         $session = $this->getSession('json');
