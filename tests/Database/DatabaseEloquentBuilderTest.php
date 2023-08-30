@@ -1086,8 +1086,8 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->mockConnectionForModel($model, 'SQLite');
         $query = $model->newQuery()->search('name', 'foo')
             ->search('username', 'bar');
-        $this->assertEquals('select * from "table" where "name" like ? and "username" like ?', $query->toSql());
-        $this->assertEquals(['foo', 'bar'], $query->getBindings());
+        $this->assertEquals('select * from "table" where "name" like ? or "username" like ?', $query->toSql());
+        $this->assertEquals(['foo%', 'bar%'], $query->getBindings());
     }
 
     public function testRealQueryHigherOrderOrWhereScopes()

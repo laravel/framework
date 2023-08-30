@@ -363,7 +363,7 @@ class Builder implements BuilderContract
     }
 
      /**
-     * Add a basic "search" clause to the query. 
+     * Add a basic "search" clause to the query.
      *
      * @param  \Closure|array|string|\Illuminate\Contracts\Database\Query\Expression  $column
      * @param mixed $value
@@ -371,7 +371,7 @@ class Builder implements BuilderContract
      */
     public function search($column, $value)
     {
-        return $this->where($column, "like", "$value");
+        return $this->where($column, "like", "$value%", 'or');
     }
 
     /**
@@ -2058,5 +2058,5 @@ class Builder implements BuilderContract
     {
         $this->query = clone $this->query;
     }
-    
+
 }
