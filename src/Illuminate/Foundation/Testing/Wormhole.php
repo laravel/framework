@@ -193,6 +193,19 @@ class Wormhole
     }
 
     /**
+     * Travel forward the given number of months without month overflow.
+     *
+     * @param  callable|null  $callback
+     * @return mixed
+     */
+    public function monthsNoOverflow($callback = null)
+    {
+        Carbon::setTestNow(Carbon::now()->addMonthsNoOverflow($this->value));
+
+        return $this->handleCallback($callback);
+    }
+
+    /**
      * Travel forward the given number of years.
      *
      * @param  callable|null  $callback
