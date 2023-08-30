@@ -5,6 +5,7 @@ namespace Illuminate\Session;
 use Closure;
 use Illuminate\Contracts\Session\Session;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
@@ -356,6 +357,29 @@ class Store implements Session
     public function float($key, $default = 0.0)
     {
         return floatval($this->get($key, $default));
+    }
+
+    /**
+     * Retrieve an item from the session as a Carbon instance.
+     *
+     * @param  string  $key
+     * @param  string|null  $format
+     * @param  string|null  $tz
+     * @return \Illuminate\Support\Carbon|null
+     *
+     * @throws \Carbon\Exceptions\InvalidFormatException
+     */
+    public function date($key, $format = null, $tz = null)
+    {
+        if (! $this->has($key)) {
+            return null;
+        }
+
+        if (is_null($format)) {
+            return Date::parse($this->get($key), $tz);
+        }
+
+        return Date::createFromFormat($format, $this->get($key), $tz);
     }
 
     /**
