@@ -347,6 +347,18 @@ class Store implements Session
     }
 
     /**
+     * Retrieve an item as a float value.
+     *
+     * @param  string  $key
+     * @param  float  $default
+     * @return float
+     */
+    public function float($key, $default = 0.0)
+    {
+        return floatval($this->get($key, $default));
+    }
+
+    /**
      * Get the value of a given key and then forget it.
      *
      * @param  string  $key
