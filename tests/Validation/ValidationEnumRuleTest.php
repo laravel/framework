@@ -11,7 +11,7 @@ use Illuminate\Validation\ValidationServiceProvider;
 use Illuminate\Validation\Validator;
 use PHPUnit\Framework\TestCase;
 
-include 'Enums.php';
+include_once 'Enums.php';
 
 class ValidationEnumRuleTest extends TestCase
 {

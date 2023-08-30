@@ -6,7 +6,7 @@ use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\NotIn;
 use PHPUnit\Framework\TestCase;
 
-include 'Enums.php';
+include_once 'Enums.php';
 
 class ValidationNotInRuleTest extends TestCase
 {
