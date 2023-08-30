@@ -7,9 +7,10 @@ use Closure;
 use Illuminate\Contracts\Support\DeferringDisplayableValue;
 use Illuminate\Support\Enumerable;
 use IteratorAggregate;
+use Stringable;
 use Traversable;
 
-class InvokableComponentVariable implements DeferringDisplayableValue, IteratorAggregate
+class InvokableComponentVariable implements DeferringDisplayableValue, IteratorAggregate, Stringable
 {
     /**
      * The callable instance to resolve the variable value.

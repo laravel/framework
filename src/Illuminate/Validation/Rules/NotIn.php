@@ -2,7 +2,9 @@
 
 namespace Illuminate\Validation\Rules;
 
-class NotIn
+use Stringable;
+
+class NotIn implements Stringable
 {
     /**
      * The name of the rule.

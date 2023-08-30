@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use ValueError;
 
 include 'Enums.php';
 
@@ -24,6 +25,11 @@ class EloquentModelEnumCastingTest extends DatabaseTestCase
             $table->json('integer_status_collection')->nullable();
             $table->json('integer_status_array')->nullable();
             $table->string('arrayable_status')->nullable();
+        });
+
+        Schema::create('unique_enum_casts', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('string_status', 100)->unique();
         });
     }
 
@@ -264,6 +270,59 @@ class EloquentModelEnumCastingTest extends DatabaseTestCase
         $this->assertEquals(StringStatus::pending, $model->string_status);
         $this->assertEquals(StringStatus::done, $model2->string_status);
     }
+
+    public function testAttributeCastToAnEnumCanNotBeSetToAnotherEnum(): void
+    {
+        $model = new EloquentModelEnumCastingTestModel;
+
+        $this->expectException(ValueError::class);
+        $this->expectExceptionMessage(
+            sprintf('Value [%s] is not of the expected enum type [%s].', var_export(ArrayableStatus::pending, true), StringStatus::class)
+        );
+
+        $model->string_status = ArrayableStatus::pending;
+    }
+
+    public function testAttributeCastToAnEnumCanNotBeSetToAValueNotDefinedOnTheEnum(): void
+    {
+        $model = new EloquentModelEnumCastingTestModel;
+
+        $this->expectException(ValueError::class);
+        $this->expectExceptionMessage(
+            sprintf('"unexpected_value" is not a valid backing value for enum %s', StringStatus::class)
+        );
+
+        $model->string_status = 'unexpected_value';
+    }
+
+    public function testAnAttributeWithoutACastCanBeSetToAnEnum(): void
+    {
+        $model = new EloquentModelEnumCastingTestModel;
+
+        $model->non_enum_status = StringStatus::pending;
+
+        $this->assertEquals(StringStatus::pending, $model->non_enum_status);
+    }
+
+    public function testCreateOrFirst()
+    {
+        $model1 = EloquentModelEnumCastingUniqueTestModel::createOrFirst([
+            'string_status' => StringStatus::pending,
+        ]);
+
+        $model2 = EloquentModelEnumCastingUniqueTestModel::createOrFirst([
+            'string_status' => StringStatus::pending,
+        ]);
+
+        $model3 = EloquentModelEnumCastingUniqueTestModel::createOrFirst([
+            'string_status' => StringStatus::done,
+        ]);
+
+        $this->assertEquals(StringStatus::pending, $model1->string_status);
+        $this->assertEquals(StringStatus::pending, $model2->string_status);
+        $this->assertTrue($model1->is($model2));
+        $this->assertEquals(StringStatus::done, $model3->string_status);
+    }
 }
 
 class EloquentModelEnumCastingTestModel extends Model
@@ -280,5 +339,16 @@ class EloquentModelEnumCastingTestModel extends Model
         'integer_status_collection' => AsEnumCollection::class.':'.IntegerStatus::class,
         'integer_status_array' => AsEnumArrayObject::class.':'.IntegerStatus::class,
         'arrayable_status' => ArrayableStatus::class,
+    ];
+}
+
+class EloquentModelEnumCastingUniqueTestModel extends Model
+{
+    public $timestamps = false;
+    protected $guarded = [];
+    protected $table = 'unique_enum_casts';
+
+    public $casts = [
+        'string_status' => StringStatus::class,
     ];
 }

@@ -2,10 +2,12 @@
 
 namespace Illuminate\Tests\Database;
 
+use Exception;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use stdClass;
@@ -153,6 +155,7 @@ class DatabaseEloquentHasManyTest extends TestCase
         $relation = $this->getRelation();
         $relation->getQuery()->shouldReceive('where')->once()->with(['foo'])->andReturn($relation->getQuery());
         $relation->getQuery()->shouldReceive('first')->once()->with()->andReturn(null);
+        $relation->getQuery()->shouldReceive('withSavepointIfNeeded')->once()->andReturnUsing(fn ($scope) => $scope());
         $model = $this->expectCreatedModel($relation, ['foo']);
 
         $this->assertEquals($model, $relation->firstOrCreate(['foo']));
@@ -163,9 +166,59 @@ class DatabaseEloquentHasManyTest extends TestCase
         $relation = $this->getRelation();
         $relation->getQuery()->shouldReceive('where')->once()->with(['foo' => 'bar'])->andReturn($relation->getQuery());
         $relation->getQuery()->shouldReceive('first')->once()->with()->andReturn(null);
+        $relation->getQuery()->shouldReceive('withSavepointIfNeeded')->once()->andReturnUsing(fn ($scope) => $scope());
         $model = $this->expectCreatedModel($relation, ['foo' => 'bar', 'baz' => 'qux']);
 
         $this->assertEquals($model, $relation->firstOrCreate(['foo' => 'bar'], ['baz' => 'qux']));
+    }
+
+    public function testCreateOrFirstMethodWithValuesFindsFirstModel()
+    {
+        $relation = $this->getRelation();
+
+        $relation->getRelated()->shouldReceive('newInstance')->once()->with(['foo' => 'bar', 'baz' => 'qux'])->andReturn(m::mock(Model::class, function ($model) {
+            $model->shouldReceive('setAttribute')->once()->with('foreign_key', 1);
+            $model->shouldReceive('save')->once()->andThrow(
+                new UniqueConstraintViolationException('mysql', 'example mysql', [], new Exception('SQLSTATE[23000]: Integrity constraint violation: 1062')),
+            );
+        }));
+
+        $relation->getQuery()->shouldReceive('withSavepointIfNeeded')->once()->andReturnUsing(function ($scope) {
+            return $scope();
+        });
+        $relation->getQuery()->shouldReceive('useWritePdo')->once()->andReturn($relation->getQuery());
+        $relation->getQuery()->shouldReceive('where')->once()->with(['foo' => 'bar'])->andReturn($relation->getQuery());
+        $relation->getQuery()->shouldReceive('first')->once()->with()->andReturn($model = m::mock(stdClass::class));
+
+        $this->assertInstanceOf(stdClass::class, $found = $relation->createOrFirst(['foo' => 'bar'], ['baz' => 'qux']));
+        $this->assertSame($model, $found);
+    }
+
+    public function testCreateOrFirstMethodCreatesNewModelWithForeignKeySet()
+    {
+        $relation = $this->getRelation();
+
+        $relation->getQuery()->shouldReceive('withSavepointIfNeeded')->once()->andReturnUsing(function ($scope) {
+            return $scope();
+        });
+        $relation->getQuery()->shouldReceive('where')->never();
+        $relation->getQuery()->shouldReceive('first')->never();
+        $model = $this->expectCreatedModel($relation, ['foo']);
+
+        $this->assertEquals($model, $relation->createOrFirst(['foo']));
+    }
+
+    public function testCreateOrFirstMethodWithValuesCreatesNewModelWithForeignKeySet()
+    {
+        $relation = $this->getRelation();
+        $relation->getQuery()->shouldReceive('withSavepointIfNeeded')->once()->andReturnUsing(function ($scope) {
+            return $scope();
+        });
+        $relation->getQuery()->shouldReceive('where')->never();
+        $relation->getQuery()->shouldReceive('first')->never();
+        $model = $this->expectCreatedModel($relation, ['foo' => 'bar', 'baz' => 'qux']);
+
+        $this->assertEquals($model, $relation->createOrFirst(['foo' => 'bar'], ['baz' => 'qux']));
     }
 
     public function testUpdateOrCreateMethodFindsFirstModelAndUpdates()

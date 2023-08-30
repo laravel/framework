@@ -638,7 +638,7 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
      * @param  callable(TValue, TValue): int  $callback
      * @return static
      */
-    public function intersectUsing()
+    public function intersectUsing($items, callable $callback)
     {
         return $this->passthru('intersectUsing', func_get_args());
     }

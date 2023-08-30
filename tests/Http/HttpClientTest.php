@@ -23,6 +23,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Fluent;
+use Illuminate\Support\Sleep;
 use Illuminate\Support\Str;
 use JsonSerializable;
 use Mockery as m;
@@ -1397,11 +1398,11 @@ class HttpClientTest extends TestCase
 
         $request = $request->withOptions(['http_errors' => true, 'connect_timeout' => 10]);
 
-        $this->assertSame(['connect_timeout' => 10, 'http_errors' => true, 'timeout' => 30], $request->getOptions());
+        $this->assertSame(['connect_timeout' => 10, 'crypto_method' => 33, 'http_errors' => true, 'timeout' => 30], $request->getOptions());
 
         $request = $request->withOptions(['connect_timeout' => 20]);
 
-        $this->assertSame(['connect_timeout' => 20, 'http_errors' => true, 'timeout' => 30], $request->getOptions());
+        $this->assertSame(['connect_timeout' => 20, 'crypto_method' => 33, 'http_errors' => true, 'timeout' => 30], $request->getOptions());
     }
 
     public function testMultipleRequestsAreSentInThePool()
@@ -1715,7 +1716,7 @@ class HttpClientTest extends TestCase
 
     public function testRequestsWillBeWaitingSleepMillisecondsReceivedBeforeRetry()
     {
-        $startTime = microtime(true);
+        Sleep::fake();
 
         $this->factory->fake([
             '*' => $this->factory->sequence()
@@ -1734,8 +1735,13 @@ class HttpClientTest extends TestCase
 
         $this->factory->assertSentCount(3);
 
-        // Make sure was waited 300ms for the first two attempts
-        $this->assertEqualsWithDelta(0.3, microtime(true) - $startTime, 0.03);
+        // Make sure we waited 300ms for the first two attempts
+        Sleep::assertSleptTimes(2);
+
+        Sleep::assertSequence([
+            Sleep::usleep(100_000),
+            Sleep::usleep(200_000),
+        ]);
     }
 
     public function testMiddlewareRunsWhenFaked()
@@ -2323,11 +2329,11 @@ class HttpClientTest extends TestCase
 
         $request = $request->withOptions(['allow_redirects' => ['max' => 5]]);
 
-        $this->assertSame(['connect_timeout' => 10, 'http_errors' => false, 'timeout' => 30, 'allow_redirects' => ['max' => 5]], $request->getOptions());
+        $this->assertSame(['connect_timeout' => 10, 'crypto_method' => 33, 'http_errors' => false, 'timeout' => 30, 'allow_redirects' => ['max' => 5]], $request->getOptions());
 
         $request = $request->maxRedirects(10);
 
-        $this->assertSame(['connect_timeout' => 10, 'http_errors' => false, 'timeout' => 30, 'allow_redirects' => ['max' => 10]], $request->getOptions());
+        $this->assertSame(['connect_timeout' => 10, 'crypto_method' => 33, 'http_errors' => false, 'timeout' => 30, 'allow_redirects' => ['max' => 10]], $request->getOptions());
     }
 
     public function testPreventDuplicatedContentType(): void

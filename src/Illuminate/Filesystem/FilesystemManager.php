@@ -214,7 +214,7 @@ class FilesystemManager implements FactoryContract
     {
         $provider = SftpConnectionProvider::fromArray($config);
 
-        $root = $config['root'] ?? '/';
+        $root = $config['root'] ?? '';
 
         $visibility = PortableVisibilityConverter::fromArray(
             $config['permissions'] ?? []
@@ -285,7 +285,13 @@ class FilesystemManager implements FactoryContract
 
         return $this->build(tap(
             is_string($config['disk']) ? $this->getConfig($config['disk']) : $config['disk'],
-            fn (&$parent) => $parent['prefix'] = $config['prefix']
+            function (&$parent) use ($config) {
+                $parent['prefix'] = $config['prefix'];
+
+                if (isset($config['visibility'])) {
+                    $parent['visibility'] = $config['visibility'];
+                }
+            }
         ));
     }
 

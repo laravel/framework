@@ -128,6 +128,10 @@ class ComponentTagCompiler
                             )
                             |
                             (?:
+                                (![\w]+)
+                            )
+                            |
+                            (?:
                                 [\w\-:.@%]+
                                 (
                                     =
@@ -190,6 +194,10 @@ class ComponentTagCompiler
                             |
                             (?:
                                 (\:\\\$)(\w+)
+                            )
+                            |
+                            (?:
+                                (![\w]+)
                             )
                             |
                             (?:
@@ -582,6 +590,7 @@ class ComponentTagCompiler
     protected function getAttributesFromAttributeString(string $attributeString)
     {
         $attributeString = $this->parseShortAttributeSyntax($attributeString);
+        $attributeString = $this->parseShortFalseSyntax($attributeString);
         $attributeString = $this->parseAttributeBag($attributeString);
         $attributeString = $this->parseComponentTagClassStatements($attributeString);
         $attributeString = $this->parseComponentTagStyleStatements($attributeString);
@@ -647,6 +656,21 @@ class ComponentTagCompiler
 
         return preg_replace_callback($pattern, function (array $matches) {
             return " :{$matches[1]}=\"\${$matches[1]}\"";
+        }, $value);
+    }
+
+    /**
+     * Parses a short false syntax like !required into a fully-qualified syntax like :required="false".
+     *
+     * @param  string  $value
+     * @return string
+     */
+    protected function parseShortFalseSyntax(string $value)
+    {
+        $pattern = "/\s!(\w+)/x";
+
+        return preg_replace_callback($pattern, function (array $matches) {
+            return " :{$matches[1]}=\"false\"";
         }, $value);
     }
 

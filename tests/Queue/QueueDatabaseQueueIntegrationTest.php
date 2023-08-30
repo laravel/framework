@@ -6,8 +6,11 @@ use Illuminate\Container\Container;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Events\Dispatcher;
 use Illuminate\Queue\DatabaseQueue;
+use Illuminate\Queue\Events\JobQueued;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Str;
 use PHPUnit\Framework\TestCase;
 
 class QueueDatabaseQueueIntegrationTest extends TestCase
@@ -44,7 +47,9 @@ class QueueDatabaseQueueIntegrationTest extends TestCase
 
         $this->queue = new DatabaseQueue($this->connection(), $this->table);
 
-        $this->container = $this->createMock(Container::class);
+        $this->container = new Container;
+
+        $this->container->instance('events', new Dispatcher($this->container));
 
         $this->queue->setContainer($this->container);
 
@@ -240,5 +245,23 @@ class QueueDatabaseQueueIntegrationTest extends TestCase
         $popped_job = $this->queue->pop($mock_queue_name);
 
         $this->assertNull($popped_job);
+    }
+
+    public function testJobPayloadIsAvailableOnEvent()
+    {
+        $event = null;
+        Str::createUuidsUsingSequence([
+            'expected-job-uuid',
+        ]);
+        $this->container['events']->listen(function (JobQueued $e) use (&$event) {
+            $event = $e;
+        });
+
+        $this->queue->push('MyJob', [
+            'laravel' => 'Framework',
+        ]);
+
+        $this->assertIsArray($event->payload());
+        $this->assertSame('expected-job-uuid', $event->payload()['uuid']);
     }
 }

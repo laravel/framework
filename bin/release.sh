@@ -10,7 +10,7 @@ then
     exit 1
 fi
 
-RELEASE_BRANCH="10.x"
+RELEASE_BRANCH="11.x"
 CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
 VERSION=$1
 

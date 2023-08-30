@@ -39,7 +39,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        php: [8.1, 8.2, 8.3]
+        php: [8.2, 8.3]
         stability: [prefer-lowest, prefer-stable]
 
     name: PHP ${{ matrix.php }} - ${{ matrix.stability }}
@@ -61,13 +61,6 @@ jobs:
         env:
           REDIS_CONFIGURE_OPTS: --enable-redis --enable-redis-igbinary --enable-redis-msgpack --enable-redis-lzf --with-liblzf --enable-redis-zstd --with-libzstd --enable-redis-lz4 --with-liblz4
           REDIS_LIBS: liblz4-dev, liblzf-dev, libzstd-dev
-
-      - name: Set Minimum PHP 8.1 Versions
-        uses: nick-fields/retry@v2
-        with:
-          timeout_minutes: 5
-          max_attempts: 5
-          command: composer require symfony/css-selector:^6.0 --no-interaction --no-update
 
       - name: Set Minimum PHP 8.2 Versions
         uses: nick-fields/retry@v2
@@ -117,7 +110,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        php: [8.1, 8.2, 8.3]
+        php: [8.2, 8.3]
         stability: [prefer-lowest, prefer-stable]
 
     name: PHP ${{ matrix.php }} - ${{ matrix.stability }} - Windows
@@ -140,13 +133,6 @@ jobs:
           extensions: dom, curl, libxml, mbstring, zip, pdo, sqlite, pdo_sqlite, gd, pdo_mysql, fileinfo, ftp, redis, memcached, gmp
           tools: composer:v2
           coverage: none
-
-      - name: Set Minimum PHP 8.1 Versions
-        uses: nick-fields/retry@v2
-        with:
-          timeout_minutes: 5
-          max_attempts: 5
-          command: composer require symfony/css-selector:~6.0 --no-interaction --no-update
 
       - name: Set Minimum PHP 8.2 Versions
         uses: nick-fields/retry@v2

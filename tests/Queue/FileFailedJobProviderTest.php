@@ -140,6 +140,18 @@ class FileFailedJobProviderTest extends TestCase
         $this->assertEmpty($failedJobs);
     }
 
+    public function testJobsCanBeCounted()
+    {
+        $this->assertCount(0, $this->provider);
+
+        $this->logFailedJob();
+        $this->assertCount(1, $this->provider);
+
+        $this->logFailedJob();
+        $this->logFailedJob();
+        $this->assertCount(3, $this->provider);
+    }
+
     public function logFailedJob()
     {
         $uuid = Str::uuid();
