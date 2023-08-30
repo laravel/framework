@@ -308,7 +308,7 @@ trait HasAttributes
             }
 
             if (isset($attributes[$key]) && ($this->isCustomDateTimeCast($value) ||
-                $this->isImmutableCustomDateTimeCast($value))) {
+                    $this->isImmutableCustomDateTimeCast($value))) {
                 $attributes[$key] = $attributes[$key]->format(explode(':', $value, 2)[1]);
             }
 
@@ -463,8 +463,8 @@ trait HasAttributes
         }
 
         return $this->isRelation($key) || $this->relationLoaded($key)
-                    ? $this->getRelationValue($key)
-                    : $this->throwMissingAttributeExceptionIfApplicable($key);
+            ? $this->getRelationValue($key)
+            : $this->throwMissingAttributeExceptionIfApplicable($key);
     }
 
     /**
@@ -554,7 +554,7 @@ trait HasAttributes
         }
 
         return method_exists($this, $key) ||
-               $this->relationResolver(static::class, $key);
+            $this->relationResolver(static::class, $key);
     }
 
     /**
@@ -635,8 +635,8 @@ trait HasAttributes
         $returnType = (new ReflectionMethod($this, $method))->getReturnType();
 
         return static::$attributeMutatorCache[get_class($this)][$key] =
-                    $returnType instanceof ReflectionNamedType &&
-                    $returnType->getName() === Attribute::class;
+            $returnType instanceof ReflectionNamedType &&
+            $returnType->getName() === Attribute::class;
     }
 
     /**
@@ -710,12 +710,12 @@ trait HasAttributes
         if ($this->isClassCastable($key)) {
             $value = $this->getClassCastableAttributeValue($key, $value);
         } elseif (isset(static::$getAttributeMutatorCache[get_class($this)][$key]) &&
-                  static::$getAttributeMutatorCache[get_class($this)][$key] === true) {
+            static::$getAttributeMutatorCache[get_class($this)][$key] === true) {
             $value = $this->mutateAttributeMarkedAttribute($key, $value);
 
             $value = $value instanceof DateTimeInterface
-                        ? $this->serializeDate($value)
-                        : $value;
+                ? $this->serializeDate($value)
+                : $value;
         } else {
             $value = $this->mutateAttribute($key, $value);
         }
@@ -956,7 +956,7 @@ trait HasAttributes
     protected function isCustomDateTimeCast($cast)
     {
         return str_starts_with($cast, 'date:') ||
-                str_starts_with($cast, 'datetime:');
+            str_starts_with($cast, 'datetime:');
     }
 
     /**
@@ -968,7 +968,7 @@ trait HasAttributes
     protected function isImmutableCustomDateTimeCast($cast)
     {
         return str_starts_with($cast, 'immutable_date:') ||
-                str_starts_with($cast, 'immutable_datetime:');
+            str_starts_with($cast, 'immutable_datetime:');
     }
 
     /**
@@ -1075,9 +1075,9 @@ trait HasAttributes
         $returnType = (new ReflectionMethod($this, $method))->getReturnType();
 
         return static::$setAttributeMutatorCache[$class][$key] =
-                    $returnType instanceof ReflectionNamedType &&
-                    $returnType->getName() === Attribute::class &&
-                    is_callable($this->{$method}()->set);
+            $returnType instanceof ReflectionNamedType &&
+            $returnType->getName() === Attribute::class &&
+            is_callable($this->{$method}()->set);
     }
 
     /**
@@ -1220,8 +1220,8 @@ trait HasAttributes
     protected function getEnumCaseFromValue($enumClass, $value)
     {
         return is_subclass_of($enumClass, BackedEnum::class)
-                ? $enumClass::from($value)
-                : constant($enumClass.'::'.$value);
+            ? $enumClass::from($value)
+            : constant($enumClass.'::'.$value);
     }
 
     /**
@@ -1238,8 +1238,8 @@ trait HasAttributes
         }
 
         return $value instanceof BackedEnum
-                ? $value->value
-                : $value->name;
+            ? $value->value
+            : $value->name;
     }
 
     /**
@@ -2250,15 +2250,15 @@ trait HasAttributes
 
         static::$getAttributeMutatorCache[$class] =
             collect($attributeMutatorMethods = static::getAttributeMarkedMutatorMethods($classOrInstance))
-                    ->mapWithKeys(function ($match) {
-                        return [lcfirst(static::$snakeAttributes ? Str::snake($match) : $match) => true];
-                    })->all();
+                ->mapWithKeys(function ($match) {
+                    return [lcfirst(static::$snakeAttributes ? Str::snake($match) : $match) => true];
+                })->all();
 
         static::$mutatorCache[$class] = collect(static::getMutatorMethods($class))
-                ->merge($attributeMutatorMethods)
-                ->map(function ($match) {
-                    return lcfirst(static::$snakeAttributes ? Str::snake($match) : $match);
-                })->all();
+            ->merge($attributeMutatorMethods)
+            ->map(function ($match) {
+                return lcfirst(static::$snakeAttributes ? Str::snake($match) : $match);
+            })->all();
     }
 
     /**
