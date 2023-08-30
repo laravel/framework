@@ -403,6 +403,17 @@ class Store implements Session
     }
 
     /**
+     * Retrieve an item from the session as a collection.
+     *
+     * @param  array|string|null  $key
+     * @return \Illuminate\Support\Collection
+     */
+    public function collect($key = null)
+    {
+        return collect(is_array($key) ? $this->only($key) : $this->get($key));
+    }
+
+    /**
      * Get the value of a given key and then forget it.
      *
      * @param  string  $key
