@@ -335,6 +335,18 @@ class Store implements Session
     }
 
     /**
+     * Retrieve an item as an integer value.
+     *
+     * @param  string  $key
+     * @param  int  $default
+     * @return int
+     */
+    public function integer($key, $default = 0)
+    {
+        return intval($this->get($key, $default));
+    }
+
+    /**
      * Get the value of a given key and then forget it.
      *
      * @param  string  $key
