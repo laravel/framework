@@ -310,7 +310,7 @@ trait MakesHttpRequests
     }
 
     /**
-     * Set the precognition header.
+     * Set the Laravel Precognition header to "true".
      *
      * @return $this
      */
