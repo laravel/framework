@@ -64,7 +64,7 @@ class ApiInstallCommand extends Command
     protected function installSanctum()
     {
         $this->requireComposerPackages($this->option('composer'), [
-            'laravel/sanctum:dev-develop',
+            'laravel/sanctum:dev-master',
         ]);
 
         $php = (new PhpExecutableFinder())->find(false) ?: 'php';
