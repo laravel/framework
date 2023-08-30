@@ -321,6 +321,20 @@ class Store implements Session
     }
 
     /**
+     * Retrieve an item as a boolean value.
+     *
+     * Returns true when value is "1", "true", "on", and "yes". Otherwise, returns false.
+     *
+     * @param  string|null  $key
+     * @param  bool  $default
+     * @return bool
+     */
+    public function boolean($key = null, $default = false)
+    {
+        return filter_var($this->get($key, $default), FILTER_VALIDATE_BOOLEAN);
+    }
+
+    /**
      * Get the value of a given key and then forget it.
      *
      * @param  string  $key
