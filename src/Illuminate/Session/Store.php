@@ -383,6 +383,26 @@ class Store implements Session
     }
 
     /**
+     * Retrieve an item from the session as an enum.
+     *
+     * @template TEnum
+     *
+     * @param  string  $key
+     * @param  class-string<TEnum>  $enumClass
+     * @return TEnum|null
+     */
+    public function enum($key, $enumClass)
+    {
+        if (! $this->has($key) ||
+            ! enum_exists($enumClass) ||
+            ! method_exists($enumClass, 'tryFrom')) {
+            return null;
+        }
+
+        return $enumClass::tryFrom($this->input($key));
+    }
+
+    /**
      * Get the value of a given key and then forget it.
      *
      * @param  string  $key
