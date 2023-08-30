@@ -8,7 +8,6 @@ use Countable;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Env;
 use Illuminate\Support\Optional;
-use Illuminate\Support\Sleep;
 use Illuminate\Support\Stringable;
 use Illuminate\Tests\Support\Fixtures\IntBackedEnum;
 use Illuminate\Tests\Support\Fixtures\StringBackedEnum;
@@ -776,7 +775,7 @@ class SupportHelpersTest extends TestCase
 
     public function testRetry()
     {
-        Sleep::fake();
+        $startTime = microtime(true);
 
         $attempts = retry(2, function ($attempts) {
             if ($attempts > 1) {
@@ -790,16 +789,12 @@ class SupportHelpersTest extends TestCase
         $this->assertEquals(2, $attempts);
 
         // Make sure we waited 100ms for the first attempt
-        Sleep::assertSleptTimes(1);
-
-        Sleep::assertSequence([
-            Sleep::usleep(100_000),
-        ]);
+        $this->assertEqualsWithDelta(0.1, microtime(true) - $startTime, 0.03);
     }
 
     public function testRetryWithPassingSleepCallback()
     {
-        Sleep::fake();
+        $startTime = microtime(true);
 
         $attempts = retry(3, function ($attempts) {
             if ($attempts > 2) {
@@ -817,17 +812,12 @@ class SupportHelpersTest extends TestCase
         $this->assertEquals(3, $attempts);
 
         // Make sure we waited 300ms for the first two attempts
-        Sleep::assertSleptTimes(2);
-
-        Sleep::assertSequence([
-            Sleep::usleep(100_000),
-            Sleep::usleep(200_000),
-        ]);
+        $this->assertEqualsWithDelta(0.3, microtime(true) - $startTime, 0.03);
     }
 
     public function testRetryWithPassingWhenCallback()
     {
-        Sleep::fake();
+        $startTime = microtime(true);
 
         $attempts = retry(2, function ($attempts) {
             if ($attempts > 1) {
@@ -843,11 +833,7 @@ class SupportHelpersTest extends TestCase
         $this->assertEquals(2, $attempts);
 
         // Make sure we waited 100ms for the first attempt
-        Sleep::assertSleptTimes(1);
-
-        Sleep::assertSequence([
-            Sleep::usleep(100_000),
-        ]);
+        $this->assertEqualsWithDelta(0.1, microtime(true) - $startTime, 0.03);
     }
 
     public function testRetryWithFailingWhenCallback()
@@ -867,8 +853,7 @@ class SupportHelpersTest extends TestCase
 
     public function testRetryWithBackoff()
     {
-        Sleep::fake();
-
+        $startTime = microtime(true);
         $attempts = retry([50, 100, 200], function ($attempts) {
             if ($attempts > 3) {
                 return $attempts;
@@ -880,13 +865,7 @@ class SupportHelpersTest extends TestCase
         // Make sure we made four attempts
         $this->assertEquals(4, $attempts);
 
-        Sleep::assertSleptTimes(3);
-
-        Sleep::assertSequence([
-            Sleep::usleep(50_000),
-            Sleep::usleep(100_000),
-            Sleep::usleep(200_000),
-        ]);
+        $this->assertEqualsWithDelta(0.05 + 0.1 + 0.2, microtime(true) - $startTime, 0.05);
     }
 
     public function testTransform()

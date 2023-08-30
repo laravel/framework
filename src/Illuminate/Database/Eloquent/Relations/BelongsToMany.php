@@ -11,7 +11,6 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Eloquent\Relations\Concerns\AsPivot;
 use Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithDictionary;
 use Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithPivotTable;
-use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
 
@@ -610,7 +609,7 @@ class BelongsToMany extends Relation
     }
 
     /**
-     * Get the first record matching the attributes. If the record is not found, create it.
+     * Get the first related record matching the attributes or create it.
      *
      * @param  array  $attributes
      * @param  array  $values
@@ -629,32 +628,6 @@ class BelongsToMany extends Relation
         }
 
         return $instance;
-    }
-
-    /**
-     * Attempt to create the record. If a unique constraint violation occurs, attempt to find the matching record.
-     *
-     * @param  array  $attributes
-     * @param  array  $values
-     * @param  array  $joining
-     * @param  bool  $touch
-     * @return \Illuminate\Database\Eloquent\Model
-     */
-    public function createOrFirst(array $attributes = [], array $values = [], array $joining = [], $touch = true)
-    {
-        try {
-            return $this->getQuery()->withSavePointIfNeeded(fn () => $this->create(array_merge($attributes, $values), $joining, $touch));
-        } catch (UniqueConstraintViolationException $exception) {
-            // ...
-        }
-
-        try {
-            return tap($this->related->where($attributes)->first(), function ($instance) use ($joining, $touch) {
-                $this->getQuery()->withSavepointIfNeeded(fn () => $this->attach($instance, $joining, $touch));
-            });
-        } catch (UniqueConstraintViolationException $exception) {
-            return (clone $this)->where($attributes)->first();
-        }
     }
 
     /**

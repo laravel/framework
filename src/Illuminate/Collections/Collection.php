@@ -1083,7 +1083,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      *
      * @param  TValue|(callable(TValue,TKey): bool)  $value
      * @param  bool  $strict
-     * @return TKey|false
+     * @return TKey|bool
      */
     public function search($value, $strict = false)
     {

@@ -235,19 +235,11 @@ abstract class Factory
     /**
      * Create a collection of models and persist them to the database.
      *
-     * @param  int|null|iterable<int, array<string, mixed>>  $records
+     * @param  iterable<int, array<string, mixed>>  $records
      * @return \Illuminate\Database\Eloquent\Collection<int, \Illuminate\Database\Eloquent\Model|TModel>
      */
-    public function createMany(int|iterable|null $records = null)
+    public function createMany(iterable $records)
     {
-        if (is_null($records)) {
-            $records = $this->count ?? 1;
-        }
-
-        if (is_numeric($records)) {
-            $records = array_fill(0, $records, []);
-        }
-
         return new EloquentCollection(
             collect($records)->map(function ($record) {
                 return $this->state($record)->create();
@@ -258,10 +250,10 @@ abstract class Factory
     /**
      * Create a collection of models and persist them to the database without dispatching any model events.
      *
-     * @param  int|null|iterable<int, array<string, mixed>>  $records
+     * @param  iterable<int, array<string, mixed>>  $records
      * @return \Illuminate\Database\Eloquent\Collection<int, \Illuminate\Database\Eloquent\Model|TModel>
      */
-    public function createManyQuietly(int|iterable|null $records = null)
+    public function createManyQuietly(iterable $records)
     {
         return Model::withoutEvents(function () use ($records) {
             return $this->createMany($records);

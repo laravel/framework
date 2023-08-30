@@ -803,7 +803,7 @@ class Builder implements BuilderContract
         // If the value is a Closure, it means the developer is performing an entire
         // sub-select within the query and we will need to compile the sub-select
         // within the where clause to get the appropriate query record results.
-        if ($this->isQueryable($value)) {
+        if ($value instanceof Closure) {
             return $this->whereSub($column, $operator, $value, $boolean);
         }
 
@@ -1658,22 +1658,18 @@ class Builder implements BuilderContract
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
      * @param  string  $operator
-     * @param  \Closure||\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $callback
+     * @param  \Closure  $callback
      * @param  string  $boolean
      * @return $this
      */
-    protected function whereSub($column, $operator, $callback, $boolean)
+    protected function whereSub($column, $operator, Closure $callback, $boolean)
     {
         $type = 'Sub';
 
-        if ($callback instanceof Closure) {
-            // Once we have the query instance we can simply execute it so it can add all
-            // of the sub-select's conditions to itself, and then we can cache it off
-            // in the array of where clauses for the "main" parent query instance.
-            $callback($query = $this->forSubQuery());
-        } else {
-            $query = $callback instanceof EloquentBuilder ? $callback->toBase() : $callback;
-        }
+        // Once we have the query instance we can simply execute it so it can add all
+        // of the sub-select's conditions to itself, and then we can cache it off
+        // in the array of where clauses for the "main" parent query instance.
+        $callback($query = $this->forSubQuery());
 
         $this->wheres[] = compact(
             'type', 'column', 'operator', 'query', 'boolean'

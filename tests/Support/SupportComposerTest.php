@@ -48,21 +48,7 @@ class SupportComposerTest extends TestCase
         $composer->dumpOptimized();
     }
 
-    public function testRequirePackagesRunsTheCorrectCommand()
-    {
-        $composer = $this->mockComposer(['composer', 'require', 'pestphp/pest:^2.0', 'pestphp/pest-plugin-laravel:^2.0', '--dev']);
-
-        $composer->requirePackages(['pestphp/pest:^2.0', 'pestphp/pest-plugin-laravel:^2.0'], true);
-    }
-
-    public function testRemovePackagesRunsTheCorrectCommand()
-    {
-        $composer = $this->mockComposer(['composer', 'remove', 'phpunit/phpunit', '--dev']);
-
-        $composer->removePackages(['phpunit/phpunit'], true);
-    }
-
-    private function mockComposer(array $expectedProcessArguments, $customComposerPhar = false, array $environmentVariables = [])
+    private function mockComposer(array $expectedProcessArguments, $customComposerPhar = false)
     {
         $directory = __DIR__;
 
@@ -74,7 +60,7 @@ class SupportComposerTest extends TestCase
 
         $composer = $this->getMockBuilder(Composer::class)
             ->onlyMethods(['getProcess'])
-            ->setConstructorArgs([$files, $directory, $environmentVariables])
+            ->setConstructorArgs([$files, $directory])
             ->getMock();
         $composer->expects($this->once())
             ->method('getProcess')

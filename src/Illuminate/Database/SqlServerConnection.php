@@ -3,7 +3,6 @@
 namespace Illuminate\Database;
 
 use Closure;
-use Exception;
 use Illuminate\Database\PDO\SqlServerDriver;
 use Illuminate\Database\Query\Grammars\SqlServerGrammar as QueryGrammar;
 use Illuminate\Database\Query\Processors\SqlServerProcessor;
@@ -66,17 +65,6 @@ class SqlServerConnection extends Connection
         $hex = bin2hex($value);
 
         return "0x{$hex}";
-    }
-
-    /**
-     * Determine if the given database exception was caused by a unique constraint violation.
-     *
-     * @param  \Exception  $exception
-     * @return bool
-     */
-    protected function isUniqueConstraintError(Exception $exception)
-    {
-        return boolval(preg_match('#Cannot insert duplicate key row in object#i', $exception->getMessage()));
     }
 
     /**

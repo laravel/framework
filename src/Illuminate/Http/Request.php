@@ -31,7 +31,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     /**
      * The decoded JSON content for the request.
      *
-     * @var \Symfony\Component\HttpFoundation\InputBag|null
+     * @var \Symfony\Component\HttpFoundation\ParameterBag|null
      */
     protected $json;
 
@@ -398,7 +398,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      *
      * @param  string|null  $key
      * @param  mixed  $default
-     * @return \Symfony\Component\HttpFoundation\InputBag|mixed
+     * @return \Symfony\Component\HttpFoundation\ParameterBag|mixed
      */
     public function json($key = null, $default = null)
     {
@@ -416,7 +416,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     /**
      * Get the input source for the request.
      *
-     * @return \Symfony\Component\HttpFoundation\InputBag
+     * @return \Symfony\Component\HttpFoundation\ParameterBag
      */
     protected function getInputSource()
     {
@@ -646,7 +646,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     /**
      * Set the JSON payload for the request.
      *
-     * @param  \Symfony\Component\HttpFoundation\InputBag  $json
+     * @param  \Symfony\Component\HttpFoundation\ParameterBag  $json
      * @return $this
      */
     public function setJson($json)
