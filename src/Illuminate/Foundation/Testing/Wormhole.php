@@ -187,7 +187,7 @@ class Wormhole
      */
     public function months($callback = null)
     {
-        Carbon::setTestNow(Carbon::now()->addMonths($this->value));
+        Carbon::setTestNow(Carbon::now()->addMonthsNoOverflow($this->value));
 
         return $this->handleCallback($callback);
     }
