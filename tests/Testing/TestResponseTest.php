@@ -1038,19 +1038,19 @@ class TestResponseTest extends TestCase
     public function testAssertPrecognitionSuccessfulWithMissingHeader()
     {
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Precognition-Success Header not present on response.');
+        $this->expectExceptionMessage('Header [Precognition-Success] not present on response.');
 
         $baseResponse = new Response('', 204);
 
         $response = TestResponse::fromBaseResponse($baseResponse);
 
-        $response->assertPrecognitionSuccess();
+        $response->assertSuccessfulPrecognition();
     }
 
     public function testAssertPrecognitionSuccessfulWithIncorrectValue()
     {
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Precognition-Success Header was found, but the value is not `true`.');
+        $this->expectExceptionMessage('The Precognition-Success header was found, but the value is not `true`.');
 
         $baseResponse = tap(new Response('', 204), function ($response) {
             $response->header('Precognition-Success', '');
@@ -1058,7 +1058,7 @@ class TestResponseTest extends TestCase
 
         $response = TestResponse::fromBaseResponse($baseResponse);
 
-        $response->assertPrecognitionSuccess();
+        $response->assertSuccessfulPrecognition();
     }
 
     public function testAssertJsonWithArray()
