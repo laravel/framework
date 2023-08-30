@@ -362,6 +362,18 @@ class Builder implements BuilderContract
         return $this->whereNot($column, $operator, $value, 'or');
     }
 
+     /**
+     * Add a basic "search" clause to the query. 
+     *
+     * @param  \Closure|array|string|\Illuminate\Contracts\Database\Query\Expression  $column
+     * @param mixed $value
+     * @return $this
+     */
+    public function search($column, $value)
+    {
+        return $this->where($column, "like", "$value");
+    }
+
     /**
      * Add an "order by" clause for a timestamp to the query.
      *
@@ -2046,4 +2058,5 @@ class Builder implements BuilderContract
     {
         $this->query = clone $this->query;
     }
+    
 }
