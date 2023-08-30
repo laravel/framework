@@ -522,7 +522,7 @@ class Store implements Session
      */
     public function increment($key, $amount = 1)
     {
-        $this->put($key, $value = $this->get($key, 0) + $amount);
+        $this->put($key, $value = $this->integer($key) + $amount);
 
         return $value;
     }
