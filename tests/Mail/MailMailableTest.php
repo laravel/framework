@@ -1158,6 +1158,42 @@ class MailMailableTest extends TestCase
         $this->assertEquals('X-Custom-Header', $sentMessage->getOriginalMessage()->getHeaders()->get('x-custom-header')->getName());
         $this->assertEquals('Custom Value', $sentMessage->getOriginalMessage()->getHeaders()->get('x-custom-header')->getValue());
     }
+
+    public function testMailableAttributesInBuild()
+    {
+        Container::getInstance()->instance('mailer', new class
+        {
+            public function render()
+            {
+                //
+            }
+        });
+
+        $mailable = new class() extends Mailable
+        {
+            public function build()
+            {
+                $this
+                    ->to('hello@laravel.com')
+                    ->replyTo('taylor@laravel.com')
+                    ->cc('cc@laravel.com', 'Taylor Otwell')
+                    ->bcc('bcc@laravel.com', 'Taylor Otwell')
+                    ->tag('test-tag')
+                    ->metadata('origin', 'test-suite')
+                    ->metadata('user_id', 1)
+                    ->subject('test subject');
+            }
+        };
+
+        $mailable->assertTo('hello@laravel.com');
+        $mailable->assertHasReplyTo('taylor@laravel.com');
+        $mailable->assertHasCc('cc@laravel.com', 'Taylor Otwell');
+        $mailable->assertHasBcc('bcc@laravel.com', 'Taylor Otwell');
+        $mailable->assertHasTag('test-tag');
+        $mailable->assertHasMetadata('origin', 'test-suite');
+        $mailable->assertHasMetadata('user_id', 1);
+        $mailable->assertHasSubject('test subject');
+    }
 }
 
 class MailableHeadersStub extends Mailable
