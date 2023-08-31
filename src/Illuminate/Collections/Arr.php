@@ -63,6 +63,32 @@ class Arr
     }
 
     /**
+     * Extract a column from a multi-dimensional array using "dot" notation.
+     *
+     * @param  array  $array
+     * @param  string|int|null  $column_key
+     * @param  string|int|null  $index_key
+     * @return array
+     */
+    public static function column($array, $column_key = null, $index_key = null)
+    {
+        $result = [];
+
+        foreach ($array as $item) {
+            $value = data_get($item, $column_key);
+
+            if (is_null($index_key)) {
+                $result[] = $value;
+            } else {
+                $index = data_get($item, $index_key);
+                $result[$index] = $value;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
      * Cross join the given arrays, returning all possible permutations.
      *
      * @param  iterable  ...$arrays

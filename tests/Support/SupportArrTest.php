@@ -45,6 +45,23 @@ class SupportArrTest extends TestCase
         $this->assertEquals([1, 2, 3, 'foo', 'bar', 'baz', 'boom'], Arr::collapse($array));
     }
 
+    public function testColumn(){
+        $data = [
+            ['id' => 1, 'name' => 'Alice', 'age' => 25,],
+            ['id' => 2, 'name' => 'Bob', 'age' => 30],
+            ['id' => 3, 'name' => 'Charlie', 'age' => 28],
+        ];
+
+        $this->assertEquals([1, 2, 3], Arr::column($data, 'id'));
+        $this->assertEquals(['Alice', 'Bob', 'Charlie'], Arr::column($data, 'name'));
+        $this->assertEquals([25, 30, 28], Arr::column($data, 'age'));
+
+        $this->assertEquals(
+            ['Alice' => 1, 'Bob' => 2, 'Charlie' => 3],
+            Arr::column($data, 'id', 'name')
+        );
+    }
+
     public function testCrossJoin()
     {
         // Single dimension
