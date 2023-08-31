@@ -45,9 +45,10 @@ class SupportArrTest extends TestCase
         $this->assertEquals([1, 2, 3, 'foo', 'bar', 'baz', 'boom'], Arr::collapse($array));
     }
 
-    public function testColumn(){
+    public function testColumn()
+    {
         $data = [
-            ['id' => 1, 'name' => 'Alice', 'age' => 25,],
+            ['id' => 1, 'name' => 'Alice', 'age' => 25],
             ['id' => 2, 'name' => 'Bob', 'age' => 30],
             ['id' => 3, 'name' => 'Charlie', 'age' => 28],
         ];
