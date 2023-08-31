@@ -605,6 +605,17 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     {
         return call_user_func($this->getUserResolver(), $guard);
     }
+    
+    /**
+     * Get the user id making the request.
+     *
+     * @param  string|null  $guard
+     * @return mixed
+     */
+    public function id($guard = null)
+    {
+        return $this->user($guard)?->id;
+    }
 
     /**
      * Get the route handling the request.
