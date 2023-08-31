@@ -2138,10 +2138,11 @@ trait HasAttributes
      * Get the accessors that are being appended to model arrays.
      *
      * @return array
+     * @throws ReflectionException
      */
     public function getAppends(): array
     {
-        $attributeAppends = $this->getArrayableAppends();
+        $attributeAppends = $this->getAttributeAppends();
 
         return array_merge($this->appends, $attributeAppends);
     }
