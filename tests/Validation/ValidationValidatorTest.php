@@ -19,6 +19,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Exceptions\MathException;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Translation\ArrayLoader;
 use Illuminate\Translation\Translator;
 use Illuminate\Validation\DatabasePresenceVerifierInterface;
@@ -1795,6 +1796,26 @@ class ValidationValidatorTest extends TestCase
         $trans->addLines(['validation.in_array' => 'The value of :attribute does not exist in :other.'], 'en');
         $v = new Validator($trans, ['foo' => [1, 2, 3], 'bar' => [1, 2]], ['foo.*' => 'in_array:bar.*']);
         $this->assertSame('The value of foo.2 does not exist in bar.*.', $v->messages()->first('foo.2'));
+    }
+
+    public function testColumnExists()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $validator = new Validator($trans, ['column' => 'title'], ['column' => 'column_exists:users']);
+        Schema::shouldReceive('hasColumn')->with('users', 'title')->once()->andReturnTrue();
+        $this->assertTrue($validator->passes());
+
+        $validator = new Validator($trans, ['column' => 'title'], ['column' => 'column_exists:users']);
+        Schema::shouldReceive('hasColumn')->with('users', 'title')->once()->andReturnFalse();
+        $this->assertFalse($validator->passes());
+
+        $validator = new Validator($trans, ['column' => ['title', 'body']], ['column' => 'column_exists:users']);
+        Schema::shouldReceive('hasColumns')->with('users', ['title', 'body'])->once()->andReturnTrue();
+        $this->assertTrue($validator->passes());
+
+        $validator = new Validator($trans, ['column' => ['title', 'body']], ['column' => 'column_exists:users']);
+        Schema::shouldReceive('hasColumns')->with('users', ['title', 'body'])->once()->andReturnFalse();
+        $this->assertFalse($validator->passes());
     }
 
     public function testValidateConfirmed()
