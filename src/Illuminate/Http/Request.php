@@ -614,7 +614,9 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      */
     public function id($guard = null)
     {
-        return $this->user($guard)?->id;
+        if ($user = $this->user($guard)) {
+            return $user->getAuthIdentifier();
+        }
     }
 
     /**
