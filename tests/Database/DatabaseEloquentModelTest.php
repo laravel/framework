@@ -1945,8 +1945,9 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertSame('admin', $model->is_admin);
         $this->assertSame('camelCased', $model->camelCased);
         $this->assertSame('StudlyCased', $model->StudlyCased);
+        $this->assertEquals(['admin', 'web_master'], $model->roles);
 
-        $this->assertEquals(['is_admin', 'camelCased', 'StudlyCased'], $model->getAppends());
+        $this->assertEquals(['is_admin', 'camelCased', 'StudlyCased', 'roles'], $model->getAppends());
 
         $this->assertTrue($model->hasAppended('is_admin'));
         $this->assertTrue($model->hasAppended('camelCased'));
