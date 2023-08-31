@@ -2140,7 +2140,7 @@ trait HasAttributes
      * @return array
      * @throws ReflectionException
      */
-    public function getAppends(): array
+    public function getAppends()
     {
         $attributeAppends = $this->getAttributeAppends();
 
