@@ -19,6 +19,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Exceptions\MathException;
 use Illuminate\Support\Facades\Date;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Exists;
 use Illuminate\Validation\Rules\Unique;
@@ -473,6 +474,21 @@ trait ValidatesAttributes
         $acceptable = [true, false, 0, 1, '0', '1'];
 
         return in_array($value, $acceptable, true);
+    }
+
+    /**
+     * Validate that the attribute's value is among the database table's columns.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  array<int, int|string>  $parameters
+     * @return bool
+     */
+    protected function validateColumnExists($attribute, $value, $parameters)
+    {
+        return is_array($value)
+            ? Schema::hasColumns($parameters[0], $value)
+            : Schema::hasColumn($parameters[0], $value);
     }
 
     /**
