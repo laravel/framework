@@ -449,6 +449,38 @@ class Sleep
     }
 
     /**
+     * Sleep while the closure evaluates to falsey.
+     *
+     * @template TReturn of mixed
+     *
+     * @param  (callable(int): TReturn)  $callback
+     * @param  int  $bailAfter
+     * @return TReturn
+     */
+    public function while($callback)
+    {
+        $this->shouldNotSleep();
+
+        $sleeps = 0;
+
+        while (true) {
+            $result = $callback($sleeps);
+
+            if (! $result instanceof Sleep && $result) {
+                return $result;
+            }
+
+            $duration = $result instanceof Sleep
+                ? $result->shouldNotSleep()->duration
+                : $this->duration;
+
+            Sleep::for($duration);
+
+            $sleeps++;
+        }
+    }
+
+    /**
      * Specify a callback that should be invoked when faking sleep within a test.
      *
      * @param  callable  $callback

@@ -537,4 +537,67 @@ class SleepTest extends TestCase
 
         $this->assertTrue(true);
     }
+
+    public function testItDoesntSleepIfClosureEvaluatesToNonFalseInstantly()
+    {
+        Sleep::fake();
+        $processRunning = false;
+        $sleeps = 0;
+
+        Sleep::for(50)->milliseconds()->while(fn () => true);
+
+        Sleep::assertNeverSlept();
+    }
+
+    public function testWhileReturnValueIsReturnedToUser()
+    {
+        Sleep::fake();
+
+        $value = Sleep::for(50)->milliseconds()->while(fn () => 'foo');
+
+        Sleep::assertNeverSlept();
+        $this->assertSame('foo', $value);
+    }
+
+    public function testItCanSleepUsingFluentWhileMethodBailingAfterOneSleep()
+    {
+        Sleep::fake();
+
+        Sleep::for(1)->second()->while(fn ($sleeps) => $sleeps === 1);
+
+        Sleep::assertSequence([
+            Sleep::for(1)->second(),
+        ]);
+    }
+
+    public function testItCanSleepUsingFluentWhileMethodBailingAfterThreeSleep()
+    {
+        Sleep::fake();
+
+        Sleep::for(1)->second()->while(fn ($sleeps) => $sleeps === 3);
+
+        Sleep::assertSequence([
+            Sleep::for(1)->second(),
+            Sleep::for(1)->second(),
+            Sleep::for(1)->second(),
+        ]);
+    }
+
+    public function testWhileReturningSleepForBackoffStategy()
+    {
+        Sleep::fake();
+
+        Sleep::for(50)->milliseconds()->while(fn ($sleeps) => match ($sleeps) {
+            4 => true, // stop after four sleeps.
+            0 => false, // use default for the first sleep.
+            default => Sleep::for($sleeps * 11)->milliseconds(),
+        });
+
+        Sleep::assertSequence([
+            Sleep::for(50)->milliseconds(),
+            Sleep::for(11)->milliseconds(),
+            Sleep::for(22)->milliseconds(),
+            Sleep::for(33)->milliseconds(),
+        ]);
+    }
 }
