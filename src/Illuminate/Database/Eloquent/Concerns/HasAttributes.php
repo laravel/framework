@@ -2155,12 +2155,11 @@ trait HasAttributes
      */
     public function getAttributeAppends(): array
     {
-        $reflectionClass = new ReflectionClass($this);
         $attributeMethods = $this->getAttributeMarkedMutatorMethods($this);
         $results = [];
         foreach ($attributeMethods as $methodName){
-            $method = $reflectionClass->getMethod($methodName);
-            if(!in_array($method, $this->appends) && $method->getAttributes(Append::class)){
+            $method = new ReflectionMethod($this, $methodName);
+            if(!in_array($methodName, $this->appends) && $method->getAttributes(Append::class)){
                 $results[] = $methodName;
             }
         }
@@ -2184,11 +2183,19 @@ trait HasAttributes
     /**
      * Return whether the accessor attribute has been appended.
      *
-     * @param  string  $attribute
+     * @param string $attribute
      * @return bool
+     * @throws ReflectionException
      */
     public function hasAppended($attribute)
     {
+        if(in_array($attribute, $this->getAttributeMarkedMutatorMethods($this))){
+            $method = new ReflectionMethod($this, $attribute);
+            if($method->getAttributes(Append::class)){
+                return true;
+            }
+        }
+
         return in_array($attribute, $this->appends);
     }
 
