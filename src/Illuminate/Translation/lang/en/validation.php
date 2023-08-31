@@ -33,6 +33,7 @@ return [
     ],
     'boolean' => 'The :attribute field must be true or false.',
     'can' => 'The :attribute field contains an unauthorized value.',
+    'column_exists' => 'The :attribute is invalid.',
     'confirmed' => 'The :attribute field confirmation does not match.',
     'current_password' => 'The password is incorrect.',
     'date' => 'The :attribute field must be a valid date.',
