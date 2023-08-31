@@ -13,6 +13,7 @@ use DateTimeInterface;
 use Illuminate\Contracts\Database\Eloquent\Castable;
 use Illuminate\Contracts\Database\Eloquent\CastsInboundAttributes;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Database\Eloquent\Attributes\Append;
 use Illuminate\Database\Eloquent\Casts\AsArrayObject;
 use Illuminate\Database\Eloquent\Casts\AsCollection;
 use Illuminate\Database\Eloquent\Casts\AsEncryptedArrayObject;
@@ -37,6 +38,7 @@ use Illuminate\Support\Str;
 use InvalidArgumentException;
 use LogicException;
 use ReflectionClass;
+use ReflectionException;
 use ReflectionMethod;
 use ReflectionNamedType;
 
@@ -2137,9 +2139,32 @@ trait HasAttributes
      *
      * @return array
      */
-    public function getAppends()
+    public function getAppends(): array
     {
-        return $this->appends;
+        $attributeAppends = $this->getArrayableAppends();
+
+        return array_merge($this->appends, $attributeAppends);
+    }
+
+    /**
+     * Get appends defined by attributes
+     *
+     * @return array
+     * @throws ReflectionException
+     */
+    public function getAttributeAppends(): array
+    {
+        $reflectionClass = new ReflectionClass($this);
+        $attributeMethods = $this->getAttributeMarkedMutatorMethods($this);
+        $results = [];
+        foreach ($attributeMethods as $methodName){
+            $method = $reflectionClass->getMethod($methodName);
+            if(!in_array($method, $this->appends) && $method->getAttributes(Append::class)){
+                $results[] = $methodName;
+            }
+        }
+
+        return $results;
     }
 
     /**
