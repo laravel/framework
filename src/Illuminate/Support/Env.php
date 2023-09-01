@@ -66,6 +66,31 @@ class Env
     }
 
     /**
+     * Get the value of an environment variable.
+     *
+     * @param  string  $key
+     * @param  mixed  $default
+     * @return mixed
+     */
+    public static function get($key, $default = null)
+    {
+        return self::getOption($key)->getOrCall(fn () => value($default));
+    }
+
+    /**
+     * Get the value of a required environment variable.
+     *
+     * @param  string  $key
+     * @return mixed
+     *
+     * @throws \RuntimeException
+     */
+    public static function getOrFail($key)
+    {
+        return self::getOption($key)->getOrThrow(new RuntimeException("Environment variable [$key] has no value."));
+    }
+
+    /**
      * Get the possible option for this environment variable.
      *
      * @param  string  $key
@@ -96,30 +121,5 @@ class Env
 
                 return $value;
             });
-    }
-
-    /**
-     * Gets the value of a required environment variable.
-     *
-     * @param  string  $key
-     * @return mixed
-     *
-     * @throws \RuntimeException
-     */
-    public static function getRequired($key)
-    {
-        return self::getOption($key)->getOrThrow(new RuntimeException("[$key] has no value"));
-    }
-
-    /**
-     * Gets the value of an environment variable.
-     *
-     * @param  string  $key
-     * @param  mixed  $default
-     * @return mixed
-     */
-    public static function get($key, $default = null)
-    {
-        return self::getOption($key)->getOrCall(fn () => value($default));
     }
 }

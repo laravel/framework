@@ -139,21 +139,6 @@ if (! function_exists('env')) {
     }
 }
 
-if (! function_exists('requireEnv')) {
-    /**
-     * Gets the value of a required environment variable.
-     *
-     * @param  string  $key
-     * @return mixed
-     *
-     * @throws \RuntimeException
-     */
-    function requireEnv($key)
-    {
-        return Env::getRequired($key);
-    }
-}
-
 if (! function_exists('filled')) {
     /**
      * Determine if a value is "filled".

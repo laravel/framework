@@ -1017,13 +1017,13 @@ class SupportHelpersTest extends TestCase
     {
         $this->expectExceptionObject(new RuntimeException('[required-does-not-exist] has no value'));
 
-        requireEnv('required-does-not-exist');
+        Env::getOrFail('required-does-not-exist');
     }
 
     public function testRequiredEnvReturnsValue(): void
     {
         $_SERVER['required-exists'] = 'some-value';
-        $this->assertSame('some-value', requireEnv('required-exists'));
+        $this->assertSame('some-value', Env::getOrFail('required-exists'));
     }
 
     public static function providesPregReplaceArrayData()
