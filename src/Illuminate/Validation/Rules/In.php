@@ -2,6 +2,9 @@
 
 namespace Illuminate\Validation\Rules;
 
+use BackedEnum;
+use UnitEnum;
+
 class In
 {
     /**
@@ -39,6 +42,12 @@ class In
     public function __toString()
     {
         $values = array_map(function ($value) {
+            $value = match (true) {
+                $value instanceof BackedEnum => $value->value,
+                $value instanceof UnitEnum => $value->name,
+                default => $value,
+            };
+
             return '"'.str_replace('"', '""', $value).'"';
         }, $this->values);
 

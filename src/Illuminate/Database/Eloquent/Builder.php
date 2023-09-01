@@ -581,8 +581,8 @@ class Builder implements BuilderContract
     {
         try {
             return $this->withSavepointIfNeeded(fn () => $this->create(array_merge($attributes, $values)));
-        } catch (UniqueConstraintViolationException) {
-            return $this->useWritePdo()->where($attributes)->first();
+        } catch (UniqueConstraintViolationException $e) {
+            return $this->useWritePdo()->where($attributes)->first() ?? throw $e;
         }
     }
 
@@ -1166,7 +1166,7 @@ class Builder implements BuilderContract
             ) {
                 $timestamp = $this->model->newInstance()
                     ->forceFill([$column => $timestamp])
-                    ->getAttributes()[$column];
+                    ->getAttributes()[$column] ?? $timestamp;
             }
 
             $values = array_merge([$column => $timestamp], $values);

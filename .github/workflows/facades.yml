@@ -34,7 +34,7 @@ jobs:
           timeout_minutes: 5
           max_attempts: 5
           command: |
-            composer config repositories.facade-documenter vcs git@github.com:laravel-labs/facade-documenter.git
+            composer config repositories.facade-documenter vcs git@github.com:laravel/facade-documenter.git
             composer require --dev laravel/facade-documenter:dev-main --prefer-stable --prefer-dist --no-interaction --no-progress
 
       - name: Update facade docblocks
