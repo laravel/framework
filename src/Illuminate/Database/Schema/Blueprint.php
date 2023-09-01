@@ -1784,6 +1784,14 @@ class Blueprint
     {
         return $this->table;
     }
+    /**
+     * Get the table prefix.
+     * @return string
+     */
+    public function getPrefix()
+    {
+        return $this->prefix;
+    }
 
     /**
      * Get the columns on the blueprint.
