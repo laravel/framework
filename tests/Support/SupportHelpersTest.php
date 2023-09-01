@@ -26,6 +26,8 @@ class SupportHelpersTest extends TestCase
     protected function tearDown(): void
     {
         m::close();
+
+        parent::tearDown();
     }
 
     public function testE()
@@ -1009,6 +1011,19 @@ class SupportHelpersTest extends TestCase
         $_ENV['foo'] = 'From $_ENV';
         $_SERVER['foo'] = 'From $_SERVER';
         $this->assertSame('From $_SERVER', env('foo'));
+    }
+
+    public function testRequiredEnvVariableThrowsAnExceptionWhenNotFound(): void
+    {
+        $this->expectExceptionObject(new RuntimeException('[required-does-not-exist] has no value'));
+
+        Env::getOrFail('required-does-not-exist');
+    }
+
+    public function testRequiredEnvReturnsValue(): void
+    {
+        $_SERVER['required-exists'] = 'some-value';
+        $this->assertSame('some-value', Env::getOrFail('required-exists'));
     }
 
     public static function providesPregReplaceArrayData()
