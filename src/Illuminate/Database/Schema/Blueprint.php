@@ -1784,8 +1784,10 @@ class Blueprint
     {
         return $this->table;
     }
+
     /**
      * Get the table prefix.
+     *
      * @return string
      */
     public function getPrefix()
