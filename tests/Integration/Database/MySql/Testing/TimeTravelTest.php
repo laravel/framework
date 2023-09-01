@@ -15,6 +15,8 @@ class TimeTravelTest extends MySqlTestCase
         $this->freezeTime();
         $user = UserFactory::new()->create();
 
+        $user->setDateFormat('Y-m-d H:i:s.v');
+
         $this->travel(1)->hour();
         $user->updateTimestamps()->save();
 
