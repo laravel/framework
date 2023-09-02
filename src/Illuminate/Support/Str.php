@@ -1574,7 +1574,7 @@ class Str
     /**
      * Set the callable that will be used to generate ULIDs.
      *
-     * @param callable|null $factory
+     * @param  callable|null  $factory
      * @return void
      */
     public static function createUlidsUsing(callable $factory = null)
@@ -1585,8 +1585,8 @@ class Str
     /**
      * Set the sequence that will be used to generate ULIDs.
      *
-     * @param array $sequence
-     * @param callable|null $whenMissing
+     * @param  array  $sequence
+     * @param  callable|null  $whenMissing
      * @return void
      */
     public static function createUlidsUsingSequence(array $sequence, $whenMissing = null)
@@ -1619,14 +1619,14 @@ class Str
     /**
      * Always return the same ULID when generating new ULIDs.
      *
-     * @param Closure|null $callback
+     * @param  Closure|null  $callback
      * @return Ulid
      */
     public static function freezeUlids(Closure $callback = null)
     {
         $ulid = Str::ulid();
 
-        Str::createUlidsUsing(fn() => $ulid);
+        Str::createUlidsUsing(fn () => $ulid);
 
         if ($callback !== null) {
             try {

@@ -1200,7 +1200,7 @@ class SupportStrTest extends TestCase
     {
         try {
             Str::freezeUlids(function () {
-                Str::createUlidsUsing(fn() => Str::of('1234'));
+                Str::createUlidsUsing(fn () => Str::of('1234'));
                 $this->assertSame('1234', (string) Str::ulid());
                 throw new \Exception('Something failed');
             });
@@ -1246,7 +1246,7 @@ class SupportStrTest extends TestCase
     {
         Str::createUlidsUsingSequence(
             [Str::ulid(), Str::ulid()],
-            fn() => throw new Exception('Out of Ulids'),
+            fn () => throw new Exception('Out of Ulids'),
         );
         Str::ulid();
         Str::ulid();
