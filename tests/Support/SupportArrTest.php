@@ -169,7 +169,7 @@ class SupportArrTest extends TestCase
                 'bar' => 'test',
                 'baz' => [
                     'bob' => 'Bob',
-                    'alice' => 'Alice'
+                    'alice' => 'Alice',
                 ],
                 'languages' => ['PHP', 'C#'],
             ],
