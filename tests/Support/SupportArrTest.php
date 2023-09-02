@@ -139,6 +139,77 @@ class SupportArrTest extends TestCase
         $this->assertEquals(['foo', 'foo' => ['bar' => 'baz', 'baz' => ['a' => 'b']]], $array);
     }
 
+    public function testArrow()
+    {
+        $array = Arr::arrow(['foo' => ['bar' => 'baz', 'foobar' => 'foobaz']]);
+        $this->assertEquals(['foo->bar' => 'baz', 'foo->foobar' => 'foobaz'], $array);
+
+        $array = Arr::arrow([]);
+        $this->assertEquals([], $array);
+
+        $array = Arr::arrow(['foo' => []]);
+        $this->assertEquals(['foo' => []], $array);
+
+        $array = Arr::arrow(['foo' => ['bar' => []]]);
+        $this->assertEquals(['foo->bar' => []], $array);
+    }
+
+    public function testUnarrow()
+    {
+        $array = Arr::unarrow([
+            'foo->bar' => 'test',
+            'foo->baz->bob' => 'Bob',
+            'foo->baz->alice' => 'Alice',
+            'foo->languages->0' => 'PHP',
+            'foo->languages->1' => 'C#',
+        ]);
+
+        $this->assertEquals([
+            'foo' => [
+                'bar' => 'test',
+                'baz' => [
+                    'bob' => 'Bob',
+                    'alice' => 'Alice'
+                ],
+                'languages' => ['PHP', 'C#'],
+            ],
+        ], $array);
+    }
+
+    public function testFlattenWith()
+    {
+        $array = Arr::flattenWith([
+            'path' => [
+                'to' => [
+                    'files' => 'somefile',
+                    'logs' => 'somelog',
+                ],
+            ],
+        ], '/');
+
+        $this->assertEquals([
+            'path/to/files' => 'somefile',
+            'path/to/logs' => 'somelog',
+        ], $array);
+    }
+
+    public function testUnflattenWith()
+    {
+        $array = Arr::unflattenWith([
+            'path/to/files' => ['somefile', 'someotherfile'],
+            'path/to/logs' => ['somelog', 'someotherlog'],
+        ], '/');
+
+        $this->assertEquals([
+            'path' => [
+                'to' => [
+                    'files' => ['somefile', 'someotherfile'],
+                    'logs' => ['somelog', 'someotherlog'],
+                ],
+            ],
+        ], $array);
+    }
+
     public function testExcept()
     {
         $array = ['name' => 'taylor', 'age' => 26];
