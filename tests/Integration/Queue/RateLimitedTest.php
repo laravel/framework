@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Integration\Queue;
 
 use Illuminate\Bus\Dispatcher;
 use Illuminate\Bus\Queueable;
+use Illuminate\Cache\Contracts\RateLimit;
 use Illuminate\Cache\RateLimiter;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Contracts\Cache\Repository as Cache;
@@ -43,7 +44,7 @@ class RateLimitedTest extends TestCase
         $cache->shouldReceive('increment')->andReturn(1);
         $cache->shouldReceive('has')->andReturn(true);
 
-        $rateLimiter = new RateLimiter($cache);
+        $rateLimiter = new RateLimiter($cache, $this->app);
         $this->app->instance(RateLimiter::class, $rateLimiter);
         $rateLimiter = $this->app->make(RateLimiter::class);
 
@@ -130,6 +131,17 @@ class RateLimitedTest extends TestCase
         $this->assertFalse($restoredRateLimited->shouldRelease);
         $this->assertSame('limiterName', $fetch('limiterName'));
         $this->assertInstanceOf(RateLimiter::class, $fetch('limiter'));
+    }
+
+    public function testItCouldBeLimitedByRateLimitImplementation()
+    {
+        $rateLimiter = $this->app->make(RateLimiter::class);
+
+        $rateLimiter->for('test', TestRateLimit::class);
+
+        $this->assertInstanceOf(RateLimit::class, $rateLimiter->limiter('test'));
+        $this->assertJobRanSuccessfully(RateLimitedTestJob::class);
+        $this->assertJobRanSuccessfully(RateLimitedTestJob::class);
     }
 
     protected function assertJobRanSuccessfully($class)
@@ -228,5 +240,13 @@ class RateLimitedDontReleaseTestJob extends RateLimitedTestJob
     public function middleware()
     {
         return [(new RateLimited('test'))->dontRelease()];
+    }
+}
+
+class TestRateLimit implements RateLimit
+{
+    public function __invoke($request)
+    {
+        return Limit::none();
     }
 }

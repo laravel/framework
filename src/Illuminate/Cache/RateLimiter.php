@@ -3,7 +3,9 @@
 namespace Illuminate\Cache;
 
 use Closure;
+use Illuminate\Cache\Contracts\RateLimit;
 use Illuminate\Contracts\Cache\Repository as Cache;
+use Illuminate\Contracts\Container\Container;
 use Illuminate\Support\InteractsWithTime;
 
 class RateLimiter
@@ -18,6 +20,13 @@ class RateLimiter
     protected $cache;
 
     /**
+     * The container instance.
+     *
+     * @var \Illuminate\Contracts\Container\Container
+     */
+    private Container $container;
+
+    /**
      * The configured limit object resolvers.
      *
      * @var array
@@ -30,19 +39,20 @@ class RateLimiter
      * @param  \Illuminate\Contracts\Cache\Repository  $cache
      * @return void
      */
-    public function __construct(Cache $cache)
+    public function __construct(Cache $cache, Container $container)
     {
         $this->cache = $cache;
+        $this->container = $container;
     }
 
     /**
      * Register a named limiter configuration.
      *
      * @param  string  $name
-     * @param  \Closure  $callback
+     * @param  \Closure|class-string<RateLimit>  $callback
      * @return $this
      */
-    public function for(string $name, Closure $callback)
+    public function for(string $name, Closure|string $callback)
     {
         $this->limiters[$name] = $callback;
 
@@ -53,11 +63,17 @@ class RateLimiter
      * Get the given named rate limiter.
      *
      * @param  string  $name
-     * @return \Closure|null
+     * @return \Closure|RateLimit|null
      */
     public function limiter(string $name)
     {
-        return $this->limiters[$name] ?? null;
+        $limiter = $this->limiters[$name] ?? null;
+
+        if (is_a($limiter, RateLimit::class, allow_string: true)) {
+            $limiter = $this->container->make($limiter);
+        }
+
+        return $limiter;
     }
 
     /**

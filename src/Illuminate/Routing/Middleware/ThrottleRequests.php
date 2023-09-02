@@ -3,6 +3,7 @@
 namespace Illuminate\Routing\Middleware;
 
 use Closure;
+use Illuminate\Cache\Contracts\RateLimit;
 use Illuminate\Cache\RateLimiter;
 use Illuminate\Cache\RateLimiting\Unlimited;
 use Illuminate\Http\Exceptions\HttpResponseException;
@@ -112,7 +113,7 @@ class ThrottleRequests
      *
      * @throws \Illuminate\Http\Exceptions\ThrottleRequestsException
      */
-    protected function handleRequestUsingNamedLimiter($request, Closure $next, $limiterName, Closure $limiter)
+    protected function handleRequestUsingNamedLimiter($request, Closure $next, $limiterName, Closure|RateLimit $limiter)
     {
         $limiterResponse = $limiter($request);
 
