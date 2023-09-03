@@ -185,9 +185,10 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
      * Dump the collection and end the script when the given condition is true.
      *
      * @param  mixed  $condition
+     * @param  mixed ...$args
      * @return never
      */
-    public function ddWhen(mixed $condition);
+    public function ddWhen(mixed $condition, ...$args);
 
     /**
      * Dump the collection.
@@ -200,9 +201,10 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
      * Dump the collection when the given condition is true.
      *
      * @param  mixed $condition
+     * @param  mixed ...$args
      * @return $this
      */
-    public function dumpWhen(mixed $condition);
+    public function dumpWhen(mixed $condition, ...$args);
 
     /**
      * Get the items that are not present in the given items.

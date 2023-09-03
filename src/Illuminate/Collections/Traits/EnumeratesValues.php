@@ -212,11 +212,12 @@ trait EnumeratesValues
      * Dump the collection and end the script when the given condition is true.
      *
      * @param  mixed  $condition
+     * @param  mixed ...$args
      * @return never|EnumeratesValues
      */
-    public function ddWhen(mixed $condition)
+    public function ddWhen(mixed $condition, ...$args)
     {
-        return $this->when($condition, fn ($items) => dd($items));
+        return $this->when($condition, fn () => $this->dd(...$args));
     }
 
     /**
@@ -240,9 +241,9 @@ trait EnumeratesValues
      *
      * @return $this
      */
-    public function dumpWhen(mixed $condition)
+    public function dumpWhen(mixed $condition, ...$args)
     {
-        return $this->when($condition, fn () => $this->dump());
+        return $this->when($condition, fn () => $this->dump(...$args));
     }
 
     /**
