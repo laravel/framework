@@ -4421,6 +4421,42 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testDumpWhenTrue($collection)
+    {
+        $log = new Collection;
+
+        VarDumper::setHandler(function ($value) use ($log) {
+            $log->add($value);
+        });
+
+        (new $collection([1, 2, 3]))->dumpWhen(true, 'one', 'two');
+
+        $this->assertSame(['one', 'two', [1, 2, 3]], $log->all());
+
+        VarDumper::setHandler(null);
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testDumpWhenFalse($collection)
+    {
+        $log = new Collection;
+
+        VarDumper::setHandler(function ($value) use ($log) {
+            $log->add($value);
+        });
+
+        (new $collection([1, 2, 3]))->dumpWhen(false, 'one', 'two');
+
+        $this->assertSame([], $log->all());
+
+        VarDumper::setHandler(null);
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testReduce($collection)
     {
         $data = new $collection([1, 2, 3]);
