@@ -209,6 +209,17 @@ trait EnumeratesValues
     }
 
     /**
+     * Dump the collection and end the script if the condition is true.
+     *
+     * @param  mixed  $condition
+     * @return never|EnumeratesValues
+     */
+    public function ddWhen(mixed $condition)
+    {
+        return $this->when($condition, fn ($items) => dd($items));
+    }
+
+    /**
      * Dump the items.
      *
      * @return $this
