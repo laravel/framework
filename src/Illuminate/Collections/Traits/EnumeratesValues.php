@@ -209,7 +209,7 @@ trait EnumeratesValues
     }
 
     /**
-     * Dump the collection and end the script if the condition is true.
+     * Dump the collection and end the script when the given condition is true.
      *
      * @param  mixed  $condition
      * @return never|EnumeratesValues
@@ -236,7 +236,7 @@ trait EnumeratesValues
     }
 
     /**
-     * Dump the collection if the condition is true.
+     * Dump the collection when the given condition is true.
      *
      * @return $this
      */
