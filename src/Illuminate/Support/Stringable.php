@@ -1208,6 +1208,17 @@ class Stringable implements JsonSerializable, ArrayAccess
     }
 
     /**
+     * Dump the string and end the script when the given condition is true.
+     *
+     * @param  mixed $condition
+     * @return never|$this
+     */
+    public function ddWhen(mixed $condition)
+    {
+        return $this->when($condition, fn () => $this->dd());
+    }
+
+    /**
      * Get the underlying string value.
      *
      * @return string
