@@ -1187,7 +1187,7 @@ class Stringable implements JsonSerializable, ArrayAccess
     /**
      * Dump the string when the given condition is true.
      *
-     * @param  mixed $condition
+     * @param  mixed  $condition
      * @return $this
      */
     public function dumpWhen(mixed $condition)
@@ -1210,7 +1210,7 @@ class Stringable implements JsonSerializable, ArrayAccess
     /**
      * Dump the string and end the script when the given condition is true.
      *
-     * @param  mixed $condition
+     * @param  mixed  $condition
      * @return never|$this
      */
     public function ddWhen(mixed $condition)
