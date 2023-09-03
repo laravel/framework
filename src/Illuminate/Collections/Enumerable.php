@@ -182,7 +182,7 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     public function dd(...$args);
 
     /**
-     * Dump the collection and end the script if the condition is true.
+     * Dump the collection and end the script when the given condition is true.
      *
      * @param  mixed  $condition
      * @return never
@@ -197,7 +197,7 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     public function dump();
 
     /**
-     * Dump the collection if the condition is true.
+     * Dump the collection when the given condition is true.
      *
      * @param  mixed $condition
      * @return $this
