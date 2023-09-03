@@ -197,6 +197,14 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     public function dump();
 
     /**
+     * Dump the collection if the condition is true.
+     *
+     * @param  mixed $condition
+     * @return $this
+     */
+    public function dumpWhen(mixed $condition);
+
+    /**
      * Get the items that are not present in the given items.
      *
      * @param  \Illuminate\Contracts\Support\Arrayable<array-key, TValue>|iterable<array-key, TValue>  $items

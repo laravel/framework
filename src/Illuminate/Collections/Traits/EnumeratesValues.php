@@ -236,6 +236,16 @@ trait EnumeratesValues
     }
 
     /**
+     * Dump the collection if the condition is true.
+     *
+     * @return $this
+     */
+    public function dumpWhen(mixed $condition)
+    {
+        return $this->when($condition, fn () => $this->dump());
+    }
+
+    /**
      * Execute a callback over each item.
      *
      * @param  callable(TValue, TKey): mixed  $callback
