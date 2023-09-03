@@ -19,7 +19,7 @@ class MySqlSchemaState extends SchemaState
     public function dump(Connection $connection, $path)
     {
         $this->executeDumpProcess($this->makeProcess(
-            $this->baseDumpCommand().' --routines --result-file="${:LARAVEL_LOAD_PATH}" --no-data'
+            $this->baseDumpCommand().' --routines --result-file="${:LARAVEL_LOAD_PATH}" --no-data --databases'
         ), $this->output, array_merge($this->baseVariables($this->connection->getConfig()), [
             'LARAVEL_LOAD_PATH' => $path,
         ]));
