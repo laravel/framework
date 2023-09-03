@@ -7,6 +7,7 @@ use Illuminate\Support\Str;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\UuidInterface;
 use ReflectionClass;
+use Symfony\Component\VarDumper\VarDumper;
 
 class SupportStrTest extends TestCase
 {
@@ -1158,6 +1159,36 @@ class SupportStrTest extends TestCase
     public function testPasswordCreation()
     {
         $this->assertTrue(strlen(Str::password()) === 32);
+    }
+
+    public function testDumpWhenTrue()
+    {
+        $log = Str::of('');
+
+        VarDumper::setHandler(function ($value) use (&$log) {
+            $log = $log->append($value);
+        });
+
+        Str::of('Laravel')->dumpWhen(true);
+
+        $this->assertSame('Laravel', $log->toString());
+
+        VarDumper::setHandler(null);
+    }
+
+    public function testDumpWhenFalse()
+    {
+        $log = Str::of('');
+
+        VarDumper::setHandler(function ($value) use (&$log) {
+            $log = $log->append($value);
+        });
+
+        Str::of('Laravel')->dumpWhen(fn () => false);
+
+        $this->assertSame('', $log->toString());
+
+        VarDumper::setHandler(null);
     }
 }
 
