@@ -13,7 +13,6 @@ use Illuminate\Foundation\Exceptions\Handler;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithExceptionHandling;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Log\Logger;
 use Illuminate\Routing\Redirector;
 use Illuminate\Routing\ResponseFactory;
 use Illuminate\Support\MessageBag;
@@ -34,7 +33,6 @@ use Symfony\Component\HttpFoundation\Exception\SuspiciousOperationException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
-use Throwable;
 
 class FoundationExceptionsHandlerTest extends TestCase
 {
