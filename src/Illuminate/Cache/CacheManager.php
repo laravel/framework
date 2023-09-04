@@ -260,7 +260,7 @@ class CacheManager implements FactoryContract
 
         if (! empty($config['key']) && ! empty($config['secret'])) {
             $dynamoConfig['credentials'] = Arr::only(
-                $config, ['key', 'secret', 'token']
+                $config, ['key', 'secret']
             );
         }
 
