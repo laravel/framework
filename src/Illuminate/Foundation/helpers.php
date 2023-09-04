@@ -106,10 +106,12 @@ if (! function_exists('action')) {
 if (! function_exists('app')) {
     /**
      * Get the available container instance.
+     * 
+     * @template TAbstract
      *
-     * @param  string|null  $abstract
+     * @param  string|class-string<TAbstract>|null  $abstract
      * @param  array  $parameters
-     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Foundation\Application|mixed
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Foundation\Application|TAbstract|mixed
      */
     function app($abstract = null, array $parameters = [])
     {
@@ -752,10 +754,12 @@ if (! function_exists('rescue')) {
 if (! function_exists('resolve')) {
     /**
      * Resolve a service from the container.
+     * 
+     * @template TAbstract
      *
-     * @param  string  $name
+     * @param  string|class-string<TAbstract>  $name
      * @param  array  $parameters
-     * @return mixed
+     * @return TAbstract|mixed
      */
     function resolve($name, array $parameters = [])
     {
