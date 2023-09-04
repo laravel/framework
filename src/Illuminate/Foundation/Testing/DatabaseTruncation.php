@@ -98,7 +98,7 @@ trait DatabaseTruncation
      * @param  string  $table
      * @return string
      */
-    protected function withoutTablePrefix(ConnectionInterface $connection, string $table): string
+    protected function withoutTablePrefix(ConnectionInterface $connection, string $table)
     {
         $prefix = $connection->getTablePrefix();
 
