@@ -264,7 +264,7 @@ class CacheManager implements FactoryContract
             );
         }
 
-        return new DynamoDbClient($dynamoConfig);
+        return new DynamoDbClient(Arr::except($dynamoConfig, ['token']));
     }
 
     /**
