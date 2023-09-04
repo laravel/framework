@@ -253,7 +253,25 @@ class Mailer implements MailerContract, MailQueueContract
 
         $data['message'] = $this->createMessage();
 
-        return $this->renderView($view ?: $plain, $data);
+        $renderedView = $this->renderView($view ?: $plain, $data);
+
+        $attachments = $data['message']->getSymfonyMessage()->getAttachments();
+
+        //search all images to replace cids by data-uris to show in browser
+        if(preg_match_all('/<img.+?src=[\'"]cid:([^\'"]+)[\'"].*?>/i', $renderedView, $matches))
+        {
+            $images = array_unique($matches[1]);
+            foreach($images as $image){
+                foreach ($attachments as $attachment){
+                    if($attachment->getFilename() == $image){
+                        $renderedView = str_replace('cid:'.$image, 'data:'.$attachment->getContentType().';base64,'.$attachment->bodyToString(), $renderedView);
+                        break;
+                    }
+                }
+            }
+        }
+
+        return $renderedView;
     }
 
     /**
