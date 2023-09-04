@@ -258,7 +258,7 @@ class Mailer implements MailerContract, MailQueueContract
         $attachments = $data['message']->getSymfonyMessage()->getAttachments();
 
         //search all images to replace cids by data-uris to show in browser
-        if(preg_match_all('/<img.+?src=[\'"]cid:([^\'"]+)[\'"].*?>/i', $renderedView, $matches)) {
+        if (preg_match_all('/<img.+?src=[\'"]cid:([^\'"]+)[\'"].*?>/i', $renderedView, $matches)) {
             $images = array_unique($matches[1]);
             foreach ($images as $image) {
                 foreach ($attachments as $attachment) {
