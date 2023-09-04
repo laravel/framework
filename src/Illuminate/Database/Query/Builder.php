@@ -2655,7 +2655,7 @@ class Builder implements BuilderContract
      *
      * @param  int|string  $id
      * @param  array|string  $columns
-     * @return mixed|static
+     * @return mixed
      */
     public function find($id, $columns = ['*'])
     {
@@ -2668,7 +2668,7 @@ class Builder implements BuilderContract
      * @param  mixed  $id
      * @param  \Closure|array|string  $columns
      * @param  \Closure|null  $callback
-     * @return mixed|static
+     * @return mixed
      */
     public function findOr($id, $columns = ['*'], Closure $callback = null)
     {

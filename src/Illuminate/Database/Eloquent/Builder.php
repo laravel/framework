@@ -151,7 +151,7 @@ class Builder implements BuilderContract
      * Create and return an un-saved model instance.
      *
      * @param  array  $attributes
-     * @return \Illuminate\Database\Eloquent\Model|static
+     * @return \Illuminate\Database\Eloquent\Model
      */
     public function make(array $attributes = [])
     {
@@ -311,7 +311,7 @@ class Builder implements BuilderContract
      * @param  mixed  $operator
      * @param  mixed  $value
      * @param  string  $boolean
-     * @return \Illuminate\Database\Eloquent\Model|static|null
+     * @return \Illuminate\Database\Eloquent\Model|null
      */
     public function firstWhere($column, $operator = null, $value = null, $boolean = 'and')
     {
@@ -436,7 +436,7 @@ class Builder implements BuilderContract
      *
      * @param  mixed  $id
      * @param  array|string  $columns
-     * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection|static[]|static|null
+     * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection|null
      */
     public function find($id, $columns = ['*'])
     {
@@ -470,7 +470,7 @@ class Builder implements BuilderContract
      *
      * @param  mixed  $id
      * @param  array|string  $columns
-     * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection|static|static[]
+     * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection
      *
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException<\Illuminate\Database\Eloquent\Model>
      */
@@ -504,7 +504,7 @@ class Builder implements BuilderContract
      *
      * @param  mixed  $id
      * @param  array|string  $columns
-     * @return \Illuminate\Database\Eloquent\Model|static
+     * @return \Illuminate\Database\Eloquent\Model
      */
     public function findOrNew($id, $columns = ['*'])
     {
@@ -521,7 +521,7 @@ class Builder implements BuilderContract
      * @param  mixed  $id
      * @param  \Closure|array|string  $columns
      * @param  \Closure|null  $callback
-     * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection|static[]|static|mixed
+     * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection|mixed
      */
     public function findOr($id, $columns = ['*'], Closure $callback = null)
     {
@@ -543,7 +543,7 @@ class Builder implements BuilderContract
      *
      * @param  array  $attributes
      * @param  array  $values
-     * @return \Illuminate\Database\Eloquent\Model|static
+     * @return \Illuminate\Database\Eloquent\Model
      */
     public function firstOrNew(array $attributes = [], array $values = [])
     {
@@ -559,7 +559,7 @@ class Builder implements BuilderContract
      *
      * @param  array  $attributes
      * @param  array  $values
-     * @return \Illuminate\Database\Eloquent\Model|static
+     * @return \Illuminate\Database\Eloquent\Model
      */
     public function firstOrCreate(array $attributes = [], array $values = [])
     {
@@ -591,7 +591,7 @@ class Builder implements BuilderContract
      *
      * @param  array  $attributes
      * @param  array  $values
-     * @return \Illuminate\Database\Eloquent\Model|static
+     * @return \Illuminate\Database\Eloquent\Model
      */
     public function updateOrCreate(array $attributes, array $values = [])
     {
@@ -606,7 +606,7 @@ class Builder implements BuilderContract
      * Execute the query and get the first result or throw an exception.
      *
      * @param  array|string  $columns
-     * @return \Illuminate\Database\Eloquent\Model|static
+     * @return \Illuminate\Database\Eloquent\Model
      *
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException<\Illuminate\Database\Eloquent\Model>
      */
@@ -624,7 +624,7 @@ class Builder implements BuilderContract
      *
      * @param  \Closure|array|string  $columns
      * @param  \Closure|null  $callback
-     * @return \Illuminate\Database\Eloquent\Model|static|mixed
+     * @return \Illuminate\Database\Eloquent\Model|mixed
      */
     public function firstOr($columns = ['*'], Closure $callback = null)
     {
@@ -709,7 +709,7 @@ class Builder implements BuilderContract
      * Execute the query as a "select" statement.
      *
      * @param  array|string  $columns
-     * @return \Illuminate\Database\Eloquent\Collection|static[]
+     * @return \Illuminate\Database\Eloquent\Collection
      */
     public function get($columns = ['*'])
     {
@@ -729,7 +729,7 @@ class Builder implements BuilderContract
      * Get the hydrated models without eager loading.
      *
      * @param  array|string  $columns
-     * @return \Illuminate\Database\Eloquent\Model[]|static[]
+     * @return \Illuminate\Database\Eloquent\Model[]
      */
     public function getModels($columns = ['*'])
     {
@@ -1530,7 +1530,7 @@ class Builder implements BuilderContract
      * Create a new instance of the model being queried.
      *
      * @param  array  $attributes
-     * @return \Illuminate\Database\Eloquent\Model|static
+     * @return \Illuminate\Database\Eloquent\Model
      */
     public function newModelInstance($attributes = [])
     {
@@ -1818,7 +1818,7 @@ class Builder implements BuilderContract
     /**
      * Get the model instance being queried.
      *
-     * @return \Illuminate\Database\Eloquent\Model|static
+     * @return \Illuminate\Database\Eloquent\Model
      */
     public function getModel()
     {
