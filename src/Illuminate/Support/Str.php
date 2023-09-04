@@ -44,18 +44,18 @@ class Str
     protected static $studlyCache = [];
 
     /**
-     * The callback that should be used to generate ULIDs.
-     *
-     * @var callable|null
-     */
-    protected static $ulidFactory;
-
-    /**
      * The callback that should be used to generate UUIDs.
      *
      * @var callable|null
      */
     protected static $uuidFactory;
+
+    /**
+     * The callback that should be used to generate ULIDs.
+     *
+     * @var callable|null
+     */
+    protected static $ulidFactory;
 
     /**
      * The callback that should be used to generate random strings.
