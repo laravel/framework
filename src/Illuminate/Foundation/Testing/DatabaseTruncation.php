@@ -85,8 +85,8 @@ trait DatabaseTruncation
                 fn ($tables) => $tables->intersect($this->tablesToTruncate),
                 fn ($tables) => $tables->diff($this->exceptTables($name))
             )
-            ->filter(fn ($table) => $connection->table($this->removeTablePrefix($connection, $table))->exists())
-            ->each(fn ($table) => $connection->table($this->removeTablePrefix($connection, $table))->truncate());
+            ->filter(fn ($table) => $connection->table($this->withoutTablePrefix($connection, $table))->exists())
+            ->each(fn ($table) => $connection->table($this->withoutTablePrefix($connection, $table))->truncate());
 
         $connection->setEventDispatcher($dispatcher);
     }
@@ -98,19 +98,13 @@ trait DatabaseTruncation
      * @param  string  $table
      * @return string
      */
-    protected function removeTablePrefix(ConnectionInterface $connection, string $table): string
+    protected function withoutTablePrefix(ConnectionInterface $connection, string $table): string
     {
-        // Retrieve the table prefix associated with the connection
         $prefix = $connection->getTablePrefix();
 
-        // Check if the table name contains the prefix
-        if (strpos($table, $prefix) === 0) {
-            // If the prefix is found, remove it from the table name
-            return substr($table, strlen($prefix));
-        }
-
-        // If no prefix is found, return the original table name
-        return $table;
+        return strpos($table, $prefix) === 0
+            ? substr($table, strlen($prefix))
+            : $table;
     }
 
     /**
