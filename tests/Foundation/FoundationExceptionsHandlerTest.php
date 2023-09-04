@@ -13,6 +13,7 @@ use Illuminate\Foundation\Exceptions\Handler;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithExceptionHandling;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Log\Logger;
 use Illuminate\Routing\Redirector;
 use Illuminate\Routing\ResponseFactory;
 use Illuminate\Support\MessageBag;
@@ -33,6 +34,7 @@ use Symfony\Component\HttpFoundation\Exception\SuspiciousOperationException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Throwable;
 
 class FoundationExceptionsHandlerTest extends TestCase
 {
@@ -435,6 +437,40 @@ class FoundationExceptionsHandlerTest extends TestCase
         if ($testFailed) {
             Assert::fail('assertThrows failed: non matching message are thrown.');
         }
+    }
+
+    public function testItReportsDuplicateExceptions()
+    {
+        $reported = [];
+        $this->handler->reportable(function (\Throwable $e) use (&$reported) {
+            $reported[] = $e;
+
+            return false;
+        });
+
+        $this->handler->report($one = new RuntimeException('foo'));
+        $this->handler->report($one);
+        $this->handler->report($two = new RuntimeException('foo'));
+
+        $this->assertSame($reported, [$one, $one, $two]);
+    }
+
+    public function testItCanDedupeExceptions()
+    {
+        $reported = [];
+        $e = new RuntimeException('foo');
+        $this->handler->reportable(function (\Throwable $e) use (&$reported) {
+            $reported[] = $e;
+
+            return false;
+        });
+
+        $this->handler->dedupeReporting();
+        $this->handler->report($one = new RuntimeException('foo'));
+        $this->handler->report($one);
+        $this->handler->report($two = new RuntimeException('foo'));
+
+        $this->assertSame($reported, [$one, $two]);
     }
 }
 
