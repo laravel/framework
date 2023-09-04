@@ -235,6 +235,19 @@ class Str
     }
 
     /**
+     * Given a multibyte string, return an array of its characters.
+     *
+     * @param  string  $string  The string to split into characters or chunks.
+     * @param  int  $length  If specified, each element of the returned array will be composed of multiple characters instead of a single character.
+     * @param  string|null  $encoding  The character encoding (default: null, which uses the internal encoding).
+     * @return array returns an array of strings.
+     */
+    public static function chunk(string $string, int $length = 1, ?string $encoding = null)
+    {
+        return mb_str_split($string, $length, $encoding);
+    }
+
+    /**
      * Determine if a given string contains a given substring.
      *
      * @param  string  $haystack
