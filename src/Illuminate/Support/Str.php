@@ -239,7 +239,7 @@ class Str
      *
      * @param  string  $string  The string to split into characters or chunks.
      * @param  int  $length  If specified, each element of the returned array will be composed of multiple characters instead of a single character.
-     * @param  string|null  $encoding  The character encoding (default: UTF-8, If it is null, the function will use the internal encoding.
+     * @param  string|null  $encoding  The character encoding (default: UTF-8, If it is null, the function will use the internal encoding).
      * @return array returns an array of strings.
      */
     public static function chunk(string $string, int $length = 1, ?string $encoding = 'UTF-8')
