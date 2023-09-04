@@ -1155,6 +1155,111 @@ class SupportStrTest extends TestCase
         }
     }
 
+    public function testItCanFreezeUlids()
+    {
+        $this->assertNotSame((string) Str::ulid(), (string) Str::ulid());
+        $this->assertNotSame(Str::ulid(), Str::ulid());
+
+        $ulid = Str::freezeUlids();
+
+        $this->assertSame($ulid, Str::ulid());
+        $this->assertSame(Str::ulid(), Str::ulid());
+        $this->assertSame((string) $ulid, (string) Str::ulid());
+        $this->assertSame((string) Str::ulid(), (string) Str::ulid());
+
+        Str::createUlidsNormally();
+
+        $this->assertNotSame(Str::ulid(), Str::ulid());
+        $this->assertNotSame((string) Str::ulid(), (string) Str::ulid());
+    }
+
+    public function testItCanFreezeUlidsInAClosure()
+    {
+        $ulids = [];
+
+        $ulid = Str::freezeUlids(function ($ulid) use (&$ulids) {
+            $ulids[] = $ulid;
+            $ulids[] = Str::ulid();
+            $ulids[] = Str::ulid();
+        });
+
+        $this->assertSame($ulid, $ulids[0]);
+        $this->assertSame((string) $ulid, (string) $ulids[0]);
+        $this->assertSame((string) $ulids[0], (string) $ulids[1]);
+        $this->assertSame($ulids[0], $ulids[1]);
+        $this->assertSame((string) $ulids[0], (string) $ulids[1]);
+        $this->assertSame($ulids[1], $ulids[2]);
+        $this->assertSame((string) $ulids[1], (string) $ulids[2]);
+        $this->assertNotSame(Str::ulid(), Str::ulid());
+        $this->assertNotSame((string) Str::ulid(), (string) Str::ulid());
+
+        Str::createUlidsNormally();
+    }
+
+    public function testItCreatesUlidsNormallyAfterFailureWithinFreezeMethod()
+    {
+        try {
+            Str::freezeUlids(function () {
+                Str::createUlidsUsing(fn () => Str::of('1234'));
+                $this->assertSame('1234', (string) Str::ulid());
+                throw new \Exception('Something failed');
+            });
+        } catch (\Exception) {
+            $this->assertNotSame('1234', (string) Str::ulid());
+        }
+    }
+
+    public function testItCanSpecifyASequenceOfUlidsToUtilise()
+    {
+        Str::createUlidsUsingSequence([
+            0 => ($zeroth = Str::ulid()),
+            1 => ($first = Str::ulid()),
+            // just generate a random one here...
+            3 => ($third = Str::ulid()),
+            // continue to generate random ulids...
+        ]);
+
+        $retrieved = Str::ulid();
+        $this->assertSame($zeroth, $retrieved);
+        $this->assertSame((string) $zeroth, (string) $retrieved);
+
+        $retrieved = Str::ulid();
+        $this->assertSame($first, $retrieved);
+        $this->assertSame((string) $first, (string) $retrieved);
+
+        $retrieved = Str::ulid();
+        $this->assertFalse(in_array($retrieved, [$zeroth, $first, $third], true));
+        $this->assertFalse(in_array((string) $retrieved, [(string) $zeroth, (string) $first, (string) $third], true));
+
+        $retrieved = Str::ulid();
+        $this->assertSame($third, $retrieved);
+        $this->assertSame((string) $third, (string) $retrieved);
+
+        $retrieved = Str::ulid();
+        $this->assertFalse(in_array($retrieved, [$zeroth, $first, $third], true));
+        $this->assertFalse(in_array((string) $retrieved, [(string) $zeroth, (string) $first, (string) $third], true));
+
+        Str::createUlidsNormally();
+    }
+
+    public function testItCanSpecifyAFallbackForAUlidSequence()
+    {
+        Str::createUlidsUsingSequence(
+            [Str::ulid(), Str::ulid()],
+            fn () => throw new Exception('Out of Ulids'),
+        );
+        Str::ulid();
+        Str::ulid();
+
+        try {
+            $this->expectExceptionMessage('Out of Ulids');
+            Str::ulid();
+            $this->fail();
+        } finally {
+            Str::createUlidsNormally();
+        }
+    }
+
     public function testPasswordCreation()
     {
         $this->assertTrue(strlen(Str::password()) === 32);
