@@ -42,7 +42,7 @@ class BcryptHasher extends AbstractHasher implements HasherContract
      *
      * @throws \RuntimeException
      */
-    public function make($value, array $options = [])
+    public function make(string $value, array $options = []): string
     {
         $hash = password_hash($value, PASSWORD_BCRYPT, [
             'cost' => $this->cost($options),
@@ -58,14 +58,13 @@ class BcryptHasher extends AbstractHasher implements HasherContract
     /**
      * Check the given plain value against a hash.
      *
-     * @param  string  $value
-     * @param  string  $hashedValue
-     * @param  array  $options
+     * @param string $value
+     * @param string|null $hashedValue
+     * @param array $options
      * @return bool
      *
-     * @throws \RuntimeException
      */
-    public function check($value, $hashedValue, array $options = [])
+    public function check(string $value, string $hashedValue = null, array $options = []): bool
     {
         if ($this->verifyAlgorithm && $this->info($hashedValue)['algoName'] !== 'bcrypt') {
             throw new RuntimeException('This password does not use the Bcrypt algorithm.');
@@ -81,7 +80,7 @@ class BcryptHasher extends AbstractHasher implements HasherContract
      * @param  array  $options
      * @return bool
      */
-    public function needsRehash($hashedValue, array $options = [])
+    public function needsRehash(string $hashedValue, array $options = []): bool
     {
         return password_needs_rehash($hashedValue, PASSWORD_BCRYPT, [
             'cost' => $this->cost($options),

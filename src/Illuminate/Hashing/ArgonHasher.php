@@ -58,7 +58,7 @@ class ArgonHasher extends AbstractHasher implements HasherContract
      *
      * @throws \RuntimeException
      */
-    public function make($value, array $options = [])
+    public function make(string $value, array $options = []): string
     {
         $hash = @password_hash($value, $this->algorithm(), [
             'memory_cost' => $this->memory($options),
@@ -76,9 +76,9 @@ class ArgonHasher extends AbstractHasher implements HasherContract
     /**
      * Get the algorithm that should be used for hashing.
      *
-     * @return int
+     * @return string
      */
-    protected function algorithm()
+    protected function algorithm() : string
     {
         return PASSWORD_ARGON2I;
     }
@@ -86,14 +86,13 @@ class ArgonHasher extends AbstractHasher implements HasherContract
     /**
      * Check the given plain value against a hash.
      *
-     * @param  string  $value
-     * @param  string  $hashedValue
-     * @param  array  $options
+     * @param string $value
+     * @param string|null $hashedValue
+     * @param array $options
      * @return bool
      *
-     * @throws \RuntimeException
      */
-    public function check($value, $hashedValue, array $options = [])
+    public function check(string $value, string $hashedValue = null, array $options = []): bool
     {
         if ($this->verifyAlgorithm && $this->info($hashedValue)['algoName'] !== 'argon2i') {
             throw new RuntimeException('This password does not use the Argon2i algorithm.');
@@ -109,7 +108,7 @@ class ArgonHasher extends AbstractHasher implements HasherContract
      * @param  array  $options
      * @return bool
      */
-    public function needsRehash($hashedValue, array $options = [])
+    public function needsRehash(string $hashedValue, array $options = []): bool
     {
         return password_needs_rehash($hashedValue, $this->algorithm(), [
             'memory_cost' => $this->memory($options),
@@ -124,7 +123,7 @@ class ArgonHasher extends AbstractHasher implements HasherContract
      * @param  int  $memory
      * @return $this
      */
-    public function setMemory(int $memory)
+    public function setMemory(int $memory): static
     {
         $this->memory = $memory;
 
@@ -137,7 +136,7 @@ class ArgonHasher extends AbstractHasher implements HasherContract
      * @param  int  $time
      * @return $this
      */
-    public function setTime(int $time)
+    public function setTime(int $time): static
     {
         $this->time = $time;
 
@@ -150,7 +149,7 @@ class ArgonHasher extends AbstractHasher implements HasherContract
      * @param  int  $threads
      * @return $this
      */
-    public function setThreads(int $threads)
+    public function setThreads(int $threads): static
     {
         $this->threads = $threads;
 
@@ -163,7 +162,7 @@ class ArgonHasher extends AbstractHasher implements HasherContract
      * @param  array  $options
      * @return int
      */
-    protected function memory(array $options)
+    protected function memory(array $options): int
     {
         return $options['memory'] ?? $this->memory;
     }
@@ -174,7 +173,7 @@ class ArgonHasher extends AbstractHasher implements HasherContract
      * @param  array  $options
      * @return int
      */
-    protected function time(array $options)
+    protected function time(array $options): int
     {
         return $options['time'] ?? $this->time;
     }
@@ -185,7 +184,7 @@ class ArgonHasher extends AbstractHasher implements HasherContract
      * @param  array  $options
      * @return int
      */
-    protected function threads(array $options)
+    protected function threads(array $options): int
     {
         if (defined('PASSWORD_ARGON2_PROVIDER') && PASSWORD_ARGON2_PROVIDER === 'sodium') {
             return 1;

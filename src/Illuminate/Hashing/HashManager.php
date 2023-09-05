@@ -6,16 +6,16 @@ use Illuminate\Contracts\Hashing\Hasher;
 use Illuminate\Support\Manager;
 
 /**
- * @mixin \Illuminate\Contracts\Hashing\Hasher
+ * @mixin Hasher
  */
 class HashManager extends Manager implements Hasher
 {
     /**
      * Create an instance of the Bcrypt hash Driver.
      *
-     * @return \Illuminate\Hashing\BcryptHasher
+     * @return BcryptHasher
      */
-    public function createBcryptDriver()
+    public function createBcryptDriver(): BcryptHasher
     {
         return new BcryptHasher($this->config->get('hashing.bcrypt') ?? []);
     }
@@ -23,9 +23,9 @@ class HashManager extends Manager implements Hasher
     /**
      * Create an instance of the Argon2i hash Driver.
      *
-     * @return \Illuminate\Hashing\ArgonHasher
+     * @return ArgonHasher
      */
-    public function createArgonDriver()
+    public function createArgonDriver(): ArgonHasher
     {
         return new ArgonHasher($this->config->get('hashing.argon') ?? []);
     }
@@ -33,9 +33,9 @@ class HashManager extends Manager implements Hasher
     /**
      * Create an instance of the Argon2id hash Driver.
      *
-     * @return \Illuminate\Hashing\Argon2IdHasher
+     * @return Argon2IdHasher
      */
-    public function createArgon2idDriver()
+    public function createArgon2idDriver(): Argon2IdHasher
     {
         return new Argon2IdHasher($this->config->get('hashing.argon') ?? []);
     }
@@ -43,10 +43,10 @@ class HashManager extends Manager implements Hasher
     /**
      * Get information about the given hashed value.
      *
-     * @param  string  $hashedValue
+     * @param string $hashedValue
      * @return array
      */
-    public function info($hashedValue)
+    public function info(string $hashedValue): array
     {
         return $this->driver()->info($hashedValue);
     }
@@ -54,11 +54,11 @@ class HashManager extends Manager implements Hasher
     /**
      * Hash the given value.
      *
-     * @param  string  $value
-     * @param  array  $options
+     * @param string $value
+     * @param array $options
      * @return string
      */
-    public function make($value, array $options = [])
+    public function make(string $value, array $options = []): string
     {
         return $this->driver()->make($value, $options);
     }
@@ -66,12 +66,12 @@ class HashManager extends Manager implements Hasher
     /**
      * Check the given plain value against a hash.
      *
-     * @param  string  $value
-     * @param  string  $hashedValue
-     * @param  array  $options
+     * @param string $value
+     * @param string|null $hashedValue
+     * @param array $options
      * @return bool
      */
-    public function check($value, $hashedValue, array $options = [])
+    public function check(string $value, string $hashedValue = null, array $options = []): bool
     {
         return $this->driver()->check($value, $hashedValue, $options);
     }
@@ -79,11 +79,11 @@ class HashManager extends Manager implements Hasher
     /**
      * Check if the given hash has been hashed using the given options.
      *
-     * @param  string  $hashedValue
-     * @param  array  $options
+     * @param string $hashedValue
+     * @param array $options
      * @return bool
      */
-    public function needsRehash($hashedValue, array $options = [])
+    public function needsRehash(string $hashedValue, array $options = []): bool
     {
         return $this->driver()->needsRehash($hashedValue, $options);
     }
@@ -91,10 +91,10 @@ class HashManager extends Manager implements Hasher
     /**
      * Determine if a given string is already hashed.
      *
-     * @param  string  $value
+     * @param string $value
      * @return bool
      */
-    public function isHashed($value)
+    public function isHashed(string $value): bool
     {
         return password_get_info($value)['algo'] !== null;
     }
@@ -104,7 +104,7 @@ class HashManager extends Manager implements Hasher
      *
      * @return string
      */
-    public function getDefaultDriver()
+    public function getDefaultDriver(): string
     {
         return $this->config->get('hashing.driver', 'bcrypt');
     }

@@ -7,36 +7,36 @@ interface Hasher
     /**
      * Get information about the given hashed value.
      *
-     * @param  string  $hashedValue
+     * @param string $hashedValue
      * @return array
      */
-    public function info($hashedValue);
+    public function info(string $hashedValue): array;
 
     /**
      * Hash the given value.
      *
-     * @param  string  $value
-     * @param  array  $options
+     * @param string $value
+     * @param array $options
      * @return string
      */
-    public function make($value, array $options = []);
+    public function make(string $value, array $options = []): string;
 
     /**
      * Check the given plain value against a hash.
      *
-     * @param  string  $value
-     * @param  string  $hashedValue
-     * @param  array  $options
+     * @param string $value
+     * @param string|null $hashedValue
+     * @param array $options
      * @return bool
      */
-    public function check($value, $hashedValue, array $options = []);
+    public function check(string $value, string $hashedValue = null, array $options = []): bool;
 
     /**
      * Check if the given hash has been hashed using the given options.
      *
-     * @param  string  $hashedValue
-     * @param  array  $options
+     * @param string $hashedValue
+     * @param array $options
      * @return bool
      */
-    public function needsRehash($hashedValue, array $options = []);
+    public function needsRehash(string $hashedValue, array $options = []): bool;
 }
