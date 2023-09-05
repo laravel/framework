@@ -355,6 +355,21 @@ class DatabaseSchemaBlueprintTest extends TestCase
         ], $blueprint->toSql($connection, new MySqlGrammar));
     }
 
+    public function testGenerateRelationshipNullableColumnWithIncrementalModel()
+    {
+        $base = new Blueprint('posts', function ($table) {
+            $table->nullableForeignIdFor('Illuminate\Foundation\Auth\User');
+        });
+
+        $connection = m::mock(Connection::class);
+
+        $blueprint = clone $base;
+
+        $this->assertEquals([
+            'alter table `posts` add `user_id` bigint unsigned null',
+        ], $blueprint->toSql($connection, new MySqlGrammar));
+    }
+
     public function testGenerateRelationshipColumnWithUuidModel()
     {
         require_once __DIR__.'/stubs/EloquentModelUuidStub.php';
@@ -369,6 +384,23 @@ class DatabaseSchemaBlueprintTest extends TestCase
 
         $this->assertEquals([
             'alter table `posts` add `eloquent_model_uuid_stub_id` char(36) not null',
+        ], $blueprint->toSql($connection, new MySqlGrammar));
+    }
+
+    public function testGenerateRelationshipNullableColumnWithUuidModel()
+    {
+        require_once __DIR__.'/stubs/EloquentModelUuidStub.php';
+
+        $base = new Blueprint('posts', function ($table) {
+            $table->nullableForeignIdFor('EloquentModelUuidStub');
+        });
+
+        $connection = m::mock(Connection::class);
+
+        $blueprint = clone $base;
+
+        $this->assertEquals([
+            'alter table `posts` add `eloquent_model_uuid_stub_id` char(36) null',
         ], $blueprint->toSql($connection, new MySqlGrammar));
     }
 

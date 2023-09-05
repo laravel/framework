@@ -955,6 +955,18 @@ class Blueprint
     }
 
     /**
+     * Create a nullable foreign ID column for the given model.
+     *
+     * @param  string  $model
+     * @param  string|null  $column
+     * @return \Illuminate\Database\Schema\ColumnDefinition
+     */
+    public function nullableForeignIdFor($model, $column = null)
+    {
+        return $this->foreignIdFor($model, $column)->nullable();
+    }
+
+    /**
      * Create a new float column on the table.
      *
      * @param  string  $column
