@@ -7,6 +7,7 @@ use Illuminate\Database\Connection;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\ForeignIdColumnDefinition;
 use Illuminate\Database\Schema\Grammars\SQLiteGrammar;
+use Illuminate\Tests\Database\stubs\TestEnum;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
@@ -508,6 +509,16 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
 
         $this->assertCount(1, $statements);
         $this->assertSame('alter table "users" add column "role" varchar check ("role" in (\'member\', \'admin\')) not null', $statements[0]);
+    }
+
+    public function testAddingEnumUsingPhpEnum()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->enum('role', TestEnum::class);
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table "users" add column "role" varchar check ("role" in (\'test\')) not null', $statements[0]);
     }
 
     public function testAddingJson()

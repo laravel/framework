@@ -7,6 +7,7 @@ use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\ForeignIdColumnDefinition;
 use Illuminate\Database\Schema\Grammars\MySqlGrammar;
+use Illuminate\Tests\Database\stubs\TestEnum;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
@@ -789,6 +790,16 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
 
         $this->assertCount(1, $statements);
         $this->assertSame('alter table `users` add `role` enum(\'member\', \'admin\') not null', $statements[0]);
+    }
+
+    public function testAddingEnumUsingPhpEnum()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->enum('role', TestEnum::class);
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table `users` add `role` enum(\'test\') not null', $statements[0]);
     }
 
     public function testAddingSet()
