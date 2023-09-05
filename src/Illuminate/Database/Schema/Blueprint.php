@@ -1055,7 +1055,7 @@ class Blueprint
      */
     public function enum($column, array|string $allowed)
     {
-        if (is_string($allowed) && enum_exists($allowed) && method_exists($allowed, 'tryFrom')) {
+        if (is_string($allowed) && enum_exists($allowed) && method_exists($allowed, 'cases')) {
             $allowed = array_map(fn ($case) => $case->value, $allowed::cases());
         }
 
