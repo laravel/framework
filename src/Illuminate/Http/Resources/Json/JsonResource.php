@@ -129,7 +129,7 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
             return [];
         }
 
-        return is_array($this->resource)
+        return is_array($this->resource) || $this->resource instanceof JsonSerializable
             ? $this->resource
             : $this->resource->toArray();
     }
