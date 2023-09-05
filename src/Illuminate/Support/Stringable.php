@@ -547,11 +547,12 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
      * Call the given callback and return a new string.
      *
      * @param  callable  $callback
+     * @param  mixed  $args
      * @return static
      */
-    public function pipe(callable $callback)
+    public function pipe(callable $callback, ...$args)
     {
-        return new static($callback($this));
+        return new static($callback($this, ...$args));
     }
 
     /**
