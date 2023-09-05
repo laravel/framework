@@ -264,6 +264,10 @@ class CacheManager implements FactoryContract
             );
         }
 
+        if (! empty($config['token'])) {
+            $dynamoConfig['credentials']['token'] = $config['token'];
+        }
+
         return new DynamoDbClient($dynamoConfig);
     }
 
