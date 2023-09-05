@@ -291,6 +291,7 @@ class SupportStrTest extends TestCase
      */
     public function testStrContains($haystack, $needles, $expected, $ignoreCase = false)
     {
+        error_reporting(E_ALL);
         $this->assertEquals($expected, Str::contains($haystack, $needles, $ignoreCase));
     }
 
@@ -984,6 +985,7 @@ class SupportStrTest extends TestCase
             ['Taylor', ['xxx'], false],
             ['Taylor', '', false],
             ['', '', false],
+            [null, 'xxx', false],
         ];
     }
 
