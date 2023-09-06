@@ -463,7 +463,7 @@ class FoundationExceptionsHandlerTest extends TestCase
             return false;
         });
 
-        $this->handler->deduplicateReporting();
+        $this->handler->dontReportDuplicates();
         $this->handler->report($one = new RuntimeException('foo'));
         $this->handler->report($one);
         $this->handler->report($two = new RuntimeException('foo'));

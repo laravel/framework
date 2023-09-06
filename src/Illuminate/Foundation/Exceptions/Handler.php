@@ -810,6 +810,18 @@ class Handler implements ExceptionHandlerContract
     }
 
     /**
+     * Do not report duplicate exceptions.
+     *
+     * @return $this
+     */
+    public function dontReportDuplicates()
+    {
+        $this->deduplicateReporting = true;
+
+        return $this;
+    }
+
+    /**
      * Determine if the given exception is an HTTP exception.
      *
      * @param  \Throwable  $e
@@ -818,17 +830,5 @@ class Handler implements ExceptionHandlerContract
     protected function isHttpException(Throwable $e)
     {
         return $e instanceof HttpExceptionInterface;
-    }
-
-    /**
-     * Do not report duplicate exceptions.
-     *
-     * @return $this
-     */
-    public function deduplicateReporting()
-    {
-        $this->deduplicateReporting = true;
-
-        return $this;
     }
 }
