@@ -136,7 +136,7 @@ class BelongsToMany extends Relation
      *
      * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @param  \Illuminate\Database\Eloquent\Model  $parent
-     * @param  string  $table
+     * @param  string|class-string<\Illuminate\Database\Eloquent\Model>  $table
      * @param  string  $foreignPivotKey
      * @param  string  $relatedPivotKey
      * @param  string  $parentKey
@@ -648,16 +648,16 @@ class BelongsToMany extends Relation
     {
         try {
             return $this->getQuery()->withSavePointIfNeeded(fn () => $this->create(array_merge($attributes, $values), $joining, $touch));
-        } catch (UniqueConstraintViolationException $exception) {
+        } catch (UniqueConstraintViolationException $e) {
             // ...
         }
 
         try {
-            return tap($this->related->where($attributes)->first(), function ($instance) use ($joining, $touch) {
+            return tap($this->related->where($attributes)->first() ?? throw $e, function ($instance) use ($joining, $touch) {
                 $this->getQuery()->withSavepointIfNeeded(fn () => $this->attach($instance, $joining, $touch));
             });
-        } catch (UniqueConstraintViolationException) {
-            return (clone $this)->useWritePdo()->where($attributes)->first();
+        } catch (UniqueConstraintViolationException $e) {
+            return (clone $this)->useWritePdo()->where($attributes)->first() ?? throw $e;
         }
     }
 
