@@ -19,7 +19,7 @@ class Distinct
     protected $strict;
 
     /**
-     * Ignore case sensitive
+     * Ignore case sensitive.
      *
      * @var bool
      */
@@ -52,6 +52,6 @@ class Distinct
             $mode = $this->strict ? 'strict' : null;
         }
 
-        return $this->rule.($mode ? ':'. $mode : null);
+        return $this->rule.($mode ? ':'.$mode : null);
     }
 }
