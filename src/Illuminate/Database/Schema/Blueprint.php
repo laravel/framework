@@ -1058,8 +1058,8 @@ class Blueprint
     public function enum($column, array|string $allowed)
     {
         if (is_string($allowed)) {
-            if (!is_subclass_of($allowed, BackedEnum::class)) {
-                throw new InvalidArgumentException(sprintf("Class [%s] must be BackedEnum", $allowed));
+            if (! is_subclass_of($allowed, BackedEnum::class)) {
+                throw new InvalidArgumentException(sprintf('Class [%s] must be BackedEnum', $allowed));
             }
 
             $allowed = array_map(function (BackedEnum $case) {
