@@ -1136,7 +1136,7 @@ class Route
     }
 
     /**
-     * Get the middleware should be removed from the route.
+     * Get the middleware that should be removed from the route.
      *
      * @return array
      */
