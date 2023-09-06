@@ -98,6 +98,18 @@ class Exceptions
     }
 
     /**
+     * Do not report duplicate exceptions.
+     *
+     * @return $this
+     */
+    public function dontReportDuplicates()
+    {
+        $this->handler->dontReportDuplicates();
+
+        return $this;
+    }
+
+    /**
      * Indicate that the given attributes should never be flashed to the session on validation errors.
      *
      * @param  array|string  $attributes
