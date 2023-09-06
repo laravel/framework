@@ -177,7 +177,13 @@ class ModelMakeCommand extends GeneratorCommand
     {
         $test = Str::studly(class_basename($this->argument('name')));
 
-        $this->call('make:test', ['name' => "{$test}Test"]);
+        $options = ['name' => "{$test}Test"];
+
+        if (File::exists(base_path('tests/') . 'Pest.php')) {
+            $options[] = '--pest';
+        }
+
+        $this->call('make:test', $options);
     }
 
     /**
