@@ -400,6 +400,28 @@ trait ValidatesAttributes
     }
 
     /**
+     * Validate that an attribute contains only alpha-numeric characters and underscores.
+     * If the 'ascii' option is passed, validate that an attribute contains only ascii alpha-numeric characters and
+     * underscores.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @return bool
+     */
+    public function validateAlphaUnderscore($attribute, $value, $parameters): bool
+    {
+        if (! is_string($value) && ! is_numeric($value)) {
+            return false;
+        }
+
+        if (isset($parameters[0]) && $parameters[0] === 'ascii') {
+            return preg_match('/\A[a-zA-Z0-9_]+\z/u', $value) > 0;
+        }
+
+        return preg_match('/\A[\pL\pM\pN_]+\z/u', $value) > 0;
+    }
+
+    /**
      * Validate that an attribute is an array.
      *
      * @param  string  $attribute

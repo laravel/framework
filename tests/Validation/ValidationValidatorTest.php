@@ -4680,6 +4680,43 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
     }
 
+    public function testValidateAlphaUnderscore()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['x' => 'asls1_3dlks'], ['x' => 'AlphaUnderscore']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => 'asls1-3dlks'], ['x' => 'AlphaUnderscore']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['x' => 'asls1-_3dlks'], ['x' => 'AlphaUnderscore']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['x' => 'https://_g232oogle.com'], ['x' => 'AlphaUnderscore']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['x' => 'tai.chi'], ['x' => 'AlphaUnderscore']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['x' => 'नमस्कार_'], ['x' => 'AlphaUnderscore']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => '१२३'], ['x' => 'AlphaUnderscore']); // numbers in Hindi
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => '٧٨٩'], ['x' => 'AlphaUnderscore']); // eastern arabic numerals
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => "abc\n"], ['x' => 'AlphaUnderscore']); // ends with newline
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['x' => 'abcdef'], ['x' => 'AlphaUnderscore']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => 'abc def'], ['x' => 'AlphaUnderscore']);
+        $this->assertFalse($v->passes());
+    }
+
     public function testValidateAlphaWithAsciiOption()
     {
         $trans = $this->getIlluminateArrayTranslator();
@@ -4775,6 +4812,37 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
 
         $v = new Validator($trans, ['x' => "abc\n"], ['x' => 'AlphaDash:ascii']); // ends with newline
+        $this->assertFalse($v->passes());
+    }
+
+    public function testValidateAlphaUnderscoreWithAsciiOption()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['x' => 'asls1_3dlks'], ['x' => 'AlphaUnderscore:ascii']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => 'https://_g232oogle.com'], ['x' => 'AlphaUnderscore:ascii']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['x' => 'tai.chi'], ['x' => 'AlphaUnderscore:ascii']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['x' => 'नमस्कार_'], ['x' => 'AlphaUnderscore:ascii']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['x' => '१२३'], ['x' => 'AlphaUnderscore:ascii']); // numbers in Hindi
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['x' => '٧٨٩'], ['x' => 'AlphaUnderscore:ascii']); // eastern arabic numerals
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['x' => "abc\n"], ['x' => 'AlphaUnderscore:ascii']); // ends with newline
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['x' => 'abcdef'], ['x' => 'AlphaUnderscore:ascii']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => 'abcd ef'], ['x' => 'AlphaUnderscore:ascii']);
         $this->assertFalse($v->passes());
     }
 
