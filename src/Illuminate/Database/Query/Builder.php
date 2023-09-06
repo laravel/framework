@@ -285,7 +285,7 @@ class Builder implements BuilderContract
         [$query, $bindings] = $this->createSub($query);
 
         return $this->selectRaw(
-            '('.$query.') as '.$this->grammar->wrap($as), $bindings
+            $this->grammar->compileSelectAs($query, $this->grammar->wrap($as)), $bindings
         );
     }
 
@@ -320,7 +320,7 @@ class Builder implements BuilderContract
     {
         [$query, $bindings] = $this->createSub($query);
 
-        return $this->fromRaw('('.$query.') as '.$this->grammar->wrapTable($as), $bindings);
+        return $this->fromRaw($this->grammar->compileSelectAs($query, $this->grammar->wrapTable($as)), $bindings);
     }
 
     /**
@@ -579,7 +579,7 @@ class Builder implements BuilderContract
     {
         [$query, $bindings] = $this->createSub($query);
 
-        $expression = '('.$query.') as '.$this->grammar->wrapTable($as);
+        $expression = $this->grammar->compileSelectAs($query, $this->grammar->wrapTable($as));
 
         $this->addBinding($bindings, 'join');
 
@@ -703,7 +703,7 @@ class Builder implements BuilderContract
     {
         [$query, $bindings] = $this->createSub($query);
 
-        $expression = '('.$query.') as '.$this->grammar->wrapTable($as);
+        $expression = $this->grammar->compileSelectAs($query, $this->grammar->wrapTable($as));
 
         $this->addBinding($bindings, 'join');
 

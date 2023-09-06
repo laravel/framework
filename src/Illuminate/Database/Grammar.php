@@ -290,4 +290,16 @@ abstract class Grammar
 
         return $this;
     }
+
+    /**
+     * Compile an aliased select statement.
+     *
+     * @param  string  $query
+     * @param  string  $alias
+     * @return string
+     */
+    public function compileSelectAs($query, $alias)
+    {
+        return '('.$query.') as '.$alias;
+    }
 }
