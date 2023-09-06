@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Tests\Integration\Http\Fixtures\Author;
 use Illuminate\Tests\Integration\Http\Fixtures\AuthorResourceWithOptionalRelationship;
 use Illuminate\Tests\Integration\Http\Fixtures\EmptyPostCollectionResource;
+use Illuminate\Tests\Integration\Http\Fixtures\JsonSerializableObject;
 use Illuminate\Tests\Integration\Http\Fixtures\ObjectResource;
 use Illuminate\Tests\Integration\Http\Fixtures\Post;
 use Illuminate\Tests\Integration\Http\Fixtures\PostCollectionResource;
@@ -670,6 +671,25 @@ class ResourceTest extends TestCase
                 'id' => 5,
                 'title' => 'Test Title',
             ]));
+        });
+
+        $response = $this->withoutExceptionHandling()->get(
+            '/', ['Accept' => 'application/json']
+        );
+
+        $response->assertStatus(200);
+
+        $response->assertJson([
+            'data' => [
+                'id' => 5,
+            ],
+        ]);
+    }
+
+    public function testJsonSerializableCanBeUsedAsResource()
+    {
+        Route::get('/', function () {
+            return JsonResource::make(new JsonSerializableObject(5));
         });
 
         $response = $this->withoutExceptionHandling()->get(
