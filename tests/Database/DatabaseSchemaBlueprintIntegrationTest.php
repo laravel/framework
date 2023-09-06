@@ -11,6 +11,9 @@ use Illuminate\Database\Schema\Grammars\PostgresGrammar;
 use Illuminate\Database\Schema\Grammars\SQLiteGrammar;
 use Illuminate\Database\Schema\Grammars\SqlServerGrammar;
 use Illuminate\Support\Facades\Facade;
+use Illuminate\Tests\Database\stubs\TestEnum;
+use Illuminate\Tests\Database\stubs\TestUnitEnum;
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseSchemaBlueprintIntegrationTest extends TestCase
@@ -670,6 +673,23 @@ class DatabaseSchemaBlueprintIntegrationTest extends TestCase
 
         $this->db->connection()->getSchemaBuilder()->table('users', function (Blueprint $table) {
             $table->dropForeign('something');
+        });
+    }
+
+    public function testBlueprintEnumAllowsEnumClassStringAsArgument()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->enum('role', TestEnum::class);
+        $column = $blueprint->getColumns()[0];
+        self::assertEquals(['test'], $column->get('allowed'));
+    }
+
+    public function testBlueprintEnumAcceptsOnlyBackedEnums()
+    {
+        $this->expectException(InvalidArgumentException::class);
+
+        $this->db->connection()->getSchemaBuilder()->table('users', function (Blueprint $table) {
+            $table->enum('some_name', TestUnitEnum::class);
         });
     }
 }

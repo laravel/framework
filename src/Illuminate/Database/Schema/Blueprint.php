@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Schema;
 
+use BackedEnum;
 use BadMethodCallException;
 use Closure;
 use Illuminate\Database\Connection;
@@ -11,6 +12,7 @@ use Illuminate\Database\Schema\Grammars\Grammar;
 use Illuminate\Database\SQLiteConnection;
 use Illuminate\Support\Fluent;
 use Illuminate\Support\Traits\Macroable;
+use InvalidArgumentException;
 
 class Blueprint
 {
@@ -1053,8 +1055,18 @@ class Blueprint
      * @param  array  $allowed
      * @return \Illuminate\Database\Schema\ColumnDefinition
      */
-    public function enum($column, array $allowed)
+    public function enum($column, array|string $allowed)
     {
+        if (is_string($allowed)) {
+            if (!is_subclass_of($allowed, BackedEnum::class)) {
+                throw new InvalidArgumentException(sprintf("Class [%s] must be BackedEnum", $allowed));
+            }
+
+            $allowed = array_map(function (BackedEnum $case) {
+                return $case->value;
+            }, $allowed::cases());
+        }
+
         return $this->addColumn('enum', $column, compact('allowed'));
     }
 
