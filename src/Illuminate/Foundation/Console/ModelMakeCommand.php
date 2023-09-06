@@ -266,7 +266,7 @@ class ModelMakeCommand extends GeneratorCommand
             'migration' => 'Migration',
             'policy' => 'Policy',
             'resource' => 'Resource Controller',
-            'feature-test' => 'Feature Test'
+            'feature-test' => 'Feature Test',
         ]))->each(fn ($option) => $input->setOption($option, true));
     }
 }
