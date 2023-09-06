@@ -179,7 +179,7 @@ class ModelMakeCommand extends GeneratorCommand
 
         $options = ['name' => "{$test}Test"];
 
-        if (File::exists(base_path('tests/') . 'Pest.php')) {
+        if (File::exists(base_path('tests/').'Pest.php')) {
             $options[] = '--pest';
         }
 
