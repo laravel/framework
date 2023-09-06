@@ -6,6 +6,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Validation\Rules\Can;
 use Illuminate\Validation\Rules\Dimensions;
+use Illuminate\Validation\Rules\Distinct;
 use Illuminate\Validation\Rules\Enum;
 use Illuminate\Validation\Rules\ExcludeIf;
 use Illuminate\Validation\Rules\Exists;
@@ -184,5 +185,16 @@ class Rule
     public static function dimensions(array $constraints = [])
     {
         return new Dimensions($constraints);
+    }
+
+    /**
+     * Get a distinct constraint builder instance.
+     *
+     * @param  array  $constraints
+     * @return \Illuminate\Validation\Rules\Distinct
+     */
+    public static function distinct(bool $strict = false, bool $ignoreCase = false)
+    {
+        return new Distinct($strict, $ignoreCase);
     }
 }
