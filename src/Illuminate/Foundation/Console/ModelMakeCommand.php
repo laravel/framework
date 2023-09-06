@@ -4,6 +4,7 @@ namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Concerns\CreatesMatchingTest;
 use Illuminate\Console\GeneratorCommand;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputInterface;
@@ -56,6 +57,7 @@ class ModelMakeCommand extends GeneratorCommand
             $this->input->setOption('controller', true);
             $this->input->setOption('policy', true);
             $this->input->setOption('resource', true);
+            $this->input->setOption('feature-test', true);
         }
 
         if ($this->option('factory')) {
@@ -76,6 +78,10 @@ class ModelMakeCommand extends GeneratorCommand
 
         if ($this->option('policy')) {
             $this->createPolicy();
+        }
+
+        if ($this->option('feature-test')) {
+            $this->createFeatureTest();
         }
     }
 
@@ -163,6 +169,18 @@ class ModelMakeCommand extends GeneratorCommand
     }
 
     /**
+     * Create a feature test for the model.
+     *
+     * @return void
+     */
+    protected function createFeatureTest()
+    {
+        $test = Str::studly(class_basename($this->argument('name')));
+
+        $this->call('make:test', ['name' => "{$test}Test"]);
+    }
+
+    /**
      * Get the stub file for the generator.
      *
      * @return string
@@ -222,6 +240,7 @@ class ModelMakeCommand extends GeneratorCommand
             ['seed', 's', InputOption::VALUE_NONE, 'Create a new seeder for the model'],
             ['pivot', 'p', InputOption::VALUE_NONE, 'Indicates if the generated model should be a custom intermediate table model'],
             ['resource', 'r', InputOption::VALUE_NONE, 'Indicates if the generated controller should be a resource controller'],
+            ['feature-test', 't', InputOption::VALUE_NONE, 'Create a new feature test file for the model'],
             ['api', null, InputOption::VALUE_NONE, 'Indicates if the generated controller should be an API resource controller'],
             ['requests', 'R', InputOption::VALUE_NONE, 'Create new form request classes and use them in the resource controller'],
         ];
@@ -247,6 +266,7 @@ class ModelMakeCommand extends GeneratorCommand
             'migration' => 'Migration',
             'policy' => 'Policy',
             'resource' => 'Resource Controller',
+            'feature-test' => 'Feature Test'
         ]))->each(fn ($option) => $input->setOption($option, true));
     }
 }
