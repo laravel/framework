@@ -2750,6 +2750,31 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->passes());
     }
 
+    public function testValidateFloat()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => 42], ['foo' => 'Float']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => -42], ['foo' => 'Float']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => 42.42], ['foo' => 'Float']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => -42.42], ['foo' => 'Float']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => '42.42'], ['foo' => 'Float']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => '-42.42'], ['foo' => 'Float']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => 'abc'], ['foo' => 'Float']);
+        $this->assertFalse($v->passes());
+    }
+
     public function testValidateDecimal()
     {
         $trans = $this->getIlluminateArrayTranslator();
