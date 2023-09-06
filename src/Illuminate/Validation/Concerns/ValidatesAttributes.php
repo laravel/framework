@@ -1106,7 +1106,7 @@ trait ValidatesAttributes
      */
     public function validateFloat($attribute, $value)
     {
-        return (filter_var($value, FILTER_VALIDATE_FLOAT) !== false) && !is_int($value);
+        return (filter_var($value, FILTER_VALIDATE_FLOAT) !== false) && ! is_int($value);
     }
 
     /**
