@@ -2,10 +2,8 @@
 
 namespace Illuminate\Tests\Validation;
 
-use Illuminate\Tests\Validation\fixtures\Values;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Distinct;
-use Illuminate\Validation\Rules\In;
 use PHPUnit\Framework\TestCase;
 
 class ValidationDistinctRuleTest extends TestCase
