@@ -1098,6 +1098,18 @@ trait ValidatesAttributes
     }
 
     /**
+     * Validate that an attribute is a float.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @return bool
+     */
+    public function validateFloat($attribute, $value)
+    {
+        return (filter_var($value, FILTER_VALIDATE_FLOAT) !== false) && !is_int($value);
+    }
+
+    /**
      * Validate that an attribute is greater than another attribute.
      *
      * @param  string  $attribute
