@@ -105,15 +105,16 @@ class Arr
      *
      * @param  iterable  $array
      * @param  string  $prepend
+     * @param  string  $separator
      * @return array
      */
-    public static function dot($array, $prepend = '')
+    public static function dot($array, $prepend = '', $separator = '.')
     {
         $results = [];
 
         foreach ($array as $key => $value) {
             if (is_array($value) && ! empty($value)) {
-                $results = array_merge($results, static::dot($value, $prepend.$key.'.'));
+                $results = array_merge($results, static::dot($value, $prepend.$key.$separator, $separator));
             } else {
                 $results[$prepend.$key] = $value;
             }
@@ -126,14 +127,15 @@ class Arr
      * Convert a flatten "dot" notation array into an expanded array.
      *
      * @param  iterable  $array
+     * @param  string  $separator
      * @return array
      */
-    public static function undot($array)
+    public static function undot($array, $separator = '.')
     {
         $results = [];
 
         foreach ($array as $key => $value) {
-            static::set($results, $key, $value);
+            static::set($results, $key, $value, $separator);
         }
 
         return $results;
@@ -694,15 +696,16 @@ class Arr
      * @param  array  $array
      * @param  string|int|null  $key
      * @param  mixed  $value
+     * @param  string  $separator
      * @return array
      */
-    public static function set(&$array, $key, $value)
+    public static function set(&$array, $key, $value, $separator = '.')
     {
         if (is_null($key)) {
             return $array = $value;
         }
 
-        $keys = explode('.', $key);
+        $keys = explode($separator, $key);
 
         foreach ($keys as $i => $key) {
             if (count($keys) === 1) {

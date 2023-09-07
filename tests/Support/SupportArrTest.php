@@ -139,6 +139,43 @@ class SupportArrTest extends TestCase
         $this->assertEquals(['foo', 'foo' => ['bar' => 'baz', 'baz' => ['a' => 'b']]], $array);
     }
 
+    public function testDotArrow()
+    {
+        $array = Arr::dot(['foo' => ['bar' => 'baz', 'foobar' => 'foobaz']], separator: '->');
+        $this->assertEquals(['foo->bar' => 'baz', 'foo->foobar' => 'foobaz'], $array);
+
+        $array = Arr::dot([], separator: '->');
+        $this->assertEquals([], $array);
+
+        $array = Arr::dot(['foo' => []], separator: '->');
+        $this->assertEquals(['foo' => []], $array);
+
+        $array = Arr::dot(['foo' => ['bar' => []]], separator: '->');
+        $this->assertEquals(['foo->bar' => []], $array);
+    }
+
+    public function testDotUnarrow()
+    {
+        $array = Arr::undot([
+            'foo->bar' => 'test',
+            'foo->baz->bob' => 'Bob',
+            'foo->baz->alice' => 'Alice',
+            'foo->languages->0' => 'PHP',
+            'foo->languages->1' => 'C#',
+        ], '->');
+
+        $this->assertEquals([
+            'foo' => [
+                'bar' => 'test',
+                'baz' => [
+                    'bob' => 'Bob',
+                    'alice' => 'Alice',
+                ],
+                'languages' => ['PHP', 'C#'],
+            ],
+        ], $array);
+    }
+
     public function testExcept()
     {
         $array = ['name' => 'taylor', 'age' => 26];
