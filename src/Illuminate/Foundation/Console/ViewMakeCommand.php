@@ -56,6 +56,19 @@ class ViewMakeCommand extends GeneratorCommand
     }
 
     /**
+     * Get the destination view path.
+     *
+     * @param  string  $name
+     * @return string
+     */
+    protected function getPath($name)
+    {
+        return $this->viewPath(
+            $this->getNameInput().'.'.$this->option('extension'),
+        );
+    }
+
+    /**
      * Get the desired view name from the input.
      *
      * @return string
@@ -70,32 +83,6 @@ class ViewMakeCommand extends GeneratorCommand
     }
 
     /**
-     * Get the console command arguments.
-     *
-     * @return array
-     */
-    protected function getOptions()
-    {
-        return [
-            ['extension', null, InputOption::VALUE_OPTIONAL, 'The extension of the generated view.', 'blade.php'],
-            ['force', 'f', InputOption::VALUE_NONE, 'Create the view even if the view already exists'],
-        ];
-    }
-
-    /**
-     * Get the destination view path.
-     *
-     * @param  string  $name
-     * @return string
-     */
-    protected function getPath($name)
-    {
-        return $this->viewPath(
-            $this->getNameInput().'.'.$this->option('extension'),
-        );
-    }
-
-    /**
      * Get the stub file for the generator.
      *
      * @return string
@@ -105,6 +92,19 @@ class ViewMakeCommand extends GeneratorCommand
         return $this->resolveStubPath(
             '/stubs/view.stub',
         );
+    }
+
+    /**
+     * Resolve the fully-qualified path to the stub.
+     *
+     * @param  string  $stub
+     * @return string
+     */
+    protected function resolveStubPath($stub)
+    {
+        return file_exists($customPath = $this->laravel->basePath(trim($stub, '/')))
+                        ? $customPath
+                        : __DIR__.$stub;
     }
 
     /**
@@ -121,20 +121,6 @@ class ViewMakeCommand extends GeneratorCommand
                 ->append('Test.php')
                 ->value()
         );
-    }
-
-    /**
-     * Get the test stub file for the generator.
-     *
-     * @return string
-     */
-    protected function getTestStub()
-    {
-        $stubName = 'view.'.($this->option('pest') ? 'pest' : 'test').'.stub';
-
-        return file_exists($customPath = $this->laravel->basePath("stubs/$stubName"))
-            ? $customPath
-            : __DIR__.'/stubs/'.$stubName;
     }
 
     /**
@@ -160,16 +146,28 @@ class ViewMakeCommand extends GeneratorCommand
     }
 
     /**
-     * Resolve the fully-qualified path to the stub.
+     * Get the namespace for the test.
      *
-     * @param  string  $stub
      * @return string
      */
-    protected function resolveStubPath($stub)
+    protected function testNamespace()
     {
-        return file_exists($customPath = $this->laravel->basePath(trim($stub, '/')))
-                        ? $customPath
-                        : __DIR__.$stub;
+        return Str::of($this->testClassFullyQualifiedName())
+            ->beforeLast('\\')
+            ->value();
+    }
+
+    /**
+     * Get the class name for the test.
+     *
+     * @return string
+     */
+    protected function testClassName()
+    {
+        return Str::of($this->testClassFullyQualifiedName())
+            ->afterLast('\\')
+            ->append('Test')
+            ->value();
     }
 
     /**
@@ -197,28 +195,17 @@ class ViewMakeCommand extends GeneratorCommand
     }
 
     /**
-     * Get the class name for the test.
+     * Get the test stub file for the generator.
      *
      * @return string
      */
-    protected function testClassName()
+    protected function getTestStub()
     {
-        return Str::of($this->testClassFullyQualifiedName())
-            ->afterLast('\\')
-            ->append('Test')
-            ->value();
-    }
+        $stubName = 'view.'.($this->option('pest') ? 'pest' : 'test').'.stub';
 
-    /**
-     * Get the namespace for the test.
-     *
-     * @return string
-     */
-    protected function testNamespace()
-    {
-        return Str::of($this->testClassFullyQualifiedName())
-            ->beforeLast('\\')
-            ->value();
+        return file_exists($customPath = $this->laravel->basePath("stubs/$stubName"))
+            ? $customPath
+            : __DIR__.'/stubs/'.$stubName;
     }
 
     /**
@@ -232,5 +219,18 @@ class ViewMakeCommand extends GeneratorCommand
             ->replace('/', '.')
             ->lower()
             ->value();
+    }
+
+    /**
+     * Get the console command arguments.
+     *
+     * @return array
+     */
+    protected function getOptions()
+    {
+        return [
+            ['extension', null, InputOption::VALUE_OPTIONAL, 'The extension of the generated view', 'blade.php'],
+            ['force', 'f', InputOption::VALUE_NONE, 'Create the view even if the view already exists'],
+        ];
     }
 }
