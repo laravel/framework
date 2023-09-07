@@ -4,6 +4,7 @@ namespace Illuminate\Routing\Console;
 
 use Illuminate\Console\Concerns\CreatesMatchingTest;
 use Illuminate\Console\GeneratorCommand;
+use Illuminate\Support\Str;
 use InvalidArgumentException;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputInterface;
@@ -122,6 +123,10 @@ class ControllerMakeCommand extends GeneratorCommand
             $replace = $this->buildModelReplacements($replace);
         }
 
+        if ($this->hasOption('views')) {
+            $replace = $this->buildViewReplacements($replace);
+        }
+
         if ($this->option('creatable')) {
             $replace['abort(404);'] = '//';
         }
@@ -186,6 +191,50 @@ class ControllerMakeCommand extends GeneratorCommand
             'DummyModelVariable' => lcfirst(class_basename($modelClass)),
             '{{ modelVariable }}' => lcfirst(class_basename($modelClass)),
             '{{modelVariable}}' => lcfirst(class_basename($modelClass)),
+        ]);
+    }
+
+    /**
+     * Build the view replacement values.
+     *
+     * @param  array  $replace
+     * @return array
+     */
+    protected function buildViewReplacements(array $replace)
+    {
+        if (! $this->option('resource') && ! $this->option('parent') && ! $this->option('model')) {
+            return $replace;
+        }
+
+        $options = [];
+
+        if ($this->option('views')) {
+            $options['--extension'] = $this->option('views');
+        }
+
+        if ($this->option('test')) {
+            $options['--test'] = true;
+        }
+
+        if ($this->option('pest')) {
+            $options['--pest'] = true;
+        }
+
+        $path = Str::of($this->qualifyClass($this->getNameInput()))
+            ->after($this->getDefaultNamespace(rtrim($this->rootNamespace(), '\\')).'\\')
+            ->replaceLast('Controller', '')
+            ->split('/\\\\/')
+            ->map(fn ($part) => Str::kebab($part))
+            ->join('.');
+
+        $this->call('make:view', array_merge($options, ['name' => $path.'.index']));
+        $this->call('make:view', array_merge($options, ['name' => $path.'.create']));
+        $this->call('make:view', array_merge($options, ['name' => $path.'.edit']));
+        $this->call('make:view', array_merge($options, ['name' => $path.'.show']));
+
+        return array_merge($replace, [
+            '{{ viewPath }}' => $path,
+            '{{viewPath}}' => $path,
         ]);
     }
 
@@ -290,6 +339,7 @@ class ControllerMakeCommand extends GeneratorCommand
             ['requests', 'R', InputOption::VALUE_NONE, 'Generate FormRequest classes for store and update'],
             ['singleton', 's', InputOption::VALUE_NONE, 'Generate a singleton resource controller class'],
             ['creatable', null, InputOption::VALUE_NONE, 'Indicate that a singleton resource should be creatable'],
+            ['views', null, InputOption::VALUE_OPTIONAL, 'Generate the views for the resource controller'],
         ];
     }
 
