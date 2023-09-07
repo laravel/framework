@@ -56,30 +56,6 @@ class ViewMakeCommand extends GeneratorCommand
     }
 
     /**
-     * Get the fully qualified name for the test.
-     *
-     * @return string
-     */
-    protected function fullyQualifiedTestName()
-    {
-        $name = Str::of(Str::lower($this->getNameInput()))->replace('.'.$this->option('extension'), '');
-
-        $namespacedName = Str::of(
-            Str::of($name)
-                ->replace('/', ' ')
-                ->explode(' ')
-                ->map(fn ($part) => Str::of($part)->ucfirst())
-                ->implode('\\')
-        )
-            ->replace(['-', '_'], ' ')
-            ->explode(' ')
-            ->map(fn ($part) => Str::of($part)->ucfirst())
-            ->implode('');
-
-        return 'Tests\\Feature\\View\\'.$namespacedName;
-    }
-
-    /**
      * Get the desired view name from the input.
      *
      * @return string
@@ -139,7 +115,7 @@ class ViewMakeCommand extends GeneratorCommand
     protected function getTestPath()
     {
         return base_path(
-            Str::of($this->fullyQualifiedTestName())
+            Str::of($this->testClassFullyQualifiedName())
                 ->replace('\\', '/')
                 ->replaceFirst('Tests/Feature', 'tests/Feature')
                 ->append('Test.php')
@@ -197,13 +173,37 @@ class ViewMakeCommand extends GeneratorCommand
     }
 
     /**
+     * Get the class fully qualified name for the test.
+     *
+     * @return string
+     */
+    protected function testClassFullyQualifiedName()
+    {
+        $name = Str::of(Str::lower($this->getNameInput()))->replace('.'.$this->option('extension'), '');
+
+        $namespacedName = Str::of(
+            Str::of($name)
+                ->replace('/', ' ')
+                ->explode(' ')
+                ->map(fn ($part) => Str::of($part)->ucfirst())
+                ->implode('\\')
+        )
+            ->replace(['-', '_'], ' ')
+            ->explode(' ')
+            ->map(fn ($part) => Str::of($part)->ucfirst())
+            ->implode('');
+
+        return 'Tests\\Feature\\View\\'.$namespacedName;
+    }
+
+    /**
      * Get the class name for the test.
      *
      * @return string
      */
     protected function testClassName()
     {
-        return Str::of($this->fullyQualifiedTestName())
+        return Str::of($this->testClassFullyQualifiedName())
             ->afterLast('\\')
             ->append('Test')
             ->value();
@@ -216,7 +216,7 @@ class ViewMakeCommand extends GeneratorCommand
      */
     protected function testNamespace()
     {
-        return Str::of($this->fullyQualifiedTestName())
+        return Str::of($this->testClassFullyQualifiedName())
             ->beforeLast('\\')
             ->value();
     }
