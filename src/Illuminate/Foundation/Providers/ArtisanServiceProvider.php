@@ -204,8 +204,8 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         'Serve' => ServeCommand::class,
         'StubPublish' => StubPublishCommand::class,
         'TestMake' => TestMakeCommand::class,
-        'ViewMake' => ViewMakeCommand::class,
         'VendorPublish' => VendorPublishCommand::class,
+        'ViewMake' => ViewMakeCommand::class,
     ];
 
     /**
