@@ -16,13 +16,6 @@ class ViewMakeCommand extends GeneratorCommand
     use CreatesMatchingTest;
 
     /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
-    protected $name = 'make:view';
-
-    /**
      * The console command description.
      *
      * @var string
@@ -30,11 +23,88 @@ class ViewMakeCommand extends GeneratorCommand
     protected $description = 'Create a new view';
 
     /**
+     * The name and signature of the console command.
+     *
+     * @var string
+     */
+    protected $name = 'make:view';
+
+    /**
      * The type of file being generated.
      *
      * @var string
      */
     protected $type = 'View';
+
+    /**
+     * Build the class with the given name.
+     *
+     * @param  string  $name
+     * @return string
+     *
+     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
+     */
+    protected function buildClass($name)
+    {
+        $contents = parent::buildClass($name);
+
+        return str_replace(
+            '{{ quote }}',
+            Inspiring::quotes()->random(),
+            $contents,
+        );
+    }
+
+    /**
+     * Get the fully qualified name for the test.
+     *
+     * @return string
+     */
+    protected function fullyQualifiedTestName()
+    {
+        $name = Str::of(Str::lower($this->getNameInput()))->replace('.'.$this->option('extension'), '');
+
+        $namespacedName = Str::of(
+            Str::of($name)
+                ->replace('/', ' ')
+                ->explode(' ')
+                ->map(fn ($part) => Str::of($part)->ucfirst())
+                ->implode('\\')
+        )
+            ->replace(['-', '_'], ' ')
+            ->explode(' ')
+            ->map(fn ($part) => Str::of($part)->ucfirst())
+            ->implode('');
+
+        return 'Tests\\Feature\\View\\'.$namespacedName;
+    }
+
+    /**
+     * Get the desired view name from the input.
+     *
+     * @return string
+     */
+    protected function getNameInput()
+    {
+        $name = trim($this->argument('name'));
+
+        $name = str_replace(['\\', '.'], '/', $this->argument('name'));
+
+        return $name;
+    }
+
+    /**
+     * Get the console command arguments.
+     *
+     * @return array
+     */
+    protected function getOptions()
+    {
+        return [
+            ['extension', null, InputOption::VALUE_OPTIONAL, 'The extension of the generated view.', 'blade.php'],
+            ['force', 'f', InputOption::VALUE_NONE, 'Create the view even if the view already exists'],
+        ];
+    }
 
     /**
      * Get the destination view path.
@@ -62,87 +132,19 @@ class ViewMakeCommand extends GeneratorCommand
     }
 
     /**
-     * Build the class with the given name.
+     * Get the destination test case path.
      *
-     * @param  string  $name
      * @return string
-     *
-     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
      */
-    protected function buildClass($name)
+    protected function getTestPath()
     {
-        $contents = parent::buildClass($name);
-
-        return str_replace(
-            '{{ quote }}',
-            Inspiring::quotes()->random(),
-            $contents,
+        return base_path(
+            Str::of($this->fullyQualifiedTestName())
+                ->replace('\\', '/')
+                ->replaceFirst('Tests/Feature', 'tests/Feature')
+                ->append('Test.php')
+                ->value()
         );
-    }
-
-    /**
-     * Resolve the fully-qualified path to the stub.
-     *
-     * @param  string  $stub
-     * @return string
-     */
-    protected function resolveStubPath($stub)
-    {
-        return file_exists($customPath = $this->laravel->basePath(trim($stub, '/')))
-                        ? $customPath
-                        : __DIR__.$stub;
-    }
-
-    /**
-     * Get the namespace for the test.
-     *
-     * @return string
-     */
-    protected function testNamespace()
-    {
-        return Str::of($this->fullyQualifiedTestName())
-            ->beforeLast('\\')
-            ->value();
-    }
-
-    /**
-     * Get the class name for the test.
-     *
-     * @return string
-     */
-    protected function testClassName()
-    {
-        return Str::of($this->fullyQualifiedTestName())
-            ->afterLast('\\')
-            ->append('Test')
-            ->value();
-    }
-
-    /**
-     * Get the view name for the test.
-     *
-     * @return string
-     */
-    protected function testViewName()
-    {
-        return Str::of($this->getNameInput())
-            ->replace('/', '.')
-            ->lower()
-            ->value();
-    }
-
-    /**
-     * Get the desired view name from the input.
-     *
-     * @return string
-     */
-    protected function getNameInput()
-    {
-        $name = trim($this->argument('name'));
-
-        $name = str_replace(['\\', '.'], '/', $this->argument('name'));
-
-        return $name;
     }
 
     /**
@@ -182,55 +184,53 @@ class ViewMakeCommand extends GeneratorCommand
     }
 
     /**
-     * Get the destination test case path.
+     * Resolve the fully-qualified path to the stub.
      *
+     * @param  string  $stub
      * @return string
      */
-    protected function getTestPath()
+    protected function resolveStubPath($stub)
     {
-        return base_path(
-            Str::of($this->fullyQualifiedTestName())
-                ->replace('\\', '/')
-                ->replaceFirst('Tests/Feature', 'tests/Feature')
-                ->append('Test.php')
-                ->value()
-        );
+        return file_exists($customPath = $this->laravel->basePath(trim($stub, '/')))
+                        ? $customPath
+                        : __DIR__.$stub;
     }
 
     /**
-     * Get the fully qualified name for the test.
+     * Get the class name for the test.
      *
      * @return string
      */
-    protected function fullyQualifiedTestName()
+    protected function testClassName()
     {
-        $name = Str::of(Str::lower($this->getNameInput()))->replace('.'.$this->option('extension'), '');
-
-        $namespacedName = Str::of(
-            Str::of($name)
-                ->replace('/', ' ')
-                ->explode(' ')
-                ->map(fn ($part) => Str::of($part)->ucfirst())
-                ->implode('\\')
-        )
-            ->replace(['-', '_'], ' ')
-            ->explode(' ')
-            ->map(fn ($part) => Str::of($part)->ucfirst())
-            ->implode('');
-
-        return 'Tests\\Feature\\View\\'.$namespacedName;
+        return Str::of($this->fullyQualifiedTestName())
+            ->afterLast('\\')
+            ->append('Test')
+            ->value();
     }
 
     /**
-     * Get the console command arguments.
+     * Get the namespace for the test.
      *
-     * @return array
+     * @return string
      */
-    protected function getOptions()
+    protected function testNamespace()
     {
-        return [
-            ['extension', null, InputOption::VALUE_OPTIONAL, 'The extension of the generated view.', 'blade.php'],
-            ['force', 'f', InputOption::VALUE_NONE, 'Create the view even if the view already exists'],
-        ];
+        return Str::of($this->fullyQualifiedTestName())
+            ->beforeLast('\\')
+            ->value();
+    }
+
+    /**
+     * Get the view name for the test.
+     *
+     * @return string
+     */
+    protected function testViewName()
+    {
+        return Str::of($this->getNameInput())
+            ->replace('/', '.')
+            ->lower()
+            ->value();
     }
 }
