@@ -614,7 +614,7 @@ trait ValidatesAttributes
     }
 
     /**
-     * Validate that an attribute is different from another attribute.
+     * Validate that an attribute is different from other attributes.
      *
      * @param  string  $attribute
      * @param  mixed  $value
