@@ -436,6 +436,40 @@ class FoundationExceptionsHandlerTest extends TestCase
             Assert::fail('assertThrows failed: non matching message are thrown.');
         }
     }
+
+    public function testItReportsDuplicateExceptions()
+    {
+        $reported = [];
+        $this->handler->reportable(function (\Throwable $e) use (&$reported) {
+            $reported[] = $e;
+
+            return false;
+        });
+
+        $this->handler->report($one = new RuntimeException('foo'));
+        $this->handler->report($one);
+        $this->handler->report($two = new RuntimeException('foo'));
+
+        $this->assertSame($reported, [$one, $one, $two]);
+    }
+
+    public function testItCanDedupeExceptions()
+    {
+        $reported = [];
+        $e = new RuntimeException('foo');
+        $this->handler->reportable(function (\Throwable $e) use (&$reported) {
+            $reported[] = $e;
+
+            return false;
+        });
+
+        $this->handler->dontReportDuplicates();
+        $this->handler->report($one = new RuntimeException('foo'));
+        $this->handler->report($one);
+        $this->handler->report($two = new RuntimeException('foo'));
+
+        $this->assertSame($reported, [$one, $two]);
+    }
 }
 
 class CustomException extends Exception
