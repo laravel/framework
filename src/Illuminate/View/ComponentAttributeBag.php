@@ -459,7 +459,7 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate,
     /**
      * Convert the object into something JSON serializable.
      *
-     * @return array
+     * @return mixed
      */
     public function jsonSerialize()
     {
