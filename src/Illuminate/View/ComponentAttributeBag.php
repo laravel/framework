@@ -14,7 +14,7 @@ use IteratorAggregate;
 use JsonSerializable;
 use Traversable;
 
-class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate, JsonSerializable
+class ComponentAttributeBag implements ArrayAccess, IteratorAggregate, JsonSerializable, Htmlable
 {
     use Conditionable, Macroable;
 
@@ -457,7 +457,7 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate,
     }
 
     /**
-     * Convert the object into something JSON serializable.
+     * Convert the object into a JSON serializable form.
      *
      * @return mixed
      */
