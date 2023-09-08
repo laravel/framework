@@ -1,0 +1,17 @@
+<?php
+
+namespace {{ collectionNamespace }};
+
+use Illuminate\Support\Carbon;
+use Illuminate\Database\Eloquent\Collection;
+
+class {{ collection }}Collection extends Collection
+{
+    public function createdTodayCount(): int
+    {
+        return $this->pluck(['created_at'])
+            ->map(fn ($createdAt) => Carbon::parse($createdAt)->isToday())
+            ->filter()
+            ->count();
+    }
+}
