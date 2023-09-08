@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Http;
 
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Http\Middleware\ValidatePostSize;
 use Illuminate\Http\Exceptions\PostTooLargeException;
@@ -43,6 +44,9 @@ use Illuminate\Tests\Integration\Http\Fixtures\ReallyEmptyPostResource;
 use Illuminate\Tests\Integration\Http\Fixtures\ResourceWithPreservedKeys;
 use Illuminate\Tests\Integration\Http\Fixtures\SerializablePostResource;
 use Illuminate\Tests\Integration\Http\Fixtures\Subscription;
+use Illuminate\Tests\Testing\Stubs\ArrayableStubObject;
+use Illuminate\Tests\Testing\Stubs\JsonSerializableStubObject;
+use JsonSerializable;
 use LogicException;
 use Mockery as m;
 use Orchestra\Testbench\TestCase;
@@ -684,6 +688,100 @@ class ResourceTest extends TestCase
             ],
         ]);
     }
+
+    public function testJsonSerializableCanBeUsedAsResource()
+    {
+        Route::get('/', function () {
+            $instance = JsonSerializableStubObject::make(['foo' => 'bar']);
+
+            return JsonResource::make($instance);
+        });
+
+        $response = $this->withoutExceptionHandling()->get(
+            '/', ['Accept' => 'application/json']
+        );
+
+        $response->assertStatus(200);
+
+        $response->assertJson([
+            'data' => [
+                'foo' => 'bar',
+            ],
+        ]);
+    }
+
+    public function testArrayableToArray()
+    {
+        Route::get('/', function (Request $request) {
+            $instance = ArrayableStubObject::make(['foo' => 'bar']);
+
+            return JsonResource::make($instance)->toArray($request);
+        });
+
+        $response = $this->withoutExceptionHandling()->get(
+            '/', ['Accept' => 'application/json']
+        );
+
+        $response->assertStatus(200);
+
+        $response->assertJson([
+            'foo' => 'bar',
+        ]);
+    }
+
+    public function testJsonSerializableToArray()
+    {
+        Route::get('/', function (Request $request) {
+            $instance = JsonSerializableStubObject::make(['foo' => 'bar']);
+
+            return JsonResource::make($instance)->toArray($request);
+        });
+
+        $response = $this->withoutExceptionHandling()->get(
+            '/', ['Accept' => 'application/json']
+        );
+
+        $response->assertStatus(200);
+
+        $response->assertJson([
+            'foo' => 'bar',
+        ]);
+    }
+
+    public function testArrayableAndJsonSerializableResourceToArrayPreservingBehaviour()
+    {
+        $instance = new class implements Arrayable, JsonSerializable {
+            public function toArray()
+            {
+                return [
+                    'foo' => 'bar',
+                ];
+            }
+
+            public function jsonSerialize(): array
+            {
+                return [
+                    'baz' => 'qux',
+                ];
+            }
+        };
+
+        Route::get('/', function (Request $request) use ($instance) {
+            return JsonResource::make($instance)->toArray($request);
+        });
+
+        $response = $this->withoutExceptionHandling()->get(
+            '/', ['Accept' => 'application/json']
+        );
+
+        $response->assertStatus(200);
+
+        $response->assertJson([
+            'foo' => 'bar',
+        ]);
+    }
+
+
 
     public function testResourcesMayCustomizeResponses()
     {
