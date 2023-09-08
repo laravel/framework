@@ -461,7 +461,7 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate,
      *
      * @return mixed
      */
-    public function jsonSerialize()
+    public function jsonSerialize(): mixed
     {
         return $this->attributes;
     }
