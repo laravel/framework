@@ -121,4 +121,13 @@ class TranslationFileLoaderTest extends TestCase
 
         $this->assertEquals(['foo' => 'bar', 'baz' => 'backagesplash'], $loader->load('en', '*', '*'));
     }
+
+    public function testAllRegisteredNamespaceReturnProperly()
+    {
+        $loader = new FileLoader($files = m::mock(Filesystem::class), __DIR__);
+        $loader->addNamespace('namespace', 'foo');
+        $loader->addNamespace('namespace2', 'bar');
+        $this->assertEquals(['namespace' => 'foo', 'namespace2' => 'bar'], $loader->namespaces());
+    }
+
 }
