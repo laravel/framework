@@ -129,5 +129,4 @@ class TranslationFileLoaderTest extends TestCase
         $loader->addNamespace('namespace2', 'bar');
         $this->assertEquals(['namespace' => 'foo', 'namespace2' => 'bar'], $loader->namespaces());
     }
-
 }
