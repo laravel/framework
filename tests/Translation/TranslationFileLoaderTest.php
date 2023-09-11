@@ -129,4 +129,14 @@ class TranslationFileLoaderTest extends TestCase
         $loader->addNamespace('namespace2', 'bar');
         $this->assertEquals(['namespace' => 'foo', 'namespace2' => 'bar'], $loader->namespaces());
     }
+
+    public function testAllAddedJsonPathsReturnProperly()
+    {
+        $loader = new FileLoader(m::mock(Filesystem::class), __DIR__);
+        $path1 = __DIR__ . '/another';
+        $path2 = __DIR__ . '/another2';
+        $loader->addJsonPath($path1);
+        $loader->addJsonPath($path2);
+        $this->assertEquals([$path1, $path2], $loader->jsonPaths());
+    }
 }
