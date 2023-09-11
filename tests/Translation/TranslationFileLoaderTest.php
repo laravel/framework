@@ -122,6 +122,19 @@ class TranslationFileLoaderTest extends TestCase
         $this->assertEquals(['foo' => 'bar', 'baz' => 'backagesplash'], $loader->load('en', '*', '*'));
     }
 
+    public function testLoadMethodThrowExceptionWhenProvideInvalidJSON()
+    {
+        $loader = new FileLoader($files = m::mock(Filesystem::class), __DIR__);
+        $loader->addJsonPath(__DIR__ . '/invalid');
+
+        $invalidJsonString = '.{"foo":"cricket", "baz": "football"}';
+        $files->shouldReceive('exists')->once()->with(__DIR__ . '/invalid/en.json')->andReturn(true);
+        $files->shouldReceive('get')->once()->with(__DIR__ . '/invalid/en.json')->andReturn($invalidJsonString);
+
+        $this->expectException(\RuntimeException::class);
+        $loader->load('en', '*', '*');
+    }
+
     public function testAllRegisteredNamespaceReturnProperly()
     {
         $loader = new FileLoader(m::mock(Filesystem::class), __DIR__);
