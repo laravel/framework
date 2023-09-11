@@ -8,11 +8,13 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithDatabase;
 use Illuminate\Foundation\Testing\TestCase as TestingTestCase;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Mockery as m;
 use Orchestra\Testbench\Concerns\CreatesApplication;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
+use stdClass;
 
 class FoundationInteractsWithDatabaseTest extends TestCase
 {
@@ -95,6 +97,118 @@ class FoundationInteractsWithDatabaseTest extends TestCase
         $this->assertDatabaseHas($this->table, $this->data);
     }
 
+    public function testAssertDatabaseHasSupportsClosuresInColumns()
+    {
+        $this->data = ['title' => $title = 'Spark'];
+
+        $row1 = new stdClass;
+        $row1->title = $title;
+        $row1->name = 'Laravel';
+        $row1->type = 'Framework';
+
+        $row2 = new stdClass;
+        $row2->title = $title;
+        $row2->name = 'PHP';
+        $row2->type = 'Vanilla';
+
+        $rows = [$row1, $row2];
+
+        $mock = $this->mockCountBuilder(count($rows));
+
+        $mock->shouldReceive('get')
+            ->andReturn(
+                new Collection($rows)
+            );
+
+        $this->assertDatabaseHas(
+            ProductStub::class,
+            [
+                'title' => 'Spark',
+                'name' => fn(mixed $value) => in_array($value, ['Laravel', 'Value2']),
+                'type' => fn(string $value) => $value !== 'Library',
+            ],
+        );
+    }
+
+    public function testAssertDatabaseHasHandlesNotFoundClosuresInColumns()
+    {
+        $this->data = ['title' => $title = 'Spark'];
+
+        $row1 = new stdClass;
+        $row1->title = $title;
+        $row1->name = 'Laravel';
+        $row1->type = 'Framework';
+
+        $row2 = new stdClass;
+        $row2->title = $title;
+        $row2->name = 'PHP';
+        $row2->type = 'Vanilla';
+
+        $rows = [$row1, $row2];
+
+        $mock = $this->mockCountBuilder(count($rows));
+
+        $mock->shouldReceive('select')->with(['title', 'name', 'type'])->andReturnSelf();
+
+        $mock->shouldReceive('get')
+            ->andReturn(
+                new Collection($rows)
+            );
+
+        $this->expectException(ExpectationFailedException::class);
+
+        $this->expectExceptionMessage("Failed asserting that a row in the table [products] matches the attributes {\n    \"title\": \"Spark\"\n}.\n\nFound similar results: ".json_encode($rows, JSON_PRETTY_PRINT).'.');
+
+        $this->assertDatabaseHas(
+            ProductStub::class,
+            [
+                'title' => 'Spark',
+                'name' => fn(mixed $value) => $value === 'PHP',
+                'type' => fn(string $value) => $value === 'Library',
+            ],
+        );
+    }
+
+    public function testAssertDatabaseHasHandlesNotFoundClosuresInNonExistingColumns()
+    {
+        $this->data = ['title' => $title = 'Spark'];
+
+        $row1 = new stdClass;
+        $row1->title = $title;
+        $row1->name = 'Laravel';
+        $row1->type = 'Framework';
+
+        $row2 = new stdClass;
+        $row2->title = $title;
+        $row2->name = 'PHP';
+        $row2->type = 'Vanilla';
+
+        $rows = [$row1, $row2];
+
+        $mock = $this->mockCountBuilder(count($rows));
+
+        $mock->shouldReceive('select')->with(['title', 'name', 'type', 'non_existing_column'])->andReturnSelf();
+
+        $mock->shouldReceive('get')
+            ->andReturn(
+                new Collection($rows)
+            );
+
+        $this->expectException(ExpectationFailedException::class);
+
+        $this->expectExceptionMessage("Failed asserting that a row in the table [products] matches the attributes {\n    \"title\": \"Spark\"\n}.\n\nFound similar results: ".json_encode($rows, JSON_PRETTY_PRINT).'.');
+
+        $this->assertDatabaseHas(
+            ProductStub::class,
+            [
+                'title' => 'Spark',
+                'name' => fn(mixed $value) => $value === 'PHP',
+                'type' => fn(string $value) => $value === 'Library',
+                'non_existing_column' => fn($value) => false,
+            ],
+        );
+    }
+
     public function testDontSeeInDatabaseDoesNotFindResults()
     {
         $this->mockCountBuilder(0);
@@ -120,6 +234,78 @@ class FoundationInteractsWithDatabaseTest extends TestCase
         $builder->shouldReceive('get')->andReturn(collect([$this->data]));
 
         $this->assertDatabaseMissing($this->table, $this->data);
+    }
+
+    public function testAssertDatabaseMissingSupportsClosuresInColumns()
+    {
+        $this->data = ['title' => $title = 'Spark'];
+
+        $row1 = new stdClass;
+        $row1->title = $title;
+        $row1->name = 'Laravel';
+        $row1->type = 'Framework';
+
+        $row2 = new stdClass;
+        $row2->title = $title;
+        $row2->name = 'PHP';
+        $row2->type = 'Vanilla';
+
+        $rows = [$row1, $row2];
+
+        $mock = $this->mockCountBuilder(count($rows));
+
+        $mock->shouldReceive('get')
+            ->andReturn(
+                new Collection($rows)
+            );
+
+        $this->assertDatabaseMissing(
+            ProductStub::class,
+            [
+                'title' => 'Spark',
+                'name' => fn(mixed $value) => $value === 'PHP',
+                'type' => fn(string $value) => $value === 'Library',
+            ],
+        );
+    }
+
+    public function testAssertDatabaseMissingHandlesFoundClosuresInColumns()
+    {
+        $this->data = ['title' => $title = 'Spark'];
+
+        $row1 = new stdClass;
+        $row1->title = $title;
+        $row1->name = 'Laravel';
+        $row1->type = 'Framework';
+
+        $row2 = new stdClass;
+        $row2->title = $title;
+        $row2->name = 'PHP';
+        $row2->type = 'Vanilla';
+
+        $rows = [$row1, $row2];
+
+        $mock = $this->mockCountBuilder(count($rows));
+
+        $mock->shouldReceive('select')->with(['title', 'name', 'type'])->andReturnSelf();
+
+        $mock->shouldReceive('get')
+            ->andReturn(
+                new Collection($rows)
+            );
+
+        $this->expectException(ExpectationFailedException::class);
+
+        $this->expectExceptionMessage("Failed asserting that a row in the table [products] does not match the attributes {\n    \"title\": \"Spark\"\n}.\n\nFound similar results: ".json_encode($rows, JSON_PRETTY_PRINT).'.');
+
+        $this->assertDatabaseMissing(
+            ProductStub::class,
+            [
+                'title' => 'Spark',
+                'name' => fn(mixed $value) => $value === 'PHP',
+                'type' => fn(string $value) => $value === 'Vanilla',
+            ],
+        );
     }
 
     public function testAssertTableEntriesCount()

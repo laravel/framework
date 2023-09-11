@@ -51,7 +51,34 @@ class HasInDatabase extends Constraint
      */
     public function matches($table): bool
     {
-        return $this->database->table($table)->where($this->data)->count() > 0;
+        $allData = collect($this->data);
+
+        // Only get callables
+        $callables = $allData->filter(function ($value) {
+            return is_callable($value);
+        });
+
+        // Only get non-callables
+        $data = $allData->filter(function ($value, string $column) use ($callables) {
+            return ! $callables->has($column);
+        })
+            ->toArray();
+
+        $query = $this->database->table($table)->where($data);
+
+        $hasData = $query->count() > 0;
+
+        if (! $hasData || $callables->isEmpty()) {
+            return $hasData;
+        }
+
+        return $query->get()
+            ->filter(function ($row) use ($callables) {
+                return $callables->every(function (callable $callable, string $column) use ($row) {
+                    return property_exists($row, $column) && $callable($row->{$column});
+                });
+            })
+            ->isNotEmpty();
     }
 
     /**
@@ -113,6 +140,10 @@ class HasInDatabase extends Constraint
     public function toString($options = 0): string
     {
         foreach ($this->data as $key => $data) {
+            if (is_callable($data)) {
+                continue;
+            }
+
             $output[$key] = $data instanceof Expression ? $data->getValue($this->database->getQueryGrammar()) : $data;
         }
 
