@@ -196,7 +196,7 @@ class PhpRedisConnector implements Connector
             }
 
             if (! empty($options['failover'])) {
-                $client->setOption(Redis::OPT_SLAVE_FAILOVER, $options['failover']);
+                $client->setOption(RedisCluster::OPT_SLAVE_FAILOVER, $options['failover']);
             }
 
             if (! empty($options['name'])) {
