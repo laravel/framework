@@ -2523,4 +2523,48 @@ class HttpClientTest extends TestCase
         $this->assertSame('Bar', $responses[0]->header('X-Foo'));
         $this->assertSame('', $responses[1]->header('X-Foo'));
     }
+
+    public function testItReturnsResponse(): void
+    {
+        $this->factory->fake([
+            '*' => $this->factory::response('expected content'),
+        ]);
+
+        $response = $this->factory->get('http://laravel.com');
+
+        $this->assertInstanceOf(Response::class, $response);
+        $this->assertSame('expected content', $response->body());
+    }
+
+    public function testItCanReturnCustomResponseClass(): void
+    {
+        $factory = new CustomFactory;
+
+        $factory->fake([
+            '*' => $factory::response('expected content'),
+        ]);
+
+        $response = $factory->get('http://laravel.fake');
+
+        $this->assertInstanceOf(TestResponse::class, $response);
+        $this->assertSame('expected content', $response->body());
+    }
+}
+
+class CustomFactory extends Factory
+{
+    protected function newPendingRequest()
+    {
+        return new class extends PendingRequest
+        {
+            protected function newResponse($response)
+            {
+                return new TestResponse($response);
+            }
+        };
+    }
+}
+
+class TestResponse extends Response
+{
 }
