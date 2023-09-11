@@ -1012,17 +1012,6 @@ class PendingRequest
     }
 
     /**
-     * Return a new response instance with the response.
-     *
-     * @param  MessageInterface  $response
-     * @return Response
-     */
-    protected function newResponse($response)
-    {
-        return new Response($response);
-    }
-
-    /**
      * Send a request either synchronously or asynchronously.
      *
      * @param  string  $method
@@ -1307,6 +1296,17 @@ class PendingRequest
             array_merge_recursive($this->options, Arr::only($options, $this->mergableOptions)),
             ...$options
         );
+    }
+
+    /**
+     * Create a new response instance using the given PSR response.
+     *
+     * @param  \Psr\Http\Message\MessageInterface  $response
+     * @return Response
+     */
+    protected function newResponse($response)
+    {
+        return new Response($response);
     }
 
     /**
