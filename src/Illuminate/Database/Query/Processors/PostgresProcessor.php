@@ -31,15 +31,28 @@ class PostgresProcessor extends Processor
     }
 
     /**
-     * Process the results of a column listing query.
+     * Process the results of columns query.
      *
      * @param  array  $results
      * @return array
      */
-    public function processColumnListing($results)
+    public function processColumns($results)
     {
         return array_map(function ($result) {
-            return ((object) $result)->column_name;
+            $result = (object) $result;
+
+            $autoincrement = $result->default !== null && str_starts_with($result->default, "nextval(");
+
+            return [
+                'name' => $result->name,
+                'type_name' => $result->type_name,
+                'type' => $result->type,
+                'collation' => $result->collation,
+                'nullable' => (bool) $result->nullable,
+                'default' => $autoincrement ? null : $result->default,
+                'auto_increment' => $autoincrement,
+                'comment' => $result->comment,
+            ];
         }, $results);
     }
 }

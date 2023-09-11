@@ -39,10 +39,23 @@ class SQLiteGrammar extends Grammar
     /**
      * Compile the query to determine the list of columns.
      *
+     * @deprecated Will be removed in a future Laravel version.
+     *
      * @param  string  $table
      * @return string
      */
     public function compileColumnListing($table)
+    {
+        return $this->compileColumns($table);
+    }
+
+    /**
+     * Compile the query to determine the columns.
+     *
+     * @param  string  $table
+     * @return string
+     */
+    public function compileColumns($table)
     {
         return 'pragma table_info('.$this->wrap(str_replace('.', '__', $table)).')';
     }

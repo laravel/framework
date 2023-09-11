@@ -56,15 +56,33 @@ class SqlServerProcessor extends Processor
     }
 
     /**
-     * Process the results of a column listing query.
+     * Process the results of columns query.
      *
      * @param  array  $results
      * @return array
      */
-    public function processColumnListing($results)
+    public function processColumns($results)
     {
         return array_map(function ($result) {
-            return ((object) $result)->name;
+            $result = (object) $result;
+
+            $type = match ($typeName = $result->type_name) {
+                'binary', 'varbinary', 'char', 'varchar', 'nchar', 'nvarchar' => $result->length == -1 ? $typeName.'(max)' : $typeName."($result->length)",
+                'decimal', 'numeric' => $typeName."($result->precision,$result->places)",
+                'float', 'datetime2', 'datetimeoffset', 'time' => $typeName."($result->precision)",
+                default => $typeName,
+            };
+
+            return [
+                'name' => $result->name,
+                'type_name' => $result->type_name,
+                'type' => $type,
+                'collation' => $result->collation,
+                'nullable' => (bool) $result->nullable,
+                'default' => $result->default,
+                'auto_increment' => (bool) $result->autoincrement,
+                'comment' => $result->comment,
+            ];
         }, $results);
     }
 }
