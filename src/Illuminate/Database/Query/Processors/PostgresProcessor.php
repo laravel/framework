@@ -41,7 +41,7 @@ class PostgresProcessor extends Processor
         return array_map(function ($result) {
             $result = (object) $result;
 
-            $autoincrement = $result->default !== null && str_starts_with($result->default, "nextval(");
+            $autoincrement = $result->default !== null && str_starts_with($result->default, 'nextval(');
 
             return [
                 'name' => $result->name,
