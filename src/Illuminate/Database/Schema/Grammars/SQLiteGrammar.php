@@ -57,7 +57,11 @@ class SQLiteGrammar extends Grammar
      */
     public function compileColumns($table)
     {
-        return 'pragma table_info('.$this->wrap(str_replace('.', '__', $table)).')';
+        return sprintf(
+            "select name, type, not 'notnull' as 'nullable', dflt_value as 'default', pk as 'primary'"
+            .'from pragma_table_info(%) order by cid asc',
+            $this->wrap(str_replace('.', '__', $table))
+        );
     }
 
     /**

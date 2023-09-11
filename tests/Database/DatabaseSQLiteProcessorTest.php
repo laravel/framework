@@ -12,9 +12,9 @@ class DatabaseSQLiteProcessorTest extends TestCase
         $processor = new SQLiteProcessor;
 
         $listing = [
-            ['name' => 'id', 'type' => 'INTEGER', 'notnull' => '1', 'dflt_value' => '', 'pk' => '1'],
-            ['name' => 'name', 'type' => 'varchar', 'notnull' => '0', 'dflt_value' => 'foo', 'pk' => '0'],
-            ['name' => 'is_active', 'type' => 'tinyint(1)', 'notnull' => '1', 'dflt_value' => '1', 'pk' => '0'],
+            ['name' => 'id', 'type' => 'INTEGER', 'nullable' => '0', 'default' => '', 'primary' => '1'],
+            ['name' => 'name', 'type' => 'varchar', 'nullable' => '1', 'default' => 'foo', 'primary' => '0'],
+            ['name' => 'is_active', 'type' => 'tinyint(1)', 'nullable' => '0', 'default' => '1', 'primary' => '0'],
         ];
         $expected = [
             ['name' => 'id', 'type_name' => 'integer', 'type' => 'integer', 'collation' => null, 'nullable' => false, 'default' => '', 'auto_increment' => true, 'comment' => null],

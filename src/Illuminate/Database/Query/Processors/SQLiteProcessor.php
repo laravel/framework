@@ -27,7 +27,7 @@ class SQLiteProcessor extends Processor
      */
     public function processColumns($results)
     {
-        $hasPrimaryKey = array_sum(array_column($results, 'pk')) === 1;
+        $hasPrimaryKey = array_sum(array_column($results, 'primary')) === 1;
 
         return array_map(function ($result) use ($hasPrimaryKey) {
             $result = (object) $result;
@@ -39,9 +39,9 @@ class SQLiteProcessor extends Processor
                 'type_name' => strtok($type, '('),
                 'type' => $type,
                 'collation' => null,
-                'nullable' => ! $result->notnull,
-                'default' => $result->dflt_value,
-                'auto_increment' => $hasPrimaryKey && $result->pk && $type === 'integer',
+                'nullable' => (bool) $result->nullable,
+                'default' => $result->default,
+                'auto_increment' => $hasPrimaryKey && $result->primary && $type === 'integer',
                 'comment' => null,
             ];
         }, $results);
