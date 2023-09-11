@@ -124,8 +124,8 @@ class FoundationInteractsWithDatabaseTest extends TestCase
             ProductStub::class,
             [
                 'title' => 'Spark',
-                'name' => fn(mixed $value) => in_array($value, ['Laravel', 'Value2']),
-                'type' => fn(string $value) => $value !== 'Library',
+                'name' => fn (mixed $value) => in_array($value, ['Laravel', 'Value2']),
+                'type' => fn (string $value) => $value !== 'Library',
             ],
         );
     }
@@ -163,8 +163,8 @@ class FoundationInteractsWithDatabaseTest extends TestCase
             ProductStub::class,
             [
                 'title' => 'Spark',
-                'name' => fn(mixed $value) => $value === 'PHP',
-                'type' => fn(string $value) => $value === 'Library',
+                'name' => fn (mixed $value) => $value === 'PHP',
+                'type' => fn (string $value) => $value === 'Library',
             ],
         );
     }
@@ -202,9 +202,9 @@ class FoundationInteractsWithDatabaseTest extends TestCase
             ProductStub::class,
             [
                 'title' => 'Spark',
-                'name' => fn(mixed $value) => $value === 'PHP',
-                'type' => fn(string $value) => $value === 'Library',
-                'non_existing_column' => fn($value) => false,
+                'name' => fn (mixed $value) => $value === 'PHP',
+                'type' => fn (string $value) => $value === 'Library',
+                'non_existing_column' => fn ($value) => false,
             ],
         );
     }
@@ -263,8 +263,8 @@ class FoundationInteractsWithDatabaseTest extends TestCase
             ProductStub::class,
             [
                 'title' => 'Spark',
-                'name' => fn(mixed $value) => $value === 'PHP',
-                'type' => fn(string $value) => $value === 'Library',
+                'name' => fn (mixed $value) => $value === 'PHP',
+                'type' => fn (string $value) => $value === 'Library',
             ],
         );
     }
@@ -302,8 +302,8 @@ class FoundationInteractsWithDatabaseTest extends TestCase
             ProductStub::class,
             [
                 'title' => 'Spark',
-                'name' => fn(mixed $value) => $value === 'PHP',
-                'type' => fn(string $value) => $value === 'Vanilla',
+                'name' => fn (mixed $value) => $value === 'PHP',
+                'type' => fn (string $value) => $value === 'Vanilla',
             ],
         );
     }
