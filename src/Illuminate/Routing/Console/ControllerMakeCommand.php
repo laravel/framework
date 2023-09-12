@@ -111,6 +111,10 @@ class ControllerMakeCommand extends GeneratorCommand
      */
     protected function buildClass($name)
     {
+        if ($this->hasOption('views')) {
+            $this->generateViews();
+        }
+
         $controllerNamespace = $this->getNamespace($name);
 
         $replace = [];
@@ -121,10 +125,6 @@ class ControllerMakeCommand extends GeneratorCommand
 
         if ($this->option('model')) {
             $replace = $this->buildModelReplacements($replace);
-        }
-
-        if ($this->hasOption('views')) {
-            $replace = $this->buildViewReplacements($replace);
         }
 
         if ($this->option('creatable')) {
@@ -191,42 +191,6 @@ class ControllerMakeCommand extends GeneratorCommand
             'DummyModelVariable' => lcfirst(class_basename($modelClass)),
             '{{ modelVariable }}' => lcfirst(class_basename($modelClass)),
             '{{modelVariable}}' => lcfirst(class_basename($modelClass)),
-        ]);
-    }
-
-    /**
-     * Build the view replacement values.
-     *
-     * @param  array  $replace
-     * @return array
-     */
-    protected function buildViewReplacements(array $replace)
-    {
-        if (! $this->option('resource') && ! $this->option('parent') && ! $this->option('model')) {
-            return $replace;
-        }
-
-        $options = array_filter([
-            '--extension' => $this->option('views'),
-            '--test' => $this->option('test'),
-            '--pest' => $this->option('pest'),
-        ]);
-
-        $path = Str::of($this->qualifyClass($this->getNameInput()))
-            ->after($this->getDefaultNamespace(rtrim($this->rootNamespace(), '\\')).'\\')
-            ->replaceLast('Controller', '')
-            ->split('/\\\\/')
-            ->map(fn ($part) => Str::kebab($part))
-            ->join('.');
-
-        $this->call('make:view', array_merge($options, ['name' => $path.'.index']));
-        $this->call('make:view', array_merge($options, ['name' => $path.'.create']));
-        $this->call('make:view', array_merge($options, ['name' => $path.'.edit']));
-        $this->call('make:view', array_merge($options, ['name' => $path.'.show']));
-
-        return array_merge($replace, [
-            '{{ viewPath }}' => $path,
-            '{{viewPath}}' => $path,
         ]);
     }
 
@@ -314,6 +278,36 @@ class ControllerMakeCommand extends GeneratorCommand
     }
 
     /**
+     * Generate the views for the controller, if applicable.
+     *
+     * @return void
+     */
+    protected function generateViews()
+    {
+        if (! $this->option('resource') && ! $this->option('parent') && ! $this->option('model')) {
+            return;
+        }
+
+        $options = array_filter([
+            '--extension' => $this->option('views'),
+            '--test' => $this->option('test'),
+            '--pest' => $this->option('pest'),
+        ]);
+
+        $path = Str::of($this->qualifyClass($this->getNameInput()))
+            ->after($this->getDefaultNamespace(rtrim($this->rootNamespace(), '\\')).'\\')
+            ->replaceLast('Controller', '')
+            ->split('/\\\\/')
+            ->map(fn ($part) => Str::kebab($part))
+            ->join('.');
+
+        $this->call('make:view', array_merge($options, ['name' => $path.'.index']));
+        $this->call('make:view', array_merge($options, ['name' => $path.'.create']));
+        $this->call('make:view', array_merge($options, ['name' => $path.'.edit']));
+        $this->call('make:view', array_merge($options, ['name' => $path.'.show']));
+    }
+
+    /**
      * Get the console command options.
      *
      * @return array
@@ -329,9 +323,9 @@ class ControllerMakeCommand extends GeneratorCommand
             ['parent', 'p', InputOption::VALUE_OPTIONAL, 'Generate a nested resource controller class'],
             ['resource', 'r', InputOption::VALUE_NONE, 'Generate a resource controller class'],
             ['requests', 'R', InputOption::VALUE_NONE, 'Generate FormRequest classes for store and update'],
+            ['views', null, InputOption::VALUE_OPTIONAL, 'Generate views for the resource controller'],
             ['singleton', 's', InputOption::VALUE_NONE, 'Generate a singleton resource controller class'],
             ['creatable', null, InputOption::VALUE_NONE, 'Indicate that a singleton resource should be creatable'],
-            ['views', null, InputOption::VALUE_OPTIONAL, 'Generate the views for the resource controller'],
         ];
     }
 
