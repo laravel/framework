@@ -284,7 +284,8 @@ class ControllerMakeCommand extends GeneratorCommand
      */
     protected function generateViews()
     {
-        if (! $this->option('resource') && ! $this->option('parent') && ! $this->option('model')) {
+        if (! $this->option('resource') && ! $this->option('parent') && ! $this->option('model') &&
+            ! $this->option('singleton') && ! $this->option('creatable')) {
             return;
         }
 
@@ -301,8 +302,14 @@ class ControllerMakeCommand extends GeneratorCommand
             ->map(fn ($part) => Str::kebab($part))
             ->join('.');
 
-        $this->call('make:view', array_merge($options, ['name' => $path.'.index']));
-        $this->call('make:view', array_merge($options, ['name' => $path.'.create']));
+        if (! $this->option('singleton') && ! $this->option('creatable')) {
+            $this->call('make:view', array_merge($options, ['name' => $path.'.index']));
+        }
+
+        if (! $this->option('singleton')) {
+            $this->call('make:view', array_merge($options, ['name' => $path.'.create']));
+        }
+
         $this->call('make:view', array_merge($options, ['name' => $path.'.edit']));
         $this->call('make:view', array_merge($options, ['name' => $path.'.show']));
     }
