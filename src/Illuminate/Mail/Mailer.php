@@ -260,7 +260,7 @@ class Mailer implements MailerContract, MailQueueContract
     }
 
     /**
-     * Replace the embedded image attachments when raw, inline image data for browser rendering.
+     * Replace the embedded image attachments with raw, inline image data for browser rendering.
      *
      * @param  string  $renderedView
      * @param  array  $attachments
