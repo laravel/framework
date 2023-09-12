@@ -255,15 +255,30 @@ class Mailer implements MailerContract, MailQueueContract
 
         $renderedView = $this->renderView($view ?: $plain, $data);
 
-        $attachments = $data['message']->getSymfonyMessage()->getAttachments();
+        return $this->replaceEmbeddedAttachments(
+            $renderedView, $data['message']->getSymfonyMessage()->getAttachments()
+        );
+    }
 
-        //search all images to replace cids by data-uris to show in browser
+    /**
+     * Replace the embedded image attachments when raw, inline image data for browser rendering.
+     *
+     * @param  string  $renderedView
+     * @param  array  $attachments
+     * @return string
+     */
+    protected function replaceEmbeddedAttachments(string $renderedView, array $attachments)
+    {
         if (preg_match_all('/<img.+?src=[\'"]cid:([^\'"]+)[\'"].*?>/i', $renderedView, $matches)) {
-            $images = array_unique($matches[1]);
-            foreach ($images as $image) {
+            foreach (array_unique($matches[1]) as $image) {
                 foreach ($attachments as $attachment) {
-                    if ($attachment->getFilename() == $image) {
-                        $renderedView = str_replace('cid:'.$image, 'data:'.$attachment->getContentType().';base64,'.$attachment->bodyToString(), $renderedView);
+                    if ($attachment->getFilename() === $image) {
+                        $renderedView = str_replace(
+                            'cid:'.$image,
+                            'data:'.$attachment->getContentType().';base64,'.$attachment->bodyToString(),
+                            $renderedView
+                        );
+
                         break;
                     }
                 }
