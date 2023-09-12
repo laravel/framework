@@ -206,19 +206,11 @@ class ControllerMakeCommand extends GeneratorCommand
             return $replace;
         }
 
-        $options = [];
-
-        if ($this->option('views')) {
-            $options['--extension'] = $this->option('views');
-        }
-
-        if ($this->option('test')) {
-            $options['--test'] = true;
-        }
-
-        if ($this->option('pest')) {
-            $options['--pest'] = true;
-        }
+        $options = array_filter([
+            '--extension' => $this->option('views'),
+            '--test' => $this->option('test'),
+            '--pest' => $this->option('pest'),
+        ]);
 
         $path = Str::of($this->qualifyClass($this->getNameInput()))
             ->after($this->getDefaultNamespace(rtrim($this->rootNamespace(), '\\')).'\\')
