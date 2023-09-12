@@ -145,6 +145,31 @@ class CacheRepositoryTest extends TestCase
         $this->assertSame('bar', $result);
     }
 
+    public function testRefreshMethodUpdatesKeyAndReturnsNewTTL()
+    {
+        $repo = $this->getRepository();
+        $value = 'bar';
+        $ttl = 60;
+
+        $repo->getStore()->shouldReceive('get')->twice()->with('foo')->andReturn($value);
+        $repo->getStore()->shouldReceive('put')->once()->with('foo', $value, $ttl)->andReturn(true);
+
+        $result = $repo->refresh('foo', $ttl);
+
+        $this->assertTrue($result);
+    }
+
+    public function testRefreshMethodReturnsFalseWhenKeyDoesNotExist()
+    {
+        $repo = $this->getRepository();
+        $ttl = 60;
+
+        $repo->getStore()->shouldReceive('get')->once()->with('foo')->andReturn(null);
+        $result = $repo->refresh('foo', $ttl);
+
+        $this->assertFalse($result);
+    }
+
     public function testPuttingMultipleItemsInCache()
     {
         $repo = $this->getRepository();
