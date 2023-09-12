@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation;
 
+use ErrorException;
 use Illuminate\Contracts\Foundation\MaintenanceMode as MaintenanceModeContract;
 
 class FileBasedMaintenanceMode implements MaintenanceModeContract
@@ -46,6 +47,8 @@ class FileBasedMaintenanceMode implements MaintenanceModeContract
      * Get the data array which was provided when the application was placed into maintenance.
      *
      * @return array
+     *
+     * @throws ErrorException file_get_contents - exception after convert PHP errors to ErrorException
      */
     public function data(): array
     {

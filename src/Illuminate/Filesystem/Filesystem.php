@@ -483,6 +483,8 @@ class Filesystem
      *
      * @param  string  $path
      * @return int
+     *
+     * @throws ErrorException filemtime - exception after convert PHP errors to ErrorException
      */
     public function lastModified($path)
     {

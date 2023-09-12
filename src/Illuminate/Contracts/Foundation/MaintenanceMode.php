@@ -2,6 +2,8 @@
 
 namespace Illuminate\Contracts\Foundation;
 
+use ErrorException;
+
 interface MaintenanceMode
 {
     /**
@@ -30,6 +32,8 @@ interface MaintenanceMode
      * Get the data array which was provided when the application was placed into maintenance.
      *
      * @return array
+     *
+     * @throws ErrorException
      */
     public function data(): array;
 }
