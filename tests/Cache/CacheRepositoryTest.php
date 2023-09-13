@@ -137,10 +137,10 @@ class CacheRepositoryTest extends TestCase
     public function testRememberReturnsStoredNullValue()
     {
         $repo = $this->getRepository();
-        $repo->put('foo', null);
         $repo->getStore()->shouldReceive('has')->once()->andReturn(true);
         $repo->getStore()->shouldReceive('get')->once()->andReturn(null);
-        $repo->getStore()->shouldReceive('put')->never();
+        $repo->getStore()->shouldReceive('put')->once();
+        $repo->put('foo', null);
         $result = $repo->remember('foo', 10, function () {
             return 'bar';
         });
@@ -161,10 +161,10 @@ class CacheRepositoryTest extends TestCase
     public function testRememberForeverReturnsStoredNullValue()
     {
         $repo = $this->getRepository();
-        $repo->put('foo', null);
         $repo->getStore()->shouldReceive('has')->once()->andReturn(true);
         $repo->getStore()->shouldReceive('get')->once()->andReturn(null);
         $repo->getStore()->shouldReceive('forever')->never();
+        $repo->put('foo', null);
         $result = $repo->rememberForever('foo', function () {
             return 'bar';
         });
