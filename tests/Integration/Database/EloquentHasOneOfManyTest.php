@@ -57,21 +57,22 @@ class EloquentHasOneOfManyTest extends DatabaseTestCase
     {
         $user = User::create();
 
-        $expectedState = $user->states()->create([
+        $latestState = $user->states()->create([
             'state' => 'state',
             'type' => 'type',
             'created_at' => '2023-01-01',
             'updated_at' => '2023-01-03',
         ]);
 
-        $user->states()->create([
+        $oldestState = $user->states()->create([
             'state' => 'state',
             'type' => 'type',
             'created_at' => '2023-01-01',
             'updated_at' => '2023-01-02',
         ]);
 
-        $this->assertSame($user->latest_updated_latest_created_state->id, $expectedState->id);
+        $this->assertSame($user->latest_updated_latest_created_state->id, $latestState->id);
+        $this->assertSame($user->oldest_updated_oldest_created_state->id, $oldestState->id);
     }
 }
 
@@ -95,6 +96,15 @@ class User extends Model
         return $this->hasOne(State::class, 'user_id')->ofMany([
             'updated_at' => 'max',
             'created_at' => 'max',
+        ]);
+    }
+
+    
+    public function oldest_updated_oldest_created_state()
+    {
+        return $this->hasOne(State::class, 'user_id')->ofMany([
+            'updated_at' => 'min',
+            'created_at' => 'min',
         ]);
     }
 }
