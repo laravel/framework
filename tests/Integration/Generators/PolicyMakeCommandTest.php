@@ -2,9 +2,6 @@
 
 namespace Illuminate\Tests\Integration\Generators;
 
-use Illuminate\Console\Generators\PresetManager;
-use Illuminate\Console\Generators\Presets\Laravel;
-
 class PolicyMakeCommandTest extends TestCase
 {
     protected $files = [
