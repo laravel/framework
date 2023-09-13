@@ -3,6 +3,7 @@
 namespace Illuminate\Console;
 
 use Illuminate\Console\Concerns\CreatesMatchingTest;
+use Illuminate\Console\Concerns\CreatesUsingGeneratorPreset;
 use Illuminate\Contracts\Console\PromptsForMissingInput;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Str;
@@ -11,6 +12,8 @@ use Symfony\Component\Finder\Finder;
 
 abstract class GeneratorCommand extends Command implements PromptsForMissingInput
 {
+    use CreatesUsingGeneratorPreset;
+
     /**
      * The filesystem instance.
      *
@@ -24,6 +27,13 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
      * @var string
      */
     protected $type;
+
+    /**
+     * Cached traits used by the generator.
+     *
+     * @var array<int, class-string>
+     */
+    protected $usesGeneratorConcerns;
 
     /**
      * Reserved names that cannot be used for generation.
@@ -125,7 +135,11 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
     {
         parent::__construct();
 
-        if (in_array(CreatesMatchingTest::class, class_uses_recursive($this))) {
+        $this->usesGeneratorConcerns = class_uses_recursive($this);
+
+        $this->addGeneratorPresetOptions();
+
+        if (in_array(CreatesMatchingTest::class, $this->usesGeneratorConcerns)) {
             $this->addTestOptions();
         }
 
@@ -181,7 +195,7 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
 
         $info = $this->type;
 
-        if (in_array(CreatesMatchingTest::class, class_uses_recursive($this))) {
+        if (in_array(CreatesMatchingTest::class, $this->usesGeneratorConcerns)) {
             if ($this->handleTestCreation($path)) {
                 $info .= ' and test';
             }
@@ -304,7 +318,7 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
     {
         $name = Str::replaceFirst($this->rootNamespace(), '', $name);
 
-        return $this->laravel['path'].'/'.str_replace('\\', '/', $name).'.php';
+        return $this->generatorPreset()->sourcePath().'/'.str_replace('\\', '/', $name).'.php';
     }
 
     /**
@@ -424,7 +438,7 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
      */
     protected function rootNamespace()
     {
-        return $this->laravel->getNamespace();
+        return $this->generatorPreset()->rootNamespace();
     }
 
     /**
@@ -434,11 +448,7 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
      */
     protected function userProviderModel()
     {
-        $config = $this->laravel['config'];
-
-        $provider = $config->get('auth.guards.'.$config->get('auth.defaults.guard').'.provider');
-
-        return $config->get("auth.providers.{$provider}.model");
+        return $this->generatorPreset()->userProviderModel();
     }
 
     /**
@@ -462,9 +472,7 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
      */
     protected function viewPath($path = '')
     {
-        $views = $this->laravel['config']['view.paths'][0] ?? resource_path('views');
-
-        return $views.($path ? DIRECTORY_SEPARATOR.$path : $path);
+        return $this->generatorPreset()->viewPath().($path ? DIRECTORY_SEPARATOR.$path : $path);
     }
 
     /**
