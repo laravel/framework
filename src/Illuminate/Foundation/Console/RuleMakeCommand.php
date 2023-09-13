@@ -54,7 +54,7 @@ class RuleMakeCommand extends GeneratorCommand
      */
     protected function getStub()
     {
-        $this->resolveStubPath(
+        return $this->resolveStubPath(
             $this->option('implicit')
                 ? '/stubs/rule.implicit.stub'
                 : '/stubs/rule.stub'
