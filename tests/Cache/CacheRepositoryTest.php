@@ -145,7 +145,7 @@ class CacheRepositoryTest extends TestCase
         $this->assertSame('bar', $result);
     }
 
-    public function testRefreshMethodUpdatesKeyAndReturnsNewTTL()
+    public function testExtendMethodUpdatesKeyAndReturnsNewTTL()
     {
         $repo = $this->getRepository();
         $value = 'bar';
@@ -154,18 +154,18 @@ class CacheRepositoryTest extends TestCase
         $repo->getStore()->shouldReceive('get')->twice()->with('foo')->andReturn($value);
         $repo->getStore()->shouldReceive('put')->once()->with('foo', $value, $ttl)->andReturn(true);
 
-        $result = $repo->refresh('foo', $ttl);
+        $result = $repo->extend('foo', $ttl);
 
         $this->assertTrue($result);
     }
 
-    public function testRefreshMethodReturnsFalseWhenKeyDoesNotExist()
+    public function testExtendMethodReturnsFalseWhenKeyDoesNotExist()
     {
         $repo = $this->getRepository();
         $ttl = 60;
 
         $repo->getStore()->shouldReceive('get')->once()->with('foo')->andReturn(null);
-        $result = $repo->refresh('foo', $ttl);
+        $result = $repo->extend('foo', $ttl);
 
         $this->assertFalse($result);
     }

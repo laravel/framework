@@ -224,13 +224,13 @@ class Repository implements ArrayAccess, CacheContract
     }
 
     /**
-     * Refresh an item in the cache with a new TTL.
+     * Extend an item in the cache with a new TTL.
      *
      * @param  string  $key
      * @param  \DateTimeInterface|\DateInterval|int|null  $ttl
      * @return bool
      */
-    public function refresh($key, $ttl = null): bool
+    public function extend($key, $ttl = null): bool
     {
         if ($this->has($key)) {
             return $this->put($key, $this->get($key), $ttl);
