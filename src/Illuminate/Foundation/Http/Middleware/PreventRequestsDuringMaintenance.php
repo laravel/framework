@@ -43,7 +43,7 @@ class PreventRequestsDuringMaintenance
      * @return mixed
      *
      * @throws \Symfony\Component\HttpKernel\Exception\HttpException
-     * @throws ErrorException
+     * @throws \ErrorException
      */
     public function handle($request, Closure $next)
     {
