@@ -47,13 +47,15 @@ class ListenerMakeCommand extends GeneratorCommand
     protected function buildClass($name)
     {
         $event = $this->option('event') ?? '';
+        $preset = $this->generatorPreset();
+
 
         if (! Str::startsWith($event, [
-            $this->laravel->getNamespace(),
+            $preset->rootNamespace(),
             'Illuminate',
             '\\',
         ])) {
-            $event = $this->laravel->getNamespace().'Events\\'.str_replace('/', '\\', $event);
+            $event = $preset->rootNamespace().'Events\\'.str_replace('/', '\\', $event);
         }
 
         $stub = str_replace(

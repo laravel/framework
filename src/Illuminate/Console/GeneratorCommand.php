@@ -259,7 +259,9 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
      */
     protected function possibleModels()
     {
-        $modelPath = is_dir(app_path('Models')) ? app_path('Models') : app_path();
+        $sourcePath = $this->generatorPreset()->sourcePath();
+
+        $modelPath = is_dir("{$sourcePath}/Models") ? "{$sourcePath}/Models" : $sourcePath;
 
         return collect((new Finder)->files()->depth(0)->in($modelPath))
             ->map(fn ($file) => $file->getBasename('.php'))
@@ -275,9 +277,9 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
      */
     protected function possibleEvents()
     {
-        $eventPath = app_path('Events');
+        $sourcePath = $this->generatorPreset()->sourcePath();
 
-        if (! is_dir($eventPath)) {
+        if (! is_dir($eventPath = "{$sourcePath}/Events")) {
             return [];
         }
 

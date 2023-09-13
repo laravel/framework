@@ -97,7 +97,7 @@ class Laravel extends Preset
      */
     public function modelNamespace()
     {
-        return "{$this->rootNamespace}\Models";
+        return is_dir("{$this->sourcePath}/Models") ? "{$this->rootNamespace}\Models" : $this->rootNamespace;
     }
 
     /**

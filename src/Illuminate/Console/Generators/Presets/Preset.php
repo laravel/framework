@@ -3,6 +3,7 @@
 namespace Illuminate\Console\Generators\Presets;
 
 use Illuminate\Contracts\Config\Repository as ConfigContract;
+use LogicException;
 
 abstract class Preset
 {
@@ -140,13 +141,18 @@ abstract class Preset
     /**
      * Get the model for the default guard's user provider.
      *
+     * @param  string|null  $guard
      * @return string|null
      */
-    public function userProviderModel()
+    public function userProviderModel($guard = null)
     {
         $config = $this->config;
 
-        $provider = $config->get('auth.guards.'.$config->get('auth.defaults.guard').'.provider');
+        $guard = $guard ?: $config->get('auth.defaults.guard');
+
+        if (is_null($provider = $config->get('auth.guards.'.$guard.'.provider'))) {
+            throw new LogicException('The ['.$guard.'] guard is not defined in your "auth" configuration file.');
+        }
 
         return $config->get("auth.providers.{$provider}.model");
     }

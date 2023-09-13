@@ -123,6 +123,17 @@ class MailMakeCommand extends GeneratorCommand
     }
 
     /**
+     * Resolve the default fully-qualified path to the stub.
+     *
+     * @param  string  $stub
+     * @return string
+     */
+    protected function resolveDefaultStubPath($stub)
+    {
+        return __DIR__.$stub;
+    }
+
+    /**
      * Get the default namespace for the class.
      *
      * @param  string  $rootNamespace
