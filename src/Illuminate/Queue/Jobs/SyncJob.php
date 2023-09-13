@@ -39,17 +39,6 @@ class SyncJob extends Job implements JobContract
     }
 
     /**
-     * Release the job back into the queue after (n) seconds.
-     *
-     * @param  int  $delay
-     * @return void
-     */
-    public function release($delay = 0)
-    {
-        parent::release($delay);
-    }
-
-    /**
      * Get the number of times the job has been attempted.
      *
      * @return int

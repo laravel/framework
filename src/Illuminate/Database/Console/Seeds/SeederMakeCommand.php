@@ -31,16 +31,6 @@ class SeederMakeCommand extends GeneratorCommand
     protected $type = 'Seeder';
 
     /**
-     * Execute the console command.
-     *
-     * @return void
-     */
-    public function handle()
-    {
-        parent::handle();
-    }
-
-    /**
      * Get the stub file for the generator.
      *
      * @return string
