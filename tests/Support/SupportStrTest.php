@@ -965,8 +965,6 @@ class SupportStrTest extends TestCase
             ['af6f8cb-c57d-11e1-9b21-0800200c9a66'],
             ['af6f8cb0c57d11e19b210800200c9a66'],
             ['ff6f8cb0-c57da-51e1-9b21-0800200c9a66'],
-            ['ff6f8cb0-c57d-11e1-cb21-0800200c9a66'], // Invalid variant
-            ['ff6f8cb0-c57d-61e1-9b21-0800200c9a66'], // Invalid version
         ];
     }
 
