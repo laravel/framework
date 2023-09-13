@@ -142,7 +142,7 @@ class ControllerMakeCommand extends GeneratorCommand
 
         if (! class_exists($parentModelClass) &&
             confirm("A {$parentModelClass} model does not exist. Do you want to generate it?", default: true)) {
-            $this->call('make:model', ['name' => $parentModelClass]);
+            $this->call('make:model', ['name' => $parentModelClass, '--preset' => $this->option('preset')]);
         }
 
         return [
@@ -169,7 +169,7 @@ class ControllerMakeCommand extends GeneratorCommand
         $modelClass = $this->parseModel($this->option('model'));
 
         if (! class_exists($modelClass) && confirm("A {$modelClass} model does not exist. Do you want to generate it?", default: true)) {
-            $this->call('make:model', ['name' => $modelClass]);
+            $this->call('make:model', ['name' => $modelClass, '--preset' => $this->option('preset')]);
         }
 
         $replace = $this->buildFormRequestReplacements($replace, $modelClass);
