@@ -5,84 +5,85 @@ namespace Illuminate\Tests\Integration\Generators;
 class ListenerMakeCommandTest extends TestCase
 {
     protected $files = [
-        'app/Listeners/Foo.php',
-        'tests/Feature/Listeners/FooTest.php',
+        'app/Listeners/FooListener.php',
+        'tests/Feature/Listeners/FooListenerTest.php',
     ];
 
     public function testItCanGenerateListenerFile()
     {
-        $this->artisan('make:listener', ['name' => 'Foo'])
+        $this->artisan('make:listener', ['name' => 'FooListener'])
             ->assertExitCode(0);
 
         $this->assertFileContains([
             'namespace App\Listeners;',
-            'class Foo',
+            'class FooListener',
             'public function handle(object $event)',
-        ], 'app/Listeners/Foo.php');
+        ], 'app/Listeners/FooListener.php');
 
         $this->assertFileNotContains([
-            'class Foo implements ShouldQueue',
-        ], 'app/Listeners/Foo.php');
+            'class FooListener implements ShouldQueue',
+        ], 'app/Listeners/FooListener.php');
     }
+
 
     public function testItCanGenerateListenerFileForEvent()
     {
-        $this->artisan('make:listener', ['name' => 'Foo', '--event' => 'FooCreated'])
+        $this->artisan('make:listener', ['name' => 'FooListener', '--event' => 'FooListenerCreated'])
             ->assertExitCode(0);
 
         $this->assertFileContains([
             'namespace App\Listeners;',
-            'use App\Events\FooCreated;',
-            'class Foo',
-            'public function handle(FooCreated $event)',
-        ], 'app/Listeners/Foo.php');
+            'use App\Events\FooListenerCreated;',
+            'class FooListener',
+            'public function handle(FooListenerCreated $event)',
+        ], 'app/Listeners/FooListener.php');
     }
 
     public function testItCanGenerateListenerFileForIlluminateEvent()
     {
-        $this->artisan('make:listener', ['name' => 'Foo', '--event' => 'Illuminate\Auth\Events\Login'])
+        $this->artisan('make:listener', ['name' => 'FooListener', '--event' => 'Illuminate\Auth\Events\Login'])
             ->assertExitCode(0);
 
         $this->assertFileContains([
             'namespace App\Listeners;',
             'use Illuminate\Auth\Events\Login;',
-            'class Foo',
+            'class FooListener',
             'public function handle(Login $event)',
-        ], 'app/Listeners/Foo.php');
+        ], 'app/Listeners/FooListener.php');
     }
 
     public function testItCanGenerateQueuedListenerFile()
     {
-        $this->artisan('make:listener', ['name' => 'Foo', '--queued' => true])
+        $this->artisan('make:listener', ['name' => 'FooListener', '--queued' => true])
             ->assertExitCode(0);
 
         $this->assertFileContains([
             'namespace App\Listeners;',
             'use Illuminate\Contracts\Queue\ShouldQueue;',
             'use Illuminate\Queue\InteractsWithQueue;',
-            'class Foo implements ShouldQueue',
+            'class FooListener implements ShouldQueue',
             'public function handle(object $event)',
-        ], 'app/Listeners/Foo.php');
+        ], 'app/Listeners/FooListener.php');
     }
 
     public function testItCanGenerateQueuedListenerFileForEvent()
     {
-        $this->artisan('make:listener', ['name' => 'Foo', '--queued' => true, '--event' => 'FooCreated'])
+        $this->artisan('make:listener', ['name' => 'FooListener', '--queued' => true, '--event' => 'FooListenerCreated'])
             ->assertExitCode(0);
 
         $this->assertFileContains([
             'namespace App\Listeners;',
-            'use App\Events\FooCreated;',
+            'use App\Events\FooListenerCreated;',
             'use Illuminate\Contracts\Queue\ShouldQueue;',
             'use Illuminate\Queue\InteractsWithQueue;',
-            'class Foo implements ShouldQueue',
-            'public function handle(FooCreated $event)',
-        ], 'app/Listeners/Foo.php');
+            'class FooListener implements ShouldQueue',
+            'public function handle(FooListenerCreated $event)',
+        ], 'app/Listeners/FooListener.php');
     }
 
     public function testItCanGenerateQueuedListenerFileForIlluminateEvent()
     {
-        $this->artisan('make:listener', ['name' => 'Foo', '--queued' => true, '--event' => 'Illuminate\Auth\Events\Login'])
+        $this->artisan('make:listener', ['name' => 'FooListener', '--queued' => true, '--event' => 'Illuminate\Auth\Events\Login'])
             ->assertExitCode(0);
 
         $this->assertFileContains([
@@ -90,17 +91,17 @@ class ListenerMakeCommandTest extends TestCase
             'use Illuminate\Auth\Events\Login;',
             'use Illuminate\Contracts\Queue\ShouldQueue;',
             'use Illuminate\Queue\InteractsWithQueue;',
-            'class Foo implements ShouldQueue',
+            'class FooListener implements ShouldQueue',
             'public function handle(Login $event)',
-        ], 'app/Listeners/Foo.php');
+        ], 'app/Listeners/FooListener.php');
     }
 
     public function testItCanGenerateQueuedListenerFileWithTest()
     {
-        $this->artisan('make:listener', ['name' => 'Foo', '--test' => true])
+        $this->artisan('make:listener', ['name' => 'FooListener', '--test' => true])
             ->assertExitCode(0);
 
-        $this->assertFilenameExists('app/Listeners/Foo.php');
-        $this->assertFilenameExists('tests/Feature/Listeners/FooTest.php');
+        $this->assertFilenameExists('app/Listeners/FooListener.php');
+        $this->assertFilenameExists('tests/Feature/Listeners/FooListenerTest.php');
     }
 }
