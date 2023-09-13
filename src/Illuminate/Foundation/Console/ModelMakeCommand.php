@@ -4,12 +4,12 @@ namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Concerns\CreatesMatchingTest;
 use Illuminate\Console\GeneratorCommand;
-use Illuminate\Support\Composer;
 use Illuminate\Support\Str;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+
 use function Laravel\Prompts\multiselect;
 
 #[AsCommand(name: 'make:model')]
