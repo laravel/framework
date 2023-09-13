@@ -120,7 +120,6 @@ class FactoryMakeCommand extends GeneratorCommand
             return $modelName;
         }
 
-
         return $this->generatorPreset()->modelNamespace().'\Model';
     }
 
