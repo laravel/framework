@@ -91,7 +91,7 @@ abstract class Compiler
      * @param  string  $path
      * @return bool
      *
-     * @throws ErrorException
+     * @throws \ErrorException
      */
     public function isExpired($path)
     {
