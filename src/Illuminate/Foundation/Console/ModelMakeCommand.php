@@ -126,6 +126,7 @@ class ModelMakeCommand extends GeneratorCommand
 
         $this->call('make:seeder', [
             'name' => "{$seeder}Seeder",
+            '--preset' => $this->option('preset'),
         ]);
     }
 
@@ -147,6 +148,7 @@ class ModelMakeCommand extends GeneratorCommand
             '--requests' => $this->option('requests') || $this->option('all'),
             '--test' => $this->option('test'),
             '--pest' => $this->option('pest'),
+            '--preset' => $this->option('preset'),
         ]));
     }
 
@@ -162,6 +164,7 @@ class ModelMakeCommand extends GeneratorCommand
         $this->call('make:policy', [
             'name' => "{$policy}Policy",
             '--model' => $this->qualifyClass($this->getNameInput()),
+            '--preset' => $this->option('preset'),
         ]);
     }
 
@@ -195,11 +198,12 @@ class ModelMakeCommand extends GeneratorCommand
     }
 
     /**
-     * Get the root namespace for the class.
+     * Get the default namespace for the class.
      *
+     * @param  string  $rootNamespace
      * @return string
      */
-    protected function rootNamespace()
+    protected function getDefaultNamespace($rootNamespace)
     {
         return $this->generatorPreset()->modelNamespace();
     }

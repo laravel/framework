@@ -73,11 +73,12 @@ class ConsoleMakeCommand extends GeneratorCommand
     }
 
     /**
-     * Get the root namespace for the class.
+     * Get the default namespace for the class.
      *
+     * @param  string  $rootNamespace
      * @return string
      */
-    protected function rootNamespace()
+    protected function getDefaultNamespace($rootNamespace)
     {
         return $this->generatorPreset()->commandNamespace();
     }

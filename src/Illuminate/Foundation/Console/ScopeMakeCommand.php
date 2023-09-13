@@ -52,16 +52,6 @@ class ScopeMakeCommand extends GeneratorCommand
     }
 
     /**
-     * Get the root namespace for the class.
-     *
-     * @return string
-     */
-    protected function rootNamespace()
-    {
-        return $this->generatorPreset()->modelNamespace();
-    }
-
-    /**
      * Get the default namespace for the class.
      *
      * @param  string  $rootNamespace
@@ -69,7 +59,7 @@ class ScopeMakeCommand extends GeneratorCommand
      */
     protected function getDefaultNamespace($rootNamespace)
     {
-        return $rootNamespace.'\Scopes';
+        return $this->generatorPreset()->modelNamespace().'\Scopes';
     }
 
     /**

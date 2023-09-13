@@ -54,7 +54,7 @@ class ListenerMakeCommand extends GeneratorCommand
             'Illuminate',
             '\\',
         ])) {
-            $event = $preset->rootNamespace().'Events\\'.str_replace('/', '\\', $event);
+            $event = $preset->rootNamespace().'\\Events\\'.str_replace('/', '\\', $event);
         }
 
         $stub = str_replace(
