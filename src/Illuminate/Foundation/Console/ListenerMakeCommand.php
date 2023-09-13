@@ -49,7 +49,6 @@ class ListenerMakeCommand extends GeneratorCommand
         $event = $this->option('event') ?? '';
         $preset = $this->generatorPreset();
 
-
         if (! Str::startsWith($event, [
             $preset->rootNamespace(),
             'Illuminate',
