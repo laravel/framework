@@ -41,8 +41,8 @@ class CastMakeCommand extends GeneratorCommand
     protected function getStub()
     {
         return $this->option('inbound')
-                    ? $this->resolveStubPath('cast.inbound.stub')
-                    : $this->resolveStubPath('cast.stub');
+                    ? $this->resolveStubPath('/stubs/cast.inbound.stub')
+                    : $this->resolveStubPath('/stubs/cast.stub');
     }
 
     /**
@@ -53,7 +53,7 @@ class CastMakeCommand extends GeneratorCommand
      */
     protected function resolveDefaultStubPath($stub)
     {
-        return __DIR__."/stubs/{$stub}";
+        return __DIR__.$stub;
     }
 
     /**

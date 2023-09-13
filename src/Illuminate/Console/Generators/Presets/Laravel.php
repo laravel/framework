@@ -33,6 +33,16 @@ class Laravel extends Preset
     }
 
     /**
+     * Preset has custom stub path.
+     *
+     * @return bool
+     */
+    public function hasCustomStubPath()
+    {
+        return true;
+    }
+
+    /**
      * Get the path to the base working directory.
      *
      * @return string
@@ -49,7 +59,7 @@ class Laravel extends Preset
      */
     public function sourcePath()
     {
-        return implode(DIRECTORY_SEPARATOR, [$this->basePath(), 'app']);
+        return implode('/', [$this->basePath(), 'app']);
     }
 
     /**
@@ -59,7 +69,7 @@ class Laravel extends Preset
      */
     public function viewPath()
     {
-        return $this->config['view.paths'][0] ?? implode(DIRECTORY_SEPARATOR, [$this->resourcePath(), 'views']);
+        return $this->config['view.paths'][0] ?? implode('/', [$this->resourcePath(), 'views']);
     }
 
     /**
@@ -73,13 +83,13 @@ class Laravel extends Preset
     }
 
     /**
-     * Testing namespace.
+     * Command namespace.
      *
      * @return string
      */
-    public function testingNamespace()
+    abstract public function commandNamespace()
     {
-        return 'Tests';
+        return "{$this->rootNamespace}\Console\Command";
     }
 
     /**
@@ -103,12 +113,12 @@ class Laravel extends Preset
     }
 
     /**
-     * Get custom stub path.
+     * Testing namespace.
      *
-     * @return string|null
+     * @return string
      */
-    public function getCustomStubPath()
+    public function testingNamespace()
     {
-        return implode(DIRECTORY_SEPARATOR, [$this->basePath(), 'stubs']);
+        return 'Tests';
     }
 }

@@ -32,6 +32,16 @@ abstract class Preset
     }
 
     /**
+     * Preset has custom stub path.
+     *
+     * @return bool
+     */
+    public function hasCustomStubPath()
+    {
+        return false;
+    }
+
+    /**
      * Get the path to the base working directory.
      *
      * @return string
@@ -48,7 +58,7 @@ abstract class Preset
      */
     public function testingPath()
     {
-        return implode(DIRECTORY_SEPARATOR, [$this->basePath(), 'tests']);
+        return implode('/', [$this->basePath(), 'tests']);
     }
 
     /**
@@ -58,7 +68,7 @@ abstract class Preset
      */
     public function vendorPath()
     {
-        return implode(DIRECTORY_SEPARATOR, [$this->basePath(), 'vendor']);
+        return implode('/', [$this->basePath(), 'vendor']);
     }
 
     /**
@@ -68,7 +78,7 @@ abstract class Preset
      */
     public function resourcePath()
     {
-        return implode(DIRECTORY_SEPARATOR, [$this->basePath(), 'resources']);
+        return implode('/', [$this->basePath(), 'resources']);
     }
 
     /**
@@ -78,7 +88,7 @@ abstract class Preset
      */
     public function viewPath()
     {
-        return implode(DIRECTORY_SEPARATOR, [$this->resourcePath(), 'views']);
+        return implode('/', [$this->resourcePath(), 'views']);
     }
 
     /**
@@ -86,7 +96,7 @@ abstract class Preset
      */
     public function factoryPath(): string
     {
-        return implode(DIRECTORY_SEPARATOR, [$this->basePath(), 'database', 'factories']);
+        return implode('/', [$this->basePath(), 'database', 'factories']);
     }
 
     /**
@@ -94,7 +104,7 @@ abstract class Preset
      */
     public function migrationPath(): string
     {
-        return implode(DIRECTORY_SEPARATOR, [$this->basePath(), 'database', 'migrations']);
+        return implode('/', [$this->basePath(), 'database', 'migrations']);
     }
 
     /**
@@ -104,7 +114,7 @@ abstract class Preset
      */
     public function seederPath(): string
     {
-        return implode(DIRECTORY_SEPARATOR, [$this->basePath(), 'database', 'seeders']);
+        return implode('/', [$this->basePath(), 'database', 'seeders']);
     }
 
     /**
@@ -142,16 +152,6 @@ abstract class Preset
     }
 
     /**
-     * Preset has custom stub path.
-     *
-     * @return bool
-     */
-    public function hasCustomStubPath()
-    {
-        return ! is_null($this->getCustomStubPath());
-    }
-
-    /**
      * Preset name.
      *
      * @return string
@@ -180,11 +180,11 @@ abstract class Preset
     abstract public function rootNamespace();
 
     /**
-     * Testing namespace.
+     * Command namespace.
      *
      * @return string
      */
-    abstract public function testingNamespace();
+    abstract public function commandNamespace();
 
     /**
      * Model namespace.
@@ -201,9 +201,9 @@ abstract class Preset
     abstract public function providerNamespace();
 
     /**
-     * Get custom stub path.
+     * Testing namespace.
      *
-     * @return string|null
+     * @return string
      */
-    abstract public function getCustomStubPath();
+    abstract public function testingNamespace();
 }

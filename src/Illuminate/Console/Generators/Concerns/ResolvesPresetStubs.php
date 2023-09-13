@@ -14,7 +14,7 @@ trait ResolvesPresetStubs
     {
         $preset = $this->generatorPreset();
 
-        return $preset->hasCustomStubPath() && file_exists($customPath = $preset->getCustomStubPath().$stub)
+        return $preset->hasCustomStubPath() && file_exists($customPath = implode('/', [$preset->basePath(), trim($stub, '/')]))
             ? $customPath
             : $this->resolveDefaultStubPath($stub);
     }

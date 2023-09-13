@@ -11,7 +11,7 @@ class PresetManager extends Manager
      *
      * @var string
      */
-    protected $defaultDriver = 'laravel';
+    protected $defaultPreset = 'laravel';
 
     /**
      * Create "laravel" driver.
@@ -20,7 +20,9 @@ class PresetManager extends Manager
      */
     public function createLaravelDriver()
     {
-        return new Presets\Laravel(basePath: $this->container['path.base']);
+        return new Presets\Laravel(
+            $this->container->getNamespace(), $this->container['path.base']
+        );
     }
 
     /**
@@ -31,7 +33,7 @@ class PresetManager extends Manager
      */
     public function setDefaultDriver($name)
     {
-        $this->defaultDriver = $name;
+        $this->defaultPreset = $name;
     }
 
     /**
@@ -41,6 +43,6 @@ class PresetManager extends Manager
      */
     public function getDefaultDriver()
     {
-        return $this->defaultDriver;
+        return $this->defaultPreset;
     }
 }
