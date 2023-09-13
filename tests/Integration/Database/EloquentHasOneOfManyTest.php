@@ -99,7 +99,6 @@ class User extends Model
         ]);
     }
 
-    
     public function oldest_updated_oldest_created_state()
     {
         return $this->hasOne(State::class, 'user_id')->ofMany([
