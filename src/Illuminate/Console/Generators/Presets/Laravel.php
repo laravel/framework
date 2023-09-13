@@ -2,8 +2,6 @@
 
 namespace Illuminate\Console\Generators\Presets;
 
-use Illuminate\Filesystem\Filesystem;
-
 class Laravel extends Preset
 {
     /**
