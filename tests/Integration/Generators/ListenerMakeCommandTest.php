@@ -9,7 +9,7 @@ class ListenerMakeCommandTest extends TestCase
         'tests/Feature/Listeners/FooTest.php',
     ];
 
-    public function testItCanGenerateListenerFile()
+    public function itCanGenerateListenerFile()
     {
         $this->artisan('make:listener', ['name' => 'Foo'])
             ->assertExitCode(0);
@@ -25,7 +25,7 @@ class ListenerMakeCommandTest extends TestCase
         ], 'app/Listeners/Foo.php');
     }
 
-    public function testItCanGenerateListenerFileForEvent()
+    public function itCanGenerateListenerFileForEvent()
     {
         $this->artisan('make:listener', ['name' => 'Foo', '--event' => 'FooCreated'])
             ->assertExitCode(0);
@@ -38,7 +38,7 @@ class ListenerMakeCommandTest extends TestCase
         ], 'app/Listeners/Foo.php');
     }
 
-    public function testItCanGenerateListenerFileForIlluminateEvent()
+    public function itCanGenerateListenerFileForIlluminateEvent()
     {
         $this->artisan('make:listener', ['name' => 'Foo', '--event' => 'Illuminate\Auth\Events\Login'])
             ->assertExitCode(0);
@@ -51,7 +51,7 @@ class ListenerMakeCommandTest extends TestCase
         ], 'app/Listeners/Foo.php');
     }
 
-    public function testItCanGenerateQueuedListenerFile()
+    public function itCanGenerateQueuedListenerFile()
     {
         $this->artisan('make:listener', ['name' => 'Foo', '--queued' => true])
             ->assertExitCode(0);
@@ -65,7 +65,7 @@ class ListenerMakeCommandTest extends TestCase
         ], 'app/Listeners/Foo.php');
     }
 
-    public function testItCanGenerateQueuedListenerFileForEvent()
+    public function itCanGenerateQueuedListenerFileForEvent()
     {
         $this->artisan('make:listener', ['name' => 'Foo', '--queued' => true, '--event' => 'FooCreated'])
             ->assertExitCode(0);
@@ -80,7 +80,7 @@ class ListenerMakeCommandTest extends TestCase
         ], 'app/Listeners/Foo.php');
     }
 
-    public function testItCanGenerateQueuedListenerFileForIlluminateEvent()
+    public function itCanGenerateQueuedListenerFileForIlluminateEvent()
     {
         $this->artisan('make:listener', ['name' => 'Foo', '--queued' => true, '--event' => 'Illuminate\Auth\Events\Login'])
             ->assertExitCode(0);
@@ -95,7 +95,7 @@ class ListenerMakeCommandTest extends TestCase
         ], 'app/Listeners/Foo.php');
     }
 
-    public function testItCanGenerateQueuedListenerFileWithTest()
+    public function itCanGenerateQueuedListenerFileWithTest()
     {
         $this->artisan('make:listener', ['name' => 'Foo', '--test' => true])
             ->assertExitCode(0);
