@@ -42,8 +42,10 @@ class TestMakeCommandTest extends TestCase
     {
         $manager = $this->app->make(PresetManager::class);
 
-        $manager->extend('acme', fn () => new class('App', $this->app->basePath(), $this->app->make('config')) extends Laravel {
-            public function testingNamespace() {
+        $manager->extend('acme', fn () => new class('App', $this->app->basePath(), $this->app->make('config')) extends Laravel
+        {
+            public function testingNamespace()
+            {
                 return 'Acme\Tests';
             }
         });
@@ -60,13 +62,14 @@ class TestMakeCommandTest extends TestCase
         ], 'tests/Feature/FooTest.php');
     }
 
-
     public function testItCanGenerateUnitTestWithCustomNamespace()
     {
         $manager = $this->app->make(PresetManager::class);
 
-        $manager->extend('acme', fn () => new class('App', $this->app->basePath(), $this->app->make('config')) extends Laravel {
-            public function testingNamespace() {
+        $manager->extend('acme', fn () => new class('App', $this->app->basePath(), $this->app->make('config')) extends Laravel
+        {
+            public function testingNamespace()
+            {
                 return 'Acme\Tests';
             }
         });
@@ -107,12 +110,13 @@ class TestMakeCommandTest extends TestCase
     {
         $manager = $this->app->make(PresetManager::class);
 
-        $manager->extend('acme', fn () => new class('App', $this->app->basePath(), $this->app->make('config')) extends Laravel {
-            public function testingNamespace() {
+        $manager->extend('acme', fn () => new class('App', $this->app->basePath(), $this->app->make('config')) extends Laravel
+        {
+            public function testingNamespace()
+            {
                 return 'Acme\Tests';
             }
         });
-
 
         $this->artisan('make:test', ['name' => 'FooTest', '--pest' => true, '--preset' => 'acme'])
             ->assertExitCode(0);
@@ -128,8 +132,10 @@ class TestMakeCommandTest extends TestCase
     {
         $manager = $this->app->make(PresetManager::class);
 
-        $manager->extend('acme', fn () => new class('App', $this->app->basePath(), $this->app->make('config')) extends Laravel {
-            public function testingNamespace() {
+        $manager->extend('acme', fn () => new class('App', $this->app->basePath(), $this->app->make('config')) extends Laravel
+        {
+            public function testingNamespace()
+            {
                 return 'Acme\Tests';
             }
         });
