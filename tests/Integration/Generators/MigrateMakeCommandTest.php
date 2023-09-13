@@ -28,7 +28,6 @@ class MigrateMakeCommandTest extends TestCase
         ], 'add_bar_to_foos_table.php');
     }
 
-    /** @test */
     public function testItCanGenerateMigrationFileUsingCreateKeyword()
     {
         $this->artisan('make:migration', ['name' => 'CreateFoosTable'])
@@ -42,7 +41,6 @@ class MigrateMakeCommandTest extends TestCase
         ], 'create_foos_table.php');
     }
 
-    /** @test */
     public function testItCanGenerateMigrationFileUsingCreateOption()
     {
         $this->artisan('make:migration', ['name' => 'FoosTable', '--create' => 'foobar'])
