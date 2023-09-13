@@ -385,13 +385,11 @@ class Repository implements ArrayAccess, CacheContract
      */
     public function remember($key, $ttl, Closure $callback)
     {
-        $value = $this->get($key);
-
         // If the item exists in the cache we will just return this immediately and if
         // not we will execute the given Closure and cache the result of that for a
         // given number of seconds so it's available for all subsequent requests.
-        if (! is_null($value)) {
-            return $value;
+        if ($this->has($key)) {
+            return $this->get($key);
         }
 
         $value = $callback();
@@ -426,13 +424,11 @@ class Repository implements ArrayAccess, CacheContract
      */
     public function rememberForever($key, Closure $callback)
     {
-        $value = $this->get($key);
-
         // If the item exists in the cache we will just return this immediately
         // and if not we will execute the given Closure and cache the result
         // of that forever so it is available for all subsequent requests.
-        if (! is_null($value)) {
-            return $value;
+        if ($this->has($key)) {
+            return $this->get($key);
         }
 
         $this->forever($key, $value = $callback());

@@ -134,6 +134,19 @@ class CacheRepositoryTest extends TestCase
         $this->assertSame('bar', $result);
     }
 
+    public function testRememberReturnsStoredNullValue()
+    {
+        $repo = $this->getRepository();
+        $repo->put('foo', null);
+        $repo->getStore()->shouldReceive('has')->once()->andReturn(true);
+        $repo->getStore()->shouldReceive('get')->once()->andReturn(null);
+        $repo->getStore()->shouldReceive('put')->never();
+        $result = $repo->remember('foo', 10, function () {
+            return 'bar';
+        });
+        $this->assertSame(null, $result);
+    }
+
     public function testRememberForeverMethodCallsForeverAndReturnsDefault()
     {
         $repo = $this->getRepository();
@@ -143,6 +156,19 @@ class CacheRepositoryTest extends TestCase
             return 'bar';
         });
         $this->assertSame('bar', $result);
+    }
+
+    public function testRememberForeverReturnsStoredNullValue()
+    {
+        $repo = $this->getRepository();
+        $repo->put('foo', null);
+        $repo->getStore()->shouldReceive('has')->once()->andReturn(true);
+        $repo->getStore()->shouldReceive('get')->once()->andReturn(null);
+        $repo->getStore()->shouldReceive('forever')->never();
+        $result = $repo->rememberForever('foo', function () {
+            return 'bar';
+        });
+        $this->assertSame(null, $result);
     }
 
     public function testPuttingMultipleItemsInCache()
