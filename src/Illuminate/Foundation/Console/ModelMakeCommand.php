@@ -91,6 +91,7 @@ class ModelMakeCommand extends GeneratorCommand
         $this->call('make:factory', [
             'name' => "{$factory}Factory",
             '--model' => $this->qualifyClass($this->getNameInput()),
+            '--preset' => $this->option('preset'),
         ]);
     }
 

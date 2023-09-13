@@ -43,13 +43,13 @@ class ObserverMakeCommandTest extends TestCase
     {
         $manager = $this->app->make(PresetManager::class);
 
-        $manager->extend('custom', fn () => new class('App', $this->app->basePath(), $this->app->make('config')) extends Laravel {
+        $manager->extend('acme', fn () => new class('App', $this->app->basePath(), $this->app->make('config')) extends Laravel {
             public function modelNamespace() {
                 return 'Acme\Model';
             }
         });
 
-        $this->artisan('make:observer', ['name' => 'FooObserver', '--model' => 'Foo', '--preset' => 'custom'])
+        $this->artisan('make:observer', ['name' => 'FooObserver', '--model' => 'Foo', '--preset' => 'acme'])
             ->assertExitCode(0);
 
         $this->assertFileContains([

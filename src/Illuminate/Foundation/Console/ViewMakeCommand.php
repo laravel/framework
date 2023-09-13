@@ -203,7 +203,7 @@ class ViewMakeCommand extends GeneratorCommand
     {
         $stubName = 'view.'.($this->option('pest') ? 'pest' : 'test').'.stub';
 
-        return $this->resolveStubPath("stubs/{$stubName}");
+        return $this->resolveStubPath("/stubs/{$stubName}");
     }
 
     /**
