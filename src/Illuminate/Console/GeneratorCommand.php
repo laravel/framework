@@ -4,6 +4,7 @@ namespace Illuminate\Console;
 
 use Illuminate\Console\Concerns\CreatesMatchingTest;
 use Illuminate\Console\Concerns\CreatesUsingGeneratorPreset;
+use Illuminate\Console\Generators\Concerns\ResolvesPresetStubs;
 use Illuminate\Contracts\Console\PromptsForMissingInput;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Str;
@@ -12,7 +13,8 @@ use Symfony\Component\Finder\Finder;
 
 abstract class GeneratorCommand extends Command implements PromptsForMissingInput
 {
-    use CreatesUsingGeneratorPreset;
+    use CreatesUsingGeneratorPreset,
+        ResolvesPresetStubs;
 
     /**
      * The filesystem instance.

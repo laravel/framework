@@ -4,15 +4,13 @@ namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Concerns\CreatesMatchingTest;
 use Illuminate\Console\GeneratorCommand;
-use Illuminate\Console\Generators\Concerns\ResolvesPresetStubs;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputOption;
 
 #[AsCommand(name: 'make:job')]
 class JobMakeCommand extends GeneratorCommand
 {
-    use CreatesMatchingTest,
-        ResolvesPresetStubs;
+    use CreatesMatchingTest;
 
     /**
      * The console command name.
@@ -43,8 +41,8 @@ class JobMakeCommand extends GeneratorCommand
     protected function getStub()
     {
         return $this->option('sync')
-                        ? $this->resolveStubPath('job.stub')
-                        : $this->resolveStubPath('job.queued.stub');
+                        ? $this->resolveStubPath('/stubs/job.stub')
+                        : $this->resolveStubPath('/stubs/job.queued.stub');
     }
 
     /**
@@ -55,7 +53,7 @@ class JobMakeCommand extends GeneratorCommand
      */
     protected function resolveDefaultStubPath($stub)
     {
-        return __DIR__."/stubs/{$stub}";
+        return __DIR__.$stub;
     }
 
     /**

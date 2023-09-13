@@ -3,15 +3,12 @@
 namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\GeneratorCommand;
-use Illuminate\Console\Generators\Concerns\ResolvesPresetStubs;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputOption;
 
 #[AsCommand(name: 'make:cast')]
 class CastMakeCommand extends GeneratorCommand
 {
-    use ResolvesPresetStubs;
-
     /**
      * The console command name.
      *

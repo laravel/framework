@@ -3,15 +3,12 @@
 namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\GeneratorCommand;
-use Illuminate\Console\Generators\Concerns\ResolvesPresetStubs;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputOption;
 
 #[AsCommand(name: 'make:event')]
 class EventMakeCommand extends GeneratorCommand
 {
-    use ResolvesPresetStubs;
-
     /**
      * The console command name.
      *
@@ -52,7 +49,7 @@ class EventMakeCommand extends GeneratorCommand
      */
     protected function getStub()
     {
-        return $this->resolveStubPath('event.stub');
+        return $this->resolveStubPath('/stubs/event.stub');
     }
 
     /**
@@ -63,7 +60,7 @@ class EventMakeCommand extends GeneratorCommand
      */
     protected function resolveDefaultStubPath($stub)
     {
-        return __DIR__."/stubs/{$stub}";
+        return __DIR__.$stub;
     }
 
     /**

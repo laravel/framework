@@ -4,7 +4,6 @@ namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Concerns\CreatesMatchingTest;
 use Illuminate\Console\GeneratorCommand;
-use Illuminate\Console\Generators\Concerns\ResolvesPresetStubs;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Str;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -13,8 +12,7 @@ use Symfony\Component\Console\Input\InputOption;
 #[AsCommand(name: 'make:component')]
 class ComponentMakeCommand extends GeneratorCommand
 {
-    use CreatesMatchingTest,
-        ResolvesPresetStubs;
+    use CreatesMatchingTest;
 
     /**
      * The console command name.
@@ -141,7 +139,7 @@ class ComponentMakeCommand extends GeneratorCommand
      */
     protected function getStub()
     {
-        return $this->resolveStubPath('view-component.stub');
+        return $this->resolveStubPath('/stubs/view-component.stub');
     }
 
     /**
@@ -152,7 +150,7 @@ class ComponentMakeCommand extends GeneratorCommand
      */
     protected function resolveDefaultStubPath($stub)
     {
-        return __DIR__."/stubs/{$stub}";
+        return __DIR__.$stub;
     }
 
     /**
