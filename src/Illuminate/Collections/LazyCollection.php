@@ -1421,7 +1421,24 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     public function take($limit)
     {
         if ($limit < 0) {
-            return $this->passthru('take', func_get_args());
+            return new static(function () use ($limit) {
+                $queue = [];
+                $positiveLimit = abs($limit);
+
+                $iterator = $this->getIterator();
+                foreach ($iterator as $key => $value) {
+                    $queue[] = [$key, $value];
+
+                    // If the length of tempQueue exceeds abs($limit), remove the first element.
+                    if (count($queue) > $positiveLimit) {
+                        array_shift($queue);
+                    }
+                }
+
+                foreach ($queue as $item) {
+                    yield $item[0] => $item[1];
+                }
+            });
         }
 
         return new static(function () use ($limit) {
