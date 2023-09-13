@@ -51,16 +51,14 @@ class SeederMakeCommand extends GeneratorCommand
     }
 
     /**
-     * Resolve the fully-qualified path to the stub.
+     * Resolve the default fully-qualified path to the stub.
      *
      * @param  string  $stub
      * @return string
      */
-    protected function resolveStubPath($stub)
+    protected function resolveDefaultStubPath($stub)
     {
-        return is_file($customPath = $this->laravel->basePath(trim($stub, '/')))
-            ? $customPath
-            : __DIR__.$stub;
+        return __DIR__.$stub;
     }
 
     /**
@@ -73,11 +71,7 @@ class SeederMakeCommand extends GeneratorCommand
     {
         $name = str_replace('\\', '/', Str::replaceFirst($this->rootNamespace(), '', $name));
 
-        if (is_dir($this->laravel->databasePath().'/seeds')) {
-            return $this->laravel->databasePath().'/seeds/'.$name.'.php';
-        }
-
-        return $this->laravel->databasePath().'/seeders/'.$name.'.php';
+        return $this->generatorPreset()->seederPath().'/'.$name.'.php';
     }
 
     /**
@@ -87,6 +81,6 @@ class SeederMakeCommand extends GeneratorCommand
      */
     protected function rootNamespace()
     {
-        return 'Database\Seeders\\';
+        return $this->generatorPreset()->seederNamespace();
     }
 }

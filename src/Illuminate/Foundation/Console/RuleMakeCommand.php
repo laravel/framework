@@ -54,13 +54,22 @@ class RuleMakeCommand extends GeneratorCommand
      */
     protected function getStub()
     {
-        $stub = $this->option('implicit')
-            ? '/stubs/rule.implicit.stub'
-            : '/stubs/rule.stub';
+        $this->resolveStubPath(
+            $this->option('implicit')
+                ? '/stubs/rule.implicit.stub'
+                : '/stubs/rule.stub'
+        );
+    }
 
-        return file_exists($customPath = $this->laravel->basePath(trim($stub, '/')))
-            ? $customPath
-            : __DIR__.$stub;
+    /**
+     * Resolve the default fully-qualified path to the stub.
+     *
+     * @param  string  $stub
+     * @return string
+     */
+    protected function resolveDefaultStubPath($stub)
+    {
+        return __DIR__.$stub;
     }
 
     /**

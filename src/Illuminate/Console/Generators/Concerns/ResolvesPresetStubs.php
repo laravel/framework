@@ -25,5 +25,8 @@ trait ResolvesPresetStubs
      * @param  string  $stub
      * @return string
      */
-    abstract protected function resolveDefaultStubPath($stub);
+    protected function resolveDefaultStubPath($stub)
+    {
+        return $stub;
+    }
 }

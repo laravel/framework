@@ -2,6 +2,8 @@
 
 namespace Illuminate\Console\Generators\Presets;
 
+use Illuminate\Contracts\Config\Repository as ConfigContract;
+
 class Laravel extends Preset
 {
     /**
@@ -71,6 +73,20 @@ class Laravel extends Preset
     }
 
     /**
+     * Get the path to the seeder directory.
+     *
+     * @return string
+     */
+    public function seederPath(): string
+    {
+        if (is_dir($seederPath = implode('/', [$this->basePath(), 'database', 'seeds']))) {
+            return $seederPath;
+        }
+
+        return implode('/', [$this->basePath(), 'database', 'seeders']);
+    }
+
+    /**
      * Preset namespace.
      *
      * @return string
@@ -85,7 +101,7 @@ class Laravel extends Preset
      *
      * @return string
      */
-    abstract public function commandNamespace()
+    public function commandNamespace()
     {
         return "{$this->rootNamespace}\Console\Command";
     }
@@ -97,7 +113,7 @@ class Laravel extends Preset
      */
     public function modelNamespace()
     {
-        return is_dir("{$this->sourcePath}/Models") ? "{$this->rootNamespace}\Models" : $this->rootNamespace;
+        return is_dir("{$this->sourcePath()}/Models") ? "{$this->rootNamespace}\Models" : $this->rootNamespace;
     }
 
     /**

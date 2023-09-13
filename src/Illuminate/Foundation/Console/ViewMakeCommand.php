@@ -95,16 +95,14 @@ class ViewMakeCommand extends GeneratorCommand
     }
 
     /**
-     * Resolve the fully-qualified path to the stub.
+     * Resolve the default fully-qualified path to the stub.
      *
      * @param  string  $stub
      * @return string
      */
-    protected function resolveStubPath($stub)
+    protected function resolveDefaultStubPath($stub)
     {
-        return file_exists($customPath = $this->laravel->basePath(trim($stub, '/')))
-                        ? $customPath
-                        : __DIR__.$stub;
+        return __DIR__.$stub;
     }
 
     /**
@@ -114,13 +112,15 @@ class ViewMakeCommand extends GeneratorCommand
      */
     protected function getTestPath()
     {
-        return base_path(
-            Str::of($this->testClassFullyQualifiedName())
+        $preset = $this->generatorPreset();
+
+        $testPath = Str::of($this->testClassFullyQualifiedName())
                 ->replace('\\', '/')
-                ->replaceFirst('Tests/Feature', 'tests/Feature')
+                ->replaceFirst('Tests/Feature', str_replace($preset->basePath(), '', $preset->testingPath()).'/Feature')
                 ->append('Test.php')
-                ->value()
-        );
+                ->value();
+
+        return $this->generatorPreset()->basePath().$testPath;
     }
 
     /**
@@ -191,7 +191,7 @@ class ViewMakeCommand extends GeneratorCommand
             ->map(fn ($part) => Str::of($part)->ucfirst())
             ->implode('');
 
-        return 'Tests\\Feature\\View\\'.$namespacedName;
+        return $this->generatorPreset()->testingNamespace().'\\Feature\\View\\'.$namespacedName;
     }
 
     /**
@@ -203,9 +203,7 @@ class ViewMakeCommand extends GeneratorCommand
     {
         $stubName = 'view.'.($this->option('pest') ? 'pest' : 'test').'.stub';
 
-        return file_exists($customPath = $this->laravel->basePath("stubs/$stubName"))
-            ? $customPath
-            : __DIR__.'/stubs/'.$stubName;
+        return $this->resolveStubPath("stubs/{$stubName}");
     }
 
     /**

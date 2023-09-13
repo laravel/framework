@@ -241,15 +241,13 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
 
         $model = str_replace('/', '\\', $model);
 
-        $rootNamespace = $this->rootNamespace();
+        $rootNamespace = $this->generatorPreset()->modelNamespace();
 
         if (Str::startsWith($model, $rootNamespace)) {
             return $model;
         }
 
-        return is_dir(app_path('Models'))
-                    ? $rootNamespace.'Models\\'.$model
-                    : $rootNamespace.$model;
+        return $rootNamespace.'\\'.$model;
     }
 
     /**

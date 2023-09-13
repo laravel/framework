@@ -123,7 +123,7 @@ abstract class Preset
      *
      * @return string
      */
-    public function factoryNamespace(): string
+    public function factoryNamespace()
     {
         return 'Database\Factories';
     }

@@ -2,6 +2,7 @@
 
 namespace Illuminate\Console\Concerns;
 
+use Illuminate\Console\Generators\PresetManager;
 use Illuminate\Support\Str;
 use Symfony\Component\Console\Input\InputOption;
 

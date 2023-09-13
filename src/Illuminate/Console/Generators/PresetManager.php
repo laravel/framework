@@ -21,7 +21,7 @@ class PresetManager extends Manager
     public function createLaravelDriver()
     {
         return new Presets\Laravel(
-            $this->container->getNamespace(), $this->container['path.base']
+            trim($this->container->getNamespace(), '\\'), $this->container['path.base'], $this->config
         );
     }
 
