@@ -22,7 +22,8 @@ class ViewComponentTest extends TestCase
 
     public function testIgnoredMethodsAreNotExposedToViewData()
     {
-        $component = new class extends Component {
+        $component = new class extends Component
+        {
             protected $except = ['goodbye'];
 
             public function render()
