@@ -20,6 +20,14 @@ class EloquentHasOneOfManyTest extends DatabaseTestCase
             $table->id();
             $table->foreignId('user_id');
         });
+
+        Schema::create('states', function ($table) {
+            $table->increments('id');
+            $table->string('state');
+            $table->string('type');
+            $table->foreignId('user_id');
+            $table->timestamps();
+        });
     }
 
     public function testItOnlyEagerLoadsRequiredModels()
@@ -44,6 +52,27 @@ class EloquentHasOneOfManyTest extends DatabaseTestCase
 
         $this->assertSame(2, $this->retrievedLogins);
     }
+
+    public function testItGetsCorrectResultUsingAtLeastTwoAggregatesDistinctFromId()
+    {
+        $user = User::create();
+
+        $expectedState = $user->states()->create([
+            'state' => 'state',
+            'type' => 'type',
+            'created_at' => '2023-01-01',
+            'updated_at' => '2023-01-03',
+        ]);
+
+        $user->states()->create([
+            'state' => 'state',
+            'type' => 'type',
+            'created_at' => '2023-01-01',
+            'updated_at' => '2023-01-02',
+        ]);
+
+        $this->assertSame($user->latest_updated_latest_created_state->id, $expectedState->id);
+    }
 }
 
 class User extends Model
@@ -55,10 +84,28 @@ class User extends Model
     {
         return $this->hasOne(Login::class)->ofMany();
     }
+
+    public function states()
+    {
+        return $this->hasMany(State::class);
+    }
+
+    public function latest_updated_latest_created_state()
+    {
+        return $this->hasOne(State::class, 'user_id')->ofMany([
+            'updated_at' => 'max',
+            'created_at' => 'max',
+        ]);
+    }
 }
 
 class Login extends Model
 {
     protected $guarded = [];
     public $timestamps = false;
+}
+
+class State extends Model
+{
+    protected $guarded = [];
 }
