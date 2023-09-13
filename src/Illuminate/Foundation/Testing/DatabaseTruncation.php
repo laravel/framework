@@ -24,6 +24,8 @@ trait DatabaseTruncation
      */
     protected function truncateDatabaseTables(): void
     {
+        $this->beforeTruncatingDatabase();
+
         // Migrate and seed the database on first run...
         if (! RefreshDatabaseState::$migrated) {
             $this->artisan('migrate:fresh', $this->migrateFreshUsing());
@@ -45,6 +47,8 @@ trait DatabaseTruncation
             // Use the default seeder class...
             $this->artisan('db:seed');
         }
+
+        $this->afterTruncatingDatabase();
     }
 
     /**
@@ -143,5 +147,25 @@ trait DatabaseTruncation
         }
 
         return [$this->app['config']->get('database.migrations')];
+    }
+
+    /**
+     * Perform any work that should take place before the database has started truncating.
+     *
+     * @return void
+     */
+    protected function beforeTruncatingDatabase(): void
+    {
+        //
+    }
+
+    /**
+     * Perform any work that should take place once the database has finished truncating.
+     *
+     * @return void
+     */
+    protected function afterTruncatingDatabase(): void
+    {
+        //
     }
 }

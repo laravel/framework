@@ -5,7 +5,6 @@ namespace Illuminate\Tests\Console;
 use Illuminate\Console\Command;
 use Illuminate\Console\Signals;
 use Illuminate\Tests\Console\Fixtures\FakeSignalsRegistry;
-use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
 class CommandTrapTest extends TestCase
@@ -22,11 +21,6 @@ class CommandTrapTest extends TestCase
 
         $this->registry = new FakeSignalsRegistry();
         $this->state = null;
-    }
-
-    protected function tearDown(): void
-    {
-        m::close();
     }
 
     public function testTrapWhenAvailable()
