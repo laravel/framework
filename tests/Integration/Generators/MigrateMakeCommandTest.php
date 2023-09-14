@@ -61,14 +61,14 @@ class MigrateMakeCommandTest extends TestCase
         ], 'foos_table.php');
     }
 
-
     public function testItCanGenerateMigrationFileWithCustomMigrationPath()
     {
         $manager = $this->app->make(PresetManager::class);
 
         $manager->extend('acme', fn () => $preset = new class('App', $this->app->basePath(), $this->app->make('config')) extends Laravel
         {
-            public function name() {
+            public function name()
+            {
                 return 'acme';
             }
 
@@ -81,6 +81,6 @@ class MigrateMakeCommandTest extends TestCase
         $this->artisan('make:migration', ['name' => 'AcmeFoosTable', '--create' => 'foobar', '--preset' => 'acme'])
             ->assertExitCode(0);
 
-        $this->assertCount(1, $this->app['files']->glob($this->app->basePath("database/acme-migrations/*acme_foos_table.php")));
+        $this->assertCount(1, $this->app['files']->glob($this->app->basePath('database/acme-migrations/*acme_foos_table.php')));
     }
 }
