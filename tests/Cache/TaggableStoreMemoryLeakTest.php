@@ -3,7 +3,7 @@
 namespace Tests\Cache;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
+use Illuminate\Tests\TestCase;
 
 class TaggableStoreMemoryLeakTest extends TestCase
 {
