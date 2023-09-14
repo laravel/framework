@@ -46,7 +46,7 @@ class SQLiteGrammar extends Grammar
      */
     public function compileColumnListing($table)
     {
-        return $this->compileColumns($table);
+        return 'pragma table_info('.$this->wrap(str_replace('.', '__', $table)).')';
     }
 
     /**
