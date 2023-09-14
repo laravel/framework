@@ -9,9 +9,8 @@ use Illuminate\Contracts\Cache\Store;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Str;
-use RuntimeException;
 
-class DynamoDbStore implements LockProvider, Store
+class DynamoDbStore extends TaggableStore implements LockProvider, Store
 {
     use InteractsWithTime;
 
@@ -82,6 +81,27 @@ class DynamoDbStore implements LockProvider, Store
         $this->expirationAttribute = $expirationAttribute;
 
         $this->setPrefix($prefix);
+    }
+
+    /**
+     * making use of tags
+     * 
+     * @param array|string $names
+     * @return DynamoDbTaggedCache
+     */
+    public function tags($names)
+    {
+        return new DynamoDbTaggedCache(
+            $this,
+            new DynamoDbStoreConfig(
+                $this->table,
+                $this->keyAttribute,
+                $this->prefix,
+                $this->valueAttribute,
+                $this->expirationAttribute
+            ),
+            new TagSet($this, is_array($names) ? $names : [ $names ])
+        );
     }
 
     /**
@@ -451,12 +471,64 @@ class DynamoDbStore implements LockProvider, Store
      * Remove all items from the cache.
      *
      * @return bool
-     *
-     * @throws \RuntimeException
      */
     public function flush()
     {
-        throw new RuntimeException('DynamoDb does not support flushing an entire table. Please create a new table.');
+        $keys = [];
+        $exclusiveStartKey = null;
+
+        do {
+            $scanRequest = [
+                'TableName' => $this->table,
+                'ProjectionExpression' => $this->keyAttribute,
+                'Select' => 'SPECIFIC_ATTRIBUTES'
+            ];
+
+            if ($exclusiveStartKey) {
+                $scanRequest['ExclusiveStartKey'] = $exclusiveStartKey;
+            }
+
+            $response = $this->dynamo->scan($scanRequest);
+
+            $exclusiveStartKey = $response->get('LastEvaluatedKey') ?? null;
+
+            $keys = array_merge($keys, array_map(function ($item) {
+                return $item[$this->keyAttribute]['S'];
+            }, $response->get('Items')));
+        } while ($exclusiveStartKey);
+
+        $this->batchDelete($keys);
+
+        return true;
+    }
+
+    /**
+     * @param string[] $keys
+     * @return bool
+     */
+    public function batchDelete(array $keys)
+    {
+        $chunks = array_chunk($keys, 25);
+
+        foreach ($chunks as $chunk) {
+            $this->dynamo->batchWriteItem([
+                'RequestItems' => [
+                    $this->table => array_map(function (string $key) {
+                        return [
+                            'DeleteRequest' => [
+                                'Key' => [
+                                    $this->keyAttribute => [
+                                        'S' => $this->prefix . $key
+                                    ]
+                                ]
+                            ]
+                        ];
+                    }, $chunk)
+                ]
+            ]);
+        }
+
+        return true;
     }
 
     /**
