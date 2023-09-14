@@ -80,7 +80,7 @@ class ConsoleMakeCommand extends GeneratorCommand
      */
     protected function getDefaultNamespace($rootNamespace)
     {
-        return $this->generatorPreset()->commandNamespace();
+        return rtrim($this->generatorPreset()->commandNamespace(), '\\');
     }
 
     /**
