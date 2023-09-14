@@ -2,8 +2,6 @@
 
 namespace Illuminate\Console\Generators\Presets;
 
-use Illuminate\Contracts\Config\Repository as ConfigContract;
-
 class Laravel extends Preset
 {
     /**
