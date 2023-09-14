@@ -70,7 +70,7 @@ class TestMakeCommand extends GeneratorCommand
     {
         $name = Str::replaceFirst($this->rootNamespace(), '', $name);
 
-        return $this->generatorPreset()->testingPath().str_replace('\\', '/', $name).'.php';
+        return $this->generatorPreset()->testingPath().'/'.str_replace('\\', '/', $name).'.php';
     }
 
     /**
