@@ -21,7 +21,6 @@ class ConsoleMakeCommandTest extends TestCase
         ], 'app/Console/Commands/FooCommand.php');
     }
 
-    /** @test */
     public function testItCanGenerateConsoleFileWithCommandOption()
     {
         $this->artisan('make:command', ['name' => 'FooCommand', '--command' => 'foo:bar'])
