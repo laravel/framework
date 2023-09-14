@@ -93,7 +93,7 @@ class Laravel extends Preset
      */
     public function commandNamespace()
     {
-        return "{$this->rootNamespace()}Console\Command\\";
+        return "{$this->rootNamespace()}Console\Commands\\";
     }
 
     /**
