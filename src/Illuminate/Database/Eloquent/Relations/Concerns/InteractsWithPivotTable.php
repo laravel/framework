@@ -584,7 +584,7 @@ trait InteractsWithPivotTable
      */
     public function withPivot($columns = '*')
     {
-        if($columns === '*') {
+        if ($columns === '*') {
             $this->pivotColumns = Schema::getColumnListing($this->getTable());
         } else {
             $this->pivotColumns = array_merge(
