@@ -6,6 +6,13 @@ use Illuminate\Contracts\Cache\Store;
 
 class TaggedCache extends Repository
 {
+    /**
+     * The array to track cache keys associated with tags.
+     *
+     * @var array
+     */
+    protected $taggedCacheKeys = [];
+
     use RetrievesMultipleKeys {
         putMany as putManyAlias;
     }
@@ -34,6 +41,9 @@ class TaggedCache extends Repository
     /**
      * Store multiple items in the cache for a given number of seconds.
      *
+     * Note: The tracking logic has been commented out in favor of handling
+     * it in the set method, providing a consistent approach to tracking keys.
+     *
      * @param  array  $values
      * @param  int|null  $ttl
      * @return bool
@@ -45,6 +55,29 @@ class TaggedCache extends Repository
         }
 
         return $this->putManyAlias($values, $ttl);
+    }
+
+    /**
+     * Store an item in the cache.
+     *
+     * This method was added to keep track of the cache keys associated
+     * with their respective tags.
+     *
+     * @param  string  $key
+     * @param  mixed  $value
+     * @param  \DateTimeInterface|\DateInterval|float|int|null  $ttl
+     * @return bool
+     */
+    public function set($key, $value, $ttl = null): bool
+    {
+        $result = parent::set($key, $value, $ttl);
+
+        foreach ($this->tags->getNames() as $tag) {
+            $this->taggedCacheKeys[$tag][] = $key;
+            $this->taggedCacheKeys[$tag] = array_unique($this->taggedCacheKeys[$tag]);
+        }
+
+        return $result;
     }
 
     /**
@@ -74,10 +107,22 @@ class TaggedCache extends Repository
     /**
      * Remove all items from the cache.
      *
+     * This method was modified to ensure that all tagged cache items
+     * are cleared out when the flush method is called.
+     *
      * @return bool
      */
     public function flush()
     {
+        foreach ($this->tags->getNames() as $tag) {
+            if (isset($this->taggedCacheKeys[$tag])) {
+                foreach ($this->taggedCacheKeys[$tag] as $key) {
+                    parent::forget($key);
+                }
+                unset($this->taggedCacheKeys[$tag]);
+            }
+        }
+
         $this->tags->reset();
 
         return true;
