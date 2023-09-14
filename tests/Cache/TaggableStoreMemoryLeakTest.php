@@ -1,9 +1,9 @@
 <?php
 
-namespace Tests\Cache;
+namespace Illuminate\Tests\Cache;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Tests\TestCase;
+use PHPUnit\Framework\TestCase;
+
 
 class TaggableStoreMemoryLeakTest extends TestCase
 {
