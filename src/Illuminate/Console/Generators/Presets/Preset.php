@@ -102,7 +102,7 @@ abstract class Preset
      *
      * @return string
      */
-    abstract function factoryPath();
+    abstract public function factoryPath();
 
     /**
      * Get the path to the migration directory.
