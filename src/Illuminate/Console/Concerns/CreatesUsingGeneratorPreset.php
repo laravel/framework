@@ -18,9 +18,9 @@ trait CreatesUsingGeneratorPreset
         $this->getDefinition()->addOption(new InputOption(
             'preset',
             null,
-            InputOption::VALUE_REQUIRED,
+            InputOption::VALUE_OPTIONAL,
             sprintf('Preset used when generating %s', Str::lower($this->type)),
-            'laravel',
+            null,
         ));
     }
 
