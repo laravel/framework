@@ -106,7 +106,7 @@ class ControllerMakeCommandTest extends TestCase
         {
             public function modelNamespace()
             {
-                return 'Acme\Model';
+                return 'Acme\Model\\';
             }
         });
 

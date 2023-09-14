@@ -93,7 +93,7 @@ class Laravel extends Preset
      */
     public function rootNamespace()
     {
-        return $this->rootNamespace;
+        return trim($this->rootNamespace, '\\').'\\';
     }
 
     /**
@@ -103,7 +103,7 @@ class Laravel extends Preset
      */
     public function commandNamespace()
     {
-        return "{$this->rootNamespace}\Console\Command";
+        return "{$this->rootNamespace()}Console\Command\\";
     }
 
     /**
@@ -113,7 +113,7 @@ class Laravel extends Preset
      */
     public function modelNamespace()
     {
-        return is_dir("{$this->sourcePath()}/Models") ? "{$this->rootNamespace}\Models" : $this->rootNamespace;
+        return is_dir("{$this->sourcePath()}/Models") ? "{$this->rootNamespace()}Models\\" : $this->rootNamespace();
     }
 
     /**
@@ -123,7 +123,7 @@ class Laravel extends Preset
      */
     public function providerNamespace()
     {
-        return "{$this->rootNamespace}\Providers";
+        return "{$this->rootNamespace()}Providers\\";
     }
 
     /**
