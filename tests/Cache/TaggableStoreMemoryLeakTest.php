@@ -4,7 +4,6 @@ namespace Illuminate\Tests\Cache;
 
 use PHPUnit\Framework\TestCase;
 
-
 class TaggableStoreMemoryLeakTest extends TestCase
 {
     /**
@@ -29,7 +28,7 @@ class TaggableStoreMemoryLeakTest extends TestCase
         // Initialize a cache store with tags.
         $store = new \Illuminate\Cache\Repository(new \Illuminate\Cache\ArrayStore());
         $store = $store->tags(['test']);
-        
+
         // Capture the memory usage before the test operations start.
         $memoryBefore = memory_get_usage(true);
 
@@ -41,7 +40,7 @@ class TaggableStoreMemoryLeakTest extends TestCase
 
             // For monitoring purposes, print memory usage every 1,000 iterations.
             if ($i % 1000 == 0) {
-                echo "Iteration $i: " . memory_get_usage(true) . PHP_EOL;
+                echo "Iteration $i: ".memory_get_usage(true).PHP_EOL;
             }
         }
 
@@ -50,7 +49,7 @@ class TaggableStoreMemoryLeakTest extends TestCase
         $memoryDifference = $memoryAfter - $memoryBefore;
 
         // Output the total memory difference for inspection.
-        echo "Total Memory Difference: $memoryDifference bytes" . PHP_EOL;
+        echo "Total Memory Difference: $memoryDifference bytes".PHP_EOL;
 
         // Assert that the memory usage difference is below the acceptable threshold.
         // If this assertion fails, it indicates a potential memory leak.
