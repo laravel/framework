@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Support\Collection as BaseCollection;
+use Illuminate\Support\Facades\Schema;
 
 trait InteractsWithPivotTable
 {
@@ -581,11 +582,15 @@ trait InteractsWithPivotTable
      * @param  array|mixed  $columns
      * @return $this
      */
-    public function withPivot($columns)
+    public function withPivot($columns = "*")
     {
-        $this->pivotColumns = array_merge(
-            $this->pivotColumns, is_array($columns) ? $columns : func_get_args()
-        );
+        if($columns === "*") {
+            $this->pivotColumns = Schema::getColumnListing($this->getTable());
+        } else {
+            $this->pivotColumns = array_merge(
+                $this->pivotColumns, is_array($columns) ? $columns : func_get_args()
+            );
+        }
 
         return $this;
     }
