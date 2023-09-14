@@ -231,4 +231,23 @@ class SupportLazyCollectionTest extends TestCase
 
         $this->assertSame([1, 2], $data->all());
     }
+
+    public function testTakeWithNegativeLimit()
+    {
+        $data = LazyCollection::times(10);
+
+        $this->assertSame([
+            7 => 8,
+            8 => 9,
+            9 => 10,
+        ], $data->take(-3)->all());
+
+        $this->assertSame([
+            7 => 8,
+            8 => 9,
+            9 => 10,
+        ], $data->take(-5)->take(-3)->all());
+
+        $this->assertSame($data->take(10)->all(), $data->take(-10)->all());
+    }
 }
