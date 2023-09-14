@@ -2,23 +2,27 @@
 
 namespace Illuminate\Console\Generators\Presets;
 
-use Illuminate\Contracts\Config\Repository as ConfigContract;
+use Illuminate\Contracts\Foundation\Application;
 use LogicException;
 
 abstract class Preset
 {
     /**
+     * The application instance.
+     *
+     * @var \Illuminate\Contracts\Foundation\Application
+     */
+    protected $app;
+
+    /**
      * Construct a new preset.
      *
-     * @param  string  $basePath
-     * @param  \Illuminate\Contracts\Config\Repository  $config
+     * @param  \Illuminate\Contracts\Foundation\Application  $app
      * @return void
      */
-    public function __construct(
-        protected string $basePath,
-        protected ConfigContract $config
-    ) {
-        //
+    public function __construct(Application $app)
+    {
+        $this->app = $app;
     }
 
     /**
@@ -40,16 +44,6 @@ abstract class Preset
     public function hasCustomStubPath()
     {
         return false;
-    }
-
-    /**
-     * Get the path to the base working directory.
-     *
-     * @return string
-     */
-    public function basePath()
-    {
-        return $this->basePath;
     }
 
     /**
@@ -94,6 +88,8 @@ abstract class Preset
 
     /**
      * Get the path to the factory directory.
+     *
+     * @return string
      */
     public function factoryPath()
     {
@@ -102,6 +98,8 @@ abstract class Preset
 
     /**
      * Get the path to the migration directory.
+     *
+     * @return string
      */
     public function migrationPath()
     {
@@ -146,7 +144,7 @@ abstract class Preset
      */
     public function userProviderModel($guard = null)
     {
-        $config = $this->config;
+        $config = $this->app['config'];
 
         $guard = $guard ?: $config->get('auth.defaults.guard');
 
@@ -163,6 +161,13 @@ abstract class Preset
      * @return string
      */
     abstract public function name();
+
+    /**
+     * Get the path to the base working directory.
+     *
+     * @return string
+     */
+    abstract public function basePath();
 
     /**
      * Get the path to the source directory.

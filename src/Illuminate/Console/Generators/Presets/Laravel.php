@@ -7,22 +7,6 @@ use Illuminate\Contracts\Config\Repository as ConfigContract;
 class Laravel extends Preset
 {
     /**
-     * Construct a new preset.
-     *
-     * @param  string  $rootNamespace
-     * @param  string  $basePath
-     * @param  \Illuminate\Contracts\Config\Repository  $config
-     * @return void
-     */
-    public function __construct(
-        protected string $rootNamespace,
-        string $basePath,
-        ConfigContract $config
-    ) {
-        parent::__construct($basePath, $config);
-    }
-
-    /**
      * Preset name.
      *
      * @return string
@@ -43,13 +27,23 @@ class Laravel extends Preset
     }
 
     /**
+     * Get the path to the base working directory.
+     *
+     * @return string
+     */
+    public function basePath()
+    {
+        return $this->app->basePath();
+    }
+
+    /**
      * Get the path to the source directory.
      *
      * @return string
      */
     public function sourcePath()
     {
-        return implode('/', [$this->basePath(), 'app']);
+        return $this->app->basePath('app');
     }
 
     /**
@@ -59,7 +53,7 @@ class Laravel extends Preset
      */
     public function viewPath()
     {
-        return $this->config['view.paths'][0] ?? implode('/', [$this->resourcePath(), 'views']);
+        return $this->app['config']['view.paths'][0] ?? $this->app->resourcePath('views');
     }
 
     /**
@@ -69,11 +63,11 @@ class Laravel extends Preset
      */
     public function seederPath(): string
     {
-        if (is_dir($seederPath = implode('/', [$this->basePath(), 'database', 'seeds']))) {
+        if (is_dir($seederPath = $this->app->databasePath('seeds'))) {
             return $seederPath;
         }
 
-        return implode('/', [$this->basePath(), 'database', 'seeders']);
+        return $this->app->databasePath('seeders');
     }
 
     /**
@@ -83,7 +77,7 @@ class Laravel extends Preset
      */
     public function rootNamespace()
     {
-        return trim($this->rootNamespace, '\\').'\\';
+        return $this->app->getNamespace();
     }
 
     /**

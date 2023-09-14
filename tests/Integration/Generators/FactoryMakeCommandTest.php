@@ -29,7 +29,7 @@ class FactoryMakeCommandTest extends TestCase
     {
         $manager = $this->app->make(PresetManager::class);
 
-        $manager->extend('acme', fn () => new class('App', $this->app->basePath(), $this->app->make('config')) extends Laravel
+        $manager->extend('acme', fn () => new class($this->app) extends Laravel
         {
             public function factoryNamespace()
             {

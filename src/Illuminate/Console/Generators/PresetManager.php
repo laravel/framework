@@ -16,13 +16,11 @@ class PresetManager extends Manager
     /**
      * Create "laravel" driver.
      *
-     * @return \Laravel
+     * @return \Illuminate\Console\Generators\Presets\Laravel
      */
     public function createLaravelDriver()
     {
-        return new Presets\Laravel(
-            $this->container->getNamespace(), $this->container['path.base'], $this->config
-        );
+        return new Presets\Laravel($this->container);
     }
 
     /**

@@ -65,7 +65,7 @@ class MigrateMakeCommandTest extends TestCase
     {
         $manager = $this->app->make(PresetManager::class);
 
-        $manager->extend('acme', fn () => $preset = new class('App', $this->app->basePath(), $this->app->make('config')) extends Laravel
+        $manager->extend('acme', fn () => $preset = new class($this->app) extends Laravel
         {
             public function name()
             {
