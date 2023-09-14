@@ -27,8 +27,9 @@ class TaggableStoreMemoryLeakTest extends TestCase
     public function testMemoryLeakWhenFlushingTaggableStore()
     {
         // Initialize a cache store with tags.
-        $store = cache()->store('array')->tags(['test']);
-
+        $store = new \Illuminate\Cache\Repository(new \Illuminate\Cache\ArrayStore());
+        $store = $store->tags(['test']);
+        
         // Capture the memory usage before the test operations start.
         $memoryBefore = memory_get_usage(true);
 
