@@ -497,7 +497,8 @@ class FoundationExceptionsHandlerTest extends TestCase
 
     public function testItDoesNotThrottleExceptionsWhenNullReturned()
     {
-        $handler = new class($this->container) extends Handler {
+        $handler = new class($this->container) extends Handler
+        {
             protected function throttle($e)
             {
                 //
@@ -519,7 +520,8 @@ class FoundationExceptionsHandlerTest extends TestCase
 
     public function testItDoesNotThrottleExceptionsWhenUnlimitedLimit()
     {
-        $handler = new class($this->container) extends Handler {
+        $handler = new class($this->container) extends Handler
+        {
             protected function throttle($e)
             {
                 return Limit::none();
@@ -541,7 +543,8 @@ class FoundationExceptionsHandlerTest extends TestCase
 
     public function testItCanSampleExceptionsByClass()
     {
-        $handler = new class($this->container) extends Handler {
+        $handler = new class($this->container) extends Handler
+        {
             protected function throttle($e)
             {
                 return match (true) {
@@ -573,7 +576,8 @@ class FoundationExceptionsHandlerTest extends TestCase
 
     public function testItRescuesExceptionsWhileThrottlingAndReports()
     {
-        $handler = new class($this->container) extends Handler {
+        $handler = new class($this->container) extends Handler
+        {
             protected function throttle($e)
             {
                 throw new RuntimeException('Something went wrong in the throttle method.');
@@ -594,7 +598,8 @@ class FoundationExceptionsHandlerTest extends TestCase
 
     public function testItRescuesExceptionsIfThereIsAnIssueResolvingTheRateLimiter()
     {
-        $handler = new class($this->container) extends Handler {
+        $handler = new class($this->container) extends Handler
+        {
             protected function throttle($e)
             {
                 return Limit::perDay(1);
@@ -622,7 +627,8 @@ class FoundationExceptionsHandlerTest extends TestCase
 
     public function testItRescuesExceptionsIfThereIsAnIssueWithTheRateLimiter()
     {
-        $handler = new class($this->container) extends Handler {
+        $handler = new class($this->container) extends Handler
+        {
             protected function throttle($e)
             {
                 return Limit::perDay(1);
@@ -634,7 +640,8 @@ class FoundationExceptionsHandlerTest extends TestCase
 
             return false;
         });
-        $this->container->instance(RateLimiter::class, $limiter = new class (new Repository(new NullStore)) extends RateLimiter {
+        $this->container->instance(RateLimiter::class, $limiter = new class(new Repository(new NullStore)) extends RateLimiter
+        {
             public $attempted = false;
 
             public function attempt($key, $maxAttempts, Closure $callback, $decaySeconds = 60)
@@ -654,7 +661,8 @@ class FoundationExceptionsHandlerTest extends TestCase
 
     public function testItCanRateLimitExceptions()
     {
-        $handler = new class($this->container) extends Handler {
+        $handler = new class($this->container) extends Handler
+        {
             protected function throttle($e)
             {
                 return Limit::perMinute(7);
@@ -666,7 +674,8 @@ class FoundationExceptionsHandlerTest extends TestCase
 
             return false;
         });
-        $this->container->instance(RateLimiter::class, $limiter = new class (new Repository(new ArrayStore)) extends RateLimiter {
+        $this->container->instance(RateLimiter::class, $limiter = new class(new Repository(new ArrayStore)) extends RateLimiter
+        {
             public $attempted = 0;
 
             public function attempt($key, $maxAttempts, Closure $callback, $decaySeconds = 60)

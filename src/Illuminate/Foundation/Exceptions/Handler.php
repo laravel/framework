@@ -27,7 +27,6 @@ use Illuminate\Routing\Router;
 use Illuminate\Session\TokenMismatchException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Lottery;
 use Illuminate\Support\Reflector;
 use Illuminate\Support\Traits\ReflectsClosures;
@@ -94,6 +93,13 @@ class Handler implements ExceptionHandlerContract
      * @var array<string, \Closure>
      */
     protected $exceptionMap = [];
+
+    /**
+     * Indicates that throttled keys should be hashed.
+     *
+     * @var bool
+     */
+    protected $hashThrottleKeys = true;
 
     /**
      * A list of the internal exception types that should not be reported.
@@ -351,7 +357,7 @@ class Handler implements ExceptionHandlerContract
             }
 
             return ! $this->container->make(RateLimiter::class)->attempt(
-                $throttle->key ?: $e::class,
+                with($throttle->key ?: $e::class, fn ($key) => $this->hashThrottleKeys ? md5($key) : $key),
                 $throttle->maxAttempts,
                 fn () => true,
                 $throttle->decayMinutes
@@ -859,7 +865,7 @@ class Handler implements ExceptionHandlerContract
     /**
      * Throttle the given exception.
      *
-     * @param  \Throwable $e
+     * @param  \Throwable  $e
      * @return \Illuminate\Support\Lottery|\Illuminate\Cache\RateLimiting\Limit|null
      */
     protected function throttle(Throwable $e)
