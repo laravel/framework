@@ -81,6 +81,11 @@ class MigrateMakeCommandTest extends TestCase
         $this->artisan('make:migration', ['name' => 'AcmeFoosTable', '--create' => 'foobar', '--preset' => 'acme'])
             ->assertExitCode(0);
 
-        $this->assertCount(1, $this->app['files']->glob($this->app->basePath('database/acme-migrations/*acme_foos_table.php')));
+        $this->assertMigrationFileContains([
+            'use Illuminate\Database\Migrations\Migration;',
+            'return new class extends Migration',
+            'Schema::create(\'foobar\', function (Blueprint $table) {',
+            'Schema::dropIfExists(\'foobar\');',
+        ], 'acme_foos_table.php', directory: 'database/acme-migrations');
     }
 }
