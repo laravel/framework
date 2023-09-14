@@ -125,18 +125,25 @@ abstract class ServiceProvider
     /**
      * Merge the given configuration with the existing configuration.
      *
+     * Call this method in several times, in order to merge new Configuration files
+     * into existing one. (eg:. merge different environment overrides).
+     *
      * @param  string  $path
      * @param  string  $key
      * @return void
      */
     protected function mergeConfigFrom($path, $key)
     {
-        if (! ($this->app instanceof CachesConfiguration && $this->app->configurationIsCached())) {
+        if (!($this->app instanceof CachesConfiguration && $this->app->configurationIsCached())) {
             $config = $this->app->make('config');
 
-            $config->set($key, array_merge(
-                require $path, $config->get($key, [])
-            ));
+            $config->set(
+                $key,
+                array_replace_recursive(
+                    $config->get($key, []),
+                    require $path
+                )
+            );
         }
     }
 
