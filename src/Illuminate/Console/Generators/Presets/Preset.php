@@ -165,13 +165,6 @@ abstract class Preset
     abstract public function name();
 
     /**
-     * Get the path to the base working directory.
-     *
-     * @return string
-     */
-    abstract public function laravelPath();
-
-    /**
      * Get the path to the source directory.
      *
      * @return string
