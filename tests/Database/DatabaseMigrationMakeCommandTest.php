@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Database;
 
-use Illuminate\Config\Repository as ConfigRepository;
 use Illuminate\Console\Generators\PresetManager;
 use Illuminate\Console\Generators\Presets\Laravel;
 use Illuminate\Database\Console\Migrations\MigrateMakeCommand;
