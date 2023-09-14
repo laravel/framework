@@ -205,7 +205,7 @@ class ModelMakeCommand extends GeneratorCommand
      */
     protected function getDefaultNamespace($rootNamespace)
     {
-        return $this->generatorPreset()->modelNamespace();
+        return rtrim($this->generatorPreset()->modelNamespace(), '\\');
     }
 
     /**

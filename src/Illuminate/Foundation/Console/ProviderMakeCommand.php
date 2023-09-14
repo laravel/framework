@@ -59,7 +59,7 @@ class ProviderMakeCommand extends GeneratorCommand
      */
     protected function getDefaultNamespace($rootNamespace)
     {
-        return $this->generatorPreset()->providerNamespace();
+        return rtrim($this->generatorPreset()->providerNamespace(), '\\');
     }
 
     /**
