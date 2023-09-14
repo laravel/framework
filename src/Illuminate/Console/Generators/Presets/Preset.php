@@ -37,36 +37,6 @@ abstract class Preset
     }
 
     /**
-     * Preset has custom stub path.
-     *
-     * @return bool
-     */
-    public function hasCustomStubPath()
-    {
-        return false;
-    }
-
-    /**
-     * Database factory namespace.
-     *
-     * @return string
-     */
-    public function factoryNamespace()
-    {
-        return 'Database\Factories\\';
-    }
-
-    /**
-     * Database seeder namespace.
-     *
-     * @return string
-     */
-    public function seederNamespace()
-    {
-        return 'Database\Seeders\\';
-    }
-
-    /**
      * Get the model for the default guard's user provider.
      *
      * @param  string|null  $guard
@@ -182,4 +152,25 @@ abstract class Preset
      * @return string
      */
     abstract public function testingNamespace();
+
+    /**
+     * Database factory namespace.
+     *
+     * @return string
+     */
+    abstract public function factoryNamespace();
+
+    /**
+     * Database seeder namespace.
+     *
+     * @return string
+     */
+    abstract public function seederNamespace();
+
+    /**
+     * Preset has custom stub path.
+     *
+     * @return bool
+     */
+    abstract public function hasCustomStubPath();
 }

@@ -17,16 +17,6 @@ class Laravel extends Preset
     }
 
     /**
-     * Preset has custom stub path.
-     *
-     * @return bool
-     */
-    public function hasCustomStubPath()
-    {
-        return true;
-    }
-
-    /**
      * Get the path to the base working directory.
      *
      * @return string
@@ -158,5 +148,35 @@ class Laravel extends Preset
     public function testingNamespace()
     {
         return 'Tests\\';
+    }
+
+    /**
+     * Database factory namespace.
+     *
+     * @return string
+     */
+    public function factoryNamespace()
+    {
+        return 'Database\Factories\\';
+    }
+
+    /**
+     * Database seeder namespace.
+     *
+     * @return string
+     */
+    public function seederNamespace()
+    {
+        return 'Database\Seeders\\';
+    }
+
+    /**
+     * Preset has custom stub path.
+     *
+     * @return bool
+     */
+    public function hasCustomStubPath()
+    {
+        return true;
     }
 }
