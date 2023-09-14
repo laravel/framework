@@ -47,6 +47,26 @@ class Laravel extends Preset
     }
 
     /**
+     * Get the path to the testing directory.
+     *
+     * @return string
+     */
+    public function testingPath()
+    {
+        return $this->app->basePath('tests');
+    }
+
+    /**
+     * Get the path to the resource directory.
+     *
+     * @return string
+     */
+    public function resourcePath()
+    {
+        return $this->app->resourcePath();
+    }
+
+    /**
      * Get the path to the view directory.
      *
      * @return string
@@ -54,6 +74,26 @@ class Laravel extends Preset
     public function viewPath()
     {
         return $this->app['config']['view.paths'][0] ?? $this->app->resourcePath('views');
+    }
+
+    /**
+     * Get the path to the factory directory.
+     *
+     * @return string
+     */
+    public function factoryPath()
+    {
+        return $this->app->databasePath('factories');
+    }
+
+    /**
+     * Get the path to the migration directory.
+     *
+     * @return string
+     */
+    public function migrationPath()
+    {
+        return $this->app->databasePath('migrations');
     }
 
     /**

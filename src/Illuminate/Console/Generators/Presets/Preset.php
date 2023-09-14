@@ -47,76 +47,6 @@ abstract class Preset
     }
 
     /**
-     * Get the path to the testing directory.
-     *
-     * @return string
-     */
-    public function testingPath()
-    {
-        return implode('/', [$this->basePath(), 'tests']);
-    }
-
-    /**
-     * Get the path to the vendor directory.
-     *
-     * @return string
-     */
-    public function vendorPath()
-    {
-        return implode('/', [$this->basePath(), 'vendor']);
-    }
-
-    /**
-     * Get the path to the resource directory.
-     *
-     * @return string
-     */
-    public function resourcePath()
-    {
-        return implode('/', [$this->basePath(), 'resources']);
-    }
-
-    /**
-     * Get the path to the view directory.
-     *
-     * @return string
-     */
-    public function viewPath()
-    {
-        return implode('/', [$this->resourcePath(), 'views']);
-    }
-
-    /**
-     * Get the path to the factory directory.
-     *
-     * @return string
-     */
-    public function factoryPath()
-    {
-        return implode('/', [$this->basePath(), 'database', 'factories']);
-    }
-
-    /**
-     * Get the path to the migration directory.
-     *
-     * @return string
-     */
-    public function migrationPath()
-    {
-        return implode('/', [$this->basePath(), 'database', 'migrations']);
-    }
-
-    /**
-     * Get the path to the seeder directory.
-     *
-     * @return string
-     */
-    public function seederPath()
-    {
-        return implode('/', [$this->basePath(), 'database', 'seeders']);
-    }
-
-    /**
      * Database factory namespace.
      *
      * @return string
@@ -175,6 +105,48 @@ abstract class Preset
      * @return string
      */
     abstract public function sourcePath();
+
+    /**
+     * Get the path to the testing directory.
+     *
+     * @return string
+     */
+    abstract public function testingPath();
+
+    /**
+     * Get the path to the resource directory.
+     *
+     * @return string
+     */
+    abstract public function resourcePath();
+
+    /**
+     * Get the path to the view directory.
+     *
+     * @return string
+     */
+    abstract public function viewPath();
+
+    /**
+     * Get the path to the factory directory.
+     *
+     * @return string
+     */
+    abstract function factoryPath();
+
+    /**
+     * Get the path to the migration directory.
+     *
+     * @return string
+     */
+    abstract public function migrationPath();
+
+    /**
+     * Get the path to the seeder directory.
+     *
+     * @return string
+     */
+    abstract public function seederPath();
 
     /**
      * Preset namespace.
