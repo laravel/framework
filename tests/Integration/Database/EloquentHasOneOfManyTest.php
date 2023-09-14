@@ -103,7 +103,6 @@ class User extends Model
     {
         return $this->hasOne(State::class, 'user_id')->ofMany('updated_at', 'min');
     }
-}
 
     public function latest_updated_latest_created_state()
     {
