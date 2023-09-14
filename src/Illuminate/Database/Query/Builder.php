@@ -512,7 +512,7 @@ class Builder implements BuilderContract
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $table
      * @param  \Closure|string  $first
      * @param  string|null  $operator
-     * @param  string|null  $second
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string|null  $second
      * @param  string  $type
      * @param  bool  $where
      * @return $this
@@ -552,7 +552,7 @@ class Builder implements BuilderContract
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $table
      * @param  \Closure|string  $first
      * @param  string  $operator
-     * @param  string  $second
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $second
      * @param  string  $type
      * @return $this
      */
@@ -568,7 +568,7 @@ class Builder implements BuilderContract
      * @param  string  $as
      * @param  \Closure|string  $first
      * @param  string|null  $operator
-     * @param  string|null  $second
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string|null  $second
      * @param  string  $type
      * @param  bool  $where
      * @return $this
@@ -592,7 +592,7 @@ class Builder implements BuilderContract
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $table
      * @param  \Closure|string  $first
      * @param  string|null  $operator
-     * @param  string|null  $second
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string|null  $second
      * @return $this
      */
     public function leftJoin($table, $first, $operator = null, $second = null)
@@ -606,7 +606,7 @@ class Builder implements BuilderContract
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $table
      * @param  \Closure|string  $first
      * @param  string  $operator
-     * @param  string  $second
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string|null  $second
      * @return $this
      */
     public function leftJoinWhere($table, $first, $operator, $second)
@@ -621,7 +621,7 @@ class Builder implements BuilderContract
      * @param  string  $as
      * @param  \Closure|string  $first
      * @param  string|null  $operator
-     * @param  string|null  $second
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string|null  $second
      * @return $this
      */
     public function leftJoinSub($query, $as, $first, $operator = null, $second = null)
@@ -635,7 +635,7 @@ class Builder implements BuilderContract
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $table
      * @param  \Closure|string  $first
      * @param  string|null  $operator
-     * @param  string|null  $second
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string|null  $second
      * @return $this
      */
     public function rightJoin($table, $first, $operator = null, $second = null)
@@ -649,7 +649,7 @@ class Builder implements BuilderContract
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $table
      * @param  \Closure|string  $first
      * @param  string  $operator
-     * @param  string  $second
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $second
      * @return $this
      */
     public function rightJoinWhere($table, $first, $operator, $second)
@@ -664,7 +664,7 @@ class Builder implements BuilderContract
      * @param  string  $as
      * @param  \Closure|string  $first
      * @param  string|null  $operator
-     * @param  string|null  $second
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string|null  $second
      * @return $this
      */
     public function rightJoinSub($query, $as, $first, $operator = null, $second = null)
@@ -678,7 +678,7 @@ class Builder implements BuilderContract
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $table
      * @param  \Closure|string|null  $first
      * @param  string|null  $operator
-     * @param  string|null  $second
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string|null  $second
      * @return $this
      */
     public function crossJoin($table, $first = null, $operator = null, $second = null)
