@@ -50,6 +50,7 @@
         "symfony/mime": "^6.2",
         "symfony/process": "^6.2",
         "symfony/routing": "^6.2",
+        "symfony/symfony": "6.4.x-dev",
         "symfony/uid": "^6.2",
         "symfony/var-dumper": "^6.2",
         "tijsverkoyen/css-to-inline-styles": "^2.2.5",
