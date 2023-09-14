@@ -8,8 +8,7 @@ class ConsoleMakeCommandTest extends TestCase
         'app/Console/Commands/FooCommand.php',
     ];
 
-    /** @test */
-    public function it_can_generate_command_file()
+    public function testItCanGenerateConsoleFile()
     {
         $this->artisan('make:command', ['name' => 'FooCommand'])
             ->assertExitCode(0);
@@ -22,8 +21,7 @@ class ConsoleMakeCommandTest extends TestCase
         ], 'app/Console/Commands/FooCommand.php');
     }
 
-    /** @test */
-    public function it_can_generate_command_file_with_command_name()
+    public function testItCanGenerateConsoleFileWithCommandOption()
     {
         $this->artisan('make:command', ['name' => 'FooCommand', '--command' => 'foo:bar'])
             ->assertExitCode(0);
