@@ -70,7 +70,7 @@ class FactoryMakeCommand extends GeneratorCommand
 
         $model = class_basename($namespaceModel);
 
-        $namespace = $this->generatorPreset()->factoryNamespace();
+        $namespace = rtrim($this->generatorPreset()->factoryNamespace(), '\\');
 
         $replace = [
             '{{ factoryNamespace }}' => $namespace,
@@ -120,7 +120,7 @@ class FactoryMakeCommand extends GeneratorCommand
             return $modelName;
         }
 
-        return $this->generatorPreset()->modelNamespace().'\Model';
+        return $this->generatorPreset()->modelNamespace().'Model';
     }
 
     /**

@@ -125,7 +125,7 @@ abstract class Preset
      */
     public function factoryNamespace()
     {
-        return 'Database\Factories';
+        return 'Database\Factories\\';
     }
 
     /**
@@ -135,7 +135,7 @@ abstract class Preset
      */
     public function seederNamespace()
     {
-        return 'Database\Seeders';
+        return 'Database\Seeders\\';
     }
 
     /**
