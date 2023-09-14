@@ -74,7 +74,7 @@ class EloquentHasOneOfManyTest extends DatabaseTestCase
         $this->assertSame($user->oldest_updated_state->id, $oldestState->id);
         $this->assertSame($user->oldest_updated_oldest_created_state->id, $oldestState->id);
 
-        $users = User::with('latest_updated_state', 'latest_updated_latest_created_state')->all();
+        $users = User::with('latest_updated_state', 'latest_updated_latest_created_state')->get();
 
         $this->assertSame($users[0]->latest_updated_state->id, $latestState->id);
         $this->assertSame($users[0]->latest_updated_latest_created_state->id, $latestState->id);
