@@ -2,6 +2,9 @@
 
 namespace Illuminate\Tests\Database;
 
+use Illuminate\Config\Repository as ConfigRepository;
+use Illuminate\Console\Generators\PresetManager;
+use Illuminate\Console\Generators\Presets\Laravel;
 use Illuminate\Database\Console\Migrations\MigrateMakeCommand;
 use Illuminate\Database\Migrations\MigrationCreator;
 use Illuminate\Foundation\Application;
@@ -20,11 +23,17 @@ class DatabaseMigrationMakeCommandTest extends TestCase
 
     public function testBasicCreateDumpsAutoload()
     {
+        $preset = m::mock(PresetManager::class);
+        $laravel = m::mock(Laravel::class);
+        $preset->shouldReceive('driver')->andReturn($laravel);
+        $laravel->shouldReceive('is')->with('laravel')->andReturnTrue();
+
         $command = new MigrateMakeCommand(
             $creator = m::mock(MigrationCreator::class),
             $composer = m::mock(Composer::class)
         );
         $app = new Application;
+        $app->instance(PresetManager::class, $preset);
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
         $creator->shouldReceive('create')->once()
@@ -36,11 +45,17 @@ class DatabaseMigrationMakeCommandTest extends TestCase
 
     public function testBasicCreateGivesCreatorProperArguments()
     {
+        $preset = m::mock(PresetManager::class);
+        $laravel = m::mock(Laravel::class);
+        $preset->shouldReceive('driver')->andReturn($laravel);
+        $laravel->shouldReceive('is')->with('laravel')->andReturnTrue();
+
         $command = new MigrateMakeCommand(
             $creator = m::mock(MigrationCreator::class),
             m::mock(Composer::class)->shouldIgnoreMissing()
         );
         $app = new Application;
+        $app->instance(PresetManager::class, $preset);
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
         $creator->shouldReceive('create')->once()
@@ -52,11 +67,17 @@ class DatabaseMigrationMakeCommandTest extends TestCase
 
     public function testBasicCreateGivesCreatorProperArgumentsWhenNameIsStudlyCase()
     {
+        $preset = m::mock(PresetManager::class);
+        $laravel = m::mock(Laravel::class);
+        $preset->shouldReceive('driver')->andReturn($laravel);
+        $laravel->shouldReceive('is')->with('laravel')->andReturnTrue();
+
         $command = new MigrateMakeCommand(
             $creator = m::mock(MigrationCreator::class),
             m::mock(Composer::class)->shouldIgnoreMissing()
         );
         $app = new Application;
+        $app->instance(PresetManager::class, $preset);
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
         $creator->shouldReceive('create')->once()
@@ -68,11 +89,17 @@ class DatabaseMigrationMakeCommandTest extends TestCase
 
     public function testBasicCreateGivesCreatorProperArgumentsWhenTableIsSet()
     {
+        $preset = m::mock(PresetManager::class);
+        $laravel = m::mock(Laravel::class);
+        $preset->shouldReceive('driver')->andReturn($laravel);
+        $laravel->shouldReceive('is')->with('laravel')->andReturnTrue();
+
         $command = new MigrateMakeCommand(
             $creator = m::mock(MigrationCreator::class),
             m::mock(Composer::class)->shouldIgnoreMissing()
         );
         $app = new Application;
+        $app->instance(PresetManager::class, $preset);
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
         $creator->shouldReceive('create')->once()
@@ -84,11 +111,17 @@ class DatabaseMigrationMakeCommandTest extends TestCase
 
     public function testBasicCreateGivesCreatorProperArgumentsWhenCreateTablePatternIsFound()
     {
+        $preset = m::mock(PresetManager::class);
+        $laravel = m::mock(Laravel::class);
+        $preset->shouldReceive('driver')->andReturn($laravel);
+        $laravel->shouldReceive('is')->with('laravel')->andReturnTrue();
+
         $command = new MigrateMakeCommand(
             $creator = m::mock(MigrationCreator::class),
             m::mock(Composer::class)->shouldIgnoreMissing()
         );
         $app = new Application;
+        $app->instance(PresetManager::class, $preset);
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
         $creator->shouldReceive('create')->once()
@@ -100,11 +133,17 @@ class DatabaseMigrationMakeCommandTest extends TestCase
 
     public function testCanSpecifyPathToCreateMigrationsIn()
     {
+        $preset = m::mock(PresetManager::class);
+        $laravel = m::mock(Laravel::class);
+        $preset->shouldReceive('driver')->andReturn($laravel);
+        $laravel->shouldReceive('is')->with('laravel')->andReturnTrue();
+
         $command = new MigrateMakeCommand(
             $creator = m::mock(MigrationCreator::class),
             m::mock(Composer::class)->shouldIgnoreMissing()
         );
         $app = new Application;
+        $app->instance(PresetManager::class, $preset);
         $command->setLaravel($app);
         $app->setBasePath('/home/laravel');
         $creator->shouldReceive('create')->once()
