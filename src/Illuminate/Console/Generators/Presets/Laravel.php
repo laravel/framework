@@ -123,6 +123,6 @@ class Laravel extends Preset
      */
     public function testingNamespace()
     {
-        return 'Tests';
+        return 'Tests\\';
     }
 }

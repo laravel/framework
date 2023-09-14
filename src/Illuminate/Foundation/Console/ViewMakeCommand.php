@@ -191,7 +191,7 @@ class ViewMakeCommand extends GeneratorCommand
             ->map(fn ($part) => Str::of($part)->ucfirst())
             ->implode('');
 
-        return $this->generatorPreset()->testingNamespace().'\\Feature\\View\\'.$namespacedName;
+        return $this->generatorPreset()->testingNamespace().'Feature\\View\\'.$namespacedName;
     }
 
     /**
