@@ -95,7 +95,7 @@ abstract class Preset
     /**
      * Get the path to the factory directory.
      */
-    public function factoryPath(): string
+    public function factoryPath()
     {
         return implode('/', [$this->basePath(), 'database', 'factories']);
     }
@@ -103,7 +103,7 @@ abstract class Preset
     /**
      * Get the path to the migration directory.
      */
-    public function migrationPath(): string
+    public function migrationPath()
     {
         return implode('/', [$this->basePath(), 'database', 'migrations']);
     }
@@ -113,7 +113,7 @@ abstract class Preset
      *
      * @return string
      */
-    public function seederPath(): string
+    public function seederPath()
     {
         return implode('/', [$this->basePath(), 'database', 'seeders']);
     }

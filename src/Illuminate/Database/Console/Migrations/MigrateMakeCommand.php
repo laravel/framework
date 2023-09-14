@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Console\Migrations;
 
+use Illuminate\Console\Concerns\CreatesUsingGeneratorPreset;
 use Illuminate\Contracts\Console\PromptsForMissingInput;
 use Illuminate\Database\Migrations\MigrationCreator;
 use Illuminate\Support\Composer;
@@ -9,6 +10,8 @@ use Illuminate\Support\Str;
 
 class MigrateMakeCommand extends BaseCommand implements PromptsForMissingInput
 {
+    use CreatesUsingGeneratorPreset;
+
     /**
      * The console command signature.
      *
@@ -45,6 +48,13 @@ class MigrateMakeCommand extends BaseCommand implements PromptsForMissingInput
     protected $composer;
 
     /**
+     * The type of class being generated.
+     *
+     * @var string
+     */
+    protected $type = 'Migration';
+
+    /**
      * Create a new migration install command instance.
      *
      * @param  \Illuminate\Database\Migrations\MigrationCreator  $creator
@@ -57,6 +67,8 @@ class MigrateMakeCommand extends BaseCommand implements PromptsForMissingInput
 
         $this->creator = $creator;
         $this->composer = $composer;
+
+        $this->addGeneratorPresetOptions();
     }
 
     /**
@@ -66,6 +78,13 @@ class MigrateMakeCommand extends BaseCommand implements PromptsForMissingInput
      */
     public function handle()
     {
+        $preset = $this->generatorPreset();
+
+        if (! $preset->is('laravel')) {
+            $this->input->setOption('path', $preset->migrationPath());
+            $this->input->setOption('realpath', true);
+        }
+
         // It's possible for the developer to specify the tables to modify in this
         // schema operation. The developer may also specify if this table needs
         // to be freshly created so we can create the appropriate migrations.

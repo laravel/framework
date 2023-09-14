@@ -2,8 +2,15 @@
 
 namespace Illuminate\Tests\Integration\Generators;
 
+use Illuminate\Console\Generators\PresetManager;
+use Illuminate\Console\Generators\Presets\Laravel;
+
 class MigrateMakeCommandTest extends TestCase
 {
+    protected $files = [
+        'database/acme-migrations/*.php',
+    ];
+
     public function testItCanGenerateMigrationFile()
     {
         $this->artisan('make:migration', ['name' => 'AddBarToFoosTable'])
@@ -52,5 +59,28 @@ class MigrateMakeCommandTest extends TestCase
             'Schema::create(\'foobar\', function (Blueprint $table) {',
             'Schema::dropIfExists(\'foobar\');',
         ], 'foos_table.php');
+    }
+
+
+    public function testItCanGenerateMigrationFileWithCustomMigrationPath()
+    {
+        $manager = $this->app->make(PresetManager::class);
+
+        $manager->extend('acme', fn () => $preset = new class('App', $this->app->basePath(), $this->app->make('config')) extends Laravel
+        {
+            public function name() {
+                return 'acme';
+            }
+
+            public function migrationPath()
+            {
+                return implode('/', [$this->basePath(), 'database', 'acme-migrations']);
+            }
+        });
+
+        $this->artisan('make:migration', ['name' => 'AcmeFoosTable', '--create' => 'foobar', '--preset' => 'acme'])
+            ->assertExitCode(0);
+
+        $this->assertCount(1, $this->app['files']->glob($this->app->basePath("database/acme-migrations/*acme_foos_table.php")));
     }
 }
