@@ -1398,6 +1398,10 @@ trait ValidatesAttributes
             return false;
         }
 
+        if ($value instanceof UploadedFile && $value->getMimeType() === 'application/json') {
+            $value = $value->getContent();
+        }
+
         json_decode($value);
 
         return json_last_error() === JSON_ERROR_NONE;
