@@ -71,11 +71,16 @@ class EloquentHasOneOfManyTest extends DatabaseTestCase
             'updated_at' => '2023-01-02',
         ]);
 
-        $this->assertSame($user->latest_updated_state->id, $latestState->id);
         $this->assertSame($user->oldest_updated_state->id, $oldestState->id);
-
-        $this->assertSame($user->latest_updated_latest_created_state->id, $latestState->id);
         $this->assertSame($user->oldest_updated_oldest_created_state->id, $oldestState->id);
+
+        $users = User::with('latest_updated_state', 'latest_updated_latest_created_state')->all();
+
+        $this->assertSame($users[0]->latest_updated_state->id, $latestState->id);
+        $this->assertSame($users[0]->latest_updated_latest_created_state->id, $latestState->id);
+        
+
+        
     }
 }
 
