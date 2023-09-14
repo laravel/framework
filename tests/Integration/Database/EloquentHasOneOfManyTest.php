@@ -71,6 +71,9 @@ class EloquentHasOneOfManyTest extends DatabaseTestCase
             'updated_at' => '2023-01-02',
         ]);
 
+        $this->assertSame($user->latest_updated_state->id, $latestState->id);
+        $this->assertSame($user->oldest_updated_state->id, $oldestState->id);
+
         $this->assertSame($user->latest_updated_latest_created_state->id, $latestState->id);
         $this->assertSame($user->oldest_updated_oldest_created_state->id, $oldestState->id);
     }
@@ -90,6 +93,17 @@ class User extends Model
     {
         return $this->hasMany(State::class);
     }
+
+    public function latest_updated_state()
+    {
+        return $this->hasOne(State::class, 'user_id')->ofMany('updated_at', 'max');
+    }
+
+    public function oldest_updated_state()
+    {
+        return $this->hasOne(State::class, 'user_id')->ofMany('updated_at', 'min');
+    }
+}
 
     public function latest_updated_latest_created_state()
     {
