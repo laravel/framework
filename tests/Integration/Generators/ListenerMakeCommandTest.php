@@ -25,7 +25,6 @@ class ListenerMakeCommandTest extends TestCase
         ], 'app/Listeners/FooListener.php');
     }
 
-
     public function testItCanGenerateListenerFileForEvent()
     {
         $this->artisan('make:listener', ['name' => 'FooListener', '--event' => 'FooListenerCreated'])
