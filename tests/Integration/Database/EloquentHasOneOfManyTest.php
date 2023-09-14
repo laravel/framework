@@ -78,9 +78,6 @@ class EloquentHasOneOfManyTest extends DatabaseTestCase
 
         $this->assertSame($users[0]->latest_updated_state->id, $latestState->id);
         $this->assertSame($users[0]->latest_updated_latest_created_state->id, $latestState->id);
-        
-
-        
     }
 }
 
