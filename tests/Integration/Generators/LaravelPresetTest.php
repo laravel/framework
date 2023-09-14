@@ -35,4 +35,13 @@ class LaravelPresetTest extends TestCase
         $this->assertTrue($preset->hasCustomStubPath());
         $this->assertSame('Illuminate\Foundation\Auth\User', $preset->userProviderModel());
     }
+
+    public function testItAvailableAsTheDefaultDriver()
+    {
+        $preset = $this->app[PresetManager::class]->driver();
+
+        $this->assertInstanceOf(Laravel::class, $preset);
+        $this->assertSame('laravel', $preset->name());
+        $this->assertTrue($preset->is('laravel'));
+    }
 }
