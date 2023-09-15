@@ -76,6 +76,25 @@ class FilesystemTest extends TestCase
         );
     }
 
+    public function testCsv()
+    {
+        $path = self::$tempDir.'/file.csv';
+
+        file_put_contents($path, "a,b,c\nx,y,z");
+
+        $files = new Filesystem;
+
+        $this->assertInstanceOf(LazyCollection::class, $files->csv($path));
+
+        $this->assertSame(
+            [
+                ['a', 'b', 'c'],
+                ['x', 'y', 'z'],
+            ],
+            $files->csv($path)->all()
+        );
+    }
+
     public function testReplaceCreatesFile()
     {
         $tempFile = self::$tempDir.'/file.txt';

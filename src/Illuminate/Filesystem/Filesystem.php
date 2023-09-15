@@ -181,6 +181,35 @@ class Filesystem
     }
 
     /**
+     * Get the contents of a file as parsed CSV fields.
+     *
+     * @param  string  $path
+     * @return \Illuminate\Support\LazyCollection
+     *
+     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
+     */
+    public function csv($path, $separator = ',', $enclosure = '"', $escape = '\\')
+    {
+        $handle = fopen($path, 'r');
+
+        if ($handle) {
+            $args = func_get_args();
+
+            array_shift($args);
+
+            return LazyCollection::make(function () use ($handle, $args) {
+                while (($item = fgetcsv($handle, null, ...$args)) !== false) {
+                    yield $item;
+                }
+
+                fclose($handle);
+            });
+        }
+
+        throw new FileNotFoundException("File does not exist at path {$path}.");
+    }
+
+    /**
      * Get the hash of the file at the given path.
      *
      * @param  string  $path
