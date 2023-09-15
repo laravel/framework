@@ -823,19 +823,20 @@ class SupportStrTest extends TestCase
         $this->assertSame(1, Str::substrCount('laravelPHPFramework', 'a', -10, -3));
     }
 
-    public function testSubstrPos() {
-        $this->assertSame(7, Str::substrPos("Hello, World!", "W"));
-        $this->assertSame(10, Str::substrPos("This is a test string.", "test"));
-        $this->assertSame(23, Str::substrPos("This is a test string, test again.", "test", 15));
-        $this->assertSame(0, Str::substrPos("Hello, World!", "Hello"));
-        $this->assertSame(7, Str::substrPos("Hello, World!", "World!"));
-        $this->assertSame(10, Str::substrPos("This is a tEsT string.", "tEsT", 0, 'UTF-8'));
-        $this->assertSame(7, Str::substrPos("Hello, World!", "W", -6));
-        $this->assertSame(18, Str::substrPos("Äpfel, Birnen und Kirschen", "Kirschen", -10, 'UTF-8'));
-        $this->assertFalse(Str::substrPos("Hello, World!", "w", 0, 'UTF-8'));
-        $this->assertFalse(Str::substrPos("Hello, World!", "X", 0, 'UTF-8'));
-        $this->assertFalse(Str::substrPos("", "test"));
-        $this->assertFalse(Str::substrPos("Hello, World!", "X"));
+    public function testSubstrPos()
+    {
+        $this->assertSame(7, Str::substrPos('Hello, World!', 'W'));
+        $this->assertSame(10, Str::substrPos('This is a test string.', 'test'));
+        $this->assertSame(23, Str::substrPos('This is a test string, test again.', 'test', 15));
+        $this->assertSame(0, Str::substrPos('Hello, World!', 'Hello'));
+        $this->assertSame(7, Str::substrPos('Hello, World!', 'World!'));
+        $this->assertSame(10, Str::substrPos('This is a tEsT string.', 'tEsT', 0, 'UTF-8'));
+        $this->assertSame(7, Str::substrPos('Hello, World!', 'W', -6));
+        $this->assertSame(18, Str::substrPos('Äpfel, Birnen und Kirschen', 'Kirschen', -10, 'UTF-8'));
+        $this->assertFalse(Str::substrPos('Hello, World!', 'w', 0, 'UTF-8'));
+        $this->assertFalse(Str::substrPos('Hello, World!', 'X', 0, 'UTF-8'));
+        $this->assertFalse(Str::substrPos('', 'test'));
+        $this->assertFalse(Str::substrPos('Hello, World!', 'X'));
     }
 
     public function testSubstrReplace()
