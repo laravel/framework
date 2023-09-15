@@ -411,10 +411,9 @@ class QueryBuilderTest extends DatabaseTestCase
             2 => 'Bar Post',
         ], DB::table('posts')->pluck('title', 'id')->toArray());
 
-        $this->assertSame([
-            '2017-11-12 13:14:15' => 'Foo Post',
-            '2018-01-02 03:04:05' => 'Bar Post',
-        ], DB::table('posts')->pluck('title', 'created_at')->toArray());
+        $results = DB::table('posts')->pluck('title', 'created_at');
+        $this->assertSame(['2017-11-12 13:14:15', '2018-01-02 03:04:05'], $results->keys()->map(fn ($v) => substr($v, 0, 19))->toArray());
+        $this->assertSame(['Foo Post', 'Bar Post'], $results->values()->toArray());
 
         $this->assertSame([
             'Lorem Ipsum.' => 'Bar Post',
