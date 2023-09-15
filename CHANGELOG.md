@@ -1,6 +1,16 @@
 # Release Notes for 10.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v10.23.0...10.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v10.23.1...10.x)
+
+## [v10.23.1](https://github.com/laravel/framework/compare/v10.23.0...v10.23.1) - 2023-09-13
+
+- Use PHP native json_validate in isJson function if available by [@jnoordsij](https://github.com/jnoordsij) in https://github.com/laravel/framework/pull/48367
+- [10.x] Remove and update a few tearDown methods. by [@lucasmichot](https://github.com/lucasmichot) in https://github.com/laravel/framework/pull/48381
+- [10.x] Test Improvements by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/48378
+- add "resolve" to `Component::ignoredMethods()` method by [@PH7-Jack](https://github.com/PH7-Jack) in https://github.com/laravel/framework/pull/48373
+- [10.x] Add `notModified` method to HTTP client by [@lucasmichot](https://github.com/lucasmichot) in https://github.com/laravel/framework/pull/48379
+- [10.x] Update the visibility of setUp and tearDown by [@lucasmichot](https://github.com/lucasmichot) in https://github.com/laravel/framework/pull/48383
+- Revert "[10.x] Validate version and variant in `Str::isUuid()`" by [@taylorotwell](https://github.com/taylorotwell) in https://github.com/laravel/framework/pull/48385
 
 ## [v10.23.0](https://github.com/laravel/framework/compare/v10.22.0...v10.23.0) - 2023-09-12
 
