@@ -11,6 +11,59 @@ class BladePhpStatementsTest extends AbstractBladeTestCase
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
 
+    public function testMixedPhpStatementsAreCompiled()
+    {
+        $string = <<<'BLADE'
+            @php($set = true)
+            @php($set = true) @php ($set = false;) @endphp
+            @php ($set = true) @php($set = false;)@endphp
+            <div>{{ $set }}</div>
+            @php
+                $set = false;
+            @endphp
+            @php (
+                $set = false;
+            )@endphp
+            @php(
+                $set = false;
+            )@endphp
+            @php (
+                $set = false
+            )
+            @php(
+                $set = false
+            )
+            @php
+                $set = '@@php';
+            @endphp
+            BLADE;
+        $expected = <<<'PHP'
+            <?php ($set = true); ?>
+            <?php ($set = true); ?> <?php ($set = false;) ?>
+            <?php ($set = true); ?> <?php($set = false;)?>
+            <div><?php echo e($set); ?></div>
+            <?php
+                $set = false;
+            ?>
+            <?php (
+                $set = false;
+            )?>
+            <?php(
+                $set = false;
+            )?>
+            <?php (
+                $set = false
+            ); ?>
+            <?php (
+                $set = false
+            ); ?>
+            <?php
+                $set = '@@php';
+            ?>
+            PHP;
+        $this->assertEquals($expected, $this->compiler->compileString($string));
+    }
+
     public function testStringWithParenthesisWithEndPHP()
     {
         $string = "@php(\$data = ['related_to' => 'issue#45388'];) {{ \$data }} @endphp";
