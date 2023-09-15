@@ -398,4 +398,34 @@ class QueryBuilderTest extends DatabaseTestCase
         $this->assertSame('Bar Post', $results[1]);
         $this->assertCount(3, DB::getQueryLog());
     }
+
+    public function testPluck()
+    {
+        $this->assertSame([
+            'Foo Post',
+            'Bar Post',
+        ], DB::table('posts')->pluck('title')->toArray());
+
+        $this->assertSame([
+            1 => 'Foo Post',
+            2 => 'Bar Post',
+        ], DB::table('posts')->pluck('title', 'id')->toArray());
+
+        $this->assertSame([
+            '2017-11-12 13:14:15' => 'Foo Post',
+            '2018-01-02 03:04:05' => 'Bar Post',
+        ], DB::table('posts')->pluck('title', 'created_at')->toArray());
+
+        $this->assertSame([
+            'Lorem Ipsum.' => 'Bar Post',
+        ], DB::table('posts')->pluck('title', 'content')->toArray());
+
+        $this->assertSame([
+            2 => 'FOO POST',
+            4 => 'BAR POST',
+        ], DB::table('posts')->pluck(
+            DB::raw('UPPER(title)'),
+            DB::raw('2 * id')
+        )->toArray());
+    }
 }

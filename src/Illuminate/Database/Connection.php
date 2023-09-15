@@ -120,6 +120,13 @@ class Connection implements ConnectionInterface
     protected $fetchMode = PDO::FETCH_OBJ;
 
     /**
+     * The fetch mode override for $statement->fetchAll() calls.
+     *
+     * @var int|null
+     */
+    protected $fetchAllMode;
+
+    /**
      * The number of active transactions.
      *
      * @var int
@@ -420,6 +427,10 @@ class Connection implements ConnectionInterface
 
             $statement->execute();
 
+            if (! is_null($this->fetchAllMode)) {
+                return $statement->fetchAll($this->fetchAllMode);
+            }
+
             return $statement->fetchAll();
         });
     }
@@ -493,6 +504,32 @@ class Connection implements ConnectionInterface
         while ($record = $statement->fetch()) {
             yield $record;
         }
+    }
+
+    /**
+     * Set the fetch mode override for calling $statement->fetchAll().
+     *
+     * @param  int  $fetchAllMode
+     * @param  bool  $bitwiseOrCurrent
+     * @return $this
+     */
+    public function setFetchAllMode($fetchAllMode, $bitwiseOrCurrent = true)
+    {
+        $this->fetchAllMode = $fetchAllMode | ($bitwiseOrCurrent ? $this->fetchMode : 0);
+
+        return $this;
+    }
+
+    /**
+     * Reset the fetch mode override for calling $statement->fetchAll().
+     *
+     * @return $this
+     */
+    public function resetFetchAllMode()
+    {
+        $this->fetchAllMode = null;
+
+        return $this;
     }
 
     /**
