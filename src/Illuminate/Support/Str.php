@@ -1343,6 +1343,20 @@ class Str
     }
 
     /**
+     * Find multi-byte safe position of first occurrence of substring in a string.
+     * If substr is not found, it returns false.
+     *
+     * @param string $haystack The string to search in
+     * @param string $needle The string to search for in $haystack
+     * @param int $offset Search offset. A negative offset counts from the end of the string
+     * @param string|null $encoding If it is omitted or null, the internal character encoding value will be used
+     * @return int|false
+     */
+    public static function substrPos($haystack, $needle, $offset = 0, $encoding = null) {
+        return mb_strpos($haystack, (string) $needle, $offset, $encoding);
+    }
+
+    /**
      * Replace text within a portion of a string.
      *
      * @param  string|string[]  $string
