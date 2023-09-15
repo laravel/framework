@@ -121,11 +121,11 @@ class Handler implements ExceptionHandlerContract
     ];
 
     /**
-     * Indicates that exception reporting should be deduplicated.
+     * Indicates that an exception instance should only be reported once.
      *
      * @var bool
      */
-    protected $deduplicateReporting = false;
+    protected $withoutDuplicates = false;
 
     /**
      * The already reported exception map.
@@ -326,7 +326,7 @@ class Handler implements ExceptionHandlerContract
      */
     protected function shouldntReport(Throwable $e)
     {
-        if ($this->deduplicateReporting && ($this->reportedExceptionMap[$e] ?? false)) {
+        if ($this->withoutDuplicates && ($this->reportedExceptionMap[$e] ?? false)) {
             return true;
         }
 
@@ -816,7 +816,7 @@ class Handler implements ExceptionHandlerContract
      */
     public function dontReportDuplicates()
     {
-        $this->deduplicateReporting = true;
+        $this->withoutDuplicates = true;
 
         return $this;
     }
