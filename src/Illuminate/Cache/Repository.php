@@ -163,7 +163,6 @@ class Repository implements ArrayAccess, CacheContract
         if (is_null($value)) {
             $this->event(new CacheMissed($key));
 
-            // Use the default value only if keys are key-value pairs, not just values
             return (isset($keys[$key]) && ! array_is_list($keys)) ? value($keys[$key]) : null;
         }
 
