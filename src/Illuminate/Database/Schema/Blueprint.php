@@ -1050,11 +1050,17 @@ class Blueprint
      * Create a new enum column on the table.
      *
      * @param  string  $column
-     * @param  array  $allowed
+     * @param  array|string  $allowed
      * @return \Illuminate\Database\Schema\ColumnDefinition
      */
-    public function enum($column, array $allowed)
+    public function enum($column, array|string $allowed)
     {
+        if (enum_exists($allowed)) {
+            $allowed = collect($allowed::cases())->map(function ($allow) {
+                return $allow->value;
+            });
+        }
+
         return $this->addColumn('enum', $column, compact('allowed'));
     }
 
