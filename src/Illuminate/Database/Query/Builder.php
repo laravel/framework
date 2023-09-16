@@ -2976,7 +2976,7 @@ class Builder implements BuilderContract
         $mode = \PDO::FETCH_COLUMN | (is_null($key) ? 0 : \PDO::FETCH_UNIQUE);
 
         return collect($this->onceWithColumns(
-    is_null($key) ? [$column] : [$key, $column],
+            is_null($key) ? [$column] : [$key, $column],
             fn () => $this->onceWithFetchAllArgs($mode, function () {
                 return $this->processor->processSelect(
                     $this, $this->runSelect()
