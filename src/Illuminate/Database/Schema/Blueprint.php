@@ -1056,9 +1056,7 @@ class Blueprint
     public function enum($column, array|string $allowed)
     {
         if (enum_exists($allowed)) {
-            $allowed = collect($allowed::cases())->map(function ($allow) {
-                return $allow->value;
-            });
+            $allowed = collect($allowed::cases())->map(fn ($allow) => $allow->value);
         }
 
         return $this->addColumn('enum', $column, compact('allowed'));
