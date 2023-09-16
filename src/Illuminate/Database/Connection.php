@@ -507,7 +507,7 @@ class Connection implements ConnectionInterface
     }
 
     /**
-     * Set the fetch mode override for calling $statement->fetchAll().
+     * Set the arguments for calling $statement->fetchAll().
      *
      * @param  int  $mode
      * @param  mixed  ...$args
@@ -521,7 +521,7 @@ class Connection implements ConnectionInterface
     }
 
     /**
-     * Reset the fetch mode override for calling $statement->fetchAll().
+     * Reset the arguments for calling $statement->fetchAll().
      *
      * @return $this
      */
