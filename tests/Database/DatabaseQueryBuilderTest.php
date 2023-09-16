@@ -2571,6 +2571,7 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testPluckMethodGetsCollectionOfColumnValues()
     {
         $builder = $this->getBuilder();
+        $builder->getConnection()->shouldReceive('setFetchAllArgs', 'resetFetchAllArgs')->once();
         $builder->getConnection()->shouldReceive('select')->once()->andReturn(['bar', 'baz']);
         $builder->getProcessor()->shouldReceive('processSelect')->once()->with($builder, ['bar', 'baz'])->andReturnUsing(function ($query, $results) {
             return $results;
@@ -2579,6 +2580,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals(['bar', 'baz'], $results->all());
 
         $builder = $this->getBuilder();
+        $builder->getConnection()->shouldReceive('setFetchAllArgs', 'resetFetchAllArgs')->once();
         $builder->getConnection()->shouldReceive('select')->once()->andReturn([1 => 'bar', 10 => 'baz']);
         $builder->getProcessor()->shouldReceive('processSelect')->once()->with($builder, [1 => 'bar', 10 => 'baz'])->andReturnUsing(function ($query, $results) {
             return $results;
@@ -2591,6 +2593,7 @@ class DatabaseQueryBuilderTest extends TestCase
     {
         // Test without glue.
         $builder = $this->getBuilder();
+        $builder->getConnection()->shouldReceive('setFetchAllArgs', 'resetFetchAllArgs')->once();
         $builder->getConnection()->shouldReceive('select')->once()->andReturn(['bar', 'baz']);
         $builder->getProcessor()->shouldReceive('processSelect')->once()->with($builder, ['bar', 'baz'])->andReturnUsing(function ($query, $results) {
             return $results;
@@ -2600,6 +2603,7 @@ class DatabaseQueryBuilderTest extends TestCase
 
         // Test with glue.
         $builder = $this->getBuilder();
+        $builder->getConnection()->shouldReceive('setFetchAllArgs', 'resetFetchAllArgs')->once();
         $builder->getConnection()->shouldReceive('select')->once()->andReturn(['bar', 'baz']);
         $builder->getProcessor()->shouldReceive('processSelect')->once()->with($builder, ['bar', 'baz'])->andReturnUsing(function ($query, $results) {
             return $results;
@@ -5683,8 +5687,6 @@ SQL;
     {
         $connection = m::mock(ConnectionInterface::class);
         $connection->shouldReceive('getDatabaseName')->andReturn('database');
-        $connection->shouldReceive('setFetchAllMode');
-        $connection->shouldReceive('resetFetchAllMode');
 
         return $connection;
     }
