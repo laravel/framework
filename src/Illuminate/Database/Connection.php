@@ -122,9 +122,9 @@ class Connection implements ConnectionInterface
     /**
      * The fetch mode override for $statement->fetchAll() calls.
      *
-     * @var int|null
+     * @var array
      */
-    protected $fetchAllMode;
+    protected $fetchAllArgs;
 
     /**
      * The number of active transactions.
@@ -427,8 +427,8 @@ class Connection implements ConnectionInterface
 
             $statement->execute();
 
-            if (! is_null($this->fetchAllMode)) {
-                return $statement->fetchAll($this->fetchAllMode);
+            if (! empty($this->fetchAllArgs)) {
+                return $statement->fetchAll(...$this->fetchAllArgs);
             }
 
             return $statement->fetchAll();
@@ -509,13 +509,13 @@ class Connection implements ConnectionInterface
     /**
      * Set the fetch mode override for calling $statement->fetchAll().
      *
-     * @param  int  $fetchAllMode
-     * @param  bool  $bitwiseOrCurrent
+     * @param  int  $mode
+     * @param  mixed  ...$args
      * @return $this
      */
-    public function setFetchAllMode($fetchAllMode, $bitwiseOrCurrent = true)
+    public function setFetchAllArgs($mode, ...$args)
     {
-        $this->fetchAllMode = $fetchAllMode | ($bitwiseOrCurrent ? $this->fetchMode : 0);
+        $this->fetchAllArgs = [$mode, ...$args];
 
         return $this;
     }
@@ -525,9 +525,9 @@ class Connection implements ConnectionInterface
      *
      * @return $this
      */
-    public function resetFetchAllMode()
+    public function resetFetchAllArgs()
     {
-        $this->fetchAllMode = null;
+        $this->fetchAllArgs = [];
 
         return $this;
     }

@@ -2971,17 +2971,17 @@ class Builder implements BuilderContract
      */
     public function pluck($column, $key = null)
     {
+        // A single column can be fetched efficiently using FETCH COLUMN. A combination
+        // with a key is done using a bitwise-or with FETCH_UNIQUE.
+        $mode = \PDO::FETCH_COLUMN | (is_null($key) ? 0 : \PDO::FETCH_UNIQUE);
+
         return collect($this->onceWithColumns(
     is_null($key) ? [$column] : [$key, $column],
-            // When the key is null, we only need to fetch one unique column. If a key
-            // is given, a combination of PDO::FETCH_UNIQUE | PDO::FETCH_COLUMN will
-            // result in a neat key/value response.
-            fn () => $this->onceWithFetchAllMode(is_null($key) ? \PDO::FETCH_COLUMN : \PDO::FETCH_UNIQUE | \PDO::FETCH_COLUMN, function () {
+            fn () => $this->onceWithFetchAllArgs($mode, function () {
                 return $this->processor->processSelect(
                     $this, $this->runSelect()
                 );
-            }, true)
-        ));
+            }), true));
     }
 
     /**
@@ -3196,13 +3196,14 @@ class Builder implements BuilderContract
      *
      * @param  array  $columns
      * @param  callable  $callback
+     * @param  bool  $force
      * @return mixed
      */
-    protected function onceWithColumns($columns, $callback)
+    protected function onceWithColumns($columns, $callback, $force = false)
     {
         $original = $this->columns;
 
-        if (is_null($original)) {
+        if (is_null($original) || $force) {
             $this->columns = $columns;
         }
 
@@ -3218,16 +3219,15 @@ class Builder implements BuilderContract
      *
      * After running the callback, the fetch mode is reverted.
      *
-     * @param  int  $mode
+     * @param  mixed  $fetchAllArgs
      * @param  Closure  $callback
-     * @param  bool  $bitwiseOrCurrent
      * @return \Illuminate\Support\HigherOrderTapProxy|mixed
      */
-    protected function onceWithFetchAllMode($mode, Closure $callback, $bitwiseOrCurrent = false)
+    protected function onceWithFetchAllArgs($fetchAllArgs, Closure $callback)
     {
-        $this->connection->setFetchAllMode($mode, $bitwiseOrCurrent);
+        $this->connection->setFetchAllArgs(...Arr::wrap($fetchAllArgs));
 
-        return tap($callback(), fn () => $this->connection->resetFetchAllMode());
+        return tap($callback(), fn () => $this->connection->resetFetchAllArgs());
     }
 
     /**
