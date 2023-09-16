@@ -403,8 +403,9 @@ class QueryBuilderTest extends DatabaseTestCase
     {
         // Test SELECT override, since pluck will take the first column.
         $this->assertSame([
-            1, 2,
-        ], DB::table('posts')->select(['content', 'id', 'title'])->pluck('id')->toArray());
+            'Foo Post',
+            'Bar Post',
+        ], DB::table('posts')->select(['content', 'id', 'title'])->pluck('title')->toArray());
 
         $this->assertSame([
             'Foo Post',
