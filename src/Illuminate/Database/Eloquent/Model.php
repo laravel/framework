@@ -967,6 +967,8 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
             return false;
         }
 
+        $extra = array_merge($extra, $this->getDirty());
+
         return tap($this->setKeysForSaveQuery($query)->{$method}($column, $amount, $extra), function () use ($column) {
             $this->syncChanges();
 
