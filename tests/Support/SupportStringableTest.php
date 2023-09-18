@@ -1028,6 +1028,7 @@ class SupportStringableTest extends TestCase
         $this->assertSame(10, $this->stringable('This is a tEsT string.')->substrPos('tEsT', 0, 'UTF-8'));
         $this->assertSame(7, $this->stringable('Hello, World!')->substrPos('W', -6));
         $this->assertSame(18, $this->stringable('Äpfel, Birnen und Kirschen')->substrPos('Kirschen', -10, 'UTF-8'));
+        $this->assertSame(9, $this->stringable('@%€/=!"][$')->substrPos('$', 0, 'UTF-8'));
         $this->assertFalse($this->stringable('Hello, World!')->substrPos('w', 0, 'UTF-8'));
         $this->assertFalse($this->stringable('Hello, World!')->substrPos('X', 0, 'UTF-8'));
         $this->assertFalse($this->stringable('')->substrPos('test'));

@@ -833,6 +833,7 @@ class SupportStrTest extends TestCase
         $this->assertSame(10, Str::substrPos('This is a tEsT string.', 'tEsT', 0, 'UTF-8'));
         $this->assertSame(7, Str::substrPos('Hello, World!', 'W', -6));
         $this->assertSame(18, Str::substrPos('Äpfel, Birnen und Kirschen', 'Kirschen', -10, 'UTF-8'));
+        $this->assertSame(9, Str::substrPos('@%€/=!"][$', '$', 0, 'UTF-8'));
         $this->assertFalse(Str::substrPos('Hello, World!', 'w', 0, 'UTF-8'));
         $this->assertFalse(Str::substrPos('Hello, World!', 'X', 0, 'UTF-8'));
         $this->assertFalse(Str::substrPos('', 'test'));
