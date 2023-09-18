@@ -1020,19 +1020,19 @@ class SupportStringableTest extends TestCase
 
     public function testSubstrPos()
     {
-        $this->assertSame(7, $this->stringable('Hello, World!')->substrPos('W'));
-        $this->assertSame(10, $this->stringable('This is a test string.')->substrPos('test'));
-        $this->assertSame(23, $this->stringable('This is a test string, test again.')->substrPos('test', 15));
-        $this->assertSame(0, $this->stringable('Hello, World!')->substrPos('Hello'));
-        $this->assertSame(7, $this->stringable('Hello, World!')->substrPos('World!'));
-        $this->assertSame(10, $this->stringable('This is a tEsT string.')->substrPos('tEsT', 0, 'UTF-8'));
-        $this->assertSame(7, $this->stringable('Hello, World!')->substrPos('W', -6));
-        $this->assertSame(18, $this->stringable('Äpfel, Birnen und Kirschen')->substrPos('Kirschen', -10, 'UTF-8'));
-        $this->assertSame(9, $this->stringable('@%€/=!"][$')->substrPos('$', 0, 'UTF-8'));
-        $this->assertFalse($this->stringable('Hello, World!')->substrPos('w', 0, 'UTF-8'));
-        $this->assertFalse($this->stringable('Hello, World!')->substrPos('X', 0, 'UTF-8'));
-        $this->assertFalse($this->stringable('')->substrPos('test'));
-        $this->assertFalse($this->stringable('Hello, World!')->substrPos('X'));
+        $this->assertSame(7, $this->stringable('Hello, World!')->position('W'));
+        $this->assertSame(10, $this->stringable('This is a test string.')->position('test'));
+        $this->assertSame(23, $this->stringable('This is a test string, test again.')->position('test', 15));
+        $this->assertSame(0, $this->stringable('Hello, World!')->position('Hello'));
+        $this->assertSame(7, $this->stringable('Hello, World!')->position('World!'));
+        $this->assertSame(10, $this->stringable('This is a tEsT string.')->position('tEsT', 0, 'UTF-8'));
+        $this->assertSame(7, $this->stringable('Hello, World!')->position('W', -6));
+        $this->assertSame(18, $this->stringable('Äpfel, Birnen und Kirschen')->position('Kirschen', -10, 'UTF-8'));
+        $this->assertSame(9, $this->stringable('@%€/=!"][$')->position('$', 0, 'UTF-8'));
+        $this->assertFalse($this->stringable('Hello, World!')->position('w', 0, 'UTF-8'));
+        $this->assertFalse($this->stringable('Hello, World!')->position('X', 0, 'UTF-8'));
+        $this->assertFalse($this->stringable('')->position('test'));
+        $this->assertFalse($this->stringable('Hello, World!')->position('X'));
     }
 
     public function testSubstrReplace()

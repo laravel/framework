@@ -576,6 +576,19 @@ class Stringable implements JsonSerializable, ArrayAccess
     }
 
     /**
+     * Find the multi-byte safe position of the first occurrence of the given substring.
+     *
+     * @param  string  $needle
+     * @param  int  $offset
+     * @param  string|null  $encoding
+     * @return int|false
+     */
+    public function position($needle, $offset = 0, $encoding = null)
+    {
+        return Str::position($this->value, $needle, $offset, $encoding);
+    }
+
+    /**
      * Prepend the given values to the string.
      *
      * @param  string  ...$values
@@ -861,19 +874,6 @@ class Stringable implements JsonSerializable, ArrayAccess
     public function substrCount($needle, $offset = 0, $length = null)
     {
         return Str::substrCount($this->value, $needle, $offset, $length);
-    }
-
-    /**
-     * Find the multi-byte safe position of the first occurrence of the given substring.
-     *
-     * @param  string  $needle
-     * @param  int  $offset
-     * @param  string|null  $encoding
-     * @return int|false
-     */
-    public function substrPos($needle, $offset = 0, $encoding = null)
-    {
-        return Str::substrPos($this->value, $needle, $offset, $encoding);
     }
 
     /**
