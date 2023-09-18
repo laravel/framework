@@ -59,9 +59,9 @@ class BusBatchTest extends TestCase
             $table->integer('failed_jobs');
             $table->text('failed_job_ids');
             $table->text('options')->nullable();
-            $table->integer('cancelled_at')->nullable();
-            $table->integer('created_at');
-            $table->integer('finished_at')->nullable();
+            $table->timestamp('cancelled_at')->nullable();
+            $table->timestamp('created_at');
+            $table->timestamp('finished_at')->nullable();
         });
     }
 
@@ -432,7 +432,7 @@ class BusBatchTest extends TestCase
                 'failed_jobs' => '',
                 'failed_job_ids' => '[]',
                 'options' => $serialize,
-                'created_at' => now()->timestamp,
+                'created_at' => now(),
                 'cancelled_at' => null,
                 'finished_at' => null,
             ]);

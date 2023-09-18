@@ -104,7 +104,7 @@ class DatabaseBatchRepository implements PrunableBatchRepository
             'failed_jobs' => 0,
             'failed_job_ids' => '[]',
             'options' => $this->serialize($batch->options),
-            'created_at' => time(),
+            'created_at' => CarbonImmutable::now(),
             'cancelled_at' => null,
             'finished_at' => null,
         ]);
@@ -203,7 +203,7 @@ class DatabaseBatchRepository implements PrunableBatchRepository
     public function markAsFinished(string $batchId)
     {
         $this->connection->table($this->table)->where('id', $batchId)->update([
-            'finished_at' => time(),
+            'finished_at' => CarbonImmutable::now(),
         ]);
     }
 
@@ -216,8 +216,8 @@ class DatabaseBatchRepository implements PrunableBatchRepository
     public function cancel(string $batchId)
     {
         $this->connection->table($this->table)->where('id', $batchId)->update([
-            'cancelled_at' => time(),
-            'finished_at' => time(),
+            'cancelled_at' => CarbonImmutable::now(),
+            'finished_at' => CarbonImmutable::now(),
         ]);
     }
 
