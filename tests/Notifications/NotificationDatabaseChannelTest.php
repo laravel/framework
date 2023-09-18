@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Notifications;
 
 use Illuminate\Notifications\Channels\DatabaseChannel;
+use Illuminate\Notifications\Exceptions\DatabaseTypeNotificationMissingException;
 use Illuminate\Notifications\Messages\DatabaseMessage;
 use Illuminate\Notifications\Notification;
 use Mockery as m;
@@ -65,6 +66,31 @@ class NotificationDatabaseChannelTest extends TestCase
         ]);
 
         $channel = new ExtendedDatabaseChannel;
+        $channel->send($notifiable, $notification);
+    }
+
+    public function testRequireDatabaseTypeThrowsAnExceptionWhenEnabled()
+    {
+        DatabaseChannel::requireDatabaseType();
+        $notification = new NotificationDatabaseChannelTestNotification;
+        $notifiable = m::mock();
+
+        $notifiable->shouldReceive('routeNotificationFor->create');
+        $this->expectException(DatabaseTypeNotificationMissingException::class);
+
+        $channel = new DatabaseChannel;
+        $channel->send($notifiable, $notification);
+    }
+
+    public function testRequireDatabaseTypeDoesNotThrowAnExceptionWhenDisabled()
+    {
+        DatabaseChannel::requireDatabaseType(false);
+        $notification = new NotificationDatabaseChannelTestNotification;
+        $notifiable = m::mock();
+
+        $notifiable->shouldReceive('routeNotificationFor->create');
+
+        $channel = new DatabaseChannel;
         $channel->send($notifiable, $notification);
     }
 }
