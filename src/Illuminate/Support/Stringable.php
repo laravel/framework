@@ -864,12 +864,11 @@ class Stringable implements JsonSerializable, ArrayAccess
     }
 
     /**
-     * Find multi-byte safe position of first occurrence of given substring.
-     * If substr is not found, it returns false.
+     * Find the multi-byte safe position of the first occurrence of the given substring.
      *
-     * @param  string  $needle  The string to search for in $haystack
-     * @param  int  $offset  Search offset. A negative offset counts from the end of the string
-     * @param  string|null  $encoding  If it is omitted or null, the internal character encoding value will be used
+     * @param  string  $needle
+     * @param  int  $offset
+     * @param  string|null  $encoding
      * @return int|false
      */
     public function substrPos($needle, $offset = 0, $encoding = null)
