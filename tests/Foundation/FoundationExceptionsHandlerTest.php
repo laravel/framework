@@ -283,8 +283,8 @@ class FoundationExceptionsHandlerTest extends TestCase
         $file = m::mock(UploadedFile::class);
         $file->shouldReceive('getPathname')->andReturn('photo.jpg');
         $file->shouldReceive('getClientOriginalName')->andReturn('photo.jpg');
-        $file->shouldReceive('getClientMimeType')->andReturn(null);
-        $file->shouldReceive('getError')->andReturn(null);
+        $file->shouldReceive('getClientMimeType')->andReturn('application/octet-stream');
+        $file->shouldReceive('getError')->andReturn(\UPLOAD_ERR_NO_FILE);
 
         $request = Request::create('/', 'POST', $argumentExpected, [], ['photo' => $file]);
 
