@@ -4,6 +4,7 @@ namespace Illuminate\Notifications;
 
 use Illuminate\Contracts\Notifications\Dispatcher as DispatcherContract;
 use Illuminate\Contracts\Notifications\Factory as FactoryContract;
+use Illuminate\Contracts\Notifications\Manager;
 use Illuminate\Support\ServiceProvider;
 
 class NotificationServiceProvider extends ServiceProvider
@@ -32,6 +33,10 @@ class NotificationServiceProvider extends ServiceProvider
     public function register()
     {
         $this->app->singleton(ChannelManager::class, fn ($app) => new ChannelManager($app));
+
+        $this->app->alias(
+            ChannelManager::class, Manager::class
+        );
 
         $this->app->alias(
             ChannelManager::class, DispatcherContract::class
