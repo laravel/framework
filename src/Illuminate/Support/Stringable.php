@@ -903,7 +903,7 @@ class Stringable implements JsonSerializable, ArrayAccess
     /**
      * Take the first or last {$limit} characters.
      *
-     * @param  int $limit
+     * @param  int  $limit
      * @return static
      */
     public function take(int $limit)
