@@ -459,6 +459,56 @@ if (! function_exists('fake') && class_exists(\Faker\Factory::class)) {
     }
 }
 
+if (! function_exists('forbid')) {
+    /**
+     * Throw a forbidden HttpException with the given data.
+     *
+     * @param  string  $message
+     * @param  array  $headers
+     * @return never
+     *
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+     */
+    function forbid($message = '', array $headers = [])
+    {
+        abort(403, $message, $headers);
+    }
+}
+
+if (! function_exists('forbid_if')) {
+    /**
+     * Throw a forbidden HttpException with the given data if the given condition is true.
+     *
+     * @param  bool  $condition
+     * @param  string  $message
+     * @param  array  $headers
+     * @return void
+     *
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+     */
+    function forbid_if($condition, $message = '', array $headers = [])
+    {
+        abort_if($condition, 403, $message, $headers);
+    }
+}
+
+if (! function_exists('forbid_unless')) {
+    /**
+     * Throw a forbidden HttpException with the given data unless the given condition is true.
+     *
+     * @param  bool  $condition
+     * @param  string  $message
+     * @param  array  $headers
+     * @return void
+     *
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+     */
+    function forbid_unless($condition, $message = '', array $headers = [])
+    {
+        abort_unless($condition, 403, $message, $headers);
+    }
+}
+
 if (! function_exists('info')) {
     /**
      * Write some information to the log.
