@@ -110,7 +110,7 @@
         "phpunit/phpunit": "^10.0.7",
         "predis/predis": "^2.0.2",
         "symfony/cache": "^6.2",
-        "symfony/http-client": "^6.2"
+        "symfony/http-client": "^6.2.4"
     },
     "provide": {
         "psr/container-implementation": "1.1|2.0",
