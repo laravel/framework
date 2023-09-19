@@ -165,7 +165,7 @@ class Composer
     /**
      * Get the Composer binary / command for the environment.
      *
-     * @param  string|null $composerBinary
+     * @param  string|null  $composerBinary
      * @return array
      */
     public function findComposer($composerBinary = null)
