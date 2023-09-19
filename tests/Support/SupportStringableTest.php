@@ -123,6 +123,12 @@ class SupportStringableTest extends TestCase
         $this->assertTrue($stringable->matchAll('/nothing/')->isEmpty());
     }
 
+    public function testTake()
+    {
+        $this->assertSame('ab', (string) $this->stringable('abcdef')->take(2));
+        $this->assertSame('ef', (string) $this->stringable('abcdef')->take(-2));
+    }
+
     public function testTest()
     {
         $stringable = $this->stringable('foo bar');
