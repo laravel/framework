@@ -11,7 +11,7 @@ class PhpRedisClusterConnection extends PhpRedisConnection
      */
     public function flushdb()
     {
-        $arguments = func_get_args();
+        $arguments = \func_get_args();
 
         $async = strtoupper((string) ($arguments[0] ?? null)) === 'ASYNC';
 

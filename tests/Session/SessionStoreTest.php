@@ -83,7 +83,7 @@ class SessionStoreTest extends TestCase
         $oldId = $session->getId();
 
         $session->put('foo', 'bar');
-        $this->assertGreaterThan(0, count($session->all()));
+        $this->assertGreaterThan(0, \count($session->all()));
 
         $session->flash('name', 'Taylor');
         $this->assertTrue($session->has('name'));

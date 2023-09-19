@@ -20,11 +20,11 @@ class Util
      */
     public static function arrayWrap($value)
     {
-        if (is_null($value)) {
+        if (\is_null($value)) {
             return [];
         }
 
-        return is_array($value) ? $value : [$value];
+        return \is_array($value) ? $value : [$value];
     }
 
     /**
@@ -51,7 +51,7 @@ class Util
      */
     public static function getParameterClassName($parameter)
     {
-        $type = $parameter->getType();
+        $type = $parameter->\gettype();
 
         if (! $type instanceof ReflectionNamedType || $type->isBuiltin()) {
             return null;
@@ -59,7 +59,7 @@ class Util
 
         $name = $type->getName();
 
-        if (! is_null($class = $parameter->getDeclaringClass())) {
+        if (! \is_null($class = $parameter->getDeclaringClass())) {
             if ($name === 'self') {
                 return $class->getName();
             }

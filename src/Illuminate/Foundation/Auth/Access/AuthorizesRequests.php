@@ -49,7 +49,7 @@ trait AuthorizesRequests
      */
     protected function parseAbilityAndArguments($ability, $arguments)
     {
-        if (is_string($ability) && ! str_contains($ability, '\\')) {
+        if (\is_string($ability) && ! str_contains($ability, '\\')) {
             return [$ability, $arguments];
         }
 
@@ -82,16 +82,16 @@ trait AuthorizesRequests
      */
     public function authorizeResource($model, $parameter = null, array $options = [], $request = null)
     {
-        $model = is_array($model) ? implode(',', $model) : $model;
+        $model = \is_array($model) ? implode(',', $model) : $model;
 
-        $parameter = is_array($parameter) ? implode(',', $parameter) : $parameter;
+        $parameter = \is_array($parameter) ? implode(',', $parameter) : $parameter;
 
         $parameter = $parameter ?: Str::snake(class_basename($model));
 
         $middleware = [];
 
         foreach ($this->resourceAbilityMap() as $method => $ability) {
-            $modelName = in_array($method, $this->resourceMethodsWithoutModels()) ? $model : $parameter;
+            $modelName = \in_array($method, $this->resourceMethodsWithoutModels()) ? $model : $parameter;
 
             $middleware["can:{$ability},{$modelName}"][] = $method;
         }

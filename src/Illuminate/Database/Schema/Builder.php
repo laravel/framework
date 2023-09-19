@@ -85,7 +85,7 @@ class Builder
      */
     public static function defaultMorphKeyType(string $type)
     {
-        if (! in_array($type, ['int', 'uuid', 'ulid'])) {
+        if (! \in_array($type, ['int', 'uuid', 'ulid'])) {
             throw new InvalidArgumentException("Morph key type must be 'int', 'uuid', or 'ulid'.");
         }
 
@@ -159,7 +159,7 @@ class Builder
     {
         $table = $this->connection->getTablePrefix().$table;
 
-        return count($this->connection->selectFromWriteConnection(
+        return \count($this->connection->selectFromWriteConnection(
             $this->grammar->compileTableExists(), [$table]
         )) > 0;
     }
@@ -173,7 +173,7 @@ class Builder
      */
     public function hasColumn($table, $column)
     {
-        return in_array(
+        return \in_array(
             strtolower($column), array_map('strtolower', $this->getColumnListing($table))
         );
     }
@@ -190,7 +190,7 @@ class Builder
         $tableColumns = array_map('strtolower', $this->getColumnListing($table));
 
         foreach ($columns as $column) {
-            if (! in_array(strtolower($column), $tableColumns)) {
+            if (! \in_array(strtolower($column), $tableColumns)) {
                 return false;
             }
         }
@@ -239,7 +239,7 @@ class Builder
     {
         $table = $this->connection->getTablePrefix().$table;
 
-        return $this->connection->getDoctrineColumn($table, $column)->getType()->getName();
+        return $this->connection->getDoctrineColumn($table, $column)->\gettype()->getName();
     }
 
     /**
@@ -453,7 +453,7 @@ class Builder
                     : '';
 
         if (isset($this->resolver)) {
-            return call_user_func($this->resolver, $table, $callback, $prefix);
+            return \call_user_func($this->resolver, $table, $callback, $prefix);
         }
 
         return Container::getInstance()->make(Blueprint::class, compact('table', 'callback', 'prefix'));

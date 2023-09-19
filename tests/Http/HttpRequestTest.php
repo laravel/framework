@@ -1032,7 +1032,7 @@ class HttpRequestTest extends TestCase
     {
         $payload = ['name' => 'taylor'];
         $content = json_encode($payload);
-        $request = Request::create('/', 'GET', [], [], [], ['HTTP_CONTENT_TYPE' => 'application/json', 'HTTP_CONTENT_LENGTH' => strlen($content)], $content);
+        $request = Request::create('/', 'GET', [], [], [], ['HTTP_CONTENT_TYPE' => 'application/json', 'HTTP_CONTENT_LENGTH' => \strlen($content)], $content);
         $this->assertTrue($request->isJson());
         $data = $request->json()->all();
         $this->assertEquals($payload, $data);

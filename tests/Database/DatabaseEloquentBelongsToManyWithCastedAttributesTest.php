@@ -49,7 +49,7 @@ class DatabaseEloquentBelongsToManyWithCastedAttributesTest extends TestCase
 
         $models = $relation->match([$model1, $model2], Collection::wrap($result1), 'foo');
         $this->assertNull($models[1]->foo);
-        $this->assertSame(1, $models[0]->foo->count());
+        $this->assertSame(1, $models[0]->foo->\count());
         $this->assertContains($result1, $models[0]->foo);
     }
 

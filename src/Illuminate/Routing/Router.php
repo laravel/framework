@@ -282,8 +282,8 @@ class Router implements BindingRegistrar, RegistrarContract
                 ->setDefaults([
                     'view' => $view,
                     'data' => $data,
-                    'status' => is_array($status) ? 200 : $status,
-                    'headers' => is_array($status) ? $status : $headers,
+                    'status' => \is_array($status) ? 200 : $status,
+                    'headers' => \is_array($status) ? $status : $headers,
                 ]);
     }
 
@@ -576,7 +576,7 @@ class Router implements BindingRegistrar, RegistrarContract
     protected function actionReferencesController($action)
     {
         if (! $action instanceof Closure) {
-            return is_string($action) || (isset($action['uses']) && is_string($action['uses']));
+            return \is_string($action) || (isset($action['uses']) && \is_string($action['uses']));
         }
 
         return false;
@@ -590,7 +590,7 @@ class Router implements BindingRegistrar, RegistrarContract
      */
     protected function convertToControllerAction($action)
     {
-        if (is_string($action)) {
+        if (\is_string($action)) {
             $action = ['uses' => $action];
         }
 
@@ -835,7 +835,7 @@ class Router implements BindingRegistrar, RegistrarContract
                 return false;
             }
 
-            if (in_array($name, $excluded, true)) {
+            if (\in_array($name, $excluded, true)) {
                 return true;
             }
 
@@ -905,7 +905,7 @@ class Router implements BindingRegistrar, RegistrarContract
                     $response instanceof ArrayObject ||
                     $response instanceof JsonSerializable ||
                     $response instanceof stdClass ||
-                    is_array($response))) {
+                    \is_array($response))) {
             $response = new JsonResponse($response);
         } elseif (! $response instanceof SymfonyResponse) {
             $response = new Response($response, 200, ['Content-Type' => 'text/html']);
@@ -964,7 +964,7 @@ class Router implements BindingRegistrar, RegistrarContract
      */
     protected function performBinding($key, $value, $route)
     {
-        return call_user_func($this->binders[$key], $value, $route);
+        return \call_user_func($this->binders[$key], $value, $route);
     }
 
     /**
@@ -1010,7 +1010,7 @@ class Router implements BindingRegistrar, RegistrarContract
      */
     public function hasMiddlewareGroup($name)
     {
-        return array_key_exists($name, $this->middlewareGroups);
+        return \array_key_exists($name, $this->middlewareGroups);
     }
 
     /**
@@ -1048,7 +1048,7 @@ class Router implements BindingRegistrar, RegistrarContract
      */
     public function prependMiddlewareToGroup($group, $middleware)
     {
-        if (isset($this->middlewareGroups[$group]) && ! in_array($middleware, $this->middlewareGroups[$group])) {
+        if (isset($this->middlewareGroups[$group]) && ! \in_array($middleware, $this->middlewareGroups[$group])) {
             array_unshift($this->middlewareGroups[$group], $middleware);
         }
 
@@ -1066,11 +1066,11 @@ class Router implements BindingRegistrar, RegistrarContract
      */
     public function pushMiddlewareToGroup($group, $middleware)
     {
-        if (! array_key_exists($group, $this->middlewareGroups)) {
+        if (! \array_key_exists($group, $this->middlewareGroups)) {
             $this->middlewareGroups[$group] = [];
         }
 
-        if (! in_array($middleware, $this->middlewareGroups[$group])) {
+        if (! \in_array($middleware, $this->middlewareGroups[$group])) {
             $this->middlewareGroups[$group][] = $middleware;
         }
 
@@ -1092,7 +1092,7 @@ class Router implements BindingRegistrar, RegistrarContract
 
         $reversedMiddlewaresArray = array_flip($this->middlewareGroups[$group]);
 
-        if (! array_key_exists($middleware, $reversedMiddlewaresArray)) {
+        if (! \array_key_exists($middleware, $reversedMiddlewaresArray)) {
             return $this;
         }
 
@@ -1260,7 +1260,7 @@ class Router implements BindingRegistrar, RegistrarContract
      */
     public function has($name)
     {
-        $names = is_array($name) ? $name : func_get_args();
+        $names = \is_array($name) ? $name : \func_get_args();
 
         foreach ($names as $value) {
             if (! $this->routes->hasNamedRoute($value)) {
@@ -1430,7 +1430,7 @@ class Router implements BindingRegistrar, RegistrarContract
         $result = [];
 
         foreach ($middleware as $value) {
-            $key = \is_object($value) ? \spl_object_id($value) : $value;
+            $key = \\is_object($value) ? \spl_object_id($value) : $value;
 
             if (! isset($seen[$key])) {
                 $seen[$key] = true;
@@ -1468,13 +1468,13 @@ class Router implements BindingRegistrar, RegistrarContract
         }
 
         if ($method === 'middleware') {
-            return (new RouteRegistrar($this))->attribute($method, is_array($parameters[0]) ? $parameters[0] : $parameters);
+            return (new RouteRegistrar($this))->attribute($method, \is_array($parameters[0]) ? $parameters[0] : $parameters);
         }
 
         if ($method !== 'where' && Str::startsWith($method, 'where')) {
             return (new RouteRegistrar($this))->{$method}(...$parameters);
         }
 
-        return (new RouteRegistrar($this))->attribute($method, array_key_exists(0, $parameters) ? $parameters[0] : true);
+        return (new RouteRegistrar($this))->attribute($method, \array_key_exists(0, $parameters) ? $parameters[0] : true);
     }
 }

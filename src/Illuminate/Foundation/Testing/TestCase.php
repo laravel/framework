@@ -173,7 +173,7 @@ abstract class TestCase extends BaseTestCase
         try {
             $result = parent::runTest();
         } catch (Throwable $e) {
-            if (! is_null(static::$latestResponse)) {
+            if (! \is_null(static::$latestResponse)) {
                 static::$latestResponse->transformNotSuccessfulException($e);
             }
 

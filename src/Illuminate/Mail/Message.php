@@ -53,7 +53,7 @@ class Message
      */
     public function from($address, $name = null)
     {
-        is_array($address)
+        \is_array($address)
             ? $this->message->from(...$address)
             : $this->message->from(new Address($address, (string) $name));
 
@@ -69,7 +69,7 @@ class Message
      */
     public function sender($address, $name = null)
     {
-        is_array($address)
+        \is_array($address)
             ? $this->message->sender(...$address)
             : $this->message->sender(new Address($address, (string) $name));
 
@@ -100,7 +100,7 @@ class Message
     public function to($address, $name = null, $override = false)
     {
         if ($override) {
-            is_array($address)
+            \is_array($address)
                 ? $this->message->to(...$address)
                 : $this->message->to(new Address($address, (string) $name));
 
@@ -137,7 +137,7 @@ class Message
     public function cc($address, $name = null, $override = false)
     {
         if ($override) {
-            is_array($address)
+            \is_array($address)
                 ? $this->message->cc(...$address)
                 : $this->message->cc(new Address($address, (string) $name));
 
@@ -174,7 +174,7 @@ class Message
     public function bcc($address, $name = null, $override = false)
     {
         if ($override) {
-            is_array($address)
+            \is_array($address)
                 ? $this->message->bcc(...$address)
                 : $this->message->bcc(new Address($address, (string) $name));
 
@@ -222,19 +222,19 @@ class Message
      */
     protected function addAddresses($address, $name, $type)
     {
-        if (is_array($address)) {
+        if (\is_array($address)) {
             $type = lcfirst($type);
 
             $addresses = collect($address)->map(function ($address, $key) {
-                if (is_string($key) && is_string($address)) {
+                if (\is_string($key) && \is_string($address)) {
                     return new Address($key, $address);
                 }
 
-                if (is_array($address)) {
+                if (\is_array($address)) {
                     return new Address($address['email'] ?? $address['address'], $address['name'] ?? null);
                 }
 
-                if (is_null($address)) {
+                if (\is_null($address)) {
                     return new Address($key);
                 }
 

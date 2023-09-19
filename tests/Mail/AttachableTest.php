@@ -46,7 +46,7 @@ class AttachableTest extends TestCase
 
             public function withPathAttachment()
             {
-                $this->pathArgs = func_get_args();
+                $this->pathArgs = \func_get_args();
             }
         };
         $attachable = new class() implements Attachable
@@ -85,7 +85,7 @@ class AttachableTest extends TestCase
 
             public function withDataAttachment()
             {
-                $this->dataArgs = func_get_args();
+                $this->dataArgs = \func_get_args();
             }
         };
         $attachable = new class() implements Attachable

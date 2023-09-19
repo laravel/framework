@@ -131,7 +131,7 @@ class ResponseSequence
      */
     public function isEmpty()
     {
-        return count($this->responses) === 0;
+        return \count($this->responses) === 0;
     }
 
     /**

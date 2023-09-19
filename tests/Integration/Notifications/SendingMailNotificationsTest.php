@@ -161,7 +161,7 @@ class SendingMailNotificationsTest extends TestCase
 
             $expected = array_merge($notification->toMail($user)->toArray(), [
                 '__laravel_notification_id' => $notification->id,
-                '__laravel_notification' => get_class($notification),
+                '__laravel_notification' => \get_class($notification),
                 '__laravel_notification_queued' => false,
             ]);
 
@@ -295,7 +295,7 @@ class SendingMailNotificationsTest extends TestCase
             ['html', 'plain'],
             array_merge($notification->toMail($user)->toArray(), [
                 '__laravel_notification_id' => $notification->id,
-                '__laravel_notification' => get_class($notification),
+                '__laravel_notification' => \get_class($notification),
                 '__laravel_notification_queued' => false,
             ]),
             m::on(function ($closure) {
@@ -327,7 +327,7 @@ class SendingMailNotificationsTest extends TestCase
             'html',
             array_merge($notification->toMail($user)->toArray(), [
                 '__laravel_notification_id' => $notification->id,
-                '__laravel_notification' => get_class($notification),
+                '__laravel_notification' => \get_class($notification),
                 '__laravel_notification_queued' => false,
             ]),
             m::on(function ($closure) {
@@ -359,7 +359,7 @@ class SendingMailNotificationsTest extends TestCase
             [null, 'plain'],
             array_merge($notification->toMail($user)->toArray(), [
                 '__laravel_notification_id' => $notification->id,
-                '__laravel_notification' => get_class($notification),
+                '__laravel_notification' => \get_class($notification),
                 '__laravel_notification_queued' => false,
             ]),
             m::on(function ($closure) {

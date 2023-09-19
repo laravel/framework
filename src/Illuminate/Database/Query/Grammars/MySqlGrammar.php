@@ -179,7 +179,7 @@ class MySqlGrammar extends Grammar
      */
     protected function compileLock(Builder $query, $value)
     {
-        if (! is_string($value)) {
+        if (! \is_string($value)) {
             return $value ? 'for update' : 'lock in share mode';
         }
 
@@ -263,9 +263,9 @@ class MySqlGrammar extends Grammar
      */
     protected function compileJsonUpdateColumn($key, $value)
     {
-        if (is_bool($value)) {
+        if (\is_bool($value)) {
             $value = $value ? 'true' : 'false';
-        } elseif (is_array($value)) {
+        } elseif (\is_array($value)) {
             $value = 'cast(? as json)';
         } else {
             $value = $this->parameter($value);
@@ -312,9 +312,9 @@ class MySqlGrammar extends Grammar
     public function prepareBindingsForUpdate(array $bindings, array $values)
     {
         $values = collect($values)->reject(function ($value, $column) {
-            return $this->isJsonSelector($column) && is_bool($value);
+            return $this->isJsonSelector($column) && \is_bool($value);
         })->map(function ($value) {
-            return is_array($value) ? json_encode($value) : $value;
+            return \is_array($value) ? json_encode($value) : $value;
         })->all();
 
         return parent::prepareBindingsForUpdate($bindings, $values);

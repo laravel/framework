@@ -92,7 +92,7 @@ class Blueprint
         $this->table = $table;
         $this->prefix = $prefix;
 
-        if (! is_null($callback)) {
+        if (! \is_null($callback)) {
             $callback($this);
         }
     }
@@ -133,7 +133,7 @@ class Blueprint
             $method = 'compile'.ucfirst($command->name);
 
             if (method_exists($grammar, $method) || $grammar::hasMacro($method)) {
-                if (! is_null($sql = $grammar->$method($this, $command, $connection))) {
+                if (! \is_null($sql = $grammar->$method($this, $command, $connection))) {
                     $statements = array_merge($statements, (array) $sql);
                 }
             }
@@ -153,14 +153,14 @@ class Blueprint
     protected function ensureCommandsAreValid(Connection $connection)
     {
         if ($connection instanceof SQLiteConnection) {
-            if ($this->commandsNamed(['dropColumn', 'renameColumn'])->count() > 1
+            if ($this->commandsNamed(['dropColumn', 'renameColumn'])->\count() > 1
                 && ! $connection->usingNativeSchemaOperations()) {
                 throw new BadMethodCallException(
                     "SQLite doesn't support multiple calls to dropColumn / renameColumn in a single modification."
                 );
             }
 
-            if ($this->commandsNamed(['dropForeign'])->count() > 0) {
+            if ($this->commandsNamed(['dropForeign'])->\count() > 0) {
                 throw new BadMethodCallException(
                     "SQLite doesn't support dropping foreign keys (you would need to re-create the table)."
                 );
@@ -177,7 +177,7 @@ class Blueprint
     protected function commandsNamed(array $names)
     {
         return collect($this->commands)->filter(function ($command) use ($names) {
-            return in_array($command->name, $names);
+            return \in_array($command->name, $names);
         });
     }
 
@@ -190,11 +190,11 @@ class Blueprint
      */
     protected function addImpliedCommands(Connection $connection, Grammar $grammar)
     {
-        if (count($this->getAddedColumns()) > 0 && ! $this->creating()) {
+        if (\count($this->getAddedColumns()) > 0 && ! $this->creating()) {
             array_unshift($this->commands, $this->createCommand('add'));
         }
 
-        if (count($this->getChangedColumns()) > 0 && ! $this->creating()) {
+        if (\count($this->getChangedColumns()) > 0 && ! $this->creating()) {
             array_unshift($this->commands, $this->createCommand('change'));
         }
 
@@ -325,7 +325,7 @@ class Blueprint
      */
     public function dropColumn($columns)
     {
-        $columns = is_array($columns) ? $columns : func_get_args();
+        $columns = \is_array($columns) ? $columns : \func_get_args();
 
         return $this->addCommand('dropColumn', compact('columns'));
     }
@@ -430,7 +430,7 @@ class Blueprint
      */
     public function dropForeignIdFor($model, $column = null)
     {
-        if (is_string($model)) {
+        if (\is_string($model)) {
             $model = new $model;
         }
 
@@ -446,7 +446,7 @@ class Blueprint
      */
     public function dropConstrainedForeignIdFor($model, $column = null)
     {
-        if (is_string($model)) {
+        if (\is_string($model)) {
             $model = new $model;
         }
 
@@ -631,7 +631,7 @@ class Blueprint
             $this->indexCommand('foreign', $columns, $name)->getAttributes()
         );
 
-        $this->commands[count($this->commands) - 1] = $command;
+        $this->commands[\count($this->commands) - 1] = $command;
 
         return $command;
     }
@@ -722,7 +722,7 @@ class Blueprint
      */
     public function char($column, $length = null)
     {
-        $length = ! is_null($length) ? $length : Builder::$defaultStringLength;
+        $length = ! \is_null($length) ? $length : Builder::$defaultStringLength;
 
         return $this->addColumn('char', $column, compact('length'));
     }
@@ -935,7 +935,7 @@ class Blueprint
      */
     public function foreignIdFor($model, $column = null)
     {
-        if (is_string($model)) {
+        if (\is_string($model)) {
             $model = new $model;
         }
 
@@ -947,7 +947,7 @@ class Blueprint
 
         $modelTraits = class_uses_recursive($model);
 
-        if (in_array(HasUlids::class, $modelTraits, true)) {
+        if (\in_array(HasUlids::class, $modelTraits, true)) {
             return $this->foreignUlid($column);
         }
 
@@ -1663,7 +1663,7 @@ class Blueprint
         // If the given "index" is actually an array of columns, the developer means
         // to drop an index merely by specifying the columns involved without the
         // conventional name, so we will build the index name from the columns.
-        if (is_array($index)) {
+        if (\is_array($index)) {
             $index = $this->createIndexName($type, $columns = $index);
         }
 

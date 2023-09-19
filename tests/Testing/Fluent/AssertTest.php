@@ -251,7 +251,7 @@ class AssertTest extends TestCase
             'baz',
         ]);
 
-        $assert->count(3);
+        $assert->\count(3);
     }
 
     public function testAssertCountFails()
@@ -265,7 +265,7 @@ class AssertTest extends TestCase
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('Root level does not have the expected size.');
 
-        $assert->count(2);
+        $assert->\count(2);
     }
 
     public function testAssertCountFailsScoped()
@@ -281,7 +281,7 @@ class AssertTest extends TestCase
         $this->expectExceptionMessage('Property [bar] does not have the expected size.');
 
         $assert->has('bar', function ($bar) {
-            $bar->count(3);
+            $bar->\count(3);
         });
     }
 
@@ -434,7 +434,7 @@ class AssertTest extends TestCase
         $assert->where('bar', function ($value) {
             $this->assertInstanceOf(Collection::class, $value);
 
-            return $value->count() === 2;
+            return $value->\count() === 2;
         });
     }
 

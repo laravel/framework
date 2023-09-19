@@ -74,7 +74,7 @@ class BelongsTo extends Relation
      */
     public function getResults()
     {
-        if (is_null($this->getForeignKeyFrom($this->child))) {
+        if (\is_null($this->getForeignKeyFrom($this->child))) {
             return $this->getDefaultFor($this->parent);
         }
 
@@ -130,7 +130,7 @@ class BelongsTo extends Relation
         // to query for via the eager loading query. We will add them to an array then
         // execute a "where in" statement to gather up all of those related records.
         foreach ($models as $model) {
-            if (! is_null($value = $this->getForeignKeyFrom($model))) {
+            if (! \is_null($value = $this->getForeignKeyFrom($model))) {
                 $keys[] = $value;
             }
         }
@@ -286,7 +286,7 @@ class BelongsTo extends Relation
     protected function relationHasIncrementingId()
     {
         return $this->related->getIncrementing() &&
-            in_array($this->related->getKeyType(), ['int', 'integer']);
+            \in_array($this->related->getKeyType(), ['int', 'integer']);
     }
 
     /**

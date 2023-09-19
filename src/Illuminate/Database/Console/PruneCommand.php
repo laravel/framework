@@ -61,7 +61,7 @@ class PruneCommand extends Command
         $pruning = [];
 
         $events->listen(ModelsPruned::class, function ($event) use (&$pruning) {
-            if (! in_array($event->model, $pruning)) {
+            if (! \in_array($event->model, $pruning)) {
                 $pruning[] = $event->model;
 
                 $this->newLine();
@@ -136,7 +136,7 @@ class PruneCommand extends Command
                 );
             })->when(! empty($except), function ($models) use ($except) {
                 return $models->reject(function ($model) use ($except) {
-                    return in_array($model, $except);
+                    return \in_array($model, $except);
                 });
             })->filter(function ($model) {
                 return $this->isPrunable($model);
@@ -165,7 +165,7 @@ class PruneCommand extends Command
     {
         $uses = class_uses_recursive($model);
 
-        return in_array(Prunable::class, $uses) || in_array(MassPrunable::class, $uses);
+        return \in_array(Prunable::class, $uses) || \in_array(MassPrunable::class, $uses);
     }
 
     /**
@@ -179,9 +179,9 @@ class PruneCommand extends Command
         $instance = new $model;
 
         $count = $instance->prunable()
-            ->when(in_array(SoftDeletes::class, class_uses_recursive(get_class($instance))), function ($query) {
+            ->when(\in_array(SoftDeletes::class, class_uses_recursive(\get_class($instance))), function ($query) {
                 $query->withTrashed();
-            })->count();
+            })->\count();
 
         if ($count === 0) {
             $this->components->info("No prunable [$model] records found.");

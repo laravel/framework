@@ -121,7 +121,7 @@ class PostgresGrammar extends Grammar
     {
         $language = $where['options']['language'] ?? 'english';
 
-        if (! in_array($language, $this->validFullTextLanguages())) {
+        if (! \in_array($language, $this->validFullTextLanguages())) {
             $language = 'english';
         }
 
@@ -187,11 +187,11 @@ class PostgresGrammar extends Grammar
         // If the query is actually performing an aggregating select, we will let that
         // compiler handle the building of the select clauses, as it will need some
         // more syntax that is best handled by that function to keep things neat.
-        if (! is_null($query->aggregate)) {
+        if (! \is_null($query->aggregate)) {
             return;
         }
 
-        if (is_array($query->distinct)) {
+        if (\is_array($query->distinct)) {
             $select = 'select distinct on ('.$this->columnize($query->distinct).') ';
         } elseif ($query->distinct) {
             $select = 'select distinct ';
@@ -304,7 +304,7 @@ class PostgresGrammar extends Grammar
      */
     protected function compileLock(Builder $query, $value)
     {
-        if (! is_string($value)) {
+        if (! \is_string($value)) {
             return $value ? 'for update' : 'for share';
         }
 
@@ -440,7 +440,7 @@ class PostgresGrammar extends Grammar
                 return $this->wrapTable($join->table);
             })->all();
 
-            if (count($froms) > 0) {
+            if (\count($froms) > 0) {
                 $from = ' from '.implode(', ', $froms);
             }
         }
@@ -510,7 +510,7 @@ class PostgresGrammar extends Grammar
     public function prepareBindingsForUpdateFrom(array $bindings, array $values)
     {
         $values = collect($values)->map(function ($value, $column) {
-            return is_array($value) || ($this->isJsonSelector($column) && ! $this->isExpression($value))
+            return \is_array($value) || ($this->isJsonSelector($column) && ! $this->isExpression($value))
                 ? json_encode($value)
                 : $value;
         })->all();
@@ -552,7 +552,7 @@ class PostgresGrammar extends Grammar
     public function prepareBindingsForUpdate(array $bindings, array $values)
     {
         $values = collect($values)->map(function ($value, $column) {
-            return is_array($value) || ($this->isJsonSelector($column) && ! $this->isExpression($value))
+            return \is_array($value) || ($this->isJsonSelector($column) && ! $this->isExpression($value))
                 ? json_encode($value)
                 : $value;
         })->all();
@@ -665,7 +665,7 @@ class PostgresGrammar extends Grammar
      */
     protected function wrapJsonPathAttributes($path)
     {
-        $quote = func_num_args() === 2 ? func_get_arg(1) : "'";
+        $quote = \func_num_args() === 2 ? func_get_arg(1) : "'";
 
         return collect($path)->map(function ($attribute) {
             return $this->parseJsonPathArrayKeys($attribute);

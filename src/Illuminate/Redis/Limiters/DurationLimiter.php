@@ -88,7 +88,7 @@ class DurationLimiter
             Sleep::usleep($sleep * 1000);
         }
 
-        if (is_callable($callback)) {
+        if (\is_callable($callback)) {
             return $callback();
         }
 

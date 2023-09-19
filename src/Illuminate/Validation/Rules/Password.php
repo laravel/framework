@@ -121,11 +121,11 @@ class Password implements Rule, DataAwareRule, ValidatorAwareRule
      */
     public static function defaults($callback = null)
     {
-        if (is_null($callback)) {
+        if (\is_null($callback)) {
             return static::default();
         }
 
-        if (! is_callable($callback) && ! $callback instanceof static) {
+        if (! \is_callable($callback) && ! $callback instanceof static) {
             throw new InvalidArgumentException('The given callback should be callable or an instance of '.static::class);
         }
 
@@ -139,8 +139,8 @@ class Password implements Rule, DataAwareRule, ValidatorAwareRule
      */
     public static function default()
     {
-        $password = is_callable(static::$defaultCallback)
-                            ? call_user_func(static::$defaultCallback)
+        $password = \is_callable(static::$defaultCallback)
+                            ? \call_user_func(static::$defaultCallback)
                             : static::$defaultCallback;
 
         return $password instanceof Rule ? $password : static::min(8);
@@ -296,7 +296,7 @@ class Password implements Rule, DataAwareRule, ValidatorAwareRule
             $this->validator->customMessages,
             $this->validator->customAttributes
         )->after(function ($validator) use ($attribute, $value) {
-            if (! is_string($value)) {
+            if (! \is_string($value)) {
                 return;
             }
 

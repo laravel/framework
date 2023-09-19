@@ -218,7 +218,7 @@ trait HasRelationships
         // If no relation name was given, we will use this debug backtrace to extract
         // the calling method's name and use that as the relationship name as most
         // of the time this will be what we desire to use for the relationships.
-        if (is_null($relation)) {
+        if (\is_null($relation)) {
             $relation = $this->guessBelongsToRelation();
         }
 
@@ -227,7 +227,7 @@ trait HasRelationships
         // If no foreign key was supplied, we can use a backtrace to guess the proper
         // foreign key name by using the name of the relationship function, which
         // when combined with an "_id" should conventionally match the columns.
-        if (is_null($foreignKey)) {
+        if (\is_null($foreignKey)) {
             $foreignKey = Str::snake($relation).'_'.$instance->getKeyName();
         }
 
@@ -279,7 +279,7 @@ trait HasRelationships
         // If the type value is null it is probably safe to assume we're eager loading
         // the relationship. In this case we'll just pass in a dummy query where we
         // need to remove any eager loads that may already be defined on a model.
-        return is_null($class = $this->getAttributeFromArray($type)) || $class === ''
+        return \is_null($class = $this->getAttributeFromArray($type)) || $class === ''
                     ? $this->morphEagerTo($name, $type, $id, $ownerKey)
                     : $this->morphInstanceTo($class, $name, $type, $id, $ownerKey);
     }
@@ -368,7 +368,7 @@ trait HasRelationships
      */
     public function through($relationship)
     {
-        if (is_string($relationship)) {
+        if (\is_string($relationship)) {
             $relationship = $this->{$relationship}();
         }
 
@@ -516,7 +516,7 @@ trait HasRelationships
         // If no relationship name was passed, we will pull backtraces to get the
         // name of the calling function. We will use that function name as the
         // title of this relation since that is a great convention to apply.
-        if (is_null($relation)) {
+        if (\is_null($relation)) {
             $relation = $this->guessBelongsToManyRelation();
         }
 
@@ -532,7 +532,7 @@ trait HasRelationships
         // If no table name was provided, we can guess it by concatenating the two
         // models using underscores in alphabetical order. The two model names
         // are transformed to snake case from their default CamelCase also.
-        if (is_null($table)) {
+        if (\is_null($table)) {
             $table = $this->joiningTable($related, $instance);
         }
 
@@ -669,13 +669,13 @@ trait HasRelationships
     protected function guessBelongsToManyRelation()
     {
         $caller = Arr::first(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS), function ($trace) {
-            return ! in_array(
+            return ! \in_array(
                 $trace['function'],
                 array_merge(static::$manyMethods, ['guessBelongsToManyRelation'])
             );
         });
 
-        return ! is_null($caller) ? $caller['function'] : null;
+        return ! \is_null($caller) ? $caller['function'] : null;
     }
 
     /**
@@ -722,7 +722,7 @@ trait HasRelationships
      */
     public function touches($relation)
     {
-        return in_array($relation, $this->getTouchedRelations());
+        return \in_array($relation, $this->getTouchedRelations());
     }
 
     /**
@@ -767,7 +767,7 @@ trait HasRelationships
     {
         $morphMap = Relation::morphMap();
 
-        if (! empty($morphMap) && in_array(static::class, $morphMap)) {
+        if (! empty($morphMap) && \in_array(static::class, $morphMap)) {
             return array_search(static::class, $morphMap, true);
         }
 
@@ -837,7 +837,7 @@ trait HasRelationships
      */
     public function relationLoaded($key)
     {
-        return array_key_exists($key, $this->relations);
+        return \array_key_exists($key, $this->relations);
     }
 
     /**

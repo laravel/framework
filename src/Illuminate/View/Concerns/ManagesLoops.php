@@ -23,7 +23,7 @@ trait ManagesLoops
     public function addLoop($data)
     {
         $length = is_countable($data) && ! $data instanceof LazyCollection
-                            ? count($data)
+                            ? \count($data)
                             : null;
 
         $parent = Arr::last($this->loopsStack);
@@ -37,7 +37,7 @@ trait ManagesLoops
             'last' => isset($length) ? $length == 1 : null,
             'odd' => false,
             'even' => true,
-            'depth' => count($this->loopsStack) + 1,
+            'depth' => \count($this->loopsStack) + 1,
             'parent' => $parent ? (object) $parent : null,
         ];
     }
@@ -49,7 +49,7 @@ trait ManagesLoops
      */
     public function incrementLoopIndices()
     {
-        $loop = $this->loopsStack[$index = count($this->loopsStack) - 1];
+        $loop = $this->loopsStack[$index = \count($this->loopsStack) - 1];
 
         $this->loopsStack[$index] = array_merge($this->loopsStack[$index], [
             'iteration' => $loop['iteration'] + 1,

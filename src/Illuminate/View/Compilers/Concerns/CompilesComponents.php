@@ -159,7 +159,7 @@ trait CompilesComponents
 } ?>
 <?php \$__defined_vars = get_defined_vars(); ?>
 <?php foreach (\$attributes as \$__key => \$__value) {
-    if (array_key_exists(\$__key, \$__defined_vars)) unset(\$\$__key);
+    if (\array_key_exists(\$__key, \$__defined_vars)) unset(\$\$__key);
 } ?>
 <?php unset(\$__defined_vars); ?>";
     }
@@ -173,8 +173,8 @@ trait CompilesComponents
     protected function compileAware($expression)
     {
         return "<?php foreach ({$expression} as \$__key => \$__value) {
-    \$__consumeVariable = is_string(\$__key) ? \$__key : \$__value;
-    \$\$__consumeVariable = is_string(\$__key) ? \$__env->getConsumableComponentData(\$__key, \$__value) : \$__env->getConsumableComponentData(\$__value);
+    \$__consumeVariable = \is_string(\$__key) ? \$__key : \$__value;
+    \$\$__consumeVariable = \is_string(\$__key) ? \$__env->getConsumableComponentData(\$__key, \$__value) : \$__env->getConsumableComponentData(\$__value);
 } ?>";
     }
 
@@ -190,8 +190,8 @@ trait CompilesComponents
             return $value->escapeWhenCastingToString();
         }
 
-        return is_string($value) ||
-               (is_object($value) && ! $value instanceof ComponentAttributeBag && method_exists($value, '__toString'))
+        return \is_string($value) ||
+               (\is_object($value) && ! $value instanceof ComponentAttributeBag && method_exists($value, '__toString'))
                         ? e($value)
                         : $value;
     }

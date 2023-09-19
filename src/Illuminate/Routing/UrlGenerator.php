@@ -315,11 +315,11 @@ class UrlGenerator implements UrlGeneratorContract
      */
     public function formatScheme($secure = null)
     {
-        if (! is_null($secure)) {
+        if (! \is_null($secure)) {
             return $secure ? 'https://' : 'http://';
         }
 
-        if (is_null($this->cachedScheme)) {
+        if (\is_null($this->cachedScheme)) {
             $this->cachedScheme = $this->forceScheme ?: $this->request->getScheme().'://';
         }
 
@@ -349,7 +349,7 @@ class UrlGenerator implements UrlGeneratorContract
 
         ksort($parameters);
 
-        $key = call_user_func($this->keyResolver);
+        $key = \call_user_func($this->keyResolver);
 
         return $this->route($name, $parameters + [
             'signature' => hash_hmac('sha256', $this->route($name, $parameters, $absolute), $key),
@@ -364,13 +364,13 @@ class UrlGenerator implements UrlGeneratorContract
      */
     protected function ensureSignedRouteParametersAreNotReserved($parameters)
     {
-        if (array_key_exists('signature', $parameters)) {
+        if (\array_key_exists('signature', $parameters)) {
             throw new InvalidArgumentException(
                 '"Signature" is a reserved parameter when generating signed routes. Please rename your route parameter.'
             );
         }
 
-        if (array_key_exists('expires', $parameters)) {
+        if (\array_key_exists('expires', $parameters)) {
             throw new InvalidArgumentException(
                 '"Expires" is a reserved parameter when generating signed routes. Please rename your route parameter.'
             );
@@ -432,12 +432,12 @@ class UrlGenerator implements UrlGeneratorContract
         $url = $absolute ? $request->url() : '/'.$request->path();
 
         $queryString = collect(explode('&', (string) $request->server->get('QUERY_STRING')))
-            ->reject(fn ($parameter) => in_array(Str::before($parameter, '='), $ignoreQuery))
+            ->reject(fn ($parameter) => \in_array(Str::before($parameter, '='), $ignoreQuery))
             ->join('&');
 
         $original = rtrim($url.'?'.$queryString, '?');
 
-        $signature = hash_hmac('sha256', $original, call_user_func($this->keyResolver));
+        $signature = hash_hmac('sha256', $original, \call_user_func($this->keyResolver));
 
         return hash_equals($signature, (string) $request->query('signature', ''));
     }
@@ -467,12 +467,12 @@ class UrlGenerator implements UrlGeneratorContract
      */
     public function route($name, $parameters = [], $absolute = true)
     {
-        if (! is_null($route = $this->routes->getByName($name))) {
+        if (! \is_null($route = $this->routes->getByName($name))) {
             return $this->toRoute($route, $parameters, $absolute);
         }
 
-        if (! is_null($this->missingNamedRouteResolver) &&
-            ! is_null($url = call_user_func($this->missingNamedRouteResolver, $name, $parameters, $absolute))) {
+        if (! \is_null($this->missingNamedRouteResolver) &&
+            ! \is_null($url = \call_user_func($this->missingNamedRouteResolver, $name, $parameters, $absolute))) {
             return $url;
         }
 
@@ -516,7 +516,7 @@ class UrlGenerator implements UrlGeneratorContract
      */
     public function action($action, $parameters = [], $absolute = true)
     {
-        if (is_null($route = $this->routes->getByAction($action = $this->formatAction($action)))) {
+        if (\is_null($route = $this->routes->getByAction($action = $this->formatAction($action)))) {
             throw new InvalidArgumentException("Action {$action} not defined.");
         }
 
@@ -531,7 +531,7 @@ class UrlGenerator implements UrlGeneratorContract
      */
     protected function formatAction($action)
     {
-        if (is_array($action)) {
+        if (\is_array($action)) {
             $action = '\\'.implode('@', $action);
         }
 
@@ -588,8 +588,8 @@ class UrlGenerator implements UrlGeneratorContract
      */
     public function formatRoot($scheme, $root = null)
     {
-        if (is_null($root)) {
-            if (is_null($this->cachedRoot)) {
+        if (\is_null($root)) {
+            if (\is_null($this->cachedRoot)) {
                 $this->cachedRoot = $this->forcedRoot ?: $this->request->root();
             }
 
@@ -614,11 +614,11 @@ class UrlGenerator implements UrlGeneratorContract
         $path = '/'.trim($path, '/');
 
         if ($this->formatHostUsing) {
-            $root = call_user_func($this->formatHostUsing, $root, $route);
+            $root = \call_user_func($this->formatHostUsing, $root, $route);
         }
 
         if ($this->formatPathUsing) {
-            $path = call_user_func($this->formatPathUsing, $path, $route);
+            $path = \call_user_func($this->formatPathUsing, $path, $route);
         }
 
         return trim($root.$path, '/');
@@ -791,7 +791,7 @@ class UrlGenerator implements UrlGeneratorContract
     protected function getSession()
     {
         if ($this->sessionResolver) {
-            return call_user_func($this->sessionResolver);
+            return \call_user_func($this->sessionResolver);
         }
     }
 

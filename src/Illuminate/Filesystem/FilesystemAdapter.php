@@ -120,7 +120,7 @@ class FilesystemAdapter implements CloudFilesystemContract
                 $this->exists($path), "Unable to find a file or directory at path [{$path}]."
             );
 
-            if (! is_null($content)) {
+            if (! \is_null($content)) {
                 $actual = $this->get($path);
 
                 PHPUnit::assertSame(
@@ -273,7 +273,7 @@ class FilesystemAdapter implements CloudFilesystemContract
     {
         $content = $this->get($path);
 
-        return is_null($content) ? null : json_decode($content, true, 512, $flags);
+        return \is_null($content) ? null : json_decode($content, true, 512, $flags);
     }
 
     /**
@@ -289,15 +289,15 @@ class FilesystemAdapter implements CloudFilesystemContract
     {
         $response = new StreamedResponse;
 
-        if (! array_key_exists('Content-Type', $headers)) {
+        if (! \array_key_exists('Content-Type', $headers)) {
             $headers['Content-Type'] = $this->mimeType($path);
         }
 
-        if (! array_key_exists('Content-Length', $headers)) {
+        if (! \array_key_exists('Content-Length', $headers)) {
             $headers['Content-Length'] = $this->size($path);
         }
 
-        if (! array_key_exists('Content-Disposition', $headers)) {
+        if (! \array_key_exists('Content-Disposition', $headers)) {
             $filename = $name ?? basename($path);
 
             $disposition = $response->headers->makeDisposition(
@@ -351,7 +351,7 @@ class FilesystemAdapter implements CloudFilesystemContract
      */
     public function put($path, $contents, $options = [])
     {
-        $options = is_string($options)
+        $options = \is_string($options)
                      ? ['visibility' => $options]
                      : (array) $options;
 
@@ -370,7 +370,7 @@ class FilesystemAdapter implements CloudFilesystemContract
                 return true;
             }
 
-            is_resource($contents)
+            \is_resource($contents)
                 ? $this->driver->writeStream($path, $contents, $options)
                 : $this->driver->write($path, $contents, $options);
         } catch (UnableToWriteFile|UnableToSetVisibility $e) {
@@ -392,11 +392,11 @@ class FilesystemAdapter implements CloudFilesystemContract
      */
     public function putFile($path, $file = null, $options = [])
     {
-        if (is_null($file) || is_array($file)) {
+        if (\is_null($file) || \is_array($file)) {
             [$path, $file, $options] = ['', $path, $file ?? []];
         }
 
-        $file = is_string($file) ? new File($file) : $file;
+        $file = \is_string($file) ? new File($file) : $file;
 
         return $this->putFileAs($path, $file, $file->hashName(), $options);
     }
@@ -412,11 +412,11 @@ class FilesystemAdapter implements CloudFilesystemContract
      */
     public function putFileAs($path, $file, $name = null, $options = [])
     {
-        if (is_null($name) || is_array($name)) {
+        if (\is_null($name) || \is_array($name)) {
             [$path, $file, $name, $options] = ['', $path, $file, $name ?? []];
         }
 
-        $stream = fopen(is_string($file) ? $file : $file->getRealPath(), 'r');
+        $stream = fopen(\is_string($file) ? $file : $file->getRealPath(), 'r');
 
         // Next, we will format the path of the file and store the file using a stream since
         // they provide better performance than alternatives. Once we write the file this
@@ -425,7 +425,7 @@ class FilesystemAdapter implements CloudFilesystemContract
             $path = trim($path.'/'.$name, '/'), $stream, $options
         );
 
-        if (is_resource($stream)) {
+        if (\is_resource($stream)) {
             fclose($stream);
         }
 
@@ -509,7 +509,7 @@ class FilesystemAdapter implements CloudFilesystemContract
      */
     public function delete($paths)
     {
-        $paths = is_array($paths) ? $paths : func_get_args();
+        $paths = \is_array($paths) ? $paths : \func_get_args();
 
         $success = true;
 
@@ -942,7 +942,7 @@ class FilesystemAdapter implements CloudFilesystemContract
      */
     protected function parseVisibility($visibility)
     {
-        if (is_null($visibility)) {
+        if (\is_null($visibility)) {
             return;
         }
 

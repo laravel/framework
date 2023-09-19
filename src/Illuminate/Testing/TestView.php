@@ -50,11 +50,11 @@ class TestView
      */
     public function assertViewHas($key, $value = null)
     {
-        if (is_array($key)) {
+        if (\is_array($key)) {
             return $this->assertViewHasAll($key);
         }
 
-        if (is_null($value)) {
+        if (\is_null($value)) {
             PHPUnit::assertTrue(Arr::has($this->view->gatherData(), $key));
         } elseif ($value instanceof Closure) {
             PHPUnit::assertTrue($value(Arr::get($this->view->gatherData(), $key)));
@@ -83,7 +83,7 @@ class TestView
     public function assertViewHasAll(array $bindings)
     {
         foreach ($bindings as $key => $value) {
-            if (is_int($key)) {
+            if (\is_int($key)) {
                 $this->assertViewHas($value);
             } else {
                 $this->assertViewHas($key, $value);

@@ -179,7 +179,7 @@ abstract class Factory
      */
     public static function times(int $count)
     {
-        return static::new()->count($count);
+        return static::new()->\count($count);
     }
 
     /**
@@ -218,7 +218,7 @@ abstract class Factory
      */
     public function createOne($attributes = [])
     {
-        return $this->count(null)->create($attributes);
+        return $this->\count(null)->create($attributes);
     }
 
     /**
@@ -229,7 +229,7 @@ abstract class Factory
      */
     public function createOneQuietly($attributes = [])
     {
-        return $this->count(null)->createQuietly($attributes);
+        return $this->\count(null)->createQuietly($attributes);
     }
 
     /**
@@ -240,7 +240,7 @@ abstract class Factory
      */
     public function createMany(int|iterable|null $records = null)
     {
-        if (is_null($records)) {
+        if (\is_null($records)) {
             $records = $this->count ?? 1;
         }
 
@@ -370,7 +370,7 @@ abstract class Factory
      */
     public function makeOne($attributes = [])
     {
-        return $this->count(null)->make($attributes);
+        return $this->\count(null)->make($attributes);
     }
 
     /**
@@ -488,7 +488,7 @@ abstract class Factory
                 return $attribute;
             })
             ->map(function ($attribute, $key) use (&$definition, $evaluateRelations) {
-                if (is_callable($attribute) && ! is_string($attribute) && ! is_array($attribute)) {
+                if (\is_callable($attribute) && ! \is_string($attribute) && ! \is_array($attribute)) {
                     $attribute = $attribute($definition);
                 }
 
@@ -511,7 +511,7 @@ abstract class Factory
     {
         return $this->newInstance([
             'states' => $this->states->concat([
-                is_callable($state) ? $state : function () use ($state) {
+                \is_callable($state) ? $state : function () use ($state) {
                     return $state;
                 },
             ]),
@@ -549,7 +549,7 @@ abstract class Factory
      */
     public function forEachSequence(...$sequence)
     {
-        return $this->state(new Sequence(...$sequence))->count(count($sequence));
+        return $this->state(new Sequence(...$sequence))->\count(\count($sequence));
     }
 
     /**
@@ -645,9 +645,9 @@ abstract class Factory
             'recycle' => $this->recycle
                 ->flatten()
                 ->merge(
-                    Collection::wrap($model instanceof Model ? func_get_args() : $model)
+                    Collection::wrap($model instanceof Model ? \func_get_args() : $model)
                         ->flatten()
-                )->groupBy(fn ($model) => get_class($model)),
+                )->groupBy(fn ($model) => \get_class($model)),
         ]);
     }
 
@@ -721,7 +721,7 @@ abstract class Factory
      * @param  int|null  $count
      * @return static
      */
-    public function count(?int $count)
+    public function \count(?int $count)
     {
         return $this->newInstance(['count' => $count]);
     }
@@ -779,7 +779,7 @@ abstract class Factory
     {
         $resolver = static::$modelNameResolver ?? function (self $factory) {
             $namespacedFactoryBasename = Str::replaceLast(
-                'Factory', '', Str::replaceFirst(static::$namespace, '', get_class($factory))
+                'Factory', '', Str::replaceFirst(static::$namespace, '', \get_class($factory))
             );
 
             $factoryBasename = Str::replaceLast('Factory', '', class_basename($factory));
@@ -900,7 +900,7 @@ abstract class Factory
             return $this->macroCall($method, $parameters);
         }
 
-        if ($method === 'trashed' && in_array(SoftDeletes::class, class_uses_recursive($this->modelName()))) {
+        if ($method === 'trashed' && \in_array(SoftDeletes::class, class_uses_recursive($this->modelName()))) {
             return $this->state([
                 $this->newModel()->getDeletedAtColumn() => $parameters[0] ?? Carbon::now()->subDay(),
             ]);
@@ -912,7 +912,7 @@ abstract class Factory
 
         $relationship = Str::camel(Str::substr($method, 3));
 
-        $relatedModel = get_class($this->newModel()->{$relationship}()->getRelated());
+        $relatedModel = \get_class($this->newModel()->{$relationship}()->getRelated());
 
         if (method_exists($relatedModel, 'newFactory')) {
             $factory = $relatedModel::newFactory() ?? static::factoryForModel($relatedModel);
@@ -925,8 +925,8 @@ abstract class Factory
         } elseif (str_starts_with($method, 'has')) {
             return $this->has(
                 $factory
-                    ->count(is_numeric($parameters[0] ?? null) ? $parameters[0] : 1)
-                    ->state((is_callable($parameters[0] ?? null) || is_array($parameters[0] ?? null)) ? $parameters[0] : ($parameters[1] ?? [])),
+                    ->\count(is_numeric($parameters[0] ?? null) ? $parameters[0] : 1)
+                    ->state((\is_callable($parameters[0] ?? null) || \is_array($parameters[0] ?? null)) ? $parameters[0] : ($parameters[1] ?? [])),
                 $relationship
             );
         }

@@ -85,13 +85,13 @@ class EventListCommand extends Command
 
         foreach ($this->getRawListeners() as $event => $rawListeners) {
             foreach ($rawListeners as $rawListener) {
-                if (is_string($rawListener)) {
+                if (\is_string($rawListener)) {
                     $events[$event][] = $this->appendListenerInterfaces($rawListener);
                 } elseif ($rawListener instanceof Closure) {
                     $events[$event][] = $this->stringifyClosure($rawListener);
-                } elseif (is_array($rawListener) && count($rawListener) === 2) {
-                    if (is_object($rawListener[0])) {
-                        $rawListener[0] = get_class($rawListener[0]);
+                } elseif (\is_array($rawListener) && \count($rawListener) === 2) {
+                    if (\is_object($rawListener[0])) {
+                        $rawListener[0] = \get_class($rawListener[0]);
                     }
 
                     $events[$event][] = $this->appendListenerInterfaces(implode('@', $rawListener));
@@ -116,7 +116,7 @@ class EventListCommand extends Command
 
         $interfaces = class_implements($event);
 
-        if (in_array(ShouldBroadcast::class, $interfaces)) {
+        if (\in_array(ShouldBroadcast::class, $interfaces)) {
             $event .= ' <fg=bright-blue>(ShouldBroadcast)</>';
         }
 
@@ -137,7 +137,7 @@ class EventListCommand extends Command
 
         $listener = implode('@', $listener);
 
-        if (in_array(ShouldQueue::class, $interfaces)) {
+        if (\in_array(ShouldQueue::class, $interfaces)) {
             $listener .= ' <fg=bright-blue>(ShouldQueue)</>';
         }
 
@@ -203,9 +203,9 @@ class EventListCommand extends Command
      */
     public function getEventsDispatcher()
     {
-        return is_null(self::$eventsResolver)
+        return \is_null(self::$eventsResolver)
             ? $this->getLaravel()->make('events')
-            : call_user_func(self::$eventsResolver);
+            : \call_user_func(self::$eventsResolver);
     }
 
     /**

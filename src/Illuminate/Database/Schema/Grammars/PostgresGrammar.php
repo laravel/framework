@@ -172,7 +172,7 @@ class PostgresGrammar extends Grammar
         $columns = [];
 
         foreach ($blueprint->getChangedColumns() as $column) {
-            $changes = ['type '.$this->getType($column).$this->modifyCollate($blueprint, $column)];
+            $changes = ['type '.$this->\gettype($column).$this->modifyCollate($blueprint, $column)];
 
             foreach ($this->modifiers as $modifier) {
                 if ($modifier === 'Collate') {
@@ -223,11 +223,11 @@ class PostgresGrammar extends Grammar
             $this->columnize($command->columns)
         );
 
-        if (! is_null($command->deferrable)) {
+        if (! \is_null($command->deferrable)) {
             $sql .= $command->deferrable ? ' deferrable' : ' not deferrable';
         }
 
-        if ($command->deferrable && ! is_null($command->initiallyImmediate)) {
+        if ($command->deferrable && ! \is_null($command->initiallyImmediate)) {
             $sql .= $command->initiallyImmediate ? ' initially immediate' : ' initially deferred';
         }
 
@@ -300,15 +300,15 @@ class PostgresGrammar extends Grammar
     {
         $sql = parent::compileForeign($blueprint, $command);
 
-        if (! is_null($command->deferrable)) {
+        if (! \is_null($command->deferrable)) {
             $sql .= $command->deferrable ? ' deferrable' : ' not deferrable';
         }
 
-        if ($command->deferrable && ! is_null($command->initiallyImmediate)) {
+        if ($command->deferrable && ! \is_null($command->initiallyImmediate)) {
             $sql .= $command->initiallyImmediate ? ' initially immediate' : ' initially deferred';
         }
 
-        if (! is_null($command->notValid)) {
+        if (! \is_null($command->notValid)) {
             $sql .= ' not valid';
         }
 
@@ -554,11 +554,11 @@ class PostgresGrammar extends Grammar
      */
     public function compileComment(Blueprint $blueprint, Fluent $command)
     {
-        if (! is_null($comment = $command->column->comment) || $command->column->change) {
+        if (! \is_null($comment = $command->column->comment) || $command->column->change) {
             return sprintf('comment on column %s.%s is %s',
                 $this->wrapTable($blueprint),
                 $this->wrap($command->column->name),
-                is_null($comment) ? 'NULL' : "'".str_replace("'", "''", $comment)."'"
+                \is_null($comment) ? 'NULL' : "'".str_replace("'", "''", $comment)."'"
             );
         }
     }
@@ -675,7 +675,7 @@ class PostgresGrammar extends Grammar
      */
     protected function typeInteger(Fluent $column)
     {
-        return $column->autoIncrement && is_null($column->generatedAs) ? 'serial' : 'integer';
+        return $column->autoIncrement && \is_null($column->generatedAs) ? 'serial' : 'integer';
     }
 
     /**
@@ -686,7 +686,7 @@ class PostgresGrammar extends Grammar
      */
     protected function typeBigInteger(Fluent $column)
     {
-        return $column->autoIncrement && is_null($column->generatedAs) ? 'bigserial' : 'bigint';
+        return $column->autoIncrement && \is_null($column->generatedAs) ? 'bigserial' : 'bigint';
     }
 
     /**
@@ -719,7 +719,7 @@ class PostgresGrammar extends Grammar
      */
     protected function typeSmallInteger(Fluent $column)
     {
-        return $column->autoIncrement && is_null($column->generatedAs) ? 'smallserial' : 'smallint';
+        return $column->autoIncrement && \is_null($column->generatedAs) ? 'smallserial' : 'smallint';
     }
 
     /**
@@ -855,7 +855,7 @@ class PostgresGrammar extends Grammar
      */
     protected function typeTime(Fluent $column)
     {
-        return 'time'.(is_null($column->precision) ? '' : "($column->precision)").' without time zone';
+        return 'time'.(\is_null($column->precision) ? '' : "($column->precision)").' without time zone';
     }
 
     /**
@@ -866,7 +866,7 @@ class PostgresGrammar extends Grammar
      */
     protected function typeTimeTz(Fluent $column)
     {
-        return 'time'.(is_null($column->precision) ? '' : "($column->precision)").' with time zone';
+        return 'time'.(\is_null($column->precision) ? '' : "($column->precision)").' with time zone';
     }
 
     /**
@@ -881,7 +881,7 @@ class PostgresGrammar extends Grammar
             $column->default(new Expression('CURRENT_TIMESTAMP'));
         }
 
-        return 'timestamp'.(is_null($column->precision) ? '' : "($column->precision)").' without time zone';
+        return 'timestamp'.(\is_null($column->precision) ? '' : "($column->precision)").' without time zone';
     }
 
     /**
@@ -896,7 +896,7 @@ class PostgresGrammar extends Grammar
             $column->default(new Expression('CURRENT_TIMESTAMP'));
         }
 
-        return 'timestamp'.(is_null($column->precision) ? '' : "($column->precision)").' with time zone';
+        return 'timestamp'.(\is_null($column->precision) ? '' : "($column->precision)").' with time zone';
     }
 
     /**
@@ -1082,7 +1082,7 @@ class PostgresGrammar extends Grammar
      */
     protected function modifyCollate(Blueprint $blueprint, Fluent $column)
     {
-        if (! is_null($column->collation)) {
+        if (! \is_null($column->collation)) {
             return ' collate '.$this->wrapValue($column->collation);
         }
     }
@@ -1113,10 +1113,10 @@ class PostgresGrammar extends Grammar
     protected function modifyDefault(Blueprint $blueprint, Fluent $column)
     {
         if ($column->change) {
-            return is_null($column->default) ? 'drop default' : 'set default '.$this->getDefaultValue($column->default);
+            return \is_null($column->default) ? 'drop default' : 'set default '.$this->getDefaultValue($column->default);
         }
 
-        if (! is_null($column->default)) {
+        if (! \is_null($column->default)) {
             return ' default '.$this->getDefaultValue($column->default);
         }
     }
@@ -1131,7 +1131,7 @@ class PostgresGrammar extends Grammar
     protected function modifyIncrement(Blueprint $blueprint, Fluent $column)
     {
         if (! $column->change
-            && (in_array($column->type, $this->serials) || ($column->generatedAs !== null))
+            && (\in_array($column->type, $this->serials) || ($column->generatedAs !== null))
             && $column->autoIncrement) {
             return ' primary key';
         }
@@ -1147,8 +1147,8 @@ class PostgresGrammar extends Grammar
     protected function modifyVirtualAs(Blueprint $blueprint, Fluent $column)
     {
         if ($column->change) {
-            if (array_key_exists('virtualAs', $column->getAttributes())) {
-                return is_null($column->virtualAs)
+            if (\array_key_exists('virtualAs', $column->getAttributes())) {
+                return \is_null($column->virtualAs)
                     ? 'drop expression if exists'
                     : throw new LogicException('This database driver does not support modifying generated columns.');
             }
@@ -1156,7 +1156,7 @@ class PostgresGrammar extends Grammar
             return null;
         }
 
-        if (! is_null($column->virtualAs)) {
+        if (! \is_null($column->virtualAs)) {
             return " generated always as ({$column->virtualAs})";
         }
     }
@@ -1171,8 +1171,8 @@ class PostgresGrammar extends Grammar
     protected function modifyStoredAs(Blueprint $blueprint, Fluent $column)
     {
         if ($column->change) {
-            if (array_key_exists('storedAs', $column->getAttributes())) {
-                return is_null($column->storedAs)
+            if (\array_key_exists('storedAs', $column->getAttributes())) {
+                return \is_null($column->storedAs)
                     ? 'drop expression if exists'
                     : throw new LogicException('This database driver does not support modifying generated columns.');
             }
@@ -1180,7 +1180,7 @@ class PostgresGrammar extends Grammar
             return null;
         }
 
-        if (! is_null($column->storedAs)) {
+        if (! \is_null($column->storedAs)) {
             return " generated always as ({$column->storedAs}) stored";
         }
     }
@@ -1196,18 +1196,18 @@ class PostgresGrammar extends Grammar
     {
         $sql = null;
 
-        if (! is_null($column->generatedAs)) {
+        if (! \is_null($column->generatedAs)) {
             $sql = sprintf(
                 ' generated %s as identity%s',
                 $column->always ? 'always' : 'by default',
-                ! is_bool($column->generatedAs) && ! empty($column->generatedAs) ? " ({$column->generatedAs})" : ''
+                ! \is_bool($column->generatedAs) && ! empty($column->generatedAs) ? " ({$column->generatedAs})" : ''
             );
         }
 
         if ($column->change) {
             $changes = ['drop identity if exists'];
 
-            if (! is_null($sql)) {
+            if (! \is_null($sql)) {
                 $changes[] = 'add '.$sql;
             }
 

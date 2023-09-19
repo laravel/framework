@@ -58,7 +58,7 @@ class AuthenticateSession implements AuthenticatesSessions
         }
 
         return tap($next($request), function () use ($request) {
-            if (! is_null($this->guard()->user())) {
+            if (! \is_null($this->guard()->user())) {
                 $this->storePasswordHashInSession($request);
             }
         });

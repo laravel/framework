@@ -52,7 +52,7 @@ class CallbackEvent extends Event
      */
     public function __construct(EventMutex $mutex, $callback, array $parameters = [], $timezone = null)
     {
-        if (! is_string($callback) && ! Reflector::isCallable($callback)) {
+        if (! \is_string($callback) && ! Reflector::isCallable($callback)) {
             throw new InvalidArgumentException(
                 'Invalid scheduled callback event. Must be a string or callable.'
             );
@@ -114,7 +114,7 @@ class CallbackEvent extends Event
     protected function execute($container)
     {
         try {
-            $this->result = is_object($this->callback)
+            $this->result = \is_object($this->callback)
                 ? $container->call([$this->callback, '__invoke'], $this->parameters)
                 : $container->call($this->callback, $this->parameters);
 
@@ -172,11 +172,11 @@ class CallbackEvent extends Event
      */
     public function getSummaryForDisplay()
     {
-        if (is_string($this->description)) {
+        if (\is_string($this->description)) {
             return $this->description;
         }
 
-        return is_string($this->callback) ? $this->callback : 'Callback';
+        return \is_string($this->callback) ? $this->callback : 'Callback';
     }
 
     /**

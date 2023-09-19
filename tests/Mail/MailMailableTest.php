@@ -104,7 +104,7 @@ class MailMailableTest extends TestCase
                 $mailable->assertHasTo($address);
                 $this->fail();
             } catch (AssertionFailedError $e) {
-                if (! is_string($address)) {
+                if (! \is_string($address)) {
                     $address = json_encode($address);
                 }
                 $this->assertSame("Did not see expected recipient [{$address}] in email recipients.\nFailed asserting that false is true.", $e->getMessage());
@@ -201,7 +201,7 @@ class MailMailableTest extends TestCase
                 $mailable->assertHasCc($address);
                 $this->fail();
             } catch (AssertionFailedError $e) {
-                if (! is_string($address)) {
+                if (! \is_string($address)) {
                     $address = json_encode($address);
                 }
                 $this->assertSame("Did not see expected recipient [{$address}] in email recipients.\nFailed asserting that false is true.", $e->getMessage());
@@ -298,7 +298,7 @@ class MailMailableTest extends TestCase
                 $mailable->assertHasBcc($address);
                 $this->fail();
             } catch (AssertionFailedError $e) {
-                if (! is_string($address)) {
+                if (! \is_string($address)) {
                     $address = json_encode($address);
                 }
                 $this->assertSame("Did not see expected recipient [{$address}] in email recipients.\nFailed asserting that false is true.", $e->getMessage());
@@ -384,7 +384,7 @@ class MailMailableTest extends TestCase
                 $mailable->assertHasReplyTo($address);
                 $this->fail();
             } catch (AssertionFailedError $e) {
-                if (! is_string($address)) {
+                if (! \is_string($address)) {
                     $address = json_encode($address);
                 }
                 $this->assertSame("Did not see expected address [{$address}] as email 'reply to' recipient.\nFailed asserting that false is true.", $e->getMessage());
@@ -470,7 +470,7 @@ class MailMailableTest extends TestCase
                 $mailable->assertFrom($address);
                 $this->fail();
             } catch (AssertionFailedError $e) {
-                if (! is_string($address)) {
+                if (! \is_string($address)) {
                     $address = json_encode($address);
                 }
                 $this->assertSame("Email was not from expected address [{$address}].\nFailed asserting that false is true.", $e->getMessage());

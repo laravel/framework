@@ -47,7 +47,7 @@ trait PacksPhpRedisValues
 
         if ($this->compressed()) {
             if ($this->supportsLzf() && $this->lzfCompressed()) {
-                if (! function_exists('lzf_compress')) {
+                if (! \function_exists('lzf_compress')) {
                     throw new RuntimeException("'lzf' extension required to call 'lzf_compress'.");
                 }
 
@@ -55,7 +55,7 @@ trait PacksPhpRedisValues
                     return \lzf_compress($this->client->_serialize($value));
                 };
             } elseif ($this->supportsZstd() && $this->zstdCompressed()) {
-                if (! function_exists('zstd_compress')) {
+                if (! \function_exists('zstd_compress')) {
                     throw new RuntimeException("'zstd' extension required to call 'zstd_compress'.");
                 }
 
@@ -89,7 +89,7 @@ trait PacksPhpRedisValues
      */
     public function compressed(): bool
     {
-        return defined('Redis::OPT_COMPRESSION') &&
+        return \defined('Redis::OPT_COMPRESSION') &&
                $this->client->getOption(Redis::OPT_COMPRESSION) !== Redis::COMPRESSION_NONE;
     }
 
@@ -100,7 +100,7 @@ trait PacksPhpRedisValues
      */
     public function lzfCompressed(): bool
     {
-        return defined('Redis::COMPRESSION_LZF') &&
+        return \defined('Redis::COMPRESSION_LZF') &&
                $this->client->getOption(Redis::OPT_COMPRESSION) === Redis::COMPRESSION_LZF;
     }
 
@@ -111,7 +111,7 @@ trait PacksPhpRedisValues
      */
     public function zstdCompressed(): bool
     {
-        return defined('Redis::COMPRESSION_ZSTD') &&
+        return \defined('Redis::COMPRESSION_ZSTD') &&
                $this->client->getOption(Redis::OPT_COMPRESSION) === Redis::COMPRESSION_ZSTD;
     }
 
@@ -122,7 +122,7 @@ trait PacksPhpRedisValues
      */
     public function lz4Compressed(): bool
     {
-        return defined('Redis::COMPRESSION_LZ4') &&
+        return \defined('Redis::COMPRESSION_LZ4') &&
                $this->client->getOption(Redis::OPT_COMPRESSION) === Redis::COMPRESSION_LZ4;
     }
 

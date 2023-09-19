@@ -67,7 +67,7 @@ class TableCommand extends DatabaseInspectionCommand
         $data = [
             'table' => [
                 'name' => $table->getName(),
-                'columns' => $columns->count(),
+                'columns' => $columns->\count(),
                 'size' => $this->getTableSize($connection, $table->getName()),
             ],
             'columns' => $columns,
@@ -92,7 +92,7 @@ class TableCommand extends DatabaseInspectionCommand
             'column' => $column->getName(),
             'attributes' => $this->getAttributesForColumn($column),
             'default' => $column->getDefault(),
-            'type' => $column->getType()->getName(),
+            'type' => $column->\gettype()->getName(),
         ]);
     }
 
@@ -106,7 +106,7 @@ class TableCommand extends DatabaseInspectionCommand
     {
         return collect([
             $column->getAutoincrement() ? 'autoincrement' : null,
-            'type' => $column->getType()->getName(),
+            'type' => $column->\gettype()->getName(),
             $column->getUnsigned() ? 'unsigned' : null,
             ! $column->getNotNull() ? 'nullable' : null,
         ])->filter();
@@ -136,7 +136,7 @@ class TableCommand extends DatabaseInspectionCommand
     protected function getAttributesForIndex(Index $index)
     {
         return collect([
-            'compound' => count($index->getColumns()) > 1,
+            'compound' => \count($index->getColumns()) > 1,
             'unique' => $index->isUnique(),
             'primary' => $index->isPrimary(),
         ])->filter()->keys()->map(fn ($attribute) => Str::lower($attribute));

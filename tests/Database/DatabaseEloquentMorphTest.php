@@ -33,7 +33,7 @@ class DatabaseEloquentMorphTest extends TestCase
         $relation->getParent()->shouldReceive('getKeyName')->once()->andReturn('id');
         $relation->getParent()->shouldReceive('getKeyType')->once()->andReturn('string');
         $relation->getQuery()->shouldReceive('whereIn')->once()->with('table.morph_id', [1, 2]);
-        $relation->getQuery()->shouldReceive('where')->once()->with('table.morph_type', get_class($relation->getParent()));
+        $relation->getQuery()->shouldReceive('where')->once()->with('table.morph_type', \get_class($relation->getParent()));
 
         $model1 = new EloquentMorphResetModelStub;
         $model1->id = 1;
@@ -57,7 +57,7 @@ class DatabaseEloquentMorphTest extends TestCase
         $relation->getParent()->shouldReceive('getKeyName')->once()->andReturn('id');
         $relation->getParent()->shouldReceive('getKeyType')->once()->andReturn('int');
         $relation->getQuery()->shouldReceive('whereIntegerInRaw')->once()->with('table.morph_id', [1, 2]);
-        $relation->getQuery()->shouldReceive('where')->once()->with('table.morph_type', get_class($relation->getParent()));
+        $relation->getQuery()->shouldReceive('where')->once()->with('table.morph_type', \get_class($relation->getParent()));
 
         $model1 = new EloquentMorphResetModelStub;
         $model1->id = 1;
@@ -73,7 +73,7 @@ class DatabaseEloquentMorphTest extends TestCase
         $relation = $this->getOneRelation();
         $instance = m::mock(Model::class);
         $instance->shouldReceive('setAttribute')->once()->with('morph_id', 1);
-        $instance->shouldReceive('setAttribute')->once()->with('morph_type', get_class($relation->getParent()));
+        $instance->shouldReceive('setAttribute')->once()->with('morph_type', \get_class($relation->getParent()));
         $instance->shouldReceive('save')->never();
         $relation->getRelated()->shouldReceive('newInstance')->once()->with(['name' => 'taylor'])->andReturn($instance);
 
@@ -86,7 +86,7 @@ class DatabaseEloquentMorphTest extends TestCase
         $relation = $this->getOneRelation();
         $created = m::mock(Model::class);
         $created->shouldReceive('setAttribute')->once()->with('morph_id', 1);
-        $created->shouldReceive('setAttribute')->once()->with('morph_type', get_class($relation->getParent()));
+        $created->shouldReceive('setAttribute')->once()->with('morph_type', \get_class($relation->getParent()));
         $relation->getRelated()->shouldReceive('newInstance')->once()->with(['name' => 'taylor'])->andReturn($created);
         $created->shouldReceive('save')->once()->andReturn(true);
 
@@ -110,7 +110,7 @@ class DatabaseEloquentMorphTest extends TestCase
         $relation->getQuery()->shouldReceive('find')->once()->with('foo', ['*'])->andReturn(null);
         $relation->getRelated()->shouldReceive('newInstance')->once()->with()->andReturn($model = m::mock(Model::class));
         $model->shouldReceive('setAttribute')->once()->with('morph_id', 1);
-        $model->shouldReceive('setAttribute')->once()->with('morph_type', get_class($relation->getParent()));
+        $model->shouldReceive('setAttribute')->once()->with('morph_type', \get_class($relation->getParent()));
         $model->shouldReceive('save')->never();
 
         $this->assertInstanceOf(Model::class, $relation->findOrNew('foo'));
@@ -147,7 +147,7 @@ class DatabaseEloquentMorphTest extends TestCase
         $relation->getQuery()->shouldReceive('first')->once()->with()->andReturn(null);
         $relation->getRelated()->shouldReceive('newInstance')->once()->with(['foo'])->andReturn($model = m::mock(Model::class));
         $model->shouldReceive('setAttribute')->once()->with('morph_id', 1);
-        $model->shouldReceive('setAttribute')->once()->with('morph_type', get_class($relation->getParent()));
+        $model->shouldReceive('setAttribute')->once()->with('morph_type', \get_class($relation->getParent()));
         $model->shouldReceive('save')->never();
 
         $this->assertInstanceOf(Model::class, $relation->firstOrNew(['foo']));
@@ -160,7 +160,7 @@ class DatabaseEloquentMorphTest extends TestCase
         $relation->getQuery()->shouldReceive('first')->once()->with()->andReturn(null);
         $relation->getRelated()->shouldReceive('newInstance')->once()->with(['foo' => 'bar', 'baz' => 'qux'])->andReturn($model = m::mock(Model::class));
         $model->shouldReceive('setAttribute')->once()->with('morph_id', 1);
-        $model->shouldReceive('setAttribute')->once()->with('morph_type', get_class($relation->getParent()));
+        $model->shouldReceive('setAttribute')->once()->with('morph_type', \get_class($relation->getParent()));
         $model->shouldReceive('save')->never();
 
         $this->assertInstanceOf(Model::class, $relation->firstOrNew(['foo' => 'bar'], ['baz' => 'qux']));
@@ -198,7 +198,7 @@ class DatabaseEloquentMorphTest extends TestCase
         $relation->getQuery()->shouldReceive('withSavepointIfNeeded')->once()->andReturnUsing(fn ($scope) => $scope());
         $relation->getRelated()->shouldReceive('newInstance')->once()->with(['foo'])->andReturn($model = m::mock(Model::class));
         $model->shouldReceive('setAttribute')->once()->with('morph_id', 1);
-        $model->shouldReceive('setAttribute')->once()->with('morph_type', get_class($relation->getParent()));
+        $model->shouldReceive('setAttribute')->once()->with('morph_type', \get_class($relation->getParent()));
         $model->shouldReceive('save')->once()->andReturn(true);
 
         $this->assertInstanceOf(Model::class, $relation->firstOrCreate(['foo']));
@@ -212,7 +212,7 @@ class DatabaseEloquentMorphTest extends TestCase
         $relation->getQuery()->shouldReceive('withSavepointIfNeeded')->once()->andReturnUsing(fn ($scope) => $scope());
         $relation->getRelated()->shouldReceive('newInstance')->once()->with(['foo' => 'bar', 'baz' => 'qux'])->andReturn($model = m::mock(Model::class));
         $model->shouldReceive('setAttribute')->once()->with('morph_id', 1);
-        $model->shouldReceive('setAttribute')->once()->with('morph_type', get_class($relation->getParent()));
+        $model->shouldReceive('setAttribute')->once()->with('morph_type', \get_class($relation->getParent()));
         $model->shouldReceive('save')->once()->andReturn(true);
 
         $this->assertInstanceOf(Model::class, $relation->firstOrCreate(['foo' => 'bar'], ['baz' => 'qux']));
@@ -224,7 +224,7 @@ class DatabaseEloquentMorphTest extends TestCase
 
         $relation->getRelated()->shouldReceive('newInstance')->once()->with(['foo'])->andReturn($model = m::mock(Model::class));
         $model->shouldReceive('setAttribute')->once()->with('morph_id', 1);
-        $model->shouldReceive('setAttribute')->once()->with('morph_type', get_class($relation->getParent()));
+        $model->shouldReceive('setAttribute')->once()->with('morph_type', \get_class($relation->getParent()));
         $model->shouldReceive('save')->once()->andThrow(
             new UniqueConstraintViolationException('mysql', 'example mysql', [], new Exception('SQLSTATE[23000]: Integrity constraint violation: 1062')),
         );
@@ -245,7 +245,7 @@ class DatabaseEloquentMorphTest extends TestCase
 
         $relation->getRelated()->shouldReceive('newInstance')->once()->with(['foo' => 'bar', 'baz' => 'qux'])->andReturn($model = m::mock(Model::class));
         $model->shouldReceive('setAttribute')->once()->with('morph_id', 1);
-        $model->shouldReceive('setAttribute')->once()->with('morph_type', get_class($relation->getParent()));
+        $model->shouldReceive('setAttribute')->once()->with('morph_type', \get_class($relation->getParent()));
         $model->shouldReceive('save')->once()->andThrow(
             new UniqueConstraintViolationException('mysql', 'example mysql', [], new Exception('SQLSTATE[23000]: Integrity constraint violation: 1062')),
         );
@@ -266,7 +266,7 @@ class DatabaseEloquentMorphTest extends TestCase
 
         $relation->getRelated()->shouldReceive('newInstance')->once()->with(['foo'])->andReturn($model = m::mock(Model::class));
         $model->shouldReceive('setAttribute')->once()->with('morph_id', 1);
-        $model->shouldReceive('setAttribute')->once()->with('morph_type', get_class($relation->getParent()));
+        $model->shouldReceive('setAttribute')->once()->with('morph_type', \get_class($relation->getParent()));
         $model->shouldReceive('save')->once()->andReturn(true);
 
         $relation->getQuery()->shouldReceive('withSavepointIfNeeded')->once()->andReturnUsing(function ($scope) {
@@ -284,7 +284,7 @@ class DatabaseEloquentMorphTest extends TestCase
 
         $relation->getRelated()->shouldReceive('newInstance')->once()->with(['foo' => 'bar', 'baz' => 'qux'])->andReturn($model = m::mock(Model::class));
         $model->shouldReceive('setAttribute')->once()->with('morph_id', 1);
-        $model->shouldReceive('setAttribute')->once()->with('morph_type', get_class($relation->getParent()));
+        $model->shouldReceive('setAttribute')->once()->with('morph_type', \get_class($relation->getParent()));
         $model->shouldReceive('save')->once()->andReturn(true);
 
         $relation->getQuery()->shouldReceive('withSavepointIfNeeded')->once()->andReturnUsing(function ($scope) {
@@ -323,7 +323,7 @@ class DatabaseEloquentMorphTest extends TestCase
 
         $model->wasRecentlyCreated = true;
         $model->shouldReceive('setAttribute')->once()->with('morph_id', 1);
-        $model->shouldReceive('setAttribute')->once()->with('morph_type', get_class($relation->getParent()));
+        $model->shouldReceive('setAttribute')->once()->with('morph_type', \get_class($relation->getParent()));
         $model->shouldReceive('save')->once()->andReturn(true);
 
         $this->assertInstanceOf(Model::class, $relation->updateOrCreate(['foo'], ['bar']));
@@ -450,8 +450,8 @@ class DatabaseEloquentMorphTest extends TestCase
         $builder->shouldReceive('getModel')->andReturn($related);
         $parent = m::mock(Model::class);
         $parent->shouldReceive('getAttribute')->with('id')->andReturn(1);
-        $parent->shouldReceive('getMorphClass')->andReturn(get_class($parent));
-        $builder->shouldReceive('where')->once()->with('table.morph_type', get_class($parent));
+        $parent->shouldReceive('getMorphClass')->andReturn(\get_class($parent));
+        $builder->shouldReceive('where')->once()->with('table.morph_type', \get_class($parent));
 
         return new MorphOne($builder, $parent, 'table.morph_type', 'table.morph_id', 'id');
     }
@@ -465,8 +465,8 @@ class DatabaseEloquentMorphTest extends TestCase
         $builder->shouldReceive('getModel')->andReturn($related);
         $parent = m::mock(Model::class);
         $parent->shouldReceive('getAttribute')->with('id')->andReturn(1);
-        $parent->shouldReceive('getMorphClass')->andReturn(get_class($parent));
-        $builder->shouldReceive('where')->once()->with('table.morph_type', get_class($parent));
+        $parent->shouldReceive('getMorphClass')->andReturn(\get_class($parent));
+        $builder->shouldReceive('where')->once()->with('table.morph_type', \get_class($parent));
 
         return new MorphMany($builder, $parent, 'table.morph_type', 'table.morph_id', 'id');
     }

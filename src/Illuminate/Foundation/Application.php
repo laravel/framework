@@ -653,8 +653,8 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function environment(...$environments)
     {
-        if (count($environments) > 0) {
-            $patterns = is_array($environments[0]) ? $environments[0] : $environments;
+        if (\count($environments) > 0) {
+            $patterns = \is_array($environments[0]) ? $environments[0] : $environments;
 
             return Str::is($patterns, $this['env']);
         }
@@ -761,7 +761,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
         // If the given "provider" is a string, we will resolve it, passing in the
         // application instance automatically for the developer. This is simply
         // a more convenient way of specifying your service provider classes.
-        if (is_string($provider)) {
+        if (\is_string($provider)) {
             $provider = $this->resolveProvider($provider);
         }
 
@@ -778,7 +778,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
 
         if (property_exists($provider, 'singletons')) {
             foreach ($provider->singletons as $key => $value) {
-                $key = is_int($key) ? $value : $key;
+                $key = \is_int($key) ? $value : $key;
 
                 $this->singleton($key, $value);
             }
@@ -815,7 +815,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function getProviders($provider)
     {
-        $name = is_string($provider) ? $provider : get_class($provider);
+        $name = \is_string($provider) ? $provider : \get_class($provider);
 
         return Arr::where($this->serviceProviders, fn ($value) => $value instanceof $name);
     }
@@ -841,7 +841,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
     {
         $this->serviceProviders[] = $provider;
 
-        $this->loadedProviders[get_class($provider)] = true;
+        $this->loadedProviders[\get_class($provider)] = true;
     }
 
     /**
@@ -1049,7 +1049,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
     {
         $index = 0;
 
-        while ($index < count($callbacks)) {
+        while ($index < \count($callbacks)) {
             $callbacks[$index]($this);
 
             $index++;
@@ -1166,7 +1166,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     protected function normalizeCachePath($key, $default)
     {
-        if (is_null($env = Env::get($key))) {
+        if (\is_null($env = Env::get($key))) {
             return $this->bootstrapPath($default);
         }
 
@@ -1250,7 +1250,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
     {
         $index = 0;
 
-        while ($index < count($this->terminatingCallbacks)) {
+        while ($index < \count($this->terminatingCallbacks)) {
             $this->call($this->terminatingCallbacks[$index]);
 
             $index++;
@@ -1489,7 +1489,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function getNamespace()
     {
-        if (! is_null($this->namespace)) {
+        if (! \is_null($this->namespace)) {
             return $this->namespace;
         }
 

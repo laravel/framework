@@ -307,7 +307,7 @@ class PendingCommand
                 $this->expectedExitCode, $exitCode,
                 "Expected status code {$this->expectedExitCode} but received {$exitCode}."
             );
-        } elseif (! is_null($this->unexpectedExitCode)) {
+        } elseif (! \is_null($this->unexpectedExitCode)) {
             $this->test->assertNotEquals(
                 $this->unexpectedExitCode, $exitCode,
                 "Unexpected status code {$this->unexpectedExitCode} was received."
@@ -327,11 +327,11 @@ class PendingCommand
      */
     protected function verifyExpectations()
     {
-        if (count($this->test->expectedQuestions)) {
+        if (\count($this->test->expectedQuestions)) {
             $this->test->fail('Question "'.Arr::first($this->test->expectedQuestions)[0].'" was not asked.');
         }
 
-        if (count($this->test->expectedChoices) > 0) {
+        if (\count($this->test->expectedChoices) > 0) {
             foreach ($this->test->expectedChoices as $question => $answers) {
                 $assertion = $answers['strict'] ? 'assertEquals' : 'assertEqualsCanonicalizing';
 
@@ -343,11 +343,11 @@ class PendingCommand
             }
         }
 
-        if (count($this->test->expectedOutput)) {
+        if (\count($this->test->expectedOutput)) {
             $this->test->fail('Output "'.Arr::first($this->test->expectedOutput).'" was not printed.');
         }
 
-        if (count($this->test->expectedOutputSubstrings)) {
+        if (\count($this->test->expectedOutputSubstrings)) {
             $this->test->fail('Output does not contain "'.Arr::first($this->test->expectedOutputSubstrings).'".');
         }
 

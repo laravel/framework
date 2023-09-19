@@ -60,7 +60,7 @@ trait InteractsWithContainer
      */
     protected function mock($abstract, Closure $mock = null)
     {
-        return $this->instance($abstract, Mockery::mock(...array_filter(func_get_args())));
+        return $this->instance($abstract, Mockery::mock(...array_filter(\func_get_args())));
     }
 
     /**
@@ -72,7 +72,7 @@ trait InteractsWithContainer
      */
     protected function partialMock($abstract, Closure $mock = null)
     {
-        return $this->instance($abstract, Mockery::mock(...array_filter(func_get_args()))->makePartial());
+        return $this->instance($abstract, Mockery::mock(...array_filter(\func_get_args()))->makePartial());
     }
 
     /**
@@ -84,7 +84,7 @@ trait InteractsWithContainer
      */
     protected function spy($abstract, Closure $mock = null)
     {
-        return $this->instance($abstract, Mockery::spy(...array_filter(func_get_args())));
+        return $this->instance($abstract, Mockery::spy(...array_filter(\func_get_args())));
     }
 
     /**

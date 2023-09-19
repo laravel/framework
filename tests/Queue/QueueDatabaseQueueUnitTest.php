@@ -164,7 +164,7 @@ class QueueDatabaseQueueUnitTest extends TestCase
         $queue = m::mock(DatabaseQueue::class);
         $record = $queue->buildDatabaseRecord('queue', 'any_payload', 0);
         $this->assertArrayHasKey('payload', $record);
-        $this->assertArrayHasKey('payload', array_slice($record, -1, 1, true));
+        $this->assertArrayHasKey('payload', \array_slice($record, -1, 1, true));
     }
 }
 

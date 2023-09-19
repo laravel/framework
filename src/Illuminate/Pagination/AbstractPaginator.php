@@ -176,7 +176,7 @@ abstract class AbstractPaginator implements Htmlable
         // to the URL. This allows for extra information like sortings storage.
         $parameters = [$this->pageName => $page];
 
-        if (count($this->query) > 0) {
+        if (\count($this->query) > 0) {
             $parameters = array_merge($this->query, $parameters);
         }
 
@@ -194,7 +194,7 @@ abstract class AbstractPaginator implements Htmlable
      */
     public function fragment($fragment = null)
     {
-        if (is_null($fragment)) {
+        if (\is_null($fragment)) {
             return $this->fragment;
         }
 
@@ -212,11 +212,11 @@ abstract class AbstractPaginator implements Htmlable
      */
     public function appends($key, $value = null)
     {
-        if (is_null($key)) {
+        if (\is_null($key)) {
             return $this;
         }
 
-        if (is_array($key)) {
+        if (\is_array($key)) {
             return $this->appendArray($key);
         }
 
@@ -246,7 +246,7 @@ abstract class AbstractPaginator implements Htmlable
     public function withQueryString()
     {
         if (isset(static::$queryStringResolver)) {
-            return $this->appends(call_user_func(static::$queryStringResolver));
+            return $this->appends(\call_user_func(static::$queryStringResolver));
         }
 
         return $this;
@@ -323,7 +323,7 @@ abstract class AbstractPaginator implements Htmlable
      */
     public function firstItem()
     {
-        return count($this->items) > 0 ? ($this->currentPage - 1) * $this->perPage + 1 : null;
+        return \count($this->items) > 0 ? ($this->currentPage - 1) * $this->perPage + 1 : null;
     }
 
     /**
@@ -333,7 +333,7 @@ abstract class AbstractPaginator implements Htmlable
      */
     public function lastItem()
     {
-        return count($this->items) > 0 ? $this->firstItem() + $this->count() - 1 : null;
+        return \count($this->items) > 0 ? $this->firstItem() + $this->\count() - 1 : null;
     }
 
     /**
@@ -478,7 +478,7 @@ abstract class AbstractPaginator implements Htmlable
     public static function resolveCurrentPath($default = '/')
     {
         if (isset(static::$currentPathResolver)) {
-            return call_user_func(static::$currentPathResolver);
+            return \call_user_func(static::$currentPathResolver);
         }
 
         return $default;
@@ -505,7 +505,7 @@ abstract class AbstractPaginator implements Htmlable
     public static function resolveCurrentPage($pageName = 'page', $default = 1)
     {
         if (isset(static::$currentPageResolver)) {
-            return (int) call_user_func(static::$currentPageResolver, $pageName);
+            return (int) \call_user_func(static::$currentPageResolver, $pageName);
         }
 
         return $default;
@@ -555,7 +555,7 @@ abstract class AbstractPaginator implements Htmlable
      */
     public static function viewFactory()
     {
-        return call_user_func(static::$viewFactoryResolver);
+        return \call_user_func(static::$viewFactoryResolver);
     }
 
     /**
@@ -680,9 +680,9 @@ abstract class AbstractPaginator implements Htmlable
      *
      * @return int
      */
-    public function count(): int
+    public function \count(): int
     {
-        return $this->items->count();
+        return $this->items->\count();
     }
 
     /**

@@ -53,11 +53,11 @@ class TrustProxies
             return $this->setTrustedProxyIpAddressesToTheCallingIp($request);
         }
 
-        $trustedIps = is_string($trustedIps)
+        $trustedIps = \is_string($trustedIps)
                 ? array_map('trim', explode(',', $trustedIps))
                 : $trustedIps;
 
-        if (is_array($trustedIps)) {
+        if (\is_array($trustedIps)) {
             return $this->setTrustedProxyIpAddressesToSpecificIps($request, $trustedIps);
         }
     }
@@ -92,7 +92,7 @@ class TrustProxies
      */
     protected function getTrustedHeaderNames()
     {
-        if (is_int($this->headers)) {
+        if (\is_int($this->headers)) {
             return $this->headers;
         }
 

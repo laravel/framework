@@ -48,7 +48,7 @@ class ChannelListCommand extends Command
             $this->components->warn('The [App\Providers\BroadcastServiceProvider] has not been loaded. Your private channels may not be loaded.');
         }
 
-        if (! $channels->count()) {
+        if (! $channels->\count()) {
             return $this->components->error("Your application doesn't have any private broadcasting channels.");
         }
 
@@ -117,13 +117,13 @@ class ChannelListCommand extends Command
      */
     protected function determineChannelCountOutput($channels, $terminalWidth)
     {
-        $channelCountText = 'Showing ['.$channels->count().'] private channels';
+        $channelCountText = 'Showing ['.$channels->\count().'] private channels';
 
         $offset = $terminalWidth - mb_strlen($channelCountText) - 2;
 
         $spaces = str_repeat(' ', $offset);
 
-        return $spaces.'<fg=blue;options=bold>Showing ['.$channels->count().'] private channels</>';
+        return $spaces.'<fg=blue;options=bold>Showing ['.$channels->\count().'] private channels</>';
     }
 
     /**
@@ -133,9 +133,9 @@ class ChannelListCommand extends Command
      */
     public static function getTerminalWidth()
     {
-        return is_null(static::$terminalWidthResolver)
+        return \is_null(static::$terminalWidthResolver)
             ? (new Terminal)->getWidth()
-            : call_user_func(static::$terminalWidthResolver);
+            : \call_user_func(static::$terminalWidthResolver);
     }
 
     /**

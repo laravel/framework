@@ -49,11 +49,11 @@ trait InteractsWithQueue
      */
     public function fail($exception = null)
     {
-        if (is_string($exception)) {
+        if (\is_string($exception)) {
             $exception = new ManuallyFailedException($exception);
         }
 
-        if ($exception instanceof Throwable || is_null($exception)) {
+        if ($exception instanceof Throwable || \is_null($exception)) {
             if ($this->job) {
                 return $this->job->fail($exception);
             }

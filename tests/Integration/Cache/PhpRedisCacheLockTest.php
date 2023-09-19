@@ -90,7 +90,7 @@ class PhpRedisCacheLockTest extends TestCase
 
     public function testRedisLockCanBeAcquiredAndReleasedWithIgbinarySerialization()
     {
-        if (! defined('Redis::SERIALIZER_IGBINARY')) {
+        if (! \defined('Redis::SERIALIZER_IGBINARY')) {
             $this->markTestSkipped('Redis extension is not configured to support the igbinary serializer.');
         }
 
@@ -115,7 +115,7 @@ class PhpRedisCacheLockTest extends TestCase
 
     public function testRedisLockCanBeAcquiredAndReleasedWithMsgpackSerialization()
     {
-        if (! defined('Redis::SERIALIZER_MSGPACK')) {
+        if (! \defined('Redis::SERIALIZER_MSGPACK')) {
             $this->markTestSkipped('Redis extension is not configured to support the msgpack serializer.');
         }
 
@@ -143,7 +143,7 @@ class PhpRedisCacheLockTest extends TestCase
      */
     public function testRedisLockCanBeAcquiredAndReleasedWithLzfCompression()
     {
-        if (! defined('Redis::COMPRESSION_LZF')) {
+        if (! \defined('Redis::COMPRESSION_LZF')) {
             $this->markTestSkipped('Redis extension is not configured to support the lzf compression.');
         }
 
@@ -172,7 +172,7 @@ class PhpRedisCacheLockTest extends TestCase
      */
     public function testRedisLockCanBeAcquiredAndReleasedWithZstdCompression()
     {
-        if (! defined('Redis::COMPRESSION_ZSTD')) {
+        if (! \defined('Redis::COMPRESSION_ZSTD')) {
             $this->markTestSkipped('Redis extension is not configured to support the zstd compression.');
         }
 
@@ -220,7 +220,7 @@ class PhpRedisCacheLockTest extends TestCase
      */
     public function testRedisLockCanBeAcquiredAndReleasedWithLz4Compression()
     {
-        if (! defined('Redis::COMPRESSION_LZ4')) {
+        if (! \defined('Redis::COMPRESSION_LZ4')) {
             $this->markTestSkipped('Redis extension is not configured to support the lz4 compression.');
         }
 
@@ -268,7 +268,7 @@ class PhpRedisCacheLockTest extends TestCase
      */
     public function testRedisLockCanBeAcquiredAndReleasedWithSerializationAndCompression()
     {
-        if (! defined('Redis::COMPRESSION_LZF')) {
+        if (! \defined('Redis::COMPRESSION_LZF')) {
             $this->markTestSkipped('Redis extension is not configured to support the lzf compression.');
         }
 

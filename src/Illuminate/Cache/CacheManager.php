@@ -84,7 +84,7 @@ class CacheManager implements FactoryContract
     {
         $config = $this->getConfig($name);
 
-        if (is_null($config)) {
+        if (\is_null($config)) {
             throw new InvalidArgumentException("Cache store [{$name}] is not defined.");
         }
 
@@ -330,7 +330,7 @@ class CacheManager implements FactoryContract
      */
     protected function getConfig($name)
     {
-        if (! is_null($name) && $name !== 'null') {
+        if (! \is_null($name) && $name !== 'null') {
             return $this->app['config']["cache.stores.{$name}"];
         }
 

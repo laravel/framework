@@ -173,7 +173,7 @@ class TestResponse implements ArrayAccess
             $this->statusMessageWithDetails('201, 301, 302, 303, 307, 308', $this->getStatusCode()),
         );
 
-        if (! is_null($uri)) {
+        if (! \is_null($uri)) {
             $this->assertLocation($uri);
         }
 
@@ -230,7 +230,7 @@ class TestResponse implements ArrayAccess
      */
     public function assertRedirectToSignedRoute($name = null, $parameters = [])
     {
-        if (! is_null($name)) {
+        if (! \is_null($name)) {
             $uri = route($name, $parameters);
         }
 
@@ -245,7 +245,7 @@ class TestResponse implements ArrayAccess
             $request->hasValidSignature(), 'The response is not a redirect to a signed route.'
         );
 
-        if (! is_null($name)) {
+        if (! \is_null($name)) {
             $expectedUri = rtrim($request->fullUrlWithQuery([
                 'signature' => null,
                 'expires' => null,
@@ -274,7 +274,7 @@ class TestResponse implements ArrayAccess
 
         $actual = $this->headers->get($headerName);
 
-        if (! is_null($value)) {
+        if (! \is_null($value)) {
             PHPUnit::assertEquals(
                 $value, $this->headers->get($headerName),
                 "Header [{$headerName}] was found, but value [{$actual}] does not match [{$value}]."
@@ -331,7 +331,7 @@ class TestResponse implements ArrayAccess
             );
         }
 
-        if (! is_null($filename)) {
+        if (! \is_null($filename)) {
             if (isset($contentDisposition[1]) &&
                 trim(explode('=', $contentDisposition[1])[0]) !== 'filename') {
                 PHPUnit::fail(
@@ -388,11 +388,11 @@ class TestResponse implements ArrayAccess
     public function assertCookie($cookieName, $value = null, $encrypted = true, $unserialize = false)
     {
         PHPUnit::assertNotNull(
-            $cookie = $this->getCookie($cookieName, $encrypted && ! is_null($value), $unserialize),
+            $cookie = $this->getCookie($cookieName, $encrypted && ! \is_null($value), $unserialize),
             "Cookie [{$cookieName}] not present on response."
         );
 
-        if (! $cookie || is_null($value)) {
+        if (! $cookie || \is_null($value)) {
             return $this;
         }
 
@@ -656,7 +656,7 @@ class TestResponse implements ArrayAccess
     {
         $json = $this->decodeResponseJson();
 
-        if (is_array($value)) {
+        if (\is_array($value)) {
             $json->assertSubset($value, $strict);
         } else {
             $assert = AssertableJson::fromAssertableJsonString($json);
@@ -827,7 +827,7 @@ class TestResponse implements ArrayAccess
                 : 'Response does not have JSON validation errors.';
 
         foreach ($errors as $key => $value) {
-            if (is_int($key)) {
+            if (\is_int($key)) {
                 $this->assertJsonValidationErrorFor($value, $responseKey);
 
                 continue;
@@ -907,7 +907,7 @@ class TestResponse implements ArrayAccess
 
         $errors = Arr::get($json, $responseKey, []);
 
-        if (is_null($keys) && count($errors) > 0) {
+        if (\is_null($keys) && \count($errors) > 0) {
             PHPUnit::fail(
                 'Response has unexpected validation errors: '.PHP_EOL.PHP_EOL.
                 json_encode($errors, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)
@@ -937,7 +937,7 @@ class TestResponse implements ArrayAccess
         $encodedData = json_encode($data);
 
         PHPUnit::assertTrue(
-            is_array($data)
+            \is_array($data)
             && str_starts_with($encodedData, '[')
             && str_ends_with($encodedData, ']')
         );
@@ -958,7 +958,7 @@ class TestResponse implements ArrayAccess
         $encodedData = json_encode($data);
 
         PHPUnit::assertTrue(
-            is_array($data)
+            \is_array($data)
             && str_starts_with($encodedData, '{')
             && str_ends_with($encodedData, '}')
         );
@@ -979,7 +979,7 @@ class TestResponse implements ArrayAccess
 
         $decodedResponse = $testJson->json();
 
-        if (is_null($decodedResponse) || $decodedResponse === false) {
+        if (\is_null($decodedResponse) || $decodedResponse === false) {
             if ($this->exception) {
                 throw $this->exception;
             } else {
@@ -1036,13 +1036,13 @@ class TestResponse implements ArrayAccess
      */
     public function assertViewHas($key, $value = null)
     {
-        if (is_array($key)) {
+        if (\is_array($key)) {
             return $this->assertViewHasAll($key);
         }
 
         $this->ensureResponseHasView();
 
-        if (is_null($value)) {
+        if (\is_null($value)) {
             PHPUnit::assertTrue(Arr::has($this->original->gatherData(), $key));
         } elseif ($value instanceof Closure) {
             PHPUnit::assertTrue($value(Arr::get($this->original->gatherData(), $key)));
@@ -1071,7 +1071,7 @@ class TestResponse implements ArrayAccess
     public function assertViewHasAll(array $bindings)
     {
         foreach ($bindings as $key => $value) {
-            if (is_int($key)) {
+            if (\is_int($key)) {
                 $this->assertViewHas($value);
             } else {
                 $this->assertViewHas($key, $value);
@@ -1159,7 +1159,7 @@ class TestResponse implements ArrayAccess
             return $this;
         }
 
-        if (is_null($keys) && count($errors) > 0) {
+        if (\is_null($keys) && \count($errors) > 0) {
             PHPUnit::fail(
                 'Response has unexpected validation errors: '.PHP_EOL.PHP_EOL.
                 json_encode($errors, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)
@@ -1203,12 +1203,12 @@ class TestResponse implements ArrayAccess
 
         foreach (Arr::wrap($errors) as $key => $value) {
             PHPUnit::assertArrayHasKey(
-                (is_int($key)) ? $value : $key,
+                (\is_int($key)) ? $value : $key,
                 $sessionErrors,
                 "Failed to find a validation error in session for key: '{$value}'".PHP_EOL.PHP_EOL.$errorMessage
             );
 
-            if (! is_int($key)) {
+            if (! \is_int($key)) {
                 $hasError = false;
 
                 foreach (Arr::wrap($sessionErrors[$key]) as $sessionErrorMessage) {
@@ -1239,11 +1239,11 @@ class TestResponse implements ArrayAccess
      */
     public function assertSessionHas($key, $value = null)
     {
-        if (is_array($key)) {
+        if (\is_array($key)) {
             return $this->assertSessionHasAll($key);
         }
 
-        if (is_null($value)) {
+        if (\is_null($value)) {
             PHPUnit::assertTrue(
                 $this->session()->has($key),
                 "Session is missing expected key [{$key}]."
@@ -1266,7 +1266,7 @@ class TestResponse implements ArrayAccess
     public function assertSessionHasAll(array $bindings)
     {
         foreach ($bindings as $key => $value) {
-            if (is_int($key)) {
+            if (\is_int($key)) {
                 $this->assertSessionHas($value);
             } else {
                 $this->assertSessionHas($key, $value);
@@ -1285,9 +1285,9 @@ class TestResponse implements ArrayAccess
      */
     public function assertSessionHasInput($key, $value = null)
     {
-        if (is_array($key)) {
+        if (\is_array($key)) {
             foreach ($key as $k => $v) {
-                if (is_int($k)) {
+                if (\is_int($k)) {
                     $this->assertSessionHasInput($v);
                 } else {
                     $this->assertSessionHasInput($k, $v);
@@ -1297,7 +1297,7 @@ class TestResponse implements ArrayAccess
             return $this;
         }
 
-        if (is_null($value)) {
+        if (\is_null($value)) {
             PHPUnit::assertTrue(
                 $this->session()->hasOldInput($key),
                 "Session is missing expected key [{$key}]."
@@ -1328,10 +1328,10 @@ class TestResponse implements ArrayAccess
         $errors = $this->session()->get('errors')->getBag($errorBag);
 
         foreach ($keys as $key => $value) {
-            if (is_int($key)) {
+            if (\is_int($key)) {
                 PHPUnit::assertTrue($errors->has($value), "Session missing error: $value");
             } else {
-                PHPUnit::assertContains(is_bool($value) ? (string) $value : $value, $errors->get($key, $format));
+                PHPUnit::assertContains(\is_bool($value) ? (string) $value : $value, $errors->get($key, $format));
             }
         }
 
@@ -1354,7 +1354,7 @@ class TestResponse implements ArrayAccess
             return $this->assertSessionHasNoErrors();
         }
 
-        if (is_null($this->session()->get('errors'))) {
+        if (\is_null($this->session()->get('errors'))) {
             PHPUnit::assertTrue(true);
 
             return $this;
@@ -1363,7 +1363,7 @@ class TestResponse implements ArrayAccess
         $errors = $this->session()->get('errors')->getBag($errorBag);
 
         foreach ($keys as $key => $value) {
-            if (is_int($key)) {
+            if (\is_int($key)) {
                 PHPUnit::assertFalse($errors->has($value), "Session has unexpected error: $value");
             } else {
                 PHPUnit::assertNotContains($value, $errors->get($key, $format));
@@ -1426,7 +1426,7 @@ class TestResponse implements ArrayAccess
      */
     public function assertSessionMissing($key)
     {
-        if (is_array($key)) {
+        if (\is_array($key)) {
             foreach ($key as $value) {
                 $this->assertSessionMissing($value);
             }
@@ -1509,7 +1509,7 @@ class TestResponse implements ArrayAccess
             $content = $json;
         }
 
-        if (! is_null($key)) {
+        if (! \is_null($key)) {
             dump(data_get($content, $key));
         } else {
             dump($content);
@@ -1556,7 +1556,7 @@ class TestResponse implements ArrayAccess
      */
     public function streamedContent()
     {
-        if (! is_null($this->streamedContent)) {
+        if (! \is_null($this->streamedContent)) {
             return $this->streamedContent;
         }
 
@@ -1609,7 +1609,7 @@ class TestResponse implements ArrayAccess
         if ($this->baseResponse instanceof RedirectResponse) {
             $session = $this->baseResponse->getSession();
 
-            if (! is_null($session) && $session->has('errors')) {
+            if (! \is_null($session) && $session->has('errors')) {
                 return $this->appendErrorsToException($session->get('errors')->all(), $exception);
             }
         }

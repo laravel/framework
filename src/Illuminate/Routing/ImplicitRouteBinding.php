@@ -42,24 +42,24 @@ class ImplicitRouteBinding
 
             $parent = $route->parentOfParameter($parameterName);
 
-            $routeBindingMethod = $route->allowsTrashedBindings() && in_array(SoftDeletes::class, class_uses_recursive($instance))
+            $routeBindingMethod = $route->allowsTrashedBindings() && \in_array(SoftDeletes::class, class_uses_recursive($instance))
                         ? 'resolveSoftDeletableRouteBinding'
                         : 'resolveRouteBinding';
 
             if ($parent instanceof UrlRoutable &&
                 ! $route->preventsScopedBindings() &&
-                ($route->enforcesScopedBindings() || array_key_exists($parameterName, $route->bindingFields()))) {
-                $childRouteBindingMethod = $route->allowsTrashedBindings() && in_array(SoftDeletes::class, class_uses_recursive($instance))
+                ($route->enforcesScopedBindings() || \array_key_exists($parameterName, $route->bindingFields()))) {
+                $childRouteBindingMethod = $route->allowsTrashedBindings() && \in_array(SoftDeletes::class, class_uses_recursive($instance))
                             ? 'resolveSoftDeletableChildRouteBinding'
                             : 'resolveChildRouteBinding';
 
                 if (! $model = $parent->{$childRouteBindingMethod}(
                     $parameterName, $parameterValue, $route->bindingFieldFor($parameterName)
                 )) {
-                    throw (new ModelNotFoundException)->setModel(get_class($instance), [$parameterValue]);
+                    throw (new ModelNotFoundException)->setModel(\get_class($instance), [$parameterValue]);
                 }
             } elseif (! $model = $instance->{$routeBindingMethod}($parameterValue, $route->bindingFieldFor($parameterName))) {
-                throw (new ModelNotFoundException)->setModel(get_class($instance), [$parameterValue]);
+                throw (new ModelNotFoundException)->setModel(\get_class($instance), [$parameterValue]);
             }
 
             $route->setParameter($parameterName, $model);
@@ -84,11 +84,11 @@ class ImplicitRouteBinding
 
             $parameterValue = $parameters[$parameterName];
 
-            $backedEnumClass = $parameter->getType()?->getName();
+            $backedEnumClass = $parameter->\gettype()?->getName();
 
             $backedEnum = $backedEnumClass::tryFrom((string) $parameterValue);
 
-            if (is_null($backedEnum)) {
+            if (\is_null($backedEnum)) {
                 throw new BackedEnumCaseNotFoundException($backedEnumClass, $parameterValue);
             }
 
@@ -107,11 +107,11 @@ class ImplicitRouteBinding
      */
     protected static function getParameterName($name, $parameters)
     {
-        if (array_key_exists($name, $parameters)) {
+        if (\array_key_exists($name, $parameters)) {
             return $name;
         }
 
-        if (array_key_exists($snakedName = Str::snake($name), $parameters)) {
+        if (\array_key_exists($snakedName = Str::snake($name), $parameters)) {
             return $snakedName;
         }
     }

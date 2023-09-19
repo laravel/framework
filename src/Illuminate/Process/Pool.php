@@ -65,7 +65,7 @@ class Pool
      */
     public function start(?callable $output = null)
     {
-        call_user_func($this->callback, $this);
+        \call_user_func($this->callback, $this);
 
         return new InvokedProcessPool(
             collect($this->pendingProcesses)

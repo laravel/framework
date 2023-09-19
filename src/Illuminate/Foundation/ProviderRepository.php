@@ -106,7 +106,7 @@ class ProviderRepository
      */
     public function shouldRecompile($manifest, $providers)
     {
-        return is_null($manifest) || $manifest['providers'] != $providers;
+        return \is_null($manifest) || $manifest['providers'] != $providers;
     }
 
     /**
@@ -118,7 +118,7 @@ class ProviderRepository
      */
     protected function registerLoadEvents($provider, array $events)
     {
-        if (count($events) < 1) {
+        if (\count($events) < 1) {
             return;
         }
 
@@ -184,7 +184,7 @@ class ProviderRepository
      */
     public function writeManifest($manifest)
     {
-        if (! is_writable($dirname = dirname($this->manifestPath))) {
+        if (! is_writable($dirname = \dirname($this->manifestPath))) {
             throw new Exception("The {$dirname} directory must be present and writable.");
         }
 

@@ -52,7 +52,7 @@ class SqlServerProcessor extends Processor
 
         $row = $result[0];
 
-        return is_object($row) ? $row->insertid : $row['insertid'];
+        return \is_object($row) ? $row->insertid : $row['insertid'];
     }
 
     /**

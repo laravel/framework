@@ -78,7 +78,7 @@ class ShowModelCommand extends DatabaseInspectionCommand
         try {
             $model = $this->laravel->make($class);
 
-            $class = get_class($model);
+            $class = \get_class($model);
         } catch (BindingResolutionException $e) {
             return $this->components->error($e->getMessage());
         }
@@ -158,7 +158,7 @@ class ShowModelCommand extends DatabaseInspectionCommand
             ->reject(
                 fn (ReflectionMethod $method) => $method->isStatic()
                     || $method->isAbstract()
-                    || $method->getDeclaringClass()->getName() !== get_class($model)
+                    || $method->getDeclaringClass()->getName() !== \get_class($model)
             )
             ->mapWithKeys(function (ReflectionMethod $method) use ($model) {
                 if (preg_match('/^get(.+)Attribute$/', $method->getName(), $matches) === 1) {
@@ -198,7 +198,7 @@ class ShowModelCommand extends DatabaseInspectionCommand
             ->reject(
                 fn (ReflectionMethod $method) => $method->isStatic()
                     || $method->isAbstract()
-                    || $method->getDeclaringClass()->getName() !== get_class($model)
+                    || $method->getDeclaringClass()->getName() !== \get_class($model)
             )
             ->filter(function (ReflectionMethod $method) {
                 $file = new SplFileObject($method->getFileName());
@@ -221,8 +221,8 @@ class ShowModelCommand extends DatabaseInspectionCommand
 
                 return [
                     'name' => $method->getName(),
-                    'type' => Str::afterLast(get_class($relation), '\\'),
-                    'related' => get_class($relation->getRelated()),
+                    'type' => Str::afterLast(\get_class($relation), '\\'),
+                    'related' => \get_class($relation->getRelated()),
                 ];
             })
             ->filter()
@@ -256,7 +256,7 @@ class ShowModelCommand extends DatabaseInspectionCommand
         foreach ($listeners as $key => $observerMethods) {
             $formatted[] = [
                 'event' => $extractVerb($key),
-                'observer' => array_map(fn ($obs) => is_string($obs) ? $obs : 'Closure', $observerMethods),
+                'observer' => array_map(fn ($obs) => \is_string($obs) ? $obs : 'Closure', $observerMethods),
             ];
         }
 
@@ -380,7 +380,7 @@ class ShowModelCommand extends DatabaseInspectionCommand
 
         $this->components->twoColumnDetail('<fg=green;options=bold>Observers</>');
 
-        if ($observers->count()) {
+        if ($observers->\count()) {
             foreach ($observers as $observer) {
                 $this->components->twoColumnDetail(
                     sprintf('%s', $observer['event']),
@@ -435,11 +435,11 @@ class ShowModelCommand extends DatabaseInspectionCommand
      */
     protected function getColumnType($column)
     {
-        $name = $column->getType()->getName();
+        $name = $column->\gettype()->getName();
 
         $unsigned = $column->getUnsigned() ? ' unsigned' : '';
 
-        $details = match (get_class($column->getType())) {
+        $details = match (\get_class($column->\gettype())) {
             DecimalType::class => $column->getPrecision().','.$column->getScale(),
             default => $column->getLength(),
         };
@@ -478,12 +478,12 @@ class ShowModelCommand extends DatabaseInspectionCommand
      */
     protected function attributeIsHidden($attribute, $model)
     {
-        if (count($model->getHidden()) > 0) {
-            return in_array($attribute, $model->getHidden());
+        if (\count($model->getHidden()) > 0) {
+            return \in_array($attribute, $model->getHidden());
         }
 
-        if (count($model->getVisible()) > 0) {
-            return ! in_array($attribute, $model->getVisible());
+        if (\count($model->getVisible()) > 0) {
+            return ! \in_array($attribute, $model->getVisible());
         }
 
         return false;
@@ -499,7 +499,7 @@ class ShowModelCommand extends DatabaseInspectionCommand
     protected function columnIsUnique($column, $indexes)
     {
         return collect($indexes)
-            ->filter(fn (Index $index) => count($index->getColumns()) === 1 && $index->getColumns()[0] === $column)
+            ->filter(fn (Index $index) => \count($index->getColumns()) === 1 && $index->getColumns()[0] === $column)
             ->contains(fn (Index $index) => $index->isUnique());
     }
 

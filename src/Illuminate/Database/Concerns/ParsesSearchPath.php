@@ -12,7 +12,7 @@ trait ParsesSearchPath
      */
     protected function parseSearchPath($searchPath)
     {
-        if (is_string($searchPath)) {
+        if (\is_string($searchPath)) {
             preg_match_all('/[^\s,"\']+/', $searchPath, $matches);
 
             $searchPath = $matches[0];

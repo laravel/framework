@@ -95,7 +95,7 @@ class DiscoverEvents
     protected static function classFromFile(SplFileInfo $file, $basePath)
     {
         if (static::$guessClassNamesUsingCallback) {
-            return call_user_func(static::$guessClassNamesUsingCallback, $file, $basePath);
+            return \call_user_func(static::$guessClassNamesUsingCallback, $file, $basePath);
         }
 
         $class = trim(Str::replaceFirst($basePath, '', $file->getRealPath()), DIRECTORY_SEPARATOR);

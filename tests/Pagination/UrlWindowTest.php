@@ -28,7 +28,7 @@ class UrlWindowTest extends TestCase
         for ($i = 1; $i <= 20; $i++) {
             $array[$i] = 'item'.$i;
         }
-        $p = new LengthAwarePaginator($array, count($array), 1, 12);
+        $p = new LengthAwarePaginator($array, \count($array), 1, 12);
         $window = new UrlWindow($p);
         $slider = [];
         for ($i = 9; $i <= 15; $i++) {
@@ -44,7 +44,7 @@ class UrlWindowTest extends TestCase
         for ($i = 1; $i <= 20; $i++) {
             $array[$i] = 'item'.$i;
         }
-        $p = new LengthAwarePaginator($array, count($array), 1, 17);
+        $p = new LengthAwarePaginator($array, \count($array), 1, 17);
         $window = new UrlWindow($p);
         $last = [];
         for ($i = 11; $i <= 20; $i++) {
@@ -60,7 +60,7 @@ class UrlWindowTest extends TestCase
             $array[$i] = 'item'.$i;
         }
 
-        $p = new LengthAwarePaginator($array, count($array), 1, 8);
+        $p = new LengthAwarePaginator($array, \count($array), 1, 8);
         $p->onEachSide(1);
         $window = new UrlWindow($p);
 

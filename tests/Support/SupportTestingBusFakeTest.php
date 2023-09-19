@@ -705,7 +705,7 @@ class SupportTestingBusFakeTest extends TestCase
             new BusFakeJobWithSerialization('hello'),
         ])->dispatch();
         $this->fake->assertBatched(function (PendingBatchFake $batchedCollection) {
-            return $batchedCollection->jobs->count() === 1 && $batchedCollection->jobs->first()->value === 'hello';
+            return $batchedCollection->jobs->\count() === 1 && $batchedCollection->jobs->first()->value === 'hello';
         });
 
         // when enabling the serializeAndRestore property, each batch jobs will each be serialized/restored
@@ -714,7 +714,7 @@ class SupportTestingBusFakeTest extends TestCase
         ])->dispatch();
 
         $serializingBusFake->assertBatched(function (PendingBatchFake $batchedCollection) {
-            return $batchedCollection->jobs->count() === 1 && $batchedCollection->jobs->first()->value === 'hello';
+            return $batchedCollection->jobs->\count() === 1 && $batchedCollection->jobs->first()->value === 'hello';
         });
     }
 }

@@ -192,7 +192,7 @@ trait EnumeratesValues
      */
     public function some($key, $operator = null, $value = null)
     {
-        return $this->contains(...func_get_args());
+        return $this->contains(...\func_get_args());
     }
 
     /**
@@ -215,7 +215,7 @@ trait EnumeratesValues
      */
     public function dump()
     {
-        (new Collection(func_get_args()))
+        (new Collection(\func_get_args()))
             ->push($this->all())
             ->each(function ($item) {
                 VarDumper::dump($item);
@@ -266,7 +266,7 @@ trait EnumeratesValues
      */
     public function every($key, $operator = null, $value = null)
     {
-        if (func_num_args() === 1) {
+        if (\func_num_args() === 1) {
             $callback = $this->valueRetriever($key);
 
             foreach ($this as $k => $v) {
@@ -278,7 +278,7 @@ trait EnumeratesValues
             return true;
         }
 
-        return $this->every($this->operatorForWhere(...func_get_args()));
+        return $this->every($this->operatorForWhere(...\func_get_args()));
     }
 
     /**
@@ -291,7 +291,7 @@ trait EnumeratesValues
      */
     public function firstWhere($key, $operator = null, $value = null)
     {
-        return $this->first($this->operatorForWhere(...func_get_args()));
+        return $this->first($this->operatorForWhere(...\func_get_args()));
     }
 
     /**
@@ -418,8 +418,8 @@ trait EnumeratesValues
         $callback = $this->valueRetriever($callback);
 
         return $this->map(fn ($value) => $callback($value))
-            ->filter(fn ($value) => ! is_null($value))
-            ->reduce(fn ($result, $value) => is_null($result) || $value < $result ? $value : $result);
+            ->filter(fn ($value) => ! \is_null($value))
+            ->reduce(fn ($result, $value) => \is_null($result) || $value < $result ? $value : $result);
     }
 
     /**
@@ -432,10 +432,10 @@ trait EnumeratesValues
     {
         $callback = $this->valueRetriever($callback);
 
-        return $this->filter(fn ($value) => ! is_null($value))->reduce(function ($result, $item) use ($callback) {
+        return $this->filter(fn ($value) => ! \is_null($value))->reduce(function ($result, $item) use ($callback) {
             $value = $callback($item);
 
-            return is_null($result) || $value > $result ? $value : $result;
+            return \is_null($result) || $value > $result ? $value : $result;
         });
     }
 
@@ -466,9 +466,9 @@ trait EnumeratesValues
         $passed = [];
         $failed = [];
 
-        $callback = func_num_args() === 1
+        $callback = \func_num_args() === 1
                 ? $this->valueRetriever($key)
-                : $this->operatorForWhere(...func_get_args());
+                : $this->operatorForWhere(...\func_get_args());
 
         foreach ($this as $key => $item) {
             if ($callback($item, $key)) {
@@ -495,7 +495,7 @@ trait EnumeratesValues
         }
 
         return round(
-            $this->filter($callback)->count() / $this->count() * 100,
+            $this->filter($callback)->\count() / $this->\count() * 100,
             $precision
         );
     }
@@ -508,7 +508,7 @@ trait EnumeratesValues
      */
     public function sum($callback = null)
     {
-        $callback = is_null($callback)
+        $callback = \is_null($callback)
             ? $this->identity()
             : $this->valueRetriever($callback);
 
@@ -581,7 +581,7 @@ trait EnumeratesValues
      */
     public function where($key, $operator = null, $value = null)
     {
-        return $this->filter($this->operatorForWhere(...func_get_args()));
+        return $this->filter($this->operatorForWhere(...\func_get_args()));
     }
 
     /**
@@ -630,7 +630,7 @@ trait EnumeratesValues
     {
         $values = $this->getArrayableItems($values);
 
-        return $this->filter(fn ($item) => in_array(data_get($item, $key), $values, $strict));
+        return $this->filter(fn ($item) => \in_array(data_get($item, $key), $values, $strict));
     }
 
     /**
@@ -683,7 +683,7 @@ trait EnumeratesValues
     {
         $values = $this->getArrayableItems($values);
 
-        return $this->reject(fn ($item) => in_array(data_get($item, $key), $values, $strict));
+        return $this->reject(fn ($item) => \in_array(data_get($item, $key), $values, $strict));
     }
 
     /**
@@ -709,7 +709,7 @@ trait EnumeratesValues
     public function whereInstanceOf($type)
     {
         return $this->filter(function ($value) use ($type) {
-            if (is_array($type)) {
+            if (\is_array($type)) {
                 foreach ($type as $classType) {
                     if ($value instanceof $classType) {
                         return true;
@@ -798,12 +798,12 @@ trait EnumeratesValues
         $result = $initial;
 
         foreach ($this as $key => $value) {
-            $result = call_user_func_array($callback, array_merge($result, [$value, $key]));
+            $result = \call_user_func_array($callback, array_merge($result, [$value, $key]));
 
-            if (! is_array($result)) {
+            if (! \is_array($result)) {
                 throw new UnexpectedValueException(sprintf(
                     "%s::reduceSpread expects reducer to return an array, but got a '%s' instead.",
-                    class_basename(static::class), gettype($result)
+                    class_basename(static::class), \gettype($result)
                 ));
             }
         }
@@ -870,7 +870,7 @@ trait EnumeratesValues
         $exists = [];
 
         return $this->reject(function ($item, $key) use ($callback, $strict, &$exists) {
-            if (in_array($id = $callback($item, $key), $exists, $strict)) {
+            if (\in_array($id = $callback($item, $key), $exists, $strict)) {
                 return true;
             }
 
@@ -997,7 +997,7 @@ trait EnumeratesValues
      */
     public function __get($key)
     {
-        if (! in_array($key, static::$proxies)) {
+        if (! \in_array($key, static::$proxies)) {
             throw new Exception("Property [{$key}] does not exist on this collection instance.");
         }
 
@@ -1012,7 +1012,7 @@ trait EnumeratesValues
      */
     protected function getArrayableItems($items)
     {
-        if (is_array($items)) {
+        if (\is_array($items)) {
             return $items;
         }
 
@@ -1041,13 +1041,13 @@ trait EnumeratesValues
             return $key;
         }
 
-        if (func_num_args() === 1) {
+        if (\func_num_args() === 1) {
             $value = true;
 
             $operator = '=';
         }
 
-        if (func_num_args() === 2) {
+        if (\func_num_args() === 2) {
             $value = $operator;
 
             $operator = '=';
@@ -1057,11 +1057,11 @@ trait EnumeratesValues
             $retrieved = data_get($item, $key);
 
             $strings = array_filter([$retrieved, $value], function ($value) {
-                return is_string($value) || (is_object($value) && method_exists($value, '__toString'));
+                return \is_string($value) || (\is_object($value) && method_exists($value, '__toString'));
             });
 
-            if (count($strings) < 2 && count(array_filter([$retrieved, $value], 'is_object')) == 1) {
-                return in_array($operator, ['!=', '<>', '!==']);
+            if (\count($strings) < 2 && \count(array_filter([$retrieved, $value], 'is_object')) == 1) {
+                return \in_array($operator, ['!=', '<>', '!==']);
             }
 
             switch ($operator) {
@@ -1089,7 +1089,7 @@ trait EnumeratesValues
      */
     protected function useAsCallable($value)
     {
-        return ! is_string($value) && is_callable($value);
+        return ! \is_string($value) && \is_callable($value);
     }
 
     /**

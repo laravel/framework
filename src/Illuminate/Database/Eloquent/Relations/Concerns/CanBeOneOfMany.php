@@ -76,12 +76,12 @@ trait CanBeOneOfMany
 
         $keyName = $this->query->getModel()->getKeyName();
 
-        $columns = is_string($columns = $column) ? [
+        $columns = \is_string($columns = $column) ? [
             $column => $aggregate,
             $keyName => $aggregate,
         ] : $column;
 
-        if (! array_key_exists($keyName, $columns)) {
+        if (! \array_key_exists($keyName, $columns)) {
             $columns[$keyName] = 'MAX';
         }
 
@@ -90,7 +90,7 @@ trait CanBeOneOfMany
         }
 
         foreach ($columns as $column => $aggregate) {
-            if (! in_array(strtolower($aggregate), ['min', 'max'])) {
+            if (! \in_array(strtolower($aggregate), ['min', 'max'])) {
                 throw new InvalidArgumentException("Invalid aggregate [{$aggregate}] used within ofMany relation. Available aggregates: MIN, MAX");
             }
 
@@ -125,7 +125,7 @@ trait CanBeOneOfMany
 
         $columns = $this->query->getQuery()->columns;
 
-        if (is_null($columns) || $columns === ['*']) {
+        if (\is_null($columns) || $columns === ['*']) {
             $this->select([$this->qualifyColumn('*')]);
         }
 
@@ -191,7 +191,7 @@ trait CanBeOneOfMany
             $subQuery->groupBy($this->qualifyRelatedColumn($group));
         }
 
-        if (! is_null($column)) {
+        if (! \is_null($column)) {
             $subQuery->selectRaw($aggregate.'('.$subQuery->getQuery()->grammar->wrap($subQuery->qualifyColumn($column)).') as '.$subQuery->getQuery()->grammar->wrap($column.'_aggregate'));
         }
 

@@ -18,7 +18,7 @@ trait InteractsWithDictionary
      */
     protected function getDictionaryKey($attribute)
     {
-        if (is_object($attribute)) {
+        if (\is_object($attribute)) {
             if (method_exists($attribute, '__toString')) {
                 return $attribute->__toString();
             }

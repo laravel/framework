@@ -16,7 +16,7 @@ class FileFactory
      */
     public function create($name, $kilobytes = 0, $mimeType = null)
     {
-        if (is_string($kilobytes)) {
+        if (\is_string($kilobytes)) {
             return $this->createWithContent($name, $kilobytes);
         }
 
@@ -73,26 +73,26 @@ class FileFactory
      */
     protected function generateImage($width, $height, $extension)
     {
-        if (! function_exists('imagecreatetruecolor')) {
+        if (! \function_exists('imagecreatetruecolor')) {
             throw new LogicException('GD extension is not installed.');
         }
 
         return tap(tmpfile(), function ($temp) use ($width, $height, $extension) {
             ob_start();
 
-            $extension = in_array($extension, ['jpeg', 'png', 'gif', 'webp', 'wbmp', 'bmp'])
+            $extension = \in_array($extension, ['jpeg', 'png', 'gif', 'webp', 'wbmp', 'bmp'])
                 ? strtolower($extension)
                 : 'jpeg';
 
             $image = imagecreatetruecolor($width, $height);
 
-            if (! function_exists($functionName = "image{$extension}")) {
+            if (! \function_exists($functionName = "image{$extension}")) {
                 ob_get_clean();
 
                 throw new LogicException("{$functionName} function is not defined and image cannot be generated.");
             }
 
-            call_user_func($functionName, $image);
+            \call_user_func($functionName, $image);
 
             fwrite($temp, ob_get_clean());
         });

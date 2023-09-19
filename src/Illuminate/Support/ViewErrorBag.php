@@ -70,7 +70,7 @@ class ViewErrorBag implements Countable
      */
     public function any()
     {
-        return $this->count() > 0;
+        return $this->\count() > 0;
     }
 
     /**
@@ -78,9 +78,9 @@ class ViewErrorBag implements Countable
      *
      * @return int
      */
-    public function count(): int
+    public function \count(): int
     {
-        return $this->getBag('default')->count();
+        return $this->getBag('default')->\count();
     }
 
     /**

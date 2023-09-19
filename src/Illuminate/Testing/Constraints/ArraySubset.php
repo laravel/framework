@@ -125,7 +125,7 @@ final class ArraySubset extends Constraint
      */
     private function toArray(iterable $other): array
     {
-        if (is_array($other)) {
+        if (\is_array($other)) {
             return $other;
         }
 

@@ -44,11 +44,11 @@ class EloquentPushTest extends DatabaseTestCase
         $user->posts[0]->comments[0]->comment = 'Test comment 1';
         $user->push();
 
-        $this->assertSame(1, UserX::count());
+        $this->assertSame(1, UserX::\count());
         $this->assertSame('Test 1', UserX::firstOrFail()->name);
-        $this->assertSame(1, PostX::count());
+        $this->assertSame(1, PostX::\count());
         $this->assertSame('Test title 1', PostX::firstOrFail()->title);
-        $this->assertSame(1, CommentX::count());
+        $this->assertSame(1, CommentX::\count());
         $this->assertSame('Test comment 1', CommentX::firstOrFail()->comment);
     }
 }

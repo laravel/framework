@@ -18,7 +18,7 @@ trait CompilesJsonPaths
 
         $field = $this->wrap($parts[0]);
 
-        $path = count($parts) > 1 ? ', '.$this->wrapJsonPath($parts[1], '->') : '';
+        $path = \count($parts) > 1 ? ', '.$this->wrapJsonPath($parts[1], '->') : '';
 
         return [$field, $path];
     }

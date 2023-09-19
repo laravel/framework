@@ -58,7 +58,7 @@ trait ResolvesDumpSource
         }
 
         if (static::$dumpSourceResolver) {
-            return call_user_func(static::$dumpSourceResolver);
+            return \call_user_func(static::$dumpSourceResolver);
         }
 
         $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 20);
@@ -80,19 +80,19 @@ trait ResolvesDumpSource
                 }
             }
 
-            if (! is_null($sourceKey)) {
+            if (! \is_null($sourceKey)) {
                 break;
             }
         }
 
-        if (is_null($sourceKey)) {
+        if (\is_null($sourceKey)) {
             return;
         }
 
         $file = $trace[$sourceKey]['file'] ?? null;
         $line = $trace[$sourceKey]['line'] ?? null;
 
-        if (is_null($file) || is_null($line)) {
+        if (\is_null($file) || \is_null($line)) {
             return;
         }
 
@@ -104,7 +104,7 @@ trait ResolvesDumpSource
         }
 
         if (str_starts_with($file, $this->basePath)) {
-            $relativeFile = substr($file, strlen($this->basePath) + 1);
+            $relativeFile = substr($file, \strlen($this->basePath) + 1);
         }
 
         return [$file, $relativeFile, $line];
@@ -157,7 +157,7 @@ trait ResolvesDumpSource
             return;
         }
 
-        $href = is_array($editor) && isset($editor['href'])
+        $href = \is_array($editor) && isset($editor['href'])
             ? $editor['href']
             : ($this->editorHrefs[$editor['name'] ?? $editor] ?? sprintf('%s://open?file={file}&line={line}', $editor['name'] ?? $editor));
 
@@ -167,7 +167,7 @@ trait ResolvesDumpSource
 
         $href = str_replace(
             ['{file}', '{line}'],
-            [$file, is_null($line) ? 1 : $line],
+            [$file, \is_null($line) ? 1 : $line],
             $href,
         );
 

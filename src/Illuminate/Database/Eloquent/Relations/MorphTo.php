@@ -140,13 +140,13 @@ class MorphTo extends BelongsTo
                             ->mergeConstraintsFrom($this->getQuery())
                             ->with(array_merge(
                                 $this->getQuery()->getEagerLoads(),
-                                (array) ($this->morphableEagerLoads[get_class($instance)] ?? [])
+                                (array) ($this->morphableEagerLoads[\get_class($instance)] ?? [])
                             ))
                             ->withCount(
-                                (array) ($this->morphableEagerLoadCounts[get_class($instance)] ?? [])
+                                (array) ($this->morphableEagerLoadCounts[\get_class($instance)] ?? [])
                             );
 
-        if ($callback = ($this->morphableConstraints[get_class($instance)] ?? null)) {
+        if ($callback = ($this->morphableConstraints[\get_class($instance)] ?? null)) {
             $callback($query);
         }
 
@@ -213,7 +213,7 @@ class MorphTo extends BelongsTo
     protected function matchToMorphParents($type, Collection $results)
     {
         foreach ($results as $result) {
-            $ownerKey = ! is_null($this->ownerKey) ? $this->getDictionaryKey($result->{$this->ownerKey}) : $result->getKey();
+            $ownerKey = ! \is_null($this->ownerKey) ? $this->getDictionaryKey($result->{$this->ownerKey}) : $result->getKey();
 
             if (isset($this->dictionary[$type][$ownerKey])) {
                 foreach ($this->dictionary[$type][$ownerKey] as $model) {
@@ -269,7 +269,7 @@ class MorphTo extends BelongsTo
      */
     public function touch()
     {
-        if (! is_null($this->child->{$this->foreignKey})) {
+        if (! \is_null($this->child->{$this->foreignKey})) {
             parent::touch();
         }
     }
@@ -428,7 +428,7 @@ class MorphTo extends BelongsTo
         try {
             $result = parent::__call($method, $parameters);
 
-            if (in_array($method, ['select', 'selectRaw', 'selectSub', 'addSelect', 'withoutGlobalScopes'])) {
+            if (\in_array($method, ['select', 'selectRaw', 'selectSub', 'addSelect', 'withoutGlobalScopes'])) {
                 $this->macroBuffer[] = compact('method', 'parameters');
             }
 

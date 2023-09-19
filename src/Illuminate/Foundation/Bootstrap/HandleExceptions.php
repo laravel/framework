@@ -135,7 +135,7 @@ class HandleExceptions
 
             $this->ensureNullLogDriverIsConfigured();
 
-            if (is_array($options = $config->get('logging.deprecations'))) {
+            if (\is_array($options = $config->get('logging.deprecations'))) {
                 $driver = $options['channel'] ?? 'null';
             } else {
                 $driver = $options ?? 'null';
@@ -226,7 +226,7 @@ class HandleExceptions
     {
         self::$reservedMemory = null;
 
-        if (! is_null($error = error_get_last()) && $this->isFatal($error['type'])) {
+        if (! \is_null($error = error_get_last()) && $this->isFatal($error['type'])) {
             $this->handleException($this->fatalErrorFromPhpError($error, 0));
         }
     }
@@ -263,7 +263,7 @@ class HandleExceptions
      */
     protected function isDeprecation($level)
     {
-        return in_array($level, [E_DEPRECATED, E_USER_DEPRECATED]);
+        return \in_array($level, [E_DEPRECATED, E_USER_DEPRECATED]);
     }
 
     /**
@@ -274,7 +274,7 @@ class HandleExceptions
      */
     protected function isFatal($type)
     {
-        return in_array($type, [E_COMPILE_ERROR, E_CORE_ERROR, E_ERROR, E_PARSE]);
+        return \in_array($type, [E_COMPILE_ERROR, E_CORE_ERROR, E_ERROR, E_PARSE]);
     }
 
     /**

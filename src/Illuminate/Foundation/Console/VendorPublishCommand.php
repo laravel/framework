@@ -120,7 +120,7 @@ class VendorPublishCommand extends Command
             scroll: 15,
         );
 
-        if ($choice == $choices[0] || is_null($choice)) {
+        if ($choice == $choices[0] || \is_null($choice)) {
             return;
         }
 
@@ -168,7 +168,7 @@ class VendorPublishCommand extends Command
     {
         $pathsToPublish = $this->pathsToPublish($tag);
 
-        if ($publishing = count($pathsToPublish) > 0) {
+        if ($publishing = \count($pathsToPublish) > 0) {
             $this->components->info(sprintf(
                 'Publishing %sassets',
                 $tag ? "[$tag] " : '',
@@ -230,7 +230,7 @@ class VendorPublishCommand extends Command
     {
         if ((! $this->option('existing') && (! $this->files->exists($to) || $this->option('force')))
             || ($this->option('existing') && $this->files->exists($to))) {
-            $this->createParentDirectory(dirname($to));
+            $this->createParentDirectory(\dirname($to));
 
             $this->files->copy($from, $to);
 

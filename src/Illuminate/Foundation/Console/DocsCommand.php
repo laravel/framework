@@ -217,7 +217,7 @@ class DocsCommand extends Command
             return null;
         }
 
-        if (! is_callable($strategy)) {
+        if (! \is_callable($strategy)) {
             return null;
         }
 
@@ -332,7 +332,7 @@ class DocsCommand extends Command
         ($this->urlOpener ?? function ($url) {
             if (Env::get('ARTISAN_DOCS_OPEN_STRATEGY')) {
                 $this->openViaCustomStrategy($url);
-            } elseif (in_array($this->systemOsFamily, ['Darwin', 'Windows', 'Linux'])) {
+            } elseif (\in_array($this->systemOsFamily, ['Darwin', 'Windows', 'Linux'])) {
                 $this->openViaBuiltInStrategy($url);
             } else {
                 $this->components->warn('Unable to open the URL on your system. You will need to open it yourself or create a custom opener for your system.');
@@ -354,7 +354,7 @@ class DocsCommand extends Command
             $command = null;
         }
 
-        if (! is_callable($command)) {
+        if (! \is_callable($command)) {
             $this->components->warn('Unable to open the URL with your custom strategy. You will need to open it yourself.');
 
             return;

@@ -154,8 +154,8 @@ class MailChannel
     {
         return [
             '__laravel_notification_id' => $notification->id,
-            '__laravel_notification' => get_class($notification),
-            '__laravel_notification_queued' => in_array(
+            '__laravel_notification' => \get_class($notification),
+            '__laravel_notification_queued' => \in_array(
                 ShouldQueue::class,
                 class_implements($notification)
             ),
@@ -181,7 +181,7 @@ class MailChannel
 
         $this->addAttachments($mailMessage, $message);
 
-        if (! is_null($message->priority)) {
+        if (! \is_null($message->priority)) {
             $mailMessage->priority($message->priority);
         }
 
@@ -258,13 +258,13 @@ class MailChannel
      */
     protected function getRecipients($notifiable, $notification, $message)
     {
-        if (is_string($recipients = $notifiable->routeNotificationFor('mail', $notification))) {
+        if (\is_string($recipients = $notifiable->routeNotificationFor('mail', $notification))) {
             $recipients = [$recipients];
         }
 
         return collect($recipients)->mapWithKeys(function ($recipient, $email) {
             return is_numeric($email)
-                    ? [$email => (is_string($recipient) ? $recipient : $recipient->email)]
+                    ? [$email => (\is_string($recipient) ? $recipient : $recipient->email)]
                     : [$email => $recipient];
         })->all();
     }

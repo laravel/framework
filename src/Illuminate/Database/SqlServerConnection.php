@@ -76,7 +76,7 @@ class SqlServerConnection extends Connection
      */
     protected function isUniqueConstraintError(Exception $exception)
     {
-        return boolval(preg_match('#Cannot insert duplicate key row in object#i', $exception->getMessage()));
+        return \boolval(preg_match('#Cannot insert duplicate key row in object#i', $exception->getMessage()));
     }
 
     /**
@@ -98,7 +98,7 @@ class SqlServerConnection extends Connection
      */
     public function getSchemaBuilder()
     {
-        if (is_null($this->schemaGrammar)) {
+        if (\is_null($this->schemaGrammar)) {
             $this->useDefaultSchemaGrammar();
         }
 

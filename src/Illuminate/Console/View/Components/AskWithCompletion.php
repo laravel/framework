@@ -18,7 +18,7 @@ class AskWithCompletion extends Component
     {
         $question = new Question($question, $default);
 
-        is_callable($choices)
+        \is_callable($choices)
             ? $question->setAutocompleterCallback($choices)
             : $question->setAutocompleterValues($choices);
 

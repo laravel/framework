@@ -42,7 +42,7 @@ class ScheduleWorkCommand extends Command
 
         $command = implode(' ', array_map(fn ($arg) => ProcessUtils::escapeArgument($arg), [
             PHP_BINARY,
-            defined('ARTISAN_BINARY') ? ARTISAN_BINARY : 'artisan',
+            \defined('ARTISAN_BINARY') ? ARTISAN_BINARY : 'artisan',
             'schedule:run',
         ]));
 

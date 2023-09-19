@@ -67,7 +67,7 @@ class EloquentModelRefreshTest extends DatabaseTestCase
 
         $post->children()->attach($child->getKey());
 
-        $this->assertEquals(1, $post->children->count());
+        $this->assertEquals(1, $post->children->\count());
 
         $post->children->first()->refresh();
     }

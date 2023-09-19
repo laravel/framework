@@ -50,10 +50,10 @@ class RewindableGenerator implements Countable, IteratorAggregate
      *
      * @return int
      */
-    public function count(): int
+    public function \count(): int
     {
-        if (is_callable($count = $this->count)) {
-            $this->count = $count();
+        if (\is_callable($count = $this->count)) {
+            $this->count = $\count();
         }
 
         return $this->count;

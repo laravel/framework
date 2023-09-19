@@ -22,7 +22,7 @@ class RouteAction
         // If no action is passed in right away, we assume the user will make use of
         // fluent routing. In that case, we set a default closure, to be executed
         // if the user never explicitly sets an action to handle the given uri.
-        if (is_null($action)) {
+        if (\is_null($action)) {
             return static::missingAction($uri);
         }
 
@@ -30,7 +30,7 @@ class RouteAction
         // as the "uses" property, because there is nothing else we need to do when
         // it is available. Otherwise we will need to find it in the action list.
         if (Reflector::isCallable($action, true)) {
-            return ! is_array($action) ? ['uses' => $action] : [
+            return ! \is_array($action) ? ['uses' => $action] : [
                 'uses' => $action[0].'@'.$action[1],
                 'controller' => $action[0].'@'.$action[1],
             ];
@@ -43,7 +43,7 @@ class RouteAction
             $action['uses'] = static::findCallable($action);
         }
 
-        if (! static::containsSerializedClosure($action) && is_string($action['uses']) && ! str_contains($action['uses'], '@')) {
+        if (! static::containsSerializedClosure($action) && \is_string($action['uses']) && ! str_contains($action['uses'], '@')) {
             $action['uses'] = static::makeInvokable($action['uses']);
         }
 
@@ -103,7 +103,7 @@ class RouteAction
      */
     public static function containsSerializedClosure(array $action)
     {
-        return is_string($action['uses']) && Str::startsWith($action['uses'], [
+        return \is_string($action['uses']) && Str::startsWith($action['uses'], [
             'O:47:"Laravel\\SerializableClosure\\SerializableClosure',
             'O:55:"Laravel\\SerializableClosure\\UnsignedSerializableClosure',
         ]) !== false;

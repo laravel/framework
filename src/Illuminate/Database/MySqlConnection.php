@@ -35,7 +35,7 @@ class MySqlConnection extends Connection
      */
     protected function isUniqueConstraintError(Exception $exception)
     {
-        return boolval(preg_match('#Integrity constraint violation: 1062#i', $exception->getMessage()));
+        return \boolval(preg_match('#Integrity constraint violation: 1062#i', $exception->getMessage()));
     }
 
     /**
@@ -67,7 +67,7 @@ class MySqlConnection extends Connection
      */
     public function getSchemaBuilder()
     {
-        if (is_null($this->schemaGrammar)) {
+        if (\is_null($this->schemaGrammar)) {
             $this->useDefaultSchemaGrammar();
         }
 

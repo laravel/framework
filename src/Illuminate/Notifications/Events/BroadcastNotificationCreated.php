@@ -67,7 +67,7 @@ class BroadcastNotificationCreated implements ShouldBroadcast
             return $channels;
         }
 
-        if (is_string($channels = $this->channelName())) {
+        if (\is_string($channels = $this->channelName())) {
             return [new PrivateChannel($channels)];
         }
 
@@ -87,7 +87,7 @@ class BroadcastNotificationCreated implements ShouldBroadcast
             return $this->notifiable->receivesBroadcastNotificationsOn($this->notification);
         }
 
-        $class = str_replace('\\', '.', get_class($this->notifiable));
+        $class = str_replace('\\', '.', \get_class($this->notifiable));
 
         return $class.'.'.$this->notifiable->getKey();
     }
@@ -118,7 +118,7 @@ class BroadcastNotificationCreated implements ShouldBroadcast
     {
         return method_exists($this->notification, 'broadcastType')
                     ? $this->notification->broadcastType()
-                    : get_class($this->notification);
+                    : \get_class($this->notification);
     }
 
     /**

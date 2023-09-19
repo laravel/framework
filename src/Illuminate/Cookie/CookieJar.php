@@ -110,7 +110,7 @@ class CookieJar implements JarContract
      */
     public function hasQueued($key, $path = null)
     {
-        return ! is_null($this->queued($key, null, $path));
+        return ! \is_null($this->queued($key, null, $path));
     }
 
     /**
@@ -199,7 +199,7 @@ class CookieJar implements JarContract
      */
     protected function getPathAndDomain($path, $domain, $secure = null, $sameSite = null)
     {
-        return [$path ?: $this->path, $domain ?: $this->domain, is_bool($secure) ? $secure : $this->secure, $sameSite ?: $this->sameSite];
+        return [$path ?: $this->path, $domain ?: $this->domain, \is_bool($secure) ? $secure : $this->secure, $sameSite ?: $this->sameSite];
     }
 
     /**

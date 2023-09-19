@@ -179,10 +179,10 @@ abstract class Relation implements BuilderContract
     {
         $result = $this->take(2)->get($columns);
 
-        $count = $result->count();
+        $count = $result->\count();
 
         if ($count === 0) {
-            throw (new ModelNotFoundException)->setModel(get_class($this->related));
+            throw (new ModelNotFoundException)->setModel(\get_class($this->related));
         }
 
         if ($count > 1) {
@@ -240,7 +240,7 @@ abstract class Relation implements BuilderContract
     public function getRelationExistenceCountQuery(Builder $query, Builder $parentQuery)
     {
         return $this->getRelationExistenceQuery(
-            $query, $parentQuery, new Expression('count(*)')
+            $query, $parentQuery, new Expression('\count(*)')
         )->setBindings([], 'select');
     }
 
@@ -414,7 +414,7 @@ abstract class Relation implements BuilderContract
     protected function whereInMethod(Model $model, $key)
     {
         return $model->getKeyName() === last(explode('.', $key))
-                    && in_array($model->getKeyType(), ['int', 'integer'])
+                    && \in_array($model->getKeyType(), ['int', 'integer'])
                         ? 'whereIntegerInRaw'
                         : 'whereIn';
     }
@@ -465,7 +465,7 @@ abstract class Relation implements BuilderContract
     {
         $map = static::buildMorphMapFromModels($map);
 
-        if (is_array($map)) {
+        if (\is_array($map)) {
             static::$morphMap = $merge && static::$morphMap
                             ? $map + static::$morphMap : $map;
         }
@@ -481,7 +481,7 @@ abstract class Relation implements BuilderContract
      */
     protected static function buildMorphMapFromModels(array $models = null)
     {
-        if (is_null($models) || ! array_is_list($models)) {
+        if (\is_null($models) || ! array_is_list($models)) {
             return $models;
         }
 

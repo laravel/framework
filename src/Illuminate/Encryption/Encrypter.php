@@ -229,21 +229,21 @@ class Encrypter implements EncrypterContract, StringEncrypter
      */
     protected function validPayload($payload)
     {
-        if (! is_array($payload)) {
+        if (! \is_array($payload)) {
             return false;
         }
 
         foreach (['iv', 'value', 'mac'] as $item) {
-            if (! isset($payload[$item]) || ! is_string($payload[$item])) {
+            if (! isset($payload[$item]) || ! \is_string($payload[$item])) {
                 return false;
             }
         }
 
-        if (isset($payload['tag']) && ! is_string($payload['tag'])) {
+        if (isset($payload['tag']) && ! \is_string($payload['tag'])) {
             return false;
         }
 
-        return strlen(base64_decode($payload['iv'], true)) === openssl_cipher_iv_length(strtolower($this->cipher));
+        return \strlen(base64_decode($payload['iv'], true)) === openssl_cipher_iv_length(strtolower($this->cipher));
     }
 
     /**
@@ -267,11 +267,11 @@ class Encrypter implements EncrypterContract, StringEncrypter
      */
     protected function ensureTagIsValid($tag)
     {
-        if (self::$supportedCiphers[strtolower($this->cipher)]['aead'] && strlen($tag) !== 16) {
+        if (self::$supportedCiphers[strtolower($this->cipher)]['aead'] && \strlen($tag) !== 16) {
             throw new DecryptException('Could not decrypt the data.');
         }
 
-        if (! self::$supportedCiphers[strtolower($this->cipher)]['aead'] && is_string($tag)) {
+        if (! self::$supportedCiphers[strtolower($this->cipher)]['aead'] && \is_string($tag)) {
             throw new DecryptException('Unable to use tag because the cipher algorithm does not support AEAD.');
         }
     }

@@ -184,8 +184,8 @@ class Builder implements BuilderContract
      */
     public function withoutGlobalScope($scope)
     {
-        if (! is_string($scope)) {
-            $scope = get_class($scope);
+        if (! \is_string($scope)) {
+            $scope = \get_class($scope);
         }
 
         unset($this->scopes[$scope]);
@@ -203,7 +203,7 @@ class Builder implements BuilderContract
      */
     public function withoutGlobalScopes(array $scopes = null)
     {
-        if (! is_array($scopes)) {
+        if (! \is_array($scopes)) {
             $scopes = array_keys($this->scopes);
         }
 
@@ -236,8 +236,8 @@ class Builder implements BuilderContract
             $id = $id->getKey();
         }
 
-        if (is_array($id) || $id instanceof Arrayable) {
-            if (in_array($this->model->getKeyType(), ['int', 'integer'])) {
+        if (\is_array($id) || $id instanceof Arrayable) {
+            if (\in_array($this->model->getKeyType(), ['int', 'integer'])) {
                 $this->query->whereIntegerInRaw($this->model->getQualifiedKeyName(), $id);
             } else {
                 $this->query->whereIn($this->model->getQualifiedKeyName(), $id);
@@ -265,8 +265,8 @@ class Builder implements BuilderContract
             $id = $id->getKey();
         }
 
-        if (is_array($id) || $id instanceof Arrayable) {
-            if (in_array($this->model->getKeyType(), ['int', 'integer'])) {
+        if (\is_array($id) || $id instanceof Arrayable) {
+            if (\in_array($this->model->getKeyType(), ['int', 'integer'])) {
                 $this->query->whereIntegerNotInRaw($this->model->getQualifiedKeyName(), $id);
             } else {
                 $this->query->whereNotIn($this->model->getQualifiedKeyName(), $id);
@@ -293,12 +293,12 @@ class Builder implements BuilderContract
      */
     public function where($column, $operator = null, $value = null, $boolean = 'and')
     {
-        if ($column instanceof Closure && is_null($operator)) {
+        if ($column instanceof Closure && \is_null($operator)) {
             $column($query = $this->model->newQueryWithoutRelationships());
 
             $this->query->addNestedWhereQuery($query->getQuery(), $boolean);
         } else {
-            $this->query->where(...func_get_args());
+            $this->query->where(...\func_get_args());
         }
 
         return $this;
@@ -315,7 +315,7 @@ class Builder implements BuilderContract
      */
     public function firstWhere($column, $operator = null, $value = null, $boolean = 'and')
     {
-        return $this->where(...func_get_args())->first();
+        return $this->where(...\func_get_args())->first();
     }
 
     /**
@@ -329,7 +329,7 @@ class Builder implements BuilderContract
     public function orWhere($column, $operator = null, $value = null)
     {
         [$value, $operator] = $this->query->prepareValueAndOperator(
-            $value, $operator, func_num_args() === 2
+            $value, $operator, \func_num_args() === 2
         );
 
         return $this->where($column, $operator, $value, 'or');
@@ -370,7 +370,7 @@ class Builder implements BuilderContract
      */
     public function latest($column = null)
     {
-        if (is_null($column)) {
+        if (\is_null($column)) {
             $column = $this->model->getCreatedAtColumn() ?? 'created_at';
         }
 
@@ -387,7 +387,7 @@ class Builder implements BuilderContract
      */
     public function oldest($column = null)
     {
-        if (is_null($column)) {
+        if (\is_null($column)) {
             $column = $this->model->getCreatedAtColumn() ?? 'created_at';
         }
 
@@ -409,7 +409,7 @@ class Builder implements BuilderContract
         return $instance->newCollection(array_map(function ($item) use ($items, $instance) {
             $model = $instance->newFromBuilder($item);
 
-            if (count($items) > 1) {
+            if (\count($items) > 1) {
                 $model->preventsLazyLoading = Model::preventsLazyLoading();
             }
 
@@ -440,7 +440,7 @@ class Builder implements BuilderContract
      */
     public function find($id, $columns = ['*'])
     {
-        if (is_array($id) || $id instanceof Arrayable) {
+        if (\is_array($id) || $id instanceof Arrayable) {
             return $this->findMany($id, $columns);
         }
 
@@ -480,19 +480,19 @@ class Builder implements BuilderContract
 
         $id = $id instanceof Arrayable ? $id->toArray() : $id;
 
-        if (is_array($id)) {
-            if (count($result) !== count(array_unique($id))) {
+        if (\is_array($id)) {
+            if (\count($result) !== \count(array_unique($id))) {
                 throw (new ModelNotFoundException)->setModel(
-                    get_class($this->model), array_diff($id, $result->modelKeys())
+                    \get_class($this->model), array_diff($id, $result->modelKeys())
                 );
             }
 
             return $result;
         }
 
-        if (is_null($result)) {
+        if (\is_null($result)) {
             throw (new ModelNotFoundException)->setModel(
-                get_class($this->model), $id
+                \get_class($this->model), $id
             );
         }
 
@@ -508,7 +508,7 @@ class Builder implements BuilderContract
      */
     public function findOrNew($id, $columns = ['*'])
     {
-        if (! is_null($model = $this->find($id, $columns))) {
+        if (! \is_null($model = $this->find($id, $columns))) {
             return $model;
         }
 
@@ -531,7 +531,7 @@ class Builder implements BuilderContract
             $columns = ['*'];
         }
 
-        if (! is_null($model = $this->find($id, $columns))) {
+        if (! \is_null($model = $this->find($id, $columns))) {
             return $model;
         }
 
@@ -547,7 +547,7 @@ class Builder implements BuilderContract
      */
     public function firstOrNew(array $attributes = [], array $values = [])
     {
-        if (! is_null($instance = $this->where($attributes)->first())) {
+        if (! \is_null($instance = $this->where($attributes)->first())) {
             return $instance;
         }
 
@@ -563,7 +563,7 @@ class Builder implements BuilderContract
      */
     public function firstOrCreate(array $attributes = [], array $values = [])
     {
-        if (! is_null($instance = $this->where($attributes)->first())) {
+        if (! \is_null($instance = $this->where($attributes)->first())) {
             return $instance;
         }
 
@@ -612,11 +612,11 @@ class Builder implements BuilderContract
      */
     public function firstOrFail($columns = ['*'])
     {
-        if (! is_null($model = $this->first($columns))) {
+        if (! \is_null($model = $this->first($columns))) {
             return $model;
         }
 
-        throw (new ModelNotFoundException)->setModel(get_class($this->model));
+        throw (new ModelNotFoundException)->setModel(\get_class($this->model));
     }
 
     /**
@@ -634,7 +634,7 @@ class Builder implements BuilderContract
             $columns = ['*'];
         }
 
-        if (! is_null($model = $this->first($columns))) {
+        if (! \is_null($model = $this->first($columns))) {
             return $model;
         }
 
@@ -655,7 +655,7 @@ class Builder implements BuilderContract
         try {
             return $this->baseSole($columns);
         } catch (RecordsNotFoundException) {
-            throw (new ModelNotFoundException)->setModel(get_class($this->model));
+            throw (new ModelNotFoundException)->setModel(\get_class($this->model));
         }
     }
 
@@ -718,7 +718,7 @@ class Builder implements BuilderContract
         // If we actually found models we will also eager load any relationships that
         // have been specified as needing to be eager loaded, which will solve the
         // n+1 query issue for the developers to avoid running a lot of queries.
-        if (count($models = $builder->getModels($columns)) > 0) {
+        if (\count($models = $builder->getModels($columns)) > 0) {
             $models = $builder->eagerLoadRelations($models);
         }
 
@@ -810,7 +810,7 @@ class Builder implements BuilderContract
         // If there are nested relationships set on the query, we will put those onto
         // the query instances so that they can be handled after this relationship
         // is loaded. In this way they will all trickle down as they are loaded.
-        if (count($nested) > 0) {
+        if (\count($nested) > 0) {
             $relation->getQuery()->with($nested);
         }
 
@@ -832,7 +832,7 @@ class Builder implements BuilderContract
         // that start with the given top relations and adds them to our arrays.
         foreach ($this->eagerLoad as $name => $constraints) {
             if ($this->isNestedUnder($relation, $name)) {
-                $nested[substr($name, strlen($relation.'.'))] = $constraints;
+                $nested[substr($name, \strlen($relation.'.'))] = $constraints;
             }
         }
 
@@ -893,7 +893,7 @@ class Builder implements BuilderContract
         // columns are returned as you would expect from these Eloquent models.
         if (! $this->model->hasGetMutator($column) &&
             ! $this->model->hasCast($column) &&
-            ! in_array($column, $this->model->getDates())) {
+            ! \in_array($column, $this->model->getDates())) {
             return $results;
         }
 
@@ -918,7 +918,7 @@ class Builder implements BuilderContract
     {
         $page = $page ?: Paginator::resolveCurrentPage($pageName);
 
-        $total = func_num_args() === 5 ? value(func_get_arg(4)) : $this->toBase()->getCountForPagination();
+        $total = \func_num_args() === 5 ? value(func_get_arg(4)) : $this->toBase()->getCountForPagination();
 
         $perPage = ($perPage instanceof Closure
             ? $perPage($total)
@@ -1073,11 +1073,11 @@ class Builder implements BuilderContract
             return 0;
         }
 
-        if (! is_array(reset($values))) {
+        if (! \is_array(reset($values))) {
             $values = [$values];
         }
 
-        if (is_null($update)) {
+        if (\is_null($update)) {
             $update = array_keys(reset($values));
         }
 
@@ -1104,7 +1104,7 @@ class Builder implements BuilderContract
 
         $column = $this->model->getUpdatedAtColumn();
 
-        if (! $this->model->usesTimestamps() || is_null($column)) {
+        if (! $this->model->usesTimestamps() || \is_null($column)) {
             return false;
         }
 
@@ -1150,13 +1150,13 @@ class Builder implements BuilderContract
     protected function addUpdatedAtColumn(array $values)
     {
         if (! $this->model->usesTimestamps() ||
-            is_null($this->model->getUpdatedAtColumn())) {
+            \is_null($this->model->getUpdatedAtColumn())) {
             return $values;
         }
 
         $column = $this->model->getUpdatedAtColumn();
 
-        if (! array_key_exists($column, $values)) {
+        if (! \array_key_exists($column, $values)) {
             $timestamp = $this->model->freshTimestampString();
 
             if (
@@ -1197,7 +1197,7 @@ class Builder implements BuilderContract
 
         foreach ($this->model->uniqueIds() as $uniqueIdAttribute) {
             foreach ($values as &$row) {
-                if (! array_key_exists($uniqueIdAttribute, $row)) {
+                if (! \array_key_exists($uniqueIdAttribute, $row)) {
                     $row = array_merge([$uniqueIdAttribute => $this->model->newUniqueId()], $row);
                 }
             }
@@ -1248,9 +1248,9 @@ class Builder implements BuilderContract
 
         $column = $this->model->getUpdatedAtColumn();
 
-        if (! is_null($column) &&
-            ! array_key_exists($column, $update) &&
-            ! in_array($column, $update)) {
+        if (! \is_null($column) &&
+            ! \array_key_exists($column, $update) &&
+            ! \in_array($column, $update)) {
             $update[] = $column;
         }
 
@@ -1265,7 +1265,7 @@ class Builder implements BuilderContract
     public function delete()
     {
         if (isset($this->onDelete)) {
-            return call_user_func($this->onDelete, $this);
+            return \call_user_func($this->onDelete, $this);
         }
 
         return $this->toBase()->delete();
@@ -1319,7 +1319,7 @@ class Builder implements BuilderContract
             // If the scope key is an integer, then the scope was passed as the value and
             // the parameter list is empty, so we will format the scope name and these
             // parameters here. Then, we'll be ready to call the scope on the model.
-            if (is_int($scope)) {
+            if (\is_int($scope)) {
                 [$scope, $parameters] = [$parameters, []];
             }
 
@@ -1388,12 +1388,12 @@ class Builder implements BuilderContract
         // We will keep track of how many wheres are on the query before running the
         // scope so that we can properly group the added scope constraints in the
         // query as their own isolated nested where statement and avoid issues.
-        $originalWhereCount = is_null($query->wheres)
-                    ? 0 : count($query->wheres);
+        $originalWhereCount = \is_null($query->wheres)
+                    ? 0 : \count($query->wheres);
 
         $result = $scope(...$parameters) ?? $this;
 
-        if (count((array) $query->wheres) > $originalWhereCount) {
+        if (\count((array) $query->wheres) > $originalWhereCount) {
             $this->addNewWheresWithinGroup($query, $originalWhereCount);
         }
 
@@ -1431,11 +1431,11 @@ class Builder implements BuilderContract
         $query->wheres = [];
 
         $this->groupWhereSliceForScope(
-            $query, array_slice($allWheres, 0, $originalWhereCount)
+            $query, \array_slice($allWheres, 0, $originalWhereCount)
         );
 
         $this->groupWhereSliceForScope(
-            $query, array_slice($allWheres, $originalWhereCount)
+            $query, \array_slice($allWheres, $originalWhereCount)
         );
     }
 
@@ -1490,7 +1490,7 @@ class Builder implements BuilderContract
         if ($callback instanceof Closure) {
             $eagerLoad = $this->parseWithRelations([$relations => $callback]);
         } else {
-            $eagerLoad = $this->parseWithRelations(is_string($relations) ? func_get_args() : $relations);
+            $eagerLoad = $this->parseWithRelations(\is_string($relations) ? \func_get_args() : $relations);
         }
 
         $this->eagerLoad = array_merge($this->eagerLoad, $eagerLoad);
@@ -1507,7 +1507,7 @@ class Builder implements BuilderContract
     public function without($relations)
     {
         $this->eagerLoad = array_diff_key($this->eagerLoad, array_flip(
-            is_string($relations) ? func_get_args() : $relations
+            \is_string($relations) ? \func_get_args() : $relations
         ));
 
         return $this;
@@ -1584,7 +1584,7 @@ class Builder implements BuilderContract
         // syntax, we shall loop over the nested relations and prepend each key of
         // this array while flattening into the traditional dot notation format.
         foreach ($relations as $key => $value) {
-            if (! is_string($key) || ! is_array($value)) {
+            if (! \is_string($key) || ! \is_array($value)) {
                 continue;
             }
 
@@ -1603,7 +1603,7 @@ class Builder implements BuilderContract
         // and may be a string or Closure. We'll loop over them and ensure all of
         // the present Closures are merged + strings are made into constraints.
         foreach ($relations as $key => $value) {
-            if (is_numeric($key) && is_string($value)) {
+            if (is_numeric($key) && \is_string($value)) {
                 [$key, $value] = $this->parseNameAndAttributeSelectionConstraint($value);
             }
 
@@ -1918,11 +1918,11 @@ class Builder implements BuilderContract
      */
     public function __get($key)
     {
-        if (in_array($key, ['orWhere', 'whereNot', 'orWhereNot'])) {
+        if (\in_array($key, ['orWhere', 'whereNot', 'orWhereNot'])) {
             return new HigherOrderBuilderProxy($this, $key);
         }
 
-        if (in_array($key, $this->propertyPassthru)) {
+        if (\in_array($key, $this->propertyPassthru)) {
             return $this->toBase()->{$key};
         }
 
@@ -1964,7 +1964,7 @@ class Builder implements BuilderContract
             return $this->callNamedScope($method, $parameters);
         }
 
-        if (in_array($method, $this->passthru)) {
+        if (\in_array($method, $this->passthru)) {
             return $this->toBase()->{$method}(...$parameters);
         }
 

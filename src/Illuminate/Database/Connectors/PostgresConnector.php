@@ -129,7 +129,7 @@ class PostgresConnector extends Connector implements ConnectorInterface
      */
     protected function quoteSearchPath($searchPath)
     {
-        return count($searchPath) === 1 ? '"'.$searchPath[0].'"' : '"'.implode('", "', $searchPath).'"';
+        return \count($searchPath) === 1 ? '"'.$searchPath[0].'"' : '"'.implode('", "', $searchPath).'"';
     }
 
     /**
@@ -174,7 +174,7 @@ class PostgresConnector extends Connector implements ConnectorInterface
         // If a port was specified, we will add it to this Postgres DSN connections
         // format. Once we have done that we are ready to return this connection
         // string back out for usage, as this has been fully constructed here.
-        if (! is_null($port)) {
+        if (! \is_null($port)) {
             $dsn .= ";port={$port}";
         }
 

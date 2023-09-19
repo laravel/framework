@@ -107,7 +107,7 @@ class BusBatchTest extends TestCase
                 $args[0] == $job &&
                 $args[1] == $secondJob &&
                 $args[2] instanceof CallQueuedClosure
-                && is_string($args[2]->batchId);
+                && \is_string($args[2]->batchId);
         }), '', 'test-queue');
 
         $batch = $batch->add([$job, $secondJob, $thirdJob]);

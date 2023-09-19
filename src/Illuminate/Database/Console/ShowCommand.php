@@ -79,7 +79,7 @@ class ShowCommand extends DatabaseInspectionCommand
         return collect($schema->listTables())->map(fn (Table $table, $index) => [
             'table' => $table->getName(),
             'size' => $this->getTableSize($connection, $table->getName()),
-            'rows' => $this->option('counts') ? $connection->table($table->getName())->count() : null,
+            'rows' => $this->option('counts') ? $connection->table($table->getName())->\count() : null,
             'engine' => rescue(fn () => $table->getOption('engine'), null, false),
             'comment' => $table->getComment(),
         ]);
@@ -99,7 +99,7 @@ class ShowCommand extends DatabaseInspectionCommand
                 ->startsWith(['pg_catalog', 'information_schema', 'spt_']))
             ->map(fn (View $view) => [
                 'view' => $view->getName(),
-                'rows' => $connection->table($view->getName())->count(),
+                'rows' => $connection->table($view->getName())->\count(),
             ]);
     }
 
@@ -146,7 +146,7 @@ class ShowCommand extends DatabaseInspectionCommand
         $this->components->twoColumnDetail('Username', Arr::get($platform['config'], 'username'));
         $this->components->twoColumnDetail('URL', Arr::get($platform['config'], 'url'));
         $this->components->twoColumnDetail('Open Connections', $platform['open_connections']);
-        $this->components->twoColumnDetail('Tables', $tables->count());
+        $this->components->twoColumnDetail('Tables', $tables->\count());
 
         if ($tableSizeSum = $tables->sum('size')) {
             $this->components->twoColumnDetail('Total Size', number_format($tableSizeSum / 1024 / 1024, 2).'MiB');

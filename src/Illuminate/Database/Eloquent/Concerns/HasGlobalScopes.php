@@ -20,12 +20,12 @@ trait HasGlobalScopes
      */
     public static function addGlobalScope($scope, $implementation = null)
     {
-        if (is_string($scope) && ($implementation instanceof Closure || $implementation instanceof Scope)) {
+        if (\is_string($scope) && ($implementation instanceof Closure || $implementation instanceof Scope)) {
             return static::$globalScopes[static::class][$scope] = $implementation;
         } elseif ($scope instanceof Closure) {
             return static::$globalScopes[static::class][spl_object_hash($scope)] = $scope;
         } elseif ($scope instanceof Scope) {
-            return static::$globalScopes[static::class][get_class($scope)] = $scope;
+            return static::$globalScopes[static::class][\get_class($scope)] = $scope;
         }
 
         throw new InvalidArgumentException('Global scope must be an instance of Closure or Scope.');
@@ -39,7 +39,7 @@ trait HasGlobalScopes
      */
     public static function hasGlobalScope($scope)
     {
-        return ! is_null(static::getGlobalScope($scope));
+        return ! \is_null(static::getGlobalScope($scope));
     }
 
     /**
@@ -50,12 +50,12 @@ trait HasGlobalScopes
      */
     public static function getGlobalScope($scope)
     {
-        if (is_string($scope)) {
+        if (\is_string($scope)) {
             return Arr::get(static::$globalScopes, static::class.'.'.$scope);
         }
 
         return Arr::get(
-            static::$globalScopes, static::class.'.'.get_class($scope)
+            static::$globalScopes, static::class.'.'.\get_class($scope)
         );
     }
 

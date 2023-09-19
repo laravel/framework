@@ -297,7 +297,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         foreach (class_uses_recursive($class) as $trait) {
             $method = 'boot'.class_basename($trait);
 
-            if (method_exists($class, $method) && ! in_array($method, $booted)) {
+            if (method_exists($class, $method) && ! \in_array($method, $booted)) {
                 forward_static_call([$class, $method]);
 
                 $booted[] = $method;
@@ -519,27 +519,27 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
                 $this->setAttribute($key, $value);
             } elseif ($totallyGuarded || static::preventsSilentlyDiscardingAttributes()) {
                 if (isset(static::$discardedAttributeViolationCallback)) {
-                    call_user_func(static::$discardedAttributeViolationCallback, $this, [$key]);
+                    \call_user_func(static::$discardedAttributeViolationCallback, $this, [$key]);
                 } else {
                     throw new MassAssignmentException(sprintf(
                         'Add [%s] to fillable property to allow mass assignment on [%s].',
-                        $key, get_class($this)
+                        $key, \get_class($this)
                     ));
                 }
             }
         }
 
-        if (count($attributes) !== count($fillable) &&
+        if (\count($attributes) !== \count($fillable) &&
             static::preventsSilentlyDiscardingAttributes()) {
             $keys = array_diff(array_keys($attributes), array_keys($fillable));
 
             if (isset(static::$discardedAttributeViolationCallback)) {
-                call_user_func(static::$discardedAttributeViolationCallback, $this, $keys);
+                \call_user_func(static::$discardedAttributeViolationCallback, $this, $keys);
             } else {
                 throw new MassAssignmentException(sprintf(
                     'Add fillable property [%s] to allow mass assignment on [%s].',
                     implode(', ', $keys),
-                    get_class($this)
+                    \get_class($this)
                 ));
             }
         }
@@ -672,7 +672,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     public static function all($columns = ['*'])
     {
         return static::query()->get(
-            is_array($columns) ? $columns : func_get_args()
+            \is_array($columns) ? $columns : \func_get_args()
         );
     }
 
@@ -685,7 +685,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     public static function with($relations)
     {
         return static::query()->with(
-            is_string($relations) ? func_get_args() : $relations
+            \is_string($relations) ? \func_get_args() : $relations
         );
     }
 
@@ -698,7 +698,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     public function load($relations)
     {
         $query = $this->newQueryWithoutRelationships()->with(
-            is_string($relations) ? func_get_args() : $relations
+            \is_string($relations) ? \func_get_args() : $relations
         );
 
         $query->eagerLoadRelations([$this]);
@@ -719,7 +719,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
             return $this;
         }
 
-        $className = get_class($this->{$relation});
+        $className = \get_class($this->{$relation});
 
         $this->{$relation}->load($relations[$className] ?? []);
 
@@ -734,7 +734,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function loadMissing($relations)
     {
-        $relations = is_string($relations) ? func_get_args() : $relations;
+        $relations = \is_string($relations) ? \func_get_args() : $relations;
 
         $this->newCollection([$this])->loadMissing($relations);
 
@@ -764,7 +764,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function loadCount($relations)
     {
-        $relations = is_string($relations) ? func_get_args() : $relations;
+        $relations = \is_string($relations) ? \func_get_args() : $relations;
 
         return $this->loadAggregate($relations, '*', 'count');
     }
@@ -843,7 +843,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
             return $this;
         }
 
-        $className = get_class($this->{$relation});
+        $className = \get_class($this->{$relation});
 
         $this->{$relation}->loadAggregate($relations[$className] ?? [], $column, $function);
 
@@ -1209,7 +1209,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         // models are updated, giving them a chance to do any special processing.
         $dirty = $this->getDirty();
 
-        if (count($dirty) > 0) {
+        if (\count($dirty) > 0) {
             $this->setKeysForSaveQuery($query)->update($dirty);
 
             $this->syncChanges();
@@ -1351,9 +1351,9 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
             $ids = $ids->all();
         }
 
-        $ids = is_array($ids) ? $ids : func_get_args();
+        $ids = \is_array($ids) ? $ids : \func_get_args();
 
-        if (count($ids) === 0) {
+        if (\count($ids) === 0) {
             return 0;
         }
 
@@ -1384,7 +1384,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     {
         $this->mergeAttributesFromCachedCasts();
 
-        if (is_null($this->getKeyName())) {
+        if (\is_null($this->getKeyName())) {
             throw new LogicException('No primary key defined on model.');
         }
 
@@ -1679,7 +1679,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
 
         return $this->setKeysForSelectQuery($this->newQueryWithoutScopes())
             ->useWritePdo()
-            ->with(is_string($with) ? func_get_args() : $with)
+            ->with(\is_string($with) ? \func_get_args() : $with)
             ->first();
     }
 
@@ -1703,7 +1703,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
 
         $this->load(collect($this->relations)->reject(function ($relation) {
             return $relation instanceof Pivot
-                || (is_object($relation) && in_array(AsPivot::class, class_uses_recursive($relation), true));
+                || (\is_object($relation) && \in_array(AsPivot::class, class_uses_recursive($relation), true));
         })->keys()->all());
 
         $this->syncOriginal();
@@ -1757,7 +1757,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function is($model)
     {
-        return ! is_null($model) &&
+        return ! \is_null($model) &&
             $this->getKey() === $model->getKey() &&
             $this->getTable() === $model->getTable() &&
             $this->getConnectionName() === $model->getConnectionName();
@@ -2201,7 +2201,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function broadcastChannelRoute()
     {
-        return str_replace('\\', '.', get_class($this)).'.{'.Str::camel(class_basename($this)).'}';
+        return str_replace('\\', '.', \get_class($this)).'.{'.Str::camel(class_basename($this)).'}';
     }
 
     /**
@@ -2211,7 +2211,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function broadcastChannel()
     {
-        return str_replace('\\', '.', get_class($this)).'.'.$this->getKey();
+        return str_replace('\\', '.', \get_class($this)).'.'.$this->getKey();
     }
 
     /**
@@ -2246,7 +2246,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     public function offsetExists($offset): bool
     {
         try {
-            return ! is_null($this->getAttribute($offset));
+            return ! \is_null($this->getAttribute($offset));
         } catch (MissingAttributeException) {
             return false;
         }
@@ -2317,7 +2317,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function __call($method, $parameters)
     {
-        if (in_array($method, ['increment', 'decrement', 'incrementQuietly', 'decrementQuietly'])) {
+        if (\in_array($method, ['increment', 'decrement', 'incrementQuietly', 'decrementQuietly'])) {
             return $this->$method(...$parameters);
         }
 

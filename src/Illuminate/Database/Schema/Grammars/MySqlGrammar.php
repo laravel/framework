@@ -144,7 +144,7 @@ class MySqlGrammar extends Grammar
         // table is being created on. We will add these to the create table query.
         if (isset($blueprint->charset)) {
             $sql .= ' default character set '.$blueprint->charset;
-        } elseif (! is_null($charset = $connection->getConfig('charset'))) {
+        } elseif (! \is_null($charset = $connection->getConfig('charset'))) {
             $sql .= ' default character set '.$charset;
         }
 
@@ -153,7 +153,7 @@ class MySqlGrammar extends Grammar
         // connection that the query is targeting. We'll add it to this SQL query.
         if (isset($blueprint->collation)) {
             $sql .= " collate '{$blueprint->collation}'";
-        } elseif (! is_null($collation = $connection->getConfig('collation'))) {
+        } elseif (! \is_null($collation = $connection->getConfig('collation'))) {
             $sql .= " collate '{$collation}'";
         }
 
@@ -172,7 +172,7 @@ class MySqlGrammar extends Grammar
     {
         if (isset($blueprint->engine)) {
             return $sql.' engine = '.$blueprint->engine;
-        } elseif (! is_null($engine = $connection->getConfig('engine'))) {
+        } elseif (! \is_null($engine = $connection->getConfig('engine'))) {
             return $sql.' engine = '.$engine;
         }
 
@@ -247,10 +247,10 @@ class MySqlGrammar extends Grammar
 
         foreach ($blueprint->getChangedColumns() as $column) {
             $sql = sprintf('%s %s%s %s',
-                is_null($column->renameTo) ? 'modify' : 'change',
+                \is_null($column->renameTo) ? 'modify' : 'change',
                 $this->wrap($column),
-                is_null($column->renameTo) ? '' : ' '.$this->wrap($column->renameTo),
-                $this->getType($column)
+                \is_null($column->renameTo) ? '' : ' '.$this->wrap($column->renameTo),
+                $this->\gettype($column)
             );
 
             $columns[] = $this->addModifiers($sql, $blueprint, $column);
@@ -1040,7 +1040,7 @@ class MySqlGrammar extends Grammar
      */
     protected function modifyVirtualAs(Blueprint $blueprint, Fluent $column)
     {
-        if (! is_null($virtualAs = $column->virtualAsJson)) {
+        if (! \is_null($virtualAs = $column->virtualAsJson)) {
             if ($this->isJsonSelector($virtualAs)) {
                 $virtualAs = $this->wrapJsonSelector($virtualAs);
             }
@@ -1048,7 +1048,7 @@ class MySqlGrammar extends Grammar
             return " as ({$virtualAs})";
         }
 
-        if (! is_null($virtualAs = $column->virtualAs)) {
+        if (! \is_null($virtualAs = $column->virtualAs)) {
             return " as ({$virtualAs})";
         }
     }
@@ -1062,7 +1062,7 @@ class MySqlGrammar extends Grammar
      */
     protected function modifyStoredAs(Blueprint $blueprint, Fluent $column)
     {
-        if (! is_null($storedAs = $column->storedAsJson)) {
+        if (! \is_null($storedAs = $column->storedAsJson)) {
             if ($this->isJsonSelector($storedAs)) {
                 $storedAs = $this->wrapJsonSelector($storedAs);
             }
@@ -1070,7 +1070,7 @@ class MySqlGrammar extends Grammar
             return " as ({$storedAs}) stored";
         }
 
-        if (! is_null($storedAs = $column->storedAs)) {
+        if (! \is_null($storedAs = $column->storedAs)) {
             return " as ({$storedAs}) stored";
         }
     }
@@ -1098,7 +1098,7 @@ class MySqlGrammar extends Grammar
      */
     protected function modifyCharset(Blueprint $blueprint, Fluent $column)
     {
-        if (! is_null($column->charset)) {
+        if (! \is_null($column->charset)) {
             return ' character set '.$column->charset;
         }
     }
@@ -1112,7 +1112,7 @@ class MySqlGrammar extends Grammar
      */
     protected function modifyCollate(Blueprint $blueprint, Fluent $column)
     {
-        if (! is_null($column->collation)) {
+        if (! \is_null($column->collation)) {
             return " collate '{$column->collation}'";
         }
     }
@@ -1126,10 +1126,10 @@ class MySqlGrammar extends Grammar
      */
     protected function modifyNullable(Blueprint $blueprint, Fluent $column)
     {
-        if (is_null($column->virtualAs) &&
-            is_null($column->virtualAsJson) &&
-            is_null($column->storedAs) &&
-            is_null($column->storedAsJson)) {
+        if (\is_null($column->virtualAs) &&
+            \is_null($column->virtualAsJson) &&
+            \is_null($column->storedAs) &&
+            \is_null($column->storedAsJson)) {
             return $column->nullable ? ' null' : ' not null';
         }
 
@@ -1147,7 +1147,7 @@ class MySqlGrammar extends Grammar
      */
     protected function modifyInvisible(Blueprint $blueprint, Fluent $column)
     {
-        if (! is_null($column->invisible)) {
+        if (! \is_null($column->invisible)) {
             return ' invisible';
         }
     }
@@ -1161,7 +1161,7 @@ class MySqlGrammar extends Grammar
      */
     protected function modifyDefault(Blueprint $blueprint, Fluent $column)
     {
-        if (! is_null($column->default)) {
+        if (! \is_null($column->default)) {
             return ' default '.$this->getDefaultValue($column->default);
         }
     }
@@ -1175,7 +1175,7 @@ class MySqlGrammar extends Grammar
      */
     protected function modifyOnUpdate(Blueprint $blueprint, Fluent $column)
     {
-        if (! is_null($column->onUpdate)) {
+        if (! \is_null($column->onUpdate)) {
             return ' on update '.$this->getValue($column->onUpdate);
         }
     }
@@ -1189,7 +1189,7 @@ class MySqlGrammar extends Grammar
      */
     protected function modifyIncrement(Blueprint $blueprint, Fluent $column)
     {
-        if (in_array($column->type, $this->serials) && $column->autoIncrement) {
+        if (\in_array($column->type, $this->serials) && $column->autoIncrement) {
             return ' auto_increment primary key';
         }
     }
@@ -1203,7 +1203,7 @@ class MySqlGrammar extends Grammar
      */
     protected function modifyFirst(Blueprint $blueprint, Fluent $column)
     {
-        if (! is_null($column->first)) {
+        if (! \is_null($column->first)) {
             return ' first';
         }
     }
@@ -1217,7 +1217,7 @@ class MySqlGrammar extends Grammar
      */
     protected function modifyAfter(Blueprint $blueprint, Fluent $column)
     {
-        if (! is_null($column->after)) {
+        if (! \is_null($column->after)) {
             return ' after '.$this->wrap($column->after);
         }
     }
@@ -1231,7 +1231,7 @@ class MySqlGrammar extends Grammar
      */
     protected function modifyComment(Blueprint $blueprint, Fluent $column)
     {
-        if (! is_null($column->comment)) {
+        if (! \is_null($column->comment)) {
             return " comment '".addslashes($column->comment)."'";
         }
     }
@@ -1245,7 +1245,7 @@ class MySqlGrammar extends Grammar
      */
     protected function modifySrid(Blueprint $blueprint, Fluent $column)
     {
-        if (is_int($column->srid) && $column->srid > 0) {
+        if (\is_int($column->srid) && $column->srid > 0) {
             return ' srid '.$column->srid;
         }
     }

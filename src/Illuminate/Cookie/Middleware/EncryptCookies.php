@@ -101,7 +101,7 @@ class EncryptCookies
      */
     protected function validateValue(string $key, $value)
     {
-        return is_array($value)
+        return \is_array($value)
                     ? $this->validateArray($key, $value)
                     : CookieValuePrefix::validate($key, $value, $this->encrypter->getKey());
     }
@@ -133,7 +133,7 @@ class EncryptCookies
      */
     protected function decryptCookie($name, $cookie)
     {
-        return is_array($cookie)
+        return \is_array($cookie)
                         ? $this->decryptArray($cookie)
                         : $this->encrypter->decrypt($cookie, static::serialized($name));
     }
@@ -149,11 +149,11 @@ class EncryptCookies
         $decrypted = [];
 
         foreach ($cookie as $key => $value) {
-            if (is_string($value)) {
+            if (\is_string($value)) {
                 $decrypted[$key] = $this->encrypter->decrypt($value, static::serialized($key));
             }
 
-            if (is_array($value)) {
+            if (\is_array($value)) {
                 $decrypted[$key] = $this->decryptArray($value);
             }
         }
@@ -210,7 +210,7 @@ class EncryptCookies
      */
     public function isDisabled($name)
     {
-        return in_array($name, $this->except);
+        return \in_array($name, $this->except);
     }
 
     /**

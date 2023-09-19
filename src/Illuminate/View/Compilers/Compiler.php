@@ -128,8 +128,8 @@ abstract class Compiler
      */
     protected function ensureCompiledDirectoryExists($path)
     {
-        if (! $this->files->exists(dirname($path))) {
-            $this->files->makeDirectory(dirname($path), 0777, true, true);
+        if (! $this->files->exists(\dirname($path))) {
+            $this->files->makeDirectory(\dirname($path), 0777, true, true);
         }
     }
 }

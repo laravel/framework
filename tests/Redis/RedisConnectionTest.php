@@ -601,7 +601,7 @@ class RedisConnectionTest extends TestCase
             do {
                 [$cursor, $returnedKeys] = $redis->scan($iterator);
 
-                if (! is_array($returnedKeys)) {
+                if (! \is_array($returnedKeys)) {
                     $returnedKeys = [$returnedKeys];
                 }
 
@@ -629,7 +629,7 @@ class RedisConnectionTest extends TestCase
             do {
                 [$iterator, $returnedMembers] = $redis->zscan('set', $iterator);
 
-                if (! is_array($returnedMembers)) {
+                if (! \is_array($returnedMembers)) {
                     $returnedMembers = [$returnedMembers];
                 }
 
@@ -853,7 +853,7 @@ class RedisConnectionTest extends TestCase
             ],
         ]))->connection();
 
-        if (defined('Redis::COMPRESSION_LZF')) {
+        if (\defined('Redis::COMPRESSION_LZF')) {
             $connections['compression_lzf'] = (new RedisManager(new Application, 'phpredis', [
                 'cluster' => false,
                 'default' => [
@@ -869,7 +869,7 @@ class RedisConnectionTest extends TestCase
             ]))->connection();
         }
 
-        if (defined('Redis::COMPRESSION_ZSTD')) {
+        if (\defined('Redis::COMPRESSION_ZSTD')) {
             $connections['compression_zstd'] = (new RedisManager(new Application, 'phpredis', [
                 'cluster' => false,
                 'default' => [
@@ -930,7 +930,7 @@ class RedisConnectionTest extends TestCase
             ]))->connection();
         }
 
-        if (defined('Redis::COMPRESSION_LZ4')) {
+        if (\defined('Redis::COMPRESSION_LZ4')) {
             $connections['compression_lz4'] = (new RedisManager(new Application, 'phpredis', [
                 'cluster' => false,
                 'default' => [

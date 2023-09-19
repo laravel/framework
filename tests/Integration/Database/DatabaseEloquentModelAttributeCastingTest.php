@@ -362,14 +362,14 @@ class TestEloquentModelWithAttributeCast extends Model
     {
         return new Attribute(
             function ($value, $attributes) {
-                if (is_null($attributes['address_line_one'])) {
+                if (\is_null($attributes['address_line_one'])) {
                     return;
                 }
 
                 return new AttributeCastAddress($attributes['address_line_one'], $attributes['address_line_two']);
             },
             function ($value) {
-                if (is_null($value)) {
+                if (\is_null($value)) {
                     return [
                         'address_line_one' => null,
                         'address_line_two' => null,

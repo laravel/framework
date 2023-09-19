@@ -140,7 +140,7 @@ class ViewMakeCommand extends GeneratorCommand
             File::get($this->getTestStub()),
         );
 
-        File::ensureDirectoryExists(dirname($this->getTestPath()), 0755, true);
+        File::ensureDirectoryExists(\dirname($this->getTestPath()), 0755, true);
 
         return File::put($this->getTestPath(), $contents);
     }

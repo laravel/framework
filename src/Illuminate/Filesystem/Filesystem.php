@@ -220,10 +220,10 @@ class Filesystem
 
         $path = realpath($path) ?: $path;
 
-        $tempPath = tempnam(dirname($path), basename($path));
+        $tempPath = tempnam(\dirname($path), basename($path));
 
         // Fix permissions of tempPath because `tempnam()` creates it with permissions set to 0600...
-        if (! is_null($mode)) {
+        if (! \is_null($mode)) {
             chmod($tempPath, $mode);
         } else {
             chmod($tempPath, 0777 - umask());
@@ -299,7 +299,7 @@ class Filesystem
      */
     public function delete($paths)
     {
-        $paths = is_array($paths) ? $paths : func_get_args();
+        $paths = \is_array($paths) ? $paths : \func_get_args();
 
         $success = true;
 
@@ -377,7 +377,7 @@ class Filesystem
             );
         }
 
-        $relativeTarget = (new SymfonyFilesystem)->makePathRelative($target, dirname($link));
+        $relativeTarget = (new SymfonyFilesystem)->makePathRelative($target, \dirname($link));
 
         $this->link($this->isFile($target) ? rtrim($relativeTarget, '/') : $relativeTarget, $link);
     }
@@ -410,7 +410,7 @@ class Filesystem
      * @param  string  $path
      * @return string
      */
-    public function dirname($path)
+    public function \dirname($path)
     {
         return pathinfo($path, PATHINFO_DIRNAME);
     }

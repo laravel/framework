@@ -85,7 +85,7 @@ abstract class Broadcaster implements BroadcasterContract
     {
         if ($channel instanceof HasBroadcastChannel) {
             $channel = $channel->broadcastChannelRoute();
-        } elseif (is_string($channel) && class_exists($channel) && is_a($channel, HasBroadcastChannel::class, true)) {
+        } elseif (\is_string($channel) && class_exists($channel) && is_a($channel, HasBroadcastChannel::class, true)) {
             $channel = (new $channel)->broadcastChannelRoute();
         }
 
@@ -157,9 +157,9 @@ abstract class Broadcaster implements BroadcasterContract
      */
     protected function extractParameters($callback)
     {
-        if (is_callable($callback)) {
+        if (\is_callable($callback)) {
             return (new ReflectionFunction($callback))->getParameters();
-        } elseif (is_string($callback)) {
+        } elseif (\is_string($callback)) {
             return $this->extractParametersFromClass($callback);
         }
 
@@ -228,7 +228,7 @@ abstract class Broadcaster implements BroadcasterContract
         $binder = $this->binder();
 
         if ($binder && $binder->getBindingCallback($key)) {
-            return call_user_func($binder->getBindingCallback($key), $value);
+            return \call_user_func($binder->getBindingCallback($key), $value);
         }
 
         return $value;
@@ -253,7 +253,7 @@ abstract class Broadcaster implements BroadcasterContract
 
             $className = Reflector::getParameterClassName($parameter);
 
-            if (is_null($model = (new $className)->resolveRouteBinding($value))) {
+            if (\is_null($model = (new $className)->resolveRouteBinding($value))) {
                 throw new AccessDeniedHttpException;
             }
 
@@ -312,7 +312,7 @@ abstract class Broadcaster implements BroadcasterContract
      */
     protected function normalizeChannelHandlerToCallable($callback)
     {
-        return is_callable($callback) ? $callback : function (...$args) use ($callback) {
+        return \is_callable($callback) ? $callback : function (...$args) use ($callback) {
             return Container::getInstance()
                 ->make($callback)
                 ->join(...$args);
@@ -332,7 +332,7 @@ abstract class Broadcaster implements BroadcasterContract
 
         $guards = $options['guards'] ?? null;
 
-        if (is_null($guards)) {
+        if (\is_null($guards)) {
             return $request->user();
         }
 

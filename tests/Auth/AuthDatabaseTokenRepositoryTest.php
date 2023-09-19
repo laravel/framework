@@ -34,7 +34,7 @@ class AuthDatabaseTokenRepositoryTest extends TestCase
         $results = $repo->create($user);
 
         $this->assertIsString($results);
-        $this->assertGreaterThan(1, strlen($results));
+        $this->assertGreaterThan(1, \strlen($results));
     }
 
     public function testExistReturnsFalseIfNoRowFoundForUser()

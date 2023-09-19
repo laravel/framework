@@ -52,7 +52,7 @@ class EloquentWhereTest extends DatabaseTestCase
         $this->assertSame(
             1,
             UserWhereTest::where(['name' => 'test-name', 'email' => 'test-email1'])
-                ->orWhere(['name' => 'test-name1', 'address' => 'wrong-address'])->count()
+                ->orWhere(['name' => 'test-name1', 'address' => 'wrong-address'])->\count()
         );
 
         $this->assertTrue(

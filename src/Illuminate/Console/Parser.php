@@ -20,7 +20,7 @@ class Parser
     {
         $name = static::name($expression);
 
-        if (preg_match_all('/\{\s*(.*?)\s*\}/', $expression, $matches) && count($matches[1])) {
+        if (preg_match_all('/\{\s*(.*?)\s*\}/', $expression, $matches) && \count($matches[1])) {
             return array_merge([$name], static::parameters($matches[1]));
         }
 
@@ -136,6 +136,6 @@ class Parser
     {
         $parts = preg_split('/\s+:\s+/', trim($token), 2);
 
-        return count($parts) === 2 ? $parts : [$token, ''];
+        return \count($parts) === 2 ? $parts : [$token, ''];
     }
 }

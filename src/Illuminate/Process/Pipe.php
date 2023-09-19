@@ -65,7 +65,7 @@ class Pipe
      */
     public function run(?callable $output = null)
     {
-        call_user_func($this->callback, $this);
+        \call_user_func($this->callback, $this);
 
         return collect($this->pendingProcesses)
                 ->reduce(function ($previousProcessResult, $pendingProcess, $key) use ($output) {

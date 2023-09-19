@@ -45,7 +45,7 @@ if (isset($data['secret']) && $_SERVER['REQUEST_URI'] === '/'.$data['secret']) {
 if (isset($_COOKIE['laravel_maintenance']) && isset($data['secret'])) {
     $payload = json_decode(base64_decode($_COOKIE['laravel_maintenance']), true);
 
-    if (is_array($payload) &&
+    if (\is_array($payload) &&
         is_numeric($payload['expires_at'] ?? null) &&
         isset($payload['mac']) &&
         hash_equals(hash_hmac('sha256', $payload['expires_at'], $data['secret']), $payload['mac']) &&

@@ -193,7 +193,7 @@ class QueuedEventsTest extends TestCase
         $d->dispatch('some.event', ['foo', 'bar']);
 
         $fakeQueue->assertPushed(CallQueuedListener::class, function ($job) {
-            return count($job->middleware) === 1
+            return \count($job->middleware) === 1
                 && $job->middleware[0] instanceof TestMiddleware
                 && $job->middleware[0]->a === 'foo'
                 && $job->middleware[0]->b === 'bar';

@@ -89,7 +89,7 @@ class Factory
     {
         $this->recording = true;
 
-        if (is_null($callback)) {
+        if (\is_null($callback)) {
             $this->fakeHandlers = ['*' => fn () => new FakeProcessResult];
 
             return $this;
@@ -181,12 +181,12 @@ class Factory
      */
     public function assertRan(Closure|string $callback)
     {
-        $callback = is_string($callback) ? fn ($process) => $process->command === $callback : $callback;
+        $callback = \is_string($callback) ? fn ($process) => $process->command === $callback : $callback;
 
         PHPUnit::assertTrue(
             collect($this->recorded)->filter(function ($pair) use ($callback) {
                 return $callback($pair[0], $pair[1]);
-            })->count() > 0,
+            })->\count() > 0,
             'An expected process was not invoked.'
         );
 
@@ -202,11 +202,11 @@ class Factory
      */
     public function assertRanTimes(Closure|string $callback, int $times = 1)
     {
-        $callback = is_string($callback) ? fn ($process) => $process->command === $callback : $callback;
+        $callback = \is_string($callback) ? fn ($process) => $process->command === $callback : $callback;
 
         $count = collect($this->recorded)->filter(function ($pair) use ($callback) {
             return $callback($pair[0], $pair[1]);
-        })->count();
+        })->\count();
 
         PHPUnit::assertSame(
             $times, $count,
@@ -224,12 +224,12 @@ class Factory
      */
     public function assertNotRan(Closure|string $callback)
     {
-        $callback = is_string($callback) ? fn ($process) => $process->command === $callback : $callback;
+        $callback = \is_string($callback) ? fn ($process) => $process->command === $callback : $callback;
 
         PHPUnit::assertTrue(
             collect($this->recorded)->filter(function ($pair) use ($callback) {
                 return $callback($pair[0], $pair[1]);
-            })->count() === 0,
+            })->\count() === 0,
             'An unexpected process was invoked.'
         );
 
@@ -281,7 +281,7 @@ class Factory
      */
     public function pipe(callable|array $callback, ?callable $output = null)
     {
-        return is_array($callback)
+        return \is_array($callback)
             ? (new Pipe($this, fn ($pipe) => collect($callback)->each(
                 fn ($command) => $pipe->command($command)
             )))->run(output: $output)

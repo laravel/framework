@@ -86,9 +86,9 @@ class ResourceCollection extends JsonResource implements Countable, IteratorAggr
      *
      * @return int
      */
-    public function count(): int
+    public function \count(): int
     {
-        return $this->collection->count();
+        return $this->collection->\count();
     }
 
     /**
@@ -127,7 +127,7 @@ class ResourceCollection extends JsonResource implements Countable, IteratorAggr
     {
         if ($this->preserveAllQueryParameters) {
             $this->resource->appends($request->query());
-        } elseif (! is_null($this->queryParameters)) {
+        } elseif (! \is_null($this->queryParameters)) {
             $this->resource->appends($this->queryParameters);
         }
 

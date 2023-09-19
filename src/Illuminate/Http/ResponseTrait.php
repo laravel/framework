@@ -106,7 +106,7 @@ trait ResponseTrait
      */
     public function cookie($cookie)
     {
-        return $this->withCookie(...func_get_args());
+        return $this->withCookie(...\func_get_args());
     }
 
     /**
@@ -117,8 +117,8 @@ trait ResponseTrait
      */
     public function withCookie($cookie)
     {
-        if (is_string($cookie) && function_exists('cookie')) {
-            $cookie = cookie(...func_get_args());
+        if (\is_string($cookie) && \function_exists('cookie')) {
+            $cookie = cookie(...\func_get_args());
         }
 
         $this->headers->setCookie($cookie);
@@ -136,7 +136,7 @@ trait ResponseTrait
      */
     public function withoutCookie($cookie, $path = null, $domain = null)
     {
-        if (is_string($cookie) && function_exists('cookie')) {
+        if (\is_string($cookie) && \function_exists('cookie')) {
             $cookie = cookie($cookie, null, -2628000, $path, $domain);
         }
 

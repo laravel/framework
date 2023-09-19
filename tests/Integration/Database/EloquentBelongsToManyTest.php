@@ -167,7 +167,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         $pivot->tag_id = 2;
         $pivot->save();
 
-        $this->assertEquals(1, PostTagPivot::count());
+        $this->assertEquals(1, PostTagPivot::\count());
         $this->assertEquals(1, PostTagPivot::first()->post_id);
         $this->assertEquals(2, PostTagPivot::first()->tag_id);
     }

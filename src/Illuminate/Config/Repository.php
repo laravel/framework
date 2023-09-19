@@ -49,7 +49,7 @@ class Repository implements ArrayAccess, ConfigContract
      */
     public function get($key, $default = null)
     {
-        if (is_array($key)) {
+        if (\is_array($key)) {
             return $this->getMany($key);
         }
 
@@ -86,7 +86,7 @@ class Repository implements ArrayAccess, ConfigContract
      */
     public function set($key, $value = null)
     {
-        $keys = is_array($key) ? $key : [$key => $value];
+        $keys = \is_array($key) ? $key : [$key => $value];
 
         foreach ($keys as $key => $value) {
             Arr::set($this->items, $key, $value);

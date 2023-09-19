@@ -86,18 +86,18 @@ class ValidationRuleParser
      */
     protected function explodeExplicitRule($rule, $attribute)
     {
-        if (is_string($rule)) {
+        if (\is_string($rule)) {
             return explode('|', $rule);
         }
 
-        if (is_object($rule)) {
+        if (\is_object($rule)) {
             return Arr::wrap($this->prepareRule($rule, $attribute));
         }
 
         return array_map(
             [$this, 'prepareRule'],
             $rule,
-            array_fill((int) array_key_first($rule), count($rule), $attribute)
+            array_fill((int) array_key_first($rule), \count($rule), $attribute)
         );
     }
 
@@ -118,7 +118,7 @@ class ValidationRuleParser
             $rule = InvokableValidationRule::make($rule);
         }
 
-        if (! is_object($rule) ||
+        if (! \is_object($rule) ||
             $rule instanceof RuleContract ||
             ($rule instanceof Exists && $rule->queryCallbacks()) ||
             ($rule instanceof Unique && $rule->queryCallbacks())) {
@@ -183,7 +183,7 @@ class ValidationRuleParser
      */
     public function mergeRules($results, $attribute, $rules = [])
     {
-        if (is_array($attribute)) {
+        if (\is_array($attribute)) {
             foreach ((array) $attribute as $innerAttribute => $innerRules) {
                 $results = $this->mergeRulesForAttribute($results, $innerAttribute, $innerRules);
             }
@@ -227,7 +227,7 @@ class ValidationRuleParser
             return [$rule, []];
         }
 
-        if (is_array($rule)) {
+        if (\is_array($rule)) {
             $rule = static::parseArrayRule($rule);
         } else {
             $rule = static::parseStringRule($rule);
@@ -246,7 +246,7 @@ class ValidationRuleParser
      */
     protected static function parseArrayRule(array $rule)
     {
-        return [Str::studly(trim(Arr::get($rule, 0, ''))), array_slice($rule, 1)];
+        return [Str::studly(trim(Arr::get($rule, 0, ''))), \array_slice($rule, 1)];
     }
 
     /**
@@ -291,7 +291,7 @@ class ValidationRuleParser
      */
     protected static function ruleIsRegex($rule)
     {
-        return in_array(strtolower($rule), ['regex', 'not_regex', 'notregex'], true);
+        return \in_array(strtolower($rule), ['regex', 'not_regex', 'notregex'], true);
     }
 
     /**
@@ -319,7 +319,7 @@ class ValidationRuleParser
     public static function filterConditionalRules($rules, array $data = [])
     {
         return collect($rules)->mapWithKeys(function ($attributeRules, $attribute) use ($data) {
-            if (! is_array($attributeRules) &&
+            if (! \is_array($attributeRules) &&
                 ! $attributeRules instanceof ConditionalRules) {
                 return [$attribute => $attributeRules];
             }

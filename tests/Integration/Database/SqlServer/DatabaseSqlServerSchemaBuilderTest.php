@@ -32,7 +32,7 @@ class DatabaseSqlServerSchemaBuilderTest extends SqlServerTestCase
         $rows = Schema::getAllTables();
 
         $this->assertContainsOnlyInstancesOf(stdClass::class, $rows);
-        $this->assertGreaterThanOrEqual(2, count($rows));
+        $this->assertGreaterThanOrEqual(2, \count($rows));
         $this->assertTrue(
             collect($rows)->contains(fn ($row) => $row->name === 'migrations' && $row->type === 'U '),
             'Failed asserting that table "migrations" was returned.'

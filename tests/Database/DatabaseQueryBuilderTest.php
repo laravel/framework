@@ -1343,40 +1343,40 @@ class DatabaseQueryBuilderTest extends TestCase
 
     public function testUnionAggregate()
     {
-        $expected = 'select count(*) as aggregate from ((select * from `posts`) union (select * from `videos`)) as `temp_table`';
+        $expected = 'select \count(*) as aggregate from ((select * from `posts`) union (select * from `videos`)) as `temp_table`';
         $builder = $this->getMySqlBuilder();
         $builder->getConnection()->shouldReceive('select')->once()->with($expected, [], true);
         $builder->getProcessor()->shouldReceive('processSelect')->once();
-        $builder->from('posts')->union($this->getMySqlBuilder()->from('videos'))->count();
+        $builder->from('posts')->union($this->getMySqlBuilder()->from('videos'))->\count();
 
-        $expected = 'select count(*) as aggregate from ((select `id` from `posts`) union (select `id` from `videos`)) as `temp_table`';
+        $expected = 'select \count(*) as aggregate from ((select `id` from `posts`) union (select `id` from `videos`)) as `temp_table`';
         $builder = $this->getMySqlBuilder();
         $builder->getConnection()->shouldReceive('select')->once()->with($expected, [], true);
         $builder->getProcessor()->shouldReceive('processSelect')->once();
-        $builder->from('posts')->select('id')->union($this->getMySqlBuilder()->from('videos')->select('id'))->count();
+        $builder->from('posts')->select('id')->union($this->getMySqlBuilder()->from('videos')->select('id'))->\count();
 
-        $expected = 'select count(*) as aggregate from ((select * from "posts") union (select * from "videos")) as "temp_table"';
+        $expected = 'select \count(*) as aggregate from ((select * from "posts") union (select * from "videos")) as "temp_table"';
         $builder = $this->getPostgresBuilder();
         $builder->getConnection()->shouldReceive('select')->once()->with($expected, [], true);
         $builder->getProcessor()->shouldReceive('processSelect')->once();
-        $builder->from('posts')->union($this->getPostgresBuilder()->from('videos'))->count();
+        $builder->from('posts')->union($this->getPostgresBuilder()->from('videos'))->\count();
 
-        $expected = 'select count(*) as aggregate from (select * from (select * from "posts") union select * from (select * from "videos")) as "temp_table"';
+        $expected = 'select \count(*) as aggregate from (select * from (select * from "posts") union select * from (select * from "videos")) as "temp_table"';
         $builder = $this->getSQLiteBuilder();
         $builder->getConnection()->shouldReceive('select')->once()->with($expected, [], true);
         $builder->getProcessor()->shouldReceive('processSelect')->once();
-        $builder->from('posts')->union($this->getSQLiteBuilder()->from('videos'))->count();
+        $builder->from('posts')->union($this->getSQLiteBuilder()->from('videos'))->\count();
 
-        $expected = 'select count(*) as aggregate from (select * from (select * from [posts]) as [temp_table] union select * from (select * from [videos]) as [temp_table]) as [temp_table]';
+        $expected = 'select \count(*) as aggregate from (select * from (select * from [posts]) as [temp_table] union select * from (select * from [videos]) as [temp_table]) as [temp_table]';
         $builder = $this->getSqlServerBuilder();
         $builder->getConnection()->shouldReceive('select')->once()->with($expected, [], true);
         $builder->getProcessor()->shouldReceive('processSelect')->once();
-        $builder->from('posts')->union($this->getSqlServerBuilder()->from('videos'))->count();
+        $builder->from('posts')->union($this->getSqlServerBuilder()->from('videos'))->\count();
     }
 
     public function testHavingAggregate()
     {
-        $expected = 'select count(*) as aggregate from (select (select `count(*)` from `videos` where `posts`.`id` = `videos`.`post_id`) as `videos_count` from `posts` having `videos_count` > ?) as `temp_table`';
+        $expected = 'select \count(*) as aggregate from (select (select `\count(*)` from `videos` where `posts`.`id` = `videos`.`post_id`) as `videos_count` from `posts` having `videos_count` > ?) as `temp_table`';
         $builder = $this->getMySqlBuilder();
         $builder->getConnection()->shouldReceive('getDatabaseName');
         $builder->getConnection()->shouldReceive('select')->once()->with($expected, [0 => 1], true)->andReturn([['aggregate' => 1]]);
@@ -1385,9 +1385,9 @@ class DatabaseQueryBuilderTest extends TestCase
         });
 
         $builder->from('posts')->selectSub(function ($query) {
-            $query->from('videos')->select('count(*)')->whereColumn('posts.id', '=', 'videos.post_id');
+            $query->from('videos')->select('\count(*)')->whereColumn('posts.id', '=', 'videos.post_id');
         }, 'videos_count')->having('videos_count', '>', 1);
-        $builder->count();
+        $builder->\count();
     }
 
     public function testSubSelectWhereIns()
@@ -1724,12 +1724,12 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertSame('select "email" as "foo_email" from "users" having "foo_email" > ?', $builder->toSql());
 
         $builder = $this->getBuilder();
-        $builder->select(['category', new Raw('count(*) as "total"')])->from('item')->where('department', '=', 'popular')->groupBy('category')->having('total', '>', new Raw('3'));
-        $this->assertSame('select "category", count(*) as "total" from "item" where "department" = ? group by "category" having "total" > 3', $builder->toSql());
+        $builder->select(['category', new Raw('\count(*) as "total"')])->from('item')->where('department', '=', 'popular')->groupBy('category')->having('total', '>', new Raw('3'));
+        $this->assertSame('select "category", \count(*) as "total" from "item" where "department" = ? group by "category" having "total" > 3', $builder->toSql());
 
         $builder = $this->getBuilder();
-        $builder->select(['category', new Raw('count(*) as "total"')])->from('item')->where('department', '=', 'popular')->groupBy('category')->having('total', '>', 3);
-        $this->assertSame('select "category", count(*) as "total" from "item" where "department" = ? group by "category" having "total" > ?', $builder->toSql());
+        $builder->select(['category', new Raw('\count(*) as "total"')])->from('item')->where('department', '=', 'popular')->groupBy('category')->having('total', '>', 3);
+        $this->assertSame('select "category", \count(*) as "total" from "item" where "department" = ? group by "category" having "total" > ?', $builder->toSql());
     }
 
     public function testNestedHavings()
@@ -1791,12 +1791,12 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertSame('select "email" as "foo_email" from "users" having "foo_email" is null', $builder->toSql());
 
         $builder = $this->getBuilder();
-        $builder->select(['category', new Raw('count(*) as "total"')])->from('item')->where('department', '=', 'popular')->groupBy('category')->havingNull('total');
-        $this->assertSame('select "category", count(*) as "total" from "item" where "department" = ? group by "category" having "total" is null', $builder->toSql());
+        $builder->select(['category', new Raw('\count(*) as "total"')])->from('item')->where('department', '=', 'popular')->groupBy('category')->havingNull('total');
+        $this->assertSame('select "category", \count(*) as "total" from "item" where "department" = ? group by "category" having "total" is null', $builder->toSql());
 
         $builder = $this->getBuilder();
-        $builder->select(['category', new Raw('count(*) as "total"')])->from('item')->where('department', '=', 'popular')->groupBy('category')->havingNull('total');
-        $this->assertSame('select "category", count(*) as "total" from "item" where "department" = ? group by "category" having "total" is null', $builder->toSql());
+        $builder->select(['category', new Raw('\count(*) as "total"')])->from('item')->where('department', '=', 'popular')->groupBy('category')->havingNull('total');
+        $this->assertSame('select "category", \count(*) as "total" from "item" where "department" = ? group by "category" having "total" is null', $builder->toSql());
     }
 
     public function testHavingNotNull()
@@ -1826,12 +1826,12 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertSame('select "email" as "foo_email" from "users" having "foo_email" is not null', $builder->toSql());
 
         $builder = $this->getBuilder();
-        $builder->select(['category', new Raw('count(*) as "total"')])->from('item')->where('department', '=', 'popular')->groupBy('category')->havingNotNull('total');
-        $this->assertSame('select "category", count(*) as "total" from "item" where "department" = ? group by "category" having "total" is not null', $builder->toSql());
+        $builder->select(['category', new Raw('\count(*) as "total"')])->from('item')->where('department', '=', 'popular')->groupBy('category')->havingNotNull('total');
+        $this->assertSame('select "category", \count(*) as "total" from "item" where "department" = ? group by "category" having "total" is not null', $builder->toSql());
 
         $builder = $this->getBuilder();
-        $builder->select(['category', new Raw('count(*) as "total"')])->from('item')->where('department', '=', 'popular')->groupBy('category')->havingNotNull('total');
-        $this->assertSame('select "category", count(*) as "total" from "item" where "department" = ? group by "category" having "total" is not null', $builder->toSql());
+        $builder->select(['category', new Raw('\count(*) as "total"')])->from('item')->where('department', '=', 'popular')->groupBy('category')->havingNotNull('total');
+        $this->assertSame('select "category", \count(*) as "total" from "item" where "department" = ? group by "category" having "total" is not null', $builder->toSql());
     }
 
     public function testHavingExpression()
@@ -1860,24 +1860,24 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testHavingFollowedBySelectGet()
     {
         $builder = $this->getBuilder();
-        $query = 'select "category", count(*) as "total" from "item" where "department" = ? group by "category" having "total" > ?';
+        $query = 'select "category", \count(*) as "total" from "item" where "department" = ? group by "category" having "total" > ?';
         $builder->getConnection()->shouldReceive('select')->once()->with($query, ['popular', 3], true)->andReturn([['category' => 'rock', 'total' => 5]]);
         $builder->getProcessor()->shouldReceive('processSelect')->andReturnUsing(function ($builder, $results) {
             return $results;
         });
         $builder->from('item');
-        $result = $builder->select(['category', new Raw('count(*) as "total"')])->where('department', '=', 'popular')->groupBy('category')->having('total', '>', 3)->get();
+        $result = $builder->select(['category', new Raw('\count(*) as "total"')])->where('department', '=', 'popular')->groupBy('category')->having('total', '>', 3)->get();
         $this->assertEquals([['category' => 'rock', 'total' => 5]], $result->all());
 
         // Using \Raw value
         $builder = $this->getBuilder();
-        $query = 'select "category", count(*) as "total" from "item" where "department" = ? group by "category" having "total" > 3';
+        $query = 'select "category", \count(*) as "total" from "item" where "department" = ? group by "category" having "total" > 3';
         $builder->getConnection()->shouldReceive('select')->once()->with($query, ['popular'], true)->andReturn([['category' => 'rock', 'total' => 5]]);
         $builder->getProcessor()->shouldReceive('processSelect')->andReturnUsing(function ($builder, $results) {
             return $results;
         });
         $builder->from('item');
-        $result = $builder->select(['category', new Raw('count(*) as "total"')])->where('department', '=', 'popular')->groupBy('category')->having('total', '>', new Raw('3'))->get();
+        $result = $builder->select(['category', new Raw('\count(*) as "total"')])->where('department', '=', 'popular')->groupBy('category')->having('total', '>', new Raw('3'))->get();
         $this->assertEquals([['category' => 'rock', 'total' => 5]], $result->all());
     }
 
@@ -1965,7 +1965,7 @@ class DatabaseQueryBuilderTest extends TestCase
             $q->select('body')->from('posts')->where('id', 4);
         }, 'post');
 
-        $builder->getConnection()->shouldReceive('select')->once()->with('select count(*) as aggregate from "users"', [], true)->andReturn([['aggregate' => 1]]);
+        $builder->getConnection()->shouldReceive('select')->once()->with('select \count(*) as aggregate from "users"', [], true)->andReturn([['aggregate' => 1]]);
         $builder->getProcessor()->shouldReceive('processSelect')->once()->andReturnUsing(function ($builder, $results) {
             return $results;
         });
@@ -1981,7 +1981,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $columns = ['body as post_body', 'teaser', 'posts.created as published'];
         $builder->from('posts')->select($columns);
 
-        $builder->getConnection()->shouldReceive('select')->once()->with('select count("body", "teaser", "posts"."created") as aggregate from "posts"', [], true)->andReturn([['aggregate' => 1]]);
+        $builder->getConnection()->shouldReceive('select')->once()->with('select \count("body", "teaser", "posts"."created") as aggregate from "posts"', [], true)->andReturn([['aggregate' => 1]]);
         $builder->getProcessor()->shouldReceive('processSelect')->once()->andReturnUsing(function ($builder, $results) {
             return $results;
         });
@@ -1995,7 +1995,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getBuilder();
         $builder->from('posts')->select('id')->union($this->getBuilder()->from('videos')->select('id'));
 
-        $builder->getConnection()->shouldReceive('select')->once()->with('select count(*) as aggregate from ((select "id" from "posts") union (select "id" from "videos")) as "temp_table"', [], true)->andReturn([['aggregate' => 1]]);
+        $builder->getConnection()->shouldReceive('select')->once()->with('select \count(*) as aggregate from ((select "id" from "posts") union (select "id" from "videos")) as "temp_table"', [], true)->andReturn([['aggregate' => 1]]);
         $builder->getProcessor()->shouldReceive('processSelect')->once()->andReturnUsing(function ($builder, $results) {
             return $results;
         });
@@ -2629,11 +2629,11 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testAggregateFunctions()
     {
         $builder = $this->getBuilder();
-        $builder->getConnection()->shouldReceive('select')->once()->with('select count(*) as aggregate from "users"', [], true)->andReturn([['aggregate' => 1]]);
+        $builder->getConnection()->shouldReceive('select')->once()->with('select \count(*) as aggregate from "users"', [], true)->andReturn([['aggregate' => 1]]);
         $builder->getProcessor()->shouldReceive('processSelect')->once()->andReturnUsing(function ($builder, $results) {
             return $results;
         });
-        $results = $builder->from('users')->count();
+        $results = $builder->from('users')->\count();
         $this->assertEquals(1, $results);
 
         $builder = $this->getBuilder();
@@ -2730,14 +2730,14 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testAggregateResetFollowedByGet()
     {
         $builder = $this->getBuilder();
-        $builder->getConnection()->shouldReceive('select')->once()->with('select count(*) as aggregate from "users"', [], true)->andReturn([['aggregate' => 1]]);
+        $builder->getConnection()->shouldReceive('select')->once()->with('select \count(*) as aggregate from "users"', [], true)->andReturn([['aggregate' => 1]]);
         $builder->getConnection()->shouldReceive('select')->once()->with('select sum("id") as aggregate from "users"', [], true)->andReturn([['aggregate' => 2]]);
         $builder->getConnection()->shouldReceive('select')->once()->with('select "column1", "column2" from "users"', [], true)->andReturn([['column1' => 'foo', 'column2' => 'bar']]);
         $builder->getProcessor()->shouldReceive('processSelect')->andReturnUsing(function ($builder, $results) {
             return $results;
         });
         $builder->from('users')->select('column1', 'column2');
-        $count = $builder->count();
+        $count = $builder->\count();
         $this->assertEquals(1, $count);
         $sum = $builder->sum('id');
         $this->assertEquals(2, $sum);
@@ -2748,13 +2748,13 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testAggregateResetFollowedBySelectGet()
     {
         $builder = $this->getBuilder();
-        $builder->getConnection()->shouldReceive('select')->once()->with('select count("column1") as aggregate from "users"', [], true)->andReturn([['aggregate' => 1]]);
+        $builder->getConnection()->shouldReceive('select')->once()->with('select \count("column1") as aggregate from "users"', [], true)->andReturn([['aggregate' => 1]]);
         $builder->getConnection()->shouldReceive('select')->once()->with('select "column2", "column3" from "users"', [], true)->andReturn([['column2' => 'foo', 'column3' => 'bar']]);
         $builder->getProcessor()->shouldReceive('processSelect')->andReturnUsing(function ($builder, $results) {
             return $results;
         });
         $builder->from('users');
-        $count = $builder->count('column1');
+        $count = $builder->\count('column1');
         $this->assertEquals(1, $count);
         $result = $builder->select('column2', 'column3')->get();
         $this->assertEquals([['column2' => 'foo', 'column3' => 'bar']], $result->all());
@@ -2763,13 +2763,13 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testAggregateResetFollowedByGetWithColumns()
     {
         $builder = $this->getBuilder();
-        $builder->getConnection()->shouldReceive('select')->once()->with('select count("column1") as aggregate from "users"', [], true)->andReturn([['aggregate' => 1]]);
+        $builder->getConnection()->shouldReceive('select')->once()->with('select \count("column1") as aggregate from "users"', [], true)->andReturn([['aggregate' => 1]]);
         $builder->getConnection()->shouldReceive('select')->once()->with('select "column2", "column3" from "users"', [], true)->andReturn([['column2' => 'foo', 'column3' => 'bar']]);
         $builder->getProcessor()->shouldReceive('processSelect')->andReturnUsing(function ($builder, $results) {
             return $results;
         });
         $builder->from('users');
-        $count = $builder->count('column1');
+        $count = $builder->\count('column1');
         $this->assertEquals(1, $count);
         $result = $builder->get(['column2', 'column3']);
         $this->assertEquals([['column2' => 'foo', 'column3' => 'bar']], $result->all());
@@ -2778,14 +2778,14 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testAggregateWithSubSelect()
     {
         $builder = $this->getBuilder();
-        $builder->getConnection()->shouldReceive('select')->once()->with('select count(*) as aggregate from "users"', [], true)->andReturn([['aggregate' => 1]]);
+        $builder->getConnection()->shouldReceive('select')->once()->with('select \count(*) as aggregate from "users"', [], true)->andReturn([['aggregate' => 1]]);
         $builder->getProcessor()->shouldReceive('processSelect')->once()->andReturnUsing(function ($builder, $results) {
             return $results;
         });
         $builder->from('users')->selectSub(function ($query) {
             $query->from('posts')->select('foo', 'bar')->where('title', 'foo');
         }, 'post');
-        $count = $builder->count();
+        $count = $builder->\count();
         $this->assertEquals(1, $count);
         $this->assertSame('(select "foo", "bar" from "posts" where "title" = ?) as "post"', $builder->getGrammar()->getValue($builder->columns[0]));
         $this->assertEquals(['foo'], $builder->getBindings());
@@ -5460,22 +5460,22 @@ SQL;
     {
         $builder = $this->getSqlServerBuilder();
         $builder->select('*')->from('users')->whereJsonLength('options', 0);
-        $this->assertSame('select * from [users] where (select count(*) from openjson([options])) = ?', $builder->toSql());
+        $this->assertSame('select * from [users] where (select \count(*) from openjson([options])) = ?', $builder->toSql());
         $this->assertEquals([0], $builder->getBindings());
 
         $builder = $this->getSqlServerBuilder();
         $builder->select('*')->from('users')->whereJsonLength('users.options->languages', '>', 0);
-        $this->assertSame('select * from [users] where (select count(*) from openjson([users].[options], \'$."languages"\')) > ?', $builder->toSql());
+        $this->assertSame('select * from [users] where (select \count(*) from openjson([users].[options], \'$."languages"\')) > ?', $builder->toSql());
         $this->assertEquals([0], $builder->getBindings());
 
         $builder = $this->getSqlServerBuilder();
         $builder->select('*')->from('users')->where('id', '=', 1)->orWhereJsonLength('options->languages', new Raw('0'));
-        $this->assertSame('select * from [users] where [id] = ? or (select count(*) from openjson([options], \'$."languages"\')) = 0', $builder->toSql());
+        $this->assertSame('select * from [users] where [id] = ? or (select \count(*) from openjson([options], \'$."languages"\')) = 0', $builder->toSql());
         $this->assertEquals([1], $builder->getBindings());
 
         $builder = $this->getSqlServerBuilder();
         $builder->select('*')->from('users')->where('id', '=', 1)->orWhereJsonLength('options->languages', '>', new Raw('0'));
-        $this->assertSame('select * from [users] where [id] = ? or (select count(*) from openjson([options], \'$."languages"\')) > 0', $builder->toSql());
+        $this->assertSame('select * from [users] where [id] = ? or (select \count(*) from openjson([options], \'$."languages"\')) > 0', $builder->toSql());
         $this->assertEquals([1], $builder->getBindings());
     }
 

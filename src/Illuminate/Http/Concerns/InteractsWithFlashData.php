@@ -39,7 +39,7 @@ trait InteractsWithFlashData
     public function flashOnly($keys)
     {
         $this->session()->flashInput(
-            $this->only(is_array($keys) ? $keys : func_get_args())
+            $this->only(\is_array($keys) ? $keys : \func_get_args())
         );
     }
 
@@ -52,7 +52,7 @@ trait InteractsWithFlashData
     public function flashExcept($keys)
     {
         $this->session()->flashInput(
-            $this->except(is_array($keys) ? $keys : func_get_args())
+            $this->except(\is_array($keys) ? $keys : \func_get_args())
         );
     }
 

@@ -91,7 +91,7 @@ class Envelope
      */
     public function __construct(Address|string $from = null, $to = [], $cc = [], $bcc = [], $replyTo = [], string $subject = null, array $tags = [], array $metadata = [], Closure|array $using = [])
     {
-        $this->from = is_string($from) ? new Address($from) : $from;
+        $this->from = \is_string($from) ? new Address($from) : $from;
         $this->to = $this->normalizeAddresses($to);
         $this->cc = $this->normalizeAddresses($cc);
         $this->bcc = $this->normalizeAddresses($bcc);
@@ -111,7 +111,7 @@ class Envelope
     protected function normalizeAddresses($addresses)
     {
         return collect($addresses)->map(function ($address) {
-            return is_string($address) ? new Address($address) : $address;
+            return \is_string($address) ? new Address($address) : $address;
         })->all();
     }
 
@@ -124,7 +124,7 @@ class Envelope
      */
     public function from(Address|string $address, $name = null)
     {
-        $this->from = is_string($address) ? new Address($address, $name) : $address;
+        $this->from = \is_string($address) ? new Address($address, $name) : $address;
 
         return $this;
     }
@@ -139,7 +139,7 @@ class Envelope
     public function to(Address|array|string $address, $name = null)
     {
         $this->to = array_merge($this->to, $this->normalizeAddresses(
-            is_string($name) ? [new Address($address, $name)] : Arr::wrap($address),
+            \is_string($name) ? [new Address($address, $name)] : Arr::wrap($address),
         ));
 
         return $this;
@@ -155,7 +155,7 @@ class Envelope
     public function cc(Address|array|string $address, $name = null)
     {
         $this->cc = array_merge($this->cc, $this->normalizeAddresses(
-            is_string($name) ? [new Address($address, $name)] : Arr::wrap($address),
+            \is_string($name) ? [new Address($address, $name)] : Arr::wrap($address),
         ));
 
         return $this;
@@ -171,7 +171,7 @@ class Envelope
     public function bcc(Address|array|string $address, $name = null)
     {
         $this->bcc = array_merge($this->bcc, $this->normalizeAddresses(
-            is_string($name) ? [new Address($address, $name)] : Arr::wrap($address),
+            \is_string($name) ? [new Address($address, $name)] : Arr::wrap($address),
         ));
 
         return $this;
@@ -187,7 +187,7 @@ class Envelope
     public function replyTo(Address|array|string $address, $name = null)
     {
         $this->replyTo = array_merge($this->replyTo, $this->normalizeAddresses(
-            is_string($name) ? [new Address($address, $name)] : Arr::wrap($address),
+            \is_string($name) ? [new Address($address, $name)] : Arr::wrap($address),
         ));
 
         return $this;
@@ -268,7 +268,7 @@ class Envelope
      */
     public function isFrom(string $address, string $name = null)
     {
-        if (is_null($name)) {
+        if (\is_null($name)) {
             return $this->from->address === $address;
         }
 
@@ -335,7 +335,7 @@ class Envelope
     protected function hasRecipient(array $recipients, string $address, ?string $name = null)
     {
         return collect($recipients)->contains(function ($recipient) use ($address, $name) {
-            if (is_null($name)) {
+            if (\is_null($name)) {
                 return $recipient->address === $address;
             }
 

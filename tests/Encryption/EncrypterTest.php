@@ -38,7 +38,7 @@ class EncrypterTest extends TestCase
         $e = new Encrypter(str_repeat('a', 16));
         $lengths = [];
         for ($i = 0; $i < 100; $i++) {
-            $lengths[] = strlen($e->encrypt('foo'));
+            $lengths[] = \strlen($e->encrypt('foo'));
         }
         $this->assertSame(min($lengths), max($lengths));
     }

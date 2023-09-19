@@ -181,7 +181,7 @@ class ConditionableLogger
 
     public function has($value)
     {
-        return in_array($value, $this->values);
+        return \in_array($value, $this->values);
     }
 
     public function toggle()

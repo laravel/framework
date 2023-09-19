@@ -271,7 +271,7 @@ class MailMessage extends SimpleMessage implements Renderable
     public function attachMany($files)
     {
         foreach ($files as $file => $options) {
-            if (is_int($file)) {
+            if (\is_int($file)) {
                 $this->attach($options);
             } else {
                 $this->attach($file, $options);

@@ -98,7 +98,7 @@ class QueueFake extends QueueManager implements Fake, Queue
         }
 
         PHPUnit::assertTrue(
-            $this->pushed($job, $callback)->count() > 0,
+            $this->pushed($job, $callback)->\count() > 0,
             "The expected [{$job}] job was not pushed."
         );
     }
@@ -112,7 +112,7 @@ class QueueFake extends QueueManager implements Fake, Queue
      */
     protected function assertPushedTimes($job, $times = 1)
     {
-        $count = $this->pushed($job)->count();
+        $count = $this->pushed($job)->\count();
 
         PHPUnit::assertSame(
             $times, $count,
@@ -139,7 +139,7 @@ class QueueFake extends QueueManager implements Fake, Queue
                 return false;
             }
 
-            return $callback ? $callback(...func_get_args()) : true;
+            return $callback ? $callback(...\func_get_args()) : true;
         });
     }
 
@@ -215,7 +215,7 @@ class QueueFake extends QueueManager implements Fake, Queue
     {
         $matching = $this->pushed($job, $callback)->map->chained->map(function ($chain) {
             return collect($chain)->map(function ($job) {
-                return get_class(unserialize($job));
+                return \get_class(unserialize($job));
             });
         })->filter(function ($chain) use ($expectedChain) {
             return $chain->all() === $expectedChain;
@@ -256,7 +256,7 @@ class QueueFake extends QueueManager implements Fake, Queue
      */
     protected function isChainOfObjects($chain)
     {
-        return ! collect($chain)->contains(fn ($job) => ! is_object($job));
+        return ! collect($chain)->contains(fn ($job) => ! \is_object($job));
     }
 
     /**
@@ -340,7 +340,7 @@ class QueueFake extends QueueManager implements Fake, Queue
     {
         return collect($this->jobs)->flatten(1)->filter(
             fn ($job) => $job['queue'] === $queue
-        )->count();
+        )->\count();
     }
 
     /**
@@ -358,13 +358,13 @@ class QueueFake extends QueueManager implements Fake, Queue
                 $job = CallQueuedClosure::create($job);
             }
 
-            $this->jobs[is_object($job) ? get_class($job) : $job][] = [
+            $this->jobs[\is_object($job) ? \get_class($job) : $job][] = [
                 'job' =>  $this->serializeAndRestore ? $this->serializeAndRestoreJob($job) : $job,
                 'queue' => $queue,
                 'data' => $data,
             ];
         } else {
-            is_object($job) && isset($job->connection)
+            \is_object($job) && isset($job->connection)
                 ? $this->queue->connection($job->connection)->push($job, $data, $queue)
                 : $this->queue->push($job, $data, $queue);
         }

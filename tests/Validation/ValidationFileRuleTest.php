@@ -44,7 +44,7 @@ class ValidationFileRuleTest extends TestCase
             $v = new Validator(
                 resolve('translator'),
                 ['my_file' => $value],
-                ['my_file' => is_object($rule) ? clone $rule : $rule]
+                ['my_file' => \is_object($rule) ? clone $rule : $rule]
             );
 
             $this->assertSame($result, $v->passes());

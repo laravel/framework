@@ -89,8 +89,8 @@ class DatabaseConnectionFactoryTest extends TestCase
     public function testSingleConnectionNotCreatedUntilNeeded()
     {
         $connection = $this->db->getConnection();
-        $pdo = new ReflectionProperty(get_class($connection), 'pdo');
-        $readPdo = new ReflectionProperty(get_class($connection), 'readPdo');
+        $pdo = new ReflectionProperty(\get_class($connection), 'pdo');
+        $readPdo = new ReflectionProperty(\get_class($connection), 'readPdo');
 
         $this->assertNotInstanceOf(PDO::class, $pdo->getValue($connection));
         $this->assertNotInstanceOf(PDO::class, $readPdo->getValue($connection));
@@ -99,8 +99,8 @@ class DatabaseConnectionFactoryTest extends TestCase
     public function testReadWriteConnectionsNotCreatedUntilNeeded()
     {
         $connection = $this->db->getConnection('read_write');
-        $pdo = new ReflectionProperty(get_class($connection), 'pdo');
-        $readPdo = new ReflectionProperty(get_class($connection), 'readPdo');
+        $pdo = new ReflectionProperty(\get_class($connection), 'pdo');
+        $readPdo = new ReflectionProperty(\get_class($connection), 'readPdo');
 
         $this->assertNotInstanceOf(PDO::class, $pdo->getValue($connection));
         $this->assertNotInstanceOf(PDO::class, $readPdo->getValue($connection));

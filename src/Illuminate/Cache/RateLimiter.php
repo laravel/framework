@@ -75,7 +75,7 @@ class RateLimiter
             return false;
         }
 
-        if (is_null($result = $callback())) {
+        if (\is_null($result = $callback())) {
             $result = true;
         }
 

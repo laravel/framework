@@ -62,9 +62,9 @@ class FakeProcessResult implements ProcessResultContract
     {
         if (empty($output)) {
             return '';
-        } elseif (is_string($output)) {
+        } elseif (\is_string($output)) {
             return rtrim($output, "\n")."\n";
-        } elseif (is_array($output)) {
+        } elseif (\is_array($output)) {
             return rtrim(
                 collect($output)
                     ->map(fn ($line) => rtrim($line, "\n")."\n")

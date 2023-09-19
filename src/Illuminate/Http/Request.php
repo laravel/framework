@@ -132,7 +132,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     {
         $question = $this->getBaseUrl().$this->getPathInfo() === '/' ? '/?' : '?';
 
-        return count($this->query()) > 0
+        return \count($this->query()) > 0
             ? $this->url().$question.Arr::query(array_merge($this->query(), $query))
             : $this->fullUrl().$question.Arr::query($query);
     }
@@ -149,7 +149,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
 
         $question = $this->getBaseUrl().$this->getPathInfo() === '/' ? '/?' : '?';
 
-        return count($query) > 0
+        return \count($query) > 0
             ? $this->url().$question.Arr::query($query)
             : $this->url();
     }
@@ -406,7 +406,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
             $this->json = new InputBag((array) json_decode($this->getContent(), true));
         }
 
-        if (is_null($key)) {
+        if (\is_null($key)) {
             return $this->json;
         }
 
@@ -424,7 +424,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
             return $this->json();
         }
 
-        return in_array($this->getRealMethod(), ['GET', 'HEAD']) ? $this->query : $this->request;
+        return \in_array($this->getRealMethod(), ['GET', 'HEAD']) ? $this->query : $this->request;
     }
 
     /**
@@ -516,7 +516,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
         }
 
         foreach ($files as $key => $file) {
-            if (is_array($file)) {
+            if (\is_array($file)) {
                 $files[$key] = $this->filterFiles($files[$key]);
             }
 
@@ -533,7 +533,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      */
     public function hasSession(bool $skipIfUninitialized = false): bool
     {
-        return ! is_null($this->session);
+        return ! \is_null($this->session);
     }
 
     /**
@@ -603,7 +603,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      */
     public function user($guard = null)
     {
-        return call_user_func($this->getUserResolver(), $guard);
+        return \call_user_func($this->getUserResolver(), $guard);
     }
 
     /**
@@ -615,9 +615,9 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      */
     public function route($param = null, $default = null)
     {
-        $route = call_user_func($this->getRouteResolver());
+        $route = \call_user_func($this->getRouteResolver());
 
-        if (is_null($route) || is_null($param)) {
+        if (\is_null($route) || \is_null($param)) {
             return $route;
         }
 
@@ -774,7 +774,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      */
     public function __isset($key)
     {
-        return ! is_null($this->__get($key));
+        return ! \is_null($this->__get($key));
     }
 
     /**

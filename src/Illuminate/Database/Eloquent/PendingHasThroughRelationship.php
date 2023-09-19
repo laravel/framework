@@ -43,7 +43,7 @@ class PendingHasThroughRelationship
      */
     public function has($callback)
     {
-        if (is_string($callback)) {
+        if (\is_string($callback)) {
             $callback = fn () => $this->localRelationship->getRelated()->{$callback}();
         }
 

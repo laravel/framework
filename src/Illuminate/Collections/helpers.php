@@ -3,7 +3,7 @@
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 
-if (! function_exists('collect')) {
+if (! \function_exists('collect')) {
     /**
      * Create a collection from the given value.
      *
@@ -19,7 +19,7 @@ if (! function_exists('collect')) {
     }
 }
 
-if (! function_exists('data_fill')) {
+if (! \function_exists('data_fill')) {
     /**
      * Fill in data where it's missing.
      *
@@ -34,7 +34,7 @@ if (! function_exists('data_fill')) {
     }
 }
 
-if (! function_exists('data_get')) {
+if (! \function_exists('data_get')) {
     /**
      * Get an item from an array or object using "dot" notation.
      *
@@ -45,16 +45,16 @@ if (! function_exists('data_get')) {
      */
     function data_get($target, $key, $default = null)
     {
-        if (is_null($key)) {
+        if (\is_null($key)) {
             return $target;
         }
 
-        $key = is_array($key) ? $key : explode('.', $key);
+        $key = \is_array($key) ? $key : explode('.', $key);
 
         foreach ($key as $i => $segment) {
             unset($key[$i]);
 
-            if (is_null($segment)) {
+            if (\is_null($segment)) {
                 return $target;
             }
 
@@ -71,12 +71,12 @@ if (! function_exists('data_get')) {
                     $result[] = data_get($item, $key);
                 }
 
-                return in_array('*', $key) ? Arr::collapse($result) : $result;
+                return \in_array('*', $key) ? Arr::collapse($result) : $result;
             }
 
             if (Arr::accessible($target) && Arr::exists($target, $segment)) {
                 $target = $target[$segment];
-            } elseif (is_object($target) && isset($target->{$segment})) {
+            } elseif (\is_object($target) && isset($target->{$segment})) {
                 $target = $target->{$segment};
             } else {
                 return value($default);
@@ -87,7 +87,7 @@ if (! function_exists('data_get')) {
     }
 }
 
-if (! function_exists('data_set')) {
+if (! \function_exists('data_set')) {
     /**
      * Set an item on an array or object using dot notation.
      *
@@ -99,7 +99,7 @@ if (! function_exists('data_set')) {
      */
     function data_set(&$target, $key, $value, $overwrite = true)
     {
-        $segments = is_array($key) ? $key : explode('.', $key);
+        $segments = \is_array($key) ? $key : explode('.', $key);
 
         if (($segment = array_shift($segments)) === '*') {
             if (! Arr::accessible($target)) {
@@ -125,7 +125,7 @@ if (! function_exists('data_set')) {
             } elseif ($overwrite || ! Arr::exists($target, $segment)) {
                 $target[$segment] = $value;
             }
-        } elseif (is_object($target)) {
+        } elseif (\is_object($target)) {
             if ($segments) {
                 if (! isset($target->{$segment})) {
                     $target->{$segment} = [];
@@ -149,7 +149,7 @@ if (! function_exists('data_set')) {
     }
 }
 
-if (! function_exists('data_forget')) {
+if (! \function_exists('data_forget')) {
     /**
      * Remove / unset an item from an array or object using "dot" notation.
      *
@@ -159,7 +159,7 @@ if (! function_exists('data_forget')) {
      */
     function data_forget(&$target, $key)
     {
-        $segments = is_array($key) ? $key : explode('.', $key);
+        $segments = \is_array($key) ? $key : explode('.', $key);
 
         if (($segment = array_shift($segments)) === '*' && Arr::accessible($target)) {
             if ($segments) {
@@ -173,7 +173,7 @@ if (! function_exists('data_forget')) {
             } else {
                 Arr::forget($target, $segment);
             }
-        } elseif (is_object($target)) {
+        } elseif (\is_object($target)) {
             if ($segments && isset($target->{$segment})) {
                 data_forget($target->{$segment}, $segments);
             } elseif (isset($target->{$segment})) {
@@ -185,7 +185,7 @@ if (! function_exists('data_forget')) {
     }
 }
 
-if (! function_exists('head')) {
+if (! \function_exists('head')) {
     /**
      * Get the first element of an array. Useful for method chaining.
      *
@@ -198,7 +198,7 @@ if (! function_exists('head')) {
     }
 }
 
-if (! function_exists('last')) {
+if (! \function_exists('last')) {
     /**
      * Get the last element from an array.
      *
@@ -211,7 +211,7 @@ if (! function_exists('last')) {
     }
 }
 
-if (! function_exists('value')) {
+if (! \function_exists('value')) {
     /**
      * Return the default value of the given value.
      *

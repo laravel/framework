@@ -46,13 +46,13 @@ class RedisTagSet extends TagSet
                         ['match' => '*', 'count' => 1000]
                     );
 
-                    if (! is_array($entries)) {
+                    if (! \is_array($entries)) {
                         break;
                     }
 
                     $entries = array_unique(array_keys($entries));
 
-                    if (count($entries) === 0) {
+                    if (\count($entries) === 0) {
                         continue;
                     }
 

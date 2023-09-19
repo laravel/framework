@@ -43,7 +43,7 @@ class Cursor implements Arrayable
      */
     public function parameter(string $parameterName)
     {
-        if (! array_key_exists($parameterName, $this->parameters)) {
+        if (! \array_key_exists($parameterName, $this->parameters)) {
             throw new UnexpectedValueException("Unable to find parameter [{$parameterName}] in pagination item.");
         }
 
@@ -113,7 +113,7 @@ class Cursor implements Arrayable
      */
     public static function fromEncoded($encodedString)
     {
-        if (! is_string($encodedString)) {
+        if (! \is_string($encodedString)) {
             return null;
         }
 

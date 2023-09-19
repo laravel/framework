@@ -101,7 +101,7 @@ trait ConfiguresPrompts
             $result = $prompt();
 
             if ($required && ($result === '' || $result === [] || $result === false)) {
-                $this->components->error(is_string($required) ? $required : 'Required.');
+                $this->components->error(\is_string($required) ? $required : 'Required.');
 
                 continue;
             }
@@ -109,7 +109,7 @@ trait ConfiguresPrompts
             if ($validate) {
                 $error = $validate($result);
 
-                if (is_string($error) && strlen($error) > 0) {
+                if (\is_string($error) && \strlen($error) > 0) {
                     $this->components->error($error);
 
                     continue;

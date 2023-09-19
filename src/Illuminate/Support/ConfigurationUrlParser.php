@@ -29,7 +29,7 @@ class ConfigurationUrlParser
      */
     public function parseConfiguration($config)
     {
-        if (is_string($config)) {
+        if (\is_string($config)) {
             $config = ['url' => $config];
         }
 
@@ -67,7 +67,7 @@ class ConfigurationUrlParser
             'port' => $url['port'] ?? null,
             'username' => $url['user'] ?? null,
             'password' => $url['pass'] ?? null,
-        ], fn ($value) => ! is_null($value));
+        ], fn ($value) => ! \is_null($value));
     }
 
     /**
@@ -150,11 +150,11 @@ class ConfigurationUrlParser
      */
     protected function parseStringsToNativeTypes($value)
     {
-        if (is_array($value)) {
+        if (\is_array($value)) {
             return array_map([$this, 'parseStringsToNativeTypes'], $value);
         }
 
-        if (! is_string($value)) {
+        if (! \is_string($value)) {
             return $value;
         }
 

@@ -78,7 +78,7 @@ class Bus extends Facade
      */
     public static function dispatchChain($jobs)
     {
-        $jobs = is_array($jobs) ? $jobs : func_get_args();
+        $jobs = \is_array($jobs) ? $jobs : \func_get_args();
 
         return (new PendingChain(array_shift($jobs), $jobs))
                     ->dispatch();

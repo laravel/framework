@@ -17,10 +17,10 @@ class AuthAccessGateTest extends TestCase
     {
         $gate = $this->getBasicGate();
 
-        $gate->define('foo', function ($user) {
+        $gate->\define('foo', function ($user) {
             return true;
         });
-        $gate->define('bar', function ($user) {
+        $gate->\define('bar', function ($user) {
             return false;
         });
 
@@ -93,11 +93,11 @@ class AuthAccessGateTest extends TestCase
             //
         });
 
-        $gate->define('foo', function (?stdClass $user) {
+        $gate->\define('foo', function (?stdClass $user) {
             return true;
         });
 
-        $gate->define('bar', function (stdClass $user) {
+        $gate->\define('bar', function (stdClass $user) {
             return false;
         });
 
@@ -173,7 +173,7 @@ class AuthAccessGateTest extends TestCase
             $_SERVER['__laravel.gateAfter2'] = true;
         });
 
-        $gate->define('foo', function ($user = null) {
+        $gate->\define('foo', function ($user = null) {
             return true;
         });
 
@@ -225,7 +225,7 @@ class AuthAccessGateTest extends TestCase
     {
         $gate = $this->getBasicGate();
 
-        $gate->define('foo', function ($user) {
+        $gate->\define('foo', function ($user) {
             return true;
         });
         $gate->before(function ($user, $ability) {
@@ -241,7 +241,7 @@ class AuthAccessGateTest extends TestCase
     {
         $gate = $this->getBasicGate();
 
-        $gate->define('foo', function ($user) {
+        $gate->\define('foo', function ($user) {
             return true;
         });
         $gate->before(function () {
@@ -255,11 +255,11 @@ class AuthAccessGateTest extends TestCase
     {
         $gate = $this->getBasicGate();
 
-        $gate->define('foo', function ($user) {
+        $gate->\define('foo', function ($user) {
             return true;
         });
 
-        $gate->define('bar', function ($user) {
+        $gate->\define('bar', function ($user) {
             return false;
         });
 
@@ -293,11 +293,11 @@ class AuthAccessGateTest extends TestCase
     {
         $gate = $this->getBasicGate();
 
-        $gate->define('deny', function ($user) {
+        $gate->\define('deny', function ($user) {
             return false;
         });
 
-        $gate->define('allow', function ($user) {
+        $gate->\define('allow', function ($user) {
             return true;
         });
 
@@ -329,7 +329,7 @@ class AuthAccessGateTest extends TestCase
     {
         $gate = $this->getBasicGate();
 
-        $gate->define('foo', function ($user) {
+        $gate->\define('foo', function ($user) {
             $this->assertSame(1, $user->id);
 
             return true;
@@ -349,7 +349,7 @@ class AuthAccessGateTest extends TestCase
             $this->assertSame($dummy, $arguments[0]);
         });
 
-        $gate->define('foo', function ($user, $x) use ($dummy) {
+        $gate->\define('foo', function ($user, $x) use ($dummy) {
             $this->assertSame($dummy, $x);
 
             return true;
@@ -375,7 +375,7 @@ class AuthAccessGateTest extends TestCase
             $this->assertSame([$dummy1, $dummy2], $arguments);
         });
 
-        $gate->define('foo', function ($user, $x, $y) use ($dummy1, $dummy2) {
+        $gate->\define('foo', function ($user, $x, $y) use ($dummy1, $dummy2) {
             $this->assertSame($dummy1, $x);
             $this->assertSame($dummy2, $y);
 
@@ -394,7 +394,7 @@ class AuthAccessGateTest extends TestCase
     {
         $gate = $this->getBasicGate();
 
-        $gate->define('foo', AccessGateTestClass::class.'@foo');
+        $gate->\define('foo', AccessGateTestClass::class.'@foo');
 
         $this->assertTrue($gate->check('foo'));
     }
@@ -403,7 +403,7 @@ class AuthAccessGateTest extends TestCase
     {
         $gate = $this->getBasicGate();
 
-        $gate->define('foo', AccessGateTestInvokableClass::class);
+        $gate->\define('foo', AccessGateTestInvokableClass::class);
 
         $this->assertTrue($gate->check('foo'));
     }
@@ -412,7 +412,7 @@ class AuthAccessGateTest extends TestCase
     {
         $gate = $this->getBasicGate();
 
-        $gate->define('foo', [new AccessGateTestStaticClass, 'foo']);
+        $gate->\define('foo', [new AccessGateTestStaticClass, 'foo']);
 
         $this->assertTrue($gate->check('foo'));
     }
@@ -421,7 +421,7 @@ class AuthAccessGateTest extends TestCase
     {
         $gate = $this->getBasicGate();
 
-        $gate->define('foo', [AccessGateTestStaticClass::class, 'foo']);
+        $gate->\define('foo', [AccessGateTestStaticClass::class, 'foo']);
 
         $this->assertTrue($gate->check('foo'));
     }
@@ -493,7 +493,7 @@ class AuthAccessGateTest extends TestCase
     {
         $gate = $this->getBasicGate();
 
-        $gate->define('update', function () {
+        $gate->\define('update', function () {
             $this->fail();
         });
 
@@ -506,7 +506,7 @@ class AuthAccessGateTest extends TestCase
     {
         $gate = $this->getBasicGate();
 
-        $gate->define('nonexistent_method', function ($user) {
+        $gate->\define('nonexistent_method', function ($user) {
             return true;
         });
 
@@ -520,7 +520,7 @@ class AuthAccessGateTest extends TestCase
         $gate = $this->getBasicGate();
 
         // Assert that the callback receives the new user with ID of 2 instead of ID of 1...
-        $gate->define('foo', function ($user) {
+        $gate->\define('foo', function ($user) {
             $this->assertSame(2, $user->id);
 
             return true;
@@ -533,7 +533,7 @@ class AuthAccessGateTest extends TestCase
     {
         $gate = $this->getBasicGate();
 
-        $gate->define('foo', function () {
+        $gate->\define('foo', function () {
             return true;
         });
 
@@ -564,7 +564,7 @@ class AuthAccessGateTest extends TestCase
 
         $gate = $this->getBasicGate();
 
-        $gate->define('foo', $callback);
+        $gate->\define('foo', $callback);
     }
 
     /**
@@ -1078,14 +1078,14 @@ class AuthAccessGateTest extends TestCase
             //
         });
 
-        $gate->define('foo', AccessGateTestClassForGuest::class.'@foo');
-        $gate->define('obj_foo', [new AccessGateTestClassForGuest, 'foo']);
-        $gate->define('static_foo', [AccessGateTestClassForGuest::class, 'staticFoo']);
-        $gate->define('static_@foo', AccessGateTestClassForGuest::class.'@staticFoo');
-        $gate->define('bar', AccessGateTestClassForGuest::class.'@bar');
-        $gate->define('invokable', AccessGateTestGuestInvokableClass::class);
-        $gate->define('nullable_invokable', AccessGateTestGuestNullableInvokable::class);
-        $gate->define('absent_invokable', 'someAbsentClass');
+        $gate->\define('foo', AccessGateTestClassForGuest::class.'@foo');
+        $gate->\define('obj_foo', [new AccessGateTestClassForGuest, 'foo']);
+        $gate->\define('static_foo', [AccessGateTestClassForGuest::class, 'staticFoo']);
+        $gate->\define('static_@foo', AccessGateTestClassForGuest::class.'@staticFoo');
+        $gate->\define('bar', AccessGateTestClassForGuest::class.'@bar');
+        $gate->\define('invokable', AccessGateTestGuestInvokableClass::class);
+        $gate->\define('nullable_invokable', AccessGateTestGuestNullableInvokable::class);
+        $gate->\define('absent_invokable', 'someAbsentClass');
 
         AccessGateTestClassForGuest::$calledMethod = '';
 
@@ -1118,7 +1118,7 @@ class AuthAccessGateTest extends TestCase
 
         $gate->defaultDenialResponse(Response::denyWithStatus(999, 'my_message', 'abc'));
 
-        $gate->define('foo', function () {
+        $gate->\define('foo', function () {
             return false;
         });
 
@@ -1137,7 +1137,7 @@ class AuthAccessGateTest extends TestCase
             //
         });
 
-        $gate->define('foo', function () {
+        $gate->\define('foo', function () {
             return false;
         });
         $gate->defaultDenialResponse(Response::denyWithStatus(404, 'not_found', 'xyz'));

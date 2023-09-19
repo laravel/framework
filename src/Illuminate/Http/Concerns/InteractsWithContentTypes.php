@@ -48,7 +48,7 @@ trait InteractsWithContentTypes
     {
         $accepts = $this->getAcceptableContentTypes();
 
-        if (count($accepts) === 0) {
+        if (\count($accepts) === 0) {
             return true;
         }
 
@@ -86,14 +86,14 @@ trait InteractsWithContentTypes
         $contentTypes = (array) $contentTypes;
 
         foreach ($accepts as $accept) {
-            if (in_array($accept, ['*/*', '*'])) {
+            if (\in_array($accept, ['*/*', '*'])) {
                 return $contentTypes[0];
             }
 
             foreach ($contentTypes as $contentType) {
                 $type = $contentType;
 
-                if (! is_null($mimeType = $this->getMimeType($contentType))) {
+                if (! \is_null($mimeType = $this->getMimeType($contentType))) {
                     $type = $mimeType;
                 }
 
@@ -117,7 +117,7 @@ trait InteractsWithContentTypes
     {
         $acceptable = $this->getAcceptableContentTypes();
 
-        return count($acceptable) === 0 || (
+        return \count($acceptable) === 0 || (
             isset($acceptable[0]) && ($acceptable[0] === '*/*' || $acceptable[0] === '*')
         );
     }

@@ -69,7 +69,7 @@ class SupportStrTest extends TestCase
 
     public function testStringWithoutWordsDoesntProduceError()
     {
-        $nbsp = chr(0xC2).chr(0xA0);
+        $nbsp = \chr(0xC2).\chr(0xA0);
         $this->assertSame(' ', Str::words(' '));
         $this->assertEquals($nbsp, Str::words($nbsp));
     }
@@ -503,9 +503,9 @@ class SupportStrTest extends TestCase
 
     public function testRandom()
     {
-        $this->assertEquals(16, strlen(Str::random()));
+        $this->assertEquals(16, \strlen(Str::random()));
         $randomInteger = random_int(1, 100);
-        $this->assertEquals($randomInteger, strlen(Str::random($randomInteger)));
+        $this->assertEquals($randomInteger, \strlen(Str::random($randomInteger)));
         $this->assertIsString(Str::random());
     }
 
@@ -1143,16 +1143,16 @@ class SupportStrTest extends TestCase
         $this->assertSame((string) $first, (string) $retrieved);
 
         $retrieved = Str::uuid();
-        $this->assertFalse(in_array($retrieved, [$zeroth, $first, $third], true));
-        $this->assertFalse(in_array((string) $retrieved, [(string) $zeroth, (string) $first, (string) $third], true));
+        $this->assertFalse(\in_array($retrieved, [$zeroth, $first, $third], true));
+        $this->assertFalse(\in_array((string) $retrieved, [(string) $zeroth, (string) $first, (string) $third], true));
 
         $retrieved = Str::uuid();
         $this->assertSame($third, $retrieved);
         $this->assertSame((string) $third, (string) $retrieved);
 
         $retrieved = Str::uuid();
-        $this->assertFalse(in_array($retrieved, [$zeroth, $first, $third], true));
-        $this->assertFalse(in_array((string) $retrieved, [(string) $zeroth, (string) $first, (string) $third], true));
+        $this->assertFalse(\in_array($retrieved, [$zeroth, $first, $third], true));
+        $this->assertFalse(\in_array((string) $retrieved, [(string) $zeroth, (string) $first, (string) $third], true));
 
         Str::createUuidsNormally();
     }
@@ -1245,16 +1245,16 @@ class SupportStrTest extends TestCase
         $this->assertSame((string) $first, (string) $retrieved);
 
         $retrieved = Str::ulid();
-        $this->assertFalse(in_array($retrieved, [$zeroth, $first, $third], true));
-        $this->assertFalse(in_array((string) $retrieved, [(string) $zeroth, (string) $first, (string) $third], true));
+        $this->assertFalse(\in_array($retrieved, [$zeroth, $first, $third], true));
+        $this->assertFalse(\in_array((string) $retrieved, [(string) $zeroth, (string) $first, (string) $third], true));
 
         $retrieved = Str::ulid();
         $this->assertSame($third, $retrieved);
         $this->assertSame((string) $third, (string) $retrieved);
 
         $retrieved = Str::ulid();
-        $this->assertFalse(in_array($retrieved, [$zeroth, $first, $third], true));
-        $this->assertFalse(in_array((string) $retrieved, [(string) $zeroth, (string) $first, (string) $third], true));
+        $this->assertFalse(\in_array($retrieved, [$zeroth, $first, $third], true));
+        $this->assertFalse(\in_array((string) $retrieved, [(string) $zeroth, (string) $first, (string) $third], true));
 
         Str::createUlidsNormally();
     }
@@ -1279,7 +1279,7 @@ class SupportStrTest extends TestCase
 
     public function testPasswordCreation()
     {
-        $this->assertTrue(strlen(Str::password()) === 32);
+        $this->assertTrue(\strlen(Str::password()) === 32);
     }
 }
 

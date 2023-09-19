@@ -127,7 +127,7 @@ class EloquentUserProvider implements UserProvider
         $query = $this->newModelQuery();
 
         foreach ($credentials as $key => $value) {
-            if (is_array($value) || $value instanceof Arrayable) {
+            if (\is_array($value) || $value instanceof Arrayable) {
                 $query->whereIn($key, $value);
             } elseif ($value instanceof Closure) {
                 $value($query);
@@ -148,7 +148,7 @@ class EloquentUserProvider implements UserProvider
      */
     public function validateCredentials(UserContract $user, array $credentials)
     {
-        if (is_null($plain = $credentials['password'])) {
+        if (\is_null($plain = $credentials['password'])) {
             return false;
         }
 
@@ -163,7 +163,7 @@ class EloquentUserProvider implements UserProvider
      */
     protected function newModelQuery($model = null)
     {
-        $query = is_null($model)
+        $query = \is_null($model)
                 ? $this->createModel()->newQuery()
                 : $model->newQuery();
 

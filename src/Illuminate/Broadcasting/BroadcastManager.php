@@ -152,7 +152,7 @@ class BroadcastManager implements FactoryContract
     public function queue($event)
     {
         if ($event instanceof ShouldBroadcastNow ||
-            (is_object($event) &&
+            (\is_object($event) &&
              method_exists($event, 'shouldBroadcastNow') &&
              $event->shouldBroadcastNow())) {
             return $this->app->make(BusDispatcherContract::class)->dispatchNow(new BroadcastEvent(clone $event));
@@ -245,7 +245,7 @@ class BroadcastManager implements FactoryContract
     {
         $config = $this->getConfig($name);
 
-        if (is_null($config)) {
+        if (\is_null($config)) {
             throw new InvalidArgumentException("Broadcast connection [{$name}] is not defined.");
         }
 
@@ -377,7 +377,7 @@ class BroadcastManager implements FactoryContract
      */
     protected function getConfig($name)
     {
-        if (! is_null($name) && $name !== 'null') {
+        if (! \is_null($name) && $name !== 'null') {
             return $this->app['config']["broadcasting.connections.{$name}"];
         }
 

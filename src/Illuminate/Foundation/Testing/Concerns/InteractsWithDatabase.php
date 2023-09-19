@@ -192,7 +192,7 @@ trait InteractsWithDatabase
             $actual = 0;
 
             $connectionInstance->listen(function (QueryExecuted $event) use (&$actual, $connectionInstance, $connection) {
-                if (is_null($connection) || $connectionInstance === $event->connection) {
+                if (\is_null($connection) || $connectionInstance === $event->connection) {
                     $actual++;
                 }
             });
@@ -218,7 +218,7 @@ trait InteractsWithDatabase
     protected function isSoftDeletableModel($model)
     {
         return $model instanceof Model
-            && in_array(SoftDeletes::class, class_uses_recursive($model));
+            && \in_array(SoftDeletes::class, class_uses_recursive($model));
     }
 
     /**
@@ -231,7 +231,7 @@ trait InteractsWithDatabase
     {
         if ($value instanceof Jsonable) {
             $value = $value->toJson();
-        } elseif (is_array($value) || is_object($value)) {
+        } elseif (\is_array($value) || \is_object($value)) {
             $value = json_encode($value);
         }
 

@@ -195,7 +195,7 @@ class NotificationSender
                     $notification->id = $notificationId;
                 }
 
-                if (! is_null($this->locale)) {
+                if (! \is_null($this->locale)) {
                     $notification->locale = $this->locale;
                 }
 
@@ -230,7 +230,7 @@ class NotificationSender
                     (new SendQueuedNotifications($notifiable, $notification, [$channel]))
                             ->onConnection($connection)
                             ->onQueue($queue)
-                            ->delay(is_array($delay) ? ($delay[$channel] ?? null) : $delay)
+                            ->delay(\is_array($delay) ? ($delay[$channel] ?? null) : $delay)
                             ->through($middleware)
                 );
             }
@@ -245,7 +245,7 @@ class NotificationSender
      */
     protected function formatNotifiables($notifiables)
     {
-        if (! $notifiables instanceof Collection && ! is_array($notifiables)) {
+        if (! $notifiables instanceof Collection && ! \is_array($notifiables)) {
             return $notifiables instanceof Model
                             ? new ModelCollection([$notifiables]) : [$notifiables];
         }

@@ -343,7 +343,7 @@ class Mailable implements MailableContract, Renderable
         $data = $this->viewData;
 
         if (static::$viewDataCallback) {
-            $data = array_merge($data, call_user_func(static::$viewDataCallback, $this));
+            $data = array_merge($data, \call_user_func(static::$viewDataCallback, $this));
         }
 
         foreach ((new ReflectionClass($this))->getProperties(ReflectionProperty::IS_PUBLIC) as $property) {
@@ -745,8 +745,8 @@ class Mailable implements MailableContract, Renderable
      */
     protected function addressesToArray($address, $name)
     {
-        if (! is_array($address) && ! $address instanceof Collection) {
-            $address = is_string($name) ? [['name' => $name, 'email' => $address]] : [$address];
+        if (! \is_array($address) && ! $address instanceof Collection) {
+            $address = \is_string($name) ? [['name' => $name, 'email' => $address]] : [$address];
         }
 
         return $address;
@@ -760,7 +760,7 @@ class Mailable implements MailableContract, Renderable
      */
     protected function normalizeRecipient($recipient)
     {
-        if (is_array($recipient)) {
+        if (\is_array($recipient)) {
             if (array_values($recipient) === $recipient) {
                 return (object) array_map(function ($email) {
                     return compact('email');
@@ -768,7 +768,7 @@ class Mailable implements MailableContract, Renderable
             }
 
             return (object) $recipient;
-        } elseif (is_string($recipient)) {
+        } elseif (\is_string($recipient)) {
             return (object) ['email' => $recipient];
         } elseif ($recipient instanceof Address) {
             return (object) ['email' => $recipient->getAddress(), 'name' => $recipient->getName()];
@@ -926,7 +926,7 @@ class Mailable implements MailableContract, Renderable
      */
     public function with($key, $value = null)
     {
-        if (is_array($key)) {
+        if (\is_array($key)) {
             $this->viewData = array_merge($this->viewData, $key);
         } else {
             $this->viewData[$key] = $value;
@@ -969,7 +969,7 @@ class Mailable implements MailableContract, Renderable
     public function attachMany($files)
     {
         foreach ($files as $file => $options) {
-            if (is_int($file)) {
+            if (\is_int($file)) {
                 $this->attach($options);
             } else {
                 $this->attach($file, $options);
@@ -1034,7 +1034,7 @@ class Mailable implements MailableContract, Renderable
 
         $attachments = $this->attachments();
 
-        return Collection::make(is_object($attachments) ? [$attachments] : $attachments)
+        return Collection::make(\is_object($attachments) ? [$attachments] : $attachments)
                 ->map(fn ($attached) => $attached instanceof Attachable ? $attached->toMailAttachment() : $attached)
                 ->contains(fn ($attached) => $attached->isEquivalent($attachment, $options));
     }
@@ -1164,8 +1164,8 @@ class Mailable implements MailableContract, Renderable
      */
     public function hasTag($value)
     {
-        return in_array($value, $this->tags) ||
-               (method_exists($this, 'envelope') && in_array($value, $this->envelope()->tags));
+        return \in_array($value, $this->tags) ||
+               (method_exists($this, 'envelope') && \in_array($value, $this->envelope()->tags));
     }
 
     /**
@@ -1321,7 +1321,7 @@ class Mailable implements MailableContract, Renderable
      */
     private function formatAssertionRecipient($address, $name = null)
     {
-        if (! is_string($address)) {
+        if (! \is_string($address)) {
             $address = json_encode($address);
         }
 
@@ -1602,7 +1602,7 @@ class Mailable implements MailableContract, Renderable
                 $view = $this->buildView(), $this->buildViewData()
             );
 
-            if (is_array($view) && isset($view[1])) {
+            if (\is_array($view) && isset($view[1])) {
                 $text = $view[1];
             }
 
@@ -1653,7 +1653,7 @@ class Mailable implements MailableContract, Renderable
                 $message->getHeaders()->addIdHeader('Message-Id', $headers->messageId);
             }
 
-            if (count($headers->references) > 0) {
+            if (\count($headers->references) > 0) {
                 $message->getHeaders()->addTextHeader('References', $headers->referencesString());
             }
 
@@ -1754,7 +1754,7 @@ class Mailable implements MailableContract, Renderable
 
         $attachments = $this->attachments();
 
-        Collection::make(is_object($attachments) ? [$attachments] : $attachments)
+        Collection::make(\is_object($attachments) ? [$attachments] : $attachments)
             ->each(function ($attachment) {
                 $this->attach($attachment);
             });

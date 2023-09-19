@@ -137,7 +137,7 @@ class ServeCommand extends Command
                 return [$key => $value];
             }
 
-            return in_array($key, static::$passthroughVariables) ? [$key => $value] : [$key => false];
+            return \in_array($key, static::$passthroughVariables) ? [$key => $value] : [$key => false];
         })->all());
 
         $process->start($this->handleProcessOutput());
@@ -185,7 +185,7 @@ class ServeCommand extends Command
     {
         $port = $this->input->getOption('port');
 
-        if (is_null($port)) {
+        if (\is_null($port)) {
             [, $port] = $this->getHostAndPort();
         }
 
@@ -223,7 +223,7 @@ class ServeCommand extends Command
      */
     protected function canTryAnotherPort()
     {
-        return is_null($this->input->getOption('port')) &&
+        return \is_null($this->input->getOption('port')) &&
                ($this->input->getOption('tries') > $this->portOffset);
     }
 
@@ -288,7 +288,7 @@ class ServeCommand extends Command
                 // ...
             } elseif (! empty($line)) {
                 $warning = explode('] ', $line);
-                $this->components->warn(count($warning) > 1 ? $warning[1] : $warning[0]);
+                $this->components->warn(\count($warning) > 1 ? $warning[1] : $warning[0]);
             }
         });
     }

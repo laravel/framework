@@ -106,7 +106,7 @@ class Str
             return $subject;
         }
 
-        return substr($subject, $position + strlen($search));
+        return substr($subject, $position + \strlen($search));
     }
 
     /**
@@ -448,11 +448,11 @@ class Str
      */
     public static function isJson($value)
     {
-        if (! is_string($value)) {
+        if (! \is_string($value)) {
             return false;
         }
 
-        if (function_exists('json_validate')) {
+        if (\function_exists('json_validate')) {
             return json_validate($value, 512);
         }
 
@@ -474,7 +474,7 @@ class Str
      */
     public static function isUrl($value, array $protocols = [])
     {
-        if (! is_string($value)) {
+        if (! \is_string($value)) {
             return false;
         }
 
@@ -516,7 +516,7 @@ class Str
      */
     public static function isUuid($value)
     {
-        if (! is_string($value)) {
+        if (! \is_string($value)) {
             return false;
         }
 
@@ -531,7 +531,7 @@ class Str
      */
     public static function isUlid($value)
     {
-        if (! is_string($value)) {
+        if (! \is_string($value)) {
             return false;
         }
 
@@ -857,7 +857,7 @@ class Str
                     ']', '|', ':', ';',
                 ]))
                 ->when($spaces, fn ($c) => $c->merge([' ']))
-                ->pipe(fn ($c) => Collection::times($length, fn () => $c[random_int(0, $c->count() - 1)]))
+                ->pipe(fn ($c) => Collection::times($length, fn () => $c[random_int(0, $c->\count() - 1)]))
                 ->implode('');
     }
 
@@ -886,7 +886,7 @@ class Str
         return (static::$randomStringFactory ?? function ($length) {
             $string = '';
 
-            while (($len = strlen($string)) < $length) {
+            while (($len = \strlen($string)) < $length) {
                 $size = $length - $len;
 
                 $bytesSize = (int) ceil($size / 3) * 3;
@@ -937,7 +937,7 @@ class Str
         };
 
         static::createRandomStringsUsing(function ($length) use (&$next, $sequence, $whenMissing) {
-            if (array_key_exists($next, $sequence)) {
+            if (\array_key_exists($next, $sequence)) {
                 return $sequence[$next++];
             }
 
@@ -1039,7 +1039,7 @@ class Str
         $position = strpos($subject, $search);
 
         if ($position !== false) {
-            return substr_replace($subject, $replace, $position, strlen($search));
+            return substr_replace($subject, $replace, $position, \strlen($search));
         }
 
         return $subject;
@@ -1087,7 +1087,7 @@ class Str
         $position = strrpos($subject, $search);
 
         if ($position !== false) {
-            return substr_replace($subject, $replace, $position, strlen($search));
+            return substr_replace($subject, $replace, $position, \strlen($search));
         }
 
         return $subject;
@@ -1192,7 +1192,7 @@ class Str
     {
         $parts = explode(' ', $value);
 
-        $parts = count($parts) > 1
+        $parts = \count($parts) > 1
             ? array_map([static::class, 'title'], $parts)
             : array_map([static::class, 'title'], static::ucsplit(implode('_', $parts)));
 
@@ -1349,7 +1349,7 @@ class Str
      */
     public static function substrCount($haystack, $needle, $offset = 0, $length = null)
     {
-        if (! is_null($length)) {
+        if (! \is_null($length)) {
             return substr_count($haystack, $needle, $offset, $length);
         }
 
@@ -1368,7 +1368,7 @@ class Str
     public static function substrReplace($string, $replace, $offset = 0, $length = null)
     {
         if ($length === null) {
-            $length = strlen($string);
+            $length = \strlen($string);
         }
 
         return substr_replace($string, $replace, $offset, $length);
@@ -1453,7 +1453,7 @@ class Str
     public static function uuid()
     {
         return static::$uuidFactory
-                    ? call_user_func(static::$uuidFactory)
+                    ? \call_user_func(static::$uuidFactory)
                     : Uuid::uuid4();
     }
 
@@ -1465,7 +1465,7 @@ class Str
     public static function orderedUuid()
     {
         if (static::$uuidFactory) {
-            return call_user_func(static::$uuidFactory);
+            return \call_user_func(static::$uuidFactory);
         }
 
         $factory = new UuidFactory;
@@ -1519,7 +1519,7 @@ class Str
         };
 
         static::createUuidsUsing(function () use (&$next, $sequence, $whenMissing) {
-            if (array_key_exists($next, $sequence)) {
+            if (\array_key_exists($next, $sequence)) {
                 return $sequence[$next++];
             }
 
@@ -1569,7 +1569,7 @@ class Str
     public static function ulid($time = null)
     {
         if (static::$ulidFactory) {
-            return call_user_func(static::$ulidFactory);
+            return \call_user_func(static::$ulidFactory);
         }
 
         if ($time === null) {
@@ -1626,7 +1626,7 @@ class Str
         };
 
         static::createUlidsUsing(function () use (&$next, $sequence, $whenMissing) {
-            if (array_key_exists($next, $sequence)) {
+            if (\array_key_exists($next, $sequence)) {
                 return $sequence[$next++];
             }
 

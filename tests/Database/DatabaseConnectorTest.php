@@ -339,13 +339,13 @@ class DatabaseConnectorTest extends TestCase
 
         $availableDrivers = PDO::getAvailableDrivers();
 
-        if (in_array('odbc', $availableDrivers) &&
+        if (\in_array('odbc', $availableDrivers) &&
             ($config['odbc'] ?? null) === true) {
             return isset($config['odbc_datasource_name'])
                 ? 'odbc:'.$config['odbc_datasource_name'] : '';
         }
 
-        if (in_array('sqlsrv', $availableDrivers)) {
+        if (\in_array('sqlsrv', $availableDrivers)) {
             $port = isset($config['port']) ? ','.$port : '';
             $appname = isset($config['appname']) ? ';APP='.$config['appname'] : '';
             $readonly = isset($config['readonly']) ? ';ApplicationIntent=ReadOnly' : '';

@@ -309,7 +309,7 @@ class Connection implements ConnectionInterface
      */
     public function getSchemaBuilder()
     {
-        if (is_null($this->schemaGrammar)) {
+        if (\is_null($this->schemaGrammar)) {
             $this->useDefaultSchemaGrammar();
         }
 
@@ -369,13 +369,13 @@ class Connection implements ConnectionInterface
     {
         $record = $this->selectOne($query, $bindings, $useReadPdo);
 
-        if (is_null($record)) {
+        if (\is_null($record)) {
             return null;
         }
 
         $record = (array) $record;
 
-        if (count($record) > 1) {
+        if (\count($record) > 1) {
             throw new MultipleColumnsSelectedException;
         }
 
@@ -693,11 +693,11 @@ class Connection implements ConnectionInterface
     {
         foreach ($bindings as $key => $value) {
             $statement->bindValue(
-                is_string($key) ? $key : $key + 1,
+                \is_string($key) ? $key : $key + 1,
                 $value,
                 match (true) {
-                    is_int($value) => PDO::PARAM_INT,
-                    is_resource($value) => PDO::PARAM_LOB,
+                    \is_int($value) => PDO::PARAM_INT,
+                    \is_resource($value) => PDO::PARAM_LOB,
                     default => PDO::PARAM_STR
                 },
             );
@@ -720,7 +720,7 @@ class Connection implements ConnectionInterface
             // so we'll just ask the grammar for the format to get from the date.
             if ($value instanceof DateTimeInterface) {
                 $bindings[$key] = $value->format($grammar->getDateFormat());
-            } elseif (is_bool($value)) {
+            } elseif (\is_bool($value)) {
                 $bindings[$key] = (int) $value;
             }
         }
@@ -867,7 +867,7 @@ class Connection implements ConnectionInterface
             'handler' => $handler,
         ];
 
-        $key = count($this->queryDurationHandlers) - 1;
+        $key = \count($this->queryDurationHandlers) - 1;
 
         $this->listen(function ($event) use ($threshold, $handler, $key) {
             if (! $this->queryDurationHandlers[$key]['has_run'] && $this->totalQueryDuration() > $threshold) {
@@ -963,10 +963,10 @@ class Connection implements ConnectionInterface
      */
     public function reconnect()
     {
-        if (is_callable($this->reconnector)) {
+        if (\is_callable($this->reconnector)) {
             $this->doctrineConnection = null;
 
-            return call_user_func($this->reconnector, $this);
+            return \call_user_func($this->reconnector, $this);
         }
 
         throw new LostConnectionException('Lost connection and no reconnector available.');
@@ -979,7 +979,7 @@ class Connection implements ConnectionInterface
      */
     public function reconnectIfMissingConnection()
     {
-        if (is_null($this->pdo)) {
+        if (\is_null($this->pdo)) {
             $this->reconnect();
         }
     }
@@ -1072,9 +1072,9 @@ class Connection implements ConnectionInterface
             return 'null';
         } elseif ($binary) {
             return $this->escapeBinary($value);
-        } elseif (is_int($value) || is_float($value)) {
+        } elseif (\is_int($value) || \is_float($value)) {
             return (string) $value;
-        } elseif (is_bool($value)) {
+        } elseif (\is_bool($value)) {
             return $this->escapeBool($value);
         } else {
             if (str_contains($value, "\00")) {
@@ -1234,7 +1234,7 @@ class Connection implements ConnectionInterface
      */
     public function getDoctrineConnection()
     {
-        if (is_null($this->doctrineConnection)) {
+        if (\is_null($this->doctrineConnection)) {
             $driver = $this->getDoctrineDriver();
 
             $this->doctrineConnection = new DoctrineConnection(array_filter([
@@ -1275,7 +1275,7 @@ class Connection implements ConnectionInterface
 
         if (! Type::hasType($name)) {
             Type::getTypeRegistry()
-                ->register($name, is_string($class) ? new $class() : $class);
+                ->register($name, \is_string($class) ? new $class() : $class);
         }
 
         $this->doctrineTypeMappings[$name] = $type;
@@ -1289,7 +1289,7 @@ class Connection implements ConnectionInterface
     public function getPdo()
     {
         if ($this->pdo instanceof Closure) {
-            return $this->pdo = call_user_func($this->pdo);
+            return $this->pdo = \call_user_func($this->pdo);
         }
 
         return $this->pdo;
@@ -1322,7 +1322,7 @@ class Connection implements ConnectionInterface
         }
 
         if ($this->readPdo instanceof Closure) {
-            return $this->readPdo = call_user_func($this->readPdo);
+            return $this->readPdo = \call_user_func($this->readPdo);
         }
 
         return $this->readPdo ?: $this->getPdo();

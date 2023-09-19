@@ -91,7 +91,7 @@ abstract class Component
     public static function resolve($data)
     {
         if (static::$componentsResolver) {
-            return call_user_func(static::$componentsResolver, static::class, $data);
+            return \call_user_func(static::$componentsResolver, static::class, $data);
         }
 
         $parameters = static::extractConstructorParameters();
@@ -166,7 +166,7 @@ abstract class Component
             return static::$bladeViewCache[$key];
         }
 
-        if (strlen($contents) <= PHP_MAXPATHLEN && $this->factory()->exists($contents)) {
+        if (\strlen($contents) <= PHP_MAXPATHLEN && $this->factory()->exists($contents)) {
             return static::$bladeViewCache[$key] = $contents;
         }
 
@@ -220,7 +220,7 @@ abstract class Component
      */
     protected function extractPublicProperties()
     {
-        $class = get_class($this);
+        $class = \get_class($this);
 
         if (! isset(static::$propertyCache[$class])) {
             $reflection = new ReflectionClass($this);
@@ -253,7 +253,7 @@ abstract class Component
      */
     protected function extractPublicMethods()
     {
-        $class = get_class($this);
+        $class = \get_class($this);
 
         if (! isset(static::$methodCache[$class])) {
             $reflection = new ReflectionClass($this);
@@ -311,7 +311,7 @@ abstract class Component
     protected function shouldIgnore($name)
     {
         return str_starts_with($name, '__') ||
-               in_array($name, $this->ignoredMethods());
+               \in_array($name, $this->ignoredMethods());
     }
 
     /**
@@ -406,7 +406,7 @@ abstract class Component
      */
     protected function factory()
     {
-        if (is_null(static::$factory)) {
+        if (\is_null(static::$factory)) {
             static::$factory = Container::getInstance()->make('view');
         }
 

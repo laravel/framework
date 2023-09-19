@@ -85,7 +85,7 @@ class Sleep
      */
     public static function until($timestamp)
     {
-        if (is_int($timestamp)) {
+        if (\is_int($timestamp)) {
             $timestamp = Carbon::createFromTimestamp($timestamp);
         }
 
@@ -328,7 +328,7 @@ class Sleep
      */
     public static function assertSlept($expected, $times = 1)
     {
-        $count = collect(static::$sequence)->filter($expected)->count();
+        $count = collect(static::$sequence)->filter($expected)->\count();
 
         PHPUnit::assertSame(
             $times,
@@ -345,7 +345,7 @@ class Sleep
      */
     public static function assertSleptTimes($expected)
     {
-        PHPUnit::assertSame($expected, $count = count(static::$sequence), "Expected [{$expected}] sleeps but found [{$count}].");
+        PHPUnit::assertSame($expected, $count = \count(static::$sequence), "Expected [{$expected}] sleeps but found [{$count}].");
     }
 
     /**
@@ -356,7 +356,7 @@ class Sleep
      */
     public static function assertSequence($sequence)
     {
-        static::assertSleptTimes(count($sequence));
+        static::assertSleptTimes(\count($sequence));
 
         collect($sequence)
             ->zip(static::$sequence)

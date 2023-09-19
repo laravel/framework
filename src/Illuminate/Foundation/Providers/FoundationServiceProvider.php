@@ -100,7 +100,7 @@ class FoundationServiceProvider extends AggregateServiceProvider
             'cli' == $format => CliDumper::register($basePath, $compiledViewPath),
             'server' == $format => null,
             $format && 'tcp' == parse_url($format, PHP_URL_SCHEME) => null,
-            default => in_array(PHP_SAPI, ['cli', 'phpdbg']) ? CliDumper::register($basePath, $compiledViewPath) : HtmlDumper::register($basePath, $compiledViewPath),
+            default => \in_array(PHP_SAPI, ['cli', 'phpdbg']) ? CliDumper::register($basePath, $compiledViewPath) : HtmlDumper::register($basePath, $compiledViewPath),
         };
     }
 

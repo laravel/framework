@@ -36,7 +36,7 @@ class SupportLazyCollectionIsLazyTest extends TestCase
         $this->assertEnumeratesOnce(function ($collection) {
             $collection = $collection->eager();
 
-            $collection->count();
+            $collection->\count();
             $collection->all();
         });
     }
@@ -160,7 +160,7 @@ class SupportLazyCollectionIsLazyTest extends TestCase
     public function testCountEnumeratesOnce()
     {
         $this->assertEnumeratesOnce(function ($collection) {
-            $collection->count();
+            $collection->\count();
         });
     }
 

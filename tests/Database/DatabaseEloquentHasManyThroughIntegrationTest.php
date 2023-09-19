@@ -356,7 +356,7 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
 
         $country->posts()->chunkById(2, function ($collection) use (&$i, &$count) {
             $i++;
-            $count += $collection->count();
+            $count += $collection->\count();
         });
 
         $this->assertEquals(3, $i);

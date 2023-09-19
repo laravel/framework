@@ -113,7 +113,7 @@ class ResourceRegistrar
             }
 
             if (isset($options['trashed']) &&
-                in_array($m, ! empty($options['trashed']) ? $options['trashed'] : array_intersect($resourceMethods, ['show', 'edit', 'update']))) {
+                \in_array($m, ! empty($options['trashed']) ? $options['trashed'] : array_intersect($resourceMethods, ['show', 'edit', 'update']))) {
                 $route->withTrashed();
             }
 
@@ -230,7 +230,7 @@ class ResourceRegistrar
         // To get the prefix, we will take all of the name segments and implode them on
         // a slash. This will generate a proper URI prefix for us. Then we take this
         // last segment, which will be considered the final resources name we use.
-        $prefix = implode('/', array_slice($segments, 0, -1));
+        $prefix = implode('/', \array_slice($segments, 0, -1));
 
         return [end($segments), $prefix];
     }
@@ -650,7 +650,7 @@ class ResourceRegistrar
         // array first. We will also check for the specific method within this array
         // so the names may be specified on a more "granular" level using methods.
         if (isset($options['names'])) {
-            if (is_string($options['names'])) {
+            if (\is_string($options['names'])) {
                 $name = $options['names'];
             } elseif (isset($options['names'][$method])) {
                 return $options['names'][$method];

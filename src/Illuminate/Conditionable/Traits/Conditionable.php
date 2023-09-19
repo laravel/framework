@@ -22,11 +22,11 @@ trait Conditionable
     {
         $value = $value instanceof Closure ? $value($this) : $value;
 
-        if (func_num_args() === 0) {
+        if (\func_num_args() === 0) {
             return new HigherOrderWhenProxy($this);
         }
 
-        if (func_num_args() === 1) {
+        if (\func_num_args() === 1) {
             return (new HigherOrderWhenProxy($this))->condition($value);
         }
 
@@ -54,11 +54,11 @@ trait Conditionable
     {
         $value = $value instanceof Closure ? $value($this) : $value;
 
-        if (func_num_args() === 0) {
+        if (\func_num_args() === 0) {
             return (new HigherOrderWhenProxy($this))->negateConditionOnCapture();
         }
 
-        if (func_num_args() === 1) {
+        if (\func_num_args() === 1) {
             return (new HigherOrderWhenProxy($this))->condition(! $value);
         }
 

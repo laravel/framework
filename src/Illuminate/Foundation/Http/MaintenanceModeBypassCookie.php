@@ -34,7 +34,7 @@ class MaintenanceModeBypassCookie
     {
         $payload = json_decode(base64_decode($cookie), true);
 
-        return is_array($payload) &&
+        return \is_array($payload) &&
             is_numeric($payload['expires_at'] ?? null) &&
             isset($payload['mac']) &&
             hash_equals(hash_hmac('sha256', $payload['expires_at'], $key), $payload['mac']) &&

@@ -69,7 +69,7 @@ class Event extends Facade
     {
         return static::fake([
             function ($eventName) use ($eventsToAllow) {
-                return ! in_array($eventName, (array) $eventsToAllow);
+                return ! \in_array($eventName, (array) $eventsToAllow);
             },
         ]);
     }

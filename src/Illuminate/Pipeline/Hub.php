@@ -67,7 +67,7 @@ class Hub implements HubContract
     {
         $pipeline = $pipeline ?: 'default';
 
-        return call_user_func(
+        return \call_user_func(
             $this->pipelines[$pipeline], new Pipeline($this->container), $object
         );
     }

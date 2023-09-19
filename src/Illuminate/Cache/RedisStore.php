@@ -64,7 +64,7 @@ class RedisStore extends TaggableStore implements LockProvider
     {
         $value = $this->connection()->get($this->prefix.$key);
 
-        return ! is_null($value) ? $this->unserialize($value) : null;
+        return ! \is_null($value) ? $this->unserialize($value) : null;
     }
 
     /**
@@ -77,7 +77,7 @@ class RedisStore extends TaggableStore implements LockProvider
      */
     public function many(array $keys)
     {
-        if (count($keys) === 0) {
+        if (\count($keys) === 0) {
             return [];
         }
 
@@ -88,7 +88,7 @@ class RedisStore extends TaggableStore implements LockProvider
         }, $keys));
 
         foreach ($values as $index => $value) {
-            $results[$keys[$index]] = ! is_null($value) ? $this->unserialize($value) : null;
+            $results[$keys[$index]] = ! \is_null($value) ? $this->unserialize($value) : null;
         }
 
         return $results;
@@ -133,7 +133,7 @@ class RedisStore extends TaggableStore implements LockProvider
                 $key, (int) max(1, $seconds), $value
             );
 
-            $manyResult = is_null($manyResult) ? $result : $result && $manyResult;
+            $manyResult = \is_null($manyResult) ? $result : $result && $manyResult;
         }
 
         $this->connection()->exec();
@@ -271,7 +271,7 @@ class RedisStore extends TaggableStore implements LockProvider
     public function tags($names)
     {
         return new RedisTaggedCache(
-            $this, new RedisTagSet($this, is_array($names) ? $names : func_get_args())
+            $this, new RedisTagSet($this, \is_array($names) ? $names : \func_get_args())
         );
     }
 
@@ -303,7 +303,7 @@ class RedisStore extends TaggableStore implements LockProvider
                     ['match' => $prefix.'tag:*:entries', 'count' => $chunkSize]
                 );
 
-                if (! is_array($tagsChunk)) {
+                if (! \is_array($tagsChunk)) {
                     break;
                 }
 
@@ -403,7 +403,7 @@ class RedisStore extends TaggableStore implements LockProvider
      */
     protected function serialize($value)
     {
-        return is_numeric($value) && ! in_array($value, [INF, -INF]) && ! is_nan($value) ? $value : serialize($value);
+        return is_numeric($value) && ! \in_array($value, [INF, -INF]) && ! is_nan($value) ? $value : serialize($value);
     }
 
     /**

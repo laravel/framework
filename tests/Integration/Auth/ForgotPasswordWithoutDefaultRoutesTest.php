@@ -60,7 +60,7 @@ class ForgotPasswordWithoutDefaultRoutesTest extends TestCase
             function (ResetPassword $notification, $channels) use ($user) {
                 $message = $notification->toMail($user);
 
-                return ! is_null($notification->token)
+                return ! \is_null($notification->token)
                     && $message->actionUrl === route('custom.password.reset', ['token' => $notification->token, 'email' => $user->email]);
             }
         );
@@ -88,7 +88,7 @@ class ForgotPasswordWithoutDefaultRoutesTest extends TestCase
             function (ResetPassword $notification, $channels) use ($user) {
                 $message = $notification->toMail($user);
 
-                return ! is_null($notification->token)
+                return ! \is_null($notification->token)
                     && $message->actionUrl === route('custom.password.reset', ['token' => $notification->token]);
             }
         );
@@ -120,7 +120,7 @@ class ForgotPasswordWithoutDefaultRoutesTest extends TestCase
             function (ResetPassword $notification, $channels) use ($user) {
                 $message = $notification->toMail($user);
 
-                return ! is_null($notification->token)
+                return ! \is_null($notification->token)
                     && $message->actionUrl === route('custom.password.reset', ['token' => $notification->token]);
             }
         );

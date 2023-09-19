@@ -106,7 +106,7 @@ class PruneCommandTest extends TestCase
             $output,
         );
 
-        $this->assertEquals(2, PrunableTestSoftDeletedModelWithPrunableRecords::withTrashed()->count());
+        $this->assertEquals(2, PrunableTestSoftDeletedModelWithPrunableRecords::withTrashed()->\count());
     }
 
     public function testNonPrunableTest()
@@ -160,7 +160,7 @@ class PruneCommandTest extends TestCase
             $output->fetch(),
         );
 
-        $this->assertEquals(5, PrunableTestModelWithPrunableRecords::count());
+        $this->assertEquals(5, PrunableTestModelWithPrunableRecords::\count());
     }
 
     public function testTheCommandMayBePretendedOnSoftDeletedModel()
@@ -193,7 +193,7 @@ class PruneCommandTest extends TestCase
             $output->fetch(),
         );
 
-        $this->assertEquals(4, PrunableTestSoftDeletedModelWithPrunableRecords::withTrashed()->count());
+        $this->assertEquals(4, PrunableTestSoftDeletedModelWithPrunableRecords::withTrashed()->\count());
     }
 
     public function testTheCommandDispatchesEvents()
@@ -201,13 +201,13 @@ class PruneCommandTest extends TestCase
         $dispatcher = m::mock(DispatcherContract::class);
 
         $dispatcher->shouldReceive('dispatch')->once()->withArgs(function ($event) {
-            return get_class($event) === ModelPruningStarting::class &&
+            return \get_class($event) === ModelPruningStarting::class &&
                 $event->models === [PrunableTestModelWithPrunableRecords::class];
         });
         $dispatcher->shouldReceive('listen')->once()->with(ModelsPruned::class, m::type(Closure::class));
         $dispatcher->shouldReceive('dispatch')->twice()->with(m::type(ModelsPruned::class));
         $dispatcher->shouldReceive('dispatch')->once()->withArgs(function ($event) {
-            return get_class($event) === ModelPruningFinished::class &&
+            return \get_class($event) === ModelPruningFinished::class &&
                 $event->models === [PrunableTestModelWithPrunableRecords::class];
         });
         $dispatcher->shouldReceive('forget')->once()->with(ModelsPruned::class);

@@ -515,7 +515,7 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, ['framework' => 3], ['framework' => 'framework_php']);
         $v->addExtension('framework_php', function ($attribute, $value, $parameters, $validator) {
-            return in_array($value, [1, 2]);
+            return \in_array($value, [1, 2]);
         });
         $v->addCustomValues(['framework' => $frameworks]);
 
@@ -1675,7 +1675,7 @@ class ValidationValidatorTest extends TestCase
     {
         $emptyCountable = new class implements Countable
         {
-            public function count(): int
+            public function \count(): int
             {
                 return 0;
             }
@@ -2290,7 +2290,7 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, ['foo' => new class implements Countable
         {
-            public function count(): int
+            public function \count(): int
             {
                 return 0;
             }
@@ -2329,7 +2329,7 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, ['foo' => new class implements Countable
         {
-            public function count(): int
+            public function \count(): int
             {
                 return 0;
             }
@@ -2368,7 +2368,7 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, ['foo' => new class implements Countable
         {
-            public function count(): int
+            public function \count(): int
             {
                 return 0;
             }
@@ -2410,7 +2410,7 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, ['foo' => new class implements Countable
         {
-            public function count(): int
+            public function \count(): int
             {
                 return 0;
             }
@@ -2452,7 +2452,7 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, ['foo' => new class implements Countable
         {
-            public function count(): int
+            public function \count(): int
             {
                 return 0;
             }
@@ -3696,7 +3696,7 @@ class ValidationValidatorTest extends TestCase
         $mock = m::mock(DatabasePresenceVerifierInterface::class);
         $mock->shouldReceive('setConnection')->once()->with(null);
         $mock->shouldReceive('getCount')->once()->withArgs(function () {
-            return func_get_args() === ['users', 'email_addr', 'foo', null, 'id_col', ['foo' => 'bar']];
+            return \func_get_args() === ['users', 'email_addr', 'foo', null, 'id_col', ['foo' => 'bar']];
         })->andReturn(2);
         $v->setPresenceVerifier($mock);
         $this->assertFalse($v->passes());
@@ -5860,7 +5860,7 @@ class ValidationValidatorTest extends TestCase
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['foo' => [['name' => 'first', 'title' => null]]], []);
         $v->sometimes('foo.*.name', 'Required|String', function ($i) {
-            return is_null($i['foo'][0]['title']);
+            return \is_null($i['foo'][0]['title']);
         });
         $this->assertEquals(['foo.0.name' => ['Required', 'String']], $v->getRules());
     }
@@ -7381,7 +7381,7 @@ class ValidationValidatorTest extends TestCase
                 {
                     public function passes($attribute, $value)
                     {
-                        return in_array($value, ['AK', 'HI']);
+                        return \in_array($value, ['AK', 'HI']);
                     }
 
                     public function message()
@@ -8877,7 +8877,7 @@ class ValidationValidatorTest extends TestCase
         $withinRange = true;
 
         $validator->ensureExponentWithinAllowedRangeUsing(function () use (&$scale, &$attribute, &$value, &$withinRange) {
-            [$scale, $attribute, $value] = func_get_args();
+            [$scale, $attribute, $value] = \func_get_args();
 
             return $withinRange;
         });

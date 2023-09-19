@@ -272,7 +272,7 @@ class DatabaseEloquentCollectionTest extends TestCase
             return 'not-a-model';
         });
 
-        $this->assertEquals(BaseCollection::class, get_class($c));
+        $this->assertEquals(BaseCollection::class, \get_class($c));
     }
 
     public function testMapWithKeys()
@@ -301,7 +301,7 @@ class DatabaseEloquentCollectionTest extends TestCase
             return [$key++ => 'not-a-model'];
         });
 
-        $this->assertEquals(BaseCollection::class, get_class($c));
+        $this->assertEquals(BaseCollection::class, \get_class($c));
     }
 
     public function testCollectionDiffsWithGivenCollection()
@@ -492,13 +492,13 @@ class DatabaseEloquentCollectionTest extends TestCase
     {
         $a = new Collection([['foo' => 'bar'], ['foo' => 'baz']]);
         $b = new Collection(['a', 'b', 'c']);
-        $this->assertEquals(BaseCollection::class, get_class($a->pluck('foo')));
-        $this->assertEquals(BaseCollection::class, get_class($a->keys()));
-        $this->assertEquals(BaseCollection::class, get_class($a->collapse()));
-        $this->assertEquals(BaseCollection::class, get_class($a->flatten()));
-        $this->assertEquals(BaseCollection::class, get_class($a->zip(['a', 'b'], ['c', 'd'])));
-        $this->assertEquals(BaseCollection::class, get_class($a->countBy('foo')));
-        $this->assertEquals(BaseCollection::class, get_class($b->flip()));
+        $this->assertEquals(BaseCollection::class, \get_class($a->pluck('foo')));
+        $this->assertEquals(BaseCollection::class, \get_class($a->keys()));
+        $this->assertEquals(BaseCollection::class, \get_class($a->collapse()));
+        $this->assertEquals(BaseCollection::class, \get_class($a->flatten()));
+        $this->assertEquals(BaseCollection::class, \get_class($a->zip(['a', 'b'], ['c', 'd'])));
+        $this->assertEquals(BaseCollection::class, \get_class($a->countBy('foo')));
+        $this->assertEquals(BaseCollection::class, \get_class($b->flip()));
     }
 
     public function testMakeVisibleRemovesHiddenAndIncludesVisible()

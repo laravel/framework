@@ -64,7 +64,7 @@ class Grammar extends BaseGrammar
         // can build the query and concatenate all the pieces together as one.
         $original = $query->columns;
 
-        if (is_null($query->columns)) {
+        if (\is_null($query->columns)) {
             $query->columns = ['*'];
         }
 
@@ -119,7 +119,7 @@ class Grammar extends BaseGrammar
         // If the query has a "distinct" constraint and we're not asking for all columns
         // we need to prepend "distinct" onto the column name so that the query takes
         // it into account when it performs the aggregating operations on the data.
-        if (is_array($query->distinct)) {
+        if (\is_array($query->distinct)) {
             $column = 'distinct '.$this->columnize($query->distinct);
         } elseif ($query->distinct && $column !== '*') {
             $column = 'distinct '.$column;
@@ -140,7 +140,7 @@ class Grammar extends BaseGrammar
         // If the query is actually performing an aggregating select, we will let that
         // compiler handle the building of the select clauses, as it will need some
         // more syntax that is best handled by that function to keep things neat.
-        if (! is_null($query->aggregate)) {
+        if (! \is_null($query->aggregate)) {
             return;
         }
 
@@ -177,9 +177,9 @@ class Grammar extends BaseGrammar
         return collect($joins)->map(function ($join) use ($query) {
             $table = $this->wrapTable($join->table);
 
-            $nestedJoins = is_null($join->joins) ? '' : ' '.$this->compileJoins($query, $join->joins);
+            $nestedJoins = \is_null($join->joins) ? '' : ' '.$this->compileJoins($query, $join->joins);
 
-            $tableAndNestedJoins = is_null($join->joins) ? $table : '('.$table.$nestedJoins.')';
+            $tableAndNestedJoins = \is_null($join->joins) ? $table : '('.$table.$nestedJoins.')';
 
             return trim("{$join->type} join {$tableAndNestedJoins} {$this->compileWheres($join)}");
         })->implode(' ');
@@ -196,14 +196,14 @@ class Grammar extends BaseGrammar
         // Each type of where clause has its own compiler function, which is responsible
         // for actually creating the where clauses SQL. This helps keep the code nice
         // and maintainable since each clause has a very small method that it uses.
-        if (is_null($query->wheres)) {
+        if (\is_null($query->wheres)) {
             return '';
         }
 
         // If we actually have some where clauses, we will strip off the first boolean
         // operator, which is added by the query builders for convenience so we can
         // avoid checking for the first clauses in each of the compilers methods.
-        if (count($sql = $this->compileWheresToArray($query)) > 0) {
+        if (\count($sql = $this->compileWheresToArray($query)) > 0) {
             return $this->concatenateWhereClauses($query, $sql);
         }
 
@@ -380,9 +380,9 @@ class Grammar extends BaseGrammar
     {
         $between = $where['not'] ? 'not between' : 'between';
 
-        $min = $this->parameter(is_array($where['values']) ? reset($where['values']) : $where['values'][0]);
+        $min = $this->parameter(\is_array($where['values']) ? reset($where['values']) : $where['values'][0]);
 
-        $max = $this->parameter(is_array($where['values']) ? end($where['values']) : $where['values'][1]);
+        $max = $this->parameter(\is_array($where['values']) ? end($where['values']) : $where['values'][1]);
 
         return $this->wrap($where['column']).' '.$between.' '.$min.' and '.$max;
     }
@@ -398,9 +398,9 @@ class Grammar extends BaseGrammar
     {
         $between = $where['not'] ? 'not between' : 'between';
 
-        $min = $this->wrap(is_array($where['values']) ? reset($where['values']) : $where['values'][0]);
+        $min = $this->wrap(\is_array($where['values']) ? reset($where['values']) : $where['values'][0]);
 
-        $max = $this->wrap(is_array($where['values']) ? end($where['values']) : $where['values'][1]);
+        $max = $this->wrap(\is_array($where['values']) ? end($where['values']) : $where['values'][1]);
 
         return $this->wrap($where['column']).' '.$between.' '.$min.' and '.$max;
     }
@@ -1027,7 +1027,7 @@ class Grammar extends BaseGrammar
             return "insert into {$table} default values";
         }
 
-        if (! is_array(reset($values))) {
+        if (! \is_array(reset($values))) {
             $values = [$values];
         }
 
@@ -1269,7 +1269,7 @@ class Grammar extends BaseGrammar
      */
     protected function compileLock(Builder $query, $value)
     {
-        return is_string($value) ? $value : '';
+        return \is_string($value) ? $value : '';
     }
 
     /**
@@ -1365,14 +1365,14 @@ class Grammar extends BaseGrammar
 
         $isStringLiteral = false;
 
-        for ($i = 0; $i < strlen($sql); $i++) {
+        for ($i = 0; $i < \strlen($sql); $i++) {
             $char = $sql[$i];
             $nextChar = $sql[$i + 1] ?? null;
 
             // Single quotes can be escaped as '' according to the SQL standard while
             // MySQL uses \'. Postgres has operators like ?| that must get encoded
             // in PHP like ??|. We should skip over the escaped characters here.
-            if (in_array($char.$nextChar, ["\'", "''", '??'])) {
+            if (\in_array($char.$nextChar, ["\'", "''", '??'])) {
                 $query .= $char.$nextChar;
                 $i += 1;
             } elseif ($char === "'") { // Starting / leaving string literal...

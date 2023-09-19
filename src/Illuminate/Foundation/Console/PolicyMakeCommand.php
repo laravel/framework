@@ -87,7 +87,7 @@ class PolicyMakeCommand extends GeneratorCommand
 
         $guard = $this->option('guard') ?: $config->get('auth.defaults.guard');
 
-        if (is_null($guardProvider = $config->get('auth.guards.'.$guard.'.provider'))) {
+        if (\is_null($guardProvider = $config->get('auth.guards.'.$guard.'.provider'))) {
             throw new LogicException('The ['.$guard.'] guard is not defined in your "auth" configuration file.');
         }
 

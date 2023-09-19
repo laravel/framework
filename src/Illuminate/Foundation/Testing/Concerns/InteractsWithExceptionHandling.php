@@ -127,7 +127,7 @@ trait InteractsWithExceptionHandling
 
                 if ($e instanceof NotFoundHttpException) {
                     throw new NotFoundHttpException(
-                        "{$request->method()} {$request->url()}", $e, is_int($e->getCode()) ? $e->getCode() : 0
+                        "{$request->method()} {$request->url()}", $e, \is_int($e->getCode()) ? $e->getCode() : 0
                     );
                 }
 

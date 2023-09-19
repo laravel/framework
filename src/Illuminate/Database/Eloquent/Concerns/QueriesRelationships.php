@@ -31,7 +31,7 @@ trait QueriesRelationships
      */
     public function has($relation, $operator = '>=', $count = 1, $boolean = 'and', Closure $callback = null)
     {
-        if (is_string($relation)) {
+        if (\is_string($relation)) {
             if (str_contains($relation, '.')) {
                 return $this->hasNested($relation, $operator, $count, $boolean, $callback);
             }
@@ -93,7 +93,7 @@ trait QueriesRelationships
             // In order to nest "has", we need to add count relation constraints on the
             // callback Closure. We'll do this by simply passing the Closure its own
             // reference to itself so it calls itself recursively on each segment.
-            count($relations) > 1
+            \count($relations) > 1
                 ? $q->whereHas(array_shift($relations), $closure)
                 : $q->has(array_shift($relations), $operator, $count, 'and', $callback);
         };
@@ -220,7 +220,7 @@ trait QueriesRelationships
      */
     public function hasMorph($relation, $types, $operator = '>=', $count = 1, $boolean = 'and', Closure $callback = null)
     {
-        if (is_string($relation)) {
+        if (\is_string($relation)) {
             $relation = $this->getRelationWithoutConstraints($relation);
         }
 
@@ -453,18 +453,18 @@ trait QueriesRelationships
      */
     public function whereMorphedTo($relation, $model, $boolean = 'and')
     {
-        if (is_string($relation)) {
+        if (\is_string($relation)) {
             $relation = $this->getRelationWithoutConstraints($relation);
         }
 
-        if (is_null($model)) {
+        if (\is_null($model)) {
             return $this->whereNull($relation->getMorphType(), $boolean);
         }
 
-        if (is_string($model)) {
+        if (\is_string($model)) {
             $morphMap = Relation::morphMap();
 
-            if (! empty($morphMap) && in_array($model, $morphMap)) {
+            if (! empty($morphMap) && \in_array($model, $morphMap)) {
                 $model = array_search($model, $morphMap, true);
             }
 
@@ -486,14 +486,14 @@ trait QueriesRelationships
      */
     public function whereNotMorphedTo($relation, $model, $boolean = 'and')
     {
-        if (is_string($relation)) {
+        if (\is_string($relation)) {
             $relation = $this->getRelationWithoutConstraints($relation);
         }
 
-        if (is_string($model)) {
+        if (\is_string($model)) {
             $morphMap = Relation::morphMap();
 
-            if (! empty($morphMap) && in_array($model, $morphMap)) {
+            if (! empty($morphMap) && \in_array($model, $morphMap)) {
                 $model = array_search($model, $morphMap, true);
             }
 
@@ -605,11 +605,11 @@ trait QueriesRelationships
             return $this;
         }
 
-        if (is_null($this->query->columns)) {
+        if (\is_null($this->query->columns)) {
             $this->query->select([$this->query->from.'.*']);
         }
 
-        $relations = is_array($relations) ? $relations : [$relations];
+        $relations = \is_array($relations) ? $relations : [$relations];
 
         foreach ($this->parseWithRelations($relations) as $name => $constraints) {
             // First we will determine if the name has been aliased using an "as" clause on the name
@@ -619,7 +619,7 @@ trait QueriesRelationships
 
             unset($alias);
 
-            if (count($segments) === 3 && Str::lower($segments[1]) === 'as') {
+            if (\count($segments) === 3 && Str::lower($segments[1]) === 'as') {
                 [$name, $alias] = [$segments[0], $segments[2]];
             }
 
@@ -654,7 +654,7 @@ trait QueriesRelationships
             $query->orders = null;
             $query->setBindings([], 'order');
 
-            if (count($query->columns) > 1) {
+            if (\count($query->columns) > 1) {
                 $query->columns = [$query->columns[0]];
                 $query->bindings['select'] = [];
             }
@@ -708,7 +708,7 @@ trait QueriesRelationships
      */
     public function withCount($relations)
     {
-        return $this->withAggregate(is_array($relations) ? $relations : func_get_args(), '*', 'count');
+        return $this->withAggregate(\is_array($relations) ? $relations : \func_get_args(), '*', 'count');
     }
 
     /**
@@ -828,7 +828,7 @@ trait QueriesRelationships
     {
         return collect($wheres)->map(function ($where) use ($from, $to) {
             return collect($where)->map(function ($value) use ($from, $to) {
-                return is_string($value) && str_starts_with($value, $from.'.')
+                return \is_string($value) && str_starts_with($value, $from.'.')
                     ? $to.'.'.Str::afterLast($value, '.')
                     : $value;
             });

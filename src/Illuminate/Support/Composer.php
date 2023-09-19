@@ -50,8 +50,8 @@ class Composer
     {
         $composer = json_decode(file_get_contents($this->findComposerFile()), true);
 
-        return array_key_exists($package, $composer['require'] ?? [])
-            || array_key_exists($package, $composer['require-dev'] ?? []);
+        return \array_key_exists($package, $composer['require'] ?? [])
+            || \array_key_exists($package, $composer['require-dev'] ?? []);
     }
 
     /**
@@ -129,7 +129,7 @@ class Composer
         file_put_contents(
             $composerFile,
             json_encode(
-                call_user_func($callback, $composer),
+                \call_user_func($callback, $composer),
                 JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
             )
         );
@@ -170,7 +170,7 @@ class Composer
      */
     public function findComposer($composerBinary = null)
     {
-        if (! is_null($composerBinary) && $this->files->exists($composerBinary)) {
+        if (! \is_null($composerBinary) && $this->files->exists($composerBinary)) {
             return [$this->phpBinary(), $composerBinary];
         } elseif ($this->files->exists($this->workingPath.'/composer.phar')) {
             return [$this->phpBinary(), 'composer.phar'];

@@ -37,7 +37,7 @@ class RetryCommand extends Command
      */
     public function handle()
     {
-        $jobsFound = count($ids = $this->getJobIds()) > 0;
+        $jobsFound = \count($ids = $this->getJobIds()) > 0;
 
         if ($jobsFound) {
             $this->components->info('Pushing failed queue jobs back onto the queue.');
@@ -46,7 +46,7 @@ class RetryCommand extends Command
         foreach ($ids as $id) {
             $job = $this->laravel['queue.failer']->find($id);
 
-            if (is_null($job)) {
+            if (\is_null($job)) {
                 $this->components->error("Unable to find failed job with ID [{$id}].");
             } else {
                 $this->laravel['events']->dispatch(new JobRetryRequested($job));
@@ -69,7 +69,7 @@ class RetryCommand extends Command
     {
         $ids = (array) $this->argument('id');
 
-        if (count($ids) === 1 && $ids[0] === 'all') {
+        if (\count($ids) === 1 && $ids[0] === 'all') {
             return Arr::pluck($this->laravel['queue.failer']->all(), 'id');
         }
 
@@ -97,7 +97,7 @@ class RetryCommand extends Command
                         ->pluck('id')
                         ->toArray();
 
-        if (count($ids) === 0) {
+        if (\count($ids) === 0) {
             $this->components->error("Unable to find failed jobs for queue [{$queue}].");
         }
 
@@ -181,7 +181,7 @@ class RetryCommand extends Command
             throw new RuntimeException('Unable to extract job payload.');
         }
 
-        if (is_object($instance) && ! $instance instanceof \__PHP_Incomplete_Class && method_exists($instance, 'retryUntil')) {
+        if (\is_object($instance) && ! $instance instanceof \__PHP_Incomplete_Class && method_exists($instance, 'retryUntil')) {
             $retryUntil = $instance->retryUntil();
 
             $payload['retryUntil'] = $retryUntil instanceof DateTimeInterface

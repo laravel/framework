@@ -145,7 +145,7 @@ class Worker
             if (! $this->daemonShouldRun($options, $connectionName, $queue)) {
                 $status = $this->pauseWorker($options, $lastRestart);
 
-                if (! is_null($status)) {
+                if (! \is_null($status)) {
                     return $this->stop($status, $options);
                 }
 
@@ -193,7 +193,7 @@ class Worker
                 $options, $lastRestart, $startTime, $jobsProcessed, $job
             );
 
-            if (! is_null($status)) {
+            if (! \is_null($status)) {
                 return $this->stop($status, $options);
             }
         }
@@ -257,7 +257,7 @@ class Worker
      */
     protected function timeoutForJob($job, WorkerOptions $options)
     {
-        return $job && ! is_null($job->timeout()) ? $job->timeout() : $options->timeout;
+        return $job && ! \is_null($job->timeout()) ? $job->timeout() : $options->timeout;
     }
 
     /**
@@ -305,7 +305,7 @@ class Worker
             $this->shouldQuit => static::EXIT_SUCCESS,
             $this->memoryExceeded($options->memory) => static::EXIT_MEMORY_LIMIT,
             $this->queueShouldRestart($lastRestart) => static::EXIT_SUCCESS,
-            $options->stopWhenEmpty && is_null($job) => static::EXIT_SUCCESS,
+            $options->stopWhenEmpty && \is_null($job) => static::EXIT_SUCCESS,
             $options->maxTime && hrtime(true) / 1e9 - $startTime >= $options->maxTime => static::EXIT_SUCCESS,
             $options->maxJobs && $jobsProcessed >= $options->maxJobs => static::EXIT_SUCCESS,
             default => null
@@ -360,7 +360,7 @@ class Worker
             }
 
             foreach (explode(',', $queue) as $queue) {
-                if (! is_null($job = $popJobCallback($queue))) {
+                if (! \is_null($job = $popJobCallback($queue))) {
                     $this->raiseAfterJobPopEvent($connection->getConnectionName(), $job);
 
                     return $job;
@@ -504,7 +504,7 @@ class Worker
      */
     protected function markJobAsFailedIfAlreadyExceedsMaxAttempts($connectionName, $job, $maxTries)
     {
-        $maxTries = ! is_null($job->maxTries()) ? $job->maxTries() : $maxTries;
+        $maxTries = ! \is_null($job->maxTries()) ? $job->maxTries() : $maxTries;
 
         $retryUntil = $job->retryUntil();
 
@@ -532,7 +532,7 @@ class Worker
      */
     protected function markJobAsFailedIfWillExceedMaxAttempts($connectionName, $job, $maxTries, Throwable $e)
     {
-        $maxTries = ! is_null($job->maxTries()) ? $job->maxTries() : $maxTries;
+        $maxTries = ! \is_null($job->maxTries()) ? $job->maxTries() : $maxTries;
 
         if ($job->retryUntil() && $job->retryUntil() <= Carbon::now()->getTimestamp()) {
             $this->failJob($job, $e);
@@ -553,8 +553,8 @@ class Worker
      */
     protected function markJobAsFailedIfWillExceedMaxExceptions($connectionName, $job, Throwable $e)
     {
-        if (! $this->cache || is_null($uuid = $job->uuid()) ||
-            is_null($maxExceptions = $job->maxExceptions())) {
+        if (! $this->cache || \is_null($uuid = $job->uuid()) ||
+            \is_null($maxExceptions = $job->maxExceptions())) {
             return;
         }
 
@@ -607,7 +607,7 @@ class Worker
     {
         $backoff = explode(
             ',',
-            method_exists($job, 'backoff') && ! is_null($job->backoff())
+            method_exists($job, 'backoff') && ! \is_null($job->backoff())
                         ? $job->backoff()
                         : $options->backoff
         );
@@ -728,7 +728,7 @@ class Worker
      */
     protected function supportsAsyncSignals()
     {
-        return extension_loaded('pcntl');
+        return \extension_loaded('pcntl');
     }
 
     /**
@@ -767,7 +767,7 @@ class Worker
     {
         $this->events->dispatch(new WorkerStopping($status, $options));
 
-        if (extension_loaded('posix')) {
+        if (\extension_loaded('posix')) {
             posix_kill(getmypid(), SIGKILL);
         }
 
@@ -850,7 +850,7 @@ class Worker
      */
     public static function popUsing($workerName, $callback)
     {
-        if (is_null($callback)) {
+        if (\is_null($callback)) {
             unset(static::$popCallbacks[$workerName]);
         } else {
             static::$popCallbacks[$workerName] = $callback;

@@ -103,7 +103,7 @@ class FilesystemManager implements FactoryContract
      */
     public function build($config)
     {
-        return $this->resolve('ondemand', is_array($config) ? $config : [
+        return $this->resolve('ondemand', \is_array($config) ? $config : [
             'driver' => 'local',
             'root' => $config,
         ]);
@@ -288,7 +288,7 @@ class FilesystemManager implements FactoryContract
         }
 
         return $this->build(tap(
-            is_string($config['disk']) ? $this->getConfig($config['disk']) : $config['disk'],
+            \is_string($config['disk']) ? $this->getConfig($config['disk']) : $config['disk'],
             function (&$parent) use ($config) {
                 $parent['prefix'] = $config['prefix'];
 

@@ -35,7 +35,7 @@ class CacheFileStoreTest extends TestCase
         $contents = '0000000000';
         $full_dir = __DIR__.'/'.substr($hash, 0, 2).'/'.substr($hash, 2, 2);
         $files->expects($this->once())->method('makeDirectory')->with($this->equalTo($full_dir), $this->equalTo(0777), $this->equalTo(true));
-        $files->expects($this->once())->method('put')->with($this->equalTo($full_dir.'/'.$hash))->willReturn(strlen($contents));
+        $files->expects($this->once())->method('put')->with($this->equalTo($full_dir.'/'.$hash))->willReturn(\strlen($contents));
         $store = new FileStore($files, __DIR__);
         $result = $store->put('foo', $contents, 0);
         $this->assertTrue($result);
@@ -55,7 +55,7 @@ class CacheFileStoreTest extends TestCase
             $this->equalTo($filePath),
             $this->equalTo($fileContents),
             $this->equalTo($exclusiveLock) // Ensure we do lock the file while putting.
-        )->willReturn(strlen($fileContents));
+        )->willReturn(\strlen($fileContents));
 
         (new FileStore($files, __DIR__))->put('O--L / key', 'gold', 0);
     }
@@ -105,7 +105,7 @@ class CacheFileStoreTest extends TestCase
         $contents = '1111111111'.serialize('Hello World');
         $hash = sha1('foo');
         $cache_dir = substr($hash, 0, 2).'/'.substr($hash, 2, 2);
-        $files->expects($this->once())->method('put')->with($this->equalTo(__DIR__.'/'.$cache_dir.'/'.$hash), $this->equalTo($contents))->willReturn(strlen($contents));
+        $files->expects($this->once())->method('put')->with($this->equalTo(__DIR__.'/'.$cache_dir.'/'.$hash), $this->equalTo($contents))->willReturn(\strlen($contents));
         $result = $store->put('foo', 'Hello World', 10);
         $this->assertTrue($result);
     }
@@ -118,7 +118,7 @@ class CacheFileStoreTest extends TestCase
         $hash = sha1('foo');
         $cache_dir = substr($hash, 0, 2).'/'.substr($hash, 2, 2);
         $files->shouldReceive('put')->withArgs([__DIR__.'/'.$cache_dir.'/'.$hash, m::any(), m::any()])->andReturnUsing(function ($name, $value) {
-            return strlen($value);
+            return \strlen($value);
         });
         $files->shouldReceive('chmod')->withArgs([__DIR__.'/'.$cache_dir.'/'.$hash])->andReturnValues(['0600', '0644'])->times(3);
         $files->shouldReceive('chmod')->withArgs([__DIR__.'/'.$cache_dir.'/'.$hash, 0644])->andReturn([true])->once();
@@ -141,7 +141,7 @@ class CacheFileStoreTest extends TestCase
         $cache_dir = $cache_parent_dir.'/'.substr($hash, 2, 2);
 
         $files->shouldReceive('put')->withArgs([__DIR__.'/'.$cache_dir.'/'.$hash, m::any(), m::any()])->andReturnUsing(function ($name, $value) {
-            return strlen($value);
+            return \strlen($value);
         });
 
         $files->shouldReceive('exists')->withArgs([__DIR__.'/'.$cache_dir])->andReturn(false)->once();
@@ -162,7 +162,7 @@ class CacheFileStoreTest extends TestCase
         $contents = '9999999999'.serialize('Hello World');
         $hash = sha1('foo');
         $cache_dir = substr($hash, 0, 2).'/'.substr($hash, 2, 2);
-        $files->expects($this->once())->method('put')->with($this->equalTo(__DIR__.'/'.$cache_dir.'/'.$hash), $this->equalTo($contents))->willReturn(strlen($contents));
+        $files->expects($this->once())->method('put')->with($this->equalTo(__DIR__.'/'.$cache_dir.'/'.$hash), $this->equalTo($contents))->willReturn(\strlen($contents));
         $store = new FileStore($files, __DIR__);
         $result = $store->forever('foo', 'Hello World', 10);
         $this->assertTrue($result);

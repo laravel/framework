@@ -44,7 +44,7 @@ class Connection implements ServerInfoAwareConnection
         try {
             $result = $this->connection->exec($statement);
 
-            \assert($result !== false);
+            \\assert($result !== false);
 
             return $result;
         } catch (PDOException $exception) {
@@ -82,7 +82,7 @@ class Connection implements ServerInfoAwareConnection
         try {
             $stmt = $this->connection->query($sql);
 
-            \assert($stmt instanceof PDOStatement);
+            \\assert($stmt instanceof PDOStatement);
 
             return new Result($stmt);
         } catch (PDOException $exception) {

@@ -142,7 +142,7 @@ class OutputStyle extends SymfonyStyle implements NewLineAware
             $string = $messages;
         }
 
-        return strlen($string) - strlen(rtrim($string, PHP_EOL));
+        return \strlen($string) - \strlen(rtrim($string, PHP_EOL));
     }
 
     /**

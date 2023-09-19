@@ -204,7 +204,7 @@ class Vite implements Htmlable
      */
     public function useScriptTagAttributes($attributes)
     {
-        if (! is_callable($attributes)) {
+        if (! \is_callable($attributes)) {
             $attributes = fn () => $attributes;
         }
 
@@ -221,7 +221,7 @@ class Vite implements Htmlable
      */
     public function useStyleTagAttributes($attributes)
     {
-        if (! is_callable($attributes)) {
+        if (! \is_callable($attributes)) {
             $attributes = fn () => $attributes;
         }
 
@@ -238,7 +238,7 @@ class Vite implements Htmlable
      */
     public function usePreloadTagAttributes($attributes)
     {
-        if (! is_callable($attributes)) {
+        if (! \is_callable($attributes)) {
             $attributes = fn () => $attributes;
         }
 
@@ -361,7 +361,7 @@ class Vite implements Htmlable
         if (
             $this->nonce === null
             && $this->integrityKey !== false
-            && ! array_key_exists($this->integrityKey, $chunk ?? [])
+            && ! \array_key_exists($this->integrityKey, $chunk ?? [])
             && $this->scriptTagAttributesResolvers === []
             && $this->styleTagAttributesResolvers === []) {
             return $this->makeTag($url);
@@ -586,9 +586,9 @@ class Vite implements Htmlable
     protected function parseAttributes($attributes)
     {
         return Collection::make($attributes)
-            ->reject(fn ($value, $key) => in_array($value, [false, null], true))
+            ->reject(fn ($value, $key) => \in_array($value, [false, null], true))
             ->flatMap(fn ($value, $key) => $value === true ? [$key] : [$key => $value])
-            ->map(fn ($value, $key) => is_int($key) ? $value : $key.'="'.$value.'"')
+            ->map(fn ($value, $key) => \is_int($key) ? $value : $key.'="'.$value.'"')
             ->values()
             ->all();
     }

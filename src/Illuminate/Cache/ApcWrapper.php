@@ -18,7 +18,7 @@ class ApcWrapper
      */
     public function __construct()
     {
-        $this->apcu = function_exists('apcu_fetch');
+        $this->apcu = \function_exists('apcu_fetch');
     }
 
     /**

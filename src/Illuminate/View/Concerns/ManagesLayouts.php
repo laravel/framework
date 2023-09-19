@@ -206,7 +206,7 @@ trait ManagesLayouts
      */
     public function hasSection($name)
     {
-        return array_key_exists($name, $this->sections);
+        return \array_key_exists($name, $this->sections);
     }
 
     /**

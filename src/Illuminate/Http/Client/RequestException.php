@@ -38,6 +38,6 @@ class RequestException extends HttpClientException
 
         $summary = Message::bodySummary($response->toPsrResponse());
 
-        return is_null($summary) ? $message : $message .= ":\n{$summary}\n";
+        return \is_null($summary) ? $message : $message .= ":\n{$summary}\n";
     }
 }

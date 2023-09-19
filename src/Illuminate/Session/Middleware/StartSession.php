@@ -88,7 +88,7 @@ class StartSession
 
         try {
             $lock->block(
-                ! is_null($request->route()->waitsFor())
+                ! \is_null($request->route()->waitsFor())
                         ? $request->route()->waitsFor()
                         : 10
             );
@@ -270,7 +270,7 @@ class StartSession
      */
     protected function sessionConfigured()
     {
-        return ! is_null($this->manager->getSessionConfig()['driver'] ?? null);
+        return ! \is_null($this->manager->getSessionConfig()['driver'] ?? null);
     }
 
     /**
@@ -283,7 +283,7 @@ class StartSession
     {
         $config = $config ?: $this->manager->getSessionConfig();
 
-        return ! is_null($config['driver'] ?? null);
+        return ! \is_null($config['driver'] ?? null);
     }
 
     /**
@@ -294,6 +294,6 @@ class StartSession
      */
     protected function cache($driver)
     {
-        return call_user_func($this->cacheFactoryResolver)->driver($driver);
+        return \call_user_func($this->cacheFactoryResolver)->driver($driver);
     }
 }

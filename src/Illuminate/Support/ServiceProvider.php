@@ -99,7 +99,7 @@ abstract class ServiceProvider
     {
         $index = 0;
 
-        while ($index < count($this->bootingCallbacks)) {
+        while ($index < \count($this->bootingCallbacks)) {
             $this->app->call($this->bootingCallbacks[$index]);
 
             $index++;
@@ -115,7 +115,7 @@ abstract class ServiceProvider
     {
         $index = 0;
 
-        while ($index < count($this->bootedCallbacks)) {
+        while ($index < \count($this->bootedCallbacks)) {
             $this->app->call($this->bootedCallbacks[$index]);
 
             $index++;
@@ -164,7 +164,7 @@ abstract class ServiceProvider
     {
         $this->callAfterResolving('view', function ($view) use ($path, $namespace) {
             if (isset($this->app->config['view']['paths']) &&
-                is_array($this->app->config['view']['paths'])) {
+                \is_array($this->app->config['view']['paths'])) {
                 foreach ($this->app->config['view']['paths'] as $viewPath) {
                     if (is_dir($appPath = $viewPath.'/vendor/'.$namespace)) {
                         $view->addNamespace($namespace, $appPath);
@@ -187,7 +187,7 @@ abstract class ServiceProvider
     {
         $this->callAfterResolving(BladeCompiler::class, function ($blade) use ($prefix, $components) {
             foreach ($components as $alias => $component) {
-                $blade->component($component, is_string($alias) ? $alias : null, $prefix);
+                $blade->component($component, \is_string($alias) ? $alias : null, $prefix);
             }
         });
     }
@@ -293,7 +293,7 @@ abstract class ServiceProvider
      */
     protected function ensurePublishArrayInitialized($class)
     {
-        if (! array_key_exists($class, static::$publishes)) {
+        if (! \array_key_exists($class, static::$publishes)) {
             static::$publishes[$class] = [];
         }
     }
@@ -307,7 +307,7 @@ abstract class ServiceProvider
      */
     protected function addPublishGroup($group, $paths)
     {
-        if (! array_key_exists($group, static::$publishGroups)) {
+        if (! \array_key_exists($group, static::$publishGroups)) {
             static::$publishGroups[$group] = [];
         }
 
@@ -325,7 +325,7 @@ abstract class ServiceProvider
      */
     public static function pathsToPublish($provider = null, $group = null)
     {
-        if (! is_null($paths = static::pathsForProviderOrGroup($provider, $group))) {
+        if (! \is_null($paths = static::pathsForProviderOrGroup($provider, $group))) {
             return $paths;
         }
 
@@ -345,9 +345,9 @@ abstract class ServiceProvider
     {
         if ($provider && $group) {
             return static::pathsForProviderAndGroup($provider, $group);
-        } elseif ($group && array_key_exists($group, static::$publishGroups)) {
+        } elseif ($group && \array_key_exists($group, static::$publishGroups)) {
             return static::$publishGroups[$group];
-        } elseif ($provider && array_key_exists($provider, static::$publishes)) {
+        } elseif ($provider && \array_key_exists($provider, static::$publishes)) {
             return static::$publishes[$provider];
         } elseif ($group || $provider) {
             return [];
@@ -398,7 +398,7 @@ abstract class ServiceProvider
      */
     public function commands($commands)
     {
-        $commands = is_array($commands) ? $commands : func_get_args();
+        $commands = \is_array($commands) ? $commands : \func_get_args();
 
         Artisan::starting(function ($artisan) use ($commands) {
             $artisan->resolveCommands($commands);

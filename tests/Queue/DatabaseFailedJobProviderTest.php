@@ -32,15 +32,15 @@ class DatabaseFailedJobProviderTest extends TestCase
 
         $db->getConnection()->table('failed_jobs')->insert(['failed_at' => Date::now()->subDays(10)]);
         $provider->flush();
-        $this->assertSame(0, $db->getConnection()->table('failed_jobs')->count());
+        $this->assertSame(0, $db->getConnection()->table('failed_jobs')->\count());
 
         $db->getConnection()->table('failed_jobs')->insert(['failed_at' => Date::now()->subDays(10)]);
         $provider->flush(15 * 24);
-        $this->assertSame(1, $db->getConnection()->table('failed_jobs')->count());
+        $this->assertSame(1, $db->getConnection()->table('failed_jobs')->\count());
 
         $db->getConnection()->table('failed_jobs')->insert(['failed_at' => Date::now()->subDays(10)]);
         $provider->flush(10 * 24);
-        $this->assertSame(0, $db->getConnection()->table('failed_jobs')->count());
+        $this->assertSame(0, $db->getConnection()->table('failed_jobs')->\count());
     }
 
     public function testCanProperlyLogFailedJob()
@@ -69,7 +69,7 @@ class DatabaseFailedJobProviderTest extends TestCase
 
         $exception = (string) mb_convert_encoding($exception, 'UTF-8');
 
-        $this->assertSame(1, $db->getConnection()->table('failed_jobs')->count());
+        $this->assertSame(1, $db->getConnection()->table('failed_jobs')->\count());
         $this->assertSame($exception, $db->getConnection()->table('failed_jobs')->first()->exception);
     }
 
@@ -90,14 +90,14 @@ class DatabaseFailedJobProviderTest extends TestCase
         });
         $provider = new DatabaseFailedJobProvider($db->getDatabaseManager(), 'default', 'failed_jobs');
 
-        $this->assertSame(0, $provider->count());
+        $this->assertSame(0, $provider->\count());
 
         $provider->log('database', 'default', json_encode(['uuid' => (string) Str::uuid()]), new RuntimeException());
-        $this->assertSame(1, $provider->count());
+        $this->assertSame(1, $provider->\count());
 
         $provider->log('database', 'default', json_encode(['uuid' => (string) Str::uuid()]), new RuntimeException());
         $provider->log('another-connection', 'another-queue', json_encode(['uuid' => (string) Str::uuid()]), new RuntimeException());
-        $this->assertSame(3, $provider->count());
+        $this->assertSame(3, $provider->\count());
     }
 
     public function testJobsCanBeCountedByConnection()
@@ -119,12 +119,12 @@ class DatabaseFailedJobProviderTest extends TestCase
 
         $provider->log('connection-1', 'default', json_encode(['uuid' => (string) Str::uuid()]), new RuntimeException());
         $provider->log('connection-2', 'default', json_encode(['uuid' => (string) Str::uuid()]), new RuntimeException());
-        $this->assertSame(1, $provider->count('connection-1'));
-        $this->assertSame(1, $provider->count('connection-2'));
+        $this->assertSame(1, $provider->\count('connection-1'));
+        $this->assertSame(1, $provider->\count('connection-2'));
 
         $provider->log('connection-1', 'default', json_encode(['uuid' => (string) Str::uuid()]), new RuntimeException());
-        $this->assertSame(2, $provider->count('connection-1'));
-        $this->assertSame(1, $provider->count('connection-2'));
+        $this->assertSame(2, $provider->\count('connection-1'));
+        $this->assertSame(1, $provider->\count('connection-2'));
     }
 
     public function testJobsCanBeCountedByQueue()
@@ -146,12 +146,12 @@ class DatabaseFailedJobProviderTest extends TestCase
 
         $provider->log('database', 'queue-1', json_encode(['uuid' => (string) Str::uuid()]), new RuntimeException());
         $provider->log('database', 'queue-2', json_encode(['uuid' => (string) Str::uuid()]), new RuntimeException());
-        $this->assertSame(1, $provider->count(queue: 'queue-1'));
-        $this->assertSame(1, $provider->count(queue: 'queue-2'));
+        $this->assertSame(1, $provider->\count(queue: 'queue-1'));
+        $this->assertSame(1, $provider->\count(queue: 'queue-2'));
 
         $provider->log('database', 'queue-1', json_encode(['uuid' => (string) Str::uuid()]), new RuntimeException());
-        $this->assertSame(2, $provider->count(queue: 'queue-1'));
-        $this->assertSame(1, $provider->count(queue: 'queue-2'));
+        $this->assertSame(2, $provider->\count(queue: 'queue-1'));
+        $this->assertSame(1, $provider->\count(queue: 'queue-2'));
     }
 
     public function testJobsCanBeCountedByQueueAndConnection()
@@ -177,9 +177,9 @@ class DatabaseFailedJobProviderTest extends TestCase
         $provider->log('connection-1', 'queue-1', json_encode(['uuid' => (string) Str::uuid()]), new RuntimeException());
         $provider->log('connection-2', 'queue-1', json_encode(['uuid' => (string) Str::uuid()]), new RuntimeException());
         $provider->log('connection-2', 'queue-1', json_encode(['uuid' => (string) Str::uuid()]), new RuntimeException());
-        $this->assertSame(2, $provider->count('connection-1', 'queue-99'));
-        $this->assertSame(1, $provider->count('connection-2', 'queue-99'));
-        $this->assertSame(1, $provider->count('connection-1', 'queue-1'));
-        $this->assertSame(2, $provider->count('connection-2', 'queue-1'));
+        $this->assertSame(2, $provider->\count('connection-1', 'queue-99'));
+        $this->assertSame(1, $provider->\count('connection-2', 'queue-99'));
+        $this->assertSame(1, $provider->\count('connection-1', 'queue-1'));
+        $this->assertSame(2, $provider->\count('connection-2', 'queue-1'));
     }
 }

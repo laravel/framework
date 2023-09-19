@@ -51,8 +51,8 @@ class LockableFile
      */
     protected function ensureDirectoryExists($path)
     {
-        if (! file_exists(dirname($path))) {
-            @mkdir(dirname($path), 0777, true);
+        if (! file_exists(\dirname($path))) {
+            @mkdir(\dirname($path), 0777, true);
         }
     }
 

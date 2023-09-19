@@ -76,7 +76,7 @@ class Js implements Htmlable
 
         $json = static::encode($data, $flags, $depth);
 
-        if (is_string($data)) {
+        if (\is_string($data)) {
             return "'".substr($json, 1, -1)."'";
         }
 

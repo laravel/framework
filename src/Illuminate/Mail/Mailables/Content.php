@@ -146,7 +146,7 @@ class Content
      */
     public function with($key, $value = null)
     {
-        if (is_array($key)) {
+        if (\is_array($key)) {
             $this->with = array_merge($this->with, $key);
         } else {
             $this->with[$key] = $value;

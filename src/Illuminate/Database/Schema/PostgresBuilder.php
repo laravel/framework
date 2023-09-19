@@ -48,7 +48,7 @@ class PostgresBuilder extends Builder
 
         $table = $this->connection->getTablePrefix().$table;
 
-        return count($this->connection->selectFromWriteConnection(
+        return \count($this->connection->selectFromWriteConnection(
             $this->grammar->compileTableExists(), [$database, $schema, $table]
         )) > 0;
     }
@@ -213,7 +213,7 @@ class PostgresBuilder extends Builder
         // If the reference contains a database name, we will use that instead of the
         // default database name for the connection. This allows the database name
         // to be specified in the query instead of at the full connection level.
-        if (count($parts) === 3) {
+        if (\count($parts) === 3) {
             $database = $parts[0];
             array_shift($parts);
         }
@@ -223,7 +223,7 @@ class PostgresBuilder extends Builder
         // instead of a default schema configured in the connection search path.
         $schema = $searchPath[0];
 
-        if (count($parts) === 2) {
+        if (\count($parts) === 2) {
             $schema = $parts[0];
             array_shift($parts);
         }

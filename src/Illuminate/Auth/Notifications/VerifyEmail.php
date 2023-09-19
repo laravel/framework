@@ -47,7 +47,7 @@ class VerifyEmail extends Notification
         $verificationUrl = $this->verificationUrl($notifiable);
 
         if (static::$toMailCallback) {
-            return call_user_func(static::$toMailCallback, $notifiable, $verificationUrl);
+            return \call_user_func(static::$toMailCallback, $notifiable, $verificationUrl);
         }
 
         return $this->buildMailMessage($verificationUrl);
@@ -77,7 +77,7 @@ class VerifyEmail extends Notification
     protected function verificationUrl($notifiable)
     {
         if (static::$createUrlCallback) {
-            return call_user_func(static::$createUrlCallback, $notifiable);
+            return \call_user_func(static::$createUrlCallback, $notifiable);
         }
 
         return URL::temporarySignedRoute(

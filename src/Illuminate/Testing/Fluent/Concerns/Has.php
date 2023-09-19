@@ -15,9 +15,9 @@ trait Has
      * @param  int|null  $length
      * @return $this
      */
-    public function count($key, int $length = null): self
+    public function \count($key, int $length = null): self
     {
-        if (is_null($length)) {
+        if (\is_null($length)) {
             $path = $this->dotPath();
 
             PHPUnit::assertCount(
@@ -52,8 +52,8 @@ trait Has
     {
         $prop = $this->prop();
 
-        if (is_int($key) && is_null($length)) {
-            return $this->count($key);
+        if (\is_int($key) && \is_null($length)) {
+            return $this->\count($key);
         }
 
         PHPUnit::assertTrue(
@@ -63,12 +63,12 @@ trait Has
 
         $this->interactsWith($key);
 
-        if (! is_null($callback)) {
+        if (! \is_null($callback)) {
             return $this->has($key, function (self $scope) use ($length, $callback) {
                 return $scope
                     ->tap(function (self $scope) use ($length) {
-                        if (! is_null($length)) {
-                            $scope->count($length);
+                        if (! \is_null($length)) {
+                            $scope->\count($length);
                         }
                     })
                     ->first($callback)
@@ -76,12 +76,12 @@ trait Has
             });
         }
 
-        if (is_callable($length)) {
+        if (\is_callable($length)) {
             return $this->scope($key, $length);
         }
 
-        if (! is_null($length)) {
-            return $this->count($key, $length);
+        if (! \is_null($length)) {
+            return $this->\count($key, $length);
         }
 
         return $this;
@@ -95,10 +95,10 @@ trait Has
      */
     public function hasAll($key): self
     {
-        $keys = is_array($key) ? $key : func_get_args();
+        $keys = \is_array($key) ? $key : \func_get_args();
 
         foreach ($keys as $prop => $count) {
-            if (is_int($prop)) {
+            if (\is_int($prop)) {
                 $this->has($count);
             } else {
                 $this->has($prop, $count);
@@ -116,7 +116,7 @@ trait Has
      */
     public function hasAny($key): self
     {
-        $keys = is_array($key) ? $key : func_get_args();
+        $keys = \is_array($key) ? $key : \func_get_args();
 
         PHPUnit::assertTrue(
             Arr::hasAny($this->prop(), $keys),
@@ -138,7 +138,7 @@ trait Has
      */
     public function missingAll($key): self
     {
-        $keys = is_array($key) ? $key : func_get_args();
+        $keys = \is_array($key) ? $key : \func_get_args();
 
         foreach ($keys as $prop) {
             $this->missing($prop);

@@ -42,7 +42,7 @@ class ValidationExcludeIfTest extends TestCase
         foreach ([1, 1.1, 'phpinfo', new stdClass] as $condition) {
             try {
                 new ExcludeIf($condition);
-                $this->fail('The ExcludeIf constructor must not accept '.gettype($condition));
+                $this->fail('The ExcludeIf constructor must not accept '.\gettype($condition));
             } catch (InvalidArgumentException $exception) {
                 $this->assertEquals('The provided condition must be a callable or boolean.', $exception->getMessage());
             }

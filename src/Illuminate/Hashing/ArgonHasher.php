@@ -66,7 +66,7 @@ class ArgonHasher extends AbstractHasher implements HasherContract
             'threads' => $this->threads($options),
         ]);
 
-        if (! is_string($hash)) {
+        if (! \is_string($hash)) {
             throw new RuntimeException('Argon2 hashing not supported.');
         }
 
@@ -187,7 +187,7 @@ class ArgonHasher extends AbstractHasher implements HasherContract
      */
     protected function threads(array $options)
     {
-        if (defined('PASSWORD_ARGON2_PROVIDER') && PASSWORD_ARGON2_PROVIDER === 'sodium') {
+        if (\defined('PASSWORD_ARGON2_PROVIDER') && PASSWORD_ARGON2_PROVIDER === 'sodium') {
             return 1;
         }
 

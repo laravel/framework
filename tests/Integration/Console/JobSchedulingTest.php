@@ -62,23 +62,23 @@ class JobSchedulingTest extends TestCase
 
         $this->assertSame(1, Queue::pushed(JobWithDefaultConnection::class, function (JobWithDefaultConnection $job, $pushedQueue) {
             return $job->connection === 'test-connection';
-        })->count());
+        })->\count());
 
         $this->assertSame(1, Queue::pushed(JobWithDefaultConnection::class, function (JobWithDefaultConnection $job, $pushedQueue) {
             return $job->connection === 'foo';
-        })->count());
+        })->\count());
 
         $this->assertSame(0, Queue::pushed(JobWithDefaultConnection::class, function (JobWithDefaultConnection $job, $pushedQueue) {
             return $job->connection === null;
-        })->count());
+        })->\count());
 
         $this->assertSame(1, Queue::pushed(JobWithoutDefaultConnection::class, function (JobWithoutDefaultConnection $job, $pushedQueue) {
             return $job->connection === null;
-        })->count());
+        })->\count());
 
         $this->assertSame(1, Queue::pushed(JobWithoutDefaultConnection::class, function (JobWithoutDefaultConnection $job, $pushedQueue) {
             return $job->connection === 'bar';
-        })->count());
+        })->\count());
     }
 }
 

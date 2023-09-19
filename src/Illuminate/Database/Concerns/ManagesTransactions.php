@@ -89,7 +89,7 @@ trait ManagesTransactions
                 $this->getName(), $this->transactions
             );
 
-            throw new DeadlockException($e->getMessage(), is_int($e->getCode()) ? $e->getCode() : 0, $e);
+            throw new DeadlockException($e->getMessage(), \is_int($e->getCode()) ? $e->getCode() : 0, $e);
         }
 
         // If there was an exception we will rollback this transaction and then we
@@ -212,7 +212,7 @@ trait ManagesTransactions
     {
         return $this->transactions == 0 ||
             ($this->transactionsManager &&
-             $this->transactionsManager->callbackApplicableTransactions()->count() === 1);
+             $this->transactionsManager->callbackApplicableTransactions()->\count() === 1);
     }
 
     /**
@@ -253,7 +253,7 @@ trait ManagesTransactions
         // We allow developers to rollback to a certain transaction level. We will verify
         // that this given transaction level is valid before attempting to rollback to
         // that level. If it's not we will just return out and not attempt anything.
-        $toLevel = is_null($toLevel)
+        $toLevel = \is_null($toLevel)
                     ? $this->transactions - 1
                     : $toLevel;
 

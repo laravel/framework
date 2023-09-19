@@ -206,9 +206,9 @@ class Stringable implements JsonSerializable, ArrayAccess
      * @param  int  $levels
      * @return static
      */
-    public function dirname($levels = 1)
+    public function \dirname($levels = 1)
     {
-        return new static(dirname($this->value, $levels));
+        return new static(\dirname($this->value, $levels));
     }
 
     /**
@@ -908,7 +908,7 @@ class Stringable implements JsonSerializable, ArrayAccess
      */
     public function trim($characters = null)
     {
-        return new static(trim(...array_merge([$this->value], func_get_args())));
+        return new static(trim(...array_merge([$this->value], \func_get_args())));
     }
 
     /**
@@ -919,7 +919,7 @@ class Stringable implements JsonSerializable, ArrayAccess
      */
     public function ltrim($characters = null)
     {
-        return new static(ltrim(...array_merge([$this->value], func_get_args())));
+        return new static(ltrim(...array_merge([$this->value], \func_get_args())));
     }
 
     /**
@@ -930,7 +930,7 @@ class Stringable implements JsonSerializable, ArrayAccess
      */
     public function rtrim($characters = null)
     {
-        return new static(rtrim(...array_merge([$this->value], func_get_args())));
+        return new static(rtrim(...array_merge([$this->value], \func_get_args())));
     }
 
     /**
@@ -1236,7 +1236,7 @@ class Stringable implements JsonSerializable, ArrayAccess
      */
     public function toInteger()
     {
-        return intval($this->value);
+        return \intval($this->value);
     }
 
     /**
@@ -1246,7 +1246,7 @@ class Stringable implements JsonSerializable, ArrayAccess
      */
     public function toFloat()
     {
-        return floatval($this->value);
+        return \floatval($this->value);
     }
 
     /**
@@ -1272,7 +1272,7 @@ class Stringable implements JsonSerializable, ArrayAccess
      */
     public function toDate($format = null, $tz = null)
     {
-        if (is_null($format)) {
+        if (\is_null($format)) {
             return Date::parse($this->value, $tz);
         }
 

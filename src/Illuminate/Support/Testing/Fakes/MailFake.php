@@ -73,12 +73,12 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
 
         $message = "The expected [{$mailable}] mailable was not sent.";
 
-        if (count($this->queuedMailables) > 0) {
+        if (\count($this->queuedMailables) > 0) {
             $message .= ' Did you mean to use assertQueued() instead?';
         }
 
         PHPUnit::assertTrue(
-            $this->sent($mailable, $callback)->count() > 0,
+            $this->sent($mailable, $callback)->\count() > 0,
             $message
         );
     }
@@ -92,7 +92,7 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
      */
     protected function assertSentTimes($mailable, $times = 1)
     {
-        $count = $this->sent($mailable)->count();
+        $count = $this->sent($mailable)->\count();
 
         PHPUnit::assertSame(
             $times, $count,
@@ -149,7 +149,7 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
     public function assertNothingSent()
     {
         $mailableNames = collect($this->mailables)->map(
-            fn ($mailable) => get_class($mailable)
+            fn ($mailable) => \get_class($mailable)
         )->join(', ');
 
         PHPUnit::assertEmpty($this->mailables, 'The following mailables were sent unexpectedly: '.$mailableNames);
@@ -171,7 +171,7 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
         }
 
         PHPUnit::assertTrue(
-            $this->queued($mailable, $callback)->count() > 0,
+            $this->queued($mailable, $callback)->\count() > 0,
             "The expected [{$mailable}] mailable was not queued."
         );
     }
@@ -185,7 +185,7 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
      */
     protected function assertQueuedTimes($mailable, $times = 1)
     {
-        $count = $this->queued($mailable)->count();
+        $count = $this->queued($mailable)->\count();
 
         PHPUnit::assertSame(
             $times, $count,
@@ -218,7 +218,7 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
     public function assertNothingQueued()
     {
         $mailableNames = collect($this->queuedMailables)->map(
-            fn ($mailable) => get_class($mailable)
+            fn ($mailable) => \get_class($mailable)
         )->join(', ');
 
         PHPUnit::assertEmpty($this->queuedMailables, 'The following mailables were queued unexpectedly: '.$mailableNames);
@@ -232,7 +232,7 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
      */
     public function assertSentCount($count)
     {
-        $total = collect($this->mailables)->count();
+        $total = collect($this->mailables)->\count();
 
         PHPUnit::assertSame(
             $count, $total,
@@ -248,7 +248,7 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
      */
     public function assertQueuedCount($count)
     {
-        $total = collect($this->queuedMailables)->count();
+        $total = collect($this->queuedMailables)->\count();
 
         PHPUnit::assertSame(
             $count, $total,
@@ -266,7 +266,7 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
     {
         $total = collect($this->mailables)
             ->concat($this->queuedMailables)
-            ->count();
+            ->\count();
 
         PHPUnit::assertSame(
             $count, $total,
@@ -302,7 +302,7 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
      */
     public function hasSent($mailable)
     {
-        return $this->mailablesOf($mailable)->count() > 0;
+        return $this->mailablesOf($mailable)->\count() > 0;
     }
 
     /**
@@ -333,7 +333,7 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
      */
     public function hasQueued($mailable)
     {
-        return $this->queuedMailablesOf($mailable)->count() > 0;
+        return $this->queuedMailablesOf($mailable)->\count() > 0;
     }
 
     /**

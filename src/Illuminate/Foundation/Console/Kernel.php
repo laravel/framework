@@ -112,8 +112,8 @@ class Kernel implements KernelContract
      */
     public function __construct(Application $app, Dispatcher $events)
     {
-        if (! defined('ARTISAN_BINARY')) {
-            define('ARTISAN_BINARY', 'artisan');
+        if (! \defined('ARTISAN_BINARY')) {
+            \define('ARTISAN_BINARY', 'artisan');
         }
 
         $this->app = $app;
@@ -137,7 +137,7 @@ class Kernel implements KernelContract
      */
     public function rerouteSymfonyCommandEvents()
     {
-        if (is_null($this->symfonyDispatcher)) {
+        if (\is_null($this->symfonyDispatcher)) {
             $this->symfonyDispatcher = new EventDispatcher;
 
             $this->symfonyDispatcher->addListener(ConsoleEvents::COMMAND, function (ConsoleCommandEvent $event) {
@@ -192,7 +192,7 @@ class Kernel implements KernelContract
         $this->commandStartedAt = Carbon::now();
 
         try {
-            if (in_array($input->getFirstArgument(), ['env:encrypt', 'env:decrypt'], true)) {
+            if (\in_array($input->getFirstArgument(), ['env:encrypt', 'env:decrypt'], true)) {
                 $this->bootstrapWithoutBootingProviders();
             }
 
@@ -391,7 +391,7 @@ class Kernel implements KernelContract
      */
     public function call($command, array $parameters = [], $outputBuffer = null)
     {
-        if (in_array($command, ['env:encrypt', 'env:decrypt'], true)) {
+        if (\in_array($command, ['env:encrypt', 'env:decrypt'], true)) {
             $this->bootstrapWithoutBootingProviders();
         }
 
@@ -409,7 +409,7 @@ class Kernel implements KernelContract
      */
     public function queue($command, array $parameters = [])
     {
-        return QueuedCommand::dispatch(func_get_args());
+        return QueuedCommand::dispatch(\func_get_args());
     }
 
     /**
@@ -477,7 +477,7 @@ class Kernel implements KernelContract
      */
     protected function getArtisan()
     {
-        if (is_null($this->artisan)) {
+        if (\is_null($this->artisan)) {
             $this->artisan = (new Artisan($this->app, $this->events, $this->app->version()))
                                     ->resolveCommands($this->commands)
                                     ->setContainerCommandLoader();

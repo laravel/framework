@@ -93,7 +93,7 @@ class VerifyCsrfToken
      */
     protected function isReading($request)
     {
-        return in_array($request->method(), ['HEAD', 'GET', 'OPTIONS']);
+        return \in_array($request->method(), ['HEAD', 'GET', 'OPTIONS']);
     }
 
     /**
@@ -137,8 +137,8 @@ class VerifyCsrfToken
     {
         $token = $this->getTokenFromRequest($request);
 
-        return is_string($request->session()->token()) &&
-               is_string($token) &&
+        return \is_string($request->session()->token()) &&
+               \is_string($token) &&
                hash_equals($request->session()->token(), $token);
     }
 

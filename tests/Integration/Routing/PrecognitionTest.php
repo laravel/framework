@@ -208,7 +208,7 @@ class PrecognitionTest extends TestCase
     public function testItAppliesHeadersWhenFlowControlExceptionIsThrown()
     {
         // Check with Authorize middleware first...
-        Gate::define('alwaysDeny', fn () => false);
+        Gate::\define('alwaysDeny', fn () => false);
         Route::get('test-route-before', fn () => fail())
             ->middleware(['can:alwaysDeny', HandlePrecognitiveRequests::class]);
 

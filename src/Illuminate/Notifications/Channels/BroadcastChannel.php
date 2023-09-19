@@ -40,7 +40,7 @@ class BroadcastChannel
         $message = $this->getData($notifiable, $notification);
 
         $event = new BroadcastNotificationCreated(
-            $notifiable, $notification, is_array($message) ? $message : $message->data
+            $notifiable, $notification, \is_array($message) ? $message : $message->data
         );
 
         if ($message instanceof BroadcastMessage) {

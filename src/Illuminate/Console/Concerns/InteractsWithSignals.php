@@ -42,7 +42,7 @@ trait InteractsWithSignals
      */
     public function untrap()
     {
-        if (! is_null($this->signals)) {
+        if (! \is_null($this->signals)) {
             $this->signals->unregister();
 
             $this->signals = null;

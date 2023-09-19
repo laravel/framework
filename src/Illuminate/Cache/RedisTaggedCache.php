@@ -16,7 +16,7 @@ class RedisTaggedCache extends TaggedCache
     {
         $this->tags->addEntry(
             $this->itemKey($key),
-            ! is_null($ttl) ? $this->getSeconds($ttl) : 0
+            ! \is_null($ttl) ? $this->getSeconds($ttl) : 0
         );
 
         return parent::add($key, $value, $ttl);
@@ -32,7 +32,7 @@ class RedisTaggedCache extends TaggedCache
      */
     public function put($key, $value, $ttl = null)
     {
-        if (is_null($ttl)) {
+        if (\is_null($ttl)) {
             return $this->forever($key, $value);
         }
 

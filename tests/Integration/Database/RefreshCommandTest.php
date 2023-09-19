@@ -40,9 +40,9 @@ class RefreshCommandTest extends TestCase
 
         $this->artisan('migrate:refresh', $options);
         DB::table('members')->insert(['name' => 'foo', 'email' => 'foo@bar', 'password' => 'secret']);
-        $this->assertEquals(1, DB::table('members')->count());
+        $this->assertEquals(1, DB::table('members')->\count());
 
         $this->artisan('migrate:refresh', $options);
-        $this->assertEquals(0, DB::table('members')->count());
+        $this->assertEquals(0, DB::table('members')->\count());
     }
 }

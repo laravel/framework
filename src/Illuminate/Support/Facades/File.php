@@ -25,7 +25,7 @@ namespace Illuminate\Support\Facades;
  * @method static void relativeLink(string $target, string $link)
  * @method static string name(string $path)
  * @method static string basename(string $path)
- * @method static string dirname(string $path)
+ * @method static string \dirname(string $path)
  * @method static string extension(string $path)
  * @method static string|null guessExtension(string $path)
  * @method static string type(string $path)

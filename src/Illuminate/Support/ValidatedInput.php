@@ -35,7 +35,7 @@ class ValidatedInput implements ValidatedData
      */
     public function has($keys)
     {
-        $keys = is_array($keys) ? $keys : func_get_args();
+        $keys = \is_array($keys) ? $keys : \func_get_args();
 
         foreach ($keys as $key) {
             if (! Arr::has($this->input, $key)) {
@@ -71,7 +71,7 @@ class ValidatedInput implements ValidatedData
 
         $placeholder = new stdClass;
 
-        foreach (is_array($keys) ? $keys : func_get_args() as $key) {
+        foreach (\is_array($keys) ? $keys : \func_get_args() as $key) {
             $value = data_get($input, $key, $placeholder);
 
             if ($value !== $placeholder) {
@@ -90,7 +90,7 @@ class ValidatedInput implements ValidatedData
      */
     public function except($keys)
     {
-        $keys = is_array($keys) ? $keys : func_get_args();
+        $keys = \is_array($keys) ? $keys : \func_get_args();
 
         $results = $this->input;
 
@@ -215,7 +215,7 @@ class ValidatedInput implements ValidatedData
      */
     public function offsetSet($key, $value): void
     {
-        if (is_null($key)) {
+        if (\is_null($key)) {
             $this->input[] = $value;
         } else {
             $this->input[$key] = $value;

@@ -97,7 +97,7 @@ class ThrottlesExceptions
 
             $this->limiter->clear($jobKey);
         } catch (Throwable $throwable) {
-            if ($this->whenCallback && ! call_user_func($this->whenCallback, $throwable)) {
+            if ($this->whenCallback && ! \call_user_func($this->whenCallback, $throwable)) {
                 throw $throwable;
             }
 
@@ -160,7 +160,7 @@ class ThrottlesExceptions
             return $this->prefix.$job->job->uuid();
         }
 
-        return $this->prefix.md5(get_class($job));
+        return $this->prefix.md5(\get_class($job));
     }
 
     /**

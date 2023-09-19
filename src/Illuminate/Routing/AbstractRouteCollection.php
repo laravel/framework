@@ -28,7 +28,7 @@ abstract class AbstractRouteCollection implements Countable, IteratorAggregate, 
      */
     protected function handleMatchedRoute(Request $request, $route)
     {
-        if (! is_null($route)) {
+        if (! \is_null($route)) {
             return $route->bind($request);
         }
 
@@ -37,7 +37,7 @@ abstract class AbstractRouteCollection implements Countable, IteratorAggregate, 
         // inform the user agent of which HTTP verb it should use for this route.
         $others = $this->checkForAlternateVerbs($request);
 
-        if (count($others) > 0) {
+        if (\count($others) > 0) {
             return $this->getRouteForMethods($request, $others);
         }
 
@@ -63,7 +63,7 @@ abstract class AbstractRouteCollection implements Countable, IteratorAggregate, 
         return array_values(array_filter(
             $methods,
             function ($method) use ($request) {
-                return ! is_null($this->matchAgainstRoutes($this->get($method), $request, false));
+                return ! \is_null($this->matchAgainstRoutes($this->get($method), $request, false));
             }
         ));
     }
@@ -232,9 +232,9 @@ abstract class AbstractRouteCollection implements Countable, IteratorAggregate, 
         $name = $route->getName();
 
         if (
-            ! is_null($name)
+            ! \is_null($name)
             && str_ends_with($name, '.')
-            && ! is_null($symfonyRoutes->get($name))
+            && ! \is_null($symfonyRoutes->get($name))
         ) {
             $name = null;
         }
@@ -243,7 +243,7 @@ abstract class AbstractRouteCollection implements Countable, IteratorAggregate, 
             $route->name($this->generateRouteName());
 
             $this->add($route);
-        } elseif (! is_null($symfonyRoutes->get($name))) {
+        } elseif (! \is_null($symfonyRoutes->get($name))) {
             throw new LogicException("Unable to prepare route [{$route->uri}] for serialization. Another route has already been assigned name [{$name}].");
         }
 
@@ -277,8 +277,8 @@ abstract class AbstractRouteCollection implements Countable, IteratorAggregate, 
      *
      * @return int
      */
-    public function count(): int
+    public function \count(): int
     {
-        return count($this->getRoutes());
+        return \count($this->getRoutes());
     }
 }

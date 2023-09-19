@@ -68,7 +68,7 @@ class NullFailedJobProvider implements CountableFailedJobProvider, FailedJobProv
      * @param  string|null  $queue
      * @return int
      */
-    public function count($connection = null, $queue = null)
+    public function \count($connection = null, $queue = null)
     {
         return 0;
     }

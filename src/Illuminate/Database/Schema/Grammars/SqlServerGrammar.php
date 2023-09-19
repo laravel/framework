@@ -156,7 +156,7 @@ class SqlServerGrammar extends Grammar
             $sql = sprintf('alter table %s alter column %s %s',
                 $this->wrapTable($blueprint),
                 $this->wrap($column),
-                $this->getType($column)
+                $this->\gettype($column)
             );
 
             foreach ($this->modifiers as $modifier) {
@@ -244,7 +244,7 @@ class SqlServerGrammar extends Grammar
      */
     public function compileDefault(Blueprint $blueprint, Fluent $command)
     {
-        if ($command->column->change && ! is_null($command->column->default)) {
+        if ($command->column->change && ! \is_null($command->column->default)) {
             return sprintf('alter table %s add default %s for %s',
                 $this->wrapTable($blueprint),
                 $this->getDefaultValue($command->column->default),
@@ -949,7 +949,7 @@ class SqlServerGrammar extends Grammar
      */
     protected function modifyCollate(Blueprint $blueprint, Fluent $column)
     {
-        if (! is_null($column->collation)) {
+        if (! \is_null($column->collation)) {
             return ' collate '.$column->collation;
         }
     }
@@ -977,7 +977,7 @@ class SqlServerGrammar extends Grammar
      */
     protected function modifyDefault(Blueprint $blueprint, Fluent $column)
     {
-        if (! $column->change && ! is_null($column->default)) {
+        if (! $column->change && ! \is_null($column->default)) {
             return ' default '.$this->getDefaultValue($column->default);
         }
     }
@@ -991,7 +991,7 @@ class SqlServerGrammar extends Grammar
      */
     protected function modifyIncrement(Blueprint $blueprint, Fluent $column)
     {
-        if (! $column->change && in_array($column->type, $this->serials) && $column->autoIncrement) {
+        if (! $column->change && \in_array($column->type, $this->serials) && $column->autoIncrement) {
             return ' identity primary key';
         }
     }
@@ -1041,7 +1041,7 @@ class SqlServerGrammar extends Grammar
      */
     public function quoteString($value)
     {
-        if (is_array($value)) {
+        if (\is_array($value)) {
             return implode(', ', array_map([$this, __FUNCTION__], $value));
         }
 

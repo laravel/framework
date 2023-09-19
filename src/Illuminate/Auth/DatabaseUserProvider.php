@@ -115,7 +115,7 @@ class DatabaseUserProvider implements UserProvider
         $query = $this->connection->table($this->table);
 
         foreach ($credentials as $key => $value) {
-            if (is_array($value) || $value instanceof Arrayable) {
+            if (\is_array($value) || $value instanceof Arrayable) {
                 $query->whereIn($key, $value);
             } elseif ($value instanceof Closure) {
                 $value($query);
@@ -140,7 +140,7 @@ class DatabaseUserProvider implements UserProvider
      */
     protected function getGenericUser($user)
     {
-        if (! is_null($user)) {
+        if (! \is_null($user)) {
             return new GenericUser((array) $user);
         }
     }

@@ -45,7 +45,7 @@ class EnvironmentDetector
         // First we will check if an environment argument was passed via console arguments
         // and if it was that automatically overrides as the environment. Otherwise, we
         // will check the environment as a "web" request like a typical HTTP request.
-        if (! is_null($value = $this->getEnvironmentArgument($args))) {
+        if (! \is_null($value = $this->getEnvironmentArgument($args))) {
             return $value;
         }
 
@@ -66,7 +66,7 @@ class EnvironmentDetector
             }
 
             if (str_starts_with($value, '--env')) {
-                return head(array_slice(explode('=', $value), 1));
+                return head(\array_slice(explode('=', $value), 1));
             }
         }
     }

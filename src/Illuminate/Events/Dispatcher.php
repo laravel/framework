@@ -180,11 +180,11 @@ class Dispatcher implements DispatcherContract
 
         $events = $subscriber->subscribe($this);
 
-        if (is_array($events)) {
+        if (\is_array($events)) {
             foreach ($events as $event => $listeners) {
                 foreach (Arr::wrap($listeners) as $listener) {
-                    if (is_string($listener) && method_exists($subscriber, $listener)) {
-                        $this->listen($event, [get_class($subscriber), $listener]);
+                    if (\is_string($listener) && method_exists($subscriber, $listener)) {
+                        $this->listen($event, [\get_class($subscriber), $listener]);
 
                         continue;
                     }
@@ -203,7 +203,7 @@ class Dispatcher implements DispatcherContract
      */
     protected function resolveSubscriber($subscriber)
     {
-        if (is_string($subscriber)) {
+        if (\is_string($subscriber)) {
             return $this->container->make($subscriber);
         }
 
@@ -251,7 +251,7 @@ class Dispatcher implements DispatcherContract
             // If a response is returned from the listener and event halting is enabled
             // we will just return this response, and not call the rest of the event
             // listeners. Otherwise we will add the response on the response list.
-            if ($halt && ! is_null($response)) {
+            if ($halt && ! \is_null($response)) {
                 return $response;
             }
 
@@ -277,8 +277,8 @@ class Dispatcher implements DispatcherContract
      */
     protected function parseEventAndPayload($event, $payload)
     {
-        if (is_object($event)) {
-            [$payload, $event] = [[$event], get_class($event)];
+        if (\is_object($event)) {
+            [$payload, $event] = [[$event], \get_class($event)];
         }
 
         return [$event, Arr::wrap($payload)];
@@ -405,11 +405,11 @@ class Dispatcher implements DispatcherContract
      */
     public function makeListener($listener, $wildcard = false)
     {
-        if (is_string($listener)) {
+        if (\is_string($listener)) {
             return $this->createClassListener($listener, $wildcard);
         }
 
-        if (is_array($listener) && isset($listener[0]) && is_string($listener[0])) {
+        if (\is_array($listener) && isset($listener[0]) && \is_string($listener[0])) {
             return $this->createClassListener($listener, $wildcard);
         }
 
@@ -433,7 +433,7 @@ class Dispatcher implements DispatcherContract
     {
         return function ($event, $payload) use ($listener, $wildcard) {
             if ($wildcard) {
-                return call_user_func($this->createClassCallable($listener), $event, $payload);
+                return \call_user_func($this->createClassCallable($listener), $event, $payload);
             }
 
             $callable = $this->createClassCallable($listener);
@@ -450,7 +450,7 @@ class Dispatcher implements DispatcherContract
      */
     protected function createClassCallable($listener)
     {
-        [$class, $method] = is_array($listener)
+        [$class, $method] = \is_array($listener)
                             ? $listener
                             : $this->parseClassCallable($listener);
 
@@ -508,8 +508,8 @@ class Dispatcher implements DispatcherContract
     {
         return function () use ($class, $method) {
             $arguments = array_map(function ($a) {
-                return is_object($a) ? clone $a : $a;
-            }, func_get_args());
+                return \is_object($a) ? clone $a : $a;
+            }, \func_get_args());
 
             if ($this->handlerWantsToBeQueued($class, $arguments)) {
                 $this->queueHandler($class, $method, $arguments);
@@ -538,7 +538,7 @@ class Dispatcher implements DispatcherContract
     protected function createCallbackForListenerRunningAfterCommits($listener, $method)
     {
         return function () use ($method, $listener) {
-            $payload = func_get_args();
+            $payload = \func_get_args();
 
             $this->container->make('db.transactions')->addCallback(
                 function () use ($listener, $method, $payload) {
@@ -590,7 +590,7 @@ class Dispatcher implements DispatcherContract
             ? (isset($arguments[0]) ? $listener->withDelay($arguments[0]) : $listener->withDelay())
             : $listener->delay ?? null;
 
-        is_null($delay)
+        \is_null($delay)
             ? $connection->pushOn($queue, $job)
             : $connection->laterOn($queue, $delay, $job);
     }
@@ -681,7 +681,7 @@ class Dispatcher implements DispatcherContract
      */
     protected function resolveQueue()
     {
-        return call_user_func($this->queueResolver);
+        return \call_user_func($this->queueResolver);
     }
 
     /**

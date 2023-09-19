@@ -11,5 +11,5 @@ interface CountableFailedJobProvider
      * @param  string|null  $queue
      * @return int
      */
-    public function count($connection = null, $queue = null);
+    public function \count($connection = null, $queue = null);
 }

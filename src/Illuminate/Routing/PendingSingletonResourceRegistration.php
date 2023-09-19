@@ -69,7 +69,7 @@ class PendingSingletonResourceRegistration
      */
     public function only($methods)
     {
-        $this->options['only'] = is_array($methods) ? $methods : func_get_args();
+        $this->options['only'] = \is_array($methods) ? $methods : \func_get_args();
 
         return $this;
     }
@@ -82,7 +82,7 @@ class PendingSingletonResourceRegistration
      */
     public function except($methods)
     {
-        $this->options['except'] = is_array($methods) ? $methods : func_get_args();
+        $this->options['except'] = \is_array($methods) ? $methods : \func_get_args();
 
         return $this;
     }

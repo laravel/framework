@@ -102,7 +102,7 @@ class MarkdownNotification extends Notification
     {
         $message = (new MailMessage)->markdown('markdown');
 
-        if (! is_null($this->theme)) {
+        if (! \is_null($this->theme)) {
             $message->theme($this->theme);
         }
 

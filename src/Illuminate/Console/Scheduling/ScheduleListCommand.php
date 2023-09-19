@@ -132,7 +132,7 @@ class ScheduleListCommand extends Command
         if ($event instanceof CallbackEvent) {
             $command = $event->getSummaryForDisplay();
 
-            if (in_array($command, ['Closure', 'Callback'])) {
+            if (\in_array($command, ['Closure', 'Callback'])) {
                 $command = 'Closure at: '.$this->getClosureLocation($event);
             }
         }
@@ -270,12 +270,12 @@ class ScheduleListCommand extends Command
             );
         }
 
-        if (is_string($callback)) {
+        if (\is_string($callback)) {
             return $callback;
         }
 
-        if (is_array($callback)) {
-            $className = is_string($callback[0]) ? $callback[0] : $callback[0]::class;
+        if (\is_array($callback)) {
+            $className = \is_string($callback[0]) ? $callback[0] : $callback[0]::class;
 
             return sprintf('%s::%s', $className, $callback[1]);
         }
@@ -290,9 +290,9 @@ class ScheduleListCommand extends Command
      */
     public static function getTerminalWidth()
     {
-        return is_null(static::$terminalWidthResolver)
+        return \is_null(static::$terminalWidthResolver)
             ? (new Terminal)->getWidth()
-            : call_user_func(static::$terminalWidthResolver);
+            : \call_user_func(static::$terminalWidthResolver);
     }
 
     /**

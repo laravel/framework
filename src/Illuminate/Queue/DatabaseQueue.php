@@ -74,7 +74,7 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
     {
         return $this->database->table($this->table)
                     ->where('queue', $this->getQueue($queue))
-                    ->count();
+                    ->\count();
     }
 
     /**

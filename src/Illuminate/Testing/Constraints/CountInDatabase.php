@@ -51,7 +51,7 @@ class CountInDatabase extends Constraint
      */
     public function matches($table): bool
     {
-        $this->actualCount = $this->database->table($table)->count();
+        $this->actualCount = $this->database->table($table)->\count();
 
         return $this->actualCount === $this->expectedCount;
     }

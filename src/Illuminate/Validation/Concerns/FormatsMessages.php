@@ -29,7 +29,7 @@ trait FormatsMessages
         // First we will retrieve the custom message for the validation rule if one
         // exists. If a custom validation message is being used we'll return the
         // custom message, otherwise we'll keep searching for a valid message.
-        if (! is_null($inlineMessage)) {
+        if (! \is_null($inlineMessage)) {
             return $inlineMessage;
         }
 
@@ -38,7 +38,7 @@ trait FormatsMessages
         $customKey = "validation.custom.{$attribute}.{$lowerRule}";
 
         $customMessage = $this->getCustomMessageFromTranslator(
-            in_array($rule, $this->sizeRules)
+            \in_array($rule, $this->sizeRules)
                 ? [$customKey.".{$this->getAttributeType($attribute)}", $customKey]
                 : $customKey
         );
@@ -53,7 +53,7 @@ trait FormatsMessages
         // If the rule being validated is a "size" rule, we will need to gather the
         // specific error message for the type of attribute being validated such
         // as a number, file or string which all have different message types.
-        elseif (in_array($rule, $this->sizeRules)) {
+        elseif (\in_array($rule, $this->sizeRules)) {
             return $this->getSizeMessage($attributeWithPlaceholders, $rule);
         }
 
@@ -82,7 +82,7 @@ trait FormatsMessages
     {
         $inlineEntry = $this->getFromLocalArray($attribute, Str::snake($rule));
 
-        return is_array($inlineEntry) && in_array($rule, $this->sizeRules)
+        return \is_array($inlineEntry) && \in_array($rule, $this->sizeRules)
                     ? $inlineEntry[$this->getAttributeType($attribute)]
                     : $inlineEntry;
     }
@@ -112,7 +112,7 @@ trait FormatsMessages
                     if (preg_match('#^'.$pattern.'\z#u', $key) === 1) {
                         $message = $source[$sourceKey];
 
-                        if (is_array($message) && isset($message[$lowerRule])) {
+                        if (\is_array($message) && isset($message[$lowerRule])) {
                             return $message[$lowerRule];
                         }
 
@@ -125,7 +125,7 @@ trait FormatsMessages
                 if (Str::is($sourceKey, $key)) {
                     $message = $source[$sourceKey];
 
-                    if ($sourceKey === $attribute && is_array($message) && isset($message[$lowerRule])) {
+                    if ($sourceKey === $attribute && \is_array($message) && isset($message[$lowerRule])) {
                         return $message[$lowerRule];
                     }
 
@@ -422,7 +422,7 @@ trait FormatsMessages
     {
         $actualValue = $this->getValue($attribute);
 
-        if (is_scalar($actualValue) || is_null($actualValue)) {
+        if (\is_scalar($actualValue) || \is_null($actualValue)) {
             $message = str_replace(':input', $this->getDisplayableValue($attribute, $actualValue), $message);
         }
 
@@ -442,7 +442,7 @@ trait FormatsMessages
             return $this->customValues[$attribute][$value];
         }
 
-        if (is_array($value)) {
+        if (\is_array($value)) {
             return 'array';
         }
 
@@ -452,11 +452,11 @@ trait FormatsMessages
             return $line;
         }
 
-        if (is_bool($value)) {
+        if (\is_bool($value)) {
             return $value ? 'true' : 'false';
         }
 
-        if (is_null($value)) {
+        if (\is_null($value)) {
             return 'empty';
         }
 
@@ -498,8 +498,8 @@ trait FormatsMessages
         $callback = $this->replacers[$rule];
 
         if ($callback instanceof Closure) {
-            return $callback(...func_get_args());
-        } elseif (is_string($callback)) {
+            return $callback(...\func_get_args());
+        } elseif (\is_string($callback)) {
             return $this->callClassBasedReplacer($callback, $message, $attribute, $rule, $parameters, $validator);
         }
     }
@@ -519,6 +519,6 @@ trait FormatsMessages
     {
         [$class, $method] = Str::parseCallback($callback, 'replace');
 
-        return $this->container->make($class)->{$method}(...array_slice(func_get_args(), 1));
+        return $this->container->make($class)->{$method}(...\array_slice(\func_get_args(), 1));
     }
 }

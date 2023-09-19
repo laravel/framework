@@ -54,8 +54,8 @@ class BatchRepositoryFake implements BatchRepository
         $this->batches[$id] = new BatchFake(
             $id,
             $batch->name,
-            count($batch->jobs),
-            count($batch->jobs),
+            \count($batch->jobs),
+            \count($batch->jobs),
             0,
             [],
             $batch->options,

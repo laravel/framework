@@ -752,7 +752,7 @@ class SupportHelpersTest extends TestCase
     public function testOptionalIsMacroable()
     {
         Optional::macro('present', function () {
-            if (is_object($this->value)) {
+            if (\is_object($this->value)) {
                 return $this->value->present();
             }
 
@@ -1098,7 +1098,7 @@ class SupportTestArrayAccess implements ArrayAccess
 
     public function offsetExists($offset): bool
     {
-        return array_key_exists($offset, $this->attributes);
+        return \array_key_exists($offset, $this->attributes);
     }
 
     public function offsetGet($offset): mixed
@@ -1134,7 +1134,7 @@ class SupportTestArrayIterable implements IteratorAggregate
 
 class SupportTestCountable implements Countable
 {
-    public function count(): int
+    public function \count(): int
     {
         return 0;
     }

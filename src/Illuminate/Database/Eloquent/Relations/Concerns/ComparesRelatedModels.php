@@ -15,7 +15,7 @@ trait ComparesRelatedModels
      */
     public function is($model)
     {
-        $match = ! is_null($model) &&
+        $match = ! \is_null($model) &&
                $this->compareKeys($this->getParentKey(), $this->getRelatedKeyFrom($model)) &&
                $this->related->getTable() === $model->getTable() &&
                $this->related->getConnectionName() === $model->getConnectionName();
@@ -68,7 +68,7 @@ trait ComparesRelatedModels
             return false;
         }
 
-        if (is_int($parentKey) || is_int($relatedKey)) {
+        if (\is_int($parentKey) || \is_int($relatedKey)) {
             return (int) $parentKey === (int) $relatedKey;
         }
 

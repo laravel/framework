@@ -65,7 +65,7 @@ class StatusCommand extends BaseCommand
                     return str($migration[1])->contains('Pending');
                 }));
 
-            if (count($migrations) > 0) {
+            if (\count($migrations) > 0) {
                 $this->newLine();
 
                 $this->components->twoColumnDetail('<fg=gray>Migration name</>', '<fg=gray>Batch / Status</>');
@@ -97,11 +97,11 @@ class StatusCommand extends BaseCommand
                     ->map(function ($migration) use ($ran, $batches) {
                         $migrationName = $this->migrator->getMigrationName($migration);
 
-                        $status = in_array($migrationName, $ran)
+                        $status = \in_array($migrationName, $ran)
                             ? '<fg=green;options=bold>Ran</>'
                             : '<fg=yellow;options=bold>Pending</>';
 
-                        if (in_array($migrationName, $ran)) {
+                        if (\in_array($migrationName, $ran)) {
                             $status = '['.$batches[$migrationName].'] '.$status;
                         }
 

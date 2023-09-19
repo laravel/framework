@@ -71,8 +71,8 @@ class ComponentMakeCommand extends GeneratorCommand
             str_replace('.', '/', 'components.'.$this->getView()).'.blade.php'
         );
 
-        if (! $this->files->isDirectory(dirname($path))) {
-            $this->files->makeDirectory(dirname($path), 0777, true, true);
+        if (! $this->files->isDirectory(\dirname($path))) {
+            $this->files->makeDirectory(\dirname($path), 0777, true, true);
         }
 
         if ($this->files->exists($path) && ! $this->option('force')) {

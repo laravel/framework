@@ -76,7 +76,7 @@ class Signals
      */
     protected function initializeSignal($signal)
     {
-        return is_callable($existingHandler = pcntl_signal_get_handler($signal))
+        return \is_callable($existingHandler = pcntl_signal_get_handler($signal))
             ? [$existingHandler]
             : null;
     }
@@ -91,7 +91,7 @@ class Signals
         $previousHandlers = $this->previousHandlers;
 
         foreach ($previousHandlers as $signal => $handler) {
-            if (is_null($handler)) {
+            if (\is_null($handler)) {
                 pcntl_signal($signal, SIG_DFL);
 
                 unset($previousHandlers[$signal]);

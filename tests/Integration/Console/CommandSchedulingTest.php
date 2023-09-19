@@ -55,7 +55,7 @@ class CommandSchedulingTest extends TestCase
         $this->fs->delete($this->logfile);
         $this->fs->delete(base_path('artisan'));
 
-        if (! is_null($this->originalArtisan)) {
+        if (! \is_null($this->originalArtisan)) {
             $this->fs->put(base_path('artisan'), $this->originalArtisan);
         }
 
@@ -156,7 +156,7 @@ class CommandSchedulingTest extends TestCase
 // If you are seeing this file, an unexpected error must have occurred. Please
 // manually remove it.
 
-define('LARAVEL_START', microtime(true));
+\define('LARAVEL_START', microtime(true));
 
 require __DIR__.'/../../../autoload.php';
 

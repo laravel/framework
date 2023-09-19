@@ -178,7 +178,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
             $this->setPath($path);
         }
 
-        if (! is_null($this->cachePath)) {
+        if (! \is_null($this->cachePath)) {
             $contents = $this->compileString($this->files->get($this->getPath()));
 
             if (! empty($this->getPath())) {
@@ -221,7 +221,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
         return collect(token_get_all($contents))
             ->pluck(0)
             ->filter(function ($token) {
-                return in_array($token, [T_OPEN_TAG, T_OPEN_TAG_WITH_ECHO, T_CLOSE_TAG]);
+                return \in_array($token, [T_OPEN_TAG, T_OPEN_TAG_WITH_ECHO, T_CLOSE_TAG]);
             });
     }
 
@@ -277,7 +277,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
         // parse each one into the corresponding valid PHP. We will then have this
         // template as the correctly rendered PHP that can be rendered natively.
         foreach (token_get_all($value) as $token) {
-            $result .= is_array($token) ? $this->parseToken($token) : $token;
+            $result .= \is_array($token) ? $this->parseToken($token) : $token;
         }
 
         if (! empty($this->rawBlocks)) {
@@ -287,7 +287,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
         // If there are any footer lines that need to get added to a template we will
         // add them here at the end of the template. This gets used mainly for the
         // template inheritance via the extends keyword that should be appended.
-        if (count($this->footer) > 0) {
+        if (\count($this->footer) > 0) {
             $result = $this->addFooters($result);
         }
 
@@ -585,8 +585,8 @@ class BladeCompiler extends Compiler implements CompilerInterface
 
         if ($position !== false) {
             return [
-                substr_replace($subject, $replace, $position, strlen($search)),
-                $position + strlen($replace),
+                substr_replace($subject, $replace, $position, \strlen($search)),
+                $position + \strlen($replace),
             ];
         }
 
@@ -657,7 +657,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
             $value = Str::substr($value, 1, -1);
         }
 
-        return call_user_func($this->customDirectives[$name], trim($value));
+        return \call_user_func($this->customDirectives[$name], trim($value));
     }
 
     /**
@@ -739,7 +739,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     public function check($name, ...$parameters)
     {
-        return call_user_func($this->conditions[$name], ...$parameters);
+        return \call_user_func($this->conditions[$name], ...$parameters);
     }
 
     /**
@@ -752,11 +752,11 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     public function component($class, $alias = null, $prefix = '')
     {
-        if (! is_null($alias) && str_contains($alias, '\\')) {
+        if (! \is_null($alias) && str_contains($alias, '\\')) {
             [$class, $alias] = [$alias, $class];
         }
 
-        if (is_null($alias)) {
+        if (\is_null($alias)) {
             $alias = str_contains($class, '\\View\\Components\\')
                             ? collect(explode('\\', Str::after($class, '\\View\\Components\\')))->map(function ($segment) {
                                 return Str::kebab($segment);

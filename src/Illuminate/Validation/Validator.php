@@ -337,7 +337,7 @@ class Validator implements ValidatorContract
         $newData = [];
 
         foreach ($data as $key => $value) {
-            if (is_array($value)) {
+            if (\is_array($value)) {
                 $value = $this->parseData($value);
             }
 
@@ -364,7 +364,7 @@ class Validator implements ValidatorContract
         $originalData = [];
 
         foreach ($data as $key => $value) {
-            $originalData[$this->replacePlaceholderInString($key)] = is_array($value)
+            $originalData[$this->replacePlaceholderInString($key)] = \is_array($value)
                         ? $this->replacePlaceholders($value)
                         : $value;
         }
@@ -395,7 +395,7 @@ class Validator implements ValidatorContract
      */
     public function after($callback)
     {
-        if (is_array($callback) && ! is_callable($callback)) {
+        if (\is_array($callback) && ! \is_callable($callback)) {
             foreach ($callback as $rule) {
                 $this->after(method_exists($rule, 'after') ? $rule->after(...) : $rule);
             }
@@ -543,7 +543,7 @@ class Validator implements ValidatorContract
      */
     public function safe(array $keys = null)
     {
-        return is_array($keys)
+        return \is_array($keys)
                 ? (new ValidatedInput($this->validated()))->only($keys)
                 : new ValidatedInput($this->validated());
     }
@@ -565,7 +565,7 @@ class Validator implements ValidatorContract
 
         foreach ($this->getRules() as $key => $rules) {
             if ($this->excludeUnvalidatedArrayKeys &&
-                in_array('array', $rules) &&
+                \in_array('array', $rules) &&
                 ! empty(preg_grep('/^'.preg_quote($key, '/').'\.+/', array_keys($this->getRules())))) {
                 continue;
             }
@@ -645,7 +645,7 @@ class Validator implements ValidatorContract
      */
     protected function dependsOnOtherFields($rule)
     {
-        return in_array($rule, $this->dependentRules);
+        return \in_array($rule, $this->dependentRules);
     }
 
     /**
@@ -680,7 +680,7 @@ class Validator implements ValidatorContract
     protected function getPrimaryAttribute($attribute)
     {
         foreach ($this->implicitAttributes as $unparsed => $parsed) {
-            if (in_array($attribute, $parsed, true)) {
+            if (\in_array($attribute, $parsed, true)) {
                 return $unparsed;
             }
         }
@@ -725,7 +725,7 @@ class Validator implements ValidatorContract
      */
     protected function isValidatable($rule, $attribute, $value)
     {
-        if (in_array($rule, $this->excludeRules)) {
+        if (\in_array($rule, $this->excludeRules)) {
             return true;
         }
 
@@ -745,7 +745,7 @@ class Validator implements ValidatorContract
      */
     protected function presentOrRuleIsImplicit($rule, $attribute, $value)
     {
-        if (is_string($value) && trim($value) === '') {
+        if (\is_string($value) && trim($value) === '') {
             return $this->isImplicit($rule);
         }
 
@@ -762,7 +762,7 @@ class Validator implements ValidatorContract
     protected function isImplicit($rule)
     {
         return $rule instanceof ImplicitRule ||
-               in_array($rule, $this->implicitRules);
+               \in_array($rule, $this->implicitRules);
     }
 
     /**
@@ -779,8 +779,8 @@ class Validator implements ValidatorContract
 
         $data = ValidationData::initializeAndGatherData($attribute, $this->data);
 
-        return array_key_exists($attribute, $data)
-            || array_key_exists($attribute, $this->data);
+        return \array_key_exists($attribute, $data)
+            || \array_key_exists($attribute, $this->data);
     }
 
     /**
@@ -796,7 +796,7 @@ class Validator implements ValidatorContract
             return true;
         }
 
-        return ! is_null(Arr::get($this->data, $attribute, 0));
+        return ! \is_null(Arr::get($this->data, $attribute, 0));
     }
 
     /**
@@ -810,7 +810,7 @@ class Validator implements ValidatorContract
      */
     protected function hasNotFailedPreviousRuleIfPresenceRule($rule, $attribute)
     {
-        return in_array($rule, ['Unique', 'Exists']) ? ! $this->messages->has($attribute) : true;
+        return \in_array($rule, ['Unique', 'Exists']) ? ! $this->messages->has($attribute) : true;
     }
 
     /**
@@ -825,7 +825,7 @@ class Validator implements ValidatorContract
     {
         $attribute = $this->replacePlaceholderInString($attribute);
 
-        $value = is_array($value) ? $this->replacePlaceholders($value) : $value;
+        $value = \is_array($value) ? $this->replacePlaceholders($value) : $value;
 
         if ($rule instanceof ValidatorAwareRule) {
             $rule->setValidator($this);
@@ -837,8 +837,8 @@ class Validator implements ValidatorContract
 
         if (! $rule->passes($attribute, $value)) {
             $ruleClass = $rule instanceof InvokableValidationRule ?
-                get_class($rule->invokable()) :
-                get_class($rule);
+                \get_class($rule->invokable()) :
+                \get_class($rule);
 
             $this->failedRules[$attribute][$ruleClass] = [];
 
@@ -847,7 +847,7 @@ class Validator implements ValidatorContract
             $messages = $messages ? (array) $messages : [$ruleClass];
 
             foreach ($messages as $key => $message) {
-                $key = is_string($key) ? $key : $attribute;
+                $key = \is_string($key) ? $key : $attribute;
 
                 $this->messages->add($key, $this->makeReplacements(
                     $message, $key, $ruleClass, []
@@ -871,7 +871,7 @@ class Validator implements ValidatorContract
         }
 
         if (isset($this->failedRules[$cleanedAttribute]) &&
-            array_key_exists('uploaded', $this->failedRules[$cleanedAttribute])) {
+            \array_key_exists('uploaded', $this->failedRules[$cleanedAttribute])) {
             return true;
         }
 
@@ -901,7 +901,7 @@ class Validator implements ValidatorContract
 
         $attribute = $this->replacePlaceholderInString($attribute);
 
-        if (in_array($rule, $this->excludeRules)) {
+        if (\in_array($rule, $this->excludeRules)) {
             return $this->excludeAttribute($attribute);
         }
 
@@ -1032,7 +1032,7 @@ class Validator implements ValidatorContract
      */
     public function hasRule($attribute, $rules)
     {
-        return ! is_null($this->getRule($attribute, $rules));
+        return ! \is_null($this->getRule($attribute, $rules));
     }
 
     /**
@@ -1044,7 +1044,7 @@ class Validator implements ValidatorContract
      */
     protected function getRule($attribute, $rules)
     {
-        if (! array_key_exists($attribute, $this->rules)) {
+        if (! \array_key_exists($attribute, $this->rules)) {
             return;
         }
 
@@ -1053,7 +1053,7 @@ class Validator implements ValidatorContract
         foreach ($this->rules[$attribute] as $rule) {
             [$rule, $parameters] = ValidationRuleParser::parse($rule);
 
-            if (in_array($rule, $rules)) {
+            if (\in_array($rule, $rules)) {
                 return [$rule, $parameters];
             }
         }
@@ -1226,7 +1226,7 @@ class Validator implements ValidatorContract
                     ? Str::replaceLast($lastSegmentOfAttribute, '', $attribute)
                     : $attribute;
 
-        return is_array($data = data_get($this->data, $attribute))
+        return \is_array($data = data_get($this->data, $attribute))
             ? new Fluent($data)
             : $data;
     }
@@ -1558,9 +1558,9 @@ class Validator implements ValidatorContract
     {
         $callback = $this->extensions[$rule];
 
-        if (is_callable($callback)) {
+        if (\is_callable($callback)) {
             return $callback(...array_values($parameters));
-        } elseif (is_string($callback)) {
+        } elseif (\is_string($callback)) {
             return $this->callClassBasedExtension($callback, $parameters);
         }
     }

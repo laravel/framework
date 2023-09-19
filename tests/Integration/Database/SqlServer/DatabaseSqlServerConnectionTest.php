@@ -39,7 +39,7 @@ class DatabaseSqlServerConnectionTest extends SqlServerTestCase
             ['json_col' => '{"bar":null}'],
         ]);
 
-        $this->assertSame($count, DB::table('json_table')->whereJsonContainsKey($column)->count());
+        $this->assertSame($count, DB::table('json_table')->whereJsonContainsKey($column)->\count());
     }
 
     public static function jsonContainsKeyDataProvider()

@@ -36,7 +36,7 @@ class Sequence implements Countable
     public function __construct(...$sequence)
     {
         $this->sequence = $sequence;
-        $this->count = count($sequence);
+        $this->count = \count($sequence);
     }
 
     /**
@@ -44,7 +44,7 @@ class Sequence implements Countable
      *
      * @return int
      */
-    public function count(): int
+    public function \count(): int
     {
         return $this->count;
     }

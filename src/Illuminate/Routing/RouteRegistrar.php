@@ -106,7 +106,7 @@ class RouteRegistrar
      */
     public function attribute($key, $value)
     {
-        if (! in_array($key, $this->allowedAttributes)) {
+        if (! \in_array($key, $this->allowedAttributes)) {
             throw new InvalidArgumentException("Attribute [{$key}] does not exist.");
         }
 
@@ -217,7 +217,7 @@ class RouteRegistrar
      */
     protected function registerRoute($method, $uri, $action = null)
     {
-        if (! is_array($action)) {
+        if (! \is_array($action)) {
             $action = array_merge($this->attributes, $action ? ['uses' => $action] : []);
         }
 
@@ -232,15 +232,15 @@ class RouteRegistrar
      */
     protected function compileAction($action)
     {
-        if (is_null($action)) {
+        if (\is_null($action)) {
             return $this->attributes;
         }
 
-        if (is_string($action) || $action instanceof Closure) {
+        if (\is_string($action) || $action instanceof Closure) {
             $action = ['uses' => $action];
         }
 
-        if (is_array($action) &&
+        if (\is_array($action) &&
             array_is_list($action) &&
             Reflector::isCallable($action)) {
             if (strncmp($action[0], '\\', 1)) {
@@ -266,16 +266,16 @@ class RouteRegistrar
      */
     public function __call($method, $parameters)
     {
-        if (in_array($method, $this->passthru)) {
+        if (\in_array($method, $this->passthru)) {
             return $this->registerRoute($method, ...$parameters);
         }
 
-        if (in_array($method, $this->allowedAttributes)) {
+        if (\in_array($method, $this->allowedAttributes)) {
             if ($method === 'middleware') {
-                return $this->attribute($method, is_array($parameters[0]) ? $parameters[0] : $parameters);
+                return $this->attribute($method, \is_array($parameters[0]) ? $parameters[0] : $parameters);
             }
 
-            return $this->attribute($method, array_key_exists(0, $parameters) ? $parameters[0] : true);
+            return $this->attribute($method, \array_key_exists(0, $parameters) ? $parameters[0] : true);
         }
 
         throw new BadMethodCallException(sprintf(

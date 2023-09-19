@@ -41,7 +41,7 @@ trait BuildsQueries
             // we will call the callback with the current chunk of these results here.
             $results = $this->forPage($page, $count)->get();
 
-            $countResults = $results->count();
+            $countResults = $results->\count();
 
             if ($countResults == 0) {
                 break;
@@ -129,7 +129,7 @@ trait BuildsQueries
             // we will call the callback with the current chunk of these results here.
             $results = $clone->forPageAfterId($count, $lastId, $column)->get();
 
-            $countResults = $results->count();
+            $countResults = $results->\count();
 
             if ($countResults == 0) {
                 break;
@@ -202,7 +202,7 @@ trait BuildsQueries
                     yield $result;
                 }
 
-                if ($results->count() < $chunkSize) {
+                if ($results->\count() < $chunkSize) {
                     return;
                 }
             }
@@ -276,7 +276,7 @@ trait BuildsQueries
                     yield $result;
                 }
 
-                if ($results->count() < $chunkSize) {
+                if ($results->\count() < $chunkSize) {
                     return;
                 }
 
@@ -313,7 +313,7 @@ trait BuildsQueries
     {
         $result = $this->take(2)->get($columns);
 
-        $count = $result->count();
+        $count = $result->\count();
 
         if ($count === 0) {
             throw new RecordsNotFoundException;
@@ -338,18 +338,18 @@ trait BuildsQueries
     protected function paginateUsingCursor($perPage, $columns = ['*'], $cursorName = 'cursor', $cursor = null)
     {
         if (! $cursor instanceof Cursor) {
-            $cursor = is_string($cursor)
+            $cursor = \is_string($cursor)
                 ? Cursor::fromEncoded($cursor)
                 : CursorPaginator::resolveCurrentCursor($cursorName, $cursor);
         }
 
-        $orders = $this->ensureOrderForCursorPagination(! is_null($cursor) && $cursor->pointsToPreviousItems());
+        $orders = $this->ensureOrderForCursorPagination(! \is_null($cursor) && $cursor->pointsToPreviousItems());
 
-        if (! is_null($cursor)) {
+        if (! \is_null($cursor)) {
             $addCursorConditions = function (self $builder, $previousColumn, $i) use (&$addCursorConditions, $cursor, $orders) {
                 $unionBuilders = isset($builder->unions) ? collect($builder->unions)->pluck('query') : collect();
 
-                if (! is_null($previousColumn)) {
+                if (! \is_null($previousColumn)) {
                     $originalColumn = $this->getOriginalColumnNameForCursorPagination($this, $previousColumn);
 
                     $builder->where(
@@ -380,7 +380,7 @@ trait BuildsQueries
                         $cursor->parameter($column)
                     );
 
-                    if ($i < $orders->count() - 1) {
+                    if ($i < $orders->\count() - 1) {
                         $builder->orWhere(function (self $builder) use ($addCursorConditions, $column, $i) {
                             $addCursorConditions($builder, $column, $i + 1);
                         });
@@ -394,7 +394,7 @@ trait BuildsQueries
                                 $cursor->parameter($column)
                             );
 
-                            if ($i < $orders->count() - 1) {
+                            if ($i < $orders->\count() - 1) {
                                 $unionBuilder->orWhere(function (self $builder) use ($addCursorConditions, $column, $i) {
                                     $addCursorConditions($builder, $column, $i + 1);
                                 });
@@ -429,7 +429,7 @@ trait BuildsQueries
     {
         $columns = $builder instanceof Builder ? $builder->getQuery()->getColumns() : $builder->getColumns();
 
-        if (! is_null($columns)) {
+        if (! \is_null($columns)) {
             foreach ($columns as $column) {
                 if (($position = strripos($column, ' as ')) !== false) {
                     $original = substr($column, 0, $position);

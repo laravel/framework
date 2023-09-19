@@ -81,7 +81,7 @@ class PhpRedisConnector implements Connector
         return tap(new Redis, function ($client) use ($config) {
             if ($client instanceof RedisFacade) {
                 throw new LogicException(
-                    extension_loaded('redis')
+                    \extension_loaded('redis')
                         ? 'Please remove or rename the Redis facade alias in your "app" configuration file in order to avoid collision with the PHP Redis extension.'
                         : 'Please make sure the PHP Redis extension is installed and enabled.'
                 );
@@ -90,7 +90,7 @@ class PhpRedisConnector implements Connector
             $this->establishConnection($client, $config);
 
             if (! empty($config['password'])) {
-                if (isset($config['username']) && $config['username'] !== '' && is_string($config['password'])) {
+                if (isset($config['username']) && $config['username'] !== '' && \is_string($config['password'])) {
                     $client->auth([$config['username'], $config['password']]);
                 } else {
                     $client->auth($config['password']);
@@ -117,15 +117,15 @@ class PhpRedisConnector implements Connector
                 $client->client('SETNAME', $config['name']);
             }
 
-            if (array_key_exists('serializer', $config)) {
+            if (\array_key_exists('serializer', $config)) {
                 $client->setOption(Redis::OPT_SERIALIZER, $config['serializer']);
             }
 
-            if (array_key_exists('compression', $config)) {
+            if (\array_key_exists('compression', $config)) {
                 $client->setOption(Redis::OPT_COMPRESSION, $config['compression']);
             }
 
-            if (array_key_exists('compression_level', $config)) {
+            if (\array_key_exists('compression_level', $config)) {
                 $client->setOption(Redis::OPT_COMPRESSION_LEVEL, $config['compression_level']);
             }
         });
@@ -154,7 +154,7 @@ class PhpRedisConnector implements Connector
             $parameters[] = Arr::get($config, 'read_timeout', 0.0);
         }
 
-        if (version_compare(phpversion('redis'), '5.3.0', '>=') && ! is_null($context = Arr::get($config, 'context'))) {
+        if (version_compare(phpversion('redis'), '5.3.0', '>=') && ! \is_null($context = Arr::get($config, 'context'))) {
             $parameters[] = $context;
         }
 
@@ -182,7 +182,7 @@ class PhpRedisConnector implements Connector
             $parameters[] = $options['password'] ?? null;
         }
 
-        if (version_compare(phpversion('redis'), '5.3.2', '>=') && ! is_null($context = Arr::get($options, 'context'))) {
+        if (version_compare(phpversion('redis'), '5.3.2', '>=') && ! \is_null($context = Arr::get($options, 'context'))) {
             $parameters[] = $context;
         }
 
@@ -203,15 +203,15 @@ class PhpRedisConnector implements Connector
                 $client->client('SETNAME', $options['name']);
             }
 
-            if (array_key_exists('serializer', $options)) {
+            if (\array_key_exists('serializer', $options)) {
                 $client->setOption(Redis::OPT_SERIALIZER, $options['serializer']);
             }
 
-            if (array_key_exists('compression', $options)) {
+            if (\array_key_exists('compression', $options)) {
                 $client->setOption(Redis::OPT_COMPRESSION, $options['compression']);
             }
 
-            if (array_key_exists('compression_level', $options)) {
+            if (\array_key_exists('compression_level', $options)) {
                 $client->setOption(Redis::OPT_COMPRESSION_LEVEL, $options['compression_level']);
             }
         });

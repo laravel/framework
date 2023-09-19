@@ -1652,7 +1652,7 @@ class SupportCollectionTest extends TestCase
         $result = [];
         $c->each(function ($item, $key) use (&$result) {
             $result[$key] = $item;
-            if (is_string($key)) {
+            if (\is_string($key)) {
                 return false;
             }
         });
@@ -2497,11 +2497,11 @@ class SupportCollectionTest extends TestCase
         $this->assertCount(2, $random);
         $this->assertCount(2, array_intersect_assoc($random->all(), $data->all()));
 
-        $random = $data->random(fn ($items) => min(10, count($items)));
+        $random = $data->random(fn ($items) => min(10, \count($items)));
         $this->assertInstanceOf($collection, $random);
         $this->assertCount(6, $random);
 
-        $random = $data->random(fn ($items) => min(10, count($items) - 1), true);
+        $random = $data->random(fn ($items) => min(10, \count($items) - 1), true);
         $this->assertInstanceOf($collection, $random);
         $this->assertCount(5, $random);
         $this->assertCount(5, array_intersect_assoc($random->all(), $data->all()));
@@ -3626,7 +3626,7 @@ class SupportCollectionTest extends TestCase
         ]);
 
         $this->assertTrue($c->contains(function ($value) {
-            return is_null($value);
+            return \is_null($value);
         }));
     }
 
@@ -3687,7 +3687,7 @@ class SupportCollectionTest extends TestCase
         ]);
 
         $this->assertFalse($c->doesntContain(function ($value) {
-            return is_null($value);
+            return \is_null($value);
         }));
     }
 
@@ -3728,7 +3728,7 @@ class SupportCollectionTest extends TestCase
         ]);
 
         $this->assertTrue($c->some(function ($value) {
-            return is_null($value);
+            return \is_null($value);
         }));
     }
 
@@ -5731,7 +5731,7 @@ class TestAccessorEloquentTestStub
         $accessor = 'get'.lcfirst($attribute).'Attribute';
 
         if (method_exists($this, $accessor)) {
-            return ! is_null($this->$accessor());
+            return ! \is_null($this->$accessor());
         }
 
         return isset($this->$attribute);

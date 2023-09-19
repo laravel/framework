@@ -139,14 +139,14 @@ class DatabaseManager implements ConnectionResolverInterface
         // registered specifically for that connection. If it has we will call the
         // Closure and pass it the config allowing it to resolve the connection.
         if (isset($this->extensions[$name])) {
-            return call_user_func($this->extensions[$name], $config, $name);
+            return \call_user_func($this->extensions[$name], $config, $name);
         }
 
         // Next we will check to see if an extension has been registered for a driver
         // and will call the Closure if so, which allows us to have a more generic
         // resolver for the drivers themselves which applies to all connections.
         if (isset($this->extensions[$driver = $config['driver']])) {
-            return call_user_func($this->extensions[$driver], $config, $name);
+            return \call_user_func($this->extensions[$driver], $config, $name);
         }
 
         return $this->factory->make($config, $name);
@@ -169,7 +169,7 @@ class DatabaseManager implements ConnectionResolverInterface
         // If the configuration doesn't exist, we'll throw an exception and bail.
         $connections = $this->app['config']['database.connections'];
 
-        if (is_null($config = Arr::get($connections, $name))) {
+        if (\is_null($config = Arr::get($connections, $name))) {
             throw new InvalidArgumentException("Database connection [{$name}] not configured.");
         }
 

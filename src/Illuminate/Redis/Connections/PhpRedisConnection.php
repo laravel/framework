@@ -109,7 +109,7 @@ class PhpRedisConnection extends Connection implements ConnectionContract
      */
     public function hmget($key, ...$dictionary)
     {
-        if (count($dictionary) === 1) {
+        if (\count($dictionary) === 1) {
             $dictionary = $dictionary[0];
         }
 
@@ -125,7 +125,7 @@ class PhpRedisConnection extends Connection implements ConnectionContract
      */
     public function hmset($key, ...$dictionary)
     {
-        if (count($dictionary) === 1) {
+        if (\count($dictionary) === 1) {
             $dictionary = $dictionary[0];
         } else {
             $input = collect($dictionary);
@@ -197,7 +197,7 @@ class PhpRedisConnection extends Connection implements ConnectionContract
      */
     public function spop($key, $count = 1)
     {
-        return $this->command('spop', func_get_args());
+        return $this->command('spop', \func_get_args());
     }
 
     /**
@@ -209,7 +209,7 @@ class PhpRedisConnection extends Connection implements ConnectionContract
      */
     public function zadd($key, ...$dictionary)
     {
-        if (is_array(end($dictionary))) {
+        if (\is_array(end($dictionary))) {
             foreach (array_pop($dictionary) as $member => $score) {
                 $dictionary[] = $score;
                 $dictionary[] = $member;
@@ -218,8 +218,8 @@ class PhpRedisConnection extends Connection implements ConnectionContract
 
         $options = [];
 
-        foreach (array_slice($dictionary, 0, 3) as $i => $value) {
-            if (in_array($value, ['nx', 'xx', 'ch', 'incr', 'gt', 'lt', 'NX', 'XX', 'CH', 'INCR', 'GT', 'LT'], true)) {
+        foreach (\array_slice($dictionary, 0, 3) as $i => $value) {
+            if (\in_array($value, ['nx', 'xx', 'ch', 'incr', 'gt', 'lt', 'NX', 'XX', 'CH', 'INCR', 'GT', 'LT'], true)) {
                 $options[] = $value;
 
                 unset($dictionary[$i]);
@@ -400,7 +400,7 @@ class PhpRedisConnection extends Connection implements ConnectionContract
     {
         $pipeline = $this->client()->pipeline();
 
-        return is_null($callback)
+        return \is_null($callback)
             ? $pipeline
             : tap($pipeline, $callback)->exec();
     }
@@ -415,7 +415,7 @@ class PhpRedisConnection extends Connection implements ConnectionContract
     {
         $transaction = $this->client()->multi();
 
-        return is_null($callback)
+        return \is_null($callback)
             ? $transaction
             : tap($transaction, $callback)->exec();
     }
@@ -496,7 +496,7 @@ class PhpRedisConnection extends Connection implements ConnectionContract
      */
     public function flushdb()
     {
-        $arguments = func_get_args();
+        $arguments = \func_get_args();
 
         if (strtoupper((string) ($arguments[0] ?? null)) === 'ASYNC') {
             return $this->command('flushdb', [true]);
@@ -532,7 +532,7 @@ class PhpRedisConnection extends Connection implements ConnectionContract
         } catch (RedisException $e) {
             foreach (['went away', 'socket', 'read error on connection', 'Connection lost'] as $errorMessage) {
                 if (str_contains($e->getMessage(), $errorMessage)) {
-                    $this->client = $this->connector ? call_user_func($this->connector) : $this->client;
+                    $this->client = $this->connector ? \call_user_func($this->connector) : $this->client;
 
                     break;
                 }

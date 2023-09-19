@@ -165,8 +165,8 @@ class Batch implements Arrayable, JsonSerializable
         $jobs = Collection::wrap($jobs)->map(function ($job) use (&$count) {
             $job = $job instanceof Closure ? CallQueuedClosure::create($job) : $job;
 
-            if (is_array($job)) {
-                $count += count($job);
+            if (\is_array($job)) {
+                $count += \count($job);
 
                 return with($this->prepareBatchedChain($job), function ($chain) {
                     return $chain->first()
@@ -280,7 +280,7 @@ class Batch implements Arrayable, JsonSerializable
      */
     public function finished()
     {
-        return ! is_null($this->finishedAt);
+        return ! \is_null($this->finishedAt);
     }
 
     /**
@@ -403,7 +403,7 @@ class Batch implements Arrayable, JsonSerializable
      */
     public function cancelled()
     {
-        return ! is_null($this->cancelledAt);
+        return ! \is_null($this->cancelledAt);
     }
 
     /**
@@ -429,7 +429,7 @@ class Batch implements Arrayable, JsonSerializable
         try {
             return $handler($batch, $e);
         } catch (Throwable $e) {
-            if (function_exists('report')) {
+            if (\function_exists('report')) {
                 report($e);
             }
         }

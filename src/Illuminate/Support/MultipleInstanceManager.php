@@ -99,11 +99,11 @@ abstract class MultipleInstanceManager
     {
         $config = $this->getInstanceConfig($name);
 
-        if (is_null($config)) {
+        if (\is_null($config)) {
             throw new InvalidArgumentException("Instance [{$name}] is not defined.");
         }
 
-        if (! array_key_exists('driver', $config)) {
+        if (! \array_key_exists('driver', $config)) {
             throw new RuntimeException("Instance [{$name}] does not specify a driver.");
         }
 

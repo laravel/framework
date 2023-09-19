@@ -345,7 +345,7 @@ trait ManagesFrequencies
         $segments = explode(':', $time);
 
         return $this->hourBasedSchedule(
-            count($segments) === 2 ? (int) $segments[1] : '0',
+            \count($segments) === 2 ? (int) $segments[1] : '0',
             (int) $segments[0]
         );
     }
@@ -386,9 +386,9 @@ trait ManagesFrequencies
      */
     protected function hourBasedSchedule($minutes, $hours)
     {
-        $minutes = is_array($minutes) ? implode(',', $minutes) : $minutes;
+        $minutes = \is_array($minutes) ? implode(',', $minutes) : $minutes;
 
-        $hours = is_array($hours) ? implode(',', $hours) : $hours;
+        $hours = \is_array($hours) ? implode(',', $hours) : $hours;
 
         return $this->spliceIntoPosition(1, $minutes)
                     ->spliceIntoPosition(2, $hours);
@@ -631,7 +631,7 @@ trait ManagesFrequencies
      */
     public function days($days)
     {
-        $days = is_array($days) ? $days : func_get_args();
+        $days = \is_array($days) ? $days : \func_get_args();
 
         return $this->spliceIntoPosition(5, implode(',', $days));
     }

@@ -19,7 +19,7 @@ interface Gate
      * @param  callable|string  $callback
      * @return $this
      */
-    public function define($ability, $callback);
+    public function \define($ability, $callback);
 
     /**
      * Define abilities for a resource.

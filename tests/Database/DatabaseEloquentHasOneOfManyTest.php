@@ -348,7 +348,7 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
         $user->logins()->create();
         $user->logins()->create();
 
-        $this->assertSame(1, $user->latest_login()->count());
+        $this->assertSame(1, $user->latest_login()->\count());
     }
 
     public function testAggregate()

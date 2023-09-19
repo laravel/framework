@@ -175,8 +175,8 @@ abstract class DatabaseInspectionCommand extends Command
     {
         $result = match (true) {
             $connection instanceof MySqlConnection => $connection->selectOne('show status where variable_name = "threads_connected"'),
-            $connection instanceof PostgresConnection => $connection->selectOne('select count(*) AS "Value" from pg_stat_activity'),
-            $connection instanceof SqlServerConnection => $connection->selectOne('SELECT COUNT(*) Value FROM sys.dm_exec_sessions WHERE status = ?', ['running']),
+            $connection instanceof PostgresConnection => $connection->selectOne('select \count(*) AS "Value" from pg_stat_activity'),
+            $connection instanceof SqlServerConnection => $connection->selectOne('SELECT \count(*) Value FROM sys.dm_exec_sessions WHERE status = ?', ['running']),
             default => null,
         };
 
@@ -240,7 +240,7 @@ abstract class DatabaseInspectionCommand extends Command
         try {
             $process->run(fn ($type, $line) => $this->output->write($line));
         } catch (ProcessSignaledException $e) {
-            if (extension_loaded('pcntl') && $e->getSignal() !== SIGINT) {
+            if (\extension_loaded('pcntl') && $e->getSignal() !== SIGINT) {
                 throw $e;
             }
         }

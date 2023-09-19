@@ -299,8 +299,8 @@ class ComponentTagCompiler
             return $class;
         }
 
-        if (! is_null($guess = $this->guessAnonymousComponentUsingNamespaces($viewFactory, $component)) ||
-            ! is_null($guess = $this->guessAnonymousComponentUsingPaths($viewFactory, $component))) {
+        if (! \is_null($guess = $this->guessAnonymousComponentUsingNamespaces($viewFactory, $component)) ||
+            ! \is_null($guess = $this->guessAnonymousComponentUsingPaths($viewFactory, $component))) {
             return $guess;
         }
 
@@ -335,7 +335,7 @@ class ComponentTagCompiler
                         ? Str::after($component, $delimiter)
                         : $component;
 
-                if (! is_null($guess = match (true) {
+                if (! \is_null($guess = match (true) {
                     $viewFactory->exists($guess = $path['prefixHash'].$delimiter.$formattedComponent) => $guess,
                     $viewFactory->exists($guess = $path['prefixHash'].$delimiter.$formattedComponent.'.index') => $guess,
                     default => null,
@@ -363,7 +363,7 @@ class ComponentTagCompiler
             })
             ->prepend('components', $component)
             ->reduce(function ($carry, $directory, $prefix) use ($component, $viewFactory) {
-                if (! is_null($carry)) {
+                if (! \is_null($carry)) {
                     return $carry;
                 }
 
@@ -477,7 +477,7 @@ class ComponentTagCompiler
                     : [];
 
         return collect($attributes)->partition(function ($value, $key) use ($parameterNames) {
-            return in_array(Str::camel($key), $parameterNames);
+            return \in_array(Str::camel($key), $parameterNames);
         })->all();
     }
 
@@ -611,7 +611,7 @@ class ComponentTagCompiler
             $attribute = $match['attribute'];
             $value = $match['value'] ?? null;
 
-            if (is_null($value)) {
+            if (\is_null($value)) {
                 $value = 'true';
 
                 $attribute = Str::start($attribute, 'bind:');
@@ -755,7 +755,7 @@ class ComponentTagCompiler
     protected function escapeSingleQuotesOutsideOfPhpBlocks(string $value)
     {
         return collect(token_get_all($value))->map(function ($token) {
-            if (! is_array($token)) {
+            if (! \is_array($token)) {
                 return $token;
             }
 

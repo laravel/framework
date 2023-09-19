@@ -116,7 +116,7 @@ class CallQueuedListener implements ShouldQueue
      */
     protected function setJobInstanceIfNecessary(Job $job, $instance)
     {
-        if (in_array(InteractsWithQueue::class, class_uses_recursive($instance))) {
+        if (\in_array(InteractsWithQueue::class, class_uses_recursive($instance))) {
             $instance->setJob($job);
         }
 
@@ -151,7 +151,7 @@ class CallQueuedListener implements ShouldQueue
      */
     protected function prepareData()
     {
-        if (is_string($this->data)) {
+        if (\is_string($this->data)) {
             $this->data = unserialize($this->data);
         }
     }
@@ -174,7 +174,7 @@ class CallQueuedListener implements ShouldQueue
     public function __clone()
     {
         $this->data = array_map(function ($data) {
-            return is_object($data) ? clone $data : $data;
+            return \is_object($data) ? clone $data : $data;
         }, $this->data);
     }
 }

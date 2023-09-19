@@ -541,7 +541,7 @@ class DatabaseEloquentFactoryTest extends TestCase
             )
             ->make();
 
-        $assert($usersByClass);
+        $\assert($usersByClass);
 
         $usersByMethod = FactoryTestUserFactory::times(4)
             ->crossJoinSequence(
@@ -550,7 +550,7 @@ class DatabaseEloquentFactoryTest extends TestCase
             )
             ->make();
 
-        $assert($usersByMethod);
+        $\assert($usersByMethod);
     }
 
     public function test_resolve_nested_model_factories()
@@ -701,7 +701,7 @@ class DatabaseEloquentFactoryTest extends TestCase
             ->hasComments(2)
             ->create();
 
-        $this->assertSame(1, FactoryTestUser::count());
+        $this->assertSame(1, FactoryTestUser::\count());
         $this->assertEquals($user->id, $post->user_id);
         $this->assertEquals($user->id, $post->comments[0]->user_id);
         $this->assertEquals($user->id, $post->comments[1]->user_id);
@@ -719,7 +719,7 @@ class DatabaseEloquentFactoryTest extends TestCase
             ->for(FactoryTestUserFactory::new())
             ->create();
 
-        $this->assertSame(1, FactoryTestUser::count());
+        $this->assertSame(1, FactoryTestUser::\count());
     }
 
     public function test_has_method_does_not_reassign_the_parent()
@@ -735,7 +735,7 @@ class DatabaseEloquentFactoryTest extends TestCase
             ->has(FactoryTestPostFactory::new(), 'posts')
             ->create();
 
-        $this->assertSame(2, FactoryTestPost::count());
+        $this->assertSame(2, FactoryTestPost::\count());
     }
 
     public function test_multiple_models_can_be_provided_to_recycle()
@@ -744,16 +744,16 @@ class DatabaseEloquentFactoryTest extends TestCase
             return $model.'Factory';
         });
 
-        $users = FactoryTestUserFactory::new()->count(3)->create();
+        $users = FactoryTestUserFactory::new()->\count(3)->create();
 
         $posts = FactoryTestPostFactory::new()
             ->recycle($users)
             ->for(FactoryTestUserFactory::new())
-            ->has(FactoryTestCommentFactory::new()->count(5), 'comments')
-            ->count(2)
+            ->has(FactoryTestCommentFactory::new()->\count(5), 'comments')
+            ->\count(2)
             ->create();
 
-        $this->assertSame(3, FactoryTestUser::count());
+        $this->assertSame(3, FactoryTestUser::\count());
     }
 
     public function test_recycled_models_can_be_combined_with_multiple_calls()
@@ -763,11 +763,11 @@ class DatabaseEloquentFactoryTest extends TestCase
         });
 
         $users = FactoryTestUserFactory::new()
-            ->count(2)
+            ->\count(2)
             ->create();
         $posts = FactoryTestPostFactory::new()
             ->recycle($users)
-            ->count(2)
+            ->\count(2)
             ->create();
         $additionalUser = FactoryTestUserFactory::new()
             ->create();
@@ -775,18 +775,18 @@ class DatabaseEloquentFactoryTest extends TestCase
             ->recycle($additionalUser)
             ->create();
 
-        $this->assertSame(3, FactoryTestUser::count());
-        $this->assertSame(3, FactoryTestPost::count());
+        $this->assertSame(3, FactoryTestUser::\count());
+        $this->assertSame(3, FactoryTestPost::\count());
 
         $comments = FactoryTestCommentFactory::new()
             ->recycle($users)
             ->recycle($posts)
             ->recycle([$additionalUser, $additionalPost])
-            ->count(5)
+            ->\count(5)
             ->create();
 
-        $this->assertSame(3, FactoryTestUser::count());
-        $this->assertSame(3, FactoryTestPost::count());
+        $this->assertSame(3, FactoryTestUser::\count());
+        $this->assertSame(3, FactoryTestPost::\count());
     }
 
     public function test_no_models_can_be_provided_to_recycle()
@@ -797,11 +797,11 @@ class DatabaseEloquentFactoryTest extends TestCase
 
         $posts = FactoryTestPostFactory::new()
             ->recycle([])
-            ->count(2)
+            ->\count(2)
             ->create();
 
-        $this->assertSame(2, FactoryTestPost::count());
-        $this->assertSame(2, FactoryTestUser::count());
+        $this->assertSame(2, FactoryTestPost::\count());
+        $this->assertSame(2, FactoryTestUser::\count());
     }
 
     /**

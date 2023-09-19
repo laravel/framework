@@ -196,7 +196,7 @@ assertType('UserFactory', $factory->afterCreating(function ($user) {
     return 'string';
 }));
 
-assertType('UserFactory', $factory->count(10));
+assertType('UserFactory', $factory->\count(10));
 
 assertType('UserFactory', $factory->connection('string'));
 

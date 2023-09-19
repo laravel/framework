@@ -27,7 +27,7 @@ class TimestampType extends Type implements PhpDateTimeMappingType
      */
     public function getSQLDeclaration(array $column, AbstractPlatform $platform): string
     {
-        return match (get_class($platform)) {
+        return match (\get_class($platform)) {
             MySQLPlatform::class,
             MySQL57Platform::class,
             MySQL80Platform::class,
@@ -39,7 +39,7 @@ class TimestampType extends Type implements PhpDateTimeMappingType
             SQLServerPlatform::class,
             SQLServer2012Platform::class => $this->getSqlServerPlatformSQLDeclaration($column),
             SqlitePlatform::class => 'DATETIME',
-            default => throw new DBALException('Invalid platform: '.substr(strrchr(get_class($platform), '\\'), 1)),
+            default => throw new DBALException('Invalid platform: '.substr(strrchr(\get_class($platform), '\\'), 1)),
         };
     }
 

@@ -155,14 +155,14 @@ class Schedule
     public function job($job, $queue = null, $connection = null)
     {
         return $this->call(function () use ($job, $queue, $connection) {
-            $job = is_string($job) ? Container::getInstance()->make($job) : $job;
+            $job = \is_string($job) ? Container::getInstance()->make($job) : $job;
 
             if ($job instanceof ShouldQueue) {
                 $this->dispatchToQueue($job, $queue ?? $job->queue, $connection ?? $job->connection);
             } else {
                 $this->dispatchNow($job);
             }
-        })->name(is_string($job) ? $job : get_class($job));
+        })->name(\is_string($job) ? $job : \get_class($job));
     }
 
     /**
@@ -241,7 +241,7 @@ class Schedule
      */
     public function exec($command, array $parameters = [])
     {
-        if (count($parameters)) {
+        if (\count($parameters)) {
             $command .= ' '.$this->compileParameters($parameters);
         }
 
@@ -259,7 +259,7 @@ class Schedule
     protected function compileParameters(array $parameters)
     {
         return collect($parameters)->map(function ($value, $key) {
-            if (is_array($value)) {
+            if (\is_array($value)) {
                 return $this->compileArrayInput($key, $value);
             }
 
@@ -364,7 +364,7 @@ class Schedule
             } catch (BindingResolutionException $e) {
                 throw new RuntimeException(
                     'Unable to resolve the dispatcher from the service container. Please bind it or install the illuminate/bus package.',
-                    is_int($e->getCode()) ? $e->getCode() : 0, $e
+                    \is_int($e->getCode()) ? $e->getCode() : 0, $e
                 );
             }
         }

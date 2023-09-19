@@ -50,8 +50,8 @@ class ConditionalRules
      */
     public function passes(array $data = [])
     {
-        return is_callable($this->condition)
-                    ? call_user_func($this->condition, new Fluent($data))
+        return \is_callable($this->condition)
+                    ? \call_user_func($this->condition, new Fluent($data))
                     : $this->condition;
     }
 
@@ -63,7 +63,7 @@ class ConditionalRules
      */
     public function rules(array $data = [])
     {
-        return is_string($this->rules)
+        return \is_string($this->rules)
                     ? explode('|', $this->rules)
                     : value($this->rules, new Fluent($data));
     }
@@ -76,7 +76,7 @@ class ConditionalRules
      */
     public function defaultRules(array $data = [])
     {
-        return is_string($this->defaultRules)
+        return \is_string($this->defaultRules)
                     ? explode('|', $this->defaultRules)
                     : value($this->defaultRules, new Fluent($data));
     }

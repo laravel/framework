@@ -125,7 +125,7 @@ class SendQueuedMailable
      */
     public function displayName()
     {
-        return get_class($this->mailable);
+        return \get_class($this->mailable);
     }
 
     /**

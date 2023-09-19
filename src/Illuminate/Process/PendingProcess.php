@@ -359,7 +359,7 @@ class PendingProcess
     {
         $result = $fake($this);
 
-        if (is_string($result) || is_array($result)) {
+        if (\is_string($result) || \is_array($result)) {
             return (new FakeProcessResult(output: $result))->withCommand($command);
         }
 
@@ -384,7 +384,7 @@ class PendingProcess
     {
         $result = $fake($this);
 
-        if (is_string($result) || is_array($result)) {
+        if (\is_string($result) || \is_array($result)) {
             $result = new FakeProcessResult(output: $result);
         }
 

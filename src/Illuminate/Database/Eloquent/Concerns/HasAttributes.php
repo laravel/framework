@@ -250,7 +250,7 @@ trait HasAttributes
             // We want to spin through all the mutated attributes for this model and call
             // the mutator for the attribute. We cache off every mutated attributes so
             // we don't have to constantly check on attributes that actually change.
-            if (! array_key_exists($key, $attributes)) {
+            if (! \array_key_exists($key, $attributes)) {
                 continue;
             }
 
@@ -275,8 +275,8 @@ trait HasAttributes
     protected function addCastAttributesToArray(array $attributes, array $mutatedAttributes)
     {
         foreach ($this->getCasts() as $key => $value) {
-            if (! array_key_exists($key, $attributes) ||
-                in_array($key, $mutatedAttributes)) {
+            if (! \array_key_exists($key, $attributes) ||
+                \in_array($key, $mutatedAttributes)) {
                 continue;
             }
 
@@ -290,7 +290,7 @@ trait HasAttributes
             // If the attribute cast was a date or a datetime, we will serialize the date as
             // a string. This allows the developers to customize how dates are serialized
             // into an array without affecting how they are persisted into the storage.
-            if (isset($attributes[$key]) && in_array($value, ['date', 'datetime', 'immutable_date', 'immutable_datetime'])) {
+            if (isset($attributes[$key]) && \in_array($value, ['date', 'datetime', 'immutable_date', 'immutable_datetime'])) {
                 $attributes[$key] = $this->serializeDate($attributes[$key]);
             }
 
@@ -337,7 +337,7 @@ trait HasAttributes
      */
     protected function getArrayableAppends()
     {
-        if (! count($this->appends)) {
+        if (! \count($this->appends)) {
             return [];
         }
 
@@ -366,7 +366,7 @@ trait HasAttributes
             // If the value is null, we'll still go ahead and set it in this list of
             // attributes, since null is used to represent empty relationships if
             // it has a has one or belongs to type relationships on the models.
-            elseif (is_null($value)) {
+            elseif (\is_null($value)) {
                 $relation = $value;
             }
 
@@ -380,7 +380,7 @@ trait HasAttributes
             // If the relation value has been set, we will set it on this attributes
             // list for returning. If it was not arrayable or null, we'll not set
             // the value on the array because it is some type of invalid value.
-            if (isset($relation) || is_null($value)) {
+            if (isset($relation) || \is_null($value)) {
                 $attributes[$key] = $relation;
             }
 
@@ -408,11 +408,11 @@ trait HasAttributes
      */
     protected function getArrayableItems(array $values)
     {
-        if (count($this->getVisible()) > 0) {
+        if (\count($this->getVisible()) > 0) {
             $values = array_intersect_key($values, array_flip($this->getVisible()));
         }
 
-        if (count($this->getHidden()) > 0) {
+        if (\count($this->getHidden()) > 0) {
             $values = array_diff_key($values, array_flip($this->getHidden()));
         }
 
@@ -434,8 +434,8 @@ trait HasAttributes
         // If the attribute exists in the attribute array or has a "get" mutator we will
         // get the attribute's value. Otherwise, we will proceed as if the developers
         // are asking for a relationship's value. This covers both types of values.
-        if (array_key_exists($key, $this->attributes) ||
-            array_key_exists($key, $this->casts) ||
+        if (\array_key_exists($key, $this->attributes) ||
+            \array_key_exists($key, $this->casts) ||
             $this->hasGetMutator($key) ||
             $this->hasAttributeMutator($key) ||
             $this->isClassCastable($key)) {
@@ -468,7 +468,7 @@ trait HasAttributes
             ! $this->wasRecentlyCreated &&
             static::preventsAccessingMissingAttributes()) {
             if (isset(static::$missingAttributeViolationCallback)) {
-                return call_user_func(static::$missingAttributeViolationCallback, $this, $key);
+                return \call_user_func(static::$missingAttributeViolationCallback, $this, $key);
             }
 
             throw new MissingAttributeException($this, $key);
@@ -553,7 +553,7 @@ trait HasAttributes
     protected function handleLazyLoadingViolation($key)
     {
         if (isset(static::$lazyLoadingViolationCallback)) {
-            return call_user_func(static::$lazyLoadingViolationCallback, $this, $key);
+            return \call_user_func(static::$lazyLoadingViolationCallback, $this, $key);
         }
 
         if (! $this->exists || $this->wasRecentlyCreated) {
@@ -576,7 +576,7 @@ trait HasAttributes
         $relation = $this->$method();
 
         if (! $relation instanceof Relation) {
-            if (is_null($relation)) {
+            if (\is_null($relation)) {
                 throw new LogicException(sprintf(
                     '%s::%s must return a relationship instance, but "null" was returned. Was the "return" keyword used?', static::class, $method
                 ));
@@ -611,17 +611,17 @@ trait HasAttributes
      */
     public function hasAttributeMutator($key)
     {
-        if (isset(static::$attributeMutatorCache[get_class($this)][$key])) {
-            return static::$attributeMutatorCache[get_class($this)][$key];
+        if (isset(static::$attributeMutatorCache[\get_class($this)][$key])) {
+            return static::$attributeMutatorCache[\get_class($this)][$key];
         }
 
         if (! method_exists($this, $method = Str::camel($key))) {
-            return static::$attributeMutatorCache[get_class($this)][$key] = false;
+            return static::$attributeMutatorCache[\get_class($this)][$key] = false;
         }
 
         $returnType = (new ReflectionMethod($this, $method))->getReturnType();
 
-        return static::$attributeMutatorCache[get_class($this)][$key] =
+        return static::$attributeMutatorCache[\get_class($this)][$key] =
                     $returnType instanceof ReflectionNamedType &&
                     $returnType->getName() === Attribute::class;
     }
@@ -634,15 +634,15 @@ trait HasAttributes
      */
     public function hasAttributeGetMutator($key)
     {
-        if (isset(static::$getAttributeMutatorCache[get_class($this)][$key])) {
-            return static::$getAttributeMutatorCache[get_class($this)][$key];
+        if (isset(static::$getAttributeMutatorCache[\get_class($this)][$key])) {
+            return static::$getAttributeMutatorCache[\get_class($this)][$key];
         }
 
         if (! $this->hasAttributeMutator($key)) {
-            return static::$getAttributeMutatorCache[get_class($this)][$key] = false;
+            return static::$getAttributeMutatorCache[\get_class($this)][$key] = false;
         }
 
-        return static::$getAttributeMutatorCache[get_class($this)][$key] = is_callable($this->{Str::camel($key)}()->get);
+        return static::$getAttributeMutatorCache[\get_class($this)][$key] = \is_callable($this->{Str::camel($key)}()->get);
     }
 
     /**
@@ -666,17 +666,17 @@ trait HasAttributes
      */
     protected function mutateAttributeMarkedAttribute($key, $value)
     {
-        if (array_key_exists($key, $this->attributeCastCache)) {
+        if (\array_key_exists($key, $this->attributeCastCache)) {
             return $this->attributeCastCache[$key];
         }
 
         $attribute = $this->{Str::camel($key)}();
 
-        $value = call_user_func($attribute->get ?: function ($value) {
+        $value = \call_user_func($attribute->get ?: function ($value) {
             return $value;
         }, $value, $this->attributes);
 
-        if ($attribute->withCaching || (is_object($value) && $attribute->withObjectCaching)) {
+        if ($attribute->withCaching || (\is_object($value) && $attribute->withObjectCaching)) {
             $this->attributeCastCache[$key] = $value;
         } else {
             unset($this->attributeCastCache[$key]);
@@ -696,8 +696,8 @@ trait HasAttributes
     {
         if ($this->isClassCastable($key)) {
             $value = $this->getClassCastableAttributeValue($key, $value);
-        } elseif (isset(static::$getAttributeMutatorCache[get_class($this)][$key]) &&
-                  static::$getAttributeMutatorCache[get_class($this)][$key] === true) {
+        } elseif (isset(static::$getAttributeMutatorCache[\get_class($this)][$key]) &&
+                  static::$getAttributeMutatorCache[\get_class($this)][$key] === true) {
             $value = $this->mutateAttributeMarkedAttribute($key, $value);
 
             $value = $value instanceof DateTimeInterface
@@ -734,7 +734,7 @@ trait HasAttributes
     {
         $castType = $this->getCastType($key);
 
-        if (is_null($value) && in_array($castType, static::$primitiveCastTypes)) {
+        if (\is_null($value) && \in_array($castType, static::$primitiveCastTypes)) {
             return $value;
         }
 
@@ -815,7 +815,7 @@ trait HasAttributes
                 : $caster->get($this, $key, $value, $this->attributes);
 
             if ($caster instanceof CastsInboundAttributes ||
-                ! is_object($value) ||
+                ! \is_object($value) ||
                 $objectCachingDisabled) {
                 unset($this->classCastCache[$key]);
             } else {
@@ -835,7 +835,7 @@ trait HasAttributes
      */
     protected function getEnumCastableAttributeValue($key, $value)
     {
-        if (is_null($value)) {
+        if (\is_null($value)) {
             return;
         }
 
@@ -962,7 +962,7 @@ trait HasAttributes
         // If an attribute is listed as a "date", we'll convert it from a DateTime
         // instance into a form proper for storage on the database tables using
         // the connection grammar's date format. We will auto set the values.
-        elseif (! is_null($value) && $this->isDateAttribute($key)) {
+        elseif (! \is_null($value) && $this->isDateAttribute($key)) {
             $value = $this->fromDateTime($value);
         }
 
@@ -978,7 +978,7 @@ trait HasAttributes
             return $this;
         }
 
-        if (! is_null($value) && $this->isJsonCastable($key)) {
+        if (! \is_null($value) && $this->isJsonCastable($key)) {
             $value = $this->castAttributeAsJson($key, $value);
         }
 
@@ -989,11 +989,11 @@ trait HasAttributes
             return $this->fillJsonAttribute($key, $value);
         }
 
-        if (! is_null($value) && $this->isEncryptedCastable($key)) {
+        if (! \is_null($value) && $this->isEncryptedCastable($key)) {
             $value = $this->castAttributeAsEncryptedString($key, $value);
         }
 
-        if (! is_null($value) && $this->hasCast($key, 'hashed')) {
+        if (! \is_null($value) && $this->hasCast($key, 'hashed')) {
             $value = $this->castAttributeAsHashedString($key, $value);
         }
 
@@ -1021,7 +1021,7 @@ trait HasAttributes
      */
     public function hasAttributeSetMutator($key)
     {
-        $class = get_class($this);
+        $class = \get_class($this);
 
         if (isset(static::$setAttributeMutatorCache[$class][$key])) {
             return static::$setAttributeMutatorCache[$class][$key];
@@ -1036,7 +1036,7 @@ trait HasAttributes
         return static::$setAttributeMutatorCache[$class][$key] =
                     $returnType instanceof ReflectionNamedType &&
                     $returnType->getName() === Attribute::class &&
-                    is_callable($this->{$method}()->set);
+                    \is_callable($this->{$method}()->set);
     }
 
     /**
@@ -1073,7 +1073,7 @@ trait HasAttributes
             )
         );
 
-        if ($attribute->withCaching || (is_object($value) && $attribute->withObjectCaching)) {
+        if ($attribute->withCaching || (\is_object($value) && $attribute->withObjectCaching)) {
             $this->attributeCastCache[$key] = $value;
         } else {
             unset($this->attributeCastCache[$key]);
@@ -1090,7 +1090,7 @@ trait HasAttributes
      */
     protected function isDateAttribute($key)
     {
-        return in_array($key, $this->getDates(), true) ||
+        return \in_array($key, $this->getDates(), true) ||
             $this->isDateCastable($key);
     }
 
@@ -1139,7 +1139,7 @@ trait HasAttributes
         );
 
         if ($caster instanceof CastsInboundAttributes ||
-            ! is_object($value) ||
+            ! \is_object($value) ||
             ($caster->withoutObjectCaching ?? false)) {
             unset($this->classCastCache[$key]);
         } else {
@@ -1160,7 +1160,7 @@ trait HasAttributes
 
         if (! isset($value)) {
             $this->attributes[$key] = null;
-        } elseif (is_object($value)) {
+        } elseif (\is_object($value)) {
             $this->attributes[$key] = $this->getStorableEnumValue($value);
         } else {
             $this->attributes[$key] = $this->getStorableEnumValue(
@@ -1180,7 +1180,7 @@ trait HasAttributes
     {
         return is_subclass_of($enumClass, BackedEnum::class)
                 ? $enumClass::from($value)
-                : constant($enumClass.'::'.$value);
+                : \constant($enumClass.'::'.$value);
     }
 
     /**
@@ -1507,8 +1507,8 @@ trait HasAttributes
      */
     public function hasCast($key, $types = null)
     {
-        if (array_key_exists($key, $this->getCasts())) {
-            return $types ? in_array($this->getCastType($key), (array) $types, true) : true;
+        if (\array_key_exists($key, $this->getCasts())) {
+            return $types ? \in_array($this->getCastType($key), (array) $types, true) : true;
         }
 
         return false;
@@ -1584,13 +1584,13 @@ trait HasAttributes
     {
         $casts = $this->getCasts();
 
-        if (! array_key_exists($key, $casts)) {
+        if (! \array_key_exists($key, $casts)) {
             return false;
         }
 
         $castType = $this->parseCasterClass($casts[$key]);
 
-        if (in_array($castType, static::$primitiveCastTypes)) {
+        if (\in_array($castType, static::$primitiveCastTypes)) {
             return false;
         }
 
@@ -1611,13 +1611,13 @@ trait HasAttributes
     {
         $casts = $this->getCasts();
 
-        if (! array_key_exists($key, $casts)) {
+        if (! \array_key_exists($key, $casts)) {
             return false;
         }
 
         $castType = $casts[$key];
 
-        if (in_array($castType, static::$primitiveCastTypes)) {
+        if (\in_array($castType, static::$primitiveCastTypes)) {
             return false;
         }
 
@@ -1670,7 +1670,7 @@ trait HasAttributes
 
         $arguments = [];
 
-        if (is_string($castType) && str_contains($castType, ':')) {
+        if (\is_string($castType) && str_contains($castType, ':')) {
             $segments = explode(':', $castType, 2);
 
             $castType = $segments[0];
@@ -1681,7 +1681,7 @@ trait HasAttributes
             $castType = $castType::castUsing($arguments);
         }
 
-        if (is_object($castType)) {
+        if (\is_object($castType)) {
             return $castType;
         }
 
@@ -1767,7 +1767,7 @@ trait HasAttributes
      */
     protected function normalizeCastClassResponse($key, $value)
     {
-        return is_array($value) ? $value : [$key => $value];
+        return \is_array($value) ? $value : [$key => $value];
     }
 
     /**
@@ -1869,7 +1869,7 @@ trait HasAttributes
     {
         $results = [];
 
-        foreach (is_array($attributes) ? $attributes : func_get_args() as $attribute) {
+        foreach (\is_array($attributes) ? $attributes : \func_get_args() as $attribute) {
             $results[$attribute] = $this->getAttribute($attribute);
         }
 
@@ -1907,7 +1907,7 @@ trait HasAttributes
      */
     public function syncOriginalAttributes($attributes)
     {
-        $attributes = is_array($attributes) ? $attributes : func_get_args();
+        $attributes = \is_array($attributes) ? $attributes : \func_get_args();
 
         $modelAttributes = $this->getAttributes();
 
@@ -1939,7 +1939,7 @@ trait HasAttributes
     public function isDirty($attributes = null)
     {
         return $this->hasChanges(
-            $this->getDirty(), is_array($attributes) ? $attributes : func_get_args()
+            $this->getDirty(), \is_array($attributes) ? $attributes : \func_get_args()
         );
     }
 
@@ -1951,7 +1951,7 @@ trait HasAttributes
      */
     public function isClean($attributes = null)
     {
-        return ! $this->isDirty(...func_get_args());
+        return ! $this->isDirty(...\func_get_args());
     }
 
     /**
@@ -1975,7 +1975,7 @@ trait HasAttributes
     public function wasChanged($attributes = null)
     {
         return $this->hasChanges(
-            $this->getChanges(), is_array($attributes) ? $attributes : func_get_args()
+            $this->getChanges(), \is_array($attributes) ? $attributes : \func_get_args()
         );
     }
 
@@ -1992,14 +1992,14 @@ trait HasAttributes
         // already contains any attributes. If it does we will just return that this
         // count is greater than zero. Else, we need to check specific attributes.
         if (empty($attributes)) {
-            return count($changes) > 0;
+            return \count($changes) > 0;
         }
 
         // Here we will spin through every attribute and see if this is in the array of
         // dirty attributes. If it is, we will return true and if we make it through
         // all of the attributes for the entire array we will return false at end.
         foreach (Arr::wrap($attributes) as $attribute) {
-            if (array_key_exists($attribute, $changes)) {
+            if (\array_key_exists($attribute, $changes)) {
                 return true;
             }
         }
@@ -2043,7 +2043,7 @@ trait HasAttributes
      */
     public function originalIsEquivalent($key)
     {
-        if (! array_key_exists($key, $this->original)) {
+        if (! \array_key_exists($key, $this->original)) {
             return false;
         }
 
@@ -2052,7 +2052,7 @@ trait HasAttributes
 
         if ($attribute === $original) {
             return true;
-        } elseif (is_null($attribute)) {
+        } elseif (\is_null($attribute)) {
             return false;
         } elseif ($this->isDateAttribute($key) || $this->isDateCastableWithCustomFormat($key)) {
             return $this->fromDateTime($attribute) ===
@@ -2110,7 +2110,7 @@ trait HasAttributes
         // instance on retrieval, which makes it quite convenient to work with
         // date fields without having to create a mutator for each property.
         if ($value !== null
-            && \in_array($key, $this->getDates(), false)) {
+            && \\in_array($key, $this->getDates(), false)) {
             return $this->asDateTime($value);
         }
 
@@ -2126,7 +2126,7 @@ trait HasAttributes
     public function append($attributes)
     {
         $this->appends = array_values(array_unique(
-            array_merge($this->appends, is_string($attributes) ? func_get_args() : $attributes)
+            array_merge($this->appends, \is_string($attributes) ? \func_get_args() : $attributes)
         ));
 
         return $this;
@@ -2163,7 +2163,7 @@ trait HasAttributes
      */
     public function hasAppended($attribute)
     {
-        return in_array($attribute, $this->appends);
+        return \in_array($attribute, $this->appends);
     }
 
     /**
@@ -2226,14 +2226,14 @@ trait HasAttributes
      */
     protected static function getAttributeMarkedMutatorMethods($class)
     {
-        $instance = is_object($class) ? $class : new $class;
+        $instance = \is_object($class) ? $class : new $class;
 
         return collect((new ReflectionClass($instance))->getMethods())->filter(function ($method) use ($instance) {
             $returnType = $method->getReturnType();
 
             if ($returnType instanceof ReflectionNamedType &&
                 $returnType->getName() === Attribute::class) {
-                if (is_callable($method->invoke($instance)->get)) {
+                if (\is_callable($method->invoke($instance)->get)) {
                     return true;
                 }
             }

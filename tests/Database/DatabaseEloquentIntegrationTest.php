@@ -190,7 +190,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
         EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
         EloquentTestUser::create(['id' => 2, 'email' => 'abigailotwell@gmail.com']);
 
-        $this->assertEquals(2, EloquentTestUser::count());
+        $this->assertEquals(2, EloquentTestUser::\count());
 
         $this->assertFalse(EloquentTestUser::where('email', 'taylorotwell@gmail.com')->doesntExist());
         $this->assertTrue(EloquentTestUser::where('email', 'mohamed@laravel.com')->doesntExist());
@@ -393,7 +393,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         $query = EloquentTestUser::select([
             'id',
-            'friends_count' => EloquentTestUser::whereColumn('friend_id', 'user_id')->count(),
+            'friends_count' => EloquentTestUser::whereColumn('friend_id', 'user_id')->\count(),
         ])->groupBy('email')->getQuery();
 
         $this->assertEquals(4, $query->getCountForPagination());
@@ -611,7 +611,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
         );
 
         $this->assertSame('Mohamed Said', $user3->name);
-        $this->assertEquals(2, EloquentTestUser::count());
+        $this->assertEquals(2, EloquentTestUser::\count());
     }
 
     public function testUpdateOrCreateOnDifferentConnection()
@@ -628,8 +628,8 @@ class DatabaseEloquentIntegrationTest extends TestCase
             ['name' => 'Mohamed Said']
         );
 
-        $this->assertEquals(1, EloquentTestUser::count());
-        $this->assertEquals(2, EloquentTestUser::on('second_connection')->count());
+        $this->assertEquals(1, EloquentTestUser::\count());
+        $this->assertEquals(2, EloquentTestUser::on('second_connection')->\count());
     }
 
     public function testCheckAndCreateMethodsOnMultiConnections()
@@ -653,12 +653,12 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertSame('second_connection', $user1->getConnectionName());
         $this->assertSame('second_connection', $user2->getConnectionName());
 
-        $this->assertEquals(1, EloquentTestUser::on('second_connection')->count());
+        $this->assertEquals(1, EloquentTestUser::on('second_connection')->\count());
         $user1 = EloquentTestUser::on('second_connection')->firstOrCreate(['email' => 'taylorotwell@gmail.com']);
         $user2 = EloquentTestUser::on('second_connection')->firstOrCreate(['email' => 'themsaid@gmail.com']);
         $this->assertSame('second_connection', $user1->getConnectionName());
         $this->assertSame('second_connection', $user2->getConnectionName());
-        $this->assertEquals(2, EloquentTestUser::on('second_connection')->count());
+        $this->assertEquals(2, EloquentTestUser::on('second_connection')->\count());
     }
 
     public function testCreatingModelWithEmptyAttributes()
@@ -1172,7 +1172,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         $query = EloquentTestUser::has('postWithPhotos');
 
-        $bindingsCount = count($query->getBindings());
+        $bindingsCount = \count($query->getBindings());
         $questionMarksCount = substr_count($query->toSql(), '?');
 
         $this->assertEquals($questionMarksCount, $bindingsCount);
@@ -1185,7 +1185,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         $photos = EloquentTestPhoto::has('imageable')->get();
 
-        $this->assertEquals(1, $photos->count());
+        $this->assertEquals(1, $photos->\count());
     }
 
     public function testBelongsToManyRelationshipModelsAreProperlyHydratedWithSoleQuery()
@@ -1399,7 +1399,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
         ]);
 
         $this->assertTrue($post->saveOrFail());
-        $this->assertEquals(1, EloquentTestPost::count());
+        $this->assertEquals(1, EloquentTestPost::\count());
     }
 
     public function testSavingJSONFields()
@@ -1444,7 +1444,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
         ]);
 
         $this->assertTrue($result);
-        $this->assertEquals(2, EloquentTestPost::count());
+        $this->assertEquals(2, EloquentTestPost::\count());
     }
 
     public function testMultiInsertsWithSameValues()
@@ -1456,7 +1456,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
         ]);
 
         $this->assertTrue($result);
-        $this->assertEquals(2, EloquentTestPost::count());
+        $this->assertEquals(2, EloquentTestPost::\count());
     }
 
     public function testNestedTransactions()

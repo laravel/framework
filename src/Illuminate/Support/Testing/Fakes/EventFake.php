@@ -88,10 +88,10 @@ class EventFake implements Dispatcher, Fake
 
             $normalizedListener = $expectedListener;
 
-            if (is_string($actualListener) && Str::contains($actualListener, '@')) {
+            if (\is_string($actualListener) && Str::contains($actualListener, '@')) {
                 $actualListener = Str::parseCallback($actualListener);
 
-                if (is_string($expectedListener)) {
+                if (\is_string($expectedListener)) {
                     if (Str::contains($expectedListener, '@')) {
                         $normalizedListener = Str::parseCallback($expectedListener);
                     } else {
@@ -135,12 +135,12 @@ class EventFake implements Dispatcher, Fake
             [$event, $callback] = [$this->firstClosureParameterType($event), $event];
         }
 
-        if (is_int($callback)) {
+        if (\is_int($callback)) {
             return $this->assertDispatchedTimes($event, $callback);
         }
 
         PHPUnit::assertTrue(
-            $this->dispatched($event, $callback)->count() > 0,
+            $this->dispatched($event, $callback)->\count() > 0,
             "The expected [{$event}] event was not dispatched."
         );
     }
@@ -154,7 +154,7 @@ class EventFake implements Dispatcher, Fake
      */
     public function assertDispatchedTimes($event, $times = 1)
     {
-        $count = $this->dispatched($event)->count();
+        $count = $this->dispatched($event)->\count();
 
         PHPUnit::assertSame(
             $times, $count,
@@ -188,7 +188,7 @@ class EventFake implements Dispatcher, Fake
      */
     public function assertNothingDispatched()
     {
-        $count = count(Arr::flatten($this->events));
+        $count = \count(Arr::flatten($this->events));
 
         PHPUnit::assertSame(
             0, $count,
@@ -294,10 +294,10 @@ class EventFake implements Dispatcher, Fake
      */
     public function dispatch($event, $payload = [], $halt = false)
     {
-        $name = is_object($event) ? get_class($event) : (string) $event;
+        $name = \is_object($event) ? \get_class($event) : (string) $event;
 
         if ($this->shouldFakeEvent($name, $payload)) {
-            $this->events[$name][] = func_get_args();
+            $this->events[$name][] = \func_get_args();
         } else {
             return $this->dispatcher->dispatch($event, $payload, $halt);
         }

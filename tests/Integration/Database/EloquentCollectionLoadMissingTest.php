@@ -110,12 +110,12 @@ class EloquentCollectionLoadMissingTest extends DatabaseTestCase
         $user = User::first();
         $user->loadMissing('posts.postRelation.postSubRelations.postSubSubRelations');
 
-        $this->assertEquals(2, $user->posts->count());
+        $this->assertEquals(2, $user->posts->\count());
         $this->assertNull($user->posts[0]->postRelation);
         $this->assertInstanceOf(PostRelation::class, $user->posts[1]->postRelation);
-        $this->assertEquals(1, $user->posts[1]->postRelation->postSubRelations->count());
+        $this->assertEquals(1, $user->posts[1]->postRelation->postSubRelations->\count());
         $this->assertInstanceOf(PostSubRelation::class, $user->posts[1]->postRelation->postSubRelations[0]);
-        $this->assertEquals(1, $user->posts[1]->postRelation->postSubRelations[0]->postSubSubRelations->count());
+        $this->assertEquals(1, $user->posts[1]->postRelation->postSubRelations[0]->postSubSubRelations->\count());
         $this->assertInstanceOf(PostSubSubRelation::class, $user->posts[1]->postRelation->postSubRelations[0]->postSubSubRelations[0]);
     }
 }

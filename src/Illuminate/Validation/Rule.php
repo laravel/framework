@@ -93,7 +93,7 @@ class Rule
             $values = $values->toArray();
         }
 
-        return new In(is_array($values) ? $values : func_get_args());
+        return new In(\is_array($values) ? $values : \func_get_args());
     }
 
     /**
@@ -108,7 +108,7 @@ class Rule
             $values = $values->toArray();
         }
 
-        return new NotIn(is_array($values) ? $values : func_get_args());
+        return new NotIn(\is_array($values) ? $values : \func_get_args());
     }
 
     /**

@@ -63,7 +63,7 @@ class SoftDeletedInDatabase extends Constraint
         return $this->database->table($table)
                 ->where($this->data)
                 ->whereNotNull($this->deletedAtColumn)
-                ->count() > 0;
+                ->\count() > 0;
     }
 
     /**
@@ -98,8 +98,8 @@ class SoftDeletedInDatabase extends Constraint
 
         $description = 'Found: '.json_encode($results, JSON_PRETTY_PRINT);
 
-        if ($query->count() > $this->show) {
-            $description .= sprintf(' and %s others', $query->count() - $this->show);
+        if ($query->\count() > $this->show) {
+            $description .= sprintf(' and %s others', $query->\count() - $this->show);
         }
 
         return $description;

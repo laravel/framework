@@ -67,7 +67,7 @@ class Repository implements ArrayAccess, CacheContract
      */
     public function has($key): bool
     {
-        return ! is_null($this->get($key));
+        return ! \is_null($this->get($key));
     }
 
     /**
@@ -92,7 +92,7 @@ class Repository implements ArrayAccess, CacheContract
      */
     public function get($key, $default = null): mixed
     {
-        if (is_array($key)) {
+        if (\is_array($key)) {
             return $this->many($key);
         }
 
@@ -101,7 +101,7 @@ class Repository implements ArrayAccess, CacheContract
         // If we could not find the cache value, we will fire the missed event and get
         // the default value for this cache value. This default could be a callback
         // so we will execute the value function which will resolve it if needed.
-        if (is_null($value)) {
+        if (\is_null($value)) {
             $this->event(new CacheMissed($key));
 
             $value = value($default);
@@ -123,7 +123,7 @@ class Repository implements ArrayAccess, CacheContract
     public function many(array $keys)
     {
         $values = $this->store->many(collect($keys)->map(function ($value, $key) {
-            return is_string($key) ? $key : $value;
+            return \is_string($key) ? $key : $value;
         })->values()->all());
 
         return collect($values)->map(function ($value, $key) use ($keys) {
@@ -160,7 +160,7 @@ class Repository implements ArrayAccess, CacheContract
         // If we could not find the cache value, we will fire the missed event and get
         // the default value for this cache value. This default could be a callback
         // so we will execute the value function which will resolve it if needed.
-        if (is_null($value)) {
+        if (\is_null($value)) {
             $this->event(new CacheMissed($key));
 
             return (isset($keys[$key]) && ! array_is_list($keys)) ? value($keys[$key]) : null;
@@ -200,7 +200,7 @@ class Repository implements ArrayAccess, CacheContract
      */
     public function put($key, $value, $ttl = null)
     {
-        if (is_array($key)) {
+        if (\is_array($key)) {
             return $this->putMany($key, $value);
         }
 
@@ -289,7 +289,7 @@ class Repository implements ArrayAccess, CacheContract
      */
     public function setMultiple($values, $ttl = null): bool
     {
-        return $this->putMany(is_array($values) ? $values : iterator_to_array($values), $ttl);
+        return $this->putMany(\is_array($values) ? $values : iterator_to_array($values), $ttl);
     }
 
     /**
@@ -324,7 +324,7 @@ class Repository implements ArrayAccess, CacheContract
         // If the value did not exist in the cache, we will put the value in the cache
         // so it exists for subsequent requests. Then, we will return true so it is
         // easy to know if the value gets added. Otherwise, we will return false.
-        if (is_null($this->get($key))) {
+        if (\is_null($this->get($key))) {
             return $this->put($key, $value, $seconds);
         }
 
@@ -390,7 +390,7 @@ class Repository implements ArrayAccess, CacheContract
         // If the item exists in the cache we will just return this immediately and if
         // not we will execute the given Closure and cache the result of that for a
         // given number of seconds so it's available for all subsequent requests.
-        if (! is_null($value)) {
+        if (! \is_null($value)) {
             return $value;
         }
 
@@ -431,7 +431,7 @@ class Repository implements ArrayAccess, CacheContract
         // If the item exists in the cache we will just return this immediately
         // and if not we will execute the given Closure and cache the result
         // of that forever so it is available for all subsequent requests.
-        if (! is_null($value)) {
+        if (! \is_null($value)) {
             return $value;
         }
 
@@ -507,9 +507,9 @@ class Repository implements ArrayAccess, CacheContract
             throw new BadMethodCallException('This cache store does not support tagging.');
         }
 
-        $cache = $this->store->tags(is_array($names) ? $names : func_get_args());
+        $cache = $this->store->tags(\is_array($names) ? $names : \func_get_args());
 
-        if (! is_null($this->events)) {
+        if (! \is_null($this->events)) {
             $cache->setEventDispatcher($this->events);
         }
 

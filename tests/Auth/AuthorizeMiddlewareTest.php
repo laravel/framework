@@ -72,7 +72,7 @@ class AuthorizeMiddlewareTest extends TestCase
         $this->expectException(AuthorizationException::class);
         $this->expectExceptionMessage('This action is unauthorized.');
 
-        $this->gate()->define('view-dashboard', function ($user, $additional = null) {
+        $this->gate()->\define('view-dashboard', function ($user, $additional = null) {
             $this->assertNull($additional);
 
             return false;
@@ -90,7 +90,7 @@ class AuthorizeMiddlewareTest extends TestCase
 
     public function testSimpleAbilityAuthorized()
     {
-        $this->gate()->define('view-dashboard', function ($user) {
+        $this->gate()->\define('view-dashboard', function ($user) {
             return true;
         });
 
@@ -108,7 +108,7 @@ class AuthorizeMiddlewareTest extends TestCase
 
     public function testSimpleAbilityWithStringParameter()
     {
-        $this->gate()->define('view-dashboard', function ($user, $param) {
+        $this->gate()->\define('view-dashboard', function ($user, $param) {
             return $param === 'some string';
         });
 
@@ -126,7 +126,7 @@ class AuthorizeMiddlewareTest extends TestCase
 
     public function testSimpleAbilityWithNullParameter()
     {
-        $this->gate()->define('view-dashboard', function ($user, $param = null) {
+        $this->gate()->\define('view-dashboard', function ($user, $param = null) {
             $this->assertNull($param);
 
             return true;
@@ -150,7 +150,7 @@ class AuthorizeMiddlewareTest extends TestCase
             return $post;
         });
 
-        $this->gate()->define('view-comments', function ($user, $model = null) {
+        $this->gate()->\define('view-comments', function ($user, $model = null) {
             return true;
         });
 
@@ -178,7 +178,7 @@ class AuthorizeMiddlewareTest extends TestCase
 
     public function testSimpleAbilityWithStringParameterFromRouteParameter()
     {
-        $this->gate()->define('view-dashboard', function ($user, $param) {
+        $this->gate()->\define('view-dashboard', function ($user, $param) {
             return $param === 'true';
         });
 
@@ -196,7 +196,7 @@ class AuthorizeMiddlewareTest extends TestCase
 
     public function testSimpleAbilityWithStringParameter0FromRouteParameter()
     {
-        $this->gate()->define('view-dashboard', function ($user, $param) {
+        $this->gate()->\define('view-dashboard', function ($user, $param) {
             return $param === '0';
         });
 
@@ -217,7 +217,7 @@ class AuthorizeMiddlewareTest extends TestCase
         $this->expectException(AuthorizationException::class);
         $this->expectExceptionMessage('This action is unauthorized.');
 
-        $this->gate()->define('create', function ($user, $model) {
+        $this->gate()->\define('create', function ($user, $model) {
             $this->assertSame('App\User', $model);
 
             return false;
@@ -235,7 +235,7 @@ class AuthorizeMiddlewareTest extends TestCase
 
     public function testModelTypeAuthorized()
     {
-        $this->gate()->define('create', function ($user, $model) {
+        $this->gate()->\define('create', function ($user, $model) {
             $this->assertSame('App\User', $model);
 
             return true;
@@ -264,7 +264,7 @@ class AuthorizeMiddlewareTest extends TestCase
             return $post;
         });
 
-        $this->gate()->define('edit', function ($user, $model) use ($post) {
+        $this->gate()->\define('edit', function ($user, $model) use ($post) {
             $this->assertSame($model, $post);
 
             return false;
@@ -288,7 +288,7 @@ class AuthorizeMiddlewareTest extends TestCase
             return $post;
         });
 
-        $this->gate()->define('edit', function ($user, $model) use ($post) {
+        $this->gate()->\define('edit', function ($user, $model) use ($post) {
             $this->assertSame($model, $post);
 
             return true;
@@ -310,7 +310,7 @@ class AuthorizeMiddlewareTest extends TestCase
     {
         $instance = m::mock(Model::class);
 
-        $this->gate()->define('success', function ($user, $model) use ($instance) {
+        $this->gate()->\define('success', function ($user, $model) use ($instance) {
             $this->assertSame($model, $instance);
 
             return true;

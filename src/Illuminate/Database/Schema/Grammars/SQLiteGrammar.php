@@ -81,14 +81,14 @@ class SQLiteGrammar extends Grammar
             // are building, since SQLite needs foreign keys on the tables creation.
             $sql .= $this->getForeignKey($foreign);
 
-            if (! is_null($foreign->onDelete)) {
+            if (! \is_null($foreign->onDelete)) {
                 $sql .= " on delete {$foreign->onDelete}";
             }
 
             // If this foreign key specifies the action to be taken on update we will add
             // that to the statement here. We'll append it to this SQL and then return
             // the SQL so we can keep adding any other foreign constraints onto this.
-            if (! is_null($foreign->onUpdate)) {
+            if (! \is_null($foreign->onUpdate)) {
                 $sql .= " on update {$foreign->onUpdate}";
             }
 
@@ -122,7 +122,7 @@ class SQLiteGrammar extends Grammar
      */
     protected function addPrimaryKeys(Blueprint $blueprint)
     {
-        if (! is_null($primary = $this->getCommandByName($blueprint, 'primary'))) {
+        if (! \is_null($primary = $this->getCommandByName($blueprint, 'primary'))) {
             return ", primary key ({$this->columnize($primary->columns)})";
         }
     }
@@ -911,7 +911,7 @@ class SQLiteGrammar extends Grammar
      */
     protected function modifyVirtualAs(Blueprint $blueprint, Fluent $column)
     {
-        if (! is_null($virtualAs = $column->virtualAsJson)) {
+        if (! \is_null($virtualAs = $column->virtualAsJson)) {
             if ($this->isJsonSelector($virtualAs)) {
                 $virtualAs = $this->wrapJsonSelector($virtualAs);
             }
@@ -919,7 +919,7 @@ class SQLiteGrammar extends Grammar
             return " as ({$virtualAs})";
         }
 
-        if (! is_null($virtualAs = $column->virtualAs)) {
+        if (! \is_null($virtualAs = $column->virtualAs)) {
             return " as ({$virtualAs})";
         }
     }
@@ -933,7 +933,7 @@ class SQLiteGrammar extends Grammar
      */
     protected function modifyStoredAs(Blueprint $blueprint, Fluent $column)
     {
-        if (! is_null($storedAs = $column->storedAsJson)) {
+        if (! \is_null($storedAs = $column->storedAsJson)) {
             if ($this->isJsonSelector($storedAs)) {
                 $storedAs = $this->wrapJsonSelector($storedAs);
             }
@@ -941,7 +941,7 @@ class SQLiteGrammar extends Grammar
             return " as ({$storedAs}) stored";
         }
 
-        if (! is_null($storedAs = $column->storedAs)) {
+        if (! \is_null($storedAs = $column->storedAs)) {
             return " as ({$column->storedAs}) stored";
         }
     }
@@ -955,10 +955,10 @@ class SQLiteGrammar extends Grammar
      */
     protected function modifyNullable(Blueprint $blueprint, Fluent $column)
     {
-        if (is_null($column->virtualAs) &&
-            is_null($column->virtualAsJson) &&
-            is_null($column->storedAs) &&
-            is_null($column->storedAsJson)) {
+        if (\is_null($column->virtualAs) &&
+            \is_null($column->virtualAsJson) &&
+            \is_null($column->storedAs) &&
+            \is_null($column->storedAsJson)) {
             return $column->nullable ? '' : ' not null';
         }
 
@@ -976,7 +976,7 @@ class SQLiteGrammar extends Grammar
      */
     protected function modifyDefault(Blueprint $blueprint, Fluent $column)
     {
-        if (! is_null($column->default) && is_null($column->virtualAs) && is_null($column->virtualAsJson) && is_null($column->storedAs)) {
+        if (! \is_null($column->default) && \is_null($column->virtualAs) && \is_null($column->virtualAsJson) && \is_null($column->storedAs)) {
             return ' default '.$this->getDefaultValue($column->default);
         }
     }
@@ -990,7 +990,7 @@ class SQLiteGrammar extends Grammar
      */
     protected function modifyIncrement(Blueprint $blueprint, Fluent $column)
     {
-        if (in_array($column->type, $this->serials) && $column->autoIncrement) {
+        if (\in_array($column->type, $this->serials) && $column->autoIncrement) {
             return ' primary key autoincrement';
         }
     }

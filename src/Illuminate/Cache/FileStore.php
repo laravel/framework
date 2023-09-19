@@ -140,14 +140,14 @@ class FileStore implements Store, LockProvider
      */
     protected function ensureCacheDirectoryExists($path)
     {
-        $directory = dirname($path);
+        $directory = \dirname($path);
 
         if (! $this->files->exists($directory)) {
             $this->files->makeDirectory($directory, 0777, true, true);
 
             // We're creating two levels of directories (e.g. 7e/24), so we check them both...
             $this->ensurePermissionsAreCorrect($directory);
-            $this->ensurePermissionsAreCorrect(dirname($directory));
+            $this->ensurePermissionsAreCorrect(\dirname($directory));
         }
     }
 
@@ -159,8 +159,8 @@ class FileStore implements Store, LockProvider
      */
     protected function ensurePermissionsAreCorrect($path)
     {
-        if (is_null($this->filePermission) ||
-            intval($this->files->chmod($path), 8) == $this->filePermission) {
+        if (\is_null($this->filePermission) ||
+            \intval($this->files->chmod($path), 8) == $this->filePermission) {
             return;
         }
 
@@ -340,7 +340,7 @@ class FileStore implements Store, LockProvider
      */
     public function path($key)
     {
-        $parts = array_slice(str_split($hash = sha1($key), 2), 0, 2);
+        $parts = \array_slice(str_split($hash = sha1($key), 2), 0, 2);
 
         return $this->directory.'/'.implode('/', $parts).'/'.$hash;
     }

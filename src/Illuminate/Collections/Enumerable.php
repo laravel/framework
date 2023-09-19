@@ -1165,7 +1165,7 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
      *
      * @return int
      */
-    public function count(): int;
+    public function \count(): int;
 
     /**
      * Count the number of items in the collection by a field or using a callback.

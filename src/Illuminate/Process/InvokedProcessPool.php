@@ -60,8 +60,8 @@ class InvokedProcessPool implements Countable
      *
      * @return int
      */
-    public function count(): int
+    public function \count(): int
     {
-        return count($this->invokedProcesses);
+        return \count($this->invokedProcesses);
     }
 }

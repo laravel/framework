@@ -110,7 +110,7 @@ class DatabaseSoftDeletingTraitStub
 
     public function getUpdatedAtColumn()
     {
-        return defined('static::UPDATED_AT') ? static::UPDATED_AT : 'updated_at';
+        return \defined('static::UPDATED_AT') ? static::UPDATED_AT : 'updated_at';
     }
 
     public function setKeysForSaveQuery($query)

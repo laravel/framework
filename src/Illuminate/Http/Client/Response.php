@@ -75,7 +75,7 @@ class Response implements ArrayAccess
             $this->decoded = json_decode($this->body(), true);
         }
 
-        if (is_null($key)) {
+        if (\is_null($key)) {
             return $this->decoded;
         }
 
@@ -283,11 +283,11 @@ class Response implements ArrayAccess
      */
     public function throw()
     {
-        $callback = func_get_args()[0] ?? null;
+        $callback = \func_get_args()[0] ?? null;
 
         if ($this->failed()) {
             throw tap($this->toException(), function ($exception) use ($callback) {
-                if ($callback && is_callable($callback)) {
+                if ($callback && \is_callable($callback)) {
                     $callback($this, $exception);
                 }
             });
@@ -307,7 +307,7 @@ class Response implements ArrayAccess
      */
     public function throwIf($condition)
     {
-        return value($condition, $this) ? $this->throw(func_get_args()[1] ?? null) : $this;
+        return value($condition, $this) ? $this->throw(\func_get_args()[1] ?? null) : $this;
     }
 
     /**
@@ -320,7 +320,7 @@ class Response implements ArrayAccess
      */
     public function throwIfStatus($statusCode)
     {
-        if (is_callable($statusCode) &&
+        if (\is_callable($statusCode) &&
             $statusCode($this->status(), $this)) {
             return $this->throw();
         }
@@ -338,7 +338,7 @@ class Response implements ArrayAccess
      */
     public function throwUnlessStatus($statusCode)
     {
-        if (is_callable($statusCode) &&
+        if (\is_callable($statusCode) &&
             ! $statusCode($this->status(), $this)) {
             return $this->throw();
         }

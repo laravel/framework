@@ -108,7 +108,7 @@ class CliDumper extends BaseCliDumper
      */
     protected function getDumpSourceContent()
     {
-        if (is_null($dumpSource = $this->resolveDumpSource())) {
+        if (\is_null($dumpSource = $this->resolveDumpSource())) {
             return '';
         }
 
@@ -118,9 +118,9 @@ class CliDumper extends BaseCliDumper
 
         return sprintf(
             ' <fg=gray>// <fg=gray%s>%s%s</></>',
-            is_null($href) ? '' : ";href=$href",
+            \is_null($href) ? '' : ";href=$href",
             $relativeFile,
-            is_null($line) ? '' : ":$line"
+            \is_null($line) ? '' : ":$line"
         );
     }
 

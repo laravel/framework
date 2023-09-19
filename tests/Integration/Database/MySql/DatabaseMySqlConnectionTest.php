@@ -135,7 +135,7 @@ class DatabaseMySqlConnectionTest extends MySqlTestCase
             ['json_col' => '{"bar":null}'],
         ]);
 
-        $this->assertSame($count, DB::table(self::TABLE)->whereJsonContainsKey($column)->count());
+        $this->assertSame($count, DB::table(self::TABLE)->whereJsonContainsKey($column)->\count());
     }
 
     public static function jsonContainsKeyDataProvider()

@@ -34,13 +34,13 @@ class NestedRules
      */
     public function compile($attribute, $value, $data = null)
     {
-        $rules = call_user_func($this->callback, $value, $attribute, $data);
+        $rules = \call_user_func($this->callback, $value, $attribute, $data);
 
         $parser = new ValidationRuleParser(
             Arr::undot(Arr::wrap($data))
         );
 
-        if (is_array($rules) && ! array_is_list($rules)) {
+        if (\is_array($rules) && ! array_is_list($rules)) {
             $nested = [];
 
             foreach ($rules as $key => $rule) {

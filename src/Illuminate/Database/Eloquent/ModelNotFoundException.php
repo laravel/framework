@@ -38,7 +38,7 @@ class ModelNotFoundException extends RecordsNotFoundException
 
         $this->message = "No query results for model [{$model}]";
 
-        if (count($this->ids) > 0) {
+        if (\count($this->ids) > 0) {
             $this->message .= ' '.implode(', ', $this->ids);
         } else {
             $this->message .= '.';

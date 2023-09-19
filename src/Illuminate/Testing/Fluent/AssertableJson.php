@@ -54,7 +54,7 @@ class AssertableJson implements Arrayable
      */
     protected function dotPath(string $key = ''): string
     {
-        if (is_null($this->path)) {
+        if (\is_null($this->path)) {
             return $key;
         }
 

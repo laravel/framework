@@ -49,7 +49,7 @@ class TrimStrings extends TransformsRequest
      */
     protected function transform($key, $value)
     {
-        if (in_array($key, $this->except, true) || ! is_string($value)) {
+        if (\in_array($key, $this->except, true) || ! \is_string($value)) {
             return $value;
         }
 

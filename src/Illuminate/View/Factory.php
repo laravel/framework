@@ -219,7 +219,7 @@ class Factory implements FactoryContract
         // If is actually data in the array, we will loop through the data and append
         // an instance of the partial view to the final result HTML passing in the
         // iterated value of this data array, allowing the views to access them.
-        if (count($data) > 0) {
+        if (\count($data) > 0) {
             foreach ($data as $key => $value) {
                 $result .= $this->make(
                     $view, ['key' => $key, $iterator => $value]
@@ -334,7 +334,7 @@ class Factory implements FactoryContract
      */
     public function share($key, $value = null)
     {
-        $keys = is_array($key) ? $key : [$key => $value];
+        $keys = \is_array($key) ? $key : [$key => $value];
 
         foreach ($keys as $key => $value) {
             $this->shared[$key] = $value;

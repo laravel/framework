@@ -17,12 +17,12 @@ class SetCacheHeaders
      */
     public static function using($options)
     {
-        if (is_string($options)) {
+        if (\is_string($options)) {
             return static::class.':'.$options;
         }
 
         return collect($options)
-            ->map(fn ($value, $key) => is_int($key) ? $value : "{$key}={$value}")
+            ->map(fn ($value, $key) => \is_int($key) ? $value : "{$key}={$value}")
             ->map(fn ($value) => Str::finish($value, ';'))
             ->pipe(fn ($options) => rtrim(static::class.':'.$options->implode(''), ';'));
     }
@@ -45,7 +45,7 @@ class SetCacheHeaders
             return $response;
         }
 
-        if (is_string($options)) {
+        if (\is_string($options)) {
             $options = $this->parseOptions($options);
         }
 

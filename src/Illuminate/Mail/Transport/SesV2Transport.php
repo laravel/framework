@@ -81,7 +81,7 @@ class SesV2Transport extends AbstractTransport
 
             throw new Exception(
                 sprintf('Request to AWS SES V2 API failed. Reason: %s.', $reason),
-                is_int($e->getCode()) ? $e->getCode() : 0,
+                \is_int($e->getCode()) ? $e->getCode() : 0,
                 $e
             );
         }

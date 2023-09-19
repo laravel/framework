@@ -404,10 +404,10 @@ class FoundationInteractsWithDatabaseTest extends TestCase
                 $this->expectsDatabaseQueryCount(3);
 
                 DB::pretend(function ($db) {
-                    $db->table('foo')->count();
-                    $db->table('foo')->count();
-                    $db->table('foo')->count();
-                    $db->table('foo')->count();
+                    $db->table('foo')->\count();
+                    $db->table('foo')->\count();
+                    $db->table('foo')->\count();
+                    $db->table('foo')->\count();
                 });
             }
         };
@@ -432,13 +432,13 @@ class FoundationInteractsWithDatabaseTest extends TestCase
                 $this->expectsDatabaseQueryCount(1, 'mysql');
 
                 DB::pretend(function ($db) {
-                    $db->table('foo')->count();
-                    $db->table('foo')->count();
-                    $db->table('foo')->count();
+                    $db->table('foo')->\count();
+                    $db->table('foo')->\count();
+                    $db->table('foo')->\count();
                 });
 
                 DB::connection('mysql')->pretend(function ($db) {
-                    $db->table('foo')->count();
+                    $db->table('foo')->\count();
                 });
             }
         };

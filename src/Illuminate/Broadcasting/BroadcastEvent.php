@@ -74,7 +74,7 @@ class BroadcastEvent implements ShouldQueue
     public function handle(BroadcastingFactory $manager)
     {
         $name = method_exists($this->event, 'broadcastAs')
-                ? $this->event->broadcastAs() : get_class($this->event);
+                ? $this->event->broadcastAs() : \get_class($this->event);
 
         $channels = Arr::wrap($this->event->broadcastOn());
 
@@ -104,7 +104,7 @@ class BroadcastEvent implements ShouldQueue
     protected function getPayloadFromEvent($event)
     {
         if (method_exists($event, 'broadcastWith') &&
-            ! is_null($payload = $event->broadcastWith())) {
+            ! \is_null($payload = $event->broadcastWith())) {
             return array_merge($payload, ['socket' => data_get($event, 'socket')]);
         }
 
@@ -141,7 +141,7 @@ class BroadcastEvent implements ShouldQueue
      */
     public function displayName()
     {
-        return get_class($this->event);
+        return \get_class($this->event);
     }
 
     /**

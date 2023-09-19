@@ -129,7 +129,7 @@ class DynamoDbStore implements LockProvider, Store
      */
     public function many(array $keys)
     {
-        if (count($keys) === 0) {
+        if (\count($keys) === 0) {
             return [];
         }
 
@@ -223,7 +223,7 @@ class DynamoDbStore implements LockProvider, Store
      */
     public function putMany(array $values, $seconds)
     {
-        if (count($values) === 0) {
+        if (\count($values) === 0) {
             return true;
         }
 

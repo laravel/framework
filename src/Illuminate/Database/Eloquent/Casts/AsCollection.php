@@ -37,7 +37,7 @@ class AsCollection implements Castable
                     throw new InvalidArgumentException('The provided class must extend ['.Collection::class.'].');
                 }
 
-                return is_array($data) ? new $collectionClass($data) : null;
+                return \is_array($data) ? new $collectionClass($data) : null;
             }
 
             public function set($model, $key, $value, $attributes)

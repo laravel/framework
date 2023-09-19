@@ -67,10 +67,10 @@ class ComponentAttributeBag implements ArrayAccess, IteratorAggregate, JsonSeria
      */
     public function has($key)
     {
-        $keys = is_array($key) ? $key : func_get_args();
+        $keys = \is_array($key) ? $key : \func_get_args();
 
         foreach ($keys as $value) {
-            if (! array_key_exists($value, $this->attributes)) {
+            if (! \array_key_exists($value, $this->attributes)) {
                 return false;
             }
         }
@@ -86,11 +86,11 @@ class ComponentAttributeBag implements ArrayAccess, IteratorAggregate, JsonSeria
      */
     public function hasAny($key)
     {
-        if (! count($this->attributes)) {
+        if (! \count($this->attributes)) {
             return false;
         }
 
-        $keys = is_array($key) ? $key : func_get_args();
+        $keys = \is_array($key) ? $key : \func_get_args();
 
         foreach ($keys as $value) {
             if ($this->has($value)) {
@@ -120,7 +120,7 @@ class ComponentAttributeBag implements ArrayAccess, IteratorAggregate, JsonSeria
      */
     public function only($keys)
     {
-        if (is_null($keys)) {
+        if (\is_null($keys)) {
             $values = $this->attributes;
         } else {
             $keys = Arr::wrap($keys);
@@ -139,7 +139,7 @@ class ComponentAttributeBag implements ArrayAccess, IteratorAggregate, JsonSeria
      */
     public function except($keys)
     {
-        if (is_null($keys)) {
+        if (\is_null($keys)) {
             $values = $this->attributes;
         } else {
             $keys = Arr::wrap($keys);
@@ -317,9 +317,9 @@ class ComponentAttributeBag implements ArrayAccess, IteratorAggregate, JsonSeria
             return false;
         }
 
-        return ! is_object($value) &&
-               ! is_null($value) &&
-               ! is_bool($value);
+        return ! \is_object($value) &&
+               ! \is_null($value) &&
+               ! \is_bool($value);
     }
 
     /**
@@ -476,7 +476,7 @@ class ComponentAttributeBag implements ArrayAccess, IteratorAggregate, JsonSeria
         $string = '';
 
         foreach ($this->attributes as $key => $value) {
-            if ($value === false || is_null($value)) {
+            if ($value === false || \is_null($value)) {
                 continue;
             }
 

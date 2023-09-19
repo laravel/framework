@@ -404,7 +404,7 @@ class FilesystemTest extends TestCase
     {
         file_put_contents(self::$tempDir.'/foo.txt', 'foo');
         $files = new Filesystem;
-        $this->assertEquals(self::$tempDir, $files->dirname(self::$tempDir.'/foo.txt'));
+        $this->assertEquals(self::$tempDir, $files->\dirname(self::$tempDir.'/foo.txt'));
     }
 
     public function testTypeIdentifiesFile()
@@ -546,7 +546,7 @@ class FilesystemTest extends TestCase
                 $files->put(self::$tempDir.'/file.txt', $content, true);
                 $read = $files->get(self::$tempDir.'/file.txt', true);
 
-                exit(strlen($read) === strlen($content) ? 1 : 0);
+                exit(\strlen($read) === \strlen($content) ? 1 : 0);
             }
         }
 
@@ -566,8 +566,8 @@ class FilesystemTest extends TestCase
         $filesystem->requireOnce(self::$tempDir.'/scripts/foo.php');
         file_put_contents(self::$tempDir.'/scripts/foo.php', '<?php function random_function_xyz_changed(){};');
         $filesystem->requireOnce(self::$tempDir.'/scripts/foo.php');
-        $this->assertTrue(function_exists('random_function_xyz'));
-        $this->assertFalse(function_exists('random_function_xyz_changed'));
+        $this->assertTrue(\function_exists('random_function_xyz'));
+        $this->assertFalse(\function_exists('random_function_xyz_changed'));
     }
 
     public function testCopyCopiesFileProperly()

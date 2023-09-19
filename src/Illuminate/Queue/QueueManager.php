@@ -155,7 +155,7 @@ class QueueManager implements FactoryContract, MonitorContract
     {
         $config = $this->getConfig($name);
 
-        if (is_null($config)) {
+        if (\is_null($config)) {
             throw new InvalidArgumentException("The [{$name}] queue connection has not been configured.");
         }
 
@@ -178,7 +178,7 @@ class QueueManager implements FactoryContract, MonitorContract
             throw new InvalidArgumentException("No connector for [$driver].");
         }
 
-        return call_user_func($this->connectors[$driver]);
+        return \call_user_func($this->connectors[$driver]);
     }
 
     /**
@@ -213,7 +213,7 @@ class QueueManager implements FactoryContract, MonitorContract
      */
     protected function getConfig($name)
     {
-        if (! is_null($name) && $name !== 'null') {
+        if (! \is_null($name) && $name !== 'null') {
             return $this->app['config']["queue.connections.{$name}"];
         }
 

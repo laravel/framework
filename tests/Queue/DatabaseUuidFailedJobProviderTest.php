@@ -28,14 +28,14 @@ class DatabaseUuidFailedJobProviderTest extends TestCase
         });
         $provider = new DatabaseUuidFailedJobProvider($db->getDatabaseManager(), 'default', 'failed_jobs');
 
-        $this->assertSame(0, $provider->count());
+        $this->assertSame(0, $provider->\count());
 
         $provider->log('connection-1', 'queue-1', json_encode(['uuid' => (string) Str::uuid()]), new RuntimeException());
-        $this->assertSame(1, $provider->count());
+        $this->assertSame(1, $provider->\count());
 
         $provider->log('connection-1', 'queue-1', json_encode(['uuid' => (string) Str::uuid()]), new RuntimeException());
         $provider->log('connection-2', 'queue-2', json_encode(['uuid' => (string) Str::uuid()]), new RuntimeException());
-        $this->assertSame(3, $provider->count());
+        $this->assertSame(3, $provider->\count());
     }
 
     public function testJobsCanBeCountedByConnection()
@@ -57,12 +57,12 @@ class DatabaseUuidFailedJobProviderTest extends TestCase
 
         $provider->log('connection-1', 'default', json_encode(['uuid' => (string) Str::uuid()]), new RuntimeException());
         $provider->log('connection-2', 'default', json_encode(['uuid' => (string) Str::uuid()]), new RuntimeException());
-        $this->assertSame(1, $provider->count('connection-1'));
-        $this->assertSame(1, $provider->count('connection-2'));
+        $this->assertSame(1, $provider->\count('connection-1'));
+        $this->assertSame(1, $provider->\count('connection-2'));
 
         $provider->log('connection-1', 'default', json_encode(['uuid' => (string) Str::uuid()]), new RuntimeException());
-        $this->assertSame(2, $provider->count('connection-1'));
-        $this->assertSame(1, $provider->count('connection-2'));
+        $this->assertSame(2, $provider->\count('connection-1'));
+        $this->assertSame(1, $provider->\count('connection-2'));
     }
 
     public function testJobsCanBeCountedByQueue()
@@ -84,12 +84,12 @@ class DatabaseUuidFailedJobProviderTest extends TestCase
 
         $provider->log('database', 'queue-1', json_encode(['uuid' => (string) Str::uuid()]), new RuntimeException());
         $provider->log('database', 'queue-2', json_encode(['uuid' => (string) Str::uuid()]), new RuntimeException());
-        $this->assertSame(1, $provider->count(queue: 'queue-1'));
-        $this->assertSame(1, $provider->count(queue: 'queue-2'));
+        $this->assertSame(1, $provider->\count(queue: 'queue-1'));
+        $this->assertSame(1, $provider->\count(queue: 'queue-2'));
 
         $provider->log('database', 'queue-1', json_encode(['uuid' => (string) Str::uuid()]), new RuntimeException());
-        $this->assertSame(2, $provider->count(queue: 'queue-1'));
-        $this->assertSame(1, $provider->count(queue: 'queue-2'));
+        $this->assertSame(2, $provider->\count(queue: 'queue-1'));
+        $this->assertSame(1, $provider->\count(queue: 'queue-2'));
     }
 
     public function testJobsCanBeCountedByQueueAndConnection()
@@ -115,9 +115,9 @@ class DatabaseUuidFailedJobProviderTest extends TestCase
         $provider->log('connection-1', 'queue-1', json_encode(['uuid' => (string) Str::uuid()]), new RuntimeException());
         $provider->log('connection-2', 'queue-1', json_encode(['uuid' => (string) Str::uuid()]), new RuntimeException());
         $provider->log('connection-2', 'queue-1', json_encode(['uuid' => (string) Str::uuid()]), new RuntimeException());
-        $this->assertSame(2, $provider->count('connection-1', 'queue-99'));
-        $this->assertSame(1, $provider->count('connection-2', 'queue-99'));
-        $this->assertSame(1, $provider->count('connection-1', 'queue-1'));
-        $this->assertSame(2, $provider->count('connection-2', 'queue-1'));
+        $this->assertSame(2, $provider->\count('connection-1', 'queue-99'));
+        $this->assertSame(1, $provider->\count('connection-2', 'queue-99'));
+        $this->assertSame(1, $provider->\count('connection-1', 'queue-1'));
+        $this->assertSame(2, $provider->\count('connection-2', 'queue-1'));
     }
 }

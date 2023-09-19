@@ -36,7 +36,7 @@ class AuthenticateWithBasicAuth
      */
     public static function using($guard = null, $field = null)
     {
-        return static::class.':'.implode(',', func_get_args());
+        return static::class.':'.implode(',', \func_get_args());
     }
 
     /**

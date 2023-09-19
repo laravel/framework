@@ -83,11 +83,11 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
      */
     public static function defaults($callback = null)
     {
-        if (is_null($callback)) {
+        if (\is_null($callback)) {
             return static::default();
         }
 
-        if (! is_callable($callback) && ! $callback instanceof static) {
+        if (! \is_callable($callback) && ! $callback instanceof static) {
             throw new InvalidArgumentException('The given callback should be callable or an instance of '.static::class);
         }
 
@@ -101,8 +101,8 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
      */
     public static function default()
     {
-        $file = is_callable(static::$defaultCallback)
-            ? call_user_func(static::$defaultCallback)
+        $file = \is_callable(static::$defaultCallback)
+            ? \call_user_func(static::$defaultCallback)
             : static::$defaultCallback;
 
         return $file instanceof Rule ? $file : new self();
@@ -192,11 +192,11 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
      */
     protected function toKilobytes($size)
     {
-        if (! is_string($size)) {
+        if (! \is_string($size)) {
             return $size;
         }
 
-        $value = floatval($size);
+        $value = \floatval($size);
 
         return round(match (true) {
             Str::endsWith($size, 'kb') => $value * 1,
@@ -257,9 +257,9 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
         $rules = array_merge($rules, $this->buildMimetypes());
 
         $rules[] = match (true) {
-            is_null($this->minimumFileSize) && is_null($this->maximumFileSize) => null,
-            is_null($this->maximumFileSize) => "min:{$this->minimumFileSize}",
-            is_null($this->minimumFileSize) => "max:{$this->maximumFileSize}",
+            \is_null($this->minimumFileSize) && \is_null($this->maximumFileSize) => null,
+            \is_null($this->maximumFileSize) => "min:{$this->minimumFileSize}",
+            \is_null($this->minimumFileSize) => "max:{$this->maximumFileSize}",
             $this->minimumFileSize !== $this->maximumFileSize => "between:{$this->minimumFileSize},{$this->maximumFileSize}",
             default => "size:{$this->minimumFileSize}",
         };
@@ -274,7 +274,7 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
      */
     protected function buildMimetypes()
     {
-        if (count($this->allowedMimetypes) === 0) {
+        if (\count($this->allowedMimetypes) === 0) {
             return [];
         }
 
@@ -287,11 +287,11 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
 
         $mimes = array_diff($this->allowedMimetypes, $mimetypes);
 
-        if (count($mimetypes) > 0) {
+        if (\count($mimetypes) > 0) {
             $rules[] = 'mimetypes:'.implode(',', $mimetypes);
         }
 
-        if (count($mimes) > 0) {
+        if (\count($mimes) > 0) {
             $rules[] = 'mimes:'.implode(',', $mimes);
         }
 

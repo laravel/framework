@@ -158,8 +158,8 @@ trait CompilesEchos
      */
     public function applyEchoHandler($value)
     {
-        if (is_object($value) && isset($this->echoHandlers[get_class($value)])) {
-            return call_user_func($this->echoHandlers[get_class($value)], $value);
+        if (\is_object($value) && isset($this->echoHandlers[\get_class($value)])) {
+            return \call_user_func($this->echoHandlers[\get_class($value)], $value);
         }
 
         return $value;

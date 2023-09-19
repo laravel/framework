@@ -38,12 +38,12 @@ class Enum implements Rule
             return true;
         }
 
-        if (is_null($value) || ! enum_exists($this->type) || ! method_exists($this->type, 'tryFrom')) {
+        if (\is_null($value) || ! enum_exists($this->type) || ! method_exists($this->type, 'tryFrom')) {
             return false;
         }
 
         try {
-            return ! is_null($this->type::tryFrom($value));
+            return ! \is_null($this->type::tryFrom($value));
         } catch (TypeError) {
             return false;
         }

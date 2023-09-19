@@ -30,13 +30,13 @@ class AsEnumCollection implements Castable
 
             public function get($model, $key, $value, $attributes)
             {
-                if (! isset($attributes[$key]) || is_null($attributes[$key])) {
+                if (! isset($attributes[$key]) || \is_null($attributes[$key])) {
                     return;
                 }
 
                 $data = Json::decode($attributes[$key]);
 
-                if (! is_array($data)) {
+                if (! \is_array($data)) {
                     return;
                 }
 
@@ -45,7 +45,7 @@ class AsEnumCollection implements Castable
                 return (new Collection($data))->map(function ($value) use ($enumClass) {
                     return is_subclass_of($enumClass, BackedEnum::class)
                         ? $enumClass::from($value)
-                        : constant($enumClass.'::'.$value);
+                        : \constant($enumClass.'::'.$value);
                 });
             }
 
@@ -69,7 +69,7 @@ class AsEnumCollection implements Castable
 
             protected function getStorableEnumValue($enum)
             {
-                if (is_string($enum) || is_int($enum)) {
+                if (\is_string($enum) || \is_int($enum)) {
                     return $enum;
                 }
 

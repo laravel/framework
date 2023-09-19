@@ -65,9 +65,9 @@ class ControllerMakeCommand extends GeneratorCommand
             $stub = '/stubs/controller.stub';
         }
 
-        if ($this->option('api') && is_null($stub)) {
+        if ($this->option('api') && \is_null($stub)) {
             $stub = '/stubs/controller.api.stub';
-        } elseif ($this->option('api') && ! is_null($stub) && ! $this->option('invokable')) {
+        } elseif ($this->option('api') && ! \is_null($stub) && ! $this->option('invokable')) {
             $stub = str_replace('.stub', '.api.stub', $stub);
         }
 
@@ -318,7 +318,7 @@ class ControllerMakeCommand extends GeneratorCommand
             $input->setOption($type, true);
         }
 
-        if (in_array($type, ['api', 'resource', 'singleton'])) {
+        if (\in_array($type, ['api', 'resource', 'singleton'])) {
             $model = suggest(
                 "What model should this $type controller be for? (Optional)",
                 $this->possibleModels()

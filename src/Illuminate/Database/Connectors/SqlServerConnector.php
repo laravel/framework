@@ -71,7 +71,7 @@ class SqlServerConnector extends Connector implements ConnectorInterface
             return $this->getOdbcDsn($config);
         }
 
-        if (in_array('sqlsrv', $this->getAvailableDrivers())) {
+        if (\in_array('sqlsrv', $this->getAvailableDrivers())) {
             return $this->getSqlSrvDsn($config);
         } else {
             return $this->getDblibDsn($config);
@@ -86,7 +86,7 @@ class SqlServerConnector extends Connector implements ConnectorInterface
      */
     protected function prefersOdbc(array $config)
     {
-        return in_array('odbc', $this->getAvailableDrivers()) &&
+        return \in_array('odbc', $this->getAvailableDrivers()) &&
                ($config['odbc'] ?? null) === true;
     }
 

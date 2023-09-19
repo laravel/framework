@@ -51,7 +51,7 @@ class HasInDatabase extends Constraint
      */
     public function matches($table): bool
     {
-        return $this->database->table($table)->where($this->data)->count() > 0;
+        return $this->database->table($table)->where($this->data)->\count() > 0;
     }
 
     /**
@@ -97,8 +97,8 @@ class HasInDatabase extends Constraint
             $description = 'Found: '.json_encode($results, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
         }
 
-        if ($query->count() > $this->show) {
-            $description .= sprintf(' and %s others', $query->count() - $this->show);
+        if ($query->\count() > $this->show) {
+            $description .= sprintf(' and %s others', $query->\count() - $this->show);
         }
 
         return $description;

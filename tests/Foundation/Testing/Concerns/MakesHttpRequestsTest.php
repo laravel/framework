@@ -221,6 +221,6 @@ class TerminatingMiddleware
 
     public function terminate($request, $response)
     {
-        call_user_func(static::$callback, $request, $response);
+        \call_user_func(static::$callback, $request, $response);
     }
 }

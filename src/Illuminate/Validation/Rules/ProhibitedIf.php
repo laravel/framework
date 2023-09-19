@@ -24,7 +24,7 @@ class ProhibitedIf
      */
     public function __construct($condition)
     {
-        if ($condition instanceof Closure || is_bool($condition)) {
+        if ($condition instanceof Closure || \is_bool($condition)) {
             $this->condition = $condition;
         } else {
             throw new InvalidArgumentException('The provided condition must be a callable or boolean.');
@@ -38,8 +38,8 @@ class ProhibitedIf
      */
     public function __toString()
     {
-        if (is_callable($this->condition)) {
-            return call_user_func($this->condition) ? 'prohibited' : '';
+        if (\is_callable($this->condition)) {
+            return \call_user_func($this->condition) ? 'prohibited' : '';
         }
 
         return $this->condition ? 'prohibited' : '';

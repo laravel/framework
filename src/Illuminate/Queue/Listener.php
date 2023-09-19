@@ -71,7 +71,7 @@ class Listener
      */
     protected function artisanBinary()
     {
-        return defined('ARTISAN_BINARY') ? ARTISAN_BINARY : 'artisan';
+        return \defined('ARTISAN_BINARY') ? ARTISAN_BINARY : 'artisan';
     }
 
     /**
@@ -163,7 +163,7 @@ class Listener
             "--tries={$options->maxTries}",
             $options->force ? '--force' : null,
         ], function ($value) {
-            return ! is_null($value);
+            return ! \is_null($value);
         });
     }
 
@@ -198,7 +198,7 @@ class Listener
     protected function handleWorkerOutput($type, $line)
     {
         if (isset($this->outputHandler)) {
-            call_user_func($this->outputHandler, $type, $line);
+            \call_user_func($this->outputHandler, $type, $line);
         }
     }
 

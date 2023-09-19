@@ -110,7 +110,7 @@ abstract class Grammar
     protected function wrapSegments($segments)
     {
         return collect($segments)->map(function ($segment, $key) use ($segments) {
-            return $key == 0 && count($segments) > 1
+            return $key == 0 && \count($segments) > 1
                             ? $this->wrapTable($segment)
                             : $this->wrapValue($segment);
         })->implode('.');
@@ -196,7 +196,7 @@ abstract class Grammar
      */
     public function quoteString($value)
     {
-        if (is_array($value)) {
+        if (\is_array($value)) {
             return implode(', ', array_map([$this, __FUNCTION__], $value));
         }
 
@@ -212,7 +212,7 @@ abstract class Grammar
      */
     public function escape($value, $binary = false)
     {
-        if (is_null($this->connection)) {
+        if (\is_null($this->connection)) {
             throw new RuntimeException("The database driver's grammar implementation does not support escaping values.");
         }
 

@@ -54,7 +54,7 @@ class ScheduleTestCommand extends Command
                 return trim(str_replace($commandBinary, '', $commandName)) === $name;
             });
 
-            if (count($matches) !== 1) {
+            if (\count($matches) !== 1) {
                 $this->components->info('No matching scheduled command found.');
 
                 return;
@@ -96,7 +96,7 @@ class ScheduleTestCommand extends Command
      */
     protected function getSelectedCommandByIndex(array $commandNames)
     {
-        if (count($commandNames) !== count(array_unique($commandNames))) {
+        if (\count($commandNames) !== \count(array_unique($commandNames))) {
             // Some commands (likely closures) have the same name, append unique indexes to each one...
             $uniqueCommandNames = array_map(function ($index, $value) {
                 return "$value [$index]";

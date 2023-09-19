@@ -92,7 +92,7 @@ class RouteListCommand extends Command
     {
         $this->router->flushMiddlewareGroups();
 
-        if (! $this->router->getRoutes()->count()) {
+        if (! $this->router->getRoutes()->\count()) {
             return $this->components->error("Your application doesn't have any routes.");
         }
 
@@ -212,10 +212,10 @@ class RouteListCommand extends Command
         if ($route->action['uses'] instanceof Closure) {
             $path = (new ReflectionFunction($route->action['uses']))
                                 ->getFileName();
-        } elseif (is_string($route->action['uses']) &&
+        } elseif (\is_string($route->action['uses']) &&
                   str_contains($route->action['uses'], 'SerializableClosure')) {
             return false;
-        } elseif (is_string($route->action['uses'])) {
+        } elseif (\is_string($route->action['uses'])) {
             if ($this->isFrameworkController($route)) {
                 return false;
             }
@@ -237,7 +237,7 @@ class RouteListCommand extends Command
      */
     protected function isFrameworkController(Route $route)
     {
-        return in_array($route->getControllerClass(), [
+        return \in_array($route->getControllerClass(), [
             '\Illuminate\Routing\RedirectController',
             '\Illuminate\Routing\ViewController',
         ], true);
@@ -442,13 +442,13 @@ class RouteListCommand extends Command
      */
     protected function determineRouteCountOutput($routes, $terminalWidth)
     {
-        $routeCountText = 'Showing ['.$routes->count().'] routes';
+        $routeCountText = 'Showing ['.$routes->\count().'] routes';
 
         $offset = $terminalWidth - mb_strlen($routeCountText) - 2;
 
         $spaces = str_repeat(' ', $offset);
 
-        return $spaces.'<fg=blue;options=bold>Showing ['.$routes->count().'] routes</>';
+        return $spaces.'<fg=blue;options=bold>Showing ['.$routes->\count().'] routes</>';
     }
 
     /**
@@ -458,9 +458,9 @@ class RouteListCommand extends Command
      */
     public static function getTerminalWidth()
     {
-        return is_null(static::$terminalWidthResolver)
+        return \is_null(static::$terminalWidthResolver)
             ? (new Terminal)->getWidth()
-            : call_user_func(static::$terminalWidthResolver);
+            : \call_user_func(static::$terminalWidthResolver);
     }
 
     /**

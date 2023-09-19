@@ -61,7 +61,7 @@ class CommandDurationThresholdTest extends TestCase
         $input = new StringInput('foo');
         $args = null;
         $kernel->whenCommandLifecycleIsLongerThan(CarbonInterval::seconds(0), function () use (&$args) {
-            $args = func_get_args();
+            $args = \func_get_args();
         });
 
         Carbon::setTestNow($startedAt = Carbon::now());

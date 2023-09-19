@@ -647,7 +647,7 @@ class HttpClientTest extends TestCase
             $userAgent = $request->header('User-Agent');
 
             return $request->url() === 'http://foo.com/json' &&
-                count($userAgent) === 1 &&
+                \count($userAgent) === 1 &&
                 $userAgent[0] === 'FooBar';
         });
     }
@@ -2427,7 +2427,7 @@ class HttpClientTest extends TestCase
         $this->factory->fake(function ($r) use (&$requests) {
             $requests[] = $r;
 
-            Carbon::setTestNow(now()->addSeconds(6 * count($requests)));
+            Carbon::setTestNow(now()->addSeconds(6 * \count($requests)));
 
             return $this->factory::response('expected content');
         });
@@ -2440,7 +2440,7 @@ class HttpClientTest extends TestCase
                 ->withAddedHeader('list', ['item-3']);
         }))->globalMiddleware(Middleware::mapResponse(function ($response) use (&$requests) {
             // Test adding headers in incoming response..
-            return $response->withHeader('X-Count', (string) count($requests));
+            return $response->withHeader('X-Count', (string) \count($requests));
         }))->globalMiddleware(function ($handler) {
             // Test wrapping request in timing function...
             return function ($request, $options) use ($handler) {

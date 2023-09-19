@@ -55,7 +55,7 @@ class RequirePassword
      */
     public static function using($redirectToRoute = null, $passwordTimeoutSeconds = null)
     {
-        return static::class.':'.implode(',', func_get_args());
+        return static::class.':'.implode(',', \func_get_args());
     }
 
     /**

@@ -26,7 +26,7 @@ class InvalidArgumentException extends Exception
                 'Argument #%d of %s() must be %s %s',
                 $argument,
                 $function,
-                in_array(lcfirst($type)[0], ['a', 'e', 'i', 'o', 'u'], true) ? 'an' : 'a',
+                \in_array(lcfirst($type)[0], ['a', 'e', 'i', 'o', 'u'], true) ? 'an' : 'a',
                 $type
             )
         );

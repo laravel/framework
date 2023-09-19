@@ -244,7 +244,7 @@ class Event
      */
     public function isRepeatable()
     {
-        return ! is_null($this->repeatSeconds);
+        return ! \is_null($this->repeatSeconds);
     }
 
     /**
@@ -396,7 +396,7 @@ class Event
      */
     public function runsInEnvironment($environment)
     {
-        return empty($this->environments) || in_array($environment, $this->environments);
+        return empty($this->environments) || \in_array($environment, $this->environments);
     }
 
     /**
@@ -520,7 +520,7 @@ class Event
      */
     protected function ensureOutputIsBeingCaptured()
     {
-        if (is_null($this->output) || $this->output == $this->getDefaultOutput()) {
+        if (\is_null($this->output) || $this->output == $this->getDefaultOutput()) {
             $this->sendOutputTo(storage_path('logs/schedule-'.sha1($this->mutexName()).'.log'));
         }
     }
@@ -678,7 +678,7 @@ class Event
      */
     public function environments($environments)
     {
-        $this->environments = is_array($environments) ? $environments : func_get_args();
+        $this->environments = \is_array($environments) ? $environments : \func_get_args();
 
         return $this;
     }
@@ -932,7 +932,7 @@ class Event
      */
     public function getSummaryForDisplay()
     {
-        if (is_string($this->description)) {
+        if (\is_string($this->description)) {
             return $this->description;
         }
 
@@ -985,7 +985,7 @@ class Event
     {
         $mutexNameResolver = $this->mutexNameResolver;
 
-        if (! is_null($mutexNameResolver) && is_callable($mutexNameResolver)) {
+        if (! \is_null($mutexNameResolver) && \is_callable($mutexNameResolver)) {
             return $mutexNameResolver($this);
         }
 
@@ -1000,7 +1000,7 @@ class Event
      */
     public function createMutexNameUsing(Closure|string $mutexName)
     {
-        $this->mutexNameResolver = is_string($mutexName) ? fn () => $mutexName : $mutexName;
+        $this->mutexNameResolver = \is_string($mutexName) ? fn () => $mutexName : $mutexName;
 
         return $this;
     }

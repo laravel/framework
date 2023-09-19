@@ -103,7 +103,7 @@ class FakeInvokedProcess implements InvokedProcessContract
      */
     public function hasReceivedSignal(int $signal)
     {
-        return in_array($signal, $this->receivedSignals);
+        return \in_array($signal, $this->receivedSignals);
     }
 
     /**
@@ -115,7 +115,7 @@ class FakeInvokedProcess implements InvokedProcessContract
     {
         $this->invokeOutputHandlerWithNextLineOfOutput();
 
-        $this->remainingRunIterations = is_null($this->remainingRunIterations)
+        $this->remainingRunIterations = \is_null($this->remainingRunIterations)
                 ? $this->process->runIterations
                 : $this->remainingRunIterations;
 
@@ -143,7 +143,7 @@ class FakeInvokedProcess implements InvokedProcessContract
         }
 
         [$outputCount, $outputStartingPoint] = [
-            count($this->process->output),
+            \count($this->process->output),
             min($this->nextOutputIndex, $this->nextErrorOutputIndex),
         ];
 
@@ -151,12 +151,12 @@ class FakeInvokedProcess implements InvokedProcessContract
             $currentOutput = $this->process->output[$i];
 
             if ($currentOutput['type'] === 'out' && $i >= $this->nextOutputIndex) {
-                call_user_func($this->outputHandler, 'out', $currentOutput['buffer']);
+                \call_user_func($this->outputHandler, 'out', $currentOutput['buffer']);
                 $this->nextOutputIndex = $i + 1;
 
                 return $currentOutput;
             } elseif ($currentOutput['type'] === 'err' && $i >= $this->nextErrorOutputIndex) {
-                call_user_func($this->outputHandler, 'err', $currentOutput['buffer']);
+                \call_user_func($this->outputHandler, 'err', $currentOutput['buffer']);
                 $this->nextErrorOutputIndex = $i + 1;
 
                 return $currentOutput;
@@ -213,7 +213,7 @@ class FakeInvokedProcess implements InvokedProcessContract
      */
     public function latestOutput()
     {
-        $outputCount = count($this->process->output);
+        $outputCount = \count($this->process->output);
 
         for ($i = $this->nextOutputIndex; $i < $outputCount; $i++) {
             if ($this->process->output[$i]['type'] === 'out') {
@@ -236,7 +236,7 @@ class FakeInvokedProcess implements InvokedProcessContract
      */
     public function latestErrorOutput()
     {
-        $outputCount = count($this->process->output);
+        $outputCount = \count($this->process->output);
 
         for ($i = $this->nextErrorOutputIndex; $i < $outputCount; $i++) {
             if ($this->process->output[$i]['type'] === 'err') {

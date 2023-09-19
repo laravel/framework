@@ -67,7 +67,7 @@ trait CountsEnumerations
         callable $executor
     ) {
         $enumerated = 0;
-        $count = $collection->count();
+        $count = $collection->\count();
         $collection = $this->countEnumerations($collection, $enumerated);
 
         $executor($collection);

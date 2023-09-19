@@ -71,7 +71,7 @@ class EloquentMassPrunableTest extends DatabaseTestCase
         $count = (new MassPrunableTestModel)->pruneAll();
 
         $this->assertEquals(1500, $count);
-        $this->assertEquals(3500, MassPrunableTestModel::count());
+        $this->assertEquals(3500, MassPrunableTestModel::\count());
     }
 
     public function testPrunesSoftDeletedRecords()
@@ -90,8 +90,8 @@ class EloquentMassPrunableTest extends DatabaseTestCase
         $count = (new MassPrunableSoftDeleteTestModel)->pruneAll();
 
         $this->assertEquals(3000, $count);
-        $this->assertEquals(0, MassPrunableSoftDeleteTestModel::count());
-        $this->assertEquals(2000, MassPrunableSoftDeleteTestModel::withTrashed()->count());
+        $this->assertEquals(0, MassPrunableSoftDeleteTestModel::\count());
+        $this->assertEquals(2000, MassPrunableSoftDeleteTestModel::withTrashed()->\count());
     }
 
     protected function tearDown(): void

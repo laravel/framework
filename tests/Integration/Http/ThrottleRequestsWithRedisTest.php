@@ -53,8 +53,8 @@ class ThrottleRequestsWithRedisTest extends TestCase
                 $this->assertEquals(429, $e->getStatusCode());
                 $this->assertEquals(2, $e->getHeaders()['X-RateLimit-Limit']);
                 $this->assertEquals(0, $e->getHeaders()['X-RateLimit-Remaining']);
-                // $this->assertTrue(in_array($e->getHeaders()['Retry-After'], [2, 3]));
-                // $this->assertTrue(in_array($e->getHeaders()['X-RateLimit-Reset'], [$finish->getTimestamp() + 2, $finish->getTimestamp() + 3]));
+                // $this->assertTrue(\in_array($e->getHeaders()['Retry-After'], [2, 3]));
+                // $this->assertTrue(\in_array($e->getHeaders()['X-RateLimit-Reset'], [$finish->getTimestamp() + 2, $finish->getTimestamp() + 3]));
             }
         });
     }

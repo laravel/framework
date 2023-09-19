@@ -50,7 +50,7 @@ class Lottery
      */
     public function __construct($chances, $outOf = null)
     {
-        if ($outOf === null && is_float($chances) && $chances > 1) {
+        if ($outOf === null && \is_float($chances) && $chances > 1) {
             throw new RuntimeException('Float must not be greater than 1.');
         }
 
@@ -240,7 +240,7 @@ class Lottery
         };
 
         static::setResultFactory(function ($chances, $outOf) use (&$next, $sequence, $whenMissing) {
-            if (array_key_exists($next, $sequence)) {
+            if (\array_key_exists($next, $sequence)) {
                 return $sequence[$next++];
             }
 

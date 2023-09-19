@@ -19,21 +19,21 @@ class Reflector
      */
     public static function isCallable($var, $syntaxOnly = false)
     {
-        if (! is_array($var)) {
-            return is_callable($var, $syntaxOnly);
+        if (! \is_array($var)) {
+            return \is_callable($var, $syntaxOnly);
         }
 
-        if (! isset($var[0], $var[1]) || ! is_string($var[1] ?? null)) {
+        if (! isset($var[0], $var[1]) || ! \is_string($var[1] ?? null)) {
             return false;
         }
 
         if ($syntaxOnly &&
-            (is_string($var[0]) || is_object($var[0])) &&
-            is_string($var[1])) {
+            (\is_string($var[0]) || \is_object($var[0])) &&
+            \is_string($var[1])) {
             return true;
         }
 
-        $class = is_object($var[0]) ? get_class($var[0]) : $var[0];
+        $class = \is_object($var[0]) ? \get_class($var[0]) : $var[0];
 
         $method = $var[1];
 
@@ -45,11 +45,11 @@ class Reflector
             return (new ReflectionMethod($class, $method))->isPublic();
         }
 
-        if (is_object($var[0]) && method_exists($class, '__call')) {
+        if (\is_object($var[0]) && method_exists($class, '__call')) {
             return (new ReflectionMethod($class, '__call'))->isPublic();
         }
 
-        if (! is_object($var[0]) && method_exists($class, '__callStatic')) {
+        if (! \is_object($var[0]) && method_exists($class, '__callStatic')) {
             return (new ReflectionMethod($class, '__callStatic'))->isPublic();
         }
 
@@ -64,7 +64,7 @@ class Reflector
      */
     public static function getParameterClassName($parameter)
     {
-        $type = $parameter->getType();
+        $type = $parameter->\gettype();
 
         if (! $type instanceof ReflectionNamedType || $type->isBuiltin()) {
             return;
@@ -81,7 +81,7 @@ class Reflector
      */
     public static function getParameterClassNames($parameter)
     {
-        $type = $parameter->getType();
+        $type = $parameter->\gettype();
 
         if (! $type instanceof ReflectionUnionType) {
             return array_filter([static::getParameterClassName($parameter)]);
@@ -111,7 +111,7 @@ class Reflector
     {
         $name = $type->getName();
 
-        if (! is_null($class = $parameter->getDeclaringClass())) {
+        if (! \is_null($class = $parameter->getDeclaringClass())) {
             if ($name === 'self') {
                 return $class->getName();
             }
@@ -148,13 +148,13 @@ class Reflector
      */
     public static function isParameterBackedEnumWithStringBackingType($parameter)
     {
-        if (! $parameter->getType() instanceof ReflectionNamedType) {
+        if (! $parameter->\gettype() instanceof ReflectionNamedType) {
             return false;
         }
 
-        $backedEnumClass = $parameter->getType()?->getName();
+        $backedEnumClass = $parameter->\gettype()?->getName();
 
-        if (is_null($backedEnumClass)) {
+        if (\is_null($backedEnumClass)) {
             return false;
         }
 

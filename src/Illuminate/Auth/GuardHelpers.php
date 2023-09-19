@@ -33,7 +33,7 @@ trait GuardHelpers
      */
     public function authenticate()
     {
-        if (! is_null($user = $this->user())) {
+        if (! \is_null($user = $this->user())) {
             return $user;
         }
 
@@ -47,7 +47,7 @@ trait GuardHelpers
      */
     public function hasUser()
     {
-        return ! is_null($this->user);
+        return ! \is_null($this->user);
     }
 
     /**
@@ -57,7 +57,7 @@ trait GuardHelpers
      */
     public function check()
     {
-        return ! is_null($this->user());
+        return ! \is_null($this->user());
     }
 
     /**

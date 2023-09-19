@@ -72,7 +72,7 @@ class FileFailedJobProvider implements CountableFailedJobProvider, FailedJobProv
                 'failed_at_timestamp' => $failedAt->getTimestamp(),
             ]);
 
-            $this->write(array_slice($jobs, 0, $this->limit));
+            $this->write(\array_slice($jobs, 0, $this->limit));
 
             return $id;
         });
@@ -114,7 +114,7 @@ class FileFailedJobProvider implements CountableFailedJobProvider, FailedJobProv
                 ->values()
                 ->all());
 
-            return count($jobs) !== count($pruned);
+            return \count($jobs) !== \count($pruned);
         });
     }
 
@@ -144,7 +144,7 @@ class FileFailedJobProvider implements CountableFailedJobProvider, FailedJobProv
                 return $job->failed_at_timestamp <= $before->getTimestamp();
             })->values()->all());
 
-            return count($jobs) - count($prunedJobs);
+            return \count($jobs) - \count($prunedJobs);
         });
     }
 
@@ -186,7 +186,7 @@ class FileFailedJobProvider implements CountableFailedJobProvider, FailedJobProv
 
         $content = json_decode($content);
 
-        return is_array($content) ? $content : [];
+        return \is_array($content) ? $content : [];
     }
 
     /**
@@ -210,14 +210,14 @@ class FileFailedJobProvider implements CountableFailedJobProvider, FailedJobProv
      * @param  string|null  $queue
      * @return int
      */
-    public function count($connection = null, $queue = null)
+    public function \count($connection = null, $queue = null)
     {
         if (($connection ?? $queue) === null) {
-            return count($this->read());
+            return \count($this->read());
         }
 
         return collect($this->read())
             ->filter(fn ($job) => $job->connection === ($connection ?? $job->connection) && $job->queue === ($queue ?? $job->queue))
-            ->count();
+            ->\count();
     }
 }

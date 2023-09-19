@@ -1009,7 +1009,7 @@ class SupportArrTest extends TestCase
         $array = [100, '200', 300, '400', 500];
 
         $array = Arr::where($array, function ($value, $key) {
-            return is_string($value);
+            return \is_string($value);
         });
 
         $this->assertEquals([1 => '200', 3 => '400'], $array);

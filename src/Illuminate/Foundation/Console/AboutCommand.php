@@ -71,11 +71,11 @@ class AboutCommand extends Command
         collect(static::$data)
             ->map(fn ($items) => collect($items)
                 ->map(function ($value) {
-                    if (is_array($value)) {
+                    if (\is_array($value)) {
                         return [$value];
                     }
 
-                    if (is_string($value)) {
+                    if (\is_string($value)) {
                         $value = $this->laravel->make($value);
                     }
 
@@ -91,7 +91,7 @@ class AboutCommand extends Command
                 return $index === false ? 99 : $index;
             })
             ->filter(function ($data, $key) {
-                return $this->option('only') ? in_array($this->toSearchKeyword($key), $this->sections()) : true;
+                return $this->option('only') ? \in_array($this->toSearchKeyword($key), $this->sections()) : true;
             })
             ->pipe(fn ($data) => $this->display($data));
 
@@ -210,7 +210,7 @@ class AboutCommand extends Command
      */
     protected function hasPhpFiles(string $path): bool
     {
-        return count(glob($path.'/*.php')) > 0;
+        return \count(glob($path.'/*.php')) > 0;
     }
 
     /**
@@ -236,11 +236,11 @@ class AboutCommand extends Command
      */
     protected static function addToSection(string $section, $data, string $value = null)
     {
-        if (is_array($data)) {
+        if (\is_array($data)) {
             foreach ($data as $key => $value) {
                 self::$data[$section][] = [$key, $value];
             }
-        } elseif (is_callable($data) || ($value === null && class_exists($data))) {
+        } elseif (\is_callable($data) || ($value === null && class_exists($data))) {
             self::$data[$section][] = $data;
         } else {
             self::$data[$section][] = [$data, $value];

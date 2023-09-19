@@ -91,7 +91,7 @@ class AuthorizesResourcesTest extends TestCase
         $router = new Router(new Dispatcher);
 
         $router->aliasMiddleware('can', AuthorizesResourcesMiddleware::class);
-        $router->get($method)->uses(get_class($controller).'@'.$method);
+        $router->get($method)->uses(\get_class($controller).'@'.$method);
 
         $this->assertSame(
             'caught '.$middleware,

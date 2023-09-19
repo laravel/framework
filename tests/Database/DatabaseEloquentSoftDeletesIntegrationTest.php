@@ -144,7 +144,7 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         $count = 0;
         $query = SoftDeletesTestUser::query();
         $query->chunk(2, function ($user) use (&$count) {
-            $count += count($user);
+            $count += \count($user);
         });
         $this->assertEquals(1, $count);
 
@@ -568,19 +568,19 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         // check count before soft delete
         $abigail->posts()->create(['title' => 'First Title']);
         $abigail->posts()->create(['title' => 'Second Title']);
-        $this->assertEquals(2, $abigail->posts()->count());
+        $this->assertEquals(2, $abigail->posts()->\count());
 
         // check count after soft delete
         $abigail->posts()->where('title', 'Second Title')->delete();
-        $this->assertEquals(1, $abigail->posts()->count());
+        $this->assertEquals(1, $abigail->posts()->\count());
 
         // check count after restore
         $abigail->posts()->withTrashed()->restore();
-        $this->assertEquals(2, $abigail->posts()->count());
+        $this->assertEquals(2, $abigail->posts()->\count());
 
         // check count after a force delete
         $abigail->posts()->where('title', 'Second Title')->forceDelete();
-        $this->assertEquals(1, $abigail->posts()->count());
+        $this->assertEquals(1, $abigail->posts()->\count());
     }
 
     public function testRelationAggregatesHonorsSoftDelete()
@@ -904,7 +904,7 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         $this->assertTrue($abigail->self_referencing->first()->is($taylor));
 
         $this->assertCount(0, $taylor->self_referencing);
-        $this->assertEquals(1, SoftDeletesTestUser::whereHas('self_referencing')->count());
+        $this->assertEquals(1, SoftDeletesTestUser::whereHas('self_referencing')->\count());
     }
 
     /**

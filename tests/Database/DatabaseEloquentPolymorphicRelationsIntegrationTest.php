@@ -116,7 +116,7 @@ class DatabaseEloquentPolymorphicRelationsIntegrationTest extends TestCase
         $iterations = 0;
         $post->tags()->chunkById(2, function ($tags) use (&$iterations, &$count) {
             $this->assertInstanceOf(EloquentManyToManyPolymorphicTestTag::class, $tags->first());
-            $count += $tags->count();
+            $count += $tags->\count();
             $iterations++;
         });
 

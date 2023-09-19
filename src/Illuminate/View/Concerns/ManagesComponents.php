@@ -118,12 +118,12 @@ trait ManagesComponents
 
         $slots = array_merge([
             '__default' => $defaultSlot,
-        ], $this->slots[count($this->componentStack)]);
+        ], $this->slots[\count($this->componentStack)]);
 
         return array_merge(
-            $this->componentData[count($this->componentStack)],
+            $this->componentData[\count($this->componentStack)],
             ['slot' => $defaultSlot],
-            $this->slots[count($this->componentStack)],
+            $this->slots[\count($this->componentStack)],
             ['__laravel_slots' => $slots]
         );
     }
@@ -137,11 +137,11 @@ trait ManagesComponents
      */
     public function getConsumableComponentData($key, $default = null)
     {
-        if (array_key_exists($key, $this->currentComponentData)) {
+        if (\array_key_exists($key, $this->currentComponentData)) {
             return $this->currentComponentData[$key];
         }
 
-        $currentComponent = count($this->componentStack);
+        $currentComponent = \count($this->componentStack);
 
         if ($currentComponent === 0) {
             return value($default);
@@ -150,7 +150,7 @@ trait ManagesComponents
         for ($i = $currentComponent - 1; $i >= 0; $i--) {
             $data = $this->componentData[$i] ?? [];
 
-            if (array_key_exists($key, $data)) {
+            if (\array_key_exists($key, $data)) {
                 return $data[$key];
             }
         }
@@ -168,7 +168,7 @@ trait ManagesComponents
      */
     public function slot($name, $content = null, $attributes = [])
     {
-        if (func_num_args() === 2 || $content !== null) {
+        if (\func_num_args() === 2 || $content !== null) {
             $this->slots[$this->currentComponent()][$name] = $content;
         } elseif (ob_start()) {
             $this->slots[$this->currentComponent()][$name] = '';
@@ -204,7 +204,7 @@ trait ManagesComponents
      */
     protected function currentComponent()
     {
-        return count($this->componentStack) - 1;
+        return \count($this->componentStack) - 1;
     }
 
     /**

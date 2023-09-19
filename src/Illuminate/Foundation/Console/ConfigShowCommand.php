@@ -55,7 +55,7 @@ class ConfigShowCommand extends Command
     {
         $data = config($name);
 
-        if (! is_array($data)) {
+        if (! \is_array($data)) {
             $this->title($name, $this->formatValue($data));
 
             return;
@@ -112,12 +112,12 @@ class ConfigShowCommand extends Command
     protected function formatValue($value)
     {
         return match (true) {
-            is_bool($value) => sprintf('<fg=#ef8414;options=bold>%s</>', $value ? 'true' : 'false'),
-            is_null($value) => '<fg=#ef8414;options=bold>null</>',
+            \is_bool($value) => sprintf('<fg=#ef8414;options=bold>%s</>', $value ? 'true' : 'false'),
+            \is_null($value) => '<fg=#ef8414;options=bold>null</>',
             is_numeric($value) => "<fg=#ef8414;options=bold>{$value}</>",
-            is_array($value) => '[]',
-            is_object($value) => get_class($value),
-            is_string($value) => $value,
+            \is_array($value) => '[]',
+            \is_object($value) => \get_class($value),
+            \is_string($value) => $value,
             default => print_r($value, true),
         };
     }

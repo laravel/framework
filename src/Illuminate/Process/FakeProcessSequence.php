@@ -74,7 +74,7 @@ class FakeProcessSequence
      */
     protected function toProcessResult(ProcessResultContract|FakeProcessDescription|array|string $process)
     {
-        return is_array($process) || is_string($process)
+        return \is_array($process) || \is_string($process)
                 ? new FakeProcessResult(output: $process)
                 : $process;
     }
@@ -96,7 +96,7 @@ class FakeProcessSequence
      */
     public function isEmpty()
     {
-        return count($this->processes) === 0;
+        return \count($this->processes) === 0;
     }
 
     /**
@@ -108,11 +108,11 @@ class FakeProcessSequence
      */
     public function __invoke()
     {
-        if ($this->failWhenEmpty && count($this->processes) === 0) {
+        if ($this->failWhenEmpty && \count($this->processes) === 0) {
             throw new OutOfBoundsException('A process was invoked, but the process result sequence is empty.');
         }
 
-        if (! $this->failWhenEmpty && count($this->processes) === 0) {
+        if (! $this->failWhenEmpty && \count($this->processes) === 0) {
             return value($this->emptyProcess ?? new FakeProcessResult);
         }
 

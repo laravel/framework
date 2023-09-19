@@ -54,7 +54,7 @@ class EloquentPrunableTest extends DatabaseTestCase
         $count = (new PrunableTestModel)->pruneAll();
 
         $this->assertEquals(1500, $count);
-        $this->assertEquals(3500, PrunableTestModel::count());
+        $this->assertEquals(3500, PrunableTestModel::\count());
 
         Event::assertDispatched(ModelsPruned::class, 2);
     }
@@ -72,8 +72,8 @@ class EloquentPrunableTest extends DatabaseTestCase
         $count = (new PrunableSoftDeleteTestModel)->pruneAll();
 
         $this->assertEquals(3000, $count);
-        $this->assertEquals(0, PrunableSoftDeleteTestModel::count());
-        $this->assertEquals(2000, PrunableSoftDeleteTestModel::withTrashed()->count());
+        $this->assertEquals(0, PrunableSoftDeleteTestModel::\count());
+        $this->assertEquals(2000, PrunableSoftDeleteTestModel::withTrashed()->\count());
 
         Event::assertDispatched(ModelsPruned::class, 3);
     }
@@ -93,7 +93,7 @@ class EloquentPrunableTest extends DatabaseTestCase
         $this->assertEquals(1000, $count);
         $this->assertTrue((bool) PrunableWithCustomPruneMethodTestModel::first()->pruned);
         $this->assertFalse((bool) PrunableWithCustomPruneMethodTestModel::orderBy('id', 'desc')->first()->pruned);
-        $this->assertEquals(5000, PrunableWithCustomPruneMethodTestModel::count());
+        $this->assertEquals(5000, PrunableWithCustomPruneMethodTestModel::\count());
 
         Event::assertDispatched(ModelsPruned::class, 1);
     }

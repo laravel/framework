@@ -125,7 +125,7 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
     {
         parent::__construct();
 
-        if (in_array(CreatesMatchingTest::class, class_uses_recursive($this))) {
+        if (\in_array(CreatesMatchingTest::class, class_uses_recursive($this))) {
             $this->addTestOptions();
         }
 
@@ -181,7 +181,7 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
 
         $info = $this->type;
 
-        if (in_array(CreatesMatchingTest::class, class_uses_recursive($this))) {
+        if (\in_array(CreatesMatchingTest::class, class_uses_recursive($this))) {
             if ($this->handleTestCreation($path)) {
                 $info .= ' and test';
             }
@@ -315,8 +315,8 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
      */
     protected function makeDirectory($path)
     {
-        if (! $this->files->isDirectory(dirname($path))) {
-            $this->files->makeDirectory(dirname($path), 0777, true, true);
+        if (! $this->files->isDirectory(\dirname($path))) {
+            $this->files->makeDirectory(\dirname($path), 0777, true, true);
         }
 
         return $path;
@@ -371,7 +371,7 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
      */
     protected function getNamespace($name)
     {
-        return trim(implode('\\', array_slice(explode('\\', $name), 0, -1)), '\\');
+        return trim(implode('\\', \array_slice(explode('\\', $name), 0, -1)), '\\');
     }
 
     /**
@@ -451,7 +451,7 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
     {
         $name = strtolower($name);
 
-        return in_array($name, $this->reservedNames);
+        return \in_array($name, $this->reservedNames);
     }
 
     /**
