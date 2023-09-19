@@ -5635,6 +5635,71 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testEnsureBoolean($collection)
+    {
+        $data = $collection::make([true, false]);
+        $data->ensureBoolean();
+
+        $data = $collection::make([true, false, 1]);
+        $this->expectException(UnexpectedValueException::class);
+        $data->ensureBoolean();
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testEnsureFloat($collection)
+    {
+        $data = $collection::make([1.23, 0.5]);
+        $data->ensureFloat();
+
+        $data = $collection::make([1.23, 0.5, 78]);
+        $this->expectException(UnexpectedValueException::class);
+        $data->ensureFloat();
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testEnsureInteger($collection)
+    {
+        $data = $collection::make([1, 23]);
+        $data->ensureInteger();
+
+        $data = $collection::make([1, 23, 7.8]);
+        $this->expectException(UnexpectedValueException::class);
+        $data->ensureInteger();
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testEnsureString($collection)
+    {
+        $data = $collection::make(['foo', 'bar']);
+        $data->ensureString();
+
+        $data = $collection::make(['foo', 'bar', 123]);
+        $this->expectException(UnexpectedValueException::class);
+        $data->ensureString();
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testEnsureArray($collection)
+    {
+        $data = $collection::make([[1], ['foo' => 'bar']]);
+        $data->ensureArray();
+
+        $data = $collection::make([[1], ['foo' => 'bar'], new stdClass]);
+        $this->expectException(UnexpectedValueException::class);
+        $data->ensureArray();
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testPercentageWithFlatCollection($collection)
     {
         $collection = new $collection([1, 1, 2, 2, 2, 3]);

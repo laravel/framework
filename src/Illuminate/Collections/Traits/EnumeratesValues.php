@@ -336,6 +336,96 @@ trait EnumeratesValues
     }
 
     /**
+     * Ensure that every item in the collection is a boolean.
+     *
+     * @return static<TKey, bool>
+     *
+     * @throws \UnexpectedValueException
+     */
+    public function ensureBoolean()
+    {
+        return $this->each(function ($item) {
+            if (! is_bool($item)) {
+                throw new UnexpectedValueException(
+                    sprintf("Collection should only include 'bool' items, but '%s' found.", get_debug_type($item))
+                );
+            }
+        });
+    }
+
+    /**
+     * Ensure that every item in the collection is a float.
+     *
+     * @return static<TKey, float>
+     *
+     * @throws \UnexpectedValueException
+     */
+    public function ensureFloat()
+    {
+        return $this->each(function ($item) {
+            if (! is_float($item)) {
+                throw new UnexpectedValueException(
+                    sprintf("Collection should only include 'float' items, but '%s' found.", get_debug_type($item))
+                );
+            }
+        });
+    }
+
+    /**
+     * Ensure that every item in the collection is an integer.
+     *
+     * @return static<TKey, int>
+     *
+     * @throws \UnexpectedValueException
+     */
+    public function ensureInteger()
+    {
+        return $this->each(function ($item) {
+            if (! is_int($item)) {
+                throw new UnexpectedValueException(
+                    sprintf("Collection should only include 'int' items, but '%s' found.", get_debug_type($item))
+                );
+            }
+        });
+    }
+
+    /**
+     * Ensure that every item in the collection is a string.
+     *
+     * @return static<TKey, string>
+     *
+     * @throws \UnexpectedValueException
+     */
+    public function ensureString()
+    {
+        return $this->each(function ($item) {
+            if (! is_string($item)) {
+                throw new UnexpectedValueException(
+                    sprintf("Collection should only include 'string' items, but '%s' found.", get_debug_type($item))
+                );
+            }
+        });
+    }
+
+    /**
+     * Ensure that every item in the collection is an array.
+     *
+     * @return static<TKey, array<array-key, mixed>>
+     *
+     * @throws \UnexpectedValueException
+     */
+    public function ensureArray()
+    {
+        return $this->each(function ($item) {
+            if (! is_array($item)) {
+                throw new UnexpectedValueException(
+                    sprintf("Collection should only include 'array' items, but '%s' found.", get_debug_type($item))
+                );
+            }
+        });
+    }
+
+    /**
      * Determine if the collection is not empty.
      *
      * @return bool
