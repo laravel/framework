@@ -4,8 +4,6 @@ namespace Illuminate\Support\Testing\Fakes;
 
 use Closure;
 use Exception;
-use Illuminate\Contracts\Notifications\Dispatcher as NotificationDispatcher;
-use Illuminate\Contracts\Notifications\Factory as NotificationFactory;
 use Illuminate\Contracts\Notifications\Manager as ChannelManager;
 use Illuminate\Contracts\Translation\HasLocalePreference;
 use Illuminate\Notifications\AnonymousNotifiable;
@@ -25,6 +23,13 @@ class NotificationFake implements Fake, ChannelManager
      * @var array
      */
     protected $notifications = [];
+
+    /**
+     * The default channel used to deliver messages.
+     *
+     * @var string
+     */
+    protected $defaultChannel = 'mail';
 
     /**
      * Locale used when sending notifications.
@@ -358,5 +363,36 @@ class NotificationFake implements Fake, ChannelManager
     public function sentNotifications()
     {
         return $this->notifications;
+    }
+
+    /**
+     * Get the default channel driver name.
+     *
+     * @return string
+     */
+    public function getDefaultDriver()
+    {
+        return $this->defaultChannel;
+    }
+
+    /**
+     * Get the default channel driver name.
+     *
+     * @return string
+     */
+    public function deliversVia()
+    {
+        return $this->getDefaultDriver();
+    }
+
+    /**
+     * Set the default channel driver name.
+     *
+     * @param  string  $channel
+     * @return void
+     */
+    public function deliverVia($channel)
+    {
+        $this->defaultChannel = $channel;
     }
 }
