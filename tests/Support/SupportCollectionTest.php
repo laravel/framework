@@ -5673,6 +5673,33 @@ class SupportCollectionTest extends TestCase
         $this->assertNull($collection->percentage(fn ($value) => $value === 1));
     }
 
+    public function testDynamicItemAccess()
+    {
+        $collection = new Collection(['name' => 'foo']);
+
+        $this->assertSame('foo', $collection->name);
+    }
+
+    public function testDynamicAccessThrowsExceptionForMissingItem()
+    {
+        $this->expectException(Exception::class);
+
+        $collection = new Collection(['baz' => 'foo']);
+
+        $collection->name;
+    }
+
+    public function testDynamicItemSetting()
+    {
+        $collection = new Collection(['name' => 'foo']);
+
+        $collection->name = 'baz';
+        $collection->bar = 'buzz';
+
+        $this->assertSame('baz', $collection->get('name'));
+        $this->assertSame('buzz', $collection->get('bar'));
+    }
+
     /**
      * Provides each collection class, respectively.
      *

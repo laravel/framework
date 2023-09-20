@@ -4,6 +4,7 @@ namespace Illuminate\Support;
 
 use ArrayAccess;
 use ArrayIterator;
+use Exception;
 use Illuminate\Contracts\Support\CanBeEscapedWhenCastToString;
 use Illuminate\Support\Traits\EnumeratesValues;
 use Illuminate\Support\Traits\Macroable;
@@ -23,7 +24,10 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     /**
      * @use \Illuminate\Support\Traits\EnumeratesValues<TKey, TValue>
      */
-    use EnumeratesValues, Macroable;
+    use EnumeratesValues {
+        __get as private EnumeratesValues__get;
+    }
+    use Macroable;
 
     /**
      * The items contained in the collection.
@@ -1757,5 +1761,38 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     public function offsetUnset($key): void
     {
         unset($this->items[$key]);
+    }
+
+    /**
+     * Dynamically access collection items and proxies.
+     *
+     * @param  string  $key
+     * @return mixed
+     *
+     * @throws \Exception
+     */
+    public function __get($key): mixed
+    {
+        try {
+            return $this->EnumeratesValues__get($key);
+        } catch (Exception $e) {
+        }
+
+        if (isset($this->items[$key])) {
+            return $this->items[$key];
+        }
+
+        throw new Exception("Property [{$key}] does not exist on this collection instance.");
+    }
+
+    /**
+     * Dynamically set an item on the collection.
+     *
+     * @param  TKey  $key
+     * @param  TValue  $value
+     */
+    public function __set(string $key, mixed $value): void
+    {
+        $this->items[$key] = $value;
     }
 }
