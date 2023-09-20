@@ -24,7 +24,7 @@ class EloquentTransactionUsingRefreshDatabaseTest extends DatabaseTestCase
     {
         User::observe($observer = EloquentTransactionUsingRefreshDatabaseUserObserver::resetting());
 
-        $user1 = User::create($this->newFakeUser());
+        $user1 = User::create(UserFactory::new()->raw());
 
         $this->assertTrue($user1->exists);
         $this->assertEquals(1, $observer::$calledTimes, 'Failed to assert the observer was called once.');
@@ -34,7 +34,7 @@ class EloquentTransactionUsingRefreshDatabaseTest extends DatabaseTestCase
     {
         User::observe($observer = EloquentTransactionUsingRefreshDatabaseUserObserver::resetting());
 
-        $user1 = DB::transaction(fn () => User::create($this->newFakeUser()));
+        $user1 = DB::transaction(fn () => User::create(UserFactory::new()->raw()));
 
         $this->assertTrue($user1->exists);
         $this->assertEquals(1, $observer::$calledTimes, 'Failed to assert the observer was called once.');
@@ -44,7 +44,7 @@ class EloquentTransactionUsingRefreshDatabaseTest extends DatabaseTestCase
     {
         User::observe($observer = EloquentTransactionUsingRefreshDatabaseUserObserver::resetting());
 
-        $user1 = User::createOrFirst($this->newFakeUser());
+        $user1 = User::createOrFirst(UserFactory::new()->raw());
 
         $this->assertTrue($user1->exists);
         $this->assertEquals(1, $observer::$calledTimes, 'Failed to assert the observer was called once.');
@@ -54,15 +54,10 @@ class EloquentTransactionUsingRefreshDatabaseTest extends DatabaseTestCase
     {
         User::observe($observer = EloquentTransactionUsingRefreshDatabaseUserObserver::resetting());
 
-        $user1 = DB::transaction(fn () => User::createOrFirst($this->newFakeUser()));
+        $user1 = DB::transaction(fn () => User::createOrFirst(UserFactory::new()->raw()));
 
         $this->assertTrue($user1->exists);
         $this->assertEquals(1, $observer::$calledTimes, 'Failed to assert the observer was called once.');
-    }
-
-    protected function newFakeUser(): array
-    {
-        return UserFactory::new()->make()->makeVisible('password')->toArray();
     }
 }
 
