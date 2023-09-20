@@ -901,6 +901,21 @@ class Stringable implements JsonSerializable, ArrayAccess
     }
 
     /**
+     * Take the first or last {$limit} characters.
+     *
+     * @param  int  $limit
+     * @return static
+     */
+    public function take(int $limit)
+    {
+        if ($limit < 0) {
+            return $this->substr($limit);
+        }
+
+        return $this->substr(0, $limit);
+    }
+
+    /**
      * Trim the string of the given characters.
      *
      * @param  string  $characters
