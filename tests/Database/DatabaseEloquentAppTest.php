@@ -49,6 +49,30 @@ class DatabaseEloquentAppTest extends TestCase
         $this->assertTrue($user1->exists);
         $this->assertEquals(1, $observer::$calledTimes, 'Failed to assert the observer was called once.');
     }
+
+    public function testObserverIsCalledOnTestsWithAfterCommitWhenUsingSavepoint()
+    {
+        DatabaseEloquentAppTestUser::observe($observer = DatabaseEloquentAppTestUserObserver::reseting());
+
+        $user1 = DatabaseEloquentAppTestUser::createOrFirst([
+            'email' => 'hello@example.com',
+        ]);
+
+        $this->assertTrue($user1->exists);
+        $this->assertEquals(1, $observer::$calledTimes, 'Failed to assert the observer was called once.');
+    }
+
+    public function testObserverIsCalledOnTestsWithAfterCommitWhenUsingSavepointAndInsideTransaction()
+    {
+        DatabaseEloquentAppTestUser::observe($observer = DatabaseEloquentAppTestUserObserver::reseting());
+
+        $user1 = DB::transaction(fn () => DatabaseEloquentAppTestUser::createOrFirst([
+            'email' => 'hello@example.com',
+        ]));
+
+        $this->assertTrue($user1->exists);
+        $this->assertEquals(1, $observer::$calledTimes, 'Failed to assert the observer was called once.');
+    }
 }
 
 class DatabaseEloquentAppTestUser extends Model
