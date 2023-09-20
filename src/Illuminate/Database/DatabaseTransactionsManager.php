@@ -68,17 +68,50 @@ class DatabaseTransactionsManager
      */
     public function commit($connection)
     {
-        [$forThisConnection, $forOtherConnections] = $this->transactions->partition(
+        if ($this->afterCommitCallbacksShouldBeExecuted()) {
+            [$forThisConnection, $forOtherConnections] = $this->transactions->partition(
+                fn ($transaction) => $transaction->connection == $connection
+            );
+
+            $this->transactions = $forOtherConnections->values();
+
+            $forThisConnection->map->executeCallbacks();
+
+            if ($this->transactions->isEmpty()) {
+                $this->callbacksShouldIgnore = null;
+            }
+
+            return;
+        }
+
+        $last = $this->transactions->last(
             fn ($transaction) => $transaction->connection == $connection
         );
+        $parent = $this->transactions->last(
+            fn ($transaction) => $transaction->connection == $connection && $last !== $transaction,
+        );
 
-        $this->transactions = $forOtherConnections->values();
+        $this->transactions = $this->transactions->reject(
+            fn ($transaction) => $transaction === $last,
+        )->values();
 
-        $forThisConnection->map->executeCallbacks();
+        foreach ($last?->getCallbacks() ?? [] as $callback) {
+            $parent?->addCallback($callback);
+        }
 
         if ($this->transactions->isEmpty()) {
             $this->callbacksShouldIgnore = null;
         }
+    }
+
+    /**
+     * Determine if after commit callbacks should be executed.
+     *
+     * @return bool
+     */
+    protected function afterCommitCallbacksShouldBeExecuted()
+    {
+        return $this->callbackApplicableTransactions()->count() === 1;
     }
 
     /**
