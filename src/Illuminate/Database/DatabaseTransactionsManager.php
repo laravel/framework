@@ -14,7 +14,7 @@ class DatabaseTransactionsManager
     /**
      * The database transaction that should be ignored by callbacks.
      *
-     * @var \Illuminate\Support\Collection
+     * @var \Illuminate\Support\Collection<int, \Illuminate\Database\DatabaseTransactionRecord>
      */
     protected $callbacksShouldIgnore;
 
