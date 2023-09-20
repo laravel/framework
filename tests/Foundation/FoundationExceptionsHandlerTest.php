@@ -2,7 +2,13 @@
 
 namespace Illuminate\Tests\Foundation;
 
+use Closure;
 use Exception;
+use Illuminate\Cache\ArrayStore;
+use Illuminate\Cache\NullStore;
+use Illuminate\Cache\RateLimiter;
+use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Cache\Repository;
 use Illuminate\Config\Repository as Config;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Routing\ResponseFactory as ResponseFactoryContract;
@@ -15,6 +21,8 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
 use Illuminate\Routing\ResponseFactory;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Lottery;
 use Illuminate\Support\MessageBag;
 use Illuminate\Testing\Assert;
 use Illuminate\Validation\ValidationException;
@@ -469,6 +477,233 @@ class FoundationExceptionsHandlerTest extends TestCase
         $this->handler->report($two = new RuntimeException('foo'));
 
         $this->assertSame($reported, [$one, $two]);
+    }
+
+    public function testItDoesNotThrottleExceptionsByDefault()
+    {
+        $reported = [];
+        $this->handler->reportable(function (\Throwable $e) use (&$reported) {
+            $reported[] = $e;
+
+            return false;
+        });
+
+        for ($i = 0; $i < 100; $i++) {
+            $this->handler->report(new RuntimeException("Exception {$i}"));
+        }
+
+        $this->assertCount(100, $reported);
+    }
+
+    public function testItDoesNotThrottleExceptionsWhenNullReturned()
+    {
+        $handler = new class($this->container) extends Handler
+        {
+            protected function throttle($e)
+            {
+                //
+            }
+        };
+        $reported = [];
+        $handler->reportable(function (\Throwable $e) use (&$reported) {
+            $reported[] = $e;
+
+            return false;
+        });
+
+        for ($i = 0; $i < 100; $i++) {
+            $handler->report(new RuntimeException("Exception {$i}"));
+        }
+
+        $this->assertCount(100, $reported);
+    }
+
+    public function testItDoesNotThrottleExceptionsWhenUnlimitedLimit()
+    {
+        $handler = new class($this->container) extends Handler
+        {
+            protected function throttle($e)
+            {
+                return Limit::none();
+            }
+        };
+        $reported = [];
+        $handler->reportable(function (\Throwable $e) use (&$reported) {
+            $reported[] = $e;
+
+            return false;
+        });
+
+        for ($i = 0; $i < 100; $i++) {
+            $handler->report(new RuntimeException("Exception {$i}"));
+        }
+
+        $this->assertCount(100, $reported);
+    }
+
+    public function testItCanSampleExceptionsByClass()
+    {
+        $handler = new class($this->container) extends Handler
+        {
+            protected function throttle($e)
+            {
+                return match (true) {
+                    $e instanceof RuntimeException => Lottery::odds(2, 10),
+                    default => parent::throttle($e),
+                };
+            }
+        };
+        Lottery::forceResultWithSequence([
+            true, false, false, false, false,
+            true, false, false, false, false,
+        ]);
+        $reported = [];
+        $handler->reportable(function (\Throwable $e) use (&$reported) {
+            $reported[] = $e;
+
+            return false;
+        });
+
+        for ($i = 0; $i < 10; $i++) {
+            $handler->report(new Exception("Exception {$i}"));
+            $handler->report(new RuntimeException("RuntimeException {$i}"));
+        }
+
+        [$runtimeExceptions, $baseExceptions] = collect($reported)->partition(fn ($e) => $e instanceof RuntimeException);
+        $this->assertCount(10, $baseExceptions);
+        $this->assertCount(2, $runtimeExceptions);
+    }
+
+    public function testItRescuesExceptionsWhileThrottlingAndReports()
+    {
+        $handler = new class($this->container) extends Handler
+        {
+            protected function throttle($e)
+            {
+                throw new RuntimeException('Something went wrong in the throttle method.');
+            }
+        };
+        $reported = [];
+        $handler->reportable(function (\Throwable $e) use (&$reported) {
+            $reported[] = $e;
+
+            return false;
+        });
+
+        $handler->report(new Exception('Something in the app went wrong.'));
+
+        $this->assertCount(1, $reported);
+        $this->assertSame('Something in the app went wrong.', $reported[0]->getMessage());
+    }
+
+    public function testItRescuesExceptionsIfThereIsAnIssueResolvingTheRateLimiter()
+    {
+        $handler = new class($this->container) extends Handler
+        {
+            protected function throttle($e)
+            {
+                return Limit::perDay(1);
+            }
+        };
+        $reported = [];
+        $handler->reportable(function (\Throwable $e) use (&$reported) {
+            $reported[] = $e;
+
+            return false;
+        });
+        $resolved = false;
+        $this->container->bind(RateLimiter::class, function () use (&$resolved) {
+            $resolved = true;
+
+            throw new Exception('Error resolving rate limiter.');
+        });
+
+        $handler->report(new Exception('Something in the app went wrong.'));
+
+        $this->assertTrue($resolved);
+        $this->assertCount(1, $reported);
+        $this->assertSame('Something in the app went wrong.', $reported[0]->getMessage());
+    }
+
+    public function testItRescuesExceptionsIfThereIsAnIssueWithTheRateLimiter()
+    {
+        $handler = new class($this->container) extends Handler
+        {
+            protected function throttle($e)
+            {
+                return Limit::perDay(1);
+            }
+        };
+        $reported = [];
+        $handler->reportable(function (\Throwable $e) use (&$reported) {
+            $reported[] = $e;
+
+            return false;
+        });
+        $this->container->instance(RateLimiter::class, $limiter = new class(new Repository(new NullStore)) extends RateLimiter
+        {
+            public $attempted = false;
+
+            public function attempt($key, $maxAttempts, Closure $callback, $decaySeconds = 60)
+            {
+                $this->attempted = true;
+
+                throw new Exception('Unable to connect to Redis.');
+            }
+        });
+
+        $handler->report(new Exception('Something in the app went wrong.'));
+
+        $this->assertTrue($limiter->attempted);
+        $this->assertCount(1, $reported);
+        $this->assertSame('Something in the app went wrong.', $reported[0]->getMessage());
+    }
+
+    public function testItCanRateLimitExceptions()
+    {
+        $handler = new class($this->container) extends Handler
+        {
+            protected function throttle($e)
+            {
+                return Limit::perMinute(7);
+            }
+        };
+        $reported = [];
+        $handler->reportable(function (\Throwable $e) use (&$reported) {
+            $reported[] = $e;
+
+            return false;
+        });
+        $this->container->instance(RateLimiter::class, $limiter = new class(new Repository(new ArrayStore)) extends RateLimiter
+        {
+            public $attempted = 0;
+
+            public function attempt($key, $maxAttempts, Closure $callback, $decaySeconds = 60)
+            {
+                $this->attempted++;
+
+                return parent::attempt(...func_get_args());
+            }
+        });
+        Carbon::setTestNow(Carbon::now()->startOfDay());
+
+        for ($i = 0; $i < 100; $i++) {
+            $handler->report(new Exception('Something in the app went wrong.'));
+        }
+
+        $this->assertSame(100, $limiter->attempted);
+        $this->assertCount(7, $reported);
+        $this->assertSame('Something in the app went wrong.', $reported[0]->getMessage());
+
+        Carbon::setTestNow(Carbon::now()->addMinute());
+
+        for ($i = 0; $i < 100; $i++) {
+            $handler->report(new Exception('Something in the app went wrong.'));
+        }
+
+        $this->assertSame(200, $limiter->attempted);
+        $this->assertCount(14, $reported);
+        $this->assertSame('Something in the app went wrong.', $reported[0]->getMessage());
     }
 }
 
