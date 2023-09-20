@@ -11,6 +11,131 @@ class BladePhpStatementsTest extends AbstractBladeTestCase
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
 
+    public function testMixedPhpStatementsAreCompiled()
+    {
+        $string = <<<'BLADE'
+            @php($set = true)
+            @php($set = true) @php ($set = false;) @endphp
+            @php ($set = true) @php($set = false;)@endphp
+            <div>{{ $set }}</div>
+            @php
+                $set = false;
+            @endphp
+            @php (
+                $set = false;
+            )@endphp
+            @php(
+                $set = false;
+            )@endphp
+            @php (
+                $set = false
+            )
+            @php(
+                $set = false
+            )
+            @php
+                $set = '@@php';
+            @endphp
+            BLADE;
+        $expected = <<<'PHP'
+            <?php ($set = true); ?>
+            <?php ($set = true); ?> <?php ($set = false;) ?>
+            <?php ($set = true); ?> <?php($set = false;)?>
+            <div><?php echo e($set); ?></div>
+            <?php
+                $set = false;
+            ?>
+            <?php (
+                $set = false;
+            )?>
+            <?php(
+                $set = false;
+            )?>
+            <?php (
+                $set = false
+            ); ?>
+            <?php (
+                $set = false
+            ); ?>
+            <?php
+                $set = '@@php';
+            ?>
+            PHP;
+        $this->assertEquals($expected, $this->compiler->compileString($string));
+    }
+
+    public function testCompilationOfMixedPhpStatements()
+    {
+        $string = '@php($set = true) @php ($hello = \'hi\') @php echo "Hello world" @endphp';
+        $expected = '<?php ($set = true); ?> <?php ($hello = \'hi\'); ?> <?php echo "Hello world" ?>';
+
+        $this->assertEquals($expected, $this->compiler->compileString($string));
+    }
+
+    public function testCompilationOfMixedUsageStatements()
+    {
+        $string = '@php (
+            $classes = [
+                \'admin-font-mono\', // Font weight
+            ])
+        @endphp';
+        $expected = '<?php (
+            $classes = [
+                \'admin-font-mono\', // Font weight
+            ])
+        ?>';
+
+        $this->assertEquals($expected, $this->compiler->compileString($string));
+    }
+
+    public function testMultilinePhpStatementsWithParenthesesCanBeCompiled()
+    {
+        $string = <<<'BLADE'
+            @php (
+                $classes = [
+                    'admin-font-mono'
+                ])
+            @endphp
+
+            <span class="{{ implode(' ', $classes) }}">Laravel</span>
+            BLADE;
+
+        $expected = <<<'PHP'
+            <?php (
+                $classes = [
+                    'admin-font-mono'
+                ])
+            ?>
+
+            <span class="<?php echo e(implode(' ', $classes)); ?>">Laravel</span>
+            PHP;
+
+        $this->assertEquals($expected, $this->compiler->compileString($string));
+    }
+
+    public function testMixedOfPhpStatementsCanBeCompiled()
+    {
+        $string = <<<'BLADE'
+            @php($total = 0)
+            {{-- ... --}}
+            <div>{{ $total }}</div>
+            @php
+                // ...
+            @endphp
+            BLADE;
+
+        $expected = <<<'PHP'
+            <?php ($total = 0); ?>
+
+            <div><?php echo e($total); ?></div>
+            <?php
+                // ...
+            ?>
+            PHP;
+
+        $this->assertEquals($expected, $this->compiler->compileString($string));
+    }
+
     public function testStringWithParenthesisWithEndPHP()
     {
         $string = "@php(\$data = ['related_to' => 'issue#45388'];) {{ \$data }} @endphp";
