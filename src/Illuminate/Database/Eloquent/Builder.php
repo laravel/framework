@@ -1721,9 +1721,17 @@ class Builder implements BuilderContract
      */
     public function withSavepointIfNeeded(Closure $scope): mixed
     {
-        return $this->getQuery()->getConnection()->transactionLevel() > 0
-            ? $this->getQuery()->getConnection()->transaction($scope)
-            : $scope();
+        $connection = $this->getQuery()->getConnection();
+
+        if ($connection->transactionLevel() === 0) {
+            return $scope();
+        }
+
+        return $connection->transaction(function () use ($connection, $scope) {
+            $connection->ignoreLatestTransactionForCallbacks();
+
+            return $scope();
+        });
     }
 
     /**

@@ -98,9 +98,7 @@ trait RefreshDatabase
             $connection->setEventDispatcher($dispatcher);
 
             if ($this->app->resolved('db.transactions')) {
-                $this->app->make('db.transactions')->callbacksShouldIgnore(
-                    $this->app->make('db.transactions')->getTransactions()->first()
-                );
+                $connection->ignoreLatestTransactionForCallbacks();
             }
         }
 

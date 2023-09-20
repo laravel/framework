@@ -14,7 +14,7 @@ class DatabaseTransactionsManager
     /**
      * The database transaction that should be ignored by callbacks.
      *
-     * @var \Illuminate\Database\DatabaseTransactionRecord
+     * @var \Illuminate\Support\Collection
      */
     protected $callbacksShouldIgnore;
 
@@ -26,6 +26,7 @@ class DatabaseTransactionsManager
     public function __construct()
     {
         $this->transactions = collect();
+        $this->callbacksShouldIgnore = collect();
     }
 
     /**
@@ -56,7 +57,7 @@ class DatabaseTransactionsManager
         )->values();
 
         if ($this->transactions->isEmpty()) {
-            $this->callbacksShouldIgnore = null;
+            $this->callbacksShouldIgnore = collect();
         }
     }
 
@@ -77,7 +78,7 @@ class DatabaseTransactionsManager
         $forThisConnection->map->executeCallbacks();
 
         if ($this->transactions->isEmpty()) {
-            $this->callbacksShouldIgnore = null;
+            $this->callbacksShouldIgnore = collect();
         }
     }
 
@@ -104,7 +105,7 @@ class DatabaseTransactionsManager
      */
     public function callbacksShouldIgnore(DatabaseTransactionRecord $transaction)
     {
-        $this->callbacksShouldIgnore = $transaction;
+        $this->callbacksShouldIgnore->push($transaction);
 
         return $this;
     }
@@ -117,7 +118,7 @@ class DatabaseTransactionsManager
     public function callbackApplicableTransactions()
     {
         return $this->transactions->reject(function ($transaction) {
-            return $transaction === $this->callbacksShouldIgnore;
+            return $this->callbacksShouldIgnore->contains($transaction);
         })->values();
     }
 

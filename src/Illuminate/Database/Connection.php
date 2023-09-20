@@ -1546,6 +1546,18 @@ class Connection implements ConnectionInterface
     }
 
     /**
+     * Ignores the current transaction level when calling the callbacks.
+     *
+     * @return void
+     */
+    public function ignoreLatestTransactionForCallbacks()
+    {
+        $this->transactionsManager?->callbacksShouldIgnore(
+            $this->transactionsManager?->getTransactions()?->last()
+        );
+    }
+
+    /**
      * Determine if the connection is in a "dry run".
      *
      * @return bool
