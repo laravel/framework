@@ -507,4 +507,15 @@ trait BuildsQueries
 
         return $this;
     }
+
+    /**
+     * Execute the query and get the array.
+     *
+     * @param  array|string  $columns
+     * @return array
+     */
+    public function getArray($columns = ['*'])
+    {
+        return $this->get($columns)->toArray();
+    }
 }
