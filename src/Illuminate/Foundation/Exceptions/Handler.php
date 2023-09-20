@@ -366,6 +366,17 @@ class Handler implements ExceptionHandlerContract
     }
 
     /**
+     * Throttle the given exception.
+     *
+     * @param  \Throwable  $e
+     * @return \Illuminate\Support\Lottery|\Illuminate\Cache\RateLimiting\Limit|null
+     */
+    protected function throttle(Throwable $e)
+    {
+        return Limit::none();
+    }
+
+    /**
      * Remove the given exception class from the list of exceptions that should be ignored.
      *
      * @param  string  $exception
@@ -860,16 +871,5 @@ class Handler implements ExceptionHandlerContract
     protected function isHttpException(Throwable $e)
     {
         return $e instanceof HttpExceptionInterface;
-    }
-
-    /**
-     * Throttle the given exception.
-     *
-     * @param  \Throwable  $e
-     * @return \Illuminate\Support\Lottery|\Illuminate\Cache\RateLimiting\Limit|null
-     */
-    protected function throttle(Throwable $e)
-    {
-        return Limit::none();
     }
 }
