@@ -28,7 +28,7 @@ class DatabaseEloquentAppTest extends TestCase
 
     public function testObserverIsCalledOnTestsWithAfterCommit()
     {
-        DatabaseEloquentAppTestUser::observe($observer = DatabaseEloquentAppTestUserObserver::reseting());
+        DatabaseEloquentAppTestUser::observe($observer = DatabaseEloquentAppTestUserObserver::resetting());
 
         $user1 = DatabaseEloquentAppTestUser::create([
             'email' => 'hello@example.com',
@@ -40,7 +40,7 @@ class DatabaseEloquentAppTest extends TestCase
 
     public function testObserverCalledWithAfterCommitWhenInsideTransaction()
     {
-        DatabaseEloquentAppTestUser::observe($observer = DatabaseEloquentAppTestUserObserver::reseting());
+        DatabaseEloquentAppTestUser::observe($observer = DatabaseEloquentAppTestUserObserver::resetting());
 
         $user1 = DB::transaction(fn () => DatabaseEloquentAppTestUser::create([
             'email' => 'hello@example.com',
@@ -52,7 +52,7 @@ class DatabaseEloquentAppTest extends TestCase
 
     public function testObserverIsCalledOnTestsWithAfterCommitWhenUsingSavepoint()
     {
-        DatabaseEloquentAppTestUser::observe($observer = DatabaseEloquentAppTestUserObserver::reseting());
+        DatabaseEloquentAppTestUser::observe($observer = DatabaseEloquentAppTestUserObserver::resetting());
 
         $user1 = DatabaseEloquentAppTestUser::createOrFirst([
             'email' => 'hello@example.com',
@@ -64,7 +64,7 @@ class DatabaseEloquentAppTest extends TestCase
 
     public function testObserverIsCalledOnTestsWithAfterCommitWhenUsingSavepointAndInsideTransaction()
     {
-        DatabaseEloquentAppTestUser::observe($observer = DatabaseEloquentAppTestUserObserver::reseting());
+        DatabaseEloquentAppTestUser::observe($observer = DatabaseEloquentAppTestUserObserver::resetting());
 
         $user1 = DB::transaction(fn () => DatabaseEloquentAppTestUser::createOrFirst([
             'email' => 'hello@example.com',
@@ -86,7 +86,7 @@ class DatabaseEloquentAppTestUserObserver
 
     public $afterCommit = true;
 
-    public static function reseting()
+    public static function resetting()
     {
         static::$calledTimes = 0;
 
