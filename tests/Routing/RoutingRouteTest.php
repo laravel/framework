@@ -1536,6 +1536,17 @@ class RoutingRouteTest extends TestCase
         $this->assertSame('foos/{foo}/bars/{bar}', $routes[3]->uri());
     }
 
+    public function testSingleRouteNaming()
+    {
+        $router = $this->getRouter();
+
+        $router->get('foo', fn () => null)->name('foo.index');
+        $router->name('foo.show')->get('foo/show', fn () => null);
+
+        $this->assertTrue($router->getRoutes()->hasNamedRoute('foo.index'));
+        $this->assertTrue($router->getRoutes()->hasNamedRoute('foo.show'));
+    }
+
     public function testResourceRouteNaming()
     {
         $router = $this->getRouter();

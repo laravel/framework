@@ -79,9 +79,7 @@ class RouteCollection extends AbstractRouteCollection
         // If the route has a name, we will add it to the name look-up table so that we
         // will quickly be able to find any route associate with a name and not have
         // to iterate through every route every time we need to perform a look-up.
-        if ($name = $route->getName()) {
-            $this->nameList[$name] = $route;
-        }
+        $this->addToNameList($route);
 
         // When the route is routing to a controller we will also store the action that
         // is used by the route. This will let us reverse route to controllers while
@@ -90,6 +88,19 @@ class RouteCollection extends AbstractRouteCollection
 
         if (isset($action['controller'])) {
             $this->addToActionList($action, $route);
+        }
+    }
+
+    /**
+     * Add a route to the name list.
+     *
+     * @param  \Illuminate\Routing\Route  $route
+     * @return void
+     */
+    public function addToNameList(Route $route): void
+    {
+        if ($name = $route->getName()) {
+            $this->nameList[$name] = $route;
         }
     }
 
@@ -117,9 +128,7 @@ class RouteCollection extends AbstractRouteCollection
         $this->nameList = [];
 
         foreach ($this->allRoutes as $route) {
-            if ($route->getName()) {
-                $this->nameList[$route->getName()] = $route;
-            }
+            $this->addToNameList($route);
         }
     }
 

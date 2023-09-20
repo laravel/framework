@@ -876,6 +876,10 @@ class Route
     {
         $this->action['as'] = isset($this->action['as']) ? $this->action['as'].$name : $name;
 
+        if (! is_null($this->router)) {
+            $this->router->getRoutes()->addToNameList($this);
+        }
+
         return $this;
     }
 
