@@ -181,6 +181,8 @@ class TestValidationRule implements ValidationRule
 
     public function validate($attribute, $value, $fail): void
     {
-        if ($this->param !== $value) $fail('');
+        if ($this->param !== $value) {
+            $fail('');
+        }
     }
 }
