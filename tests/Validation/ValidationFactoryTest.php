@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Validation;
 
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Translation\Translator as TranslatorInterface;
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Validation\Factory;
 use Illuminate\Validation\PresenceVerifierInterface;
 use Illuminate\Validation\Validator;
@@ -108,6 +109,22 @@ class ValidationFactoryTest extends TestCase
         $this->assertTrue($validator->passes());
     }
 
+    public function testValidatorCanBeExtendedWithValidationRule()
+    {
+        $translator = m::mock(TranslatorInterface::class);
+        $translator->shouldReceive('get')->andReturn('');
+
+        $factory = new Factory($translator);
+        $factory->extend('foo', TestValidationRule::class);
+
+        $validator = $factory->make(['foo' => 'bar'], ['foo' => 'foo']);
+        $this->assertEquals(['foo' => TestValidationRule::class], $validator->extensions);
+        $this->assertTrue($validator->passes());
+
+        $validator = $factory->make(['foo' => 'bar'], ['foo' => 'foo:foo']);
+        $this->assertFalse($validator->passes());
+    }
+
     public function testExcludeAndIncludeUnvalidatedArrayKeys()
     {
         $translator = m::mock(TranslatorInterface::class);
@@ -150,5 +167,20 @@ class ValidationFactoryTest extends TestCase
         $this->assertNull($factory->getContainer());
 
         $this->assertSame($container, $factory->setContainer($container)->getContainer());
+    }
+}
+
+class TestValidationRule implements ValidationRule
+{
+    public $param;
+
+    public function __construct(string $param = 'bar')
+    {
+        $this->param = $param;
+    }
+
+    public function validate($attribute, $value, $fail): void
+    {
+        if ($this->param !== $value) $fail('');
     }
 }

@@ -8,6 +8,7 @@ use Illuminate\Contracts\Translation\Translator;
 use Illuminate\Contracts\Validation\DataAwareRule;
 use Illuminate\Contracts\Validation\ImplicitRule;
 use Illuminate\Contracts\Validation\Rule as RuleContract;
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Contracts\Validation\Validator as ValidatorContract;
 use Illuminate\Contracts\Validation\ValidatorAwareRule;
 use Illuminate\Support\Arr;
@@ -1576,7 +1577,31 @@ class Validator implements ValidatorContract
     {
         [$class, $method] = Str::parseCallback($callback, 'validate');
 
+        $interfaces = class_implements($class);
+
+        if ($interfaces && in_array(ValidationRule::class, $interfaces)) {
+            return $this->callValidationRuleExtension($class, $parameters);
+        }
+
         return $this->container->make($class)->{$method}(...array_values($parameters));
+    }
+
+    /**
+     * Call a validation rule based validator extension.
+     *
+     * @param  string  $class
+     * @param  array  $parameters
+     * @return bool
+     */
+    protected function callValidationRuleExtension($class, $parameters)
+    {
+        [$attribute, $value, $parameters, $validator] = $parameters;
+
+        $rule = InvokableValidationRule::make(new $class(...$parameters));
+
+        $rule->setValidator($validator);
+
+        return $rule->passes($attribute, $value);
     }
 
     /**
