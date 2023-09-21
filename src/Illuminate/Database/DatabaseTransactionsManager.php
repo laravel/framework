@@ -76,7 +76,7 @@ class DatabaseTransactionsManager
      * @param  int  $level
      * @return void
      */
-    public function commit($connection, $level)
+    public function commit($connection, $level = 1)
     {
         // If the transaction level being commited reaches 1 (meaning it was the root
         // transaction), we'll run the callbacks. In test mode, since we wrap each
