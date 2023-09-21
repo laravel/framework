@@ -78,7 +78,10 @@ class DatabaseTransactionsManager
      */
     public function commit($connection, $level)
     {
-        if ($level == 0 || ($this->isRunningInTestMode() && $level == 1)) {
+        // If the transaction level being commited reaches 1 (meaning it was the root
+        // transaction), we'll run the callbacks. In test mode, since we wrap each
+        // test in a transaction, we'll run the callbacks when reaching level 2.
+        if ($level == 1 || ($this->isRunningInTestMode() && $level == 2)) {
             [$forThisConnection, $forOtherConnections] = $this->transactions->partition(
                 fn ($transaction) => $transaction->connection == $connection
             );
