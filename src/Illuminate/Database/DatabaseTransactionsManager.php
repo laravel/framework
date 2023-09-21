@@ -93,16 +93,6 @@ class DatabaseTransactionsManager
     }
 
     /**
-     * Checks if the transaction manager is running in test mode.
-     *
-     * @return bool
-     */
-    public function isRunningInTestMode()
-    {
-        return $this->callbacksTransactionManagerTestMode;
-    }
-
-    /**
      * Register a transaction callback.
      *
      * @param  callable  $callback
@@ -110,6 +100,9 @@ class DatabaseTransactionsManager
      */
     public function addCallback($callback)
     {
+        // If there are no transactions, we'll run the callbacks right away. Also, we'll run it
+        // right away when we're in test mode and we only have the wrapping transaction. For
+        // every other case, we'll queue up the callback to run after the commit happens.
         if ($this->transactions->isEmpty() || ($this->isRunningInTestMode() && $this->transactions->count() == 1)) {
             return $callback();
         }
@@ -125,5 +118,15 @@ class DatabaseTransactionsManager
     public function getTransactions()
     {
         return $this->transactions;
+    }
+
+    /**
+     * Checks if the transaction manager is running in test mode.
+     *
+     * @return bool
+     */
+    protected function isRunningInTestMode()
+    {
+        return $this->callbacksTransactionManagerTestMode;
     }
 }
