@@ -287,8 +287,8 @@ class ThrottleRequests
         ];
 
         if (! is_null($retryAfter)) {
-            $headers['Retry-After'] = $retryAfter;
-            $headers['X-RateLimit-Reset'] = $this->availableAt($retryAfter);
+            $headers['Retry-After'] = $retryAfter + 1;
+            $headers['X-RateLimit-Reset'] = $this->availableAt($retryAfter + 1);
         }
 
         return $headers;
