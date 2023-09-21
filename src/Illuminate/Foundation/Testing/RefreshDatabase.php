@@ -98,7 +98,7 @@ trait RefreshDatabase
             $connection->setEventDispatcher($dispatcher);
 
             if ($this->app->resolved('db.transactions')) {
-                $this->app->make('db.transactions')->withCallbacksExecutionInTestMode();
+                $this->app->make('db.transactions')->withAfterCommitCallbacksInTestMode();
             }
         }
 

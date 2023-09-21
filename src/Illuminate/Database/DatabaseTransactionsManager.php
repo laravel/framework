@@ -16,7 +16,7 @@ class DatabaseTransactionsManager
      *
      * @var bool
      */
-    protected $callbacksTransactionManagerTestMode = false;
+    protected $afterCommitCallbacksInTestMode = false;
 
     /**
      * Create a new database transactions manager instance.
@@ -26,7 +26,7 @@ class DatabaseTransactionsManager
     public function __construct()
     {
         $this->transactions = collect();
-        $this->callbacksTransactionManagerTestMode = false;
+        $this->afterCommitCallbacksInTestMode = false;
     }
 
     /**
@@ -34,9 +34,9 @@ class DatabaseTransactionsManager
      *
      * @return self
      */
-    public function withCallbacksExecutionInTestMode()
+    public function withAfterCommitCallbacksInTestMode()
     {
-        $this->callbacksTransactionManagerTestMode = true;
+        $this->afterCommitCallbacksInTestMode = true;
 
         return $this;
     }
@@ -81,7 +81,7 @@ class DatabaseTransactionsManager
         // If the transaction level being commited reaches 1 (meaning it was the root
         // transaction), we'll run the callbacks. In test mode, since we wrap each
         // test in a transaction, we'll run the callbacks when reaching level 2.
-        if ($level == 1 || ($this->isRunningInTestMode() && $level == 2)) {
+        if ($level == 1 || ($this->afterCommitCallbacksInTestMode && $level == 2)) {
             [$forThisConnection, $forOtherConnections] = $this->transactions->partition(
                 fn ($transaction) => $transaction->connection == $connection
             );
@@ -103,7 +103,7 @@ class DatabaseTransactionsManager
         // If there are no transactions, we'll run the callbacks right away. Also, we'll run it
         // right away when we're in test mode and we only have the wrapping transaction. For
         // every other case, we'll queue up the callback to run after the commit happens.
-        if ($this->transactions->isEmpty() || ($this->isRunningInTestMode() && $this->transactions->count() == 1)) {
+        if ($this->transactions->isEmpty() || ($this->afterCommitCallbacksInTestMode && $this->transactions->count() == 1)) {
             return $callback();
         }
 
@@ -118,15 +118,5 @@ class DatabaseTransactionsManager
     public function getTransactions()
     {
         return $this->transactions;
-    }
-
-    /**
-     * Checks if the transaction manager is running in test mode.
-     *
-     * @return bool
-     */
-    protected function isRunningInTestMode()
-    {
-        return $this->callbacksTransactionManagerTestMode;
     }
 }
