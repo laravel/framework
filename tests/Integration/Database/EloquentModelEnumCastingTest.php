@@ -9,7 +9,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
-include 'Enums.php';
+include_once 'Enums.php';
 
 class EloquentModelEnumCastingTest extends DatabaseTestCase
 {

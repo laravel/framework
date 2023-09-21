@@ -163,7 +163,7 @@ class Repository implements ArrayAccess, CacheContract
         if (is_null($value)) {
             $this->event(new CacheMissed($key));
 
-            return isset($keys[$key]) ? value($keys[$key]) : null;
+            return (isset($keys[$key]) && ! array_is_list($keys)) ? value($keys[$key]) : null;
         }
 
         // If we found a valid value we will fire the "hit" event and return the value

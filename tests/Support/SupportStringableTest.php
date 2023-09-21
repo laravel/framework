@@ -123,6 +123,12 @@ class SupportStringableTest extends TestCase
         $this->assertTrue($stringable->matchAll('/nothing/')->isEmpty());
     }
 
+    public function testTake()
+    {
+        $this->assertSame('ab', (string) $this->stringable('abcdef')->take(2));
+        $this->assertSame('ef', (string) $this->stringable('abcdef')->take(-2));
+    }
+
     public function testTest()
     {
         $stringable = $this->stringable('foo bar');
@@ -1016,6 +1022,23 @@ class SupportStringableTest extends TestCase
         $this->assertSame(1, $this->stringable('laravelPHPFramework')->substrCount('a', 1, 2));
         $this->assertSame(3, $this->stringable('laravelPHPFramework')->substrCount('a', 1, -2));
         $this->assertSame(1, $this->stringable('laravelPHPFramework')->substrCount('a', -10, -3));
+    }
+
+    public function testPosition()
+    {
+        $this->assertSame(7, $this->stringable('Hello, World!')->position('W'));
+        $this->assertSame(10, $this->stringable('This is a test string.')->position('test'));
+        $this->assertSame(23, $this->stringable('This is a test string, test again.')->position('test', 15));
+        $this->assertSame(0, $this->stringable('Hello, World!')->position('Hello'));
+        $this->assertSame(7, $this->stringable('Hello, World!')->position('World!'));
+        $this->assertSame(10, $this->stringable('This is a tEsT string.')->position('tEsT', 0, 'UTF-8'));
+        $this->assertSame(7, $this->stringable('Hello, World!')->position('W', -6));
+        $this->assertSame(18, $this->stringable('Äpfel, Birnen und Kirschen')->position('Kirschen', -10, 'UTF-8'));
+        $this->assertSame(9, $this->stringable('@%€/=!"][$')->position('$', 0, 'UTF-8'));
+        $this->assertFalse($this->stringable('Hello, World!')->position('w', 0, 'UTF-8'));
+        $this->assertFalse($this->stringable('Hello, World!')->position('X', 0, 'UTF-8'));
+        $this->assertFalse($this->stringable('')->position('test'));
+        $this->assertFalse($this->stringable('Hello, World!')->position('X'));
     }
 
     public function testSubstrReplace()
