@@ -388,6 +388,23 @@ class Validator implements ValidatorContract
     }
 
     /**
+     * Sort arrays by key to preserve original order.
+     *
+     * @param  array  $data
+     * @return array
+     */
+    protected function sortArraysByKey($data)
+    {
+        foreach ($data as &$value) {
+            if(is_array($value)) {
+                ksort($value);
+            }
+        }
+
+        return $data;
+    }
+
+    /**
      * Add an after validation callback.
      *
      * @param  callable|array|string  $callback
@@ -577,7 +594,7 @@ class Validator implements ValidatorContract
             }
         }
 
-        return $this->replacePlaceholders($results);
+        return $this->sortArraysByKey($this->replacePlaceholders($results));
     }
 
     /**
