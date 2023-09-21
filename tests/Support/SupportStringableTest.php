@@ -30,27 +30,27 @@ class SupportStringableTest extends TestCase
     public function testIsAlphanumeric()
     {
         // Alphanumeric strings
-        $this->assertTrue($this->stringable("abc123")->isAlphanumeric());
-        $this->assertTrue($this->stringable("ABC456")->isAlphanumeric());
-        $this->assertTrue($this->stringable("123XYZ")->isAlphanumeric());
-        $this->assertTrue($this->stringable("123AbC")->isAlphanumeric());
-        $this->assertTrue($this->stringable("xyzXYZ")->isAlphanumeric());
-        $this->assertTrue($this->stringable("987654")->isAlphanumeric());
+        $this->assertTrue($this->stringable('abc123')->isAlphanumeric());
+        $this->assertTrue($this->stringable('ABC456')->isAlphanumeric());
+        $this->assertTrue($this->stringable('123XYZ')->isAlphanumeric());
+        $this->assertTrue($this->stringable('123AbC')->isAlphanumeric());
+        $this->assertTrue($this->stringable('xyzXYZ')->isAlphanumeric());
+        $this->assertTrue($this->stringable('987654')->isAlphanumeric());
 
         // Non-alphanumeric strings
-        $this->assertFalse($this->stringable("abc 123")->isAlphanumeric());
-        $this->assertFalse($this->stringable("abc!123")->isAlphanumeric());
-        $this->assertFalse($this->stringable("   ")->isAlphanumeric());
-        $this->assertFalse($this->stringable("abc_123")->isAlphanumeric());
-        $this->assertFalse($this->stringable("1.2.3")->isAlphanumeric());
-        $this->assertFalse($this->stringable("12 34")->isAlphanumeric());
+        $this->assertFalse($this->stringable('abc 123')->isAlphanumeric());
+        $this->assertFalse($this->stringable('abc!123')->isAlphanumeric());
+        $this->assertFalse($this->stringable('   ')->isAlphanumeric());
+        $this->assertFalse($this->stringable('abc_123')->isAlphanumeric());
+        $this->assertFalse($this->stringable('1.2.3')->isAlphanumeric());
+        $this->assertFalse($this->stringable('12 34')->isAlphanumeric());
 
         // Edge cases
-        $this->assertFalse($this->stringable("")->isAlphanumeric()); // Empty string
-        $this->assertTrue($this->stringable("1")->isAlphanumeric()); // Single alphanumeric character
-        $this->assertFalse($this->stringable(" ")->isAlphanumeric()); // Single space
+        $this->assertFalse($this->stringable('')->isAlphanumeric()); // Empty string
+        $this->assertTrue($this->stringable('1')->isAlphanumeric()); // Single alphanumeric character
+        $this->assertFalse($this->stringable(' ')->isAlphanumeric()); // Single space
         $this->assertFalse($this->stringable("\n\t")->isAlphanumeric()); // Newlines and tabs
-        $this->assertFalse($this->stringable("Ø12")->isAlphanumeric()); // Special characters (UTF-8)
+        $this->assertFalse($this->stringable('Ø12')->isAlphanumeric()); // Special characters (UTF-8)
         $this->assertFalse($this->stringable(" \t")->isAlphanumeric()); // Whitespace characters
     }
 

@@ -432,7 +432,7 @@ class Str
     /**
      * Determine if a given string is alphanumeric.
      *
-     * @param $value
+     * @param  $value
      * @return bool
      */
     public static function isAlphanumeric($value)
