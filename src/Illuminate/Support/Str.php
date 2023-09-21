@@ -437,7 +437,11 @@ class Str
      */
     public static function isAlphanumeric($value)
     {
-        return ctype_alnum((string) $value);
+        if (function_exists('ctype_alnum')) {
+            return ctype_alnum((string) $value);
+        }
+
+        return preg_match('/^[a-zA-Z0-9]+$/', $value) === 1;
     }
 
     /**
