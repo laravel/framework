@@ -59,6 +59,30 @@ class EloquentTransactionUsingRefreshDatabaseTest extends DatabaseTestCase
         $this->assertTrue($user1->exists);
         $this->assertEquals(1, $observer::$calledTimes, 'Failed to assert the observer was called once.');
     }
+
+    public function testObserverIsCalledEvenWhenDeeplyNestingTransactions()
+    {
+        User::observe($observer = EloquentTransactionUsingRefreshDatabaseUserObserver::resetting());
+
+        $user1 = DB::transaction(function () use ($observer) {
+            return tap(DB::transaction(function () use ($observer) {
+                return tap(DB::transaction(function () use ($observer) {
+                    return tap(DB::transaction(function () {
+                        return User::createOrFirst(UserFactory::new()->raw());
+                    }), function () use ($observer) {
+                        $this->assertCount(0, $observer::$calledTimes, 'Should not have been called');
+                    });
+                }), function () use ($observer) {
+                    $this->assertCount(0, $observer::$calledTimes, 'Should not have been called');
+                });
+            }), function () use ($observer) {
+                $this->assertCount(0, $observer::$calledTimes, 'Should not have been called');
+            });
+        });
+
+        $this->assertTrue($user1->exists);
+        $this->assertEquals(1, $observer::$calledTimes, 'Failed to assert the observer was called once.');
+    }
 }
 
 class EloquentTransactionUsingRefreshDatabaseUserObserver
