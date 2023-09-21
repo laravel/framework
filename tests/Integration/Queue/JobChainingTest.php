@@ -285,6 +285,74 @@ class JobChainingTest extends TestCase
         $this->assertEquals(['c1', 'c2', 'b1', 'b2', 'b3', 'b4', 'c3'], JobRunRecorder::$results);
     }
 
+    public function testDynamicBatchCanBeAddedToChain()
+    {
+        Bus::chain([
+            new JobChainingNamedTestJob('c1'),
+            new JobChainingNamedTestJob('c2'),
+            Bus::batch([
+                new JobChainingTestBatchedJob('b1'),
+                new JobChainingTestBatchedJob('b2', times: 4),
+                new JobChainingTestBatchedJob('b3'),
+                new JobChainingTestBatchedJob('b4'),
+            ]),
+            new JobChainingNamedTestJob('c3'),
+        ])->dispatch();
+
+        $this->assertEquals(['c1', 'c2', 'b1', 'b2-0', 'b2-1', 'b2-2', 'b2-3', 'b2', 'b3', 'b4', 'c3'], JobRunRecorder::$results);
+    }
+
+    public function testChainBatchChain()
+    {
+        Bus::chain([
+            new JobChainingNamedTestJob('c1'),
+            new JobChainingNamedTestJob('c2'),
+            Bus::batch([
+                [
+                    new JobChainingNamedTestJob('bc1'),
+                    new JobChainingNamedTestJob('bc2'),
+                ],
+                new JobChainingTestBatchedJob('b1'),
+                new JobChainingTestBatchedJob('b2', times: 4),
+                new JobChainingTestBatchedJob('b3'),
+                new JobChainingTestBatchedJob('b4'),
+            ]),
+            new JobChainingNamedTestJob('c3'),
+        ])->dispatch();
+
+        $this->assertEquals(['c1', 'c2', 'bc1', 'bc2', 'b1', 'b2-0', 'b2-1', 'b2-2', 'b2-3', 'b2', 'b3', 'b4', 'c3'], JobRunRecorder::$results);
+    }
+
+    /**
+     * @group debug
+     *
+     * @return void
+     */
+    public function testChainBatchChainBatch()
+    {
+        Bus::chain([
+            new JobChainingNamedTestJob('c1'),
+            new JobChainingNamedTestJob('c2'),
+            Bus::batch([
+                [
+                    new JobChainingNamedTestJob('bc1'),
+                    new JobChainingNamedTestJob('bc2'),
+                    Bus::batch([
+                        new JobChainingTestBatchedJob('bb1'),
+                        new JobChainingTestBatchedJob('bb2'),
+                    ]),
+                ],
+                new JobChainingTestBatchedJob('b1'),
+                new JobChainingTestBatchedJob('b2', times: 4),
+                new JobChainingTestBatchedJob('b3'),
+                new JobChainingTestBatchedJob('b4'),
+            ]),
+            new JobChainingNamedTestJob('c3'),
+        ])->dispatch();
+
+        $this->assertEquals(['c1', 'c2', 'bc1', 'bc2', 'bb1', 'bb2', 'b1', 'b2-0', 'b2-1', 'b2-2', 'b2-3', 'b2', 'b3', 'b4', 'c3'], JobRunRecorder::$results);
+    }
+
     public function testBatchCatchCallbacks()
     {
         Bus::chain([
@@ -445,7 +513,7 @@ class JobChainingTestThrowJob implements ShouldQueue
 
 class JobChainingNamedTestJob implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable;
+    use Batchable, Dispatchable, InteractsWithQueue, Queueable;
 
     public static $results = [];
 
@@ -468,13 +536,19 @@ class JobChainingTestBatchedJob implements ShouldQueue
 
     public string $id;
 
-    public function __construct(string $id)
+    public int $times;
+
+    public function __construct(string $id, int $times = 0)
     {
         $this->id = $id;
+        $this->times = $times;
     }
 
     public function handle()
     {
+        for ($i = 0; $i < $this->times; $i++) {
+            $this->batch()->add(new JobChainingTestBatchedJob($this->id.'-'.$i));
+        }
         JobRunRecorder::record($this->id);
     }
 }

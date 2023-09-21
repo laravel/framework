@@ -20,7 +20,7 @@ class ChainedBatch implements ShouldQueue
 
     public function __construct(PendingBatch $batch)
     {
-        $this->jobs = $batch->jobs;
+        $this->jobs = static::prepareNestedBatches($batch->jobs);
         $this->options = $batch->options;
         $this->name = $batch->name;
     }
@@ -41,7 +41,7 @@ class ChainedBatch implements ShouldQueue
             $batch->onConnection($this->connection);
         }
 
-        foreach ($this->chainCatchCallbacks as $cb) {
+        foreach ($this->chainCatchCallbacks ?? [] as $cb) {
             $batch->catch($cb);
         }
 
@@ -65,5 +65,23 @@ class ChainedBatch implements ShouldQueue
 
             $this->chained = [];
         }
+    }
+
+    public static function prepareNestedBatches(Collection $jobs): Collection
+    {
+        foreach ($jobs as $k => $job) {
+            if (is_array($job)) {
+                $jobs[$k] = static::prepareNestedBatches(collect($job))->all();
+            }
+            if ($job instanceof Collection) {
+                $jobs[$k] = static::prepareNestedBatches($job);
+            }
+
+            if ($job instanceof PendingBatch) {
+                $jobs[$k] = new ChainedBatch($job);
+            }
+        }
+
+        return $jobs;
     }
 }
