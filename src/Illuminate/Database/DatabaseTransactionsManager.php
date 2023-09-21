@@ -73,7 +73,7 @@ class DatabaseTransactionsManager
      * Commit the active database transaction.
      *
      * @param  string  $connection
-     * @param  int     $level
+     * @param  int  $level
      * @return void
      */
     public function commit($connection, $level)
