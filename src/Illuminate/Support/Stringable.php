@@ -315,6 +315,16 @@ class Stringable implements JsonSerializable, ArrayAccess
     }
 
     /**
+     * Determine if string is alphanumeric.
+     *
+     * @return bool
+     */
+    public function isAlphanumeric()
+    {
+        return Str::isAlphanumeric($this->value);
+    }
+
+    /**
      * Determine if a given string is 7 bit ASCII.
      *
      * @return bool

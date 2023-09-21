@@ -405,6 +405,33 @@ class SupportStrTest extends TestCase
         $this->assertTrue(Str::is([null], null));
     }
 
+    public function testIsAlphanumeric()
+    {
+        // Alphanumeric strings
+        $this->assertTrue(Str::isAlphanumeric("abc123"));
+        $this->assertTrue(Str::isAlphanumeric("ABC456"));
+        $this->assertTrue(Str::isAlphanumeric("123XYZ"));
+        $this->assertTrue(Str::isAlphanumeric("123AbC"));
+        $this->assertTrue(Str::isAlphanumeric("xyzXYZ"));
+        $this->assertTrue(Str::isAlphanumeric("987654"));
+
+        // Non-alphanumeric strings
+        $this->assertFalse(Str::isAlphanumeric("abc 123"));
+        $this->assertFalse(Str::isAlphanumeric("abc!123"));
+        $this->assertFalse(Str::isAlphanumeric("   "));
+        $this->assertFalse(Str::isAlphanumeric("abc_123"));
+        $this->assertFalse(Str::isAlphanumeric("1.2.3"));
+        $this->assertFalse(Str::isAlphanumeric("12 34"));
+
+        // Edge cases
+        $this->assertFalse(Str::isAlphanumeric("")); // Empty string
+        $this->assertTrue(Str::isAlphanumeric("1")); // Single alphanumeric character
+        $this->assertFalse(Str::isAlphanumeric(" ")); // Single space
+        $this->assertFalse(Str::isAlphanumeric("\n\t")); // Newlines and tabs
+        $this->assertFalse(Str::isAlphanumeric("Ø12")); // Special characters (UTF-8)
+        $this->assertFalse(Str::isAlphanumeric(" \t")); // Whitespace characters
+    }
+
     public function testIsUrl()
     {
         $this->assertTrue(Str::isUrl('https://laravel.com'));

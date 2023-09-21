@@ -430,6 +430,17 @@ class Str
     }
 
     /**
+     * Determine if a given string is alphanumeric.
+     *
+     * @param $value
+     * @return bool
+     */
+    public static function isAlphanumeric($value)
+    {
+        return ctype_alnum((string) $value);
+    }
+
+    /**
      * Determine if a given string is 7 bit ASCII.
      *
      * @param  string  $value
