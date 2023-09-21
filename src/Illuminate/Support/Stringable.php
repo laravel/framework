@@ -209,7 +209,7 @@ class Stringable implements JsonSerializable, ArrayAccess
      */
     public function convertCase(int $mode = MB_CASE_FOLD, ?string $encoding = 'UTF-8')
     {
-        return Str::convertCase($this->value, $mode, $encoding);
+        return new static(Str::convertCase($this->value, $mode, $encoding));
     }
 
     /**
