@@ -396,7 +396,7 @@ class Validator implements ValidatorContract
     protected function sortArraysByKey($data)
     {
         foreach ($data as &$value) {
-            if(is_array($value)) {
+            if (is_array($value)) {
                 ksort($value);
             }
         }
