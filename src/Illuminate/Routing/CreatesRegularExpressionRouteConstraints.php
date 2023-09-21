@@ -70,7 +70,7 @@ trait CreatesRegularExpressionRouteConstraints
      */
     public function whereIn($parameters, $values)
     {
-        if (enum_exists($values)) {
+        if (is_string($values) && enum_exists($values)) {
             $values = array_column($values::cases(), 'value');
         }
 
