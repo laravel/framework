@@ -12,11 +12,11 @@ class DatabaseTransactionsManager
     protected $transactions;
 
     /**
-     * The database transaction that should be ignored by callbacks.
+     * When in test mode, we'll run the after commit callbacks on the top-level transaction.
      *
-     * @var \Illuminate\Support\Collection<int, \Illuminate\Database\DatabaseTransactionRecord>
+     * @var bool
      */
-    protected $callbacksShouldIgnore;
+    protected $callbacksTransactionManagerTestMode = false;
 
     /**
      * Create a new database transactions manager instance.
@@ -26,7 +26,19 @@ class DatabaseTransactionsManager
     public function __construct()
     {
         $this->transactions = collect();
-        $this->callbacksShouldIgnore = collect();
+        $this->callbacksTransactionManagerTestMode = false;
+    }
+
+    /**
+     * Sets the transaction manager to test mode.
+     *
+     * @return self
+     */
+    public function withCallbacksExecutionInTestMode()
+    {
+        $this->callbacksTransactionManagerTestMode = true;
+
+        return $this;
     }
 
     /**
@@ -55,31 +67,36 @@ class DatabaseTransactionsManager
         $this->transactions = $this->transactions->reject(
             fn ($transaction) => $transaction->connection == $connection && $transaction->level > $level
         )->values();
-
-        if ($this->transactions->isEmpty()) {
-            $this->callbacksShouldIgnore = collect();
-        }
     }
 
     /**
      * Commit the active database transaction.
      *
      * @param  string  $connection
+     * @param  int     $level
      * @return void
      */
-    public function commit($connection)
+    public function commit($connection, $level)
     {
-        [$forThisConnection, $forOtherConnections] = $this->transactions->partition(
-            fn ($transaction) => $transaction->connection == $connection
-        );
+        if ($level == 0 || ($this->isRunningInTestMode() && $level == 1)) {
+            [$forThisConnection, $forOtherConnections] = $this->transactions->partition(
+                fn ($transaction) => $transaction->connection == $connection
+            );
 
-        $this->transactions = $forOtherConnections->values();
+            $this->transactions = $forOtherConnections->values();
 
-        $forThisConnection->map->executeCallbacks();
-
-        if ($this->transactions->isEmpty()) {
-            $this->callbacksShouldIgnore = collect();
+            $forThisConnection->map->executeCallbacks();
         }
+    }
+
+    /**
+     * Checks if the transaction manager is running in test mode.
+     *
+     * @return bool
+     */
+    public function isRunningInTestMode()
+    {
+        return $this->callbacksTransactionManagerTestMode;
     }
 
     /**
@@ -90,36 +107,11 @@ class DatabaseTransactionsManager
      */
     public function addCallback($callback)
     {
-        if ($current = $this->callbackApplicableTransactions()->last()) {
-            return $current->addCallback($callback);
+        if ($this->transactions->isEmpty() || ($this->isRunningInTestMode() && $this->transactions->count() == 1)) {
+            return $callback();
         }
 
-        $callback();
-    }
-
-    /**
-     * Specify that callbacks should ignore the given transaction when determining if they should be executed.
-     *
-     * @param  \Illuminate\Database\DatabaseTransactionRecord  $transaction
-     * @return $this
-     */
-    public function callbacksShouldIgnore(DatabaseTransactionRecord $transaction)
-    {
-        $this->callbacksShouldIgnore->push($transaction);
-
-        return $this;
-    }
-
-    /**
-     * Get the transactions that are applicable to callbacks.
-     *
-     * @return \Illuminate\Support\Collection
-     */
-    public function callbackApplicableTransactions()
-    {
-        return $this->transactions->reject(function ($transaction) {
-            return $this->callbacksShouldIgnore->contains($transaction);
-        })->values();
+        return $this->transactions->last()->addCallback($callback);
     }
 
     /**
