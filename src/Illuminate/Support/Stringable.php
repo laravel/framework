@@ -201,6 +201,18 @@ class Stringable implements JsonSerializable, ArrayAccess
     }
 
     /**
+     * Convert the case of a string.
+     *
+     * @param  int  $mode
+     * @param  string  $encoding
+     * @return string
+     */
+    public function convertCase(int $mode = MB_CASE_FOLD, ?string $encoding = 'UTF-8')
+    {
+        return new static(Str::convertCase($this->value, $mode, $encoding));
+    }
+
+    /**
      * Get the parent directory's path.
      *
      * @param  int  $levels
