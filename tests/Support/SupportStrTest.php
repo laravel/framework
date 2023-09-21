@@ -501,6 +501,17 @@ class SupportStrTest extends TestCase
         $this->assertEquals(11, Str::length('foo bar baz', 'UTF-8'));
     }
 
+    public function testNumbers()
+    {
+        $this->assertSame('5551234567', Str::numbers('(555) 123-4567'));
+        $this->assertSame('443', Str::numbers('L4r4v3l!'));
+        $this->assertSame('', Str::numbers('Laravel!'));
+
+        $arrayValue = ['(555) 123-4567', 'L4r4v3l', 'Laravel!'];
+        $arrayExpected = ['5551234567', '443', ''];
+        $this->assertSame($arrayExpected, Str::numbers($arrayValue));
+    }
+
     public function testRandom()
     {
         $this->assertEquals(16, strlen(Str::random()));
