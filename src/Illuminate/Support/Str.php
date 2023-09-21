@@ -579,6 +579,17 @@ class Str
     }
 
     /**
+     * Remove all non-numeric characters from a string or an array of strings.
+     *
+     * @param string|string[] $value
+     * @return string|string[]
+     */
+    public static function numbers(string|array $value): string|array
+    {
+        return preg_replace('/[^0-9]/', '', $value);
+    }
+
+    /**
      * Convert the given string to lower-case.
      *
      * @param  string  $value
