@@ -65,11 +65,15 @@ trait CreatesRegularExpressionRouteConstraints
      * Specify that the given route parameters must be one of the given values.
      *
      * @param  array|string  $parameters
-     * @param  array  $values
+     * @param  array|string  $values
      * @return $this
      */
-    public function whereIn($parameters, array $values)
+    public function whereIn($parameters, $values)
     {
+        if (enum_exists($values)) {
+            $values = array_column($values::cases(), 'value');
+        }
+
         return $this->assignExpressionToParameters($parameters, implode('|', $values));
     }
 
