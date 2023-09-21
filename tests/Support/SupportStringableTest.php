@@ -1024,7 +1024,7 @@ class SupportStringableTest extends TestCase
         $this->assertSame(1, $this->stringable('laravelPHPFramework')->substrCount('a', -10, -3));
     }
 
-    public function testSubstrPos()
+    public function testPosition()
     {
         $this->assertSame(7, $this->stringable('Hello, World!')->position('W'));
         $this->assertSame(10, $this->stringable('This is a test string.')->position('test'));
