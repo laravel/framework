@@ -50,7 +50,7 @@ class ChainedBatch implements ShouldQueue
 
     protected function hijackChain(PendingBatch $batch)
     {
-        if (property_exists($this, 'chained') && ! empty($this->chained)) {
+        if (! empty($this->chained)) {
             $next = unserialize(array_shift($this->chained));
             $next->chained = $this->chained;
 
