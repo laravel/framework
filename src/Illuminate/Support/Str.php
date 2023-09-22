@@ -581,7 +581,7 @@ class Str
     /**
      * Remove all non-numeric characters from a string or an array of strings.
      *
-     * @param string|string[]  $value
+     * @param  string|string[]  $value
      * @return string|string[]
      */
     public static function numbers(string|array $value): string|array
