@@ -830,8 +830,8 @@ class Arr
 
         if (self::isNumericallyIndexed($array)) {
             $descending
-                ? rsort($array, $options)
-                : sort($array, $options);
+                ? krsort($array, $options)
+                : ksort($array, $options);
         }
 
         return $array;
