@@ -92,7 +92,7 @@ class Blueprint
         $this->table = $table;
         $this->prefix = $prefix;
 
-        if (! is_null($callback)) {
+        if (!is_null($callback)) {
             $callback($this);
         }
     }
@@ -130,10 +130,10 @@ class Blueprint
         $this->ensureCommandsAreValid($connection);
 
         foreach ($this->commands as $command) {
-            $method = 'compile'.ucfirst($command->name);
+            $method = 'compile' . ucfirst($command->name);
 
             if (method_exists($grammar, $method) || $grammar::hasMacro($method)) {
-                if (! is_null($sql = $grammar->$method($this, $command, $connection))) {
+                if (!is_null($sql = $grammar->$method($this, $command, $connection))) {
                     $statements = array_merge($statements, (array) $sql);
                 }
             }
@@ -153,8 +153,10 @@ class Blueprint
     protected function ensureCommandsAreValid(Connection $connection)
     {
         if ($connection instanceof SQLiteConnection) {
-            if ($this->commandsNamed(['dropColumn', 'renameColumn'])->count() > 1
-                && ! $connection->usingNativeSchemaOperations()) {
+            if (
+                $this->commandsNamed(['dropColumn', 'renameColumn'])->count() > 1
+                && !$connection->usingNativeSchemaOperations()
+            ) {
                 throw new BadMethodCallException(
                     "SQLite doesn't support multiple calls to dropColumn / renameColumn in a single modification."
                 );
@@ -190,11 +192,11 @@ class Blueprint
      */
     protected function addImpliedCommands(Connection $connection, Grammar $grammar)
     {
-        if (count($this->getAddedColumns()) > 0 && ! $this->creating()) {
+        if (count($this->getAddedColumns()) > 0 && !$this->creating()) {
             array_unshift($this->commands, $this->createCommand('add'));
         }
 
-        if (count($this->getChangedColumns()) > 0 && ! $this->creating()) {
+        if (count($this->getChangedColumns()) > 0 && !$this->creating()) {
             array_unshift($this->commands, $this->createCommand('change'));
         }
 
@@ -226,7 +228,7 @@ class Blueprint
                 // and the column is supposed to be changed, we will call the drop index
                 // method with an array of column to drop it by its conventional name.
                 elseif ($column->{$index} === false && $column->change) {
-                    $this->{'drop'.ucfirst($index)}([$column->name]);
+                    $this->{'drop' . ucfirst($index)}([$column->name]);
                     $column->{$index} = null;
 
                     continue 2;
@@ -255,7 +257,7 @@ class Blueprint
     public function addFluentCommands(Connection $connection, Grammar $grammar)
     {
         foreach ($this->columns as $column) {
-            if ($column->change && ! $connection->usingNativeSchemaOperations()) {
+            if ($column->change && !$connection->usingNativeSchemaOperations()) {
                 continue;
             }
 
@@ -722,7 +724,7 @@ class Blueprint
      */
     public function char($column, $length = null)
     {
-        $length = ! is_null($length) ? $length : Builder::$defaultStringLength;
+        $length = !is_null($length) ? $length : Builder::$defaultStringLength;
 
         return $this->addColumn('char', $column, compact('length'));
     }
@@ -1176,7 +1178,7 @@ class Blueprint
     }
 
     /**
-     * Add nullable creation and update timestamps to the table. These timestamps update 
+     * Add nullable creation and update timestamps to the table. These timestamps update
      *  automatically.
      *
      * @param  int|null  $precision
@@ -1190,7 +1192,7 @@ class Blueprint
     }
 
     /**
-     * Add nullable creation and update timestamps to the table. These timestamps update 
+     * Add nullable creation and update timestamps to the table. These timestamps update
      *  automatically.
      *
      * Alias for self::timestamps().
@@ -1204,7 +1206,7 @@ class Blueprint
     }
 
     /**
-     * Add creation and update timestampTz columns to the table. These timestamps update 
+     * Add creation and update timestampTz columns to the table. These timestamps update
      *  automatically.
      *
      * @param  int|null  $precision
@@ -1218,7 +1220,7 @@ class Blueprint
     }
 
     /**
-     * Add creation and update datetime columns to the table. These timestamps update 
+     * Add creation and update datetime columns to the table. These timestamps update
      *  automatically.
      *
      * @param  int|null  $precision
@@ -1648,7 +1650,8 @@ class Blueprint
         $index = $index ?: $this->createIndexName($type, $columns);
 
         return $this->addCommand(
-            $type, compact('index', 'columns', 'algorithm')
+            $type,
+            compact('index', 'columns', 'algorithm')
         );
     }
 
@@ -1683,7 +1686,7 @@ class Blueprint
      */
     protected function createIndexName($type, array $columns)
     {
-        $index = strtolower($this->prefix.$this->table.'_'.implode('_', $columns).'_'.$type);
+        $index = strtolower($this->prefix . $this->table . '_' . implode('_', $columns) . '_' . $type);
 
         return str_replace(['-', '.'], '_', $index);
     }
@@ -1827,7 +1830,7 @@ class Blueprint
     public function getAddedColumns()
     {
         return array_filter($this->columns, function ($column) {
-            return ! $column->change;
+            return !$column->change;
         });
     }
 
