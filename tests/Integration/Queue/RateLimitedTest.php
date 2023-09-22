@@ -4,13 +4,17 @@ namespace Illuminate\Tests\Integration\Queue;
 
 use Illuminate\Bus\Dispatcher;
 use Illuminate\Bus\Queueable;
+use Illuminate\Cache\ArrayStore;
 use Illuminate\Cache\RateLimiter;
 use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Cache\Repository;
+use Illuminate\Container\Container;
 use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Queue\CallQueuedHandler;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\Middleware\RateLimited;
+use Illuminate\Support\Carbon;
 use Mockery as m;
 use Orchestra\Testbench\TestCase;
 
@@ -187,6 +191,94 @@ class RateLimitedTest extends TestCase
         ]);
 
         $this->assertFalse($class::$handled);
+    }
+
+    public function testItCanLimitPerMinute()
+    {
+        Container::getInstance()->instance(RateLimiter::class, $limiter = new RateLimiter(new Repository(new ArrayStore)));
+        $limiter->for('test', fn () => Limit::perMinute(3));
+        $jobFactory = fn () => new class
+        {
+            public $released = false;
+
+            public function release()
+            {
+                $this->released = true;
+            }
+        };
+        $next = fn ($job) => $job;
+
+        $middleware = new RateLimited('test');
+
+        Carbon::setTestNow('2000-00-00 00:00:00.000');
+
+        for ($i = 0; $i < 3; $i++) {
+            $result = $middleware->handle($job = $jobFactory(), $next);
+            $this->assertSame($job, $result);
+            $this->assertFalse($job->released);
+
+            Carbon::setTestNow(now()->addSeconds(1));
+        }
+
+        $result = $middleware->handle($job = $jobFactory(), $next);
+        $this->assertNull($result);
+        $this->assertTrue($job->released);
+
+        Carbon::setTestNow('2000-00-00 00:00:59.999');
+
+        $result = $middleware->handle($job = $jobFactory(), $next);
+        $this->assertNull($result);
+        $this->assertTrue($job->released);
+
+        Carbon::setTestNow('2000-00-00 00:01:00.000');
+
+        $result = $middleware->handle($job = $jobFactory(), $next);
+        $this->assertSame($job, $result);
+        $this->assertFalse($job->released);
+    }
+
+    public function testItCanLimitPerSecond()
+    {
+        Container::getInstance()->instance(RateLimiter::class, $limiter = new RateLimiter(new Repository(new ArrayStore)));
+        $limiter->for('test', fn () => Limit::perSecond(3));
+        $jobFactory = fn () => new class
+        {
+            public $released = false;
+
+            public function release()
+            {
+                $this->released = true;
+            }
+        };
+        $next = fn ($job) => $job;
+
+        $middleware = new RateLimited('test');
+
+        Carbon::setTestNow('2000-00-00 00:00:00.000');
+
+        for ($i = 0; $i < 3; $i++) {
+            $result = $middleware->handle($job = $jobFactory(), $next);
+            $this->assertSame($job, $result);
+            $this->assertFalse($job->released);
+
+            Carbon::setTestNow(now()->addMilliseconds(100));
+        }
+
+        $result = $middleware->handle($job = $jobFactory(), $next);
+        $this->assertNull($result);
+        $this->assertTrue($job->released);
+
+        Carbon::setTestNow('2000-00-00 00:00:00.999');
+
+        $result = $middleware->handle($job = $jobFactory(), $next);
+        $this->assertNull($result);
+        $this->assertTrue($job->released);
+
+        Carbon::setTestNow('2000-00-00 00:00:01.000');
+
+        $result = $middleware->handle($job = $jobFactory(), $next);
+        $this->assertSame($job, $result);
+        $this->assertFalse($job->released);
     }
 }
 

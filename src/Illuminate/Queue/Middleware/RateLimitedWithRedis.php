@@ -49,7 +49,7 @@ class RateLimitedWithRedis extends RateLimited
     protected function handleJob($job, $next, array $limits)
     {
         foreach ($limits as $limit) {
-            if ($this->tooManyAttempts($limit->key, $limit->maxAttempts, $limit->decayMinutes)) {
+            if ($this->tooManyAttempts($limit->key, $limit->maxAttempts, $limit->decaySeconds)) {
                 return $this->shouldRelease
                     ? $job->release($this->getTimeUntilNextRetry($limit->key))
                     : false;
@@ -64,13 +64,13 @@ class RateLimitedWithRedis extends RateLimited
      *
      * @param  string  $key
      * @param  int  $maxAttempts
-     * @param  int  $decayMinutes
+     * @param  int  $decaySeconds
      * @return bool
      */
-    protected function tooManyAttempts($key, $maxAttempts, $decayMinutes)
+    protected function tooManyAttempts($key, $maxAttempts, $decaySeconds)
     {
         $limiter = new DurationLimiter(
-            $this->redis, $key, $maxAttempts, $decayMinutes * 60
+            $this->redis, $key, $maxAttempts, $decaySeconds
         );
 
         return tap(! $limiter->acquire(), function () use ($key, $limiter) {
