@@ -497,6 +497,16 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     }
 
     /**
+     * Remove all non-numeric characters from a string.
+     *
+     * @return static
+     */
+    public function numbers()
+    {
+        return new static(Str::numbers($this->value));
+    }
+
+    /**
      * Pad both sides of the string with another.
      *
      * @param  int  $length

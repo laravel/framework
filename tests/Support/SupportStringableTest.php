@@ -1224,6 +1224,11 @@ class SupportStringableTest extends TestCase
         $this->assertFalse($this->stringable('no')->toBoolean());
     }
 
+    public function testNumbers()
+    {
+        $this->assertSame('5551234567', (string) $this->stringable('(555) 123-4567')->numbers());
+    }
+
     public function testToDate()
     {
         $current = Carbon::create(2020, 1, 1, 16, 30, 25);
