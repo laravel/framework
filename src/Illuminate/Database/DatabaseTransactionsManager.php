@@ -133,11 +133,9 @@ class DatabaseTransactionsManager
      */
     public function callbackApplicableTransactions()
     {
-        if (! $this->afterCommitCallbacksRunningInTestTransaction) {
-            return clone $this->transactions;
-        }
-
-        return $this->transactions->skip(1)->values();
+        return $this->transactions
+            ->when($this->afterCommitCallbacksRunningInTestTransaction, fn ($transactions) => $transactions->skip(1))
+            ->values();
     }
 
     /**
