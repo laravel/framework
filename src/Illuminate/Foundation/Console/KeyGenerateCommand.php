@@ -19,7 +19,8 @@ class KeyGenerateCommand extends Command
      */
     protected $signature = 'key:generate
                     {--show : Display the key instead of modifying files}
-                    {--force : Force the operation to run when in production}';
+                    {--force : Force the operation to run when in production}
+                    {--unless-present : Only generate the key if the key is not present yet}';
 
     /**
      * The console command description.
@@ -35,6 +36,12 @@ class KeyGenerateCommand extends Command
      */
     public function handle()
     {
+        if ($this->option('unless-present')) {
+            if (config('app.key') != null) {
+                return;
+            }
+        }
+
         $key = $this->generateRandomKey();
 
         if ($this->option('show')) {
