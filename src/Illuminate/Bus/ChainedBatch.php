@@ -12,7 +12,7 @@ class ChainedBatch implements ShouldQueue
 {
     use Batchable, Dispatchable, InteractsWithQueue, Queueable;
 
-    public array|Collection $jobs;
+    public Collection $jobs;
 
     public array $options;
 
