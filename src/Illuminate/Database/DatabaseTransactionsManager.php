@@ -124,7 +124,7 @@ class DatabaseTransactionsManager
         return $this->withAfterCommitCallbacksInTestTransactionAwareMode();
     }
 
-        /**
+    /**
      * Get the transactions that are applicable to callbacks.
      *
      * @return \Illuminate\Support\Collection
