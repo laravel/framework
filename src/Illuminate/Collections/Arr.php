@@ -812,6 +812,32 @@ class Arr
     }
 
     /**
+     * Recursively sort numerically indexed array by keys.
+     *
+     *
+     * @param  array  $array
+     * @param  int  $options
+     * @param  bool  $descending
+     * @return array
+     */
+    public static function sortRecursiveNumericallyIndexed($array, $options = SORT_REGULAR, $descending = false)
+    {
+        foreach ($array as &$value) {
+            if (is_array($value)) {
+                $value = static::sortRecursiveNumericallyIndexed($value, $options, $descending);
+            }
+        }
+
+        if (self::isNumericallyIndexed($array)) {
+            $descending
+                ? rsort($array, $options)
+                : sort($array, $options);
+        }
+
+        return $array;
+    }
+
+    /**
      * Conditionally compile classes from an array into a CSS class list.
      *
      * @param  array  $array
@@ -893,5 +919,24 @@ class Arr
         }
 
         return is_array($value) ? $value : [$value];
+    }
+
+    /**
+     * Determine if an array is numerically indexed
+     *
+     * @param  mixed  $array
+     * @return boolean
+     */
+    public static function isNumericallyIndexed($array) {
+        if (!is_array($array)) {
+            return false;
+        }
+
+        foreach ($array as $key => $value) {
+            if (!is_int($key)) {
+                return false;
+            }
+        }
+        return true;
     }
 }
