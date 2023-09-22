@@ -1183,9 +1183,9 @@ class Blueprint
      */
     public function timestamps($precision = 0)
     {
-        $this->timestamp('created_at', $precision)->nullable();
+        $this->timestamp('created_at', $precision)->nullable()->useCurrent();
 
-        $this->timestamp('updated_at', $precision)->nullable();
+        $this->timestamp('updated_at', $precision)->nullable()->useCurrent()->useCurrentOnUpdate();
     }
 
     /**
@@ -1209,9 +1209,9 @@ class Blueprint
      */
     public function timestampsTz($precision = 0)
     {
-        $this->timestampTz('created_at', $precision)->nullable();
+        $this->timestampTz('created_at', $precision)->nullable()->useCurrent();
 
-        $this->timestampTz('updated_at', $precision)->nullable();
+        $this->timestampTz('updated_at', $precision)->nullable()->useCurrent()->useCurrentOnUpdate();
     }
 
     /**
@@ -1222,9 +1222,9 @@ class Blueprint
      */
     public function datetimes($precision = 0)
     {
-        $this->datetime('created_at', $precision)->nullable();
+        $this->datetime('created_at', $precision)->nullable()->useCurrent();
 
-        $this->datetime('updated_at', $precision)->nullable();
+        $this->datetime('updated_at', $precision)->nullable()->useCurrent()->useCurrentOnUpdate();
     }
 
     /**
