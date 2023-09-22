@@ -111,6 +111,36 @@ class DatabaseTransactionsManager
     }
 
     /**
+     * Specify that callbacks should ignore the given transaction when determining if they should be executed.
+     *
+     * @param  \Illuminate\Database\DatabaseTransactionRecord  $transaction
+     * @return $this
+     *
+     * @deprecated Will be removed in a future Laravel version. Use withAfterCommitCallbacksInTestTransactionAwareMode() instead.
+     */
+    public function callbacksShouldIgnore(DatabaseTransactionRecord $transaction)
+    {
+        // This method was meant for testing only, so we're forwarding the call to the new method...
+        return $this->withAfterCommitCallbacksInTestTransactionAwareMode();
+    }
+
+        /**
+     * Get the transactions that are applicable to callbacks.
+     *
+     * @return \Illuminate\Support\Collection
+     *
+     * @deprecated Will be removed in a future Laravel version.
+     */
+    public function callbackApplicableTransactions()
+    {
+        if (! $this->afterCommitCallbacksRunningInTestTransaction) {
+            return clone $this->transactions;
+        }
+
+        return $this->transactions->skip(1)->values();
+    }
+
+    /**
      * Get all the transactions.
      *
      * @return \Illuminate\Support\Collection
