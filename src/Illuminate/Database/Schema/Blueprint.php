@@ -1176,7 +1176,8 @@ class Blueprint
     }
 
     /**
-     * Add nullable creation and update timestamps to the table.
+     * Add nullable creation and update timestamps to the table. These timestamps update 
+     *  automatically.
      *
      * @param  int|null  $precision
      * @return void
@@ -1189,7 +1190,8 @@ class Blueprint
     }
 
     /**
-     * Add nullable creation and update timestamps to the table.
+     * Add nullable creation and update timestamps to the table. These timestamps update 
+     *  automatically.
      *
      * Alias for self::timestamps().
      *
@@ -1202,7 +1204,8 @@ class Blueprint
     }
 
     /**
-     * Add creation and update timestampTz columns to the table.
+     * Add creation and update timestampTz columns to the table. These timestamps update 
+     *  automatically.
      *
      * @param  int|null  $precision
      * @return void
@@ -1215,7 +1218,8 @@ class Blueprint
     }
 
     /**
-     * Add creation and update datetime columns to the table.
+     * Add creation and update datetime columns to the table. These timestamps update 
+     *  automatically.
      *
      * @param  int|null  $precision
      * @return void
