@@ -922,21 +922,23 @@ class Arr
     }
 
     /**
-     * Determine if an array is numerically indexed
+     * Determine if an array is numerically indexed.
      *
      * @param  mixed  $array
-     * @return boolean
+     * @return bool
      */
-    public static function isNumericallyIndexed($array) {
-        if (!is_array($array)) {
+    public static function isNumericallyIndexed($array)
+    {
+        if (! is_array($array)) {
             return false;
         }
 
         foreach ($array as $key => $value) {
-            if (!is_int($key)) {
+            if (! is_int($key)) {
                 return false;
             }
         }
+
         return true;
     }
 }
