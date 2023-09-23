@@ -613,7 +613,7 @@ class Arr
      */
     public static function prepend($array, $value, $key = null)
     {
-        if (func_num_args() == 2 || (func_num_args() == 3 && empty($key))) {
+        if (func_num_args() == 2) {
             array_unshift($array, $value);
         } else {
             $array = [$key => $value] + $array;
