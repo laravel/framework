@@ -172,7 +172,7 @@ class BelongsTo extends Relation
         $dictionary = [];
 
         foreach ($results as $result) {
-            $attribute = $this->getDictionaryKey($this->getForeignKeyFrom($result));
+            $attribute = $this->getDictionaryKey($this->getRelatedKeyFrom($result));
 
             $dictionary[$attribute] = $result;
         }
