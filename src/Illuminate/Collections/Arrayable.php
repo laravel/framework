@@ -467,7 +467,7 @@ class Arrayable
      * @param  int  $options
      * @return array
      */
-    public static function sortRecursiveDesc($options = SORT_REGULAR)
+    public function sortRecursiveDesc($options = SORT_REGULAR)
     {
         $this->value = Arr::sortRecursive($this->value, $options);
 
