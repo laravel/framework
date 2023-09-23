@@ -2,7 +2,6 @@
 
 namespace Illuminate\Support;
 
-use Illuminate\Support\Arr;
 use Symfony\Component\VarDumper\VarDumper;
 
 class Arrayable
@@ -20,7 +19,7 @@ class Arrayable
      * @param  string|array  $values
      * @return void
      */
-    public function __construct(string | array $values)
+    public function __construct(string|array $values)
     {
         $this->value = $values;
     }
@@ -59,7 +58,7 @@ class Arrayable
     {
         $this->value = Arr::collapse($this->value);
 
-        if (!empty($array)) {
+        if (! empty($array)) {
             $this->value = Arr::collapse([$this->value, ...$array]);
         }
 
@@ -424,7 +423,7 @@ class Arrayable
     {
         $this->value = Arr::sort($this->value, $callback);
 
-        if (!is_null($callback)) {
+        if (! is_null($callback)) {
             $this->value = array_values($this->value);
         }
 
@@ -441,7 +440,7 @@ class Arrayable
     {
         $this->value = Arr::sortDesc($this->value, $callback);
 
-        if (!is_null($callback)) {
+        if (! is_null($callback)) {
             $this->value = array_values($this->value);
         }
 
