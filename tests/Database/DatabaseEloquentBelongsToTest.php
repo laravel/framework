@@ -99,15 +99,18 @@ class DatabaseEloquentBelongsToTest extends TestCase
     {
         $relation = $this->getRelation();
 
-        $result1 = new class extends Model {
+        $result1 = new class extends Model
+        {
             protected $attributes = ['id' => 1];
         };
 
-        $result2 = new class extends Model {
+        $result2 = new class extends Model
+        {
             protected $attributes = ['id' => 2];
         };
 
-        $result3 = new class extends Model {
+        $result3 = new class extends Model
+        {
             protected $attributes = ['id' => 3];
 
             public function __toString()
