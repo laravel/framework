@@ -166,6 +166,13 @@ class Validator implements ValidatorContract
     public $excludeUnvalidatedArrayKeys = false;
 
     /**
+     * Indicates that validated array data will be sorted by key.
+     *
+     * @var bool
+     */
+    public $sortValidatedArrayDataByKey = false;
+
+    /**
      * All of the custom validator extensions.
      *
      * @var array
@@ -577,7 +584,9 @@ class Validator implements ValidatorContract
             }
         }
 
-        return Arr::sortRecursiveNumericallyIndexed($this->replacePlaceholders($results));
+        return $this->sortValidatedArrayDataByKey
+            ? Arr::sortRecursiveNumericallyIndexed($this->replacePlaceholders($results))
+            : $this->replacePlaceholders($results);
     }
 
     /**

@@ -74,6 +74,13 @@ class Factory implements FactoryContract
     protected $excludeUnvalidatedArrayKeys = true;
 
     /**
+     * Indicates that validated array data will be sorted by key.
+     *
+     * @var bool
+     */
+    protected $sortValidatedArrayDataByKey = false;
+
+    /**
      * The Validator resolver instance.
      *
      * @var \Closure
@@ -108,6 +115,7 @@ class Factory implements FactoryContract
             $data, $rules, $messages, $attributes
         );
 
+
         // The presence verifier is responsible for checking the unique and exists data
         // for the validator. It is behind an interface so that multiple versions of
         // it may be written besides database. We'll inject it into the validator.
@@ -123,6 +131,8 @@ class Factory implements FactoryContract
         }
 
         $validator->excludeUnvalidatedArrayKeys = $this->excludeUnvalidatedArrayKeys;
+
+        $validator->sortValidatedArrayDataByKey = $this->sortValidatedArrayDataByKey;
 
         $this->addExtensions($validator);
 
@@ -266,6 +276,16 @@ class Factory implements FactoryContract
     public function excludeUnvalidatedArrayKeys()
     {
         $this->excludeUnvalidatedArrayKeys = true;
+    }
+
+    /**
+     * Indicates that validated array data should be sorted by key.
+     *
+     * @return void
+     */
+    public function sortValidatedArrayDataByKey()
+    {
+        $this->sortValidatedArrayDataByKey = true;
     }
 
     /**
