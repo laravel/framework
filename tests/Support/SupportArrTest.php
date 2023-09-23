@@ -249,12 +249,25 @@ class SupportArrTest extends TestCase
         });
         $this->assertEquals(200, $last);
 
-        $last = Arr::last($array, function ($value, $key) {
+        // Callback is not null, array is not empty but no satisfied item
+        $value2 = Arr::last($array, function ($value) {
+            return $value > 300;
+        });
+        $value3 = Arr::last($array, function ($value) {
+            return $value > 300;
+        }, 'bar');
+        $value4 = Arr::last($array, function ($value) {
+            return $value > 300;
+        }, function () {
+            return 'baz';
+        });
+        $value5 = Arr::last($array, function ($value, $key) {
             return $key < 2;
         });
-        $this->assertEquals(200, $last);
-
-        $this->assertEquals(300, Arr::last($array));
+        $this->assertNull($value2);
+        $this->assertSame('bar', $value3);
+        $this->assertSame('baz', $value4);
+        $this->assertEquals(200, $value5);
     }
 
     public function testFlatten()
