@@ -708,7 +708,7 @@
 
 ### Fixed
 
-- Fix typo in function `createMissingSqliteDatabase` name in `src/Illuminate/Database/Console/Migrations/MigrateCommand.php` ([#46326](https://github.com/laravel/framework/pull/46326))
+- Fix typo in function `createMissingSqliteDatbase` name in `src/Illuminate/Database/Console/Migrations/MigrateCommand.php` ([#46326](https://github.com/laravel/framework/pull/46326))
 
 ### Changed
 
