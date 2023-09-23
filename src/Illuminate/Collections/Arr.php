@@ -12,6 +12,17 @@ class Arr
     use Macroable;
 
     /**
+     * Get a new Arrayable object from the given array or string.
+     *
+     * @param  string|array  $values
+     * @return \Illuminate\Support\Arrayable
+     */
+    public static function of(string|array $values)
+    {
+        return new Arrayable($values);
+    }
+
+    /**
      * Determine whether the given value is array accessible.
      *
      * @param  mixed  $value
