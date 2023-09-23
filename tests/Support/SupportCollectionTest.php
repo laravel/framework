@@ -4037,7 +4037,7 @@ class SupportCollectionTest extends TestCase
 
         $c = new Collection(['one' => 1, 'two' => 2]);
         $this->assertEquals(
-            [null => 0, 'one' => 1, 'two' => 2],
+            [0 => 0, 'one' => 1, 'two' => 2],
             $c->prepend(0, null)->all()
         );
     }

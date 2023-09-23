@@ -607,7 +607,7 @@ class Arr
         } else {
             $array = [$key => $value] + $array;
         }
-        
+
         return $array;
     }
 
