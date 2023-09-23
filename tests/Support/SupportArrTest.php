@@ -233,6 +233,17 @@ class SupportArrTest extends TestCase
     {
         $array = [100, 200, 300];
 
+        // Callback is null and array is empty
+        $this->assertNull(Arr::last([], null));
+        $this->assertSame('foo', Arr::last([], null, 'foo'));
+        $this->assertSame('bar', Arr::last([], null, function () {
+            return 'bar';
+        }));
+
+        // Callback is null and array is not empty
+        $this->assertEquals(300, Arr::last($array));
+
+        // Callback is not null and array is not empty
         $last = Arr::last($array, function ($value) {
             return $value < 250;
         });
