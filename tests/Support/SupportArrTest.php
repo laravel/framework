@@ -207,9 +207,13 @@ class SupportArrTest extends TestCase
         }, function () {
             return 'baz';
         });
+        $value5 = Arr::first($array, function ($value, $key) {
+            return $key < 2;
+        });
         $this->assertNull($value2);
         $this->assertSame('bar', $value3);
         $this->assertSame('baz', $value4);
+        $this->assertEquals(100, $value5);
     }
 
     public function testJoin()
