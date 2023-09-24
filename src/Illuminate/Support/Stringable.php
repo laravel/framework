@@ -155,7 +155,7 @@ class Stringable implements JsonSerializable, ArrayAccess
     }
 
     /**
-     * Get the smallest possible portion of a string between two given values.
+     * Get the portion of a string between two given values, starting at the first occurence of the $from and ending at the first occurence of the $to.
      *
      * @param  string  $from
      * @param  string  $to
@@ -164,6 +164,18 @@ class Stringable implements JsonSerializable, ArrayAccess
     public function betweenFirst($from, $to)
     {
         return new static(Str::betweenFirst($this->value, $from, $to));
+    }
+
+    /**
+     * Get the portion of a string between two given values, starting at the last occurence of the $from and ending at the first occurence of the $to.
+     *
+     * @param  string  $from
+     * @param  string  $to
+     * @return static
+     */
+    public function betweenLast($from, $to)
+    {
+        return new static(Str::betweenLast($this->value, $from, $to));
     }
 
     /**
