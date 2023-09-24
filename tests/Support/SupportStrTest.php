@@ -260,6 +260,13 @@ class SupportStrTest extends TestCase
         $this->assertSame('', Str::betweenFirst('foobarbar', 'foo', 'bar'));
     }
 
+    public function testStrBetweenLast()
+    {
+        $this->assertSame('file', Str::betweenLast('/home/user/file.txt', '/', '.'));
+        $this->assertSame('a', Str::betweenLast('hannah', 'n', 'h'));
+        $this->assertSame('', Str::betweenLast('foobarbar', 'r', 'r'));
+    }
+
     public function testStrAfter()
     {
         $this->assertSame('nah', Str::after('hannah', 'han'));
