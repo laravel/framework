@@ -192,7 +192,7 @@ class Str
     }
 
     /**
-     * Get the smallest possible portion of a string between two given values.
+     * Get the portion of a string between two given values, starting at the first occurence of the $from and ending at the first occurence of the $to.
      *
      * @param  string  $subject
      * @param  string  $from
@@ -206,6 +206,23 @@ class Str
         }
 
         return static::before(static::after($subject, $from), $to);
+    }
+
+    /**
+     * Get the portion of a string between two given values, starting at the last occurence of the $from and ending at the first occurence of the $to.
+     *
+     * @param  string  $subject
+     * @param  string  $from
+     * @param  string  $to
+     * @return string
+     */
+    public static function betweenLast($subject, $from, $to)
+    {
+        if ($from === '' || $to === '') {
+            return $subject;
+        }
+
+        return static::before(static::afterLast($subject, $from), $to);
     }
 
     /**
