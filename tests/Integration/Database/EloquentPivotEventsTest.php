@@ -140,7 +140,7 @@ class EloquentPivotEventsTest extends DatabaseTestCase
             'name' => 'Test Project',
         ]);
 
-        PivotEventsTestModelEquipment::deleting(function($model) use ($project) {
+        PivotEventsTestModelEquipment::deleting(function ($model) use ($project) {
             $this->assertInstanceOf(PivotEventsTestProject::class, $model->equipmentable);
             $this->assertEquals($project->id, $model->equipmentable->id);
         });
