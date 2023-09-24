@@ -28,7 +28,7 @@ class DatabaseMigrationMakeCommandTest extends TestCase
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
         $creator->shouldReceive('create')->once()
-                ->with('create_foo', __DIR__.DIRECTORY_SEPARATOR.'migrations', 'foo', true)
+                ->with('create_foo', __DIR__.DIRECTORY_SEPARATOR.'migrations', 'foo', true, false)
                 ->andReturn(__DIR__.'/migrations/2021_04_23_110457_create_foo.php');
 
         $this->runCommand($command, ['name' => 'create_foo']);
@@ -44,7 +44,7 @@ class DatabaseMigrationMakeCommandTest extends TestCase
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
         $creator->shouldReceive('create')->once()
-                ->with('create_foo', __DIR__.DIRECTORY_SEPARATOR.'migrations', 'foo', true)
+                ->with('create_foo', __DIR__.DIRECTORY_SEPARATOR.'migrations', 'foo', true, false)
                 ->andReturn(__DIR__.'/migrations/2021_04_23_110457_create_foo.php');
 
         $this->runCommand($command, ['name' => 'create_foo']);
@@ -60,7 +60,7 @@ class DatabaseMigrationMakeCommandTest extends TestCase
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
         $creator->shouldReceive('create')->once()
-                ->with('create_foo', __DIR__.DIRECTORY_SEPARATOR.'migrations', 'foo', true)
+                ->with('create_foo', __DIR__.DIRECTORY_SEPARATOR.'migrations', 'foo', true, false)
                 ->andReturn(__DIR__.'/migrations/2021_04_23_110457_create_foo.php');
 
         $this->runCommand($command, ['name' => 'CreateFoo']);
@@ -76,7 +76,7 @@ class DatabaseMigrationMakeCommandTest extends TestCase
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
         $creator->shouldReceive('create')->once()
-                ->with('create_foo', __DIR__.DIRECTORY_SEPARATOR.'migrations', 'users', true)
+                ->with('create_foo', __DIR__.DIRECTORY_SEPARATOR.'migrations', 'users', true, false)
                 ->andReturn(__DIR__.'/migrations/2021_04_23_110457_create_foo.php');
 
         $this->runCommand($command, ['name' => 'create_foo', '--create' => 'users']);
@@ -92,7 +92,7 @@ class DatabaseMigrationMakeCommandTest extends TestCase
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
         $creator->shouldReceive('create')->once()
-                ->with('create_users_table', __DIR__.DIRECTORY_SEPARATOR.'migrations', 'users', true)
+                ->with('create_users_table', __DIR__.DIRECTORY_SEPARATOR.'migrations', 'users', true, false)
                 ->andReturn(__DIR__.'/migrations/2021_04_23_110457_create_users_table.php');
 
         $this->runCommand($command, ['name' => 'create_users_table']);
@@ -108,9 +108,25 @@ class DatabaseMigrationMakeCommandTest extends TestCase
         $command->setLaravel($app);
         $app->setBasePath('/home/laravel');
         $creator->shouldReceive('create')->once()
-                ->with('create_foo', '/home/laravel/vendor/laravel-package/migrations', 'users', true)
+                ->with('create_foo', '/home/laravel/vendor/laravel-package/migrations', 'users', true, false)
                 ->andReturn('/home/laravel/vendor/laravel-package/migrations/2021_04_23_110457_create_foo.php');
         $this->runCommand($command, ['name' => 'create_foo', '--path' => 'vendor/laravel-package/migrations', '--create' => 'users']);
+    }
+
+    public function testBasicCreateGivesCreatorProperArgumentsWhenUpOnlyIsTrue()
+    {
+        $command = new MigrateMakeCommand(
+            $creator = m::mock(MigrationCreator::class),
+            m::mock(Composer::class)->shouldIgnoreMissing()
+        );
+        $app = new Application;
+        $app->useDatabasePath(__DIR__);
+        $command->setLaravel($app);
+        $creator->shouldReceive('create')->once()
+            ->with('update_foo', __DIR__.DIRECTORY_SEPARATOR.'migrations', null, false, true)
+            ->andReturn(__DIR__.'/migrations/2021_04_23_110457_update_foo.php');
+
+        $this->runCommand($command, ['name' => 'update_foo', '--up' => true]);
     }
 
     protected function runCommand($command, $input = [])

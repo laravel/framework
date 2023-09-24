@@ -50,18 +50,19 @@ class MigrationCreator
      * @param  string  $path
      * @param  string|null  $table
      * @param  bool  $create
+     * @param  bool  $upOnly
      * @return string
      *
      * @throws \Exception
      */
-    public function create($name, $path, $table = null, $create = false)
+    public function create($name, $path, $table = null, $create = false, $upOnly = false)
     {
         $this->ensureMigrationDoesntAlreadyExist($name, $path);
 
         // First we will get the stub file for the migration, which serves as a type
         // of template for the migration. Once we have those we will populate the
         // various place-holders, save the file, and run the post create event.
-        $stub = $this->getStub($table, $create);
+        $stub = $this->getStub($table, $create, $upOnly);
 
         $path = $this->getPath($name, $path);
 
@@ -108,23 +109,22 @@ class MigrationCreator
      *
      * @param  string|null  $table
      * @param  bool  $create
+     * @param  bool  $upOnly
      * @return string
      */
-    protected function getStub($table, $create)
+    protected function getStub($table, $create, $upOnly)
     {
+        $stubFileName = $upOnly ? '/migration.update.up.stub' : '/migration.update.stub';
+
         if (is_null($table)) {
-            $stub = $this->files->exists($customPath = $this->customStubPath.'/migration.stub')
-                            ? $customPath
-                            : $this->stubPath().'/migration.stub';
+            $stubFileName = $upOnly ? '/migration.up.stub' : '/migration.stub';
         } elseif ($create) {
-            $stub = $this->files->exists($customPath = $this->customStubPath.'/migration.create.stub')
-                            ? $customPath
-                            : $this->stubPath().'/migration.create.stub';
-        } else {
-            $stub = $this->files->exists($customPath = $this->customStubPath.'/migration.update.stub')
-                            ? $customPath
-                            : $this->stubPath().'/migration.update.stub';
+            $stubFileName = $upOnly ? '/migration.create.up.stub' : '/migration.create.stub';
         }
+
+        $stub = $this->files->exists($customPath = $this->customStubPath.$stubFileName)
+            ? $customPath
+            : $this->stubPath().$stubFileName;
 
         return $this->files->get($stub);
     }

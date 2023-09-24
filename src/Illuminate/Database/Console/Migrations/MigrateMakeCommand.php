@@ -19,6 +19,7 @@ class MigrateMakeCommand extends BaseCommand implements PromptsForMissingInput
         {--table= : The table to migrate}
         {--path= : The location where the migration file should be created}
         {--realpath : Indicate any provided migration file paths are pre-resolved absolute paths}
+        {--up : Only generate the `up` method}
         {--fullpath : Output the full path of the migration (Deprecated)}';
 
     /**
@@ -75,6 +76,8 @@ class MigrateMakeCommand extends BaseCommand implements PromptsForMissingInput
 
         $create = $this->input->getOption('create') ?: false;
 
+        $upOnly = $this->input->getOption('up');
+
         // If no table was given as an option but a create option is given then we
         // will use the "create" option as the table name. This allows the devs
         // to pass a table name into this option as a short-cut for creating.
@@ -94,7 +97,7 @@ class MigrateMakeCommand extends BaseCommand implements PromptsForMissingInput
         // Now we are ready to write the migration out to disk. Once we've written
         // the migration out, we will dump-autoload for the entire framework to
         // make sure that the migrations are registered by the class loaders.
-        $this->writeMigration($name, $table, $create);
+        $this->writeMigration($name, $table, $create, $upOnly);
     }
 
     /**
@@ -103,12 +106,13 @@ class MigrateMakeCommand extends BaseCommand implements PromptsForMissingInput
      * @param  string  $name
      * @param  string  $table
      * @param  bool  $create
+     * @param  bool  $upOnly
      * @return void
      */
-    protected function writeMigration($name, $table, $create)
+    protected function writeMigration($name, $table, $create, $upOnly)
     {
         $file = $this->creator->create(
-            $name, $this->getMigrationPath(), $table, $create
+            $name, $this->getMigrationPath(), $table, $create, $upOnly
         );
 
         $this->components->info(sprintf('Migration [%s] created successfully.', $file));
