@@ -64,14 +64,14 @@ class EloquentTransactionUsingRefreshDatabaseTest extends DatabaseTestCase
     {
         User::observe($observer = EloquentTransactionUsingRefreshDatabaseUserObserver::resetting());
 
-        $user1 = DB::transaction(function () use ($observer) {
-            return tap(DB::transaction(function () use ($observer) {
-                return DB::transaction(function () use ($observer) {
-                    return tap(User::createOrFirst(UserFactory::new()->raw()), function () use ($observer) {
+        $user1 = DB::transaction(function () {
+            return tap(DB::transaction(function () {
+                return DB::transaction(function () {
+                    return tap(User::createOrFirst(UserFactory::new()->raw()), function () {
                         //$this->assertEquals(0, $observer::$calledTimes, 'Should not have been called');
                     });
                 });
-            }), function () use ($observer) {
+            }), function () {
                 // $this->assertEquals(0, $observer::$calledTimes, 'Should not have been called');
             });
         });

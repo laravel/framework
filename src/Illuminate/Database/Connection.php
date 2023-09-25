@@ -1525,7 +1525,7 @@ class Connection implements ConnectionInterface
     /**
      * Get the transaction manager instance on the connection.
      *
-     * @return  \Illuminate\Database\DatabaseTransactionsManager
+     * @return \Illuminate\Database\DatabaseTransactionsManager
      */
     public function getTransactionManager()
     {
