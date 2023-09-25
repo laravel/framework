@@ -140,6 +140,19 @@ class EloquentHasManyThroughTest extends DatabaseTestCase
         $this->assertEquals([1], $categories->pluck('id')->all());
     }
 
+    public function testFirstOrCreateWhenModelDoesntExist()
+    {
+        $owner = User::create(['name' => 'Taylor']);
+        Team::create(['owner_id' => $owner->id]);
+
+        $mate = $owner->teamMates()->firstOrCreate(['slug' => 'adam'], ['name' => 'Adam']);
+
+        $this->assertTrue($mate->wasRecentlyCreated);
+        $this->assertNull($mate->team_id);
+        $this->assertEquals('Adam', $mate->name);
+        $this->assertEquals('adam', $mate->slug);
+    }
+
     public function testUpdateOrCreateAffectingWrongModelsRegression()
     {
         // On Laravel 10.21.0, a bug was introduced that would update the wrong model when using `updateOrCreate()`,
