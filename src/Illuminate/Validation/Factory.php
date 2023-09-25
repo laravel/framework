@@ -74,6 +74,13 @@ class Factory implements FactoryContract
     protected $excludeUnvalidatedArrayKeys = true;
 
     /**
+     * Indicates that it is ensured that validated array data will be ordered as original.
+     *
+     * @var bool
+     */
+    public $ensureValidatedArrayDataIsSortedAsOriginal = false;
+
+    /**
      * The Validator resolver instance.
      *
      * @var \Closure
@@ -123,6 +130,8 @@ class Factory implements FactoryContract
         }
 
         $validator->excludeUnvalidatedArrayKeys = $this->excludeUnvalidatedArrayKeys;
+
+        $validator->ensureValidatedArrayDataIsSortedAsOriginal = $this->ensureValidatedArrayDataIsSortedAsOriginal;
 
         $this->addExtensions($validator);
 
@@ -266,6 +275,16 @@ class Factory implements FactoryContract
     public function excludeUnvalidatedArrayKeys()
     {
         $this->excludeUnvalidatedArrayKeys = true;
+    }
+
+    /**
+     * Indicate that it is ensured that validated array data will be ordered as original.
+     *
+     * @return void
+     */
+    public function ensureValidatedArrayDataIsSortedAsOriginal()
+    {
+        $this->ensureValidatedArrayDataIsSortedAsOriginal = true;
     }
 
     /**

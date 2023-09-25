@@ -166,6 +166,13 @@ class Validator implements ValidatorContract
     public $excludeUnvalidatedArrayKeys = false;
 
     /**
+     * Indicates that it is ensured that validated array data will be ordered as original.
+     *
+     * @var bool
+     */
+    public $ensureValidatedArrayDataIsSortedAsOriginal = false;
+
+    /**
      * All of the custom validator extensions.
      *
      * @var array
@@ -601,7 +608,9 @@ class Validator implements ValidatorContract
             }
         }
 
-        return $this->sortValidatedDataBasedOnOriginal($this->data, $this->replacePlaceholders($results));
+        return $this->ensureValidatedArrayDataIsSortedAsOriginal
+            ? $this->sortValidatedDataBasedOnOriginal($this->data, $this->replacePlaceholders($results))
+            : $this->replacePlaceholders($results);
     }
 
     /**
