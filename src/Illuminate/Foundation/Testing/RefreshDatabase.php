@@ -100,7 +100,7 @@ trait RefreshDatabase
             if ($transactionManager = $connection->getTransactionManager()) {
                 $transactionManager->callbacksShouldIgnore(
                     $transactionManager->getTransactions()->first()
-                )->afterCommitCallbacksShouldBeExecuted(fn ($level) => $level === 2);
+                )->afterCommitCallbacksShouldBeExecutedUsing(fn ($level) => $level === 2);
             }
         }
 

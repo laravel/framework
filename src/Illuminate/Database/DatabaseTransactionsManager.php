@@ -105,7 +105,7 @@ class DatabaseTransactionsManager
         // If there are no transactions, we'll run the callbacks right away. Also, we'll run it
         // right away when we're in test mode and we only have the wrapping transaction. For
         // every other case, we'll queue up the callback to run after the commit happens.
-        if ($this->transactions->isEmpty() || ($this->callbackApplicableTransactions()->count() == 1)) {
+        if ($this->callbackApplicableTransactions()->count() === 0) {
             $callback();
         } else {
             $this->transactions->last()->addCallback($callback);

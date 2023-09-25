@@ -203,11 +203,13 @@ trait ManagesTransactions
      * Determine if after commit callbacks should be executed.
      *
      * @return bool
+     *
+     * @deprecated
      */
     protected function afterCommitCallbacksShouldBeExecuted()
     {
         return $this->transactions == 0 ||
-            ($this->transactionsManager?->afterCommitCallbacksShouldBeExecuted() ?? false);
+            ($this->transactionsManager?->afterCommitCallbacksShouldBeExecuted(1));
     }
 
     /**
