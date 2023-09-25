@@ -101,7 +101,7 @@ trait RefreshDatabase
                 $transactionManager->callbacksShouldIgnore(
                     $transactionManager->getTransactions()->first()
                 )->afterCommitCallbacksShouldBeExecutedUsing(
-                    fn ($level, $transactions) => $transactions->skip(1)->first()->level === $level
+                    fn ($level) => $level === 2
                 );
             }
         }
