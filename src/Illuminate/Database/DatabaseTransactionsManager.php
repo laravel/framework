@@ -21,7 +21,7 @@ class DatabaseTransactionsManager
     /**
      * The callback to determine after commit callback should be executed.
      *
-     * @var (callable():bool)|null
+     * @var (callable(int, \Illuminate\Support\Collection<int, \Illuminate\Database\DatabaseTransactionRecord>):(bool))|null
      */
     protected $afterCommitCallbacksShouldBeExecutedCallback;
 
