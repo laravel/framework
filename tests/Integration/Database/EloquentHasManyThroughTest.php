@@ -146,16 +146,15 @@ class EloquentHasManyThroughTest extends DatabaseTestCase
         // because the UPDATE statement would target a model based on the ID from the parent instead of the actual
         // conditions that the `updateOrCreate()` targeted. This test replicates the case that causes this bug.
 
-        // Manually providing IDs to keep ID 1 and 2 free for the team-mates...
-        $taylor = User::create(['name' => 'Taylor', 'id' => 3]);
-        $user2 = User::create(['name' => 'Adam', 'id' => 4]);
+        $team1 = Team::create();
+        $team2 = Team::create();
 
-        $team1 = Team::create(['owner_id' => $taylor->id]);
-        $team2 = Team::create(['owner_id' => $user2->id]);
-
-        $john = User::create(['name' => 'John', 'slug' => 'john-slug', 'team_id' => $team1->id, 'id' => 2]);
         // Jane's ID should be the same as the $team1's ID for the bug to occur.
-        $jane = User::create(['name' => 'Jane', 'slug' => 'jane-slug', 'team_id' => $team2->id, 'id' => $team1->id]);
+        $jane = User::create(['name' => 'Jane', 'slug' => 'jane-slug', 'team_id' => $team2->id]);
+        $john = User::create(['name' => 'John', 'slug' => 'john-slug', 'team_id' => $team1->id]);
+
+        $taylor = User::create(['name' => 'Taylor']);
+        $team1->update(['owner_id' => $taylor->id]);
 
         $this->assertSame(2, $john->id);
         $this->assertSame(1, $jane->id);
