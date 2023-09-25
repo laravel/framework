@@ -7,16 +7,23 @@ class DatabaseTransactionsManager
     /**
      * All of the recorded transactions.
      *
-     * @var \Illuminate\Support\Collection
+     * @var \Illuminate\Support\Collection<int, \Illuminate\Database\DatabaseTransactionRecord>
      */
     protected $transactions;
 
     /**
      * The database transaction that should be ignored by callbacks.
      *
-     * @var \Illuminate\Database\DatabaseTransactionRecord
+     * @var \Illuminate\Database\DatabaseTransactionRecord|null
      */
     protected $callbacksShouldIgnore;
+
+    /**
+     * The callback to determine after commit callback should be executed.
+     *
+     * @var (callable():bool)|null
+     */
+    protected $afterCommitCallbacksShouldBeExecutedCallback;
 
     /**
      * Create a new database transactions manager instance.
@@ -119,6 +126,30 @@ class DatabaseTransactionsManager
         return $this->transactions->reject(
             fn ($transaction) => $transaction === $this->callbacksShouldIgnore
         )->values();
+    }
+
+    /**
+     * Add custom callback to determine if after commit callbacks should be executed.
+     *
+     * @return bool
+     */
+    public function afterCommitCallbacksShouldBeExecutedUsing(callable $callback = null)
+    {
+        $this->afterCommitCallbacksShouldBeExecutedCallback = $callback;
+
+        return $this;
+    }
+
+    /**
+     * Determine if after commit callbacks should be executed.
+     *
+     * @return bool
+     */
+    public function afterCommitCallbacksShouldBeExecuted()
+    {
+        return is_callable($this->afterCommitCallbacksShouldBeExecutedCallback)
+            ? call_user_func($this->afterCommitCallbacksShouldBeExecutedCallback, $this->transactions)
+            : $this->callbackApplicableTransactions()->count() === 1;
     }
 
     /**
