@@ -98,11 +98,11 @@ class DatabaseTransactionsManager
     {
         $transactions = $this->callbackApplicableTransactions();
 
-        if ($transactions->count() > 0 && $current = $this->callbackApplicableTransactions()->last()) {
-            return $current->addCallback($callback);
+        if ($transactions->isEmpty()) {
+            $callback();
+        } elseif ($current = $transactions->first()) {
+            $current->addCallback($callback);
         }
-
-        $callback();
     }
 
     /**

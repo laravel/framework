@@ -47,8 +47,6 @@ trait ManagesTransactions
                     $this->getPdo()->commit();
                 }
 
-                $this->transactions = max(0, $this->transactions - 1);
-
                 if ($this->afterCommitCallbacksShouldBeExecuted()) {
                     $this->transactionsManager?->commit($this->getName());
                 }
@@ -193,8 +191,6 @@ trait ManagesTransactions
             $this->fireConnectionEvent('committing');
             $this->getPdo()->commit();
         }
-
-        $this->transactions = max(0, $this->transactions - 1);
 
         if ($this->afterCommitCallbacksShouldBeExecuted()) {
             $this->transactionsManager?->commit($this->getName());

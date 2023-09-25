@@ -1523,6 +1523,16 @@ class Connection implements ConnectionInterface
     }
 
     /**
+     * Get the transaction manager instance on the connection.
+     *
+     * @return  \Illuminate\Database\DatabaseTransactionsManager
+     */
+    public function getTransactionManager()
+    {
+        return $this->transactionsManager;
+    }
+
+    /**
      * Set the transaction manager instance on the connection.
      *
      * @param  \Illuminate\Database\DatabaseTransactionsManager  $manager
