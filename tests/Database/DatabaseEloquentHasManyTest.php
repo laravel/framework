@@ -155,7 +155,6 @@ class DatabaseEloquentHasManyTest extends TestCase
         $relation = $this->getRelation();
         $relation->getQuery()->shouldReceive('where')->once()->with(['foo'])->andReturn($relation->getQuery());
         $relation->getQuery()->shouldReceive('first')->once()->with()->andReturn(null);
-        $relation->getQuery()->shouldReceive('withSavepointIfNeeded')->once()->andReturnUsing(fn ($scope) => $scope());
         $model = $this->expectCreatedModel($relation, ['foo']);
 
         $this->assertEquals($model, $relation->firstOrCreate(['foo']));
@@ -166,7 +165,6 @@ class DatabaseEloquentHasManyTest extends TestCase
         $relation = $this->getRelation();
         $relation->getQuery()->shouldReceive('where')->once()->with(['foo' => 'bar'])->andReturn($relation->getQuery());
         $relation->getQuery()->shouldReceive('first')->once()->with()->andReturn(null);
-        $relation->getQuery()->shouldReceive('withSavepointIfNeeded')->once()->andReturnUsing(fn ($scope) => $scope());
         $model = $this->expectCreatedModel($relation, ['foo' => 'bar', 'baz' => 'qux']);
 
         $this->assertEquals($model, $relation->firstOrCreate(['foo' => 'bar'], ['baz' => 'qux']));
