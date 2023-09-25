@@ -32,12 +32,10 @@ class EloquentTransactionWithAfterCommitUsingDatabaseTransactionsTest extends Te
     {
         $connection = $app->make('config')->get('database.default');
 
-        $db = $app['config']->get("database.connections.{$connection}");
-
-        if ($db['driver'] === 'sqlite' && $db['database'] == ':memory:') {
+        if ($this->usesSqliteInMemoryDatabaseConnection($connection)) {
             $this->markTestSkipped('Test cannot be used with in-memory SQLite connection.');
         }
 
-        $this->driver = $db['driver'];
+        $this->driver = $app['config']->get("database.connections.$connection.driver");
     }
 }
