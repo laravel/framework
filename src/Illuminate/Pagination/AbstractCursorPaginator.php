@@ -103,7 +103,7 @@ abstract class AbstractCursorPaginator implements Htmlable
     {
         // If we have any extra query string key / value pairs that need to be added
         // onto the URL, we will put them in query string form and then attach it
-        // to the URL. This allows for extra information like sorting storage.
+        // to the URL. This allows for extra information like sortings storage.
         $parameters = is_null($cursor) ? [] : [$this->cursorName => $cursor->encode()];
 
         if (count($this->query) > 0) {
