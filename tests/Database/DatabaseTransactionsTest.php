@@ -64,7 +64,7 @@ class DatabaseTransactionsTest extends TestCase
     {
         $transactionManager = m::mock(new DatabaseTransactionsManager);
         $transactionManager->shouldReceive('begin')->once()->with('default', 1);
-        $transactionManager->shouldReceive('commit')->once()->with('default', 1);
+        $transactionManager->shouldReceive('commit')->once()->with('default');
 
         $this->connection()->setTransactionManager($transactionManager);
 
@@ -83,7 +83,7 @@ class DatabaseTransactionsTest extends TestCase
     {
         $transactionManager = m::mock(new DatabaseTransactionsManager);
         $transactionManager->shouldReceive('begin')->once()->with('default', 1);
-        $transactionManager->shouldReceive('commit')->once()->with('default', 1);
+        $transactionManager->shouldReceive('commit')->once()->with('default');
 
         $this->connection()->setTransactionManager($transactionManager);
 
@@ -103,8 +103,8 @@ class DatabaseTransactionsTest extends TestCase
         $transactionManager = m::mock(new DatabaseTransactionsManager);
         $transactionManager->shouldReceive('begin')->once()->with('default', 1);
         $transactionManager->shouldReceive('begin')->once()->with('default', 2);
-        $transactionManager->shouldReceive('commit')->once()->with('default', 2);
-        $transactionManager->shouldReceive('commit')->once()->with('default', 1);
+        $transactionManager->shouldReceive('commit')->once()->with('default');
+        $transactionManager->shouldReceive('commit')->once()->with('default');
 
         $this->connection()->setTransactionManager($transactionManager);
 
@@ -131,9 +131,8 @@ class DatabaseTransactionsTest extends TestCase
         $transactionManager->shouldReceive('begin')->once()->with('default', 1);
         $transactionManager->shouldReceive('begin')->once()->with('second_connection', 1);
         $transactionManager->shouldReceive('begin')->once()->with('second_connection', 2);
-        $transactionManager->shouldReceive('commit')->once()->with('second_connection', 2);
-        $transactionManager->shouldReceive('commit')->once()->with('second_connection', 1);
-        $transactionManager->shouldReceive('commit')->once()->with('default', 1);
+        $transactionManager->shouldReceive('commit')->once()->with('second_connection');
+        $transactionManager->shouldReceive('commit')->once()->with('default');
 
         $this->connection()->setTransactionManager($transactionManager);
         $this->connection('second_connection')->setTransactionManager($transactionManager);

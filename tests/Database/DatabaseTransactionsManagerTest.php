@@ -118,11 +118,7 @@ class DatabaseTransactionsManagerTest extends TestCase
 
         $manager->begin('admin', 1);
 
-        $manager->commit('default', 2);
-
-        $this->assertEmpty($callbacks, 'Should not have ran the callbacks.');
-
-        $manager->commit('default', 1);
+        $manager->commit('default');
 
         $this->assertCount(2, $callbacks);
         $this->assertEquals(['default', 1], $callbacks[0]);
@@ -148,11 +144,7 @@ class DatabaseTransactionsManagerTest extends TestCase
             $callbacks[] = ['admin', 1];
         });
 
-        $manager->commit('default', 2);
-
-        $this->assertEmpty($callbacks, 'Should not have run the callbacks.');
-
-        $manager->commit('default', 1);
+        $manager->commit('default');
 
         $this->assertCount(1, $callbacks);
         $this->assertEquals(['default', 1], $callbacks[0]);
