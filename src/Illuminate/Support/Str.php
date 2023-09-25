@@ -518,13 +518,15 @@ class Str
      */
     public static function words($value, $words = 100, $end = '...')
     {
-        preg_match('/^\s*+(?:\S++\s*+){1,'.$words.'}/u', $value, $matches);
+        $word_array = explode(' ', $value);
+        $sliced_words = array_slice($word_array, 0, $words);
+        $result = implode(' ', $sliced_words);
 
-        if (! isset($matches[0]) || static::length($value) === static::length($matches[0])) {
-            return $value;
+        if (count($word_array) > $words) {
+            $result .= $end;
         }
 
-        return rtrim($matches[0]).$end;
+        return $result;
     }
 
     /**
