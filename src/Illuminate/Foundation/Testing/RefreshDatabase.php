@@ -99,9 +99,12 @@ trait RefreshDatabase
 
             if ($this->app->resolved('db.transactions')) {
                 $this->app->make('db.transactions')
-                ->callbacksShouldIgnore(
-                    $this->app->make('db.transactions')->getTransactions()->first()
-                );
+                    ->callbacksShouldIgnore(
+                        $this->app->make('db.transactions')->getTransactions()->first()
+                    )
+                    ->afterCommitCallbacksShouldBeExecutedUsing(
+                        fn ($transactions) => $transactions->skip(1)->count() <= 1
+                    );
             }
         }
 
