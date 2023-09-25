@@ -263,6 +263,22 @@ class HasManyThrough extends Relation
     }
 
     /**
+     * Get the first record matching the attributes. If the record is not found, create it.
+     *
+     * @param  array  $attributes
+     * @param  array  $values
+     * @return \Illuminate\Database\Eloquent\Model
+     */
+    public function firstOrCreate(array $attributes = [], array $values = [])
+    {
+        if (is_null($instance = $this->where($attributes)->first())) {
+            $instance = $this->create(array_merge($attributes, $values));
+        }
+
+        return $instance;
+    }
+
+    /**
      * Create or update a related record matching the attributes, and fill it with values.
      *
      * @param  array  $attributes
