@@ -64,10 +64,9 @@ class DatabaseTransactionsManager
      * Commit the active database transaction.
      *
      * @param  string  $connection
-     * @param  int  $level
      * @return void
      */
-    public function commit($connection, $level = 1)
+    public function commit($connection)
     {
         [$forThisConnection, $forOtherConnections] = $this->transactions->partition(
             fn ($transaction) => $transaction->connection == $connection

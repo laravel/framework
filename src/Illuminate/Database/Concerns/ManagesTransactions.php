@@ -48,7 +48,7 @@ trait ManagesTransactions
                 }
 
                 if ($this->afterCommitCallbacksShouldBeExecuted()) {
-                    $this->transactionsManager?->commit($this->getName(), $this->transactions);
+                    $this->transactionsManager?->commit($this->getName());
                 }
             } catch (Throwable $e) {
                 $this->handleCommitTransactionException(
@@ -195,7 +195,7 @@ trait ManagesTransactions
         }
 
         if ($this->afterCommitCallbacksShouldBeExecuted()) {
-            $this->transactionsManager?->commit($this->getName(), $this->transactions);
+            $this->transactionsManager?->commit($this->getName());
         }
 
         $this->transactions = max(0, $this->transactions - 1);
