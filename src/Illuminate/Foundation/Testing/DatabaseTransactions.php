@@ -23,7 +23,7 @@ trait DatabaseTransactions
 
             if ($this->app->resolved('db.transactions')) {
                 $this->app->make('db.transactions')->callbacksShouldIgnore(
-                    $this->app->make('db.transactions')->getTransactions()->first()
+                    fn ($transaction) => $transaction === $this->app->make('db.transactions')->getTransactions()->first()
                 );
             }
         }

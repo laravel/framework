@@ -99,10 +99,10 @@ class DatabaseTransactionsManager
     /**
      * Specify that callbacks should ignore the given transaction when determining if they should be executed.
      *
-     * @param  \Illuminate\Database\DatabaseTransactionRecord  $transaction
+     * @param  \Illuminate\Database\DatabaseTransactionRecord|(callback(\Illuminate\Database\DatabaseTransactionRecord):bool)  $transaction
      * @return $this
      */
-    public function callbacksShouldIgnore(DatabaseTransactionRecord $transaction)
+    public function callbacksShouldIgnore($transaction)
     {
         $this->callbacksShouldIgnore = $transaction;
 
@@ -116,9 +116,13 @@ class DatabaseTransactionsManager
      */
     public function callbackApplicableTransactions()
     {
-        return $this->transactions->reject(function ($transaction) {
-            return $transaction === $this->callbacksShouldIgnore;
-        })->values();
+        if (is_callable($this->callbacksShouldIgnore)) {
+            return $this->transactions->filter($this->callbacksShouldIgnore)->values();
+        }
+
+        return $this->transactions->reject(
+            fn ($transaction) => $transaction === $this->callbacksShouldIgnore
+        )->values();
     }
 
     /**
