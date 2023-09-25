@@ -388,6 +388,28 @@ class Validator implements ValidatorContract
     }
 
     /**
+     * Sort validated data to match original data order.
+     *
+     * @param  array  $originalData
+     * @param  array  $validatedData
+     * @return array
+     */
+    protected function sortValidatedDataBasedOnOriginal($originalData, $validatedData)
+    {
+        $validatedDataSorted = [];
+
+        foreach ($originalData as $key => $value) {
+            if (array_key_exists($key, $validatedData)) {
+                $validatedDataSorted[$key] = is_array($validatedData[$key])
+                    ? $this->sortValidatedDataBasedOnOriginal($originalData[$key], $validatedData[$key])
+                    : $validatedData[$key];
+            }
+        }
+
+        return $validatedDataSorted;
+    }
+
+    /**
      * Add an after validation callback.
      *
      * @param  callable|array|string  $callback
@@ -577,7 +599,7 @@ class Validator implements ValidatorContract
             }
         }
 
-        return $this->replacePlaceholders($results);
+        return $this->sortValidatedDataBasedOnOriginal($this->data, $this->replacePlaceholders($results));
     }
 
     /**
