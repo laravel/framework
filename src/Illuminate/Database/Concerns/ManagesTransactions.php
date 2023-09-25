@@ -212,7 +212,7 @@ trait ManagesTransactions
     {
         return $this->transactions == 0 ||
             ($this->transactionsManager &&
-             $this->transactionsManager->callbackApplicableTransactions()->count() === 1);
+             $this->transactionsManager->callbackApplicableTransactions()->count() >= 1);
     }
 
     /**
