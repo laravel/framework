@@ -8,6 +8,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
+use Spatie\LaravelRay\RayServiceProvider;
 
 class EloquentHasManyThroughTest extends DatabaseTestCase
 {
@@ -153,21 +154,38 @@ class EloquentHasManyThroughTest extends DatabaseTestCase
 		$team1 = Team::create(['owner_id' => $user1->id]);
 		$team2 = Team::create(['owner_id' => $user2->id]);
 		
-		$teamMate1 = User::create(['name' => 'John', 'team_id' => $team1->id, 'id' => 2]);
+		$teamMate1 = User::create(['name' => 'John', 'slug' => 'john-slug', 'team_id' => $team1->id, 'id' => 2]);
 		// $teamMate2->id should be the same as the $team1->id for the bug to occur.
-		$teamMate2 = User::create(['name' => 'Jane', 'team_id' => $team2->id, 'id' => $team1->id]);
+		$teamMate2 = User::create(['name' => 'Jane', 'slug' => 'jane-slug', 'team_id' => $team2->id, 'id' => $team1->id]);
 		
+		$this->assertSame(2, $teamMate1->id);
+		$this->assertSame(1, $teamMate2->id);
+		
+		$this->assertSame(2, $teamMate1->refresh()->id);
+		$this->assertSame(1, $teamMate2->refresh()->id);
+		
+		$this->assertSame('john-slug', $teamMate1->slug);
+		$this->assertSame('jane-slug', $teamMate2->slug);
+		
+		$this->assertSame('john-slug', $teamMate1->refresh()->slug);
+		$this->assertSame('jane-slug', $teamMate2->refresh()->slug);
+		
+		(new RayServiceProvider($this->app))->register();
+		(new RayServiceProvider($this->app))->boot();
+		
+		ray()->showQueries();
 		$user1->teamMates()->updateOrCreate([
 			'name' => 'John',
 		], [
 			'name' => 'John Doe',
 		]);
+		ray()->stopShowingQueries();
 		
 		// In Laravel 10.21.0, the $teamMate1 would not be updated and still have the name "John"...
 		$this->assertSame('John Doe', $teamMate1->fresh()->name);
-		// ... and the $teamMate2 would be updated and now have the name "John Doe", because this
-		// $teamMate has the same ID as the $user1. Even more dangerous, $teamMate2 belongs to a
-		// totally different team and is not related to $user1 in any way or via any relation.
+		// The `$teamMate2` variable would be updated and now have the name "John Doe". This is because
+		// `$teamMate2` has the same ID as the `$team1`. Even more dangerous, $teamMate2 belongs to a
+		// totally different team and is not related to `$user1` in any way or via any relationship.
 		$this->assertSame('Jane', $teamMate2->fresh()->name);
 	}
 }
