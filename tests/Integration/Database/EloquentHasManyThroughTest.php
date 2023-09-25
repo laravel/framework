@@ -139,6 +139,37 @@ class EloquentHasManyThroughTest extends DatabaseTestCase
 
         $this->assertEquals([1], $categories->pluck('id')->all());
     }
+	
+	public function testUpdateOrCreateWillNotUseIdFromParentModel()
+	{
+		// On Laravel 10.21.0, a bug was introduced that would update the wroong model when using `updateOrCreate()`,
+		// because the UPDATE statement would target a model based on the ID from the parent instead of the actual
+		// conditions that the `updateOrCreate()` targeted. This test replicates the case that causes this bug.
+		
+		// Manually provide IDs, keep ID 1 and 2 free for the team-mates.
+		$user1 = User::create(['name' => Str::random(), 'id' => 3]);
+		$user2 = User::create(['name' => Str::random(), 'id' => 4]);
+		
+		$team1 = Team::create(['owner_id' => $user1->id]);
+		$team2 = Team::create(['owner_id' => $user2->id]);
+		
+		$teamMate1 = User::create(['name' => 'John', 'team_id' => $team1->id, 'id' => 2]);
+		// $teamMate2->id should be the same as the $team1->id for the bug to occur.
+		$teamMate2 = User::create(['name' => 'Jane', 'team_id' => $team2->id, 'id' => $team1->id]);
+		
+		$user1->teamMates()->updateOrCreate([
+			'name' => 'John',
+		], [
+			'name' => 'John Doe',
+		]);
+		
+		// In Laravel 10.21.0, the $teamMate1 would not be updated and still have the name "John"...
+		$this->assertSame('John Doe', $teamMate1->fresh()->name);
+		// ... and the $teamMate2 would be updated and now have the name "John Doe", because this
+		// $teamMate has the same ID as the $user1. Even more dangerous, $teamMate2 belongs to a
+		// totally different team and is not related to $user1 in any way or via any relation.
+		$this->assertSame('Jane', $teamMate2->fresh()->name);
+	}
 }
 
 class User extends Model
