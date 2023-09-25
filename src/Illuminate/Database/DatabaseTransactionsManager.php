@@ -112,7 +112,7 @@ class DatabaseTransactionsManager
     /**
      * Get the transactions that are applicable to callbacks.
      *
-     * @return \Illuminate\Support\Collection
+     * @return \Illuminate\Support\Collection<int, \Illuminate\Database\DatabaseTransactionRecord>
      */
     public function callbackApplicableTransactions()
     {
