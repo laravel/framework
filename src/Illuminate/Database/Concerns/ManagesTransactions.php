@@ -48,14 +48,14 @@ trait ManagesTransactions
                 }
 
                 $this->transactionsManager?->commit($this->getName(), $this->transactions);
-
-                $this->transactions = max(0, $this->transactions - 1);
             } catch (Throwable $e) {
                 $this->handleCommitTransactionException(
                     $e, $currentAttempt, $attempts
                 );
 
                 continue;
+            } finally {
+                $this->transactions = max(0, $this->transactions - 1);
             }
 
             $this->fireConnectionEvent('committed');

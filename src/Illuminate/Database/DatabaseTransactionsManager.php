@@ -71,20 +71,26 @@ class DatabaseTransactionsManager
      * Commit the active database transaction.
      *
      * @param  string  $connection
+     * @param  int  $level
      * @return void
      */
-    public function commit($connection)
+    public function commit($connection, $level = 1)
     {
         [$forThisConnection, $forOtherConnections] = $this->transactions->partition(
             fn ($transaction) => $transaction->connection == $connection
         );
 
-        $this->transactions = $forOtherConnections->values();
+        // If the transaction level being commited reaches 1 (meaning it was the root
+        // transaction), we'll run the callbacks. In test mode, since we wrap each
+        // test in a transaction, we'll run the callbacks when reaching level 2.
+        if ($this->afterCommitCallbacksShouldBeExecuted($level)) {
+            $this->transactions = $forOtherConnections->values();
 
-        $forThisConnection->map->executeCallbacks();
+            $forThisConnection->map->executeCallbacks();
 
-        if ($this->transactions->isEmpty()) {
-            $this->callbacksShouldIgnore = null;
+            if ($this->transactions->isEmpty()) {
+                $this->callbacksShouldIgnore = null;
+            }
         }
     }
 
@@ -96,12 +102,13 @@ class DatabaseTransactionsManager
      */
     public function addCallback($callback)
     {
-        $transactions = $this->callbackApplicableTransactions();
-
-        if ($transactions->isEmpty()) {
+        // If there are no transactions, we'll run the callbacks right away. Also, we'll run it
+        // right away when we're in test mode and we only have the wrapping transaction. For
+        // every other case, we'll queue up the callback to run after the commit happens.
+        if ($this->transactions->isEmpty() || ($this->callbackApplicableTransactions()->count() == 1)) {
             $callback();
-        } elseif ($current = $transactions->last()) {
-            $current->addCallback($callback);
+        } else {
+            $this->transactions->last()->addCallback($callback);
         }
     }
 
@@ -133,6 +140,7 @@ class DatabaseTransactionsManager
     /**
      * Add custom callback to determine if after commit callbacks should be executed.
      *
+     * @param  (callable(int, \Illuminate\Support\Collection<int, \Illuminate\Database\DatabaseTransactionRecord>):(bool))|null  $callback
      * @return bool
      */
     public function afterCommitCallbacksShouldBeExecutedUsing(callable $callback = null)
@@ -145,11 +153,14 @@ class DatabaseTransactionsManager
     /**
      * Determine if after commit callbacks should be executed.
      *
+     * @param  int  $level
      * @return bool
      */
-    public function afterCommitCallbacksShouldBeExecuted()
+    public function afterCommitCallbacksShouldBeExecuted($level)
     {
-        return $this->callbackApplicableTransactions()->count() === 1;
+        return is_callable($this->afterCommitCallbacksShouldBeExecutedCallback)
+            ? call_user_func($this->afterCommitCallbacksShouldBeExecutedCallback, $level, $this->transactions)
+            : $level === 1;
     }
 
     /**
