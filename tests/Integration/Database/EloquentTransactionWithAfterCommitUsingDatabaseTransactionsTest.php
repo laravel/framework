@@ -8,4 +8,17 @@ class EloquentTransactionWithAfterCommitUsingDatabaseTransactionsTest extends Da
 {
     use EloquentTransactionWithAfterCommitTests;
     use DatabaseTransactions;
+
+    protected function getEnvironmentSetUp($app)
+    {
+        parent::getEnvironmentSetUp($app);
+
+        $connection = $app->make('config')->get('database.default');
+
+        $db = $app['config']->get("database.connections.{$connection}");
+
+        if ($db['driver'] === 'sqlite' && $db['database'] == ':memory:') {
+            $this->markTestSkipped('Test cannot be used with in-memory SQLite connection.');
+        }
+    }
 }
