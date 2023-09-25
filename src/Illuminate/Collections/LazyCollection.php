@@ -419,7 +419,26 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
      */
     public function except($keys)
     {
-        return $this->passthru('except', func_get_args());
+        $keys = match (true) {
+            $keys instanceof Enumerable => $keys->all(),
+            is_array($keys) => $keys,
+            is_null($keys) => [],
+            default => func_get_args(),
+        };
+
+        if (count($keys) === 0) {
+            return new static(function () {
+                yield from $this;
+            });
+        }
+
+        return new static(function () use ($keys) {
+            foreach ($this as $key => $value) {
+                if (!in_array($key, $keys)) {
+                    yield $key => $value;
+                }
+            }
+        });
     }
 
     /**
