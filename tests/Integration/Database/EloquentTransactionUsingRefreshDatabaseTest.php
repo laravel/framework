@@ -20,13 +20,6 @@ class EloquentTransactionUsingRefreshDatabaseTest extends DatabaseTestCase
         parent::setUp();
     }
 
-    protected function getEnvironmentSetUp($app)
-    {
-        $app['config']->set('database.default', 'sqlite');
-
-        parent::getEnvironmentSetUp($app);
-    }
-
     public function testObserverIsCalledOnTestsWithAfterCommit()
     {
         User::observe($observer = EloquentTransactionUsingRefreshDatabaseUserObserver::resetting());
