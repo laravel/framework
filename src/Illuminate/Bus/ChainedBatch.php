@@ -31,7 +31,7 @@ class ChainedBatch implements ShouldQueue
         $batch->name = $this->name;
         $batch->options = $this->options;
 
-        $this->hijackChain($batch);
+        $this->moveChainToEndOfBatch($batch);
 
         if ($this->queue) {
             $batch->onQueue($this->queue);
@@ -48,7 +48,7 @@ class ChainedBatch implements ShouldQueue
         $batch->dispatch();
     }
 
-    protected function hijackChain(PendingBatch $batch)
+    protected function moveChainToEndOfBatch(PendingBatch $batch)
     {
         if (! empty($this->chained)) {
             $next = unserialize(array_shift($this->chained));
@@ -80,8 +80,8 @@ class ChainedBatch implements ShouldQueue
             if ($job instanceof PendingBatch) {
                 $jobs[$k] = new ChainedBatch($job);
             }
-        }
 
+}
         return $jobs;
     }
 }
