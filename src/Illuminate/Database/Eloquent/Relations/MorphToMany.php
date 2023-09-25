@@ -150,6 +150,7 @@ class MorphToMany extends BelongsToMany
     public function newPivot(array $attributes = [], $exists = false)
     {
         $using = $this->using;
+
         $attributes = array_merge([$this->morphType => $this->morphClass], $attributes);
 
         $pivot = $using ? $using::fromRawAttributes($this->parent, $attributes, $this->table, $exists)
