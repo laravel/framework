@@ -139,6 +139,50 @@ class EloquentHasManyThroughTest extends DatabaseTestCase
 
         $this->assertEquals([1], $categories->pluck('id')->all());
     }
+
+    public function testUpdateOrCreateAffectingWrongModelsRegression()
+    {
+        // On Laravel 10.21.0, a bug was introduced that would update the wrong model when using `updateOrCreate()`,
+        // because the UPDATE statement would target a model based on the ID from the parent instead of the actual
+        // conditions that the `updateOrCreate()` targeted. This test replicates the case that causes this bug.
+
+        $team1 = Team::create();
+        $team2 = Team::create();
+
+        // Jane's ID should be the same as the $team1's ID for the bug to occur.
+        $jane = User::create(['name' => 'Jane', 'slug' => 'jane-slug', 'team_id' => $team2->id]);
+        $john = User::create(['name' => 'John', 'slug' => 'john-slug', 'team_id' => $team1->id]);
+
+        $taylor = User::create(['name' => 'Taylor']);
+        $team1->update(['owner_id' => $taylor->id]);
+
+        $this->assertSame(2, $john->id);
+        $this->assertSame(1, $jane->id);
+
+        $this->assertSame(2, $john->refresh()->id);
+        $this->assertSame(1, $jane->refresh()->id);
+
+        $this->assertSame('john-slug', $john->slug);
+        $this->assertSame('jane-slug', $jane->slug);
+
+        $this->assertSame('john-slug', $john->refresh()->slug);
+        $this->assertSame('jane-slug', $jane->refresh()->slug);
+
+        // The `updateOrCreate` method would first try to find a matching attached record with a query like:
+        // `->where($attributes)->first()`, which should return `John` of ID 1 in our case. However, it'd
+        // return the incorrect ID of 2, which caused it to update Jane's record instead of John's.
+
+        $taylor->teamMates()->updateOrCreate([
+            'name' => 'John',
+        ], [
+            'slug' => 'john-doe',
+        ]);
+
+        // Expect $john's slug to be updated to john-doe instead of john-slug.
+        $this->assertSame('john-doe', $john->fresh()->slug);
+        // $jane should not be updated, because it belongs to a different user altogether.
+        $this->assertSame('jane-slug', $jane->fresh()->slug);
+    }
 }
 
 class User extends Model
