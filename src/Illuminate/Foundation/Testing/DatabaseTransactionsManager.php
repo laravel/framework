@@ -4,7 +4,6 @@ namespace Illuminate\Foundation\Testing;
 
 class DatabaseTransactionsManager extends \Illuminate\Database\DatabaseTransactionsManager
 {
-
     /**
      * Register a transaction callback.
      *
