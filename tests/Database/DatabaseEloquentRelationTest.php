@@ -271,7 +271,7 @@ class DatabaseEloquentRelationTest extends TestCase
 
     public function testIsRelationIgnoresAttribute()
     {
-        $model = new EloquentRelationAndAtrributeModelStub;
+        $model = new EloquentRelationAndAttributeModelStub;
 
         $this->assertTrue($model->isRelation('parent'));
         $this->assertFalse($model->isRelation('field'));
@@ -339,7 +339,7 @@ class EloquentNoTouchingAnotherModelStub extends Model
     ];
 }
 
-class EloquentRelationAndAtrributeModelStub extends Model
+class EloquentRelationAndAttributeModelStub extends Model
 {
     protected $table = 'one_more_table';
 
