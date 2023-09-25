@@ -209,7 +209,7 @@ trait ManagesTransactions
     protected function afterCommitCallbacksShouldBeExecuted()
     {
         return $this->transactions == 0 ||
-            ($this->transactionsManager?->afterCommitCallbacksShouldBeExecuted(1));
+            $this->transactionsManager?->afterCommitCallbacksShouldBeExecuted(1);
     }
 
     /**
