@@ -3,26 +3,27 @@
 namespace Illuminate\Tests\Integration\Database;
 
 use Illuminate\Foundation\Auth\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Orchestra\Testbench\Concerns\WithLaravelMigrations;
 use Orchestra\Testbench\Factories\UserFactory;
 
-class EloquentTransactionUsingRefreshDatabaseTest extends DatabaseTestCase
+trait EloquentTransactionWithAfterCommitTests
 {
-    use RefreshDatabase, WithLaravelMigrations;
+    use WithLaravelMigrations;
 
-    protected function setUp(): void
+    protected function setUpEloquentTransactionWithAfterCommitTests(): void
     {
-        $this->afterApplicationCreated(fn () => User::unguard());
-        $this->beforeApplicationDestroyed(fn () => User::reguard());
+        User::unguard();
+    }
 
-        parent::setUp();
+    protected function tearDownEloquentTransactionWithAfterCommitTests(): void
+    {
+        User::reguard();
     }
 
     public function testObserverIsCalledOnTestsWithAfterCommit()
     {
-        User::observe($observer = EloquentTransactionUsingRefreshDatabaseUserObserver::resetting());
+        User::observe($observer = EloquentTransactionWithAfterCommitTestsUserObserver::resetting());
 
         $user1 = User::create(UserFactory::new()->raw());
 
@@ -32,7 +33,7 @@ class EloquentTransactionUsingRefreshDatabaseTest extends DatabaseTestCase
 
     public function testObserverCalledWithAfterCommitWhenInsideTransaction()
     {
-        User::observe($observer = EloquentTransactionUsingRefreshDatabaseUserObserver::resetting());
+        User::observe($observer = EloquentTransactionWithAfterCommitTestsUserObserver::resetting());
 
         $user1 = DB::transaction(fn () => User::create(UserFactory::new()->raw()));
 
@@ -42,7 +43,7 @@ class EloquentTransactionUsingRefreshDatabaseTest extends DatabaseTestCase
 
     public function testObserverIsCalledOnTestsWithAfterCommitWhenUsingSavepoint()
     {
-        User::observe($observer = EloquentTransactionUsingRefreshDatabaseUserObserver::resetting());
+        User::observe($observer = EloquentTransactionWithAfterCommitTestsUserObserver::resetting());
 
         $user1 = User::createOrFirst(UserFactory::new()->raw());
 
@@ -52,7 +53,7 @@ class EloquentTransactionUsingRefreshDatabaseTest extends DatabaseTestCase
 
     public function testObserverIsCalledOnTestsWithAfterCommitWhenUsingSavepointAndInsideTransaction()
     {
-        User::observe($observer = EloquentTransactionUsingRefreshDatabaseUserObserver::resetting());
+        User::observe($observer = EloquentTransactionWithAfterCommitTestsUserObserver::resetting());
 
         $user1 = DB::transaction(fn () => User::createOrFirst(UserFactory::new()->raw()));
 
@@ -62,7 +63,7 @@ class EloquentTransactionUsingRefreshDatabaseTest extends DatabaseTestCase
 
     public function testObserverIsCalledEvenWhenDeeplyNestingTransactions()
     {
-        User::observe($observer = EloquentTransactionUsingRefreshDatabaseUserObserver::resetting());
+        User::observe($observer = EloquentTransactionWithAfterCommitTestsUserObserver::resetting());
 
         $user1 = DB::transaction(function () {
             return tap(DB::transaction(function () {
@@ -81,7 +82,7 @@ class EloquentTransactionUsingRefreshDatabaseTest extends DatabaseTestCase
     }
 }
 
-class EloquentTransactionUsingRefreshDatabaseUserObserver
+class EloquentTransactionWithAfterCommitTestsUserObserver
 {
     public static $calledTimes = 0;
 

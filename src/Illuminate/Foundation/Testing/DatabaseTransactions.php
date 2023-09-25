@@ -21,12 +21,10 @@ trait DatabaseTransactions
             $connection->beginTransaction();
             $connection->setEventDispatcher($dispatcher);
 
-            if ($this->app->resolved('db.transactions')) {
-                $this->app->make('db.transactions')->callbacksShouldIgnore(
-                    $this->app->make('db.transactions')->getTransactions()->first()
-                )->afterCommitCallbacksShouldBeExecutedUsing(
-                    fn ($transactions) => $transactions->skip(1)
-                );
+            if ($transactionManager = $connection->getTransactionManager()) {
+                $transactionManager->callbacksShouldIgnore(
+                    $transactionManager->getTransactions()->first()
+                )->afterCommitCallbacksShouldBeExecutedUsing(fn ($level) => $level === 2);
             }
         }
 
