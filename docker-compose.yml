@@ -11,7 +11,7 @@ services:
       - "11211:11211"
     restart: always
   mysql:
-    image: mysql/mysql-server:8.0
+    image: mysql/mysql-server:5.7
     environment:
       MYSQL_ALLOW_EMPTY_PASSWORD: 1
       MYSQL_ROOT_PASSWORD: ""
