@@ -99,7 +99,6 @@ trait RefreshDatabase
             $connection->unsetEventDispatcher();
             $connection->beginTransaction();
             $connection->setEventDispatcher($dispatcher);
-
         }
 
         $this->beforeApplicationDestroyed(function () use ($database) {
