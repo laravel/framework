@@ -434,7 +434,7 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
 
         return new static(function () use ($keys) {
             foreach ($this as $key => $value) {
-                if (!in_array($key, $keys)) {
+                if (! in_array($key, $keys)) {
                     yield $key => $value;
                 }
             }
