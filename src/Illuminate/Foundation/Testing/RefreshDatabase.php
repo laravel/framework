@@ -100,9 +100,7 @@ trait RefreshDatabase
             if ($transactionManager = $connection->getTransactionManager()) {
                 $transactionManager->callbacksShouldIgnore(
                     $transactionManager->getTransactions()->first()
-                )->afterCommitCallbacksShouldBeExecutedUsing(function ($transactions) {
-                    return true;
-                });
+                );
             }
         }
 
@@ -110,6 +108,12 @@ trait RefreshDatabase
             foreach ($this->connectionsToTransact() as $name) {
                 $connection = $database->connection($name);
                 $dispatcher = $connection->getEventDispatcher();
+
+                if ($transactionManager = $connection->getTransactionManager()) {
+                    $transactionManager->getTransactions()
+                        ->skip(1)
+                        ->map->executeCallbacks();
+                }
 
                 $connection->unsetEventDispatcher();
                 $connection->rollBack();

@@ -100,7 +100,7 @@ class DatabaseTransactionsManager
 
         if ($transactions->isEmpty()) {
             $callback();
-        } elseif ($current = $transactions->first()) {
+        } elseif ($current = $transactions->last()) {
             $current->addCallback($callback);
         }
     }
@@ -149,9 +149,7 @@ class DatabaseTransactionsManager
      */
     public function afterCommitCallbacksShouldBeExecuted()
     {
-        return is_callable($this->afterCommitCallbacksShouldBeExecutedCallback)
-            ? call_user_func($this->afterCommitCallbacksShouldBeExecutedCallback, $this->transactions)
-            : $this->callbackApplicableTransactions()->count() === 1;
+        return $this->callbackApplicableTransactions()->count() === 1;
     }
 
     /**
