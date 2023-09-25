@@ -111,12 +111,6 @@ trait RefreshDatabase
                 $connection = $database->connection($name);
                 $dispatcher = $connection->getEventDispatcher();
 
-                if ($transactionManager = $connection->getTransactionManager()) {
-                    $transactionManager->getTransactions()
-                        ->skip(1)
-                        ->map->executeCallbacks();
-                }
-
                 $connection->unsetEventDispatcher();
                 $connection->rollBack();
                 $connection->setEventDispatcher($dispatcher);
