@@ -140,51 +140,49 @@ class EloquentHasManyThroughTest extends DatabaseTestCase
         $this->assertEquals([1], $categories->pluck('id')->all());
     }
 
-    public function testUpdateOrCreateWillNotUseIdFromParentModel()
+    public function testUpdateOrCreateAffectingWrongModelsRegression()
     {
         // On Laravel 10.21.0, a bug was introduced that would update the wrong model when using `updateOrCreate()`,
         // because the UPDATE statement would target a model based on the ID from the parent instead of the actual
         // conditions that the `updateOrCreate()` targeted. This test replicates the case that causes this bug.
 
-        // Manually provide IDs, keep ID 1 and 2 free for the team-mates.
-        $user1 = User::create(['name' => Str::random(), 'id' => 3]);
-        $user2 = User::create(['name' => Str::random(), 'id' => 4]);
+        // Manually providing IDs to keep ID 1 and 2 free for the team-mates...
+        $taylor = User::create(['name' => 'Taylor', 'id' => 3]);
+        $user2 = User::create(['name' => 'Adam', 'id' => 4]);
 
-        $team1 = Team::create(['owner_id' => $user1->id]);
+        $team1 = Team::create(['owner_id' => $taylor->id]);
         $team2 = Team::create(['owner_id' => $user2->id]);
 
-        $teamMate1 = User::create(['name' => 'John', 'slug' => 'john-slug', 'team_id' => $team1->id, 'id' => 2]);
-        // $teamMate2->id should be the same as the $team1->id for the bug to occur.
-        $teamMate2 = User::create(['name' => 'Jane', 'slug' => 'jane-slug', 'team_id' => $team2->id, 'id' => $team1->id]);
+        $john = User::create(['name' => 'John', 'slug' => 'john-slug', 'team_id' => $team1->id, 'id' => 2]);
+        // Jane's ID should be the same as the $team1's ID for the bug to occur.
+        $jane = User::create(['name' => 'Jane', 'slug' => 'jane-slug', 'team_id' => $team2->id, 'id' => $team1->id]);
 
-        $this->assertSame(2, $teamMate1->id);
-        $this->assertSame(1, $teamMate2->id);
+        $this->assertSame(2, $john->id);
+        $this->assertSame(1, $jane->id);
 
-        $this->assertSame(2, $teamMate1->refresh()->id);
-        $this->assertSame(1, $teamMate2->refresh()->id);
+        $this->assertSame(2, $john->refresh()->id);
+        $this->assertSame(1, $jane->refresh()->id);
 
-        $this->assertSame('john-slug', $teamMate1->slug);
-        $this->assertSame('jane-slug', $teamMate2->slug);
+        $this->assertSame('john-slug', $john->slug);
+        $this->assertSame('jane-slug', $jane->slug);
 
-        $this->assertSame('john-slug', $teamMate1->refresh()->slug);
-        $this->assertSame('jane-slug', $teamMate2->refresh()->slug);
+        $this->assertSame('john-slug', $john->refresh()->slug);
+        $this->assertSame('jane-slug', $jane->refresh()->slug);
 
-        $user1->teamMates()->updateOrCreate([
+        // The `updateOrCreate` method would first try to find a matching attached record with a query like:
+        // `->where($attributes)->first()`, which should return `John` of ID 1 in our case. However, it'd
+        // return the incorrect ID of 2, which caused it to update Jane's record instead of John's.
+
+        $taylor->teamMates()->updateOrCreate([
             'name' => 'John',
-            // The `updateOrCreate()` method tries to retrieve an existing model first like `->where($conditions)->first()`.
-            // In our case, that will return the model with the name `John`. However, the ID of the model with the name
-            // `John` is hydrated to `1` – where the actual ID should be `2` for the model with the name `John` (see
-            // the assertions above). If the `->where($conditions)->first()` return a model, a `->fill()->save()`
-            // action is executed. Because the ID is incorrectly hydrated to `1`, it will now update the Jane
-            // model with *all* the attributes of the `John` model, instead of updating the `John` model.
         ], [
             'slug' => 'john-doe',
         ]);
 
-        // Expect $teamMate1's slug to be updated to john-doe instead of john-old.
-        $this->assertSame('john-doe', $teamMate1->fresh()->slug);
-        // $teamMate2 should not be updated, because it belongs to a different user altogether.
-        $this->assertSame('jane-slug', $teamMate2->fresh()->slug);
+        // Expect $john's slug to be updated to john-doe instead of john-slug.
+        $this->assertSame('john-doe', $john->fresh()->slug);
+        // $jane should not be updated, because it belongs to a different user altogether.
+        $this->assertSame('jane-slug', $jane->fresh()->slug);
     }
 }
 
