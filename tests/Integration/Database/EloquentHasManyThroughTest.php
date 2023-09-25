@@ -170,23 +170,22 @@ class EloquentHasManyThroughTest extends DatabaseTestCase
 		$this->assertSame('john-slug', $teamMate1->refresh()->slug);
 		$this->assertSame('jane-slug', $teamMate2->refresh()->slug);
 		
-		(new RayServiceProvider($this->app))->register();
-		(new RayServiceProvider($this->app))->boot();
-		
-		ray()->showQueries();
 		$user1->teamMates()->updateOrCreate([
 			'name' => 'John',
+			// The `updateOrCreate()` method tries to retrieve an existing model first like `->where($conditions)->first()`.
+			// In our case, that will return the model with the name `John`. However, the ID of the model with the name
+			// `John` is hydrated to `1` – where the actual ID should be `2` for the model with the name `John` (see
+			// the assertions above). If the `->where($conditions)->first()` return a model, a `->fill()->save()`
+			// action is executed. Because the ID is incorrectly hydrated to `1`, it will now update the Jane
+			// model with *all* the attributes of the `John` model, instead of updating the `John` model.
 		], [
-			'name' => 'John Doe',
+			'slug' => 'john-doe',
 		]);
-		ray()->stopShowingQueries();
 		
-		// In Laravel 10.21.0, the $teamMate1 would not be updated and still have the name "John"...
-		$this->assertSame('John Doe', $teamMate1->fresh()->name);
-		// The `$teamMate2` variable would be updated and now have the name "John Doe". This is because
-		// `$teamMate2` has the same ID as the `$team1`. Even more dangerous, $teamMate2 belongs to a
-		// totally different team and is not related to `$user1` in any way or via any relationship.
-		$this->assertSame('Jane', $teamMate2->fresh()->name);
+		// Expect $teamMate1's slug to be updated to john-doe instead of john-old.
+		$this->assertSame('john-doe', $teamMate1->fresh()->slug);
+		// $teamMate2 should not be updated, because it belongs to a different user altogether.
+		$this->assertSame('jane-slug', $teamMate2->fresh()->slug);
 	}
 }
 
