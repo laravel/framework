@@ -188,7 +188,7 @@
 - [10.x] Prompts by [@jessarcher](https://github.com/jessarcher) in https://github.com/laravel/framework/pull/46772
 - [10.x] Migrate JSON data to shared InputBag by [@timacdonald](https://github.com/timacdonald) in https://github.com/laravel/framework/pull/47914
 - [10.x] Fix `Factory::configure()` return type by [@axlon](https://github.com/axlon) in https://github.com/laravel/framework/pull/47920
-- [10.x] Fix Http global middleware for queue, octane, and dependecy injection by [@timacdonald](https://github.com/timacdonald) in https://github.com/laravel/framework/pull/47915
+- [10.x] Fix Http global middleware for queue, octane, and dependency injection by [@timacdonald](https://github.com/timacdonald) in https://github.com/laravel/framework/pull/47915
 
 ## [v10.16.1](https://github.com/laravel/framework/compare/v10.17.1...v10.16.1) - 2023-07-26
 
@@ -353,7 +353,7 @@
 
 ### Reverted
 
-- Revert "[10.x] Fix inconsistentcy between report and render methods" ([#47326](https://github.com/laravel/framework/pull/47326))
+- Revert "[10.x] Fix inconsistency between report and render methods" ([#47326](https://github.com/laravel/framework/pull/47326))
 
 ### Changed
 
@@ -372,7 +372,7 @@
 ### Fixed
 
 - Fixed bug when function wrapped around definition of related factory ([#47168](https://github.com/laravel/framework/pull/47168))
-- Fixed inconsistentcy between report and render methods ([#47201](https://github.com/laravel/framework/pull/47201))
+- Fixed inconsistency between report and render methods ([#47201](https://github.com/laravel/framework/pull/47201))
 - Fixes Model::isDirty() when AsCollection or AsEncryptedCollection have arguments ([#47235](https://github.com/laravel/framework/pull/47235))
 - Fixed escaped String for JSON_CONTAINS ([#47244](https://github.com/laravel/framework/pull/47244))
 - Fixes missing output on ProcessFailedException exception ([#47285](https://github.com/laravel/framework/pull/47285))
@@ -704,7 +704,7 @@
 
 ### Reverted
 
-- Revert "[10.x] Fix custom themes not reseting on Markdown renderer" ([#46328](https://github.com/laravel/framework/pull/46328))
+- Revert "[10.x] Fix custom themes not resetting on Markdown renderer" ([#46328](https://github.com/laravel/framework/pull/46328))
 
 ### Fixed
 
@@ -770,7 +770,7 @@
 ### Fixed
 
 - Fixing issue where 0 is discarded as a valid timestamp ([#46158](https://github.com/laravel/framework/pull/46158))
-- Fix custom themes not reseting on Markdown renderer ([#46200](https://github.com/laravel/framework/pull/46200))
+- Fix custom themes not resetting on Markdown renderer ([#46200](https://github.com/laravel/framework/pull/46200))
 
 ### Changed
 
