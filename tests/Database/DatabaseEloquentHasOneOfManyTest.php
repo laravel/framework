@@ -463,7 +463,7 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
         $this->assertNotNull($user->latest_login_with_soft_deletes);
     }
 
-    public function testWithContraintNotInAggregate()
+    public function testWithConstraintNotInAggregate()
     {
         $user = HasOneOfManyTestUser::create();
 
