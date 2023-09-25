@@ -73,17 +73,12 @@ class DatabaseTransactionsManager
             fn ($transaction) => $transaction->connection == $connection
         );
 
-        // If the transaction level being commited reaches 1 (meaning it was the root
-        // transaction), we'll run the callbacks. In test mode, since we wrap each
-        // test in a transaction, we'll run the callbacks when reaching level 2.
-        if ($this->afterCommitCallbacksShouldBeExecuted($level)) {
-            $this->transactions = $forOtherConnections->values();
+        $this->transactions = $forOtherConnections->values();
 
-            $forThisConnection->map->executeCallbacks();
+        $forThisConnection->map->executeCallbacks();
 
-            if ($this->transactions->isEmpty()) {
-                $this->callbacksShouldIgnore = null;
-            }
+        if ($this->transactions->isEmpty()) {
+            $this->callbacksShouldIgnore = null;
         }
     }
 
@@ -95,14 +90,11 @@ class DatabaseTransactionsManager
      */
     public function addCallback($callback)
     {
-        // If there are no transactions, we'll run the callbacks right away. Also, we'll run it
-        // right away when we're in test mode and we only have the wrapping transaction. For
-        // every other case, we'll queue up the callback to run after the commit happens.
-        if ($this->callbackApplicableTransactions()->count() === 0) {
-            $callback();
-        } else {
-            $this->transactions->last()->addCallback($callback);
+        if ($current = $this->callbackApplicableTransactions()->last()) {
+            return $current->addCallback($callback);
         }
+
+        $callback();
     }
 
     /**

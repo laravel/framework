@@ -47,7 +47,9 @@ trait ManagesTransactions
                     $this->getPdo()->commit();
                 }
 
-                $this->transactionsManager?->commit($this->getName(), $this->transactions);
+                if ($this->afterCommitCallbacksShouldBeExecuted()) {
+                    $this->transactionsManager?->commit($this->getName(), $this->transactions);
+                }
             } catch (Throwable $e) {
                 $this->handleCommitTransactionException(
                     $e, $currentAttempt, $attempts
@@ -192,7 +194,9 @@ trait ManagesTransactions
             $this->getPdo()->commit();
         }
 
-        $this->transactionsManager?->commit($this->getName(), $this->transactions);
+        if ($this->afterCommitCallbacksShouldBeExecuted()) {
+            $this->transactionsManager?->commit($this->getName(), $this->transactions);
+        }
 
         $this->transactions = max(0, $this->transactions - 1);
 
@@ -203,13 +207,11 @@ trait ManagesTransactions
      * Determine if after commit callbacks should be executed.
      *
      * @return bool
-     *
-     * @deprecated
      */
     protected function afterCommitCallbacksShouldBeExecuted()
     {
         return $this->transactions == 0 ||
-            $this->transactionsManager?->afterCommitCallbacksShouldBeExecuted(1);
+            $this->transactionsManager?->afterCommitCallbacksShouldBeExecuted($this->transactions);
     }
 
     /**
