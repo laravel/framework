@@ -143,7 +143,7 @@ class EloquentHasManyThroughTest extends DatabaseTestCase
 	
 	public function testUpdateOrCreateWillNotUseIdFromParentModel()
 	{
-		// On Laravel 10.21.0, a bug was introduced that would update the wroong model when using `updateOrCreate()`,
+		// On Laravel 10.21.0, a bug was introduced that would update the wrong model when using `updateOrCreate()`,
 		// because the UPDATE statement would target a model based on the ID from the parent instead of the actual
 		// conditions that the `updateOrCreate()` targeted. This test replicates the case that causes this bug.
 		
