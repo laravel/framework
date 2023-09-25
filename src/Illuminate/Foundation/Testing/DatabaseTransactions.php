@@ -13,21 +13,16 @@ trait DatabaseTransactions
     {
         $database = $this->app->make('db');
 
+        $this->app->instance('db.transactions', $transactionsManager = new DatabaseTransactionsManager());
+
         foreach ($this->connectionsToTransact() as $name) {
             $connection = $database->connection($name);
+            $connection->setTransactionManager($transactionsManager);
             $dispatcher = $connection->getEventDispatcher();
 
             $connection->unsetEventDispatcher();
             $connection->beginTransaction();
             $connection->setEventDispatcher($dispatcher);
-
-            if ($transactionManager = $connection->getTransactionManager()) {
-                $transactionManager->callbacksShouldIgnore(
-                    $transactionManager->getTransactions()->first()
-                )->afterCommitCallbacksShouldBeExecutedUsing(
-                    fn ($level) => $level === 2
-                );
-            }
         }
 
         $this->beforeApplicationDestroyed(function () use ($database) {
