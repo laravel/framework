@@ -101,9 +101,6 @@ trait RefreshDatabase
                 $this->app->make('db.transactions')
                 ->callbacksShouldIgnore(
                     $this->app->make('db.transactions')->getTransactions()->first()
-                )
-                ->afterCommitCallbacksShouldBeExecutedUsing(
-                    fn ($transactions) => $transactions->skip(1)->count() === 1
                 );
             }
         }
