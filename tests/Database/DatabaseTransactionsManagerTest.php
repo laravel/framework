@@ -67,7 +67,7 @@ class DatabaseTransactionsManagerTest extends TestCase
         $manager->begin('default', 2);
         $manager->begin('admin', 1);
 
-        $manager->commit('default', 1);
+        $manager->commit('default');
 
         $this->assertCount(1, $manager->getTransactions());
 
