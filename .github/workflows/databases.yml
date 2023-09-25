@@ -8,44 +8,6 @@ on:
   pull_request:
 
 jobs:
-  sqlite:
-    runs-on: ubuntu-22.04
-
-    strategy:
-      fail-fast: true
-
-    name: SQLite
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: 8.1
-          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_mysql
-          tools: composer:v2
-          coverage: none
-
-      - name: Install dependencies
-        uses: nick-fields/retry@v2
-        with:
-          timeout_minutes: 5
-          max_attempts: 5
-          command: composer update --prefer-stable --prefer-dist --no-interaction --no-progress
-
-      - name: Setup database
-        run: |
-          php vendor/bin/testbench package:create-sqlite-db
-
-      - name: Execute tests
-        run: vendor/bin/phpunit tests/Integration/Database
-        env:
-          DB_CONNECTION: sqlite
-
   mysql_57:
     runs-on: ubuntu-22.04
 
