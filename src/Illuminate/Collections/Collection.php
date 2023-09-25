@@ -4,11 +4,13 @@ namespace Illuminate\Support;
 
 use ArrayAccess;
 use ArrayIterator;
+use BackedEnum;
 use Illuminate\Contracts\Support\CanBeEscapedWhenCastToString;
 use Illuminate\Support\Traits\EnumeratesValues;
 use Illuminate\Support\Traits\Macroable;
 use stdClass;
 use Traversable;
+use UnitEnum;
 
 /**
  * @template TKey of array-key
@@ -78,7 +80,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     /**
      * Get the average value of a given key.
      *
-     * @param  (callable(TValue): float|int)|string|null  $callback
+     * @param  (callable(TValue): float|int)|string|BackedEnum|UnitEnum|null  $callback
      * @return float|int|null
      */
     public function avg($callback = null)
@@ -303,7 +305,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     /**
      * Retrieve duplicate items from the collection.
      *
-     * @param  (callable(TValue): bool)|string|null  $callback
+     * @param  (callable(TValue): bool)|string|BackedEnum|UnitEnum|null  $callback
      * @param  bool  $strict
      * @return static
      */
@@ -482,7 +484,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     /**
      * Group an associative array by a field or using a callback.
      *
-     * @param  (callable(TValue, TKey): array-key)|array|string  $groupBy
+     * @param  (callable(TValue, TKey): array-key)|array|string|BackedEnum|UnitEnum  $groupBy
      * @param  bool  $preserveKeys
      * @return static<array-key, static<array-key, TValue>>
      */
@@ -533,7 +535,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     /**
      * Key an associative array by a field or using a callback.
      *
-     * @param  (callable(TValue, TKey): array-key)|array|string  $keyBy
+     * @param  (callable(TValue, TKey): array-key)|array|string|BackedEnum|UnitEnum  $keyBy
      * @return static<array-key, TValue>
      */
     public function keyBy($keyBy)
@@ -1368,7 +1370,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     /**
      * Sort the collection using the given callback.
      *
-     * @param  array<array-key, (callable(TValue, TValue): mixed)|(callable(TValue, TKey): mixed)|string|array{string, string}>|(callable(TValue, TKey): mixed)|string  $callback
+     * @param  array<array-key, (callable(TValue, TValue): mixed)|(callable(TValue, TKey): mixed)|string|array{string, string}>|(callable(TValue, TKey): mixed)|string|BackedEnum|UnitEnum  $callback
      * @param  int  $options
      * @param  bool  $descending
      * @return static
@@ -1589,7 +1591,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     /**
      * Return only unique items from the collection array.
      *
-     * @param  (callable(TValue, TKey): mixed)|string|null  $key
+     * @param  (callable(TValue, TKey): mixed)|string|BackedEnum|UnitEnum|null  $key
      * @param  bool  $strict
      * @return static
      */

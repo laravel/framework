@@ -841,10 +841,11 @@ class SupportCollectionTest extends TestCase
     public function testCountByWithKey($collection)
     {
         $c = new $collection([
-            ['key' => 'a'], ['key' => 'a'], ['key' => 'a'], ['key' => 'a'],
-            ['key' => 'b'], ['key' => 'b'], ['key' => 'b'],
+            ['key' => 'a', 'foo' => 'c'], ['key' => 'a', 'foo' => 'c'], ['key' => 'a', 'foo' => 'c'], ['key' => 'a', 'foo' => 'c'],
+            ['key' => 'b', 'foo' => 'd'], ['key' => 'b', 'foo' => 'd'], ['key' => 'b', 'foo' => 'd'],
         ]);
         $this->assertEquals(['a' => 4, 'b' => 3], $c->countBy('key')->all());
+        $this->assertEquals(['c' => 4, 'd' => 3], $c->countBy(TestStringBackedEnum::FOO)->all());
     }
 
     /**
@@ -1600,6 +1601,11 @@ class SupportCollectionTest extends TestCase
         $items = [['Framework' => 'vue'], ['framework' => 'vue'], ['Framework' => 'vue']];
         $duplicates = $collection::make($items)->duplicates('Framework', true)->all();
         $this->assertSame([2 => 'vue'], $duplicates);
+
+        // works with key and strict
+        $items = [['Framework' => 'enum'], [TestStringBackedEnum::FOO->value => 'enum'], [TestStringBackedEnum::FOO->value => 'enum']];
+        $duplicates = $collection::make($items)->duplicates(TestStringBackedEnum::FOO, true)->all();
+        $this->assertSame([2 => 'enum'], $duplicates);
     }
 
     /**
@@ -1813,30 +1819,35 @@ class SupportCollectionTest extends TestCase
     public function testUniqueWithCallback($collection)
     {
         $c = new $collection([
-            1 => ['id' => 1, 'first' => 'Taylor', 'last' => 'Otwell'],
-            2 => ['id' => 2, 'first' => 'Taylor', 'last' => 'Otwell'],
-            3 => ['id' => 3, 'first' => 'Abigail', 'last' => 'Otwell'],
-            4 => ['id' => 4, 'first' => 'Abigail', 'last' => 'Otwell'],
-            5 => ['id' => 5, 'first' => 'Taylor', 'last' => 'Swift'],
-            6 => ['id' => 6, 'first' => 'Taylor', 'last' => 'Swift'],
+            1 => ['id' => 1, 'first' => 'Taylor', 'last' => 'Otwell', 'foo' => 'Laravel'],
+            2 => ['id' => 2, 'first' => 'Taylor', 'last' => 'Otwell', 'foo' => 'Laravel'],
+            3 => ['id' => 3, 'first' => 'Abigail', 'last' => 'Otwell', 'foo' => 'Laravel'],
+            4 => ['id' => 4, 'first' => 'Abigail', 'last' => 'Otwell', 'foo' => 'Laravel'],
+            5 => ['id' => 5, 'first' => 'Taylor', 'last' => 'Swift', 'foo' => 'Nova'],
+            6 => ['id' => 6, 'first' => 'Taylor', 'last' => 'Swift', 'foo' => 'Nova'],
         ]);
 
         $this->assertEquals([
-            1 => ['id' => 1, 'first' => 'Taylor', 'last' => 'Otwell'],
-            3 => ['id' => 3, 'first' => 'Abigail', 'last' => 'Otwell'],
+            1 => ['id' => 1, 'first' => 'Taylor', 'last' => 'Otwell', 'foo' => 'Laravel'],
+            3 => ['id' => 3, 'first' => 'Abigail', 'last' => 'Otwell', 'foo' => 'Laravel'],
         ], $c->unique('first')->all());
 
         $this->assertEquals([
-            1 => ['id' => 1, 'first' => 'Taylor', 'last' => 'Otwell'],
-            3 => ['id' => 3, 'first' => 'Abigail', 'last' => 'Otwell'],
-            5 => ['id' => 5, 'first' => 'Taylor', 'last' => 'Swift'],
+            1 => ['id' => 1, 'first' => 'Taylor', 'last' => 'Otwell', 'foo' => 'Laravel'],
+            5 => ['id' => 5, 'first' => 'Taylor', 'last' => 'Swift', 'foo' => 'Nova'],
+        ], $c->unique(TestStringBackedEnum::FOO)->all());
+
+        $this->assertEquals([
+            1 => ['id' => 1, 'first' => 'Taylor', 'last' => 'Otwell', 'foo' => 'Laravel'],
+            3 => ['id' => 3, 'first' => 'Abigail', 'last' => 'Otwell', 'foo' => 'Laravel'],
+            5 => ['id' => 5, 'first' => 'Taylor', 'last' => 'Swift', 'foo' => 'Nova'],
         ], $c->unique(function ($item) {
             return $item['first'].$item['last'];
         })->all());
 
         $this->assertEquals([
-            1 => ['id' => 1, 'first' => 'Taylor', 'last' => 'Otwell'],
-            2 => ['id' => 2, 'first' => 'Taylor', 'last' => 'Otwell'],
+            1 => ['id' => 1, 'first' => 'Taylor', 'last' => 'Otwell', 'foo' => 'Laravel'],
+            2 => ['id' => 2, 'first' => 'Taylor', 'last' => 'Otwell', 'foo' => 'Laravel'],
         ], $c->unique(function ($item, $key) {
             return $key % 2;
         })->all());
@@ -2253,6 +2264,10 @@ class SupportCollectionTest extends TestCase
         $this->assertTrue($c->every('active'));
         $this->assertTrue($c->every->active);
         $this->assertFalse($c->concat([['active' => false]])->every->active);
+
+        $c = new $collection([['foo' => 18], ['foo' => 20], ['foo' => 20]]);
+        $this->assertFalse($c->every(TestStringBackedEnum::FOO, 18));
+        $this->assertTrue($c->every(TestStringBackedEnum::FOO, '>=', 18));
     }
 
     /**
@@ -3287,13 +3302,16 @@ class SupportCollectionTest extends TestCase
      */
     public function testGroupByAttribute($collection)
     {
-        $data = new $collection([['rating' => 1, 'url' => '1'], ['rating' => 1, 'url' => '1'], ['rating' => 2, 'url' => '2']]);
+        $data = new $collection([['rating' => 1, 'url' => '1', 'foo' => '1'], ['rating' => 1, 'url' => '1', 'foo' => '1'], ['rating' => 2, 'url' => '2', 'foo' => '2']]);
 
         $result = $data->groupBy('rating');
-        $this->assertEquals([1 => [['rating' => 1, 'url' => '1'], ['rating' => 1, 'url' => '1']], 2 => [['rating' => 2, 'url' => '2']]], $result->toArray());
+        $this->assertEquals([1 => [['rating' => 1, 'url' => '1', 'foo' => '1'], ['rating' => 1, 'url' => '1', 'foo' => '1']], 2 => [['rating' => 2, 'url' => '2', 'foo' => '2']]], $result->toArray());
 
         $result = $data->groupBy('url');
-        $this->assertEquals([1 => [['rating' => 1, 'url' => '1'], ['rating' => 1, 'url' => '1']], 2 => [['rating' => 2, 'url' => '2']]], $result->toArray());
+        $this->assertEquals([1 => [['rating' => 1, 'url' => '1', 'foo' => '1'], ['rating' => 1, 'url' => '1', 'foo' => '1']], 2 => [['rating' => 2, 'url' => '2', 'foo' => '2']]], $result->toArray());
+
+        $result = $data->groupBy(TestStringBackedEnum::FOO);
+        $this->assertEquals([1 => [['rating' => 1, 'url' => '1', 'foo' => '1'], ['rating' => 1, 'url' => '1', 'foo' => '1']], 2 => [['rating' => 2, 'url' => '2', 'foo' => '2']]], $result->toArray());
     }
 
     /**
@@ -3522,15 +3540,18 @@ class SupportCollectionTest extends TestCase
      */
     public function testKeyByAttribute($collection)
     {
-        $data = new $collection([['rating' => 1, 'name' => '1'], ['rating' => 2, 'name' => '2'], ['rating' => 3, 'name' => '3']]);
+        $data = new $collection([['rating' => 1, 'name' => '1', 'foo' => '1'], ['rating' => 2, 'name' => '2', 'foo' => '2'], ['rating' => 3, 'name' => '3', 'foo' => '3']]);
 
         $result = $data->keyBy('rating');
-        $this->assertEquals([1 => ['rating' => 1, 'name' => '1'], 2 => ['rating' => 2, 'name' => '2'], 3 => ['rating' => 3, 'name' => '3']], $result->all());
+        $this->assertEquals([1 => ['rating' => 1, 'name' => '1', 'foo' => '1'], 2 => ['rating' => 2, 'name' => '2', 'foo' => '2'], 3 => ['rating' => 3, 'name' => '3', 'foo' => '3']], $result->all());
+
+        $result = $data->keyBy(TestStringBackedEnum::FOO);
+        $this->assertEquals([1 => ['rating' => 1, 'name' => '1', 'foo' => '1'], 2 => ['rating' => 2, 'name' => '2', 'foo' => '2'], 3 => ['rating' => 3, 'name' => '3', 'foo' => '3']], $result->all());
 
         $result = $data->keyBy(function ($item) {
             return $item['rating'] * 2;
         });
-        $this->assertEquals([2 => ['rating' => 1, 'name' => '1'], 4 => ['rating' => 2, 'name' => '2'], 6 => ['rating' => 3, 'name' => '3']], $result->all());
+        $this->assertEquals([2 => ['rating' => 1, 'name' => '1', 'foo' => '1'], 4 => ['rating' => 2, 'name' => '2', 'foo' => '2'], 6 => ['rating' => 3, 'name' => '3', 'foo' => '3']], $result->all());
     }
 
     /**
@@ -3800,6 +3821,7 @@ class SupportCollectionTest extends TestCase
     {
         $c = new $collection([(object) ['foo' => 50], (object) ['foo' => 50]]);
         $this->assertEquals(100, $c->sum('foo'));
+        $this->assertEquals(100, $c->sum(TestStringBackedEnum::FOO));
 
         $c = new $collection([(object) ['foo' => 50], (object) ['foo' => 50]]);
         $this->assertEquals(100, $c->sum(function ($i) {
@@ -4150,6 +4172,7 @@ class SupportCollectionTest extends TestCase
             return $item->foo;
         }));
         $this->assertEquals(20, $c->max('foo'));
+        $this->assertEquals(20, $c->max(TestStringBackedEnum::FOO));
         $this->assertEquals(20, $c->max->foo);
 
         $c = new $collection([['foo' => 10], ['foo' => 20]]);
@@ -4173,6 +4196,7 @@ class SupportCollectionTest extends TestCase
             return $item->foo;
         }));
         $this->assertEquals(10, $c->min('foo'));
+        $this->assertEquals(10, $c->min(TestStringBackedEnum::FOO));
         $this->assertEquals(10, $c->min->foo);
 
         $c = new $collection([['foo' => 10], ['foo' => 20]]);
@@ -4223,6 +4247,7 @@ class SupportCollectionTest extends TestCase
             return $item->foo;
         }));
         $this->assertEquals(15, $c->avg('foo'));
+        $this->assertEquals(15, $c->avg(TestStringBackedEnum::FOO));
         $this->assertEquals(15, $c->avg->foo);
 
         $c = new $collection([(object) ['foo' => 10], (object) ['foo' => 20], (object) ['foo' => null]]);
@@ -4989,6 +5014,14 @@ class SupportCollectionTest extends TestCase
 
         $this->assertSame([['free' => true, 'title' => 'Basic']], $free->values()->toArray());
         $this->assertSame([['free' => false, 'title' => 'Premium']], $premium->values()->toArray());
+
+        $fooBar = new $collection([
+            ['foo' => true, 'bar' => 'Basic'], ['foo' => false, 'bar' => 'Premium'],
+        ]);
+
+        [$foo, $bar] = $fooBar->partition(TestStringBackedEnum::FOO)->all();
+        $this->assertSame([['foo' => true, 'bar' => 'Basic']], $foo->values()->toArray());
+        $this->assertSame([['foo' => false, 'bar' => 'Premium']], $bar->values()->toArray());
     }
 
     /**

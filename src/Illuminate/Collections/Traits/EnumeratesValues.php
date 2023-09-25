@@ -2,6 +2,7 @@
 
 namespace Illuminate\Support\Traits;
 
+use BackedEnum;
 use CachingIterator;
 use Closure;
 use Exception;
@@ -259,7 +260,7 @@ trait EnumeratesValues
     /**
      * Determine if all items pass the given truth test.
      *
-     * @param  (callable(TValue, TKey): bool)|TValue|string  $key
+     * @param  (callable(TValue, TKey): bool)|TValue|string|BackedEnum|UnitEnum  $key
      * @param  mixed  $operator
      * @param  mixed  $value
      * @return bool
@@ -410,7 +411,7 @@ trait EnumeratesValues
     /**
      * Get the min value of a given key.
      *
-     * @param  (callable(TValue):mixed)|string|null  $callback
+     * @param  (callable(TValue):mixed)|string|BackedEnum|UnitEnum|null  $callback
      * @return mixed
      */
     public function min($callback = null)
@@ -425,7 +426,7 @@ trait EnumeratesValues
     /**
      * Get the max value of a given key.
      *
-     * @param  (callable(TValue):mixed)|string|null  $callback
+     * @param  (callable(TValue):mixed)|string|BackedEnum|UnitEnum|null  $callback
      * @return mixed
      */
     public function max($callback = null)
@@ -456,7 +457,7 @@ trait EnumeratesValues
     /**
      * Partition the collection into two arrays using the given callback or key.
      *
-     * @param  (callable(TValue, TKey): bool)|TValue|string  $key
+     * @param  (callable(TValue, TKey): bool)|TValue|string|BackedEnum|UnitEnum  $key
      * @param  TValue|string|null  $operator
      * @param  TValue|null  $value
      * @return static<int<0, 1>, static<TKey, TValue>>
@@ -503,7 +504,7 @@ trait EnumeratesValues
     /**
      * Get the sum of the given values.
      *
-     * @param  (callable(TValue): mixed)|string|null  $callback
+     * @param  (callable(TValue): mixed)|string|BackedEnum|UnitEnum|null  $callback
      * @return mixed
      */
     public function sum($callback = null)
@@ -859,7 +860,7 @@ trait EnumeratesValues
     /**
      * Return only unique items from the collection array.
      *
-     * @param  (callable(TValue, TKey): mixed)|string|null  $key
+     * @param  (callable(TValue, TKey): mixed)|string|BackedEnum|UnitEnum|null  $key
      * @param  bool  $strict
      * @return static
      */
@@ -1030,7 +1031,7 @@ trait EnumeratesValues
     /**
      * Get an operator checker callback.
      *
-     * @param  callable|string  $key
+     * @param  callable|string|BackedEnum|UnitEnum  $key
      * @param  string|null  $operator
      * @param  mixed  $value
      * @return \Closure
@@ -1039,6 +1040,14 @@ trait EnumeratesValues
     {
         if ($this->useAsCallable($key)) {
             return $key;
+        }
+
+        if ($key instanceof BackedEnum) {
+            $key = $key->value;
+        }
+
+        if ($key instanceof UnitEnum) {
+            $key = $key->name;
         }
 
         if (func_num_args() === 1) {
@@ -1095,13 +1104,21 @@ trait EnumeratesValues
     /**
      * Get a value retrieving callback.
      *
-     * @param  callable|string|null  $value
+     * @param  callable|string|BackedEnum|UnitEnum|null  $value
      * @return callable
      */
     protected function valueRetriever($value)
     {
         if ($this->useAsCallable($value)) {
             return $value;
+        }
+
+        if ($value instanceof BackedEnum) {
+            $value = $value->value;
+        }
+
+        if ($value instanceof UnitEnum) {
+            $value = $value->name;
         }
 
         return fn ($item) => data_get($item, $value);

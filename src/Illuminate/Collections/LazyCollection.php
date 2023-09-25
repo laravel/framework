@@ -3,6 +3,7 @@
 namespace Illuminate\Support;
 
 use ArrayIterator;
+use BackedEnum;
 use Closure;
 use DateTimeInterface;
 use Generator;
@@ -13,6 +14,7 @@ use InvalidArgumentException;
 use IteratorAggregate;
 use stdClass;
 use Traversable;
+use UnitEnum;
 
 /**
  * @template TKey of array-key
@@ -293,7 +295,7 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     /**
      * Count the number of items in the collection by a field or using a callback.
      *
-     * @param  (callable(TValue, TKey): array-key)|string|null  $countBy
+     * @param  (callable(TValue, TKey): array-key)|string|BackedEnum|UnitEnum|null  $countBy
      * @return static<array-key, int>
      */
     public function countBy($countBy = null)
@@ -549,7 +551,7 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     /**
      * Key an associative array by a field or using a callback.
      *
-     * @param  (callable(TValue, TKey): array-key)|array|string  $keyBy
+     * @param  (callable(TValue, TKey): array-key)|array|string|BackedEnum|UnitEnum  $keyBy
      * @return static<array-key, TValue>
      */
     public function keyBy($keyBy)
@@ -1556,7 +1558,7 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     /**
      * Return only unique items from the collection array.
      *
-     * @param  (callable(TValue, TKey): mixed)|string|null  $key
+     * @param  (callable(TValue, TKey): mixed)|string|BackedEnum|UnitEnum|null  $key
      * @param  bool  $strict
      * @return static
      */
