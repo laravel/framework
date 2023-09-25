@@ -399,10 +399,12 @@ class Validator implements ValidatorContract
         $validatedDataSorted = [];
 
         foreach ($originalData as $key => $value) {
-            if (array_key_exists($key, $validatedData)) {
-                $validatedDataSorted[$key] = is_array($validatedData[$key])
-                    ? $this->sortValidatedDataBasedOnOriginal($originalData[$key], $validatedData[$key])
-                    : $validatedData[$key];
+            $originalKey = $this->replacePlaceholderInString($key);
+
+            if (array_key_exists($originalKey, $validatedData)) {
+                $validatedDataSorted[$originalKey] = is_array($validatedData[$originalKey])
+                    ? $this->sortValidatedDataBasedOnOriginal($value, $validatedData[$originalKey])
+                    : $validatedData[$originalKey];
             }
         }
 
