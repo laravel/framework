@@ -622,7 +622,7 @@ class BelongsToMany extends Relation
     {
         if (is_null($instance = (clone $this)->where($attributes)->first())) {
             if (is_null($instance = $this->related->where($attributes)->first())) {
-                $instance = $this->createOrFirst($attributes, $values, $joining, $touch);
+                $instance = $this->create(array_merge($attributes, $values), $joining, $touch);
             } else {
                 try {
                     $this->getQuery()->withSavepointIfNeeded(fn () => $this->attach($instance, $joining, $touch));
