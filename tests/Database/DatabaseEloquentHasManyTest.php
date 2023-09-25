@@ -227,9 +227,7 @@ class DatabaseEloquentHasManyTest extends TestCase
         $relation->getQuery()->shouldReceive('where')->once()->with(['foo'])->andReturn($relation->getQuery());
         $relation->getQuery()->shouldReceive('first')->once()->with()->andReturn($model = m::mock(stdClass::class));
         $relation->getRelated()->shouldReceive('newInstance')->never();
-
-        $model->wasRecentlyCreated = false;
-        $model->shouldReceive('fill')->once()->with(['bar'])->andReturn($model);
+        $model->shouldReceive('fill')->once()->with(['bar']);
         $model->shouldReceive('save')->once();
 
         $this->assertInstanceOf(stdClass::class, $relation->updateOrCreate(['foo'], ['bar']));
@@ -238,15 +236,11 @@ class DatabaseEloquentHasManyTest extends TestCase
     public function testUpdateOrCreateMethodCreatesNewModelWithForeignKeySet()
     {
         $relation = $this->getRelation();
-        $relation->getQuery()->shouldReceive('withSavepointIfNeeded')->once()->andReturnUsing(function ($scope) {
-            return $scope();
-        });
         $relation->getQuery()->shouldReceive('where')->once()->with(['foo'])->andReturn($relation->getQuery());
         $relation->getQuery()->shouldReceive('first')->once()->with()->andReturn(null);
-        $relation->getRelated()->shouldReceive('newInstance')->once()->with(['foo', 'bar'])->andReturn($model = m::mock(Model::class));
-
-        $model->wasRecentlyCreated = true;
+        $relation->getRelated()->shouldReceive('newInstance')->once()->with(['foo'])->andReturn($model = m::mock(Model::class));
         $model->shouldReceive('save')->once()->andReturn(true);
+        $model->shouldReceive('fill')->once()->with(['bar']);
         $model->shouldReceive('setAttribute')->once()->with('foreign_key', 1);
 
         $this->assertInstanceOf(Model::class, $relation->updateOrCreate(['foo'], ['bar']));
