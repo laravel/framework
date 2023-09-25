@@ -59,8 +59,6 @@ class DatabaseTransactionRecord
         foreach ($this->callbacks as $callback) {
             $callback();
         }
-
-        $this->callbacks = [];
     }
 
     /**
