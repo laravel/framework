@@ -24,7 +24,9 @@ trait DatabaseTransactions
             if ($transactionManager = $connection->getTransactionManager()) {
                 $transactionManager->callbacksShouldIgnore(
                     $transactionManager->getTransactions()->first()
-                )->afterCommitCallbacksShouldBeExecutedUsing(fn ($level) => $level === 2);
+                )->afterCommitCallbacksShouldBeExecutedUsing(
+                    fn ($level, $transactions) => $transactions->skip(1)->first()->level === $level
+                );
             }
         }
 
