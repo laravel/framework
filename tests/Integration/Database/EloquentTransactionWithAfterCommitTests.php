@@ -65,15 +65,17 @@ trait EloquentTransactionWithAfterCommitTests
     {
         User::observe($observer = EloquentTransactionWithAfterCommitTestsUserObserver::resetting());
 
-        $user1 = DB::transaction(function () {
-            return tap(DB::transaction(function () {
-                return DB::transaction(function () {
-                    return tap(User::createOrFirst(UserFactory::new()->raw()), function () {
-                        //$this->assertEquals(0, $observer::$calledTimes, 'Should not have been called');
+        $user1 = DB::transaction(function () use ($observer) {
+            return tap(DB::transaction(function () use ($observer) {
+                return tap(DB::transaction(function () use ($observer) {
+                    return tap(User::createOrFirst(UserFactory::new()->raw()), function () use ($observer) {
+                        $this->assertEquals(0, $observer::$calledTimes, 'Should not have been called');
                     });
+                }), function () use ($observer) {
+                    $this->assertEquals(0, $observer::$calledTimes, 'Should not have been called');
                 });
-            }), function () {
-                // $this->assertEquals(0, $observer::$calledTimes, 'Should not have been called');
+            }), function () use ($observer) {
+                $this->assertEquals(0, $observer::$calledTimes, 'Should not have been called');
             });
         });
 
