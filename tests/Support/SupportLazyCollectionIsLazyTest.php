@@ -351,6 +351,10 @@ class SupportLazyCollectionIsLazyTest extends TestCase
         $this->assertEnumeratesOnce(function ($collection) {
             $collection->except([1, 2])->all();
         });
+
+        $this->assertEnumerates(2, function ($collection) {
+            $collection->except([1, 2])->take(1)->all();
+        });
     }
 
     public function testFilterIsLazy()
