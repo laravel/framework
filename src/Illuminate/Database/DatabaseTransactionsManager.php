@@ -116,7 +116,7 @@ class DatabaseTransactionsManager
      */
     public function callbackApplicableTransactions()
     {
-        return $this->transactions->values();
+        return $this->transactions;
     }
 
     /**
