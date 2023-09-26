@@ -616,7 +616,7 @@ class LogManagerTest extends TestCase
         $this->assertSame(['invocation-id' => 'expected-id'], $context);
     }
 
-    public function testContextCanBePublicallyAccessedByOtherLoggingSystems()
+    public function testContextCanBePubliclyAccessedByOtherLoggingSystems()
     {
         $manager = new LogManager($this->app);
         $context = null;

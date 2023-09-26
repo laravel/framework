@@ -320,7 +320,7 @@ class ProcessTest extends TestCase
         $result = $factory->run('ls -la');
     }
 
-    public function testStrayProcessesCanBePreventedWithStringComand()
+    public function testStrayProcessesCanBePreventedWithStringCommand()
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Attempted process [');

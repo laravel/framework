@@ -73,7 +73,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
             $table->timestamps();
         });
 
-        $this->schema('default')->create('users_with_space_in_colum_name', function ($table) {
+        $this->schema('default')->create('users_with_space_in_column_name', function ($table) {
             $table->increments('id');
             $table->string('name')->nullable();
             $table->string('email address');
@@ -734,7 +734,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
         EloquentTestUserWithSpaceInColumnName::create(['id' => 1, 'email address' => 'taylorotwell@gmail.com']);
         EloquentTestUserWithSpaceInColumnName::create(['id' => 2, 'email address' => 'abigailotwell@gmail.com']);
 
-        $simple = EloquentTestUserWithSpaceInColumnName::oldest('id')->pluck('users_with_space_in_colum_name.email address')->all();
+        $simple = EloquentTestUserWithSpaceInColumnName::oldest('id')->pluck('users_with_space_in_column_name.email address')->all();
         $keyed = EloquentTestUserWithSpaceInColumnName::oldest('id')->pluck('email address', 'id')->all();
 
         $this->assertEquals(['taylorotwell@gmail.com', 'abigailotwell@gmail.com'], $simple);
@@ -2266,7 +2266,7 @@ class EloquentTestUserWithCustomFriendPivot extends EloquentTestUser
 
 class EloquentTestUserWithSpaceInColumnName extends EloquentTestUser
 {
-    protected $table = 'users_with_space_in_colum_name';
+    protected $table = 'users_with_space_in_column_name';
 }
 
 class EloquentTestNonIncrementing extends Eloquent

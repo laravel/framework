@@ -278,7 +278,7 @@ class FakeInvokedProcess implements InvokedProcessContract
     }
 
     /**
-     * Get the ultimate process result that wil be returned by this "process".
+     * Get the ultimate process result that will be returned by this "process".
      *
      * @return \Illuminate\Contracts\Process\ProcessResult
      */
