@@ -431,6 +431,7 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
         }
 
         $keys = array_flip($keys);
+
         return new static(function () use ($keys) {
             foreach ($this as $key => $value) {
                 if (! array_key_exists($key, $keys)) {
