@@ -169,20 +169,20 @@ class BladeTest extends TestCase
 </div>', trim($content));
     }
 
-     public function testViewCacheCommandHandlesConfiguredBladeExtensions()
-     {
-         $this->artisan('view:clear');
+    public function testViewCacheCommandHandlesConfiguredBladeExtensions()
+    {
+        $this->artisan('view:clear');
 
-         View::addExtension('sh', 'blade');
-         $this->artisan('view:cache');
+        View::addExtension('sh', 'blade');
+        $this->artisan('view:cache');
 
-         $compiledFiles = Finder::create()->in(Config::get('view.compiled'))->files();
-         $found = collect($compiledFiles)
-             ->contains(fn (SplFileInfo $file) => str_contains($file->getContents(), 'echo "<?php echo e($scriptMessage); ?>" > output.log'));
-         $this->assertTrue($found);
+        $compiledFiles = Finder::create()->in(Config::get('view.compiled'))->files();
+        $found = collect($compiledFiles)
+            ->contains(fn (SplFileInfo $file) => str_contains($file->getContents(), 'echo "<?php echo e($scriptMessage); ?>" > output.log'));
+        $this->assertTrue($found);
 
-         $this->artisan('view:clear');
-     }
+        $this->artisan('view:clear');
+    }
 
     protected function getEnvironmentSetUp($app)
     {
