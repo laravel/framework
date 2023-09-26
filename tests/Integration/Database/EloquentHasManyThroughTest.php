@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Integration\Database\EloquentHasManyThroughTest;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
@@ -35,6 +36,13 @@ class EloquentHasManyThroughTest extends DatabaseTestCase
         Schema::create('products', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('category_id');
+        });
+
+        Schema::create('articles', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('user_id');
+            $table->string('title')->unique();
+            $table->timestamps();
         });
     }
 
@@ -140,6 +148,144 @@ class EloquentHasManyThroughTest extends DatabaseTestCase
         $this->assertEquals([1], $categories->pluck('id')->all());
     }
 
+    public function testFirstOrCreateWhenModelDoesntExist()
+    {
+        $owner = User::create(['name' => 'Taylor']);
+        Team::create(['owner_id' => $owner->id]);
+
+        $mate = $owner->teamMates()->firstOrCreate(['slug' => 'adam'], ['name' => 'Adam']);
+
+        $this->assertTrue($mate->wasRecentlyCreated);
+        $this->assertNull($mate->team_id);
+        $this->assertEquals('Adam', $mate->name);
+        $this->assertEquals('adam', $mate->slug);
+    }
+
+    public function testFirstOrCreateWhenModelExists()
+    {
+        $owner = User::create(['name' => 'Taylor']);
+        $team = Team::create(['owner_id' => $owner->id]);
+
+        $team->members()->create(['slug' => 'adam', 'name' => 'Adam Wathan']);
+
+        $mate = $owner->teamMates()->firstOrCreate(['slug' => 'adam'], ['name' => 'Adam']);
+
+        $this->assertFalse($mate->wasRecentlyCreated);
+        $this->assertNotNull($mate->team_id);
+        $this->assertTrue($team->is($mate->team));
+        $this->assertEquals('Adam Wathan', $mate->name);
+        $this->assertEquals('adam', $mate->slug);
+    }
+
+    public function testFirstOrCreateRegressionIssue()
+    {
+        $team1 = Team::create();
+        $team2 = Team::create();
+
+        $jane = $team2->members()->create(['name' => 'Jane', 'slug' => 'jane']);
+        $john = $team1->members()->create(['name' => 'John', 'slug' => 'john']);
+
+        $taylor = User::create(['name' => 'Taylor']);
+        $team1->update(['owner_id' => $taylor->id]);
+
+        $newJohn = $taylor->teamMates()->firstOrCreate(
+            ['slug' => 'john'],
+            ['name' => 'John Doe'],
+        );
+
+        $this->assertFalse($newJohn->wasRecentlyCreated);
+        $this->assertTrue($john->is($newJohn));
+        $this->assertEquals('john', $newJohn->refresh()->slug);
+        $this->assertEquals('John', $newJohn->name);
+
+        $this->assertSame('john', $john->refresh()->slug);
+        $this->assertSame('John', $john->name);
+        $this->assertSame('jane', $jane->refresh()->slug);
+        $this->assertSame('Jane', $jane->name);
+    }
+
+    public function testCreateOrFirstWhenRecordDoesntExist()
+    {
+        $team = Team::create();
+        $tony = $team->members()->create(['name' => 'Tony']);
+
+        $article = $team->articles()->createOrFirst(
+            ['title' => 'Laravel Forever'],
+            ['user_id' => $tony->id],
+        );
+
+        $this->assertTrue($article->wasRecentlyCreated);
+        $this->assertEquals('Laravel Forever', $article->title);
+        $this->assertTrue($tony->is($article->user));
+    }
+
+    public function testCreateOrFirstWhenRecordExists()
+    {
+        $team = Team::create();
+        $taylor = $team->members()->create(['name' => 'Taylor']);
+        $tony = $team->members()->create(['name' => 'Tony']);
+
+        $existingArticle = $taylor->articles()->create([
+            'title' => 'Laravel Forever',
+        ]);
+
+        $newArticle = $team->articles()->createOrFirst(
+            ['title' => 'Laravel Forever'],
+            ['user_id' => $tony->id],
+        );
+
+        $this->assertFalse($newArticle->wasRecentlyCreated);
+        $this->assertEquals('Laravel Forever', $newArticle->title);
+        $this->assertTrue($taylor->is($newArticle->user));
+        $this->assertTrue($existingArticle->is($newArticle));
+    }
+
+    public function testCreateOrFirstWhenRecordExistsInTransaction()
+    {
+        $team = Team::create();
+        $taylor = $team->members()->create(['name' => 'Taylor']);
+        $tony = $team->members()->create(['name' => 'Tony']);
+
+        $existingArticle = $taylor->articles()->create([
+            'title' => 'Laravel Forever',
+        ]);
+
+        $newArticle = DB::transaction(fn () => $team->articles()->createOrFirst(
+            ['title' => 'Laravel Forever'],
+            ['user_id' => $tony->id],
+        ));
+
+        $this->assertFalse($newArticle->wasRecentlyCreated);
+        $this->assertEquals('Laravel Forever', $newArticle->title);
+        $this->assertTrue($taylor->is($newArticle->user));
+        $this->assertTrue($existingArticle->is($newArticle));
+    }
+
+    public function testCreateOrFirstRegressionIssue()
+    {
+        $team1 = Team::create();
+
+        $taylor = $team1->members()->create(['name' => 'Taylor']);
+        $tony = $team1->members()->create(['name' => 'Tony']);
+
+        $existingTonyArticle = $tony->articles()->create(['title' => 'The New createOrFirst Method']);
+        $existingTaylorArticle = $taylor->articles()->create(['title' => 'Laravel Forever']);
+
+        $newArticle = $team1->articles()->createOrFirst(
+            ['title' => 'Laravel Forever'],
+            ['user_id' => $tony->id],
+        );
+
+        $this->assertFalse($newArticle->wasRecentlyCreated);
+        $this->assertTrue($existingTaylorArticle->is($newArticle));
+        $this->assertEquals('Laravel Forever', $newArticle->refresh()->title);
+        $this->assertTrue($taylor->is($newArticle->user));
+
+        $this->assertSame('Laravel Forever', $existingTaylorArticle->refresh()->title);
+        $this->assertSame('The New createOrFirst Method', $existingTonyArticle->refresh()->title);
+        $this->assertTrue($tony->is($existingTonyArticle->user));
+    }
+
     public function testUpdateOrCreateAffectingWrongModelsRegression()
     {
         // On Laravel 10.21.0, a bug was introduced that would update the wrong model when using `updateOrCreate()`,
@@ -228,6 +374,16 @@ class User extends Model
     {
         return $this->hasMany(Team::class, 'owner_id');
     }
+
+    public function team()
+    {
+        return $this->belongsTo(Team::class);
+    }
+
+    public function articles()
+    {
+        return $this->hasMany(Article::class);
+    }
 }
 
 class UserWithGlobalScope extends Model
@@ -261,6 +417,11 @@ class Team extends Model
     {
         return $this->hasMany(UserWithGlobalScope::class, 'team_id');
     }
+
+    public function articles()
+    {
+        return $this->hasManyThrough(Article::class, User::class);
+    }
 }
 
 class Category extends Model
@@ -280,4 +441,14 @@ class Product extends Model
 {
     public $timestamps = false;
     protected $guarded = [];
+}
+
+class Article extends Model
+{
+    protected $guarded = [];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }
