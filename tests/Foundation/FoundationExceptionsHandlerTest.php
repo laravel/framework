@@ -273,17 +273,17 @@ class FoundationExceptionsHandlerTest extends TestCase
             $redirector = m::mock(Redirector::class);
 
             $redirector->shouldReceive('to')->once()
-                ->andReturn($responser = m::mock(RedirectResponse::class));
+                ->andReturn($responder = m::mock(RedirectResponse::class));
 
-            $responser->shouldReceive('withInput')->once()->with(m::on(
+            $responder->shouldReceive('withInput')->once()->with(m::on(
                 function ($argument) use (&$argumentActual) {
                     $argumentActual = $argument;
 
                     return true;
-                }))->andReturn($responser);
+                }))->andReturn($responder);
 
-            $responser->shouldReceive('withErrors')->once()
-                ->andReturn($responser);
+            $responder->shouldReceive('withErrors')->once()
+                ->andReturn($responder);
 
             return $redirector;
         });
