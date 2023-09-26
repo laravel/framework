@@ -36,6 +36,14 @@ class EloquentHasManyThroughTest extends DatabaseTestCase
             $table->increments('id');
             $table->integer('category_id');
         });
+
+        Schema::create('articles', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('user_id');
+            $table->string('slug')->unique();
+            $table->string('title')->nullable();
+            $table->timestamps();
+        });
     }
 
     public function testBasicCreateAndRetrieve()
@@ -196,6 +204,22 @@ class EloquentHasManyThroughTest extends DatabaseTestCase
         $this->assertSame('Jane', $jane->name);
     }
 
+    public function testCreateOrFirstWhenRecordDoesntExist()
+    {
+        $team = Team::create();
+        $tony = $team->members()->create(['name' => 'Tony']);
+
+        $article = $team->articles()->createOrFirst(
+            ['user_id' => $tony->id, 'slug' => 'laravel-forever'],
+            ['title' => 'Laravel Forever'],
+        );
+
+        $this->assertTrue($article->wasRecentlyCreated);
+        $this->assertEquals('laravel-forever', $article->slug);
+        $this->assertEquals('Laravel Forever', $article->title);
+        $this->assertTrue($tony->is($article->user));
+    }
+
     public function testUpdateOrCreateAffectingWrongModelsRegression()
     {
         // On Laravel 10.21.0, a bug was introduced that would update the wrong model when using `updateOrCreate()`,
@@ -289,6 +313,11 @@ class User extends Model
     {
         return $this->belongsTo(Team::class);
     }
+
+    public function articles()
+    {
+        return $this->hasMany(Article::class);
+    }
 }
 
 class UserWithGlobalScope extends Model
@@ -322,6 +351,11 @@ class Team extends Model
     {
         return $this->hasMany(UserWithGlobalScope::class, 'team_id');
     }
+
+    public function articles()
+    {
+        return $this->hasManyThrough(Article::class, User::class);
+    }
 }
 
 class Category extends Model
@@ -341,4 +375,14 @@ class Product extends Model
 {
     public $timestamps = false;
     protected $guarded = [];
+}
+
+class Article extends Model
+{
+    protected $guarded = [];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }
