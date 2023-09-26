@@ -271,11 +271,11 @@ class HasManyThrough extends Relation
      */
     public function firstOrCreate(array $attributes = [], array $values = [])
     {
-        if (is_null($instance = $this->where($attributes)->first())) {
-            $instance = $this->create(array_merge($attributes, $values));
+        if ($instance = $this->where($attributes)->first()) {
+            return $instance;
         }
 
-        return $instance;
+        return $this->create(array_merge($attributes, $values));
     }
 
     /**
