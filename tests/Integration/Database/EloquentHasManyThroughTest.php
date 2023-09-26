@@ -40,8 +40,7 @@ class EloquentHasManyThroughTest extends DatabaseTestCase
         Schema::create('articles', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id');
-            $table->string('slug')->unique();
-            $table->string('title')->nullable();
+            $table->string('title')->unique();
             $table->timestamps();
         });
     }
@@ -210,14 +209,34 @@ class EloquentHasManyThroughTest extends DatabaseTestCase
         $tony = $team->members()->create(['name' => 'Tony']);
 
         $article = $team->articles()->createOrFirst(
-            ['user_id' => $tony->id, 'slug' => 'laravel-forever'],
             ['title' => 'Laravel Forever'],
+            ['user_id' => $tony->id],
         );
 
         $this->assertTrue($article->wasRecentlyCreated);
-        $this->assertEquals('laravel-forever', $article->slug);
         $this->assertEquals('Laravel Forever', $article->title);
         $this->assertTrue($tony->is($article->user));
+    }
+
+    public function testCreateOrFirstWhenRecordExists()
+    {
+        $team = Team::create();
+        $taylor = $team->members()->create(['name' => 'Taylor']);
+        $tony = $team->members()->create(['name' => 'Tony']);
+
+        $existingArticle = $taylor->articles()->create([
+            'title' => 'Laravel Forever',
+        ]);
+
+        $newArticle = $team->articles()->createOrFirst(
+            ['title' => 'Laravel Forever'],
+            ['user_id' => $tony->id],
+        );
+
+        $this->assertFalse($newArticle->wasRecentlyCreated);
+        $this->assertEquals('Laravel Forever', $newArticle->title);
+        $this->assertTrue($taylor->is($newArticle->user));
+        $this->assertTrue($existingArticle->is($newArticle));
     }
 
     public function testUpdateOrCreateAffectingWrongModelsRegression()
