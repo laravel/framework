@@ -26,6 +26,16 @@ class PaginationState
             return 1;
         });
 
+        Paginator::perPageResolver(function ($perPageName = 'per_page') use ($app) {
+            $perPage = $app['request']->input($perPageName);
+
+            if (filter_var($perPage, FILTER_VALIDATE_INT) !== false && (int) $perPage > 0) {
+                return (int) $perPage;
+            }
+
+            return 15;
+        });
+
         Paginator::queryStringResolver(fn () => $app['request']->query());
 
         CursorPaginator::currentCursorResolver(function ($cursorName = 'cursor') use ($app) {

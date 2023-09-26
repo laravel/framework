@@ -24,12 +24,12 @@ class Paginator extends AbstractPaginator implements Arrayable, ArrayAccess, Cou
      * Create a new paginator instance.
      *
      * @param  mixed  $items
-     * @param  int  $perPage
+     * @param  int|null  $perPage
      * @param  int|null  $currentPage
      * @param  array  $options  (path, query, fragment, pageName)
      * @return void
      */
-    public function __construct($items, $perPage, $currentPage = null, array $options = [])
+    public function __construct($items, $perPage = null, $currentPage = null, array $options = [])
     {
         $this->options = $options;
 
@@ -37,7 +37,7 @@ class Paginator extends AbstractPaginator implements Arrayable, ArrayAccess, Cou
             $this->{$key} = $value;
         }
 
-        $this->perPage = $perPage;
+        $this->perPage = $this->setPerPage($perPage);
         $this->currentPage = $this->setCurrentPage($currentPage);
         $this->path = $this->path !== '/' ? rtrim($this->path, '/') : $this->path;
 
@@ -55,6 +55,19 @@ class Paginator extends AbstractPaginator implements Arrayable, ArrayAccess, Cou
         $currentPage = $currentPage ?: static::resolveCurrentPage();
 
         return $this->isValidPageNumber($currentPage) ? (int) $currentPage : 1;
+    }
+
+    /**
+     * Get the per page for the request.
+     *
+     * @param  int  $perPage
+     * @return int
+     */
+    protected function setPerPage($perPage)
+    {
+        $perPage = $perPage ?: static::resolvePerPage();
+
+        return $this->isValidPerPageNumber($perPage) ? (int) $perPage : 15;
     }
 
     /**

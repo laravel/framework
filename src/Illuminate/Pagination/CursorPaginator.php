@@ -24,12 +24,12 @@ class CursorPaginator extends AbstractCursorPaginator implements Arrayable, Arra
      * Create a new paginator instance.
      *
      * @param  mixed  $items
-     * @param  int  $perPage
+     * @param  int|null  $perPage
      * @param  \Illuminate\Pagination\Cursor|null  $cursor
      * @param  array  $options  (path, query, fragment, pageName)
      * @return void
      */
-    public function __construct($items, $perPage, $cursor = null, array $options = [])
+    public function __construct($items, $perPage = null, $cursor = null, array $options = [])
     {
         $this->options = $options;
 
@@ -37,11 +37,25 @@ class CursorPaginator extends AbstractCursorPaginator implements Arrayable, Arra
             $this->{$key} = $value;
         }
 
-        $this->perPage = (int) $perPage;
+        $this->perPage = $this->setPerPage($perPage, $this->perPageName);
         $this->cursor = $cursor;
         $this->path = $this->path !== '/' ? rtrim($this->path, '/') : $this->path;
 
         $this->setItems($items);
+    }
+
+    /**
+     * Get the per page for the request.
+     *
+     * @param  int  $perPage
+     * @param  string  $perPageName
+     * @return int
+     */
+    protected function setPerPage($perPage, $perPageName)
+    {
+        $perPage = $perPage ?: static::resolvePerPage($perPageName);
+
+        return $this->isValidPerPageNumber($perPage) ? (int) $perPage : 15;
     }
 
     /**

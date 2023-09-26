@@ -38,6 +38,13 @@ abstract class AbstractCursorPaginator implements Htmlable
     protected $perPage;
 
     /**
+     * The query string variable used to store the per page.
+     *
+     * @var string
+     */
+    protected $perPageName = 'per_page';
+
+    /**
      * The base path to assign to all URLs.
      *
      * @var string
@@ -94,6 +101,13 @@ abstract class AbstractCursorPaginator implements Htmlable
     protected static $currentCursorResolver;
 
     /**
+     * The per page resolver callback.
+     *
+     * @var \Closure
+     */
+    protected static $perPageResolver;
+
+    /**
      * Get the URL for a given cursor.
      *
      * @param  \Illuminate\Pagination\Cursor|null  $cursor
@@ -114,6 +128,44 @@ abstract class AbstractCursorPaginator implements Htmlable
             .(str_contains($this->path(), '?') ? '&' : '?')
             .Arr::query($parameters)
             .$this->buildFragment();
+    }
+
+    /**
+     * Resolve the per page or return the default value.
+     *
+     * @param  string  $perPageName
+     * @param  int  $default
+     * @return int
+     */
+    public static function resolvePerPage($perPageName = 'per_page', $default = 15)
+    {
+        if (isset(static::$perPageResolver)) {
+            return (int) call_user_func(static::$perPageResolver, $perPageName);
+        }
+
+        return $default;
+    }
+
+    /**
+     * Set the per page resolver callback.
+     *
+     * @param  \Closure  $resolver
+     * @return void
+     */
+    public static function perPageResolver(Closure $resolver)
+    {
+        static::$perPageResolver = $resolver;
+    }
+
+    /**
+     * Determine if the given value is a valid per page number.
+     *
+     * @param  int  $perPage
+     * @return bool
+     */
+    protected function isValidPerPageNumber($perPage)
+    {
+        return $perPage > 0 && filter_var($perPage, FILTER_VALIDATE_INT) !== false;
     }
 
     /**

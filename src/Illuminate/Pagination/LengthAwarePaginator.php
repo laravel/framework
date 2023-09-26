@@ -32,12 +32,12 @@ class LengthAwarePaginator extends AbstractPaginator implements Arrayable, Array
      *
      * @param  mixed  $items
      * @param  int  $total
-     * @param  int  $perPage
+     * @param  int|null  $perPage
      * @param  int|null  $currentPage
      * @param  array  $options  (path, query, fragment, pageName)
      * @return void
      */
-    public function __construct($items, $total, $perPage, $currentPage = null, array $options = [])
+    public function __construct($items, $total, $perPage = null, $currentPage = null, array $options = [])
     {
         $this->options = $options;
 
@@ -46,7 +46,7 @@ class LengthAwarePaginator extends AbstractPaginator implements Arrayable, Array
         }
 
         $this->total = $total;
-        $this->perPage = (int) $perPage;
+        $this->perPage = $this->setPerPage($perPage, $this->perPageName);
         $this->lastPage = max((int) ceil($total / $perPage), 1);
         $this->path = $this->path !== '/' ? rtrim($this->path, '/') : $this->path;
         $this->currentPage = $this->setCurrentPage($currentPage, $this->pageName);
@@ -65,6 +65,20 @@ class LengthAwarePaginator extends AbstractPaginator implements Arrayable, Array
         $currentPage = $currentPage ?: static::resolveCurrentPage($pageName);
 
         return $this->isValidPageNumber($currentPage) ? (int) $currentPage : 1;
+    }
+
+    /**
+     * Get the per page for the request.
+     *
+     * @param  int  $perPage
+     * @param  string  $perPageName
+     * @return int
+     */
+    protected function setPerPage($perPage, $perPageName)
+    {
+        $perPage = $perPage ?: static::resolvePerPage($perPageName);
+
+        return $this->isValidPerPageNumber($perPage) ? (int) $perPage : 15;
     }
 
     /**
