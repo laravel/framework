@@ -17,7 +17,9 @@ class FakeCommandWithInputPrompting extends Command implements PromptsForMissing
 
     protected function configurePrompts(InputInterface $input)
     {
+        Prompt::interactive(true);
         Prompt::fallbackWhen(true);
+
         TextPrompt::fallbackUsing(function () {
             $this->prompted = true;
 
