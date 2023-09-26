@@ -427,9 +427,7 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
         };
 
         if (count($keys) === 0) {
-            return new static(function () {
-                yield from $this;
-            });
+            return $this;
         }
 
         return new static(function () use ($keys) {
