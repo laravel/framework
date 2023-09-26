@@ -15,7 +15,7 @@ class FakeCommandWithInputPrompting extends Command implements PromptsForMissing
 
     public $prompted = false;
 
-    protected function interact(InputInterface $input, OutputInterface $output)
+    protected function configurePrompts(InputInterface $input)
     {
         Prompt::fallbackWhen(true);
         TextPrompt::fallbackUsing(function () {
@@ -23,8 +23,6 @@ class FakeCommandWithInputPrompting extends Command implements PromptsForMissing
 
             return 'foo';
         });
-
-        parent::interact($input, $output);
     }
 
     public function handle(): int
