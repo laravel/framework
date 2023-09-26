@@ -148,6 +148,22 @@ class EloquentHasManyThroughTest extends DatabaseTestCase
         $this->assertEquals([1], $categories->pluck('id')->all());
     }
 
+    public function testFirstOrNewOnMissingRecord()
+    {
+        $taylor = User::create(['name' => 'Taylor', 'slug' => 'taylor']);
+        $team = Team::create(['owner_id' => $taylor->id]);
+
+        $user1 = $taylor->teamMates()->firstOrNew(
+            ['slug' => 'tony'],
+            ['name' => 'Tony', 'team_id' => $team->id],
+        );
+
+        $this->assertFalse($user1->exists);
+        $this->assertEquals($team->id, $user1->team_id);
+        $this->assertSame('tony', $user1->slug);
+        $this->assertSame('Tony', $user1->name);
+    }
+
     public function testFirstOrCreateWhenModelDoesntExist()
     {
         $owner = User::create(['name' => 'Taylor']);
