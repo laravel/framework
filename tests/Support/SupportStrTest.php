@@ -172,8 +172,8 @@ class SupportStrTest extends TestCase
         $this->assertSame('...abc...', Str::excerpt('z  abc  d', 'b', ['radius' => 1]));
         $this->assertSame('[...]is a beautiful morn[...]', Str::excerpt('This is a beautiful morning', 'beautiful', ['omission' => '[...]', 'radius' => 5]));
         $this->assertSame(
-            'This is the ultimate supercalifragilisticexpialidoceous very looooooooooooooooooong looooooooooooong beautiful morning with amazing sunshine and awesome tempera[...]',
-            Str::excerpt('This is the ultimate supercalifragilisticexpialidoceous very looooooooooooooooooong looooooooooooong beautiful morning with amazing sunshine and awesome temperatures. So what are you gonna do about it?', 'very',
+            'This is the ultimate supercalifragilisticexpialidocious very looooooooooooooooooong looooooooooooong beautiful morning with amazing sunshine and awesome tempera[...]',
+            Str::excerpt('This is the ultimate supercalifragilisticexpialidocious very looooooooooooooooooong looooooooooooong beautiful morning with amazing sunshine and awesome temperatures. So what are you gonna do about it?', 'very',
                 ['omission' => '[...]'],
             ));
 
@@ -834,11 +834,34 @@ class SupportStrTest extends TestCase
         $this->assertSame(1, Str::substrCount('laravelPHPFramework', 'a', -10, -3));
     }
 
+    public function testPosition()
+    {
+        $this->assertSame(7, Str::position('Hello, World!', 'W'));
+        $this->assertSame(10, Str::position('This is a test string.', 'test'));
+        $this->assertSame(23, Str::position('This is a test string, test again.', 'test', 15));
+        $this->assertSame(0, Str::position('Hello, World!', 'Hello'));
+        $this->assertSame(7, Str::position('Hello, World!', 'World!'));
+        $this->assertSame(10, Str::position('This is a tEsT string.', 'tEsT', 0, 'UTF-8'));
+        $this->assertSame(7, Str::position('Hello, World!', 'W', -6));
+        $this->assertSame(18, Str::position('Äpfel, Birnen und Kirschen', 'Kirschen', -10, 'UTF-8'));
+        $this->assertSame(9, Str::position('@%€/=!"][$', '$', 0, 'UTF-8'));
+        $this->assertFalse(Str::position('Hello, World!', 'w', 0, 'UTF-8'));
+        $this->assertFalse(Str::position('Hello, World!', 'X', 0, 'UTF-8'));
+        $this->assertFalse(Str::position('', 'test'));
+        $this->assertFalse(Str::position('Hello, World!', 'X'));
+    }
+
     public function testSubstrReplace()
     {
         $this->assertSame('12:00', Str::substrReplace('1200', ':', 2, 0));
         $this->assertSame('The Laravel Framework', Str::substrReplace('The Framework', 'Laravel ', 4, 0));
         $this->assertSame('Laravel – The PHP Framework for Web Artisans', Str::substrReplace('Laravel Framework', '– The PHP Framework for Web Artisans', 8));
+    }
+
+    public function testTake()
+    {
+        $this->assertSame('ab', Str::take('abcdef', 2));
+        $this->assertSame('ef', Str::take('abcdef', -2));
     }
 
     public function testLcfirst()

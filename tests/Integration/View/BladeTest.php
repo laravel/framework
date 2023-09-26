@@ -3,9 +3,12 @@
 namespace Illuminate\Tests\Integration\View;
 
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\View;
 use Illuminate\View\Component;
 use Orchestra\Testbench\TestCase;
+use Symfony\Component\Finder\Finder;
+use Symfony\Component\Finder\SplFileInfo;
 
 class BladeTest extends TestCase
 {
@@ -164,6 +167,21 @@ class BladeTest extends TestCase
         $this->assertSame('<div>
     <input type="text" class="input text-input-lg" name="my_form_field" data-test="data" />
 </div>', trim($content));
+    }
+
+    public function testViewCacheCommandHandlesConfiguredBladeExtensions()
+    {
+        $this->artisan('view:clear');
+
+        View::addExtension('sh', 'blade');
+        $this->artisan('view:cache');
+
+        $compiledFiles = Finder::create()->in(Config::get('view.compiled'))->files();
+        $found = collect($compiledFiles)
+            ->contains(fn (SplFileInfo $file) => str_contains($file->getContents(), 'echo "<?php echo e($scriptMessage); ?>" > output.log'));
+        $this->assertTrue($found);
+
+        $this->artisan('view:clear');
     }
 
     protected function getEnvironmentSetUp($app)

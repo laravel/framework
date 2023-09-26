@@ -70,4 +70,17 @@ class FilesystemTest extends TestCase
         clearstatcache(true, $this->stubFile);
         $this->assertFalse(File::isFile($this->stubFile));
     }
+
+    public function testItCanDeleteDirectoryViaFilesystem()
+    {
+        if (! File::exists(storage_path('app/public/testdir'))) {
+            File::makeDirectory(storage_path('app/public/testdir'));
+        }
+
+        $this->assertTrue(File::exists(storage_path('app/public/testdir')));
+
+        File::deleteDirectory(storage_path('app/public/testdir'));
+
+        $this->assertFalse(File::exists(storage_path('app/public/testdir')));
+    }
 }

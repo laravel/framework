@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use ValueError;
 
-include 'Enums.php';
+include_once 'Enums.php';
 
 class EloquentModelEnumCastingTest extends DatabaseTestCase
 {
