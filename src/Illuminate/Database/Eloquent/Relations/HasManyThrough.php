@@ -280,9 +280,7 @@ class HasManyThrough extends Relation
     }
 
     /**
-     * Get the first record matching the attributes. If the record is not found, create it.
-     * Attempt to create the record with the given attribute and values. If a unique contraint
-     * violation is triggered,
+     * Attempt to create the record. If a unique constraint violation occurs, attempt to find the matching record.
      *
      * @param  array  $attributes
      * @param  array  $values
