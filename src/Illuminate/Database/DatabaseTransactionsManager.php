@@ -7,14 +7,14 @@ class DatabaseTransactionsManager
     /**
      * All of the recorded transactions.
      *
-     * @var \Illuminate\Support\Collection
+     * @var \Illuminate\Support\Collection<int, \Illuminate\Database\DatabaseTransactionRecord>
      */
     protected $transactions;
 
     /**
      * The database transaction that should be ignored by callbacks.
      *
-     * @var \Illuminate\Database\DatabaseTransactionRecord
+     * @var \Illuminate\Database\DatabaseTransactionRecord|null
      */
     protected $callbacksShouldIgnore;
 
@@ -112,13 +112,22 @@ class DatabaseTransactionsManager
     /**
      * Get the transactions that are applicable to callbacks.
      *
-     * @return \Illuminate\Support\Collection
+     * @return \Illuminate\Support\Collection<int, \Illuminate\Database\DatabaseTransactionRecord>
      */
     public function callbackApplicableTransactions()
     {
-        return $this->transactions->reject(function ($transaction) {
-            return $transaction === $this->callbacksShouldIgnore;
-        })->values();
+        return $this->transactions;
+    }
+
+    /**
+     * Determine if after commit callbacks should be executed for the given transaction level.
+     *
+     * @param  int  $level
+     * @return bool
+     */
+    public function afterCommitCallbacksShouldBeExecuted($level)
+    {
+        return $level === 1;
     }
 
     /**
