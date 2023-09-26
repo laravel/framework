@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Integration\Database\EloquentHasManyThroughTest;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
@@ -232,6 +233,27 @@ class EloquentHasManyThroughTest extends DatabaseTestCase
             ['title' => 'Laravel Forever'],
             ['user_id' => $tony->id],
         );
+
+        $this->assertFalse($newArticle->wasRecentlyCreated);
+        $this->assertEquals('Laravel Forever', $newArticle->title);
+        $this->assertTrue($taylor->is($newArticle->user));
+        $this->assertTrue($existingArticle->is($newArticle));
+    }
+
+    public function testCreateOrFirstWhenRecordExistsInTransaction()
+    {
+        $team = Team::create();
+        $taylor = $team->members()->create(['name' => 'Taylor']);
+        $tony = $team->members()->create(['name' => 'Tony']);
+
+        $existingArticle = $taylor->articles()->create([
+            'title' => 'Laravel Forever',
+        ]);
+
+        $newArticle = DB::transaction(fn () => $team->articles()->createOrFirst(
+            ['title' => 'Laravel Forever'],
+            ['user_id' => $tony->id],
+        ));
 
         $this->assertFalse($newArticle->wasRecentlyCreated);
         $this->assertEquals('Laravel Forever', $newArticle->title);
