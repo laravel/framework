@@ -120,7 +120,7 @@ class DatabaseTransactionsManager
     }
 
     /**
-     * Determine if after commit callbacks should be executed.
+     * Determine if after commit callbacks should be executed for the given transaction level.
      *
      * @param  int  $level
      * @return bool

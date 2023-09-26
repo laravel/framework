@@ -2,7 +2,9 @@
 
 namespace Illuminate\Foundation\Testing;
 
-class DatabaseTransactionsManager extends \Illuminate\Database\DatabaseTransactionsManager
+use Illuminate\Database\DatabaseTransactionsManager as BaseManager;
+
+class DatabaseTransactionsManager extends BaseManager
 {
     /**
      * Register a transaction callback.
@@ -33,7 +35,7 @@ class DatabaseTransactionsManager extends \Illuminate\Database\DatabaseTransacti
     }
 
     /**
-     * Determine if after commit callbacks should be executed.
+     * Determine if after commit callbacks should be executed for the given transaction level.
      *
      * @param  int  $level
      * @return bool
