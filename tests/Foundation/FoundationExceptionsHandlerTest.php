@@ -706,7 +706,7 @@ class FoundationExceptionsHandlerTest extends TestCase
         $this->assertSame('Something in the app went wrong.', $reported[0]->getMessage());
     }
 
-    public function testRateLimitExpires()
+    public function testRateLimitExpiresOnBoundary()
     {
         $handler = new class($this->container) extends Handler
         {
