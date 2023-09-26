@@ -4,7 +4,6 @@ namespace Illuminate\Tests\Console;
 
 use Illuminate\Console\Command;
 use Illuminate\Console\CommandMutex;
-use Illuminate\Container\Container;
 use Illuminate\Contracts\Console\Isolatable;
 use Illuminate\Foundation\Application;
 use Mockery as m;
