@@ -7,7 +7,6 @@ use Illuminate\Contracts\Console\PromptsForMissingInput;
 use Laravel\Prompts\Prompt;
 use Laravel\Prompts\TextPrompt;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
 
 class FakeCommandWithInputPrompting extends Command implements PromptsForMissingInput
 {
