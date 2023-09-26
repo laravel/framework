@@ -6,6 +6,7 @@ use Illuminate\Console\Command;
 use Illuminate\Console\CommandMutex;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Console\Isolatable;
+use Illuminate\Foundation\Application;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -37,9 +38,9 @@ class CommandMutexTest extends TestCase
 
         $this->commandMutex = m::mock(CommandMutex::class);
 
-        $container = Container::getInstance();
-        $container->instance(CommandMutex::class, $this->commandMutex);
-        $this->command->setLaravel($container);
+        $app = new Application;
+        $app->instance(CommandMutex::class, $this->commandMutex);
+        $this->command->setLaravel($app);
     }
 
     public function testCanRunIsolatedCommandIfNotBlocked()
