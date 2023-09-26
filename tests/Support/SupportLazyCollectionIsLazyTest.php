@@ -352,8 +352,12 @@ class SupportLazyCollectionIsLazyTest extends TestCase
             $collection->except([1, 2])->all();
         });
 
-        $this->assertEnumerates(2, function ($collection) {
-            $collection->except([1, 2])->take(1)->all();
+        $this->assertEnumerates(3, function ($collection) {
+            // $collection contains a list of [1, 2, 3, ..., 100]
+            // Using except to exclude offset 0, 1, and then take(1),
+            // 1 and 2 are excluded, leaving 3 as the value in $collection.
+            // Therefore, Enumerates Count will be 3.
+            $collection->except([0, 1])->take(1)->all();
         });
     }
 
