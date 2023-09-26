@@ -8894,6 +8894,116 @@ class ValidationValidatorTest extends TestCase
         $validator->passes();
     }
 
+    /** @dataProvider providesPreservesKeyOrderData */
+    public function testValidatedDataPreservesKeyOrderWhenSomeFieldsAreOptional($rules, $data, $expectedResultUnsorted, $expectedResultSorted)
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+
+        $validator = new Validator($trans, $data, $rules, [], []);
+        $validator->excludeUnvalidatedArrayKeys = true;
+
+        // We cannot use assertEquals() because the order of the keys does not matter in that function
+        // We expect the result to be unsorted because by default $ensureValidatedDataIsSortedAsOriginal is false in Validator
+        $this->assertTrue($expectedResultUnsorted === $validator->validated());
+
+        $validator->ensureValidatedDataIsSortedAsOriginal = true;
+
+        // After assigning true to $ensureValidatedDataIsSortedAsOriginal we expect the result to be sorted
+        $this->assertTrue($expectedResultSorted === $validator->validated());
+    }
+
+    public static function providesPreservesKeyOrderData()
+    {
+        return [
+            [
+                // Rules
+                [
+                    'vehicles' => 'array',
+                    'vehicles.*.license_plate' => 'nullable|string',
+                    'vehicles.*.type' => 'required|string',
+                    'vehicles.*.wheels' => 'array',
+                    'vehicles.*.wheels.*.color' => 'nullable|string',
+                    'vehicles.*.wheels.*.position' => 'required|string',
+                    'first_name' => 'required|string',
+                ],
+                // Data
+                [
+                    'vehicles' => [
+                        [
+                            'type' => 'bus',
+                            'wheels' => [
+                                ['position' => 'front-right'],
+                                ['position' => 'front-left'],
+                                ['color' => 'black', 'position' => 'back-right'],
+                                ['position' => 'back-left'],
+                            ],
+                        ],
+                        [
+                            'license_plate' => 'FACADE',
+                            'type' => 'car',
+                            'wheels' => [],
+                        ],
+                        [
+                            'type' => 'car',
+                            'wheels' => [],
+                            'color' => 'white',
+                        ],
+                    ],
+                    'first_name' => 'Jon',
+                    'last_name' => 'Doe',
+                ],
+                // Expected result unsorted data
+                [
+                    'first_name' => 'Jon',
+                    'vehicles' => [
+                        1 => [
+                            'license_plate' => 'FACADE',
+                            'type' => 'car',
+                            'wheels' => [],
+                        ],
+                        0 => [
+                            'type' => 'bus',
+                            'wheels' => [
+                                2 => ['color' => 'black', 'position' => 'back-right'],
+                                0 => ['position' => 'front-right'],
+                                1 => ['position' => 'front-left'],
+                                3 => ['position' => 'back-left'],
+                            ],
+                        ],
+                        2 => [
+                            'type' => 'car',
+                            'wheels' => [],
+                        ],
+                    ],
+                ],
+                // Expected result sorted data
+                [
+                    'vehicles' => [
+                        [
+                            'type' => 'bus',
+                            'wheels' => [
+                                ['position' => 'front-right'],
+                                ['position' => 'front-left'],
+                                ['color' => 'black', 'position' => 'back-right'],
+                                ['position' => 'back-left'],
+                            ],
+                        ],
+                        [
+                            'license_plate' => 'FACADE',
+                            'type' => 'car',
+                            'wheels' => [],
+                        ],
+                        [
+                            'type' => 'car',
+                            'wheels' => [],
+                        ],
+                    ],
+                    'first_name' => 'Jon',
+                ]
+            ]
+        ];
+    }
+
     protected function getTranslator()
     {
         return m::mock(TranslatorContract::class);
