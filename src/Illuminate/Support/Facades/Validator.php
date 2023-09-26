@@ -11,7 +11,7 @@ namespace Illuminate\Support\Facades;
  * @method static void replacer(string $rule, \Closure|string $replacer)
  * @method static void includeUnvalidatedArrayKeys()
  * @method static void excludeUnvalidatedArrayKeys()
- * @method static void ensureValidatedArrayDataIsSortedAsOriginal()
+ * @method static void ensureValidatedDataIsSortedAsOriginal()
  * @method static void resolver(\Closure $resolver)
  * @method static \Illuminate\Contracts\Translation\Translator getTranslator()
  * @method static \Illuminate\Validation\PresenceVerifierInterface getPresenceVerifier()
