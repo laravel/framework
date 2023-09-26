@@ -1047,6 +1047,20 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Save a new model and return the instance with the given relation.
+     *
+     * @param  array  $attributes
+     * @param  array|string  $relation
+     * @return \Illuminate\Database\Eloquent\Model|$this
+     */
+    public function createWith(array $attributes = [], $relation)
+    {
+        $modelInstance = $this->create($attributes);
+
+        return $modelInstance->load($relation);
+    }
+
+    /**
      * Update records in the database.
      *
      * @param  array  $values
