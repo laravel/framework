@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithDictionary;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\UniqueConstraintViolationException;
 
 class HasManyThrough extends Relation
 {
@@ -276,6 +277,24 @@ class HasManyThrough extends Relation
         }
 
         return $this->create(array_merge($attributes, $values));
+    }
+
+    /**
+     * Get the first record matching the attributes. If the record is not found, create it.
+     * Attempt to create the record with the given attribute and values. If a unique contraint
+     * violation is triggered,
+     *
+     * @param  array  $attributes
+     * @param  array  $values
+     * @return \Illuminate\Database\Eloquent\Model
+     */
+    public function createOrFirst(array $attributes = [], array $values = [])
+    {
+        try {
+            return $this->create(array_merge($attributes, $values));
+        } catch (UniqueConstraintViolationException $exception) {
+            return $this->where($attributes)->first() ?? throw $exception;
+        }
     }
 
     /**

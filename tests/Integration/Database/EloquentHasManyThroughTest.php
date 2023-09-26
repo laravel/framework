@@ -239,6 +239,31 @@ class EloquentHasManyThroughTest extends DatabaseTestCase
         $this->assertTrue($existingArticle->is($newArticle));
     }
 
+    public function testCreateOrFirstRegressionIssue()
+    {
+        $team1 = Team::create();
+
+        $taylor = $team1->members()->create(['name' => 'Taylor']);
+        $tony = $team1->members()->create(['name' => 'Tony']);
+
+        $existingTonyArticle = $tony->articles()->create(['title' => 'The New createOrFirst Method']);
+        $existingTaylorArticle = $taylor->articles()->create(['title' => 'Laravel Forever']);
+
+        $newArticle = $team1->articles()->createOrFirst(
+            ['title' => 'Laravel Forever'],
+            ['user_id' => $tony->id],
+        );
+
+        $this->assertFalse($newArticle->wasRecentlyCreated);
+        $this->assertTrue($existingTaylorArticle->is($newArticle));
+        $this->assertEquals('Laravel Forever', $newArticle->refresh()->title);
+        $this->assertTrue($taylor->is($newArticle->user));
+
+        $this->assertSame('Laravel Forever', $existingTaylorArticle->refresh()->title);
+        $this->assertSame('The New createOrFirst Method', $existingTonyArticle->refresh()->title);
+        $this->assertTrue($tony->is($existingTonyArticle->user));
+    }
+
     public function testUpdateOrCreateAffectingWrongModelsRegression()
     {
         // On Laravel 10.21.0, a bug was introduced that would update the wrong model when using `updateOrCreate()`,
