@@ -8999,8 +8999,8 @@ class ValidationValidatorTest extends TestCase
                         ],
                     ],
                     'first_name' => 'Jon',
-                ]
-            ]
+                ],
+            ],
         ];
     }
 
