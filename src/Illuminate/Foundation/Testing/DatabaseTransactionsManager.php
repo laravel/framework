@@ -29,9 +29,7 @@ class DatabaseTransactionsManager extends \Illuminate\Database\DatabaseTransacti
      */
     public function callbackApplicableTransactions()
     {
-        return $this->transactions->reject(
-            fn ($transaction) => $transaction === $this->transactions->first()
-        )->values();
+        return $this->transactions->skip(1)->values();
     }
 
     /**
