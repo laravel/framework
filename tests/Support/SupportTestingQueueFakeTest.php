@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Support;
 
 use BadMethodCallException;
 use Illuminate\Bus\Queueable;
+use Illuminate\Events\CallQueuedListener;
 use Illuminate\Foundation\Application;
 use Illuminate\Queue\QueueManager;
 use Illuminate\Support\Testing\Fakes\QueueFake;
@@ -373,6 +374,27 @@ class SupportTestingQueueFakeTest extends TestCase
 
         $fake->assertNotPushed(JobStub::class);
         $fake->assertPushed(JobToFakeStub::class);
+    }
+
+    public function testItDoesntFakeListenersPassedViaExcept()
+    {
+        $job = new CallQueuedListener(JobStub::class, 'handle', []);
+
+        $manager = m::mock(QueueManager::class);
+        $manager->shouldReceive('push')->once()->withArgs(function ($passedJob) use ($job) {
+            return $passedJob === $job;
+        });
+
+        $fake = (new QueueFake(new Application, [], $manager))->except(JobStub::class);
+
+        $fake->push($job);
+        $fake->push(new CallQueuedListener(JobToFakeStub::class, 'handle', []));
+
+        $fake->assertNotPushed(JobStub::class);
+
+        $fake->assertPushed(CallQueuedListener::class, function ($job) {
+            return $job->class == JobToFakeStub::class;
+        });
     }
 
     public function testItCanSerializeAndRestoreJobs()

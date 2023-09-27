@@ -5,6 +5,7 @@ namespace Illuminate\Support\Testing\Fakes;
 use BadMethodCallException;
 use Closure;
 use Illuminate\Contracts\Queue\Queue;
+use Illuminate\Events\CallQueuedListener;
 use Illuminate\Queue\CallQueuedClosure;
 use Illuminate\Queue\QueueManager;
 use Illuminate\Support\Collection;
@@ -404,7 +405,9 @@ class QueueFake extends QueueManager implements Fake, Queue
         }
 
         return $this->jobsToBeQueued->contains(
-            fn ($jobToQueue) => $job instanceof ((string) $jobToQueue)
+            fn ($jobToQueue) => $job instanceof ((string) CallQueuedListener::class) ?
+                $job->class === (string) $jobToQueue :
+                $job instanceof ((string) $jobToQueue)
         );
     }
 
