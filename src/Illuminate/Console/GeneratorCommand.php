@@ -7,6 +7,7 @@ use Illuminate\Contracts\Console\PromptsForMissingInput;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Str;
 use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Finder\Finder;
 
 abstract class GeneratorCommand extends Command implements PromptsForMissingInput
@@ -129,6 +130,13 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
             $this->addTestOptions();
         }
 
+        $this->getDefinition()->addOption(new InputOption(
+            'in',
+            null,
+            InputOption::VALUE_REQUIRED,
+            "Specify a sub-namespace to generate the {$this->type} class in"
+        ));
+
         $this->files = $files;
     }
 
@@ -206,6 +214,10 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
 
         if (Str::startsWith($name, $rootNamespace)) {
             return $name;
+        }
+
+        if ($subNamespace = $this->option('in')) {
+            $rootNamespace .= Str::finish($subNamespace, '\\');
         }
 
         return $this->qualifyClass(
