@@ -456,7 +456,7 @@ class SupportArrTest extends TestCase
     public function testGetOrFailExceptionScenarios()
     {
         $exceptions = 0;
-        $expectedMessage = "The array does not contain an element with the specified key.";
+        $expectedMessage = 'The array does not contain an element with the specified key.';
 
         // Testing for a non-existent key
         try {

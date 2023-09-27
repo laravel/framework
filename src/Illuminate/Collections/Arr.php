@@ -335,28 +335,28 @@ class Arr
     }
 
     /**
-    * Get an item from an array using "dot" notation or throw an exception if not found.
-    *
-    * @param  \ArrayAccess|array  $array
-    * @param  string|int|null  $key
-    * @return mixed
-    *
-    * @throws \Illuminate\Support\ItemNotFoundException
-    */
+     * Get an item from an array or throw an exception if not found.
+     *
+     * @param  \ArrayAccess|array  $array
+     * @param  string|int|null  $key
+     * @return mixed
+     *
+     * @throws \Illuminate\Support\ItemNotFoundException
+     */
     public static function getOrFail($array, $key)
     {
         $value = static::get($array, $key);
-        $message = "The array does not contain an element with the specified key.";
+        $message = 'The array does not contain an element with the specified key.';
 
         if (empty($array)) {
             throw new \Illuminate\Support\ItemNotFoundException($message);
         }
 
-        if(is_null($key) || is_null($value)) {
+        if (is_null($key) || is_null($value)) {
             throw new \Illuminate\Support\ItemNotFoundException($message);
         }
 
-        if (is_string($value) && trim($value) === "") {
+        if (is_string($value) && trim($value) === '') {
             throw new \Illuminate\Support\ItemNotFoundException($message);
         }
 
