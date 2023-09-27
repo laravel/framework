@@ -252,15 +252,16 @@ class HasManyThrough extends Relation
      * Get the first related model record matching the attributes or instantiate it.
      *
      * @param  array  $attributes
+     * @param  array  $values
      * @return \Illuminate\Database\Eloquent\Model
      */
-    public function firstOrNew(array $attributes)
+    public function firstOrNew(array $attributes = [], array $values = [])
     {
-        if (is_null($instance = $this->where($attributes)->first())) {
-            $instance = $this->related->newInstance($attributes);
+        if (! is_null($instance = $this->where($attributes)->first())) {
+            return $instance;
         }
 
-        return $instance;
+        return $this->related->newInstance(array_merge($attributes, $values));
     }
 
     /**
