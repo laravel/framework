@@ -24,7 +24,7 @@ trait ConfiguresPrompts
     {
         Prompt::setOutput($this->output);
 
-        Prompt::interactive(($input->isInteractive() && stream_isatty(STDIN)) || $this->laravel->runningUnitTests());
+        Prompt::interactive(($input->isInteractive() && defined('STDIN') && stream_isatty(STDIN)) || $this->laravel->runningUnitTests());
 
         Prompt::fallbackWhen(windows_os() || $this->laravel->runningUnitTests());
 
