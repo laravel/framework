@@ -95,7 +95,7 @@
         "ext-gmp": "*",
         "ably/ably-php": "^1.0",
         "aws/aws-sdk-php": "^3.235.5",
-        "doctrine/dbal": "^3.5.1",
+        "doctrine/dbal": "3.6.7",
         "fakerphp/faker": "^1.21",
         "guzzlehttp/guzzle": "^7.5",
         "league/flysystem-aws-s3-v3": "^3.0",
