@@ -6,6 +6,7 @@ use ArrayObject;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\ItemNotFoundException;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use stdClass;
@@ -405,6 +406,120 @@ class SupportArrTest extends TestCase
         $this->assertSame('dayle', Arr::get($array, 'names.otherDeveloper', function () {
             return 'dayle';
         }));
+    }
+
+    public function testGetOrFail()
+    {
+        $array = ['products.desk' => ['price' => 100]];
+        $this->assertEquals(['price' => 100], Arr::getOrFail($array, 'products.desk'));
+
+        $array = ['products' => ['desk' => ['price' => 100]]];
+        $value = Arr::getOrFail($array, 'products.desk');
+        $this->assertEquals(['price' => 100], $value);
+
+        // Test direct ArrayAccess object
+        $array = ['products' => ['desk' => ['price' => 100]]];
+        $arrayAccessObject = new ArrayObject($array);
+        $value = Arr::getOrFail($arrayAccessObject, 'products.desk');
+        $this->assertEquals(['price' => 100], $value);
+
+        // Test array containing ArrayAccess object
+        $arrayAccessChild = new ArrayObject(['products' => ['desk' => ['price' => 100]]]);
+        $array = ['child' => $arrayAccessChild];
+        $value = Arr::getOrFail($array, 'child.products.desk');
+        $this->assertEquals(['price' => 100], $value);
+
+        // Test array containing multiple nested ArrayAccess objects
+        $arrayAccessChild = new ArrayObject(['products' => ['desk' => ['price' => 100]]]);
+        $arrayAccessParent = new ArrayObject(['child' => $arrayAccessChild]);
+        $array = ['parent' => $arrayAccessParent];
+        $value = Arr::getOrFail($array, 'parent.child.products.desk');
+        $this->assertEquals(['price' => 100], $value);
+
+        // Test numeric keys
+        $array = [
+            'products' => [
+                ['name' => 'desk'],
+                ['name' => 'chair'],
+            ],
+        ];
+        $this->assertSame('desk', Arr::getOrFail($array, 'products.0.name'));
+        $this->assertSame('chair', Arr::getOrFail($array, 'products.1.name'));
+
+        // Test return value from function
+        $array = ['names' => ['developer' => 'taylor']];
+        $this->assertSame('taylor', Arr::getOrFail($array, 'names.developer', function () {
+            return 'taylor';
+        }));
+    }
+
+    public function testGetOrFailExceptionScenarios()
+    {
+        $exceptions = 0;
+        $expectedMessage = "The array does not contain an element with the specified key.";
+
+        // Testing for a non-existent key
+        try {
+            $array = ['names' => ['developer' => 'taylor']];
+            Arr::getOrFail($array, 'names.otherDeveloper');
+        } catch (ItemNotFoundException $e) {
+            $exceptions++;
+            $this->assertSame($expectedMessage, $e->getMessage());
+        }
+
+        // Testing when the key exists but the value is an empty string
+        try {
+            $array = ['names' => ['developer' => 'taylor', 'otherDeveloper' => '']];
+            Arr::getOrFail($array, 'names.otherDeveloper');
+        } catch (ItemNotFoundException $e) {
+            $exceptions++;
+            $this->assertSame($expectedMessage, $e->getMessage());
+        }
+
+        // Testing when the key exists but the value is a string containing only whitespace
+        try {
+            $array = ['names' => ['developer' => 'taylor', 'otherDeveloper' => ' ']];
+            Arr::getOrFail($array, 'names.otherDeveloper');
+        } catch (ItemNotFoundException $e) {
+            $exceptions++;
+            $this->assertSame($expectedMessage, $e->getMessage());
+        }
+
+        // Testing when the key exists but the value is null
+        try {
+            $array = ['names' => ['developer' => 'taylor', 'otherDeveloper' => null]];
+            Arr::getOrFail($array, 'names.otherDeveloper');
+        } catch (ItemNotFoundException $e) {
+            $exceptions++;
+            $this->assertSame($expectedMessage, $e->getMessage());
+        }
+
+         // Testing when the key is null
+         try {
+             $array = ['names' => ['developer' => 'taylor']];
+             Arr::getOrFail($array, null);
+         } catch (ItemNotFoundException $e) {
+             $exceptions++;
+             $this->assertSame($expectedMessage, $e->getMessage());
+         }
+
+        // Testing when the array is empty
+        try {
+            Arr::getOrFail([], 'names.developer');
+        } catch (ItemNotFoundException $e) {
+            $exceptions++;
+            $this->assertSame($expectedMessage, $e->getMessage());
+        }
+
+        // Testing when the array is null
+        try {
+            Arr::getOrFail(null, 'names.developer');
+        } catch (ItemNotFoundException $e) {
+            $exceptions++;
+            $this->assertSame($expectedMessage, $e->getMessage());
+        }
+
+        $this->assertSame(7, $exceptions);
     }
 
     public function testHas()
