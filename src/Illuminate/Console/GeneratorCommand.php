@@ -368,7 +368,7 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
         foreach ($searches as $search) {
             $stub = str_replace(
                 $search,
-                [$this->getNamespace($name), $this->rootNamespace().'\\', $this->userProviderModel()],
+                [$this->getNamespace($name), $this->rootNamespace(), $this->userProviderModel()],
                 $stub
             );
         }

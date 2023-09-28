@@ -318,7 +318,7 @@ trait EnumeratesValues
      * @template TEnsureOfType
      *
      * @param  class-string<TEnsureOfType>  $type
-     * @return static<mixed, TEnsureOfType>
+     * @return static<TKey, TEnsureOfType>
      *
      * @throws \UnexpectedValueException
      */

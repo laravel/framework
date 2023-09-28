@@ -81,12 +81,14 @@ class ConsoleApplicationTest extends TestCase
     public function testCommandInputPromptsWhenRequiredArgumentIsMissing()
     {
         $app = new Application(
-            $app = new \Illuminate\Foundation\Application(__DIR__),
+            $laravel = new \Illuminate\Foundation\Application(__DIR__),
             $events = m::mock(Dispatcher::class, ['dispatch' => null, 'fire' => null]),
             'testing'
         );
 
         $app->addCommands([$command = new FakeCommandWithInputPrompting()]);
+
+        $command->setLaravel($laravel);
 
         $statusCode = $app->call('fake-command-for-testing');
 
