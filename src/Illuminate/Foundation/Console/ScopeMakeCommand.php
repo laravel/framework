@@ -59,7 +59,7 @@ class ScopeMakeCommand extends GeneratorCommand
      */
     protected function getDefaultNamespace($rootNamespace)
     {
-        return $this->generatorPreset()->modelNamespace().'\Scopes';
+        return $this->generatorPreset()->modelNamespace().'Scopes';
     }
 
     /**
