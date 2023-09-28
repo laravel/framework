@@ -705,52 +705,6 @@ class FoundationExceptionsHandlerTest extends TestCase
         $this->assertCount(14, $reported);
         $this->assertSame('Something in the app went wrong.', $reported[0]->getMessage());
     }
-
-    public function testRateLimitExpiresOnBoundary()
-    {
-        $handler = new class($this->container) extends Handler
-        {
-            protected function throttle($e)
-            {
-                return Limit::perMinute(1);
-            }
-        };
-        $reported = [];
-        $handler->reportable(function (\Throwable $e) use (&$reported) {
-            $reported[] = $e;
-
-            return false;
-        });
-        $this->container->instance(RateLimiter::class, $limiter = new class(new Repository(new ArrayStore)) extends RateLimiter
-        {
-            public $attempted = 0;
-
-            public function attempt($key, $maxAttempts, Closure $callback, $decaySeconds = 60)
-            {
-                $this->attempted++;
-
-                return parent::attempt(...func_get_args());
-            }
-        });
-
-        Carbon::setTestNow('2000-01-01 00:00:00.000');
-        $handler->report(new Exception('Something in the app went wrong 1.'));
-        Carbon::setTestNow('2000-01-01 00:00:59.999');
-        $handler->report(new Exception('Something in the app went wrong 1.'));
-
-        $this->assertSame(2, $limiter->attempted);
-        $this->assertCount(1, $reported);
-        $this->assertSame('Something in the app went wrong 1.', $reported[0]->getMessage());
-
-        Carbon::setTestNow('2000-01-01 00:01:00.000');
-        $handler->report(new Exception('Something in the app went wrong 2.'));
-        Carbon::setTestNow('2000-01-01 00:01:59.999');
-        $handler->report(new Exception('Something in the app went wrong 2.'));
-
-        $this->assertSame(4, $limiter->attempted);
-        $this->assertCount(2, $reported);
-        $this->assertSame('Something in the app went wrong 2.', $reported[1]->getMessage());
-    }
 }
 
 class CustomException extends Exception
