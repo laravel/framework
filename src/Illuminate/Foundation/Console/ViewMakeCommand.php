@@ -47,11 +47,15 @@ class ViewMakeCommand extends GeneratorCommand
     protected function buildClass($name)
     {
         $contents = parent::buildClass($name);
+        $layout = $this->option('layout');
+
+        $replace = [
+            '{{ layout }}' => $layout ? "@extends('{$layout}')\n\n" : null,
+            '{{ quote }}' => Inspiring::quotes()->random()
+        ];
 
         return str_replace(
-            '{{ quote }}',
-            Inspiring::quotes()->random(),
-            $contents,
+            array_keys($replace), array_values($replace), $contents
         );
     }
 
@@ -229,6 +233,7 @@ class ViewMakeCommand extends GeneratorCommand
     protected function getOptions()
     {
         return [
+            ['layout', null, InputOption::VALUE_OPTIONAL, 'The parent of the generated view', null],
             ['extension', null, InputOption::VALUE_OPTIONAL, 'The extension of the generated view', 'blade.php'],
             ['force', 'f', InputOption::VALUE_NONE, 'Create the view even if the view already exists'],
         ];
