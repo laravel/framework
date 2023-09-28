@@ -89,7 +89,7 @@ class Laravel extends Preset
      *
      * @return string
      */
-    public function seederPath(): string
+    public function seederPath()
     {
         if (is_dir($seederPath = $this->app->databasePath('seeds'))) {
             return $seederPath;
