@@ -87,11 +87,12 @@ trait RefreshDatabase
         foreach ($this->connectionsToTransact() as $name) {
             $connection = $database->connection($name);
 
+            $connection->setTransactionManager($transactionsManager);
+
             if ($this->usingInMemoryDatabase()) {
                 RefreshDatabaseState::$inMemoryConnections[$name] ??= $connection->getPdo();
             }
 
-            $connection->setTransactionManager($transactionsManager);
             $dispatcher = $connection->getEventDispatcher();
 
             $connection->unsetEventDispatcher();
