@@ -173,7 +173,13 @@ class MailManager implements FactoryContract
      */
     protected function createSmtpTransport(array $config)
     {
-        $factory = new EsmtpTransportFactory;
+        $logger = $this->app->make(LoggerInterface::class);
+
+        if ($logger instanceof LogManager) {
+            $logger = $logger->channel($this->app['config']->get('mail.log_channel', 'null'));
+        }
+
+        $factory = new EsmtpTransportFactory(null, null, $logger);
 
         $scheme = $config['scheme'] ?? null;
 
