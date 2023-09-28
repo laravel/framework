@@ -216,9 +216,10 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
             return $name;
         }
 
-        if ($subNamespace = $this->option('in')) {
-            $rootNamespace .= Str::finish($subNamespace, '\\');
-        }
+        $rootNamespace .= implode('\\', array_filter([
+            $this->laravel['config']->get('app.generator_namespace'),
+            $this->option('in'),
+        ]));
 
         return $this->qualifyClass(
             $this->getDefaultNamespace(trim($rootNamespace, '\\')).'\\'.$name
