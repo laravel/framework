@@ -58,7 +58,7 @@ trait QueriesRelationships
         // proper logical grouping of the where clauses if needed by this Eloquent query
         // builder. Then, we will be ready to finalize and return this query instance.
         if ($callback) {
-            $hasQuery->callScope($callback);
+            $hasQuery->callScope($callback, [$relation]);
         }
 
         return $this->addHasWhere(
