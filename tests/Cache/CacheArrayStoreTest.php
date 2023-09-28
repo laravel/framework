@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Cache;
 
 use Illuminate\Cache\ArrayStore;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Sleep;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
@@ -14,6 +15,21 @@ class CacheArrayStoreTest extends TestCase
         parent::tearDown();
 
         Carbon::setTestNow(null);
+    }
+
+    public function testCacheTtl(): void
+    {
+        $store = new ArrayStore();
+
+        while ((microtime(true) - time()) <= .9800) {
+            usleep(1000);
+        }
+
+        $store->put('hello', 'world', 1);
+
+        Sleep::for(20)->milliseconds();
+
+        $this->assertSame('world', $store->get('hello'));
     }
 
     public function testItemsCanBeSetAndRetrieved()

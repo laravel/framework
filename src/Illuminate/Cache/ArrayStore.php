@@ -3,6 +3,7 @@
 namespace Illuminate\Cache;
 
 use Illuminate\Contracts\Cache\LockProvider;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\InteractsWithTime;
 
 class ArrayStore extends TaggableStore implements LockProvider
@@ -12,7 +13,7 @@ class ArrayStore extends TaggableStore implements LockProvider
     /**
      * The array of stored values.
      *
-     * @var array
+     * @var array<string, array{expiresAt: float, value: mixed}>>
      */
     protected $storage = [];
 
@@ -44,23 +45,22 @@ class ArrayStore extends TaggableStore implements LockProvider
     /**
      * Retrieve an item from the cache by key.
      *
-     * @param  string|array  $key
+     * @param  string  $key
      * @return mixed
      */
     public function get($key)
     {
         if (! isset($this->storage[$key])) {
-            return;
+            return null;
         }
 
         $item = $this->storage[$key];
 
         $expiresAt = $item['expiresAt'] ?? 0;
-
         if ($expiresAt !== 0 && $this->currentTime() > $expiresAt) {
             $this->forget($key);
 
-            return;
+            return null;
         }
 
         return $this->serializesValues ? unserialize($item['value']) : $item['value'];
@@ -173,7 +173,7 @@ class ArrayStore extends TaggableStore implements LockProvider
      * Get the expiration time of the key.
      *
      * @param  int  $seconds
-     * @return int
+     * @return float
      */
     protected function calculateExpiration($seconds)
     {
@@ -184,7 +184,7 @@ class ArrayStore extends TaggableStore implements LockProvider
      * Get the UNIX timestamp for the given number of seconds.
      *
      * @param  int  $seconds
-     * @return int
+     * @return float
      */
     protected function toTimestamp($seconds)
     {
@@ -214,5 +214,32 @@ class ArrayStore extends TaggableStore implements LockProvider
     public function restoreLock($name, $owner)
     {
         return $this->lock($name, 0, $owner);
+    }
+
+    /**
+     * Get the "available at" Carbon TimestampMs.
+     *
+     * @param  \DateTimeInterface|\DateInterval|int  $delay
+     * @return int
+     */
+    protected function availableAt($delay = 0)
+    {
+        $delay = $this->parseDateInterval($delay);
+
+        return $delay instanceof \DateTimeInterface
+            ? Carbon::instance($delay)->getPreciseTimestamp(3) / 1_000
+            : Carbon::now()
+                ->addSeconds($delay)
+                ->getPreciseTimestamp(3) / 1_000;
+    }
+
+    /**
+     * Get the current system time as a Carbon TimestampMs.
+     *
+     * @return float
+     */
+    protected function currentTime()
+    {
+        return Carbon::now()->getPreciseTimestamp(3) / 1_000;
     }
 }

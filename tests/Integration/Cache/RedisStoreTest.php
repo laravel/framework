@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Integration\Cache;
 
 use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Sleep;
 use Orchestra\Testbench\TestCase;
 
 class RedisStoreTest extends TestCase
@@ -22,6 +23,21 @@ class RedisStoreTest extends TestCase
         parent::tearDown();
 
         $this->tearDownRedis();
+    }
+
+    public function testCacheTtl(): void
+    {
+        $store = Cache::store('redis');
+
+        while ((microtime(true) - time()) <= .9800) {
+            usleep(1000);
+        }
+
+        $store->put('hello', 'world', 1);
+
+        Sleep::for(20)->milliseconds();
+
+        $this->assertSame('world', $store->get('hello'));
     }
 
     public function testItCanStoreInfinite()
