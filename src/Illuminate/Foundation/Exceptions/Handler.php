@@ -360,7 +360,7 @@ class Handler implements ExceptionHandlerContract
                 with($throttle->key ?: 'illuminate:foundation:exceptions:'.$e::class, fn ($key) => $this->hashThrottleKeys ? md5($key) : $key),
                 $throttle->maxAttempts,
                 fn () => true,
-                60 * $throttle->decayMinutes
+                $throttle->decayMinutes
             );
         }), rescue: false, report: false);
     }
