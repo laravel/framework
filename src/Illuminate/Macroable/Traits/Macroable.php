@@ -4,6 +4,7 @@ namespace Illuminate\Support\Traits;
 
 use BadMethodCallException;
 use Closure;
+use InvalidArgumentException;
 use ReflectionClass;
 use ReflectionMethod;
 
@@ -20,11 +21,15 @@ trait Macroable
      * Register a custom macro.
      *
      * @param  string  $name
-     * @param  object|callable  $macro
+     * @param  callable  $macro
      * @return void
      */
     public static function macro($name, $macro)
     {
+        if (! is_callable($macro)) {
+            throw new InvalidArgumentException('Second argument to macro must be callable');
+        }
+
         static::$macros[$name] = $macro;
     }
 

@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Support;
 
 use BadMethodCallException;
 use Illuminate\Support\Traits\Macroable;
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
 class SupportMacroableTest extends TestCase
@@ -159,6 +160,29 @@ class SupportMacroableTest extends TestCase
 
         $this->assertSame('newMethod', $this->macroable::existingMethod());
     }
+
+    public function testRegisteringInvalidMacroThrowsException()
+    {
+        $this->expectException(InvalidArgumentException::class);
+
+        $this->macroable::macro('invalid', 'notACallable');
+    }
+
+    public function testRegisteringNonCallableObjectThrowsException()
+    {
+        $this->expectException(InvalidArgumentException::class);
+
+        $nonCallableObject = new NonCallableClass();
+        $this->macroable::macro('invalid', $nonCallableObject);
+    }
+
+    public function testRegisterCallableObjectAsMacro()
+    {
+        $callableObject = new CallableClass();
+        $this->macroable::macro('callableMacro', $callableObject);
+
+        $this->assertSame('callable object invoked', $this->macroable->callableMacro());
+    }
 }
 
 class EmptyMacroable
@@ -199,5 +223,17 @@ class TestMixin
         return function () {
             return 'foo';
         };
+    }
+}
+
+class NonCallableClass
+{
+}
+
+class CallableClass
+{
+    public function __invoke()
+    {
+        return 'callable object invoked';
     }
 }
