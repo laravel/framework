@@ -309,7 +309,11 @@ class ServeCommand extends Command
 
         preg_match($regex, $line, $matches);
 
-        return Carbon::createFromFormat('D M d H:i:s Y', $matches[1]);
+        if (isset($matches[1])) { 
+            return Carbon::createFromFormat('D M d H:i:s Y', $matches[1]);
+        } else {
+            Carbon::now();
+        }
     }
 
     /**
