@@ -431,10 +431,17 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
             return $this;
         }
 
+        // $keys may contain keys written in dotted notation,
+        // and expand into nested arrays for recursive except() processing of lazy collections.
+        // In doing so, fill with true to determine that it is the end of the nest.
         $keys = Arr::undot(array_fill_keys($keys, true));
 
+        // Anonymous function to handle recursive except operation
         $forget = function (LazyCollection|ArrayAccess|array $data, array $keys) use (&$forget) {
             if ($data instanceof LazyCollection) {
+                // If the $data input is a LazyCollection,
+                // you must loop through the collection to determine if the value should be excluded,
+                // and if not, yield the value
                 return new static(function () use ($data, $keys, $forget) {
                     foreach ($data as $key => $value) {
                         foreach ($keys as $k => $v) {
@@ -447,6 +454,8 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
                                     || $value instanceof ArrayAccess
                                 )
                             ) {
+                                // If the dot notation may exclude nested destinations,
+                                // recursively exclude data in the next level of hierarchy
                                 yield $key => $forget($value, $v);
                                 continue 2;
                             }
@@ -458,8 +467,13 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
                     }
                 });
             }
+
+            // If the $data input is not a LazyCollection, but a simple array or ArrayAccess,
+            // you can just unset to exclude the value
             foreach ($keys as $k => $v) {
                 if (is_array($v)) {
+                    // If the dot notation may exclude nested destinations,
+                    // recursively exclude data in the next level of hierarchy
                     $forget($data, $v);
                 } else {
                     unset($data[$k]);
