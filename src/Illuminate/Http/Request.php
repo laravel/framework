@@ -734,7 +734,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
 
         if (!empty($input) && $this->has($input)) {
             $json = json_decode($this->input($input), true);
-            $data = ($json !== null && is_object($json)) ? (array) $json : $this->input($input);
+            $data = ($json !== null && is_object($json)) ? (array) $json : [$input => $this->input($input)];
         } else {
             $data = $this->except("_token");
         }
