@@ -479,6 +479,7 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
                     unset($data[$k]);
                 }
             }
+
             return $data;
         };
 
