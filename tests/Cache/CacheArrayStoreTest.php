@@ -4,7 +4,6 @@ namespace Illuminate\Tests\Cache;
 
 use Illuminate\Cache\ArrayStore;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Sleep;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
@@ -21,15 +20,14 @@ class CacheArrayStoreTest extends TestCase
     {
         $store = new ArrayStore();
 
-        while ((microtime(true) - time()) <= .9800) {
-            usleep(1000);
-        }
-
+        Carbon::setTestNow('2023-09-29 00:00:00.999');
         $store->put('hello', 'world', 1);
 
-        Sleep::for(20)->milliseconds();
-
+        Carbon::setTestNow('2023-09-29 00:00:01.000');
         $this->assertSame('world', $store->get('hello'));
+
+        Carbon::setTestNow('2023-09-29 00:00:02.000');
+        $this->assertNull($store->get('hello'));
     }
 
     public function testItemsCanBeSetAndRetrieved()
