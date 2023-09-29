@@ -719,8 +719,8 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     /**
      * Converts a JSON request value to an object of the specified class.
      *
-     * @param string $type The name of the object class.
-     * @param string|null $input The name of the input JSON, or null to use the default input.
+     * @param  string  $type  The name of the object class.
+     * @param  string|null  $input  The name of the input JSON, or null to use the default input.
      *
      * @return object The converted object.
      *
@@ -728,15 +728,15 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      */
     public function toObject(string $class, $input = null): object
     {
-        if (!class_exists($class)) {
+        if (! class_exists($class)) {
             throw new \InvalidArgumentException("The specified class $class does not exist.");
         }
 
-        if (!empty($input) && $this->has($input)) {
+        if (! empty($input) && $this->has($input)) {
             $json = json_decode($this->input($input), true);
             $data = ($json !== null && is_object($json)) ? (array) $json : [$input => $this->input($input)];
         } else {
-            $data = $this->except("_token");
+            $data = $this->except('_token');
         }
 
         $object = new $class();
