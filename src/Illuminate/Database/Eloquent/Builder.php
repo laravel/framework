@@ -1075,6 +1075,20 @@ class Builder implements BuilderContract
             $values = [$values];
         }
 
+        
+        $castKeys = array_keys(array_filter($this->model->getCasts(), function ($value) {
+            return in_array($value, ["array", "json"]);
+        }));
+
+
+        array_walk($values, function (&$value) use ($castKeys) {
+            foreach ($castKeys as $key) {
+                if (isset($value[$key]) && is_array($value[$key])) {
+                    $value[$key] = \Illuminate\Database\Eloquent\Casts\Json::encode($value[$key]);
+                }
+            }
+        });
+
         if (is_null($update)) {
             $update = array_keys(reset($values));
         }
