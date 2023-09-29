@@ -2,6 +2,7 @@
 
 namespace Illuminate\Support;
 
+use ArrayAccess;
 use ArrayIterator;
 use Closure;
 use DateTimeInterface;
@@ -430,14 +431,45 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
             return $this;
         }
 
-        $keys = array_flip($keys);
+        $keys = Arr::undot(array_fill_keys($keys, true));
 
-        return new static(function () use ($keys) {
-            foreach ($this as $key => $value) {
-                if (! array_key_exists($key, $keys)) {
-                    yield $key => $value;
+        $forget = function (LazyCollection|ArrayAccess|array $data, array $keys) use (&$forget) {
+            if ($data instanceof LazyCollection) {
+                return new static(function () use ($data, $keys, $forget) {
+                    foreach ($data as $key => $value) {
+                        foreach ($keys as $k => $v) {
+                            if (
+                                $k === $key
+                                && is_array($v)
+                                && (
+                                    $value instanceof LazyCollection
+                                    || is_array($value)
+                                    || $value instanceof ArrayAccess
+                                )
+                            ) {
+                                yield $key => $forget($value, $v);
+                                continue 2;
+                            }
+                            if ($k === $key) {
+                                continue 2;
+                            }
+                        }
+                        yield $key => $value;
+                    }
+                });
+            }
+            foreach ($keys as $k => $v) {
+                if (is_array($v)) {
+                    $forget($data, $v);
+                } else {
+                    unset($data[$k]);
                 }
             }
+            return $data;
+        };
+
+        return new static(function () use ($keys, $forget) {
+            yield from $forget($this, $keys);
         });
     }
 
