@@ -721,7 +721,6 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      *
      * @param  string  $type  The name of the object class.
      * @param  string|null  $input  The name of the input JSON, or null to use the default input.
-     *
      * @return object The converted object.
      *
      * @throws InvalidArgumentException If the specified class does not exist.
