@@ -30,7 +30,7 @@ class BufferedConsoleOutput extends ConsoleOutput
      *
      * @return void
      */
-    protected function doWrite(string $message, bool $newline)
+    protected function doWrite(string $message, bool $newline): void
     {
         $this->buffer .= $message;
 
