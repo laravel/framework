@@ -36,7 +36,7 @@
         "league/flysystem": "^3.8.0",
         "monolog/monolog": "^3.0",
         "nesbot/carbon": "^2.67",
-        "nunomaduro/termwind": "^1.13",
+        "nunomaduro/termwind": "dev-symfony7",
         "psr/container": "^1.1.1|^2.0.1",
         "psr/log": "^1.0|^2.0|^3.0",
         "psr/simple-cache": "^1.0|^2.0|^3.0",
@@ -191,6 +191,12 @@
             "composer/package-versions-deprecated": true
         }
     },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/laravel-labs/termwind"
+        }
+    ],
     "minimum-stability": "dev",
     "prefer-stable": true
 }
