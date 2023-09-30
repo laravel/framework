@@ -29,6 +29,13 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
         Macroable;
 
     /**
+     * The Laravel session instance.
+     *
+     * @var
+     */
+    protected $laravelSession;
+
+    /**
      * The decoded JSON content for the request.
      *
      * @var \Symfony\Component\HttpFoundation\InputBag|null
@@ -533,7 +540,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      */
     public function hasSession(bool $skipIfUninitialized = false): bool
     {
-        return ! is_null($this->session);
+        return ! is_null($this->laravelSession);
     }
 
     /**
@@ -542,7 +549,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     public function getSession(): SessionInterface
     {
         return $this->hasSession()
-                    ? new SymfonySessionDecorator($this->session())
+                    ? new SymfonySessionDecorator($this->laravelSession)
                     : throw new SessionNotFoundException;
     }
 
@@ -559,7 +566,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
             throw new RuntimeException('Session store not set on request.');
         }
 
-        return $this->session;
+        return $this->laravelSession;
     }
 
     /**
@@ -570,7 +577,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      */
     public function setLaravelSession($session)
     {
-        $this->session = $session;
+        $this->laravelSession = $session;
     }
 
     /**
