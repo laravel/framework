@@ -31,7 +31,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     /**
      * The Laravel session instance.
      *
-     * @var
+     * @var \Illuminate\Contracts\Session\Session
      */
     protected $laravelSession;
 
