@@ -74,8 +74,6 @@ class OutputStyle extends SymfonyStyle implements NewLineAware
 
     /**
      * {@inheritdoc}
-     *
-     * @return void
      */
     public function writeln(string|iterable $messages, int $type = self::OUTPUT_NORMAL): void
     {
@@ -87,8 +85,6 @@ class OutputStyle extends SymfonyStyle implements NewLineAware
 
     /**
      * {@inheritdoc}
-     *
-     * @return void
      */
     public function newLine(int $count = 1): void
     {

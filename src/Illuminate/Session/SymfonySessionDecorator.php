@@ -46,8 +46,6 @@ class SymfonySessionDecorator implements SessionInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @return void
      */
     public function setId(string $id): void
     {
@@ -64,8 +62,6 @@ class SymfonySessionDecorator implements SessionInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @return void
      */
     public function setName(string $name): void
     {
@@ -94,8 +90,6 @@ class SymfonySessionDecorator implements SessionInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @return void
      */
     public function save(): void
     {
@@ -120,8 +114,6 @@ class SymfonySessionDecorator implements SessionInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @return void
      */
     public function set(string $name, mixed $value): void
     {
@@ -138,8 +130,6 @@ class SymfonySessionDecorator implements SessionInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @return void
      */
     public function replace(array $attributes): void
     {
@@ -156,8 +146,6 @@ class SymfonySessionDecorator implements SessionInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @return void
      */
     public function clear(): void
     {
@@ -174,8 +162,6 @@ class SymfonySessionDecorator implements SessionInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @return void
      */
     public function registerBag(SessionBagInterface $bag): void
     {
