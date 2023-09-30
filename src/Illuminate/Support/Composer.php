@@ -60,12 +60,13 @@ class Composer
      * @param  array<int, string>  $packages
      * @param  bool  $dev
      * @param  \Closure|\Symfony\Component\Console\Output\OutputInterface|null  $output
+     * @param  string|null  $composerBinary
      * @return bool
      */
-    public function requirePackages(array $packages, bool $dev = false, Closure|OutputInterface $output = null)
+    public function requirePackages(array $packages, bool $dev = false, Closure|OutputInterface $output = null, $composerBinary = null)
     {
         $command = collect([
-            ...$this->findComposer(),
+            ...$this->findComposer($composerBinary),
             'require',
             ...$packages,
         ])
@@ -88,12 +89,13 @@ class Composer
      * @param  array<int, string>  $packages
      * @param  bool  $dev
      * @param  \Closure|\Symfony\Component\Console\Output\OutputInterface|null  $output
+     * @param  string|null  $composerBinary
      * @return bool
      */
-    public function removePackages(array $packages, bool $dev = false, Closure|OutputInterface $output = null)
+    public function removePackages(array $packages, bool $dev = false, Closure|OutputInterface $output = null, $composerBinary = null)
     {
         $command = collect([
-            ...$this->findComposer(),
+            ...$this->findComposer($composerBinary),
             'remove',
             ...$packages,
         ])
@@ -137,13 +139,14 @@ class Composer
      * Regenerate the Composer autoloader files.
      *
      * @param  string|array  $extra
+     * @param  string|null  $composerBinary
      * @return int
      */
-    public function dumpAutoloads($extra = '')
+    public function dumpAutoloads($extra = '', $composerBinary = null)
     {
         $extra = $extra ? (array) $extra : [];
 
-        $command = array_merge($this->findComposer(), ['dump-autoload'], $extra);
+        $command = array_merge($this->findComposer($composerBinary), ['dump-autoload'], $extra);
 
         return $this->getProcess($command)->run();
     }
@@ -151,21 +154,25 @@ class Composer
     /**
      * Regenerate the optimized Composer autoloader files.
      *
+     * @param  string|null  $composerBinary
      * @return int
      */
-    public function dumpOptimized()
+    public function dumpOptimized($composerBinary = null)
     {
-        return $this->dumpAutoloads('--optimize');
+        return $this->dumpAutoloads('--optimize', $composerBinary);
     }
 
     /**
      * Get the Composer binary / command for the environment.
      *
+     * @param  string|null  $composerBinary
      * @return array
      */
-    public function findComposer()
+    public function findComposer($composerBinary = null)
     {
-        if ($this->files->exists($this->workingPath.'/composer.phar')) {
+        if (! is_null($composerBinary) && $this->files->exists($composerBinary)) {
+            return [$this->phpBinary(), $composerBinary];
+        } elseif ($this->files->exists($this->workingPath.'/composer.phar')) {
             return [$this->phpBinary(), 'composer.phar'];
         }
 

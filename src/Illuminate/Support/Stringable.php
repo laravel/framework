@@ -202,6 +202,18 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     }
 
     /**
+     * Convert the case of a string.
+     *
+     * @param  int  $mode
+     * @param  string  $encoding
+     * @return string
+     */
+    public function convertCase(int $mode = MB_CASE_FOLD, ?string $encoding = 'UTF-8')
+    {
+        return new static(Str::convertCase($this->value, $mode, $encoding));
+    }
+
+    /**
      * Get the parent directory's path.
      *
      * @param  int  $levels
@@ -497,6 +509,16 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     }
 
     /**
+     * Remove all non-numeric characters from a string.
+     *
+     * @return static
+     */
+    public function numbers()
+    {
+        return new static(Str::numbers($this->value));
+    }
+
+    /**
      * Pad both sides of the string with another.
      *
      * @param  int  $length
@@ -574,6 +596,19 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     public function pluralStudly($count = 2)
     {
         return new static(Str::pluralStudly($this->value, $count));
+    }
+
+    /**
+     * Find the multi-byte safe position of the first occurrence of the given substring.
+     *
+     * @param  string  $needle
+     * @param  int  $offset
+     * @param  string|null  $encoding
+     * @return int|false
+     */
+    public function position($needle, $offset = 0, $encoding = null)
+    {
+        return Str::position($this->value, $needle, $offset, $encoding);
     }
 
     /**
@@ -886,6 +921,21 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     public function swap(array $map)
     {
         return new static(strtr($this->value, $map));
+    }
+
+    /**
+     * Take the first or last {$limit} characters.
+     *
+     * @param  int  $limit
+     * @return static
+     */
+    public function take(int $limit)
+    {
+        if ($limit < 0) {
+            return $this->substr($limit);
+        }
+
+        return $this->substr(0, $limit);
     }
 
     /**

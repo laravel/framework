@@ -82,8 +82,12 @@ trait RefreshDatabase
     {
         $database = $this->app->make('db');
 
+        $this->app->instance('db.transactions', $transactionsManager = new DatabaseTransactionsManager);
+
         foreach ($this->connectionsToTransact() as $name) {
             $connection = $database->connection($name);
+
+            $connection->setTransactionManager($transactionsManager);
 
             if ($this->usingInMemoryDatabase()) {
                 RefreshDatabaseState::$inMemoryConnections[$name] ??= $connection->getPdo();
@@ -94,12 +98,6 @@ trait RefreshDatabase
             $connection->unsetEventDispatcher();
             $connection->beginTransaction();
             $connection->setEventDispatcher($dispatcher);
-
-            if ($this->app->resolved('db.transactions')) {
-                $this->app->make('db.transactions')->callbacksShouldIgnore(
-                    $this->app->make('db.transactions')->getTransactions()->first()
-                );
-            }
         }
 
         $this->beforeApplicationDestroyed(function () use ($database) {

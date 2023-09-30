@@ -168,7 +168,7 @@ class PendingProcess
     }
 
     /**
-     * Set the additional environent variables for the process.
+     * Set the additional environment variables for the process.
      *
      * @param  array  $environment
      * @return $this

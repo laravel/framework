@@ -39,7 +39,7 @@ class Response implements Arrayable, Stringable
      * Create a new response.
      *
      * @param  bool  $allowed
-     * @param  string  $message
+     * @param  string|null  $message
      * @param  mixed  $code
      * @return void
      */

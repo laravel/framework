@@ -130,7 +130,7 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
 
         $user = HasOneOfManyTestUser::create();
         $relation = $user->price_without_global_scope();
-        $this->assertSame('select "prices".* from "prices" inner join (select max("prices"."id") as "id_aggregate", "prices"."user_id" from "prices" inner join (select max("prices"."published_at") as "published_at_aggregate", "prices"."user_id" from "prices" where "published_at" < ? and "prices"."user_id" = ? and "prices"."user_id" is not null group by "prices"."user_id") as "price_without_global_scope" on "price_without_global_scope"."published_at_aggregate" = "prices"."published_at" and "price_without_global_scope"."user_id" = "prices"."user_id" where "published_at" < ? group by "prices"."user_id") as "price_without_global_scope" on "price_without_global_scope"."id_aggregate" = "prices"."id" and "price_without_global_scope"."user_id" = "prices"."user_id" where "prices"."user_id" = ? and "prices"."user_id" is not null', $relation->getQuery()->toSql());
+        $this->assertSame('select "prices".* from "prices" inner join (select max("prices"."id") as "id_aggregate", min("prices"."published_at") as "published_at_aggregate", "prices"."user_id" from "prices" inner join (select max("prices"."published_at") as "published_at_aggregate", "prices"."user_id" from "prices" where "published_at" < ? and "prices"."user_id" = ? and "prices"."user_id" is not null group by "prices"."user_id") as "price_without_global_scope" on "price_without_global_scope"."published_at_aggregate" = "prices"."published_at" and "price_without_global_scope"."user_id" = "prices"."user_id" where "published_at" < ? group by "prices"."user_id") as "price_without_global_scope" on "price_without_global_scope"."id_aggregate" = "prices"."id" and "price_without_global_scope"."published_at_aggregate" = "prices"."published_at" and "price_without_global_scope"."user_id" = "prices"."user_id" where "prices"."user_id" = ? and "prices"."user_id" is not null', $relation->getQuery()->toSql());
 
         HasOneOfManyTestPrice::addGlobalScope('test', function ($query) {
         });
@@ -463,7 +463,7 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
         $this->assertNotNull($user->latest_login_with_soft_deletes);
     }
 
-    public function testWithContraintNotInAggregate()
+    public function testWithConstraintNotInAggregate()
     {
         $user = HasOneOfManyTestUser::create();
 
@@ -484,6 +484,27 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
         ]);
 
         $this->assertSame($newFoo->id, $user->last_updated_foo_state->id);
+    }
+
+    public function testItGetsCorrectResultUsingAtLeastTwoAggregatesDistinctFromId()
+    {
+        $user = HasOneOfManyTestUser::create();
+
+        $expectedState = $user->states()->create([
+            'state' => 'state',
+            'type' => 'type',
+            'created_at' => '2023-01-01',
+            'updated_at' => '2023-01-03',
+        ]);
+
+        $user->states()->create([
+            'state' => 'state',
+            'type' => 'type',
+            'created_at' => '2023-01-01',
+            'updated_at' => '2023-01-02',
+        ]);
+
+        $this->assertSame($user->latest_updated_latest_created_state->id, $expectedState->id);
     }
 
     /**
@@ -620,6 +641,14 @@ class HasOneOfManyTestUser extends Eloquent
         ], function ($q) {
             $q->where('published_at', '<', now());
         });
+    }
+
+    public function latest_updated_latest_created_state()
+    {
+        return $this->hasOne(HasOneOfManyTestState::class, 'user_id')->ofMany([
+            'updated_at' => 'max',
+            'created_at' => 'max',
+        ]);
     }
 }
 
