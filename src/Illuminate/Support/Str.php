@@ -100,13 +100,13 @@ class Str
             return $subject;
         }
 
-        $position = strrpos($subject, (string) $search);
+        $position = mb_strrpos($subject, (string) $search);
 
         if ($position === false) {
             return $subject;
         }
 
-        return substr($subject, $position + strlen($search));
+        return static::substr($subject, $position + strlen($search));
     }
 
     /**
@@ -165,13 +165,13 @@ class Str
             return $subject;
         }
 
-        $pos = mb_strrpos($subject, $search);
+        $position = mb_strrpos($subject, (string) $search);
 
-        if ($pos === false) {
+        if ($position === false) {
             return $subject;
         }
 
-        return static::substr($subject, 0, $pos);
+        return static::substr($subject, 0, $position);
     }
 
     /**
