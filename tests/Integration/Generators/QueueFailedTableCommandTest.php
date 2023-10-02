@@ -2,7 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Generators;
 
-class FailedTableCommandTest extends TestCase
+class QueueFailedTableCommandTest extends TestCase
 {
     public function testCreateMakesMigration()
     {

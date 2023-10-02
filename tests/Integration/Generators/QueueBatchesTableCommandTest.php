@@ -2,7 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Generators;
 
-class BatchesTableCommandTest extends TestCase
+class QueueBatchesTableCommandTest extends TestCase
 {
     public function testCreateMakesMigration()
     {
