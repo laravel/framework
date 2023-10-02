@@ -33,6 +33,7 @@ class CacheTableCommandTest extends TestCase
         $command->setLaravel($app);
         $path = __DIR__.'/migrations';
         $creator->shouldReceive('create')->once()->with('create_cache_table', $path)->andReturn($path);
+        $files->shouldReceive('glob')->once()->andReturn([]);
         $files->shouldReceive('get')->once()->andReturn('foo');
         $files->shouldReceive('put')->once()->with($path, 'foo');
 
