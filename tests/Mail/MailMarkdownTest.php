@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Mail;
 
+use Illuminate\Config\Repository as Config;
 use Illuminate\Mail\Markdown;
 use Illuminate\View\Factory;
 use Mockery as m;
@@ -12,6 +13,13 @@ class MailMarkdownTest extends TestCase
     protected function tearDown(): void
     {
         m::close();
+    }
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->createConfig();
     }
 
     public function testRenderFunctionReturnsHtml()
@@ -86,5 +94,19 @@ class MailMarkdownTest extends TestCase
         $result = $markdown->parse('# Something')->toHtml();
 
         $this->assertSame("<h1>Something</h1>\n", $result);
+    }
+
+    /**
+     * Create a new config repository instance.
+     *
+     * @return \Illuminate\Config\Repository
+     */
+    protected function createConfig()
+    {
+        return new Config([
+            'mail' => [
+                'markdown' => ['allow_unsafe_links' => false],
+            ],
+        ]);
     }
 }
