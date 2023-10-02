@@ -14,7 +14,7 @@ class CacheTableCommandTest extends TestCase
             'Schema::create(\'cache\', function (Blueprint $table) {',
             'Schema::create(\'cache_locks\', function (Blueprint $table) {',
             'Schema::dropIfExists(\'cache\');',
-            'Schema::dropIfExists(\'cache_locks\');'
+            'Schema::dropIfExists(\'cache_locks\');',
         ], 'create_cache_table.php');
     }
 }
