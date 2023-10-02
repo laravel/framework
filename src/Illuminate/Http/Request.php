@@ -4,6 +4,7 @@ namespace Illuminate\Http;
 
 use ArrayAccess;
 use Closure;
+use Illuminate\Contracts\Session\Session as SessionContract;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Session\SymfonySessionDecorator;
 use Illuminate\Support\Arr;
@@ -27,13 +28,6 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
         Concerns\InteractsWithFlashData,
         Concerns\InteractsWithInput,
         Macroable;
-
-    /**
-     * The Laravel session instance.
-     *
-     * @var
-     */
-    protected $laravelSession;
 
     /**
      * The decoded JSON content for the request.
@@ -540,7 +534,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      */
     public function hasSession(bool $skipIfUninitialized = false): bool
     {
-        return ! is_null($this->laravelSession);
+        return $this->session instanceof SymfonySessionDecorator;
     }
 
     /**
@@ -549,7 +543,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     public function getSession(): SessionInterface
     {
         return $this->hasSession()
-                    ? new SymfonySessionDecorator($this->laravelSession)
+                    ? $this->session
                     : throw new SessionNotFoundException;
     }
 
@@ -566,7 +560,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
             throw new RuntimeException('Session store not set on request.');
         }
 
-        return $this->laravelSession;
+        return $this->session->store();
     }
 
     /**
@@ -577,7 +571,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      */
     public function setLaravelSession($session)
     {
-        $this->laravelSession = $session;
+        $this->session = new SymfonySessionDecorator($session);
     }
 
     /**

@@ -183,4 +183,14 @@ class SymfonySessionDecorator implements SessionInterface
     {
         throw new BadMethodCallException('Method not implemented by Laravel.');
     }
+
+    /**
+     * Get underlying Laravel session store.
+     *
+     * @return \Illuminate\Session\Store
+     */
+    public function store()
+    {
+        return $this->store;
+    }
 }
