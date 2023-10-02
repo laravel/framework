@@ -33,6 +33,7 @@ class SessionTableCommandTest extends TestCase
         $command->setLaravel($app);
         $path = __DIR__.'/migrations';
         $creator->shouldReceive('create')->once()->with('create_sessions_table', $path)->andReturn($path);
+        $files->shouldReceive('glob')->once()->with($app->joinPaths($app->databasePath('migrations'), '*_*_*_*_create_sessions_table.php'))->andReturn([]);
         $files->shouldReceive('get')->once()->andReturn('foo');
         $files->shouldReceive('put')->once()->with($path, 'foo');
 

@@ -60,6 +60,12 @@ class SessionTableCommand extends Command
      */
     public function handle()
     {
+        if ($this->migrationExists()) {
+            $this->components->error('Migration already exists.');
+
+            return 1;
+        }
+
         $fullPath = $this->createBaseMigration();
 
         $this->files->put($fullPath, $this->files->get(__DIR__.'/stubs/database.stub'));
@@ -79,5 +85,17 @@ class SessionTableCommand extends Command
         $path = $this->laravel->databasePath().'/migrations';
 
         return $this->laravel['migration.creator']->create($name, $path);
+    }
+
+    /**
+     * Determine whether the session table migration already exists.
+     *
+     * @return bool
+     */
+    protected function migrationExists()
+    {
+        return count($this->files->glob(
+            $this->laravel->joinPaths($this->laravel->databasePath('migrations'), '*_*_*_*_create_sessions_table.php')
+        )) !== 0;
     }
 }
