@@ -88,7 +88,7 @@ class SessionTableCommand extends Command
     }
 
     /**
-     * Check whether the sessions migration already exists.
+     * Determine whether the session table migration already exists.
      *
      * @return bool
      */
