@@ -811,6 +811,50 @@ class SupportCollectionTest extends TestCase
         $this->assertTrue(isset($c['name']));
     }
 
+    public function testForgetNestedKey()
+    {
+        $c = new Collection([
+            [
+                'name' => 'John',
+                'age' => 25,
+            ],
+            [
+                'name' => 'Jane',
+                'age' => 26,
+            ],
+        ]);
+        $c = $c->forget('*.name')->all();
+        $this->assertEquals([
+            [
+                'age' => 25,
+            ],
+            [
+                'age' => 26,
+            ],
+        ], $c);
+
+        $c = new Collection([
+            'a' => [
+                'name' => 'John',
+                'age' => 25,
+            ],
+            'b' => [
+                'name' => 'Jane',
+                'age' => 26,
+            ]
+        ]);
+        $c = $c->forget('a.name')->all();
+        $this->assertEquals([
+            'a' => [
+                'age' => 25,
+            ],
+            'b' => [
+                'name' => 'Jane',
+                'age' => 26,
+            ]
+        ], $c);
+    }
+
     /**
      * @dataProvider collectionClassProvider
      */

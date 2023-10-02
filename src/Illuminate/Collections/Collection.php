@@ -1756,6 +1756,6 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      */
     public function offsetUnset($key): void
     {
-        unset($this->items[$key]);
+        data_forget($this->items, $key);
     }
 }
