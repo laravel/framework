@@ -20,7 +20,7 @@ trait Macroable
      * Register a custom macro.
      *
      * @param  string  $name
-     * @param  object|callable  $macro
+     * @param  callable  $macro
      * @return void
      */
     public static function macro($name, $macro)
