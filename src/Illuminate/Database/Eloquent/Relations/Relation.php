@@ -283,7 +283,8 @@ abstract class Relation implements BuilderContract
     {
         return collect($models)->map(function ($value) use ($key) {
             return $key ? $value->getAttribute($key) : $value->getKey();
-        })->values()->unique(null, true)->filter()->sort()->all();
+        })->filter(fn ($value) => ! is_null($value))->values()
+            ->unique(null, true)->sort()->all();
     }
 
     /**
