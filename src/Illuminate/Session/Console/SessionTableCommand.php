@@ -94,6 +94,8 @@ class SessionTableCommand extends Command
      */
     protected function migrationExists()
     {
-        return count($this->files->glob($this->laravel->databasePath('migrations/*_*_*_*_create_sessions_table.php'))) !== 0;
+        return count($this->files->glob(
+            $this->laravel->joinPaths($this->laravel->databasePath('migrations'), '*_*_*_*_create_sessions_table.php')
+        )) !== 0;
     }
 }
