@@ -106,7 +106,7 @@ class Markdown
     public static function parse($text)
     {
         $environment = new Environment([
-            'allow_unsafe_links' => false,
+            'allow_unsafe_links' => config('mail.markdown.allow_unsafe_links', false),
         ]);
 
         $environment->addExtension(new CommonMarkCoreExtension);
