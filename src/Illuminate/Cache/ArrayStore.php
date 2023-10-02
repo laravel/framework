@@ -173,7 +173,7 @@ class ArrayStore extends TaggableStore implements LockProvider
      * Get the expiration time of the key.
      *
      * @param  int  $seconds
-     * @return int
+     * @return float
      */
     protected function calculateExpiration($seconds)
     {
