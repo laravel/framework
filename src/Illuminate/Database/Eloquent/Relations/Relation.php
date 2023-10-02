@@ -273,7 +273,7 @@ abstract class Relation implements BuilderContract
     }
 
     /**
-     * Get all of the primary keys for an array of models.
+     * Get all of the given, or primary keys for an array of models.
      *
      * @param  array  $models
      * @param  string|null  $key
@@ -283,7 +283,7 @@ abstract class Relation implements BuilderContract
     {
         return collect($models)->map(function ($value) use ($key) {
             return $key ? $value->getAttribute($key) : $value->getKey();
-        })->values()->unique(null, true)->sort()->all();
+        })->values()->unique(null, true)->filter()->sort()->all();
     }
 
     /**
