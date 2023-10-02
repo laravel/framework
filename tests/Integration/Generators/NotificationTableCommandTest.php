@@ -12,7 +12,7 @@ class NotificationTableCommandTest extends TestCase
             'use Illuminate\Database\Migrations\Migration;',
             'return new class extends Migration',
             'Schema::create(\'notifications\', function (Blueprint $table) {',
-            'Schema::dropIfExists(\'notifications\');'
+            'Schema::dropIfExists(\'notifications\');',
         ], 'create_notifications_table.php');
     }
 }

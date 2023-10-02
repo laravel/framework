@@ -12,7 +12,7 @@ class BatchesTableCommandTest extends TestCase
             'use Illuminate\Database\Migrations\Migration;',
             'return new class extends Migration',
             'Schema::create(\'job_batches\', function (Blueprint $table) {',
-            'Schema::dropIfExists(\'job_batches\');'
+            'Schema::dropIfExists(\'job_batches\');',
         ], 'create_job_batches_table.php');
     }
 }
