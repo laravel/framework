@@ -1361,6 +1361,17 @@ class Stringable implements JsonSerializable, ArrayAccess
     }
 
     /**
+     * @param int $length
+     * @return static
+     */
+    public function random($length = 16)
+    {
+        $this->value = Str::random($length);
+
+        return $this;
+    }
+
+    /**
      * Proxy dynamic properties onto methods.
      *
      * @param  string  $key

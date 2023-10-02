@@ -1274,4 +1274,12 @@ class SupportStringableTest extends TestCase
         $this->assertTrue(isset($str[2]));
         $this->assertFalse(isset($str[10]));
     }
+
+    public function testRandom()
+    {
+        $str = $this->stringable('my string');
+        $this->assertNotSame('my string', $str->random());
+        $this->assertSame(10, strlen($str->random(10)));
+        $this->assertSame(16, strlen($str->random()));
+    }
 }
