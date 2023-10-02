@@ -15,6 +15,8 @@ abstract class MigrationGeneratorCommand extends Command
     protected $files;
 
     /**
+     * The Composer instance.
+     *
      * @var \Illuminate\Support\Composer
      *
      * @deprecated Will be removed in a future Laravel version.
@@ -22,7 +24,7 @@ abstract class MigrationGeneratorCommand extends Command
     protected $composer;
 
     /**
-     * Create a new batched queue jobs table command instance.
+     * Create a new migration generator command instance.
      *
      * @param  \Illuminate\Filesystem\Filesystem  $files
      * @param  \Illuminate\Support\Composer  $composer
@@ -37,9 +39,23 @@ abstract class MigrationGeneratorCommand extends Command
     }
 
     /**
+     * Get the migration table name.
+     *
+     * @return string
+     */
+    abstract protected function migrationTableName();
+
+    /**
+     * Get the path to the migration stub file.
+     *
+     * @return string
+     */
+    abstract protected function migrationStubFile();
+
+    /**
      * Execute the console command.
      *
-     * @return void
+     * @return int
      */
     public function handle()
     {
@@ -51,11 +67,13 @@ abstract class MigrationGeneratorCommand extends Command
             return 1;
         }
 
-        $this->replaceMigration(
+        $this->replaceMigrationPlaceholders(
             $this->createBaseMigration($table), $table
         );
 
         $this->components->info('Migration created successfully.');
+
+        return 0;
     }
 
     /**
@@ -72,13 +90,13 @@ abstract class MigrationGeneratorCommand extends Command
     }
 
     /**
-     * Replace the generated migration with the batches job table stub.
+     * Replace the placeholders in the generated migration file.
      *
      * @param  string  $path
      * @param  string  $table
      * @return void
      */
-    protected function replaceMigration($path, $table)
+    protected function replaceMigrationPlaceholders($path, $table)
     {
         $stub = str_replace(
             '{{table}}', $table, $this->files->get($this->migrationStubFile())
@@ -88,7 +106,7 @@ abstract class MigrationGeneratorCommand extends Command
     }
 
     /**
-     * Determine whether the session table migration already exists.
+     * Determine whether a migration for the table already exists.
      *
      * @param  string  $table
      * @return bool
@@ -99,18 +117,4 @@ abstract class MigrationGeneratorCommand extends Command
             $this->laravel->joinPaths($this->laravel->databasePath('migrations'), '*_*_*_*_create_'.$table.'_table.php')
         )) !== 0;
     }
-
-    /**
-     * Get the migration table name.
-     *
-     * @return string
-     */
-    abstract protected function migrationTableName();
-
-    /**
-     * Get the migration table name.
-     *
-     * @return string
-     */
-    abstract protected function migrationStubFile();
 }

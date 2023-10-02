@@ -33,7 +33,7 @@ class NotificationTableCommand extends MigrationGeneratorCommand
     }
 
     /**
-     * Get the migration table name.
+     * Get the path to the migration stub file.
      *
      * @return string
      */
