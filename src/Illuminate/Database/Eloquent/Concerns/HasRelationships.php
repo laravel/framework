@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Database\Eloquent\Relations\HasManyInSet;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
@@ -455,6 +456,44 @@ trait HasRelationships
     protected function newHasManyThrough(Builder $query, Model $farParent, Model $throughParent, $firstKey, $secondKey, $localKey, $secondLocalKey)
     {
         return new HasManyThrough($query, $farParent, $throughParent, $firstKey, $secondKey, $localKey, $secondLocalKey);
+    }
+
+    /**
+     * Define a one-to-many relationship from set collumn.
+     *
+     * @param  string  $related
+     * @param  string|null  $foreignKey
+     * @param  string|null  $localKey (set)
+     * @return \Illuminate\Database\Eloquent\Relations\HasManyInSet
+     */
+    public function hasManyInSet($related, $foreignKey = null, $localKey = null)
+    {
+        $instance = $this->newRelatedInstance($related);
+
+        $foreignKey = $foreignKey ?: $this->getForeignKey();
+
+        $localKey = $localKey ?: $this->getKeyName();
+
+        return $this->newHasManyInSet(
+            $instance->newQuery(),
+            $this,
+            $instance->getTable() . '.' . $foreignKey,
+            $localKey
+        );
+    }
+
+    /**
+     * Instantiate a new HasManyInSet relationship.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param  \Illuminate\Database\Eloquent\Model  $parent
+     * @param  string  $foreignKey
+     * @param  string  $localKey
+     * @return \Illuminate\Database\Eloquent\Relations\HasManyInSet
+     */
+    public function newHasManyInSet(Builder $query, Model $parent, $foreignKey, $localKey)
+    {
+        return new HasManyInSet($query, $parent, $foreignKey, $localKey);
     }
 
     /**
