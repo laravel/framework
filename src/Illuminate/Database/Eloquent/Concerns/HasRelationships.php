@@ -11,8 +11,8 @@ use Illuminate\Database\Eloquent\PendingHasThroughRelationship;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\HasManyInSet;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
@@ -463,7 +463,7 @@ trait HasRelationships
      *
      * @param  string  $related
      * @param  string|null  $foreignKey
-     * @param  string|null  $localKey (set)
+     * @param  string|null  $localKey  (set)
      * @return \Illuminate\Database\Eloquent\Relations\HasManyInSet
      */
     public function hasManyInSet($related, $foreignKey = null, $localKey = null)
@@ -477,7 +477,7 @@ trait HasRelationships
         return $this->newHasManyInSet(
             $instance->newQuery(),
             $this,
-            $instance->getTable() . '.' . $foreignKey,
+            $instance->getTable().'.'.$foreignKey,
             $localKey
         );
     }
