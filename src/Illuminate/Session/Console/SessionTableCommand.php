@@ -2,13 +2,11 @@
 
 namespace Illuminate\Session\Console;
 
-use Illuminate\Console\Command;
-use Illuminate\Filesystem\Filesystem;
-use Illuminate\Support\Composer;
+use Illuminate\Console\MigrationGeneratorCommand;
 use Symfony\Component\Console\Attribute\AsCommand;
 
 #[AsCommand(name: 'session:table')]
-class SessionTableCommand extends Command
+class SessionTableCommand extends MigrationGeneratorCommand
 {
     /**
      * The console command name.
@@ -25,77 +23,22 @@ class SessionTableCommand extends Command
     protected $description = 'Create a migration for the session database table';
 
     /**
-     * The filesystem instance.
-     *
-     * @var \Illuminate\Filesystem\Filesystem
-     */
-    protected $files;
-
-    /**
-     * @var \Illuminate\Support\Composer
-     *
-     * @deprecated Will be removed in a future Laravel version.
-     */
-    protected $composer;
-
-    /**
-     * Create a new session table command instance.
-     *
-     * @param  \Illuminate\Filesystem\Filesystem  $files
-     * @param  \Illuminate\Support\Composer  $composer
-     * @return void
-     */
-    public function __construct(Filesystem $files, Composer $composer)
-    {
-        parent::__construct();
-
-        $this->files = $files;
-        $this->composer = $composer;
-    }
-
-    /**
-     * Execute the console command.
-     *
-     * @return void
-     */
-    public function handle()
-    {
-        if ($this->migrationExists()) {
-            $this->components->error('Migration already exists.');
-
-            return 1;
-        }
-
-        $fullPath = $this->createBaseMigration();
-
-        $this->files->put($fullPath, $this->files->get(__DIR__.'/stubs/database.stub'));
-
-        $this->components->info('Migration created successfully.');
-    }
-
-    /**
-     * Create a base migration file for the session.
+     * Get the migration table name.
      *
      * @return string
      */
-    protected function createBaseMigration()
+    protected function migrationTableName()
     {
-        $name = 'create_sessions_table';
-
-        $path = $this->laravel->databasePath().'/migrations';
-
-        return $this->laravel['migration.creator']->create($name, $path);
+        return 'sessions';
     }
 
     /**
-     * Determine whether the session table migration already exists.
+     * Get the path to the migration stub file.
      *
-     * @return bool
+     * @return string
      */
-    protected function migrationExists()
+    protected function migrationStubFile()
     {
-        return count($this->files->glob(
-            $this->laravel->joinPaths($this->laravel->databasePath('migrations'), '*_*_*_*_create_sessions_table.php')
-        )) !== 0;
+        return __DIR__.'/stubs/database.stub';
     }
 }
