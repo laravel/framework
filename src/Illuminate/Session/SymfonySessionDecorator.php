@@ -15,7 +15,7 @@ class SymfonySessionDecorator implements SessionInterface
      *
      * @var \Illuminate\Session\Store
      */
-    protected $store;
+    public readonly $store;
 
     /**
      * Create a new session decorator.
@@ -182,15 +182,5 @@ class SymfonySessionDecorator implements SessionInterface
     public function getMetadataBag(): MetadataBag
     {
         throw new BadMethodCallException('Method not implemented by Laravel.');
-    }
-
-    /**
-     * Get underlying Laravel session store.
-     *
-     * @return \Illuminate\Session\Store
-     */
-    public function store()
-    {
-        return $this->store;
     }
 }

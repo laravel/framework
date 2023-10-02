@@ -559,7 +559,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
             throw new RuntimeException('Session store not set on request.');
         }
 
-        return $this->session->store();
+        return $this->session->store;
     }
 
     /**
