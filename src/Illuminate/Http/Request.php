@@ -4,7 +4,6 @@ namespace Illuminate\Http;
 
 use ArrayAccess;
 use Closure;
-use Illuminate\Contracts\Session\Session as SessionContract;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Session\SymfonySessionDecorator;
 use Illuminate\Support\Arr;
