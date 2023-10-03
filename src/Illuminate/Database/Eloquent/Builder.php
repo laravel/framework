@@ -73,7 +73,7 @@ class Builder implements BuilderContract
     /**
      * A replacement for the typical delete function.
      *
-     * @var \Closure(self): mixed
+     * @var \Closure
      */
     protected $onDelete;
 
@@ -125,7 +125,7 @@ class Builder implements BuilderContract
     /**
      * Applied global scopes.
      *
-     * @var array<(\Closure(static): void)>
+     * @var array
      */
     protected $scopes = [];
 
@@ -162,7 +162,7 @@ class Builder implements BuilderContract
      * Register a new global scope.
      *
      * @param  string  $identifier
-     * @param  \Illuminate\Database\Eloquent\Scope|(\Closure(static): void)  $scope
+     * @param  \Illuminate\Database\Eloquent\Scope|\Closure  $scope
      * @return $this
      */
     public function withGlobalScope($identifier, $scope)
@@ -285,7 +285,7 @@ class Builder implements BuilderContract
     /**
      * Add a basic where clause to the query.
      *
-     * @param  (\Closure(self): void)|string|array|\Illuminate\Contracts\Database\Query\Expression  $column
+     * @param  \Closure|string|array|\Illuminate\Contracts\Database\Query\Expression  $column
      * @param  mixed  $operator
      * @param  mixed  $value
      * @param  string  $boolean
@@ -307,7 +307,7 @@ class Builder implements BuilderContract
     /**
      * Add a basic where clause to the query, and return the first result.
      *
-     * @param  (\Closure(self): void)|string|array|\Illuminate\Contracts\Database\Query\Expression  $column
+     * @param  \Closure|string|array|\Illuminate\Contracts\Database\Query\Expression  $column
      * @param  mixed  $operator
      * @param  mixed  $value
      * @param  string  $boolean
@@ -321,7 +321,7 @@ class Builder implements BuilderContract
     /**
      * Add an "or where" clause to the query.
      *
-     * @param  (\Closure(self): void)|array|string|\Illuminate\Contracts\Database\Query\Expression  $column
+     * @param  \Closure|array|string|\Illuminate\Contracts\Database\Query\Expression  $column
      * @param  mixed  $operator
      * @param  mixed  $value
      * @return $this
@@ -338,7 +338,7 @@ class Builder implements BuilderContract
     /**
      * Add a basic "where not" clause to the query.
      *
-     * @param  (\Closure(self): void)|string|array|\Illuminate\Contracts\Database\Query\Expression  $column
+     * @param  \Closure|string|array|\Illuminate\Contracts\Database\Query\Expression  $column
      * @param  mixed  $operator
      * @param  mixed  $value
      * @param  string  $boolean
@@ -352,7 +352,7 @@ class Builder implements BuilderContract
     /**
      * Add an "or where not" clause to the query.
      *
-     * @param  (\Closure(self): void)|array|string|\Illuminate\Contracts\Database\Query\Expression  $column
+     * @param  \Closure|array|string|\Illuminate\Contracts\Database\Query\Expression  $column
      * @param  mixed  $operator
      * @param  mixed  $value
      * @return $this
@@ -519,8 +519,8 @@ class Builder implements BuilderContract
      * Find a model by its primary key or call a callback.
      *
      * @param  mixed  $id
-     * @param  (\Closure(): mixed)|array|string  $columns
-     * @param  (\Closure(): mixed)|null  $callback
+     * @param  \Closure|array|string  $columns
+     * @param  \Closure|null  $callback
      * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection|static[]|static|mixed
      */
     public function findOr($id, $columns = ['*'], Closure $callback = null)
@@ -620,8 +620,8 @@ class Builder implements BuilderContract
     /**
      * Execute the query and get the first result or call a callback.
      *
-     * @param  (\Closure(): mixed)|array|string  $columns
-     * @param  (\Closure(): mixed)|null  $callback
+     * @param  \Closure|array|string  $columns
+     * @param  \Closure|null  $callback
      * @return \Illuminate\Database\Eloquent\Model|static|mixed
      */
     public function firstOr($columns = ['*'], Closure $callback = null)
@@ -761,7 +761,7 @@ class Builder implements BuilderContract
      *
      * @param  array  $models
      * @param  string  $name
-     * @param  \Closure(\Illuminate\Database\Eloquent\Relations\Relation): void  $constraints
+     * @param  \Closure  $constraints
      * @return array
      */
     protected function eagerLoadRelation(array $models, $name, Closure $constraints)
@@ -903,10 +903,11 @@ class Builder implements BuilderContract
     /**
      * Paginate the given query.
      *
-     * @param  int|null|(\Closure(int): int|null)  $perPage
+     * @param  int|null|\Closure  $perPage
      * @param  array|string  $columns
      * @param  string  $pageName
      * @param  int|null  $page
+     * @param  \Closure|int|null  $total
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      *
      * @throws \InvalidArgumentException
@@ -1283,7 +1284,7 @@ class Builder implements BuilderContract
     /**
      * Register a replacement for the default delete function.
      *
-     * @param  \Closure(static): mixed  $callback
+     * @param  \Closure  $callback
      * @return void
      */
     public function onDelete(Closure $callback)
@@ -1372,7 +1373,7 @@ class Builder implements BuilderContract
     /**
      * Apply the given scope on the current builder instance.
      *
-     * @param  (callable(mixed $parameters...): mixed)  $scope
+     * @param  callable  $scope
      * @param  array  $parameters
      * @return mixed
      */
@@ -1478,8 +1479,8 @@ class Builder implements BuilderContract
     /**
      * Set the relationships that should be eager loaded.
      *
-     * @param  string|array<string|(\Closure(\Illuminate\Database\Eloquent\Relations\Relation): self|null)>  $relations
-     * @param  string|(\Closure(\Illuminate\Database\Eloquent\Relations\Relation): self|null)|null  $callback
+     * @param  string|array  $relations
+     * @param  string|\Closure|null  $callback
      * @return $this
      */
     public function with($relations, $callback = null)
@@ -1618,8 +1619,8 @@ class Builder implements BuilderContract
     /**
      * Combine an array of constraints into a single constraint.
      *
-     * @param  array<(\Closure(\Illuminate\Database\Eloquent\Relations\Relation): self|null)>  $constraints
-     * @return \Closure(\Illuminate\Database\Eloquent\Relations\Relation): self
+     * @param  array  $constraints
+     * @return \Closure
      */
     protected function combineConstraints(array $constraints)
     {
