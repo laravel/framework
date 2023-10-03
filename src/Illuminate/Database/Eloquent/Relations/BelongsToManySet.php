@@ -34,8 +34,7 @@ class BelongsToManySet extends HasMany
         $whereIn = $this->whereInMethod($this->parent, $this->localKey);
 
         $this->query->{$whereIn}(
-            $this->foreignKey,
-            $this->getSets($models, $this->localKey)
+            $this->foreignKey, $this->getSets($models, $this->localKey)
         );
     }
 
@@ -86,7 +85,9 @@ class BelongsToManySet extends HasMany
                 return isset($dictionary[$key = $value]) ? $this->getRelationValue($dictionary, $key, $type) : null;
             })->flatten()->values()->unique(null, true)->filter()->all();
 
-            $model->setRelations($relations);
+            $model->setRelation(
+                $relation, $this->related->newCollection($relations)
+            );
         }
 
         return $models;
