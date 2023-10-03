@@ -763,7 +763,7 @@ class Connection implements ConnectionInterface
         // then log the query, bindings, and execution time so we will report them on
         // the event that the developer needs them. We'll log time in milliseconds.
         $this->logQuery(
-            $query, $bindings, $this->getElapsedTime($start)
+            $query, $bindings, $this->getElapsedTime($start), $this->getRowCount($result)
         );
 
         return $result;
@@ -821,16 +821,17 @@ class Connection implements ConnectionInterface
      * @param  string  $query
      * @param  array  $bindings
      * @param  float|null  $time
+     * @param  int|null  $count
      * @return void
      */
-    public function logQuery($query, $bindings, $time = null)
+    public function logQuery($query, $bindings, $time = null, $count = null)
     {
         $this->totalQueryDuration += $time ?? 0.0;
 
-        $this->event(new QueryExecuted($query, $bindings, $time, $this));
+        $this->event(new QueryExecuted($query, $bindings, $time, $this, $count));
 
         if ($this->loggingQueries) {
-            $this->queryLog[] = compact('query', 'bindings', 'time');
+            $this->queryLog[] = compact('query', 'bindings', 'time', 'count');
         }
     }
 
@@ -843,6 +844,25 @@ class Connection implements ConnectionInterface
     protected function getElapsedTime($start)
     {
         return round((microtime(true) - $start) * 1000, 2);
+    }
+
+    /**
+     * Get the affected row count.
+     *
+     * @param  mixed  $result
+     * @return int|null
+     */
+    protected function getRowCount($result)
+    {
+        if (is_int($result)) {
+            return $result;
+        }
+
+        if (is_array($result)) {
+            return count($result);
+        }
+
+        return null;
     }
 
     /**
