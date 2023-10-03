@@ -567,11 +567,11 @@ trait HasRelationships
      * Define a many-to-many relationship from set collumn.
      *
      * @param  string  $related
-     * @param  string|null  $foreignKey
      * @param  string  $localKey  (set)
+     * @param  string|null  $foreignKey
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToManySet
      */
-    public function belongsToManySet($related, $foreignKey = null, $localKey)
+    public function belongsToManySet($related, $localKey, $foreignKey = null)
     {
         $instance = $this->newRelatedInstance($related);
 
