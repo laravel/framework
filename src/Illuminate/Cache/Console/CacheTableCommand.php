@@ -2,13 +2,11 @@
 
 namespace Illuminate\Cache\Console;
 
-use Illuminate\Console\Command;
-use Illuminate\Filesystem\Filesystem;
-use Illuminate\Support\Composer;
+use Illuminate\Console\MigrationGeneratorCommand;
 use Symfony\Component\Console\Attribute\AsCommand;
 
 #[AsCommand(name: 'cache:table')]
-class CacheTableCommand extends Command
+class CacheTableCommand extends MigrationGeneratorCommand
 {
     /**
      * The console command name.
@@ -25,59 +23,22 @@ class CacheTableCommand extends Command
     protected $description = 'Create a migration for the cache database table';
 
     /**
-     * The filesystem instance.
-     *
-     * @var \Illuminate\Filesystem\Filesystem
-     */
-    protected $files;
-
-    /**
-     * @var \Illuminate\Support\Composer
-     *
-     * @deprecated Will be removed in a future Laravel version.
-     */
-    protected $composer;
-
-    /**
-     * Create a new cache table command instance.
-     *
-     * @param  \Illuminate\Filesystem\Filesystem  $files
-     * @param  \Illuminate\Support\Composer  $composer
-     * @return void
-     */
-    public function __construct(Filesystem $files, Composer $composer)
-    {
-        parent::__construct();
-
-        $this->files = $files;
-        $this->composer = $composer;
-    }
-
-    /**
-     * Execute the console command.
-     *
-     * @return void
-     */
-    public function handle()
-    {
-        $fullPath = $this->createBaseMigration();
-
-        $this->files->put($fullPath, $this->files->get(__DIR__.'/stubs/cache.stub'));
-
-        $this->components->info('Migration created successfully.');
-    }
-
-    /**
-     * Create a base migration file for the table.
+     * Get the migration table name.
      *
      * @return string
      */
-    protected function createBaseMigration()
+    protected function migrationTableName()
     {
-        $name = 'create_cache_table';
+        return 'cache';
+    }
 
-        $path = $this->laravel->databasePath().'/migrations';
-
-        return $this->laravel['migration.creator']->create($name, $path);
+    /**
+     * Get the path to the migration stub file.
+     *
+     * @return string
+     */
+    protected function migrationStubFile()
+    {
+        return __DIR__.'/stubs/cache.stub';
     }
 }
