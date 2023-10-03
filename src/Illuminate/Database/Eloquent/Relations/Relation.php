@@ -94,10 +94,8 @@ abstract class Relation implements BuilderContract
     /**
      * Run a callback with constraints disabled on the relation.
      *
-     * @template TValue
-     *
-     * @param  \Closure(): TValue  $callback
-     * @return TValue
+     * @param  \Closure  $callback
+     * @return mixed
      */
     public static function noConstraints(Closure $callback)
     {

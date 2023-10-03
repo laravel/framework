@@ -755,8 +755,8 @@ class BelongsToMany extends Relation
      * Find a related model by its primary key or call a callback.
      *
      * @param  mixed  $id
-     * @param  (\Closure(): mixed)|array  $columns
-     * @param  (\Closure(): mixed)|null  $callback
+     * @param  \Closure|array  $columns
+     * @param  \Closure|null  $callback
      * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection|mixed
      */
     public function findOr($id, $columns = ['*'], Closure $callback = null)
@@ -785,7 +785,7 @@ class BelongsToMany extends Relation
     /**
      * Add a basic where clause to the query, and return the first result.
      *
-     * @param  (\Closure(\Illuminate\Database\Eloquent\Builder): void)|string|array  $column
+     * @param  \Closure|string|array  $column
      * @param  mixed  $operator
      * @param  mixed  $value
      * @param  string  $boolean
@@ -829,8 +829,8 @@ class BelongsToMany extends Relation
     /**
      * Execute the query and get the first result or call a callback.
      *
-     * @param  (\Closure(): mixed)|array  $columns
-     * @param  (\Closure(): mixed)|null  $callback
+     * @param  \Closure|array  $columns
+     * @param  \Closure|null  $callback
      * @return \Illuminate\Database\Eloquent\Model|static|mixed
      */
     public function firstOr($columns = ['*'], Closure $callback = null)
@@ -1021,7 +1021,7 @@ class BelongsToMany extends Relation
     /**
      * Execute a callback over each item while chunking.
      *
-     * @param  callable(object, int): bool  $callback
+     * @param  callable  $callback
      * @param  int  $count
      * @return bool
      */

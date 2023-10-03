@@ -65,7 +65,7 @@ trait BuildsQueries
     /**
      * Run a map over each item while chunking.
      *
-     * @param  callable(object): mixed  $callback
+     * @param  callable  $callback
      * @param  int  $count
      * @return \Illuminate\Support\Collection
      */
@@ -85,7 +85,7 @@ trait BuildsQueries
     /**
      * Execute a callback over each item while chunking.
      *
-     * @param  callable(object, int): bool  $callback
+     * @param  callable  $callback
      * @param  int  $count
      * @return bool
      *
@@ -159,7 +159,7 @@ trait BuildsQueries
     /**
      * Execute a callback over each item while chunking by ID.
      *
-     * @param  callable(object, int): bool  $callback
+     * @param  callable  $callback
      * @param  int  $count
      * @param  string|null  $column
      * @param  string|null  $alias
