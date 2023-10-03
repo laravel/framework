@@ -10,8 +10,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\PendingHasThroughRelationship;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToManySet;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasManyInSet;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasOneThrough;
@@ -459,44 +459,6 @@ trait HasRelationships
     }
 
     /**
-     * Define a one-to-many relationship from set collumn.
-     *
-     * @param  string  $related
-     * @param  string|null  $foreignKey
-     * @param  string|null  $localKey  (set)
-     * @return \Illuminate\Database\Eloquent\Relations\HasManyInSet
-     */
-    public function hasManyInSet($related, $foreignKey = null, $localKey = null)
-    {
-        $instance = $this->newRelatedInstance($related);
-
-        $foreignKey = $foreignKey ?: $this->getForeignKey();
-
-        $localKey = $localKey ?: $this->getKeyName();
-
-        return $this->newHasManyInSet(
-            $instance->newQuery(),
-            $this,
-            $instance->getTable().'.'.$foreignKey,
-            $localKey
-        );
-    }
-
-    /**
-     * Instantiate a new HasManyInSet relationship.
-     *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @param  \Illuminate\Database\Eloquent\Model  $parent
-     * @param  string  $foreignKey
-     * @param  string  $localKey
-     * @return \Illuminate\Database\Eloquent\Relations\HasManyInSet
-     */
-    public function newHasManyInSet(Builder $query, Model $parent, $foreignKey, $localKey)
-    {
-        return new HasManyInSet($query, $parent, $foreignKey, $localKey);
-    }
-
-    /**
      * Define a polymorphic one-to-many relationship.
      *
      * @param  string  $related
@@ -599,6 +561,44 @@ trait HasRelationships
                                         $parentKey, $relatedKey, $relationName = null)
     {
         return new BelongsToMany($query, $parent, $table, $foreignPivotKey, $relatedPivotKey, $parentKey, $relatedKey, $relationName);
+    }
+
+    /**
+     * Define a many-to-many relationship from set collumn.
+     *
+     * @param  string  $related
+     * @param  string|null  $foreignKey
+     * @param  string  $localKey  (set)
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToManySet
+     */
+    public function belongsToManySet($related, $foreignKey = null, $localKey)
+    {
+        $instance = $this->newRelatedInstance($related);
+
+        $foreignKey = $foreignKey ?: $this->getForeignKey();
+
+        $localKey = $localKey ?: $this->getKeyName();
+
+        return $this->newBelongsToManySet(
+            $instance->newQuery(),
+            $this,
+            $instance->getTable().'.'.$foreignKey,
+            $localKey
+        );
+    }
+
+    /**
+     * Instantiate a new BelongsToManySet relationship.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param  \Illuminate\Database\Eloquent\Model  $parent
+     * @param  string  $foreignKey
+     * @param  string  $localKey
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToManySet
+     */
+    public function newBelongsToManySet(Builder $query, Model $parent, $foreignKey, $localKey)
+    {
+        return new BelongsToManySet($query, $parent, $foreignKey, $localKey);
     }
 
     /**

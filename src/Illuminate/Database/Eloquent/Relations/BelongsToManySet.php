@@ -5,7 +5,7 @@ namespace Illuminate\Database\Eloquent\Relations;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 
-class HasManyInSet extends HasMany
+class BelongsToManySet extends HasMany
 {
     /**
      * Set the base constraints on the relation query.
