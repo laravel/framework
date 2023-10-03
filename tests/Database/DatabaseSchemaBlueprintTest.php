@@ -395,6 +395,54 @@ class DatabaseSchemaBlueprintTest extends TestCase
         ], $blueprint->toSql($connection, new MySqlGrammar()));
     }
 
+    public function testGenerateRelationshipColumnWithModelConstrained()
+    {
+        $base = new Blueprint('posts', function ($table) {
+            $table->foreignIdFor('Illuminate\Foundation\Auth\User')->constrained();
+        });
+
+        $connection = m::mock(Connection::class);
+
+        $blueprint = clone $base;
+
+        $this->assertEquals([
+            'alter table `posts` add `user_id` bigint unsigned not null',
+            'alter table `posts` add constraint `posts_user_id_foreign` foreign key (`user_id`) references `users` (`id`)',
+        ], $blueprint->toSql($connection, new MySqlGrammar));
+    }
+
+    public function testGenerateRelationshipColumnWithModelConstrainedWithCustomColumn()
+    {
+        $base = new Blueprint('posts', function ($table) {
+            $table->foreignIdFor('Illuminate\Foundation\Auth\User', 'author_id')->constrained();
+        });
+
+        $connection = m::mock(Connection::class);
+
+        $blueprint = clone $base;
+
+        $this->assertEquals([
+            'alter table `posts` add `author_id` bigint unsigned not null',
+            'alter table `posts` add constraint `posts_author_id_foreign` foreign key (`author_id`) references `users` (`id`)',
+        ], $blueprint->toSql($connection, new MySqlGrammar));
+    }
+
+    public function testGenerateRelationshipColumnWithModelConstrainedWithCustomColumnAndTable()
+    {
+        $base = new Blueprint('posts', function ($table) {
+            $table->foreignIdFor('Illuminate\Foundation\Auth\User', 'author_id')->constrained('admin_users');
+        });
+
+        $connection = m::mock(Connection::class);
+
+        $blueprint = clone $base;
+
+        $this->assertEquals([
+            'alter table `posts` add `author_id` bigint unsigned not null',
+            'alter table `posts` add constraint `posts_author_id_foreign` foreign key (`author_id`) references `admin_users` (`id`)',
+        ], $blueprint->toSql($connection, new MySqlGrammar));
+    }
+
     public function testDropRelationshipColumnWithIncrementalModel()
     {
         $base = new Blueprint('posts', function ($table) {
