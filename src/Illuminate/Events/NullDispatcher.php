@@ -46,7 +46,7 @@ class NullDispatcher implements DispatcherContract
      * @param  array<int|string, mixed>  $events
      * @return void
      */
-    public function dispatchMultiple($events)
+    public function dispatchMany($events)
     {
         //
     }

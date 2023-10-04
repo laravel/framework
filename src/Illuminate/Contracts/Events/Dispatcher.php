@@ -54,7 +54,7 @@ interface Dispatcher
      * @param  array<int|string, mixed>  $events
      * @return void
      */
-    public function dispatchMultiple($events);
+    public function dispatchMany($events);
 
     /**
      * Register an event and payload to be fired later.

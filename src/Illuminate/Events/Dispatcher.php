@@ -274,7 +274,7 @@ class Dispatcher implements DispatcherContract
      * @param  array<int|string, mixed>  $events
      * @return void
      */
-    public function dispatchMultiple($events)
+    public function dispatchMany($events)
     {
         foreach ($events as $event => $payload) {
             // If the key is an integer, we can assume we are dealing with an array and not a hashmap.

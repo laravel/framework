@@ -14,7 +14,7 @@ use Illuminate\Support\Testing\Fakes\EventFake;
  * @method static void subscribe(object|string $subscriber)
  * @method static mixed until(string|object $event, mixed $payload = [])
  * @method static array|null dispatch(string|object $event, mixed $payload = [], bool $halt = false)
- * @method static void dispatchMultiple(array $events)
+ * @method static void dispatchMany(array $events)
  * @method static array getListeners(string $eventName)
  * @method static \Closure makeListener(\Closure|string|array $listener, bool $wildcard = false)
  * @method static \Closure createClassListener(string $listener, bool $wildcard = false)

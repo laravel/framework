@@ -142,7 +142,7 @@ class EventFakeTest extends TestCase
     {
         Event::fake();
 
-        Event::dispatchMultiple([new NonImportantEvent(), new AnotherEvent()]);
+        Event::dispatchMany([new NonImportantEvent(), new AnotherEvent()]);
 
         Event::assertDispatched(NonImportantEvent::class);
         Event::assertDispatched(AnotherEvent::class);
@@ -152,7 +152,7 @@ class EventFakeTest extends TestCase
     {
         Event::fake();
 
-        Event::dispatchMultiple([
+        Event::dispatchMany([
             NonImportantEvent::class => 'foo',
             AnotherEvent::class => 'bar'
         ]);
@@ -165,7 +165,7 @@ class EventFakeTest extends TestCase
     {
         Event::fake();
 
-        Event::dispatchMultiple([
+        Event::dispatchMany([
             NonImportantEvent::class,
             AnotherEvent::class
         ]);

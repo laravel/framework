@@ -309,7 +309,7 @@ class EventFake implements Dispatcher, Fake
      * @param  array<int|string, mixed>  $events
      * @return void
      */
-    public function dispatchMultiple($events)
+    public function dispatchMany($events)
     {
         foreach ($events as $event => $payload) {
             if (is_int($event)) {

@@ -44,7 +44,7 @@ class EventsDispatcherTest extends TestCase
         $d = new Dispatcher;
         $d->listen('foo', fn ($foo) => $_SERVER['__event.test_foo'] = $foo);
         $d->listen('bar', fn ($bar) => $_SERVER['__event.test_bar'] = $bar);
-        $d->dispatchMultiple([
+        $d->dispatchMany([
             'foo' => 'bar',
             'bar' => 'baz',
         ]);
@@ -60,7 +60,7 @@ class EventsDispatcherTest extends TestCase
         $d = new Dispatcher;
         $d->listen('foo', fn () => $_SERVER['__event.test_foo'] = 1);
         $d->listen('bar', fn () => $_SERVER['__event.test_bar'] = 2);
-        $d->dispatchMultiple([
+        $d->dispatchMany([
             'foo',
             'bar'
         ]);
@@ -81,7 +81,7 @@ class EventsDispatcherTest extends TestCase
         $d->listen(AnotherEvent::class, function () {
             $_SERVER['__event.test_bar'] = 'two';
         });
-        $d->dispatchMultiple([
+        $d->dispatchMany([
             new ExampleEvent,
             new AnotherEvent
         ]);
