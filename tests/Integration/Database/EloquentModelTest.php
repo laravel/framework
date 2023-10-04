@@ -76,14 +76,14 @@ class EloquentModelTest extends DatabaseTestCase
         $this->assertFalse($user->isDirty());
         $this->assertFalse($user->wasChanged());
 
-        $user->name = $overideName = Str::random();
+        $user->name = $overrideName = Str::random();
 
-        $this->assertEquals(['name' => $overideName], $user->getDirty());
+        $this->assertEquals(['name' => $overrideName], $user->getDirty());
         $this->assertEmpty($user->getChanges());
         $this->assertTrue($user->isDirty());
         $this->assertFalse($user->wasChanged());
         $this->assertSame($originalName, $user->getOriginal('name'));
-        $this->assertSame($overideName, $user->getAttribute('name'));
+        $this->assertSame($overrideName, $user->getAttribute('name'));
 
         $user->discardChanges();
 

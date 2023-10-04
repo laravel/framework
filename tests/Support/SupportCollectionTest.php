@@ -26,9 +26,7 @@ use Symfony\Component\VarDumper\VarDumper;
 use Traversable;
 use UnexpectedValueException;
 
-if (PHP_VERSION_ID >= 80100) {
-    include_once 'Enums.php';
-}
+include_once 'Enums.php';
 
 class SupportCollectionTest extends TestCase
 {
@@ -4741,7 +4739,7 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
-    public function testSplitCollectionWithADivisableCount($collection)
+    public function testSplitCollectionWithADivisibleCount($collection)
     {
         $data = new $collection(['a', 'b', 'c', 'd']);
         $split = $data->split(2);

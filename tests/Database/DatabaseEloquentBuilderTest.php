@@ -1460,6 +1460,25 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertEquals(['larry', '90210', '90220', 'fooside dr', 29], $builder->getBindings());
     }
 
+    public function testHasWithConstraintsWithOrWhereAndSubqueryInRelationFromClause()
+    {
+        EloquentBuilderTestModelParentStub::resolveRelationUsing('addressAsExpression', function ($model) {
+            return $model->address()->fromSub(EloquentBuilderTestModelCloseRelatedStub::query(), 'eloquent_builder_test_model_close_related_stubs');
+        });
+
+        $model = new EloquentBuilderTestModelParentStub;
+
+        $builder = $model->where('name', 'larry');
+        $builder->whereHas('addressAsExpression', function ($q) {
+            $q->where('zipcode', '90210');
+            $q->orWhere('zipcode', '90220');
+            $q->having('street', '=', 'fooside dr');
+        })->where('age', 29);
+
+        $this->assertSame('select * from "eloquent_builder_test_model_parent_stubs" where "name" = ? and exists (select * from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id" and ("zipcode" = ? or "zipcode" = ?) having "street" = ?) and "age" = ?', $builder->toSql());
+        $this->assertEquals(['larry', '90210', '90220', 'fooside dr', 29], $builder->getBindings());
+    }
+
     public function testHasWithConstraintsAndJoinAndHavingInSubquery()
     {
         $model = new EloquentBuilderTestModelParentStub;

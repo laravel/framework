@@ -292,7 +292,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
     protected function registerCacheTableCommand()
     {
         $this->app->singleton(CacheTableCommand::class, function ($app) {
-            return new CacheTableCommand($app['files'], $app['composer']);
+            return new CacheTableCommand($app['files']);
         });
     }
 
@@ -508,7 +508,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
     protected function registerNotificationTableCommand()
     {
         $this->app->singleton(NotificationTableCommand::class, function ($app) {
-            return new NotificationTableCommand($app['files'], $app['composer']);
+            return new NotificationTableCommand($app['files']);
         });
     }
 
@@ -638,7 +638,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
     protected function registerQueueFailedTableCommand()
     {
         $this->app->singleton(FailedTableCommand::class, function ($app) {
-            return new FailedTableCommand($app['files'], $app['composer']);
+            return new FailedTableCommand($app['files']);
         });
     }
 
@@ -650,7 +650,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
     protected function registerQueueTableCommand()
     {
         $this->app->singleton(TableCommand::class, function ($app) {
-            return new TableCommand($app['files'], $app['composer']);
+            return new TableCommand($app['files']);
         });
     }
 
@@ -662,7 +662,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
     protected function registerQueueBatchesTableCommand()
     {
         $this->app->singleton(BatchesTableCommand::class, function ($app) {
-            return new BatchesTableCommand($app['files'], $app['composer']);
+            return new BatchesTableCommand($app['files']);
         });
     }
 
@@ -722,7 +722,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
     protected function registerSeederMakeCommand()
     {
         $this->app->singleton(SeederMakeCommand::class, function ($app) {
-            return new SeederMakeCommand($app['files'], $app['composer']);
+            return new SeederMakeCommand($app['files']);
         });
     }
 
@@ -734,7 +734,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
     protected function registerSessionTableCommand()
     {
         $this->app->singleton(SessionTableCommand::class, function ($app) {
-            return new SessionTableCommand($app['files'], $app['composer']);
+            return new SessionTableCommand($app['files']);
         });
     }
 

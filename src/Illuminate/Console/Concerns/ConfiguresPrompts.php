@@ -3,6 +3,7 @@
 namespace Illuminate\Console\Concerns;
 
 use Laravel\Prompts\ConfirmPrompt;
+use Laravel\Prompts\MultiSearchPrompt;
 use Laravel\Prompts\MultiSelectPrompt;
 use Laravel\Prompts\PasswordPrompt;
 use Laravel\Prompts\Prompt;
@@ -24,7 +25,9 @@ trait ConfiguresPrompts
     {
         Prompt::setOutput($this->output);
 
-        Prompt::fallbackWhen(! $input->isInteractive() || windows_os() || $this->laravel->runningUnitTests());
+        Prompt::interactive(($input->isInteractive() && defined('STDIN') && stream_isatty(STDIN)) || $this->laravel->runningUnitTests());
+
+        Prompt::fallbackWhen(windows_os() || $this->laravel->runningUnitTests());
 
         TextPrompt::fallbackUsing(fn (TextPrompt $prompt) => $this->promptUntilValid(
             fn () => $this->components->ask($prompt->label, $prompt->default ?: null) ?? '',
@@ -83,6 +86,32 @@ trait ConfiguresPrompts
                 return $this->components->choice($prompt->label, $options);
             },
             false,
+            $prompt->validate
+        ));
+
+        MultiSearchPrompt::fallbackUsing(fn (MultiSearchPrompt $prompt) => $this->promptUntilValid(
+            function () use ($prompt) {
+                $query = $this->components->ask($prompt->label);
+
+                $options = ($prompt->options)($query);
+
+                if ($prompt->required === false) {
+                    if (array_is_list($options)) {
+                        return collect($this->components->choice($prompt->label, ['None', ...$options], 'None', multiple: true))
+                            ->reject('None')
+                            ->values()
+                            ->all();
+                    }
+
+                    return collect($this->components->choice($prompt->label, ['' => 'None', ...$options], '', multiple: true))
+                        ->reject('')
+                        ->values()
+                        ->all();
+                }
+
+                return $this->components->choice($prompt->label, $options, multiple: true);
+            },
+            $prompt->required,
             $prompt->validate
         ));
     }
