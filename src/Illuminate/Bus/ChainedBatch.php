@@ -80,7 +80,6 @@ class ChainedBatch implements ShouldQueue
             if ($job instanceof PendingBatch) {
                 $jobs[$k] = new ChainedBatch($job);
             }
-
         }
 
         return $jobs;
