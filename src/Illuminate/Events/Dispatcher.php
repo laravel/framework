@@ -277,14 +277,13 @@ class Dispatcher implements DispatcherContract
     public function dispatchMultiple($events)
     {
         foreach ($events as $event => $payload) {
-            if (is_object($payload)) {
+            // If the key is an integer, we can assume we are dealing with an array and not a hashmap.
+            if (is_int($event)) {
                 // The payload is the event itself.
                 $this->dispatch($payload);
 
                 continue;
             }
-
-            [$event, $payload] = $this->parseEventAndPayload($event, $payload);
 
             $this->dispatch($event, $payload);
         }

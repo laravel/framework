@@ -53,6 +53,22 @@ class EventsDispatcherTest extends TestCase
         $this->assertSame('baz', $_SERVER['__event.test_bar']);
     }
 
+    public function testMultipleEventsCanBeDispatchedArrayNoPayload()
+    {
+        unset($_SERVER['__event.test_foo']);
+        unset($_SERVER['__event.test_bar']);
+        $d = new Dispatcher;
+        $d->listen('foo', fn () => $_SERVER['__event.test_foo'] = 1);
+        $d->listen('bar', fn () => $_SERVER['__event.test_bar'] = 2);
+        $d->dispatchMultiple([
+            'foo',
+            'bar'
+        ]);
+
+        $this->assertSame(1, $_SERVER['__event.test_foo']);
+        $this->assertSame(2, $_SERVER['__event.test_bar']);
+    }
+
     public function testMultipleEventsCanBeDispatchedObject()
     {
         unset($_SERVER['__event.test_foo']);
