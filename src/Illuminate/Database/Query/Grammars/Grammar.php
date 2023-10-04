@@ -889,7 +889,15 @@ class Grammar extends BaseGrammar
     protected function compileOrdersToArray(Builder $query, $orders)
     {
         return array_map(function ($order) {
-            return $order['sql'] ?? $this->wrap($order['column']).' '.$order['direction'];
+            if (isset($order['sql'])) {
+                return $order['sql'];
+            }
+
+            if (isset($order['values'])) {
+                throw new RuntimeException('This database engine does not support "order by field" clause.');
+            }
+
+            return $this->wrap($order['column']).' '.$order['direction'];
         }, $orders);
     }
 

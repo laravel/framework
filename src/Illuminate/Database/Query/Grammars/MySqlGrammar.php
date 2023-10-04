@@ -346,6 +346,22 @@ class MySqlGrammar extends Grammar
         return $sql;
     }
 
+    protected function compileOrdersToArray(Builder $query, $orders)
+    {
+
+        return array_map(function ($order) {
+            if (isset($order['sql'])) {
+                return $order['sql'];
+            }
+
+            if (isset($order['values'])) {
+                return 'field (' . $this->wrap($order['column']). ', '.$this->parameterize($order['values']).') '.$order['direction'];
+            }
+
+            return $this->wrap($order['column']).' '.$order['direction'];
+        }, $orders);
+    }
+
     /**
      * Wrap a single string in keyword identifiers.
      *

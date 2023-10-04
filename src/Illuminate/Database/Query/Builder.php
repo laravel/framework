@@ -2313,11 +2313,7 @@ class Builder implements BuilderContract
             $this->addBinding($bindings, $this->unions ? 'unionOrder' : 'order');
         }
 
-        $direction = strtolower($direction);
-
-        if (! in_array($direction, ['asc', 'desc'], true)) {
-            throw new InvalidArgumentException('Order direction must be "asc" or "desc".');
-        }
+        $direction = $this->validateOrderByDirection($direction);
 
         $this->{$this->unions ? 'unionOrders' : 'orders'}[] = [
             'column' => $column,
@@ -2336,6 +2332,55 @@ class Builder implements BuilderContract
     public function orderByDesc($column)
     {
         return $this->orderBy($column, 'desc');
+    }
+
+    /**
+     * Add an "order by field" clause to the query.
+     *
+     * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder|\Illuminate\Contracts\Database\Query\Expression|string  $column
+     * @param mixed $values
+     * @param  string  $direction
+     * @return $this
+     *
+     * @throws InvalidArgumentException
+     */
+    public function orderByField($column, $values, $direction = 'asc')
+    {
+        $bindingType = $this->unions ? 'unionOrder' : 'order';
+
+        if ($this->isQueryable($column)) {
+            [$query, $bindings] = $this->createSub($column);
+
+            $column = new Expression('('.$query.')');
+
+            $this->addBinding($bindings, $bindingType);
+        }
+
+        $direction = $this->validateOrderByDirection($direction);
+
+        if ($this->isQueryable($values)) {
+            throw new InvalidArgumentException('Queryable values may not be passed to orderByField method.');
+
+        }
+
+        if ($values instanceof Arrayable) {
+            $values = $values->toArray();
+        }
+
+        if (count($values) !== count(Arr::flatten($values, 1))) {
+            throw new InvalidArgumentException('Nested arrays may not be passed to orderByField method.');
+        }
+
+        if (empty($values)) {
+            throw new InvalidArgumentException('Non-empty array must be passed to orderByField method.');
+        }
+
+        $type = 'Field';
+        $this->{$this->unions ? 'unionOrders' : 'orders'}[] = compact('type', 'column','values','direction');
+
+        $this->addBinding($this->cleanBindings($values), $bindingType);
+
+        return $this;
     }
 
     /**
@@ -3965,5 +4010,23 @@ class Builder implements BuilderContract
         }
 
         static::throwBadMethodCallException($method);
+    }
+
+    /**
+     * validate the direction of the "orderBy" clause.
+     *
+     * @param  string  $direction
+     * @return string
+     *
+     * @throws InvalidArgumentException
+     */
+    protected function validateOrderByDirection(string $direction)
+    {
+        $direction = strtolower($direction);
+
+        if (!in_array($direction, ['asc', 'desc'], true)) {
+            throw new InvalidArgumentException('Order direction must be "asc" or "desc".');
+        }
+        return $direction;
     }
 }

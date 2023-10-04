@@ -971,6 +971,58 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([0 => 1, 1 => 1, 2 => 2, 3 => 3], $builder->getBindings());
     }
 
+    public function testOrderByField()
+    {
+
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->orderByField('id', [2, 1, 3]);
+        $this->assertSame('select * from `users` order by field (`id`, ?, ?, ?) asc', $builder->toSql());
+        $this->assertEquals([0 => 2, 1 => 1, 2 => 3], $builder->getBindings());
+
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->orderByField('id', [2, 1, 3], 'desc');
+        $this->assertSame('select * from `users` order by field (`id`, ?, ?, ?) desc', $builder->toSql());
+        $this->assertEquals([0 => 2, 1 => 1, 2 => 3], $builder->getBindings());
+
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->orderByField('id', [
+            'issue' => 45582,
+            'id' => 2,
+            3,
+        ]);
+
+        $this->assertSame('select * from `users` order by field (`id`, ?, ?, ?) asc', $builder->toSql());
+        $this->assertEquals([0 => 45582, 1 => 2, 2 => 3], $builder->getBindings());
+    }
+
+    public function testOrderByFieldThrowExceptionWhenValuesAreEmpty()
+    {
+        $this->expectException(InvalidArgumentException::class);
+
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->orderByField('id', []);
+    }
+
+    public function testOrderByFieldThrowExceptionWhenValuesQueriables()
+    {
+        $this->expectException(InvalidArgumentException::class);
+
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('logins')->orderByField('user_id', function ($query) {
+            return $query->select('id')->from('users')->where('created_at', '>', '2011-01-25');
+        });
+    }
+
+    public function testOrderByFieldThrowExceptionWhenEngineDoesntSupportIt()
+    {
+        $this->expectException(RuntimeException::class);
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->orderByField('id', [2, 1, 3]);
+        $this->assertSame('select * from `users` order by field (`id`, ?, ?, ?) asc', $builder->toSql());
+        $this->assertEquals([0 => 2, 1 => 1, 2 => 3], $builder->getBindings());
+    }
+
     public function testBasicWhereInsException()
     {
         $this->expectException(InvalidArgumentException::class);
@@ -1285,6 +1337,14 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->orderBy('id', 'desc');
         $this->assertSame('(select * from "users" where "id" = ?) union (select * from "users" where "id" = ?) order by "id" desc', $builder->toSql());
         $this->assertEquals([0 => 1, 1 => 2], $builder->getBindings());
+
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->where('id', '=', 1);
+        $builder->union($this->getMySqlBuilder()->select('*')->from('users')->whereIn('id', [2, 3]));
+        $builder->orderByField('id',[3,2], 'desc');
+
+        $this->assertSame('(select * from `users` where `id` = ?) union (select * from `users` where `id` in (?, ?)) order by field (`id`, ?, ?) desc', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => 2, 2 => 3, 3 => 3, 4 => 2], $builder->getBindings());
     }
 
     public function testUnionLimitsAndOffsets()
