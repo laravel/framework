@@ -81,7 +81,8 @@ class ChainedBatch implements ShouldQueue
                 $jobs[$k] = new ChainedBatch($job);
             }
 
-}
+        }
+
         return $jobs;
     }
 }

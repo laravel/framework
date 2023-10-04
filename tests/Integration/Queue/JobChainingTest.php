@@ -323,11 +323,6 @@ class JobChainingTest extends TestCase
         $this->assertEquals(['c1', 'c2', 'bc1', 'bc2', 'b1', 'b2-0', 'b2-1', 'b2-2', 'b2-3', 'b2', 'b3', 'b4', 'c3'], JobRunRecorder::$results);
     }
 
-    /**
-     * @group debug
-     *
-     * @return void
-     */
     public function testChainBatchChainBatch()
     {
         Bus::chain([
@@ -361,6 +356,7 @@ class JobChainingTest extends TestCase
             Bus::batch([
                 new JobChainingTestFailingBatchedJob('fb1'),
             ])->catch(fn () => JobRunRecorder::recordFailure('batch failed')),
+            new JobChainingNamedTestJob('c3'),
         ])->catch(fn () => JobRunRecorder::recordFailure('chain failed'))->dispatch();
 
         $this->assertEquals(['c1', 'c2'], JobRunRecorder::$results);
