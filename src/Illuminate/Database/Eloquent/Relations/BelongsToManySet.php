@@ -65,7 +65,7 @@ class BelongsToManySet extends Relation
             if ($this->setIsLocal) {
                 $query->whereIn($this->foreignKey, explode(',', $this->getParentKey()));
             } else {
-                $query->whereRaw('FIND_IN_SET(?, ' . $this->foreignKey . ')', $this->getParentKey());
+                $query->whereRaw('FIND_IN_SET(?, '.$this->foreignKey.')', $this->getParentKey());
             }
 
             $query->whereNotNull($this->foreignKey);
@@ -90,7 +90,7 @@ class BelongsToManySet extends Relation
         } else {
             foreach ($models as $model) {
                 $this->query->orWhereRaw(
-                    'FIND_IN_SET(?, ' . $this->foreignKey . ')',
+                    'FIND_IN_SET(?, '.$this->foreignKey.')',
                     $model->getAttribute($this->localKey)
                 );
             }
@@ -183,7 +183,7 @@ class BelongsToManySet extends Relation
     }
 
     /**
-     * Get the value of a many-to-many relationship
+     * Get the value of a many-to-many relationship.
      *
      * @param  array  $dictionary
      * @param  string  $key
@@ -232,7 +232,7 @@ class BelongsToManySet extends Relation
      */
     public function getResults()
     {
-        return !is_null($this->getParentKey())
+        return ! is_null($this->getParentKey())
             ? $this->query->get()
             : $this->related->newCollection();
     }
