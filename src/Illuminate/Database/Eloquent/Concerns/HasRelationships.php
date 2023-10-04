@@ -567,11 +567,12 @@ trait HasRelationships
      * Define a many-to-many relationship from set collumn.
      *
      * @param  string  $related
-     * @param  string  $localKey  (set)
+     * @param  string  $localKey
      * @param  string|null  $foreignKey
+     * @param  bool|true  $setLocal
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToManySet
      */
-    public function belongsToManySet($related, $localKey, $foreignKey = null)
+    public function belongsToManySet($related, $localKey, $foreignKey = null, $setLocal = true)
     {
         $instance = $this->newRelatedInstance($related);
 
@@ -583,7 +584,8 @@ trait HasRelationships
             $instance->newQuery(),
             $this,
             $instance->getTable().'.'.$foreignKey,
-            $localKey
+            $localKey,
+            $setLocal
         );
     }
 
@@ -596,9 +598,9 @@ trait HasRelationships
      * @param  string  $localKey
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToManySet
      */
-    public function newBelongsToManySet(Builder $query, Model $parent, $foreignKey, $localKey)
+    public function newBelongsToManySet(Builder $query, Model $parent, $foreignKey, $localKey, $setLocal)
     {
-        return new BelongsToManySet($query, $parent, $foreignKey, $localKey);
+        return new BelongsToManySet($query, $parent, $foreignKey, $localKey, $setLocal);
     }
 
     /**

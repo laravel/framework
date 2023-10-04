@@ -2,11 +2,56 @@
 
 namespace Illuminate\Database\Eloquent\Relations;
 
+use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithDictionary;
 
-class BelongsToManySet extends HasMany
+class BelongsToManySet extends Relation
 {
+    use InteractsWithDictionary;
+
+    /**
+     * The foreign key of the parent model.
+     *
+     * @var string
+     */
+    protected $foreignKey;
+
+    /**
+     * The local key of the parent model.
+     *
+     * @var string
+     */
+    protected $localKey;
+
+    /**
+     * The location of the set collumn.
+     *
+     * @var bool
+     */
+    protected $setIsLocal = true;
+
+
+    /**
+     * Create a new has one or many relationship instance.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param  \Illuminate\Database\Eloquent\Model  $parent
+     * @param  string  $foreignKey
+     * @param  string  $localKey
+     * @param  bool  $setLocal
+     * @return void
+     */
+    public function __construct(Builder $query, Model $parent, $foreignKey, $localKey, $setIsLocal)
+    {
+        $this->localKey = $localKey;
+        $this->foreignKey = $foreignKey;
+        $this->setIsLocal = $setIsLocal;
+
+        parent::__construct($query, $parent);
+    }
+
     /**
      * Set the base constraints on the relation query.
      *
@@ -17,7 +62,11 @@ class BelongsToManySet extends HasMany
         if (static::$constraints) {
             $query = $this->getRelationQuery();
 
-            $query->whereIn($this->foreignKey, explode(',', $this->getParentKey()));
+            if ($this->setIsLocal) {
+                $query->whereIn($this->foreignKey, explode(',', $this->getParentKey()));
+            } else {
+                $query->whereRaw('FIND_IN_SET(?, ' . $this->foreignKey . ')', $this->getParentKey());
+            }
 
             $query->whereNotNull($this->foreignKey);
         }
@@ -31,11 +80,80 @@ class BelongsToManySet extends HasMany
      */
     public function addEagerConstraints(array $models)
     {
-        $whereIn = $this->whereInMethod($this->parent, $this->localKey);
+        if ($this->setIsLocal) {
+            $whereIn = $this->whereInMethod($this->parent, $this->localKey);
 
-        $this->query->{$whereIn}(
-            $this->foreignKey, $this->getSets($models, $this->localKey)
-        );
+            $this->query->{$whereIn}(
+                $this->foreignKey,
+                $this->getSets($models, $this->localKey)
+            );
+        } else {
+            foreach ($models as $model) {
+                $this->query->orWhereRaw(
+                    'FIND_IN_SET(?, ' . $this->foreignKey . ')',
+                    $model->getAttribute($this->localKey)
+                );
+            }
+        }
+    }
+
+    /**
+     * Initialize the relation on a set of models.
+     *
+     * @param  array  $models
+     * @param  string  $relation
+     * @return array
+     */
+    public function initRelation(array $models, $relation)
+    {
+        foreach ($models as $model) {
+            $model->setRelation($relation, $this->related->newCollection());
+        }
+
+        return $models;
+    }
+
+    /**
+     * Match the eagerly loaded results to their parents.
+     *
+     * @param  array  $models
+     * @param  \Illuminate\Database\Eloquent\Collection  $results
+     * @param  string  $relation
+     * @return array
+     */
+    public function match(array $models, Collection $results, $relation)
+    {
+        $dictionary = $this->buildDictionary($results);
+
+        // Once we have the dictionary we can simply spin through the parent models to
+        // link them up with their children using the keyed dictionary to make the
+        // matching very convenient and easy work. Then we'll just return them.
+        foreach ($models as $model) {
+            $relations = collect($this->getSet($model, $this->localKey))->map(function ($value) use ($dictionary) {
+                return isset($dictionary[$key = $value]) ? $this->getRelationValue($dictionary, $key) : null;
+            })->flatten()->values()->unique(null, true)->filter()->all();
+
+            $model->setRelation(
+                $relation,
+                $this->related->newCollection($relations)
+            );
+        }
+
+        return $models;
+    }
+
+    /**
+     * Get all of the primary keys for an array of models.
+     *
+     * @param  array  $models
+     * @param  string|null  $key
+     * @return array
+     */
+    protected function getKeys(array $models, $key = null)
+    {
+        return collect($models)->map(function ($value) use ($key) {
+            return $key ? $value->getAttribute($key) : $value->getKey();
+        })->values()->unique(null, true)->sort()->all();
     }
 
     /**
@@ -65,31 +183,79 @@ class BelongsToManySet extends HasMany
     }
 
     /**
-     * Match the eagerly loaded results to their many parents.
+     * Get the value of a many-to-many relationship
      *
-     * @param  array  $models
+     * @param  array  $dictionary
+     * @param  string  $key
+     * @return mixed
+     */
+    protected function getRelationValue(array $dictionary, $key)
+    {
+        $value = $dictionary[$key];
+
+        return $this->related->newCollection($value);
+    }
+
+    /**
+     * Build model dictionary keyed by the relation's foreign key.
+     *
      * @param  \Illuminate\Database\Eloquent\Collection  $results
-     * @param  string  $relation
-     * @param  string  $type
      * @return array
      */
-    protected function matchOneOrMany(array $models, Collection $results, $relation, $type)
+    protected function buildDictionary(Collection $results)
     {
-        $dictionary = $this->buildDictionary($results);
+        $foreign = $this->getForeignKeyName();
 
-        // Once we have the dictionary we can simply spin through the parent models to
-        // link them up with their children using the keyed dictionary to make the
-        // matching very convenient and easy work. Then we'll just return them.
-        foreach ($models as $model) {
-            $relations = collect($this->getSet($model, $this->localKey))->map(function ($value) use ($dictionary, $type) {
-                return isset($dictionary[$key = $value]) ? $this->getRelationValue($dictionary, $key, $type) : null;
-            })->flatten()->values()->unique(null, true)->filter()->all();
-
-            $model->setRelation(
-                $relation, $this->related->newCollection($relations)
-            );
+        if ($this->setIsLocal) {
+            return $results->mapToDictionary(function ($result) use ($foreign) {
+                return [$this->getDictionaryKey($result->{$foreign}) => $result];
+            })->all();
         }
 
-        return $models;
+        $dictionary = [];
+
+        foreach ($results as $result) {
+            $keys = explode(',', $result->{$foreign});
+
+            foreach ($keys as $key) {
+                $dictionary[$key][] = $result;
+            }
+        }
+
+        return $dictionary;
+    }
+
+    /**
+     * Get the results of the relationship.
+     *
+     * @return mixed
+     */
+    public function getResults()
+    {
+        return !is_null($this->getParentKey())
+            ? $this->query->get()
+            : $this->related->newCollection();
+    }
+
+    /**
+     * Get the key value of the parent's local key.
+     *
+     * @return mixed
+     */
+    public function getParentKey()
+    {
+        return $this->parent->getAttribute($this->localKey);
+    }
+
+    /**
+     * Get the plain foreign key.
+     *
+     * @return string
+     */
+    public function getForeignKeyName()
+    {
+        $segments = explode('.', $this->foreignKey);
+
+        return end($segments);
     }
 }
