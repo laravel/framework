@@ -304,6 +304,26 @@ class EventFake implements Dispatcher, Fake
     }
 
     /**
+     * Dispatch multiple events and call their listeners.
+     *
+     * @param  array<int|string, mixed>  $events
+     * @return void
+     */
+    public function dispatchMultiple($events)
+    {
+        foreach ($events as $event => $payload) {
+            if (is_int($event)) {
+                // The payload is the event itself.
+                $this->dispatch($payload);
+
+                continue;
+            }
+
+            $this->dispatch($event, $payload);
+        }
+    }
+
+    /**
      * Determine if an event should be faked or actually dispatched.
      *
      * @param  string  $eventName

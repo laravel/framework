@@ -41,6 +41,17 @@ class NullDispatcher implements DispatcherContract
     }
 
     /**
+     * Don't fire multiple events.
+     *
+     * @param  array<int|string, mixed>  $events
+     * @return void
+     */
+    public function dispatchMultiple($events)
+    {
+        //
+    }
+
+    /**
      * Don't register an event and payload to be fired later.
      *
      * @param  string  $event

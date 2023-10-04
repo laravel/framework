@@ -138,6 +138,42 @@ class EventFakeTest extends TestCase
         $this->assertEquals(['important'], Event::dispatch('important-event'));
     }
 
+    public function testEventsAreFakedWhenMultipleDispatchedObject()
+    {
+        Event::fake();
+
+        Event::dispatchMultiple([new NonImportantEvent(), new AnotherEvent()]);
+
+        Event::assertDispatched(NonImportantEvent::class);
+        Event::assertDispatched(AnotherEvent::class);
+    }
+
+    public function testEventsAreFakedWhenMultipleDispatchedArray()
+    {
+        Event::fake();
+
+        Event::dispatchMultiple([
+            NonImportantEvent::class => 'foo',
+            AnotherEvent::class => 'bar'
+        ]);
+
+        Event::assertDispatched(NonImportantEvent::class);
+        Event::assertDispatched(AnotherEvent::class);
+    }
+
+    public function testEventsAreFakedWhenMultipleDispatchedArrayNoPayload()
+    {
+        Event::fake();
+
+        Event::dispatchMultiple([
+            NonImportantEvent::class,
+            AnotherEvent::class
+        ]);
+
+        Event::assertDispatched(NonImportantEvent::class);
+        Event::assertDispatched(AnotherEvent::class);
+    }
+
     public function testAssertListening()
     {
         Event::fake();
@@ -199,6 +235,11 @@ class Post extends Model
 class NonImportantEvent
 {
     //
+}
+
+class AnotherEvent
+{
+
 }
 
 class PostEventSubscriber
