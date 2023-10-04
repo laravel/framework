@@ -49,6 +49,14 @@ interface Dispatcher
     public function dispatch($event, $payload = [], $halt = false);
 
     /**
+     * Dispatch multiple events and call their listeners.
+     *
+     * @param  array<int|string, mixed>  $events
+     * @return void
+     */
+    public function dispatchMultiple($events);
+
+    /**
      * Register an event and payload to be fired later.
      *
      * @param  string  $event

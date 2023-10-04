@@ -269,6 +269,28 @@ class Dispatcher implements DispatcherContract
     }
 
     /**
+     * Dispatch multiple events and call their listeners.
+     *
+     * @param  array<int|string, mixed>  $events
+     * @return void
+     */
+    public function dispatchMultiple($events)
+    {
+        foreach ($events as $event => $payload) {
+            if (is_object($payload)) {
+                // The payload is the event itself.
+                $this->dispatch($payload);
+
+                continue;
+            }
+
+            [$event, $payload] = $this->parseEventAndPayload($event, $payload);
+
+            $this->dispatch($event, $payload);
+        }
+    }
+
+    /**
      * Parse the given event and payload and prepare them for dispatching.
      *
      * @param  mixed  $event

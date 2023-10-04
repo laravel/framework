@@ -37,6 +37,43 @@ class EventsDispatcherTest extends TestCase
         $this->assertSame('barbar', $_SERVER['__event.test']);
     }
 
+    public function testMultipleEventsCanBeDispatchedArray()
+    {
+        unset($_SERVER['__event.test_foo']);
+        unset($_SERVER['__event.test_bar']);
+        $d = new Dispatcher;
+        $d->listen('foo', fn ($foo) => $_SERVER['__event.test_foo'] = $foo);
+        $d->listen('bar', fn ($bar) => $_SERVER['__event.test_bar'] = $bar);
+        $d->dispatchMultiple([
+            'foo' => 'bar',
+            'bar' => 'baz',
+        ]);
+
+        $this->assertSame('bar', $_SERVER['__event.test_foo']);
+        $this->assertSame('baz', $_SERVER['__event.test_bar']);
+    }
+
+    public function testMultipleEventsCanBeDispatchedObject()
+    {
+        unset($_SERVER['__event.test_foo']);
+        unset($_SERVER['__event.test_bar']);
+        $d = new Dispatcher;
+
+        $d->listen(ExampleEvent::class, function () {
+            $_SERVER['__event.test_foo'] = 'one';
+        });
+        $d->listen(AnotherEvent::class, function () {
+            $_SERVER['__event.test_bar'] = 'two';
+        });
+        $d->dispatchMultiple([
+            new ExampleEvent,
+            new AnotherEvent
+        ]);
+
+        $this->assertSame('one', $_SERVER['__event.test_foo']);
+        $this->assertSame('two', $_SERVER['__event.test_bar']);
+    }
+
     public function testHaltingEventExecution()
     {
         unset($_SERVER['__event.test']);
