@@ -32,7 +32,6 @@ class BelongsToManySet extends Relation
      */
     protected $setIsLocal = true;
 
-
     /**
      * Create a new has one or many relationship instance.
      *
