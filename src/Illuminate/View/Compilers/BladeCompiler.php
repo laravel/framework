@@ -259,7 +259,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
         foreach ($this->prepareStringsForCompilationUsing as $callback) {
             $value = $callback($value);
         }
-        
+
         $value = $this->storeUncompiledBlocks($value);
 
         // First we will compile the Blade component tags. This is a precompile style
