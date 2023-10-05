@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Database;
 
 use BadMethodCallException;
 use Closure;
+use Exception;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Database\Eloquent\Builder;
@@ -16,6 +17,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Query\Builder as BaseBuilder;
 use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\Query\Processors\Processor;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection as BaseCollection;
 use Mockery as m;
@@ -2133,6 +2135,69 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertEquals(1, $result);
 
         Carbon::setTestNow(null);
+    }
+
+    public function testCreateOrFirstMethodCreatesNewRecord()
+    {
+        Carbon::setTestNow('2023-01-01 00:00:00');
+
+        Model::unguarded(function () {
+            $model = new EloquentBuilderTestStubStringPrimaryKey();
+            $this->mockConnectionForModel($model, 'SQLite');
+            $model->getConnection()->shouldReceive('transactionLevel')->andReturn(0);
+            $model->getConnection()->shouldReceive('getName')->andReturn('sqlite');
+
+            $model->getConnection()->expects('insert')->with(
+                'insert into "foo_table" ("attr", "val", "updated_at", "created_at") values (?, ?, ?, ?)',
+                ['foo', 'bar', '2023-01-01 00:00:00', '2023-01-01 00:00:00'],
+            )->andReturnTrue();
+
+            $result = $model->newQuery()->createOrFirst(['attr' => 'foo'], ['val' => 'bar']);
+            $this->assertEquals([
+                'attr' => 'foo',
+                'val' => 'bar',
+                'created_at' => '2023-01-01T00:00:00.000000Z',
+                'updated_at' => '2023-01-01T00:00:00.000000Z',
+            ], $result->toArray());
+        });
+    }
+
+    public function testCreateOrFirstMethodRetrievesExistingRecord()
+    {
+        Carbon::setTestNow('2023-01-01 00:00:00');
+
+        Model::unguarded(function () {
+            $model = new EloquentBuilderTestStubStringPrimaryKey();
+            $this->mockConnectionForModel($model, 'SQLite');
+            $model->getConnection()->shouldReceive('transactionLevel')->andReturn(0);
+            $model->getConnection()->shouldReceive('getName')->andReturn('sqlite');
+
+            $sql = 'insert into "foo_table" ("attr", "val", "updated_at", "created_at") values (?, ?, ?, ?)';
+            $bindings = ['foo', 'bar', '2023-01-01 00:00:00', '2023-01-01 00:00:00'];
+
+            $model->getConnection()
+                ->expects('insert')
+                ->with($sql, $bindings)
+                ->andThrow(new UniqueConstraintViolationException('sqlite', $sql, $bindings, new Exception()));
+
+            $model->getConnection()
+                ->expects('select')
+                ->with('select * from "foo_table" where ("attr" = ?) limit 1', ['foo'], false)
+                ->andReturn([[
+                    'attr' => 'foo',
+                    'val' => 'bar',
+                    'created_at' => '2023-01-01 00:00:00',
+                    'updated_at' => '2023-01-01 00:00:00',
+                ]]);
+
+            $result = $model->newQuery()->createOrFirst(['attr' => 'foo'], ['val' => 'bar']);
+            $this->assertEquals([
+                'attr' => 'foo',
+                'val' => 'bar',
+                'created_at' => '2023-01-01T00:00:00.000000Z',
+                'updated_at' => '2023-01-01T00:00:00.000000Z',
+            ], $result->toArray());
+        });
     }
 
     public function testUpsert()
