@@ -390,6 +390,19 @@ class Str
     }
 
     /**
+     * Returns the initials version of the string.
+     *
+     * @param  string  $string
+     * @return string
+     */
+    public static function initials($string)
+    {
+        $words = explode(' ', static::replace(['-', '_'], ' ', $string));
+
+        return implode(array_map(fn ($word) => static::substr($word, 0, 1), $words));
+    }
+    
+    /**
      * Determine if a given string matches a given pattern.
      *
      * @param  string|iterable<string>  $pattern
