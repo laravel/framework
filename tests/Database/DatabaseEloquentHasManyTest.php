@@ -413,6 +413,118 @@ class DatabaseEloquentHasManyTest extends TestCase
         });
     }
 
+    public function testFirstOrCreateMethodCreatesNewRecord()
+    {
+        Carbon::setTestNow('2023-01-01 00:00:00');
+
+        Model::unguarded(function () {
+            $model = new EloquentHasManyModelStubWithRelation();
+            $model->id = '123';
+            $this->mockConnectionForModel($model, 'SQLite');
+            $model->getConnection()->shouldReceive('transactionLevel')->andReturn(0);
+            $model->getConnection()->shouldReceive('getName')->andReturn('sqlite');
+
+            $model->getConnection()
+                ->expects('select')
+                ->with('select * from "child_table" where "child_table"."parent_id" = ? and "child_table"."parent_id" is not null and ("attr" = ?) limit 1', ['123', 'foo'], true)
+                ->andReturn([]);
+
+            $model->getConnection()->expects('insert')->with(
+                'insert into "child_table" ("attr", "val", "parent_id", "updated_at", "created_at") values (?, ?, ?, ?, ?)',
+                ['foo', 'bar', '123', '2023-01-01 00:00:00', '2023-01-01 00:00:00'],
+            )->andReturnTrue();
+
+            $result = $model->child()->firstOrCreate(['attr' => 'foo'], ['val' => 'bar']);
+            $this->assertEquals([
+                'parent_id' => '123',
+                'attr' => 'foo',
+                'val' => 'bar',
+                'created_at' => '2023-01-01T00:00:00.000000Z',
+                'updated_at' => '2023-01-01T00:00:00.000000Z',
+            ], $result->toArray());
+        });
+    }
+
+    public function testFirstOrCreateMethodRetrievesExistingRecord()
+    {
+        Carbon::setTestNow('2023-01-01 00:00:00');
+
+        Model::unguarded(function () {
+            $model = new EloquentHasManyModelStubWithRelation();
+            $model->id = '123';
+            $this->mockConnectionForModel($model, 'SQLite');
+            $model->getConnection()->shouldReceive('transactionLevel')->andReturn(0);
+            $model->getConnection()->shouldReceive('getName')->andReturn('sqlite');
+
+            $model->getConnection()
+                ->expects('select')
+                ->with('select * from "child_table" where "child_table"."parent_id" = ? and "child_table"."parent_id" is not null and ("attr" = ?) limit 1', ['123', 'foo'], true)
+                ->andReturn([[
+                    'parent_id' => '123',
+                    'attr' => 'foo',
+                    'val' => 'bar',
+                    'created_at' => '2023-01-01T00:00:00.000000Z',
+                    'updated_at' => '2023-01-01T00:00:00.000000Z',
+                ]]);
+
+            $result = $model->child()->firstOrCreate(['attr' => 'foo'], ['val' => 'bar']);
+            $this->assertEquals([
+                'parent_id' => '123',
+                'attr' => 'foo',
+                'val' => 'bar',
+                'created_at' => '2023-01-01T00:00:00.000000Z',
+                'updated_at' => '2023-01-01T00:00:00.000000Z',
+            ], $result->toArray());
+        });
+    }
+
+    public function testFirstOrCreateMethodRetrievesRecordCreatedJustNow()
+    {
+        Carbon::setTestNow('2023-01-01 00:00:00');
+
+        Model::unguarded(function () {
+            $model = new EloquentHasManyModelStubWithRelation();
+            $model->id = '123';
+            $this->mockConnectionForModel($model, 'SQLite');
+            $model->getConnection()->shouldReceive('transactionLevel')->andReturn(0);
+            $model->getConnection()->shouldReceive('getName')->andReturn('sqlite');
+
+            $model->getConnection()
+                ->expects('select')
+                ->with('select * from "child_table" where "child_table"."parent_id" = ? and "child_table"."parent_id" is not null and ("attr" = ?) limit 1', ['123', 'foo'], true)
+                ->andReturn([]);
+
+            $sql = 'insert into "child_table" ("attr", "val", "parent_id", "updated_at", "created_at") values (?, ?, ?, ?, ?)';
+            $bindings = ['foo', 'bar', '123', '2023-01-01 00:00:00', '2023-01-01 00:00:00'];
+
+            $model->getConnection()
+                ->expects('insert')
+                ->with($sql, $bindings)
+                ->andThrow(new UniqueConstraintViolationException('sqlite', $sql, $bindings, new Exception()));
+
+            $model->getConnection()
+                ->expects('select')
+                // FIXME: duplicate conditions
+                ->with('select * from "child_table" where "child_table"."parent_id" = ? and "child_table"."parent_id" is not null and ("attr" = ?) and ("attr" = ?) limit 1', ['123', 'foo', 'foo'], false)
+                ->andReturn([[
+                    'parent_id' => '123',
+                    'attr' => 'foo',
+                    'val' => 'bar',
+                    'created_at' => '2023-01-01 00:00:00',
+                    'updated_at' => '2023-01-01 00:00:00',
+                ]]);
+
+            $result = $model->child()->firstOrCreate(['attr' => 'foo'], ['val' => 'bar']);
+            $this->assertEquals([
+                'parent_id' => '123',
+                'attr' => 'foo',
+                'val' => 'bar',
+                'created_at' => '2023-01-01T00:00:00.000000Z',
+                'updated_at' => '2023-01-01T00:00:00.000000Z',
+            ], $result->toArray());
+        });
+    }
+
     protected function getRelation()
     {
         $builder = m::mock(Builder::class);
