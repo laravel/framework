@@ -246,7 +246,7 @@ class Grammar extends BaseGrammar
      */
     protected function whereRaw(Builder $query, $where)
     {
-        return $where['sql'];
+        return $where['sql']->getValue($this);
     }
 
     /**
