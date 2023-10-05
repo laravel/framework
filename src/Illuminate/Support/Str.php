@@ -390,7 +390,7 @@ class Str
     }
 
     /**
-     * Returns the initials version of the string.
+     * Returns the initials of the string.
      *
      * @param  string  $string
      * @return string
