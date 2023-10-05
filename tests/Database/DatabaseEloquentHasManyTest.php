@@ -3,10 +3,13 @@
 namespace Illuminate\Tests\Database;
 
 use Exception;
+use Illuminate\Database\ConnectionInterface;
+use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Query\Builder as BaseBuilder;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -356,6 +359,22 @@ class DatabaseEloquentHasManyTest extends TestCase
         return new HasMany($builder, $parent, 'table.foreign_key', 'id');
     }
 
+    protected function mockConnectionForModel($model, $database)
+    {
+        $grammarClass = 'Illuminate\Database\Query\Grammars\\'.$database.'Grammar';
+        $processorClass = 'Illuminate\Database\Query\Processors\\'.$database.'Processor';
+        $grammar = new $grammarClass;
+        $processor = new $processorClass;
+        $connection = m::mock(ConnectionInterface::class, ['getQueryGrammar' => $grammar, 'getPostProcessor' => $processor]);
+        $connection->shouldReceive('query')->andReturnUsing(function () use ($connection, $grammar, $processor) {
+            return new BaseBuilder($connection, $grammar, $processor);
+        });
+        $connection->shouldReceive('getDatabaseName')->andReturn('database');
+        $resolver = m::mock(ConnectionResolverInterface::class, ['connection' => $connection]);
+        $class = get_class($model);
+        $class::setConnectionResolver($resolver);
+    }
+
     protected function expectNewModel($relation, $attributes = null)
     {
         $model = $this->getMockBuilder(Model::class)->onlyMethods(['setAttribute', 'save'])->getMock();
@@ -389,4 +408,27 @@ class DatabaseEloquentHasManyTest extends TestCase
 class EloquentHasManyModelStub extends Model
 {
     public $foreign_key = 'foreign.value';
+}
+
+class EloquentHasManyModelStubWithRelation extends Model
+{
+    public $incrementing = false;
+
+    protected $table = 'parent_table';
+
+    protected $keyType = 'string';
+
+    public function child()
+    {
+        return $this->hasMany(EloquentHasManyChildModelStub::class, 'parent_id');
+    }
+}
+
+class EloquentHasManyChildModelStub extends Model
+{
+    public $incrementing = false;
+
+    protected $table = 'child_table';
+
+    protected $keyType = 'string';
 }
