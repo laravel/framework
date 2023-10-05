@@ -1174,7 +1174,7 @@ trait HasAttributes
      *
      * @param  string  $enumClass
      * @param  string|int  $value
-     * @return \UnitEnum|\BackedEnum
+     * @return \UnitEnum|\BackedEnum|null
      */
     protected function getEnumCaseFromValue($enumClass, $value)
     {
