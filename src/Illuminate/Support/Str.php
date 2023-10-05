@@ -401,7 +401,7 @@ class Str
 
         return implode(array_map(fn ($word) => static::substr($word, 0, 1), $words));
     }
-    
+
     /**
      * Determine if a given string matches a given pattern.
      *
