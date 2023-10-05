@@ -1,6 +1,42 @@
 # Release Notes for 10.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v10.25.0...10.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v10.26.2...10.x)
+
+## [v10.26.2](https://github.com/laravel/framework/compare/v10.26.1...v10.26.2) - 2023-10-03
+
+* Revert "Hint query builder closures (#48562)" by @taylorotwell in https://github.com/laravel/framework/pull/48620
+
+## [v10.26.1](https://github.com/laravel/framework/compare/v10.26.0...v10.26.1) - 2023-10-03
+
+- [10.x] Fix selection of vendor files after searching by [@jessarcher](https://github.com/jessarcher) in https://github.com/laravel/framework/pull/48619
+
+## [v10.26.0](https://github.com/laravel/framework/compare/v10.25.2...v10.26.0) - 2023-10-03
+
+- [10.x] Convert Expression to string for from in having subqueries by @ikari7789 in https://github.com/laravel/framework/pull/48525
+- [10.x] Allow searching on `vendor:publish` prompt by @jessarcher in https://github.com/laravel/framework/pull/48586
+- [10.x] Enhance Test Coverage for Macroable Trait by @salehhashemi1992 in https://github.com/laravel/framework/pull/48583
+- [10.x] Add new SQL error messages by @magnusvin in https://github.com/laravel/framework/pull/48601
+- [10.x] Ensure array cache considers milliseconds by @timacdonald in https://github.com/laravel/framework/pull/48573
+- [10.x] Prevent `session:table` command from creating duplicates by @jessarcher in https://github.com/laravel/framework/pull/48602
+- [10.x] Handle expiration in seconds by @timacdonald in https://github.com/laravel/framework/pull/48600
+- [10.x] Avoid duplicate code for create table commands by extending new `Illuminate\Console\MigrationGeneratorCommand` by @crynobone in https://github.com/laravel/framework/pull/48603
+- [10.x] Add Closure Type Hinting for Query Builders by @AJenbo in https://github.com/laravel/framework/pull/48562
+
+## [v10.25.2](https://github.com/laravel/framework/compare/v10.25.1...v10.25.2) - 2023-09-28
+
+- [10.x] Account for new MariaDB platform by [@timacdonald](https://github.com/timacdonald) in https://github.com/laravel/framework/pull/48563
+- [10.x] Add Windows fallback for `multisearch` prompt by [@jessarcher](https://github.com/jessarcher) in https://github.com/laravel/framework/pull/48565
+- Revert "[10.x] Fix blade failing to compile when mixing inline/block [@php](https://github.com/php) directives" by [@driesvints](https://github.com/driesvints) in https://github.com/laravel/framework/pull/48575
+- [10.x] Added Validation Macro Functionality Tests by [@salehhashemi1992](https://github.com/salehhashemi1992) in https://github.com/laravel/framework/pull/48570
+- Revert expiry time changes by [@driesvints](https://github.com/driesvints) in https://github.com/laravel/framework/pull/48576
+
+## [v10.25.1](https://github.com/laravel/framework/compare/v10.25.0...v10.25.1) - 2023-09-27
+
+- [10.x] Correct parameter type on MakesHttpRequests:followRedirects() by [@AJenbo](https://github.com/AJenbo) in https://github.com/laravel/framework/pull/48557
+- [10.x] Fix `firstOrNew` on `HasManyThrough` relations by [@tonysm](https://github.com/tonysm) in https://github.com/laravel/framework/pull/48542
+- [10.x] Fix "after commit" callbacks not running on nested transactions using `RefreshDatabase` or `DatabaseMigrations` by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/48523
+- [10.x] Use the dedicated key getters in BelongsTo by [@iamgergo](https://github.com/iamgergo) in https://github.com/laravel/framework/pull/48509
+- [10.x] Fix undefined constant `STDIN` error with `Artisan::call` during a request by [@jessarcher](https://github.com/jessarcher) in https://github.com/laravel/framework/pull/48559
 
 ## [v10.25.0](https://github.com/laravel/framework/compare/v10.24.0...v10.25.0) - 2023-09-26
 
