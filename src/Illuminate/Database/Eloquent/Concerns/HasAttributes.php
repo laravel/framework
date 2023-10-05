@@ -1179,7 +1179,7 @@ trait HasAttributes
     protected function getEnumCaseFromValue($enumClass, $value)
     {
         return is_subclass_of($enumClass, BackedEnum::class)
-                ? $enumClass::from($value)
+                ? $enumClass::tryFrom($value)
                 : constant($enumClass.'::'.$value);
     }
 
