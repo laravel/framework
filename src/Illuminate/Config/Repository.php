@@ -92,6 +92,19 @@ class Repository implements ArrayAccess, ConfigContract
             Arr::set($this->items, $key, $value);
         }
     }
+	
+	/**
+	 * Unset a given configuration key.
+	 *
+	 * @param  array|string  $key
+	 * @return void
+	 */
+	public function unset($key)
+	{
+		$keys = is_array($key) ? $key : [$key];
+
+		Arr::forget($items, $keys);
+	}
 
     /**
      * Prepend a value onto an array configuration value.
