@@ -39,6 +39,7 @@ use Illuminate\Foundation\Console\ConfigShowCommand;
 use Illuminate\Foundation\Console\ConsoleMakeCommand;
 use Illuminate\Foundation\Console\DocsCommand;
 use Illuminate\Foundation\Console\DownCommand;
+use Illuminate\Foundation\Console\EnumMakeCommand;
 use Illuminate\Foundation\Console\EnvironmentCommand;
 use Illuminate\Foundation\Console\EnvironmentDecryptCommand;
 use Illuminate\Foundation\Console\EnvironmentEncryptCommand;
@@ -206,6 +207,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         'TestMake' => TestMakeCommand::class,
         'VendorPublish' => VendorPublishCommand::class,
         'ViewMake' => ViewMakeCommand::class,
+        'EnumMake' => EnumMakeCommand::class,
     ];
 
     /**
