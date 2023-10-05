@@ -5708,7 +5708,7 @@ SQL;
         $grammar = new MySqlGrammar;
         $processor = m::mock(Processor::class);
 
-        return new Builder(m::mock(ConnectionInterface::class), $grammar, $processor);
+        return new Builder($this->getConnection(), $grammar, $processor);
     }
 
     protected function getSQLiteBuilder()
