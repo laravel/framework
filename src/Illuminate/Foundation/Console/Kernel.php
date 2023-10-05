@@ -14,6 +14,7 @@ use Illuminate\Contracts\Console\Kernel as KernelContract;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Foundation\Console\Events\CommandHandled;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Env;
@@ -198,14 +199,20 @@ class Kernel implements KernelContract
 
             $this->bootstrap();
 
-            return $this->getArtisan()->run($input, $output);
+            $exitCode = $this->getArtisan()->run($input, $output);
         } catch (Throwable $e) {
             $this->reportException($e);
 
             $this->renderException($output, $e);
 
-            return 1;
+            $exitCode = 1;
         }
+
+        $this->events->dispatch(
+            new CommandHandled($input, $output, $exitCode)
+        );
+
+        return $exitCode;
     }
 
     /**
