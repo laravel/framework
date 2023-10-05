@@ -101,9 +101,7 @@ class Repository implements ArrayAccess, ConfigContract
 	 */
 	public function unset($key)
 	{
-		$keys = is_array($key) ? $key : [$key];
-
-		Arr::forget($items, $keys);
+		Arr::forget($this->items, Arr::wrap($key));
 	}
 
     /**
