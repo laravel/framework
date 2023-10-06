@@ -405,4 +405,3 @@ class HasManyThroughParent extends Model
         );
     }
 }
-
