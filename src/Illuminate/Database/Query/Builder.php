@@ -2306,11 +2306,7 @@ class Builder implements BuilderContract
     public function orderBy($column, $direction = 'asc')
     {
         if ($this->isQueryable($column)) {
-            [$query, $bindings] = $this->createSub($column);
-
-            $column = new Expression('('.$query.')');
-
-            $this->addBinding($bindings, $this->unions ? 'unionOrder' : 'order');
+            $column = $this->prepareQueryableColumn($column, $this->unions ? 'unionOrder' : 'order');
         }
 
         $direction = $this->validateOrderByDirection($direction);
@@ -2349,11 +2345,7 @@ class Builder implements BuilderContract
         $bindingType = $this->unions ? 'unionOrder' : 'order';
 
         if ($this->isQueryable($column)) {
-            [$query, $bindings] = $this->createSub($column);
-
-            $column = new Expression('('.$query.')');
-
-            $this->addBinding($bindings, $bindingType);
+            $column = $this->prepareQueryableColumn($column, $bindingType);
         }
 
         $direction = $this->validateOrderByDirection($direction);
@@ -4028,5 +4020,20 @@ class Builder implements BuilderContract
             throw new InvalidArgumentException('Order direction must be "asc" or "desc".');
         }
         return $direction;
+    }
+
+    /**
+     * @param EloquentBuilder|string|Closure|Builder|ExpressionContract $column
+     * @param string $bindingType
+     * @return Expression
+     */
+    protected function prepareQueryableColumn(EloquentBuilder|string|Closure|Builder|ExpressionContract $column, string $bindingType): Expression
+    {
+        [$query, $bindings] = $this->createSub($column);
+
+        $column = new Expression('(' . $query . ')');
+
+        $this->addBinding($bindings, $bindingType);
+        return $column;
     }
 }
