@@ -277,7 +277,7 @@ class HasManyThrough extends Relation
             return $instance;
         }
 
-        return $this->create(array_merge($attributes, $values));
+        return $this->createOrFirst(array_merge($attributes, $values));
     }
 
     /**
