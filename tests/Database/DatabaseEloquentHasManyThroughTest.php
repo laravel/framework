@@ -402,8 +402,6 @@ class HasManyThroughParent extends Model
             HasManyThroughPivot::class,
             'parent_id',
             'pivot_id',
-            'id',
-            'id',
         );
     }
 }
