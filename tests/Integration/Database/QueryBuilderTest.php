@@ -407,13 +407,13 @@ class QueryBuilderTest extends DatabaseTestCase
             'Bar Post',
         ], DB::table('posts')->select(['content', 'id', 'title'])->pluck('title')->toArray());
 
-        # Test without SELECT override.
+        // Test without SELECT override.
         $this->assertSame([
             'Foo Post',
             'Bar Post',
         ], DB::table('posts')->pluck('title')->toArray());
 
-        # Test specific key.
+        // Test specific key.
         $this->assertSame([
             1 => 'Foo Post',
             2 => 'Bar Post',
