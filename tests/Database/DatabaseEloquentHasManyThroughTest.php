@@ -184,6 +184,7 @@ class DatabaseEloquentHasManyThroughTest extends TestCase
 
             $parent->getConnection()
                 ->expects('select')
+                // FIXME: duplicate conditions
                 ->with(
                     'select "child".*, "pivot"."parent_id" as "laravel_through_key" from "child" inner join "pivot" on "pivot"."id" = "child"."pivot_id" where "pivot"."parent_id" = ? and ("attr" = ?) and ("attr" = ? and "val" = ?) limit 1',
                     ['123', 'foo', 'foo', 'bar'],
@@ -315,6 +316,7 @@ class DatabaseEloquentHasManyThroughTest extends TestCase
 
             $parent->getConnection()
                 ->expects('select')
+                // FIXME: duplicate conditions
                 ->with(
                     'select "child".*, "pivot"."parent_id" as "laravel_through_key" from "child" inner join "pivot" on "pivot"."id" = "child"."pivot_id" where "pivot"."parent_id" = ? and ("attr" = ?) and ("attr" = ? and "val" = ?) limit 1',
                     ['123', 'foo', 'foo', 'bar'],
