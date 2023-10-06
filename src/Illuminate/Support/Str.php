@@ -994,6 +994,8 @@ class Str
     }
 
     /**
+     * Convert the given value to a string or return the given fallback on failure.
+     *
      * @param  mixed  $value
      * @param  string  $fallback
      * @return string
