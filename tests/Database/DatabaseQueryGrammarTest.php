@@ -21,9 +21,9 @@ class DatabaseQueryGrammarTest extends TestCase
         $grammar = new Grammar;
         $reflection = new ReflectionClass($grammar);
         $method = $reflection->getMethod('whereRaw');
-        $expression = ['sql' => new Expression('select * from "users"')];
+        $expressionArray = ['sql' => new Expression('select * from "users"')];
 
-        $rawQuery = $method->invoke($grammar, $builder, $expression);
+        $rawQuery = $method->invoke($grammar, $builder, $expressionArray);
 
         $this->assertSame('select * from "users"', $rawQuery);
     }
@@ -34,9 +34,9 @@ class DatabaseQueryGrammarTest extends TestCase
         $grammar = new Grammar;
         $reflection = new ReflectionClass($grammar);
         $method = $reflection->getMethod('whereRaw');
-        $array = ['sql' => 'select * from "users"'];
+        $stringArray = ['sql' => 'select * from "users"'];
 
-        $rawQuery = $method->invoke($grammar, $builder, $array);
+        $rawQuery = $method->invoke($grammar, $builder, $stringArray);
 
         $this->assertSame('select * from "users"', $rawQuery);
     }
