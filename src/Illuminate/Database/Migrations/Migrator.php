@@ -194,13 +194,8 @@ class Migrator
 
     /**
      * Run "up" a migration instance.
-     *
-     * @param  string  $file
-     * @param  int  $batch
-     * @param  bool  $pretend
-     * @return void
      */
-    protected function runUp($file, $batch, $pretend)
+    protected function runUp(string $file, int $batch, bool $pretend): void
     {
         // First we will resolve a "real" instance of the migration class from this
         // migration file name. Once we have the instances we can run the actual
@@ -210,7 +205,9 @@ class Migrator
         $name = $this->getMigrationName($file);
 
         if ($pretend) {
-            return $this->pretendToRun($migration, 'up');
+            $this->pretendToRun($migration, 'up');
+
+            return;
         }
 
         $this->write(Task::class, $name, fn () => $this->runMigration($migration, 'up'));
@@ -363,13 +360,8 @@ class Migrator
 
     /**
      * Run "down" a migration instance.
-     *
-     * @param  string  $file
-     * @param  object  $migration
-     * @param  bool  $pretend
-     * @return void
      */
-    protected function runDown($file, $migration, $pretend)
+    protected function runDown(string $file, object $migration, bool $pretend): void
     {
         // First we will get the file name of the migration so we can resolve out an
         // instance of the migration. Once we get an instance we can either run a
@@ -379,7 +371,9 @@ class Migrator
         $name = $this->getMigrationName($file);
 
         if ($pretend) {
-            return $this->pretendToRun($instance, 'down');
+            $this->pretendToRun($instance, 'down');
+
+            return;
         }
 
         $this->write(Task::class, $name, fn () => $this->runMigration($instance, 'down'));
@@ -421,12 +415,8 @@ class Migrator
 
     /**
      * Pretend to run the migrations.
-     *
-     * @param  object  $migration
-     * @param  string  $method
-     * @return void
      */
-    protected function pretendToRun($migration, $method)
+    protected function pretendToRun(object $migration, string $method): void
     {
         try {
             $name = get_class($migration);
@@ -746,11 +736,9 @@ class Migrator
     /**
      * Write to the console's output.
      *
-     * @param  string  $component
-     * @param  array<int, string>|string  ...$arguments
-     * @return void
+     * @param  array<int, string>|string|callable  ...$arguments
      */
-    protected function write($component, ...$arguments)
+    protected function write(string $component, ...$arguments): void
     {
         if ($this->output && class_exists($component)) {
             (new $component($this->output))->render(...$arguments);
