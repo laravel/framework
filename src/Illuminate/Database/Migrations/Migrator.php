@@ -311,12 +311,8 @@ class Migrator
 
     /**
      * Rolls all of the currently applied migrations back.
-     *
-     * @param  array|string  $paths
-     * @param  bool  $pretend
-     * @return array
      */
-    public function reset($paths = [], $pretend = false)
+    public function reset(array|string $paths = [], bool $pretend = false): array
     {
         // Next, we will reverse the migration list so we can run them back in the
         // correct order for resetting this database. This will allow us to get

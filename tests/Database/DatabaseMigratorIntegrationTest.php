@@ -292,7 +292,7 @@ class DatabaseMigratorIntegrationTest extends TestCase
     {
         $this->migrator->setConnection('default');
         $this->migrator->run([__DIR__.'/migrations/one'], ['database' => 'sqlite2']);
-        $this->migrator->reset([__DIR__.'/migrations/one'], ['database' => 'sqlite2']);
+        $this->migrator->reset([__DIR__.'/migrations/one']);
         $this->assertSame('default', $this->migrator->getConnection());
     }
 }
