@@ -15,6 +15,7 @@ class DatabaseQueryGrammarTest extends TestCase
     {
         m::close();
     }
+
     public function testWhereRawReturnsStringWhenExpressionPassed()
     {
         $builder = m::mock(Builder::class);
