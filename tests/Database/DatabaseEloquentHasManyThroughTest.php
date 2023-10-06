@@ -22,6 +22,72 @@ class DatabaseEloquentHasManyThroughTest extends TestCase
         parent::setUp();
         Carbon::setTestNow('2023-01-01 00:00:00');
     }
+
+    public function testCreateOrFirstMethodCreatesNewRecord(): void
+    {
+        Model::unguarded(function () {
+            $parent = new HasManyThroughParent();
+            $this->mockConnectionForModel($parent, 'SQLite');
+            $parent->getConnection()->shouldReceive('transactionLevel')->andReturn(0);
+            $parent->getConnection()->shouldReceive('getName')->andReturn('sqlite');
+            $parent->getConnection()->expects('insert')->with(
+                'insert into "child" ("attr", "val", "updated_at", "created_at") values (?, ?, ?, ?)',
+                ['foo', 'bar', '2023-01-01 00:00:00', '2023-01-01 00:00:00'],
+            )->andReturnTrue();
+
+            $result = $parent->children()->createOrFirst(['attr' => 'foo'], ['val' => 'bar']);
+            $this->assertEquals([
+                'attr' => 'foo',
+                'val' => 'bar',
+                'created_at' => '2023-01-01T00:00:00.000000Z',
+                'updated_at' => '2023-01-01T00:00:00.000000Z',
+            ], $result->toArray());
+        });
+    }
+
+    public function testCreateOrFirstMethodRetrievesExistingRecord(): void
+    {
+        Model::unguarded(function () {
+            $parent = new HasManyThroughParent();
+            $parent->id = '123';
+            $this->mockConnectionForModel($parent, 'SQLite');
+            $parent->getConnection()->shouldReceive('transactionLevel')->andReturn(0);
+            $parent->getConnection()->shouldReceive('getName')->andReturn('sqlite');
+
+            $sql = 'insert into "child" ("attr", "val", "updated_at", "created_at") values (?, ?, ?, ?)';
+            $bindings = ['foo', 'bar', '2023-01-01 00:00:00', '2023-01-01 00:00:00'];
+
+            $parent->getConnection()
+                ->expects('insert')
+                ->with($sql, $bindings)
+                ->andThrow(new UniqueConstraintViolationException('sqlite', $sql, $bindings, new Exception()));
+
+            $parent->getConnection()
+                ->expects('select')
+                ->with(
+                    'select "child".*, "pivot"."parent_id" as "laravel_through_key" from "child" inner join "pivot" on "pivot"."child_id" = "child"."id" where "pivot"."parent_id" = ? and ("attr" = ?) limit 1',
+                    ['123', 'foo'],
+                    true,
+                )
+                ->andReturn([[
+                    'parent_id' => '123',
+                    'attr' => 'foo',
+                    'val' => 'bar',
+                    'created_at' => '2023-01-01 00:00:00',
+                    'updated_at' => '2023-01-01 00:00:00',
+                ]]);
+
+            $result = $parent->children()->createOrFirst(['attr' => 'foo'], ['val' => 'bar']);
+            $this->assertEquals([
+                'parent_id' => '123',
+                'attr' => 'foo',
+                'val' => 'bar',
+                'created_at' => '2023-01-01T00:00:00.000000Z',
+                'updated_at' => '2023-01-01T00:00:00.000000Z',
+            ], $result->toArray());
+        });
+    }
+
     protected function mockConnectionForModel(Model $model, string $database): void
     {
         $grammarClass = 'Illuminate\Database\Query\Grammars\\'.$database.'Grammar';
