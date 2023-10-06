@@ -15,6 +15,7 @@ use Ramsey\Uuid\Generator\CombGenerator;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidFactory;
 use Symfony\Component\Uid\Ulid;
+use Throwable;
 use Traversable;
 use voku\helper\ASCII;
 
@@ -986,10 +987,26 @@ class Str
         $result = array_shift($segments);
 
         foreach ($segments as $segment) {
-            $result .= (array_shift($replace) ?? $search).$segment;
+            $result .= self::toStringOr(array_shift($replace) ?? $search, $search).$segment;
         }
 
         return $result;
+    }
+
+    /**
+     * Convert the given value to a string or return the given fallback on failure.
+     *
+     * @param  mixed  $value
+     * @param  string  $fallback
+     * @return string
+     */
+    private static function toStringOr($value, $fallback)
+    {
+        try {
+            return (string) $value;
+        } catch (Throwable $e) {
+            return $fallback;
+        }
     }
 
     /**
