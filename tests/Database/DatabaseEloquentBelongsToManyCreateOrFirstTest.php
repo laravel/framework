@@ -21,21 +21,21 @@ class DatabaseEloquentBelongsToManyCreateOrFirstTest extends TestCase
 {
     public function setUp(): void
     {
-        parent::setUp();
         Carbon::setTestNow('2023-01-01 00:00:00');
     }
 
     protected function tearDown(): void
     {
+        Carbon::setTestNow();
         Mockery::close();
     }
 
     public function testCreateOrFirstMethodCreatesNewRelated(): void
     {
-        $source = new BelongsToManyCreateOrFirstSource();
+        $source = new BelongsToManyCreateOrFirstTestSourceModel();
         $source->id = 123;
         $this->mockConnectionForModels(
-            [$source, new BelongsToManyCreateOrFirstRelated()],
+            [$source, new BelongsToManyCreateOrFirstTestRelatedModel()],
             'SQLite',
             [456],
         );
@@ -65,10 +65,10 @@ class DatabaseEloquentBelongsToManyCreateOrFirstTest extends TestCase
 
     public function testCreateOrFirstMethodAssociatesExistingRelated(): void
     {
-        $source = new BelongsToManyCreateOrFirstSource();
+        $source = new BelongsToManyCreateOrFirstTestSourceModel();
         $source->id = 123;
         $this->mockConnectionForModels(
-            [$source, new BelongsToManyCreateOrFirstRelated()],
+            [$source, new BelongsToManyCreateOrFirstTestRelatedModel()],
             'SQLite',
         );
         $source->getConnection()->shouldReceive('transactionLevel')->andReturn(0);
@@ -112,10 +112,10 @@ class DatabaseEloquentBelongsToManyCreateOrFirstTest extends TestCase
 
     public function testFirstOrCreateMethodRetrievesExistingRelatedAlreadyAssociated(): void
     {
-        $source = new BelongsToManyCreateOrFirstSource();
+        $source = new BelongsToManyCreateOrFirstTestSourceModel();
         $source->id = 123;
         $this->mockConnectionForModels(
-            [$source, new BelongsToManyCreateOrFirstRelated()],
+            [$source, new BelongsToManyCreateOrFirstTestRelatedModel()],
             'SQLite',
         );
         $source->getConnection()->shouldReceive('transactionLevel')->andReturn(0);
@@ -155,10 +155,10 @@ class DatabaseEloquentBelongsToManyCreateOrFirstTest extends TestCase
 
     public function testCreateOrFirstMethodRetrievesExistingRelatedAssociatedJustNow(): void
     {
-        $source = new BelongsToManyCreateOrFirstSource();
+        $source = new BelongsToManyCreateOrFirstTestSourceModel();
         $source->id = 123;
         $this->mockConnectionForModels(
-            [$source, new BelongsToManyCreateOrFirstRelated()],
+            [$source, new BelongsToManyCreateOrFirstTestRelatedModel()],
             'SQLite',
         );
         $source->getConnection()->shouldReceive('transactionLevel')->andReturn(0);
@@ -225,10 +225,10 @@ class DatabaseEloquentBelongsToManyCreateOrFirstTest extends TestCase
 
     public function testFirstOrCreateMethodRetrievesExistingRelatedAndAssociatesIt(): void
     {
-        $source = new BelongsToManyCreateOrFirstSource();
+        $source = new BelongsToManyCreateOrFirstTestSourceModel();
         $source->id = 123;
         $this->mockConnectionForModels(
-            [$source, new BelongsToManyCreateOrFirstRelated()],
+            [$source, new BelongsToManyCreateOrFirstTestRelatedModel()],
             'SQLite',
         );
         $source->getConnection()->shouldReceive('transactionLevel')->andReturn(0);
@@ -280,7 +280,7 @@ class DatabaseEloquentBelongsToManyCreateOrFirstTest extends TestCase
 
     public function testFirstOrCreateMethodFallsBackToCreateOrFirst(): void
     {
-        $source = new class() extends BelongsToManyCreateOrFirstSource
+        $source = new class() extends BelongsToManyCreateOrFirstTestSourceModel
         {
             protected function newBelongsToMany(Builder $query, Model $parent, $table, $foreignPivotKey, $relatedPivotKey, $parentKey, $relatedKey, $relationName = null): BelongsToMany
             {
@@ -289,7 +289,7 @@ class DatabaseEloquentBelongsToManyCreateOrFirstTest extends TestCase
                 $relation
                     ->expects('createOrFirst')
                     ->with(['attr' => 'foo'], ['val' => 'bar'], [], true)
-                    ->andReturn(new BelongsToManyCreateOrFirstRelated([
+                    ->andReturn(new BelongsToManyCreateOrFirstTestRelatedModel([
                         'id' => 456,
                         'attr' => 'foo',
                         'val' => 'bar',
@@ -302,7 +302,7 @@ class DatabaseEloquentBelongsToManyCreateOrFirstTest extends TestCase
         };
         $source->id = 123;
         $this->mockConnectionForModels(
-            [$source, new BelongsToManyCreateOrFirstRelated()],
+            [$source, new BelongsToManyCreateOrFirstTestRelatedModel()],
             'SQLite',
         );
         $source->getConnection()->shouldReceive('transactionLevel')->andReturn(0);
@@ -366,7 +366,7 @@ class DatabaseEloquentBelongsToManyCreateOrFirstTest extends TestCase
 /**
  * @property int $id
  */
-class BelongsToManyCreateOrFirstRelated extends Model
+class BelongsToManyCreateOrFirstTestRelatedModel extends Model
 {
     protected $table = 'related_table';
     protected $guarded = [];
@@ -375,7 +375,7 @@ class BelongsToManyCreateOrFirstRelated extends Model
 /**
  * @property int $id
  */
-class BelongsToManyCreateOrFirstSource extends Model
+class BelongsToManyCreateOrFirstTestSourceModel extends Model
 {
     protected $table = 'source_table';
     protected $guarded = [];
@@ -383,7 +383,7 @@ class BelongsToManyCreateOrFirstSource extends Model
     public function related(): BelongsToMany
     {
         return $this->belongsToMany(
-            BelongsToManyCreateOrFirstRelated::class,
+            BelongsToManyCreateOrFirstTestRelatedModel::class,
             'pivot_table',
             'source_id',
             'related_id',

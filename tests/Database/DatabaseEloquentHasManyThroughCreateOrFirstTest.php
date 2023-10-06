@@ -20,18 +20,18 @@ class DatabaseEloquentHasManyThroughCreateOrFirstTest extends TestCase
 {
     public function setUp(): void
     {
-        parent::setUp();
         Carbon::setTestNow('2023-01-01 00:00:00');
     }
 
     protected function tearDown(): void
     {
+        Carbon::setTestNow();
         Mockery::close();
     }
 
     public function testCreateOrFirstMethodCreatesNewRecord(): void
     {
-        $parent = new HasManyThroughCreateOrFirstParent();
+        $parent = new HasManyThroughCreateOrFirstTestParentModel();
         $parent->id = 123;
         $this->mockConnectionForModel($parent, 'SQLite', [789]);
         $parent->getConnection()->shouldReceive('transactionLevel')->andReturn(0);
@@ -54,7 +54,7 @@ class DatabaseEloquentHasManyThroughCreateOrFirstTest extends TestCase
 
     public function testCreateOrFirstMethodRetrievesExistingRecord(): void
     {
-        $parent = new HasManyThroughCreateOrFirstParent();
+        $parent = new HasManyThroughCreateOrFirstTestParentModel();
         $parent->id = 123;
         $this->mockConnectionForModel($parent, 'SQLite');
         $parent->getConnection()->shouldReceive('transactionLevel')->andReturn(0);
@@ -100,7 +100,7 @@ class DatabaseEloquentHasManyThroughCreateOrFirstTest extends TestCase
 
     public function testFirstOrCreateMethodCreatesNewRecord(): void
     {
-        $parent = new HasManyThroughCreateOrFirstParent();
+        $parent = new HasManyThroughCreateOrFirstTestParentModel();
         $parent->id = 123;
         $this->mockConnectionForModel($parent, 'SQLite', [789]);
         $parent->getConnection()->shouldReceive('transactionLevel')->andReturn(0);
@@ -133,7 +133,7 @@ class DatabaseEloquentHasManyThroughCreateOrFirstTest extends TestCase
 
     public function testFirstOrCreateMethodRetrievesExistingRecord(): void
     {
-        $parent = new HasManyThroughCreateOrFirstParent();
+        $parent = new HasManyThroughCreateOrFirstTestParentModel();
         $parent->id = 123;
         $this->mockConnectionForModel($parent, 'SQLite');
         $parent->getConnection()->shouldReceive('transactionLevel')->andReturn(0);
@@ -171,7 +171,7 @@ class DatabaseEloquentHasManyThroughCreateOrFirstTest extends TestCase
 
     public function testFirstOrCreateMethodRetrievesRecordCreatedJustNow(): void
     {
-        $parent = new HasManyThroughCreateOrFirstParent();
+        $parent = new HasManyThroughCreateOrFirstTestParentModel();
         $parent->id = 123;
         $this->mockConnectionForModel($parent, 'SQLite');
         $parent->getConnection()->shouldReceive('transactionLevel')->andReturn(0);
@@ -227,7 +227,7 @@ class DatabaseEloquentHasManyThroughCreateOrFirstTest extends TestCase
 
     public function testUpdateOrCreateMethodCreatesNewRecord(): void
     {
-        $parent = new HasManyThroughCreateOrFirstParent();
+        $parent = new HasManyThroughCreateOrFirstTestParentModel();
         $parent->id = 123;
         $this->mockConnectionForModel($parent, 'SQLite', [789]);
         $parent->getConnection()->shouldReceive('transactionLevel')->andReturn(0);
@@ -263,7 +263,7 @@ class DatabaseEloquentHasManyThroughCreateOrFirstTest extends TestCase
 
     public function testUpdateOrCreateMethodUpdatesExistingRecord(): void
     {
-        $parent = new HasManyThroughCreateOrFirstParent();
+        $parent = new HasManyThroughCreateOrFirstTestParentModel();
         $parent->id = 123;
         $this->mockConnectionForModel($parent, 'SQLite');
         $parent->getConnection()->shouldReceive('transactionLevel')->andReturn(0);
@@ -309,7 +309,7 @@ class DatabaseEloquentHasManyThroughCreateOrFirstTest extends TestCase
 
     public function testUpdateOrCreateMethodUpdatesRecordCreatedJustNow(): void
     {
-        $parent = new HasManyThroughCreateOrFirstParent();
+        $parent = new HasManyThroughCreateOrFirstTestParentModel();
         $parent->id = 123;
         $this->mockConnectionForModel($parent, 'SQLite');
         $parent->getConnection()->shouldReceive('transactionLevel')->andReturn(0);
@@ -391,7 +391,7 @@ class DatabaseEloquentHasManyThroughCreateOrFirstTest extends TestCase
  * @property int $id
  * @property int $pivot_id
  */
-class HasManyThroughCreateOrFirstChild extends Model
+class HasManyThroughCreateOrFirstTestChildModel extends Model
 {
     protected $table = 'child';
     protected $guarded = [];
@@ -401,7 +401,7 @@ class HasManyThroughCreateOrFirstChild extends Model
  * @property int $id
  * @property int $parent_id
  */
-class HasManyThroughCreateOrFirstPivot extends Model
+class HasManyThroughCreateOrFirstTestPivotModel extends Model
 {
     protected $table = 'pivot';
     protected $guarded = [];
@@ -410,7 +410,7 @@ class HasManyThroughCreateOrFirstPivot extends Model
 /**
  * @property int $id
  */
-class HasManyThroughCreateOrFirstParent extends Model
+class HasManyThroughCreateOrFirstTestParentModel extends Model
 {
     protected $table = 'parent';
     protected $guarded = [];
@@ -418,8 +418,8 @@ class HasManyThroughCreateOrFirstParent extends Model
     public function children(): HasManyThrough
     {
         return $this->hasManyThrough(
-            HasManyThroughCreateOrFirstChild::class,
-            HasManyThroughCreateOrFirstPivot::class,
+            HasManyThroughCreateOrFirstTestChildModel::class,
+            HasManyThroughCreateOrFirstTestPivotModel::class,
             'parent_id',
             'pivot_id',
         );
