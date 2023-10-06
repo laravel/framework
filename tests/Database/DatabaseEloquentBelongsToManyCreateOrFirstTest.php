@@ -286,16 +286,24 @@ class DatabaseEloquentBelongsToManyCreateOrFirstTest extends TestCase
             {
                 $relation = Mockery::mock(BelongsToMany::class)->makePartial();
                 $relation->__construct(...func_get_args());
+                $instance = new BelongsToManyCreateOrFirstTestRelatedModel([
+                    'id' => 456,
+                    'attr' => 'foo',
+                    'val' => 'bar',
+                    'created_at' => '2023-01-01T00:00:00.000000Z',
+                    'updated_at' => '2023-01-01T00:00:00.000000Z',
+                    'pivot' => [
+                        'source_id' => 123,
+                        'related_id' => 456,
+                    ],
+                ]);
+                $instance->exists = true;
+                $instance->wasRecentlyCreated = false;
+                $instance->syncOriginal();
                 $relation
                     ->expects('createOrFirst')
                     ->with(['attr' => 'foo'], ['val' => 'bar'], [], true)
-                    ->andReturn(new BelongsToManyCreateOrFirstTestRelatedModel([
-                        'id' => 456,
-                        'attr' => 'foo',
-                        'val' => 'bar',
-                        'created_at' => '2023-01-01T00:00:00.000000Z',
-                        'updated_at' => '2023-01-01T00:00:00.000000Z',
-                    ]));
+                    ->andReturn($instance);
 
                 return $relation;
             }
@@ -331,6 +339,104 @@ class DatabaseEloquentBelongsToManyCreateOrFirstTest extends TestCase
             'id' => 456,
             'attr' => 'foo',
             'val' => 'bar',
+            'created_at' => '2023-01-01T00:00:00.000000Z',
+            'updated_at' => '2023-01-01T00:00:00.000000Z',
+            'pivot' => [
+                'source_id' => 123,
+                'related_id' => 456,
+            ],
+        ], $result->toArray());
+    }
+
+    public function testUpdateOrCreateMethodCreatesNewRelated(): void
+    {
+        $source = new class() extends BelongsToManyCreateOrFirstTestSourceModel
+        {
+            protected function newBelongsToMany(Builder $query, Model $parent, $table, $foreignPivotKey, $relatedPivotKey, $parentKey, $relatedKey, $relationName = null): BelongsToMany
+            {
+                $relation = Mockery::mock(BelongsToMany::class)->makePartial();
+                $relation->__construct(...func_get_args());
+                $instance = new BelongsToManyCreateOrFirstTestRelatedModel([
+                    'id' => 456,
+                    'attr' => 'foo',
+                    'val' => 'bar',
+                    'created_at' => '2023-01-01T00:00:00.000000Z',
+                    'updated_at' => '2023-01-01T00:00:00.000000Z',
+                ]);
+                $instance->exists = true;
+                $instance->wasRecentlyCreated = true;
+                $instance->syncOriginal();
+                $relation
+                    ->expects('firstOrCreate')
+                    ->with(['attr' => 'foo'], ['val' => 'baz'], [], true)
+                    ->andReturn($instance);
+
+                return $relation;
+            }
+        };
+        $source->id = 123;
+        $this->mockConnectionForModels(
+            [$source, new BelongsToManyCreateOrFirstTestRelatedModel()],
+            'SQLite',
+        );
+
+        $result = $source->related()->updateOrCreate(['attr' => 'foo'], ['val' => 'baz']);
+        $this->assertEquals([
+            'id' => 456,
+            'attr' => 'foo',
+            'val' => 'bar',
+            'created_at' => '2023-01-01T00:00:00.000000Z',
+            'updated_at' => '2023-01-01T00:00:00.000000Z',
+        ], $result->toArray());
+    }
+
+    public function testUpdateOrCreateMethodUpdatesExistingRelated(): void
+    {
+        $source = new class() extends BelongsToManyCreateOrFirstTestSourceModel
+        {
+            protected function newBelongsToMany(Builder $query, Model $parent, $table, $foreignPivotKey, $relatedPivotKey, $parentKey, $relatedKey, $relationName = null): BelongsToMany
+            {
+                $relation = Mockery::mock(BelongsToMany::class)->makePartial();
+                $relation->__construct(...func_get_args());
+                $instance = new BelongsToManyCreateOrFirstTestRelatedModel([
+                    'id' => 456,
+                    'attr' => 'foo',
+                    'val' => 'bar',
+                    'created_at' => '2023-01-01T00:00:00.000000Z',
+                    'updated_at' => '2023-01-01T00:00:00.000000Z',
+                ]);
+                $instance->exists = true;
+                $instance->wasRecentlyCreated = false;
+                $instance->syncOriginal();
+                $relation
+                    ->expects('firstOrCreate')
+                    ->with(['attr' => 'foo'], ['val' => 'baz'], [], true)
+                    ->andReturn($instance);
+
+                return $relation;
+            }
+        };
+        $source->id = 123;
+        $this->mockConnectionForModels(
+            [$source, new BelongsToManyCreateOrFirstTestRelatedModel()],
+            'SQLite',
+        );
+        $source->getConnection()->shouldReceive('transactionLevel')->andReturn(0);
+        $source->getConnection()->shouldReceive('getName')->andReturn('sqlite');
+
+        $source->getConnection()
+            ->expects('update')
+            ->with(
+                'update "related_table" set "val" = ?, "updated_at" = ? where "id" = ?',
+                ['baz', '2023-01-01 00:00:00', 456],
+            )
+            ->andReturn(1);
+
+        $result = $source->related()->updateOrCreate(['attr' => 'foo'], ['val' => 'baz']);
+        $this->assertEquals([
+            'id' => 456,
+            'attr' => 'foo',
+            'val' => 'baz',
             'created_at' => '2023-01-01T00:00:00.000000Z',
             'updated_at' => '2023-01-01T00:00:00.000000Z',
         ], $result->toArray());
