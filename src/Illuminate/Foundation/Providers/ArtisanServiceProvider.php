@@ -215,10 +215,8 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
      */
     public function register()
     {
-        $this->registerCommands(array_merge(
-            $this->commands,
-            $this->devCommands
-        ));
+        $this->registerCommands($this->commands);
+        $this->registerCommands($this->devCommands, true);
 
         Signals::resolveAvailabilityUsing(function () {
             return $this->app->runningInConsole()
@@ -231,9 +229,10 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
      * Register the given commands.
      *
      * @param  array  $commands
+     * @param  bool  $bool
      * @return void
      */
-    protected function registerCommands(array $commands)
+    protected function registerCommands(array $commands, bool $dev = false)
     {
         foreach ($commands as $commandName => $command) {
             $method = "register{$commandName}Command";
@@ -242,6 +241,10 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
                 $this->{$method}();
             } else {
                 $this->app->singleton($command);
+            }
+
+            if ($dev === true && $this->app->isProduction()) {
+                $this->callAfterResolving($command, fn ($console) => $console->setHidden(true));
             }
         }
 
