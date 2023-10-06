@@ -10,6 +10,7 @@ use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Query\Builder;
+use Illuminate\Database\QueryException;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Carbon;
 use Mockery;
@@ -78,6 +79,114 @@ class DatabaseEloquentHasManyThroughTest extends TestCase
                 ]]);
 
             $result = $parent->children()->createOrFirst(['attr' => 'foo'], ['val' => 'bar']);
+            $this->assertEquals([
+                'parent_id' => '123',
+                'attr' => 'foo',
+                'val' => 'bar',
+                'created_at' => '2023-01-01T00:00:00.000000Z',
+                'updated_at' => '2023-01-01T00:00:00.000000Z',
+            ], $result->toArray());
+        });
+    }
+
+    public function testFirstOrCreateMethodCreatesNewRecord(): void
+    {
+        Model::unguarded(function () {
+            $parent = new HasManyThroughParent();
+            $parent->id = '123';
+            $this->mockConnectionForModel($parent, 'SQLite');
+            $parent->getConnection()->shouldReceive('transactionLevel')->andReturn(0);
+            $parent->getConnection()->shouldReceive('getName')->andReturn('sqlite');
+
+            $parent->getConnection()
+                ->expects('select')
+                ->with(
+                    'select "child".*, "pivot"."parent_id" as "laravel_through_key" from "child" inner join "pivot" on "pivot"."child_id" = "child"."id" where "pivot"."parent_id" = ? and ("attr" = ?) limit 1',
+                    ['123', 'foo'],
+                    true,
+                )
+                ->andReturn([]);
+
+            $parent->getConnection()->expects('insert')->with(
+                'insert into "child" ("attr", "val", "updated_at", "created_at") values (?, ?, ?, ?)',
+                ['foo', 'bar', '2023-01-01 00:00:00', '2023-01-01 00:00:00'],
+            )->andReturnTrue();
+
+            $result = $parent->children()->firstOrCreate(['attr' => 'foo'], ['val' => 'bar']);
+            $this->assertEquals([
+                'attr' => 'foo',
+                'val' => 'bar',
+                'created_at' => '2023-01-01T00:00:00.000000Z',
+                'updated_at' => '2023-01-01T00:00:00.000000Z',
+            ], $result->toArray());
+        });
+    }
+
+    public function testFirstOrCreateMethodRetrievesExistingRecord(): void
+    {
+        Model::unguarded(function () {
+            $parent = new HasManyThroughParent();
+            $parent->id = '123';
+            $this->mockConnectionForModel($parent, 'SQLite');
+            $parent->getConnection()->shouldReceive('transactionLevel')->andReturn(0);
+            $parent->getConnection()->shouldReceive('getName')->andReturn('sqlite');
+
+            $parent->getConnection()
+                ->expects('select')
+                ->with(
+                    'select "child".*, "pivot"."parent_id" as "laravel_through_key" from "child" inner join "pivot" on "pivot"."child_id" = "child"."id" where "pivot"."parent_id" = ? and ("attr" = ?) limit 1',
+                    ['123', 'foo'],
+                    true,
+                )
+                ->andReturn([[
+                    'parent_id' => '123',
+                    'attr' => 'foo',
+                    'val' => 'bar',
+                    'created_at' => '2023-01-01 00:00:00',
+                    'updated_at' => '2023-01-01 00:00:00',
+                ]]);
+
+            $result = $parent->children()->firstOrCreate(['attr' => 'foo'], ['val' => 'bar']);
+            $this->assertEquals([
+                'parent_id' => '123',
+                'attr' => 'foo',
+                'val' => 'bar',
+                'created_at' => '2023-01-01T00:00:00.000000Z',
+                'updated_at' => '2023-01-01T00:00:00.000000Z',
+            ], $result->toArray());
+        });
+    }
+
+    public function testFirstOrCreateMethodRetrievesRecordCreatedJustNow()
+    {
+        Model::unguarded(function () {
+            $parent = new HasManyThroughParent();
+            $parent->id = '123';
+            $this->mockConnectionForModel($parent, 'SQLite');
+            $parent->getConnection()->shouldReceive('transactionLevel')->andReturn(0);
+            $parent->getConnection()->shouldReceive('getName')->andReturn('sqlite');
+
+            $parent->getConnection()
+                ->expects('select')
+                ->with(
+                    'select "child".*, "pivot"."parent_id" as "laravel_through_key" from "child" inner join "pivot" on "pivot"."child_id" = "child"."id" where "pivot"."parent_id" = ? and ("attr" = ?) limit 1',
+                    ['123', 'foo'],
+                    true,
+                )
+                ->andReturn([]);
+
+            $sql = 'insert into "child" ("attr", "val", "updated_at", "created_at") values (?, ?, ?, ?)';
+            $bindings = ['foo', 'bar', '2023-01-01 00:00:00', '2023-01-01 00:00:00'];
+
+            $parent->getConnection()
+                ->expects('insert')
+                ->with($sql, $bindings)
+                ->andThrow(new QueryException('Integrity constraint violation', $sql, $bindings, new Exception()));
+
+            // Verify that it is directly thrown without being converted into retries or custom exceptions
+            $this->expectException(QueryException::class);
+            $this->expectExceptionMessage('Integrity constraint violation');
+            $result = $parent->children()->firstOrCreate(['attr' => 'foo'], ['val' => 'bar']);
             $this->assertEquals([
                 'parent_id' => '123',
                 'attr' => 'foo',
