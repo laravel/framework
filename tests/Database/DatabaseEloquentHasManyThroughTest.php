@@ -10,7 +10,6 @@ use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Query\Builder;
-use Illuminate\Database\QueryException;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Carbon;
 use Mockery;
@@ -66,7 +65,7 @@ class DatabaseEloquentHasManyThroughTest extends TestCase
             $parent->getConnection()
                 ->expects('select')
                 ->with(
-                    'select "child".*, "pivot"."parent_id" as "laravel_through_key" from "child" inner join "pivot" on "pivot"."child_id" = "child"."id" where "pivot"."parent_id" = ? and ("attr" = ?) limit 1',
+                    'select "child".*, "pivot"."parent_id" as "laravel_through_key" from "child" inner join "pivot" on "pivot"."id" = "child"."pivot_id" where "pivot"."parent_id" = ? and ("attr" = ?) limit 1',
                     ['123', 'foo'],
                     true,
                 )
@@ -101,7 +100,7 @@ class DatabaseEloquentHasManyThroughTest extends TestCase
             $parent->getConnection()
                 ->expects('select')
                 ->with(
-                    'select "child".*, "pivot"."parent_id" as "laravel_through_key" from "child" inner join "pivot" on "pivot"."child_id" = "child"."id" where "pivot"."parent_id" = ? and ("attr" = ?) limit 1',
+                    'select "child".*, "pivot"."parent_id" as "laravel_through_key" from "child" inner join "pivot" on "pivot"."id" = "child"."pivot_id" where "pivot"."parent_id" = ? and ("attr" = ?) limit 1',
                     ['123', 'foo'],
                     true,
                 )
@@ -134,7 +133,7 @@ class DatabaseEloquentHasManyThroughTest extends TestCase
             $parent->getConnection()
                 ->expects('select')
                 ->with(
-                    'select "child".*, "pivot"."parent_id" as "laravel_through_key" from "child" inner join "pivot" on "pivot"."child_id" = "child"."id" where "pivot"."parent_id" = ? and ("attr" = ?) limit 1',
+                    'select "child".*, "pivot"."parent_id" as "laravel_through_key" from "child" inner join "pivot" on "pivot"."id" = "child"."pivot_id" where "pivot"."parent_id" = ? and ("attr" = ?) limit 1',
                     ['123', 'foo'],
                     true,
                 )
@@ -169,7 +168,7 @@ class DatabaseEloquentHasManyThroughTest extends TestCase
             $parent->getConnection()
                 ->expects('select')
                 ->with(
-                    'select "child".*, "pivot"."parent_id" as "laravel_through_key" from "child" inner join "pivot" on "pivot"."child_id" = "child"."id" where "pivot"."parent_id" = ? and ("attr" = ?) limit 1',
+                    'select "child".*, "pivot"."parent_id" as "laravel_through_key" from "child" inner join "pivot" on "pivot"."id" = "child"."pivot_id" where "pivot"."parent_id" = ? and ("attr" = ?) limit 1',
                     ['123', 'foo'],
                     true,
                 )
@@ -181,12 +180,31 @@ class DatabaseEloquentHasManyThroughTest extends TestCase
             $parent->getConnection()
                 ->expects('insert')
                 ->with($sql, $bindings)
-                ->andThrow(new QueryException('Integrity constraint violation', $sql, $bindings, new Exception()));
+                ->andThrow(new UniqueConstraintViolationException('sqlite', $sql, $bindings, new Exception()));
 
-            // Verify that it is directly thrown without being converted into retries or custom exceptions
-            $this->expectException(QueryException::class);
-            $this->expectExceptionMessage('Integrity constraint violation');
-            $parent->children()->firstOrCreate(['attr' => 'foo'], ['val' => 'bar']);
+            $parent->getConnection()
+                ->expects('select')
+                ->with(
+                    'select "child".*, "pivot"."parent_id" as "laravel_through_key" from "child" inner join "pivot" on "pivot"."id" = "child"."pivot_id" where "pivot"."parent_id" = ? and ("attr" = ?) and ("attr" = ? and "val" = ?) limit 1',
+                    ['123', 'foo', 'foo', 'bar'],
+                    true,
+                )
+                ->andReturn([[
+                    'parent_id' => '123',
+                    'attr' => 'foo',
+                    'val' => 'bar',
+                    'created_at' => '2023-01-01T00:00:00.000000Z',
+                    'updated_at' => '2023-01-01T00:00:00.000000Z',
+                ]]);
+
+            $result = $parent->children()->firstOrCreate(['attr' => 'foo'], ['val' => 'bar']);
+            $this->assertEquals([
+                'parent_id' => '123',
+                'attr' => 'foo',
+                'val' => 'bar',
+                'created_at' => '2023-01-01T00:00:00.000000Z',
+                'updated_at' => '2023-01-01T00:00:00.000000Z',
+            ], $result->toArray());
         });
     }
 
@@ -202,7 +220,7 @@ class DatabaseEloquentHasManyThroughTest extends TestCase
             $parent->getConnection()
                 ->expects('select')
                 ->with(
-                    'select "child".*, "pivot"."parent_id" as "laravel_through_key" from "child" inner join "pivot" on "pivot"."child_id" = "child"."id" where "pivot"."parent_id" = ? and ("attr" = ?) limit 1',
+                    'select "child".*, "pivot"."parent_id" as "laravel_through_key" from "child" inner join "pivot" on "pivot"."id" = "child"."pivot_id" where "pivot"."parent_id" = ? and ("attr" = ?) limit 1',
                     ['123', 'foo'],
                     true,
                 )
@@ -238,7 +256,7 @@ class DatabaseEloquentHasManyThroughTest extends TestCase
             $parent->getConnection()
                 ->expects('select')
                 ->with(
-                    'select "child".*, "pivot"."parent_id" as "laravel_through_key" from "child" inner join "pivot" on "pivot"."child_id" = "child"."id" where "pivot"."parent_id" = ? and ("attr" = ?) limit 1',
+                    'select "child".*, "pivot"."parent_id" as "laravel_through_key" from "child" inner join "pivot" on "pivot"."id" = "child"."pivot_id" where "pivot"."parent_id" = ? and ("attr" = ?) limit 1',
                     ['123', 'foo'],
                     true,
                 )
@@ -281,7 +299,7 @@ class DatabaseEloquentHasManyThroughTest extends TestCase
             $parent->getConnection()
                 ->expects('select')
                 ->with(
-                    'select "child".*, "pivot"."parent_id" as "laravel_through_key" from "child" inner join "pivot" on "pivot"."child_id" = "child"."id" where "pivot"."parent_id" = ? and ("attr" = ?) limit 1',
+                    'select "child".*, "pivot"."parent_id" as "laravel_through_key" from "child" inner join "pivot" on "pivot"."id" = "child"."pivot_id" where "pivot"."parent_id" = ? and ("attr" = ?) limit 1',
                     ['123', 'foo'],
                     true,
                 )
@@ -293,12 +311,31 @@ class DatabaseEloquentHasManyThroughTest extends TestCase
             $parent->getConnection()
                 ->expects('insert')
                 ->with($sql, $bindings)
-                ->andThrow(new QueryException('Integrity constraint violation', $sql, $bindings, new Exception()));
+                ->andThrow(new UniqueConstraintViolationException('sqlite', $sql, $bindings, new Exception()));
 
-            // Verify that it is directly thrown without being converted into retries or custom exceptions
-            $this->expectException(QueryException::class);
-            $this->expectExceptionMessage('Integrity constraint violation');
-            $parent->children()->firstOrCreate(['attr' => 'foo'], ['val' => 'bar']);
+            $parent->getConnection()
+                ->expects('select')
+                ->with(
+                    'select "child".*, "pivot"."parent_id" as "laravel_through_key" from "child" inner join "pivot" on "pivot"."id" = "child"."pivot_id" where "pivot"."parent_id" = ? and ("attr" = ?) and ("attr" = ? and "val" = ?) limit 1',
+                    ['123', 'foo', 'foo', 'bar'],
+                    true,
+                )
+                ->andReturn([[
+                    'id' => '123',
+                    'attr' => 'foo',
+                    'val' => 'bar',
+                    'created_at' => '2023-01-01T00:00:00.000000Z',
+                    'updated_at' => '2023-01-01T00:00:00.000000Z',
+                ]]);
+
+            $result = $parent->children()->firstOrCreate(['attr' => 'foo'], ['val' => 'bar']);
+            $this->assertEquals([
+                'id' => '123',
+                'attr' => 'foo',
+                'val' => 'bar',
+                'created_at' => '2023-01-01T00:00:00.000000Z',
+                'updated_at' => '2023-01-01T00:00:00.000000Z',
+            ], $result->toArray());
         });
     }
 
@@ -321,6 +358,7 @@ class DatabaseEloquentHasManyThroughTest extends TestCase
 
 /**
  * @property string $id
+ * @property string $pivot_id
  */
 class HasManyThroughChild extends Model
 {
@@ -334,7 +372,6 @@ class HasManyThroughChild extends Model
 /**
  * @property string $id
  * @property string $parent_id
- * @property string $child_id
  */
 class HasManyThroughPivot extends Model
 {
@@ -362,9 +399,9 @@ class HasManyThroughParent extends Model
             HasManyThroughChild::class,
             HasManyThroughPivot::class,
             'parent_id',
+            'pivot_id',
             'id',
             'id',
-            'child_id',
         );
     }
 }
