@@ -234,6 +234,8 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
      */
     protected function registerCommands(array $commands, bool $dev = false)
     {
+        $shouldBeHidden = $dev === true && $this->app->isProduction();
+
         foreach ($commands as $commandName => $command) {
             $method = "register{$commandName}Command";
 
@@ -243,7 +245,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
                 $this->app->singleton($command);
             }
 
-            if ($dev === true && $this->app->isProduction()) {
+            if ($shouldBeHidden === true) {
                 $this->callAfterResolving($command, fn ($console) => $console->setHidden(true));
             }
         }
