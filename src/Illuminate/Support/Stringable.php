@@ -304,6 +304,16 @@ class Stringable implements JsonSerializable, ArrayAccess
     }
 
     /**
+     * Returns the initials of the string.
+     *
+     * @return string
+     */
+    public function initials()
+    {
+        return Str::initials($this->value);
+    }
+
+    /**
      * Determine if a given string matches a given pattern.
      *
      * @param  string|iterable<string>  $pattern
