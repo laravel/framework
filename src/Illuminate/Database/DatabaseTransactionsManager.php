@@ -127,7 +127,7 @@ class DatabaseTransactionsManager
      */
     public function afterCommitCallbacksShouldBeExecuted($level)
     {
-        return $level === 1;
+        return $level === 0;
     }
 
     /**
