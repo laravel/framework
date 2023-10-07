@@ -292,14 +292,16 @@ class DatabaseConnectionTest extends TestCase
 
     public function testAfterCommitIsExecutedOnFinalCommit()
     {
-        $pdo = $this->getMockBuilder(DatabaseConnectionTestMockPDO::class)->onlyMethods(['beginTransaction','commit'])->getMock();
+        $pdo = $this->getMockBuilder(DatabaseConnectionTestMockPDO::class)->onlyMethods(['beginTransaction', 'commit'])->getMock();
         $transactionsManager = $this->getMockBuilder(DatabaseTransactionsManager::class)->onlyMethods(['afterCommitCallbacksShouldBeExecuted'])->getMock();
         $transactionsManager->expects($this->once())->method('afterCommitCallbacksShouldBeExecuted')->with(0)->willReturn(true);
 
         $connection = $this->getMockConnection([], $pdo);
         $connection->setTransactionManager($transactionsManager);
 
-        $connection->transaction(function(){});
+        $connection->transaction(function () {
+            // do nothing
+        });
     }
 
     public function testRollBackedFiresEventsIfSet()
