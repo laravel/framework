@@ -154,8 +154,32 @@ class DatabaseUserProvider implements UserProvider
      */
     public function validateCredentials(UserContract $user, array $credentials)
     {
-        return $this->hasher->check(
-            $credentials['password'], $user->getAuthPassword()
-        );
+        if (is_null($plain = $credentials['password'])) {
+            return false;
+        }
+
+        if (! $this->hasher->check($plain, $hash = $user->getAuthPassword())) {
+            return false;
+        }
+
+        if ($this->hasher->needsRehash($hash)) {
+            $this->rehashUserPassword($user, $plain);
+        }
+
+        return true;
+    }
+
+    /**
+     * Rehash the user's password.
+     *
+     * @param \Illuminate\Contracts\Auth\Authenticatable $user
+     * @param string $plain
+     * @return void
+     */
+    public function rehashUserPassword(UserContract $user, string $plain): void
+    {
+        $this->connection->table($this->table)
+            ->where($user->getAuthIdentifierName(), $user->getAuthIdentifier())
+            ->update([$user->getAuthPasswordName() => $this->hasher->make($plain)]);
     }
 }

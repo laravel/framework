@@ -132,12 +132,42 @@ class AuthEloquentUserProviderTest extends TestCase
     {
         $hasher = m::mock(Hasher::class);
         $hasher->shouldReceive('check')->once()->with('plain', 'hash')->andReturn(true);
+        $hasher->shouldReceive('needsRehash')->once()->with('hash')->andReturn(false);
         $provider = new EloquentUserProvider($hasher, 'foo');
         $user = m::mock(Authenticatable::class);
         $user->shouldReceive('getAuthPassword')->once()->andReturn('hash');
         $result = $provider->validateCredentials($user, ['password' => 'plain']);
 
         $this->assertTrue($result);
+    }
+
+    public function testCredentialValidationRequiresRehash()
+    {
+        $hasher = m::mock(Hasher::class);
+        $hasher->shouldReceive('check')->once()->with('plain', 'hash')->andReturn(true);
+        $hasher->shouldReceive('needsRehash')->once()->with('hash')->andReturn(true);
+        $hasher->shouldReceive('make')->once()->with('plain')->andReturn('rehashed');
+        $provider = new EloquentUserProvider($hasher, 'foo');
+        $user = m::mock(Authenticatable::class);
+        $user->shouldReceive('getAuthPassword')->once()->andReturn('hash');
+        $user->shouldReceive('getAuthPasswordName')->once()->andReturn('password_attribute');
+        $user->shouldReceive('forceFill')->once()->with(['password_attribute' => 'rehashed'])->andReturnSelf();
+        $user->shouldReceive('save')->once();
+        $result = $provider->validateCredentials($user, ['password' => 'plain']);
+
+        $this->assertTrue($result);
+    }
+
+    public function testCredentialValidationFailed()
+    {
+        $hasher = m::mock(Hasher::class);
+        $hasher->shouldReceive('check')->once()->with('plain', 'hash')->andReturn(false);
+        $provider = new EloquentUserProvider($hasher, 'foo');
+        $user = m::mock(Authenticatable::class);
+        $user->shouldReceive('getAuthPassword')->once()->andReturn('hash');
+        $result = $provider->validateCredentials($user, ['password' => 'plain']);
+
+        $this->assertFalse($result);
     }
 
     public function testModelsCanBeCreated()
