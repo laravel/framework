@@ -172,8 +172,8 @@ class DatabaseUserProvider implements UserProvider
     /**
      * Rehash the user's password.
      *
-     * @param \Illuminate\Contracts\Auth\Authenticatable $user
-     * @param string $plain
+     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
+     * @param  string  $plain
      * @return void
      */
     public function rehashUserPassword(UserContract $user, string $plain): void
