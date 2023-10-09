@@ -839,8 +839,12 @@ class Str
      * @param  bool  $spaces
      * @return string
      */
-    public static function password($length = 32, $letters = true, $numbers = true, $symbols = true, $spaces = false)
+    public static function password($length = 32, $letters = true, $numbers = true, $symbols = true, $spaces = false, $dashed = false)
     {
+        if(!($letters || $numbers || $symbols)){
+            return '';
+        }
+
         return (new Collection)
                 ->when($letters, fn ($c) => $c->merge([
                     'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k',
