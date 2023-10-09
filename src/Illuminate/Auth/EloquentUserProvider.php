@@ -173,7 +173,7 @@ class EloquentUserProvider implements UserProvider
     {
         $attribute = method_exists($user, 'getAuthPasswordName') ? $user->getAuthPasswordName() : 'password';
 
-        if (! $attribute || ! isset($user->{$attribute})) {
+        if (! $attribute || ! isset($user->{$attribute}) || ! hash_equals($hash, $user->{$attribute})) {
             return;
         }
 
