@@ -1339,10 +1339,15 @@ class Route
      */
     public function prepareForSerialization()
     {
-        if ($this->action['uses'] instanceof Closure) {
-            $this->action['uses'] = serialize(
-                SerializableClosure::unsigned($this->action['uses'])
-            );
+        if (is_callable($this->action['uses'])) {
+            if (! Str::contains((new \ReflectionFunction($this->action['uses']))->name, '{closure}')) {
+                $name = (new \ReflectionFunction($this->action['uses']))->name;
+                $this->action['uses'] = "\\{$name}";
+            } elseif ($this->action['uses'] instanceof Closure) {
+                $this->action['uses'] = serialize(
+                    SerializableClosure::unsigned($this->action['uses'])
+                );
+            }
         }
 
         if (isset($this->action['missing']) && $this->action['missing'] instanceof Closure) {
