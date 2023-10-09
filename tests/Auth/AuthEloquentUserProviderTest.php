@@ -140,6 +140,49 @@ class AuthEloquentUserProviderTest extends TestCase
         $this->assertTrue($result);
     }
 
+    public function testCredentialValidationWithPasswordAttributeWithoutRehashing()
+    {
+        $hasher = m::mock(Hasher::class);
+        $hasher->shouldReceive('check')->once()->with('plain', 'hash')->andReturn(true);
+        $hasher->shouldReceive('needsRehash')->once()->with('hash')->andReturn(false);
+        $provider = new EloquentUserProvider($hasher, 'foo');
+        $user = m::mock(Authenticatable::class);
+        $user->password = 'hash';
+        $user->shouldReceive('getAuthPassword')->once()->andReturn('hash');
+        $result = $provider->validateCredentials($user, ['password' => 'plain']);
+
+        $this->assertTrue($result);
+    }
+
+    public function testCredentialValidationRequiresRehash()
+    {
+        $hasher = m::mock(Hasher::class);
+        $hasher->shouldReceive('check')->once()->with('plain', 'hash')->andReturn(true);
+        $hasher->shouldReceive('needsRehash')->once()->with('hash')->andReturn(true);
+        $hasher->shouldReceive('make')->once()->with('plain')->andReturn('rehashed');
+        $provider = new EloquentUserProvider($hasher, 'foo');
+        $user = m::mock(Authenticatable::class);
+        $user->password = 'hash';
+        $user->shouldReceive('getAuthPassword')->once()->andReturn('hash');
+        $user->shouldReceive('forceFill')->once()->with(['password' => 'rehashed'])->andReturnSelf();
+        $user->shouldReceive('save')->once();
+        $result = $provider->validateCredentials($user, ['password' => 'plain']);
+
+        $this->assertTrue($result);
+    }
+
+    public function testCredentialValidationFailed()
+    {
+        $hasher = m::mock(Hasher::class);
+        $hasher->shouldReceive('check')->once()->with('plain', 'hash')->andReturn(false);
+        $provider = new EloquentUserProvider($hasher, 'foo');
+        $user = m::mock(Authenticatable::class);
+        $user->shouldReceive('getAuthPassword')->once()->andReturn('hash');
+        $result = $provider->validateCredentials($user, ['password' => 'plain']);
+
+        $this->assertFalse($result);
+    }
+
     public function testModelsCanBeCreated()
     {
         $hasher = m::mock(Hasher::class);
