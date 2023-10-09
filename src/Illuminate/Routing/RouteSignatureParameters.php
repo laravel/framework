@@ -22,15 +22,20 @@ class RouteSignatureParameters
                         ? unserialize($action['uses'])->getClosure()
                         : $action['uses'];
 
-        $parameters = is_string($callback)
-                        ? static::fromClassMethodString($callback)
-                        : (new ReflectionFunction($callback))->getParameters();
+        $parameters = static::isClassMethodString($callback)
+            ? static::fromClassMethodString($callback)
+            : (new ReflectionFunction($callback))->getParameters();
 
         return match (true) {
             ! empty($conditions['subClass']) => array_filter($parameters, fn ($p) => Reflector::isParameterSubclassOf($p, $conditions['subClass'])),
             ! empty($conditions['backedEnum']) => array_filter($parameters, fn ($p) => Reflector::isParameterBackedEnumWithStringBackingType($p)),
             default => $parameters,
         };
+    }
+
+    protected static function isClassMethodString($string)
+    {
+        return is_string($string) && Str::contains($string, '@');
     }
 
     /**
