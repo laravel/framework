@@ -43,7 +43,7 @@ class RouteAction
             $action['uses'] = static::findCallable($action);
         }
 
-        if (! static::containsSerializedClosure($action) && is_string($action['uses']) && ! str_contains($action['uses'], '@')) {
+        if (! static::containsSerializedClosure($action) && is_string($action['uses']) && ! str_contains($action['uses'], '@') && class_exists($action['uses'])) {
             $action['uses'] = static::makeInvokable($action['uses']);
         }
 
