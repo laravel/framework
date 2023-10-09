@@ -170,9 +170,9 @@ class DatabaseUserProvider implements UserProvider
     /**
      * Rehash the user's password if required.
      *
-     * @param UserContract $user
-     * @param string $hash
-     * @param string $plain
+     * @param  UserContract  $user
+     * @param  string  $hash
+     * @param  string  $plain
      * @return void
      */
     public function rehashIfRequired(UserContract $user, string $hash, string $plain)
