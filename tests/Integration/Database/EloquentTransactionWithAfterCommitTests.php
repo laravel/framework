@@ -126,7 +126,7 @@ class EloquentTransactionWithAfterCommitTestsUserObserverUsingDispatchSync exten
 {
     public function created($user)
     {
-        dispatch_sync(new EloquentTransactionWithAfterCommitTestsJob($user));
+        dispatch_sync(new EloquentTransactionWithAfterCommitTestsJob($user->email));
 
         parent::created($user);
     }
