@@ -11,6 +11,7 @@ class RouteCachingTest extends TestCase
         $this->routes(__DIR__.'/Fixtures/wildcard_catch_all_routes.php');
 
         $this->get('/foo')->assertSee('Regular route');
+        $this->get('/baz')->assertSee('First class callable');
         $this->get('/bar')->assertSee('Wildcard route');
     }
 

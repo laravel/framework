@@ -1,11 +1,27 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
 
-Route::get('/foo', function () {
-    return 'Regular route';
-});
+namespace Test {
+    function firstClassCallable(): string
+    {
+        return 'First class callable';
+    }
+}
 
-Route::get('{slug}', function () {
-    return 'Wildcard route';
-});
+namespace {
+    use Illuminate\Support\Facades\Route;
+
+    Route::get('/foo', function () {
+        return 'Regular route';
+    });
+
+
+    Route::get('/baz', \Test\firstClassCallable(...));
+
+    Route::get('/bag', ['Controller', 'method']);
+
+    Route::get('{slug}', function () {
+        return 'Wildcard route';
+    });
+
+}
