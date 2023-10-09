@@ -837,14 +837,11 @@ class Str
      * @param  bool  $numbers
      * @param  bool  $symbols
      * @param  bool  $spaces
+     * @param  bool  $dashed
      * @return string
      */
     public static function password($length = 32, $letters = true, $numbers = true, $symbols = true, $spaces = false, $dashed = false)
     {
-        if(!($letters || $numbers || $symbols)){
-            return '';
-        }
-
         return (new Collection)
                 ->when($letters, fn ($c) => $c->merge([
                     'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k',
@@ -861,9 +858,10 @@ class Str
                     '_', '.', ',', '<', '>', '?', '/', '\\', '{', '}', '[',
                     ']', '|', ':', ';',
                 ]))
-                ->when($spaces, fn ($c) => $c->merge([' ']))
-                ->pipe(fn ($c) => Collection::times($length, fn () => $c[random_int(0, $c->count() - 1)]))
-                ->implode('');
+            ->when($spaces, fn ($c) => $c->merge([' ']))
+            ->pipe(fn ($c) => Collection::times($length, fn ($index) => ($dashed && ($index % 6 === 0) && $index != 0) ? '-' : $c[random_int(0, $c->count() - 1)]))
+            ->implode('');
+
     }
 
     /**
