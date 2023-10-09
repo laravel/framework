@@ -14,7 +14,7 @@ trait ValidatesWhenResolvedTrait
      *
      * @return void
      */
-    public function validateResolved():void
+    public function validateResolved(): void
     {
         $this->prepareForValidation();
 
@@ -40,7 +40,7 @@ trait ValidatesWhenResolvedTrait
      *
      * @return void
      */
-    protected function prepareForValidation():void
+    protected function prepareForValidation(): void
     {
         //
     }
@@ -60,7 +60,7 @@ trait ValidatesWhenResolvedTrait
      *
      * @return void
      */
-    protected function passedValidation():void
+    protected function passedValidation(): void
     {
         //
     }
@@ -83,7 +83,7 @@ trait ValidatesWhenResolvedTrait
      *
      * @return bool
      */
-    protected function passesAuthorization():bool
+    protected function passesAuthorization(): bool
     {
         if (method_exists($this, 'authorize')) {
             return $this->authorize();
@@ -99,7 +99,7 @@ trait ValidatesWhenResolvedTrait
      *
      * @throws \Illuminate\Validation\UnauthorizedException
      */
-    protected function failedAuthorization():void
+    protected function failedAuthorization(): void
     {
         throw new UnauthorizedException;
     }
