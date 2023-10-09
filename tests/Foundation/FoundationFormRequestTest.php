@@ -410,12 +410,12 @@ class FoundationTestFormRequestHooks extends FormRequest
         return true;
     }
 
-    public function prepareForValidation():void
+    public function prepareForValidation(): void
     {
         $this->replace(['name' => 'Taylor']);
     }
 
-    public function passedValidation():void
+    public function passedValidation(): void
     {
         $this->replace(['name' => 'Adam']);
     }
