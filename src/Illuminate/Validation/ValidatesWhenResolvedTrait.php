@@ -50,7 +50,7 @@ trait ValidatesWhenResolvedTrait
      *
      * @return \Illuminate\Validation\Validator
      */
-    protected function getValidatorInstance()
+    protected function getValidatorInstance(): Validator
     {
         return $this->validator();
     }
@@ -73,7 +73,7 @@ trait ValidatesWhenResolvedTrait
      *
      * @throws \Illuminate\Validation\ValidationException
      */
-    protected function failedValidation(Validator $validator)
+    protected function failedValidation(Validator $validator): void
     {
         throw new ValidationException($validator);
     }
