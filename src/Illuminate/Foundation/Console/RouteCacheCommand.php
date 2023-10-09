@@ -60,6 +60,7 @@ class RouteCacheCommand extends Command
             return $this->components->error("Your application doesn't have any routes.");
         }
 
+        /** @var \Illuminate\Routing\Route $route */
         foreach ($routes as $route) {
             $route->prepareForSerialization();
         }
