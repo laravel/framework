@@ -175,7 +175,7 @@ class DatabaseUserProvider implements UserProvider
      * @param  string  $plain
      * @return void
      */
-    public function rehashIfRequired(UserContract $user, string $hash, string $plain)
+    protected function rehashIfRequired(UserContract $user, string $hash, string $plain)
     {
         $attribute = method_exists($user, 'getAuthPasswordName') ? $user->getAuthPasswordName() : 'password';
 
