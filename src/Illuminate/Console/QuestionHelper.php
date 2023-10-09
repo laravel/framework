@@ -64,7 +64,9 @@ class QuestionHelper extends SymfonyQuestionHelper
             }
         }
 
-        $output->write('<options=bold>❯ </>');
+        $text = sprintf('<options=bold>%s </>', OutputFormatter::escape('>'));
+
+        $output->write($text);
     }
 
     /**
