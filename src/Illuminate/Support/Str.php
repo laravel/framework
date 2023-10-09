@@ -861,7 +861,6 @@ class Str
             ->when($spaces, fn ($c) => $c->merge([' ']))
             ->pipe(fn ($c) => Collection::times($length, fn ($index) => ($dashed && ($index % 6 === 0) && $index != 0) ? '-' : $c[random_int(0, $c->count() - 1)]))
             ->implode('');
-
     }
 
     /**
