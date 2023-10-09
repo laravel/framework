@@ -127,7 +127,7 @@ trait BuildsQueries
      */
     public function chunkByIdDesc($count, callable $callback, $column = null, $alias = null)
     {
-        return $this->orderedChunkById($count, $callback, $column, $alias, true);
+        return $this->orderedChunkById($count, $callback, $column, $alias, descending: true);
     }
 
     /**
