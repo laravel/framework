@@ -26,7 +26,7 @@ class Stringable implements JsonSerializable, ArrayAccess
     /**
      * Create a new instance of the class.
      *
-     * @param  string|int|float|NativeStringable|null  $value
+     * @param  string|int|float|bool|NativeStringable|null  $value
      * @return void
      */
     public function __construct($value = '')
