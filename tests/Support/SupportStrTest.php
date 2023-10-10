@@ -594,6 +594,8 @@ class SupportStrTest extends TestCase
         // Test for associative array support
         $this->assertSame('foo/bar', Str::replaceArray('?', [1 => 'foo', 2 => 'bar'], '?/?'));
         $this->assertSame('foo/bar', Str::replaceArray('?', ['x' => 'foo', 'y' => 'bar'], '?/?'));
+        // Test does not crash on bad input
+        $this->assertSame('?', Str::replaceArray('?', [(object) ['foo' => 'bar']], '?'));
     }
 
     public function testReplaceFirst()
