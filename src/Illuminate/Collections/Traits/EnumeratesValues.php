@@ -37,6 +37,7 @@ use UnitEnum;
  * @property-read HigherOrderCollectionProxy $max
  * @property-read HigherOrderCollectionProxy $min
  * @property-read HigherOrderCollectionProxy $partition
+ * @property-read HigherOrderCollectionProxy $percentage
  * @property-read HigherOrderCollectionProxy $reject
  * @property-read HigherOrderCollectionProxy $skipUntil
  * @property-read HigherOrderCollectionProxy $skipWhile
@@ -83,6 +84,7 @@ trait EnumeratesValues
         'max',
         'min',
         'partition',
+        'percentage',
         'reject',
         'skipUntil',
         'skipWhile',
