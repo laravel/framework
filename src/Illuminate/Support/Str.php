@@ -860,18 +860,15 @@ class Str
                 ']', '|', ':', ';',
             ] : null,
             'spaces' => $spaces === true ? [' '] : null,
-        ]))->filter()
-        ->each(fn ($c) => $password->push($c[random_int(0, count($c) - 1)]))
-        ->flatten();
+        ]))->filter()->each(fn ($c) =>
+            $password->push($c[random_int(0, count($c) - 1)])
+        )->flatten();
 
         $length = $length - $password->count();
 
-        return $password->merge(
-            $options->pipe(
-                fn ($c) => Collection::times($length, fn () => $c[random_int(0, $c->count() - 1)])
-            )
-        )->shuffle()
-        ->implode('');
+        return $password->merge($options->pipe(
+            fn ($c) => Collection::times($length, fn () => $c[random_int(0, $c->count() - 1)])
+        ))->shuffle()->implode('');
     }
 
     /**
