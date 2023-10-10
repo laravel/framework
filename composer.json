@@ -194,10 +194,6 @@
     "repositories": [
         {
             "type": "vcs",
-            "url": "https://github.com/laravel-labs/termwind"
-        },
-        {
-            "type": "vcs",
             "url": "https://github.com/laravel-labs/php-cors"
         }
     ],
