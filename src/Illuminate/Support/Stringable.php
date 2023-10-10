@@ -9,6 +9,7 @@ use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Support\Traits\Tappable;
 use JsonSerializable;
+use Stringable as NativeStringable;
 use Symfony\Component\VarDumper\VarDumper;
 
 class Stringable implements JsonSerializable, ArrayAccess
@@ -25,7 +26,7 @@ class Stringable implements JsonSerializable, ArrayAccess
     /**
      * Create a new instance of the class.
      *
-     * @param  string  $value
+     * @param  string|int|float|NativeStringable|null  $value
      * @return void
      */
     public function __construct($value = '')
