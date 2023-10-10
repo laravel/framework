@@ -860,8 +860,7 @@ class Str
                 ']', '|', ':', ';',
             ] : null,
             'spaces' => $spaces === true ? [' '] : null,
-        ]))->filter()->each(fn ($c) =>
-            $password->push($c[random_int(0, count($c) - 1)])
+        ]))->filter()->each(fn ($c) => $password->push($c[random_int(0, count($c) - 1)])
         )->flatten();
 
         $length = $length - $password->count();
