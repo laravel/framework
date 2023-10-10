@@ -1340,9 +1340,8 @@ class Route
     public function prepareForSerialization()
     {
         if (is_callable($this->action['uses'])) {
-            if (! Str::contains((new \ReflectionFunction($this->action['uses']))->name, '{closure}')) {
-                $name = (new \ReflectionFunction($this->action['uses']))->name;
-                $this->action['uses'] = "\\{$name}";
+            if (! Str::contains($name = (new \ReflectionFunction($this->action['uses']))->name, '{closure}')) {
+                $this->action['uses'] = $name;
             } elseif ($this->action['uses'] instanceof Closure) {
                 $this->action['uses'] = serialize(
                     SerializableClosure::unsigned($this->action['uses'])
