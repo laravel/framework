@@ -299,7 +299,7 @@ class EventFake implements Dispatcher, Fake
         $name = is_object($event) ? get_class($event) : (string) $event;
 
         if ($this->shouldFakeEvent($name, $payload)) {
-            $this->fakeEvent($event, $name);
+            $this->fakeEvent($event, $name, func_get_args());
         } else {
             return $this->dispatcher->dispatch($event, $payload, $halt);
         }
@@ -336,19 +336,20 @@ class EventFake implements Dispatcher, Fake
      *
      * @param  string|object  $event
      * @param  string  $name
+     * @param  array  $args
      * @return void
      */
-    protected function fakeEvent($event, $name)
+    protected function fakeEvent($event, $name, $args)
     {
         if (
             $event instanceof TransactionAware &&
             Container::getInstance()->bound('db.transactions')
         ) {
             return Container::getInstance()->make('db.transactions')
-                ->addCallback(fn () => $this->events[$name][] = func_get_args());
+                ->addCallback(fn () => $this->events[$name][] = $args);
         }
 
-        $this->events[$name][] = func_get_args();
+        $this->events[$name][] = $args;
     }
 
     /**
