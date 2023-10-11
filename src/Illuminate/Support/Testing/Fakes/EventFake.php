@@ -334,8 +334,8 @@ class EventFake implements Dispatcher, Fake
     /**
      * Push the event onto the fake events array immediately or after the next database transaction.
      *
-     * @param string|object $event
-     * @param string$name
+     * @param  string|object  $event
+     * @param  string  $name
      * @return void
      */
     protected function fakeEvent($event, $name)
@@ -345,7 +345,7 @@ class EventFake implements Dispatcher, Fake
             Container::getInstance()->bound('db.transactions')
         ) {
             return Container::getInstance()->make('db.transactions')
-                ->addCallback(fn() => $this->events[$name][] = func_get_args());
+                ->addCallback(fn () => $this->events[$name][] = func_get_args());
         }
 
         $this->events[$name][] = func_get_args();

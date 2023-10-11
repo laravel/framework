@@ -38,7 +38,6 @@ class TransactionAwareEventTest extends TestCase
                 throw new \Exception;
             });
         } catch (\Exception) {
-
         }
 
         $this->assertFalse(TransactionAwareTestEvent::$ran);

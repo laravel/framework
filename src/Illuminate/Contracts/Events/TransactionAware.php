@@ -3,4 +3,5 @@
 namespace Illuminate\Contracts\Events;
 
 interface TransactionAware
-{}
+{
+}
