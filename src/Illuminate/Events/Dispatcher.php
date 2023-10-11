@@ -9,6 +9,7 @@ use Illuminate\Contracts\Broadcasting\Factory as BroadcastFactory;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Contracts\Container\Container as ContainerContract;
 use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
+use Illuminate\Contracts\Events\TransactionAware;
 use Illuminate\Contracts\Queue\ShouldBeEncrypted;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Arr;
@@ -239,33 +240,50 @@ class Dispatcher implements DispatcherContract
             $event, $payload
         );
 
-        if ($this->shouldBroadcast($payload)) {
-            $this->broadcastEvent($payload[0]);
-        }
-
-        $responses = [];
-
-        foreach ($this->getListeners($event) as $listener) {
-            $response = $listener($event, $payload);
-
-            // If a response is returned from the listener and event halting is enabled
-            // we will just return this response, and not call the rest of the event
-            // listeners. Otherwise we will add the response on the response list.
-            if ($halt && ! is_null($response)) {
-                return $response;
+        $executeEvent = function () use ($halt, $event, $payload) {
+            if ($this->shouldBroadcast($payload)) {
+                $this->broadcastEvent($payload[0]);
             }
 
-            // If a boolean false is returned from a listener, we will stop propagating
-            // the event to any further listeners down in the chain, else we keep on
-            // looping through the listeners and firing every one in our sequence.
-            if ($response === false) {
-                break;
+            $responses = [];
+
+            foreach ($this->getListeners($event) as $listener) {
+                $response = $listener($event, $payload);
+
+                // If a response is returned from the listener and event halting is enabled
+                // we will just return this response, and not call the rest of the event
+                // listeners. Otherwise we will add the response on the response list.
+                if ($halt && !is_null($response)) {
+                    return $response;
+                }
+
+                // If a boolean false is returned from a listener, we will stop propagating
+                // the event to any further listeners down in the chain, else we keep on
+                // looping through the listeners and firing every one in our sequence.
+                if ($response === false) {
+                    break;
+                }
+
+                $responses[] = $response;
             }
 
-            $responses[] = $response;
+            return $halt ? null : $responses;
+        };
+
+        // If the event is meant to be reserved upon a database transaction failure,
+        // we will add the actual event dispatching to a callback that executes
+        // once the database transaction has been committed within the DB.
+        if (
+            $this->isEventObject($event, $payload) &&
+            $payload[0] instanceof TransactionAware &&
+            $this->container->bound('db.transactions')
+        ) {
+            $this->container->make('db.transactions')->addCallback($executeEvent);
+
+            return null;
         }
 
-        return $halt ? null : $responses;
+        return $executeEvent();
     }
 
     /**
@@ -705,5 +723,20 @@ class Dispatcher implements DispatcherContract
     public function getRawListeners()
     {
         return $this->listeners;
+    }
+
+    /**
+     *
+     * @param mixed $event
+     * @param mixed $payload
+     * @return bool
+     */
+    protected function isEventObject($event, $payload)
+    {
+        if (! isset($payload[0]) || ! is_object($payload[0])) {
+            return false;
+        }
+
+        return get_class($payload[0]) === $event;
     }
 }
