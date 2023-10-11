@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Tests\Console;
+namespace Illuminate\Tests\Foundation\Console;
 
 use Illuminate\Console\Application;
 use Illuminate\Contracts\Events\Dispatcher;
