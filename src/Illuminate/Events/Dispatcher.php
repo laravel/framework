@@ -233,6 +233,8 @@ class Dispatcher implements DispatcherContract
      */
     public function dispatch($event, $payload = [], $halt = false)
     {
+        $isEventObject = is_object($event);
+
         // When the given "event" is actually an object we will assume it is an event
         // object and use the class as the event name and this event itself as the
         // payload to the handler, which makes object based events quite simple.
@@ -240,50 +242,59 @@ class Dispatcher implements DispatcherContract
             $event, $payload
         );
 
-        $executeEvent = function () use ($halt, $event, $payload) {
-            if ($this->shouldBroadcast($payload)) {
-                $this->broadcastEvent($payload[0]);
-            }
-
-            $responses = [];
-
-            foreach ($this->getListeners($event) as $listener) {
-                $response = $listener($event, $payload);
-
-                // If a response is returned from the listener and event halting is enabled
-                // we will just return this response, and not call the rest of the event
-                // listeners. Otherwise we will add the response on the response list.
-                if ($halt && !is_null($response)) {
-                    return $response;
-                }
-
-                // If a boolean false is returned from a listener, we will stop propagating
-                // the event to any further listeners down in the chain, else we keep on
-                // looping through the listeners and firing every one in our sequence.
-                if ($response === false) {
-                    break;
-                }
-
-                $responses[] = $response;
-            }
-
-            return $halt ? null : $responses;
-        };
-
         // If the event is meant to be reserved upon a database transaction failure,
         // we will add the actual event dispatching to a callback that executes
         // once the database transaction has been committed within the DB.
         if (
-            $this->isEventObject($event, $payload) &&
+            $isEventObject &&
             $payload[0] instanceof TransactionAware &&
             $this->container->bound('db.transactions')
         ) {
-            $this->container->make('db.transactions')->addCallback($executeEvent);
+            $this->container->make('db.transactions')->addCallback(fn () => $this->executeListeners($event, $payload, $halt));
 
             return null;
         }
 
-        return $executeEvent();
+        return $this->executeListeners($event, $payload, $halt);
+    }
+
+    /**
+     * Broadcast and event and call its listeners.
+     *
+     * @param  string|object  $event
+     * @param  mixed  $payload
+     * @param  bool  $halt
+     * @return array|null
+     */
+    protected function executeListeners($event, $payload, $halt = false)
+    {
+        if ($this->shouldBroadcast($payload)) {
+            $this->broadcastEvent($payload[0]);
+        }
+
+        $responses = [];
+
+        foreach ($this->getListeners($event) as $listener) {
+            $response = $listener($event, $payload);
+
+            // If a response is returned from the listener and event halting is enabled
+            // we will just return this response, and not call the rest of the event
+            // listeners. Otherwise we will add the response on the response list.
+            if ($halt && !is_null($response)) {
+                return $response;
+            }
+
+            // If a boolean false is returned from a listener, we will stop propagating
+            // the event to any further listeners down in the chain, else we keep on
+            // looping through the listeners and firing every one in our sequence.
+            if ($response === false) {
+                break;
+            }
+
+            $responses[] = $response;
+        }
+
+        return $halt ? null : $responses;
     }
 
     /**
@@ -723,20 +734,5 @@ class Dispatcher implements DispatcherContract
     public function getRawListeners()
     {
         return $this->listeners;
-    }
-
-    /**
-     *
-     * @param mixed $event
-     * @param mixed $payload
-     * @return bool
-     */
-    protected function isEventObject($event, $payload)
-    {
-        if (! isset($payload[0]) || ! is_object($payload[0])) {
-            return false;
-        }
-
-        return get_class($payload[0]) === $event;
     }
 }
