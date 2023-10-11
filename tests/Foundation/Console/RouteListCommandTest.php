@@ -34,7 +34,7 @@ class RouteListCommandTest extends TestCase
         $kernel = new class($laravel, $router) extends Kernel
         {
             protected $middlewareGroups = [
-                'web' => ['Middleware 1', 'Middleware 2'],
+                'web' => ['Middleware 1', 'Middleware 2', 'Middleware 5'],
                 'auth' => ['Middleware 3', 'Middleware 4'],
             ];
 
@@ -45,6 +45,8 @@ class RouteListCommandTest extends TestCase
                 'Middleware 3',
             ];
         };
+
+        $kernel->prependToMiddlewarePriority('Middleware 5');
 
         $laravel->singleton(Kernel::class, function () use ($kernel) {
             return $kernel;
@@ -80,6 +82,12 @@ class RouteListCommandTest extends TestCase
         $this->assertStringContainsString('exampleMiddleware', $output);
         $this->assertStringContainsString('web', $output);
         $this->assertStringContainsString('auth', $output);
+
+        $this->assertStringNotContainsString('Middleware 1', $output);
+        $this->assertStringNotContainsString('Middleware 2', $output);
+        $this->assertStringNotContainsString('Middleware 3', $output);
+        $this->assertStringNotContainsString('Middleware 4', $output);
+        $this->assertStringNotContainsString('Middleware 5', $output);
     }
 
     public function testMiddlewareGroupsExpandInCliIfVeryVerbose()
@@ -92,6 +100,7 @@ class RouteListCommandTest extends TestCase
         $this->assertStringContainsString('Middleware 2', $output);
         $this->assertStringContainsString('Middleware 3', $output);
         $this->assertStringContainsString('Middleware 4', $output);
+        $this->assertStringContainsString('Middleware 5', $output);
 
         $this->assertStringNotContainsString('web', $output);
         $this->assertStringNotContainsString('auth', $output);
@@ -105,6 +114,12 @@ class RouteListCommandTest extends TestCase
         $this->assertStringContainsString('exampleMiddleware', $output);
         $this->assertStringContainsString('web', $output);
         $this->assertStringContainsString('auth', $output);
+
+        $this->assertStringNotContainsString('Middleware 1', $output);
+        $this->assertStringNotContainsString('Middleware 2', $output);
+        $this->assertStringNotContainsString('Middleware 3', $output);
+        $this->assertStringNotContainsString('Middleware 4', $output);
+        $this->assertStringNotContainsString('Middleware 5', $output);
     }
 
     public function testMiddlewareGroupsExpandInJsonIfVeryVerbose()
@@ -117,6 +132,7 @@ class RouteListCommandTest extends TestCase
         $this->assertStringContainsString('Middleware 2', $output);
         $this->assertStringContainsString('Middleware 3', $output);
         $this->assertStringContainsString('Middleware 4', $output);
+        $this->assertStringContainsString('Middleware 5', $output);
 
         $this->assertStringNotContainsString('web', $output);
         $this->assertStringNotContainsString('auth', $output);
@@ -127,7 +143,7 @@ class RouteListCommandTest extends TestCase
         $this->app->call('route:list', ['--json' => true, '-vv' => true]);
         $output = $this->app->output();
 
-        $expectedOrder = '[{"domain":null,"method":"GET|HEAD","uri":"example","name":null,"action":"Closure","middleware":["exampleMiddleware"]},{"domain":null,"method":"GET|HEAD","uri":"example-group","name":null,"action":"Closure","middleware":["Middleware 1","Middleware 4","Middleware 2","Middleware 3"]}]';
+        $expectedOrder = '[{"domain":null,"method":"GET|HEAD","uri":"example","name":null,"action":"Closure","middleware":["exampleMiddleware"]},{"domain":null,"method":"GET|HEAD","uri":"example-group","name":null,"action":"Closure","middleware":["Middleware 5","Middleware 1","Middleware 4","Middleware 2","Middleware 3"]}]';
 
         $this->assertJsonStringEqualsJsonString($expectedOrder, $output);
     }
