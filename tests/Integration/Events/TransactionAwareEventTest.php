@@ -1,11 +1,8 @@
 <?php
 
-declare(strict_types=1);
-
 namespace Illuminate\Tests\Integration\Events;
 
 use Illuminate\Contracts\Events\TransactionAware;
-use Illuminate\Database\DatabaseTransactionsManager;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Mockery as m;
