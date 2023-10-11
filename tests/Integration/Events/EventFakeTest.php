@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Schema;
 use Orchestra\Testbench\TestCase;
+use PHPUnit\Framework\ExpectationFailedException;
 
 class EventFakeTest extends TestCase
 {
@@ -219,6 +220,22 @@ class EventFakeTest extends TestCase
 
         Event::dispatch(new TransactionAwareEvent());
         Event::assertDispatched(TransactionAwareEvent::class);
+    }
+
+    public function testAssertNothingDispatchedTransactionAware()
+    {
+        Event::fake();
+        Event::assertNothingDispatched();
+
+        Event::dispatch(new TransactionAwareEvent);
+        Event::dispatch(new TransactionAwareEvent);
+
+        try {
+            Event::assertNothingDispatched();
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertStringContainsString('2 unexpected events were dispatched.', $e->getMessage());
+        }
     }
 }
 
