@@ -21,7 +21,6 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use ReflectionClass;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Output\ConsoleOutput;
 
 class Migrator
 {
@@ -137,9 +136,9 @@ class Migrator
     protected function pendingMigrations($files, $ran)
     {
         return Collection::make($files)
-                ->reject(function ($file) use ($ran) {
-                    return in_array($this->getMigrationName($file), $ran);
-                })->values()->all();
+            ->reject(function ($file) use ($ran) {
+                return in_array($this->getMigrationName($file), $ran);
+            })->values()->all();
     }
 
     /**
@@ -191,11 +190,6 @@ class Migrator
         if ($this->output) {
             $this->output->writeln('');
         }
-    }
-
-    public function informTableExistance($table)
-    {
-        (new ConsoleOutput)->write("\n\tTable {$table} already exists ");
     }
 
     /**
@@ -420,9 +414,9 @@ class Migrator
         };
 
         $this->getSchemaGrammar($connection)->supportsSchemaTransactions()
-            && $migration->withinTransaction
-                    ? $connection->transaction($callback)
-                    : $callback();
+        && $migration->withinTransaction
+            ? $connection->transaction($callback)
+            : $callback();
     }
 
     /**
@@ -533,8 +527,8 @@ class Migrator
 
         if (is_object($migration)) {
             return method_exists($migration, '__construct')
-                    ? $this->files->getRequire($path)
-                    : clone $migration;
+                ? $this->files->getRequire($path)
+                : clone $migration;
         }
 
         return new $class;
