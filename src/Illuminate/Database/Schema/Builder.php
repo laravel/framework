@@ -5,9 +5,10 @@ namespace Illuminate\Database\Schema;
 use Closure;
 use Illuminate\Container\Container;
 use Illuminate\Database\Connection;
-use Illuminate\Database\Migrations\Migrator;
+use Illuminate\Support\Facades\Schema;
 use InvalidArgumentException;
 use LogicException;
+use Symfony\Component\Console\Output\ConsoleOutput;
 
 class Builder
 {
@@ -161,8 +162,8 @@ class Builder
         $table = $this->connection->getTablePrefix().$table;
 
         return count($this->connection->selectFromWriteConnection(
-            $this->grammar->compileTableExists(), [$table]
-        )) > 0;
+                $this->grammar->compileTableExists(), [$table]
+            )) > 0;
     }
 
     /**
@@ -277,8 +278,15 @@ class Builder
      * @param  \Closure  $callback
      * @return void
      */
-    public function create($table, Closure $callback)
+    public function create($table, Closure $callback, $if_table_not_existing = false)
     {
+        if ($if_table_not_existing){
+            if ($this->tableExists($table)){
+                (new ConsoleOutput)->write("\n\tTable {$table} already exists");
+                return;
+            }
+        }
+
         $this->build(tap($this->createBlueprint($table), function ($blueprint) use ($callback) {
             $blueprint->create();
 
@@ -286,22 +294,9 @@ class Builder
         }));
     }
 
-    /**
-     * Create a new table on the schema if table doesn't exist.
-     *
-     * @param  string  $table
-     * @param Closure $callback
-     * @return void
-     */
-    public function createIfNotExist($table, Closure $callback)
+    public function tableExists($table)
     {
-        if ($this->hasTable($table)) {
-            $migrator = new Migrator(app('migration.repository'), app('db'), app('files'));
-            $migrator->informTableExistance($table);
-            return;
-        }
-
-        $this->create($table, $callback);
+        return Schema::hasTable($table);
     }
 
     /**
@@ -468,8 +463,8 @@ class Builder
     protected function createBlueprint($table, Closure $callback = null)
     {
         $prefix = $this->connection->getConfig('prefix_indexes')
-                    ? $this->connection->getConfig('prefix')
-                    : '';
+            ? $this->connection->getConfig('prefix')
+            : '';
 
         if (isset($this->resolver)) {
             return call_user_func($this->resolver, $table, $callback, $prefix);
