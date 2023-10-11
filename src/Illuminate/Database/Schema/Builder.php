@@ -5,6 +5,7 @@ namespace Illuminate\Database\Schema;
 use Closure;
 use Illuminate\Container\Container;
 use Illuminate\Database\Connection;
+use Illuminate\Database\Migrations\Migrator;
 use InvalidArgumentException;
 use LogicException;
 
@@ -283,6 +284,24 @@ class Builder
 
             $callback($blueprint);
         }));
+    }
+
+    /**
+     * Create a new table on the schema if table doesn't exist.
+     *
+     * @param  string  $table
+     * @param Closure $callback
+     * @return void
+     */
+    public function createIfNotExist($table, Closure $callback)
+    {
+        if ($this->hasTable($table)) {
+            $migrator = new Migrator(app('migration.repository'), app('db'), app('files'));
+            $migrator->informTableExistance($table);
+            return;
+        }
+
+        $this->create($table, $callback);
     }
 
     /**
