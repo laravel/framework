@@ -82,7 +82,9 @@ jobs:
         with:
           timeout_minutes: 5
           max_attempts: 5
-          command: composer update --${{ matrix.stability }} --prefer-dist --no-interaction --no-progress
+          command: |
+            composer require symfony/psr-http-message-bridge:^2.0 nyholm/psr7:^1.0 --no-interaction --no-update
+            composer update --${{ matrix.stability }} --prefer-dist --no-interaction --no-progress
 
       - name: Execute tests
         run: vendor/bin/phpunit --display-deprecation
@@ -152,7 +154,9 @@ jobs:
         with:
           timeout_minutes: 5
           max_attempts: 5
-          command: composer update --${{ matrix.stability }} --prefer-dist --no-interaction --no-progress
+          command: |
+            composer require symfony/psr-http-message-bridge:^^^^2.0 nyholm/psr7:^^^^1.0 --no-interaction --no-update
+            composer update --${{ matrix.stability }} --prefer-dist --no-interaction --no-progress
 
       - name: Execute tests
         run: vendor/bin/phpunit
