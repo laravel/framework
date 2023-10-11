@@ -183,15 +183,41 @@ class Batch implements Arrayable, JsonSerializable
             return $job;
         });
 
+        $this->getQueueConnection()->getConnectionName() === 'sync' ?
+            $this->bulk($jobs, $count) :
+            $this->repository->transaction(function () use ($jobs, $count) {
+                $this->bulk($jobs, $count);
+            });
+
+        return $this->fresh();
+    }
+
+    /**
+     * Gets a queue connection instance.
+     *
+     * @return \Illuminate\Contracts\Queue\Queue
+     */
+    protected function getQueueConnection()
+    {
+        return $this->queue->connection($this->options['connection'] ?? null);
+    }
+
+    /**
+     * Add jobs in bulk.
+     *
+     * @param  \Illuminate\Support\Enumerable|object|array  $jobs
+     * @param  int  $count
+     * @return void
+     */
+    protected function bulk($jobs, $count)
+    {
         $this->repository->incrementTotalJobs($this->id, $count);
 
-        $this->queue->connection($this->options['connection'] ?? null)->bulk(
+        $this->getQueueConnection()->bulk(
             $jobs->all(),
             $data = '',
             $this->options['queue'] ?? null
         );
-
-        return $this->fresh();
     }
 
     /**
