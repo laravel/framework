@@ -21,6 +21,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use ReflectionClass;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Output\ConsoleOutput;
 
 class Migrator
 {
@@ -190,6 +191,11 @@ class Migrator
         if ($this->output) {
             $this->output->writeln('');
         }
+    }
+
+    public function informTableExistance($table)
+    {
+        (new ConsoleOutput)->write("\n\tTable {$table} already exists ");
     }
 
     /**
