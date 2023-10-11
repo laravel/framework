@@ -90,7 +90,7 @@ class RouteListCommand extends Command
      */
     public function handle()
     {
-        if(!$this->output->isVeryVerbose()) {
+        if (! $this->output->isVeryVerbose()) {
             $this->router->flushMiddlewareGroups();
         }
 

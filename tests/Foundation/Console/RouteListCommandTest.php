@@ -31,7 +31,8 @@ class RouteListCommandTest extends TestCase
 
         $router = new Router(m::mock('Illuminate\Events\Dispatcher'));
 
-        $kernel = new class($laravel, $router) extends Kernel {
+        $kernel = new class($laravel, $router) extends Kernel
+        {
             protected $middlewareGroups = [
                 'web' => ['Middleware 1', 'Middleware 2'],
                 'auth' => ['Middleware 3', 'Middleware 4'],
@@ -76,7 +77,7 @@ class RouteListCommandTest extends TestCase
 
     public function testMiddlewareGroupsExpandInCliIfVeryVerbose()
     {
-        $this->app->call('route:list', ['-vv' => true,]);
+        $this->app->call('route:list', ['-vv' => true]);
         $output = $this->app->output();
 
         $this->assertStringContainsString('exampleMiddleware', $output);
@@ -101,7 +102,7 @@ class RouteListCommandTest extends TestCase
 
     public function testMiddlewareGroupsExpandInJsonIfVeryVerbose()
     {
-        $this->app->call('route:list', ['--json' => true, '-vv' => true,]);
+        $this->app->call('route:list', ['--json' => true, '-vv' => true]);
         $output = $this->app->output();
 
         $this->assertStringContainsString('exampleMiddleware', $output);
