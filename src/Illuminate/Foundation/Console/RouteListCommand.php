@@ -70,6 +70,8 @@ class RouteListCommand extends Command
         'DELETE' => 'red',
     ];
 
+    private array $cachedGroups;
+
     /**
      * Create a new route command instance.
      *
@@ -81,6 +83,7 @@ class RouteListCommand extends Command
         parent::__construct();
 
         $this->router = $router;
+        $this->cachedGroups = $router->getMiddlewareGroups();
     }
 
     /**
@@ -322,9 +325,28 @@ class RouteListCommand extends Command
     {
         return $routes
             ->map(function ($route) {
+
                 $route['middleware'] = empty($route['middleware']) ? [] : explode("\n", $route['middleware']);
 
+                if($route['middleware'] === [] || $this->output->isVeryVerbose() === false) {
+                    return $route;
+                }
+
+                foreach ($route['middleware'] as $middleware) {
+                    if (!isset($this->cachedGroups[$middleware])) {
+                        $route['middleware'][] = $middleware;
+                        continue;
+                    }
+
+                    if (($key = array_search($middleware, $route['middleware'])) !== false) {
+                        unset($route['middleware'][$key]);
+                    }
+
+                    $route['middleware'] = array_merge($route['middleware'], $this->cachedGroups[$middleware]);
+                }
+
                 return $route;
+
             })
             ->values()
             ->toJson();
@@ -363,7 +385,25 @@ class RouteListCommand extends Command
 
             $middleware = Str::of($middleware)->explode("\n")->filter()->whenNotEmpty(
                 fn ($collection) => $collection->map(
-                    fn ($middleware) => sprintf('         %s⇂ %s', str_repeat(' ', $maxMethod), $middleware)
+                    function ($middleware) use ($maxMethod)
+                    {
+                        if ($this->output->isVeryVerbose() === false) {
+                            return  sprintf('         %s⇂ %s', str_repeat(' ', $maxMethod), $middleware);
+                        }
+
+                        if (isset($this->cachedGroups[$middleware])) {
+
+                            $middlewareGroup = sprintf('         %s⇂ %s', str_repeat(' ', $maxMethod), $middleware . " (group)");
+
+                            foreach ($this->cachedGroups[$middleware] as $groupMiddleware) {
+                                $middlewareGroup .= sprintf("\n         %s    %s", str_repeat(' ', $maxMethod), $groupMiddleware);
+                            }
+
+                            return $middlewareGroup;
+                        }
+
+                       return  sprintf('         %s⇂ %s', str_repeat(' ', $maxMethod), $middleware);
+                    }
                 )
             )->implode("\n");
 
