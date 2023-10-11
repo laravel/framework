@@ -23,9 +23,12 @@ class RouteListCommandTest extends TestCase
     {
         parent::setUp();
 
-        $laravel = new \Illuminate\Foundation\Application(__DIR__);
-        $events = m::mock(Dispatcher::class, ['dispatch' => null, 'fire' => null]);
-        $this->app = new Application($laravel, $events, 'testing');
+        $this->app = new Application(
+            $laravel = new \Illuminate\Foundation\Application(__DIR__),
+            m::mock(Dispatcher::class, ['dispatch' => null, 'fire' => null]),
+            'testing',
+        );
+
         $router = new Router(m::mock('Illuminate\Events\Dispatcher'));
 
         $kernel = new class($laravel, $router) extends Kernel {
