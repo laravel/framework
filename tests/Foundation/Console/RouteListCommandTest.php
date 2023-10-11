@@ -37,6 +37,13 @@ class RouteListCommandTest extends TestCase
                 'web' => ['Middleware 1', 'Middleware 2'],
                 'auth' => ['Middleware 3', 'Middleware 4'],
             ];
+
+            protected $middlewarePriority = [
+                'Middleware 1',
+                'Middleware 4',
+                'Middleware 2',
+                'Middleware 3',
+            ];
         };
 
         $laravel->singleton(Kernel::class, function () use ($kernel) {
@@ -113,5 +120,15 @@ class RouteListCommandTest extends TestCase
 
         $this->assertStringNotContainsString('web', $output);
         $this->assertStringNotContainsString('auth', $output);
+    }
+
+    public function testMiddlewareGroupsExpandCorrectlySortedIfVeryVerbose()
+    {
+        $this->app->call('route:list', ['--json' => true, '-vv' => true]);
+        $output = $this->app->output();
+
+        $expectedOrder = '[{"domain":null,"method":"GET|HEAD","uri":"example","name":null,"action":"Closure","middleware":["exampleMiddleware"]},{"domain":null,"method":"GET|HEAD","uri":"example-group","name":null,"action":"Closure","middleware":["Middleware 1","Middleware 4","Middleware 2","Middleware 3"]}]';
+
+        $this->assertJsonStringEqualsJsonString($expectedOrder, $output);
     }
 }
