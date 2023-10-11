@@ -480,6 +480,17 @@ class Arr
     }
 
     /**
+     * Get a new ArrayableHelper object from the given array.
+     *
+     * @param  array  $array
+     * @return ArrayableHelper
+     */
+    public static function of($array): ArrayableHelper
+    {
+        return new ArrayableHelper($array);
+    }
+
+    /**
      * Get a subset of the items from the given array.
      *
      * @param  array  $array

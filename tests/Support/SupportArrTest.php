@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Support;
 
 use ArrayObject;
 use Illuminate\Support\Arr;
+use Illuminate\Support\ArrayableHelper;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use InvalidArgumentException;
@@ -1223,5 +1224,156 @@ class SupportArrTest extends TestCase
                 'key' => 1,
             ],
         ], Arr::prependKeysWith($array, 'test.'));
+    }
+
+    public function testOf()
+    {
+        $array = Arr::of([
+            'id' => '123',
+        ]);
+
+        $this->assertInstanceOf(ArrayableHelper::class, Arr::of($array));
+    }
+
+    public function testOfToArray()
+    {
+        $result = Arr::of([
+            'id' => '123',
+        ]);
+
+        $this->assertEquals(['id' => '123'], $result->toArray());
+    }
+
+    public function testOfToJson()
+    {
+        $result = Arr::of([
+            'id' => '123',
+        ]);
+
+        $this->assertEquals('{"id":"123"}', $result->toJson());
+    }
+
+    public function testOfChaining()
+    {
+        $array = [
+            [
+                'id' => 1,
+                'name' => 'John',
+            ],
+            [
+                'id' => 2,
+                'name' => 'Jane',
+            ],
+        ];
+
+        $response = Arr::of($array)
+            ->flatten()
+            ->prepend('Jacob');
+
+        $this->assertCount(5, $response->toArray());
+        $this->assertEquals('Jacob', $response->first());
+        $this->assertEquals('Jane', $response->last());
+    }
+
+    public function testOfAccessible()
+    {
+        $this->assertTrue(Arr::of(['id' => '123'])->accessible());
+        $this->assertFalse(Arr::of('invalid')->accessible());
+    }
+
+    public function testOfMap()
+    {
+        $array = Arr::of([
+            [
+                'id' => 1,
+                'name' => 'John',
+            ],
+            [
+                'id' => 2,
+                'name' => 'Jane',
+            ],
+        ]);
+
+        $result = $array->map(function ($item) {
+            $this->assertIsArray($item);
+
+            return $item['id'];
+        });
+
+        $this->assertInstanceOf(ArrayableHelper::class, $result);
+        $this->assertEquals([1, 2], $result->toArray());
+    }
+
+    public function testOfAdd()
+    {
+        $result = Arr::of(['id' => 1])->add('name', 'John');
+
+        $this->assertEquals('John', $result->get('name'));
+    }
+
+    public function testOfCrossJoin()
+    {
+        // Single dimension
+        $this->assertSame(
+            [[1, 'a'], [1, 'b'], [1, 'c']],
+            Arr::of([1])->crossJoin(['a', 'b', 'c'])->toArray()
+        );
+
+        // Square matrix
+        $this->assertSame(
+            [[1, 'a'], [1, 'b'], [2, 'a'], [2, 'b']],
+            Arr::of([1, 2])->crossJoin(['a', 'b'])->toArray()
+        );
+
+        // Rectangular matrix
+        $this->assertSame(
+            [[1, 'a'], [1, 'b'], [1, 'c'], [2, 'a'], [2, 'b'], [2, 'c']],
+            Arr::of([1, 2])->crossJoin(['a', 'b', 'c'])->toArray()
+        );
+
+        // 3D matrix
+        $this->assertSame(
+            [
+                [1, 'a', 'I'], [1, 'a', 'II'], [1, 'a', 'III'],
+                [1, 'b', 'I'], [1, 'b', 'II'], [1, 'b', 'III'],
+                [2, 'a', 'I'], [2, 'a', 'II'], [2, 'a', 'III'],
+                [2, 'b', 'I'], [2, 'b', 'II'], [2, 'b', 'III'],
+            ],
+            Arr::of([1, 2])->crossJoin(['a', 'b'], ['I', 'II', 'III'])->toArray()
+        );
+
+        // With 1 empty dimension
+        $this->assertEmpty(Arr::of([])->crossJoin(['a', 'b'], ['I', 'II', 'III'])->toArray());
+        $this->assertEmpty(Arr::of([1, 2])->crossJoin([], ['I', 'II', 'III'])->toArray());
+        $this->assertEmpty(Arr::of([1, 2])->crossJoin(['a', 'b'], [])->toArray());
+
+        // With empty arrays
+        $this->assertEmpty(Arr::of([])->crossJoin([], [])->toArray());
+        $this->assertEmpty(Arr::of([])->crossJoin([])->toArray());
+        $this->assertEmpty(Arr::of([])->toArray());
+    }
+
+    public function testOfPull()
+    {
+        $result = Arr::of(['name' => 'Desk', 'price' => 100]);
+        $name = Arr::of($result)->pull('name');
+
+        $this->assertSame('Desk', $name);
+        $this->assertSame(['price' => 100], $result->toArray());
+    }
+
+    public function testOfSet()
+    {
+        $result = Arr::of([
+            'products' => [
+                'desk' => [
+                    'price' => 100,
+                ],
+            ],
+        ]);
+
+        $result->set('products.desk.price', 200);
+
+        $this->assertEquals(200, $result->get('products.desk.price'));
     }
 }
