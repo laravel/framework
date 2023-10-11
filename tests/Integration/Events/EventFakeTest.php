@@ -3,9 +3,12 @@
 namespace Illuminate\Tests\Integration\Events;
 
 use Closure;
+use Exception;
+use Illuminate\Contracts\Events\TransactionAware;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Schema;
 use Orchestra\Testbench\TestCase;
@@ -182,6 +185,41 @@ class EventFakeTest extends TestCase
 
         $this->assertEquals('bar', Event::fake()->foo());
     }
+
+    public function testTransactionAwareEventsAreNotDispatchedIfTransactionFails()
+    {
+        Event::fake();
+
+        try {
+            DB::transaction(function () {
+                Event::dispatch(new TransactionAwareEvent());
+
+                throw new Exception('foo');
+            });
+        } catch (Exception $e) {
+        }
+
+        Event::assertNotDispatched(TransactionAwareEvent::class);
+    }
+
+    public function testTransactionAwareEventsAreDispatchedIfTransactionSucceeds()
+    {
+        Event::fake();
+
+        DB::transaction(function () {
+            Event::dispatch(new TransactionAwareEvent());
+        });
+
+        Event::assertDispatched(TransactionAwareEvent::class);
+    }
+
+    public function testTransactionAwareEventsAreDispatchedIfThereIsNoTransaction()
+    {
+        Event::fake();
+
+        Event::dispatch(new TransactionAwareEvent());
+        Event::assertDispatched(TransactionAwareEvent::class);
+    }
 }
 
 class Post extends Model
@@ -248,3 +286,9 @@ class InvokableEventSubscriber
         //
     }
 }
+
+class TransactionAwareEvent implements TransactionAware
+{
+    //
+}
+
