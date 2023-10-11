@@ -7,6 +7,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Collection;
+use Throwable;
 
 class ChainedBatch implements ShouldQueue
 {
@@ -42,7 +43,13 @@ class ChainedBatch implements ShouldQueue
         }
 
         foreach ($this->chainCatchCallbacks ?? [] as $cb) {
-            $batch->catch($cb);
+            $batch->catch(function (Batch $batch, ?Throwable $exception) use ($cb) {
+                if ($batch->allowsFailures()) {
+                    return;
+                }
+
+                $cb($exception);
+            });
         }
 
         $batch->dispatch();
@@ -61,7 +68,13 @@ class ChainedBatch implements ShouldQueue
             $next->chainQueue = $this->chainQueue;
             $next->chainCatchCallbacks = $this->chainCatchCallbacks;
 
-            $batch->then(fn () => dispatch($next));
+            $batch->finally(function (Batch $batch) use ($next) {
+                if ($batch->canceled()) {
+                    return;
+                }
+
+                dispatch($next);
+            });
 
             $this->chained = [];
         }

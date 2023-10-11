@@ -362,6 +362,41 @@ class JobChainingTest extends TestCase
         $this->assertEquals(['c1', 'c2'], JobRunRecorder::$results);
         $this->assertEquals(['batch failed', 'chain failed'], JobRunRecorder::$failures);
     }
+
+    public function testChainBatchFailureAllowed()
+    {
+        Bus::chain([
+            new JobChainingNamedTestJob('c1'),
+            new JobChainingNamedTestJob('c2'),
+            Bus::batch([
+                new JobChainingTestBatchedJob('b1'),
+                new JobChainingTestFailingBatchedJob('b2'),
+                new JobChainingTestBatchedJob('b3'),
+            ])->allowFailures()->catch(fn () => JobRunRecorder::recordFailure('batch failed')),
+            new JobChainingNamedTestJob('c3'),
+        ])->catch(fn () => JobRunRecorder::recordFailure('chain failed'))->dispatch();
+
+        $this->assertEquals(['c1', 'c2', 'b1', 'b3', 'c3'], JobRunRecorder::$results);
+        // Only the batch failed, but the chain should keep going since the batch allows failures
+        $this->assertEquals(['batch failed'], JobRunRecorder::$failures);
+    }
+
+    public function testChainBatchFailureNotAllowed()
+    {
+        Bus::chain([
+            new JobChainingNamedTestJob('c1'),
+            new JobChainingNamedTestJob('c2'),
+            Bus::batch([
+                new JobChainingTestBatchedJob('b1'),
+                new JobChainingTestFailingBatchedJob('b2'),
+                new JobChainingTestBatchedJob('b3'),
+            ])->allowFailures(false)->catch(fn () => JobRunRecorder::recordFailure('batch failed')),
+            new JobChainingNamedTestJob('c3'),
+        ])->catch(fn () => JobRunRecorder::recordFailure('chain failed'))->dispatch();
+
+        $this->assertEquals(['c1', 'c2', 'b1', 'b3'], JobRunRecorder::$results);
+        $this->assertEquals(['batch failed', 'chain failed'], JobRunRecorder::$failures);
+    }
 }
 
 class JobChainingTestFirstJob implements ShouldQueue
