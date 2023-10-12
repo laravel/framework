@@ -33,7 +33,7 @@
         }
     },
     "suggest": {
-        "symfony/var-dumper": "Required to use the dump method (^6.3)."
+        "symfony/var-dumper": "Required to use the dump method (^7.0)."
     },
     "config": {
         "sort-packages": true
