@@ -105,7 +105,7 @@ class ComponentTest extends TestCase
         $this->assertInstanceOf(Closure::class, $closure);
         $this->assertSame('__components::9cc08f5001b343c093ee1a396da820dc', $viewPath);
 
-        $hash = str_replace('__components::', '',$viewPath);
+        $hash = str_replace('__components::', '', $viewPath);
         $this->assertSame('<p>Hello World</p>', file_get_contents("/tmp/{$hash}.blade.php"));
     }
 
