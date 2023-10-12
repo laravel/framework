@@ -124,7 +124,7 @@ class Connection implements ConnectionInterface
      *
      * @var array
      */
-    protected $fetchAllArgs;
+    protected $fetchAllArgs = [];
 
     /**
      * The number of active transactions.
@@ -427,11 +427,7 @@ class Connection implements ConnectionInterface
 
             $statement->execute();
 
-            if (! empty($this->fetchAllArgs)) {
-                return $statement->fetchAll(...$this->fetchAllArgs);
-            }
-
-            return $statement->fetchAll();
+            return $statement->fetchAll(...$this->fetchAllArgs);
         });
     }
 
