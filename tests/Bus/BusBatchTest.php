@@ -98,7 +98,7 @@ class BusBatchTest extends TestCase
         $thirdJob = function () {
         };
 
-        $queue->shouldReceive('connection')->once()
+        $queue->shouldReceive('connection')
                         ->with('test-connection')
                         ->andReturn($connection = m::mock(stdClass::class));
 
@@ -188,7 +188,7 @@ class BusBatchTest extends TestCase
             use Batchable;
         };
 
-        $queue->shouldReceive('connection')->once()
+        $queue->shouldReceive('connection')
                         ->with('test-connection')
                         ->andReturn($connection = m::mock(stdClass::class));
 
@@ -226,7 +226,7 @@ class BusBatchTest extends TestCase
             use Batchable;
         };
 
-        $queue->shouldReceive('connection')->once()
+        $queue->shouldReceive('connection')
                         ->with('test-connection')
                         ->andReturn($connection = m::mock(stdClass::class));
 
@@ -267,7 +267,7 @@ class BusBatchTest extends TestCase
             use Batchable;
         };
 
-        $queue->shouldReceive('connection')->once()
+        $queue->shouldReceive('connection')
                         ->with('test-connection')
                         ->andReturn($connection = m::mock(stdClass::class));
 
@@ -364,7 +364,7 @@ class BusBatchTest extends TestCase
 
         $thirdJob = new ThirdTestJob;
 
-        $queue->shouldReceive('connection')->once()
+        $queue->shouldReceive('connection')
             ->with('test-connection')
             ->andReturn($connection = m::mock(stdClass::class));
 

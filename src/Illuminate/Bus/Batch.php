@@ -7,6 +7,7 @@ use Closure;
 use Illuminate\Contracts\Queue\Factory as QueueFactory;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Queue\CallQueuedClosure;
+use Illuminate\Queue\SyncQueue;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use JsonSerializable;
@@ -183,7 +184,7 @@ class Batch implements Arrayable, JsonSerializable
             return $job;
         });
 
-        $this->getQueueConnection()->getConnectionName() === 'sync' ?
+        $this->getQueueConnection() instanceof SyncQueue ?
             $this->bulk($jobs, $count) :
             $this->repository->transaction(function () use ($jobs, $count) {
                 $this->bulk($jobs, $count);
