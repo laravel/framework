@@ -256,6 +256,57 @@ class DatabaseEloquentRelationTest extends TestCase
         $this->assertFalse($model->relationLoaded('foo'));
     }
 
+    public function testOnlyRelations()
+    {
+        $original = new EloquentNoTouchingModelStub;
+
+        $original->setRelation('foo', 'baz');
+        $original->setRelation('lorem', 'ipsum');
+        $original->setRelation('bar', 'foo');
+        $original->setRelation('hello', 'world');
+
+        $this->assertSame('baz', $original->getRelation('foo'));
+        $this->assertSame('ipsum', $original->getRelation('lorem'));
+        $this->assertSame('foo', $original->getRelation('bar'));
+        $this->assertSame('world', $original->getRelation('hello'));
+
+        $model = $original->onlyRelations('foo');
+
+        $this->assertInstanceOf(EloquentNoTouchingModelStub::class, $model);
+        $this->assertTrue($original->relationLoaded('foo'));
+        $this->assertTrue($model->relationLoaded('foo'));
+        $this->assertTrue($original->relationLoaded('lorem'));
+        $this->assertFalse($model->relationLoaded('lorem'));
+        $this->assertTrue($original->relationLoaded('bar'));
+        $this->assertFalse($model->relationLoaded('bar'));
+        $this->assertTrue($original->relationLoaded('hello'));
+        $this->assertFalse($model->relationLoaded('hello'));
+
+        $model = $original->onlyRelations('foo', 'bar');
+
+        $this->assertInstanceOf(EloquentNoTouchingModelStub::class, $model);
+        $this->assertTrue($original->relationLoaded('foo'));
+        $this->assertTrue($model->relationLoaded('foo'));
+        $this->assertTrue($original->relationLoaded('lorem'));
+        $this->assertFalse($model->relationLoaded('lorem'));
+        $this->assertTrue($original->relationLoaded('bar'));
+        $this->assertTrue($model->relationLoaded('bar'));
+        $this->assertTrue($original->relationLoaded('hello'));
+        $this->assertFalse($model->relationLoaded('hello'));
+
+        $model = $original->onlyRelations(['lorem', 'hello']);
+
+        $this->assertInstanceOf(EloquentNoTouchingModelStub::class, $model);
+        $this->assertTrue($original->relationLoaded('foo'));
+        $this->assertFalse($model->relationLoaded('foo'));
+        $this->assertTrue($original->relationLoaded('lorem'));
+        $this->assertTrue($model->relationLoaded('lorem'));
+        $this->assertTrue($original->relationLoaded('bar'));
+        $this->assertFalse($model->relationLoaded('bar'));
+        $this->assertTrue($original->relationLoaded('hello'));
+        $this->assertTrue($model->relationLoaded('hello'));
+    }
+
     public function testMacroable()
     {
         Relation::macro('foo', function () {

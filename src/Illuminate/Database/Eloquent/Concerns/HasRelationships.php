@@ -893,6 +893,27 @@ trait HasRelationships
     }
 
     /**
+     * Duplicate the instance and only keep the specified relations.
+     *
+     * @param  array|string  $relations
+     * @return $this
+     */
+    public function onlyRelations($relations)
+    {
+        $relations = is_string($relations) ? func_get_args() : $relations;
+
+        $model = clone $this;
+
+        foreach (array_keys($model->getRelations()) as $relation) {
+            if (! in_array($relation, $relations)) {
+                $model->unsetRelation($relation);
+            }
+        }
+
+        return $model;
+    }
+
+    /**
      * Unset all the loaded relations for the instance.
      *
      * @return $this
