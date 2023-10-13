@@ -44,7 +44,7 @@
         "symfony/console": "^6.2",
         "symfony/error-handler": "^6.2",
         "symfony/finder": "^6.2",
-        "symfony/http-foundation": "^6.2",
+        "symfony/http-foundation": "^6.3",
         "symfony/http-kernel": "^6.2",
         "symfony/mailer": "^6.2",
         "symfony/mime": "^6.2",
@@ -104,13 +104,15 @@
         "league/flysystem-read-only": "^3.3",
         "league/flysystem-sftp-v3": "^3.0",
         "mockery/mockery": "^1.5.1",
+        "nyholm/psr7": "^1.2",
         "orchestra/testbench-core": "^8.12",
         "pda/pheanstalk": "^4.0",
         "phpstan/phpstan": "^1.4.7",
         "phpunit/phpunit": "^10.0.7",
         "predis/predis": "^2.0.2",
         "symfony/cache": "^6.2",
-        "symfony/http-client": "^6.2.4"
+        "symfony/http-client": "^6.2.4",
+        "symfony/psr-http-message-bridge": "^2.0"
     },
     "provide": {
         "psr/container-implementation": "1.1|2.0",
