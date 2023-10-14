@@ -93,6 +93,14 @@ interface Application extends Container
     public function runningInConsole();
 
     /**
+     * Determine if the application is running any of the specified console commands.
+     *
+     * @param string|array  ...$commands
+     * @return bool
+     */
+    public function runningConsoleCommand(...$commands);
+
+    /**
      * Determine if the application is running unit tests.
      *
      * @return bool
