@@ -93,7 +93,7 @@ interface Application extends Container
     public function runningInConsole();
 
     /**
-     * Determine if the application is running any of the specified console commands.
+     * Determine if the application is running any of the given console commands.
      *
      * @param string|array  ...$commands
      * @return bool
