@@ -95,7 +95,7 @@ interface Application extends Container
     /**
      * Determine if the application is running any of the given console commands.
      *
-     * @param string|array  ...$commands
+     * @param  string|array  ...$commands
      * @return bool
      */
     public function runningConsoleCommand(...$commands);
