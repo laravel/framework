@@ -5,6 +5,7 @@ namespace Illuminate\Validation;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Validation\Rules\Can;
+use Illuminate\Validation\Rules\CompareDate;
 use Illuminate\Validation\Rules\Dimensions;
 use Illuminate\Validation\Rules\Enum;
 use Illuminate\Validation\Rules\ExcludeIf;
@@ -184,5 +185,38 @@ class Rule
     public static function dimensions(array $constraints = [])
     {
         return new Dimensions($constraints);
+    }
+
+    /**
+     * Get a date compare builder instance with initial equal rule.
+     *
+     * @param  int|string|\DateTimeInterface  $date
+     * @return \Illuminate\Validation\Rules\CompareDate
+     */
+    public static function equalDate($date)
+    {
+        return new CompareDate($date, '=');
+    }
+
+    /**
+     * Get a date compare builder instance with initial before rule.
+     *
+     * @param  int|string|\DateTimeInterface  $date
+     * @return \Illuminate\Validation\Rules\CompareDate
+     */
+    public static function beforeDate($date)
+    {
+        return new CompareDate($date, '<');
+    }
+
+    /**
+     * Get a date compare builder instance with initial after rule.
+     *
+     * @param  int|string|\DateTimeInterface  $date
+     * @return \Illuminate\Validation\Rules\CompareDate
+     */
+    public static function afterDate($date)
+    {
+        return new CompareDate($date, '>');
     }
 }
