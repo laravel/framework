@@ -173,9 +173,12 @@ class SupportStrTest extends TestCase
         $this->assertSame('[...]is a beautiful morn[...]', Str::excerpt('This is a beautiful morning', 'beautiful', ['omission' => '[...]', 'radius' => 5]));
         $this->assertSame(
             'This is the ultimate supercalifragilisticexpialidocious very looooooooooooooooooong looooooooooooong beautiful morning with amazing sunshine and awesome tempera[...]',
-            Str::excerpt('This is the ultimate supercalifragilisticexpialidocious very looooooooooooooooooong looooooooooooong beautiful morning with amazing sunshine and awesome temperatures. So what are you gonna do about it?', 'very',
+            Str::excerpt(
+                'This is the ultimate supercalifragilisticexpialidocious very looooooooooooooooooong looooooooooooong beautiful morning with amazing sunshine and awesome temperatures. So what are you gonna do about it?',
+                'very',
                 ['omission' => '[...]'],
-            ));
+            )
+        );
 
         $this->assertSame('...y...', Str::excerpt('taylor', 'y', ['radius' => 0]));
         $this->assertSame('...ayl...', Str::excerpt('taylor', 'Y', ['radius' => 1]));
@@ -1296,6 +1299,16 @@ class SupportStrTest extends TestCase
             Str::of(Str::password())->contains(['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'])
         );
     }
+
+    public function testMatchPattern()
+    {
+        $this->assertEquals('John', Str::matchPattern('/name is (\w+)!/', 'Hello, my name is John!'));
+        $this->assertEquals('Doe', Str::matchPattern('/surname is (\w+)!/', 'Hello, my surname is Doe!'));
+        $this->assertNull(Str::matchPattern('/surname is (\w+)!/', 'Hello, my name is John!'));
+        $this->assertEquals('Unknown', Str::matchPattern('/surname is (\w+)!/', 'Hello, my name is John!', 'Unknown'));
+    }
+
+
 }
 
 class StringableObjectStub

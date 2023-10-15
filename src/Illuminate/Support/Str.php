@@ -860,7 +860,8 @@ class Str
                 ']', '|', ':', ';',
             ] : null,
             'spaces' => $spaces === true ? [' '] : null,
-        ]))->filter()->each(fn ($c) => $password->push($c[random_int(0, count($c) - 1)])
+        ]))->filter()->each(
+            fn ($c) => $password->push($c[random_int(0, count($c) - 1)])
         )->flatten();
 
         $length = $length - $password->count();
@@ -1697,6 +1698,21 @@ class Str
 
         return $ulid;
     }
+
+    /**
+     * Get the matched result from the given string using the given pattern.
+     *
+     * @param  string  $pattern
+     * @param  string  $value
+     * @param  mixed  $default
+     * @return mixed
+    */
+    public static function matchPattern($pattern, $value, $default = null)
+    {
+        preg_match($pattern, $value, $matches);
+        return $matches[1] ?? $default;
+    }
+
 
     /**
      * Remove all strings from the casing caches.
