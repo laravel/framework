@@ -39,6 +39,7 @@ use RuntimeException;
 use stdClass;
 use Symfony\Component\HttpFoundation\Exception\SuspiciousOperationException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
@@ -48,6 +49,8 @@ class FoundationExceptionsHandlerTest extends TestCase
     use InteractsWithExceptionHandling;
 
     protected $config;
+
+    protected $viewFactory;
 
     protected $container;
 
@@ -59,14 +62,18 @@ class FoundationExceptionsHandlerTest extends TestCase
     {
         $this->config = m::mock(Config::class);
 
+        $this->viewFactory = m::mock(ViewFactory::class);
+
         $this->request = m::mock(stdClass::class);
 
         $this->container = Container::setInstance(new Container);
 
         $this->container->instance('config', $this->config);
 
+        $this->container->instance(ViewFactory::class, $this->viewFactory);
+
         $this->container->instance(ResponseFactoryContract::class, new ResponseFactory(
-            m::mock(ViewFactory::class),
+            $this->viewFactory,
             m::mock(Redirector::class)
         ));
 
@@ -395,6 +402,45 @@ class FoundationExceptionsHandlerTest extends TestCase
         };
 
         $this->assertNull($handler->getErrorView(new HttpException(404)));
+    }
+
+    private function executeScenarioWhereErrorViewThrowsWhileRenderingAndDebugIs($debug)
+    {
+        $this->viewFactory->shouldReceive('exists')->once()->with('errors::404')->andReturn(true);
+        $this->viewFactory->shouldReceive('make')->once()->withAnyArgs()->andThrow(new Exception("Rendering this view throws an exception"));
+
+        $this->config->shouldReceive('get')->with('app.debug', null)->andReturn($debug);
+
+        $handler = new class($this->container) extends Handler
+        {
+            protected function registerErrorViewPaths() {}
+
+            public function getErrorView($e)
+            {
+                return $this->renderHttpException($e);
+            }
+        };
+
+        $this->assertInstanceOf(SymfonyResponse::class, $handler->getErrorView(new HttpException(404)));
+    }
+
+    public function testItDoesNotCrashIfErrorViewThrowsWhileRenderingAndDebugFalse()
+    {
+        // When debug is false, the exception thrown while rendering the error view
+        // should not bubble as this may trigger an infinite loop.
+
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage("Rendering this view throws an exception");
+
+        $this->executeScenarioWhereErrorViewThrowsWhileRenderingAndDebugIs(false);
+    }
+
+    public function testItDoesNotCrashIfErrorViewThrowsWhileRenderingAndDebugTrue()
+    {
+        // When debug is true, it is OK to bubble the exception thrown while rendering
+        // the error view as the debug handler should handle this gracefully.
+
+        $this->executeScenarioWhereErrorViewThrowsWhileRenderingAndDebugIs(true);
     }
 
     public function testAssertExceptionIsThrown()
