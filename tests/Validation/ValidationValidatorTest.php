@@ -18,6 +18,7 @@ use Illuminate\Contracts\Validation\ValidatorAwareRule;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Exceptions\MathException;
 use Illuminate\Translation\ArrayLoader;
 use Illuminate\Translation\Translator;
 use Illuminate\Validation\DatabasePresenceVerifierInterface;
@@ -1413,6 +1414,29 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->fails());
         $this->assertCount(1, $v->messages());
         $this->assertSame('The baz field is required when foo is empty.', $v->messages()->first('baz'));
+    }
+
+    public function testRequiredIfArrayToStringConversationErrorException()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, [
+            'is_customer' => 1,
+            'fullname' => null,
+        ], [
+            'is_customer' => 'required|boolean',
+            'fullname' => 'required_if:is_customer,true',
+        ]);
+        $this->assertTrue($v->fails());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, [
+            'is_customer' => ['test'],
+            'fullname' => null,
+        ], [
+            'is_customer' => 'required|boolean',
+            'fullname' => 'required_if:is_customer,true',
+        ]);
+        $this->assertTrue($v->fails());
     }
 
     public function testRequiredUnless()
@@ -4462,7 +4486,7 @@ class ValidationValidatorTest extends TestCase
     {
         $trans = $this->getIlluminateArrayTranslator();
 
-        $uploadedFile = [__DIR__.'/ValidationRuleTest.php', '', null, null, true];
+        $uploadedFile = [__DIR__.'/ValidationMacroTest.php', '', null, null, true];
 
         $file = $this->getMockBuilder(UploadedFile::class)->onlyMethods(['guessExtension', 'getClientOriginalExtension'])->setConstructorArgs($uploadedFile)->getMock();
         $file->expects($this->any())->method('guessExtension')->willReturn('rtf');
@@ -8256,6 +8280,39 @@ class ValidationValidatorTest extends TestCase
         $this->assertSame($expectedValidatedData, $validator->validated());
     }
 
+    public function testExcludeBeforeADependentRule()
+    {
+        $validator = new Validator(
+            $this->getIlluminateArrayTranslator(),
+            [
+                'profile_id' => null,
+                'type'       => 'denied',
+            ],
+            [
+                'type'       => ['required', 'string', 'exclude'],
+                'profile_id' => ['nullable', 'required_if:type,profile', 'integer'],
+            ],
+        );
+
+        $this->assertTrue($validator->passes());
+        $this->assertSame(['profile_id' => null], $validator->validated());
+
+        $validator = new Validator(
+            $this->getIlluminateArrayTranslator(),
+            [
+                'profile_id' => null,
+                'type'       => 'profile',
+            ],
+            [
+                'type'       => ['required', 'string', 'exclude'],
+                'profile_id' => ['nullable', 'required_if:type,profile', 'integer'],
+            ],
+        );
+
+        $this->assertFalse($validator->passes());
+        $this->assertSame(['profile_id' => ['validation.required_if']], $validator->getMessageBag()->getMessages());
+    }
+
     public function testExcludingArrays()
     {
         $validator = new Validator(
@@ -8765,6 +8822,76 @@ class ValidationValidatorTest extends TestCase
             'size',
             'size_str',
         ], $validator->messages()->keys());
+    }
+
+    /** @dataProvider outsideRangeExponents */
+    public function testItLimitsLengthOfScientificNotationExponent($value)
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $validator = new Validator($trans, ['foo' => $value], ['foo' => 'numeric|min:3']);
+
+        $this->expectException(MathException::class);
+        $this->expectExceptionMessage('Scientific notation exponent outside of allowed range.');
+
+        $validator->passes();
+    }
+
+    public static function outsideRangeExponents()
+    {
+        return [
+            ['1.0e+1001'],
+            ['1.0E+1001'],
+            ['1.0e1001'],
+            ['1.0E1001'],
+            ['1.0e-1001'],
+            ['1.0E-1001'],
+        ];
+    }
+
+    /** @dataProvider withinRangeExponents */
+    public function testItAllowsScientificNotationWithinRange($value, $rule)
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $validator = new Validator($trans, ['foo' => $value], ['foo' => ['numeric', $rule]]);
+
+        $this->assertTrue($validator->passes());
+    }
+
+    public static function withinRangeExponents()
+    {
+        return [
+            ['1.0e+1000', 'min:3'],
+            ['1.0E+1000', 'min:3'],
+            ['1.0e1000', 'min:3'],
+            ['1.0E1000', 'min:3'],
+            ['1.0e-1000', 'max:3'],
+            ['1.0E-1000', 'max:3'],
+        ];
+    }
+
+    public function testItCanConfigureAllowedExponentRange()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $validator = new Validator($trans, ['foo' => '1.0e-1000'], ['foo' => ['numeric', 'max:3']]);
+        $scale = $attribute = $value = null;
+        $withinRange = true;
+
+        $validator->ensureExponentWithinAllowedRangeUsing(function () use (&$scale, &$attribute, &$value, &$withinRange) {
+            [$scale, $attribute, $value] = func_get_args();
+
+            return $withinRange;
+        });
+
+        $this->assertTrue($validator->passes());
+        $this->assertSame(-1000, $scale);
+        $this->assertSame('foo', $attribute);
+        $this->assertSame('1.0e-1000', $value);
+
+        $withinRange = false;
+        $this->expectException(MathException::class);
+        $this->expectExceptionMessage('Scientific notation exponent outside of allowed range.');
+
+        $validator->passes();
     }
 
     protected function getTranslator()

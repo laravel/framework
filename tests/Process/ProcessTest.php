@@ -6,18 +6,12 @@ use Illuminate\Contracts\Process\ProcessResult;
 use Illuminate\Process\Exceptions\ProcessFailedException;
 use Illuminate\Process\Exceptions\ProcessTimedOutException;
 use Illuminate\Process\Factory;
-use Mockery as m;
 use OutOfBoundsException;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 
 class ProcessTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     public function testSuccessfulProcess()
     {
         $factory = new Factory;
@@ -326,7 +320,7 @@ class ProcessTest extends TestCase
         $result = $factory->run('ls -la');
     }
 
-    public function testStrayProcessesCanBePreventedWithStringComand()
+    public function testStrayProcessesCanBePreventedWithStringCommand()
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Attempted process [');

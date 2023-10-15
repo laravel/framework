@@ -44,6 +44,13 @@ class QueueFake extends QueueManager implements Fake, Queue
     protected $jobs = [];
 
     /**
+     * Indicates if items should be serialized and restored when pushed to the queue.
+     *
+     * @var bool
+     */
+    protected bool $serializeAndRestore = false;
+
+    /**
      * Create a new fake queue instance.
      *
      * @param  \Illuminate\Contracts\Foundation\Application  $app
@@ -352,7 +359,7 @@ class QueueFake extends QueueManager implements Fake, Queue
             }
 
             $this->jobs[is_object($job) ? get_class($job) : $job][] = [
-                'job' => $job,
+                'job' =>  $this->serializeAndRestore ? $this->serializeAndRestoreJob($job) : $job,
                 'queue' => $queue,
                 'data' => $data,
             ];
@@ -380,7 +387,7 @@ class QueueFake extends QueueManager implements Fake, Queue
         }
 
         return $this->jobsToFake->contains(
-            fn ($jobToFake) => $job instanceof ((string) $jobToFake)
+            fn ($jobToFake) => $job instanceof ((string) $jobToFake) || $job === (string) $jobToFake
         );
     }
 
@@ -489,6 +496,30 @@ class QueueFake extends QueueManager implements Fake, Queue
     public function pushedJobs()
     {
         return $this->jobs;
+    }
+
+    /**
+     * Specify if jobs should be serialized and restored when being "pushed" to the queue.
+     *
+     * @param  bool  $serializeAndRestore
+     * @return $this
+     */
+    public function serializeAndRestore(bool $serializeAndRestore = true)
+    {
+        $this->serializeAndRestore = $serializeAndRestore;
+
+        return $this;
+    }
+
+    /**
+     * Serialize and unserialize the job to simulate the queueing process.
+     *
+     * @param  mixed  $job
+     * @return mixed
+     */
+    protected function serializeAndRestoreJob($job)
+    {
+        return unserialize(serialize($job));
     }
 
     /**

@@ -864,6 +864,10 @@ trait ValidatesAttributes
 
         $expected = is_array($value) ? count(array_unique($value)) : 1;
 
+        if ($expected === 0) {
+            return true;
+        }
+
         return $this->getExistCount(
             $connection, $table, $column, $value, $parameters
         ) >= $expected;
@@ -2352,7 +2356,7 @@ trait ValidatesAttributes
         // is the size. If it is a file, we take kilobytes, and for a string the
         // entire length of the string will be considered the attribute size.
         if (is_numeric($value) && $hasNumeric) {
-            return $this->trim($value);
+            return $this->ensureExponentWithinAllowedRange($attribute, $this->trim($value));
         } elseif (is_array($value)) {
             return count($value);
         } elseif ($value instanceof File) {
@@ -2468,5 +2472,35 @@ trait ValidatesAttributes
     protected function trim($value)
     {
         return is_string($value) ? trim($value) : $value;
+    }
+
+    /**
+     * Ensure the exponent is within the allowed range.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @return mixed
+     */
+    protected function ensureExponentWithinAllowedRange($attribute, $value)
+    {
+        $stringValue = (string) $value;
+
+        if (! is_numeric($value) || ! Str::contains($stringValue, 'e', ignoreCase: true)) {
+            return $value;
+        }
+
+        $scale = (int) (Str::contains($stringValue, 'e')
+            ? Str::after($stringValue, 'e')
+            : Str::after($stringValue, 'E'));
+
+        $withinRange = (
+            $this->ensureExponentWithinAllowedRangeUsing ?? fn ($scale) => $scale <= 1000 && $scale >= -1000
+        )($scale, $attribute, $value);
+
+        if (! $withinRange) {
+            throw new MathException('Scientific notation exponent outside of allowed range.');
+        }
+
+        return $value;
     }
 }

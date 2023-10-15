@@ -342,7 +342,7 @@ class DatabaseBatchRepository implements PrunableBatchRepository
 
         try {
             return unserialize($serialized);
-        } catch (ModelNotFoundException $e) {
+        } catch (ModelNotFoundException) {
             return [];
         }
     }

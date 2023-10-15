@@ -15,7 +15,7 @@ class HasherTest extends TestCase
 {
     public $hashManager;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -54,6 +54,7 @@ class HasherTest extends TestCase
         $this->assertFalse($hasher->needsRehash($value));
         $this->assertTrue($hasher->needsRehash($value, ['rounds' => 1]));
         $this->assertSame('bcrypt', password_get_info($value)['algoName']);
+        $this->assertGreaterThanOrEqual(12, password_get_info($value)['options']['cost']);
         $this->assertTrue($this->hashManager->isHashed($value));
     }
 

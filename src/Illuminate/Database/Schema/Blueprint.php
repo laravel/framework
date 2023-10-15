@@ -1786,6 +1786,16 @@ class Blueprint
     }
 
     /**
+     * Get the table prefix.
+     *
+     * @return string
+     */
+    public function getPrefix()
+    {
+        return $this->prefix;
+    }
+
+    /**
      * Get the columns on the blueprint.
      *
      * @return \Illuminate\Database\Schema\ColumnDefinition[]

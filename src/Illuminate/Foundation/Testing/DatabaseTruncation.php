@@ -24,6 +24,8 @@ trait DatabaseTruncation
      */
     protected function truncateDatabaseTables(): void
     {
+        $this->beforeTruncatingDatabase();
+
         // Migrate and seed the database on first run...
         if (! RefreshDatabaseState::$migrated) {
             $this->artisan('migrate:fresh', $this->migrateFreshUsing());
@@ -45,6 +47,8 @@ trait DatabaseTruncation
             // Use the default seeder class...
             $this->artisan('db:seed');
         }
+
+        $this->afterTruncatingDatabase();
     }
 
     /**
@@ -85,10 +89,26 @@ trait DatabaseTruncation
                 fn ($tables) => $tables->intersect($this->tablesToTruncate),
                 fn ($tables) => $tables->diff($this->exceptTables($name))
             )
-            ->filter(fn ($table) => $connection->table($table)->exists())
-            ->each(fn ($table) => $connection->table($table)->truncate());
+            ->filter(fn ($table) => $connection->table($this->withoutTablePrefix($connection, $table))->exists())
+            ->each(fn ($table) => $connection->table($this->withoutTablePrefix($connection, $table))->truncate());
 
         $connection->setEventDispatcher($dispatcher);
+    }
+
+    /**
+     * Remove the table prefix from a table name, if it exists.
+     *
+     * @param  \Illuminate\Database\ConnectionInterface  $connection
+     * @param  string  $table
+     * @return string
+     */
+    protected function withoutTablePrefix(ConnectionInterface $connection, string $table)
+    {
+        $prefix = $connection->getTablePrefix();
+
+        return strpos($table, $prefix) === 0
+            ? substr($table, strlen($prefix))
+            : $table;
     }
 
     /**
@@ -127,5 +147,25 @@ trait DatabaseTruncation
         }
 
         return [$this->app['config']->get('database.migrations')];
+    }
+
+    /**
+     * Perform any work that should take place before the database has started truncating.
+     *
+     * @return void
+     */
+    protected function beforeTruncatingDatabase(): void
+    {
+        //
+    }
+
+    /**
+     * Perform any work that should take place once the database has finished truncating.
+     *
+     * @return void
+     */
+    protected function afterTruncatingDatabase(): void
+    {
+        //
     }
 }

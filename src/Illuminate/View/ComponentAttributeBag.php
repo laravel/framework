@@ -11,9 +11,10 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\Macroable;
 use IteratorAggregate;
+use JsonSerializable;
 use Traversable;
 
-class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
+class ComponentAttributeBag implements ArrayAccess, IteratorAggregate, JsonSerializable, Htmlable
 {
     use Conditionable, Macroable;
 
@@ -453,6 +454,16 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
     public function getIterator(): Traversable
     {
         return new ArrayIterator($this->attributes);
+    }
+
+    /**
+     * Convert the object into a JSON serializable form.
+     *
+     * @return mixed
+     */
+    public function jsonSerialize(): mixed
+    {
+        return $this->attributes;
     }
 
     /**

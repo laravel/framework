@@ -844,7 +844,7 @@ class PendingRequest
      * Send a pool of asynchronous requests concurrently.
      *
      * @param  callable  $callback
-     * @return array
+     * @return array<array-key, \Illuminate\Http\Client\Response>
      */
     public function pool(callable $callback)
     {
@@ -889,7 +889,7 @@ class PendingRequest
 
         return retry($this->tries ?? 1, function ($attempt) use ($method, $url, $options, &$shouldRetry) {
             try {
-                return tap(new Response($this->sendRequest($method, $url, $options)), function ($response) use ($attempt, &$shouldRetry) {
+                return tap($this->newResponse($this->sendRequest($method, $url, $options)), function ($response) use ($attempt, &$shouldRetry) {
                     $this->populateResponse($response);
 
                     $this->dispatchResponseReceivedEvent($response);
@@ -1001,13 +1001,13 @@ class PendingRequest
     {
         return $this->promise = $this->sendRequest($method, $url, $options)
             ->then(function (MessageInterface $message) {
-                return tap(new Response($message), function ($response) {
+                return tap($this->newResponse($message), function ($response) {
                     $this->populateResponse($response);
                     $this->dispatchResponseReceivedEvent($response);
                 });
             })
             ->otherwise(function (TransferException $e) {
-                return $e instanceof RequestException && $e->hasResponse() ? $this->populateResponse(new Response($e->getResponse())) : $e;
+                return $e instanceof RequestException && $e->hasResponse() ? $this->populateResponse($this->newResponse($e->getResponse())) : $e;
             });
     }
 
@@ -1193,7 +1193,7 @@ class PendingRequest
                 return $promise->then(function ($response) use ($request, $options) {
                     $this->factory?->recordRequestResponsePair(
                         (new Request($request))->withData($options['laravel_data']),
-                        new Response($response)
+                        $this->newResponse($response)
                     );
 
                     return $response;
@@ -1296,6 +1296,17 @@ class PendingRequest
             array_merge_recursive($this->options, Arr::only($options, $this->mergableOptions)),
             ...$options
         );
+    }
+
+    /**
+     * Create a new response instance using the given PSR response.
+     *
+     * @param  \Psr\Http\Message\MessageInterface  $response
+     * @return Response
+     */
+    protected function newResponse($response)
+    {
+        return new Response($response);
     }
 
     /**

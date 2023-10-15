@@ -169,7 +169,7 @@ class UrlSigningTest extends TestCase
         $this->assertSame('valid', $this->get($url.'&two=value&one=&three')->original);
     }
 
-    public function testUnusualExceptedParametersWorksAsExpexted()
+    public function testUnusualExceptedParametersWorksAsExpected()
     {
         $this->withoutExceptionHandling();
         Route::get('/foo/{id}', function (Request $request, $id) {

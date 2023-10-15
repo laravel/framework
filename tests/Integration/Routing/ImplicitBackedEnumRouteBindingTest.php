@@ -5,7 +5,7 @@ namespace Illuminate\Tests\Integration\Routing;
 use Illuminate\Support\Facades\Route;
 use Orchestra\Testbench\TestCase;
 
-include 'Enums.php';
+include_once 'Enums.php';
 
 class ImplicitBackedEnumRouteBindingTest extends TestCase
 {

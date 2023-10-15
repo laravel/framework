@@ -214,7 +214,7 @@ class Worker
         pcntl_signal(SIGALRM, function () use ($job, $options) {
             if ($job) {
                 $this->markJobAsFailedIfWillExceedMaxAttempts(
-                    $job->getConnectionName(), $job, (int) $options->maxTries, $e = $this->timoutExceededException($job)
+                    $job->getConnectionName(), $job, (int) $options->maxTries, $e = $this->timeoutExceededException($job)
                 );
 
                 $this->markJobAsFailedIfWillExceedMaxExceptions(
@@ -793,7 +793,7 @@ class Worker
      * @param  \Illuminate\Contracts\Queue\Job  $job
      * @return \Illuminate\Queue\TimeoutExceededException
      */
-    protected function timoutExceededException($job)
+    protected function timeoutExceededException($job)
     {
         return new TimeoutExceededException(
             $job->resolveName().' has timed out.'

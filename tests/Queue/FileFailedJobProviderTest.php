@@ -140,13 +140,63 @@ class FileFailedJobProviderTest extends TestCase
         $this->assertEmpty($failedJobs);
     }
 
-    public function logFailedJob()
+    public function testJobsCanBeCounted()
+    {
+        $this->assertSame(0, $this->provider->count());
+
+        $this->logFailedJob('database', 'default');
+        $this->assertSame(1, $this->provider->count());
+
+        $this->logFailedJob('database', 'default');
+        $this->logFailedJob('another-connection', 'another-queue');
+        $this->assertSame(3, $this->provider->count());
+    }
+
+    public function testJobsCanBeCountedByConnection()
+    {
+        $this->logFailedJob('connection-1', 'default');
+        $this->logFailedJob('connection-2', 'default');
+        $this->assertSame(1, $this->provider->count('connection-1'));
+        $this->assertSame(1, $this->provider->count('connection-2'));
+
+        $this->logFailedJob('connection-1', 'default');
+        $this->assertSame(2, $this->provider->count('connection-1'));
+        $this->assertSame(1, $this->provider->count('connection-2'));
+    }
+
+    public function testJobsCanBeCountedByQueue()
+    {
+        $this->logFailedJob('database', 'queue-1');
+        $this->logFailedJob('database', 'queue-2');
+        $this->assertSame(1, $this->provider->count(queue: 'queue-1'));
+        $this->assertSame(1, $this->provider->count(queue: 'queue-2'));
+
+        $this->logFailedJob('database', 'queue-1');
+        $this->assertSame(2, $this->provider->count(queue: 'queue-1'));
+        $this->assertSame(1, $this->provider->count(queue: 'queue-2'));
+    }
+
+    public function testJobsCanBeCountedByQueueAndConnection()
+    {
+        $this->logFailedJob('connection-1', 'queue-99');
+        $this->logFailedJob('connection-1', 'queue-99');
+        $this->logFailedJob('connection-2', 'queue-99');
+        $this->logFailedJob('connection-1', 'queue-1');
+        $this->logFailedJob('connection-2', 'queue-1');
+        $this->logFailedJob('connection-2', 'queue-1');
+        $this->assertSame(2, $this->provider->count('connection-1', 'queue-99'));
+        $this->assertSame(1, $this->provider->count('connection-2', 'queue-99'));
+        $this->assertSame(1, $this->provider->count('connection-1', 'queue-1'));
+        $this->assertSame(2, $this->provider->count('connection-2', 'queue-1'));
+    }
+
+    public function logFailedJob($connection = 'connection', $queue = 'queue')
     {
         $uuid = Str::uuid();
 
         $exception = new Exception("Something went wrong at job [{$uuid}].");
 
-        $this->provider->log('connection', 'queue', json_encode(['uuid' => (string) $uuid]), $exception);
+        $this->provider->log($connection, $queue, json_encode(['uuid' => (string) $uuid]), $exception);
 
         return [(string) $uuid, $exception];
     }

@@ -23,6 +23,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Fluent;
+use Illuminate\Support\Sleep;
 use Illuminate\Support\Str;
 use JsonSerializable;
 use Mockery as m;
@@ -51,6 +52,8 @@ class HttpClientTest extends TestCase
     protected function tearDown(): void
     {
         m::close();
+
+        parent::tearDown();
     }
 
     public function testStubbedResponsesAreReturnedAfterFaking()
@@ -130,6 +133,20 @@ class HttpClientTest extends TestCase
 
         $response = $this->factory->post('http://forge.laravel.com');
         $this->assertFalse($response->found());
+    }
+
+    public function testNotModifiedRequest(): void
+    {
+        $this->factory->fake([
+            'vapor.laravel.com' => $this->factory::response('', HttpResponse::HTTP_NOT_MODIFIED),
+            'forge.laravel.com' => $this->factory::response('', HttpResponse::HTTP_OK),
+        ]);
+
+        $response = $this->factory->post('https://vapor.laravel.com');
+        $this->assertTrue($response->notModified());
+
+        $response = $this->factory->post('https://forge.laravel.com');
+        $this->assertFalse($response->notModified());
     }
 
     public function testBadRequestRequest()
@@ -1715,7 +1732,7 @@ class HttpClientTest extends TestCase
 
     public function testRequestsWillBeWaitingSleepMillisecondsReceivedBeforeRetry()
     {
-        $startTime = microtime(true);
+        Sleep::fake();
 
         $this->factory->fake([
             '*' => $this->factory->sequence()
@@ -1734,8 +1751,13 @@ class HttpClientTest extends TestCase
 
         $this->factory->assertSentCount(3);
 
-        // Make sure was waited 300ms for the first two attempts
-        $this->assertEqualsWithDelta(0.3, microtime(true) - $startTime, 0.03);
+        // Make sure we waited 300ms for the first two attempts
+        Sleep::assertSleptTimes(2);
+
+        Sleep::assertSequence([
+            Sleep::usleep(100_000),
+            Sleep::usleep(200_000),
+        ]);
     }
 
     public function testMiddlewareRunsWhenFaked()
@@ -2517,4 +2539,48 @@ class HttpClientTest extends TestCase
         $this->assertSame('Bar', $responses[0]->header('X-Foo'));
         $this->assertSame('', $responses[1]->header('X-Foo'));
     }
+
+    public function testItReturnsResponse(): void
+    {
+        $this->factory->fake([
+            '*' => $this->factory::response('expected content'),
+        ]);
+
+        $response = $this->factory->get('http://laravel.com');
+
+        $this->assertInstanceOf(Response::class, $response);
+        $this->assertSame('expected content', $response->body());
+    }
+
+    public function testItCanReturnCustomResponseClass(): void
+    {
+        $factory = new CustomFactory;
+
+        $factory->fake([
+            '*' => $factory::response('expected content'),
+        ]);
+
+        $response = $factory->get('http://laravel.fake');
+
+        $this->assertInstanceOf(TestResponse::class, $response);
+        $this->assertSame('expected content', $response->body());
+    }
+}
+
+class CustomFactory extends Factory
+{
+    protected function newPendingRequest()
+    {
+        return new class extends PendingRequest
+        {
+            protected function newResponse($response)
+            {
+                return new TestResponse($response);
+            }
+        };
+    }
+}
+
+class TestResponse extends Response
+{
 }

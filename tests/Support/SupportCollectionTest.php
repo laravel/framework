@@ -26,9 +26,7 @@ use Symfony\Component\VarDumper\VarDumper;
 use Traversable;
 use UnexpectedValueException;
 
-if (PHP_VERSION_ID >= 80100) {
-    include_once 'Enums.php';
-}
+include_once 'Enums.php';
 
 class SupportCollectionTest extends TestCase
 {
@@ -4741,7 +4739,7 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
-    public function testSplitCollectionWithADivisableCount($collection)
+    public function testSplitCollectionWithADivisibleCount($collection)
     {
         $data = new $collection(['a', 'b', 'c', 'd']);
         $split = $data->split(2);
@@ -5632,6 +5630,62 @@ class SupportCollectionTest extends TestCase
         $data = $collection::make([new \Error, new \Error, new $collection]);
         $this->expectException(UnexpectedValueException::class);
         $data->ensure(\Throwable::class);
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testPercentageWithFlatCollection($collection)
+    {
+        $collection = new $collection([1, 1, 2, 2, 2, 3]);
+
+        $this->assertSame(33.33, $collection->percentage(fn ($value) => $value === 1));
+        $this->assertSame(50.00, $collection->percentage(fn ($value) => $value === 2));
+        $this->assertSame(16.67, $collection->percentage(fn ($value) => $value === 3));
+        $this->assertSame(0.0, $collection->percentage(fn ($value) => $value === 5));
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testPercentageWithNestedCollection($collection)
+    {
+        $collection = new $collection([
+            ['name' => 'Taylor', 'foo' => 'foo'],
+            ['name' => 'Nuno', 'foo' => 'bar'],
+            ['name' => 'Dries', 'foo' => 'bar'],
+            ['name' => 'Jess', 'foo' => 'baz'],
+        ]);
+
+        $this->assertSame(25.00, $collection->percentage(fn ($value) => $value['foo'] === 'foo'));
+        $this->assertSame(50.00, $collection->percentage(fn ($value) => $value['foo'] === 'bar'));
+        $this->assertSame(25.00, $collection->percentage(fn ($value) => $value['foo'] === 'baz'));
+        $this->assertSame(0.0, $collection->percentage(fn ($value) => $value['foo'] === 'test'));
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testHighOrderPercentage($collection)
+    {
+        $collection = new $collection([
+            ['name' => 'Taylor', 'active' => true],
+            ['name' => 'Nuno', 'active' => true],
+            ['name' => 'Dries', 'active' => false],
+            ['name' => 'Jess', 'active' => true],
+        ]);
+
+        $this->assertSame(75.00, $collection->percentage->active);
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testPercentageReturnsNullForEmptyCollections($collection)
+    {
+        $collection = new $collection([]);
+
+        $this->assertNull($collection->percentage(fn ($value) => $value === 1));
     }
 
     /**

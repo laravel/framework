@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Database\QueryException;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Pagination\AbstractPaginator as Paginator;
 use Illuminate\Pagination\Cursor;
 use Illuminate\Pagination\CursorPaginator;
@@ -72,7 +73,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
             $table->timestamps();
         });
 
-        $this->schema('default')->create('users_with_space_in_colum_name', function ($table) {
+        $this->schema('default')->create('users_with_space_in_column_name', function ($table) {
             $table->increments('id');
             $table->string('name')->nullable();
             $table->string('email address');
@@ -84,6 +85,16 @@ class DatabaseEloquentIntegrationTest extends TestCase
                 $table->increments('id');
                 $table->string('name')->nullable();
                 $table->string('email');
+                $table->timestamp('birthday', 6)->nullable();
+                $table->timestamps();
+            });
+
+            $this->schema($connection)->create('unique_users', function ($table) {
+                $table->increments('id');
+                $table->string('name')->nullable();
+                // Unique constraint will be applied only for non-null values
+                $table->string('screen_name')->nullable()->unique();
+                $table->string('email')->unique();
                 $table->timestamp('birthday', 6)->nullable();
                 $table->timestamps();
             });
@@ -511,6 +522,76 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertSame('Nuno Maduro', $user4->name);
     }
 
+    public function testCreateOrFirst()
+    {
+        $user1 = EloquentTestUniqueUser::createOrFirst(['email' => 'taylorotwell@gmail.com']);
+
+        $this->assertSame('taylorotwell@gmail.com', $user1->email);
+        $this->assertNull($user1->name);
+
+        $user2 = EloquentTestUniqueUser::createOrFirst(
+            ['email' => 'taylorotwell@gmail.com'],
+            ['name' => 'Taylor Otwell']
+        );
+
+        $this->assertEquals($user1->id, $user2->id);
+        $this->assertSame('taylorotwell@gmail.com', $user2->email);
+        $this->assertNull($user2->name);
+
+        $user3 = EloquentTestUniqueUser::createOrFirst(
+            ['email' => 'abigailotwell@gmail.com'],
+            ['name' => 'Abigail Otwell']
+        );
+
+        $this->assertNotEquals($user3->id, $user1->id);
+        $this->assertSame('abigailotwell@gmail.com', $user3->email);
+        $this->assertSame('Abigail Otwell', $user3->name);
+
+        $user4 = EloquentTestUniqueUser::createOrFirst(
+            ['name' => 'Dries Vints'],
+            ['name' => 'Nuno Maduro', 'email' => 'nuno@laravel.com']
+        );
+
+        $this->assertSame('Nuno Maduro', $user4->name);
+    }
+
+    public function testCreateOrFirstNonAttributeFieldViolation()
+    {
+        // 'email' and 'screen_name' are unique and independent of each other.
+        EloquentTestUniqueUser::create([
+            'email' => 'taylorotwell+foo@gmail.com',
+            'screen_name' => '@taylorotwell',
+        ]);
+
+        $this->expectException(UniqueConstraintViolationException::class);
+
+        // Although 'email' is expected to be unique and is passed as $attributes,
+        // if the 'screen_name' attribute listed in non-unique $values causes a violation,
+        // a UniqueConstraintViolationException should be thrown.
+        EloquentTestUniqueUser::createOrFirst(
+            ['email' => 'taylorotwell+bar@gmail.com'],
+            [
+                'screen_name' => '@taylorotwell',
+            ]
+        );
+    }
+
+    public function testCreateOrFirstWithinTransaction()
+    {
+        $user1 = EloquentTestUniqueUser::create(['email' => 'taylorotwell@gmail.com']);
+
+        DB::transaction(function () use ($user1) {
+            $user2 = EloquentTestUniqueUser::createOrFirst(
+                ['email' => 'taylorotwell@gmail.com'],
+                ['name' => 'Taylor Otwell']
+            );
+
+            $this->assertEquals($user1->id, $user2->id);
+            $this->assertSame('taylorotwell@gmail.com', $user2->email);
+            $this->assertNull($user2->name);
+        });
+    }
+
     public function testUpdateOrCreate()
     {
         $user1 = EloquentTestUser::create(['email' => 'taylorotwell@gmail.com']);
@@ -653,7 +734,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
         EloquentTestUserWithSpaceInColumnName::create(['id' => 1, 'email address' => 'taylorotwell@gmail.com']);
         EloquentTestUserWithSpaceInColumnName::create(['id' => 2, 'email address' => 'abigailotwell@gmail.com']);
 
-        $simple = EloquentTestUserWithSpaceInColumnName::oldest('id')->pluck('users_with_space_in_colum_name.email address')->all();
+        $simple = EloquentTestUserWithSpaceInColumnName::oldest('id')->pluck('users_with_space_in_column_name.email address')->all();
         $keyed = EloquentTestUserWithSpaceInColumnName::oldest('id')->pluck('email address', 'id')->all();
 
         $this->assertEquals(['taylorotwell@gmail.com', 'abigailotwell@gmail.com'], $simple);
@@ -1403,7 +1484,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
             try {
                 $user->email = 'otwell@laravel.com';
                 $user->saveOrFail();
-            } catch (Exception $e) {
+            } catch (Exception) {
                 // ignore the exception
             }
 
@@ -2185,7 +2266,7 @@ class EloquentTestUserWithCustomFriendPivot extends EloquentTestUser
 
 class EloquentTestUserWithSpaceInColumnName extends EloquentTestUser
 {
-    protected $table = 'users_with_space_in_colum_name';
+    protected $table = 'users_with_space_in_column_name';
 }
 
 class EloquentTestNonIncrementing extends Eloquent
@@ -2241,6 +2322,13 @@ class EloquentTestUserWithGlobalScopeRemovingOtherScope extends Eloquent
 
         parent::boot();
     }
+}
+
+class EloquentTestUniqueUser extends Eloquent
+{
+    protected $table = 'unique_users';
+    protected $casts = ['birthday' => 'datetime'];
+    protected $guarded = [];
 }
 
 class EloquentTestPost extends Eloquent

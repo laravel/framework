@@ -6,7 +6,7 @@ use DateTimeInterface;
 use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Support\Facades\Date;
 
-class DatabaseUuidFailedJobProvider implements FailedJobProviderInterface, PrunableFailedJobProvider
+class DatabaseUuidFailedJobProvider implements CountableFailedJobProvider, FailedJobProviderInterface, PrunableFailedJobProvider
 {
     /**
      * The connection resolver implementation.
@@ -141,6 +141,21 @@ class DatabaseUuidFailedJobProvider implements FailedJobProviderInterface, Pruna
         } while ($deleted !== 0);
 
         return $totalDeleted;
+    }
+
+    /**
+     * Count the failed jobs.
+     *
+     * @param  string|null  $connection
+     * @param  string|null  $queue
+     * @return int
+     */
+    public function count($connection = null, $queue = null)
+    {
+        return $this->getTable()
+            ->when($connection, fn ($builder) => $builder->whereConnection($connection))
+            ->when($queue, fn ($builder) => $builder->whereQueue($queue))
+            ->count();
     }
 
     /**

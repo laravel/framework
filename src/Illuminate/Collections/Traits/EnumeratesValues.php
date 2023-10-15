@@ -37,6 +37,7 @@ use UnitEnum;
  * @property-read HigherOrderCollectionProxy $max
  * @property-read HigherOrderCollectionProxy $min
  * @property-read HigherOrderCollectionProxy $partition
+ * @property-read HigherOrderCollectionProxy $percentage
  * @property-read HigherOrderCollectionProxy $reject
  * @property-read HigherOrderCollectionProxy $skipUntil
  * @property-read HigherOrderCollectionProxy $skipWhile
@@ -83,6 +84,7 @@ trait EnumeratesValues
         'max',
         'min',
         'partition',
+        'percentage',
         'reject',
         'skipUntil',
         'skipWhile',
@@ -318,7 +320,7 @@ trait EnumeratesValues
      * @template TEnsureOfType
      *
      * @param  class-string<TEnsureOfType>  $type
-     * @return static<mixed, TEnsureOfType>
+     * @return static<TKey, TEnsureOfType>
      *
      * @throws \UnexpectedValueException
      */
@@ -479,6 +481,25 @@ trait EnumeratesValues
         }
 
         return new static([new static($passed), new static($failed)]);
+    }
+
+    /**
+     * Calculate the percentage of items that pass a given truth test.
+     *
+     * @param  (callable(TValue, TKey): bool)  $callback
+     * @param  int  $precision
+     * @return float|null
+     */
+    public function percentage(callable $callback, int $precision = 2)
+    {
+        if ($this->isEmpty()) {
+            return null;
+        }
+
+        return round(
+            $this->filter($callback)->count() / $this->count() * 100,
+            $precision
+        );
     }
 
     /**

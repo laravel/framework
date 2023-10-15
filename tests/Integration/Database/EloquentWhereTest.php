@@ -138,7 +138,7 @@ class EloquentWhereTest extends DatabaseTestCase
         $this->assertCount(2, $users);
     }
 
-    public function testWhereInCanAcceptQueriable()
+    public function testWhereInCanAcceptQueryable()
     {
         $user1 = UserWhereTest::create([
             'name' => 'test-name1',
