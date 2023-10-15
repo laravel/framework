@@ -710,6 +710,24 @@ class Application extends Container implements ApplicationContract, CachesConfig
     }
 
     /**
+     * Determine if the application is running any of the given console commands.
+     *
+     * @param  string|array  ...$commands
+     * @return bool
+     */
+    public function runningConsoleCommand(...$commands)
+    {
+        if (! $this->runningInConsole()) {
+            return false;
+        }
+
+        return in_array(
+            $_SERVER['argv'][1] ?? null,
+            is_array($commands[0]) ? $commands[0] : $commands
+        );
+    }
+
+    /**
      * Determine if the application is running unit tests.
      *
      * @return bool
