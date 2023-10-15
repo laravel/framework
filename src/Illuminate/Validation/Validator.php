@@ -1482,6 +1482,16 @@ class Validator implements ValidatorContract
     }
 
     /**
+     * Get the exception to throw upon failed validation.
+     *
+     * @return string
+     */
+    public function getException()
+    {
+        return $this->exception;
+    }
+
+    /**
      * Set the exception to throw upon failed validation.
      *
      * @param  string  $exception
