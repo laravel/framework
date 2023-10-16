@@ -140,6 +140,47 @@ class Arr
     }
 
     /**
+     * Flatten a multi-dimensional associative array with a custom parameter.
+     *
+     * @param  iterable  $array
+     * @param  string  $prepend
+     * @param  string  $separator
+     * @return array
+     */
+    public static function compress($array, $prepend = '', $separator = '.')
+    {
+        $results = [];
+
+        foreach ($array as $key => $value) {
+            if (is_array($value) && ! empty($value)) {
+                $results = array_merge($results, static::compress($value, $prepend.$key.$separator, $separator));
+            } else {
+                $results[$prepend.$key] = $value;
+            }
+        }
+
+        return $results;
+    }
+
+    /**
+     * Convert a flatten array into an expanded array. Defaults to a "dot" as a separator.
+     *
+     * @param  iterable  $array
+     * @param  string  $separator
+     * @return array
+     */
+    public static function expand($array, $separator = '.')
+    {
+        $results = [];
+
+        foreach ($array as $key => $value) {
+            static::set($results, $key, $value, $separator);
+        }
+
+        return $results;
+    }
+
+    /**
      * Get all of the given array except for a specified array of keys.
      *
      * @param  array  $array
@@ -696,13 +737,13 @@ class Arr
      * @param  mixed  $value
      * @return array
      */
-    public static function set(&$array, $key, $value)
+    public static function set(&$array, $key, $value, $separator = '.')
     {
         if (is_null($key)) {
             return $array = $value;
         }
 
-        $keys = explode('.', $key);
+        $keys = explode($separator, $key);
 
         foreach ($keys as $i => $key) {
             if (count($keys) === 1) {
