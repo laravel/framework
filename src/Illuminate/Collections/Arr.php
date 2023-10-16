@@ -101,7 +101,7 @@ class Arr
     }
 
     /**
-     * Flatten a multi-dimensional associative array with dots. (default)
+     * Flatten a multi-dimensional associative array with dots (default).
      *
      * @param  iterable  $array
      * @param  string  $prepend
