@@ -107,13 +107,13 @@ class Arr
      * @param  string  $prepend
      * @return array
      */
-    public static function dot($array, $prepend = '')
+    public static function dot($array, $prepend = '', $separator = '.')
     {
         $results = [];
 
         foreach ($array as $key => $value) {
             if (is_array($value) && ! empty($value)) {
-                $results = array_merge($results, static::dot($value, $prepend.$key.'.'));
+                $results = array_merge($results, static::dot($value, $prepend.$key.$separator));
             } else {
                 $results[$prepend.$key] = $value;
             }
@@ -128,12 +128,12 @@ class Arr
      * @param  iterable  $array
      * @return array
      */
-    public static function undot($array)
+    public static function undot($array, $separator = '.')
     {
         $results = [];
 
         foreach ($array as $key => $value) {
-            static::set($results, $key, $value);
+            static::set($results, $key, $value, $separator);
         }
 
         return $results;
@@ -696,13 +696,13 @@ class Arr
      * @param  mixed  $value
      * @return array
      */
-    public static function set(&$array, $key, $value)
+    public static function set(&$array, $key, $value, $separator = '.')
     {
         if (is_null($key)) {
             return $array = $value;
         }
 
-        $keys = explode('.', $key);
+        $keys = explode($separator, $key);
 
         foreach ($keys as $i => $key) {
             if (count($keys) === 1) {
