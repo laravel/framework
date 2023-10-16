@@ -44,7 +44,7 @@
         "symfony/console": "^6.2",
         "symfony/error-handler": "^6.2",
         "symfony/finder": "^6.2",
-        "symfony/http-foundation": "^6.3",
+        "symfony/http-foundation": "^6.4",
         "symfony/http-kernel": "^6.2",
         "symfony/mailer": "^6.2",
         "symfony/mime": "^6.2",

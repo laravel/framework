@@ -196,9 +196,16 @@ class EncryptCookies
     protected function duplicate(Cookie $cookie, $value)
     {
         return new Cookie(
-            $cookie->getName(), $value, $cookie->getExpiresTime(),
-            $cookie->getPath(), $cookie->getDomain(), $cookie->isSecure(),
-            $cookie->isHttpOnly(), $cookie->isRaw(), $cookie->getSameSite()
+            $cookie->getName(),
+            $value,
+            $cookie->getExpiresTime(),
+            $cookie->getPath(),
+            $cookie->getDomain(),
+            $cookie->isSecure(),
+            $cookie->isHttpOnly(),
+            $cookie->isRaw(),
+            $cookie->getSameSite(),
+            $cookie->isPartitioned()
         );
     }
 
