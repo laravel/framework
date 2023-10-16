@@ -1142,6 +1142,24 @@ class Str
     }
 
     /**
+     * Replace the patterns matching the given regular expression.
+     *
+     * @param  string  $pattern
+     * @param  \Closure|string  $replace
+     * @param  array|string  $subject
+     * @param  int  $limit
+     * @return string|string[]|null
+     */
+    public function replaceMatches($pattern, $replace, $subject, $limit = -1)
+    {
+        if ($replace instanceof Closure) {
+            return preg_replace_callback($pattern, $replace, $subject, $limit);
+        }
+
+        return preg_replace($pattern, $replace, $subject, $limit);
+    }
+
+    /**
      * Remove any occurrence of the given string in the subject.
      *
      * @param  string|iterable<string>  $search
