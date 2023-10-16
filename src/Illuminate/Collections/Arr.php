@@ -105,6 +105,7 @@ class Arr
      *
      * @param  iterable  $array
      * @param  string  $prepend
+     * @param  string  $separator
      * @return array
      */
     public static function dot($array, $prepend = '', $separator = '.')
@@ -126,6 +127,7 @@ class Arr
      * Convert a flatten array into an expanded array. Defaults to a "dot" as a separator.
      *
      * @param  iterable  $array
+     * @param  string  $separator
      * @return array
      */
     public static function undot($array, $separator = '.')
@@ -694,6 +696,7 @@ class Arr
      * @param  array  $array
      * @param  string|int|null  $key
      * @param  mixed  $value
+     * @param  string  $separator
      * @return array
      */
     public static function set(&$array, $key, $value, $separator = '.')
