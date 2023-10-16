@@ -113,7 +113,7 @@ class Arr
 
         foreach ($array as $key => $value) {
             if (is_array($value) && ! empty($value)) {
-                $results = array_merge($results, static::dot($value, $prepend.$key.$separator), $separator);
+                $results = array_merge($results, static::dot($value, $prepend.$key.$separator, $separator));
             } else {
                 $results[$prepend.$key] = $value;
             }
