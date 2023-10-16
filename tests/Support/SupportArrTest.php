@@ -1225,7 +1225,7 @@ class SupportArrTest extends TestCase
         ], Arr::prependKeysWith($array, 'test.'));
     }
 
-    public function testDotArrow()
+    public function testCompressArrow()
     {
         $array = Arr::compress(['foo' => ['bar' => 'baz', 'foobar' => 'foobaz']], separator: '->');
         $this->assertEquals(['foo->bar' => 'baz', 'foo->foobar' => 'foobaz'], $array);
@@ -1240,7 +1240,7 @@ class SupportArrTest extends TestCase
         $this->assertEquals(['foo->bar' => []], $array);
     }
 
-    public function testDotUnarrow()
+    public function testExpandUnarrow()
     {
         $array = Arr::expand([
             'foo->bar' => 'test',
