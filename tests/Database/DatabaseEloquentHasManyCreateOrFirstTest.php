@@ -177,8 +177,7 @@ class DatabaseEloquentHasManyCreateOrFirstTest extends TestCase
 
         $model->getConnection()
             ->expects('select')
-            // FIXME: duplicate conditions
-            ->with('select * from "child_table" where "child_table"."parent_id" = ? and "child_table"."parent_id" is not null and ("attr" = ?) and ("attr" = ?) limit 1', [123, 'foo', 'foo'], false)
+            ->with('select * from "child_table" where "child_table"."parent_id" = ? and "child_table"."parent_id" is not null and ("attr" = ?) limit 1', [123, 'foo'], false)
             ->andReturn([[
                 'id' => 456,
                 'parent_id' => 123,
@@ -290,8 +289,7 @@ class DatabaseEloquentHasManyCreateOrFirstTest extends TestCase
 
         $model->getConnection()
             ->expects('select')
-            // FIXME: duplicate conditions
-            ->with('select * from "child_table" where "child_table"."parent_id" = ? and "child_table"."parent_id" is not null and ("attr" = ?) and ("attr" = ?) limit 1', [123, 'foo', 'foo'], false)
+            ->with('select * from "child_table" where "child_table"."parent_id" = ? and "child_table"."parent_id" is not null and ("attr" = ?) limit 1', [123, 'foo'], false)
             ->andReturn([[
                 'id' => 456,
                 'parent_id' => 123,

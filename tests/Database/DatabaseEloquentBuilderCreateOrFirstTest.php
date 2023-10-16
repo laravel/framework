@@ -165,8 +165,7 @@ class DatabaseEloquentBuilderCreateOrFirstTest extends TestCase
 
         $model->getConnection()
             ->expects('select')
-            // FIXME: duplicate conditions
-            ->with('select * from "table" where ("attr" = ?) and ("attr" = ?) limit 1', ['foo', 'foo'], false)
+            ->with('select * from "table" where ("attr" = ?) limit 1', ['foo'], false)
             ->andReturn([[
                 'id' => 123,
                 'attr' => 'foo',
@@ -273,8 +272,7 @@ class DatabaseEloquentBuilderCreateOrFirstTest extends TestCase
 
         $model->getConnection()
             ->expects('select')
-            // FIXME: duplicate conditions
-            ->with('select * from "table" where ("attr" = ?) and ("attr" = ?) limit 1', ['foo', 'foo'], false)
+            ->with('select * from "table" where ("attr" = ?) limit 1', ['foo'], false)
             ->andReturn([[
                 'id' => 123,
                 'attr' => 'foo',
