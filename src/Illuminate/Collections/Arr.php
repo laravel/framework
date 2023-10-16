@@ -101,7 +101,7 @@ class Arr
     }
 
     /**
-     * Flatten a multi-dimensional associative array with dots.
+     * Flatten a multi-dimensional associative array with dots. (default)
      *
      * @param  iterable  $array
      * @param  string  $prepend
@@ -123,7 +123,7 @@ class Arr
     }
 
     /**
-     * Convert a flatten "dot" notation array into an expanded array.
+     * Convert a flatten array into an expanded array. Defaults to a "dot" as a separator.
      *
      * @param  iterable  $array
      * @return array
