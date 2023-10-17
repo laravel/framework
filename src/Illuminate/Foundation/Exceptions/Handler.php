@@ -725,7 +725,7 @@ class Handler implements ExceptionHandlerContract
                     'exception' => $e,
                 ], $e->getStatusCode(), $e->getHeaders());
             } catch (Throwable $t) {
-                config('app.debug') || throw $t;
+                config('app.debug') && throw $t;
             }
         }
 
