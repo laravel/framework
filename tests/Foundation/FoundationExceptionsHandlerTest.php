@@ -428,10 +428,6 @@ class FoundationExceptionsHandlerTest extends TestCase
         // When debug is false, the exception thrown while rendering the error view
         // should not bubble as this may trigger an infinite loop.
 
-        $this->expectException(\Exception::class);
-        $this->expectExceptionMessage("Rendering this view throws an exception");
-
-        $this->executeScenarioWhereErrorViewThrowsWhileRenderingAndDebugIs(false);
     }
 
     public function testItDoesNotCrashIfErrorViewThrowsWhileRenderingAndDebugTrue()
@@ -439,6 +435,8 @@ class FoundationExceptionsHandlerTest extends TestCase
         // When debug is true, it is OK to bubble the exception thrown while rendering
         // the error view as the debug handler should handle this gracefully.
 
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage("Rendering this view throws an exception");
         $this->executeScenarioWhereErrorViewThrowsWhileRenderingAndDebugIs(true);
     }
 
