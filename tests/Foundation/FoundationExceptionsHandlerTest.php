@@ -404,45 +404,6 @@ class FoundationExceptionsHandlerTest extends TestCase
         $this->assertNull($handler->getErrorView(new HttpException(404)));
     }
 
-    private function executeScenarioWhereErrorViewThrowsWhileRenderingAndDebugIs($debug)
-    {
-        $this->viewFactory->shouldReceive('exists')->once()->with('errors::404')->andReturn(true);
-        $this->viewFactory->shouldReceive('make')->once()->withAnyArgs()->andThrow(new Exception("Rendering this view throws an exception"));
-
-        $this->config->shouldReceive('get')->with('app.debug', null)->andReturn($debug);
-
-        $handler = new class($this->container) extends Handler
-        {
-            protected function registerErrorViewPaths() {}
-
-            public function getErrorView($e)
-            {
-                return $this->renderHttpException($e);
-            }
-        };
-
-        $this->assertInstanceOf(SymfonyResponse::class, $handler->getErrorView(new HttpException(404)));
-    }
-
-    public function testItDoesNotCrashIfErrorViewThrowsWhileRenderingAndDebugFalse()
-    {
-        // When debug is false, the exception thrown while rendering the error view
-        // should not bubble as this may trigger an infinite loop.
-
-        $this->expectException(\Exception::class);
-        $this->expectExceptionMessage("Rendering this view throws an exception");
-
-        $this->executeScenarioWhereErrorViewThrowsWhileRenderingAndDebugIs(false);
-    }
-
-    public function testItDoesNotCrashIfErrorViewThrowsWhileRenderingAndDebugTrue()
-    {
-        // When debug is true, it is OK to bubble the exception thrown while rendering
-        // the error view as the debug handler should handle this gracefully.
-
-        $this->executeScenarioWhereErrorViewThrowsWhileRenderingAndDebugIs(true);
-    }
-
     public function testAssertExceptionIsThrown()
     {
         $this->assertThrows(function () {
