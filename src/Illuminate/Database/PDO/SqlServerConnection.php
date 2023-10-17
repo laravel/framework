@@ -135,7 +135,7 @@ class SqlServerConnection implements ConnectionContract
      *
      * @return string
      */
-    public function getServerVersion()
+    public function getServerVersion(): string
     {
         return $this->connection->getServerVersion();
     }
