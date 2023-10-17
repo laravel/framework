@@ -2,10 +2,10 @@
 
 namespace Illuminate\Database\PDO\Concerns;
 
+use Doctrine\DBAL\Driver\Connection as ConnectionContract;
 use Illuminate\Database\PDO\Connection;
 use InvalidArgumentException;
 use PDO;
-use Doctrine\DBAL\Driver\Connection as ConnectionContract;
 
 trait ConnectsToDatabase
 {
