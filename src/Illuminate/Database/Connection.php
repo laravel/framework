@@ -21,8 +21,11 @@ use Illuminate\Database\Query\Grammars\Grammar as QueryGrammar;
 use Illuminate\Database\Query\Processors\Processor;
 use Illuminate\Database\Schema\Builder as SchemaBuilder;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Traits\Macroable;
+use Illuminate\Testing\Exceptions\InvalidArgumentException;
+use Laravel\SerializableClosure\Support\ReflectionClosure;
 use PDO;
 use PDOStatement;
 use RuntimeException;
@@ -653,6 +656,44 @@ class Connection implements ConnectionInterface
 
             return $this->queryLog;
         });
+    }
+
+    /**
+     * Execute the given callback in "hot" mode.
+     *
+     * @param  \Closure  $callback
+     * @return array
+     */
+    public function doNotPretend(Closure $callback): array
+    {
+        if (!$this->pretending) {
+            return $callback();
+        }
+
+        // We wish to have this as secure as possible to not accidentally execute any
+        // affecting statements while in pretend mode. Reflection for the win.
+        $reflectionClosure = new ReflectionClosure($callback);
+
+        // First, we require the closure to be typed as array. Since all the select
+        // methods should return an array, this gives us the first confidence.
+        $isArrayTyped = $reflectionClosure->getReturnType()->getName() === 'array';
+
+        // Second, we check the closure code itself to ensure that the given callback
+        // is exclusively using any  of the DB facade DB::select*() methods.
+        $isSelectMethod = \str_contains($reflectionClosure->getCode(), DB::class . '::select');
+
+        // Finally, if any of the above conditions are not met, we throw an exception.
+        if(!$isArrayTyped || !$isSelectMethod) {
+            throw new InvalidArgumentException('Closure must be typed as array and only DB::select* methods are allowed.');
+        }
+
+        $this->pretending = false;
+
+        $result = $callback($this);
+
+        $this->pretending = true;
+
+        return $result;
     }
 
     /**

@@ -2,7 +2,9 @@
 
 namespace Illuminate\Tests\Integration\Migration;
 
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Mockery as m;
 use Orchestra\Testbench\TestCase;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -96,6 +98,72 @@ class MigratorTest extends TestCase
         $this->subject->run([__DIR__.'/fixtures'], ['pretend' => true]);
 
         $this->assertFalse(DB::getSchemaBuilder()->hasTable('people'));
+    }
+
+
+    public function testDoNotPretendReturnsValue()
+    {
+        // Create two tables with different columns so that we can query it later
+        // with the new method DB::doNotPretend().
+
+        Schema::create('table_1', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('column_1');
+        });
+
+        Schema::create('table_2', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('column_2')->default('default_value');
+        });
+
+        // From here on we simulate to be in pretend mode. This normally is done by
+        // running the migration with the option --pretend.
+
+        DB::pretend(function ()
+        {
+            $tablesEmpty = DB::select("SELECT name FROM sqlite_master WHERE type='table'");
+
+            $this->assertTrue([] === $tablesEmpty);
+
+            $tablesList = DB::doNotPretend(function (): array {
+                return DB::select("SELECT name FROM sqlite_master WHERE type='table'");
+            });
+
+            $this->assertTrue([] !== $tablesList);
+
+            // The following would not be possible in pretend mode, if the
+            // method DB::doNotPretend() would not exists, because select
+            // statements are not executed in pretend mode.
+
+            foreach ($tablesList as $table) {
+
+                if (in_array($table->name, ['sqlite_sequence', 'migrations'])) {
+                    continue;
+                }
+
+                $columnsEmpty = DB::select("PRAGMA table_info($table->name)");
+
+                $this->assertTrue([] === $columnsEmpty);
+
+                $columnsList = DB::doNotPretend(function () use ($table): array {
+                    return DB::select("PRAGMA table_info($table->name)");
+                });
+
+                $this->assertTrue([] !== $columnsList);
+                $this->assertCount(2, $columnsList);
+
+                // Prove that we are still in pretend mode this column will not be added.
+                // We query the table columns again to ensure count is still two.
+
+                DB::statement("ALTER TABLE $table->name ADD COLUMN column_2 varchar(255) DEFAULT 'default_value' NOT NULL");
+
+                $columnsList = DB::doNotPretend(function () use ($table): array {
+                    return DB::select("PRAGMA table_info($table->name)");
+                });
+
+                $this->assertCount(2, $columnsList);
+            }
+        });
     }
 
     protected function expectInfo($message): void
