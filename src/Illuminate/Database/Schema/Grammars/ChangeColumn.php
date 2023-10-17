@@ -133,10 +133,10 @@ class ChangeColumn
         }
 
         if (static::doesntNeedCharacterOptions($fluent['type'])) {
-            $options['customSchemaOptions'] = [
-                'collation' => '',
-                'charset' => '',
-            ];
+            // $options['customSchemaOptions'] = [
+            //     'collation' => '',
+            //     'charset' => '',
+            // ];
         }
 
         return $options;

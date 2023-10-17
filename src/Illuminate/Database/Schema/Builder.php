@@ -239,7 +239,9 @@ class Builder
     {
         $table = $this->connection->getTablePrefix().$table;
 
-        return $this->connection->getDoctrineColumn($table, $column)->getType()->getName();
+        $type = $this->connection->getDoctrineColumn($table, $column)->getType();
+
+        return $type::lookupName($type);
     }
 
     /**
