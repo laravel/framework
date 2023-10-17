@@ -2,7 +2,7 @@
 
 namespace Illuminate\Database\DBAL;
 
-use Doctrine\DBAL\Exception as DBALException;
+use Doctrine\DBAL\Exception\ConnectionException;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Platforms\MariaDb1027Platform;
 use Doctrine\DBAL\Platforms\MariaDb1052Platform;
@@ -24,7 +24,7 @@ class TimestampType extends Type implements PhpDateTimeMappingType
     /**
      * {@inheritdoc}
      *
-     * @throws DBALException
+     * @throws \Doctrine\DBAL\Exception\ConnectionException
      */
     public function getSQLDeclaration(array $column, AbstractPlatform $platform): string
     {
@@ -41,7 +41,7 @@ class TimestampType extends Type implements PhpDateTimeMappingType
             SQLServerPlatform::class,
             SQLServer2012Platform::class => $this->getSqlServerPlatformSQLDeclaration($column),
             SqlitePlatform::class => 'DATETIME',
-            default => throw new DBALException('Invalid platform: '.substr(strrchr(get_class($platform), '\\'), 1)),
+            default => throw new ConnectionException('Invalid platform: '.substr(strrchr(get_class($platform), '\\'), 1)),
         };
     }
 

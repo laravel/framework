@@ -175,7 +175,7 @@ class Connection implements ConnectionContract
     }
 
     /**
-     * Get the wrapped PDO connection.
+     * Get the native PDO connection.
      *
      * @return \PDO
      */
