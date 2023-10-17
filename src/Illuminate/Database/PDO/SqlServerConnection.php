@@ -4,12 +4,12 @@ namespace Illuminate\Database\PDO;
 
 use Doctrine\DBAL\Driver\PDO\SQLSrv\Statement;
 use Doctrine\DBAL\Driver\Result;
-use Doctrine\DBAL\Driver\ServerInfoAwareConnection;
+use Doctrine\DBAL\Driver\Connection as ConnectionContract;
 use Doctrine\DBAL\Driver\Statement as StatementInterface;
 use Doctrine\DBAL\ParameterType;
 use PDO;
 
-class SqlServerConnection implements ServerInfoAwareConnection
+class SqlServerConnection implements ConnectionContract
 {
     /**
      * The underlying connection instance.

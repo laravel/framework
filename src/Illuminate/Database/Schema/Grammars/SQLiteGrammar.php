@@ -324,7 +324,9 @@ class SQLiteGrammar extends Grammar
                 );
             }
 
-            return (array) $schema->getDatabasePlatform()->getAlterTableSQL($tableDiff);
+            $platform = $connection->getDoctrineConnection()->getDatabasePlatform();
+
+            return (array) $platform->getAlterTableSQL($tableDiff);
         }
     }
 
