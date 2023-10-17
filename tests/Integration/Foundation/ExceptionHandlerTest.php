@@ -7,7 +7,6 @@ use Illuminate\Auth\Access\Response;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\View;
 use Orchestra\Testbench\TestCase;
 use Symfony\Component\Process\PhpProcess;
 use Throwable;
