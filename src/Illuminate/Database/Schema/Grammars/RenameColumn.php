@@ -62,11 +62,20 @@ class RenameColumn
      */
     protected static function setRenamedColumns(TableDiff $tableDiff, Fluent $command, Column $column)
     {
-        $tableDiff->renamedColumns = [
-            $command->from => new Column($command->to, $column->getType(), self::getWritableColumnOptions($column)),
-        ];
-
-        return $tableDiff;
+        return new TableDiff(
+            $tableDiff->getOldTable(),
+            $tableDiff->getAddedColumns(),
+            $tableDiff->getModifiedColumns(),
+            $tableDiff->getDroppedColumns(),
+            [$command->from => new Column($command->to, $column->getType(), self::getWritableColumnOptions($column))],
+            $tableDiff->getAddedIndexes(),
+            $tableDiff->getModifiedIndexes(),
+            $tableDiff->getDroppedIndexes(),
+            $tableDiff->getRenamedIndexes(),
+            $tableDiff->getAddedForeignKeys(),
+            $tableDiff->getModifiedColumns(),
+            $tableDiff->getDroppedForeignKeys(),
+        );
     }
 
     /**
