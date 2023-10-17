@@ -2,8 +2,8 @@
 
 namespace Illuminate\Database\DBAL;
 
-use Doctrine\DBAL\Exception\ConnectionException;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
+use Doctrine\DBAL\Platforms\Exception\NotSupported;
 use Doctrine\DBAL\Platforms\MariaDb1027Platform;
 use Doctrine\DBAL\Platforms\MariaDb1052Platform;
 use Doctrine\DBAL\Platforms\MariaDBPlatform;
@@ -24,7 +24,7 @@ class TimestampType extends Type implements PhpDateTimeMappingType
     /**
      * {@inheritdoc}
      *
-     * @throws \Doctrine\DBAL\Exception\ConnectionException
+     * @throws \Doctrine\DBAL\Platforms\Exception\NotSupported
      */
     public function getSQLDeclaration(array $column, AbstractPlatform $platform): string
     {
