@@ -726,6 +726,8 @@ class Handler implements ExceptionHandlerContract
                 ], $e->getStatusCode(), $e->getHeaders());
             } catch (Throwable $t) {
                 config('app.debug') && throw $t;
+
+                $this->report($t);
             }
         }
 
