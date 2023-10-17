@@ -101,10 +101,10 @@ class MigratorTest extends TestCase
     }
 
 
-    public function testDoNotPretendReturnsValue()
+    public function testIgnorePretendModeForCallbackReturnsValues()
     {
         // Create two tables with different columns so that we can query it later
-        // with the new method DB::doNotPretend().
+        // with the new method DB::ignorePretendModeForCallback().
 
         Schema::create('table_1', function (Blueprint $table) {
             $table->increments('id');
@@ -125,15 +125,15 @@ class MigratorTest extends TestCase
 
             $this->assertTrue([] === $tablesEmpty);
 
-            $tablesList = DB::doNotPretend(function (): array {
+            $tablesList = DB::ignorePretendModeForCallback(function (): array {
                 return DB::select("SELECT name FROM sqlite_master WHERE type='table'");
             });
 
             $this->assertTrue([] !== $tablesList);
 
             // The following would not be possible in pretend mode, if the
-            // method DB::doNotPretend() would not exists, because select
-            // statements are not executed in pretend mode.
+            // method DB::ignorePretendModeForCallback() would not exists,
+            // because nothing is executed in pretend mode.
 
             foreach ($tablesList as $table) {
 
@@ -145,7 +145,7 @@ class MigratorTest extends TestCase
 
                 $this->assertTrue([] === $columnsEmpty);
 
-                $columnsList = DB::doNotPretend(function () use ($table): array {
+                $columnsList = DB::ignorePretendModeForCallback(function () use ($table): array {
                     return DB::select("PRAGMA table_info($table->name)");
                 });
 
@@ -157,7 +157,7 @@ class MigratorTest extends TestCase
 
                 DB::statement("ALTER TABLE $table->name ADD COLUMN column_2 varchar(255) DEFAULT 'default_value' NOT NULL");
 
-                $columnsList = DB::doNotPretend(function () use ($table): array {
+                $columnsList = DB::ignorePretendModeForCallback(function () use ($table): array {
                     return DB::select("PRAGMA table_info($table->name)");
                 });
 

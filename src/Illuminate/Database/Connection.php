@@ -664,7 +664,7 @@ class Connection implements ConnectionInterface
      * @param  \Closure  $callback
      * @return array
      */
-    public function doNotPretend(Closure $callback): array
+    public function ignorePretendModeForCallback(Closure $callback): array
     {
         if (!$this->pretending) {
             return $callback();
