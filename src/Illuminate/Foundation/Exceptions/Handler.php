@@ -302,7 +302,7 @@ class Handler implements ExceptionHandlerContract
         }
 
         try {
-            $logger = $this->container->make(LoggerInterface::class);
+            $logger = $this->makeLogger();
         } catch (Exception) {
             throw $e;
         }
@@ -871,5 +871,17 @@ class Handler implements ExceptionHandlerContract
     protected function isHttpException(Throwable $e)
     {
         return $e instanceof HttpExceptionInterface;
+    }
+
+    /**
+     * Creates a new logger instance.
+     *
+     * @return \Psr\Log\LoggerInterface
+     *
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     */
+    protected function makeLogger()
+    {
+        return $this->container->make(LoggerInterface::class);
     }
 }
