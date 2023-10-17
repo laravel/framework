@@ -41,7 +41,7 @@ class TimestampType extends Type implements PhpDateTimeMappingType
             SQLServerPlatform::class,
             SQLServer2012Platform::class => $this->getSqlServerPlatformSQLDeclaration($column),
             SqlitePlatform::class => 'DATETIME',
-            default => throw new ConnectionException('Invalid platform: '.substr(strrchr(get_class($platform), '\\'), 1)),
+            default => throw NotSupported::new('TIMESTAMP'),
         };
     }
 
