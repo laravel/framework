@@ -84,7 +84,7 @@ class SqlServerConnection implements ConnectionContract
     /**
      * Begin a new database transaction.
      *
-     * @return voif
+     * @return void
      */
     public function beginTransaction(): void
     {

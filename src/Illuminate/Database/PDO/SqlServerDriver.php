@@ -3,6 +3,7 @@
 namespace Illuminate\Database\PDO;
 
 use Doctrine\DBAL\Driver\AbstractSQLServerDriver;
+use Doctrine\DBAL\Driver\Connection as ConnectionContract;
 
 class SqlServerDriver extends AbstractSQLServerDriver
 {
@@ -12,7 +13,7 @@ class SqlServerDriver extends AbstractSQLServerDriver
      * @param  mixed[]  $params
      * @return \Illuminate\Database\PDO\SqlServerConnection
      */
-    public function connect(array $params)
+    public function connect(array $params): ConnectionContract
     {
         return new SqlServerConnection(
             new Connection($params['pdo'])
