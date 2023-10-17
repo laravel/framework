@@ -676,7 +676,7 @@ class Connection implements ConnectionInterface
 
         // First, we require the closure to be typed as array. Since all the select
         // methods should return an array, this gives us the first confidence.
-        $isArrayTyped = $reflectionClosure->getReturnType()->getName() === 'array';
+        $isArrayTyped = $reflectionClosure->getReturnType()?->getName() === 'array';
 
         // Second, we check the closure code itself to ensure that the given callback
         // is exclusively using any  of the DB facade DB::select*() methods.
