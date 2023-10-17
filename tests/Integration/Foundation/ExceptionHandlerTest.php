@@ -171,7 +171,7 @@ EOF, __DIR__.'/../../../', ['APP_RUNNING_IN_CONSOLE' => true]);
         }
 
         $this->assertCount(1, $reported);
-        $this->assertSame('Undefined variable $foo (View: '.__DIR__.'/Fixtures/MalformedErrorViews/errors/404.blade.php)', $reported[0]->getMessage());
+        $this->assertSame('Undefined variable $foo (View: '.__DIR__.DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.'MalformedErrorViews'.DIRECTORY_SEPARATOR.'errors'.DIRECTORY_SEPARATOR.'404.blade.php)', $reported[0]->getMessage());
         $this->assertNotNull($response);
         $response->assertStatus(404);
     }
@@ -192,7 +192,7 @@ EOF, __DIR__.'/../../../', ['APP_RUNNING_IN_CONSOLE' => true]);
         }
 
         $this->assertCount(1, $reported);
-        $this->assertSame('Undefined variable $foo (View: '.__DIR__.'/Fixtures/MalformedErrorViews/errors/404.blade.php)', $reported[0]->getMessage());
+        $this->assertSame('Undefined variable $foo (View: '.__DIR__.DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.'MalformedErrorViews'.DIRECTORY_SEPARATOR.'errors'.DIRECTORY_SEPARATOR.'404.blade.php)', $reported[0]->getMessage());
         $this->assertNotNull($response);
         $response->assertStatus(500);
     }
