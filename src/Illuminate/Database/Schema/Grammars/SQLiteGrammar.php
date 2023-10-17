@@ -319,6 +319,7 @@ class SQLiteGrammar extends Grammar
             );
 
             foreach ($command->columns as $name) {
+                // @TODO swap `removedColumns`/`droppedColumns`
                 $tableDiff->removedColumns[$name] = $connection->getDoctrineColumn(
                     $this->getTablePrefix().$blueprint->getTable(), $name
                 );
