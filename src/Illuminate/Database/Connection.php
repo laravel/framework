@@ -20,6 +20,7 @@ use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Query\Grammars\Grammar as QueryGrammar;
 use Illuminate\Database\Query\Processors\Processor;
 use Illuminate\Database\Schema\Builder as SchemaBuilder;
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Arr;
 use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Traits\Macroable;
@@ -278,6 +279,18 @@ class Connection implements ConnectionInterface
      * @return \Illuminate\Database\Schema\Grammars\Grammar|null
      */
     protected function getDefaultSchemaGrammar()
+    {
+        //
+    }
+
+    /**
+     * Get the schema state for the connection.
+     *
+     * @param  \Illuminate\Filesystem\Filesystem|null  $files
+     * @param  callable|null  $processFactory
+     * @return \Illuminate\Database\Schema\SchemaState|null
+     */
+    public function getSchemaState(Filesystem $files = null, callable $processFactory = null)
     {
         //
     }
