@@ -161,6 +161,14 @@ class ComponentAttributeBag implements ArrayAccess, IteratorAggregate, JsonSeria
         return new static(collect($this->attributes)->filter($callback)->all());
     }
 
+    public function filterByPrefix(string $prefix): self {
+        $inputAttributes = collect($this->whereStartsWith($prefix)->getAttributes())
+            ->mapWithKeys(fn ($value, $key) => [str_replace($prefix, '', $key) => $value])
+            ->toArray();
+
+        return new static($inputAttributes);
+    }
+
     /**
      * Return a bag of attributes that have keys starting with the given value / pattern.
      *
@@ -264,14 +272,6 @@ class ComponentAttributeBag implements ArrayAccess, IteratorAggregate, JsonSeria
         $styleList = Arr::wrap($styleList);
 
         return $this->merge(['style' => Arr::toCssStyles($styleList)]);
-    }
-
-    public function filterByPrefix(string $prefix): self {
-        $inputAttributes = collect($this->whereStartsWith($prefix)->getAttributes())
-            ->mapWithKeys(fn ($value, $key) => [str_replace($prefix, '', $key) => $value])
-            ->toArray();
-
-        return new self($inputAttributes);
     }
 
     /**
