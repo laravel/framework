@@ -161,7 +161,13 @@ class ComponentAttributeBag implements ArrayAccess, IteratorAggregate, JsonSeria
         return new static(collect($this->attributes)->filter($callback)->all());
     }
 
-    public function filterByPrefix(string $prefix): self {
+    /**
+     * Filter the attributes, returning a bag of attributes start with the prefix without the prefix.
+     *
+     * @param string $prefix
+     * @return static
+     */
+    public function filterByPrefix(string $prefix): static {
         $inputAttributes = collect($this->whereStartsWith($prefix)->getAttributes())
             ->mapWithKeys(fn ($value, $key) => [str_replace($prefix, '', $key) => $value])
             ->toArray();
