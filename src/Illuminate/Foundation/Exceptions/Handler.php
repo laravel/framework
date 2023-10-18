@@ -719,10 +719,16 @@ class Handler implements ExceptionHandlerContract
         $this->registerErrorViewPaths();
 
         if ($view = $this->getHttpExceptionView($e)) {
-            return response()->view($view, [
-                'errors' => new ViewErrorBag,
-                'exception' => $e,
-            ], $e->getStatusCode(), $e->getHeaders());
+            try {
+                return response()->view($view, [
+                    'errors' => new ViewErrorBag,
+                    'exception' => $e,
+                ], $e->getStatusCode(), $e->getHeaders());
+            } catch (Throwable $t) {
+                config('app.debug') && throw $t;
+
+                $this->report($t);
+            }
         }
 
         return $this->convertExceptionToResponse($e);
