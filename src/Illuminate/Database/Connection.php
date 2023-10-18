@@ -661,7 +661,7 @@ class Connection implements ConnectionInterface
      * @param  \Closure  $callback
      * @return mixed
      */
-    public function ignorePretendModeForCallback(Closure $callback): mixed
+    public function ignorePretendModeForCallback(\Closure $callback): mixed
     {
         if (!$this->pretending) {
             return $callback();
@@ -849,6 +849,10 @@ class Connection implements ConnectionInterface
         $this->totalQueryDuration += $time ?? 0.0;
 
         $this->event(new QueryExecuted($query, $bindings, $time, $this));
+
+        $query = $this->pretending === true
+            ? $this->queryGrammar?->substituteBindingsIntoRawSql($query, $bindings) ?? $query
+            : $query;
 
         if ($this->loggingQueries) {
             $this->queryLog[] = compact('query', 'bindings', 'time');

@@ -11,19 +11,26 @@ class DynamicContentIsShown extends Migration
     {
         Schema::create('blogs', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('name');
+            $table->string('url')->nullable();
+            $table->string('name')->nullable();
         });
+
+        DB::table('blogs')->insert([
+            ['url' => 'www.janedoe.com'],
+            ['url' => 'www.johndoe.com'],
+        ]);
+
+        DB::statement("ALTER TABLE 'pseudo_table_name' MODIFY 'column_name' VARCHAR(191)");
 
         /** @var \Illuminate\Support\Collection $tablesList */
         $tablesList = DB::ignorePretendModeForCallback(function () {
             return DB::table('people')->get();
         });
 
-        DB::statement("ALTER TABLE pseudo_table_name MODIFY column_name VARCHAR(191);");
-
-        $tablesList->each(function ($table) {
-            DB::table('blogs')->insert([
-                'name' => "{$table->name} Blog",
+        $tablesList->each(function ($person, $key) {
+            DB::table('blogs')->where('blog_id', '=', $person->blog_id)->insert([
+                'id' => $key+1,
+                'name' => "{$person->name} Blog",
             ]);
         });
     }

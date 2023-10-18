@@ -11,14 +11,21 @@ class DynamicContentNotShown extends Migration
     {
         Schema::create('blogs', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('name');
+            $table->string('url')->nullable();
+            $table->string('name')->nullable();
         });
 
-        DB::statement("ALTER TABLE pseudo_table_name MODIFY column_name VARCHAR(191);");
+        DB::table('blogs')->insert([
+            ['url' => 'www.janedoe.com'],
+            ['url' => 'www.johndoe.com'],
+        ]);
 
-        DB::table('people')->get()->each(function ($table) {
-            DB::table('blogs')->insert([
-                'name' => "{$table->name} Blog",
+        DB::statement("ALTER TABLE 'pseudo_table_name' MODIFY 'column_name' VARCHAR(191)");
+
+        DB::table('people')->get()->each(function ($person, $key) {
+            DB::table('blogs')->where('blog_id', '=', $person->blog_id)->insert([
+                'id' => $key+1,
+                'name' => "{$person->name} Blog",
             ]);
         });
     }

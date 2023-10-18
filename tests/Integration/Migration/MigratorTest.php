@@ -185,11 +185,12 @@ class MigratorTest extends TestCase
         $this->expectInfo('Running migrations.');
         $this->expectTwoColumnDetail('DynamicContentIsShown');
         $this->expectBulletList([
-            'create table "blogs" ("id" integer primary key autoincrement not null, "name" varchar not null)',
-            'ALTER TABLE pseudo_table_name MODIFY column_name VARCHAR(191);',
+            'create table "blogs" ("id" integer primary key autoincrement not null, "url" varchar, "name" varchar)',
+            'insert into "blogs" ("url") values (\'www.janedoe.com\'), (\'www.johndoe.com\')',
+            'ALTER TABLE \'pseudo_table_name\' MODIFY \'column_name\' VARCHAR(191)',
             'select * from "people"',
-            'insert into "blogs" ("name") values (?)',
-            'insert into "blogs" ("name") values (?)',
+            'insert into "blogs" ("id", "name") values (1, \'Jane Doe Blog\')',
+            'insert into "blogs" ("id", "name") values (2, \'John Doe Blog\')',
         ]);
 
         $this->output->shouldReceive('writeln')->once();
@@ -217,8 +218,9 @@ class MigratorTest extends TestCase
         $this->expectInfo('Running migrations.');
         $this->expectTwoColumnDetail('DynamicContentNotShown');
         $this->expectBulletList([
-            'create table "blogs" ("id" integer primary key autoincrement not null, "name" varchar not null)',
-            'ALTER TABLE pseudo_table_name MODIFY column_name VARCHAR(191);',
+            'create table "blogs" ("id" integer primary key autoincrement not null, "url" varchar, "name" varchar)',
+            'insert into "blogs" ("url") values (\'www.janedoe.com\'), (\'www.johndoe.com\')',
+            'ALTER TABLE \'pseudo_table_name\' MODIFY \'column_name\' VARCHAR(191)',
             'select * from "people"',
         ]);
 

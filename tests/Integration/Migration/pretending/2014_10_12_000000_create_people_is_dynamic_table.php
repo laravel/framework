@@ -11,6 +11,7 @@ class CreatePeopleIsDynamicTable extends Migration
     {
         Schema::create('people', function (Blueprint $table) {
             $table->increments('id');
+            $table->string('blog_id')->nullable();
             $table->string('name');
             $table->string('email')->unique();
             $table->string('password');
