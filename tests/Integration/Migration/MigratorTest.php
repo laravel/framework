@@ -155,7 +155,7 @@ class MigratorTest extends TestCase
                 // Prove that we are still in pretend mode this column will not be added.
                 // We query the table columns again to ensure count is still two.
 
-                DB::statement("ALTER TABLE $table->name ADD COLUMN column_2 varchar(255) DEFAULT 'default_value' NOT NULL");
+                DB::statement("ALTER TABLE $table->name ADD COLUMN column_3 varchar(255) DEFAULT 'default_value' NOT NULL");
 
                 $columnsList = DB::ignorePretendModeForCallback(function () use ($table): array {
                     return DB::select("PRAGMA table_info($table->name)");
