@@ -406,13 +406,15 @@ class FoundationExceptionsHandlerTest extends TestCase
     private function executeScenarioWhereErrorViewThrowsWhileRenderingAndDebugIs($debug)
     {
         $this->viewFactory->shouldReceive('exists')->once()->with('errors::404')->andReturn(true);
-        $this->viewFactory->shouldReceive('make')->once()->withAnyArgs()->andThrow(new Exception("Rendering this view throws an exception"));
+        $this->viewFactory->shouldReceive('make')->once()->withAnyArgs()->andThrow(new Exception('Rendering this view throws an exception'));
 
         $this->config->shouldReceive('get')->with('app.debug', null)->andReturn($debug);
 
         $handler = new class($this->container) extends Handler
         {
-            protected function registerErrorViewPaths() {}
+            protected function registerErrorViewPaths()
+            {
+            }
 
             public function getErrorView($e)
             {
@@ -427,7 +429,6 @@ class FoundationExceptionsHandlerTest extends TestCase
     {
         // When debug is false, the exception thrown while rendering the error view
         // should not bubble as this may trigger an infinite loop.
-
     }
 
     public function testItDoesNotCrashIfErrorViewThrowsWhileRenderingAndDebugTrue()
@@ -436,7 +437,7 @@ class FoundationExceptionsHandlerTest extends TestCase
         // the error view as the debug handler should handle this gracefully.
 
         $this->expectException(\Exception::class);
-        $this->expectExceptionMessage("Rendering this view throws an exception");
+        $this->expectExceptionMessage('Rendering this view throws an exception');
         $this->executeScenarioWhereErrorViewThrowsWhileRenderingAndDebugIs(true);
     }
 
