@@ -302,7 +302,7 @@ class Handler implements ExceptionHandlerContract
         }
 
         try {
-            $logger = $this->makeLogger();
+            $logger = $this->newLogger();
         } catch (Exception) {
             throw $e;
         }
@@ -874,13 +874,11 @@ class Handler implements ExceptionHandlerContract
     }
 
     /**
-     * Creates a new logger instance.
+     * Create a new logger instance.
      *
      * @return \Psr\Log\LoggerInterface
-     *
-     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
-    protected function makeLogger()
+    protected function newLogger()
     {
         return $this->container->make(LoggerInterface::class);
     }
