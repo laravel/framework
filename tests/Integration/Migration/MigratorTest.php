@@ -118,8 +118,7 @@ class MigratorTest extends TestCase
         // From here on we simulate to be in pretend mode. This normally is done by
         // running the migration with the option --pretend.
 
-        DB::pretend(function ()
-        {
+        DB::pretend(function () {
             // Returns an empty array because we are in pretend mode.
             $tablesEmpty = DB::select("SELECT name FROM sqlite_master WHERE type='table'");
 
@@ -136,7 +135,6 @@ class MigratorTest extends TestCase
             // method DB::ignorePretendModeForCallback() would not exists,
             // because nothing is executed in pretend mode.
             foreach ($tablesList as $table) {
-
                 if (in_array($table->name, ['sqlite_sequence', 'migrations'])) {
                     continue;
                 }

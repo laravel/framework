@@ -29,7 +29,7 @@ class DynamicContentIsShown extends Migration
 
         $tablesList->each(function ($person, $key) {
             DB::table('blogs')->where('blog_id', '=', $person->blog_id)->insert([
-                'id' => $key+1,
+                'id' => $key + 1,
                 'name' => "{$person->name} Blog",
             ]);
         });

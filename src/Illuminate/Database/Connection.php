@@ -661,9 +661,9 @@ class Connection implements ConnectionInterface
      * @param  \Closure  $callback
      * @return mixed
      */
-    public function ignorePretendModeForCallback(\Closure $callback): mixed
+    public function ignorePretendModeForCallback(Closure $callback): mixed
     {
-        if (!$this->pretending) {
+        if (! $this->pretending) {
             return $callback();
         }
 
