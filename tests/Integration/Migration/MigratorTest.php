@@ -121,10 +121,12 @@ class MigratorTest extends TestCase
 
         DB::pretend(function ()
         {
+            // Returns an empty array because we are in pretend mode.
             $tablesEmpty = DB::select("SELECT name FROM sqlite_master WHERE type='table'");
 
             $this->assertTrue([] === $tablesEmpty);
 
+            // Returns an array with two tables because we ignore pretend mode.
             $tablesList = DB::ignorePretendModeForCallback(function (): array {
                 return DB::select("SELECT name FROM sqlite_master WHERE type='table'");
             });
@@ -134,7 +136,6 @@ class MigratorTest extends TestCase
             // The following would not be possible in pretend mode, if the
             // method DB::ignorePretendModeForCallback() would not exists,
             // because nothing is executed in pretend mode.
-
             foreach ($tablesList as $table) {
 
                 if (in_array($table->name, ['sqlite_sequence', 'migrations'])) {
@@ -152,9 +153,9 @@ class MigratorTest extends TestCase
                 $this->assertTrue([] !== $columnsList);
                 $this->assertCount(2, $columnsList);
 
-                // Prove that we are still in pretend mode this column will not be added.
-                // We query the table columns again to ensure count is still two.
-
+                // Confirm that we are still in pretend mode. This column should
+                // not be added. We query the table columns again to ensure the
+                // count is still two.
                 DB::statement("ALTER TABLE $table->name ADD COLUMN column_3 varchar(255) DEFAULT 'default_value' NOT NULL");
 
                 $columnsList = DB::ignorePretendModeForCallback(function () use ($table): array {
@@ -164,6 +165,9 @@ class MigratorTest extends TestCase
                 $this->assertCount(2, $columnsList);
             }
         });
+
+        Schema::dropIfExists('table_1');
+        Schema::dropIfExists('table_2');
     }
 
     protected function expectInfo($message): void
