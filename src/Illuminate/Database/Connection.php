@@ -289,10 +289,12 @@ class Connection implements ConnectionInterface
      * @param  \Illuminate\Filesystem\Filesystem|null  $files
      * @param  callable|null  $processFactory
      * @return \Illuminate\Database\Schema\SchemaState|null
+     *
+     * @throws \RuntimeException
      */
     public function getSchemaState(Filesystem $files = null, callable $processFactory = null)
     {
-        //
+        throw new RuntimeException('Database connection does not define a schema state.');
     }
 
     /**
