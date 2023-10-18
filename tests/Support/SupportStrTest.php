@@ -488,7 +488,10 @@ class SupportStrTest extends TestCase
         $string = 'The PHP framework for web artisans.';
         $this->assertSame('The PHP...', Str::limit($string, 7));
         $this->assertSame('The PHP', Str::limit($string, 7, ''));
-        $this->assertSame('The PHP framework for web artisans.', Str::limit($string, 100));
+        $this->assertSame('The PHP framework for web artisans.', Str::limit($string, 35));
+        $this->assertSame('The PHP framework for web artisans...', Str::limit($string, 34));
+        $this->assertSame('The PHP framework for web artis...', Str::limit($string, 34, '...', true));
+        $this->assertSame('The PHP framework for web artisan…', Str::limit($string, 34, '…', true));
 
         $nonAsciiString = '这是一段中文';
         $this->assertSame('这是一...', Str::limit($nonAsciiString, 6));
