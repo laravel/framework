@@ -24,6 +24,9 @@
         "illuminate/macroable": "^10.0",
         "illuminate/support": "^10.0"
     },
+    "conflict": {
+        "doctrine/dbal": ">=4"
+    },
     "autoload": {
         "psr-4": {
             "Illuminate\\Database\\": ""
