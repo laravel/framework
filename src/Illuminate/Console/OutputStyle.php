@@ -3,6 +3,7 @@
 namespace Illuminate\Console;
 
 use Illuminate\Console\Contracts\NewLineAware;
+use Symfony\Component\Console\Helper\ProgressIndicator;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
@@ -193,5 +194,18 @@ class OutputStyle extends SymfonyStyle implements NewLineAware
     public function getOutput()
     {
         return $this->output;
+    }
+
+    /**
+     * Create a new progress indicator.
+     *
+     * @param string|null $format
+     * @param int $indicatorChangeInterval
+     * @param array|null $indicatorValues
+     * @return ProgressIndicator
+     */
+    public function createProgressIndicator(string $format = null, int $indicatorChangeInterval = 100, array $indicatorValues = null): ProgressIndicator
+    {
+        return new ProgressIndicator($this->output, $format, $indicatorChangeInterval, $indicatorValues);
     }
 }
