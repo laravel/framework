@@ -266,6 +266,14 @@ class ComponentAttributeBag implements ArrayAccess, IteratorAggregate, JsonSeria
         return $this->merge(['style' => Arr::toCssStyles($styleList)]);
     }
 
+    public function filterByPrefix(string $prefix): self {
+        $inputAttributes = collect($this->whereStartsWith($prefix)->getAttributes())
+            ->mapWithKeys(fn ($value, $key) => [str_replace($prefix, '', $key) => $value])
+            ->toArray();
+
+        return new self($inputAttributes);
+    }
+
     /**
      * Merge additional attributes / values into the attribute bag.
      *

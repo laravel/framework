@@ -101,6 +101,17 @@ class ViewComponentAttributeBagTest extends TestCase
             'test-extract-1',
             'test-extract-2' => 'defaultValue',
         ]));
+
+        $bag = (new ComponentAttributeBag([
+            'box:class' => 'bg-yellow-500 text-yellow-900',
+            'msg:class' => 'italic',
+            'link:url' => '#',
+            'link:class' => 'underline',
+            'link:label' => 'label'
+        ]));
+
+        $this->assertSame('class="underline" label="label"', (string) $bag->except('link:url')->filterByPrefix('link:'));
+
     }
 
     public function testItMakesAnExceptionForAlpineXdata()
