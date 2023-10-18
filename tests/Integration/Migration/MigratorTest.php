@@ -169,6 +169,68 @@ class MigratorTest extends TestCase
         Schema::dropIfExists('table_2');
     }
 
+    public function testIgnorePretendModeForCallbackOutputDynamicContentIsShown()
+    {
+        // Persist data to table we can work with.
+        $this->expectInfo('Running migrations.');
+        $this->expectTask('2014_10_12_000000_create_people_is_dynamic_table', 'DONE');
+
+        $this->output->shouldReceive('writeln')->once();
+
+        $this->subject->run([__DIR__.'/pretending/2014_10_12_000000_create_people_is_dynamic_table.php'], ['pretend' => false]);
+
+        $this->assertTrue(DB::getSchemaBuilder()->hasTable('people'));
+
+        // Test the actual functionality.
+        $this->expectInfo('Running migrations.');
+        $this->expectTwoColumnDetail('DynamicContentIsShown');
+        $this->expectBulletList([
+            'create table "blogs" ("id" integer primary key autoincrement not null, "name" varchar not null)',
+            'ALTER TABLE pseudo_table_name MODIFY column_name VARCHAR(191);',
+            'select * from "people"',
+            'insert into "blogs" ("name") values (?)',
+            'insert into "blogs" ("name") values (?)',
+        ]);
+
+        $this->output->shouldReceive('writeln')->once();
+
+        $this->subject->run([__DIR__.'/pretending/2023_10_17_000000_dynamic_content_is_shown.php'], ['pretend' => true]);
+
+        $this->assertFalse(DB::getSchemaBuilder()->hasTable('blogs'));
+
+        Schema::dropIfExists('people');
+    }
+
+    public function testIgnorePretendModeForCallbackOutputDynamicContentNotShown()
+    {
+        // Persist data to table we can work with.
+        $this->expectInfo('Running migrations.');
+        $this->expectTask('2014_10_12_000000_create_people_non_dynamic_table', 'DONE');
+
+        $this->output->shouldReceive('writeln')->once();
+
+        $this->subject->run([__DIR__.'/pretending/2014_10_12_000000_create_people_non_dynamic_table.php'], ['pretend' => false]);
+
+        $this->assertTrue(DB::getSchemaBuilder()->hasTable('people'));
+
+        // Test the actual functionality.
+        $this->expectInfo('Running migrations.');
+        $this->expectTwoColumnDetail('DynamicContentNotShown');
+        $this->expectBulletList([
+            'create table "blogs" ("id" integer primary key autoincrement not null, "name" varchar not null)',
+            'ALTER TABLE pseudo_table_name MODIFY column_name VARCHAR(191);',
+            'select * from "people"',
+        ]);
+
+        $this->output->shouldReceive('writeln')->once();
+
+        $this->subject->run([__DIR__.'/pretending/2023_10_17_000000_dynamic_content_not_shown.php'], ['pretend' => true]);
+
+        $this->assertFalse(DB::getSchemaBuilder()->hasTable('blogs'));
+
+        Schema::dropIfExists('people');
+    }
+
     protected function expectInfo($message): void
     {
         $this->output->shouldReceive('writeln')->once()->with(m::on(
