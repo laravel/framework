@@ -100,8 +100,7 @@ class MigratorTest extends TestCase
         $this->assertFalse(DB::getSchemaBuilder()->hasTable('people'));
     }
 
-
-    public function testIgnorePretendModeForCallbackReturnsValues()
+    public function testIgnorePretendModeForCallbackData()
     {
         // Create two tables with different columns so that we can query it later
         // with the new method DB::ignorePretendModeForCallback().
