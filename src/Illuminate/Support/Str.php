@@ -1150,7 +1150,7 @@ class Str
      * @param  int  $limit
      * @return string|string[]|null
      */
-    public function replaceMatches($pattern, $replace, $subject, $limit = -1)
+    public static function replaceMatches($pattern, $replace, $subject, $limit = -1)
     {
         if ($replace instanceof Closure) {
             return preg_replace_callback($pattern, $replace, $subject, $limit);
