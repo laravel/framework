@@ -199,9 +199,9 @@ class OutputStyle extends SymfonyStyle implements NewLineAware
     /**
      * Create a new progress indicator.
      *
-     * @param string|null $format
-     * @param int $indicatorChangeInterval
-     * @param array|null $indicatorValues
+     * @param  string|null  $format
+     * @param  int  $indicatorChangeInterval
+     * @param  array|null  $indicatorValues
      * @return ProgressIndicator
      */
     public function createProgressIndicator(string $format = null, int $indicatorChangeInterval = 100, array $indicatorValues = null): ProgressIndicator

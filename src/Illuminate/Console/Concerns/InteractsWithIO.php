@@ -7,7 +7,6 @@ use Illuminate\Console\OutputStyle;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Str;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
-use Symfony\Component\Console\Helper\ProgressIndicator;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -283,13 +282,12 @@ trait InteractsWithIO
     /**
      * Execute a given callback while spinning a progress indicator.
      *
-     * @param \Closure $callback
-     * @param string $startMessage
-     * @param string $finishMessage
-     * @param string|null $format
-     * @param int $indicatorChangeInterval
-     * @param array|null $indicatorValues
-     * @return void
+     * @param  \Closure  $callback
+     * @param  string  $startMessage
+     * @param  string  $finishMessage
+     * @param  string|null  $format
+     * @param  int  $indicatorChangeInterval
+     * @param  array|null  $indicatorValues
      */
     public function withProgressIndicator(Closure $callback, string $startMessage = '', string $finishMessage = '', string $format = null, int $indicatorChangeInterval = 100, array $indicatorValues = null)
     {
