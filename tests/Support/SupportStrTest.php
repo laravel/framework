@@ -203,6 +203,7 @@ class SupportStrTest extends TestCase
         $this->assertSame('...ocê e...', Str::excerpt('Como você está', 'Ê', ['radius' => 2]));
         $this->assertSame('João...', Str::excerpt('João Antônio ', 'jo', ['radius' => 2]));
         $this->assertSame('João Antô...', Str::excerpt('João Antônio', 'JOÃO', ['radius' => 5]));
+        $this->assertNull(Str::excerpt('', '/'));
     }
 
     public function testStrBefore()
