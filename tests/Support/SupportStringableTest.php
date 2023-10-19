@@ -814,17 +814,17 @@ class SupportStringableTest extends TestCase
     public function testLimit()
     {
         $this->assertSame('Laravel is...',
-            (string) $this->stringable('Laravel is a free, open source PHP web application framework.')->limit(10)
+            (string) $this->stringable('Laravel is a free, open source PHP web application framework.')->limit(13)
         );
-        $this->assertSame('这是一...', (string) $this->stringable('这是一段中文')->limit(6));
+        $this->assertSame('这是一...', (string) $this->stringable('这是一段中文')->limit(9));
 
         $string = 'The PHP framework for web artisans.';
-        $this->assertSame('The PHP...', (string) $this->stringable($string)->limit(7));
+        $this->assertSame('The PHP...', (string) $this->stringable($string)->limit(10));
         $this->assertSame('The PHP', (string) $this->stringable($string)->limit(7, ''));
         $this->assertSame('The PHP framework for web artisans.', (string) $this->stringable($string)->limit(100));
 
         $nonAsciiString = '这是一段中文';
-        $this->assertSame('这是一...', (string) $this->stringable($nonAsciiString)->limit(6));
+        $this->assertSame('这是一...', (string) $this->stringable($nonAsciiString)->limit(9));
         $this->assertSame('这是一', (string) $this->stringable($nonAsciiString)->limit(6, ''));
     }
 

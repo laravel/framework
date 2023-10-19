@@ -586,7 +586,7 @@ class SupportHelpersTest extends TestCase
 
         $strAccessor = str();
         $this->assertTrue((new ReflectionClass($strAccessor))->isAnonymous());
-        $this->assertSame($strAccessor->limit('string-value', 3), 'str...');
+        $this->assertSame($strAccessor->limit('string-value', 6), 'str...');
 
         $strAccessor = str();
         $this->assertTrue((new ReflectionClass($strAccessor))->isAnonymous());
