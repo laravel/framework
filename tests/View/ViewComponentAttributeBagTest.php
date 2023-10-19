@@ -111,7 +111,6 @@ class ViewComponentAttributeBagTest extends TestCase
         ]));
 
         $this->assertSame('class="underline" label="label"', (string) $bag->except('link:url')->filterByPrefix('link:'));
-
     }
 
     public function testItMakesAnExceptionForAlpineXdata()
