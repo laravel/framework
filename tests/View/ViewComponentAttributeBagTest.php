@@ -107,7 +107,7 @@ class ViewComponentAttributeBagTest extends TestCase
             'msg:class' => 'italic',
             'link:url' => '#',
             'link:class' => 'underline',
-            'link:label' => 'label'
+            'link:label' => 'label',
         ]));
 
         $this->assertSame('class="underline" label="label"', (string) $bag->except('link:url')->filterByPrefix('link:'));
