@@ -482,19 +482,18 @@ class SupportStrTest extends TestCase
 
     public function testLimit()
     {
-        $this->assertSame('Laravel is...', Str::limit('Laravel is a free, open source PHP web application framework.', 10));
-        $this->assertSame('这是一...', Str::limit('这是一段中文', 6));
+        $this->assertSame('Laravel is...', Str::limit('Laravel is a free, open source PHP web application framework.', 13));
+        $this->assertSame('这是一...', Str::limit('这是一段中文', 9));
 
         $string = 'The PHP framework for web artisans.';
-        $this->assertSame('The PHP...', Str::limit($string, 7));
+        $this->assertSame('The PHP...', Str::limit($string, 10));
         $this->assertSame('The PHP', Str::limit($string, 7, ''));
         $this->assertSame('The PHP framework for web artisans.', Str::limit($string, 35));
-        $this->assertSame('The PHP framework for web artisans...', Str::limit($string, 34));
-        $this->assertSame('The PHP framework for web artis...', Str::limit($string, 34, '...', true));
-        $this->assertSame('The PHP framework for web artisan…', Str::limit($string, 34, '…', true));
+        $this->assertSame('The PHP framework for web artis...', Str::limit($string, 34));
+        $this->assertSame('The PHP framework for web artisan…', Str::limit($string, 34, '…'));
 
         $nonAsciiString = '这是一段中文';
-        $this->assertSame('这是一...', Str::limit($nonAsciiString, 6));
+        $this->assertSame('这是一...', Str::limit($nonAsciiString, 9));
         $this->assertSame('这是一', Str::limit($nonAsciiString, 6, ''));
     }
 

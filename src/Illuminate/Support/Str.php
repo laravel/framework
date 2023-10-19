@@ -567,20 +567,15 @@ class Str
      * @param  string  $value
      * @param  int  $limit
      * @param  string  $end
-     * @param  bool  $limitIncludesEnd
      * @return string
      */
-    public static function limit($value, $limit = 100, $end = '...', $limitIncludesEnd = false)
+    public static function limit($value, $limit = 100, $end = '...')
     {
-        $width = mb_strwidth($value, 'UTF-8');
-
-        if ($width <= $limit) {
+        if (mb_strwidth($value, 'UTF-8') <= $limit) {
             return $value;
         }
 
-        if ($limitIncludesEnd) {
-            $limit = $limit - mb_strwidth($end, 'UTF-8');
-        }
+        $limit = $limit - mb_strwidth($end, 'UTF-8');
 
         return rtrim(mb_strimwidth($value, 0, $limit, '', 'UTF-8')).$end;
     }
