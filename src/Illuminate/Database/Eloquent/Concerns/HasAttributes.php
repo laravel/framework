@@ -39,6 +39,7 @@ use LogicException;
 use ReflectionClass;
 use ReflectionMethod;
 use ReflectionNamedType;
+use RuntimeException;
 
 trait HasAttributes
 {
@@ -1316,7 +1317,19 @@ trait HasAttributes
      */
     protected function castAttributeAsHashedString($key, $value)
     {
-        return $value !== null && ! Hash::isHashed($value) ? Hash::make($value) : $value;
+        if ($value === null) {
+            return;
+        }
+
+        if (! Hash::isHashed($value)) {
+            return Hash::make($value);
+        }
+
+        if (Hash::needsRehash($value)) {
+            throw new RuntimeException('The hash does not match the configured hashing options.');
+        }
+
+        return $value;
     }
 
     /**

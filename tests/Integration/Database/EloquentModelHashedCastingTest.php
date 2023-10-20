@@ -5,21 +5,13 @@ namespace Illuminate\Tests\Integration\Database;
 use Illuminate\Contracts\Hashing\Hasher;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Schema;
+use RuntimeException;
 
 class EloquentModelHashedCastingTest extends DatabaseTestCase
 {
-    protected $hasher;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $this->hasher = $this->mock(Hasher::class);
-        Hash::swap($this->hasher);
-    }
-
     protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
     {
         Schema::create('hashed_casts', function (Blueprint $table) {
@@ -30,11 +22,11 @@ class EloquentModelHashedCastingTest extends DatabaseTestCase
 
     public function testHashed()
     {
-        $this->hasher->expects('isHashed')
+        Hash::expects('isHashed')
             ->with('this is a password')
             ->andReturnFalse();
 
-        $this->hasher->expects('make')
+        Hash::expects('make')
             ->with('this is a password')
             ->andReturn('hashed-password');
 
@@ -51,9 +43,13 @@ class EloquentModelHashedCastingTest extends DatabaseTestCase
 
     public function testNotHashedIfAlreadyHashed()
     {
-        $this->hasher->expects('isHashed')
+        Hash::expects('isHashed')
             ->with('already-hashed-password')
             ->andReturnTrue();
+
+        Hash::expects('needsRehash')
+            ->with('already-hashed-password')
+            ->andReturnFalse();
 
         $subject = HashedCast::create([
             'password' => 'already-hashed-password',
@@ -76,6 +72,32 @@ class EloquentModelHashedCastingTest extends DatabaseTestCase
         $this->assertDatabaseHas('hashed_casts', [
             'id' => $subject->id,
             'password' => null,
+        ]);
+    }
+
+    public function testPassingHashWithHigherCostThrowsException()
+    {
+        Config::set('hashing.bcrypt.rounds', 10);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('The hash does not match the configured hashing options.');
+
+        $subject = HashedCast::create([
+            // "password"; 13 rounds; bcrypt;
+            'password' => '$2y$13$Hdxlvi7OZqK3/fKVNypJs.vJqQcmOo3HnnT6w7fec9FRTRYxAhuCO',
+        ]);
+    }
+
+    public function testPassingHashWithLowerCostThrowsException()
+    {
+        Config::set('hashing.bcrypt.rounds', 10);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('The hash does not match the configured hashing options.');
+
+        $subject = HashedCast::create([
+            // "password"; 7 rounds; bcrypt;
+            'password' => '$2y$07$Ivc2VnUOUFtfdbXFc/Ysu.PgiwAHkDmbZQNR1OpIjKCxTxEfWLP5y',
         ]);
     }
 }
