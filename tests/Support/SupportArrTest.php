@@ -323,6 +323,59 @@ class SupportArrTest extends TestCase
         $this->assertEquals(['#foo', '#bar', ['#baz'], '#zap'], Arr::flatten($array, 2));
     }
 
+    public function testFilled()
+    {
+        // Test filled value
+        $array = ['products' => [
+            'desk' => ['price' => 100],
+            'chair' => ['price' => 0],
+            'closet' => ['price' => '0'],
+        ]];
+        $this->assertTrue(Arr::filled($array, 'products.desk.price'));
+        $this->assertTrue(Arr::filled($array, ['products.chair.price']));
+        $this->assertTrue(Arr::filled($array, ['products.closet.price']));
+        $this->assertTrue(Arr::filled($array, ['products.desk.price', 'products.chair.price', 'products.closet.price']));
+
+        // Test blank value
+        $array = [
+            'products' => [
+                'desk' => ['price' => null],
+                'chair' => ['price' => ''],
+                'closet' => ['price' => ' '],
+            ],
+        ];
+        $this->assertFalse(Arr::filled($array, 'products.desk.price'));
+        $this->assertFalse(Arr::filled($array, 'products.chair.price'));
+        $this->assertFalse(Arr::filled($array, 'products.closet.price'));
+        $this->assertFalse(Arr::filled($array, [
+            'products.desk.price',
+            'products.chair.price',
+        ]));
+
+        // Test missing keys in array
+        $array = ['products' => ['desk' => ['price' => 100]]];
+        $this->assertFalse(Arr::filled($array, 'products.chair.price'));
+        $this->assertFalse(Arr::filled($array, [
+            'products.desk.price',
+            'products.chair.price',
+            'products.closet.price',
+        ]));
+
+        // Test array containing ArrayAccess object
+        $array = new ArrayObject(['products' => [
+            'desk' => ['price' => 100],
+            'chair' => ['price' => 100],
+        ]]);
+        $this->assertTrue(Arr::filled($array, 'products'));
+        $this->assertFalse(Arr::filled($array, 'items'));
+
+        $this->assertTrue(Arr::filled($array, 'products.desk.price'));
+        $this->assertFalse(Arr::filled($array, 'products.closet.price'));
+
+        $this->assertTrue(Arr::filled($array, ['products.desk', 'products.chair']));
+        $this->assertFalse(Arr::filled($array, ['products.desk', 'products.closet']));
+    }
+
     public function testGet()
     {
         $array = ['products.desk' => ['price' => 100]];
