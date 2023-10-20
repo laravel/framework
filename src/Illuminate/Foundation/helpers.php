@@ -7,6 +7,7 @@ use Illuminate\Contracts\Broadcasting\Factory as BroadcastFactory;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Contracts\Cookie\Factory as CookieFactory;
 use Illuminate\Contracts\Debug\ExceptionHandler;
+use Illuminate\Contracts\Mail\Factory as MailFactory;
 use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Contracts\Routing\UrlGenerator;
 use Illuminate\Contracts\Support\Responsable;
@@ -527,6 +528,18 @@ if (! function_exists('method_field')) {
     function method_field($method)
     {
         return new HtmlString('<input type="hidden" name="_method" value="'.$method.'">');
+    }
+}
+
+if (! function_exists('mailer')) {
+    /**
+     * Get the mailer instance.
+     *
+     * @return \Illuminate\Contracts\Mail\Factory
+     */
+    function mailer()
+    {
+        return app(MailFactory::class);
     }
 }
 
