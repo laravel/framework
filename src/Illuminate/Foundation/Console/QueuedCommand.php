@@ -47,6 +47,6 @@ class QueuedCommand implements ShouldQueue
      */
     public function displayName()
     {
-        return $this->data[0];
+        return array_values($this->data)[0];
     }
 }
