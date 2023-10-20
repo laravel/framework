@@ -298,6 +298,34 @@ class Arr
     }
 
     /**
+     * Check if an item or items are filled in an array using "dot" notation.
+     *
+     * @param  \ArrayAccess|array  $array
+     * @param  string|array  $keys
+     * @return bool
+     */
+    public static function filled($array, $keys)
+    {
+        $keys = (array) $keys;
+
+        if (! $array || $keys === []) {
+            return false;
+        }
+
+        if (! static::has($array, $keys)) {
+            return false;
+        }
+
+        foreach ($keys as $key) {
+            if (blank(static::get($array, $key))) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
      * Get an item from an array using "dot" notation.
      *
      * @param  \ArrayAccess|array  $array
