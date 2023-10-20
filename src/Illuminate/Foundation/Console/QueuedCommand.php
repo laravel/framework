@@ -39,4 +39,14 @@ class QueuedCommand implements ShouldQueue
     {
         $kernel->call(...array_values($this->data));
     }
+
+    /**
+     * Get the display name for the queued job.
+     *
+     * @return string
+     */
+    public function displayName()
+    {
+        return $this->data[0];
+    }
 }
