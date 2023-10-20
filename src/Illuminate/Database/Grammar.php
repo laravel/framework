@@ -281,7 +281,7 @@ abstract class Grammar
     /**
      * Set the grammar's database connection.
      *
-     * @param  \Illuminate\Database\Connection  $prefix
+     * @param  \Illuminate\Database\Connection  $connection
      * @return $this
      */
     public function setConnection($connection)
