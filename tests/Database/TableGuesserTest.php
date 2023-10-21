@@ -28,6 +28,14 @@ class TableGuesserTest extends TestCase
         [$table, $create] = TableGuesser::guess('drop_status_column_from_users_table');
         $this->assertSame('users', $table);
         $this->assertFalse($create);
+
+        [$table, $create] = TableGuesser::guess('alter_users_table_add_status_column');
+        $this->assertSame('users', $table);
+        $this->assertFalse($create);
+
+        [$table, $create] = TableGuesser::guess('alter_user_roles_table_drop_is_active');
+        $this->assertSame('user_roles', $table);
+        $this->assertFalse($create);
     }
 
     public function testMigrationIsProperlyParsedWithoutTableSuffix()
