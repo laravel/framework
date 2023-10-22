@@ -1207,6 +1207,64 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Add a "where in set" clause to the query.
+     *
+     * @param  string  $column
+     * @param  mixed|array|null  $values
+     * @param  string  $boolean
+     * @param  bool  $not
+     * @return $this
+     */
+    public function whereInSet($column, $values = null, $boolean = 'and', $not = false)
+    {
+        $type = $not ? 'not like' : 'like';
+        $groupBoolean = $not ? 'and' : 'or';
+
+        $wheres = [];
+        foreach (Arr::wrap($values) as $value) {
+            $wheres[] = [$column, $not ? '!=' : '=', $value, $groupBoolean];
+            $wheres[] = [$column, $type, $value.',%', $groupBoolean];
+            $wheres[] = [$column, $type, '%,'.$value.',%', $groupBoolean];
+            $wheres[] = [$column, $type, $value.',%', $groupBoolean];
+        }
+
+        return $this->addArrayOfWheres($wheres, $boolean);
+    }
+
+    /**
+     * Add a "where not in set" clause to the query.
+     *
+     * @param  string  $column
+     * @param  mixed|array|null  $values
+     */
+    public function whereNotInSet($column, $values = null)
+    {
+        return $this->whereInSet($column, $values, 'and', true);
+    }
+
+    /**
+     * Add an "or where in set" clause to the query.
+     *
+     * @param  string  $column
+     * @param  mixed|array|null  $values
+     */
+    public function orWhereInSet($column, $values = null)
+    {
+        return $this->whereInSet($column, $values, 'or');
+    }
+
+    /**
+     * Add an "or where not in set" clause to the query.
+     *
+     * @param  string  $column
+     * @param  mixed|array|null  $values
+     */
+    public function orWhereNotInSet($column, $values = null)
+    {
+        return $this->whereInSet($column, $values, 'or', true);
+    }
+
+    /**
      * Add a "where null" clause to the query.
      *
      * @param  string|array|\Illuminate\Contracts\Database\Query\Expression  $columns
