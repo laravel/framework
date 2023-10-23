@@ -1689,6 +1689,19 @@ trait ValidatesAttributes
     }
 
     /**
+     * Validate an attribute is not hashed.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  array<int, int|string>  $parameters
+     * @return bool
+     */
+    public function validateNotHashed($attribute, $value, $parameters)
+    {
+        return password_get_info($value)['algo'] === null;
+    }
+
+    /**
      * Validate an attribute is not contained within a list of values.
      *
      * @param  string  $attribute

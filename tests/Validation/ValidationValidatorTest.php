@@ -8894,6 +8894,20 @@ class ValidationValidatorTest extends TestCase
         $validator->passes();
     }
 
+    public function test_not_hashed_rule()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.not_hashed' => 'The :attribute field must not be hashed.'], 'en');
+        $validator = new Validator($trans, ['password_1' => '$2y$10$i0RXVShQYw25byk7sy48NOLV3mRMzWfoawutQoyXB00Ly.UCK54PK', 'password_2' => 'correct horse battery staple'], ['password_1' => 'not_hashed', 'password_2' => 'not_hashed']);
+
+        $this->assertFalse($validator->passes());
+        $this->assertSame([
+            'password_1' => [
+                'The password 1 field must not be hashed.'
+            ]
+        ], $validator->errors()->messages());
+    }
+
     protected function getTranslator()
     {
         return m::mock(TranslatorContract::class);
