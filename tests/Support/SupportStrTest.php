@@ -261,6 +261,26 @@ class SupportStrTest extends TestCase
         $this->assertSame('', Str::betweenFirst('foobarbar', 'foo', 'bar'));
     }
 
+    public function testStrBetweenAll()
+    {
+        // Single occurrence
+        $this->assertSame(['1'], Str::betweenAll('[1] bla bla', '[', ']'));
+        $this->assertSame(['a'], Str::betweenAll('[a]ab[b', '[', ']'));
+
+        // Multiple occurrences
+        $this->assertSame(['1', '2'], Str::betweenAll('[1] bla bla [2]', '[', ']'));
+        $this->assertSame(['a', 'b', 'c'], Str::betweenAll('[a]ab[b]c[c]', '[', ']'));
+
+        // No occurrence
+        $this->assertSame([], Str::betweenAll('abc', '[', ']'));
+
+        // Edge case: Empty string
+        $this->assertSame([], Str::betweenAll('', '[', ']'));
+
+        // Edge case: Same delimiters
+        $this->assertSame(['1', '2'], Str::betweenAll('[1][2]', '[', ']'));
+    }
+
     public function testStrAfter()
     {
         $this->assertSame('nah', Str::after('hannah', 'han'));

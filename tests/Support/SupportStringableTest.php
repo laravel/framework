@@ -642,6 +642,26 @@ class SupportStringableTest extends TestCase
         $this->assertSame('bar', (string) $this->stringable('foobarbar')->between('foo', 'bar'));
     }
 
+    public function testBetweenAll()
+    {
+        // Single occurrence
+        $this->assertSame(['1'], $this->stringable('[1] bla bla')->betweenAll('[', ']'));
+        $this->assertSame(['a'], $this->stringable('[a]ab[b')->betweenAll('[', ']'));
+
+        // Multiple occurrences
+        $this->assertSame(['1', '2'], $this->stringable('[1] bla bla [2]')->betweenAll('[', ']'));
+        $this->assertSame(['a', 'b', 'c'], $this->stringable('[a]ab[b]c[c]')->betweenAll('[', ']'));
+
+        // No occurrence
+        $this->assertSame([], $this->stringable('abc')->betweenAll('[', ']'));
+
+        // Edge case: Empty string
+        $this->assertSame([], $this->stringable('')->betweenAll('[', ']'));
+
+        // Edge case: Same delimiters
+        $this->assertSame(['1', '2'], $this->stringable('[1][2]')->betweenAll('[', ']'));
+    }
+
     public function testBetweenFirst()
     {
         $this->assertSame('abc', (string) $this->stringable('abc')->betweenFirst('', 'c'));

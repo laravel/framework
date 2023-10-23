@@ -167,6 +167,18 @@ class Stringable implements JsonSerializable, ArrayAccess
     }
 
     /**
+     * Get all occurrences of text between two given values.
+     *
+     * @param  string  $from
+     * @param  string  $to
+     * @return array<int, string|null>
+     */
+    public function betweenAll($from, $to)
+    {
+        return Str::betweenAll($this->value, $from, $to);
+    }
+
+    /**
      * Convert a value to camel case.
      *
      * @return static
