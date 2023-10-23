@@ -12,6 +12,7 @@ use Illuminate\Support\Stringable;
 use Illuminate\Tests\Database\Fixtures\Models\Money\Price;
 use InvalidArgumentException;
 use Mockery as m;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\Exception\SessionNotFoundException;
@@ -80,9 +81,7 @@ class HttpRequestTest extends TestCase
         $this->assertSame('foo bar', $request->decodedPath());
     }
 
-    /**
-     * @dataProvider segmentProvider
-     */
+    #[DataProvider('segmentProvider')]
     public function testSegmentMethod($path, $segment, $expected)
     {
         $request = Request::create($path);
@@ -99,9 +98,7 @@ class HttpRequestTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider segmentsProvider
-     */
+    #[DataProvider('segmentsProvider')]
     public function testSegmentsMethod($path, $expected)
     {
         $request = Request::create($path);
@@ -1068,9 +1065,7 @@ class HttpRequestTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider getPrefersCases
-     */
+    #[DataProvider('getPrefersCases')]
     public function testPrefersMethod($accept, $prefers, $expected)
     {
         $this->assertSame(

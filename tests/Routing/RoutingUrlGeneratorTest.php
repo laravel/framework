@@ -10,6 +10,7 @@ use Illuminate\Routing\Route;
 use Illuminate\Routing\RouteCollection;
 use Illuminate\Routing\UrlGenerator;
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
@@ -587,9 +588,7 @@ class RoutingUrlGeneratorTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider providerRouteParameters
-     */
+    #[DataProvider('providerRouteParameters')]
     public function testUrlGenerationForControllersRequiresPassingOfRequiredParameters($parameters)
     {
         $this->expectException(UrlGenerationException::class);
@@ -641,9 +640,7 @@ class RoutingUrlGeneratorTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider provideParametersAndExpectedMeaningfulExceptionMessages
-     */
+    #[DataProvider('provideParametersAndExpectedMeaningfulExceptionMessages')]
     public function testUrlGenerationThrowsExceptionForMissingParametersWithMeaningfulMessage($parameters, $expectedMeaningfulExceptionMessage)
     {
         $this->expectException(UrlGenerationException::class);

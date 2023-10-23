@@ -3,11 +3,11 @@
 namespace Illuminate\Tests\Integration\Database\MySql;
 
 use RuntimeException;
+use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 
-/**
- * @requires extension pdo_mysql
- * @requires OS Linux|Darwin
- */
+#[RequiresOperatingSystem('Linux|Darwin')]
+#[RequiresPhpExtension('pdo_mysql')]
 class EscapeTest extends MySqlTestCase
 {
     public function testEscapeInt()

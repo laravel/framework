@@ -7,6 +7,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Sleep;
 use Orchestra\Testbench\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class SubMinuteSchedulingTest extends TestCase
 {
@@ -45,7 +46,7 @@ class SubMinuteSchedulingTest extends TestCase
         Sleep::assertNeverSlept();
     }
 
-    /** @dataProvider frequencyProvider */
+    #[DataProvider('frequencyProvider')]
     public function test_it_runs_sub_minute_callbacks($frequency, $expectedRuns)
     {
         $runs = 0;

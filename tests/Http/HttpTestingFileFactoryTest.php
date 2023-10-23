@@ -3,13 +3,14 @@
 namespace Illuminate\Tests\Http;
 
 use Illuminate\Http\Testing\FileFactory;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @requires extension gd
- *
  * @link https://www.php.net/manual/en/function.gd-info.php
  */
+#[RequiresPhpExtension('gd')]
 class HttpTestingFileFactoryTest extends TestCase
 {
     public function testImagePng()
@@ -118,7 +119,7 @@ class HttpTestingFileFactoryTest extends TestCase
         );
     }
 
-    /** @dataProvider generateImageDataProvider */
+    #[DataProvider('generateImageDataProvider')]
     public function testCallingCreateWithoutGDLoadedThrowsAnException(string $fileExtension, string $driver)
     {
         if ($this->isGDSupported($driver)) {

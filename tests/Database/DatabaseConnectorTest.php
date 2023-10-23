@@ -10,6 +10,8 @@ use Illuminate\Database\Connectors\SqlServerConnector;
 use Mockery as m;
 use PDO;
 use PDOStatement;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
@@ -27,9 +29,7 @@ class DatabaseConnectorTest extends TestCase
         $this->assertEquals([0 => 'baz', 1 => 'bar', 2 => 'boom'], $connector->getOptions(['options' => [0 => 'baz', 2 => 'boom']]));
     }
 
-    /**
-     * @dataProvider mySqlConnectProvider
-     */
+    #[DataProvider('mySqlConnectProvider')]
     public function testMySqlConnectCallsCreateConnectionWithProperArguments($dsn, $config)
     {
         $connector = $this->getMockBuilder(MySqlConnector::class)->onlyMethods(['createConnection', 'getOptions'])->getMock();
@@ -90,11 +90,10 @@ class DatabaseConnectorTest extends TestCase
     }
 
     /**
-     * @dataProvider provideSearchPaths
-     *
      * @param  string  $searchPath
      * @param  string  $expectedSql
      */
+    #[DataProvider('provideSearchPaths')]
     public function testPostgresSearchPathIsSet($searchPath, $expectedSql)
     {
         $dsn = 'pgsql:host=foo;dbname=\'bar\'';
@@ -317,9 +316,7 @@ class DatabaseConnectorTest extends TestCase
         $this->assertSame($result, $connection);
     }
 
-    /**
-     * @requires extension odbc
-     */
+    #[RequiresPhpExtension('odbc')]
     public function testSqlServerConnectCallsCreateConnectionWithPreferredODBC()
     {
         $config = ['odbc' => true, 'odbc_datasource_name' => 'server=localhost;database=test;'];

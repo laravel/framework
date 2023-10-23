@@ -6,6 +6,7 @@ use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\Access\Response;
 use Illuminate\Support\Facades\Route;
 use Orchestra\Testbench\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Process\PhpProcess;
 
 class ExceptionHandlerTest extends TestCase
@@ -120,9 +121,7 @@ class ExceptionHandlerTest extends TestCase
             ]);
     }
 
-    /**
-     * @dataProvider exitCodesProvider
-     */
+    #[DataProvider('exitCodesProvider')]
     public function testItReturnsNonZeroExitCodesForUncaughtExceptions($providers, $successful)
     {
         $basePath = static::applicationBasePath();

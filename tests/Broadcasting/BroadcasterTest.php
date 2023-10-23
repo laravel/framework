@@ -9,6 +9,7 @@ use Illuminate\Contracts\Routing\BindingRegistrar;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Mockery as m;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
@@ -314,9 +315,7 @@ class BroadcasterTest extends TestCase
         $this->assertNull($this->broadcaster->resolveAuthenticatedUser(new Request(['socket_id' => '1234.1234'])));
     }
 
-    /**
-     * @dataProvider channelNameMatchPatternProvider
-     */
+    #[DataProvider('channelNameMatchPatternProvider')]
     public function testChannelNameMatchPattern($channel, $pattern, $shouldMatch)
     {
         $this->assertEquals($shouldMatch, $this->broadcaster->channelNameMatchesPattern($channel, $pattern));
