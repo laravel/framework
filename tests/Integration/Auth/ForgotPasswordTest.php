@@ -10,7 +10,6 @@ use Illuminate\Support\Str;
 use Illuminate\Tests\Integration\Auth\Fixtures\AuthenticationTestUser;
 use Orchestra\Testbench\Factories\UserFactory;
 use Orchestra\Testbench\TestCase;
-use PHPUnit\Framework\Attributes\Test;
 
 class ForgotPasswordTest extends TestCase
 {
