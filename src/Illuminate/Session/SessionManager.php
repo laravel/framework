@@ -227,6 +227,26 @@ class SessionManager extends Manager
     }
 
     /**
+     * Get the maximum number of seconds the session lock should be held for.
+     *
+     * @return int
+     */
+    public function blocksFor()
+    {
+        return $this->config->get('session.block__lock_timeout', 10);
+    }
+
+    /**
+     * Get the maximum number of seconds to wait while attempting to acquire a session lock.
+     *
+     * @return int
+     */
+    public function waitsFor()
+    {
+        return $this->config->get('session.block_wait_timeout', 10);
+    }
+
+    /**
      * Get the name of the cache store / driver that should be used to acquire session locks.
      *
      * @return string|null
