@@ -65,7 +65,7 @@ class ForgotPasswordWithoutDefaultRoutesTest extends TestCase
         );
     }
 
-    public function testItCanSendForgotPasswordEmailViaToMailUsing()
+    public function testItCanSendForgotPasswordEmailViaCreateUrlUsing()
     {
         Notification::fake();
 
