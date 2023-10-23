@@ -44,8 +44,7 @@ class ForgotPasswordTest extends TestCase
         })->name('custom.password.reset');
     }
 
-    #[Test]
-    public function it_can_send_forgot_password_email()
+    public function testItCanSendForgotPasswordEmail()
     {
         Notification::fake();
 
@@ -68,8 +67,7 @@ class ForgotPasswordTest extends TestCase
         );
     }
 
-    #[Test]
-    public function it_can_send_forgot_password_email_via_create_url_using()
+    public function testItCanSendForgotPasswordEmailViaCreateUrlUsing()
     {
         Notification::fake();
 
@@ -96,8 +94,7 @@ class ForgotPasswordTest extends TestCase
         );
     }
 
-    #[Test]
-    public function it_can_send_forgot_password_email_via_to_mail_using()
+    public function testItCanSendForgotPasswordEmailViaToMailUsing()
     {
         Notification::fake();
 
