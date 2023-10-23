@@ -2,9 +2,9 @@
 
 namespace Illuminate\Tests\Integration\Database\MySql;
 
-use RuntimeException;
 use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
+use RuntimeException;
 
 #[RequiresOperatingSystem('Linux|Darwin')]
 #[RequiresPhpExtension('pdo_mysql')]

@@ -4,8 +4,8 @@ namespace Illuminate\Tests\Bus;
 
 use Carbon\CarbonImmutable;
 use Illuminate\Bus\Batch;
-use Illuminate\Bus\BatchFactory;
 use Illuminate\Bus\Batchable;
+use Illuminate\Bus\BatchFactory;
 use Illuminate\Bus\DatabaseBatchRepository;
 use Illuminate\Bus\PendingBatch;
 use Illuminate\Bus\Queueable;

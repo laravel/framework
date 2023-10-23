@@ -19,8 +19,8 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use RuntimeException;
-use Traversable;
 use stdClass;
+use Traversable;
 
 class SupportHelpersTest extends TestCase
 {
