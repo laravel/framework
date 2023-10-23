@@ -104,10 +104,10 @@
         "league/flysystem-read-only": "^3.3",
         "league/flysystem-sftp-v3": "^3.0",
         "mockery/mockery": "^1.5.1",
-        "orchestra/testbench-core": "^9.0",
+        "orchestra/testbench-core": "dev-phpunit11",
         "pda/pheanstalk": "^4.0",
         "phpstan/phpstan": "^1.4.7",
-        "phpunit/phpunit": "^10.1",
+        "phpunit/phpunit": "^11.0",
         "predis/predis": "^2.0.2",
         "symfony/cache": "^7.0",
         "symfony/http-client": "^7.0"

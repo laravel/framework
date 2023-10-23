@@ -7,6 +7,8 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\LazyCollection;
 use Illuminate\Testing\Assert;
 use Mockery as m;
+use PHPUnit\Framework\Attributes\AfterClass;
+use PHPUnit\Framework\Attributes\BeforeClass;
 use PHPUnit\Framework\TestCase;
 use SplFileInfo;
 
@@ -14,18 +16,14 @@ class FilesystemTest extends TestCase
 {
     private static $tempDir;
 
-    /**
-     * @beforeClass
-     */
+    #[BeforeClass]
     public static function setUpTempDir()
     {
         self::$tempDir = sys_get_temp_dir().'/tmp';
         mkdir(self::$tempDir);
     }
 
-    /**
-     * @afterClass
-     */
+    #[AfterClass]
     public static function tearDownTempDir()
     {
         $files = new Filesystem;

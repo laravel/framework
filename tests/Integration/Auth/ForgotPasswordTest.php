@@ -10,6 +10,7 @@ use Illuminate\Support\Str;
 use Illuminate\Tests\Integration\Auth\Fixtures\AuthenticationTestUser;
 use Orchestra\Testbench\Factories\UserFactory;
 use Orchestra\Testbench\TestCase;
+use PHPUnit\Framework\Attributes\Test;
 
 class ForgotPasswordTest extends TestCase
 {
@@ -43,7 +44,7 @@ class ForgotPasswordTest extends TestCase
         })->name('custom.password.reset');
     }
 
-    /** @test */
+    #[Test]
     public function it_can_send_forgot_password_email()
     {
         Notification::fake();
@@ -67,7 +68,7 @@ class ForgotPasswordTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_can_send_forgot_password_email_via_create_url_using()
     {
         Notification::fake();
@@ -95,7 +96,7 @@ class ForgotPasswordTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_can_send_forgot_password_email_via_to_mail_using()
     {
         Notification::fake();

@@ -10,6 +10,7 @@ use Illuminate\Support\Str;
 use Illuminate\Tests\Integration\Auth\Fixtures\AuthenticationTestUser;
 use Orchestra\Testbench\Factories\UserFactory;
 use Orchestra\Testbench\TestCase;
+use PHPUnit\Framework\Attributes\Test;
 
 class ForgotPasswordWithoutDefaultRoutesTest extends TestCase
 {
@@ -39,7 +40,7 @@ class ForgotPasswordWithoutDefaultRoutesTest extends TestCase
         })->name('custom.password.reset');
     }
 
-    /** @test */
+    #[Test]
     public function it_cannot_send_forgot_password_email()
     {
         $this->expectException('Symfony\Component\Routing\Exception\RouteNotFoundException');
@@ -66,7 +67,7 @@ class ForgotPasswordWithoutDefaultRoutesTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_can_send_forgot_password_email_via_create_url_using()
     {
         Notification::fake();
@@ -94,7 +95,7 @@ class ForgotPasswordWithoutDefaultRoutesTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_can_send_forgot_password_email_via_to_mail_using()
     {
         Notification::fake();

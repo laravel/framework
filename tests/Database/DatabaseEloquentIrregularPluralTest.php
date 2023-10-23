@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Database;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentIrregularPluralTest extends TestCase
@@ -71,7 +72,7 @@ class DatabaseEloquentIrregularPluralTest extends TestCase
         return $connection->getSchemaBuilder();
     }
 
-    /** @test */
+    #[Test]
     public function itPluralizesTheTableName()
     {
         $model = new IrregularPluralHuman;
@@ -79,7 +80,7 @@ class DatabaseEloquentIrregularPluralTest extends TestCase
         $this->assertSame('irregular_plural_humans', $model->getTable());
     }
 
-    /** @test */
+    #[Test]
     public function itTouchesTheParentWithAnIrregularPlural()
     {
         Carbon::setTestNow('2018-05-01 12:13:14');
@@ -104,7 +105,7 @@ class DatabaseEloquentIrregularPluralTest extends TestCase
         $this->assertSame('2018-05-01 15:16:17', (string) $human->updated_at);
     }
 
-    /** @test */
+    #[Test]
     public function itPluralizesMorphToManyRelationships()
     {
         $human = IrregularPluralHuman::create(['email' => 'bobby@example.com']);
