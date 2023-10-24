@@ -2,14 +2,14 @@
 
 namespace Illuminate\Database\PDO;
 
+use Doctrine\DBAL\Driver\Connection as ConnectionContract;
 use Doctrine\DBAL\Driver\PDO\SQLSrv\Statement;
 use Doctrine\DBAL\Driver\Result;
-use Doctrine\DBAL\Driver\ServerInfoAwareConnection;
 use Doctrine\DBAL\Driver\Statement as StatementInterface;
 use Doctrine\DBAL\ParameterType;
 use PDO;
 
-class SqlServerConnection implements ServerInfoAwareConnection
+class SqlServerConnection implements ConnectionContract
 {
     /**
      * The underlying connection instance.
@@ -68,9 +68,9 @@ class SqlServerConnection implements ServerInfoAwareConnection
      * Get the last insert ID.
      *
      * @param  string|null  $name
-     * @return mixed
+     * @return string|int
      */
-    public function lastInsertId($name = null)
+    public function lastInsertId($name = null): string|int
     {
         if ($name === null) {
             return $this->connection->lastInsertId($name);
@@ -84,31 +84,31 @@ class SqlServerConnection implements ServerInfoAwareConnection
     /**
      * Begin a new database transaction.
      *
-     * @return bool
+     * @return void
      */
-    public function beginTransaction()
+    public function beginTransaction(): void
     {
-        return $this->connection->beginTransaction();
+        $this->connection->beginTransaction();
     }
 
     /**
      * Commit a database transaction.
      *
-     * @return bool
+     * @return void
      */
-    public function commit()
+    public function commit(): void
     {
-        return $this->connection->commit();
+        $this->connection->commit();
     }
 
     /**
      * Rollback a database transaction.
      *
-     * @return bool
+     * @return void
      */
-    public function rollBack()
+    public function rollBack(): void
     {
-        return $this->connection->rollBack();
+        $this->connection->rollBack();
     }
 
     /**
@@ -118,7 +118,7 @@ class SqlServerConnection implements ServerInfoAwareConnection
      * @param  int  $type
      * @return string
      */
-    public function quote($value, $type = ParameterType::STRING)
+    public function quote($value, $type = ParameterType::STRING): string
     {
         $val = $this->connection->quote($value, $type);
 
@@ -135,17 +135,17 @@ class SqlServerConnection implements ServerInfoAwareConnection
      *
      * @return string
      */
-    public function getServerVersion()
+    public function getServerVersion(): string
     {
         return $this->connection->getServerVersion();
     }
 
     /**
-     * Get the wrapped PDO connection.
+     * Get the native PDO connection.
      *
      * @return \PDO
      */
-    public function getWrappedConnection(): PDO
+    public function getNativeConnection(): PDO
     {
         return $this->connection->getWrappedConnection();
     }

@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Schema\Grammars;
 
 use Doctrine\DBAL\Schema\Index;
+use Doctrine\DBAL\Schema\TableDiff;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Schema\Blueprint;
@@ -318,13 +319,32 @@ class SQLiteGrammar extends Grammar
                 $blueprint, $schema = $connection->getDoctrineSchemaManager()
             );
 
+            $droppedColumns = [];
+
             foreach ($command->columns as $name) {
-                $tableDiff->removedColumns[$name] = $connection->getDoctrineColumn(
+                $droppedColumns[$name] = $connection->getDoctrineColumn(
                     $this->getTablePrefix().$blueprint->getTable(), $name
                 );
             }
 
-            return (array) $schema->getDatabasePlatform()->getAlterTableSQL($tableDiff);
+            $platform = $connection->getDoctrineConnection()->getDatabasePlatform();
+
+            return (array) $platform->getAlterTableSQL(
+                new TableDiff(
+                    $tableDiff->getOldTable(),
+                    $tableDiff->getAddedColumns(),
+                    $tableDiff->getModifiedColumns(),
+                    $droppedColumns,
+                    $tableDiff->getRenamedColumns(),
+                    $tableDiff->getAddedIndexes(),
+                    $tableDiff->getModifiedIndexes(),
+                    $tableDiff->getDroppedIndexes(),
+                    $tableDiff->getRenamedIndexes(),
+                    $tableDiff->getAddedForeignKeys(),
+                    $tableDiff->getModifiedColumns(),
+                    $tableDiff->getDroppedForeignKeys(),
+                )
+            );
         }
     }
 

@@ -756,7 +756,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertSame('alter table `users` add `foo` double not null', $statements[0]);
+        $this->assertSame('alter table `users` add `foo` double(15, 6) not null', $statements[0]);
     }
 
     public function testAddingDoubleSpecifyingPrecision()

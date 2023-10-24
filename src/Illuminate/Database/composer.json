@@ -36,7 +36,7 @@
     },
     "suggest": {
         "ext-filter": "Required to use the Postgres database driver.",
-        "doctrine/dbal": "Required to rename columns and drop SQLite columns (^3.5.1).",
+        "doctrine/dbal": "Required to rename columns and drop SQLite columns (^4.0).",
         "fakerphp/faker": "Required to use the eloquent factory builder (^1.21).",
         "illuminate/console": "Required to use the database commands (^11.0).",
         "illuminate/events": "Required to use the observers with Eloquent (^11.0).",
