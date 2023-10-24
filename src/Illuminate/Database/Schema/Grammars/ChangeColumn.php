@@ -82,6 +82,7 @@ class ChangeColumn
             // Doctrine column definitions - which is necessary because Laravel and Doctrine
             // use some different terminology for various column attributes on the tables.
             foreach ($fluent->getAttributes() as $key => $value) {
+                // @FIXME `Column::setScale(int $scale)` doesn't support Fluent `$places` as `NULL`
                 if (! is_null($option = static::mapFluentOptionToDoctrine($key))) {
                     if (method_exists($column, $method = 'set'.ucfirst($option))) {
                         $column->{$method}(static::mapFluentValueToDoctrine($option, $value));
@@ -118,25 +119,25 @@ class ChangeColumn
      */
     protected static function getDoctrineColumnChangeOptions(Fluent $fluent)
     {
-        $options = ['type' => static::getDoctrineColumnType($fluent['type'])];
+        $options = ['Type' => static::getDoctrineColumnType($fluent['type'])];
 
         if (! in_array($fluent['type'], ['smallint', 'integer', 'bigint'])) {
-            $options['autoincrement'] = false;
+            $options['Autoincrement'] = false;
         }
 
         if (in_array($fluent['type'], ['tinyText', 'text', 'mediumText', 'longText'])) {
-            $options['length'] = static::calculateDoctrineTextLength($fluent['type']);
+            $options['Length'] = static::calculateDoctrineTextLength($fluent['type']);
         }
 
         if ($fluent['type'] === 'char') {
-            $options['fixed'] = true;
+            $options['Fixed'] = true;
         }
 
         if (static::doesntNeedCharacterOptions($fluent['type'])) {
-            // $options['customSchemaOptions'] = [
-            //     'collation' => '',
-            //     'charset' => '',
-            // ];
+            $options['PlatformOptions'] = [
+                'collation' => '',
+                'charset' => '',
+            ];
         }
 
         return $options;
