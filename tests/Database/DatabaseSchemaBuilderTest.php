@@ -73,7 +73,7 @@ class DatabaseSchemaBuilderTest extends TestCase
     public function testGetColumnTypeAddsPrefix()
     {
         $connection = m::mock(Connection::class);
-        $column = m::mock('alias:'.Column::class);
+        $column = m::mock(Column::class);
         $type = m::mock('alias:'.Type::class);
         $grammar = m::mock('alias:'.Grammar::class);
         $connection->shouldReceive('getSchemaGrammar')->once()->andReturn($grammar);
