@@ -74,7 +74,7 @@ class DatabaseSchemaBuilderTest extends TestCase
     {
         $connection = m::mock(Connection::class);
         $column = m::mock(Column::class);
-        $type = m::mock('alias:'.Type::class);
+        $type = m::mock(Type::class);
         $grammar = m::mock('alias:'.Grammar::class);
         $connection->shouldReceive('getSchemaGrammar')->once()->andReturn($grammar);
         $builder = new Builder($connection);
