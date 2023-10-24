@@ -535,7 +535,6 @@ class DatabaseSchemaBlueprintTest extends TestCase
             ],
         ];
 
-
         $this->assertContains($queries, $expected);
 
         $blueprintPostgres = new Blueprint('users', function ($table) {
