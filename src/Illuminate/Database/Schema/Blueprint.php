@@ -977,7 +977,7 @@ class Blueprint
      * @param  bool  $unsigned
      * @return \Illuminate\Database\Schema\ColumnDefinition
      */
-    public function double($column, $total = null, $places = null, $unsigned = false)
+    public function double($column, $total = 15, $places = 6, $unsigned = false)
     {
         return $this->addColumn('double', $column, compact('total', 'places', 'unsigned'));
     }

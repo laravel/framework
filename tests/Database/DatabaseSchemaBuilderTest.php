@@ -2,8 +2,11 @@
 
 namespace Illuminate\Tests\Database;
 
+use Doctrine\DBAL\Schema\Column;
+use Doctrine\DBAL\Types\Type;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Schema\Builder;
+use Illuminate\Database\Schema\Grammars\Grammar;
 use LogicException;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -70,15 +73,15 @@ class DatabaseSchemaBuilderTest extends TestCase
     public function testGetColumnTypeAddsPrefix()
     {
         $connection = m::mock(Connection::class);
-        $column = m::mock(stdClass::class);
-        $type = m::mock(stdClass::class);
-        $grammar = m::mock(stdClass::class);
+        $column = m::mock(Column::class);
+        $type = m::mock(Type::class);
+        $grammar = m::mock(Grammar::class);
         $connection->shouldReceive('getSchemaGrammar')->once()->andReturn($grammar);
         $builder = new Builder($connection);
         $connection->shouldReceive('getTablePrefix')->once()->andReturn('prefix_');
         $connection->shouldReceive('getDoctrineColumn')->once()->with('prefix_users', 'id')->andReturn($column);
         $column->shouldReceive('getType')->once()->andReturn($type);
-        $type->shouldReceive('getName')->once()->andReturn('integer');
+        $type->shouldReceive('lookupName')->once()->andReturn('integer');
 
         $this->assertSame('integer', $builder->getColumnType('users', 'id'));
     }
