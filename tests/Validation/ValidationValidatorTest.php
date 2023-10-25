@@ -8903,8 +8903,8 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($validator->passes());
         $this->assertSame([
             'password_1' => [
-                'The password 1 field must not be hashed.'
-            ]
+                'The password 1 field must not be hashed.',
+            ],
         ], $validator->errors()->messages());
     }
 
