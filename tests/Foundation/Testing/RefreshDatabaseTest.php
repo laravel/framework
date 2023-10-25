@@ -10,6 +10,7 @@ use Orchestra\Testbench\Concerns\Testing;
 use Orchestra\Testbench\Foundation\Application as Testbench;
 use PHPUnit\Framework\TestCase;
 use ReflectionMethod;
+
 use function Orchestra\Testbench\package_path;
 
 class RefreshDatabaseTest extends TestCase
