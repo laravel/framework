@@ -9,6 +9,9 @@ use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
+/**
+ * @requires extension memcached
+ */
 class CacheMemcachedStoreTest extends TestCase
 {
     protected function tearDown(): void
