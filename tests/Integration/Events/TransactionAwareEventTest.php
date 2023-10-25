@@ -71,7 +71,6 @@ class TransactionAwareEventTest extends TestCase
                     throw new \Exception;
                 });
             } catch (\Exception) {
-
             }
 
             // This event should be dispatched, as the parent transaction does not fail.
