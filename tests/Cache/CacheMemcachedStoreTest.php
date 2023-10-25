@@ -7,7 +7,6 @@ use Illuminate\Support\Carbon;
 use Memcached;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use stdClass;
 
 /**
  * @requires extension memcached
