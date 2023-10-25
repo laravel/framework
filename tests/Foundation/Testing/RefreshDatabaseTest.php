@@ -22,12 +22,18 @@ class RefreshDatabaseTest extends TestCase
         RefreshDatabaseState::$migrated = false;
 
         $this->traitObject = m::mock(RefreshDatabaseTestMockClass::class)->makePartial();
-        $this->traitObject->prepare();
+        $this->traitObject->setUp();
     }
 
     protected function tearDown(): void
     {
-        unset($this->traitObject);
+        $this->traitObject->tearDown();
+
+        if ($container = m::getContainer()) {
+            $this->addToAssertionCount($container->mockery_getExpectationCount());
+        }
+
+        m::close();
     }
 
     private function __reflectAndSetupAccessibleForProtectedTraitMethod($methodName)
@@ -103,15 +109,20 @@ class RefreshDatabaseTestMockClass
 
     public $dropTypes = false;
 
-    public function prepare()
+    public function setUp()
     {
+        RefreshDatabaseState::$migrated = false;
+
         $this->app = $this->refreshApplication();
         $this->withoutMockingConsoleOutput();
     }
 
-    public function __destruct()
+    public function tearDown()
     {
-        $this->tearDownTheTestEnvironment();
+        RefreshDatabaseState::$migrated = false;
+
+        $this->callBeforeApplicationDestroyedCallbacks();
+        $this->app?->flush();
     }
 
     protected function setUpTraits()
