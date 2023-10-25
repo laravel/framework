@@ -15,6 +15,20 @@ use Symfony\Component\HttpFoundation\Response;
 class StartSession
 {
     /**
+     * Get the maximum number of seconds to wait while attempting to acquire a session lock.
+     *
+     * @var int
+     */
+    protected $locksFor = 10;
+
+    /**
+     * Get the maximum number of seconds to wait while attempting to acquire a session lock.
+     *
+     * @var int
+     */
+    protected $waitsFor = 10;
+
+    /**
      * The session manager.
      *
      * @var \Illuminate\Session\SessionManager
@@ -80,7 +94,7 @@ class StartSession
 
         $lockFor = $request->route() && $request->route()->locksFor()
                         ? $request->route()->locksFor()
-                        : 10;
+                        : $this->locksFor;
 
         $lock = $this->cache($this->manager->blockDriver())
                     ->lock('session:'.$session->getId(), $lockFor)
@@ -90,7 +104,7 @@ class StartSession
             $lock->block(
                 ! is_null($request->route()->waitsFor())
                         ? $request->route()->waitsFor()
-                        : 10
+                        : $this->waitsFor
             );
 
             return $this->handleStatefulRequest($request, $session, $next);
