@@ -46,7 +46,7 @@ class ClosureCommand extends Command
         $parameters = [];
 
         foreach ((new ReflectionFunction($this->callback))->getParameters() as $parameter) {
-            if (isset($inputs[$parameter->getName()])) {
+            if (isset($inputs[$parameter->getName()]) || is_null($inputs[$parameter->getName()])) {
                 $parameters[$parameter->getName()] = $inputs[$parameter->getName()];
             }
         }
