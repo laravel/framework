@@ -259,7 +259,7 @@ class Dispatcher implements DispatcherContract
     }
 
     /**
-     * Broadcast and event and call its listeners.
+     * Broadcast an event and call its listeners.
      *
      * @param  string|object  $event
      * @param  mixed  $payload
