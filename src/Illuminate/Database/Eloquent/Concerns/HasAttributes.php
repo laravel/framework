@@ -1793,6 +1793,35 @@ trait HasAttributes
     }
 
     /**
+     * Determine if a model's attribute equals a given value.
+     *
+     * @param  string  $attribute
+     * @param  mixed   $value
+     * @return bool
+     */
+    public function hasAttribute($attribute, $value)
+    {
+        return $this->getAttribute($attribute) === $value;
+    }
+
+    /**
+     * Check if the model has the specified attributes with the given values.
+     *
+     * @param  array  $attributes
+     * @return bool
+     */
+    public function hasAttributes(array $attributes)
+    {
+        foreach ($attributes as $attribute => $value) {
+            if ($this->getAttribute($attribute) !== $value) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
      * Set the array of model attributes. No checking is done.
      *
      * @param  array  $attributes
