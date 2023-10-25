@@ -67,7 +67,7 @@ class BcryptHasher extends AbstractHasher implements HasherContract
      */
     public function check($value, $hashedValue, array $options = [])
     {
-        if ($this->verifyAlgorithm && ! $this->verifyAlgorithm($hashedValue)) {
+        if ($this->verifyAlgorithm && ! $this->isUsingCorrectAlgorithm($hashedValue)) {
             throw new RuntimeException('This password does not use the Bcrypt algorithm.');
         }
 
@@ -95,7 +95,7 @@ class BcryptHasher extends AbstractHasher implements HasherContract
      */
     public function verifyConfiguration($value)
     {
-        return $this->verifyAlgorithm($value) && $this->verifyOptions($value);
+        return $this->isUsingCorrectAlgorithm($value) && $this->isUsingValidOptions($value);
     }
 
     /**
@@ -104,7 +104,7 @@ class BcryptHasher extends AbstractHasher implements HasherContract
      * @param  string  $hashedValue
      * @return bool
      */
-    protected function verifyAlgorithm($hashedValue)
+    protected function isUsingCorrectAlgorithm($hashedValue)
     {
         return $this->info($hashedValue)['algoName'] === 'bcrypt';
     }
@@ -115,7 +115,7 @@ class BcryptHasher extends AbstractHasher implements HasherContract
      * @param  string  $hashedValue
      * @return bool
      */
-    protected function verifyOptions($hashedValue)
+    protected function isUsingValidOptions($hashedValue)
     {
         ['options' => $options] = $this->info($hashedValue);
 
