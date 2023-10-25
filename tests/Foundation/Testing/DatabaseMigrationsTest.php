@@ -6,7 +6,9 @@ use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithConsole;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Foundation\Testing\RefreshDatabaseState;
+use Illuminate\Support\Facades\Facade;
 use Mockery as m;
+use Orchestra\Testbench\Concerns\Testing;
 use Orchestra\Testbench\Foundation\Application as Testbench;
 use PHPUnit\Framework\TestCase;
 use ReflectionMethod;
@@ -22,17 +24,12 @@ class DatabaseMigrationsTest extends TestCase
         RefreshDatabaseState::$migrated = false;
 
         $this->traitObject = m::mock(DatabaseMigrationsTestMockClass::class)->makePartial();
-
-        $app = Testbench::create(
-            basePath: package_path('vendor/orchestra/testbench-core/laravel')
-        );
-
-        $this->traitObject->app = $app;
+        $this->traitObject->prepare();
     }
 
     protected function tearDown(): void
     {
-        m::close();
+        unset($this->traitObject);
     }
 
     private function __reflectAndSetupAccessibleForProtectedTraitMethod($methodName)
@@ -102,20 +99,37 @@ class DatabaseMigrationsTestMockClass
 {
     use DatabaseMigrations;
     use InteractsWithConsole;
-
-    public $app;
+    use Testing;
 
     public $dropViews = false;
 
     public $dropTypes = false;
 
-    public function __construct()
+    public function prepare()
     {
+        $this->app = $this->refreshApplication();
         $this->withoutMockingConsoleOutput();
     }
 
-    public function beforeApplicationDestroyed()
+    public function __destruct()
     {
-        //
+        $this->tearDownTheTestEnvironment();
+    }
+
+    protected function setUpTraits()
+    {
+        return [];
+    }
+
+    protected function setUpTheTestEnvironmentTraitToBeIgnored(string $use): bool
+    {
+        return true;
+    }
+
+    protected function refreshApplication()
+    {
+        return Testbench::create(
+            basePath: package_path('vendor/orchestra/testbench-core/laravel')
+        );
     }
 }
