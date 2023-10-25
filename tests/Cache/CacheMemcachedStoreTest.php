@@ -23,7 +23,7 @@ class CacheMemcachedStoreTest extends TestCase
 
     public function testGetReturnsNullWhenNotFound()
     {
-        $memcache = $this->getMockBuilder(stdClass::class)->onlyMethods(['get', 'getResultCode'])->getMock();
+        $memcache = $this->getMockBuilder(Memcached::class)->onlyMethods(['get', 'getResultCode'])->getMock();
         $memcache->expects($this->once())->method('get')->with($this->equalTo('foo:bar'))->willReturn(null);
         $memcache->expects($this->once())->method('getResultCode')->willReturn(1);
         $store = new MemcachedStore($memcache, 'foo');
@@ -32,7 +32,7 @@ class CacheMemcachedStoreTest extends TestCase
 
     public function testMemcacheValueIsReturned()
     {
-        $memcache = $this->getMockBuilder(stdClass::class)->onlyMethods(['get', 'getResultCode'])->getMock();
+        $memcache = $this->getMockBuilder(Memcached::class)->onlyMethods(['get', 'getResultCode'])->getMock();
         $memcache->expects($this->once())->method('get')->willReturn('bar');
         $memcache->expects($this->once())->method('getResultCode')->willReturn(0);
         $store = new MemcachedStore($memcache);
@@ -41,7 +41,7 @@ class CacheMemcachedStoreTest extends TestCase
 
     public function testMemcacheGetMultiValuesAreReturnedWithCorrectKeys()
     {
-        $memcache = $this->getMockBuilder(stdClass::class)->onlyMethods(['getMulti', 'getResultCode'])->getMock();
+        $memcache = $this->getMockBuilder(Memcached::class)->onlyMethods(['getMulti', 'getResultCode'])->getMock();
         $memcache->expects($this->once())->method('getMulti')->with(
             ['foo:foo', 'foo:bar', 'foo:baz']
         )->willReturn([
