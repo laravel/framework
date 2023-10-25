@@ -9,9 +9,6 @@ use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
-/**
- * @requires extension memcached
- */
 class CacheMemcachedStoreTest extends TestCase
 {
     protected function tearDown(): void
@@ -23,31 +20,31 @@ class CacheMemcachedStoreTest extends TestCase
 
     public function testGetReturnsNullWhenNotFound()
     {
-        $memcache = m::mock(stdClass::class)->makePartial();
-        $memcache->shouldReceive('get')->once()->with('foo:bar')->andReturn(null);
-        $memcache->shouldReceive('getResultCode')->once()->andReturn(1);
+        $memcache = $this->getMockBuilder(stdClass::class)->onlyMethods(['get', 'getResultCode'])->getMock();
+        $memcache->expects($this->once())->method('get')->with($this->equalTo('foo:bar'))->willReturn(null);
+        $memcache->expects($this->once())->method('getResultCode')->willReturn(1);
         $store = new MemcachedStore($memcache, 'foo');
         $this->assertNull($store->get('bar'));
     }
 
     public function testMemcacheValueIsReturned()
     {
-        $memcache = m::mock(stdClass::class)->makePartial();
-        $memcache->shouldReceive('get')->once()->andReturn('bar');
-        $memcache->shouldReceive('getResultCode')->once()->andReturn(0);
+        $memcache = $this->getMockBuilder(stdClass::class)->onlyMethods(['get', 'getResultCode'])->getMock();
+        $memcache->expects($this->once())->method('get')->willReturn('bar');
+        $memcache->expects($this->once())->method('getResultCode')->willReturn(0);
         $store = new MemcachedStore($memcache);
         $this->assertSame('bar', $store->get('foo'));
     }
 
     public function testMemcacheGetMultiValuesAreReturnedWithCorrectKeys()
     {
-        $memcache = m::mock(stdClass::class)->makePartial();
-        $memcache->shouldReceive('getMulti')->once()->with(
+        $memcache = $this->getMockBuilder(stdClass::class)->onlyMethods(['getMulti', 'getResultCode'])->getMock();
+        $memcache->expects($this->once())->method('getMulti')->with(
             ['foo:foo', 'foo:bar', 'foo:baz']
-        )->andReturn([
+        )->willReturn([
             'fizz', 'buzz', 'norf',
         ]);
-        $memcache->shouldReceive('getResultCode')->once()->andReturn(0);
+        $memcache->expects($this->once())->method('getResultCode')->willReturn(0);
         $store = new MemcachedStore($memcache, 'foo');
         $this->assertEquals([
             'foo' => 'fizz',
