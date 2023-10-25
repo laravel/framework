@@ -7,6 +7,7 @@ use Illuminate\Support\Carbon;
 use Memcached;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use stdClass;
 
 /**
  * @requires extension memcached
@@ -22,7 +23,7 @@ class CacheMemcachedStoreTest extends TestCase
 
     public function testGetReturnsNullWhenNotFound()
     {
-        $memcache = m::mock(Memcached::class)->makePartial();
+        $memcache = m::mock(stdClass::class)->makePartial();
         $memcache->shouldReceive('get')->once()->with('foo:bar')->andReturn(null);
         $memcache->shouldReceive('getResultCode')->once()->andReturn(1);
         $store = new MemcachedStore($memcache, 'foo');
@@ -31,7 +32,7 @@ class CacheMemcachedStoreTest extends TestCase
 
     public function testMemcacheValueIsReturned()
     {
-        $memcache = m::mock(Memcached::class)->makePartial();
+        $memcache = m::mock(stdClass::class)->makePartial();
         $memcache->shouldReceive('get')->once()->andReturn('bar');
         $memcache->shouldReceive('getResultCode')->once()->andReturn(0);
         $store = new MemcachedStore($memcache);
@@ -40,7 +41,7 @@ class CacheMemcachedStoreTest extends TestCase
 
     public function testMemcacheGetMultiValuesAreReturnedWithCorrectKeys()
     {
-        $memcache = m::mock(Memcached::class)->makePartial();
+        $memcache = m::mock(stdClass::class)->makePartial();
         $memcache->shouldReceive('getMulti')->once()->with(
             ['foo:foo', 'foo:bar', 'foo:baz']
         )->andReturn([
