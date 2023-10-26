@@ -799,7 +799,7 @@ class Filesystem
      */
     public function bytesToHuman($bytes, $precision = 2)
     {
-        $units = ['B','KB','MB','GB','TB','PB','EB','ZB','YB'];
+        $units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
 
         for ($i = 0; ($bytes / 1024) > 0.9 && ($i < count($units) - 1); $i++) {
             $bytes /= 1024;
