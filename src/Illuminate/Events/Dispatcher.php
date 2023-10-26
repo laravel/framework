@@ -58,6 +58,13 @@ class Dispatcher implements DispatcherContract
     protected $queueResolver;
 
     /**
+     * The database transaction manager resolver instance.
+     *
+     * @var callable
+     */
+    protected $transactionManagerResolver;
+
+    /**
      * Create a new event dispatcher instance.
      *
      * @param  \Illuminate\Contracts\Container\Container|null  $container
@@ -233,29 +240,28 @@ class Dispatcher implements DispatcherContract
      */
     public function dispatch($event, $payload = [], $halt = false)
     {
-        $isEventObject = is_object($event);
-
         // When the given "event" is actually an object we will assume it is an event
         // object and use the class as the event name and this event itself as the
         // payload to the handler, which makes object based events quite simple.
-        [$event, $payload] = $this->parseEventAndPayload(
-            $event, $payload
-        );
+        [$isEventObject, $event, $payload] = [
+            is_object($event),
+            ...$this->parseEventAndPayload($event, $payload)
+        ];
 
-        // If the event is meant to be reserved upon a database transaction failure,
-        // we will add the actual event dispatching to a callback that executes
-        // once the database transaction has been committed within the DB.
-        if (
-            $isEventObject &&
+        // If the event is meant to be reserved upon a database transaction failure
+        // we will add the actual event dispatching to a callback which executes
+        // after the database transaction has been "committed" within this DB.
+        if ($isEventObject &&
             $payload[0] instanceof TransactionAware &&
-            $this->container->bound('db.transactions')
-        ) {
-            $this->container->make('db.transactions')->addCallback(fn () => $this->executeListeners($event, $payload, $halt));
+            $this->resolveTransactionManager()) {
+            $this->resolveTransactionManager()->addCallback(
+                fn () => $this->invokeListeners($event, $payload, $halt)
+            );
 
             return null;
         }
 
-        return $this->executeListeners($event, $payload, $halt);
+        return $this->invokeListeners($event, $payload, $halt);
     }
 
     /**
@@ -266,7 +272,7 @@ class Dispatcher implements DispatcherContract
      * @param  bool  $halt
      * @return array|null
      */
-    protected function executeListeners($event, $payload, $halt = false)
+    protected function invokeListeners($event, $payload, $halt = false)
     {
         if ($this->shouldBroadcast($payload)) {
             $this->broadcastEvent($payload[0]);
@@ -722,6 +728,29 @@ class Dispatcher implements DispatcherContract
     public function setQueueResolver(callable $resolver)
     {
         $this->queueResolver = $resolver;
+
+        return $this;
+    }
+
+    /**
+     * Get the database transaction manager implementation from the resolver.
+     *
+     * @return \Illuminate\Database\DatabaseTransactionsManager|null
+     */
+    protected function resolveTransactionManager()
+    {
+        return call_user_func($this->transactionManagerResolver);
+    }
+
+    /**
+     * Set the database transaction manager resolver implementation.
+     *
+     * @param  callable  $resolver
+     * @return $this
+     */
+    public function setTransactionManagerResolver(callable $resolver)
+    {
+        $this->transactionManagerResolver = $resolver;
 
         return $this;
     }
