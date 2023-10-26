@@ -139,7 +139,7 @@ class RoutingServiceProvider extends ServiceProvider
 
                 return with((new PsrHttpFactory($psr17Factory, $psr17Factory, $psr17Factory, $psr17Factory))
                     ->createRequest($illuminateRequest = $app->make('request')), fn ($request) => $request->withParsedBody(
-                        array_merge($request->getParsedBody(), $illuminateRequest->getPayload()->all())
+                        array_merge($request->getParsedBody() ?? [], $illuminateRequest->getPayload()->all())
                     ));
             }
 

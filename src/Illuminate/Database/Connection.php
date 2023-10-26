@@ -656,6 +656,27 @@ class Connection implements ConnectionInterface
     }
 
     /**
+     * Execute the given callback without "pretending".
+     *
+     * @param  \Closure  $callback
+     * @return mixed
+     */
+    public function withoutPretending(Closure $callback)
+    {
+        if (! $this->pretending) {
+            return $callback();
+        }
+
+        $this->pretending = false;
+
+        $result = $callback();
+
+        $this->pretending = true;
+
+        return $result;
+    }
+
+    /**
      * Execute the given callback in "dry run" mode.
      *
      * @param  \Closure  $callback
@@ -828,6 +849,10 @@ class Connection implements ConnectionInterface
         $this->totalQueryDuration += $time ?? 0.0;
 
         $this->event(new QueryExecuted($query, $bindings, $time, $this));
+
+        $query = $this->pretending === true
+            ? $this->queryGrammar?->substituteBindingsIntoRawSql($query, $bindings) ?? $query
+            : $query;
 
         if ($this->loggingQueries) {
             $this->queryLog[] = compact('query', 'bindings', 'time');
