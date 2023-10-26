@@ -651,6 +651,10 @@ class FilesystemTest extends TestCase
         $this->assertSame('1.234 KB', $filesystem->bytesToHuman(1264, 3));
         $this->assertSame('5 GB', $filesystem->bytesToHuman(1024 * 1024 * 1024 * 5));
         $this->assertSame('10 TB', $filesystem->bytesToHuman((1024 ** 4) * 10));
+        $this->assertSame('10 PB', $filesystem->bytesToHuman((1024 ** 5) * 10));
+        $this->assertSame('1 ZB', $filesystem->bytesToHuman(1024 ** 7));
+        $this->assertSame('1 YB', $filesystem->bytesToHuman(1024 ** 8));
+        $this->assertSame('1024 YB', $filesystem->bytesToHuman(1024 ** 9));
     }
 
     /**
