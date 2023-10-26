@@ -104,13 +104,15 @@
         "league/flysystem-read-only": "^3.3",
         "league/flysystem-sftp-v3": "^3.0",
         "mockery/mockery": "^1.5.1",
+        "nyholm/psr7": "^1.2",
         "orchestra/testbench-core": "^9.0",
         "pda/pheanstalk": "^4.0",
         "phpstan/phpstan": "^1.4.7",
         "phpunit/phpunit": "^10.1",
         "predis/predis": "^2.0.2",
         "symfony/cache": "^7.0",
-        "symfony/http-client": "^7.0"
+        "symfony/http-client": "^7.0",
+        "symfony/psr-http-message-bridge": "^2.0"
     },
     "provide": {
         "psr/container-implementation": "1.1|2.0",

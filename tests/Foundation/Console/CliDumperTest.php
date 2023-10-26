@@ -55,7 +55,7 @@ class CliDumperTest extends TestCase
         $output = $this->dump(['string', 1, 1.1, ['string', 1, 1.1]]);
 
         $expected = <<<'EOF'
-        array:4 [ // app/routes/console.php:18
+        array:4 [
           0 => "string"
           1 => 1
           2 => 1.1
@@ -64,7 +64,7 @@ class CliDumperTest extends TestCase
             1 => 1
             2 => 1.1
           ]
-        ]
+        ] // app/routes/console.php:18
 
         EOF;
 
@@ -90,9 +90,9 @@ class CliDumperTest extends TestCase
         $objectId = spl_object_id($user);
 
         $expected = <<<EOF
-        {#$objectId // app/routes/console.php:18
+        {#$objectId
           +"name": "Guus"
-        }
+        } // app/routes/console.php:18
 
         EOF;
 

@@ -12,8 +12,7 @@ class FoundationServiceProvidersTest extends TestCase
         return [HeadServiceProvider::class];
     }
 
-    /** @test */
-    public function it_can_boot_service_provider_registered_from_another_service_provider()
+    public function testItCanBootServiceProviderRegisteredFromAnotherServiceProvider()
     {
         $this->assertTrue($this->app['tail.registered']);
         $this->assertTrue($this->app['tail.booted']);
