@@ -23,7 +23,7 @@ class DynamicContentIsShown extends Migration
         DB::statement("ALTER TABLE 'pseudo_table_name' MODIFY 'column_name' VARCHAR(191)");
 
         /** @var \Illuminate\Support\Collection $tablesList */
-        $tablesList = DB::ignorePretendModeForCallback(function () {
+        $tablesList = DB::withoutPretending(function () {
             return DB::table('people')->get();
         });
 

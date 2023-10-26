@@ -656,12 +656,12 @@ class Connection implements ConnectionInterface
     }
 
     /**
-     * Execute the given callback in "hot" mode.
+     * Execute the given callback without "pretending".
      *
      * @param  \Closure  $callback
      * @return mixed
      */
-    public function ignorePretendModeForCallback(Closure $callback): mixed
+    public function withoutPretending(Closure $callback)
     {
         if (! $this->pretending) {
             return $callback();

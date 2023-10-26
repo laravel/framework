@@ -103,7 +103,7 @@ class MigratorTest extends TestCase
     public function testIgnorePretendModeForCallbackData()
     {
         // Create two tables with different columns so that we can query it later
-        // with the new method DB::ignorePretendModeForCallback().
+        // with the new method DB::withoutPretending().
 
         Schema::create('table_1', function (Blueprint $table) {
             $table->increments('id');
@@ -125,14 +125,14 @@ class MigratorTest extends TestCase
             $this->assertTrue([] === $tablesEmpty);
 
             // Returns an array with two tables because we ignore pretend mode.
-            $tablesList = DB::ignorePretendModeForCallback(function (): array {
+            $tablesList = DB::withoutPretending(function (): array {
                 return DB::select("SELECT name FROM sqlite_master WHERE type='table'");
             });
 
             $this->assertTrue([] !== $tablesList);
 
             // The following would not be possible in pretend mode, if the
-            // method DB::ignorePretendModeForCallback() would not exists,
+            // method DB::withoutPretending() would not exists,
             // because nothing is executed in pretend mode.
             foreach ($tablesList as $table) {
                 if (in_array($table->name, ['sqlite_sequence', 'migrations'])) {
@@ -143,7 +143,7 @@ class MigratorTest extends TestCase
 
                 $this->assertTrue([] === $columnsEmpty);
 
-                $columnsList = DB::ignorePretendModeForCallback(function () use ($table): array {
+                $columnsList = DB::withoutPretending(function () use ($table): array {
                     return DB::select("PRAGMA table_info($table->name)");
                 });
 
@@ -155,7 +155,7 @@ class MigratorTest extends TestCase
                 // count is still two.
                 DB::statement("ALTER TABLE $table->name ADD COLUMN column_3 varchar(255) DEFAULT 'default_value' NOT NULL");
 
-                $columnsList = DB::ignorePretendModeForCallback(function () use ($table): array {
+                $columnsList = DB::withoutPretending(function () use ($table): array {
                     return DB::select("PRAGMA table_info($table->name)");
                 });
 
