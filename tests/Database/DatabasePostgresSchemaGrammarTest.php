@@ -1186,11 +1186,11 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $this->assertSame('select * from information_schema.tables where table_catalog = ? and table_schema = ? and table_name = ? and table_type = \'BASE TABLE\'', $statement);
     }
 
-    public function testCompileColumnListing()
+    public function testCompileColumns()
     {
-        $statement = $this->getGrammar()->compileColumnListing();
+        $statement = $this->getGrammar()->compileColumns('db', 'public', 'table');
 
-        $this->assertSame('select column_name from information_schema.columns where table_catalog = ? and table_schema = ? and table_name = ?', $statement);
+        $this->assertStringContainsString("where c.relname = 'table' and n.nspname = 'public'", $statement);
     }
 
     protected function getConnection()

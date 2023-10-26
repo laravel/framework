@@ -77,6 +77,7 @@ class DatabaseSchemaBuilderTest extends TestCase
         $builder = new Builder($connection);
         $connection->shouldReceive('getTablePrefix')->once()->andReturn('prefix_');
         $connection->shouldReceive('getDoctrineColumn')->once()->with('prefix_users', 'id')->andReturn($column);
+        $connection->shouldReceive('usingNativeSchemaOperations')->once()->andReturn(false);
         $column->shouldReceive('getType')->once()->andReturn($type);
         $type->shouldReceive('getName')->once()->andReturn('integer');
 
