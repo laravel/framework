@@ -204,6 +204,7 @@ class SupportStrTest extends TestCase
         $this->assertSame('...ocê e...', Str::excerpt('Como você está', 'Ê', ['radius' => 2]));
         $this->assertSame('João...', Str::excerpt('João Antônio ', 'jo', ['radius' => 2]));
         $this->assertSame('João Antô...', Str::excerpt('João Antônio', 'JOÃO', ['radius' => 5]));
+        $this->assertNull(Str::excerpt('', '/'));
     }
 
     public function testStrBefore()
@@ -297,6 +298,29 @@ class SupportStrTest extends TestCase
     public function testStrContainsAll($haystack, $needles, $expected, $ignoreCase = false)
     {
         $this->assertEquals($expected, Str::containsAll($haystack, $needles, $ignoreCase));
+    }
+
+    public function testConvertCase()
+    {
+        // Upper Case Conversion
+        $this->assertSame('HELLO', Str::convertCase('hello', MB_CASE_UPPER));
+        $this->assertSame('WORLD', Str::convertCase('WORLD', MB_CASE_UPPER));
+
+        // Lower Case Conversion
+        $this->assertSame('hello', Str::convertCase('HELLO', MB_CASE_LOWER));
+        $this->assertSame('world', Str::convertCase('WORLD', MB_CASE_LOWER));
+
+        // Case Folding
+        $this->assertSame('hello', Str::convertCase('HeLLo', MB_CASE_FOLD));
+        $this->assertSame('world', Str::convertCase('WoRLD', MB_CASE_FOLD));
+
+        // Multi-byte String
+        $this->assertSame('ÜÖÄ', Str::convertCase('üöä', MB_CASE_UPPER, 'UTF-8'));
+        $this->assertSame('üöä', Str::convertCase('ÜÖÄ', MB_CASE_LOWER, 'UTF-8'));
+
+        // Unsupported Mode
+        $this->expectException(\ValueError::class);
+        Str::convertCase('Hello', -1);
     }
 
     public function testParseCallback()
@@ -597,6 +621,8 @@ class SupportStrTest extends TestCase
         // Test for associative array support
         $this->assertSame('foo/bar', Str::replaceArray('?', [1 => 'foo', 2 => 'bar'], '?/?'));
         $this->assertSame('foo/bar', Str::replaceArray('?', ['x' => 'foo', 'y' => 'bar'], '?/?'));
+        // Test does not crash on bad input
+        $this->assertSame('?', Str::replaceArray('?', [(object) ['foo' => 'bar']], '?'));
     }
 
     public function testReplaceFirst()
@@ -854,6 +880,11 @@ class SupportStrTest extends TestCase
     {
         $this->assertSame('ab', Str::take('abcdef', 2));
         $this->assertSame('ef', Str::take('abcdef', -2));
+        $this->assertSame('', Str::take('abcdef', 0));
+        $this->assertSame('', Str::take('', 2));
+        $this->assertSame('abcdef', Str::take('abcdef', 10));
+        $this->assertSame('abcdef', Str::take('abcdef', 6));
+        $this->assertSame('ü', Str::take('üöä', 1));
     }
 
     public function testLcfirst()
@@ -1285,6 +1316,13 @@ class SupportStrTest extends TestCase
     public function testPasswordCreation()
     {
         $this->assertTrue(strlen(Str::password()) === 32);
+
+        $this->assertStringNotContainsString(' ', Str::password());
+        $this->assertStringContainsString(' ', Str::password(spaces: true));
+
+        $this->assertTrue(
+            Str::of(Str::password())->contains(['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'])
+        );
     }
 }
 

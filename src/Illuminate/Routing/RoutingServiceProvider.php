@@ -137,8 +137,10 @@ class RoutingServiceProvider extends ServiceProvider
             if (class_exists(Psr17Factory::class) && class_exists(PsrHttpFactory::class)) {
                 $psr17Factory = new Psr17Factory;
 
-                return (new PsrHttpFactory($psr17Factory, $psr17Factory, $psr17Factory, $psr17Factory))
-                    ->createRequest($app->make('request'));
+                return with((new PsrHttpFactory($psr17Factory, $psr17Factory, $psr17Factory, $psr17Factory))
+                    ->createRequest($illuminateRequest = $app->make('request')), fn ($request) => $request->withParsedBody(
+                        array_merge($request->getParsedBody(), $illuminateRequest->getPayload()->all())
+                    ));
             }
 
             throw new BindingResolutionException('Unable to resolve PSR request. Please install the symfony/psr-http-message-bridge and nyholm/psr7 packages.');

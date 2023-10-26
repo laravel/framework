@@ -5059,6 +5059,19 @@ class SupportCollectionTest extends TestCase
     }
 
     #[DataProvider('collectionClassProvider')]
+    public function testHighOrderPercentage($collection)
+    {
+        $collection = new $collection([
+            ['name' => 'Taylor', 'active' => true],
+            ['name' => 'Nuno', 'active' => true],
+            ['name' => 'Dries', 'active' => false],
+            ['name' => 'Jess', 'active' => true],
+        ]);
+
+        $this->assertSame(75.00, $collection->percentage->active);
+    }
+
+    #[DataProvider('collectionClassProvider')]
     public function testPercentageReturnsNullForEmptyCollections($collection)
     {
         $collection = new $collection([]);
