@@ -248,13 +248,13 @@ class Dispatcher implements DispatcherContract
             ...$this->parseEventAndPayload($event, $payload)
         ];
 
-        // If the event is meant to be reserved upon a database transaction failure
-        // we will add the actual event dispatching to a callback which executes
-        // after the database transaction has been "committed" within this DB.
+        // If the event is not intended to be dispatched unless the current database
+        // transaction is successful, we'll register a callback which will handle
+        // dispatching this event on the next successful DB transaction commit.
         if ($isEventObject &&
             $payload[0] instanceof TransactionAware &&
-            $this->resolveTransactionManager()) {
-            $this->resolveTransactionManager()->addCallback(
+            ! is_null($transactions = $this->resolveTransactionManager())) {
+            $transactions->addCallback(
                 fn () => $this->invokeListeners($event, $payload, $halt)
             );
 
