@@ -67,7 +67,8 @@ class SeedCommand extends Command
         $this->resolver->setDefaultConnection($this->getDatabase());
 
         Model::unguarded(function () {
-            $this->getSeeder()->__invoke();
+            $params = $this->input->getOption('rollback') ? ['rollback'] : [];
+            $this->getSeeder()->__invoke($params);
         });
 
         if ($previousConnection) {
@@ -135,6 +136,7 @@ class SeedCommand extends Command
             ['class', null, InputOption::VALUE_OPTIONAL, 'The class name of the root seeder', 'Database\\Seeders\\DatabaseSeeder'],
             ['database', null, InputOption::VALUE_OPTIONAL, 'The database connection to seed'],
             ['force', null, InputOption::VALUE_NONE, 'Force the operation to run when in production'],
+            ['rollback', null, InputOption::VALUE_NONE, 'To run the rollback function which aims to revert any db changes made'],
         ];
     }
 }
