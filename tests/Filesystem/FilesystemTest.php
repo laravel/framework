@@ -639,6 +639,20 @@ class FilesystemTest extends TestCase
         $this->assertSame('76d3bc41c9f588f7fcd0d5bf4718f8f84b1c41b20882703100b9eb9413807c01', $filesystem->hash(self::$tempDir.'/foo.txt', 'sha3-256'));
     }
 
+    public function testBytesToHuman()
+    {
+        $filesystem = new Filesystem;
+
+        $this->assertSame('0 B', $filesystem->bytesToHuman(0));
+        $this->assertSame('1 B', $filesystem->bytesToHuman(1));
+        $this->assertSame('1 KB', $filesystem->bytesToHuman(1024));
+        $this->assertSame('2 KB', $filesystem->bytesToHuman(2048));
+        $this->assertSame('1.23 KB', $filesystem->bytesToHuman(1264));
+        $this->assertSame('1.234 KB', $filesystem->bytesToHuman(1264, 3));
+        $this->assertSame('5 GB', $filesystem->bytesToHuman(1024 * 1024 * 1024 * 5));
+        $this->assertSame('10 TB', $filesystem->bytesToHuman((1024 ** 4) * 10));
+    }
+
     /**
      * @param  string  $file
      * @return int

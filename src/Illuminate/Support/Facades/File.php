@@ -49,6 +49,7 @@ namespace Illuminate\Support\Facades;
  * @method static bool deleteDirectory(string $directory, bool $preserve = false)
  * @method static bool deleteDirectories(string $directory)
  * @method static bool cleanDirectory(string $directory)
+ * @method static string bytesToHuman(int $bytes, int $precision = 2)
  * @method static \Illuminate\Filesystem\Filesystem|mixed when(\Closure|mixed|null $value = null, callable|null $callback = null, callable|null $default = null)
  * @method static \Illuminate\Filesystem\Filesystem|mixed unless(\Closure|mixed|null $value = null, callable|null $callback = null, callable|null $default = null)
  * @method static void macro(string $name, object|callable $macro)

@@ -789,4 +789,20 @@ class Filesystem
     {
         return $this->deleteDirectory($directory, true);
     }
+
+    /**
+     * Format the number of bytes to a human-readable string.
+     *
+     * @param  int  $bytes
+     * @param  int  $precision
+     * @return string
+     */
+    public function bytesToHuman($bytes, $precision = 2)
+    {
+        for ($i = 0; ($bytes / 1024) > 0.9; $i++) {
+            $bytes /= 1024;
+        }
+
+        return round($bytes, $precision).' '.['B', 'KB', 'MB', 'GB', 'TB'][$i];
+    }
 }
