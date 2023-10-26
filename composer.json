@@ -108,7 +108,7 @@
         "orchestra/testbench-core": "^9.0",
         "pda/pheanstalk": "^4.0",
         "phpstan/phpstan": "^1.4.7",
-        "phpunit/phpunit": "^11.0",
+        "phpunit/phpunit": "^10.1",
         "predis/predis": "^2.0.2",
         "symfony/cache": "^7.0",
         "symfony/http-client": "^7.0",
