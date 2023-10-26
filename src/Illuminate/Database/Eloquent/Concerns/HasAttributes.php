@@ -1796,7 +1796,7 @@ trait HasAttributes
      * Determine if a model's attribute equals a given value.
      *
      * @param  string  $attribute
-     * @param  mixed   $value
+     * @param  mixed  $value
      * @return bool
      */
     public function hasAttribute($attribute, $value)
