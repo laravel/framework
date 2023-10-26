@@ -20,7 +20,7 @@ class SQLiteProcessor extends Processor
     }
 
     /**
-     * Process the results of columns listing query.
+     * Process the results of a columns query.
      *
      * @param  array  $results
      * @return array

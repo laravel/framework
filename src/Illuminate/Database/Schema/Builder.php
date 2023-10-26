@@ -276,9 +276,9 @@ class Builder
     {
         $table = $this->connection->getTablePrefix().$table;
 
-        $results = $this->connection->selectFromWriteConnection($this->grammar->compileColumns($table));
-
-        return $this->connection->getPostProcessor()->processColumns($results);
+        return $this->connection->getPostProcessor()->processColumns(
+            $this->connection->selectFromWriteConnection($this->grammar->compileColumns($table))
+        );
     }
 
     /**

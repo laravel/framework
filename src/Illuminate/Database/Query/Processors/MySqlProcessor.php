@@ -20,7 +20,7 @@ class MySqlProcessor extends Processor
     }
 
     /**
-     * Process the results of columns query.
+     * Process the results of a columns query.
      *
      * @param  array  $results
      * @return array
