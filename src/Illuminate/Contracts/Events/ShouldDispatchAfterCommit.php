@@ -2,6 +2,7 @@
 
 namespace Illuminate\Contracts\Events;
 
-interface TransactionAware
+interface ShouldDispatchAfterCommit
 {
+    //
 }

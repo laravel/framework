@@ -9,7 +9,7 @@ use Illuminate\Contracts\Broadcasting\Factory as BroadcastFactory;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Contracts\Container\Container as ContainerContract;
 use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
-use Illuminate\Contracts\Events\TransactionAware;
+use Illuminate\Contracts\Events\ShouldDispatchAfterCommit;
 use Illuminate\Contracts\Queue\ShouldBeEncrypted;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Arr;
@@ -252,7 +252,7 @@ class Dispatcher implements DispatcherContract
         // transaction is successful, we'll register a callback which will handle
         // dispatching this event on the next successful DB transaction commit.
         if ($isEventObject &&
-            $payload[0] instanceof TransactionAware &&
+            $payload[0] instanceof ShouldDispatchAfterCommit &&
             ! is_null($transactions = $this->resolveTransactionManager())) {
             $transactions->addCallback(
                 fn () => $this->invokeListeners($event, $payload, $halt)

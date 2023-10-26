@@ -5,7 +5,7 @@ namespace Illuminate\Support\Testing\Fakes;
 use Closure;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
-use Illuminate\Contracts\Events\TransactionAware;
+use Illuminate\Contracts\Events\ShouldDispatchAfterCommit;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ForwardsCalls;
@@ -341,7 +341,7 @@ class EventFake implements Dispatcher, Fake
      */
     protected function fakeEvent($event, $name, $args)
     {
-        if ($event instanceof TransactionAware && Container::getInstance()->bound('db.transactions')) {
+        if ($event instanceof ShouldDispatchAfterCommit && Container::getInstance()->bound('db.transactions')) {
             return Container::getInstance()->make('db.transactions')
                 ->addCallback(fn () => $this->events[$name][] = $args);
         }

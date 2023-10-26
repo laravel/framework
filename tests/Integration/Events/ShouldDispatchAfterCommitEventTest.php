@@ -2,56 +2,56 @@
 
 namespace Illuminate\Tests\Integration\Events;
 
-use Illuminate\Contracts\Events\TransactionAware;
+use Illuminate\Contracts\Events\ShouldDispatchAfterCommit;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Mockery as m;
 use Orchestra\Testbench\TestCase;
 
-class TransactionAwareEventTest extends TestCase
+class ShouldDispatchAfterCommitEventTest extends TestCase
 {
     protected function tearDown(): void
     {
         TransactionUnawareTestEvent::$ran = false;
-        TransactionAwareTestEvent::$ran = false;
+        ShouldDispatchAfterCommitTestEvent::$ran = false;
 
         m::close();
     }
 
     public function testEventIsDispatchedIfThereIsNoTransaction()
     {
-        Event::listen(TransactionAwareTestEvent::class, TransactionAwareListener::class);
+        Event::listen(ShouldDispatchAfterCommitTestEvent::class, ShouldDispatchAfterCommitListener::class);
 
-        Event::dispatch(new TransactionAwareTestEvent);
+        Event::dispatch(new ShouldDispatchAfterCommitTestEvent);
 
-        $this->assertTrue(TransactionAwareTestEvent::$ran);
+        $this->assertTrue(ShouldDispatchAfterCommitTestEvent::$ran);
     }
 
     public function testEventIsNotDispatchedIfTransactionFails()
     {
-        Event::listen(TransactionAwareTestEvent::class, TransactionAwareListener::class);
+        Event::listen(ShouldDispatchAfterCommitTestEvent::class, ShouldDispatchAfterCommitListener::class);
 
         try {
             DB::transaction(function () {
-                Event::dispatch(new TransactionAwareTestEvent);
+                Event::dispatch(new ShouldDispatchAfterCommitTestEvent);
 
                 throw new \Exception;
             });
         } catch (\Exception) {
         }
 
-        $this->assertFalse(TransactionAwareTestEvent::$ran);
+        $this->assertFalse(ShouldDispatchAfterCommitTestEvent::$ran);
     }
 
     public function testEventIsDispatchedIfTransactionSucceeds()
     {
-        Event::listen(TransactionAwareTestEvent::class, TransactionAwareListener::class);
+        Event::listen(ShouldDispatchAfterCommitTestEvent::class, ShouldDispatchAfterCommitListener::class);
 
         DB::transaction(function () {
-            Event::dispatch(new TransactionAwareTestEvent);
+            Event::dispatch(new ShouldDispatchAfterCommitTestEvent);
         });
 
-        $this->assertTrue(TransactionAwareTestEvent::$ran);
+        $this->assertTrue(ShouldDispatchAfterCommitTestEvent::$ran);
     }
 
     public function testItHandlesNestedTransactions()
@@ -60,25 +60,25 @@ class TransactionAwareEventTest extends TestCase
         // The parent transaction will succeed, but the nested transaction is going to fail and be rolled back.
         // We want to ensure the event dispatched on the child transaction does not get published, since it failed,
         // however, the event dispatched on the parent transaction should still be dispatched as usual.
-        Event::listen(TransactionAwareTestEvent::class, TransactionAwareListener::class);
-        Event::listen(AnotherTransactionAwareTestEvent::class, AnotherTransactionAwareListener::class);
+        Event::listen(ShouldDispatchAfterCommitTestEvent::class, ShouldDispatchAfterCommitListener::class);
+        Event::listen(AnotherShouldDispatchAfterCommitTestEvent::class, AnotherShouldDispatchAfterCommitListener::class);
 
         DB::transaction(function () {
             try {
                 DB::transaction(function () {
                     // This event should not be dispatched since the transaction is going to fail.
-                    Event::dispatch(new TransactionAwareTestEvent);
+                    Event::dispatch(new ShouldDispatchAfterCommitTestEvent);
                     throw new \Exception;
                 });
             } catch (\Exception) {
             }
 
             // This event should be dispatched, as the parent transaction does not fail.
-            Event::dispatch(new AnotherTransactionAwareTestEvent);
+            Event::dispatch(new AnotherShouldDispatchAfterCommitTestEvent);
         });
 
-        $this->assertFalse(TransactionAwareTestEvent::$ran);
-        $this->assertTrue(AnotherTransactionAwareTestEvent::$ran);
+        $this->assertFalse(ShouldDispatchAfterCommitTestEvent::$ran);
+        $this->assertTrue(AnotherShouldDispatchAfterCommitTestEvent::$ran);
     }
 }
 
@@ -87,17 +87,17 @@ class TransactionUnawareTestEvent
     public static $ran = false;
 }
 
-class TransactionAwareTestEvent implements TransactionAware
+class ShouldDispatchAfterCommitTestEvent implements ShouldDispatchAfterCommit
 {
     public static $ran = false;
 }
 
-class AnotherTransactionAwareTestEvent implements TransactionAware
+class AnotherShouldDispatchAfterCommitTestEvent implements ShouldDispatchAfterCommit
 {
     public static $ran = false;
 }
 
-class TransactionAwareListener
+class ShouldDispatchAfterCommitListener
 {
     public function handle(object $event)
     {
@@ -105,7 +105,7 @@ class TransactionAwareListener
     }
 }
 
-class AnotherTransactionAwareListener
+class AnotherShouldDispatchAfterCommitListener
 {
     public function handle(object $event)
     {

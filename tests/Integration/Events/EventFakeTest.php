@@ -4,7 +4,7 @@ namespace Illuminate\Tests\Integration\Events;
 
 use Closure;
 use Exception;
-use Illuminate\Contracts\Events\TransactionAware;
+use Illuminate\Contracts\Events\ShouldDispatchAfterCommit;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Arr;
@@ -187,48 +187,48 @@ class EventFakeTest extends TestCase
         $this->assertEquals('bar', Event::fake()->foo());
     }
 
-    public function testTransactionAwareEventsAreNotDispatchedIfTransactionFails()
+    public function testShouldDispatchAfterCommitEventsAreNotDispatchedIfTransactionFails()
     {
         Event::fake();
 
         try {
             DB::transaction(function () {
-                Event::dispatch(new TransactionAwareEvent());
+                Event::dispatch(new ShouldDispatchAfterCommitEvent());
 
                 throw new Exception('foo');
             });
         } catch (Exception $e) {
         }
 
-        Event::assertNotDispatched(TransactionAwareEvent::class);
+        Event::assertNotDispatched(ShouldDispatchAfterCommitEvent::class);
     }
 
-    public function testTransactionAwareEventsAreDispatchedIfTransactionSucceeds()
+    public function testShouldDispatchAfterCommitEventsAreDispatchedIfTransactionSucceeds()
     {
         Event::fake();
 
         DB::transaction(function () {
-            Event::dispatch(new TransactionAwareEvent());
+            Event::dispatch(new ShouldDispatchAfterCommitEvent());
         });
 
-        Event::assertDispatched(TransactionAwareEvent::class);
+        Event::assertDispatched(ShouldDispatchAfterCommitEvent::class);
     }
 
-    public function testTransactionAwareEventsAreDispatchedIfThereIsNoTransaction()
+    public function testShouldDispatchAfterCommitEventsAreDispatchedIfThereIsNoTransaction()
     {
         Event::fake();
 
-        Event::dispatch(new TransactionAwareEvent());
-        Event::assertDispatched(TransactionAwareEvent::class);
+        Event::dispatch(new ShouldDispatchAfterCommitEvent());
+        Event::assertDispatched(ShouldDispatchAfterCommitEvent::class);
     }
 
-    public function testAssertNothingDispatchedTransactionAware()
+    public function testAssertNothingDispatchedShouldDispatchAfterCommit()
     {
         Event::fake();
         Event::assertNothingDispatched();
 
-        Event::dispatch(new TransactionAwareEvent);
-        Event::dispatch(new TransactionAwareEvent);
+        Event::dispatch(new ShouldDispatchAfterCommitEvent);
+        Event::dispatch(new ShouldDispatchAfterCommitEvent);
 
         try {
             Event::assertNothingDispatched();
@@ -304,7 +304,7 @@ class InvokableEventSubscriber
     }
 }
 
-class TransactionAwareEvent implements TransactionAware
+class ShouldDispatchAfterCommitEvent implements ShouldDispatchAfterCommit
 {
     //
 }
