@@ -112,7 +112,7 @@
         "predis/predis": "^2.0.2",
         "symfony/cache": "^7.0",
         "symfony/http-client": "^7.0",
-        "symfony/psr-http-message-bridge": "^2.0"
+        "symfony/psr-http-message-bridge": "^v7.0.0-BETA1"
     },
     "provide": {
         "psr/container-implementation": "1.1|2.0",
