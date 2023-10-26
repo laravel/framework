@@ -19,6 +19,7 @@ use Illuminate\Events\Dispatcher;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Carbon;
 use Mockery as m;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class CacheRepositoryTest extends TestCase
@@ -280,10 +281,9 @@ class CacheRepositoryTest extends TestCase
     }
 
     /**
-     * @dataProvider dataProviderTestGetSeconds
-     *
      * @param  mixed  $duration
      */
+    #[DataProvider('dataProviderTestGetSeconds')]
     public function testGetSeconds($duration)
     {
         $repo = $this->getRepository();

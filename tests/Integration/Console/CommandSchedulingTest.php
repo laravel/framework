@@ -6,6 +6,7 @@ use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Str;
 use Orchestra\Testbench\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class CommandSchedulingTest extends TestCase
 {
@@ -62,9 +63,7 @@ class CommandSchedulingTest extends TestCase
         parent::tearDown();
     }
 
-    /**
-     * @dataProvider executionProvider
-     */
+    #[DataProvider('executionProvider')]
     public function testExecutionOrder($background, $expected)
     {
         $schedule = $this->app->make(Schedule::class);

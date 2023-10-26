@@ -8,6 +8,7 @@ use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Route;
 use Orchestra\Testbench\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Process\PhpProcess;
 use Throwable;
 
@@ -123,9 +124,7 @@ class ExceptionHandlerTest extends TestCase
             ]);
     }
 
-    /**
-     * @dataProvider exitCodesProvider
-     */
+    #[DataProvider('exitCodesProvider')]
     public function testItReturnsNonZeroExitCodesForUncaughtExceptions($providers, $successful)
     {
         $basePath = static::applicationBasePath();

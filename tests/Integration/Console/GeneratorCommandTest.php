@@ -3,12 +3,11 @@
 namespace Illuminate\Tests\Integration\Console;
 
 use Orchestra\Testbench\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class GeneratorCommandTest extends TestCase
 {
-    /**
-     * @dataProvider reservedNamesDataProvider
-     */
+    #[DataProvider('reservedNamesDataProvider')]
     public function testItCannotGenerateClassUsingReservedName($given)
     {
         $this->artisan('make:command', ['name' => $given])

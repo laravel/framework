@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Str;
 use Orchestra\Testbench\Foundation\Application as Testbench;
 use Orchestra\Testbench\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class CommandEventsTest extends TestCase
 {
@@ -48,9 +49,7 @@ class CommandEventsTest extends TestCase
         parent::setUp();
     }
 
-    /**
-     * @dataProvider foregroundCommandEventsProvider
-     */
+    #[DataProvider('foregroundCommandEventsProvider')]
     public function testCommandEventsReceiveParsedInput($callback)
     {
         $this->app[ConsoleKernel::class]->registerCommand(new CommandEventsTestCommand);

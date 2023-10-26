@@ -6,11 +6,10 @@ use Illuminate\Cache\MemcachedStore;
 use Illuminate\Support\Carbon;
 use Memcached;
 use Mockery as m;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @requires extension memcached
- */
+#[RequiresPhpExtension('memcached')]
 class CacheMemcachedStoreTest extends TestCase
 {
     protected function tearDown(): void

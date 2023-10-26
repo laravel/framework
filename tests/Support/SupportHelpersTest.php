@@ -15,6 +15,7 @@ use Illuminate\Tests\Support\Fixtures\StringBackedEnum;
 use IteratorAggregate;
 use LogicException;
 use Mockery as m;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use RuntimeException;
@@ -1045,9 +1046,7 @@ class SupportHelpersTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider providesPregReplaceArrayData
-     */
+    #[DataProvider('providesPregReplaceArrayData')]
     public function testPregReplaceArray($pattern, $replacements, $subject, $expectedOutput)
     {
         $this->assertSame(

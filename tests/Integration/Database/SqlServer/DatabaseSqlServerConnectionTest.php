@@ -5,11 +5,12 @@ namespace Illuminate\Tests\Integration\Database\SqlServer;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 
-/**
- * @requires extension pdo_sqlsrv
- * @requires OS Linux|Darwin
- */
+#[RequiresOperatingSystem('Linux|Darwin')]
+#[RequiresPhpExtension('pdo_sqlsrv')]
 class DatabaseSqlServerConnectionTest extends SqlServerTestCase
 {
     protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
@@ -26,9 +27,7 @@ class DatabaseSqlServerConnectionTest extends SqlServerTestCase
         Schema::drop('json_table');
     }
 
-    /**
-     * @dataProvider jsonContainsKeyDataProvider
-     */
+    #[DataProvider('jsonContainsKeyDataProvider')]
     public function testWhereJsonContainsKey($count, $column)
     {
         DB::table('json_table')->insert([

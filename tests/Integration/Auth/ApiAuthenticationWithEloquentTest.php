@@ -7,10 +7,9 @@ use Illuminate\Foundation\Auth\User as FoundationUser;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 use Orchestra\Testbench\TestCase;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 
-/**
- * @requires extension pdo_mysql
- */
+#[RequiresPhpExtension('pdo_mysql')]
 class ApiAuthenticationWithEloquentTest extends TestCase
 {
     protected function getEnvironmentSetUp($app)

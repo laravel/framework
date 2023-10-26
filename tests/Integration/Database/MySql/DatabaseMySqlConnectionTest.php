@@ -5,11 +5,12 @@ namespace Illuminate\Tests\Integration\Database\MySql;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 
-/**
- * @requires extension pdo_mysql
- * @requires OS Linux|Darwin
- */
+#[RequiresOperatingSystem('Linux|Darwin')]
+#[RequiresPhpExtension('pdo_mysql')]
 class DatabaseMySqlConnectionTest extends MySqlTestCase
 {
     const TABLE = 'player';
@@ -32,9 +33,7 @@ class DatabaseMySqlConnectionTest extends MySqlTestCase
         Schema::drop(self::TABLE);
     }
 
-    /**
-     * @dataProvider floatComparisonsDataProvider
-     */
+    #[DataProvider('floatComparisonsDataProvider')]
     public function testJsonFloatComparison($value, $operator, $shouldMatch)
     {
         DB::table(self::TABLE)->insert([self::JSON_COL => '{"rank":'.self::FLOAT_VAL.'}']);
@@ -68,9 +67,7 @@ class DatabaseMySqlConnectionTest extends MySqlTestCase
         $this->assertEquals(self::FLOAT_VAL, DB::table(self::TABLE)->value(self::FLOAT_COL));
     }
 
-    /**
-     * @dataProvider jsonWhereNullDataProvider
-     */
+    #[DataProvider('jsonWhereNullDataProvider')]
     public function testJsonWhereNull($expected, $key, array $value = ['value' => 123])
     {
         DB::table(self::TABLE)->insert([self::JSON_COL => json_encode($value)]);
@@ -78,9 +75,7 @@ class DatabaseMySqlConnectionTest extends MySqlTestCase
         $this->assertSame($expected, DB::table(self::TABLE)->whereNull(self::JSON_COL.'->'.$key)->exists());
     }
 
-    /**
-     * @dataProvider jsonWhereNullDataProvider
-     */
+    #[DataProvider('jsonWhereNullDataProvider')]
     public function testJsonWhereNotNull($expected, $key, array $value = ['value' => 123])
     {
         DB::table(self::TABLE)->insert([self::JSON_COL => json_encode($value)]);
@@ -122,9 +117,7 @@ class DatabaseMySqlConnectionTest extends MySqlTestCase
         $this->assertSame(1, $updatedCount);
     }
 
-    /**
-     * @dataProvider jsonContainsKeyDataProvider
-     */
+    #[DataProvider('jsonContainsKeyDataProvider')]
     public function testWhereJsonContainsKey($count, $column)
     {
         DB::table(self::TABLE)->insert([

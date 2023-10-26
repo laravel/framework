@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\View\Blade;
 
 use Illuminate\Contracts\View\ViewCompilationException;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class BladeForeachStatementsTest extends AbstractBladeTestCase
 {
@@ -94,9 +95,7 @@ tag info
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
 
-    /**
-     * @dataProvider invalidForeachStatementsDataProvider
-     */
+    #[DataProvider('invalidForeachStatementsDataProvider')]
     public function testForeachStatementsThrowHumanizedMessageWhenInvalidStatement($initialStatement)
     {
         $this->expectException(ViewCompilationException::class);

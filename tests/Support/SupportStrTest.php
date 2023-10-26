@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Support;
 
 use Exception;
 use Illuminate\Support\Str;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\UuidInterface;
 use ReflectionClass;
@@ -287,17 +288,13 @@ class SupportStrTest extends TestCase
         $this->assertSame('foo', Str::afterLast('----foo', '---'));
     }
 
-    /**
-     * @dataProvider strContainsProvider
-     */
+    #[DataProvider('strContainsProvider')]
     public function testStrContains($haystack, $needles, $expected, $ignoreCase = false)
     {
         $this->assertEquals($expected, Str::contains($haystack, $needles, $ignoreCase));
     }
 
-    /**
-     * @dataProvider strContainsAllProvider
-     */
+    #[DataProvider('strContainsAllProvider')]
     public function testStrContainsAll($haystack, $needles, $expected, $ignoreCase = false)
     {
         $this->assertEquals($expected, Str::containsAll($haystack, $needles, $ignoreCase));
@@ -435,17 +432,13 @@ class SupportStrTest extends TestCase
         $this->assertFalse(Str::isUrl('invalid url'));
     }
 
-    /**
-     * @dataProvider validUuidList
-     */
+    #[DataProvider('validUuidList')]
     public function testIsUuidWithValidUuid($uuid)
     {
         $this->assertTrue(Str::isUuid($uuid));
     }
 
-    /**
-     * @dataProvider invalidUuidList
-     */
+    #[DataProvider('invalidUuidList')]
     public function testIsUuidWithInvalidUuid($uuid)
     {
         $this->assertFalse(Str::isUuid($uuid));
@@ -1081,9 +1074,7 @@ class SupportStrTest extends TestCase
         $this->assertSame('', Str::repeat('', 5));
     }
 
-    /**
-     * @dataProvider specialCharacterProvider
-     */
+    #[DataProvider('specialCharacterProvider')]
     public function testTransliterate(string $value, string $expected): void
     {
         $this->assertSame($expected, Str::transliterate($value));
@@ -1109,9 +1100,7 @@ class SupportStrTest extends TestCase
         $this->assertSame('Hello', Str::transliterate('🎂', 'Hello'));
     }
 
-    /**
-     * @dataProvider specialCharacterProvider
-     */
+    #[DataProvider('specialCharacterProvider')]
     public function testTransliterateStrict(string $value, string $expected): void
     {
         $this->assertSame($expected, Str::transliterate($value, '?', true));
