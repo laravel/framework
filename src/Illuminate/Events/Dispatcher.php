@@ -560,7 +560,7 @@ class Dispatcher implements DispatcherContract
      */
     protected function handlerShouldBeDispatchedAfterDatabaseTransactions($listener)
     {
-        return ($listener->afterCommit ?? null) && $this->container->bound('db.transactions');
+        return ($listener->afterCommit ?? null) && $this->resolveTransactionManager();
     }
 
     /**
@@ -575,7 +575,7 @@ class Dispatcher implements DispatcherContract
         return function () use ($method, $listener) {
             $payload = func_get_args();
 
-            $this->container->make('db.transactions')->addCallback(
+            $this->resolveTransactionManager()->addCallback(
                 function () use ($listener, $method, $payload) {
                     $listener->$method(...$payload);
                 }
