@@ -205,9 +205,7 @@ abstract class Factory
             return $this->state($attributes)->getExpandedAttributes($parent);
         }
 
-        return array_map(function () use ($attributes, $parent) {
-            return $this->state($attributes)->getExpandedAttributes($parent);
-        }, range(1, $this->count));
+        return array_map(fn () => $this->state($attributes)->getExpandedAttributes($parent), range(1, $this->count));
     }
 
     /**
@@ -396,9 +394,7 @@ abstract class Factory
             return $this->newModel()->newCollection();
         }
 
-        $instances = $this->newModel()->newCollection(array_map(function () use ($parent) {
-            return $this->makeInstance($parent);
-        }, range(1, $this->count)));
+        $instances = $this->newModel()->newCollection(array_map(fn () => $this->makeInstance($parent), range(1, $this->count)));
 
         $this->callAfterMaking($instances);
 

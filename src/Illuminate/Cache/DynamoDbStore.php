@@ -133,9 +133,7 @@ class DynamoDbStore implements LockProvider, Store
             return [];
         }
 
-        $prefixedKeys = array_map(function ($key) {
-            return $this->prefix.$key;
-        }, $keys);
+        $prefixedKeys = array_map(fn ($key) => $this->prefix.$key, $keys);
 
         $response = $this->dynamo->batchGetItem([
             'RequestItems' => [

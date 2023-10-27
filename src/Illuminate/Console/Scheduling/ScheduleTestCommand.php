@@ -50,9 +50,7 @@ class ScheduleTestCommand extends Command
         if (! empty($name = $this->option('name'))) {
             $commandBinary = $phpBinary.' '.Application::artisanBinary();
 
-            $matches = array_filter($commandNames, function ($commandName) use ($commandBinary, $name) {
-                return trim(str_replace($commandBinary, '', $commandName)) === $name;
-            });
+            $matches = array_filter($commandNames, fn ($commandName) => trim(str_replace($commandBinary, '', $commandName)) === $name);
 
             if (count($matches) !== 1) {
                 $this->components->info('No matching scheduled command found.');
@@ -107,11 +105,11 @@ class ScheduleTestCommand extends Command
             preg_match('/\[(\d+)\]/', $selectedCommand, $choice);
 
             return (int) $choice[1];
-        } else {
-            return array_search(
-                select('Which command would you like to run?', $commandNames),
-                $commandNames
-            );
         }
+
+        return array_search(
+            select('Which command would you like to run?', $commandNames),
+            $commandNames
+        );
     }
 }

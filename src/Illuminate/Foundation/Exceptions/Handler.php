@@ -431,9 +431,7 @@ class Handler implements ExceptionHandlerContract
     protected function context()
     {
         try {
-            return array_filter([
-                'userId' => Auth::id(),
-            ]);
+            return array_filter(['userId' => Auth::id()]);
         } catch (Throwable) {
             return [];
         }

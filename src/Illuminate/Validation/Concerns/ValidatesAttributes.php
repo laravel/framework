@@ -2072,9 +2072,7 @@ trait ValidatesAttributes
      */
     protected function convertValuesToNull($values)
     {
-        return array_map(function ($value) {
-            return Str::lower($value) === 'null' ? null : $value;
-        }, $values);
+        return array_map(fn ($value) => Str::lower($value) === 'null' ? null : $value, $values);
     }
 
     /**

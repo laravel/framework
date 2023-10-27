@@ -170,9 +170,7 @@ class RouteListCommand extends Command
      */
     protected function pluckColumns(array $routes)
     {
-        return array_map(function ($route) {
-            return Arr::only($route, $this->getColumns());
-        }, $routes);
+        return array_map(fn ($route) => Arr::only($route, $this->getColumns()), $routes);
     }
 
     /**

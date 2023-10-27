@@ -83,9 +83,7 @@ class RedisStore extends TaggableStore implements LockProvider
 
         $results = [];
 
-        $values = $this->connection()->mget(array_map(function ($key) {
-            return $this->prefix.$key;
-        }, $keys));
+        $values = $this->connection()->mget(array_map(fn ($key) => $this->prefix.$key, $keys));
 
         foreach ($values as $index => $value) {
             $results[$keys[$index]] = ! is_null($value) ? $this->unserialize($value) : null;

@@ -105,8 +105,6 @@ class HandleCors
             return $paths[$host];
         }
 
-        return array_filter($paths, function ($path) {
-            return is_string($path);
-        });
+        return array_filter($paths, fn ($path) => is_string($path));
     }
 }

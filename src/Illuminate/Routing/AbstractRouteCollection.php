@@ -62,9 +62,7 @@ abstract class AbstractRouteCollection implements Countable, IteratorAggregate, 
         // proper error response with the correct headers on the response string.
         return array_values(array_filter(
             $methods,
-            function ($method) use ($request) {
-                return ! is_null($this->matchAgainstRoutes($this->get($method), $request, false));
-            }
+            fn ($method) => ! is_null($this->matchAgainstRoutes($this->get($method), $request, false))
         ));
     }
 

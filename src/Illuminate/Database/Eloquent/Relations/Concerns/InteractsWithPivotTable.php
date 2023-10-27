@@ -632,9 +632,7 @@ trait InteractsWithPivotTable
      */
     protected function castKeys(array $keys)
     {
-        return array_map(function ($v) {
-            return $this->castKey($v);
-        }, $keys);
+        return array_map(fn ($key) => $this->castKey($key), $keys);
     }
 
     /**

@@ -173,8 +173,6 @@ class CallQueuedListener implements ShouldQueue
      */
     public function __clone()
     {
-        $this->data = array_map(function ($data) {
-            return is_object($data) ? clone $data : $data;
-        }, $this->data);
+        $this->data = array_map(fn ($data) => is_object($data) ? clone $data : $data, $this->data);
     }
 }

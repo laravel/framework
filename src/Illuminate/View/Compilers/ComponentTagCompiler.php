@@ -425,9 +425,7 @@ class ComponentTagCompiler
      */
     public function formatClassName(string $component)
     {
-        $componentPieces = array_map(function ($componentPiece) {
-            return ucfirst(Str::camel($componentPiece));
-        }, explode('.', $component));
+        $componentPieces = array_map(fn ($componentPiece) => ucfirst(Str::camel($componentPiece)), explode('.', $component));
 
         return implode('\\', $componentPieces);
     }

@@ -202,9 +202,7 @@ class PendingCommand
 
         $table->render();
 
-        $lines = array_filter(
-            explode(PHP_EOL, $output->fetch())
-        );
+        $lines = array_filter(explode(PHP_EOL, $output->fetch()));
 
         foreach ($lines as $line) {
             $this->expectsOutput($line);

@@ -696,9 +696,7 @@ class Validator implements ValidatorContract
      */
     protected function replaceDotInParameters(array $parameters)
     {
-        return array_map(function ($field) {
-            return str_replace('\.', $this->dotPlaceholder, $field);
-        }, $parameters);
+        return array_map(fn ($field) => str_replace('\.', $this->dotPlaceholder, $field), $parameters);
     }
 
     /**
@@ -710,9 +708,7 @@ class Validator implements ValidatorContract
      */
     protected function replaceAsterisksInParameters(array $parameters, array $keys)
     {
-        return array_map(function ($field) use ($keys) {
-            return vsprintf(str_replace('*', '%s', $field), $keys);
-        }, $parameters);
+        return array_map(fn ($field) => vsprintf(str_replace('*', '%s', $field), $keys), $parameters);
     }
 
     /**

@@ -162,8 +162,6 @@ LUA;
      */
     protected function formatChannels(array $channels)
     {
-        return array_map(function ($channel) {
-            return $this->prefix.$channel;
-        }, parent::formatChannels($channels));
+        return array_map(fn ($channel) => $this->prefix.$channel, parent::formatChannels($channels));
     }
 }
