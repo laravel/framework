@@ -40,11 +40,27 @@ interface ProcessResult
     public function output();
 
     /**
+     * Determine if the output contains the given string.
+     *
+     * @param  string  $output
+     * @return bool
+     */
+    public function seeInOutput(string $output);
+
+    /**
      * Get the error output of the process.
      *
      * @return string
      */
     public function errorOutput();
+
+    /**
+     * Determine if the error output contains the given string.
+     *
+     * @param  string  $output
+     * @return bool
+     */
+    public function seeInErrorOutput(string $output);
 
     /**
      * Throw an exception if the process failed.
