@@ -6,5 +6,21 @@ use RuntimeException;
 
 class MaxAttemptsExceededException extends RuntimeException
 {
-    //
+    /**
+     * @var \Illuminate\Contracts\Queue\Job
+     */
+    public $job;
+
+    /**
+     * Create a new instance for the job.
+     *
+     * @param  \Illuminate\Contracts\Queue\Job  $job
+     * @return static
+     */
+    public static function forJob($job)
+    {
+        return tap(new static($job->resolveName().' has been attempted too many times.'), function ($e) use ($job) {
+            $e->job = $job;
+        });
+    }
 }
