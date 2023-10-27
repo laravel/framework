@@ -353,12 +353,12 @@ class BladeCompiler extends Compiler implements CompilerInterface
             return $view->with($data)->render();
         } elseif ($view instanceof Htmlable) {
             return $view->toHtml();
-        } else {
-            return Container::getInstance()
-                ->make(ViewFactory::class)
-                ->make($view, $data)
-                ->render();
         }
+
+        return Container::getInstance()
+            ->make(ViewFactory::class)
+            ->make($view, $data)
+            ->render();
     }
 
     /**

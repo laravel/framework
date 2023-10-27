@@ -375,11 +375,11 @@ class Builder implements BuilderContract
             return [$query->toSql(), $query->getBindings()];
         } elseif (is_string($query)) {
             return [$query, []];
-        } else {
-            throw new InvalidArgumentException(
-                'A subquery must be a query builder instance, a Closure, or a string.'
-            );
         }
+
+        throw new InvalidArgumentException(
+            'A subquery must be a query builder instance, a Closure, or a string.'
+        );
     }
 
     /**

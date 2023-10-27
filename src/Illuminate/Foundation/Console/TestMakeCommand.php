@@ -85,9 +85,9 @@ class TestMakeCommand extends GeneratorCommand
     {
         if ($this->option('unit')) {
             return $rootNamespace.'\Unit';
-        } else {
-            return $rootNamespace.'\Feature';
         }
+
+        return $rootNamespace.'\Feature';
     }
 
     /**
