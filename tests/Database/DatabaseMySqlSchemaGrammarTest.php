@@ -1269,7 +1269,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $statement = $this->getGrammar()->compileCreateDatabase('my_database_a', $connection);
 
         $this->assertSame(
-            'create database `my_database_a` default character set `utf8mb4_foo` default collate `utf8mb4_unicode_ci_foo`',
+            'create database if not exists `my_database_a` default character set `utf8mb4_foo` default collate `utf8mb4_unicode_ci_foo`',
             $statement
         );
 
@@ -1280,7 +1280,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $statement = $this->getGrammar()->compileCreateDatabase('my_database_b', $connection);
 
         $this->assertSame(
-            'create database `my_database_b` default character set `utf8mb4_bar` default collate `utf8mb4_unicode_ci_bar`',
+            'create database if not exists `my_database_b` default character set `utf8mb4_bar` default collate `utf8mb4_unicode_ci_bar`',
             $statement
         );
     }
