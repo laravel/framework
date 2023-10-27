@@ -606,6 +606,26 @@ class AuthGuardTest extends TestCase
         $this->assertNull($guard->getUser());
     }
 
+    public function testUserIsReturnedWhenUsingUserOrFail()
+    {
+        $user = m::mock(Authenticatable::class);
+        $guard = $this->getGuard();
+        $guard->setUser($user);
+
+        $this->assertSame($user, $guard->userOrFail());
+    }
+
+    public function testExceptionIsThrownIfUsingUserOrFailAndThereIsNoAuthenticatedUser()
+    {
+        $this->expectException(AuthenticationException::class);
+        $this->expectExceptionMessage('There is no authenticated user.');
+
+        $guard = $this->getGuard();
+        $guard->getSession()->shouldReceive('get')->once()->andReturn(null);
+
+        $guard->userOrFail();
+    }
+
     protected function getGuard()
     {
         [$session, $provider, $request, $cookie, $timebox] = $this->getMocks();

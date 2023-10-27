@@ -71,6 +71,18 @@ trait GuardHelpers
     }
 
     /**
+     * Get the currently authenticated user or throw an exception if not authenticated.
+     *
+     * @return \Illuminate\Contracts\Auth\Authenticatable
+     * @throws AuthenticationException
+     */
+    public function userOrFail()
+    {
+        return $this->user()
+            ?? throw new AuthenticationException('There is no authenticated user.');
+    }
+
+    /**
      * Get the ID for the currently authenticated user.
      *
      * @return int|string|null
