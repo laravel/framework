@@ -118,7 +118,7 @@ class FileSessionHandler implements SessionHandlerInterface
                     ->ignoreDotFiles(true)
                     ->date('<= now - '.$lifetime.' seconds');
 
-        if ( ini_get('max_execution_time') <= 30 && $files->count() > 1000 ) {
+        if (ini_get('max_execution_time') <= 30 && $files->count() > 1000) {
             throw new RuntimeException('Session driver [file] has accumulated too many files which is preventing garbage collection.');
         }
 
