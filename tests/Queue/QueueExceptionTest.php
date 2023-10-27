@@ -22,7 +22,7 @@ class QueueExceptionTest extends TestCase
     {
         $e = MaxAttemptsExceededException::forJob($job = new MyFakeRedisJob());
 
-        $this->assertSame('App\\Jobs\\UnderlyingJob has been attempted too many times.', $e->getmessage());
+        $this->assertSame('App\\Jobs\\UnderlyingJob has been attempted too many times.', $e->getMessage());
         $this->assertSame($job, $e->job);
     }
 }
