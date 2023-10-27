@@ -10,8 +10,10 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Contracts\Container\Container as ContainerContract;
 use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
 use Illuminate\Contracts\Events\ShouldDispatchAfterCommit;
+use Illuminate\Contracts\Events\ShouldHandleEventsAfterCommit;
 use Illuminate\Contracts\Queue\ShouldBeEncrypted;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Contracts\Queue\ShouldQueueAfterCommit;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
@@ -560,7 +562,9 @@ class Dispatcher implements DispatcherContract
      */
     protected function handlerShouldBeDispatchedAfterDatabaseTransactions($listener)
     {
-        return ($listener->afterCommit ?? null) && $this->resolveTransactionManager();
+        return (($listener->afterCommit ?? null) ||
+                $listener instanceof ShouldHandleEventsAfterCommit) &&
+                $this->resolveTransactionManager();
     }
 
     /**
@@ -659,7 +663,12 @@ class Dispatcher implements DispatcherContract
         return tap($job, function ($job) use ($listener) {
             $data = array_values($job->data);
 
-            $job->afterCommit = property_exists($listener, 'afterCommit') ? $listener->afterCommit : null;
+            if ($listener instanceof ShouldQueueAfterCommit) {
+                $job->afterCommit = true;
+            } else {
+                $job->afterCommit = property_exists($listener, 'afterCommit') ? $listener->afterCommit : null;
+            }
+
             $job->backoff = method_exists($listener, 'backoff') ? $listener->backoff(...$data) : ($listener->backoff ?? null);
             $job->maxExceptions = $listener->maxExceptions ?? null;
             $job->retryUntil = method_exists($listener, 'retryUntil') ? $listener->retryUntil(...$data) : null;
