@@ -14,7 +14,7 @@ class QueueExceptionTest extends TestCase
     {
         $e = TimeoutExceededException::forJob($job = new MyFakeRedisJob());
 
-        $this->assertSame('App\\Jobs\\UnderlyingJob has timed out.', $e->getmessage());
+        $this->assertSame('App\\Jobs\\UnderlyingJob has timed out.', $e->getMessage());
         $this->assertSame($job, $e->job);
     }
 
