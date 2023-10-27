@@ -4,6 +4,7 @@ namespace Illuminate\Session;
 
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Carbon;
+use RuntimeException;
 use SessionHandlerInterface;
 use Symfony\Component\Finder\Finder;
 
@@ -116,6 +117,10 @@ class FileSessionHandler implements SessionHandlerInterface
                     ->files()
                     ->ignoreDotFiles(true)
                     ->date('<= now - '.$lifetime.' seconds');
+
+        if ( ini_get('max_execution_time') <= 30 && $files->count() > 5000 ) {
+            throw new RuntimeException('Session driver [file] has accumulated too many files which is preventing garbage collection.');
+        }
 
         $deletedSessions = 0;
 
