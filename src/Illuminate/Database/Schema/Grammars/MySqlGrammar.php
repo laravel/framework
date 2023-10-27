@@ -44,7 +44,7 @@ class MySqlGrammar extends Grammar
     public function compileCreateDatabase($name, $connection)
     {
         return sprintf(
-            'create database %s default character set %s default collate %s',
+            'create database if not exists %s default character set %s default collate %s',
             $this->wrapValue($name),
             $this->wrapValue($connection->getConfig('charset')),
             $this->wrapValue($connection->getConfig('collation')),
