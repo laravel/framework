@@ -147,4 +147,21 @@ class RouteListCommandTest extends TestCase
 
         $this->assertJsonStringEqualsJsonString($expectedOrder, $output);
     }
+
+    public function testMiddlewareFilterable()
+    {
+        $this->app->call('route:list', ['--middleware' => 'exampleMiddleware']);
+        $outputCli = $this->app->output();
+        $this->assertStringContainsString('exampleMiddleware', $outputCli);
+        $this->assertStringNotContainsString('Middleware 1', $outputCli);
+
+        $this->app->call('route:list', ['--middleware' => 'Middleware 1', '--json' => true]);
+        $outputJson = $this->app->output();
+        $this->assertStringContainsString('Middleware 1', $outputJson);
+        $this->assertStringNotContainsString('exampleMiddleware', $outputJson);
+
+        $this->app->call('route:list', ['--middleware' => 'notExistsMiddleware']);
+        $notExistsOutputCli = $this->app->output();
+        $this->assertStringContainsString('Your application doesn\'t have any routes matching the given criteria.', $notExistsOutputCli);
+    }
 }

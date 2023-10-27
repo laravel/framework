@@ -270,6 +270,14 @@ class RouteListCommand extends Command
             }
         }
 
+        if ($this->option('middleware') &&
+            Str::of($route['middleware'])->explode("\n")->filter(function (string $middleware) {
+                return Str::contains($middleware, $this->option('middleware'));
+            })->isEmpty()
+        ) {
+            return;
+        }
+
         return $route;
     }
 
@@ -494,6 +502,7 @@ class RouteListCommand extends Command
             ['sort', null, InputOption::VALUE_OPTIONAL, 'The column (domain, method, uri, name, action, middleware) to sort by', 'uri'],
             ['except-vendor', null, InputOption::VALUE_NONE, 'Do not display routes defined by vendor packages'],
             ['only-vendor', null, InputOption::VALUE_NONE, 'Only display routes defined by vendor packages'],
+            ['middleware', null, InputOption::VALUE_NONE, 'Filter the routes by middleware'],
         ];
     }
 }
