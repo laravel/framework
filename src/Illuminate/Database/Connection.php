@@ -1101,6 +1101,8 @@ class Connection implements ConnectionInterface
             return (string) $value;
         } elseif (is_bool($value)) {
             return $this->escapeBool($value);
+        } elseif (is_array($value)) {
+            return $this->escapeArray($value);
         } else {
             if (str_contains($value, "\00")) {
                 throw new RuntimeException('Strings with null bytes cannot be escaped. Use the binary escape option.');
@@ -1134,6 +1136,16 @@ class Connection implements ConnectionInterface
     protected function escapeBool($value)
     {
         return $value ? '1' : '0';
+    }
+
+    /**
+     * Escape an array value for safe SQL embedding.
+     *
+     * @param  array  $value
+     */
+    protected function escapeArray(array $value)
+    {
+        throw new RuntimeException('The database connection does not support escaping array values.');
     }
 
     /**
