@@ -105,11 +105,11 @@ class ScheduleTestCommand extends Command
             preg_match('/\[(\d+)\]/', $selectedCommand, $choice);
 
             return (int) $choice[1];
+        } else {
+            return array_search(
+                select('Which command would you like to run?', $commandNames),
+                $commandNames
+            );
         }
-
-        return array_search(
-            select('Which command would you like to run?', $commandNames),
-            $commandNames
-        );
     }
 }

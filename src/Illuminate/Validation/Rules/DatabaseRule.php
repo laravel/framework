@@ -71,8 +71,8 @@ trait DatabaseRule
             }
 
             return implode(
-                '.', 
-                array_map(fn (string $part) => trim($part, '.'), 
+                '.',
+                array_map(fn (string $part) => trim($part, '.'),
                 array_filter([$model->getConnectionName(), $model->getTable()]))
             );
         }

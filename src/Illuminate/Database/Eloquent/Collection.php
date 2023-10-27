@@ -734,9 +734,9 @@ class Collection extends BaseCollection implements QueueableCollection
             return [];
         } elseif (count($relations) === 1) {
             return reset($relations);
+        } else {
+            return array_intersect(...array_values($relations));
         }
-
-        return array_intersect(...array_values($relations));
     }
 
     /**
