@@ -74,6 +74,7 @@ trait GuardHelpers
      * Get the currently authenticated user or throw an exception if not authenticated.
      *
      * @return \Illuminate\Contracts\Auth\Authenticatable
+     *
      * @throws \Illuminate\Auth\AuthenticationException
      */
     public function userOrFail()
