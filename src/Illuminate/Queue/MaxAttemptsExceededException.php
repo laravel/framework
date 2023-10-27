@@ -7,6 +7,8 @@ use RuntimeException;
 class MaxAttemptsExceededException extends RuntimeException
 {
     /**
+     * The job instance.
+     *
      * @var \Illuminate\Contracts\Queue\Job|null
      */
     public $job;
