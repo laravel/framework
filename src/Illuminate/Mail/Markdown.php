@@ -140,7 +140,7 @@ class Markdown
     /**
      * Get the component paths with the specified suffix.
      *
-     * @param string $suffix
+     * @param  string  $suffix
      * @return array
      */
     protected function getComponentPaths($suffix)
