@@ -124,9 +124,7 @@ class Markdown
      */
     public function htmlComponentPaths()
     {
-        return array_map(function ($path) {
-            return $path.'/html';
-        }, $this->componentPaths());
+        return $this->getComponentPaths('html');
     }
 
     /**
@@ -136,9 +134,18 @@ class Markdown
      */
     public function textComponentPaths()
     {
-        return array_map(function ($path) {
-            return $path.'/text';
-        }, $this->componentPaths());
+        return $this->getComponentPaths('text');
+    }
+
+    /**
+     * Get the component paths with the specified suffix.
+     *
+     * @param string $suffix
+     * @return array
+     */
+    protected function getComponentPaths($suffix)
+    {
+        return array_map(fn ($path) => $path.'/'.$suffix, $this->componentPaths());
     }
 
     /**
