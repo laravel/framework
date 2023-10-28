@@ -1046,11 +1046,9 @@ class PendingRequest
                 $mergedOption = array_map( function ( $value ) {
                     return $value instanceof Stringable ? $value->toString() : $value;
                 }, $mergedOption );
-            } else {
-                $mergedOption = $mergedOption instanceof Stringable ? $mergedOption->toString() : $mergedOption;
             }
 
-            return $mergedOption;
+            return $mergedOption instanceof Stringable ? $mergedOption->toString() : $mergedOption;
         }, $mergedOptions);
 
         return $this->buildClient()->$clientMethod($method, $url, $mergedOptions);
