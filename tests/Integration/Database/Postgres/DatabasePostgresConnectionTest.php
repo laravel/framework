@@ -5,11 +5,12 @@ namespace Illuminate\Tests\Integration\Database\Postgres;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 
-/**
- * @requires extension pdo_pgsql
- * @requires OS Linux|Darwin
- */
+#[RequiresOperatingSystem('Linux|Darwin')]
+#[RequiresPhpExtension('pdo_pgsql')]
 class DatabasePostgresConnectionTest extends PostgresTestCase
 {
     protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
@@ -26,9 +27,7 @@ class DatabasePostgresConnectionTest extends PostgresTestCase
         Schema::drop('json_table');
     }
 
-    /**
-     * @dataProvider jsonWhereNullDataProvider
-     */
+    #[DataProvider('jsonWhereNullDataProvider')]
     public function testJsonWhereNull($expected, $key, array $value = ['value' => 123])
     {
         DB::table('json_table')->insert(['json_col' => json_encode($value)]);
@@ -36,9 +35,7 @@ class DatabasePostgresConnectionTest extends PostgresTestCase
         $this->assertSame($expected, DB::table('json_table')->whereNull("json_col->$key")->exists());
     }
 
-    /**
-     * @dataProvider jsonWhereNullDataProvider
-     */
+    #[DataProvider('jsonWhereNullDataProvider')]
     public function testJsonWhereNotNull($expected, $key, array $value = ['value' => 123])
     {
         DB::table('json_table')->insert(['json_col' => json_encode($value)]);
@@ -91,9 +88,7 @@ class DatabasePostgresConnectionTest extends PostgresTestCase
         $this->assertSame(1, $updatedCount);
     }
 
-    /**
-     * @dataProvider jsonContainsKeyDataProvider
-     */
+    #[DataProvider('jsonContainsKeyDataProvider')]
     public function testWhereJsonContainsKey($count, $column)
     {
         DB::table('json_table')->insert([

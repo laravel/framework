@@ -25,7 +25,7 @@ class ConfigureCustomDoctrineTypeTest extends DatabaseTestCase
     {
         $this->assertTrue(
             DB::connection()
-                ->getDoctrineSchemaManager()
+                ->getDoctrineConnection()
                 ->getDatabasePlatform()
                 ->hasDoctrineTypeMappingFor('xml')
         );
@@ -34,7 +34,7 @@ class ConfigureCustomDoctrineTypeTest extends DatabaseTestCase
         // this is not the default connection but it has the custom type mappings
         $this->assertTrue(
             DB::connection('sqlite')
-                ->getDoctrineSchemaManager()
+                ->getDoctrineConnection()
                 ->getDatabasePlatform()
                 ->hasDoctrineTypeMappingFor('xml')
         );
@@ -87,7 +87,7 @@ class ConfigureCustomDoctrineTypeTest extends DatabaseTestCase
 
 class PostgresXmlType extends Type
 {
-    public function getSQLDeclaration(array $fieldDeclaration, AbstractPlatform $platform)
+    public function getSQLDeclaration(array $fieldDeclaration, AbstractPlatform $platform): string
     {
         return 'xml';
     }
@@ -100,7 +100,7 @@ class PostgresXmlType extends Type
 
 class MySQLBitType extends Type
 {
-    public function getSQLDeclaration(array $fieldDeclaration, AbstractPlatform $platform)
+    public function getSQLDeclaration(array $fieldDeclaration, AbstractPlatform $platform): string
     {
         return 'bit';
     }

@@ -21,7 +21,7 @@ class TinyInteger extends Type
      * @param  \Doctrine\DBAL\Platforms\AbstractPlatform  $platform
      * @return string
      */
-    public function getSQLDeclaration(array $fieldDeclaration, AbstractPlatform $platform)
+    public function getSQLDeclaration(array $fieldDeclaration, AbstractPlatform $platform): string
     {
         return 'TINYINT';
     }

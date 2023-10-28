@@ -12,11 +12,10 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Database\Schema\Blueprint;
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @group integration
- */
+#[Group('integration')]
 class EloquentModelCustomCastingTest extends TestCase
 {
     protected function setUp(): void
@@ -67,9 +66,7 @@ class EloquentModelCustomCastingTest extends TestCase
         $this->schema()->drop('members');
     }
 
-    /**
-     * @requires extension gmp
-     */
+    #[RequiresPhpExtension('gmp')]
     public function testSavingCastedAttributesToDatabase()
     {
         /** @var \Illuminate\Tests\Integration\Database\CustomCasts $model */
@@ -106,9 +103,7 @@ class EloquentModelCustomCastingTest extends TestCase
         $this->assertInstanceOf(GMP::class, $model->amount);
     }
 
-    /**
-     * @requires extension gmp
-     */
+    #[RequiresPhpExtension('gmp')]
     public function testInvalidArgumentExceptionOnInvalidValue()
     {
         /** @var \Illuminate\Tests\Integration\Database\CustomCasts $model */
@@ -127,9 +122,7 @@ class EloquentModelCustomCastingTest extends TestCase
         $this->assertSame('address_line_two_value', $model->address->lineTwo);
     }
 
-    /**
-     * @requires extension gmp
-     */
+    #[RequiresPhpExtension('gmp')]
     public function testInvalidArgumentExceptionOnNull()
     {
         /** @var \Illuminate\Tests\Integration\Database\CustomCasts $model */
@@ -148,9 +141,7 @@ class EloquentModelCustomCastingTest extends TestCase
         $this->assertSame('address_line_two_value', $model->address->lineTwo);
     }
 
-    /**
-     * @requires extension gmp
-     */
+    #[RequiresPhpExtension('gmp')]
     public function testModelsWithCustomCastsCanBeConvertedToArrays()
     {
         /** @var \Illuminate\Tests\Integration\Database\CustomCasts $model */

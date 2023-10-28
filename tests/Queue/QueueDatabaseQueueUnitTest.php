@@ -8,6 +8,7 @@ use Illuminate\Queue\DatabaseQueue;
 use Illuminate\Queue\Queue;
 use Illuminate\Support\Str;
 use Mockery as m;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use stdClass;
@@ -19,9 +20,7 @@ class QueueDatabaseQueueUnitTest extends TestCase
         m::close();
     }
 
-    /**
-     * @dataProvider pushJobsDataProvider
-     */
+    #[DataProvider('pushJobsDataProvider')]
     public function testPushProperlyPushesJobOntoDatabase($uuid, $job, $displayNameStartsWith, $jobStartsWith)
     {
         Str::createUuidsUsing(function () use ($uuid) {
@@ -99,7 +98,7 @@ class QueueDatabaseQueueUnitTest extends TestCase
         $job = new stdClass;
         $job->invalid = "\xc3\x28";
 
-        $queue = $this->getMockForAbstractClass(Queue::class);
+        $queue = m::mock(Queue::class)->makePartial();
         $class = new ReflectionClass(Queue::class);
 
         $createPayload = $class->getMethod('createPayload');
@@ -113,7 +112,7 @@ class QueueDatabaseQueueUnitTest extends TestCase
     {
         $this->expectException('InvalidArgumentException');
 
-        $queue = $this->getMockForAbstractClass(Queue::class);
+        $queue = m::mock(Queue::class)->makePartial();
         $class = new ReflectionClass(Queue::class);
 
         $createPayload = $class->getMethod('createPayload');

@@ -64,7 +64,7 @@ class OutputStyle extends SymfonyStyle implements NewLineAware
     /**
      * {@inheritdoc}
      */
-    public function write(string|iterable $messages, bool $newline = false, int $options = 0)
+    public function write(string|iterable $messages, bool $newline = false, int $options = 0): void
     {
         $this->newLinesWritten = $this->trailingNewLineCount($messages) + (int) $newline;
         $this->newLineWritten = $this->newLinesWritten > 0;
@@ -74,10 +74,8 @@ class OutputStyle extends SymfonyStyle implements NewLineAware
 
     /**
      * {@inheritdoc}
-     *
-     * @return void
      */
-    public function writeln(string|iterable $messages, int $type = self::OUTPUT_NORMAL)
+    public function writeln(string|iterable $messages, int $type = self::OUTPUT_NORMAL): void
     {
         $this->newLinesWritten = $this->trailingNewLineCount($messages) + 1;
         $this->newLineWritten = true;
@@ -87,10 +85,8 @@ class OutputStyle extends SymfonyStyle implements NewLineAware
 
     /**
      * {@inheritdoc}
-     *
-     * @return void
      */
-    public function newLine(int $count = 1)
+    public function newLine(int $count = 1): void
     {
         $this->newLinesWritten += $count;
         $this->newLineWritten = $this->newLinesWritten > 0;

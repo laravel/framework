@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Schema\Grammars;
 
 use Doctrine\DBAL\Schema\Index;
+use Doctrine\DBAL\Schema\TableDiff;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Schema\Blueprint;
@@ -39,12 +40,29 @@ class SQLiteGrammar extends Grammar
     /**
      * Compile the query to determine the list of columns.
      *
+     * @deprecated Will be removed in a future Laravel version.
+     *
      * @param  string  $table
      * @return string
      */
     public function compileColumnListing($table)
     {
         return 'pragma table_info('.$this->wrap(str_replace('.', '__', $table)).')';
+    }
+
+    /**
+     * Compile the query to determine the columns.
+     *
+     * @param  string  $table
+     * @return string
+     */
+    public function compileColumns($table)
+    {
+        return sprintf(
+            "select name, type, not 'notnull' as 'nullable', dflt_value as 'default', pk as 'primary' "
+            .'from pragma_table_info(%s) order by cid asc',
+            $this->wrap(str_replace('.', '__', $table))
+        );
     }
 
     /**
@@ -318,13 +336,32 @@ class SQLiteGrammar extends Grammar
                 $blueprint, $schema = $connection->getDoctrineSchemaManager()
             );
 
+            $droppedColumns = [];
+
             foreach ($command->columns as $name) {
-                $tableDiff->removedColumns[$name] = $connection->getDoctrineColumn(
+                $droppedColumns[$name] = $connection->getDoctrineColumn(
                     $this->getTablePrefix().$blueprint->getTable(), $name
                 );
             }
 
-            return (array) $schema->getDatabasePlatform()->getAlterTableSQL($tableDiff);
+            $platform = $connection->getDoctrineConnection()->getDatabasePlatform();
+
+            return (array) $platform->getAlterTableSQL(
+                new TableDiff(
+                    $tableDiff->getOldTable(),
+                    $tableDiff->getAddedColumns(),
+                    $tableDiff->getModifiedColumns(),
+                    $droppedColumns,
+                    $tableDiff->getRenamedColumns(),
+                    $tableDiff->getAddedIndexes(),
+                    $tableDiff->getModifiedIndexes(),
+                    $tableDiff->getDroppedIndexes(),
+                    $tableDiff->getRenamedIndexes(),
+                    $tableDiff->getAddedForeignKeys(),
+                    $tableDiff->getModifiedColumns(),
+                    $tableDiff->getDroppedForeignKeys(),
+                )
+            );
         }
     }
 

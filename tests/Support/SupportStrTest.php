@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Support;
 
 use Exception;
 use Illuminate\Support\Str;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\UuidInterface;
 use ReflectionClass;
@@ -203,6 +204,7 @@ class SupportStrTest extends TestCase
         $this->assertSame('...ocê e...', Str::excerpt('Como você está', 'Ê', ['radius' => 2]));
         $this->assertSame('João...', Str::excerpt('João Antônio ', 'jo', ['radius' => 2]));
         $this->assertSame('João Antô...', Str::excerpt('João Antônio', 'JOÃO', ['radius' => 5]));
+        $this->assertNull(Str::excerpt('', '/'));
     }
 
     public function testStrBefore()
@@ -286,20 +288,39 @@ class SupportStrTest extends TestCase
         $this->assertSame('foo', Str::afterLast('----foo', '---'));
     }
 
-    /**
-     * @dataProvider strContainsProvider
-     */
+    #[DataProvider('strContainsProvider')]
     public function testStrContains($haystack, $needles, $expected, $ignoreCase = false)
     {
         $this->assertEquals($expected, Str::contains($haystack, $needles, $ignoreCase));
     }
 
-    /**
-     * @dataProvider strContainsAllProvider
-     */
+    #[DataProvider('strContainsAllProvider')]
     public function testStrContainsAll($haystack, $needles, $expected, $ignoreCase = false)
     {
         $this->assertEquals($expected, Str::containsAll($haystack, $needles, $ignoreCase));
+    }
+
+    public function testConvertCase()
+    {
+        // Upper Case Conversion
+        $this->assertSame('HELLO', Str::convertCase('hello', MB_CASE_UPPER));
+        $this->assertSame('WORLD', Str::convertCase('WORLD', MB_CASE_UPPER));
+
+        // Lower Case Conversion
+        $this->assertSame('hello', Str::convertCase('HELLO', MB_CASE_LOWER));
+        $this->assertSame('world', Str::convertCase('WORLD', MB_CASE_LOWER));
+
+        // Case Folding
+        $this->assertSame('hello', Str::convertCase('HeLLo', MB_CASE_FOLD));
+        $this->assertSame('world', Str::convertCase('WoRLD', MB_CASE_FOLD));
+
+        // Multi-byte String
+        $this->assertSame('ÜÖÄ', Str::convertCase('üöä', MB_CASE_UPPER, 'UTF-8'));
+        $this->assertSame('üöä', Str::convertCase('ÜÖÄ', MB_CASE_LOWER, 'UTF-8'));
+
+        // Unsupported Mode
+        $this->expectException(\ValueError::class);
+        Str::convertCase('Hello', -1);
     }
 
     public function testParseCallback()
@@ -411,17 +432,13 @@ class SupportStrTest extends TestCase
         $this->assertFalse(Str::isUrl('invalid url'));
     }
 
-    /**
-     * @dataProvider validUuidList
-     */
+    #[DataProvider('validUuidList')]
     public function testIsUuidWithValidUuid($uuid)
     {
         $this->assertTrue(Str::isUuid($uuid));
     }
 
-    /**
-     * @dataProvider invalidUuidList
-     */
+    #[DataProvider('invalidUuidList')]
     public function testIsUuidWithInvalidUuid($uuid)
     {
         $this->assertFalse(Str::isUuid($uuid));
@@ -520,8 +537,7 @@ class SupportStrTest extends TestCase
         $this->assertIsString(Str::random());
     }
 
-    /** @test */
-    public function TestWhetherTheNumberOfGeneratedCharactersIsEquallyDistributed()
+    public function testWhetherTheNumberOfGeneratedCharactersIsEquallyDistributed()
     {
         $results = [];
         // take 6.200.000 samples, because there are 62 different characters
@@ -605,6 +621,8 @@ class SupportStrTest extends TestCase
         // Test for associative array support
         $this->assertSame('foo/bar', Str::replaceArray('?', [1 => 'foo', 2 => 'bar'], '?/?'));
         $this->assertSame('foo/bar', Str::replaceArray('?', ['x' => 'foo', 'y' => 'bar'], '?/?'));
+        // Test does not crash on bad input
+        $this->assertSame('?', Str::replaceArray('?', [(object) ['foo' => 'bar']], '?'));
     }
 
     public function testReplaceFirst()
@@ -862,6 +880,11 @@ class SupportStrTest extends TestCase
     {
         $this->assertSame('ab', Str::take('abcdef', 2));
         $this->assertSame('ef', Str::take('abcdef', -2));
+        $this->assertSame('', Str::take('abcdef', 0));
+        $this->assertSame('', Str::take('', 2));
+        $this->assertSame('abcdef', Str::take('abcdef', 10));
+        $this->assertSame('abcdef', Str::take('abcdef', 6));
+        $this->assertSame('ü', Str::take('üöä', 1));
     }
 
     public function testLcfirst()
@@ -1051,9 +1074,7 @@ class SupportStrTest extends TestCase
         $this->assertSame('', Str::repeat('', 5));
     }
 
-    /**
-     * @dataProvider specialCharacterProvider
-     */
+    #[DataProvider('specialCharacterProvider')]
     public function testTransliterate(string $value, string $expected): void
     {
         $this->assertSame($expected, Str::transliterate($value));
@@ -1079,9 +1100,7 @@ class SupportStrTest extends TestCase
         $this->assertSame('Hello', Str::transliterate('🎂', 'Hello'));
     }
 
-    /**
-     * @dataProvider specialCharacterProvider
-     */
+    #[DataProvider('specialCharacterProvider')]
     public function testTransliterateStrict(string $value, string $expected): void
     {
         $this->assertSame($expected, Str::transliterate($value, '?', true));
@@ -1297,6 +1316,13 @@ class SupportStrTest extends TestCase
     public function testPasswordCreation()
     {
         $this->assertTrue(strlen(Str::password()) === 32);
+
+        $this->assertStringNotContainsString(' ', Str::password());
+        $this->assertStringContainsString(' ', Str::password(spaces: true));
+
+        $this->assertTrue(
+            Str::of(Str::password())->contains(['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'])
+        );
     }
 }
 

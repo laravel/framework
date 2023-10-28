@@ -256,11 +256,11 @@ class BladeCompiler extends Compiler implements CompilerInterface
     {
         [$this->footer, $result] = [[], ''];
 
-        $value = $this->storeUncompiledBlocks($value);
-
         foreach ($this->prepareStringsForCompilationUsing as $callback) {
             $value = $callback($value);
         }
+
+        $value = $this->storeUncompiledBlocks($value);
 
         // First we will compile the Blade component tags. This is a precompile style
         // step which compiles the component Blade tags into @component directives

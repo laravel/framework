@@ -143,6 +143,10 @@ abstract class Component
         }
 
         $resolver = function ($view) {
+            if ($view instanceof ViewContract) {
+                return $view;
+            }
+
             return $this->extractBladeViewFromString($view);
         };
 
