@@ -973,20 +973,7 @@ class PendingRequest
                 return $value;
             }
 
-            $value = $value instanceof Arrayable ? $value->toArray() : $value;
-            $value = $value instanceof Stringable ? $value->toString() : $value;
-
-            if(is_array($value)) {
-                $value = array_map(function ($data) {
-                    if($data instanceof Stringable) {
-                        return $data->toString();
-                    }
-
-                    return $data;
-                }, $value);
-            }
-
-            return $value;
+            return $value instanceof Arrayable ? $value->toArray() : $value;
         })->all();
     }
 
@@ -1049,10 +1036,24 @@ class PendingRequest
             $this->transferStats = $transferStats;
         };
 
-        return $this->buildClient()->$clientMethod($method, $url, $this->mergeOptions([
+        $mergedOptions = $this->mergeOptions([
             'laravel_data' => $laravelData,
             'on_stats' => $onStats,
-        ], $options));
+        ], $options);
+
+        $mergedOptions = array_map(function($mergedOption) {
+            if ( is_array( $mergedOption ) ) {
+                $mergedOption = array_map( function ( $value ) {
+                    return $value instanceof Stringable ? $value->toString() : $value;
+                }, $mergedOption );
+            } else {
+                $mergedOption = $mergedOption instanceof Stringable ? $mergedOption->toString() : $mergedOption;
+            }
+
+            return $mergedOption;
+        }, $mergedOptions);
+
+        return $this->buildClient()->$clientMethod($method, $url, $mergedOptions);
     }
 
     /**
