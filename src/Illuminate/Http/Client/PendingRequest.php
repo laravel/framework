@@ -1043,9 +1043,9 @@ class PendingRequest
 
         $mergedOptions = array_map(function($mergedOption) {
             if ( is_array( $mergedOption ) ) {
-                $mergedOption = array_map( function ( $value ) {
-                    return $value instanceof Stringable ? $value->toString() : $value;
-                }, $mergedOption );
+                array_walk_recursive($mergedOption, function (&$value) {
+                    $value = $value instanceof Stringable ? $value->toString() : $value;
+                });
             }
 
             return $mergedOption instanceof Stringable ? $mergedOption->toString() : $mergedOption;
