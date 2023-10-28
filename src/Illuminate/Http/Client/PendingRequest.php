@@ -19,6 +19,7 @@ use Illuminate\Http\Client\Events\ResponseReceived;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use Illuminate\Support\Stringable;
 use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\Macroable;
 use JsonSerializable;
@@ -972,7 +973,20 @@ class PendingRequest
                 return $value;
             }
 
-            return $value instanceof Arrayable ? $value->toArray() : $value;
+            $value = $value instanceof Arrayable ? $value->toArray() : $value;
+            $value = $value instanceof Stringable ? $value->toString() : $value;
+
+            if(is_array($value)) {
+                $value = array_map(function ($data) {
+                    if($data instanceof Stringable) {
+                        return $data->toString();
+                    }
+
+                    return $data;
+                }, $value);
+            }
+
+            return $value;
         })->all();
     }
 
