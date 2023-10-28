@@ -139,7 +139,7 @@ trait RefreshDatabase
      *
      * @return void
      */
-    public function withCheckTransactionLevel()
+    protected function withCheckTransactionLevel()
     {
         $this->shouldCheckTransactionLevel = true;
     }
@@ -147,7 +147,7 @@ trait RefreshDatabase
     /**
      * Skips the check of matching transaction start and end counts at the end of a test.
      */
-    public function withoutCheckTransactionLevel()
+    protected function withoutCheckTransactionLevel()
     {
         $this->shouldCheckTransactionLevel = false;
     }
