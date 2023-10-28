@@ -122,6 +122,34 @@ class EloquentWhereHasTest extends DatabaseTestCase
         $this->assertEquals([1], $users->pluck('id')->all());
     }
 
+    public function testWhereRelationIn()
+    {
+        $users = User::query()->whereRelation('posts', 'public', 'in', [true])->get();
+
+        $this->assertEquals([1], $users->pluck('id')->all());
+    }
+
+    public function testWhereRelationNotIn()
+    {
+        $users = User::query()->whereRelation('posts', 'public', 'not in', [false])->get();
+
+        $this->assertEquals([1], $users->pluck('id')->all());
+    }
+
+    public function testOrWhereRelationNotIn()
+    {
+        $users = User::query()->whereRelation('posts', 'public', -1)->orWhereRelation('posts', 'public', 'not in', [false])->get();
+
+        $this->assertEquals([1], $users->pluck('id')->all());
+    }
+
+    public function testOrWhereRelationIn()
+    {
+        $users = User::query()->whereRelation('posts', 'public', -1)->orWhereRelation('posts', 'public', 'in', [true])->get();
+
+        $this->assertEquals([1], $users->pluck('id')->all());
+    }
+
     public function testOrWhereRelation()
     {
         $users = User::whereRelation('posts', 'public', true)->orWhereRelation('posts', 'public', false)->get();

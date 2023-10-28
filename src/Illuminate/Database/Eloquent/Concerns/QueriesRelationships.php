@@ -384,6 +384,13 @@ trait QueriesRelationships
         return $this->whereHas($relation, function ($query) use ($column, $operator, $value) {
             if ($column instanceof Closure) {
                 $column($query);
+            } elseif(
+                $operator === Str::lower('in') ||
+                // Remove space in case user sends 'not in' instead of 'notin'
+                str_replace(' ', '', $operator) === Str::lower('notin')
+            ) {
+                $operator = str_replace(' ', '', $operator);
+                $query->whereIn($column, $value, 'and', $operator === 'notin');
             } else {
                 $query->where($column, $operator, $value);
             }
@@ -404,6 +411,13 @@ trait QueriesRelationships
         return $this->orWhereHas($relation, function ($query) use ($column, $operator, $value) {
             if ($column instanceof Closure) {
                 $column($query);
+            } elseif(
+                $operator === Str::lower('in') ||
+                // Remove space in case user sends 'not in' instead of 'notin'
+                str_replace(' ', '', $operator) === Str::lower('notin')
+            ) {
+                $operator = str_replace(' ', '', $operator);
+                $query->whereIn($column, $value, 'and', $operator === 'notin');
             } else {
                 $query->where($column, $operator, $value);
             }
