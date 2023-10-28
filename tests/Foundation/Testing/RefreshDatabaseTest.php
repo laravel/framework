@@ -10,6 +10,7 @@ use Orchestra\Testbench\Concerns\Testing;
 use Orchestra\Testbench\Foundation\Application as Testbench;
 use PHPUnit\Framework\TestCase;
 use ReflectionMethod;
+use RuntimeException;
 
 use function Orchestra\Testbench\package_path;
 
@@ -97,6 +98,62 @@ class RefreshDatabaseTest extends TestCase
 
         $refreshTestDatabaseReflection->invoke($this->traitObject);
     }
+
+    public function testSuccessWithCheckTransactionLevel()
+    {
+        $refreshTestDatabaseReflection = $this->__reflectAndSetupAccessibleForProtectedTraitMethod('refreshTestDatabase');
+
+        $refreshTestDatabaseReflection->invoke($this->traitObject);
+
+        $this->traitObject->withCheckTransactionLevel();
+
+        $this->traitObject->callBeforeApplicationDestroyedCallbacks();
+        $this->assertNull($this->traitObject->__getCallbackException());
+    }
+
+    public function testErrorOnExcessiveTransactionCommit()
+    {
+        $refreshTestDatabaseReflection = $this->__reflectAndSetupAccessibleForProtectedTraitMethod('refreshTestDatabase');
+
+        $refreshTestDatabaseReflection->invoke($this->traitObject);
+
+        $this->traitObject->withCheckTransactionLevel();
+        $connection = $this->traitObject->__getConnection();
+        $connection->commit();
+
+        $this->traitObject->callBeforeApplicationDestroyedCallbacks();
+        $this->assertInstanceOf(RuntimeException::class, $this->traitObject->__getCallbackException());
+    }
+
+    public function testErrorOnUncommittedTransaction()
+    {
+        $refreshTestDatabaseReflection = $this->__reflectAndSetupAccessibleForProtectedTraitMethod('refreshTestDatabase');
+
+        $refreshTestDatabaseReflection->invoke($this->traitObject);
+
+        $this->traitObject->withCheckTransactionLevel();
+        $connection = $this->traitObject->__getConnection();
+        $connection->beginTransaction();
+
+        $this->traitObject->callBeforeApplicationDestroyedCallbacks();
+        $this->assertInstanceOf(RuntimeException::class, $this->traitObject->__getCallbackException());
+    }
+
+    public function testNoErrorThrownWithoutCheckTransactionLevel()
+    {
+        $refreshTestDatabaseReflection = $this->__reflectAndSetupAccessibleForProtectedTraitMethod('refreshTestDatabase');
+
+        $refreshTestDatabaseReflection->invoke($this->traitObject);
+
+        // This is the default, so there is no need to actually specify it.
+        $this->traitObject->withoutCheckTransactionLevel();
+
+        $connection = $this->traitObject->__getConnection();
+        $connection->beginTransaction();
+
+        $this->traitObject->callBeforeApplicationDestroyedCallbacks();
+        $this->assertNull($this->traitObject->__getCallbackException());
+    }
 }
 
 class RefreshDatabaseTestMockClass
@@ -140,5 +197,15 @@ class RefreshDatabaseTestMockClass
         return Testbench::create(
             basePath: package_path('vendor/orchestra/testbench-core/laravel')
         );
+    }
+
+    public function __getConnection()
+    {
+        return $this->app->get('db.connection');
+    }
+
+    public function __getCallbackException()
+    {
+        return $this->callbackException;
     }
 }

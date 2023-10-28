@@ -4,10 +4,13 @@ namespace Illuminate\Foundation\Testing;
 
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Foundation\Testing\Traits\CanConfigureMigrationCommands;
+use RuntimeException;
 
 trait RefreshDatabase
 {
     use CanConfigureMigrationCommands;
+
+    private bool $shouldCheckTransactionLevel = false;
 
     /**
      * Define hooks to migrate the database before and after each test.
@@ -104,12 +107,18 @@ trait RefreshDatabase
         $this->beforeApplicationDestroyed(function () use ($database) {
             foreach ($this->connectionsToTransact() as $name) {
                 $connection = $database->connection($name);
+                $isInvalidTransactionLevel = $this->shouldCheckTransactionLevel && $connection->transactionLevel() !== 1;
+
                 $dispatcher = $connection->getEventDispatcher();
 
                 $connection->unsetEventDispatcher();
                 $connection->rollBack();
                 $connection->setEventDispatcher($dispatcher);
                 $connection->disconnect();
+
+                if ($isInvalidTransactionLevel) {
+                    throw new RuntimeException('Transaction level mismatch detected: The number of transaction starts and ends do not match.');
+                }
             }
         });
     }
@@ -123,6 +132,24 @@ trait RefreshDatabase
     {
         return property_exists($this, 'connectionsToTransact')
                             ? $this->connectionsToTransact : [null];
+    }
+
+    /**
+     * Checks if the number of transaction starts and ends match at the end of a test.
+     *
+     * @return void
+     */
+    public function withCheckTransactionLevel()
+    {
+        $this->shouldCheckTransactionLevel = true;
+    }
+
+    /**
+     * Skips the check of matching transaction start and end counts at the end of a test.
+     */
+    public function withoutCheckTransactionLevel()
+    {
+        $this->shouldCheckTransactionLevel = false;
     }
 
     /**
