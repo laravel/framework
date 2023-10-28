@@ -107,7 +107,7 @@ trait RefreshDatabase
         $this->beforeApplicationDestroyed(function () use ($database) {
             foreach ($this->connectionsToTransact() as $name) {
                 $connection = $database->connection($name);
-                $isInvalidTransactionLevel = $this->shouldCheckTransactionLevel && $connection->transactionLevel() !== 1;
+                $isInvalidTransactionLevel = $this->shouldCheckTransactionLevel && $connection->transactionLevel() < 1;
 
                 $dispatcher = $connection->getEventDispatcher();
 

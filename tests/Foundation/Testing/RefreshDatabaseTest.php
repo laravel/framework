@@ -125,20 +125,6 @@ class RefreshDatabaseTest extends TestCase
         $this->assertInstanceOf(RuntimeException::class, $this->traitObject->__getCallbackException());
     }
 
-    public function testErrorOnUncommittedTransaction()
-    {
-        $refreshTestDatabaseReflection = $this->__reflectAndSetupAccessibleForProtectedTraitMethod('refreshTestDatabase');
-
-        $refreshTestDatabaseReflection->invoke($this->traitObject);
-
-        $this->traitObject->withCheckTransactionLevel();
-        $connection = $this->traitObject->__getConnection();
-        $connection->beginTransaction();
-
-        $this->traitObject->callBeforeApplicationDestroyedCallbacks();
-        $this->assertInstanceOf(RuntimeException::class, $this->traitObject->__getCallbackException());
-    }
-
     public function testNoErrorThrownWithoutCheckTransactionLevel()
     {
         $refreshTestDatabaseReflection = $this->__reflectAndSetupAccessibleForProtectedTraitMethod('refreshTestDatabase');
