@@ -89,6 +89,9 @@ class Builder implements BuilderContract
     /**
      * The methods that should be returned from query builder.
      *
+     * Note that the names in the array need to be lowercase so that PHP's case-insensitivity
+     * regarding method calls can be achieved when forwarding the call to the base object.
+     *
      * @var string[]
      */
     protected $passthru = [
@@ -97,29 +100,29 @@ class Builder implements BuilderContract
         'avg',
         'count',
         'dd',
-        'ddRawSql',
-        'doesntExist',
-        'doesntExistOr',
+        'ddrawsql',
+        'doesntexist',
+        'doesntexistor',
         'dump',
-        'dumpRawSql',
+        'dumprawsql',
         'exists',
-        'existsOr',
+        'existsor',
         'explain',
-        'getBindings',
-        'getConnection',
-        'getGrammar',
+        'getbindings',
+        'getconnection',
+        'getgrammar',
         'implode',
         'insert',
-        'insertGetId',
-        'insertOrIgnore',
-        'insertUsing',
+        'insertgetid',
+        'insertorignore',
+        'insertusing',
         'max',
         'min',
         'raw',
-        'rawValue',
+        'rawvalue',
         'sum',
-        'toSql',
-        'toRawSql',
+        'tosql',
+        'torawsql',
     ];
 
     /**
@@ -1964,7 +1967,7 @@ class Builder implements BuilderContract
             return $this->callNamedScope($method, $parameters);
         }
 
-        if (in_array($method, $this->passthru)) {
+        if (in_array(strtolower($method), $this->passthru)) {
             return $this->toBase()->{$method}(...$parameters);
         }
 
