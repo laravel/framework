@@ -89,9 +89,6 @@ class Builder implements BuilderContract
     /**
      * The methods that should be returned from query builder.
      *
-     * Note that the names in the array need to be lowercase so that PHP's case-insensitivity
-     * regarding method calls can be achieved when forwarding the call to the base object.
-     *
      * @var string[]
      */
     protected $passthru = [
