@@ -102,26 +102,24 @@ class RefreshDatabaseTest extends TestCase
     public function testSuccessWithCheckTransactionLevel()
     {
         $refreshTestDatabaseReflection = $this->__reflectAndSetupAccessibleForProtectedTraitMethod('refreshTestDatabase');
-
         $refreshTestDatabaseReflection->invoke($this->traitObject);
 
         $this->traitObject->withCheckTransactionLevel();
-
         $this->traitObject->callBeforeApplicationDestroyedCallbacks();
+
         $this->assertNull($this->traitObject->__getCallbackException());
     }
 
     public function testErrorOnExcessiveTransactionCommit()
     {
         $refreshTestDatabaseReflection = $this->__reflectAndSetupAccessibleForProtectedTraitMethod('refreshTestDatabase');
-
         $refreshTestDatabaseReflection->invoke($this->traitObject);
 
         $this->traitObject->withCheckTransactionExcess();
         $connection = $this->traitObject->__getConnection();
         $connection->commit();
-
         $this->traitObject->callBeforeApplicationDestroyedCallbacks();
+
         $this->assertInstanceOf(LogicException::class, $this->traitObject->__getCallbackException());
         $this->assertStringContainsString('ends is greater than', $this->traitObject->__getCallbackException()->getMessage());
     }
@@ -129,14 +127,13 @@ class RefreshDatabaseTest extends TestCase
     public function testErrorOnTransactionShortfall()
     {
         $refreshTestDatabaseReflection = $this->__reflectAndSetupAccessibleForProtectedTraitMethod('refreshTestDatabase');
-
         $refreshTestDatabaseReflection->invoke($this->traitObject);
 
         $this->traitObject->withCheckTransactionShortfall();
         $connection = $this->traitObject->__getConnection();
         $connection->beginTransaction();
-
         $this->traitObject->callBeforeApplicationDestroyedCallbacks();
+
         $this->assertInstanceOf(LogicException::class, $this->traitObject->__getCallbackException());
         $this->assertStringContainsString('starts is greater than', $this->traitObject->__getCallbackException()->getMessage());
     }
@@ -144,32 +141,28 @@ class RefreshDatabaseTest extends TestCase
     public function testNoErrorThrownWithoutCheckOnExcessiveCommit()
     {
         $refreshTestDatabaseReflection = $this->__reflectAndSetupAccessibleForProtectedTraitMethod('refreshTestDatabase');
-
         $refreshTestDatabaseReflection->invoke($this->traitObject);
 
         // This is the default, so there is no need to actually specify it.
         $this->traitObject->withoutCheckTransactionLevel();
-
         $connection = $this->traitObject->__getConnection();
         $connection->beginTransaction();
-
         $this->traitObject->callBeforeApplicationDestroyedCallbacks();
+
         $this->assertNull($this->traitObject->__getCallbackException());
     }
 
     public function testNoErrorThrownWithoutCheckOnShortfallCommit()
     {
         $refreshTestDatabaseReflection = $this->__reflectAndSetupAccessibleForProtectedTraitMethod('refreshTestDatabase');
-
         $refreshTestDatabaseReflection->invoke($this->traitObject);
 
         // This is the default, so there is no need to actually specify it.
         $this->traitObject->withoutCheckTransactionLevel();
-
         $connection = $this->traitObject->__getConnection();
         $connection->commit();
-
         $this->traitObject->callBeforeApplicationDestroyedCallbacks();
+
         $this->assertNull($this->traitObject->__getCallbackException());
     }
 }
