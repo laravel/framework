@@ -4,7 +4,7 @@ namespace Illuminate\Foundation\Testing;
 
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Foundation\Testing\Traits\CanConfigureMigrationCommands;
-use RuntimeException;
+use LogicException;
 
 trait RefreshDatabase
 {
@@ -117,7 +117,7 @@ trait RefreshDatabase
                 $connection->disconnect();
 
                 if ($isInvalidTransactionLevel) {
-                    throw new RuntimeException('Transaction level mismatch detected: The number of transaction starts and ends do not match.');
+                    throw new LogicException('Transaction level mismatch detected: The number of transaction starts and ends do not match.');
                 }
             }
         });

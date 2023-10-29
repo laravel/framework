@@ -5,12 +5,12 @@ namespace Illuminate\Tests\Foundation\Testing;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithConsole;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\RefreshDatabaseState;
+use LogicException;
 use Mockery as m;
 use Orchestra\Testbench\Concerns\Testing;
 use Orchestra\Testbench\Foundation\Application as Testbench;
 use PHPUnit\Framework\TestCase;
 use ReflectionMethod;
-use RuntimeException;
 
 use function Orchestra\Testbench\package_path;
 
@@ -122,7 +122,7 @@ class RefreshDatabaseTest extends TestCase
         $connection->commit();
 
         $this->traitObject->callBeforeApplicationDestroyedCallbacks();
-        $this->assertInstanceOf(RuntimeException::class, $this->traitObject->__getCallbackException());
+        $this->assertInstanceOf(LogicException::class, $this->traitObject->__getCallbackException());
     }
 
     public function testNoErrorThrownWithoutCheckTransactionLevel()
