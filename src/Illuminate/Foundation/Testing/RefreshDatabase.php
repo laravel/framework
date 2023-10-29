@@ -10,7 +10,8 @@ trait RefreshDatabase
 {
     use CanConfigureMigrationCommands;
 
-    private bool $shouldCheckTransactionLevel = false;
+    private bool $shouldCheckTransactionExcess = false;
+    private bool $shouldCheckTransactionShortfall = false;
 
     /**
      * Define hooks to migrate the database before and after each test.
@@ -107,7 +108,8 @@ trait RefreshDatabase
         $this->beforeApplicationDestroyed(function () use ($database) {
             foreach ($this->connectionsToTransact() as $name) {
                 $connection = $database->connection($name);
-                $isInvalidTransactionLevel = $this->shouldCheckTransactionLevel && $connection->transactionLevel() < 1;
+                $isTransactionExcessive = $this->shouldCheckTransactionExcess && $connection->transactionLevel() < 1;
+                $isTransactionShortfall = $this->shouldCheckTransactionShortfall && $connection->transactionLevel() > 1;
 
                 $dispatcher = $connection->getEventDispatcher();
 
@@ -116,8 +118,11 @@ trait RefreshDatabase
                 $connection->setEventDispatcher($dispatcher);
                 $connection->disconnect();
 
-                if ($isInvalidTransactionLevel) {
-                    throw new LogicException('Transaction level mismatch detected: The number of transaction starts and ends do not match.');
+                if ($isTransactionExcessive) {
+                    throw new LogicException('Transaction level mismatch detected: The number of transaction ends is greater than the number of starts.');
+                }
+                if($isTransactionShortfall) {
+                    throw new LogicException('Transaction level mismatch detected: The number of transaction starts is greater than the number of ends.');
                 }
             }
         });
@@ -135,13 +140,34 @@ trait RefreshDatabase
     }
 
     /**
-     * Checks if the number of transaction starts and ends match at the end of a test.
+     * Enables checking for both excess and shortfall in transactions during a test.
      *
      * @return void
      */
     protected function withCheckTransactionLevel()
     {
-        $this->shouldCheckTransactionLevel = true;
+        $this->shouldCheckTransactionExcess = true;
+        $this->shouldCheckTransactionShortfall = true;
+    }
+
+    /**
+     * Enables checking for excess transactions like unnecessary commits in a test.
+     *
+     * @return void
+     */
+    protected function withCheckTransactionExcess()
+    {
+        $this->shouldCheckTransactionExcess = true;
+    }
+
+    /**
+     * Enables checking for transaction shortfall, such as missing commits or rollbacks.
+     *
+     * @return void
+     */
+    protected function withCheckTransactionShortfall()
+    {
+        $this->shouldCheckTransactionShortfall = true;
     }
 
     /**
@@ -149,7 +175,8 @@ trait RefreshDatabase
      */
     protected function withoutCheckTransactionLevel()
     {
-        $this->shouldCheckTransactionLevel = false;
+        $this->shouldCheckTransactionExcess = false;
+        $this->shouldCheckTransactionShortfall = false;
     }
 
     /**
