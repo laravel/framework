@@ -121,7 +121,7 @@ trait RefreshDatabase
                 if ($isTransactionExcessive) {
                     throw new LogicException('Transaction level mismatch detected: The number of transaction ends is greater than the number of starts.');
                 }
-                if($isTransactionShortfall) {
+                if ($isTransactionShortfall) {
                     throw new LogicException('Transaction level mismatch detected: The number of transaction starts is greater than the number of ends.');
                 }
             }
