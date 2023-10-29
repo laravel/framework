@@ -3,10 +3,25 @@
 namespace Illuminate\Support;
 
 use Illuminate\Support\Traits\Macroable;
+use NumberFormatter;
 
 class Number
 {
     use Macroable;
+
+    /**
+     * Format the number to a fluent human-readable string.
+     *
+     * @param  float|int  $number
+     * @param  string  $locale
+     * @return false|string
+     */
+    public static function toHuman($number, $locale = 'en')
+    {
+        $formatter = new NumberFormatter($locale, NumberFormatter::SPELLOUT);
+
+        return $formatter->format($number);
+    }
 
     /**
      * Format the number of bytes to a human-readable string.
