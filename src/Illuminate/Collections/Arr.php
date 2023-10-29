@@ -195,6 +195,7 @@ class Arr
             foreach ($array as $item) {
                 return $item;
             }
+
             return null;
         }
 
