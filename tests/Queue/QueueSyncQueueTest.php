@@ -7,6 +7,7 @@ use Illuminate\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Queue\QueueableEntity;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Database\DatabaseTransactionsManager;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\Jobs\SyncJob;
 use Illuminate\Queue\SyncQueue;
@@ -77,6 +78,19 @@ class QueueSyncQueueTest extends TestCase
             $this->assertSame('extraValue', $e->getMessage());
         }
     }
+
+    public function testItAddsATransactionCallbackForAfterCommitJobs()
+    {
+        $sync = new SyncQueue;
+        $container = new Container;
+        $container->bind(\Illuminate\Contracts\Container\Container::class, \Illuminate\Container\Container::class);
+        $transactionManager = m::mock(DatabaseTransactionsManager::class);
+        $transactionManager->shouldReceive('addCallback')->once()->andReturn(null);
+        $container->instance('db.transactions', $transactionManager);
+
+        $sync->setContainer($container);
+        $sync->push(new SyncQueueAfterCommitJob());
+    }
 }
 
 class SyncQueueTestEntity implements QueueableEntity
@@ -132,5 +146,17 @@ class SyncQueueJob implements ShouldQueue
         $payload = $this->job->payload();
 
         return $payload['data'][$key] ?? null;
+    }
+}
+
+class SyncQueueAfterCommitJob
+{
+    use InteractsWithQueue;
+
+    public $afterCommit = true;
+
+    public function handle()
+    {
+
     }
 }
