@@ -2246,6 +2246,48 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertSame('select * from "users" where "email" = \'foo\'', $builder->toRawSql());
     }
 
+    public function testPassthruMethodsCallsAreNotCaseSensitive()
+    {
+        $query = m::mock(BaseBuilder::class);
+
+        $mockResponse = 'select 1';
+        $query
+            ->shouldReceive('toRawSql')
+            ->andReturn($mockResponse)
+            ->times(3);
+
+        $builder = new Builder($query);
+
+        $this->assertSame('select 1', $builder->TORAWSQL());
+        $this->assertSame('select 1', $builder->toRawSql());
+        $this->assertSame('select 1', $builder->toRawSQL());
+    }
+
+    public function testPassthruArrayElementsMustAllBeLowercase()
+    {
+        $builder = new class(m::mock(BaseBuilder::class)) extends Builder
+        {
+            // expose protected member for test
+            public function getPassthru(): array
+            {
+                return $this->passthru;
+            }
+        };
+
+        $passthru = $builder->getPassthru();
+
+        foreach ($passthru as $method) {
+            $lowercaseMethod = strtolower($method);
+
+            $this->assertSame(
+                $lowercaseMethod,
+                $method,
+                'Eloquent\\Builder relies on lowercase method names in $passthru array to correctly mimic PHP case-insensitivity on method dispatch.'.
+                    'If you are adding a new method to the $passthru array, make sure the name is lowercased.'
+            );
+        }
+    }
+
     protected function mockConnectionForModel($model, $database)
     {
         $grammarClass = 'Illuminate\Database\Query\Grammars\\'.$database.'Grammar';
