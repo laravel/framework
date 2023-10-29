@@ -196,7 +196,7 @@ class Arr
                 return $item;
             }
 
-            return null;
+            return value($default);
         }
 
         foreach ($array as $key => $value) {
