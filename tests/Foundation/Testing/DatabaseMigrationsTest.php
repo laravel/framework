@@ -2,12 +2,16 @@
 
 namespace Illuminate\Tests\Foundation\Testing;
 
-use Illuminate\Contracts\Console\Kernel;
+use Illuminate\Foundation\Testing\Concerns\InteractsWithConsole;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Foundation\Testing\RefreshDatabaseState;
 use Mockery as m;
+use Orchestra\Testbench\Concerns\Testing;
+use Orchestra\Testbench\Foundation\Application as Testbench;
 use PHPUnit\Framework\TestCase;
 use ReflectionMethod;
+
+use function Orchestra\Testbench\package_path;
 
 class DatabaseMigrationsTest extends TestCase
 {
@@ -15,20 +19,19 @@ class DatabaseMigrationsTest extends TestCase
 
     protected function setUp(): void
     {
-        RefreshDatabaseState::$migrated = false;
+        $this->traitObject = m::mock(DatabaseMigrationsTestMockClass::class)->makePartial();
+        $this->traitObject->setUp();
+    }
 
-        $this->traitObject = $this->getMockForAbstractClass(DatabaseMigrationsTestMockClass::class, [], '', true, true, true, [
-            'artisan',
-            'beforeApplicationDestroyed',
-        ]);
+    protected function tearDown(): void
+    {
+        $this->traitObject->tearDown();
 
-        $kernelObj = m::mock();
-        $kernelObj->shouldReceive('setArtisan')
-            ->with(null);
+        if ($container = m::getContainer()) {
+            $this->addToAssertionCount($container->mockery_getExpectationCount());
+        }
 
-        $this->traitObject->app = [
-            Kernel::class => $kernelObj,
-        ];
+        m::close();
     }
 
     private function __reflectAndSetupAccessibleForProtectedTraitMethod($methodName)
@@ -44,8 +47,8 @@ class DatabaseMigrationsTest extends TestCase
     public function testRefreshTestDatabaseDefault()
     {
         $this->traitObject
-            ->expects($this->once())
-            ->method('artisan')
+            ->shouldReceive('artisan')
+            ->once()
             ->with('migrate:fresh', [
                 '--drop-views' => false,
                 '--drop-types' => false,
@@ -62,8 +65,8 @@ class DatabaseMigrationsTest extends TestCase
         $this->traitObject->dropViews = true;
 
         $this->traitObject
-            ->expects($this->once())
-            ->method('artisan')
+            ->shouldReceive('artisan')
+            ->once()
             ->with('migrate:fresh', [
                 '--drop-views' => true,
                 '--drop-types' => false,
@@ -80,8 +83,8 @@ class DatabaseMigrationsTest extends TestCase
         $this->traitObject->dropTypes = true;
 
         $this->traitObject
-            ->expects($this->once())
-            ->method('artisan')
+            ->shouldReceive('artisan')
+            ->once()
             ->with('migrate:fresh', [
                 '--drop-views' => false,
                 '--drop-types' => true,
@@ -97,10 +100,43 @@ class DatabaseMigrationsTest extends TestCase
 class DatabaseMigrationsTestMockClass
 {
     use DatabaseMigrations;
-
-    public $app;
+    use InteractsWithConsole;
+    use Testing;
 
     public $dropViews = false;
 
     public $dropTypes = false;
+
+    public function setUp()
+    {
+        RefreshDatabaseState::$migrated = false;
+
+        $this->app = $this->refreshApplication();
+        $this->withoutMockingConsoleOutput();
+    }
+
+    public function tearDown()
+    {
+        RefreshDatabaseState::$migrated = false;
+
+        $this->callBeforeApplicationDestroyedCallbacks();
+        $this->app?->flush();
+    }
+
+    protected function setUpTraits()
+    {
+        return [];
+    }
+
+    protected function setUpTheTestEnvironmentTraitToBeIgnored(string $use): bool
+    {
+        return true;
+    }
+
+    protected function refreshApplication()
+    {
+        return Testbench::create(
+            basePath: package_path('vendor/orchestra/testbench-core/laravel')
+        );
+    }
 }
