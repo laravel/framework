@@ -5,11 +5,18 @@ namespace Illuminate\Database;
 class DatabaseTransactionsManager
 {
     /**
-     * All of the recorded transactions.
+     * All of the recorded ready transactions.
      *
      * @var \Illuminate\Support\Collection<int, \Illuminate\Database\DatabaseTransactionRecord>
      */
-    protected $transactions;
+    protected $readyTransactions;
+
+    /**
+     * All of the recorded pending transactions.
+     *
+     * @var \Illuminate\Support\Collection<int, \Illuminate\Database\DatabaseTransactionRecord>
+     */
+    protected $pendingTransactions;
 
     /**
      * Create a new database transactions manager instance.
@@ -18,7 +25,8 @@ class DatabaseTransactionsManager
      */
     public function __construct()
     {
-        $this->transactions = collect();
+        $this->readyTransactions = collect();
+        $this->pendingTransactions = collect();
     }
 
     /**
@@ -30,7 +38,7 @@ class DatabaseTransactionsManager
      */
     public function begin($connection, $level)
     {
-        $this->transactions->push(
+        $this->pendingTransactions->push(
             new DatabaseTransactionRecord($connection, $level)
         );
     }
@@ -44,7 +52,7 @@ class DatabaseTransactionsManager
      */
     public function rollback($connection, $level)
     {
-        $this->transactions = $this->transactions->reject(
+        $this->pendingTransactions = $this->pendingTransactions->reject(
             fn ($transaction) => $transaction->connection == $connection && $transaction->level > $level
         )->values();
     }
@@ -57,11 +65,11 @@ class DatabaseTransactionsManager
      */
     public function commit($connection)
     {
-        [$forThisConnection, $forOtherConnections] = $this->transactions->partition(
+        [$forThisConnection, $forOtherConnections] = $this->readyTransactions->partition(
             fn ($transaction) => $transaction->connection == $connection
         );
 
-        $this->transactions = $forOtherConnections->values();
+        $this->readyTransactions = $forOtherConnections->values();
 
         $forThisConnection->map->executeCallbacks();
     }
@@ -82,13 +90,27 @@ class DatabaseTransactionsManager
     }
 
     /**
+     * Move all the pending transactions to a ready state.
+     *
+     * @return void
+     */
+    public function stageTransactions()
+    {
+        $this->readyTransactions = $this->readyTransactions->merge(
+            $this->pendingTransactions
+        );
+
+        $this->pendingTransactions = collect();
+    }
+
+    /**
      * Get the transactions that are applicable to callbacks.
      *
      * @return \Illuminate\Support\Collection<int, \Illuminate\Database\DatabaseTransactionRecord>
      */
     public function callbackApplicableTransactions()
     {
-        return $this->transactions;
+        return $this->pendingTransactions;
     }
 
     /**
@@ -109,6 +131,6 @@ class DatabaseTransactionsManager
      */
     public function getTransactions()
     {
-        return $this->transactions;
+        return $this->readyTransactions;
     }
 }
