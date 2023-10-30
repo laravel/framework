@@ -463,7 +463,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
     public function testAddingFloat()
     {
         $blueprint = new Blueprint('users');
-        $blueprint->float('foo', 5, 2);
+        $blueprint->float('foo', 5);
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
@@ -473,11 +473,11 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
     public function testAddingDouble()
     {
         $blueprint = new Blueprint('users');
-        $blueprint->double('foo', 15, 8);
+        $blueprint->double('foo');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertSame('alter table "users" add column "foo" float not null', $statements[0]);
+        $this->assertSame('alter table "users" add column "foo" double not null', $statements[0]);
     }
 
     public function testAddingDecimal()

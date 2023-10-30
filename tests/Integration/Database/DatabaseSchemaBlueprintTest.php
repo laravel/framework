@@ -123,7 +123,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $schema->useNativeSchemaOperationsIfPossible();
 
         $blueprint = new Blueprint('users', function ($table) {
-            $table->double('amount', 6, 2)->nullable()->invisible()->after('name')->change();
+            $table->double('amount')->nullable()->invisible()->after('name')->change();
             $table->timestamp('added_at', 4)->nullable(false)->useCurrent()->useCurrentOnUpdate()->change();
             $table->enum('difficulty', ['easy', 'hard'])->default('easy')->charset('utf8mb4')->collation('unicode')->change();
             $table->multiPolygon('positions')->srid(1234)->storedAs('expression')->change();
@@ -133,7 +133,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
 
         $this->assertEquals([
             'alter table `users` '
-            .'modify `amount` double(6, 2) null invisible after `name`, '
+            .'modify `amount` double null invisible after `name`, '
             .'modify `added_at` timestamp(4) not null default CURRENT_TIMESTAMP(4) on update CURRENT_TIMESTAMP(4), '
             ."modify `difficulty` enum('easy', 'hard') character set utf8mb4 collate 'unicode' not null default 'easy', "
             .'modify `positions` multipolygon as (expression) stored srid 1234, '
