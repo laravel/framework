@@ -14,6 +14,9 @@ class DatabaseTransactionsTest extends DatabaseTestCase
             new TestObjectForTransactions(),
         ];
 
+        // The problem here is that we're initiating a base transaction, and then two nested transactions.
+        // Although these two nested transactions are not the same, they share the same level (2).
+        // Since they are not the same, the latter one failing should not affect the first one.
         DB::transaction(function () use ($thirdObject, $secondObject, $firstObject) { // Adds a transaction @ level 1
             DB::transaction(function () use ($firstObject) { // Adds a transaction @ level 2
                 DB::afterCommit(fn () => $firstObject->handle()); // Adds a callback to be executed after transaction level 2 is committed
