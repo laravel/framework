@@ -1036,20 +1036,10 @@ class PendingRequest
             $this->transferStats = $transferStats;
         };
 
-        $mergedOptions = $this->mergeOptions([
+        $mergedOptions = $this->normalizeRequestOptions($this->mergeOptions([
             'laravel_data' => $laravelData,
             'on_stats' => $onStats,
-        ], $options);
-
-        $mergedOptions = array_map(function($mergedOption) {
-            if ( is_array( $mergedOption ) ) {
-                array_walk_recursive($mergedOption, function (&$value) {
-                    $value = $value instanceof Stringable ? $value->toString() : $value;
-                });
-            }
-
-            return $mergedOption instanceof Stringable ? $mergedOption->toString() : $mergedOption;
-        }, $mergedOptions);
+        ], $options));
 
         return $this->buildClient()->$clientMethod($method, $url, $mergedOptions);
     }
@@ -1087,6 +1077,25 @@ class PendingRequest
         }
 
         return is_array($laravelData) ? $laravelData : [];
+    }
+
+    /**
+     * Normalize the given request options.
+     *
+     * @param  array  $options
+     * @return array
+     */
+    protected function normalizeRequestOptions(array $options)
+    {
+        foreach ($options as $key => $value) {
+            $options[$key] = match (true) {
+                is_array($value) => $this->normalizeRequestOptions($value),
+                $value instanceof Stringable => $value->toString(),
+                default => $value,
+            };
+        }
+
+        return $options;
     }
 
     /**
