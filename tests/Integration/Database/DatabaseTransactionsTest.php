@@ -27,7 +27,7 @@ class DatabaseTransactionsTest extends DatabaseTestCase
             try {
                 DB::transaction(function () use ($thirdObject) { // Adds a transaction 3 @ level 2
                     DB::afterCommit(fn () => $thirdObject->handle());
-                    throw new \Exception();
+                    throw new \Exception(); // This should only affect callback 3, not 1, even though both share the same transaction level.
                 });
             } catch (\Exception) {}
         });
