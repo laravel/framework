@@ -127,13 +127,6 @@ class Connection implements ConnectionInterface
     protected $transactions = 0;
 
     /**
-     * The global counter for the unique number of transactions.
-     *
-     * @var int
-     */
-    protected $uniqueTransactionsCounter = 0;
-
-    /**
      * The transaction manager instance.
      *
      * @var \Illuminate\Database\DatabaseTransactionsManager

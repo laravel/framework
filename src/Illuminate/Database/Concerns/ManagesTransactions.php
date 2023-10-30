@@ -117,10 +117,9 @@ trait ManagesTransactions
         $this->createTransaction();
 
         $this->transactions++;
-        $this->uniqueTransactionsCounter++;
 
         $this->transactionsManager?->begin(
-            $this->getName(), $this->transactions, $this->uniqueTransactionsCounter
+            $this->getName(), $this->transactions
         );
 
         $this->fireConnectionEvent('beganTransaction');
@@ -272,7 +271,7 @@ trait ManagesTransactions
         $this->transactions = $toLevel;
 
         $this->transactionsManager?->rollback(
-            $this->getName(), $this->transactions, $this->uniqueTransactionsCounter
+            $this->getName(), $this->transactions
         );
 
         $this->fireConnectionEvent('rollingBack');

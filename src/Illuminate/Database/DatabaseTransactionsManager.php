@@ -26,13 +26,12 @@ class DatabaseTransactionsManager
      *
      * @param  string  $connection
      * @param  int  $level
-     * @param  int  $counter
      * @return void
      */
-    public function begin($connection, $level, $counter)
+    public function begin($connection, $level)
     {
         $this->transactions->push(
-            new DatabaseTransactionRecord($connection, $level, $counter)
+            new DatabaseTransactionRecord($connection, $level)
         );
     }
 
@@ -41,13 +40,12 @@ class DatabaseTransactionsManager
      *
      * @param  string  $connection
      * @param  int  $level
-     * @param  int $counter
      * @return void
      */
-    public function rollback($connection, $level, $counter)
+    public function rollback($connection, $level)
     {
         $this->transactions = $this->transactions->reject(
-            fn ($transaction) => $transaction->connection == $connection && $transaction->level > $level && $transaction->counter === $counter
+            fn ($transaction) => $transaction->connection == $connection && $transaction->level > $level
         )->values();
     }
 
