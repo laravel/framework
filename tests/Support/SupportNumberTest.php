@@ -45,10 +45,10 @@ class SupportNumberTest extends TestCase
     {
         $this->assertSame('0 B', Number::bytesToHuman(0));
         $this->assertSame('1 B', Number::bytesToHuman(1));
-        $this->assertSame('1 KB', Number::bytesToHuman(1024));
-        $this->assertSame('2 KB', Number::bytesToHuman(2048));
-        $this->assertSame('1.23 KB', Number::bytesToHuman(1264));
-        $this->assertSame('1.234 KB', Number::bytesToHuman(1264, 3));
+        $this->assertSame('1 kB', Number::bytesToHuman(1024));
+        $this->assertSame('2 kB', Number::bytesToHuman(2048));
+        $this->assertSame('1.23 kB', Number::bytesToHuman(1264));
+        $this->assertSame('1.234 kB', Number::bytesToHuman(1264, 3));
         $this->assertSame('5 GB', Number::bytesToHuman(1024 * 1024 * 1024 * 5));
         $this->assertSame('10 TB', Number::bytesToHuman((1024 ** 4) * 10));
         $this->assertSame('10 PB', Number::bytesToHuman((1024 ** 5) * 10));
