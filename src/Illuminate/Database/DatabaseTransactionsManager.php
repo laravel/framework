@@ -125,11 +125,21 @@ class DatabaseTransactionsManager
     }
 
     /**
-     * Get all the transactions.
+     * Get all the pending transactions.
      *
      * @return \Illuminate\Support\Collection
      */
-    public function getTransactions()
+    public function getPendingTransactions()
+    {
+        return $this->pendingTransactions;
+    }
+
+    /**
+     * Get all the ready transactions.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function getReadyTransactions()
     {
         return $this->readyTransactions;
     }
