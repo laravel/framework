@@ -609,7 +609,7 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertSame('alter table "users" add column "foo" float(5) precision not null', $statements[0]);
+        $this->assertSame('alter table "users" add column "foo" float(5) not null', $statements[0]);
     }
 
     public function testAddingDouble()
