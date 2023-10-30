@@ -14,6 +14,7 @@ class ShouldDispatchAfterCommitEventTest extends TestCase
     {
         TransactionUnawareTestEvent::$ran = false;
         ShouldDispatchAfterCommitTestEvent::$ran = false;
+        AnotherShouldDispatchAfterCommitTestEvent::$ran = false;
 
         m::close();
     }
