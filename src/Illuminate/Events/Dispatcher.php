@@ -247,7 +247,7 @@ class Dispatcher implements DispatcherContract
         // payload to the handler, which makes object based events quite simple.
         [$isEventObject, $event, $payload] = [
             is_object($event),
-            ...$this->parseEventAndPayload($event, $payload)
+            ...$this->parseEventAndPayload($event, $payload),
         ];
 
         // If the event is not intended to be dispatched unless the current database
