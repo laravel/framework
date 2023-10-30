@@ -3,7 +3,6 @@
 namespace Illuminate\Tests\Queue;
 
 use Illuminate\Queue\Jobs\RedisJob;
-use Illuminate\Queue\Jobs\SyncJob;
 use Illuminate\Queue\MaxAttemptsExceededException;
 use Illuminate\Queue\TimeoutExceededException;
 use PHPUnit\Framework\TestCase;
