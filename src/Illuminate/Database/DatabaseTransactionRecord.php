@@ -19,6 +19,13 @@ class DatabaseTransactionRecord
     public $level;
 
     /**
+     * The transaction counter.
+     *
+     * @var int
+     */
+    public $counter;
+
+    /**
      * The callbacks that should be executed after committing.
      *
      * @var array
@@ -30,12 +37,14 @@ class DatabaseTransactionRecord
      *
      * @param  string  $connection
      * @param  int  $level
+     * @param  int  $counter
      * @return void
      */
-    public function __construct($connection, $level)
+    public function __construct($connection, $level, $counter)
     {
         $this->connection = $connection;
         $this->level = $level;
+        $this->counter = $counter;
     }
 
     /**
