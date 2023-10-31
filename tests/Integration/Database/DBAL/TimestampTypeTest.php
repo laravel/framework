@@ -40,8 +40,7 @@ class TimestampTypeTest extends DatabaseTestCase
         // Only Postgres and MySQL actually have a timestamp type
         $this->assertSame(
             match ($this->driver) {
-                'mysql' => 'timestamp',
-                'pgsql' => 'timestamp without time zone',
+                'mysql', 'pgsql' => 'timestamp',
                 default => 'datetime',
             },
             Schema::getColumnType('test', 'datetime_to_timestamp')
@@ -62,7 +61,7 @@ class TimestampTypeTest extends DatabaseTestCase
         // Postgres only has a timestamp type
         $this->assertSame(
             match ($this->driver) {
-                'pgsql' => 'timestamp without time zone',
+                'pgsql' => 'timestamp',
                 'sqlsrv' => 'datetime2',
                 default => 'datetime',
             },
