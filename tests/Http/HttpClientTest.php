@@ -803,7 +803,7 @@ class HttpClientTest extends TestCase
                 'Name' => 'foo',
                 'Value' => 'bar',
                 'Domain' => 'https://laravel.com',
-            ]
+            ],
         ]);
 
         $response = $this->factory->withCookieJar($cookieJar)
