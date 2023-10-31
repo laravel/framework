@@ -2,8 +2,6 @@
 
 namespace Illuminate\Tests\Database;
 
-use Doctrine\DBAL\Schema\Column;
-use Doctrine\DBAL\Types\Type;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Query\Processors\Processor;
 use Illuminate\Database\Schema\Builder;
