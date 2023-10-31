@@ -1721,7 +1721,7 @@ class Mailable implements MailableContract, Renderable
         }
 
         if ($content->html) {
-            $this->view($content->html);
+            $this->html($content->html);
         }
 
         if ($content->text) {
