@@ -5704,13 +5704,13 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
-    public function testMapEnum($collection)
+    public function testMapIntoEnum($collection)
     {
         $data = new $collection([
             1, 2,
         ]);
 
-        $data = $data->mapEnum(TestBackedEnum::class);
+        $data = $data->mapIntoEnum(TestBackedEnum::class);
 
         $this->assertSame(TestBackedEnum::A, $data->get(0));
         $this->assertSame(TestBackedEnum::B, $data->get(1));

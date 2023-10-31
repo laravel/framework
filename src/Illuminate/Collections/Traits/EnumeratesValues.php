@@ -417,7 +417,7 @@ trait EnumeratesValues
      * @param  class-string<TEnum>  $enumClass
      * @return static<TKey, TEnum>
      */
-    public function mapEnum($enumClass)
+    public function mapIntoEnum($enumClass)
     {
         return $this->map(fn ($value) => enum_exists($enumClass) && method_exists($enumClass, 'tryFrom') ? $enumClass::tryFrom($value) : null);
     }
