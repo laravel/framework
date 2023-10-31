@@ -52,11 +52,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
                 'CREATE TABLE users (name VARCHAR NOT NULL, age INTEGER NOT NULL)',
                 'INSERT INTO users (name, age) SELECT name, age FROM __temp__users',
                 'DROP TABLE __temp__users',
-                'CREATE TEMPORARY TABLE __temp__users AS SELECT name, age FROM users',
-                'DROP TABLE users',
-                'CREATE TABLE users (first_name VARCHAR NOT NULL, age VARCHAR NOT NULL)',
-                'INSERT INTO users (first_name, age) SELECT name, age FROM __temp__users',
-                'DROP TABLE __temp__users',
+                'alter table "users" rename column "name" to "first_name"',
             ],
         ];
 
@@ -632,39 +628,6 @@ class DatabaseSchemaBlueprintTest extends TestCase
             'drop index "users_name_unique" on "users"',
             $blueprint->toSql($connection, new SqlServerGrammar)
         );
-    }
-
-    public function testItEnsuresDroppingMultipleColumnsIsAvailable()
-    {
-        $this->expectException(BadMethodCallException::class);
-        $this->expectExceptionMessage("SQLite doesn't support multiple calls to dropColumn / renameColumn in a single modification.");
-
-        Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn('name');
-            $table->dropColumn('email');
-        });
-    }
-
-    public function testItEnsuresRenamingMultipleColumnsIsAvailable()
-    {
-        $this->expectException(BadMethodCallException::class);
-        $this->expectExceptionMessage("SQLite doesn't support multiple calls to dropColumn / renameColumn in a single modification.");
-
-        Schema::table('users', function (Blueprint $table) {
-            $table->renameColumn('name', 'first_name');
-            $table->renameColumn('name2', 'last_name');
-        });
-    }
-
-    public function testItEnsuresRenamingAndDroppingMultipleColumnsIsAvailable()
-    {
-        $this->expectException(BadMethodCallException::class);
-        $this->expectExceptionMessage("SQLite doesn't support multiple calls to dropColumn / renameColumn in a single modification.");
-
-        Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn('name');
-            $table->renameColumn('name2', 'last_name');
-        });
     }
 
     public function testItDoesNotSetPrecisionHigherThanSupportedWhenRenamingTimestamps()
