@@ -5700,6 +5700,21 @@ class SupportCollectionTest extends TestCase
             [LazyCollection::class],
         ];
     }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testMapEnum($collection)
+    {
+        $data = new $collection([
+            1, 2,
+        ]);
+
+        $data = $data->mapEnum(TestBackedEnum::class);
+
+        $this->assertSame(TestBackedEnum::A, $data->get(0));
+        $this->assertSame(TestBackedEnum::B, $data->get(1));
+    }
 }
 
 class TestSupportCollectionHigherOrderItem
