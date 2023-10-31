@@ -42,7 +42,7 @@ class DatabaseMySqlSchemaBuilderAlterTableWithEnumTest extends MySqlTestCase
             $table->unsignedInteger('age')->charset('')->change();
         });
 
-        $this->assertSame('integer', Schema::getColumnType('users', 'age'));
+        $this->assertSame('int', Schema::getColumnType('users', 'age'));
     }
 
     public function testGetAllTablesAndColumnListing()

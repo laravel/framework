@@ -153,12 +153,10 @@ class SqlServerGrammar extends Grammar
      */
     public function compileRenameColumn(Blueprint $blueprint, Fluent $command, Connection $connection)
     {
-        return $connection->usingNativeSchemaOperations()
-            ? sprintf("sp_rename '%s', %s, 'COLUMN'",
-                $this->wrap($blueprint->getTable().'.'.$command->from),
-                $this->wrap($command->to)
-            )
-            : parent::compileRenameColumn($blueprint, $command, $connection);
+        return sprintf("sp_rename '%s', %s, 'COLUMN'",
+            $this->wrap($blueprint->getTable().'.'.$command->from),
+            $this->wrap($command->to)
+        );
     }
 
     /**

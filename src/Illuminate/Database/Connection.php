@@ -1227,20 +1227,6 @@ class Connection implements ConnectionInterface
     }
 
     /**
-     * Get a Doctrine Schema Column instance.
-     *
-     * @param  string  $table
-     * @param  string  $column
-     * @return \Doctrine\DBAL\Schema\Column
-     */
-    public function getDoctrineColumn($table, $column)
-    {
-        $schema = $this->getDoctrineSchemaManager();
-
-        return $schema->introspectTable($table)->getColumn($column);
-    }
-
-    /**
      * Get the Doctrine DBAL schema manager for the connection.
      *
      * @return \Doctrine\DBAL\Schema\AbstractSchemaManager

@@ -38,9 +38,14 @@ class TimestampTypeTest extends DatabaseTestCase
 
         $this->assertTrue(Schema::hasColumn('test', 'datetime_to_timestamp'));
         // Only Postgres and MySQL actually have a timestamp type
-        in_array($this->driver, ['pgsql', 'mysql'])
-            ? $this->assertSame('timestamp', Schema::getColumnType('test', 'datetime_to_timestamp'))
-            : $this->assertSame('datetime', Schema::getColumnType('test', 'datetime_to_timestamp'));
+        $this->assertSame(
+            match ($this->driver) {
+                'mysql' => 'timestamp',
+                'pgsql' => 'timestamp without time zone',
+                default => 'datetime',
+            },
+            Schema::getColumnType('test', 'datetime_to_timestamp')
+        );
     }
 
     public function testChangeTimestampColumnToDatetimeColumn()
@@ -55,9 +60,14 @@ class TimestampTypeTest extends DatabaseTestCase
 
         $this->assertTrue(Schema::hasColumn('test', 'timestamp_to_datetime'));
         // Postgres only has a timestamp type
-        $this->driver === 'pgsql'
-            ? $this->assertSame('timestamp', Schema::getColumnType('test', 'timestamp_to_datetime'))
-            : $this->assertSame('datetime', Schema::getColumnType('test', 'timestamp_to_datetime'));
+        $this->assertSame(
+            match ($this->driver) {
+                'pgsql' => 'timestamp without time zone',
+                'sqlsrv' => 'datetime2',
+                default => 'datetime',
+            },
+            Schema::getColumnType('test', 'timestamp_to_datetime')
+        );
     }
 
     public function testChangeStringColumnToTimestampColumn()

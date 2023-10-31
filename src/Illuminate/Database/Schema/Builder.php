@@ -238,14 +238,6 @@ class Builder
      */
     public function getColumnType($table, $column, $fullDefinition = false)
     {
-        $table = $this->connection->getTablePrefix().$table;
-
-        if (! $this->connection->usingNativeSchemaOperations()) {
-            $type = $this->connection->getDoctrineColumn($table, $column)->getType();
-
-            return $type::lookupName($type);
-        }
-
         $columns = $this->getColumns($table);
 
         foreach ($columns as $value) {
