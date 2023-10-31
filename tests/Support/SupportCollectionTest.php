@@ -5731,6 +5731,18 @@ class SupportCollectionTest extends TestCase
         $this->assertSame(TestBackedEnum::B, $data->get(1));
         $this->assertSame(null, $data->get(2));
     }
+    
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testMapIntoEnumThrowsInvalidArgumentException($collection)
+    {
+        $data = new $collection();
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage(Collection::class . ' is not a valid BackedEnum class');
+        $data->mapIntoEnum(Collection::class);
+    }
 }
 
 class TestSupportCollectionHigherOrderItem
