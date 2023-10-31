@@ -5722,7 +5722,7 @@ class SupportCollectionTest extends TestCase
     public function testMapIntoEnumIgnoresMissingValues($collection)
     {
         $data = new $collection([
-            1, 2, 3
+            1, 2, 3,
         ]);
 
         $data = $data->mapIntoEnum(TestBackedEnum::class);
@@ -5740,7 +5740,7 @@ class SupportCollectionTest extends TestCase
         $data = new $collection();
 
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage(Collection::class . ' is not a valid BackedEnum class');
+        $this->expectExceptionMessage(Collection::class .' is not a valid BackedEnum class');
         $data->mapIntoEnum(Collection::class);
     }
 }

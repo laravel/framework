@@ -412,7 +412,7 @@ trait EnumeratesValues
     /**
      * Map the values into a new Enum class.
      *
-     * @template TMapIntoValue
+     * @template TEnum
      *
      * @param  class-string<TEnum>  $enumClass
      * @return static<TKey, TEnum>
@@ -421,7 +421,7 @@ trait EnumeratesValues
     {
         $validEnum = enum_exists($enumClass) && method_exists($enumClass, 'tryFrom');
 
-        throw_unless($validEnum, \InvalidArgumentException::class, $enumClass .' is not a valid BackedEnum class');
+        throw_unless($validEnum, \InvalidArgumentException::class, $enumClass.' is not a valid BackedEnum class');
 
         return $this
             ->filter(fn($value) => is_string($value) || is_int($value))
