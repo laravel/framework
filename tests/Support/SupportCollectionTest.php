@@ -5731,7 +5731,7 @@ class SupportCollectionTest extends TestCase
         $this->assertSame(TestBackedEnum::B, $data->get(1));
         $this->assertSame(null, $data->get(2));
     }
-    
+
     /**
      * @dataProvider collectionClassProvider
      */
