@@ -410,6 +410,19 @@ trait EnumeratesValues
     }
 
     /**
+     * Map the values into a new Enum class.
+     *
+     * @template TMapIntoValue
+     *
+     * @param  class-string<TEnum>  $enumClass
+     * @return static<TKey, TEnum>
+     */
+    public function mapEnum($enumClass)
+    {
+        return $this->map(fn ($value) => enum_exists($enumClass) && method_exists($enumClass, 'tryFrom') ? $enumClass::tryFrom($value) : null);
+    }
+
+    /**
      * Get the min value of a given key.
      *
      * @param  (callable(TValue):mixed)|string|null  $callback
