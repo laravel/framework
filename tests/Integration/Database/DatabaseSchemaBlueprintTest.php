@@ -16,10 +16,6 @@ class DatabaseSchemaBlueprintTest extends TestCase
 {
     protected function setUp(): void
     {
-        $this->beforeApplicationDestroyed(function () {
-            Schema::useNativeSchemaOperationsIfPossible(false);
-        });
-
         parent::setUp();
     }
 
@@ -64,8 +60,6 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $connection = DB::connection();
         $schema = $connection->getSchemaBuilder();
 
-        $schema->useNativeSchemaOperationsIfPossible();
-
         $base = new Blueprint('users', function ($table) {
             $table->renameColumn('name', 'new_name');
         });
@@ -102,8 +96,6 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $connection = DB::connection();
         $schema = $connection->getSchemaBuilder();
 
-        $schema->useNativeSchemaOperationsIfPossible();
-
         $blueprint = new Blueprint('users', function ($table) {
             $table->dropColumn('name');
         });
@@ -115,8 +107,6 @@ class DatabaseSchemaBlueprintTest extends TestCase
     {
         $connection = DB::connection();
         $schema = $connection->getSchemaBuilder();
-
-        $schema->useNativeSchemaOperationsIfPossible();
 
         $blueprint = new Blueprint('users', function ($table) {
             $table->double('amount', 6, 2)->nullable()->invisible()->after('name')->change();
@@ -143,8 +133,6 @@ class DatabaseSchemaBlueprintTest extends TestCase
     {
         $connection = DB::connection();
         $schema = $connection->getSchemaBuilder();
-
-        $schema->useNativeSchemaOperationsIfPossible();
 
         $blueprint = new Blueprint('users', function ($table) {
             $table->integer('code')->autoIncrement()->from(10)->comment('my comment')->change();
@@ -219,8 +207,6 @@ class DatabaseSchemaBlueprintTest extends TestCase
     {
         $connection = DB::connection();
         $schema = $connection->getSchemaBuilder();
-
-        $schema->useNativeSchemaOperationsIfPossible();
 
         $blueprint = new Blueprint('users', function ($table) {
             $table->timestamp('added_at', 4)->nullable(false)->useCurrent()->change();
@@ -438,11 +424,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
 
         $expected = [
             [
-                'CREATE TEMPORARY TABLE __temp__users AS SELECT name FROM users',
-                'DROP TABLE users',
-                'CREATE TABLE users (name VARCHAR(255) DEFAULT NULL)',
-                'INSERT INTO users (name) SELECT name FROM __temp__users',
-                'DROP TABLE __temp__users',
+                'alter table `users` modify `name` varchar(255) null',
                 'alter table `users` add unique `users_name_unique`(`name`)',
             ],
         ];
@@ -457,13 +439,9 @@ class DatabaseSchemaBlueprintTest extends TestCase
 
         $expected = [
             [
-
-                'CREATE TEMPORARY TABLE __temp__users AS SELECT name FROM users',
-                'DROP TABLE users',
-                'CREATE TABLE users (name VARCHAR(255) DEFAULT NULL)',
-                'INSERT INTO users (name) SELECT name FROM __temp__users',
-                'DROP TABLE __temp__users',
+                'alter table "users" alter column "name" type varchar(255), alter column "name" drop not null, alter column "name" drop default, alter column "name" drop identity if exists',
                 'alter table "users" add constraint "users_name_unique" unique ("name")',
+                'comment on column "users"."name" is NULL',
             ],
         ];
 
@@ -496,11 +474,8 @@ class DatabaseSchemaBlueprintTest extends TestCase
 
         $expected = [
             [
-                'CREATE TEMPORARY TABLE __temp__users AS SELECT name FROM users',
-                'DROP TABLE users',
-                'CREATE TABLE users (name VARCHAR(255) DEFAULT NULL)',
-                'INSERT INTO users (name) SELECT name FROM __temp__users',
-                'DROP TABLE __temp__users',
+                "DECLARE @sql NVARCHAR(MAX) = '';SELECT @sql += 'ALTER TABLE [dbo].[users] DROP CONSTRAINT ' + OBJECT_NAME([default_object_id]) + ';' FROM sys.columns WHERE [object_id] = OBJECT_ID('[dbo].[users]') AND [name] in ('name') AND [default_object_id] <> 0;EXEC(@sql)",
+                'alter table "users" alter column "name" nvarchar(255) null',
                 'create unique index "users_name_unique" on "users" ("name")',
             ],
         ];
@@ -522,11 +497,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
 
         $expected = [
             [
-                'CREATE TEMPORARY TABLE __temp__users AS SELECT name FROM users',
-                'DROP TABLE users',
-                'CREATE TABLE users (name VARCHAR(255) DEFAULT NULL)',
-                'INSERT INTO users (name) SELECT name FROM __temp__users',
-                'DROP TABLE __temp__users',
+                'alter table `users` modify `name` varchar(255) null',
                 'alter table `users` add unique `index1`(`name`)',
             ],
         ];
@@ -540,12 +511,9 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $queries = $blueprintPostgres->toSql(DB::connection(), new PostgresGrammar);
 
         $expected = [
-            'CREATE TEMPORARY TABLE __temp__users AS SELECT name FROM users',
-            'DROP TABLE users',
-            'CREATE TABLE users (name INTEGER UNSIGNED DEFAULT NULL)',
-            'INSERT INTO users (name) SELECT name FROM __temp__users',
-            'DROP TABLE __temp__users',
+            'alter table "users" alter column "name" type integer, alter column "name" drop not null, alter column "name" drop default, alter column "name" drop identity if exists',
             'alter table "users" add constraint "index1" unique ("name")',
+            'comment on column "users"."name" is NULL',
         ];
 
         $this->assertEquals($expected, $queries);
@@ -574,11 +542,8 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $queries = $blueprintSqlServer->toSql(DB::connection(), new SqlServerGrammar);
 
         $expected = [
-            'CREATE TEMPORARY TABLE __temp__users AS SELECT name FROM users',
-            'DROP TABLE users',
-            'CREATE TABLE users (name INTEGER UNSIGNED DEFAULT NULL)',
-            'INSERT INTO users (name) SELECT name FROM __temp__users',
-            'DROP TABLE __temp__users',
+            "DECLARE @sql NVARCHAR(MAX) = '';SELECT @sql += 'ALTER TABLE [dbo].[users] DROP CONSTRAINT ' + OBJECT_NAME([default_object_id]) + ';' FROM sys.columns WHERE [object_id] = OBJECT_ID('[dbo].[users]') AND [name] in ('name') AND [default_object_id] <> 0;EXEC(@sql)",
+            'alter table "users" alter column "name" int null',
             'create unique index "index1" on "users" ("name")',
         ];
 

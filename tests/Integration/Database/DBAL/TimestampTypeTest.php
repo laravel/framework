@@ -85,7 +85,7 @@ class TimestampTypeTest extends DatabaseTestCase
 
         $queries = $blueprint->toSql($this->getConnection(), $this->getConnection()->getSchemaGrammar());
 
-        $expected = ['ALTER TABLE test CHANGE string_to_timestamp string_to_timestamp TIMESTAMP NULL DEFAULT NULL'];
+        $expected = ['alter table `test` modify `string_to_timestamp` timestamp null'];
 
         $this->assertEquals($expected, $queries);
     }

@@ -105,9 +105,9 @@ class SchemaBuilderTest extends DatabaseTestCase
 
             $queries = $blueprint->toSql($this->getConnection(), $this->getConnection()->getSchemaGrammar());
 
-            $uppercase = strtoupper($type);
+            $uppercase = strtolower($type);
 
-            $expected = ["ALTER TABLE test CHANGE test_column test_column $uppercase NOT NULL"];
+            $expected = ["alter table `test` modify `test_column` $uppercase not null"];
 
             $this->assertEquals($expected, $queries);
         }
@@ -130,9 +130,9 @@ class SchemaBuilderTest extends DatabaseTestCase
 
             $queries = $blueprint->toSql($this->getConnection(), $this->getConnection()->getSchemaGrammar());
 
-            $uppercase = strtoupper($type);
+            $uppercase = strtolower($type);
 
-            $expected = ["ALTER TABLE test CHANGE test_column test_column $uppercase NOT NULL"];
+            $expected = ["alter table `test` modify `test_column` $uppercase not null"];
 
             $this->assertEquals($expected, $queries);
         }

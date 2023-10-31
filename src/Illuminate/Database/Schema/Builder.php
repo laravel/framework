@@ -46,11 +46,11 @@ class Builder
     public static $defaultMorphKeyType = 'int';
 
     /**
-     * Indicates whether Doctrine DBAL usage will be prevented if possible when dropping, renaming, and modifying columns.
+     * Indicates whether Doctrine DBAL usage will be prevented if possible when modifying columns.
      *
      * @var bool
      */
-    public static $alwaysUsesNativeSchemaOperationsIfPossible = false;
+    public static $alwaysUsesNativeSchemaOperationsIfPossible = true;
 
     /**
      * Create a new database Schema manager.
