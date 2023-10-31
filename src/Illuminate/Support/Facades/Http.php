@@ -45,6 +45,7 @@ use Illuminate\Http\Client\Factory;
  * @method static \Illuminate\Http\Client\PendingRequest withUserAgent(string|bool $userAgent)
  * @method static \Illuminate\Http\Client\PendingRequest withUrlParameters(array $parameters = [])
  * @method static \Illuminate\Http\Client\PendingRequest withCookies(array $cookies, string $domain)
+ * @method static \Illuminate\Http\Client\PendingRequest withCookieJar(\GuzzleHttp\Cookie\CookieJarInterface $cookieJar)
  * @method static \Illuminate\Http\Client\PendingRequest maxRedirects(int $max)
  * @method static \Illuminate\Http\Client\PendingRequest withoutRedirecting()
  * @method static \Illuminate\Http\Client\PendingRequest withoutVerifying()

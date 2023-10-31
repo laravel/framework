@@ -6,6 +6,7 @@ use Closure;
 use Exception;
 use GuzzleHttp\Client;
 use GuzzleHttp\Cookie\CookieJar;
+use GuzzleHttp\Cookie\CookieJarInterface;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Exception\TransferException;
@@ -516,6 +517,21 @@ class PendingRequest
         return tap($this, function () use ($cookies, $domain) {
             $this->options = array_merge_recursive($this->options, [
                 'cookies' => CookieJar::fromArray($cookies, $domain),
+            ]);
+        });
+    }
+
+    /**
+     * Specify the CookieJar that should be used with the request.
+     *
+     * @param  CookieJarInterface  $cookieJar
+     * @return $this
+     */
+    public function withCookieJar(CookieJarInterface $cookieJar)
+    {
+        return tap($this, function () use ($cookieJar) {
+            $this->options = array_merge_recursive($this->options, [
+                'cookies' => $cookieJar
             ]);
         });
     }
