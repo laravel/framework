@@ -62,7 +62,6 @@ class TimestampTypeTest extends DatabaseTestCase
         $this->assertSame(
             match ($this->driver) {
                 'pgsql' => 'timestamp',
-                'sqlsrv' => 'datetime2',
                 default => 'datetime',
             },
             Schema::getColumnType('test', 'timestamp_to_datetime')
