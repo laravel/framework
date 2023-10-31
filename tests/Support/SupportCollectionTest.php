@@ -5740,7 +5740,7 @@ class SupportCollectionTest extends TestCase
         $data = new $collection();
 
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage(Collection::class .' is not a valid BackedEnum class');
+        $this->expectExceptionMessage(Collection::class.' is not a valid BackedEnum class');
         $data->mapIntoEnum(Collection::class);
     }
 }

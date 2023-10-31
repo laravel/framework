@@ -424,9 +424,9 @@ trait EnumeratesValues
         throw_unless($validEnum, \InvalidArgumentException::class, $enumClass.' is not a valid BackedEnum class');
 
         return $this
-            ->filter(fn($value) => is_string($value) || is_int($value))
+            ->filter(fn ($value) => is_string($value) || is_int($value))
             ->map(fn ($value) => $enumClass::tryFrom($value))
-            ->filter(fn($value) => $value instanceof $enumClass);
+            ->filter(fn ($value) => $value instanceof $enumClass);
     }
 
     /**
