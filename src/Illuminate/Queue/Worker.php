@@ -14,6 +14,7 @@ use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Queue\Events\JobProcessing;
 use Illuminate\Queue\Events\JobReleasedAfterException;
 use Illuminate\Queue\Events\JobTimedOut;
+use Illuminate\Queue\Events\JobTimingOut;
 use Illuminate\Queue\Events\Looping;
 use Illuminate\Queue\Events\WorkerStopping;
 use Illuminate\Support\Carbon;
@@ -213,6 +214,10 @@ class Worker
         // signals supported in recent versions of PHP to accomplish it conveniently.
         pcntl_signal(SIGALRM, function () use ($job, $options) {
             if ($job) {
+                $this->events->dispatch(new JobTimingOut(
+                    $job->getConnectionName(), $job
+                ));
+
                 $this->markJobAsFailedIfWillExceedMaxAttempts(
                     $job->getConnectionName(), $job, (int) $options->maxTries, $e = $this->timeoutExceededException($job)
                 );
