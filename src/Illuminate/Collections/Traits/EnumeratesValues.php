@@ -419,7 +419,14 @@ trait EnumeratesValues
      */
     public function mapIntoEnum($enumClass)
     {
-        return $this->map(fn ($value) => enum_exists($enumClass) && method_exists($enumClass, 'tryFrom') ? $enumClass::tryFrom($value) : null);
+        $validEnum = enum_exists($enumClass) && method_exists($enumClass, 'tryFrom');
+
+        throw_unless($validEnum, \InvalidArgumentException::class, $enumClass .' is not a valid BackedEnum class');
+
+        return $this
+            ->filter(fn($value) => is_string($value) || is_int($value))
+            ->map(fn ($value) => $enumClass::tryFrom($value))
+            ->filter(fn($value) => $value instanceof $enumClass);
     }
 
     /**
