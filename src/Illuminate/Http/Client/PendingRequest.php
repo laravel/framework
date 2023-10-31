@@ -531,7 +531,7 @@ class PendingRequest
     {
         return tap($this, function () use ($cookieJar) {
             $this->options = array_merge_recursive($this->options, [
-                'cookies' => $cookieJar
+                'cookies' => $cookieJar,
             ]);
         });
     }

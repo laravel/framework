@@ -4,7 +4,6 @@ namespace Illuminate\Tests\Http;
 
 use Exception;
 use GuzzleHttp\Cookie\CookieJar;
-use GuzzleHttp\Cookie\SetCookie;
 use GuzzleHttp\Middleware;
 use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\Psr7\Response as Psr7Response;
@@ -803,7 +802,7 @@ class HttpClientTest extends TestCase
             [
                 'Name' => 'foo',
                 'Value' => 'bar',
-                'Domain' => 'https://laravel.com'
+                'Domain' => 'https://laravel.com',
             ]
         ]);
 
