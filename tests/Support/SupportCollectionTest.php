@@ -5715,6 +5715,22 @@ class SupportCollectionTest extends TestCase
         $this->assertSame(TestBackedEnum::A, $data->get(0));
         $this->assertSame(TestBackedEnum::B, $data->get(1));
     }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testMapIntoEnumIgnoresMissingValues($collection)
+    {
+        $data = new $collection([
+            1, 2, 3
+        ]);
+
+        $data = $data->mapIntoEnum(TestBackedEnum::class);
+
+        $this->assertSame(TestBackedEnum::A, $data->get(0));
+        $this->assertSame(TestBackedEnum::B, $data->get(1));
+        $this->assertSame(null, $data->get(2));
+    }
 }
 
 class TestSupportCollectionHigherOrderItem
