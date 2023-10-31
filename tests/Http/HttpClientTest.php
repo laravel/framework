@@ -3,6 +3,8 @@
 namespace Illuminate\Tests\Http;
 
 use Exception;
+use GuzzleHttp\Cookie\CookieJar;
+use GuzzleHttp\Cookie\SetCookie;
 use GuzzleHttp\Middleware;
 use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\Psr7\Response as Psr7Response;
@@ -791,6 +793,33 @@ class HttpClientTest extends TestCase
         $this->assertSame('foo', $responseCookie['Name']);
         $this->assertSame('bar', $responseCookie['Value']);
         $this->assertSame('https://laravel.com', $responseCookie['Domain']);
+    }
+
+    public function testWithCookieJar()
+    {
+        $this->factory->fakeSequence()->pushStatus(200);
+
+        $cookieJar = new CookieJar(cookieArray: [
+            [
+                'Name' => 'foo',
+                'Value' => 'bar',
+                'Domain' => 'https://laravel.com'
+            ]
+        ]);
+
+        $response = $this->factory->withCookieJar($cookieJar)
+            ->get('https://laravel.com');
+
+        $this->assertCount(1, $response->cookies()->toArray());
+
+        /** @var \GuzzleHttp\Cookie\CookieJarInterface $responseCookies */
+        $responseCookie = $response->cookies()->toArray()[0];
+
+        $this->assertSame('foo', $responseCookie['Name']);
+        $this->assertSame('bar', $responseCookie['Value']);
+        $this->assertSame('https://laravel.com', $responseCookie['Domain']);
+
+        $this->assertSame($response->cookies(), $cookieJar);
     }
 
     public function testWithQueryParameters()
