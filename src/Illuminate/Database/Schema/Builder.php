@@ -238,9 +238,9 @@ class Builder
      */
     public function getColumnType($table, $column, $fullDefinition = false)
     {
-        $table = $this->connection->getTablePrefix().$table;
-
         if (! $this->connection->usingNativeSchemaOperations()) {
+            $table = $this->connection->getTablePrefix().$table;
+
             return $this->connection->getDoctrineColumn($table, $column)->getType()->getName();
         }
 
