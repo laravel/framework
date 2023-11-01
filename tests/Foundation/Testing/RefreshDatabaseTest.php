@@ -6,7 +6,7 @@ use Illuminate\Foundation\Testing\Concerns\InteractsWithConsole;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\RefreshDatabaseState;
 use Mockery as m;
-use Orchestra\Testbench\Concerns\Testing;
+use Orchestra\Testbench\Concerns\ApplicationTestingHooks;
 use Orchestra\Testbench\Foundation\Application as Testbench;
 use PHPUnit\Framework\TestCase;
 use ReflectionMethod;
@@ -23,17 +23,21 @@ class RefreshDatabaseTest extends TestCase
 
         $this->traitObject = m::mock(RefreshDatabaseTestMockClass::class)->makePartial();
         $this->traitObject->setUp();
+
+        $this->traitObject
+            ->shouldReceive('artisan')
+            ->with('migrate:rollback');
     }
 
     protected function tearDown(): void
     {
-        $this->traitObject->tearDown();
-
         if ($container = m::getContainer()) {
             $this->addToAssertionCount($container->mockery_getExpectationCount());
         }
 
         m::close();
+
+        $this->traitObject->tearDown();
     }
 
     private function __reflectAndSetupAccessibleForProtectedTraitMethod($methodName)
@@ -101,9 +105,9 @@ class RefreshDatabaseTest extends TestCase
 
 class RefreshDatabaseTestMockClass
 {
+    use ApplicationTestingHooks;
     use InteractsWithConsole;
     use RefreshDatabase;
-    use Testing;
 
     public $dropViews = false;
 
@@ -113,32 +117,21 @@ class RefreshDatabaseTestMockClass
     {
         RefreshDatabaseState::$migrated = false;
 
-        $this->app = $this->refreshApplication();
+        $this->setUpTheApplicationTestingHooks();
         $this->withoutMockingConsoleOutput();
     }
 
     public function tearDown()
     {
+        $this->tearDownTheApplicationTestingHooks();
+
         RefreshDatabaseState::$migrated = false;
-
-        $this->callBeforeApplicationDestroyedCallbacks();
-        $this->app?->flush();
     }
 
-    protected function setUpTraits()
+    protected function refreshApplication()
     {
-        return [];
-    }
-
-    protected function setUpTheTestEnvironmentTraitToBeIgnored(string $use): bool
-    {
-        return true;
-    }
-
-    public function refreshApplication()
-    {
-        return Testbench::create(
-            basePath: package_path('vendor/orchestra/testbench-core/laravel')
+        $this->app = Testbench::create(
+            basePath: package_path('vendor/orchestra/testbench-core/laravel'),
         );
     }
 }
