@@ -3,9 +3,28 @@
 namespace Illuminate\Tests\Integration\Database;
 
 use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Capsule\Manager;
+use Orchestra\Testbench\TestCase;
 
-class DatabaseTransactionsTest extends DatabaseTestCase
+class DatabaseTransactionsTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        app(Manager::class)
+            ->addConnection([
+                'driver' => 'sqlite',
+                'database' => ':memory:',
+            ]);
+
+        app(Manager::class)
+            ->addConnection([
+                'driver' => 'sqlite',
+                'database' => ':memory:',
+            ], 'second_connection');
+    }
+
     public function testTransactionCallbacks()
     {
         [$firstObject, $secondObject, $thirdObject] = [
@@ -24,6 +43,8 @@ class DatabaseTransactionsTest extends DatabaseTestCase
 
         $this->assertTrue($firstObject->ran);
         $this->assertTrue($secondObject->ran);
+        $this->assertEquals(1, $firstObject->runs);
+        $this->assertEquals(1, $secondObject->runs);
         $this->assertFalse($thirdObject->ran);
     }
 
@@ -56,16 +77,50 @@ class DatabaseTransactionsTest extends DatabaseTestCase
 
         $this->assertTrue($firstObject->ran);
         $this->assertTrue($secondObject->ran);
+        $this->assertEquals(1, $firstObject->runs);
+        $this->assertEquals(1, $secondObject->runs);
+        $this->assertFalse($thirdObject->ran);
+    }
+
+    public function testTransactionsDoNotAffectDifferentConnections()
+    {
+        [$firstObject, $secondObject, $thirdObject] = [
+            new TestObjectForTransactions(),
+            new TestObjectForTransactions(),
+            new TestObjectForTransactions()
+        ];
+
+        DB::transaction(function () use ($secondObject, $firstObject, $thirdObject) {
+            DB::transaction(function () use ($secondObject) {
+                DB::afterCommit(fn () => $secondObject->handle());
+            });
+
+            DB::afterCommit(fn () => $firstObject->handle());
+
+            try {
+                DB::connection('second_connection')->transaction(function () use ($thirdObject) {
+                    DB::afterCommit(fn() => $thirdObject->handle());
+
+                    throw new \Exception;
+                });
+            } catch (\Exception) {}
+        });
+
+        $this->assertTrue($firstObject->ran);
+        $this->assertTrue($secondObject->ran);
         $this->assertFalse($thirdObject->ran);
     }
 }
 
 class TestObjectForTransactions
 {
-    public bool $ran = false;
+    public $ran = false;
+
+    public $runs = 0;
 
     public function handle()
     {
         $this->ran = true;
+        $this->runs++;
     }
 }

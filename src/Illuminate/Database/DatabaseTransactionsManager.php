@@ -92,15 +92,16 @@ class DatabaseTransactionsManager
     /**
      * Move all the pending transactions to a ready state.
      *
+     * @param  string $connection
      * @return void
      */
-    public function stageTransactions()
+    public function stageTransactions($connection)
     {
         $this->readyTransactions = $this->readyTransactions->merge(
-            $this->pendingTransactions
+            $this->pendingTransactions->filter(fn ($transaction) => $transaction->connection === $connection)
         );
 
-        $this->pendingTransactions = collect();
+        $this->pendingTransactions = $this->pendingTransactions->reject(fn ($transaction) => $transaction->connection === $connection);
     }
 
     /**

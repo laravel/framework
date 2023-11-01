@@ -67,7 +67,8 @@ class DatabaseTransactionsManagerTest extends TestCase
         $manager->begin('default', 2);
         $manager->begin('admin', 1);
 
-        $manager->stageTransactions();
+        $manager->stageTransactions('default');
+        $manager->stageTransactions('admin');
         $manager->commit('default');
 
         $this->assertCount(0, $manager->getPendingTransactions());
@@ -120,7 +121,7 @@ class DatabaseTransactionsManagerTest extends TestCase
 
         $manager->begin('admin', 1);
 
-        $manager->stageTransactions();
+        $manager->stageTransactions('default');
         $manager->commit('default');
 
         $this->assertCount(2, $callbacks);
@@ -147,7 +148,7 @@ class DatabaseTransactionsManagerTest extends TestCase
             $callbacks[] = ['admin', 1];
         });
 
-        $manager->stageTransactions();
+        $manager->stageTransactions('default');
         $manager->commit('default');
 
         $this->assertCount(1, $callbacks);
