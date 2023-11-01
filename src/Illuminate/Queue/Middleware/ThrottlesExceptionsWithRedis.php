@@ -38,7 +38,7 @@ class ThrottlesExceptionsWithRedis extends ThrottlesExceptions
         $this->redis = Container::getInstance()->make(Redis::class);
 
         $this->limiter = new DurationLimiter(
-            $this->redis, $this->getKey($job), $this->maxAttempts, $this->decayMinutes * 60
+            $this->getRedisConnection(), $this->getKey($job), $this->maxAttempts, $this->decayMinutes * 60
         );
 
         if ($this->limiter->tooManyAttempts()) {
@@ -58,5 +58,15 @@ class ThrottlesExceptionsWithRedis extends ThrottlesExceptions
 
             return $job->release($this->retryAfterMinutes * 60);
         }
+    }
+
+    /**
+     * Get the Redis connection that should be used for throttling.
+     *
+     * @return \Illuminate\Redis\Connections\Connection
+     */
+    protected function getRedisConnection()
+    {
+        return $this->redis->connection();
     }
 }
