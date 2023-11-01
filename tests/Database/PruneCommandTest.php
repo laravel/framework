@@ -218,7 +218,6 @@ class PruneCommandTest extends TestCase
         $this->artisan(['--model' => PrunableTestModelWithPrunableRecords::class]);
     }
 
-
     public function testTheCommandDoesntAcceptIncompatibleOptions()
     {
         $this->expectException(InvalidArgumentException::class);
