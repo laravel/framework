@@ -46,20 +46,20 @@ class MySqlBuilder extends Builder
     }
 
     /**
-     * Get the columns for a given table.
+     * Get the column listing for a given table.
      *
      * @param  string  $table
      * @return array
      */
-    public function getColumns($table)
+    public function getColumnListing($table)
     {
         $table = $this->connection->getTablePrefix().$table;
 
         $results = $this->connection->selectFromWriteConnection(
-            $this->grammar->compileColumns($this->connection->getDatabaseName(), $table)
+            $this->grammar->compileColumnListing(), [$this->connection->getDatabaseName(), $table]
         );
 
-        return $this->connection->getPostProcessor()->processColumns($results);
+        return $this->connection->getPostProcessor()->processColumnListing($results);
     }
 
     /**

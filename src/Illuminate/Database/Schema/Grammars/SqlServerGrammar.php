@@ -79,39 +79,12 @@ class SqlServerGrammar extends Grammar
     /**
      * Compile the query to determine the list of columns.
      *
-     * @deprecated Will be removed in a future Laravel version.
-     *
      * @param  string  $table
      * @return string
      */
     public function compileColumnListing($table)
     {
         return "select name from sys.columns where object_id = object_id('$table')";
-    }
-
-    /**
-     * Compile the query to determine the columns.
-     *
-     * @param  string  $table
-     * @return string
-     */
-    public function compileColumns($table)
-    {
-        return sprintf(
-            'select col.name, type.name as type_name, '
-            .'col.max_length as length, col.precision as precision, col.scale as places, '
-            .'col.is_nullable as nullable, def.definition as [default], '
-            .'col.is_identity as autoincrement, col.collation_name as collation, '
-            .'cast(prop.value as nvarchar(max)) as comment '
-            .'from sys.columns as col '
-            .'join sys.types as type on col.user_type_id = type.user_type_id '
-            .'join sys.objects as obj on col.object_id = obj.object_id '
-            .'join sys.schemas as scm on obj.schema_id = scm.schema_id '
-            .'left join sys.default_constraints def on col.default_object_id = def.object_id and col.object_id = def.parent_object_id '
-            ."left join sys.extended_properties as prop on obj.object_id = prop.major_id and col.column_id = prop.minor_id and prop.name = 'MS_Description' "
-            ."where obj.type = 'U' and obj.name = %s and scm.name = SCHEMA_NAME()",
-            $this->quoteString($table),
-        );
     }
 
     /**
