@@ -70,12 +70,22 @@ class RateLimitedWithRedis extends RateLimited
     protected function tooManyAttempts($key, $maxAttempts, $decayMinutes)
     {
         $limiter = new DurationLimiter(
-            $this->redis, $key, $maxAttempts, $decayMinutes * 60
+            $this->getRedisConnection(), $key, $maxAttempts, $decayMinutes * 60
         );
 
         return tap(! $limiter->acquire(), function () use ($key, $limiter) {
             $this->decaysAt[$key] = $limiter->decaysAt;
         });
+    }
+
+    /**
+     * Get the Redis connection that should be used for throttling.
+     *
+     * @return \Illuminate\Redis\Connections\Connection
+     */
+    protected function getRedisConnection()
+    {
+        return $this->redis->connection();
     }
 
     /**
