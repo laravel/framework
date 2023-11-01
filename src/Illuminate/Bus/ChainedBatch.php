@@ -2,7 +2,8 @@
 
 namespace Illuminate\Bus;
 
-use Illuminate\Contracts\Container\Container;
+use Illuminate\Container\Container;
+use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
@@ -51,11 +52,11 @@ class ChainedBatch implements ShouldQueue
     /**
      * Handle the job.
      *
-     * @param  \Illuminate\Container\Container  $container
+     * @return void
      */
-    public function handle(Container $container)
+    public function handle()
     {
-        $batch = new PendingBatch($container, $this->jobs);
+        $batch = new PendingBatch(Container::getInstance(), $this->jobs);
 
         $batch->name = $this->name;
         $batch->options = $this->options;
@@ -103,7 +104,7 @@ class ChainedBatch implements ShouldQueue
 
             $batch->finally(function (Batch $batch) use ($next) {
                 if (! $batch->canceled()) {
-                    dispatch($next);
+                    Container::getInstance()->make(Dispatcher::class)->dispatch($next);
                 }
             });
 
