@@ -4,6 +4,7 @@ namespace Illuminate\Support;
 
 use Illuminate\Support\Traits\Macroable;
 use NumberFormatter;
+use RuntimeException;
 
 class Number
 {
@@ -18,6 +19,8 @@ class Number
      */
     public static function toHuman($number, $locale = 'en')
     {
+        static::needsIntlExtension();
+
         $formatter = new NumberFormatter($locale, NumberFormatter::SPELLOUT);
 
         return $formatter->format($number);
@@ -39,5 +42,19 @@ class Number
         }
 
         return sprintf('%s %s', round($bytes, $precision), $units[$i]);
+    }
+
+    /**
+     * Some of the helper methods are wrappers for the PHP intl extension,
+     * and thus require it to be installed on the server. If it's not
+     * installed, we instead throw an exception from this method.
+     *
+     * @return void
+     */
+    protected static function needsIntlExtension()
+    {
+        if (! extension_loaded('intl')) {
+            throw new RuntimeException('The intl PHP extension is required to use this helper.');
+        }
     }
 }

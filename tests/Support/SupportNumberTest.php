@@ -9,6 +9,8 @@ class SupportNumberTest extends TestCase
 {
     public function testToHuman()
     {
+        $this->needsIntlExtension();
+
         $this->assertSame('zero', Number::toHuman(0));
         $this->assertSame('one', Number::toHuman(1));
         $this->assertSame('ten', Number::toHuman(10));
@@ -34,6 +36,8 @@ class SupportNumberTest extends TestCase
 
     public function testToHumanWithDifferentLocale()
     {
+        $this->needsIntlExtension();
+
         $this->assertSame('cent vingt-trois', Number::toHuman(123, 'fr'));
 
         $this->assertSame('ein­hundert­drei­und­zwanzig', Number::toHuman(123, 'de'));
@@ -55,5 +59,12 @@ class SupportNumberTest extends TestCase
         $this->assertSame('1 ZB', Number::bytesToHuman(1024 ** 7));
         $this->assertSame('1 YB', Number::bytesToHuman(1024 ** 8));
         $this->assertSame('1024 YB', Number::bytesToHuman(1024 ** 9));
+    }
+
+    protected function needsIntlExtension()
+    {
+        if (! extension_loaded('intl')) {
+            $this->markTestSkipped('The intl extension is not installed. Please install the extension to enable '.__CLASS__);
+        }
     }
 }
