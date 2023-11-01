@@ -101,6 +101,7 @@ class EloquentModelTest extends DatabaseTestCase
             $table->id();
             $table->string('label');
             $table->timestamp('start');
+            $table->timestamp('end')->nullable();
             $table->boolean('analyze');
         });
 
@@ -114,12 +115,14 @@ class EloquentModelTest extends DatabaseTestCase
         $model->newInstance()->create([
             'label' => 'test',
             'start' => '2023-01-01 00:00:00',
+            'end' => '2024-01-01 00:00:00',
             'analyze' => true,
         ]);
 
         $this->assertDatabaseHas('actions', [
             'label' => 'test',
             'start' => '2023-01-01 00:00:00',
+            'end' => '2024-01-01 00:00:00',
             'analyze' => true,
         ]);
     }
