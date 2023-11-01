@@ -229,6 +229,18 @@ class SleepTest extends TestCase
         ]);
     }
 
+    public function testItCanSleepTillGivenTimestampAsString()
+    {
+        Sleep::fake();
+        Carbon::setTestNow(now()->startOfDay());
+
+        Sleep::until(strval(now()->addMinute()->timestamp));
+
+        Sleep::assertSequence([
+            Sleep::for(60)->seconds(),
+        ]);
+    }
+
     public function testItSleepsForZeroTimeWithNegativeDateTime()
     {
         Sleep::fake();
