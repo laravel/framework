@@ -6,6 +6,27 @@ use Illuminate\Support\Facades\DB;
 
 class DatabaseTransactionsTest extends DatabaseTestCase
 {
+    public function testTransactionCallbacks()
+    {
+        [$firstObject, $secondObject, $thirdObject] = [
+            new TestObjectForTransactions(),
+            new TestObjectForTransactions(),
+            new TestObjectForTransactions()
+        ];
+
+        DB::transaction(function () use ($secondObject, $firstObject) {
+            DB::afterCommit(fn () => $firstObject->handle());
+
+            DB::transaction(function () use ($secondObject) {
+                DB::afterCommit(fn () => $secondObject->handle());
+            });
+        });
+
+        $this->assertTrue($firstObject->ran);
+        $this->assertTrue($secondObject->ran);
+        $this->assertFalse($thirdObject->ran);
+    }
+
     public function testTransactionCallbacksDoNotInterfereWithOneAnother()
     {
         [$firstObject, $secondObject, $thirdObject] = [
