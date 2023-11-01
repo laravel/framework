@@ -15,6 +15,7 @@ use Illuminate\Database\Events\ModelPruningStarting;
 use Illuminate\Database\Events\ModelsPruned;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Foundation\Application;
+use InvalidArgumentException;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -215,6 +216,17 @@ class PruneCommandTest extends TestCase
         Application::getInstance()->singleton(DispatcherContract::class, fn () => $dispatcher);
 
         $this->artisan(['--model' => PrunableTestModelWithPrunableRecords::class]);
+    }
+
+
+    public function testTheCommandDoesntAcceptIncompatibleOptions()
+    {
+        $this->expectException(InvalidArgumentException::class);
+
+        $this->artisan([
+            '--model' => PrunableTestModelWithPrunableRecords::class,
+            '--except' => PrunableTestModelWithoutPrunableRecords::class,
+        ]);
     }
 
     protected function artisan($arguments)
