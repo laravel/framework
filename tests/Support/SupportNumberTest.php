@@ -45,6 +45,36 @@ class SupportNumberTest extends TestCase
         $this->assertSame('ett­hundra­tjugo­tre', Number::toHuman(123, 'sv'));
     }
 
+    public function testToCurrency()
+    {
+        $this->needsIntlExtension();
+
+        $this->assertSame('$0.00', Number::toCurrency(0));
+        $this->assertSame('$1.00', Number::toCurrency(1));
+        $this->assertSame('$10.00', Number::toCurrency(10));
+
+        $this->assertSame('€0.00', Number::toCurrency(0, 'EUR'));
+        $this->assertSame('€1.00', Number::toCurrency(1, 'EUR'));
+        $this->assertSame('€10.00', Number::toCurrency(10, 'EUR'));
+
+        $this->assertSame('-$5.00', Number::toCurrency(-5));
+        $this->assertSame('$5.00', Number::toCurrency(5.00));
+        $this->assertSame('$5.32', Number::toCurrency(5.325));
+    }
+
+    public function testToCurrencyWithDifferentLocale()
+    {
+        $this->needsIntlExtension();
+
+        $this->assertSame('1,00 €', Number::toCurrency(1, 'EUR', 'de'));
+        $this->assertSame('1,00 $', Number::toCurrency(1, 'USD', 'de'));
+        $this->assertSame('1,00 £', Number::toCurrency(1, 'GBP', 'de'));
+
+        $this->assertSame('123.456.789,12 $', Number::toCurrency(123456789.12345, 'USD', 'de'));
+        $this->assertSame('123.456.789,12 €', Number::toCurrency(123456789.12345, 'EUR', 'de'));
+        $this->assertSame('1 234,56 $US', Number::toCurrency(1234.56, 'USD', 'fr'));
+    }
+
     public function testBytesToHuman()
     {
         $this->assertSame('0 B', Number::bytesToHuman(0));

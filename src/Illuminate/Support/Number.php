@@ -27,6 +27,23 @@ class Number
     }
 
     /**
+     * Format the number to a currency format.
+     *
+     * @param  float|int  $number
+     * @param  string  $currency
+     * @param  string  $locale
+     * @return false|string
+     */
+    public static function toCurrency($number, $currency = 'USD', $locale = 'en')
+    {
+        static::needsIntlExtension();
+
+        $formatter = new NumberFormatter($locale, NumberFormatter::CURRENCY);
+
+        return $formatter->formatCurrency($number, $currency);
+    }
+
+    /**
      * Format the number of bytes to a human-readable string.
      *
      * @param  int  $bytes
