@@ -12,6 +12,7 @@ use Illuminate\Queue\Events\JobQueued;
 use Illuminate\Support\Arr;
 use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Str;
+use JsonException;
 
 abstract class Queue
 {
@@ -103,11 +104,11 @@ abstract class Queue
             $job = CallQueuedClosure::create($job);
         }
 
-        $payload = json_encode($value = $this->createPayloadArray($job, $queue, $data), \JSON_UNESCAPED_UNICODE);
-
-        if (json_last_error() !== JSON_ERROR_NONE) {
+        try {
+            $payload = json_encode($value = $this->createPayloadArray($job, $queue, $data), \JSON_UNESCAPED_UNICODE|\JSON_THROW_ON_ERROR);
+        } catch (JsonException $e) {
             throw new InvalidPayloadException(
-                'Unable to JSON encode payload. Error code: '.json_last_error(), $value
+                'Unable to JSON encode payload. Error code: '.$e->getCode(), $value, $e
             );
         }
 

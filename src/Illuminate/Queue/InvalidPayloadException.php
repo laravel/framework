@@ -3,6 +3,7 @@
 namespace Illuminate\Queue;
 
 use InvalidArgumentException;
+use Throwable;
 
 class InvalidPayloadException extends InvalidArgumentException
 {
@@ -18,11 +19,12 @@ class InvalidPayloadException extends InvalidArgumentException
      *
      * @param  string|null  $message
      * @param  mixed  $value
+     * @param  \Throwable|null  $previous
      * @return void
      */
-    public function __construct($message = null, $value = null)
+    public function __construct($message = null, $value = null, ?Throwable $previous = null)
     {
-        parent::__construct($message ?: json_last_error());
+        parent::__construct($message ?: json_last_error(), 0, $previous);
 
         $this->value = $value;
     }

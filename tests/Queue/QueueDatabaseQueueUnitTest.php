@@ -5,8 +5,10 @@ namespace Illuminate\Tests\Queue;
 use Illuminate\Container\Container;
 use Illuminate\Database\Connection;
 use Illuminate\Queue\DatabaseQueue;
+use Illuminate\Queue\InvalidPayloadException;
 use Illuminate\Queue\Queue;
 use Illuminate\Support\Str;
+use JsonException;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
@@ -102,11 +104,20 @@ class QueueDatabaseQueueUnitTest extends TestCase
         $queue = m::mock(Queue::class)->makePartial();
         $class = new ReflectionClass(Queue::class);
 
-        $createPayload = $class->getMethod('createPayload');
-        $createPayload->invokeArgs($queue, [
-            $job,
-            'queue-name',
-        ]);
+        try {
+            $createPayload = $class->getMethod('createPayload');
+            $createPayload->invokeArgs($queue, [
+                $job,
+                'queue-name',
+            ]);
+        } catch (InvalidPayloadException $e) {
+            $this->assertInstanceOf(JsonException::class, $e->getPrevious());
+            $this->assertSame('Unable to JSON encode payload. Error code: 5', $e->getMessage());
+            $this->assertSame(5, $e->getPrevious()->getCode());
+            $this->assertSame('Malformed UTF-8 characters, possibly incorrectly encoded', $e->getPrevious()->getMessage());
+
+            throw $e;
+        }
     }
 
     public function testFailureToCreatePayloadFromArray()
@@ -116,11 +127,20 @@ class QueueDatabaseQueueUnitTest extends TestCase
         $queue = m::mock(Queue::class)->makePartial();
         $class = new ReflectionClass(Queue::class);
 
-        $createPayload = $class->getMethod('createPayload');
-        $createPayload->invokeArgs($queue, [
-            ["\xc3\x28"],
-            'queue-name',
-        ]);
+        try {
+            $createPayload = $class->getMethod('createPayload');
+            $createPayload->invokeArgs($queue, [
+                ["\xc3\x28"],
+                'queue-name',
+            ]);
+        } catch (InvalidPayloadException $e) {
+            $this->assertInstanceOf(JsonException::class, $e->getPrevious());
+            $this->assertSame('Unable to JSON encode payload. Error code: 5', $e->getMessage());
+            $this->assertSame(5, $e->getPrevious()->getCode());
+            $this->assertSame('Malformed UTF-8 characters, possibly incorrectly encoded', $e->getPrevious()->getMessage());
+
+            throw $e;
+        }
     }
 
     public function testBulkBatchPushesOntoDatabase()
