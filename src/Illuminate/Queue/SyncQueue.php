@@ -55,7 +55,7 @@ class SyncQueue extends Queue implements QueueContract
      *
      * @throws \Throwable
      */
-    public function executeJob($job, $data = '', $queue = null)
+    protected function executeJob($job, $data = '', $queue = null)
     {
         $queueJob = $this->resolveJob($this->createPayload($job, $queue, $data), $queue);
 
