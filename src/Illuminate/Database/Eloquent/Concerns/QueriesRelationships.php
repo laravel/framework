@@ -230,6 +230,10 @@ trait QueriesRelationships
             $types = $this->model->newModelQuery()->distinct()->pluck($relation->getMorphType())->filter()->all();
         }
 
+        if (empty($types)) {
+            return $this->whereNotNull($relation->getMorphType(), $boolean);
+        }
+
         foreach ($types as &$type) {
             $type = Relation::getMorphedModel($type) ?? $type;
         }

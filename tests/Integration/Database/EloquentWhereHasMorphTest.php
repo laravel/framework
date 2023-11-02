@@ -27,7 +27,7 @@ class EloquentWhereHasMorphTest extends DatabaseTestCase
 
         Schema::create('comments', function (Blueprint $table) {
             $table->increments('id');
-            $table->morphs('commentable');
+            $table->nullableMorphs('commentable');
             $table->softDeletes();
         });
 
@@ -41,6 +41,7 @@ class EloquentWhereHasMorphTest extends DatabaseTestCase
         $models[] = Video::create(['title' => 'foo']);
         $models[] = Video::create(['title' => 'bar']);
         $models[] = Video::create(['title' => 'baz']);
+        $models[] = null; // deleted
 
         foreach ($models as $model) {
             (new Comment)->commentable()->associate($model)->save();
@@ -101,6 +102,17 @@ class EloquentWhereHasMorphTest extends DatabaseTestCase
         } finally {
             Relation::morphMap([], false);
         }
+    }
+
+    public function testWhereHasMorphWithWildcardAndOnlyNullMorphTypes()
+    {
+        Comment::whereNotNull('commentable_type')->forceDelete();
+
+        $comments = Comment::query()
+            ->whereHasMorph('commentable', '*')
+            ->orderBy('id')->get();
+
+        $this->assertEmpty($comments->pluck('id')->all());
     }
 
     public function testWhereHasMorphWithRelationConstraint()
