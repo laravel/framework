@@ -537,6 +537,36 @@ class ResourceTest extends TestCase
         ]);
     }
 
+    public function testResourcesMayExecuteWhenLoadedCallbackWhenLoadedRelationshipValueNull()
+    {
+        Route::get('/', function () {
+            $post = new Post([
+                'id' => 5,
+                'title' => 'Test Title',
+            ]);
+
+            $post->setRelation('author', new Author(['name' => 'jrrmartin']));
+            $post->setRelation('category', null);
+
+            return new PostResourceWithOptionalRelationship($post);
+        });
+
+        $response = $this->withoutExceptionHandling()->get(
+            '/', ['Accept' => 'application/json']
+        );
+
+        $response->assertStatus(200);
+
+        $response->assertExactJson([
+            'data' => [
+                'id' => 5,
+                'author' => ['name' => 'jrrmartin'],
+                'author_name' => 'jrrmartin',
+                'category' => 'No Category',
+            ],
+        ]);
+    }
+
     public function testResourcesMayHaveOptionalRelationshipsWithDefaultValues()
     {
         Route::get('/', function () {
