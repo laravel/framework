@@ -229,6 +229,32 @@ class SleepTest extends TestCase
         ]);
     }
 
+    public function testItCanSleepTillGivenTimestampAsString()
+    {
+        Sleep::fake();
+        Carbon::setTestNow(now()->startOfDay());
+
+        Sleep::until(strval(now()->addMinute()->timestamp));
+
+        Sleep::assertSequence([
+            Sleep::for(60)->seconds(),
+        ]);
+    }
+
+    public function testItCanSleepTillGivenTimestampAsStringWithMilliseconds()
+    {
+        Sleep::fake();
+        Carbon::setTestNow('2000-01-01 00:00:00.000'); // 946684800
+
+        Sleep::until('946684899.123');
+
+        Sleep::assertSequence([
+            Sleep::for(1)->minute()
+                ->and(39)->seconds()
+                ->and(123)->milliseconds(),
+        ]);
+    }
+
     public function testItSleepsForZeroTimeWithNegativeDateTime()
     {
         Sleep::fake();
