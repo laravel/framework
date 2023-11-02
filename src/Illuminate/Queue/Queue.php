@@ -105,7 +105,7 @@ abstract class Queue
         }
 
         try {
-            $payload = json_encode($value = $this->createPayloadArray($job, $queue, $data), \JSON_UNESCAPED_UNICODE|\JSON_THROW_ON_ERROR);
+            $payload = json_encode($value = $this->createPayloadArray($job, $queue, $data), \JSON_UNESCAPED_UNICODE | \JSON_THROW_ON_ERROR);
         } catch (JsonException $e) {
             throw new InvalidPayloadException(
                 'Unable to JSON encode payload. Error code: '.$e->getCode(), $value, $e
