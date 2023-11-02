@@ -50,6 +50,22 @@ class ChainedBatch implements ShouldQueue
     }
 
     /**
+     * Prepare any nested batches within the given collection of jobs.
+     *
+     * @param  \Illuminate\Support\Collection  $jobs
+     * @return \Illuminate\Support\Collection
+     */
+    public static function prepareNestedBatches(Collection $jobs): Collection
+    {
+        return $jobs->map(fn ($job) => match (true) {
+            is_array($job) => static::prepareNestedBatches(collect($job))->all(),
+            $job instanceof Collection => static::prepareNestedBatches($job),
+            $job instanceof PendingBatch => new ChainedBatch($job),
+            default => $job,
+        });
+    }
+
+    /**
      * Handle the job.
      *
      * @return void
@@ -61,8 +77,6 @@ class ChainedBatch implements ShouldQueue
         $batch->name = $this->name;
         $batch->options = $this->options;
 
-        $this->dispatchRemainderOfChainAfterBatch($batch);
-
         if ($this->queue) {
             $batch->onQueue($this->queue);
         }
@@ -70,6 +84,8 @@ class ChainedBatch implements ShouldQueue
         if ($this->connection) {
             $batch->onConnection($this->connection);
         }
+
+        $this->dispatchRemainderOfChainAfterBatch($batch);
 
         foreach ($this->chainCatchCallbacks ?? [] as $callback) {
             $batch->catch(function (Batch $batch, ?Throwable $exception) use ($callback) {
@@ -103,28 +119,12 @@ class ChainedBatch implements ShouldQueue
             $next->chainCatchCallbacks = $this->chainCatchCallbacks;
 
             $batch->finally(function (Batch $batch) use ($next) {
-                if (! $batch->canceled()) {
+                if (! $batch->cancelled()) {
                     Container::getInstance()->make(Dispatcher::class)->dispatch($next);
                 }
             });
 
             $this->chained = [];
         }
-    }
-
-    /**
-     * Prepare any nested batches within the given collection of jobs.
-     *
-     * @param  \Illuminate\Support\Collection  $jobs
-     * @return \Illuminate\Support\Collection
-     */
-    public static function prepareNestedBatches(Collection $jobs): Collection
-    {
-        return $jobs->map(fn ($job) => match (true) {
-            is_array($job) => static::prepareNestedBatches(collect($job))->all(),
-            $job instanceof Collection => static::prepareNestedBatches($job),
-            $job instanceof PendingBatch => new ChainedBatch($job),
-            default => $job,
-        });
     }
 }
