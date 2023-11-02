@@ -43,11 +43,13 @@ class MySqlGrammar extends Grammar
      */
     public function compileCreateDatabase($name, $connection)
     {
+        $collation = $connection->getConfig('collation');
+
         return sprintf(
             'create database %s default character set %s default collate %s',
             $this->wrapValue($name),
             $this->wrapValue($connection->getConfig('charset')),
-            $this->wrapValue($connection->getConfig('collation')),
+            ! empty($collation) ? $this->wrapValue($collation) : $collation,
         );
     }
 
