@@ -4,11 +4,7 @@
 
 ## [v10.30.1](https://github.com/laravel/framework/compare/v10.30.0...v10.30.1) - 2023-11-01
 
-### What's Changed
-
 - [10.x] Fix postgreSQL reserved word column names w/ guarded attributes broken in native column attributes implementation by [@hafezdivandari](https://github.com/hafezdivandari) in https://github.com/laravel/framework/pull/48877
-
-**Full Changelog**: https://github.com/laravel/framework/compare/v10.30.0...v10.30.1
 
 ## [v10.30.0](https://github.com/laravel/framework/compare/v10.29.0...v10.30.0) - 2023-10-31
 
