@@ -168,4 +168,33 @@ class DatabaseTransactionsManagerTest extends TestCase
         $this->assertCount(1, $callbacks);
         $this->assertEquals(['default', 1], $callbacks[0]);
     }
+
+    public function testStageTransactions()
+    {
+        $manager = (new DatabaseTransactionsManager);
+
+        $manager->begin('default', 1);
+        $manager->begin('admin', 1);
+
+        $this->assertCount(2, $manager->getPendingTransactions());
+
+        $pendingTransactions = $manager->getPendingTransactions();
+
+        $this->assertEquals(1, $pendingTransactions[0]->level);
+        $this->assertEquals('default', $pendingTransactions[0]->connection);
+        $this->assertEquals(1, $pendingTransactions[1]->level);
+        $this->assertEquals('admin', $pendingTransactions[1]->connection);
+
+        $manager->stageTransactions('default');
+
+        $this->assertCount(1, $manager->getPendingTransactions());
+        $this->assertCount(1, $manager->getReadyTransactions());
+        $this->assertEquals('default', $manager->getReadyTransactions()[0]->connection);
+
+        $manager->stageTransactions('admin');
+
+        $this->assertCount(0, $manager->getPendingTransactions());
+        $this->assertCount(2, $manager->getReadyTransactions());
+        $this->assertEquals('admin', $manager->getReadyTransactions()[1]->connection);
+    }
 }
