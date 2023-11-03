@@ -7,7 +7,8 @@ use PHPUnit\Framework\TestCase;
 
 class SupportNumberTest extends TestCase
 {
-    public function testPercentage() {
+    public function testPercentage()
+    {
         $this->assertSame('23.50%', Number::percentage(23.5));
         $this->assertSame('23.50 %', Number::percentage(23.5, ['format' => '%s %s']));
         $this->assertSame('23.501%', Number::percentage(23.501, ['precision' => 3]));
@@ -23,7 +24,7 @@ class SupportNumberTest extends TestCase
         $this->assertSame('306%', Number::percentage(306.00, ['strip_insignificant_zeros' => true]));
         $this->assertSame('307.11%', Number::percentage(307.110, ['precision' => 3, 'strip_insignificant_zeros' => true]));
 
-        $this->expectException(\RuntimeException::class, );
+        $this->expectException(\RuntimeException::class);
         Number::percentage(23.5, ['locale' => 'es']);
     }
 }

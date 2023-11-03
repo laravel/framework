@@ -2,36 +2,38 @@
 
 namespace Illuminate\Support;
 
-class Number {
+class Number
+{
     protected static array $formatsByLocale = [
         'en' => [
             'precision' => 2,
             'format' => '%s%s',
             'thousands_separator' => ',',
-            'decimal_separator' => '.'
+            'decimal_separator' => '.',
         ],
         'fr' => [
             'precision' => 2,
             'format' => '%s %s',
             'thousands_separator' => ' ',
-            'decimal_separator' => ','
+            'decimal_separator' => ',',
         ],
         'de' => [
             'precision' => 2,
             'format' => '%s %s',
             'thousands_separator' => '.',
-            'decimal_separator' => ','
+            'decimal_separator' => ',',
         ]
     ];
 
     /**
      * Percentage format with locale support.
      *
-     * @param int|float $value
-     * @param array $options
+     * @param  int|float  $value
+     * @param  array  $options
      * @return string
      */
-    public static function percentage(int|float $value, array $options = []): string {
+    public static function percentage(int|float $value, array $options = []): string
+    {
         $defaults = [
             'strip_insignificant_zeros' => false,
         ];
@@ -43,17 +45,18 @@ class Number {
             $formatted = rtrim($formatted, '0\.');
         }
 
-        return sprintf($options['format'],$formatted, '%');
+        return sprintf($options['format'], $formatted, '%');
     }
 
     /**
      * Format the given number.
      *
-     * @param int|float $value
-     * @param array $options
+     * @param  int|float  $value
+     * @param  array  $options
      * @return string
      */
-    public static function format(int|float $value, array $options = []): string {
+    public static function format(int|float $value, array $options = []): string
+    {
         $locale = $options['locale'] ?? 'en';
 
         $options = array_merge(self::getFormatByLocale($locale), $options);
@@ -63,10 +66,11 @@ class Number {
     /**
      * Return the format options for the given locale.
      *
-     * @param string $locale
+     * @param  string  $locale
      * @return array
      */
-    protected static function getFormatByLocale(string $locale = 'en'): array {
+    protected static function getFormatByLocale(string $locale = 'en'): array
+    {
         if (isset(self::$formatsByLocale[$locale])) {
             return self::$formatsByLocale[$locale];
         }
