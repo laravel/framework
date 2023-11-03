@@ -204,6 +204,18 @@ class EloquentWhereHasMorphTest extends DatabaseTestCase
         $this->assertEquals([1, 4], $comments->pluck('id')->all());
     }
 
+    public function testOrWhereHasMorphWithWildcardAndOnlyNullMorphTypes()
+    {
+        Comment::where('id', '!=', 1)->whereNotNull('commentable_type')->forceDelete();
+
+        $comments = Comment::where('id', 1)
+            ->orWhereHasMorph('commentable', '*', function (Builder $query) {
+                $query->where('title', 'foo');
+            })->orderBy('id')->get();
+
+        $this->assertEquals([1], $comments->pluck('id')->all());
+    }
+
     public function testWhereDoesntHaveMorph()
     {
         $comments = Comment::whereDoesntHaveMorph('commentable', Post::class, function (Builder $query) {
@@ -211,6 +223,17 @@ class EloquentWhereHasMorphTest extends DatabaseTestCase
         })->orderBy('id')->get();
 
         $this->assertEquals([2, 3], $comments->pluck('id')->all());
+    }
+
+    public function testWhereDoesntHaveMorphWithWildcardAndOnlyNullMorphTypes()
+    {
+        Comment::whereNotNull('commentable_type')->forceDelete();
+
+        $comments = Comment::whereDoesntHaveMorph('commentable', [], function (Builder $query) {
+            $query->where('title', 'foo');
+        })->orderBy('id')->get();
+
+        $this->assertEquals([7], $comments->pluck('id')->all());
     }
 
     public function testOrWhereDoesntHaveMorph()

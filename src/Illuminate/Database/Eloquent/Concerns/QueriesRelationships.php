@@ -231,7 +231,7 @@ trait QueriesRelationships
         }
 
         if (empty($types)) {
-            return $this->whereNotNull($relation->getMorphType(), $boolean);
+            return $this->where(new Expression('0'), $operator, $count, $boolean);
         }
 
         foreach ($types as &$type) {
