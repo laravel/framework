@@ -43,7 +43,9 @@ class Stringable implements JsonSerializable, ArrayAccess
         } catch (BadMethodCallException $exception) {}
 
         try {
-            return Str::$method(...[ ...$parameters]);
+            return is_string($result = Str::$method(...[(string)$this, ...$parameters]))
+                ? new static($result)
+                : $result;
         } catch (BadMethodCallException) {
             throw $exception;
         }

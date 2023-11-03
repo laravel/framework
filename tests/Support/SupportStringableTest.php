@@ -1306,6 +1306,18 @@ class SupportStringableTest extends TestCase
             $this->stringable('hello')->test_macro_method(123),
         );
 
+        Str::macro(
+            'test_macro_method',
+            fn (string $firstArgument, int $secondArgument): string => $firstArgument . $secondArgument
+        );
+        $macroResult = $this->stringable('hello')->test_macro_method(123);
+        $this->assertNotSame(
+            Str::test_macro_method('hello', 123),
+            $macroResult,
+        );
+        $this->assertInstanceOf(Stringable::class, $macroResult);
+        $this->assertSame('hello123', $macroResult->toString());
+
         Stringable::macro('test_macro_method', fn (string $name) => new static ($name));
         $macroResult = $this->stringable()->test_macro_method('world');
         $this->assertInstanceOf(Stringable::class, $macroResult);
