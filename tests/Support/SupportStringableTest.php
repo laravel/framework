@@ -2,9 +2,11 @@
 
 namespace Illuminate\Tests\Support;
 
+use BadMethodCallException;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\HtmlString;
+use Illuminate\Support\Str;
 use Illuminate\Support\Stringable;
 use PHPUnit\Framework\TestCase;
 
@@ -1288,5 +1290,42 @@ class SupportStringableTest extends TestCase
         $this->assertSame('t', $str[4]);
         $this->assertTrue(isset($str[2]));
         $this->assertFalse(isset($str[10]));
+    }
+
+    public function testUsesStrHelperMacros()
+    {
+        Stringable::flushMacros();
+        Str::flushMacros();
+
+        Str::macro('test_macro_method', fn (string $firstArgument, int $secondArgument) => [
+            $firstArgument,
+            $secondArgument,
+        ]);
+        $this->assertSame(
+            Str::test_macro_method('hello', 123),
+            $this->stringable('hello')->test_macro_method(123),
+        );
+
+        Stringable::macro('test_macro_method', fn (string $name) => new static ($name));
+        $macroResult = $this->stringable()->test_macro_method('world');
+        $this->assertInstanceOf(Stringable::class, $macroResult);
+        $this->assertSame('world', $macroResult->toString());
+
+        Str::flushMacros();
+        $macroResult = $this->stringable()->test_macro_method('world');
+        $this->assertInstanceOf(Stringable::class, $macroResult);
+        $this->assertSame('world', $macroResult->toString());
+
+        Stringable::flushMacros();
+        $this->expectException(BadMethodCallException::class);
+        $this->expectExceptionMessageMatches(
+            $this->stringable(Stringable::class . '::test_macro_method')
+                ->prepend('/')
+                ->append('/')
+                ->replace('\\', '\\\\')
+                ->toString()
+        );
+
+        $this->stringable()->test_macro_method('world');
     }
 }
