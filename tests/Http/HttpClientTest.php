@@ -2335,6 +2335,22 @@ class HttpClientTest extends TestCase
         $this->assertInstanceOf(RequestException::class, $exception);
     }
 
+    public function testRequestExceptionIsReturnedAfterLastRetryInPool()
+    {
+        $this->factory->fake([
+            '*' => $this->factory->response(['error'], 403),
+        ]);
+
+        [$exception] = $this->factory->pool(fn ($pool) => [
+            $pool->retry(3)->throw()->get('http://foo.com/get'),
+        ]);
+
+        $this->assertNotNull($exception);
+        $this->assertInstanceOf(RequestException::class, $exception);
+
+        $this->factory->assertSentCount(3);
+    }
+
     public function testRequestExceptionIsThrowIfConditionIsSatisfied()
     {
         $this->factory->fake([

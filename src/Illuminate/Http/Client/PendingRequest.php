@@ -1037,18 +1037,18 @@ class PendingRequest
                     return $exception;
                 }
 
+                if ($attempt < $this->tries && $shouldRetry) {
+                    $options['delay'] = value($this->retryDelay);
+
+                    return $this->makePromise($method, $url, $options, $attempt + 1);
+                }
+
                 if ($response instanceof Response && $this->throwCallback && ($this->throwIfCallback === null || call_user_func($this->throwIfCallback, $response))) {
                     try {
                         $response->throw($this->throwCallback);
                     } catch (Exception $exception) {
                         return $exception;
                     }
-                }
-
-                if ($attempt < $this->tries && $shouldRetry) {
-                    $options['delay'] = value($this->retryDelay);
-
-                    return $this->makePromise($method, $url, $options, $attempt + 1);
                 }
 
                 if ($this->tries > 1 && $this->retryThrow) {
