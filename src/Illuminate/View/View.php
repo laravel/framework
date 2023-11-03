@@ -93,7 +93,7 @@ class View implements ArrayAccess, Htmlable, ViewContract
     /**
      * Get the evaluated contents for a given array of fragments or return all fragments.
      *
-     * @param array|null $fragments
+     * @param  array|null  $fragments
      * @return string
      */
     public function fragments(?array $fragments = null)
@@ -142,7 +142,7 @@ class View implements ArrayAccess, Htmlable, ViewContract
      */
     protected function allFragments()
     {
-        return collect($this->render(fn() => $this->factory->getFragments()))->implode('');
+        return collect($this->render(fn () => $this->factory->getFragments()))->implode('');
     }
 
     /**
