@@ -108,7 +108,7 @@ class View implements ArrayAccess, Htmlable, ViewContract
      * @param array|null $fragments
      * @return string
      */
-    public function fragments(array|null $fragments = null)
+    public function fragments(?array $fragments = null)
     {
         if ($fragments === null) {
             return $this->allFragments();
