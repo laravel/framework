@@ -109,7 +109,9 @@ class EloquentWhereHasMorphTest extends DatabaseTestCase
         Comment::whereNotNull('commentable_type')->forceDelete();
 
         $comments = Comment::query()
-            ->whereHasMorph('commentable', '*')
+            ->whereHasMorph('commentable', '*', function (Builder $query) {
+                $query->where('title', 'foo');
+            })
             ->orderBy('id')->get();
 
         $this->assertEmpty($comments->pluck('id')->all());
