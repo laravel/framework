@@ -163,13 +163,14 @@ if (! function_exists('data_forget')) {
 
         if (($segment = array_shift($segments)) === '*' && Arr::accessible($target)) {
             if ($segments) {
-                foreach ($target as &$inner) {
-                    data_forget($inner, $segments);
+                foreach ($target as $segment => &$inner) {
+                    $target[$segment] = data_forget($inner, $segments);
                 }
             }
         } elseif (Arr::accessible($target)) {
             if ($segments && Arr::exists($target, $segment)) {
-                data_forget($target[$segment], $segments);
+                $inner = $target[$segment];
+                $target[$segment] = data_forget($inner, $segments);
             } else {
                 Arr::forget($target, $segment);
             }
