@@ -91,18 +91,6 @@ class View implements ArrayAccess, Htmlable, ViewContract
     }
 
     /**
-     * Get all fragments and return as a single string.
-     *
-     * @return string
-     */
-    protected function allFragments()
-    {
-        $fragments = $this->render(fn() => $this->factory->getFragments());
-
-        return collect($fragments)->implode('');
-    }
-
-    /**
      * Get the evaluated contents for a given array of fragments or return all fragments.
      *
      * @param array|null $fragments
@@ -110,11 +98,9 @@ class View implements ArrayAccess, Htmlable, ViewContract
      */
     public function fragments(?array $fragments = null)
     {
-        if ($fragments === null) {
-            return $this->allFragments();
-        }
-
-        return collect($fragments)->map(fn ($f) => $this->fragment($f))->implode('');
+        return is_null($fragments)
+            ? $this->allFragments()
+            : collect($fragments)->map(fn ($f) => $this->fragment($f))->implode('');
     }
 
     /**
@@ -147,6 +133,16 @@ class View implements ArrayAccess, Htmlable, ViewContract
         }
 
         return $this->render();
+    }
+
+    /**
+     * Get all fragments as a single string.
+     *
+     * @return string
+     */
+    protected function allFragments()
+    {
+        return collect($this->render(fn() => $this->factory->getFragments()))->implode('');
     }
 
     /**
