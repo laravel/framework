@@ -103,8 +103,7 @@ class View implements ArrayAccess, Htmlable, ViewContract
     }
 
     /**
-     * Get the evaluated contents for a given array of fragments.
-     * If no fragments are provided, return all fragments.
+     * Get the evaluated contents for a given array of fragments or return all fragments.
      *
      * @param array|null $fragments
      * @return string
