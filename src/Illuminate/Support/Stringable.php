@@ -40,10 +40,11 @@ class Stringable implements JsonSerializable, ArrayAccess
     {
         try {
             return $this->macroCall($method, $parameters);
-        } catch (BadMethodCallException $exception) {}
+        } catch (BadMethodCallException $exception) {
+        }
 
         try {
-            return is_string($result = Str::$method(...[(string)$this, ...$parameters]))
+            return is_string($result = Str::$method(...[(string) $this, ...$parameters]))
                 ? new static($result)
                 : $result;
         } catch (BadMethodCallException) {

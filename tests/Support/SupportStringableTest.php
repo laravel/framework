@@ -1308,7 +1308,7 @@ class SupportStringableTest extends TestCase
 
         Str::macro(
             'test_macro_method',
-            fn (string $firstArgument, int $secondArgument): string => $firstArgument . $secondArgument
+            fn (string $firstArgument, int $secondArgument): string => $firstArgument.$secondArgument
         );
         $macroResult = $this->stringable('hello')->test_macro_method(123);
         $this->assertNotSame(
@@ -1331,7 +1331,7 @@ class SupportStringableTest extends TestCase
         Stringable::flushMacros();
         $this->expectException(BadMethodCallException::class);
         $this->expectExceptionMessageMatches(
-            $this->stringable(Stringable::class . '::test_macro_method')
+            $this->stringable(Stringable::class.'::test_macro_method')
                 ->prepend('/')
                 ->append('/')
                 ->replace('\\', '\\\\')
