@@ -116,6 +116,11 @@ class QueueDatabaseQueueUnitTest extends TestCase
             $this->assertSame(5, $e->getPrevious()->getCode());
             $this->assertSame('Malformed UTF-8 characters, possibly incorrectly encoded', $e->getPrevious()->getMessage());
 
+            $this->assertSame([
+                'code' => 5,
+                'message' => 'Malformed UTF-8 characters, possibly incorrectly encoded',
+            ], $e->context()['json-exception']);
+
             throw $e;
         }
     }
@@ -138,6 +143,11 @@ class QueueDatabaseQueueUnitTest extends TestCase
             $this->assertSame('Unable to JSON encode payload. Error code: 5', $e->getMessage());
             $this->assertSame(5, $e->getPrevious()->getCode());
             $this->assertSame('Malformed UTF-8 characters, possibly incorrectly encoded', $e->getPrevious()->getMessage());
+
+            $this->assertSame([
+                'code' => 5,
+                'message' => 'Malformed UTF-8 characters, possibly incorrectly encoded',
+            ], $e->context()['json-exception']);
 
             throw $e;
         }
