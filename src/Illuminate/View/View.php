@@ -142,7 +142,7 @@ class View implements ArrayAccess, Htmlable, ViewContract
      * @param  array|null  $fragments
      * @return string
      */
-    public function fragmentsIf($boolean, array|null $fragments = null)
+    public function fragmentsIf($boolean, ?array $fragments = null)
     {
         if (value($boolean)) {
             return $this->fragments($fragments);
