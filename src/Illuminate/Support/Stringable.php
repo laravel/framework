@@ -3,6 +3,7 @@
 namespace Illuminate\Support;
 
 use ArrayAccess;
+use BadMethodCallException;
 use Closure;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Traits\Conditionable;
@@ -13,7 +14,9 @@ use Symfony\Component\VarDumper\VarDumper;
 
 class Stringable implements JsonSerializable, ArrayAccess
 {
-    use Conditionable, Macroable, Tappable;
+    use Conditionable, Tappable, Macroable {
+        Macroable::__call as macroCall;
+    }
 
     /**
      * The underlying string value.
@@ -31,6 +34,19 @@ class Stringable implements JsonSerializable, ArrayAccess
     public function __construct($value = '')
     {
         $this->value = (string) $value;
+    }
+
+    public function __call($method, $parameters)
+    {
+        try {
+            return $this->macroCall($method, $parameters);
+        } catch (BadMethodCallException $exception) {}
+
+        try {
+            return Str::$method(...[ ...$parameters]);
+        } catch (BadMethodCallException) {
+            throw $exception;
+        }
     }
 
     /**
