@@ -1008,6 +1008,10 @@ class PendingRequest
                 });
             })
             ->otherwise(function (TransferException $e) {
+                if ($e instanceof ConnectException) {
+                    $this->dispatchConnectionFailedEvent();
+                }
+
                 return $e instanceof RequestException && $e->hasResponse() ? $this->populateResponse($this->newResponse($e->getResponse())) : $e;
             });
     }
