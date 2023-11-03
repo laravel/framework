@@ -32,7 +32,7 @@ class InvalidPayloadException extends InvalidArgumentException
 
     /**
      * Get the exception context.
-     * 
+     *
      * @return array
      */
     public function context()
