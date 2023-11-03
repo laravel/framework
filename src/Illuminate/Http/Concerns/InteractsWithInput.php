@@ -397,17 +397,18 @@ trait InteractsWithInput
      *
      * @param  string  $key
      * @param  class-string<TEnum>  $enumClass
+     * @param  string|int|float $default
      * @return TEnum|null
      */
-    public function enum($key, $enumClass)
+    public function enum($key, $enumClass, $default = null)
     {
-        if ($this->isNotFilled($key) ||
+        if ($this->isNotFilled($key) && is_null($default) ||
             ! enum_exists($enumClass) ||
             ! method_exists($enumClass, 'tryFrom')) {
             return null;
         }
 
-        return $enumClass::tryFrom($this->input($key));
+        return $enumClass::tryFrom($this->input($key, $default));
     }
 
     /**
