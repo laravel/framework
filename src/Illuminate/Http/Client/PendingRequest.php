@@ -16,6 +16,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Http\Client\Events\ConnectionFailed;
 use Illuminate\Http\Client\Events\RequestSending;
 use Illuminate\Http\Client\Events\ResponseReceived;
+use Illuminate\Http\Client\Response;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
@@ -1018,7 +1019,7 @@ class PendingRequest
 
                 return $e instanceof RequestException && $e->hasResponse() ? $this->populateResponse($this->newResponse($e->getResponse())) : $e;
             })
-            ->then(function (Response|TransferException $response) use ($method, $url, $options, $attempt) {
+            ->then(function (Response|TransferException|ConnectionException $response) use ($method, $url, $options, $attempt) {
                 if ($response instanceof Response && $response->successful()) {
                     return $response;
                 }
@@ -1028,14 +1029,16 @@ class PendingRequest
                 }
 
                 try {
-                    $shouldRetry = $this->retryWhenCallback ? call_user_func($this->retryWhenCallback, $response->toException(), $this) : true;
+                    $shouldRetry = $this->retryWhenCallback ? call_user_func(
+                        $this->retryWhenCallback,
+                        $response instanceof Response ? $response->toException() : $response,
+                        $this
+                    ) : true;
                 } catch (Exception $exception) {
-                    $shouldRetry = false;
-
                     return $exception;
                 }
 
-                if ($this->throwCallback && ($this->throwIfCallback === null || call_user_func($this->throwIfCallback, $response))) {
+                if ($response instanceof Response && $this->throwCallback && ($this->throwIfCallback === null || call_user_func($this->throwIfCallback, $response))) {
                     try {
                         $response->throw($this->throwCallback);
                     } catch (Exception $exception) {
@@ -1044,15 +1047,13 @@ class PendingRequest
                 }
 
                 if ($attempt < $this->tries && $shouldRetry) {
-                    if ($this->retryDelay) {
-                        $options['delay'] = $this->retryDelay;
-                    }
+                    $options['delay'] = value($this->retryDelay);
 
                     return $this->makePromise($method, $url, $options, $attempt + 1);
                 }
 
                 if ($this->tries > 1 && $this->retryThrow) {
-                    return $response->toException();
+                    return $response instanceof Response ? $response->toException() : $response;
                 }
 
                 return $response;
