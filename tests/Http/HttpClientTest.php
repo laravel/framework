@@ -1866,8 +1866,7 @@ class HttpClientTest extends TestCase
                 $whenAttempts->push($exception);
 
                 return $exception->response->status() === 403;
-            }, true)
-            ->get('http://foo.com/get')
+            }, true)->get('http://foo.com/get'),
         ]);
 
         $this->assertNotNull($exception);
@@ -1908,7 +1907,7 @@ class HttpClientTest extends TestCase
                 $whenAttempts->push($exception);
 
                 return $exception->response->status() === 403;
-            }, false)->get('http://foo.com/get')
+            }, false)->get('http://foo.com/get'),
         ]);
 
         $this->assertNotNull($response);
@@ -1935,7 +1934,7 @@ class HttpClientTest extends TestCase
                 $request->withHeaders(['Foo' => 'Bar']);
 
                 return true;
-            }, false)->get('http://foo.com/get')
+            }, false)->get('http://foo.com/get'),
         ]);
 
         $this->assertTrue($response->successful());
@@ -2215,7 +2214,7 @@ class HttpClientTest extends TestCase
         ]);
 
         [$response] = $this->factory->pool(fn ($pool) => [
-            $pool->throw()->get('http://foo.com/get')
+            $pool->throw()->get('http://foo.com/get'),
         ]);
 
         $this->assertInstanceOf(Response::class, $response);
@@ -2229,7 +2228,7 @@ class HttpClientTest extends TestCase
         ]);
 
         [$exception] = $this->factory->pool(fn ($pool) => [
-            $pool->throw()->get('http://foo.com/get')
+            $pool->throw()->get('http://foo.com/get'),
         ]);
 
         $this->assertNotNull($exception);
@@ -2243,7 +2242,7 @@ class HttpClientTest extends TestCase
         ]);
 
         [$exception] = $this->factory->pool(fn ($pool) => [
-            $pool->throwIf(true)->get('http://foo.com/get')
+            $pool->throwIf(true)->get('http://foo.com/get'),
         ]);
 
         $this->assertNotNull($exception);
@@ -2257,7 +2256,7 @@ class HttpClientTest extends TestCase
         ]);
 
         [$response] = $this->factory->pool(fn ($pool) => [
-            $pool->throwIf(false)->get('http://foo.com/get')
+            $pool->throwIf(false)->get('http://foo.com/get'),
         ]);
 
         $this->assertInstanceOf(Response::class, $response);
@@ -2285,7 +2284,7 @@ class HttpClientTest extends TestCase
                 $this->assertInstanceOf(RequestException::class, $e);
 
                 $hitThrowCallback->push(true);
-            })->get('http://foo.com/get')
+            })->get('http://foo.com/get'),
         ]);
 
         $this->assertNotNull($exception);
@@ -2327,7 +2326,7 @@ class HttpClientTest extends TestCase
         [$exception] = $this->factory->pool(fn ($pool) => [
             $pool->throw(function ($exception) use (&$flag) {
                 $flag->push(true);
-            })->get('http://foo.com/get')
+            })->get('http://foo.com/get'),
         ]);
 
         $this->assertCount(1, $flag);

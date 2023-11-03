@@ -998,7 +998,7 @@ class PendingRequest
      * @param  string  $method
      * @param  string  $url
      * @param  array  $options
-     * @param  integer  $attempt
+     * @param  int  $attempt
      * @return \GuzzleHttp\Promise\PromiseInterface
      */
     protected function makePromise(string $method, string $url, array $options = [], int $attempt = 1)
