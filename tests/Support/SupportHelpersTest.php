@@ -6,6 +6,7 @@ use ArrayAccess;
 use ArrayIterator;
 use Countable;
 use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Env;
 use Illuminate\Support\Optional;
 use Illuminate\Support\Sleep;
@@ -443,10 +444,106 @@ class SupportHelpersTest extends TestCase
             data_forget($data, 'nothing')
         );
 
+        $data = ['foo' => null, 'hello' => 'world'];
+
+        $this->assertEquals(
+            ['hello' => 'world'],
+            data_forget($data, 'foo')
+        );
+
         $data = ['one' => ['two' => ['three' => 'hello', 'four' => ['five']]]];
 
         $this->assertEquals(
             ['one' => ['two' => ['four' => ['five']]]],
+            data_forget($data, 'one.two.three')
+        );
+
+        $data = ['one' => ['two' => null]];
+
+        $this->assertEquals(
+            ['one' => ['two' => null]],
+            data_forget($data, 'one.two.three')
+        );
+
+        $data = (object) ['foo' => 'bar', 'hello' => 'world'];
+
+        $this->assertEquals(
+            (object) ['hello' => 'world'],
+            data_forget($data, 'foo')
+        );
+
+        $data = (object) ['foo' => 'bar', 'hello' => 'world'];
+
+        $this->assertEquals(
+            (object) ['foo' => 'bar', 'hello' => 'world'],
+            data_forget($data, 'nothing')
+        );
+
+        $data = (object) ['one' => ['two' => ['three' => 'hello', 'four' => ['five']]]];
+
+        $this->assertEquals(
+            (object) ['one' => ['two' => ['four' => ['five']]]],
+            data_forget($data, 'one.two.three')
+        );
+
+        $data = (object) ['one' => ['two' => null]];
+
+        $this->assertEquals(
+            (object) ['one' => ['two' => null]],
+            data_forget($data, 'one.two.three')
+        );
+
+        $data = new Collection(['foo' => 'bar', 'hello' => 'world']);
+
+        $this->assertEquals(
+            new Collection(['hello' => 'world']),
+            data_forget($data, 'foo')
+        );
+
+        $data = new Collection(['foo' => 'bar', 'hello' => 'world']);
+
+        $this->assertEquals(
+            new Collection(['foo' => 'bar', 'hello' => 'world']),
+            data_forget($data, 'nothing')
+        );
+
+        $data = new Collection(['one' => ['two' => ['three' => 'hello', 'four' => ['five']]]]);
+
+        $this->assertEquals(
+            new Collection(['one' => ['two' => ['four' => ['five']]]]),
+            data_forget($data, 'one.two.three')
+        );
+
+        $data = new Collection([
+            'one' => [
+                'two' => (object) [
+                    'three' => new Collection([
+                        'four' => 'goodbye',
+                        'five' => 'hello',
+                    ]),
+                    'six' => 'hello',
+                ],
+            ],
+        ]);
+
+        $this->assertEquals(
+            new Collection([
+                'one' => [
+                    'two' => (object) [
+                        'three' => new Collection([
+                            'five' => 'hello',
+                        ]),
+                        'six' => 'hello',
+                    ],
+                ],
+            ]),
+            data_forget($data, 'one.two.three.four')
+        );
+
+        $data = new Collection(['one' => ['two' => null]]);
+
+        $this->assertEquals(
+            new Collection(['one' => ['two' => null]]),
             data_forget($data, 'one.two.three')
         );
     }
@@ -475,10 +572,115 @@ class SupportHelpersTest extends TestCase
             ],
             data_forget($data, 'article.comments.*.name')
         );
+
+        $data = (object) [
+            'article' => (object) [
+                'title' => 'Foo',
+                'comments' => [
+                    (object) ['comment' => 'foo', 'name' => 'First'],
+                    (object) ['comment' => 'bar', 'name' => 'Second'],
+                ],
+            ],
+        ];
+
+        $this->assertEquals(
+            (object) [
+                'article' => (object) [
+                    'title' => 'Foo',
+                    'comments' => [
+                        (object) ['comment' => 'foo'],
+                        (object) ['comment' => 'bar'],
+                    ],
+                ],
+            ],
+            data_forget($data, 'article.comments.*.name')
+        );
+
+        $data = new Collection([
+            'article' => [
+                'title' => 'Foo',
+                'comments' => [
+                    ['comment' => 'foo', 'name' => 'First'],
+                    ['comment' => 'bar', 'name' => 'Second'],
+                ],
+            ],
+        ]);
+
+        $this->assertEquals(
+            new Collection([
+                'article' => [
+                    'title' => 'Foo',
+                    'comments' => [
+                        ['comment' => 'foo'],
+                        ['comment' => 'bar'],
+                    ],
+                ],
+            ]),
+            data_forget($data, 'article.comments.*.name')
+        );
+
+        $data = new Collection([
+            'article' => [
+                'title' => 'Foo',
+                'comments' => [
+                    (object) ['comment' => 'foo', 'name' => 'First'],
+                    (object) ['comment' => 'bar', 'name' => 'Second'],
+                ],
+            ],
+        ]);
+
+        $this->assertEquals(
+            new Collection([
+                'article' => [
+                    'title' => 'Foo',
+                    'comments' => [
+                        (object) ['comment' => 'foo'],
+                        (object) ['comment' => 'bar'],
+                    ],
+                ],
+            ]),
+            data_forget($data, 'article.comments.*.name')
+        );
     }
 
     public function testDataRemoveWithDoubleStar()
     {
+        $data = [
+            'posts' => [
+                [
+                    'comments' => [
+                        ['name' => 'First', 'comment' => 'foo'],
+                        ['name' => 'Second', 'comment' => 'bar'],
+                    ],
+                ],
+                [
+                    'comments' => [
+                        ['name' => 'Third', 'comment' => 'hello'],
+                        ['name' => 'Fourth', 'comment' => 'world'],
+                    ],
+                ],
+            ],
+        ];
+
+        data_forget($data, 'posts.*.comments.*.name');
+
+        $this->assertEquals([
+            'posts' => [
+                [
+                    'comments' => [
+                        ['comment' => 'foo'],
+                        ['comment' => 'bar'],
+                    ],
+                ],
+                [
+                    'comments' => [
+                        ['comment' => 'hello'],
+                        ['comment' => 'world'],
+                    ],
+                ],
+            ],
+        ], $data);
+
         $data = [
             'posts' => [
                 (object) [
@@ -514,6 +716,42 @@ class SupportHelpersTest extends TestCase
                 ],
             ],
         ], $data);
+
+        $data = new Collection([
+            'posts' => [
+                [
+                    'comments' => [
+                        ['name' => 'First', 'comment' => 'foo'],
+                        ['name' => 'Second', 'comment' => 'bar'],
+                    ],
+                ],
+                [
+                    'comments' => [
+                        ['name' => 'Third', 'comment' => 'hello'],
+                        ['name' => 'Fourth', 'comment' => 'world'],
+                    ],
+                ],
+            ],
+        ]);
+
+        data_forget($data, 'posts.*.comments.*.name');
+
+        $this->assertEquals(new Collection([
+            'posts' => [
+                [
+                    'comments' => [
+                        ['comment' => 'foo'],
+                        ['comment' => 'bar'],
+                    ],
+                ],
+                [
+                    'comments' => [
+                        ['comment' => 'hello'],
+                        ['comment' => 'world'],
+                    ],
+                ],
+            ],
+        ]), $data);
     }
 
     public function testHead()
