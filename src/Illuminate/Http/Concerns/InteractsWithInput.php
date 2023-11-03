@@ -397,7 +397,7 @@ trait InteractsWithInput
      *
      * @param  string  $key
      * @param  class-string<TEnum>  $enumClass
-     * @param  string|int|float $default
+     * @param  string|int|float  $default
      * @return TEnum|null
      */
     public function enum($key, $enumClass, $default = null)
