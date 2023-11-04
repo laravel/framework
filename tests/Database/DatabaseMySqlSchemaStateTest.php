@@ -18,38 +18,38 @@ class DatabaseMySqlSchemaStateTest extends TestCase
     {
         $connection = $this->createMock(MySqlConnection::class);
         $connection->method('getConfig')->willReturn($dbConfig);
-		
-		$latestCommand = null;
 
-        $schemaState = new MySqlSchemaState($connection, processFactory: function(...$arguments) use (&$latestCommand) {
-			$latestCommand = $arguments[0];
-			
-			return new class
-			{
-				public function __call(string $name, $arguments)
-				{
-					 return $this;
-				}
-			};
+        $latestCommand = null;
+
+        $schemaState = new MySqlSchemaState($connection, processFactory: function (...$arguments) use (&$latestCommand) {
+            $latestCommand = $arguments[0];
+
+            return new class
+            {
+                public function __call(string $name, $arguments)
+                {
+                    return $this;
+                }
+            };
         });
-		
+
         // test connectionString
         $method = new ReflectionMethod(get_class($schemaState), 'connectionString');
         $connString = $method->invoke($schemaState);
 
         self::assertEquals($expectedConnectionString, $connString);
-	    
-	    // test baseDumpCommand
-	    $method = new ReflectionMethod(get_class($schemaState), 'baseDumpCommand');
-	    $baseDumpCommand = $method->invoke($schemaState);
-	    
-	    self::assertEquals(Str::replace('{{CONNECTION_STRING}}', $connString, $expectedBaseDumpCommand), $baseDumpCommand);
-	    
-	    // test load
-	    $method = new ReflectionMethod(get_class($schemaState), 'load');
-	    $method->invoke($schemaState, 'PATH');
-	    
-	    self::assertEquals(Str::replace('{{CONNECTION_STRING}}', $connString, $expectedLoadCommand), $latestCommand);
+
+        // test baseDumpCommand
+        $method = new ReflectionMethod(get_class($schemaState), 'baseDumpCommand');
+        $baseDumpCommand = $method->invoke($schemaState);
+
+        self::assertEquals(Str::replace('{{CONNECTION_STRING}}', $connString, $expectedBaseDumpCommand), $baseDumpCommand);
+
+        // test load
+        $method = new ReflectionMethod(get_class($schemaState), 'load');
+        $method->invoke($schemaState, 'PATH');
+
+        self::assertEquals(Str::replace('{{CONNECTION_STRING}}', $connString, $expectedLoadCommand), $latestCommand);
 
         // test baseVariables
         $method = new ReflectionMethod(get_class($schemaState), 'baseVariables');
@@ -78,7 +78,7 @@ class DatabaseMySqlSchemaStateTest extends TestCase
                 'database' => 'forge',
             ],
         ];
-		
+
         yield 'default_bin_path' => [
             ' --user="${:LARAVEL_LOAD_USER}" --password="${:LARAVEL_LOAD_PASSWORD}" --host="${:LARAVEL_LOAD_HOST}" --port="${:LARAVEL_LOAD_PORT}"',
             '/Users/Shared/DBngin/MySQL/8.0.33/bin/mysqldump {{CONNECTION_STRING}} --no-tablespaces --skip-add-locks --skip-comments --skip-set-charset --tz-utc --column-statistics=0 --set-gtid-purged=OFF "${:LARAVEL_LOAD_DATABASE}"',
@@ -95,7 +95,7 @@ class DatabaseMySqlSchemaStateTest extends TestCase
                 'username' => 'root',
                 'host' => '127.0.0.1',
                 'database' => 'forge',
-                'bin' => '/Users/Shared/DBngin/MySQL/8.0.33/bin'
+                'bin' => '/Users/Shared/DBngin/MySQL/8.0.33/bin',
             ],
         ];
 

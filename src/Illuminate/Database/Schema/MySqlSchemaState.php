@@ -6,6 +6,7 @@ use Exception;
 use Illuminate\Database\Connection;
 use Illuminate\Support\Str;
 use Symfony\Component\Process\Process;
+
 use const DIRECTORY_SEPARATOR;
 
 class MySqlSchemaState extends SchemaState
@@ -70,7 +71,7 @@ class MySqlSchemaState extends SchemaState
      */
     public function load($path)
     {
-        $command = $this->binPath() . 'mysql '.$this->connectionString().' --database="${:LARAVEL_LOAD_DATABASE}" < "${:LARAVEL_LOAD_PATH}"';
+        $command = $this->binPath().'mysql '.$this->connectionString().' --database="${:LARAVEL_LOAD_DATABASE}" < "${:LARAVEL_LOAD_PATH}"';
 
         $process = $this->makeProcess($command)->setTimeout(null);
 
@@ -86,7 +87,7 @@ class MySqlSchemaState extends SchemaState
      */
     protected function baseDumpCommand()
     {
-        $command = $this->binPath() . 'mysqldump '.$this->connectionString().' --no-tablespaces --skip-add-locks --skip-comments --skip-set-charset --tz-utc --column-statistics=0';
+        $command = $this->binPath().'mysqldump '.$this->connectionString().' --no-tablespaces --skip-add-locks --skip-comments --skip-set-charset --tz-utc --column-statistics=0';
 
         if (! $this->connection->isMaria()) {
             $command .= ' --set-gtid-purged=OFF';
@@ -137,22 +138,22 @@ class MySqlSchemaState extends SchemaState
             'LARAVEL_LOAD_SSL_CA' => $config['options'][\PDO::MYSQL_ATTR_SSL_CA] ?? '',
         ];
     }
-	
-	/**
-	 * Get the bin path for the dump / load command.
-	 *
-	 * @return string
-	 */
-	protected function binPath()
-	{
-		$binPath = $this->connection->getConfig()['bin'] ?? '';
-		
-		if ($binPath) {
-			$binPath = Str::finish($binPath, DIRECTORY_SEPARATOR);
-		}
-		
-		return $binPath;
-	}
+
+    /**
+     * Get the bin path for the dump / load command.
+     *
+     * @return string
+     */
+    protected function binPath()
+    {
+        $binPath = $this->connection->getConfig()['bin'] ?? '';
+
+        if ($binPath) {
+            $binPath = Str::finish($binPath, DIRECTORY_SEPARATOR);
+        }
+
+        return $binPath;
+    }
 
     /**
      * Execute the given dump process.

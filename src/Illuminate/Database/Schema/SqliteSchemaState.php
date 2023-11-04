@@ -82,7 +82,7 @@ class SqliteSchemaState extends SchemaState
      */
     protected function baseCommand()
     {
-        return $this->binPath() . 'sqlite3 "${:LARAVEL_LOAD_DATABASE}"';
+        return $this->binPath().'sqlite3 "${:LARAVEL_LOAD_DATABASE}"';
     }
 
     /**
@@ -97,20 +97,20 @@ class SqliteSchemaState extends SchemaState
             'LARAVEL_LOAD_DATABASE' => $config['database'],
         ];
     }
-	
-	/**
-	 * Get the bin path for the sqlite3 command.
-	 *
-	 * @return string
-	 */
-	protected function binPath()
-	{
-		$binPath = $this->connection->getConfig()['bin'] ?? '';
-		
-		if ($binPath) {
-			$binPath = Str::finish($binPath, DIRECTORY_SEPARATOR);
-		}
-		
-		return $binPath;
-	}
+
+    /**
+     * Get the bin path for the sqlite3 command.
+     *
+     * @return string
+     */
+    protected function binPath()
+    {
+        $binPath = $this->connection->getConfig()['bin'] ?? '';
+
+        if ($binPath) {
+            $binPath = Str::finish($binPath, DIRECTORY_SEPARATOR);
+        }
+
+        return $binPath;
+    }
 }
