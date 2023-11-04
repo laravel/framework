@@ -2,27 +2,36 @@
 
 namespace Illuminate\Tests\Support;
 
-use Illuminate\Container\Container;
+use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Number;
-use Mockery;
 use PHPUnit\Framework\TestCase;
 
 class SupportNumberTest extends TestCase
 {
+    protected Application $app;
+
     protected function setUp(): void
     {
         parent::setUp();
 
-        App::swap(new Container);
-        App::shouldReceive('getLocale')->andReturn('en');
+        $this->app = new class extends Application
+        {
+            public string $locale = 'en';
+
+            public function getLocale(): string
+            {
+                return $this->locale;
+            }
+        };
+
+        App::swap($this->app);
     }
 
     protected function tearDown(): void
     {
-        Mockery::close();
         App::clearResolvedInstances();
-        App::swap(new Container);
+        App::swap(new Application);
 
         parent::tearDown();
     }
@@ -69,8 +78,7 @@ class SupportNumberTest extends TestCase
 
         $this->assertSame('123,456,789', Number::format(123456789));
 
-        App::clearResolvedInstances();
-        App::shouldReceive('getLocale')->andReturn('de');
+        $this->app->locale = 'de';
 
         $this->assertSame('123.456.789', Number::format(123456789));
     }
