@@ -10,6 +10,7 @@ use Mockery as m;
 use PDO;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Process;
+
 use const DIRECTORY_SEPARATOR;
 
 class DatabaseSqliteSchemaStateTest extends TestCase
@@ -59,7 +60,7 @@ class DatabaseSqliteSchemaStateTest extends TestCase
         $schemaState->load('database/schema/sqlite-schema.dump');
 
         $processFactory->shouldHaveBeenCalled()->with(
-			Str::replace('/', DIRECTORY_SEPARATOR, '/usr/bin/sqlite3 "${:LARAVEL_LOAD_DATABASE}" < "${:LARAVEL_LOAD_PATH}"')
+            Str::replace('/', DIRECTORY_SEPARATOR, '/usr/bin/sqlite3 "${:LARAVEL_LOAD_DATABASE}" < "${:LARAVEL_LOAD_PATH}"')
         );
 
         $process->shouldHaveReceived('mustRun')->with(null, [
