@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Schema;
 
 use Illuminate\Database\Connection;
+use Illuminate\Support\Str;
 
 class PostgresSchemaState extends SchemaState
 {
@@ -35,10 +36,10 @@ class PostgresSchemaState extends SchemaState
      */
     public function load($path)
     {
-        $command = 'pg_restore --no-owner --no-acl --clean --if-exists --host="${:LARAVEL_LOAD_HOST}" --port="${:LARAVEL_LOAD_PORT}" --username="${:LARAVEL_LOAD_USER}" --dbname="${:LARAVEL_LOAD_DATABASE}" "${:LARAVEL_LOAD_PATH}"';
+        $command = $this->binPath() . 'pg_restore --no-owner --no-acl --clean --if-exists --host="${:LARAVEL_LOAD_HOST}" --port="${:LARAVEL_LOAD_PORT}" --username="${:LARAVEL_LOAD_USER}" --dbname="${:LARAVEL_LOAD_DATABASE}" "${:LARAVEL_LOAD_PATH}"';
 
         if (str_ends_with($path, '.sql')) {
-            $command = 'psql --file="${:LARAVEL_LOAD_PATH}" --host="${:LARAVEL_LOAD_HOST}" --port="${:LARAVEL_LOAD_PORT}" --username="${:LARAVEL_LOAD_USER}" --dbname="${:LARAVEL_LOAD_DATABASE}"';
+            $command = $this->binPath() . 'psql --file="${:LARAVEL_LOAD_PATH}" --host="${:LARAVEL_LOAD_HOST}" --port="${:LARAVEL_LOAD_PORT}" --username="${:LARAVEL_LOAD_USER}" --dbname="${:LARAVEL_LOAD_DATABASE}"';
         }
 
         $process = $this->makeProcess($command);
@@ -55,7 +56,7 @@ class PostgresSchemaState extends SchemaState
      */
     protected function baseDumpCommand()
     {
-        return 'pg_dump --no-owner --no-acl --host="${:LARAVEL_LOAD_HOST}" --port="${:LARAVEL_LOAD_PORT}" --username="${:LARAVEL_LOAD_USER}" --dbname="${:LARAVEL_LOAD_DATABASE}"';
+        return $this->binPath() . 'pg_dump --no-owner --no-acl --host="${:LARAVEL_LOAD_HOST}" --port="${:LARAVEL_LOAD_PORT}" --username="${:LARAVEL_LOAD_USER}" --dbname="${:LARAVEL_LOAD_DATABASE}"';
     }
 
     /**
@@ -76,4 +77,20 @@ class PostgresSchemaState extends SchemaState
             'LARAVEL_LOAD_DATABASE' => $config['database'],
         ];
     }
+	
+	/**
+	 * Get the bin path for the dump / restore command.
+	 *
+	 * @return string
+	 */
+	protected function binPath()
+	{
+		$binPath = $this->connection->getConfig()['bin'] ?? '';
+		
+		if ($binPath) {
+			$binPath = Str::finish($binPath, DIRECTORY_SEPARATOR);
+		}
+		
+		return $binPath;
+	}
 }

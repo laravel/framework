@@ -70,7 +70,7 @@ class MySqlSchemaState extends SchemaState
      */
     public function load($path)
     {
-        $command = $this->mysqlBinPath() . 'mysql '.$this->connectionString().' --database="${:LARAVEL_LOAD_DATABASE}" < "${:LARAVEL_LOAD_PATH}"';
+        $command = $this->binPath() . 'mysql '.$this->connectionString().' --database="${:LARAVEL_LOAD_DATABASE}" < "${:LARAVEL_LOAD_PATH}"';
 
         $process = $this->makeProcess($command)->setTimeout(null);
 
@@ -86,7 +86,7 @@ class MySqlSchemaState extends SchemaState
      */
     protected function baseDumpCommand()
     {
-        $command = $this->mysqlBinPath() . 'mysqldump '.$this->connectionString().' --no-tablespaces --skip-add-locks --skip-comments --skip-set-charset --tz-utc --column-statistics=0';
+        $command = $this->binPath() . 'mysqldump '.$this->connectionString().' --no-tablespaces --skip-add-locks --skip-comments --skip-set-charset --tz-utc --column-statistics=0';
 
         if (! $this->connection->isMaria()) {
             $command .= ' --set-gtid-purged=OFF';
@@ -143,15 +143,15 @@ class MySqlSchemaState extends SchemaState
 	 *
 	 * @return string
 	 */
-	protected function mysqlBinPath()
+	protected function binPath()
 	{
-		$mysqlBinPath = $this->connection->getConfig()['bin'] ?? '';
+		$binPath = $this->connection->getConfig()['bin'] ?? '';
 		
-		if ($mysqlBinPath) {
-			$mysqlBinPath = Str::finish($mysqlBinPath, DIRECTORY_SEPARATOR);
+		if ($binPath) {
+			$binPath = Str::finish($binPath, DIRECTORY_SEPARATOR);
 		}
 		
-		return $mysqlBinPath;
+		return $binPath;
 	}
 
     /**

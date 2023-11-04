@@ -1,4 +1,3 @@
-
 <?php
 
 namespace Illuminate\Tests\Database;
@@ -35,6 +34,29 @@ class DatabaseSqliteSchemaStateTest extends TestCase
         $schemaState->load('database/schema/sqlite-schema.dump');
 
         $processFactory->shouldHaveBeenCalled()->with('sqlite3 "${:LARAVEL_LOAD_DATABASE}" < "${:LARAVEL_LOAD_PATH}"');
+
+        $process->shouldHaveReceived('mustRun')->with(null, [
+            'LARAVEL_LOAD_DATABASE' => 'database/database.sqlite',
+            'LARAVEL_LOAD_PATH' => 'database/schema/sqlite-schema.dump',
+        ]);
+    }
+
+    public function testLoadSchemaToDatabaseWithBinPath(): void
+    {
+        $config = ['driver' => 'sqlite', 'database' => 'database/database.sqlite', 'prefix' => '', 'foreign_key_constraints' => true, 'name' => 'sqlite', 'bin' => '/usr/bin'];
+        $connection = m::mock(SQLiteConnection::class);
+        $connection->shouldReceive('getConfig')->andReturn($config);
+        $connection->shouldReceive('getDatabaseName')->andReturn($config['database']);
+
+        $process = m::spy(Process::class);
+        $processFactory = m::spy(function () use ($process) {
+            return $process;
+        });
+
+        $schemaState = new SqliteSchemaState($connection, null, $processFactory);
+        $schemaState->load('database/schema/sqlite-schema.dump');
+
+        $processFactory->shouldHaveBeenCalled()->with('/usr/bin/sqlite3 "${:LARAVEL_LOAD_DATABASE}" < "${:LARAVEL_LOAD_PATH}"');
 
         $process->shouldHaveReceived('mustRun')->with(null, [
             'LARAVEL_LOAD_DATABASE' => 'database/database.sqlite',
