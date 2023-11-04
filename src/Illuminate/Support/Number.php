@@ -12,6 +12,22 @@ class Number
     use Macroable;
 
     /**
+     * Format the number according to the current locale.
+     *
+     * @param  float|int  $number
+     * @param  ?string  $locale
+     * @return false|string
+     */
+    public static function format($number, $locale = null)
+    {
+        static::needsIntlExtension();
+
+        $formatter = new NumberFormatter($locale ?? App::getLocale(), NumberFormatter::DECIMAL);
+
+        return $formatter->format($number);
+    }
+
+    /**
      * Format the number to a fluent human-readable string.
      *
      * @param  float|int  $number

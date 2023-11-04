@@ -27,6 +27,54 @@ class SupportNumberTest extends TestCase
         parent::tearDown();
     }
 
+    public function testFormat()
+    {
+        $this->needsIntlExtension();
+
+        $this->assertSame('0', Number::format(0));
+        $this->assertSame('1', Number::format(1));
+        $this->assertSame('10', Number::format(10));
+        $this->assertSame('25', Number::format(25));
+        $this->assertSame('100', Number::format(100));
+        $this->assertSame('100,000', Number::format(100000));
+        $this->assertSame('123,456,789', Number::format(123456789));
+
+        $this->assertSame('-1', Number::format(-1));
+        $this->assertSame('-10', Number::format(-10));
+        $this->assertSame('-25', Number::format(-25));
+
+        $this->assertSame('0.2', Number::format(0.2));
+        $this->assertSame('1.23', Number::format(1.23));
+        $this->assertSame('-1.23', Number::format(-1.23));
+        $this->assertSame('123.456', Number::format(123.456));
+
+        $this->assertSame('∞', Number::format(INF));
+        $this->assertSame('NaN', Number::format(NAN));
+    }
+
+    public function testFormatWithDifferentLocale()
+    {
+        $this->needsIntlExtension();
+
+        $this->assertSame('123,456,789', Number::format(123456789, 'en'));
+        $this->assertSame('123.456.789', Number::format(123456789, 'de'));
+        $this->assertSame('123 456 789', Number::format(123456789, 'fr'));
+        $this->assertSame('123 456 789', Number::format(123456789, 'ru'));
+        $this->assertSame('123 456 789', Number::format(123456789, 'sv'));
+    }
+
+    public function testFormatWithAppLocale()
+    {
+        $this->needsIntlExtension();
+
+        $this->assertSame('123,456,789', Number::format(123456789));
+
+        App::clearResolvedInstances();
+        App::shouldReceive('getLocale')->andReturn('de');
+
+        $this->assertSame('123.456.789', Number::format(123456789));
+    }
+
     public function testToHuman()
     {
         $this->needsIntlExtension();
