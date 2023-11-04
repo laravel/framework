@@ -2,11 +2,31 @@
 
 namespace Illuminate\Tests\Support;
 
+use Illuminate\Container\Container;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Number;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 
 class SupportNumberTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        App::swap(new Container);
+        App::shouldReceive('getLocale')->andReturn('en');
+    }
+
+    protected function tearDown(): void
+    {
+        Mockery::close();
+        App::clearResolvedInstances();
+        App::swap(new Container);
+
+        parent::tearDown();
+    }
+
     public function testToHuman()
     {
         $this->needsIntlExtension();

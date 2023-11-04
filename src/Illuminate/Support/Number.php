@@ -2,6 +2,7 @@
 
 namespace Illuminate\Support;
 
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Traits\Macroable;
 use NumberFormatter;
 use RuntimeException;
@@ -14,14 +15,14 @@ class Number
      * Format the number to a fluent human-readable string.
      *
      * @param  float|int  $number
-     * @param  string  $locale
+     * @param  ?string  $locale
      * @return false|string
      */
-    public static function toHuman($number, $locale = 'en')
+    public static function toHuman($number, $locale = null)
     {
         static::needsIntlExtension();
 
-        $formatter = new NumberFormatter($locale, NumberFormatter::SPELLOUT);
+        $formatter = new NumberFormatter($locale ?? App::getLocale(), NumberFormatter::SPELLOUT);
 
         return $formatter->format($number);
     }
@@ -31,14 +32,14 @@ class Number
      *
      * @param  float|int  $number
      * @param  string  $currency
-     * @param  string  $locale
+     * @param  ?string  $locale
      * @return false|string
      */
-    public static function toCurrency($number, $currency = 'USD', $locale = 'en')
+    public static function toCurrency($number, $currency = 'USD', $locale = null)
     {
         static::needsIntlExtension();
 
-        $formatter = new NumberFormatter($locale, NumberFormatter::CURRENCY);
+        $formatter = new NumberFormatter($locale ?? App::getLocale(), NumberFormatter::CURRENCY);
 
         return $formatter->formatCurrency($number, $currency);
     }
