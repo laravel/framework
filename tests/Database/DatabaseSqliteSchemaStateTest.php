@@ -46,7 +46,15 @@ class DatabaseSqliteSchemaStateTest extends TestCase
 
     public function testLoadSchemaToDatabaseWithBinPath(): void
     {
-        $config = ['driver' => 'sqlite', 'database' => 'database/database.sqlite', 'prefix' => '', 'foreign_key_constraints' => true, 'name' => 'sqlite', 'bin' => '/usr/bin'];
+        $config = [
+			'driver' => 'sqlite',
+			'database' => 'database/database.sqlite',
+			'prefix' => '',
+			'foreign_key_constraints' => true,
+			'name' => 'sqlite',
+			'bin' => Str::replace('/', DIRECTORY_SEPARATOR,'/usr/bin'),
+        ];
+		
         $connection = m::mock(SQLiteConnection::class);
         $connection->shouldReceive('getConfig')->andReturn($config);
         $connection->shouldReceive('getDatabaseName')->andReturn($config['database']);
