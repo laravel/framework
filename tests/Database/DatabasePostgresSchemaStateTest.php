@@ -72,8 +72,8 @@ class DatabasePostgresSchemaStateTest extends TestCase
         ];
 
         yield 'default_bin_path' => [
-	        Str::replace('/', DIRECTORY_SEPARATOR,'/Users/Shared/DBngin/postgresql/15.1/bin/pg_dump --no-owner --no-acl --host="${:LARAVEL_LOAD_HOST}" --port="${:LARAVEL_LOAD_PORT}" --username="${:LARAVEL_LOAD_USER}" --dbname="${:LARAVEL_LOAD_DATABASE}"'),
-	        Str::replace('/', DIRECTORY_SEPARATOR,'/Users/Shared/DBngin/postgresql/15.1/bin/pg_restore --no-owner --no-acl --clean --if-exists --host="${:LARAVEL_LOAD_HOST}" --port="${:LARAVEL_LOAD_PORT}" --username="${:LARAVEL_LOAD_USER}" --dbname="${:LARAVEL_LOAD_DATABASE}" "${:LARAVEL_LOAD_PATH}"'),
+            Str::replace('/', DIRECTORY_SEPARATOR, '/Users/Shared/DBngin/postgresql/15.1/bin/pg_dump --no-owner --no-acl --host="${:LARAVEL_LOAD_HOST}" --port="${:LARAVEL_LOAD_PORT}" --username="${:LARAVEL_LOAD_USER}" --dbname="${:LARAVEL_LOAD_DATABASE}"'),
+            Str::replace('/', DIRECTORY_SEPARATOR, '/Users/Shared/DBngin/postgresql/15.1/bin/pg_restore --no-owner --no-acl --clean --if-exists --host="${:LARAVEL_LOAD_HOST}" --port="${:LARAVEL_LOAD_PORT}" --username="${:LARAVEL_LOAD_USER}" --dbname="${:LARAVEL_LOAD_DATABASE}" "${:LARAVEL_LOAD_PATH}"'),
             [
                 'LARAVEL_LOAD_HOST' => '127.0.0.1',
                 'LARAVEL_LOAD_PORT' => '',
@@ -85,7 +85,7 @@ class DatabasePostgresSchemaStateTest extends TestCase
                 'host' => '127.0.0.1',
                 'database' => 'forge',
                 'password' => 'secret',
-                'bin' => Str::replace('/', DIRECTORY_SEPARATOR,'/Users/Shared/DBngin/postgresql/15.1/bin'),
+                'bin' => Str::replace('/', DIRECTORY_SEPARATOR, '/Users/Shared/DBngin/postgresql/15.1/bin'),
             ],
         ];
     }

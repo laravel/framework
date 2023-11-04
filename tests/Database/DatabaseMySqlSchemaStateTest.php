@@ -8,6 +8,7 @@ use Illuminate\Database\Schema\MySqlSchemaState;
 use Illuminate\Support\Str;
 use PHPUnit\Framework\TestCase;
 use ReflectionMethod;
+
 use const DIRECTORY_SEPARATOR;
 
 class DatabaseMySqlSchemaStateTest extends TestCase
