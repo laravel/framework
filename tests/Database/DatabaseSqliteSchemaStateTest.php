@@ -5,10 +5,12 @@ namespace Illuminate\Tests\Database;
 use Illuminate\Database\Schema\SqliteSchemaState;
 use Illuminate\Database\SQLiteConnection;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Str;
 use Mockery as m;
 use PDO;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Process;
+use const DIRECTORY_SEPARATOR;
 
 class DatabaseSqliteSchemaStateTest extends TestCase
 {
@@ -56,7 +58,9 @@ class DatabaseSqliteSchemaStateTest extends TestCase
         $schemaState = new SqliteSchemaState($connection, null, $processFactory);
         $schemaState->load('database/schema/sqlite-schema.dump');
 
-        $processFactory->shouldHaveBeenCalled()->with('/usr/bin/sqlite3 "${:LARAVEL_LOAD_DATABASE}" < "${:LARAVEL_LOAD_PATH}"');
+        $processFactory->shouldHaveBeenCalled()->with(
+			Str::replace('/', DIRECTORY_SEPARATOR, '/usr/bin/sqlite3 "${:LARAVEL_LOAD_DATABASE}" < "${:LARAVEL_LOAD_PATH}"')
+        );
 
         $process->shouldHaveReceived('mustRun')->with(null, [
             'LARAVEL_LOAD_DATABASE' => 'database/database.sqlite',
