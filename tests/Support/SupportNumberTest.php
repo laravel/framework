@@ -121,6 +121,23 @@ class SupportNumberTest extends TestCase
         $this->assertSame('ett­hundra­tjugo­tre', Number::toHuman(123, 'sv'));
     }
 
+    public function testToPercent()
+    {
+        $this->needsIntlExtension();
+
+        $this->assertSame('0%', Number::toPercent(0));
+        $this->assertSame('1%', Number::toPercent(1));
+        $this->assertSame('10%', Number::toPercent(10));
+        $this->assertSame('100%', Number::toPercent(100));
+
+        $this->assertSame('300%', Number::toPercent(300));
+        $this->assertSame('1,000%', Number::toPercent(1000));
+
+        $this->assertSame('1.75%', Number::toPercent(1.75));
+        $this->assertSame('0.12%', Number::toPercent(0.12345));
+        $this->assertSame('0.1235%', Number::toPercent(0.12345, 4));
+    }
+
     public function testToCurrency()
     {
         $this->needsIntlExtension();

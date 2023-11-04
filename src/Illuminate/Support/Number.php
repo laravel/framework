@@ -44,6 +44,25 @@ class Number
     }
 
     /**
+     * Format the number to a percent format.
+     *
+     * @param  float|int  $number
+     * @param  int  $precision
+     * @param  string  $locale
+     * @return false|string
+     */
+    public static function toPercent($number, $precision = 2, $locale = 'en')
+    {
+        static::needsIntlExtension();
+
+        $formatter = new NumberFormatter($locale, NumberFormatter::PERCENT);
+
+        $formatter->setAttribute(NumberFormatter::MAX_FRACTION_DIGITS, $precision);
+
+        return $formatter->format($number / 100);
+    }
+
+    /**
      * Format the number to a currency format.
      *
      * @param  float|int  $number
