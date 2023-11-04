@@ -8,6 +8,7 @@ use Illuminate\Database\Schema\MySqlSchemaState;
 use Illuminate\Support\Str;
 use PHPUnit\Framework\TestCase;
 use ReflectionMethod;
+use const DIRECTORY_SEPARATOR;
 
 class DatabaseMySqlSchemaStateTest extends TestCase
 {
@@ -81,8 +82,8 @@ class DatabaseMySqlSchemaStateTest extends TestCase
 
         yield 'default_bin_path' => [
             ' --user="${:LARAVEL_LOAD_USER}" --password="${:LARAVEL_LOAD_PASSWORD}" --host="${:LARAVEL_LOAD_HOST}" --port="${:LARAVEL_LOAD_PORT}"',
-            '/Users/Shared/DBngin/MySQL/8.0.33/bin/mysqldump {{CONNECTION_STRING}} --no-tablespaces --skip-add-locks --skip-comments --skip-set-charset --tz-utc --column-statistics=0 --set-gtid-purged=OFF "${:LARAVEL_LOAD_DATABASE}"',
-            '/Users/Shared/DBngin/MySQL/8.0.33/bin/mysql {{CONNECTION_STRING}} --database="${:LARAVEL_LOAD_DATABASE}" < "${:LARAVEL_LOAD_PATH}"',
+            Str::replace('/', DIRECTORY_SEPARATOR, '/Users/Shared/DBngin/MySQL/8.0.33/bin/mysqldump {{CONNECTION_STRING}} --no-tablespaces --skip-add-locks --skip-comments --skip-set-charset --tz-utc --column-statistics=0 --set-gtid-purged=OFF "${:LARAVEL_LOAD_DATABASE}"'),
+            Str::replace('/', DIRECTORY_SEPARATOR, '/Users/Shared/DBngin/MySQL/8.0.33/bin/mysql {{CONNECTION_STRING}} --database="${:LARAVEL_LOAD_DATABASE}" < "${:LARAVEL_LOAD_PATH}"'),
             [
                 'LARAVEL_LOAD_SOCKET' => '',
                 'LARAVEL_LOAD_HOST' => '127.0.0.1',
@@ -95,7 +96,7 @@ class DatabaseMySqlSchemaStateTest extends TestCase
                 'username' => 'root',
                 'host' => '127.0.0.1',
                 'database' => 'forge',
-                'bin' => '/Users/Shared/DBngin/MySQL/8.0.33/bin',
+                'bin' => Str::replace('/', DIRECTORY_SEPARATOR, '/Users/Shared/DBngin/MySQL/8.0.33/bin'),
             ],
         ];
 
