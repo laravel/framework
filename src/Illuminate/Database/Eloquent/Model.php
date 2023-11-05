@@ -12,6 +12,7 @@ use Illuminate\Contracts\Support\CanBeEscapedWhenCastToString;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\Concerns\AsPivot;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
@@ -1061,6 +1062,13 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function push()
     {
+        // BelongsTo relationships must be handled earlier than the other relationships.
+        // Since record creation will fail unless the foreign key is set on the base
+        // model, we need to ensure that the BelongsTo relationships are created.
+        if (! $this->pushBelongsToRelations($this->getRelationsOfType(BelongsTo::class)->all(), true)) {
+            return false;
+        }
+
         if (! $this->save()) {
             return false;
         }
@@ -1068,15 +1076,8 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         // To sync all of the relationships to the database, we will simply spin through
         // the relationships and save each model via this "push" method, which allows
         // us to recurse into all of these nested relations for the model instance.
-        foreach ($this->relations as $models) {
-            $models = $models instanceof Collection
-                ? $models->all() : [$models];
-
-            foreach (array_filter($models) as $model) {
-                if (! $model->push()) {
-                    return false;
-                }
-            }
+        if (! $this->pushRelations($this->getRelationsExceptOfType(BelongsTo::class)->all(), true)) {
+            return false;
         }
 
         return true;
@@ -1090,6 +1091,59 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     public function pushQuietly()
     {
         return static::withoutEvents(fn () => $this->push());
+    }
+
+    /**
+     * @param array $relations
+     * @param bool $associate
+     * @return bool
+     */
+    public function pushBelongsToRelations($relations, $associate = false)
+    {
+        foreach ($relations as $relation => $models) {
+             $models = $models instanceof Collection
+                ? $models->all() : [$models];
+
+            foreach (array_filter($models) as $model) {
+                if (! $model->push()) {
+                    return false;
+                }
+
+                if ($associate) {
+                    $this->{$relation}()->associate($model);
+                }
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * @param array $relations
+     * @param bool $associate
+     * @return bool
+     */
+    public function pushRelations($relations, $associate = false)
+    {
+        foreach ($relations as $relation => $models) {
+             $models = $models instanceof Collection
+                ? $models->all() : [$models];
+
+            foreach (array_filter($models) as $model) {
+                if ($associate && ! $model->exists) {
+                    /** @var \Illuminate\Database\Eloquent\Relations\HasOneOrMany $relation */
+                    $relation = $this->{$relation}();
+
+                    $model = $model->setAttribute($relation->getForeignKeyName(), $relation->getParentKey());
+                }
+
+                if (! $model->push()) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 
     /**

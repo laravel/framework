@@ -22,6 +22,7 @@ use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use ReflectionClass;
 
 trait HasRelationships
 {
@@ -925,5 +926,43 @@ trait HasRelationships
         $this->touches = $touches;
 
         return $this;
+    }
+
+    /**
+     * @param  class-string<\Illuminate\Database\Eloquent\Relations\Relation> $type
+     * @return \Illuminate\Support\Collection<int, \Illuminate\Database\Eloquent\Relations\Relation>
+     */
+    public function getRelationsOfType($type)
+    {
+        return collect($this->getRelations())->filter(function ($models, $relation) use ($type) {
+            return $this->isRelationshipOfType($relation, $type);
+        });
+    }
+
+    /**
+     * @param  class-string<\Illuminate\Database\Eloquent\Relations\Relation> $type
+     * @return \Illuminate\Support\Collection<int, \Illuminate\Database\Eloquent\Relations\Relation>
+     */
+    public function getRelationsExceptOfType($type)
+    {
+        return collect($this->getRelations())->reject(function ($models, $relation) use ($type) {
+            return $this->isRelationshipOfType($relation, $type);
+        });
+    }
+
+    /**
+     * @param  string  $relation
+     * @param  class-string<\Illuminate\Database\Eloquent\Relations\Relation>  $type
+     * @return bool
+     */
+    public function isRelationshipOfType($relation, $type)
+    {
+        $relationObject = $this->$relation();
+
+        if (! $relationObject) {
+            return null;
+        }
+
+        return $relationObject instanceof $type;
     }
 }

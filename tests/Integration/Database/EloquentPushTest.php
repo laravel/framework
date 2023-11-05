@@ -2,9 +2,11 @@
 
 namespace Illuminate\Tests\Integration\Database;
 
+use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Mockery;
 
 class EloquentPushTest extends DatabaseTestCase
 {
@@ -52,6 +54,20 @@ class EloquentPushTest extends DatabaseTestCase
         $this->assertSame('Test comment 1', CommentX::firstOrFail()->comment);
     }
 
+    public function testPushSavesAHasManyRelationship()
+    {
+        UserX::create(['name' => 'First test']); // So user starts at ID 2
+        $user = UserX::make(['name' => 'Test']);
+        $post = PostX::make(['title' => 'Test title']);
+        $user->posts->push($post);
+
+        $user->push();
+
+        $this->assertEquals(2, $user->id);
+        $this->assertEquals(1, $post->id);
+        $this->assertTrue($post->fresh()->user->is($user));
+    }
+
     public function testPushSavesABelongsToRelationship()
     {
         $post = PostX::make(['title' => 'Test title']);
@@ -62,6 +78,34 @@ class EloquentPushTest extends DatabaseTestCase
         $this->assertEquals(1, $user->id);
         $this->assertEquals(1, $post->id);
         $this->assertTrue($post->fresh()->user->is($user));
+    }
+
+    public function testPushReturnsFalseIfBelongsToSaveFails()
+    {
+        $post = PostX::make(['title' => 'Test title']);
+        $user = UserX::make(['name' => 'Test']);
+        $user->setEventDispatcher($events = Mockery::mock(Dispatcher::class));
+        $events->expects('until')->with('eloquent.saving: '.get_class($user), $user)->andReturns(false);
+
+        $post->user()->associate($user);
+
+        $this->assertFalse($post->push());
+    }
+
+    public function testPushReturnsFalseIfRelationshipsFail()
+    {
+        $post = PostX::make(['title' => 'Test title']);
+        $user = UserX::make(['name' => 'Test']);
+        Model::setEventDispatcher($events = Mockery::mock(Dispatcher::class));
+        $events->makePartial();
+        $events->expects('dispatch')->times(3)->andReturn();
+        $events->expects('until')->times(3)->andReturn(true);
+        $events->expects('until')->with('eloquent.saving: '.get_class($post), $post)->andReturn(false);
+        $user->save();
+
+        $user->posts->push($post);
+
+        $this->assertFalse($user->push());
     }
 }
 
