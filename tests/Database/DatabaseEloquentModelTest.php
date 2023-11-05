@@ -972,7 +972,7 @@ class DatabaseEloquentModelTest extends TestCase
     {
         $related1 = $this->getMockBuilder(EloquentModelStub::class)->onlyMethods(['newModelQuery', 'updateTimestamps', 'refresh'])->getMock();
         $query = m::mock(Builder::class);
-        $query->shouldReceive('insertGetId')->once()->with(['name' => 'related1'], 'id')->andReturn(2);
+        $query->shouldReceive('insertGetId')->once()->with(['name' => 'related1', 'foo' => 1], 'id')->andReturn(2);
         $query->shouldReceive('getConnection')->once();
         $related1->expects($this->once())->method('newModelQuery')->willReturn($query);
         $related1->expects($this->once())->method('updateTimestamps');
@@ -1022,7 +1022,7 @@ class DatabaseEloquentModelTest extends TestCase
     {
         $related1 = $this->getMockBuilder(EloquentModelStub::class)->onlyMethods(['newModelQuery', 'updateTimestamps', 'refresh'])->getMock();
         $query = m::mock(Builder::class);
-        $query->shouldReceive('insertGetId')->once()->with(['name' => 'related1'], 'id')->andReturn(2);
+        $query->shouldReceive('insertGetId')->once()->with(['name' => 'related1', 'foo' => 1], 'id')->andReturn(2);
         $query->shouldReceive('getConnection')->once();
         $related1->expects($this->once())->method('newModelQuery')->willReturn($query);
         $related1->expects($this->once())->method('updateTimestamps');
@@ -1031,7 +1031,7 @@ class DatabaseEloquentModelTest extends TestCase
 
         $related2 = $this->getMockBuilder(EloquentModelStub::class)->onlyMethods(['newModelQuery', 'updateTimestamps', 'refresh'])->getMock();
         $query = m::mock(Builder::class);
-        $query->shouldReceive('insertGetId')->once()->with(['name' => 'related2'], 'id')->andReturn(3);
+        $query->shouldReceive('insertGetId')->once()->with(['name' => 'related2', 'foo' => 1], 'id')->andReturn(3);
         $query->shouldReceive('getConnection')->once();
         $related2->expects($this->once())->method('newModelQuery')->willReturn($query);
         $related2->expects($this->once())->method('updateTimestamps');
@@ -1048,7 +1048,6 @@ class DatabaseEloquentModelTest extends TestCase
         $model->name = 'taylor';
         $model->exists = false;
         $model->setRelation('relationMany', new Collection([$related1, $related2]));
-
         $this->assertTrue($model->push());
         $this->assertEquals(1, $model->id);
         $this->assertTrue($model->exists);
@@ -2896,6 +2895,16 @@ class EloquentModelStub extends Model
     public function belongsToExplicitKeyStub()
     {
         return $this->belongsTo(EloquentModelSaveStub::class, 'foo');
+    }
+
+    public function relationMany()
+    {
+        return $this->hasMany(EloquentModelSaveStub::class, 'foo');
+    }
+
+    public function relationOne()
+    {
+        return $this->hasOne(EloquentModelSaveStub::class, 'foo');
     }
 
     public function incorrectRelationStub()
