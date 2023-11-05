@@ -1092,6 +1092,12 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
             return false;
         }
 
+        if (! $this->pushRelations(
+            $this->getRelationsOfType(BelongsToMany::class)->all()
+        )) {
+            return false;
+        }
+
         return true;
     }
 
@@ -1127,6 +1133,8 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
 
                 if ($relation instanceof BelongsTo) {
                     $relation->associate($model);
+                } elseif ($relation instanceof BelongsToMany) {
+                    $relation->attach($model);
                 }
             }
         }

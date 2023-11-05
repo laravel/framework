@@ -24,6 +24,17 @@ class EloquentPushTest extends DatabaseTestCase
             $table->unsignedInteger('user_id');
         });
 
+        Schema::create('tags', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('tag');
+        });
+
+        Schema::create('post_tag', function (Blueprint $table) {
+            $table->increments('id');
+            $table->unsignedInteger('post_id');
+            $table->unsignedInteger('tag_id');
+        });
+
         Schema::create('post_details', function (Blueprint $table) {
             $table->increments('id');
             $table->string('description');
@@ -141,6 +152,20 @@ class EloquentPushTest extends DatabaseTestCase
         $this->assertTrue($comment->commentable->is($post));
     }
 
+    public function testPushSavesABelongsToManyRelationship()
+    {
+        $user = UserX::create(['name' => 'Mateus']);
+        $post = PostX::make(['title' => 'Test title', 'user_id' => $user->id]);
+        $tag = TagX::make(['tag' => 'Test tag']);
+        $post->tags->push($tag);
+
+        $post->push();
+
+        $this->assertEquals(1, $post->id);
+        $this->assertEquals(1, $tag->id);
+        $this->assertTrue($post->tags->first()->is($tag));
+    }
+
     public function testPushReturnsFalseIfBelongsToSaveFails()
     {
         $post = PostX::make(['title' => 'Test title']);
@@ -188,6 +213,11 @@ class PostX extends Model
     protected $guarded = [];
     protected $table = 'posts';
 
+    public function tags()
+    {
+        return $this->belongsToMany(TagX::class, 'post_tag', 'post_id', 'tag_id');
+    }
+
     public function details()
     {
         return $this->hasOne(PostDetails::class, 'post_id');
@@ -230,5 +260,17 @@ class CommentX extends Model
     public function commentable()
     {
         return $this->morphTo('commentable');
+    }
+}
+
+class TagX extends Model
+{
+    public $timestamps = false;
+    protected $guarded = [];
+    protected $table = 'tags';
+
+    public function posts()
+    {
+        return $this->belongsToMany(PostX::class, 'post_tag', 'tag_id', 'post_id');
     }
 }
