@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\Concerns\AsPivot;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasOneOrMany;
 use Illuminate\Database\Eloquent\Relations\MorphOneOrMany;
 use Illuminate\Database\Eloquent\Relations\Pivot;
@@ -1067,9 +1068,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         // BelongsTo relationships must be handled earlier than the other relationships.
         // Since record creation will fail unless the foreign key is set on the base
         // model, we need to ensure that the BelongsTo relationships are created.
-        if (! $this->pushRelations(
-            $this->getRelationsOfType(BelongsTo::class)->all(),
-            BelongsTo::class)) {
+        if (! $this->pushRelations($this->getRelationsOfType(BelongsTo::class)->all())) {
             return false;
         }
 
@@ -1081,19 +1080,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         // the relationships and save each model via this "push" method, which allows
         // us to recurse into all of these nested relations for the model instance.
         if (! $this->pushRelations(
-            $this->getRelationsOfType(MorphOneOrMany::class)->all()
-        )) {
-            return false;
-        }
-
-        if (! $this->pushRelations(
-            $this->getRelationsOfType(HasOneOrMany::class)->all()
-        )) {
-            return false;
-        }
-
-        if (! $this->pushRelations(
-            $this->getRelationsOfType(BelongsToMany::class)->all()
+            $this->getRelationsOfType(MorphOneOrMany::class, HasOneOrMany::class, BelongsToMany::class)->all()
         )) {
             return false;
         }
@@ -1113,16 +1100,16 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
 
     protected function pushRelations($relations)
     {
-        foreach ($relations as $relation => $models) {
+        foreach ($relations as $relationName => $models) {
              $models = $models instanceof Collection
                 ? $models->all() : [$models];
 
             foreach (array_filter($models) as $model) {
-                $relation = $this->{$relation}();
+                $relation = $this->{$relationName}();
 
                 if ($relation instanceof MorphOneOrMany) {
-                    $model->setAttribute($relation->getForeignKeyName(), $relation->getParentKey());
-                    $model->setAttribute($relation->getMorphType(), $relation->getMorphClass());
+                    $model->setAttribute($relation->getForeignKeyName(), $relation->getParentKey())
+                          ->setAttribute($relation->getMorphType(), $relation->getMorphClass());
                 } elseif ($relation instanceof HasOneOrMany) {
                     $model->setAttribute($relation->getForeignKeyName(), $relation->getParentKey());
                 }

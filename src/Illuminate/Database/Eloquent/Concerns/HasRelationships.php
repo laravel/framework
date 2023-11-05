@@ -23,6 +23,7 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use ReflectionClass;
+use ReflectionObject;
 
 trait HasRelationships
 {
@@ -929,40 +930,46 @@ trait HasRelationships
     }
 
     /**
-     * @param  class-string<\Illuminate\Database\Eloquent\Relations\Relation> $type
+     * @param  class-string<\Illuminate\Database\Eloquent\Relations\Relation> ...$types
      * @return \Illuminate\Support\Collection<int, \Illuminate\Database\Eloquent\Relations\Relation>
      */
-    public function getRelationsOfType($type)
+    public function getRelationsOfType(...$types)
     {
-        return collect($this->getRelations())->filter(function ($models, $relation) use ($type) {
-            return $this->isRelationshipOfType($relation, $type);
+        return collect($this->getRelations())->filter(function ($models, $relation) use ($types) {
+            return $this->isRelationshipOfType($relation, $types);
         });
     }
 
     /**
-     * @param  class-string<\Illuminate\Database\Eloquent\Relations\Relation> $type
+     * @param  class-string<\Illuminate\Database\Eloquent\Relations\Relation> ...$types
      * @return \Illuminate\Support\Collection<int, \Illuminate\Database\Eloquent\Relations\Relation>
      */
-    public function getRelationsExceptOfType($type)
+    public function getRelationsExceptOfType(...$types)
     {
-        return collect($this->getRelations())->reject(function ($models, $relation) use ($type) {
-            return $this->isRelationshipOfType($relation, $type);
+        return collect($this->getRelations())->reject(function ($models, $relation) use ($types) {
+            return $this->isRelationshipOfType($relation, $types);
         });
     }
 
     /**
      * @param  string  $relation
-     * @param  class-string<\Illuminate\Database\Eloquent\Relations\Relation>  $type
+     * @param  class-string<\Illuminate\Database\Eloquent\Relations\Relation>[]  $types
      * @return bool
      */
-    public function isRelationshipOfType($relation, $type)
+    public function isRelationshipOfType($relation, $types)
     {
         $relationObject = $this->$relation();
 
         if (! $relationObject) {
-            return null;
+            return false;
         }
 
-        return $relationObject instanceof $type;
+        foreach ($types as $type) {
+            if ($relationObject instanceof $type) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
