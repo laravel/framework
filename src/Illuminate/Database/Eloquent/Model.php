@@ -1081,14 +1081,14 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         // the relationships and save each model via this "push" method, which allows
         // us to recurse into all of these nested relations for the model instance.
         if (! $this->pushRelations(
-            $this->getRelationsOfType(MorphOneOrMany::class)->all(),
-            MorphOneOrMany::class)) {
+            $this->getRelationsOfType(MorphOneOrMany::class)->all()
+        )) {
             return false;
         }
 
         if (! $this->pushRelations(
-            $this->getRelationsOfType(HasOneOrMany::class)->all(),
-            HasOneOrMany::class)) {
+            $this->getRelationsOfType(HasOneOrMany::class)->all()
+        )) {
             return false;
         }
 
@@ -1105,7 +1105,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         return static::withoutEvents(fn () => $this->push());
     }
 
-    protected function pushRelations($relations, $relationType)
+    protected function pushRelations($relations)
     {
         foreach ($relations as $relation => $models) {
              $models = $models instanceof Collection
@@ -1114,23 +1114,18 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
             foreach (array_filter($models) as $model) {
                 $relation = $this->{$relation}();
 
-
-
-                if ($relationType === MorphOneOrMany::class && ! $model->exists) {
+                if ($relation instanceof MorphOneOrMany) {
                     $model->setAttribute($relation->getForeignKeyName(), $relation->getParentKey());
                     $model->setAttribute($relation->getMorphType(), $relation->getMorphClass());
+                } elseif ($relation instanceof HasOneOrMany) {
+                    $model->setAttribute($relation->getForeignKeyName(), $relation->getParentKey());
                 }
-
-                if ($relationType === HasOneOrMany::class && ! $model->exists) {
-                    $model = $model->setAttribute($relation->getForeignKeyName(), $relation->getParentKey());
-                }
-
 
                 if (! $model->push()) {
                     return false;
                 }
 
-                if ($relationType === BelongsTo::class) {
+                if ($relation instanceof BelongsTo) {
                     $relation->associate($model);
                 }
             }

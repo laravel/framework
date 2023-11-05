@@ -101,6 +101,20 @@ class EloquentPushTest extends DatabaseTestCase
         $this->assertTrue($post->fresh()->user->is($user));
     }
 
+    public function testPushSavesAMorphOneRelationship()
+    {
+        $user = UserX::create(['name' => 'Mateus']);
+        $post = PostX::make(['title' => 'Test title', 'user_id' => $user->id]);
+        $comment = CommentX::make(['comment' => 'Test comment']);
+        $post->comment = $comment;
+
+        $post->push();
+
+        $this->assertEquals(1, $post->id);
+        $this->assertEquals(1, $comment->id);
+        $this->assertTrue($post->fresh()->comment->is($comment));
+    }
+
     public function testPushSavesAMorphManyRelationship()
     {
         $user = UserX::create(['name' => 'Mateus']);
@@ -112,6 +126,19 @@ class EloquentPushTest extends DatabaseTestCase
         $this->assertEquals(1, $post->id);
         $this->assertEquals(1, $comment->id);
         $this->assertTrue($post->comments->first()->is($comment));
+    }
+
+    public function testPushSavesAMorphToRelationship()
+    {
+        $user = UserX::create(['name' => 'Mateus']);
+        $post = PostX::make(['title' => 'Test title', 'user_id' => $user->id]);
+        $comment = CommentX::make(['comment' => 'Test comment']);
+        $comment->commentable()->associate($post);
+        $comment->push();
+
+        $this->assertEquals(1, $post->id);
+        $this->assertEquals(1, $comment->id);
+        $this->assertTrue($comment->commentable->is($post));
     }
 
     public function testPushReturnsFalseIfBelongsToSaveFails()
@@ -166,6 +193,11 @@ class PostX extends Model
         return $this->hasOne(PostDetails::class, 'post_id');
     }
 
+    public function comment()
+    {
+        return $this->morphOne(CommentX::Class, 'commentable');
+    }
+
     public function comments()
     {
         return $this->morphMany(CommentX::class, 'commentable');
@@ -195,8 +227,8 @@ class CommentX extends Model
     protected $guarded = [];
     protected $table = 'comments';
 
-    public function post()
+    public function commentable()
     {
-        return $this->morphTo(PostX::class, 'commentable');
+        return $this->morphTo('commentable');
     }
 }
