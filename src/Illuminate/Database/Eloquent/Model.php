@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\Concerns\AsPivot;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\HasOneOrMany;
+use Illuminate\Database\Eloquent\Relations\MorphOneOrMany;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection as BaseCollection;
@@ -1080,6 +1081,12 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         // the relationships and save each model via this "push" method, which allows
         // us to recurse into all of these nested relations for the model instance.
         if (! $this->pushRelations(
+            $this->getRelationsOfType(MorphOneOrMany::class)->all(),
+            MorphOneOrMany::class)) {
+            return false;
+        }
+
+        if (! $this->pushRelations(
             $this->getRelationsOfType(HasOneOrMany::class)->all(),
             HasOneOrMany::class)) {
             return false;
@@ -1105,10 +1112,18 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
                 ? $models->all() : [$models];
 
             foreach (array_filter($models) as $model) {
+                $relation = $this->{$relation}();
+
+                if ($relationType === MorphOneOrMany::class && ! $model->exists) {
+                    $model->setAttribute($relation->getForeignKeyName(), $relation->getParentKey());
+                    $model->setAttribute($relation->getMorphType(), $relation->getMorphClass());
+                }
+
                 if ($relationType === HasOneOrMany::class && ! $model->exists) {
                     $relation = $this->{$relation}();
                     $model = $model->setAttribute($relation->getForeignKeyName(), $relation->getParentKey());
                 }
+
 
                 if (! $model->push()) {
                     return false;

@@ -33,7 +33,7 @@ class EloquentPushTest extends DatabaseTestCase
         Schema::create('comments', function (Blueprint $table) {
             $table->increments('id');
             $table->string('comment');
-            $table->unsignedInteger('post_id');
+            $table->nullableMorphs('commentable');
         });
     }
 
@@ -101,6 +101,19 @@ class EloquentPushTest extends DatabaseTestCase
         $this->assertTrue($post->fresh()->user->is($user));
     }
 
+    public function testPushSavesAMorphManyRelationship()
+    {
+        $user = UserX::create(['name' => 'Mateus']);
+        $post = PostX::make(['title' => 'Test title', 'user_id' => $user->id]);
+        $post->comments->push($comment = CommentX::make(['comment' => 'Test comment']));
+
+        $post->push();
+
+        $this->assertEquals(1, $post->id);
+        $this->assertEquals(1, $comment->id);
+        $this->assertTrue($post->comments->first()->is($comment));
+    }
+
     public function testPushReturnsFalseIfBelongsToSaveFails()
     {
         $post = PostX::make(['title' => 'Test title']);
@@ -155,7 +168,7 @@ class PostX extends Model
 
     public function comments()
     {
-        return $this->hasMany(CommentX::class, 'post_id');
+        return $this->morphMany(CommentX::class, 'commentable');
     }
 
     public function user()
@@ -181,4 +194,9 @@ class CommentX extends Model
     public $timestamps = false;
     protected $guarded = [];
     protected $table = 'comments';
+
+    public function post()
+    {
+        return $this->morphTo(PostX::class, 'commentable');
+    }
 }
