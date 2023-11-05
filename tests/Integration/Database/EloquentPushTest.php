@@ -51,6 +51,18 @@ class EloquentPushTest extends DatabaseTestCase
         $this->assertSame(1, CommentX::count());
         $this->assertSame('Test comment 1', CommentX::firstOrFail()->comment);
     }
+
+    public function testPushSavesABelongsToRelationship()
+    {
+        $post = PostX::make(['title' => 'Test title']);
+        $post->user()->associate($user = UserX::make(['name' => 'Test']));
+
+        $post->push();
+
+        $this->assertEquals(1, $user->id);
+        $this->assertEquals(1, $post->id);
+        $this->assertTrue($post->fresh()->user->is($user));
+    }
 }
 
 class UserX extends Model
@@ -74,6 +86,11 @@ class PostX extends Model
     public function comments()
     {
         return $this->hasMany(CommentX::class, 'post_id');
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(UserX::class, 'user_id');
     }
 }
 
