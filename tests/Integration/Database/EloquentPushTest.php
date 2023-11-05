@@ -4,7 +4,6 @@ namespace Illuminate\Tests\Integration\Database;
 
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Mockery;
@@ -225,7 +224,7 @@ class PostX extends Model
 
     public function comment()
     {
-        return $this->morphOne(CommentX::Class, 'commentable');
+        return $this->morphOne(CommentX::class, 'commentable');
     }
 
     public function comments()

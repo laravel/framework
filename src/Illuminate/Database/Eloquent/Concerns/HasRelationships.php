@@ -22,8 +22,6 @@ use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
-use ReflectionClass;
-use ReflectionObject;
 
 trait HasRelationships
 {
@@ -930,7 +928,7 @@ trait HasRelationships
     }
 
     /**
-     * @param  class-string<\Illuminate\Database\Eloquent\Relations\Relation> ...$types
+     * @param  class-string<\Illuminate\Database\Eloquent\Relations\Relation>  ...$types
      * @return \Illuminate\Support\Collection<int, \Illuminate\Database\Eloquent\Relations\Relation>
      */
     public function getRelationsOfType(...$types)
@@ -941,7 +939,7 @@ trait HasRelationships
     }
 
     /**
-     * @param  class-string<\Illuminate\Database\Eloquent\Relations\Relation> ...$types
+     * @param  class-string<\Illuminate\Database\Eloquent\Relations\Relation>  ...$types
      * @return \Illuminate\Support\Collection<int, \Illuminate\Database\Eloquent\Relations\Relation>
      */
     public function getRelationsExceptOfType(...$types)

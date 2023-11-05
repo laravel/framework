@@ -16,7 +16,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\Concerns\AsPivot;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasOneOrMany;
 use Illuminate\Database\Eloquent\Relations\MorphOneOrMany;
 use Illuminate\Database\Eloquent\Relations\Pivot;
@@ -1101,8 +1100,8 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     protected function pushRelations($relations)
     {
         foreach ($relations as $relationName => $models) {
-             $models = $models instanceof Collection
-                ? $models->all() : [$models];
+            $models = $models instanceof Collection
+               ? $models->all() : [$models];
 
             foreach (array_filter($models) as $model) {
                 $relation = $this->{$relationName}();
