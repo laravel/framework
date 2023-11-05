@@ -1114,13 +1114,14 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
             foreach (array_filter($models) as $model) {
                 $relation = $this->{$relation}();
 
+
+
                 if ($relationType === MorphOneOrMany::class && ! $model->exists) {
                     $model->setAttribute($relation->getForeignKeyName(), $relation->getParentKey());
                     $model->setAttribute($relation->getMorphType(), $relation->getMorphClass());
                 }
 
                 if ($relationType === HasOneOrMany::class && ! $model->exists) {
-                    $relation = $this->{$relation}();
                     $model = $model->setAttribute($relation->getForeignKeyName(), $relation->getParentKey());
                 }
 
@@ -1130,7 +1131,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
                 }
 
                 if ($relationType === BelongsTo::class) {
-                    $this->{$relation}()->associate($model);
+                    $relation->associate($model);
                 }
             }
         }
