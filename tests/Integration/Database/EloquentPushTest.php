@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Integration\Database;
 
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Mockery;
@@ -21,6 +22,12 @@ class EloquentPushTest extends DatabaseTestCase
             $table->increments('id');
             $table->string('title');
             $table->unsignedInteger('user_id');
+        });
+
+        Schema::create('post_details', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('description');
+            $table->unsignedInteger('post_id');
         });
 
         Schema::create('comments', function (Blueprint $table) {
@@ -52,6 +59,20 @@ class EloquentPushTest extends DatabaseTestCase
         $this->assertSame('Test title 1', PostX::firstOrFail()->title);
         $this->assertSame(1, CommentX::count());
         $this->assertSame('Test comment 1', CommentX::firstOrFail()->comment);
+    }
+
+    public function testPushSavesAHasOneRelationship()
+    {
+        $user = UserX::create(['name' => 'Mateus']);
+        $post = PostX::make(['title' => 'Test title', 'user_id' => $user->id]);
+        $details = PostDetails::make(['description' => 'Test description']);
+
+        $post->details = $details;
+        $post->push();
+
+        $this->assertEquals(1, $post->id);
+        $this->assertEquals(1, $details->id);
+        $this->assertTrue($details->fresh()->post->is($post));
     }
 
     public function testPushSavesAHasManyRelationship()
@@ -127,6 +148,11 @@ class PostX extends Model
     protected $guarded = [];
     protected $table = 'posts';
 
+    public function details()
+    {
+        return $this->hasOne(PostDetails::class, 'post_id');
+    }
+
     public function comments()
     {
         return $this->hasMany(CommentX::class, 'post_id');
@@ -135,6 +161,18 @@ class PostX extends Model
     public function user()
     {
         return $this->belongsTo(UserX::class, 'user_id');
+    }
+}
+
+class PostDetails extends Model
+{
+    public $timestamps = false;
+    protected $guarded = [];
+    protected $table = 'post_details';
+
+    public function post()
+    {
+        return $this->belongsTo(PostX::class, 'post_id');
     }
 }
 

@@ -998,6 +998,10 @@ trait HasAttributes
             $value = $this->castAttributeAsHashedString($key, $value);
         }
 
+        if ($this->isRelation($key)) {
+            return $this->setRelation($key, $value);
+        }
+
         $this->attributes[$key] = $value;
 
         return $this;
