@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\Concerns\AsPivot;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Database\Eloquent\Relations\HasOneOrMany;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection as BaseCollection;
@@ -1065,7 +1066,9 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         // BelongsTo relationships must be handled earlier than the other relationships.
         // Since record creation will fail unless the foreign key is set on the base
         // model, we need to ensure that the BelongsTo relationships are created.
-        if (! $this->pushBelongsToRelations($this->getRelationsOfType(BelongsTo::class)->all(), true)) {
+        if (! $this->pushRelations(
+            $this->getRelationsOfType(BelongsTo::class)->all(),
+            BelongsTo::class)) {
             return false;
         }
 
@@ -1076,7 +1079,9 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         // To sync all of the relationships to the database, we will simply spin through
         // the relationships and save each model via this "push" method, which allows
         // us to recurse into all of these nested relations for the model instance.
-        if (! $this->pushRelations($this->getRelationsExceptOfType(BelongsTo::class)->all(), true)) {
+        if (! $this->pushRelations(
+            $this->getRelationsOfType(HasOneOrMany::class)->all(),
+            HasOneOrMany::class)) {
             return false;
         }
 
@@ -1093,52 +1098,24 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         return static::withoutEvents(fn () => $this->push());
     }
 
-    /**
-     * @param array $relations
-     * @param bool $associate
-     * @return bool
-     */
-    public function pushBelongsToRelations($relations, $associate = false)
+    protected function pushRelations($relations, $relationType)
     {
         foreach ($relations as $relation => $models) {
              $models = $models instanceof Collection
                 ? $models->all() : [$models];
 
             foreach (array_filter($models) as $model) {
-                if (! $model->push()) {
-                    return false;
-                }
-
-                if ($associate) {
-                    $this->{$relation}()->associate($model);
-                }
-            }
-        }
-
-        return true;
-    }
-
-    /**
-     * @param array $relations
-     * @param bool $associate
-     * @return bool
-     */
-    public function pushRelations($relations, $associate = false)
-    {
-        foreach ($relations as $relation => $models) {
-             $models = $models instanceof Collection
-                ? $models->all() : [$models];
-
-            foreach (array_filter($models) as $model) {
-                if ($associate && ! $model->exists) {
-                    /** @var \Illuminate\Database\Eloquent\Relations\HasOneOrMany $relation */
+                if ($relationType === HasOneOrMany::class && ! $model->exists) {
                     $relation = $this->{$relation}();
-
                     $model = $model->setAttribute($relation->getForeignKeyName(), $relation->getParentKey());
                 }
 
                 if (! $model->push()) {
                     return false;
+                }
+
+                if ($relationType === BelongsTo::class) {
+                    $this->{$relation}()->associate($model);
                 }
             }
         }
