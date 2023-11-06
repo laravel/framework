@@ -94,7 +94,7 @@ class RateLimiter
     public function tooManyAttempts($key, $maxAttempts)
     {
         if ($this->attempts($key) >= $maxAttempts) {
-            if ($this->cache->has($this->cleanRateLimiterKey($key).':timer')) {
+            if ($this->cache->has($this->cleanRateLimiterKey($key) . ':timer')) {
                 return true;
             }
 
@@ -105,7 +105,7 @@ class RateLimiter
     }
 
     /**
-     * Increment the counter for a given key for a given decay time.
+     * Increment (by 1) the counter for a given key for a given decay time.
      *
      * @param  string  $key
      * @param  int  $decaySeconds
@@ -113,17 +113,33 @@ class RateLimiter
      */
     public function hit($key, $decaySeconds = 60)
     {
+        return $this->increment($key, $decaySeconds);
+    }
+
+    /**
+     * Increment the counter for a given key for a given decay time by a custom
+     * amount.
+     *
+     * @param string $key
+     * @param int $decaySeconds
+     * @param int $step
+     * @return int
+     */
+    public function increment($key, $decaySeconds = 60, $step = 1)
+    {
         $key = $this->cleanRateLimiterKey($key);
 
         $this->cache->add(
-            $key.':timer', $this->availableAt($decaySeconds), $decaySeconds
+            $key . ':timer',
+            $this->availableAt($decaySeconds),
+            $decaySeconds
         );
 
         $added = $this->cache->add($key, 0, $decaySeconds);
 
-        $hits = (int) $this->cache->increment($key);
+        $hits = (int) $this->cache->increment($key, $step);
 
-        if (! $added && $hits == 1) {
+        if (!$added && $hits == 1) {
             $this->cache->put($key, 1, $decaySeconds);
         }
 
@@ -196,7 +212,7 @@ class RateLimiter
 
         $this->resetAttempts($key);
 
-        $this->cache->forget($key.':timer');
+        $this->cache->forget($key . ':timer');
     }
 
     /**
@@ -209,7 +225,7 @@ class RateLimiter
     {
         $key = $this->cleanRateLimiterKey($key);
 
-        return max(0, $this->cache->get($key.':timer') - $this->currentTime());
+        return max(0, $this->cache->get($key . ':timer') - $this->currentTime());
     }
 
     /**
