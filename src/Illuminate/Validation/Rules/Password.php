@@ -269,7 +269,7 @@ class Password implements Rule, DataAwareRule, ValidatorAwareRule
     /**
      * Specify additional validation rules that should be merged with the default rules during validation.
      *
-     * @param  string|array  $rules
+     * @param  string|array|\Closure  $rules
      * @return $this
      */
     public function rules($rules)
