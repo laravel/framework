@@ -92,11 +92,11 @@ class ClearCommand extends Command
             return;
         }
 
-        foreach ($this->files->files($storagePath) as $file) {
+        array_map(function ($file) {
             if (preg_match('/facade-.*\.php$/', $file)) {
                 $this->files->delete($file);
             }
-        }
+        }, $this->files->files($storagePath));
     }
 
     /**
