@@ -290,7 +290,7 @@ class ValidationPasswordRuleTest extends TestCase
         $this->assertFalse($v->passes());
 
         $this->assertSame(
-            [ 'my_password' => array_values($messages) ],
+            ['my_password' => array_values($messages)],
             $v->messages()->toArray()
         );
     }

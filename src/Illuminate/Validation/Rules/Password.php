@@ -326,6 +326,7 @@ class Password implements Rule, DataAwareRule, ValidatorAwareRule
             'threshold' => $this->compromisedThreshold,
         ])) {
             $validator->addFailure($attribute, 'password.uncompromised');
+
             return $this->fail($validator->messages()->all());
         }
 
