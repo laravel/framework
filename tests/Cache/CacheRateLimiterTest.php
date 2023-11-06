@@ -7,6 +7,9 @@ use Illuminate\Contracts\Cache\Repository as Cache;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @group debug
+ */
 class CacheRateLimiterTest extends TestCase
 {
     protected function tearDown(): void
@@ -30,10 +33,21 @@ class CacheRateLimiterTest extends TestCase
         $cache = m::mock(Cache::class);
         $cache->shouldReceive('add')->once()->with('key:timer', m::type('int'), 1)->andReturn(true);
         $cache->shouldReceive('add')->once()->with('key', 0, 1)->andReturn(true);
-        $cache->shouldReceive('increment')->once()->with('key')->andReturn(1);
+        $cache->shouldReceive('increment')->once()->with('key', 1)->andReturn(1);
         $rateLimiter = new RateLimiter($cache);
 
         $rateLimiter->hit('key', 1);
+    }
+
+    public function testIncrementProperlyIncrementsAttemptCount()
+    {
+        $cache = m::mock(Cache::class);
+        $cache->shouldReceive('add')->once()->with('key:timer', m::type('int'), 1)->andReturn(true);
+        $cache->shouldReceive('add')->once()->with('key', 0, 1)->andReturn(true);
+        $cache->shouldReceive('increment')->once()->with('key', 5)->andReturn(5);
+        $rateLimiter = new RateLimiter($cache);
+
+        $rateLimiter->increment('key', 1, 5);
     }
 
     public function testHitHasNoMemoryLeak()
@@ -41,7 +55,7 @@ class CacheRateLimiterTest extends TestCase
         $cache = m::mock(Cache::class);
         $cache->shouldReceive('add')->once()->with('key:timer', m::type('int'), 1)->andReturn(true);
         $cache->shouldReceive('add')->once()->with('key', 0, 1)->andReturn(false);
-        $cache->shouldReceive('increment')->once()->with('key')->andReturn(1);
+        $cache->shouldReceive('increment')->once()->with('key', 1)->andReturn(1);
         $cache->shouldReceive('put')->once()->with('key', 1, 1);
         $rateLimiter = new RateLimiter($cache);
 
@@ -83,7 +97,7 @@ class CacheRateLimiterTest extends TestCase
         $cache->shouldReceive('get')->once()->with('key', 0)->andReturn(0);
         $cache->shouldReceive('add')->once()->with('key:timer', m::type('int'), 1);
         $cache->shouldReceive('add')->once()->with('key', 0, 1)->andReturns(1);
-        $cache->shouldReceive('increment')->once()->with('key')->andReturn(1);
+        $cache->shouldReceive('increment')->once()->with('key', 1)->andReturn(1);
 
         $executed = false;
 
@@ -101,7 +115,7 @@ class CacheRateLimiterTest extends TestCase
         $cache->shouldReceive('get')->times(6)->with('key', 0)->andReturn(0);
         $cache->shouldReceive('add')->times(6)->with('key:timer', m::type('int'), 1);
         $cache->shouldReceive('add')->times(6)->with('key', 0, 1)->andReturns(1);
-        $cache->shouldReceive('increment')->times(6)->with('key')->andReturn(1);
+        $cache->shouldReceive('increment')->times(6)->with('key', 1)->andReturn(1);
 
         $rateLimiter = new RateLimiter($cache);
 
