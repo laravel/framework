@@ -59,7 +59,7 @@ class PostgresProcessor extends Processor
             $autoincrement = $result->default !== null && str_starts_with($result->default, 'nextval(');
 
             return [
-                'name' => $result->name,
+                'name' => str_starts_with($result->name, '"') ? str_replace('"', '', $result->name) : $result->name,
                 'type_name' => $result->type_name,
                 'type' => $result->type,
                 'collation' => $result->collation,
