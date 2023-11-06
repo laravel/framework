@@ -87,6 +87,13 @@ class Password implements Rule, DataAwareRule, ValidatorAwareRule
     protected $customRules = [];
 
     /**
+     * The failure messages, if any.
+     *
+     * @var array
+     */
+    protected $messages = [];
+
+    /**
      * The callback that will generate the "default" version of the password rule.
      *
      * @var string|array|callable|null
@@ -294,34 +301,52 @@ class Password implements Rule, DataAwareRule, ValidatorAwareRule
             }
 
             if ($this->mixedCase && ! preg_match('/(\p{Ll}+.*\p{Lu})|(\p{Lu}+.*\p{Ll})/u', $value)) {
-                $validator->addFailure($attribute, 'mixed');
+                $validator->addFailure($attribute, 'password.mixed');
             }
 
             if ($this->letters && ! preg_match('/\pL/u', $value)) {
-                $validator->addFailure($attribute, 'letters');
+                $validator->addFailure($attribute, 'password.letters');
             }
 
             if ($this->symbols && ! preg_match('/\p{Z}|\p{S}|\p{P}/u', $value)) {
-                $validator->addFailure($attribute, 'symbols');
+                $validator->addFailure($attribute, 'password.symbols');
             }
 
             if ($this->numbers && ! preg_match('/\pN/u', $value)) {
-                $validator->addFailure($attribute, 'numbers');
+                $validator->addFailure($attribute, 'password.numbers');
             }
         });
 
         if ($validator->fails()) {
-            return false;
+            return $this->fail($validator->messages()->all());
         }
 
         if ($this->uncompromised && ! Container::getInstance()->make(UncompromisedVerifier::class)->verify([
             'value' => $value,
             'threshold' => $this->compromisedThreshold,
         ])) {
-            $validator->addFailure($attribute, 'uncompromised');
-            return false;
+            $validator->addFailure($attribute, 'password.uncompromised');
+            return $this->fail($validator->messages()->all());
         }
 
         return true;
+    }
+
+    public function message()
+    {
+        return $this->messages;
+    }
+
+    /**
+     * Adds the given failures, and return false.
+     *
+     * @param  array|string  $messages
+     * @return bool
+     */
+    protected function fail($messages)
+    {
+        $this->messages = array_merge($this->messages, Arr::wrap($messages));
+
+        return false;
     }
 }
