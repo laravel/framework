@@ -87,13 +87,6 @@ class Password implements Rule, DataAwareRule, ValidatorAwareRule
     protected $customRules = [];
 
     /**
-     * The failure messages, if any.
-     *
-     * @var array
-     */
-    protected $messages = [];
-
-    /**
      * The callback that will generate the "default" version of the password rule.
      *
      * @var string|array|callable|null
@@ -301,95 +294,34 @@ class Password implements Rule, DataAwareRule, ValidatorAwareRule
             }
 
             if ($this->mixedCase && ! preg_match('/(\p{Ll}+.*\p{Lu})|(\p{Lu}+.*\p{Ll})/u', $value)) {
-                $validator->errors()->add(
-                    $attribute,
-                    $this->getErrorMessage('validation.password.mixed')
-                );
+                $validator->addFailure($attribute, 'mixed');
             }
 
             if ($this->letters && ! preg_match('/\pL/u', $value)) {
-                $validator->errors()->add(
-                    $attribute,
-                    $this->getErrorMessage('validation.password.letters')
-                );
+                $validator->addFailure($attribute, 'letters');
             }
 
             if ($this->symbols && ! preg_match('/\p{Z}|\p{S}|\p{P}/u', $value)) {
-                $validator->errors()->add(
-                    $attribute,
-                    $this->getErrorMessage('validation.password.symbols')
-                );
+                $validator->addFailure($attribute, 'symbols');
             }
 
             if ($this->numbers && ! preg_match('/\pN/u', $value)) {
-                $validator->errors()->add(
-                    $attribute,
-                    $this->getErrorMessage('validation.password.numbers')
-                );
+                $validator->addFailure($attribute, 'numbers');
             }
         });
 
         if ($validator->fails()) {
-            return $this->fail($validator->messages()->all());
+            return false;
         }
 
         if ($this->uncompromised && ! Container::getInstance()->make(UncompromisedVerifier::class)->verify([
             'value' => $value,
             'threshold' => $this->compromisedThreshold,
         ])) {
-            return $this->fail($this->getErrorMessage('validation.password.uncompromised'));
+            $validator->addFailure($attribute, 'uncompromised');
+            return false;
         }
 
         return true;
-    }
-
-    /**
-     * Get the validation error message.
-     *
-     * @return array
-     */
-    public function message()
-    {
-        return $this->messages;
-    }
-
-    /**
-     * Get the translated password error message.
-     *
-     * @param  string  $key
-     * @return string
-     */
-    protected function getErrorMessage($key)
-    {
-        if (($message = $this->validator->getTranslator()->get($key)) !== $key) {
-            return $message;
-        }
-
-        $messages = [
-            'validation.password.mixed' => 'The :attribute must contain at least one uppercase and one lowercase letter.',
-            'validation.password.letters' => 'The :attribute must contain at least one letter.',
-            'validation.password.symbols' => 'The :attribute must contain at least one symbol.',
-            'validation.password.numbers' => 'The :attribute must contain at least one number.',
-            'validation.password.uncompromised' => 'The given :attribute has appeared in a data leak. Please choose a different :attribute.',
-        ];
-
-        return $messages[$key];
-    }
-
-    /**
-     * Adds the given failures, and return false.
-     *
-     * @param  array|string  $messages
-     * @return bool
-     */
-    protected function fail($messages)
-    {
-        $messages = collect(Arr::wrap($messages))->map(function ($message) {
-            return $this->validator->getTranslator()->get($message);
-        })->all();
-
-        $this->messages = array_merge($this->messages, $messages);
-
-        return false;
     }
 }
