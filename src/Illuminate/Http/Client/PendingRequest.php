@@ -1008,7 +1008,7 @@ class PendingRequest
                     $this->dispatchResponseReceivedEvent($response);
                 });
             })
-            ->otherwise(function (TransferException | OutOfBoundsException $e) {
+            ->otherwise(function (TransferException|OutOfBoundsException $e) {
                 if ($e instanceof ConnectException) {
                     $this->dispatchConnectionFailedEvent();
                 }
