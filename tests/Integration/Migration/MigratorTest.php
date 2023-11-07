@@ -2,7 +2,9 @@
 
 namespace Illuminate\Tests\Integration\Migration;
 
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Mockery as m;
 use Orchestra\Testbench\TestCase;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -96,6 +98,137 @@ class MigratorTest extends TestCase
         $this->subject->run([__DIR__.'/fixtures'], ['pretend' => true]);
 
         $this->assertFalse(DB::getSchemaBuilder()->hasTable('people'));
+    }
+
+    public function testIgnorePretendModeForCallbackData()
+    {
+        // Create two tables with different columns so that we can query it later
+        // with the new method DB::withoutPretending().
+
+        Schema::create('table_1', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('column_1');
+        });
+
+        Schema::create('table_2', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('column_2')->default('default_value');
+        });
+
+        // From here on we simulate to be in pretend mode. This normally is done by
+        // running the migration with the option --pretend.
+
+        DB::pretend(function () {
+            // Returns an empty array because we are in pretend mode.
+            $tablesEmpty = DB::select("SELECT name FROM sqlite_master WHERE type='table'");
+
+            $this->assertTrue([] === $tablesEmpty);
+
+            // Returns an array with two tables because we ignore pretend mode.
+            $tablesList = DB::withoutPretending(function (): array {
+                return DB::select("SELECT name FROM sqlite_master WHERE type='table'");
+            });
+
+            $this->assertTrue([] !== $tablesList);
+
+            // The following would not be possible in pretend mode, if the
+            // method DB::withoutPretending() would not exists,
+            // because nothing is executed in pretend mode.
+            foreach ($tablesList as $table) {
+                if (in_array($table->name, ['sqlite_sequence', 'migrations'])) {
+                    continue;
+                }
+
+                $columnsEmpty = DB::select("PRAGMA table_info($table->name)");
+
+                $this->assertTrue([] === $columnsEmpty);
+
+                $columnsList = DB::withoutPretending(function () use ($table): array {
+                    return DB::select("PRAGMA table_info($table->name)");
+                });
+
+                $this->assertTrue([] !== $columnsList);
+                $this->assertCount(2, $columnsList);
+
+                // Confirm that we are still in pretend mode. This column should
+                // not be added. We query the table columns again to ensure the
+                // count is still two.
+                DB::statement("ALTER TABLE $table->name ADD COLUMN column_3 varchar(255) DEFAULT 'default_value' NOT NULL");
+
+                $columnsList = DB::withoutPretending(function () use ($table): array {
+                    return DB::select("PRAGMA table_info($table->name)");
+                });
+
+                $this->assertCount(2, $columnsList);
+            }
+        });
+
+        Schema::dropIfExists('table_1');
+        Schema::dropIfExists('table_2');
+    }
+
+    public function testIgnorePretendModeForCallbackOutputDynamicContentIsShown()
+    {
+        // Persist data to table we can work with.
+        $this->expectInfo('Running migrations.');
+        $this->expectTask('2014_10_12_000000_create_people_is_dynamic_table', 'DONE');
+
+        $this->output->shouldReceive('writeln')->once();
+
+        $this->subject->run([__DIR__.'/pretending/2014_10_12_000000_create_people_is_dynamic_table.php'], ['pretend' => false]);
+
+        $this->assertTrue(DB::getSchemaBuilder()->hasTable('people'));
+
+        // Test the actual functionality.
+        $this->expectInfo('Running migrations.');
+        $this->expectTwoColumnDetail('DynamicContentIsShown');
+        $this->expectBulletList([
+            'create table "blogs" ("id" integer primary key autoincrement not null, "url" varchar, "name" varchar)',
+            'insert into "blogs" ("url") values (\'www.janedoe.com\'), (\'www.johndoe.com\')',
+            'ALTER TABLE \'pseudo_table_name\' MODIFY \'column_name\' VARCHAR(191)',
+            'select * from "people"',
+            'insert into "blogs" ("id", "name") values (1, \'Jane Doe Blog\')',
+            'insert into "blogs" ("id", "name") values (2, \'John Doe Blog\')',
+        ]);
+
+        $this->output->shouldReceive('writeln')->once();
+
+        $this->subject->run([__DIR__.'/pretending/2023_10_17_000000_dynamic_content_is_shown.php'], ['pretend' => true]);
+
+        $this->assertFalse(DB::getSchemaBuilder()->hasTable('blogs'));
+
+        Schema::dropIfExists('people');
+    }
+
+    public function testIgnorePretendModeForCallbackOutputDynamicContentNotShown()
+    {
+        // Persist data to table we can work with.
+        $this->expectInfo('Running migrations.');
+        $this->expectTask('2014_10_12_000000_create_people_non_dynamic_table', 'DONE');
+
+        $this->output->shouldReceive('writeln')->once();
+
+        $this->subject->run([__DIR__.'/pretending/2014_10_12_000000_create_people_non_dynamic_table.php'], ['pretend' => false]);
+
+        $this->assertTrue(DB::getSchemaBuilder()->hasTable('people'));
+
+        // Test the actual functionality.
+        $this->expectInfo('Running migrations.');
+        $this->expectTwoColumnDetail('DynamicContentNotShown');
+        $this->expectBulletList([
+            'create table "blogs" ("id" integer primary key autoincrement not null, "url" varchar, "name" varchar)',
+            'insert into "blogs" ("url") values (\'www.janedoe.com\'), (\'www.johndoe.com\')',
+            'ALTER TABLE \'pseudo_table_name\' MODIFY \'column_name\' VARCHAR(191)',
+            'select * from "people"',
+        ]);
+
+        $this->output->shouldReceive('writeln')->once();
+
+        $this->subject->run([__DIR__.'/pretending/2023_10_17_000000_dynamic_content_not_shown.php'], ['pretend' => true]);
+
+        $this->assertFalse(DB::getSchemaBuilder()->hasTable('blogs'));
+
+        Schema::dropIfExists('people');
     }
 
     protected function expectInfo($message): void

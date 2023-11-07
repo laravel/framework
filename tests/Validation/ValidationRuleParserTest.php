@@ -199,6 +199,28 @@ class ValidationRuleParserTest extends TestCase
         $this->assertEquals([], $results->implicitAttributes);
     }
 
+    public function testExplodeHandlesForwardSlashesInWildcardRule()
+    {
+        $parser = (new ValidationRuleParser([
+            'redirects' => [
+                'directory/subdirectory/file' => [
+                    'directory/subdirectory/redirectedfile',
+                ],
+            ],
+        ]));
+
+        $results = $parser->explode([
+            'redirects.directory/subdirectory/file.*' => 'string',
+        ]);
+
+        $this->assertEquals([
+            'redirects.directory/subdirectory/file.0' => ['string'],
+        ], $results->rules);
+        $this->assertEquals([
+            'redirects.directory/subdirectory/file.*' => ['redirects.directory/subdirectory/file.0'],
+        ], $results->implicitAttributes);
+    }
+
     public function testExplodeHandlesArraysOfNestedRules()
     {
         $parser = (new ValidationRuleParser([

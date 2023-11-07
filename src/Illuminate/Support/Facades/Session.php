@@ -5,6 +5,8 @@ namespace Illuminate\Support\Facades;
 /**
  * @method static bool shouldBlock()
  * @method static string|null blockDriver()
+ * @method static int defaultRouteBlockLockSeconds()
+ * @method static int defaultRouteBlockWaitSeconds()
  * @method static array getSessionConfig()
  * @method static string getDefaultDriver()
  * @method static void setDefaultDriver(string $name)
