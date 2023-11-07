@@ -204,7 +204,7 @@ class ValidationRuleParserTest extends TestCase
         $parser = (new ValidationRuleParser([
             'redirects' => [
                 'directory/subdirectory/file' => [
-                    'directory/subdirectory/redirectedfile'
+                    'directory/subdirectory/redirectedfile',
                 ],
             ],
         ]));
@@ -217,7 +217,7 @@ class ValidationRuleParserTest extends TestCase
             'redirects.directory/subdirectory/file.0' => ['string'],
         ], $results->rules);
         $this->assertEquals([
-            'redirects.directory/subdirectory/file.*' => ['redirects.directory/subdirectory/file.0']
+            'redirects.directory/subdirectory/file.*' => ['redirects.directory/subdirectory/file.0'],
         ], $results->implicitAttributes);
     }
 
