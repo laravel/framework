@@ -147,7 +147,7 @@ abstract class Component
                 return $view;
             }
 
-            return $this->extractBladeViewFromString($view);
+            return $this->extractBladeViewFromString(strval($view));
         };
 
         return $view instanceof Closure ? function (array $data = []) use ($view, $resolver) {
