@@ -1729,6 +1729,86 @@ trait ValidatesAttributes
     }
 
     /**
+     * Validate that an attribute is present when another attribute has a given value.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  array<int, int|string>  $parameters
+     * @return bool
+     */
+    public function validatePresentIf($attribute, $value, $parameters)
+    {
+        $this->requireParameterCount(2, $parameters, 'present_if');
+
+        [$values, $other] = $this->parseDependentRuleParameters($parameters);
+
+        if (in_array($other, $values, is_bool($other) || is_null($other))) {
+            return $this->validatePresent($attribute, $value, $parameters);
+        }
+
+        return true;
+    }
+
+    /**
+     * Validate that an attribute is present unless another attribute has a given value.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  array<int, int|string>  $parameters
+     * @return bool
+     */
+    public function validatePresentUnless($attribute, $value, $parameters)
+    {
+        $this->requireParameterCount(2, $parameters, 'present_unless');
+
+        [$values, $other] = $this->parseDependentRuleParameters($parameters);
+
+        if (! in_array($other, $values, is_bool($other) || is_null($other))) {
+            return $this->validatePresent($attribute, $value, $parameters);
+        }
+
+        return true;
+    }
+
+    /**
+     * Validate that an attribute is present when any given attribute is present.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  array<int, int|string>  $parameters
+     * @return bool
+     */
+    public function validatePresentWith($attribute, $value, $parameters)
+    {
+        $this->requireParameterCount(1, $parameters, 'present_with');
+
+        if (Arr::hasAny($this->data, $parameters)) {
+            return $this->validatePresent($attribute, $value, $parameters);
+        }
+
+        return true;
+    }
+
+    /**
+     * Validate that an attribute is present when all given attributes are present.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  array<int, int|string>  $parameters
+     * @return bool
+     */
+    public function validatePresentWithAll($attribute, $value, $parameters)
+    {
+        $this->requireParameterCount(1, $parameters, 'present_with_all');
+
+        if (Arr::has($this->data, $parameters)) {
+            return $this->validatePresent($attribute, $value, $parameters);
+        }
+
+        return true;
+    }
+
+    /**
      * Validate that an attribute passes a regular expression check.
      *
      * @param  string  $attribute
