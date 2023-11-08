@@ -133,7 +133,7 @@ abstract class Component
     public function resolveView()
     {
         $resolver = function ($view) {
-            if (($view instanceof ViewContract) || ($view instanceof Htmlable)) {
+            if ($view instanceof ViewContract || $view instanceof Htmlable) {
                 return $view;
             }
 
