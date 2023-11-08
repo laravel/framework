@@ -313,6 +313,16 @@ class DatabaseBatchRepository implements PrunableBatchRepository
     }
 
     /**
+     * Rollback the specific database connection.
+     *
+     * @return mixed
+     */
+    public function rollbackTransaction()
+    {
+        return $this->connection->rollBack();
+    }
+
+    /**
      * Serialize the given value.
      *
      * @param  mixed  $value
