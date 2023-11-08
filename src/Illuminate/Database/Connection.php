@@ -1219,7 +1219,7 @@ class Connection implements ConnectionInterface
     }
 
     /**
-     * Indicates whether native alter operations will be used when dropping, renaming, or modifying columns, even if Doctrine DBAL is installed.
+     * Indicates whether native alter operations will be used when modifying columns, even if Doctrine DBAL is installed.
      *
      * @return bool
      */
