@@ -289,13 +289,8 @@ class FilesystemAdapter implements CloudFilesystemContract
     {
         $response = new StreamedResponse;
 
-        if (! array_key_exists('Content-Type', $headers)) {
-            $headers['Content-Type'] = $this->mimeType($path);
-        }
-
-        if (! array_key_exists('Content-Length', $headers)) {
-            $headers['Content-Length'] = $this->size($path);
-        }
+        $headers['Content-Type'] ??= $this->mimeType($path);
+        $headers['Content-Length'] ??= $this->size($path);
 
         if (! array_key_exists('Content-Disposition', $headers)) {
             $filename = $name ?? basename($path);
