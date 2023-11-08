@@ -7,7 +7,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Bus;
@@ -19,7 +19,7 @@ use Orchestra\Testbench\TestCase;
 #[WithMigration('queue')]
 class JobChainingTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseMigrations;
 
     public static $catchCallbackRan = false;
 

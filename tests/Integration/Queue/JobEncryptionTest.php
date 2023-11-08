@@ -8,7 +8,7 @@ use Illuminate\Contracts\Queue\ShouldBeEncrypted;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Queue;
@@ -20,7 +20,7 @@ use Orchestra\Testbench\Attributes\WithMigration;
 #[WithMigration('queue')]
 class JobEncryptionTest extends DatabaseTestCase
 {
-    use RefreshDatabase;
+    use DatabaseMigrations;
 
     protected function getEnvironmentSetUp($app)
     {
