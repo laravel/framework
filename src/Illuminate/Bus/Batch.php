@@ -322,6 +322,10 @@ class Batch implements Arrayable, JsonSerializable
      */
     public function recordFailedJob(string $jobId, $e)
     {
+        if (method_exists($this->repository, 'rollbackTransaction')) {
+            $this->repository->rollbackTransaction();
+        }
+
         $counts = $this->incrementFailedJobs($jobId);
 
         if ($counts->failedJobs === 1 && ! $this->allowsFailures()) {

@@ -2,7 +2,6 @@
 
 namespace Illuminate\Queue;
 
-use Illuminate\Bus\Batchable;
 use Illuminate\Contracts\Cache\Repository as CacheContract;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Events\Dispatcher;
@@ -214,22 +213,6 @@ class Worker
         // signals supported in recent versions of PHP to accomplish it conveniently.
         pcntl_signal(SIGALRM, function () use ($job, $options) {
             if ($job) {
-                transform($job->resolveName(), function ($job) {
-                    if (! class_exists($job)) {
-                        return;
-                    }
-
-                    $isBatchable = isset(class_uses_recursive($job)[Batchable::class]);
-
-                    if ($isBatchable) {
-                        $batchRepository = $jobUses->batchRepository();
-
-                        if (method_exists($batchRepository, 'rollbackTransaction')) {
-                            $batchRepository->rollbackTransaction();
-                        }
-                    }
-                });
-
                 $this->markJobAsFailedIfWillExceedMaxAttempts(
                     $job->getConnectionName(), $job, (int) $options->maxTries, $e = $this->timeoutExceededException($job)
                 );
