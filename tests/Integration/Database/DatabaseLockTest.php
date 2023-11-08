@@ -2,10 +2,8 @@
 
 namespace Illuminate\Tests\Integration\Database;
 
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
 use Orchestra\Testbench\Attributes\WithMigration;
 
 #[WithMigration('cache')]
