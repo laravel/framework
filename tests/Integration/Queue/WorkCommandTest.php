@@ -17,7 +17,7 @@ class WorkCommandTest extends TestCase
     use DatabaseMigrations;
 
     protected function tearDown(): void
-{
+    {
         parent::tearDown();
 
         FirstJob::$ran = false;
