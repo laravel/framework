@@ -83,7 +83,7 @@ class Factory
 
         $this->stubCallbacks = collect();
     }
-    
+
     /**
      * Get the array of global middleware.
      *
