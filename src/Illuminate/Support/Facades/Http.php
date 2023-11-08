@@ -87,6 +87,7 @@ use Illuminate\Http\Client\Factory;
  * @method static array getOptions()
  * @method static \Illuminate\Http\Client\PendingRequest|mixed when(\Closure|mixed|null $value = null, callable|null $callback = null, callable|null $default = null)
  * @method static \Illuminate\Http\Client\PendingRequest|mixed unless(\Closure|mixed|null $value = null, callable|null $callback = null, callable|null $default = null)
+ * @method static \Illuminate\Http\Client\PendingRequest newPendingRequest()
  *
  * @see \Illuminate\Http\Client\Factory
  */

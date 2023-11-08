@@ -2656,7 +2656,7 @@ class HttpClientTest extends TestCase
 
 class CustomFactory extends Factory
 {
-    protected function newPendingRequest()
+    public function newPendingRequest()
     {
         return new class extends PendingRequest
         {
