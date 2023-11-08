@@ -132,32 +132,23 @@ abstract class Component
      */
     public function resolveView()
     {
-        $view = $this->render();
-
-        if ($view instanceof ViewContract) {
-            return $view;
-        }
-
-        if ($view instanceof Htmlable) {
-            return $view;
-        }
-
         $resolver = function ($view) {
-            if ($view instanceof ViewContract) {
+            if (($view instanceof ViewContract) || ($view instanceof Htmlable)) {
                 return $view;
             }
 
-            if (! is_string($view)) {
-                return '';
+            if (is_string($view)) {
+                return $this->extractBladeViewFromString($view);
             }
 
-            return $this->extractBladeViewFromString($view);
+            return '';
         };
 
-        return $view instanceof Closure ? function (array $data = []) use ($view, $resolver) {
-            return $resolver($view($data));
-        }
-        : $resolver($view);
+        $view = $this->render();
+
+        return ($view instanceof Closure)
+            ? fn (array $data = []) => $resolver($view($data))
+            : $resolver($view);
     }
 
     /**
