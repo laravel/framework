@@ -11,7 +11,6 @@ use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 use Orchestra\Testbench\Attributes\WithMigration;
-use Orchestra\Testbench\TestCase;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Throwable;
 
@@ -63,6 +62,6 @@ class TimeOutJobWithTransaction implements ShouldQueue
 
     public function handle(): void
     {
-        DB::transaction(fn() => sleep(20));
+        DB::transaction(fn () => sleep(20));
     }
 }
