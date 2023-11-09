@@ -114,17 +114,13 @@ class Number
             15 => 'quadrillion',
         ];
 
-        if ($number === 0) {
-            return '0';
-        }
-
-        if ($number < 0) {
-            return sprintf('-%s', static::toHuman(abs($number), $precision));
-        }
-
-        // If over 1 quadrillion
-        if ($number >= pow(10, 15)) {
-            return sprintf('%s quadrillion', static::toHuman($number / pow(10, 15), $precision));
+        switch (true) {
+            case $number === 0:
+                return '0';
+            case $number < 0:
+                return sprintf('-%s', static::toHuman(abs($number), $precision));
+            case $number >= 1e15:
+                return sprintf('%s quadrillion', static::toHuman($number / 1e15, $precision));
         }
 
         $numberExponent = floor(log10($number));
