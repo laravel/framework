@@ -23,7 +23,7 @@ class DatabaseTransactionsTest extends TestCase
         [$firstObject, $secondObject, $thirdObject] = [
             new TestObjectForTransactions(),
             new TestObjectForTransactions(),
-            new TestObjectForTransactions()
+            new TestObjectForTransactions(),
         ];
 
         DB::transaction(function () use ($secondObject, $firstObject) {
@@ -80,7 +80,7 @@ class DatabaseTransactionsTest extends TestCase
         [$firstObject, $secondObject, $thirdObject] = [
             new TestObjectForTransactions(),
             new TestObjectForTransactions(),
-            new TestObjectForTransactions()
+            new TestObjectForTransactions(),
         ];
 
         DB::transaction(function () use ($secondObject, $firstObject, $thirdObject) {
@@ -92,11 +92,13 @@ class DatabaseTransactionsTest extends TestCase
 
             try {
                 DB::connection('second_connection')->transaction(function () use ($thirdObject) {
-                    DB::afterCommit(fn() => $thirdObject->handle());
+                    DB::afterCommit(fn () => $thirdObject->handle());
 
                     throw new \Exception;
                 });
-            } catch (\Exception) {}
+            } catch (\Exception) {
+                //
+            }
         });
 
         $this->assertTrue($firstObject->ran);

@@ -92,7 +92,7 @@ class DatabaseTransactionsManager
     /**
      * Move all the pending transactions to a ready state.
      *
-     * @param  string $connection
+     * @param  string  $connection
      * @return void
      */
     public function stageTransactions($connection)
