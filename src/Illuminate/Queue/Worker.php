@@ -2,6 +2,8 @@
 
 namespace Illuminate\Queue;
 
+use Illuminate\Bus\BatchRepository;
+use Illuminate\Container\Container;
 use Illuminate\Contracts\Cache\Repository as CacheContract;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Events\Dispatcher;
@@ -579,6 +581,12 @@ class Worker
      */
     protected function markJobAsFailedIfItShouldFailOnTimeout($connectionName, $job, Throwable $e)
     {
+        $batchRepository = Container::getInstance()->make(BatchRepository::class);
+
+        if (method_exists($batchRepository, 'rollbackTransaction')) {
+            $batchRepository->rollbackTransaction();
+        }
+
         if (method_exists($job, 'shouldFailOnTimeout') ? $job->shouldFailOnTimeout() : false) {
             $this->failJob($job, $e);
         }
