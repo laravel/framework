@@ -202,13 +202,7 @@ class PendingCommand
 
         $table->render();
 
-        $lines = array_filter(
-            explode(PHP_EOL, $output->fetch())
-        );
-
-        foreach ($lines as $line) {
-            $this->expectsOutput($line);
-        }
+        $this->test->expectedTables[] = $output->fetch();
 
         return $this;
     }
@@ -347,6 +341,10 @@ class PendingCommand
             $this->test->fail('Output "'.Arr::first($this->test->expectedOutput).'" was not printed.');
         }
 
+        if (count($this->test->expectedTables)) {
+            $this->test->fail('Table "'.Arr::first($this->test->expectedTables).'" was not printed.');
+        }
+
         if (count($this->test->expectedOutputSubstrings)) {
             $this->test->fail('Output does not contain "'.Arr::first($this->test->expectedOutputSubstrings).'".');
         }
@@ -367,7 +365,7 @@ class PendingCommand
      */
     protected function mockConsoleOutput()
     {
-        $mock = Mockery::mock(OutputStyle::class.'[askQuestion]', [
+        $mock = Mockery::mock(OutputStyle::class.'[askQuestion, write]', [
             new ArrayInput($this->parameters), $this->createABufferedOutputMock(),
         ]);
 
@@ -386,6 +384,16 @@ class PendingCommand
                     unset($this->test->expectedQuestions[$i]);
 
                     return $question[1];
+                });
+        }
+
+        foreach ($this->test->expectedTables as $i => $table) {
+            $mock->shouldReceive('write')
+                ->once()
+                ->ordered()
+                ->with($table, Mockery::any())
+                ->andReturnUsing(function () use ($i) {
+                    unset($this->test->expectedTables[$i]);
                 });
         }
 
