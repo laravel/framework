@@ -28,13 +28,13 @@ class Number
     }
 
     /**
-     * Format the number to a fluent human-readable string.
+     * Spell out the number according to the current locale.
      *
      * @param  float|int  $number
      * @param  ?string  $locale
      * @return false|string
      */
-    public static function toHuman($number, $locale = null)
+    public static function spellout($number, $locale = null)
     {
         static::needsIntlExtension();
 
