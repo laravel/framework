@@ -106,25 +106,36 @@ class Number
      */
     public static function toHuman($number, $precision = 2)
     {
-        $shortScale = [
-            100 => 'Hundred',
-            1000 => 'Thousand',
-            1000000 => 'Million',
-            1000000000 => 'Billion',
-            1000000000000 => 'Trillion',
-            1000000000000000 => 'Quadrillion',
-            1000000000000000000 => 'Quintillion',
+        $units = [
+            0 => '',
+            1 => 'ten',
+            2 => 'hundred',
+            3 => 'thousand',
+            6 => 'million',
+            9 => 'billion',
+            12 => 'trillion',
+            15 => 'quadrillion',
+            -1 => 'deci',
+            -2 => 'centi',
+            -3 => 'mili',
+            -6 => 'micro',
+            -9 => 'nano',
+            -12 => 'pico',
+            -15 => 'femto'
         ];
 
-        $scale = 1;
-        foreach ($shortScale as $value => $name) {
-            if ($number < $value) {
-                break;
-            }
-            $scale = $value;
+        $numberExponent = floor(log10($number));
+        $displayExponent = $numberExponent - ($numberExponent % 3);
+        $number /= pow(10, $displayExponent);
+
+        $unit = $units[$displayExponent];
+
+        if (! $unit && $displayExponent > 0) {
+            $unit = $units[max(array_keys($units))];
+            $number *= 1000;
         }
 
-        return sprintf('%s %s', round($number / $scale, $precision), $shortScale[$scale]);
+        return trim(sprintf('%s %s', round($number, $precision), $unit));
     }
 
     /**

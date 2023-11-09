@@ -186,25 +186,25 @@ class SupportNumberTest extends TestCase
 
     public function testToHuman()
     {
-        $this->assertSame('1 Hundred',      Number::toHuman(100));
-        $this->assertSame('1 Thousand',     Number::toHuman(1000));
-        $this->assertSame('1 Million',      Number::toHuman(1000000));
-        $this->assertSame('1 Billion',      Number::toHuman(1000000000));
-        $this->assertSame('1 Trillion',     Number::toHuman(1000000000000));
-        $this->assertSame('1 Quadrillion',  Number::toHuman(1000000000000000));
-        $this->assertSame('1 Quintillion',  Number::toHuman(1000000000000000000));
+        $this->assertSame('100',      Number::toHuman(100));
+        $this->assertSame('1 thousand',     Number::toHuman(1000));
+        $this->assertSame('1 million',      Number::toHuman(1000000));
+        $this->assertSame('1 billion',      Number::toHuman(1000000000));
+        $this->assertSame('1 trillion',     Number::toHuman(1000000000000));
+        $this->assertSame('1 quadrillion',  Number::toHuman(1000000000000000));
+        $this->assertSame('1000 quadrillion',  Number::toHuman(1000000000000000000));
 
-        $this->assertSame('1.23 Hundred', Number::toHuman(123));
-        $this->assertSame('1.23 Thousand', Number::toHuman(1234));
-        $this->assertSame('12.35 Thousand', Number::toHuman(12345));
-        $this->assertSame('1.23 Million', Number::toHuman(1234567));
-        $this->assertSame('1.23 Billion', Number::toHuman(1234567890));
-        $this->assertSame('1.23 Trillion', Number::toHuman(1234567890123));
-        $this->assertSame('1.23 Quadrillion', Number::toHuman(1234567890123456));
-        $this->assertSame('1.23 Quintillion', Number::toHuman(1234567890123456789));
-        $this->assertSame('490 Thousand', Number::toHuman(489939, precision: 0));
-        $this->assertSame('489.939 Thousand', Number::toHuman(489939, precision: 4));
-        $this->assertSame('500 Million', Number::toHuman(500000000, precision: 5));
+        $this->assertSame('123', Number::toHuman(123));
+        $this->assertSame('1.23 thousand', Number::toHuman(1234));
+        $this->assertSame('12.35 thousand', Number::toHuman(12345));
+        $this->assertSame('1.23 million', Number::toHuman(1234567));
+        $this->assertSame('1.23 billion', Number::toHuman(1234567890));
+        $this->assertSame('1.23 trillion', Number::toHuman(1234567890123));
+        $this->assertSame('1.23 quadrillion', Number::toHuman(1234567890123456));
+        $this->assertSame('1234.57 quadrillion', Number::toHuman(1234567890123456789));
+        $this->assertSame('490 thousand', Number::toHuman(489939, precision: 0));
+        $this->assertSame('489.939 thousand', Number::toHuman(489939, precision: 4));
+        $this->assertSame('500 million', Number::toHuman(500000000, precision: 5));
     }
 
     protected function needsIntlExtension()
