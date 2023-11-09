@@ -3,7 +3,6 @@
 namespace Illuminate\Tests\Integration\Database;
 
 use Illuminate\Support\Facades\DB;
-use Illuminate\Database\Capsule\Manager;
 use Orchestra\Testbench\TestCase;
 
 class DatabaseTransactionsTest extends TestCase
