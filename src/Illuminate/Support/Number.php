@@ -98,6 +98,36 @@ class Number
     }
 
     /**
+     * Format the number to a fluent human-readable string.
+     *
+     * @param  int  $number
+     * @param  int  $precision
+     * @return string
+     */
+    public static function toHuman($number, $precision = 2)
+    {
+        $shortScale = [
+            100 => 'Hundred',
+            1000 => 'Thousand',
+            1000000 => 'Million',
+            1000000000 => 'Billion',
+            1000000000000 => 'Trillion',
+            1000000000000000 => 'Quadrillion',
+            1000000000000000000 => 'Quintillion',
+        ];
+
+        $scale = 1;
+        foreach ($shortScale as $value => $name) {
+            if ($number < $value) {
+                break;
+            }
+            $scale = $value;
+        }
+
+        return sprintf('%s %s', round($number / $scale, $precision), $shortScale[$scale]);
+    }
+
+    /**
      * Some of the helper methods are wrappers for the PHP intl extension,
      * and thus require it to be installed on the server. If it's not
      * installed, we instead throw an exception from this method.
