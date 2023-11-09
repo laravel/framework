@@ -3,14 +3,14 @@
 namespace Illuminate\Tests\Integration\Database;
 
 use Illuminate\Support\Facades\DB;
-use Orchestra\Testbench\TestCase;
 
-class DatabaseTransactionsTest extends TestCase
+class DatabaseTransactionsTest extends DatabaseTestCase
 {
     protected function defineEnvironment($app)
     {
+        parent::defineEnvironment($app);
+
         $app['config']->set([
-            'database.default' => 'testing',
             'database.connections.second_connection' => [
                 'driver' => 'sqlite',
                 'database' => ':memory:',
