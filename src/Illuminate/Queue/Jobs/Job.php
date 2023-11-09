@@ -2,9 +2,11 @@
 
 namespace Illuminate\Queue\Jobs;
 
+use Illuminate\Bus\BatchRepository;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\ManuallyFailedException;
+use Illuminate\Queue\TimeoutExceededException;
 use Illuminate\Support\InteractsWithTime;
 
 abstract class Job
@@ -181,6 +183,14 @@ abstract class Job
 
         if ($this->isDeleted()) {
             return;
+        }
+
+        if ($e instanceof TimeoutExceededException) {
+            $batchRepository = $this->resolve(BatchRepository::class);
+
+            if (method_exists($batchRepository, 'rollbackTransaction')) {
+                $batchRepository->rollbackTransaction();
+            }
         }
 
         try {
