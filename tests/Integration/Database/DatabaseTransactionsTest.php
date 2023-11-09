@@ -8,21 +8,15 @@ use Orchestra\Testbench\TestCase;
 
 class DatabaseTransactionsTest extends TestCase
 {
-    protected function setUp(): void
+    protected function defineEnvironment($app)
     {
-        parent::setUp();
-
-        app(Manager::class)
-            ->addConnection([
+        $app['config']->set([
+            'database.default' => 'testing',
+            'database.connections.second_connection' => [
                 'driver' => 'sqlite',
                 'database' => ':memory:',
-            ]);
-
-        app(Manager::class)
-            ->addConnection([
-                'driver' => 'sqlite',
-                'database' => ':memory:',
-            ], 'second_connection');
+            ],
+        ]);
     }
 
     public function testTransactionCallbacks()
