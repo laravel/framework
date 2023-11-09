@@ -2,8 +2,6 @@
 
 namespace Illuminate\Queue;
 
-use Illuminate\Bus\BatchRepository;
-use Illuminate\Container\Container;
 use Illuminate\Contracts\Cache\Repository as CacheContract;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Events\Dispatcher;
