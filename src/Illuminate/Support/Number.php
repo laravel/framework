@@ -107,35 +107,31 @@ class Number
     public static function toHuman($number, $precision = 2)
     {
         $units = [
-            0 => '',
-            1 => 'ten',
-            2 => 'hundred',
             3 => 'thousand',
             6 => 'million',
             9 => 'billion',
             12 => 'trillion',
             15 => 'quadrillion',
-            -1 => 'deci',
-            -2 => 'centi',
-            -3 => 'mili',
-            -6 => 'micro',
-            -9 => 'nano',
-            -12 => 'pico',
-            -15 => 'femto'
         ];
+
+        if ($number === 0) {
+            return '0';
+        }
+
+        if ($number < 0) {
+            return sprintf('-%s', static::toHuman(abs($number), $precision));
+        }
+
+        // If over 1 quadrillion
+        if ($number >= pow(10, 15)) {
+            return sprintf('%s quadrillion', static::toHuman($number / pow(10, 15), $precision));
+        }
 
         $numberExponent = floor(log10($number));
         $displayExponent = $numberExponent - ($numberExponent % 3);
         $number /= pow(10, $displayExponent);
 
-        $unit = $units[$displayExponent];
-
-        if (! $unit && $displayExponent > 0) {
-            $unit = $units[max(array_keys($units))];
-            $number *= 1000;
-        }
-
-        return trim(sprintf('%s %s', round($number, $precision), $unit));
+        return trim(sprintf('%s %s', round($number, $precision), $units[$displayExponent]));
     }
 
     /**
