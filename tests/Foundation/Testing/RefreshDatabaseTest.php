@@ -11,7 +11,6 @@ use Mockery as m;
 use Orchestra\Testbench\Concerns\ApplicationTestingHooks;
 use Orchestra\Testbench\Foundation\Application as Testbench;
 use PHPUnit\Framework\TestCase;
-use ReflectionMethod;
 
 use function Orchestra\Testbench\package_path;
 
