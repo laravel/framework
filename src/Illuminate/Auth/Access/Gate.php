@@ -448,9 +448,7 @@ class Gate implements GateContract
         // if that is required for this application. Then we'll return the result.
         return tap($this->callAfterCallbacks(
             $user, $ability, $arguments, $result
-        ), function ($result) use ($user, $ability, $arguments) {
-            $this->dispatchGateEvaluatedEvent($user, $ability, $arguments, $result);
-        });
+        ), fn ($result) => $this->dispatchGateEvaluatedEvent($user, $ability, $arguments, $result));
     }
 
     /**
