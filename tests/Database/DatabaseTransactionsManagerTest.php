@@ -72,10 +72,10 @@ class DatabaseTransactionsManagerTest extends TestCase
         $manager->commit('default');
 
         $this->assertCount(0, $manager->getPendingTransactions());
-        $this->assertCount(1, $manager->getReadyTransactions());
+        $this->assertCount(1, $manager->getCommittedTransactions());
 
-        $this->assertSame('admin', $manager->getReadyTransactions()[0]->connection);
-        $this->assertEquals(1, $manager->getReadyTransactions()[0]->level);
+        $this->assertSame('admin', $manager->getCommittedTransactions()[0]->connection);
+        $this->assertEquals(1, $manager->getCommittedTransactions()[0]->level);
     }
 
     public function testCallbacksAreAddedToTheCurrentTransaction()
@@ -188,13 +188,13 @@ class DatabaseTransactionsManagerTest extends TestCase
         $manager->stageTransactions('default');
 
         $this->assertCount(1, $manager->getPendingTransactions());
-        $this->assertCount(1, $manager->getReadyTransactions());
-        $this->assertEquals('default', $manager->getReadyTransactions()[0]->connection);
+        $this->assertCount(1, $manager->getCommittedTransactions());
+        $this->assertEquals('default', $manager->getCommittedTransactions()[0]->connection);
 
         $manager->stageTransactions('admin');
 
         $this->assertCount(0, $manager->getPendingTransactions());
-        $this->assertCount(2, $manager->getReadyTransactions());
-        $this->assertEquals('admin', $manager->getReadyTransactions()[1]->connection);
+        $this->assertCount(2, $manager->getCommittedTransactions());
+        $this->assertEquals('admin', $manager->getCommittedTransactions()[1]->connection);
     }
 }

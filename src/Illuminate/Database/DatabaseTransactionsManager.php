@@ -2,17 +2,19 @@
 
 namespace Illuminate\Database;
 
+use Illuminate\Support\Collection;
+
 class DatabaseTransactionsManager
 {
     /**
-     * All of the recorded ready transactions.
+     * All of the committed transactions.
      *
      * @var \Illuminate\Support\Collection<int, \Illuminate\Database\DatabaseTransactionRecord>
      */
-    protected $readyTransactions;
+    protected $committedTransactions;
 
     /**
-     * All of the recorded pending transactions.
+     * All of the pending transactions.
      *
      * @var \Illuminate\Support\Collection<int, \Illuminate\Database\DatabaseTransactionRecord>
      */
@@ -25,8 +27,8 @@ class DatabaseTransactionsManager
      */
     public function __construct()
     {
-        $this->readyTransactions = collect();
-        $this->pendingTransactions = collect();
+        $this->committedTransactions = new Collection;
+        $this->pendingTransactions = new Collection;
     }
 
     /**
@@ -65,11 +67,11 @@ class DatabaseTransactionsManager
      */
     public function commit($connection)
     {
-        [$forThisConnection, $forOtherConnections] = $this->readyTransactions->partition(
+        [$forThisConnection, $forOtherConnections] = $this->committedTransactions->partition(
             fn ($transaction) => $transaction->connection == $connection
         );
 
-        $this->readyTransactions = $forOtherConnections->values();
+        $this->committedTransactions = $forOtherConnections->values();
 
         $forThisConnection->map->executeCallbacks();
     }
@@ -90,18 +92,20 @@ class DatabaseTransactionsManager
     }
 
     /**
-     * Move all the pending transactions to a ready state.
+     * Move all the pending transactions to a committed state.
      *
      * @param  string  $connection
      * @return void
      */
     public function stageTransactions($connection)
     {
-        $this->readyTransactions = $this->readyTransactions->merge(
+        $this->committedTransactions = $this->committedTransactions->merge(
             $this->pendingTransactions->filter(fn ($transaction) => $transaction->connection === $connection)
         );
 
-        $this->pendingTransactions = $this->pendingTransactions->reject(fn ($transaction) => $transaction->connection === $connection);
+        $this->pendingTransactions = $this->pendingTransactions->reject(
+            fn ($transaction) => $transaction->connection === $connection
+        );
     }
 
     /**
@@ -126,7 +130,7 @@ class DatabaseTransactionsManager
     }
 
     /**
-     * Get all the pending transactions.
+     * Get all of the pending transactions.
      *
      * @return \Illuminate\Support\Collection
      */
@@ -136,12 +140,12 @@ class DatabaseTransactionsManager
     }
 
     /**
-     * Get all the ready transactions.
+     * Get all of the committed transactions.
      *
      * @return \Illuminate\Support\Collection
      */
-    public function getReadyTransactions()
+    public function getCommittedTransactions()
     {
-        return $this->readyTransactions;
+        return $this->committedTransactions;
     }
 }
