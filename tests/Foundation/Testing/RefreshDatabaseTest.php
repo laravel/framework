@@ -27,7 +27,7 @@ class RefreshDatabaseTest extends TestCase
 
     public $dropTypes = false;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         RefreshDatabaseState::$migrated = false;
 
