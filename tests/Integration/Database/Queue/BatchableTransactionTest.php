@@ -51,13 +51,11 @@ class BatchableTransactionTest extends DatabaseTestCase
         $this->assertSame(0, DB::table('jobs')->count());
         $this->assertSame(1, DB::table('failed_jobs')->count());
 
-        $failed = DB::table('failed_jobs')->pluck('uuid');
-
         $this->assertDatabaseHas('job_batches', [
             'total_jobs' => 1,
             'pending_jobs' => 1,
             'failed_jobs' => 1,
-            'failed_job_ids' => json_encode($failed->all()),
+            'failed_job_ids' => json_encode(DB::table('failed_jobs')->pluck('uuid')->all()),
         ]);
     }
 }
