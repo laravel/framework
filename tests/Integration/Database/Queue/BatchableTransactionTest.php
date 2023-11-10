@@ -7,11 +7,13 @@ use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 use Orchestra\Testbench\Attributes\WithMigration;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use Symfony\Component\Process\Exception\ProcessSignaledException;
 use Throwable;
 
 use function Orchestra\Testbench\remote;
 
+#[RequiresPhpExtension('pcntl')]
 #[WithMigration('laravel', 'queue')]
 class BatchableTransactionTest extends DatabaseTestCase
 {
