@@ -6,14 +6,24 @@ use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Str;
 use Illuminate\Tests\Integration\Auth\Fixtures\AuthenticationTestUser;
 use Orchestra\Testbench\Factories\UserFactory;
 use Orchestra\Testbench\TestCase;
 
 class ForgotPasswordTest extends TestCase
 {
+    protected function tearDown(): void
+    {
+        ResetPassword::$createUrlCallback = null;
+        ResetPassword::$toMailCallback = null;
+
+        parent::tearDown();
+    }
+
     protected function defineEnvironment($app)
     {
+        $app['config']->set('app.key', Str::random(32));
         $app['config']->set('auth.providers.users.model', AuthenticationTestUser::class);
     }
 
@@ -33,8 +43,7 @@ class ForgotPasswordTest extends TestCase
         })->name('custom.password.reset');
     }
 
-    /** @test */
-    public function it_can_send_forgot_password_email()
+    public function testItCanSendForgotPasswordEmail()
     {
         Notification::fake();
 
@@ -57,8 +66,7 @@ class ForgotPasswordTest extends TestCase
         );
     }
 
-    /** @test */
-    public function it_can_send_forgot_password_email_via_create_url_using()
+    public function testItCanSendForgotPasswordEmailViaCreateUrlUsing()
     {
         Notification::fake();
 
@@ -85,8 +93,7 @@ class ForgotPasswordTest extends TestCase
         );
     }
 
-    /** @test */
-    public function it_can_send_forgot_password_email_via_to_mail_using()
+    public function testItCanSendForgotPasswordEmailViaToMailUsing()
     {
         Notification::fake();
 

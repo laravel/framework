@@ -1,6 +1,9 @@
 php:
   preset: laravel
   version: 8.1
+  finder:
+    not-name:
+      - bad-syntax-strategy.php
 js:
   finder:
     not-name:

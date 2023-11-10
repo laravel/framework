@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Database;
 
 use Exception;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -204,7 +205,7 @@ class DatabaseEloquentRelationTest extends TestCase
             });
 
             $this->fail('Exception was not thrown');
-        } catch (Exception $exception) {
+        } catch (Exception) {
             // Does nothing.
         }
 
@@ -268,18 +269,12 @@ class DatabaseEloquentRelationTest extends TestCase
         $this->assertSame('foo', $result);
     }
 
-    public function testRelationResolvers()
+    public function testIsRelationIgnoresAttribute()
     {
-        $model = new EloquentRelationResetModelStub;
-        $builder = m::mock(Builder::class);
-        $builder->shouldReceive('getModel')->andReturn($model);
+        $model = new EloquentRelationAndAttributeModelStub;
 
-        EloquentRelationResetModelStub::resolveRelationUsing('customer', function ($model) use ($builder) {
-            return new EloquentResolverRelationStub($builder, $model);
-        });
-
-        $this->assertInstanceOf(EloquentResolverRelationStub::class, $model->customer());
-        $this->assertSame(['key' => 'value'], $model->customer);
+        $this->assertTrue($model->isRelation('parent'));
+        $this->assertFalse($model->isRelation('field'));
     }
 }
 
@@ -344,10 +339,24 @@ class EloquentNoTouchingAnotherModelStub extends Model
     ];
 }
 
-class EloquentResolverRelationStub extends EloquentRelationStub
+class EloquentRelationAndAttributeModelStub extends Model
 {
-    public function getResults()
+    protected $table = 'one_more_table';
+
+    public function field(): Attribute
     {
-        return ['key' => 'value'];
+        return new Attribute(
+            function ($value) {
+                return $value;
+            },
+            function ($value) {
+                return $value;
+            },
+        );
+    }
+
+    public function parent()
+    {
+        return $this->belongsTo(self::class);
     }
 }

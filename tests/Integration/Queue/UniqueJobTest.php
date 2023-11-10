@@ -48,9 +48,9 @@ class UniqueJobTest extends TestCase
             $this->app->get(Cache::class)->lock($this->getLockKey(UniqueTestJob::class), 10)->get()
         );
 
-        Bus::fake();
+        Bus::assertDispatchedTimes(UniqueTestJob::class);
         UniqueTestJob::dispatch();
-        Bus::assertNotDispatched(UniqueTestJob::class);
+        Bus::assertDispatchedTimes(UniqueTestJob::class);
 
         $this->assertFalse(
             $this->app->get(Cache::class)->lock($this->getLockKey(UniqueTestJob::class), 10)->get()
@@ -150,7 +150,7 @@ class UniqueJobTest extends TestCase
 
     protected function getLockKey($job)
     {
-        return 'laravel_unique_job:'.(is_string($job) ? $job : get_class($job));
+        return 'laravel_unique_job:'.(is_string($job) ? $job : get_class($job)).':';
     }
 }
 

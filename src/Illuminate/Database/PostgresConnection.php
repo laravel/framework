@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database;
 
+use Exception;
 use Illuminate\Database\PDO\PostgresDriver;
 use Illuminate\Database\Query\Grammars\PostgresGrammar as QueryGrammar;
 use Illuminate\Database\Query\Processors\PostgresProcessor;
@@ -9,34 +10,42 @@ use Illuminate\Database\Schema\Grammars\PostgresGrammar as SchemaGrammar;
 use Illuminate\Database\Schema\PostgresBuilder;
 use Illuminate\Database\Schema\PostgresSchemaState;
 use Illuminate\Filesystem\Filesystem;
-use PDO;
 
 class PostgresConnection extends Connection
 {
     /**
-     * Bind values to their parameters in the given statement.
+     * Escape a binary value for safe SQL embedding.
      *
-     * @param  \PDOStatement  $statement
-     * @param  array  $bindings
-     * @return void
+     * @param  string  $value
+     * @return string
      */
-    public function bindValues($statement, $bindings)
+    protected function escapeBinary($value)
     {
-        foreach ($bindings as $key => $value) {
-            if (is_int($value)) {
-                $pdoParam = PDO::PARAM_INT;
-            } elseif (is_resource($value)) {
-                $pdoParam = PDO::PARAM_LOB;
-            } else {
-                $pdoParam = PDO::PARAM_STR;
-            }
+        $hex = bin2hex($value);
 
-            $statement->bindValue(
-                is_string($key) ? $key : $key + 1,
-                $value,
-                $pdoParam
-            );
-        }
+        return "'\x{$hex}'::bytea";
+    }
+
+    /**
+     * Escape a bool value for safe SQL embedding.
+     *
+     * @param  bool  $value
+     * @return string
+     */
+    protected function escapeBool($value)
+    {
+        return $value ? 'true' : 'false';
+    }
+
+    /**
+     * Determine if the given database exception was caused by a unique constraint violation.
+     *
+     * @param  \Exception  $exception
+     * @return bool
+     */
+    protected function isUniqueConstraintError(Exception $exception)
+    {
+        return '23505' === $exception->getCode();
     }
 
     /**
@@ -46,7 +55,9 @@ class PostgresConnection extends Connection
      */
     protected function getDefaultQueryGrammar()
     {
-        return $this->withTablePrefix(new QueryGrammar);
+        ($grammar = new QueryGrammar)->setConnection($this);
+
+        return $this->withTablePrefix($grammar);
     }
 
     /**
@@ -70,7 +81,9 @@ class PostgresConnection extends Connection
      */
     protected function getDefaultSchemaGrammar()
     {
-        return $this->withTablePrefix(new SchemaGrammar);
+        ($grammar = new SchemaGrammar)->setConnection($this);
+
+        return $this->withTablePrefix($grammar);
     }
 
     /**

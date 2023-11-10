@@ -67,9 +67,7 @@ class ConfigurationUrlParser
             'port' => $url['port'] ?? null,
             'username' => $url['user'] ?? null,
             'password' => $url['pass'] ?? null,
-        ], function ($value) {
-            return ! is_null($value);
-        });
+        ], fn ($value) => ! is_null($value));
     }
 
     /**

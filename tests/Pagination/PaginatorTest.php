@@ -9,7 +9,7 @@ class PaginatorTest extends TestCase
 {
     public function testSimplePaginatorReturnsRelevantContextInformation()
     {
-        $p = new Paginator($array = ['item3', 'item4', 'item5'], 2, 2);
+        $p = new Paginator(['item3', 'item4', 'item5'], 2, 2);
 
         $this->assertEquals(2, $p->currentPage());
         $this->assertTrue($p->hasPages());
@@ -33,40 +33,35 @@ class PaginatorTest extends TestCase
 
     public function testPaginatorRemovesTrailingSlashes()
     {
-        $p = new Paginator($array = ['item1', 'item2', 'item3'], 2, 2,
-                                    ['path' => 'http://website.com/test/']);
+        $p = new Paginator(['item1', 'item2', 'item3'], 2, 2, ['path' => 'http://website.com/test/']);
 
         $this->assertSame('http://website.com/test?page=1', $p->previousPageUrl());
     }
 
     public function testPaginatorGeneratesUrlsWithoutTrailingSlash()
     {
-        $p = new Paginator($array = ['item1', 'item2', 'item3'], 2, 2,
-                                    ['path' => 'http://website.com/test']);
+        $p = new Paginator(['item1', 'item2', 'item3'], 2, 2, ['path' => 'http://website.com/test']);
 
         $this->assertSame('http://website.com/test?page=1', $p->previousPageUrl());
     }
 
     public function testItRetrievesThePaginatorOptions()
     {
-        $p = new Paginator($array = ['item1', 'item2', 'item3'], 2, 2,
-            $options = ['path' => 'http://website.com/test']);
+        $p = new Paginator(['item1', 'item2', 'item3'], 2, 2, ['path' => 'http://website.com/test']);
 
-        $this->assertSame($p->getOptions(), $options);
+        $this->assertSame(['path' => 'http://website.com/test'], $p->getOptions());
     }
 
     public function testPaginatorReturnsPath()
     {
-        $p = new Paginator($array = ['item1', 'item2', 'item3'], 2, 2,
-                                    ['path' => 'http://website.com/test']);
+        $p = new Paginator(['item1', 'item2', 'item3'], 2, 2, ['path' => 'http://website.com/test']);
 
-        $this->assertSame($p->path(), 'http://website.com/test');
+        $this->assertSame('http://website.com/test', $p->path());
     }
 
     public function testCanTransformPaginatorItems()
     {
-        $p = new Paginator($array = ['item1', 'item2', 'item3'], 3, 1,
-                                    ['path' => 'http://website.com/test']);
+        $p = new Paginator(['item1', 'item2', 'item3'], 3, 1, ['path' => 'http://website.com/test']);
 
         $p->through(function ($item) {
             return substr($item, 4, 1);

@@ -20,7 +20,7 @@ class TimestampTypeTest extends DatabaseTestCase
     {
         $this->assertTrue(
             $this->app['db']->connection()
-                ->getDoctrineSchemaManager()
+                ->getDoctrineConnection()
                 ->getDatabasePlatform()
                 ->hasDoctrineTypeMappingFor('timestamp')
         );
@@ -58,5 +58,26 @@ class TimestampTypeTest extends DatabaseTestCase
         $this->driver === 'pgsql'
             ? $this->assertSame('timestamp', Schema::getColumnType('test', 'timestamp_to_datetime'))
             : $this->assertSame('datetime', Schema::getColumnType('test', 'timestamp_to_datetime'));
+    }
+
+    public function testChangeStringColumnToTimestampColumn()
+    {
+        if ($this->driver !== 'mysql') {
+            $this->markTestSkipped('Test requires a MySQL connection.');
+        }
+
+        Schema::create('test', function (Blueprint $table) {
+            $table->string('string_to_timestamp');
+        });
+
+        $blueprint = new Blueprint('test', function ($table) {
+            $table->timestamp('string_to_timestamp')->nullable(true)->change();
+        });
+
+        $queries = $blueprint->toSql($this->getConnection(), $this->getConnection()->getSchemaGrammar());
+
+        $expected = ['ALTER TABLE test CHANGE string_to_timestamp string_to_timestamp TIMESTAMP NULL DEFAULT NULL'];
+
+        $this->assertEquals($expected, $queries);
     }
 }

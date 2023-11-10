@@ -8,7 +8,6 @@ use Illuminate\Contracts\Auth\UserProvider;
 use Illuminate\Contracts\Hashing\Hasher as HasherContract;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\ConnectionInterface;
-use Illuminate\Support\Str;
 
 class DatabaseUserProvider implements UserProvider
 {
@@ -36,7 +35,7 @@ class DatabaseUserProvider implements UserProvider
     /**
      * Create a new database user provider.
      *
-     * @param  \Illuminate\Database\ConnectionInterface  $conn
+     * @param  \Illuminate\Database\ConnectionInterface  $connection
      * @param  \Illuminate\Contracts\Hashing\Hasher  $hasher
      * @param  string  $table
      * @return void
@@ -100,9 +99,13 @@ class DatabaseUserProvider implements UserProvider
      */
     public function retrieveByCredentials(array $credentials)
     {
-        if (empty($credentials) ||
-           (count($credentials) === 1 &&
-            array_key_exists('password', $credentials))) {
+        $credentials = array_filter(
+            $credentials,
+            fn ($key) => ! str_contains($key, 'password'),
+            ARRAY_FILTER_USE_KEY
+        );
+
+        if (empty($credentials)) {
             return;
         }
 
@@ -112,10 +115,6 @@ class DatabaseUserProvider implements UserProvider
         $query = $this->connection->table($this->table);
 
         foreach ($credentials as $key => $value) {
-            if (Str::contains($key, 'password')) {
-                continue;
-            }
-
             if (is_array($value) || $value instanceof Arrayable) {
                 $query->whereIn($key, $value);
             } elseif ($value instanceof Closure) {
@@ -125,9 +124,9 @@ class DatabaseUserProvider implements UserProvider
             }
         }
 
-        // Now we are ready to execute the query to see if we have an user matching
-        // the given credentials. If not, we will just return nulls and indicate
-        // that there are no matching users for these given credential arrays.
+        // Now we are ready to execute the query to see if we have a user matching
+        // the given credentials. If not, we will just return null and indicate
+        // that there are no matching users from the given credential arrays.
         $user = $query->first();
 
         return $this->getGenericUser($user);

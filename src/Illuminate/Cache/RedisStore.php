@@ -5,6 +5,9 @@ namespace Illuminate\Cache;
 use Illuminate\Contracts\Cache\LockProvider;
 use Illuminate\Contracts\Redis\Factory as Redis;
 use Illuminate\Redis\Connections\PhpRedisConnection;
+use Illuminate\Redis\Connections\PredisConnection;
+use Illuminate\Support\LazyCollection;
+use Illuminate\Support\Str;
 
 class RedisStore extends TaggableStore implements LockProvider
 {
@@ -74,6 +77,10 @@ class RedisStore extends TaggableStore implements LockProvider
      */
     public function many(array $keys)
     {
+        if (count($keys) === 0) {
+            return [];
+        }
+
         $results = [];
 
         $values = $this->connection()->mget(array_map(function ($key) {
@@ -111,12 +118,20 @@ class RedisStore extends TaggableStore implements LockProvider
      */
     public function putMany(array $values, $seconds)
     {
+        $serializedValues = [];
+
+        foreach ($values as $key => $value) {
+            $serializedValues[$this->prefix.$key] = $this->serialize($value);
+        }
+
         $this->connection()->multi();
 
         $manyResult = null;
 
-        foreach ($values as $key => $value) {
-            $result = $this->put($key, $value, $seconds);
+        foreach ($serializedValues as $key => $value) {
+            $result = (bool) $this->connection()->setex(
+                $key, (int) max(1, $seconds), $value
+            );
 
             $manyResult = is_null($manyResult) ? $result : $result && $manyResult;
         }
@@ -236,6 +251,18 @@ class RedisStore extends TaggableStore implements LockProvider
     }
 
     /**
+     * Remove all expired tag set entries.
+     *
+     * @return void
+     */
+    public function flushStaleTags()
+    {
+        foreach ($this->currentTags()->chunk(1000) as $tags) {
+            $this->tags($tags->all())->flushStale();
+        }
+    }
+
+    /**
      * Begin executing a new tags operation.
      *
      * @param  array|mixed  $names
@@ -244,8 +271,53 @@ class RedisStore extends TaggableStore implements LockProvider
     public function tags($names)
     {
         return new RedisTaggedCache(
-            $this, new TagSet($this, is_array($names) ? $names : func_get_args())
+            $this, new RedisTagSet($this, is_array($names) ? $names : func_get_args())
         );
+    }
+
+    /**
+     * Get a collection of all of the cache tags currently being used.
+     *
+     * @param  int  $chunkSize
+     * @return \Illuminate\Support\LazyCollection
+     */
+    protected function currentTags($chunkSize = 1000)
+    {
+        $connection = $this->connection();
+
+        // Connections can have a global prefix...
+        $connectionPrefix = match (true) {
+            $connection instanceof PhpRedisConnection => $connection->_prefix(''),
+            $connection instanceof PredisConnection => $connection->getOptions()->prefix ?: '',
+            default => '',
+        };
+
+        $prefix = $connectionPrefix.$this->getPrefix();
+
+        return LazyCollection::make(function () use ($connection, $chunkSize, $prefix) {
+            $cursor = $defaultCursorValue = '0';
+
+            do {
+                [$cursor, $tagsChunk] = $connection->scan(
+                    $cursor,
+                    ['match' => $prefix.'tag:*:entries', 'count' => $chunkSize]
+                );
+
+                if (! is_array($tagsChunk)) {
+                    break;
+                }
+
+                $tagsChunk = array_unique($tagsChunk);
+
+                if (empty($tagsChunk)) {
+                    continue;
+                }
+
+                foreach ($tagsChunk as $tag) {
+                    yield $tag;
+                }
+            } while (((string) $cursor) !== $defaultCursorValue);
+        })->map(fn (string $tagKey) => Str::match('/^'.preg_quote($prefix, '/').'tag:(.*):entries$/', $tagKey));
     }
 
     /**
@@ -320,7 +392,7 @@ class RedisStore extends TaggableStore implements LockProvider
      */
     public function setPrefix($prefix)
     {
-        $this->prefix = ! empty($prefix) ? $prefix.':' : '';
+        $this->prefix = $prefix;
     }
 
     /**

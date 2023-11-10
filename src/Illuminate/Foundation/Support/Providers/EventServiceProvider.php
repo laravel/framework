@@ -11,7 +11,7 @@ class EventServiceProvider extends ServiceProvider
     /**
      * The event handler mappings for the application.
      *
-     * @var array
+     * @var array<string, array<int, string>>
      */
     protected $listen = [];
 
@@ -25,7 +25,7 @@ class EventServiceProvider extends ServiceProvider
     /**
      * The model observers to register.
      *
-     * @var array
+     * @var array<string, string|object|array<int, string|object>>
      */
     protected $observers = [];
 
@@ -40,7 +40,7 @@ class EventServiceProvider extends ServiceProvider
             $events = $this->getEvents();
 
             foreach ($events as $event => $listeners) {
-                foreach (array_unique($listeners) as $listener) {
+                foreach (array_unique($listeners, SORT_REGULAR) as $listener) {
                     Event::listen($event, $listener);
                 }
             }

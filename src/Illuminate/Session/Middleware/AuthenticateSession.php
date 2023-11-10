@@ -5,8 +5,10 @@ namespace Illuminate\Session\Middleware;
 use Closure;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Contracts\Auth\Factory as AuthFactory;
+use Illuminate\Contracts\Session\Middleware\AuthenticatesSessions;
+use Illuminate\Http\Request;
 
-class AuthenticateSession
+class AuthenticateSession implements AuthenticatesSessions
 {
     /**
      * The authentication factory implementation.
@@ -40,7 +42,7 @@ class AuthenticateSession
         }
 
         if ($this->guard()->viaRemember()) {
-            $passwordHash = explode('|', $request->cookies->get($this->auth->getRecallerName()))[2] ?? null;
+            $passwordHash = explode('|', $request->cookies->get($this->guard()->getRecallerName()))[2] ?? null;
 
             if (! $passwordHash || $passwordHash != $request->user()->getAuthPassword()) {
                 $this->logout($request);
@@ -93,7 +95,9 @@ class AuthenticateSession
 
         $request->session()->flush();
 
-        throw new AuthenticationException('Unauthenticated.', [$this->auth->getDefaultDriver()]);
+        throw new AuthenticationException(
+            'Unauthenticated.', [$this->auth->getDefaultDriver()], $this->redirectTo($request)
+        );
     }
 
     /**
@@ -104,5 +108,16 @@ class AuthenticateSession
     protected function guard()
     {
         return $this->auth;
+    }
+
+    /**
+     * Get the path the user should be redirected to when their session is not authenticated.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return string|null
+     */
+    protected function redirectTo(Request $request)
+    {
+        //
     }
 }

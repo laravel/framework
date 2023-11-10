@@ -5,6 +5,7 @@ namespace Illuminate\Notifications;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeEncrypted;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Contracts\Queue\ShouldQueueAfterCommit;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Queue\InteractsWithQueue;
@@ -51,6 +52,13 @@ class SendQueuedNotifications implements ShouldQueue
     public $timeout;
 
     /**
+     * The maximum number of unhandled exceptions to allow before failing.
+     *
+     * @var int
+     */
+    public $maxExceptions;
+
+    /**
      * Indicates if the job should be encrypted.
      *
      * @var bool
@@ -72,7 +80,14 @@ class SendQueuedNotifications implements ShouldQueue
         $this->notifiables = $this->wrapNotifiables($notifiables);
         $this->tries = property_exists($notification, 'tries') ? $notification->tries : null;
         $this->timeout = property_exists($notification, 'timeout') ? $notification->timeout : null;
-        $this->afterCommit = property_exists($notification, 'afterCommit') ? $notification->afterCommit : null;
+        $this->maxExceptions = property_exists($notification, 'maxExceptions') ? $notification->maxExceptions : null;
+
+        if ($notification instanceof ShouldQueueAfterCommit) {
+            $this->afterCommit = true;
+        } else {
+            $this->afterCommit = property_exists($notification, 'afterCommit') ? $notification->afterCommit : null;
+        }
+
         $this->shouldBeEncrypted = $notification instanceof ShouldBeEncrypted;
     }
 
@@ -142,9 +157,9 @@ class SendQueuedNotifications implements ShouldQueue
     }
 
     /**
-     * Get the expiration for the notification.
+     * Determine the time at which the job should timeout.
      *
-     * @return mixed
+     * @return \DateTime|null
      */
     public function retryUntil()
     {

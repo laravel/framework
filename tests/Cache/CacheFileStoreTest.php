@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Cache;
 
+use Exception;
 use Illuminate\Cache\FileStore;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Filesystem\Filesystem;
@@ -11,13 +12,6 @@ use PHPUnit\Framework\TestCase;
 
 class CacheFileStoreTest extends TestCase
 {
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        Carbon::setTestNow(Carbon::now());
-    }
-
     protected function tearDown(): void
     {
         parent::tearDown();
@@ -47,7 +41,43 @@ class CacheFileStoreTest extends TestCase
         $this->assertTrue($result);
     }
 
-    public function testExpiredItemsReturnNull()
+    public function testPutWillConsiderZeroAsEternalTime()
+    {
+        $files = $this->mockFilesystem();
+
+        $hash = sha1('O--L / key');
+        $filePath = __DIR__.'/'.substr($hash, 0, 2).'/'.substr($hash, 2, 2).'/'.$hash;
+        $ten9s = '9999999999'; // The "forever" time value.
+        $fileContents = $ten9s.serialize('gold');
+        $exclusiveLock = true;
+
+        $files->expects($this->once())->method('put')->with(
+            $this->equalTo($filePath),
+            $this->equalTo($fileContents),
+            $this->equalTo($exclusiveLock) // Ensure we do lock the file while putting.
+        )->willReturn(strlen($fileContents));
+
+        (new FileStore($files, __DIR__))->put('O--L / key', 'gold', 0);
+    }
+
+    public function testPutWillConsiderBigValuesAsEternalTime()
+    {
+        $files = $this->mockFilesystem();
+
+        $hash = sha1('O--L / key');
+        $filePath = __DIR__.'/'.substr($hash, 0, 2).'/'.substr($hash, 2, 2).'/'.$hash;
+        $ten9s = '9999999999'; // The "forever" time value.
+        $fileContents = $ten9s.serialize('gold');
+
+        $files->expects($this->once())->method('put')->with(
+            $this->equalTo($filePath),
+            $this->equalTo($fileContents),
+        );
+
+        (new FileStore($files, __DIR__))->put('O--L / key', 'gold', (int) $ten9s + 1);
+    }
+
+    public function testExpiredItemsReturnNullAndGetDeleted()
     {
         $files = $this->mockFilesystem();
         $contents = '0000000000';
@@ -149,8 +179,88 @@ class CacheFileStoreTest extends TestCase
         $this->assertSame('Hello World', $store->get('foo'));
     }
 
+    public function testIncrementExpiredKeys()
+    {
+        Carbon::setTestNow(Carbon::now());
+
+        $filePath = $this->getCachePath('foo');
+        $files = $this->mockFilesystem();
+        $now = Carbon::now()->getTimestamp();
+        $initialValue = ($now - 10).serialize(77);
+        $valueAfterIncrement = '9999999999'.serialize(3);
+        $store = new FileStore($files, __DIR__);
+
+        $files->expects($this->once())->method('get')->with($this->equalTo($filePath), $this->equalTo(true))->willReturn($initialValue);
+        $files->expects($this->once())->method('put')->with($this->equalTo($filePath), $this->equalTo($valueAfterIncrement));
+
+        $result = $store->increment('foo', 3);
+    }
+
+    public function testIncrementCanAtomicallyJump()
+    {
+        $filePath = $this->getCachePath('foo');
+        $files = $this->mockFilesystem();
+        $initialValue = '9999999999'.serialize(1);
+        $valueAfterIncrement = '9999999999'.serialize(4);
+        $store = new FileStore($files, __DIR__);
+
+        $files->expects($this->once())->method('get')->with($this->equalTo($filePath), $this->equalTo(true))->willReturn($initialValue);
+        $files->expects($this->once())->method('put')->with($this->equalTo($filePath), $this->equalTo($valueAfterIncrement));
+
+        $result = $store->increment('foo', 3);
+        $this->assertEquals(4, $result);
+    }
+
+    public function testDecrementCanAtomicallyJump()
+    {
+        $filePath = $this->getCachePath('foo');
+
+        $files = $this->mockFilesystem();
+        $initialValue = '9999999999'.serialize(2);
+        $valueAfterIncrement = '9999999999'.serialize(0);
+        $store = new FileStore($files, __DIR__);
+
+        $files->expects($this->once())->method('get')->with($this->equalTo($filePath), $this->equalTo(true))->willReturn($initialValue);
+        $files->expects($this->once())->method('put')->with($this->equalTo($filePath), $this->equalTo($valueAfterIncrement));
+
+        $result = $store->decrement('foo', 2);
+        $this->assertEquals(0, $result);
+    }
+
+    public function testIncrementNonNumericValues()
+    {
+        $filePath = $this->getCachePath('foo');
+
+        $files = $this->mockFilesystem();
+        $initialValue = '1999999909'.serialize('foo');
+        $valueAfterIncrement = '1999999909'.serialize(1);
+        $store = new FileStore($files, __DIR__);
+        $files->expects($this->once())->method('get')->with($this->equalTo($filePath), $this->equalTo(true))->willReturn($initialValue);
+        $files->expects($this->once())->method('put')->with($this->equalTo($filePath), $this->equalTo($valueAfterIncrement));
+        $result = $store->increment('foo');
+
+        $this->assertEquals(1, $result);
+    }
+
+    public function testIncrementNonExistentKeys()
+    {
+        $filePath = $this->getCachePath('foo');
+
+        $files = $this->mockFilesystem();
+        $valueAfterIncrement = '9999999999'.serialize(1);
+        $store = new FileStore($files, __DIR__);
+        // simulates a missing item in file store by the exception
+        $files->expects($this->once())->method('get')->with($this->equalTo($filePath), $this->equalTo(true))->willThrowException(new Exception);
+        $files->expects($this->once())->method('put')->with($this->equalTo($filePath), $this->equalTo($valueAfterIncrement));
+        $result = $store->increment('foo');
+        $this->assertIsInt($result);
+        $this->assertEquals(1, $result);
+    }
+
     public function testIncrementDoesNotExtendCacheLife()
     {
+        Carbon::setTestNow(Carbon::now());
+
         $files = $this->mockFilesystem();
         $expiration = Carbon::now()->addSeconds(50)->getTimestamp();
         $initialValue = $expiration.serialize(1);
@@ -222,5 +332,13 @@ class CacheFileStoreTest extends TestCase
     protected function mockFilesystem()
     {
         return $this->createMock(Filesystem::class);
+    }
+
+    protected function getCachePath($key)
+    {
+        $hash = sha1($key);
+        $cache_dir = substr($hash, 0, 2).'/'.substr($hash, 2, 2);
+
+        return __DIR__.'/'.$cache_dir.'/'.$hash;
     }
 }

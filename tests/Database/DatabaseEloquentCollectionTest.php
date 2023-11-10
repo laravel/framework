@@ -2,9 +2,11 @@
 
 namespace Illuminate\Tests\Database;
 
+use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Support\Collection as BaseCollection;
 use LogicException;
 use Mockery as m;
@@ -13,8 +15,51 @@ use stdClass;
 
 class DatabaseEloquentCollectionTest extends TestCase
 {
+    /**
+     * Setup the database schema.
+     *
+     * @return void
+     */
+    protected function setUp(): void
+    {
+        $db = new DB;
+
+        $db->addConnection([
+            'driver' => 'sqlite',
+            'database' => ':memory:',
+        ]);
+
+        $db->bootEloquent();
+        $db->setAsGlobal();
+
+        $this->createSchema();
+    }
+
+    protected function createSchema()
+    {
+        $this->schema()->create('users', function ($table) {
+            $table->increments('id');
+            $table->string('email')->unique();
+        });
+
+        $this->schema()->create('articles', function ($table) {
+            $table->increments('id');
+            $table->integer('user_id');
+            $table->string('title');
+        });
+
+        $this->schema()->create('comments', function ($table) {
+            $table->increments('id');
+            $table->integer('article_id');
+            $table->string('content');
+        });
+    }
+
     protected function tearDown(): void
     {
+        $this->schema()->drop('users');
+        $this->schema()->drop('articles');
+        $this->schema()->drop('comments');
         m::close();
     }
 
@@ -390,13 +435,14 @@ class DatabaseEloquentCollectionTest extends TestCase
         $one->shouldReceive('getKey')->andReturn(1);
 
         $two = m::mock(Model::class);
-        $two->shouldReceive('getKey')->andReturn('2');
+        $two->shouldReceive('getKey')->andReturn(2);
 
         $three = m::mock(Model::class);
         $three->shouldReceive('getKey')->andReturn(3);
 
         $c = new Collection([$one, $two, $three]);
 
+        $this->assertEquals($c, $c->except(null));
         $this->assertEquals(new Collection([$one, $three]), $c->except(2));
         $this->assertEquals(new Collection([$one]), $c->except([2, 3]));
     }
@@ -417,6 +463,22 @@ class DatabaseEloquentCollectionTest extends TestCase
         $this->assertEquals([], $c[0]->getHidden());
     }
 
+    public function testSetVisibleReplacesVisibleOnEntireCollection()
+    {
+        $c = new Collection([new TestEloquentCollectionModel]);
+        $c = $c->setVisible(['hidden']);
+
+        $this->assertEquals(['hidden'], $c[0]->getVisible());
+    }
+
+    public function testSetHiddenReplacesHiddenOnEntireCollection()
+    {
+        $c = new Collection([new TestEloquentCollectionModel]);
+        $c = $c->setHidden(['visible']);
+
+        $this->assertEquals(['visible'], $c[0]->getHidden());
+    }
+
     public function testAppendsAddsTestOnEntireCollection()
     {
         $c = new Collection([new TestEloquentCollectionModel]);
@@ -435,6 +497,7 @@ class DatabaseEloquentCollectionTest extends TestCase
         $this->assertEquals(BaseCollection::class, get_class($a->collapse()));
         $this->assertEquals(BaseCollection::class, get_class($a->flatten()));
         $this->assertEquals(BaseCollection::class, get_class($a->zip(['a', 'b'], ['c', 'd'])));
+        $this->assertEquals(BaseCollection::class, get_class($a->countBy('foo')));
         $this->assertEquals(BaseCollection::class, get_class($b->flip()));
     }
 
@@ -536,6 +599,73 @@ class DatabaseEloquentCollectionTest extends TestCase
         $c = new Collection;
         $c->toQuery();
     }
+
+    public function testLoadExistsShouldCastBool()
+    {
+        $this->seedData();
+        $user = EloquentTestUserModel::with('articles')->first();
+        $user->articles->loadExists('comments');
+        $commentsExists = $user->articles->pluck('comments_exists')->toArray();
+        $this->assertContainsOnly('bool', $commentsExists);
+    }
+
+    public function testWithNonScalarKey()
+    {
+        $fooKey = new EloquentTestKey('foo');
+        $foo = m::mock(Model::class);
+        $foo->shouldReceive('getKey')->andReturn($fooKey);
+
+        $barKey = new EloquentTestKey('bar');
+        $bar = m::mock(Model::class);
+        $bar->shouldReceive('getKey')->andReturn($barKey);
+
+        $collection = new Collection([$foo, $bar]);
+
+        $this->assertCount(1, $collection->only([$fooKey]));
+        $this->assertSame($foo, $collection->only($fooKey)->first());
+
+        $this->assertCount(1, $collection->except([$fooKey]));
+        $this->assertSame($bar, $collection->except($fooKey)->first());
+    }
+
+    /**
+     * Helpers...
+     */
+    protected function seedData()
+    {
+        $user = EloquentTestUserModel::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+
+        EloquentTestArticleModel::query()->insert([
+            ['user_id' => 1, 'title' => 'Another title'],
+            ['user_id' => 1, 'title' => 'Another title'],
+            ['user_id' => 1, 'title' => 'Another title'],
+        ]);
+
+        EloquentTestCommentModel::query()->insert([
+            ['article_id' => 1, 'content' => 'Another comment'],
+            ['article_id' => 2, 'content' => 'Another comment'],
+        ]);
+    }
+
+    /**
+     * Get a database connection instance.
+     *
+     * @return \Illuminate\Database\ConnectionInterface
+     */
+    protected function connection()
+    {
+        return Eloquent::getConnectionResolver()->connection();
+    }
+
+    /**
+     * Get a schema builder instance.
+     *
+     * @return \Illuminate\Database\Schema\Builder
+     */
+    protected function schema()
+    {
+        return $this->connection()->getSchemaBuilder();
+    }
 }
 
 class TestEloquentCollectionModel extends Model
@@ -546,5 +676,48 @@ class TestEloquentCollectionModel extends Model
     public function getTestAttribute()
     {
         return 'test';
+    }
+}
+
+class EloquentTestUserModel extends Model
+{
+    protected $table = 'users';
+    protected $guarded = [];
+    public $timestamps = false;
+
+    public function articles()
+    {
+        return $this->hasMany(EloquentTestArticleModel::class, 'user_id');
+    }
+}
+
+class EloquentTestArticleModel extends Model
+{
+    protected $table = 'articles';
+    protected $guarded = [];
+    public $timestamps = false;
+
+    public function comments()
+    {
+        return $this->hasMany(EloquentTestCommentModel::class, 'article_id');
+    }
+}
+
+class EloquentTestCommentModel extends Model
+{
+    protected $table = 'comments';
+    protected $guarded = [];
+    public $timestamps = false;
+}
+
+class EloquentTestKey
+{
+    public function __construct(private readonly string $key)
+    {
+    }
+
+    public function __toString()
+    {
+        return $this->key;
     }
 }

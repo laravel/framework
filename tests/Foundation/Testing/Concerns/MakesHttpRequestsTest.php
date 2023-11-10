@@ -1,9 +1,10 @@
 <?php
 
-namespace Illuminate\Tests\Foundation\Bootstrap\Testing\Concerns;
+namespace Illuminate\Tests\Foundation\Testing\Concerns;
 
 use Illuminate\Contracts\Routing\Registrar;
 use Illuminate\Contracts\Routing\UrlGenerator;
+use Illuminate\Foundation\Http\Middleware\HandlePrecognitiveRequests;
 use Illuminate\Http\RedirectResponse;
 use Orchestra\Testbench\TestCase;
 
@@ -24,6 +25,33 @@ class MakesHttpRequestsTest extends TestCase
 
         $this->withToken('foobar', 'Basic');
         $this->assertSame('Basic foobar', $this->defaultHeaders['Authorization']);
+    }
+
+    public function testWithBasicAuthSetsAuthorizationHeader()
+    {
+        $callback = function ($username, $password) {
+            return base64_encode("$username:$password");
+        };
+
+        $username = 'foo';
+        $password = 'bar';
+
+        $this->withBasicAuth($username, $password);
+        $this->assertSame('Basic '.$callback($username, $password), $this->defaultHeaders['Authorization']);
+
+        $password = 'buzz';
+
+        $this->withBasicAuth($username, $password);
+        $this->assertSame('Basic '.$callback($username, $password), $this->defaultHeaders['Authorization']);
+    }
+
+    public function testWithoutTokenRemovesAuthorizationHeader()
+    {
+        $this->withToken('foobar');
+        $this->assertSame('Bearer foobar', $this->defaultHeaders['Authorization']);
+
+        $this->withoutToken();
+        $this->assertArrayNotHasKey('Authorization', $this->defaultHeaders);
     }
 
     public function testWithoutAndWithMiddleware()
@@ -158,6 +186,19 @@ class MakesHttpRequestsTest extends TestCase
         $this->followingRedirects()->get('from');
 
         $this->assertEquals(['from', 'to'], $callOrder);
+    }
+
+    public function testWithPrecognition()
+    {
+        $this->withPrecognition();
+        $this->assertSame('true', $this->defaultHeaders['Precognition']);
+
+        $this->app->make(Registrar::class)
+            ->get('test-route', fn () => 'ok')->middleware(HandlePrecognitiveRequests::class);
+        $this->get('test-route')
+            ->assertStatus(204)
+            ->assertHeader('Precognition', 'true')
+            ->assertHeader('Precognition-Success', 'true');
     }
 }
 

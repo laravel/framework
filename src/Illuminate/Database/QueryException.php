@@ -9,6 +9,13 @@ use Throwable;
 class QueryException extends PDOException
 {
     /**
+     * The database connection name.
+     *
+     * @var string
+     */
+    public $connectionName;
+
+    /**
      * The SQL for the query.
      *
      * @var string
@@ -25,19 +32,21 @@ class QueryException extends PDOException
     /**
      * Create a new query exception instance.
      *
+     * @param  string  $connectionName
      * @param  string  $sql
      * @param  array  $bindings
      * @param  \Throwable  $previous
      * @return void
      */
-    public function __construct($sql, array $bindings, Throwable $previous)
+    public function __construct($connectionName, $sql, array $bindings, Throwable $previous)
     {
         parent::__construct('', 0, $previous);
 
+        $this->connectionName = $connectionName;
         $this->sql = $sql;
         $this->bindings = $bindings;
         $this->code = $previous->getCode();
-        $this->message = $this->formatMessage($sql, $bindings, $previous);
+        $this->message = $this->formatMessage($connectionName, $sql, $bindings, $previous);
 
         if ($previous instanceof PDOException) {
             $this->errorInfo = $previous->errorInfo;
@@ -47,14 +56,25 @@ class QueryException extends PDOException
     /**
      * Format the SQL error message.
      *
+     * @param  string  $connectionName
      * @param  string  $sql
      * @param  array  $bindings
      * @param  \Throwable  $previous
      * @return string
      */
-    protected function formatMessage($sql, $bindings, Throwable $previous)
+    protected function formatMessage($connectionName, $sql, $bindings, Throwable $previous)
     {
-        return $previous->getMessage().' (SQL: '.Str::replaceArray('?', $bindings, $sql).')';
+        return $previous->getMessage().' (Connection: '.$connectionName.', SQL: '.Str::replaceArray('?', $bindings, $sql).')';
+    }
+
+    /**
+     * Get the connection name for the query.
+     *
+     * @return string
+     */
+    public function getConnectionName()
+    {
+        return $this->connectionName;
     }
 
     /**

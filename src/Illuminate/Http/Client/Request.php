@@ -4,7 +4,6 @@ namespace Illuminate\Http\Client;
 
 use ArrayAccess;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 use LogicException;
 
@@ -194,7 +193,7 @@ class Request implements ArrayAccess
     protected function json()
     {
         if (! $this->data) {
-            $this->data = json_decode($this->body(), true);
+            $this->data = json_decode($this->body(), true) ?? [];
         }
 
         return $this->data;
@@ -218,7 +217,7 @@ class Request implements ArrayAccess
     public function isJson()
     {
         return $this->hasHeader('Content-Type') &&
-               Str::contains($this->header('Content-Type')[0], 'json');
+               str_contains($this->header('Content-Type')[0], 'json');
     }
 
     /**
@@ -229,7 +228,7 @@ class Request implements ArrayAccess
     public function isMultipart()
     {
         return $this->hasHeader('Content-Type') &&
-               Str::contains($this->header('Content-Type')[0], 'multipart');
+               str_contains($this->header('Content-Type')[0], 'multipart');
     }
 
     /**

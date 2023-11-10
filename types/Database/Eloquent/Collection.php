@@ -135,7 +135,7 @@ assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->un
     assertType('User', $user);
     assertType('int', $int);
 
-    return true;
+    return $user->getTable();
 }));
 assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->unique('string'));
 
@@ -158,8 +158,8 @@ assertType('array<User>', $collection->getDictionary());
 assertType('array<User>', $collection->getDictionary($collection));
 assertType('array<User>', $collection->getDictionary([new User]));
 
-assertType('Illuminate\Support\Collection<int, mixed>', $collection->pluck('string'));
-assertType('Illuminate\Support\Collection<int, mixed>', $collection->pluck(['string']));
+assertType('Illuminate\Support\Collection<(int|string), mixed>', $collection->pluck('string'));
+assertType('Illuminate\Support\Collection<(int|string), mixed>', $collection->pluck(['string']));
 
 assertType('Illuminate\Support\Collection<int, int>', $collection->keys());
 

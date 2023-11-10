@@ -9,7 +9,6 @@ use Illuminate\Notifications\AnonymousNotifiable;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Testing\Fakes\NotificationFake;
-use PHPUnit\Framework\Constraint\ExceptionMessage;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 
@@ -45,7 +44,7 @@ class SupportTestingNotificationFakeTest extends TestCase
             $this->fake->assertSentTo($this->user, NotificationStub::class);
             $this->fail();
         } catch (ExpectationFailedException $e) {
-            $this->assertThat($e, new ExceptionMessage('The expected [Illuminate\Tests\Support\NotificationStub] notification was not sent.'));
+            $this->assertStringContainsString('The expected [Illuminate\Tests\Support\NotificationStub] notification was not sent.', $e->getMessage());
         }
 
         $this->fake->send($this->user, new NotificationStub);
@@ -88,7 +87,7 @@ class SupportTestingNotificationFakeTest extends TestCase
             $this->fake->assertNotSentTo($this->user, NotificationStub::class);
             $this->fail();
         } catch (ExpectationFailedException $e) {
-            $this->assertThat($e, new ExceptionMessage('The unexpected [Illuminate\Tests\Support\NotificationStub] notification was sent.'));
+            $this->assertStringContainsString('The unexpected [Illuminate\Tests\Support\NotificationStub] notification was sent.', $e->getMessage());
         }
     }
 
@@ -102,7 +101,33 @@ class SupportTestingNotificationFakeTest extends TestCase
             });
             $this->fail();
         } catch (ExpectationFailedException $e) {
-            $this->assertThat($e, new ExceptionMessage('The unexpected [Illuminate\Tests\Support\NotificationStub] notification was sent.'));
+            $this->assertStringContainsString('The unexpected [Illuminate\Tests\Support\NotificationStub] notification was sent.', $e->getMessage());
+        }
+    }
+
+    public function testAssertNothingSent()
+    {
+        $this->fake->assertNothingSent();
+        $this->fake->send($this->user, new NotificationStub);
+
+        try {
+            $this->fake->assertNothingSent();
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertStringContainsString('Notifications were sent unexpectedly.', $e->getMessage());
+        }
+    }
+
+    public function testAssertNothingSentTo()
+    {
+        $this->fake->assertNothingSentTo($this->user);
+        $this->fake->send($this->user, new NotificationStub);
+
+        try {
+            $this->fake->assertNothingSentTo($this->user);
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertStringContainsString('Notifications were sent unexpectedly.', $e->getMessage());
         }
     }
 
@@ -138,9 +163,9 @@ class SupportTestingNotificationFakeTest extends TestCase
         $this->assertNotSame($id, $this->notification->id);
     }
 
-    public function testAssertTimesSent()
+    public function testAssertSentTimes()
     {
-        $this->fake->assertTimesSent(0, NotificationStub::class);
+        $this->fake->assertSentTimes(NotificationStub::class, 0);
 
         $this->fake->send($this->user, new NotificationStub);
 
@@ -148,7 +173,7 @@ class SupportTestingNotificationFakeTest extends TestCase
 
         $this->fake->send(new UserStub, new NotificationStub);
 
-        $this->fake->assertTimesSent(3, NotificationStub::class);
+        $this->fake->assertSentTimes(NotificationStub::class, 3);
     }
 
     public function testAssertSentToTimes()

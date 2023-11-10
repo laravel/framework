@@ -55,9 +55,13 @@ class DatabaseEloquentIrregularPluralTest extends TestCase
 
     protected function tearDown(): void
     {
+        parent::tearDown();
+
         $this->schema()->drop('irregular_plural_tokens');
         $this->schema()->drop('irregular_plural_humans');
         $this->schema()->drop('irregular_plural_human_irregular_plural_token');
+
+        Carbon::setTestNow(null);
     }
 
     protected function schema()
@@ -67,16 +71,14 @@ class DatabaseEloquentIrregularPluralTest extends TestCase
         return $connection->getSchemaBuilder();
     }
 
-    /** @test */
-    public function itPluralizesTheTableName()
+    public function testItPluralizesTheTableName()
     {
         $model = new IrregularPluralHuman;
 
         $this->assertSame('irregular_plural_humans', $model->getTable());
     }
 
-    /** @test */
-    public function itTouchesTheParentWithAnIrregularPlural()
+    public function testItTouchesTheParentWithAnIrregularPlural()
     {
         Carbon::setTestNow('2018-05-01 12:13:14');
 
@@ -100,8 +102,7 @@ class DatabaseEloquentIrregularPluralTest extends TestCase
         $this->assertSame('2018-05-01 15:16:17', (string) $human->updated_at);
     }
 
-    /** @test */
-    public function itPluralizesMorphToManyRelationships()
+    public function testItPluralizesMorphToManyRelationships()
     {
         $human = IrregularPluralHuman::create(['email' => 'bobby@example.com']);
 

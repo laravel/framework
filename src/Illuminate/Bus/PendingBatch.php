@@ -57,11 +57,13 @@ class PendingBatch
     /**
      * Add jobs to the batch.
      *
-     * @param  iterable  $jobs
+     * @param  iterable|object|array  $jobs
      * @return $this
      */
     public function add($jobs)
     {
+        $jobs = is_iterable($jobs) ? $jobs : Arr::wrap($jobs);
+
         foreach ($jobs as $job) {
             $this->jobs->push($job);
         }
@@ -268,5 +270,50 @@ class PendingBatch
         );
 
         return $batch;
+    }
+
+    /**
+     * Dispatch the batch after the response is sent to the browser.
+     *
+     * @return \Illuminate\Bus\Batch
+     */
+    public function dispatchAfterResponse()
+    {
+        $repository = $this->container->make(BatchRepository::class);
+
+        $batch = $repository->store($this);
+
+        if ($batch) {
+            $this->container->terminating(function () use ($batch) {
+                $this->dispatchExistingBatch($batch);
+            });
+        }
+
+        return $batch;
+    }
+
+    /**
+     * Dispatch an existing batch.
+     *
+     * @param  \Illuminate\Bus\Batch  $batch
+     * @return void
+     *
+     * @throws \Throwable
+     */
+    protected function dispatchExistingBatch($batch)
+    {
+        try {
+            $batch = $batch->add($this->jobs);
+        } catch (Throwable $e) {
+            if (isset($batch)) {
+                $batch->delete();
+            }
+
+            throw $e;
+        }
+
+        $this->container->make(EventDispatcher::class)->dispatch(
+            new BatchDispatched($batch)
+        );
     }
 }

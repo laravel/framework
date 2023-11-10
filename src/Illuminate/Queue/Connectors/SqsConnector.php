@@ -23,7 +23,9 @@ class SqsConnector implements ConnectorInterface
         }
 
         return new SqsQueue(
-            new SqsClient($config),
+            new SqsClient(
+                Arr::except($config, ['token'])
+            ),
             $config['queue'],
             $config['prefix'] ?? '',
             $config['suffix'] ?? '',

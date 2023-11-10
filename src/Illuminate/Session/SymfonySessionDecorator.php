@@ -3,6 +3,7 @@
 namespace Illuminate\Session;
 
 use BadMethodCallException;
+use Illuminate\Contracts\Session\Session;
 use Symfony\Component\HttpFoundation\Session\SessionBagInterface;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpFoundation\Session\Storage\MetadataBag;
@@ -12,17 +13,17 @@ class SymfonySessionDecorator implements SessionInterface
     /**
      * The underlying Laravel session store.
      *
-     * @var \Illuminate\Session\Store
+     * @var \Illuminate\Contracts\Session\Session
      */
-    protected $store;
+    public readonly Session $store;
 
     /**
      * Create a new session decorator.
      *
-     * @param  \Illuminate\Session\Store  $store
+     * @param  \Illuminate\Contracts\Session\Session  $store
      * @return void
      */
-    public function __construct(Store $store)
+    public function __construct(Session $store)
     {
         $this->store = $store;
     }
@@ -46,7 +47,7 @@ class SymfonySessionDecorator implements SessionInterface
     /**
      * {@inheritdoc}
      */
-    public function setId(string $id)
+    public function setId(string $id): void
     {
         $this->store->setId($id);
     }
@@ -62,7 +63,7 @@ class SymfonySessionDecorator implements SessionInterface
     /**
      * {@inheritdoc}
      */
-    public function setName(string $name)
+    public function setName(string $name): void
     {
         $this->store->setName($name);
     }
@@ -90,7 +91,7 @@ class SymfonySessionDecorator implements SessionInterface
     /**
      * {@inheritdoc}
      */
-    public function save()
+    public function save(): void
     {
         $this->store->save();
     }
@@ -114,7 +115,7 @@ class SymfonySessionDecorator implements SessionInterface
     /**
      * {@inheritdoc}
      */
-    public function set(string $name, mixed $value)
+    public function set(string $name, mixed $value): void
     {
         $this->store->put($name, $value);
     }
@@ -130,7 +131,7 @@ class SymfonySessionDecorator implements SessionInterface
     /**
      * {@inheritdoc}
      */
-    public function replace(array $attributes)
+    public function replace(array $attributes): void
     {
         $this->store->replace($attributes);
     }
@@ -146,7 +147,7 @@ class SymfonySessionDecorator implements SessionInterface
     /**
      * {@inheritdoc}
      */
-    public function clear()
+    public function clear(): void
     {
         $this->store->flush();
     }
@@ -162,7 +163,7 @@ class SymfonySessionDecorator implements SessionInterface
     /**
      * {@inheritdoc}
      */
-    public function registerBag(SessionBagInterface $bag)
+    public function registerBag(SessionBagInterface $bag): void
     {
         throw new BadMethodCallException('Method not implemented by Laravel.');
     }

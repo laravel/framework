@@ -2,6 +2,8 @@
 
 namespace Illuminate\Contracts\Database\Eloquent;
 
+use Illuminate\Database\Eloquent\Model;
+
 interface SerializesCastableAttributes
 {
     /**
@@ -13,5 +15,5 @@ interface SerializesCastableAttributes
      * @param  array  $attributes
      * @return mixed
      */
-    public function serialize($model, string $key, $value, array $attributes);
+    public function serialize(Model $model, string $key, mixed $value, array $attributes);
 }

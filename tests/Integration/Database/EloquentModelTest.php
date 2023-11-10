@@ -64,6 +64,68 @@ class EloquentModelTest extends DatabaseTestCase
         $this->assertTrue($user->wasChanged());
         $this->assertTrue($user->wasChanged('name'));
     }
+
+    public function testDiscardChanges()
+    {
+        $user = TestModel2::create([
+            'name' => $originalName = Str::random(), 'title' => Str::random(),
+        ]);
+
+        $this->assertEmpty($user->getDirty());
+        $this->assertEmpty($user->getChanges());
+        $this->assertFalse($user->isDirty());
+        $this->assertFalse($user->wasChanged());
+
+        $user->name = $overrideName = Str::random();
+
+        $this->assertEquals(['name' => $overrideName], $user->getDirty());
+        $this->assertEmpty($user->getChanges());
+        $this->assertTrue($user->isDirty());
+        $this->assertFalse($user->wasChanged());
+        $this->assertSame($originalName, $user->getOriginal('name'));
+        $this->assertSame($overrideName, $user->getAttribute('name'));
+
+        $user->discardChanges();
+
+        $this->assertEmpty($user->getDirty());
+        $this->assertSame($originalName, $user->getOriginal('name'));
+        $this->assertSame($originalName, $user->getAttribute('name'));
+
+        $user->save();
+        $this->assertFalse($user->wasChanged());
+    }
+
+    public function testInsertRecordWithReservedWordFieldName()
+    {
+        Schema::create('actions', function (Blueprint $table) {
+            $table->id();
+            $table->string('label');
+            $table->timestamp('start');
+            $table->timestamp('end')->nullable();
+            $table->boolean('analyze');
+        });
+
+        $model = new class extends Model
+        {
+            protected $table = 'actions';
+            protected $guarded = ['id'];
+            public $timestamps = false;
+        };
+
+        $model->newInstance()->create([
+            'label' => 'test',
+            'start' => '2023-01-01 00:00:00',
+            'end' => '2024-01-01 00:00:00',
+            'analyze' => true,
+        ]);
+
+        $this->assertDatabaseHas('actions', [
+            'label' => 'test',
+            'start' => '2023-01-01 00:00:00',
+            'end' => '2024-01-01 00:00:00',
+            'analyze' => true,
+        ]);
+    }
 }
 
 class TestModel1 extends Model

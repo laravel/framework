@@ -4,10 +4,7 @@ namespace Illuminate\Redis\Connections;
 
 use Closure;
 use Illuminate\Contracts\Redis\Connection as ConnectionContract;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
 use Redis;
-use RedisCluster;
 use RedisException;
 
 /**
@@ -107,7 +104,7 @@ class PhpRedisConnection extends Connection implements ConnectionContract
      * Get the value of the given hash fields.
      *
      * @param  string  $key
-     * @param  mixed  $dictionary
+     * @param  mixed  ...$dictionary
      * @return array
      */
     public function hmget($key, ...$dictionary)
@@ -123,7 +120,7 @@ class PhpRedisConnection extends Connection implements ConnectionContract
      * Set the given hash fields to their respective values.
      *
      * @param  string  $key
-     * @param  mixed  $dictionary
+     * @param  mixed  ...$dictionary
      * @return int
      */
     public function hmset($key, ...$dictionary)
@@ -168,7 +165,7 @@ class PhpRedisConnection extends Connection implements ConnectionContract
     /**
      * Removes and returns the first element of the list stored at key.
      *
-     * @param  mixed  $arguments
+     * @param  mixed  ...$arguments
      * @return array|null
      */
     public function blpop(...$arguments)
@@ -181,7 +178,7 @@ class PhpRedisConnection extends Connection implements ConnectionContract
     /**
      * Removes and returns the last element of the list stored at key.
      *
-     * @param  mixed  $arguments
+     * @param  mixed  ...$arguments
      * @return array|null
      */
     public function brpop(...$arguments)
@@ -207,7 +204,7 @@ class PhpRedisConnection extends Connection implements ConnectionContract
      * Add one or more members to a sorted set or update its score if it already exists.
      *
      * @param  string  $key
-     * @param  mixed  $dictionary
+     * @param  mixed  ...$dictionary
      * @return int
      */
     public function zadd($key, ...$dictionary)
@@ -243,7 +240,7 @@ class PhpRedisConnection extends Connection implements ConnectionContract
      */
     public function zrangebyscore($key, $min, $max, $options = [])
     {
-        if (isset($options['limit']) && Arr::isAssoc($options['limit'])) {
+        if (isset($options['limit']) && ! array_is_list($options['limit'])) {
             $options['limit'] = [
                 $options['limit']['offset'],
                 $options['limit']['count'],
@@ -264,7 +261,7 @@ class PhpRedisConnection extends Connection implements ConnectionContract
      */
     public function zrevrangebyscore($key, $min, $max, $options = [])
     {
-        if (isset($options['limit']) && Arr::isAssoc($options['limit'])) {
+        if (isset($options['limit']) && ! array_is_list($options['limit'])) {
             $options['limit'] = [
                 $options['limit']['offset'],
                 $options['limit']['count'],
@@ -428,7 +425,7 @@ class PhpRedisConnection extends Connection implements ConnectionContract
      *
      * @param  string  $script
      * @param  int  $numkeys
-     * @param  mixed  $arguments
+     * @param  mixed  ...$arguments
      * @return mixed
      */
     public function evalsha($script, $numkeys, ...$arguments)
@@ -443,7 +440,7 @@ class PhpRedisConnection extends Connection implements ConnectionContract
      *
      * @param  string  $script
      * @param  int  $numberOfKeys
-     * @param  dynamic  $arguments
+     * @param  mixed  ...$arguments
      * @return mixed
      */
     public function eval($script, $numberOfKeys, ...$arguments)
@@ -495,17 +492,17 @@ class PhpRedisConnection extends Connection implements ConnectionContract
     /**
      * Flush the selected Redis database.
      *
-     * @return void
+     * @return mixed
      */
     public function flushdb()
     {
-        if (! $this->client instanceof RedisCluster) {
-            return $this->command('flushdb');
+        $arguments = func_get_args();
+
+        if (strtoupper((string) ($arguments[0] ?? null)) === 'ASYNC') {
+            return $this->command('flushdb', [true]);
         }
 
-        foreach ($this->client->_masters() as $master) {
-            $this->client->flushDb($master);
-        }
+        return $this->command('flushdb');
     }
 
     /**
@@ -533,8 +530,12 @@ class PhpRedisConnection extends Connection implements ConnectionContract
         try {
             return parent::command($method, $parameters);
         } catch (RedisException $e) {
-            if (Str::contains($e->getMessage(), 'went away')) {
-                $this->client = $this->connector ? call_user_func($this->connector) : $this->client;
+            foreach (['went away', 'socket', 'read error on connection', 'Connection lost'] as $errorMessage) {
+                if (str_contains($e->getMessage(), $errorMessage)) {
+                    $this->client = $this->connector ? call_user_func($this->connector) : $this->client;
+
+                    break;
+                }
             }
 
             throw $e;
@@ -549,19 +550,6 @@ class PhpRedisConnection extends Connection implements ConnectionContract
     public function disconnect()
     {
         $this->client->close();
-    }
-
-    /**
-     * Apply a prefix to the given key if necessary.
-     *
-     * @param  string  $key
-     * @return string
-     */
-    private function applyPrefix($key)
-    {
-        $prefix = (string) $this->client->getOption(Redis::OPT_PREFIX);
-
-        return $prefix.$key;
     }
 
     /**

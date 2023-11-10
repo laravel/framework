@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\View\Blade;
 
+use Illuminate\View\Component;
 use Illuminate\View\ComponentAttributeBag;
 use Mockery as m;
 
@@ -15,11 +16,11 @@ class BladeComponentsTest extends AbstractBladeTestCase
 
     public function testClassComponentsAreCompiled()
     {
-        $this->assertSame('<?php if (isset($component)) { $__componentOriginal35bda42cbf6f9717b161c4f893644ac7a48b0d98 = $component; } ?>
-<?php $component = $__env->getContainer()->make(Test::class, ["foo" => "bar"] + (isset($attributes) ? (array) $attributes->getIterator() : [])); ?>
+        $this->assertSame('<?php if (isset($component)) { $__componentOriginal2dda3d2f2f9b76bd400bf03f0b84e87f = $component; } ?>
+<?php $component = Illuminate\Tests\View\Blade\ComponentStub::class::resolve(["foo" => "bar"] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
 <?php $component->withName(\'test\'); ?>
 <?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>', $this->compiler->compileString('@component(\'Test::class\', \'test\', ["foo" => "bar"])'));
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>', $this->compiler->compileString('@component(\'Illuminate\Tests\View\Blade\ComponentStub::class\', \'test\', ["foo" => "bar"])'));
     }
 
     public function testEndComponentsAreCompiled()
@@ -35,9 +36,9 @@ class BladeComponentsTest extends AbstractBladeTestCase
 
         $this->assertSame('<?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
-<?php if (isset($__componentOriginal0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33)): ?>
-<?php $component = $__componentOriginal0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33; ?>
-<?php unset($__componentOriginal0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33); ?>
+<?php if (isset($__componentOriginal79aef92e83454121ab6e5f64077e7d8a)): ?>
+<?php $component = $__componentOriginal79aef92e83454121ab6e5f64077e7d8a; ?>
+<?php unset($__componentOriginal79aef92e83454121ab6e5f64077e7d8a); ?>
 <?php endif; ?>', $this->compiler->compileString('@endcomponentClass'));
     }
 
@@ -56,17 +57,24 @@ class BladeComponentsTest extends AbstractBladeTestCase
     {
         $attributes = new ComponentAttributeBag(['foo' => 'baz', 'other' => 'ok']);
 
-        $component = m::mock(\Illuminate\View\Component::class);
+        $component = m::mock(Component::class);
         $component->shouldReceive('withName', 'test');
         $component->shouldReceive('shouldRender')->andReturn(false);
 
-        $__env = m::mock(\Illuminate\View\Factory::class);
-        $__env->shouldReceive('getContainer->make')->with('Test', ['foo' => 'bar', 'other' => 'ok'])->andReturn($component);
+        Component::resolveComponentsUsing(fn () => $component);
 
-        $template = $this->compiler->compileString('@component(\'Test::class\', \'test\', ["foo" => "bar"])');
+        $template = $this->compiler->compileString('@component(\'Illuminate\Tests\View\Blade\ComponentStub::class\', \'test\', ["foo" => "bar"])');
 
         ob_start();
         eval(" ?> $template <?php endif; ");
         ob_get_clean();
+    }
+}
+
+class ComponentStub extends Component
+{
+    public function render()
+    {
+        return '';
     }
 }

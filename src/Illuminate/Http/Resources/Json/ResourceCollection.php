@@ -3,6 +3,7 @@
 namespace Illuminate\Http\Resources\Json;
 
 use Countable;
+use Illuminate\Http\Request;
 use Illuminate\Http\Resources\CollectsResources;
 use Illuminate\Pagination\AbstractCursorPaginator;
 use Illuminate\Pagination\AbstractPaginator;
@@ -96,7 +97,7 @@ class ResourceCollection extends JsonResource implements Countable, IteratorAggr
      * @param  \Illuminate\Http\Request  $request
      * @return array|\Illuminate\Contracts\Support\Arrayable|\JsonSerializable
      */
-    public function toArray($request)
+    public function toArray(Request $request)
     {
         return $this->collection->map->toArray($request)->all();
     }

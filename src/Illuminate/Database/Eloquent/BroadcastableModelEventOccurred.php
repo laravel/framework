@@ -47,6 +47,13 @@ class BroadcastableModelEventOccurred implements ShouldBroadcast
     public $queue;
 
     /**
+     * Indicates whether the job should be dispatched after all database transactions have committed.
+     *
+     * @var bool|null
+     */
+    public $afterCommit;
+
+    /**
      * Create a new event instance.
      *
      * @param  \Illuminate\Database\Eloquent\Model  $model

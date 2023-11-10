@@ -115,6 +115,37 @@ class SupportMessageBagTest extends TestCase
         $this->assertFalse($container->has('bar'));
     }
 
+    public function testMissingIndicatesNonExistence()
+    {
+        $container = new MessageBag;
+        $container->setFormat(':message');
+        $container->add('foo', 'bar');
+        $this->assertFalse($container->missing('foo'));
+        $this->assertFalse($container->missing(['foo', 'baz']));
+        $this->assertFalse($container->missing('foo', 'baz'));
+        $this->assertTrue($container->missing('baz'));
+        $this->assertTrue($container->missing(['baz', 'biz']));
+        $this->assertTrue($container->missing('baz', 'biz'));
+    }
+
+    public function testAddIf()
+    {
+        $container = new MessageBag;
+        $container->setFormat(':message');
+        $container->addIf(true, 'foo', 'bar');
+        $this->assertTrue($container->has('foo'));
+
+        $container->addIf(false, 'bar', 'biz');
+        $this->assertFalse($container->has('bar'));
+    }
+
+    public function testForget()
+    {
+        $container = new MessageBag(['foo' => 'bar']);
+        $container->forget('foo');
+        $this->assertFalse($container->has('foo'));
+    }
+
     public function testHasWithKeyNull()
     {
         $container = new MessageBag;
@@ -138,6 +169,14 @@ class SupportMessageBagTest extends TestCase
         $this->assertFalse($container->hasAny(['baz']));
         $this->assertFalse($container->hasAny('baz'));
         $this->assertFalse($container->hasAny('baz', 'biz'));
+    }
+
+    public function testHasAnyWithKeyNull()
+    {
+        $container = new MessageBag;
+        $container->setFormat(':message');
+        $container->add('foo', 'bar');
+        $this->assertTrue($container->hasAny(null));
     }
 
     public function testHasIndicatesExistenceOfAllKeys()

@@ -7,6 +7,8 @@ use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\In;
 use PHPUnit\Framework\TestCase;
 
+include_once 'Enums.php';
+
 class ValidationInRuleTest extends TestCase
 {
     public function testItCorrectlyFormatsAStringVersionOfTheRule()
@@ -38,5 +40,17 @@ class ValidationInRuleTest extends TestCase
         $rule = Rule::in('1', '2', '3', '4');
 
         $this->assertSame('in:"1","2","3","4"', (string) $rule);
+
+        $rule = Rule::in([StringStatus::done]);
+
+        $this->assertSame('in:"done"', (string) $rule);
+
+        $rule = Rule::in([IntegerStatus::done]);
+
+        $this->assertSame('in:"2"', (string) $rule);
+
+        $rule = Rule::in([PureEnum::one]);
+
+        $this->assertSame('in:"one"', (string) $rule);
     }
 }

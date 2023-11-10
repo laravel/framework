@@ -79,6 +79,8 @@ class SendingMailWithLocaleTest extends TestCase
         );
 
         $this->assertSame('en', Carbon::getLocale());
+
+        Carbon::setTestNow(null);
     }
 
     public function testLocaleIsSentWithModelPreferredLocale()
@@ -93,6 +95,11 @@ class SendingMailWithLocaleTest extends TestCase
         $this->assertStringContainsString('esm',
             app('mailer')->getSymfonyTransport()->messages()[0]->toString()
         );
+
+        $mailable = new Mailable;
+        $mailable->to($recipient);
+
+        $this->assertSame($recipient->email_locale, $mailable->locale);
     }
 
     public function testLocaleIsSentWithSelectedLocaleOverridingModelPreferredLocale()

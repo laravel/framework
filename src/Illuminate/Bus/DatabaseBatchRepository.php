@@ -6,6 +6,7 @@ use Carbon\CarbonImmutable;
 use Closure;
 use DateTimeInterface;
 use Illuminate\Database\Connection;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\PostgresConnection;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Support\Str;
@@ -59,9 +60,7 @@ class DatabaseBatchRepository implements PrunableBatchRepository
         return $this->connection->table($this->table)
                             ->orderByDesc('id')
                             ->take($limit)
-                            ->when($before, function ($q) use ($before) {
-                                return $q->where('id', '<', $before);
-                            })
+                            ->when($before, fn ($q) => $q->where('id', '<', $before))
                             ->get()
                             ->map(function ($batch) {
                                 return $this->toBatch($batch);
@@ -78,6 +77,7 @@ class DatabaseBatchRepository implements PrunableBatchRepository
     public function find(string $batchId)
     {
         $batch = $this->connection->table($this->table)
+                            ->useWritePdo()
                             ->where('id', $batchId)
                             ->first();
 
@@ -141,7 +141,7 @@ class DatabaseBatchRepository implements PrunableBatchRepository
             return [
                 'pending_jobs' => $batch->pending_jobs - 1,
                 'failed_jobs' => $batch->failed_jobs,
-                'failed_job_ids' => json_encode(array_values(array_diff(json_decode($batch->failed_job_ids, true), [$jobId]))),
+                'failed_job_ids' => json_encode(array_values(array_diff((array) json_decode($batch->failed_job_ids, true), [$jobId]))),
             ];
         });
 
@@ -164,7 +164,7 @@ class DatabaseBatchRepository implements PrunableBatchRepository
             return [
                 'pending_jobs' => $batch->pending_jobs,
                 'failed_jobs' => $batch->failed_jobs + 1,
-                'failed_job_ids' => json_encode(array_values(array_unique(array_merge(json_decode($batch->failed_job_ids, true), [$jobId])))),
+                'failed_job_ids' => json_encode(array_values(array_unique(array_merge((array) json_decode($batch->failed_job_ids, true), [$jobId])))),
             ];
         });
 
@@ -279,6 +279,29 @@ class DatabaseBatchRepository implements PrunableBatchRepository
     }
 
     /**
+     * Prune all of the cancelled entries older than the given date.
+     *
+     * @param  \DateTimeInterface  $before
+     * @return int
+     */
+    public function pruneCancelled(DateTimeInterface $before)
+    {
+        $query = $this->connection->table($this->table)
+            ->whereNotNull('cancelled_at')
+            ->where('created_at', '<', $before->getTimestamp());
+
+        $totalDeleted = 0;
+
+        do {
+            $deleted = $query->take(1000)->delete();
+
+            $totalDeleted += $deleted;
+        } while ($deleted !== 0);
+
+        return $totalDeleted;
+    }
+
+    /**
      * Execute the given Closure within a storage specific transaction.
      *
      * @param  \Closure  $callback
@@ -286,9 +309,7 @@ class DatabaseBatchRepository implements PrunableBatchRepository
      */
     public function transaction(Closure $callback)
     {
-        return $this->connection->transaction(function () use ($callback) {
-            return $callback();
-        });
+        return $this->connection->transaction(fn () => $callback());
     }
 
     /**
@@ -319,7 +340,11 @@ class DatabaseBatchRepository implements PrunableBatchRepository
             $serialized = base64_decode($serialized);
         }
 
-        return unserialize($serialized);
+        try {
+            return unserialize($serialized);
+        } catch (ModelNotFoundException) {
+            return [];
+        }
     }
 
     /**
@@ -337,11 +362,32 @@ class DatabaseBatchRepository implements PrunableBatchRepository
             (int) $batch->total_jobs,
             (int) $batch->pending_jobs,
             (int) $batch->failed_jobs,
-            json_decode($batch->failed_job_ids, true),
+            (array) json_decode($batch->failed_job_ids, true),
             $this->unserialize($batch->options),
             CarbonImmutable::createFromTimestamp($batch->created_at),
             $batch->cancelled_at ? CarbonImmutable::createFromTimestamp($batch->cancelled_at) : $batch->cancelled_at,
             $batch->finished_at ? CarbonImmutable::createFromTimestamp($batch->finished_at) : $batch->finished_at
         );
+    }
+
+    /**
+     * Get the underlying database connection.
+     *
+     * @return \Illuminate\Database\Connection
+     */
+    public function getConnection()
+    {
+        return $this->connection;
+    }
+
+    /**
+     * Set the underlying database connection.
+     *
+     * @param  \Illuminate\Database\Connection  $connection
+     * @return void
+     */
+    public function setConnection(Connection $connection)
+    {
+        $this->connection = $connection;
     }
 }

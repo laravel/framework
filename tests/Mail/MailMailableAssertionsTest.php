@@ -44,7 +44,9 @@ class MailMailableAssertionsTest extends TestCase
     {
         $mailable = new MailableAssertionsStub;
 
-        $mailable->assertSeeInHtml('<li>First Item</li>');
+        $mailable->assertSeeInHtml('Fourth & Fifth Item');
+
+        $mailable->assertSeeInHtml('<li>First Item</li>', false);
     }
 
     public function testMailableAssertSeeInHtmlFailsWhenAbsent()
@@ -63,13 +65,22 @@ class MailMailableAssertionsTest extends TestCase
         $mailable->assertDontSeeInHtml('<li>Fourth Item</li>');
     }
 
-    public function testMailableAssertDontSeeInHtmlFailsWhenPresent()
+    public function testMailableAssertDontSeeInHtmlEscapedFailsWhenPresent()
     {
         $mailable = new MailableAssertionsStub;
 
         $this->expectException(AssertionFailedError::class);
 
-        $mailable->assertDontSeeInHtml('<li>First Item</li>');
+        $mailable->assertDontSeeInHtml('Fourth & Fifth Item');
+    }
+
+    public function testMailableAssertDontSeeInHtmlUnescapedFailsWhenPresent()
+    {
+        $mailable = new MailableAssertionsStub;
+
+        $this->expectException(AssertionFailedError::class);
+
+        $mailable->assertDontSeeInHtml('<li>First Item</li>', false);
     }
 
     public function testMailableAssertSeeInOrderTextPassesWhenPresentInOrder()
@@ -101,10 +112,16 @@ class MailMailableAssertionsTest extends TestCase
         $mailable = new MailableAssertionsStub;
 
         $mailable->assertSeeInOrderInHtml([
+            'Third Item',
+            'Fourth & Fifth Item',
+            'Sixth Item',
+        ]);
+
+        $mailable->assertSeeInOrderInHtml([
             '<li>First Item</li>',
             '<li>Second Item</li>',
             '<li>Third Item</li>',
-        ]);
+        ], false);
     }
 
     public function testMailableAssertInOrderHtmlFailsWhenAbsentInOrder()
@@ -130,6 +147,8 @@ class MailableAssertionsStub extends Mailable
         - First Item
         - Second Item
         - Third Item
+        - Fourth & Fifth Item
+        - Sixth Item
         EOD;
 
         $html = <<<'EOD'
@@ -146,6 +165,8 @@ class MailableAssertionsStub extends Mailable
         <li>First Item</li>
         <li>Second Item</li>
         <li>Third Item</li>
+        <li>Fourth &amp; Fifth Item</li>
+        <li>Sixth Item</li>
         </ul>
         </body>
         </html>

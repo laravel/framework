@@ -29,6 +29,16 @@ class SupportMacroableTest extends TestCase
         $this->assertSame('Taylor', $macroable::{__CLASS__}());
     }
 
+    public function testHasMacro()
+    {
+        $macroable = $this->macroable;
+        $macroable::macro('foo', function () {
+            return 'Taylor';
+        });
+        $this->assertTrue($macroable::hasMacro('foo'));
+        $this->assertFalse($macroable::hasMacro('bar'));
+    }
+
     public function testRegisterMacroAndCallWithoutStatic()
     {
         $macroable = $this->macroable;
@@ -90,6 +100,64 @@ class SupportMacroableTest extends TestCase
         $this->expectException(BadMethodCallException::class);
 
         $instance->flushMethod();
+    }
+
+    public function testFlushMacrosStatic()
+    {
+        TestMacroable::macro('flushMethod', function () {
+            return 'flushMethod';
+        });
+
+        $instance = new TestMacroable;
+
+        $this->assertSame('flushMethod', $instance::flushMethod());
+
+        TestMacroable::flushMacros();
+
+        $this->expectException(BadMethodCallException::class);
+
+        $instance::flushMethod();
+    }
+
+    public function testMacroWithArguments()
+    {
+        $this->macroable::macro('concatenate', function ($arg1, $arg2) {
+            return $arg1.' '.$arg2;
+        });
+
+        $result = $this->macroable::concatenate('Hello', 'World');
+        $this->assertSame('Hello World', $result);
+    }
+
+    public function testMacroWithDefaultArguments()
+    {
+        $this->macroable::macro('greet', function ($name = 'Guest') {
+            return 'Hello, '.$name;
+        });
+
+        $this->assertSame('Hello, Guest', $this->macroable::greet());
+        $this->assertSame('Hello, Saleh', $this->macroable::greet('Saleh'));
+    }
+
+    public function testCallingUndefinedMacroThrowsException()
+    {
+        $this->expectException(BadMethodCallException::class);
+
+        $this->macroable::nonExistentMacro();
+    }
+
+    public function testMethodConflictDoesNotThrowException()
+    {
+        $this->macroable::macro('existingMethod', function () {
+            return 'oldMethod';
+        });
+
+        // Replacing existing macro.
+        $this->macroable::macro('existingMethod', function () {
+            return 'newMethod';
+        });
+
+        $this->assertSame('newMethod', $this->macroable::existingMethod());
     }
 }
 

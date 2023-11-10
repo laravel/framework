@@ -11,7 +11,7 @@ class AsArrayObject implements Castable
      * Get the caster class to use when casting from / to this cast target.
      *
      * @param  array  $arguments
-     * @return object|string
+     * @return \Illuminate\Contracts\Database\Eloquent\CastsAttributes<\Illuminate\Database\Eloquent\Casts\ArrayObject<array-key, mixed>, iterable>
      */
     public static function castUsing(array $arguments)
     {
@@ -19,12 +19,18 @@ class AsArrayObject implements Castable
         {
             public function get($model, $key, $value, $attributes)
             {
-                return isset($attributes[$key]) ? new ArrayObject(json_decode($attributes[$key], true)) : null;
+                if (! isset($attributes[$key])) {
+                    return;
+                }
+
+                $data = Json::decode($attributes[$key]);
+
+                return is_array($data) ? new ArrayObject($data) : null;
             }
 
             public function set($model, $key, $value, $attributes)
             {
-                return [$key => json_encode($value)];
+                return [$key => Json::encode($value)];
             }
 
             public function serialize($model, string $key, $value, array $attributes)

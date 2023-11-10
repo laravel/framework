@@ -13,7 +13,10 @@ use Monolog\Handler\NewRelicHandler;
 use Monolog\Handler\NullHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Handler\SyslogHandler;
+use Monolog\Level;
 use Monolog\Logger as Monolog;
+use Monolog\Processor\MemoryUsageProcessor;
+use Monolog\Processor\PsrLogMessageProcessor;
 use Monolog\Processor\UidProcessor;
 use Orchestra\Testbench\TestCase;
 use ReflectionProperty;
@@ -29,6 +32,20 @@ class LogManagerTest extends TestCase
         $logger2 = $manager->channel('single')->getLogger();
 
         $this->assertSame($logger1, $logger2);
+    }
+
+    public function testLogManagerGetDefaultDriver()
+    {
+        $config = $this->app['config'];
+        $config->set('logging.default', 'single');
+
+        $manager = new LogManager($this->app);
+        $this->assertEmpty($manager->getChannels());
+
+        //we don't specify any channel name
+        $manager->channel();
+        $this->assertCount(1, $manager->getChannels());
+        $this->assertEquals('single', $manager->getDefaultDriver());
     }
 
     public function testStackChannel()
@@ -48,6 +65,7 @@ class LogManagerTest extends TestCase
                 'stream' => 'php://stderr',
                 'bubble' => false,
             ],
+            'processors' => [PsrLogMessageProcessor::class],
         ]);
 
         $config->set('logging.channels.stdout', [
@@ -69,9 +87,10 @@ class LogManagerTest extends TestCase
         $this->assertInstanceOf(Logger::class, $logger);
         $this->assertCount(2, $handlers);
         $this->assertInstanceOf(StreamHandler::class, $handlers[0]);
+        $this->assertInstanceOf(PsrLogMessageProcessor::class, $logger->getLogger()->getProcessors()[0]);
         $this->assertInstanceOf(StreamHandler::class, $handlers[1]);
-        $this->assertEquals(Monolog::NOTICE, $handlers[0]->getLevel());
-        $this->assertEquals(Monolog::INFO, $handlers[1]->getLevel());
+        $this->assertEquals(Level::Notice, $handlers[0]->getLevel());
+        $this->assertEquals(Level::Info, $handlers[1]->getLevel());
         $this->assertFalse($handlers[0]->getBubble());
         $this->assertTrue($handlers[1]->getBubble());
     }
@@ -100,11 +119,10 @@ class LogManagerTest extends TestCase
         $this->assertSame('foobar', $logger->getName());
         $this->assertCount(1, $handlers);
         $this->assertInstanceOf(StreamHandler::class, $handlers[0]);
-        $this->assertEquals(Monolog::NOTICE, $handlers[0]->getLevel());
+        $this->assertEquals(Level::Notice, $handlers[0]->getLevel());
         $this->assertFalse($handlers[0]->getBubble());
 
         $url = new ReflectionProperty(get_class($handlers[0]), 'url');
-        $url->setAccessible(true);
         $this->assertSame('php://stderr', $url->getValue($handlers[0]));
 
         $config->set('logging.channels.logentries', [
@@ -120,7 +138,6 @@ class LogManagerTest extends TestCase
         $handlers = $logger->getLogger()->getHandlers();
 
         $logToken = new ReflectionProperty(get_class($handlers[0]), 'logToken');
-        $logToken->setAccessible(true);
 
         $this->assertInstanceOf(LogEntriesHandler::class, $handlers[0]);
         $this->assertSame('123456789', $logToken->getValue($handlers[0]));
@@ -163,7 +180,6 @@ class LogManagerTest extends TestCase
         $this->assertInstanceOf(HtmlFormatter::class, $formatter);
 
         $dateFormat = new ReflectionProperty(get_class($formatter), 'dateFormat');
-        $dateFormat->setAccessible(true);
 
         $this->assertSame('Y/m/d--test', $dateFormat->getValue($formatter));
     }
@@ -183,12 +199,7 @@ class LogManagerTest extends TestCase
         $logger = $manager->channel('null');
         $handler = $logger->getLogger()->getHandlers()[0];
 
-        if (Monolog::API === 1) {
-            $this->assertInstanceOf(NullHandler::class, $handler);
-            $this->assertInstanceOf(HtmlFormatter::class, $handler->getFormatter());
-        } else {
-            $this->assertInstanceOf(NullHandler::class, $handler);
-        }
+        $this->assertInstanceOf(NullHandler::class, $handler);
 
         $config->set('logging.channels.null2', [
             'driver' => 'monolog',
@@ -198,12 +209,39 @@ class LogManagerTest extends TestCase
         $logger = $manager->channel('null2');
         $handler = $logger->getLogger()->getHandlers()[0];
 
-        if (Monolog::API === 1) {
-            $this->assertInstanceOf(NullHandler::class, $handler);
-            $this->assertInstanceOf(LineFormatter::class, $handler->getFormatter());
-        } else {
-            $this->assertInstanceOf(NullHandler::class, $handler);
-        }
+        $this->assertInstanceOf(NullHandler::class, $handler);
+    }
+
+    public function testLogManagerCreatesMonologHandlerWithProcessors()
+    {
+        $config = $this->app->make('config');
+        $config->set('logging.channels.memory', [
+            'driver' => 'monolog',
+            'name' => 'memory',
+            'handler' => StreamHandler::class,
+            'with' => [
+                'stream' => 'php://stderr',
+            ],
+            'processors' => [
+                MemoryUsageProcessor::class,
+                ['processor' => PsrLogMessageProcessor::class, 'with' => ['removeUsedContextFields' => true]],
+            ],
+        ]);
+
+        $manager = new LogManager($this->app);
+
+        // create logger with handler specified from configuration
+        $logger = $manager->channel('memory');
+        $handler = $logger->getLogger()->getHandlers()[0];
+        $processors = $logger->getLogger()->getProcessors();
+
+        $this->assertInstanceOf(StreamHandler::class, $handler);
+        $this->assertInstanceOf(MemoryUsageProcessor::class, $processors[0]);
+        $this->assertInstanceOf(PsrLogMessageProcessor::class, $processors[1]);
+
+        $removeUsedContextFields = new ReflectionProperty(get_class($processors[1]), 'removeUsedContextFields');
+
+        $this->assertTrue($removeUsedContextFields->getValue($processors[1]));
     }
 
     public function testItUtilisesTheNullDriverDuringTestsWhenNullDriverUsed()
@@ -248,6 +286,7 @@ class LogManagerTest extends TestCase
             'driver' => 'single',
             'name' => 'ds',
             'path' => storage_path('logs/laravel.log'),
+            'replace_placeholders' => true,
         ]);
 
         $manager = new LogManager($this->app);
@@ -259,6 +298,7 @@ class LogManagerTest extends TestCase
 
         $this->assertInstanceOf(StreamHandler::class, $handler);
         $this->assertInstanceOf(LineFormatter::class, $formatter);
+        $this->assertInstanceOf(PsrLogMessageProcessor::class, $logger->getLogger()->getProcessors()[0]);
 
         $config->set('logging.channels.formattedsingle', [
             'driver' => 'single',
@@ -268,6 +308,7 @@ class LogManagerTest extends TestCase
             'formatter_with' => [
                 'dateFormat' => 'Y/m/d--test',
             ],
+            'replace_placeholders' => false,
         ]);
 
         $logger = $manager->channel('formattedsingle');
@@ -276,9 +317,9 @@ class LogManagerTest extends TestCase
 
         $this->assertInstanceOf(StreamHandler::class, $handler);
         $this->assertInstanceOf(HtmlFormatter::class, $formatter);
+        $this->assertEmpty($logger->getLogger()->getProcessors());
 
         $dateFormat = new ReflectionProperty(get_class($formatter), 'dateFormat');
-        $dateFormat->setAccessible(true);
 
         $this->assertSame('Y/m/d--test', $dateFormat->getValue($formatter));
     }
@@ -290,6 +331,7 @@ class LogManagerTest extends TestCase
             'driver' => 'daily',
             'name' => 'dd',
             'path' => storage_path('logs/laravel.log'),
+            'replace_placeholders' => true,
         ]);
 
         $manager = new LogManager($this->app);
@@ -301,6 +343,7 @@ class LogManagerTest extends TestCase
 
         $this->assertInstanceOf(StreamHandler::class, $handler);
         $this->assertInstanceOf(LineFormatter::class, $formatter);
+        $this->assertInstanceOf(PsrLogMessageProcessor::class, $logger->getLogger()->getProcessors()[0]);
 
         $config->set('logging.channels.formatteddaily', [
             'driver' => 'daily',
@@ -310,6 +353,7 @@ class LogManagerTest extends TestCase
             'formatter_with' => [
                 'dateFormat' => 'Y/m/d--test',
             ],
+            'replace_placeholders' => false,
         ]);
 
         $logger = $manager->channel('formatteddaily');
@@ -318,9 +362,9 @@ class LogManagerTest extends TestCase
 
         $this->assertInstanceOf(StreamHandler::class, $handler);
         $this->assertInstanceOf(HtmlFormatter::class, $formatter);
+        $this->assertEmpty($logger->getLogger()->getProcessors());
 
         $dateFormat = new ReflectionProperty(get_class($formatter), 'dateFormat');
-        $dateFormat->setAccessible(true);
 
         $this->assertSame('Y/m/d--test', $dateFormat->getValue($formatter));
     }
@@ -331,6 +375,7 @@ class LogManagerTest extends TestCase
         $config->set('logging.channels.defaultsyslog', [
             'driver' => 'syslog',
             'name' => 'ds',
+            'replace_placeholders' => true,
         ]);
 
         $manager = new LogManager($this->app);
@@ -342,6 +387,7 @@ class LogManagerTest extends TestCase
 
         $this->assertInstanceOf(SyslogHandler::class, $handler);
         $this->assertInstanceOf(LineFormatter::class, $formatter);
+        $this->assertInstanceOf(PsrLogMessageProcessor::class, $logger->getLogger()->getProcessors()[0]);
 
         $config->set('logging.channels.formattedsyslog', [
             'driver' => 'syslog',
@@ -350,6 +396,7 @@ class LogManagerTest extends TestCase
             'formatter_with' => [
                 'dateFormat' => 'Y/m/d--test',
             ],
+            'replace_placeholders' => false,
         ]);
 
         $logger = $manager->channel('formattedsyslog');
@@ -358,9 +405,9 @@ class LogManagerTest extends TestCase
 
         $this->assertInstanceOf(SyslogHandler::class, $handler);
         $this->assertInstanceOf(HtmlFormatter::class, $formatter);
+        $this->assertEmpty($logger->getLogger()->getProcessors());
 
         $dateFormat = new ReflectionProperty(get_class($formatter), 'dateFormat');
-        $dateFormat->setAccessible(true);
 
         $this->assertSame('Y/m/d--test', $dateFormat->getValue($formatter));
     }
@@ -393,7 +440,6 @@ class LogManagerTest extends TestCase
         $this->assertInstanceOf(StreamHandler::class, $handler);
 
         $url = new ReflectionProperty(get_class($handler), 'url');
-        $url->setAccessible(true);
 
         $this->assertSame(storage_path('logs/on-demand.log'), $url->getValue($handler));
     }
@@ -429,7 +475,6 @@ class LogManagerTest extends TestCase
         $this->assertInstanceOf(UidProcessor::class, $processor);
 
         $url = new ReflectionProperty(get_class($handler), 'url');
-        $url->setAccessible(true);
 
         $this->assertSame(storage_path('logs/custom.log'), $url->getValue($handler));
     }
@@ -459,26 +504,221 @@ class LogManagerTest extends TestCase
         $this->assertCount(1, $handlers);
 
         $expectedFingersCrossedHandler = $handlers[0];
-        $this->assertInstanceOf(FingersCrossedHandler::class, $expectedFingersCrossedHandler, );
+        $this->assertInstanceOf(FingersCrossedHandler::class, $expectedFingersCrossedHandler);
 
         $activationStrategyProp = new ReflectionProperty(get_class($expectedFingersCrossedHandler), 'activationStrategy');
-        $activationStrategyProp->setAccessible(true);
         $activationStrategyValue = $activationStrategyProp->getValue($expectedFingersCrossedHandler);
 
         $actionLevelProp = new ReflectionProperty(get_class($activationStrategyValue), 'actionLevel');
-        $actionLevelProp->setAccessible(true);
         $actionLevelValue = $actionLevelProp->getValue($activationStrategyValue);
 
-        $this->assertEquals(Monolog::CRITICAL, $actionLevelValue);
+        $this->assertEquals(Level::Critical, $actionLevelValue);
 
         if (method_exists($expectedFingersCrossedHandler, 'getHandler')) {
             $expectedStreamHandler = $expectedFingersCrossedHandler->getHandler();
         } else {
             $handlerProp = new ReflectionProperty(get_class($expectedFingersCrossedHandler), 'handler');
-            $handlerProp->setAccessible(true);
             $expectedStreamHandler = $handlerProp->getValue($expectedFingersCrossedHandler);
         }
         $this->assertInstanceOf(StreamHandler::class, $expectedStreamHandler);
-        $this->assertEquals(Monolog::DEBUG, $expectedStreamHandler->getLevel());
+        $this->assertEquals(Level::Debug, $expectedStreamHandler->getLevel());
+    }
+
+    public function testFingersCrossedHandlerStopsRecordBufferingAfterFirstFlushByDefault()
+    {
+        $config = $this->app['config'];
+
+        $config->set('logging.channels.fingerscrossed', [
+            'driver' => 'monolog',
+            'handler' => StreamHandler::class,
+            'level' => 'debug',
+            'action_level' => 'critical',
+            'with' => [
+                'stream' => 'php://stderr',
+                'bubble' => false,
+            ],
+        ]);
+
+        $manager = new LogManager($this->app);
+
+        // create logger with handler specified from configuration
+        $logger = $manager->channel('fingerscrossed');
+        $handlers = $logger->getLogger()->getHandlers();
+
+        $expectedFingersCrossedHandler = $handlers[0];
+
+        $stopBufferingProp = new ReflectionProperty(get_class($expectedFingersCrossedHandler), 'stopBuffering');
+        $stopBufferingValue = $stopBufferingProp->getValue($expectedFingersCrossedHandler);
+
+        $this->assertTrue($stopBufferingValue);
+    }
+
+    public function testFingersCrossedHandlerCanBeConfiguredToResumeBufferingAfterFlushing()
+    {
+        $config = $this->app['config'];
+
+        $config->set('logging.channels.fingerscrossed', [
+            'driver' => 'monolog',
+            'handler' => StreamHandler::class,
+            'level' => 'debug',
+            'action_level' => 'critical',
+            'stop_buffering' => false,
+            'with' => [
+                'stream' => 'php://stderr',
+                'bubble' => false,
+            ],
+        ]);
+
+        $manager = new LogManager($this->app);
+
+        // create logger with handler specified from configuration
+        $logger = $manager->channel('fingerscrossed');
+        $handlers = $logger->getLogger()->getHandlers();
+
+        $expectedFingersCrossedHandler = $handlers[0];
+
+        $stopBufferingProp = new ReflectionProperty(get_class($expectedFingersCrossedHandler), 'stopBuffering');
+        $stopBufferingValue = $stopBufferingProp->getValue($expectedFingersCrossedHandler);
+
+        $this->assertFalse($stopBufferingValue);
+    }
+
+    public function testItSharesContextWithAlreadyResolvedChannels()
+    {
+        $manager = new LogManager($this->app);
+        $channel = $manager->channel('single');
+        $context = null;
+
+        $channel->listen(function ($message) use (&$context) {
+            $context = $message->context;
+        });
+        $manager->shareContext([
+            'invocation-id' => 'expected-id',
+        ]);
+        $channel->info('xxxx');
+
+        $this->assertSame(['invocation-id' => 'expected-id'], $context);
+    }
+
+    public function testItSharesContextWithFreshlyResolvedChannels()
+    {
+        $manager = new LogManager($this->app);
+        $context = null;
+
+        $manager->shareContext([
+            'invocation-id' => 'expected-id',
+        ]);
+        $manager->channel('single')->listen(function ($message) use (&$context) {
+            $context = $message->context;
+        });
+        $manager->channel('single')->info('xxxx');
+
+        $this->assertSame(['invocation-id' => 'expected-id'], $context);
+    }
+
+    public function testContextCanBePubliclyAccessedByOtherLoggingSystems()
+    {
+        $manager = new LogManager($this->app);
+        $context = null;
+
+        $manager->shareContext([
+            'invocation-id' => 'expected-id',
+        ]);
+
+        $this->assertSame($manager->sharedContext(), ['invocation-id' => 'expected-id']);
+    }
+
+    public function testItSharesContextWithStacksWhenTheyAreResolved()
+    {
+        $manager = new LogManager($this->app);
+        $context = null;
+
+        $manager->shareContext([
+            'invocation-id' => 'expected-id',
+        ]);
+        $stack = $manager->stack(['single']);
+        $stack->listen(function ($message) use (&$context) {
+            $context = $message->context;
+        });
+        $stack->info('xxxx');
+
+        $this->assertSame(['invocation-id' => 'expected-id'], $context);
+    }
+
+    public function testItMergesSharedContextRatherThanReplacing()
+    {
+        $manager = new LogManager($this->app);
+        $context = null;
+
+        $manager->shareContext([
+            'invocation-id' => 'expected-id',
+        ]);
+        $manager->shareContext([
+            'invocation-start' => 1651800456,
+        ]);
+        $manager->channel('single')->listen(function ($message) use (&$context) {
+            $context = $message->context;
+        });
+        $manager->channel('single')->info('xxxx', [
+            'logged' => 'context',
+        ]);
+
+        $this->assertSame([
+            'invocation-id' => 'expected-id',
+            'invocation-start' => 1651800456,
+            'logged' => 'context',
+        ], $context);
+        $this->assertSame([
+            'invocation-id' => 'expected-id',
+            'invocation-start' => 1651800456,
+        ], $manager->sharedContext());
+    }
+
+    public function testFlushSharedContext()
+    {
+        $manager = new LogManager($this->app);
+
+        $manager->shareContext($context = ['foo' => 'bar']);
+
+        $this->assertSame($context, $manager->sharedContext());
+
+        $manager->flushSharedContext();
+
+        $this->assertEmpty($manager->sharedContext());
+    }
+
+    public function testLogManagerCreateCustomFormatterWithTap()
+    {
+        $config = $this->app['config'];
+        $config->set('logging.channels.custom', [
+            'driver' => 'single',
+            'tap' => [CustomizeFormatter::class],
+        ]);
+
+        $manager = new LogManager($this->app);
+
+        $logger = $manager->channel('custom');
+        $handler = $logger->getLogger()->getHandlers()[0];
+        $formatter = $handler->getFormatter();
+
+        $this->assertInstanceOf(LineFormatter::class, $formatter);
+
+        $format = new ReflectionProperty(get_class($formatter), 'format');
+
+        $this->assertEquals(
+            '[%datetime%] %channel%.%level_name%: %message% %context% %extra%',
+            rtrim($format->getValue($formatter)));
+    }
+}
+
+class CustomizeFormatter
+{
+    public function __invoke($logger)
+    {
+        foreach ($logger->getHandlers() as $handler) {
+            $handler->setFormatter(new LineFormatter(
+                '[%datetime%] %channel%.%level_name%: %message% %context% %extra%'
+            ));
+        }
     }
 }

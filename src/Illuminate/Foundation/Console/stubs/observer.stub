@@ -8,55 +8,40 @@ class {{ class }}
 {
     /**
      * Handle the {{ model }} "created" event.
-     *
-     * @param  \{{ namespacedModel }}  ${{ modelVariable }}
-     * @return void
      */
-    public function created({{ model }} ${{ modelVariable }})
+    public function created({{ model }} ${{ modelVariable }}): void
     {
         //
     }
 
     /**
      * Handle the {{ model }} "updated" event.
-     *
-     * @param  \{{ namespacedModel }}  ${{ modelVariable }}
-     * @return void
      */
-    public function updated({{ model }} ${{ modelVariable }})
+    public function updated({{ model }} ${{ modelVariable }}): void
     {
         //
     }
 
     /**
      * Handle the {{ model }} "deleted" event.
-     *
-     * @param  \{{ namespacedModel }}  ${{ modelVariable }}
-     * @return void
      */
-    public function deleted({{ model }} ${{ modelVariable }})
+    public function deleted({{ model }} ${{ modelVariable }}): void
     {
         //
     }
 
     /**
      * Handle the {{ model }} "restored" event.
-     *
-     * @param  \{{ namespacedModel }}  ${{ modelVariable }}
-     * @return void
      */
-    public function restored({{ model }} ${{ modelVariable }})
+    public function restored({{ model }} ${{ modelVariable }}): void
     {
         //
     }
 
     /**
      * Handle the {{ model }} "force deleted" event.
-     *
-     * @param  \{{ namespacedModel }}  ${{ modelVariable }}
-     * @return void
      */
-    public function forceDeleted({{ model }} ${{ modelVariable }})
+    public function forceDeleted({{ model }} ${{ modelVariable }}): void
     {
         //
     }

@@ -36,6 +36,23 @@ class EloquentCursorPaginateTest extends DatabaseTestCase
         $this->assertCount(15, TestPost::cursorPaginate(15, ['id', 'title']));
     }
 
+    public function testPaginationWithUnion()
+    {
+        TestPost::create(['title' => 'Hello world', 'user_id' => 1]);
+        TestPost::create(['title' => 'Goodbye world', 'user_id' => 2]);
+        TestPost::create(['title' => 'Howdy', 'user_id' => 3]);
+        TestPost::create(['title' => '4th', 'user_id' => 4]);
+
+        $table1 = TestPost::query()->whereIn('user_id', [1, 2]);
+        $table2 = TestPost::query()->whereIn('user_id', [3, 4]);
+
+        $result = $table1->unionAll($table2)
+            ->orderBy('user_id', 'desc')
+            ->cursorPaginate(1);
+
+        $this->assertSame(['user_id'], $result->getOptions()['parameters']);
+    }
+
     public function testPaginationWithDistinct()
     {
         for ($i = 1; $i <= 3; $i++) {
@@ -64,11 +81,10 @@ class EloquentCursorPaginateTest extends DatabaseTestCase
         $this->assertCount(3, $query->cursorPaginate()->items());
     }
 
-    /** @group SkipMSSQL */
     public function testPaginationWithHasClause()
     {
         for ($i = 1; $i <= 3; $i++) {
-            TestUser::create(['id' => $i]);
+            TestUser::create();
             TestPost::create(['title' => 'Hello world', 'user_id' => null]);
             TestPost::create(['title' => 'Goodbye world', 'user_id' => 2]);
             TestPost::create(['title' => 'Howdy', 'user_id' => 3]);
@@ -81,11 +97,10 @@ class EloquentCursorPaginateTest extends DatabaseTestCase
         $this->assertCount(2, $query->cursorPaginate()->items());
     }
 
-    /** @group SkipMSSQL */
     public function testPaginationWithWhereHasClause()
     {
         for ($i = 1; $i <= 3; $i++) {
-            TestUser::create(['id' => $i]);
+            TestUser::create();
             TestPost::create(['title' => 'Hello world', 'user_id' => null]);
             TestPost::create(['title' => 'Goodbye world', 'user_id' => 2]);
             TestPost::create(['title' => 'Howdy', 'user_id' => 3]);
@@ -100,11 +115,10 @@ class EloquentCursorPaginateTest extends DatabaseTestCase
         $this->assertCount(1, $query->cursorPaginate()->items());
     }
 
-    /** @group SkipMSSQL */
     public function testPaginationWithWhereExistsClause()
     {
         for ($i = 1; $i <= 3; $i++) {
-            TestUser::create(['id' => $i]);
+            TestUser::create();
             TestPost::create(['title' => 'Hello world', 'user_id' => null]);
             TestPost::create(['title' => 'Goodbye world', 'user_id' => 2]);
             TestPost::create(['title' => 'Howdy', 'user_id' => 3]);
@@ -121,11 +135,10 @@ class EloquentCursorPaginateTest extends DatabaseTestCase
         $this->assertCount(2, $query->cursorPaginate()->items());
     }
 
-    /** @group SkipMSSQL */
     public function testPaginationWithMultipleWhereClauses()
     {
         for ($i = 1; $i <= 4; $i++) {
-            TestUser::create(['id' => $i]);
+            TestUser::create();
             TestPost::create(['title' => 'Hello world', 'user_id' => null]);
             TestPost::create(['title' => 'Goodbye world', 'user_id' => 2]);
             TestPost::create(['title' => 'Howdy', 'user_id' => 3]);
@@ -154,11 +167,10 @@ class EloquentCursorPaginateTest extends DatabaseTestCase
         );
     }
 
-    /** @group SkipMSSQL */
     public function testPaginationWithAliasedOrderBy()
     {
         for ($i = 1; $i <= 6; $i++) {
-            TestUser::create(['id' => $i]);
+            TestUser::create();
         }
 
         $query = TestUser::query()->select('id as user_id')->orderBy('user_id');
@@ -194,6 +206,7 @@ class EloquentCursorPaginateTest extends DatabaseTestCase
     {
         for ($i = 1; $i <= 5; $i++) {
             $user = TestUser::create();
+
             for ($j = 1; $j <= 10; $j++) {
                 TestPost::create([
                     'title' => 'Title '.$i,

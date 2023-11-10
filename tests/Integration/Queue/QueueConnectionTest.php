@@ -49,7 +49,7 @@ class QueueConnectionTest extends TestCase
 
         try {
             Bus::dispatch((new QueueConnectionTestJob)->beforeCommit());
-        } catch (Throwable $e) {
+        } catch (Throwable) {
             // This job was dispatched
         }
     }
@@ -67,7 +67,7 @@ class QueueConnectionTest extends TestCase
 
         try {
             Bus::dispatch((new QueueConnectionTestJob)->afterCommit());
-        } catch (SqsException $e) {
+        } catch (SqsException) {
             // This job was dispatched
         }
     }

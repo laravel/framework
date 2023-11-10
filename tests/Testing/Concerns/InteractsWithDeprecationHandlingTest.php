@@ -14,7 +14,7 @@ class InteractsWithDeprecationHandlingTest extends TestCase
 
     protected $deprecationsFound = false;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -42,7 +42,7 @@ class InteractsWithDeprecationHandlingTest extends TestCase
         trigger_error('Something is deprecated', E_USER_DEPRECATED);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         set_error_handler($this->original);
 

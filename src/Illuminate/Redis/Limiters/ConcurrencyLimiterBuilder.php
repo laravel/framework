@@ -45,6 +45,13 @@ class ConcurrencyLimiterBuilder
     public $timeout = 3;
 
     /**
+     * The number of milliseconds to wait between attempts to acquire the lock.
+     *
+     * @var int
+     */
+    public $sleep = 250;
+
+    /**
      * Create a new builder instance.
      *
      * @param  \Illuminate\Redis\Connections\Connection  $connection
@@ -97,6 +104,19 @@ class ConcurrencyLimiterBuilder
     }
 
     /**
+     * The number of milliseconds to wait between lock acquisition attempts.
+     *
+     * @param  int  $sleep
+     * @return $this
+     */
+    public function sleep($sleep)
+    {
+        $this->sleep = $sleep;
+
+        return $this;
+    }
+
+    /**
      * Execute the given callback if a lock is obtained, otherwise call the failure callback.
      *
      * @param  callable  $callback
@@ -110,7 +130,7 @@ class ConcurrencyLimiterBuilder
         try {
             return (new ConcurrencyLimiter(
                 $this->connection, $this->name, $this->maxLocks, $this->releaseAfter
-            ))->block($this->timeout, $callback);
+            ))->block($this->timeout, $callback, $this->sleep);
         } catch (LimiterTimeoutException $e) {
             if ($failure) {
                 return $failure($e);

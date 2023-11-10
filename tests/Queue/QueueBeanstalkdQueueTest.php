@@ -14,12 +14,12 @@ use PHPUnit\Framework\TestCase;
 class QueueBeanstalkdQueueTest extends TestCase
 {
     /**
-     * @var BeanstalkdQueue
+     * @var \Illuminate\Queue\BeanstalkdQueue
      */
     private $queue;
 
     /**
-     * @var Container|m\LegacyMockInterface|m\MockInterface
+     * @var \Illuminate\Container\Container|\Mockery\LegacyMockInterface|\Mockery\MockInterface
      */
     private $container;
 

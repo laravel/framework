@@ -3,13 +3,12 @@
 namespace Illuminate\Tests\Support;
 
 use Illuminate\Support\ConfigurationUrlParser;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class ConfigurationUrlParserTest extends TestCase
 {
-    /**
-     * @dataProvider databaseUrls
-     */
+    #[DataProvider('databaseUrls')]
     public function testDatabaseUrlsAreParsed($config, $expectedOutput)
     {
         $this->assertEquals($expectedOutput, (new ConfigurationUrlParser)->parseConfiguration($config));
@@ -45,7 +44,7 @@ class ConfigurationUrlParserTest extends TestCase
         ], (new ConfigurationUrlParser)->parseConfiguration('some-particular-alias://null'));
     }
 
-    public function databaseUrls()
+    public static function databaseUrls()
     {
         return [
             'simple URL' => [

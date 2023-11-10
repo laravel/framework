@@ -2,10 +2,16 @@
 
 namespace Illuminate\Tests\Foundation\Testing;
 
-use Illuminate\Contracts\Console\Kernel;
+use Illuminate\Foundation\Testing\Concerns\InteractsWithConsole;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\RefreshDatabaseState;
+use Mockery as m;
+use Orchestra\Testbench\Concerns\Testing;
+use Orchestra\Testbench\Foundation\Application as Testbench;
 use PHPUnit\Framework\TestCase;
+use ReflectionMethod;
+
+use function Orchestra\Testbench\package_path;
 
 class RefreshDatabaseTest extends TestCase
 {
@@ -15,28 +21,27 @@ class RefreshDatabaseTest extends TestCase
     {
         RefreshDatabaseState::$migrated = false;
 
-        $this->traitObject = $this->getMockForTrait(RefreshDatabase::class, [], '', true, true, true, [
-            'artisan',
-            'beginDatabaseTransaction',
-        ]);
+        $this->traitObject = m::mock(RefreshDatabaseTestMockClass::class)->makePartial();
+        $this->traitObject->setUp();
+    }
 
-        $kernelObj = \Mockery::mock();
-        $kernelObj->shouldReceive('setArtisan')
-            ->with(null);
+    protected function tearDown(): void
+    {
+        $this->traitObject->tearDown();
 
-        $this->traitObject->app = [
-            Kernel::class => $kernelObj,
-        ];
+        if ($container = m::getContainer()) {
+            $this->addToAssertionCount($container->mockery_getExpectationCount());
+        }
+
+        m::close();
     }
 
     private function __reflectAndSetupAccessibleForProtectedTraitMethod($methodName)
     {
-        $migrateFreshUsingReflection = new \ReflectionMethod(
+        $migrateFreshUsingReflection = new ReflectionMethod(
             get_class($this->traitObject),
             $methodName
         );
-
-        $migrateFreshUsingReflection->setAccessible(true);
 
         return $migrateFreshUsingReflection;
     }
@@ -44,8 +49,8 @@ class RefreshDatabaseTest extends TestCase
     public function testRefreshTestDatabaseDefault()
     {
         $this->traitObject
-            ->expects($this->exactly(1))
-            ->method('artisan')
+            ->shouldReceive('artisan')
+            ->once()
             ->with('migrate:fresh', [
                 '--drop-views' => false,
                 '--drop-types' => false,
@@ -62,8 +67,8 @@ class RefreshDatabaseTest extends TestCase
         $this->traitObject->dropViews = true;
 
         $this->traitObject
-            ->expects($this->exactly(1))
-            ->method('artisan')
+            ->shouldReceive('artisan')
+            ->once()
             ->with('migrate:fresh', [
                 '--drop-views' => true,
                 '--drop-types' => false,
@@ -80,8 +85,8 @@ class RefreshDatabaseTest extends TestCase
         $this->traitObject->dropTypes = true;
 
         $this->traitObject
-            ->expects($this->exactly(1))
-            ->method('artisan')
+            ->shouldReceive('artisan')
+            ->once()
             ->with('migrate:fresh', [
                 '--drop-views' => false,
                 '--drop-types' => true,
@@ -91,5 +96,49 @@ class RefreshDatabaseTest extends TestCase
         $refreshTestDatabaseReflection = $this->__reflectAndSetupAccessibleForProtectedTraitMethod('refreshTestDatabase');
 
         $refreshTestDatabaseReflection->invoke($this->traitObject);
+    }
+}
+
+class RefreshDatabaseTestMockClass
+{
+    use InteractsWithConsole;
+    use RefreshDatabase;
+    use Testing;
+
+    public $dropViews = false;
+
+    public $dropTypes = false;
+
+    public function setUp()
+    {
+        RefreshDatabaseState::$migrated = false;
+
+        $this->app = $this->refreshApplication();
+        $this->withoutMockingConsoleOutput();
+    }
+
+    public function tearDown()
+    {
+        RefreshDatabaseState::$migrated = false;
+
+        $this->callBeforeApplicationDestroyedCallbacks();
+        $this->app?->flush();
+    }
+
+    protected function setUpTraits()
+    {
+        return [];
+    }
+
+    protected function setUpTheTestEnvironmentTraitToBeIgnored(string $use): bool
+    {
+        return true;
+    }
+
+    public function refreshApplication()
+    {
+        return Testbench::create(
+            basePath: package_path('vendor/orchestra/testbench-core/laravel')
+        );
     }
 }

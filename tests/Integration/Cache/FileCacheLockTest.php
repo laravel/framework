@@ -3,7 +3,6 @@
 namespace Illuminate\Tests\Integration\Cache;
 
 use Exception;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Orchestra\Testbench\TestCase;
 
@@ -37,8 +36,6 @@ class FileCacheLockTest extends TestCase
 
     public function testLocksCanBlockForSeconds()
     {
-        Carbon::setTestNow();
-
         Cache::lock('foo')->forceRelease();
         $this->assertSame('taylor', Cache::lock('foo', 10)->block(1, function () {
             return 'taylor';
@@ -74,7 +71,7 @@ class FileCacheLockTest extends TestCase
             $firstLock->block(1, function () {
                 throw new Exception('failed');
             });
-        } catch (Exception $e) {
+        } catch (Exception) {
             // Not testing the exception, just testing the lock
             // is released regardless of the how the exception
             // thrown by the callback was handled.

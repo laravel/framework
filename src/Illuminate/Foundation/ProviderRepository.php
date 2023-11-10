@@ -122,9 +122,7 @@ class ProviderRepository
             return;
         }
 
-        $this->app->make('events')->listen($events, function () use ($provider) {
-            $this->app->register($provider);
-        });
+        $this->app->make('events')->listen($events, fn () => $this->app->register($provider));
     }
 
     /**

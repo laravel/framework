@@ -3,13 +3,12 @@
 namespace Illuminate\Tests\Translation;
 
 use Illuminate\Translation\MessageSelector;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class TranslationMessageSelectorTest extends TestCase
 {
-    /**
-     * @dataProvider chooseTestData
-     */
+    #[DataProvider('chooseTestData')]
     public function testChoose($expected, $id, $number)
     {
         $selector = new MessageSelector;
@@ -17,7 +16,7 @@ class TranslationMessageSelectorTest extends TestCase
         $this->assertEquals($expected, $selector->choose($id, $number, 'en'));
     }
 
-    public function chooseTestData()
+    public static function chooseTestData()
     {
         return [
             ['first', 'first', 1],

@@ -3,9 +3,26 @@
 namespace Illuminate\Database\Eloquent\Relations;
 
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 
 class MorphMany extends MorphOneOrMany
 {
+    /**
+     * Convert the relationship to a "morph one" relationship.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\MorphOne
+     */
+    public function one()
+    {
+        return MorphOne::noConstraints(fn () => new MorphOne(
+            $this->getQuery(),
+            $this->getParent(),
+            $this->morphType,
+            $this->foreignKey,
+            $this->localKey
+        ));
+    }
+
     /**
      * Get the results of the relationship.
      *
@@ -45,5 +62,29 @@ class MorphMany extends MorphOneOrMany
     public function match(array $models, Collection $results, $relation)
     {
         return $this->matchMany($models, $results, $relation);
+    }
+
+    /**
+     * Create a new instance of the related model. Allow mass-assignment.
+     *
+     * @param  array  $attributes
+     * @return \Illuminate\Database\Eloquent\Model
+     */
+    public function forceCreate(array $attributes = [])
+    {
+        $attributes[$this->getMorphType()] = $this->morphClass;
+
+        return parent::forceCreate($attributes);
+    }
+
+    /**
+     * Create a new instance of the related model with mass assignment without raising model events.
+     *
+     * @param  array  $attributes
+     * @return \Illuminate\Database\Eloquent\Model
+     */
+    public function forceCreateQuietly(array $attributes = [])
+    {
+        return Model::withoutEvents(fn () => $this->forceCreate($attributes));
     }
 }

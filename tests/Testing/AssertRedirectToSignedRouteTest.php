@@ -37,6 +37,11 @@ class AssertRedirectToSignedRouteTest extends TestCase
         $this->urlGenerator = $this->app->make(UrlGenerator::class);
     }
 
+    protected function defineEnvironment($app): void
+    {
+        $app['config']->set(['app.key' => 'AckfSECXIvnK5r28GVIWUAxmbBSjTsmF']);
+    }
+
     public function testAssertRedirectToSignedRouteWithoutRouteName()
     {
         $this->router->get('test-route', function () {
@@ -90,7 +95,7 @@ class AssertRedirectToSignedRouteTest extends TestCase
             ->assertRedirectToSignedRoute('signed-route');
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 

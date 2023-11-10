@@ -25,7 +25,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertSame('create table "users" ("id" int identity primary key not null, "email" nvarchar(255) not null)', $statements[0]);
+        $this->assertSame('create table "users" ("id" int not null identity primary key, "email" nvarchar(255) not null)', $statements[0]);
 
         $blueprint = new Blueprint('users');
         $blueprint->increments('id');
@@ -33,7 +33,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertSame('alter table "users" add "id" int identity primary key not null, "email" nvarchar(255) not null', $statements[0]);
+        $this->assertSame('alter table "users" add "id" int not null identity primary key, "email" nvarchar(255) not null', $statements[0]);
 
         $blueprint = new Blueprint('users');
         $blueprint->create();
@@ -42,7 +42,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar()->setTablePrefix('prefix_'));
 
         $this->assertCount(1, $statements);
-        $this->assertSame('create table "prefix_users" ("id" int identity primary key not null, "email" nvarchar(255) not null)', $statements[0]);
+        $this->assertSame('create table "prefix_users" ("id" int not null identity primary key, "email" nvarchar(255) not null)', $statements[0]);
     }
 
     public function testCreateTemporaryTable()
@@ -55,7 +55,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertSame('create table "#users" ("id" int identity primary key not null, "email" nvarchar(255) not null)', $statements[0]);
+        $this->assertSame('create table "#users" ("id" int not null identity primary key, "email" nvarchar(255) not null)', $statements[0]);
     }
 
     public function testDropTable()
@@ -305,7 +305,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertSame('alter table "users" add "id" int identity primary key not null', $statements[0]);
+        $this->assertSame('alter table "users" add "id" int not null identity primary key', $statements[0]);
     }
 
     public function testAddingSmallIncrementingID()
@@ -315,7 +315,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertSame('alter table "users" add "id" smallint identity primary key not null', $statements[0]);
+        $this->assertSame('alter table "users" add "id" smallint not null identity primary key', $statements[0]);
     }
 
     public function testAddingMediumIncrementingID()
@@ -325,7 +325,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertSame('alter table "users" add "id" int identity primary key not null', $statements[0]);
+        $this->assertSame('alter table "users" add "id" int not null identity primary key', $statements[0]);
     }
 
     public function testAddingID()
@@ -335,14 +335,14 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertSame('alter table "users" add "id" bigint identity primary key not null', $statements[0]);
+        $this->assertSame('alter table "users" add "id" bigint not null identity primary key', $statements[0]);
 
         $blueprint = new Blueprint('users');
         $blueprint->id('foo');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertSame('alter table "users" add "foo" bigint identity primary key not null', $statements[0]);
+        $this->assertSame('alter table "users" add "foo" bigint not null identity primary key', $statements[0]);
     }
 
     public function testAddingForeignID()
@@ -366,6 +366,17 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         ], $statements);
     }
 
+    public function testAddingForeignIdSpecifyingIndexNameInConstraint()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->foreignId('company_id')->constrained(indexName: 'my_index');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertSame([
+            'alter table "users" add "company_id" bigint not null',
+            'alter table "users" add constraint "my_index" foreign key ("company_id") references "companies" ("id")',
+        ], $statements);
+    }
+
     public function testAddingBigIncrementingID()
     {
         $blueprint = new Blueprint('users');
@@ -373,7 +384,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertSame('alter table "users" add "id" bigint identity primary key not null', $statements[0]);
+        $this->assertSame('alter table "users" add "id" bigint not null identity primary key', $statements[0]);
     }
 
     public function testAddingString()
@@ -424,7 +435,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertSame('alter table "users" add "foo" bigint identity primary key not null', $statements[0]);
+        $this->assertSame('alter table "users" add "foo" bigint not null identity primary key', $statements[0]);
     }
 
     public function testAddingInteger()
@@ -441,7 +452,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertSame('alter table "users" add "foo" int identity primary key not null', $statements[0]);
+        $this->assertSame('alter table "users" add "foo" int not null identity primary key', $statements[0]);
     }
 
     public function testAddingMediumInteger()
@@ -458,7 +469,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertSame('alter table "users" add "foo" int identity primary key not null', $statements[0]);
+        $this->assertSame('alter table "users" add "foo" int not null identity primary key', $statements[0]);
     }
 
     public function testAddingTinyInteger()
@@ -475,7 +486,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertSame('alter table "users" add "foo" tinyint identity primary key not null', $statements[0]);
+        $this->assertSame('alter table "users" add "foo" tinyint not null identity primary key', $statements[0]);
     }
 
     public function testAddingSmallInteger()
@@ -492,7 +503,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertSame('alter table "users" add "foo" smallint identity primary key not null', $statements[0]);
+        $this->assertSame('alter table "users" add "foo" smallint not null identity primary key', $statements[0]);
     }
 
     public function testAddingFloat()

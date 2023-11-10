@@ -2,17 +2,21 @@
 
 namespace Illuminate\Tests\Testing;
 
-use Exception;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\View\View;
 use Illuminate\Cookie\CookieValuePrefix;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Encryption\Encrypter;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Routing\RouteCollection;
+use Illuminate\Routing\UrlGenerator;
 use Illuminate\Session\ArraySessionHandler;
 use Illuminate\Session\Store;
+use Illuminate\Support\Collection;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\ViewErrorBag;
 use Illuminate\Testing\Fluent\AssertableJson;
@@ -24,6 +28,7 @@ use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Cookie;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class TestResponseTest extends TestCase
 {
@@ -50,20 +55,12 @@ class TestResponseTest extends TestCase
 
     public function testAssertViewHasModel()
     {
-        $model = new class extends Model
-        {
-            public function is($model)
-            {
-                return $this == $model;
-            }
-        };
+        $model = new TestModel(['id' => 1]);
 
         $response = $this->makeMockResponse([
             'render' => 'hello world',
             'gatherData' => ['foo' => $model],
         ]);
-
-        $response->original->foo = $model;
 
         $response->assertViewHas('foo', $model);
     }
@@ -118,6 +115,101 @@ class TestResponseTest extends TestCase
         $response->assertViewHas('foo.nested', 'bar');
     }
 
+    public function testAssertViewHasEloquentCollection()
+    {
+        $collection = new EloquentCollection([
+            new TestModel(['id' => 1]),
+            new TestModel(['id' => 2]),
+            new TestModel(['id' => 3]),
+        ]);
+
+        $response = $this->makeMockResponse([
+            'render' => 'hello world',
+            'gatherData' => ['foos' => $collection],
+        ]);
+
+        $response->assertViewHas('foos', $collection);
+    }
+
+    public function testAssertViewHasEloquentCollectionRespectsOrder()
+    {
+        $collection = new EloquentCollection([
+            new TestModel(['id' => 3]),
+            new TestModel(['id' => 2]),
+            new TestModel(['id' => 1]),
+        ]);
+
+        $response = $this->makeMockResponse([
+            'render' => 'hello world',
+            'gatherData' => ['foos' => $collection],
+        ]);
+
+        $this->expectException(AssertionFailedError::class);
+
+        $response->assertViewHas('foos', $collection->reverse()->values());
+    }
+
+    public function testAssertViewHasEloquentCollectionRespectsType()
+    {
+        $actual = new EloquentCollection([
+            new TestModel(['id' => 1]),
+            new TestModel(['id' => 2]),
+        ]);
+
+        $response = $this->makeMockResponse([
+            'render' => 'hello world',
+            'gatherData' => ['foos' => $actual],
+        ]);
+
+        $expected = new EloquentCollection([
+            new AnotherTestModel(['id' => 1]),
+            new AnotherTestModel(['id' => 2]),
+        ]);
+
+        $this->expectException(AssertionFailedError::class);
+
+        $response->assertViewHas('foos', $expected);
+    }
+
+    public function testAssertViewHasEloquentCollectionRespectsSize()
+    {
+        $actual = new EloquentCollection([
+            new TestModel(['id' => 1]),
+            new TestModel(['id' => 2]),
+        ]);
+
+        $response = $this->makeMockResponse([
+            'render' => 'hello world',
+            'gatherData' => ['foos' => $actual],
+        ]);
+
+        $this->expectException(AssertionFailedError::class);
+
+        $response->assertViewHas('foos', $actual->concat([new TestModel(['id' => 3])]));
+    }
+
+    public function testAssertViewHasWithArray()
+    {
+        $response = $this->makeMockResponse([
+            'render' => 'hello world',
+            'gatherData' => ['foo' => 'bar'],
+        ]);
+
+        $response->assertViewHas(['foo' => 'bar']);
+    }
+
+    public function testAssertViewHasAll()
+    {
+        $response = $this->makeMockResponse([
+            'render' => 'hello world',
+            'gatherData' => ['foo' => 'bar'],
+        ]);
+
+        $response->assertViewHasAll([
+            'foo' => 'bar',
+        ]);
+    }
+
     public function testAssertViewMissing()
     {
         $response = $this->makeMockResponse([
@@ -140,6 +232,57 @@ class TestResponseTest extends TestCase
         ]);
 
         $response->assertViewMissing('foo.baz');
+    }
+
+    public function testAssertContent()
+    {
+        $response = $this->makeMockResponse([
+            'render' => 'expected response data',
+        ]);
+
+        $response->assertContent('expected response data');
+
+        try {
+            $response->assertContent('expected');
+            $this->fail('xxxx');
+        } catch (AssertionFailedError $e) {
+            $this->assertSame('Failed asserting that two strings are identical.', $e->getMessage());
+        }
+
+        try {
+            $response->assertContent('expected response data with extra');
+            $this->fail('xxxx');
+        } catch (AssertionFailedError $e) {
+            $this->assertSame('Failed asserting that two strings are identical.', $e->getMessage());
+        }
+    }
+
+    public function testAssertStreamedContent()
+    {
+        $response = TestResponse::fromBaseResponse(
+            new StreamedResponse(function () {
+                $stream = fopen('php://memory', 'r+');
+                fwrite($stream, 'expected response data');
+                rewind($stream);
+                fpassthru($stream);
+            })
+        );
+
+        $response->assertStreamedContent('expected response data');
+
+        try {
+            $response->assertStreamedContent('expected');
+            $this->fail('xxxx');
+        } catch (AssertionFailedError $e) {
+            $this->assertSame('Failed asserting that two strings are identical.', $e->getMessage());
+        }
+
+        try {
+            $response->assertStreamedContent('expected response data with extra');
+            $this->fail('xxxx');
+        } catch (AssertionFailedError $e) {
+            $this->assertSame('Failed asserting that two strings are identical.', $e->getMessage());
+        }
     }
 
     public function testAssertSee()
@@ -440,6 +583,43 @@ class TestResponseTest extends TestCase
         $response->assertNotFound();
     }
 
+    public function testAssertMethodNotAllowed()
+    {
+        $response = TestResponse::fromBaseResponse(
+            (new Response)->setStatusCode(Response::HTTP_METHOD_NOT_ALLOWED)
+        );
+
+        $response->assertMethodNotAllowed();
+
+        $response = TestResponse::fromBaseResponse(
+            (new Response)->setStatusCode(Response::HTTP_OK)
+        );
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage("Expected response status code [405] but received 200.\nFailed asserting that 405 is identical to 200.");
+
+        $response->assertMethodNotAllowed();
+    }
+
+    public function testAssertNotAcceptable()
+    {
+        $response = TestResponse::fromBaseResponse(
+            (new Response)->setStatusCode(Response::HTTP_NOT_ACCEPTABLE)
+        );
+
+        $response->assertNotAcceptable();
+
+        $response = TestResponse::fromBaseResponse(
+            (new Response)->setStatusCode(Response::HTTP_OK)
+        );
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage("Expected response status code [406] but received 200.\nFailed asserting that 406 is identical to 200.");
+
+        $response->assertNotAcceptable();
+        $this->fail();
+    }
+
     public function testAssertForbidden()
     {
         $statusCode = 500;
@@ -472,6 +652,233 @@ class TestResponseTest extends TestCase
         $response->assertUnauthorized();
     }
 
+    public function testAssertBadRequest()
+    {
+        $response = TestResponse::fromBaseResponse(
+            (new Response)->setStatusCode(Response::HTTP_BAD_REQUEST)
+        );
+
+        $response->assertBadRequest();
+
+        $response = TestResponse::fromBaseResponse(
+            (new Response)->setStatusCode(Response::HTTP_OK)
+        );
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage("Expected response status code [400] but received 200.\nFailed asserting that 400 is identical to 200.");
+
+        $response->assertBadRequest();
+        $this->fail();
+    }
+
+    public function testAssertRequestTimeout()
+    {
+        $response = TestResponse::fromBaseResponse(
+            (new Response)->setStatusCode(Response::HTTP_REQUEST_TIMEOUT)
+        );
+
+        $response->assertRequestTimeout();
+
+        $response = TestResponse::fromBaseResponse(
+            (new Response)->setStatusCode(Response::HTTP_OK)
+        );
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage("Expected response status code [408] but received 200.\nFailed asserting that 408 is identical to 200.");
+
+        $response->assertRequestTimeout();
+        $this->fail();
+    }
+
+    public function testAssertPaymentRequired()
+    {
+        $response = TestResponse::fromBaseResponse(
+            (new Response)->setStatusCode(Response::HTTP_PAYMENT_REQUIRED)
+        );
+
+        $response->assertPaymentRequired();
+
+        $response = TestResponse::fromBaseResponse(
+            (new Response)->setStatusCode(Response::HTTP_OK)
+        );
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage("Expected response status code [402] but received 200.\nFailed asserting that 402 is identical to 200.");
+
+        $response->assertPaymentRequired();
+        $this->fail();
+    }
+
+    public function testAssertMovedPermanently()
+    {
+        $response = TestResponse::fromBaseResponse(
+            (new Response)->setStatusCode(Response::HTTP_MOVED_PERMANENTLY)
+        );
+
+        $response->assertMovedPermanently();
+
+        $response = TestResponse::fromBaseResponse(
+            (new Response)->setStatusCode(Response::HTTP_OK)
+        );
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage("Expected response status code [301] but received 200.\nFailed asserting that 301 is identical to 200.");
+
+        $response->assertMovedPermanently();
+        $this->fail();
+    }
+
+    public function testAssertFound()
+    {
+        $response = TestResponse::fromBaseResponse(
+            (new Response)->setStatusCode(Response::HTTP_FOUND)
+        );
+
+        $response->assertFound();
+
+        $response = TestResponse::fromBaseResponse(
+            (new Response)->setStatusCode(Response::HTTP_OK)
+        );
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage("Expected response status code [302] but received 200.\nFailed asserting that 302 is identical to 200.");
+
+        $response->assertFound();
+        $this->fail();
+    }
+
+    public function testAssertNotModified()
+    {
+        $response = TestResponse::fromBaseResponse(
+            (new Response)->setStatusCode(Response::HTTP_NOT_MODIFIED)
+        );
+
+        $response->assertNotModified();
+
+        $response = TestResponse::fromBaseResponse(
+            (new Response)->setStatusCode(Response::HTTP_OK)
+        );
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage("Expected response status code [304] but received 200.\nFailed asserting that 304 is identical to 200.");
+
+        $response->assertNotModified();
+        $this->fail();
+    }
+
+    public function testAssertTemporaryRedirect()
+    {
+        $response = TestResponse::fromBaseResponse(
+            (new Response)->setStatusCode(Response::HTTP_TEMPORARY_REDIRECT)
+        );
+
+        $response->assertTemporaryRedirect();
+
+        $response = TestResponse::fromBaseResponse(
+            (new Response)->setStatusCode(Response::HTTP_OK)
+        );
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage("Expected response status code [307] but received 200.\nFailed asserting that 307 is identical to 200.");
+
+        $response->assertTemporaryRedirect();
+        $this->fail();
+    }
+
+    public function testAssertPermanentRedirect()
+    {
+        $response = TestResponse::fromBaseResponse(
+            (new Response)->setStatusCode(Response::HTTP_PERMANENTLY_REDIRECT)
+        );
+
+        $response->assertPermanentRedirect();
+
+        $response = TestResponse::fromBaseResponse(
+            (new Response)->setStatusCode(Response::HTTP_OK)
+        );
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage("Expected response status code [308] but received 200.\nFailed asserting that 308 is identical to 200.");
+
+        $response->assertPermanentRedirect();
+        $this->fail();
+    }
+
+    public function testAssertConflict()
+    {
+        $response = TestResponse::fromBaseResponse(
+            (new Response)->setStatusCode(Response::HTTP_CONFLICT)
+        );
+
+        $response->assertConflict();
+
+        $response = TestResponse::fromBaseResponse(
+            (new Response)->setStatusCode(Response::HTTP_OK)
+        );
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage("Expected response status code [409] but received 200.\nFailed asserting that 409 is identical to 200.");
+
+        $response->assertConflict();
+        $this->fail();
+    }
+
+    public function testAssertGone()
+    {
+        $response = TestResponse::fromBaseResponse(
+            (new Response)->setStatusCode(Response::HTTP_GONE)
+        );
+
+        $response->assertGone();
+
+        $response = TestResponse::fromBaseResponse(
+            (new Response)->setStatusCode(Response::HTTP_OK)
+        );
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage("Expected response status code [410] but received 200.\nFailed asserting that 410 is identical to 200.");
+
+        $response->assertGone();
+    }
+
+    public function testAssertTooManyRequests()
+    {
+        $response = TestResponse::fromBaseResponse(
+            (new Response)->setStatusCode(Response::HTTP_TOO_MANY_REQUESTS)
+        );
+
+        $response->assertTooManyRequests();
+
+        $response = TestResponse::fromBaseResponse(
+            (new Response)->setStatusCode(Response::HTTP_OK)
+        );
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage("Expected response status code [429] but received 200.\nFailed asserting that 429 is identical to 200.");
+
+        $response->assertTooManyRequests();
+        $this->fail();
+    }
+
+    public function testAssertAccepted()
+    {
+        $response = TestResponse::fromBaseResponse(
+            (new Response)->setStatusCode(Response::HTTP_ACCEPTED)
+        );
+
+        $response->assertAccepted();
+
+        $response = TestResponse::fromBaseResponse(
+            (new Response)->setStatusCode(Response::HTTP_OK)
+        );
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage("Expected response status code [202] but received 200.\nFailed asserting that 202 is identical to 200.");
+
+        $response->assertAccepted();
+        $this->fail();
+    }
+
     public function testAssertUnprocessable()
     {
         $statusCode = 500;
@@ -486,6 +893,54 @@ class TestResponseTest extends TestCase
 
         $response = TestResponse::fromBaseResponse($baseResponse);
         $response->assertUnprocessable();
+    }
+
+    public function testAssertServerError()
+    {
+        $statusCode = 500;
+
+        $baseResponse = tap(new Response, function ($response) use ($statusCode) {
+            $response->setStatusCode($statusCode);
+        });
+
+        $response = TestResponse::fromBaseResponse($baseResponse);
+        $response->assertServerError();
+    }
+
+    public function testAssertInternalServerError()
+    {
+        $response = TestResponse::fromBaseResponse(
+            (new Response)->setStatusCode(Response::HTTP_INTERNAL_SERVER_ERROR)
+        );
+
+        $response->assertInternalServerError();
+
+        $response = TestResponse::fromBaseResponse(
+            (new Response)->setStatusCode(Response::HTTP_OK)
+        );
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage("Expected response status code [500] but received 200.\nFailed asserting that 500 is identical to 200.");
+
+        $response->assertInternalServerError();
+    }
+
+    public function testAssertServiceUnavailable()
+    {
+        $response = TestResponse::fromBaseResponse(
+            (new Response)->setStatusCode(Response::HTTP_SERVICE_UNAVAILABLE)
+        );
+
+        $response->assertServiceUnavailable();
+
+        $response = TestResponse::fromBaseResponse(
+            (new Response)->setStatusCode(Response::HTTP_OK)
+        );
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage("Expected response status code [503] but received 200.\nFailed asserting that 503 is identical to 200.");
+
+        $response->assertServiceUnavailable();
     }
 
     public function testAssertNoContentAsserts204StatusCodeByDefault()
@@ -553,90 +1008,6 @@ class TestResponseTest extends TestCase
         $response->assertStatus($expectedStatusCode);
     }
 
-    public function testAssertStatusShowsExceptionOnUnexpected500()
-    {
-        $statusCode = 500;
-        $expectedStatusCode = 200;
-
-        $this->expectException(AssertionFailedError::class);
-
-        $this->expectExceptionMessage('Test exception message');
-
-        $baseResponse = tap(new Response, function ($response) use ($statusCode) {
-            $response->setStatusCode($statusCode);
-        });
-        $exceptions = collect([new Exception('Test exception message')]);
-
-        $response = TestResponse::fromBaseResponse($baseResponse)
-            ->withExceptions($exceptions);
-        $response->assertStatus($expectedStatusCode);
-    }
-
-    public function testAssertStatusShowsErrorsOnUnexpectedErrorRedirect()
-    {
-        $statusCode = 302;
-        $expectedStatusCode = 200;
-
-        $this->expectException(AssertionFailedError::class);
-
-        $this->expectExceptionMessage('The first name field is required.');
-
-        $baseResponse = tap(new RedirectResponse('/', $statusCode), function ($response) {
-            $response->setSession(new Store('test-session', new ArraySessionHandler(1)));
-            $response->withErrors([
-                'first_name' => 'The first name field is required.',
-                'last_name' => 'The last name field is required.',
-            ]);
-        });
-
-        $response = TestResponse::fromBaseResponse($baseResponse);
-        $response->assertStatus($expectedStatusCode);
-    }
-
-    public function testAssertStatusShowsJsonErrorsOnUnexpected422()
-    {
-        $statusCode = 422;
-        $expectedStatusCode = 200;
-
-        $this->expectException(AssertionFailedError::class);
-
-        $this->expectExceptionMessage('"The first name field is required."');
-
-        $baseResponse = new Response(
-            [
-                'message' => 'The given data was invalid.',
-                'errors' => [
-                    'first_name' => 'The first name field is required.',
-                    'last_name' => 'The last name field is required.',
-                ],
-            ],
-            $statusCode
-        );
-
-        $response = TestResponse::fromBaseResponse($baseResponse);
-        $response->assertStatus($expectedStatusCode);
-    }
-
-    public function testAssertStatusWhenJsonIsFalse()
-    {
-        $baseResponse = new Response('false', 200, ['Content-Type' => 'application/json']);
-
-        $response = TestResponse::fromBaseResponse($baseResponse);
-        $response->assertStatus(200);
-    }
-
-    public function testAssertStatusWhenJsonIsEncoded()
-    {
-        $baseResponse = tap(new Response, function ($response) {
-            $response->header('Content-Type', 'application/json');
-            $response->header('Content-Encoding', 'gzip');
-            $response->setContent('b"x£½V*.I,)-V▓R╩¤V¬\x05\x00+ü\x059"');
-        });
-
-        $response = TestResponse::fromBaseResponse($baseResponse);
-        $response->assertStatus(200);
-    }
-
     public function testAssertHeader()
     {
         $this->expectException(AssertionFailedError::class);
@@ -662,6 +1033,32 @@ class TestResponseTest extends TestCase
         $response = TestResponse::fromBaseResponse($baseResponse);
 
         $response->assertHeaderMissing('Location');
+    }
+
+    public function testAssertPrecognitionSuccessfulWithMissingHeader()
+    {
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Header [Precognition-Success] not present on response.');
+
+        $baseResponse = new Response('', 204);
+
+        $response = TestResponse::fromBaseResponse($baseResponse);
+
+        $response->assertSuccessfulPrecognition();
+    }
+
+    public function testAssertPrecognitionSuccessfulWithIncorrectValue()
+    {
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('The Precognition-Success header was found, but the value is not `true`.');
+
+        $baseResponse = tap(new Response('', 204), function ($response) {
+            $response->header('Precognition-Success', '');
+        });
+
+        $response = TestResponse::fromBaseResponse($baseResponse);
+
+        $response->assertSuccessfulPrecognition();
     }
 
     public function testAssertJsonWithArray()
@@ -827,6 +1224,50 @@ class TestResponseTest extends TestCase
         $response->assertJsonPath('0.id', '10');
     }
 
+    public function testAssertJsonPathWithClosure()
+    {
+        $response = TestResponse::fromBaseResponse(new Response([
+            'data' => ['foo' => 'bar'],
+        ]));
+
+        $response->assertJsonPath('data.foo', fn ($value) => $value === 'bar');
+    }
+
+    public function testAssertJsonPathWithClosureCanFail()
+    {
+        $response = TestResponse::fromBaseResponse(new Response([
+            'data' => ['foo' => 'bar'],
+        ]));
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Failed asserting that false is true.');
+
+        $response->assertJsonPath('data.foo', fn ($value) => $value === null);
+    }
+
+    public function testAssertJsonPathCanonicalizing()
+    {
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceStub));
+
+        $response->assertJsonPathCanonicalizing('*.foo', ['foo 0', 'foo 1', 'foo 2', 'foo 3']);
+        $response->assertJsonPathCanonicalizing('*.foo', ['foo 1', 'foo 0', 'foo 3', 'foo 2']);
+
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceWithIntegersStub));
+
+        $response->assertJsonPathCanonicalizing('*.id', [10, 20, 30]);
+        $response->assertJsonPathCanonicalizing('*.id', [30, 10, 20]);
+    }
+
+    public function testAssertJsonPathCanonicalizingCanFail()
+    {
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceStub));
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Failed asserting that two arrays are equal.');
+
+        $response->assertJsonPathCanonicalizing('*.foo', ['foo 0', 'foo 2', 'foo 3']);
+    }
+
     public function testAssertJsonFragment()
     {
         $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceStub));
@@ -855,6 +1296,16 @@ class TestResponseTest extends TestCase
         $this->expectException(AssertionFailedError::class);
 
         $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceWithIntegersStub));
+
+        $response->assertJsonFragment(['id' => 1]);
+    }
+
+    public function testAssertJsonFragmentUnicodeCanFail()
+    {
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessageMatches('/Привет|Мир/');
+
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceWithUnicodeStub));
 
         $response->assertJsonFragment(['id' => 1]);
     }
@@ -941,6 +1392,45 @@ class TestResponseTest extends TestCase
         $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceWithIntegersStub));
 
         $response->assertJsonMissingExact(['id' => 20, 'foo' => 'bar']);
+    }
+
+    public function testAssertJsonMissingPath()
+    {
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub));
+
+        // With simple key
+        $response->assertJsonMissingPath('missing');
+
+        // With nested key
+        $response->assertJsonMissingPath('foobar.missing');
+        $response->assertJsonMissingPath('numeric_keys.0');
+    }
+
+    public function testAssertJsonMissingPathCanFail()
+    {
+        $this->expectException(AssertionFailedError::class);
+
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub));
+
+        $response->assertJsonMissingPath('foo');
+    }
+
+    public function testAssertJsonMissingPathCanFail2()
+    {
+        $this->expectException(AssertionFailedError::class);
+
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub));
+
+        $response->assertJsonMissingPath('foobar.foobar_foo');
+    }
+
+    public function testAssertJsonMissingPathCanFail3()
+    {
+        $this->expectException(AssertionFailedError::class);
+
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub));
+
+        $response->assertJsonMissingPath('numeric_keys.3');
     }
 
     public function testAssertJsonValidationErrors()
@@ -1411,6 +1901,38 @@ class TestResponseTest extends TestCase
         $testResponse->assertJsonMissingValidationErrors('bar', 'data.errors');
     }
 
+    public function testAssertJsonIsArray()
+    {
+        $responseArray = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceStub));
+        $responseArray->assertJsonIsArray();
+    }
+
+    public function testAssertJsonIsNotArray()
+    {
+        $this->expectException(ExpectationFailedException::class);
+
+        $responseObject = TestResponse::fromBaseResponse(new Response([
+            'foo' => 'bar',
+        ]));
+        $responseObject->assertJsonIsArray();
+    }
+
+    public function testAssertJsonIsObject()
+    {
+        $responseObject = TestResponse::fromBaseResponse(new Response([
+            'foo' => 'bar',
+        ]));
+        $responseObject->assertJsonIsObject();
+    }
+
+    public function testAssertJsonIsNotObject()
+    {
+        $this->expectException(ExpectationFailedException::class);
+
+        $responseArray = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceStub));
+        $responseArray->assertJsonIsObject();
+    }
+
     public function testAssertDownloadOffered()
     {
         $files = new Filesystem;
@@ -1521,6 +2043,43 @@ class TestResponseTest extends TestCase
         );
     }
 
+    public function testResponseCanBeReturnedAsCollection()
+    {
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub));
+
+        $this->assertInstanceOf(Collection::class, $response->collect());
+        $this->assertEquals(collect([
+            'foo' => 'bar',
+            'foobar' => [
+                'foobar_foo' => 'foo',
+                'foobar_bar' => 'bar',
+            ],
+            '0' => ['foo'],
+            'bars' => [
+                ['bar' => 'foo 0', 'foo' => 'bar 0'],
+                ['bar' => 'foo 1', 'foo' => 'bar 1'],
+                ['bar' => 'foo 2', 'foo' => 'bar 2'],
+            ],
+            'baz' => [
+                ['foo' => 'bar 0', 'bar' => ['foo' => 'bar 0', 'bar' => 'foo 0']],
+                ['foo' => 'bar 1', 'bar' => ['foo' => 'bar 1', 'bar' => 'foo 1']],
+            ],
+            'barfoo' => [
+                ['bar' => ['bar' => 'foo 0']],
+                ['bar' => ['bar' => 'foo 0', 'foo' => 'foo 0']],
+                ['bar' => ['foo' => 'bar 0', 'bar' => 'foo 0', 'rab' => 'rab 0']],
+            ],
+            'numeric_keys' => [
+                2 => ['bar' => 'foo 0', 'foo' => 'bar 0'],
+                3 => ['bar' => 'foo 1', 'foo' => 'bar 1'],
+                4 => ['bar' => 'foo 2', 'foo' => 'bar 2'],
+            ],
+        ]), $response->collect());
+        $this->assertEquals(collect(['foobar_foo' => 'foo', 'foobar_bar' => 'bar']), $response->collect('foobar'));
+        $this->assertEquals(collect(['bar']), $response->collect('foobar.foobar_bar'));
+        $this->assertEquals(collect(), $response->collect('missing_key'));
+    }
+
     public function testItCanBeTapped()
     {
         $response = TestResponse::fromBaseResponse(
@@ -1605,6 +2164,20 @@ class TestResponseTest extends TestCase
         $response->assertCookieMissing('cookie-name');
     }
 
+    public function testAssertLocation()
+    {
+        app()->instance('url', $url = new UrlGenerator(new RouteCollection, new Request));
+
+        $response = TestResponse::fromBaseResponse(
+            new RedirectResponse($url->to('https://foo.com'))
+        );
+
+        $response->assertLocation('https://foo.com');
+
+        $this->expectException(ExpectationFailedException::class);
+        $response->assertLocation('https://foo.net');
+    }
+
     public function testAssertRedirectContains()
     {
         $response = TestResponse::fromBaseResponse(
@@ -1618,6 +2191,15 @@ class TestResponseTest extends TestCase
         $response->assertRedirectContains('url.net');
     }
 
+    public function testAssertRedirect()
+    {
+        $response = TestResponse::fromBaseResponse(
+            (new Response('', 302))->withHeaders(['Location' => 'https://url.com'])
+        );
+
+        $response->assertRedirect();
+    }
+
     public function testGetDecryptedCookie()
     {
         $response = TestResponse::fromBaseResponse(
@@ -1627,8 +2209,138 @@ class TestResponseTest extends TestCase
         $cookie = $response->getCookie('cookie-name', false);
 
         $this->assertInstanceOf(Cookie::class, $cookie);
-        $this->assertEquals('cookie-name', $cookie->getName());
-        $this->assertEquals('cookie-value', $cookie->getValue());
+        $this->assertSame('cookie-name', $cookie->getName());
+        $this->assertSame('cookie-value', $cookie->getValue());
+    }
+
+    public function testAssertSessionHasErrors()
+    {
+        app()->instance('session.store', $store = new Store('test-session', new ArraySessionHandler(1)));
+
+        $store->put('errors', $errorBag = new ViewErrorBag);
+
+        $errorBag->put('default', new MessageBag([
+            'foo' => [
+                'foo is required',
+            ],
+        ]));
+
+        $response = TestResponse::fromBaseResponse(new Response());
+
+        $response->assertSessionHasErrors(['foo']);
+    }
+
+    public function testAssertJsonSerializedSessionHasErrors()
+    {
+        app()->instance('session.store', $store = new Store('test-session', new ArraySessionHandler(1), null, 'json'));
+
+        $store->put('errors', $errorBag = new ViewErrorBag);
+
+        $errorBag->put('default', new MessageBag([
+            'foo' => [
+                'foo is required',
+            ],
+        ]));
+
+        $store->save(); // Required to serialize error bag to JSON
+
+        $response = TestResponse::fromBaseResponse(new Response());
+
+        $response->assertSessionHasErrors(['foo']);
+    }
+
+    public function testAssertSessionDoesntHaveErrors()
+    {
+        $this->expectException(AssertionFailedError::class);
+
+        app()->instance('session.store', $store = new Store('test-session', new ArraySessionHandler(1)));
+
+        $store->put('errors', $errorBag = new ViewErrorBag);
+
+        $errorBag->put('default', new MessageBag([
+            'foo' => [
+                'foo is required',
+            ],
+        ]));
+
+        $response = TestResponse::fromBaseResponse(new Response());
+
+        $response->assertSessionDoesntHaveErrors(['foo']);
+    }
+
+    public function testAssertSessionHasNoErrors()
+    {
+        app()->instance('session.store', $store = new Store('test-session', new ArraySessionHandler(1)));
+
+        $store->put('errors', $errorBag = new ViewErrorBag);
+
+        $errorBag->put('default', new MessageBag([
+            'foo' => [
+                'foo is required',
+            ],
+        ]));
+
+        $errorBag->put('some-other-bag', new MessageBag([
+            'bar' => [
+                'bar is required',
+            ],
+        ]));
+
+        $response = TestResponse::fromBaseResponse(new Response());
+
+        try {
+            $response->assertSessionHasNoErrors();
+        } catch (AssertionFailedError $e) {
+            $this->assertStringContainsString('foo is required', $e->getMessage());
+            $this->assertStringContainsString('bar is required', $e->getMessage());
+        }
+    }
+
+    public function testAssertSessionHas()
+    {
+        app()->instance('session.store', $store = new Store('test-session', new ArraySessionHandler(1)));
+
+        $store->put('foo', 'value');
+        $store->put('bar', 'value');
+
+        $response = TestResponse::fromBaseResponse(new Response());
+
+        $response->assertSessionHas('foo');
+        $response->assertSessionHas('bar');
+        $response->assertSessionHas(['foo', 'bar']);
+    }
+
+    public function testAssertSessionMissing()
+    {
+        $this->expectException(AssertionFailedError::class);
+
+        app()->instance('session.store', $store = new Store('test-session', new ArraySessionHandler(1)));
+
+        $store->put('foo', 'value');
+
+        $response = TestResponse::fromBaseResponse(new Response());
+        $response->assertSessionMissing('foo');
+    }
+
+    public function testAssertSessionHasInput()
+    {
+        app()->instance('session.store', $store = new Store('test-session', new ArraySessionHandler(1)));
+
+        $store->put('_old_input', [
+            'foo' => 'value',
+            'bar' => 'value',
+        ]);
+
+        $response = TestResponse::fromBaseResponse(new Response());
+
+        $response->assertSessionHasInput('foo');
+        $response->assertSessionHasInput('foo', 'value');
+        $response->assertSessionHasInput('bar');
+        $response->assertSessionHasInput('bar', 'value');
+        $response->assertSessionHasInput(['foo', 'bar']);
+        $response->assertSessionHasInput('foo', function ($value) {
+            return $value === 'value';
+        });
     }
 
     public function testGetEncryptedCookie()
@@ -1723,4 +2435,26 @@ class JsonSerializableSingleResourceWithIntegersStub implements JsonSerializable
             ['id' => 30, 'foo' => 'bar'],
         ];
     }
+}
+
+class JsonSerializableSingleResourceWithUnicodeStub implements JsonSerializable
+{
+    public function jsonSerialize(): array
+    {
+        return [
+            ['id' => 10, 'foo' => 'bar'],
+            ['id' => 20, 'foo' => 'Привет'],
+            ['id' => 30, 'foo' => 'Мир'],
+        ];
+    }
+}
+
+class TestModel extends Model
+{
+    protected $guarded = [];
+}
+
+class AnotherTestModel extends Model
+{
+    protected $guarded = [];
 }

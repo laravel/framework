@@ -4,10 +4,13 @@ namespace Illuminate\Http\Resources;
 
 use Exception;
 use Illuminate\Support\Traits\ForwardsCalls;
+use Illuminate\Support\Traits\Macroable;
 
 trait DelegatesToResource
 {
-    use ForwardsCalls;
+    use ForwardsCalls, Macroable {
+        __call as macroCall;
+    }
 
     /**
      * Get the value of the resource's route key.
@@ -145,6 +148,10 @@ trait DelegatesToResource
      */
     public function __call($method, $parameters)
     {
+        if (static::hasMacro($method)) {
+            return $this->macroCall($method, $parameters);
+        }
+
         return $this->forwardCallTo($this->resource, $method, $parameters);
     }
 }

@@ -129,6 +129,10 @@ class DynamoDbStore implements LockProvider, Store
      */
     public function many(array $keys)
     {
+        if (count($keys) === 0) {
+            return [];
+        }
+
         $prefixedKeys = array_map(function ($key) {
             return $this->prefix.$key;
         }, $keys);
@@ -211,7 +215,7 @@ class DynamoDbStore implements LockProvider, Store
     }
 
     /**
-     * Store multiple items in the cache for a given number of $seconds.
+     * Store multiple items in the cache for a given number of seconds.
      *
      * @param  array  $values
      * @param  int  $seconds
@@ -219,6 +223,10 @@ class DynamoDbStore implements LockProvider, Store
      */
     public function putMany(array $values, $seconds)
     {
+        if (count($values) === 0) {
+            return true;
+        }
+
         $expiration = $this->toTimestamp($seconds);
 
         $this->dynamo->batchWriteItem([
@@ -284,7 +292,7 @@ class DynamoDbStore implements LockProvider, Store
 
             return true;
         } catch (DynamoDbException $e) {
-            if (Str::contains($e->getMessage(), 'ConditionalCheckFailed')) {
+            if (str_contains($e->getMessage(), 'ConditionalCheckFailed')) {
                 return false;
             }
 
@@ -329,7 +337,7 @@ class DynamoDbStore implements LockProvider, Store
 
             return (int) $response['Attributes'][$this->valueAttribute]['N'];
         } catch (DynamoDbException $e) {
-            if (Str::contains($e->getMessage(), 'ConditionalCheckFailed')) {
+            if (str_contains($e->getMessage(), 'ConditionalCheckFailed')) {
                 return false;
             }
 
@@ -374,7 +382,7 @@ class DynamoDbStore implements LockProvider, Store
 
             return (int) $response['Attributes'][$this->valueAttribute]['N'];
         } catch (DynamoDbException $e) {
-            if (Str::contains($e->getMessage(), 'ConditionalCheckFailed')) {
+            if (str_contains($e->getMessage(), 'ConditionalCheckFailed')) {
                 return false;
             }
 
@@ -523,13 +531,13 @@ class DynamoDbStore implements LockProvider, Store
      */
     public function setPrefix($prefix)
     {
-        $this->prefix = ! empty($prefix) ? $prefix.':' : '';
+        $this->prefix = $prefix;
     }
 
     /**
      * Get the DynamoDb Client instance.
      *
-     * @return DynamoDbClient
+     * @return \Aws\DynamoDb\DynamoDbClient
      */
     public function getClient()
     {

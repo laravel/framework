@@ -7,6 +7,7 @@ use Illuminate\Container\Container;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Testing\Concerns\TestDatabases;
 use Mockery as m;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use ReflectionMethod;
 
@@ -46,9 +47,7 @@ class TestDatabasesTest extends TestCase
         $this->switchToDatabase('my_database_test_1');
     }
 
-    /**
-     * @dataProvider databaseUrls
-     */
+    #[DataProvider('databaseUrls')]
     public function testSwitchToDatabaseWithUrl($testDatabase, $url, $testUrl)
     {
         DB::shouldReceive('purge')->once();
@@ -73,10 +72,10 @@ class TestDatabasesTest extends TestCase
         };
 
         $method = new ReflectionMethod($instance, 'switchToDatabase');
-        tap($method)->setAccessible(true)->invoke($instance, $database);
+        $method->invoke($instance, $database);
     }
 
-    public function databaseUrls()
+    public static function databaseUrls()
     {
         return [
             [
@@ -97,7 +96,7 @@ class TestDatabasesTest extends TestCase
         ];
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 

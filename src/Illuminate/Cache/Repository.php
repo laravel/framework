@@ -62,7 +62,7 @@ class Repository implements ArrayAccess, CacheContract
     /**
      * Determine if an item exists in the cache.
      *
-     * @param  string  $key
+     * @param  array|string  $key
      * @return bool
      */
     public function has($key): bool
@@ -84,9 +84,11 @@ class Repository implements ArrayAccess, CacheContract
     /**
      * Retrieve an item from the cache by key.
      *
-     * @param  string  $key
-     * @param  mixed  $default
-     * @return mixed
+     * @template TCacheValue
+     *
+     * @param  array|string  $key
+     * @param  TCacheValue|(\Closure(): TCacheValue)  $default
+     * @return (TCacheValue is null ? mixed : TCacheValue)
      */
     public function get($key, $default = null): mixed
     {
@@ -161,7 +163,7 @@ class Repository implements ArrayAccess, CacheContract
         if (is_null($value)) {
             $this->event(new CacheMissed($key));
 
-            return isset($keys[$key]) ? value($keys[$key]) : null;
+            return (isset($keys[$key]) && ! array_is_list($keys)) ? value($keys[$key]) : null;
         }
 
         // If we found a valid value we will fire the "hit" event and return the value
@@ -175,9 +177,11 @@ class Repository implements ArrayAccess, CacheContract
     /**
      * Retrieve an item from the cache and delete it.
      *
-     * @param  string  $key
-     * @param  mixed  $default
-     * @return mixed
+     * @template TCacheValue
+     *
+     * @param  array|string  $key
+     * @param  TCacheValue|(\Closure(): TCacheValue)  $default
+     * @return (TCacheValue is null ? mixed : TCacheValue)
      */
     public function pull($key, $default = null)
     {
@@ -189,7 +193,7 @@ class Repository implements ArrayAccess, CacheContract
     /**
      * Store an item in the cache.
      *
-     * @param  string  $key
+     * @param  array|string  $key
      * @param  mixed  $value
      * @param  \DateTimeInterface|\DateInterval|int|null  $ttl
      * @return bool
@@ -372,10 +376,12 @@ class Repository implements ArrayAccess, CacheContract
     /**
      * Get an item from the cache, or execute the given Closure and store the result.
      *
+     * @template TCacheValue
+     *
      * @param  string  $key
      * @param  \Closure|\DateTimeInterface|\DateInterval|int|null  $ttl
-     * @param  \Closure  $callback
-     * @return mixed
+     * @param  \Closure(): TCacheValue  $callback
+     * @return TCacheValue
      */
     public function remember($key, $ttl, Closure $callback)
     {
@@ -388,7 +394,9 @@ class Repository implements ArrayAccess, CacheContract
             return $value;
         }
 
-        $this->put($key, $value = $callback(), value($ttl));
+        $value = $callback();
+
+        $this->put($key, $value, value($ttl, $value));
 
         return $value;
     }
@@ -396,9 +404,11 @@ class Repository implements ArrayAccess, CacheContract
     /**
      * Get an item from the cache, or execute the given Closure and store the result forever.
      *
+     * @template TCacheValue
+     *
      * @param  string  $key
-     * @param  \Closure  $callback
-     * @return mixed
+     * @param  \Closure(): TCacheValue  $callback
+     * @return TCacheValue
      */
     public function sear($key, Closure $callback)
     {
@@ -408,9 +418,11 @@ class Repository implements ArrayAccess, CacheContract
     /**
      * Get an item from the cache, or execute the given Closure and store the result forever.
      *
+     * @template TCacheValue
+     *
      * @param  string  $key
-     * @param  \Closure  $callback
-     * @return mixed
+     * @param  \Closure(): TCacheValue  $callback
+     * @return TCacheValue
      */
     public function rememberForever($key, Closure $callback)
     {
@@ -529,7 +541,7 @@ class Repository implements ArrayAccess, CacheContract
             $duration = Carbon::now()->diffInRealSeconds($duration, false);
         }
 
-        return (int) $duration > 0 ? $duration : 0;
+        return (int) ($duration > 0 ? $duration : 0);
     }
 
     /**
@@ -576,6 +588,19 @@ class Repository implements ArrayAccess, CacheContract
     }
 
     /**
+     * Set the cache store implementation.
+     *
+     * @param  \Illuminate\Contracts\Cache\Store  $store
+     * @return static
+     */
+    public function setStore($store)
+    {
+        $this->store = $store;
+
+        return $this;
+    }
+
+    /**
      * Fire an event for this cache instance.
      *
      * @param  object|string  $event
@@ -583,9 +608,7 @@ class Repository implements ArrayAccess, CacheContract
      */
     protected function event($event)
     {
-        if (isset($this->events)) {
-            $this->events->dispatch($event);
-        }
+        $this->events?->dispatch($event);
     }
 
     /**

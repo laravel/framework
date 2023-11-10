@@ -2,12 +2,15 @@
 
 namespace Illuminate\Tests\Database;
 
+use Exception;
 use Foo\Bar\EloquentModelNamespacedStub;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Database\Query\Builder as QueryBuilder;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
@@ -193,6 +196,7 @@ class DatabaseEloquentMorphTest extends TestCase
         $relation = $this->getOneRelation();
         $relation->getQuery()->shouldReceive('where')->once()->with(['foo'])->andReturn($relation->getQuery());
         $relation->getQuery()->shouldReceive('first')->once()->with()->andReturn(null);
+        $relation->getQuery()->shouldReceive('withSavepointIfNeeded')->once()->andReturnUsing(fn ($scope) => $scope());
         $relation->getRelated()->shouldReceive('newInstance')->once()->with(['foo'])->andReturn($model = m::mock(Model::class));
         $model->shouldReceive('setAttribute')->once()->with('morph_id', 1);
         $model->shouldReceive('setAttribute')->once()->with('morph_type', get_class($relation->getParent()));
@@ -206,6 +210,7 @@ class DatabaseEloquentMorphTest extends TestCase
         $relation = $this->getOneRelation();
         $relation->getQuery()->shouldReceive('where')->once()->with(['foo' => 'bar'])->andReturn($relation->getQuery());
         $relation->getQuery()->shouldReceive('first')->once()->with()->andReturn(null);
+        $relation->getQuery()->shouldReceive('withSavepointIfNeeded')->once()->andReturnUsing(fn ($scope) => $scope());
         $relation->getRelated()->shouldReceive('newInstance')->once()->with(['foo' => 'bar', 'baz' => 'qux'])->andReturn($model = m::mock(Model::class));
         $model->shouldReceive('setAttribute')->once()->with('morph_id', 1);
         $model->shouldReceive('setAttribute')->once()->with('morph_type', get_class($relation->getParent()));
@@ -214,14 +219,94 @@ class DatabaseEloquentMorphTest extends TestCase
         $this->assertInstanceOf(Model::class, $relation->firstOrCreate(['foo' => 'bar'], ['baz' => 'qux']));
     }
 
+    public function testCreateOrFirstMethodFindsFirstModel()
+    {
+        $relation = $this->getOneRelation();
+
+        $relation->getRelated()->shouldReceive('newInstance')->once()->with(['foo'])->andReturn($model = m::mock(Model::class));
+        $model->shouldReceive('setAttribute')->once()->with('morph_id', 1);
+        $model->shouldReceive('setAttribute')->once()->with('morph_type', get_class($relation->getParent()));
+        $model->shouldReceive('save')->once()->andThrow(
+            new UniqueConstraintViolationException('mysql', 'example mysql', [], new Exception('SQLSTATE[23000]: Integrity constraint violation: 1062')),
+        );
+
+        $relation->getQuery()->shouldReceive('withSavepointIfNeeded')->once()->andReturnUsing(function ($scope) {
+            return $scope();
+        });
+        $relation->getQuery()->shouldReceive('useWritePdo')->once()->andReturn($relation->getQuery());
+        $relation->getQuery()->shouldReceive('where')->once()->with(['foo'])->andReturn($relation->getQuery());
+        $relation->getQuery()->shouldReceive('first')->once()->with()->andReturn($model = m::mock(Model::class));
+
+        $this->assertInstanceOf(Model::class, $relation->createOrFirst(['foo']));
+    }
+
+    public function testCreateOrFirstMethodWithValuesFindsFirstModel()
+    {
+        $relation = $this->getOneRelation();
+
+        $relation->getRelated()->shouldReceive('newInstance')->once()->with(['foo' => 'bar', 'baz' => 'qux'])->andReturn($model = m::mock(Model::class));
+        $model->shouldReceive('setAttribute')->once()->with('morph_id', 1);
+        $model->shouldReceive('setAttribute')->once()->with('morph_type', get_class($relation->getParent()));
+        $model->shouldReceive('save')->once()->andThrow(
+            new UniqueConstraintViolationException('mysql', 'example mysql', [], new Exception('SQLSTATE[23000]: Integrity constraint violation: 1062')),
+        );
+
+        $relation->getQuery()->shouldReceive('withSavepointIfNeeded')->once()->andReturnUsing(function ($scope) {
+            return $scope();
+        });
+        $relation->getQuery()->shouldReceive('useWritePdo')->once()->andReturn($relation->getQuery());
+        $relation->getQuery()->shouldReceive('where')->once()->with(['foo' => 'bar'])->andReturn($relation->getQuery());
+        $relation->getQuery()->shouldReceive('first')->once()->with()->andReturn($model = m::mock(Model::class));
+
+        $this->assertInstanceOf(Model::class, $relation->createOrFirst(['foo' => 'bar'], ['baz' => 'qux']));
+    }
+
+    public function testCreateOrFirstMethodCreatesNewMorphModel()
+    {
+        $relation = $this->getOneRelation();
+
+        $relation->getRelated()->shouldReceive('newInstance')->once()->with(['foo'])->andReturn($model = m::mock(Model::class));
+        $model->shouldReceive('setAttribute')->once()->with('morph_id', 1);
+        $model->shouldReceive('setAttribute')->once()->with('morph_type', get_class($relation->getParent()));
+        $model->shouldReceive('save')->once()->andReturn(true);
+
+        $relation->getQuery()->shouldReceive('withSavepointIfNeeded')->once()->andReturnUsing(function ($scope) {
+            return $scope();
+        });
+        $relation->getQuery()->shouldReceive('where')->never();
+        $relation->getQuery()->shouldReceive('first')->never();
+
+        $this->assertInstanceOf(Model::class, $relation->createOrFirst(['foo']));
+    }
+
+    public function testCreateOrFirstMethodWithValuesCreatesNewMorphModel()
+    {
+        $relation = $this->getOneRelation();
+
+        $relation->getRelated()->shouldReceive('newInstance')->once()->with(['foo' => 'bar', 'baz' => 'qux'])->andReturn($model = m::mock(Model::class));
+        $model->shouldReceive('setAttribute')->once()->with('morph_id', 1);
+        $model->shouldReceive('setAttribute')->once()->with('morph_type', get_class($relation->getParent()));
+        $model->shouldReceive('save')->once()->andReturn(true);
+
+        $relation->getQuery()->shouldReceive('withSavepointIfNeeded')->once()->andReturnUsing(function ($scope) {
+            return $scope();
+        });
+        $relation->getQuery()->shouldReceive('where')->never();
+        $relation->getQuery()->shouldReceive('first')->never();
+
+        $this->assertInstanceOf(Model::class, $relation->createOrFirst(['foo' => 'bar'], ['baz' => 'qux']));
+    }
+
     public function testUpdateOrCreateMethodFindsFirstModelAndUpdates()
     {
         $relation = $this->getOneRelation();
         $relation->getQuery()->shouldReceive('where')->once()->with(['foo'])->andReturn($relation->getQuery());
         $relation->getQuery()->shouldReceive('first')->once()->with()->andReturn($model = m::mock(Model::class));
         $relation->getRelated()->shouldReceive('newInstance')->never();
+
+        $model->wasRecentlyCreated = false;
         $model->shouldReceive('setAttribute')->never();
-        $model->shouldReceive('fill')->once()->with(['bar']);
+        $model->shouldReceive('fill')->once()->with(['bar'])->andReturn($model);
         $model->shouldReceive('save')->once();
 
         $this->assertInstanceOf(Model::class, $relation->updateOrCreate(['foo'], ['bar']));
@@ -230,13 +315,17 @@ class DatabaseEloquentMorphTest extends TestCase
     public function testUpdateOrCreateMethodCreatesNewMorphModel()
     {
         $relation = $this->getOneRelation();
+        $relation->getQuery()->shouldReceive('withSavepointIfNeeded')->once()->andReturnUsing(function ($scope) {
+            return $scope();
+        });
         $relation->getQuery()->shouldReceive('where')->once()->with(['foo'])->andReturn($relation->getQuery());
         $relation->getQuery()->shouldReceive('first')->once()->with()->andReturn(null);
-        $relation->getRelated()->shouldReceive('newInstance')->once()->with(['foo'])->andReturn($model = m::mock(Model::class));
+        $relation->getRelated()->shouldReceive('newInstance')->once()->with(['foo', 'bar'])->andReturn($model = m::mock(Model::class));
+
+        $model->wasRecentlyCreated = true;
         $model->shouldReceive('setAttribute')->once()->with('morph_id', 1);
         $model->shouldReceive('setAttribute')->once()->with('morph_type', get_class($relation->getParent()));
         $model->shouldReceive('save')->once()->andReturn(true);
-        $model->shouldReceive('fill')->once()->with(['bar']);
 
         $this->assertInstanceOf(Model::class, $relation->updateOrCreate(['foo'], ['bar']));
     }
@@ -355,7 +444,8 @@ class DatabaseEloquentMorphTest extends TestCase
 
     protected function getOneRelation()
     {
-        $builder = m::mock(Builder::class);
+        $queryBuilder = m::mock(QueryBuilder::class);
+        $builder = m::mock(Builder::class, [$queryBuilder]);
         $builder->shouldReceive('whereNotNull')->once()->with('table.morph_id');
         $builder->shouldReceive('where')->once()->with('table.morph_id', '=', 1);
         $related = m::mock(Model::class);

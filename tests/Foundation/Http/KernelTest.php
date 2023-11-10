@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Tests\Foundation\Bootstrap\Http;
+namespace Illuminate\Tests\Foundation\Http;
 
 use Illuminate\Events\Dispatcher;
 use Illuminate\Foundation\Application;
@@ -29,13 +29,15 @@ class KernelTest extends TestCase
         $kernel = new Kernel($this->getApplication(), $this->getRouter());
 
         $this->assertEquals([
+            \Illuminate\Foundation\Http\Middleware\HandlePrecognitiveRequests::class,
             \Illuminate\Cookie\Middleware\EncryptCookies::class,
+            \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
             \Illuminate\Session\Middleware\StartSession::class,
             \Illuminate\View\Middleware\ShareErrorsFromSession::class,
             \Illuminate\Contracts\Auth\Middleware\AuthenticatesRequests::class,
             \Illuminate\Routing\Middleware\ThrottleRequests::class,
             \Illuminate\Routing\Middleware\ThrottleRequestsWithRedis::class,
-            \Illuminate\Session\Middleware\AuthenticateSession::class,
+            \Illuminate\Contracts\Session\Middleware\AuthenticatesSessions::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
             \Illuminate\Auth\Middleware\Authorize::class,
         ], $kernel->getMiddlewarePriority());

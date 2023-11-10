@@ -7,6 +7,7 @@ use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\ForeignIdColumnDefinition;
 use Illuminate\Database\Schema\Grammars\MySqlGrammar;
+use Illuminate\Tests\Database\Fixtures\Enums\Foo;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
@@ -64,6 +65,19 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $this->assertCount(2, $statements);
         $this->assertSame("create table `users` (`id` int unsigned not null auto_increment primary key, `email` varchar(255) not null) default character set utf8 collate 'utf8_unicode_ci'", $statements[0]);
         $this->assertSame('alter table `users` auto_increment = 1000', $statements[1]);
+    }
+
+    public function testAddColumnsWithMultipleAutoIncrementStartingValue()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->id()->from(100);
+        $blueprint->string('name')->from(200);
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertEquals([
+            'alter table `users` add `id` bigint unsigned not null auto_increment primary key, add `name` varchar(255) not null',
+            'alter table `users` auto_increment = 100',
+        ], $statements);
     }
 
     public function testEngineCreateTable()
@@ -319,7 +333,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertSame('alter table `users` add primary key `bar`(`foo`)', $statements[0]);
+        $this->assertSame('alter table `users` add primary key (`foo`)', $statements[0]);
     }
 
     public function testAddingPrimaryKeyWithAlgorithm()
@@ -329,7 +343,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertSame('alter table `users` add primary key `bar` using hash(`foo`)', $statements[0]);
+        $this->assertSame('alter table `users` add primary key using hash(`foo`)', $statements[0]);
     }
 
     public function testAddingUniqueKey()
@@ -484,6 +498,17 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         ], $statements);
     }
 
+    public function testAddingForeignIdSpecifyingIndexNameInConstraint()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->foreignId('company_id')->constrained(indexName: 'my_index');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertSame([
+            'alter table `users` add `company_id` bigint unsigned not null',
+            'alter table `users` add constraint `my_index` foreign key (`company_id`) references `companies` (`id`)',
+        ], $statements);
+    }
+
     public function testAddingBigIncrementingID()
     {
         $blueprint = new Blueprint('users');
@@ -599,6 +624,13 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
 
         $this->assertCount(1, $statements);
         $this->assertSame('alter table `users` add `foo` varchar(100) null default CURRENT TIMESTAMP', $statements[0]);
+
+        $blueprint = new Blueprint('users');
+        $blueprint->string('foo', 100)->nullable()->default(Foo::BAR);
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table `users` add `foo` varchar(100) null default \'bar\'', $statements[0]);
     }
 
     public function testAddingText()
@@ -724,7 +756,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertSame('alter table `users` add `foo` double not null', $statements[0]);
+        $this->assertSame('alter table `users` add `foo` double(15, 6) not null', $statements[0]);
     }
 
     public function testAddingDoubleSpecifyingPrecision()
@@ -837,7 +869,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $blueprint->dateTime('foo')->useCurrent();
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
         $this->assertCount(1, $statements);
-        $this->assertSame('alter table `users` add `foo` datetime default CURRENT_TIMESTAMP not null', $statements[0]);
+        $this->assertSame('alter table `users` add `foo` datetime not null default CURRENT_TIMESTAMP', $statements[0]);
     }
 
     public function testAddingDateTimeWithOnUpdateCurrent()
@@ -846,7 +878,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $blueprint->dateTime('foo')->useCurrentOnUpdate();
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
         $this->assertCount(1, $statements);
-        $this->assertSame('alter table `users` add `foo` datetime on update CURRENT_TIMESTAMP not null', $statements[0]);
+        $this->assertSame('alter table `users` add `foo` datetime not null on update CURRENT_TIMESTAMP', $statements[0]);
     }
 
     public function testAddingDateTimeWithDefaultCurrentAndOnUpdateCurrent()
@@ -855,7 +887,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $blueprint->dateTime('foo')->useCurrent()->useCurrentOnUpdate();
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
         $this->assertCount(1, $statements);
-        $this->assertSame('alter table `users` add `foo` datetime default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP not null', $statements[0]);
+        $this->assertSame('alter table `users` add `foo` datetime not null default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP', $statements[0]);
     }
 
     public function testAddingDateTimeWithDefaultCurrentOnUpdateCurrentAndPrecision()
@@ -864,7 +896,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $blueprint->dateTime('foo', 3)->useCurrent()->useCurrentOnUpdate();
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
         $this->assertCount(1, $statements);
-        $this->assertSame('alter table `users` add `foo` datetime(3) default CURRENT_TIMESTAMP(3) on update CURRENT_TIMESTAMP(3) not null', $statements[0]);
+        $this->assertSame('alter table `users` add `foo` datetime(3) not null default CURRENT_TIMESTAMP(3) on update CURRENT_TIMESTAMP(3)', $statements[0]);
     }
 
     public function testAddingDateTimeTz()
@@ -951,7 +983,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $blueprint->timestamp('created_at', 1)->useCurrent();
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
         $this->assertCount(1, $statements);
-        $this->assertSame('alter table `users` add `created_at` timestamp(1) default CURRENT_TIMESTAMP(1) not null', $statements[0]);
+        $this->assertSame('alter table `users` add `created_at` timestamp(1) not null default CURRENT_TIMESTAMP(1)', $statements[0]);
     }
 
     public function testAddingTimestampWithOnUpdateCurrentSpecifyingPrecision()
@@ -960,7 +992,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $blueprint->timestamp('created_at', 1)->useCurrentOnUpdate();
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
         $this->assertCount(1, $statements);
-        $this->assertSame('alter table `users` add `created_at` timestamp(1) on update CURRENT_TIMESTAMP(1) not null', $statements[0]);
+        $this->assertSame('alter table `users` add `created_at` timestamp(1) not null on update CURRENT_TIMESTAMP(1)', $statements[0]);
     }
 
     public function testAddingTimestampWithDefaultCurrentAndOnUpdateCurrentSpecifyingPrecision()
@@ -969,7 +1001,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $blueprint->timestamp('created_at', 1)->useCurrent()->useCurrentOnUpdate();
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
         $this->assertCount(1, $statements);
-        $this->assertSame('alter table `users` add `created_at` timestamp(1) default CURRENT_TIMESTAMP(1) on update CURRENT_TIMESTAMP(1) not null', $statements[0]);
+        $this->assertSame('alter table `users` add `created_at` timestamp(1) not null default CURRENT_TIMESTAMP(1) on update CURRENT_TIMESTAMP(1)', $statements[0]);
     }
 
     public function testAddingTimestampTz()
@@ -1295,6 +1327,21 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
 
         $this->assertCount(1, $statements);
         $this->assertSame("create table `users` (`my_json_column` varchar(255) not null, `my_other_column` varchar(255) as (json_unquote(json_extract(`my_json_column`, '$.\"some_attribute\".\"nested\"'))))", $statements[0]);
+    }
+
+    public function testCreateTableWithVirtualAsColumnWhenJsonColumnHasArrayKey()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->create();
+        $blueprint->string('my_json_column')->virtualAsJson('my_json_column->foo[0][1]');
+
+        $conn = $this->getConnection();
+        $conn->shouldReceive('getConfig')->andReturn(null);
+
+        $statements = $blueprint->toSql($conn, $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertSame("create table `users` (`my_json_column` varchar(255) as (json_unquote(json_extract(`my_json_column`, '$.\"foo\"[0][1]'))))", $statements[0]);
     }
 
     public function testCreateTableWithStoredAsColumn()

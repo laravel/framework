@@ -4,14 +4,20 @@ namespace Illuminate\Tests\Support;
 
 use ArrayAccess;
 use ArrayIterator;
+use Countable;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Env;
 use Illuminate\Support\Optional;
+use Illuminate\Support\Sleep;
 use Illuminate\Support\Stringable;
+use Illuminate\Tests\Support\Fixtures\IntBackedEnum;
+use Illuminate\Tests\Support\Fixtures\StringBackedEnum;
 use IteratorAggregate;
 use LogicException;
 use Mockery as m;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use ReflectionClass;
 use RuntimeException;
 use stdClass;
 use Traversable;
@@ -21,25 +27,101 @@ class SupportHelpersTest extends TestCase
     protected function tearDown(): void
     {
         m::close();
+
+        parent::tearDown();
     }
 
     public function testE()
     {
         $str = 'A \'quote\' is <b>bold</b>';
         $this->assertSame('A &#039;quote&#039; is &lt;b&gt;bold&lt;/b&gt;', e($str));
+
         $html = m::mock(Htmlable::class);
         $html->shouldReceive('toHtml')->andReturn($str);
         $this->assertEquals($str, e($html));
+    }
+
+    public function testEWithInvalidCodePoints()
+    {
+        $str = mb_convert_encoding('føø bar', 'ISO-8859-1', 'UTF-8');
+        $this->assertEquals('f�� bar', e($str));
+    }
+
+    public function testEWithEnums()
+    {
+        $enumValue = StringBackedEnum::ADMIN_LABEL;
+        $this->assertSame('I am &#039;admin&#039;', e($enumValue));
+
+        $enumValue = IntBackedEnum::ROLE_ADMIN;
+        $this->assertSame('1', e($enumValue));
+    }
+
+    public function testBlank()
+    {
+        $this->assertTrue(blank(null));
+        $this->assertTrue(blank(''));
+        $this->assertTrue(blank('  '));
+        $this->assertFalse(blank(10));
+        $this->assertFalse(blank(true));
+        $this->assertFalse(blank(false));
+        $this->assertFalse(blank(0));
+        $this->assertFalse(blank(0.0));
+
+        $object = new SupportTestCountable();
+        $this->assertTrue(blank($object));
     }
 
     public function testClassBasename()
     {
         $this->assertSame('Baz', class_basename('Foo\Bar\Baz'));
         $this->assertSame('Baz', class_basename('Baz'));
+        // back-slash
+        $this->assertSame('Baz', class_basename('\Baz'));
+        $this->assertSame('Baz', class_basename('\\\\Baz\\'));
+        $this->assertSame('Baz', class_basename('\Foo\Bar\Baz\\'));
+        $this->assertSame('Baz', class_basename('\Foo/Bar\Baz/'));
+        // forward-slash
+        $this->assertSame('Baz', class_basename('/Foo/Bar/Baz/'));
+        $this->assertSame('Baz', class_basename('/Foo///Bar/Baz//'));
+        // accepts objects
+        $this->assertSame('stdClass', class_basename(new stdClass()));
+        // edge-cases
+        $this->assertSame('1', class_basename(1));
+        $this->assertSame('1', class_basename('1'));
+        $this->assertSame('', class_basename(''));
+        $this->assertSame('', class_basename('\\'));
+        $this->assertSame('', class_basename('\\\\'));
+        $this->assertSame('', class_basename('/'));
+        $this->assertSame('', class_basename('///'));
+        $this->assertSame('..', class_basename('\Foo\Bar\Baz\\..\\'));
+    }
+
+    public function testFilled()
+    {
+        $this->assertFalse(filled(null));
+        $this->assertFalse(filled(''));
+        $this->assertFalse(filled('  '));
+        $this->assertTrue(filled(10));
+        $this->assertTrue(filled(true));
+        $this->assertTrue(filled(false));
+        $this->assertTrue(filled(0));
+        $this->assertTrue(filled(0.0));
+
+        $object = new SupportTestCountable();
+        $this->assertFalse(filled($object));
     }
 
     public function testValue()
     {
+        $callable = new class
+        {
+            public function __call($method, $arguments)
+            {
+                return $arguments;
+            }
+        };
+
+        $this->assertSame($callable, value($callable, 'foo'));
         $this->assertSame('foo', value('foo'));
         $this->assertSame('foo', value(function () {
             return 'foo';
@@ -56,6 +138,27 @@ class SupportHelpersTest extends TestCase
         $class->name->first = 'Taylor';
 
         $this->assertSame('Taylor', object_get($class, 'name.first'));
+        $this->assertSame('Taylor', object_get($class, 'name.first', 'default'));
+    }
+
+    public function testObjectGetDefaultValue()
+    {
+        $class = new stdClass;
+        $class->name = new stdClass;
+        $class->name->first = 'Taylor';
+
+        $this->assertSame('default', object_get($class, 'name.family', 'default'));
+        $this->assertNull(object_get($class, 'name.family'));
+    }
+
+    public function testObjectGetWhenKeyIsNullOrEmpty()
+    {
+        $object = new stdClass;
+
+        $this->assertEquals($object, object_get($object, null));
+        $this->assertEquals($object, object_get($object, false));
+        $this->assertEquals($object, object_get($object, ''));
+        $this->assertEquals($object, object_get($object, '  '));
     }
 
     public function testDataGet()
@@ -325,6 +428,95 @@ class SupportHelpersTest extends TestCase
         ], $data);
     }
 
+    public function testDataRemove()
+    {
+        $data = ['foo' => 'bar', 'hello' => 'world'];
+
+        $this->assertEquals(
+            ['hello' => 'world'],
+            data_forget($data, 'foo')
+        );
+
+        $data = ['foo' => 'bar', 'hello' => 'world'];
+
+        $this->assertEquals(
+            ['foo' => 'bar', 'hello' => 'world'],
+            data_forget($data, 'nothing')
+        );
+
+        $data = ['one' => ['two' => ['three' => 'hello', 'four' => ['five']]]];
+
+        $this->assertEquals(
+            ['one' => ['two' => ['four' => ['five']]]],
+            data_forget($data, 'one.two.three')
+        );
+    }
+
+    public function testDataRemoveWithStar()
+    {
+        $data = [
+            'article' => [
+                'title' => 'Foo',
+                'comments' => [
+                    ['comment' => 'foo', 'name' => 'First'],
+                    ['comment' => 'bar', 'name' => 'Second'],
+                ],
+            ],
+        ];
+
+        $this->assertEquals(
+            [
+                'article' => [
+                    'title' => 'Foo',
+                    'comments' => [
+                        ['comment' => 'foo'],
+                        ['comment' => 'bar'],
+                    ],
+                ],
+            ],
+            data_forget($data, 'article.comments.*.name')
+        );
+    }
+
+    public function testDataRemoveWithDoubleStar()
+    {
+        $data = [
+            'posts' => [
+                (object) [
+                    'comments' => [
+                        (object) ['name' => 'First', 'comment' => 'foo'],
+                        (object) ['name' => 'Second', 'comment' => 'bar'],
+                    ],
+                ],
+                (object) [
+                    'comments' => [
+                        (object) ['name' => 'Third', 'comment' => 'hello'],
+                        (object) ['name' => 'Fourth', 'comment' => 'world'],
+                    ],
+                ],
+            ],
+        ];
+
+        data_forget($data, 'posts.*.comments.*.name');
+
+        $this->assertEquals([
+            'posts' => [
+                (object) [
+                    'comments' => [
+                        (object) ['comment' => 'foo'],
+                        (object) ['comment' => 'bar'],
+                    ],
+                ],
+                (object) [
+                    'comments' => [
+                        (object) ['comment' => 'hello'],
+                        (object) ['comment' => 'world'],
+                    ],
+                ],
+            ],
+        ], $data);
+    }
+
     public function testHead()
     {
         $array = ['a', 'b', 'c'];
@@ -339,30 +531,47 @@ class SupportHelpersTest extends TestCase
 
     public function testClassUsesRecursiveShouldReturnTraitsOnParentClasses()
     {
-        $this->assertSame([
-            SupportTestTraitTwo::class => SupportTestTraitTwo::class,
-            SupportTestTraitOne::class => SupportTestTraitOne::class,
-        ],
-        class_uses_recursive(SupportTestClassTwo::class));
+        $this->assertSame(
+            [
+                SupportTestTraitTwo::class => SupportTestTraitTwo::class,
+                SupportTestTraitOne::class => SupportTestTraitOne::class,
+            ],
+            class_uses_recursive(SupportTestClassTwo::class)
+        );
     }
 
     public function testClassUsesRecursiveAcceptsObject()
     {
-        $this->assertSame([
-            SupportTestTraitTwo::class => SupportTestTraitTwo::class,
-            SupportTestTraitOne::class => SupportTestTraitOne::class,
-        ],
-        class_uses_recursive(new SupportTestClassTwo));
+        $this->assertSame(
+            [
+                SupportTestTraitTwo::class => SupportTestTraitTwo::class,
+                SupportTestTraitOne::class => SupportTestTraitOne::class,
+            ],
+            class_uses_recursive(new SupportTestClassTwo)
+        );
     }
 
     public function testClassUsesRecursiveReturnParentTraitsFirst()
     {
+        $this->assertSame(
+            [
+                SupportTestTraitTwo::class => SupportTestTraitTwo::class,
+                SupportTestTraitOne::class => SupportTestTraitOne::class,
+                SupportTestTraitThree::class => SupportTestTraitThree::class,
+            ],
+            class_uses_recursive(SupportTestClassThree::class)
+        );
+    }
+
+    public function testTraitUsesRecursive()
+    {
         $this->assertSame([
-            SupportTestTraitTwo::class => SupportTestTraitTwo::class,
-            SupportTestTraitOne::class => SupportTestTraitOne::class,
-            SupportTestTraitThree::class => SupportTestTraitThree::class,
+            'Illuminate\Tests\Support\SupportTestTraitTwo' => 'Illuminate\Tests\Support\SupportTestTraitTwo',
+            'Illuminate\Tests\Support\SupportTestTraitOne' => 'Illuminate\Tests\Support\SupportTestTraitOne',
         ],
-        class_uses_recursive(SupportTestClassThree::class));
+            trait_uses_recursive(SupportTestClassOne::class));
+
+        $this->assertSame([], trait_uses_recursive(SupportTestClassTwo::class));
     }
 
     public function testStr()
@@ -377,11 +586,11 @@ class SupportHelpersTest extends TestCase
         $this->assertTrue($stringable->isEmpty());
 
         $strAccessor = str();
-        $this->assertTrue((new \ReflectionClass($strAccessor))->isAnonymous());
+        $this->assertTrue((new ReflectionClass($strAccessor))->isAnonymous());
         $this->assertSame($strAccessor->limit('string-value', 3), 'str...');
 
         $strAccessor = str();
-        $this->assertTrue((new \ReflectionClass($strAccessor))->isAnonymous());
+        $this->assertTrue((new ReflectionClass($strAccessor))->isAnonymous());
         $this->assertSame((string) $strAccessor, '');
     }
 
@@ -570,7 +779,7 @@ class SupportHelpersTest extends TestCase
 
     public function testRetry()
     {
-        $startTime = microtime(true);
+        Sleep::fake();
 
         $attempts = retry(2, function ($attempts) {
             if ($attempts > 1) {
@@ -584,12 +793,16 @@ class SupportHelpersTest extends TestCase
         $this->assertEquals(2, $attempts);
 
         // Make sure we waited 100ms for the first attempt
-        $this->assertEqualsWithDelta(0.1, microtime(true) - $startTime, 0.02);
+        Sleep::assertSleptTimes(1);
+
+        Sleep::assertSequence([
+            Sleep::usleep(100_000),
+        ]);
     }
 
     public function testRetryWithPassingSleepCallback()
     {
-        $startTime = microtime(true);
+        Sleep::fake();
 
         $attempts = retry(3, function ($attempts) {
             if ($attempts > 2) {
@@ -597,7 +810,9 @@ class SupportHelpersTest extends TestCase
             }
 
             throw new RuntimeException;
-        }, function ($attempt) {
+        }, function ($attempt, $exception) {
+            $this->assertInstanceOf(RuntimeException::class, $exception);
+
             return $attempt * 100;
         });
 
@@ -605,12 +820,17 @@ class SupportHelpersTest extends TestCase
         $this->assertEquals(3, $attempts);
 
         // Make sure we waited 300ms for the first two attempts
-        $this->assertEqualsWithDelta(0.3, microtime(true) - $startTime, 0.02);
+        Sleep::assertSleptTimes(2);
+
+        Sleep::assertSequence([
+            Sleep::usleep(100_000),
+            Sleep::usleep(200_000),
+        ]);
     }
 
     public function testRetryWithPassingWhenCallback()
     {
-        $startTime = microtime(true);
+        Sleep::fake();
 
         $attempts = retry(2, function ($attempts) {
             if ($attempts > 1) {
@@ -626,7 +846,11 @@ class SupportHelpersTest extends TestCase
         $this->assertEquals(2, $attempts);
 
         // Make sure we waited 100ms for the first attempt
-        $this->assertEqualsWithDelta(0.1, microtime(true) - $startTime, 0.02);
+        Sleep::assertSleptTimes(1);
+
+        Sleep::assertSequence([
+            Sleep::usleep(100_000),
+        ]);
     }
 
     public function testRetryWithFailingWhenCallback()
@@ -646,7 +870,8 @@ class SupportHelpersTest extends TestCase
 
     public function testRetryWithBackoff()
     {
-        $startTime = microtime(true);
+        Sleep::fake();
+
         $attempts = retry([50, 100, 200], function ($attempts) {
             if ($attempts > 3) {
                 return $attempts;
@@ -658,7 +883,13 @@ class SupportHelpersTest extends TestCase
         // Make sure we made four attempts
         $this->assertEquals(4, $attempts);
 
-        $this->assertEqualsWithDelta(0.05 + 0.1 + 0.2, microtime(true) - $startTime, 0.02);
+        Sleep::assertSleptTimes(3);
+
+        Sleep::assertSequence([
+            Sleep::usleep(50_000),
+            Sleep::usleep(100_000),
+            Sleep::usleep(200_000),
+        ]);
     }
 
     public function testTransform()
@@ -692,6 +923,15 @@ class SupportHelpersTest extends TestCase
         $this->assertEquals(10, with(5, function ($five) {
             return $five + 5;
         }));
+    }
+
+    public function testAppendConfig()
+    {
+        $this->assertSame([10000 => 'name', 10001 => 'family'], append_config([1 => 'name', 2 => 'family']));
+        $this->assertSame([10000 => 'name', 10001 => 'family'], append_config(['name', 'family']));
+
+        $array = ['name' => 'Taylor', 'family' => 'Otwell'];
+        $this->assertSame($array, append_config($array));
     }
 
     public function testEnv()
@@ -774,7 +1014,20 @@ class SupportHelpersTest extends TestCase
         $this->assertSame('From $_SERVER', env('foo'));
     }
 
-    public function providesPregReplaceArrayData()
+    public function testRequiredEnvVariableThrowsAnExceptionWhenNotFound(): void
+    {
+        $this->expectExceptionObject(new RuntimeException('[required-does-not-exist] has no value'));
+
+        Env::getOrFail('required-does-not-exist');
+    }
+
+    public function testRequiredEnvReturnsValue(): void
+    {
+        $_SERVER['required-exists'] = 'some-value';
+        $this->assertSame('some-value', Env::getOrFail('required-exists'));
+    }
+
+    public static function providesPregReplaceArrayData()
     {
         $pointerArray = ['Taylor', 'Otwell'];
 
@@ -793,9 +1046,7 @@ class SupportHelpersTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider providesPregReplaceArrayData
-     */
+    #[DataProvider('providesPregReplaceArrayData')]
     public function testPregReplaceArray($pattern, $replacements, $subject, $expectedOutput)
     {
         $this->assertSame(
@@ -877,5 +1128,13 @@ class SupportTestArrayIterable implements IteratorAggregate
     public function getIterator(): Traversable
     {
         return new ArrayIterator($this->items);
+    }
+}
+
+class SupportTestCountable implements Countable
+{
+    public function count(): int
+    {
+        return 0;
     }
 }

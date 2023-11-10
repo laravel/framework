@@ -5,8 +5,9 @@ namespace Illuminate\Tests\Support;
 use BadMethodCallException;
 use Illuminate\Bus\Queueable;
 use Illuminate\Foundation\Application;
+use Illuminate\Queue\QueueManager;
 use Illuminate\Support\Testing\Fakes\QueueFake;
-use PHPUnit\Framework\Constraint\ExceptionMessage;
+use Mockery as m;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 
@@ -29,18 +30,57 @@ class SupportTestingQueueFakeTest extends TestCase
         $this->job = new JobStub;
     }
 
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        m::close();
+    }
+
     public function testAssertPushed()
     {
         try {
             $this->fake->assertPushed(JobStub::class);
             $this->fail();
         } catch (ExpectationFailedException $e) {
-            $this->assertThat($e, new ExceptionMessage('The expected [Illuminate\Tests\Support\JobStub] job was not pushed.'));
+            $this->assertStringContainsString('The expected [Illuminate\Tests\Support\JobStub] job was not pushed.', $e->getMessage());
         }
 
         $this->fake->push($this->job);
 
         $this->fake->assertPushed(JobStub::class);
+    }
+
+    public function testItCanAssertAgainstDataWithPush()
+    {
+        $data = null;
+        $this->fake->push(JobStub::class, ['foo' => 'bar'], 'redis');
+
+        $this->fake->assertPushed(JobStub::class, function ($job, $queue, $jobData) use (&$data) {
+            $data = $jobData;
+
+            return true;
+        });
+
+        $this->assertSame(['foo' => 'bar'], $data);
+    }
+
+    public function testAssertPushedWithIgnore()
+    {
+        $job = new JobStub;
+
+        $manager = m::mock(QueueManager::class);
+        $manager->shouldReceive('push')->once()->withArgs(function ($passedJob) use ($job) {
+            return $passedJob === $job;
+        });
+
+        $fake = new QueueFake(new Application, JobToFakeStub::class, $manager);
+
+        $fake->push($job);
+        $fake->push(new JobToFakeStub());
+
+        $fake->assertNotPushed(JobStub::class);
+        $fake->assertPushed(JobToFakeStub::class);
     }
 
     public function testAssertPushedWithClosure()
@@ -69,7 +109,7 @@ class SupportTestingQueueFakeTest extends TestCase
             $this->fake->assertNotPushed(JobStub::class);
             $this->fail();
         } catch (ExpectationFailedException $e) {
-            $this->assertThat($e, new ExceptionMessage('The unexpected [Illuminate\Tests\Support\JobStub] job was pushed.'));
+            $this->assertStringContainsString('The unexpected [Illuminate\Tests\Support\JobStub] job was pushed.', $e->getMessage());
         }
     }
 
@@ -85,7 +125,7 @@ class SupportTestingQueueFakeTest extends TestCase
             });
             $this->fail();
         } catch (ExpectationFailedException $e) {
-            $this->assertThat($e, new ExceptionMessage('The unexpected [Illuminate\Tests\Support\JobStub] job was pushed.'));
+            $this->assertStringContainsString('The unexpected [Illuminate\Tests\Support\JobStub] job was pushed.', $e->getMessage());
         }
     }
 
@@ -97,7 +137,7 @@ class SupportTestingQueueFakeTest extends TestCase
             $this->fake->assertPushedOn('bar', JobStub::class);
             $this->fail();
         } catch (ExpectationFailedException $e) {
-            $this->assertThat($e, new ExceptionMessage('The expected [Illuminate\Tests\Support\JobStub] job was not pushed.'));
+            $this->assertStringContainsString('The expected [Illuminate\Tests\Support\JobStub] job was not pushed.', $e->getMessage());
         }
 
         $this->fake->assertPushedOn('foo', JobStub::class);
@@ -113,7 +153,7 @@ class SupportTestingQueueFakeTest extends TestCase
             });
             $this->fail();
         } catch (ExpectationFailedException $e) {
-            $this->assertThat($e, new ExceptionMessage('The expected [Illuminate\Tests\Support\JobStub] job was not pushed.'));
+            $this->assertStringContainsString('The expected [Illuminate\Tests\Support\JobStub] job was not pushed.', $e->getMessage());
         }
 
         $this->fake->assertPushedOn('foo', function (JobStub $job) {
@@ -130,7 +170,7 @@ class SupportTestingQueueFakeTest extends TestCase
             $this->fake->assertPushed(JobStub::class, 1);
             $this->fail();
         } catch (ExpectationFailedException $e) {
-            $this->assertThat($e, new ExceptionMessage('The expected [Illuminate\Tests\Support\JobStub] job was pushed 2 times instead of 1 times.'));
+            $this->assertStringContainsString('The expected [Illuminate\Tests\Support\JobStub] job was pushed 2 times instead of 1 times.', $e->getMessage());
         }
 
         $this->fake->assertPushed(JobStub::class, 2);
@@ -146,7 +186,7 @@ class SupportTestingQueueFakeTest extends TestCase
             $this->fake->assertNothingPushed();
             $this->fail();
         } catch (ExpectationFailedException $e) {
-            $this->assertThat($e, new ExceptionMessage('Jobs were pushed unexpectedly.'));
+            $this->assertStringContainsString('Jobs were pushed unexpectedly.', $e->getMessage());
         }
     }
 
@@ -232,7 +272,7 @@ class SupportTestingQueueFakeTest extends TestCase
             });
             $this->fail();
         } catch (ExpectationFailedException $e) {
-            $this->assertThat($e, new ExceptionMessage('The expected chain was not pushed'));
+            $this->assertStringContainsString('The expected chain was not pushed.', $e->getMessage());
         }
     }
 
@@ -242,7 +282,7 @@ class SupportTestingQueueFakeTest extends TestCase
             $this->fake->assertPushedWithChain(JobWithChainStub::class, []);
             $this->fail();
         } catch (ExpectationFailedException $e) {
-            $this->assertThat($e, new ExceptionMessage('The expected [Illuminate\Tests\Support\JobWithChainStub] job was not pushed'));
+            $this->assertStringContainsString('The expected [Illuminate\Tests\Support\JobWithChainStub] job was not pushed.', $e->getMessage());
         }
 
         $this->fake->push(new JobWithChainStub([
@@ -253,7 +293,7 @@ class SupportTestingQueueFakeTest extends TestCase
             $this->fake->assertPushedWithChain(JobWithChainStub::class, []);
             $this->fail();
         } catch (ExpectationFailedException $e) {
-            $this->assertThat($e, new ExceptionMessage('The expected chain can not be empty'));
+            $this->assertStringContainsString('The expected chain can not be empty.', $e->getMessage());
         }
 
         try {
@@ -263,7 +303,7 @@ class SupportTestingQueueFakeTest extends TestCase
             ]);
             $this->fail();
         } catch (ExpectationFailedException $e) {
-            $this->assertThat($e, new ExceptionMessage('The expected chain was not pushed'));
+            $this->assertStringContainsString('The expected chain was not pushed.', $e->getMessage());
         }
 
         try {
@@ -273,7 +313,7 @@ class SupportTestingQueueFakeTest extends TestCase
             ]);
             $this->fail();
         } catch (ExpectationFailedException $e) {
-            $this->assertThat($e, new ExceptionMessage('The expected chain was not pushed'));
+            $this->assertStringContainsString('The expected chain was not pushed.', $e->getMessage());
         }
     }
 
@@ -282,14 +322,100 @@ class SupportTestingQueueFakeTest extends TestCase
         try {
             $this->fake->undefinedMethod();
         } catch (BadMethodCallException $e) {
-            $this->assertThat($e, new ExceptionMessage(sprintf(
+            $this->assertSame(sprintf(
                 'Call to undefined method %s::%s()', get_class($this->fake), 'undefinedMethod'
-            )));
+            ), $e->getMessage());
         }
+    }
+
+    public function testAssertClosurePushed()
+    {
+        $this->fake->push(function () {
+            // Do nothing
+        });
+
+        $this->fake->assertClosurePushed();
+    }
+
+    public function testAssertClosurePushedWithTimes()
+    {
+        $this->fake->push(function () {
+            // Do nothing
+        });
+
+        $this->fake->push(function () {
+            // Do nothing
+        });
+
+        $this->fake->assertClosurePushed(2);
+    }
+
+    public function testAssertClosureNotPushed()
+    {
+        $this->fake->push($this->job);
+
+        $this->fake->assertClosureNotPushed();
+    }
+
+    public function testItDoesntFakeJobsPassedViaExcept()
+    {
+        $job = new JobStub;
+
+        $manager = m::mock(QueueManager::class);
+        $manager->shouldReceive('push')->once()->withArgs(function ($passedJob) use ($job) {
+            return $passedJob === $job;
+        });
+
+        $fake = (new QueueFake(new Application, [], $manager))->except(JobStub::class);
+
+        $fake->push($job);
+        $fake->push(new JobToFakeStub());
+
+        $fake->assertNotPushed(JobStub::class);
+        $fake->assertPushed(JobToFakeStub::class);
+    }
+
+    public function testItCanSerializeAndRestoreJobs()
+    {
+        // confirm that the default behavior is maintained
+        $this->fake->push(new JobWithSerialization('hello'));
+        $this->fake->assertPushed(JobWithSerialization::class, fn ($job) => $job->value === 'hello');
+
+        $job = new JobWithSerialization('hello');
+
+        $fake = new QueueFake(new Application);
+        $fake->serializeAndRestore();
+        $fake->push($job);
+
+        $fake->assertPushed(
+            JobWithSerialization::class,
+            fn ($job) => $job->value === 'hello-serialized-unserialized'
+        );
+    }
+
+    public function testItCanFakePushedJobsWithClassAndPayload()
+    {
+        $fake = new QueueFake(new Application, ['JobStub']);
+
+        $this->assertTrue($fake->shouldFakeJob('JobStub'));
+
+        $fake->push('JobStub', ['job' => 'payload']);
+
+        $fake->assertPushed('JobStub');
+        $fake->assertPushed('JobStub', 1);
+        $fake->assertPushed('JobStub', fn ($job, $queue, $payload) => $payload === ['job' => 'payload']);
     }
 }
 
 class JobStub
+{
+    public function handle()
+    {
+        //
+    }
+}
+
+class JobToFakeStub
 {
     public function handle()
     {
@@ -327,5 +453,24 @@ class JobWithChainAndParameterStub
     public function handle()
     {
         //
+    }
+}
+
+class JobWithSerialization
+{
+    use Queueable;
+
+    public function __construct(public $value)
+    {
+    }
+
+    public function __serialize(): array
+    {
+        return ['value' => $this->value.'-serialized'];
+    }
+
+    public function __unserialize(array $data): void
+    {
+        $this->value = $data['value'].'-unserialized';
     }
 }

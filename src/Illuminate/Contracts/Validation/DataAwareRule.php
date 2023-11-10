@@ -10,5 +10,5 @@ interface DataAwareRule
      * @param  array  $data
      * @return $this
      */
-    public function setData($data);
+    public function setData(array $data);
 }

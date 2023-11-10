@@ -31,11 +31,11 @@ class RedirectController extends Controller
 
         $parameters = $parameters->only(
             $route->getCompiled()->getPathVariables()
-        )->toArray();
+        )->all();
 
         $url = $url->toRoute($route, $parameters, false);
 
-        if (! Str::startsWith($destination, '/') && Str::startsWith($url, '/')) {
+        if (! str_starts_with($destination, '/') && str_starts_with($url, '/')) {
             $url = Str::after($url, '/');
         }
 

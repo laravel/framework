@@ -4,7 +4,9 @@ namespace Illuminate\Cache\Console;
 
 use Illuminate\Cache\CacheManager;
 use Illuminate\Console\Command;
+use Symfony\Component\Console\Attribute\AsCommand;
 
+#[AsCommand(name: 'cache:forget')]
 class ForgetCommand extends Command
 {
     /**
@@ -13,15 +15,6 @@ class ForgetCommand extends Command
      * @var string
      */
     protected $signature = 'cache:forget {key : The key to remove} {store? : The store to remove the key from}';
-
-    /**
-     * The name of the console command.
-     *
-     * This name is used to identify the command during lazy loading.
-     *
-     * @var string|null
-     */
-    protected static $defaultName = 'cache:forget';
 
     /**
      * The console command description.
@@ -61,6 +54,6 @@ class ForgetCommand extends Command
             $this->argument('key')
         );
 
-        $this->info('The ['.$this->argument('key').'] key has been removed from the cache.');
+        $this->components->info('The ['.$this->argument('key').'] key has been removed from the cache.');
     }
 }

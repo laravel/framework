@@ -65,7 +65,7 @@ class AblyBroadcaster extends Broadcaster
      */
     public function validAuthenticationResponse($request, $result)
     {
-        if (Str::startsWith($request->channel_name, 'private')) {
+        if (str_starts_with($request->channel_name, 'private')) {
             $signature = $this->generateAblySignature(
                 $request->channel_name, $request->socket_id
             );
@@ -174,7 +174,7 @@ class AblyBroadcaster extends Broadcaster
     public function normalizeChannelName($channel)
     {
         if ($this->isGuardedChannel($channel)) {
-            return Str::startsWith($channel, 'private-')
+            return str_starts_with($channel, 'private-')
                         ? Str::replaceFirst('private-', '', $channel)
                         : Str::replaceFirst('presence-', '', $channel);
         }
@@ -194,7 +194,7 @@ class AblyBroadcaster extends Broadcaster
             $channel = (string) $channel;
 
             if (Str::startsWith($channel, ['private-', 'presence-'])) {
-                return Str::startsWith($channel, 'private-')
+                return str_starts_with($channel, 'private-')
                     ? Str::replaceFirst('private-', 'private:', $channel)
                     : Str::replaceFirst('presence-', 'presence:', $channel);
             }
@@ -206,7 +206,7 @@ class AblyBroadcaster extends Broadcaster
     /**
      * Get the public token value from the Ably key.
      *
-     * @return mixed
+     * @return string
      */
     protected function getPublicToken()
     {
@@ -216,7 +216,7 @@ class AblyBroadcaster extends Broadcaster
     /**
      * Get the private token value from the Ably key.
      *
-     * @return mixed
+     * @return string
      */
     protected function getPrivateToken()
     {

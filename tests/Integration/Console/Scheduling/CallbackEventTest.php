@@ -64,7 +64,7 @@ class CallbackEventTest extends TestCase
 
         try {
             $event->run($this->app);
-        } catch (Exception $e) {
+        } catch (Exception) {
         }
 
         $this->assertFalse($success);

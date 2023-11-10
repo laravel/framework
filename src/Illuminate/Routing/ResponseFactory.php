@@ -6,10 +6,12 @@ use Illuminate\Contracts\Routing\ResponseFactory as FactoryContract;
 use Illuminate\Contracts\View\Factory as ViewFactory;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
+use Illuminate\Routing\Exceptions\StreamedResponseException;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use Throwable;
 
 class ResponseFactory implements FactoryContract
 {
@@ -117,7 +119,7 @@ class ResponseFactory implements FactoryContract
     /**
      * Create a new streamed response instance.
      *
-     * @param  \Closure  $callback
+     * @param  callable  $callback
      * @param  int  $status
      * @param  array  $headers
      * @return \Symfony\Component\HttpFoundation\StreamedResponse
@@ -130,7 +132,7 @@ class ResponseFactory implements FactoryContract
     /**
      * Create a new streamed response instance as a file download.
      *
-     * @param  \Closure  $callback
+     * @param  callable  $callback
      * @param  string|null  $name
      * @param  array  $headers
      * @param  string|null  $disposition
@@ -138,7 +140,15 @@ class ResponseFactory implements FactoryContract
      */
     public function streamDownload($callback, $name = null, array $headers = [], $disposition = 'attachment')
     {
-        $response = new StreamedResponse($callback, 200, $headers);
+        $withWrappedException = function () use ($callback) {
+            try {
+                $callback();
+            } catch (Throwable $e) {
+                throw new StreamedResponseException($e);
+            }
+        };
+
+        $response = new StreamedResponse($withWrappedException, 200, $headers);
 
         if (! is_null($name)) {
             $response->headers->set('Content-Disposition', $response->headers->makeDisposition(
@@ -225,7 +235,7 @@ class ResponseFactory implements FactoryContract
     /**
      * Create a new redirect response to a controller action.
      *
-     * @param  string  $action
+     * @param  array|string  $action
      * @param  mixed  $parameters
      * @param  int  $status
      * @param  array  $headers

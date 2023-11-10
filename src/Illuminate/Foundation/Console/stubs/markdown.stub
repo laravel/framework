@@ -1,12 +1,12 @@
-@component('mail::message')
+<x-mail::message>
 # Introduction
 
 The body of your message.
 
-@component('mail::button', ['url' => ''])
+<x-mail::button :url="''">
 Button Text
-@endcomponent
+</x-mail::button>
 
 Thanks,<br>
 {{ config('app.name') }}
-@endcomponent
+</x-mail::message>

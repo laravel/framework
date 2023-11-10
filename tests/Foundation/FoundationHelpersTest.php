@@ -94,7 +94,7 @@ class FoundationHelpersTest extends TestCase
     public function testMixMissingManifestThrowsException()
     {
         $this->expectException(Exception::class);
-        $this->expectExceptionMessage('The Mix manifest does not exist.');
+        $this->expectExceptionMessage('Mix manifest not found');
 
         mix('unversioned.css', 'missing');
     }
@@ -204,9 +204,7 @@ class FoundationHelpersTest extends TestCase
 
     protected function makeHotModuleReloadFile($url, $directory = '')
     {
-        app()->singleton('path.public', function () {
-            return __DIR__;
-        });
+        app()->usePublicPath(__DIR__);
 
         $path = public_path(Str::finish($directory, '/').'hot');
 
@@ -219,9 +217,7 @@ class FoundationHelpersTest extends TestCase
 
     protected function makeManifest($directory = '')
     {
-        app()->singleton('path.public', function () {
-            return __DIR__;
-        });
+        app()->usePublicPath(__DIR__);
 
         $path = public_path(Str::finish($directory, '/').'mix-manifest.json');
 

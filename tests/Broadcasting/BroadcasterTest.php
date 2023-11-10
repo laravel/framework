@@ -9,6 +9,7 @@ use Illuminate\Contracts\Routing\BindingRegistrar;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Mockery as m;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
@@ -284,15 +285,43 @@ class BroadcasterTest extends TestCase
         $this->broadcaster->retrieveUser($request, 'somechannel');
     }
 
-    /**
-     * @dataProvider channelNameMatchPatternProvider
-     */
+    public function testUserAuthenticationWithValidUser()
+    {
+        $this->broadcaster->resolveAuthenticatedUserUsing(function ($request) {
+            return ['id' => '12345', 'socket' => $request->socket_id];
+        });
+
+        $user = $this->broadcaster->resolveAuthenticatedUser(new Request(['socket_id' => '1234.1234']));
+
+        $this->assertSame([
+            'id' => '12345',
+            'socket' => '1234.1234',
+        ], $user);
+    }
+
+    public function testUserAuthenticationWithInvalidUser()
+    {
+        $this->broadcaster->resolveAuthenticatedUserUsing(function ($request) {
+            return null;
+        });
+
+        $user = $this->broadcaster->resolveAuthenticatedUser(new Request(['socket_id' => '1234.1234']));
+
+        $this->assertNull($user);
+    }
+
+    public function testUserAuthenticationWithoutResolve()
+    {
+        $this->assertNull($this->broadcaster->resolveAuthenticatedUser(new Request(['socket_id' => '1234.1234'])));
+    }
+
+    #[DataProvider('channelNameMatchPatternProvider')]
     public function testChannelNameMatchPattern($channel, $pattern, $shouldMatch)
     {
         $this->assertEquals($shouldMatch, $this->broadcaster->channelNameMatchesPattern($channel, $pattern));
     }
 
-    public function channelNameMatchPatternProvider()
+    public static function channelNameMatchPatternProvider()
     {
         return [
             ['something', 'something', true],
@@ -300,12 +329,14 @@ class BroadcasterTest extends TestCase
             ['something.23.test', 'something.{id}.test', true],
             ['something.23.test.42', 'something.{id}.test.{id2}', true],
             ['something-23:test-42', 'something-{id}:test-{id2}', true],
-            ['something..test.42', 'something.{id}.test.{id2}', true],
+            ['something..test.42', 'something.{id}.test.{id2}', false],
             ['23:string:test', '{id}:string:{text}', true],
             ['something.23', 'something', false],
             ['something.23.test.42', 'something.test.{id}', false],
             ['something-23-test-42', 'something-{id}-test', false],
             ['23:test', '{id}:test:abcd', false],
+            ['customer.order.1', 'order.{id}', false],
+            ['customerorder.1', 'order.{id}', false],
         ];
     }
 }

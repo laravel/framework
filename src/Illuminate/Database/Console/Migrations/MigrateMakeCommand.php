@@ -2,11 +2,12 @@
 
 namespace Illuminate\Database\Console\Migrations;
 
+use Illuminate\Contracts\Console\PromptsForMissingInput;
 use Illuminate\Database\Migrations\MigrationCreator;
 use Illuminate\Support\Composer;
 use Illuminate\Support\Str;
 
-class MigrateMakeCommand extends BaseCommand
+class MigrateMakeCommand extends BaseCommand implements PromptsForMissingInput
 {
     /**
      * The console command signature.
@@ -18,7 +19,7 @@ class MigrateMakeCommand extends BaseCommand
         {--table= : The table to migrate}
         {--path= : The location where the migration file should be created}
         {--realpath : Indicate any provided migration file paths are pre-resolved absolute paths}
-        {--fullpath : Output the full path of the migration}';
+        {--fullpath : Output the full path of the migration (Deprecated)}';
 
     /**
      * The console command description.
@@ -38,6 +39,8 @@ class MigrateMakeCommand extends BaseCommand
      * The Composer instance.
      *
      * @var \Illuminate\Support\Composer
+     *
+     * @deprecated Will be removed in a future Laravel version.
      */
     protected $composer;
 
@@ -92,8 +95,6 @@ class MigrateMakeCommand extends BaseCommand
         // the migration out, we will dump-autoload for the entire framework to
         // make sure that the migrations are registered by the class loaders.
         $this->writeMigration($name, $table, $create);
-
-        $this->composer->dumpAutoloads();
     }
 
     /**
@@ -102,7 +103,7 @@ class MigrateMakeCommand extends BaseCommand
      * @param  string  $name
      * @param  string  $table
      * @param  bool  $create
-     * @return string
+     * @return void
      */
     protected function writeMigration($name, $table, $create)
     {
@@ -110,11 +111,7 @@ class MigrateMakeCommand extends BaseCommand
             $name, $this->getMigrationPath(), $table, $create
         );
 
-        if (! $this->option('fullpath')) {
-            $file = pathinfo($file, PATHINFO_FILENAME);
-        }
-
-        $this->line("<info>Created Migration:</info> {$file}");
+        $this->components->info(sprintf('Migration [%s] created successfully.', $file));
     }
 
     /**
@@ -131,5 +128,17 @@ class MigrateMakeCommand extends BaseCommand
         }
 
         return parent::getMigrationPath();
+    }
+
+    /**
+     * Prompt for missing input arguments using the returned questions.
+     *
+     * @return array
+     */
+    protected function promptForMissingArgumentsUsing()
+    {
+        return [
+            'name' => ['What should the migration be named?', 'E.g. create_flights_table'],
+        ];
     }
 }

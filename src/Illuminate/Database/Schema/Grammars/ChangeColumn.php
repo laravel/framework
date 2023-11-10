@@ -3,7 +3,6 @@
 namespace Illuminate\Database\Schema\Grammars;
 
 use Doctrine\DBAL\Schema\AbstractSchemaManager as SchemaManager;
-use Doctrine\DBAL\Schema\Comparator;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\Type;
 use Illuminate\Database\Connection;
@@ -34,14 +33,14 @@ class ChangeColumn
         }
 
         $schema = $connection->getDoctrineSchemaManager();
-        $databasePlatform = $schema->getDatabasePlatform();
+        $databasePlatform = $connection->getDoctrineConnection()->getDatabasePlatform();
         $databasePlatform->registerDoctrineTypeMapping('enum', 'string');
 
         $tableDiff = static::getChangedDiff(
             $grammar, $blueprint, $schema
         );
 
-        if ($tableDiff !== false) {
+        if (! $tableDiff->isEmpty()) {
             return (array) $databasePlatform->getAlterTableSQL($tableDiff);
         }
 
@@ -54,13 +53,13 @@ class ChangeColumn
      * @param  \Illuminate\Database\Schema\Grammars\Grammar  $grammar
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Doctrine\DBAL\Schema\AbstractSchemaManager  $schema
-     * @return \Doctrine\DBAL\Schema\TableDiff|bool
+     * @return \Doctrine\DBAL\Schema\TableDiff
      */
     protected static function getChangedDiff($grammar, Blueprint $blueprint, SchemaManager $schema)
     {
-        $current = $schema->listTableDetails($grammar->getTablePrefix().$blueprint->getTable());
+        $current = $schema->introspectTable($grammar->getTablePrefix().$blueprint->getTable());
 
-        return (new Comparator)->diffTable(
+        return $schema->createComparator()->compareTables(
             $current, static::getTableWithColumnChanges($blueprint, $current)
         );
     }
@@ -89,7 +88,7 @@ class ChangeColumn
                         continue;
                     }
 
-                    $column->setCustomSchemaOption($option, static::mapFluentValueToDoctrine($option, $value));
+                    $column->setPlatformOption($option, static::mapFluentValueToDoctrine($option, $value));
                 }
             }
         }
@@ -106,7 +105,7 @@ class ChangeColumn
      */
     protected static function getDoctrineColumn(Table $table, Fluent $fluent)
     {
-        return $table->changeColumn(
+        return $table->modifyColumn(
             $fluent['name'], static::getDoctrineColumnChangeOptions($fluent)
         )->getColumn($fluent['name']);
     }
@@ -119,14 +118,22 @@ class ChangeColumn
      */
     protected static function getDoctrineColumnChangeOptions(Fluent $fluent)
     {
-        $options = ['type' => static::getDoctrineColumnType($fluent['type'])];
+        $options = ['Type' => static::getDoctrineColumnType($fluent['type'])];
 
-        if (in_array($fluent['type'], ['text', 'mediumText', 'longText'])) {
-            $options['length'] = static::calculateDoctrineTextLength($fluent['type']);
+        if (! in_array($fluent['type'], ['smallint', 'integer', 'bigint'])) {
+            $options['Autoincrement'] = false;
+        }
+
+        if (in_array($fluent['type'], ['tinyText', 'text', 'mediumText', 'longText'])) {
+            $options['Length'] = static::calculateDoctrineTextLength($fluent['type']);
+        }
+
+        if ($fluent['type'] === 'char') {
+            $options['Fixed'] = true;
         }
 
         if (static::doesntNeedCharacterOptions($fluent['type'])) {
-            $options['customSchemaOptions'] = [
+            $options['PlatformOptions'] = [
                 'collation' => '',
                 'charset' => '',
             ];
@@ -148,9 +155,11 @@ class ChangeColumn
         return Type::getType(match ($type) {
             'biginteger' => 'bigint',
             'smallinteger' => 'smallint',
-            'mediumtext', 'longtext' => 'text',
+            'tinytext', 'mediumtext', 'longtext' => 'text',
             'binary' => 'blob',
             'uuid' => 'guid',
+            'char' => 'string',
+            'double' => 'float',
             default => $type,
         });
     }
@@ -164,6 +173,7 @@ class ChangeColumn
     protected static function calculateDoctrineTextLength($type)
     {
         return match ($type) {
+            'tinyText' => 1,
             'mediumText' => 65535 + 1,
             'longText' => 16777215 + 1,
             default => 255 + 1,
@@ -192,6 +202,7 @@ class ChangeColumn
             'mediumInteger',
             'smallInteger',
             'time',
+            'timestamp',
             'tinyInteger',
         ]);
     }

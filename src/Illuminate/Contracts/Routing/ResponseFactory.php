@@ -60,7 +60,7 @@ interface ResponseFactory
     /**
      * Create a new streamed response instance.
      *
-     * @param  \Closure  $callback
+     * @param  callable  $callback
      * @param  int  $status
      * @param  array  $headers
      * @return \Symfony\Component\HttpFoundation\StreamedResponse
@@ -70,7 +70,7 @@ interface ResponseFactory
     /**
      * Create a new streamed response instance as a file download.
      *
-     * @param  \Closure  $callback
+     * @param  callable  $callback
      * @param  string|null  $name
      * @param  array  $headers
      * @param  string|null  $disposition
@@ -123,7 +123,7 @@ interface ResponseFactory
     /**
      * Create a new redirect response to a controller action.
      *
-     * @param  string  $action
+     * @param  array|string  $action
      * @param  mixed  $parameters
      * @param  int  $status
      * @param  array  $headers

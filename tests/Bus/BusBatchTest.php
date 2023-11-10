@@ -15,9 +15,11 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\PostgresConnection;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\CallQueuedClosure;
 use Mockery as m;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 use stdClass;
@@ -115,6 +117,47 @@ class BusBatchTest extends TestCase
         $this->assertEquals(3, $batch->pendingJobs);
         $this->assertIsString($job->batchId);
         $this->assertInstanceOf(CarbonImmutable::class, $batch->createdAt);
+    }
+
+    public function test_jobs_can_be_added_to_pending_batch()
+    {
+        $batch = new PendingBatch(new Container, collect());
+        $this->assertCount(0, $batch->jobs);
+
+        $job = new class
+        {
+            use Batchable;
+        };
+        $batch->add([$job]);
+        $this->assertCount(1, $batch->jobs);
+
+        $secondJob = new class
+        {
+            use Batchable;
+
+            public $anotherProperty;
+        };
+        $batch->add($secondJob);
+        $this->assertCount(2, $batch->jobs);
+    }
+
+    public function test_jobs_can_be_added_to_the_pending_batch_from_iterable()
+    {
+        $batch = new PendingBatch(new Container, collect());
+        $this->assertCount(0, $batch->jobs);
+
+        $count = 3;
+        $generator = function (int $jobsCount) {
+            for ($i = 0; $i < $jobsCount; $i++) {
+                yield new class
+                {
+                    use Batchable;
+                };
+            }
+        };
+
+        $batch->add($generator($count));
+        $this->assertCount($count, $batch->jobs);
     }
 
     public function test_processed_jobs_can_be_calculated()
@@ -352,9 +395,11 @@ class BusBatchTest extends TestCase
             ->onQueue('test-queue');
 
         $connection = m::spy(PostgresConnection::class);
+        $builder = m::spy(Builder::class);
 
-        $connection->shouldReceive('table')->andReturnSelf()
-            ->shouldReceive('where')->andReturnSelf();
+        $connection->shouldReceive('table')->andReturn($builder);
+        $builder->shouldReceive('useWritePdo')->andReturnSelf();
+        $builder->shouldReceive('where')->andReturnSelf();
 
         $repository = new DatabaseBatchRepository(
             new BatchFactory(m::mock(Factory::class)), $connection, 'job_batches'
@@ -362,22 +407,22 @@ class BusBatchTest extends TestCase
 
         $repository->store($pendingBatch);
 
-        $connection->shouldHaveReceived('insert')
+        $builder->shouldHaveReceived('insert')
             ->withArgs(function ($argument) use ($pendingBatch) {
                 return unserialize(base64_decode($argument['options'])) === $pendingBatch->options;
             });
+
+        $builder->shouldHaveReceived('first');
     }
 
-    /**
-     * @dataProvider serializedOptions
-     */
+    #[DataProvider('serializedOptions')]
     public function test_options_unserialize_on_postgres($serialize, $options)
     {
         $factory = m::mock(BatchFactory::class);
 
         $connection = m::spy(PostgresConnection::class);
 
-        $connection->shouldReceive('table->where->first')
+        $connection->shouldReceive('table->useWritePdo->where->first')
             ->andReturn($m = (object) [
                 'id' => '',
                 'name' => '',
@@ -402,7 +447,7 @@ class BusBatchTest extends TestCase
     /**
      * @return array
      */
-    public function serializedOptions()
+    public static function serializedOptions()
     {
         $options = [1, 2];
 

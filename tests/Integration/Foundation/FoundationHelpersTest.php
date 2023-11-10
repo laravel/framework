@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Integration\Foundation;
 
 use Exception;
+use Illuminate\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
@@ -115,11 +116,44 @@ class FoundationHelpersTest extends TestCase
         unlink($manifest);
     }
 
+    public function testFakeReturnsSameInstance()
+    {
+        app()->instance('config', new ConfigRepository([]));
+
+        $this->assertSame(fake(), fake());
+        $this->assertSame(fake(), fake('en_US'));
+        $this->assertSame(fake('en_AU'), fake('en_AU'));
+        $this->assertNotSame(fake('en_US'), fake('en_AU'));
+
+        app()->flush();
+    }
+
+    public function testFakeUsesLocale()
+    {
+        mt_srand(12345, MT_RAND_PHP);
+        app()->instance('config', new ConfigRepository([]));
+
+        // Should fallback to en_US
+        $this->assertSame('Arkansas', fake()->state());
+        $this->assertContains(fake('de_DE')->state(), [
+            'Baden-Württemberg', 'Bayern', 'Berlin', 'Brandenburg', 'Bremen', 'Hamburg', 'Hessen', 'Mecklenburg-Vorpommern', 'Niedersachsen', 'Nordrhein-Westfalen', 'Rheinland-Pfalz', 'Saarland', 'Sachsen', 'Sachsen-Anhalt', 'Schleswig-Holstein', 'Thüringen',
+        ]);
+        $this->assertContains(fake('fr_FR')->region(), [
+            'Auvergne-Rhône-Alpes', 'Bourgogne-Franche-Comté', 'Bretagne', 'Centre-Val de Loire', 'Corse', 'Grand Est', 'Hauts-de-France',
+            'Île-de-France', 'Normandie', 'Nouvelle-Aquitaine', 'Occitanie', 'Pays de la Loire', "Provence-Alpes-Côte d'Azur",
+            'Guadeloupe', 'Martinique', 'Guyane', 'La Réunion', 'Mayotte',
+        ]);
+
+        app()->instance('config', new ConfigRepository(['app' => ['faker_locale' => 'en_AU']]));
+        mt_srand(4, MT_RAND_PHP);
+
+        // Should fallback to en_US
+        $this->assertSame('Australian Capital Territory', fake()->state());
+    }
+
     protected function makeManifest($directory = '')
     {
-        $this->app->singleton('path.public', function () {
-            return __DIR__;
-        });
+        app()->usePublicPath(__DIR__);
 
         $path = public_path(Str::finish($directory, '/').'mix-manifest.json');
 

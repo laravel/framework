@@ -23,6 +23,14 @@ class ContainerResolveNonInstantiableTest extends TestCase
         $this->assertCount(0, $parent->child->objects);
         $this->assertSame(42, $parent->i);
     }
+
+    public function testResolveVariadicPrimitive()
+    {
+        $container = new Container;
+        $parent = $container->make(VariadicPrimitive::class);
+
+        $this->assertSame($parent->params, []);
+    }
 }
 
 interface TestInterface
@@ -71,5 +79,18 @@ class ChildClass
     public function __construct(TestInterface ...$objects)
     {
         $this->objects = $objects;
+    }
+}
+
+class VariadicPrimitive
+{
+    /**
+     * @var array
+     */
+    public $params;
+
+    public function __construct(...$params)
+    {
+        $this->params = $params;
     }
 }

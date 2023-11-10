@@ -23,7 +23,7 @@ class RedisBroadcaster extends Broadcaster
     /**
      * The Redis connection to use for broadcasting.
      *
-     * @var ?string
+     * @var string|null
      */
     protected $connection = null;
 

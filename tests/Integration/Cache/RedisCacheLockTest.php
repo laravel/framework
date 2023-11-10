@@ -4,7 +4,6 @@ namespace Illuminate\Tests\Integration\Cache;
 
 use Exception;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Orchestra\Testbench\TestCase;
 
@@ -50,8 +49,6 @@ class RedisCacheLockTest extends TestCase
 
     public function testRedisLocksCanBlockForSeconds()
     {
-        Carbon::setTestNow();
-
         Cache::store('redis')->lock('foo')->forceRelease();
         $this->assertSame('taylor', Cache::store('redis')->lock('foo', 10)->block(1, function () {
             return 'taylor';
@@ -87,7 +84,7 @@ class RedisCacheLockTest extends TestCase
             $firstLock->block(1, function () {
                 throw new Exception('failed');
             });
-        } catch (Exception $e) {
+        } catch (Exception) {
             // Not testing the exception, just testing the lock
             // is released regardless of the how the exception
             // thrown by the callback was handled.

@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Broadcasting;
 
+use Ably\AblyRest;
 use Illuminate\Broadcasting\Broadcasters\AblyBroadcaster;
 use Illuminate\Http\Request;
 use Mockery as m;
@@ -21,10 +22,16 @@ class AblyBroadcasterTest extends TestCase
     {
         parent::setUp();
 
-        $this->ably = m::mock('Ably\AblyRest');
-        $this->ably->options = (object) ['key' => 'abcd:efgh'];
+        $this->ably = m::mock(AblyRest::class, ['abcd:efgh']);
 
         $this->broadcaster = m::mock(AblyBroadcaster::class, [$this->ably])->makePartial();
+    }
+
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        m::close();
     }
 
     public function testAuthCallValidAuthenticationResponseWithPrivateChannelWhenCallbackReturnTrue()
@@ -115,8 +122,7 @@ class AblyBroadcasterTest extends TestCase
     protected function getMockRequestWithUserForChannel($channel)
     {
         $request = m::mock(Request::class);
-        $request->channel_name = $channel;
-        $request->socket_id = 'abcd.1234';
+        $request->shouldReceive('all')->andReturn(['channel_name' => $channel, 'socket_id' => 'abcd.1234']);
 
         $request->shouldReceive('input')
                 ->with('callback', false)
@@ -141,7 +147,7 @@ class AblyBroadcasterTest extends TestCase
     protected function getMockRequestWithoutUserForChannel($channel)
     {
         $request = m::mock(Request::class);
-        $request->channel_name = $channel;
+        $request->shouldReceive('all')->andReturn(['channel_name' => $channel]);
 
         $request->shouldReceive('user')
                 ->andReturn(null);

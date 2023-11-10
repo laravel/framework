@@ -7,6 +7,7 @@ use DateTimeInterface;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Encryption\Encrypter;
 use Illuminate\Contracts\Queue\ShouldBeEncrypted;
+use Illuminate\Contracts\Queue\ShouldQueueAfterCommit;
 use Illuminate\Queue\Events\JobQueued;
 use Illuminate\Support\Arr;
 use Illuminate\Support\InteractsWithTime;
@@ -33,7 +34,7 @@ abstract class Queue
     /**
      * Indicates that jobs should be dispatched after all database transactions have committed.
      *
-     * @return $this
+     * @var bool
      */
     protected $dispatchAfterCommit;
 
@@ -58,7 +59,7 @@ abstract class Queue
     }
 
     /**
-     * Push a new job onto the queue after a delay.
+     * Push a new job onto a specific queue after (n) seconds.
      *
      * @param  string  $queue
      * @param  \DateTimeInterface|\DateInterval|int  $delay
@@ -102,11 +103,11 @@ abstract class Queue
             $job = CallQueuedClosure::create($job);
         }
 
-        $payload = json_encode($this->createPayloadArray($job, $queue, $data));
+        $payload = json_encode($value = $this->createPayloadArray($job, $queue, $data), \JSON_UNESCAPED_UNICODE);
 
-        if (JSON_ERROR_NONE !== json_last_error()) {
+        if (json_last_error() !== JSON_ERROR_NONE) {
             throw new InvalidPayloadException(
-                'Unable to JSON encode payload. Error code: '.json_last_error()
+                'Unable to JSON encode payload. Error code: '.json_last_error(), $value
             );
         }
 
@@ -282,9 +283,7 @@ abstract class Queue
     {
         if (! empty(static::$createPayloadCallbacks)) {
             foreach (static::$createPayloadCallbacks as $callback) {
-                $payload = array_merge($payload, call_user_func(
-                    $callback, $this->getConnectionName(), $queue, $payload
-                ));
+                $payload = array_merge($payload, $callback($this->getConnectionName(), $queue, $payload));
             }
         }
 
@@ -307,15 +306,15 @@ abstract class Queue
             $this->container->bound('db.transactions')) {
             return $this->container->make('db.transactions')->addCallback(
                 function () use ($payload, $queue, $delay, $callback, $job) {
-                    return tap($callback($payload, $queue, $delay), function ($jobId) use ($job) {
-                        $this->raiseJobQueuedEvent($jobId, $job);
+                    return tap($callback($payload, $queue, $delay), function ($jobId) use ($job, $payload) {
+                        $this->raiseJobQueuedEvent($jobId, $job, $payload);
                     });
                 }
             );
         }
 
-        return tap($callback($payload, $queue, $delay), function ($jobId) use ($job) {
-            $this->raiseJobQueuedEvent($jobId, $job);
+        return tap($callback($payload, $queue, $delay), function ($jobId) use ($job, $payload) {
+            $this->raiseJobQueuedEvent($jobId, $job, $payload);
         });
     }
 
@@ -327,7 +326,11 @@ abstract class Queue
      */
     protected function shouldDispatchAfterCommit($job)
     {
-        if (is_object($job) && isset($job->afterCommit)) {
+        if ($job instanceof ShouldQueueAfterCommit) {
+            return true;
+        }
+
+        if (! $job instanceof Closure && is_object($job) && isset($job->afterCommit)) {
             return $job->afterCommit;
         }
 
@@ -343,12 +346,13 @@ abstract class Queue
      *
      * @param  string|int|null  $jobId
      * @param  \Closure|string|object  $job
+     * @param  string  $payload
      * @return void
      */
-    protected function raiseJobQueuedEvent($jobId, $job)
+    protected function raiseJobQueuedEvent($jobId, $job, $payload)
     {
         if ($this->container->bound('events')) {
-            $this->container['events']->dispatch(new JobQueued($this->connectionName, $jobId, $job));
+            $this->container['events']->dispatch(new JobQueued($this->connectionName, $jobId, $job, $payload));
         }
     }
 

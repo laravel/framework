@@ -8,9 +8,33 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Carbon;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class CacheTest extends TestCase
 {
+    public function testItCanGenerateDefinitionViaStaticMethod()
+    {
+        $signature = (string) Cache::using('max_age=120;no-transform;s_maxage=60;');
+        $this->assertSame('Illuminate\Http\Middleware\SetCacheHeaders:max_age=120;no-transform;s_maxage=60;', $signature);
+
+        $signature = (string) Cache::using('max_age=120;no-transform;s_maxage=60');
+        $this->assertSame('Illuminate\Http\Middleware\SetCacheHeaders:max_age=120;no-transform;s_maxage=60', $signature);
+
+        $signature = (string) Cache::using([
+            'max_age=120',
+            'no-transform',
+            's_maxage=60',
+        ]);
+        $this->assertSame('Illuminate\Http\Middleware\SetCacheHeaders:max_age=120;no-transform;s_maxage=60', $signature);
+
+        $signature = (string) Cache::using([
+            'max_age' => 120,
+            'no-transform',
+            's_maxage' => '60',
+        ]);
+        $this->assertSame('Illuminate\Http\Middleware\SetCacheHeaders:max_age=120;no-transform;s_maxage=60', $signature);
+    }
+
     public function testDoNotSetHeaderWhenMethodNotCacheable()
     {
         $request = new Request;
@@ -31,6 +55,17 @@ class CacheTest extends TestCase
 
         $this->assertNull($response->getMaxAge());
         $this->assertNull($response->getEtag());
+    }
+
+    public function testSetHeaderToFileEvenWithNoContent()
+    {
+        $response = (new Cache)->handle(new Request, function () {
+            $filePath = __DIR__.'/../fixtures/test.txt';
+
+            return new BinaryFileResponse($filePath);
+        }, 'max_age=120;s_maxage=60');
+
+        $this->assertNotNull($response->getMaxAge());
     }
 
     public function testAddHeaders()

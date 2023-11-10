@@ -24,6 +24,7 @@ class RepositoryTest extends TestCase
             'bar' => 'baz',
             'baz' => 'bat',
             'null' => null,
+            'boolean' => true,
             'associate' => [
                 'x' => 'xxx',
                 'y' => 'yyy',
@@ -35,9 +36,37 @@ class RepositoryTest extends TestCase
             'x' => [
                 'z' => 'zoo',
             ],
+            'a.b' => 'c',
+            'a' => [
+                'b.c' => 'd',
+            ],
         ]);
 
         parent::setUp();
+    }
+
+    public function testGetValueWhenKeyContainDot()
+    {
+        $this->assertSame(
+            $this->repository->get('a.b'), 'c'
+        );
+        $this->assertNull(
+            $this->repository->get('a.b.c')
+        );
+    }
+
+    public function testGetBooleanValue()
+    {
+        $this->assertTrue(
+            $this->repository->get('boolean')
+        );
+    }
+
+    public function testGetNullValue()
+    {
+        $this->assertNull(
+            $this->repository->get('null')
+        );
     }
 
     public function testConstruct()
@@ -126,21 +155,52 @@ class RepositoryTest extends TestCase
         $this->repository->set([
             'key1' => 'value1',
             'key2' => 'value2',
+            'key3',
+            'key4' => [
+                'foo' => 'bar',
+                'bar' => [
+                    'foo' => 'bar',
+                ],
+            ],
         ]);
         $this->assertSame('value1', $this->repository->get('key1'));
         $this->assertSame('value2', $this->repository->get('key2'));
+        $this->assertNull($this->repository->get('key3'));
+        $this->assertSame('bar', $this->repository->get('key4.foo'));
+        $this->assertSame('bar', $this->repository->get('key4.bar.foo'));
+        $this->assertNull($this->repository->get('key5'));
     }
 
     public function testPrepend()
     {
+        $this->assertSame('aaa', $this->repository->get('array.0'));
+        $this->assertSame('zzz', $this->repository->get('array.1'));
         $this->repository->prepend('array', 'xxx');
         $this->assertSame('xxx', $this->repository->get('array.0'));
+        $this->assertSame('aaa', $this->repository->get('array.1'));
+        $this->assertSame('zzz', $this->repository->get('array.2'));
     }
 
     public function testPush()
     {
+        $this->assertSame('aaa', $this->repository->get('array.0'));
+        $this->assertSame('zzz', $this->repository->get('array.1'));
         $this->repository->push('array', 'xxx');
+        $this->assertSame('aaa', $this->repository->get('array.0'));
+        $this->assertSame('zzz', $this->repository->get('array.1'));
         $this->assertSame('xxx', $this->repository->get('array.2'));
+    }
+
+    public function testPrependWithNewKey()
+    {
+        $this->repository->prepend('new_key', 'xxx');
+        $this->assertSame(['xxx'], $this->repository->get('new_key'));
+    }
+
+    public function testPushWithNewKey()
+    {
+        $this->repository->push('new_key', 'xxx');
+        $this->assertSame(['xxx'], $this->repository->get('new_key'));
     }
 
     public function testAll()
@@ -182,5 +242,14 @@ class RepositoryTest extends TestCase
 
         $this->assertArrayHasKey('associate', $this->repository->all());
         $this->assertNull($this->repository->get('associate'));
+    }
+
+    public function testsItIsMacroable()
+    {
+        $this->repository->macro('foo', function () {
+            return 'macroable';
+        });
+
+        $this->assertSame('macroable', $this->repository->foo());
     }
 }

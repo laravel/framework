@@ -31,6 +31,14 @@ class ViewComponentAttributeBagTest extends TestCase
         $this->assertSame('class="mt-4 font-bold" name="test"', (string) $bag->class(['mt-4']));
         $this->assertSame('class="mt-4 ml-2 font-bold" name="test"', (string) $bag->class(['mt-4', 'ml-2' => true, 'mr-2' => false]));
 
+        $bag = new ComponentAttributeBag(['class' => 'font-bold', 'name' => 'test', 'style' => 'margin-top: 10px']);
+        $this->assertSame('class="mt-4 ml-2 font-bold" style="margin-top: 10px;" name="test"', (string) $bag->class(['mt-4', 'ml-2' => true, 'mr-2' => false]));
+        $this->assertSame('style="margin-top: 4px; margin-left: 10px; margin-top: 10px;" class="font-bold" name="test"', (string) $bag->style(['margin-top: 4px', 'margin-left: 10px;']));
+
+        $bag = new ComponentAttributeBag(['class' => 'font-bold', 'name' => 'test', 'style' => 'margin-top: 10px; font-weight: bold']);
+        $this->assertSame('class="mt-4 ml-2 font-bold" style="margin-top: 10px; font-weight: bold;" name="test"', (string) $bag->class(['mt-4', 'ml-2' => true, 'mr-2' => false]));
+        $this->assertSame('style="margin-top: 4px; margin-left: 10px; margin-top: 10px; font-weight: bold;" class="font-bold" name="test"', (string) $bag->style(['margin-top: 4px', 'margin-left: 10px;']));
+
         $bag = new ComponentAttributeBag([]);
 
         $this->assertSame('class="mt-4"', (string) $bag->merge(['class' => 'mt-4']));
@@ -93,5 +101,31 @@ class ViewComponentAttributeBagTest extends TestCase
             'test-extract-1',
             'test-extract-2' => 'defaultValue',
         ]));
+    }
+
+    public function testItMakesAnExceptionForAlpineXdata()
+    {
+        $bag = new ComponentAttributeBag([
+            'required' => true,
+            'x-data' => true,
+        ]);
+
+        $this->assertSame('required="required" x-data=""', (string) $bag);
+    }
+
+    public function testAttributeExistence()
+    {
+        $bag = new ComponentAttributeBag(['name' => 'test']);
+
+        $this->assertTrue((bool) $bag->has('name'));
+        $this->assertTrue((bool) $bag->has(['name']));
+        $this->assertTrue((bool) $bag->hasAny(['class', 'name']));
+        $this->assertTrue((bool) $bag->hasAny('class', 'name'));
+        $this->assertFalse((bool) $bag->missing('name'));
+        $this->assertFalse((bool) $bag->has('class'));
+        $this->assertFalse((bool) $bag->has(['class']));
+        $this->assertFalse((bool) $bag->has(['name', 'class']));
+        $this->assertFalse((bool) $bag->has('name', 'class'));
+        $this->assertTrue((bool) $bag->missing('class'));
     }
 }

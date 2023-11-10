@@ -3,12 +3,13 @@
 namespace Illuminate\Mail\Transport;
 
 use Psr\Log\LoggerInterface;
+use Stringable;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\TransportInterface;
 use Symfony\Component\Mime\RawMessage;
 
-class LogTransport implements TransportInterface
+class LogTransport implements Stringable, TransportInterface
 {
     /**
      * The Logger instance.
@@ -30,12 +31,16 @@ class LogTransport implements TransportInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @return int
      */
     public function send(RawMessage $message, Envelope $envelope = null): ?SentMessage
     {
-        $this->logger->debug($message->toString());
+        $string = $message->toString();
+
+        if (str_contains($string, 'Content-Transfer-Encoding: quoted-printable')) {
+            $string = quoted_printable_decode($string);
+        }
+
+        $this->logger->debug($string);
 
         return new SentMessage($message, $envelope ?? Envelope::create($message));
     }

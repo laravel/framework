@@ -67,7 +67,7 @@ class Markdown
         if ($this->view->exists($customTheme = Str::start($this->theme, 'mail.'))) {
             $theme = $customTheme;
         } else {
-            $theme = Str::contains($this->theme, '::')
+            $theme = str_contains($this->theme, '::')
                 ? $this->theme
                 : 'mail::themes.'.$this->theme;
         }
@@ -114,7 +114,7 @@ class Markdown
 
         $converter = new MarkdownConverter($environment);
 
-        return new HtmlString((string) $converter->convertToHtml($text));
+        return new HtmlString($converter->convert($text)->getContent());
     }
 
     /**

@@ -15,7 +15,7 @@ interface Paginator
     /**
      * Add a set of query string values to the paginator.
      *
-     * @param  array|string  $key
+     * @param  array|string|null  $key
      * @param  string|null  $value
      * @return $this
      */
@@ -25,7 +25,7 @@ interface Paginator
      * Get / set the URL fragment to be appended to URLs.
      *
      * @param  string|null  $fragment
-     * @return $this|string
+     * @return $this|string|null
      */
     public function fragment($fragment = null);
 
@@ -53,14 +53,14 @@ interface Paginator
     /**
      * Get the "index" of the first item being paginated.
      *
-     * @return int
+     * @return int|null
      */
     public function firstItem();
 
     /**
      * Get the "index" of the last item being paginated.
      *
-     * @return int
+     * @return int|null
      */
     public function lastItem();
 

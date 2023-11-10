@@ -28,17 +28,17 @@ trait CreatesMatchingTest
      * Create the matching test case if requested.
      *
      * @param  string  $path
-     * @return void
+     * @return bool
      */
     protected function handleTestCreation($path)
     {
         if (! $this->option('test') && ! $this->option('pest')) {
-            return;
+            return false;
         }
 
-        $this->call('make:test', [
+        return $this->callSilent('make:test', [
             'name' => Str::of($path)->after($this->laravel['path'])->beforeLast('.php')->append('Test')->replace('\\', '/'),
             '--pest' => $this->option('pest'),
-        ]);
+        ]) == 0;
     }
 }

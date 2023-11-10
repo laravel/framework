@@ -51,4 +51,28 @@ class SqlServerBuilder extends Builder
     {
         $this->connection->statement($this->grammar->compileDropAllViews());
     }
+
+    /**
+     * Drop all tables from the database.
+     *
+     * @return array
+     */
+    public function getAllTables()
+    {
+        return $this->connection->select(
+            $this->grammar->compileGetAllTables()
+        );
+    }
+
+    /**
+     * Get all of the view names for the database.
+     *
+     * @return array
+     */
+    public function getAllViews()
+    {
+        return $this->connection->select(
+            $this->grammar->compileGetAllViews()
+        );
+    }
 }

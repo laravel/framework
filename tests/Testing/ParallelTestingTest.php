@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Testing;
 
 use Illuminate\Container\Container;
 use Illuminate\Testing\ParallelTesting;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class ParallelTestingTest extends TestCase
@@ -17,9 +18,7 @@ class ParallelTestingTest extends TestCase
         $_SERVER['LARAVEL_PARALLEL_TESTING'] = 1;
     }
 
-    /**
-     * @dataProvider callbacks
-     */
+    #[DataProvider('callbacks')]
     public function testCallbacks($callback)
     {
         $parallelTesting = new ParallelTesting(Container::getInstance());
@@ -36,7 +35,7 @@ class ParallelTestingTest extends TestCase
                 $this->assertNull($testCase);
             }
 
-            $this->assertSame('1', $token);
+            $this->assertSame('1', (string) $token);
             $state = true;
         });
 
@@ -83,10 +82,10 @@ class ParallelTestingTest extends TestCase
             return '1';
         });
 
-        $this->assertSame('1', $parallelTesting->token());
+        $this->assertSame('1', (string) $parallelTesting->token());
     }
 
-    public function callbacks()
+    public static function callbacks()
     {
         return [
             ['setUpProcess'],
@@ -97,7 +96,7 @@ class ParallelTestingTest extends TestCase
         ];
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 

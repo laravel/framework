@@ -7,6 +7,8 @@ use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Eloquent\MassPrunable;
 use Illuminate\Database\Eloquent\Prunable;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Events\ModelPruningFinished;
+use Illuminate\Database\Events\ModelPruningStarting;
 use Illuminate\Database\Events\ModelsPruned;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
@@ -43,7 +45,7 @@ class PruneCommand extends Command
         $models = $this->models();
 
         if ($models->isEmpty()) {
-            $this->info('No prunable models found.');
+            $this->components->info('No prunable models found.');
 
             return;
         }
@@ -56,27 +58,52 @@ class PruneCommand extends Command
             return;
         }
 
-        $events->listen(ModelsPruned::class, function ($event) {
-            $this->info("{$event->count} [{$event->model}] records have been pruned.");
+        $pruning = [];
+
+        $events->listen(ModelsPruned::class, function ($event) use (&$pruning) {
+            if (! in_array($event->model, $pruning)) {
+                $pruning[] = $event->model;
+
+                $this->newLine();
+
+                $this->components->info(sprintf('Pruning [%s] records.', $event->model));
+            }
+
+            $this->components->twoColumnDetail($event->model, "{$event->count} records");
         });
+
+        $events->dispatch(new ModelPruningStarting($models->all()));
 
         $models->each(function ($model) {
-            $instance = new $model;
-
-            $chunkSize = property_exists($instance, 'prunableChunkSize')
-                            ? $instance->prunableChunkSize
-                            : $this->option('chunk');
-
-            $total = $this->isPrunable($model)
-                        ? $instance->pruneAll($chunkSize)
-                        : 0;
-
-            if ($total == 0) {
-                $this->info("No prunable [$model] records found.");
-            }
+            $this->pruneModel($model);
         });
 
+        $events->dispatch(new ModelPruningFinished($models->all()));
+
         $events->forget(ModelsPruned::class);
+    }
+
+    /**
+     * Prune the given model.
+     *
+     * @param  string  $model
+     * @return void
+     */
+    protected function pruneModel(string $model)
+    {
+        $instance = new $model;
+
+        $chunkSize = property_exists($instance, 'prunableChunkSize')
+            ? $instance->prunableChunkSize
+            : $this->option('chunk');
+
+        $total = $this->isPrunable($model)
+            ? $instance->pruneAll($chunkSize)
+            : 0;
+
+        if ($total == 0) {
+            $this->components->info("No prunable [$model] records found.");
+        }
     }
 
     /**
@@ -87,7 +114,9 @@ class PruneCommand extends Command
     protected function models()
     {
         if (! empty($models = $this->option('model'))) {
-            return collect($models);
+            return collect($models)->filter(function ($model) {
+                return class_exists($model);
+            })->values();
         }
 
         $except = $this->option('except');
@@ -110,6 +139,8 @@ class PruneCommand extends Command
                     return in_array($model, $except);
                 });
             })->filter(function ($model) {
+                return class_exists($model);
+            })->filter(function ($model) {
                 return $this->isPrunable($model);
             })->values();
     }
@@ -117,7 +148,7 @@ class PruneCommand extends Command
     /**
      * Get the default path where models are located.
      *
-     * @return string
+     * @return string|string[]
      */
     protected function getDefaultPath()
     {
@@ -153,9 +184,9 @@ class PruneCommand extends Command
             })->count();
 
         if ($count === 0) {
-            $this->info("No prunable [$model] records found.");
+            $this->components->info("No prunable [$model] records found.");
         } else {
-            $this->info("{$count} [{$model}] records will be pruned.");
+            $this->components->info("{$count} [{$model}] records will be pruned.");
         }
     }
 }

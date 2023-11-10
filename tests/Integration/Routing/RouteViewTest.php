@@ -26,6 +26,18 @@ class RouteViewTest extends TestCase
 
         $this->assertStringContainsString('Test bar', $this->get('/route/value1/value2')->getContent());
         $this->assertStringContainsString('Test bar', $this->get('/route/value1')->getContent());
+
+        tap($this->get('/route/value1/value2'), function ($response) {
+            $this->assertEquals('value1', $response->viewData('param'));
+            $this->assertEquals('value1', $response->baseRequest->route('param'));
+            $this->assertEquals('value2', $response->baseRequest->route('param2'));
+        });
+
+        tap($this->get('/route/value1/value2'), function ($response) {
+            $this->assertEquals('value2', $response->viewData('param2'));
+            $this->assertEquals('value1', $response->baseRequest->route('param'));
+            $this->assertEquals('value2', $response->baseRequest->route('param2'));
+        });
     }
 
     public function testRouteViewWithStatus()

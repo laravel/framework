@@ -5,6 +5,7 @@ namespace Illuminate\Foundation\Testing\Concerns;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Testing\Constraints\CountInDatabase;
@@ -69,6 +70,22 @@ trait InteractsWithDatabase
     }
 
     /**
+     * Assert that the given table has no entries.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model|string  $table
+     * @param  string|null  $connection
+     * @return $this
+     */
+    protected function assertDatabaseEmpty($table, $connection = null)
+    {
+        $this->assertThat(
+            $this->getTable($table), new CountInDatabase($this->getConnection($connection, $table), 0)
+        );
+
+        return $this;
+    }
+
+    /**
      * Assert the given record has been "soft deleted".
      *
      * @param  \Illuminate\Database\Eloquent\Model|string  $table
@@ -89,7 +106,12 @@ trait InteractsWithDatabase
         }
 
         $this->assertThat(
-            $this->getTable($table), new SoftDeletedInDatabase($this->getConnection($connection, $table), $data, $deletedAtColumn)
+            $this->getTable($table),
+            new SoftDeletedInDatabase(
+                $this->getConnection($connection, $table),
+                $data,
+                $this->getDeletedAtColumn($table, $deletedAtColumn)
+            )
         );
 
         return $this;
@@ -116,7 +138,12 @@ trait InteractsWithDatabase
         }
 
         $this->assertThat(
-            $this->getTable($table), new NotSoftDeletedInDatabase($this->getConnection($connection, $table), $data, $deletedAtColumn)
+            $this->getTable($table),
+            new NotSoftDeletedInDatabase(
+                $this->getConnection($connection, $table),
+                $data,
+                $this->getDeletedAtColumn($table, $deletedAtColumn)
+            )
         );
 
         return $this;
@@ -153,6 +180,36 @@ trait InteractsWithDatabase
     }
 
     /**
+     * Specify the number of database queries that should occur throughout the test.
+     *
+     * @param  int  $expected
+     * @param  string|null  $connection
+     * @return $this
+     */
+    public function expectsDatabaseQueryCount($expected, $connection = null)
+    {
+        with($this->getConnection($connection), function ($connectionInstance) use ($expected, $connection) {
+            $actual = 0;
+
+            $connectionInstance->listen(function (QueryExecuted $event) use (&$actual, $connectionInstance, $connection) {
+                if (is_null($connection) || $connectionInstance === $event->connection) {
+                    $actual++;
+                }
+            });
+
+            $this->beforeApplicationDestroyed(function () use (&$actual, $expected, $connectionInstance) {
+                $this->assertSame(
+                    $actual,
+                    $expected,
+                    "Expected {$expected} database queries on the [{$connectionInstance->getName()}] connection. {$actual} occurred."
+                );
+            });
+        });
+
+        return $this;
+    }
+
+    /**
      * Determine if the argument is a soft deletable model.
      *
      * @param  mixed  $model
@@ -167,8 +224,8 @@ trait InteractsWithDatabase
     /**
      * Cast a JSON string to a database compatible type.
      *
-     * @param  array|string  $value
-     * @return \Illuminate\Database\Query\Expression
+     * @param  array|object|string  $value
+     * @return \Illuminate\Contracts\Database\Query\Expression
      */
     public function castAsJson($value)
     {
@@ -180,7 +237,9 @@ trait InteractsWithDatabase
 
         $value = DB::connection()->getPdo()->quote($value);
 
-        return DB::raw("CAST($value AS JSON)");
+        return DB::raw(
+            DB::connection()->getQueryGrammar()->compileJsonValueCast($value)
+        );
     }
 
     /**
@@ -219,6 +278,18 @@ trait InteractsWithDatabase
     protected function getTableConnection($table)
     {
         return $this->newModelFor($table)?->getConnectionName();
+    }
+
+    /**
+     * Get the table column name used for soft deletes.
+     *
+     * @param  string  $table
+     * @param  string  $defaultColumnName
+     * @return string
+     */
+    protected function getDeletedAtColumn($table, $defaultColumnName = 'deleted_at')
+    {
+        return $this->newModelFor($table)?->getDeletedAtColumn() ?: $defaultColumnName;
     }
 
     /**

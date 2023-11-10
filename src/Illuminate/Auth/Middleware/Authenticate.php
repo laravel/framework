@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Contracts\Auth\Factory as Auth;
 use Illuminate\Contracts\Auth\Middleware\AuthenticatesRequests;
+use Illuminate\Http\Request;
 
 class Authenticate implements AuthenticatesRequests
 {
@@ -25,6 +26,18 @@ class Authenticate implements AuthenticatesRequests
     public function __construct(Auth $auth)
     {
         $this->auth = $auth;
+    }
+
+    /**
+     * Specify the guards for the middleware.
+     *
+     * @param  string  $guard
+     * @param  string  $others
+     * @return string
+     */
+    public static function using($guard, ...$others)
+    {
+        return static::class.':'.implode(',', [$guard, ...$others]);
     }
 
     /**
@@ -90,7 +103,7 @@ class Authenticate implements AuthenticatesRequests
      * @param  \Illuminate\Http\Request  $request
      * @return string|null
      */
-    protected function redirectTo($request)
+    protected function redirectTo(Request $request)
     {
         //
     }

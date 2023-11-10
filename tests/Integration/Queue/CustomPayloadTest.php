@@ -8,6 +8,7 @@ use Illuminate\Foundation\Testing\TestCase;
 use Illuminate\Queue\Queue;
 use Illuminate\Support\ServiceProvider;
 use Orchestra\Testbench\Concerns\CreatesApplication;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class CustomPayloadTest extends TestCase
 {
@@ -18,16 +19,14 @@ class CustomPayloadTest extends TestCase
         return [QueueServiceProvider::class];
     }
 
-    public function websites()
+    public static function websites()
     {
         yield ['laravel.com'];
 
         yield ['blog.laravel.com'];
     }
 
-    /**
-     * @dataProvider websites
-     */
+    #[DataProvider('websites')]
     public function test_custom_payload_gets_cleared_for_each_data_provider(string $websites)
     {
         $dispatcher = $this->app->make(QueueingDispatcher::class);

@@ -65,9 +65,7 @@ class BusPendingBatchTest extends TestCase
 
         $container = new Container;
 
-        $job = new class
-        {
-        };
+        $job = new class {};
 
         $pendingBatch = new PendingBatch($container, new Collection([$job]));
 

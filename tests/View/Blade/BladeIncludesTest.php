@@ -7,12 +7,15 @@ class BladeIncludesTest extends AbstractBladeTestCase
     public function testEachsAreCompiled()
     {
         $this->assertSame('<?php echo $__env->renderEach(\'foo\', \'bar\'); ?>', $this->compiler->compileString('@each(\'foo\', \'bar\')'));
+        $this->assertSame('<?php echo $__env->renderEach(\'foo\', \'(bar))\'); ?>', $this->compiler->compileString('@each(\'foo\', \'(bar))\')'));
         $this->assertSame('<?php echo $__env->renderEach(name(foo)); ?>', $this->compiler->compileString('@each(name(foo))'));
     }
 
     public function testIncludesAreCompiled()
     {
         $this->assertSame('<?php echo $__env->make(\'foo\', \Illuminate\Support\Arr::except(get_defined_vars(), [\'__data\', \'__path\']))->render(); ?>', $this->compiler->compileString('@include(\'foo\')'));
+        $this->assertSame('<?php echo $__env->make(\'foo\', [\'((\'], \Illuminate\Support\Arr::except(get_defined_vars(), [\'__data\', \'__path\']))->render(); ?>', $this->compiler->compileString('@include(\'foo\', [\'((\'])'));
+        $this->assertSame('<?php echo $__env->make(\'foo\', [\'((a)\' => \'((a)\'], \Illuminate\Support\Arr::except(get_defined_vars(), [\'__data\', \'__path\']))->render(); ?>', $this->compiler->compileString('@include(\'foo\', [\'((a)\' => \'((a)\'])'));
         $this->assertSame('<?php echo $__env->make(name(foo), \Illuminate\Support\Arr::except(get_defined_vars(), [\'__data\', \'__path\']))->render(); ?>', $this->compiler->compileString('@include(name(foo))'));
     }
 
@@ -31,6 +34,7 @@ class BladeIncludesTest extends AbstractBladeTestCase
     public function testIncludeUnlessesAreCompiled()
     {
         $this->assertSame('<?php echo $__env->renderUnless(true, \'foo\', ["foo" => "bar"], \Illuminate\Support\Arr::except(get_defined_vars(), [\'__data\', \'__path\'])); ?>', $this->compiler->compileString('@includeUnless(true, \'foo\', ["foo" => "bar"])'));
+        $this->assertSame('<?php echo $__env->renderUnless(true, \'foo\', ["foo" => "bar_))-))>"], \Illuminate\Support\Arr::except(get_defined_vars(), [\'__data\', \'__path\'])); ?>', $this->compiler->compileString('@includeUnless(true, \'foo\', ["foo" => "bar_))-))>"])'));
         $this->assertSame('<?php echo $__env->renderUnless($undefined ?? true, \'foo\', \Illuminate\Support\Arr::except(get_defined_vars(), [\'__data\', \'__path\'])); ?>', $this->compiler->compileString('@includeUnless($undefined ?? true, \'foo\')'));
     }
 
@@ -38,5 +42,8 @@ class BladeIncludesTest extends AbstractBladeTestCase
     {
         $this->assertSame('<?php echo $__env->first(["one", "two"], \Illuminate\Support\Arr::except(get_defined_vars(), [\'__data\', \'__path\']))->render(); ?>', $this->compiler->compileString('@includeFirst(["one", "two"])'));
         $this->assertSame('<?php echo $__env->first(["one", "two"], ["foo" => "bar"], \Illuminate\Support\Arr::except(get_defined_vars(), [\'__data\', \'__path\']))->render(); ?>', $this->compiler->compileString('@includeFirst(["one", "two"], ["foo" => "bar"])'));
+        $this->assertSame('<?php echo $__env->first(["issue", "#45424)"], ["foo()" => "bar)-))"], \Illuminate\Support\Arr::except(get_defined_vars(), [\'__data\', \'__path\']))->render(); ?>', $this->compiler->compileString('@includeFirst(["issue", "#45424)"], ["foo()" => "bar)-))"])'));
+        $this->assertSame('<?php echo $__env->first(["issue", "#45424)"], ["foo" => "bar(-(("], \Illuminate\Support\Arr::except(get_defined_vars(), [\'__data\', \'__path\']))->render(); ?>', $this->compiler->compileString('@includeFirst(["issue", "#45424)"], ["foo" => "bar(-(("])'));
+        $this->assertSame('<?php echo $__env->first(["issue", "#45424)"], [(string) "foo()" => "bar(-(("], \Illuminate\Support\Arr::except(get_defined_vars(), [\'__data\', \'__path\']))->render(); ?>', $this->compiler->compileString('@includeFirst(["issue", "#45424)"], [(string) "foo()" => "bar(-(("])'));
     }
 }

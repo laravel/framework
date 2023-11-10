@@ -121,10 +121,10 @@ class CompiledRouteCollection extends AbstractRouteCollection
             if ($result = $matcher->matchRequest($trimmedRequest)) {
                 $route = $this->getByName($result['_route']);
             }
-        } catch (ResourceNotFoundException|MethodNotAllowedException $e) {
+        } catch (ResourceNotFoundException|MethodNotAllowedException) {
             try {
                 return $this->routes->match($request);
-            } catch (NotFoundHttpException $e) {
+            } catch (NotFoundHttpException) {
                 //
             }
         }
@@ -136,7 +136,7 @@ class CompiledRouteCollection extends AbstractRouteCollection
                 if (! $dynamicRoute->isFallback) {
                     $route = $dynamicRoute;
                 }
-            } catch (NotFoundHttpException|MethodNotAllowedHttpException $e) {
+            } catch (NotFoundHttpException|MethodNotAllowedHttpException) {
                 //
             }
         }
@@ -152,7 +152,7 @@ class CompiledRouteCollection extends AbstractRouteCollection
      */
     protected function requestWithoutTrailingSlash(Request $request)
     {
-        $trimmedRequest = Request::createFromBase($request);
+        $trimmedRequest = $request->duplicate();
 
         $parts = explode('?', $request->server->get('REQUEST_URI'), 2);
 
@@ -252,11 +252,7 @@ class CompiledRouteCollection extends AbstractRouteCollection
             })
             ->map(function (Collection $routes) {
                 return $routes->mapWithKeys(function (Route $route) {
-                    if ($domain = $route->getDomain()) {
-                        return [$domain.'/'.$route->uri => $route];
-                    }
-
-                    return [$route->uri => $route];
+                    return [$route->getDomain().$route->uri => $route];
                 })->all();
             })
             ->all();

@@ -2,6 +2,9 @@
 
 namespace Illuminate\Tests\View\Blade;
 
+use Illuminate\Contracts\View\ViewCompilationException;
+use PHPUnit\Framework\Attributes\DataProvider;
+
 class BladeForelseStatementsTest extends AbstractBladeTestCase
 {
     public function testForelseStatementsAreCompiled()
@@ -76,5 +79,31 @@ tag empty
 empty
 <?php endif; ?>';
         $this->assertEquals($expected, $this->compiler->compileString($string));
+    }
+
+    #[DataProvider('invalidForelseStatementsDataProvider')]
+    public function testForelseStatementsThrowHumanizedMessageWhenInvalidStatement($initialStatement)
+    {
+        $this->expectException(ViewCompilationException::class);
+        $this->expectExceptionMessage('Malformed @forelse statement.');
+        $string = "$initialStatement
+breeze
+@empty
+tag empty
+@endforelse";
+        $this->compiler->compileString($string);
+    }
+
+    public static function invalidForelseStatementsDataProvider()
+    {
+        return [
+            ['@forelse'],
+            ['@forelse()'],
+            ['@forelse ()'],
+            ['@forelse($test)'],
+            ['@forelse($test as)'],
+            ['@forelse(as)'],
+            ['@forelse ( as )'],
+        ];
     }
 }

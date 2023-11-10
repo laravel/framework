@@ -10,6 +10,7 @@ use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
 use Illuminate\Queue\CallQueuedHandler;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\Middleware\ThrottlesExceptionsWithRedis;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use Mockery as m;
 use Orchestra\Testbench\TestCase;
@@ -23,6 +24,8 @@ class ThrottlesExceptionsWithRedisTest extends TestCase
         parent::setUp();
 
         $this->setUpRedis();
+
+        Carbon::setTestNow(now());
     }
 
     protected function tearDown(): void
@@ -30,6 +33,8 @@ class ThrottlesExceptionsWithRedisTest extends TestCase
         parent::tearDown();
 
         $this->tearDownRedis();
+
+        Carbon::setTestNow();
 
         m::close();
     }
@@ -123,6 +128,8 @@ class CircuitBreakerWithRedisTestJob
 
     public static $handled = false;
 
+    public $key;
+
     public function __construct($key)
     {
         $this->key = $key;
@@ -137,7 +144,7 @@ class CircuitBreakerWithRedisTestJob
 
     public function middleware()
     {
-        return [(new ThrottlesExceptionsWithRedis(2, 10))->by($this->key)];
+        return [(new ThrottlesExceptionsWithRedis(2, 10 * 60))->by($this->key)];
     }
 }
 
@@ -146,6 +153,8 @@ class CircuitBreakerWithRedisSuccessfulJob
     use InteractsWithQueue, Queueable;
 
     public static $handled = false;
+
+    public $key;
 
     public function __construct($key)
     {
@@ -159,6 +168,6 @@ class CircuitBreakerWithRedisSuccessfulJob
 
     public function middleware()
     {
-        return [(new ThrottlesExceptionsWithRedis(2, 10))->by($this->key)];
+        return [(new ThrottlesExceptionsWithRedis(2, 10 * 60))->by($this->key)];
     }
 }

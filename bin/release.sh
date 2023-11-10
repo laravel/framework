@@ -10,7 +10,7 @@ then
     exit 1
 fi
 
-RELEASE_BRANCH="master"
+RELEASE_BRANCH="11.x"
 CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
 VERSION=$1
 
@@ -52,7 +52,7 @@ git tag $VERSION
 git push origin --tags
 
 # Tag Components
-for REMOTE in auth broadcasting bus cache collections config console container contracts cookie database encryption events filesystem hashing http log macroable mail notifications pagination pipeline queue redis routing session support testing translation validation view
+for REMOTE in auth broadcasting bus cache collections conditionable config console container contracts cookie database encryption events filesystem hashing http log macroable mail notifications pagination pipeline process queue redis routing session support testing translation validation view
 do
     echo ""
     echo ""

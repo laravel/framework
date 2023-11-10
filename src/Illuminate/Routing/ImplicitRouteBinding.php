@@ -18,7 +18,7 @@ class ImplicitRouteBinding
      * @param  \Illuminate\Routing\Route  $route
      * @return void
      *
-     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException<\Illuminate\Database\Eloquent\Model>
      * @throws \Illuminate\Routing\Exceptions\BackedEnumCaseNotFoundException
      */
     public static function resolveForRoute($container, $route)
@@ -46,8 +46,10 @@ class ImplicitRouteBinding
                         ? 'resolveSoftDeletableRouteBinding'
                         : 'resolveRouteBinding';
 
-            if ($parent instanceof UrlRoutable && ($route->enforcesScopedBindings() || array_key_exists($parameterName, $route->bindingFields()))) {
-                $childRouteBindingMethod = $route->allowsTrashedBindings()
+            if ($parent instanceof UrlRoutable &&
+                ! $route->preventsScopedBindings() &&
+                ($route->enforcesScopedBindings() || array_key_exists($parameterName, $route->bindingFields()))) {
+                $childRouteBindingMethod = $route->allowsTrashedBindings() && in_array(SoftDeletes::class, class_uses_recursive($instance))
                             ? 'resolveSoftDeletableChildRouteBinding'
                             : 'resolveChildRouteBinding';
 
@@ -82,7 +84,7 @@ class ImplicitRouteBinding
 
             $parameterValue = $parameters[$parameterName];
 
-            $backedEnumClass = (string) $parameter->getType();
+            $backedEnumClass = $parameter->getType()?->getName();
 
             $backedEnum = $backedEnumClass::tryFrom((string) $parameterValue);
 

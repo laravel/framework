@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Translation;
 
 use Illuminate\Contracts\Translation\Loader;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Translation\MessageSelector;
 use Illuminate\Translation\Translator;
@@ -51,6 +52,16 @@ class TranslationTranslatorTest extends TestCase
         $t->getLoader()->shouldReceive('load')->once()->with('en', '*', '*')->andReturn([]);
         $t->getLoader()->shouldReceive('load')->once()->with('en', 'bar', 'foo')->andReturn(['foo' => 'foo', 'baz' => 'breeze :foo', 'qux' => ['tree :foo', 'breeze :foo']]);
         $this->assertEquals(['tree bar', 'breeze bar'], $t->get('foo::bar.qux', ['foo' => 'bar'], 'en'));
+        $this->assertSame('breeze bar', $t->get('foo::bar.baz', ['foo' => 'bar'], 'en'));
+        $this->assertSame('foo', $t->get('foo::bar.foo'));
+    }
+
+    public function testGetMethodProperlyLoadsAndRetrievesArrayItem()
+    {
+        $t = new Translator($this->getLoader(), 'en');
+        $t->getLoader()->shouldReceive('load')->once()->with('en', '*', '*')->andReturn([]);
+        $t->getLoader()->shouldReceive('load')->once()->with('en', 'bar', 'foo')->andReturn(['foo' => 'foo', 'baz' => 'breeze :foo', 'qux' => ['tree :foo', 'breeze :foo', 'beep' => ['rock' => 'tree :foo']]]);
+        $this->assertEquals(['foo' => 'foo', 'baz' => 'breeze bar', 'qux' => ['tree bar', 'breeze bar', 'beep' => ['rock' => 'tree bar']]], $t->get('foo::bar', ['foo' => 'bar'], 'en'));
         $this->assertSame('breeze bar', $t->get('foo::bar.baz', ['foo' => 'bar'], 'en'));
         $this->assertSame('foo', $t->get('foo::bar.foo'));
     }
@@ -201,6 +212,53 @@ class TranslationTranslatorTest extends TestCase
         $t->getLoader()->shouldReceive('load')->once()->with('en', '*', '*')->andReturn([]);
         $t->getLoader()->shouldReceive('load')->once()->with('en', 'foo :message', '*')->andReturn([]);
         $this->assertSame('foo baz', $t->get('foo :message', ['message' => 'baz']));
+    }
+
+    public function testEmptyFallbacks()
+    {
+        $t = new Translator($this->getLoader(), 'en');
+        $t->getLoader()->shouldReceive('load')->once()->with('en', '*', '*')->andReturn([]);
+        $t->getLoader()->shouldReceive('load')->once()->with('en', 'foo :message', '*')->andReturn([]);
+        $this->assertSame('foo ', $t->get('foo :message', ['message' => null]));
+    }
+
+    public function testGetJsonReplacesWithStringable()
+    {
+        $t = new Translator($this->getLoader(), 'en');
+        $t->getLoader()
+            ->shouldReceive('load')
+            ->once()
+            ->with('en', '*', '*')
+            ->andReturn(['test' => 'the date is :date']);
+
+        $date = Carbon::createFromTimestamp(0);
+
+        $this->assertSame(
+            'the date is 1970-01-01 00:00:00',
+            $t->get('test', ['date' => $date])
+        );
+
+        $t->stringable(function (\Illuminate\Support\Carbon $carbon) {
+            return $carbon->format('jS M Y');
+        });
+        $this->assertSame(
+            'the date is 1st Jan 1970',
+            $t->get('test', ['date' => $date])
+        );
+    }
+
+    public function testDetermineLocalesUsingMethod()
+    {
+        $t = new Translator($this->getLoader(), 'en');
+        $t->determineLocalesUsing(function ($locales) {
+            $this->assertSame(['en'], $locales);
+
+            return ['en', 'lz'];
+        });
+        $t->getLoader()->shouldReceive('load')->once()->with('en', '*', '*')->andReturn([]);
+        $t->getLoader()->shouldReceive('load')->once()->with('en', 'foo', '*')->andReturn([]);
+        $t->getLoader()->shouldReceive('load')->once()->with('lz', 'foo', '*')->andReturn([]);
+        $this->assertSame('foo', $t->get('foo'));
     }
 
     protected function getLoader()

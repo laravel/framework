@@ -2,12 +2,12 @@
 
 namespace Illuminate\Tests\Database;
 
+use Illuminate\Contracts\Database\Query\Expression;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Query\Builder as BaseBuilder;
-use Illuminate\Database\Query\Expression;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
@@ -129,6 +129,20 @@ class DatabaseEloquentHasOneTest extends TestCase
         $this->assertEquals($created, $relation->create(['name' => 'taylor']));
     }
 
+    public function testForceCreateMethodProperlyCreatesNewModel()
+    {
+        $relation = $this->getRelation();
+        $attributes = ['name' => 'taylor', $relation->getForeignKeyName() => $relation->getParentKey()];
+
+        $created = m::mock(Model::class);
+        $created->shouldReceive('getAttribute')->with($relation->getForeignKeyName())->andReturn($relation->getParentKey());
+
+        $relation->getRelated()->shouldReceive('forceCreate')->once()->with($attributes)->andReturn($created);
+
+        $this->assertEquals($created, $relation->forceCreate(['name' => 'taylor']));
+        $this->assertEquals(1, $created->getAttribute('foreign_key'));
+    }
+
     public function testRelationIsProperlyInitialized()
     {
         $relation = $this->getRelation();
@@ -183,7 +197,7 @@ class DatabaseEloquentHasOneTest extends TestCase
         $this->assertEquals(1, $models[0]->foo->foreign_key);
         $this->assertEquals(2, $models[1]->foo->foreign_key);
         $this->assertNull($models[2]->foo);
-        $this->assertEquals('4', $models[3]->foo->foreign_key);
+        $this->assertSame('4', (string) $models[3]->foo->foreign_key);
     }
 
     public function testRelationCountQueryCanBeBuilt()

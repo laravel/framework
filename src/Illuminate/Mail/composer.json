@@ -14,17 +14,16 @@
         }
     ],
     "require": {
-        "php": "^8.0.2",
-        "ext-json": "*",
-        "illuminate/collections": "^10.0",
-        "illuminate/container": "^10.0",
-        "illuminate/contracts": "^10.0",
-        "illuminate/macroable": "^10.0",
-        "illuminate/support": "^10.0",
-        "league/commonmark": "^2.0.2",
+        "php": "^8.2",
+        "illuminate/collections": "^11.0",
+        "illuminate/container": "^11.0",
+        "illuminate/contracts": "^11.0",
+        "illuminate/macroable": "^11.0",
+        "illuminate/support": "^11.0",
+        "league/commonmark": "^2.2",
         "psr/log": "^1.0|^2.0|^3.0",
-        "symfony/mailer": "^6.0",
-        "tijsverkoyen/css-to-inline-styles": "^2.2.2"
+        "symfony/mailer": "^7.0",
+        "tijsverkoyen/css-to-inline-styles": "^2.2.5"
     },
     "autoload": {
         "psr-4": {
@@ -33,14 +32,14 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "10.x-dev"
+            "dev-master": "11.x-dev"
         }
     },
     "suggest": {
-        "symfony/amazon-mailer": "Required to enable support for the SES mail transport (^6.0).",
-        "symfony/http-client": "Required to use the Symfony API mail transports (^6.0).",
-        "symfony/mailgun-mailer": "Required to enable support for the Mailgun mail transport (^6.0).",
-        "symfony/postmark-mailer": "Required to enable support for the Postmark mail transport (^6.0)."
+        "aws/aws-sdk-php": "Required to use the SES mail driver (^3.235.5).",
+        "symfony/http-client": "Required to use the Symfony API mail transports (^7.0).",
+        "symfony/mailgun-mailer": "Required to enable support for the Mailgun mail transport (^7.0).",
+        "symfony/postmark-mailer": "Required to enable support for the Postmark mail transport (^7.0)."
     },
     "config": {
         "sort-packages": true

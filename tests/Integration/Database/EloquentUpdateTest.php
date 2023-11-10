@@ -46,9 +46,12 @@ class EloquentUpdateTest extends DatabaseTestCase
         $this->assertCount(0, TestUpdateModel1::all());
     }
 
-    /** @group SkipMSSQL */
     public function testUpdateWithLimitsAndOrders()
     {
+        if ($this->driver === 'sqlsrv') {
+            $this->markTestSkipped('The limit keyword is not supported on MSSQL.');
+        }
+
         for ($i = 1; $i <= 10; $i++) {
             TestUpdateModel1::create();
         }
@@ -114,6 +117,24 @@ class EloquentUpdateTest extends DatabaseTestCase
         $models = TestUpdateModel3::withoutGlobalScopes()->orderBy('id')->get();
         $this->assertEquals(1, $models[0]->counter);
         $this->assertEquals(0, $models[1]->counter);
+    }
+
+    public function testIncrementOrDecrementIgnoresGlobalScopes()
+    {
+        /** @var TestUpdateModel3 $deletedModel */
+        $deletedModel = tap(TestUpdateModel3::create([
+            'counter' => 0,
+        ]), fn ($model) => $model->delete());
+
+        $deletedModel->increment('counter');
+
+        $this->assertEquals(1, $deletedModel->counter);
+
+        $deletedModel->fresh();
+        $this->assertEquals(1, $deletedModel->counter);
+
+        $deletedModel->decrement('counter');
+        $this->assertEquals(0, $deletedModel->fresh()->counter);
     }
 }
 

@@ -16,7 +16,7 @@ class JsonResponse extends BaseJsonResponse
     }
 
     /**
-     * Constructor.
+     * Create a new JSON response instance.
      *
      * @param  mixed  $data
      * @param  int  $status
@@ -74,15 +74,15 @@ class JsonResponse extends BaseJsonResponse
     {
         $this->original = $data;
 
-        if ($data instanceof Jsonable) {
-            $this->data = $data->toJson($this->encodingOptions);
-        } elseif ($data instanceof JsonSerializable) {
-            $this->data = json_encode($data->jsonSerialize(), $this->encodingOptions);
-        } elseif ($data instanceof Arrayable) {
-            $this->data = json_encode($data->toArray(), $this->encodingOptions);
-        } else {
-            $this->data = json_encode($data, $this->encodingOptions);
-        }
+        // Ensure json_last_error() is cleared...
+        json_decode('[]');
+
+        $this->data = match (true) {
+            $data instanceof Jsonable => $data->toJson($this->encodingOptions),
+            $data instanceof JsonSerializable => json_encode($data->jsonSerialize(), $this->encodingOptions),
+            $data instanceof Arrayable => json_encode($data->toArray(), $this->encodingOptions),
+            default => json_encode($data, $this->encodingOptions),
+        };
 
         if (! $this->hasValidJson(json_last_error())) {
             throw new InvalidArgumentException(json_last_error_msg());

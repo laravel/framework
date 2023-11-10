@@ -94,6 +94,17 @@ class DatabaseEloquentMorphOneOfManyTest extends TestCase
         $this->assertSame('active', $product->current_state->state);
     }
 
+    public function testForceCreateMorphType()
+    {
+        $product = MorphOneOfManyTestProduct::create();
+        $state = $product->states()->forceCreate([
+            'state' => 'active',
+        ]);
+
+        $this->assertNotNull($state);
+        $this->assertSame(MorphOneOfManyTestProduct::class, $product->current_state->stateful_type);
+    }
+
     public function testExists()
     {
         $product = MorphOneOfManyTestProduct::create();
@@ -113,6 +124,30 @@ class DatabaseEloquentMorphOneOfManyTest extends TestCase
             $q->whereKey($currentState->getKey());
         })->exists();
         $this->assertTrue($exists);
+    }
+
+    public function testWithWhereHas()
+    {
+        $product = MorphOneOfManyTestProduct::create();
+        $previousState = $product->states()->create([
+            'state' => 'draft',
+        ]);
+        $currentState = $product->states()->create([
+            'state' => 'active',
+        ]);
+
+        $exists = MorphOneOfManyTestProduct::withWhereHas('current_state', function ($q) use ($previousState) {
+            $q->whereKey($previousState->getKey());
+        })->exists();
+        $this->assertFalse($exists);
+
+        $exists = MorphOneOfManyTestProduct::withWhereHas('current_state', function ($q) use ($currentState) {
+            $q->whereKey($currentState->getKey());
+        })->get();
+
+        $this->assertCount(1, $exists);
+        $this->assertTrue($exists->first()->relationLoaded('current_state'));
+        $this->assertSame($exists->first()->current_state->state, $currentState->state);
     }
 
     public function testWithExists()

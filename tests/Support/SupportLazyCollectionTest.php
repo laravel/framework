@@ -47,7 +47,7 @@ class SupportLazyCollectionTest extends TestCase
         $this->assertSame($array, $data->all());
     }
 
-    public function testCanCreateCollectionFromClosure()
+    public function testCanCreateCollectionFromGeneratorFunction()
     {
         $data = LazyCollection::make(function () {
             yield 1;
@@ -68,6 +68,15 @@ class SupportLazyCollectionTest extends TestCase
             'b' => 2,
             'c' => 3,
         ], $data->all());
+    }
+
+    public function testCanCreateCollectionFromNonGeneratorFunction()
+    {
+        $data = LazyCollection::make(function () {
+            return 'laravel';
+        });
+
+        $this->assertSame(['laravel'], $data->all());
     }
 
     public function testDoesNotCreateCollectionFromGenerator()

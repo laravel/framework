@@ -4,24 +4,23 @@ namespace Illuminate\Tests\Foundation\Testing\Traits;
 
 use Illuminate\Foundation\Testing\Traits\CanConfigureMigrationCommands;
 use PHPUnit\Framework\TestCase;
+use ReflectionMethod;
 
 class CanConfigureMigrationCommandsTest extends TestCase
 {
     protected $traitObject;
 
-    protected function setup(): void
+    protected function setUp(): void
     {
-        $this->traitObject = $this->getObjectForTrait(CanConfigureMigrationCommands::class);
+        $this->traitObject = new CanConfigureMigrationCommandsTestMockClass();
     }
 
     private function __reflectAndSetupAccessibleForProtectedTraitMethod($methodName)
     {
-        $migrateFreshUsingReflection = new \ReflectionMethod(
+        $migrateFreshUsingReflection = new ReflectionMethod(
             get_class($this->traitObject),
             $methodName
         );
-
-        $migrateFreshUsingReflection->setAccessible(true);
 
         return $migrateFreshUsingReflection;
     }
@@ -75,4 +74,13 @@ class CanConfigureMigrationCommandsTest extends TestCase
 
         $this->assertEquals($expected, $migrateFreshUsingReflection->invoke($this->traitObject));
     }
+}
+
+class CanConfigureMigrationCommandsTestMockClass
+{
+    use CanConfigureMigrationCommands;
+
+    public $dropViews = false;
+
+    public $dropTypes = false;
 }
