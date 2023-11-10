@@ -466,17 +466,18 @@ trait ValidatesAttributes
      *
      * @param  string  $attribute
      * @param  mixed  $value
+     * @param  array<int, string>  $parameters
      * @return bool
      */
-    public function validateBoolean($attribute, $value, $parameters = ['medium'])
+    public function validateBoolean($attribute, $value, $parameters)
     {
-        $strictness = $this->trim($parameters[0]);
+        $strictness = isset($parameters[0]) ? $this->trim($parameters[0]) : 'medium';
         $defaultAcceptable = [true, false, 0, 1, '0', '1'];
 
         return match ($strictness) {
             'strict' => is_bool($value),
-            'medium' => in_array($value, $defaultAcceptable),
-            'low' => in_array($value, array_merge($defaultAcceptable, ['true', 'false'])),
+            'medium' => in_array($value, $defaultAcceptable, true),
+            'low' => in_array($value, array_merge($defaultAcceptable, ['true', 'false']), true),
             default => in_array($value, $defaultAcceptable, true),
         };
     }
