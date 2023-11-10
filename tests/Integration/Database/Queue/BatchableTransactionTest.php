@@ -40,7 +40,7 @@ class BatchableTransactionTest extends DatabaseTestCase
         $this->assertSame(1, DB::table('job_batches')->count());
 
         try {
-            remote('queue:work', [
+            remote('queue:work --stop-when-empty', [
                 'DB_CONNECTION' => config('database.default'),
                 'QUEUE_CONNECTION' => config('queue.default'),
             ])->run();
