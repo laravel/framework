@@ -20,7 +20,7 @@ class BatchableTransactionTest extends DatabaseTestCase
     protected function defineEnvironment($app)
     {
         parent::defineEnvironment($app);
-        
+
         $config = $app['config'];
 
         if ($config->get('database.default') === 'testing') {
