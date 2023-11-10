@@ -11,6 +11,8 @@ class TimestampTypeTest extends DatabaseTestCase
 {
     protected function defineEnvironment($app)
     {
+        parent::defineEnvironment($app);
+
         $app['config']['database.dbal.types'] = [
             'timestamp' => TimestampType::class,
         ];
