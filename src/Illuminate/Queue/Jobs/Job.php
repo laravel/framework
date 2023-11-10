@@ -2,8 +2,8 @@
 
 namespace Illuminate\Queue\Jobs;
 
-use Illuminate\Bus\BatchRepository;
 use Illuminate\Bus\Batchable;
+use Illuminate\Bus\BatchRepository;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\ManuallyFailedException;
