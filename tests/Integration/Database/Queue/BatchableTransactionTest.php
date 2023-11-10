@@ -24,15 +24,13 @@ class BatchableTransactionTest extends DatabaseTestCase
 
     protected function defineEnvironment($app)
     {
-        if (Env::get('DB_CONNECTION') === 'testing') {
-            // $this->markTestSkipped('Test does not support using :memory: database connection');
+        $config = $app['config'];
+
+        if ($config->get('database.default') === 'testing') {
+            $this->markTestSkipped('Test does not support using :memory: database connection');
         }
 
-        $app['config']->set([
-            'database.default' => 'sqlite',
-            'queue.default' => 'database',
-            'queue.batching.database' => 'sqlite',
-        ]);
+        $config->set(['queue.default' => 'database']);
     }
 
     public function testItCanHandleTimeoutJob()
@@ -57,5 +55,14 @@ class BatchableTransactionTest extends DatabaseTestCase
 
         $this->assertSame(0, DB::table('jobs')->count());
         $this->assertSame(1, DB::table('failed_jobs')->count());
+
+        $failed = DB::table('failed_jobs')->pluck('uuid');
+
+        $this->assertDatabaseHas('job_batches', [
+            'total_jobs' => 1,
+            'pending_jobs' => 1,
+            'failed_jobs' => 1,
+            'failed_job_ids' => json_encode($failed->all()),
+        ]);
     }
 }
