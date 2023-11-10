@@ -74,8 +74,6 @@ class DatabaseMigrationsTest extends TestCase
                 '--seed' => false,
             ]);
 
-        $kernel->shouldReceive('setArtisan')->once()->with(null);
-
         $this->runDatabaseMigrations();
     }
 
@@ -93,8 +91,6 @@ class DatabaseMigrationsTest extends TestCase
                 '--seed' => false,
             ]);
 
-        $kernel->shouldReceive('setArtisan')->once()->with(null);
-
         $this->runDatabaseMigrations();
     }
 
@@ -111,8 +107,6 @@ class DatabaseMigrationsTest extends TestCase
                 '--drop-types' => true,
                 '--seed' => false,
             ]);
-
-        $kernel->shouldReceive('setArtisan')->once()->with(null);
 
         $this->runDatabaseMigrations();
     }
