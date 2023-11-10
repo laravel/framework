@@ -20,8 +20,6 @@ class DatabaseMigrationsTest extends TestCase
     use DatabaseMigrations;
     use InteractsWithConsole;
 
-    protected $setUpHasRun = false;
-
     public $dropViews = false;
 
     public $dropTypes = false;
@@ -40,17 +38,13 @@ class DatabaseMigrationsTest extends TestCase
             ]);
         });
 
-        $this->setUpTheApplicationTestingHooks(function () {
-            $this->setUpHasRun = true;
-        });
+        $this->setUpTheApplicationTestingHooks();
         $this->withoutMockingConsoleOutput();
     }
 
     protected function tearDown(): void
     {
-        $this->tearDownTheApplicationTestingHooks(function () {
-            $this->setUpHasRun = false;
-        });
+        $this->tearDownTheApplicationTestingHooks();
 
         RefreshDatabaseState::$migrated = false;
     }

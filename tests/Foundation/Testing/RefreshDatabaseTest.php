@@ -20,8 +20,6 @@ class RefreshDatabaseTest extends TestCase
     use InteractsWithConsole;
     use RefreshDatabase;
 
-    protected $setUpHasRun = false;
-
     public $dropViews = false;
 
     public $dropTypes = false;
@@ -30,17 +28,13 @@ class RefreshDatabaseTest extends TestCase
     {
         RefreshDatabaseState::$migrated = false;
 
-        $this->setUpTheApplicationTestingHooks(function () {
-            $this->setUpHasRun = true;
-        });
+        $this->setUpTheApplicationTestingHooks();
         $this->withoutMockingConsoleOutput();
     }
 
     protected function tearDown(): void
     {
-        $this->tearDownTheApplicationTestingHooks(function () {
-            $this->setUpHasRun = false;
-        });
+        $this->tearDownTheApplicationTestingHooks();
 
         RefreshDatabaseState::$migrated = false;
     }
