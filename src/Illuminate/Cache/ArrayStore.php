@@ -139,13 +139,9 @@ class ArrayStore extends TaggableStore implements LockProvider
      */
     public function forget($key)
     {
-        if (array_key_exists($key, $this->storage)) {
-            unset($this->storage[$key]);
-
-            return true;
-        }
-
-        return false;
+        $exists = array_key_exists($key, $this->storage);
+        unset($this->storage[$key]);
+        return $exists;
     }
 
     /**
