@@ -3,7 +3,6 @@
 namespace Illuminate\Tests\Integration\Database\Queue;
 
 use Illuminate\Foundation\Testing\DatabaseMigrations;
-use Illuminate\Support\Env;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
