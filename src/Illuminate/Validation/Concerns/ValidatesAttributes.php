@@ -472,6 +472,7 @@ trait ValidatesAttributes
     {
         $strictness = $this->trim($parameters[0]);
         $defaultAcceptable = [true, false, 0, 1, '0', '1'];
+
         return match ($strictness) {
             'strict' => is_bool($value),
             'medium' => in_array($value, $defaultAcceptable),
