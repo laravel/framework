@@ -2,19 +2,15 @@
 
 namespace Illuminate\Tests\Integration\Database\Queue;
 
-use Illuminate\Bus\Batchable;
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
-use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Env;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 use Orchestra\Testbench\Attributes\WithMigration;
 use Symfony\Component\Process\Exception\ProcessSignaledException;
-use Symfony\Component\Process\Process;
 use Throwable;
+
 use function Orchestra\Testbench\remote;
 
 #[WithMigration('laravel', 'queue')]
