@@ -3,11 +3,13 @@
 namespace Illuminate\Queue\Jobs;
 
 use Illuminate\Bus\BatchRepository;
+use Illuminate\Bus\Batchable;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\ManuallyFailedException;
 use Illuminate\Queue\TimeoutExceededException;
 use Illuminate\Support\InteractsWithTime;
+use Throwable;
 
 abstract class Job
 {
@@ -185,11 +187,19 @@ abstract class Job
             return;
         }
 
-        if ($e instanceof TimeoutExceededException) {
+        // If the exception is due to a job timing out, we need to rollback the current
+        // database transaction so that the failed job count can be incremented with
+        // the proper value. Otherwise, the current transaction will never commit.
+        if ($e instanceof TimeoutExceededException &&
+            in_array(Batchable::class, class_uses_recursive($this->instance))) {
             $batchRepository = $this->resolve(BatchRepository::class);
 
-            if (method_exists($batchRepository, 'rollbackTransaction')) {
-                $batchRepository->rollbackTransaction();
+            if (method_exists($batchRepository, 'rollBack')) {
+                try {
+                    $batchRepository->rollBack();
+                } catch (Throwable $e) {
+                    // ...
+                }
             }
         }
 
