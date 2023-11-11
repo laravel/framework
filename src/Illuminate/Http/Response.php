@@ -82,11 +82,14 @@ class Response extends SymfonyResponse
      */
     protected function shouldBeJson($content)
     {
-        return $content instanceof Arrayable ||
-               $content instanceof Jsonable ||
-               $content instanceof ArrayObject ||
-               $content instanceof JsonSerializable ||
-               is_array($content);
+        return match (true) {
+            $content instanceof Arrayable,
+            $content instanceof Jsonable,
+            $content instanceof ArrayObject,
+            $content instanceof JsonSerializable,
+            is_array($content) => true,
+            default => false,
+        };
     }
 
     /**
@@ -97,12 +100,10 @@ class Response extends SymfonyResponse
      */
     protected function morphToJson($content)
     {
-        if ($content instanceof Jsonable) {
-            return $content->toJson();
-        } elseif ($content instanceof Arrayable) {
-            return json_encode($content->toArray());
-        }
-
-        return json_encode($content);
+        return match (true) {
+            $content instanceof Jsonable => $content->toJson(),
+            $content instanceof Arrayable => json_encode($content->toArray()),
+            default => json_encode($content),
+        };
     }
 }
