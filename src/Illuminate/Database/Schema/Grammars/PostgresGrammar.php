@@ -1183,7 +1183,7 @@ class PostgresGrammar extends Grammar
         }
 
         if (! is_null($column->virtualAs)) {
-            return " generated always as ({$column->virtualAs})";
+            return " generated always as ({$this->getValue($column->virtualAs)})";
         }
     }
 
@@ -1207,7 +1207,7 @@ class PostgresGrammar extends Grammar
         }
 
         if (! is_null($column->storedAs)) {
-            return " generated always as ({$column->storedAs}) stored";
+            return " generated always as ({$this->getValue($column->storedAs)}) stored";
         }
     }
 
