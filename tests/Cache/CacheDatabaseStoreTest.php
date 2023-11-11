@@ -91,10 +91,24 @@ class CacheDatabaseStoreTest extends TestCase
         $this->assertTrue($result);
     }
 
+    public function testValueIsUpsertDuringTransactionOnPostgres()
+    {
+        $store = $this->getMockBuilder(DatabaseStore::class)->onlyMethods(['getTime'])->setConstructorArgs($this->getPostgresMocks())->getMock();
+        $table = m::mock(stdClass::class);
+        $store->getConnection()->shouldReceive('transactionLevel')->once()->andReturn(1);
+        $store->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($table);
+        $store->expects($this->once())->method('getTime')->willReturn(1);
+        $table->shouldReceive('upsert')->once()->with(['key' => 'prefixfoo', 'value' => base64_encode(serialize("\0")), 'expiration' => 61], 'key')->andReturnTrue();
+
+        $result = $store->put('foo', "\0", 60);
+        $this->assertTrue($result);
+    }
+
     public function testValueIsInsertedOnPostgres()
     {
         $store = $this->getMockBuilder(DatabaseStore::class)->onlyMethods(['getTime'])->setConstructorArgs($this->getPostgresMocks())->getMock();
         $table = m::mock(stdClass::class);
+        $store->getConnection()->shouldReceive('transactionLevel')->once()->andReturn(0);
         $store->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($table);
         $store->expects($this->once())->method('getTime')->willReturn(1);
         $table->shouldReceive('insert')->once()->with(['key' => 'prefixfoo', 'value' => base64_encode(serialize("\0")), 'expiration' => 61])->andReturnTrue();

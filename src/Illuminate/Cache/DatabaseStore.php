@@ -137,6 +137,10 @@ class DatabaseStore implements LockProvider, Store
         $value = $this->serialize($value);
         $expiration = $this->getTime() + $seconds;
 
+        if ($this->connection instanceof PostgresConnection && $this->connection->transactionLevel() > 0) {
+            return $this->table()->upsert(compact('key', 'value', 'expiration'), 'key') > 0;
+        }
+
         try {
             return $this->table()->insert(compact('key', 'value', 'expiration'));
         } catch (Exception) {
