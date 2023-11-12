@@ -1440,6 +1440,13 @@ class TestResponse implements ArrayAccess
         return $this;
     }
 
+    public function assertResourceStructure(array $keys, JsonResource $resource, $escape = true)
+    {
+        PHPUnit::assertEquals($keys, array_keys($resource->resolve()));
+
+        return $this;
+    }
+
     /**
      * Get the current session store.
      *
