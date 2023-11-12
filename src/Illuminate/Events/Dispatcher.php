@@ -87,19 +87,55 @@ class Dispatcher implements DispatcherContract
     public function listen($events, $listener = null)
     {
         if ($events instanceof Closure) {
-            return collect($this->firstClosureParameterTypes($events))
-                ->each(function ($event) use ($events) {
-                    $this->listen($event, $events);
-                });
-        } elseif ($events instanceof QueuedClosure) {
-            return collect($this->firstClosureParameterTypes($events->closure))
-                ->each(function ($event) use ($events) {
-                    $this->listen($event, $events->resolve());
-                });
-        } elseif ($listener instanceof QueuedClosure) {
+            return $this->handleClosureEvents($events);
+        }
+
+        if ($events instanceof QueuedClosure) {
+            return $this->handleQueuedClosureEvents($events);
+        }
+
+        if ($listener instanceof QueuedClosure) {
             $listener = $listener->resolve();
         }
 
+        return $this->handleEventArray($events, $listener);
+    }
+
+    /**
+     * Handle closure events.
+     *
+     * @param \Closure|string|array $events
+     */
+    private function handleClosureEvents($events)
+    {
+        return collect($this->firstClosureParameterTypes($events))
+            ->each(function ($event) use ($events) {
+                $this->listen($event, $events);
+            });
+    }
+
+    /**
+     * Handle the queued closure events.
+     *
+     * @param \Closure|string|array $queuedClosureEvents
+     */
+    private function handleQueuedClosureEvents($queuedClosureEvents)
+    {
+        return collect($this->firstClosureParameterTypes($queuedClosureEvents->closure))
+            ->each(function ($event) use ($queuedClosureEvents) {
+                $this->listen($event, $queuedClosureEvents->resolve());
+            });
+    }
+
+    /**
+     * Handle an array of events and attach the listener to each event.
+     *
+     * @param \Closure|string|array $events
+     * @param \Closure|string|array|null $listener
+     * @return void
+     */
+    private function handleEventArray($events, $listener)
+    {
         foreach ((array) $events as $event) {
             if (str_contains($event, '*')) {
                 $this->setupWildcardListen($event, $listener);
