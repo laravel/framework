@@ -3,7 +3,6 @@
 namespace Illuminate\Cache;
 
 use Closure;
-use Exception;
 use Illuminate\Contracts\Cache\LockProvider;
 use Illuminate\Contracts\Cache\Store;
 use Illuminate\Database\ConnectionInterface;

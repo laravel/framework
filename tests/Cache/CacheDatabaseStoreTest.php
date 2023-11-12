@@ -3,7 +3,6 @@
 namespace Illuminate\Tests\Cache;
 
 use Closure;
-use Exception;
 use Illuminate\Cache\DatabaseStore;
 use Illuminate\Database\Connection;
 use Illuminate\Database\PostgresConnection;

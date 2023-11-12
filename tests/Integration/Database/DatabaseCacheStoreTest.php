@@ -5,7 +5,6 @@ namespace Illuminate\Tests\Integration\Database;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithCacheTable;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 class DatabaseCacheStoreTest extends DatabaseTestCase
 {

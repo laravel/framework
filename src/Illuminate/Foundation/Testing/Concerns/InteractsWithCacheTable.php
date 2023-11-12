@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Schema;
 trait InteractsWithCacheTable
 {
     /**
-     * Create all cache related table tables
+     * Create all cache related table tables.
      */
     protected function createCacheTables()
     {
@@ -26,7 +26,7 @@ trait InteractsWithCacheTable
     }
 
     /**
-     * Drop all cache related table tables
+     * Drop all cache related table tables.
      */
     protected function dropCacheTables()
     {
