@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Tests\Integration\Database\SqlServer\SqlServerTestCase;
 
-class PostgresCacheStoreTest extends SqlServerTestCase
+class SqlServerCacheStoreTest extends SqlServerTestCase
 {
     use InteractsWithCacheTable;
 
