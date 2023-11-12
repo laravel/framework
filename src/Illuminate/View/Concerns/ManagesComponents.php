@@ -5,6 +5,7 @@ namespace Illuminate\View\Concerns;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use Illuminate\View\ComponentSlot;
 
 trait ManagesComponents
@@ -94,6 +95,12 @@ trait ManagesComponents
 
         try {
             $view = value($view, $data);
+
+            $data = array_combine(
+                array_map(fn ($key) => preg_match('/^[a-z]+(-[a-z]+)*$/', $key)
+                    ? Str::camel($key) : $key, array_keys($data)),
+                array_values($data)
+            );
 
             if ($view instanceof View) {
                 return $view->with($data)->render();
