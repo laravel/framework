@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Tests\Integration\Cache\Database;
+namespace Illuminate\Tests\Integration\Database;
 
 use Illuminate\Foundation\Testing\Concerns\InteractsWithCacheTable;
 use Illuminate\Support\Facades\Cache;
