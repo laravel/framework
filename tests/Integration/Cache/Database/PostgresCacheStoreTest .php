@@ -1,36 +1,27 @@
 <?php
 
-namespace Illuminate\Tests\Integration\Database\Postgres;
+namespace Illuminate\Tests\Integration\Cache\Database;
 
-use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Foundation\Testing\Concerns\InteractsWithCacheTable;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
+use Illuminate\Tests\Integration\Database\Postgres\PostgresTestCase;
 
 class PostgresCacheStoreTest extends PostgresTestCase
 {
+    use InteractsWithCacheTable;
+
     protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
     {
-        Schema::create('cache', function (Blueprint $table) {
-            $table->string('key')->primary();
-            $table->mediumText('value');
-            $table->integer('expiration');
-        });
-
-        Schema::create('cache_locks', function (Blueprint $table) {
-            $table->string('key')->primary();
-            $table->string('owner');
-            $table->integer('expiration');
-        });
+        $this->createCacheTables();
     }
 
     protected function destroyDatabaseMigrations()
     {
-        Schema::dropIfExists('cache');
-        Schema::dropIfExists('cache_locks');
+        $this->dropCacheTables();
     }
 
-    public function testValueCanBePut()
+    public function testValueCanStoreNewCache()
     {
         $store = $this->getStore();
 
@@ -39,7 +30,7 @@ class PostgresCacheStoreTest extends PostgresTestCase
         $this->assertSame('bar', $store->get('foo'));
     }
 
-    public function testValueCanBeUpdate()
+    public function testValueCanUpdateExistCache()
     {
         $store = $this->getStore();
 
@@ -49,7 +40,7 @@ class PostgresCacheStoreTest extends PostgresTestCase
         $this->assertSame('new-bar', $store->get('foo'));
     }
 
-    public function testValueCanBeUpdateInTransaction()
+    public function testValueCanUpdateExistCacheInTransaction()
     {
         $store = $this->getStore();
 
