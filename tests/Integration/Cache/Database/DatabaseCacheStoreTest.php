@@ -5,9 +5,9 @@ namespace Illuminate\Tests\Integration\Cache\Database;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithCacheTable;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Tests\Integration\Database\Postgres\PostgresTestCase;
+use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
-class PostgresCacheStoreTest extends PostgresTestCase
+class DatabaseCacheStoreTest extends DatabaseTestCase
 {
     use InteractsWithCacheTable;
 
