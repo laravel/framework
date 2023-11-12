@@ -857,13 +857,12 @@ class PendingRequest
         $pool = tap(new Pool($this->factory), $callback)->getRequests();
 
         $promises = array_map(function ($request) {
-            // Convert the PendingRequest into a Guzzle Promise
             return $request instanceof static ? $request->getPromise() : $request;
         }, $pool);
 
         Each::ofLimit(
             $promises,
-            $concurrencyLimit ?: count($pool), // Fallback to the count of requests if no limit is defined
+            $concurrencyLimit ?: count($pool),
             function ($response, $index) use (&$results) {
                 // Handle a successful response
                 $results[$index] = $response instanceof \GuzzleHttp\Psr7\Response
@@ -871,7 +870,6 @@ class PendingRequest
                     : $response;
             },
             function ($reason, $index) use (&$results) {
-                // Handle exceptions, might need to wrap this in a Laravel HTTP Client response?
                 $results[$index] = $reason;
             }
         )->wait();
