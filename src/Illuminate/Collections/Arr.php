@@ -170,9 +170,7 @@ class Arr
             return $array->offsetExists($key);
         }
 
-        if (is_float($key)) {
-            $key = (string) $key;
-        }
+        $key = is_float($key) ? (string) $key : $key;
 
         return array_key_exists($key, $array);
     }
