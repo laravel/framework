@@ -104,7 +104,7 @@ class Dispatcher implements DispatcherContract
     /**
      * Handle closure events.
      *
-     * @param \Closure|string|array $events
+     * @param  \Closure|string|array  $events
      */
     private function handleClosureEvents($events)
     {
@@ -117,7 +117,7 @@ class Dispatcher implements DispatcherContract
     /**
      * Handle the queued closure events.
      *
-     * @param \Closure|string|array $queuedClosureEvents
+     * @param  \Closure|string|array  $queuedClosureEvents
      */
     private function handleQueuedClosureEvents($queuedClosureEvents)
     {
@@ -130,8 +130,8 @@ class Dispatcher implements DispatcherContract
     /**
      * Handle an array of events and attach the listener to each event.
      *
-     * @param \Closure|string|array $events
-     * @param \Closure|string|array|null $listener
+     * @param  \Closure|string|array  $events
+     * @param  \Closure|string|array|null  $listener
      * @return void
      */
     private function handleEventArray($events, $listener)
