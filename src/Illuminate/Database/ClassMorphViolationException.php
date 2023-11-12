@@ -16,11 +16,11 @@ class ClassMorphViolationException extends RuntimeException
     /**
      * Create a new exception instance.
      *
-     * @param  object  $model
+     * @param  object|string  $model
      */
     public function __construct($model)
     {
-        $class = get_class($model);
+        $class = is_object($model) ? get_class($model) : $model;
 
         parent::__construct("No morph map defined for model [{$class}].");
 

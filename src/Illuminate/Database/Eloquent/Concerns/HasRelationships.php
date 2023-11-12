@@ -761,25 +761,47 @@ trait HasRelationships
     /**
      * Get the class name for polymorphic relations.
      *
+     * @param  string  $alias
+     * @param  string  $name
+     * @return string
+     */
+    private static function resolveMorphClass(string $classname, $instance = null)
+    {
+        $morphMap = Relation::morphMap();
+
+        if (!empty($morphMap) && in_array($classname, $morphMap)) {
+            return array_search($classname, $morphMap, true);
+        }
+
+        if ($classname === Pivot::class) {
+            return $classname;
+        }
+
+        if (Relation::requiresMorphMap()) {
+            throw new ClassMorphViolationException($instance ?: $classname);
+        }
+
+        return $classname;
+    }
+
+    /**
+     * Get the class name for polymorphic relations staticly.
+     *
+     * @return string
+     */
+    public static function getMorphClassStatic()
+    {
+        return static::resolveMorphClass(static::class);
+    }
+
+    /**
+     * Get the class name for polymorphic relations.
+     *
      * @return string
      */
     public function getMorphClass()
     {
-        $morphMap = Relation::morphMap();
-
-        if (! empty($morphMap) && in_array(static::class, $morphMap)) {
-            return array_search(static::class, $morphMap, true);
-        }
-
-        if (static::class === Pivot::class) {
-            return static::class;
-        }
-
-        if (Relation::requiresMorphMap()) {
-            throw new ClassMorphViolationException($this);
-        }
-
-        return static::class;
+        return static::resolveMorphClass(static::class, $this);
     }
 
     /**

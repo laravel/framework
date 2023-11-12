@@ -68,6 +68,52 @@ class DatabaseEloquentStrictMorphsTest extends TestCase
         $pivotModel->getMorphClass();
     }
 
+    public function testStaticMethodForMorphClassRetrieval()
+    {
+        // Test without a morph map
+        Relation::requireMorphMap(true);
+        $this->expectException(ClassMorphViolationException::class);
+        TestModel::getMorphClassStatic();
+
+        Relation::requireMorphMap(false);
+
+        Relation::morphMap([
+            'test' => TestModel::class,
+        ]);
+
+        $morphName = TestModel::getMorphClassStatic();
+        $this->assertSame('test', $morphName);
+
+        $pivotMorphName = TestPivotModel::getMorphClassStatic();
+        $this->assertSame(TestPivotModel::class, $pivotMorphName);
+    }
+
+    public function testStaticMethodWithEmptyMorphMap()
+    {
+        Relation::morphMap([]);
+
+        $this->expectException(ClassMorphViolationException::class);
+        TestModel::getMorphClassStatic();
+    }
+
+    public function testStaticMethodWithNonExistingClassInMorphMap()
+    {
+        Relation::morphMap([
+            'test' => SomeOtherModel::class,
+        ]);
+
+        $this->expectException(ClassMorphViolationException::class);
+        TestModel::getMorphClassStatic();
+    }
+
+    public function testStaticMethodExceptionForRequiredMorphMap()
+    {
+        Relation::requireMorphMap(true);
+
+        $this->expectException(ClassMorphViolationException::class);
+        TestModel::getMorphClassStatic();
+    }
+
     protected function tearDown(): void
     {
         parent::tearDown();
