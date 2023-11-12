@@ -1543,56 +1543,41 @@ class HttpClientTest extends TestCase
     public function testRequestConcurrencyLimitInPoolIsRespected()
     {
         $this->factory->fake([
-            '*' => $this->factory::response('', 200),
+            'https://laravel.com/*' => function ($request) {
+                return $this->factory::response('', 200);
+            },
         ]);
 
-        (array) $requests = [
-            'test1' => 'test1.com',
-            'test2' => 'test2.com',
-            'test3' => 'test3.com',
-            'test4' => 'test4.com',
-            'test5' => 'test5.com',
-        ];
-        (array) $requestTimes = [];
-
-        $responses = $this->factory->pool(function (Pool $pool) use ($requests, &$requestTimes) {
-            foreach ($requests as $name => $url) {
-                (float) $requestTimes[$name]['start'] = microtime(true);
-                $pool->as($name)->async()->get($url)->then(function () use ($name, &$requestTimes) {
-                    (float) $requestTimes[$name]['end'] = microtime(true);
-                });
+        $callback = function (Pool $pool) {
+            for ($i = 0; $i < 10; $i++) {
+                $pool->as("request-{$i}")->async()->get("https://laravel.com/test-{$i}");
             }
-        }, $concurrencyLimit = 2);
+        };
 
-        // Flatten and sort all timestamps
-        (array) $timestamps = [];
-        foreach ($requestTimes as $key => $times) {
-            $timestamps[] = ['time' => $times['start'], 'type' => 'start'];
-            $timestamps[] = ['time' => $times['end'], 'type' => 'end'];
+        // Test with different concurrency limits, the higher the number (or null) the faster it should be
+        $concurrencyLimits = [1, 5, 10];
+        $previousDuration = PHP_INT_MAX;
+
+        foreach ($concurrencyLimits as $limit) {
+            $startTime = microtime(true);
+
+            $results = $this->factory->pool($callback, $limit);
+
+            $endTime = microtime(true);
+            $duration = $endTime - $startTime;
+
+            // Check if the results are as expected
+            $this->assertCount(10, $results);
+
+            // Assert that the higher the concurrency limit, the less time it takes
+            $this->assertLessThanOrEqual(
+                $previousDuration,
+                $duration,
+                "The duration with concurrency limit {$limit} should be less or equal than duration of previous limit."
+            );
+
+            $previousDuration = $duration;
         }
-
-        usort($timestamps, function ($a, $b) {
-            return $a['time'] <=> $b['time'];
-        });
-
-        // Analyze concurrency
-        (int) $currentConcurrency = 0;
-        (int) $maxConcurrency = 0;
-        foreach ($timestamps as $timestamp) {
-            if ($timestamp['type'] === 'start') {
-                $currentConcurrency++;
-                $maxConcurrency = max($maxConcurrency, $concurrencyLimit);
-            } else {
-                $currentConcurrency--;
-            }
-        }
-
-        // Ensure the max concurrency was equal to the limit set on the pool
-        $this->assertEquals($concurrencyLimit, $maxConcurrency);
-        // Check for same number of requests vs responses
-        $this->assertEquals(count($requests), count($responses));
-        // Check to make sure the named request array keys match the named response array keys
-        $this->assertEquals(array_keys($requests), array_keys($responses));
     }
 
     public function testMiddlewareRunsInPool()
