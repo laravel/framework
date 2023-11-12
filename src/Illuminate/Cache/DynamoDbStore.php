@@ -102,21 +102,13 @@ class DynamoDbStore implements LockProvider, Store
             ],
         ]);
 
-        if (! isset($response['Item'])) {
+        if (!isset($response['Item']) || $this->isExpired($response['Item'])) {
             return;
         }
 
-        if ($this->isExpired($response['Item'])) {
-            return;
-        }
+        $value = $response['Item'][$this->valueAttribute]['S'] ?? $response['Item'][$this->valueAttribute]['N'] ?? null;
 
-        if (isset($response['Item'][$this->valueAttribute])) {
-            return $this->unserialize(
-                $response['Item'][$this->valueAttribute]['S'] ??
-                $response['Item'][$this->valueAttribute]['N'] ??
-                null
-            );
-        }
+        return isset($value) ? $this->unserialize($value) : null;
     }
 
     /**
