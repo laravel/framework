@@ -2720,7 +2720,8 @@ class CustomFactory extends Factory
 {
     protected function newPendingRequest()
     {
-        return new class extends PendingRequest {
+        return new class extends PendingRequest
+        {
             protected function newResponse($response)
             {
                 return new TestResponse($response);
