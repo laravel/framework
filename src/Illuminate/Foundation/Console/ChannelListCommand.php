@@ -109,7 +109,7 @@ class ChannelListCommand extends Command
     }
 
     /**
-     * Determine and return the output for displaying the number of registered chanels in the CLI output.
+     * Determine and return the output for displaying the number of registered channels in the CLI output.
      *
      * @param  \Illuminate\Support\Collection  $channels
      * @param  int  $terminalWidth

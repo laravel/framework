@@ -414,6 +414,16 @@ class Factory
     }
 
     /**
+     * Get the array of global middleware.
+     *
+     * @return array
+     */
+    public function getGlobalMiddleware()
+    {
+        return $this->globalMiddleware;
+    }
+
+    /**
      * Execute a method against a new pending request instance.
      *
      * @param  string  $method

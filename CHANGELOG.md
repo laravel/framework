@@ -1,6 +1,174 @@
 # Release Notes for 10.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v10.23.1...10.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v10.31.0...10.x)
+
+## [v10.31.0](https://github.com/laravel/framework/compare/v10.30.1...v10.31.0) - 2023-11-07
+
+- [10.x] Allow `Sleep::until()` to be passed a timestamp as a string by [@jameshulse](https://github.com/jameshulse) in https://github.com/laravel/framework/pull/48883
+- [10.x] Fix whereHasMorph() with nullable morphs by [@MarkKremer](https://github.com/MarkKremer) in https://github.com/laravel/framework/pull/48903
+- [10.x] Handle `class_parents` returning false in `class_uses_recursive` by [@RoflCopter24](https://github.com/RoflCopter24) in https://github.com/laravel/framework/pull/48902
+- [10.x] Enable default retrieval of all fragments in `fragments()` and `fragmentsIf()` methods by [@tabuna](https://github.com/tabuna) in https://github.com/laravel/framework/pull/48894
+- [10.x] Allow placing a batch on a chain by [@khepin](https://github.com/khepin) in https://github.com/laravel/framework/pull/48633
+- [10.x] Dispatch 'connection failed' event in async http client request by [@gdebrauwer](https://github.com/gdebrauwer) in https://github.com/laravel/framework/pull/48900
+- authenticate method refactored to use null coalescing operator by [@miladev95](https://github.com/miladev95) in https://github.com/laravel/framework/pull/48917
+- [10.x] Add support for Sec-Purpose header by [@nanos](https://github.com/nanos) in https://github.com/laravel/framework/pull/48925
+- [10.x] Allow setting retain_visibility config option on Flysystem filesystems by [@jnoordsij](https://github.com/jnoordsij) in https://github.com/laravel/framework/pull/48935
+- [10.x] Escape forward slashes when exploding wildcard rules by [@matt-farrugia](https://github.com/matt-farrugia) in https://github.com/laravel/framework/pull/48936
+
+## [v10.30.1](https://github.com/laravel/framework/compare/v10.30.0...v10.30.1) - 2023-11-01
+
+- [10.x] Fix postgreSQL reserved word column names w/ guarded attributes broken in native column attributes implementation by [@hafezdivandari](https://github.com/hafezdivandari) in https://github.com/laravel/framework/pull/48877
+
+## [v10.30.0](https://github.com/laravel/framework/compare/v10.29.0...v10.30.0) - 2023-10-31
+
+- [10.x] Test Improvements by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/48815
+- [10.x] Verify hash config by [@timacdonald](https://github.com/timacdonald) in https://github.com/laravel/framework/pull/48814
+- [10.x] Fix the issue of using the now function within the ArrayCache in Lumen by [@cxlblm](https://github.com/cxlblm) in https://github.com/laravel/framework/pull/48826
+- [10.x] Match service provider after resolved by [@timacdonald](https://github.com/timacdonald) in https://github.com/laravel/framework/pull/48824
+- [10.x] Fix type error registering PSR Request by [@kpicaza](https://github.com/kpicaza) in https://github.com/laravel/framework/pull/48823
+- [10.x] Ability to configure default session block timeouts by [@bytestream](https://github.com/bytestream) in https://github.com/laravel/framework/pull/48795
+- [10.x] Improvements for `artisan migrate --pretend` command 🚀 by [@NickSdot](https://github.com/NickSdot) in https://github.com/laravel/framework/pull/48768
+- [10.x] Add support for getting native columns' attributes by [@hafezdivandari](https://github.com/hafezdivandari) in https://github.com/laravel/framework/pull/48357
+- fix(Eloquent/Builder): calling the methods on passthru base object should be case-insensitive by [@luka-papez](https://github.com/luka-papez) in https://github.com/laravel/framework/pull/48852
+- [10.x] Fix `QueriesRelationships[@getRelationHashedColumn](https://github.com/getRelationHashedColumn)()` typehint by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/48847
+- [10.x] Remember the job on the exception by [@timacdonald](https://github.com/timacdonald) in https://github.com/laravel/framework/pull/48830
+- fix bug for always throwing exception when we pass a callable to throwUnlessStatus method [test included] by [@mhfereydouni](https://github.com/mhfereydouni) in https://github.com/laravel/framework/pull/48844
+- [10.x] Dispatch events based on a DB transaction result by [@mateusjatenee](https://github.com/mateusjatenee) in https://github.com/laravel/framework/pull/48705
+- [10.x] Reset ShouldDispatchAfterCommitEventTest objects properties by [@mateusjatenee](https://github.com/mateusjatenee) in https://github.com/laravel/framework/pull/48858
+- [10.x] Throw exception when trying to escape array for database connection by [@sidneyprins](https://github.com/sidneyprins) in https://github.com/laravel/framework/pull/48836
+- [10.x] Fix Stringable objects not converted to string in HTTP facade Query parameters and Body by [@LasseRafn](https://github.com/LasseRafn) in https://github.com/laravel/framework/pull/48849
+
+## [v10.29.0](https://github.com/laravel/framework/compare/v10.28.0...v10.29.0) - 2023-10-24
+
+- [10.x] Fixes `Str::password()` does not always generate password with numbers by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/48681
+- [10.x] Fixes cache:prune-stale-tags preg_match delimiter no escaped by [@ame1973](https://github.com/ame1973) in https://github.com/laravel/framework/pull/48702
+- [10.x] Allow route:list to expand middleware groups in 'VeryVerbose' mode by [@NickSdot](https://github.com/NickSdot) in https://github.com/laravel/framework/pull/48703
+- [10.x] Fix model:prune command error with non-class php files by [@zlodes](https://github.com/zlodes) in https://github.com/laravel/framework/pull/48708
+- [10.x] Show CliDumper source content on last line by [@CalebDW](https://github.com/CalebDW) in https://github.com/laravel/framework/pull/48707
+- [10.x] Revival of the reverted changes in 10.25.0: `firstOrCreate` `updateOrCreate` improvement through `createOrFirst` + additional query tests  by [@mpyw](https://github.com/mpyw) in https://github.com/laravel/framework/pull/48637
+- [10.x] allow resolving view from closure by [@PH7-Jack](https://github.com/PH7-Jack) in https://github.com/laravel/framework/pull/48719
+- [10.x] Allow creation of PSR request with merged data by [@timacdonald](https://github.com/timacdonald) in https://github.com/laravel/framework/pull/48696
+- [10.x] Update DocBlock for `convertCase` Method to Reflect Optional $encoding Parameter by [@salehhashemi1992](https://github.com/salehhashemi1992) in https://github.com/laravel/framework/pull/48729
+- [10.x] Use ValidationException class from Validator Property by [@a-h-abid](https://github.com/a-h-abid) in https://github.com/laravel/framework/pull/48736
+- [10.x] Implement Test Coverage for `Str::convertCase` Method by [@salehhashemi1992](https://github.com/salehhashemi1992) in https://github.com/laravel/framework/pull/48730
+- [10.x] Extend Test Coverage for `Str::take` Function by [@salehhashemi1992](https://github.com/salehhashemi1992) in https://github.com/laravel/framework/pull/48728
+- [10.x] Add `replaceMatches` to Str class by [@hosmelq](https://github.com/hosmelq) in https://github.com/laravel/framework/pull/48727
+- [10.x] Fix duplicate conditions on retrying `SELECT` calls under `createOrFirst()` by [@KentarouTakeda](https://github.com/KentarouTakeda) in https://github.com/laravel/framework/pull/48725
+- [10.x] Uses `stefanzweifel/git-auto-commit-action[@v5](https://github.com/v5)` by [@nunomaduro](https://github.com/nunomaduro) in https://github.com/laravel/framework/pull/48763
+- [10.x] fix typo in comment by [@vintagesucks](https://github.com/vintagesucks) in https://github.com/laravel/framework/pull/48770
+- [10.x] Require DBAL 3 when installing by [@Jubeki](https://github.com/Jubeki) in https://github.com/laravel/framework/pull/48769
+- [10.x] Escape the delimiter when extracting an excerpt from text by [@standaniels](https://github.com/standaniels) in https://github.com/laravel/framework/pull/48765
+- [10.x] Fix `replaceMatches` in Str class by [@hosmelq](https://github.com/hosmelq) in https://github.com/laravel/framework/pull/48760
+- [10.x] Moves logger instance creation to a protected method by [@rodrigopedra](https://github.com/rodrigopedra) in https://github.com/laravel/framework/pull/48759
+- [10.x] Add runningConsoleCommand(...$commands) method by [@trevorgehman](https://github.com/trevorgehman) in https://github.com/laravel/framework/pull/48751
+- [10.x] Update annotations in wrap method to accommodate Collection instances by [@salehhashemi1992](https://github.com/salehhashemi1992) in https://github.com/laravel/framework/pull/48746
+- [10.x] Add Tests for Str::replaceMatches Method by [@salehhashemi1992](https://github.com/salehhashemi1992) in https://github.com/laravel/framework/pull/48771
+- [10.x] Do not bubble exceptions thrown rendering error view when debug is false (prevent infinite loops) by [@simensen](https://github.com/simensen) in https://github.com/laravel/framework/pull/48732
+- [10.x] Correct phpdoc for Grammar::setConnection by [@Neol3108](https://github.com/Neol3108) in https://github.com/laravel/framework/pull/48779
+- [10.x] Add `displayName` for queued Artisan commands by [@jessarcher](https://github.com/jessarcher) in https://github.com/laravel/framework/pull/48778
+- [10.x] Test Improvements by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/48797
+- [10.x] Make inherited relations and virtual attributes appear in model:show command by [@sebj54](https://github.com/sebj54) in https://github.com/laravel/framework/pull/48800
+
+## [v10.28.0](https://github.com/laravel/framework/compare/v10.27.0...v10.28.0) - 2023-10-10
+
+- [10.x] Fixed issue: Added a call to the `getValue` method by [@lozobojan](https://github.com/lozobojan) in https://github.com/laravel/framework/pull/48652
+- [10.x] Add an example for queue retry range option by [@pionl](https://github.com/pionl) in https://github.com/laravel/framework/pull/48691
+- [10.x] Add percentage to be used as High Order Messages by [@WendellAdriel](https://github.com/WendellAdriel) in https://github.com/laravel/framework/pull/48689
+- [10.x] Optimize `exists` validation for empty array input by [@mtawil](https://github.com/mtawil) in https://github.com/laravel/framework/pull/48684
+
+## [v10.27.0](https://github.com/laravel/framework/compare/v10.26.2...v10.27.0) - 2023-10-09
+
+- [10.x] Store blocks after prepare strings by [@nunomaduro](https://github.com/nunomaduro) in https://github.com/laravel/framework/pull/48641
+- [10.x] throw TransportException instead of Exception in SES mail drivers by [@bchalier](https://github.com/bchalier) in https://github.com/laravel/framework/pull/48645
+- [10.x] Fix `Model::replicate()` when using unique keys by [@axlon](https://github.com/axlon) in https://github.com/laravel/framework/pull/48636
+- [10.x] Don't crash if replacement cannot be represented as a string by [@GrahamCampbell](https://github.com/GrahamCampbell) in https://github.com/laravel/framework/pull/48530
+- [10.x] Extended `pluck()` testcases by [@bert-w](https://github.com/bert-w) in https://github.com/laravel/framework/pull/48657
+- [10.x] Fixes `GeneratorCommand` not able to prevent uppercase reserved name such as  `__CLASS__` by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/48667
+- [10.x] Fix timing sensitive flaky test by [@KentarouTakeda](https://github.com/KentarouTakeda) in https://github.com/laravel/framework/pull/48664
+- [10.x] Fixed implementation related to `afterCommit` on Postgres and MSSQL database drivers by [@SakiTakamachi](https://github.com/SakiTakamachi) in https://github.com/laravel/framework/pull/48662
+- [10.x] Implement chunkById in descending order by [@cristiancalara](https://github.com/cristiancalara) in https://github.com/laravel/framework/pull/48666
+
+## [v10.26.2](https://github.com/laravel/framework/compare/v10.26.1...v10.26.2) - 2023-10-03
+
+- Revert "Hint query builder closures (#48562)" by @taylorotwell in https://github.com/laravel/framework/pull/48620
+
+## [v10.26.1](https://github.com/laravel/framework/compare/v10.26.0...v10.26.1) - 2023-10-03
+
+- [10.x] Fix selection of vendor files after searching by [@jessarcher](https://github.com/jessarcher) in https://github.com/laravel/framework/pull/48619
+
+## [v10.26.0](https://github.com/laravel/framework/compare/v10.25.2...v10.26.0) - 2023-10-03
+
+- [10.x] Convert Expression to string for from in having subqueries by @ikari7789 in https://github.com/laravel/framework/pull/48525
+- [10.x] Allow searching on `vendor:publish` prompt by @jessarcher in https://github.com/laravel/framework/pull/48586
+- [10.x] Enhance Test Coverage for Macroable Trait by @salehhashemi1992 in https://github.com/laravel/framework/pull/48583
+- [10.x] Add new SQL error messages by @magnusvin in https://github.com/laravel/framework/pull/48601
+- [10.x] Ensure array cache considers milliseconds by @timacdonald in https://github.com/laravel/framework/pull/48573
+- [10.x] Prevent `session:table` command from creating duplicates by @jessarcher in https://github.com/laravel/framework/pull/48602
+- [10.x] Handle expiration in seconds by @timacdonald in https://github.com/laravel/framework/pull/48600
+- [10.x] Avoid duplicate code for create table commands by extending new `Illuminate\Console\MigrationGeneratorCommand` by @crynobone in https://github.com/laravel/framework/pull/48603
+- [10.x] Add Closure Type Hinting for Query Builders by @AJenbo in https://github.com/laravel/framework/pull/48562
+
+## [v10.25.2](https://github.com/laravel/framework/compare/v10.25.1...v10.25.2) - 2023-09-28
+
+- [10.x] Account for new MariaDB platform by [@timacdonald](https://github.com/timacdonald) in https://github.com/laravel/framework/pull/48563
+- [10.x] Add Windows fallback for `multisearch` prompt by [@jessarcher](https://github.com/jessarcher) in https://github.com/laravel/framework/pull/48565
+- Revert "[10.x] Fix blade failing to compile when mixing inline/block [@php](https://github.com/php) directives" by [@driesvints](https://github.com/driesvints) in https://github.com/laravel/framework/pull/48575
+- [10.x] Added Validation Macro Functionality Tests by [@salehhashemi1992](https://github.com/salehhashemi1992) in https://github.com/laravel/framework/pull/48570
+- Revert expiry time changes by [@driesvints](https://github.com/driesvints) in https://github.com/laravel/framework/pull/48576
+
+## [v10.25.1](https://github.com/laravel/framework/compare/v10.25.0...v10.25.1) - 2023-09-27
+
+- [10.x] Correct parameter type on MakesHttpRequests:followRedirects() by [@AJenbo](https://github.com/AJenbo) in https://github.com/laravel/framework/pull/48557
+- [10.x] Fix `firstOrNew` on `HasManyThrough` relations by [@tonysm](https://github.com/tonysm) in https://github.com/laravel/framework/pull/48542
+- [10.x] Fix "after commit" callbacks not running on nested transactions using `RefreshDatabase` or `DatabaseMigrations` by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/48523
+- [10.x] Use the dedicated key getters in BelongsTo by [@iamgergo](https://github.com/iamgergo) in https://github.com/laravel/framework/pull/48509
+- [10.x] Fix undefined constant `STDIN` error with `Artisan::call` during a request by [@jessarcher](https://github.com/jessarcher) in https://github.com/laravel/framework/pull/48559
+
+## [v10.25.0](https://github.com/laravel/framework/compare/v10.24.0...v10.25.0) - 2023-09-26
+
+- [10.x] Fix key type in [@return](https://github.com/return) tag of EnumeratesValues::ensure() docblock by [@wimski](https://github.com/wimski) in https://github.com/laravel/framework/pull/48456
+- [10.x] Add str()->take($limit) and Str::take($string, $limit) by [@moshe-autoleadstar](https://github.com/moshe-autoleadstar) in https://github.com/laravel/framework/pull/48467
+- [10.x] Throttle exceptions by [@timacdonald](https://github.com/timacdonald) in https://github.com/laravel/framework/pull/48391
+- [10.x] Fix blade failing to compile when mixing inline/block [@php](https://github.com/php) directives by [@CalebDW](https://github.com/CalebDW) in https://github.com/laravel/framework/pull/48420
+- [10.x] Fix test name for stringable position by [@shawnlindstrom](https://github.com/shawnlindstrom) in https://github.com/laravel/framework/pull/48480
+- [10.x] Create fluent method convertCase by [@rmunate](https://github.com/rmunate) in https://github.com/laravel/framework/pull/48492
+- [10.x] Fix `CanBeOneOfMany` giving erroneous results by [@Guilhem-DELAITRE](https://github.com/Guilhem-DELAITRE) in https://github.com/laravel/framework/pull/47427
+- [10.x] Disable autoincrement for unsupported column type by [@ikari7789](https://github.com/ikari7789) in https://github.com/laravel/framework/pull/48501
+- [10.x] Increase bcrypt rounds to 12 by [@valorin](https://github.com/valorin) in https://github.com/laravel/framework/pull/48494
+- [10.x] Ensure array driver expires values at the expiry time by [@timacdonald](https://github.com/timacdonald) in https://github.com/laravel/framework/pull/48497
+- [10.x] Fix typos by [@szepeviktor](https://github.com/szepeviktor) in https://github.com/laravel/framework/pull/48513
+- [10.x] Improve tests for `Arr::first` and `Arr::last` by [@tamiroh](https://github.com/tamiroh) in https://github.com/laravel/framework/pull/48511
+- [10.x] Set morph type for MorphToMany pivot model by [@gazben](https://github.com/gazben) in https://github.com/laravel/framework/pull/48432
+- [10.x] Revert from using `createOrFirst` in other `*OrCreate` methods by [@tonysm](https://github.com/tonysm) in https://github.com/laravel/framework/pull/48531
+- [10.x] Fix typos in tests by [@szepeviktor](https://github.com/szepeviktor) in https://github.com/laravel/framework/pull/48534
+- [10.x] Adds `updateOrCreate` on HasManyThrough relations regression test by [@tonysm](https://github.com/tonysm) in https://github.com/laravel/framework/pull/48533
+- [10.x] Convert exception rate limit to seconds by [@timacdonald](https://github.com/timacdonald) in https://github.com/laravel/framework/pull/48543
+- [10.x] Adds the `firstOrCreate` and `createOrFirst` methods to the `HasManyThrough` relation by [@tonysm](https://github.com/tonysm) in https://github.com/laravel/framework/pull/48541
+- [10.x] Handle custom extensions when caching views by [@timacdonald](https://github.com/timacdonald) in https://github.com/laravel/framework/pull/48524
+- [10.x] Set prompt interactivity mode by [@jessarcher](https://github.com/jessarcher) in https://github.com/laravel/framework/pull/48468
+
+## [v10.24.0](https://github.com/laravel/framework/compare/v10.23.1...v10.24.0) - 2023-09-19
+
+- Make types of  parameter of join method consistent in the Query Builder by [@melicerte](https://github.com/melicerte) in https://github.com/laravel/framework/pull/48386
+- [10.x] Fix file race condition after view:cache and artisan up by [@roxik](https://github.com/roxik) in https://github.com/laravel/framework/pull/48368
+- [10.x] Re-enable SQL Server CI by [@GrahamCampbell](https://github.com/GrahamCampbell) in https://github.com/laravel/framework/pull/48393
+- Update request.stub by [@olivsinz](https://github.com/olivsinz) in https://github.com/laravel/framework/pull/48402
+- [10.x] phpdoc: Auth\Access\Response constructor allows null message by [@snmatsui](https://github.com/snmatsui) in https://github.com/laravel/framework/pull/48394
+- [10.x] Test Improvements by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/48390
+- Turn off autocomplete for csrf_field by [@maxheckel](https://github.com/maxheckel) in https://github.com/laravel/framework/pull/48371
+- [10.x] Remove PHP 8.1 Check for including Enums in Tests by [@Jubeki](https://github.com/Jubeki) in https://github.com/laravel/framework/pull/48415
+- [10.x] Improve naming by [@timacdonald](https://github.com/timacdonald) in https://github.com/laravel/framework/pull/48413
+- [10.x] Fix "Text file busy" error when call deleteDirectory by [@ycs77](https://github.com/ycs77) in https://github.com/laravel/framework/pull/48422
+- Fix Cache::many() with small numeric keys by [@AlexKarpan](https://github.com/AlexKarpan) in https://github.com/laravel/framework/pull/48423
+- [10.x] Update actions/checkout from v3 to v4 by [@tamiroh](https://github.com/tamiroh) in https://github.com/laravel/framework/pull/48439
+- `lazyById` doesn't check availability of id (alias) column in database response and silently ends up with endless loop. `chunkById` does. by [@decadence](https://github.com/decadence) in https://github.com/laravel/framework/pull/48436
+- [10.x] Allow older jobs to be faked by [@timacdonald](https://github.com/timacdonald) in https://github.com/laravel/framework/pull/48434
+- [10.x] introduce `Str::substrPos` by [@amacado](https://github.com/amacado) in https://github.com/laravel/framework/pull/48421
+- [10.x] Guess table name correctly in migrations if column's name have ('to', 'from' and/or 'in') terms by [@i350](https://github.com/i350) in https://github.com/laravel/framework/pull/48437
+- [10.x] Refactored LazyCollection::take() to save memory by [@fuwasegu](https://github.com/fuwasegu) in https://github.com/laravel/framework/pull/48382
+- [10.x] Get value attribute when default value is an enum by [@squiaios](https://github.com/squiaios) in https://github.com/laravel/framework/pull/48452
+- [10.x] Composer helper improvements by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/48448
+- [10.x] Test Symfony v6.4 by [@driesvints](https://github.com/driesvints) in https://github.com/laravel/framework/pull/48400
 
 ## [v10.23.1](https://github.com/laravel/framework/compare/v10.23.0...v10.23.1) - 2023-09-13
 
@@ -165,7 +333,7 @@
 - [10.x] Prompts by [@jessarcher](https://github.com/jessarcher) in https://github.com/laravel/framework/pull/46772
 - [10.x] Migrate JSON data to shared InputBag by [@timacdonald](https://github.com/timacdonald) in https://github.com/laravel/framework/pull/47914
 - [10.x] Fix `Factory::configure()` return type by [@axlon](https://github.com/axlon) in https://github.com/laravel/framework/pull/47920
-- [10.x] Fix Http global middleware for queue, octane, and dependecy injection by [@timacdonald](https://github.com/timacdonald) in https://github.com/laravel/framework/pull/47915
+- [10.x] Fix Http global middleware for queue, octane, and dependency injection by [@timacdonald](https://github.com/timacdonald) in https://github.com/laravel/framework/pull/47915
 
 ## [v10.16.1](https://github.com/laravel/framework/compare/v10.17.1...v10.16.1) - 2023-07-26
 
@@ -330,7 +498,7 @@
 
 ### Reverted
 
-- Revert "[10.x] Fix inconsistentcy between report and render methods" ([#47326](https://github.com/laravel/framework/pull/47326))
+- Revert "[10.x] Fix inconsistency between report and render methods" ([#47326](https://github.com/laravel/framework/pull/47326))
 
 ### Changed
 
@@ -349,7 +517,7 @@
 ### Fixed
 
 - Fixed bug when function wrapped around definition of related factory ([#47168](https://github.com/laravel/framework/pull/47168))
-- Fixed inconsistentcy between report and render methods ([#47201](https://github.com/laravel/framework/pull/47201))
+- Fixed inconsistency between report and render methods ([#47201](https://github.com/laravel/framework/pull/47201))
 - Fixes Model::isDirty() when AsCollection or AsEncryptedCollection have arguments ([#47235](https://github.com/laravel/framework/pull/47235))
 - Fixed escaped String for JSON_CONTAINS ([#47244](https://github.com/laravel/framework/pull/47244))
 - Fixes missing output on ProcessFailedException exception ([#47285](https://github.com/laravel/framework/pull/47285))
@@ -681,7 +849,7 @@
 
 ### Reverted
 
-- Revert "[10.x] Fix custom themes not reseting on Markdown renderer" ([#46328](https://github.com/laravel/framework/pull/46328))
+- Revert "[10.x] Fix custom themes not resetting on Markdown renderer" ([#46328](https://github.com/laravel/framework/pull/46328))
 
 ### Fixed
 
@@ -747,7 +915,7 @@
 ### Fixed
 
 - Fixing issue where 0 is discarded as a valid timestamp ([#46158](https://github.com/laravel/framework/pull/46158))
-- Fix custom themes not reseting on Markdown renderer ([#46200](https://github.com/laravel/framework/pull/46200))
+- Fix custom themes not resetting on Markdown renderer ([#46200](https://github.com/laravel/framework/pull/46200))
 
 ### Changed
 

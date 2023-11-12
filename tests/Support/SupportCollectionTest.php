@@ -4739,7 +4739,7 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
-    public function testSplitCollectionWithADivisableCount($collection)
+    public function testSplitCollectionWithADivisibleCount($collection)
     {
         $data = new $collection(['a', 'b', 'c', 'd']);
         $split = $data->split(2);
@@ -5661,6 +5661,21 @@ class SupportCollectionTest extends TestCase
         $this->assertSame(50.00, $collection->percentage(fn ($value) => $value['foo'] === 'bar'));
         $this->assertSame(25.00, $collection->percentage(fn ($value) => $value['foo'] === 'baz'));
         $this->assertSame(0.0, $collection->percentage(fn ($value) => $value['foo'] === 'test'));
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testHighOrderPercentage($collection)
+    {
+        $collection = new $collection([
+            ['name' => 'Taylor', 'active' => true],
+            ['name' => 'Nuno', 'active' => true],
+            ['name' => 'Dries', 'active' => false],
+            ['name' => 'Jess', 'active' => true],
+        ]);
+
+        $this->assertSame(75.00, $collection->percentage->active);
     }
 
     /**

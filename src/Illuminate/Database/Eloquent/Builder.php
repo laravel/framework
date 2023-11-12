@@ -97,29 +97,29 @@ class Builder implements BuilderContract
         'avg',
         'count',
         'dd',
-        'ddRawSql',
-        'doesntExist',
-        'doesntExistOr',
+        'ddrawsql',
+        'doesntexist',
+        'doesntexistor',
         'dump',
-        'dumpRawSql',
+        'dumprawsql',
         'exists',
-        'existsOr',
+        'existsor',
         'explain',
-        'getBindings',
-        'getConnection',
-        'getGrammar',
+        'getbindings',
+        'getconnection',
+        'getgrammar',
         'implode',
         'insert',
-        'insertGetId',
-        'insertOrIgnore',
-        'insertUsing',
+        'insertgetid',
+        'insertorignore',
+        'insertusing',
         'max',
         'min',
         'raw',
-        'rawValue',
+        'rawvalue',
         'sum',
-        'toSql',
-        'toRawSql',
+        'tosql',
+        'torawsql',
     ];
 
     /**
@@ -563,7 +563,7 @@ class Builder implements BuilderContract
      */
     public function firstOrCreate(array $attributes = [], array $values = [])
     {
-        if (! is_null($instance = $this->where($attributes)->first())) {
+        if (! is_null($instance = (clone $this)->where($attributes)->first())) {
             return $instance;
         }
 
@@ -1964,7 +1964,7 @@ class Builder implements BuilderContract
             return $this->callNamedScope($method, $parameters);
         }
 
-        if (in_array($method, $this->passthru)) {
+        if (in_array(strtolower($method), $this->passthru)) {
             return $this->toBase()->{$method}(...$parameters);
         }
 

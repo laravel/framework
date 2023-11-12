@@ -123,6 +123,12 @@ class SupportStringableTest extends TestCase
         $this->assertTrue($stringable->matchAll('/nothing/')->isEmpty());
     }
 
+    public function testTake()
+    {
+        $this->assertSame('ab', (string) $this->stringable('abcdef')->take(2));
+        $this->assertSame('ef', (string) $this->stringable('abcdef')->take(-2));
+    }
+
     public function testTest()
     {
         $stringable = $this->stringable('foo bar');
@@ -1018,7 +1024,7 @@ class SupportStringableTest extends TestCase
         $this->assertSame(1, $this->stringable('laravelPHPFramework')->substrCount('a', -10, -3));
     }
 
-    public function testSubstrPos()
+    public function testPosition()
     {
         $this->assertSame(7, $this->stringable('Hello, World!')->position('W'));
         $this->assertSame(10, $this->stringable('This is a test string.')->position('test'));
@@ -1179,6 +1185,21 @@ class SupportStringableTest extends TestCase
         $this->assertSame('before<br>after', (string) $this->stringable('before<br>after')->stripTags('<br>'));
         $this->assertSame('before<br>after', (string) $this->stringable('<strong>before</strong><br>after')->stripTags('<br>'));
         $this->assertSame('<strong>before</strong><br>after', (string) $this->stringable('<strong>before</strong><br>after')->stripTags('<br><strong>'));
+    }
+
+    public function testReplaceMatches()
+    {
+        $stringable = $this->stringable('Hello world!');
+        $result = $stringable->replaceMatches('/world/', function ($match) {
+            return strtoupper($match[0]);
+        });
+
+        $this->assertSame('Hello WORLD!', $result->value);
+
+        $stringable = $this->stringable('apple orange apple');
+        $result = $stringable->replaceMatches('/apple/', 'fruit', 1);
+
+        $this->assertSame('fruit orange apple', $result->value);
     }
 
     public function testScan()

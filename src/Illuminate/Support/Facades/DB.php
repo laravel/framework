@@ -42,6 +42,7 @@ namespace Illuminate\Support\Facades;
  * @method static int affectingStatement(string $query, array $bindings = [])
  * @method static bool unprepared(string $query)
  * @method static array pretend(\Closure $callback)
+ * @method static mixed withoutPretending(\Closure $callback)
  * @method static void bindValues(\PDOStatement $statement, array $bindings)
  * @method static array prepareBindings(array $bindings)
  * @method static void logQuery(string $query, array $bindings, float|null $time = null)

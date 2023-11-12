@@ -81,11 +81,37 @@ class PostgresGrammar extends Grammar
     /**
      * Compile the query to determine the list of columns.
      *
+     * @deprecated Will be removed in a future Laravel version.
+     *
      * @return string
      */
     public function compileColumnListing()
     {
         return 'select column_name from information_schema.columns where table_catalog = ? and table_schema = ? and table_name = ?';
+    }
+
+    /**
+     * Compile the query to determine the columns.
+     *
+     * @param  string  $database
+     * @param  string  $schema
+     * @param  string  $table
+     * @return string
+     */
+    public function compileColumns($database, $schema, $table)
+    {
+        return sprintf(
+            'select quote_ident(a.attname) as name, t.typname as type_name, format_type(a.atttypid, a.atttypmod) as type, '
+            .'(select tc.collcollate from pg_catalog.pg_collation tc where tc.oid = a.attcollation) as collation, '
+            .'not a.attnotnull as nullable, '
+            .'(select pg_get_expr(adbin, adrelid) from pg_attrdef where c.oid = pg_attrdef.adrelid and pg_attrdef.adnum = a.attnum) as default, '
+            .'(select pg_description.description from pg_description where pg_description.objoid = c.oid and a.attnum = pg_description.objsubid) as comment '
+            .'from pg_attribute a, pg_class c, pg_type t, pg_namespace n '
+            .'where c.relname = %s and n.nspname = %s and a.attnum > 0 and a.attrelid = c.oid and a.atttypid = t.oid and n.oid = c.relnamespace '
+            .'order by a.attnum',
+            $this->quoteString($table),
+            $this->quoteString($schema)
+        );
     }
 
     /**

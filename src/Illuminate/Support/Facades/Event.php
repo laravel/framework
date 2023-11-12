@@ -20,6 +20,7 @@ use Illuminate\Support\Testing\Fakes\EventFake;
  * @method static void forget(string $event)
  * @method static void forgetPushed()
  * @method static \Illuminate\Events\Dispatcher setQueueResolver(callable $resolver)
+ * @method static \Illuminate\Events\Dispatcher setTransactionManagerResolver(callable $resolver)
  * @method static array getRawListeners()
  * @method static void macro(string $name, object|callable $macro)
  * @method static void mixin(object $mixin, bool $replace = true)

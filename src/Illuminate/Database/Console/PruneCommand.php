@@ -139,9 +139,9 @@ class PruneCommand extends Command
                     return in_array($model, $except);
                 });
             })->filter(function ($model) {
-                return $this->isPrunable($model);
-            })->filter(function ($model) {
                 return class_exists($model);
+            })->filter(function ($model) {
+                return $this->isPrunable($model);
             })->values();
     }
 

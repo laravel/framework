@@ -201,6 +201,18 @@ class Stringable implements JsonSerializable, ArrayAccess
     }
 
     /**
+     * Convert the case of a string.
+     *
+     * @param  int  $mode
+     * @param  string  $encoding
+     * @return string
+     */
+    public function convertCase(int $mode = MB_CASE_FOLD, ?string $encoding = 'UTF-8')
+    {
+        return new static(Str::convertCase($this->value, $mode, $encoding));
+    }
+
+    /**
      * Get the parent directory's path.
      *
      * @param  int  $levels
@@ -898,6 +910,21 @@ class Stringable implements JsonSerializable, ArrayAccess
     public function swap(array $map)
     {
         return new static(strtr($this->value, $map));
+    }
+
+    /**
+     * Take the first or last {$limit} characters.
+     *
+     * @param  int  $limit
+     * @return static
+     */
+    public function take(int $limit)
+    {
+        if ($limit < 0) {
+            return $this->substr($limit);
+        }
+
+        return $this->substr(0, $limit);
     }
 
     /**

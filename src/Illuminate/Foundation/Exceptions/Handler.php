@@ -6,6 +6,9 @@ use Closure;
 use Exception;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\AuthenticationException;
+use Illuminate\Cache\RateLimiter;
+use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Cache\RateLimiting\Unlimited;
 use Illuminate\Console\View\Components\BulletList;
 use Illuminate\Console\View\Components\Error;
 use Illuminate\Contracts\Container\Container;
@@ -24,6 +27,7 @@ use Illuminate\Routing\Router;
 use Illuminate\Session\TokenMismatchException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Lottery;
 use Illuminate\Support\Reflector;
 use Illuminate\Support\Traits\ReflectsClosures;
 use Illuminate\Support\ViewErrorBag;
@@ -89,6 +93,13 @@ class Handler implements ExceptionHandlerContract
      * @var array<string, \Closure>
      */
     protected $exceptionMap = [];
+
+    /**
+     * Indicates that throttled keys should be hashed.
+     *
+     * @var bool
+     */
+    protected $hashThrottleKeys = true;
 
     /**
      * A list of the internal exception types that should not be reported.
@@ -291,7 +302,7 @@ class Handler implements ExceptionHandlerContract
         }
 
         try {
-            $logger = $this->container->make(LoggerInterface::class);
+            $logger = $this->newLogger();
         } catch (Exception) {
             throw $e;
         }
@@ -332,7 +343,37 @@ class Handler implements ExceptionHandlerContract
 
         $dontReport = array_merge($this->dontReport, $this->internalDontReport);
 
-        return ! is_null(Arr::first($dontReport, fn ($type) => $e instanceof $type));
+        if (! is_null(Arr::first($dontReport, fn ($type) => $e instanceof $type))) {
+            return true;
+        }
+
+        return rescue(fn () => with($this->throttle($e), function ($throttle) use ($e) {
+            if ($throttle instanceof Unlimited || $throttle === null) {
+                return false;
+            }
+
+            if ($throttle instanceof Lottery) {
+                return ! $throttle($e);
+            }
+
+            return ! $this->container->make(RateLimiter::class)->attempt(
+                with($throttle->key ?: 'illuminate:foundation:exceptions:'.$e::class, fn ($key) => $this->hashThrottleKeys ? md5($key) : $key),
+                $throttle->maxAttempts,
+                fn () => true,
+                60 * $throttle->decayMinutes
+            );
+        }), rescue: false, report: false);
+    }
+
+    /**
+     * Throttle the given exception.
+     *
+     * @param  \Throwable  $e
+     * @return \Illuminate\Support\Lottery|\Illuminate\Cache\RateLimiting\Limit|null
+     */
+    protected function throttle(Throwable $e)
+    {
+        return Limit::none();
     }
 
     /**
@@ -678,10 +719,16 @@ class Handler implements ExceptionHandlerContract
         $this->registerErrorViewPaths();
 
         if ($view = $this->getHttpExceptionView($e)) {
-            return response()->view($view, [
-                'errors' => new ViewErrorBag,
-                'exception' => $e,
-            ], $e->getStatusCode(), $e->getHeaders());
+            try {
+                return response()->view($view, [
+                    'errors' => new ViewErrorBag,
+                    'exception' => $e,
+                ], $e->getStatusCode(), $e->getHeaders());
+            } catch (Throwable $t) {
+                config('app.debug') && throw $t;
+
+                $this->report($t);
+            }
         }
 
         return $this->convertExceptionToResponse($e);
@@ -830,5 +877,15 @@ class Handler implements ExceptionHandlerContract
     protected function isHttpException(Throwable $e)
     {
         return $e instanceof HttpExceptionInterface;
+    }
+
+    /**
+     * Create a new logger instance.
+     *
+     * @return \Psr\Log\LoggerInterface
+     */
+    protected function newLogger()
+    {
+        return $this->container->make(LoggerInterface::class);
     }
 }
