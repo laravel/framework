@@ -11,6 +11,7 @@ use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Exception\TransferException;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
+use GuzzleHttp\Promise\Each;
 use GuzzleHttp\UriTemplate\UriTemplate;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Http\Client\Events\ConnectionFailed;
@@ -846,17 +847,34 @@ class PendingRequest
      * Send a pool of asynchronous requests concurrently.
      *
      * @param  callable  $callback
+     * @param  int|null  $concurrencyLimit
      * @return array<array-key, \Illuminate\Http\Client\Response>
      */
-    public function pool(callable $callback)
+    public function pool(callable $callback, ?int $concurrencyLimit = null)
     {
         $results = [];
 
-        $requests = tap(new Pool($this->factory), $callback)->getRequests();
+        $pool = tap(new Pool($this->factory), $callback)->getRequests();
 
-        foreach ($requests as $key => $item) {
-            $results[$key] = $item instanceof static ? $item->getPromise()->wait() : $item->wait();
-        }
+        $promises = array_map(function ($request) {
+            // Convert the PendingRequest into a Guzzle Promise
+            return $request instanceof static ? $request->getPromise() : $request;
+        }, $pool);
+
+        Each::ofLimit(
+            $promises,
+            $concurrencyLimit ?: count($pool), // Fallback to the count of requests if no limit is defined
+            function ($response, $index) use (&$results) {
+                // Handle a successful response
+                $results[$index] = $response instanceof \GuzzleHttp\Psr7\Response
+                    ? new \Illuminate\Http\Client\Response($response)
+                    : $response;
+            },
+            function ($reason, $index) use (&$results) {
+                // Handle exceptions, might need to wrap this in a Laravel HTTP Client response?
+                $results[$index] = $reason;
+            }
+        )->wait();
 
         return $results;
     }

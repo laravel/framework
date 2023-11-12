@@ -3,37 +3,37 @@
 namespace Illuminate\Tests\Http;
 
 use Exception;
-use GuzzleHttp\Middleware;
-use GuzzleHttp\Promise\PromiseInterface;
-use GuzzleHttp\Psr7\Response as Psr7Response;
-use GuzzleHttp\TransferStats;
-use Illuminate\Contracts\Events\Dispatcher;
-use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Http\Client\Events\RequestSending;
-use Illuminate\Http\Client\Events\ResponseReceived;
-use Illuminate\Http\Client\Factory;
-use Illuminate\Http\Client\PendingRequest;
-use Illuminate\Http\Client\Pool;
-use Illuminate\Http\Client\Request;
-use Illuminate\Http\Client\RequestException;
-use Illuminate\Http\Client\Response;
-use Illuminate\Http\Client\ResponseSequence;
-use Illuminate\Http\Response as HttpResponse;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Carbon;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Fluent;
-use Illuminate\Support\Sleep;
-use Illuminate\Support\Str;
-use JsonSerializable;
 use Mockery as m;
+use JsonSerializable;
+use RuntimeException;
 use OutOfBoundsException;
-use PHPUnit\Framework\AssertionFailedError;
+use GuzzleHttp\Middleware;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
+use GuzzleHttp\TransferStats;
+use Illuminate\Support\Sleep;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Fluent;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Http\Client\Pool;
+use Illuminate\Support\Collection;
+use Illuminate\Http\Client\Factory;
+use Illuminate\Http\Client\Request;
+use Illuminate\Http\Client\Response;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
-use RuntimeException;
+use GuzzleHttp\Promise\PromiseInterface;
+use Illuminate\Http\Client\PendingRequest;
 use Symfony\Component\VarDumper\VarDumper;
+use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Contracts\Support\Arrayable;
+use PHPUnit\Framework\AssertionFailedError;
+use Illuminate\Http\Client\RequestException;
+use Illuminate\Http\Client\ResponseSequence;
+use GuzzleHttp\Psr7\Response as Psr7Response;
+use Illuminate\Http\Response as HttpResponse;
+use Illuminate\Http\Client\Events\RequestSending;
+use Illuminate\Http\Client\Events\ResponseReceived;
 
 class HttpClientTest extends TestCase
 {
@@ -46,7 +46,7 @@ class HttpClientTest extends TestCase
     {
         parent::setUp();
 
-        $this->factory = new Factory;
+        $this->factory = new Factory();
     }
 
     protected function tearDown(): void
@@ -435,8 +435,7 @@ class HttpClientTest extends TestCase
     {
         $this->factory->fake();
 
-        $this->factory->asJson()->post('http://foo.com/form', new class implements JsonSerializable
-        {
+        $this->factory->asJson()->post('http://foo.com/form', new class () implements JsonSerializable {
             public function jsonSerialize(): mixed
             {
                 return [
@@ -457,8 +456,7 @@ class HttpClientTest extends TestCase
     {
         $this->factory->fake();
 
-        $this->factory->asJson()->post('http://foo.com/form', new class implements JsonSerializable, Arrayable
-        {
+        $this->factory->asJson()->post('http://foo.com/form', new class () implements JsonSerializable, Arrayable {
             public function jsonSerialize(): mixed
             {
                 return [
@@ -780,7 +778,8 @@ class HttpClientTest extends TestCase
         $this->factory->fakeSequence()->pushStatus(200);
 
         $response = $this->factory->withCookies(
-            ['foo' => 'bar'], 'https://laravel.com'
+            ['foo' => 'bar'],
+            'https://laravel.com'
         )->get('https://laravel.com');
 
         $this->assertCount(1, $response->cookies()->toArray());
@@ -934,8 +933,8 @@ class HttpClientTest extends TestCase
 
         $this->factory->assertSent(function (Request $request) {
             return $request->url() === 'http://foo.com/get?foo;bar;1;5;10&page=1'
-                && ! isset($request['foo'])
-                && ! isset($request['bar'])
+                && !isset($request['foo'])
+                && !isset($request['bar'])
                 && $request['page'] === '1';
         });
     }
@@ -1538,6 +1537,56 @@ class HttpClientTest extends TestCase
         $this->assertSame(200, $responses['test200']->status());
         $this->assertSame(400, $responses['test400']->status());
         $this->assertSame(500, $responses['test500']->status());
+    }
+
+    public function testRequestConcurrencyLimitInPoolIsRespected()
+    {
+        $this->factory->fake([
+            '*' => $this->factory::response('', 200),
+        ]);
+
+        (array) $requests = [
+            'test1' => 'test1.com',
+            'test2' => 'test2.com',
+            'test3' => 'test3.com',
+            'test4' => 'test4.com',
+            'test5' => 'test5.com',
+        ];
+        (array) $requestTimes = [];
+
+        $responses = $this->factory->pool(function (Pool $pool) use ($requests, &$requestTimes) {
+            foreach ($requests as $name => $url) {
+                $requestTimes[$name]['start'] = microtime(true);
+                $pool->as($name)->async()->get($url)->then(function () use ($name, &$requestTimes) {
+                    $requestTimes[$name]['end'] = microtime(true);
+                });
+            }
+        }, $concurrencyLimit = 2);
+
+        // Flatten and sort all timestamps
+        $timestamps = [];
+        foreach ($requestTimes as $key => $times) {
+            $timestamps[] = ['time' => $times['start'], 'type' => 'start'];
+            $timestamps[] = ['time' => $times['end'], 'type' => 'end'];
+        }
+
+        usort($timestamps, function ($a, $b) {
+            return $a['time'] <=> $b['time'];
+        });
+
+        // Analyze concurrency
+        $currentConcurrency = 0;
+        $maxConcurrency = 0;
+        foreach ($timestamps as $timestamp) {
+            if ($timestamp['type'] === 'start') {
+                $currentConcurrency++;
+                $maxConcurrency = max($maxConcurrency, $concurrencyLimit);
+            } else {
+                $currentConcurrency--;
+            }
+        }
+
+        $this->assertEquals($concurrencyLimit, $maxConcurrency);
     }
 
     public function testMiddlewareRunsInPool()
@@ -2648,7 +2697,7 @@ class HttpClientTest extends TestCase
 
     public function testItCanReturnCustomResponseClass(): void
     {
-        $factory = new CustomFactory;
+        $factory = new CustomFactory();
 
         $factory->fake([
             '*' => $factory::response('expected content'),
@@ -2665,8 +2714,7 @@ class CustomFactory extends Factory
 {
     protected function newPendingRequest()
     {
-        return new class extends PendingRequest
-        {
+        return new class () extends PendingRequest {
             protected function newResponse($response)
             {
                 return new TestResponse($response);
