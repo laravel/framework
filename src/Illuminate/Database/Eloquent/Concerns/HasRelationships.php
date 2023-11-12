@@ -769,7 +769,7 @@ trait HasRelationships
     {
         $morphMap = Relation::morphMap();
 
-        if (!empty($morphMap) && in_array($classname, $morphMap)) {
+        if (! empty($morphMap) && in_array($classname, $morphMap)) {
             return array_search($classname, $morphMap, true);
         }
 
