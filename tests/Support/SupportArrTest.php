@@ -210,6 +210,13 @@ class SupportArrTest extends TestCase
         $this->assertNull($value2);
         $this->assertSame('bar', $value3);
         $this->assertSame('baz', $value4);
+
+        $cursor = (function () {
+            while (false) {
+                yield 1;
+            }
+        })();
+        $this->assertNull(Arr::first($cursor));
     }
 
     public function testJoin()
