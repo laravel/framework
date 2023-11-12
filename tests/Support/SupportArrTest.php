@@ -220,6 +220,7 @@ class SupportArrTest extends TestCase
                 yield 1;
             }
         })();
+
         $this->assertNull(Arr::first($cursor));
     }
 
