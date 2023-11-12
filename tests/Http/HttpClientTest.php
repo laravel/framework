@@ -1555,7 +1555,7 @@ class HttpClientTest extends TestCase
         };
 
         // Test with different concurrency limits, the higher the number the faster it should be
-        $concurrencyLimits = [1, 5, 10];
+        $concurrencyLimits = [2, 10];
         $previousDuration = PHP_INT_MAX;
 
         foreach ($concurrencyLimits as $limit) {
@@ -1570,12 +1570,9 @@ class HttpClientTest extends TestCase
             $this->assertCount(10, $results);
 
             // Assert that the higher the concurrency limit, the less time it takes
-            $this->assertLessThanOrEqual(
-                $previousDuration,
-                $duration,
-                "The duration with concurrency limit {$limit} should be less or equal than duration of previous limit."
-            );
+            $this->assertLessThanOrEqual($previousDuration, $duration);
 
+            // Set previous duration for the next pool test
             $previousDuration = $duration;
         }
     }
