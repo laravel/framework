@@ -1554,7 +1554,7 @@ class HttpClientTest extends TestCase
             }
         };
 
-        // Test with different concurrency limits, the higher the number (or null) the faster it should be
+        // Test with different concurrency limits, the higher the number the faster it should be
         $concurrencyLimits = [1, 5, 10];
         $previousDuration = PHP_INT_MAX;
 
