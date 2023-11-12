@@ -864,7 +864,6 @@ class PendingRequest
             $promises,
             $concurrencyLimit ?: count($pool),
             function ($response, $index) use (&$results) {
-                // Handle a successful response
                 $results[$index] = $response instanceof \GuzzleHttp\Psr7\Response
                     ? new \Illuminate\Http\Client\Response($response)
                     : $response;
