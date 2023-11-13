@@ -471,7 +471,7 @@ trait ValidatesAttributes
      */
     public function validateBoolean($attribute, $value, $parameters)
     {
-        $strictness = isset($parameters[0]) ? $this->trim($parameters[0]) : 'medium';
+        $strictness = ($parameters[0] ?? '') === 'strict';
         $defaultAcceptable = [true, false, 'true', 'false', 0, 1, '0', '1'];
 
         return match ($strictness) {
