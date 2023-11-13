@@ -75,6 +75,40 @@ class MigratorTest extends TestCase
         $this->assertFalse(DB::getSchemaBuilder()->hasTable('people'));
     }
 
+    public function testAtomicRollback()
+    {
+        $this->subject->getRepository()->log('2014_10_12_000000_create_people_table', 1);
+        $this->subject->getRepository()->log('2015_10_04_000000_modify_people_table', 1);
+        $this->subject->getRepository()->log('2016_10_04_000000_modify_people_table', 1);
+        $this->subject->getRepository()->log('__atomic', 2);
+
+        $this->expectInfo('Rolling back migrations.');
+
+        $this->expectTwoColumnDetail('__atomic', 'Clearing atomic flag');
+
+        $this->output->shouldReceive('writeln')->once();
+
+        $this->subject->rollback([__DIR__.'/fixtures']);
+
+        $this->assertFalse(DB::table('migrations')->where('migration', '__atomic')->exists());
+    }
+
+    public function testAtomicMigrate()
+    {
+        $this->subject->getRepository()->log('2014_10_12_000000_create_people_table', 1);
+        $this->subject->getRepository()->log('2015_10_04_000000_modify_people_table', 1);
+        $this->subject->getRepository()->log('2016_10_04_000000_modify_people_table', 1);
+
+        $this->expectInfo('Nothing to migrate. Setting atomic flag.');
+
+        $this->subject->run([], ['atomic' => true]);
+
+        $this->assertTrue(DB::table('migrations')
+            ->where('migration', '__atomic')
+            ->where('batch', 2)
+            ->exists());
+    }
+
     public function testPretendMigrate()
     {
         $this->expectInfo('Running migrations.');

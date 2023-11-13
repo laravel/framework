@@ -29,6 +29,7 @@ class MigrateCommand extends BaseCommand implements Isolatable
                 {--realpath : Indicate any provided migration file paths are pre-resolved absolute paths}
                 {--schema-path= : The path to a schema dump file}
                 {--pretend : Dump the SQL queries that would be run}
+                {--atomic : Record a log even if there aren\'t any migrations to be performed}
                 {--seed : Indicates if the seed task should be re-run}
                 {--seeder= : The class name of the root seeder}
                 {--step : Force the migrations to be run so they can be rolled back individually}';
@@ -88,6 +89,7 @@ class MigrateCommand extends BaseCommand implements Isolatable
             // so that migrations may be run for any path within the applications.
             $this->migrator->setOutput($this->output)
                 ->run($this->getMigrationPaths(), [
+                    'atomic' => $this->option('atomic'),
                     'pretend' => $this->option('pretend'),
                     'step' => $this->option('step'),
                 ]);

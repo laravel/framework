@@ -156,6 +156,17 @@ class Migrator
         if (count($migrations) === 0) {
             $this->fireMigrationEvent(new NoPendingMigrations('up'));
 
+            // If we have nothing to migrate, but have requested atomic migrations
+            // we'll store an atomic flag in the migrations table. This allows us to safely
+            // rollback atomic deployments that were performed in a previous deployment.
+            if ($options['atomic'] ?? false) {
+                $this->repository->log('__atomic', $this->repository->getNextBatchNumber());
+
+                $this->write(Info::class, 'Nothing to migrate. Setting atomic flag');
+
+                return;
+            }
+
             $this->write(Info::class, 'Nothing to migrate');
 
             return;
@@ -292,6 +303,17 @@ class Migrator
         // repository already returns these migration's names in reverse order.
         foreach ($migrations as $migration) {
             $migration = (object) $migration;
+
+            // If we come across an atomic migration, we will skip it and delete it from
+            // the migrations table. Atomic migrations hold a batch when rolling back
+            // within atomic environments, preventing undesirable rollbacks from running.
+            if ($migration->migration === '__atomic') {
+                $this->write(TwoColumnDetail::class, $migration->migration, '<fg=green;options=bold>Clearing atomic flag</>');
+
+                $this->repository->delete($migration);
+
+                continue;
+            }
 
             if (! $file = Arr::get($files, $migration->migration)) {
                 $this->write(TwoColumnDetail::class, $migration->migration, '<fg=yellow;options=bold>Migration not found</>');
