@@ -81,9 +81,9 @@ else
 @endPushIf';
         $expected = '<?php if(true): $__env->startPush( \'stack\'); ?>
 if
-<?php elseif(false): $__env->startPush( \'stack\'); ?>
+<?php $__env->stopPush(); elseif(false): $__env->startPush( \'stack\'); ?>
 elseif
-<?php else: $__env->startPush(\'stack\'); ?>
+<?php $__env->stopPush(); else: $__env->startPush(\'stack\'); ?>
 else
 <?php $__env->stopPush(); endif; ?>';
 

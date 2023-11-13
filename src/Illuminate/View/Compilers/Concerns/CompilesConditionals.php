@@ -383,7 +383,7 @@ trait CompilesConditionals
     {
         $parts = explode(',', $this->stripParentheses($expression), 2);
 
-        return "<?php elseif({$parts[0]}): \$__env->startPush({$parts[1]}); ?>";
+        return "<?php \$__env->stopPush(); elseif({$parts[0]}): \$__env->startPush({$parts[1]}); ?>";
     }
 
     /**
@@ -394,7 +394,7 @@ trait CompilesConditionals
      */
     protected function compilePushElse($expression)
     {
-        return "<?php else: \$__env->startPush{$expression}; ?>";
+        return "<?php \$__env->stopPush(); else: \$__env->startPush{$expression}; ?>";
     }
 
     /**
