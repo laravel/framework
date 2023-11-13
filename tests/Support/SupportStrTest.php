@@ -1324,6 +1324,40 @@ class SupportStrTest extends TestCase
             Str::of(Str::password())->contains(['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'])
         );
     }
+
+    /**
+     * @dataProvider validEmailAddressProvider
+     */
+    public function testIsEmailIsValid($email)
+    {
+        $this->assertTrue(Str::isEmail($email));
+    }
+
+    /**
+     * @dataProvider inValidEmailAddressProvider
+     */
+    public function testIsEmailIsInvalid($email)
+    {
+        $this->assertFalse(Str::isEmail($email));
+    }
+    public static function validEmailAddressProvider(): array
+    {
+        return [
+            ["taylor@email.com"],
+            ["maria@email.com"],
+            ["niko@email.com"]
+        ];
+    }
+
+    public static function inValidEmailAddressProvider(): array
+    {
+        return [
+            ["tayloremail.com"],
+            ["maria@emailcom"],
+            ["niko.email.com"],
+            ["12345"]
+        ];
+    }
 }
 
 class StringableObjectStub
