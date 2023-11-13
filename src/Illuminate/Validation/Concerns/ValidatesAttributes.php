@@ -472,7 +472,7 @@ trait ValidatesAttributes
     public function validateBoolean($attribute, $value, $parameters)
     {
         $strictness = isset($parameters[0]) ? $this->trim($parameters[0]) : 'medium';
-        $defaultAcceptable = [true, false, 0, 1, '0', '1'];
+        $defaultAcceptable = [true, false, 'true', 'false', 0, 1, '0', '1'];
 
         return match ($strictness) {
             'strict' => is_bool($value),
