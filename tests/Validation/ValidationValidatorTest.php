@@ -2655,11 +2655,35 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['foo' => 'yes'], ['foo' => 'Boolean']);
         $this->assertFalse($v->passes());
 
-        $v = new Validator($trans, ['foo' => 'false'], ['foo' => 'Boolean']);
+        $v = new Validator($trans, ['foo' => 'true'], ['foo' => 'Boolean:strict']);
         $this->assertFalse($v->passes());
 
-        $v = new Validator($trans, ['foo' => 'true'], ['foo' => 'Boolean']);
+        $v = new Validator($trans, ['foo' => 'false'], ['foo' => 'Boolean:strict']);
         $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => '1'], ['foo' => 'Boolean:strict']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => 1], ['foo' => 'Boolean:strict']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => '0'], ['foo' => 'Boolean:strict']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => 0], ['foo' => 'Boolean:strict']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => true], ['foo' => 'Boolean:strict']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => false], ['foo' => 'Boolean:strict']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => 'false'], ['foo' => 'Boolean']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => 'true'], ['foo' => 'Boolean']);
+        $this->assertTrue($v->passes());
 
         $v = new Validator($trans, [], ['foo' => 'Boolean']);
         $this->assertTrue($v->passes());
