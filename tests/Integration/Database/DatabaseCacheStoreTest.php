@@ -2,24 +2,13 @@
 
 namespace Illuminate\Tests\Integration\Database;
 
-use Illuminate\Foundation\Testing\Concerns\InteractsWithCacheTable;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Orchestra\Testbench\Attributes\WithMigration;
 
+#[WithMigration('cache')]
 class DatabaseCacheStoreTest extends DatabaseTestCase
 {
-    use InteractsWithCacheTable;
-
-    protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
-    {
-        $this->createCacheTables();
-    }
-
-    protected function destroyDatabaseMigrations()
-    {
-        $this->dropCacheTables();
-    }
-
     public function testValueCanStoreNewCache()
     {
         $store = $this->getStore();
