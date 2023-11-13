@@ -474,12 +474,9 @@ trait ValidatesAttributes
         $strictness = ($parameters[0] ?? '') === 'strict';
         $defaultAcceptable = [true, false, 'true', 'false', 0, 1, '0', '1'];
 
-        return match ($strictness) {
-            'strict' => is_bool($value),
-            'medium' => in_array($value, $defaultAcceptable, true),
-            'low' => in_array($value, array_merge($defaultAcceptable, ['true', 'false']), true),
-            default => in_array($value, $defaultAcceptable, true),
-        };
+        return $strictness
+            ? is_bool($value)
+            : in_array($value, $defaultAcceptable, true);
     }
 
     /**
