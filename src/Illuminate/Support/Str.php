@@ -566,9 +566,9 @@ class Str
      * Limit the number of characters in a string, optionally preserving the integrity of the last word.
      *
      * @param  string  $value
-     * @param  int     $limit
+     * @param  int  $limit
      * @param  string  $end
-     * @param  bool    $onWord
+     * @param  bool  $onWord
      * @return string
      */
     public static function limit($value, $limit = 100, $end = '...', $onWord = false)
