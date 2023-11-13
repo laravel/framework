@@ -292,6 +292,7 @@ class ServeCommand extends Command
                 if ($position !== false) {
                     $line = substr($line, $position + 1);
                 }
+
                 $this->components->warn($line);
             }
         });
