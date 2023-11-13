@@ -69,4 +69,24 @@ test
 
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
+
+    public function testPushIfElseIsCompiled()
+    {
+        $string = '@pushIf(true, \'stack\')
+if
+@pushElseIf(false, \'stack\')
+elseif
+@pushElse(\'stack\')
+else
+@endPushIf';
+        $expected = '<?php if(true): $__env->startPush( \'stack\'); ?>
+if
+<?php elseif(false): $__env->startPush( \'stack\'); ?>
+elseif
+<?php else: $__env->startPush(\'stack\'); ?>
+else
+<?php $__env->stopPush(); endif; ?>';
+
+        $this->assertEquals($expected, $this->compiler->compileString($string));
+    }
 }
