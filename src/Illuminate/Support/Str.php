@@ -563,20 +563,28 @@ class Str
     }
 
     /**
-     * Limit the number of characters in a string.
+     * Limit the number of characters in a string, optionally preserving the integrity of the last word.
      *
      * @param  string  $value
-     * @param  int  $limit
+     * @param  int     $limit
      * @param  string  $end
+     * @param  bool    $onWord
      * @return string
      */
-    public static function limit($value, $limit = 100, $end = '...')
+    public static function limit($value, $limit = 100, $end = '...', $onWord = false)
     {
         if (mb_strwidth($value, 'UTF-8') <= $limit) {
             return $value;
         }
-
-        return rtrim(mb_strimwidth($value, 0, $limit, '', 'UTF-8')).$end;
+    
+        $limitedString = mb_strimwidth($value, 0, $limit, '', 'UTF-8');
+    
+        if ($onWord && mb_strpos($value, ' ', $limit) != false) {
+            $lastSpace = mb_strrpos($limitedString, ' ', 0, 'UTF-8');
+            $limitedString = mb_substr($limitedString, 0, $lastSpace);
+        }
+    
+        return rtrim($limitedString).$end;
     }
 
     /**
