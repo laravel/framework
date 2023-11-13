@@ -1727,4 +1727,16 @@ class Str
         static::$camelCache = [];
         static::$studlyCache = [];
     }
+
+    /**
+     * @param mixed $value
+     * @return bool
+     */
+    public static function isEmail($value): bool
+    {
+        if (!is_string($value)) {
+            return false;
+        }
+        return filter_var($value, FILTER_VALIDATE_EMAIL) !== false;
+    }
 }
