@@ -576,14 +576,14 @@ class Str
         if (mb_strwidth($value, 'UTF-8') <= $limit) {
             return $value;
         }
-    
+
         $limitedString = mb_strimwidth($value, 0, $limit, '', 'UTF-8');
-    
+
         if ($onWord && mb_strpos($value, ' ', $limit) != false) {
             $lastSpace = mb_strrpos($limitedString, ' ', 0, 'UTF-8');
             $limitedString = mb_substr($limitedString, 0, $lastSpace);
         }
-    
+
         return rtrim($limitedString).$end;
     }
 
