@@ -964,7 +964,7 @@ class SqlServerGrammar extends Grammar
      */
     protected function typeComputed(Fluent $column)
     {
-        return "as ({$column->expression})";
+        return "as ({$this->getValue($column->expression)})";
     }
 
     /**

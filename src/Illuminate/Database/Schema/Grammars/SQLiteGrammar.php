@@ -937,7 +937,7 @@ class SQLiteGrammar extends Grammar
         }
 
         if (! is_null($virtualAs = $column->virtualAs)) {
-            return " as ({$virtualAs})";
+            return " as ({$this->getValue($virtualAs)})";
         }
     }
 
@@ -959,7 +959,7 @@ class SQLiteGrammar extends Grammar
         }
 
         if (! is_null($storedAs = $column->storedAs)) {
-            return " as ({$column->storedAs}) stored";
+            return " as ({$this->getValue($column->storedAs)}) stored";
         }
     }
 
