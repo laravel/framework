@@ -374,6 +374,30 @@ trait CompilesConditionals
     }
 
     /**
+     * Compile the else-if push statements into valid PHP.
+     *
+     * @param  string  $expression
+     * @return string
+     */
+    protected function compileElsePushIf($expression)
+    {
+        $parts = explode(',', $this->stripParentheses($expression), 2);
+
+        return "<?php \$__env->stopPush(); elseif({$parts[0]}): \$__env->startPush({$parts[1]}); ?>";
+    }
+
+    /**
+     * Compile the else push statements into valid PHP.
+     *
+     * @param  string  $expression
+     * @return string
+     */
+    protected function compileElsePush($expression)
+    {
+        return "<?php \$__env->stopPush(); else: \$__env->startPush{$expression}; ?>";
+    }
+
+    /**
      * Compile the end-push statements into valid PHP.
      *
      * @return string
