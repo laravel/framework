@@ -94,10 +94,10 @@ class ResetPassword extends Notification
             return call_user_func(static::$createUrlCallback, $notifiable, $this->token);
         }
 
-        return url(route('password.reset', [
+        return route('password.reset', [
             'token' => $this->token,
             'email' => $notifiable->getEmailForPasswordReset(),
-        ], false));
+        ]);
     }
 
     /**
