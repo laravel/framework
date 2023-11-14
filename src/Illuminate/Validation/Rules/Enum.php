@@ -43,7 +43,16 @@ class Enum implements Rule
         }
 
         try {
-            return ! is_null($this->type::tryFrom($value));
+            if (is_array($value)) {
+                foreach ($value as $val) {
+                    if ($this->type::tryFrom($val) === null) {
+                        return false;
+                    }
+                }
+                return true;
+            } else {
+                return !is_null($this->type::tryFrom($value));
+            }
         } catch (TypeError) {
             return false;
         }
