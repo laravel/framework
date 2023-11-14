@@ -33,11 +33,7 @@ trait GuardHelpers
      */
     public function authenticate()
     {
-        if (! is_null($user = $this->user())) {
-            return $user;
-        }
-
-        throw new AuthenticationException;
+        return $this->user() ?? throw new AuthenticationException;
     }
 
     /**

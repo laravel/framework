@@ -213,6 +213,10 @@ class Validator implements ValidatorContract
         'MissingWith',
         'MissingWithAll',
         'Present',
+        'PresentIf',
+        'PresentUnless',
+        'PresentWith',
+        'PresentWithAll',
         'Required',
         'RequiredIf',
         'RequiredIfAccepted',
@@ -1479,6 +1483,16 @@ class Validator implements ValidatorContract
     public function setPresenceVerifier(PresenceVerifierInterface $presenceVerifier)
     {
         $this->presenceVerifier = $presenceVerifier;
+    }
+
+    /**
+     * Get the exception to throw upon failed validation.
+     *
+     * @return string
+     */
+    public function getException()
+    {
+        return $this->exception;
     }
 
     /**

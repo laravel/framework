@@ -94,7 +94,7 @@ class CliDumper extends BaseCliDumper
         $output = (string) $this->dump($data, true);
         $lines = explode("\n", $output);
 
-        $lines[0] .= $this->getDumpSourceContent();
+        $lines[array_key_last($lines) - 1] .= $this->getDumpSourceContent();
 
         $this->output->write(implode("\n", $lines));
 

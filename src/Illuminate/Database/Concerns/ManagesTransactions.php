@@ -47,6 +47,10 @@ trait ManagesTransactions
                     $this->getPdo()->commit();
                 }
 
+                $this->transactionsManager?->stageTransactions($this->getName());
+
+                $this->transactions = max(0, $this->transactions - 1);
+
                 if ($this->afterCommitCallbacksShouldBeExecuted()) {
                     $this->transactionsManager?->commit($this->getName());
                 }
@@ -56,8 +60,6 @@ trait ManagesTransactions
                 );
 
                 continue;
-            } finally {
-                $this->transactions = max(0, $this->transactions - 1);
             }
 
             $this->fireConnectionEvent('committed');
@@ -194,11 +196,13 @@ trait ManagesTransactions
             $this->getPdo()->commit();
         }
 
+        $this->transactionsManager?->stageTransactions($this->getName());
+
+        $this->transactions = max(0, $this->transactions - 1);
+
         if ($this->afterCommitCallbacksShouldBeExecuted()) {
             $this->transactionsManager?->commit($this->getName());
         }
-
-        $this->transactions = max(0, $this->transactions - 1);
 
         $this->fireConnectionEvent('committed');
     }
@@ -210,8 +214,7 @@ trait ManagesTransactions
      */
     protected function afterCommitCallbacksShouldBeExecuted()
     {
-        return $this->transactions == 0 ||
-            $this->transactionsManager?->afterCommitCallbacksShouldBeExecuted($this->transactions);
+        return $this->transactionsManager?->afterCommitCallbacksShouldBeExecuted($this->transactions) || $this->transactions == 0;
     }
 
     /**

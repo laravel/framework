@@ -398,4 +398,42 @@ class QueryBuilderTest extends DatabaseTestCase
         $this->assertSame('Bar Post', $results[1]);
         $this->assertCount(3, DB::getQueryLog());
     }
+
+    public function testPluck()
+    {
+        // Test SELECT override, since pluck will take the first column.
+        $this->assertSame([
+            'Foo Post',
+            'Bar Post',
+        ], DB::table('posts')->select(['content', 'id', 'title'])->pluck('title')->toArray());
+
+        // Test without SELECT override.
+        $this->assertSame([
+            'Foo Post',
+            'Bar Post',
+        ], DB::table('posts')->pluck('title')->toArray());
+
+        // Test specific key.
+        $this->assertSame([
+            1 => 'Foo Post',
+            2 => 'Bar Post',
+        ], DB::table('posts')->pluck('title', 'id')->toArray());
+
+        $results = DB::table('posts')->pluck('title', 'created_at');
+
+        // Test timestamps (truncates RDBMS differences).
+        $this->assertSame([
+            '2017-11-12 13:14:15',
+            '2018-01-02 03:04:05',
+        ], $results->keys()->map(fn ($v) => substr($v, 0, 19))->toArray());
+        $this->assertSame([
+            'Foo Post',
+            'Bar Post',
+        ], $results->values()->toArray());
+
+        // Test duplicate keys (a match will override a previous match).
+        $this->assertSame([
+            'Lorem Ipsum.' => 'Bar Post',
+        ], DB::table('posts')->pluck('title', 'content')->toArray());
+    }
 }

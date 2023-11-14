@@ -3,7 +3,6 @@
 namespace Illuminate\Cache;
 
 use Closure;
-use Exception;
 use Illuminate\Contracts\Cache\LockProvider;
 use Illuminate\Contracts\Cache\Store;
 use Illuminate\Database\ConnectionInterface;
@@ -137,13 +136,7 @@ class DatabaseStore implements LockProvider, Store
         $value = $this->serialize($value);
         $expiration = $this->getTime() + $seconds;
 
-        try {
-            return $this->table()->insert(compact('key', 'value', 'expiration'));
-        } catch (Exception) {
-            $result = $this->table()->where('key', $key)->update(compact('value', 'expiration'));
-
-            return $result > 0;
-        }
+        return $this->table()->upsert(compact('key', 'value', 'expiration'), 'key') > 0;
     }
 
     /**

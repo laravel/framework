@@ -4,7 +4,7 @@ namespace Illuminate\Mail\Transport;
 
 use Aws\Exception\AwsException;
 use Aws\Ses\SesClient;
-use Exception;
+use Symfony\Component\Mailer\Exception\TransportException;
 use Symfony\Component\Mailer\Header\MetadataHeader;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\AbstractTransport;
@@ -75,7 +75,7 @@ class SesTransport extends AbstractTransport
         } catch (AwsException $e) {
             $reason = $e->getAwsErrorMessage() ?? $e->getMessage();
 
-            throw new Exception(
+            throw new TransportException(
                 sprintf('Request to AWS SES API failed. Reason: %s.', $reason),
                 is_int($e->getCode()) ? $e->getCode() : 0,
                 $e

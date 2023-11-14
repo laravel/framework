@@ -24,6 +24,20 @@ class CacheArrayStoreTest extends TestCase
         $this->assertSame('bar', $store->get('foo'));
     }
 
+    public function testCacheTtl(): void
+    {
+        $store = new ArrayStore();
+
+        Carbon::setTestNow('2000-01-01 00:00:00.500'); // 500 milliseconds past
+        $store->put('hello', 'world', 1);
+
+        Carbon::setTestNow('2000-01-01 00:00:01.499'); // progress 0.999 seconds
+        $this->assertSame('world', $store->get('hello'));
+
+        Carbon::setTestNow('2000-01-01 00:00:01.500'); // progress 0.001 seconds. 1 second since putting into cache.
+        $this->assertNull($store->get('hello'));
+    }
+
     public function testMultipleItemsCanBeSetAndRetrieved()
     {
         $store = new ArrayStore;

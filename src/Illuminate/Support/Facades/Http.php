@@ -20,6 +20,7 @@ use Illuminate\Http\Client\Factory;
  * @method static void assertSequencesAreEmpty()
  * @method static \Illuminate\Support\Collection recorded(callable $callback = null)
  * @method static \Illuminate\Contracts\Events\Dispatcher|null getDispatcher()
+ * @method static array getGlobalMiddleware()
  * @method static void macro(string $name, object|callable $macro)
  * @method static void mixin(object $mixin, bool $replace = true)
  * @method static bool hasMacro(string $name)

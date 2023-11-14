@@ -78,11 +78,33 @@ class MySqlGrammar extends Grammar
     /**
      * Compile the query to determine the list of columns.
      *
+     * @deprecated Will be removed in a future Laravel version.
+     *
      * @return string
      */
     public function compileColumnListing()
     {
         return 'select column_name as `column_name` from information_schema.columns where table_schema = ? and table_name = ?';
+    }
+
+    /**
+     * Compile the query to determine the columns.
+     *
+     * @param  string  $database
+     * @param  string  $table
+     * @return string
+     */
+    public function compileColumns($database, $table)
+    {
+        return sprintf(
+            'select column_name as `name`, data_type as `type_name`, column_type as `type`, '
+            .'collation_name as `collation`, is_nullable as `nullable`, '
+            .'column_default as `default`, column_comment AS `comment`, extra as `extra` '
+            .'from information_schema.columns where table_schema = %s and table_name = %s '
+            .'order by ordinal_position asc',
+            $this->quoteString($database),
+            $this->quoteString($table)
+        );
     }
 
     /**
@@ -1049,7 +1071,7 @@ class MySqlGrammar extends Grammar
         }
 
         if (! is_null($virtualAs = $column->virtualAs)) {
-            return " as ({$virtualAs})";
+            return " as ({$this->getValue($virtualAs)})";
         }
     }
 
@@ -1071,7 +1093,7 @@ class MySqlGrammar extends Grammar
         }
 
         if (! is_null($storedAs = $column->storedAs)) {
-            return " as ({$storedAs}) stored";
+            return " as ({$this->getValue($storedAs)}) stored";
         }
     }
 

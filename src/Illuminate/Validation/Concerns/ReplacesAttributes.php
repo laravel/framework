@@ -358,6 +358,68 @@ trait ReplacesAttributes
     }
 
     /**
+     * Replace all place-holders for the present_if rule.
+     *
+     * @param  string  $message
+     * @param  string  $attribute
+     * @param  string  $rule
+     * @param  array<int,string>  $parameters
+     * @return string
+     */
+    protected function replacePresentIf($message, $attribute, $rule, $parameters)
+    {
+        $parameters[1] = $this->getDisplayableValue($parameters[0], Arr::get($this->data, $parameters[0]));
+        $parameters[0] = $this->getDisplayableAttribute($parameters[0]);
+
+        return str_replace([':other', ':value'], $parameters, $message);
+    }
+
+    /**
+     * Replace all place-holders for the present_unless rule.
+     *
+     * @param  string  $message
+     * @param  string  $attribute
+     * @param  string  $rule
+     * @param  array<int,string>  $parameters
+     * @return string
+     */
+    protected function replacePresentUnless($message, $attribute, $rule, $parameters)
+    {
+        return str_replace([':other', ':value'], [
+            $this->getDisplayableAttribute($parameters[0]),
+            $this->getDisplayableValue($parameters[0], $parameters[1]),
+        ], $message);
+    }
+
+    /**
+     * Replace all place-holders for the present_with rule.
+     *
+     * @param  string  $message
+     * @param  string  $attribute
+     * @param  string  $rule
+     * @param  array<int,string>  $parameters
+     * @return string
+     */
+    protected function replacePresentWith($message, $attribute, $rule, $parameters)
+    {
+        return str_replace(':values', implode(' / ', $this->getAttributeList($parameters)), $message);
+    }
+
+    /**
+     * Replace all place-holders for the present_with_all rule.
+     *
+     * @param  string  $message
+     * @param  string  $attribute
+     * @param  string  $rule
+     * @param  array<int,string>  $parameters
+     * @return string
+     */
+    protected function replacePresentWithAll($message, $attribute, $rule, $parameters)
+    {
+        return $this->replacePresentWith($message, $attribute, $rule, $parameters);
+    }
+
+    /**
      * Replace all place-holders for the required_with rule.
      *
      * @param  string  $message
