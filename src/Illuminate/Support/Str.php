@@ -1729,14 +1729,15 @@ class Str
     }
 
     /**
-     * @param mixed $value
+     * @param  mixed  $value
      * @return bool
      */
     public static function isEmail($value): bool
     {
-        if (!is_string($value)) {
+        if (! is_string($value)) {
             return false;
         }
+
         return filter_var($value, FILTER_VALIDATE_EMAIL) !== false;
     }
 }

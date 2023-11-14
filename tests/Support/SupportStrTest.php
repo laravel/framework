@@ -1340,22 +1340,23 @@ class SupportStrTest extends TestCase
     {
         $this->assertFalse(Str::isEmail($email));
     }
+
     public static function validEmailAddressProvider(): array
     {
         return [
-            ["taylor@email.com"],
-            ["maria@email.com"],
-            ["niko@email.com"]
+            ['taylor@email.com'],
+            ['maria@email.com'],
+            ['niko@email.com'],
         ];
     }
 
     public static function inValidEmailAddressProvider(): array
     {
         return [
-            ["tayloremail.com"],
-            ["maria@emailcom"],
-            ["niko.email.com"],
-            ["12345"]
+            ['tayloremail.com'],
+            ['maria@emailcom'],
+            ['niko.email.com'],
+            ['12345'],
         ];
     }
 }
