@@ -674,6 +674,8 @@ class BusFake implements Fake, QueueingDispatcher
         $jobs = Collection::wrap($jobs);
         $jobs = ChainedBatch::prepareNestedBatches($jobs);
 
+        $jobs->whereInstanceOf(ChainedBatch::class)->each->handle();
+
         return new PendingChainFake($this, $jobs->shift(), $jobs->toArray());
     }
 

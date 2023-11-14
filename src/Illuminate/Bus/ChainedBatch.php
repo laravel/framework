@@ -72,7 +72,7 @@ class ChainedBatch implements ShouldQueue
      */
     public function handle()
     {
-        $batch = new PendingBatch(Container::getInstance(), $this->jobs);
+        $batch = Container::getInstance()->make(Dispatcher::class)->batch($this->jobs);
 
         $batch->name = $this->name;
         $batch->options = $this->options;
