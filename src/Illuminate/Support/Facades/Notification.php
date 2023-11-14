@@ -2,6 +2,7 @@
 
 namespace Illuminate\Support\Facades;
 
+use Illuminate\Bus\PendingBatch;
 use Illuminate\Notifications\AnonymousNotifiable;
 use Illuminate\Notifications\ChannelManager;
 use Illuminate\Support\Testing\Fakes\NotificationFake;
@@ -9,6 +10,7 @@ use Illuminate\Support\Testing\Fakes\NotificationFake;
 /**
  * @method static void send(\Illuminate\Support\Collection|array|mixed $notifiables, mixed $notification)
  * @method static void sendNow(\Illuminate\Support\Collection|array|mixed $notifiables, mixed $notification, array|null $channels = null)
+ * @method static PendingBatch batch(\Illuminate\Support\Collection|array|mixed $notifiables, mixed $notification)
  * @method static mixed channel(string|null $name = null)
  * @method static string getDefaultDriver()
  * @method static string deliversVia()

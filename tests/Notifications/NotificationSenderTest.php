@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Notifications;
 
+use Illuminate\Bus\PendingBatch;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Bus\Dispatcher as BusDispatcher;
 use Illuminate\Contracts\Events\Dispatcher as EventDispatcher;
@@ -11,6 +12,7 @@ use Illuminate\Notifications\ChannelManager;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Notifications\Notification;
 use Illuminate\Notifications\NotificationSender;
+use Illuminate\Notifications\SendQueuedNotifications;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
@@ -126,6 +128,117 @@ class NotificationSenderTest extends TestCase
         $sender = new NotificationSender($manager, $bus, $events);
 
         $sender->send($notifiable, new DummyNotificationWithViaConnections);
+    }
+
+    public function testItCanBatchQueuedNotificationsWithAStringVia()
+    {
+        $notifiable = m::mock(Notifiable::class);
+        $manager = m::mock(ChannelManager::class);
+        $bus = m::mock(BusDispatcher::class);
+        $pendingBatch = m::mock(PendingBatch::class);
+        $events = m::mock(EventDispatcher::class);
+        $pendingBatch->shouldReceive('add')
+            ->with(m::type(SendQueuedNotifications::class))
+            ->once();
+
+        $sender = new NotificationSender($manager, $bus, $events);
+
+        $result = $sender->batch($notifiable, new DummyQueuedNotificationWithStringVia, $pendingBatch);
+
+        $this->assertSame($pendingBatch, $result);
+    }
+
+    public function testItCanBatchQueuedNotificationsThroughMiddleware()
+    {
+        $notifiable = m::mock(Notifiable::class);
+        $manager = m::mock(ChannelManager::class);
+        $bus = m::mock(BusDispatcher::class);
+        $pendingBatch = m::mock(PendingBatch::class);
+        $pendingBatch->shouldReceive('add')
+            ->withArgs(function ($job) {
+                return $job->middleware[0] instanceof TestNotificationMiddleware;
+            });
+        $events = m::mock(EventDispatcher::class);
+
+        $sender = new NotificationSender($manager, $bus, $events);
+
+        $result = $sender->batch($notifiable, new DummyNotificationWithMiddleware, $pendingBatch);
+
+        $this->assertSame($pendingBatch, $result);
+    }
+
+    public function testItCanBatchQueuedMultiChannelNotificationsThroughDifferentMiddleware()
+    {
+        $notifiable = m::mock(Notifiable::class);
+        $manager = m::mock(ChannelManager::class);
+        $bus = m::mock(BusDispatcher::class);
+        $pendingBatch = m::mock(PendingBatch::class);
+        $pendingBatch->shouldReceive('add')
+            ->once()
+            ->withArgs(function ($job) {
+                return $job->middleware[0] instanceof TestMailNotificationMiddleware;
+            });
+        $pendingBatch->shouldReceive('add')
+            ->once()
+            ->withArgs(function ($job) {
+                return $job->middleware[0] instanceof TestDatabaseNotificationMiddleware;
+            });
+        $pendingBatch->shouldReceive('add')
+            ->once()
+            ->withArgs(function ($job) {
+                return empty($job->middleware);
+            });
+        $events = m::mock(EventDispatcher::class);
+
+        $sender = new NotificationSender($manager, $bus, $events);
+
+        $result = $sender->batch($notifiable, new DummyMultiChannelNotificationWithConditionalMiddleware, $pendingBatch);
+
+        $this->assertSame($pendingBatch, $result);
+    }
+
+    public function testItCanBatchQueuedWithViaConnectionsNotifications()
+    {
+        $notifiable = new AnonymousNotifiable;
+        $manager = m::mock(ChannelManager::class);
+        $bus = m::mock(BusDispatcher::class);
+        $pendingBatch = m::mock(PendingBatch::class);
+        $pendingBatch->shouldReceive('add')
+            ->once()
+            ->withArgs(function ($job) {
+                return $job->connection === 'sync' && $job->channels === ['database'];
+            });
+        $pendingBatch->shouldReceive('add')
+            ->once()
+            ->withArgs(function ($job) {
+                return $job->connection === null && $job->channels === ['mail'];
+            });
+
+        $events = m::mock(EventDispatcher::class);
+
+        $sender = new NotificationSender($manager, $bus, $events);
+
+        $result = $sender->batch($notifiable, new DummyNotificationWithViaConnections, $pendingBatch);
+
+        $this->assertSame($pendingBatch, $result);
+    }
+
+    public function testItCanOnlyBatchNotificationThatImplementShouldQueue()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('$notification must be queueable');
+
+        $notifiable = m::mock(Notifiable::class);
+        $manager = m::mock(ChannelManager::class);
+        $bus = m::mock(BusDispatcher::class);
+        $pendingBatch = m::mock(PendingBatch::class);
+        $events = m::mock(EventDispatcher::class);
+        $pendingBatch->shouldNotReceive('add')
+            ->with(m::type(SendQueuedNotifications::class));
+
+        $sender = new NotificationSender($manager, $bus, $events);
+
+        $sender->batch($notifiable, new DummyNotificationWithEmptyStringVia, $pendingBatch);
     }
 }
 

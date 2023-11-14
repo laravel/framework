@@ -2,10 +2,12 @@
 
 namespace Illuminate\Notifications;
 
+use Illuminate\Bus\PendingBatch;
 use Illuminate\Contracts\Bus\Dispatcher as Bus;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Notifications\Dispatcher as DispatcherContract;
 use Illuminate\Contracts\Notifications\Factory as FactoryContract;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Manager;
 use InvalidArgumentException;
 
@@ -37,6 +39,20 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
         (new NotificationSender(
             $this, $this->container->make(Bus::class), $this->container->make(Dispatcher::class), $this->locale)
         )->send($notifiables, $notification);
+    }
+
+    /**
+     * Send the given notification to the given notifiable entities.
+     *
+     * @param  \Illuminate\Support\Collection|array|mixed  $notifiables
+     * @param  mixed  $notification
+     * @return PendingBatch
+     */
+    public function batch($notifiables, $notification)
+    {
+        return (new NotificationSender(
+            $this, $this->container->make(Bus::class), $this->container->make(Dispatcher::class), $this->locale)
+        )->batch($notifiables, $notification, new PendingBatch($this->container, new Collection()));
     }
 
     /**

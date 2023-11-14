@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Notifications;
 
+use Illuminate\Bus\PendingBatch;
 use Illuminate\Bus\Queueable;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Bus\Dispatcher as Bus;
@@ -100,6 +101,28 @@ class NotificationChannelManagerTest extends TestCase
         $manager = m::mock(ChannelManager::class.'[driver]', [$container]);
 
         $manager->send([new NotificationChannelManagerTestNotifiable], new NotificationChannelManagerTestQueuedNotification);
+    }
+
+    public function testBatchOfQueuedNotificationsCanBeCreated()
+    {
+        $container = new Container;
+        $container->instance('config', ['app.name' => 'Name', 'app.logo' => 'Logo']);
+        $container->instance(Dispatcher::class, $events = m::mock());
+        $container->instance(Bus::class, $bus = m::mock());
+        Container::setInstance($container);
+        $manager = m::mock(ChannelManager::class.'[driver]', [$container]);
+
+        $pendingBatch = $manager->batch(
+            [new NotificationChannelManagerTestNotifiable],
+            new NotificationChannelManagerTestQueuedNotification
+        );
+
+        $this->assertInstanceOf(PendingBatch::class, $pendingBatch);
+        $this->assertCount(1, $pendingBatch->jobs);
+        $this->assertInstanceOf(SendQueuedNotifications::class, $pendingBatch->jobs[0]);
+        $this->assertCount(1, $pendingBatch->jobs[0]->notifiables);
+        $this->assertInstanceOf(NotificationChannelManagerTestNotifiable::class, $pendingBatch->jobs[0]->notifiables[0]);
+        $this->assertInstanceOf(NotificationChannelManagerTestQueuedNotification::class, $pendingBatch->jobs[0]->notification);
     }
 }
 

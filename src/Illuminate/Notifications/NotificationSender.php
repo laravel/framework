@@ -2,6 +2,8 @@
 
 namespace Illuminate\Notifications;
 
+use Illuminate\Bus\Batch;
+use Illuminate\Bus\PendingBatch;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Contracts\Translation\HasLocalePreference;
 use Illuminate\Database\Eloquent\Collection as ModelCollection;
@@ -9,6 +11,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Events\NotificationSending;
 use Illuminate\Notifications\Events\NotificationSent;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Localizable;
 
@@ -77,6 +80,23 @@ class NotificationSender
         }
 
         $this->sendNow($notifiables, $notification);
+    }
+
+    /**
+     * @param \Illuminate\Support\Collection|array|mixed $notifiables
+     * @param object $notification
+     * @param PendingBatch $pendingBatch
+     * @return PendingBatch
+     */
+    public function batch($notifiables, $notification, $pendingBatch)
+    {
+        $notifiables = $this->formatNotifiables($notifiables);
+
+        if ($notification instanceof ShouldQueue) {
+            return $this->queueNotificationBatch($notifiables, $notification, $pendingBatch);
+        }
+
+        throw new \InvalidArgumentException('$notification must be queueable');
     }
 
     /**
@@ -235,6 +255,74 @@ class NotificationSender
                 );
             }
         }
+    }
+
+    /**
+     * Queue the given notification instances.
+     *
+     * @param mixed $notifiables
+     * @param \Illuminate\Notifications\Notification $notification
+     * @param PendingBatch $pendingBatch
+     * @return PendingBatch
+     */
+    protected function queueNotificationBatch($notifiables, $notification, $pendingBatch)
+    {
+        $notifiables = $this->formatNotifiables($notifiables);
+
+        $original = clone $notification;
+
+        foreach ($notifiables as $notifiable) {
+            $notificationId = Str::uuid()->toString();
+
+            foreach ((array) $original->via($notifiable) as $channel) {
+                $notification = clone $original;
+
+                if (! $notification->id) {
+                    $notification->id = $notificationId;
+                }
+
+                if (! is_null($this->locale)) {
+                    $notification->locale = $this->locale;
+                }
+
+                $connection = $notification->connection;
+
+                if (method_exists($notification, 'viaConnections')) {
+                    $connection = $notification->viaConnections()[$channel] ?? null;
+                }
+
+                $queue = $notification->queue;
+
+                if (method_exists($notification, 'viaQueues')) {
+                    $queue = $notification->viaQueues()[$channel] ?? null;
+                }
+
+                $delay = $notification->delay;
+
+                if (method_exists($notification, 'withDelay')) {
+                    $delay = $notification->withDelay($notifiable, $channel) ?? null;
+                }
+
+                $middleware = $notification->middleware ?? [];
+
+                if (method_exists($notification, 'middleware')) {
+                    $middleware = [
+                        ...$notification->middleware($notifiable, $channel),
+                        ...$middleware
+                    ];
+                }
+
+                $pendingBatch->add(
+                    (new SendQueuedNotifications($notifiable, $notification, [$channel]))
+                        ->onConnection($connection)
+                        ->onQueue($queue)
+                        ->delay(is_array($delay) ? ($delay[$channel] ?? null) : $delay)
+                        ->through($middleware)
+                );
+            }
+        }
+
+        return $pendingBatch;
     }
 
     /**
