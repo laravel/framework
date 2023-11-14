@@ -74,9 +74,9 @@ test
     {
         $string = '@pushIf(true, \'stack\')
 if
-@pushElseIf(false, \'stack\')
+@elsePushIf(false, \'stack\')
 elseif
-@pushElse(\'stack\')
+@elsePush(\'stack\')
 else
 @endPushIf';
         $expected = '<?php if(true): $__env->startPush( \'stack\'); ?>

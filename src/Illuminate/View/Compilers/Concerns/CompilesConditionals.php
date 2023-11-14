@@ -379,7 +379,7 @@ trait CompilesConditionals
      * @param  string  $expression
      * @return string
      */
-    protected function compilePushElseIf($expression)
+    protected function compileElsePushIf($expression)
     {
         $parts = explode(',', $this->stripParentheses($expression), 2);
 
@@ -392,7 +392,7 @@ trait CompilesConditionals
      * @param  string  $expression
      * @return string
      */
-    protected function compilePushElse($expression)
+    protected function compileElsePush($expression)
     {
         return "<?php \$__env->stopPush(); else: \$__env->startPush{$expression}; ?>";
     }
