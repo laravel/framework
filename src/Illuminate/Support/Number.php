@@ -2,7 +2,6 @@
 
 namespace Illuminate\Support;
 
-use Illuminate\Support\Facades\App;
 use Illuminate\Support\Traits\Macroable;
 use NumberFormatter;
 use RuntimeException;
