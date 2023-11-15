@@ -91,17 +91,18 @@ class SupportNumberTest extends TestCase
     {
         $this->needsIntlExtension();
 
-        $this->assertSame('0%', Number::toPercentage(0));
-        $this->assertSame('1%', Number::toPercentage(1));
-        $this->assertSame('10%', Number::toPercentage(10));
-        $this->assertSame('100%', Number::toPercentage(100));
+        $this->assertSame('0%', Number::toPercentage(0, precision: 0));
+        $this->assertSame('0.00%', Number::toPercentage(0));
+        $this->assertSame('1.00%', Number::toPercentage(1));
+        $this->assertSame('10.00%', Number::toPercentage(10));
+        $this->assertSame('100.00%', Number::toPercentage(100));
 
-        $this->assertSame('300%', Number::toPercentage(300));
-        $this->assertSame('1,000%', Number::toPercentage(1000));
+        $this->assertSame('300.00%', Number::toPercentage(300));
+        $this->assertSame('1,000.00%', Number::toPercentage(1000));
 
         $this->assertSame('1.75%', Number::toPercentage(1.75));
         $this->assertSame('0.12%', Number::toPercentage(0.12345));
-        $this->assertSame('0.1235%', Number::toPercentage(0.12345, 4));
+        $this->assertSame('0.1235%', Number::toPercentage(0.12345, precision: 4));
     }
 
     public function testToCurrency()

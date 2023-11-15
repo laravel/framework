@@ -39,16 +39,16 @@ class Number
      *
      * @param  int|float  $number
      * @param  int  $precision
-     * @param  string  $locale
+     * @param  ?string  $locale
      * @return string|false
      */
-    public static function toPercentage(int|float $number, int $precision = 2, string $locale = 'en')
+    public static function toPercentage(int|float $number, int $precision = 2, ?string $locale = null)
     {
         static::ensureIntlExtensionIsInstalled();
 
-        $formatter = new NumberFormatter($locale, NumberFormatter::PERCENT);
+        $formatter = new NumberFormatter($locale ?? static::$locale, NumberFormatter::PERCENT);
 
-        $formatter->setAttribute(NumberFormatter::MAX_FRACTION_DIGITS, $precision);
+        $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, $precision);
 
         return $formatter->format($number / 100);
     }
