@@ -580,28 +580,19 @@ trait HasRelationships
                                 $relatedPivotKey = null, $parentKey = null,
                                 $relatedKey = null, $relation = null, $inverse = false)
     {
-        $relation = $relation ?: $this->guessBelongsToManyRelation();
-
         // First, we will need to determine the foreign key and "other key" for the
         // relationship. Once we have determined the keys we will make the query
         // instances, as well as the relationship instances we need for these.
         $instance = $this->newRelatedInstance($related);
 
-        $foreignPivotKey = $foreignPivotKey ?: $name.'_id';
-
-        $relatedPivotKey = $relatedPivotKey ?: $instance->getForeignKey();
-
         // Now we're ready to create a new query builder for the related model and
         // the relationship instances for this relation. This relation will set
         // appropriate query constraints then entirely manage the hydrations.
-        if (! $table) {
-            $table = Str::pluralStudly($name);
-        }
-
         return $this->newMorphToMany(
-            $instance->newQuery(), $this, $name, $table,
-            $foreignPivotKey, $relatedPivotKey, $parentKey ?: $this->getKeyName(),
-            $relatedKey ?: $instance->getKeyName(), $relation, $inverse
+            $instance->newQuery(), $this, $name, $table ?: Str::pluralStudly($name),
+            $foreignPivotKey ?: $name.'_id', $relatedPivotKey ?: $instance->getForeignKey(),
+            $parentKey ?: $this->getKeyName(), $relatedKey ?: $instance->getKeyName(),
+            $relation ?: $this->guessBelongsToManyRelation(), $inverse
         );
     }
 
