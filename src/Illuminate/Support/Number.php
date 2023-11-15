@@ -41,7 +41,7 @@ class Number
      * @param  ?string  $locale
      * @return string|false
      */
-    public static function toPercentage(int|float $number, int $precision = 2, ?string $locale = null)
+    public static function toPercentage(int|float $number, int $precision = 0, ?string $locale = null)
     {
         static::ensureIntlExtensionIsInstalled();
 
@@ -76,7 +76,7 @@ class Number
      * @param  int  $precision
      * @return string
      */
-    public static function toFileSize(int|float $bytes, int $precision = 2)
+    public static function toFileSize(int|float $bytes, int $precision = 0)
     {
         $units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
 
@@ -84,7 +84,7 @@ class Number
             $bytes /= 1024;
         }
 
-        return sprintf('%s %s', round($bytes, $precision), $units[$i]);
+        return sprintf('%s %s', number_format($bytes, $precision), $units[$i]);
     }
 
     /**
@@ -94,7 +94,7 @@ class Number
      * @param  int  $precision
      * @return string
      */
-    public static function forHumans(int|float $number, int $precision = 2)
+    public static function forHumans(int|float $number, int $precision = 0)
     {
         $units = [
             3 => 'thousand',
@@ -117,7 +117,7 @@ class Number
         $displayExponent = $numberExponent - ($numberExponent % 3);
         $number /= pow(10, $displayExponent);
 
-        return trim(sprintf('%s %s', round($number, $precision), $units[$displayExponent]));
+        return trim(sprintf('%s %s', number_format($number, $precision), $units[$displayExponent]));
     }
 
     /**
