@@ -12,48 +12,39 @@ class Number
     use Macroable;
 
     /**
-     * Format the number according to the current locale.
+     * The current default locale.
      *
-     * @param  float|int  $number
-     * @param  ?string  $locale
-     * @return false|string
+     * @var string
      */
-    public static function format($number, $locale = null)
-    {
-        static::needsIntlExtension();
+    protected static $locale = 'en';
 
-        $formatter = new NumberFormatter($locale ?? App::getLocale(), NumberFormatter::DECIMAL);
+    /**
+     * Format the given number according to the current locale.
+     *
+     * @param  int|float  $number
+     * @param  ?string  $locale
+     * @return string|false
+     */
+    public static function format(int|float $number, ?string $locale = null)
+    {
+        static::ensureIntlExtensionIsInstalled();
+
+        $formatter = new NumberFormatter($locale ?? static::$locale, NumberFormatter::DECIMAL);
 
         return $formatter->format($number);
     }
 
     /**
-     * Spell out the number according to the current locale.
+     * Convert the given number to its percentage equivalent.
      *
-     * @param  float|int  $number
-     * @param  ?string  $locale
-     * @return false|string
-     */
-    public static function spellout($number, $locale = null)
-    {
-        static::needsIntlExtension();
-
-        $formatter = new NumberFormatter($locale ?? App::getLocale(), NumberFormatter::SPELLOUT);
-
-        return $formatter->format($number);
-    }
-
-    /**
-     * Format the number to a percent format.
-     *
-     * @param  float|int  $number
+     * @param  int|float  $number
      * @param  int  $precision
      * @param  string  $locale
-     * @return false|string
+     * @return string|false
      */
-    public static function toPercent($number, $precision = 2, $locale = 'en')
+    public static function toPercentage(int|float $number, int $precision = 2, string $locale = 'en')
     {
-        static::needsIntlExtension();
+        static::ensureIntlExtensionIsInstalled();
 
         $formatter = new NumberFormatter($locale, NumberFormatter::PERCENT);
 
@@ -63,32 +54,32 @@ class Number
     }
 
     /**
-     * Format the number to a currency format.
+     * Convert the given number to its currency equivalent.
      *
-     * @param  float|int  $number
+     * @param  int|float  $number
      * @param  string  $currency
      * @param  ?string  $locale
-     * @return false|string
+     * @return string|false
      */
-    public static function toCurrency($number, $currency = 'USD', $locale = null)
+    public static function toCurrency(int|float $number, string $currency = 'USD', ?string $locale = null)
     {
-        static::needsIntlExtension();
+        static::ensureIntlExtensionIsInstalled();
 
-        $formatter = new NumberFormatter($locale ?? App::getLocale(), NumberFormatter::CURRENCY);
+        $formatter = new NumberFormatter($locale ?? static::$locale, NumberFormatter::CURRENCY);
 
         return $formatter->formatCurrency($number, $currency);
     }
 
     /**
-     * Format the number of bytes to a human-readable string.
+     * Convert the given number to its file size equivalent.
      *
-     * @param  int  $bytes
+     * @param  int|float  $bytes
      * @param  int  $precision
      * @return string
      */
-    public static function bytesToHuman($bytes, $precision = 2)
+    public static function toFileSize(int|float $bytes, int $precision = 2)
     {
-        $units = ['B', 'kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+        $units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
 
         for ($i = 0; ($bytes / 1024) > 0.9 && ($i < count($units) - 1); $i++) {
             $bytes /= 1024;
@@ -98,13 +89,13 @@ class Number
     }
 
     /**
-     * Format the number to a fluent human-readable string.
+     * Convert the number to its human readable equivalent.
      *
      * @param  int  $number
      * @param  int  $precision
      * @return string
      */
-    public static function toHuman($number, $precision = 2)
+    public static function forHumans(int|float $number, int $precision = 2)
     {
         $units = [
             3 => 'thousand',
@@ -118,9 +109,9 @@ class Number
             case $number === 0:
                 return '0';
             case $number < 0:
-                return sprintf('-%s', static::toHuman(abs($number), $precision));
+                return sprintf('-%s', static::forHumans(abs($number), $precision));
             case $number >= 1e15:
-                return sprintf('%s quadrillion', static::toHuman($number / 1e15, $precision));
+                return sprintf('%s quadrillion', static::forHumans($number / 1e15, $precision));
         }
 
         $numberExponent = floor(log10($number));
@@ -131,16 +122,41 @@ class Number
     }
 
     /**
-     * Some of the helper methods are wrappers for the PHP intl extension,
-     * and thus require it to be installed on the server. If it's not
-     * installed, we instead throw an exception from this method.
+     * Execute the given callback using the given locale.
+     *
+     * @param  string  $locale
+     * @param  callable  $callback
+     * @return mixed
+     */
+    public static function withLocale(string $locale, callable $callback)
+    {
+        $previousLocale = static::$locale;
+
+        static::useLocale($locale);
+
+        return tap($callback(), fn () => static::useLocale($previousLocale));
+    }
+
+    /**
+     * Set the default locale.
+     *
+     * @param  string  $locale
+     * @return void
+     */
+    public static function useLocale(string $locale)
+    {
+        static::$locale = $locale;
+    }
+
+    /**
+     * Ensure the "intl" PHP exntension is installed.
      *
      * @return void
      */
-    protected static function needsIntlExtension()
+    protected static function ensureIntlExtensionIsInstalled()
     {
         if (! extension_loaded('intl')) {
-            throw new RuntimeException('The intl PHP extension is required to use this helper.');
+            throw new RuntimeException('The "intl" PHP extension is required to use this method.');
         }
     }
 }

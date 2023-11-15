@@ -78,64 +78,30 @@ class SupportNumberTest extends TestCase
 
         $this->assertSame('123,456,789', Number::format(123456789));
 
+        Number::useLocale('de');
+
         $this->app->locale = 'de';
 
         $this->assertSame('123.456.789', Number::format(123456789));
-    }
 
-    public function testSpellout()
-    {
-        $this->needsIntlExtension();
-
-        $this->assertSame('zero', Number::spellout(0));
-        $this->assertSame('one', Number::spellout(1));
-        $this->assertSame('ten', Number::spellout(10));
-        $this->assertSame('twenty-five', Number::spellout(25));
-        $this->assertSame('one hundred', Number::spellout(100));
-        $this->assertSame('one hundred thousand', Number::spellout(100000));
-        $this->assertSame('one hundred twenty-three million four hundred fifty-six thousand seven hundred eighty-nine', Number::spellout(123456789));
-
-        $this->assertSame('one billion', Number::spellout(1000000000));
-        $this->assertSame('one trillion', Number::spellout(1000000000000));
-        $this->assertSame('one quadrillion', Number::spellout(1000000000000000));
-        $this->assertSame('1,000,000,000,000,000,000', Number::spellout(1000000000000000000));
-
-        $this->assertSame('minus one', Number::spellout(-1));
-        $this->assertSame('minus ten', Number::spellout(-10));
-        $this->assertSame('minus twenty-five', Number::spellout(-25));
-
-        $this->assertSame('zero point two', Number::spellout(0.2));
-        $this->assertSame('one point two three', Number::spellout(1.23));
-        $this->assertSame('minus one point two three', Number::spellout(-1.23));
-        $this->assertSame('one hundred twenty-three point four five six', Number::spellout(123.456));
-    }
-
-    public function testSpelloutWithDifferentLocale()
-    {
-        $this->needsIntlExtension();
-
-        $this->assertSame('cent vingt-trois', Number::spellout(123, 'fr'));
-
-        $this->assertSame('ein­hundert­drei­und­zwanzig', Number::spellout(123, 'de'));
-
-        $this->assertSame('ett­hundra­tjugo­tre', Number::spellout(123, 'sv'));
+        Number::useLocale('en');
     }
 
     public function testToPercent()
     {
         $this->needsIntlExtension();
 
-        $this->assertSame('0%', Number::toPercent(0));
-        $this->assertSame('1%', Number::toPercent(1));
-        $this->assertSame('10%', Number::toPercent(10));
-        $this->assertSame('100%', Number::toPercent(100));
+        $this->assertSame('0%', Number::toPercentage(0));
+        $this->assertSame('1%', Number::toPercentage(1));
+        $this->assertSame('10%', Number::toPercentage(10));
+        $this->assertSame('100%', Number::toPercentage(100));
 
-        $this->assertSame('300%', Number::toPercent(300));
-        $this->assertSame('1,000%', Number::toPercent(1000));
+        $this->assertSame('300%', Number::toPercentage(300));
+        $this->assertSame('1,000%', Number::toPercentage(1000));
 
-        $this->assertSame('1.75%', Number::toPercent(1.75));
-        $this->assertSame('0.12%', Number::toPercent(0.12345));
-        $this->assertSame('0.1235%', Number::toPercent(0.12345, 4));
+        $this->assertSame('1.75%', Number::toPercentage(1.75));
+        $this->assertSame('0.12%', Number::toPercentage(0.12345));
+        $this->assertSame('0.1235%', Number::toPercentage(0.12345, 4));
     }
 
     public function testToCurrency()
@@ -170,60 +136,60 @@ class SupportNumberTest extends TestCase
 
     public function testBytesToHuman()
     {
-        $this->assertSame('0 B', Number::bytesToHuman(0));
-        $this->assertSame('1 B', Number::bytesToHuman(1));
-        $this->assertSame('1 kB', Number::bytesToHuman(1024));
-        $this->assertSame('2 kB', Number::bytesToHuman(2048));
-        $this->assertSame('1.23 kB', Number::bytesToHuman(1264));
-        $this->assertSame('1.234 kB', Number::bytesToHuman(1264, 3));
-        $this->assertSame('5 GB', Number::bytesToHuman(1024 * 1024 * 1024 * 5));
-        $this->assertSame('10 TB', Number::bytesToHuman((1024 ** 4) * 10));
-        $this->assertSame('10 PB', Number::bytesToHuman((1024 ** 5) * 10));
-        $this->assertSame('1 ZB', Number::bytesToHuman(1024 ** 7));
-        $this->assertSame('1 YB', Number::bytesToHuman(1024 ** 8));
-        $this->assertSame('1024 YB', Number::bytesToHuman(1024 ** 9));
+        $this->assertSame('0 B', Number::toFileSize(0));
+        $this->assertSame('1 B', Number::toFileSize(1));
+        $this->assertSame('1 KB', Number::toFileSize(1024));
+        $this->assertSame('2 KB', Number::toFileSize(2048));
+        $this->assertSame('1.23 KB', Number::toFileSize(1264));
+        $this->assertSame('1.234 KB', Number::toFileSize(1264, 3));
+        $this->assertSame('5 GB', Number::toFileSize(1024 * 1024 * 1024 * 5));
+        $this->assertSame('10 TB', Number::toFileSize((1024 ** 4) * 10));
+        $this->assertSame('10 PB', Number::toFileSize((1024 ** 5) * 10));
+        $this->assertSame('1 ZB', Number::toFileSize(1024 ** 7));
+        $this->assertSame('1 YB', Number::toFileSize(1024 ** 8));
+        $this->assertSame('1024 YB', Number::toFileSize(1024 ** 9));
     }
 
     public function testToHuman()
     {
-        $this->assertSame('1', Number::toHuman(1));
-        $this->assertSame('10', Number::toHuman(10));
-        $this->assertSame('100', Number::toHuman(100));
-        $this->assertSame('1 thousand', Number::toHuman(1000));
-        $this->assertSame('1 million', Number::toHuman(1000000));
-        $this->assertSame('1 billion', Number::toHuman(1000000000));
-        $this->assertSame('1 trillion', Number::toHuman(1000000000000));
-        $this->assertSame('1 quadrillion', Number::toHuman(1000000000000000));
-        $this->assertSame('1 thousand quadrillion', Number::toHuman(1000000000000000000));
+        $this->assertSame('1', Number::forHumans(1));
+        $this->assertSame('10', Number::forHumans(10));
+        $this->assertSame('100', Number::forHumans(100));
+        $this->assertSame('1 thousand', Number::forHumans(1000));
+        $this->assertSame('1 million', Number::forHumans(1000000));
+        $this->assertSame('1 billion', Number::forHumans(1000000000));
+        $this->assertSame('1 trillion', Number::forHumans(1000000000000));
+        $this->assertSame('1 quadrillion', Number::forHumans(1000000000000000));
+        $this->assertSame('1 thousand quadrillion', Number::forHumans(1000000000000000000));
 
-        $this->assertSame('123', Number::toHuman(123));
-        $this->assertSame('1.23 thousand', Number::toHuman(1234));
-        $this->assertSame('12.35 thousand', Number::toHuman(12345));
-        $this->assertSame('1.23 million', Number::toHuman(1234567));
-        $this->assertSame('1.23 billion', Number::toHuman(1234567890));
-        $this->assertSame('1.23 trillion', Number::toHuman(1234567890123));
-        $this->assertSame('1.23 quadrillion', Number::toHuman(1234567890123456));
-        $this->assertSame('1.23 thousand quadrillion', Number::toHuman(1234567890123456789));
-        $this->assertSame('490 thousand', Number::toHuman(489939, precision: 0));
-        $this->assertSame('489.939 thousand', Number::toHuman(489939, precision: 4));
-        $this->assertSame('500 million', Number::toHuman(500000000, precision: 5));
+        $this->assertSame('123', Number::forHumans(123));
+        $this->assertSame('1.23 thousand', Number::forHumans(1234));
+        $this->assertSame('12.35 thousand', Number::forHumans(12345));
+        $this->assertSame('1.23 million', Number::forHumans(1234567));
+        $this->assertSame('1.23 billion', Number::forHumans(1234567890));
+        $this->assertSame('1.23 trillion', Number::forHumans(1234567890123));
+        $this->assertSame('1.23 quadrillion', Number::forHumans(1234567890123456));
+        $this->assertSame('1.23 thousand quadrillion', Number::forHumans(1234567890123456789));
+        $this->assertSame('490 thousand', Number::forHumans(489939, precision: 0));
+        $this->assertSame('489.939 thousand', Number::forHumans(489939, precision: 4));
+        $this->assertSame('500 million', Number::forHumans(500000000, precision: 5));
 
-        $this->assertSame('1 million quadrillion', Number::toHuman(1000000000000000000000));
-        $this->assertSame('1 billion quadrillion', Number::toHuman(1000000000000000000000000));
-        $this->assertSame('1 trillion quadrillion', Number::toHuman(1000000000000000000000000000));
-        $this->assertSame('1 quadrillion quadrillion', Number::toHuman(1000000000000000000000000000000));
-        $this->assertSame('1 thousand quadrillion quadrillion', Number::toHuman(1000000000000000000000000000000000));
+        $this->assertSame('1 million quadrillion', Number::forHumans(1000000000000000000000));
+        $this->assertSame('1 billion quadrillion', Number::forHumans(1000000000000000000000000));
+        $this->assertSame('1 trillion quadrillion', Number::forHumans(1000000000000000000000000000));
+        $this->assertSame('1 quadrillion quadrillion', Number::forHumans(1000000000000000000000000000000));
+        $this->assertSame('1 thousand quadrillion quadrillion', Number::forHumans(1000000000000000000000000000000000));
 
-        $this->assertSame('0', Number::toHuman(0));
-        $this->assertSame('-1', Number::toHuman(-1));
-        $this->assertSame('-10', Number::toHuman(-10));
-        $this->assertSame('-100', Number::toHuman(-100));
-        $this->assertSame('-1 thousand', Number::toHuman(-1000));
-        $this->assertSame('-1 million', Number::toHuman(-1000000));
-        $this->assertSame('-1 billion', Number::toHuman(-1000000000));
-        $this->assertSame('-1 trillion', Number::toHuman(-1000000000000));
-        $this->assertSame('-1 quadrillion', Number::toHuman(-1000000000000000));
-        $this->assertSame('-1 thousand quadrillion', Number::toHuman(-1000000000000000000));
+        $this->assertSame('0', Number::forHumans(0));
+        $this->assertSame('-1', Number::forHumans(-1));
+        $this->assertSame('-10', Number::forHumans(-10));
+        $this->assertSame('-100', Number::forHumans(-100));
+        $this->assertSame('-1 thousand', Number::forHumans(-1000));
+        $this->assertSame('-1 million', Number::forHumans(-1000000));
+        $this->assertSame('-1 billion', Number::forHumans(-1000000000));
+        $this->assertSame('-1 trillion', Number::forHumans(-1000000000000));
+        $this->assertSame('-1 quadrillion', Number::forHumans(-1000000000000000));
+        $this->assertSame('-1 thousand quadrillion', Number::forHumans(-1000000000000000000));
     }
 
     protected function needsIntlExtension()
