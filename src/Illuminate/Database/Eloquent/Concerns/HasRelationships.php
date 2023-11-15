@@ -595,11 +595,7 @@ trait HasRelationships
         // the relationship instances for this relation. This relation will set
         // appropriate query constraints then entirely manage the hydrations.
         if (! $table) {
-            $words = preg_split('/(_)/u', $name, -1, PREG_SPLIT_DELIM_CAPTURE);
-
-            $lastWord = array_pop($words);
-
-            $table = implode('', $words).Str::plural($lastWord);
+            $table = Str::pluralStudly($name);
         }
 
         return $this->newMorphToMany(
