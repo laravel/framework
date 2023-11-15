@@ -42,7 +42,7 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
     }
 
     /**
-     * Send the given notification to the given notifiable entities.
+     * Create a queue batch for all the notifiables to receive the notification.
      *
      * @param  \Illuminate\Support\Collection|array|mixed  $notifiables
      * @param  mixed  $notification
