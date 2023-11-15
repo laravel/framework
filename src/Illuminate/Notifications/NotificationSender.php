@@ -83,9 +83,11 @@ class NotificationSender
     }
 
     /**
-     * @param \Illuminate\Support\Collection|array|mixed $notifiables
-     * @param object $notification
-     * @param PendingBatch $pendingBatch
+     * Apply jobs to a PendingBatch for queue delivery
+     * 
+     * @param  \Illuminate\Support\Collection|array|mixed  $notifiables
+     * @param  mixed  $notification
+     * @param  PendingBatch  $pendingBatch
      * @return PendingBatch
      */
     public function batch($notifiables, $notification, $pendingBatch)
@@ -258,11 +260,11 @@ class NotificationSender
     }
 
     /**
-     * Queue the given notification instances.
+     * Add jobs to a PendingBatch.
      *
-     * @param mixed $notifiables
-     * @param \Illuminate\Notifications\Notification $notification
-     * @param PendingBatch $pendingBatch
+     * @param  mixed  $notifiables
+     * @param  \Illuminate\Notifications\Notification  $notification
+     * @param  PendingBatch  $pendingBatch
      * @return PendingBatch
      */
     protected function queueNotificationBatch($notifiables, $notification, $pendingBatch)
