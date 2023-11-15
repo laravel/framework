@@ -269,7 +269,7 @@ class Password implements Rule, DataAwareRule, ValidatorAwareRule
     /**
      * Specify additional validation rules that should be merged with the default rules during validation.
      *
-     * @param  string|array|\Closure  $rules
+     * @param  \Closure|string|array  $rules
      * @return $this
      */
     public function rules($rules)
@@ -333,6 +333,11 @@ class Password implements Rule, DataAwareRule, ValidatorAwareRule
         return true;
     }
 
+    /**
+     * Get the validation error message.
+     *
+     * @return array
+     */
     public function message()
     {
         return $this->messages;
