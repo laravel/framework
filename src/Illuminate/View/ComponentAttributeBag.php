@@ -252,6 +252,43 @@ class ComponentAttributeBag implements ArrayAccess, IteratorAggregate, JsonSeria
 
         return $this->merge(['class' => Arr::toCssClasses($classList)]);
     }
+    /**
+     * Conditionally merge classes into the attribute bag based on properties.
+     * @return static
+     */
+    public function classProps(array $cases, string $default = null, string $attribute = null):self
+    {
+        $classList = Arr::wrap($cases);
+        $defaultClasses = collect();
+        foreach ($classList as $class => $constraint) {
+            if (is_numeric($class)) {
+                $defaultClasses->push($constraint);
+            }
+        }
+        if ($attribute) {
+            $css = collect($cases)->first(
+                function ($css, $key) use ($attribute) {
+                    if ($this->get($attribute) && $this->get($attribute) == $key) {
+                        return true;
+                    }
+                    return $this->has($key);
+                }
+            );
+        } else {
+            $css = collect($cases)->first(
+                fn ($css, $key) => $this->has($key) && (!($this->get($key) !== null) || value($this->get($key)))
+            );
+        }
+        if (is_callable($css)) {
+            $css = $css($this);
+        }
+
+        return $this
+            ->except(array_keys($cases))
+            ->exceptProps($attribute ? [$attribute] : [])
+            ->merge(['class' => $defaultClasses->join(' ')])
+            ->merge(['class' => $css ?? ($default ? $cases[$default] : null)]);
+    }
 
     /**
      * Conditionally merge styles into the attribute bag.

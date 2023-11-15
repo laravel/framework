@@ -4,6 +4,7 @@ namespace Illuminate\Tests\View;
 
 use Illuminate\View\ComponentAttributeBag;
 use PHPUnit\Framework\TestCase;
+use function value;
 
 class ViewComponentAttributeBagTest extends TestCase
 {
@@ -127,5 +128,38 @@ class ViewComponentAttributeBagTest extends TestCase
         $this->assertFalse((bool) $bag->has(['name', 'class']));
         $this->assertFalse((bool) $bag->has('name', 'class'));
         $this->assertTrue((bool) $bag->missing('class'));
+    }
+
+    public function testClassPropsProperties()
+    {
+        $config = fn(ComponentAttributeBag $component) => $component->classProps([
+            'xs' => fn($c) => value($c->get('outline')) ? 'button-xs-outline' : 'button-xs',
+            'md' => 'button-md',
+        ], 'md'
+        )->classProps([
+            'outline' => 'bg-transparent'
+        ])
+        ->classProps([
+            'white'=>'text-white',
+            'black'=>'text-black',
+        ],'white','color');
+        $bag = (new ComponentAttributeBag());
+        $bag = $config($bag);
+        $this->assertSame('class="text-white button-md"', (string)$bag);
+        $bag->setAttributes(['xs' => true]);
+        $bag = $config($bag);
+        $this->assertSame('class="text-white button-xs"', (string)$bag);
+        $bag->setAttributes(['xs' => true,'outline' => false,'color'=>'black']);
+        $bag = $config($bag);
+        $this->assertSame('class="text-black button-xs"', (string)$bag);
+        $bag->setAttributes(['xs' => true,'outline' => true,'color'=>'black']);
+        $bag = $config($bag);
+        $this->assertSame('class="text-black bg-transparent button-xs-outline"', (string)$bag);
+        $bag->setAttributes(['xs' => true,'outline' => true,'color'=>'black']);
+        $bag = $config($bag);
+        $this->assertSame('class="text-black bg-transparent button-xs-outline"', (string)$bag);
+        $bag->setAttributes(['xs' => true,'outline' => true,'black'=>true]);
+        $bag = $config($bag);
+        $this->assertSame('class="text-black bg-transparent button-xs-outline"', (string)$bag);
     }
 }
