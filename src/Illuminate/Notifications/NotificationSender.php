@@ -83,7 +83,7 @@ class NotificationSender
 
     /**
      * Apply jobs to a PendingBatch for queue delivery.
-     * 
+     *
      * @param  \Illuminate\Support\Collection|array|mixed  $notifiables
      * @param  mixed  $notification
      * @param  PendingBatch  $pendingBatch
@@ -243,7 +243,7 @@ class NotificationSender
                 if (method_exists($notification, 'middleware')) {
                     $middleware = array_merge(
                         $notification->middleware($notifiable, $channel),
-                        $middleware,
+                        $middleware
                     );
                 }
 
@@ -309,7 +309,7 @@ class NotificationSender
                 if (method_exists($notification, 'middleware')) {
                     $middleware = [
                         ...$notification->middleware($notifiable, $channel),
-                        ...$middleware
+                        ...$middleware,
                     ];
                 }
 
