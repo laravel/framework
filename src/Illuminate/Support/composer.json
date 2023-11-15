@@ -49,8 +49,7 @@
         "symfony/process": "Required to use the composer class (^6.2).",
         "symfony/uid": "Required to use Str::ulid() (^6.2).",
         "symfony/var-dumper": "Required to use the dd function (^6.2).",
-        "vlucas/phpdotenv": "Required to use the Env class and env helper (^5.4.1).",
-        "ext-intl": "Required to use certain wrappers in the Number class."
+        "vlucas/phpdotenv": "Required to use the Env class and env helper (^5.4.1)."
     },
     "config": {
         "sort-packages": true
