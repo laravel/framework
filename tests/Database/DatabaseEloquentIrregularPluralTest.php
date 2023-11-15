@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 use PHPUnit\Framework\TestCase;
 
+/** @group hans */
 class DatabaseEloquentIrregularPluralTest extends TestCase
 {
     protected function setUp(): void
@@ -46,7 +47,7 @@ class DatabaseEloquentIrregularPluralTest extends TestCase
             $table->string('name');
         });
 
-        $this->schema()->create('cool_mottoes', function ($table) {
+        $this->schema()->create('cool_mottos', function ($table) {
             $table->integer('irregular_plural_motto_id');
             $table->integer('cool_motto_id');
             $table->string('cool_motto_type');
