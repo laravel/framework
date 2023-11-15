@@ -2,7 +2,6 @@
 
 namespace Illuminate\Notifications;
 
-use Illuminate\Bus\Batch;
 use Illuminate\Bus\PendingBatch;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Contracts\Translation\HasLocalePreference;
@@ -83,7 +82,7 @@ class NotificationSender
     }
 
     /**
-     * Apply jobs to a PendingBatch for queue delivery
+     * Apply jobs to a PendingBatch for queue delivery.
      * 
      * @param  \Illuminate\Support\Collection|array|mixed  $notifiables
      * @param  mixed  $notification
@@ -244,7 +243,7 @@ class NotificationSender
                 if (method_exists($notification, 'middleware')) {
                     $middleware = array_merge(
                         $notification->middleware($notifiable, $channel),
-                        $middleware
+                        $middleware,
                     );
                 }
 
