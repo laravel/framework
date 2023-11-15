@@ -4,6 +4,7 @@ namespace Illuminate\Support\Testing\Fakes;
 
 use Closure;
 use Illuminate\Bus\BatchRepository;
+use Illuminate\Bus\ChainedBatch;
 use Illuminate\Bus\PendingBatch;
 use Illuminate\Contracts\Bus\QueueingDispatcher;
 use Illuminate\Support\Arr;
@@ -671,6 +672,7 @@ class BusFake implements Fake, QueueingDispatcher
     public function chain($jobs)
     {
         $jobs = Collection::wrap($jobs);
+        $jobs = ChainedBatch::prepareNestedBatches($jobs);
 
         return new PendingChainFake($this, $jobs->shift(), $jobs->toArray());
     }
