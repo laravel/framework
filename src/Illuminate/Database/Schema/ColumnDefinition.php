@@ -22,6 +22,7 @@ use Illuminate\Support\Fluent;
  * @method $this persisted() Mark the computed generated column as persistent (SQL Server)
  * @method $this primary() Add a primary index
  * @method $this fulltext(string $indexName = null) Add a fulltext index
+ * @method $this references(string $column) Add a reference for a column
  * @method $this spatialIndex(string $indexName = null) Add a spatial index
  * @method $this startingValue(int $startingValue) Set the starting value of an auto-incrementing field (MySQL/PostgreSQL)
  * @method $this storedAs(string $expression) Create a stored generated column (MySQL/PostgreSQL/SQLite)
