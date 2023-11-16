@@ -168,6 +168,7 @@ class DatabaseStore implements LockProvider, Store
         } catch (QueryException) {
             // ignore if duplicate
         }
+
         return false;
     }
 
