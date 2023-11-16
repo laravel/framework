@@ -115,7 +115,7 @@ class DatabaseStore implements LockProvider, Store
         // item from the cache. Then we will return a null value since the cache is
         // expired. We will use "Carbon" to make this comparison with the column.
         if ($this->currentTime() >= $cache->expiration) {
-            $this->forget($key);
+            $this->forgetIfExpired($key);
 
             return;
         }
@@ -312,6 +312,22 @@ class DatabaseStore implements LockProvider, Store
     public function forget($key)
     {
         $this->table()->where('key', '=', $this->prefix.$key)->delete();
+
+        return true;
+    }
+
+    /**
+     * Remove an item from the cache if expired.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    public function forgetIfExpired($key)
+    {
+        $this->table()
+            ->where('key', '=', $this->prefix.$key)
+            ->where('expiration', '<=', $this->getTime())
+            ->delete();
 
         return true;
     }
