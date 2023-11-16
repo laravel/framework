@@ -10,7 +10,6 @@ use Illuminate\Contracts\Bus\QueueingDispatcher;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Traits\ReflectsClosures;
-use LogicException;
 use PHPUnit\Framework\Assert as PHPUnit;
 
 class BusFake implements Fake, QueueingDispatcher
