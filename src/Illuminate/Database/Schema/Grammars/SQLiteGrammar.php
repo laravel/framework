@@ -29,11 +29,50 @@ class SQLiteGrammar extends Grammar
     /**
      * Compile the query to determine if a table exists.
      *
+     * @deprecated Will be removed in a future Laravel version.
+     *
      * @return string
      */
     public function compileTableExists()
     {
         return "select * from sqlite_master where type = 'table' and name = ?";
+    }
+
+    /**
+     * Compile the query to determine if the dbstat table is available.
+     *
+     * @return string
+     */
+    public function compileDbstatExtists()
+    {
+        return "select exists (select 1 from pragma_compile_options where compile_options = 'ENABLE_DBSTAT_VTAB') as enabled";
+    }
+
+    /**
+     * Compile the query to determine the tables.
+     *
+     * @param  bool  $withSize
+     * @return string
+     */
+    public function compileTables($withSize = false)
+    {
+        return $withSize
+            ? 'select m.tbl_name as name, sum(s.pgsize) as size from sqlite_master as m '
+            .'join dbstat as s on s.name = m.name '
+            ."where m.type in ('table', 'index') and m.tbl_name not like 'sqlite_%' "
+            .'group by m.tbl_name '
+            .'order by m.tbl_name'
+            : "select name from sqlite_master where type = 'table' and name not like 'sqlite_%' order by name";
+    }
+
+    /**
+     * Compile the query to determine the views.
+     *
+     * @return string
+     */
+    public function compileViews()
+    {
+        return "select name, sql as definition from sqlite_master where type = 'view' order by name";
     }
 
     /**
@@ -286,6 +325,8 @@ class SQLiteGrammar extends Grammar
     /**
      * Compile the SQL needed to retrieve all table names.
      *
+     * @deprecated Will be removed in a future Laravel version.
+     *
      * @return string
      */
     public function compileGetAllTables()
@@ -295,6 +336,8 @@ class SQLiteGrammar extends Grammar
 
     /**
      * Compile the SQL needed to retrieve all view names.
+     *
+     * @deprecated Will be removed in a future Laravel version.
      *
      * @return string
      */

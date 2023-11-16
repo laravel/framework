@@ -79,6 +79,29 @@ class PostgresGrammar extends Grammar
     }
 
     /**
+     * Compile the query to determine the tables.
+     *
+     * @return string
+     */
+    public function compileTables()
+    {
+        return 'select c.relname as name, n.nspname as schema, pg_total_relation_size(c.oid) as size, '
+            ."obj_description(c.oid, 'pg_class') as comment from pg_class c, pg_namespace n "
+            ."where c.relkind = 'r' and n.oid = c.relnamespace "
+            .'order by c.relname';
+    }
+
+    /**
+     * Compile the query to determine the views.
+     *
+     * @return string
+     */
+    public function compileViews()
+    {
+        return 'select viewname as name, schemaname as schema, definition from pg_views order by viewname';
+    }
+
+    /**
      * Compile the query to determine the list of columns.
      *
      * @deprecated Will be removed in a future Laravel version.
@@ -401,6 +424,8 @@ class PostgresGrammar extends Grammar
     /**
      * Compile the SQL needed to retrieve all table names.
      *
+     * @deprecated Will be removed in a future Laravel version.
+     *
      * @param  string|array  $searchPath
      * @return string
      */
@@ -411,6 +436,8 @@ class PostgresGrammar extends Grammar
 
     /**
      * Compile the SQL needed to retrieve all view names.
+     *
+     * @deprecated Will be removed in a future Laravel version.
      *
      * @param  string|array  $searchPath
      * @return string

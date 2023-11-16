@@ -31,6 +31,20 @@ class SQLiteBuilder extends Builder
     }
 
     /**
+     * Get the tables for the database.
+     *
+     * @return array
+     */
+    public function getTables()
+    {
+        $withSize = $this->connection->scalar($this->grammar->compileDbstatExtists());
+
+        return $this->connection->getPostProcessor()->processTables(
+            $this->connection->selectFromWriteConnection($this->grammar->compileTables($withSize))
+        );
+    }
+
+    /**
      * Drop all tables from the database.
      *
      * @return void
@@ -69,6 +83,8 @@ class SQLiteBuilder extends Builder
     /**
      * Get all of the table names for the database.
      *
+     * @deprecated Will be removed in a future Laravel version.
+     *
      * @return array
      */
     public function getAllTables()
@@ -80,6 +96,8 @@ class SQLiteBuilder extends Builder
 
     /**
      * Get all of the view names for the database.
+     *
+     * @deprecated Will be removed in a future Laravel version.
      *
      * @return array
      */
