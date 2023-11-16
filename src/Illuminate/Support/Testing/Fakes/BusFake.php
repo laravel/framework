@@ -472,14 +472,6 @@ class BusFake implements Fake, QueueingDispatcher
             return true;
         });
 
-        // $matching = $this->dispatched($command, $callback)->map->chained->map(function ($chain) {
-        //     return collect($chain)->map(
-        //         fn ($job) => get_class(unserialize($job))
-        //     );
-        // })->filter(
-        //     fn ($chain) => $chain->all() === $expectedChain
-        // );
-
         PHPUnit::assertTrue(
             $matching->isNotEmpty(), 'The expected chain was not dispatched.'
         );
@@ -741,8 +733,6 @@ class BusFake implements Fake, QueueingDispatcher
     {
         $jobs = Collection::wrap($jobs);
         $jobs = ChainedBatch::prepareNestedBatches($jobs);
-
-        $jobs->whereInstanceOf(ChainedBatch::class)->each->handle();
 
         return new PendingChainFake($this, $jobs->shift(), $jobs->toArray());
     }
