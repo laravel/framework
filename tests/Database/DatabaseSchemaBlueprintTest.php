@@ -44,6 +44,11 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $commands = $blueprint->getCommands();
         $this->assertSame('users_foo_index', $commands[0]->index);
 
+        $blueprint = new Blueprint('users');
+        $blueprint->index('foo desc');
+        $commands = $blueprint->getCommands();
+        $this->assertSame('users_foo_desc_index', $commands[0]->index);
+
         $blueprint = new Blueprint('geo');
         $blueprint->spatialIndex('coordinates');
         $commands = $blueprint->getCommands();
@@ -61,6 +66,11 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $blueprint->index('foo');
         $commands = $blueprint->getCommands();
         $this->assertSame('prefix_users_foo_index', $commands[0]->index);
+
+        $blueprint = new Blueprint('users', null, 'prefix_');
+        $blueprint->index('foo desc');
+        $commands = $blueprint->getCommands();
+        $this->assertSame('prefix_users_foo_desc_index', $commands[0]->index);
 
         $blueprint = new Blueprint('geo', null, 'prefix_');
         $blueprint->spatialIndex('coordinates');
@@ -80,6 +90,11 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $commands = $blueprint->getCommands();
         $this->assertSame('users_foo_index', $commands[0]->index);
 
+        $blueprint = new Blueprint('users');
+        $blueprint->dropIndex(['foo DESC']);
+        $commands = $blueprint->getCommands();
+        $this->assertSame('users_foo_desc_index', $commands[0]->index);
+
         $blueprint = new Blueprint('geo');
         $blueprint->dropSpatialIndex(['coordinates']);
         $commands = $blueprint->getCommands();
@@ -97,6 +112,11 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $blueprint->dropIndex(['foo']);
         $commands = $blueprint->getCommands();
         $this->assertSame('prefix_users_foo_index', $commands[0]->index);
+
+        $blueprint = new Blueprint('users', null, 'prefix_');
+        $blueprint->dropIndex(['foo DESC']);
+        $commands = $blueprint->getCommands();
+        $this->assertSame('prefix_users_foo_desc_index', $commands[0]->index);
 
         $blueprint = new Blueprint('geo', null, 'prefix_');
         $blueprint->dropSpatialIndex(['coordinates']);

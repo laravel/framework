@@ -245,7 +245,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $this->assertSame('alter table `users` drop index `foo`', $statements[0]);
     }
 
-    public function testDropIndex()
+    public function testDropIndex(): void
     {
         $blueprint = new Blueprint('users');
         $blueprint->dropIndex('foo');
@@ -254,6 +254,17 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $this->assertCount(1, $statements);
         $this->assertSame('alter table `users` drop index `foo`', $statements[0]);
     }
+
+    public function testDropIndexWithAscendingAndDescending(): void
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->dropIndex(['foo desc', 'bar ASC', 'baz']);
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table `users` drop index `users_foo_desc_bar_asc_baz_index`', $statements[0]);
+    }
+
 
     public function testDropSpatialIndex()
     {
@@ -364,6 +375,16 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
 
         $this->assertCount(1, $statements);
         $this->assertSame('alter table `users` add index `baz`(`foo`, `bar`)', $statements[0]);
+    }
+
+    public function testAddingIndexWithAscendingAndDescending(): void
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->index(['foo desc', 'bar ASC', 'baz']);
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table `users` add index `users_foo_desc_bar_asc_baz_index`(`foo` DESC, `bar` ASC, `baz`)', $statements[0]);
     }
 
     public function testAddingIndexWithAlgorithm()

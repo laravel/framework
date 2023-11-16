@@ -157,6 +157,16 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $this->assertSame('drop index "foo" on "users"', $statements[0]);
     }
 
+    public function testDropIndexWithAscendingAndDescending()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->dropIndex('foo DESC');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('drop index "foo_desc" on "users"', $statements[0]);
+    }
+
     public function testDropSpatialIndex()
     {
         $blueprint = new Blueprint('geo');
@@ -267,6 +277,16 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
 
         $this->assertCount(1, $statements);
         $this->assertSame('create index "baz" on "users" ("foo", "bar")', $statements[0]);
+    }
+
+    public function testAddingIndexWithAscendingAndDescending(): void
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->index(['foo desc', 'bar ASC', 'baz']);
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('create index "users_foo_desc_bar_asc_baz_index" on "users" ("foo" DESC, "bar" ASC, "baz")', $statements[0]);
     }
 
     public function testAddingSpatialIndex()

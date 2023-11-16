@@ -77,6 +77,15 @@ abstract class Grammar
             return $this->wrapJsonSelector($value);
         }
 
+        // If the given value suffix has an ordering direction, we will separate
+        // it to wrap the field and ordering direction SQL independently.
+        // Afterward, we will join them back together, ensuring that the clause
+        // is processed correctly by the database.
+        if (preg_match('/\s+desc|\s+asc/i', $value)) {
+            [$column, $order] = explode(' ', $value);
+            return $this->wrap($column).' '.strtoupper($order);
+        }
+
         return $this->wrapSegments(explode('.', $value));
     }
 

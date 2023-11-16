@@ -1681,7 +1681,7 @@ class Blueprint
     {
         $index = strtolower($this->prefix.$this->table.'_'.implode('_', $columns).'_'.$type);
 
-        return str_replace(['-', '.'], '_', $index);
+        return str_replace(['-', '.', ' '], '_', $index);
     }
 
     /**

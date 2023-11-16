@@ -96,6 +96,16 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $this->assertSame('drop index "foo"', $statements[0]);
     }
 
+    public function testDropIndexWithAscendingAndDescending(): void
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->dropIndex(['foo desc', 'bar ASC', 'baz']);
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('drop index "users_foo_desc_bar_asc_baz_index"', $statements[0]);
+    }
+
     public function testDropColumn()
     {
         $db = new Manager;
@@ -180,6 +190,52 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $this->assertEquals(['name', 'email'], $details->getIndex('index2')->getUnquotedColumns());
     }
 
+    public function testRenameIndexWithAscendingAndDescending(): void
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->index(['foo desc', 'bar ASC', 'baz']);
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('create index "users_foo_desc_bar_asc_baz_index" on "users" ("foo" DESC, "bar" ASC, "baz")', $statements[0]);
+
+
+        $db = new Manager;
+
+        $db->addConnection([
+            'driver' => 'sqlite',
+            'database' => ':memory:',
+            'prefix' => 'prefix_',
+        ]);
+
+        $schema = $db->getConnection()->getSchemaBuilder();
+
+        $schema->create('users', function (Blueprint $table) {
+            $table->string('name');
+            $table->string('email');
+            $table->string('phone');
+        });
+
+        $schema->table('users', function (Blueprint $table) {
+            $table->index(['name desc', 'email ASC', 'phone']);
+        });
+
+        $manager = $db->getConnection()->getDoctrineSchemaManager();
+        $details = $manager->listTableDetails('prefix_users');
+        $this->assertTrue($details->hasIndex('users_name_desc_email_asc_phone_index'));
+        $this->assertFalse($details->hasIndex('index2'));
+
+        $schema->table('users', function (Blueprint $table) {
+            $table->renameIndex('users_name_desc_email_asc_phone_index', 'index2');
+        });
+
+        $details = $manager->listTableDetails('prefix_users');
+        $this->assertFalse($details->hasIndex('users_name_desc_email_asc_phone_index'));
+        $this->assertTrue($details->hasIndex('index2'));
+
+        $this->assertEquals(['name', 'email', 'phone'], $details->getIndex('index2')->getUnquotedColumns());
+    }
+
     public function testAddingPrimaryKey()
     {
         $blueprint = new Blueprint('users');
@@ -222,6 +278,16 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
 
         $this->assertCount(1, $statements);
         $this->assertSame('create index "baz" on "users" ("foo", "bar")', $statements[0]);
+    }
+
+    public function testAddingIndexWithAscendingAndDescending(): void
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->index(['foo desc', 'bar ASC', 'baz']);
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('create index "users_foo_desc_bar_asc_baz_index" on "users" ("foo" DESC, "bar" ASC, "baz")', $statements[0]);
     }
 
     public function testAddingSpatialIndex()
