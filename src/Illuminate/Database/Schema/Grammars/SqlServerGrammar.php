@@ -89,7 +89,7 @@ class SqlServerGrammar extends Grammar
             .'from sys.tables as t '
             .'join sys.partitions as p on p.object_id = t.object_id '
             .'join sys.allocation_units as u on u.container_id = p.hobt_id '
-            .'group by t.name '
+            .'group by t.name, t.schema_id '
             .'order by t.name';
     }
 
