@@ -8,6 +8,7 @@ use Illuminate\Contracts\Cache\Store;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\PostgresConnection;
 use Illuminate\Database\QueryException;
+use Illuminate\Database\SqlServerConnection;
 use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Str;
 
@@ -153,17 +154,23 @@ class DatabaseStore implements LockProvider, Store
         $value = $this->serialize($value);
         $expiration = $this->getTime() + $seconds;
 
+        if (! is_null($this->get($key))) {
+            return false;
+        }
+
+        $doesntSupportInsertOrIgnore = [SqlServerConnection::class];
+
+        if (! in_array(get_class($this->getConnection()), $doesntSupportInsertOrIgnore)) {
+            return $this->table()->insertOrIgnore(compact('key', 'value', 'expiration')) > 0;
+        }
+
         try {
             return $this->table()->insert(compact('key', 'value', 'expiration'));
         } catch (QueryException) {
-            return $this->table()
-                ->where('key', $key)
-                ->where('expiration', '<=', $this->getTime())
-                ->update([
-                    'value' => $value,
-                    'expiration' => $expiration,
-                ]) >= 1;
+            // ...
         }
+
+        return false;
     }
 
     /**
