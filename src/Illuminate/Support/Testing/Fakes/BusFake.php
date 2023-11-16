@@ -10,6 +10,7 @@ use Illuminate\Contracts\Bus\QueueingDispatcher;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Traits\ReflectsClosures;
+use LogicException;
 use PHPUnit\Framework\Assert as PHPUnit;
 
 class BusFake implements Fake, QueueingDispatcher
@@ -334,6 +335,14 @@ class BusFake implements Fake, QueueingDispatcher
 
         if ($command instanceof Closure) {
             [$command, $callback] = [$this->firstClosureParameterType($command), $command];
+        } elseif ($command instanceof ChainedBatchTruthTest) {
+            $instance = $command;
+
+            $command = ChainedBatch::class;
+
+            $callback = function ($job) use ($instance) {
+                return $instance($job->toPendingBatch());
+            };
         } elseif (! is_string($command)) {
             $instance = $command;
 
@@ -401,12 +410,31 @@ class BusFake implements Fake, QueueingDispatcher
      */
     protected function assertDispatchedWithChainOfObjects($command, $expectedChain, $callback)
     {
-        $chain = collect($expectedChain)->map(fn ($job) => serialize($job))->all();
+        $chain = collect($expectedChain)->map(function ($job) {
+            return $job instanceof ChainedBatchTruthTest ? $job : serialize($job);
+        })->all();
 
         PHPUnit::assertTrue(
-            $this->dispatched($command, $callback)->filter(
-                fn ($job) => $job->chained == $chain
-            )->isNotEmpty(),
+            $this->dispatched($command, $callback)->filter(function ($job) use ($chain) {
+                if (count($chain) !== count($job->chained)) {
+                    return false;
+                }
+
+                foreach ($job->chained as $index => $serializedChainedJob) {
+                    if ($chain[$index] instanceof ChainedBatchTruthTest) {
+                        $chainedBatch = unserialize($serializedChainedJob);
+
+                        if (! $chainedBatch instanceof ChainedBatch ||
+                            ! $chain[$index]($chainedBatch->toPendingBatch())) {
+                            return false;
+                        }
+                    } elseif ($chain[$index] != $serializedChainedJob) {
+                        return false;
+                    }
+                }
+
+                return true;
+            })->isNotEmpty(),
             'The expected chain was not dispatched.'
         );
     }
@@ -421,6 +449,29 @@ class BusFake implements Fake, QueueingDispatcher
      */
     protected function assertDispatchedWithChainOfClasses($command, $expectedChain, $callback)
     {
+        $chain = $expectedChain;
+
+        $matching = $this->dispatched($command, $callback)->filter(function ($job) use ($chain) {
+            if (count($expectedChain) !== count($job->chained)) {
+                return false;
+            }
+
+            foreach ($job->chained as $index => $serializedChainedJob) {
+                if ($chain[$index] instanceof ChainedBatchTruthTest) {
+                    $chainedBatch = unserialize($serializedChainedJob);
+
+                    if (! $chainedBatch instanceof ChainedBatch ||
+                        ! $chain[$index]($chainedBatch->toPendingBatch())) {
+                        return false;
+                    }
+                } elseif ($chain[$index] != $serializedChainedJob) {
+                    return false;
+                }
+            }
+
+            return true;
+        });
+
         $matching = $this->dispatched($command, $callback)->map->chained->map(function ($chain) {
             return collect($chain)->map(
                 fn ($job) => get_class(unserialize($job))
@@ -442,7 +493,24 @@ class BusFake implements Fake, QueueingDispatcher
      */
     protected function isChainOfObjects($chain)
     {
-        return ! collect($chain)->contains(fn ($job) => ! is_object($job));
+        foreach ($chain as $job) {
+            if (! is_object($job)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Create a new assertion about a chained batch.
+     *
+     * @param  \Closure  $callback
+     * @return \Illuminate\Support\Testing\Fakes\ChainedBatchTruthTest
+     */
+    public function chainedBatch(Closure $callback)
+    {
+        return new ChainedBatchTruthTest($callback);
     }
 
     /**
