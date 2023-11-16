@@ -357,9 +357,11 @@ class BusFake implements Fake, QueueingDispatcher
             "The expected [{$command}] job was not dispatched."
         );
 
-        $this->isChainOfObjects($expectedChain)
-            ? $this->assertDispatchedWithChainOfObjects($command, $expectedChain, $callback)
-            : $this->assertDispatchedWithChainOfClasses($command, $expectedChain, $callback);
+        $this->assertDispatchedWithChainOfObjects($command, $expectedChain, $callback);
+
+        // $this->isChainOfObjects($expectedChain)
+        //     ? $this->assertDispatchedWithChainOfObjects($command, $expectedChain, $callback)
+        //     : $this->assertDispatchedWithChainOfClasses($command, $expectedChain, $callback);
     }
 
     /**
@@ -396,7 +398,7 @@ class BusFake implements Fake, QueueingDispatcher
             "The expected [{$command}] job was not dispatched."
         );
 
-        $this->assertDispatchedWithChainOfClasses($command, [], $callback);
+        $this->assertDispatchedWithChainOfObjects($command, [], $callback);
     }
 
     /**
@@ -409,9 +411,11 @@ class BusFake implements Fake, QueueingDispatcher
      */
     protected function assertDispatchedWithChainOfObjects($command, $expectedChain, $callback)
     {
-        $chain = collect($expectedChain)->map(function ($job) {
-            return $job instanceof ChainedBatchTruthTest ? $job : serialize($job);
-        })->all();
+        $chain = $expectedChain;
+
+        // $chain = collect($expectedChain)->map(function ($job) {
+        //     return $job instanceof ChainedBatchTruthTest ? $job : serialize($job);
+        // })->all();
 
         PHPUnit::assertTrue(
             $this->dispatched($command, $callback)->filter(function ($job) use ($chain) {
@@ -427,7 +431,10 @@ class BusFake implements Fake, QueueingDispatcher
                             ! $chain[$index]($chainedBatch->toPendingBatch())) {
                             return false;
                         }
-                    } elseif ($chain[$index] != $serializedChainedJob) {
+                    } elseif (is_string($chain[$index]) &&
+                              $chain[$index] != get_class(unserialize($serializedChainedJob))) {
+                        return false;
+                    } elseif (serialize($chain[$index]) != $serializedChainedJob) {
                         return false;
                     }
                 }
