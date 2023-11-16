@@ -452,7 +452,7 @@ class BusFake implements Fake, QueueingDispatcher
         $chain = $expectedChain;
 
         $matching = $this->dispatched($command, $callback)->filter(function ($job) use ($chain) {
-            if (count($expectedChain) !== count($job->chained)) {
+            if (count($chain) !== count($job->chained)) {
                 return false;
             }
 
@@ -464,7 +464,7 @@ class BusFake implements Fake, QueueingDispatcher
                         ! $chain[$index]($chainedBatch->toPendingBatch())) {
                         return false;
                     }
-                } elseif ($chain[$index] != $serializedChainedJob) {
+                } elseif ($chain[$index] != get_class(unserialize($serializedChainedJob))) {
                     return false;
                 }
             }
@@ -472,13 +472,13 @@ class BusFake implements Fake, QueueingDispatcher
             return true;
         });
 
-        $matching = $this->dispatched($command, $callback)->map->chained->map(function ($chain) {
-            return collect($chain)->map(
-                fn ($job) => get_class(unserialize($job))
-            );
-        })->filter(
-            fn ($chain) => $chain->all() === $expectedChain
-        );
+        // $matching = $this->dispatched($command, $callback)->map->chained->map(function ($chain) {
+        //     return collect($chain)->map(
+        //         fn ($job) => get_class(unserialize($job))
+        //     );
+        // })->filter(
+        //     fn ($chain) => $chain->all() === $expectedChain
+        // );
 
         PHPUnit::assertTrue(
             $matching->isNotEmpty(), 'The expected chain was not dispatched.'
