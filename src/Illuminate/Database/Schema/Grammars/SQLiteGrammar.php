@@ -43,7 +43,7 @@ class SQLiteGrammar extends Grammar
      *
      * @return string
      */
-    public function compileDbstatExtists()
+    public function compileDbstatExists()
     {
         return "select exists (select 1 from pragma_compile_options where compile_options = 'ENABLE_DBSTAT_VTAB') as enabled";
     }
