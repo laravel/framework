@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Database;
 
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Orchestra\Testbench\Attributes\WithMigration;
@@ -22,10 +23,9 @@ class DatabaseCacheStoreTest extends DatabaseTestCase
     {
         $store = $this->getStore();
 
-        $result = $store->put('foo', 'bar', -1);
+        $store->put('foo', 'bar', 0);
 
-        $this->assertFalse($result);
-        $this->assertDatabaseMissing($this->getCacheTableName(), ['key' => $this->withCachePrefix('foo'), 'value' => 'bar']);
+        $this->assertDatabaseMissing($this->getCacheTableName(), ['key' => $this->withCachePrefix('foo')]);
     }
 
     public function testValueCanUpdateExistCache()
@@ -55,10 +55,10 @@ class DatabaseCacheStoreTest extends DatabaseTestCase
     {
         $store = $this->getStore();
 
-        $result = $store->add('foo', 'bar', -1);
+        $result = $store->add('foo', 'bar', 0);
 
         $this->assertFalse($result);
-        $this->assertDatabaseMissing($this->getCacheTableName(), ['key' => $this->withCachePrefix('foo'), 'value' => 'bar']);
+        $this->assertDatabaseMissing($this->getCacheTableName(), ['key' => $this->withCachePrefix('foo')]);
     }
 
     public function testAddOperationCanStoreNewCache()
@@ -100,13 +100,7 @@ class DatabaseCacheStoreTest extends DatabaseTestCase
     {
         $store = $this->getStore();
 
-        $this->insertToCacheTable(
-            [
-                'key' => $this->withCachePrefix('foo'),
-                'value' => 'bar',
-                'expiration' => 0
-            ]
-        );
+        $this->insertToCacheTable('foo', 'bar', 0);
         $result = $store->add('foo', 'new-bar', 60);
 
         $this->assertTrue($result);
@@ -117,13 +111,7 @@ class DatabaseCacheStoreTest extends DatabaseTestCase
     {
         $store = $this->getStore();
 
-        $this->insertToCacheTable(
-            [
-                'key' => $this->withCachePrefix('foo'),
-                'value' => 'bar',
-                'expiration' => 0
-            ]
-        );
+        $this->insertToCacheTable('foo', 'bar', 0);
 
         DB::beginTransaction();
         $result = $store->add('foo', 'new-bar', 60);
@@ -137,13 +125,7 @@ class DatabaseCacheStoreTest extends DatabaseTestCase
     {
         $store = $this->getStore();
 
-        $this->insertToCacheTable(
-            [
-                'key' => $this->withCachePrefix('foo'),
-                'value' => 'bar',
-                'expiration' => 0
-            ]
-        );
+        $this->insertToCacheTable('foo', 'bar', 0);
 
         $result = $store->get('foo');
 
@@ -154,13 +136,7 @@ class DatabaseCacheStoreTest extends DatabaseTestCase
     {
         $store = $this->getStore();
 
-        $this->insertToCacheTable(
-            [
-                'key' => $this->withCachePrefix('foo'),
-                'value' => 'bar',
-                'expiration' => 0
-            ]
-        );
+        $this->insertToCacheTable('foo', 'bar', 0);
 
         $store->get('foo');
 
@@ -171,13 +147,7 @@ class DatabaseCacheStoreTest extends DatabaseTestCase
     {
         $store = $this->getStore();
 
-        $this->insertToCacheTable(
-            [
-                'key' => $this->withCachePrefix('foo'),
-                'value' => 'bar',
-                'expiration' => 0
-            ]
-        );
+        $this->insertToCacheTable('foo', 'bar', 0);
 
         $store->forgetIfExpired('foo');
 
@@ -213,8 +183,15 @@ class DatabaseCacheStoreTest extends DatabaseTestCase
         return config('cache.prefix').$key;
     }
 
-    protected function insertToCacheTable(array $data)
+    protected function insertToCacheTable(string $key, $value, $ttl = 60)
     {
-        DB::table($this->getCacheTableName())->insert($data);
+        DB::table($this->getCacheTableName())
+            ->insert(
+                [
+                    'key' => $this->withCachePrefix($key),
+                    'value' => $value,
+                    'expiration' => Carbon::now()->addSeconds($ttl)->getTimestamp()
+                ]
+            );
     }
 }
