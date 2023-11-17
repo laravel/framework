@@ -42,6 +42,38 @@ class Number
     }
 
     /**
+     * Spell out the given number in the given locale.
+     *
+     * @param  int|float  $number
+     * @param  ?string  $locale
+     * @return string
+     */
+    public static function spell(int|float $number, ?string $locale = null)
+    {
+        static::ensureIntlExtensionIsInstalled();
+
+        $formatter = new NumberFormatter($locale ?? static::$locale, NumberFormatter::SPELLOUT);
+
+        return $formatter->format($number);
+    }
+
+    /**
+     * Convert the given number to ordinal form.
+     *
+     * @param  int|float  $number
+     * @param  ?string  $locale
+     * @return string
+     */
+    public static function ordinal(int|float $number, ?string $locale = null)
+    {
+        static::ensureIntlExtensionIsInstalled();
+
+        $formatter = new NumberFormatter($locale ?? static::$locale, NumberFormatter::ORDINAL);
+
+        return $formatter->format($number);
+    }
+
+    /**
      * Convert the given number to its percentage equivalent.
      *
      * @param  int|float  $number

@@ -62,6 +62,26 @@ class SupportNumberTest extends TestCase
         Number::useLocale('en');
     }
 
+    public function testSpellout()
+    {
+        $this->assertSame('ten', Number::spell(10));
+        $this->assertSame('one point two', Number::spell(1.2));
+    }
+
+    public function testSpelloutWithLocale()
+    {
+        $this->needsIntlExtension();
+
+        $this->assertSame('trois', Number::spell(3, 'fr'));
+    }
+
+    public function testOrdinal()
+    {
+        $this->assertSame('1st', Number::ordinal(1));
+        $this->assertSame('2nd', Number::ordinal(2));
+        $this->assertSame('3rd', Number::ordinal(3));
+    }
+
     public function testToPercent()
     {
         $this->needsIntlExtension();
