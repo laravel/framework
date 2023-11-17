@@ -81,6 +81,13 @@ class Handler implements ExceptionHandlerContract
     protected $levels = [];
 
     /**
+     * The callbacks that should be used to throttle reportable exceptions.
+     *
+     * @var array
+     */
+    protected $throttleCallbacks = [];
+
+    /**
      * The callbacks that should be used to build exception context data.
      *
      * @var array
@@ -408,7 +415,36 @@ class Handler implements ExceptionHandlerContract
      */
     protected function throttle(Throwable $e)
     {
+        foreach ($this->throttleCallbacks as $throttleCallback) {
+            foreach ($this->firstClosureParameterTypes($throttleCallback) as $type) {
+                if (is_a($e, $type)) {
+                    $response = $throttleCallback($e);
+
+                    if (! is_null($response)) {
+                        return $response;
+                    }
+                }
+            }
+        }
+
         return Limit::none();
+    }
+
+    /**
+     * Specify the callback that should be used to throttle reportable exceptions.
+     *
+     * @param  callable  $throttleUsing
+     * @return $this
+     */
+    public function throttleUsing(callable $throttleUsing)
+    {
+        if (! $throttleUsing instanceof Closure) {
+            $throttleUsing = Closure::fromCallable($throttleUsing);
+        }
+
+        $this->throttleCallbacks[] = $throttleUsing;
+
+        return $this;
     }
 
     /**
