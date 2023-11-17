@@ -339,9 +339,7 @@ class BusFake implements Fake, QueueingDispatcher
 
             $command = ChainedBatch::class;
 
-            $callback = function ($job) use ($instance) {
-                return $instance($job->toPendingBatch());
-            };
+            $callback = fn ($job) => $instance($job->toPendingBatch());
         } elseif (! is_string($command)) {
             $instance = $command;
 
