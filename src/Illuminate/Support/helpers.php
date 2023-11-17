@@ -5,6 +5,7 @@ use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Env;
 use Illuminate\Support\HigherOrderTapProxy;
+use Illuminate\Support\Number;
 use Illuminate\Support\Optional;
 use Illuminate\Support\Sleep;
 use Illuminate\Support\Str;
@@ -287,6 +288,19 @@ if (! function_exists('str')) {
         }
 
         return Str::of($string);
+    }
+}
+
+if (! function_exists('number')) {
+    /**
+     * Get a new numberable object from the given number.
+     *
+     * @param  int|float  $number
+     * @return \Illuminate\Support\Numberable|mixed
+     */
+    function number($number)
+    {
+        return Number::of($number);
     }
 }
 
