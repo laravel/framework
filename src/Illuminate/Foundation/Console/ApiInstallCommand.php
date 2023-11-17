@@ -36,6 +36,8 @@ class ApiInstallCommand extends Command
      */
     public function handle()
     {
+        $this->installSanctum();
+
         if (file_exists($apiRoutesPath = $this->laravel->basePath('routes/api.php')) &&
             ! $this->option('force')) {
             $this->components->error('API routes file already exists.');
@@ -44,16 +46,40 @@ class ApiInstallCommand extends Command
 
             copy(__DIR__.'/stubs/api-routes.stub', $apiRoutesPath);
 
+            $this->uncommentApiRoutesFile();
+        }
+
+        $this->components->info('API scaffolding installed. Please add the "Laravel\Sanctum\HasApiTokens" trait to your User model.');
+    }
+
+    /**
+     * Uncomment the API routes file in the application bootstrap file.
+     *
+     * @return void
+     */
+    protected function uncommentApiRoutesFile()
+    {
+        $appBootstrapPath = $this->laravel->bootstrapPath('app.php');
+
+        $content = file_get_contents($appBootstrapPath);
+
+        if (str_contains($content, '// api: ')) {
             (new Filesystem)->replaceInFile(
                 '// api: ',
                 'api: ',
-                $this->laravel->bootstrapPath('app.php'),
+                $appBootstrapPath,
             );
+        } elseif (str_contains($content, 'web: __DIR__.\'/../routes/web.php\',')) {
+            (new Filesystem)->replaceInFile(
+                'web: __DIR__.\'/../routes/web.php\',',
+                'web: __DIR__.\'/../routes/web.php\','.PHP_EOL.'        api: __DIR__.\'/../routes/api.php\',',
+                $appBootstrapPath,
+            );
+        } else {
+            $this->components->warn('Unable to automatically add API route definition to bootstrap file. API route file should be registered manually.');
+
+            return;
         }
-
-        $this->installSanctum();
-
-        $this->components->info('API scaffolding installed. Please add the "Laravel\Sanctum\HasApiTokens" trait to your User model.');
     }
 
     /**
