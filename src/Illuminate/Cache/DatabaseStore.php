@@ -150,11 +150,12 @@ class DatabaseStore implements LockProvider, Store
      */
     public function add($key, $value, $seconds)
     {
+        $noPrefixKey = $key;
         $key = $this->prefix.$key;
         $value = $this->serialize($value);
         $expiration = $this->getTime() + $seconds;
 
-        if (! is_null($this->get($key))) {
+        if (! is_null($this->get($noPrefixKey))) {
             return false;
         }
 
