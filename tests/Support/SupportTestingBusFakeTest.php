@@ -517,6 +517,23 @@ class SupportTestingBusFakeTest extends TestCase
             new ChainedJobStub,
         ]);
 
+        $this->fake->chain([
+            $this->fake->batch([
+                new OtherBusJobStub,
+                new OtherBusJobStub,
+            ]),
+            new ChainedJobStub,
+            new ChainedJobStub,
+        ])->dispatch();
+
+        $this->fake->assertChained([
+            $this->fake->chainedBatch(function ($pendingBatch) {
+                return $pendingBatch->jobs->count() === 2;
+            }),
+            ChainedJobStub::class,
+            ChainedJobStub::class,
+        ]);
+
         Container::setInstance(null);
     }
 
