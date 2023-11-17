@@ -358,10 +358,6 @@ class BusFake implements Fake, QueueingDispatcher
         );
 
         $this->assertDispatchedWithChainOfObjects($command, $expectedChain, $callback);
-
-        // $this->isChainOfObjects($expectedChain)
-        //     ? $this->assertDispatchedWithChainOfObjects($command, $expectedChain, $callback)
-        //     : $this->assertDispatchedWithChainOfClasses($command, $expectedChain, $callback);
     }
 
     /**
@@ -413,10 +409,6 @@ class BusFake implements Fake, QueueingDispatcher
     {
         $chain = $expectedChain;
 
-        // $chain = collect($expectedChain)->map(function ($job) {
-        //     return $job instanceof ChainedBatchTruthTest ? $job : serialize($job);
-        // })->all();
-
         PHPUnit::assertTrue(
             $this->dispatched($command, $callback)->filter(function ($job) use ($chain) {
                 if (count($chain) !== count($job->chained)) {
@@ -431,9 +423,10 @@ class BusFake implements Fake, QueueingDispatcher
                             ! $chain[$index]($chainedBatch->toPendingBatch())) {
                             return false;
                         }
-                    } elseif (is_string($chain[$index]) &&
-                              $chain[$index] != get_class(unserialize($serializedChainedJob))) {
-                        return false;
+                    } elseif (is_string($chain[$index])) {
+                        if ($chain[$index] != get_class(unserialize($serializedChainedJob))) {
+                            return false;
+                        }
                     } elseif (serialize($chain[$index]) != $serializedChainedJob) {
                         return false;
                     }
@@ -443,61 +436,6 @@ class BusFake implements Fake, QueueingDispatcher
             })->isNotEmpty(),
             'The expected chain was not dispatched.'
         );
-    }
-
-    /**
-     * Assert if a job was dispatched with chained jobs based on a truth-test callback.
-     *
-     * @param  string  $command
-     * @param  array  $expectedChain
-     * @param  callable|null  $callback
-     * @return void
-     */
-    protected function assertDispatchedWithChainOfClasses($command, $expectedChain, $callback)
-    {
-        $chain = $expectedChain;
-
-        $matching = $this->dispatched($command, $callback)->filter(function ($job) use ($chain) {
-            if (count($chain) !== count($job->chained)) {
-                return false;
-            }
-
-            foreach ($job->chained as $index => $serializedChainedJob) {
-                if ($chain[$index] instanceof ChainedBatchTruthTest) {
-                    $chainedBatch = unserialize($serializedChainedJob);
-
-                    if (! $chainedBatch instanceof ChainedBatch ||
-                        ! $chain[$index]($chainedBatch->toPendingBatch())) {
-                        return false;
-                    }
-                } elseif ($chain[$index] != get_class(unserialize($serializedChainedJob))) {
-                    return false;
-                }
-            }
-
-            return true;
-        });
-
-        PHPUnit::assertTrue(
-            $matching->isNotEmpty(), 'The expected chain was not dispatched.'
-        );
-    }
-
-    /**
-     * Determine if the given chain is entirely composed of objects.
-     *
-     * @param  array  $chain
-     * @return bool
-     */
-    protected function isChainOfObjects($chain)
-    {
-        foreach ($chain as $job) {
-            if (! is_object($job)) {
-                return false;
-            }
-        }
-
-        return true;
     }
 
     /**
