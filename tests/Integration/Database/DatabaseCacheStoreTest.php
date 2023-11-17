@@ -101,8 +101,60 @@ class DatabaseCacheStoreTest extends DatabaseTestCase
         $this->assertSame('new-bar', $store->get('foo'));
     }
 
+    public function testGetOperationReturnNullIfExpired()
+    {
+        $store = $this->getStore();
+
+        $store->put('foo', 'bar', -1);
+
+        $result = $store->get('foo');
+
+        $this->assertNull($result);
+    }
+
+    public function testGetOperationCanDeleteExpired()
+    {
+        $store = $this->getStore();
+
+        $store->put('foo', 'bar', -1);
+
+        $store->get('foo');
+
+        $this->assertDatabaseMissing($this->getCacheTableName(), ['key' => 'foo']);
+    }
+
+    public function testForgetIfExpiredOperationCanDeleteExpired()
+    {
+        $store = $this->getStore();
+
+        $store->put('foo', 'bar', -1);
+
+        $store->forgetIfExpired('foo');
+
+        $this->assertDatabaseMissing($this->getCacheTableName(), ['key' => 'foo']);
+    }
+
+    public function testForgetIfExpiredOperationShouldNotDeleteUnExpired()
+    {
+        $store = $this->getStore();
+
+        $store->put('foo', 'bar', 60);
+
+        $store->forgetIfExpired('foo');
+
+        $this->assertDatabaseHas($this->getCacheTableName(), ['key' => 'foo']);
+    }
+
+    /**
+     * @return \Illuminate\Cache\DatabaseStore
+     */
     protected function getStore()
     {
         return Cache::store('database');
+    }
+
+    protected function getCacheTableName()
+    {
+        return config('cache.stores.database.table');
     }
 }
