@@ -18,14 +18,14 @@ class DatabaseCacheStoreTest extends DatabaseTestCase
         $this->assertSame('bar', $store->get('foo'));
     }
 
-    public function testPutOperationCanStoreExpired()
+    public function testPutOperationShouldNotStoreExpired()
     {
         $store = $this->getStore();
 
         $result = $store->put('foo', 'bar', -1);
 
-        $this->assertTrue($result);
-        $this->assertDatabaseHas($this->getCacheTableName(), ['key' => $this->withCachePrefix('foo'), 'value' => 'bar']);
+        $this->assertFalse($result);
+        $this->assertDatabaseMissing($this->getCacheTableName(), ['key' => $this->withCachePrefix('foo'), 'value' => 'bar']);
     }
 
     public function testValueCanUpdateExistCache()
@@ -100,7 +100,13 @@ class DatabaseCacheStoreTest extends DatabaseTestCase
     {
         $store = $this->getStore();
 
-        $store->put('foo', 'bar', -1);
+        $this->insertToCacheTable(
+            [
+                'key' => $this->withCachePrefix('foo'),
+                'value' => 'bar',
+                'expiration' => 0
+            ]
+        );
         $result = $store->add('foo', 'new-bar', 60);
 
         $this->assertTrue($result);
@@ -111,7 +117,13 @@ class DatabaseCacheStoreTest extends DatabaseTestCase
     {
         $store = $this->getStore();
 
-        $store->put('foo', 'bar', -1);
+        $this->insertToCacheTable(
+            [
+                'key' => $this->withCachePrefix('foo'),
+                'value' => 'bar',
+                'expiration' => 0
+            ]
+        );
 
         DB::beginTransaction();
         $result = $store->add('foo', 'new-bar', 60);
@@ -125,7 +137,13 @@ class DatabaseCacheStoreTest extends DatabaseTestCase
     {
         $store = $this->getStore();
 
-        $store->put('foo', 'bar', -1);
+        $this->insertToCacheTable(
+            [
+                'key' => $this->withCachePrefix('foo'),
+                'value' => 'bar',
+                'expiration' => 0
+            ]
+        );
 
         $result = $store->get('foo');
 
@@ -136,7 +154,13 @@ class DatabaseCacheStoreTest extends DatabaseTestCase
     {
         $store = $this->getStore();
 
-        $store->put('foo', 'bar', -1);
+        $this->insertToCacheTable(
+            [
+                'key' => $this->withCachePrefix('foo'),
+                'value' => 'bar',
+                'expiration' => 0
+            ]
+        );
 
         $store->get('foo');
 
@@ -147,7 +171,13 @@ class DatabaseCacheStoreTest extends DatabaseTestCase
     {
         $store = $this->getStore();
 
-        $store->put('foo', 'bar', -1);
+        $this->insertToCacheTable(
+            [
+                'key' => $this->withCachePrefix('foo'),
+                'value' => 'bar',
+                'expiration' => 0
+            ]
+        );
 
         $store->forgetIfExpired('foo');
 
@@ -181,5 +211,10 @@ class DatabaseCacheStoreTest extends DatabaseTestCase
     protected function withCachePrefix(string $key)
     {
         return config('cache.prefix').$key;
+    }
+
+    protected function insertToCacheTable(array $data)
+    {
+        DB::table($this->getCacheTableName())->insert($data);
     }
 }
