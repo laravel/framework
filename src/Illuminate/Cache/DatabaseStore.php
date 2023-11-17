@@ -150,14 +150,13 @@ class DatabaseStore implements LockProvider, Store
      */
     public function add($key, $value, $seconds)
     {
-        $noPrefixKey = $key;
+        if (! is_null($this->get($key))) {
+            return false;
+        }
+
         $key = $this->prefix.$key;
         $value = $this->serialize($value);
         $expiration = $this->getTime() + $seconds;
-
-        if (! is_null($this->get($noPrefixKey))) {
-            return false;
-        }
 
         $doesntSupportInsertOrIgnore = [SqlServerConnection::class];
 
@@ -318,7 +317,7 @@ class DatabaseStore implements LockProvider, Store
     }
 
     /**
-     * Remove an item from the cache if expired.
+     * Remove an item from the cache if it is expired.
      *
      * @param  string  $key
      * @return bool

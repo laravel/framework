@@ -117,7 +117,7 @@ class Number
         $displayExponent = $numberExponent - ($numberExponent % 3);
         $number /= pow(10, $displayExponent);
 
-        return trim(sprintf('%s %s', number_format($number, $precision), $units[$displayExponent]));
+        return trim(sprintf('%s %s', number_format($number, $precision), $units[$displayExponent] ?? ''));
     }
 
     /**
