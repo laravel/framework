@@ -190,7 +190,7 @@ class DatabaseCacheStoreTest extends DatabaseTestCase
                 [
                     'key' => $this->withCachePrefix($key),
                     'value' => $value,
-                    'expiration' => Carbon::now()->addSeconds($ttl)->getTimestamp()
+                    'expiration' => Carbon::now()->addSeconds($ttl)->getTimestamp(),
                 ]
             );
     }
