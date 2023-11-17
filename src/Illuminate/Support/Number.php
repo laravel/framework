@@ -21,14 +21,22 @@ class Number
      * Format the given number according to the current locale.
      *
      * @param  int|float  $number
+     * @param  int|null  $precision
+     * @param  int|null  $maxPrecision
      * @param  ?string  $locale
      * @return string|false
      */
-    public static function format(int|float $number, ?string $locale = null)
+    public static function format(int|float $number, ?int $precision = null, ?int $maxPrecision = null, ?string $locale = null)
     {
         static::ensureIntlExtensionIsInstalled();
 
         $formatter = new NumberFormatter($locale ?? static::$locale, NumberFormatter::DECIMAL);
+
+        if (! is_null($maxPrecision)) {
+            $formatter->setAttribute(NumberFormatter::MAX_FRACTION_DIGITS, $maxPrecision);
+        } elseif (! is_null($precision)) {
+            $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, $precision);
+        }
 
         return $formatter->format($number);
     }
@@ -38,16 +46,21 @@ class Number
      *
      * @param  int|float  $number
      * @param  int  $precision
+     * @param  int|null  $maxPrecision
      * @param  ?string  $locale
      * @return string|false
      */
-    public static function percentage(int|float $number, int $precision = 0, ?string $locale = null)
+    public static function percentage(int|float $number, int $precision = 0, ?int $maxPrecision = null, ?string $locale = null)
     {
         static::ensureIntlExtensionIsInstalled();
 
         $formatter = new NumberFormatter($locale ?? static::$locale, NumberFormatter::PERCENT);
 
-        $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, $precision);
+        if (! is_null($maxPrecision)) {
+            $formatter->setAttribute(NumberFormatter::MAX_FRACTION_DIGITS, $maxPrecision);
+        } else {
+            $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, $precision);
+        }
 
         return $formatter->format($number / 100);
     }
@@ -56,17 +69,17 @@ class Number
      * Convert the given number to its currency equivalent.
      *
      * @param  int|float  $number
-     * @param  string  $currency
+     * @param  string  $in
      * @param  ?string  $locale
      * @return string|false
      */
-    public static function currency(int|float $number, string $currency = 'USD', ?string $locale = null)
+    public static function currency(int|float $number, string $in = 'USD', ?string $locale = null)
     {
         static::ensureIntlExtensionIsInstalled();
 
         $formatter = new NumberFormatter($locale ?? static::$locale, NumberFormatter::CURRENCY);
 
-        return $formatter->formatCurrency($number, $currency);
+        return $formatter->formatCurrency($number, $in);
     }
 
     /**
@@ -74,9 +87,10 @@ class Number
      *
      * @param  int|float  $bytes
      * @param  int  $precision
+     * @param  int|null  $maxPrecision
      * @return string
      */
-    public static function fileSize(int|float $bytes, int $precision = 0)
+    public static function fileSize(int|float $bytes, int $precision = 0, ?int $maxPrecision = null)
     {
         $units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
 
@@ -84,7 +98,7 @@ class Number
             $bytes /= 1024;
         }
 
-        return sprintf('%s %s', number_format($bytes, $precision), $units[$i]);
+        return sprintf('%s %s', static::format($bytes, $precision, $maxPrecision), $units[$i]);
     }
 
     /**
@@ -92,9 +106,10 @@ class Number
      *
      * @param  int  $number
      * @param  int  $precision
+     * @param  int|null  $maxPrecision
      * @return string
      */
-    public static function forHumans(int|float $number, int $precision = 0)
+    public static function forHumans(int|float $number, int $precision = 0, ?int $maxPrecision = null)
     {
         $units = [
             3 => 'thousand',
@@ -108,16 +123,16 @@ class Number
             case $number === 0:
                 return '0';
             case $number < 0:
-                return sprintf('-%s', static::forHumans(abs($number), $precision));
+                return sprintf('-%s', static::forHumans(abs($number), $precision, $maxPrecision));
             case $number >= 1e15:
-                return sprintf('%s quadrillion', static::forHumans($number / 1e15, $precision));
+                return sprintf('%s quadrillion', static::forHumans($number / 1e15, $precision, $maxPrecision));
         }
 
         $numberExponent = floor(log10($number));
         $displayExponent = $numberExponent - ($numberExponent % 3);
         $number /= pow(10, $displayExponent);
 
-        return trim(sprintf('%s %s', number_format($number, $precision), $units[$displayExponent]));
+        return trim(sprintf('%s %s', static::format($number, $precision, $maxPrecision), $units[$displayExponent] ?? ''));
     }
 
     /**
