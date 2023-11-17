@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Support;
 
+use Illuminate\Support\Number;
 use Illuminate\Support\Numberable;
 use PHPUnit\Framework\TestCase;
 
@@ -111,5 +112,45 @@ class SupportNumberableTest extends TestCase
 
         $this->assertSame(0.1, $this->numberable(10)->pow(-1)->value());
         $this->assertSame(0.01, $this->numberable(10)->pow(-2)->value());
+    }
+
+    public function testFormat()
+    {
+        $this->assertSame($this->numberable(10)->format(), Number::format(10));
+        $this->assertSame($this->numberable(1.234)->format(2), Number::format(1.234, 2));
+        $this->assertSame($this->numberable(1.234)->format(2, 1), Number::format(1.234, 2, 1));
+        $this->assertSame($this->numberable(10000)->format(locale: 'de'), Number::format(10000, locale: 'de'));
+    }
+
+    public function testPercentage()
+    {
+        $this->assertSame($this->numberable(10)->percentage(), Number::percentage(10));
+        $this->assertSame($this->numberable(1.234)->percentage(2), Number::percentage(1.234, 2));
+        $this->assertSame($this->numberable(1.234)->percentage(2, 1), Number::percentage(1.234, 2, 1));
+        $this->assertSame($this->numberable(10000)->percentage(locale: 'de'), Number::percentage(10000, locale: 'de'));
+    }
+
+    public function testCurrency()
+    {
+        $this->assertSame($this->numberable(10)->currency(), Number::currency(10));
+        $this->assertSame($this->numberable(1.234)->currency(2), Number::currency(1.234, 2));
+        $this->assertSame($this->numberable(1.234)->currency(2, 1), Number::currency(1.234, 2, 1));
+        $this->assertSame($this->numberable(10000)->currency(locale: 'de'), Number::currency(10000, locale: 'de'));
+    }
+
+    public function testFileSize()
+    {
+        $this->assertSame($this->numberable(10)->fileSize(), Number::fileSize(10));
+        $this->assertSame($this->numberable(1.234)->fileSize(2), Number::fileSize(1.234, 2));
+        $this->assertSame($this->numberable(1.234)->fileSize(2, 1), Number::fileSize(1.234, 2, 1));
+        $this->assertSame($this->numberable(10000)->fileSize(), Number::fileSize(10000));
+    }
+
+    public function testForHumans()
+    {
+        $this->assertSame($this->numberable(10)->forHumans(), Number::forHumans(10));
+        $this->assertSame($this->numberable(1.234)->forHumans(2), Number::forHumans(1.234, 2));
+        $this->assertSame($this->numberable(1.234)->forHumans(2, 1), Number::forHumans(1.234, 2, 1));
+        $this->assertSame($this->numberable(10000)->forHumans(), Number::forHumans(10000));
     }
 }

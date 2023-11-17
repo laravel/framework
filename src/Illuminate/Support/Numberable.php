@@ -111,6 +111,68 @@ class Numberable
     }
 
     /**
+     * Format the current value according to the current locale.
+     *
+     * @param  int|null  $precision
+     * @param  int|null  $maxPrecision
+     * @param  ?string  $locale
+     * @return string|false
+     */
+    public function format(?int $precision = null, ?int $maxPrecision = null, ?string $locale = null)
+    {
+        return Number::format($this->value, $precision, $maxPrecision, $locale);
+    }
+
+    /**
+     * Convert the current value to its percentage equivalent.
+     *
+     * @param  int  $precision
+     * @param  int|null  $maxPrecision
+     * @param  ?string  $locale
+     * @return string|false
+     */
+    public function percentage(int $precision = 0, ?int $maxPrecision = null, ?string $locale = null)
+    {
+        return Number::percentage($this->value, $precision, $maxPrecision, $locale);
+    }
+
+    /**
+     * Convert the current value to its currency equivalent.
+     *
+     * @param  string  $in
+     * @param  ?string  $locale
+     * @return string|false
+     */
+    public function currency(string $in = 'USD', ?string $locale = null)
+    {
+        return Number::currency($this->value, $in, $locale);
+    }
+
+    /**
+     * Convert the current value to its file size equivalent.
+     *
+     * @param  int  $precision
+     * @param  int|null  $maxPrecision
+     * @return string
+     */
+    public function fileSize(int $precision = 0, ?int $maxPrecision = null)
+    {
+        return Number::fileSize($this->value, $precision, $maxPrecision);
+    }
+
+    /**
+     * Convert the current value to its human readable equivalent.
+     *
+     * @param  int  $precision
+     * @param  int|null  $maxPrecision
+     * @return string
+     */
+    public function forHumans(int $precision = 0, ?int $maxPrecision = null)
+    {
+        return Number::forHumans($this->value, $precision, $maxPrecision);
+    }
+
+    /**
      * Proxy dynamic properties onto methods.
      *
      * @param  string  $key
