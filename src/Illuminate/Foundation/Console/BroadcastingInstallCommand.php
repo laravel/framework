@@ -40,11 +40,7 @@ class BroadcastingInstallCommand extends Command
 
             copy(__DIR__.'/stubs/broadcasting-routes.stub', $broadcastingRoutesPath);
 
-            (new Filesystem)->replaceInFile(
-                '// channels: ',
-                'channels: ',
-                $this->laravel->bootstrapPath('app.php'),
-            );
+            $this->uncommentChannelsRoutesFile();
         }
 
         // Install bootstrapping...
@@ -63,6 +59,36 @@ class BroadcastingInstallCommand extends Command
                     $bootstrapScript.PHP_EOL.file_get_contents(__DIR__.'/stubs/echo-bootstrap-js.stub')
                 );
             }
+        }
+    }
+
+    /**
+     * Uncomment the "channels" routes file in the application bootstrap file.
+     *
+     * @return void
+     */
+    protected function uncommentChannelsRoutesFile()
+    {
+        $appBootstrapPath = $this->laravel->bootstrapPath('app.php');
+
+        $content = file_get_contents($appBootstrapPath);
+
+        if (str_contains($content, '// channels: ')) {
+            (new Filesystem)->replaceInFile(
+                '// channels: ',
+                'channels: ',
+                $appBootstrapPath,
+            );
+        } elseif (str_contains($content, 'commands: __DIR__.\'/../routes/console.php\',')) {
+            (new Filesystem)->replaceInFile(
+                'commands: __DIR__.\'/../routes/console.php\',',
+                'commands: __DIR__.\'/../routes/console.php\','.PHP_EOL.'        channels: __DIR__.\'/../routes/channels.php\',',
+                $appBootstrapPath,
+            );
+        } else {
+            $this->components->warn('Unable to automatically add channel route definition to bootstrap file. Channel route file should be registered manually.');
+
+            return;
         }
     }
 }
