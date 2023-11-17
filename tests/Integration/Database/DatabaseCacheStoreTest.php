@@ -25,7 +25,7 @@ class DatabaseCacheStoreTest extends DatabaseTestCase
         $result = $store->put('foo', 'bar', -1);
 
         $this->assertTrue($result);
-        $this->assertDatabaseHas($this->getCacheTableName(), ['key' => 'foo', 'value' => 'bar']);
+        $this->assertDatabaseHas($this->getCacheTableName(), ['key' => $this->$this->withCachePrefix('foo'), 'value' => 'bar']);
     }
 
     public function testValueCanUpdateExistCache()
@@ -58,7 +58,7 @@ class DatabaseCacheStoreTest extends DatabaseTestCase
         $result = $store->add('foo', 'bar', -1);
 
         $this->assertFalse($result);
-        $this->assertDatabaseMissing($this->getCacheTableName(), ['key' => 'foo', 'value' => 'bar']);
+        $this->assertDatabaseMissing($this->getCacheTableName(), ['key' => $this->withCachePrefix('foo'), 'value' => 'bar']);
     }
 
     public function testAddOperationCanStoreNewCache()
@@ -140,7 +140,7 @@ class DatabaseCacheStoreTest extends DatabaseTestCase
 
         $store->get('foo');
 
-        $this->assertDatabaseMissing($this->getCacheTableName(), ['key' => 'foo']);
+        $this->assertDatabaseMissing($this->getCacheTableName(), ['key' => $this->withCachePrefix('foo')]);
     }
 
     public function testForgetIfExpiredOperationCanDeleteExpired()
@@ -151,7 +151,7 @@ class DatabaseCacheStoreTest extends DatabaseTestCase
 
         $store->forgetIfExpired('foo');
 
-        $this->assertDatabaseMissing($this->getCacheTableName(), ['key' => 'foo']);
+        $this->assertDatabaseMissing($this->getCacheTableName(), ['key' => $this->withCachePrefix('foo')]);
     }
 
     public function testForgetIfExpiredOperationShouldNotDeleteUnExpired()
@@ -162,7 +162,7 @@ class DatabaseCacheStoreTest extends DatabaseTestCase
 
         $store->forgetIfExpired('foo');
 
-        $this->assertDatabaseHas($this->getCacheTableName(), ['key' => 'foo']);
+        $this->assertDatabaseHas($this->getCacheTableName(), ['key' => $this->withCachePrefix('foo')]);
     }
 
     /**
@@ -176,5 +176,10 @@ class DatabaseCacheStoreTest extends DatabaseTestCase
     protected function getCacheTableName()
     {
         return config('cache.stores.database.table');
+    }
+
+    protected function withCachePrefix(string $key)
+    {
+        return config('cache.prefix').$key;
     }
 }
