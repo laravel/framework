@@ -30,12 +30,12 @@ class CacheDatabaseStoreTest extends TestCase
 
     public function testNullIsReturnedAndItemDeletedWhenItemIsExpired()
     {
-        $store = $this->getMockBuilder(DatabaseStore::class)->onlyMethods(['forget'])->setConstructorArgs($this->getMocks())->getMock();
+        $store = $this->getMockBuilder(DatabaseStore::class)->onlyMethods(['forgetIfExpired'])->setConstructorArgs($this->getMocks())->getMock();
         $table = m::mock(stdClass::class);
         $store->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($table);
         $table->shouldReceive('where')->once()->with('key', '=', 'prefixfoo')->andReturn($table);
         $table->shouldReceive('first')->once()->andReturn((object) ['expiration' => 1]);
-        $store->expects($this->once())->method('forget')->with($this->equalTo('foo'))->willReturn(null);
+        $store->expects($this->once())->method('forgetIfExpired')->with($this->equalTo('foo'))->willReturn(null);
 
         $this->assertNull($store->get('foo'));
     }
