@@ -122,6 +122,18 @@ class SupportNumberableTest extends TestCase
         $this->assertSame($this->numberable(10000)->format(locale: 'de'), Number::format(10000, locale: 'de'));
     }
 
+    public function testSpell()
+    {
+        $this->assertSame($this->numberable(100)->spell(), Number::spell(100));
+        $this->assertSame($this->numberable(25)->spell(locale: 'de'), Number::spell(25, locale: 'de'));
+    }
+
+    public function testOrdinal()
+    {
+        $this->assertSame($this->numberable(1)->ordinal(), Number::ordinal(1));
+        $this->assertSame($this->numberable(2)->ordinal(locale: 'de'), Number::ordinal(2, locale: 'de'));
+    }
+
     public function testPercentage()
     {
         $this->assertSame($this->numberable(10)->percentage(), Number::percentage(10));

@@ -124,6 +124,28 @@ class Numberable
     }
 
     /**
+     * Spell out the current value in the given locale.
+     *
+     * @param  ?string  $locale
+     * @return string
+     */
+    public function spell(?string $locale = null)
+    {
+        return Number::spell($this->value, $locale);
+    }
+
+    /**
+     * Convert the current value to ordinal form.
+     *
+     * @param  ?string  $locale
+     * @return string
+     */
+    public function ordinal(?string $locale = null)
+    {
+        return Number::ordinal($this->value, $locale);
+    }
+
+    /**
      * Convert the current value to its percentage equivalent.
      *
      * @param  int  $precision
