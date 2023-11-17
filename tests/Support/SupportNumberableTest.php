@@ -153,4 +153,81 @@ class SupportNumberableTest extends TestCase
         $this->assertSame($this->numberable(1.234)->forHumans(2, 1), Number::forHumans(1.234, 2, 1));
         $this->assertSame($this->numberable(10000)->forHumans(), Number::forHumans(10000));
     }
+
+    public function testTap()
+    {
+        $this->assertSame(15, $this->numberable(10)->tap(function (Numberable $number) {
+            $number->add(5);
+        })->value);
+    }
+
+    public function testMacro()
+    {
+        Numberable::macro('addFive', function () {
+            return $this->add(5);
+        });
+
+        $this->assertSame(15, $this->numberable(10)->addFive()->value);
+    }
+
+    public function testWhen()
+    {
+        $this->assertSame(15, $this->numberable(10)->when(true, function (Numberable $number) {
+            return $number->add(5);
+        })->value);
+
+        $this->assertSame(10, $this->numberable(10)->when(false, function (Numberable $number) {
+            return $number->add(5);
+        })->value);
+
+        $this->assertSame(15, $this->numberable(10)->when(true, function (Numberable $number) {
+            return $number->add(5);
+        }, function (Numberable $number) {
+            return $number->add(10);
+        })->value);
+
+        $this->assertSame(20, $this->numberable(10)->when(false, function (Numberable $number) {
+            return $number->add(5);
+        }, function (Numberable $number) {
+            return $number->add(10);
+        })->value);
+    }
+
+    public function testUnless()
+    {
+        $this->assertSame(15, $this->numberable(10)->unless(false, function (Numberable $number) {
+            return $number->add(5);
+        })->value);
+
+        $this->assertSame(10, $this->numberable(10)->unless(true, function (Numberable $number) {
+            return $number->add(5);
+        })->value);
+
+        $this->assertSame(15, $this->numberable(10)->unless(false, function (Numberable $number) {
+            return $number->add(5);
+        }, function (Numberable $number) {
+            return $number->add(10);
+        })->value);
+
+        $this->assertSame(20, $this->numberable(10)->unless(true, function (Numberable $number) {
+            return $number->add(5);
+        }, function (Numberable $number) {
+            return $number->add(10);
+        })->value);
+    }
+
+    public function testFluentOperations()
+    {
+        $number = $this->numberable(10);
+
+        $this->assertSame(10, (int) (string) $number);
+        $this->assertSame(15, (int) (string) $number->add(5));
+        $this->assertSame(5, (int) (string) $number->subtract(10));
+        $this->assertSame(50, (int) (string) $number->multiply(10));
+        $this->assertSame(25, (int) (string) $number->divide(2));
+        $this->assertSame(5, (int) (string) $number->modulo(20));
+        $this->assertSame(25, (int) (string) $number->pow(2));
+
+        $this->assertSame('21 trillion', $number->subtract(17)->multiply(10)->pow(7)->forHumans());
+    }
 }
