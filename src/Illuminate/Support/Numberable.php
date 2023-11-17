@@ -184,7 +184,7 @@ class Numberable
     }
 
     /**
-     * Get the raw string value.
+     * Convert the current value to its string equivalent.
      *
      * @return string
      */
