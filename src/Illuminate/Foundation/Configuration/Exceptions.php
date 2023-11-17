@@ -42,6 +42,19 @@ class Exceptions
     }
 
     /**
+     * Specify the callback that should be used to throttle reportable exceptions.
+     *
+     * @param  callable  $throttleUsing
+     * @return $this
+     */
+    public function throttle(callable $throttleUsing)
+    {
+        $this->handler->throttleUsing($throttleUsing);
+
+        return $this;
+    }
+
+    /**
      * Register a new exception mapping.
      *
      * @param  \Closure|string  $from
