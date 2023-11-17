@@ -25,7 +25,7 @@ class DatabaseCacheStoreTest extends DatabaseTestCase
         $result = $store->put('foo', 'bar', -1);
 
         $this->assertTrue($result);
-        $this->assertDatabaseHas($this->getCacheTableName(), ['key' => $this->$this->withCachePrefix('foo'), 'value' => 'bar']);
+        $this->assertDatabaseHas($this->getCacheTableName(), ['key' => $this->withCachePrefix('foo'), 'value' => 'bar']);
     }
 
     public function testValueCanUpdateExistCache()
