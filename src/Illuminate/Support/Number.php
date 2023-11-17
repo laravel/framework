@@ -41,7 +41,7 @@ class Number
      * @param  ?string  $locale
      * @return string|false
      */
-    public static function toPercentage(int|float $number, int $precision = 0, ?string $locale = null)
+    public static function percentage(int|float $number, int $precision = 0, ?string $locale = null)
     {
         static::ensureIntlExtensionIsInstalled();
 
@@ -60,7 +60,7 @@ class Number
      * @param  ?string  $locale
      * @return string|false
      */
-    public static function toCurrency(int|float $number, string $currency = 'USD', ?string $locale = null)
+    public static function currency(int|float $number, string $currency = 'USD', ?string $locale = null)
     {
         static::ensureIntlExtensionIsInstalled();
 
@@ -76,7 +76,7 @@ class Number
      * @param  int  $precision
      * @return string
      */
-    public static function toFileSize(int|float $bytes, int $precision = 0)
+    public static function fileSize(int|float $bytes, int $precision = 0)
     {
         $units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
 
