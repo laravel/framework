@@ -3,10 +3,16 @@
 namespace Illuminate\Tests\Support;
 
 use Illuminate\Support\Number;
+use Illuminate\Support\Numberable;
 use PHPUnit\Framework\TestCase;
 
 class SupportNumberTest extends TestCase
 {
+    public function testOf()
+    {
+        $this->assertEquals(new Numberable(10), Number::of(10));
+    }
+
     public function testFormat()
     {
         $this->needsIntlExtension();
