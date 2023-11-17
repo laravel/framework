@@ -32,12 +32,12 @@ class OptimizeClearCommand extends Command
         $this->components->info('Clearing cached bootstrap files.');
 
         collect([
-            'events' => fn () => $this->callSilent('event:clear') == 0,
-            'views' => fn () => $this->callSilent('view:clear') == 0,
             'cache' => fn () => $this->callSilent('cache:clear') == 0,
-            'route' => fn () => $this->callSilent('route:clear') == 0,
-            'config' => fn () => $this->callSilent('config:clear') == 0,
             'compiled' => fn () => $this->callSilent('clear-compiled') == 0,
+            'config' => fn () => $this->callSilent('config:clear') == 0,
+            'events' => fn () => $this->callSilent('event:clear') == 0,
+            'route' => fn () => $this->callSilent('route:clear') == 0,
+            'views' => fn () => $this->callSilent('view:clear') == 0,
         ])->each(fn ($task, $description) => $this->components->task($description, $task));
 
         $this->newLine();
