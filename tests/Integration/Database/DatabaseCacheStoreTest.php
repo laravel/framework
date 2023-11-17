@@ -18,6 +18,16 @@ class DatabaseCacheStoreTest extends DatabaseTestCase
         $this->assertSame('bar', $store->get('foo'));
     }
 
+    public function testPutOperationCanStoreExpired()
+    {
+        $store = $this->getStore();
+
+        $result = $store->put('foo', 'bar', -1);
+
+        $this->assertTrue($result);
+        $this->assertDatabaseHas($this->getCacheTableName(), ['key' => 'foo', 'value' => 'bar']);
+    }
+
     public function testValueCanUpdateExistCache()
     {
         $store = $this->getStore();
@@ -39,6 +49,16 @@ class DatabaseCacheStoreTest extends DatabaseTestCase
         DB::commit();
 
         $this->assertSame('new-bar', $store->get('foo'));
+    }
+
+    public function testAddOperationShouldNotStoreExpired()
+    {
+        $store = $this->getStore();
+
+        $result = $store->add('foo', 'bar', -1);
+
+        $this->assertFalse($result);
+        $this->assertDatabaseMissing($this->getCacheTableName(), ['key' => 'foo', 'value' => 'bar']);
     }
 
     public function testAddOperationCanStoreNewCache()
@@ -80,7 +100,7 @@ class DatabaseCacheStoreTest extends DatabaseTestCase
     {
         $store = $this->getStore();
 
-        $store->add('foo', 'bar', 0);
+        $store->put('foo', 'bar', -1);
         $result = $store->add('foo', 'new-bar', 60);
 
         $this->assertTrue($result);
@@ -91,7 +111,7 @@ class DatabaseCacheStoreTest extends DatabaseTestCase
     {
         $store = $this->getStore();
 
-        $store->add('foo', 'bar', 0);
+        $store->put('foo', 'bar', -1);
 
         DB::beginTransaction();
         $result = $store->add('foo', 'new-bar', 60);
