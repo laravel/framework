@@ -4,6 +4,7 @@ namespace Illuminate\Support;
 
 use Illuminate\Support\Traits\Macroable;
 use NumberFormatter;
+use Rmunate\Utilities\SpellNumber;
 use RuntimeException;
 
 class Number
@@ -52,9 +53,7 @@ class Number
     {
         static::ensureIntlExtensionIsInstalled();
 
-        $formatter = new NumberFormatter($locale ?? static::$locale, NumberFormatter::SPELLOUT);
-
-        return $formatter->format($number);
+        return SpellNumber::value($number)->locale($locale ?? static::$locale, SpellNumber::SPECIFIC_LOCALE);
     }
 
     /**
