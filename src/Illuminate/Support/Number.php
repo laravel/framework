@@ -44,7 +44,7 @@ class Number
         } elseif (! is_null($precision)) {
             $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, $precision);
         }
-        
+
         return $formatter->format($number);
     }
 
@@ -82,7 +82,7 @@ class Number
             $formatter = new NumberFormatter($locale ?? static::$locale, NumberFormatter::SPELLOUT);
             $formatter->setTextAttribute(NumberFormatter::DEFAULT_RULESET, $mode);
         }
-        
+
         return $formatter->format($number);
     }
 
