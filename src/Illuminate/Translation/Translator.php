@@ -66,6 +66,13 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
     protected $stringableHandlers = [];
 
     /**
+     * The callback that is responsible for handling missing translation keys.
+     *
+     * @var callable|null
+     */
+    protected static $missingTranslationKeyCallback;
+
+    /**
      * Create a new translator instance.
      *
      * @param  \Illuminate\Contracts\Translation\Loader  $loader
@@ -153,12 +160,47 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
                     return $line;
                 }
             }
+
+            // If we can't find a translation in neither JSON nor typical translation
+            // file, then this is considered a missing translation, handle it accordingly.
+            $key = $this->handleMissingTranslationKey($key, $replace, $locale, $fallback);
         }
 
         // If the line doesn't exist, we will return back the key which was requested as
         // that will be quick to spot in the UI if language keys are wrong or missing
         // from the application's language files. Otherwise we can return the line.
         return $this->makeReplacements($line ?: $key, $replace);
+    }
+
+    /**
+     * Handle a missing translation key.
+     *
+     * @param  string  $key
+     * @param  array  $replace
+     * @param  string|null  $locale
+     * @param  bool  $fallback
+     * @return string
+     */
+    protected function handleMissingTranslationKey($key, $replace, $locale, $fallback)
+    {
+        // Call user defined missing translation handler callback if set.
+        if (isset(static::$missingTranslationKeyCallback)) {
+            return call_user_func(static::$missingTranslationKeyCallback,
+                $key, $replace, $locale, $fallback
+            );
+        }
+        return $key;
+    }
+
+    /**
+     * Register a callback that is responsible for handling missing translation keys.
+     *
+     * @param  callable|null  $callback
+     * @return void
+     */
+    public static function handleMissingTranslationKeyUsing(?callable $callback)
+    {
+        static::$missingTranslationKeyCallback = $callback;
     }
 
     /**
