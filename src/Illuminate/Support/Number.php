@@ -11,7 +11,7 @@ class Number
     use Macroable;
 
     /**
-     * Constants Ordinal Text
+     * Constants Ordinal Text.
      */
     public const ORDINAL_DEFAULT = '%spellout-ordinal';
     public const ORDINAL_MALE = '%spellout-ordinal-masculine';
@@ -44,7 +44,7 @@ class Number
         } elseif (! is_null($precision)) {
             $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, $precision);
         }
-
+        
         return $formatter->format($number);
     }
 
