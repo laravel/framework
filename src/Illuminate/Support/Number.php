@@ -68,17 +68,21 @@ class Number
      * Convert the given number to ordinal form.
      *
      * @param  int|float  $number
+     * @param  ?string  $mode
      * @param  ?string  $locale
-     * @param  ?string  $rule
      * @return string
      */
-    public static function ordinal(int|float $number, string $rule = '%spellout-ordinal', ?string $locale = null)
+    public static function ordinal(int|float $number, ?string $mode = null, ?string $locale = null)
     {
         static::ensureIntlExtensionIsInstalled();
 
-        $formatter = new NumberFormatter($locale, NumberFormatter::SPELLOUT);
-        $formatter->setTextAttribute(NumberFormatter::DEFAULT_RULESET, $rule);
-
+        if (empty($mode)) {
+            $formatter = new NumberFormatter($locale ?? static::$locale, NumberFormatter::ORDINAL);
+        } else {
+            $formatter = new NumberFormatter($locale ?? static::$locale, NumberFormatter::SPELLOUT);
+            $formatter->setTextAttribute(NumberFormatter::DEFAULT_RULESET, $mode);
+        }
+        
         return $formatter->format($number);
     }
 
