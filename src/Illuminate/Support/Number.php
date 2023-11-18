@@ -12,7 +12,7 @@ class Number
     use Macroable;
 
     /**
-     * Constants Ordinal Text
+     * Constants Ordinal Text.
      */
     public const ORDINAL_DEFAULT = '%spellout-ordinal';
     public const ORDINAL_MALE = '%spellout-ordinal-masculine';
