@@ -72,7 +72,7 @@ class Number
      * @param  ?string  $rule
      * @return string
      */
-    public static function ordinal(int|float $number, ?string $locale = null, ?string $rule = '%spellout-ordinal')
+    public static function ordinal(int|float $number, string $rule = '%spellout-ordinal', ?string $locale = null)
     {
         static::ensureIntlExtensionIsInstalled();
 
