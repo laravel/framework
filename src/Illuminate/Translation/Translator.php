@@ -66,6 +66,13 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
     protected $stringableHandlers = [];
 
     /**
+     * Whether missing translation keys should be handled.
+     *
+     * @var bool
+     */
+    protected $handleMissingTranslationKeys = true;
+
+    /**
      * The callback that is responsible for handling missing translation keys.
      *
      * @var callable|null
@@ -183,12 +190,24 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
      */
     protected function handleMissingTranslationKey($key, $replace, $locale, $fallback)
     {
-        // Call user defined missing translation handler callback if set.
-        if (isset(static::$missingTranslationKeyCallback)) {
-            return call_user_func(static::$missingTranslationKeyCallback,
-                $key, $replace, $locale, $fallback
-            );
+        // Avoid infinite loops: don't handle any missing translations which are in
+        // the user defined callback.
+        if (! $this->handleMissingTranslationKeys) {
+            return $key;
         }
+
+        // Return the key unchanged if there is no user defined callback set.
+        if (! isset(static::$missingTranslationKeyCallback)) {
+            return $key;
+        }
+
+        // Call user defined missing translation handler callback, prevent infinite loops.
+        $this->handleMissingTranslationKeys = false;
+        $key = call_user_func(static::$missingTranslationKeyCallback,
+            $key, $replace, $locale, $fallback
+        );
+        $this->handleMissingTranslationKeys = true;
+
         return $key;
     }
 
