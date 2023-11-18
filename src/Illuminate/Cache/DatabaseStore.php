@@ -8,6 +8,7 @@ use Illuminate\Contracts\Cache\Store;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\PostgresConnection;
 use Illuminate\Database\QueryException;
+use Illuminate\Database\SqlServerConnection;
 use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Str;
 
@@ -114,7 +115,7 @@ class DatabaseStore implements LockProvider, Store
         // item from the cache. Then we will return a null value since the cache is
         // expired. We will use "Carbon" to make this comparison with the column.
         if ($this->currentTime() >= $cache->expiration) {
-            $this->forget($key);
+            $this->forgetIfExpired($key);
 
             return;
         }
@@ -149,21 +150,27 @@ class DatabaseStore implements LockProvider, Store
      */
     public function add($key, $value, $seconds)
     {
+        if (! is_null($this->get($key))) {
+            return false;
+        }
+
         $key = $this->prefix.$key;
         $value = $this->serialize($value);
         $expiration = $this->getTime() + $seconds;
 
+        $doesntSupportInsertOrIgnore = [SqlServerConnection::class];
+
+        if (! in_array(get_class($this->getConnection()), $doesntSupportInsertOrIgnore)) {
+            return $this->table()->insertOrIgnore(compact('key', 'value', 'expiration')) > 0;
+        }
+
         try {
             return $this->table()->insert(compact('key', 'value', 'expiration'));
         } catch (QueryException) {
-            return $this->table()
-                ->where('key', $key)
-                ->where('expiration', '<=', $this->getTime())
-                ->update([
-                    'value' => $value,
-                    'expiration' => $expiration,
-                ]) >= 1;
+            // ...
         }
+
+        return false;
     }
 
     /**
@@ -305,6 +312,22 @@ class DatabaseStore implements LockProvider, Store
     public function forget($key)
     {
         $this->table()->where('key', '=', $this->prefix.$key)->delete();
+
+        return true;
+    }
+
+    /**
+     * Remove an item from the cache if it is expired.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    public function forgetIfExpired($key)
+    {
+        $this->table()
+            ->where('key', '=', $this->prefix.$key)
+            ->where('expiration', '<=', $this->getTime())
+            ->delete();
 
         return true;
     }
