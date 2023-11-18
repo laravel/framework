@@ -12,6 +12,13 @@ class Number
     use Macroable;
 
     /**
+     * Constants Ordinal Text
+     */
+    public const ORDINAL_DEFAULT = '%spellout-ordinal';
+    public const ORDINAL_MALE = '%spellout-ordinal-masculine';
+    public const ORDINAL_FEMALE = '%spellout-ordinal-feminine';
+
+    /**
      * The current default locale.
      *
      * @var string
