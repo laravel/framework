@@ -11,6 +11,13 @@ class Number
     use Macroable;
 
     /**
+     * Constants Ordinal Text
+     */
+    public const ORDINAL_DEFAULT = '%spellout-ordinal';
+    public const ORDINAL_MALE = '%spellout-ordinal-masculine';
+    public const ORDINAL_FEMALE = '%spellout-ordinal-feminine';
+
+    /**
      * The current default locale.
      *
      * @var string
@@ -62,13 +69,15 @@ class Number
      *
      * @param  int|float  $number
      * @param  ?string  $locale
+     * @param  ?string  $rule
      * @return string
      */
-    public static function ordinal(int|float $number, ?string $locale = null)
+    public static function ordinal(int|float $number, ?string $locale = null, ?string $rule = '%spellout-ordinal')
     {
         static::ensureIntlExtensionIsInstalled();
 
-        $formatter = new NumberFormatter($locale ?? static::$locale, NumberFormatter::ORDINAL);
+        $formatter = new NumberFormatter($locale, NumberFormatter::SPELLOUT);
+        $formatter->setTextAttribute(NumberFormatter::DEFAULT_RULESET, $rule);
 
         return $formatter->format($number);
     }
