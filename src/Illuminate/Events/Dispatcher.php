@@ -671,6 +671,7 @@ class Dispatcher implements DispatcherContract
 
             $job->backoff = method_exists($listener, 'backoff') ? $listener->backoff(...$data) : ($listener->backoff ?? null);
             $job->maxExceptions = $listener->maxExceptions ?? null;
+            $job->queue = method_exists($listener, 'viaQueue') ? $listener->viaQueue() : ($listener->queue ?? null);
             $job->retryUntil = method_exists($listener, 'retryUntil') ? $listener->retryUntil(...$data) : null;
             $job->shouldBeEncrypted = $listener instanceof ShouldBeEncrypted;
             $job->timeout = $listener->timeout ?? null;

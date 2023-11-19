@@ -339,9 +339,9 @@ class TestDispatcherGetQueueDynamically implements ShouldQueue
         //
     }
 
-    public function viaQueue($event)
+    public function viaQueue($event = null)
     {
-        if ($event['useHighPriorityQueue']) {
+        if ($event != null && $event['useHighPriorityQueue']) {
             return 'p0';
         }
 
