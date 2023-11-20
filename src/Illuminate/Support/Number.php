@@ -79,6 +79,22 @@ class Number
     }
 
     /**
+     * Convertir un número en notación científica a formato estándar.
+     *
+     * @param  string  $scientificNotation
+     * @param  ?string  $locale
+     * @return string|false
+     */
+    public static function fromScientificNotation(string $scientificNotation, ?string $locale = null)
+    {
+        static::ensureIntlExtensionIsInstalled();
+
+        $formatter = new NumberFormatter($locale ?? static::$locale, NumberFormatter::DECIMAL);
+
+        return $formatter->format($scientificNotation, NumberFormatter::TYPE_DOUBLE);
+    }
+
+    /**
      * Convert the given number to ordinal form.
      *
      * @param  int|float  $number
