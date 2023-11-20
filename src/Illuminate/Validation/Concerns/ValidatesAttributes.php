@@ -479,7 +479,7 @@ trait ValidatesAttributes
     /**
      * Validate that an attribute is a valid HEX color.
      *
-     * @param  string $attribute
+     * @param  string  $attribute
      * @param  mixed  $value
      * @return bool
      */
@@ -489,6 +489,7 @@ trait ValidatesAttributes
 
         return preg_match($pattern, $value) === 1;
     }
+
     /**
      * Validate that an attribute has a matching confirmation.
      *
