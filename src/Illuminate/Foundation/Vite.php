@@ -722,7 +722,10 @@ class Vite implements Htmlable
      */
     protected function manifestPath($buildDirectory)
     {
-        return public_path($buildDirectory.'/'.$this->manifestFilename);
+        $vitePath = public_path($buildDirectory.'/.vite/'.$this->manifestFilename);
+        $mainPath = public_path($buildDirectory.'/'.$this->manifestFilename);
+
+        return (is_file($vitePath) || ! is_file($mainPath)) ? $vitePath : $mainPath;
     }
 
     /**
