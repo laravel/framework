@@ -32,9 +32,9 @@ class Number
 
         $formatter = new NumberFormatter($locale ?? static::$locale, NumberFormatter::DECIMAL);
 
-        if (! is_null($maxPrecision)) {
+        if (!is_null($maxPrecision)) {
             $formatter->setAttribute(NumberFormatter::MAX_FRACTION_DIGITS, $maxPrecision);
-        } elseif (! is_null($precision)) {
+        } elseif (!is_null($precision)) {
             $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, $precision);
         }
 
@@ -88,7 +88,7 @@ class Number
 
         $formatter = new NumberFormatter($locale ?? static::$locale, NumberFormatter::PERCENT);
 
-        if (! is_null($maxPrecision)) {
+        if (!is_null($maxPrecision)) {
             $formatter->setAttribute(NumberFormatter::MAX_FRACTION_DIGITS, $maxPrecision);
         } else {
             $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, $precision);
@@ -131,6 +131,46 @@ class Number
         }
 
         return sprintf('%s %s', static::format($bytes, $precision, $maxPrecision), $units[$i]);
+    }
+
+    /**
+     * Validate that the given number uses the Luhn algorithm.
+     *
+     * @param  string  $number
+     * @param  bool  $hasChecksum
+     * @return bool
+     */
+    public static function luhn(string $number, bool $hasChecksum = false): bool
+    {
+        $number = (string) $number;
+        $length = strlen($number);
+
+        if ($hasChecksum) {
+            $checksumDigit = (int) substr($number, -1);
+            $number = substr($number, 0, -1);
+            $length -= 1;
+        }
+
+        $sum = 0;
+        $parity = $length % 2;
+
+        for ($i = 0; $i < $length; $i++) {
+            $digit = (int) $number[$i];
+
+            if ($i % 2 !== $parity) {
+                $sum += $digit;
+            } elseif ($digit > 4) {
+                $sum += 2 * $digit - 9;
+            } else {
+                $sum += 2 * $digit;
+            }
+        }
+
+        if ($hasChecksum) {
+            $sum += $checksumDigit;
+        }
+
+        return ($sum % 10) === 0;
     }
 
     /**
@@ -201,7 +241,7 @@ class Number
      */
     protected static function ensureIntlExtensionIsInstalled()
     {
-        if (! extension_loaded('intl')) {
+        if (!extension_loaded('intl')) {
             throw new RuntimeException('The "intl" PHP extension is required to use this method.');
         }
     }

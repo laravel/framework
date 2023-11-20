@@ -208,6 +208,38 @@ class SupportNumberTest extends TestCase
         $this->assertSame('-1 thousand quadrillion', Number::forHumans(-1000000000000000000));
     }
 
+    public function testValidateCard()
+    {
+        $this->assertTrue(Number::luhn('378282246310005'));
+        $this->assertTrue(Number::luhn('30569309025904'));
+        $this->assertTrue(Number::luhn('3530111333300000'));
+        $this->assertTrue(Number::luhn(5555555555554444));
+        $this->assertTrue(Number::luhn(4012888888881881));
+        $this->assertTrue(Number::luhn(4222222222222));
+    }
+
+    public function testValidateICCID()
+    {
+        $this->assertTrue(Number::luhn('8931148778750293545', hasChecksum: true));
+        $this->assertTrue(Number::luhn(89311487211279571756, hasChecksum: true));
+    }
+
+    public function testValidateIMEI()
+    {
+        $this->assertTrue(Number::luhn('989171248860250'));
+        $this->assertTrue(Number::luhn('356006098564641'));
+        $this->assertTrue(Number::luhn(334584650987258));
+        $this->assertTrue(Number::luhn(530997233439450));
+    }
+
+    public function testValidateNPI()
+    {
+        $this->asserttrue(Number::luhn("808401134296023"));
+        $this->assertTrue(Number::luhn("808405592948074"));
+        $this->assertTrue(Number::luhn(80840_6200602681));
+        $this->assertTrue(Number::luhn(80840_8160946744));
+    }
+
     protected function needsIntlExtension()
     {
         if (! extension_loaded('intl')) {
