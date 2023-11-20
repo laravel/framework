@@ -43,7 +43,7 @@ class TranslatorTest extends TestCase
 
     public function testItCanHandleMissingKeysUsingCallback()
     {
-        $this->app['translator']->handleMissingTranslationKeysUsing(function ($key) {
+        $this->app['translator']->handleMissingKeysUsing(function ($key) {
             $_SERVER['__missing_translation_key'] = $key;
             return 'callback key';
         });
@@ -53,6 +53,6 @@ class TranslatorTest extends TestCase
         $this->assertSame('callback key', $key);
         $this->assertSame('some missing key', $_SERVER['__missing_translation_key']);
 
-        $this->app['translator']->handleMissingTranslationKeysUsing(null);
+        $this->app['translator']->handleMissingKeysUsing(null);
     }
 }

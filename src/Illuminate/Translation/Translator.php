@@ -360,7 +360,7 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
      * @param  callable|null  $callback
      * @return static
      */
-    public function handleMissingTranslationKeysUsing(?callable $callback)
+    public function handleMissingKeysUsing(?callable $callback)
     {
         $this->missingTranslationKeyCallback = $callback;
 
