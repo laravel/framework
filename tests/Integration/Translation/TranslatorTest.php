@@ -45,6 +45,7 @@ class TranslatorTest extends TestCase
     {
         $this->app['translator']->handleMissingKeysUsing(function ($key) {
             $_SERVER['__missing_translation_key'] = $key;
+
             return 'callback key';
         });
 
