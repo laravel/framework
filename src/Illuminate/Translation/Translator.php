@@ -345,7 +345,8 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
         // Prevent infinite loops...
         $this->handleMissingTranslationKeys = false;
 
-        $key = call_user_func($this->missingTranslationKeyCallback,
+        $key = call_user_func(
+            $this->missingTranslationKeyCallback,
             $key, $replace, $locale, $fallback
         );
 
