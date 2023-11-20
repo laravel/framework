@@ -66,18 +66,18 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
     protected $stringableHandlers = [];
 
     /**
-     * Whether missing translation keys should be handled.
-     *
-     * @var bool
-     */
-    protected $handleMissingTranslationKeys = true;
-
-    /**
      * The callback that is responsible for handling missing translation keys.
      *
      * @var callable|null
      */
     protected static $missingTranslationKeyCallback;
+
+    /**
+     * Indicates whether missing translation keys should be handled.
+     *
+     * @var bool
+     */
+    protected $handleMissingTranslationKeys = true;
 
     /**
      * Create a new translator instance.
@@ -168,58 +168,15 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
                 }
             }
 
-            // If we can't find a translation in neither JSON nor typical translation
-            // file, then this is considered a missing translation, handle it accordingly.
-            $key = $this->handleMissingTranslationKey($key, $replace, $locale, $fallback);
+            $key = $this->handleMissingTranslationKey(
+                $key, $replace, $locale, $fallback
+            );
         }
 
         // If the line doesn't exist, we will return back the key which was requested as
         // that will be quick to spot in the UI if language keys are wrong or missing
         // from the application's language files. Otherwise we can return the line.
         return $this->makeReplacements($line ?: $key, $replace);
-    }
-
-    /**
-     * Handle a missing translation key.
-     *
-     * @param  string  $key
-     * @param  array  $replace
-     * @param  string|null  $locale
-     * @param  bool  $fallback
-     * @return string
-     */
-    protected function handleMissingTranslationKey($key, $replace, $locale, $fallback)
-    {
-        // Avoid infinite loops: don't handle any missing translations which are in
-        // the user defined callback.
-        if (! $this->handleMissingTranslationKeys) {
-            return $key;
-        }
-
-        // Return the key unchanged if there is no user defined callback set.
-        if (! isset(static::$missingTranslationKeyCallback)) {
-            return $key;
-        }
-
-        // Call user defined missing translation handler callback, prevent infinite loops.
-        $this->handleMissingTranslationKeys = false;
-        $key = call_user_func(static::$missingTranslationKeyCallback,
-            $key, $replace, $locale, $fallback
-        );
-        $this->handleMissingTranslationKeys = true;
-
-        return $key;
-    }
-
-    /**
-     * Register a callback that is responsible for handling missing translation keys.
-     *
-     * @param  callable|null  $callback
-     * @return void
-     */
-    public static function handleMissingTranslationKeyUsing(?callable $callback)
-    {
-        static::$missingTranslationKeyCallback = $callback;
     }
 
     /**
@@ -367,6 +324,47 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
     protected function isLoaded($namespace, $group, $locale)
     {
         return isset($this->loaded[$namespace][$group][$locale]);
+    }
+
+    /**
+     * Handle a missing translation key.
+     *
+     * @param  string  $key
+     * @param  array  $replace
+     * @param  string|null  $locale
+     * @param  bool  $fallback
+     * @return string
+     */
+    protected function handleMissingTranslationKey($key, $replace, $locale, $fallback)
+    {
+        if (! $this->handleMissingTranslationKeys ||
+            ! isset($this->missingTranslationKeyCallback)) {
+            return $key;
+        }
+
+        // Prevent infinite loops...
+        $this->handleMissingTranslationKeys = false;
+
+        $key = call_user_func($this->missingTranslationKeyCallback,
+            $key, $replace, $locale, $fallback
+        );
+
+        $this->handleMissingTranslationKeys = true;
+
+        return $key;
+    }
+
+    /**
+     * Register a callback that is responsible for handling missing translation keys.
+     *
+     * @param  callable|null  $callback
+     * @return static
+     */
+    public function handleMissingTranslationKeyUsing(?callable $callback)
+    {
+        $this->missingTranslationKeyCallback = $callback;
+
+        return $this;
     }
 
     /**
