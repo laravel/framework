@@ -70,7 +70,7 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
      *
      * @var callable|null
      */
-    protected static $missingTranslationKeyCallback;
+    protected $missingTranslationKeyCallback;
 
     /**
      * Indicates whether missing translation keys should be handled.
