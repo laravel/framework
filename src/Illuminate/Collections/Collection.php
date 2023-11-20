@@ -765,6 +765,18 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     }
 
     /**
+     * Get the key's values.
+     *
+     * @param  string|int  $key
+     * @param  string|null $default
+     * @return static<array-key, mixed>
+     */
+    public function scope($key, $default = null)
+    {
+        return new static(Arr::get($this->items, $key, $default));
+    }
+
+    /**
      * Run a map over each of the items.
      *
      * @template TMapValue

@@ -641,6 +641,18 @@ class Collection extends BaseCollection implements QueueableCollection
     }
 
     /**
+     * Get an array with the key's values.
+     *
+     * @param  string|array<array-key, string>  $value
+     * @param  string|null  $key
+     * @return \Illuminate\Support\Collection<array-key, mixed>
+     */
+    public function scope($key, $default = null)
+    {
+        return $this->toBase()->scope($key, $default);
+    }
+
+    /**
      * Zip the collection together with one or more arrays.
      *
      * @template TZipValue

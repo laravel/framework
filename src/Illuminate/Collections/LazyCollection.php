@@ -776,6 +776,30 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     }
 
     /**
+     * Get the key's values.
+     *
+     * @template TScopeDefault
+     *
+     * @param TKey $key
+     * @param TScopeDefault|(\Closure(): TScopeDefault)  $default
+     * @return static<TKey, mixed>
+     */
+    public function scope($key, $default = null)
+    {
+        return new static(function () use ($key, $default) {
+            foreach ($this as $itemKey => $itemValue) {
+                $value = data_get([$itemKey => $itemValue], $key, $marker = new stdClass());
+
+                if ($value !== $marker) {
+                    return $value;
+                }
+            }
+
+            return value($default);
+        });
+    }
+
+    /**
      * Run a map over each of the items.
      *
      * @template TMapValue
