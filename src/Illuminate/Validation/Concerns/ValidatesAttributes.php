@@ -477,20 +477,6 @@ trait ValidatesAttributes
     }
 
     /**
-     * Validate that an attribute is a valid HEX color.
-     *
-     * @param  string  $attribute
-     * @param  mixed  $value
-     * @return bool
-     */
-    public function validateColorHex($attribute, $value)
-    {
-        $pattern = '/^#(?:[0-9a-fA-F]{3}){1,2}$/';
-
-        return preg_match($pattern, $value) === 1;
-    }
-
-    /**
      * Validate that an attribute has a matching confirmation.
      *
      * @param  string  $attribute
@@ -1282,6 +1268,18 @@ trait ValidatesAttributes
     public function validateUppercase($attribute, $value, $parameters)
     {
         return Str::upper($value) === $value;
+    }
+
+    /**
+     * Validate that an attribute is a valid HEX color.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @return bool
+     */
+    public function validateHexColor($attribute, $value)
+    {
+        return preg_match('/^#(?:[0-9a-fA-F]{3}){1,2}$/', $value) === 1;
     }
 
     /**
