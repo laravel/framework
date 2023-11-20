@@ -58,6 +58,27 @@ class Number
     }
 
     /**
+     * Format the given number in scientific notation.
+     *
+     * @param  int|float  $number
+     * @param  int|null  $precision
+     * @param  ?string  $locale
+     * @return string|false
+     */
+    public static function scientificNotation(int|float $number, ?int $precision = null, ?string $locale = null)
+    {
+        static::ensureIntlExtensionIsInstalled();
+
+        $formatter = new NumberFormatter($locale ?? static::$locale, NumberFormatter::SCIENTIFIC);
+
+        if (!is_null($precision)) {
+            $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, $precision);
+        }
+
+        return $formatter->format($number);
+    }
+
+    /**
      * Convert the given number to ordinal form.
      *
      * @param  int|float  $number
