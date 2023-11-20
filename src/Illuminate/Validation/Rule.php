@@ -34,7 +34,7 @@ class Rule
     }
 
     /**
-     * Apply the rules of the given "condition" is (or resolves to) truthy.
+     * Apply the given rules if the given condition is truthy.
      *
      * @param  callable|bool  $condition
      * @param  array|string|\Closure  $rules
@@ -47,7 +47,7 @@ class Rule
     }
 
     /**
-     * Apply the rules of the given "condition" is (or resolves to) falsy.
+     * Apply the given rules if the given condition is falsy.
      *
      * @param  callable|bool  $condition
      * @param  array|string|\Closure  $rules
