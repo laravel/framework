@@ -3,6 +3,7 @@
 namespace Illuminate\Validation\Rules;
 
 use BackedEnum;
+use Illuminate\Contracts\Support\Arrayable;
 use UnitEnum;
 
 class NotIn
@@ -24,12 +25,16 @@ class NotIn
     /**
      * Create a new "not in" rule instance.
      *
-     * @param  array  $values
+     * @param  \Illuminate\Contracts\Support\Arrayable|array|string  $values
      * @return void
      */
-    public function __construct(array $values)
+    public function __construct($values)
     {
-        $this->values = $values;
+        if ($values instanceof Arrayable) {
+            $values = $values->toArray();
+        }
+
+        $this->values = is_array($values) ? $values : func_get_args();
     }
 
     /**
