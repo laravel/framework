@@ -122,6 +122,18 @@ class RoutingServiceProviderTest extends TestCase
             'request-data' => 'request-data',
         ]);
     }
+
+    public function testItHandlesGzippedBodyPayloadsWhenCreatingServerRequestInterfaceInstances()
+    {
+        Route::post('test-route', function (ServerRequestInterface $request) {
+            return gzdecode((string) $request->getBody());
+        });
+
+        $response = $this->call('POST', 'test-route', content: file_get_contents(__DIR__.'/Fixtures/laravel.txt.gz'));
+
+        $response->assertOk();
+        $response->assertContent("Laravel\n");
+    }
 }
 
 class MergeDataMiddleware
