@@ -780,8 +780,8 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
      *
      * @template TScopeDefault
      *
-     * @param TKey $key
-     * @param TScopeDefault|(\Closure(): TScopeDefault)  $default
+     * @param  TKey  $key
+     * @param  TScopeDefault|(\Closure(): TScopeDefault)  $default
      * @return static<TKey, mixed>
      */
     public function scope($key, $default = null)

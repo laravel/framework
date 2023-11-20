@@ -768,7 +768,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      * Get the key's values.
      *
      * @param  string|int  $key
-     * @param  string|null $default
+     * @param  string|null  $default
      * @return static<array-key, mixed>
      */
     public function scope($key, $default = null)
