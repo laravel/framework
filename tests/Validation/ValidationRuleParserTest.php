@@ -74,8 +74,8 @@ class ValidationRuleParserTest extends TestCase
 
         $rules = ValidationRuleParser::filterConditionalRules([
             'name' => Rule::when($isAdmin, ['required', 'min:2'], ['string', 'max:10']),
-            'email' => Rule::unless($isAdmin,  ['required', 'min:2'], ['string', 'max:10']),
-            'password' => Rule::unless($isAdmin,  'required|min:2', 'string|max:10'),
+            'email' => Rule::unless($isAdmin, ['required', 'min:2'], ['string', 'max:10']),
+            'password' => Rule::unless($isAdmin, 'required|min:2', 'string|max:10'),
             'username' => ['required', Rule::when($isAdmin, ['min:2'], ['string', 'max:10'])],
             'address' => ['required', Rule::unless($isAdmin, ['min:2'], ['string', 'max:10'])],
         ]);
