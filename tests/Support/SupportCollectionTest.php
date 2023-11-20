@@ -2346,6 +2346,27 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testScope($collection)
+    {
+        $data = new $collection([1 => 'php', 2 => 'asp', 3 => 'java']);
+        $this->assertEquals(['php'], $data->scope(1)->all());
+        $this->assertEquals(['asp'], $data->scope(2)->all());
+
+        $data = new $collection(['user' => ['name' => 'taylor']]);
+        $this->assertEquals(['taylor'], $data->scope('user.name')->all());
+        $this->assertEquals(['dayle'], $data->scope('user.age', 'dayle')->all());
+
+        $data = new $collection(['products' => ['forge', 'vapour', 'spark']]);
+        $this->assertEquals(['forge', 'vapour', 'spark'], $data->scope('products')->all());
+        $this->assertEquals(['foo', 'bar'], $data->scope('missing', ['foo', 'bar'])->all());
+
+        $data = new $collection(['authors' => ['taylor' => ['products' => ['forge', 'vapour', 'spark']]]]);
+        $this->assertEquals(['forge', 'vapour', 'spark'], $data->scope('authors.taylor.products')->all());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testHas($collection)
     {
         $data = new $collection(['id' => 1, 'first' => 'Hello', 'second' => 'World']);
