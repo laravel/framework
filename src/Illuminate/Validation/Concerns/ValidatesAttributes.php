@@ -1271,6 +1271,18 @@ trait ValidatesAttributes
     }
 
     /**
+     * Validate that an attribute is a valid HEX color.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @return bool
+     */
+    public function validateHexColor($attribute, $value)
+    {
+        return preg_match('/^#(?:[0-9a-fA-F]{3}){1,2}$/', $value) === 1;
+    }
+
+    /**
      * Validate the MIME type of a file is an image MIME type.
      *
      * @param  string  $attribute

@@ -66,6 +66,7 @@ return [
         'numeric' => 'The :attribute field must be greater than or equal to :value.',
         'string' => 'The :attribute field must be greater than or equal to :value characters.',
     ],
+    'hex_color' => 'The :attribute field must be a valid hexadecimal color.',
     'image' => 'The :attribute field must be an image.',
     'in' => 'The selected :attribute is invalid.',
     'in_array' => 'The :attribute field must exist in :other.',
