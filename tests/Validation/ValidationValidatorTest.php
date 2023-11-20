@@ -1925,6 +1925,19 @@ class ValidationValidatorTest extends TestCase
         $this->assertSame('The value of foo.2 does not exist in bar.*.', $v->messages()->first('foo.2'));
     }
 
+    public function testValidateColorHex()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['color'=> '#FFFFFF'], ['color'=>'color_hex']);
+        $this->assertTrue($v->passes());
+        $v = new Validator($trans, ['color'=> '#FFF'], ['color'=>'color_hex']);
+        $this->assertTrue($v->passes());
+        $v = new Validator($trans, ['color'=> '#GGG'], ['color'=>'color_hex']);
+        $this->assertFalse($v->passes());
+        $v = new Validator($trans, ['color'=> '#GGGGGGG'], ['color'=>'color_hex']);
+        $this->assertFalse($v->passes());
+    }
+
     public function testValidateConfirmed()
     {
         $trans = $this->getIlluminateArrayTranslator();

@@ -33,6 +33,7 @@ return [
     ],
     'boolean' => 'The :attribute field must be true or false.',
     'can' => 'The :attribute field contains an unauthorized value.',
+    'color_hex' => 'The :attribute field is not valid hex color.',
     'confirmed' => 'The :attribute field confirmation does not match.',
     'current_password' => 'The password is incorrect.',
     'date' => 'The :attribute field must be a valid date.',
