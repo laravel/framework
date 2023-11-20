@@ -130,6 +130,26 @@ class PostgresSchemaBuilderTest extends PostgresTestCase
         $this->assertEquals('This is a new comment', DB::selectOne("select obj_description('public.posts'::regclass, 'pg_class')")->obj_description);
     }
 
+    public function testGetTables()
+    {
+        Schema::create('public.foo', function (Blueprint $table) {
+            $table->string('name');
+        });
+
+        Schema::create('private.bar', function (Blueprint $table) {
+            $table->integer('votes');
+        });
+
+        $tables = Schema::getTables();
+
+        $this->assertNotEmpty(array_filter($tables, function ($table) {
+            return $table['name'] === 'foo' && $table['schema'] === 'public';
+        }));
+        $this->assertNotEmpty(array_filter($tables, function ($table) {
+            return $table['name'] === 'bar' && $table['schema'] === 'private';
+        }));
+    }
+
     protected function hasView($schema, $table)
     {
         return DB::table('information_schema.views')

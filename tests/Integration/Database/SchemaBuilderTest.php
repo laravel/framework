@@ -137,4 +137,41 @@ class SchemaBuilderTest extends DatabaseTestCase
             $this->assertEquals($expected, $queries);
         }
     }
+
+    public function testGetTables()
+    {
+        Schema::create('foo', function (Blueprint $table) {
+            $table->comment('This is a comment');
+            $table->increments('id');
+        });
+
+        Schema::create('bar', function (Blueprint $table) {
+            $table->string('name');
+        });
+
+        Schema::create('baz', function (Blueprint $table) {
+            $table->integer('votes');
+        });
+
+        $tables = Schema::getTables();
+
+        $this->assertEmpty(array_diff(['foo', 'bar', 'baz'], array_column($tables, 'name')));
+
+        if (in_array($this->driver, ['mysql', 'pgsql'])) {
+            $this->assertNotEmpty(array_filter($tables, function ($table) {
+                return $table['name'] === 'foo' && $table['comment'] === 'This is a comment';
+            }));
+        }
+    }
+
+    public function testGetViews()
+    {
+        DB::statement('create view foo (id) as select 1');
+        DB::statement('create view bar (name) as select 1');
+        DB::statement('create view baz (votes) as select 1');
+
+        $views = Schema::getViews();
+
+        $this->assertEmpty(array_diff(['foo', 'bar', 'baz'], array_column($views, 'name')));
+    }
 }
