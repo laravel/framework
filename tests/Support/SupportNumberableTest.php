@@ -145,8 +145,7 @@ class SupportNumberableTest extends TestCase
     public function testCurrency()
     {
         $this->assertSame($this->numberable(10)->currency(), Number::currency(10));
-        $this->assertSame($this->numberable(1.234)->currency(2), Number::currency(1.234, 2));
-        $this->assertSame($this->numberable(1.234)->currency(2, 1), Number::currency(1.234, 2, 1));
+        $this->assertSame($this->numberable(1.234)->currency(in: 'EUR'), Number::currency(1.234, in: 'EUR'));
         $this->assertSame($this->numberable(10000)->currency(locale: 'de'), Number::currency(10000, locale: 'de'));
     }
 
