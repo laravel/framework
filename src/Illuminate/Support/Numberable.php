@@ -4,11 +4,10 @@ namespace Illuminate\Support;
 
 use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\Macroable;
-use Illuminate\Support\Traits\Tappable;
 
 class Numberable
 {
-    use Conditionable, Macroable, Tappable;
+    use Conditionable, Macroable;
 
     /**
      * The underlying numeric value.
@@ -45,9 +44,7 @@ class Numberable
      */
     public function add($value): static
     {
-        $this->value += $value;
-
-        return $this;
+        return new static($this->value + $value);
     }
 
     /**
@@ -57,9 +54,7 @@ class Numberable
      */
     public function subtract($value): static
     {
-        $this->value -= $value;
-
-        return $this;
+        return new static($this->value - $value);
     }
 
     /**
@@ -69,9 +64,7 @@ class Numberable
      */
     public function multiply($value): static
     {
-        $this->value *= $value;
-
-        return $this;
+        return new static($this->value * $value);
     }
 
     /**
@@ -81,9 +74,7 @@ class Numberable
      */
     public function divide($value): static
     {
-        $this->value /= $value;
-
-        return $this;
+        return new static($this->value / $value);
     }
 
     /**
@@ -93,9 +84,7 @@ class Numberable
      */
     public function modulo($value): static
     {
-        $this->value %= $value;
-
-        return $this;
+        return new static($this->value % $value);
     }
 
     /**
@@ -105,9 +94,7 @@ class Numberable
      */
     public function pow($value): static
     {
-        $this->value **= $value;
-
-        return $this;
+        return new static($this->value ** $value);
     }
 
     /**
