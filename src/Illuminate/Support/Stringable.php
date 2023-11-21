@@ -89,18 +89,6 @@ class Stringable implements JsonSerializable, ArrayAccess
     }
 
     /**
-     * Transliterate a string to its closest ASCII representation.
-     *
-     * @param  string|null  $unknown
-     * @param  bool|null  $strict
-     * @return static
-     */
-    public function transliterate($unknown = '?', $strict = false)
-    {
-        return new static(Str::transliterate($this->value, $unknown, $strict));
-    }
-
-    /**
      * Get the trailing name component of the path.
      *
      * @param  string  $suffix
@@ -807,6 +795,18 @@ class Stringable implements JsonSerializable, ArrayAccess
     public function title()
     {
         return new static(Str::title($this->value));
+    }
+
+    /**
+     * Transliterate a string to its closest ASCII representation.
+     *
+     * @param  string|null  $unknown
+     * @param  bool|null  $strict
+     * @return static
+     */
+    public function transliterate($unknown = '?', $strict = false)
+    {
+        return new static(Str::transliterate($this->value, $unknown, $strict));
     }
 
     /**
