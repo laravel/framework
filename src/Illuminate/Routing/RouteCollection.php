@@ -165,7 +165,7 @@ class RouteCollection extends AbstractRouteCollection
     /**
      * Find the first route matching a given path.
      *
-     * @param string $uri
+     * @param  string  $uri
      * @return Route|null
      */
     public function getRouteFromPath(string $uri): ?Route
