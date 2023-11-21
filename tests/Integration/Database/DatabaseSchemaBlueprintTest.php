@@ -61,7 +61,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $schema = $connection->getSchemaBuilder();
 
         $schema->create('users', function ($table) {
-            $table->string('name');
+            $table->string('name')->nullable();
         });
 
         $base = new Blueprint('users', function ($table) {
