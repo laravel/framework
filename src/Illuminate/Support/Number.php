@@ -88,7 +88,7 @@ class Number
 
         $formatter = new NumberFormatter($locale ?? static::$locale, NumberFormatter::PERCENT);
 
-        if (!is_null($maxPrecision)) {
+        if (! is_null($maxPrecision)) {
             $formatter->setAttribute(NumberFormatter::MAX_FRACTION_DIGITS, $maxPrecision);
         } else {
             $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, $precision);
@@ -241,7 +241,7 @@ class Number
      */
     protected static function ensureIntlExtensionIsInstalled()
     {
-        if (!extension_loaded('intl')) {
+        if (! extension_loaded('intl')) {
             throw new RuntimeException('The "intl" PHP extension is required to use this method.');
         }
     }
