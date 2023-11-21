@@ -205,6 +205,12 @@ class Encrypter implements EncrypterContract, StringEncrypter
      */
     protected function getJsonPayload($payload)
     {
+        // If the payload is not a string we can bail out early
+        // to avoid triggering deprecation warnings.
+        if(!is_string($payload)) {
+            throw new DecryptException('The payload is invalid.');
+        }
+
         $payload = json_decode(base64_decode($payload), true);
 
         // If the payload is not valid JSON or does not have the proper keys set we will
