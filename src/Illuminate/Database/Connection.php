@@ -1709,6 +1709,16 @@ class Connection implements ConnectionInterface
     }
 
     /**
+     * Get the server version for the connection.
+     *
+     * @return string
+     */
+    public function getServerVersion(): string
+    {
+        return $this->getPdo()->getAttribute(PDO::ATTR_SERVER_VERSION);
+    }
+
+    /**
      * Register a connection resolver.
      *
      * @param  string  $driver
