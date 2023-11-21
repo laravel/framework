@@ -8,6 +8,7 @@ use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher as EventDispatcher;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use Laravel\SerializableClosure\SerializableClosure;
 use Throwable;
 
@@ -254,9 +255,11 @@ class PendingBatch
         $repository = $this->container->make(BatchRepository::class);
 
         try {
-            $batch = $repository->store($this);
+            DB::transaction(function() use($repository, &$batch) {
+                $batch = $repository->store($this);
 
-            $batch = $batch->add($this->jobs);
+                $batch = $batch->add($this->jobs);
+            });
         } catch (Throwable $e) {
             if (isset($batch)) {
                 $repository->delete($batch->id);
