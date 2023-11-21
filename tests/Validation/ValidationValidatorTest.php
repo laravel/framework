@@ -1928,13 +1928,29 @@ class ValidationValidatorTest extends TestCase
     public function testValidateHexColor()
     {
         $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['color'=> '#FFF'], ['color'=>'hex_color']);
+        $this->assertTrue($v->passes());
+        $v = new Validator($trans, ['color'=> '#FFFF'], ['color'=>'hex_color']);
+        $this->assertTrue($v->passes());
         $v = new Validator($trans, ['color'=> '#FFFFFF'], ['color'=>'hex_color']);
         $this->assertTrue($v->passes());
-        $v = new Validator($trans, ['color'=> '#FFF'], ['color'=>'hex_color']);
+        $v = new Validator($trans, ['color'=> '#FF000080'], ['color'=>'hex_color']);
+        $this->assertTrue($v->passes());
+        $v = new Validator($trans, ['color'=> '#FF000080'], ['color'=>'hex_color']);
+        $this->assertTrue($v->passes());
+        $v = new Validator($trans, ['color'=> '#00FF0080'], ['color'=>'hex_color']);
         $this->assertTrue($v->passes());
         $v = new Validator($trans, ['color'=> '#GGG'], ['color'=>'hex_color']);
         $this->assertFalse($v->passes());
+        $v = new Validator($trans, ['color'=> '#GGGG'], ['color'=>'hex_color']);
+        $this->assertFalse($v->passes());
+        $v = new Validator($trans, ['color'=> '#GGGGGG'], ['color'=>'hex_color']);
+        $this->assertFalse($v->passes());
         $v = new Validator($trans, ['color'=> '#GGGGGGG'], ['color'=>'hex_color']);
+        $this->assertFalse($v->passes());
+        $v = new Validator($trans, ['color'=> '#FFGG00FF'], ['color'=>'hex_color']);
+        $this->assertFalse($v->passes());
+        $v = new Validator($trans, ['color'=> '#00FF008X'], ['color'=>'hex_color']);
         $this->assertFalse($v->passes());
     }
 
