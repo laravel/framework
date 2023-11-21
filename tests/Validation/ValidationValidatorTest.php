@@ -1944,6 +1944,8 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
         $v = new Validator($trans, ['color'=> '#GGGG'], ['color'=>'hex_color']);
         $this->assertFalse($v->passes());
+        $v = new Validator($trans, ['color'=> '#123AB'], ['color'=>'hex_color']);
+        $this->assertFalse($v->passes());
         $v = new Validator($trans, ['color'=> '#GGGGGG'], ['color'=>'hex_color']);
         $this->assertFalse($v->passes());
         $v = new Validator($trans, ['color'=> '#GGGGGGG'], ['color'=>'hex_color']);
