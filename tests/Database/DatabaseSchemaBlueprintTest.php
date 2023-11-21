@@ -206,14 +206,13 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $connection->shouldReceive('getServerVersion')->andReturn('5.7');
         $connection->shouldReceive('getSchemaBuilder->getColumns')->andReturn([
             ['name' => 'name', 'type' => 'varchar(255)', 'type_name' => 'varchar', 'nullable' => true, 'collation' => 'utf8mb4_unicode_ci', 'default' => 'foo', 'comment' => null, 'auto_increment' => false],
-            ['name' => 'id', 'type' => 'bigint unsigned', 'type_name' => 'bigint', 'nullable' => false, 'collation' => null, 'default' => null, 'comment' => 'lorem ipsum', 'auto_increment' => true]
+            ['name' => 'id', 'type' => 'bigint unsigned', 'type_name' => 'bigint', 'nullable' => false, 'collation' => null, 'default' => null, 'comment' => 'lorem ipsum', 'auto_increment' => true],
         ]);
 
         $this->assertEquals([
             "alter table `users` change `name` `title` varchar(255) collate 'utf8mb4_unicode_ci' null default 'foo'",
             "alter table `users` change `id` `key` bigint unsigned not null auto_increment primary key comment 'lorem ipsum'",
         ], $blueprint->toSql($connection, new MySqlGrammar));
-
     }
 
     public function testDropColumnWithoutDoctrine()

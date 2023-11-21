@@ -247,7 +247,7 @@ class MySqlGrammar extends Grammar
 
             $modifiers = $this->addModifiers($column['type'], $blueprint, new ColumnDefinition([
                 'change' => true,
-                'type' => match($column['type_name']) {
+                'type' => match ($column['type_name']) {
                     'bigint' => 'bigInteger',
                     'int' => 'integer',
                     'mediumint' => 'mediumInteger',
