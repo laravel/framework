@@ -163,6 +163,34 @@ class RouteCollection extends AbstractRouteCollection
     }
 
     /**
+     * Find the first route matching a given path.
+     *
+     * @param string $uri
+     * @return Route|null
+     */
+    public function getRouteFromPath(string $uri): ?Route
+    {
+        // Get all available routes.
+        $routes = $this->getRoutes();
+        // Create a fresh request from the given path.
+        $request = Request::create($uri);
+
+        // Find a route based on the fresh request instance.
+        $route = $this->matchAgainstRoutes($routes, $request);
+
+        // If the route is found, we return a clone so that any changes made to it does not affect any potential
+        // current request route.
+        if ($route instanceof Route) {
+            $clone = clone $route;
+            // Bind the created request so we can get parameters from the route.
+            $clone->bind($request);
+            return $clone;
+        }
+
+        return null;
+    }
+
+    /**
      * Get routes from the collection by method.
      *
      * @param  string|null  $method

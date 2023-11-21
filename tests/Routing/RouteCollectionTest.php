@@ -298,6 +298,90 @@ class RouteCollectionTest extends TestCase
         $this->routeCollection->match($request);
     }
 
+    public function testGetRouteFromPathReturnsRoute()
+    {
+        $route = new Route('GET', 'foo', [
+            'uses' => 'FooController@index',
+            'as' => 'foo_index',
+        ]);
+        $this->routeCollection->add($route);
+
+        $foundRoute = $this->routeCollection->getRouteFromPath('foo');
+        $this->assertInstanceOf(Route::class, $foundRoute);
+        $this->assertSame('foo', $route->uri());
+        $this->assertSame('foo_index', $route->getName());
+
+        // Now repeat the test with a parameter.
+        $route = new Route('GET', 'foo/{bar}', [
+            'uses' => 'FooController@show',
+            'as' => 'foo_show',
+        ]);
+        $this->routeCollection->add($route);
+
+        $foundRoute = $this->routeCollection->getRouteFromPath('foo/1');
+        $this->assertInstanceOf(Route::class, $foundRoute);
+        $this->assertSame('1', $foundRoute->parameter('bar'));
+        $this->assertSame('foo/{bar}', $foundRoute->uri());
+        $this->assertSame('foo_show', $foundRoute->getName());
+    }
+
+    public function testGetRouteFromPathReturnsNullIfRouteDoesntExist()
+    {
+        $foundRoute = $this->routeCollection->getRouteFromPath('non-existent-path');
+        $this->assertNull($foundRoute);
+    }
+
+    public function testGetRouteFromPathWontAlterCurrentRequest()
+    {
+        $route = new Route('GET', 'foo', [
+            'uses' => 'FooController@index',
+            'as' => 'foo_index',
+        ]);
+        $this->routeCollection->add($route);
+
+        $request = Request::create('foo');
+        $request->setRouteResolver(
+            fn () => $route->bind($request)
+        );
+
+        $currentRoute = $request->route();
+        $routeFromRequest = $this->routeCollection->match($request);
+        $routeFromPath = $this->routeCollection->getRouteFromPath('foo');
+
+        // If the route objects have the same properties, but are not the same object (reference) loose comparison
+        // will be true while strict comparison will be false. The match method returns the route by reference from
+        // the current request.
+        $this->assertTrue($currentRoute === $routeFromRequest);
+
+        // We want to ensure the request route matches with the found route but isn't the same ref.
+        $this->assertTrue($routeFromRequest == $routeFromPath);
+        $this->assertFalse($routeFromRequest === $routeFromPath);
+
+        // Now repeat the test with a parameter.
+        $route = new Route('GET', 'foo/{bar}', [
+            'uses' => 'FooController@show',
+            'as' => 'foo_show',
+        ]);
+        $this->routeCollection->add($route);
+
+        $request = Request::create('foo/1');
+        $request->setRouteResolver(
+            fn () => $route->bind($request)
+        );
+
+        // Generate the same route but with different parameters.
+        $routeFromRequest = $this->routeCollection->match($request);
+        $routeFromPath = $this->routeCollection->getRouteFromPath('foo/2');
+
+        $this->assertEquals('foo_show', $routeFromRequest->getName());
+        $this->assertEquals('foo_show', $routeFromPath->getName());
+        // Since they have different parameters, this should be false.
+        $this->assertFalse($routeFromRequest == $routeFromPath);
+
+        $this->assertSame('1', $routeFromRequest->parameter('bar'));
+        $this->assertSame('2', $routeFromPath->parameter('bar'));
+    }
+
     public function testHasNameRouteMethod()
     {
         $this->routeCollection->add(
