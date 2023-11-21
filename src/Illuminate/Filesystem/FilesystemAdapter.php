@@ -267,13 +267,14 @@ class FilesystemAdapter implements CloudFilesystemContract
      *
      * @param  string  $path
      * @param  int  $flags
+     * @param  bool $associative
      * @return array|null
      */
-    public function json($path, $flags = 0)
+    public function json($path, $flags = 0, $associative = true)
     {
         $content = $this->get($path);
 
-        return is_null($content) ? null : json_decode($content, true, 512, $flags);
+        return is_null($content) ? null : json_decode($content, $associative, 512, $flags);
     }
 
     /**
