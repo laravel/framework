@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Js;
+use Illuminate\Support\Number;
 use Illuminate\Support\Str;
 use Illuminate\Support\Testing\Fakes\Fake;
 use Mockery;
@@ -292,6 +293,7 @@ abstract class Facade
             'Lang' => Lang::class,
             'Log' => Log::class,
             'Mail' => Mail::class,
+            'Number' => Number::class,
             'Notification' => Notification::class,
             'Password' => Password::class,
             'Process' => Process::class,
