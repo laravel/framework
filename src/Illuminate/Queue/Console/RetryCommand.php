@@ -7,6 +7,7 @@ use Illuminate\Console\Command;
 use Illuminate\Contracts\Encryption\Encrypter;
 use Illuminate\Queue\Events\JobRetryRequested;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use RuntimeException;
 use Symfony\Component\Console\Attribute\AsCommand;
 
@@ -21,7 +22,9 @@ class RetryCommand extends Command
     protected $signature = 'queue:retry
                             {id?* : The ID of the failed job or "all" to retry all jobs}
                             {--queue= : Retry all of the failed jobs for the specified queue}
-                            {--range=* : Range of job IDs (numeric) to be retried (e.g. 1-5)}';
+                            {--range=* : Range of job IDs (numeric) to be retried (e.g. 1-5)}
+                            {--pattern= : Retry all of the failed jobs that has failed with the given Exception pattern
+                            (string) to be retried (e.g. \RuntimeException)}';
 
     /**
      * The console command description.
@@ -81,7 +84,36 @@ class RetryCommand extends Command
             $ids = array_merge($ids, $this->getJobIdsByRanges($ranges));
         }
 
+        if ($pattern = (string) $this->option('pattern')) {
+            $ids = array_merge($ids, $this->getJobIdsByPattern($pattern));
+        }
+
         return array_values(array_filter(array_unique($ids)));
+    }
+
+    /**
+     * Get the job IDs by pattern, if applicable.
+     *
+     * @param  string  $pattern
+     * @return array
+     */
+    protected function getJobIdsByPattern($pattern)
+    {
+        $ids = collect($this->laravel['queue.failer']->all())
+                        ->filter(function ($job) use ($pattern) {
+                            return Str::of(explode("\n", $job->exception)[0])
+                                // Throwable __toString() always has the format of "Exception: Message"
+                                ->before(':')
+                                ->is($pattern);
+                        })
+                        ->pluck('id')
+                        ->toArray();
+
+        if (count($ids) === 0) {
+            $this->components->error("Unable to find failed jobs for pattern [{$pattern}].");
+        }
+
+        return $ids;
     }
 
     /**
