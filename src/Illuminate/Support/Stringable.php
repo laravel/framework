@@ -325,6 +325,16 @@ class Stringable implements JsonSerializable, ArrayAccess
     }
 
     /**
+     * Determine if a given string is valid HEX color.
+     *
+     * @return bool
+     */
+    public function isHexColor()
+    {
+        return Str::isHexColor($this->value);
+    }
+
+    /**
      * Determine if a given string is valid JSON.
      *
      * @return bool

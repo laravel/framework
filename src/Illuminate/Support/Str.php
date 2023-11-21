@@ -442,6 +442,17 @@ class Str
     }
 
     /**
+     * Determine if a given string is valid HEX color.
+     *
+     * @param  string  $value
+     * @return bool
+     */
+    public static function isHexColor($value)
+    {
+        return preg_match('/^#(?:[0-9a-fA-F]{3}){1,2}$/', $value) === 1;
+    }
+
+    /**
      * Determine if a given value is valid JSON.
      *
      * @param  mixed  $value
