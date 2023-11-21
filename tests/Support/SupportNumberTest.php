@@ -234,8 +234,8 @@ class SupportNumberTest extends TestCase
 
     public function testValidateNPI()
     {
-        $this->asserttrue(Number::luhn("808401134296023"));
-        $this->assertTrue(Number::luhn("808405592948074"));
+        $this->asserttrue(Number::luhn('808401134296023'));
+        $this->assertTrue(Number::luhn('808405592948074'));
         $this->assertTrue(Number::luhn(80840_6200602681));
         $this->assertTrue(Number::luhn(80840_8160946744));
     }
