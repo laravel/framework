@@ -184,6 +184,7 @@ class RouteCollection extends AbstractRouteCollection
             $clone = clone $route;
             // Bind the created request so we can get parameters from the route.
             $clone->bind($request);
+
             return $clone;
         }
 
