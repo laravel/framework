@@ -106,6 +106,30 @@ class SqlServerGrammar extends Grammar
     }
 
     /**
+     * Compile the SQL needed to retrieve all table names.
+     *
+     * @deprecated Will be removed in a future Laravel version.
+     *
+     * @return string
+     */
+    public function compileGetAllTables()
+    {
+        return "select name, type from sys.tables where type = 'U'";
+    }
+
+    /**
+     * Compile the SQL needed to retrieve all view names.
+     *
+     * @deprecated Will be removed in a future Laravel version.
+     *
+     * @return string
+     */
+    public function compileGetAllViews()
+    {
+        return "select name, type from sys.objects where type = 'V'";
+    }
+
+    /**
      * Compile the query to determine the list of columns.
      *
      * @deprecated Will be removed in a future Laravel version.
@@ -531,30 +555,6 @@ class SqlServerGrammar extends Grammar
             FROM sys.views;
 
             EXEC sp_executesql @sql;";
-    }
-
-    /**
-     * Compile the SQL needed to retrieve all table names.
-     *
-     * @deprecated Will be removed in a future Laravel version.
-     *
-     * @return string
-     */
-    public function compileGetAllTables()
-    {
-        return "select name, type from sys.tables where type = 'U'";
-    }
-
-    /**
-     * Compile the SQL needed to retrieve all view names.
-     *
-     * @deprecated Will be removed in a future Laravel version.
-     *
-     * @return string
-     */
-    public function compileGetAllViews()
-    {
-        return "select name, type from sys.objects where type = 'V'";
     }
 
     /**

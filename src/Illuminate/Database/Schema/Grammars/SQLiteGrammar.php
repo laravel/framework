@@ -76,6 +76,30 @@ class SQLiteGrammar extends Grammar
     }
 
     /**
+     * Compile the SQL needed to retrieve all table names.
+     *
+     * @deprecated Will be removed in a future Laravel version.
+     *
+     * @return string
+     */
+    public function compileGetAllTables()
+    {
+        return 'select type, name from sqlite_master where type = \'table\' and name not like \'sqlite_%\'';
+    }
+
+    /**
+     * Compile the SQL needed to retrieve all view names.
+     *
+     * @deprecated Will be removed in a future Laravel version.
+     *
+     * @return string
+     */
+    public function compileGetAllViews()
+    {
+        return 'select type, name from sqlite_master where type = \'view\'';
+    }
+
+    /**
      * Compile the query to determine the list of columns.
      *
      * @deprecated Will be removed in a future Laravel version.
@@ -320,30 +344,6 @@ class SQLiteGrammar extends Grammar
     public function compileDropAllViews()
     {
         return "delete from sqlite_master where type in ('view')";
-    }
-
-    /**
-     * Compile the SQL needed to retrieve all table names.
-     *
-     * @deprecated Will be removed in a future Laravel version.
-     *
-     * @return string
-     */
-    public function compileGetAllTables()
-    {
-        return 'select type, name from sqlite_master where type = \'table\' and name not like \'sqlite_%\'';
-    }
-
-    /**
-     * Compile the SQL needed to retrieve all view names.
-     *
-     * @deprecated Will be removed in a future Laravel version.
-     *
-     * @return string
-     */
-    public function compileGetAllViews()
-    {
-        return 'select type, name from sqlite_master where type = \'view\'';
     }
 
     /**
