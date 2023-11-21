@@ -86,7 +86,7 @@ class MySqlGrammar extends Grammar
     public function compileTables($database)
     {
         return sprintf(
-            'select table_name as `name`, table_schema as `schema`, (data_length + index_length) as `size`, '
+            'select table_name as `name`, (data_length + index_length) as `size`, '
             .'table_comment as `comment`, engine as `engine`, table_collation as `collation` '
             ."from information_schema.tables where table_schema = %s and table_type = 'BASE TABLE' "
             .'order by table_name',
@@ -103,7 +103,7 @@ class MySqlGrammar extends Grammar
     public function compileViews($database)
     {
         return sprintf(
-            'select table_name as `name`, table_schema as `schema`, view_definition as `definition` '
+            'select table_name as `name`, view_definition as `definition` '
             .'from information_schema.views where table_schema = %s '
             .'order by table_name',
             $this->quoteString($database)

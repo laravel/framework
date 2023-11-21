@@ -62,7 +62,7 @@ class Processor
 
             return [
                 'name' => $result->name,
-                'schema' => $result->schema ?? null, // MySQL, PostgreSQL, and SQL Server
+                'schema' => $result->schema ?? null, // PostgreSQL and SQL Server
                 'size' => isset($result->size) ? (int) $result->size : null,
                 'comment' => $result->comment ?? null, // MySQL and PostgreSQL
                 'collation' => $result->collation ?? null, // MySQL only
@@ -84,7 +84,7 @@ class Processor
 
             return [
                 'name' => $result->name,
-                'schema' => $result->schema ?? null, // MySQL, PostgreSQL, and SQL Server
+                'schema' => $result->schema ?? null, // PostgreSQL and SQL Server
                 'definition' => $result->definition,
             ];
         }, $results);
