@@ -33,6 +33,12 @@ class SupportStringableTest extends TestCase
         $this->assertFalse($this->stringable('ù')->isAscii());
     }
 
+    public function testIsHexColor()
+    {
+        $this->assertTrue($this->stringable('#FFFFFF')->isHexColor());
+        $this->assertFalse($this->stringable('#GGGGGGG')->isHexColor());
+    }
+
     public function testIsUrl()
     {
         $this->assertTrue($this->stringable('https://laravel.com')->isUrl());

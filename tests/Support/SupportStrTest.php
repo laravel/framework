@@ -924,6 +924,12 @@ class SupportStrTest extends TestCase
         $this->assertSame('', Str::slug(null));
     }
 
+    public function testIsHexColor()
+    {
+        $this->assertTrue(Str::isHexColor('#FFFFFF'));
+        $this->assertFalse(Str::isHexColor('#GGGGGGG'));
+    }
+
     public function testPadBoth()
     {
         $this->assertSame('__Alien___', Str::padBoth('Alien', 10, '_'));
