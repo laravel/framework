@@ -765,18 +765,6 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     }
 
     /**
-     * Get the key's values.
-     *
-     * @param  string|int  $key
-     * @param  string|null  $default
-     * @return static<array-key, mixed>
-     */
-    public function scope($key, $default = null)
-    {
-        return new static(Arr::get($this->items, $key, $default));
-    }
-
-    /**
      * Run a map over each of the items.
      *
      * @template TMapValue
@@ -1083,6 +1071,18 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     public function reverse()
     {
         return new static(array_reverse($this->items, true));
+    }
+
+    /**
+     * Get the value of the given key as a new collection instance.
+     *
+     * @param  string|int  $key
+     * @param  string|null  $default
+     * @return static<array-key, mixed>
+     */
+    public function scope($key, $default = null)
+    {
+        return new static(Arr::get($this->items, $key, $default));
     }
 
     /**

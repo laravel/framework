@@ -776,7 +776,7 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     }
 
     /**
-     * Get the key's values.
+     * Get the value of the given key as a new collection instance.
      *
      * @template TScopeDefault
      *
@@ -788,7 +788,7 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     {
         return new static(function () use ($key, $default) {
             foreach ($this as $itemKey => $itemValue) {
-                $value = data_get([$itemKey => $itemValue], $key, $marker = new stdClass());
+                $value = data_get([$itemKey => $itemValue], $key, $marker = new stdClass);
 
                 if ($value !== $marker) {
                     return $value;
