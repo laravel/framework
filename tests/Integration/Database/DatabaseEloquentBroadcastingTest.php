@@ -231,7 +231,7 @@ class TestEloquentBroadcastUserOnSpecificEventsOnly extends Model
 
     public function broadcastOn($event)
     {
-        if($event == 'created') {
+        if ($event == 'created') {
             return [$this];
         }
     }
@@ -245,7 +245,7 @@ class TestEloquentBroadcastUserWithSpecificBroadcastName extends Model
 
     public function broadcastAs($event)
     {
-        if($event == 'created') {
+        if ($event == 'created') {
             return 'foo';
         }
     }
@@ -259,7 +259,7 @@ class TestEloquentBroadcastUserWithSpecificBroadcastPayload extends Model
 
     public function broadcastWith($event)
     {
-        if($event == 'created') {
+        if ($event == 'created') {
             return ['foo' => 'bar'];
         }
     }
