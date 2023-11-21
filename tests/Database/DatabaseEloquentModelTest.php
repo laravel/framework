@@ -2435,8 +2435,19 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertNull($model->delete);
 
         $model = m::mock(EloquentModelStub::class.'[delete]');
+        $model->shouldNotReceive('delete');
         $model->delete = 123;
         $this->assertEquals(123, $model->delete);
+    }
+
+    public function testItDoesNotCallANonRelationMethodWhenSettingAnAttribute()
+    {
+        $model = m::mock(EloquentModelStub::class.'[delete,getRelationValue]');
+        $model->shouldNotReceive('delete');
+        $model->shouldNotReceive('nonRelationMethod');
+
+        $model->nonRelationMethod = 'foo';
+        $this->assertSame('foo', $model->nonRelationMethod);
     }
 
     public function testIntKeyTypePreserved()
@@ -2940,6 +2951,11 @@ class EloquentModelStub extends Model
     public function scopeDate(Builder $builder, Carbon $date)
     {
         $this->scopesCalled['date'] = $date;
+    }
+
+    public function nonRelationMethod($args)
+    {
+        return false;
     }
 }
 

@@ -537,12 +537,20 @@ trait HasAttributes
      */
     public function isRelation($key)
     {
-        if ($this->hasAttributeMutator($key)) {
+        $hasMethodOrResolver = method_exists($this, $key) || $this->relationResolver(static::class, $key) !== null;
+
+        if (! $hasMethodOrResolver || $this->hasAttributeMutator($key)) {
             return false;
         }
 
-        return method_exists($this, $key) ||
-               $this->relationResolver(static::class, $key);
+        if ($this->relationResolver(static::class, $key) !== null) {
+            return true;
+        }
+
+        // If the method does not exist on the superclass, we know it's not an Eloquent internal method.
+        // If it also does not have parameters, we can assume it's a relationship method.
+        return ! method_exists(self::class, $key)
+            && count((new ReflectionMethod($this, $key))->getParameters()) === 0;
     }
 
     /**
