@@ -70,7 +70,7 @@ class DatabaseTransactionsManager
                                  $transaction->level >= $levelBeingCommitted
         );
 
-        $this->currentTransaction = $this->currentTransaction->parent;
+        $this->currentTransaction = $this->currentTransaction?->parent;
     }
 
     /**
