@@ -171,7 +171,7 @@ class ShouldDispatchAfterCommitEventTest extends TestCase
         $this->assertFalse(ShouldDispatchAfterCommitTestEvent::$ran);
     }
 
-public function testItHandlesNestedTransactionsWhereTheSecondOneFails()
+    public function testItHandlesNestedTransactionsWhereTheSecondOneFails()
     {
         Event::listen(ShouldDispatchAfterCommitTestEvent::class, ShouldDispatchAfterCommitListener::class);
         Event::listen(AnotherShouldDispatchAfterCommitTestEvent::class, AnotherShouldDispatchAfterCommitListener::class);
@@ -199,19 +199,19 @@ public function testItHandlesNestedTransactionsWhereTheSecondOneFails()
     {
         Event::listen(ShouldDispatchAfterCommitTestEvent::class, ShouldDispatchAfterCommitListener::class);
 
-            DB::transaction(function () {
-                try {
+        DB::transaction(function () {
+            try {
+                DB::transaction(function () {
                     DB::transaction(function () {
-                        DB::transaction(function () {
-                            Event::dispatch(new ShouldDispatchAfterCommitTestEvent());
-                        });
-
-                        throw new \Exception;
+                        Event::dispatch(new ShouldDispatchAfterCommitTestEvent());
                     });
-                } catch (\Exception $e) {
-                    //
-                }
-            });
+
+                    throw new \Exception;
+                });
+            } catch (\Exception $e) {
+                //
+            }
+        });
 
         $this->assertFalse(ShouldDispatchAfterCommitTestEvent::$ran);
     }
