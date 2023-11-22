@@ -237,6 +237,9 @@ class PendingProcess
      * @param  array<array-key, string>|string|null  $command
      * @param  callable|null  $output
      * @return \Illuminate\Contracts\Process\ProcessResult
+     *
+     * @throws \Illuminate\Process\Exceptions\ProcessTimedOutException
+     * @throws \RuntimeException
      */
     public function run(array|string $command = null, callable $output = null)
     {
