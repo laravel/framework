@@ -18,6 +18,17 @@ class Number
     protected static $locale = 'en';
 
     /**
+     * Get a new numberable object from the given numeric value.
+     *
+     * @param  int|float  $string
+     * @return \Illuminate\Support\Numberable
+     */
+    public static function of($number)
+    {
+        return new Numberable($number);
+    }
+
+    /**
      * Format the given number according to the current locale.
      *
      * @param  int|float  $number
