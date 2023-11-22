@@ -136,15 +136,18 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
         return tap(new static(), fn ($file) => $file->allowedMimetypes = (array) $mimetypes);
     }
 
+
     /**
      * Limit the uploaded file to the given file extensions.
      *
      * @param  string|array<int, string>  $extensions
-     * @return static
+     * @return $this
      */
-    public static function extensions($extensions)
+    public function extensions($extensions)
     {
-        return tap(new static(), fn ($file) => $file->allowedExtensions = (array) $extensions);
+        $this->allowedExtensions = (array) $extensions;
+
+        return $this;
     }
 
     /**
@@ -274,7 +277,7 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
 
         $rules = array_merge($rules, $this->buildMimetypes());
 
-        if ($this->allowedExtensions) {
+        if (! empty($this->allowedExtensions)) {
             $rules[] = 'extensions:'.implode(',', array_map('strtolower', $this->allowedExtensions));
         }
 

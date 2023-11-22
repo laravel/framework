@@ -187,12 +187,12 @@ class Validator implements ValidatorContract
     protected $fileRules = [
         'Between',
         'Dimensions',
+        'Extensions',
         'File',
         'Image',
         'Max',
         'Mimes',
         'Mimetypes',
-        'Extensions',
         'Min',
         'Size',
     ];
