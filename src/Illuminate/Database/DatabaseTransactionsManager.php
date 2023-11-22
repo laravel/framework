@@ -46,23 +46,25 @@ class DatabaseTransactionsManager
     }
 
     /**
-     * Rollback the active database transaction.
+     * Move relevant pending transactions to a committed state.
      *
      * @param  string  $connection
-     * @param  int  $newTransactionLevel
+     * @param  int  $levelBeingCommitted
      * @return void
      */
-    public function rollback($connection, $newTransactionLevel)
+    public function stageTransactions($connection, $levelBeingCommitted)
     {
-        if ($newTransactionLevel === 0) {
-            $this->pendingTransactions = new Collection;
-            $this->committedTransactions = new Collection;
-        } else {
-            $this->pendingTransactions = $this->pendingTransactions->reject(
-                fn ($transaction) => $transaction->connection == $connection &&
-                                     $transaction->level > $newTransactionLevel
-            )->values();
-        }
+        $this->committedTransactions = $this->committedTransactions->merge(
+            $this->pendingTransactions->filter(
+                fn ($transaction) => $transaction->connection === $connection &&
+                                     $transaction->level >= $levelBeingCommitted
+            )
+        );
+
+        $this->pendingTransactions = $this->pendingTransactions->reject(
+            fn ($transaction) => $transaction->connection === $connection &&
+                                 $transaction->level >= $levelBeingCommitted
+        );
     }
 
     /**
@@ -83,6 +85,26 @@ class DatabaseTransactionsManager
     }
 
     /**
+     * Rollback the active database transaction.
+     *
+     * @param  string  $connection
+     * @param  int  $newTransactionLevel
+     * @return void
+     */
+    public function rollback($connection, $newTransactionLevel)
+    {
+        if ($newTransactionLevel === 0) {
+            $this->pendingTransactions = new Collection;
+            $this->committedTransactions = new Collection;
+        } else {
+            $this->pendingTransactions = $this->pendingTransactions->reject(
+                fn ($transaction) => $transaction->connection == $connection &&
+                                     $transaction->level > $newTransactionLevel
+            )->values();
+        }
+    }
+
+    /**
      * Register a transaction callback.
      *
      * @param  callable  $callback
@@ -95,28 +117,6 @@ class DatabaseTransactionsManager
         }
 
         $callback();
-    }
-
-    /**
-     * Move relevant pending transactions to a committed state.
-     *
-     * @param  string  $connection
-     * @param  int  $levelBeingCommitted
-     * @return void
-     */
-    public function stageTransactions($connection, $levelBeingCommitted)
-    {
-        $this->committedTransactions = $this->committedTransactions->merge(
-            $this->pendingTransactions->filter(
-                fn ($transaction) => $transaction->connection === $connection &&
-                                     $transaction->level >= $levelBeingCommitted
-            )
-        );
-
-        $this->pendingTransactions = $this->pendingTransactions->reject(
-            fn ($transaction) => $transaction->connection === $connection &&
-                                 $transaction->level >= $levelBeingCommitted
-        );
     }
 
     /**
