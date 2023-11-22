@@ -25,7 +25,7 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
     protected $allowedMimetypes = [];
 
     /**
-     * The extensions types that the given file should match.
+     * The extensions that the given file should match.
      *
      * @var array
      */

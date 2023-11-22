@@ -142,6 +142,18 @@ class ValidationFileRuleTest extends TestCase
             ['validation.extensions']
         );
 
+        $this->fails(
+            File::extensions('png'),
+            UploadedFile::fake()->createWithContent('foo.jpg', file_get_contents(__DIR__.'/fixtures/image.png')),
+            ['validation.extensions']
+        );
+
+        $this->fails(
+            File::extensions('jpeg'),
+            UploadedFile::fake()->createWithContent('foo.jpg', file_get_contents(__DIR__.'/fixtures/image.png')),
+            ['validation.extensions']
+        );
+
         $this->passes(
             File::extensions('png'),
             UploadedFile::fake()->createWithContent('foo.png', file_get_contents(__DIR__.'/fixtures/image.png')),
@@ -153,6 +165,12 @@ class ValidationFileRuleTest extends TestCase
         $this->fails(
             File::extensions(['png', 'jpeg', 'jpg']),
             UploadedFile::fake()->createWithContent('foo', file_get_contents(__DIR__.'/fixtures/image.png')),
+            ['validation.extensions']
+        );
+
+        $this->fails(
+            File::extensions(['png', 'jpeg']),
+            UploadedFile::fake()->createWithContent('foo.jpg', file_get_contents(__DIR__.'/fixtures/image.png')),
             ['validation.extensions']
         );
 
