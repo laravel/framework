@@ -191,11 +191,14 @@ class FilesystemAdapterTest extends TestCase
         $this->assertSame(['foo' => 'bar'], $filesystemAdapter->json('file.json'));
     }
 
-    public function testJsonReturnsDecodedUnassociativeJsonData()
+    public function testJsonReturnsDecodedObjectJsonData()
     {
         $this->filesystem->write('file.json', '[{"foo": "bar"}, {"bar": "foo"}]');
         $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
-        $this->assertSame([['foo' => 'bar'], ['bar' => 'foo']], $filesystemAdapter->json('file.json'));
+        $this->assertEquals(
+            [(object) ['foo' => 'bar'], (object) ['bar' => 'foo']],
+            $filesystemAdapter->json('file.json', associative: false)
+        );
     }
 
     public function testJsonReturnsNullIfJsonDataIsInvalid()
