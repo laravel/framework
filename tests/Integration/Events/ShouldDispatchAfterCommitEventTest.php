@@ -215,6 +215,31 @@ class ShouldDispatchAfterCommitEventTest extends TestCase
 
         $this->assertFalse(ShouldDispatchAfterCommitTestEvent::$ran);
     }
+
+    public function testItHandlesNestedTransactionsWhereTheSecondOneFails2()
+    {
+        Event::listen(ShouldDispatchAfterCommitTestEvent::class, ShouldDispatchAfterCommitListener::class);
+        Event::listen(AnotherShouldDispatchAfterCommitTestEvent::class, AnotherShouldDispatchAfterCommitListener::class);
+
+        DB::transaction(function () { // lv 1
+            DB::transaction(function () { // lv 2
+                DB::transaction(fn () => Event::dispatch(new ShouldDispatchAfterCommitTestEvent()));
+                 // lv 2
+            });
+
+            try {
+                DB::transaction(function () { // lv 2
+                    // This event should not be dispatched since the transaction is going to fail.
+                    Event::dispatch(new AnotherShouldDispatchAfterCommitTestEvent);
+                    throw new \Exception;
+                });
+            } catch (\Exception $e) {
+            }
+        });
+
+        $this->assertTrue(ShouldDispatchAfterCommitTestEvent::$ran);
+        $this->assertFalse(AnotherShouldDispatchAfterCommitTestEvent::$ran);
+    }
 }
 
 class TransactionUnawareTestEvent
