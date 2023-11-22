@@ -136,7 +136,6 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
         return tap(new static(), fn ($file) => $file->allowedMimetypes = (array) $mimetypes);
     }
 
-
     /**
      * Limit the uploaded file to the given file extensions.
      *
