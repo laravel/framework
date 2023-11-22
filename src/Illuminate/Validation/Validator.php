@@ -192,6 +192,7 @@ class Validator implements ValidatorContract
         'Max',
         'Mimes',
         'Mimetypes',
+        'Extensions',
         'Min',
         'Size',
     ];

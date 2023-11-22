@@ -358,6 +358,20 @@ trait ReplacesAttributes
     }
 
     /**
+     * Replace all place-holders for the extensions rule.
+     *
+     * @param  string  $message
+     * @param  string  $attribute
+     * @param  string  $rule
+     * @param  array<int,string>  $parameters
+     * @return string
+     */
+    protected function replaceExtensions($message, $attribute, $rule, $parameters)
+    {
+        return str_replace(':values', implode(', ', $parameters), $message);
+    }
+
+    /**
      * Replace all place-holders for the present_if rule.
      *
      * @param  string  $message

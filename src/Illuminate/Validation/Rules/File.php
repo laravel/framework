@@ -25,6 +25,13 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
     protected $allowedMimetypes = [];
 
     /**
+     * The extensions types that the given file should match.
+     *
+     * @var array
+     */
+    protected $allowedExtensions = [];
+
+    /**
      * The minimum size in kilobytes that the file can be.
      *
      * @var null|int
@@ -127,6 +134,17 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
     public static function types($mimetypes)
     {
         return tap(new static(), fn ($file) => $file->allowedMimetypes = (array) $mimetypes);
+    }
+
+    /**
+     * Limit the uploaded file to the given file extensions.
+     *
+     * @param  string|array<int, string>  $extensions
+     * @return static
+     */
+    public static function extensions($extensions)
+    {
+        return tap(new static(), fn ($file) => $file->allowedExtensions = (array) $extensions);
     }
 
     /**
@@ -255,6 +273,10 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
         $rules = ['file'];
 
         $rules = array_merge($rules, $this->buildMimetypes());
+
+        if ($this->allowedExtensions) {
+            $rules[] = 'extensions:'.implode(',', array_map('strtolower', $this->allowedExtensions));
+        }
 
         $rules[] = match (true) {
             is_null($this->minimumFileSize) && is_null($this->maximumFileSize) => null,
