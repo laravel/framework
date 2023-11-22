@@ -92,19 +92,21 @@ class DatabaseTransactionsManager
     }
 
     /**
-     * Move all the pending transactions to a committed state.
+     * Move relevant pending transactions to a committed state.
      *
      * @param  string  $connection
      * @return void
      */
-    public function stageTransactions($connection)
+    public function stageTransactions($connection, $level)
     {
         $this->committedTransactions = $this->committedTransactions->merge(
-            $this->pendingTransactions->filter(fn ($transaction) => $transaction->connection === $connection)
+            $this->pendingTransactions->filter(
+                fn ($transaction) => $transaction->connection === $connection && $transaction->level >= $level
+            )
         );
 
         $this->pendingTransactions = $this->pendingTransactions->reject(
-            fn ($transaction) => $transaction->connection === $connection
+            fn ($transaction) => $transaction->connection === $connection && $transaction->level >= $level
         );
     }
 

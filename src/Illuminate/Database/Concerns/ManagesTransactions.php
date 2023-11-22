@@ -47,7 +47,7 @@ trait ManagesTransactions
                     $this->getPdo()->commit();
                 }
 
-                $this->transactionsManager?->stageTransactions($this->getName());
+                $this->transactionsManager?->stageTransactions($this->getName(), $this->transactions);
 
                 $this->transactions = max(0, $this->transactions - 1);
 
@@ -196,7 +196,7 @@ trait ManagesTransactions
             $this->getPdo()->commit();
         }
 
-        $this->transactionsManager?->stageTransactions($this->getName());
+        $this->transactionsManager?->stageTransactions($this->getName(), $this->transactions);
 
         $this->transactions = max(0, $this->transactions - 1);
 

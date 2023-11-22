@@ -67,8 +67,8 @@ class DatabaseTransactionsManagerTest extends TestCase
         $manager->begin('default', 2);
         $manager->begin('admin', 1);
 
-        $manager->stageTransactions('default');
-        $manager->stageTransactions('admin');
+        $manager->stageTransactions('default', 1);
+        $manager->stageTransactions('admin', 1);
         $manager->commit('default');
 
         $this->assertCount(0, $manager->getPendingTransactions());
@@ -121,7 +121,7 @@ class DatabaseTransactionsManagerTest extends TestCase
 
         $manager->begin('admin', 1);
 
-        $manager->stageTransactions('default');
+        $manager->stageTransactions('default', 1);
         $manager->commit('default');
 
         $this->assertCount(2, $callbacks);
@@ -148,7 +148,7 @@ class DatabaseTransactionsManagerTest extends TestCase
             $callbacks[] = ['admin', 1];
         });
 
-        $manager->stageTransactions('default');
+        $manager->stageTransactions('default', 1);
         $manager->commit('default');
 
         $this->assertCount(1, $callbacks);
@@ -185,16 +185,29 @@ class DatabaseTransactionsManagerTest extends TestCase
         $this->assertEquals(1, $pendingTransactions[1]->level);
         $this->assertEquals('admin', $pendingTransactions[1]->connection);
 
-        $manager->stageTransactions('default');
+        $manager->stageTransactions('default', 1);
 
         $this->assertCount(1, $manager->getPendingTransactions());
         $this->assertCount(1, $manager->getCommittedTransactions());
         $this->assertEquals('default', $manager->getCommittedTransactions()[0]->connection);
 
-        $manager->stageTransactions('admin');
+        $manager->stageTransactions('admin', 1);
 
         $this->assertCount(0, $manager->getPendingTransactions());
         $this->assertCount(2, $manager->getCommittedTransactions());
         $this->assertEquals('admin', $manager->getCommittedTransactions()[1]->connection);
+    }
+
+    public function testStageTransactionsOnlyStagesTheTransactionsAtOrAboveTheGivenLevel()
+    {
+        $manager = (new DatabaseTransactionsManager);
+
+        $manager->begin('default', 1);
+        $manager->begin('default', 2);
+        $manager->begin('default', 3);
+        $manager->stageTransactions('default', 2);
+
+        $this->assertCount(1, $manager->getPendingTransactions());
+        $this->assertCount(2, $manager->getCommittedTransactions());
     }
 }
