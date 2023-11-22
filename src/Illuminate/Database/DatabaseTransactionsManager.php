@@ -49,13 +49,14 @@ class DatabaseTransactionsManager
      * Rollback the active database transaction.
      *
      * @param  string  $connection
-     * @param  int  $level
+     * @param  int  $newTransactionLevel
      * @return void
      */
-    public function rollback($connection, $level)
+    public function rollback($connection, $newTransactionLevel)
     {
         $this->pendingTransactions = $this->pendingTransactions->reject(
-            fn ($transaction) => $transaction->connection == $connection && $transaction->level > $level
+            fn ($transaction) => $transaction->connection == $connection &&
+                                 $transaction->level > $newTransactionLevel
         )->values();
     }
 
@@ -95,18 +96,21 @@ class DatabaseTransactionsManager
      * Move relevant pending transactions to a committed state.
      *
      * @param  string  $connection
+     * @param  int  $levelBeingCommitted
      * @return void
      */
-    public function stageTransactions($connection, $level)
+    public function stageTransactions($connection, $levelBeingCommitted)
     {
         $this->committedTransactions = $this->committedTransactions->merge(
             $this->pendingTransactions->filter(
-                fn ($transaction) => $transaction->connection === $connection && $transaction->level >= $level
+                fn ($transaction) => $transaction->connection === $connection &&
+                                     $transaction->level >= $levelBeingCommitted
             )
         );
 
         $this->pendingTransactions = $this->pendingTransactions->reject(
-            fn ($transaction) => $transaction->connection === $connection && $transaction->level >= $level
+            fn ($transaction) => $transaction->connection === $connection &&
+                                 $transaction->level >= $levelBeingCommitted
         );
     }
 
