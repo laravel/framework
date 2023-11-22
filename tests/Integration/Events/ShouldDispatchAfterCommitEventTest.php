@@ -216,7 +216,7 @@ class ShouldDispatchAfterCommitEventTest extends TestCase
         $this->assertFalse(ShouldDispatchAfterCommitTestEvent::$ran);
     }
 
-    public function testComplexTransactionCommittingAndFailures()
+    public function testItHandlesFailuresWithTransactionsTwoLevelsHigher()
     {
         Event::listen(ShouldDispatchAfterCommitTestEvent::class, ShouldDispatchAfterCommitListener::class);
         Event::listen(AnotherShouldDispatchAfterCommitTestEvent::class, AnotherShouldDispatchAfterCommitListener::class);
