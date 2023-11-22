@@ -136,6 +136,7 @@ class DatabaseTransactionsManager
     protected function removeCommittedTransactionsThatAreChildrenOf(DatabaseTransactionRecord $transaction)
     {
         $this->committedTransactions = $this->committedTransactions->reject(fn ($committed) =>
+            $committed->connection == $transaction->connection &&
             $committed->parent === $transaction
         );
     }
