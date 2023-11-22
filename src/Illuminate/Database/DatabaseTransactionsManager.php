@@ -20,6 +20,8 @@ class DatabaseTransactionsManager
      */
     protected $pendingTransactions;
 
+    protected $currentTransaction;
+
     /**
      * Create a new database transactions manager instance.
      *
@@ -41,8 +43,10 @@ class DatabaseTransactionsManager
     public function begin($connection, $level)
     {
         $this->pendingTransactions->push(
-            new DatabaseTransactionRecord($connection, $level)
+            $newTransaction = new DatabaseTransactionRecord($connection, $level, $this->currentTransaction)
         );
+
+        $this->currentTransaction = $newTransaction;
     }
 
     /**
@@ -65,16 +69,25 @@ class DatabaseTransactionsManager
             fn ($transaction) => $transaction->connection === $connection &&
                                  $transaction->level >= $levelBeingCommitted
         );
+
+        $this->currentTransaction = $this->currentTransaction->parent;
     }
 
     /**
-     * Commit the active database transaction.
+     * Commit the root database transaction and execute callbacks.
      *
      * @param  string  $connection
      * @return void
      */
     public function commit($connection)
     {
+        // This method is only called when the root database transaction is committed so there
+        // shouldn't be any pending transactions, but going to clear them here anyways just
+        // in case. This method could be refactored to receive a level in the future too.
+        $this->pendingTransactions = $this->pendingTransactions->reject(
+            fn ($transaction) => $transaction->connection === $connection
+        )->values();
+
         [$forThisConnection, $forOtherConnections] = $this->committedTransactions->partition(
             fn ($transaction) => $transaction->connection == $connection
         );
@@ -96,12 +109,35 @@ class DatabaseTransactionsManager
         if ($newTransactionLevel === 0) {
             $this->pendingTransactions = new Collection;
             $this->committedTransactions = new Collection;
+
+            $this->currentTransaction = null;
         } else {
             $this->pendingTransactions = $this->pendingTransactions->reject(
                 fn ($transaction) => $transaction->connection == $connection &&
                                      $transaction->level > $newTransactionLevel
             )->values();
+
+            if ($this->currentTransaction) {
+                do {
+                    $this->removeCommittedTransactionsThatAreChildrenOf($this->currentTransaction);
+
+                    $this->currentTransaction = $this->currentTransaction->parent;
+                } while ($this->currentTransaction && $this->currentTransaction->level > $newTransactionLevel);
+            }
         }
+    }
+
+    /**
+     * Remove all transactions that are children of the given transaction.
+     *
+     * @param  \Illuminate\Database\DatabaseTransactionRecord  $transaction
+     * @return void
+     */
+    protected function removeCommittedTransactionsThatAreChildrenOf(DatabaseTransactionRecord $transaction)
+    {
+        $this->committedTransactions = $this->committedTransactions->reject(fn ($committed) =>
+            $committed->parent === $transaction
+        );
     }
 
     /**
