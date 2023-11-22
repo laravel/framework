@@ -103,13 +103,18 @@ class Number
      * @param  int|float  $number
      * @param  string  $in
      * @param  ?string  $locale
+     * @param  bool  $withCents
      * @return string|false
      */
-    public static function currency(int|float $number, string $in = 'USD', ?string $locale = null)
+    public static function currency(int|float $number, string $in = 'USD', ?string $locale = null, bool $withCents = true)
     {
         static::ensureIntlExtensionIsInstalled();
 
         $formatter = new NumberFormatter($locale ?? static::$locale, NumberFormatter::CURRENCY);
+
+        if (!$withCents) {
+            $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, 0);
+        }
 
         return $formatter->formatCurrency($number, $in);
     }
