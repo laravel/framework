@@ -123,21 +123,16 @@ class SupportNumberTest extends TestCase
         $this->assertSame('$5.32', Number::currency(5.325));
     }
 
-    public function testToCurrencyWithoutCents()
+    public function testToCurrencyWithPrecision()
     {
         $this->needsIntlExtension();
 
-        $this->assertSame('$0', Number::currency(0, withCents: false));
-        $this->assertSame('$1', Number::currency(1, withCents: false));
-        $this->assertSame('$10', Number::currency(10, withCents: false));
+        $this->assertSame('$0', Number::currency(0, precision: 0));
+        $this->assertSame('$2', Number::currency(1.50, precision: 0));
 
-        $this->assertSame('€0', Number::currency(0, 'EUR', withCents: false));
-        $this->assertSame('€1', Number::currency(1, 'EUR', withCents: false));
-        $this->assertSame('€10', Number::currency(10, 'EUR', withCents: false));
-
-        $this->assertSame('-$5', Number::currency(-5, withCents: false));
-        $this->assertSame('$5', Number::currency(5.00, withCents: false));
-        $this->assertSame('$5', Number::currency(5.325, withCents: false));
+        $this->assertSame('-$2', Number::currency(-1.75, precision: 0));
+        $this->assertSame('$5', Number::currency(5.00, precision: 0));
+        $this->assertSame('$5', Number::currency(5.325, precision: 0));
     }
 
     public function testToCurrencyWithDifferentLocale()
