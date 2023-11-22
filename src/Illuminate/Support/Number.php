@@ -23,7 +23,7 @@ class Number
      * @param  int|float  $number
      * @param  int|null  $precision
      * @param  int|null  $maxPrecision
-     * @param  ?string  $locale
+     * @param  string|null  $locale
      * @return string|false
      */
     public static function format(int|float $number, ?int $precision = null, ?int $maxPrecision = null, ?string $locale = null)
@@ -45,7 +45,7 @@ class Number
      * Spell out the given number in the given locale.
      *
      * @param  int|float  $number
-     * @param  ?string  $locale
+     * @param  string|null  $locale
      * @return string
      */
     public static function spell(int|float $number, ?string $locale = null)
@@ -61,7 +61,7 @@ class Number
      * Convert the given number to ordinal form.
      *
      * @param  int|float  $number
-     * @param  ?string  $locale
+     * @param  string|null  $locale
      * @return string
      */
     public static function ordinal(int|float $number, ?string $locale = null)
@@ -79,7 +79,7 @@ class Number
      * @param  int|float  $number
      * @param  int  $precision
      * @param  int|null  $maxPrecision
-     * @param  ?string  $locale
+     * @param  string|null  $locale
      * @return string|false
      */
     public static function percentage(int|float $number, int $precision = 0, ?int $maxPrecision = null, ?string $locale = null)
@@ -102,7 +102,7 @@ class Number
      *
      * @param  int|float  $number
      * @param  string  $in
-     * @param  ?string  $locale
+     * @param  string|null  $locale
      * @return string|false
      */
     public static function currency(int|float $number, string $in = 'USD', ?string $locale = null)
