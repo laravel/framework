@@ -195,7 +195,7 @@ public function testItHandlesNestedTransactionsWhereTheSecondOneFails()
         $this->assertFalse(AnotherShouldDispatchAfterCommitTestEvent::$ran);
     }
 
-    public function testItHandlesDeeplyNestedTransactions()
+    public function testChildCallbacksShouldNotBeDispatchedIfTheirParentFails()
     {
         Event::listen(ShouldDispatchAfterCommitTestEvent::class, ShouldDispatchAfterCommitListener::class);
 
