@@ -208,6 +208,52 @@ class SupportNumberTest extends TestCase
         $this->assertSame('-1 thousand quadrillion', Number::forHumans(-1000000000000000000));
     }
 
+    public function testMicroseconds()
+    {
+        $this->assertSame(0, Number::microseconds());
+        $this->assertSame(1000, Number::microseconds(milliseconds: 1));
+        $this->assertSame(1000000, Number::microseconds(seconds: 1));
+        $this->assertSame(60000000, Number::microseconds(minutes: 1));
+        $this->assertSame(3600000000, Number::microseconds(hours: 1));
+        $this->assertSame(86400000000, Number::microseconds(days: 1));
+        $this->assertSame(604800000000, Number::microseconds(weeks: 1));
+        $this->assertSame(31536000000000, Number::microseconds(years: 1));
+        $this->assertSame(32230861001000, Number::microseconds(milliseconds: 1, seconds: 1, minutes: 1, hours: 1, days: 1, weeks: 1, years: 1));
+    }
+
+    public function testMilliseconds()
+    {
+        $this->assertSame(0, Number::milliseconds());
+        $this->assertSame(1000, Number::milliseconds(seconds: 1));
+        $this->assertSame(60000, Number::milliseconds(minutes: 1));
+        $this->assertSame(3600000, Number::milliseconds(hours: 1));
+        $this->assertSame(86400000, Number::milliseconds(days: 1));
+        $this->assertSame(604800000, Number::milliseconds(weeks: 1));
+        $this->assertSame(31536000000, Number::milliseconds(years: 1));
+        $this->assertSame(32230861000, Number::milliseconds(seconds: 1, minutes: 1, hours: 1, days: 1, weeks: 1, years: 1));
+    }
+
+    public function testSeconds()
+    {
+        $this->assertSame(0, Number::seconds());
+        $this->assertSame(60, Number::seconds(minutes: 1));
+        $this->assertSame(3600, Number::seconds(hours: 1));
+        $this->assertSame(86400, Number::seconds(days: 1));
+        $this->assertSame(604800, Number::seconds(weeks: 1));
+        $this->assertSame(31536000, Number::seconds(years: 1));
+        $this->assertSame(32230860, Number::seconds(minutes: 1, hours: 1, days: 1, weeks: 1, years: 1));
+    }
+
+    public function testMinutes()
+    {
+        $this->assertSame(0, Number::minutes());
+        $this->assertSame(60, Number::minutes(hours: 1));
+        $this->assertSame(1440, Number::minutes(days: 1));
+        $this->assertSame(10080, Number::minutes(weeks: 1));
+        $this->assertSame(525600, Number::minutes(years: 1));
+        $this->assertSame(537180, Number::minutes(hours: 1, days: 1, weeks: 1, years: 1));
+    }
+
     protected function needsIntlExtension()
     {
         if (! extension_loaded('intl')) {

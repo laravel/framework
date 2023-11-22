@@ -168,6 +168,100 @@ class Number
     }
 
     /**
+     * Convert the given time units to microseconds.
+     *
+     * @param  int|float  $milliseconds
+     * @param  int|float  $seconds
+     * @param  int|float  $minutes
+     * @param  int|float  $hours
+     * @param  int|float  $days
+     * @param  int|float  $weeks
+     * @param  int|float  $years
+     * @return float|int
+     */
+    public static function microseconds(
+        int|float $milliseconds = 0,
+        int|float $seconds = 0,
+        int|float $minutes = 0,
+        int|float $hours = 0,
+        int|float $days = 0,
+        int|float $weeks = 0,
+        int|float $years = 0
+    ) {
+        $milliseconds += static::milliseconds($seconds, $minutes, $hours, $days, $weeks, $years);
+
+        return $milliseconds * 1000;
+    }
+
+    /**
+     * Convert the given time units to milliseconds.
+     *
+     * @param  int|float  $seconds
+     * @param  int|float  $minutes
+     * @param  int|float  $hours
+     * @param  int|float  $days
+     * @param  int|float  $weeks
+     * @param  int|float  $years
+     * @return float|int
+     */
+    public static function milliseconds(
+        int|float $seconds = 0,
+        int|float $minutes = 0,
+        int|float $hours = 0,
+        int|float $days = 0,
+        int|float $weeks = 0,
+        int|float $years = 0
+    ) {
+        $seconds += static::seconds($minutes, $hours, $days, $weeks, $years);
+
+        return $seconds * 1000;
+    }
+
+    /**
+     * Convert the given time units to seconds.
+     *
+     * @param  int|float  $minutes
+     * @param  int|float  $hours
+     * @param  int|float  $days
+     * @param  int|float  $weeks
+     * @param  int|float  $years
+     * @return float|int
+     */
+    public static function seconds(
+        int|float $minutes = 0,
+        int|float $hours = 0,
+        int|float $days = 0,
+        int|float $weeks = 0,
+        int|float $years = 0
+    ) {
+        $minutes += static::minutes($hours, $days, $weeks, $years);
+
+        return $minutes * 60;
+    }
+
+    /**
+     * Convert the given time units to minutes.
+     *
+     * @param  int|float  $hours
+     * @param  int|float  $days
+     * @param  int|float  $weeks
+     * @param  int|float  $years
+     * @return float|int
+     */
+    public static function minutes(
+        int|float $hours = 0,
+        int|float $days = 0,
+        int|float $weeks = 0,
+        int|float $years = 0
+    ) {
+        $days += $years * 365;
+        $days += $weeks * 7;
+        $hours += $days * 24;
+
+        return $hours * 60;
+    }
+
+    /**
      * Execute the given callback using the given locale.
      *
      * @param  string  $locale
