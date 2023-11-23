@@ -42,8 +42,8 @@ class DatabaseTransactionsManagerTest extends TestCase
 
         $this->assertFalse($testObject->ran);
 
-        $manager->stageTransactions('foo', 1);
-        $manager->commit('foo');
+        $manager->commit('foo', 2, 1);
+        $manager->commit('foo', 1, 0);
         $this->assertTrue($testObject->ran);
         $this->assertEquals(1, $testObject->runs);
     }

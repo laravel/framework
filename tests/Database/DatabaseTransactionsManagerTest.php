@@ -66,16 +66,24 @@ class DatabaseTransactionsManagerTest extends TestCase
         $manager->begin('default', 1);
         $manager->begin('default', 2);
         $manager->begin('admin', 1);
+        $manager->begin('admin', 2);
 
-        $manager->stageTransactions('default', 1);
-        $manager->stageTransactions('admin', 1);
-        $manager->commit('default');
+        $manager->commit('default', 2, 1);
+        $executedTransactions = $manager->commit('default', 1, 0);
 
-        $this->assertCount(0, $manager->getPendingTransactions());
-        $this->assertCount(1, $manager->getCommittedTransactions());
+        $executedAdminTransactions = $manager->commit('admin', 2, 1);
 
+        $this->assertCount(1, $manager->getPendingTransactions()); // One pending "admin" transaction left...
+        $this->assertCount(2, $executedTransactions); // Two committed tranasctions on "default"
+        $this->assertCount(0, $executedAdminTransactions); // Zero executed committed tranasctions on "default"
+
+        // Level 2 "admin" callback has been staged...
         $this->assertSame('admin', $manager->getCommittedTransactions()[0]->connection);
-        $this->assertEquals(1, $manager->getCommittedTransactions()[0]->level);
+        $this->assertEquals(2, $manager->getCommittedTransactions()[0]->level);
+
+        // Level 1 "admin" callback still pending...
+        $this->assertSame('admin', $manager->getPendingTransactions()[0]->connection);
+        $this->assertEquals(1, $manager->getPendingTransactions()[0]->level);
     }
 
     public function testCallbacksAreAddedToTheCurrentTransaction()
@@ -121,12 +129,12 @@ class DatabaseTransactionsManagerTest extends TestCase
 
         $manager->begin('admin', 1);
 
-        $manager->stageTransactions('default', 1);
-        $manager->commit('default');
+        $manager->commit('default', 2, 1);
+        $manager->commit('default', 1, 0);
 
         $this->assertCount(2, $callbacks);
-        $this->assertEquals(['default', 1], $callbacks[0]);
-        $this->assertEquals(['default', 2], $callbacks[1]);
+        $this->assertEquals(['default', 2], $callbacks[0]);
+        $this->assertEquals(['default', 1], $callbacks[1]);
     }
 
     public function testCommittingExecutesOnlyCallbacksOfTheConnection()
@@ -148,8 +156,8 @@ class DatabaseTransactionsManagerTest extends TestCase
             $callbacks[] = ['admin', 1];
         });
 
-        $manager->stageTransactions('default', 1);
-        $manager->commit('default');
+        $manager->commit('default', 2, 1);
+        $manager->commit('default', 1, 0);
 
         $this->assertCount(1, $callbacks);
         $this->assertEquals(['default', 1], $callbacks[0]);

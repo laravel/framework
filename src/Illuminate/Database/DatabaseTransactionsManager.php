@@ -59,6 +59,45 @@ class DatabaseTransactionsManager
     }
 
     /**
+     * Commit the root database transaction and execute callbacks.
+     *
+     * @param  string  $connection
+     * @param  int  $levelBeingCommitted
+     * @param  int  $newTransactionLevel
+     * @return array
+     */
+    public function commit($connection, $levelBeingCommitted, $newTransactionLevel)
+    {
+        $this->stageTransactions($connection, $levelBeingCommitted);
+
+        if (isset($this->currentTransaction[$connection])) {
+            $this->currentTransaction[$connection] = $this->currentTransaction[$connection]->parent;
+        }
+
+        if (! $this->afterCommitCallbacksShouldBeExecuted($newTransactionLevel) &&
+            $newTransactionLevel !== 0) {
+            return [];
+        }
+
+        // This method is only called when the root database transaction is committed so there
+        // shouldn't be any pending transactions, but going to clear them here anyways just
+        // in case. This method could be refactored to receive a level in the future too.
+        $this->pendingTransactions = $this->pendingTransactions->reject(
+            fn ($transaction) => $transaction->connection === $connection
+        )->values();
+
+        [$forThisConnection, $forOtherConnections] = $this->committedTransactions->partition(
+            fn ($transaction) => $transaction->connection == $connection
+        );
+
+        $this->committedTransactions = $forOtherConnections->values();
+
+        $forThisConnection->map->executeCallbacks();
+
+        return $forThisConnection;
+    }
+
+    /**
      * Move relevant pending transactions to a committed state.
      *
      * @param  string  $connection
@@ -78,34 +117,6 @@ class DatabaseTransactionsManager
             fn ($transaction) => $transaction->connection === $connection &&
                                  $transaction->level >= $levelBeingCommitted
         );
-
-        if (isset($this->currentTransaction[$connection])) {
-            $this->currentTransaction[$connection] = $this->currentTransaction[$connection]->parent;
-        }
-    }
-
-    /**
-     * Commit the root database transaction and execute callbacks.
-     *
-     * @param  string  $connection
-     * @return void
-     */
-    public function commit($connection)
-    {
-        // This method is only called when the root database transaction is committed so there
-        // shouldn't be any pending transactions, but going to clear them here anyways just
-        // in case. This method could be refactored to receive a level in the future too.
-        $this->pendingTransactions = $this->pendingTransactions->reject(
-            fn ($transaction) => $transaction->connection === $connection
-        )->values();
-
-        [$forThisConnection, $forOtherConnections] = $this->committedTransactions->partition(
-            fn ($transaction) => $transaction->connection == $connection
-        );
-
-        $this->committedTransactions = $forOtherConnections->values();
-
-        $forThisConnection->map->executeCallbacks();
     }
 
     /**
