@@ -1021,7 +1021,7 @@ trait EnumeratesValues
         }
 
         return match (true) {
-            $items instanceof WeakMap => throw new InvalidArgumentException('Unable to resolve array from instance of WeakMap.'),
+            $items instanceof WeakMap => throw new InvalidArgumentException('Collections can not be created using instances of WeakMap.'),
             $items instanceof Enumerable => $items->all(),
             $items instanceof Arrayable => $items->toArray(),
             $items instanceof Traversable => iterator_to_array($items),
