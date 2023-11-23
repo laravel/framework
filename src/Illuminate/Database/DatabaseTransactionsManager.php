@@ -118,15 +118,7 @@ class DatabaseTransactionsManager
     public function rollback($connection, $newTransactionLevel)
     {
         if ($newTransactionLevel === 0) {
-            $this->pendingTransactions = $this->pendingTransactions->reject(
-                fn ($transaction) => $transaction->connection == $connection
-            );
-
-            $this->committedTransactions = $this->committedTransactions->reject(
-                fn ($transaction) => $transaction->connection == $connection
-            );
-
-            $this->currentTransaction[$connection] = null;
+            $this->removeAllTransactionsForConnection($connection);
         } else {
             $this->pendingTransactions = $this->pendingTransactions->reject(
                 fn ($transaction) => $transaction->connection == $connection &&
@@ -144,6 +136,25 @@ class DatabaseTransactionsManager
     }
 
     /**
+     * Remove all pending, completed, and current transactions for the given connection name.
+     *
+     * @param  string  $connection
+     * @return void
+     */
+    protected function removeAllTransactionsForConnection($connection)
+    {
+        $this->currentTransaction[$connection] = null;
+
+        $this->pendingTransactions = $this->pendingTransactions->reject(
+            fn ($transaction) => $transaction->connection == $connection
+        )->values();
+
+        $this->committedTransactions = $this->committedTransactions->reject(
+            fn ($transaction) => $transaction->connection == $connection
+        )->values();
+    }
+
+    /**
      * Remove all transactions that are children of the given transaction.
      *
      * @param  \Illuminate\Database\DatabaseTransactionRecord  $transaction
@@ -154,7 +165,7 @@ class DatabaseTransactionsManager
         $this->committedTransactions = $this->committedTransactions->reject(fn ($committed) =>
             $committed->connection == $transaction->connection &&
             $committed->parent === $transaction
-        );
+        )->values();
     }
 
     /**
