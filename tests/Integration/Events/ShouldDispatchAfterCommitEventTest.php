@@ -130,6 +130,139 @@ class ShouldDispatchAfterCommitEventTest extends TestCase
         $this->assertTrue(ShouldDispatchAfterCommitTestEvent::$ran);
         $this->assertTrue(AnotherShouldDispatchAfterCommitTestEvent::$ran);
     }
+
+    public function testItDoesNotDispatchAfterCommitEventsImmediatelyIfASiblingTransactionIsCommittedFirst()
+    {
+        Event::listen(ShouldDispatchAfterCommitTestEvent::class, ShouldDispatchAfterCommitListener::class);
+
+        DB::transaction(function () {
+            DB::transaction(function () {
+            });
+
+            Event::dispatch(new ShouldDispatchAfterCommitTestEvent);
+
+            $this->assertFalse(ShouldDispatchAfterCommitTestEvent::$ran);
+        });
+
+        $this->assertTrue(ShouldDispatchAfterCommitTestEvent::$ran);
+    }
+
+    public function testChildEventsAreNotDispatchedIfParentTransactionFails()
+    {
+        Event::listen(ShouldDispatchAfterCommitTestEvent::class, ShouldDispatchAfterCommitListener::class);
+
+        try {
+            DB::transaction(function () {
+                DB::transaction(function () {
+                    Event::dispatch(new ShouldDispatchAfterCommitTestEvent);
+                });
+
+                $this->assertFalse(ShouldDispatchAfterCommitTestEvent::$ran);
+
+                throw new \Exception;
+            });
+        } catch (\Exception $e) {
+            //
+        }
+
+        DB::transaction(fn () => true);
+
+        // Should not have ran because parent transaction failed...
+        $this->assertFalse(ShouldDispatchAfterCommitTestEvent::$ran);
+    }
+
+    public function testItHandlesNestedTransactionsWhereTheSecondOneFails()
+    {
+        Event::listen(ShouldDispatchAfterCommitTestEvent::class, ShouldDispatchAfterCommitListener::class);
+        Event::listen(AnotherShouldDispatchAfterCommitTestEvent::class, AnotherShouldDispatchAfterCommitListener::class);
+
+        DB::transaction(function () {
+            DB::transaction(function () {
+                Event::dispatch(new ShouldDispatchAfterCommitTestEvent());
+            });
+
+            try {
+                DB::transaction(function () {
+                    // This event should not be dispatched since the transaction is going to fail.
+                    Event::dispatch(new AnotherShouldDispatchAfterCommitTestEvent);
+                    throw new \Exception;
+                });
+            } catch (\Exception $e) {
+            }
+        });
+
+        $this->assertTrue(ShouldDispatchAfterCommitTestEvent::$ran);
+        $this->assertFalse(AnotherShouldDispatchAfterCommitTestEvent::$ran);
+    }
+
+    public function testChildCallbacksShouldNotBeDispatchedIfTheirParentFails()
+    {
+        Event::listen(ShouldDispatchAfterCommitTestEvent::class, ShouldDispatchAfterCommitListener::class);
+
+        DB::transaction(function () {
+            try {
+                DB::transaction(function () {
+                    DB::transaction(function () {
+                        Event::dispatch(new ShouldDispatchAfterCommitTestEvent());
+                    });
+
+                    throw new \Exception;
+                });
+            } catch (\Exception $e) {
+                //
+            }
+        });
+
+        $this->assertFalse(ShouldDispatchAfterCommitTestEvent::$ran);
+    }
+
+    public function testItHandlesFailuresWithTransactionsTwoLevelsHigher()
+    {
+        Event::listen(ShouldDispatchAfterCommitTestEvent::class, ShouldDispatchAfterCommitListener::class);
+        Event::listen(AnotherShouldDispatchAfterCommitTestEvent::class, AnotherShouldDispatchAfterCommitListener::class);
+
+        DB::transaction(function () { // lv 1
+            DB::transaction(function () { // lv 2
+                DB::transaction(fn () => Event::dispatch(new ShouldDispatchAfterCommitTestEvent()));
+                 // lv 2
+            });
+
+            try {
+                DB::transaction(function () { // lv 2
+                    // This event should not be dispatched since the transaction is going to fail.
+                    Event::dispatch(new AnotherShouldDispatchAfterCommitTestEvent);
+                    throw new \Exception;
+                });
+            } catch (\Exception $e) {
+            }
+        });
+
+        $this->assertTrue(ShouldDispatchAfterCommitTestEvent::$ran);
+        $this->assertFalse(AnotherShouldDispatchAfterCommitTestEvent::$ran);
+    }
+
+    public function testCommittedTransactionThatWasDeeplyNestedIsRemovedIfTopLevelFails()
+    {
+        Event::listen(ShouldDispatchAfterCommitTestEvent::class, ShouldDispatchAfterCommitListener::class);
+
+        DB::transaction(function () {
+            try {
+                DB::transaction(function () {
+                    DB::transaction(function () {
+                        DB::transaction(function () {
+                            DB::transaction(fn () => Event::dispatch(new ShouldDispatchAfterCommitTestEvent()));
+                        });
+                    });
+
+                    throw new \Exception;
+                });
+            } catch (\Exception $e) {
+
+            }
+        });
+
+        $this->assertFalse(ShouldDispatchAfterCommitTestEvent::$ran);
+    }
 }
 
 class TransactionUnawareTestEvent
