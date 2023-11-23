@@ -125,10 +125,10 @@ class ShouldDispatchAfterCommitEventTest extends TestCase
 
         DB::transaction(function () {
             DB::afterCommit(function () {
-            // The main difference with this test is that we dispatch an event on the parent transaction
-            // at the end. This is important due to how the DatabaseTransactionsManager works.
-            Event::dispatch(new AnotherShouldDispatchAfterCommitTestEvent);
-        });
+                // The main difference with this test is that we dispatch an event on the parent transaction
+                // at the end. This is important due to how the DatabaseTransactionsManager works.
+                Event::dispatch(new AnotherShouldDispatchAfterCommitTestEvent);
+            });
             DB::transaction(function () {
                 Event::dispatch(new ShouldDispatchAfterCommitTestEvent);
             });
@@ -136,7 +136,6 @@ class ShouldDispatchAfterCommitEventTest extends TestCase
             // Although the child transaction has been concluded, the parent transaction has not.
             // The event dispatched on the child transaction should not have been dispatched.
             $this->assertFalse(ShouldDispatchAfterCommitTestEvent::$ran);
-
 
             $this->assertFalse(ShouldDispatchAfterCommitTestEvent::$ran);
             $this->assertFalse(AnotherShouldDispatchAfterCommitTestEvent::$ran);
@@ -153,7 +152,8 @@ class ShouldDispatchAfterCommitEventTest extends TestCase
         Event::listen(ShouldDispatchAfterCommitTestEvent::class, ShouldDispatchAfterCommitListener::class);
 
         DB::transaction(function () {
-            DB::transaction(function () {});
+            DB::transaction(function () {
+            });
 
             DB::afterCommit(
                 fn () => Event::dispatch(new ShouldDispatchAfterCommitTestEvent)
