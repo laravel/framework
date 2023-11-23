@@ -74,7 +74,8 @@ class DatabaseTransactionsManager
             $this->currentTransaction[$connection] = $this->currentTransaction[$connection]->parent;
         }
 
-        if (! $this->afterCommitCallbacksShouldBeExecuted($newTransactionLevel)) {
+        if (! $this->afterCommitCallbacksShouldBeExecuted($newTransactionLevel) ||
+            $newTransactionLevel === 0) {
             return [];
         }
 
