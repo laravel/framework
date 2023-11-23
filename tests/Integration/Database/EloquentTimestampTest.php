@@ -13,11 +13,13 @@ class EloquentTimestampTest extends DatabaseTestCase
     #[WithMigration]
     public function testItCanGetCorrectDateTimeUsingDefaultFormat($now)
     {
-        Carbon::setTestNow($now);
+        $user = UserFactory::new()->create([
+            'email_verified_at' => $now,
+        ])->mergeCasts([
+            'email_verified_at' => 'datetime',
+        ]);
 
-        $user = UserFactory::new()->create();
-
-        $this->assertSame($now, $user->created_at->toDateTimeString());
+        $this->assertSame($now, $user->email_verified_at->toDateTimeString());
     }
 
     public static function dateTimeDataProvider()
