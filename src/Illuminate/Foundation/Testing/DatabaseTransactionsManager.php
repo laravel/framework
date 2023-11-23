@@ -14,24 +14,14 @@ class DatabaseTransactionsManager extends BaseManager
      */
     public function addCallback($callback)
     {
-        // If there are no transactions, we'll run the callbacks right away. Also, we'll run it
-        // right away when we're in test mode and we only have the wrapping transaction. For
-        // every other case, we'll queue up the callback to run after the commit happens.
-        if ($this->callbackApplicableTransactions()->count() === 0) {
+        // When running in testing mode, the baseline transaction level is 1. If the
+        // current transaction level is 1, it means we have no transactions except
+        // the wrapping one. In that case, we execute the callback immediately.
+        if ($this->currentlyBeingExecutedTransaction->level === 1) {
             return $callback();
         }
 
-        $this->pendingTransactions->last()->addCallback($callback);
-    }
-
-    /**
-     * Get the transactions that are applicable to callbacks.
-     *
-     * @return \Illuminate\Support\Collection<int, \Illuminate\Database\DatabaseTransactionRecord>
-     */
-    public function callbackApplicableTransactions()
-    {
-        return $this->pendingTransactions->skip(1)->values();
+        $this->currentlyBeingExecutedTransaction?->addCallback($callback);
     }
 
     /**

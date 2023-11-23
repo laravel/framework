@@ -7,20 +7,6 @@ use Illuminate\Support\Collection;
 class DatabaseTransactionsManager
 {
     /**
-     * All of the committed transactions.
-     *
-     * @var \Illuminate\Support\Collection<int, \Illuminate\Database\DatabaseTransactionRecord>
-     */
-    protected $committedTransactions;
-
-    /**
-     * All of the pending transactions.
-     *
-     * @var \Illuminate\Support\Collection<int, \Illuminate\Database\DatabaseTransactionRecord>
-     */
-    protected $pendingTransactions;
-
-    /**
      * The current transaction.
      *
      * @var array<string, \Illuminate\Database\DatabaseTransactionRecord>
@@ -84,7 +70,7 @@ class DatabaseTransactionsManager
             $this->currentlyBeingExecutedTransaction = $parentTransaction;
         }
 
-        if (! $this->afterCommitCallbacksShouldBeExecuted($newTransactionLevel)) {
+        if (! $this->afterCommitCallbacksShouldBeExecuted($newTransactionLevel) && $newTransactionLevel !== 0) {
             return;
         }
 
