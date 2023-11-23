@@ -126,7 +126,7 @@ trait ManagesTransactions
 
         $this->transactions++;
 
-        $this->currentTransaction = $this->transactionsManager?->begin(
+        $this->transactionsManager?->begin(
             $this->getName(), $this->transactions
         );
 
@@ -343,7 +343,7 @@ trait ManagesTransactions
     public function afterCommit($callback)
     {
         if ($this->transactionsManager) {
-            return $this->transactionsManager->addCallback($callback, $this->getName());
+            return $this->transactionsManager->addCallback($callback);
         }
 
         throw new RuntimeException('Transactions Manager has not been set.');
