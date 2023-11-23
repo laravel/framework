@@ -3,6 +3,8 @@
 namespace Illuminate\Tests\Support;
 
 use Illuminate\Support\Number;
+use Illuminate\Translation\ArrayLoader;
+use Illuminate\Translation\Translator;
 use PHPUnit\Framework\TestCase;
 
 class SupportNumberTest extends TestCase
@@ -157,6 +159,8 @@ class SupportNumberTest extends TestCase
 
     public function testToHuman()
     {
+        $this->mockTranslator();
+
         $this->assertSame('1', Number::forHumans(1));
         $this->assertSame('1.00', Number::forHumans(1, precision: 2));
         $this->assertSame('10', Number::forHumans(10));
@@ -206,6 +210,46 @@ class SupportNumberTest extends TestCase
         $this->assertSame('-1.1 trillion', Number::forHumans(-1100000000000, maxPrecision: 1));
         $this->assertSame('-1 quadrillion', Number::forHumans(-1000000000000000));
         $this->assertSame('-1 thousand quadrillion', Number::forHumans(-1000000000000000000));
+    }
+
+    public function testToHumansWithLocalization()
+    {
+        $this->mockTranslator();
+
+        app('translator')->setLoaded([
+            '*' => [
+                '*' => [
+                    'sv' => [
+                        'thousand' => 'tusen',
+                        'million' => 'miljon',
+                        'billion' => 'miljard',
+                        'trillion' => 'biljon',
+                        'quadrillion' => 'biljard',
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertSame('1 tusen', Number::forHumans(1000, locale: 'sv'));
+        $this->assertSame('10 tusen', Number::forHumans(10000, locale: 'sv'));
+        $this->assertSame('1 miljon', Number::forHumans(1000000, locale: 'sv'));
+        $this->assertSame('1 miljard', Number::forHumans(1000000000, locale: 'sv'));
+        $this->assertSame('1 biljon', Number::forHumans(1000000000000, locale: 'sv'));
+        $this->assertSame('1 biljard', Number::forHumans(1000000000000000, locale: 'sv'));
+        $this->assertSame('1 tusen biljard', Number::forHumans(1000000000000000000, locale: 'sv'));
+
+        $this->assertSame('-1 tusen', Number::forHumans(-1000, locale: 'sv'));
+        $this->assertSame('-1 miljon', Number::forHumans(-1000000, locale: 'sv'));
+        $this->assertSame('-1 miljard', Number::forHumans(-1000000000, locale: 'sv'));
+
+        $this->assertSame('1,23 tusen', Number::forHumans(1234, locale: 'sv', precision: 2));
+        $this->assertSame('1,2 tusen', Number::forHumans(1234, locale: 'sv', maxPrecision: 1));
+        $this->assertSame('1,23 miljon', Number::forHumans(1234567, locale: 'sv', precision: 2));
+    }
+
+    protected function mockTranslator(): void
+    {
+        app()->singleton('translator', fn () => new Translator(new ArrayLoader(), 'en'));
     }
 
     protected function needsIntlExtension()
