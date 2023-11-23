@@ -1398,7 +1398,7 @@ trait ValidatesAttributes
             return false;
         }
 
-        if (! is_scalar($value) && ! is_null($value) && ! method_exists($value, '__toString')) {
+        if (! json_validate($value) && ! is_null($value)) {
             return false;
         }
 
