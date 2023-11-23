@@ -201,7 +201,7 @@ trait ManagesTransactions
 
         [$levelBeingCommitted, $this->transactions] = [
             $this->transactions,
-            max(0, $this->transactions - 1)
+            max(0, $this->transactions - 1),
         ];
 
         $this->transactionsManager?->commit(
