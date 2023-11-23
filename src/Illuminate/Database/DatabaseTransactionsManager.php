@@ -27,6 +27,14 @@ class DatabaseTransactionsManager
      */
     protected $currentlyBeingExecutedTransaction = null;
 
+
+    /**
+     * The ledger of recent transactions.
+     *
+     * @var \Illuminate\Database\DatabaseTransactionRecord[]
+     */
+    protected $recentTransactions = [];
+
     /**
      * Start a new database transaction.
      *
@@ -48,6 +56,7 @@ class DatabaseTransactionsManager
         }
 
         $this->movePointersTo($connection, $newTransaction);
+        $this->recentTransactions[] = $newTransaction;
 
         return $newTransaction;
     }
@@ -85,6 +94,13 @@ class DatabaseTransactionsManager
 
         $this->getParentTransaction($connection)?->removeChild($this->currentlyBeingExecutedTransaction);
         $this->movePointersTo($connection, $this->currentTransaction[$connection]->parent);
+
+        if (is_null($this->currentlyBeingExecutedTransaction)) {
+            $lastTransaction = (new Collection($this->recentTransactions))
+                ->reject(fn ($transaction) => $transaction->connection === $connection)->last();
+
+            $this->movePointersTo($lastTransaction->connection, $lastTransaction);
+        }
     }
 
     /**
