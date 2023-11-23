@@ -141,7 +141,7 @@ class Number
      * @param  int|null  $maxPrecision
      * @return string
      */
-    public static function forHumans(int|float $number, int $precision = 0, ?int $maxPrecision = null)
+    public static function forHumans(int|float $number, int $precision = 0, ?int $maxPrecision = null, $shortForm = false)
     {
         $units = [
             3 => 'thousand',
@@ -150,6 +150,16 @@ class Number
             12 => 'trillion',
             15 => 'quadrillion',
         ];
+
+        if ($shortForm) {
+            $units = [
+                3 => 'K',
+                6 => 'M',
+                9 => 'B',
+                12 => 'T',
+                15 => 'Q',
+            ];
+        }
 
         switch (true) {
             case $number === 0:
