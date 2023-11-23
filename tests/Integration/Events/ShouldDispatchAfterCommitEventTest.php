@@ -240,6 +240,29 @@ class ShouldDispatchAfterCommitEventTest extends TestCase
         $this->assertTrue(ShouldDispatchAfterCommitTestEvent::$ran);
         $this->assertFalse(AnotherShouldDispatchAfterCommitTestEvent::$ran);
     }
+
+    public function testCommittedTransactionThatWasDeeplyNestedIsRemovedIfTopLevelFails()
+    {
+        Event::listen(ShouldDispatchAfterCommitTestEvent::class, ShouldDispatchAfterCommitListener::class);
+
+        DB::transaction(function () {
+            try {
+                DB::transaction(function () {
+                    DB::transaction(function () {
+                        DB::transaction(function () {
+                            DB::transaction(fn () => Event::dispatch(new ShouldDispatchAfterCommitTestEvent()));
+                        });
+                    });
+
+                    throw new \Exception;
+                });
+            } catch (\Exception $e) {
+
+            }
+        });
+
+        $this->assertFalse(ShouldDispatchAfterCommitTestEvent::$ran);
+    }
 }
 
 class TransactionUnawareTestEvent

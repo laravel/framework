@@ -165,10 +165,15 @@ class DatabaseTransactionsManager
      */
     protected function removeCommittedTransactionsThatAreChildrenOf(DatabaseTransactionRecord $transaction)
     {
-        $this->committedTransactions = $this->committedTransactions->reject(
+        [$removedTransactions, $this->committedTransactions] = $this->committedTransactions->partition(
             fn ($committed) => $committed->connection == $transaction->connection &&
                                $committed->parent === $transaction
-        )->values();
+        );
+
+
+        $removedTransactions->each(
+            fn ($transaction) => $this->removeCommittedTransactionsThatAreChildrenOf($transaction)
+        );
     }
 
     /**
