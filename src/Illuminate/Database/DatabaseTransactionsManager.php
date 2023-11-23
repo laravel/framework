@@ -20,7 +20,12 @@ class DatabaseTransactionsManager
      */
     protected $pendingTransactions;
 
-    protected $currentTransaction;
+    /**
+     * The current transaction.
+     *
+     * @var array
+     */
+    protected $currentTransaction = [];
 
     /**
      * Create a new database transactions manager instance.
@@ -43,10 +48,14 @@ class DatabaseTransactionsManager
     public function begin($connection, $level)
     {
         $this->pendingTransactions->push(
-            $newTransaction = new DatabaseTransactionRecord($connection, $level, $this->currentTransaction)
+            $newTransaction = new DatabaseTransactionRecord(
+                $connection,
+                $level,
+                $this->currentTransaction[$connection] ?? null
+            )
         );
 
-        $this->currentTransaction = $newTransaction;
+        $this->currentTransaction[$connection] = $newTransaction;
     }
 
     /**
@@ -70,7 +79,9 @@ class DatabaseTransactionsManager
                                  $transaction->level >= $levelBeingCommitted
         );
 
-        $this->currentTransaction = $this->currentTransaction?->parent;
+        if (isset($this->currentTransaction[$connection])) {
+            $this->currentTransaction[$connection] = $this->currentTransaction[$connection]->parent;
+        }
     }
 
     /**
@@ -110,7 +121,7 @@ class DatabaseTransactionsManager
             $this->pendingTransactions = new Collection;
             $this->committedTransactions = new Collection;
 
-            $this->currentTransaction = null;
+            $this->currentTransaction[$connection] = null;
         } else {
             $this->pendingTransactions = $this->pendingTransactions->reject(
                 fn ($transaction) => $transaction->connection == $connection &&
@@ -119,10 +130,10 @@ class DatabaseTransactionsManager
 
             if ($this->currentTransaction) {
                 do {
-                    $this->removeCommittedTransactionsThatAreChildrenOf($this->currentTransaction);
+                    $this->removeCommittedTransactionsThatAreChildrenOf($this->currentTransaction[$connection]);
 
-                    $this->currentTransaction = $this->currentTransaction->parent;
-                } while ($this->currentTransaction && $this->currentTransaction->level > $newTransactionLevel);
+                    $this->currentTransaction[$connection] = $this->currentTransaction[$connection]->parent;
+                } while (isset($this->currentTransaction[$connection]) && $this->currentTransaction[$connection]->level > $newTransactionLevel);
             }
         }
     }
