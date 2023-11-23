@@ -143,26 +143,26 @@ class Number
      */
     public static function forHumans(int|float $number, int $precision = 0, ?int $maxPrecision = null, ?string $locale = null)
     {
-        $units = [
-            3 => __('thousand', locale: $locale ?? static::$locale),
-            6 => __('million', locale: $locale ?? static::$locale),
-            9 => __('billion', locale: $locale ?? static::$locale),
-            12 => __('trillion', locale: $locale ?? static::$locale),
-            15 => __('quadrillion', locale: $locale ?? static::$locale),
-        ];
-
         switch (true) {
             case $number === 0:
                 return '0';
             case $number < 0:
                 return sprintf('-%s', static::forHumans(abs($number), $precision, $maxPrecision, $locale));
             case $number >= 1e15:
-                return sprintf('%s %s', static::forHumans($number / 1e15, $precision, $maxPrecision, $locale), __('quadrillion', locale: $locale ?? static::$locale));
+                return sprintf('%s %s', static::forHumans($number = $number / 1e15, $precision, $maxPrecision, $locale), trans_choice('quadrillion', $number, locale: $locale ?? static::$locale));
         }
 
         $numberExponent = floor(log10($number));
         $displayExponent = $numberExponent - ($numberExponent % 3);
         $number /= pow(10, $displayExponent);
+
+        $units = [
+            3 => trans_choice('thousand', $number, locale: $locale ?? static::$locale),
+            6 => trans_choice('million', $number, locale: $locale ?? static::$locale),
+            9 => trans_choice('billion', $number, locale: $locale ?? static::$locale),
+            12 => trans_choice('trillion', $number, locale: $locale ?? static::$locale),
+            15 => trans_choice('quadrillion', $number, locale: $locale ?? static::$locale),
+        ];
 
         return trim(sprintf('%s %s', static::format($number, $precision, $maxPrecision, $locale), $units[$displayExponent] ?? ''));
     }
