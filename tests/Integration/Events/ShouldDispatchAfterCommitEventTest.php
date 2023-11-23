@@ -224,7 +224,7 @@ class ShouldDispatchAfterCommitEventTest extends TestCase
         DB::transaction(function () { // lv 1
             DB::transaction(function () { // lv 2
                 DB::transaction(fn () => Event::dispatch(new ShouldDispatchAfterCommitTestEvent()));
-                 // lv 2
+                // lv 2
             });
 
             try {
@@ -257,7 +257,6 @@ class ShouldDispatchAfterCommitEventTest extends TestCase
                     throw new \Exception;
                 });
             } catch (\Exception $e) {
-
             }
         });
 
