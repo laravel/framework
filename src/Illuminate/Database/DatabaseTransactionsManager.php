@@ -130,7 +130,10 @@ class DatabaseTransactionsManager
                     $this->removeCommittedTransactionsThatAreChildrenOf($this->currentTransaction[$connection]);
 
                     $this->currentTransaction[$connection] = $this->currentTransaction[$connection]->parent;
-                } while (isset($this->currentTransaction[$connection]) && $this->currentTransaction[$connection]->level > $newTransactionLevel);
+                } while (
+                    isset($this->currentTransaction[$connection]) &&
+                    $this->currentTransaction[$connection]->level > $newTransactionLevel
+                );
             }
         }
     }
@@ -162,9 +165,9 @@ class DatabaseTransactionsManager
      */
     protected function removeCommittedTransactionsThatAreChildrenOf(DatabaseTransactionRecord $transaction)
     {
-        $this->committedTransactions = $this->committedTransactions->reject(fn ($committed) =>
-            $committed->connection == $transaction->connection &&
-            $committed->parent === $transaction
+        $this->committedTransactions = $this->committedTransactions->reject(
+            fn ($committed) => $committed->connection == $transaction->connection &&
+                               $committed->parent === $transaction
         )->values();
     }
 
