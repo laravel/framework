@@ -58,7 +58,6 @@ class DatabaseTransactionsManager
 
         if (isset($this->currentTransaction[$connection])) {
             $this->currentTransaction[$connection]->addChild($newTransaction);
-            $newTransaction->setParent($this->currentTransaction[$connection]);
         }
 
         $this->currentTransaction[$connection] = $newTransaction;
@@ -73,11 +72,10 @@ class DatabaseTransactionsManager
      * @param  string  $connection
      * @param  int  $levelBeingCommitted
      * @param  int  $newTransactionLevel
-     * @return array
+     * @return void
      */
     public function commit($connection, $levelBeingCommitted, $newTransactionLevel)
     {
-//        $this->stageTransactions($connection, $levelBeingCommitted);
         $currentTransaction = $this->currentTransaction[$connection];
 
         if (isset($this->currentTransaction[$connection])) {
@@ -87,51 +85,10 @@ class DatabaseTransactionsManager
         }
 
         if (! $this->afterCommitCallbacksShouldBeExecuted($newTransactionLevel)) {
-            return [];
+            return;
         }
 
         $currentTransaction?->executeCallbacks();
-
-        return;
-
-        // This method is only called when the root database transaction is committed so there
-        // shouldn't be any pending transactions, but going to clear them here anyways just
-        // in case. This method could be refactored to receive a level in the future too.
-        $this->pendingTransactions = $this->pendingTransactions->reject(
-            fn ($transaction) => $transaction->connection === $connection
-        )->values();
-
-        [$forThisConnection, $forOtherConnections] = $this->committedTransactions->partition(
-            fn ($transaction) => $transaction->connection == $connection
-        );
-
-        $this->committedTransactions = $forOtherConnections->values();
-
-        $forThisConnection->map->executeCallbacks();
-
-        return $forThisConnection;
-    }
-
-    /**
-     * Move relevant pending transactions to a committed state.
-     *
-     * @param  string  $connection
-     * @param  int  $levelBeingCommitted
-     * @return void
-     */
-    public function stageTransactions($connection, $levelBeingCommitted)
-    {
-        $this->committedTransactions = $this->committedTransactions->merge(
-            $this->pendingTransactions->filter(
-                fn ($transaction) => $transaction->connection === $connection &&
-                                     $transaction->level >= $levelBeingCommitted
-            )
-        );
-
-        $this->pendingTransactions = $this->pendingTransactions->reject(
-            fn ($transaction) => $transaction->connection === $connection &&
-                                 $transaction->level >= $levelBeingCommitted
-        );
     }
 
     /**
@@ -173,27 +130,6 @@ class DatabaseTransactionsManager
         $this->committedTransactions = $this->committedTransactions->reject(
             fn ($transaction) => $transaction->connection == $connection
         )->values();
-    }
-
-    /**
-     * Remove all transactions that are children of the given transaction.
-     *
-     * @param  \Illuminate\Database\DatabaseTransactionRecord  $transaction
-     * @return void
-     */
-    protected function removeCommittedTransactionsThatAreChildrenOf(DatabaseTransactionRecord $transaction)
-    {
-        [$removedTransactions, $this->committedTransactions] = $this->committedTransactions->partition(
-            fn ($committed) => $committed->connection == $transaction->connection &&
-                               $committed->parent === $transaction
-        );
-
-        // There may be multiple deeply nested transactions that have already committed that we
-        // also need to remove. We will recurse down the children of all removed transaction
-        // instances until there are no more deeply nested child transactions for removal.
-        $removedTransactions->each(
-            fn ($transaction) => $this->removeCommittedTransactionsThatAreChildrenOf($transaction)
-        );
     }
 
     /**

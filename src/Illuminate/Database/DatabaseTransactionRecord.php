@@ -65,6 +65,7 @@ class DatabaseTransactionRecord
      */
     public function addChild($transaction)
     {
+        $transaction->setParent($this);
         $this->children[] = $transaction;
     }
 
