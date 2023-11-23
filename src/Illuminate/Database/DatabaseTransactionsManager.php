@@ -23,9 +23,12 @@ class DatabaseTransactionsManager
     /**
      * The current transaction.
      *
-     * @var array
+     * @var array<string, \Illuminate\Database\DatabaseTransactionRecord>
      */
     protected $currentTransaction = [];
+
+    /** @var \Illuminate\Database\DatabaseTransactionRecord|null */
+    protected $currentlyBeingExecutedTransaction = null;
 
     /**
      * Create a new database transactions manager instance.
@@ -43,19 +46,25 @@ class DatabaseTransactionsManager
      *
      * @param  string  $connection
      * @param  int  $level
-     * @return void
+     * @return \Illuminate\Database\DatabaseTransactionRecord
      */
     public function begin($connection, $level)
     {
-        $this->pendingTransactions->push(
-            $newTransaction = new DatabaseTransactionRecord(
-                $connection,
-                $level,
-                $this->currentTransaction[$connection] ?? null
-            )
+        $newTransaction = new DatabaseTransactionRecord(
+            $connection,
+            $level,
+            $this->currentTransaction[$connection] ?? null
         );
 
+        if (isset($this->currentTransaction[$connection])) {
+            $this->currentTransaction[$connection]->addChild($newTransaction);
+            $newTransaction->setParent($this->currentTransaction[$connection]);
+        }
+
         $this->currentTransaction[$connection] = $newTransaction;
+        $this->currentlyBeingExecutedTransaction = $newTransaction;
+
+        return $newTransaction;
     }
 
     /**
@@ -68,16 +77,22 @@ class DatabaseTransactionsManager
      */
     public function commit($connection, $levelBeingCommitted, $newTransactionLevel)
     {
-        $this->stageTransactions($connection, $levelBeingCommitted);
+//        $this->stageTransactions($connection, $levelBeingCommitted);
+        $currentTransaction = $this->currentTransaction[$connection];
 
         if (isset($this->currentTransaction[$connection])) {
-            $this->currentTransaction[$connection] = $this->currentTransaction[$connection]->parent;
+            $parentTransaction = $this->currentTransaction[$connection]->parent;
+            $this->currentTransaction[$connection] = $parentTransaction;
+            $this->currentlyBeingExecutedTransaction = $parentTransaction;
         }
 
-        if (! $this->afterCommitCallbacksShouldBeExecuted($newTransactionLevel) &&
-            $newTransactionLevel !== 0) {
+        if (! $this->afterCommitCallbacksShouldBeExecuted($newTransactionLevel)) {
             return [];
         }
+
+        $currentTransaction?->executeCallbacks();
+
+        return;
 
         // This method is only called when the root database transaction is committed so there
         // shouldn't be any pending transactions, but going to clear them here anyways just
@@ -129,24 +144,16 @@ class DatabaseTransactionsManager
     public function rollback($connection, $newTransactionLevel)
     {
         if ($newTransactionLevel === 0) {
-            $this->removeAllTransactionsForConnection($connection);
-        } else {
-            $this->pendingTransactions = $this->pendingTransactions->reject(
-                fn ($transaction) => $transaction->connection == $connection &&
-                                     $transaction->level > $newTransactionLevel
-            )->values();
+            $this->currentTransaction[$connection] = null;
 
-            if ($this->currentTransaction) {
-                do {
-                    $this->removeCommittedTransactionsThatAreChildrenOf($this->currentTransaction[$connection]);
-
-                    $this->currentTransaction[$connection] = $this->currentTransaction[$connection]->parent;
-                } while (
-                    isset($this->currentTransaction[$connection]) &&
-                    $this->currentTransaction[$connection]->level > $newTransactionLevel
-                );
-            }
+            return;
         }
+
+        $this->currentlyBeingExecutedTransaction->resetCallbacks();
+        $this->currentlyBeingExecutedTransaction->resetChildren();
+
+        $this->currentTransaction[$connection] = $this->currentTransaction[$connection]->parent;
+        $this->currentlyBeingExecutedTransaction = $this->currentTransaction[$connection];
     }
 
     /**
@@ -197,7 +204,7 @@ class DatabaseTransactionsManager
      */
     public function addCallback($callback)
     {
-        if ($current = $this->callbackApplicableTransactions()->last()) {
+        if ($current = $this->currentlyBeingExecutedTransaction) {
             return $current->addCallback($callback);
         }
 

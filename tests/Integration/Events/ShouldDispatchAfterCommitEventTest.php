@@ -50,6 +50,8 @@ class ShouldDispatchAfterCommitEventTest extends TestCase
 
         DB::transaction(function () {
             Event::dispatch(new ShouldDispatchAfterCommitTestEvent);
+
+            $this->assertFalse(ShouldDispatchAfterCommitTestEvent::$ran);
         });
 
         $this->assertTrue(ShouldDispatchAfterCommitTestEvent::$ran);

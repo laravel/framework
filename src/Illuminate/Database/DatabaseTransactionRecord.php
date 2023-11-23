@@ -26,6 +26,13 @@ class DatabaseTransactionRecord
     public $parent;
 
     /**
+     * The child instances of this transaction.
+     *
+     * @var \Illuminate\Database\DatabaseTransactionRecord[]
+     */
+    public $children = [];
+
+    /**
      * The callbacks that should be executed after committing.
      *
      * @var array
@@ -47,6 +54,25 @@ class DatabaseTransactionRecord
         $this->parent = $parent;
     }
 
+    public function setParent(DatabaseTransactionRecord $parent)
+    {
+        $this->parent = $parent;
+    }
+
+    /**
+     * @param \Illuminate\Database\DatabaseTransactionRecord $transaction
+     * @return void
+     */
+    public function addChild($transaction)
+    {
+        $this->children[] = $transaction;
+    }
+
+    public function resetChildren()
+    {
+        $this->children = [];
+    }
+
     /**
      * Register a callback to be executed after committing.
      *
@@ -65,6 +91,10 @@ class DatabaseTransactionRecord
      */
     public function executeCallbacks()
     {
+        foreach ($this->children as $child) {
+            $child->executeCallbacks();
+        }
+
         foreach ($this->callbacks as $callback) {
             $callback();
         }
@@ -78,5 +108,10 @@ class DatabaseTransactionRecord
     public function getCallbacks()
     {
         return $this->callbacks;
+    }
+
+    public function resetCallbacks()
+    {
+        $this->callbacks = [];
     }
 }
