@@ -53,16 +53,12 @@ class ApplicationBuilder
      * Register additional service providers.
      *
      * @param  array  $providers
-     * @param  bool  $withBootstrapProviders
      * @return $this
      */
-    public function withProviders(array $providers = [], bool $withBootstrapProviders = true)
+    public function withProviders(array $providers = [])
     {
         RegisterProviders::merge(
             $providers,
-            $withBootstrapProviders
-                ? $this->app->getBootstrapProvidersPath()
-                : null
         );
 
         return $this;

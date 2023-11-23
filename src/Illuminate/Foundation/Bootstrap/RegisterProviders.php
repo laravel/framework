@@ -14,13 +14,6 @@ class RegisterProviders
     protected static $merge = [];
 
     /**
-     * The path to the bootstrap provider configuration file.
-     *
-     * @var string|null
-     */
-    protected static $bootstrapProviderPath;
-
-    /**
      * Bootstrap the given application.
      *
      * @param  \Illuminate\Contracts\Foundation\Application  $app
@@ -43,23 +36,11 @@ class RegisterProviders
      */
     protected function mergeAdditionalProviders(Application $app)
     {
-        if (static::$bootstrapProviderPath &&
-            file_exists(static::$bootstrapProviderPath)) {
-            $packageProviders = require static::$bootstrapProviderPath;
-
-            foreach ($packageProviders as $index => $provider) {
-                if (! class_exists($provider)) {
-                    unset($packageProviders[$index]);
-                }
-            }
-        }
-
         $app->make('config')->set(
             'app.providers',
             array_merge(
                 $app->make('config')->get('app.providers'),
                 static::$merge,
-                array_values($packageProviders ?? []),
             ),
         );
     }
@@ -68,13 +49,10 @@ class RegisterProviders
      * Merge the given providers into the provider configuration before registration.
      *
      * @param  array  $providers
-     * @param  string|null  $bootstrapProviderPath
      * @return void
      */
-    public static function merge(array $providers, ?string $bootstrapProviderPath = null)
+    public static function merge(array $providers)
     {
-        static::$bootstrapProviderPath = $bootstrapProviderPath;
-
         static::$merge = array_values(array_filter(array_unique(
             array_merge(static::$merge, $providers)
         )));
