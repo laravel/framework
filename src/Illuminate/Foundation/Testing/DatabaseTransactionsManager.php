@@ -32,6 +32,8 @@ class DatabaseTransactionsManager extends BaseManager
      */
     public function afterCommitCallbacksShouldBeExecuted($level)
     {
-        return $level === 1;
+        // Since we have a wrapping base transaction from DatabaseTransactions,
+        // we want to commit the transaction on level 2 instead of level 1.
+        return $level === 2;
     }
 }

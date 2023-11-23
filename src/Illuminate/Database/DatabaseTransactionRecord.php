@@ -2,6 +2,8 @@
 
 namespace Illuminate\Database;
 
+use Illuminate\Support\Collection;
+
 class DatabaseTransactionRecord
 {
     /**
@@ -31,6 +33,20 @@ class DatabaseTransactionRecord
      * @var \Illuminate\Database\DatabaseTransactionRecord[]
      */
     public $children = [];
+
+    /**
+     * Whether the transaction has been committed.
+     *
+     * @var bool
+     */
+    public $committed = false;
+
+    /**
+     * Whether the transaction has executed its callbacks.
+     *
+     * @var bool
+     */
+    public $executedCallbacks = false;
 
     /**
      * The callbacks that should be executed after committing.
@@ -99,6 +115,8 @@ class DatabaseTransactionRecord
         foreach ($this->callbacks as $callback) {
             $callback();
         }
+
+        $this->executedCallbacks = true;
     }
 
     /**
@@ -114,5 +132,22 @@ class DatabaseTransactionRecord
     public function resetCallbacks()
     {
         $this->callbacks = [];
+    }
+
+    public function removeChild(DatabaseTransactionRecord $currentTransaction): void
+    {
+        $this->children = (new Collection($this->children))->reject(
+            fn ($transaction) => $transaction === $currentTransaction
+        )->values();
+    }
+
+    public function commit()
+    {
+        $this->committed = true;
+    }
+
+    public function isRootLevelTransaction()
+    {
+        return $this->level === 1;
     }
 }

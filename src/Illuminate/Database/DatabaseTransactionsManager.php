@@ -7,25 +7,25 @@ use Illuminate\Support\Collection;
 class DatabaseTransactionsManager
 {
     /**
-     * The current transaction.
+     * The current transactions.
      *
      * @var array<string, \Illuminate\Database\DatabaseTransactionRecord>
      */
     protected $currentTransaction = [];
 
-    /** @var \Illuminate\Database\DatabaseTransactionRecord|null */
-    protected $currentlyBeingExecutedTransaction = null;
+    /**
+     * The root transactions.
+     *
+     * @var array <string, \Illuminate\Database\DatabaseTransactionRecord>
+     */
+    protected $rootTransaction = [];
 
     /**
-     * Create a new database transactions manager instance.
+     * The transaction currently being executed.
      *
-     * @return void
+     * @var \Illuminate\Database\DatabaseTransactionRecord|null
      */
-    public function __construct()
-    {
-        $this->committedTransactions = new Collection;
-        $this->pendingTransactions = new Collection;
-    }
+    protected $currentlyBeingExecutedTransaction = null;
 
     /**
      * Start a new database transaction.
@@ -39,15 +39,15 @@ class DatabaseTransactionsManager
         $newTransaction = new DatabaseTransactionRecord(
             $connection,
             $level,
-            $this->currentTransaction[$connection] ?? null
         );
 
         if (isset($this->currentTransaction[$connection])) {
             $this->currentTransaction[$connection]->addChild($newTransaction);
+        } else {
+            $this->rootTransaction[$connection] = $newTransaction;
         }
 
-        $this->currentTransaction[$connection] = $newTransaction;
-        $this->currentlyBeingExecutedTransaction = $newTransaction;
+        $this->movePointersTo($connection, $newTransaction);
 
         return $newTransaction;
     }
@@ -56,21 +56,16 @@ class DatabaseTransactionsManager
      * Commit the root database transaction and execute callbacks.
      *
      * @param  string  $connection
-     * @param  int  $levelBeingCommitted
-     * @param  int  $newTransactionLevel
      * @return void
      */
-    public function commit($connection, $levelBeingCommitted, $newTransactionLevel)
+    public function commit($connection)
     {
         $currentTransaction = $this->currentTransaction[$connection];
+        $currentTransaction->commit();
 
-        if (isset($this->currentTransaction[$connection])) {
-            $parentTransaction = $this->currentTransaction[$connection]->parent;
-            $this->currentTransaction[$connection] = $parentTransaction;
-            $this->currentlyBeingExecutedTransaction = $parentTransaction;
-        }
+        $this->movePointersTo($connection, $this->currentTransaction[$connection]->parent);
 
-        if (! $this->afterCommitCallbacksShouldBeExecuted($newTransactionLevel) && $newTransactionLevel !== 0) {
+        if (! $this->afterCommitCallbacksShouldBeExecuted($currentTransaction->level)) {
             return;
         }
 
@@ -81,41 +76,15 @@ class DatabaseTransactionsManager
      * Rollback the active database transaction.
      *
      * @param  string  $connection
-     * @param  int  $newTransactionLevel
      * @return void
      */
-    public function rollback($connection, $newTransactionLevel)
+    public function rollback($connection)
     {
-        if ($newTransactionLevel === 0) {
-            $this->currentTransaction[$connection] = null;
+        $this->currentlyBeingExecutedTransaction?->resetCallbacks();
+        $this->currentlyBeingExecutedTransaction?->resetChildren();
 
-            return;
-        }
-
-        $this->currentlyBeingExecutedTransaction->resetCallbacks();
-        $this->currentlyBeingExecutedTransaction->resetChildren();
-
-        $this->currentTransaction[$connection] = $this->currentTransaction[$connection]->parent;
-        $this->currentlyBeingExecutedTransaction = $this->currentTransaction[$connection];
-    }
-
-    /**
-     * Remove all pending, completed, and current transactions for the given connection name.
-     *
-     * @param  string  $connection
-     * @return void
-     */
-    protected function removeAllTransactionsForConnection($connection)
-    {
-        $this->currentTransaction[$connection] = null;
-
-        $this->pendingTransactions = $this->pendingTransactions->reject(
-            fn ($transaction) => $transaction->connection == $connection
-        )->values();
-
-        $this->committedTransactions = $this->committedTransactions->reject(
-            fn ($transaction) => $transaction->connection == $connection
-        )->values();
+        $this->getParentTransaction($connection)?->removeChild($this->currentlyBeingExecutedTransaction);
+        $this->movePointersTo($connection, $this->currentTransaction[$connection]->parent);
     }
 
     /**
@@ -134,16 +103,6 @@ class DatabaseTransactionsManager
     }
 
     /**
-     * Get the transactions that are applicable to callbacks.
-     *
-     * @return \Illuminate\Support\Collection<int, \Illuminate\Database\DatabaseTransactionRecord>
-     */
-    public function callbackApplicableTransactions()
-    {
-        return $this->pendingTransactions;
-    }
-
-    /**
      * Determine if after commit callbacks should be executed for the given transaction level.
      *
      * @param  int  $level
@@ -151,26 +110,41 @@ class DatabaseTransactionsManager
      */
     public function afterCommitCallbacksShouldBeExecuted($level)
     {
-        return $level === 0;
+        return $level === 1;
     }
 
     /**
-     * Get all of the pending transactions.
+     * Get the current transaction for the given connection.
      *
-     * @return \Illuminate\Support\Collection
+     * @param string $connection
+     * @return \Illuminate\Database\DatabaseTransactionRecord|null
      */
-    public function getPendingTransactions()
+    protected function currentTransaction($connection)
     {
-        return $this->pendingTransactions;
+        return $this->currentTransaction[$connection];
     }
 
     /**
-     * Get all of the committed transactions.
+     * Get the parent transaction for the current connection.
      *
-     * @return \Illuminate\Support\Collection
+     * @param string $connection
+     * @return \Illuminate\Database\DatabaseTransactionRecord|null
      */
-    public function getCommittedTransactions()
+    protected function getParentTransaction($connection)
     {
-        return $this->committedTransactions;
+        return $this->currentTransaction($connection)->parent;
+    }
+
+    /**
+     * Move the pointer to the given transaction.
+     *
+     * @param string $connection
+     * @param \Illuminate\Database\DatabaseTransactionRecord $transaction
+     * @return void
+     */
+    public function movePointersTo($connection, $transaction)
+    {
+        $this->currentTransaction[$connection] = $transaction;
+        $this->currentlyBeingExecutedTransaction = $transaction;
     }
 }
