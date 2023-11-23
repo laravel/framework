@@ -3,32 +3,20 @@
 namespace Illuminate\Tests\Integration\Events;
 
 use Illuminate\Contracts\Events\ShouldDispatchAfterCommit;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
-use Orchestra\Testbench\Attributes\WithMigration;
+use Mockery as m;
 use Orchestra\Testbench\TestCase;
 
-#[WithMigration('queue')]
 class ShouldDispatchAfterCommitEventTest extends TestCase
 {
-    use DatabaseMigrations;
-
-    protected function setUp(): void
+    protected function tearDown(): void
     {
         TransactionUnawareTestEvent::$ran = false;
         ShouldDispatchAfterCommitTestEvent::$ran = false;
         AnotherShouldDispatchAfterCommitTestEvent::$ran = false;
 
-        parent::setUp();
-    }
-
-    protected function defineEnvironment($app)
-    {
-        $app['config']->set([
-            'database.default' => 'testing',
-            'queue.default' => 'database',
-        ]);
+        m::close();
     }
 
     public function testEventIsDispatchedIfThereIsNoTransaction()
@@ -124,11 +112,6 @@ class ShouldDispatchAfterCommitEventTest extends TestCase
         Event::listen(AnotherShouldDispatchAfterCommitTestEvent::class, AnotherShouldDispatchAfterCommitListener::class);
 
         DB::transaction(function () {
-            DB::afterCommit(function () {
-            // The main difference with this test is that we dispatch an event on the parent transaction
-            // at the end. This is important due to how the DatabaseTransactionsManager works.
-            Event::dispatch(new AnotherShouldDispatchAfterCommitTestEvent);
-        });
             DB::transaction(function () {
                 Event::dispatch(new ShouldDispatchAfterCommitTestEvent);
             });
@@ -137,32 +120,15 @@ class ShouldDispatchAfterCommitEventTest extends TestCase
             // The event dispatched on the child transaction should not have been dispatched.
             $this->assertFalse(ShouldDispatchAfterCommitTestEvent::$ran);
 
-
-            $this->assertFalse(ShouldDispatchAfterCommitTestEvent::$ran);
-            $this->assertFalse(AnotherShouldDispatchAfterCommitTestEvent::$ran);
+            // The main difference with this test is that we dispatch an event on the parent transaction
+            // at the end. This is important due to how the DatabaseTransactionsManager works.
+            Event::dispatch(new AnotherShouldDispatchAfterCommitTestEvent);
         });
 
         // Now that the parent transaction has been committed, the event
         // on the child transaction should also have been dispatched.
         $this->assertTrue(ShouldDispatchAfterCommitTestEvent::$ran);
         $this->assertTrue(AnotherShouldDispatchAfterCommitTestEvent::$ran);
-    }
-
-    public function testItOnlyDispatchesEventsAfterTheRootTransactionIsCommitted()
-    {
-        Event::listen(ShouldDispatchAfterCommitTestEvent::class, ShouldDispatchAfterCommitListener::class);
-
-        DB::transaction(function () {
-            DB::transaction(function () {});
-
-            DB::afterCommit(
-                fn () => Event::dispatch(new ShouldDispatchAfterCommitTestEvent)
-            );
-
-            $this->assertFalse(ShouldDispatchAfterCommitTestEvent::$ran);
-        });
-
-        $this->assertTrue(ShouldDispatchAfterCommitTestEvent::$ran);
     }
 }
 
