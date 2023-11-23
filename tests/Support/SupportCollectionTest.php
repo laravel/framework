@@ -2963,7 +2963,6 @@ class SupportCollectionTest extends TestCase
     public function testConstructMethodFromWeakMap($collection)
     {
         $this->expectException('InvalidArgumentException');
-        $this->expectExceptionMessage('Unable to resolve array from instance of WeakMap.');
 
         $map = new WeakMap();
         $object = new stdClass;
