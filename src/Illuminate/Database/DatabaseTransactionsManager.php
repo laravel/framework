@@ -118,8 +118,13 @@ class DatabaseTransactionsManager
     public function rollback($connection, $newTransactionLevel)
     {
         if ($newTransactionLevel === 0) {
-            $this->pendingTransactions = new Collection;
-            $this->committedTransactions = new Collection;
+            $this->pendingTransactions = $this->pendingTransactions->reject(
+                fn ($transaction) => $transaction->connection == $connection
+            );
+
+            $this->committedTransactions = $this->committedTransactions->reject(
+                fn ($transaction) => $transaction->connection == $connection
+            );
 
             $this->currentTransaction[$connection] = null;
         } else {
