@@ -19,6 +19,15 @@ class ShouldDispatchAfterCommitEventTest extends TestCase
         m::close();
     }
 
+    protected function getEnvironmentSetUp($app)
+    {
+        $app['config']->set('database.connections.conn2', [
+            'driver' => 'sqlite',
+            'database' => ':memory:',
+            'prefix' => '',
+        ]);
+    }
+
     public function testEventIsDispatchedIfThereIsNoTransaction()
     {
         Event::listen(ShouldDispatchAfterCommitTestEvent::class, ShouldDispatchAfterCommitListener::class);
@@ -263,6 +272,28 @@ class ShouldDispatchAfterCommitEventTest extends TestCase
         });
 
         $this->assertFalse(ShouldDispatchAfterCommitTestEvent::$ran);
+    }
+
+    public function testItProperlyDispatchesAnEventAfterThePreviousOneHasBeenRollbackedInDifferentConnections()
+    {
+        Event::listen(ShouldDispatchAfterCommitTestEvent::class, ShouldDispatchAfterCommitListener::class);
+
+        // Does this even make sense?
+        DB::transaction(function () {
+            try {
+                DB::connection('conn2')->transaction(function () {
+                    throw new \Exception;
+                });
+            } catch (\Exception) {
+
+            }
+
+            Event::dispatch(new ShouldDispatchAfterCommitTestEvent);
+
+            $this->assertFalse(ShouldDispatchAfterCommitTestEvent::$ran);
+        });
+
+        $this->assertTrue(ShouldDispatchAfterCommitTestEvent::$ran);
     }
 }
 
