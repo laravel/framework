@@ -9,7 +9,7 @@ class DynamoBatchTestWithTTL extends DynamoBatchTest
         $app['config']->set('queue.batching', [
             'driver' => 'dynamodb',
             'region' => 'us-west-2',
-            'endpoint' => static::DYNAMO_ENDPOINT,
+            'endpoint' => static::DYNAMODB_ENDPOINT,
             'key' => 'key',
             'secret' => 'secret',
             'ttl' => 60,
