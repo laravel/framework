@@ -2,11 +2,13 @@
 
 namespace Illuminate\Tests\Integration\Generators;
 
+use Illuminate\Cache\Console\CacheTableCommand;
+
 class CacheTableCommandTest extends TestCase
 {
     public function testCreateMakesMigration()
     {
-        $this->artisan('cache:table')->assertExitCode(0);
+        $this->artisan(CacheTableCommand::class)->assertExitCode(0);
 
         $this->assertMigrationFileContains([
             'use Illuminate\Database\Migrations\Migration;',
