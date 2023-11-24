@@ -52,6 +52,7 @@ jobs:
         env:
           DB_CONNECTION: mysql
           DB_USERNAME: root
+          MYSQL_COLLATION: utf8mb4_unicode_ci
 
   mysql_8:
     runs-on: ubuntu-22.04

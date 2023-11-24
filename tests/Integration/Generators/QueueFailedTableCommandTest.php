@@ -2,11 +2,13 @@
 
 namespace Illuminate\Tests\Integration\Generators;
 
+use Illuminate\Queue\Console\FailedTableCommand;
+
 class QueueFailedTableCommandTest extends TestCase
 {
     public function testCreateMakesMigration()
     {
-        $this->artisan('queue:failed-table')->assertExitCode(0);
+        $this->artisan(FailedTableCommand::class)->assertExitCode(0);
 
         $this->assertMigrationFileContains([
             'use Illuminate\Database\Migrations\Migration;',
