@@ -10,8 +10,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Str;
-// use Orchestra\Testbench\TestCase;
-use PHPUnit\Framework\TestCase;
+use Orchestra\Testbench\TestCase;
 
 class DynamoBatchTest extends TestCase
 {
