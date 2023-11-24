@@ -14,6 +14,8 @@ use Orchestra\Testbench\TestCase;
 
 class DynamoBatchTest extends TestCase
 {
+    const DYNAMO_ENDPOINT = 'http://localhost:8888';
+
     protected function getEnvironmentSetUp($app)
     {
         $app['config']->set('queue.connections.sync1', [
@@ -27,7 +29,7 @@ class DynamoBatchTest extends TestCase
         $app['config']->set('queue.batching', [
             'driver' => 'dynamodb',
             'region' => 'us-west-2',
-            'endpoint' => 'http://localhost:8888',
+            'endpoint' => static::DYNAMO_ENDPOINT,
             'key' => 'key',
             'secret' => 'secret',
         ]);
