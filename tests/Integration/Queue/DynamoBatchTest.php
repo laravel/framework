@@ -30,7 +30,7 @@ class DynamoBatchTest extends TestCase
     {
         parent::setUp();
 
-        JobRunRecorder::reset();
+        BatchRunRecorder::reset();
         app(DynamoBatchRepository::class)->createAwsDynamoTable();
     }
 
@@ -47,7 +47,7 @@ class DynamoBatchTest extends TestCase
             new BatchJob('2'),
         ])->dispatch();
 
-        $this->assertEquals(['1', '2'], JobRunRecorder::$results);
+        $this->assertEquals(['1', '2'], BatchRunRecorder::$results);
     }
 
     public function test_retrieve_batch_by_id()
@@ -154,7 +154,7 @@ class BatchJob implements ShouldQueue
 
     public function handle()
     {
-        JobRunRecorder::record($this->id);
+        BatchRunRecorder::record($this->id);
     }
 }
 
@@ -162,12 +162,12 @@ class FailingJob extends BatchJob
 {
     public function handle()
     {
-        JobRunRecorder::recordFailure($this->id);
+        BatchRunRecorder::recordFailure($this->id);
         $this->fail();
     }
 }
 
-class JobRunRecorder
+class BatchRunRecorder
 {
     public static $results = [];
 
