@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Tests\Bus;
+namespace Illuminate\Tests\Integration\Queue;
 
 class DynamoBatchTestWithTTL extends DynamoBatchTest
 {
