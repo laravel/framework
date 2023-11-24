@@ -12,6 +12,9 @@ use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Str;
 use Orchestra\Testbench\TestCase;
 
+/**
+ * @requires OS Linux|Darwin
+ */
 class DynamoBatchTest extends TestCase
 {
     const DYNAMODB_ENDPOINT = 'http://localhost:8888';
