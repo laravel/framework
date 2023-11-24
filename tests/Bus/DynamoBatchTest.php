@@ -11,7 +11,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Str;
 // use Orchestra\Testbench\TestCase;
-use Illuminate\Foundation\Testing\TestCase;
+use PHPUnit\Framework\TestCase;
 
 class DynamoBatchTest extends TestCase
 {
