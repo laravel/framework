@@ -14,141 +14,128 @@ use Orchestra\Testbench\TestCase;
 
 class DynamoBatchTest extends TestCase
 {
-    // const DYNAMO_ENDPOINT = 'http://localhost:8888';
+    const DYNAMO_ENDPOINT = 'http://localhost:8888';
 
-    // protected function getEnvironmentSetUp($app)
-    // {
-    //     $app['config']->set('queue.connections.sync1', [
-    //         'driver' => 'sync',
-    //     ]);
-
-    //     $app['config']->set('queue.connections.sync2', [
-    //         'driver' => 'sync',
-    //     ]);
-
-    //     $app['config']->set('queue.batching', [
-    //         'driver' => 'dynamodb',
-    //         'region' => 'us-west-2',
-    //         'endpoint' => static::DYNAMO_ENDPOINT,
-    //         'key' => 'key',
-    //         'secret' => 'secret',
-    //     ]);
-    // }
-    // public function setUp(): void
-    // {
-    //     parent::setUp();
-
-    //     JobRunRecorder::reset();
-    //     app(DynamoBatchRepository::class)->createAwsDynamoTable();
-    // }
-
-    // public function tearDown(): void
-    // {
-    //     app(DynamoBatchRepository::class)->deleteAwsDynamoTable();
-
-    //     parent::tearDown();
-    // }
-    // public function test_running_a_batch()
-    // {
-    //     Bus::batch([
-    //         new BatchJob('1'),
-    //         new BatchJob('2'),
-    //     ])->dispatch();
-
-    //     $this->assertEquals(['1', '2'], JobRunRecorder::$results);
-    // }
-
-    // public function test_retrieve_batch_by_id()
-    // {
-    //     $batch = Bus::batch([
-    //         new BatchJob('1'),
-    //         new BatchJob('2'),
-    //     ])->dispatch();
-
-    //     /** @var DynamoBatchRepository */
-    //     $repo = app(DynamoBatchRepository::class);
-    //     $retrieved = $repo->find($batch->id);
-    //     $this->assertEquals(2, $retrieved->totalJobs);
-    //     $this->assertEquals(0, $retrieved->failedJobs);
-    //     $this->assertTrue($retrieved->finishedAt->between(now()->subSecond(30), now()));
-    // }
-
-    // public function test_retrieve_non_existent_batch()
-    // {
-    //     /** @var DynamoBatchRepository */
-    //     $repo = app(DynamoBatchRepository::class);
-    //     $retrieved = $repo->find(Str::orderedUuid());
-    //     $this->assertNull($retrieved);
-    // }
-
-    // public function test_delete_batch_by_id()
-    // {
-    //     $batch = Bus::batch([
-    //         new BatchJob('1'),
-    //     ])->dispatch();
-
-    //     /** @var DynamoBatchRepository */
-    //     $repo = app(DynamoBatchRepository::class);
-    //     $retrieved = $repo->find($batch->id);
-    //     $this->assertNotNull($retrieved);
-    //     $repo->delete($retrieved->id);
-    //     $retrieved = $repo->find($batch->id);
-    //     $this->assertNull($retrieved);
-    // }
-
-    // public function test_delete_non_existent_batch()
-    // {
-    //     /** @var DynamoBatchRepository */
-    //     $repo = app(DynamoBatchRepository::class);
-    //     $repo->delete(Str::orderedUuid());
-    //     // Ensure we didn't throw an exception
-    //     $this->assertTrue(true);
-    // }
-
-    // public function test_batch_with_failing_job()
-    // {
-    //     $batch = Bus::batch([
-    //         new BatchJob('1'),
-    //         new FailingJob('2'),
-    //     ])->dispatch();
-
-    //     /** @var DynamoBatchRepository */
-    //     $repo = app(DynamoBatchRepository::class);
-    //     $retrieved = $repo->find($batch->id);
-    //     $this->assertEquals(2, $retrieved->totalJobs);
-    //     $this->assertEquals(1, $retrieved->failedJobs);
-    //     $this->assertTrue($retrieved->finishedAt->between(now()->subSecond(30), now()));
-    //     $this->assertTrue($retrieved->cancelledAt->between(now()->subSecond(30), now()));
-    // }
-
-    // public function test_get_batches()
-    // {
-    //     $batches = [
-    //         Bus::batch([new BatchJob('1')])->dispatch(),
-    //         Bus::batch([new BatchJob('1')])->dispatch(),
-    //         Bus::batch([new BatchJob('1')])->dispatch(),
-    //         Bus::batch([new BatchJob('1')])->dispatch(),
-    //         Bus::batch([new BatchJob('1')])->dispatch(),
-    //         Bus::batch([new BatchJob('1')])->dispatch(),
-    //         Bus::batch([new BatchJob('1')])->dispatch(),
-    //         Bus::batch([new BatchJob('1')])->dispatch(),
-    //         Bus::batch([new BatchJob('1')])->dispatch(),
-    //         Bus::batch([new BatchJob('1')])->dispatch(),
-    //     ];
-
-    //     /** @var DynamoBatchRepository */
-    //     $repo = app(DynamoBatchRepository::class);
-    //     $this->assertCount(10, $repo->get());
-    //     $this->assertCount(6, $repo->get(6));
-    //     $this->assertCount(6, $repo->get(100, $batches[6]->id));
-    //     $this->assertCount(0, $repo->get(100, $batches[0]->id));
-    //     $this->assertCount(9, $repo->get(100, $batches[9]->id));
-    //     $this->assertCount(10, $repo->get(100, Str::orderedUuid()));
-    // }
-
-    public function test_true()
+    protected function getEnvironmentSetUp($app)
     {
+        $app['config']->set('queue.batching', [
+            'driver' => 'dynamodb',
+            'region' => 'us-west-2',
+            'endpoint' => static::DYNAMO_ENDPOINT,
+            'key' => 'key',
+            'secret' => 'secret',
+        ]);
+    }
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        JobRunRecorder::reset();
+        app(DynamoBatchRepository::class)->createAwsDynamoTable();
+    }
+
+    public function tearDown(): void
+    {
+        app(DynamoBatchRepository::class)->deleteAwsDynamoTable();
+
+        parent::tearDown();
+    }
+    public function test_running_a_batch()
+    {
+        Bus::batch([
+            new BatchJob('1'),
+            new BatchJob('2'),
+        ])->dispatch();
+
+        $this->assertEquals(['1', '2'], JobRunRecorder::$results);
+    }
+
+    public function test_retrieve_batch_by_id()
+    {
+        $batch = Bus::batch([
+            new BatchJob('1'),
+            new BatchJob('2'),
+        ])->dispatch();
+
+        /** @var DynamoBatchRepository */
+        $repo = app(DynamoBatchRepository::class);
+        $retrieved = $repo->find($batch->id);
+        $this->assertEquals(2, $retrieved->totalJobs);
+        $this->assertEquals(0, $retrieved->failedJobs);
+        $this->assertTrue($retrieved->finishedAt->between(now()->subSecond(30), now()));
+    }
+
+    public function test_retrieve_non_existent_batch()
+    {
+        /** @var DynamoBatchRepository */
+        $repo = app(DynamoBatchRepository::class);
+        $retrieved = $repo->find(Str::orderedUuid());
+        $this->assertNull($retrieved);
+    }
+
+    public function test_delete_batch_by_id()
+    {
+        $batch = Bus::batch([
+            new BatchJob('1'),
+        ])->dispatch();
+
+        /** @var DynamoBatchRepository */
+        $repo = app(DynamoBatchRepository::class);
+        $retrieved = $repo->find($batch->id);
+        $this->assertNotNull($retrieved);
+        $repo->delete($retrieved->id);
+        $retrieved = $repo->find($batch->id);
+        $this->assertNull($retrieved);
+    }
+
+    public function test_delete_non_existent_batch()
+    {
+        /** @var DynamoBatchRepository */
+        $repo = app(DynamoBatchRepository::class);
+        $repo->delete(Str::orderedUuid());
+        // Ensure we didn't throw an exception
         $this->assertTrue(true);
+    }
+
+    public function test_batch_with_failing_job()
+    {
+        $batch = Bus::batch([
+            new BatchJob('1'),
+            new FailingJob('2'),
+        ])->dispatch();
+
+        /** @var DynamoBatchRepository */
+        $repo = app(DynamoBatchRepository::class);
+        $retrieved = $repo->find($batch->id);
+        $this->assertEquals(2, $retrieved->totalJobs);
+        $this->assertEquals(1, $retrieved->failedJobs);
+        $this->assertTrue($retrieved->finishedAt->between(now()->subSecond(30), now()));
+        $this->assertTrue($retrieved->cancelledAt->between(now()->subSecond(30), now()));
+    }
+
+    public function test_get_batches()
+    {
+        $batches = [
+            Bus::batch([new BatchJob('1')])->dispatch(),
+            Bus::batch([new BatchJob('1')])->dispatch(),
+            Bus::batch([new BatchJob('1')])->dispatch(),
+            Bus::batch([new BatchJob('1')])->dispatch(),
+            Bus::batch([new BatchJob('1')])->dispatch(),
+            Bus::batch([new BatchJob('1')])->dispatch(),
+            Bus::batch([new BatchJob('1')])->dispatch(),
+            Bus::batch([new BatchJob('1')])->dispatch(),
+            Bus::batch([new BatchJob('1')])->dispatch(),
+            Bus::batch([new BatchJob('1')])->dispatch(),
+        ];
+
+        /** @var DynamoBatchRepository */
+        $repo = app(DynamoBatchRepository::class);
+        $this->assertCount(10, $repo->get());
+        $this->assertCount(6, $repo->get(6));
+        $this->assertCount(6, $repo->get(100, $batches[6]->id));
+        $this->assertCount(0, $repo->get(100, $batches[0]->id));
+        $this->assertCount(9, $repo->get(100, $batches[9]->id));
+        $this->assertCount(10, $repo->get(100, Str::orderedUuid()));
     }
 }
 
