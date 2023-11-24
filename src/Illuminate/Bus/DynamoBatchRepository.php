@@ -181,16 +181,21 @@ class DynamoBatchRepository implements BatchRepository
      */
     public function incrementTotalJobs(string $batchId, int $amount)
     {
+        $update = 'SET total_jobs = total_jobs + :val, pending_jobs = pending_jobs + :val';
+        if ($this->ttl) {
+            $update = "SET total_jobs = total_jobs + :val, pending_jobs = pending_jobs + :val, {$this->ttlAttribute} = :ttl";
+        }
         $this->dynamoDbClient->updateItem([
             'TableName' => $this->table,
             'Key' => [
                 'application' => ['S' => $this->applicationName],
                 'id' => ['S' => $batchId],
             ],
-            'UpdateExpression' => 'SET total_jobs = total_jobs + :val, pending_jobs = pending_jobs + :val',
-            'ExpressionAttributeValues' => [
+            'UpdateExpression' => $update,
+            'ExpressionAttributeValues' => array_filter([
                 ':val' => ['N' => "$amount"],
-            ],
+                ':ttl' => array_filter(['N' => $this->getExpiryTime()]),
+            ]),
             'ReturnValues' => 'ALL_NEW',
         ]);
     }
@@ -204,16 +209,21 @@ class DynamoBatchRepository implements BatchRepository
      */
     public function decrementPendingJobs(string $batchId, string $jobId)
     {
+        $update = 'SET pending_jobs = pending_jobs - :inc';
+        if ($this->ttl !== null) {
+            $update = "SET pending_jobs = pending_jobs - :inc, {$this->ttlAttribute} = :ttl";
+        }
         $batch = $this->dynamoDbClient->updateItem([
             'TableName' => $this->table,
             'Key' => [
                 'application' => ['S' => $this->applicationName],
                 'id' => ['S' => $batchId],
             ],
-            'UpdateExpression' => 'SET pending_jobs = pending_jobs - :inc',
-            'ExpressionAttributeValues' => [
+            'UpdateExpression' => $update,
+            'ExpressionAttributeValues' => array_filter([
                 ':inc' => ['N' => '1'],
-            ],
+                ':ttl' => array_filter(['N' => $this->getExpiryTime()]),
+            ]),
             'ReturnValues' => 'ALL_NEW',
         ]);
         $values = $this->marshaler->unmarshalItem($batch['Attributes']);
@@ -233,18 +243,21 @@ class DynamoBatchRepository implements BatchRepository
      */
     public function incrementFailedJobs(string $batchId, string $jobId)
     {
+        $update = 'SET failed_jobs = failed_jobs + :inc, failed_job_ids = list_append(failed_job_ids, :jobId)';
+        if ($this->ttl !== null) {
+            $update = "SET failed_jobs = failed_jobs + :inc, failed_job_ids = list_append(failed_job_ids, :jobId), {$this->ttlAttribute} = :ttl";
+        }
         $batch = $this->dynamoDbClient->updateItem([
             'TableName' => $this->table,
             'Key' => [
                 'application' => ['S' => $this->applicationName],
                 'id' => ['S' => $batchId],
             ],
-            'UpdateExpression' => (
-                'SET failed_jobs = failed_jobs + :inc, failed_job_ids = list_append(failed_job_ids, :jobId)'
-            ),
-            'ExpressionAttributeValues' => $this->marshaler->marshalItem([
-                ':jobId' => [$jobId],
-                ':inc' => 1,
+            'UpdateExpression' => $update,
+            'ExpressionAttributeValues' => array_filter([
+                ':jobId' => $this->marshaler->marshalValue([$jobId]),
+                ':inc' => ['N' => '1'],
+                ':ttl' => array_filter(['N' => $this->getExpiryTime()]),
             ]),
             'ReturnValues' => 'ALL_NEW',
         ]);
@@ -264,17 +277,31 @@ class DynamoBatchRepository implements BatchRepository
      */
     public function markAsFinished(string $batchId)
     {
+        $update = 'SET finished_at = :timestamp';
+        if ($this->ttl !== null) {
+            $update = "SET finished_at = :timestamp, {$this->ttlAttribute} = :ttl";
+        }
         $this->dynamoDbClient->updateItem([
             'TableName' => $this->table,
             'Key' => [
                 'application' => ['S' => $this->applicationName],
                 'id' => ['S' => $batchId],
             ],
-            'UpdateExpression' => 'SET finished_at = :val',
-            'ExpressionAttributeValues' => [
-                ':val' => ['N' => (string) time()],
-            ],
+            'UpdateExpression' => $update,
+            'ExpressionAttributeValues' => array_filter([
+                ':timestamp' => ['N' => (string) time()],
+                ':ttl' => array_filter(['N' => $this->getExpiryTime()]),
+            ]),
         ]);
+    }
+
+    protected function getExpiryTime(): ?string
+    {
+        if ($this->ttl === null) {
+            return null;
+        }
+
+        return (string) (time() + $this->ttl);
     }
 
     /**
@@ -285,16 +312,22 @@ class DynamoBatchRepository implements BatchRepository
      */
     public function cancel(string $batchId)
     {
+        $update = 'SET cancelled_at = :timestamp, finished_at = :timestamp';
+        if ($this->ttl !== null) {
+            $update = "SET cancelled_at = :timestamp, finished_at = :timestamp, {$this->ttlAttribute} = :ttl";
+        }
+
         $this->dynamoDbClient->updateItem([
             'TableName' => $this->table,
             'Key' => [
                 'application' => ['S' => $this->applicationName],
                 'id' => ['S' => $batchId],
             ],
-            'UpdateExpression' => 'SET cancelled_at = :val, finished_at = :val',
-            'ExpressionAttributeValues' => [
-                ':val' => ['N' => (string) time()],
-            ],
+            'UpdateExpression' => $update,
+            'ExpressionAttributeValues' => array_filter([
+                ':timestamp' => ['N' => (string) time()],
+                ':ttl' => array_filter(['N' => $this->getExpiryTime()]),
+            ]),
         ]);
     }
 
