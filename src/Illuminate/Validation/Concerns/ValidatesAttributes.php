@@ -1444,7 +1444,7 @@ trait ValidatesAttributes
     }
 
     /**
-     * Validate the size of an attribute is less than a maximum value.
+     * Validate the size of an attribute is less than or equal to a maximum value.
      *
      * @param  string  $attribute
      * @param  mixed  $value
@@ -1477,6 +1477,25 @@ trait ValidatesAttributes
         $length = strlen((string) $value);
 
         return ! preg_match('/[^0-9]/', $value) && $length <= $parameters[0];
+    }
+
+    /**
+     * Validate the size of an attribute is less than but not equal to a maximum value.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  array<int, int|string>  $parameters
+     * @return bool
+     */
+    public function validateMaxExclusive($attribute, $value, $parameters)
+    {
+        $this->requireParameterCount(1, $parameters, 'max_exclusive');
+
+        if ($value instanceof UploadedFile && ! $value->isValid()) {
+            return false;
+        }
+
+        return BigNumber::of($this->getSize($attribute, $value))->isLessThan($this->trim($parameters[0]));
     }
 
     /**
@@ -1550,7 +1569,7 @@ trait ValidatesAttributes
     }
 
     /**
-     * Validate the size of an attribute is greater than a minimum value.
+     * Validate the size of an attribute is greater than or equal to a minimum value.
      *
      * @param  string  $attribute
      * @param  mixed  $value
@@ -1579,6 +1598,21 @@ trait ValidatesAttributes
         $length = strlen((string) $value);
 
         return ! preg_match('/[^0-9]/', $value) && $length >= $parameters[0];
+    }
+
+    /**
+     * Validate the size of an attribute is greater than but not equal to a minimum value.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  array<int, int|string>  $parameters
+     * @return bool
+     */
+    public function validateMinExclusive($attribute, $value, $parameters)
+    {
+        $this->requireParameterCount(1, $parameters, 'min_exclusive');
+
+        return BigNumber::of($this->getSize($attribute, $value))->isGreaterThan($this->trim($parameters[0]));
     }
 
     /**

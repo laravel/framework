@@ -3319,6 +3319,88 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
     }
 
+    public function testValidateMinExclusive()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => '0'], ['foo' => 'numeric|min_exclusive:0']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => '0.00001'], ['foo' => 'numeric|min_exclusive:0']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => 'uhgfr'], ['foo' => 'min_exclusive:4']);
+        $this->assertTrue($v->passes());
+
+        // An equal length does NOT qualify.
+        $v = new Validator($trans, ['foo' => 'ugur'], ['foo' => 'min_exclusive:4']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => 'ugr'], ['foo' => 'min_exclusive:4']);
+        $this->assertFalse($v->passes());
+
+        // '5' is a string of length 1 in absence of the 'Numeric' rule.
+        $v = new Validator($trans, ['foo' => '5'], ['foo' => 'min_exclusive:4']);
+        $this->assertFalse($v->passes());
+
+        // '5' is considered as a numeric value when the "Numeric" rule exists.
+        $v = new Validator($trans, ['foo' => '5'], ['foo' => 'numeric|min_exclusive:4']);
+        $this->assertTrue($v->passes());
+
+        // An equal value does NOT qualify.
+        $v = new Validator($trans, ['foo' => '4'], ['foo' => 'numeric|min_exclusive:4']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => '3'], ['foo' => 'numeric|min_exclusive:4']);
+        $this->assertFalse($v->passes());
+
+        // '4.1' is a string of length 3 in absence of the 'Numeric' rule.
+        $v = new Validator($trans, ['foo' => '4.1'], ['foo' => 'min_exclusive:4']);
+        $this->assertFalse($v->passes());
+
+        // '4.1' is considered as a float when the 'Numeric' rule exists.
+        $v = new Validator($trans, ['foo' => '4.1'], ['foo' => 'numeric|min_exclusive:4']);
+        $this->assertTrue($v->passes());
+
+        // An equal value does NOT qualify.
+        $v = new Validator($trans, ['foo' => '4.0'], ['foo' => 'numeric|min_exclusive:4']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => '3.99999'], ['foo' => 'numeric|min_exclusive:4']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => [1, 2, 3, 4, 5]], ['foo' => 'array|min_exclusive:4']);
+        $this->assertTrue($v->passes());
+
+        // An equal value does NOT qualify.
+        $v = new Validator($trans, ['foo' => [1, 2, 3, 4]], ['foo' => 'array|min_exclusive:4']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => [1, 2, 3]], ['foo' => 'array|min_exclusive:4']);
+        $this->assertFalse($v->passes());
+
+        $file = $this->getMockBuilder(File::class)->onlyMethods(['getSize'])->setConstructorArgs([__FILE__, false])->getMock();
+        $file->expects($this->any())->method('getSize')->willReturn(3072);
+        $v = new Validator($trans, ['photo' => $file], ['photo' => 'min_exclusive:2']);
+        $this->assertTrue($v->passes());
+
+        // An equal value does NOT qualify.
+        $file = $this->getMockBuilder(File::class)->onlyMethods(['getSize'])->setConstructorArgs([__FILE__, false])->getMock();
+        $file->expects($this->any())->method('getSize')->willReturn(3072);
+        $v = new Validator($trans, ['photo' => $file], ['photo' => 'min_exclusive:3']);
+        $this->assertFalse($v->passes());
+
+        // An equal value does NOT qualify.
+        $file = $this->getMockBuilder(File::class)->onlyMethods(['getSize'])->setConstructorArgs([__FILE__, false])->getMock();
+        $file->expects($this->any())->method('getSize')->willReturn(3073); // = 3.0009765625
+        $v = new Validator($trans, ['photo' => $file], ['photo' => 'min_exclusive:3']);
+        $this->assertTrue($v->passes());
+
+        $file = $this->getMockBuilder(File::class)->onlyMethods(['getSize'])->setConstructorArgs([__FILE__, false])->getMock();
+        $file->expects($this->any())->method('getSize')->willReturn(4072);
+        $v = new Validator($trans, ['photo' => $file], ['photo' => 'min_exclusive:10']);
+        $this->assertFalse($v->passes());
+    }
+
     public function testValidateMax()
     {
         $trans = $this->getIlluminateArrayTranslator();
@@ -3379,6 +3461,88 @@ class ValidationValidatorTest extends TestCase
         $file->expects($this->any())->method('isValid')->willReturn(false);
         $v = new Validator($trans, ['photo' => $file], ['photo' => 'Max:10']);
         $this->assertFalse($v->passes());
+    }
+
+    public function testValidateMaxExclusive()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => '1'], ['foo' => 'numeric|max_exclusive:1']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => '0.99999'], ['foo' => 'numeric|max_exclusive:1']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => 'ugr'], ['foo' => 'max_exclusive:4']);
+        $this->assertTrue($v->passes());
+
+        // An equal length does NOT qualify.
+        $v = new Validator($trans, ['foo' => 'ugur'], ['foo' => 'max_exclusive:4']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => 'uhgfr'], ['foo' => 'max_exclusive:4']);
+        $this->assertFalse($v->passes());
+
+        // '346' is a string of length 3 in absence of the 'Numeric' rule.
+        $v = new Validator($trans, ['foo' => '346'], ['foo' => 'max_exclusive:4']);
+        $this->assertTrue($v->passes());
+
+        // '346' is considered as a numeric value when the "Numeric" rule exists.
+        $v = new Validator($trans, ['foo' => '346'], ['foo' => 'numeric|max_exclusive:4']);
+        $this->assertFalse($v->passes());
+
+        // An equal value does NOT qualify.
+        $v = new Validator($trans, ['foo' => '4'], ['foo' => 'numeric|max_exclusive:4']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => '5'], ['foo' => 'numeric|max_exclusive:4']);
+        $this->assertFalse($v->passes());
+
+        // '1.1' is a string of length 3 in absence of the 'Numeric' rule.
+        $v = new Validator($trans, ['foo' => '1.1'], ['foo' => 'max_exclusive:2']);
+        $this->assertFalse($v->passes());
+
+        // '1.1' is considered as a float when the 'Numeric' rule exists.
+        $v = new Validator($trans, ['foo' => '1.1'], ['foo' => 'numeric|max_exclusive:4']);
+        $this->assertTrue($v->passes());
+
+        // An equal value does NOT qualify.
+        $v = new Validator($trans, ['foo' => '4.0'], ['foo' => 'numeric|max_exclusive:4']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => '4.00001'], ['foo' => 'numeric|max_exclusive:4']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => [1, 2, 3]], ['foo' => 'array|max_exclusive:4']);
+        $this->assertTrue($v->passes());
+
+        // An equal value does NOT qualify.
+        $v = new Validator($trans, ['foo' => [1, 2, 3, 4]], ['foo' => 'array|max_exclusive:4']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => [1, 2, 3, 4, 5]], ['foo' => 'array|max_exclusive:4']);
+        $this->assertFalse($v->passes());
+
+        $file = $this->getMockBuilder(File::class)->onlyMethods(['getSize'])->setConstructorArgs([__FILE__, false])->getMock();
+        $file->expects($this->any())->method('getSize')->willReturn(3072);
+        $v = new Validator($trans, ['photo' => $file], ['photo' => 'max_exclusive:2']);
+        $this->assertFalse($v->passes());
+
+        // An equal value does NOT qualify.
+        $file = $this->getMockBuilder(File::class)->onlyMethods(['getSize'])->setConstructorArgs([__FILE__, false])->getMock();
+        $file->expects($this->any())->method('getSize')->willReturn(3072);
+        $v = new Validator($trans, ['photo' => $file], ['photo' => 'max_exclusive:3']);
+        $this->assertFalse($v->passes());
+
+        // An equal value does NOT qualify.
+        $file = $this->getMockBuilder(File::class)->onlyMethods(['getSize'])->setConstructorArgs([__FILE__, false])->getMock();
+        $file->expects($this->any())->method('getSize')->willReturn(3073); // = 3.0009765625
+        $v = new Validator($trans, ['photo' => $file], ['photo' => 'max_exclusive:3']);
+        $this->assertFalse($v->passes());
+
+        $file = $this->getMockBuilder(File::class)->onlyMethods(['getSize'])->setConstructorArgs([__FILE__, false])->getMock();
+        $file->expects($this->any())->method('getSize')->willReturn(3071); // = 2.9990234375
+        $v = new Validator($trans, ['photo' => $file], ['photo' => 'max_exclusive:3']);
+        $this->assertTrue($v->passes());
     }
 
     /**
