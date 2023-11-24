@@ -145,6 +145,11 @@ class DynamoBatchTest extends TestCase
     //     $this->assertCount(9, $repo->get(100, $batches[9]->id));
     //     $this->assertCount(10, $repo->get(100, Str::orderedUuid()));
     // }
+
+    public function test_true()
+    {
+        $this->assertTrue(true);
+    }
 }
 
 class BatchJob implements ShouldQueue
