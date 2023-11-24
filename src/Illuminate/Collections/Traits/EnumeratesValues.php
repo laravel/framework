@@ -11,11 +11,13 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Enumerable;
 use Illuminate\Support\HigherOrderCollectionProxy;
+use InvalidArgumentException;
 use JsonSerializable;
 use Symfony\Component\VarDumper\VarDumper;
 use Traversable;
 use UnexpectedValueException;
 use UnitEnum;
+use WeakMap;
 
 /**
  * @template TKey of array-key
@@ -1019,6 +1021,7 @@ trait EnumeratesValues
         }
 
         return match (true) {
+            $items instanceof WeakMap => throw new InvalidArgumentException('Collections can not be created using instances of WeakMap.'),
             $items instanceof Enumerable => $items->all(),
             $items instanceof Arrayable => $items->toArray(),
             $items instanceof Traversable => iterator_to_array($items),

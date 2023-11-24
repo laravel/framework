@@ -19,12 +19,14 @@ use InvalidArgumentException;
 use IteratorAggregate;
 use JsonSerializable;
 use Mockery as m;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use stdClass;
 use Symfony\Component\VarDumper\VarDumper;
 use Traversable;
 use UnexpectedValueException;
+use WeakMap;
 
 include_once 'Enums.php';
 
@@ -2955,6 +2957,19 @@ class SupportCollectionTest extends TestCase
         $object->foo = 'bar';
         $data = new $collection($object);
         $this->assertEquals(['foo' => 'bar'], $data->all());
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testConstructMethodFromWeakMap($collection)
+    {
+        $this->expectException('InvalidArgumentException');
+
+        $map = new WeakMap();
+        $object = new stdClass;
+        $object->foo = 'bar';
+        $map[$object] = 3;
+
+        $data = new $collection($map);
     }
 
     public function testSplice()
