@@ -409,9 +409,8 @@ class Builder implements BuilderContract
         return $instance->newCollection(array_map(function ($item) use ($items, $instance) {
             $model = $instance->newFromBuilder($item);
 
-            if (count($items) > 1) {
-                $model->preventsLazyLoading = Model::preventsLazyLoading();
-            }
+            $model->preventsLazyLoading = Model::preventsLazyLoading() === 'strict'
+                || Model::preventsLazyLoading() && count($items) > 1;
 
             return $model;
         }, $items));

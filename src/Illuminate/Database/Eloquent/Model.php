@@ -164,7 +164,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     /**
      * Indicates whether lazy loading should be restricted on all models.
      *
-     * @var bool
+     * @var bool|string
      */
     protected static $modelsShouldPreventLazyLoading = false;
 
@@ -415,7 +415,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     /**
      * Prevent model relationships from being lazy loaded.
      *
-     * @param  bool  $value
+     * @param  bool|string  $value Can be set to 'strict' to prevent lazy loading even in non N+1 situations.
      * @return void
      */
     public static function preventLazyLoading($value = true)
