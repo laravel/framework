@@ -27,7 +27,7 @@ class DynamoBatchTest extends TestCase
         $app['config']->set('queue.batching', [
             'driver' => 'dynamodb',
             'region' => 'us-west-2',
-            'endpoint' => 'http://localhost:8000',
+            'endpoint' => 'http://localhost:8888',
             'key' => 'key',
             'secret' => 'secret',
         ]);
