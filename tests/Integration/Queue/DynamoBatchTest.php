@@ -14,14 +14,14 @@ use Orchestra\Testbench\TestCase;
 
 class DynamoBatchTest extends TestCase
 {
-    const DYNAMODB_ENDPOINT = 'http://localhost:8000';
+    const DYNAMODB_ENDPOINT = 'http://localhost:8888';
 
     protected function getEnvironmentSetUp($app)
     {
         $app['config']->set('queue.batching', [
             'driver' => 'dynamodb',
             'region' => 'us-west-2',
-            'endpoint' => env('DYNAMODB_ENDPOINT', static::DYNAMODB_ENDPOINT),
+            'endpoint' => static::DYNAMODB_ENDPOINT,
             'key' => 'key',
             'secret' => 'secret',
         ]);
