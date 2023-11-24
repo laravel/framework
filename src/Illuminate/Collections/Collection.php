@@ -1758,4 +1758,14 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     {
         unset($this->items[$key]);
     }
+
+    /**
+     * Shallow clone the collection.
+     *
+     * @return static
+     */
+    public function clone()
+    {
+        return clone $this;
+    }
 }
