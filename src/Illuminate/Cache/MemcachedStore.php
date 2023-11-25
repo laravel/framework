@@ -103,7 +103,7 @@ class MemcachedStore extends TaggableStore implements LockProvider
     public function put($key, $value, $seconds)
     {
         return $this->memcached->set(
-            $this->prefix.$key, $value, $this->calculateExpiration($seconds)
+            $this->prefix.$key, $value, $seconds
         );
     }
 
@@ -123,7 +123,7 @@ class MemcachedStore extends TaggableStore implements LockProvider
         }
 
         return $this->memcached->setMulti(
-            $prefixedValues, $this->calculateExpiration($seconds)
+            $prefixedValues, $seconds
         );
     }
 
