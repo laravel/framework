@@ -9,16 +9,16 @@ trait FileHelpers
     /**
      * The cache copy of the file's hash name.
      *
-     * @var string
+     * @var string|null
      */
-    protected $hashName = null;
+    protected string|null $hashName = null;
 
     /**
      * Get the fully qualified path to the file.
      *
      * @return string
      */
-    public function path()
+    public function path() : string
     {
         return $this->getRealPath();
     }
@@ -28,10 +28,11 @@ trait FileHelpers
      *
      * @return string
      */
-    public function extension()
+    public function extension() : string
     {
         return $this->guessExtension();
     }
+
 
     /**
      * Get a filename for the file.
@@ -39,19 +40,13 @@ trait FileHelpers
      * @param  string|null  $path
      * @return string
      */
-    public function hashName($path = null)
+    public function hashName(string|null $path = null): string
     {
-        if ($path) {
-            $path = rtrim($path, '/').'/';
-        }
+        $path = $path ? rtrim($path, '/') . '/' : '';
+        $hash = $this->hashName ??= Str::random(40);
+        $extension = $this->guessExtension() ? '.' . $this->guessExtension() : '';
 
-        $hash = $this->hashName ?: $this->hashName = Str::random(40);
-
-        if ($extension = $this->guessExtension()) {
-            $extension = '.'.$extension;
-        }
-
-        return $path.$hash.$extension;
+        return "{$path}{$hash}{$extension}";
     }
 
     /**
@@ -59,8 +54,13 @@ trait FileHelpers
      *
      * @return array|null
      */
-    public function dimensions()
+    public function dimensions(): ?array
     {
-        return @getimagesize($this->getRealPath());
+        try {
+            $size = getimagesize($this->getRealPath());
+            return $size !== false ? $size : null;
+        } catch (\Exception $e) {
+            return null;
+        }
     }
 }
