@@ -42,7 +42,7 @@ trait FileHelpers
      */
     public function hashName(string|null $path = null): string
     {
-        $path = $path ? rtrim($path, '/').'/':'';
+        $path = $path ? rtrim($path, '/').'/' : '';
         $hash = $this->hashName ??= Str::random(40);
         $extension = $this->guessExtension() ? '.'.$this->guessExtension() : '';
 
