@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Auth;
 
 use Illuminate\Auth\DatabaseUserProvider;
+use Illuminate\Auth\EloquentUserProvider;
 use Illuminate\Auth\GenericUser;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Hashing\Hasher;
@@ -154,32 +155,9 @@ class AuthDatabaseUserProviderTest extends TestCase
         $conn = m::mock(Connection::class);
         $hasher = m::mock(Hasher::class);
         $hasher->shouldReceive('check')->once()->with('plain', 'hash')->andReturn(true);
-        $hasher->shouldReceive('needsRehash')->once()->with('hash')->andReturn(false);
         $provider = new DatabaseUserProvider($conn, $hasher, 'foo');
         $user = m::mock(Authenticatable::class);
         $user->shouldReceive('getAuthPassword')->once()->andReturn('hash');
-        $result = $provider->validateCredentials($user, ['password' => 'plain']);
-
-        $this->assertTrue($result);
-    }
-
-    public function testCredentialValidationRequiresRehash()
-    {
-        $hasher = m::mock(Hasher::class);
-        $hasher->shouldReceive('check')->once()->with('plain', 'hash')->andReturn(true);
-        $hasher->shouldReceive('needsRehash')->once()->with('hash')->andReturn(true);
-        $hasher->shouldReceive('make')->once()->with('plain')->andReturn('rehashed');
-        $conn = m::mock(Connection::class);
-        $table = m::mock(ConnectionInterface::class);
-        $conn->shouldReceive('table')->once()->with('foo')->andReturn($table);
-        $table->shouldReceive('where')->once()->with('id', 1)->andReturnSelf();
-        $table->shouldReceive('update')->once()->with(['password_attribute' => 'rehashed']);
-        $provider = new DatabaseUserProvider($conn, $hasher, 'foo');
-        $user = m::mock(Authenticatable::class);
-        $user->shouldReceive('getAuthIdentifierName')->once()->andReturn('id');
-        $user->shouldReceive('getAuthIdentifier')->once()->andReturn(1);
-        $user->shouldReceive('getAuthPassword')->once()->andReturn('hash');
-        $user->shouldReceive('getAuthPasswordName')->once()->andReturn('password_attribute');
         $result = $provider->validateCredentials($user, ['password' => 'plain']);
 
         $this->assertTrue($result);
@@ -196,5 +174,49 @@ class AuthDatabaseUserProviderTest extends TestCase
         $result = $provider->validateCredentials($user, ['password' => 'plain']);
 
         $this->assertFalse($result);
+    }
+
+    public function testRehashPasswordIfRequired()
+    {
+        $hasher = m::mock(Hasher::class);
+        $hasher->shouldReceive('needsRehash')->once()->with('hash')->andReturn(true);
+        $hasher->shouldReceive('make')->once()->with('plain')->andReturn('rehashed');
+
+        $conn = m::mock(Connection::class);
+        $table = m::mock(ConnectionInterface::class);
+        $conn->shouldReceive('table')->once()->with('foo')->andReturn($table);
+        $table->shouldReceive('where')->once()->with('id', 1)->andReturnSelf();
+        $table->shouldReceive('update')->once()->with(['password_attribute' => 'rehashed']);
+
+        $user = m::mock(Authenticatable::class);
+        $user->shouldReceive('getAuthIdentifierName')->once()->andReturn('id');
+        $user->shouldReceive('getAuthIdentifier')->once()->andReturn(1);
+        $user->shouldReceive('getAuthPassword')->once()->andReturn('hash');
+        $user->shouldReceive('getAuthPasswordName')->once()->andReturn('password_attribute');
+
+        $provider = new DatabaseUserProvider($conn, $hasher, 'foo');
+        $provider->rehashPasswordIfRequired($user, ['password' => 'plain']);
+    }
+
+    public function testDontRehashPasswordIfNotRequired()
+    {
+        $hasher = m::mock(Hasher::class);
+        $hasher->shouldReceive('needsRehash')->once()->with('hash')->andReturn(false);
+        $hasher->shouldNotReceive('make');
+
+        $conn = m::mock(Connection::class);
+        $table = m::mock(ConnectionInterface::class);
+        $conn->shouldNotReceive('table');
+        $table->shouldNotReceive('where');
+        $table->shouldNotReceive('update');
+
+        $user = m::mock(Authenticatable::class);
+        $user->shouldReceive('getAuthPassword')->once()->andReturn('hash');
+        $user->shouldNotReceive('getAuthIdentifierName');
+        $user->shouldNotReceive('getAuthIdentifier');
+        $user->shouldNotReceive('getAuthPasswordName');
+
+        $provider = new DatabaseUserProvider($conn, $hasher, 'foo');
+        $provider->rehashPasswordIfRequired($user, ['password' => 'plain']);
     }
 }

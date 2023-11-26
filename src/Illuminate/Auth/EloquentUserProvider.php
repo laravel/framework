@@ -152,28 +152,24 @@ class EloquentUserProvider implements UserProvider
             return false;
         }
 
-        if (! $this->hasher->check($plain, $hash = $user->getAuthPassword())) {
-            return false;
-        }
-
-        if ($this->hasher->needsRehash($hash)) {
-            $this->rehashUserPassword($user, $plain);
-        }
-
-        return true;
+        return $this->hasher->check($plain, $user->getAuthPassword());
     }
 
     /**
-     * Rehash the user's password.
+     * Rehash the user's password if required and supported.
      *
      * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
-     * @param  string  $plain
-     * @return void
+     * @param  array  $credentials
+     * @return string|null
      */
-    public function rehashUserPassword(UserContract $user, string $plain): void
+    public function rehashPasswordIfRequired(UserContract $user, array $credentials)
     {
+        if (! $this->hasher->needsRehash($user->getAuthPassword())) {
+            return;
+        }
+
         $user->forceFill([
-            $user->getAuthPasswordName() => $this->hasher->make($plain),
+            $user->getAuthPasswordName() => $this->hasher->make($credentials['password']),
         ])->save();
     }
 

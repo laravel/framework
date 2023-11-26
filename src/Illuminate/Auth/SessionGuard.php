@@ -384,6 +384,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
         // to validate the user against the given credentials, and if they are in
         // fact valid we'll log the users into the application and return true.
         if ($this->hasValidCredentials($user, $credentials)) {
+            $this->provider->rehashPasswordIfRequired($user, $credentials);
             $this->login($user, $remember);
 
             return true;
@@ -415,6 +416,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
         // the user is retrieved and validated. If one of the callbacks returns falsy we do
         // not login the user. Instead, we will fail the specific authentication attempt.
         if ($this->hasValidCredentials($user, $credentials) && $this->shouldLogin($callbacks, $user)) {
+            $this->provider->rehashPasswordIfRequired($user, $credentials);
             $this->login($user, $remember);
 
             return true;

@@ -3,6 +3,7 @@
 namespace Illuminate\Auth;
 
 use Closure;
+use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\Authenticatable as UserContract;
 use Illuminate\Contracts\Auth\UserProvider;
 use Illuminate\Contracts\Hashing\Hasher as HasherContract;
@@ -154,32 +155,26 @@ class DatabaseUserProvider implements UserProvider
      */
     public function validateCredentials(UserContract $user, array $credentials)
     {
-        if (is_null($plain = $credentials['password'])) {
-            return false;
-        }
-
-        if (! $this->hasher->check($plain, $hash = $user->getAuthPassword())) {
-            return false;
-        }
-
-        if ($this->hasher->needsRehash($hash)) {
-            $this->rehashUserPassword($user, $plain);
-        }
-
-        return true;
+        return $this->hasher->check(
+            $credentials['password'], $user->getAuthPassword()
+        );
     }
 
     /**
-     * Rehash the user's password.
+     * Rehash the user's password if required and supported.
      *
      * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
-     * @param  string  $plain
-     * @return void
+     * @param  array  $credentials
+     * @return string|null
      */
-    public function rehashUserPassword(UserContract $user, string $plain): void
+    public function rehashPasswordIfRequired(Authenticatable $user, array $credentials)
     {
+        if (! $this->hasher->needsRehash($user->getAuthPassword())) {
+            return;
+        }
+
         $this->connection->table($this->table)
             ->where($user->getAuthIdentifierName(), $user->getAuthIdentifier())
-            ->update([$user->getAuthPasswordName() => $this->hasher->make($plain)]);
+            ->update([$user->getAuthPasswordName() => $this->hasher->make($credentials['password'])]);
     }
 }
