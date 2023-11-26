@@ -33,7 +33,6 @@ trait FileHelpers
         return $this->guessExtension();
     }
 
-
     /**
      * Get a filename for the file.
      *
@@ -58,6 +57,7 @@ trait FileHelpers
     {
         try {
             $size = getimagesize($this->getRealPath());
+
             return $size !== false ? $size : null;
         } catch (\Exception $e) {
             return null;
