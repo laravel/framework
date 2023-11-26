@@ -3,7 +3,6 @@
 namespace Illuminate\Auth;
 
 use Closure;
-use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\Authenticatable as UserContract;
 use Illuminate\Contracts\Auth\UserProvider;
 use Illuminate\Contracts\Hashing\Hasher as HasherContract;
@@ -167,7 +166,7 @@ class DatabaseUserProvider implements UserProvider
      * @param  array  $credentials
      * @return string|null
      */
-    public function rehashPasswordIfRequired(Authenticatable $user, array $credentials)
+    public function rehashPasswordIfRequired(UserContract $user, array $credentials)
     {
         if (! $this->hasher->needsRehash($user->getAuthPassword())) {
             return;
