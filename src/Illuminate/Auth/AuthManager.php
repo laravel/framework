@@ -128,7 +128,7 @@ class AuthManager implements FactoryContract
             $name,
             $provider,
             $this->app['session.store'],
-            $this->app['hash']->rehashOnLogin(),
+            rehashOnLogin: $this->app['hash']->rehashOnLogin(),
         );
 
         // When using the remember me functionality of the authentication services we
