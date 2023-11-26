@@ -111,7 +111,7 @@ class UploadedFileWithCustomImageSizeMethod extends UploadedFile
         return 'png';
     }
 
-    public function dimensions() : array|null
+    public function dimensions(): array|null
     {
         return [200, 200];
     }
