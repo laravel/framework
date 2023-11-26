@@ -3,7 +3,6 @@
 namespace Illuminate\Tests\Auth;
 
 use Illuminate\Auth\DatabaseUserProvider;
-use Illuminate\Auth\EloquentUserProvider;
 use Illuminate\Auth\GenericUser;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Hashing\Hasher;
