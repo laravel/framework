@@ -208,6 +208,7 @@ class Application extends SymfonyApplication implements ApplicationContract
      * @param  \Symfony\Component\Console\Command\Command  $command
      * @return \Symfony\Component\Console\Command\Command|null
      */
+    #[\Override]
     public function add(SymfonyCommand $command): ?SymfonyCommand
     {
         if ($command instanceof Command) {
@@ -285,6 +286,7 @@ class Application extends SymfonyApplication implements ApplicationContract
      *
      * @return \Symfony\Component\Console\Input\InputDefinition
      */
+    #[\Override]
     protected function getDefaultInputDefinition(): InputDefinition
     {
         return tap(parent::getDefaultInputDefinition(), function ($definition) {
