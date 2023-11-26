@@ -205,6 +205,26 @@ class AuthGuardTest extends TestCase
         $this->assertTrue($guard->attempt(['foo']));
     }
 
+    public function testAttemptDoesntRehashPasswordWhenDisabled()
+    {
+        [$session, $provider, $request, $cookie, $timebox] = $this->getMocks();
+        $guard = $this->getMockBuilder(SessionGuard::class)->onlyMethods(['login'])
+            ->setConstructorArgs(['default', $provider, $session, $request, $timebox, $rehashOnLogin = false])
+            ->getMock();
+        $guard->setDispatcher($events = m::mock(Dispatcher::class));
+        $timebox->shouldReceive('call')->once()->andReturnUsing(function ($callback, $microseconds) use ($timebox) {
+            return $callback($timebox->shouldReceive('returnEarly')->once()->getMock());
+        });
+        $events->shouldReceive('dispatch')->once()->with(m::type(Attempting::class));
+        $events->shouldReceive('dispatch')->once()->with(m::type(Validated::class));
+        $user = $this->createMock(Authenticatable::class);
+        $guard->getProvider()->shouldReceive('retrieveByCredentials')->once()->andReturn($user);
+        $guard->getProvider()->shouldReceive('validateCredentials')->with($user, ['foo'])->andReturn(true);
+        $guard->getProvider()->shouldNotReceive('rehashPasswordIfRequired');
+        $guard->expects($this->once())->method('login')->with($this->equalTo($user));
+        $this->assertTrue($guard->attempt(['foo']));
+    }
+
     public function testLoginStoresIdentifierInSession()
     {
         [$session, $provider, $request, $cookie] = $this->getMocks();

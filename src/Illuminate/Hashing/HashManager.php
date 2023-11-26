@@ -100,6 +100,16 @@ class HashManager extends Manager implements Hasher
     }
 
     /**
+     * Determine if rehashing should be performed during login.
+     *
+     * @return bool
+     */
+    public function rehashOnLogin()
+    {
+        return $this->config->get('hashing.rehash_on_login', true);
+    }
+
+    /**
      * Get the default driver name.
      *
      * @return string

@@ -97,6 +97,13 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     protected $timebox;
 
     /**
+     * Rehash passwords during login.
+     *
+     * @var bool
+     */
+    protected $rehashOnLogin;
+
+    /**
      * Indicates if the logout method has been called.
      *
      * @var bool
@@ -124,13 +131,15 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
                                 UserProvider $provider,
                                 Session $session,
                                 Request $request = null,
-                                Timebox $timebox = null)
+                                Timebox $timebox = null,
+                                bool $rehashOnLogin = true)
     {
         $this->name = $name;
         $this->session = $session;
         $this->request = $request;
         $this->provider = $provider;
         $this->timebox = $timebox ?: new Timebox;
+        $this->rehashOnLogin = $rehashOnLogin;
     }
 
     /**
@@ -384,7 +393,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
         // to validate the user against the given credentials, and if they are in
         // fact valid we'll log the users into the application and return true.
         if ($this->hasValidCredentials($user, $credentials)) {
-            $this->provider->rehashPasswordIfRequired($user, $credentials);
+            $this->rehashPasswordIfRequired($user, $credentials);
             $this->login($user, $remember);
 
             return true;
@@ -416,7 +425,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
         // the user is retrieved and validated. If one of the callbacks returns falsy we do
         // not login the user. Instead, we will fail the specific authentication attempt.
         if ($this->hasValidCredentials($user, $credentials) && $this->shouldLogin($callbacks, $user)) {
-            $this->provider->rehashPasswordIfRequired($user, $credentials);
+            $this->rehashPasswordIfRequired($user, $credentials);
             $this->login($user, $remember);
 
             return true;
@@ -447,6 +456,20 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
 
             return $validated;
         }, 200 * 1000);
+    }
+
+    /**
+     * Rehash the user's password if enabled and required.
+     *
+     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
+     * @param  array  $credentials
+     * @return bool
+     */
+    protected function rehashPasswordIfRequired(AuthenticatableContract $user, array $credentials)
+    {
+        if ($this->rehashOnLogin) {
+            $this->provider->rehashPasswordIfRequired($user, $credentials);
+        }
     }
 
     /**
