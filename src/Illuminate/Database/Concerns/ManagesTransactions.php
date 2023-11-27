@@ -55,7 +55,11 @@ trait ManagesTransactions
                     max(0, $this->transactions - 1),
                 ];
 
-                $this->transactionsManager?->commit($this->getName());
+                $this->transactionsManager?->commit(
+                    $this->getName(),
+                    $levelBeingCommitted,
+                    $this->transactions
+                );
             } catch (Throwable $e) {
                 $this->handleCommitTransactionException(
                     $e, $currentAttempt, $attempts
@@ -89,7 +93,9 @@ trait ManagesTransactions
             $this->transactions > 1) {
             $this->transactions--;
 
-            $this->transactionsManager?->rollback($this->getName());
+            $this->transactionsManager?->rollback(
+                $this->getName(), $this->transactions
+            );
 
             throw new DeadlockException($e->getMessage(), is_int($e->getCode()) ? $e->getCode() : 0, $e);
         }
@@ -201,8 +207,9 @@ trait ManagesTransactions
             max(0, $this->transactions - 1),
         ];
 
-
-        $this->transactionsManager?->commit($this->getName());
+        $this->transactionsManager?->commit(
+            $this->getName(), $levelBeingCommitted, $this->transactions
+        );
         $this->fireConnectionEvent('committed');
     }
 
