@@ -88,6 +88,11 @@ class DatabaseTransactionsManager
         $transaction = $this->currentTransaction[$connection];
         $lastTransaction = $this->findLastPendingTransactionBeforeTransaction($transaction);
 
+        if ($newTransactionLevel === 0) {
+            $this->removeAllTransactions($connection);
+            return $this->movePointersTo($connection, null);
+        }
+
         $this->removeTransaction($transaction);
 
         // In a nested setting, the rolled back transaction isn't necessarily in the same
@@ -137,12 +142,17 @@ class DatabaseTransactionsManager
     /**
      * Get all of the committed transactions.
      *
+     * @param  string $connection
      * @return \Illuminate\Support\Collection
      */
-    public function getCommittedTransactions()
+    public function getCommittedTransactions($connection = null)
     {
         return $this->transactions
             ->filter(fn ($transaction) => $transaction->committed === true)
+            ->when(
+                $connection,
+                fn ($transactions) => $transactions->filter(fn ($transaction) => $transaction->connection === $connection)
+            )
             ->values();
     }
 
@@ -187,5 +197,10 @@ class DatabaseTransactionsManager
         return $this->transactions
             ->filter(fn ($transaction, $foundIndex) => $transaction->committed === false && $foundIndex < $givenTransactionIndex)
             ->last();
+    }
+
+    protected function removeAllTransactions(string $connection)
+    {
+        $this->transactions = $this->transactions->reject(fn ($transaction) => $transaction->connection === $connection);
     }
 }
