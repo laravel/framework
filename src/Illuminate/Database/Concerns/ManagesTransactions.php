@@ -201,8 +201,8 @@ trait ManagesTransactions
             max(0, $this->transactions - 1),
         ];
 
-        $this->transactionsManager?->commit($this->getName());
 
+        $this->transactionsManager?->commit($this->getName());
         $this->fireConnectionEvent('committed');
     }
 
