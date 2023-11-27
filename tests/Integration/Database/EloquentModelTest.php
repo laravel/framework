@@ -126,6 +126,21 @@ class EloquentModelTest extends DatabaseTestCase
             'analyze' => true,
         ]);
     }
+
+    public function testJsonArrayCasting() {
+        Schema::create('test_model3', function (Blueprint $table) {
+            $table->id();
+            $table->json('settings');
+        });
+
+        $model = TestModel3::create([
+            'settings' => ['example'],
+        ]);
+
+        $this->assertDatabaseHas('test_model3', [
+            'settings' => ['example'],
+        ]);
+    }
 }
 
 class TestModel1 extends Model
@@ -141,4 +156,12 @@ class TestModel2 extends Model
     public $table = 'test_model2';
     public $timestamps = false;
     protected $guarded = [];
+}
+
+class TestModel3 extends Model
+{
+    public $table = 'test_model3';
+    public $timestamps = false;
+    protected $guarded = [];
+    protected $casts = ['settings' => 'array'];
 }
