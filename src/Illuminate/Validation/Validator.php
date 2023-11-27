@@ -284,6 +284,13 @@ class Validator implements ValidatorContract
     protected $sizeRules = ['Size', 'Between', 'Min', 'Max', 'Gt', 'Lt', 'Gte', 'Lte'];
 
     /**
+     * The default numeric related validation rules.
+     *
+     * @var string[]
+     */
+    protected $defaultNumericRules = ['Numeric', 'Integer', 'Decimal'];
+
+    /**
      * The numeric related validation rules.
      *
      * @var string[]
@@ -640,6 +647,9 @@ class Validator implements ValidatorContract
         }
 
         $method = "validate{$rule}";
+
+        // Reset numeric rules
+        $this->numericRules = $this->defaultNumericRules;
 
         if ($validatable && ! $this->$method($attribute, $value, $parameters, $this)) {
             $this->addFailure($attribute, $rule, $parameters);
