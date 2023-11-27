@@ -15,6 +15,7 @@ use Illuminate\Database\Events\ModelPruningStarting;
 use Illuminate\Database\Events\ModelsPruned;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Foundation\Application;
+use InvalidArgumentException;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -33,6 +34,39 @@ class PruneCommandTest extends TestCase
         });
 
         $container->alias(DispatcherContract::class, 'events');
+    }
+
+    public function testAllModelsCanBePruned()
+    {
+        $output = $this->artisan(['--all' => true]);
+
+        $output = $output->fetch();
+
+        $this->assertStringContainsString(
+            'Illuminate\Tests\Database\PrunableTestModelWithPrunableRecords',
+            $output,
+        );
+
+        $this->assertStringContainsString(
+            'Illuminate\Tests\Database\PrunableTestModelWithoutPrunableRecords',
+            $output,
+        );
+
+        $this->assertStringContainsString(
+            'Illuminate\Tests\Database\PrunableTestSoftDeletedModelWithPrunableRecords',
+            $output,
+        );
+    }
+
+    public function testModelAndExceptCanNotBeUsedTogether()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The --model and --except options cannot be combined.');
+
+        $this->artisan([
+            '--model' => PrunableTestModelWithPrunableRecords::class,
+            '--except' => PrunableTestModelWithoutPrunableRecords::class,
+        ]);
     }
 
     public function testPrunableModelWithPrunableRecords()

@@ -22,6 +22,7 @@ class PruneCommand extends Command
      * @var string
      */
     protected $signature = 'model:prune
+                                {--all : Find and prune all models, even outside of the app/Models directory}
                                 {--model=* : Class names of the models to be pruned}
                                 {--except=* : Class names of the models to be excluded from pruning}
                                 {--chunk=1000 : The number of models to retrieve per chunk of models to be deleted}
@@ -113,16 +114,26 @@ class PruneCommand extends Command
      */
     protected function models()
     {
-        if (! empty($models = $this->option('model'))) {
+        $models = $this->option('model');
+        $except = $this->option('except');
+
+        if (! empty($models) && ! empty($except)) {
+            throw new InvalidArgumentException('The --model and --except options cannot be combined.');
+        }
+
+        if (! empty($models)) {
             return collect($models)->filter(function ($model) {
                 return class_exists($model);
             })->values();
         }
 
-        $except = $this->option('except');
-
-        if (! empty($models) && ! empty($except)) {
-            throw new InvalidArgumentException('The --models and --except options cannot be combined.');
+        if ($this->option('all')) {
+            return collect(get_declared_classes())
+                ->when(! empty($except), function ($models) use ($except) {
+                    return $models->reject(fn ($model) => in_array($model, $except));
+                })
+                ->filter(fn ($class) => $this->isPrunable($class))
+                ->all();
         }
 
         return collect((new Finder)->in($this->getDefaultPath())->files()->name('*.php'))
@@ -135,9 +146,7 @@ class PruneCommand extends Command
                     Str::after($model->getRealPath(), realpath(app_path()).DIRECTORY_SEPARATOR)
                 );
             })->when(! empty($except), function ($models) use ($except) {
-                return $models->reject(function ($model) use ($except) {
-                    return in_array($model, $except);
-                });
+                return $models->reject(fn ($model) => in_array($model, $except));
             })->filter(function ($model) {
                 return class_exists($model);
             })->filter(function ($model) {
