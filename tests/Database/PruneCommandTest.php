@@ -38,6 +38,24 @@ class PruneCommandTest extends TestCase
 
     public function testAllModelsCanBePruned()
     {
+        $db = new DB;
+        $db->addConnection([
+            'driver' => 'sqlite',
+            'database' => ':memory:',
+        ]);
+        $db->bootEloquent();
+        $db->setAsGlobal();
+        DB::connection('default')->getSchemaBuilder()->create('prunables', function ($table) {
+            $table->string('value')->nullable();
+            $table->datetime('deleted_at')->nullable();
+        });
+        DB::connection('default')->table('prunables')->insert([
+            ['value' => 1, 'deleted_at' => null],
+            ['value' => 2, 'deleted_at' => '2021-12-01 00:00:00'],
+            ['value' => 3, 'deleted_at' => null],
+            ['value' => 4, 'deleted_at' => '2021-12-02 00:00:00'],
+        ]);
+
         $output = $this->artisan(['--all' => true]);
 
         $output = $output->fetch();
