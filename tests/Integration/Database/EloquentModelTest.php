@@ -127,7 +127,7 @@ class EloquentModelTest extends DatabaseTestCase
         ]);
     }
 
-    public function testJsonArrayCasting() {
+    public function testNonAssocArrayToArrayCasting() {
         Schema::create('test_model3', function (Blueprint $table) {
             $table->id();
             $table->json('settings');
@@ -137,8 +137,83 @@ class EloquentModelTest extends DatabaseTestCase
             'settings' => ['example'],
         ]);
 
-        $this->assertDatabaseHas('test_model3', [
+        $this->assertDatabaseHas($model, [
             'settings' => ['example'],
+        ]);
+    }
+
+    public function testAssocArrayToArrayCasting() {
+        Schema::create('test_model3', function (Blueprint $table) {
+            $table->id();
+            $table->json('settings');
+        });
+
+        $model = TestModel3::create([
+            'settings' => ['label' => 'example'],
+        ]);
+
+        $this->assertDatabaseHas($model, [
+            'settings' => ['label' => 'example'],
+        ]);
+    }
+
+    public function testNonAssocArrayToJsonCasting() {
+        Schema::create('test_model4', function (Blueprint $table) {
+            $table->id();
+            $table->json('settings');
+        });
+
+        $model = TestModel4::create([
+            'settings' => ['example'],
+        ]);
+
+        $this->assertDatabaseHas($model, [
+            'settings' => ['example'],
+        ]);
+    }
+
+    public function testAssocArrayToJsonCasting() {
+        Schema::create('test_model4', function (Blueprint $table) {
+            $table->id();
+            $table->json('settings');
+        });
+
+        $model = TestModel4::create([
+            'settings' => ['label' => 'example'],
+        ]);
+
+        $this->assertDatabaseHas($model, [
+            'settings' => ['label' => 'example'],
+        ]);
+    }
+
+    public function testNonAssocArrayToObjectCasting() {
+        Schema::create('test_model5', function (Blueprint $table) {
+            $table->id();
+            $table->json('settings');
+        });
+
+        $model = TestModel5::create([
+            'settings' => ['example'],
+        ]);
+
+        $this->assertDatabaseHas($model, [
+            'settings' => ['example'],
+        ]);
+    }
+
+    public function testAssocArrayToObjectCasting() {
+        Schema::create('test_model5', function (Blueprint $table) {
+            $table->id();
+            $table->json('settings');
+        });
+
+        $model = TestModel5::create([
+            'settings' => ['label' => 'example'],
+        ]);
+
+        $this->assertDatabaseHas($model, [
+            'settings' => ['label' => 'example'],
         ]);
     }
 }
@@ -164,4 +239,20 @@ class TestModel3 extends Model
     public $timestamps = false;
     protected $guarded = [];
     protected $casts = ['settings' => 'array'];
+}
+
+class TestModel4 extends Model
+{
+    public $table = 'test_model4';
+    public $timestamps = false;
+    protected $guarded = [];
+    protected $casts = ['settings' => 'json'];
+}
+
+class TestModel5 extends Model
+{
+    public $table = 'test_model5';
+    public $timestamps = false;
+    protected $guarded = [];
+    protected $casts = ['settings' => 'object'];
 }
