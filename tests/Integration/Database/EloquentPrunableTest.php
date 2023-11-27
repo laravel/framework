@@ -13,7 +13,7 @@ use LogicException;
 
 class EloquentPrunableTest extends DatabaseTestCase
 {
-    public function defineDatabaseMigrationsAfterDatabaseRefreshed()
+    protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
     {
         collect([
             'prunable_test_models',
