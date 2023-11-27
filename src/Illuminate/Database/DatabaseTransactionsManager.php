@@ -24,7 +24,7 @@ class DatabaseTransactionsManager
     /**
      * The transactions that have been executed.
      *
-     * @var Collection<int, \Illuminate\Database\DatabaseTransactionRecord[]>
+     * @var \Illuminate\Support\Collection<int, \Illuminate\Database\DatabaseTransactionRecord[]>
      */
     protected $transactions = [];
 
@@ -86,12 +86,7 @@ class DatabaseTransactionsManager
     public function rollback($connection, $newTransactionLevel)
     {
         $transaction = $this->currentTransaction[$connection];
-        $transactionIndex = $this->transactions->search($transaction);
-        // Find the last committed transaction previous to the one that has been rolled back.
-        // WIP: maybe use a linked list here?
-        $lastTransaction = $this->transactions
-            ->filter(fn ($transaction, $foundIndex) => $transaction->committed === false && $foundIndex < $transactionIndex)
-            ->last();
+        $lastTransaction = $this->findLastPendingTransactionBeforeTransaction($transaction);
 
         $this->removeTransaction($transaction);
 
@@ -177,5 +172,20 @@ class DatabaseTransactionsManager
         $transaction->parent?->removeChild($transaction);
 
         $this->transactions = $this->transactions->reject(fn ($t) => $t === $transaction);
+    }
+
+    /**
+     * Find the last pending transaction before the given transaction.
+     *
+     * @param  \Illuminate\Database\DatabaseTransactionRecord $transaction
+     * @return \Illuminate\Database\DatabaseTransactionRecord|null
+     */
+    protected function findLastPendingTransactionBeforeTransaction($transaction)
+    {
+        $givenTransactionIndex = $this->transactions->search($transaction);
+
+        return $this->transactions
+            ->filter(fn ($transaction, $foundIndex) => $transaction->committed === false && $foundIndex < $givenTransactionIndex)
+            ->last();
     }
 }
