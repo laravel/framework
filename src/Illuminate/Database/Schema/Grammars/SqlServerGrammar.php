@@ -69,11 +69,64 @@ class SqlServerGrammar extends Grammar
     /**
      * Compile the query to determine if a table exists.
      *
+     * @deprecated Will be removed in a future Laravel version.
+     *
      * @return string
      */
     public function compileTableExists()
     {
         return "select * from sys.sysobjects where id = object_id(?) and xtype in ('U', 'V')";
+    }
+
+    /**
+     * Compile the query to determine the tables.
+     *
+     * @return string
+     */
+    public function compileTables()
+    {
+        return 'select t.name as name, SCHEMA_NAME(t.schema_id) as [schema], sum(u.total_pages) * 8 * 1024 as size '
+            .'from sys.tables as t '
+            .'join sys.partitions as p on p.object_id = t.object_id '
+            .'join sys.allocation_units as u on u.container_id = p.hobt_id '
+            .'group by t.name, t.schema_id '
+            .'order by t.name';
+    }
+
+    /**
+     * Compile the query to determine the views.
+     *
+     * @return string
+     */
+    public function compileViews()
+    {
+        return 'select name, SCHEMA_NAME(v.schema_id) as [schema], definition from sys.views as v '
+            .'inner join sys.sql_modules as m on v.object_id = m.object_id '
+            .'order by name';
+    }
+
+    /**
+     * Compile the SQL needed to retrieve all table names.
+     *
+     * @deprecated Will be removed in a future Laravel version.
+     *
+     * @return string
+     */
+    public function compileGetAllTables()
+    {
+        return "select name, type from sys.tables where type = 'U'";
+    }
+
+    /**
+     * Compile the SQL needed to retrieve all view names.
+     *
+     * @deprecated Will be removed in a future Laravel version.
+     *
+     * @return string
+     */
+    public function compileGetAllViews()
+    {
+        return "select name, type from sys.objects where type = 'V'";
     }
 
     /**
@@ -502,26 +555,6 @@ class SqlServerGrammar extends Grammar
             FROM sys.views;
 
             EXEC sp_executesql @sql;";
-    }
-
-    /**
-     * Compile the SQL needed to retrieve all table names.
-     *
-     * @return string
-     */
-    public function compileGetAllTables()
-    {
-        return "select name, type from sys.tables where type = 'U'";
-    }
-
-    /**
-     * Compile the SQL needed to retrieve all view names.
-     *
-     * @return string
-     */
-    public function compileGetAllViews()
-    {
-        return "select name, type from sys.objects where type = 'V'";
     }
 
     /**
