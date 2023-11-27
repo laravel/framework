@@ -1883,6 +1883,29 @@ class RoutingRouteTest extends TestCase
         $this->assertEquals(302, $response->getStatusCode());
     }
 
+    public function testImplicitBindingsWithMissingModelHandledByMissingOnGroupLevel()
+    {
+        $router = $this->getRouter();
+        $router->as('foo.')
+            ->missing(fn () => new RedirectResponse('/', 302))
+            ->group(function () use ($router) {
+                $router->get('foo/{bar}', [
+                    'middleware' => SubstituteBindings::class,
+                    'uses' => function (RouteModelBindingNullStub $bar = null) {
+                        $this->assertInstanceOf(RouteModelBindingNullStub::class, $bar);
+
+                        return $bar->first();
+                    },
+                ]);
+            });
+
+        $request = Request::create('foo/taylor', 'GET');
+
+        $response = $router->dispatch($request);
+        $this->assertTrue($response->isRedirect('/'));
+        $this->assertEquals(302, $response->getStatusCode());
+    }
+
     public function testImplicitBindingsWithOptionalParameterWithNoKeyInUri()
     {
         $router = $this->getRouter();
