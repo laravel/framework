@@ -25,6 +25,14 @@ class CacheApcStoreTest extends TestCase
         $this->assertSame('bar', $store->get('foo'));
     }
 
+    public function testAPCFalseValueIsReturned()
+    {
+        $apc = $this->getMockBuilder(ApcWrapper::class)->onlyMethods(['get'])->getMock();
+        $apc->expects($this->once())->method('get')->willReturn(false);
+        $store = new ApcStore($apc);
+        $this->assertFalse($store->get('foo'));
+    }
+
     public function testGetMultipleReturnsNullWhenNotFoundAndValueWhenFound()
     {
         $apc = $this->getMockBuilder(ApcWrapper::class)->onlyMethods(['get'])->getMock();
