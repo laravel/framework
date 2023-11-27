@@ -15,8 +15,6 @@ use Illuminate\Database\Events\ModelPruningStarting;
 use Illuminate\Database\Events\ModelsPruned;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Foundation\Application;
-use Illuminate\Tests\Integration\Database\EloquentMassPrunableTest;
-use Illuminate\Tests\Integration\Database\EloquentPrunableTest;
 use Illuminate\Tests\Integration\Database\MassPrunableSoftDeleteTestModel;
 use Illuminate\Tests\Integration\Database\MassPrunableTestModel;
 use Illuminate\Tests\Integration\Database\MassPrunableTestModelMissingPrunableMethod;
@@ -47,30 +45,20 @@ class PruneCommandTest extends TestCase
 
     public function testAllModelsCanBePruned()
     {
-        $db = new DB;
-        $db->addConnection([
-            'driver' => 'sqlite',
-            'database' => ':memory:',
-        ]);
-        $db->bootEloquent();
-        $db->setAsGlobal();
-
-        DB::connection('default')->getSchemaBuilder()->create('prunables', function ($table) {
-            $table->string('value')->nullable();
-            $table->datetime('deleted_at')->nullable();
-        });
-        DB::connection('default')->table('prunables')->insert([
-            ['value' => 1, 'deleted_at' => null],
-            ['value' => 2, 'deleted_at' => '2021-12-01 00:00:00'],
-            ['value' => 3, 'deleted_at' => null],
-            ['value' => 4, 'deleted_at' => '2021-12-02 00:00:00'],
-        ]);
-
-        (new EloquentPrunableTest(''))->defineDatabaseMigrationsAfterDatabaseRefreshed();
-        (new EloquentMassPrunableTest(''))->defineDatabaseMigrationsAfterDatabaseRefreshed();
-
         $output = $this->artisan([
             '--all' => true,
+
+            // Some TestModels expect Tables to be created, which are missing for this test
+            '--except' => [
+                PrunableTestSoftDeletedModelWithPrunableRecords::class,
+                MassPrunableTestModel::class,
+                MassPrunableSoftDeleteTestModel::class,
+                MassPrunableTestModelMissingPrunableMethod::class,
+                PrunableTestModel::class,
+                PrunableSoftDeleteTestModel::class,
+                PrunableWithCustomPruneMethodTestModel::class,
+                PrunableTestModelMissingPrunableMethod::class,
+            ],
         ]);
 
         $output = $output->fetch();
