@@ -133,7 +133,7 @@ class PruneCommand extends Command
                     return $models->reject(fn ($model) => in_array($model, $except));
                 })
                 ->filter(fn ($class) => $this->isPrunable($class))
-                ->all();
+                ->values();
         }
 
         return collect((new Finder)->in($this->getDefaultPath())->files()->name('*.php'))
