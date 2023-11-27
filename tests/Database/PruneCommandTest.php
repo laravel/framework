@@ -15,6 +15,9 @@ use Illuminate\Database\Events\ModelPruningStarting;
 use Illuminate\Database\Events\ModelsPruned;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Foundation\Application;
+use Illuminate\Tests\Integration\Database\MassPrunableSoftDeleteTestModel;
+use Illuminate\Tests\Integration\Database\MassPrunableTestModel;
+use Illuminate\Tests\Integration\Database\MassPrunableTestModelMissingPrunableMethod;
 use InvalidArgumentException;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -38,25 +41,17 @@ class PruneCommandTest extends TestCase
 
     public function testAllModelsCanBePruned()
     {
-        $db = new DB;
-        $db->addConnection([
-            'driver' => 'sqlite',
-            'database' => ':memory:',
-        ]);
-        $db->bootEloquent();
-        $db->setAsGlobal();
-        DB::connection('default')->getSchemaBuilder()->create('prunables', function ($table) {
-            $table->string('value')->nullable();
-            $table->datetime('deleted_at')->nullable();
-        });
-        DB::connection('default')->table('prunables')->insert([
-            ['value' => 1, 'deleted_at' => null],
-            ['value' => 2, 'deleted_at' => '2021-12-01 00:00:00'],
-            ['value' => 3, 'deleted_at' => null],
-            ['value' => 4, 'deleted_at' => '2021-12-02 00:00:00'],
-        ]);
+        $output = $this->artisan([
+            '--all' => true,
 
-        $output = $this->artisan(['--all' => true]);
+            // Some TestModels expect Tables to be created, which are missing for this test
+            '--except' => [
+                PrunableTestSoftDeletedModelWithPrunableRecords::class,
+                MassPrunableTestModel::class,
+                MassPrunableSoftDeleteTestModel::class,
+                MassPrunableTestModelMissingPrunableMethod::class,
+            ],
+        ]);
 
         $output = $output->fetch();
 
@@ -67,11 +62,6 @@ class PruneCommandTest extends TestCase
 
         $this->assertStringContainsString(
             'Illuminate\Tests\Database\PrunableTestModelWithoutPrunableRecords',
-            $output,
-        );
-
-        $this->assertStringContainsString(
-            'Illuminate\Tests\Database\PrunableTestSoftDeletedModelWithPrunableRecords',
             $output,
         );
     }
