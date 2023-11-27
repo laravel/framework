@@ -105,6 +105,27 @@ class DatabaseTransactionsTest extends DatabaseTestCase
         $this->assertTrue($secondObject->ran);
         $this->assertFalse($thirdObject->ran);
     }
+
+    public function testEarlyFailureInADifferentConnectionDoesNotAffectTheParentTransaction()
+    {
+        $firstObject = new TestObjectForTransactions();
+
+        DB::transaction(function () use ($firstObject) {
+            try {
+                DB::connection('second_connection')->transaction(function () {
+                    throw new \Exception;
+                });
+            } catch (\Exception) {
+
+            }
+
+            DB::afterCommit(fn () => $firstObject->handle());
+
+            $this->assertFalse($firstObject->ran);
+        });
+
+        $this->assertTrue($firstObject->ran);
+    }
 }
 
 class TestObjectForTransactions

@@ -28,6 +28,13 @@ class DatabaseTransactionsManager
     protected $currentlyBeingExecutedTransaction = null;
 
     /**
+     * The transactions that have been executed.
+     *
+     * @var array<string, \Illuminate\Database\DatabaseTransactionRecord[]>
+     */
+    protected $transactions = [];
+
+    /**
      * Start a new database transaction.
      *
      * @param  string  $connection
@@ -46,6 +53,8 @@ class DatabaseTransactionsManager
         } else {
             $this->rootTransaction[$connection] = $newTransaction;
         }
+
+        $this->transactions[] = $newTransaction;
 
         $this->movePointersTo($connection, $newTransaction);
 
@@ -84,7 +93,14 @@ class DatabaseTransactionsManager
         $this->currentlyBeingExecutedTransaction?->resetChildren();
 
         $this->getParentTransaction($connection)?->removeChild($this->currentlyBeingExecutedTransaction);
-        $this->movePointersTo($connection, $this->currentTransaction[$connection]->parent);
+
+        // find the index of the current transaction
+        $index = array_search($this->currentlyBeingExecutedTransaction, $this->transactions, true);
+        $transaction = collect($this->transactions)
+            ->filter(fn ($transaction, $foundIndex) => ! $transaction->committed && $foundIndex < $index)
+            ->last();
+
+        $this->movePointersTo($connection, $transaction);
     }
 
     /**
