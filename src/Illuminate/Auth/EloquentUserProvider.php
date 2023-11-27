@@ -160,7 +160,7 @@ class EloquentUserProvider implements UserProvider
      *
      * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
      * @param  array  $credentials
-     * @return string|null
+     * @return void
      */
     public function rehashPasswordIfRequired(UserContract $user, array $credentials)
     {

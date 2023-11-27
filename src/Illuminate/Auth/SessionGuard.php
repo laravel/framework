@@ -463,7 +463,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      *
      * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
      * @param  array  $credentials
-     * @return bool
+     * @return void
      */
     protected function rehashPasswordIfRequired(AuthenticatableContract $user, array $credentials)
     {
