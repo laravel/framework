@@ -90,6 +90,7 @@ namespace Illuminate\Support\Facades;
  * @method static \Illuminate\Routing\RouteRegistrar controller(string $controller)
  * @method static \Illuminate\Routing\RouteRegistrar domain(string $value)
  * @method static \Illuminate\Routing\RouteRegistrar middleware(array|string|null $middleware)
+ * @method static \Illuminate\Routing\RouteRegistrar missing(\Closure $missing)
  * @method static \Illuminate\Routing\RouteRegistrar name(string $value)
  * @method static \Illuminate\Routing\RouteRegistrar namespace(string|null $value)
  * @method static \Illuminate\Routing\RouteRegistrar prefix(string $prefix)
