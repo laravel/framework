@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation\Testing;
 
 use Illuminate\Database\DatabaseTransactionsManager as BaseManager;
+use Illuminate\Support\Collection;
 
 class DatabaseTransactionsManager extends BaseManager
 {
@@ -35,5 +36,18 @@ class DatabaseTransactionsManager extends BaseManager
         // Since we have a wrapping base transaction from DatabaseTransactions,
         // we want to commit the transaction on level 2 instead of level 1.
         return $level === 2;
+    }
+
+    /**
+     * Get the transactions that are applicable to callbacks.
+     *
+     * @return \Illuminate\Support\Collection<int, \Illuminate\Database\DatabaseTransactionRecord>
+     */
+    public function callbackApplicableTransactions()
+    {
+        return (new Collection($this->transactions))
+            ->skip(1)
+            ->filter(fn ($transaction) => $transaction->committed === false)
+            ->values();
     }
 }

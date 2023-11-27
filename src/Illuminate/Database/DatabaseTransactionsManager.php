@@ -14,13 +14,6 @@ class DatabaseTransactionsManager
     protected $currentTransaction = [];
 
     /**
-     * The root transactions.
-     *
-     * @var array <string, \Illuminate\Database\DatabaseTransactionRecord>
-     */
-    protected $rootTransaction = [];
-
-    /**
      * The transaction currently being executed.
      *
      * @var \Illuminate\Database\DatabaseTransactionRecord|null
@@ -30,9 +23,14 @@ class DatabaseTransactionsManager
     /**
      * The transactions that have been executed.
      *
-     * @var array<string, \Illuminate\Database\DatabaseTransactionRecord[]>
+     * @var Collection<int, \Illuminate\Database\DatabaseTransactionRecord[]>
      */
     protected $transactions = [];
+
+    public function __construct()
+    {
+        $this->transactions = new Collection();
+    }
 
     /**
      * Start a new database transaction.
@@ -87,19 +85,21 @@ class DatabaseTransactionsManager
      * @param  string  $connection
      * @return void
      */
-    public function rollback($connection)
+    public function rollback($connection, $newTransactionLevel)
     {
+        $this->movePointersTo($connection, $this->currentTransaction[$connection]);
         $this->currentlyBeingExecutedTransaction?->resetCallbacks();
         $this->currentlyBeingExecutedTransaction?->resetChildren();
 
         $this->getParentTransaction($connection)?->removeChild($this->currentlyBeingExecutedTransaction);
 
         // find the index of the current transaction
-        $index = array_search($this->currentlyBeingExecutedTransaction, $this->transactions, true);
-        $transaction = collect($this->transactions)
+        $index = $this->transactions->search($this->currentlyBeingExecutedTransaction);
+        $transaction = $this->transactions
             ->filter(fn ($transaction, $foundIndex) => ! $transaction->committed && $foundIndex < $index)
             ->last();
 
+        $this->transactions = $this->transactions->reject(fn ($transaction) => $transaction === $this->currentlyBeingExecutedTransaction);
         $this->movePointersTo($connection, $transaction);
     }
 
@@ -155,12 +155,19 @@ class DatabaseTransactionsManager
      * Move the pointer to the given transaction.
      *
      * @param string $connection
-     * @param \Illuminate\Database\DatabaseTransactionRecord $transaction
+     * @param \Illuminate\Database\DatabaseTransactionRecord|null $transaction
      * @return void
      */
     public function movePointersTo($connection, $transaction)
     {
         $this->currentTransaction[$connection] = $transaction;
         $this->currentlyBeingExecutedTransaction = $transaction;
+    }
+
+    public function getPendingTransactions()
+    {
+        return $this->transactions
+            ->filter(fn ($transaction) => $transaction->committed === false)
+            ->values();
     }
 }

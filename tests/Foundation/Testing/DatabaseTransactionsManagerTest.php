@@ -48,13 +48,13 @@ class DatabaseTransactionsManagerTest extends TestCase
         $this->assertEquals(1, $testObject->runs);
     }
 
-    public function testItExecutesTransactionCallbacksAtLevelOne()
+    public function testItExecutesTransactionCallbacksAtLevelTwo()
     {
         $manager = new DatabaseTransactionsManager;
 
-        $this->assertFalse($manager->afterCommitCallbacksShouldBeExecuted(0));
-        $this->assertTrue($manager->afterCommitCallbacksShouldBeExecuted(1));
-        $this->assertFalse($manager->afterCommitCallbacksShouldBeExecuted(2));
+        $this->assertFalse($manager->afterCommitCallbacksShouldBeExecuted(1));
+        $this->assertTrue($manager->afterCommitCallbacksShouldBeExecuted(2));
+        $this->assertFalse($manager->afterCommitCallbacksShouldBeExecuted(3));
     }
 }
 
