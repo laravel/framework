@@ -2,105 +2,106 @@
 
 namespace Illuminate\Tests\Foundation\Testing;
 
-use Illuminate\Contracts\Console\Kernel;
+use Illuminate\Contracts\Console\Kernel as ConsoleKernelContract;
+use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
+use Illuminate\Foundation\Testing\Concerns\InteractsWithConsole;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Foundation\Testing\RefreshDatabaseState;
 use Mockery as m;
+use Orchestra\Testbench\Concerns\ApplicationTestingHooks;
+use Orchestra\Testbench\Foundation\Application as Testbench;
 use PHPUnit\Framework\TestCase;
-use ReflectionMethod;
+
+use function Orchestra\Testbench\package_path;
 
 class DatabaseMigrationsTest extends TestCase
 {
-    protected $traitObject;
+    use ApplicationTestingHooks;
+    use DatabaseMigrations;
+    use InteractsWithConsole;
+
+    public $dropViews = false;
+
+    public $dropTypes = false;
 
     protected function setUp(): void
     {
         RefreshDatabaseState::$migrated = false;
 
-        $this->traitObject = $this->getMockForAbstractClass(DatabaseMigrationsTestMockClass::class, [], '', true, true, true, [
-            'artisan',
-            'beforeApplicationDestroyed',
-        ]);
+        $this->afterApplicationCreated(function () {
+            $this->app['config']->set([
+                'database.default' => 'testing',
+                'database.connections.testing' => [
+                    'driver' => 'sqlite',
+                    'database' => ':memory:',
+                ],
+            ]);
+        });
 
-        $kernelObj = m::mock();
-        $kernelObj->shouldReceive('setArtisan')
-            ->with(null);
-
-        $this->traitObject->app = [
-            Kernel::class => $kernelObj,
-        ];
+        $this->setUpTheApplicationTestingHooks();
+        $this->withoutMockingConsoleOutput();
     }
 
-    private function __reflectAndSetupAccessibleForProtectedTraitMethod($methodName)
+    protected function tearDown(): void
     {
-        $migrateFreshUsingReflection = new ReflectionMethod(
-            get_class($this->traitObject),
-            $methodName
-        );
+        $this->tearDownTheApplicationTestingHooks();
 
-        return $migrateFreshUsingReflection;
+        RefreshDatabaseState::$migrated = false;
+    }
+
+    protected function refreshApplication()
+    {
+        $this->app = Testbench::create(
+            basePath: package_path('vendor/orchestra/testbench-core/laravel'),
+        );
     }
 
     public function testRefreshTestDatabaseDefault()
     {
-        $this->traitObject
-            ->expects($this->once())
-            ->method('artisan')
+        $this->app->instance(ConsoleKernelContract::class, $kernel = m::spy(ConsoleKernel::class));
+
+        $kernel->shouldReceive('call')
+            ->once()
             ->with('migrate:fresh', [
                 '--drop-views' => false,
                 '--drop-types' => false,
                 '--seed' => false,
             ]);
 
-        $refreshTestDatabaseReflection = $this->__reflectAndSetupAccessibleForProtectedTraitMethod('runDatabaseMigrations');
-
-        $refreshTestDatabaseReflection->invoke($this->traitObject);
+        $this->runDatabaseMigrations();
     }
 
     public function testRefreshTestDatabaseWithDropViewsOption()
     {
-        $this->traitObject->dropViews = true;
+        $this->dropViews = true;
 
-        $this->traitObject
-            ->expects($this->once())
-            ->method('artisan')
+        $this->app->instance(ConsoleKernelContract::class, $kernel = m::spy(ConsoleKernel::class));
+
+        $kernel->shouldReceive('call')
+            ->once()
             ->with('migrate:fresh', [
                 '--drop-views' => true,
                 '--drop-types' => false,
                 '--seed' => false,
             ]);
 
-        $refreshTestDatabaseReflection = $this->__reflectAndSetupAccessibleForProtectedTraitMethod('runDatabaseMigrations');
-
-        $refreshTestDatabaseReflection->invoke($this->traitObject);
+        $this->runDatabaseMigrations();
     }
 
     public function testRefreshTestDatabaseWithDropTypesOption()
     {
-        $this->traitObject->dropTypes = true;
+        $this->dropTypes = true;
 
-        $this->traitObject
-            ->expects($this->once())
-            ->method('artisan')
+        $this->app->instance(ConsoleKernelContract::class, $kernel = m::spy(ConsoleKernel::class));
+
+        $kernel->shouldReceive('call')
+            ->once()
             ->with('migrate:fresh', [
                 '--drop-views' => false,
                 '--drop-types' => true,
                 '--seed' => false,
             ]);
 
-        $refreshTestDatabaseReflection = $this->__reflectAndSetupAccessibleForProtectedTraitMethod('runDatabaseMigrations');
-
-        $refreshTestDatabaseReflection->invoke($this->traitObject);
+        $this->runDatabaseMigrations();
     }
-}
-
-class DatabaseMigrationsTestMockClass
-{
-    use DatabaseMigrations;
-
-    public $app;
-
-    public $dropViews = false;
-
-    public $dropTypes = false;
 }

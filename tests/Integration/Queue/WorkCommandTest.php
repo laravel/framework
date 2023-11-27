@@ -4,32 +4,20 @@ namespace Illuminate\Tests\Integration\Queue;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Carbon;
+use Orchestra\Testbench\Attributes\WithMigration;
 use Orchestra\Testbench\TestCase;
 use Queue;
 
+#[WithMigration('queue')]
 class WorkCommandTest extends TestCase
 {
-    protected function getEnvironmentSetUp($app)
-    {
-        $app['db']->connection()->getSchemaBuilder()->create('jobs', function (Blueprint $table) {
-            $table->bigIncrements('id');
-            $table->string('queue');
-            $table->longText('payload');
-            $table->tinyInteger('attempts')->unsigned();
-            $table->unsignedInteger('reserved_at')->nullable();
-            $table->unsignedInteger('available_at');
-            $table->unsignedInteger('created_at');
-            $table->index(['queue', 'reserved_at']);
-        });
-    }
+    use DatabaseMigrations;
 
     protected function tearDown(): void
     {
-        $this->app['db']->connection()->getSchemaBuilder()->drop('jobs');
-
         parent::tearDown();
 
         FirstJob::$ran = false;

@@ -97,29 +97,29 @@ class Builder implements BuilderContract
         'avg',
         'count',
         'dd',
-        'ddRawSql',
-        'doesntExist',
-        'doesntExistOr',
+        'ddrawsql',
+        'doesntexist',
+        'doesntexistor',
         'dump',
-        'dumpRawSql',
+        'dumprawsql',
         'exists',
-        'existsOr',
+        'existsor',
         'explain',
-        'getBindings',
-        'getConnection',
-        'getGrammar',
+        'getbindings',
+        'getconnection',
+        'getgrammar',
         'implode',
         'insert',
-        'insertGetId',
-        'insertOrIgnore',
-        'insertUsing',
+        'insertgetid',
+        'insertorignore',
+        'insertusing',
         'max',
         'min',
         'raw',
-        'rawValue',
+        'rawvalue',
         'sum',
-        'toSql',
-        'toRawSql',
+        'tosql',
+        'torawsql',
     ];
 
     /**
@@ -563,11 +563,11 @@ class Builder implements BuilderContract
      */
     public function firstOrCreate(array $attributes = [], array $values = [])
     {
-        if (! is_null($instance = $this->where($attributes)->first())) {
+        if (! is_null($instance = (clone $this)->where($attributes)->first())) {
             return $instance;
         }
 
-        return $this->create(array_merge($attributes, $values));
+        return $this->createOrFirst($attributes, $values);
     }
 
     /**
@@ -595,8 +595,10 @@ class Builder implements BuilderContract
      */
     public function updateOrCreate(array $attributes, array $values = [])
     {
-        return tap($this->firstOrNew($attributes), function ($instance) use ($values) {
-            $instance->fill($values)->save();
+        return tap($this->firstOrCreate($attributes, $values), function ($instance) use ($values) {
+            if (! $instance->wasRecentlyCreated) {
+                $instance->fill($values)->save();
+            }
         });
     }
 
@@ -1962,7 +1964,7 @@ class Builder implements BuilderContract
             return $this->callNamedScope($method, $parameters);
         }
 
-        if (in_array($method, $this->passthru)) {
+        if (in_array(strtolower($method), $this->passthru)) {
             return $this->toBase()->{$method}(...$parameters);
         }
 

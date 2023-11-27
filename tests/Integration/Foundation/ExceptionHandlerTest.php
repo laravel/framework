@@ -4,9 +4,12 @@ namespace Illuminate\Tests\Integration\Foundation;
 
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\Access\Response;
+use Illuminate\Contracts\Debug\ExceptionHandler;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Route;
 use Orchestra\Testbench\TestCase;
 use Symfony\Component\Process\PhpProcess;
+use Throwable;
 
 class ExceptionHandlerTest extends TestCase
 {
@@ -150,5 +153,47 @@ EOF, __DIR__.'/../../../', ['APP_RUNNING_IN_CONSOLE' => true]);
     {
         yield 'Throw exception' => [[Fixtures\Providers\ThrowUncaughtExceptionServiceProvider::class], false];
         yield 'Do not throw exception' => [[Fixtures\Providers\ThrowExceptionServiceProvider::class], true];
+    }
+
+    public function test_it_handles_malformed_error_views_in_production()
+    {
+        Config::set('view.paths', [__DIR__.'/Fixtures/MalformedErrorViews']);
+        Config::set('app.debug', false);
+        $reported = [];
+        $this->app[ExceptionHandler::class]->reportable(function (Throwable $e) use (&$reported) {
+            $reported[] = $e;
+        });
+
+        try {
+            $response = $this->get('foo');
+        } catch (Throwable) {
+            $response ??= null;
+        }
+
+        $this->assertCount(1, $reported);
+        $this->assertSame('Undefined variable $foo (View: '.__DIR__.DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.'MalformedErrorViews'.DIRECTORY_SEPARATOR.'errors'.DIRECTORY_SEPARATOR.'404.blade.php)', $reported[0]->getMessage());
+        $this->assertNotNull($response);
+        $response->assertStatus(404);
+    }
+
+    public function test_it_handles_malformed_error_views_in_development()
+    {
+        Config::set('view.paths', [__DIR__.'/Fixtures/MalformedErrorViews']);
+        Config::set('app.debug', true);
+        $reported = [];
+        $this->app[ExceptionHandler::class]->reportable(function (Throwable $e) use (&$reported) {
+            $reported[] = $e;
+        });
+
+        try {
+            $response = $this->get('foo');
+        } catch (Throwable) {
+            $response ??= null;
+        }
+
+        $this->assertCount(1, $reported);
+        $this->assertSame('Undefined variable $foo (View: '.__DIR__.DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.'MalformedErrorViews'.DIRECTORY_SEPARATOR.'errors'.DIRECTORY_SEPARATOR.'404.blade.php)', $reported[0]->getMessage());
+        $this->assertNotNull($response);
+        $response->assertStatus(500);
     }
 }

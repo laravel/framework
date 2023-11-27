@@ -94,6 +94,38 @@ class EloquentModelTest extends DatabaseTestCase
         $user->save();
         $this->assertFalse($user->wasChanged());
     }
+
+    public function testInsertRecordWithReservedWordFieldName()
+    {
+        Schema::create('actions', function (Blueprint $table) {
+            $table->id();
+            $table->string('label');
+            $table->timestamp('start');
+            $table->timestamp('end')->nullable();
+            $table->boolean('analyze');
+        });
+
+        $model = new class extends Model
+        {
+            protected $table = 'actions';
+            protected $guarded = ['id'];
+            public $timestamps = false;
+        };
+
+        $model->newInstance()->create([
+            'label' => 'test',
+            'start' => '2023-01-01 00:00:00',
+            'end' => '2024-01-01 00:00:00',
+            'analyze' => true,
+        ]);
+
+        $this->assertDatabaseHas('actions', [
+            'label' => 'test',
+            'start' => '2023-01-01 00:00:00',
+            'end' => '2024-01-01 00:00:00',
+            'analyze' => true,
+        ]);
+    }
 }
 
 class TestModel1 extends Model

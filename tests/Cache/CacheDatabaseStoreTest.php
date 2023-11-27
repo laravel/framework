@@ -3,7 +3,6 @@
 namespace Illuminate\Tests\Cache;
 
 use Closure;
-use Exception;
 use Illuminate\Cache\DatabaseStore;
 use Illuminate\Database\Connection;
 use Illuminate\Database\PostgresConnection;
@@ -31,12 +30,12 @@ class CacheDatabaseStoreTest extends TestCase
 
     public function testNullIsReturnedAndItemDeletedWhenItemIsExpired()
     {
-        $store = $this->getMockBuilder(DatabaseStore::class)->onlyMethods(['forget'])->setConstructorArgs($this->getMocks())->getMock();
+        $store = $this->getMockBuilder(DatabaseStore::class)->onlyMethods(['forgetIfExpired'])->setConstructorArgs($this->getMocks())->getMock();
         $table = m::mock(stdClass::class);
         $store->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($table);
         $table->shouldReceive('where')->once()->with('key', '=', 'prefixfoo')->andReturn($table);
         $table->shouldReceive('first')->once()->andReturn((object) ['expiration' => 1]);
-        $store->expects($this->once())->method('forget')->with($this->equalTo('foo'))->willReturn(null);
+        $store->expects($this->once())->method('forgetIfExpired')->with($this->equalTo('foo'))->willReturn(null);
 
         $this->assertNull($store->get('foo'));
     }
@@ -63,41 +62,25 @@ class CacheDatabaseStoreTest extends TestCase
         $this->assertSame('bar', $store->get('foo'));
     }
 
-    public function testValueIsInsertedWhenNoExceptionsAreThrown()
+    public function testValueIsUpserted()
     {
         $store = $this->getMockBuilder(DatabaseStore::class)->onlyMethods(['getTime'])->setConstructorArgs($this->getMocks())->getMock();
         $table = m::mock(stdClass::class);
         $store->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($table);
         $store->expects($this->once())->method('getTime')->willReturn(1);
-        $table->shouldReceive('insert')->once()->with(['key' => 'prefixfoo', 'value' => serialize('bar'), 'expiration' => 61])->andReturnTrue();
+        $table->shouldReceive('upsert')->once()->with(['key' => 'prefixfoo', 'value' => serialize('bar'), 'expiration' => 61], 'key')->andReturnTrue();
 
         $result = $store->put('foo', 'bar', 60);
         $this->assertTrue($result);
     }
 
-    public function testValueIsUpdatedWhenInsertThrowsException()
-    {
-        $store = $this->getMockBuilder(DatabaseStore::class)->onlyMethods(['getTime'])->setConstructorArgs($this->getMocks())->getMock();
-        $table = m::mock(stdClass::class);
-        $store->getConnection()->shouldReceive('table')->with('table')->andReturn($table);
-        $store->expects($this->once())->method('getTime')->willReturn(1);
-        $table->shouldReceive('insert')->once()->with(['key' => 'prefixfoo', 'value' => serialize('bar'), 'expiration' => 61])->andReturnUsing(function () {
-            throw new Exception;
-        });
-        $table->shouldReceive('where')->once()->with('key', 'prefixfoo')->andReturn($table);
-        $table->shouldReceive('update')->once()->with(['value' => serialize('bar'), 'expiration' => 61])->andReturnTrue();
-
-        $result = $store->put('foo', 'bar', 60);
-        $this->assertTrue($result);
-    }
-
-    public function testValueIsInsertedOnPostgres()
+    public function testValueIsUpsertedOnPostgres()
     {
         $store = $this->getMockBuilder(DatabaseStore::class)->onlyMethods(['getTime'])->setConstructorArgs($this->getPostgresMocks())->getMock();
         $table = m::mock(stdClass::class);
         $store->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($table);
         $store->expects($this->once())->method('getTime')->willReturn(1);
-        $table->shouldReceive('insert')->once()->with(['key' => 'prefixfoo', 'value' => base64_encode(serialize("\0")), 'expiration' => 61])->andReturnTrue();
+        $table->shouldReceive('upsert')->once()->with(['key' => 'prefixfoo', 'value' => base64_encode(serialize("\0")), 'expiration' => 61], 'key')->andReturn(1);
 
         $result = $store->put('foo', "\0", 60);
         $this->assertTrue($result);

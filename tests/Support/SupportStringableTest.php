@@ -527,6 +527,12 @@ class SupportStringableTest extends TestCase
         $this->assertSame('u', (string) $this->stringable('ü')->ascii());
     }
 
+    public function testTransliterate()
+    {
+        $this->assertSame('HHH', (string) $this->stringable('🎂🚧🏆')->transliterate('H'));
+        $this->assertSame('Hello', (string) $this->stringable('🎂')->transliterate('Hello'));
+    }
+
     public function testNewLine()
     {
         $this->assertSame('Laravel'.PHP_EOL, (string) $this->stringable('Laravel')->newLine());
@@ -1185,6 +1191,21 @@ class SupportStringableTest extends TestCase
         $this->assertSame('before<br>after', (string) $this->stringable('before<br>after')->stripTags('<br>'));
         $this->assertSame('before<br>after', (string) $this->stringable('<strong>before</strong><br>after')->stripTags('<br>'));
         $this->assertSame('<strong>before</strong><br>after', (string) $this->stringable('<strong>before</strong><br>after')->stripTags('<br><strong>'));
+    }
+
+    public function testReplaceMatches()
+    {
+        $stringable = $this->stringable('Hello world!');
+        $result = $stringable->replaceMatches('/world/', function ($match) {
+            return strtoupper($match[0]);
+        });
+
+        $this->assertSame('Hello WORLD!', $result->value);
+
+        $stringable = $this->stringable('apple orange apple');
+        $result = $stringable->replaceMatches('/apple/', 'fruit', 1);
+
+        $this->assertSame('fruit orange apple', $result->value);
     }
 
     public function testScan()

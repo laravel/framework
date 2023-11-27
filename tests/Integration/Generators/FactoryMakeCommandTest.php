@@ -11,7 +11,6 @@ class FactoryMakeCommandTest extends TestCase
         'database/factories/FooFactory.php',
     ];
 
-    /** @test */
     public function testItCanGenerateFactoryFile()
     {
         $this->artisan('make:factory', ['name' => 'FooFactory'])

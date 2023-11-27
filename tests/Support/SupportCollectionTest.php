@@ -19,12 +19,14 @@ use InvalidArgumentException;
 use IteratorAggregate;
 use JsonSerializable;
 use Mockery as m;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use stdClass;
 use Symfony\Component\VarDumper\VarDumper;
 use Traversable;
 use UnexpectedValueException;
+use WeakMap;
 
 include_once 'Enums.php';
 
@@ -2333,7 +2335,7 @@ class SupportCollectionTest extends TestCase
      */
     public function testPluckDuplicateKeysExist($collection)
     {
-        $data = new collection([
+        $data = new $collection([
             ['brand' => 'Tesla', 'color' => 'red'],
             ['brand' => 'Pagani', 'color' => 'white'],
             ['brand' => 'Tesla', 'color' => 'black'],
@@ -2955,6 +2957,19 @@ class SupportCollectionTest extends TestCase
         $object->foo = 'bar';
         $data = new $collection($object);
         $this->assertEquals(['foo' => 'bar'], $data->all());
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testConstructMethodFromWeakMap($collection)
+    {
+        $this->expectException('InvalidArgumentException');
+
+        $map = new WeakMap();
+        $object = new stdClass;
+        $object->foo = 'bar';
+        $map[$object] = 3;
+
+        $data = new $collection($map);
     }
 
     public function testSplice()
@@ -5635,6 +5650,19 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testEnsureForMultipleTypes($collection)
+    {
+        $data = $collection::make([new \Error, 123]);
+        $data->ensure([\Throwable::class, 'int']);
+
+        $data = $collection::make([new \Error, new \Error, new $collection]);
+        $this->expectException(UnexpectedValueException::class);
+        $data->ensure([\Throwable::class, 'int']);
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testPercentageWithFlatCollection($collection)
     {
         $collection = new $collection([1, 1, 2, 2, 2, 3]);
@@ -5661,6 +5689,21 @@ class SupportCollectionTest extends TestCase
         $this->assertSame(50.00, $collection->percentage(fn ($value) => $value['foo'] === 'bar'));
         $this->assertSame(25.00, $collection->percentage(fn ($value) => $value['foo'] === 'baz'));
         $this->assertSame(0.0, $collection->percentage(fn ($value) => $value['foo'] === 'test'));
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testHighOrderPercentage($collection)
+    {
+        $collection = new $collection([
+            ['name' => 'Taylor', 'active' => true],
+            ['name' => 'Nuno', 'active' => true],
+            ['name' => 'Dries', 'active' => false],
+            ['name' => 'Jess', 'active' => true],
+        ]);
+
+        $this->assertSame(75.00, $collection->percentage->active);
     }
 
     /**

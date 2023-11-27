@@ -1120,6 +1120,134 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->passes());
     }
 
+    public function testValidatePresentIf()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.present_if' => 'The :attribute field must be present when :other is :value.'], 'en');
+
+        $v = new Validator($trans, ['bar' => 1], ['foo' => 'present_if:bar,1']);
+        $this->assertFalse($v->passes());
+        $this->assertSame('The foo field must be present when bar is 1.', $v->errors()->first('foo'));
+
+        $v = new Validator($trans, ['bar' => 1, 'foo' => null], ['foo' => 'present_if:bar,2']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['bar' => 1, 'foo' => ''], ['foo' => 'present_if:bar,1']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['bar' => 1, 'foo' => [['name' => 'a']]], ['foo.*.id' => 'present_if:bar,1']);
+        $this->assertFalse($v->passes());
+        $this->assertSame('The foo.0.id field must be present when bar is 1.', $v->errors()->first('foo.0.id'));
+
+        $v = new Validator($trans, ['bar' => 1, 'foo' => [['id' => '', 'name' => 'a']]], ['foo.*.id' => 'present_if:bar,1']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['bar' => 1, 'foo' => [['id' => null, 'name' => 'a']]], ['foo.*.id' => 'present_if:bar,1']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['bar' => 1, 'foo' => '2'], ['foo' => 'present_if:bar,1']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['bar' => 2], ['foo' => 'present_if:bar,1']);
+        $this->assertTrue($v->passes());
+    }
+
+    public function testValidatePresentUnless()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.present_unless' => 'The :attribute field must be present unless :other is :value.'], 'en');
+
+        $v = new Validator($trans, ['bar' => 2], ['foo' => 'present_unless:bar,1']);
+        $this->assertFalse($v->passes());
+        $this->assertSame('The foo field must be present unless bar is 1.', $v->errors()->first('foo'));
+
+        $v = new Validator($trans, ['bar' => 2, 'foo' => null], ['foo' => 'present_unless:bar,1']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['bar' => 2, 'foo' => ''], ['foo' => 'present_unless:bar,1']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['bar' => 2, 'foo' => [['name' => 'a']]], ['foo.*.id' => 'present_unless:bar,1']);
+        $this->assertFalse($v->passes());
+        $this->assertSame('The foo.0.id field must be present unless bar is 1.', $v->errors()->first('foo.0.id'));
+
+        $v = new Validator($trans, ['bar' => 2, 'foo' => [['id' => '', 'name' => 'a']]], ['foo.*.id' => 'present_unless:bar,1']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['bar' => 2, 'foo' => [['id' => null, 'name' => 'a']]], ['foo.*.id' => 'present_unless:bar,1']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['bar' => 2, 'foo' => '2'], ['foo' => 'present_unless:bar,1']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['bar' => 1], ['foo' => 'present_unless:bar,1']);
+        $this->assertTrue($v->passes());
+    }
+
+    public function testValidatePresentWith()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.present_with' => 'The :attribute field must be present when :values is present.'], 'en');
+
+        $v = new Validator($trans, ['foo' => 1, 'bar' => 2], ['foo' => 'present_with:bar']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => null, 'bar' => 2], ['foo' => 'present_with:bar']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => '', 'bar' => 2], ['foo' => 'present_with:bar']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => [['name' => 'a']], 'bar' => 2], ['foo.*.id' => 'present_with:bar']);
+        $this->assertFalse($v->passes());
+        $this->assertSame('The foo.0.id field must be present when bar is present.', $v->errors()->first('foo.0.id'));
+
+        $v = new Validator($trans, ['foo' => [['id' => '']], 'bar' => 2], ['foo.*.id' => 'present_with:bar']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => [['id' => null]], 'bar' => 2], ['foo.*.id' => 'present_with:bar']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => 1], ['foo' => 'present_with:bar']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['bar' => 2], ['foo' => 'present_with:bar']);
+        $this->assertFalse($v->passes());
+        $this->assertSame('The foo field must be present when bar is present.', $v->errors()->first('foo'));
+    }
+
+    public function testValidatePresentWithAll()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.present_with_all' => 'The :attribute field must be present when :values are present.'], 'en');
+
+        $v = new Validator($trans, ['foo' => 1, 'bar' => 2, 'baz' => 1], ['foo' => 'present_with_all:bar,baz']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => null, 'bar' => 2, 'baz' => 1], ['foo' => 'present_with_all:bar,baz']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => '', 'bar' => 2, 'baz' => 1], ['foo' => 'present_with_all:bar,baz']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => [['name' => 'a']], 'bar' => 2, 'baz' => 1], ['foo.*.id' => 'present_with_all:bar,baz']);
+        $this->assertFalse($v->passes());
+        $this->assertSame('The foo.0.id field must be present when bar / baz are present.', $v->errors()->first('foo.0.id'));
+
+        $v = new Validator($trans, ['foo' => [['id' => '']], 'bar' => 2, 'baz' => 1], ['foo.*.id' => 'present_with_all:bar,baz']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => [['id' => null]], 'bar' => 2, 'baz' => 1], ['foo.*.id' => 'present_with_all:bar,baz']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => 1, 'bar' => 2], ['foo' => 'present_with_all:bar,baz']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['bar' => 2, 'baz' => 1], ['foo' => 'present_with_all:bar,baz']);
+        $this->assertFalse($v->passes());
+        $this->assertSame('The foo field must be present when bar / baz are present.', $v->errors()->first('foo'));
+    }
+
     public function testValidateRequired()
     {
         $trans = $this->getIlluminateArrayTranslator();
@@ -1795,6 +1923,37 @@ class ValidationValidatorTest extends TestCase
         $trans->addLines(['validation.in_array' => 'The value of :attribute does not exist in :other.'], 'en');
         $v = new Validator($trans, ['foo' => [1, 2, 3], 'bar' => [1, 2]], ['foo.*' => 'in_array:bar.*']);
         $this->assertSame('The value of foo.2 does not exist in bar.*.', $v->messages()->first('foo.2'));
+    }
+
+    public function testValidateHexColor()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['color'=> '#FFF'], ['color'=>'hex_color']);
+        $this->assertTrue($v->passes());
+        $v = new Validator($trans, ['color'=> '#FFFF'], ['color'=>'hex_color']);
+        $this->assertTrue($v->passes());
+        $v = new Validator($trans, ['color'=> '#FFFFFF'], ['color'=>'hex_color']);
+        $this->assertTrue($v->passes());
+        $v = new Validator($trans, ['color'=> '#FF000080'], ['color'=>'hex_color']);
+        $this->assertTrue($v->passes());
+        $v = new Validator($trans, ['color'=> '#FF000080'], ['color'=>'hex_color']);
+        $this->assertTrue($v->passes());
+        $v = new Validator($trans, ['color'=> '#00FF0080'], ['color'=>'hex_color']);
+        $this->assertTrue($v->passes());
+        $v = new Validator($trans, ['color'=> '#GGG'], ['color'=>'hex_color']);
+        $this->assertFalse($v->passes());
+        $v = new Validator($trans, ['color'=> '#GGGG'], ['color'=>'hex_color']);
+        $this->assertFalse($v->passes());
+        $v = new Validator($trans, ['color'=> '#123AB'], ['color'=>'hex_color']);
+        $this->assertFalse($v->passes());
+        $v = new Validator($trans, ['color'=> '#GGGGGG'], ['color'=>'hex_color']);
+        $this->assertFalse($v->passes());
+        $v = new Validator($trans, ['color'=> '#GGGGGGG'], ['color'=>'hex_color']);
+        $this->assertFalse($v->passes());
+        $v = new Validator($trans, ['color'=> '#FFGG00FF'], ['color'=>'hex_color']);
+        $this->assertFalse($v->passes());
+        $v = new Validator($trans, ['color'=> '#00FF008X'], ['color'=>'hex_color']);
+        $this->assertFalse($v->passes());
     }
 
     public function testValidateConfirmed()
@@ -4486,7 +4645,7 @@ class ValidationValidatorTest extends TestCase
     {
         $trans = $this->getIlluminateArrayTranslator();
 
-        $uploadedFile = [__DIR__.'/ValidationRuleTest.php', '', null, null, true];
+        $uploadedFile = [__DIR__.'/ValidationMacroTest.php', '', null, null, true];
 
         $file = $this->getMockBuilder(UploadedFile::class)->onlyMethods(['guessExtension', 'getClientOriginalExtension'])->setConstructorArgs($uploadedFile)->getMock();
         $file->expects($this->any())->method('guessExtension')->willReturn('rtf');
@@ -4536,6 +4695,38 @@ class ValidationValidatorTest extends TestCase
         $file->expects($this->any())->method('getClientOriginalExtension')->willReturn('jpeg');
         $v = new Validator($trans, ['x' => $file], ['x' => 'mimes:jpg']);
         $this->assertTrue($v->passes());
+    }
+
+    public function testValidateExtension()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $uploadedFile = [__FILE__, '', null, null, true];
+
+        $file = $this->getMockBuilder(UploadedFile::class)->onlyMethods(['getClientOriginalExtension'])->setConstructorArgs($uploadedFile)->getMock();
+        $file->expects($this->any())->method('getClientOriginalExtension')->willReturn('pdf');
+        $v = new Validator($trans, ['x' => $file], ['x' => 'extensions:pdf']);
+        $this->assertTrue($v->passes());
+
+        $file = $this->getMockBuilder(UploadedFile::class)->onlyMethods(['getClientOriginalExtension'])->setConstructorArgs($uploadedFile)->getMock();
+        $file->expects($this->any())->method('getClientOriginalExtension')->willReturn('jpg');
+        $v = new Validator($trans, ['x' => $file], ['x' => 'extensions:jpg']);
+        $this->assertTrue($v->passes());
+
+        $file = $this->getMockBuilder(UploadedFile::class)->onlyMethods(['getClientOriginalExtension'])->setConstructorArgs($uploadedFile)->getMock();
+        $file->expects($this->any())->method('getClientOriginalExtension')->willReturn('jpg');
+        $v = new Validator($trans, ['x' => $file], ['x' => 'extensions:jpeg,jpg']);
+        $this->assertTrue($v->passes());
+
+        $file = $this->getMockBuilder(UploadedFile::class)->onlyMethods(['getClientOriginalExtension'])->setConstructorArgs($uploadedFile)->getMock();
+        $file->expects($this->any())->method('getClientOriginalExtension')->willReturn('jpg');
+        $v = new Validator($trans, ['x' => $file], ['x' => 'extensions:jpeg']);
+        $this->assertFalse($v->passes());
+
+        $file = $this->getMockBuilder(UploadedFile::class)->onlyMethods(['guessExtension', 'getClientOriginalExtension'])->setConstructorArgs($uploadedFile)->getMock();
+        $file->expects($this->any())->method('guessExtension')->willReturn('jpg');
+        $file->expects($this->any())->method('getClientOriginalExtension')->willReturn('jpeg');
+        $v = new Validator($trans, ['x' => $file], ['x' => 'mimes:jpg|extensions:jpg']);
+        $this->assertFalse($v->passes());
     }
 
     public function testValidateMimeEnforcesPhpCheck()

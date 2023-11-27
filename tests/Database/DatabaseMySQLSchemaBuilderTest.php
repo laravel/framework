@@ -38,11 +38,11 @@ class DatabaseMySQLSchemaBuilderTest extends TestCase
         $connection->shouldReceive('getDatabaseName')->andReturn('db');
         $connection->shouldReceive('getSchemaGrammar')->andReturn($grammar);
         $connection->shouldReceive('getPostProcessor')->andReturn($processor);
-        $grammar->shouldReceive('compileColumnListing')->once()->andReturn('sql');
-        $processor->shouldReceive('processColumnListing')->once()->andReturn(['column']);
+        $grammar->shouldReceive('compileColumns')->with('db', 'prefix_table')->once()->andReturn('sql');
+        $processor->shouldReceive('processColumns')->once()->andReturn([['name' => 'column']]);
         $builder = new MySqlBuilder($connection);
         $connection->shouldReceive('getTablePrefix')->once()->andReturn('prefix_');
-        $connection->shouldReceive('selectFromWriteConnection')->once()->with('sql', ['db', 'prefix_table'])->andReturn(['column']);
+        $connection->shouldReceive('selectFromWriteConnection')->once()->with('sql')->andReturn([['name' => 'column']]);
 
         $this->assertEquals(['column'], $builder->getColumnListing('table'));
     }
