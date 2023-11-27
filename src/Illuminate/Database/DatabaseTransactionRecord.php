@@ -30,7 +30,7 @@ class DatabaseTransactionRecord
     /**
      * The child instances of this transaction.
      *
-     * @var \Illuminate\Database\DatabaseTransactionRecord[]
+     * @var \Illuminate\Support\Collection<int, \Illuminate\Database\DatabaseTransactionRecord[]>
      */
     public $children = [];
 
@@ -68,6 +68,7 @@ class DatabaseTransactionRecord
         $this->connection = $connection;
         $this->level = $level;
         $this->parent = $parent;
+        $this->children = new Collection();
     }
 
     public function setParent(DatabaseTransactionRecord $parent)
@@ -87,7 +88,7 @@ class DatabaseTransactionRecord
 
     public function resetChildren()
     {
-        $this->children = [];
+        $this->children = new Collection();
     }
 
     /**
@@ -136,9 +137,7 @@ class DatabaseTransactionRecord
 
     public function removeChild(DatabaseTransactionRecord $currentTransaction): void
     {
-        $this->children = (new Collection($this->children))->reject(
-            fn ($transaction) => $transaction === $currentTransaction
-        )->values();
+        $this->children = $this->children->reject(fn ($transaction) => $transaction === $currentTransaction)->values();
     }
 
     public function commit()
