@@ -52,6 +52,7 @@ class DatabaseTransactionsManagerTest extends TestCase
         $manager->begin('admin', 1);
 
         $manager->rollback('default', 0);
+        $manager->rollback('default', 0);
 
         $this->assertCount(1, $manager->getPendingTransactions());
 

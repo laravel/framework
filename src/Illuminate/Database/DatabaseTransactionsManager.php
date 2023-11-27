@@ -88,11 +88,6 @@ class DatabaseTransactionsManager
         $transaction = $this->currentTransaction[$connection];
         $lastTransaction = $this->findLastPendingTransactionBeforeTransaction($transaction);
 
-        if ($newTransactionLevel === 0) {
-            $this->removeAllTransactions($connection);
-            return $this->movePointersTo($connection, null);
-        }
-
         $this->removeTransaction($transaction);
 
         // In a nested setting, the rolled back transaction isn't necessarily in the same
