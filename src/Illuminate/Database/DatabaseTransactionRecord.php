@@ -32,7 +32,7 @@ class DatabaseTransactionRecord
      *
      * @var \Illuminate\Support\Collection<int, \Illuminate\Database\DatabaseTransactionRecord[]>
      */
-    public $children = [];
+    protected $children;
 
     /**
      * Whether the transaction has been committed.
@@ -69,6 +69,16 @@ class DatabaseTransactionRecord
         $this->level = $level;
         $this->parent = $parent;
         $this->children = new Collection();
+    }
+
+    /**
+     * Get the transaction's children.
+     *
+     * @return \Illuminate\Support\Collection<int, \Illuminate\Database\DatabaseTransactionRecord[]>
+     */
+    public function getChildren()
+    {
+        return $this->children;
     }
 
     public function setParent(DatabaseTransactionRecord $parent)
