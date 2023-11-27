@@ -18,6 +18,10 @@ use Illuminate\Foundation\Application;
 use Illuminate\Tests\Integration\Database\MassPrunableSoftDeleteTestModel;
 use Illuminate\Tests\Integration\Database\MassPrunableTestModel;
 use Illuminate\Tests\Integration\Database\MassPrunableTestModelMissingPrunableMethod;
+use Illuminate\Tests\Integration\Database\PrunableSoftDeleteTestModel;
+use Illuminate\Tests\Integration\Database\PrunableTestModel;
+use Illuminate\Tests\Integration\Database\PrunableTestModelMissingPrunableMethod;
+use Illuminate\Tests\Integration\Database\PrunableWithCustomPruneMethodTestModel;
 use InvalidArgumentException;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -50,6 +54,10 @@ class PruneCommandTest extends TestCase
                 MassPrunableTestModel::class,
                 MassPrunableSoftDeleteTestModel::class,
                 MassPrunableTestModelMissingPrunableMethod::class,
+                PrunableTestModel::class,
+                PrunableSoftDeleteTestModel::class,
+                PrunableWithCustomPruneMethodTestModel::class,
+                PrunableTestModelMissingPrunableMethod::class,
             ],
         ]);
 
