@@ -2863,6 +2863,13 @@ class HttpClientTest extends TestCase
         $this->assertSame('Bar', $responses[1]->header('X-Foo'));
     }
 
+    public function testItCanGetTheGlobalMiddleware()
+    {
+        $this->factory->globalMiddleware($middleware = fn () => null);
+
+        $this->assertEquals([$middleware], $this->factory->getGlobalMiddleware());
+    }
+
     public function testItCanAddRequestMiddleware()
     {
         $requests = [];

@@ -319,6 +319,7 @@ class FilesystemManager implements FactoryContract
         return new Flysystem($adapter, Arr::only($config, [
             'directory_visibility',
             'disable_asserts',
+            'retain_visibility',
             'temporary_url',
             'url',
             'visibility',

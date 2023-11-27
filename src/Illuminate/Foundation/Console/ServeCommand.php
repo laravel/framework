@@ -287,8 +287,13 @@ class ServeCommand extends Command
             } elseif (str($line)->contains(['Closed without sending a request'])) {
                 // ...
             } elseif (! empty($line)) {
-                $warning = explode('] ', $line);
-                $this->components->warn(count($warning) > 1 ? $warning[1] : $warning[0]);
+                $position = strpos($line, '] ');
+
+                if ($position !== false) {
+                    $line = substr($line, $position + 1);
+                }
+
+                $this->components->warn($line);
             }
         });
     }

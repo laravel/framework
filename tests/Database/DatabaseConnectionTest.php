@@ -7,7 +7,6 @@ use ErrorException;
 use Exception;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Connection;
-use Illuminate\Database\DatabaseTransactionsManager;
 use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Database\Events\TransactionBeginning;
 use Illuminate\Database\Events\TransactionCommitted;
@@ -288,20 +287,6 @@ class DatabaseConnectionTest extends TestCase
         $events->shouldReceive('dispatch')->once()->with(m::type(TransactionCommitting::class));
         $events->shouldReceive('dispatch')->once()->with(m::type(TransactionCommitted::class));
         $connection->commit();
-    }
-
-    public function testAfterCommitIsExecutedOnFinalCommit()
-    {
-        $pdo = $this->getMockBuilder(DatabaseConnectionTestMockPDO::class)->onlyMethods(['beginTransaction', 'commit'])->getMock();
-        $transactionsManager = $this->getMockBuilder(DatabaseTransactionsManager::class)->onlyMethods(['afterCommitCallbacksShouldBeExecuted'])->getMock();
-        $transactionsManager->expects($this->once())->method('afterCommitCallbacksShouldBeExecuted')->with(0)->willReturn(true);
-
-        $connection = $this->getMockConnection([], $pdo);
-        $connection->setTransactionManager($transactionsManager);
-
-        $connection->transaction(function () {
-            // do nothing
-        });
     }
 
     public function testRollBackedFiresEventsIfSet()

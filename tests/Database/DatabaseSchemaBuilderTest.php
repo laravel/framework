@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Database;
 use Doctrine\DBAL\Schema\Column;
 use Doctrine\DBAL\Types\Type;
 use Illuminate\Database\Connection;
+use Illuminate\Database\Query\Processors\PostgresProcessor;
 use Illuminate\Database\Schema\Builder;
 use Illuminate\Database\Schema\Grammars\Grammar;
 use LogicException;
@@ -49,11 +50,14 @@ class DatabaseSchemaBuilderTest extends TestCase
     {
         $connection = m::mock(Connection::class);
         $grammar = m::mock(stdClass::class);
+        $processor = m::mock(PostgresProcessor::class);
         $connection->shouldReceive('getSchemaGrammar')->andReturn($grammar);
+        $connection->shouldReceive('getPostProcessor')->andReturn($processor);
         $builder = new Builder($connection);
-        $grammar->shouldReceive('compileTableExists')->once()->andReturn('sql');
+        $grammar->shouldReceive('compileTables')->once()->andReturn('sql');
+        $processor->shouldReceive('processTables')->once()->andReturn([['name' => 'prefix_table']]);
         $connection->shouldReceive('getTablePrefix')->once()->andReturn('prefix_');
-        $connection->shouldReceive('selectFromWriteConnection')->once()->with('sql', ['prefix_table'])->andReturn(['prefix_table']);
+        $connection->shouldReceive('selectFromWriteConnection')->once()->with('sql')->andReturn([['name' => 'prefix_table']]);
 
         $this->assertTrue($builder->hasTable('table'));
     }

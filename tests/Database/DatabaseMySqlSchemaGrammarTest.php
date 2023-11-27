@@ -585,6 +585,18 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $this->assertSame('alter table `links` add `url` varchar(2083) character set ascii not null, add `url_hash_virtual` varchar(64) character set ascii as (sha2(url, 256)), add `url_hash_stored` varchar(64) character set ascii as (sha2(url, 256)) stored', $statements[0]);
     }
 
+    public function testAddingGeneratedColumnByExpression()
+    {
+        $blueprint = new Blueprint('products');
+        $blueprint->integer('price');
+        $blueprint->integer('discounted_virtual')->virtualAs(new Expression('price - 5'));
+        $blueprint->integer('discounted_stored')->storedAs(new Expression('price - 5'));
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table `products` add `price` int not null, add `discounted_virtual` int as (price - 5), add `discounted_stored` int as (price - 5) stored', $statements[0]);
+    }
+
     public function testAddingInvisibleColumn()
     {
         $blueprint = new Blueprint('users');
