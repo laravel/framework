@@ -221,6 +221,20 @@ class ComponentAttributeBag implements ArrayAccess, IteratorAggregate, JsonSeria
     }
 
     /**
+     * Return a bag of attributes with camel-cased keys.
+     *
+     * @return static
+     */
+    public function toProps()
+    {
+        return new static(
+            Arr::mapWithKeys($this->attributes, function ($value, $key) {
+                return [Str::camel($key) => $value];
+            })
+        );
+    }
+
+    /**
      * Extract prop names from given keys.
      *
      * @param  mixed|array  $keys

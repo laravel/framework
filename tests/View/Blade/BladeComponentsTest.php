@@ -17,7 +17,7 @@ class BladeComponentsTest extends AbstractBladeTestCase
     public function testClassComponentsAreCompiled()
     {
         $this->assertSame('<?php if (isset($component)) { $__componentOriginal2dda3d2f2f9b76bd400bf03f0b84e87f = $component; } ?>
-<?php $component = Illuminate\Tests\View\Blade\ComponentStub::class::resolve(["foo" => "bar"] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component = Illuminate\Tests\View\Blade\ComponentStub::class::resolve(["foo" => "bar"] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->toProps()->getIterator() : [])); ?>
 <?php $component->withName(\'test\'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>', $this->compiler->compileString('@component(\'Illuminate\Tests\View\Blade\ComponentStub::class\', \'test\', ["foo" => "bar"])'));
@@ -55,13 +55,16 @@ class BladeComponentsTest extends AbstractBladeTestCase
 
     public function testPropsAreExtractedFromParentAttributesCorrectlyForClassComponents()
     {
-        $attributes = new ComponentAttributeBag(['foo' => 'baz', 'other' => 'ok']);
+        $attributes = new ComponentAttributeBag(['foo' => 'baz', 'other-attr' => 'ok']);
 
         $component = m::mock(Component::class);
         $component->shouldReceive('withName', 'test');
         $component->shouldReceive('shouldRender')->andReturn(false);
 
-        Component::resolveComponentsUsing(fn () => $component);
+        Component::resolveComponentsUsing(function ($class, $data) use ($component) {
+            $this->assertSame(['foo' => 'bar', 'otherAttr' => 'ok'], $data);
+            return $component;
+        });
 
         $template = $this->compiler->compileString('@component(\'Illuminate\Tests\View\Blade\ComponentStub::class\', \'test\', ["foo" => "bar"])');
 

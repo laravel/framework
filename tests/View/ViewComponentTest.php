@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\View;
 
+use Illuminate\View\AnonymousComponent;
 use Illuminate\View\Component;
 use Illuminate\View\ComponentAttributeBag;
 use PHPUnit\Framework\TestCase;
@@ -122,6 +123,25 @@ class ViewComponentTest extends TestCase
         // protected methods do not override public properties.
         $this->assertArrayHasKey('world', $variables);
         $this->assertSame('world property', $variables['world']);
+    }
+
+    public function testAnonymousComponentData()
+    {
+        $parentAttributes = new ComponentAttributeBag([
+            'parent-attr' => 'ok',
+        ]);
+        $component = new AnonymousComponent('anonymous', [
+            'foo' => 'bar',
+            'attributes' => $parentAttributes,
+        ]);
+        $component->withAttributes([
+            'actual-attr' => 'foo',
+            'attributes' => $parentAttributes
+        ]);
+        $variables = $component->data();
+
+        $this->assertArrayHasKey('parentAttr', $variables);
+        $this->assertArrayHasKey('actualAttr', $variables);
     }
 }
 
