@@ -7,7 +7,7 @@ use Illuminate\Support\Collection;
 class DatabaseTransactionsManager
 {
     /**
-     * The current transactions.
+     * The current transactions for each connection.
      *
      * @var array<string, \Illuminate\Database\DatabaseTransactionRecord>
      */
@@ -15,6 +15,7 @@ class DatabaseTransactionsManager
 
     /**
      * The transaction currently being executed.
+     * This property is needed to allow callbacks to be added without passing a connection
      *
      * @var \Illuminate\Database\DatabaseTransactionRecord|null
      */
@@ -68,6 +69,7 @@ class DatabaseTransactionsManager
         $currentTransaction = $this->currentTransaction[$connection];
         $currentTransaction->commit();
 
+        // Commit and move "up"... if the parent is null, it means we've hit the root transaction.
         $this->movePointersTo($connection, $this->currentTransaction[$connection]->parent);
 
         if ($this->afterCommitCallbacksShouldBeExecuted($currentTransaction->level)) {
