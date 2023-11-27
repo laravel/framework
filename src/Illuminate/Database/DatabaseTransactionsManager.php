@@ -48,8 +48,6 @@ class DatabaseTransactionsManager
 
         if (isset($this->currentTransaction[$connection])) {
             $this->currentTransaction[$connection]->addChild($newTransaction);
-        } else {
-            $this->rootTransaction[$connection] = $newTransaction;
         }
 
         $this->transactions[] = $newTransaction;
@@ -72,11 +70,9 @@ class DatabaseTransactionsManager
 
         $this->movePointersTo($connection, $this->currentTransaction[$connection]->parent);
 
-        if (! $this->afterCommitCallbacksShouldBeExecuted($currentTransaction->level)) {
-            return;
+        if ($this->afterCommitCallbacksShouldBeExecuted($currentTransaction->level)) {
+            $currentTransaction->executeCallbacks();
         }
-
-        $currentTransaction?->executeCallbacks();
     }
 
     /**
@@ -87,20 +83,20 @@ class DatabaseTransactionsManager
      */
     public function rollback($connection, $newTransactionLevel)
     {
-        $this->movePointersTo($connection, $this->currentTransaction[$connection]);
-        $this->currentlyBeingExecutedTransaction?->resetCallbacks();
-        $this->currentlyBeingExecutedTransaction?->resetChildren();
-
-        $this->getParentTransaction($connection)?->removeChild($this->currentlyBeingExecutedTransaction);
-
-        // find the index of the current transaction
-        $index = $this->transactions->search($this->currentlyBeingExecutedTransaction);
-        $transaction = $this->transactions
-            ->filter(fn ($transaction, $foundIndex) => ! $transaction->committed && $foundIndex < $index)
+        $transaction = $this->currentTransaction[$connection];
+        $transactionIndex = $this->transactions->search($transaction);
+        // Find the last committed transaction previous to the one that has been rolled back.
+        // WIP: maybe use a linked list here?
+        $lastTransaction = $this->transactions
+            ->filter(fn ($transaction, $foundIndex) => $transaction->committed === false && $foundIndex < $transactionIndex)
             ->last();
 
-        $this->transactions = $this->transactions->reject(fn ($transaction) => $transaction === $this->currentlyBeingExecutedTransaction);
-        $this->movePointersTo($connection, $transaction);
+        $this->removeTransaction($transaction);
+
+        // In a nested setting, the rolled back transaction isn't necessarily in the same
+        // connection as the parent transaction. That's why we move the pointer to
+        // the last transaction before the one that has been rolled back.
+        $this->movePointersTo($connection, $lastTransaction);
     }
 
     /**
@@ -130,25 +126,27 @@ class DatabaseTransactionsManager
     }
 
     /**
-     * Get the current transaction for the given connection.
+     * Get all of the pending transactions.
      *
-     * @param string $connection
-     * @return \Illuminate\Database\DatabaseTransactionRecord|null
+     * @return \Illuminate\Support\Collection
      */
-    protected function currentTransaction($connection)
+    public function getPendingTransactions()
     {
-        return $this->currentTransaction[$connection];
+        return $this->transactions
+            ->filter(fn ($transaction) => $transaction->committed === false)
+            ->values();
     }
 
     /**
-     * Get the parent transaction for the current connection.
+     * Get all of the committed transactions.
      *
-     * @param string $connection
-     * @return \Illuminate\Database\DatabaseTransactionRecord|null
+     * @return \Illuminate\Support\Collection
      */
-    protected function getParentTransaction($connection)
+    public function getCommittedTransactions()
     {
-        return $this->currentTransaction($connection)->parent;
+        return $this->transactions
+            ->filter(fn ($transaction) => $transaction->committed === true)
+            ->values();
     }
 
     /**
@@ -158,16 +156,24 @@ class DatabaseTransactionsManager
      * @param \Illuminate\Database\DatabaseTransactionRecord|null $transaction
      * @return void
      */
-    public function movePointersTo($connection, $transaction)
+    protected function movePointersTo($connection, $transaction)
     {
         $this->currentTransaction[$connection] = $transaction;
         $this->currentlyBeingExecutedTransaction = $transaction;
     }
 
-    public function getPendingTransactions()
+    /**
+     * Remove a given transaction from the ledger.
+     *
+     * @param \Illuminate\Database\DatabaseTransactionRecord $transaction
+     * @return void
+     */
+    protected function removeTransaction($transaction)
     {
-        return $this->transactions
-            ->filter(fn ($transaction) => $transaction->committed === false)
-            ->values();
+        $transaction->resetCallbacks();
+        $transaction->resetChildren();
+        $transaction->parent?->removeChild($transaction);
+
+        $this->transactions = $this->transactions->reject(fn ($t) => $t === $transaction);
     }
 }
