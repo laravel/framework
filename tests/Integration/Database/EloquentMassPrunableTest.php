@@ -28,7 +28,7 @@ class EloquentMassPrunableTest extends DatabaseTestCase
         $container->alias(Dispatcher::class, 'events');
     }
 
-    protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
+    public function defineDatabaseMigrationsAfterDatabaseRefreshed()
     {
         collect([
             'mass_prunable_test_models',
