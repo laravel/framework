@@ -164,6 +164,16 @@ trait InteractsWithContainer
             {
                 return [];
             }
+
+            public function reactRefresh()
+            {
+                return '';
+            }
+
+            public function asset($asset, $buildDirectory = null)
+            {
+                return '';
+            }
         });
 
         return $this;
