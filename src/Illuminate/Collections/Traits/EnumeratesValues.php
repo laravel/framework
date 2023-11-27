@@ -328,10 +328,10 @@ trait EnumeratesValues
      */
     public function ensure($type)
     {
-        return $this->each(function ($item) use ($type) {
-            $itemType = get_debug_type($item);
+        $allowedTypes = is_array($type) ? $type : [$type];
 
-            $allowedTypes = is_array($type) ? $type : [$type];
+        return $this->each(function ($item) use ($allowedTypes) {
+            $itemType = get_debug_type($item);
 
             foreach ($allowedTypes as $allowedType) {
                 if ($itemType === $allowedType || $item instanceof $allowedType) {
