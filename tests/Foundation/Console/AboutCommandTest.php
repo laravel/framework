@@ -20,8 +20,8 @@ class AboutCommandTest extends TestCase
 
     public static function cliDataProvider()
     {
-        yield [AboutCommand::format(true, cli: fn ($value) => $value === true ? 'YES' : 'NO'), 'YES'];
-        yield [AboutCommand::format(false, cli: fn ($value) => $value === true ? 'YES' : 'NO'), 'NO'];
+        yield [AboutCommand::format(true, console: fn ($value) => $value === true ? 'YES' : 'NO'), 'YES'];
+        yield [AboutCommand::format(false, console: fn ($value) => $value === true ? 'YES' : 'NO'), 'NO'];
     }
 
     /**

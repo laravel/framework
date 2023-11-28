@@ -168,16 +168,16 @@ class AboutCommand extends Command
             'PHP Version' => phpversion(),
             'Composer Version' => $this->composer->getVersion() ?? '<fg=yellow;options=bold>-</>',
             'Environment' => $this->laravel->environment(),
-            'Debug Mode' => $isEnabled(config('app.debug')),
+            'Debug Mode' => static::format(config('app.debug'), console: $isEnabled),
             'URL' => Str::of(config('app.url'))->replace(['http://', 'https://'], ''),
-            'Maintenance Mode' => static::format($this->laravel->isDownForMaintenance(), cli: $isEnabled),
+            'Maintenance Mode' => static::format($this->laravel->isDownForMaintenance(), console: $isEnabled),
         ]);
 
         static::addToSection('Cache', fn () => [
-            'Config' => static::format($this->laravel->configurationIsCached(), cli: $isCached),
-            'Events' => static::format($this->laravel->eventsAreCached(), cli: $isCached),
-            'Routes' => static::format($this->laravel->routesAreCached(), cli: $isCached),
-            'Views' => static::format($this->hasPhpFiles($this->laravel->storagePath('framework/views')), cli: $isCached),
+            'Config' => static::format($this->laravel->configurationIsCached(), console: $isCached),
+            'Events' => static::format($this->laravel->eventsAreCached(), console: $isCached),
+            'Routes' => static::format($this->laravel->routesAreCached(), console: $isCached),
+            'Views' => static::format($this->hasPhpFiles($this->laravel->storagePath('framework/views')), console: $isCached),
         ]);
 
         static::addToSection('Drivers', fn () => array_filter([
@@ -192,7 +192,7 @@ class AboutCommand extends Command
 
                     return value(static::format(
                         value: $logChannel,
-                        cli: fn ($value) => '<fg=yellow;options=bold>'.$value.'</> <fg=gray;options=bold>/</> '.$secondary->implode(', '),
+                        console: fn ($value) => '<fg=yellow;options=bold>'.$value.'</> <fg=gray;options=bold>/</> '.$secondary->implode(', '),
                         json: fn () => $secondary->all(),
                     ), $json);
                 } else {
@@ -239,18 +239,18 @@ class AboutCommand extends Command
      * Format the given value for CLI or JSON.
      *
      * @param  mixed  $value
-     * @param  (\Closure():(mixed))|null  $cli
+     * @param  (\Closure():(mixed))|null  $console
      * @param  (\Closure():(mixed))|null  $json
      * @return \Closure(bool):mixed
      */
-    public static function format($value, Closure $cli = null, Closure $json = null)
+    public static function format($value, Closure $console = null, Closure $json = null)
     {
-        return function ($isJson) use ($value, $cli, $json) {
+        return function ($isJson) use ($value, $console, $json) {
             /** @var bool $isJson */
             if ($isJson === true && $json instanceof Closure) {
                 return value($json, $value);
-            } elseif ($isJson === false && $cli instanceof Closure) {
-                return value($cli, $value);
+            } elseif ($isJson === false && $console instanceof Closure) {
+                return value($console, $value);
             }
 
             return value($value);
