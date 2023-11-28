@@ -97,7 +97,7 @@ class TrustProxies
      *
      * @param  Request  $request
      * @param  int  $layers
-     * @return  void
+     * @return void
      */
     protected function setTrustedProxyIpAddressesToLayers(Request $request, int $layers): void
     {
