@@ -171,7 +171,7 @@ class MigrationCreator
      */
     protected function getPath($name, $path)
     {
-        return $path.'/'.$this->getDatePrefix().'_'.$name.'.php';
+        return $path . DIRECTORY_SEPARATOR . $this->getDatePrefix() . '_' . $name . '.php';
     }
 
     /**
