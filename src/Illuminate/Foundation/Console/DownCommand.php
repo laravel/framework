@@ -62,7 +62,7 @@ class DownCommand extends Command
             $this->components->info('Application is now in maintenance mode.');
 
             if ($downFilePayload['secret'] !== null) {
-                $this->components->info("You may bypass the application's maintenace mode by acessing the following URL [" . config('app.url') . "/{$downFilePayload['secret']}].");
+                $this->components->info("You may bypass the application's maintenace mode by going to [" . config('app.url') . "/{$downFilePayload['secret']}].");
             }
         } catch (Exception $e) {
             $this->components->error(sprintf(
