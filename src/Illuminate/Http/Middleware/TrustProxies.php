@@ -15,6 +15,13 @@ class TrustProxies
     protected $proxies;
 
     /**
+     * The number of proxy layers to trust
+     *
+     * @var int
+     */
+    protected $layers = 1;
+
+    /**
      * The proxy header mappings.
      *
      * @var int
@@ -50,7 +57,7 @@ class TrustProxies
         $trustedIps = $this->proxies() ?: config('trustedproxy.proxies');
 
         if ($trustedIps === '*' || $trustedIps === '**') {
-            return $this->setTrustedProxyIpAddressesToTheCallingIp($request);
+            return $this->setTrustedProxyIpAddressesToLayers($request, $this->layers());
         }
 
         $trustedIps = is_string($trustedIps)
@@ -86,6 +93,27 @@ class TrustProxies
     }
 
     /**
+     * Trust the most recent $layers number of proxies
+     *
+     * @param  Request  $request
+     * @param  int  $layers
+     * @return  void
+     */
+    protected function setTrustedProxyIpAddressesToLayers(Request $request, int $layers): void
+    {
+        $trustedIps = array_slice(
+            array_reverse(array_filter(explode(', ', $request->headers->get('X_FORWARDED_FOR')))),
+            0,
+            $layers - 1,
+        );
+
+        $request->setTrustedProxies(
+            array_merge([$request->server->get('REMOTE_ADDR')], $trustedIps),
+            $this->getTrustedHeaderNames()
+        );
+    }
+
+    /**
      * Retrieve trusted header name(s), falling back to defaults if config not set.
      *
      * @return int A bit field of Request::HEADER_*, to set which headers to trust from your proxies.
@@ -116,5 +144,15 @@ class TrustProxies
     protected function proxies()
     {
         return $this->proxies;
+    }
+
+    /**
+     * Get the number of proxy layers to trust
+     *
+     * @return int
+     */
+    protected function layers()
+    {
+        return $this->layers;
     }
 }

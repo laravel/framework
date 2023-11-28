@@ -80,6 +80,50 @@ class TrustProxiesTest extends TestCase
     }
 
     /**
+     * Test that TrustedProxies will apply a wildcard up to two layers of proxies deep
+     */
+    public function test_trusted_proxy_sets_trusted_proxies_for_2_layers()
+    {
+        $trustedProxy = $this->createTrustedProxy($this->headerAll, '*', 2);
+        $forwardedFor = [
+            '' => '192.168.10.10',
+            '192.0.2.2' => '192.0.2.2',
+            '192.0.2.2, 192.0.2.199' => '192.0.2.2',
+            '192.0.2.2, 192.0.2.199, 99.99.99.99' => '192.0.2.199',
+        ];
+
+        foreach ($forwardedFor as $forwardedForHeader => $expected) {
+            $request = $this->createProxiedRequest(['HTTP_X_FORWARDED_FOR' => $forwardedForHeader]);
+
+            $trustedProxy->handle($request, function ($request) use ($expected) {
+                $this->assertSame($expected, $request->getClientIp(), 'Assert trusted proxy x-forwarded-for header used 2 layers deep');
+            });
+        }
+    }
+
+    /**
+     * Test that TrustedProxies will apply a wildcard up to n layers of proxies deep
+     */
+    public function test_trusted_proxy_sets_trusted_proxies_for_n_layers()
+    {
+        $forwardedFor = '192.0.2.2, 192.0.2.199, 99.99.99.99';
+        $layers = [
+            1 => '99.99.99.99',
+            2 => '192.0.2.199',
+            3 => '192.0.2.2',
+        ];
+
+        foreach ($layers as $layer => $expected) {
+            $trustedProxy = $this->createTrustedProxy($this->headerAll, '*', $layer);
+            $request = $this->createProxiedRequest(['HTTP_X_FORWARDED_FOR' => $forwardedFor]);
+
+            $trustedProxy->handle($request, function ($request) use ($expected) {
+                $this->assertSame($expected, $request->getClientIp(), 'Assert trusted proxy x-forwarded-for header used n layers deep');
+            });
+        }
+    }
+
+    /**
      * Test the most typical usage of TrustProxies:
      * Trusted X-Forwarded-For header.
      */
@@ -392,16 +436,18 @@ class TrustProxiesTest extends TestCase
      *
      * @param  null|string|int  $trustedHeaders
      * @param  null|array|string  $trustedProxies
+     * @param  int  $layers
      * @return \Illuminate\Http\Middleware\TrustProxies
      */
-    protected function createTrustedProxy($trustedHeaders, $trustedProxies)
+    protected function createTrustedProxy($trustedHeaders, $trustedProxies, $layers = 1)
     {
-        return new class($trustedHeaders, $trustedProxies) extends TrustProxies
+        return new class($trustedHeaders, $trustedProxies, $layers) extends TrustProxies
         {
-            public function __construct($trustedHeaders, $trustedProxies)
+            public function __construct($trustedHeaders, $trustedProxies, $layers)
             {
                 $this->headers = $trustedHeaders;
                 $this->proxies = $trustedProxies;
+                $this->layers = $layers;
             }
         };
     }
