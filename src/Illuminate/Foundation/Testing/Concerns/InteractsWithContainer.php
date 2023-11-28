@@ -117,7 +117,7 @@ trait InteractsWithContainer
         {
             public function __invoke($entrypoints, $buildDirectory = null)
             {
-                return '';
+                return new HtmlString('');
             }
 
             public function __call($method, $parameters)
