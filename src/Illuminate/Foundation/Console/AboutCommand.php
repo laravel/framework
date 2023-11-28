@@ -159,8 +159,8 @@ class AboutCommand extends Command
      */
     protected function gatherApplicationInformation()
     {
-        $isEnabled = fn ($value) => $value ? '<fg=yellow;options=bold>ENABLED</>' : 'OFF';
-        $isCached = fn ($value) => $value ? '<fg=green;options=bold>CACHED</>' : '<fg=yellow;options=bold>NOT CACHED</>';
+        $formatEnabledStatus = fn ($value) => $value ? '<fg=yellow;options=bold>ENABLED</>' : 'OFF';
+        $formatCachedStatus = fn ($value) => $value ? '<fg=green;options=bold>CACHED</>' : '<fg=yellow;options=bold>NOT CACHED</>';
 
         static::addToSection('Environment', fn () => [
             'Application Name' => config('app.name'),
@@ -168,16 +168,16 @@ class AboutCommand extends Command
             'PHP Version' => phpversion(),
             'Composer Version' => $this->composer->getVersion() ?? '<fg=yellow;options=bold>-</>',
             'Environment' => $this->laravel->environment(),
-            'Debug Mode' => static::format(config('app.debug'), console: $isEnabled),
+            'Debug Mode' => static::format(config('app.debug'), console: $formatEnabledStatus),
             'URL' => Str::of(config('app.url'))->replace(['http://', 'https://'], ''),
-            'Maintenance Mode' => static::format($this->laravel->isDownForMaintenance(), console: $isEnabled),
+            'Maintenance Mode' => static::format($this->laravel->isDownForMaintenance(), console: $formatEnabledStatus),
         ]);
 
         static::addToSection('Cache', fn () => [
-            'Config' => static::format($this->laravel->configurationIsCached(), console: $isCached),
-            'Events' => static::format($this->laravel->eventsAreCached(), console: $isCached),
-            'Routes' => static::format($this->laravel->routesAreCached(), console: $isCached),
-            'Views' => static::format($this->hasPhpFiles($this->laravel->storagePath('framework/views')), console: $isCached),
+            'Config' => static::format($this->laravel->configurationIsCached(), console: $formatCachedStatus),
+            'Events' => static::format($this->laravel->eventsAreCached(), console: $formatCachedStatus),
+            'Routes' => static::format($this->laravel->routesAreCached(), console: $formatCachedStatus),
+            'Views' => static::format($this->hasPhpFiles($this->laravel->storagePath('framework/views')), console: $formatCachedStatus),
         ]);
 
         static::addToSection('Drivers', fn () => array_filter([
@@ -236,28 +236,6 @@ class AboutCommand extends Command
     }
 
     /**
-     * Format the given value for CLI or JSON.
-     *
-     * @param  mixed  $value
-     * @param  (\Closure():(mixed))|null  $console
-     * @param  (\Closure():(mixed))|null  $json
-     * @return \Closure(bool):mixed
-     */
-    public static function format($value, Closure $console = null, Closure $json = null)
-    {
-        return function ($isJson) use ($value, $console, $json) {
-            /** @var bool $isJson */
-            if ($isJson === true && $json instanceof Closure) {
-                return value($json, $value);
-            } elseif ($isJson === false && $console instanceof Closure) {
-                return value($console, $value);
-            }
-
-            return value($value);
-        };
-    }
-
-    /**
      * Add additional data to the output of the "about" command.
      *
      * @param  string  $section
@@ -289,6 +267,27 @@ class AboutCommand extends Command
             ->filter()
             ->map(fn ($only) => $this->toSearchKeyword($only))
             ->all();
+    }
+
+    /**
+     * Materialize a function that formats a given value for CLI or JSON output.
+     *
+     * @param  mixed  $value
+     * @param  (\Closure():(mixed))|null  $console
+     * @param  (\Closure():(mixed))|null  $json
+     * @return \Closure(bool):mixed
+     */
+    public static function format($value, Closure $console = null, Closure $json = null)
+    {
+        return function ($isJson) use ($value, $console, $json) {
+            if ($isJson === true && $json instanceof Closure) {
+                return value($json, $value);
+            } elseif ($isJson === false && $console instanceof Closure) {
+                return value($console, $value);
+            }
+
+            return value($value);
+        };
     }
 
     /**
