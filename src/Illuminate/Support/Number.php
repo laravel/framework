@@ -18,7 +18,7 @@ class Number
     protected $number;
 
     /**
-     * The current default locale.
+     * The current locale.
      *
      * @var string
      */
@@ -200,7 +200,7 @@ class Number
      */
     protected function ensureIntlExtensionIsInstalled()
     {
-        if (!extension_loaded('intl')) {
+        if (! extension_loaded('intl')) {
             throw new RuntimeException('The "intl" PHP extension is required to use this method.');
         }
     }
