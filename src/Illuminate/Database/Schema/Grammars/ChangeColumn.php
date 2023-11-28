@@ -32,8 +32,9 @@ class ChangeColumn
             ));
         }
 
-        $schema = $connection->getDoctrineSchemaManager();
-        $databasePlatform = $connection->getDoctrineConnection()->getDatabasePlatform();
+        $doctrineConnection = $connection->getDoctrineConnection();
+        $schema = $doctrineConnection->createSchemaManager();
+        $databasePlatform = $doctrineConnection->getDatabasePlatform();
         $databasePlatform->registerDoctrineTypeMapping('enum', 'string');
 
         $tableDiff = static::getChangedDiff(
