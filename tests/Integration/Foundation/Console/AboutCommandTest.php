@@ -13,21 +13,23 @@ class AboutCommandTest extends TestCase
     {
         $process = remote('about --json')->mustRun();
 
-        Assert::assertArraySubset([
-            'environment' => [
+        tap(json_decode($process->getOutput(), true), function ($output) {
+            Assert::assertArraySubset([
                 'application_name' => 'Laravel',
                 'php_version' => PHP_VERSION,
                 'environment' => 'testing',
                 'debug_mode' => true,
                 'url' => 'localhost',
                 'maintenance_mode' => false,
-            ],
-            'cache' => [
+            ], $output['environment']);
+
+            Assert::assertArraySubset([
                 'config' => false,
                 'events' => false,
                 'routes' => false,
-            ],
-            'drivers' => [
+            ], $output['cache']);
+
+            Assert::assertArraySubset([
                 'broadcasting' => 'log',
                 'cache' => 'file',
                 'database' => 'testing',
@@ -35,7 +37,7 @@ class AboutCommandTest extends TestCase
                 'mail' => 'smtp',
                 'queue' => 'sync',
                 'session' => 'file',
-            ],
-        ], json_decode($process->getOutput(), true));
+            ], $output['drivers']);
+        });
     }
 }
