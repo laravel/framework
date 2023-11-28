@@ -80,7 +80,7 @@ class TrustProxiesTest extends TestCase
     }
 
     /**
-     * Test that TrustedProxies will apply a wildcard up to two layers of proxies deep
+     * Test that TrustedProxies will apply a wildcard up to two layers of proxies deep.
      */
     public function test_trusted_proxy_sets_trusted_proxies_for_2_layers()
     {
@@ -102,7 +102,7 @@ class TrustProxiesTest extends TestCase
     }
 
     /**
-     * Test that TrustedProxies will apply a wildcard up to n layers of proxies deep
+     * Test that TrustedProxies will apply a wildcard up to n layers of proxies deep.
      */
     public function test_trusted_proxy_sets_trusted_proxies_for_n_layers()
     {

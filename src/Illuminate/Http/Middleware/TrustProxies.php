@@ -15,7 +15,7 @@ class TrustProxies
     protected $proxies;
 
     /**
-     * The number of proxy layers to trust
+     * The number of proxy layers to trust.
      *
      * @var int
      */
@@ -93,7 +93,7 @@ class TrustProxies
     }
 
     /**
-     * Trust the most recent $layers number of proxies
+     * Trust the most recent $layers number of proxies.
      *
      * @param  Request  $request
      * @param  int  $layers
@@ -147,7 +147,7 @@ class TrustProxies
     }
 
     /**
-     * Get the number of proxy layers to trust
+     * Get the number of proxy layers to trust.
      *
      * @return int
      */
