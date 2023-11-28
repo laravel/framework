@@ -138,7 +138,7 @@ class EloquentModelTest extends DatabaseTestCase
         ]);
 
         $this->assertDatabaseHas($model, [
-            'settings' => ['example'],
+            'settings' => $this->castAsJson(['example']),
         ]);
     }
 
@@ -153,7 +153,7 @@ class EloquentModelTest extends DatabaseTestCase
         ]);
 
         $this->assertDatabaseHas($model, [
-            'settings' => ['label' => 'example'],
+            'settings' => $this->castAsJson(['label' => 'example']),
         ]);
     }
 
@@ -168,7 +168,7 @@ class EloquentModelTest extends DatabaseTestCase
         ]);
 
         $this->assertDatabaseHas($model, [
-            'settings' => ['example'],
+            'settings' => $this->castAsJson(['example']),
         ]);
     }
 
@@ -183,7 +183,7 @@ class EloquentModelTest extends DatabaseTestCase
         ]);
 
         $this->assertDatabaseHas($model, [
-            'settings' => ['label' => 'example'],
+            'settings' => $this->castAsJson(['label' => 'example']),
         ]);
     }
 
@@ -198,7 +198,7 @@ class EloquentModelTest extends DatabaseTestCase
         ]);
 
         $this->assertDatabaseHas($model, [
-            'settings' => ['example'],
+            'settings' => $this->castAsJson(['example']),
         ]);
     }
 
@@ -213,7 +213,7 @@ class EloquentModelTest extends DatabaseTestCase
         ]);
 
         $this->assertDatabaseHas($model, [
-            'settings' => ['label' => 'example'],
+            'settings' => $this->castAsJson(['label' => 'example']),
         ]);
     }
 }
