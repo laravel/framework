@@ -160,12 +160,22 @@ trait InteractsWithContainer
                 return $this;
             }
 
+            public function usePreloadTagAttributes($attributes)
+            {
+                return $this;
+            }
+
             public function preloadedAssets()
             {
                 return [];
             }
 
             public function reactRefresh()
+            {
+                return '';
+            }
+
+            public function content($asset, $buildDirectory = null)
             {
                 return '';
             }
