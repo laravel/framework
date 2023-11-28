@@ -210,7 +210,7 @@ class SupportNumberTest extends TestCase
 
     protected function needsIntlExtension()
     {
-        if (!extension_loaded('intl')) {
+        if (! extension_loaded('intl')) {
             $this->markTestSkipped('The intl extension is not installed. Please install the extension to enable ' . __CLASS__);
         }
     }

@@ -27,8 +27,8 @@ class Number
     /**
      * Creates a new instance of the class and sets the number and locale properties.
      *
-     * @param  int|float $number
-     * @param  string $locale
+     * @param  int|float  $number
+     * @param  string  $locale
      * @return self
      */
     public static function create(int|float $number, string $locale = 'en')
@@ -55,9 +55,9 @@ class Number
 
         $formatter = new NumberFormatter($this->locale, NumberFormatter::DECIMAL);
 
-        if (!is_null($maxPrecision)) {
+        if (! is_null($maxPrecision)) {
             $formatter->setAttribute(NumberFormatter::MAX_FRACTION_DIGITS, $maxPrecision);
-        } elseif (!is_null($precision)) {
+        } elseif (! is_null($precision)) {
             $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, $precision);
         }
 
