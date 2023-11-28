@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Console;
 
+use Closure;
 use Illuminate\Console\Command;
 use Illuminate\Support\Composer;
 use Illuminate\Support\Str;
@@ -158,13 +159,8 @@ class AboutCommand extends Command
      */
     protected function gatherApplicationInformation()
     {
-        $isEnabled = function ($config) {
-            return fn ($json) => $json === true ? $config : ($config ? '<fg=yellow;options=bold>ENABLED</>' : 'OFF');
-        };
-
-        $isCached = function ($config) {
-            return fn ($json) => $json === true ? $config : ($config ? '<fg=green;options=bold>CACHED</>' : '<fg=yellow;options=bold>NOT CACHED</>');
-        };
+        $isEnabled = fn ($value) => $value ? '<fg=yellow;options=bold>ENABLED</>' : 'OFF';
+        $isCached = fn ($value) => $value ? '<fg=green;options=bold>CACHED</>' : '<fg=yellow;options=bold>NOT CACHED</>';
 
         static::addToSection('Environment', fn () => [
             'Application Name' => config('app.name'),
@@ -174,14 +170,14 @@ class AboutCommand extends Command
             'Environment' => $this->laravel->environment(),
             'Debug Mode' => $isEnabled(config('app.debug')),
             'URL' => Str::of(config('app.url'))->replace(['http://', 'https://'], ''),
-            'Maintenance Mode' => $isEnabled($this->laravel->isDownForMaintenance()),
+            'Maintenance Mode' => static::format($this->laravel->isDownForMaintenance(), cli: $isEnabled),
         ]);
 
         static::addToSection('Cache', fn () => [
-            'Config' => $isCached($this->laravel->configurationIsCached()),
-            'Events' => $isCached($this->laravel->eventsAreCached()),
-            'Routes' => $isCached($this->laravel->routesAreCached()),
-            'Views' => $isCached($this->hasPhpFiles($this->laravel->storagePath('framework/views'))),
+            'Config' => static::format($this->laravel->configurationIsCached(), cli: $isCached),
+            'Events' => static::format($this->laravel->eventsAreCached(), cli: $isCached),
+            'Routes' => static::format($this->laravel->routesAreCached(), cli: $isCached),
+            'Views' => static::format($this->hasPhpFiles($this->laravel->storagePath('framework/views')), cli: $isCached),
         ]);
 
         static::addToSection('Drivers', fn () => array_filter([
@@ -194,11 +190,11 @@ class AboutCommand extends Command
                 if (config('logging.channels.'.$logChannel.'.driver') === 'stack') {
                     $secondary = collect(config('logging.channels.'.$logChannel.'.channels'));
 
-                    if ($json === true) {
-                        return $secondary->all();
-                    }
-
-                    $logs = '<fg=yellow;options=bold>'.$logChannel.'</> <fg=gray;options=bold>/</> '.$secondary->implode(', ');
+                    return value(static::format(
+                        value: $logChannel,
+                        cli: fn ($value) => '<fg=yellow;options=bold>'.$value.'</> <fg=gray;options=bold>/</> '.$secondary->implode(', '),
+                        json: fn () => $secondary->all(),
+                    ), $json);
                 } else {
                     $logs = $logChannel;
                 }
@@ -237,6 +233,28 @@ class AboutCommand extends Command
     public static function add(string $section, $data, string $value = null)
     {
         static::$customDataResolvers[] = fn () => static::addToSection($section, $data, $value);
+    }
+
+    /**
+     * Format the given value for CLI or JSON.
+     *
+     * @param  mixed  $value
+     * @param  (\Closure():(mixed))|null  $cli
+     * @param  (\Closure():(mixed))|null  $json
+     * @return \Closure(bool):mixed
+     */
+    public static function format($value, Closure $cli = null, Closure $json = null)
+    {
+        return function ($isJson) use ($value, $cli, $json) {
+            /** @var bool $isJson */
+            if ($isJson === true && $json instanceof Closure) {
+                return value($json, $value);
+            } elseif ($isJson === false && $cli instanceof Closure) {
+                return value($cli, $value);
+            }
+
+            return value($value);
+        };
     }
 
     /**
