@@ -11,138 +11,73 @@ class Number
     use Macroable;
 
     /**
+     * The current number.
+     *
+     * @var int|float
+     */
+    protected $number;
+
+    /**
      * The current default locale.
      *
      * @var string
      */
-    protected static $locale = 'en';
+    protected $locale;
 
     /**
-     * Format the given number according to the current locale.
+     * Creates a new instance of the class and sets the number and locale properties.
      *
-     * @param  int|float  $number
+     * @param  int|float $number
+     * @param  string $locale
+     * @return self
+     */
+    public static function create(int|float $number, string $locale = 'en')
+    {
+        $instants = new static;
+
+        $instants->number = $number;
+
+        $instants->locale = $locale;
+
+        return $instants;
+    }
+
+    /**
+     * Formats the number with the specified precision and maximum precision.
+     *
      * @param  int|null  $precision
      * @param  int|null  $maxPrecision
-     * @param  string|null  $locale
      * @return string|false
      */
-    public static function format(int|float $number, ?int $precision = null, ?int $maxPrecision = null, ?string $locale = null)
+    public function format(?int $precision = null, ?int $maxPrecision = null)
     {
-        static::ensureIntlExtensionIsInstalled();
+        $this->ensureIntlExtensionIsInstalled();
 
-        $formatter = new NumberFormatter($locale ?? static::$locale, NumberFormatter::DECIMAL);
+        $formatter = new NumberFormatter($this->locale, NumberFormatter::DECIMAL);
 
-        if (! is_null($maxPrecision)) {
+        if (!is_null($maxPrecision)) {
             $formatter->setAttribute(NumberFormatter::MAX_FRACTION_DIGITS, $maxPrecision);
-        } elseif (! is_null($precision)) {
+        } elseif (!is_null($precision)) {
             $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, $precision);
         }
 
-        return $formatter->format($number);
+        return $formatter->format($this->number);
     }
 
     /**
-     * Spell out the given number in the given locale.
+     * Formats the number with a unit.
      *
-     * @param  int|float  $number
-     * @param  string|null  $locale
-     * @return string
-     */
-    public static function spell(int|float $number, ?string $locale = null)
-    {
-        static::ensureIntlExtensionIsInstalled();
-
-        $formatter = new NumberFormatter($locale ?? static::$locale, NumberFormatter::SPELLOUT);
-
-        return $formatter->format($number);
-    }
-
-    /**
-     * Convert the given number to ordinal form.
-     *
-     * @param  int|float  $number
-     * @param  string|null  $locale
-     * @return string
-     */
-    public static function ordinal(int|float $number, ?string $locale = null)
-    {
-        static::ensureIntlExtensionIsInstalled();
-
-        $formatter = new NumberFormatter($locale ?? static::$locale, NumberFormatter::ORDINAL);
-
-        return $formatter->format($number);
-    }
-
-    /**
-     * Convert the given number to its percentage equivalent.
-     *
-     * @param  int|float  $number
-     * @param  int  $precision
-     * @param  int|null  $maxPrecision
-     * @param  string|null  $locale
-     * @return string|false
-     */
-    public static function percentage(int|float $number, int $precision = 0, ?int $maxPrecision = null, ?string $locale = null)
-    {
-        static::ensureIntlExtensionIsInstalled();
-
-        $formatter = new NumberFormatter($locale ?? static::$locale, NumberFormatter::PERCENT);
-
-        if (! is_null($maxPrecision)) {
-            $formatter->setAttribute(NumberFormatter::MAX_FRACTION_DIGITS, $maxPrecision);
-        } else {
-            $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, $precision);
-        }
-
-        return $formatter->format($number / 100);
-    }
-
-    /**
-     * Convert the given number to its currency equivalent.
-     *
-     * @param  int|float  $number
-     * @param  string  $in
-     * @param  string|null  $locale
-     * @return string|false
-     */
-    public static function currency(int|float $number, string $in = 'USD', ?string $locale = null)
-    {
-        static::ensureIntlExtensionIsInstalled();
-
-        $formatter = new NumberFormatter($locale ?? static::$locale, NumberFormatter::CURRENCY);
-
-        return $formatter->formatCurrency($number, $in);
-    }
-
-    /**
-     * Convert the given number to its file size equivalent.
-     *
-     * @param  int|float  $bytes
      * @param  int  $precision
      * @param  int|null  $maxPrecision
      * @return string
      */
-    public static function fileSize(int|float $bytes, int $precision = 0, ?int $maxPrecision = null)
+    public function formatWithUnit(int $precision = 0, ?int $maxPrecision = null)
     {
-        $units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+        $number = $this->number;
 
-        for ($i = 0; ($bytes / 1024) > 0.9 && ($i < count($units) - 1); $i++) {
-            $bytes /= 1024;
-        }
-
-        return sprintf('%s %s', static::format($bytes, $precision, $maxPrecision), $units[$i]);
-    }
-
-    /**
-     * Convert the number to its human readable equivalent.
-     *
-     * @param  int  $number
-     * @param  int  $precision
-     * @param  int|null  $maxPrecision
-     * @return string
-     */
-    public static function forHumans(int|float $number, int $precision = 0, ?int $maxPrecision = null)
-    {
+        $numberExponent = floor(log10($number));
+        $displayExponent = $numberExponent - ($numberExponent % 3);
+        $number /= pow(10, $displayExponent);
         $units = [
             3 => 'thousand',
             6 => 'million',
@@ -151,47 +86,111 @@ class Number
             15 => 'quadrillion',
         ];
 
-        switch (true) {
-            case $number === 0:
-                return '0';
-            case $number < 0:
-                return sprintf('-%s', static::forHumans(abs($number), $precision, $maxPrecision));
-            case $number >= 1e15:
-                return sprintf('%s quadrillion', static::forHumans($number / 1e15, $precision, $maxPrecision));
+        return trim(sprintf('%s %s', static::create($number, $this->locale)->format($precision, $maxPrecision), $units[$displayExponent] ?? ''));
+    }
+
+    /**
+     * Spell out the given number in the given locale.
+     *
+     * @return string
+     */
+    public function toSpell()
+    {
+        $this->ensureIntlExtensionIsInstalled();
+
+        $formatter = new NumberFormatter($this->locale, NumberFormatter::SPELLOUT);
+
+        return $formatter->format($this->number);
+    }
+
+    /**
+     * Convert the given number to ordinal form.
+     *
+     * @return string
+     */
+    public function toOrdinal()
+    {
+        $this->ensureIntlExtensionIsInstalled();
+
+        $formatter = new NumberFormatter($this->locale, NumberFormatter::ORDINAL);
+
+        return $formatter->format($this->number);
+    }
+
+    /**
+     * Convert the given number to its percentage equivalent.
+     *
+     * @param  int  $precision
+     * @param  int|null  $maxPrecision
+     * @return string|false
+     */
+    public function toPercentage(int $precision = 0, ?int $maxPrecision = null)
+    {
+        $this->ensureIntlExtensionIsInstalled();
+
+        $formatter = new NumberFormatter($this->locale, NumberFormatter::PERCENT);
+
+        if (is_null($maxPrecision)) {
+            $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, $precision);
+        } else {
+            $formatter->setAttribute(NumberFormatter::MAX_FRACTION_DIGITS, $maxPrecision);
         }
 
-        $numberExponent = floor(log10($number));
-        $displayExponent = $numberExponent - ($numberExponent % 3);
-        $number /= pow(10, $displayExponent);
-
-        return trim(sprintf('%s %s', static::format($number, $precision, $maxPrecision), $units[$displayExponent] ?? ''));
+        return $formatter->format($this->number / 100);
     }
 
     /**
-     * Execute the given callback using the given locale.
+     * Convert the given number to its currency equivalent.
      *
-     * @param  string  $locale
-     * @param  callable  $callback
-     * @return mixed
+     * @param  string  $in
+     * @return string|false
      */
-    public static function withLocale(string $locale, callable $callback)
+    public function toCurrency(string $in = 'USD')
     {
-        $previousLocale = static::$locale;
+        $this->ensureIntlExtensionIsInstalled();
 
-        static::useLocale($locale);
+        $formatter = new NumberFormatter($this->locale, NumberFormatter::CURRENCY);
 
-        return tap($callback(), fn () => static::useLocale($previousLocale));
+        return $formatter->formatCurrency($this->number, $in);
     }
 
     /**
-     * Set the default locale.
+     * Convert the given number to its file size equivalent.
      *
-     * @param  string  $locale
-     * @return void
+     * @param  int  $precision
+     * @param  int|null  $maxPrecision
+     * @return string
      */
-    public static function useLocale(string $locale)
+    public function toFileSize(int $precision = 0, ?int $maxPrecision = null)
     {
-        static::$locale = $locale;
+        $bytes = $this->number;
+
+        $units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+
+        for ($i = 0; ($bytes / 1024) > 0.9 && ($i < count($units) - 1); $i++) {
+            $bytes /= 1024;
+        }
+
+        return sprintf('%s %s', static::create($bytes, $this->locale)->format($precision, $maxPrecision), $units[$i]);
+    }
+
+    /**
+     * Convert the number to its human readable equivalent.
+     *
+     * @param  int  $precision
+     * @param  int|null  $maxPrecision
+     * @return string
+     */
+    public function toHumans(int $precision = 0, ?int $maxPrecision = null)
+    {
+        $number = $this->number;
+
+        return match (true) {
+            $number === 0 => '0',
+            $number < 0 => sprintf('-%s', static::create(abs($number), $this->locale)->toHumans($precision, $maxPrecision)),
+            $number >= 1e15 => sprintf('%s quadrillion', static::create($number / 1e15, $this->locale)->toHumans($precision, $maxPrecision)),
+            default => $this->formatWithUnit($precision, $maxPrecision),
+        };
     }
 
     /**
@@ -199,9 +198,9 @@ class Number
      *
      * @return void
      */
-    protected static function ensureIntlExtensionIsInstalled()
+    protected function ensureIntlExtensionIsInstalled()
     {
-        if (! extension_loaded('intl')) {
+        if (!extension_loaded('intl')) {
             throw new RuntimeException('The "intl" PHP extension is required to use this method.');
         }
     }
