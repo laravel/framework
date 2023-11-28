@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Integration\Foundation\Console;
 
-use Illuminate\Foundation\Application;
 use Illuminate\Testing\Assert;
 use Orchestra\Testbench\TestCase;
 
