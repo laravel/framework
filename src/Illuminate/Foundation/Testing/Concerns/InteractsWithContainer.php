@@ -113,14 +113,14 @@ trait InteractsWithContainer
 
         Facade::clearResolvedInstance(Vite::class);
 
-        $this->swap(Vite::class, new class
+        $this->swap(Vite::class, new class extends Vite
         {
-            public function __invoke()
+            public function __invoke($entrypoints, $buildDirectory = null)
             {
                 return '';
             }
 
-            public function __call($name, $arguments)
+            public function __call($method, $parameters)
             {
                 return '';
             }
@@ -130,32 +130,32 @@ trait InteractsWithContainer
                 return '';
             }
 
-            public function useIntegrityKey()
+            public function useIntegrityKey($key)
             {
                 return $this;
             }
 
-            public function useBuildDirectory()
+            public function useBuildDirectory($path)
             {
                 return $this;
             }
 
-            public function useHotFile()
+            public function useHotFile($path)
             {
                 return $this;
             }
 
-            public function withEntryPoints()
+            public function withEntryPoints($entryPoints)
             {
                 return $this;
             }
 
-            public function useScriptTagAttributes()
+            public function useScriptTagAttributes($attributes)
             {
                 return $this;
             }
 
-            public function useStyleTagAttributes()
+            public function useStyleTagAttributes($attributes)
             {
                 return $this;
             }
@@ -163,6 +163,16 @@ trait InteractsWithContainer
             public function preloadedAssets()
             {
                 return [];
+            }
+
+            public function reactRefresh()
+            {
+                return '';
+            }
+
+            public function asset($asset, $buildDirectory = null)
+            {
+                return '';
             }
         });
 
