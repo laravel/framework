@@ -158,7 +158,7 @@ class DownCommand extends Command
         }
 
         if ($this->option('generate-secret')) {
-            return (string) Str::uuid();
+            return Str::random();
         }
 
         return null;
