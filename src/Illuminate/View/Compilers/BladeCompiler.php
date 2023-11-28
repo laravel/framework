@@ -332,7 +332,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
 
         return tap($view->render(), function () use ($view, $deleteCachedView) {
             if ($deleteCachedView) {
-                unlink($view->getPath());
+                @unlink($view->getPath());
             }
         });
     }

@@ -498,9 +498,9 @@ class RouteRegistrarTest extends TestCase
     public function testRegisteringNonApprovedAttributesThrows()
     {
         $this->expectException(BadMethodCallException::class);
-        $this->expectExceptionMessage('Method Illuminate\Routing\RouteRegistrar::missing does not exist.');
+        $this->expectExceptionMessage('Method Illuminate\Routing\RouteRegistrar::unsupportedMethod does not exist.');
 
-        $this->router->domain('foo')->missing('bar')->group(function ($router) {
+        $this->router->domain('foo')->unsupportedMethod('bar')->group(function ($router) {
             //
         });
     }

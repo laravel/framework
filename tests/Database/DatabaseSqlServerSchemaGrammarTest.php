@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Database;
 
 use Illuminate\Database\Connection;
+use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\ForeignIdColumnDefinition;
 use Illuminate\Database\Schema\Grammars\SqlServerGrammar;
@@ -908,6 +909,14 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $blueprint->integer('price');
         $blueprint->computed('discounted_virtual', 'price - 5');
         $blueprint->computed('discounted_stored', 'price - 5')->persisted();
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table "products" add "price" int not null, "discounted_virtual" as (price - 5), "discounted_stored" as (price - 5) persisted', $statements[0]);
+
+        $blueprint = new Blueprint('products');
+        $blueprint->integer('price');
+        $blueprint->computed('discounted_virtual', new Expression('price - 5'));
+        $blueprint->computed('discounted_stored', new Expression('price - 5'))->persisted();
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
         $this->assertCount(1, $statements);
         $this->assertSame('alter table "products" add "price" int not null, "discounted_virtual" as (price - 5), "discounted_stored" as (price - 5) persisted', $statements[0]);

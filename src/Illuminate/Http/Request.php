@@ -389,6 +389,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      * @param  mixed  $default
      * @return mixed
      */
+    #[\Override]
     public function get(string $key, mixed $default = null): mixed
     {
         return parent::get($key, $default);
@@ -499,6 +500,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      *
      * @return static
      */
+    #[\Override]
     public function duplicate(array $query = null, array $request = null, array $attributes = null, array $cookies = null, array $files = null, array $server = null): static
     {
         return parent::duplicate($query, $request, $attributes, $cookies, $this->filterFiles($files), $server);
@@ -532,6 +534,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     /**
      * {@inheritdoc}
      */
+    #[\Override]
     public function hasSession(bool $skipIfUninitialized = false): bool
     {
         return $this->session instanceof SymfonySessionDecorator;
@@ -540,6 +543,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     /**
      * {@inheritdoc}
      */
+    #[\Override]
     public function getSession(): SessionInterface
     {
         return $this->hasSession()

@@ -20,12 +20,15 @@ class DatabaseMySQLSchemaBuilderTest extends TestCase
     {
         $connection = m::mock(Connection::class);
         $grammar = m::mock(MySqlGrammar::class);
+        $processor = m::mock(MySqlProcessor::class);
         $connection->shouldReceive('getDatabaseName')->andReturn('db');
         $connection->shouldReceive('getSchemaGrammar')->andReturn($grammar);
+        $connection->shouldReceive('getPostProcessor')->andReturn($processor);
         $builder = new MySqlBuilder($connection);
-        $grammar->shouldReceive('compileTableExists')->once()->andReturn('sql');
+        $grammar->shouldReceive('compileTables')->once()->andReturn('sql');
+        $processor->shouldReceive('processTables')->once()->andReturn([['name' => 'prefix_table']]);
         $connection->shouldReceive('getTablePrefix')->once()->andReturn('prefix_');
-        $connection->shouldReceive('selectFromWriteConnection')->once()->with('sql', ['db', 'prefix_table'])->andReturn(['prefix_table']);
+        $connection->shouldReceive('selectFromWriteConnection')->once()->with('sql')->andReturn([['name' => 'prefix_table']]);
 
         $this->assertTrue($builder->hasTable('table'));
     }

@@ -52,6 +52,7 @@ class OutputStyle extends SymfonyStyle implements NewLineAware
     /**
      * {@inheritdoc}
      */
+    #[\Override]
     public function askQuestion(Question $question): mixed
     {
         try {
@@ -64,6 +65,7 @@ class OutputStyle extends SymfonyStyle implements NewLineAware
     /**
      * {@inheritdoc}
      */
+    #[\Override]
     public function write(string|iterable $messages, bool $newline = false, int $options = 0): void
     {
         $this->newLinesWritten = $this->trailingNewLineCount($messages) + (int) $newline;
@@ -75,6 +77,7 @@ class OutputStyle extends SymfonyStyle implements NewLineAware
     /**
      * {@inheritdoc}
      */
+    #[\Override]
     public function writeln(string|iterable $messages, int $type = self::OUTPUT_NORMAL): void
     {
         $this->newLinesWritten = $this->trailingNewLineCount($messages) + 1;
@@ -86,6 +89,7 @@ class OutputStyle extends SymfonyStyle implements NewLineAware
     /**
      * {@inheritdoc}
      */
+    #[\Override]
     public function newLine(int $count = 1): void
     {
         $this->newLinesWritten += $count;

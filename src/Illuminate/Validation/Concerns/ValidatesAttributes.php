@@ -15,6 +15,7 @@ use Egulias\EmailValidator\Validation\MultipleValidationWithAnd;
 use Egulias\EmailValidator\Validation\NoRFCWarningsValidation;
 use Egulias\EmailValidator\Validation\RFCValidation;
 use Exception;
+use Illuminate\Container\Container;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Exceptions\MathException;
@@ -840,7 +841,9 @@ trait ValidatesAttributes
             ->values()
             ->all() ?: [new RFCValidation];
 
-        return (new EmailValidator)->isValid($value, new MultipleValidationWithAnd($validations));
+        $emailValidator = Container::getInstance()->make(EmailValidator::class);
+
+        return $emailValidator->isValid($value, new MultipleValidationWithAnd($validations));
     }
 
     /**
@@ -1074,6 +1077,27 @@ trait ValidatesAttributes
     }
 
     /**
+     * Validate the extension of a file upload attribute is in a set of defined extensions.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  array<int, int|string>  $parameters
+     * @return bool
+     */
+    public function validateExtensions($attribute, $value, $parameters)
+    {
+        if (! $this->isValidFileInstance($value)) {
+            return false;
+        }
+
+        if ($this->shouldBlockPhpUpload($value, $parameters)) {
+            return false;
+        }
+
+        return in_array(strtolower($value->getClientOriginalExtension()), $parameters);
+    }
+
+    /**
      * Validate the given value is a valid file.
      *
      * @param  string  $attribute
@@ -1265,6 +1289,18 @@ trait ValidatesAttributes
     public function validateUppercase($attribute, $value, $parameters)
     {
         return Str::upper($value) === $value;
+    }
+
+    /**
+     * Validate that an attribute is a valid HEX color.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @return bool
+     */
+    public function validateHexColor($attribute, $value)
+    {
+        return preg_match('/^#(?:(?:[0-9a-f]{3}){1,2}|(?:[0-9a-f]{4}){1,2})$/i', $value) === 1;
     }
 
     /**
@@ -1723,6 +1759,86 @@ trait ValidatesAttributes
     public function validatePresent($attribute, $value)
     {
         return Arr::has($this->data, $attribute);
+    }
+
+    /**
+     * Validate that an attribute is present when another attribute has a given value.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  array<int, int|string>  $parameters
+     * @return bool
+     */
+    public function validatePresentIf($attribute, $value, $parameters)
+    {
+        $this->requireParameterCount(2, $parameters, 'present_if');
+
+        [$values, $other] = $this->parseDependentRuleParameters($parameters);
+
+        if (in_array($other, $values, is_bool($other) || is_null($other))) {
+            return $this->validatePresent($attribute, $value);
+        }
+
+        return true;
+    }
+
+    /**
+     * Validate that an attribute is present unless another attribute has a given value.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  array<int, int|string>  $parameters
+     * @return bool
+     */
+    public function validatePresentUnless($attribute, $value, $parameters)
+    {
+        $this->requireParameterCount(2, $parameters, 'present_unless');
+
+        [$values, $other] = $this->parseDependentRuleParameters($parameters);
+
+        if (! in_array($other, $values, is_bool($other) || is_null($other))) {
+            return $this->validatePresent($attribute, $value);
+        }
+
+        return true;
+    }
+
+    /**
+     * Validate that an attribute is present when any given attribute is present.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  array<int, int|string>  $parameters
+     * @return bool
+     */
+    public function validatePresentWith($attribute, $value, $parameters)
+    {
+        $this->requireParameterCount(1, $parameters, 'present_with');
+
+        if (Arr::hasAny($this->data, $parameters)) {
+            return $this->validatePresent($attribute, $value);
+        }
+
+        return true;
+    }
+
+    /**
+     * Validate that an attribute is present when all given attributes are present.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  array<int, int|string>  $parameters
+     * @return bool
+     */
+    public function validatePresentWithAll($attribute, $value, $parameters)
+    {
+        $this->requireParameterCount(1, $parameters, 'present_with_all');
+
+        if (Arr::has($this->data, $parameters)) {
+            return $this->validatePresent($attribute, $value);
+        }
+
+        return true;
     }
 
     /**

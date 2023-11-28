@@ -26,6 +26,7 @@ use stdClass;
 use Symfony\Component\VarDumper\VarDumper;
 use Traversable;
 use UnexpectedValueException;
+use WeakMap;
 
 include_once 'Enums.php';
 
@@ -2072,7 +2073,7 @@ class SupportCollectionTest extends TestCase
     #[DataProvider('collectionClassProvider')]
     public function testPluckDuplicateKeysExist($collection)
     {
-        $data = new collection([
+        $data = new $collection([
             ['brand' => 'Tesla', 'color' => 'red'],
             ['brand' => 'Pagani', 'color' => 'white'],
             ['brand' => 'Tesla', 'color' => 'black'],
@@ -2614,6 +2615,19 @@ class SupportCollectionTest extends TestCase
         $object->foo = 'bar';
         $data = new $collection($object);
         $this->assertEquals(['foo' => 'bar'], $data->all());
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testConstructMethodFromWeakMap($collection)
+    {
+        $this->expectException('InvalidArgumentException');
+
+        $map = new WeakMap();
+        $object = new stdClass;
+        $object->foo = 'bar';
+        $map[$object] = 3;
+
+        $data = new $collection($map);
     }
 
     public function testSplice()
@@ -5029,6 +5043,17 @@ class SupportCollectionTest extends TestCase
         $data = $collection::make([new \Error, new \Error, new $collection]);
         $this->expectException(UnexpectedValueException::class);
         $data->ensure(\Throwable::class);
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testEnsureForMultipleTypes($collection)
+    {
+        $data = $collection::make([new \Error, 123]);
+        $data->ensure([\Throwable::class, 'int']);
+
+        $data = $collection::make([new \Error, new \Error, new $collection]);
+        $this->expectException(UnexpectedValueException::class);
+        $data->ensure([\Throwable::class, 'int']);
     }
 
     #[DataProvider('collectionClassProvider')]

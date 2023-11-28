@@ -48,6 +48,7 @@
         "symfony/http-kernel": "^7.0",
         "symfony/mailer": "^7.0",
         "symfony/mime": "^7.0",
+        "symfony/polyfill-php83": "^1.28",
         "symfony/process": "^7.0",
         "symfony/routing": "^7.0",
         "symfony/uid": "^7.0",

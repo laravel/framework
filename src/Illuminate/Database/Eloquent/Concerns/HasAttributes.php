@@ -2095,6 +2095,16 @@ trait HasAttributes
     }
 
     /**
+     * Get the attributes that have been changed since the last sync for an update operation.
+     *
+     * @return array
+     */
+    protected function getDirtyForUpdate()
+    {
+        return $this->getDirty();
+    }
+
+    /**
      * Get the attributes that were changed when the model was last saved.
      *
      * @return array

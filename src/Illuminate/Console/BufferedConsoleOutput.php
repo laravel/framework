@@ -28,6 +28,7 @@ class BufferedConsoleOutput extends ConsoleOutput
     /**
      * {@inheritdoc}
      */
+    #[\Override]
     protected function doWrite(string $message, bool $newline): void
     {
         $this->buffer .= $message;
