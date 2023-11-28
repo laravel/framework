@@ -22,7 +22,7 @@ class Number
      *
      * @var string
      */
-    protected $locale;
+    protected static $locale = 'en';
 
     /**
      * Creates a new instance of the class and sets the number and locale properties.
@@ -31,13 +31,13 @@ class Number
      * @param  string  $locale
      * @return self
      */
-    public static function create(int|float $number, string $locale = 'en')
+    public static function create(int|float $number, ?string $locale = null)
     {
         $instants = new static;
 
         $instants->number = $number;
 
-        $instants->locale = $locale;
+        $instants->locale = $locale ?? static::$locale;
 
         return $instants;
     }
@@ -142,16 +142,16 @@ class Number
     /**
      * Convert the given number to its currency equivalent.
      *
-     * @param  string  $in
+     * @param  string  $currency
      * @return string|false
      */
-    public function toCurrency(string $in = 'USD')
+    public function toCurrency(string $currency = 'USD')
     {
         $this->ensureIntlExtensionIsInstalled();
 
         $formatter = new NumberFormatter($this->locale, NumberFormatter::CURRENCY);
 
-        return $formatter->formatCurrency($this->number, $in);
+        return $formatter->formatCurrency($this->number, $currency);
     }
 
     /**
@@ -191,6 +191,17 @@ class Number
             $number >= 1e15 => sprintf('%s quadrillion', static::create($number / 1e15, $this->locale)->toHumans($precision, $maxPrecision)),
             default => $this->formatWithUnit($precision, $maxPrecision),
         };
+    }
+
+    /**
+     * Set the default locale.
+     *
+     * @param  string  $locale
+     * @return void
+     */
+    public static function useLocale(string $locale)
+    {
+        static::$locale = $locale;
     }
 
     /**

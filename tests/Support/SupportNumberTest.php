@@ -146,7 +146,7 @@ class SupportNumberTest extends TestCase
         $this->assertSame('2.00 KB', Number::create(2048)->toFileSize(precision: 2));
         $this->assertSame('1.23 KB', Number::create(1264)->toFileSize(precision: 2));
         $this->assertSame('1.234 KB', Number::create(1264.12345)->toFileSize(maxPrecision: 3));
-        $this->assertSame('1.234 KB', Number::create(1264, 3)->toFileSize());
+        $this->assertSame('1.234 KB', Number::create(1264)->toFileSize(3));
         $this->assertSame('5 GB', Number::create(1024 * 1024 * 1024 * 5)->toFileSize());
         $this->assertSame('10 TB', Number::create((1024 ** 4) * 10)->toFileSize());
         $this->assertSame('10 PB', Number::create((1024 ** 5) * 10)->toFileSize());
