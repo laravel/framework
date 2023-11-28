@@ -24,7 +24,7 @@ class DatabaseSqliteConnectionTest extends DatabaseTestCase
         ]);
     }
 
-    protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
+    protected function afterRefreshingDatabase()
     {
         if (! Schema::hasTable('json_table')) {
             Schema::create('json_table', function (Blueprint $table) {

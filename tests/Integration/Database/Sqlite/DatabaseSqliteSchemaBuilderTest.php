@@ -25,7 +25,7 @@ class DatabaseSqliteSchemaBuilderTest extends DatabaseTestCase
         ]);
     }
 
-    protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
+    protected function afterRefreshingDatabase()
     {
         Schema::create('users', function (Blueprint $table) {
             $table->integer('id');
