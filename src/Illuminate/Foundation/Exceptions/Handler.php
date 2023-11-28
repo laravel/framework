@@ -81,6 +81,20 @@ class Handler implements ExceptionHandlerContract
     protected $levels = [];
 
     /**
+     * The callbacks that should be used to throttle reportable exceptions.
+     *
+     * @var array
+     */
+    protected $throttleCallbacks = [];
+
+    /**
+     * The callbacks that should be used to build exception context data.
+     *
+     * @var array
+     */
+    protected $contextCallbacks = [];
+
+    /**
      * The callbacks that should be used during rendering.
      *
      * @var \Closure[]
@@ -235,12 +249,40 @@ class Handler implements ExceptionHandlerContract
     /**
      * Indicate that the given exception type should not be reported.
      *
+     * Alias of "ignore".
+     *
+     * @param  string  $class
+     * @return $this
+     */
+    public function dontReport(string $class)
+    {
+        return $this->ignore($class);
+    }
+
+    /**
+     * Indicate that the given exception type should not be reported.
+     *
      * @param  string  $class
      * @return $this
      */
     public function ignore(string $class)
     {
         $this->dontReport[] = $class;
+
+        return $this;
+    }
+
+    /**
+     * Indicate that the given attributes should never be flashed to the session on validation errors.
+     *
+     * @param  array|string  $attributes
+     * @return $this
+     */
+    public function dontFlash($attributes)
+    {
+        $this->dontFlash = array_values(array_unique(
+            array_merge($this->dontFlash, Arr::wrap($attributes))
+        ));
 
         return $this;
     }
@@ -373,7 +415,36 @@ class Handler implements ExceptionHandlerContract
      */
     protected function throttle(Throwable $e)
     {
+        foreach ($this->throttleCallbacks as $throttleCallback) {
+            foreach ($this->firstClosureParameterTypes($throttleCallback) as $type) {
+                if (is_a($e, $type)) {
+                    $response = $throttleCallback($e);
+
+                    if (! is_null($response)) {
+                        return $response;
+                    }
+                }
+            }
+        }
+
         return Limit::none();
+    }
+
+    /**
+     * Specify the callback that should be used to throttle reportable exceptions.
+     *
+     * @param  callable  $throttleUsing
+     * @return $this
+     */
+    public function throttleUsing(callable $throttleUsing)
+    {
+        if (! $throttleUsing instanceof Closure) {
+            $throttleUsing = Closure::fromCallable($throttleUsing);
+        }
+
+        $this->throttleCallbacks[] = $throttleUsing;
+
+        return $this;
     }
 
     /**
@@ -416,11 +487,17 @@ class Handler implements ExceptionHandlerContract
      */
     protected function exceptionContext(Throwable $e)
     {
+        $context = [];
+
         if (method_exists($e, 'context')) {
-            return $e->context();
+            $context = $e->context();
         }
 
-        return [];
+        foreach ($this->contextCallbacks as $callback) {
+            $context = array_merge($context, $callback($e, $context));
+        }
+
+        return $context;
     }
 
     /**
@@ -437,6 +514,19 @@ class Handler implements ExceptionHandlerContract
         } catch (Throwable) {
             return [];
         }
+    }
+
+    /**
+     * Register a closure that should be used to build exception context data.
+     *
+     * @param  \Closure  $contextCallback
+     * @return $this
+     */
+    public function buildContextUsing(Closure $contextCallback)
+    {
+        $this->contextCallbacks[] = $contextCallback;
+
+        return $this;
     }
 
     /**
@@ -567,7 +657,7 @@ class Handler implements ExceptionHandlerContract
     {
         return $this->shouldReturnJson($request, $exception)
                     ? response()->json(['message' => $exception->getMessage()], 401)
-                    : redirect()->guest($exception->redirectTo() ?? route('login'));
+                    : redirect()->guest($exception->redirectTo($request) ?? route('login'));
     }
 
     /**
