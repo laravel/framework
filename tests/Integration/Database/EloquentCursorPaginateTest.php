@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Schema;
 
 class EloquentCursorPaginateTest extends DatabaseTestCase
 {
-    protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
+    protected function afterRefreshingDatabase()
     {
         Schema::create('test_posts', function (Blueprint $table) {
             $table->increments('id');
