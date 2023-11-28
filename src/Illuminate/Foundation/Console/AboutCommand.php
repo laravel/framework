@@ -127,7 +127,7 @@ class AboutCommand extends Command
             $data->pipe(fn ($data) => $section !== 'Environment' ? $data->sort() : $data)->each(function ($detail) {
                 [$label, $value] = $detail;
 
-                $this->components->twoColumnDetail($label, value($value));
+                $this->components->twoColumnDetail($label, value($value, false));
             });
         });
     }
@@ -143,7 +143,7 @@ class AboutCommand extends Command
         $output = $data->flatMap(function ($data, $section) {
             return [
                 (string) Str::of($section)->snake() => $data->mapWithKeys(fn ($item, $key) => [
-                    $this->toSearchKeyword($item[0]) => value($item[1]),
+                    $this->toSearchKeyword($item[0]) => value($item[1], true),
                 ]),
             ];
         });
@@ -158,40 +158,53 @@ class AboutCommand extends Command
      */
     protected function gatherApplicationInformation()
     {
+        $isEnabled = function ($config) {
+            return fn ($json) => $json === true ? $config : ($config ? '<fg=yellow;options=bold>ENABLED</>' : 'OFF');
+        };
+
+        $isCached = function ($config) {
+            return fn ($json) => $json === true ? $config : ($config ? '<fg=green;options=bold>CACHED</>' : '<fg=yellow;options=bold>NOT CACHED</>');
+        };
+
         static::addToSection('Environment', fn () => [
             'Application Name' => config('app.name'),
             'Laravel Version' => $this->laravel->version(),
             'PHP Version' => phpversion(),
             'Composer Version' => $this->composer->getVersion() ?? '<fg=yellow;options=bold>-</>',
             'Environment' => $this->laravel->environment(),
-            'Debug Mode' => config('app.debug') ? '<fg=yellow;options=bold>ENABLED</>' : 'OFF',
+            'Debug Mode' => $isEnabled(config('app.debug')),
             'URL' => Str::of(config('app.url'))->replace(['http://', 'https://'], ''),
-            'Maintenance Mode' => $this->laravel->isDownForMaintenance() ? '<fg=yellow;options=bold>ENABLED</>' : 'OFF',
+            'Maintenance Mode' => $isEnabled($this->laravel->isDownForMaintenance()),
         ]);
 
         static::addToSection('Cache', fn () => [
-            'Config' => $this->laravel->configurationIsCached() ? '<fg=green;options=bold>CACHED</>' : '<fg=yellow;options=bold>NOT CACHED</>',
-            'Events' => $this->laravel->eventsAreCached() ? '<fg=green;options=bold>CACHED</>' : '<fg=yellow;options=bold>NOT CACHED</>',
-            'Routes' => $this->laravel->routesAreCached() ? '<fg=green;options=bold>CACHED</>' : '<fg=yellow;options=bold>NOT CACHED</>',
-            'Views' => $this->hasPhpFiles($this->laravel->storagePath('framework/views')) ? '<fg=green;options=bold>CACHED</>' : '<fg=yellow;options=bold>NOT CACHED</>',
+            'Config' => $isCached($this->laravel->configurationIsCached()),
+            'Events' => $isCached($this->laravel->eventsAreCached()),
+            'Routes' => $isCached($this->laravel->routesAreCached()),
+            'Views' => $isCached($this->hasPhpFiles($this->laravel->storagePath('framework/views'))),
         ]);
-
-        $logChannel = config('logging.default');
-
-        if (config('logging.channels.'.$logChannel.'.driver') === 'stack') {
-            $secondary = collect(config('logging.channels.'.$logChannel.'.channels'))
-                ->implode(', ');
-
-            $logs = '<fg=yellow;options=bold>'.$logChannel.'</> <fg=gray;options=bold>/</> '.$secondary;
-        } else {
-            $logs = $logChannel;
-        }
 
         static::addToSection('Drivers', fn () => array_filter([
             'Broadcasting' => config('broadcasting.default'),
             'Cache' => config('cache.default'),
             'Database' => config('database.default'),
-            'Logs' => $logs,
+            'Logs' => function ($json) {
+                $logChannel = config('logging.default');
+
+                if (config('logging.channels.'.$logChannel.'.driver') === 'stack') {
+                    $secondary = collect(config('logging.channels.'.$logChannel.'.channels'));
+
+                    if ($json === true) {
+                        return $secondary->all();
+                    }
+
+                    $logs = '<fg=yellow;options=bold>'.$logChannel.'</> <fg=gray;options=bold>/</> '.$secondary->implode(', ');
+                } else {
+                    $logs = $logChannel;
+                }
+
+                return $logs;
+            },
             'Mail' => config('mail.default'),
             'Octane' => config('octane.server'),
             'Queue' => config('queue.default'),
