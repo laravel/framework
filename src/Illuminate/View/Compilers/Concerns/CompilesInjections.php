@@ -18,6 +18,12 @@ trait CompilesInjections
 
         $service = trim($segments[1]);
 
+        $enum = trim($service, " '\"");
+
+        if (enum_exists($enum)) {
+            return "<?php class_alias(\\{$enum}::class, '{$variable}'); ?>";
+        }
+
         return "<?php \${$variable} = app({$service}); ?>";
     }
 }
