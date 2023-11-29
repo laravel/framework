@@ -28,11 +28,13 @@ class BusServiceProvider extends ServiceProvider implements DeferrableProvider
         $this->registerBatchServices();
 
         $this->app->alias(
-            Dispatcher::class, DispatcherContract::class
+            Dispatcher::class,
+            DispatcherContract::class
         );
 
         $this->app->alias(
-            Dispatcher::class, QueueingDispatcherContract::class
+            Dispatcher::class,
+            QueueingDispatcherContract::class
         );
     }
 
@@ -48,6 +50,7 @@ class BusServiceProvider extends ServiceProvider implements DeferrableProvider
             if ($driver === 'dynamodb') {
                 return $app->make(DynamoBatchRepository::class);
             }
+
             return $app->make(DatabaseBatchRepository::class);
         });
 
@@ -67,7 +70,7 @@ class BusServiceProvider extends ServiceProvider implements DeferrableProvider
                 'endpoint' => $config['endpoint'] ?? null,
             ];
 
-            if (! empty($config['key']) && ! empty($config['secret'])) {
+            if (!empty($config['key']) && !empty($config['secret'])) {
                 $dynamoConfig['credentials'] = Arr::only(
                     $config,
                     ['key', 'secret', 'token']
