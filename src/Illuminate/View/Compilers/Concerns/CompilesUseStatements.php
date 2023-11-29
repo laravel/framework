@@ -5,7 +5,7 @@ namespace Illuminate\View\Compilers\Concerns;
 trait CompilesUseStatements
 {
     /**
-     * Compile the inject statements into valid PHP.
+     * Compile the use statements into valid PHP.
      *
      * @param  string  $expression
      * @return string
