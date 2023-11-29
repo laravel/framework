@@ -67,7 +67,7 @@ class BusServiceProvider extends ServiceProvider implements DeferrableProvider
                 'endpoint' => $config['endpoint'] ?? null,
             ];
 
-            if (!empty($config['key']) && !empty($config['secret'])) {
+            if (! empty($config['key']) && ! empty($config['secret'])) {
                 $dynamoConfig['credentials'] = Arr::only(
                     $config,
                     ['key', 'secret', 'token']
