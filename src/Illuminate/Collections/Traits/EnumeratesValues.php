@@ -10,6 +10,7 @@ use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Enumerable;
+use Illuminate\Support\Fluent;
 use Illuminate\Support\HigherOrderCollectionProxy;
 use JsonSerializable;
 use Symfony\Component\VarDumper\VarDumper;
@@ -870,6 +871,16 @@ trait EnumeratesValues
     public function collect()
     {
         return new Collection($this->all());
+    }
+
+    /**
+     * Get the collection of items as a support fluent instance.
+     *
+     * @return \Illuminate\Support\Fluent<TKey, TValue>
+     */
+    public function toFluent()
+    {
+        return new Fluent($this->all());
     }
 
     /**
