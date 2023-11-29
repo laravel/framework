@@ -27,7 +27,13 @@ trait InteractsWithDatabase
     protected function assertDatabaseHas($table, array $data, $connection = null)
     {
         if ($table instanceof Model) {
-            $data = (new $table)->forceFill($data)->getAttributes();
+            $table = (new $table);
+
+            foreach ($data as $key => $value) {
+                $table->setAttribute($key, $value);
+            }
+
+            $data = $table->getAttributes();
         }
 
         $this->assertThat(
