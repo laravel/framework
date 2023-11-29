@@ -15,8 +15,8 @@ trait CompilesUseStatements
         $segments = explode(',', preg_replace("/[\(\)]/", '', $expression));
 
         $use = trim($segments[0], " '\"");
-        $as = trim($segments[1], " '\"");
+        $as = isset($segments[1]) ? ' as '.trim($segments[1], " '\"") : '';
 
-        return "<?php use \\{$use} as {$as}; ?>";
+        return "<?php use \\{$use}{$as}; ?>";
     }
 }

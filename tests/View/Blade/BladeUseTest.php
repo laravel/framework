@@ -10,4 +10,11 @@ class BladeUseTest extends AbstractBladeTestCase
         $expected = "Foo <?php use \SomeNamespace\SomeClass as Foo; ?> bar";
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
+
+    public function testUseStatementsWithoutAsAreCompiled()
+    {
+        $string = "Foo @use('SomeNamespace\SomeClass') bar";
+        $expected = "Foo <?php use \SomeNamespace\SomeClass; ?> bar";
+        $this->assertEquals($expected, $this->compiler->compileString($string));
+    }
 }
