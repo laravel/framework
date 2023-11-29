@@ -30,7 +30,7 @@ class Fluent implements Arrayable, ArrayAccess, Jsonable, JsonSerializable
     }
 
     /**
-     * Get an attribute from the fluent instance.
+     * Get an attribute from the fluent instance using "dot" notation.
      *
      * @param  string  $key
      * @param  mixed  $default
@@ -38,21 +38,27 @@ class Fluent implements Arrayable, ArrayAccess, Jsonable, JsonSerializable
      */
     public function get($key, $default = null)
     {
-        return Arr::get($this->attributes, $key, $default);
+        return data_get($this->attributes, $key, $default);
     }
 
     /**
-     * Get the attributes from the fluent instance.
+     * Get an attribute from the fluent instance.
      *
-     * @return array
+     * @param  string  $key
+     * @param  mixed  $default
+     * @return mixed
      */
-    public function getAttributes()
+    public function value($key, $default = null)
     {
-        return $this->attributes;
+        if (array_key_exists($key, $this->attributes)) {
+            return $this->attributes[$key];
+        }
+
+        return value($default);
     }
 
     /**
-     * Get the value of the given key as a new instance.
+     * Get the value of the given key as a new Fluent instance.
      *
      * @param  string  $key
      * @param  mixed  $default
@@ -63,6 +69,16 @@ class Fluent implements Arrayable, ArrayAccess, Jsonable, JsonSerializable
         return new static(
             (array) $this->get($key, $default)
         );
+    }
+
+    /**
+     * Get the attributes from the fluent instance.
+     *
+     * @return array
+     */
+    public function getAttributes()
+    {
+        return $this->attributes;
     }
 
     /**
@@ -80,7 +96,7 @@ class Fluent implements Arrayable, ArrayAccess, Jsonable, JsonSerializable
      *
      * @return \Illuminate\Support\Collection
      */
-    public function toCollection()
+    public function collect()
     {
         return new Collection($this->attributes);
     }

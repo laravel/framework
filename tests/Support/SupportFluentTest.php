@@ -131,7 +131,7 @@ class SupportFluentTest extends TestCase
     public function testToCollection()
     {
         $fluent = new Fluent(['forge', 'vapour', 'spark']);
-        $this->assertEquals(['forge', 'vapour', 'spark'], $fluent->toCollection()->all());
+        $this->assertEquals(['forge', 'vapour', 'spark'], $fluent->collect()->all());
     }
 }
 
