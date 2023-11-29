@@ -10,6 +10,7 @@ use Exception;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Fluent;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\ItemNotFoundException;
 use Illuminate\Support\LazyCollection;
@@ -4904,6 +4905,26 @@ class SupportCollectionTest extends TestCase
             'b' => 2,
             'c' => 3,
         ], $data->all());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testFoo($collection)
+    {
+        $data = $collection::make([
+            'a' => 1,
+            'b' => 2,
+            'c' => 3,
+        ])->toFluent();
+
+        $this->assertInstanceOf(Fluent::class, $data);
+
+        $this->assertSame([
+            'a' => 1,
+            'b' => 2,
+            'c' => 3,
+        ], $data->toArray());
     }
 
     /**
