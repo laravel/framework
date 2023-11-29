@@ -31,4 +31,13 @@ class BladeInjectTest extends AbstractBladeTestCase
         $expected = "Foo <?php \$baz = app(SomeNamespace\SomeClass::class); ?> bar";
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
+
+    public function testEnumInjectionsAreCompiled()
+    {
+        $string = 'Foo @inject("baz", "Illuminate\Tests\View\Blade\Test") bar';
+        $expected = "Foo <?php class_alias(\Illuminate\Tests\View\Blade\Test::class, 'baz'); ?> bar";
+        $this->assertEquals($expected, $this->compiler->compileString($string));
+    }
 }
+
+enum Test {}
