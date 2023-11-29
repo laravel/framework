@@ -6,10 +6,6 @@ use Aws\DynamoDb\DynamoDbClient;
 use Aws\DynamoDb\Marshaler;
 use Carbon\CarbonImmutable;
 use Closure;
-use Illuminate\Bus\BatchFactory;
-use Illuminate\Bus\BatchRepository;
-use Illuminate\Bus\PendingBatch;
-use Illuminate\Bus\UpdatedBatchJobCounts;
 use Illuminate\Support\Str;
 
 class DynamoBatchRepository implements BatchRepository
@@ -127,7 +123,7 @@ class DynamoBatchRepository implements BatchRepository
             ],
         ]);
 
-        if (! isset($b['Item'])) {
+        if (!isset($b['Item'])) {
             // If we didn't find it via a standard read, attempt to find the item using a consistent read.
             $b = $this->dynamoDbClient->getItem([
                 'TableName' => $this->table,
@@ -138,7 +134,7 @@ class DynamoBatchRepository implements BatchRepository
                 'ConsistentRead' => true,
             ]);
 
-            if (! isset($b['Item'])) {
+            if (!isset($b['Item'])) {
                 return null;
             }
         }
@@ -172,7 +168,7 @@ class DynamoBatchRepository implements BatchRepository
             'cancelled_at' => null,
             'finished_at' => null,
         ];
-        if (! is_null($this->ttl)) {
+        if (!is_null($this->ttl)) {
             $batch[$this->ttlAttribute] = time() + $this->ttl;
         }
 
