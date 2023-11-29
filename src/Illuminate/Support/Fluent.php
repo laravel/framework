@@ -24,7 +24,7 @@ class Fluent implements Arrayable, ArrayAccess, Jsonable, JsonSerializable
      */
     public function __construct($attributes = [])
     {
-        foreach ($attributes as $key => $value) {
+        foreach ((array) $attributes as $key => $value) {
             $this->attributes[$key] = $value;
         }
     }
@@ -38,11 +38,7 @@ class Fluent implements Arrayable, ArrayAccess, Jsonable, JsonSerializable
      */
     public function get($key, $default = null)
     {
-        if (array_key_exists($key, $this->attributes)) {
-            return $this->attributes[$key];
-        }
-
-        return value($default);
+        return Arr::get($this->attributes, $key, $default);
     }
 
     /**
@@ -56,6 +52,18 @@ class Fluent implements Arrayable, ArrayAccess, Jsonable, JsonSerializable
     }
 
     /**
+     * Get the value of the given key as a new instance.
+     *
+     * @param  string  $key
+     * @param  mixed  $default
+     * @return static
+     */
+    public function scope($key, $default = null)
+    {
+        return new static($this->get($key, $default));
+    }
+
+    /**
      * Convert the fluent instance to an array.
      *
      * @return array
@@ -63,6 +71,16 @@ class Fluent implements Arrayable, ArrayAccess, Jsonable, JsonSerializable
     public function toArray()
     {
         return $this->attributes;
+    }
+
+    /**
+     * Convert the fluent instance to a Collection.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function toCollection()
+    {
+        return new Collection($this->attributes);
     }
 
     /**
