@@ -11,7 +11,7 @@ use Illuminate\Support\Str;
 
 class EloquentHasManyTest extends DatabaseTestCase
 {
-    protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
+    protected function afterRefreshingDatabase()
     {
         Schema::create('eloquent_has_many_test_users', function ($table) {
             $table->id();

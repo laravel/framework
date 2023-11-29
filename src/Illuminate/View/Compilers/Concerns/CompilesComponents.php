@@ -4,6 +4,7 @@ namespace Illuminate\View\Compilers\Concerns;
 
 use Illuminate\Contracts\Support\CanBeEscapedWhenCastToString;
 use Illuminate\Support\Str;
+use Illuminate\View\AnonymousComponent;
 use Illuminate\View\ComponentAttributeBag;
 
 trait CompilesComponents
@@ -29,7 +30,9 @@ trait CompilesComponents
 
         $component = trim($component, '\'"');
 
-        $hash = static::newComponentHash($component);
+        $hash = static::newComponentHash(
+            $component === AnonymousComponent::class ? $component.':'.trim($alias, '\'"') : $component
+        );
 
         if (Str::contains($component, ['::class', '\\'])) {
             return static::compileClassComponentOpening($component, $alias, $data, $hash);

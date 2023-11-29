@@ -68,11 +68,70 @@ class MySqlGrammar extends Grammar
     /**
      * Compile the query to determine the list of tables.
      *
+     * @deprecated Will be removed in a future Laravel version.
+     *
      * @return string
      */
     public function compileTableExists()
     {
         return "select * from information_schema.tables where table_schema = ? and table_name = ? and table_type = 'BASE TABLE'";
+    }
+
+    /**
+     * Compile the query to determine the tables.
+     *
+     * @param  string  $database
+     * @return string
+     */
+    public function compileTables($database)
+    {
+        return sprintf(
+            'select table_name as `name`, (data_length + index_length) as `size`, '
+            .'table_comment as `comment`, engine as `engine`, table_collation as `collation` '
+            ."from information_schema.tables where table_schema = %s and table_type = 'BASE TABLE' "
+            .'order by table_name',
+            $this->quoteString($database)
+        );
+    }
+
+    /**
+     * Compile the query to determine the views.
+     *
+     * @param  string  $database
+     * @return string
+     */
+    public function compileViews($database)
+    {
+        return sprintf(
+            'select table_name as `name`, view_definition as `definition` '
+            .'from information_schema.views where table_schema = %s '
+            .'order by table_name',
+            $this->quoteString($database)
+        );
+    }
+
+    /**
+     * Compile the SQL needed to retrieve all table names.
+     *
+     * @deprecated Will be removed in a future Laravel version.
+     *
+     * @return string
+     */
+    public function compileGetAllTables()
+    {
+        return 'SHOW FULL TABLES WHERE table_type = \'BASE TABLE\'';
+    }
+
+    /**
+     * Compile the SQL needed to retrieve all view names.
+     *
+     * @deprecated Will be removed in a future Laravel version.
+     *
+     * @return string
+     */
+    public function compileGetAllViews()
+    {
+        return 'SHOW FULL TABLES WHERE table_type = \'VIEW\'';
     }
 
     /**
@@ -530,26 +589,6 @@ class MySqlGrammar extends Grammar
     public function compileDropAllViews($views)
     {
         return 'drop view '.implode(',', $this->wrapArray($views));
-    }
-
-    /**
-     * Compile the SQL needed to retrieve all table names.
-     *
-     * @return string
-     */
-    public function compileGetAllTables()
-    {
-        return 'SHOW FULL TABLES WHERE table_type = \'BASE TABLE\'';
-    }
-
-    /**
-     * Compile the SQL needed to retrieve all view names.
-     *
-     * @return string
-     */
-    public function compileGetAllViews()
-    {
-        return 'SHOW FULL TABLES WHERE table_type = \'VIEW\'';
     }
 
     /**
