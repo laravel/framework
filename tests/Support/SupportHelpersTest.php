@@ -271,19 +271,19 @@ class SupportHelpersTest extends TestCase
             ],
         ];
 
-        $this->assertEquals('LHR', data_get($array, 'flights.0.segments.^.from'));
-        $this->assertEquals('PKX', data_get($array, 'flights.0.segments.$.to'));
+        $this->assertEquals('LHR', data_get($array, 'flights.0.segments.{first}.from'));
+        $this->assertEquals('PKX', data_get($array, 'flights.0.segments.{last}.to'));
 
-        $this->assertEquals('LHR', data_get($array, 'flights.^.segments.^.from'));
-        $this->assertEquals('PEK', data_get($array, 'flights.$.segments.$.to'));
-        $this->assertEquals('PKX', data_get($array, 'flights.^.segments.$.to'));
-        $this->assertEquals('LGW', data_get($array, 'flights.$.segments.^.from'));
+        $this->assertEquals('LHR', data_get($array, 'flights.{first}.segments.{first}.from'));
+        $this->assertEquals('PEK', data_get($array, 'flights.{last}.segments.{last}.to'));
+        $this->assertEquals('PKX', data_get($array, 'flights.{first}.segments.{last}.to'));
+        $this->assertEquals('LGW', data_get($array, 'flights.{last}.segments.{first}.from'));
 
-        $this->assertEquals(['LHR', 'IST'], data_get($array, 'flights.^.segments.*.from'));
-        $this->assertEquals(['SAW', 'PEK'], data_get($array, 'flights.$.segments.*.to'));
+        $this->assertEquals(['LHR', 'IST'], data_get($array, 'flights.{first}.segments.*.from'));
+        $this->assertEquals(['SAW', 'PEK'], data_get($array, 'flights.{last}.segments.*.to'));
 
-        $this->assertEquals(['LHR', 'LGW'], data_get($array, 'flights.*.segments.^.from'));
-        $this->assertEquals(['PKX', 'PEK'], data_get($array, 'flights.*.segments.$.to'));
+        $this->assertEquals(['LHR', 'LGW'], data_get($array, 'flights.*.segments.{first}.from'));
+        $this->assertEquals(['PKX', 'PEK'], data_get($array, 'flights.*.segments.{last}.to'));
     }
 
     public function testDataGetFirstLastDirectivesOnKeyedArrays()
@@ -302,28 +302,28 @@ class SupportHelpersTest extends TestCase
         ];
 
         $this->assertEquals('second', data_get($array, 'numericKeys.0'));
-        $this->assertEquals('first', data_get($array, 'numericKeys.^'));
-        $this->assertEquals('last', data_get($array, 'numericKeys.$'));
-        $this->assertEquals('first', data_get($array, 'stringKeys.^'));
-        $this->assertEquals('last', data_get($array, 'stringKeys.$'));
+        $this->assertEquals('first', data_get($array, 'numericKeys.{first}'));
+        $this->assertEquals('last', data_get($array, 'numericKeys.{last}'));
+        $this->assertEquals('first', data_get($array, 'stringKeys.{first}'));
+        $this->assertEquals('last', data_get($array, 'stringKeys.{last}'));
     }
 
     public function testDataGetEscapedSegmentKeys()
     {
         $array = [
             'symbols' => [
-                '$' => ['description' => 'dollar'],
+                '{last}' => ['description' => 'dollar'],
                 '*' => ['description' => 'asterisk'],
-                '^' => ['description' => 'caret'],
+                '{first}' => ['description' => 'caret'],
             ],
         ];
 
-        $this->assertEquals('caret', data_get($array, 'symbols.\^.description'));
-        $this->assertEquals('dollar', data_get($array, 'symbols.^.description'));
+        $this->assertEquals('caret', data_get($array, 'symbols.\{first}.description'));
+        $this->assertEquals('dollar', data_get($array, 'symbols.{first}.description'));
         $this->assertEquals('asterisk', data_get($array, 'symbols.\*.description'));
         $this->assertEquals(['dollar', 'asterisk', 'caret'], data_get($array, 'symbols.*.description'));
-        $this->assertEquals('dollar', data_get($array, 'symbols.\$.description'));
-        $this->assertEquals('caret', data_get($array, 'symbols.$.description'));
+        $this->assertEquals('dollar', data_get($array, 'symbols.\{last}.description'));
+        $this->assertEquals('caret', data_get($array, 'symbols.{last}.description'));
     }
 
     public function testDataFill()

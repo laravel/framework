@@ -76,8 +76,10 @@ if (! function_exists('data_get')) {
 
             $segment = match ($segment) {
                 '\*' => '*',
-                '\^' => '^', '^' => array_key_first($target),
-                '\$' => '$', '$' => array_key_last($target),
+                '\{first}' => '{first}',
+                '{first}' => array_key_first($target),
+                '\{last}' => '{last}',
+                '{last}' => array_key_last($target),
                 default => $segment,
             };
 
