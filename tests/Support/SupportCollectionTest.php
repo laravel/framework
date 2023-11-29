@@ -4910,26 +4910,6 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
-    public function testFoo($collection)
-    {
-        $data = $collection::make([
-            'a' => 1,
-            'b' => 2,
-            'c' => 3,
-        ])->toFluent();
-
-        $this->assertInstanceOf(Fluent::class, $data);
-
-        $this->assertSame([
-            'a' => 1,
-            'b' => 2,
-            'c' => 3,
-        ], $data->toArray());
-    }
-
-    /**
-     * @dataProvider collectionClassProvider
-     */
     public function testUndot($collection)
     {
         $data = $collection::make([

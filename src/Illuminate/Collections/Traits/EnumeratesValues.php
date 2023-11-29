@@ -874,16 +874,6 @@ trait EnumeratesValues
     }
 
     /**
-     * Get the collection of items as a support fluent instance.
-     *
-     * @return \Illuminate\Support\Fluent<TKey, TValue>
-     */
-    public function toFluent()
-    {
-        return new Fluent($this->all());
-    }
-
-    /**
      * Get the collection of items as a plain array.
      *
      * @return array<TKey, mixed>
