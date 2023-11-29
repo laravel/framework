@@ -128,7 +128,19 @@ class DynamoBatchRepository implements BatchRepository
         ]);
 
         if (!isset($b['Item'])) {
-            return null;
+            // If we didn't find it via a standard read, attempt to find the item using a consistent read.
+            $b = $this->dynamoDbClient->getItem([
+                'TableName' => $this->table,
+                'Key' => [
+                    'application' => ['S' => $this->applicationName],
+                    'id' => ['S' => $batchId],
+                ],
+                'ConsistentRead' => true,
+            ]);
+
+            if (!isset($b['Item'])) {
+                return null;
+            }
         }
 
         $batch = $this->marshaler->unmarshalItem($b['Item'], mapAsObject: true);
