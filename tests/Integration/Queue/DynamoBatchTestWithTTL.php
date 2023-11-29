@@ -12,7 +12,7 @@ class DynamoBatchTestWithTTL extends DynamoBatchTest
             'endpoint' => static::DYNAMODB_ENDPOINT,
             'key' => 'key',
             'secret' => 'secret',
-            'ttl' => 60,
+            'ttl' => 1,
             'ttlAttribute' => 'ttl_value',
         ]);
     }
