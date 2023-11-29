@@ -144,7 +144,7 @@ class Fluent implements Arrayable, ArrayAccess, Jsonable, JsonSerializable
     #[\ReturnTypeWillChange]
     public function offsetGet($offset)
     {
-        return $this->get($offset);
+        return $this->value($offset);
     }
 
     /**
@@ -194,7 +194,7 @@ class Fluent implements Arrayable, ArrayAccess, Jsonable, JsonSerializable
      */
     public function __get($key)
     {
-        return $this->get($key);
+        return $this->value($key);
     }
 
     /**
