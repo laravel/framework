@@ -1883,7 +1883,11 @@ trait HasAttributes
         $results = [];
 
         foreach (is_array($attributes) ? $attributes : func_get_args() as $attribute) {
-            $results[$attribute] = $this->getAttribute($attribute);
+            [$field, $alias] = str_contains($attribute, ' as ')
+                ? explode(' as ', $attribute, 2)
+                : [$attribute, $attribute];
+
+            $results[$alias] = $this->getAttribute($field);
         }
 
         return $results;

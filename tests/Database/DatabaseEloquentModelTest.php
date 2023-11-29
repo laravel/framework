@@ -2062,6 +2062,19 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertEquals(['firstName', 'middleName', 'lastName'], $model->getMutatedAttributes());
     }
 
+    public function testGetOnlyAttributes()
+    {
+        $model = new EloquentModelStub;
+        $model->foo = 'foo';
+        $model->bar = 'bar';
+
+        $this->assertEquals(['foo' => 'foo'], $model->only('foo'));
+
+        $this->assertEquals(['value' => 'foo'], $model->only('foo as value'));
+
+        $this->assertEquals(['value' => 'foo', 'bar' => 'bar'], $model->only('foo as value', 'bar'));
+    }
+
     public function testReplicateCreatesANewModelInstanceWithSameAttributeValues()
     {
         $model = new EloquentModelStub;
