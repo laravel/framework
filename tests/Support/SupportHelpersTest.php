@@ -286,7 +286,29 @@ class SupportHelpersTest extends TestCase
         $this->assertEquals(['PKX', 'PEK'], data_get($array, 'flights.*.segments.$.to'));
     }
 
-    public function testDataGetEscapedKeys()
+    public function testDataGetFirstLastDirectivesOnKeyedArrays()
+    {
+        $array = [
+            'numericKeys' => [
+                2 => 'first',
+                0 => 'second',
+                1 => 'last',
+            ],
+            'stringKeys' => [
+                'one' => 'first',
+                'two' => 'second',
+                'three' => 'last',
+            ],
+        ];
+
+        $this->assertEquals('second', data_get($array, 'numericKeys.0'));
+        $this->assertEquals('first', data_get($array, 'numericKeys.^'));
+        $this->assertEquals('last', data_get($array, 'numericKeys.$'));
+        $this->assertEquals('first', data_get($array, 'stringKeys.^'));
+        $this->assertEquals('last', data_get($array, 'stringKeys.$'));
+    }
+
+    public function testDataGetEscapedSegmentKeys()
     {
         $array = [
             'symbols' => [
