@@ -10,7 +10,6 @@ use Exception;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Fluent;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\ItemNotFoundException;
 use Illuminate\Support\LazyCollection;
