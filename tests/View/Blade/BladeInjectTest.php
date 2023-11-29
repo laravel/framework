@@ -40,5 +40,6 @@ class BladeInjectTest extends AbstractBladeTestCase
     }
 }
 
-enum Test {
+enum Test
+{
 }
