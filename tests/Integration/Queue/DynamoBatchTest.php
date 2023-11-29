@@ -29,6 +29,7 @@ class DynamoBatchTest extends TestCase
             'secret' => 'secret',
         ]);
     }
+
     public function setUp(): void
     {
         parent::setUp();
@@ -43,6 +44,7 @@ class DynamoBatchTest extends TestCase
 
         parent::tearDown();
     }
+
     public function test_running_a_batch()
     {
         Bus::batch([
