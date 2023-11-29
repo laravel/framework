@@ -252,6 +252,58 @@ class SupportHelpersTest extends TestCase
         $this->assertEquals([], data_get($array, 'posts.*.users.*.name'));
     }
 
+    public function testDataGetFirstLastDirectives()
+    {
+        $array = [
+            'flights' => [
+                [
+                    'segments' => [
+                        ['from' => 'LHR', 'departure' => '9:00', 'to' => 'IST', 'arrival' => '15:00'],
+                        ['from' => 'IST', 'departure' => '16:00', 'to' => 'PKX', 'arrival' => '20:00'],
+                    ],
+                ],
+                [
+                    'segments' => [
+                        ['from' => 'LGW', 'departure' => '8:00', 'to' => 'SAW', 'arrival' => '14:00'],
+                        ['from' => 'SAW', 'departure' => '15:00', 'to' => 'PEK', 'arrival' => '19:00'],
+                    ],
+                ],
+            ],
+        ];
+
+        $this->assertEquals('LHR', data_get($array, 'flights.0.segments.^.from'));
+        $this->assertEquals('PKX', data_get($array, 'flights.0.segments.$.to'));
+
+        $this->assertEquals('LHR', data_get($array, 'flights.^.segments.^.from'));
+        $this->assertEquals('PEK', data_get($array, 'flights.$.segments.$.to'));
+        $this->assertEquals('PKX', data_get($array, 'flights.^.segments.$.to'));
+        $this->assertEquals('LGW', data_get($array, 'flights.$.segments.^.from'));
+
+        $this->assertEquals(['LHR', 'IST'], data_get($array, 'flights.^.segments.*.from'));
+        $this->assertEquals(['SAW', 'PEK'], data_get($array, 'flights.$.segments.*.to'));
+
+        $this->assertEquals(['LHR', 'LGW'], data_get($array, 'flights.*.segments.^.from'));
+        $this->assertEquals(['PKX', 'PEK'], data_get($array, 'flights.*.segments.$.to'));
+    }
+
+    public function testDataGetEscapedKeys()
+    {
+        $array = [
+            'symbols' => [
+                '$' => ['description' => 'dollar'],
+                '*' => ['description' => 'asterisk'],
+                '^' => ['description' => 'caret'],
+            ],
+        ];
+
+        $this->assertEquals('caret', data_get($array, 'symbols.\^.description'));
+        $this->assertEquals('dollar', data_get($array, 'symbols.^.description'));
+        $this->assertEquals('asterisk', data_get($array, 'symbols.\*.description'));
+        $this->assertEquals(['dollar', 'asterisk', 'caret'], data_get($array, 'symbols.*.description'));
+        $this->assertEquals('dollar', data_get($array, 'symbols.\$.description'));
+        $this->assertEquals('caret', data_get($array, 'symbols.$.description'));
+    }
+
     public function testDataFill()
     {
         $data = ['foo' => 'bar'];
