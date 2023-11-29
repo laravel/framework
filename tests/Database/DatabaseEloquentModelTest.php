@@ -499,6 +499,15 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertSame('test', $newInstance->getTable());
     }
 
+    public function testExists()
+    {
+        $model = new EloquentModelStub;
+        $model->exists = true;
+
+        $this->assertTrue($model->exists());
+        $this->assertFalse($model->doesntExist());
+    }
+
     public function testNewInstanceReturnsNewInstanceWithMergedCasts()
     {
         $model = new EloquentModelStub;

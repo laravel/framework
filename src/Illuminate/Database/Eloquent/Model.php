@@ -1751,6 +1751,26 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     }
 
     /**
+     * Determine if the model exists.
+     *
+     * @var bool
+     */
+    public function exists()
+    {
+        return $this->exists;
+    }
+
+    /**
+     * Determine if the model does not exist.
+     *
+     * @var bool
+     */
+    public function doesntExist()
+    {
+        return ! $this->exists;
+    }
+
+    /**
      * Determine if two models have the same ID and belong to the same table.
      *
      * @param  \Illuminate\Database\Eloquent\Model|null  $model
