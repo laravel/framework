@@ -127,7 +127,8 @@ class EloquentModelTest extends DatabaseTestCase
         ]);
     }
 
-    public function testNonAssocArrayToArrayCasting() {
+    public function testNonAssocArrayToArrayCasting()
+    {
         Schema::create('test_model3', function (Blueprint $table) {
             $table->id();
             $table->json('settings');
@@ -142,7 +143,8 @@ class EloquentModelTest extends DatabaseTestCase
         ]);
     }
 
-    public function testAssocArrayToArrayCasting() {
+    public function testAssocArrayToArrayCasting()
+    {
         Schema::create('test_model3', function (Blueprint $table) {
             $table->id();
             $table->json('settings');
@@ -157,7 +159,8 @@ class EloquentModelTest extends DatabaseTestCase
         ]);
     }
 
-    public function testNonAssocArrayToJsonCasting() {
+    public function testNonAssocArrayToJsonCasting()
+    {
         Schema::create('test_model4', function (Blueprint $table) {
             $table->id();
             $table->json('settings');
@@ -172,7 +175,8 @@ class EloquentModelTest extends DatabaseTestCase
         ]);
     }
 
-    public function testAssocArrayToJsonCasting() {
+    public function testAssocArrayToJsonCasting()
+    {
         Schema::create('test_model4', function (Blueprint $table) {
             $table->id();
             $table->json('settings');
@@ -187,7 +191,8 @@ class EloquentModelTest extends DatabaseTestCase
         ]);
     }
 
-    public function testNonAssocArrayToObjectCasting() {
+    public function testNonAssocArrayToObjectCasting()
+    {
         Schema::create('test_model5', function (Blueprint $table) {
             $table->id();
             $table->json('settings');
@@ -202,7 +207,8 @@ class EloquentModelTest extends DatabaseTestCase
         ]);
     }
 
-    public function testAssocArrayToObjectCasting() {
+    public function testAssocArrayToObjectCasting()
+    {
         Schema::create('test_model5', function (Blueprint $table) {
             $table->id();
             $table->json('settings');
