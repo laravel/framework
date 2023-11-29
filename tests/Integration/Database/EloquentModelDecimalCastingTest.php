@@ -1,13 +1,12 @@
 <?php
 
-namespace Illuminate\Tests\Integration\Database\EloquentModelDecimalCastingTest;
+namespace Illuminate\Tests\Integration\Database;
 
 use Brick\Math\Exception\NumberFormatException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Exceptions\MathException;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 class EloquentModelDecimalCastingTest extends DatabaseTestCase
 {

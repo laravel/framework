@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Foundation\Testing;
+namespace Illuminate\Tests\Foundation\Testing;
 
 use Exception;
 use Illuminate\Foundation\Testing\TestCase;

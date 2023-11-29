@@ -1,12 +1,11 @@
 <?php
 
-namespace Illuminate\Tests\Integration\Database\EloquentModelJsonCastingTest;
+namespace Illuminate\Tests\Integration\Database;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 use stdClass;
 
 class EloquentModelJsonCastingTest extends DatabaseTestCase
@@ -25,7 +24,7 @@ class EloquentModelJsonCastingTest extends DatabaseTestCase
 
     public function testStringsAreCastable()
     {
-        /** @var \Illuminate\Tests\Integration\Database\EloquentModelJsonCastingTest\JsonCast $object */
+        /** @var \Illuminate\Tests\Integration\Database\JsonCast $object */
         $object = JsonCast::create([
             'basic_string_as_json_field' => 'this is a string',
             'json_string_as_json_field' => '{"key1":"value1"}',
@@ -37,7 +36,7 @@ class EloquentModelJsonCastingTest extends DatabaseTestCase
 
     public function testArraysAreCastable()
     {
-        /** @var \Illuminate\Tests\Integration\Database\EloquentModelJsonCastingTest\JsonCast $object */
+        /** @var \Illuminate\Tests\Integration\Database\JsonCast $object */
         $object = JsonCast::create([
             'array_as_json_field' => ['key1' => 'value1'],
         ]);
@@ -50,7 +49,7 @@ class EloquentModelJsonCastingTest extends DatabaseTestCase
         $object = new stdClass;
         $object->key1 = 'value1';
 
-        /** @var \Illuminate\Tests\Integration\Database\EloquentModelJsonCastingTest\JsonCast $user */
+        /** @var \Illuminate\Tests\Integration\Database\JsonCast $user */
         $user = JsonCast::create([
             'object_as_json_field' => $object,
         ]);
@@ -61,7 +60,7 @@ class EloquentModelJsonCastingTest extends DatabaseTestCase
 
     public function testCollectionsAreCastable()
     {
-        /** @var \Illuminate\Tests\Integration\Database\EloquentModelJsonCastingTest\JsonCast $user */
+        /** @var \Illuminate\Tests\Integration\Database\JsonCast $user */
         $user = JsonCast::create([
             'collection_as_json_field' => new Collection(['key1' => 'value1']),
         ]);

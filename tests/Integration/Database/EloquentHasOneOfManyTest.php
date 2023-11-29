@@ -1,10 +1,9 @@
 <?php
 
-namespace Illuminate\Tests\Integration\Database\EloquentHasOneOfManyTest;
+namespace Illuminate\Tests\Integration\Database;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 class EloquentHasOneOfManyTest extends DatabaseTestCase
 {

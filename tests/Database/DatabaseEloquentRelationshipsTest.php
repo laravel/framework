@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Tests\Database\EloquentRelationshipsTest;
+namespace Illuminate\Tests\Database;
 
 use Illuminate\Database\Connection;
 use Illuminate\Database\Eloquent\Builder;

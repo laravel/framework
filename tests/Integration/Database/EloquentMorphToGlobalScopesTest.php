@@ -1,13 +1,12 @@
 <?php
 
-namespace Illuminate\Tests\Integration\Database\EloquentMorphToGlobalScopesTest;
+namespace Illuminate\Tests\Integration\Database;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 class EloquentMorphToGlobalScopesTest extends DatabaseTestCase
 {
