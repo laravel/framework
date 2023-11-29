@@ -18,6 +18,7 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection as BaseCollection;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ForwardsCalls;
 use JsonSerializable;
@@ -2129,6 +2130,12 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function resolveRouteBindingQuery($query, $value, $field = null)
     {
+        $columnType = Schema::getColumnType($this->getTable(), $field ?? $this->getRouteKeyName());
+
+        if (in_array($columnType, ['varchar', 'text'])) {
+            return $query->where($field ?? $this->getRouteKeyName(), 'LIKE', "%{$value}%");
+        }
+
         return $query->where($field ?? $this->getRouteKeyName(), $value);
     }
 
