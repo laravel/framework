@@ -86,7 +86,7 @@ class DownCommand extends Command
             'redirect' => $this->redirectPath(),
             'retry' => $this->getRetryTime(),
             'refresh' => $this->option('refresh'),
-            'secret' => $this->getSecretPhrase(),
+            'secret' => $this->getSecret(),
             'status' => (int) $this->option('status', 503),
             'template' => $this->option('render') ? $this->prerenderView() : null,
         ];
@@ -151,7 +151,7 @@ class DownCommand extends Command
      *
      * @return string|null
      */
-    protected function getSecretPhrase()
+    protected function getSecret()
     {
         if ($this->option('secret') !== null) {
             return $this->option('secret');
