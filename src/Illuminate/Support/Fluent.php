@@ -24,7 +24,7 @@ class Fluent implements Arrayable, ArrayAccess, Jsonable, JsonSerializable
      */
     public function __construct($attributes = [])
     {
-        foreach ((array) $attributes as $key => $value) {
+        foreach ($attributes as $key => $value) {
             $this->attributes[$key] = $value;
         }
     }
@@ -60,7 +60,9 @@ class Fluent implements Arrayable, ArrayAccess, Jsonable, JsonSerializable
      */
     public function scope($key, $default = null)
     {
-        return new static($this->get($key, $default));
+        return new static(
+            (array) $this->get($key, $default)
+        );
     }
 
     /**
