@@ -67,7 +67,6 @@ class DatabaseUuidFailedJobProvider implements CountableFailedJobProvider, Faile
         return $uuid;
     }
 
-
     /**
      * Get a list of all of IDs the failed jobs.
      *
