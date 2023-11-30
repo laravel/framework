@@ -8,7 +8,6 @@ use ArrayObject;
 use CachingIterator;
 use Exception;
 use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Support\Collection;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\ItemNotFoundException;
@@ -16,18 +15,16 @@ use Illuminate\Support\LazyCollection;
 use Illuminate\Support\MultipleItemsFoundException;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
-use IteratorAggregate;
 use JsonSerializable;
 use Mockery as m;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use ReflectionClass;
 use stdClass;
 use Symfony\Component\VarDumper\VarDumper;
-use Traversable;
 use UnexpectedValueException;
 use WeakMap;
 
+include_once 'Common.php';
 include_once 'Enums.php';
 
 class SupportCollectionTest extends TestCase
@@ -595,46 +592,6 @@ class SupportCollectionTest extends TestCase
         })->values();
 
         $this->assertSame([3, 3, 4, 4], $data->all());
-    }
-
-    /**
-     * @dataProvider collectionClassProvider
-     */
-    public function testGetArrayableItems($collection)
-    {
-        $data = new $collection;
-
-        $class = new ReflectionClass($collection);
-        $method = $class->getMethod('getArrayableItems');
-
-        $items = new TestArrayableObject;
-        $array = $method->invokeArgs($data, [$items]);
-        $this->assertSame(['foo' => 'bar'], $array);
-
-        $items = new TestJsonableObject;
-        $array = $method->invokeArgs($data, [$items]);
-        $this->assertSame(['foo' => 'bar'], $array);
-
-        $items = new TestJsonSerializeObject;
-        $array = $method->invokeArgs($data, [$items]);
-        $this->assertSame(['foo' => 'bar'], $array);
-
-        $items = new TestJsonSerializeWithScalarValueObject;
-        $array = $method->invokeArgs($data, [$items]);
-        $this->assertSame(['foo'], $array);
-
-        $subject = [new stdClass, new stdClass];
-        $items = new TestTraversableAndJsonSerializableObject($subject);
-        $array = $method->invokeArgs($data, [$items]);
-        $this->assertSame($subject, $array);
-
-        $items = new $collection(['foo' => 'bar']);
-        $array = $method->invokeArgs($data, [$items]);
-        $this->assertSame(['foo' => 'bar'], $array);
-
-        $items = ['foo' => 'bar'];
-        $array = $method->invokeArgs($data, [$items]);
-        $this->assertSame(['foo' => 'bar'], $array);
     }
 
     /**
@@ -5816,63 +5773,11 @@ class TestArrayAccessImplementation implements ArrayAccess
     }
 }
 
-class TestArrayableObject implements Arrayable
-{
-    public function toArray()
-    {
-        return ['foo' => 'bar'];
-    }
-}
-
-class TestJsonableObject implements Jsonable
-{
-    public function toJson($options = 0)
-    {
-        return '{"foo":"bar"}';
-    }
-}
-
-class TestJsonSerializeObject implements JsonSerializable
-{
-    public function jsonSerialize(): array
-    {
-        return ['foo' => 'bar'];
-    }
-}
-
 class TestJsonSerializeToStringObject implements JsonSerializable
 {
     public function jsonSerialize(): string
     {
         return 'foobar';
-    }
-}
-
-class TestJsonSerializeWithScalarValueObject implements JsonSerializable
-{
-    public function jsonSerialize(): string
-    {
-        return 'foo';
-    }
-}
-
-class TestTraversableAndJsonSerializableObject implements IteratorAggregate, JsonSerializable
-{
-    public $items;
-
-    public function __construct($items)
-    {
-        $this->items = $items;
-    }
-
-    public function getIterator(): Traversable
-    {
-        return new ArrayIterator($this->items);
-    }
-
-    public function jsonSerialize(): array
-    {
-        return json_decode(json_encode($this->items), true);
     }
 }
 

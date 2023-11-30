@@ -40,7 +40,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      */
     public function __construct($items = [])
     {
-        $this->items = $this->getArrayableItems($items);
+        $this->items = Arr::from($items);
     }
 
     /**
@@ -227,7 +227,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     public function crossJoin(...$lists)
     {
         return new static(Arr::crossJoin(
-            $this->items, ...array_map([$this, 'getArrayableItems'], $lists)
+            $this->items, ...array_map(Arr::from(...), $lists)
         ));
     }
 
@@ -239,7 +239,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      */
     public function diff($items)
     {
-        return new static(array_diff($this->items, $this->getArrayableItems($items)));
+        return new static(array_diff($this->items, Arr::from($items)));
     }
 
     /**
@@ -251,7 +251,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      */
     public function diffUsing($items, callable $callback)
     {
-        return new static(array_udiff($this->items, $this->getArrayableItems($items), $callback));
+        return new static(array_udiff($this->items, Arr::from($items), $callback));
     }
 
     /**
@@ -262,7 +262,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      */
     public function diffAssoc($items)
     {
-        return new static(array_diff_assoc($this->items, $this->getArrayableItems($items)));
+        return new static(array_diff_assoc($this->items, Arr::from($items)));
     }
 
     /**
@@ -274,7 +274,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      */
     public function diffAssocUsing($items, callable $callback)
     {
-        return new static(array_diff_uassoc($this->items, $this->getArrayableItems($items), $callback));
+        return new static(array_diff_uassoc($this->items, Arr::from($items), $callback));
     }
 
     /**
@@ -285,7 +285,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      */
     public function diffKeys($items)
     {
-        return new static(array_diff_key($this->items, $this->getArrayableItems($items)));
+        return new static(array_diff_key($this->items, Arr::from($items)));
     }
 
     /**
@@ -297,7 +297,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      */
     public function diffKeysUsing($items, callable $callback)
     {
-        return new static(array_diff_ukey($this->items, $this->getArrayableItems($items), $callback));
+        return new static(array_diff_ukey($this->items, Arr::from($items), $callback));
     }
 
     /**
@@ -434,7 +434,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      */
     public function forget($keys)
     {
-        foreach ($this->getArrayableItems($keys) as $key) {
+        foreach (Arr::from($keys) as $key) {
             $this->offsetUnset($key);
         }
 
@@ -627,7 +627,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      */
     public function intersect($items)
     {
-        return new static(array_intersect($this->items, $this->getArrayableItems($items)));
+        return new static(array_intersect($this->items, Arr::from($items)));
     }
 
     /**
@@ -639,7 +639,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      */
     public function intersectUsing($items, callable $callback)
     {
-        return new static(array_uintersect($this->items, $this->getArrayableItems($items), $callback));
+        return new static(array_uintersect($this->items, Arr::from($items), $callback));
     }
 
     /**
@@ -650,7 +650,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      */
     public function intersectAssoc($items)
     {
-        return new static(array_intersect_assoc($this->items, $this->getArrayableItems($items)));
+        return new static(array_intersect_assoc($this->items, Arr::from($items)));
     }
 
     /**
@@ -662,7 +662,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      */
     public function intersectAssocUsing($items, callable $callback)
     {
-        return new static(array_intersect_uassoc($this->items, $this->getArrayableItems($items), $callback));
+        return new static(array_intersect_uassoc($this->items, Arr::from($items), $callback));
     }
 
     /**
@@ -674,7 +674,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     public function intersectByKeys($items)
     {
         return new static(array_intersect_key(
-            $this->items, $this->getArrayableItems($items)
+            $this->items, Arr::from($items)
         ));
     }
 
@@ -833,7 +833,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      */
     public function merge($items)
     {
-        return new static(array_merge($this->items, $this->getArrayableItems($items)));
+        return new static(array_merge($this->items, Arr::from($items)));
     }
 
     /**
@@ -846,7 +846,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      */
     public function mergeRecursive($items)
     {
-        return new static(array_merge_recursive($this->items, $this->getArrayableItems($items)));
+        return new static(array_merge_recursive($this->items, Arr::from($items)));
     }
 
     /**
@@ -859,7 +859,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      */
     public function combine($values)
     {
-        return new static(array_combine($this->all(), $this->getArrayableItems($values)));
+        return new static(array_combine($this->all(), Arr::from($values)));
     }
 
     /**
@@ -870,7 +870,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      */
     public function union($items)
     {
-        return new static($this->items + $this->getArrayableItems($items));
+        return new static($this->items + Arr::from($items));
     }
 
     /**
@@ -1049,7 +1049,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      */
     public function replace($items)
     {
-        return new static(array_replace($this->items, $this->getArrayableItems($items)));
+        return new static(array_replace($this->items, Arr::from($items)));
     }
 
     /**
@@ -1060,7 +1060,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      */
     public function replaceRecursive($items)
     {
-        return new static(array_replace_recursive($this->items, $this->getArrayableItems($items)));
+        return new static(array_replace_recursive($this->items, Arr::from($items)));
     }
 
     /**
@@ -1513,7 +1513,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
             return new static(array_splice($this->items, $offset));
         }
 
-        return new static(array_splice($this->items, $offset, $length, $this->getArrayableItems($replacement)));
+        return new static(array_splice($this->items, $offset, $length, Arr::from($replacement)));
     }
 
     /**
@@ -1635,7 +1635,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      */
     public function zip($items)
     {
-        $arrayableItems = array_map(fn ($items) => $this->getArrayableItems($items), func_get_args());
+        $arrayableItems = array_map(fn ($items) => Arr::from($items), func_get_args());
 
         $params = array_merge([fn () => new static(func_get_args()), $this->items], $arrayableItems);
 

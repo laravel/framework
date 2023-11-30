@@ -52,7 +52,7 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
                 'Generators should not be passed directly to LazyCollection. Instead, pass a generator function.'
             );
         } else {
-            $this->source = $this->getArrayableItems($source);
+            $this->source = Arr::from($source);
         }
     }
 
@@ -991,7 +991,7 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     public function replace($items)
     {
         return new static(function () use ($items) {
-            $items = $this->getArrayableItems($items);
+            $items = Arr::from($items);
 
             foreach ($this as $key => $value) {
                 if (array_key_exists($key, $items)) {

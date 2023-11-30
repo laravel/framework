@@ -4,12 +4,42 @@ namespace Illuminate\Support;
 
 use ArgumentCountError;
 use ArrayAccess;
+use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
+use JsonSerializable;
+use Traversable;
+use UnitEnum;
+use WeakMap;
 
 class Arr
 {
     use Macroable;
+
+    /**
+     * Results array of items from Collection or Arrayable.
+     *
+     * @param  mixed  $items
+     * @return array
+     */
+    public static function from($items)
+    {
+        if (is_array($items)) {
+            return $items;
+        }
+
+        return match (true) {
+            $items instanceof WeakMap => throw new InvalidArgumentException('Arrays can not be created using instances of WeakMap.'),
+            $items instanceof Enumerable => $items->all(),
+            $items instanceof Arrayable => $items->toArray(),
+            $items instanceof Traversable => iterator_to_array($items),
+            $items instanceof Jsonable => json_decode($items->toJson(), true),
+            $items instanceof JsonSerializable => (array) $items->jsonSerialize(),
+            $items instanceof UnitEnum => [$items],
+            default => (array) $items,
+        };
+    }
 
     /**
      * Determine whether the given value is array accessible.

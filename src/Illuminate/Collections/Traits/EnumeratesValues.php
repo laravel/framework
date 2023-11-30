@@ -638,7 +638,7 @@ trait EnumeratesValues
      */
     public function whereIn($key, $values, $strict = false)
     {
-        $values = $this->getArrayableItems($values);
+        $values = Arr::from($values);
 
         return $this->filter(fn ($item) => in_array(data_get($item, $key), $values, $strict));
     }
@@ -691,7 +691,7 @@ trait EnumeratesValues
      */
     public function whereNotIn($key, $values, $strict = false)
     {
-        $values = $this->getArrayableItems($values);
+        $values = Arr::from($values);
 
         return $this->reject(fn ($item) => in_array(data_get($item, $key), $values, $strict));
     }
@@ -1012,30 +1012,6 @@ trait EnumeratesValues
         }
 
         return new HigherOrderCollectionProxy($this, $key);
-    }
-
-    /**
-     * Results array of items from Collection or Arrayable.
-     *
-     * @param  mixed  $items
-     * @return array<TKey, TValue>
-     */
-    protected function getArrayableItems($items)
-    {
-        if (is_array($items)) {
-            return $items;
-        }
-
-        return match (true) {
-            $items instanceof WeakMap => throw new InvalidArgumentException('Collections can not be created using instances of WeakMap.'),
-            $items instanceof Enumerable => $items->all(),
-            $items instanceof Arrayable => $items->toArray(),
-            $items instanceof Traversable => iterator_to_array($items),
-            $items instanceof Jsonable => json_decode($items->toJson(), true),
-            $items instanceof JsonSerializable => (array) $items->jsonSerialize(),
-            $items instanceof UnitEnum => [$items],
-            default => (array) $items,
-        };
     }
 
     /**
