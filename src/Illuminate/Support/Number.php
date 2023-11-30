@@ -141,6 +141,19 @@ class Number
      * @param  int|null  $maxPrecision
      * @return string
      */
+    public static function abbreviate(int|float $number, int $precision = 0, ?int $maxPrecision = null)
+    {
+        return static::forHumans($number, $precision, $maxPrecision, abbreviate: true);
+    }
+
+    /**
+     * Convert the number to its human readable equivalent.
+     *
+     * @param  int  $number
+     * @param  int  $precision
+     * @param  int|null  $maxPrecision
+     * @return string
+     */
     public static function forHumans(int|float $number, int $precision = 0, ?int $maxPrecision = null, bool $abbreviate = false)
     {
         return static::summarize($number, $precision, $maxPrecision, $abbreviate ? [
