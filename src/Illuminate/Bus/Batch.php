@@ -387,6 +387,16 @@ class Batch implements Arrayable, JsonSerializable
     }
 
     /**
+     * Resume the batch.
+     *
+     * @return void
+     */
+    public function resume()
+    {
+        $this->repository->resume($this->id);
+    }
+
+    /**
      * Determine if the batch has been cancelled.
      *
      * @return bool

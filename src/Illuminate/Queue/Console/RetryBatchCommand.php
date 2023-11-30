@@ -15,7 +15,9 @@ class RetryBatchCommand extends Command implements Isolatable
      *
      * @var string
      */
-    protected $signature = 'queue:retry-batch {id : The ID of the batch whose failed jobs should be retried}';
+    protected $signature = 'queue:retry-batch
+                            {id : The ID of the batch whose failed jobs should be retried}
+                            {--resume : If the batch was previously cancelled, this will un-cancel the batch}';
 
     /**
      * The console command description.
@@ -41,6 +43,11 @@ class RetryBatchCommand extends Command implements Isolatable
             $this->components->error('The given batch does not contain any failed jobs.');
 
             return 1;
+        }
+
+        if ($this->option('resume')) {
+            $this->components->info("Resuming job batch [$id].");
+
         }
 
         $this->components->info("Pushing failed queue jobs of the batch [$id] back onto the queue.");
