@@ -961,7 +961,6 @@ class Router implements BindingRegistrar, RegistrarContract
         return call_user_func(
             $this->implicitBindingCallback ?? $default, $this->container, $route, $default
         );
-
     }
 
     /**
