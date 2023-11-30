@@ -1011,6 +1011,19 @@ trait EnumeratesValues
     }
 
     /**
+     * Results array of items from Collection or Arrayable.
+     *
+     * @deprecated Will be removed in a future Laravel version.
+     *
+     * @param  mixed  $items
+     * @return array<TKey, TValue>
+     */
+    protected function getArrayableItems($items)
+    {
+        return Arr::from($items);
+    }
+
+    /**
      * Get an operator checker callback.
      *
      * @param  callable|string  $key
