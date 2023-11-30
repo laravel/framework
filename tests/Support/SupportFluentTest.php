@@ -129,6 +129,9 @@ class SupportFluentTest extends TestCase
     {
         $fluent = new Fluent(['forge', 'vapour', 'spark']);
         $this->assertEquals(['forge', 'vapour', 'spark'], $fluent->collect()->all());
+
+        $fluent = new Fluent(['authors' => ['taylor' => ['products' => ['forge', 'vapour', 'spark']]]]);
+        $this->assertEquals(['forge', 'vapour', 'spark'], $fluent->collect('authors.taylor.products')->all());
     }
 }
 
