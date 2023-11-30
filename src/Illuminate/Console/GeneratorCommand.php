@@ -3,6 +3,7 @@
 namespace Illuminate\Console;
 
 use Illuminate\Console\Concerns\CreatesMatchingTest;
+use Illuminate\Console\Events\StubCreated;
 use Illuminate\Contracts\Console\PromptsForMissingInput;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Str;
@@ -190,6 +191,8 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
         if (windows_os()) {
             $path = str_replace('/', '\\', $path);
         }
+
+        event(new StubCreated($this->getStub(), $path));
 
         $this->components->info(sprintf('%s [%s] created successfully.', $info, $path));
     }
