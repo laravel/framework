@@ -269,6 +269,7 @@ class SupportHelpersTest extends TestCase
                     ],
                 ],
             ],
+            'empty' => [],
         ];
 
         $this->assertEquals('LHR', data_get($array, 'flights.0.segments.{first}.from'));
@@ -284,6 +285,47 @@ class SupportHelpersTest extends TestCase
 
         $this->assertEquals(['LHR', 'LGW'], data_get($array, 'flights.*.segments.{first}.from'));
         $this->assertEquals(['PKX', 'PEK'], data_get($array, 'flights.*.segments.{last}.to'));
+
+        $this->assertEquals('Not found', data_get($array, 'empty.{first}', 'Not found'));
+        $this->assertEquals('Not found', data_get($array, 'empty.{last}', 'Not found'));
+    }
+
+    public function testDataGetFirstLastDirectivesOnArrayAccessIterable()
+    {
+        $arrayAccessIterable = [
+            'flights' => new SupportTestArrayAccessIterable([
+                [
+                    'segments' => new SupportTestArrayAccessIterable([
+                        ['from' => 'LHR', 'departure' => '9:00', 'to' => 'IST', 'arrival' => '15:00'],
+                        ['from' => 'IST', 'departure' => '16:00', 'to' => 'PKX', 'arrival' => '20:00'],
+                    ]),
+                ],
+                [
+                    'segments' => new SupportTestArrayAccessIterable([
+                        ['from' => 'LGW', 'departure' => '8:00', 'to' => 'SAW', 'arrival' => '14:00'],
+                        ['from' => 'SAW', 'departure' => '15:00', 'to' => 'PEK', 'arrival' => '19:00'],
+                    ]),
+                ],
+            ]),
+            'empty' => new SupportTestArrayAccessIterable([]),
+        ];
+
+        $this->assertEquals('LHR', data_get($arrayAccessIterable, 'flights.0.segments.{first}.from'));
+        $this->assertEquals('PKX', data_get($arrayAccessIterable, 'flights.0.segments.{last}.to'));
+
+        $this->assertEquals('LHR', data_get($arrayAccessIterable, 'flights.{first}.segments.{first}.from'));
+        $this->assertEquals('PEK', data_get($arrayAccessIterable, 'flights.{last}.segments.{last}.to'));
+        $this->assertEquals('PKX', data_get($arrayAccessIterable, 'flights.{first}.segments.{last}.to'));
+        $this->assertEquals('LGW', data_get($arrayAccessIterable, 'flights.{last}.segments.{first}.from'));
+
+        $this->assertEquals(['LHR', 'IST'], data_get($arrayAccessIterable, 'flights.{first}.segments.*.from'));
+        $this->assertEquals(['SAW', 'PEK'], data_get($arrayAccessIterable, 'flights.{last}.segments.*.to'));
+
+        $this->assertEquals(['LHR', 'LGW'], data_get($arrayAccessIterable, 'flights.*.segments.{first}.from'));
+        $this->assertEquals(['PKX', 'PEK'], data_get($arrayAccessIterable, 'flights.*.segments.{last}.to'));
+
+        $this->assertEquals('Not found', data_get($arrayAccessIterable, 'empty.{first}', 'Not found'));
+        $this->assertEquals('Not found', data_get($arrayAccessIterable, 'empty.{last}', 'Not found'));
     }
 
     public function testDataGetFirstLastDirectivesOnKeyedArrays()
@@ -1160,48 +1202,59 @@ class SupportTestClassThree extends SupportTestClassTwo
     use SupportTestTraitThree;
 }
 
-class SupportTestArrayAccess implements ArrayAccess
+trait SupportTestTraitArrayAccess
 {
-    protected $attributes = [];
-
-    public function __construct($attributes = [])
+    public function __construct(protected array $items = [])
     {
-        $this->attributes = $attributes;
     }
 
     public function offsetExists($offset): bool
     {
-        return array_key_exists($offset, $this->attributes);
+        return array_key_exists($offset, $this->items);
     }
 
     public function offsetGet($offset): mixed
     {
-        return $this->attributes[$offset];
+        return $this->items[$offset];
     }
 
     public function offsetSet($offset, $value): void
     {
-        $this->attributes[$offset] = $value;
+        $this->items[$offset] = $value;
     }
 
     public function offsetUnset($offset): void
     {
-        unset($this->attributes[$offset]);
+        unset($this->items[$offset]);
     }
 }
 
-class SupportTestArrayIterable implements IteratorAggregate
+trait SupportTestTraitArrayIterable
 {
-    protected $items = [];
-
-    public function __construct($items = [])
+    public function __construct(protected array $items = [])
     {
-        $this->items = $items;
     }
 
     public function getIterator(): Traversable
     {
         return new ArrayIterator($this->items);
+    }
+}
+
+class SupportTestArrayAccess implements ArrayAccess
+{
+    use SupportTestTraitArrayAccess;
+}
+
+class SupportTestArrayIterable implements IteratorAggregate
+{
+    use SupportTestTraitArrayIterable;
+}
+
+class SupportTestArrayAccessIterable implements ArrayAccess, IteratorAggregate
+{
+    use SupportTestTraitArrayAccess, SupportTestTraitArrayIterable {
+        SupportTestTraitArrayAccess::__construct insteadof SupportTestTraitArrayIterable;
     }
 }
 

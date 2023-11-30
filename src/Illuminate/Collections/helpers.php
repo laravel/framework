@@ -77,9 +77,9 @@ if (! function_exists('data_get')) {
             $segment = match ($segment) {
                 '\*' => '*',
                 '\{first}' => '{first}',
-                '{first}' => array_key_first($target),
+                '{first}' => array_key_first(iterator_to_array($target)),
                 '\{last}' => '{last}',
-                '{last}' => array_key_last($target),
+                '{last}' => array_key_last(iterator_to_array($target)),
                 default => $segment,
             };
 
