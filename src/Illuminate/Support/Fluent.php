@@ -103,7 +103,7 @@ class Fluent implements Arrayable, ArrayAccess, Jsonable, JsonSerializable
     /**
      * Convert the fluent instance to a Collection.
      *
-     * @param  TKey  $key
+     * @param  string  $key
      * @return \Illuminate\Support\Collection
      */
     public function collect($key = null)
