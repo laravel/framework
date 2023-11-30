@@ -16,8 +16,8 @@ class GeneratorCommandEventTest extends TestCase
             ->assertExitCode(0);
 
         Event::assertDispatched(StubCreated::class, function (StubCreated $stubCreatedEvent) {
-            $this->assertStringEndsWith('/stubs/console.stub', $stubCreatedEvent->stubPath);
-            $this->assertStringEndsWith('/app/Console/Commands/dispatchStubEventTest.php', $stubCreatedEvent->outputPath);
+            $this->assertStringEndsWith('/stubs/console.stub', str_replace(DIRECTORY_SEPARATOR, '/', $stubCreatedEvent->stubPath));
+            $this->assertStringEndsWith('/app/Console/Commands/dispatchStubEventTest.php', str_replace(DIRECTORY_SEPARATOR, '/', $stubCreatedEvent->outputPath));
 
             return true;
         });
