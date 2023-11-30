@@ -774,7 +774,7 @@ class Str
     public static function padLeft($value, $length, $pad = ' ')
     {
         if (function_exists('mb_str_pad')) {
-            return mb_str_pad($value, $length, $pad, STR_PAD_LEFT);
+            return mb_str_pad((string)$value, $length, $pad, STR_PAD_LEFT);
         }
 
         $short = max(0, $length - mb_strlen($value));
