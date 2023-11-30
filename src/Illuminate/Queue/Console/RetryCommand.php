@@ -72,8 +72,8 @@ class RetryCommand extends Command
         if (count($ids) === 1 && $ids[0] === 'all') {
             $failer = $this->laravel['queue.failer'];
 
-            return method_exists($failer, 'keys')
-                ? $failer->keys()
+            return method_exists($failer, 'ids')
+                ? $failer->ids()
                 : Arr::pluck($failer->all(), 'id');
         }
 
@@ -98,8 +98,8 @@ class RetryCommand extends Command
     {
         $failer = $this->laravel['queue.failer'];
 
-        $ids = method_exists($failer, 'keys')
-            ? $failer->keys($queue)
+        $ids = method_exists($failer, 'ids')
+            ? $failer->ids($queue)
             : collect($failer->all())
                 ->where('queue', $queue)
                 ->pluck('id')

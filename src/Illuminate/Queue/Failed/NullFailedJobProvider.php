@@ -19,12 +19,12 @@ class NullFailedJobProvider implements CountableFailedJobProvider, FailedJobProv
     }
 
     /**
-     * Get a list of all of IDs the failed jobs.
+     * Get the IDs of all of the failed jobs.
      *
      * @param  string|null  $queue
      * @return array
      */
-    public function keys($queue = null)
+    public function ids($queue = null)
     {
         return [];
     }
