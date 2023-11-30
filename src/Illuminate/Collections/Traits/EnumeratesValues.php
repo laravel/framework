@@ -11,13 +11,9 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Enumerable;
 use Illuminate\Support\HigherOrderCollectionProxy;
-use InvalidArgumentException;
 use JsonSerializable;
 use Symfony\Component\VarDumper\VarDumper;
-use Traversable;
 use UnexpectedValueException;
-use UnitEnum;
-use WeakMap;
 
 /**
  * @template TKey of array-key
