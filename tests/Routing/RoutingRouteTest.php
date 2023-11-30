@@ -982,18 +982,6 @@ class RoutingRouteTest extends TestCase
         $this->assertSame('TAYLOR', $router->dispatch(Request::create('foo/taylor', 'GET'))->getContent());
     }
 
-    public function testRouteBindingWithBindingClosure()
-    {
-        $router = $this->getRouter();
-        $router->get('foo/{bar}', ['middleware' => SubstituteBindings::class, 'uses' => function ($name) {
-            return $name;
-        }]);
-        $router->bind('bar', function ($value) {
-            return strtoupper($value);
-        });
-        $this->assertSame('TAYLOR', $router->dispatch(Request::create('foo/taylor', 'GET'))->getContent());
-    }
-
     public function testRouteClassBinding()
     {
         $router = $this->getRouter();
