@@ -141,9 +141,15 @@ class Number
      * @param  int|null  $maxPrecision
      * @return string
      */
-    public static function forHumans(int|float $number, int $precision = 0, ?int $maxPrecision = null)
+    public static function forHumans(int|float $number, int $precision = 0, ?int $maxPrecision = null, bool $abbreviate = false)
     {
-        return static::summarize($number, $precision, $maxPrecision, [
+        return static::summarize($number, $precision, $maxPrecision, $abbreviate ? [
+            3 => 'K',
+            6 => 'M',
+            9 => 'B',
+            12 => 'T',
+            15 => 'Q',
+        ] : [
             3 => ' thousand',
             6 => ' million',
             9 => ' billion',
@@ -153,14 +159,15 @@ class Number
     }
 
     /**
-     * Summarizes the number.
+     * Convert the number to its human readable equivalent.
      *
      * @param  int  $number
      * @param  int  $precision
      * @param  int|null  $maxPrecision
+     * @param  array  $units
      * @return string
      */
-    public static function summarize(int|float $number, int $precision = 0, ?int $maxPrecision = null, array $units = [])
+    protected static function summarize(int|float $number, int $precision = 0, ?int $maxPrecision = null, array $units = [])
     {
         if (empty($units)) {
             $units = [
