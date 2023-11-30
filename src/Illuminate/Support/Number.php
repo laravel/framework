@@ -143,28 +143,18 @@ class Number
      */
     public static function forHumans(int|float $number, int $precision = 0, ?int $maxPrecision = null)
     {
-        $units = [
-            3 => 'thousand',
-            6 => 'million',
-            9 => 'billion',
-            12 => 'trillion',
-            15 => 'quadrillion',
-        ];
-
-        switch (true) {
-            case $number === 0:
-                return '0';
-            case $number < 0:
-                return sprintf('-%s', static::forHumans(abs($number), $precision, $maxPrecision));
-            case $number >= 1e15:
-                return sprintf('%s quadrillion', static::forHumans($number / 1e15, $precision, $maxPrecision));
-        }
-
-        $numberExponent = floor(log10($number));
-        $displayExponent = $numberExponent - ($numberExponent % 3);
-        $number /= pow(10, $displayExponent);
-
-        return trim(sprintf('%s %s', static::format($number, $precision, $maxPrecision), $units[$displayExponent] ?? ''));
+        return static::summarize(
+            number: $number,
+            precision: $precision,
+            maxPrecision: $maxPrecision,
+            units: [
+                3 => ' thousand',
+                6 => ' million',
+                9 => ' billion',
+                12 => ' trillion',
+                15 => ' quadrillion',
+            ],
+        );
     }
 
     /**
@@ -175,23 +165,25 @@ class Number
      * @param  int|null  $maxPrecision
      * @return string
      */
-    public static function summarize(int|float $number, int $precision = 0, ?int $maxPrecision = null)
+    public static function summarize(int|float $number, int $precision = 0, ?int $maxPrecision = null, array $units = [])
     {
-        $units = [
-            3 => 'K',
-            6 => 'M',
-            9 => 'B',
-            12 => 'T',
-            15 => 'Q',
-        ];
+        if (empty($units)) {
+            $units = [
+                3 => 'K',
+                6 => 'M',
+                9 => 'B',
+                12 => 'T',
+                15 => 'Q',
+            ];
+        }
 
         switch (true) {
             case $number === 0:
                 return '0';
             case $number < 0:
-                return sprintf('-%s', static::forHumans(abs($number), $precision, $maxPrecision));
+                return sprintf('-%s', static::summarize(abs($number), $precision, $maxPrecision));
             case $number >= 1e15:
-                return sprintf('%sQ', static::forHumans($number / 1e15, $precision, $maxPrecision));
+                return sprintf('%sQ', static::summarize($number / 1e15, $precision, $maxPrecision));
         }
 
         $numberExponent = floor(log10($number));
