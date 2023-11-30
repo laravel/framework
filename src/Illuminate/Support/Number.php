@@ -26,7 +26,7 @@ class Number
      * @param  string|null  $locale
      * @return string|false
      */
-    public static function format(int|float $number, ?int $precision = null, ?int $maxPrecision = null, ?string $locale = null)
+    public static function format(int|float $number, ?int $precision = null, ?int $maxPrecision = null, ?string $locale = null): false|string
     {
         static::ensureIntlExtensionIsInstalled();
 
@@ -48,7 +48,7 @@ class Number
      * @param  string|null  $locale
      * @return string
      */
-    public static function spell(int|float $number, ?string $locale = null)
+    public static function spell(int|float $number, ?string $locale = null): string
     {
         static::ensureIntlExtensionIsInstalled();
 
@@ -64,7 +64,7 @@ class Number
      * @param  string|null  $locale
      * @return string
      */
-    public static function ordinal(int|float $number, ?string $locale = null)
+    public static function ordinal(int|float $number, ?string $locale = null): string
     {
         static::ensureIntlExtensionIsInstalled();
 
@@ -82,7 +82,7 @@ class Number
      * @param  string|null  $locale
      * @return string|false
      */
-    public static function percentage(int|float $number, int $precision = 0, ?int $maxPrecision = null, ?string $locale = null)
+    public static function percentage(int|float $number, int $precision = 0, ?int $maxPrecision = null, ?string $locale = null): false|string
     {
         static::ensureIntlExtensionIsInstalled();
 
@@ -105,7 +105,7 @@ class Number
      * @param  string|null  $locale
      * @return string|false
      */
-    public static function currency(int|float $number, string $in = 'USD', ?string $locale = null)
+    public static function currency(int|float $number, string $in = 'USD', ?string $locale = null): false|string
     {
         static::ensureIntlExtensionIsInstalled();
 
@@ -122,7 +122,7 @@ class Number
      * @param  int|null  $maxPrecision
      * @return string
      */
-    public static function fileSize(int|float $bytes, int $precision = 0, ?int $maxPrecision = null)
+    public static function fileSize(int|float $bytes, int $precision = 0, ?int $maxPrecision = null): string
     {
         $units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
 
@@ -134,22 +134,33 @@ class Number
     }
 
     /**
-     * Convert the number to its human readable equivalent.
+     * Convert the number to its human-readable equivalent.
      *
-     * @param  int  $number
-     * @param  int  $precision
-     * @param  int|null  $maxPrecision
+     * @param int|float $number
+     * @param int $precision
+     * @param int|null $maxPrecision
+     * @param bool $shortened
      * @return string
      */
-    public static function forHumans(int|float $number, int $precision = 0, ?int $maxPrecision = null)
+    public static function forHumans(int|float $number, int $precision = 0, ?int $maxPrecision = null, bool $shortened = false): string
     {
-        $units = [
+        $unitsFull = [
             3 => 'thousand',
             6 => 'million',
             9 => 'billion',
             12 => 'trillion',
             15 => 'quadrillion',
         ];
+
+        $unitsShort = [
+            3 => 'K',
+            6 => 'M',
+            9 => 'B',
+            12 => 'T',
+            15 => 'Q',
+        ];
+
+        $units = $shortened ? $unitsShort : $unitsFull;
 
         switch (true) {
             case $number === 0:
@@ -174,7 +185,7 @@ class Number
      * @param  callable  $callback
      * @return mixed
      */
-    public static function withLocale(string $locale, callable $callback)
+    public static function withLocale(string $locale, callable $callback): mixed
     {
         $previousLocale = static::$locale;
 
@@ -189,17 +200,17 @@ class Number
      * @param  string  $locale
      * @return void
      */
-    public static function useLocale(string $locale)
+    public static function useLocale(string $locale): void
     {
         static::$locale = $locale;
     }
 
     /**
-     * Ensure the "intl" PHP exntension is installed.
+     * Ensure the "intl" PHP extension is installed.
      *
      * @return void
      */
-    protected static function ensureIntlExtensionIsInstalled()
+    protected static function ensureIntlExtensionIsInstalled(): void
     {
         if (! extension_loaded('intl')) {
             throw new RuntimeException('The "intl" PHP extension is required to use this method.');
