@@ -47,7 +47,7 @@ class RetryBatchCommand extends Command implements Isolatable
 
         if ($this->option('resume')) {
             $this->components->info("Resuming job batch [$id].");
-
+            $batch->resume();
         }
 
         $this->components->info("Pushing failed queue jobs of the batch [$id] back onto the queue.");
