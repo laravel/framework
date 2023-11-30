@@ -222,6 +222,20 @@ class DatabaseBatchRepository implements PrunableBatchRepository
     }
 
     /**
+     * Resume the batch that has the given ID.
+     *
+     * @param  string  $batchId
+     * @return void
+     */
+    public function resume(string $batchId)
+    {
+        $this->connection->table($this->table)->where('id', $batchId)->update([
+            'cancelled_at' => null,
+            'finished_at' => null,
+        ]);
+    }
+
+    /**
      * Delete the batch that has the given ID.
      *
      * @param  string  $batchId
