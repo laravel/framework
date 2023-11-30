@@ -958,11 +958,10 @@ class Router implements BindingRegistrar, RegistrarContract
     {
         $default = fn () => ImplicitRouteBinding::resolveForRoute($this->container, $route);
 
-        if ($this->implicitBindingCallback) {
-            return call_user_func($this->implicitBindingCallback, $this->container, $route, $default);
-        }
+        return call_user_func(
+            $this->implicitBindingCallback ?? $default, $this->container, $route, $default
+        );
 
-        return $default();
     }
 
     /**
