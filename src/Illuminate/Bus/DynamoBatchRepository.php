@@ -382,6 +382,15 @@ class DynamoBatchRepository implements BatchRepository
     }
 
     /**
+     * Does nothing as DynamoDB does not support transactions.
+     *
+     * @return void
+     */
+    public function rollBack()
+    {
+    }
+
+    /**
      * Serialize the given value.
      *
      * @param  mixed  $value
