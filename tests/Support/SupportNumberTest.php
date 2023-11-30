@@ -242,8 +242,8 @@ class SupportNumberTest extends TestCase
         $this->assertSame('1MQ', Number::summarize(1000000000000000000000));
         $this->assertSame('1BQ', Number::summarize(1000000000000000000000000));
         $this->assertSame('1TQ', Number::summarize(1000000000000000000000000000));
-        $this->assertSame('1Q', Number::summarize(1000000000000000000000000000000));
-        $this->assertSame('1KQ', Number::summarize(1000000000000000000000000000000000));
+        $this->assertSame('1QQ', Number::summarize(1000000000000000000000000000000));
+        $this->assertSame('1KQQ', Number::summarize(1000000000000000000000000000000000));
 
         $this->assertSame('0', Number::summarize(0));
         $this->assertSame('-1', Number::summarize(-1));
