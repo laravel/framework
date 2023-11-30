@@ -67,6 +67,22 @@ class DatabaseUuidFailedJobProvider implements CountableFailedJobProvider, Faile
         return $uuid;
     }
 
+
+    /**
+     * Get a list of all of IDs the failed jobs.
+     *
+     * @param  string|null  $queue
+     * @return array
+     */
+    public function keys($queue = null)
+    {
+        return $this->getTable()
+            ->when(! is_null($queue), fn ($query) => $query->where('queue', $queue))
+            ->orderBy('id', 'desc')
+            ->pluck('uuid')
+            ->all();
+    }
+
     /**
      * Get a list of all of the failed jobs.
      *

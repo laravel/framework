@@ -79,6 +79,20 @@ class FileFailedJobProvider implements CountableFailedJobProvider, FailedJobProv
     }
 
     /**
+     * Get a list of all of IDs the failed jobs.
+     *
+     * @param  string|null  $queue
+     * @return array
+     */
+    public function keys($queue = null)
+    {
+        return collect($this->all())
+            ->when(! is_null($queue), fn ($collect) => $collect->where('queue', $queue))
+            ->pluck('id')
+            ->all();
+    }
+
+    /**
      * Get a list of all of the failed jobs.
      *
      * @return array
