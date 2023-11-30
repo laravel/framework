@@ -143,18 +143,13 @@ class Number
      */
     public static function forHumans(int|float $number, int $precision = 0, ?int $maxPrecision = null)
     {
-        return static::summarize(
-            number: $number,
-            precision: $precision,
-            maxPrecision: $maxPrecision,
-            units: [
-                3 => ' thousand',
-                6 => ' million',
-                9 => ' billion',
-                12 => ' trillion',
-                15 => ' quadrillion',
-            ],
-        );
+        return static::summarize($number, $precision, $maxPrecision, [
+            3 => ' thousand',
+            6 => ' million',
+            9 => ' billion',
+            12 => ' trillion',
+            15 => ' quadrillion',
+        ]);
     }
 
     /**
