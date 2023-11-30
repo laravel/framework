@@ -120,11 +120,11 @@ class Router implements BindingRegistrar, RegistrarContract
     protected $groupStack = [];
 
     /**
-     * All of the registered implicit binding callbacks.
+     * The registered custom implicit binding callback.
      *
      * @var array
      */
-    protected $implicitBindingCallbacks = [];
+    protected $implicitBindingCallback;
 
     /**
      * All of the verbs supported by the router.
@@ -956,22 +956,26 @@ class Router implements BindingRegistrar, RegistrarContract
      */
     public function substituteImplicitBindings($route)
     {
-        ImplicitRouteBinding::resolveForRoute($this->container, $route);
+        $default = fn () => ImplicitRouteBinding::resolveForRoute($this->container, $route);
 
-        foreach ($this->implicitBindingCallbacks as $callback) {
-            call_user_func($callback, $route);
+        if ($this->implicitBindingCallback) {
+            return call_user_func($this->implicitBindingCallback, $this->container, $route, $default);
         }
+
+        return $default();
     }
 
     /**
      * Register a callback to to run after implicit bindings are substituted.
      *
      * @param  callable  $callback
-     * @return void
+     * @return $this
      */
     public function substituteImplicitBindingsUsing($callback)
     {
-        $this->implicitBindingCallbacks[] = $callback;
+        $this->implicitBindingCallback = $callback;
+
+        return $this;
     }
 
     /**

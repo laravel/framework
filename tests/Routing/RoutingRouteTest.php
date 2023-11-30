@@ -1760,7 +1760,9 @@ class RoutingRouteTest extends TestCase
     {
         $router = $this->getRouter();
 
-        $router->substituteImplicitBindingsUsing(function ($route) {
+        $router->substituteImplicitBindingsUsing(function ($container, $route, $default) {
+            $default = $default();
+
             $model = $route->parameter('bar');
             $model->value = 'otwell';
         });
