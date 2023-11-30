@@ -634,7 +634,7 @@ trait EnumeratesValues
      */
     public function whereIn($key, $values, $strict = false)
     {
-        $values = Arr::from($values);
+        $values = $this->getArrayableItems($values);
 
         return $this->filter(fn ($item) => in_array(data_get($item, $key), $values, $strict));
     }
@@ -687,7 +687,7 @@ trait EnumeratesValues
      */
     public function whereNotIn($key, $values, $strict = false)
     {
-        $values = Arr::from($values);
+        $values = $this->getArrayableItems($values);
 
         return $this->reject(fn ($item) => in_array(data_get($item, $key), $values, $strict));
     }
@@ -1012,8 +1012,6 @@ trait EnumeratesValues
 
     /**
      * Results array of items from Collection or Arrayable.
-     *
-     * @deprecated Will be removed in a future Laravel version.
      *
      * @param  mixed  $items
      * @return array<TKey, TValue>
