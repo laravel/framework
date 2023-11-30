@@ -98,7 +98,7 @@ class Number
     }
 
     /**
-     * Convert the given number to its currency equivalent.for
+     * Convert the given number to its currency equivalent.
      *
      * @param  int|float  $number
      * @param  string  $in
@@ -168,7 +168,7 @@ class Number
     }
 
     /**
-     * Convert the number to its human readable equivalent.
+     * Summarizes the number.
      *
      * @param  int  $number
      * @param  int  $precision
