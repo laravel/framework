@@ -208,6 +208,59 @@ class SupportNumberTest extends TestCase
         $this->assertSame('-1 thousand quadrillion', Number::forHumans(-1000000000000000000));
     }
 
+    public function testSummarize()
+    {
+        $this->assertSame('1', Number::forHumans(1));
+        $this->assertSame('1.00', Number::forHumans(1, precision: 2));
+        $this->assertSame('10', Number::forHumans(10));
+        $this->assertSame('100', Number::forHumans(100));
+        $this->assertSame('1K', Number::forHumans(1000));
+        $this->assertSame('1.00K', Number::forHumans(1000, precision: 2));
+        $this->assertSame('1K', Number::forHumans(1000, maxPrecision: 2));
+        $this->assertSame('1K', Number::forHumans(1230));
+        $this->assertSame('1.2K', Number::forHumans(1230, maxPrecision: 1));
+        $this->assertSame('1M', Number::forHumans(1000000));
+        $this->assertSame('1B', Number::forHumans(1000000000));
+        $this->assertSame('1T', Number::forHumans(1000000000000));
+        $this->assertSame('1Q', Number::forHumans(1000000000000000));
+        $this->assertSame('1KQ', Number::forHumans(1000000000000000000));
+
+        $this->assertSame('123', Number::forHumans(123));
+        $this->assertSame('1K', Number::forHumans(1234));
+        $this->assertSame('1.23K', Number::forHumans(1234, precision: 2));
+        $this->assertSame('12K', Number::forHumans(12345));
+        $this->assertSame('1M', Number::forHumans(1234567));
+        $this->assertSame('1B', Number::forHumans(1234567890));
+        $this->assertSame('1T', Number::forHumans(1234567890123));
+        $this->assertSame('1.23T', Number::forHumans(1234567890123, precision: 2));
+        $this->assertSame('1Q', Number::forHumans(1234567890123456));
+        $this->assertSame('1.23KQ', Number::forHumans(1234567890123456789, precision: 2));
+        $this->assertSame('490K', Number::forHumans(489939));
+        $this->assertSame('489.9390K', Number::forHumans(489939, precision: 4));
+        $this->assertSame('500.00000M', Number::forHumans(500000000, precision: 5));
+
+        $this->assertSame('1MQ', Number::forHumans(1000000000000000000000));
+        $this->assertSame('1BQ', Number::forHumans(1000000000000000000000000));
+        $this->assertSame('1TQ', Number::forHumans(1000000000000000000000000000));
+        $this->assertSame('1Q', Number::forHumans(1000000000000000000000000000000));
+        $this->assertSame('1KQ', Number::forHumans(1000000000000000000000000000000000));
+
+        $this->assertSame('0', Number::forHumans(0));
+        $this->assertSame('-1', Number::forHumans(-1));
+        $this->assertSame('-1.00', Number::forHumans(-1, precision: 2));
+        $this->assertSame('-10', Number::forHumans(-10));
+        $this->assertSame('-100', Number::forHumans(-100));
+        $this->assertSame('-1K', Number::forHumans(-1000));
+        $this->assertSame('-1.23K', Number::forHumans(-1234, precision: 2));
+        $this->assertSame('-1.2K', Number::forHumans(-1234, maxPrecision: 1));
+        $this->assertSame('-1M', Number::forHumans(-1000000));
+        $this->assertSame('-1B', Number::forHumans(-1000000000));
+        $this->assertSame('-1T', Number::forHumans(-1000000000000));
+        $this->assertSame('-1.1T', Number::forHumans(-1100000000000, maxPrecision: 1));
+        $this->assertSame('-1Q', Number::forHumans(-1000000000000000));
+        $this->assertSame('-1KQ', Number::forHumans(-1000000000000000000));
+    }
+
     protected function needsIntlExtension()
     {
         if (! extension_loaded('intl')) {

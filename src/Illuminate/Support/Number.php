@@ -98,7 +98,7 @@ class Number
     }
 
     /**
-     * Convert the given number to its currency equivalent.
+     * Convert the given number to its currency equivalent.for
      *
      * @param  int|float  $number
      * @param  string  $in
@@ -165,6 +165,40 @@ class Number
         $number /= pow(10, $displayExponent);
 
         return trim(sprintf('%s %s', static::format($number, $precision, $maxPrecision), $units[$displayExponent] ?? ''));
+    }
+
+    /**
+     * Convert the number to its human readable equivalent.
+     *
+     * @param  int  $number
+     * @param  int  $precision
+     * @param  int|null  $maxPrecision
+     * @return string
+     */
+    public static function summarize(int|float $number, int $precision = 0, ?int $maxPrecision = null)
+    {
+        $units = [
+            3 => 'K',
+            6 => 'M',
+            9 => 'B',
+            12 => 'T',
+            15 => 'Q',
+        ];
+
+        switch (true) {
+            case $number === 0:
+                return '0';
+            case $number < 0:
+                return sprintf('-%s', static::forHumans(abs($number), $precision, $maxPrecision));
+            case $number >= 1e15:
+                return sprintf('%sQ', static::forHumans($number / 1e15, $precision, $maxPrecision));
+        }
+
+        $numberExponent = floor(log10($number));
+        $displayExponent = $numberExponent - ($numberExponent % 3);
+        $number /= pow(10, $displayExponent);
+
+        return trim(sprintf('%s%s', static::format($number, $precision, $maxPrecision), $units[$displayExponent] ?? ''));
     }
 
     /**
