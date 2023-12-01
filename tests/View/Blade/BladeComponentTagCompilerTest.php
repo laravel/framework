@@ -731,6 +731,55 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         ob_get_clean();
 
         $this->assertNull($attributes->get('userId'));
+    }
+
+    public function testOriginalAttributesAreRestoredAfterRenderingChildComponentWithProps()
+    {
+        $container = new Container;
+        $container->instance(Application::class, $app = m::mock(Application::class));
+        $container->instance(Factory::class, $factory = m::mock(Factory::class));
+        $container->alias(Factory::class, 'view');
+        $app->shouldReceive('getNamespace')->never()->andReturn('App\\');
+        $factory->shouldReceive('exists')->never();
+
+        Container::setInstance($container);
+
+        $attributes = new ComponentAttributeBag(['userId' => 'bar', 'other' => 'ok']);
+
+        $containerComponent = m::mock(Component::class);
+        $containerComponent->shouldReceive('withName')->with('container')->once();
+        $containerComponent->shouldReceive('shouldRender')->once()->andReturn(true);
+        $containerComponent->shouldReceive('resolveView')->once()->andReturn('');
+        $containerComponent->shouldReceive('data')->once()->andReturn([]);
+        $containerComponent->shouldReceive('withAttributes')->once();
+
+        $profileComponent = m::mock(Component::class);
+        $profileComponent->shouldReceive('withName')->with('profile')->once();
+        $profileComponent->shouldReceive('shouldRender')->once()->andReturn(true);
+        $profileComponent->shouldReceive('resolveView')->once()->andReturn('');
+        $profileComponent->shouldReceive('data')->once()->andReturn([]);
+        $profileComponent->shouldReceive('withAttributes')->once();
+
+        Component::resolveComponentsUsing(fn ($component) => match ($component) {
+            TestContainerComponent::class => $containerComponent,
+            TestProfileComponent::class => $profileComponent,
+        });
+
+        $__env = m::mock(\Illuminate\View\Factory::class);
+        $__env->shouldReceive('startComponent')->twice();
+        $__env->shouldReceive('renderComponent')->twice();
+
+        $template = $this->compiler([
+            'container' => TestContainerComponent::class,
+            'profile' => TestProfileComponent::class,
+        ])->compileTags('<x-container><x-profile {{ $attributes }} /></x-container>');
+        $template = $this->compiler->compileString($template);
+
+        ob_start();
+        eval(" ?> $template <?php ");
+        ob_get_clean();
+
+        $this->assertNotNull($attributes->get('userId'), 'bar');
         $this->assertSame($attributes->get('other'), 'ok');
     }
 
@@ -795,5 +844,13 @@ class TestInputComponent extends Component
     public function render()
     {
         return 'input';
+    }
+}
+
+class TestContainerComponent extends Component
+{
+    public function render()
+    {
+        return 'container';
     }
 }
