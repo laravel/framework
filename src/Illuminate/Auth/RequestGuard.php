@@ -26,6 +26,13 @@ class RequestGuard implements Guard
     protected $request;
 
     /**
+     * Indicates if a token user retrieval has been attempted.
+     *
+     * @var bool
+     */
+    protected $recallAttempted = false;
+
+    /**
      * Create a new authentication guard.
      *
      * @param  callable  $callback
@@ -50,9 +57,11 @@ class RequestGuard implements Guard
         // If we've already retrieved the user for the current request we can just
         // return it back immediately. We do not want to fetch the user data on
         // every call to this method because that would be tremendously slow.
-        if (! is_null($this->user)) {
+        if (! is_null($this->user) || $this->recallAttempted) {
             return $this->user;
         }
+
+        $this->recallAttempted = true;
 
         return $this->user = call_user_func(
             $this->callback, $this->request, $this->getProvider()

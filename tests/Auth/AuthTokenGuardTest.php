@@ -64,6 +64,20 @@ class AuthTokenGuardTest extends TestCase
         $this->assertSame(1, $user->id);
     }
 
+    public function testUserDoesntCallRetrieveByCredentialMoreThanOnceWhenGivenAuthentication()
+    {
+        $provider = m::mock(UserProvider::class);
+        $provider->shouldReceive('retrieveByCredentials')->once()->with(['api_token' => 'foo'])->andReturnNull();
+        $request = Request::create('/', 'GET', ['api_token' => 'foo']);
+
+        $guard = new TokenGuard($provider, $request);
+
+        $this->assertNull($guard->user());
+
+        // Ensure mocked provider.retrieveByCredential expectation only called once.
+        $this->assertNull($guard->user());
+    }
+
     public function testUserCanBeRetrievedByBearerToken()
     {
         $provider = m::mock(UserProvider::class);

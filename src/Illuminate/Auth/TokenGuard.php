@@ -39,6 +39,13 @@ class TokenGuard implements Guard
     protected $hash = false;
 
     /**
+     * Indicates if a token user retrieval has been attempted.
+     *
+     * @var bool
+     */
+    protected $recallAttempted = false;
+
+    /**
      * Create a new authentication guard.
      *
      * @param  \Illuminate\Contracts\Auth\UserProvider  $provider
@@ -72,9 +79,11 @@ class TokenGuard implements Guard
         // If we've already retrieved the user for the current request we can just
         // return it back immediately. We do not want to fetch the user data on
         // every call to this method because that would be tremendously slow.
-        if (! is_null($this->user)) {
+        if (! is_null($this->user) || $this->recallAttempted) {
             return $this->user;
         }
+
+        $this->recallAttempted = true;
 
         $user = null;
 
