@@ -106,7 +106,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     public $exists = false;
 
     /**
-     * Indicates if the model was inserted during the current request lifecycle.
+     * Indicates if the model was inserted during the object's lifecycle.
      *
      * @var bool
      */
