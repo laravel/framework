@@ -77,7 +77,7 @@ class ProviderMakeCommand extends GeneratorCommand
     {
         return [
             ['force', 'f', InputOption::VALUE_NONE, 'Create the class even if the provider already exists'],
-            ['deferred', null, InputOption::VALUE_NONE, "Indicates the provider should be deferred"]
+            ['deferred', null, InputOption::VALUE_NONE, "Indicates the provider should be deferred"],
         ];
     }
 }
