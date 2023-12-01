@@ -136,11 +136,11 @@ class SQLiteGrammar extends Grammar
     public function compileIndexes($table)
     {
         return sprintf(
-            'select -1 as seq, "primary" as name, group_concat(col) as columns, 1 as "unique", 1 as "primary" '
-            .'from (select name as col from pragma_table_info(%s) where pk > 0 order by pk, cid) group by seq '
-            .'union select seq, name, group_concat(col) as columns, "unique", origin = "pk" as "primary" '
+            'select "primary" as name, group_concat(col) as columns, 1 as "unique", 1 as "primary" '
+            .'from (select name as col from pragma_table_info(%s) where pk > 0 order by pk, cid) group by name '
+            .'union select name, group_concat(col) as columns, "unique", origin = "pk" as "primary" '
             .'from (select il.*, ii.name as col from pragma_index_list(%s) il, pragma_index_info(il.name) ii order by il.seq, ii.seqno) '
-            .'group by name order by seq',
+            .'group by name, "unique", "primary"',
             $table = $this->wrap(str_replace('.', '__', $table)),
             $table
         );
