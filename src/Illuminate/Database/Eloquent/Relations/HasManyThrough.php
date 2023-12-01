@@ -297,7 +297,7 @@ class HasManyThrough extends Relation
     }
 
     /**
-     * Create or update a record matching the attributes, and fill it with updateValues or insertValues.
+     * Create or update a related record matching the attributes, and fill it with updateValues or insertValues.
      *
      * If the record exists, it will be updated with the provided $updateValues.
      * If the record doesn't exist, a new record will be created with merged $attributes and $insertValues.
