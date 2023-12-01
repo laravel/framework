@@ -2,17 +2,13 @@
 
 namespace Illuminate\Tests\Support;
 
-use ArrayIterator;
 use ArrayObject;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use InvalidArgumentException;
-use IteratorAggregate;
-use JsonSerializable;
 use PHPUnit\Framework\TestCase;
 use stdClass;
-use Traversable;
 
 include_once 'Common.php';
 
@@ -1248,33 +1244,5 @@ class SupportArrTest extends TestCase
                 'key' => 1,
             ],
         ], Arr::prependKeysWith($array, 'test.'));
-    }
-}
-
-class TestJsonSerializeWithScalarValueObject implements JsonSerializable
-{
-    public function jsonSerialize(): string
-    {
-        return 'foo';
-    }
-}
-
-class TestTraversableAndJsonSerializableObject implements IteratorAggregate, JsonSerializable
-{
-    public $items;
-
-    public function __construct($items)
-    {
-        $this->items = $items;
-    }
-
-    public function getIterator(): Traversable
-    {
-        return new ArrayIterator($this->items);
-    }
-
-    public function jsonSerialize(): array
-    {
-        return json_decode(json_encode($this->items), true);
     }
 }
