@@ -779,7 +779,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         eval(" ?> $template <?php ");
         ob_get_clean();
 
-        $this->assertNotNull($attributes->get('userId'), 'bar');
+        $this->assertSame($attributes->get('userId'), 'bar');
         $this->assertSame($attributes->get('other'), 'ok');
     }
 
