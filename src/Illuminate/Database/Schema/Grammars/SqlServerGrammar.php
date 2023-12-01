@@ -176,7 +176,7 @@ class SqlServerGrammar extends Grammar
     public function compileIndexes($table)
     {
         return sprintf(
-            "select idx.name as name, STRING_AGG(col.name, ',') within group (order by idxcol.key_ordinal) as columns, "
+            "select idx.name as name, string_agg(col.name, ',') within group (order by idxcol.key_ordinal) as columns, "
             .'idx.type_desc as [type], idx.is_unique as [unique], idx.is_primary_key as [primary] '
             .'from sys.indexes as idx '
             .'join sys.tables as tbl on idx.object_id = tbl.object_id '
