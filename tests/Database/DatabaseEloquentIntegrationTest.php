@@ -86,7 +86,6 @@ class DatabaseEloquentIntegrationTest extends TestCase
                 $table->string('name')->nullable();
                 $table->string('email');
                 $table->timestamp('birthday', 6)->nullable();
-                $table->string('status')->nullable();
                 $table->timestamps();
             });
 
@@ -617,27 +616,29 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
     public function testUpdateOrCreateWithSeparateUpdateAndInsertFields()
     {
-        $user1 = EloquentTestUser::create(['email' => 'taylorotwell@gmail.com','status' => 'inactive']);
+        $birthday = '1998-12-01 09:25:00';
+        $user1 = EloquentTestUser::create(['email' => 'taylorotwell@gmail.com', 'birthday' => $birthday]);
 
         $user2 = EloquentTestUser::updateOrCreate(
             ['email' => 'taylorotwell@gmail.com'],
             ['name' => 'Taylor Otwell'],
-            ['name' => 'Taylor Otwell' , 'status' => 'active']
+            ['name' => 'Taylor Otwell' , 'birthday' => '2000-05-10 16:00:00']
         );
 
         $this->assertEquals($user1->id, $user2->id);
         $this->assertSame('taylorotwell@gmail.com', $user2->email);
         $this->assertSame('Taylor Otwell', $user2->name);
-        $this->assertSame('inactive', $user2->status);
+        $this->assertSame($birthday, (string) $user2->birthday);
 
+        $birthday = '1996-05-10 16:00:00';
         $user3 = EloquentTestUser::updateOrCreate(
             ['email' => 'test@gmail.com'],
             ['name' => 'behnam'],
-            ['name' => 'behnam' , 'status' => 'active']
+            ['name' => 'behnam' , 'birthday' => $birthday]
         );
 
         $this->assertSame('behnam', $user3->name);
-        $this->assertSame('active', $user3->status);
+        $this->assertSame($birthday, (string) $user3->birthday);
         $this->assertEquals(2, EloquentTestUser::count());
     }
 
