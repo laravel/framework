@@ -236,6 +236,30 @@ class Number
     }
 
     /**
+     * Calculate the harmonic mean of a set of numbers.
+     *
+     * @param int|float ...$numbers An indefinite number of numeric arguments
+     * @return float Harmonic mean of the numbers
+     * @throws InvalidArgumentException If the arguments are empty, non-numeric, or contain zero values.
+     */
+    public static function harmonize(int|float ...$numbers): float 
+    {
+        if (empty($numbers)) {
+            throw new InvalidArgumentException("Arguments cannot be empty");
+        }
+
+        $sumOfReciprocals = 0;
+        foreach ($numbers as $number) {
+            if (!is_numeric($number) || $number <= 0) {
+                throw new InvalidArgumentException("All elements must be positive numbers");
+            }
+            $sumOfReciprocals += 1 / $number;
+        }
+
+        return count($numbers) / $sumOfReciprocals;
+    }
+
+    /**
      * Ensure the "intl" PHP exntension is installed.
      *
      * @return void
