@@ -715,7 +715,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         $component->shouldReceive('shouldRender')->once()->andReturn(true);
         $component->shouldReceive('resolveView')->once()->andReturn('');
         $component->shouldReceive('data')->once()->andReturn([]);
-        $component->shouldReceive('withAttributes')->once();
+        $component->shouldReceive('withAttributes')->with(['attributes' => new ComponentAttributeBag(['other' => 'ok'])])->once();
 
         Component::resolveComponentsUsing(fn () => $component);
 
@@ -730,7 +730,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         eval(" ?> $template <?php ");
         ob_get_clean();
 
-        $this->assertNull($attributes->get('userId'));
+        $this->assertSame($attributes->get('other'), 'ok');
     }
 
     public function testOriginalAttributesAreRestoredAfterRenderingChildComponentWithProps()
