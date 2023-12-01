@@ -587,17 +587,26 @@ class Builder implements BuilderContract
     }
 
     /**
-     * Create or update a record matching the attributes, and fill it with values.
+     * Create or update a record matching the attributes, and fill it with updateValues or insertValues.
      *
-     * @param  array  $attributes
-     * @param  array  $values
+     * If the record exists, it will be updated with the provided $updateValues.
+     * If the record doesn't exist, a new record will be created with merged $attributes and $insertValues.
+     *
+     * @param array $attributes
+     * @param array $updateValues
+     * @param array $insertValues
      * @return \Illuminate\Database\Eloquent\Model|static
      */
-    public function updateOrCreate(array $attributes, array $values = [])
+    public function updateOrCreate(array $attributes, array $updateValues = [], array $insertValues = [])
     {
-        return tap($this->firstOrCreate($attributes, $values), function ($instance) use ($values) {
+        // If $insertValues is not provided, use $updateValues as $insertValues
+        if (empty($insertValues)) {
+            $insertValues = $updateValues;
+        }
+
+        return tap($this->firstOrCreate($attributes, $insertValues), function ($instance) use ($updateValues) {
             if (! $instance->wasRecentlyCreated) {
-                $instance->fill($values)->save();
+                $instance->fill($updateValues)->save();
             }
         });
     }

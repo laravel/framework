@@ -662,19 +662,28 @@ class BelongsToMany extends Relation
     }
 
     /**
-     * Create or update a related record matching the attributes, and fill it with values.
+     * Create or update a related record matching the attributes, and fill it with updateValues or insertValues.
+     *
+     * If the record exists, it will be updated with the provided $updateValues.
+     * If the record doesn't exist, a new record will be created with merged $attributes and $insertValues.
      *
      * @param  array  $attributes
-     * @param  array  $values
+     * @param  array $updateValues
      * @param  array  $joining
      * @param  bool  $touch
+     * @param  array $insertValues
      * @return \Illuminate\Database\Eloquent\Model
      */
-    public function updateOrCreate(array $attributes, array $values = [], array $joining = [], $touch = true)
+    public function updateOrCreate(array $attributes, array $updateValues = [], array $joining = [], bool $touch = true, array $insertValues = [])
     {
-        return tap($this->firstOrCreate($attributes, $values, $joining, $touch), function ($instance) use ($values) {
+        // If $insertValues is not provided, use $updateValues as $insertValues
+        if (empty($insertValues)) {
+            $insertValues = $updateValues;
+        }
+
+        return tap($this->firstOrCreate($attributes, $insertValues, $joining, $touch), function ($instance) use ($updateValues) {
             if (! $instance->wasRecentlyCreated) {
-                $instance->fill($values);
+                $instance->fill($updateValues);
 
                 $instance->save(['touch' => false]);
             }
