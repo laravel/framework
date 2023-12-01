@@ -758,7 +758,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         $profileComponent->shouldReceive('shouldRender')->once()->andReturn(true);
         $profileComponent->shouldReceive('resolveView')->once()->andReturn('');
         $profileComponent->shouldReceive('data')->once()->andReturn([]);
-        $profileComponent->shouldReceive('withAttributes')->once();
+        $profileComponent->shouldReceive('withAttributes')->with(['attributes' => new ComponentAttributeBag(['other' => 'ok'])])->once();
 
         Component::resolveComponentsUsing(fn ($component) => match ($component) {
             TestContainerComponent::class => $containerComponent,
