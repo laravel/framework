@@ -37,6 +37,10 @@ class ProviderMakeCommand extends GeneratorCommand
      */
     protected function getStub()
     {
+        if ($this->option('deferred')) {
+            return $this->resolveStubPath('/stubs/provider-deferred.stub');
+        }
+
         return $this->resolveStubPath('/stubs/provider.stub');
     }
 
@@ -50,7 +54,7 @@ class ProviderMakeCommand extends GeneratorCommand
     {
         return file_exists($customPath = $this->laravel->basePath(trim($stub, '/')))
             ? $customPath
-            : __DIR__.$stub;
+            : __DIR__ . $stub;
     }
 
     /**
@@ -61,7 +65,7 @@ class ProviderMakeCommand extends GeneratorCommand
      */
     protected function getDefaultNamespace($rootNamespace)
     {
-        return $rootNamespace.'\Providers';
+        return $rootNamespace . '\Providers';
     }
 
     /**
