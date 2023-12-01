@@ -182,7 +182,7 @@ class PostgresGrammar extends Grammar
             .'join pg_am am on am.oid = ic.relam '
             .'join unnest(i.indkey) with ordinality as indseq(num, ord) on true '
             .'left join pg_attribute a on a.attrelid = i.indrelid and a.attnum = indseq.num '
-            .'where tc.relname = % and tn.nspname = %s '
+            .'where tc.relname = %s and tn.nspname = %s '
             .'group by ic.relname, am.amname, i.indisunique, i.indisprimary',
             $this->quoteString($table),
             $this->quoteString($schema)

@@ -248,7 +248,7 @@ class SchemaBuilderTest extends DatabaseTestCase
             $table->fulltext(['body', 'title']);
         });
 
-        $indexes = Schema::getIndexes('foo');
+        $indexes = Schema::getIndexes('articles');
 
         $this->assertCount(2, $indexes);
         $this->assertTrue(collect($indexes)->contains(fn ($index) => $index['columns'] === ['id'] && $index['primary']));
