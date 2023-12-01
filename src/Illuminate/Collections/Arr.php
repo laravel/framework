@@ -18,7 +18,7 @@ class Arr
     use Macroable;
 
     /**
-     * Results array of items from Collection or Arrayable.
+     * Get the underlying array of items from the given argument.
      *
      * @param  mixed  $items
      * @return array
@@ -30,7 +30,7 @@ class Arr
         }
 
         return match (true) {
-            $items instanceof WeakMap => throw new InvalidArgumentException('Arrays can not be created using instances of WeakMap.'),
+            $items instanceof WeakMap => throw new InvalidArgumentException('Arrays cannot be extracted from instances of WeakMap.'),
             $items instanceof Enumerable => $items->all(),
             $items instanceof Arrayable => $items->toArray(),
             $items instanceof Traversable => iterator_to_array($items),
