@@ -39,6 +39,7 @@ use LogicException;
 use ReflectionClass;
 use ReflectionMethod;
 use ReflectionNamedType;
+use RuntimeException;
 
 trait HasAttributes
 {
@@ -1316,7 +1317,19 @@ trait HasAttributes
      */
     protected function castAttributeAsHashedString($key, $value)
     {
-        return $value !== null && ! Hash::isHashed($value) ? Hash::make($value) : $value;
+        if ($value === null) {
+            return null;
+        }
+
+        if (! Hash::isHashed($value)) {
+            return Hash::make($value);
+        }
+
+        if (! Hash::verifyConfiguration($value)) {
+            throw new RuntimeException("Could not verify the hashed value's configuration.");
+        }
+
+        return $value;
     }
 
     /**
@@ -2023,6 +2036,16 @@ trait HasAttributes
         }
 
         return $dirty;
+    }
+
+    /**
+     * Get the attributes that have been changed since the last sync for an update operation.
+     *
+     * @return array
+     */
+    protected function getDirtyForUpdate()
+    {
+        return $this->getDirty();
     }
 
     /**

@@ -91,7 +91,7 @@ if (! function_exists('class_uses_recursive')) {
 
         $results = [];
 
-        foreach (array_reverse(class_parents($class)) + [$class => $class] as $class) {
+        foreach (array_reverse(class_parents($class) ?: []) + [$class => $class] as $class) {
             $results += trait_uses_recursive($class);
         }
 

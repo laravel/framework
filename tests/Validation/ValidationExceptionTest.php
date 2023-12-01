@@ -87,11 +87,26 @@ class ValidationExceptionTest extends TestCase
         $this->assertNull($exception->getResponse());
     }
 
+    public function testGetExceptionClassFromValidator()
+    {
+        $validator = $this->getValidator();
+
+        $exception = $validator->getException();
+
+        $this->assertEquals(ValidationException::class, $exception);
+    }
+
     protected function getException($data = [], $rules = [])
     {
-        $translator = new Translator(new ArrayLoader, 'en');
-        $validator = new Validator($translator, $data, $rules);
+        $validator = $this->getValidator($data, $rules);
 
         return new ValidationException($validator);
+    }
+
+    protected function getValidator($data = [], $rules = [])
+    {
+        $translator = new Translator(new ArrayLoader, 'en');
+
+        return new Validator($translator, $data, $rules);
     }
 }

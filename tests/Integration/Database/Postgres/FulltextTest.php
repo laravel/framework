@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Schema;
  */
 class FulltextTest extends PostgresTestCase
 {
-    protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
+    protected function afterRefreshingDatabase()
     {
         Schema::create('articles', function (Blueprint $table) {
             $table->id('id');

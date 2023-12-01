@@ -64,7 +64,7 @@ class ClosureValidationRule implements RuleContract, ValidatorAwareRule
             $this->failed = true;
 
             return $this->pendingPotentiallyTranslatedString($attribute, $message);
-        });
+        }, $this->validator);
 
         return ! $this->failed;
     }

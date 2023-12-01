@@ -79,13 +79,88 @@ class PostgresGrammar extends Grammar
     }
 
     /**
+     * Compile the query to determine the tables.
+     *
+     * @return string
+     */
+    public function compileTables()
+    {
+        return 'select c.relname as name, n.nspname as schema, pg_total_relation_size(c.oid) as size, '
+            ."obj_description(c.oid, 'pg_class') as comment from pg_class c, pg_namespace n "
+            ."where c.relkind = 'r' and n.oid = c.relnamespace "
+            .'order by c.relname';
+    }
+
+    /**
+     * Compile the query to determine the views.
+     *
+     * @return string
+     */
+    public function compileViews()
+    {
+        return 'select viewname as name, schemaname as schema, definition from pg_views order by viewname';
+    }
+
+    /**
+     * Compile the SQL needed to retrieve all table names.
+     *
+     * @deprecated Will be removed in a future Laravel version.
+     *
+     * @param  string|array  $searchPath
+     * @return string
+     */
+    public function compileGetAllTables($searchPath)
+    {
+        return "select tablename, concat('\"', schemaname, '\".\"', tablename, '\"') as qualifiedname from pg_catalog.pg_tables where schemaname in ('".implode("','", (array) $searchPath)."')";
+    }
+
+    /**
+     * Compile the SQL needed to retrieve all view names.
+     *
+     * @deprecated Will be removed in a future Laravel version.
+     *
+     * @param  string|array  $searchPath
+     * @return string
+     */
+    public function compileGetAllViews($searchPath)
+    {
+        return "select viewname, concat('\"', schemaname, '\".\"', viewname, '\"') as qualifiedname from pg_catalog.pg_views where schemaname in ('".implode("','", (array) $searchPath)."')";
+    }
+
+    /**
      * Compile the query to determine the list of columns.
+     *
+     * @deprecated Will be removed in a future Laravel version.
      *
      * @return string
      */
     public function compileColumnListing()
     {
         return 'select column_name from information_schema.columns where table_catalog = ? and table_schema = ? and table_name = ?';
+    }
+
+    /**
+     * Compile the query to determine the columns.
+     *
+     * @param  string  $database
+     * @param  string  $schema
+     * @param  string  $table
+     * @return string
+     */
+    public function compileColumns($database, $schema, $table)
+    {
+        return sprintf(
+            'select quote_ident(a.attname) as name, t.typname as type_name, format_type(a.atttypid, a.atttypmod) as type, '
+            .'(select tc.collcollate from pg_catalog.pg_collation tc where tc.oid = a.attcollation) as collation, '
+            .'not a.attnotnull as nullable, '
+            .'(select pg_get_expr(adbin, adrelid) from pg_attrdef where c.oid = pg_attrdef.adrelid and pg_attrdef.adnum = a.attnum) as default, '
+            .'(select pg_description.description from pg_description where pg_description.objoid = c.oid and a.attnum = pg_description.objsubid) as comment '
+            .'from pg_attribute a, pg_class c, pg_type t, pg_namespace n '
+            .'where c.relname = %s and n.nspname = %s and a.attnum > 0 and a.attrelid = c.oid and a.atttypid = t.oid and n.oid = c.relnamespace '
+            .'order by a.attnum',
+            $this->quoteString($table),
+            $this->quoteString($schema)
+        );
     }
 
     /**
@@ -370,28 +445,6 @@ class PostgresGrammar extends Grammar
     public function compileDropAllTypes($types)
     {
         return 'drop type '.implode(',', $this->escapeNames($types)).' cascade';
-    }
-
-    /**
-     * Compile the SQL needed to retrieve all table names.
-     *
-     * @param  string|array  $searchPath
-     * @return string
-     */
-    public function compileGetAllTables($searchPath)
-    {
-        return "select tablename, concat('\"', schemaname, '\".\"', tablename, '\"') as qualifiedname from pg_catalog.pg_tables where schemaname in ('".implode("','", (array) $searchPath)."')";
-    }
-
-    /**
-     * Compile the SQL needed to retrieve all view names.
-     *
-     * @param  string|array  $searchPath
-     * @return string
-     */
-    public function compileGetAllViews($searchPath)
-    {
-        return "select viewname, concat('\"', schemaname, '\".\"', viewname, '\"') as qualifiedname from pg_catalog.pg_views where schemaname in ('".implode("','", (array) $searchPath)."')";
     }
 
     /**
@@ -1157,7 +1210,7 @@ class PostgresGrammar extends Grammar
         }
 
         if (! is_null($column->virtualAs)) {
-            return " generated always as ({$column->virtualAs})";
+            return " generated always as ({$this->getValue($column->virtualAs)})";
         }
     }
 
@@ -1181,7 +1234,7 @@ class PostgresGrammar extends Grammar
         }
 
         if (! is_null($column->storedAs)) {
-            return " generated always as ({$column->storedAs}) stored";
+            return " generated always as ({$this->getValue($column->storedAs)}) stored";
         }
     }
 

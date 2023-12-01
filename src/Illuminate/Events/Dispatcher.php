@@ -9,8 +9,11 @@ use Illuminate\Contracts\Broadcasting\Factory as BroadcastFactory;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Contracts\Container\Container as ContainerContract;
 use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
+use Illuminate\Contracts\Events\ShouldDispatchAfterCommit;
+use Illuminate\Contracts\Events\ShouldHandleEventsAfterCommit;
 use Illuminate\Contracts\Queue\ShouldBeEncrypted;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Contracts\Queue\ShouldQueueAfterCommit;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
@@ -55,6 +58,13 @@ class Dispatcher implements DispatcherContract
      * @var callable
      */
     protected $queueResolver;
+
+    /**
+     * The database transaction manager resolver instance.
+     *
+     * @var callable
+     */
+    protected $transactionManagerResolver;
 
     /**
      * Create a new event dispatcher instance.
@@ -235,10 +245,37 @@ class Dispatcher implements DispatcherContract
         // When the given "event" is actually an object we will assume it is an event
         // object and use the class as the event name and this event itself as the
         // payload to the handler, which makes object based events quite simple.
-        [$event, $payload] = $this->parseEventAndPayload(
-            $event, $payload
-        );
+        [$isEventObject, $event, $payload] = [
+            is_object($event),
+            ...$this->parseEventAndPayload($event, $payload),
+        ];
 
+        // If the event is not intended to be dispatched unless the current database
+        // transaction is successful, we'll register a callback which will handle
+        // dispatching this event on the next successful DB transaction commit.
+        if ($isEventObject &&
+            $payload[0] instanceof ShouldDispatchAfterCommit &&
+            ! is_null($transactions = $this->resolveTransactionManager())) {
+            $transactions->addCallback(
+                fn () => $this->invokeListeners($event, $payload, $halt)
+            );
+
+            return null;
+        }
+
+        return $this->invokeListeners($event, $payload, $halt);
+    }
+
+    /**
+     * Broadcast an event and call its listeners.
+     *
+     * @param  string|object  $event
+     * @param  mixed  $payload
+     * @param  bool  $halt
+     * @return array|null
+     */
+    protected function invokeListeners($event, $payload, $halt = false)
+    {
         if ($this->shouldBroadcast($payload)) {
             $this->broadcastEvent($payload[0]);
         }
@@ -525,7 +562,9 @@ class Dispatcher implements DispatcherContract
      */
     protected function handlerShouldBeDispatchedAfterDatabaseTransactions($listener)
     {
-        return ($listener->afterCommit ?? null) && $this->container->bound('db.transactions');
+        return (($listener->afterCommit ?? null) ||
+                $listener instanceof ShouldHandleEventsAfterCommit) &&
+                $this->resolveTransactionManager();
     }
 
     /**
@@ -540,7 +579,7 @@ class Dispatcher implements DispatcherContract
         return function () use ($method, $listener) {
             $payload = func_get_args();
 
-            $this->container->make('db.transactions')->addCallback(
+            $this->resolveTransactionManager()->addCallback(
                 function () use ($listener, $method, $payload) {
                     $listener->$method(...$payload);
                 }
@@ -624,7 +663,12 @@ class Dispatcher implements DispatcherContract
         return tap($job, function ($job) use ($listener) {
             $data = array_values($job->data);
 
-            $job->afterCommit = property_exists($listener, 'afterCommit') ? $listener->afterCommit : null;
+            if ($listener instanceof ShouldQueueAfterCommit) {
+                $job->afterCommit = true;
+            } else {
+                $job->afterCommit = property_exists($listener, 'afterCommit') ? $listener->afterCommit : null;
+            }
+
             $job->backoff = method_exists($listener, 'backoff') ? $listener->backoff(...$data) : ($listener->backoff ?? null);
             $job->maxExceptions = $listener->maxExceptions ?? null;
             $job->retryUntil = method_exists($listener, 'retryUntil') ? $listener->retryUntil(...$data) : null;
@@ -693,6 +737,29 @@ class Dispatcher implements DispatcherContract
     public function setQueueResolver(callable $resolver)
     {
         $this->queueResolver = $resolver;
+
+        return $this;
+    }
+
+    /**
+     * Get the database transaction manager implementation from the resolver.
+     *
+     * @return \Illuminate\Database\DatabaseTransactionsManager|null
+     */
+    protected function resolveTransactionManager()
+    {
+        return call_user_func($this->transactionManagerResolver);
+    }
+
+    /**
+     * Set the database transaction manager resolver implementation.
+     *
+     * @param  callable  $resolver
+     * @return $this
+     */
+    public function setTransactionManagerResolver(callable $resolver)
+    {
+        $this->transactionManagerResolver = $resolver;
 
         return $this;
     }

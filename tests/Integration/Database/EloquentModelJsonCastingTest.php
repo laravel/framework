@@ -11,7 +11,7 @@ use stdClass;
 
 class EloquentModelJsonCastingTest extends DatabaseTestCase
 {
-    protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
+    protected function afterRefreshingDatabase()
     {
         Schema::create('json_casts', function (Blueprint $table) {
             $table->increments('id');

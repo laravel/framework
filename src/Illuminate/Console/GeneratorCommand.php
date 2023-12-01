@@ -187,6 +187,10 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
             }
         }
 
+        if (windows_os()) {
+            $path = str_replace('/', '\\', $path);
+        }
+
         $this->components->info(sprintf('%s [%s] created successfully.', $info, $path));
     }
 
@@ -449,9 +453,12 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
      */
     protected function isReservedName($name)
     {
-        $name = strtolower($name);
-
-        return in_array($name, $this->reservedNames);
+        return in_array(
+            strtolower($name),
+            collect($this->reservedNames)
+                ->transform(fn ($name) => strtolower($name))
+                ->all()
+        );
     }
 
     /**

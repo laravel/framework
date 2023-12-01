@@ -11,7 +11,7 @@ trait SupportsDefaultModels
      *
      * Alternatively, may be a Closure or array.
      *
-     * @var (\Closure(\Illuminate\Database\Eloquent\Model, \Illuminate\Database\Eloquent\Model): \Illuminate\Database\Eloquent\Model|null)|array|bool
+     * @var \Closure|array|bool
      */
     protected $withDefault;
 
@@ -26,7 +26,7 @@ trait SupportsDefaultModels
     /**
      * Return a new model instance in case the relationship does not exist.
      *
-     * @param  (\Closure(\Illuminate\Database\Eloquent\Model, \Illuminate\Database\Eloquent\Model): \Illuminate\Database\Eloquent\Model|null)|array|bool  $callback
+     * @param  \Closure|array|bool  $callback
      * @return $this
      */
     public function withDefault($callback = true)

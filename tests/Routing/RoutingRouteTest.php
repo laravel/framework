@@ -1756,6 +1756,27 @@ class RoutingRouteTest extends TestCase
         $this->assertSame('taylor', $router->dispatch(Request::create('foo/taylor', 'GET'))->getContent());
     }
 
+    public function testImplicitBindingsWithClosure()
+    {
+        $router = $this->getRouter();
+
+        $router->substituteImplicitBindingsUsing(function ($container, $route, $default) {
+            $default = $default();
+
+            $model = $route->parameter('bar');
+            $model->value = 'otwell';
+        });
+
+        $router->get('foo/{bar}', [
+            'middleware' => SubstituteBindings::class,
+            'uses' => function (RoutingTestUserModel $bar) {
+                return $bar->value;
+            },
+        ]);
+
+        $this->assertSame('otwell', $router->dispatch(Request::create('foo/taylor', 'GET'))->getContent());
+    }
+
     public function testImplicitBindingsWhereScopedBindingsArePrevented()
     {
         $router = $this->getRouter();
@@ -1875,6 +1896,29 @@ class RoutingRouteTest extends TestCase
         ])->missing(function () {
             return new RedirectResponse('/', 302);
         });
+
+        $request = Request::create('foo/taylor', 'GET');
+
+        $response = $router->dispatch($request);
+        $this->assertTrue($response->isRedirect('/'));
+        $this->assertEquals(302, $response->getStatusCode());
+    }
+
+    public function testImplicitBindingsWithMissingModelHandledByMissingOnGroupLevel()
+    {
+        $router = $this->getRouter();
+        $router->as('foo.')
+            ->missing(fn () => new RedirectResponse('/', 302))
+            ->group(function () use ($router) {
+                $router->get('foo/{bar}', [
+                    'middleware' => SubstituteBindings::class,
+                    'uses' => function (RouteModelBindingNullStub $bar = null) {
+                        $this->assertInstanceOf(RouteModelBindingNullStub::class, $bar);
+
+                        return $bar->first();
+                    },
+                ]);
+            });
 
         $request = Request::create('foo/taylor', 'GET');
 

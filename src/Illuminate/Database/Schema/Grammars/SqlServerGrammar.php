@@ -69,6 +69,8 @@ class SqlServerGrammar extends Grammar
     /**
      * Compile the query to determine if a table exists.
      *
+     * @deprecated Will be removed in a future Laravel version.
+     *
      * @return string
      */
     public function compileTableExists()
@@ -77,7 +79,60 @@ class SqlServerGrammar extends Grammar
     }
 
     /**
+     * Compile the query to determine the tables.
+     *
+     * @return string
+     */
+    public function compileTables()
+    {
+        return 'select t.name as name, SCHEMA_NAME(t.schema_id) as [schema], sum(u.total_pages) * 8 * 1024 as size '
+            .'from sys.tables as t '
+            .'join sys.partitions as p on p.object_id = t.object_id '
+            .'join sys.allocation_units as u on u.container_id = p.hobt_id '
+            .'group by t.name, t.schema_id '
+            .'order by t.name';
+    }
+
+    /**
+     * Compile the query to determine the views.
+     *
+     * @return string
+     */
+    public function compileViews()
+    {
+        return 'select name, SCHEMA_NAME(v.schema_id) as [schema], definition from sys.views as v '
+            .'inner join sys.sql_modules as m on v.object_id = m.object_id '
+            .'order by name';
+    }
+
+    /**
+     * Compile the SQL needed to retrieve all table names.
+     *
+     * @deprecated Will be removed in a future Laravel version.
+     *
+     * @return string
+     */
+    public function compileGetAllTables()
+    {
+        return "select name, type from sys.tables where type = 'U'";
+    }
+
+    /**
+     * Compile the SQL needed to retrieve all view names.
+     *
+     * @deprecated Will be removed in a future Laravel version.
+     *
+     * @return string
+     */
+    public function compileGetAllViews()
+    {
+        return "select name, type from sys.objects where type = 'V'";
+    }
+
+    /**
      * Compile the query to determine the list of columns.
+     *
+     * @deprecated Will be removed in a future Laravel version.
      *
      * @param  string  $table
      * @return string
@@ -85,6 +140,31 @@ class SqlServerGrammar extends Grammar
     public function compileColumnListing($table)
     {
         return "select name from sys.columns where object_id = object_id('$table')";
+    }
+
+    /**
+     * Compile the query to determine the columns.
+     *
+     * @param  string  $table
+     * @return string
+     */
+    public function compileColumns($table)
+    {
+        return sprintf(
+            'select col.name, type.name as type_name, '
+            .'col.max_length as length, col.precision as precision, col.scale as places, '
+            .'col.is_nullable as nullable, def.definition as [default], '
+            .'col.is_identity as autoincrement, col.collation_name as collation, '
+            .'cast(prop.value as nvarchar(max)) as comment '
+            .'from sys.columns as col '
+            .'join sys.types as type on col.user_type_id = type.user_type_id '
+            .'join sys.objects as obj on col.object_id = obj.object_id '
+            .'join sys.schemas as scm on obj.schema_id = scm.schema_id '
+            .'left join sys.default_constraints def on col.default_object_id = def.object_id and col.object_id = def.parent_object_id '
+            ."left join sys.extended_properties as prop on obj.object_id = prop.major_id and col.column_id = prop.minor_id and prop.name = 'MS_Description' "
+            ."where obj.type = 'U' and obj.name = %s and scm.name = SCHEMA_NAME()",
+            $this->quoteString($table),
+        );
     }
 
     /**
@@ -475,26 +555,6 @@ class SqlServerGrammar extends Grammar
             FROM sys.views;
 
             EXEC sp_executesql @sql;";
-    }
-
-    /**
-     * Compile the SQL needed to retrieve all table names.
-     *
-     * @return string
-     */
-    public function compileGetAllTables()
-    {
-        return "select name, type from sys.tables where type = 'U'";
-    }
-
-    /**
-     * Compile the SQL needed to retrieve all view names.
-     *
-     * @return string
-     */
-    public function compileGetAllViews()
-    {
-        return "select name, type from sys.objects where type = 'V'";
     }
 
     /**
@@ -937,7 +997,7 @@ class SqlServerGrammar extends Grammar
      */
     protected function typeComputed(Fluent $column)
     {
-        return "as ({$column->expression})";
+        return "as ({$this->getValue($column->expression)})";
     }
 
     /**

@@ -20,7 +20,7 @@
         "illuminate/contracts": "^10.0",
         "illuminate/macroable": "^10.0",
         "illuminate/support": "^10.0",
-        "symfony/http-foundation": "^6.2",
+        "symfony/http-foundation": "^6.4",
         "symfony/http-kernel": "^6.2"
     },
     "autoload": {

@@ -14,6 +14,8 @@ class ConfigureCustomDoctrineTypeTest extends DatabaseTestCase
 {
     protected function defineEnvironment($app)
     {
+        parent::defineEnvironment($app);
+
         $app['config']['database.connections.sqlite.database'] = ':memory:';
         $app['config']['database.dbal.types'] = [
             'bit' => MySQLBitType::class,
