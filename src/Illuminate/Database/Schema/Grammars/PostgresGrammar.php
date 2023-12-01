@@ -180,7 +180,7 @@ class PostgresGrammar extends Grammar
             .'join pg_namespace tn on tn.oid = tc.relnamespace '
             .'join pg_class ic on ic.oid = i.indexrelid '
             .'join pg_am am on am.oid = ic.relam '
-            .'join unnest(i.indkey) with ordinality as indseq(num, ord) on true '
+            .'join lateral unnest(i.indkey) with ordinality as indseq(num, ord) on true '
             .'left join pg_attribute a on a.attrelid = i.indrelid and a.attnum = indseq.num '
             .'where tc.relname = %s and tn.nspname = %s '
             .'group by ic.relname, am.amname, i.indisunique, i.indisprimary',
