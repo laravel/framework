@@ -24,7 +24,7 @@ class ProviderMakeCommandTest extends TestCase
 
     public function testItCanGenerateDeferredServiceProviderFile()
     {
-        $this->artisan('make:provider', ['name' => 'FooServiceProvider'])
+        $this->artisan('make:provider', ['name' => 'FooServiceProvider', '--deferred' => true])
             ->assertExitCode(0);
 
         $this->assertFileContains([
