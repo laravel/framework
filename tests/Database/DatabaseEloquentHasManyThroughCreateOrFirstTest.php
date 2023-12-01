@@ -260,6 +260,42 @@ class DatabaseEloquentHasManyThroughCreateOrFirstTest extends TestCase
         ], $result->toArray());
     }
 
+    public function testUpdateOrCreateMethodCreatesNewRecordWithSeparateInsertUpdateFields(): void
+    {
+        $parent = new HasManyThroughCreateOrFirstTestParentModel();
+        $parent->id = 123;
+        $this->mockConnectionForModel($parent, 'SQLite', [789]);
+        $parent->getConnection()->shouldReceive('transactionLevel')->andReturn(0);
+        $parent->getConnection()->shouldReceive('getName')->andReturn('sqlite');
+
+        $parent->getConnection()
+            ->expects('select')
+            ->with(
+                'select "child".*, "pivot"."parent_id" as "laravel_through_key" from "child" inner join "pivot" on "pivot"."id" = "child"."pivot_id" where "pivot"."parent_id" = ? and ("attr" = ?) limit 1',
+                [123, 'foo'],
+                true,
+            )
+            ->andReturn([]);
+
+        $parent->getConnection()
+            ->expects('insert')
+            ->with(
+                'insert into "child" ("attr", "val", "updated_at", "created_at") values (?, ?, ?, ?)',
+                ['foo', 'inserted', '2023-01-01 00:00:00', '2023-01-01 00:00:00'],
+            )
+            ->andReturnTrue();
+
+        $result = $parent->children()->updateOrCreate(['attr' => 'foo'], ['val' => 'updated'], ['val' => 'inserted']);
+        $this->assertTrue($result->wasRecentlyCreated);
+        $this->assertEquals([
+            'id' => 789,
+            'attr' => 'foo',
+            'val' => 'inserted',
+            'created_at' => '2023-01-01T00:00:00.000000Z',
+            'updated_at' => '2023-01-01T00:00:00.000000Z',
+        ], $result->toArray());
+    }
+
     public function testUpdateOrCreateMethodUpdatesExistingRecord(): void
     {
         $parent = new HasManyThroughCreateOrFirstTestParentModel();
@@ -301,6 +337,52 @@ class DatabaseEloquentHasManyThroughCreateOrFirstTest extends TestCase
             'laravel_through_key' => 123,
             'attr' => 'foo',
             'val' => 'baz',
+            'created_at' => '2023-01-01T00:00:00.000000Z',
+            'updated_at' => '2023-01-01T00:00:00.000000Z',
+        ], $result->toArray());
+    }
+
+    public function testUpdateOrCreateMethodUpdatesExistingRecordWithSeparateInsertUpdateFields(): void
+    {
+        $parent = new HasManyThroughCreateOrFirstTestParentModel();
+        $parent->id = 123;
+        $this->mockConnectionForModel($parent, 'SQLite');
+        $parent->getConnection()->shouldReceive('transactionLevel')->andReturn(0);
+        $parent->getConnection()->shouldReceive('getName')->andReturn('sqlite');
+
+        $parent->getConnection()
+            ->expects('select')
+            ->with(
+                'select "child".*, "pivot"."parent_id" as "laravel_through_key" from "child" inner join "pivot" on "pivot"."id" = "child"."pivot_id" where "pivot"."parent_id" = ? and ("attr" = ?) limit 1',
+                [123, 'foo'],
+                true,
+            )
+            ->andReturn([[
+                'id' => 789,
+                'pivot_id' => 456,
+                'laravel_through_key' => 123,
+                'attr' => 'foo',
+                'val' => 'bar',
+                'created_at' => '2023-01-01T00:00:00.000000Z',
+                'updated_at' => '2023-01-01T00:00:00.000000Z',
+            ]]);
+
+        $parent->getConnection()
+            ->expects('update')
+            ->with(
+                'update "child" set "val" = ?, "updated_at" = ? where "id" = ?',
+                ['updated', '2023-01-01 00:00:00', 789],
+            )
+            ->andReturn(1);
+
+        $result = $parent->children()->updateOrCreate(['attr' => 'foo'], ['val' => 'updated'], ['val' => 'inserted']);
+        $this->assertFalse($result->wasRecentlyCreated);
+        $this->assertEquals([
+            'id' => 789,
+            'pivot_id' => 456,
+            'laravel_through_key' => 123,
+            'attr' => 'foo',
+            'val' => 'updated',
             'created_at' => '2023-01-01T00:00:00.000000Z',
             'updated_at' => '2023-01-01T00:00:00.000000Z',
         ], $result->toArray());

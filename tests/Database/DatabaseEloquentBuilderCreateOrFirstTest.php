@@ -222,6 +222,43 @@ class DatabaseEloquentBuilderCreateOrFirstTest extends TestCase
         ], $result->toArray());
     }
 
+    public function testUpdateOrCreateMethodUpdatesExistingRecordWithSeparateInsertUpdateFields(): void
+    {
+        $model = new EloquentBuilderCreateOrFirstTestModel();
+        $this->mockConnectionForModel($model, 'SQLite');
+        $model->getConnection()->shouldReceive('transactionLevel')->andReturn(0);
+        $model->getConnection()->shouldReceive('getName')->andReturn('sqlite');
+
+        $model->getConnection()
+            ->expects('select')
+            ->with('select * from "table" where ("attr" = ?) limit 1', ['foo'], true)
+            ->andReturn([[
+                'id' => 123,
+                'attr' => 'foo',
+                'val' => 'bar',
+                'created_at' => '2023-01-01 00:00:00',
+                'updated_at' => '2023-01-01 00:00:00',
+            ]]);
+
+        $model->getConnection()
+            ->expects('update')
+            ->with(
+                'update "table" set "val" = ?, "updated_at" = ? where "id" = ?',
+                ['updated', '2023-01-01 00:00:00', 123],
+            )
+            ->andReturn(1);
+
+        $result = $model->newQuery()->updateOrCreate(['attr' => 'foo'], ['val' => 'updated'], ['val' => 'inserted']);
+        $this->assertFalse($result->wasRecentlyCreated);
+        $this->assertEquals([
+            'id' => 123,
+            'attr' => 'foo',
+            'val' => 'updated',
+            'created_at' => '2023-01-01T00:00:00.000000Z',
+            'updated_at' => '2023-01-01T00:00:00.000000Z',
+        ], $result->toArray());
+    }
+
     public function testUpdateOrCreateMethodCreatesNewRecord(): void
     {
         $model = new EloquentBuilderCreateOrFirstTestModel();
@@ -245,6 +282,34 @@ class DatabaseEloquentBuilderCreateOrFirstTest extends TestCase
             'id' => 123,
             'attr' => 'foo',
             'val' => 'bar',
+            'created_at' => '2023-01-01T00:00:00.000000Z',
+            'updated_at' => '2023-01-01T00:00:00.000000Z',
+        ], $result->toArray());
+    }
+
+    public function testUpdateOrCreateMethodCreatesNewRecordWithSeparateInsertUpdateFields(): void
+    {
+        $model = new EloquentBuilderCreateOrFirstTestModel();
+        $this->mockConnectionForModel($model, 'SQLite', [123]);
+        $model->getConnection()->shouldReceive('transactionLevel')->andReturn(0);
+        $model->getConnection()->shouldReceive('getName')->andReturn('sqlite');
+
+        $model->getConnection()
+            ->expects('select')
+            ->with('select * from "table" where ("attr" = ?) limit 1', ['foo'], true)
+            ->andReturn([]);
+
+        $model->getConnection()->expects('insert')->with(
+            'insert into "table" ("attr", "val", "updated_at", "created_at") values (?, ?, ?, ?)',
+            ['foo', 'inserted', '2023-01-01 00:00:00', '2023-01-01 00:00:00'],
+        )->andReturnTrue();
+
+        $result = $model->newQuery()->updateOrCreate(['attr' => 'foo'], ['val' => 'updated'], ['val' => 'inserted']);
+        $this->assertTrue($result->wasRecentlyCreated);
+        $this->assertEquals([
+            'id' => 123,
+            'attr' => 'foo',
+            'val' => 'inserted',
             'created_at' => '2023-01-01T00:00:00.000000Z',
             'updated_at' => '2023-01-01T00:00:00.000000Z',
         ], $result->toArray());

@@ -236,6 +236,20 @@ class DatabaseEloquentHasManyTest extends TestCase
         $this->assertInstanceOf(stdClass::class, $relation->updateOrCreate(['foo'], ['bar']));
     }
 
+    public function testUpdateOrCreateMethodFindsFirstModelAndUpdatesWithSeparateInsertUpdateFields()
+    {
+        $relation = $this->getRelation();
+        $relation->getQuery()->shouldReceive('where')->once()->with(['foo'])->andReturn($relation->getQuery());
+        $relation->getQuery()->shouldReceive('first')->once()->with()->andReturn($model = m::mock(stdClass::class));
+        $relation->getRelated()->shouldReceive('newInstance')->never();
+
+        $model->wasRecentlyCreated = false;
+        $model->shouldReceive('fill')->once()->with(['updated'])->andReturn($model);
+        $model->shouldReceive('save')->once();
+
+        $this->assertInstanceOf(stdClass::class, $relation->updateOrCreate(['foo'], ['updated'],['inserted']));
+    }
+
     public function testUpdateOrCreateMethodCreatesNewModelWithForeignKeySet()
     {
         $relation = $this->getRelation();
@@ -251,6 +265,23 @@ class DatabaseEloquentHasManyTest extends TestCase
         $model->shouldReceive('setAttribute')->once()->with('foreign_key', 1);
 
         $this->assertInstanceOf(Model::class, $relation->updateOrCreate(['foo'], ['bar']));
+    }
+
+    public function testUpdateOrCreateMethodCreatesNewModelWithForeignKeySetWithSeparateInsertUpdateFields()
+    {
+        $relation = $this->getRelation();
+        $relation->getQuery()->shouldReceive('withSavepointIfNeeded')->once()->andReturnUsing(function ($scope) {
+            return $scope();
+        });
+        $relation->getQuery()->shouldReceive('where')->once()->with(['foo'])->andReturn($relation->getQuery());
+        $relation->getQuery()->shouldReceive('first')->once()->with()->andReturn(null);
+        $relation->getRelated()->shouldReceive('newInstance')->once()->with(['foo', 'inserted'])->andReturn($model = m::mock(Model::class));
+
+        $model->wasRecentlyCreated = true;
+        $model->shouldReceive('save')->once()->andReturn(true);
+        $model->shouldReceive('setAttribute')->once()->with('foreign_key', 1);
+
+        $this->assertInstanceOf(Model::class, $relation->updateOrCreate(['foo'], ['updated'], ['inserted']));
     }
 
     public function testRelationIsProperlyInitialized()
