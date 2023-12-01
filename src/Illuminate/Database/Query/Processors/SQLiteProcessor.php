@@ -46,4 +46,37 @@ class SQLiteProcessor extends Processor
             ];
         }, $results);
     }
+
+    /**
+     * Process the results of an indexes query.
+     *
+     * @param  array  $results
+     * @return array
+     */
+    public function processIndexes($results)
+    {
+        $primaryCount = 0;
+
+        $indexes = array_map(function ($result) use (&$primaryCount) {
+            $result = (object) $result;
+
+            if ($isPrimary = (bool) $result->primary) {
+                $primaryCount += 1;
+            }
+
+            return [
+                'name' => strtolower($result->name),
+                'columns' => explode(',', $result->columns),
+                'type' => null,
+                'unique' => (bool) $result->unique,
+                'primary' => $isPrimary,
+            ];
+        }, $results);
+
+        if ($primaryCount > 1) {
+            $indexes = array_filter($indexes, fn ($index) => $index['name'] !== 'primary');
+        }
+
+        return $indexes;
+    }
 }
