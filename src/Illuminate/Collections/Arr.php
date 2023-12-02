@@ -896,4 +896,47 @@ class Arr
 
         return is_array($value) ? $value : [$value];
     }
+
+	/**
+	 * Generate all possible combinations from an array (permutations) array elements included.
+	 *
+	 * @param array $array
+	 *
+	 * @return array
+	 */
+	public static function permutations(array $array = [])
+	{
+
+		$permutations = $array;
+		$size = count($array);
+
+		$indices = [];
+		for ($index = 0; $index < $size; $index++) {
+			$indices[$index] = 0;
+		}
+
+		while (1) {
+
+			$res = [];
+			for ($index = 0; $index < $size; $index++) {
+				$res[] = $array[$index][$indices[$index]];
+			}
+			$permutations[] = $res;
+			$next = $size - 1;
+			while ($next >= 0 &&
+				   ($indices[$next] + 1 >= count($array[$next]))) {
+				$next--;
+			}
+			if ($next < 0) {
+				return $permutations;
+			}
+			$indices[$next]++;
+			for ($index = $next + 1; $index < $size; $index++) {
+				$indices[$index] = 0;
+			}
+
+		}
+
+	}
+
 }
