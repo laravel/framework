@@ -2,7 +2,7 @@
 
 namespace Illuminate\Queue\Jobs;
 
-use Illuminate\Container\Container;
+use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Queue\Job as JobContract;
 use Illuminate\Queue\RedisQueue;
 
@@ -39,7 +39,7 @@ class RedisJob extends Job implements JobContract
     /**
      * Create a new job instance.
      *
-     * @param  \Illuminate\Container\Container  $container
+     * @param  \Illuminate\Contracts\Container\Container  $container
      * @param  \Illuminate\Queue\RedisQueue  $redis
      * @param  string  $job
      * @param  string  $reserved

@@ -25,7 +25,7 @@ abstract class Job
     /**
      * The IoC container instance.
      *
-     * @var \Illuminate\Container\Container
+     * @var \Illuminate\Contracts\Container\Container
      */
     protected $container;
 
@@ -373,7 +373,7 @@ abstract class Job
     /**
      * Get the service container instance.
      *
-     * @return \Illuminate\Container\Container
+     * @return \Illuminate\Contracts\Container\Container
      */
     public function getContainer()
     {

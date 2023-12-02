@@ -2,7 +2,7 @@
 
 namespace Illuminate\Queue\Jobs;
 
-use Illuminate\Container\Container;
+use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Queue\Job as JobContract;
 use Pheanstalk\Job as PheanstalkJob;
 use Pheanstalk\Pheanstalk;
@@ -26,7 +26,7 @@ class BeanstalkdJob extends Job implements JobContract
     /**
      * Create a new job instance.
      *
-     * @param  \Illuminate\Container\Container  $container
+     * @param  \Illuminate\Contracts\Container\Container  $container
      * @param  \Pheanstalk\Pheanstalk  $pheanstalk
      * @param  \Pheanstalk\Job  $job
      * @param  string  $connectionName

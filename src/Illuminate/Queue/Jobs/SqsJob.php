@@ -3,7 +3,7 @@
 namespace Illuminate\Queue\Jobs;
 
 use Aws\Sqs\SqsClient;
-use Illuminate\Container\Container;
+use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Queue\Job as JobContract;
 
 class SqsJob extends Job implements JobContract
@@ -25,7 +25,7 @@ class SqsJob extends Job implements JobContract
     /**
      * Create a new job instance.
      *
-     * @param  \Illuminate\Container\Container  $container
+     * @param  \Illuminate\Contracts\Container\Container  $container
      * @param  \Aws\Sqs\SqsClient  $sqs
      * @param  array  $job
      * @param  string  $connectionName
