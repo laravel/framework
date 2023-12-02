@@ -1701,15 +1701,14 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
                 ->attributes
         );
 
-        $relations = collect($this->relations)
+
+        $this->load(
+            collect($this->relations)
                 ->reject(function ($relation) {
                     return $relation instanceof Pivot
                         || (is_object($relation) && in_array(AsPivot::class, class_uses_recursive($relation), true));
                 })
-                ->keys();
-
-        $this->load(
-            $relations->keys()
+                ->keys()
                 ->mapWithKeys(function ($relation) {
                     return [
                         $relation => fn ($query) => $query->useWritePdo(),
