@@ -1049,15 +1049,16 @@ class Blueprint
     /**
      * Create a new enum column on the table.
      *
-     * @param string $column
-     * @param array|string $allowed
+     * @param  string  $column
+     * @param  array|string  $allowed
      * @return ColumnDefinition
      */
-    public function enum($column, array | string $allowed)
+    public function enum($column, array|string $allowed)
     {
         if (is_string($allowed) && method_exists($allowed, 'cases')) {
             $allowed = array_column($allowed::cases(), 'value');
         }
+
         return $this->addColumn('enum', $column, compact('allowed'));
     }
 
