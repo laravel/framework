@@ -1712,7 +1712,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
             $relations->keys()
                 ->mapWithKeys(function ($relation) {
                     return [
-                        $relation => fn ($query) => $query->useWritePdo()
+                        $relation => fn ($query) => $query->useWritePdo(),
                     ];
                 })->all()
         );
