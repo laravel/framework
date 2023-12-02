@@ -145,7 +145,7 @@ trait FormatsMessages
     {
         foreach (Arr::wrap($keys) as $key) {
             if ($this->translator->has($key)) {
-                return $this->traslator->get($key);
+                return $this->translator->get($key);
             }
 
             // If an exact match was not found for the key, we will collapse all of these
