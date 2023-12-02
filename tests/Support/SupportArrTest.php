@@ -1235,17 +1235,39 @@ class SupportArrTest extends TestCase
 	public function testPermutations()
 	{
 
+		$includeOriginalArray = true;
 		$array = [1, 2];
 		$array2 = [3, 4];
 		$permutations = [ [1, 2], [3, 4], [1, 3], [1, 4], [2, 3], [2, 4]];
-		$permutationsResult = Arr::permutations([$array, $array2]);
+		$permutationsResult = Arr::permutations([$array, $array2], $includeOriginalArray);
 		$this->assertEquals($permutations, $permutationsResult);
 
-		$array3 = ['AB', 'CD'];
-		$array4 = ['EF', 'GH'];
+		// print_r($permutations);
+		// print_r($permutationsResult);
+		// exit();
+		$array3 = [1, 2];
+		$array4 = [3, 4];
+		$permutations = [ [1, 3], [1, 4], [2, 3], [2, 4]];
+		$permutationsResult = Arr::permutations([$array3, $array4]);
+		$this->assertEquals($permutations, $permutationsResult);
+
+		$array5 = ['AB', 'CD'];
+		$array6 = ['EF', 'GH'];
 		$permutationsExpected = [ ['AB', 'CD'], ['EF', 'GH'], ['AB', 'EF'], ['AB', 'GH'], ['CD', 'EF'], ['CD', 'GH']];
-		$permutationsElements = Arr::permutations([$array3, $array4]);
+		$permutationsElements = Arr::permutations([$array5, $array6], $includeOriginalArray);
 		$this->assertEquals($permutationsExpected, $permutationsElements);
 
+		$array7 = ['AB', 'CD'];
+		$array8 = ['EF', 'GH', 'IJ'];
+		$permutationsExpected = [ ['AB', 'EF'], ['AB', 'GH'], ['AB', 'IJ'], ['CD', 'EF'], ['CD', 'GH'], ['CD', 'IJ']];
+		$permutationsElements = Arr::permutations([$array7, $array8]);
+		$this->assertEquals($permutationsExpected, $permutationsElements);
+
+		$colors = ['Black', 'White'];
+		$storageCapacities = ['64GB', '128GB'];
+
+		// Generating variations using Arr::permutations
+		$actualVariations = Arr::permutations([$colors, $storageCapacities], false);
+		print_r($actualVariations);
 	}
 }

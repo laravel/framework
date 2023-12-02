@@ -901,13 +901,14 @@ class Arr
 	 * Generate all possible combinations from an array (permutations) array elements included.
 	 *
 	 * @param array $array
+	 * @param bool  $includeOriginalArray
 	 *
 	 * @return array
 	 */
-	public static function permutations(array $array = [])
+	public static function permutations(array $array = [], bool $includeOriginalArray = false)
 	{
 
-		$permutations = $array;
+		$permutations = $includeOriginalArray ? $array : [];
 		$size = count($array);
 
 		$indices = [];
@@ -921,6 +922,7 @@ class Arr
 			for ($index = 0; $index < $size; $index++) {
 				$res[] = $array[$index][$indices[$index]];
 			}
+
 			$permutations[] = $res;
 			$next = $size - 1;
 			while ($next >= 0 &&
