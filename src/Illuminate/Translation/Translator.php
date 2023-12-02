@@ -137,6 +137,8 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
                 $key, $replace, $locale, $fallback
             );
         }
+
+        return $line;
     }
 
     /**
