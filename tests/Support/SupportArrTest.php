@@ -1263,11 +1263,5 @@ class SupportArrTest extends TestCase
 		$permutationsElements = Arr::permutations([$array7, $array8]);
 		$this->assertEquals($permutationsExpected, $permutationsElements);
 
-		$colors = ['Black', 'White'];
-		$storageCapacities = ['64GB', '128GB'];
-
-		// Generating variations using Arr::permutations
-		$actualVariations = Arr::permutations([$colors, $storageCapacities], false);
-		print_r($actualVariations);
 	}
 }
