@@ -129,18 +129,15 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
      */
     public function get($key, array $replace = [], $locale = null, $fallback = true)
     {
-        $result = $this->translate($key, $replace, $locale, $fallback);
-        if (! is_null($result)) {
-            return $result;
+        $line = $this->translate($key, $replace, $locale, $fallback);
+
+        // Handle missing translation strings
+        if (is_null($line)) {
+            $line = $this->handleMissingTranslationKey(
+                $key, $replace, $locale, $fallback
+            );
         }
 
-        $line = $this->handleMissingTranslationKey(
-            $key, $replace, $locale, $fallback
-        );
-
-        // If the line doesn't exist, we will return back the key which was requested as
-        // that will be quick to spot in the UI if language keys are wrong or missing
-        // from the application's language files. Otherwise we can return the line.
         return $this->makeReplacements($line, $replace);
     }
 
