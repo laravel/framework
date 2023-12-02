@@ -115,18 +115,7 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
      */
     public function has($key, $locale = null, $fallback = true)
     {
-        $locale = $locale ?: $this->locale;
-
-        $line = $this->get($key, [], $locale, $fallback);
-
-        // For JSON translations, the loaded files will contain the correct line.
-        // Otherwise, we must assume we are handling typical translation file
-        // and check if the returned line is not the same as the given key.
-        if (! is_null($this->loaded['*']['*'][$locale][$key] ?? null)) {
-            return true;
-        }
-
-        return $line !== $key;
+        return $this->translate($key, [], $locale, $fallback) !== null;
     }
 
     /**
@@ -139,6 +128,23 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
      * @return string|array
      */
     public function get($key, array $replace = [], $locale = null, $fallback = true)
+    {
+        return $this->translate($key, $replace, $locale, $fallback) ??
+            $this->handleMissingTranslationKey(
+                $key, $replace, $locale, $fallback
+            );
+    }
+
+    /**
+     * Get the translation for a given key.  If not key exists, return null.
+     *
+     * @param  string  $key
+     * @param  array  $replace
+     * @param  string|null  $locale
+     * @param  bool  $fallback
+     * @return null|string|array
+     */
+    protected function translate($key, array $replace = [], $locale = null, $fallback = true)
     {
         $locale = $locale ?: $this->locale;
 
@@ -168,9 +174,7 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
                 }
             }
 
-            $key = $this->handleMissingTranslationKey(
-                $key, $replace, $locale, $fallback
-            );
+            return null;
         }
 
         // If the line doesn't exist, we will return back the key which was requested as
