@@ -39,4 +39,14 @@ interface Translator
      * @return void
      */
     public function setLocale($locale);
+
+    /**
+     * Determine if a translation exists.
+     *
+     * @param  string  $key
+     * @param  string|null  $locale
+     * @param  bool  $fallback
+     * @return bool
+     */
+    public function has($key, $locale = null, $fallback = true);
 }
