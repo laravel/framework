@@ -19,19 +19,19 @@ class TranslationTranslatorTest extends TestCase
 
     public function testHasMethodReturnsFalseWhenReturnedTranslationIsNull()
     {
-        $t = $this->getMockBuilder(Translator::class)->onlyMethods(['get'])->setConstructorArgs([$this->getLoader(), 'en'])->getMock();
+        $t = $this->getMockBuilder(Translator::class)->onlyMethods(['translate'])->setConstructorArgs([$this->getLoader(), 'en'])->getMock();
         $t->expects($this->once())->method('translate')->with($this->equalTo('foo'), $this->equalTo([]), $this->equalTo('bar'))->willReturn('foo');
         $this->assertFalse($t->has('foo', 'bar'));
 
-        $t = $this->getMockBuilder(Translator::class)->onlyMethods(['get'])->setConstructorArgs([$this->getLoader(), 'en', 'sp'])->getMock();
+        $t = $this->getMockBuilder(Translator::class)->onlyMethods(['translate'])->setConstructorArgs([$this->getLoader(), 'en', 'sp'])->getMock();
         $t->expects($this->once())->method('translate')->with($this->equalTo('foo'), $this->equalTo([]), $this->equalTo('bar'))->willReturn('bar');
         $this->assertTrue($t->has('foo', 'bar'));
 
-        $t = $this->getMockBuilder(Translator::class)->onlyMethods(['get'])->setConstructorArgs([$this->getLoader(), 'en'])->getMock();
+        $t = $this->getMockBuilder(Translator::class)->onlyMethods(['translate'])->setConstructorArgs([$this->getLoader(), 'en'])->getMock();
         $t->expects($this->once())->method('translate')->with($this->equalTo('foo'), $this->equalTo([]), $this->equalTo('bar'), false)->willReturn('bar');
         $this->assertTrue($t->hasForLocale('foo', 'bar'));
 
-        $t = $this->getMockBuilder(Translator::class)->onlyMethods(['get'])->setConstructorArgs([$this->getLoader(), 'en'])->getMock();
+        $t = $this->getMockBuilder(Translator::class)->onlyMethods(['translate'])->setConstructorArgs([$this->getLoader(), 'en'])->getMock();
         $t->expects($this->once())->method('translate')->with($this->equalTo('foo'), $this->equalTo([]), $this->equalTo('bar'), false)->willReturn('foo');
         $this->assertFalse($t->hasForLocale('foo', 'bar'));
 
