@@ -1701,7 +1701,6 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
                 ->attributes
         );
 
-
         $this->load(
             collect($this->relations)
                 ->reject(function ($relation) {
