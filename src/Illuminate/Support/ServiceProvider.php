@@ -41,6 +41,13 @@ abstract class ServiceProvider
     public static $publishes = [];
 
     /**
+     * The migration paths that should be published.
+     *
+     * @var array
+     */
+    public static $migrationPublishes = [];
+
+    /**
      * The paths that should be published by group.
      *
      * @var array
@@ -286,6 +293,22 @@ abstract class ServiceProvider
     }
 
     /**
+     * Register migration paths to be published by the publish command.
+     *
+     * @param  array  $paths
+     * @param  mixed  $groups
+     * @return void
+     */
+    protected function migrationPublishes(array $paths, $groups = null)
+    {
+        $this->publishes($paths, $groups);
+
+        $this->ensureMigrationPublishArrayInitialized($class = static::class);
+
+        static::$migrationPublishes[$class] = array_merge(static::$migrationPublishes[$class], $paths);
+    }
+
+    /**
      * Ensure the publish array for the service provider is initialized.
      *
      * @param  string  $class
@@ -295,6 +318,19 @@ abstract class ServiceProvider
     {
         if (! array_key_exists($class, static::$publishes)) {
             static::$publishes[$class] = [];
+        }
+    }
+
+    /**
+     * Ensure the migration publish array for the service provider is initialized.
+     *
+     * @param  string  $class
+     * @return void
+     */
+    protected function ensureMigrationPublishArrayInitialized($class)
+    {
+        if (! array_key_exists($class, static::$migrationPublishes)) {
+            static::$migrationPublishes[$class] = [];
         }
     }
 
