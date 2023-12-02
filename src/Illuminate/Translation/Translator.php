@@ -129,16 +129,11 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
      */
     public function get($key, array $replace = [], $locale = null, $fallback = true)
     {
-        $line = $this->translate($key, $replace, $locale, $fallback);
-
-        // Handle missing translation strings
-        if (is_null($line)) {
-            $line = $this->handleMissingTranslationKey(
+        return $this->translate($key, $replace, $locale, $fallback) ??
+            $this->handleMissingTranslationKey(
                 $key, $replace, $locale, $fallback
-            );
-        }
-
-        return $line;
+            ) ??
+            $key;
     }
 
     /**
@@ -347,7 +342,7 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
     {
         if (! $this->handleMissingTranslationKeys ||
             ! isset($this->missingTranslationKeyCallback)) {
-            return $key;
+            return null;
         }
 
         // Prevent infinite loops...
