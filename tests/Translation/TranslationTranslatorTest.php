@@ -20,7 +20,7 @@ class TranslationTranslatorTest extends TestCase
     public function testHasMethodReturnsFalseWhenReturnedTranslationIsNull()
     {
         $t = $this->getMockBuilder(Translator::class)->onlyMethods(['translate'])->setConstructorArgs([$this->getLoader(), 'en'])->getMock();
-        $t->expects($this->once())->method('translate')->with($this->equalTo('foo'), $this->equalTo([]), $this->equalTo('bar'))->willReturn('foo');
+        $t->expects($this->once())->method('translate')->with($this->equalTo('foo'), $this->equalTo([]), $this->equalTo('bar'))->willReturn(null);
         $this->assertFalse($t->has('foo', 'bar'));
 
         $t = $this->getMockBuilder(Translator::class)->onlyMethods(['translate'])->setConstructorArgs([$this->getLoader(), 'en', 'sp'])->getMock();
@@ -32,7 +32,7 @@ class TranslationTranslatorTest extends TestCase
         $this->assertTrue($t->hasForLocale('foo', 'bar'));
 
         $t = $this->getMockBuilder(Translator::class)->onlyMethods(['translate'])->setConstructorArgs([$this->getLoader(), 'en'])->getMock();
-        $t->expects($this->once())->method('translate')->with($this->equalTo('foo'), $this->equalTo([]), $this->equalTo('bar'), false)->willReturn('foo');
+        $t->expects($this->once())->method('translate')->with($this->equalTo('foo'), $this->equalTo([]), $this->equalTo('bar'), false)->willReturn(null);
         $this->assertFalse($t->hasForLocale('foo', 'bar'));
 
         $t = new Translator($this->getLoader(), 'en');
@@ -157,7 +157,7 @@ class TranslationTranslatorTest extends TestCase
     public function testGetJsonReplaces()
     {
         $t = new Translator($this->getLoader(), 'en');
-        $t->getLoader()->shouldReceive('load')->once()->with('en', '*', '*')->andReturn(['foo :i:c :u' => 'bar :i:c :u']);
+        $t->getLoader()->shouldReceive('translate')->once()->with('foo :i:c :u', 'en', '*', '*')->andReturn(['foo :i:c :u' => 'bar :i:c :u']);
         $this->assertSame('bar onetwo three', $t->get('foo :i:c :u', ['i' => 'one', 'c' => 'two', 'u' => 'three']));
     }
 
