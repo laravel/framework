@@ -999,6 +999,7 @@ class ValidationValidatorTest extends TestCase
         $container->shouldReceive('make')->with('hash')->andReturn($hasher);
 
         $trans = $this->getTranslator();
+        $trans->shouldReceive('has')->andReturn(false);
         $trans->shouldReceive('get')->andReturnArg(0);
 
         $v = new Validator($trans, ['password' => 'foo'], ['password' => 'current_password']);
@@ -1023,6 +1024,7 @@ class ValidationValidatorTest extends TestCase
         $container->shouldReceive('make')->with('hash')->andReturn($hasher);
 
         $trans = $this->getTranslator();
+        $trans->shouldReceive('has')->andReturn(false);
         $trans->shouldReceive('get')->andReturnArg(0);
 
         $v = new Validator($trans, ['password' => 'foo'], ['password' => 'current_password']);
@@ -1047,6 +1049,7 @@ class ValidationValidatorTest extends TestCase
         $container->shouldReceive('make')->with('hash')->andReturn($hasher);
 
         $trans = $this->getTranslator();
+        $trans->shouldReceive('has')->andReturn(false);
         $trans->shouldReceive('get')->andReturnArg(0);
 
         $v = new Validator($trans, ['password' => 'foo'], ['password' => 'current_password:custom']);
