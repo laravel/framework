@@ -129,6 +129,8 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
      */
     public function get($key, array $replace = [], $locale = null, $fallback = true)
     {
+        $locale = $locale ?: $this->locale;
+
         $line = $this->translate($key, $replace, $locale, $fallback);
 
         if (is_null($line)) {
