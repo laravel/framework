@@ -260,6 +260,9 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
         if (empty($replace)) {
             return $line;
         }
+        if (is_array($line)) {
+            return $line;
+        }
 
         $shouldReplace = [];
 
