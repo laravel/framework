@@ -975,6 +975,7 @@ class ValidationValidatorTest extends TestCase
 
         $trans = $this->getTranslator();
         $trans->shouldReceive('has')->andReturn(false);
+        $trans->shouldReceive('get')->andReturnArg(0);
 
         $v = new Validator($trans, ['password' => 'foo'], ['password' => 'current_password']);
         $v->setContainer($container);
