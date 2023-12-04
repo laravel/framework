@@ -235,7 +235,13 @@ trait DatabaseRule
     protected function formatWheres()
     {
         return collect($this->wheres)->map(function ($where) {
-            return $where['column'].','.'"'.str_replace('"', '""', $where['value']).'"';
+            if ($where['value'] === 'NULL') {
+                return $where['column'].',NULL';
+            } elseif ($where['value'] === 'NOT_NULL') {
+                return $where['column'].',NOT_NULL';
+            } else {
+                return $where['column'].','.'"'.str_replace('"', '""', $where['value']).'"';
+            }
         })->implode(',');
     }
 }
