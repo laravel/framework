@@ -3,14 +3,13 @@
 namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Command;
-use Illuminate\Contracts\Console\PromptsForMissingInput;
+use function Laravel\Prompts\select;
 use Symfony\Component\Console\Attribute\AsCommand;
+
 use Symfony\Component\Finder\Finder;
 
-use function Laravel\Prompts\select;
-
 #[AsCommand(name: 'config:publish')]
-class ConfigPublishCommand extends Command implements PromptsForMissingInput
+class ConfigPublishCommand extends Command
 {
     /**
      * The name and signature of the console command.
@@ -18,7 +17,8 @@ class ConfigPublishCommand extends Command implements PromptsForMissingInput
      * @var string
      */
     protected $signature = 'config:publish
-                    {name : The name of the configuration file to publish}
+                    {name? : The name of the configuration file to publish}
+                    {--all : Publish all configuration files}
                     {--force : Overwrite any existing configuration files}';
 
     /**
@@ -37,9 +37,22 @@ class ConfigPublishCommand extends Command implements PromptsForMissingInput
     {
         $config = $this->getBaseConfigurationFiles();
 
-        $name = (string) $this->argument('name');
+        if (is_null($this->argument('name')) && $this->option('all')) {
+            foreach ($config as $key => $file) {
+                $this->publish($key, $file, $this->laravel->configPath().'/'.$key.'.php');
+            }
 
-        if (! isset($config[$name])) {
+            return;
+        }
+
+        $name = (string) (is_null($this->argument('name')) ? select(
+            label: 'Which configuration file would you like to publish?',
+            options: collect($config)->map(function (string $path) {
+                return basename($path, '.php');
+            }),
+        ) : $this->argument('name'));
+
+        if (! is_null($name) && ! isset($config[$name])) {
             $this->components->error('Unrecognized configuration file.');
 
             return 1;
@@ -83,22 +96,5 @@ class ConfigPublishCommand extends Command implements PromptsForMissingInput
         }
 
         return collect($config)->sortKeys()->all();
-    }
-
-    /**
-     * Prompt for missing input arguments using the returned questions.
-     *
-     * @return array
-     */
-    protected function promptForMissingArgumentsUsing()
-    {
-        return [
-            'name' => fn () => select(
-                label: 'Which configuration file would you like to publish?',
-                options: collect($this->getBaseConfigurationFiles())->map(function (string $path) {
-                    return basename($path, '.php');
-                }),
-            ),
-        ];
     }
 }
