@@ -164,6 +164,13 @@ class SchemaBuilderTest extends DatabaseTestCase
         }
     }
 
+    public function testHasView()
+    {
+        DB::statement('create view foo (id) as select 1');
+
+        $this->assertTrue(Schema::hasView('foo'));
+    }
+
     public function testGetViews()
     {
         DB::statement('create view foo (id) as select 1');

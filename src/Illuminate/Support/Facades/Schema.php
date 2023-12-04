@@ -11,6 +11,7 @@ namespace Illuminate\Support\Facades;
  * @method static bool createDatabase(string $name)
  * @method static bool dropDatabaseIfExists(string $name)
  * @method static bool hasTable(string $table)
+ * @method static bool hasView(string $view)
  * @method static array getTables()
  * @method static array getViews()
  * @method static bool hasColumn(string $table, string $column)
