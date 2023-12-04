@@ -202,19 +202,19 @@ class NotificationSender
                 $connection = $notification->connection;
 
                 if (method_exists($notification, 'viaConnections')) {
-                    $connection = $notification->viaConnections()[$channel] ?? null;
+                    $connection = $notification->viaConnections()[$channel] ?? $connection;
                 }
 
                 $queue = $notification->queue;
 
                 if (method_exists($notification, 'viaQueues')) {
-                    $queue = $notification->viaQueues()[$channel] ?? null;
+                    $queue = $notification->viaQueues()[$channel] ?? $queue;
                 }
 
                 $delay = $notification->delay;
 
                 if (method_exists($notification, 'withDelay')) {
-                    $delay = $notification->withDelay($notifiable, $channel) ?? null;
+                    $delay = $notification->withDelay($notifiable, $channel) ?? $delay;
                 }
 
                 $middleware = $notification->middleware ?? [];
