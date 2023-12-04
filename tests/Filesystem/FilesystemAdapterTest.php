@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Filesystem;
 
 use Carbon\Carbon;
+use Composer\InstalledVersions;
 use GuzzleHttp\Psr7\Stream;
 use Illuminate\Filesystem\FilesystemAdapter;
 use Illuminate\Filesystem\FilesystemManager;
@@ -198,9 +199,19 @@ class FilesystemAdapterTest extends TestCase
         $this->assertNull($filesystemAdapter->json('file.json'));
     }
 
+    public function testMimeTypeDetectedPreferInclusiveMimeTypeOverNullAsEmpty()
+    {
+        if (version_compare(InstalledVersions::getPrettyVersion('league/flysystem'), '3.22.0', '<')) {
+            $this->markTestSkipped('Require league/flysystem 3.22.0');
+        }
+
+        $this->filesystem->write('unknown.mime-type', '');
+        $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
+        $this->assertSame('application/x-empty', $filesystemAdapter->mimeType('unknown.mime-type'));
+    }
+
     public function testMimeTypeNotDetected()
     {
-        $this->filesystem->write('unknown.mime-type', '');
         $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
         $this->assertFalse($filesystemAdapter->mimeType('unknown.mime-type'));
     }
@@ -531,8 +542,6 @@ class FilesystemAdapterTest extends TestCase
 
     public function testThrowExceptionsForMimeType()
     {
-        $this->filesystem->write('unknown.mime-type', '');
-
         $adapter = new FilesystemAdapter($this->filesystem, $this->adapter, ['throw' => true]);
 
         try {

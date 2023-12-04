@@ -236,7 +236,7 @@ class Number
     }
 
     /**
-     * Ensure the "intl" PHP exntension is installed.
+     * Ensure the "intl" PHP extension is installed.
      *
      * @return void
      */
