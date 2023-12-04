@@ -3,10 +3,10 @@
 namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Command;
-use function Laravel\Prompts\select;
 use Symfony\Component\Console\Attribute\AsCommand;
-
 use Symfony\Component\Finder\Finder;
+
+use function Laravel\Prompts\select;
 
 #[AsCommand(name: 'config:publish')]
 class ConfigPublishCommand extends Command
