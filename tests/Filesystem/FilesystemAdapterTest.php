@@ -4,7 +4,6 @@ namespace Illuminate\Tests\Filesystem;
 
 use Carbon\Carbon;
 use Composer\InstalledVersions;
-use Composer\Semver\VersionParser;
 use GuzzleHttp\Psr7\Stream;
 use Illuminate\Filesystem\FilesystemAdapter;
 use Illuminate\Filesystem\FilesystemManager;
