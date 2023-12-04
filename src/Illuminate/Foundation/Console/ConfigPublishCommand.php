@@ -15,7 +15,7 @@ class ConfigPublishCommand extends Command
      * @var string
      */
     protected $signature = 'config:publish
-                    {name? : The name of the configuration file to publish}
+                    {name : The name of the configuration file to publish}
                     {--force : Overwrite any existing configuration files}';
 
     /**
@@ -34,19 +34,15 @@ class ConfigPublishCommand extends Command
     {
         $config = $this->getBaseConfigurationFiles();
 
-        $name = $this->argument('name');
+        $name = (string) $this->argument('name');
 
-        if (! is_null($name) && ! isset($config[$name])) {
+        if (! isset($config[$name])) {
             $this->components->error('Unrecognized configuration file.');
 
             return 1;
         }
 
-        foreach ($config as $key => $file) {
-            if ($key === $name || is_null($name)) {
-                $this->publish($key, $file, $this->laravel->configPath().'/'.$key.'.php');
-            }
-        }
+        $this->publish($name, $config[$name], $this->laravel->configPath().'/'.$name.'.php');
     }
 
     /**
