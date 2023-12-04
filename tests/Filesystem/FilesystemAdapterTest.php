@@ -198,9 +198,15 @@ class FilesystemAdapterTest extends TestCase
         $this->assertNull($filesystemAdapter->json('file.json'));
     }
 
-    public function testMimeTypeNotDetected()
+    public function testMimeTypeDetectedAsEmpty()
     {
         $this->filesystem->write('unknown.mime-type', '');
+        $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
+        $this->assertSame('application/x-empty', $filesystemAdapter->mimeType('unknown.mime-type'));
+    }
+
+    public function testMimeTypeNotDetected()
+    {
         $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
         $this->assertFalse($filesystemAdapter->mimeType('unknown.mime-type'));
     }
@@ -531,8 +537,6 @@ class FilesystemAdapterTest extends TestCase
 
     public function testThrowExceptionsForMimeType()
     {
-        $this->filesystem->write('unknown.mime-type', '');
-
         $adapter = new FilesystemAdapter($this->filesystem, $this->adapter, ['throw' => true]);
 
         try {
