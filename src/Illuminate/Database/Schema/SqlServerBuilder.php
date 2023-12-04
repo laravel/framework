@@ -31,6 +31,19 @@ class SqlServerBuilder extends Builder
     }
 
     /**
+     * Determine if the given table exists.
+     *
+     * @deprecated Will be removed in a future Laravel version.
+     *
+     * @param  string  $table
+     * @return bool
+     */
+    public function hasTable($table)
+    {
+        return parent::hasTable($table) || $this->hasView($table);
+    }
+
+    /**
      * Drop all tables from the database.
      *
      * @return void
