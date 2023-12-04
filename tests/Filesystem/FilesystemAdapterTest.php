@@ -202,7 +202,7 @@ class FilesystemAdapterTest extends TestCase
 
     public function testMimeTypeDetectedPreferInclusiveMimeTypeOverNullAsEmpty()
     {
-        if (version_compare(InstalledVersions::getPrettyVersion('league/flysystem'), '<', '3.22.0')) {
+        if (version_compare(InstalledVersions::getPrettyVersion('league/flysystem'), '3.22.0', '<')) {
             $this->markTestSkipped('Require league/flysystem 3.22.0');
         }
 
