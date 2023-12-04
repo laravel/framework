@@ -5,9 +5,12 @@ namespace Illuminate\Foundation\Console;
 use Illuminate\Console\Command;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Finder\Finder;
+use Illuminate\Contracts\Console\PromptsForMissingInput;
+
+use function Laravel\Prompts\select;
 
 #[AsCommand(name: 'config:publish')]
-class ConfigPublishCommand extends Command
+class ConfigPublishCommand extends Command implements PromptsForMissingInput
 {
     /**
      * The name and signature of the console command.
@@ -80,5 +83,22 @@ class ConfigPublishCommand extends Command
         }
 
         return collect($config)->sortKeys()->all();
+    }
+
+    /**
+     * Prompt for missing input arguments using the returned questions.
+     *
+     * @return array
+     */
+    protected function promptForMissingArgumentsUsing()
+    {
+        return [
+            'name' => fn () => select(
+                label: 'Which configuration file would you like to publish?',
+                options: collect($this->getBaseConfigurationFiles())->map(function (string $path) {
+                    return basename($path, '.php');
+                }),
+            ),
+        ];
     }
 }
