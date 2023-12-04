@@ -8,6 +8,7 @@ use Illuminate\Encryption\Encrypter;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Env;
 use Illuminate\Support\Str;
+use Illuminate\Support\Stringable;
 use Symfony\Component\Console\Attribute\AsCommand;
 
 #[AsCommand(name: 'env:decrypt')]
@@ -24,7 +25,8 @@ class EnvironmentDecryptCommand extends Command
                     {--env= : The environment to be decrypted}
                     {--force : Overwrite the existing environment file}
                     {--path= : Path to write the decrypted file}
-                    {--filename= : Filename of the decrypted file}';
+                    {--filename= : Filename of the decrypted file}
+                    {--only-values : Enable if the encrypted file was encrypted with the same flag}';
 
     /**
      * The console command description.
@@ -99,9 +101,17 @@ class EnvironmentDecryptCommand extends Command
         try {
             $encrypter = new Encrypter($key, $cipher);
 
+            $contents = $this->files->get($encryptedFile);
+
+            if ($this->option('only-values')) {
+                $decryptedContents = $this->decryptValues($contents, $encrypter);
+            } else {
+                $decryptedContents = $encrypter->decrypt($contents);
+            }
+
             $this->files->put(
                 $outputFile,
-                $encrypter->decrypt($this->files->get($encryptedFile))
+                $decryptedContents
             );
         } catch (Exception $e) {
             $this->components->error($e->getMessage());
@@ -144,5 +154,23 @@ class EnvironmentDecryptCommand extends Command
         $outputFile = ltrim($outputFile, DIRECTORY_SEPARATOR);
 
         return $path.$outputFile;
+    }
+
+    protected function decryptValues(string $contents, Encrypter $encrypter): string
+    {
+        return implode(PHP_EOL, collect(explode(PHP_EOL, $contents))->map(function (string $line) use ($encrypter) {
+            $line = Str::of($line);
+
+            if (! $line->contains('=')) {
+                return $line;
+            }
+
+            return $line->before('=')
+                ->append('=')
+                ->append(
+                    $line->after('=')
+                        ->pipe(fn (Stringable $value) => $encrypter->decrypt($value->toString()))
+                );
+        })->toArray());
     }
 }
