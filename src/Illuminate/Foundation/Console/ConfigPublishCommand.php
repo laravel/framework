@@ -6,6 +6,8 @@ use Illuminate\Console\Command;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Finder\Finder;
 
+use function Laravel\Prompts\select;
+
 #[AsCommand(name: 'config:publish')]
 class ConfigPublishCommand extends Command
 {
@@ -16,6 +18,7 @@ class ConfigPublishCommand extends Command
      */
     protected $signature = 'config:publish
                     {name? : The name of the configuration file to publish}
+                    {--all : Publish all configuration files}
                     {--force : Overwrite any existing configuration files}';
 
     /**
@@ -34,7 +37,20 @@ class ConfigPublishCommand extends Command
     {
         $config = $this->getBaseConfigurationFiles();
 
-        $name = $this->argument('name');
+        if (is_null($this->argument('name')) && $this->option('all')) {
+            foreach ($config as $key => $file) {
+                $this->publish($key, $file, $this->laravel->configPath().'/'.$key.'.php');
+            }
+
+            return;
+        }
+
+        $name = (string) (is_null($this->argument('name')) ? select(
+            label: 'Which configuration file would you like to publish?',
+            options: collect($config)->map(function (string $path) {
+                return basename($path, '.php');
+            }),
+        ) : $this->argument('name'));
 
         if (! is_null($name) && ! isset($config[$name])) {
             $this->components->error('Unrecognized configuration file.');
@@ -42,11 +58,7 @@ class ConfigPublishCommand extends Command
             return 1;
         }
 
-        foreach ($config as $key => $file) {
-            if ($key === $name || is_null($name)) {
-                $this->publish($key, $file, $this->laravel->configPath().'/'.$key.'.php');
-            }
-        }
+        $this->publish($name, $config[$name], $this->laravel->configPath().'/'.$name.'.php');
     }
 
     /**
