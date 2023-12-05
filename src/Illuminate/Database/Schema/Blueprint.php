@@ -288,7 +288,7 @@ class Blueprint
     }
 
     /**
-     * Set the engine that should be used on the table.
+     * Specify the storage engine that should be used for the table.
      *
      * @param  string  $engine
      * @return void
@@ -296,6 +296,17 @@ class Blueprint
     public function engine($engine)
     {
         $this->engine = $engine;
+    }
+
+    /**
+     * Specify that the InnoDB storage engine should be used for the table (MySQL only).
+     *
+     * @param  string  $engine
+     * @return void
+     */
+    public function innoDb()
+    {
+        return $this->engine('InnoDB');
     }
 
     /**
