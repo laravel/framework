@@ -2,6 +2,9 @@
 
 namespace Illuminate\Contracts\Translation;
 
+/**
+ * @method bool has(string, string|null, bool)
+ */
 interface Translator
 {
     /**
@@ -13,6 +16,16 @@ interface Translator
      * @return mixed
      */
     public function get($key, array $replace = [], $locale = null);
+
+    /**
+     * Determine if a translation exists.
+     *
+     * @param  string  $key
+     * @param  string|null  $locale
+     * @param  bool  $fallback
+     * @return bool
+     */
+    public function has($key, $locale = null, $fallback = true);
 
     /**
      * Get a translation according to an integer value.
@@ -39,14 +52,4 @@ interface Translator
      * @return void
      */
     public function setLocale($locale);
-
-    /**
-     * Determine if a translation exists.
-     *
-     * @param  string  $key
-     * @param  string|null  $locale
-     * @param  bool  $fallback
-     * @return bool
-     */
-    public function has($key, $locale = null, $fallback = true);
 }
