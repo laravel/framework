@@ -306,7 +306,7 @@ class Blueprint
      */
     public function innoDb()
     {
-        return $this->engine('InnoDB');
+        $this->engine('InnoDB');
     }
 
     /**
