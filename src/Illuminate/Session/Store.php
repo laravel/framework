@@ -439,8 +439,8 @@ class Store implements Session
     /**
      * Flash a key / value pair to the session.
      *
-     * @param  string|array  $key
-     * @param  mixed  $value
+     * @param string|array $key
+     * @param mixed $value
      * @return void
      */
     public function flash(string|array $key, $value = true)
