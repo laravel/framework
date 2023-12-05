@@ -153,6 +153,17 @@ abstract class Lock implements LockContract
         return $this->getCurrentOwner() === $this->owner;
     }
 
+
+    /**
+     * Determine if this lock is owned  by the current owner.
+     * 
+     * @return bool
+     */
+    public function isOwner()
+    {
+        return $this->isOwnedByCurrentProcess();
+    }
+
     /**
      * Specify the number of milliseconds to sleep in between blocked lock acquisition attempts.
      *
