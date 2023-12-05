@@ -43,6 +43,13 @@ class VendorPublishCommand extends Command
     protected $tags = [];
 
     /**
+     * The time the command started.
+     *
+     * @var \Illuminate\Support\Carbon|null
+     */
+    protected $publishedAt;
+
+    /**
      * The console command signature.
      *
      * @var string
@@ -81,6 +88,8 @@ class VendorPublishCommand extends Command
      */
     public function handle()
     {
+        $this->publishedAt = now();
+
         $this->determineWhatShouldBePublished();
 
         foreach ($this->tags ?: [null] as $tag) {
@@ -360,7 +369,13 @@ class VendorPublishCommand extends Command
             $path = realpath($path);
 
             if ($from === $path && preg_match('/\d{4}_(\d{2})_(\d{2})_(\d{6})_/', $to)) {
-                return preg_replace('/\d{4}_(\d{2})_(\d{2})_(\d{6})_/', date('Y_m_d_His_'), $to);
+                $this->publishedAt->addSecond();
+
+                return preg_replace(
+                    '/\d{4}_(\d{2})_(\d{2})_(\d{6})_/',
+                    $this->publishedAt->format('Y_m_d_His').'_',
+                    $to,
+                );
             }
         }
 
