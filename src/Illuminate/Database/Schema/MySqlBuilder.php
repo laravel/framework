@@ -104,6 +104,23 @@ class MySqlBuilder extends Builder
     }
 
     /**
+     * Get the indexes for a given table.
+     *
+     * @param  string  $table
+     * @return array
+     */
+    public function getIndexes($table)
+    {
+        $table = $this->connection->getTablePrefix().$table;
+
+        return $this->connection->getPostProcessor()->processIndexes(
+            $this->connection->selectFromWriteConnection(
+                $this->grammar->compileIndexes($this->connection->getDatabaseName(), $table)
+            )
+        );
+    }
+
+    /**
      * Drop all tables from the database.
      *
      * @return void

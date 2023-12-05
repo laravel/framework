@@ -168,6 +168,28 @@ class SqlServerGrammar extends Grammar
     }
 
     /**
+     * Compile the query to determine the indexes.
+     *
+     * @param  string  $table
+     * @return string
+     */
+    public function compileIndexes($table)
+    {
+        return sprintf(
+            "select idx.name as name, string_agg(col.name, ',') within group (order by idxcol.key_ordinal) as columns, "
+            .'idx.type_desc as [type], idx.is_unique as [unique], idx.is_primary_key as [primary] '
+            .'from sys.indexes as idx '
+            .'join sys.tables as tbl on idx.object_id = tbl.object_id '
+            .'join sys.schemas as scm on tbl.schema_id = scm.schema_id '
+            .'join sys.index_columns as idxcol on idx.object_id = idxcol.object_id and idx.index_id = idxcol.index_id '
+            .'join sys.columns as col on idxcol.object_id = col.object_id and idxcol.column_id = col.column_id '
+            .'where tbl.name = %s and scm.name = SCHEMA_NAME() '
+            .'group by idx.name, idx.type_desc, idx.is_unique, idx.is_primary_key',
+            $this->quoteString($table),
+        );
+    }
+
+    /**
      * Compile a create table command.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint

@@ -343,6 +343,21 @@ class Builder
     }
 
     /**
+     * Get the indexes for a given table.
+     *
+     * @param  string  $table
+     * @return array
+     */
+    public function getIndexes($table)
+    {
+        $table = $this->connection->getTablePrefix().$table;
+
+        return $this->connection->getPostProcessor()->processIndexes(
+            $this->connection->selectFromWriteConnection($this->grammar->compileIndexes($table))
+        );
+    }
+
+    /**
      * Modify a table on the schema.
      *
      * @param  string  $table
