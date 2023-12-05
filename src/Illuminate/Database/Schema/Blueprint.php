@@ -288,6 +288,17 @@ class Blueprint
     }
 
     /**
+     * Set the engine that should be used on the table.
+     *
+     * @param  string  $engine
+     * @return void
+     */
+    public function engine($engine)
+    {
+        $this->engine = $engine;
+    }
+
+    /**
      * Indicate that the table needs to be temporary.
      *
      * @return void
