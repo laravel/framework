@@ -303,7 +303,7 @@ abstract class ServiceProvider
     {
         $this->publishes($paths, $groups);
 
-        static::$publishableMigrationPaths = array_merge(static::$publishableMigrationPaths, array_keys($paths));
+        static::$publishableMigrationPaths = array_unique(array_merge(static::$publishableMigrationPaths, array_keys($paths)));
     }
 
     /**
