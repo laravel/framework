@@ -134,9 +134,9 @@ class ServiceProviderForTestingOne extends ServiceProvider
         $this->publishes(['source/tagged/one' => 'destination/tagged/one'], 'some_tag');
         $this->publishes(['source/tagged/multiple' => 'destination/tagged/multiple'], ['tag_one', 'tag_two']);
 
-        $this->migrationPublishes(['source/unmarked/two' => 'destination/unmarked/two']);
-        $this->migrationPublishes(['source/tagged/three' => 'destination/tagged/three'], 'tag_three');
-        $this->migrationPublishes(['source/tagged/multiple_two' => 'destination/tagged/multiple_two'], ['tag_four', 'tag_five']);
+        $this->publishesMigrations(['source/unmarked/two' => 'destination/unmarked/two']);
+        $this->publishesMigrations(['source/tagged/three' => 'destination/tagged/three'], 'tag_three');
+        $this->publishesMigrations(['source/tagged/multiple_two' => 'destination/tagged/multiple_two'], ['tag_four', 'tag_five']);
     }
 }
 
