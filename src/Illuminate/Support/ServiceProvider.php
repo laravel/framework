@@ -48,6 +48,13 @@ abstract class ServiceProvider
     public static $publishGroups = [];
 
     /**
+     * The migration paths available for publishing.
+     *
+     * @var array
+     */
+    protected static $publishableMigrationPaths = [];
+
+    /**
      * Create a new service provider instance.
      *
      * @param  \Illuminate\Contracts\Foundation\Application  $app
@@ -268,6 +275,20 @@ abstract class ServiceProvider
     }
 
     /**
+     * Register migration paths to be published by the publish command.
+     *
+     * @param  array  $paths
+     * @param  mixed  $groups
+     * @return void
+     */
+    protected function publishesMigrations(array $paths, $groups = null)
+    {
+        $this->publishes($paths, $groups);
+
+        static::$publishableMigrationPaths = array_unique(array_merge(static::$publishableMigrationPaths, array_keys($paths)));
+    }
+
+    /**
      * Register paths to be published by the publish command.
      *
      * @param  array  $paths
@@ -378,6 +399,16 @@ abstract class ServiceProvider
     public static function publishableProviders()
     {
         return array_keys(static::$publishes);
+    }
+
+    /**
+     * Get the migration paths available for publishing.
+     *
+     * @return array
+     */
+    public static function publishableMigrationPaths()
+    {
+        return static::$publishableMigrationPaths;
     }
 
     /**
