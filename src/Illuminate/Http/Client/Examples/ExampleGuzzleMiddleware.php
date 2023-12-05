@@ -6,6 +6,7 @@ namespace Illuminate\Http\Client\Examples;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Client\Middleware\AbstractHttpMiddleware;
+use Illuminate\Support\Facades\Log;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
@@ -20,9 +21,7 @@ class ExampleGuzzleMiddleware extends AbstractHttpMiddleware
      */
     protected function getRequestOptions(RequestInterface $request, ResponseInterface $response, Exception $reason = null): void
     {
-        $date = Carbon::now()->format('Y-m-d H:i:s');
-        $myFile = fopen('./logs/'.$date.".txt", "w");
-        fwrite($myFile, json_encode($request->getBody()->getContents()));
-        fwrite($myFile, json_encode($response->getBody()->getContents()));
+        Log::info('Request', [$request->getBody()->getContents()]);
+        Log::info('Response', [$response->getBody()->getContents()]);
     }
 }
