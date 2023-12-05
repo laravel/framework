@@ -34,18 +34,18 @@ abstract class ServiceProvider
     protected $bootedCallbacks = [];
 
     /**
+     * The migration paths available for publishing.
+     *
+     * @var array
+     */
+    protected static $publishableMigrationPaths = [];
+
+    /**
      * The paths that should be published.
      *
      * @var array
      */
     public static $publishes = [];
-
-    /**
-     * The migration paths that should be published.
-     *
-     * @var array
-     */
-    public static $migrationPublishes = [];
 
     /**
      * The paths that should be published by group.
@@ -299,13 +299,11 @@ abstract class ServiceProvider
      * @param  mixed  $groups
      * @return void
      */
-    protected function migrationPublishes(array $paths, $groups = null)
+    protected function publishesMigrations(array $paths, $groups = null)
     {
         $this->publishes($paths, $groups);
 
-        $this->ensureMigrationPublishArrayInitialized($class = static::class);
-
-        static::$migrationPublishes[$class] = array_merge(static::$migrationPublishes[$class], $paths);
+        static::$publishableMigrationPaths = array_merge(static::$publishableMigrationPaths, array_keys($paths));
     }
 
     /**
@@ -318,19 +316,6 @@ abstract class ServiceProvider
     {
         if (! array_key_exists($class, static::$publishes)) {
             static::$publishes[$class] = [];
-        }
-    }
-
-    /**
-     * Ensure the migration publish array for the service provider is initialized.
-     *
-     * @param  string  $class
-     * @return void
-     */
-    protected function ensureMigrationPublishArrayInitialized($class)
-    {
-        if (! array_key_exists($class, static::$migrationPublishes)) {
-            static::$migrationPublishes[$class] = [];
         }
     }
 
@@ -414,6 +399,16 @@ abstract class ServiceProvider
     public static function publishableProviders()
     {
         return array_keys(static::$publishes);
+    }
+
+    /**
+     * Get the migration paths available for publishing.
+     *
+     * @return array
+     */
+    public static function publishableMigrationPaths()
+    {
+        return static::$publishableMigrationPaths;
     }
 
     /**

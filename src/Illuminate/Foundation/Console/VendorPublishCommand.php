@@ -243,6 +243,9 @@ class VendorPublishCommand extends Command
     {
         if ((! $this->option('existing') && (! $this->files->exists($to) || $this->option('force')))
             || ($this->option('existing') && $this->files->exists($to))) {
+
+            $to = $this->ensureUpToDateMigrationNames($from, $to);
+
             $this->createParentDirectory(dirname($to));
 
             $this->files->copy($from, $to);
@@ -274,7 +277,7 @@ class VendorPublishCommand extends Command
     {
         $visibility = PortableVisibilityConverter::fromArray([], Visibility::PUBLIC);
 
-        $this->moveManagedFiles(new MountManager([
+        $this->moveManagedFiles($from, new MountManager([
             'from' => new Flysystem(new LocalAdapter($from)),
             'to' => new Flysystem(new LocalAdapter($to, $visibility)),
         ]));
@@ -285,10 +288,11 @@ class VendorPublishCommand extends Command
     /**
      * Move all the files in the given MountManager.
      *
+     * @param  string  $from
      * @param  \League\Flysystem\MountManager  $manager
      * @return void
      */
-    protected function moveManagedFiles($manager)
+    protected function moveManagedFiles($from, $manager)
     {
         foreach ($manager->listContents('from://', true) as $file) {
             $path = Str::after($file['path'], 'from://');
@@ -300,6 +304,8 @@ class VendorPublishCommand extends Command
                     || ($this->option('existing') && $manager->fileExists('to://'.$path))
                 )
             ) {
+                $path = $this->ensureUpToDateMigrationNames($from, $path);
+
                 $manager->write('to://'.$path, $manager->read($file['path']));
             }
         }
@@ -338,5 +344,27 @@ class VendorPublishCommand extends Command
             $from,
             $to,
         ));
+    }
+
+    /**
+     * Ensure the migrations have current dates on their names.
+     *
+     * @param  string  $from
+     * @param  string  $to
+     * @return string
+     */
+    protected function ensureUpToDateMigrationNames($from, $to)
+    {
+        $from = realpath($from);
+
+        foreach (ServiceProvider::publishableMigrationPaths() as $path) {
+            $path = realpath($path);
+
+            if ($from === $path && preg_match('/\d{4}_(\d{2})_(\d{2})_(\d{6})_/', $to)) {
+                $to = preg_replace('/\d{4}_(\d{2})_(\d{2})_(\d{6})_/', date('Y_m_d_His_'), $to);
+            }
+        }
+
+        return $to;
     }
 }
