@@ -347,7 +347,7 @@ class VendorPublishCommand extends Command
     }
 
     /**
-     * Ensure the migrations have current dates on their names.
+     * Ensure the given migration name is up-to-date.
      *
      * @param  string  $from
      * @param  string  $to
