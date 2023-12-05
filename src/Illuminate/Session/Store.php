@@ -425,8 +425,8 @@ class Store implements Session
     /**
      * Manages the storage of a flash key-value pair in the session.
      *
-     * @param string $key
-     * @param mixed $item
+     * @param  string  $key
+     * @param  mixed  $item
      * @return void
      */
     protected function handleFlashKey($key, $item)
@@ -439,8 +439,8 @@ class Store implements Session
     /**
      * Flash a key / value pair to the session.
      *
-     * @param string|array $key
-     * @param mixed $value
+     * @param  string|array  $key
+     * @param  mixed  $value
      * @return void
      */
     public function flash(string|array $key, $value = true)
