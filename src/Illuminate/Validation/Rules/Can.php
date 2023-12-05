@@ -23,7 +23,7 @@ class Can implements Rule, ValidatorAwareRule
     protected $arguments;
 
     /**
-     * The validator performing the validation.
+     * The current validator instance.
      *
      * @var \Illuminate\Validation\Validator
      */
@@ -72,7 +72,7 @@ class Can implements Rule, ValidatorAwareRule
     }
 
     /**
-     * Set the performing validator.
+     * Set the current validator.
      *
      * @param  \Illuminate\Validation\Validator  $validator
      * @return $this

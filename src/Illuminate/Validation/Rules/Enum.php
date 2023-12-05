@@ -16,7 +16,7 @@ class Enum implements Rule, ValidatorAwareRule
     protected $type;
 
     /**
-     * The validator performing the validation.
+     * The current validator instance.
      *
      * @var \Illuminate\Validation\Validator
      */
@@ -72,7 +72,7 @@ class Enum implements Rule, ValidatorAwareRule
     }
 
     /**
-     * Set the performing validator.
+     * Set the current validator.
      *
      * @param  \Illuminate\Validation\Validator  $validator
      * @return $this
