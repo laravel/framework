@@ -243,7 +243,6 @@ class VendorPublishCommand extends Command
     {
         if ((! $this->option('existing') && (! $this->files->exists($to) || $this->option('force')))
             || ($this->option('existing') && $this->files->exists($to))) {
-
             $to = $this->ensureUpToDateMigrationNames($from, $to);
 
             $this->createParentDirectory(dirname($to));
