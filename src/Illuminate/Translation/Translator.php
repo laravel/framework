@@ -131,13 +131,11 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
     {
         $locale = $locale ?: $this->locale;
 
-        $line = $this->translate($key, $replace, $locale, $fallback);
-
-        if (is_null($line)) {
-            $line = $this->handleMissingTranslationKey(
+        $line = $this->translate($key, $replace, $locale, $fallback)
+            ?? $this->handleMissingTranslationKey(
                 $key, $replace, $locale, $fallback
-            ) ?? $key;
-        }
+            )
+            ?? $key;
 
         return $this->makeReplacements($line, $replace);
     }
