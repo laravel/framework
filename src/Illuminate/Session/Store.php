@@ -423,19 +423,37 @@ class Store implements Session
     }
 
     /**
+     * Manages the storage of a flash key-value pair in the session.
+     *
+     * @param string $key
+     * @param mixed $item
+     * @return void
+     */
+    protected function handleFlashKey($key, $item)
+    {
+        $this->put($key, $item);
+
+        $this->push('_flash.new', $key);
+    }
+
+    /**
      * Flash a key / value pair to the session.
      *
-     * @param  string  $key
+     * @param  string|array  $key
      * @param  mixed  $value
      * @return void
      */
-    public function flash(string $key, $value = true)
+    public function flash(string|array $key, $value = true)
     {
-        $this->put($key, $value);
+        if ($isKeyAnArray = is_array($key)) {
+            collect($key)->each(function ($item, $key) use ($value) {
+                $this->handleFlashKey($key, $item ?? $value);
+            });
+        } else {
+            $this->handleFlashKey($key, $value);
+        }
 
-        $this->push('_flash.new', $key);
-
-        $this->removeFromOldFlashData([$key]);
+        $this->removeFromOldFlashData($isKeyAnArray ? $key : [$key]);
     }
 
     /**
