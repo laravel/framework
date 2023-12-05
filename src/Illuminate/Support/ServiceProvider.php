@@ -34,13 +34,6 @@ abstract class ServiceProvider
     protected $bootedCallbacks = [];
 
     /**
-     * The migration paths available for publishing.
-     *
-     * @var array
-     */
-    protected static $publishableMigrationPaths = [];
-
-    /**
      * The paths that should be published.
      *
      * @var array
@@ -53,6 +46,13 @@ abstract class ServiceProvider
      * @var array
      */
     public static $publishGroups = [];
+
+    /**
+     * The migration paths available for publishing.
+     *
+     * @var array
+     */
+    protected static $publishableMigrationPaths = [];
 
     /**
      * Create a new service provider instance.
@@ -275,6 +275,20 @@ abstract class ServiceProvider
     }
 
     /**
+     * Register migration paths to be published by the publish command.
+     *
+     * @param  array  $paths
+     * @param  mixed  $groups
+     * @return void
+     */
+    protected function publishesMigrations(array $paths, $groups = null)
+    {
+        $this->publishes($paths, $groups);
+
+        static::$publishableMigrationPaths = array_unique(array_merge(static::$publishableMigrationPaths, array_keys($paths)));
+    }
+
+    /**
      * Register paths to be published by the publish command.
      *
      * @param  array  $paths
@@ -290,20 +304,6 @@ abstract class ServiceProvider
         foreach ((array) $groups as $group) {
             $this->addPublishGroup($group, $paths);
         }
-    }
-
-    /**
-     * Register migration paths to be published by the publish command.
-     *
-     * @param  array  $paths
-     * @param  mixed  $groups
-     * @return void
-     */
-    protected function publishesMigrations(array $paths, $groups = null)
-    {
-        $this->publishes($paths, $groups);
-
-        static::$publishableMigrationPaths = array_unique(array_merge(static::$publishableMigrationPaths, array_keys($paths)));
     }
 
     /**

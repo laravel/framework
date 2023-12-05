@@ -252,7 +252,7 @@ class VendorPublishCommand extends Command
     {
         if ((! $this->option('existing') && (! $this->files->exists($to) || $this->option('force')))
             || ($this->option('existing') && $this->files->exists($to))) {
-            $to = $this->ensureUpToDateMigrationNames($from, $to);
+            $to = $this->ensureMigrationNameIsUpToDate($from, $to);
 
             $this->createParentDirectory(dirname($to));
 
@@ -312,7 +312,7 @@ class VendorPublishCommand extends Command
                     || ($this->option('existing') && $manager->fileExists('to://'.$path))
                 )
             ) {
-                $path = $this->ensureUpToDateMigrationNames($from, $path);
+                $path = $this->ensureMigrationNameIsUpToDate($from, $path);
 
                 $manager->write('to://'.$path, $manager->read($file['path']));
             }
@@ -330,6 +330,34 @@ class VendorPublishCommand extends Command
         if (! $this->files->isDirectory($directory)) {
             $this->files->makeDirectory($directory, 0755, true);
         }
+    }
+
+    /**
+     * Ensure the given migration name is up-to-date.
+     *
+     * @param  string  $from
+     * @param  string  $to
+     * @return string
+     */
+    protected function ensureMigrationNameIsUpToDate($from, $to)
+    {
+        $from = realpath($from);
+
+        foreach (ServiceProvider::publishableMigrationPaths() as $path) {
+            $path = realpath($path);
+
+            if ($from === $path && preg_match('/\d{4}_(\d{2})_(\d{2})_(\d{6})_/', $to)) {
+                $this->publishedAt->addSecond();
+
+                return preg_replace(
+                    '/\d{4}_(\d{2})_(\d{2})_(\d{6})_/',
+                    $this->publishedAt->format('Y_m_d_His').'_',
+                    $to,
+                );
+            }
+        }
+
+        return $to;
     }
 
     /**
@@ -352,33 +380,5 @@ class VendorPublishCommand extends Command
             $from,
             $to,
         ));
-    }
-
-    /**
-     * Ensure the given migration name is up-to-date.
-     *
-     * @param  string  $from
-     * @param  string  $to
-     * @return string
-     */
-    protected function ensureUpToDateMigrationNames($from, $to)
-    {
-        $from = realpath($from);
-
-        foreach (ServiceProvider::publishableMigrationPaths() as $path) {
-            $path = realpath($path);
-
-            if ($from === $path && preg_match('/\d{4}_(\d{2})_(\d{2})_(\d{6})_/', $to)) {
-                $this->publishedAt->addSecond();
-
-                return preg_replace(
-                    '/\d{4}_(\d{2})_(\d{2})_(\d{6})_/',
-                    $this->publishedAt->format('Y_m_d_His').'_',
-                    $to,
-                );
-            }
-        }
-
-        return $to;
     }
 }
