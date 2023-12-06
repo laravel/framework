@@ -1525,7 +1525,7 @@ class Str
     public static function possessive($subject)
     {
         return static::endsWith(static::lower($subject), 's')
-            ?"{$subject}'"
+            ? "{$subject}'"
             : "{$subject}'s";
     }
 
