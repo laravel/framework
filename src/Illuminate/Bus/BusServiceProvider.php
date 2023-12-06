@@ -45,11 +45,10 @@ class BusServiceProvider extends ServiceProvider implements DeferrableProvider
     {
         $this->app->singleton(BatchRepository::class, function ($app) {
             $driver = $app->config->get('queue.batching.driver', 'database');
-            if ($driver === 'dynamodb') {
-                return $app->make(DynamoBatchRepository::class);
-            }
 
-            return $app->make(DatabaseBatchRepository::class);
+            return $driver === 'dynamodb'
+                ? $app->make(DynamoBatchRepository::class)
+                : $app->make(DatabaseBatchRepository::class);
         });
 
         $this->app->singleton(DatabaseBatchRepository::class, function ($app) {
@@ -62,6 +61,7 @@ class BusServiceProvider extends ServiceProvider implements DeferrableProvider
 
         $this->app->singleton(DynamoBatchRepository::class, function ($app) {
             $config = $app->config->get('queue.batching');
+
             $dynamoConfig = [
                 'region' => $config['region'],
                 'version' => 'latest',
