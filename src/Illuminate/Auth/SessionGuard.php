@@ -97,7 +97,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     protected $timebox;
 
     /**
-     * Rehash passwords during login.
+     * Indicates if paswords should be rehashed on login if needed.
      *
      * @var bool
      */
@@ -125,6 +125,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      * @param  \Illuminate\Contracts\Session\Session  $session
      * @param  \Symfony\Component\HttpFoundation\Request|null  $request
      * @param  \Illuminate\Support\Timebox|null  $timebox
+     * @param  bool  $rehashOnLogin
      * @return void
      */
     public function __construct($name,
@@ -394,6 +395,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
         // fact valid we'll log the users into the application and return true.
         if ($this->hasValidCredentials($user, $credentials)) {
             $this->rehashPasswordIfRequired($user, $credentials);
+
             $this->login($user, $remember);
 
             return true;
@@ -426,6 +428,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
         // not login the user. Instead, we will fail the specific authentication attempt.
         if ($this->hasValidCredentials($user, $credentials) && $this->shouldLogin($callbacks, $user)) {
             $this->rehashPasswordIfRequired($user, $credentials);
+
             $this->login($user, $remember);
 
             return true;

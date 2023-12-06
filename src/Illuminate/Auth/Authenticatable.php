@@ -5,18 +5,18 @@ namespace Illuminate\Auth;
 trait Authenticatable
 {
     /**
+     * The column name of the password field using during authentication.
+     *
+     * @var string
+     */
+    protected $authPasswordName = 'password';
+
+    /**
      * The column name of the "remember me" token.
      *
      * @var string
      */
     protected $rememberTokenName = 'remember_token';
-
-    /**
-     * The column name of the auth password field.
-     *
-     * @var string
-     */
-    protected $authPasswordName = 'password';
 
     /**
      * Get the name of the unique identifier for the user.
