@@ -76,8 +76,8 @@ class DatabaseSchemaBuilderTest extends TestCase
         $connection = m::mock(Connection::class);
         $grammar = m::mock(stdClass::class);
         $connection->shouldReceive('getSchemaGrammar')->andReturn($grammar);
-        $builder = m::mock(Builder::class.'[getIndexes]', [$connection]);
-        $builder->shouldReceive('getIndexes')->with('users')->times(3)->andReturn(['id', 'firstname']);
+        $builder = m::mock(Builder::class.'[getIndexListing]', [$connection]);
+        $builder->shouldReceive('getIndexListing')->with('users')->times(3)->andReturn(['id', 'firstname']);
 
         $this->assertTrue($builder->hasIndex('users', 'id'));
         $this->assertTrue($builder->hasIndex('users', 'firstname'));
@@ -89,8 +89,8 @@ class DatabaseSchemaBuilderTest extends TestCase
         $connection = m::mock(Connection::class);
         $grammar = m::mock(stdClass::class);
         $connection->shouldReceive('getSchemaGrammar')->andReturn($grammar);
-        $builder = m::mock(Builder::class.'[getIndexes]', [$connection]);
-        $builder->shouldReceive('getIndexes')->with('users')->twice()->andReturn(['id', 'firstname']);
+        $builder = m::mock(Builder::class.'[getIndexListing]', [$connection]);
+        $builder->shouldReceive('getIndexListing')->with('users')->twice()->andReturn(['id', 'firstname']);
 
         $this->assertTrue($builder->hasIndexes('users', ['id', 'firstname']));
         $this->assertFalse($builder->hasIndexes('users', ['id', 'address']));
