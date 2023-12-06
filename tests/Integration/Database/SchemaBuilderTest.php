@@ -269,7 +269,7 @@ class SchemaBuilderTest extends DatabaseTestCase
         });
 
         Schema::create('posts', function (Blueprint $table) {
-            $table->foreignId('user_id')->constrained()->cascadeOnUpdate()->nullOnDelete();
+            $table->foreignId('user_id')->nullable()->constrained()->cascadeOnUpdate()->nullOnDelete();
         });
 
         $foreignKeys = Schema::getForeignKeys('posts');
@@ -288,6 +288,8 @@ class SchemaBuilderTest extends DatabaseTestCase
             $table->id();
             $table->integer('a');
             $table->integer('b');
+
+            $table->unique(['b', 'a']);
         });
 
         Schema::create('child', function (Blueprint $table) {
