@@ -1517,6 +1517,19 @@ class Str
     }
 
     /**
+     * Add the possessive apostraphe to the given noun.
+     *
+     * @param  string  $subject
+     * @return string
+     */
+    public static function possessive($subject)
+    {
+        return static::endsWith(static::lower($subject), 's')
+            ?"{$subject}'"
+            : "{$subject}'s";
+    }
+
+    /**
      * Generate a UUID (version 4).
      *
      * @return \Ramsey\Uuid\UuidInterface

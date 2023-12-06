@@ -1324,6 +1324,16 @@ class SupportStrTest extends TestCase
             Str::of(Str::password())->contains(['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'])
         );
     }
+
+    public function testItCanGenerateThePossessiveFormOfWords()
+    {
+        $this->assertSame('John\'s', Str::possessive('John'));
+        $this->assertSame('JOHN\'s', Str::possessive('JOHN'));
+        $this->assertSame('Jess\'', Str::possessive('Jess'));
+        $this->assertSame('JESS\'', Str::possessive('JESS'));
+        $this->assertSame('The car is John\'s', Str::possessive('The car is John'));
+        $this->assertSame('The car is Jess\'', Str::possessive('The car is Jess'));
+    }
 }
 
 class StringableObjectStub
