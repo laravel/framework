@@ -148,19 +148,9 @@ abstract class Lock implements LockContract
      *
      * @return bool
      */
-    protected function isOwnedByCurrentProcess()
+    public function isOwnedByCurrentProcess()
     {
         return $this->getCurrentOwner() === $this->owner;
-    }
-
-    /**
-     * Determine if this lock is owned  by the current owner.
-     *
-     * @return bool
-     */
-    public function isOwner()
-    {
-        return $this->isOwnedByCurrentProcess();
     }
 
     /**

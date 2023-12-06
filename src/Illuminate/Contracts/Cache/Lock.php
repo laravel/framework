@@ -36,13 +36,6 @@ interface Lock
     public function owner();
 
     /**
-     * Determine if this lock is owned  by the current owner.
-     *
-     * @return bool
-     */
-    public function isOwner();
-
-    /**
      * Releases this lock in disregard of ownership.
      *
      * @return void

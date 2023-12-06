@@ -89,7 +89,7 @@ class MemcachedCacheLockTestCase extends MemcachedIntegrationTestCase
         $owner = $firstLock->owner();
 
         $secondLock = Cache::store('memcached')->restoreLock('foo', $owner);
-        $this->assertTrue($secondLock->isOwner());
+        $this->assertTrue($secondLock->isOwnedByCurrentProcess());
     }
 
     public function testOtherOwnerDoesNotOwnLockAfterRestore()
@@ -100,6 +100,6 @@ class MemcachedCacheLockTestCase extends MemcachedIntegrationTestCase
         $this->assertTrue($firstLock->get());
 
         $secondLock = Cache::store('memcached')->restoreLock('foo', 'other_owner');
-        $this->assertFalse($secondLock->isOwner());
+        $this->assertFalse($secondLock->isOwnedByCurrentProcess());
     }
 }
