@@ -100,6 +100,17 @@ class Processor
     }
 
     /**
+     * Process the results of a foreign keys query.
+     *
+     * @param  array  $results
+     * @return array
+     */
+    public function processForeignKeys($results)
+    {
+        return $results;
+    }
+
+    /**
      * Process the results of a column listing query.
      *
      * @deprecated Will be removed in a future Laravel version.
