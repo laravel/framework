@@ -80,7 +80,6 @@ class MemcachedCacheLockTestCase extends MemcachedIntegrationTestCase
         $this->assertTrue(Cache::store('memcached')->lock('foo')->get());
     }
 
-    
     public function testOwnerStatusCanBeCheckedAfterRestoringLock()
     {
         Cache::store('memcached')->lock('foo')->forceRelease();

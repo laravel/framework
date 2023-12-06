@@ -109,7 +109,6 @@ class RedisCacheLockTest extends TestCase
         $this->assertTrue(Cache::store('redis')->lock('foo')->get());
     }
 
-    
     public function testOwnerStatusCanBeCheckedAfterRestoringLock()
     {
         Cache::store('redis')->lock('foo')->forceRelease();
