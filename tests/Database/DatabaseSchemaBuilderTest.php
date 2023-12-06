@@ -71,6 +71,30 @@ class DatabaseSchemaBuilderTest extends TestCase
         $this->assertFalse($builder->hasColumns('users', ['id', 'address']));
     }
 
+    public function testTableHasIndex()
+    {
+        $connection = m::mock(Connection::class);
+        $grammar = m::mock(stdClass::class);
+        $connection->shouldReceive('getSchemaGrammar')->andReturn($grammar);
+        $builder = m::mock(Builder::class.'[getIndexes]', [$connection]);
+        $builder->shouldReceive('getIndexes')->with('users')->twice()->andReturn(['id', 'firstname']);
+
+        $this->assertTrue($builder->hasIndex('users', 'id'));
+        $this->assertFalse($builder->hasIndex('users', 'address'));
+    }
+
+    public function testTableHasIndexes()
+    {
+        $connection = m::mock(Connection::class);
+        $grammar = m::mock(stdClass::class);
+        $connection->shouldReceive('getSchemaGrammar')->andReturn($grammar);
+        $builder = m::mock(Builder::class.'[getIndexes]', [$connection]);
+        $builder->shouldReceive('getIndexes')->with('users')->twice()->andReturn(['id', 'firstname']);
+
+        $this->assertTrue($builder->hasIndexes('users', ['id', 'firstname']));
+        $this->assertFalse($builder->hasIndexes('users', ['id', 'address']));
+    }
+
     public function testGetColumnTypeAddsPrefix()
     {
         $connection = m::mock(Connection::class);
