@@ -203,7 +203,7 @@ class SqlServerGrammar extends Grammar
             .'fs.name as foreign_schema, ft.name as foreign_table, '
             ."string_agg(fc.name, ',') within group (order by fkc.constraint_column_id) as foreign_columns, "
             .'fk.update_referential_action_desc as on_update, '
-            .'fk.delete_referential_action_desc as on_delete, '
+            .'fk.delete_referential_action_desc as on_delete '
             .'from sys.foreign_keys as fk '
             .'join sys.foreign_key_columns as fkc on fkc.constraint_object_id = fk.object_id '
             .'join sys.tables as lt on lt.object_id = fk.parent_object_id '

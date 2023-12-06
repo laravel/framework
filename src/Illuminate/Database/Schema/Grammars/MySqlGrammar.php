@@ -196,7 +196,7 @@ class MySqlGrammar extends Grammar
     {
         return sprintf(
             'select kc.constraint_name as `name`, '
-            .'group_concat(kc.column_name order by kc.ordinal_position) as `columns `, '
+            .'group_concat(kc.column_name order by kc.ordinal_position) as `columns`, '
             .'kc.referenced_table_schema as `foreign_schema`, '
             .'kc.referenced_table_name as `foreign_table`, '
             .'group_concat(kc.referenced_column_name order by kc.ordinal_position) as `foreign_columns`, '
