@@ -290,6 +290,40 @@ class Builder
     }
 
     /**
+     * Determine if the given table has a given column.
+     *
+     * @param  string  $table
+     * @param  string  $index
+     * @return bool
+     */
+    public function hasIndex($table, $index)
+    {
+        return in_array(
+            strtolower($index), array_map('strtolower', $this->getIndexes($table))
+        );
+    }
+
+    /**
+     * Determine if the given table has given columns.
+     *
+     * @param  string  $table
+     * @param  array  $indexes
+     * @return bool
+     */
+    public function hasIndexes($table, array $indexes)
+    {
+        $tableIndexes = array_map('strtolower', $this->getIndexes($table));
+
+        foreach ($tableIndexes as $tableIndex) {
+            if (! in_array(strtolower($tableIndex), $indexes)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
      * Get the data type for the given column name.
      *
      * @param  string  $table
