@@ -213,7 +213,7 @@ class PostgresGrammar extends Grammar
             .'join pg_attribute la on la.attrelid = c.conrelid and la.attnum = conseq.num '
             .'join lateral unnest(c.confkey) with ordinality as confseq(num, ord) on true '
             .'join pg_attribute fa on fa.attrelid = c.confrelid and fa.attnum = confseq.num '
-            ."where c.contype = 'f' and tn.nspname = %s and tc.relname = %s "
+            ."where c.contype = 'f' and tc.relname = %s and tn.nspname = %s "
             .'group by c.conname, fn.nspname, fc.relname, c.confupdtype, c.confdeltype',
             $this->quoteString($table),
             $this->quoteString($schema)
