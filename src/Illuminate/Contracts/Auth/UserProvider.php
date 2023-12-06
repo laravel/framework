@@ -52,7 +52,8 @@ interface UserProvider
      *
      * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
      * @param  array  $credentials
+     * @param  bool  $force
      * @return void
      */
-    public function rehashPasswordIfRequired(Authenticatable $user, array $credentials);
+    public function rehashPasswordIfRequired(Authenticatable $user, array $credentials, bool $force = false);
 }

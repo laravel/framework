@@ -462,20 +462,6 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     }
 
     /**
-     * Rehash the user's password if enabled and required.
-     *
-     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
-     * @param  array  $credentials
-     * @return void
-     */
-    protected function rehashPasswordIfRequired(AuthenticatableContract $user, array $credentials)
-    {
-        if ($this->rehashOnLogin) {
-            $this->provider->rehashPasswordIfRequired($user, $credentials);
-        }
-    }
-
-    /**
      * Determine if the user should login by executing the given callbacks.
      *
      * @param  array|callable|null  $callbacks
@@ -491,6 +477,20 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
         }
 
         return true;
+    }
+
+    /**
+     * Rehash the user's password if enabled and required.
+     *
+     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
+     * @param  array  $credentials
+     * @return void
+     */
+    protected function rehashPasswordIfRequired(AuthenticatableContract $user, array $credentials)
+    {
+        if ($this->rehashOnLogin) {
+            $this->provider->rehashPasswordIfRequired($user, $credentials);
+        }
     }
 
     /**
@@ -684,18 +684,17 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      * The application must be using the AuthenticateSession middleware.
      *
      * @param  string  $password
-     * @param  string  $attribute
      * @return \Illuminate\Contracts\Auth\Authenticatable|null
      *
      * @throws \Illuminate\Auth\AuthenticationException
      */
-    public function logoutOtherDevices($password, $attribute = 'password')
+    public function logoutOtherDevices($password)
     {
         if (! $this->user()) {
             return;
         }
 
-        $result = $this->rehashUserPassword($password, $attribute);
+        $result = $this->rehashUserPasswordForDeviceLogout($password);
 
         if ($this->recaller() ||
             $this->getCookieJar()->hasQueued($this->getRecallerName())) {
@@ -708,23 +707,24 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     }
 
     /**
-     * Rehash the current user's password.
+     * Rehash the current user's password for logging out other devices via AuthenticateSession.
      *
      * @param  string  $password
-     * @param  string  $attribute
      * @return \Illuminate\Contracts\Auth\Authenticatable|null
      *
      * @throws \InvalidArgumentException
      */
-    protected function rehashUserPassword($password, $attribute)
+    protected function rehashUserPasswordForDeviceLogout($password)
     {
-        if (! Hash::check($password, $this->user()->{$attribute})) {
+        $user = $this->user();
+
+        if (! Hash::check($password, $user->getAuthPassword())) {
             throw new InvalidArgumentException('The given password does not match the current password.');
         }
 
-        return tap($this->user()->forceFill([
-            $attribute => Hash::make($password),
-        ]))->save();
+        $this->provider->rehashPasswordIfRequired(
+            $user, ['password' => $password], force: true
+        );
     }
 
     /**
