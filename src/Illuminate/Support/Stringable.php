@@ -1319,6 +1319,16 @@ class Stringable implements JsonSerializable, ArrayAccess
     }
 
     /**
+     * Add the possessive apostraphe to the given noun.
+     *
+     * @return string
+     */
+    public function possessive()
+    {
+        return Str::possessive($this->value);
+    }
+
+    /**
      * Convert the object to a string when JSON encoded.
      *
      * @return string

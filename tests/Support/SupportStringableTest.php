@@ -1295,4 +1295,14 @@ class SupportStringableTest extends TestCase
         $this->assertTrue(isset($str[2]));
         $this->assertFalse(isset($str[10]));
     }
+
+    public function testPossessiveFormOfWords()
+    {
+        $this->assertSame('John\'s', $this->stringable('John')->possessive());
+        $this->assertSame('JOHN\'s', $this->stringable('JOHN')->possessive());
+        $this->assertSame('Jess\'', $this->stringable('Jess')->possessive());
+        $this->assertSame('JESS\'', $this->stringable('JESS')->possessive());
+        $this->assertSame('The car is John\'s', $this->stringable('The car is John')->possessive());
+        $this->assertSame('The car is Jess\'', $this->stringable('The car is Jess')->possessive());
+    }
 }
