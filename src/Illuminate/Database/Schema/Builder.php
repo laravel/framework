@@ -299,7 +299,7 @@ class Builder
     public function hasIndex($table, $index)
     {
         return in_array(
-            strtolower($index), array_map('strtolower', $this->getIndexes($table))
+            strtolower($index), array_map('strtolower', $this->getIndexListing($table))
         );
     }
 
@@ -312,10 +312,10 @@ class Builder
      */
     public function hasIndexes($table, array $indexes)
     {
-        $tableIndexes = array_map('strtolower', $this->getIndexes($table));
+        $tableIndexes = array_map('strtolower', $this->getIndexListing($table));
 
-        foreach ($tableIndexes as $tableIndex) {
-            if (! in_array(strtolower($tableIndex), $indexes)) {
+        foreach ($indexes as $index) {
+            if (! in_array(strtolower($index), $tableIndexes)) {
                 return false;
             }
         }
@@ -359,6 +359,17 @@ class Builder
     public function getColumnListing($table)
     {
         return array_column($this->getColumns($table), 'name');
+    }
+
+    /**
+     * Get the index listing for a given table.
+     *
+     * @param  string  $table
+     * @return array
+     */
+    public function getIndexListing($table)
+    {
+        return array_column($this->getIndexes($table), 'name');
     }
 
     /**
