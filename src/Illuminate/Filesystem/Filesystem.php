@@ -268,7 +268,7 @@ class Filesystem
      *
      * @param  string  $path
      * @param  string  $data
-     * @param  bool    $lock
+     * @param  bool  $lock
      * @return int
      */
     public function append($path, $data, $lock = false)
