@@ -77,9 +77,10 @@ class DatabaseSchemaBuilderTest extends TestCase
         $grammar = m::mock(stdClass::class);
         $connection->shouldReceive('getSchemaGrammar')->andReturn($grammar);
         $builder = m::mock(Builder::class.'[getIndexes]', [$connection]);
-        $builder->shouldReceive('getIndexes')->with('users')->twice()->andReturn(['id', 'firstname']);
+        $builder->shouldReceive('getIndexes')->with('users')->times(3)->andReturn(['id', 'firstname']);
 
         $this->assertTrue($builder->hasIndex('users', 'id'));
+        $this->assertTrue($builder->hasIndex('users', 'firstname'));
         $this->assertFalse($builder->hasIndex('users', 'address'));
     }
 
