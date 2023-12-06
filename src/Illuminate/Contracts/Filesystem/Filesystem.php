@@ -63,6 +63,16 @@ interface Filesystem
     public function writeStream($path, $resource, array $options = []);
 
     /**
+     * Get the URL for the file at the given path.
+     *
+     * @param  string  $path
+     * @return string
+     *
+     * @throws \RuntimeException
+     */
+    public function url($path);
+
+    /**
      * Get the visibility for the given path.
      *
      * @param  string  $path
