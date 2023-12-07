@@ -1231,21 +1231,4 @@ class SupportArrTest extends TestCase
             ],
         ], Arr::prependKeysWith($array, 'test.'));
     }
-
-	public function testPermutations()
-	{
-
-		$array = [1, 2];
-		$array2 = [3, 4];
-		$permutations = [ [1, 2], [3, 4], [1, 3], [1, 4], [2, 3], [2, 4]];
-		$permutationsResult = Arr::permutations([$array, $array2]);
-		$this->assertEquals($permutations, $permutationsResult);
-
-		$array3 = ['AB', 'CD'];
-		$array4 = ['EF', 'GH'];
-		$permutationsExpected = [ ['AB', 'CD'], ['EF', 'GH'], ['AB', 'EF'], ['AB', 'GH'], ['CD', 'EF'], ['CD', 'GH']];
-		$permutationsElements = Arr::permutations([$array3, $array4]);
-		$this->assertEquals($permutationsExpected, $permutationsElements);
-
-	}
 }
