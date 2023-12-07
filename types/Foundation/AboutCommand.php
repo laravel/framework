@@ -1,6 +1,5 @@
 <?php
 
-use Closure;
 use Illuminate\Foundation\Console\AboutCommand;
 
 use function PHPStan\Testing\assertType;
