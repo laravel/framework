@@ -246,7 +246,8 @@ class ValidationExistsRuleTest extends TestCase
         $unique = Rule::unique('users', 'email')->whereNull('column1')->whereNotNull('column2');
         $this->assertSame((string) $unique, 'unique:users,email,NULL,id,column1,NULL,column2,NOT_NULL');
     }
-    public function testItOnlyTrashedSoftDeletes()
+
+	public function testItOnlyTrashedSoftDeletes()
     {
         $rule = new Exists('table');
         $rule->onlyTrashed();
