@@ -97,7 +97,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     protected $timebox;
 
     /**
-     * Indicates if paswords should be rehashed on login if needed.
+     * Indicates if passwords should be rehashed on login if needed.
      *
      * @var bool
      */
