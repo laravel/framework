@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Translation\ArrayLoader;
 use Illuminate\Translation\Translator;
 use Illuminate\Validation\DatabasePresenceVerifier;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Exists;
 use Illuminate\Validation\Validator;
 use PHPUnit\Framework\TestCase;
@@ -234,6 +235,18 @@ class ValidationExistsRuleTest extends TestCase
         $this->assertSame('exists:table,NULL,softdeleted_at,"NULL"', (string) $rule);
     }
 
+	public function testWithoutTrashedNullRule()
+	{
+		$unique = Rule::unique('users', 'email')->withoutTrashed();
+		$this->assertSame((string) $unique, 'unique:users,email,NULL,id,deleted_at,NULL');
+
+	}
+
+	public function testWhereNotNullRule()
+	{
+		$unique = Rule::unique('users', 'email')->whereNull('column1')->whereNotNull('column2');
+		$this->assertSame((string) $unique, 'unique:users,email,NULL,id,column1,NULL,column2,NOT_NULL');
+	}
     public function testItOnlyTrashedSoftDeletes()
     {
         $rule = new Exists('table');
