@@ -268,6 +268,10 @@ class Route
      */
     public function getController()
     {
+        if (! $this->isControllerAction()) {
+            return null;
+        }
+
         if (! $this->controller) {
             $class = $this->getControllerClass();
 
