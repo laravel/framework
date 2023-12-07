@@ -346,6 +346,14 @@ class Batch implements Arrayable, JsonSerializable
             $this->cancel();
         }
 
+        if ($this->hasProgressCallbacks() && $this->allowsFailures()) {
+            $batch = $this->fresh();
+
+            collect($this->options['progress'])->each(function ($handler) use ($batch, $e) {
+                $this->invokeHandlerCallback($handler, $batch, $e);
+            });
+        }
+
         if ($counts->failedJobs === 1 && $this->hasCatchCallbacks()) {
             $batch = $this->fresh();
 

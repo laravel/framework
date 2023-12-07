@@ -250,6 +250,7 @@ class BusBatchTest extends TestCase
         $this->assertTrue($batch->finished());
         $this->assertTrue($batch->cancelled());
         $this->assertEquals(1, $_SERVER['__finally.count']);
+        $this->assertEquals(0, $_SERVER['__progress.count']);
         $this->assertEquals(1, $_SERVER['__catch.count']);
         $this->assertSame('Something went wrong.', $_SERVER['__catch.exception']->getMessage());
     }
@@ -291,6 +292,7 @@ class BusBatchTest extends TestCase
         $this->assertFalse($batch->finished());
         $this->assertFalse($batch->cancelled());
         $this->assertEquals(1, $_SERVER['__catch.count']);
+        $this->assertEquals(2, $_SERVER['__progress.count']);
         $this->assertSame('Something went wrong.', $_SERVER['__catch.exception']->getMessage());
     }
 
