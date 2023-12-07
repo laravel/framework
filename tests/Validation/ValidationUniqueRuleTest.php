@@ -86,11 +86,11 @@ class ValidationUniqueRuleTest extends TestCase
     {
         $rule = new Unique('table');
         $rule->withoutTrashed();
-        $this->assertSame('unique:table,NULL,NULL,id,deleted_at,"NULL"', (string) $rule);
+        $this->assertSame('unique:table,NULL,NULL,id,deleted_at,NULL', (string) $rule);
 
         $rule = new Unique('table');
         $rule->withoutTrashed('softdeleted_at');
-        $this->assertSame('unique:table,NULL,NULL,id,softdeleted_at,"NULL"', (string) $rule);
+        $this->assertSame('unique:table,NULL,NULL,id,softdeleted_at,NULL', (string) $rule);
     }
 
     public function testItOnlyTrashedSoftDeletes()
