@@ -236,10 +236,10 @@ trait DatabaseRule
     {
         return collect($this->wheres)->map(function ($where) {
 			if ($where['value'] === 'NULL' || $where['value'] === 'NOT_NULL'){
-				return $where['column'].','.$where['value'];
-			} else {
-				return $where['column'].','.'"'.str_replace('"', '""', $where['value']).'"';
-			}
+                return $where['column'].','.$where['value'];
+            } else {
+                return $where['column'].','.'"'.str_replace('"', '""', $where['value']).'"';
+            }
         })->implode(',');
     }
 }
