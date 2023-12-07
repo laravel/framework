@@ -219,7 +219,8 @@ class VerifyCsrfToken
             $config['secure'],
             false,
             false,
-            $config['same_site'] ?? null
+            $config['same_site'] ?? null,
+            $config['partitioned'] ?? false
         );
     }
 
