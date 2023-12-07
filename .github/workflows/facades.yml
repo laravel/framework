@@ -5,6 +5,8 @@ on:
     branches:
       - master
       - '*.x'
+      - facade-doc
+  workflow_dispatch:
 
 jobs:
   update:
@@ -24,6 +26,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
+          extensions: :php-psr
           php-version: 8.1
           tools: composer:v2
           coverage: none
