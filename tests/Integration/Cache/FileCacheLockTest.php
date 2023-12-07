@@ -117,6 +117,5 @@ class FileCacheLockTest extends TestCase
 
         $secondLock = Cache::store('file')->restoreLock('foo', 'other_owner');
         $this->assertFalse($secondLock->isOwnedByCurrentProcess());
- 
-   }
+    }
 }
