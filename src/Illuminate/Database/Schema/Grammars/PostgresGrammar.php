@@ -202,7 +202,7 @@ class PostgresGrammar extends Grammar
             'select c.conname as name, '
             ."string_agg(la.attname, ',' order by conseq.ord) as columns, "
             .'fn.nspname as foreign_schema, fc.relname as foreign_table, '
-            ."string_agg(fa.attname, ',' order by confseq.ord) as foreign_columns, "
+            ."string_agg(fa.attname, ',' order by conseq.ord) as foreign_columns, "
             .'c.confupdtype as on_update, c.confdeltype as on_delete '
             .'from pg_constraint c '
             .'join pg_class tc on c.conrelid = tc.oid '
@@ -211,8 +211,7 @@ class PostgresGrammar extends Grammar
             .'join pg_namespace fn on fn.oid = fc.relnamespace '
             .'join lateral unnest(c.conkey) with ordinality as conseq(num, ord) on true '
             .'join pg_attribute la on la.attrelid = c.conrelid and la.attnum = conseq.num '
-            .'join lateral unnest(c.confkey) with ordinality as confseq(num, ord) on true '
-            .'join pg_attribute fa on fa.attrelid = c.confrelid and fa.attnum = confseq.num '
+            .'join pg_attribute fa on fa.attrelid = c.confrelid and fa.attnum = c.confkey[conseq.ord] '
             ."where c.contype = 'f' and tc.relname = %s and tn.nspname = %s "
             .'group by c.conname, fn.nspname, fc.relname, c.confupdtype, c.confdeltype',
             $this->quoteString($table),
