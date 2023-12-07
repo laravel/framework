@@ -238,7 +238,7 @@ class ValidationExistsRuleTest extends TestCase
     public function testWithoutTrashedNullRule()
     {
         $unique = Rule::unique('users', 'email')->withoutTrashed();
-		$this->assertSame((string) $unique, 'unique:users,email,NULL,id,deleted_at,NULL');
+        $this->assertSame((string) $unique, 'unique:users,email,NULL,id,deleted_at,NULL');
     }
 
     public function testWhereNotNullRule()
