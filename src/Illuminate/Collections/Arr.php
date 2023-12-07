@@ -896,5 +896,4 @@ class Arr
 
         return is_array($value) ? $value : [$value];
     }
-
 }
