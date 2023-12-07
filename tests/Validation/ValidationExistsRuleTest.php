@@ -228,11 +228,11 @@ class ValidationExistsRuleTest extends TestCase
     {
         $rule = new Exists('table');
         $rule->withoutTrashed();
-        $this->assertSame('exists:table,NULL,deleted_at,"NULL"', (string) $rule);
+        $this->assertSame('exists:table,NULL,deleted_at,NULL', (string) $rule);
 
         $rule = new Exists('table');
         $rule->withoutTrashed('softdeleted_at');
-        $this->assertSame('exists:table,NULL,softdeleted_at,"NULL"', (string) $rule);
+        $this->assertSame('exists:table,NULL,softdeleted_at,NULL', (string) $rule);
     }
 
 	public function testWithoutTrashedNullRule()
