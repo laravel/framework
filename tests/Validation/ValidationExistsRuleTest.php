@@ -247,7 +247,7 @@ class ValidationExistsRuleTest extends TestCase
         $this->assertSame((string) $unique, 'unique:users,email,NULL,id,column1,NULL,column2,NOT_NULL');
     }
 
-	public function testItOnlyTrashedSoftDeletes()
+    public function testItOnlyTrashedSoftDeletes()
     {
         $rule = new Exists('table');
         $rule->onlyTrashed();
