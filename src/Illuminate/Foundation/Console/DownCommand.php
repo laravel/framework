@@ -24,7 +24,7 @@ class DownCommand extends Command
                                  {--retry= : The number of seconds after which the request may be retried}
                                  {--refresh= : The number of seconds after which the browser may refresh}
                                  {--secret= : The secret phrase that may be used to bypass maintenance mode}
-                                 {--with-secret : Generate a random secret phrase that may be used to bypass maintenance mode}
+                                 {--with-secret= : Generate a random secret phrase that may be used to bypass maintenance mode}
                                  {--status=503 : The status code that should be used when returning the maintenance mode response}';
 
     /**
@@ -155,7 +155,7 @@ class DownCommand extends Command
     {
         return match (true) {
             ! is_null($this->option('secret')) => $this->option('secret'),
-            $this->option('with-secret') => Str::random(),
+            ! is_null($this->option('with-secret')) => Str::random($this->option('with-secret')),
             default => null,
         };
     }
