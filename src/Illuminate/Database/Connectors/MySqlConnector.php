@@ -137,6 +137,7 @@ class MySqlConnector extends Connector implements ConnectorInterface
     protected function getSocketDsn(array $config)
     {
         $host = strtoupper(substr(PHP_OS, 0, 3)) === 'WIN' ? 'host=.;' : '';
+
         return "mysql:{$host}unix_socket={$config['unix_socket']};dbname={$config['database']}";
     }
 
