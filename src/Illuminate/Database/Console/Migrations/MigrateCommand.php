@@ -31,7 +31,8 @@ class MigrateCommand extends BaseCommand implements Isolatable
                 {--pretend : Dump the SQL queries that would be run}
                 {--seed : Indicates if the seed task should be re-run}
                 {--seeder= : The class name of the root seeder}
-                {--step : Force the migrations to be run so they can be rolled back individually}';
+                {--step : Force the migrations to be run so they can be rolled back individually}
+                {--create-database : Create the configured database if it doesn\'t exist}';
 
     /**
      * The console command description.
@@ -167,7 +168,8 @@ class MigrateCommand extends BaseCommand implements Isolatable
      */
     protected function createMissingSqliteDatabase($path)
     {
-        if ($this->option('force')) {
+        if ($this->option('force') || $this->option('create-database')) {
+            $this->components->info("Creating SQLite database '{$path}'.");
             return touch($path);
         }
 
@@ -195,11 +197,11 @@ class MigrateCommand extends BaseCommand implements Isolatable
             return false;
         }
 
-        if (! $this->option('force') && $this->option('no-interaction')) {
+        if (! $this->option('force') && $this->option('no-interaction') && ! $this->option('create-database')) {
             return false;
         }
 
-        if (! $this->option('force') && ! $this->option('no-interaction')) {
+        if (! $this->option('force') && ! $this->option('no-interaction') && ! $this->option('create-database')) {
             $this->components->warn("The database '{$connection->getDatabaseName()}' does not exist on the '{$connection->getName()}' connection.");
 
             if (! confirm('Would you like to create it?', default: false)) {
@@ -213,6 +215,8 @@ class MigrateCommand extends BaseCommand implements Isolatable
             $this->laravel['db']->purge();
 
             $freshConnection = $this->migrator->resolveConnection($this->option('database'));
+
+            $this->components->info("Creating database '{$connection->getDatabaseName()}' on '{$connection->getName()}' connection.");
 
             return tap($freshConnection->unprepared("CREATE DATABASE IF NOT EXISTS `{$connection->getDatabaseName()}`"), function () {
                 $this->laravel['db']->purge();
