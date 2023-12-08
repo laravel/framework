@@ -170,6 +170,7 @@ class MigrateCommand extends BaseCommand implements Isolatable
     {
         if ($this->option('force') || $this->option('create-database')) {
             $this->components->info("Creating SQLite database '{$path}'.");
+
             return touch($path);
         }
 
