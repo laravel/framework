@@ -58,7 +58,7 @@ class RedirectIfAuthenticated
             }
 
             if (isset($routes[$uri])) {
-                return '/' . $uri;
+                return '/'.$uri;
             }
         }
 
