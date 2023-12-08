@@ -12,6 +12,8 @@ class SupportNumberTest extends TestCase
         $this->needsIntlExtension();
 
         $this->assertSame('0', Number::format(0));
+        $this->assertSame('0', Number::format(0.0));
+        $this->assertSame('0', Number::format(0.00));
         $this->assertSame('1', Number::format(1));
         $this->assertSame('10', Number::format(10));
         $this->assertSame('25', Number::format(25));
