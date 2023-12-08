@@ -56,7 +56,9 @@ class RedirectIfAuthenticated
             if (Route::has($uri)) {
                 return route($uri);
             }
+        }
 
+        foreach (['dashboard', 'home'] as $uri) {
             if (isset($routes[$uri])) {
                 return '/' . $uri;
             }
