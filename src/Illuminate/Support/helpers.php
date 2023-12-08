@@ -197,6 +197,27 @@ if (! function_exists('optional')) {
     }
 }
 
+if (! function_exists('when')) {
+    /**
+     * When the given value is truthy, return the truthy value / callback
+     * otherwise return the falsy value / callback.
+     *
+     * @param  mixed  $value
+     * @param  callable|mixed  $whenTruthy
+     * @param  callable|mixed  $whenFalsy
+     * @param  bool  $strict
+     * @return mixed
+     */
+    function when(mixed $value, mixed $whenTruthy = true, mixed $whenFalsy = false, bool $strict = false): mixed
+    {
+        if ($strict && $value === true || ! $strict && $value) {
+            return is_callable($whenTruthy) ? $whenTruthy($value) : $whenTruthy;
+        }
+
+        return is_callable($whenFalsy) ? $whenFalsy($value) : $whenFalsy;
+    }
+}
+
 if (! function_exists('preg_replace_array')) {
     /**
      * Replace a given pattern with each value in the array in sequentially.
