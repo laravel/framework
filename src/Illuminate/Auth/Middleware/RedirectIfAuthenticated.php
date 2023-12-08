@@ -60,7 +60,7 @@ class RedirectIfAuthenticated
 
         foreach (['dashboard', 'home'] as $uri) {
             if (isset($routes[$uri])) {
-                return '/' . $uri;
+                return '/'.$uri;
             }
         }
 
