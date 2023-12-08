@@ -934,7 +934,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
             $this->assertSame('2017-10-10 10:10:10', $date->toDateTimeString());
         }
 
-        $this->assertNotSame('2017-10-10 10:10:10', Tag::find(2)->updated_at);
+        $this->assertNotSame('2017-10-10 10:10:10', Tag::find(2)->updated_at?->toDateTimeString());
     }
 
     public function testWherePivotOnString()
