@@ -50,13 +50,13 @@ class RedirectIfAuthenticated
      */
     protected function defaultRedirectTo()
     {
-        $routes = Route::getRoutes()->get('GET');
-
         foreach (['dashboard', 'home'] as $uri) {
             if (Route::has($uri)) {
                 return route($uri);
             }
         }
+
+        $routes = Route::getRoutes()->get('GET');
 
         foreach (['dashboard', 'home'] as $uri) {
             if (isset($routes[$uri])) {
