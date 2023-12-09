@@ -196,6 +196,8 @@ class SchemaBuilderTest extends DatabaseTestCase
 
         $types = Schema::getTypes();
 
+        var_dump($types);
+
         $this->assertCount(11, $types);
         $this->assertTrue(collect($types)->contains(fn ($type) => $type['name'] === 'pseudo_foo' && $type['type'] === 'pseudo' && ! $type['implicit']));
         $this->assertTrue(collect($types)->contains(fn ($type) => $type['name'] === 'comp_foo' && $type['type'] === 'composite' && ! $type['implicit']));
