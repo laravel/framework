@@ -35,7 +35,7 @@ class AboutCommandTest extends TestCase
                 'database' => 'testing',
                 'logs' => ['single'],
                 'mail' => 'smtp',
-                'queue' => 'sync',
+                'queue' => 'database',
                 'session' => 'file',
             ], $output['drivers']);
         });

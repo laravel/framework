@@ -3,9 +3,10 @@
 namespace Illuminate\Validation\Rules;
 
 use BackedEnum;
+use Stringable;
 use UnitEnum;
 
-class In
+class In implements Stringable
 {
     /**
      * The name of the rule.

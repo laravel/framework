@@ -8,6 +8,7 @@ use Illuminate\Queue\DatabaseQueue;
 use Illuminate\Queue\Queue;
 use Illuminate\Support\Str;
 use Mockery as m;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use stdClass;
@@ -19,9 +20,7 @@ class QueueDatabaseQueueUnitTest extends TestCase
         m::close();
     }
 
-    /**
-     * @dataProvider pushJobsDataProvider
-     */
+    #[DataProvider('pushJobsDataProvider')]
     public function testPushProperlyPushesJobOntoDatabase($uuid, $job, $displayNameStartsWith, $jobStartsWith)
     {
         Str::createUuidsUsing(function () use ($uuid) {

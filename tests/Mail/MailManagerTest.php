@@ -4,13 +4,12 @@ namespace Illuminate\Tests\Mail;
 
 use InvalidArgumentException;
 use Orchestra\Testbench\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport;
 
 class MailManagerTest extends TestCase
 {
-    /**
-     * @dataProvider emptyTransportConfigDataProvider
-     */
+    #[DataProvider('emptyTransportConfigDataProvider')]
     public function testEmptyTransportConfig($transport)
     {
         $this->app['config']->set('mail.mailers.custom_smtp', [

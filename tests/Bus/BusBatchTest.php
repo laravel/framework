@@ -19,6 +19,7 @@ use Illuminate\Database\Query\Builder;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\CallQueuedClosure;
 use Mockery as m;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 use stdClass;
@@ -414,9 +415,7 @@ class BusBatchTest extends TestCase
         $builder->shouldHaveReceived('first');
     }
 
-    /**
-     * @dataProvider serializedOptions
-     */
+    #[DataProvider('serializedOptions')]
     public function test_options_unserialize_on_postgres($serialize, $options)
     {
         $factory = m::mock(BatchFactory::class);

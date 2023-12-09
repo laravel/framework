@@ -2,18 +2,18 @@
 
 namespace Illuminate\Database\PDO;
 
+use Doctrine\DBAL\Driver\Connection as ConnectionContract;
 use Doctrine\DBAL\Driver\PDO\Exception;
 use Doctrine\DBAL\Driver\PDO\Result;
 use Doctrine\DBAL\Driver\PDO\Statement;
 use Doctrine\DBAL\Driver\Result as ResultInterface;
-use Doctrine\DBAL\Driver\ServerInfoAwareConnection;
 use Doctrine\DBAL\Driver\Statement as StatementInterface;
 use Doctrine\DBAL\ParameterType;
 use PDO;
 use PDOException;
 use PDOStatement;
 
-class Connection implements ServerInfoAwareConnection
+class Connection implements ConnectionContract
 {
     /**
      * The underlying PDO connection.
@@ -94,11 +94,11 @@ class Connection implements ServerInfoAwareConnection
      * Get the last insert ID.
      *
      * @param  string|null  $name
-     * @return mixed
+     * @return string|int
      *
      * @throws \Doctrine\DBAL\Driver\PDO\Exception
      */
-    public function lastInsertId($name = null)
+    public function lastInsertId($name = null): string|int
     {
         try {
             if ($name === null) {
@@ -125,31 +125,31 @@ class Connection implements ServerInfoAwareConnection
     /**
      * Begin a new database transaction.
      *
-     * @return bool
+     * @return void
      */
-    public function beginTransaction()
+    public function beginTransaction(): void
     {
-        return $this->connection->beginTransaction();
+        $this->connection->beginTransaction();
     }
 
     /**
      * Commit a database transaction.
      *
-     * @return bool
+     * @return void
      */
-    public function commit()
+    public function commit(): void
     {
-        return $this->connection->commit();
+        $this->connection->commit();
     }
 
     /**
      * Rollback a database transaction.
      *
-     * @return bool
+     * @return void
      */
-    public function rollBack()
+    public function rollBack(): void
     {
-        return $this->connection->rollBack();
+        $this->connection->rollBack();
     }
 
     /**
@@ -159,7 +159,7 @@ class Connection implements ServerInfoAwareConnection
      * @param  string  $type
      * @return string
      */
-    public function quote($input, $type = ParameterType::STRING)
+    public function quote($input, $type = ParameterType::STRING): string
     {
         return $this->connection->quote($input, $type);
     }
@@ -169,17 +169,17 @@ class Connection implements ServerInfoAwareConnection
      *
      * @return string
      */
-    public function getServerVersion()
+    public function getServerVersion(): string
     {
         return $this->connection->getAttribute(PDO::ATTR_SERVER_VERSION);
     }
 
     /**
-     * Get the wrapped PDO connection.
+     * Get the native PDO connection.
      *
      * @return \PDO
      */
-    public function getWrappedConnection(): PDO
+    public function getNativeConnection(): PDO
     {
         return $this->connection;
     }

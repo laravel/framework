@@ -22,7 +22,7 @@ class TimestampTypeTest extends DatabaseTestCase
     {
         $this->assertTrue(
             $this->app['db']->connection()
-                ->getDoctrineSchemaManager()
+                ->getDoctrineConnection()
                 ->getDatabasePlatform()
                 ->hasDoctrineTypeMappingFor('timestamp')
         );

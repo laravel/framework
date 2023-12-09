@@ -4,13 +4,14 @@ namespace Illuminate\Mail\Transport;
 
 use Aws\Exception\AwsException;
 use Aws\SesV2\SesV2Client;
+use Stringable;
 use Symfony\Component\Mailer\Exception\TransportException;
 use Symfony\Component\Mailer\Header\MetadataHeader;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\AbstractTransport;
 use Symfony\Component\Mime\Message;
 
-class SesV2Transport extends AbstractTransport
+class SesV2Transport extends AbstractTransport implements Stringable
 {
     /**
      * The Amazon SES V2 instance.

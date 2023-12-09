@@ -332,7 +332,7 @@ abstract class Grammar extends BaseGrammar
 
         $table = $schema->introspectTable($tableName);
 
-        return new TableDiff(tableName: $tableName, fromTable: $table);
+        return $schema->createComparator()->compareTables(oldTable: $table, newTable: $table);
     }
 
     /**

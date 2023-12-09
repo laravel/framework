@@ -2,11 +2,13 @@
 
 namespace Illuminate\Tests\Integration\Generators;
 
+use Illuminate\Notifications\Console\NotificationTableCommand;
+
 class NotificationTableCommandTest extends TestCase
 {
     public function testCreateMakesMigration()
     {
-        $this->artisan('notifications:table')->assertExitCode(0);
+        $this->artisan(NotificationTableCommand::class)->assertExitCode(0);
 
         $this->assertMigrationFileContains([
             'use Illuminate\Database\Migrations\Migration;',

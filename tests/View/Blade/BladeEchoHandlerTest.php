@@ -5,6 +5,7 @@ namespace Illuminate\Tests\View\Blade;
 use Exception;
 use Illuminate\Support\Fluent;
 use Illuminate\Support\Str;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class BladeEchoHandlerTest extends AbstractBladeTestCase
 {
@@ -49,9 +50,7 @@ class BladeEchoHandlerTest extends AbstractBladeTestCase
         );
     }
 
-    /**
-     * @dataProvider handlerLogicDataProvider
-     */
+    #[DataProvider('handlerLogicDataProvider')]
     public function testHandlerLogicWorksCorrectly($blade)
     {
         $this->expectException(Exception::class);
@@ -80,9 +79,7 @@ class BladeEchoHandlerTest extends AbstractBladeTestCase
         ];
     }
 
-    /**
-     * @dataProvider nonStringableDataProvider
-     */
+    #[DataProvider('nonStringableDataProvider')]
     public function testHandlerWorksWithNonStringables($blade, $expectedOutput)
     {
         app()->singleton('blade.compiler', function () {

@@ -37,6 +37,7 @@ class JsonResponse extends BaseJsonResponse
      *
      * @return static
      */
+    #[\Override]
     public static function fromJsonString(?string $data = null, int $status = 200, array $headers = []): static
     {
         return new static($data, $status, $headers, 0, true);
@@ -70,6 +71,7 @@ class JsonResponse extends BaseJsonResponse
      *
      * @return static
      */
+    #[\Override]
     public function setData($data = []): static
     {
         $this->original = $data;
@@ -116,6 +118,7 @@ class JsonResponse extends BaseJsonResponse
      *
      * @return static
      */
+    #[\Override]
     public function setEncodingOptions($options): static
     {
         $this->encodingOptions = (int) $options;

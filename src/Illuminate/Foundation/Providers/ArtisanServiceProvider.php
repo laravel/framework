@@ -28,6 +28,8 @@ use Illuminate\Database\Console\ShowModelCommand;
 use Illuminate\Database\Console\TableCommand as DatabaseTableCommand;
 use Illuminate\Database\Console\WipeCommand;
 use Illuminate\Foundation\Console\AboutCommand;
+use Illuminate\Foundation\Console\ApiInstallCommand;
+use Illuminate\Foundation\Console\BroadcastingInstallCommand;
 use Illuminate\Foundation\Console\CastMakeCommand;
 use Illuminate\Foundation\Console\ChannelListCommand;
 use Illuminate\Foundation\Console\ChannelMakeCommand;
@@ -35,6 +37,7 @@ use Illuminate\Foundation\Console\ClearCompiledCommand;
 use Illuminate\Foundation\Console\ComponentMakeCommand;
 use Illuminate\Foundation\Console\ConfigCacheCommand;
 use Illuminate\Foundation\Console\ConfigClearCommand;
+use Illuminate\Foundation\Console\ConfigPublishCommand;
 use Illuminate\Foundation\Console\ConfigShowCommand;
 use Illuminate\Foundation\Console\ConsoleMakeCommand;
 use Illuminate\Foundation\Console\DocsCommand;
@@ -169,11 +172,14 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
      * @var array
      */
     protected $devCommands = [
+        'ApiInstall' => ApiInstallCommand::class,
+        'BroadcastingInstall' => BroadcastingInstallCommand::class,
         'CacheTable' => CacheTableCommand::class,
         'CastMake' => CastMakeCommand::class,
         'ChannelList' => ChannelListCommand::class,
         'ChannelMake' => ChannelMakeCommand::class,
         'ComponentMake' => ComponentMakeCommand::class,
+        'ConfigPublish' => ConfigPublishCommand::class,
         'ConsoleMake' => ConsoleMakeCommand::class,
         'ControllerMake' => ControllerMakeCommand::class,
         'Docs' => DocsCommand::class,
@@ -292,7 +298,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
     protected function registerCacheTableCommand()
     {
         $this->app->singleton(CacheTableCommand::class, function ($app) {
-            return new CacheTableCommand($app['files'], $app['composer']);
+            return new CacheTableCommand($app['files']);
         });
     }
 
@@ -353,6 +359,18 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
     {
         $this->app->singleton(ConfigClearCommand::class, function ($app) {
             return new ConfigClearCommand($app['files']);
+        });
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerConfigPublishCommand()
+    {
+        $this->app->singleton(ConfigPublishCommand::class, function ($app) {
+            return new ConfigPublishCommand;
         });
     }
 
@@ -508,7 +526,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
     protected function registerNotificationTableCommand()
     {
         $this->app->singleton(NotificationTableCommand::class, function ($app) {
-            return new NotificationTableCommand($app['files'], $app['composer']);
+            return new NotificationTableCommand($app['files']);
         });
     }
 
@@ -638,7 +656,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
     protected function registerQueueFailedTableCommand()
     {
         $this->app->singleton(FailedTableCommand::class, function ($app) {
-            return new FailedTableCommand($app['files'], $app['composer']);
+            return new FailedTableCommand($app['files']);
         });
     }
 
@@ -650,7 +668,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
     protected function registerQueueTableCommand()
     {
         $this->app->singleton(TableCommand::class, function ($app) {
-            return new TableCommand($app['files'], $app['composer']);
+            return new TableCommand($app['files']);
         });
     }
 
@@ -662,7 +680,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
     protected function registerQueueBatchesTableCommand()
     {
         $this->app->singleton(BatchesTableCommand::class, function ($app) {
-            return new BatchesTableCommand($app['files'], $app['composer']);
+            return new BatchesTableCommand($app['files']);
         });
     }
 
@@ -722,7 +740,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
     protected function registerSeederMakeCommand()
     {
         $this->app->singleton(SeederMakeCommand::class, function ($app) {
-            return new SeederMakeCommand($app['files'], $app['composer']);
+            return new SeederMakeCommand($app['files']);
         });
     }
 
@@ -734,7 +752,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
     protected function registerSessionTableCommand()
     {
         $this->app->singleton(SessionTableCommand::class, function ($app) {
-            return new SessionTableCommand($app['files'], $app['composer']);
+            return new SessionTableCommand($app['files']);
         });
     }
 

@@ -3,8 +3,9 @@
 namespace Illuminate\Support;
 
 use Illuminate\Contracts\Support\Htmlable;
+use Stringable;
 
-class HtmlString implements Htmlable
+class HtmlString implements Htmlable, Stringable
 {
     /**
      * The HTML string.

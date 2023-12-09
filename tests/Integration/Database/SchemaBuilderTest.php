@@ -132,9 +132,10 @@ class SchemaBuilderTest extends DatabaseTestCase
 
             $uppercase = strtoupper($type);
 
-            $expected = ["ALTER TABLE test CHANGE test_column test_column $uppercase NOT NULL"];
-
-            $this->assertEquals($expected, $queries);
+            $this->assertContains($queries, [
+                ["ALTER TABLE test CHANGE test_column test_column $uppercase NOT NULL"], // MySQL
+                ["ALTER TABLE test CHANGE test_column test_column $uppercase NOT NULL COLLATE `utf8mb4_uca1400_ai_ci`"], // MariaDB
+            ]);
         }
     }
 

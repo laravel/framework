@@ -40,6 +40,7 @@ use ReflectionClass;
 use ReflectionMethod;
 use ReflectionNamedType;
 use RuntimeException;
+use ValueError;
 
 trait HasAttributes
 {
@@ -183,6 +184,18 @@ trait HasAttributes
     public static $encrypter;
 
     /**
+     * Initialize the trait.
+     *
+     * @return void
+     */
+    protected function initializeHasAttributes()
+    {
+        $this->casts = $this->ensureCastsAreStringValues(
+            array_merge($this->casts, $this->casts()),
+        );
+    }
+
+    /**
      * Convert the model's attributes to an array.
      *
      * @return array
@@ -310,7 +323,7 @@ trait HasAttributes
             }
 
             if ($this->isEnumCastable($key) && (! ($attributes[$key] ?? null) instanceof Arrayable)) {
-                $attributes[$key] = isset($attributes[$key]) ? $this->getStorableEnumValue($attributes[$key]) : null;
+                $attributes[$key] = isset($attributes[$key]) ? $this->getStorableEnumValue($this->getCasts()[$key], $attributes[$key]) : null;
             }
 
             if ($attributes[$key] instanceof Arrayable) {
@@ -719,9 +732,37 @@ trait HasAttributes
      */
     public function mergeCasts($casts)
     {
+        $casts = $this->ensureCastsAreStringValues($casts);
+
         $this->casts = array_merge($this->casts, $casts);
 
         return $this;
+    }
+
+    /**
+     * Ensure that the given casts are strings.
+     *
+     * @param  array  $casts
+     * @return array
+     */
+    protected function ensureCastsAreStringValues($casts)
+    {
+        foreach ($casts as $attribute => $cast) {
+            $casts[$attribute] = match (true) {
+                is_array($cast) => value(function () use ($cast) {
+                    if (count($cast) === 1) {
+                        return $cast[0];
+                    }
+
+                    [$cast, $arguments] = [array_shift($cast), $cast];
+
+                    return $cast.':'.implode(',', $arguments);
+                }),
+                default => $cast,
+            };
+        }
+
+        return $casts;
     }
 
     /**
@@ -1162,10 +1203,10 @@ trait HasAttributes
         if (! isset($value)) {
             $this->attributes[$key] = null;
         } elseif (is_object($value)) {
-            $this->attributes[$key] = $this->getStorableEnumValue($value);
+            $this->attributes[$key] = $this->getStorableEnumValue($enumClass, $value);
         } else {
             $this->attributes[$key] = $this->getStorableEnumValue(
-                $this->getEnumCaseFromValue($enumClass, $value)
+                $enumClass, $this->getEnumCaseFromValue($enumClass, $value)
             );
         }
     }
@@ -1187,11 +1228,16 @@ trait HasAttributes
     /**
      * Get the storable value from the given enum.
      *
+     * @param  string  $expectedEnum
      * @param  \UnitEnum|\BackedEnum  $value
      * @return string|int
      */
-    protected function getStorableEnumValue($value)
+    protected function getStorableEnumValue($expectedEnum, $value)
     {
+        if (! $value instanceof $expectedEnum) {
+            throw new ValueError(sprintf('Value [%s] is not of the expected enum type [%s].', var_export($value, true), $expectedEnum));
+        }
+
         return $value instanceof BackedEnum
                 ? $value->value
                 : $value->name;
@@ -1528,7 +1574,7 @@ trait HasAttributes
     }
 
     /**
-     * Get the casts array.
+     * Get the attributes that should be cast.
      *
      * @return array
      */
@@ -1539,6 +1585,16 @@ trait HasAttributes
         }
 
         return $this->casts;
+    }
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array
+     */
+    protected function casts()
+    {
+        return [];
     }
 
     /**

@@ -3,9 +3,10 @@
 namespace Illuminate\Validation\Rules;
 
 use BackedEnum;
+use Stringable;
 use UnitEnum;
 
-class NotIn
+class NotIn implements Stringable
 {
     /**
      * The name of the rule.

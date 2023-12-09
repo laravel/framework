@@ -6,8 +6,9 @@ use ArrayAccess;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Traits\Macroable;
 use LogicException;
+use Stringable;
 
-class Response implements ArrayAccess
+class Response implements ArrayAccess, Stringable
 {
     use Concerns\DeterminesStatusCode, Macroable {
         __call as macroCall;

@@ -8,6 +8,7 @@ use Illuminate\Auth\Access\HandlesAuthorization;
 use Illuminate\Auth\Access\Response;
 use Illuminate\Container\Container;
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
@@ -555,9 +556,7 @@ class AuthAccessGateTest extends TestCase
         $this->assertSame(3, $counter);
     }
 
-    /**
-     * @dataProvider notCallableDataProvider
-     */
+    #[DataProvider('notCallableDataProvider')]
     public function testDefineSecondParameterShouldBeStringOrCallable($callback)
     {
         $this->expectException(InvalidArgumentException::class);
@@ -1036,12 +1035,11 @@ class AuthAccessGateTest extends TestCase
     }
 
     /**
-     * @dataProvider hasAbilitiesTestDataProvider
-     *
      * @param  array  $abilitiesToSet
      * @param  array|string  $abilitiesToCheck
      * @param  bool  $expectedHasValue
      */
+    #[DataProvider('hasAbilitiesTestDataProvider')]
     public function testHasAbilities($abilitiesToSet, $abilitiesToCheck, $expectedHasValue)
     {
         $gate = $this->getBasicGate();

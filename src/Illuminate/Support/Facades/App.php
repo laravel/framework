@@ -3,6 +3,7 @@
 namespace Illuminate\Support\Facades;
 
 /**
+ * @method static void configure(string|null $baseDirectory = null)
  * @method static string version()
  * @method static void bootstrapWith(string[] $bootstrappers)
  * @method static void afterLoadingEnvironment(\Closure $callback)
@@ -14,6 +15,7 @@ namespace Illuminate\Support\Facades;
  * @method static \Illuminate\Foundation\Application useAppPath(string $path)
  * @method static string basePath(string $path = '')
  * @method static string bootstrapPath(string $path = '')
+ * @method static string getBootstrapProvidersPath()
  * @method static \Illuminate\Foundation\Application useBootstrapPath(string $path)
  * @method static string configPath(string $path = '')
  * @method static \Illuminate\Foundation\Application useConfigPath(string $path)
@@ -41,6 +43,7 @@ namespace Illuminate\Support\Facades;
  * @method static bool runningConsoleCommand(string|array ...$commands)
  * @method static bool runningUnitTests()
  * @method static bool hasDebugModeEnabled()
+ * @method static void registered(callable $callback)
  * @method static void registerConfiguredProviders()
  * @method static \Illuminate\Support\ServiceProvider register(\Illuminate\Support\ServiceProvider|string $provider, bool $force = false)
  * @method static \Illuminate\Support\ServiceProvider|null getProvider(\Illuminate\Support\ServiceProvider|string $provider)
@@ -56,6 +59,8 @@ namespace Illuminate\Support\Facades;
  * @method static void booting(callable $callback)
  * @method static void booted(callable $callback)
  * @method static \Symfony\Component\HttpFoundation\Response handle(\Symfony\Component\HttpFoundation\Request $request, int $type = 1, bool $catch = true)
+ * @method static void handleRequest(\Illuminate\Http\Request $request)
+ * @method static int handleCommand(\Symfony\Component\Console\Input\InputInterface $input)
  * @method static bool shouldSkipMiddleware()
  * @method static string getCachedServicesPath()
  * @method static string getCachedPackagesPath()

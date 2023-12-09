@@ -302,7 +302,9 @@ class Builder
         if (! $this->connection->usingNativeSchemaOperations()) {
             $table = $this->connection->getTablePrefix().$table;
 
-            return $this->connection->getDoctrineColumn($table, $column)->getType()->getName();
+            $type = $this->connection->getDoctrineColumn($table, $column)->getType();
+
+            return $type::lookupName($type);
         }
 
         $columns = $this->getColumns($table);

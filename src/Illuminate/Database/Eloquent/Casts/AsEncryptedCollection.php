@@ -49,4 +49,15 @@ class AsEncryptedCollection implements Castable
             }
         };
     }
+
+    /**
+     * Specify the collection for the cast.
+     *
+     * @param  class-string  $class
+     * @return string
+     */
+    public static function using($class)
+    {
+        return static::class.':'.$class;
+    }
 }
