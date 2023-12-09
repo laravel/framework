@@ -191,7 +191,7 @@ class PostgresBuilder extends Builder
                 if ($type['type'] === 'domain') {
                     $domains[] = $type['schema'].'.'.$type['name'];
                 } else {
-                    $type[] = $type['schema'].'.'.$type['name'];
+                    $types[] = $type['schema'].'.'.$type['name'];
                 }
             }
         }

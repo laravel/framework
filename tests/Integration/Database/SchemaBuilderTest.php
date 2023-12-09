@@ -206,8 +206,6 @@ class SchemaBuilderTest extends DatabaseTestCase
         Schema::dropAllTypes();
         $types = Schema::getTypes();
 
-        var_dump($types);
-
         $this->assertEmpty($types);
     }
 
