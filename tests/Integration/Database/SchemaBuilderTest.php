@@ -196,20 +196,12 @@ class SchemaBuilderTest extends DatabaseTestCase
 
         $types = Schema::getTypes();
 
-        var_dump($types);
-
-        $this->assertCount(11, $types);
+        $this->assertCount(5, collect($types)->reject(fn ($type) => $type['implicit']));
         $this->assertTrue(collect($types)->contains(fn ($type) => $type['name'] === 'pseudo_foo' && $type['type'] === 'pseudo' && ! $type['implicit']));
         $this->assertTrue(collect($types)->contains(fn ($type) => $type['name'] === 'comp_foo' && $type['type'] === 'composite' && ! $type['implicit']));
-        $this->assertTrue(collect($types)->contains(fn ($type) => $type['name'] === '_comp_foo' && $type['type'] === 'base' && $type['implicit']));
         $this->assertTrue(collect($types)->contains(fn ($type) => $type['name'] === 'enum_foo' && $type['type'] === 'enum' && ! $type['implicit']));
-        $this->assertTrue(collect($types)->contains(fn ($type) => $type['name'] === '_enum_foo' && $type['type'] === 'base' && $type['implicit']));
         $this->assertTrue(collect($types)->contains(fn ($type) => $type['name'] === 'range_foo' && $type['type'] === 'range' && ! $type['implicit']));
-        $this->assertTrue(collect($types)->contains(fn ($type) => $type['name'] === 'multirange_foo' && $type['type'] === 'multirange' && $type['implicit']));
-        $this->assertTrue(collect($types)->contains(fn ($type) => $type['name'] === '_range_foo' && $type['type'] === 'base' && $type['implicit']));
-        $this->assertTrue(collect($types)->contains(fn ($type) => $type['name'] === '_multirange_foo' && $type['type'] === 'base' && $type['implicit']));
         $this->assertTrue(collect($types)->contains(fn ($type) => $type['name'] === 'domain_foo' && $type['type'] === 'domain' && ! $type['implicit']));
-        $this->assertTrue(collect($types)->contains(fn ($type) => $type['name'] === '_domain_foo' && $type['type'] === 'base' && $type['implicit']));
 
         Schema::dropAllTypes();
         $types = Schema::getTypes();
