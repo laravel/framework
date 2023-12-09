@@ -193,7 +193,7 @@ class Number
         }
 
         switch (true) {
-            case (int) $number === 0:
+            case floatval($number) === 0.0:
                 return '0';
             case $number < 0:
                 return sprintf('-%s', static::summarize(abs($number), $precision, $maxPrecision, $units));
