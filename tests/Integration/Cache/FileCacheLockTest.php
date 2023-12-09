@@ -95,4 +95,27 @@ class FileCacheLockTest extends TestCase
 
         $this->assertTrue(Cache::lock('foo')->get());
     }
+
+    public function testOwnerStatusCanBeCheckedAfterRestoringLock()
+    {
+        Cache::lock('foo')->forceRelease();
+
+        $firstLock = Cache::lock('foo', 10);
+        $this->assertTrue($firstLock->get());
+        $owner = $firstLock->owner();
+
+        $secondLock = Cache::store('file')->restoreLock('foo', $owner);
+        $this->assertTrue($secondLock->isOwnedByCurrentProcess());
+    }
+
+    public function testOtherOwnerDoesNotOwnLockAfterRestore()
+    {
+        Cache::lock('foo')->forceRelease();
+
+        $firstLock = Cache::lock('foo', 10);
+        $this->assertTrue($firstLock->get());
+
+        $secondLock = Cache::store('file')->restoreLock('foo', 'other_owner');
+        $this->assertFalse($secondLock->isOwnedByCurrentProcess());
+    }
 }
