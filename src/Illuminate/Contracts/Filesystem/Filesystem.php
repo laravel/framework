@@ -188,4 +188,15 @@ interface Filesystem
      * @return bool
      */
     public function deleteDirectory($directory);
+
+    /**
+     * Get and calculate size of files in the given directory
+     * returns size with kilobytes
+     * 
+     * @param  string  $path
+     * @param  bool  $hidden
+     * @return int|bool 
+     */
+
+     public function sizeFilesInDirectore($path , $hidden = false);
 }

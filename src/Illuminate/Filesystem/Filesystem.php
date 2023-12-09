@@ -790,4 +790,31 @@ class Filesystem
     {
         return $this->deleteDirectory($directory, true);
     }
+
+
+    /**
+     * Get and calculate size of files in the given directory
+     * returns size with kilobytes
+     * 
+     * @param  string  $path
+     * @param  bool  $hidden
+     * @return int|bool 
+     */
+
+    public function sizeFilesInDirectore($path , $hidden = false) 
+    {
+        $size = 0;
+
+        if($this->isFile($path)) return false;
+
+        if(!$this->isDirectory($path)) return false;
+
+        foreach($this->files($path , $hidden) as $file)
+        {
+            $size += $this->size($file->getPath());
+        }
+
+        return $size;
+
+    }
 }
