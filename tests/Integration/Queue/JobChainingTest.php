@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Integration\Queue;
 
 use Illuminate\Bus\Batchable;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
@@ -387,6 +388,18 @@ class JobChainingTest extends TestCase
         $this->assertEquals(['c1', 'c2', 'b1', 'b3'], JobRunRecorder::$results);
         $this->assertEquals(['batch failed', 'chain failed'], JobRunRecorder::$failures);
     }
+
+	public function testChainBatchUniqueJobsFireOnlyOnce()
+	{
+		Bus::chain([
+			new JobChainingTestUniqueJob('c1'),
+			new JobChainingTestUniqueJob('c2'),
+			new JobChainingTestUniqueJob('c3'),
+			new JobChainingTestUniqueJob('c4'),
+		])->dispatch();
+
+		$this->assertEquals(['c1'], JobRunRecorder::$results);
+	}
 }
 
 class JobChainingTestFirstJob implements ShouldQueue
@@ -582,6 +595,25 @@ class JobChainingTestFailingBatchedJob implements ShouldQueue
     {
         $this->fail();
     }
+}
+
+class JobChainingTestUniqueJob implements ShouldBeUnique
+{
+	use Dispatchable, InteractsWithQueue, Queueable;
+
+	public static $results = [];
+
+	public string $id;
+
+	public function __construct(string $id)
+	{
+		$this->id = $id;
+	}
+
+	public function handle()
+	{
+		JobRunRecorder::record($this->id);
+	}
 }
 
 class JobRunRecorder
