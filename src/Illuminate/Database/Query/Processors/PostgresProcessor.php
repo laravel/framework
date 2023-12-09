@@ -46,6 +46,54 @@ class PostgresProcessor extends Processor
     }
 
     /**
+     * Process the results of a types query.
+     *
+     * @param  array  $results
+     * @return array
+     */
+    public function processTypes($results)
+    {
+        return array_map(function ($result) {
+            $result = (object) $result;
+
+            return [
+                'name' => $result->name,
+                'schema' => $result->schema,
+                'implicit' => (bool) $result->implicit,
+                'type' => match (strtolower($result->type)) {
+                    'b' => 'base',
+                    'c' => 'composite',
+                    'd' => 'domain',
+                    'e' => 'enum',
+                    'p' => 'pseudo',
+                    'r' => 'range',
+                    'm' => 'multirange',
+                    default => null,
+                },
+                'category' => match (strtolower($result->category)) {
+                    'a' => 'array',
+                    'b' => 'boolean',
+                    'c' => 'composite',
+                    'd' => 'date_time',
+                    'e' => 'enum',
+                    'g' => 'geometric',
+                    'i' => 'network_address',
+                    'n' => 'numeric',
+                    'p' => 'pseudo',
+                    'r' => 'range',
+                    's' => 'string',
+                    't' => 'timespan',
+                    'u' => 'user_defined',
+                    'v' => 'bit_string',
+                    'x' => 'unknown',
+                    'z' => 'internal_use',
+                    default => null,
+                },
+            ];
+        }, $results);
+    }
+
+    /**
      * Process the results of a columns query.
      *
      * @param  array  $results

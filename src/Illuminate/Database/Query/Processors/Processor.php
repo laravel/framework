@@ -78,6 +78,17 @@ class Processor
     }
 
     /**
+     * Process the results of a types query.
+     *
+     * @param  array  $results
+     * @return array
+     */
+    public function processTypes($results)
+    {
+        return $results;
+    }
+
+    /**
      * Process the results of a columns query.
      *
      * @param  array  $results
