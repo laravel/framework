@@ -112,7 +112,10 @@ class PostgresGrammar extends Grammar
             ."((t.typinput = 'array_in'::regproc and t.typoutput = 'array_out'::regproc) or t.typtype = 'm') as implicit "
             .'from pg_type t join pg_namespace n on n.oid = t.typnamespace '
             .'left join pg_class c on c.oid = t.typrelid '
-            ."where (t.typrelid = 0 or c.relkind = 'c') and n.nspname not in ('pg_catalog', 'information_schema')";
+            .'left join pg_type el on el.oid = t.typelem '
+            .'left join pg_class ce on ce.oid = el.typrelid '
+            ."where ((t.typrelid = 0 and (ce.relkind = 'c' or ce.relkind is null)) or c.relkind = 'c') "
+            ."and n.nspname not in ('pg_catalog', 'information_schema')";
     }
 
     /**
