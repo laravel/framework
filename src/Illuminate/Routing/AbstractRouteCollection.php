@@ -20,18 +20,29 @@ abstract class AbstractRouteCollection implements Countable, IteratorAggregate, 
     /**
      * Handle the matched route.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Illuminate\Routing\Route|null  $route
+     * @param  \Illuminate\Http\Request $request
+     * @param  \Illuminate\Routing\Route|null $route
      * @return \Illuminate\Routing\Route
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     protected function handleMatchedRoute(Request $request, $route)
     {
-        if (! is_null($route)) {
-            return $route->bind($request);
-        }
+        return $route?->bind($request)
+            ?? $this->handleNoRouteFound($request);
+    }
 
+    /**
+     * Handle the route not found.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Illuminate\Routing\Route|null  $route
+     * @return \Illuminate\Routing\Route
+     *
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     */
+    protected function handleNoRouteFound(Request $request)
+    {
         // If no route was found we will now check if a matching route is specified by
         // another HTTP verb. If it is we will need to throw a MethodNotAllowed and
         // inform the user agent of which HTTP verb it should use for this route.
