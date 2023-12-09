@@ -42,13 +42,13 @@ class RedirectIfAuthenticated
     {
         return static::$redirectToCallback
             ? call_user_func(static::$redirectToCallback, $request)
-            : $this->defaultRedirectTo();
+            : $this->defaultRedirectUri();
     }
 
     /**
      * Get the default URI the user should be redirected to when they are authenticated.
      */
-    protected function defaultRedirectTo()
+    protected function defaultRedirectUri(): string
     {
         foreach (['dashboard', 'home'] as $uri) {
             if (Route::has($uri)) {
