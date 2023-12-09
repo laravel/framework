@@ -5,6 +5,7 @@ namespace Illuminate\Auth\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Route;
 use Symfony\Component\HttpFoundation\Response;
 
 class RedirectIfAuthenticated
@@ -12,7 +13,7 @@ class RedirectIfAuthenticated
     /**
      * The callback that should be used to generate the authentication redirect path.
      *
-     * @var callable
+     * @var callable|null
      */
     protected static $redirectToCallback;
 
@@ -41,7 +42,29 @@ class RedirectIfAuthenticated
     {
         return static::$redirectToCallback
             ? call_user_func(static::$redirectToCallback, $request)
-            : '/dashboard';
+            : $this->defaultRedirectUri();
+    }
+
+    /**
+     * Get the default URI the user should be redirected to when they are authenticated.
+     */
+    protected function defaultRedirectUri(): string
+    {
+        foreach (['dashboard', 'home'] as $uri) {
+            if (Route::has($uri)) {
+                return route($uri);
+            }
+        }
+
+        $routes = Route::getRoutes()->get('GET');
+
+        foreach (['dashboard', 'home'] as $uri) {
+            if (isset($routes[$uri])) {
+                return '/'.$uri;
+            }
+        }
+
+        return '/';
     }
 
     /**
