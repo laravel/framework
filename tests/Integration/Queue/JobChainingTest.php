@@ -389,7 +389,7 @@ class JobChainingTest extends TestCase
         $this->assertEquals(['batch failed', 'chain failed'], JobRunRecorder::$failures);
     }
 
-	public function testChainBatchUniqueJobsFireOnlyOnce()
+	public function testChainBatchUniqueJobFiresAtLeastOnce()
 	{
 		Bus::chain([
 			new JobChainingTestUniqueJob('c1'),
