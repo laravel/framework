@@ -59,7 +59,9 @@ class DatabaseSchemaBuilderTest extends TestCase
             $table->string('name')->index();
         });
 
-        $this->assertArrayHasKey('table1_name_index', $connection->getDoctrineSchemaManager()->listTableIndexes('example_table1'));
+        $indexes = array_column($connection->getSchemaBuilder()->getIndexes('table1'), 'name');
+
+        $this->assertContains('table1_name_index', $indexes, 'name');
     }
 
     public function testHasColumnAndIndexWithPrefixIndexEnabled()
@@ -71,6 +73,8 @@ class DatabaseSchemaBuilderTest extends TestCase
             $table->string('name')->index();
         });
 
-        $this->assertArrayHasKey('example_table1_name_index', $connection->getDoctrineSchemaManager()->listTableIndexes('example_table1'));
+        $indexes = array_column($connection->getSchemaBuilder()->getIndexes('table1'), 'name');
+
+        $this->assertContains('example_table1_name_index', $indexes);
     }
 }

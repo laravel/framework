@@ -386,8 +386,8 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $queries = $blueprint->toSql(DB::connection(), new SQLiteGrammar);
 
         $expected = [
-            'DROP INDEX index1',
-            'CREATE INDEX index2 ON users (name)',
+            'drop index "index1"',
+            'create index "index2" on "users" ("name")',
         ];
 
         $this->assertEquals($expected, $queries);

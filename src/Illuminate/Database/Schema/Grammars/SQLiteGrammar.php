@@ -2,10 +2,10 @@
 
 namespace Illuminate\Database\Schema\Grammars;
 
-use Doctrine\DBAL\Schema\Index;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Schema\IndexDefinition;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Fluent;
 use RuntimeException;
@@ -441,26 +441,32 @@ class SQLiteGrammar extends Grammar
      */
     public function compileRenameIndex(Blueprint $blueprint, Fluent $command, Connection $connection)
     {
-        $schemaManager = $connection->getDoctrineSchemaManager();
+        $indexes = $connection->getSchemaBuilder()->getIndexes($blueprint->getTable());
 
-        $indexes = $schemaManager->listTableIndexes($this->getTablePrefix().$blueprint->getTable());
-
-        $index = Arr::get($indexes, $command->from);
+        $index = Arr::first($indexes, fn ($index) => $index['name'] === $command->from);
 
         if (! $index) {
             throw new RuntimeException("Index [{$command->from}] does not exist.");
         }
 
-        $newIndex = new Index(
-            $command->to, $index->getColumns(), $index->isUnique(),
-            $index->isPrimary(), $index->getFlags(), $index->getOptions()
-        );
+        if ($index['primary']) {
+            throw new RuntimeException('Sqlite does not support alter primary key.');
+        }
 
-        $platform = $connection->getDoctrineConnection()->getDatabasePlatform();
+        if ($index['unique']) {
+            return [
+                $this->compileDropUnique($blueprint, new IndexDefinition(['index' => $index['name']])),
+                $this->compileUnique($blueprint,
+                    new IndexDefinition(['index' => $command->to, 'columns' => $index['columns']])
+                ),
+            ];
+        }
 
         return [
-            $platform->getDropIndexSQL($command->from, $this->getTablePrefix().$blueprint->getTable()),
-            $platform->getCreateIndexSQL($newIndex, $this->getTablePrefix().$blueprint->getTable()),
+            $this->compileDropIndex($blueprint, new IndexDefinition(['index' => $index['name']])),
+            $this->compileIndex($blueprint,
+                new IndexDefinition(['index' => $command->to, 'columns' => $index['columns']])
+            ),
         ];
     }
 
