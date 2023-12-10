@@ -440,8 +440,8 @@ class JobChainingTestFirstJob implements ShouldQueue
 
     public function handle()
     {
-        static::$ran            = true;
-        static::$usedQueue      = $this->queue;
+        static::$ran = true;
+        static::$usedQueue = $this->queue;
         static::$usedConnection = $this->connection;
     }
 }
@@ -458,8 +458,8 @@ class JobChainingTestSecondJob implements ShouldQueue
 
     public function handle()
     {
-        static::$ran            = true;
-        static::$usedQueue      = $this->queue;
+        static::$ran = true;
+        static::$usedQueue = $this->queue;
         static::$usedConnection = $this->connection;
     }
 }
@@ -476,8 +476,8 @@ class JobChainingTestThirdJob implements ShouldQueue
 
     public function handle()
     {
-        static::$ran            = true;
-        static::$usedQueue      = $this->queue;
+        static::$ran = true;
+        static::$usedQueue = $this->queue;
         static::$usedConnection = $this->connection;
     }
 }
@@ -600,7 +600,7 @@ class JobChainingTestBatchedJob implements ShouldQueue
 
     public function __construct(string $id, int $times = 0)
     {
-        $this->id    = $id;
+        $this->id = $id;
         $this->times = $times;
     }
 
@@ -643,7 +643,7 @@ class JobRunRecorder
 
     public static function reset()
     {
-        self::$results  = [];
+        self::$results = [];
         self::$failures = [];
     }
 }
