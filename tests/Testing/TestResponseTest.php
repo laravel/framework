@@ -1500,6 +1500,33 @@ class TestResponseTest extends TestCase
         $testResponse->assertValid();
     }
 
+    public function testInvalidWithListOfErrors()
+    {
+        app()->instance('session.store', $store = new Store('test-session', new ArraySessionHandler(1)));
+
+        $store->put('errors', $errorBag = new ViewErrorBag);
+
+        $errorBag->put('default', new MessageBag([
+            'first_name' => [
+                'Your first name is required',
+                'Your first name must be at least 1 character',
+            ],
+        ]));
+
+        $testResponse = TestResponse::fromBaseResponse(new Response);
+
+        $testResponse->assertInvalid(['first_name' => 'Your first name is required']);
+        $testResponse->assertInvalid(['first_name' => 'Your first name must be at least 1 character']);
+        $testResponse->assertInvalid(['first_name' => ['Your first name is required', 'Your first name must be at least 1 character']]);
+
+        try {
+            $testResponse->assertInvalid(['first_name' => ['Your first name is required', 'FOO']]);
+            $this->fail();
+        } catch (AssertionFailedError $e) {
+            $this->assertStringStartsWith("Failed to find a validation error for key and message: 'first_name' => 'FOO'", $e->getMessage());
+        }
+    }
+
     public function testAssertJsonValidationErrorsCustomErrorsName()
     {
         $data = [

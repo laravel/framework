@@ -1208,21 +1208,23 @@ class TestResponse implements ArrayAccess
                 "Failed to find a validation error in session for key: '{$value}'".PHP_EOL.PHP_EOL.$errorMessage
             );
 
-            if (! is_int($key)) {
-                $hasError = false;
+            foreach (Arr::wrap($value) as $message) {
+                if (! is_int($key)) {
+                    $hasError = false;
 
-                foreach (Arr::wrap($sessionErrors[$key]) as $sessionErrorMessage) {
-                    if (Str::contains($sessionErrorMessage, $value)) {
-                        $hasError = true;
+                    foreach (Arr::wrap($sessionErrors[$key]) as $sessionErrorMessage) {
+                        if (Str::contains($sessionErrorMessage, $message)) {
+                            $hasError = true;
 
-                        break;
+                            break;
+                        }
                     }
-                }
 
-                if (! $hasError) {
-                    PHPUnit::fail(
-                        "Failed to find a validation error for key and message: '$key' => '$value'".PHP_EOL.PHP_EOL.$errorMessage
-                    );
+                    if (! $hasError) {
+                        PHPUnit::fail(
+                            "Failed to find a validation error for key and message: '$key' => '$message'".PHP_EOL.PHP_EOL.$errorMessage
+                        );
+                    }
                 }
             }
         }
