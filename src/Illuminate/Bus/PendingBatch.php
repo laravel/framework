@@ -8,11 +8,14 @@ use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher as EventDispatcher;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Traits\Conditionable;
 use Laravel\SerializableClosure\SerializableClosure;
 use Throwable;
 
 class PendingBatch
 {
+    use Conditionable;
+
     /**
      * The IoC container instance.
      *

@@ -3,9 +3,11 @@
 namespace Illuminate\Tests\Integration\Queue;
 
 use Illuminate\Bus\Batchable;
+use Illuminate\Bus\PendingBatch;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Foundation\Bus\PendingChain;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Carbon;
@@ -387,6 +389,43 @@ class JobChainingTest extends TestCase
         $this->assertEquals(['c1', 'c2', 'b1', 'b3'], JobRunRecorder::$results);
         $this->assertEquals(['batch failed', 'chain failed'], JobRunRecorder::$failures);
     }
+
+    public function testChainConditionable()
+    {
+        $chain = Bus::chain([])
+            ->onConnection('sync1')
+            ->when(true, function (PendingChain $chain) {
+                $chain->onConnection('sync2');
+            });
+
+        $this->assertEquals('sync2', $chain->connection);
+
+        $chain = Bus::chain([])
+            ->onConnection('sync1')
+            ->when(false, function (PendingChain $chain) {
+                $chain->onConnection('sync2');
+            });
+
+        $this->assertEquals('sync1', $chain->connection);
+    }
+
+    public function testBatchConditionable()
+    {
+        $batch = Bus::batch([])
+            ->onConnection('sync1')
+            ->when(true, function (PendingBatch $batch) {
+                $batch->onConnection('sync2');
+            });
+
+        $this->assertEquals('sync2', $batch->connection());
+        $batch = Bus::batch([])
+            ->onConnection('sync1')
+            ->when(false, function (PendingBatch $batch) {
+                $batch->onConnection('sync2');
+            });
+
+        $this->assertEquals('sync1', $batch->connection());
+    }
 }
 
 class JobChainingTestFirstJob implements ShouldQueue
@@ -401,8 +440,8 @@ class JobChainingTestFirstJob implements ShouldQueue
 
     public function handle()
     {
-        static::$ran = true;
-        static::$usedQueue = $this->queue;
+        static::$ran            = true;
+        static::$usedQueue      = $this->queue;
         static::$usedConnection = $this->connection;
     }
 }
@@ -419,8 +458,8 @@ class JobChainingTestSecondJob implements ShouldQueue
 
     public function handle()
     {
-        static::$ran = true;
-        static::$usedQueue = $this->queue;
+        static::$ran            = true;
+        static::$usedQueue      = $this->queue;
         static::$usedConnection = $this->connection;
     }
 }
@@ -437,8 +476,8 @@ class JobChainingTestThirdJob implements ShouldQueue
 
     public function handle()
     {
-        static::$ran = true;
-        static::$usedQueue = $this->queue;
+        static::$ran            = true;
+        static::$usedQueue      = $this->queue;
         static::$usedConnection = $this->connection;
     }
 }
@@ -561,14 +600,14 @@ class JobChainingTestBatchedJob implements ShouldQueue
 
     public function __construct(string $id, int $times = 0)
     {
-        $this->id = $id;
+        $this->id    = $id;
         $this->times = $times;
     }
 
     public function handle()
     {
         for ($i = 0; $i < $this->times; $i++) {
-            $this->batch()->add(new JobChainingTestBatchedJob($this->id.'-'.$i));
+            $this->batch()->add(new JobChainingTestBatchedJob($this->id . '-' . $i));
         }
         JobRunRecorder::record($this->id);
     }
@@ -604,7 +643,7 @@ class JobRunRecorder
 
     public static function reset()
     {
-        self::$results = [];
+        self::$results  = [];
         self::$failures = [];
     }
 }
