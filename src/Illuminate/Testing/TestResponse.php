@@ -1203,9 +1203,9 @@ class TestResponse implements ArrayAccess
 
         foreach (Arr::wrap($errors) as $key => $value) {
             PHPUnit::assertArrayHasKey(
-                (is_int($key)) ? $value : $key,
+                $resolvedKey = (is_int($key)) ? $value : $key,
                 $sessionErrors,
-                "Failed to find a validation error in session for key: '{$value}'".PHP_EOL.PHP_EOL.$errorMessage
+                "Failed to find a validation error in session for key: '{$resolvedKey}'".PHP_EOL.PHP_EOL.$errorMessage
             );
 
             foreach (Arr::wrap($value) as $message) {
