@@ -2,14 +2,9 @@
 
 namespace Illuminate\Database\Console;
 
-use Doctrine\DBAL\Schema\Column;
-use Doctrine\DBAL\Schema\ForeignKeyConstraint;
-use Doctrine\DBAL\Schema\Index;
-use Doctrine\DBAL\Schema\Table;
 use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Database\Schema\Builder;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
 use Symfony\Component\Console\Attribute\AsCommand;
 
 use function Laravel\Prompts\select;
@@ -139,7 +134,7 @@ class TableCommand extends DatabaseInspectionCommand
     {
         return collect([
             $index['type'],
-            count($index['columns']) > 1 ? 'compound' : null ,
+            count($index['columns']) > 1 ? 'compound' : null,
             $index['unique'] && ! $index['primary'] ? 'unique' : null,
             $index['primary'] ? 'primary' : null,
         ])->filter();

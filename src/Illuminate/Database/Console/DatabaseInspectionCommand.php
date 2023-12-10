@@ -65,5 +65,4 @@ abstract class DatabaseInspectionCommand extends Command
 
         return Arr::except(config('database.connections.'.$database), ['password']);
     }
-
 }
