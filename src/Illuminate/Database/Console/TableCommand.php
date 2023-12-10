@@ -5,6 +5,7 @@ namespace Illuminate\Database\Console;
 use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Database\Schema\Builder;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Number;
 use Symfony\Component\Console\Attribute\AsCommand;
 
 use function Laravel\Prompts\select;
@@ -55,9 +56,11 @@ class TableCommand extends DatabaseInspectionCommand
             return 1;
         }
 
-        $columns = $this->columns($schema, $table['name']);
-        $indexes = $this->indexes($schema, $table['name']);
-        $foreignKeys = $this->foreignKeys($schema, $table['name']);
+        $tableName = $this->withoutTablePrefix($connection, $table['name']);
+
+        $columns = $this->columns($schema, $tableName);
+        $indexes = $this->indexes($schema, $tableName);
+        $foreignKeys = $this->foreignKeys($schema, $tableName);
 
         $data = [
             'table' => [
@@ -151,7 +154,7 @@ class TableCommand extends DatabaseInspectionCommand
     {
         return collect($schema->getForeignKeys($table))->map(fn ($foreignKey) => [
             'name' => $foreignKey['name'],
-            'local_columns' => collect($foreignKey['columns']),
+            'columns' => collect($foreignKey['columns']),
             'foreign_schema' => $foreignKey['foreign_schema'],
             'foreign_table' => $foreignKey['foreign_table'],
             'foreign_columns' => collect($foreignKey['foreign_columns']),
@@ -200,7 +203,7 @@ class TableCommand extends DatabaseInspectionCommand
         $this->components->twoColumnDetail('Columns', $table['columns']);
 
         if ($size = $table['size']) {
-            $this->components->twoColumnDetail('Size', number_format($size / 1024 / 1024, 2).'MiB');
+            $this->components->twoColumnDetail('Size', Number::fileSize($size, 2));
         }
 
         $this->newLine();
@@ -211,7 +214,7 @@ class TableCommand extends DatabaseInspectionCommand
             $columns->each(function ($column) {
                 $this->components->twoColumnDetail(
                     $column['column'].' <fg=gray>'.$column['attributes']->implode(', ').'</>',
-                    ($column['default'] ? '<fg=gray>'.$column['default'].'</> ' : '').''.$column['type'].''
+                    ($column['default'] ? '<fg=gray>'.$column['default'].'</> ' : '').$column['type']
                 );
             });
 
@@ -236,7 +239,7 @@ class TableCommand extends DatabaseInspectionCommand
 
             $foreignKeys->each(function ($foreignKey) {
                 $this->components->twoColumnDetail(
-                    $foreignKey['name'].' <fg=gray;options=bold>'.$foreignKey['local_columns']->implode(', ').' references '.$foreignKey['foreign_columns']->implode(', ').' on '.$foreignKey['foreign_table'].'</>',
+                    $foreignKey['name'].' <fg=gray;options=bold>'.$foreignKey['columns']->implode(', ').' references '.$foreignKey['foreign_columns']->implode(', ').' on '.$foreignKey['foreign_table'].'</>',
                     $foreignKey['on_update'].' / '.$foreignKey['on_delete'],
                 );
             });
