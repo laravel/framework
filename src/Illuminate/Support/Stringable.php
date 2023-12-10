@@ -224,6 +224,31 @@ class Stringable implements JsonSerializable, ArrayAccess
     }
 
     /**
+     * Convert all applicable characters to HTML entities.
+     *
+     * @param  int  $flags
+     * @param  string|null  $encoding
+     * @param  bool  $doubleEncode
+     * @return static
+     */
+    public function encodeHtml(int $flags = ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML401, ?string $encoding = null, bool $doubleEncode = true): static
+    {
+        return new static(Str::encodeHtml($this->value, $flags, $encoding, $doubleEncode));
+    }
+
+    /**
+     * Convert HTML entities to their corresponding characters.
+     *
+     * @param  int  $flags
+     * @param  string|null  $encoding
+     * @return static
+     */
+    public function decodeHtml(int $flags = ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML401, ?string $encoding = null): static
+    {
+        return new static(Str::decodeHtml($this->value, $flags, $encoding));
+    }
+
+    /**
      * Determine if a given string ends with a given substring.
      *
      * @param  string|iterable<string>  $needles

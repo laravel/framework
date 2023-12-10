@@ -306,6 +306,33 @@ class Str
     }
 
     /**
+     * Convert all applicable characters to HTML entities.
+     *
+     * @param  string  $string
+     * @param  int  $flags
+     * @param  string|null  $encoding
+     * @param  bool  $doubleEncode
+     * @return string
+     */
+    public static function encodeHtml(string $string, int $flags = ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML401, ?string $encoding = null, bool $doubleEncode = true): string
+    {
+        return htmlentities($string, $flags, $encoding, $doubleEncode);
+    }
+
+    /**
+     * Convert HTML entities to their corresponding characters.
+     *
+     * @param  string  $string
+     * @param  int  $flags
+     * @param  string|null  $encoding
+     * @return string
+     */
+    public static function decodeHtml(string $string, int $flags = ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML401, ?string $encoding = null): string
+    {
+        return html_entity_decode($string, $flags, $encoding);
+    }
+
+    /**
      * Determine if a given string ends with a given substring.
      *
      * @param  string  $haystack

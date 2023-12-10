@@ -303,6 +303,34 @@ class SupportStrTest extends TestCase
         $this->assertEquals($expected, Str::containsAll($haystack, $needles, $ignoreCase));
     }
 
+    public function testStrEncodeHtml()
+    {
+        $strings = [
+            'Hello "World"',
+            'Hello <World>',
+            'Hello & World',
+            'سلام‌دنیا',
+        ];
+
+        foreach ($strings as $string) {
+            $this->assertEquals(htmlentities($string), Str::encodeHtml($string));
+        }
+    }
+
+    public function testStrDecodeHtml()
+    {
+        $strings = [
+            'Hello &quot;World&quot;',
+            'Hello &lt;World&gt;',
+            'Hello &amp; World',
+            'سلام&zwnj;دنیا',
+        ];
+
+        foreach ($strings as $string) {
+            $this->assertEquals(html_entity_decode($string), Str::decodeHtml($string));
+        }
+    }
+
     public function testConvertCase()
     {
         // Upper Case Conversion
