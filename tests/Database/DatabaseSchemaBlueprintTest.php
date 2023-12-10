@@ -173,7 +173,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $this->assertEquals(['alter table `users` add `foo` varchar(255) not null'], $blueprint->toSql($connection, new MySqlGrammar));
     }
 
-    public function testRenameColumnWithoutDoctrine()
+    public function testRenameColumn()
     {
         $base = new Blueprint('users', function ($table) {
             $table->renameColumn('foo', 'bar');
@@ -215,7 +215,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
         ], $blueprint->toSql($connection, new MySqlGrammar));
     }
 
-    public function testDropColumnWithoutDoctrine()
+    public function testDropColumn()
     {
         $base = new Blueprint('users', function ($table) {
             $table->dropColumn('foo');

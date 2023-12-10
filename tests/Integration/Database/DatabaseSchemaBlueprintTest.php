@@ -55,7 +55,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $this->assertContains($queries, $expected);
     }
 
-    public function testRenamingColumnsWithoutDoctrineWorks()
+    public function testRenamingColumnsWorks()
     {
         $connection = DB::connection();
         $schema = $connection->getSchemaBuilder();
@@ -98,7 +98,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $this->assertTrue($schema->hasColumns('test', ['bar', 'qux']));
     }
 
-    public function testDroppingColumnsWithoutDoctrineWorks()
+    public function testDroppingColumnsWorks()
     {
         $connection = DB::connection();
         $schema = $connection->getSchemaBuilder();
