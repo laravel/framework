@@ -607,7 +607,7 @@ class JobChainingTestBatchedJob implements ShouldQueue
     public function handle()
     {
         for ($i = 0; $i < $this->times; $i++) {
-            $this->batch()->add(new JobChainingTestBatchedJob($this->id . '-' . $i));
+            $this->batch()->add(new JobChainingTestBatchedJob($this->id.'-'.$i));
         }
         JobRunRecorder::record($this->id);
     }
