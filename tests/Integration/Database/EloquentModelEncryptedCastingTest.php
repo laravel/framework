@@ -27,7 +27,7 @@ class EloquentModelEncryptedCastingTest extends DatabaseTestCase
         Model::$encrypter = null;
     }
 
-    protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
+    protected function afterRefreshingDatabase()
     {
         Schema::create('encrypted_casts', function (Blueprint $table) {
             $table->increments('id');

@@ -5,6 +5,7 @@ namespace Illuminate\Testing\Fluent;
 use Closure;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Support\Traits\Tappable;
 use Illuminate\Testing\AssertableJsonString;
@@ -16,6 +17,7 @@ class AssertableJson implements Arrayable
         Concerns\Matching,
         Concerns\Debugging,
         Concerns\Interaction,
+        Conditionable,
         Macroable,
         Tappable;
 

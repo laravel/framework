@@ -17,7 +17,7 @@ class DatabaseMySqlConnectionTest extends MySqlTestCase
     const JSON_COL = 'json_col';
     const FLOAT_VAL = 0.2;
 
-    protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
+    protected function afterRefreshingDatabase()
     {
         if (! Schema::hasTable(self::TABLE)) {
             Schema::create(self::TABLE, function (Blueprint $table) {

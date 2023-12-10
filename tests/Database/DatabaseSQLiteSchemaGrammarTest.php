@@ -164,20 +164,21 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
             $table->index(['name', 'email'], 'index1');
         });
 
-        $manager = $db->getConnection()->getDoctrineSchemaManager();
-        $details = $manager->listTableDetails('prefix_users');
-        $this->assertTrue($details->hasIndex('index1'));
-        $this->assertFalse($details->hasIndex('index2'));
+        $indexes = array_column($schema->getIndexes('users'), 'name');
+
+        $this->assertContains('index1', $indexes);
+        $this->assertNotContains('index2', $indexes);
 
         $schema->table('users', function (Blueprint $table) {
             $table->renameIndex('index1', 'index2');
         });
 
-        $details = $manager->listTableDetails('prefix_users');
-        $this->assertFalse($details->hasIndex('index1'));
-        $this->assertTrue($details->hasIndex('index2'));
+        $indexes = $schema->getIndexes('users');
 
-        $this->assertEquals(['name', 'email'], $details->getIndex('index2')->getUnquotedColumns());
+        $this->assertNotContains('index1', array_column($indexes, 'name'));
+        $this->assertTrue(collect($indexes)->contains(
+            fn ($index) => $index['name'] === 'index2' && $index['columns'] === ['name', 'email']
+        ));
     }
 
     public function testAddingPrimaryKey()

@@ -130,6 +130,41 @@ class PostgresSchemaBuilderTest extends PostgresTestCase
         $this->assertEquals('This is a new comment', DB::selectOne("select obj_description('public.posts'::regclass, 'pg_class')")->obj_description);
     }
 
+    public function testGetTables()
+    {
+        Schema::create('public.table', function (Blueprint $table) {
+            $table->string('name');
+        });
+
+        Schema::create('private.table', function (Blueprint $table) {
+            $table->integer('votes');
+        });
+
+        $tables = Schema::getTables();
+
+        $this->assertNotEmpty(array_filter($tables, function ($table) {
+            return $table['name'] === 'table' && $table['schema'] === 'public';
+        }));
+        $this->assertNotEmpty(array_filter($tables, function ($table) {
+            return $table['name'] === 'table' && $table['schema'] === 'private';
+        }));
+    }
+
+    public function testGetViews()
+    {
+        DB::statement('create view public.foo (id) as select 1');
+        DB::statement('create view private.foo (id) as select 1');
+
+        $views = Schema::getViews();
+
+        $this->assertNotEmpty(array_filter($views, function ($view) {
+            return $view['name'] === 'foo' && $view['schema'] === 'public';
+        }));
+        $this->assertNotEmpty(array_filter($views, function ($view) {
+            return $view['name'] === 'foo' && $view['schema'] === 'private';
+        }));
+    }
+
     protected function hasView($schema, $table)
     {
         return DB::table('information_schema.views')

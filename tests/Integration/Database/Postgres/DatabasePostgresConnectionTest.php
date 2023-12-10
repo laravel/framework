@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Schema;
  */
 class DatabasePostgresConnectionTest extends PostgresTestCase
 {
-    protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
+    protected function afterRefreshingDatabase()
     {
         if (! Schema::hasTable('json_table')) {
             Schema::create('json_table', function (Blueprint $table) {

@@ -69,11 +69,64 @@ class SqlServerGrammar extends Grammar
     /**
      * Compile the query to determine if a table exists.
      *
+     * @deprecated Will be removed in a future Laravel version.
+     *
      * @return string
      */
     public function compileTableExists()
     {
         return "select * from sys.sysobjects where id = object_id(?) and xtype in ('U', 'V')";
+    }
+
+    /**
+     * Compile the query to determine the tables.
+     *
+     * @return string
+     */
+    public function compileTables()
+    {
+        return 'select t.name as name, SCHEMA_NAME(t.schema_id) as [schema], sum(u.total_pages) * 8 * 1024 as size '
+            .'from sys.tables as t '
+            .'join sys.partitions as p on p.object_id = t.object_id '
+            .'join sys.allocation_units as u on u.container_id = p.hobt_id '
+            .'group by t.name, t.schema_id '
+            .'order by t.name';
+    }
+
+    /**
+     * Compile the query to determine the views.
+     *
+     * @return string
+     */
+    public function compileViews()
+    {
+        return 'select name, SCHEMA_NAME(v.schema_id) as [schema], definition from sys.views as v '
+            .'inner join sys.sql_modules as m on v.object_id = m.object_id '
+            .'order by name';
+    }
+
+    /**
+     * Compile the SQL needed to retrieve all table names.
+     *
+     * @deprecated Will be removed in a future Laravel version.
+     *
+     * @return string
+     */
+    public function compileGetAllTables()
+    {
+        return "select name, type from sys.tables where type = 'U'";
+    }
+
+    /**
+     * Compile the SQL needed to retrieve all view names.
+     *
+     * @deprecated Will be removed in a future Laravel version.
+     *
+     * @return string
+     */
+    public function compileGetAllViews()
+    {
+        return "select name, type from sys.objects where type = 'V'";
     }
 
     /**
@@ -110,6 +163,28 @@ class SqlServerGrammar extends Grammar
             .'left join sys.default_constraints def on col.default_object_id = def.object_id and col.object_id = def.parent_object_id '
             ."left join sys.extended_properties as prop on obj.object_id = prop.major_id and col.column_id = prop.minor_id and prop.name = 'MS_Description' "
             ."where obj.type = 'U' and obj.name = %s and scm.name = SCHEMA_NAME()",
+            $this->quoteString($table),
+        );
+    }
+
+    /**
+     * Compile the query to determine the indexes.
+     *
+     * @param  string  $table
+     * @return string
+     */
+    public function compileIndexes($table)
+    {
+        return sprintf(
+            "select idx.name as name, string_agg(col.name, ',') within group (order by idxcol.key_ordinal) as columns, "
+            .'idx.type_desc as [type], idx.is_unique as [unique], idx.is_primary_key as [primary] '
+            .'from sys.indexes as idx '
+            .'join sys.tables as tbl on idx.object_id = tbl.object_id '
+            .'join sys.schemas as scm on tbl.schema_id = scm.schema_id '
+            .'join sys.index_columns as idxcol on idx.object_id = idxcol.object_id and idx.index_id = idxcol.index_id '
+            .'join sys.columns as col on idxcol.object_id = col.object_id and idxcol.column_id = col.column_id '
+            .'where tbl.name = %s and scm.name = SCHEMA_NAME() '
+            .'group by idx.name, idx.type_desc, idx.is_unique, idx.is_primary_key',
             $this->quoteString($table),
         );
     }
@@ -502,26 +577,6 @@ class SqlServerGrammar extends Grammar
             FROM sys.views;
 
             EXEC sp_executesql @sql;";
-    }
-
-    /**
-     * Compile the SQL needed to retrieve all table names.
-     *
-     * @return string
-     */
-    public function compileGetAllTables()
-    {
-        return "select name, type from sys.tables where type = 'U'";
-    }
-
-    /**
-     * Compile the SQL needed to retrieve all view names.
-     *
-     * @return string
-     */
-    public function compileGetAllViews()
-    {
-        return "select name, type from sys.objects where type = 'V'";
     }
 
     /**
