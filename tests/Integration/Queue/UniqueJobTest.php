@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Bus;
 use Orchestra\Testbench\Attributes\WithMigration;
 use Orchestra\Testbench\TestCase;
 
+#[WithMigration]
 #[WithMigration('queue')]
 class UniqueJobTest extends TestCase
 {

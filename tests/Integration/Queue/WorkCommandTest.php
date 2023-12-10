@@ -11,6 +11,7 @@ use Orchestra\Testbench\Attributes\WithMigration;
 use Orchestra\Testbench\TestCase;
 use Queue;
 
+#[WithMigration]
 #[WithMigration('queue')]
 class WorkCommandTest extends TestCase
 {

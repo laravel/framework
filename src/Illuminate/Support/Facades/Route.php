@@ -37,6 +37,7 @@ namespace Illuminate\Support\Facades;
  * @method static \Symfony\Component\HttpFoundation\Response toResponse(\Symfony\Component\HttpFoundation\Request $request, mixed $response)
  * @method static \Illuminate\Routing\Route substituteBindings(\Illuminate\Routing\Route $route)
  * @method static void substituteImplicitBindings(\Illuminate\Routing\Route $route)
+ * @method static \Illuminate\Routing\Router substituteImplicitBindingsUsing(callable $callback)
  * @method static void matched(string|callable $callback)
  * @method static array getMiddleware()
  * @method static \Illuminate\Routing\Router aliasMiddleware(string $name, string $class)

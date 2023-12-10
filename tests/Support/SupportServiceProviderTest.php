@@ -39,7 +39,14 @@ class SupportServiceProviderTest extends TestCase
     public function testPublishableGroups()
     {
         $toPublish = ServiceProvider::publishableGroups();
-        $this->assertEquals(['some_tag', 'tag_one', 'tag_two'], $toPublish, 'Publishable groups do not return expected set of groups.');
+        $this->assertEquals([
+            'some_tag',
+            'tag_one',
+            'tag_two',
+            'tag_three',
+            'tag_four',
+            'tag_five',
+        ], $toPublish, 'Publishable groups do not return expected set of groups.');
     }
 
     public function testSimpleAssetsArePublishedCorrectly()
@@ -47,7 +54,14 @@ class SupportServiceProviderTest extends TestCase
         $toPublish = ServiceProvider::pathsToPublish(ServiceProviderForTestingOne::class);
         $this->assertArrayHasKey('source/unmarked/one', $toPublish, 'Service provider does not return expected published path key.');
         $this->assertArrayHasKey('source/tagged/one', $toPublish, 'Service provider does not return expected published path key.');
-        $this->assertEquals(['source/unmarked/one' => 'destination/unmarked/one', 'source/tagged/one' => 'destination/tagged/one', 'source/tagged/multiple' => 'destination/tagged/multiple'], $toPublish, 'Service provider does not return expected set of published paths.');
+        $this->assertEquals([
+            'source/unmarked/one' => 'destination/unmarked/one',
+            'source/tagged/one' => 'destination/tagged/one',
+            'source/tagged/multiple' => 'destination/tagged/multiple',
+            'source/unmarked/two' => 'destination/unmarked/two',
+            'source/tagged/three' => 'destination/tagged/three',
+            'source/tagged/multiple_two' => 'destination/tagged/multiple_two',
+        ], $toPublish, 'Service provider does not return expected set of published paths.');
     }
 
     public function testMultipleAssetsArePublishedCorrectly()
@@ -119,6 +133,10 @@ class ServiceProviderForTestingOne extends ServiceProvider
         $this->publishes(['source/unmarked/one' => 'destination/unmarked/one']);
         $this->publishes(['source/tagged/one' => 'destination/tagged/one'], 'some_tag');
         $this->publishes(['source/tagged/multiple' => 'destination/tagged/multiple'], ['tag_one', 'tag_two']);
+
+        $this->publishesMigrations(['source/unmarked/two' => 'destination/unmarked/two']);
+        $this->publishesMigrations(['source/tagged/three' => 'destination/tagged/three'], 'tag_three');
+        $this->publishesMigrations(['source/tagged/multiple_two' => 'destination/tagged/multiple_two'], ['tag_four', 'tag_five']);
     }
 }
 

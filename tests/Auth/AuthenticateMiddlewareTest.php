@@ -209,6 +209,8 @@ class AuthenticateMiddlewareTest extends TestCase
     {
         $request = m::mock(Request::class);
 
+        $request->shouldReceive('expectsJson')->andReturn(false);
+
         $nextParam = null;
 
         $next = function ($param) use (&$nextParam) {

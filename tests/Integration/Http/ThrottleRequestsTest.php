@@ -11,6 +11,7 @@ use Illuminate\Routing\Middleware\ThrottleRequests;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Route;
 use Orchestra\Testbench\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Throwable;
 
 class ThrottleRequestsTest extends TestCase
@@ -127,7 +128,7 @@ class ThrottleRequestsTest extends TestCase
         ];
     }
 
-    /** @dataProvider perMinuteThrottlingDataSet */
+    #[DataProvider('perMinuteThrottlingDataSet')]
     public function testItCanThrottlePerMinute(string $middleware)
     {
         $rateLimiter = Container::getInstance()->make(RateLimiter::class);
