@@ -167,28 +167,11 @@ class PostgresSchemaBuilderTest extends PostgresTestCase
 
     public function testDropPartitionedTables()
     {
-        DB::unprepared(<<<'SQL'
-            CREATE TABLE groups (
-                id BIGSERIAL,
-                tenant_id BIGINT,
-                name VARCHAR,
-                PRIMARY KEY (id, tenant_id)
-            ) PARTITION BY HASH (tenant_id);
+        DB::statement('create table groups (id bigserial, tenant_id bigint, name varchar, primary key (id, tenant_id)) partition by hash (tenant_id)');
+        DB::statement('create table groups_1 partition of groups for values with (modulus 2, remainder 0)');
+        DB::statement('create table groups_2 partition of groups for values with (modulus 2, remainder 1)');
 
-            CREATE TABLE groups_1
-            PARTITION OF groups
-            FOR VALUES WITH (MODULUS 2, REMAINDER 0);
-
-            CREATE TABLE groups_2
-            PARTITION OF groups
-            FOR VALUES WITH (MODULUS 2, REMAINDER 1);
-        SQL);
-
-        $tables = Schema::getTables();
-
-        var_dump($tables);
-
-        $tables = array_column($tables, 'name');
+        $tables = array_column(Schema::getTables(), 'name');
 
         $this->assertContains('groups', $tables);
         $this->assertContains('groups_1', $tables);
@@ -197,23 +180,6 @@ class PostgresSchemaBuilderTest extends PostgresTestCase
         Schema::dropAllTables();
 
         $this->assertEmpty(Schema::getTables());
-
-        DB::unprepared(<<<'SQL'
-            CREATE TABLE groups (
-                id BIGSERIAL,
-                tenant_id BIGINT,
-                name VARCHAR,
-                PRIMARY KEY (id, tenant_id)
-            ) PARTITION BY HASH (tenant_id);
-
-            CREATE TABLE groups_1
-            PARTITION OF groups
-            FOR VALUES WITH (MODULUS 2, REMAINDER 0);
-
-            CREATE TABLE groups_2
-            PARTITION OF groups
-            FOR VALUES WITH (MODULUS 2, REMAINDER 1);
-        SQL);
     }
 
     protected function hasView($schema, $table)
