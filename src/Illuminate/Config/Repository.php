@@ -2,6 +2,7 @@
 
 namespace Illuminate\Config;
 
+use Exception;
 use ArrayAccess;
 use Illuminate\Contracts\Config\Repository as ConfigContract;
 use Illuminate\Support\Arr;
@@ -19,14 +20,38 @@ class Repository implements ArrayAccess, ConfigContract
     protected $items = [];
 
     /**
+     * Configs loaded from cache
+     *
+     * @var boolean
+     */
+    private bool $loadedFromCache = false;
+
+    /**
+     * Path of configuration files
+     *
+     * @var string
+     */
+    private string $configPath;
+
+    /**
      * Create a new configuration repository.
      *
      * @param  array  $items
-     * @return void
+     * @param  string  $configPath
+     * @throws Exception
      */
-    public function __construct(array $items = [])
+    public function __construct(array $items = [], string $configPath = 'test')
     {
-        $this->items = $items;
+        $this->configPath = $configPath;
+
+        if ($items) {
+            $this->items           = $items;
+            $this->loadedFromCache = true;
+        }
+
+        if (!$configPath == 'test' && !$this->get('app')) {
+            throw new Exception('Unable to load the "app" configuration file.');
+        }
     }
 
     /**
@@ -37,7 +62,31 @@ class Repository implements ArrayAccess, ConfigContract
      */
     public function has($key)
     {
+        if (is_array($key)) {
+            return $this->hasMany($key);
+        }
+
+        $this->load($key);
         return Arr::has($this->items, $key);
+    }
+
+    /**
+     * Check many keys has on configuration items.
+     * this added for load file before checking
+     *
+     * @param  array  $keys
+     * @return bool
+     */
+    public function hasMany(array $keys): bool
+    {
+        foreach ($keys as $key) {
+            $this->load($key);
+            if (!Arr::has($this->items, $key)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -53,6 +102,7 @@ class Repository implements ArrayAccess, ConfigContract
             return $this->getMany($key);
         }
 
+        $this->load($key);
         return Arr::get($this->items, $key, $default);
     }
 
@@ -71,6 +121,7 @@ class Repository implements ArrayAccess, ConfigContract
                 [$key, $default] = [$default, null];
             }
 
+            $this->load($key);
             $config[$key] = Arr::get($this->items, $key, $default);
         }
 
@@ -89,6 +140,7 @@ class Repository implements ArrayAccess, ConfigContract
         $keys = is_array($key) ? $key : [$key => $value];
 
         foreach ($keys as $key => $value) {
+            $this->load($key);
             Arr::set($this->items, $key, $value);
         }
     }
@@ -178,5 +230,54 @@ class Repository implements ArrayAccess, ConfigContract
     public function offsetUnset($key): void
     {
         $this->set($key, null);
+    }
+
+    /**
+     * Load config file when not loaded or cache not loaded
+     *
+     * @param  string|int  $key
+     * @return void
+     */
+    private function load($key): void
+    {
+        if (!$this->loadedFromCache && (is_string($key) || is_int($key)) && $file = $this->getConfigurationFile("" . $key)) {
+            if (!Arr::has($this->items, $file[0])) {
+                Arr::set($this->items, $file[0], require $file[1]);
+            }
+        }
+    }
+
+    /**
+     * Get config file key and file path
+     *
+     * @param  string  $key
+     * @param  string  $fileKey
+     * @param  string|null  $configPath
+     * @return array
+     */
+    private function getConfigurationFile(string $key, string $fileKey = '', string $configPath = null): array
+    {
+        $aKey = explode('.', $key, 2);
+
+        if (!$configPath) {
+            $configPath = realpath($this->configPath);
+        }
+
+        $fileKey   .= $fileKey ? "." . $aKey[0] : $aKey[0];
+        $directory = $configPath . DIRECTORY_SEPARATOR . $aKey[0];
+
+        //this for check on nests directories
+        if (count($aKey) > 1 && is_dir($directory) && $file = $this->getConfigurationFile($aKey[1], $fileKey, $directory)) {
+            //This part is for when we have a directory and a file
+            // with the same name, the file is loaded first and
+            // then the files inside the folder are loaded.
+            if (is_file($directory . ".php")) {
+                $this->load($fileKey);
+            }
+            return $file;
+        } elseif (is_file($directory . ".php")) {
+            return [$fileKey, $directory . ".php"];
+        }
+        return [];
     }
 }
