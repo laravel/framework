@@ -37,7 +37,7 @@ class BladeUseTest extends AbstractBladeTestCase
         $string = <<<EOF
             @use([
                 'SomeNamespace\SomeClass' => 'Foo',
-                'AnotherNamespace\AnotherClass'
+                'AnotherNamespace\AnotherClass',
             ])
             EOF;
 

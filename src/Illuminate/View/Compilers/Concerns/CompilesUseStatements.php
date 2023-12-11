@@ -33,6 +33,7 @@ trait CompilesUseStatements
     protected function compileMultipleUseStatements($expression)
     {
         return collect(explode(',', $expression))
+            ->filter(fn ($value) => trim($value))
             ->map(function ($use) {
                 $use = str_replace('=>', ',', $use);
 
