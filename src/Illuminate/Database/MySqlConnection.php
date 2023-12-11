@@ -10,6 +10,7 @@ use Illuminate\Database\Schema\Grammars\MySqlGrammar as SchemaGrammar;
 use Illuminate\Database\Schema\MySqlBuilder;
 use Illuminate\Database\Schema\MySqlSchemaState;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Str;
 use PDO;
 
 class MySqlConnection extends Connection
@@ -46,6 +47,18 @@ class MySqlConnection extends Connection
     public function isMaria()
     {
         return str_contains($this->getPdo()->getAttribute(PDO::ATTR_SERVER_VERSION), 'MariaDB');
+    }
+
+    /**
+     * Get the server version for the connection.
+     *
+     * @return string
+     */
+    public function getServerVersion(): string
+    {
+        return str_contains($version = parent::getServerVersion(), 'MariaDB')
+            ? Str::between($version, '5.5.5-', '-MariaDB')
+            : $version;
     }
 
     /**

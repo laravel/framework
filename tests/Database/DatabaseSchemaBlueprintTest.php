@@ -181,6 +181,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
 
         $connection = m::mock(Connection::class);
         $connection->shouldReceive('getServerVersion')->andReturn('8.0.4');
+        $connection->shouldReceive('isMaria')->andReturn(false);
 
         $blueprint = clone $base;
         $this->assertEquals(['alter table `users` rename column `foo` to `bar`'], $blueprint->toSql($connection, new MySqlGrammar));
@@ -203,7 +204,29 @@ class DatabaseSchemaBlueprintTest extends TestCase
         });
 
         $connection = m::mock(Connection::class);
+        $connection->shouldReceive('isMaria')->andReturn(false);
         $connection->shouldReceive('getServerVersion')->andReturn('5.7');
+        $connection->shouldReceive('getSchemaBuilder->getColumns')->andReturn([
+            ['name' => 'name', 'type' => 'varchar(255)', 'type_name' => 'varchar', 'nullable' => true, 'collation' => 'utf8mb4_unicode_ci', 'default' => 'foo', 'comment' => null, 'auto_increment' => false],
+            ['name' => 'id', 'type' => 'bigint unsigned', 'type_name' => 'bigint', 'nullable' => false, 'collation' => null, 'default' => null, 'comment' => 'lorem ipsum', 'auto_increment' => true],
+        ]);
+
+        $this->assertEquals([
+            "alter table `users` change `name` `title` varchar(255) collate 'utf8mb4_unicode_ci' null default 'foo'",
+            "alter table `users` change `id` `key` bigint unsigned not null auto_increment primary key comment 'lorem ipsum'",
+        ], $blueprint->toSql($connection, new MySqlGrammar));
+    }
+
+    public function testNativeRenameColumnOnLegacyMariaDB()
+    {
+        $blueprint = new Blueprint('users', function ($table) {
+            $table->renameColumn('name', 'title');
+            $table->renameColumn('id', 'key');
+        });
+
+        $connection = m::mock(Connection::class);
+        $connection->shouldReceive('isMaria')->andReturn(true);
+        $connection->shouldReceive('getServerVersion')->andReturn('10.1.35');
         $connection->shouldReceive('getSchemaBuilder->getColumns')->andReturn([
             ['name' => 'name', 'type' => 'varchar(255)', 'type_name' => 'varchar', 'nullable' => true, 'collation' => 'utf8mb4_unicode_ci', 'default' => 'foo', 'comment' => null, 'auto_increment' => false],
             ['name' => 'id', 'type' => 'bigint unsigned', 'type_name' => 'bigint', 'nullable' => false, 'collation' => null, 'default' => null, 'comment' => 'lorem ipsum', 'auto_increment' => true],
