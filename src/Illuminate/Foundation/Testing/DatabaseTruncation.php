@@ -26,6 +26,13 @@ trait DatabaseTruncation
     {
         $this->beforeTruncatingDatabase();
 
+        $this->beforeApplicationDestroyed(function () {
+            $database = $this->app->make('db');
+            foreach (array_keys($database->getConnections()) as $name) {
+                $database->purge($name);
+            }
+        });
+
         // Migrate and seed the database on first run...
         if (! RefreshDatabaseState::$migrated) {
             $this->artisan('migrate:fresh', $this->migrateFreshUsing());

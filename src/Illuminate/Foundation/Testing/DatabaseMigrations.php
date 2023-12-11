@@ -24,6 +24,11 @@ trait DatabaseMigrations
             $this->artisan('migrate:rollback');
 
             RefreshDatabaseState::$migrated = false;
+
+            $database = $this->app->make('db');
+            foreach (array_keys($database->getConnections()) as $name) {
+                $database->purge($name);
+            }
         });
     }
 
