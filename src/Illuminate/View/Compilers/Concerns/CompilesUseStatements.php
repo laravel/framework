@@ -12,14 +12,14 @@ trait CompilesUseStatements
      */
     protected function compileUse($expression)
     {
-        if (preg_match('/\(\s*\[\s*(.*)\s*\]\s*\)/', $expression)) {
-            return $this->compileMultipleUseStatements(preg_replace('/\(\s*\[\s*(.*)\s*\]\s*\)/', '$1', $expression));
+        if (preg_match('/\(\s*\[\s*(.*)\s*\]\s*\)/s', $expression)) {
+            return $this->compileMultipleUseStatements(preg_replace('/\(\s*\[\s*(.*)\s*\]\s*\)/s', '$1', $expression));
         }
 
         $segments = explode(',', preg_replace("/[\(\)]/", '', $expression));
 
-        $use = trim($segments[0], " '\"");
-        $as = isset($segments[1]) ? ' as '.trim($segments[1], " '\"") : '';
+        $use = trim($segments[0], " '\"\n\r\t\v\0");
+        $as = isset($segments[1]) ? ' as '.trim($segments[1], " '\"\n\r\t\v\0") : '';
 
         return "<?php use \\{$use}{$as}; ?>";
     }

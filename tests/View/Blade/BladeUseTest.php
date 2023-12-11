@@ -31,4 +31,17 @@ class BladeUseTest extends AbstractBladeTestCase
         $expected = "Foo <?php use \SomeNamespace\SomeClass as Foo; ?>\n<?php use \AnotherNamespace\AnotherClass as Bar; ?> bar";
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
+
+    public function testUseStatementsWithMultipleValuesOnNewLinesAreCompiled()
+    {
+        $string = <<<EOF
+            @use([
+                'SomeNamespace\SomeClass' => 'Foo',
+                'AnotherNamespace\AnotherClass'
+            ])
+            EOF;
+
+        $expected = "<?php use \SomeNamespace\SomeClass as Foo; ?>\n<?php use \AnotherNamespace\AnotherClass; ?>";
+        $this->assertEquals($expected, $this->compiler->compileString($string));
+    }
 }
