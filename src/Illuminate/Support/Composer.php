@@ -4,10 +4,11 @@ namespace Illuminate\Support;
 
 use Closure;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Process\PendingProcess;
+use Illuminate\Support\Facades\Process;
 use RuntimeException;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\PhpExecutableFinder;
-use Symfony\Component\Process\Process;
 
 class Composer
 {
@@ -74,13 +75,13 @@ class Composer
             $command->push('--dev');
         })->all();
 
-        return 0 === $this->getProcess($command, ['COMPOSER_MEMORY_LIMIT' => '-1'])
+        return $this->getProcess($command, ['COMPOSER_MEMORY_LIMIT' => '-1'])
             ->run(
                 $output instanceof OutputInterface
                     ? function ($type, $line) use ($output) {
                         $output->write('    '.$line);
                     } : $output
-            );
+            )->successful();
     }
 
     /**
@@ -103,13 +104,13 @@ class Composer
             $command->push('--dev');
         })->all();
 
-        return 0 === $this->getProcess($command, ['COMPOSER_MEMORY_LIMIT' => '-1'])
+        return $this->getProcess($command, ['COMPOSER_MEMORY_LIMIT' => '-1'])
             ->run(
                 $output instanceof OutputInterface
                     ? function ($type, $line) use ($output) {
                         $output->write('    '.$line);
                     } : $output
-            );
+            )->successful();
     }
 
     /**
@@ -148,7 +149,7 @@ class Composer
 
         $command = array_merge($this->findComposer($composerBinary), ['dump-autoload'], $extra);
 
-        return $this->getProcess($command)->run();
+        return $this->getProcess($command)->run()->exitCode();
     }
 
     /**
@@ -172,7 +173,9 @@ class Composer
     {
         if (! is_null($composerBinary) && $this->files->exists($composerBinary)) {
             return [$this->phpBinary(), $composerBinary];
-        } elseif ($this->files->exists($this->workingPath.'/composer.phar')) {
+        }
+
+        if ($this->files->exists($this->workingPath.'/composer.phar')) {
             return [$this->phpBinary(), 'composer.phar'];
         }
 
@@ -212,11 +215,11 @@ class Composer
      *
      * @param  array  $command
      * @param  array  $env
-     * @return \Symfony\Component\Process\Process
+     * @return PendingProcess
      */
     protected function getProcess(array $command, array $env = [])
     {
-        return (new Process($command, $this->workingPath, $env))->setTimeout(null);
+        return Process::env($env)->path($this->workingPath)->forever()->command($command);
     }
 
     /**
@@ -243,9 +246,7 @@ class Composer
 
         $process = $this->getProcess($command);
 
-        $process->run();
-
-        $output = $process->getOutput();
+        $output = $process->run()->output();
 
         if (preg_match('/(\d+(\.\d+){2})/', $output, $version)) {
             return $version[1];
