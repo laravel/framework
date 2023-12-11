@@ -1964,7 +1964,7 @@ class Builder implements BuilderContract
             return $this->callNamedScope($method, $parameters);
         }
 
-        if (in_array(strtolower($method), $this->passthru)) {
+        if (in_array(strtolower($method), array_map('strtolower', $this->passthru))) {
             return $this->toBase()->{$method}(...$parameters);
         }
 
