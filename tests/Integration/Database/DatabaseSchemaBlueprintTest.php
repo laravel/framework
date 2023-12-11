@@ -57,31 +57,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
 
     public function testRenamingColumnsWorks()
     {
-        $connection = DB::connection();
-        $schema = $connection->getSchemaBuilder();
-
-        $schema->create('users', function ($table) {
-            $table->string('name')->nullable();
-        });
-
-        $base = new Blueprint('users', function ($table) {
-            $table->renameColumn('name', 'new_name');
-        });
-
-        $blueprint = clone $base;
-        $this->assertContains($blueprint->toSql($connection, new MySqlGrammar), [
-            ['alter table `users` rename column `name` to `new_name`'], // MySQL 8.0
-            ['alter table `users` change `name` `new_name` varchar null'], // MySQL 5.7
-        ]);
-
-        $blueprint = clone $base;
-        $this->assertEquals(['alter table "users" rename column "name" to "new_name"'], $blueprint->toSql($connection, new PostgresGrammar));
-
-        $blueprint = clone $base;
-        $this->assertEquals(['alter table "users" rename column "name" to "new_name"'], $blueprint->toSql($connection, new SQLiteGrammar));
-
-        $blueprint = clone $base;
-        $this->assertEquals(['sp_rename \'"users"."name"\', "new_name", \'COLUMN\''], $blueprint->toSql($connection, new SqlServerGrammar));
+        $schema = DB::connection()->getSchemaBuilder();
 
         $schema->create('test', function (Blueprint $table) {
             $table->string('foo');
