@@ -4,10 +4,12 @@ namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Console\Kernel as ConsoleKernelContract;
+use Illuminate\Foundation\Bootstrap\LoadConfiguration;
 use Illuminate\Filesystem\Filesystem;
 use LogicException;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Throwable;
+use Illuminate\Contracts\Config\Repository as RepositoryContract;
 
 #[AsCommand(name: 'config:cache')]
 class ConfigCacheCommand extends Command
@@ -62,7 +64,7 @@ class ConfigCacheCommand extends Command
         $configPath = $this->laravel->getCachedConfigPath();
 
         $this->files->put(
-            $configPath, '<?php return '.var_export($config, true).';'.PHP_EOL
+            $configPath, '<?php return ' . var_export($config, true) . ';' . PHP_EOL
         );
 
         try {
@@ -77,7 +79,7 @@ class ConfigCacheCommand extends Command
     }
 
     /**
-     * Boot a fresh copy of the application configuration.
+     * Boot a fresh copy all of the application configuration.
      *
      * @return array
      */
@@ -88,6 +90,8 @@ class ConfigCacheCommand extends Command
         $app->useStoragePath($this->laravel->storagePath());
 
         $app->make(ConsoleKernelContract::class)->bootstrap();
+
+        $app->make(LoadConfiguration::class)->loadConfigurationFiles($app, $app->make(RepositoryContract::class));
 
         return $app['config']->all();
     }
