@@ -226,7 +226,6 @@ class ScheduleRunCommand extends Command
         $runsUntil = $this->startedAt->copy()->addSeconds(59);
 
         while (Date::now()->lte($runsUntil)) {
-
             foreach ($events as $event) {
                 if ($this->shouldInterrupt()) {
                     return;
