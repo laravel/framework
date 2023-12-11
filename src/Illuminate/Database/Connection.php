@@ -1229,18 +1229,6 @@ class Connection implements ConnectionInterface
     }
 
     /**
-     * Get the Doctrine DBAL schema manager for the connection.
-     *
-     * @return \Doctrine\DBAL\Schema\AbstractSchemaManager
-     */
-    public function getDoctrineSchemaManager()
-    {
-        $connection = $this->getDoctrineConnection();
-
-        return $connection->createSchemaManager();
-    }
-
-    /**
      * Get the Doctrine DBAL database connection instance.
      *
      * @return \Doctrine\DBAL\Connection
