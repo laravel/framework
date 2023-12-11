@@ -3,10 +3,11 @@
 namespace Illuminate\Tests\Support;
 
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Process\PendingProcess;
+use Illuminate\Process\ProcessResult;
 use Illuminate\Support\Composer;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Process\Process;
 
 class SupportComposerTest extends TestCase
 {
@@ -44,7 +45,6 @@ class SupportComposerTest extends TestCase
     public function testDumpOptimizedTheCorrectCommand()
     {
         $composer = $this->mockComposer(['composer', 'dump-autoload', '--optimize']);
-
         $composer->dumpOptimized();
     }
 
@@ -62,6 +62,13 @@ class SupportComposerTest extends TestCase
         $composer->removePackages(['phpunit/phpunit'], true);
     }
 
+    public function testGetVersionRunsTheCorrectCommand()
+    {
+        $composer = $this->mockComposer(['composer', '-V', '--no-ansi']);
+
+        $composer->getVersion();
+    }
+
     private function mockComposer(array $expectedProcessArguments, $customComposerPhar = false, array $environmentVariables = [])
     {
         $directory = __DIR__;
@@ -69,8 +76,12 @@ class SupportComposerTest extends TestCase
         $files = m::mock(Filesystem::class);
         $files->shouldReceive('exists')->once()->with($directory.'/composer.phar')->andReturn($customComposerPhar);
 
-        $process = m::mock(Process::class);
-        $process->shouldReceive('run')->once();
+        $processResult = m::mock(ProcessResult::class);
+        $processResult->shouldReceive('exitCode');
+        $processResult->shouldReceive('successful');
+        $processResult->shouldReceive('output');
+        $process = m::mock(PendingProcess::class);
+        $process->shouldReceive('run')->once()->andReturn($processResult);
 
         $composer = $this->getMockBuilder(Composer::class)
             ->onlyMethods(['getProcess'])
