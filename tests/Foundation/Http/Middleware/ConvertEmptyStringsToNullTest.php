@@ -41,4 +41,24 @@ class ConvertEmptyStringsToNullTest extends TestCase
             $this->assertSame('', $request->get('baz'));
         });
     }
+
+    public function testItClearsOutSkipCallbacksWhenTerminated(): void
+    {
+        $middleware = new ConvertEmptyStringsToNull();
+
+        ConvertEmptyStringsToNull::skipWhen(fn (Request $request) => true);
+
+        $middleware->terminate();
+
+        $symfonyRequest = new SymfonyRequest([
+            'foo' => '',
+        ]);
+
+        $symfonyRequest->server->set('REQUEST_METHOD', 'GET');
+        $request = Request::createFromBase($symfonyRequest);
+
+        $middleware->handle($request, function (Request $request) {
+            $this->assertSame(null, $request->get('foo'));
+        });
+    }
 }

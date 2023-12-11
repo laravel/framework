@@ -44,6 +44,16 @@ class ConvertEmptyStringsToNull extends TransformsRequest
     }
 
     /**
+     * Clean up callbacks list when the app terminates.
+     *
+     * @return void
+     */
+    public function terminate()
+    {
+        static::$skipCallbacks = [];
+    }
+
+    /**
      * Register a callback that instructs the middleware to be skipped.
      *
      * @param  \Closure  $callback
