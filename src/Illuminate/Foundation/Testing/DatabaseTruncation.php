@@ -130,9 +130,11 @@ trait DatabaseTruncation
      */
     protected function exceptTables(?string $connectionName): array
     {
-        if (property_exists($this, 'exceptTables')) {
-            $migrationsTable = $this->app['config']->get('database.migrations');
+        $migrations = $this->app['config']->get('database.migrations');
 
+        $migrationsTable = is_array($migrations) ? ($migrations['table'] ?? null) : $migrations;
+
+        if (property_exists($this, 'exceptTables')) {
             if (array_is_list($this->exceptTables ?? [])) {
                 return array_merge(
                     $this->exceptTables ?? [],
@@ -146,7 +148,7 @@ trait DatabaseTruncation
             );
         }
 
-        return [$this->app['config']->get('database.migrations')];
+        return [$migrationsTable];
     }
 
     /**
