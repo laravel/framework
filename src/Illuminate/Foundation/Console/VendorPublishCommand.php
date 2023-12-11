@@ -50,6 +50,7 @@ class VendorPublishCommand extends Command
     protected $signature = 'vendor:publish
                     {--existing : Publish and overwrite only the files that have already been published}
                     {--force : Overwrite any existing files}
+                    {--clean : Delete existing files in published directories}
                     {--all : Publish assets for all service providers without prompt}
                     {--provider= : The service provider that has assets you want to publish}
                     {--tag=* : One or many tags that have assets you want to publish}';
@@ -276,7 +277,11 @@ class VendorPublishCommand extends Command
 
         $this->moveManagedFiles(new MountManager([
             'from' => new Flysystem(new LocalAdapter($from)),
-            'to' => new Flysystem(new LocalAdapter($to, $visibility)),
+            'to' => tap(new Flysystem(new LocalAdapter($to, $visibility)), function ($files) {
+                if ($this->option('clean')) {
+                    $files->deleteDirectory('');
+                }
+            }),
         ]));
 
         $this->status($from, $to, 'directory');
