@@ -223,7 +223,7 @@ class ScheduleRunCommand extends Command
     {
         $hasEnteredMaintenanceMode = false;
 
-        $runsUntil = $this->startedAt->copy()->addMinute();
+        $runsUntil = $this->startedAt->copy()->addSeconds(59);
 
         while (Date::now()->lte($runsUntil)) {
 
