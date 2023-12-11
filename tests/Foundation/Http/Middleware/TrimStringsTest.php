@@ -36,7 +36,7 @@ class TrimStringsTest extends TestCase
             // Here has some NBSP, but it still display to space.
             // Please note, do not edit in browser
             'abc' => '   123    ',
-            'zwnbsp' => '﻿  ha  ﻿﻿',
+            'zwnbsp' => '  ha  ',
             'xyz' => 'だ',
             'foo' => 'ム',
             'bar' => '   だ    ',
@@ -54,6 +54,25 @@ class TrimStringsTest extends TestCase
             $this->assertSame('だ', $request->get('bar'));
             $this->assertSame('ム', $request->get('baz'));
             $this->assertSame("\xE9", $request->get('binary'));
+        });
+    }
+
+    public function testItClearsOutSkipCallbacksWhenTerminated(): void
+    {
+        $middleware = new TrimStrings();
+
+        TrimStrings::skipWhen(fn (Request $request) => true);
+
+        $middleware->terminate();
+
+        $symfonyRequest = new SymfonyRequest([
+            'foo' => '  bar  ',
+        ]);
+        $symfonyRequest->server->set('REQUEST_METHOD', 'GET');
+        $request = Request::createFromBase($symfonyRequest);
+
+        $middleware->handle($request, function (Request $request) {
+            $this->assertSame('bar', $request->get('foo'));
         });
     }
 }
