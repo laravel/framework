@@ -87,7 +87,7 @@ class PostgresGrammar extends Grammar
     {
         return 'select c.relname as name, n.nspname as schema, pg_total_relation_size(c.oid) as size, '
             ."obj_description(c.oid, 'pg_class') as comment from pg_class c, pg_namespace n "
-            ."where c.relkind = 'r' and n.oid = c.relnamespace "
+            ."where c.relkind in ('r', 'p') and n.oid = c.relnamespace and n.nspname not in ('pg_catalog', 'information_schema')"
             .'order by c.relname';
     }
 
@@ -98,7 +98,7 @@ class PostgresGrammar extends Grammar
      */
     public function compileViews()
     {
-        return 'select viewname as name, schemaname as schema, definition from pg_views order by viewname';
+        return "select viewname as name, schemaname as schema, definition from pg_views where schemaname not in ('pg_catalog', 'information_schema') order by viewname";
     }
 
     /**
