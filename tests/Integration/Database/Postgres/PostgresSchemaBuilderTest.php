@@ -181,6 +181,8 @@ class PostgresSchemaBuilderTest extends PostgresTestCase
 
         $this->artisan('migrate:install');
 
+        $tables = array_column(Schema::getTables(), 'name');
+
         $this->assertNotContains('groups', $tables);
         $this->assertNotContains('groups_1', $tables);
         $this->assertNotContains('groups_2', $tables);
