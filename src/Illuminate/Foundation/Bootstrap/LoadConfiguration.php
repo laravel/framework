@@ -16,6 +16,8 @@ class LoadConfiguration
      *
      * @param  \Illuminate\Contracts\Foundation\Application  $app
      * @return void
+     *
+     * @throws \Exception
      */
     public function bootstrap(Application $app)
     {
@@ -27,22 +29,24 @@ class LoadConfiguration
         if (file_exists($cached = $app->getCachedConfigPath())) {
             $items = require $cached;
 
-            $loadedFromCache = true;
+//            $loadedFromCache = true;
         }
 
         // Next we will spin through all of the configuration files in the configuration
         // directory and load each one into the repository. This will make all of the
         // options available to the developer for use in various parts of this app.
-        $app->instance('config', $config = new Repository($items));
-
-        if (! isset($loadedFromCache)) {
-            $this->loadConfigurationFiles($app, $config);
-        }
+        // ...
+        // Repository changed for load as needed configs
+        $app->instance('config', $config = new Repository($items, $app->configPath()));
+        // Load all config in boot removed, no need
+//        if (! isset($loadedFromCache)) {
+//            $this->loadConfigurationFiles($app, $config);
+//        }
 
         // Finally, we will set the application's environment based on the configuration
         // values that were loaded. We will pass a callback which will be used to get
         // the environment in a web context where an "--env" switch is not present.
-        $app->detectEnvironment(fn () => $config->get('app.env', 'production'));
+        $app->detectEnvironment(fn() => $config->get('app.env', 'production'));
 
         date_default_timezone_set($config->get('app.timezone', 'UTC'));
 
@@ -55,20 +59,20 @@ class LoadConfiguration
      * @param  \Illuminate\Contracts\Foundation\Application  $app
      * @param  \Illuminate\Contracts\Config\Repository  $repository
      * @return void
-     *
-     * @throws \Exception
      */
-    protected function loadConfigurationFiles(Application $app, RepositoryContract $repository)
+    public function loadConfigurationFiles(Application $app, RepositoryContract $repository)
     {
         $files = $this->getConfigurationFiles($app);
 
-        if (! isset($files['app'])) {
-            throw new Exception('Unable to load the "app" configuration file.');
-        }
+//        if (!isset($files['app'])) {
+//            throw new Exception('Unable to load the "app" configuration file.');
+//        }
 
-        foreach ($files as $key => $path) {
-            $repository->set($key, require $path);
-        }
+//        foreach ($files as $key => $path) {
+//            $repository->set($key, require $path);
+//        }
+
+        $repository->get($files);
     }
 
     /**
@@ -86,10 +90,11 @@ class LoadConfiguration
         foreach (Finder::create()->files()->name('*.php')->in($configPath) as $file) {
             $directory = $this->getNestedDirectory($file, $configPath);
 
-            $files[$directory.basename($file->getRealPath(), '.php')] = $file->getRealPath();
+            //$files[$directory . basename($file->getRealPath(), '.php')] = $file->getRealPath();
+            $files[] = $directory . basename($file->getRealPath(), '.php');
         }
 
-        ksort($files, SORT_NATURAL);
+        //ksort($files, SORT_NATURAL);
 
         return $files;
     }
@@ -106,7 +111,7 @@ class LoadConfiguration
         $directory = $file->getPath();
 
         if ($nested = trim(str_replace($configPath, '', $directory), DIRECTORY_SEPARATOR)) {
-            $nested = str_replace(DIRECTORY_SEPARATOR, '.', $nested).'.';
+            $nested = str_replace(DIRECTORY_SEPARATOR, '.', $nested) . '.';
         }
 
         return $nested;
