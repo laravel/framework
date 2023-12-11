@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Support;
 
+use Illuminate\Config\Repository as Config;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\ServiceProvider;
 use Mockery as m;
@@ -9,12 +10,21 @@ use PHPUnit\Framework\TestCase;
 
 class SupportServiceProviderTest extends TestCase
 {
+    protected $app;
+
     protected function setUp(): void
     {
         ServiceProvider::$publishes = [];
         ServiceProvider::$publishGroups = [];
 
-        $app = m::mock(Application::class)->makePartial();
+        $this->app = $app = m::mock(Application::class)->makePartial();
+        $config = m::mock(Config::class)->makePartial();
+
+        $config = new Config();
+
+        $app->instance('config', $config);
+        $config->set('database.migrations.update_date_on_publish', true);
+
         $one = new ServiceProviderForTestingOne($app);
         $one->boot();
         $two = new ServiceProviderForTestingTwo($app);
@@ -118,6 +128,37 @@ class SupportServiceProviderTest extends TestCase
             'source/tagged/two/b' => 'destination/tagged/two/b',
         ];
         $this->assertEquals($expected, $toPublish, 'Service provider does not return expected set of published tagged paths.');
+    }
+
+    public function testPublishesMigrations()
+    {
+        $serviceProvider = new ServiceProviderForTestingOne($this->app);
+
+        (fn () => $this->publishesMigrations(['source/tagged/four' => 'destination/tagged/four'], 'tag_four'))
+            ->call($serviceProvider);
+
+        $this->assertContains('source/tagged/four', ServiceProvider::publishableMigrationPaths());
+
+        $this->app->config->set('database.migrations.update_date_on_publish', false);
+
+        (fn () => $this->publishesMigrations(['source/tagged/five' => 'destination/tagged/five'], 'tag_four'))
+            ->call($serviceProvider);
+
+        $this->assertNotContains('source/tagged/five', ServiceProvider::publishableMigrationPaths());
+
+        $this->app->config->set('database.migrations', 'migrations');
+
+        (fn () => $this->publishesMigrations(['source/tagged/five' => 'destination/tagged/five'], 'tag_four'))
+            ->call($serviceProvider);
+
+        $this->assertNotContains('source/tagged/five', ServiceProvider::publishableMigrationPaths());
+
+        $this->app->config->set('database.migrations', null);
+
+        (fn () => $this->publishesMigrations(['source/tagged/five' => 'destination/tagged/five'], 'tag_four'))
+            ->call($serviceProvider);
+
+        $this->assertNotContains('source/tagged/five', ServiceProvider::publishableMigrationPaths());
     }
 }
 
