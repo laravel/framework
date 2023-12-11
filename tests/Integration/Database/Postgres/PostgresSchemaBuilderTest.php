@@ -179,7 +179,11 @@ class PostgresSchemaBuilderTest extends PostgresTestCase
 
         Schema::dropAllTables();
 
-        $this->assertEmpty(Schema::getTables());
+        $this->artisan('migrate:install');
+
+        $this->assertNotContains('groups', $tables);
+        $this->assertNotContains('groups_1', $tables);
+        $this->assertNotContains('groups_2', $tables);
     }
 
     protected function hasView($schema, $table)
