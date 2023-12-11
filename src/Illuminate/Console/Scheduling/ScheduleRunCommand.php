@@ -223,7 +223,10 @@ class ScheduleRunCommand extends Command
     {
         $hasEnteredMaintenanceMode = false;
 
-        while (Date::now()->lte($this->startedAt->endOfMinute())) {
+        $endsAt = $this->startedAt->copy()->addMinute();
+
+        while (Date::now()->lte($endsAt)) {
+
             foreach ($events as $event) {
                 if ($this->shouldInterrupt()) {
                     return;
