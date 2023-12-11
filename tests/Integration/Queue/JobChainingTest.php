@@ -3,9 +3,11 @@
 namespace Illuminate\Tests\Integration\Queue;
 
 use Illuminate\Bus\Batchable;
+use Illuminate\Bus\PendingBatch;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Foundation\Bus\PendingChain;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Carbon;
@@ -386,6 +388,43 @@ class JobChainingTest extends TestCase
 
         $this->assertEquals(['c1', 'c2', 'b1', 'b3'], JobRunRecorder::$results);
         $this->assertEquals(['batch failed', 'chain failed'], JobRunRecorder::$failures);
+    }
+
+    public function testChainConditionable()
+    {
+        $chain = Bus::chain([])
+            ->onConnection('sync1')
+            ->when(true, function (PendingChain $chain) {
+                $chain->onConnection('sync2');
+            });
+
+        $this->assertEquals('sync2', $chain->connection);
+
+        $chain = Bus::chain([])
+            ->onConnection('sync1')
+            ->when(false, function (PendingChain $chain) {
+                $chain->onConnection('sync2');
+            });
+
+        $this->assertEquals('sync1', $chain->connection);
+    }
+
+    public function testBatchConditionable()
+    {
+        $batch = Bus::batch([])
+            ->onConnection('sync1')
+            ->when(true, function (PendingBatch $batch) {
+                $batch->onConnection('sync2');
+            });
+
+        $this->assertEquals('sync2', $batch->connection());
+        $batch = Bus::batch([])
+            ->onConnection('sync1')
+            ->when(false, function (PendingBatch $batch) {
+                $batch->onConnection('sync2');
+            });
+
+        $this->assertEquals('sync1', $batch->connection());
     }
 }
 
