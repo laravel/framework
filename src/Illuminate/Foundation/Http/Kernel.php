@@ -510,6 +510,31 @@ class Kernel implements KernelContract
     }
 
     /**
+     * Get the application's global middleware.
+     *
+     * @return array
+     */
+    public function getGlobalMiddleware()
+    {
+        return $this->middleware;
+    }
+
+    /**
+     * Set the application's global middleware.
+     *
+     * @param  array  $middleware
+     * @return $this
+     */
+    public function setGlobalMiddleware(array $middleware)
+    {
+        $this->middleware = $middleware;
+
+        $this->syncMiddlewareToRouter();
+
+        return $this;
+    }
+
+    /**
      * Get the application's route middleware groups.
      *
      * @return array
@@ -517,6 +542,21 @@ class Kernel implements KernelContract
     public function getMiddlewareGroups()
     {
         return $this->middlewareGroups;
+    }
+
+    /**
+     * Set the application's middleware groups.
+     *
+     * @param  array  $groups
+     * @return $this
+     */
+    public function setMiddlewareGroups(array $groups)
+    {
+        $this->middlewareGroups = $groups;
+
+        $this->syncMiddlewareToRouter();
+
+        return $this;
     }
 
     /**
@@ -539,6 +579,21 @@ class Kernel implements KernelContract
     public function getMiddlewareAliases()
     {
         return array_merge($this->routeMiddleware, $this->middlewareAliases);
+    }
+
+    /**
+     * Set the application's route middleware aliases.
+     *
+     * @param  array  $aliases
+     * @return $this
+     */
+    public function setMiddlewareAliases(array $aliases)
+    {
+        $this->middlewareAliases = $aliases;
+
+        $this->syncMiddlewareToRouter();
+
+        return $this;
     }
 
     /**

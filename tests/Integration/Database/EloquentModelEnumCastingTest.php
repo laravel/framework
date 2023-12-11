@@ -14,7 +14,7 @@ include_once 'Enums.php';
 
 class EloquentModelEnumCastingTest extends DatabaseTestCase
 {
-    protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
+    protected function afterRefreshingDatabase()
     {
         Schema::create('enum_casts', function (Blueprint $table) {
             $table->increments('id');

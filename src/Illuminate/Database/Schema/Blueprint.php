@@ -288,6 +288,28 @@ class Blueprint
     }
 
     /**
+     * Specify the storage engine that should be used for the table.
+     *
+     * @param  string  $engine
+     * @return void
+     */
+    public function engine($engine)
+    {
+        $this->engine = $engine;
+    }
+
+    /**
+     * Specify that the InnoDB storage engine should be used for the table (MySQL only).
+     *
+     * @param  string  $engine
+     * @return void
+     */
+    public function innoDb()
+    {
+        $this->engine('InnoDB');
+    }
+
+    /**
      * Indicate that the table needs to be temporary.
      *
      * @return void

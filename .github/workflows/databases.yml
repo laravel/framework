@@ -36,7 +36,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: 8.2
-          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_mysql
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_mysql, :php-psr
           tools: composer:v2
           coverage: none
 
@@ -52,6 +52,7 @@ jobs:
         env:
           DB_CONNECTION: mysql
           DB_USERNAME: root
+          MYSQL_COLLATION: utf8mb4_unicode_ci
 
   mysql_8:
     runs-on: ubuntu-22.04
@@ -81,7 +82,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: 8.2
-          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_mysql
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_mysql, :php-psr
           tools: composer:v2
           coverage: none
 
@@ -126,7 +127,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: 8.2
-          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_mysql
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_mysql, :php-psr
           tools: composer:v2
           coverage: none
 
@@ -140,7 +141,7 @@ jobs:
       - name: Execute tests
         run: vendor/bin/phpunit tests/Integration/Database
         env:
-          DB_CONNECTION: mysql
+          DB_CONNECTION: mariadb
           DB_USERNAME: root
 
   pgsql:
@@ -172,7 +173,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: 8.2
-          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_pgsql
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_pgsql, :php-psr
           tools: composer:v2
           coverage: none
 
@@ -216,7 +217,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: 8.2
-          extensions: dom, curl, libxml, mbstring, zip, pcntl, sqlsrv, pdo, pdo_sqlsrv, odbc, pdo_odbc
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, sqlsrv, pdo, pdo_sqlsrv, odbc, pdo_odbc, :php-psr
           tools: composer:v2
           coverage: none
 

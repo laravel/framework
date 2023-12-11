@@ -132,9 +132,10 @@ class SchemaBuilderTest extends DatabaseTestCase
 
             $uppercase = strtoupper($type);
 
-            $expected = ["ALTER TABLE test CHANGE test_column test_column $uppercase NOT NULL"];
-
-            $this->assertEquals($expected, $queries);
+            $this->assertContains($queries, [
+                ["ALTER TABLE test CHANGE test_column test_column $uppercase NOT NULL"], // MySQL
+                ["ALTER TABLE test CHANGE test_column test_column $uppercase NOT NULL COLLATE `utf8mb4_uca1400_ai_ci`"], // MariaDB
+            ]);
         }
     }
 
@@ -164,6 +165,13 @@ class SchemaBuilderTest extends DatabaseTestCase
         }
     }
 
+    public function testHasView()
+    {
+        DB::statement('create view foo (id) as select 1');
+
+        $this->assertTrue(Schema::hasView('foo'));
+    }
+
     public function testGetViews()
     {
         DB::statement('create view foo (id) as select 1');
@@ -173,5 +181,85 @@ class SchemaBuilderTest extends DatabaseTestCase
         $views = Schema::getViews();
 
         $this->assertEmpty(array_diff(['foo', 'bar', 'baz'], array_column($views, 'name')));
+    }
+
+    public function testGetIndexes()
+    {
+        Schema::create('foo', function (Blueprint $table) {
+            $table->string('bar')->index('my_index');
+        });
+
+        $indexes = Schema::getIndexes('foo');
+
+        $this->assertCount(1, $indexes);
+        $this->assertTrue(
+            $indexes[0]['name'] === 'my_index'
+            && $indexes[0]['columns'] === ['bar']
+            && ! $indexes[0]['unique']
+            && ! $indexes[0]['primary']
+        );
+    }
+
+    public function testGetUniqueIndexes()
+    {
+        Schema::create('foo', function (Blueprint $table) {
+            $table->id();
+            $table->string('bar');
+            $table->integer('baz');
+
+            $table->unique(['baz', 'bar']);
+        });
+
+        $indexes = Schema::getIndexes('foo');
+
+        $this->assertCount(2, $indexes);
+        $this->assertTrue(collect($indexes)->contains(
+            fn ($index) => $index['columns'] === ['id'] && $index['primary']
+        ));
+        $this->assertTrue(collect($indexes)->contains(
+            fn ($index) => $index['name'] === 'foo_baz_bar_unique' && $index['columns'] === ['baz', 'bar'] && $index['unique']
+        ));
+    }
+
+    public function testGetIndexesWithCompositeKeys()
+    {
+        Schema::create('foo', function (Blueprint $table) {
+            $table->unsignedBigInteger('key');
+            $table->string('bar')->unique();
+            $table->integer('baz');
+
+            $table->primary(['baz', 'key']);
+        });
+
+        $indexes = Schema::getIndexes('foo');
+
+        $this->assertCount(2, $indexes);
+        $this->assertTrue(collect($indexes)->contains(
+            fn ($index) => $index['columns'] === ['baz', 'key'] && $index['primary']
+        ));
+        $this->assertTrue(collect($indexes)->contains(
+            fn ($index) => $index['name'] === 'foo_bar_unique' && $index['columns'] === ['bar'] && $index['unique']
+        ));
+    }
+
+    public function testGetFullTextIndexes()
+    {
+        if (! in_array($this->driver, ['pgsql', 'mysql'])) {
+            $this->markTestSkipped('Test requires a MySQL or a PostgreSQL connection.');
+        }
+
+        Schema::create('articles', function (Blueprint $table) {
+            $table->id();
+            $table->string('title', 200);
+            $table->text('body');
+
+            $table->fulltext(['body', 'title']);
+        });
+
+        $indexes = Schema::getIndexes('articles');
+
+        $this->assertCount(2, $indexes);
+        $this->assertTrue(collect($indexes)->contains(fn ($index) => $index['columns'] === ['id'] && $index['primary']));
+        $this->assertTrue(collect($indexes)->contains('name', 'articles_body_title_fulltext'));
     }
 }

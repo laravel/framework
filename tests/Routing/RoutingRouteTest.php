@@ -1756,6 +1756,27 @@ class RoutingRouteTest extends TestCase
         $this->assertSame('taylor', $router->dispatch(Request::create('foo/taylor', 'GET'))->getContent());
     }
 
+    public function testImplicitBindingsWithClosure()
+    {
+        $router = $this->getRouter();
+
+        $router->substituteImplicitBindingsUsing(function ($container, $route, $default) {
+            $default = $default();
+
+            $model = $route->parameter('bar');
+            $model->value = 'otwell';
+        });
+
+        $router->get('foo/{bar}', [
+            'middleware' => SubstituteBindings::class,
+            'uses' => function (RoutingTestUserModel $bar) {
+                return $bar->value;
+            },
+        ]);
+
+        $this->assertSame('otwell', $router->dispatch(Request::create('foo/taylor', 'GET'))->getContent());
+    }
+
     public function testImplicitBindingsWhereScopedBindingsArePrevented()
     {
         $router = $this->getRouter();

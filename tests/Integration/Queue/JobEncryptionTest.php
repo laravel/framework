@@ -15,6 +15,7 @@ use Illuminate\Support\Str;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 use Orchestra\Testbench\Attributes\WithMigration;
 
+#[WithMigration]
 #[WithMigration('queue')]
 class JobEncryptionTest extends DatabaseTestCase
 {

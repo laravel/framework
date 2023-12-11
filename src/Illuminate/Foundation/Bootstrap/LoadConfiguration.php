@@ -27,7 +27,7 @@ class LoadConfiguration
         if (file_exists($cached = $app->getCachedConfigPath())) {
             $items = require $cached;
 
-            $loadedFromCache = true;
+            $app->instance('config_loaded_from_cache', $loadedFromCache = true);
         }
 
         // Next we will spin through all of the configuration files in the configuration
@@ -62,13 +62,43 @@ class LoadConfiguration
     {
         $files = $this->getConfigurationFiles($app);
 
-        if (! isset($files['app'])) {
-            throw new Exception('Unable to load the "app" configuration file.');
+        // if (! isset($files['app'])) {
+        //     throw new Exception('Unable to load the "app" configuration file.');
+        // }
+
+        $base = $this->getBaseConfiguration();
+
+        foreach ($files as $name => $path) {
+            $base = $this->loadConfigurationFile($repository, $name, $path, $base);
         }
 
-        foreach ($files as $key => $path) {
-            $repository->set($key, require $path);
+        foreach ($base as $name => $config) {
+            $repository->set($name, $config);
         }
+    }
+
+    /**
+     * Load the given configuration file.
+     *
+     * @param  \Illuminate\Contracts\Config\Repository  $repository
+     * @param  string  $name
+     * @param  string  $path
+     * @param  array  $base
+     * @return array
+     */
+    protected function loadConfigurationFile(RepositoryContract $repository, $name, $path, array $base)
+    {
+        $config = require $path;
+
+        if (isset($base[$name])) {
+            $config = array_merge($base[$name], $config);
+
+            unset($base[$name]);
+        }
+
+        $repository->set($name, $config);
+
+        return $base;
     }
 
     /**
@@ -110,5 +140,21 @@ class LoadConfiguration
         }
 
         return $nested;
+    }
+
+    /**
+     * Get the base configuration files.
+     *
+     * @return array
+     */
+    protected function getBaseConfiguration()
+    {
+        $config = [];
+
+        foreach (Finder::create()->files()->name('*.php')->in(__DIR__.'/../../../../config') as $file) {
+            $config[basename($file->getRealPath(), '.php')] = require $file->getRealPath();
+        }
+
+        return $config;
     }
 }

@@ -16,7 +16,7 @@ namespace Illuminate\Support\Facades;
  * @method static void replace(string $path, string $content, int|null $mode = null)
  * @method static void replaceInFile(array|string $search, array|string $replace, string $path)
  * @method static int prepend(string $path, string $data)
- * @method static int append(string $path, string $data)
+ * @method static int append(string $path, string $data, bool $lock = false)
  * @method static mixed chmod(string $path, int|null $mode = null)
  * @method static bool delete(string|array $paths)
  * @method static bool move(string $path, string $target)

@@ -86,7 +86,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $blueprint->create();
         $blueprint->increments('id');
         $blueprint->string('email');
-        $blueprint->engine = 'InnoDB';
+        $blueprint->engine('InnoDB');
 
         $conn = $this->getConnection();
         $conn->shouldReceive('getConfig')->once()->with('charset')->andReturn('utf8');

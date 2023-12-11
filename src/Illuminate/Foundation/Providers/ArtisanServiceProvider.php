@@ -28,6 +28,8 @@ use Illuminate\Database\Console\ShowModelCommand;
 use Illuminate\Database\Console\TableCommand as DatabaseTableCommand;
 use Illuminate\Database\Console\WipeCommand;
 use Illuminate\Foundation\Console\AboutCommand;
+use Illuminate\Foundation\Console\ApiInstallCommand;
+use Illuminate\Foundation\Console\BroadcastingInstallCommand;
 use Illuminate\Foundation\Console\CastMakeCommand;
 use Illuminate\Foundation\Console\ChannelListCommand;
 use Illuminate\Foundation\Console\ChannelMakeCommand;
@@ -35,6 +37,7 @@ use Illuminate\Foundation\Console\ClearCompiledCommand;
 use Illuminate\Foundation\Console\ComponentMakeCommand;
 use Illuminate\Foundation\Console\ConfigCacheCommand;
 use Illuminate\Foundation\Console\ConfigClearCommand;
+use Illuminate\Foundation\Console\ConfigPublishCommand;
 use Illuminate\Foundation\Console\ConfigShowCommand;
 use Illuminate\Foundation\Console\ConsoleMakeCommand;
 use Illuminate\Foundation\Console\DocsCommand;
@@ -169,11 +172,14 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
      * @var array
      */
     protected $devCommands = [
+        'ApiInstall' => ApiInstallCommand::class,
+        'BroadcastingInstall' => BroadcastingInstallCommand::class,
         'CacheTable' => CacheTableCommand::class,
         'CastMake' => CastMakeCommand::class,
         'ChannelList' => ChannelListCommand::class,
         'ChannelMake' => ChannelMakeCommand::class,
         'ComponentMake' => ComponentMakeCommand::class,
+        'ConfigPublish' => ConfigPublishCommand::class,
         'ConsoleMake' => ConsoleMakeCommand::class,
         'ControllerMake' => ControllerMakeCommand::class,
         'Docs' => DocsCommand::class,
@@ -353,6 +359,18 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
     {
         $this->app->singleton(ConfigClearCommand::class, function ($app) {
             return new ConfigClearCommand($app['files']);
+        });
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerConfigPublishCommand()
+    {
+        $this->app->singleton(ConfigPublishCommand::class, function ($app) {
+            return new ConfigPublishCommand;
         });
     }
 
