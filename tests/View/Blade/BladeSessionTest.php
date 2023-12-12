@@ -14,7 +14,7 @@ class BladeSessionTest extends AbstractBladeTestCase
 <?php $__sessionArgs = [\'status\'];
 if (session()->has($__sessionArgs[0])) :
 if (isset($session)) { $__sessionOriginal = $session; }
-$session = session()->get($__errorArgs[0]); ?>
+$session = session()->get($__sessionArgs[0]); ?>
     <span><?php echo e($session); ?></span>
 <?php unset($session);
 if (isset($__sessionOriginal)) { $session = $__sessionOriginal; }
