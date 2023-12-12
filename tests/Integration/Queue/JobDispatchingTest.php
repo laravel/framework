@@ -26,7 +26,7 @@ class JobDispatchingTest extends TestCase
         $this->beforeApplicationDestroyed(function () {
             Job::$ran = false;
             Job::$value = null;
-        })
+        });
 
         parent::setUp();
     }
