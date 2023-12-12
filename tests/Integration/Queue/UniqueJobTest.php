@@ -13,9 +13,15 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Bus;
 use Orchestra\Testbench\Attributes\WithMigration;
 
+#[WithMigration('cache')]
 #[WithMigration('queue')]
 class UniqueJobTest extends QueueTestCase
 {
+    protected function defineEnvironment($app)
+    {
+        $app['config']->set('cache.default', 'database');
+    }
+
     public function testUniqueJobsAreNotDispatched()
     {
         Bus::fake();
