@@ -11,9 +11,8 @@ use Illuminate\Queue\CallQueuedHandler;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\Middleware\WithoutOverlapping;
 use Mockery as m;
-use Orchestra\Testbench\TestCase;
 
-class WithoutOverlappingJobsTest extends TestCase
+class WithoutOverlappingJobsTest extends QueueTestCase
 {
     public function testNonOverlappingJobsAreExecuted()
     {

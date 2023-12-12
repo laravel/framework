@@ -7,12 +7,11 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Queue;
 use Orchestra\Testbench\Attributes\WithMigration;
-use Orchestra\Testbench\TestCase;
-use Queue;
 
 #[WithMigration('queue')]
-class WorkCommandTest extends TestCase
+class WorkCommandTest extends QueueTestCase
 {
     use DatabaseMigrations;
 
