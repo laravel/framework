@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Tests\Queue\Redis;
+namespace Illuminate\Tests\Queue;
 
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;

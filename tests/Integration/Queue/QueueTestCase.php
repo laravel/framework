@@ -20,12 +20,11 @@ abstract class QueueTestCase extends TestCase
 
     protected function runQueueWorkCommand(int $times = 1): void
     {
-        if ($this->driver !== 'sync' && $times > 0) {
+        if ($this->getQueueDriver() !== 'sync' && $times > 0) {
             $count = 0;
 
             do {
                 $this->artisan('queue:work', [
-                    'connection' => $this->driver,
                     '--once' => true,
                     '--memory' => 1024,
                 ])->assertSuccessful();
@@ -33,5 +32,10 @@ abstract class QueueTestCase extends TestCase
                 $count++;
             } while ($count < $times);
         }
+    }
+
+    protected function getQueueDriver(): string
+    {
+        return $this->driver;
     }
 }
