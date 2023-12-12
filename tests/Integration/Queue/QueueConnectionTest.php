@@ -24,12 +24,6 @@ class QueueConnectionTest extends TestCase
 {
     use DatabaseMigrations, InteractsWithRedis;
 
-    protected function getEnvironmentSetUp($app)
-    {
-        $app['config']->set('queue.default', 'sqs');
-        $app['config']->set('queue.connections.sqs.after_commit', true);
-    }
-
     protected function setUp(): void
     {
         parent::setUp();
@@ -47,6 +41,8 @@ class QueueConnectionTest extends TestCase
 
     public function testJobWontGetDispatchedInsideATransaction()
     {
+        $this->app['config']->set('queue.default', 'sqs');
+        $this->app['config']->set('queue.connections.sqs.after_commit', true);
         $this->app->singleton('db.transactions', function () {
             $transactionManager = m::mock(DatabaseTransactionsManager::class);
             $transactionManager->shouldReceive('addCallback')->once()->andReturn(null);
@@ -59,6 +55,8 @@ class QueueConnectionTest extends TestCase
 
     public function testJobWillGetDispatchedInsideATransactionWhenExplicitlyIndicated()
     {
+        $this->app['config']->set('queue.default', 'sqs');
+        $this->app['config']->set('queue.connections.sqs.after_commit', true);
         $this->app->singleton('db.transactions', function () {
             $transactionManager = m::mock(DatabaseTransactionsManager::class);
             $transactionManager->shouldNotReceive('addCallback')->andReturn(null);
@@ -75,6 +73,7 @@ class QueueConnectionTest extends TestCase
 
     public function testJobWontGetDispatchedInsideATransactionWhenExplicitlyIndicated()
     {
+        $this->app['config']->set('queue.default', 'sqs');
         $this->app['config']->set('queue.connections.sqs.after_commit', false);
 
         $this->app->singleton('db.transactions', function () {
@@ -94,8 +93,9 @@ class QueueConnectionTest extends TestCase
     /**
      * @dataProvider connectionQueueDataProvider
      */
-    public function testStuff($job, $connection, $queue, $setUp = null)
+    public function testUserSpecifiedConnectionAndQueueAreStoredInPayload($job, $connection, $queue, $setUp = null)
     {
+        Config::set('queue.default', 'database');
         ($setUp ?? fn () => null)();
         $payload = null;
         Event::listen(function (JobQueued $event) use (&$payload) {
@@ -112,7 +112,7 @@ class QueueConnectionTest extends TestCase
     public static function connectionQueueDataProvider()
     {
         return [
-            'null null' => [new ConnectionAndQueueJob(connection: null, queue: null), null, 'default'],
+            'null null' => [new ConnectionAndQueueJob(connection: null, queue: null), 'database', 'default'],
             'database null' => [new ConnectionAndQueueJob(connection: 'database', queue: null), 'database', 'default'],
             'database named-queue' => [new ConnectionAndQueueJob(connection: 'database', queue: 'named-queue'), 'database', 'named-queue'],
             'database configured-default' => [new ConnectionAndQueueJob(connection: 'database', queue: null), 'database', 'configured-default', function () {
@@ -122,6 +122,10 @@ class QueueConnectionTest extends TestCase
             'redis named-queue' => [new ConnectionAndQueueJob(connection: 'redis', queue: 'named-queue'), 'redis', 'named-queue'],
             'redis configured-default' => [new ConnectionAndQueueJob(connection: 'redis', queue: null), 'redis', 'configured-default', function () {
                 Config::set('queue.connections.redis.queue', 'configured-default');
+            }],
+            'redis_xl configured-default' => [new ConnectionAndQueueJob(connection: 'redis_xl', queue: null), 'redis_xl', 'configured-default', function () {
+                Config::set('queue.connections.redis_xl', Config::get('queue.connections.redis'));
+                Config::set('queue.connections.redis_xl.queue', 'configured-default');
             }],
         ];
     }
