@@ -12,12 +12,23 @@ use Orchestra\Testbench\TestCase;
 
 class JobDispatchingTest extends TestCase
 {
-    protected function tearDown(): void
+    protected function defineEnvironment($app)
     {
-        Job::$ran = false;
-        Job::$value = null;
+        $app['config']->set([
+            'queue.default' => 'sync',
+            'queue.connections.sync1' => ['driver' => 'sync'],
+            'queue.connections.sync2' => ['driver' => 'sync'],
+        ]);
+    }
 
-        parent::tearDown();
+    protected function setUp(): void
+    {
+        $this->beforeApplicationDestroyed(function () {
+            Job::$ran = false;
+            Job::$value = null;
+        })
+
+        parent::setUp();
     }
 
     public function testJobCanUseCustomMethodsAfterDispatch()
