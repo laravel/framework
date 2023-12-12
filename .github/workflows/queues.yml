@@ -117,7 +117,10 @@ jobs:
           max_attempts: 5
           command: composer update --prefer-stable --prefer-dist --no-interaction --no-progress
 
+      - name: Daemonize beanstalkd
+        run: ./beanstalkd-1.13/beanstalkd &
+
       - name: Execute tests
         run: vendor/bin/phpunit tests/Integration/Queue
         env:
-          QUEUE_CONNECTION: redis
+          QUEUE_CONNECTION: beanstalkd
