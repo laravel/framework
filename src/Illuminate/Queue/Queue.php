@@ -153,7 +153,7 @@ abstract class Queue
                 'command' => $job,
             ],
             'connection' => $this->getConnectionName(),
-            'queue' => $this instanceof RedisQueue && str_starts_with('queues:', $queue)
+            'queue' => $this instanceof RedisQueue && str_starts_with($queue, 'queues:')
                 ? Str::after($queue, 'queues:')
                 : $queue,
         ]);
@@ -259,7 +259,7 @@ abstract class Queue
             'timeout' => null,
             'data' => $data,
             'connection' => $this->getConnectionName(),
-            'queue' => $this instanceof RedisQueue && str_starts_with('queues:', $queue)
+            'queue' => $this instanceof RedisQueue && str_starts_with($queue, 'queues:')
                 ? Str::after($queue, 'queues:')
                 : $queue,
         ]);
