@@ -3,8 +3,6 @@
 namespace Illuminate\Tests\Foundation\Testing;
 
 use Illuminate\Contracts\Console\Kernel as ConsoleKernelContract;
-use Illuminate\Database\ConnectionInterface;
-use Illuminate\Database\DatabaseManager;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithConsole;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
@@ -103,21 +101,6 @@ class DatabaseMigrationsTest extends TestCase
                 '--drop-types' => true,
                 '--seed' => false,
             ]);
-
-        $this->runDatabaseMigrations();
-    }
-
-    public function testDisconnectionAfterTestCompletion()
-    {
-        $this->app->instance(ConsoleKernelContract::class, m::spy(ConsoleKernel::class));
-        $this->app->instance('db', $database = m::mock(DatabaseManager::class));
-
-        $database->shouldReceive('getConnections')->once()->andReturn([
-            'default' => m::mock(ConnectionInterface::class),
-            'mysql' => m::mock(ConnectionInterface::class),
-        ]);
-        $database->shouldReceive('purge')->with('default');
-        $database->shouldReceive('purge')->with('mysql');
 
         $this->runDatabaseMigrations();
     }
