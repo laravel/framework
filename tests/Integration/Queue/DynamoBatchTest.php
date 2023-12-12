@@ -19,7 +19,7 @@ class DynamoBatchTest extends TestCase
 {
     const DYNAMODB_ENDPOINT = 'http://localhost:8888';
 
-    protected function getEnvironmentSetUp($app)
+    protected function defineEnvironment($app)
     {
         $app['config']->set('queue.batching', [
             'driver' => 'dynamodb',
