@@ -17,8 +17,8 @@ use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Env;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\InteractsWithTime;
-use Illuminate\Support\Str;
 use ReflectionClass;
 use SplFileInfo;
 use Symfony\Component\Console\ConsoleEvents;
@@ -357,15 +357,11 @@ class Kernel implements KernelContract
      *
      * @param  \SplFileInfo  $file
      * @param  string  $namespace
-     * @return string
+     * @return class-string
      */
     protected function commandClassFromFile(SplFileInfo $file, string $namespace): string
     {
-        return $namespace.str_replace(
-            ['/', '.php'],
-            ['\\', ''],
-            Str::after($file->getRealPath(), realpath(app_path()).DIRECTORY_SEPARATOR)
-        );
+        return File::classFromFile($file->getRealPath());
     }
 
     /**

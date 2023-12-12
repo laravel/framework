@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Events\ModelPruningFinished;
 use Illuminate\Database\Events\ModelPruningStarting;
 use Illuminate\Database\Events\ModelsPruned;
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\File;
 use InvalidArgumentException;
 use Symfony\Component\Finder\Finder;
 
@@ -126,15 +126,8 @@ class PruneCommand extends Command
         }
 
         return collect((new Finder)->in($this->getDefaultPath())->files()->name('*.php'))
-            ->map(function ($model) {
-                $namespace = $this->laravel->getNamespace();
-
-                return $namespace.str_replace(
-                    ['/', '.php'],
-                    ['\\', ''],
-                    Str::after($model->getRealPath(), realpath(app_path()).DIRECTORY_SEPARATOR)
-                );
-            })->when(! empty($except), function ($models) use ($except) {
+            ->map(fn ($model) => File::classFromFile($model->getRealPath()))
+            ->when(! empty($except), function ($models) use ($except) {
                 return $models->reject(function ($model) use ($except) {
                     return in_array($model, $except);
                 });

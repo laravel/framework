@@ -6,6 +6,7 @@ use ErrorException;
 use FilesystemIterator;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Support\LazyCollection;
+use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\Macroable;
 use RuntimeException;
@@ -599,6 +600,25 @@ class Filesystem
         return iterator_to_array(
             Finder::create()->files()->ignoreDotFiles(! $hidden)->in($directory)->sortByName(),
             false
+        );
+    }
+
+    /**
+     * Get the PSR-4 class name for a file.
+     *
+     * @return ($files is string ? class-string : array<int, class-string>)
+     */
+    public function classFromFile(array|string $files, ?string $basePath = null): string|array
+    {
+        $namespaces = app('composer')->getNamespaces();
+        $realBasePath = Str::of(realpath($basePath ?? base_path()))
+            ->finish(DIRECTORY_SEPARATOR)
+            ->toString();
+
+        return str_replace(
+            search: [$realBasePath, ...array_values($namespaces), DIRECTORY_SEPARATOR, '.php'],
+            replace: ['', ...array_keys($namespaces), '\\', ''],
+            subject: $files,
         );
     }
 

@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Filesystem;
 
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Composer;
 use Illuminate\Support\LazyCollection;
 use Illuminate\Testing\Assert;
 use Mockery as m;
@@ -19,7 +20,7 @@ class FilesystemTest extends TestCase
      */
     public static function setUpTempDir()
     {
-        self::$tempDir = sys_get_temp_dir().'/tmp';
+        self::$tempDir = sys_get_temp_dir().DIRECTORY_SEPARATOR.'tmp';
         mkdir(self::$tempDir);
     }
 
@@ -246,6 +247,27 @@ class FilesystemTest extends TestCase
         $this->assertInstanceOf(SplFileInfo::class, $results[0]);
         $this->assertInstanceOf(SplFileInfo::class, $results[1]);
         unset($files);
+    }
+
+    public function testClassFromFile()
+    {
+        $composer = m::mock(Composer::class)
+            ->shouldReceive('getNamespaces')->andReturn([
+                'App\\' => 'src1'.DIRECTORY_SEPARATOR,
+                'Bar\\' => 'src2'.DIRECTORY_SEPARATOR,
+            ])
+            ->getMock();
+
+        app()->instance('composer', $composer);
+
+        $file1 = implode(DIRECTORY_SEPARATOR, [realpath(self::$tempDir), 'src1', 'Foo.php']);
+        $file2 = implode(DIRECTORY_SEPARATOR, [realpath(self::$tempDir), 'src2', 'Baz.php']);
+
+        $files = new Filesystem;
+        $class = $files->classFromFile($file1, self::$tempDir);
+        $this->assertSame('App\\Foo', $class);
+        $classes = $files->classFromFile([$file1, $file2], self::$tempDir);
+        $this->assertSame(['App\\Foo', 'Bar\\Baz'], $classes);
     }
 
     public function testCopyDirectoryReturnsFalseIfSourceIsntDirectory()

@@ -41,6 +41,7 @@ namespace Illuminate\Support\Facades;
  * @method static array glob(string $pattern, int $flags = 0)
  * @method static \Symfony\Component\Finder\SplFileInfo[] files(string $directory, bool $hidden = false)
  * @method static \Symfony\Component\Finder\SplFileInfo[] allFiles(string $directory, bool $hidden = false)
+ * @method static string|array<int, class-string> classFromFile(string|array $file, ?string $basePath = null)
  * @method static array directories(string $directory)
  * @method static void ensureDirectoryExists(string $path, int $mode = 0755, bool $recursive = true)
  * @method static bool makeDirectory(string $path, int $mode = 0755, bool $recursive = false, bool $force = false)

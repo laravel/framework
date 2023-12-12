@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Events;
 
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Reflector;
 use Illuminate\Support\Str;
 use ReflectionClass;
@@ -90,7 +91,7 @@ class DiscoverEvents
      *
      * @param  \SplFileInfo  $file
      * @param  string  $basePath
-     * @return string
+     * @return class-string
      */
     protected static function classFromFile(SplFileInfo $file, $basePath)
     {
@@ -98,13 +99,7 @@ class DiscoverEvents
             return call_user_func(static::$guessClassNamesUsingCallback, $file, $basePath);
         }
 
-        $class = trim(Str::replaceFirst($basePath, '', $file->getRealPath()), DIRECTORY_SEPARATOR);
-
-        return str_replace(
-            [DIRECTORY_SEPARATOR, ucfirst(basename(app()->path())).'\\'],
-            ['\\', app()->getNamespace()],
-            ucfirst(Str::replaceLast('.php', '', $class))
-        );
+        return File::classFromFile($file->getRealPath(), $basePath);
     }
 
     /**
