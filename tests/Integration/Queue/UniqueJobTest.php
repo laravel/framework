@@ -64,6 +64,8 @@ class UniqueJobTest extends QueueTestCase
 
     public function testLockIsNotReleasedForJobRetries()
     {
+        $this->markTestSkippedWhenUsingSyncQueueDriver();
+
         UniqueTestRetryJob::$handled = false;
 
         dispatch($job = new UniqueTestRetryJob);
@@ -84,6 +86,8 @@ class UniqueJobTest extends QueueTestCase
 
     public function testLockIsNotReleasedForJobReleases()
     {
+        $this->markTestSkippedWhenUsingSyncQueueDriver();
+
         UniqueTestReleasedJob::$handled = false;
         dispatch($job = new UniqueTestReleasedJob);
 
@@ -103,6 +107,8 @@ class UniqueJobTest extends QueueTestCase
 
     public function testLockCanBeReleasedBeforeProcessing()
     {
+        $this->markTestSkippedWhenUsingSyncQueueDriver();
+
         UniqueUntilStartTestJob::$handled = false;
 
         dispatch($job = new UniqueUntilStartTestJob);
