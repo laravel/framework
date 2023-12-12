@@ -330,7 +330,7 @@ class JobChainingTest extends QueueTestCase
             new JobChainingNamedTestJob('c3'),
         ])->dispatch();
 
-        $this->runQueueWorkCommand(['--once' => true], 11);
+        $this->runQueueWorkCommand(['--stop-when-empty' => true]);
 
         $this->assertEquals(
             match ($this->getQueueDriver()) {
