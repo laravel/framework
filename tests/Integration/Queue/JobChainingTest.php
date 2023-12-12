@@ -330,7 +330,7 @@ class JobChainingTest extends QueueTestCase
             new JobChainingNamedTestJob('c3'),
         ])->dispatch();
 
-        $this->runQueueWorkCommand(['--daemon' => true, '--stop-when-empty' => true]);
+        $this->runQueueWorkCommand(['--daemon' => true, '--once' => true], 11);
 
         $this->assertEquals(['c1', 'c2', 'b1', 'b2-0', 'b2-1', 'b2-2', 'b2-3', 'b2', 'b3', 'b4', 'c3'], JobRunRecorder::$results);
     }
