@@ -5,6 +5,7 @@ on:
     branches:
       - master
       - '*.x'
+      - 'queue-tests-ci'
   pull_request:
 
 jobs:
