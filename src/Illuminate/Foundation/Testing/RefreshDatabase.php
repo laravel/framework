@@ -109,6 +109,7 @@ trait RefreshDatabase
                 $connection->unsetEventDispatcher();
                 $connection->rollBack();
                 $connection->setEventDispatcher($dispatcher);
+                $database->purge($name);
             }
         });
     }
