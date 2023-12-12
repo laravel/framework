@@ -16,6 +16,8 @@ class JobDispatchingTest extends TestCase
     {
         Job::$ran = false;
         Job::$value = null;
+
+        parent::tearDown();
     }
 
     public function testJobCanUseCustomMethodsAfterDispatch()

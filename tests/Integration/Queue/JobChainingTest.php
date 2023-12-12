@@ -45,6 +45,8 @@ class JobChainingTest extends TestCase
         JobChainingTestSecondJob::$ran = false;
         JobChainingTestThirdJob::$ran = false;
         static::$catchCallbackRan = false;
+
+        parent::tearDown();
     }
 
     public function testJobsCanBeChainedOnSuccess()

@@ -18,11 +18,11 @@ class WorkCommandTest extends TestCase
 
     protected function tearDown(): void
     {
-        parent::tearDown();
-
         FirstJob::$ran = false;
         SecondJob::$ran = false;
         ThirdJob::$ran = false;
+
+        parent::tearDown();
     }
 
     public function testRunningOneJob()
