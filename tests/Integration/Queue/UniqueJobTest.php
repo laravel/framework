@@ -72,13 +72,13 @@ class UniqueJobTest extends QueueTestCase
 
         $this->assertFalse($this->app->get(Cache::class)->lock($this->getLockKey($job), 10)->get());
 
-        $this->runQueueWorkerCommand(['--stop-when-empty' => true]);
+        $this->runQueueWorkerCommand(['--once' => true]);
 
         $this->assertTrue($job::$handled);
         $this->assertFalse($this->app->get(Cache::class)->lock($this->getLockKey($job), 10)->get());
 
         UniqueTestRetryJob::$handled = false;
-        $this->runQueueWorkerCommand(['--stop-when-empty' => true]);
+        $this->runQueueWorkerCommand(['--once' => true]);
 
         $this->assertTrue($job::$handled);
         $this->assertTrue($this->app->get(Cache::class)->lock($this->getLockKey($job), 10)->get());
