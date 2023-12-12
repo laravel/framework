@@ -152,6 +152,10 @@ abstract class Queue
                 'commandName' => $job,
                 'command' => $job,
             ],
+            'connection' => $this->getConnectionName(),
+            'queue' => $this instanceof RedisQueue && str_starts_with('queues:', $queue)
+                ? Str::after($queue, 'queues:')
+                : $queue,
         ]);
 
         $command = $this->jobShouldBeEncrypted($job) && $this->container->bound(Encrypter::class)
@@ -254,6 +258,10 @@ abstract class Queue
             'backoff' => null,
             'timeout' => null,
             'data' => $data,
+            'connection' => $this->getConnectionName(),
+            'queue' => $this instanceof RedisQueue && str_starts_with('queues:', $queue)
+                ? Str::after($queue, 'queues:')
+                : $queue,
         ]);
     }
 
