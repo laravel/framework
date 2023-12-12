@@ -25,7 +25,7 @@ abstract class QueueTestCase extends TestCase
 
             do {
                 $this->artisan('queue:work', [
-                    'connection' => 'database',
+                    'connection' => $this->driver,
                     '--once' => true,
                     '--memory' => 1024,
                 ])->assertSuccessful();
