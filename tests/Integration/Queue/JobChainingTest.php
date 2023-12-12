@@ -31,19 +31,18 @@ class JobChainingTest extends QueueTestCase
 
     protected function setUp(): void
     {
+        $this->afterApplicationCreated(function () {
+            JobRunRecorder::reset();
+        });
+
+        $this->beforeApplicationDestroyed(function () {
+            JobChainingTestFirstJob::$ran = false;
+            JobChainingTestSecondJob::$ran = false;
+            JobChainingTestThirdJob::$ran = false;
+            static::$catchCallbackRan = false;
+        });
+
         parent::setUp();
-
-        JobRunRecorder::reset();
-    }
-
-    protected function tearDown(): void
-    {
-        JobChainingTestFirstJob::$ran = false;
-        JobChainingTestSecondJob::$ran = false;
-        JobChainingTestThirdJob::$ran = false;
-        static::$catchCallbackRan = false;
-
-        parent::tearDown();
     }
 
     public function testJobsCanBeChainedOnSuccess()
