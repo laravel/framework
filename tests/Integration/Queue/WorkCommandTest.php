@@ -129,6 +129,8 @@ class WorkCommandTest extends QueueTestCase
         Queue::push(new FirstJob);
         Queue::push(new SecondJob);
 
+        sleep(2);
+
         $this->artisan('queue:work', [
             '--daemon' => true,
             '--stop-when-empty' => true,
