@@ -19,6 +19,8 @@ class UniqueJobTest extends QueueTestCase
 {
     protected function defineEnvironment($app)
     {
+        parent::defineEnvironment($app);
+
         $app['config']->set('cache.default', 'database');
     }
 
