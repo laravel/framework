@@ -1220,7 +1220,7 @@ class ResourceTest extends TestCase
         });
     }
 
-    public function testCollectionResourceWithPaginationInfomation()
+    public function testCollectionResourceWithPaginationInformation()
     {
         $posts = collect([
             new Post(['id' => 5, 'title' => 'Test Title']),
@@ -1251,7 +1251,7 @@ class ResourceTest extends TestCase
         ]);
     }
 
-    public function testResourceWithPaginationInfomation()
+    public function testResourceWithPaginationInformation()
     {
         $posts = collect([
             new Post(['id' => 5, 'title' => 'Test Title']),
@@ -1346,7 +1346,7 @@ class ResourceTest extends TestCase
         $response->assertJson(['data' => $data]);
     }
 
-    public function testKeysArePreservedInAnAnonymousColletionIfTheResourceIsFlaggedToPreserveKeys()
+    public function testKeysArePreservedInAnAnonymousCollectionIfTheResourceIsFlaggedToPreserveKeys()
     {
         $data = Collection::make([
             [
@@ -1595,6 +1595,29 @@ class ResourceTest extends TestCase
 
         $this->assertEquals([
             'Taylor', 'Mohamed', 'Jeffrey',
+        ], $results);
+    }
+
+    public function testMergeValuesMayFallbackToDefaults()
+    {
+        $filter = new class
+        {
+            use ConditionallyLoadsAttributes;
+
+            public function work()
+            {
+                return $this->filter([
+                    $this->mergeUnless(false, ['Taylor', 'Mohamed'], ['First', 'Second']),
+                    $this->mergeWhen(false, ['Adam', 'Matt'], ['Abigail', 'Lydia']),
+                    'Jeffrey',
+                ]);
+            }
+        };
+
+        $results = $filter->work();
+
+        $this->assertEquals([
+            'Taylor', 'Mohamed', 'Abigail', 'Lydia', 'Jeffrey',
         ], $results);
     }
 

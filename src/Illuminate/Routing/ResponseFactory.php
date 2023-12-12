@@ -235,7 +235,7 @@ class ResponseFactory implements FactoryContract
     /**
      * Create a new redirect response to a controller action.
      *
-     * @param  string  $action
+     * @param  array|string  $action
      * @param  mixed  $parameters
      * @param  int  $status
      * @param  array  $headers

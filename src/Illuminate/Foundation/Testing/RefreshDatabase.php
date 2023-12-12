@@ -89,19 +89,16 @@ trait RefreshDatabase
     {
         $database = $this->app->make('db');
 
+        $this->app->instance('db.transactions', $transactionsManager = new DatabaseTransactionsManager);
+
         foreach ($this->connectionsToTransact() as $name) {
             $connection = $database->connection($name);
+            $connection->setTransactionManager($transactionsManager);
             $dispatcher = $connection->getEventDispatcher();
 
             $connection->unsetEventDispatcher();
             $connection->beginTransaction();
             $connection->setEventDispatcher($dispatcher);
-
-            if ($this->app->resolved('db.transactions')) {
-                $this->app->make('db.transactions')->callbacksShouldIgnore(
-                    $this->app->make('db.transactions')->getTransactions()->first()
-                );
-            }
         }
 
         $this->beforeApplicationDestroyed(function () use ($database) {
@@ -112,7 +109,7 @@ trait RefreshDatabase
                 $connection->unsetEventDispatcher();
                 $connection->rollBack();
                 $connection->setEventDispatcher($dispatcher);
-                $connection->disconnect();
+                $database->purge($name);
             }
         });
     }

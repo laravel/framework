@@ -4,7 +4,6 @@ parameters:
   level: 0
   ignoreErrors:
     - "#\\(void\\) is used#"
-    - "#Access to undefined constant#"
     - "#Access to an undefined property#"
     - "#Call to an undefined method#"
     - "#but return statement is missing.#"

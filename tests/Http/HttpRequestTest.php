@@ -20,9 +20,7 @@ use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
-if (PHP_VERSION_ID >= 80100) {
-    include 'Enums.php';
-}
+include_once 'Enums.php';
 
 class HttpRequestTest extends TestCase
 {
@@ -255,6 +253,15 @@ class HttpRequestTest extends TestCase
         $request->headers->set('Purpose', 'prefetch');
         $this->assertTrue($request->prefetch());
         $request->headers->set('Purpose', 'Prefetch');
+        $this->assertTrue($request->prefetch());
+
+        $request->headers->remove('Purpose');
+
+        $request->headers->set('Sec-Purpose', '');
+        $this->assertFalse($request->prefetch());
+        $request->headers->set('Sec-Purpose', 'prefetch');
+        $this->assertTrue($request->prefetch());
+        $request->headers->set('Sec-Purpose', 'Prefetch');
         $this->assertTrue($request->prefetch());
     }
 
@@ -1570,5 +1577,35 @@ class HttpRequestTest extends TestCase
 
         $this->assertInstanceOf(InputBag::class, $request->getPayload());
         $this->assertSame('world', $request->getPayload()->get('hello'));
+    }
+
+    public function testJsonRequestsCanMergeDataIntoJsonRequest()
+    {
+        if (! method_exists(SymfonyRequest::class, 'getPayload')) {
+            return;
+        }
+
+        $base = SymfonyRequest::create('/', 'POST', server: ['CONTENT_TYPE' => 'application/json'], content: '{"first":"Taylor","last":"Otwell"}');
+        $request = Request::createFromBase($base);
+
+        $request->merge([
+            'name' => $request->get('first').' '.$request->get('last'),
+        ]);
+
+        $this->assertSame('Taylor Otwell', $request->get('name'));
+    }
+
+    public function testItCanHaveObjectsInJsonPayload()
+    {
+        if (! method_exists(SymfonyRequest::class, 'getPayload')) {
+            return;
+        }
+
+        $base = SymfonyRequest::create('/', 'POST', server: ['CONTENT_TYPE' => 'application/json'], content: '{"framework":{"name":"Laravel"}}');
+        $request = Request::createFromBase($base);
+
+        $value = $request->get('framework');
+
+        $this->assertSame(['name' => 'Laravel'], $request->get('framework'));
     }
 }

@@ -38,7 +38,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      *
      * @var string
      */
-    const VERSION = '10.16.1';
+    const VERSION = '10.36.0';
 
     /**
      * The base path for the Laravel installation.
@@ -529,6 +529,10 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function storagePath($path = '')
     {
+        if (isset($_ENV['LARAVEL_STORAGE_PATH'])) {
+            return $this->joinPaths($this->storagePath ?: $_ENV['LARAVEL_STORAGE_PATH'], $path);
+        }
+
         return $this->joinPaths($this->storagePath ?: $this->basePath('storage'), $path);
     }
 
@@ -703,6 +707,24 @@ class Application extends Container implements ApplicationContract, CachesConfig
         }
 
         return $this->isRunningInConsole;
+    }
+
+    /**
+     * Determine if the application is running any of the given console commands.
+     *
+     * @param  string|array  ...$commands
+     * @return bool
+     */
+    public function runningConsoleCommand(...$commands)
+    {
+        if (! $this->runningInConsole()) {
+            return false;
+        }
+
+        return in_array(
+            $_SERVER['argv'][1] ?? null,
+            is_array($commands[0]) ? $commands[0] : $commands
+        );
     }
 
     /**

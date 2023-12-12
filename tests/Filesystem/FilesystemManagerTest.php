@@ -98,6 +98,40 @@ class FilesystemManagerTest extends TestCase
         }
     }
 
+    /**
+     * @requires OS Linux|Darwin
+     */
+    public function testCanBuildScopedDisksWithVisibility()
+    {
+        try {
+            $filesystem = new FilesystemManager(tap(new Application, function ($app) {
+                $app['config'] = [
+                    'filesystems.disks.local' => [
+                        'driver' => 'local',
+                        'root' => 'to-be-scoped',
+                        'visibility' => 'public',
+                    ],
+                ];
+            }));
+
+            $scoped = $filesystem->build([
+                'driver' => 'scoped',
+                'disk' => 'local',
+                'prefix' => 'path-prefix',
+                'visibility' => 'private',
+            ]);
+
+            $scoped->put('dirname/filename.txt', 'file content');
+
+            $this->assertEquals('private', $scoped->getVisibility('dirname/filename.txt'));
+        } finally {
+            unlink(__DIR__.'/../../to-be-scoped/path-prefix/dirname/filename.txt');
+            rmdir(__DIR__.'/../../to-be-scoped/path-prefix/dirname');
+            rmdir(__DIR__.'/../../to-be-scoped/path-prefix');
+            rmdir(__DIR__.'/../../to-be-scoped');
+        }
+    }
+
     public function testCanBuildInlineScopedDisks()
     {
         try {

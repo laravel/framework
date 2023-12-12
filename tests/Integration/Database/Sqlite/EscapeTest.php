@@ -73,4 +73,11 @@ class EscapeTest extends DatabaseTestCase
 
         $this->app['db']->escape("I am hiding a \00 byte");
     }
+
+    public function testEscapeArray()
+    {
+        $this->expectException(RuntimeException::class);
+
+        $this->app['db']->escape(['a', 'b']);
+    }
 }

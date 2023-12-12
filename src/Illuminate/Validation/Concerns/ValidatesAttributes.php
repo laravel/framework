@@ -15,6 +15,7 @@ use Egulias\EmailValidator\Validation\MultipleValidationWithAnd;
 use Egulias\EmailValidator\Validation\NoRFCWarningsValidation;
 use Egulias\EmailValidator\Validation\RFCValidation;
 use Exception;
+use Illuminate\Container\Container;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Exceptions\MathException;
@@ -599,7 +600,9 @@ trait ValidatesAttributes
 
         $matches = [];
 
-        preg_match('/^[+-]?\d*.(\d*)$/', $value, $matches);
+        if (preg_match('/^[+-]?\d*\.?(\d*)$/', $value, $matches) !== 1) {
+            return false;
+        }
 
         $decimals = strlen(end($matches));
 
@@ -838,7 +841,9 @@ trait ValidatesAttributes
             ->values()
             ->all() ?: [new RFCValidation];
 
-        return (new EmailValidator)->isValid($value, new MultipleValidationWithAnd($validations));
+        $emailValidator = Container::getInstance()->make(EmailValidator::class);
+
+        return $emailValidator->isValid($value, new MultipleValidationWithAnd($validations));
     }
 
     /**
@@ -861,6 +866,10 @@ trait ValidatesAttributes
         $column = $this->getQueryColumn($parameters, $attribute);
 
         $expected = is_array($value) ? count(array_unique($value)) : 1;
+
+        if ($expected === 0) {
+            return true;
+        }
 
         return $this->getExistCount(
             $connection, $table, $column, $value, $parameters
@@ -1068,6 +1077,27 @@ trait ValidatesAttributes
     }
 
     /**
+     * Validate the extension of a file upload attribute is in a set of defined extensions.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  array<int, int|string>  $parameters
+     * @return bool
+     */
+    public function validateExtensions($attribute, $value, $parameters)
+    {
+        if (! $this->isValidFileInstance($value)) {
+            return false;
+        }
+
+        if ($this->shouldBlockPhpUpload($value, $parameters)) {
+            return false;
+        }
+
+        return in_array(strtolower($value->getClientOriginalExtension()), $parameters);
+    }
+
+    /**
      * Validate the given value is a valid file.
      *
      * @param  string  $attribute
@@ -1259,6 +1289,18 @@ trait ValidatesAttributes
     public function validateUppercase($attribute, $value, $parameters)
     {
         return Str::upper($value) === $value;
+    }
+
+    /**
+     * Validate that an attribute is a valid HEX color.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @return bool
+     */
+    public function validateHexColor($attribute, $value)
+    {
+        return preg_match('/^#(?:(?:[0-9a-f]{3}){1,2}|(?:[0-9a-f]{4}){1,2})$/i', $value) === 1;
     }
 
     /**
@@ -1717,6 +1759,86 @@ trait ValidatesAttributes
     public function validatePresent($attribute, $value)
     {
         return Arr::has($this->data, $attribute);
+    }
+
+    /**
+     * Validate that an attribute is present when another attribute has a given value.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  array<int, int|string>  $parameters
+     * @return bool
+     */
+    public function validatePresentIf($attribute, $value, $parameters)
+    {
+        $this->requireParameterCount(2, $parameters, 'present_if');
+
+        [$values, $other] = $this->parseDependentRuleParameters($parameters);
+
+        if (in_array($other, $values, is_bool($other) || is_null($other))) {
+            return $this->validatePresent($attribute, $value);
+        }
+
+        return true;
+    }
+
+    /**
+     * Validate that an attribute is present unless another attribute has a given value.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  array<int, int|string>  $parameters
+     * @return bool
+     */
+    public function validatePresentUnless($attribute, $value, $parameters)
+    {
+        $this->requireParameterCount(2, $parameters, 'present_unless');
+
+        [$values, $other] = $this->parseDependentRuleParameters($parameters);
+
+        if (! in_array($other, $values, is_bool($other) || is_null($other))) {
+            return $this->validatePresent($attribute, $value);
+        }
+
+        return true;
+    }
+
+    /**
+     * Validate that an attribute is present when any given attribute is present.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  array<int, int|string>  $parameters
+     * @return bool
+     */
+    public function validatePresentWith($attribute, $value, $parameters)
+    {
+        $this->requireParameterCount(1, $parameters, 'present_with');
+
+        if (Arr::hasAny($this->data, $parameters)) {
+            return $this->validatePresent($attribute, $value);
+        }
+
+        return true;
+    }
+
+    /**
+     * Validate that an attribute is present when all given attributes are present.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  array<int, int|string>  $parameters
+     * @return bool
+     */
+    public function validatePresentWithAll($attribute, $value, $parameters)
+    {
+        $this->requireParameterCount(1, $parameters, 'present_with_all');
+
+        if (Arr::has($this->data, $parameters)) {
+            return $this->validatePresent($attribute, $value);
+        }
+
+        return true;
     }
 
     /**
@@ -2350,7 +2472,7 @@ trait ValidatesAttributes
         // is the size. If it is a file, we take kilobytes, and for a string the
         // entire length of the string will be considered the attribute size.
         if (is_numeric($value) && $hasNumeric) {
-            return $this->trim($value);
+            return $this->ensureExponentWithinAllowedRange($attribute, $this->trim($value));
         } elseif (is_array($value)) {
             return count($value);
         } elseif ($value instanceof File) {
@@ -2466,5 +2588,35 @@ trait ValidatesAttributes
     protected function trim($value)
     {
         return is_string($value) ? trim($value) : $value;
+    }
+
+    /**
+     * Ensure the exponent is within the allowed range.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @return mixed
+     */
+    protected function ensureExponentWithinAllowedRange($attribute, $value)
+    {
+        $stringValue = (string) $value;
+
+        if (! is_numeric($value) || ! Str::contains($stringValue, 'e', ignoreCase: true)) {
+            return $value;
+        }
+
+        $scale = (int) (Str::contains($stringValue, 'e')
+            ? Str::after($stringValue, 'e')
+            : Str::after($stringValue, 'E'));
+
+        $withinRange = (
+            $this->ensureExponentWithinAllowedRangeUsing ?? fn ($scale) => $scale <= 1000 && $scale >= -1000
+        )($scale, $attribute, $value);
+
+        if (! $withinRange) {
+            throw new MathException('Scientific notation exponent outside of allowed range.');
+        }
+
+        return $value;
     }
 }

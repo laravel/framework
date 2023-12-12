@@ -298,7 +298,7 @@ class RouteCollectionTest extends TestCase
         $this->routeCollection->match($request);
     }
 
-    public function testHasNameRouteMehod()
+    public function testHasNameRouteMethod()
     {
         $this->routeCollection->add(
             new Route('GET', 'users', ['uses' => 'UsersController@index', 'as' => 'users'])

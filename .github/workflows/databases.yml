@@ -28,13 +28,15 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: 8.1
-          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_mysql
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_mysql, :php-psr
           tools: composer:v2
           coverage: none
 
@@ -71,13 +73,15 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: 8.1
-          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_mysql
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_mysql, :php-psr
           tools: composer:v2
           coverage: none
 
@@ -114,13 +118,15 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: 8.1
-          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_mysql
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_mysql, :php-psr
           tools: composer:v2
           coverage: none
 
@@ -158,13 +164,15 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: 8.1
-          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_pgsql
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_pgsql, :php-psr
           tools: composer:v2
           coverage: none
 
@@ -200,13 +208,15 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: 8.1
-          extensions: dom, curl, libxml, mbstring, zip, pcntl, sqlsrv, pdo, pdo_sqlsrv, odbc, pdo_odbc
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, sqlsrv, pdo, pdo_sqlsrv, odbc, pdo_odbc, :php-psr
           tools: composer:v2
           coverage: none
 

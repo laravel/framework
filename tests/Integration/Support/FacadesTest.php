@@ -2,6 +2,8 @@
 
 namespace Illuminate\Tests\Integration\Support;
 
+use Illuminate\Auth\AuthManager;
+use Illuminate\Foundation\Application;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Facade;
@@ -19,7 +21,7 @@ class FacadesTest extends TestCase
 
     public function testFacadeResolvedCanResolveCallback()
     {
-        Auth::resolved(function () {
+        Auth::resolved(function (AuthManager $auth, Application $app) {
             $_SERVER['__laravel.authResolved'] = true;
         });
 
@@ -36,7 +38,7 @@ class FacadesTest extends TestCase
 
         $this->assertFalse(isset($_SERVER['__laravel.authResolved']));
 
-        Auth::resolved(function () {
+        Auth::resolved(function (AuthManager $auth, Application $app) {
             $_SERVER['__laravel.authResolved'] = true;
         });
 

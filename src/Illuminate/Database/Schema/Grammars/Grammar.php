@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Schema\Grammars;
 
+use BackedEnum;
 use Doctrine\DBAL\Schema\AbstractSchemaManager as SchemaManager;
 use Doctrine\DBAL\Schema\TableDiff;
 use Illuminate\Contracts\Database\Query\Expression;
@@ -307,6 +308,10 @@ abstract class Grammar extends BaseGrammar
     {
         if ($value instanceof Expression) {
             return $this->getValue($value);
+        }
+
+        if ($value instanceof BackedEnum) {
+            return "'{$value->value}'";
         }
 
         return is_bool($value)

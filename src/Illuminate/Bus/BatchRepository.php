@@ -4,6 +4,9 @@ namespace Illuminate\Bus;
 
 use Closure;
 
+/**
+ * @method void rollBack()
+ */
 interface BatchRepository
 {
     /**

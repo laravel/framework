@@ -268,11 +268,12 @@ class Filesystem
      *
      * @param  string  $path
      * @param  string  $data
+     * @param  bool  $lock
      * @return int
      */
-    public function append($path, $data)
+    public function append($path, $data, $lock = false)
     {
-        return file_put_contents($path, $data, FILE_APPEND);
+        return file_put_contents($path, $data, FILE_APPEND | ($lock ? LOCK_EX : 0));
     }
 
     /**
@@ -748,6 +749,8 @@ class Filesystem
                 $this->delete($item->getPathname());
             }
         }
+
+        unset($items);
 
         if (! $preserve) {
             @rmdir($directory);

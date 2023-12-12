@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Query\Grammars;
 
+use Illuminate\Contracts\Database\Query\Expression;
 use Illuminate\Database\Concerns\CompilesJsonPaths;
 use Illuminate\Database\Grammar as BaseGrammar;
 use Illuminate\Database\Query\Builder;
@@ -246,7 +247,7 @@ class Grammar extends BaseGrammar
      */
     protected function whereRaw(Builder $query, $where)
     {
-        return $where['sql'];
+        return $where['sql'] instanceof Expression ? $where['sql']->getValue($this) : $where['sql'];
     }
 
     /**

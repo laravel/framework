@@ -80,7 +80,7 @@ class StartSession
 
         $lockFor = $request->route() && $request->route()->locksFor()
                         ? $request->route()->locksFor()
-                        : 10;
+                        : $this->manager->defaultRouteBlockLockSeconds();
 
         $lock = $this->cache($this->manager->blockDriver())
                     ->lock('session:'.$session->getId(), $lockFor)
@@ -90,7 +90,7 @@ class StartSession
             $lock->block(
                 ! is_null($request->route()->waitsFor())
                         ? $request->route()->waitsFor()
-                        : 10
+                        : $this->manager->defaultRouteBlockWaitSeconds()
             );
 
             return $this->handleStatefulRequest($request, $session, $next);
@@ -219,9 +219,16 @@ class StartSession
     {
         if ($this->sessionIsPersistent($config = $this->manager->getSessionConfig())) {
             $response->headers->setCookie(new Cookie(
-                $session->getName(), $session->getId(), $this->getCookieExpirationDate(),
-                $config['path'], $config['domain'], $config['secure'] ?? false,
-                $config['http_only'] ?? true, false, $config['same_site'] ?? null
+                $session->getName(),
+                $session->getId(),
+                $this->getCookieExpirationDate(),
+                $config['path'],
+                $config['domain'],
+                $config['secure'] ?? false,
+                $config['http_only'] ?? true,
+                false,
+                $config['same_site'] ?? null,
+                $config['partitioned'] ?? false
             ));
         }
     }

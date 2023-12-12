@@ -12,7 +12,7 @@ class SubMinuteSchedulingTest extends TestCase
 {
     protected Schedule $schedule;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 

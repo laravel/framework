@@ -19,6 +19,7 @@
         "illuminate/collections": "^10.0",
         "illuminate/contracts": "^10.0",
         "illuminate/macroable": "^10.0",
+        "laravel/prompts": "^0.1.9",
         "illuminate/support": "^10.0",
         "illuminate/view": "^10.0",
         "nunomaduro/termwind": "^1.13",

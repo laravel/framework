@@ -106,9 +106,11 @@ class TestCaseTest extends BaseTestCase
         throw $exception;
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         ExampleTestCase::$latestResponse = null;
+
+        parent::tearDown();
     }
 }
 

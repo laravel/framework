@@ -33,6 +33,7 @@ use Illuminate\Support\Testing\Fakes\BusFake;
  * @method static void assertNotDispatchedAfterResponse(string|\Closure $command, callable|null $callback = null)
  * @method static void assertChained(array $expectedChain)
  * @method static void assertDispatchedWithoutChain(string|\Closure $command, callable|null $callback = null)
+ * @method static \Illuminate\Support\Testing\Fakes\ChainedBatchTruthTest chainedBatch(\Closure $callback)
  * @method static void assertBatched(callable $callback)
  * @method static void assertBatchCount(int $count)
  * @method static void assertNothingBatched()
@@ -45,6 +46,7 @@ use Illuminate\Support\Testing\Fakes\BusFake;
  * @method static bool hasDispatchedAfterResponse(string $command)
  * @method static \Illuminate\Bus\Batch dispatchFakeBatch(string $name = '')
  * @method static \Illuminate\Bus\Batch recordPendingBatch(\Illuminate\Bus\PendingBatch $pendingBatch)
+ * @method static \Illuminate\Support\Testing\Fakes\BusFake serializeAndRestore(bool $serializeAndRestore = true)
  *
  * @see \Illuminate\Bus\Dispatcher
  * @see \Illuminate\Support\Testing\Fakes\BusFake

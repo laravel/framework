@@ -33,7 +33,7 @@ class QueueBeanstalkdJobTest extends TestCase
     public function testFailProperlyCallsTheJobHandler()
     {
         $job = $this->getJob();
-        $job->getPheanstalkJob()->shouldReceive('getData')->once()->andReturn(json_encode(['job' => 'foo', 'uuid' => 'test-uuid', 'data' => ['data']]));
+        $job->getPheanstalkJob()->shouldReceive('getData')->andReturn(json_encode(['job' => 'foo', 'uuid' => 'test-uuid', 'data' => ['data']]));
         $job->getContainer()->shouldReceive('make')->once()->with('foo')->andReturn($handler = m::mock(BeanstalkdJobTestFailedTest::class));
         $job->getPheanstalk()->shouldReceive('delete')->once()->with($job->getPheanstalkJob())->andReturnSelf();
         $handler->shouldReceive('failed')->once()->with(['data'], m::type(Exception::class), 'test-uuid');

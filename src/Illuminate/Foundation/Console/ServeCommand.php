@@ -287,8 +287,13 @@ class ServeCommand extends Command
             } elseif (str($line)->contains(['Closed without sending a request'])) {
                 // ...
             } elseif (! empty($line)) {
-                $warning = explode('] ', $line);
-                $this->components->warn(count($warning) > 1 ? $warning[1] : $warning[0]);
+                $position = strpos($line, '] ');
+
+                if ($position !== false) {
+                    $line = substr($line, $position + 1);
+                }
+
+                $this->components->warn($line);
             }
         });
     }
@@ -304,6 +309,8 @@ class ServeCommand extends Command
         $regex = env('PHP_CLI_SERVER_WORKERS', 1) > 1
             ? '/^\[\d+]\s\[([a-zA-Z0-9: ]+)\]/'
             : '/^\[([^\]]+)\]/';
+
+        $line = str_replace('  ', ' ', $line);
 
         preg_match($regex, $line, $matches);
 

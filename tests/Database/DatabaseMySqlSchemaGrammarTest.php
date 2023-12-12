@@ -7,6 +7,7 @@ use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\ForeignIdColumnDefinition;
 use Illuminate\Database\Schema\Grammars\MySqlGrammar;
+use Illuminate\Tests\Database\Fixtures\Enums\Foo;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
@@ -85,7 +86,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $blueprint->create();
         $blueprint->increments('id');
         $blueprint->string('email');
-        $blueprint->engine = 'InnoDB';
+        $blueprint->engine('InnoDB');
 
         $conn = $this->getConnection();
         $conn->shouldReceive('getConfig')->once()->with('charset')->andReturn('utf8');
@@ -584,6 +585,18 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $this->assertSame('alter table `links` add `url` varchar(2083) character set ascii not null, add `url_hash_virtual` varchar(64) character set ascii as (sha2(url, 256)), add `url_hash_stored` varchar(64) character set ascii as (sha2(url, 256)) stored', $statements[0]);
     }
 
+    public function testAddingGeneratedColumnByExpression()
+    {
+        $blueprint = new Blueprint('products');
+        $blueprint->integer('price');
+        $blueprint->integer('discounted_virtual')->virtualAs(new Expression('price - 5'));
+        $blueprint->integer('discounted_stored')->storedAs(new Expression('price - 5'));
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table `products` add `price` int not null, add `discounted_virtual` int as (price - 5), add `discounted_stored` int as (price - 5) stored', $statements[0]);
+    }
+
     public function testAddingInvisibleColumn()
     {
         $blueprint = new Blueprint('users');
@@ -623,6 +636,13 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
 
         $this->assertCount(1, $statements);
         $this->assertSame('alter table `users` add `foo` varchar(100) null default CURRENT TIMESTAMP', $statements[0]);
+
+        $blueprint = new Blueprint('users');
+        $blueprint->string('foo', 100)->nullable()->default(Foo::BAR);
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table `users` add `foo` varchar(100) null default \'bar\'', $statements[0]);
     }
 
     public function testAddingText()

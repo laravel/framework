@@ -10,8 +10,8 @@ class TableGuesser
     ];
 
     const CHANGE_PATTERNS = [
-        '/_(to|from|in)_(\w+)_table$/',
-        '/_(to|from|in)_(\w+)$/',
+        '/.+_(to|from|in)_(\w+)_table$/',
+        '/.+_(to|from|in)_(\w+)$/',
     ];
 
     /**

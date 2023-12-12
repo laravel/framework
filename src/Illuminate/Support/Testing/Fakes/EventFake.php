@@ -3,7 +3,9 @@
 namespace Illuminate\Support\Testing\Fakes;
 
 use Closure;
+use Illuminate\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Contracts\Events\ShouldDispatchAfterCommit;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ForwardsCalls;
@@ -297,7 +299,7 @@ class EventFake implements Dispatcher, Fake
         $name = is_object($event) ? get_class($event) : (string) $event;
 
         if ($this->shouldFakeEvent($name, $payload)) {
-            $this->events[$name][] = func_get_args();
+            $this->fakeEvent($event, $name, func_get_args());
         } else {
             return $this->dispatcher->dispatch($event, $payload, $halt);
         }
@@ -327,6 +329,24 @@ class EventFake implements Dispatcher, Fake
                             : $event === $eventName;
             })
             ->isNotEmpty();
+    }
+
+    /**
+     * Push the event onto the fake events array immediately or after the next database transaction.
+     *
+     * @param  string|object  $event
+     * @param  string  $name
+     * @param  array  $arguments
+     * @return void
+     */
+    protected function fakeEvent($event, $name, $arguments)
+    {
+        if ($event instanceof ShouldDispatchAfterCommit && Container::getInstance()->bound('db.transactions')) {
+            return Container::getInstance()->make('db.transactions')
+                ->addCallback(fn () => $this->events[$name][] = $arguments);
+        }
+
+        $this->events[$name][] = $arguments;
     }
 
     /**

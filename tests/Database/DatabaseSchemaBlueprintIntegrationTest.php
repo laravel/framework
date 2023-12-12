@@ -358,6 +358,31 @@ class DatabaseSchemaBlueprintIntegrationTest extends TestCase
         $this->assertContains($queries, $expected);
     }
 
+    public function testChangingPrimaryAutoincrementColumnsToNonAutoincrementColumnsWork()
+    {
+        $this->db->connection()->getSchemaBuilder()->create('users', function ($table) {
+            $table->increments('id');
+        });
+
+        $blueprint = new Blueprint('users', function ($table) {
+            $table->binary('id')->change();
+        });
+
+        $queries = $blueprint->toSql($this->db->connection(), new SQLiteGrammar);
+
+        $expected = [
+            [
+                'CREATE TEMPORARY TABLE __temp__users AS SELECT id FROM users',
+                'DROP TABLE users',
+                'CREATE TABLE users (id BLOB NOT NULL, PRIMARY KEY(id))',
+                'INSERT INTO users (id) SELECT id FROM __temp__users',
+                'DROP TABLE __temp__users',
+            ],
+        ];
+
+        $this->assertContains($queries, $expected);
+    }
+
     public function testChangingDoubleColumnsWork()
     {
         $this->db->connection()->getSchemaBuilder()->create('products', function ($table) {

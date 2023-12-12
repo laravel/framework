@@ -61,7 +61,7 @@ class DatabaseMigratorIntegrationTest extends TestCase
         $output = m::mock(OutputStyle::class);
         $output->shouldReceive('write');
         $output->shouldReceive('writeln');
-        $output->shouldReceive('newLineWritten');
+        $output->shouldReceive('newLinesWritten');
 
         $this->migrator->setOutput($output);
 

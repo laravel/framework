@@ -118,10 +118,23 @@ abstract class Connection
         $time = round((microtime(true) - $start) * 1000, 2);
 
         if (isset($this->events)) {
-            $this->event(new CommandExecuted($method, $parameters, $time, $this));
+            $this->event(new CommandExecuted(
+                $method, $this->parseParametersForEvent($parameters), $time, $this
+            ));
         }
 
         return $result;
+    }
+
+    /**
+     * Parse the command's parameters for event dispatching.
+     *
+     * @param  array  $parameters
+     * @return array
+     */
+    protected function parseParametersForEvent(array $parameters)
+    {
+        return $parameters;
     }
 
     /**

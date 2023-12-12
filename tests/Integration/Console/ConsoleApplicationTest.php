@@ -5,6 +5,8 @@ namespace Illuminate\Tests\Integration\Console;
 use Illuminate\Console\Command;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Contracts\Console\Kernel;
+use Illuminate\Foundation\Console\QueuedCommand;
+use Illuminate\Support\Facades\Queue;
 use Orchestra\Testbench\TestCase;
 
 class ConsoleApplicationTest extends TestCase
@@ -64,6 +66,19 @@ class ConsoleApplicationTest extends TestCase
         $this->artisan('foo:schedule');
 
         $this->assertTrue($this->app->resolved(Schedule::class));
+    }
+
+    public function testArtisanQueue()
+    {
+        Queue::fake();
+
+        $this->app[Kernel::class]->queue('foo:bar', [
+            'id' => 1,
+        ]);
+
+        Queue::assertPushed(QueuedCommand::class, function ($job) {
+            return $job->displayName() === 'foo:bar';
+        });
     }
 }
 

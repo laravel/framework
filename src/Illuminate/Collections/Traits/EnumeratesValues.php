@@ -11,11 +11,13 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Enumerable;
 use Illuminate\Support\HigherOrderCollectionProxy;
+use InvalidArgumentException;
 use JsonSerializable;
 use Symfony\Component\VarDumper\VarDumper;
 use Traversable;
 use UnexpectedValueException;
 use UnitEnum;
+use WeakMap;
 
 /**
  * @template TKey of array-key
@@ -37,6 +39,7 @@ use UnitEnum;
  * @property-read HigherOrderCollectionProxy $max
  * @property-read HigherOrderCollectionProxy $min
  * @property-read HigherOrderCollectionProxy $partition
+ * @property-read HigherOrderCollectionProxy $percentage
  * @property-read HigherOrderCollectionProxy $reject
  * @property-read HigherOrderCollectionProxy $skipUntil
  * @property-read HigherOrderCollectionProxy $skipWhile
@@ -83,6 +86,7 @@ trait EnumeratesValues
         'max',
         'min',
         'partition',
+        'percentage',
         'reject',
         'skipUntil',
         'skipWhile',
@@ -313,6 +317,35 @@ trait EnumeratesValues
     }
 
     /**
+     * Ensure that every item in the collection is of the expected type.
+     *
+     * @template TEnsureOfType
+     *
+     * @param  class-string<TEnsureOfType>|array<array-key, class-string<TEnsureOfType>>  $type
+     * @return static<TKey, TEnsureOfType>
+     *
+     * @throws \UnexpectedValueException
+     */
+    public function ensure($type)
+    {
+        $allowedTypes = is_array($type) ? $type : [$type];
+
+        return $this->each(function ($item) use ($allowedTypes) {
+            $itemType = get_debug_type($item);
+
+            foreach ($allowedTypes as $allowedType) {
+                if ($itemType === $allowedType || $item instanceof $allowedType) {
+                    return true;
+                }
+            }
+
+            throw new UnexpectedValueException(
+                sprintf("Collection should only include [%s] items, but '%s' found.", implode(', ', $allowedTypes), $itemType)
+            );
+        });
+    }
+
+    /**
      * Determine if the collection is not empty.
      *
      * @return bool
@@ -327,7 +360,7 @@ trait EnumeratesValues
      *
      * @template TMapSpreadValue
      *
-     * @param  callable(mixed): TMapSpreadValue  $callback
+     * @param  callable(mixed...): TMapSpreadValue  $callback
      * @return static<TKey, TMapSpreadValue>
      */
     public function mapSpread(callable $callback)
@@ -456,6 +489,25 @@ trait EnumeratesValues
         }
 
         return new static([new static($passed), new static($failed)]);
+    }
+
+    /**
+     * Calculate the percentage of items that pass a given truth test.
+     *
+     * @param  (callable(TValue, TKey): bool)  $callback
+     * @param  int  $precision
+     * @return float|null
+     */
+    public function percentage(callable $callback, int $precision = 2)
+    {
+        if ($this->isEmpty()) {
+            return null;
+        }
+
+        return round(
+            $this->filter($callback)->count() / $this->count() * 100,
+            $precision
+        );
     }
 
     /**
@@ -975,6 +1027,7 @@ trait EnumeratesValues
         }
 
         return match (true) {
+            $items instanceof WeakMap => throw new InvalidArgumentException('Collections can not be created using instances of WeakMap.'),
             $items instanceof Enumerable => $items->all(),
             $items instanceof Arrayable => $items->toArray(),
             $items instanceof Traversable => iterator_to_array($items),

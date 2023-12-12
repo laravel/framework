@@ -24,7 +24,7 @@ class MultipleInstanceManagerTest extends TestCase
         $this->assertEquals(spl_object_hash($barInstance), spl_object_hash($duplicateBarInstance));
     }
 
-    public function test_unresolvable_isntances_throw_errors()
+    public function test_unresolvable_instances_throw_errors()
     {
         $this->expectException(RuntimeException::class);
 

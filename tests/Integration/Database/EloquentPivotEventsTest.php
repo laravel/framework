@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Integration\Database;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphPivot;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -17,7 +18,7 @@ class EloquentPivotEventsTest extends DatabaseTestCase
         PivotEventsTestCollaborator::$eventsCalled = [];
     }
 
-    protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
+    protected function afterRefreshingDatabase()
     {
         Schema::create('users', function (Blueprint $table) {
             $table->increments('id');
@@ -29,6 +30,18 @@ class EloquentPivotEventsTest extends DatabaseTestCase
             $table->increments('id');
             $table->string('name');
             $table->timestamps();
+        });
+
+        Schema::create('equipments', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('name');
+            $table->timestamps();
+        });
+
+        Schema::create('equipmentables', function (Blueprint $table) {
+            $table->increments('id');
+            $table->morphs('equipmentable');
+            $table->foreignId('equipment_id');
         });
 
         Schema::create('project_users', function (Blueprint $table) {
@@ -120,11 +133,45 @@ class EloquentPivotEventsTest extends DatabaseTestCase
 
         $this->assertSame(['role' => 'Lead Developer'], $_SERVER['pivot_dirty_attributes']);
     }
+
+    public function testCustomMorphPivotClassDetachAttributes()
+    {
+        $project = PivotEventsTestProject::forceCreate([
+            'name' => 'Test Project',
+        ]);
+
+        PivotEventsTestModelEquipment::deleting(function ($model) use ($project) {
+            $this->assertInstanceOf(PivotEventsTestProject::class, $model->equipmentable);
+            $this->assertEquals($project->id, $model->equipmentable->id);
+        });
+
+        $equipment = PivotEventsTestEquipment::forceCreate([
+            'name' => 'important-equipment',
+        ]);
+
+        $project->equipments()->save($equipment);
+        $equipment->projects()->sync([]);
+    }
 }
 
 class PivotEventsTestUser extends Model
 {
     public $table = 'users';
+}
+
+class PivotEventsTestEquipment extends Model
+{
+    public $table = 'equipments';
+
+    public function getForeignKey()
+    {
+        return 'equipment_id';
+    }
+
+    public function projects()
+    {
+        return $this->morphedByMany(PivotEventsTestProject::class, 'equipmentable')->using(PivotEventsTestModelEquipment::class);
+    }
 }
 
 class PivotEventsTestProject extends Model
@@ -143,6 +190,26 @@ class PivotEventsTestProject extends Model
         return $this->belongsToMany(PivotEventsTestUser::class, 'project_users', 'project_id', 'user_id')
             ->using(PivotEventsTestCollaborator::class)
             ->wherePivot('role', 'contributor');
+    }
+
+    public function equipments()
+    {
+        return $this->morphToMany(PivotEventsTestEquipment::class, 'equipmentable')->using(PivotEventsTestModelEquipment::class);
+    }
+}
+
+class PivotEventsTestModelEquipment extends MorphPivot
+{
+    public $table = 'equipmentables';
+
+    public function equipment()
+    {
+        return $this->belongsTo(PivotEventsTestEquipment::class);
+    }
+
+    public function equipmentable()
+    {
+        return $this->morphTo();
     }
 }
 

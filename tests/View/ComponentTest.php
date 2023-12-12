@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\View;
 
+use Closure;
 use Illuminate\Config\Repository as Config;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Container\BindingResolutionException;
@@ -70,6 +71,42 @@ class ComponentTest extends TestCase
         $component = new TestRegularViewComponentUsingViewHelper;
 
         $this->assertSame($view, $component->resolveView());
+    }
+
+    public function testRenderingStringClosureFromComponent()
+    {
+        $this->config->shouldReceive('get')->once()->with('view.compiled')->andReturn('/tmp');
+        $this->viewFactory->shouldReceive('exists')->once()->andReturn(false);
+        $this->viewFactory->shouldReceive('addNamespace')->once()->with('__components', '/tmp');
+
+        $component = new class() extends Component
+        {
+            protected $title;
+
+            public function __construct($title = 'World')
+            {
+                $this->title = $title;
+            }
+
+            public function render()
+            {
+                return function (array $data) {
+                    return "<p>Hello {$this->title}</p>";
+                };
+            }
+        };
+
+        $closure = $component->resolveView();
+
+        $viewPath = $closure([]);
+
+        $this->viewFactory->shouldReceive('make')->with($viewPath, [], [])->andReturn('<p>Hello World</p>');
+
+        $this->assertInstanceOf(Closure::class, $closure);
+        $this->assertSame('__components::9cc08f5001b343c093ee1a396da820dc', $viewPath);
+
+        $hash = str_replace('__components::', '', $viewPath);
+        $this->assertSame('<p>Hello World</p>', file_get_contents("/tmp/{$hash}.blade.php"));
     }
 
     public function testRegularViewsGetReturnedUsingViewMethod()

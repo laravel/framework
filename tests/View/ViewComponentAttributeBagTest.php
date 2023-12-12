@@ -113,7 +113,7 @@ class ViewComponentAttributeBagTest extends TestCase
         $this->assertSame('required="required" x-data=""', (string) $bag);
     }
 
-    public function testAttibuteExistence()
+    public function testAttributeExistence()
     {
         $bag = new ComponentAttributeBag(['name' => 'test']);
 

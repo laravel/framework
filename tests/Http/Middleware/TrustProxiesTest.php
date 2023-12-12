@@ -120,7 +120,7 @@ class TrustProxiesTest extends TestCase
     /**
      * Test X-Forwarded-For header with multiple IP addresses, with some of those being trusted.
      */
-    public function test_get_client_ip_with_muliple_ip_addresses_some_of_which_are_trusted()
+    public function test_get_client_ip_with_multiple_ip_addresses_some_of_which_are_trusted()
     {
         $trustedProxy = $this->createTrustedProxy($this->headerAll, ['192.168.10.10', '192.0.2.199']);
 
@@ -143,7 +143,7 @@ class TrustProxiesTest extends TestCase
     /**
      * Test X-Forwarded-For header with multiple IP addresses, with * wildcard trusting of all proxies.
      */
-    public function test_get_client_ip_with_muliple_ip_addresses_all_proxies_are_trusted()
+    public function test_get_client_ip_with_multiple_ip_addresses_all_proxies_are_trusted()
     {
         $trustedProxy = $this->createTrustedProxy($this->headerAll, '*');
 

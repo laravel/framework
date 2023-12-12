@@ -23,6 +23,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Fluent;
+use Illuminate\Support\Sleep;
 use Illuminate\Support\Str;
 use JsonSerializable;
 use Mockery as m;
@@ -51,6 +52,8 @@ class HttpClientTest extends TestCase
     protected function tearDown(): void
     {
         m::close();
+
+        parent::tearDown();
     }
 
     public function testStubbedResponsesAreReturnedAfterFaking()
@@ -130,6 +133,20 @@ class HttpClientTest extends TestCase
 
         $response = $this->factory->post('http://forge.laravel.com');
         $this->assertFalse($response->found());
+    }
+
+    public function testNotModifiedRequest(): void
+    {
+        $this->factory->fake([
+            'vapor.laravel.com' => $this->factory::response('', HttpResponse::HTTP_NOT_MODIFIED),
+            'forge.laravel.com' => $this->factory::response('', HttpResponse::HTTP_OK),
+        ]);
+
+        $response = $this->factory->post('https://vapor.laravel.com');
+        $this->assertTrue($response->notModified());
+
+        $response = $this->factory->post('https://forge.laravel.com');
+        $this->assertFalse($response->notModified());
     }
 
     public function testBadRequestRequest()
@@ -464,6 +481,57 @@ class HttpClientTest extends TestCase
         });
     }
 
+    public function testCanSendJsonDataWithStringable()
+    {
+        $this->factory->fake();
+
+        $this->factory->withHeaders([
+            'X-Test-Header' => 'foo',
+            'X-Test-ArrayHeader' => ['bar', 'baz'],
+        ])->post('http://foo.com/json', [
+            'name' => Str::of('Taylor'),
+        ]);
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'http://foo.com/json' &&
+                   $request->hasHeader('Content-Type', 'application/json') &&
+                   $request->hasHeader('X-Test-Header', 'foo') &&
+                   $request->hasHeader('X-Test-ArrayHeader', ['bar', 'baz']) &&
+                   $request['name'] === 'Taylor';
+        });
+    }
+
+    public function testCanSendFormDataWithStringable()
+    {
+        $this->factory->fake();
+
+        $this->factory->asForm()->post('http://foo.com/form', [
+            'name' => Str::of('Taylor'),
+            'title' => 'Laravel Developer',
+        ]);
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'http://foo.com/form' &&
+                   $request->hasHeader('Content-Type', 'application/x-www-form-urlencoded') &&
+                   $request['name'] === 'Taylor';
+        });
+    }
+
+    public function testCanSendFormDataWithStringableInArrays()
+    {
+        $this->factory->fake();
+
+        $this->factory->asForm()->post('http://foo.com/form', [
+            'posts' => [['title' => Str::of('Taylor')]],
+        ]);
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'http://foo.com/form' &&
+                   $request->hasHeader('Content-Type', 'application/x-www-form-urlencoded') &&
+                   $request['posts'][0]['title'] === 'Taylor';
+        });
+    }
+
     public function testRecordedCallsAreEmptiedWhenFakeIsCalled()
     {
         $this->factory->fake([
@@ -780,6 +848,32 @@ class HttpClientTest extends TestCase
 
         $this->factory->assertSent(function (Request $request) {
             return $request->url() === 'https://laravel.com?foo=bar&baz=qux';
+        });
+    }
+
+    public function testWithStringableQueryParameters()
+    {
+        $this->factory->fake();
+
+        $this->factory->withQueryParameters(
+            ['foo' => Str::of('bar')]
+        )->get('https://laravel.com');
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'https://laravel.com?foo=bar';
+        });
+    }
+
+    public function testWithArrayStringableQueryParameters()
+    {
+        $this->factory->fake();
+
+        $this->factory->withQueryParameters(
+            ['foo' => ['bar', Str::of('baz')]],
+        )->get('https://laravel.com');
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'https://laravel.com?foo%5B0%5D=bar&foo%5B1%5D=baz';
         });
     }
 
@@ -1715,7 +1809,7 @@ class HttpClientTest extends TestCase
 
     public function testRequestsWillBeWaitingSleepMillisecondsReceivedBeforeRetry()
     {
-        $startTime = microtime(true);
+        Sleep::fake();
 
         $this->factory->fake([
             '*' => $this->factory->sequence()
@@ -1734,8 +1828,13 @@ class HttpClientTest extends TestCase
 
         $this->factory->assertSentCount(3);
 
-        // Make sure was waited 300ms for the first two attempts
-        $this->assertEqualsWithDelta(0.3, microtime(true) - $startTime, 0.03);
+        // Make sure we waited 300ms for the first two attempts
+        Sleep::assertSleptTimes(2);
+
+        Sleep::assertSequence([
+            Sleep::usleep(100_000),
+            Sleep::usleep(200_000),
+        ]);
     }
 
     public function testMiddlewareRunsWhenFaked()
@@ -2172,6 +2271,16 @@ class HttpClientTest extends TestCase
         }
 
         $this->assertNull($exception);
+
+        $exception = null;
+
+        try {
+            $this->factory->get('http://foo.com/api/500')->throwUnlessStatus(fn ($status) => $status === 500);
+        } catch (RequestException $e) {
+            $exception = $e;
+        }
+
+        $this->assertNull($exception);
     }
 
     public function testRequestExceptionIsThrownIfIsClientError()
@@ -2484,6 +2593,13 @@ class HttpClientTest extends TestCase
         $this->assertSame('Bar', $responses[1]->header('X-Foo'));
     }
 
+    public function testItCanGetTheGlobalMiddleware()
+    {
+        $this->factory->globalMiddleware($middleware = fn () => null);
+
+        $this->assertEquals([$middleware], $this->factory->getGlobalMiddleware());
+    }
+
     public function testItCanAddRequestMiddleware()
     {
         $requests = [];
@@ -2517,4 +2633,48 @@ class HttpClientTest extends TestCase
         $this->assertSame('Bar', $responses[0]->header('X-Foo'));
         $this->assertSame('', $responses[1]->header('X-Foo'));
     }
+
+    public function testItReturnsResponse(): void
+    {
+        $this->factory->fake([
+            '*' => $this->factory::response('expected content'),
+        ]);
+
+        $response = $this->factory->get('http://laravel.com');
+
+        $this->assertInstanceOf(Response::class, $response);
+        $this->assertSame('expected content', $response->body());
+    }
+
+    public function testItCanReturnCustomResponseClass(): void
+    {
+        $factory = new CustomFactory;
+
+        $factory->fake([
+            '*' => $factory::response('expected content'),
+        ]);
+
+        $response = $factory->get('http://laravel.fake');
+
+        $this->assertInstanceOf(TestResponse::class, $response);
+        $this->assertSame('expected content', $response->body());
+    }
+}
+
+class CustomFactory extends Factory
+{
+    protected function newPendingRequest()
+    {
+        return new class extends PendingRequest
+        {
+            protected function newResponse($response)
+            {
+                return new TestResponse($response);
+            }
+        };
+    }
+}
+
+class TestResponse extends Response
+{
 }

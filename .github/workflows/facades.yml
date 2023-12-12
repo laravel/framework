@@ -5,6 +5,7 @@ on:
     branches:
       - master
       - '*.x'
+  workflow_dispatch:
 
 jobs:
   update:
@@ -17,11 +18,14 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
+          extensions: :php-psr
           php-version: 8.1
           tools: composer:v2
           coverage: none
@@ -31,13 +35,55 @@ jobs:
         with:
           timeout_minutes: 5
           max_attempts: 5
-          command: composer update --prefer-stable --prefer-dist --no-interaction --no-progress
+          command: |
+            composer config repositories.facade-documenter vcs git@github.com:laravel/facade-documenter.git
+            composer require --dev laravel/facade-documenter:dev-main --prefer-stable --prefer-dist --no-interaction --no-progress
 
       - name: Update facade docblocks
-        run: php -f bin/facades.php
+        run: |
+          php -f vendor/bin/facade.php -- \
+            Illuminate\\Support\\Facades\\App \
+            Illuminate\\Support\\Facades\\Artisan \
+            Illuminate\\Support\\Facades\\Auth \
+            Illuminate\\Support\\Facades\\Blade \
+            Illuminate\\Support\\Facades\\Broadcast \
+            Illuminate\\Support\\Facades\\Bus \
+            Illuminate\\Support\\Facades\\Cache \
+            Illuminate\\Support\\Facades\\Config \
+            Illuminate\\Support\\Facades\\Cookie \
+            Illuminate\\Support\\Facades\\Crypt \
+            Illuminate\\Support\\Facades\\DB \
+            Illuminate\\Support\\Facades\\Date \
+            Illuminate\\Support\\Facades\\Event \
+            Illuminate\\Support\\Facades\\File \
+            Illuminate\\Support\\Facades\\Gate \
+            Illuminate\\Support\\Facades\\Hash \
+            Illuminate\\Support\\Facades\\Http \
+            Illuminate\\Support\\Facades\\Lang \
+            Illuminate\\Support\\Facades\\Log \
+            Illuminate\\Support\\Facades\\Mail \
+            Illuminate\\Support\\Facades\\Notification \
+            Illuminate\\Support\\Facades\\ParallelTesting \
+            Illuminate\\Support\\Facades\\Password \
+            Illuminate\\Support\\Facades\\Pipeline \
+            Illuminate\\Support\\Facades\\Process \
+            Illuminate\\Support\\Facades\\Queue \
+            Illuminate\\Support\\Facades\\RateLimiter \
+            Illuminate\\Support\\Facades\\Redirect \
+            Illuminate\\Support\\Facades\\Redis \
+            Illuminate\\Support\\Facades\\Request \
+            Illuminate\\Support\\Facades\\Response \
+            Illuminate\\Support\\Facades\\Route \
+            Illuminate\\Support\\Facades\\Schema \
+            Illuminate\\Support\\Facades\\Session \
+            Illuminate\\Support\\Facades\\Storage \
+            Illuminate\\Support\\Facades\\URL \
+            Illuminate\\Support\\Facades\\Validator \
+            Illuminate\\Support\\Facades\\View \
+            Illuminate\\Support\\Facades\\Vite
 
       - name: Commit facade docblocks
-        uses: stefanzweifel/git-auto-commit-action@v4
+        uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: Update facade docblocks
           file_pattern: src/
