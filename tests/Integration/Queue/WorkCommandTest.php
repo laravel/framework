@@ -15,27 +15,34 @@ class WorkCommandTest extends QueueTestCase
 {
     use DatabaseMigrations;
 
-    protected function tearDown(): void
+    protected function setUp(): void
     {
-        FirstJob::$ran = false;
-        SecondJob::$ran = false;
-        ThirdJob::$ran = false;
+        $this->beforeApplicationDestroyed(function () {
+            FirstJob::$ran = false;
+            SecondJob::$ran = false;
+            ThirdJob::$ran = false;
+        });
 
-        parent::tearDown();
+        parent::setUp();
+    }
+
+    protected function defineEnvironment($app)
+    {
+        parent::defineEnvironment($app);
+
+        if ($this->driver === 'sync') {
+            $this->markTestSkipped('Unable to test `queue:work` on `sync` driver');
+        }
     }
 
     public function testRunningOneJob()
     {
-        Queue::connection('database')->push(new FirstJob);
-        Queue::connection('database')->push(new SecondJob);
+        Queue::push(new FirstJob);
+        Queue::push(new SecondJob);
 
-        $this->artisan('queue:work', [
-            'connection' => 'database',
-            '--once' => true,
-            '--memory' => 1024,
-        ])->assertExitCode(0);
+        $this->runQueueWorkCommand();
 
-        $this->assertSame(1, Queue::connection('database')->size());
+        $this->assertSame(1, Queue::size());
         $this->assertTrue(FirstJob::$ran);
         $this->assertFalse(SecondJob::$ran);
     }
