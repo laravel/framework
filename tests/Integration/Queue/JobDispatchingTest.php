@@ -9,18 +9,10 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Orchestra\Testbench\TestCase;
-use PHPUnit\Framework\Attributes\Group;
 
-#[Group('queue-dispatch')]
-class JobDispatchingTest extends TestCase
+#[WithMigration('queue')]
+class JobDispatchingTest extends QueueTestCase
 {
-    protected function defineEnvironment($app)
-    {
-        $app['config']->set([
-            'queue.default' => 'sync',
-        ]);
-    }
-
     protected function setUp(): void
     {
         $this->beforeApplicationDestroyed(function () {

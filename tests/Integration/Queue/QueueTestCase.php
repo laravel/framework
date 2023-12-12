@@ -6,6 +6,8 @@ use Orchestra\Testbench\TestCase;
 
 abstract class QueueTestCase extends TestCase
 {
+    use RefreshDatabase;
+
     /**
      * The current database driver.
      *
