@@ -212,6 +212,16 @@ class Builder
     }
 
     /**
+     * Get the user-defined types that belong to the database.
+     *
+     * @return array
+     */
+    public function getTypes()
+    {
+        throw new LogicException('This database driver does not support user-defined types.');
+    }
+
+    /**
      * Get all of the table names for the database.
      *
      * @deprecated Will be removed in a future Laravel version.

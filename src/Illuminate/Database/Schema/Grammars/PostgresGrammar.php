@@ -102,6 +102,23 @@ class PostgresGrammar extends Grammar
     }
 
     /**
+     * Compile the query to determine the user-defined types.
+     *
+     * @return string
+     */
+    public function compileTypes()
+    {
+        return 'select t.typname as name, n.nspname as schema, t.typtype as type, t.typcategory as category, '
+            ."((t.typinput = 'array_in'::regproc and t.typoutput = 'array_out'::regproc) or t.typtype = 'm') as implicit "
+            .'from pg_type t join pg_namespace n on n.oid = t.typnamespace '
+            .'left join pg_class c on c.oid = t.typrelid '
+            .'left join pg_type el on el.oid = t.typelem '
+            .'left join pg_class ce on ce.oid = el.typrelid '
+            ."where ((t.typrelid = 0 and (ce.relkind = 'c' or ce.relkind is null)) or c.relkind = 'c') "
+            ."and n.nspname not in ('pg_catalog', 'information_schema')";
+    }
+
+    /**
      * Compile the SQL needed to retrieve all table names.
      *
      * @deprecated Will be removed in a future Laravel version.
@@ -504,7 +521,20 @@ class PostgresGrammar extends Grammar
     }
 
     /**
+     * Compile the SQL needed to drop all domains.
+     *
+     * @param  array  $domains
+     * @return string
+     */
+    public function compileDropAllDomains($domains)
+    {
+        return 'drop domain '.implode(',', $this->escapeNames($domains)).' cascade';
+    }
+
+    /**
      * Compile the SQL needed to retrieve all type names.
+     *
+     * @deprecated Will be removed in a future Laravel version.
      *
      * @return string
      */

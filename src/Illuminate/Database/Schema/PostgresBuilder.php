@@ -54,6 +54,18 @@ class PostgresBuilder extends Builder
     }
 
     /**
+     * Get the user-defined types that belong to the database.
+     *
+     * @return array
+     */
+    public function getTypes()
+    {
+        return $this->connection->getPostProcessor()->processTypes(
+            $this->connection->selectFromWriteConnection($this->grammar->compileTypes())
+        );
+    }
+
+    /**
      * Get all of the table names for the database.
      *
      * @deprecated Will be removed in a future Laravel version.
@@ -151,6 +163,8 @@ class PostgresBuilder extends Builder
     /**
      * Get all of the type names for the database.
      *
+     * @deprecated Will be removed in a future Laravel version.
+     *
      * @return array
      */
     public function getAllTypes()
@@ -168,20 +182,27 @@ class PostgresBuilder extends Builder
     public function dropAllTypes()
     {
         $types = [];
+        $domains = [];
 
-        foreach ($this->getAllTypes() as $row) {
-            $row = (array) $row;
+        $schemas = $this->grammar->escapeNames($this->getSchemas());
 
-            $types[] = reset($row);
+        foreach ($this->getTypes() as $type) {
+            if (! $type['implicit'] && in_array($this->grammar->escapeNames([$type['schema']])[0], $schemas)) {
+                if ($type['type'] === 'domain') {
+                    $domains[] = $type['schema'].'.'.$type['name'];
+                } else {
+                    $types[] = $type['schema'].'.'.$type['name'];
+                }
+            }
         }
 
-        if (empty($types)) {
-            return;
+        if (! empty($types)) {
+            $this->connection->statement($this->grammar->compileDropAllTypes($types));
         }
 
-        $this->connection->statement(
-            $this->grammar->compileDropAllTypes($types)
-        );
+        if (! empty($domains)) {
+            $this->connection->statement($this->grammar->compileDropAllDomains($domains));
+        }
     }
 
     /**
