@@ -30,7 +30,7 @@ class UniqueJobTest extends QueueTestCase
         Bus::fake();
 
         UniqueTestJob::dispatch();
-        $this->runQueueWorkerCommand();
+        $this->runQueueWorkerCommand(['--stop-when-empty' => true]);
         Bus::assertDispatched(UniqueTestJob::class);
 
         $this->assertFalse(
@@ -39,7 +39,7 @@ class UniqueJobTest extends QueueTestCase
 
         Bus::assertDispatchedTimes(UniqueTestJob::class);
         UniqueTestJob::dispatch();
-        $this->runQueueWorkerCommand();
+        $this->runQueueWorkerCommand(['--stop-when-empty' => true]);
         Bus::assertDispatchedTimes(UniqueTestJob::class);
 
         $this->assertFalse(
@@ -51,7 +51,7 @@ class UniqueJobTest extends QueueTestCase
     {
         UniqueTestJob::$handled = false;
         dispatch($job = new UniqueTestJob);
-        $this->runQueueWorkerCommand();
+        $this->runQueueWorkerCommand(['--stop-when-empty' => true]);
 
         $this->assertTrue($job::$handled);
         $this->assertTrue($this->app->get(Cache::class)->lock($this->getLockKey($job), 10)->get());
@@ -65,7 +65,7 @@ class UniqueJobTest extends QueueTestCase
 
         try {
             dispatch($job = new UniqueTestFailJob);
-            $this->runQueueWorkerCommand();
+            $this->runQueueWorkerCommand(['--stop-when-empty' => true]);
         } finally {
             $this->assertTrue($job::$handled);
             $this->assertTrue($this->app->get(Cache::class)->lock($this->getLockKey($job), 10)->get());
@@ -80,13 +80,13 @@ class UniqueJobTest extends QueueTestCase
 
         $this->assertFalse($this->app->get(Cache::class)->lock($this->getLockKey($job), 10)->get());
 
-        $this->runQueueWorkerCommand();
+        $this->runQueueWorkerCommand(['--stop-when-empty' => true]);
 
         $this->assertTrue($job::$handled);
         $this->assertFalse($this->app->get(Cache::class)->lock($this->getLockKey($job), 10)->get());
 
         UniqueTestRetryJob::$handled = false;
-        $this->runQueueWorkerCommand();
+        $this->runQueueWorkerCommand(['--stop-when-empty' => true]);
 
         $this->assertTrue($job::$handled);
         $this->assertTrue($this->app->get(Cache::class)->lock($this->getLockKey($job), 10)->get());
@@ -99,13 +99,13 @@ class UniqueJobTest extends QueueTestCase
 
         $this->assertFalse($this->app->get(Cache::class)->lock($this->getLockKey($job), 10)->get());
 
-        $this->runQueueWorkerCommand();
+        $this->runQueueWorkerCommand(['--stop-when-empty' => true]);
 
         $this->assertTrue($job::$handled);
         $this->assertFalse($this->app->get(Cache::class)->lock($this->getLockKey($job), 10)->get());
 
         UniqueTestReleasedJob::$handled = false;
-        $this->runQueueWorkerCommand();
+        $this->runQueueWorkerCommand(['--stop-when-empty' => true]);
 
         $this->assertFalse($job::$handled);
         $this->assertTrue($this->app->get(Cache::class)->lock($this->getLockKey($job), 10)->get());
@@ -119,7 +119,7 @@ class UniqueJobTest extends QueueTestCase
 
         $this->assertFalse($this->app->get(Cache::class)->lock($this->getLockKey($job), 10)->get());
 
-        $this->runQueueWorkerCommand();
+        $this->runQueueWorkerCommand(['--stop-when-empty' => true]);
 
         $this->assertTrue($job::$handled);
         $this->assertTrue($this->app->get(Cache::class)->lock($this->getLockKey($job), 10)->get());
