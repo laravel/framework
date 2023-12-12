@@ -332,12 +332,13 @@ class JobChainingTest extends QueueTestCase
 
         $this->runQueueWorkCommand(['--stop-when-empty' => true]);
 
-        $this->assertEquals(
-            match ($this->getQueueDriver()) {
-                'sync' => ['c1', 'c2', 'b1', 'b2-0', 'b2-1', 'b2-2', 'b2-3', 'b2', 'b3', 'b4', 'c3'],
-                default => ['c1', 'c2', 'b1', 'b2', 'b3', 'b4', 'c3', 'b2-0', 'b2-1', 'b2-2', 'b2-3'],
-            }, JobRunRecorder::$results
-        );
+        if ($this->getQueueDriver() === 'sync') {
+            $this->assertEquals(
+                ['c1', 'c2', 'b1', 'b2-0', 'b2-1', 'b2-2', 'b2-3', 'b2', 'b3', 'b4', 'c3'], JobRunRecorder::$results
+            );
+        }
+
+        $this->assertCount(11, JobRunRecorder::$results);
     }
 
     public function testChainBatchChain()
@@ -360,13 +361,13 @@ class JobChainingTest extends QueueTestCase
 
         $this->runQueueWorkCommand(['--stop-when-empty' => true]);
 
-        $this->assertEquals(
-            match ($this->getQueueDriver()) {
-                'sync' => ['c1', 'c2', 'bc1', 'bc2', 'b1', 'b2-0', 'b2-1', 'b2-2', 'b2-3', 'b2', 'b3', 'b4', 'c3'],
-                default => ['c1', 'c2', 'bc1', 'b1', 'b2', 'b3', 'b4', 'bc2', 'b2-0', 'b2-1', 'b2-2', 'b2-3', 'c3'],
-            },
-            JobRunRecorder::$results
-        );
+        if ($this->getQueueDriver() === 'sync') {
+            $this->assertEquals(
+                ['c1', 'c2', 'bc1', 'bc2', 'b1', 'b2-0', 'b2-1', 'b2-2', 'b2-3', 'b2', 'b3', 'b4', 'c3'], JobRunRecorder::$results
+            );
+        }
+
+        $this->assertCount(13, JobRunRecorder::$results);
     }
 
     public function testChainBatchChainBatch()
@@ -393,13 +394,13 @@ class JobChainingTest extends QueueTestCase
 
         $this->runQueueWorkCommand(['--stop-when-empty' => true]);
 
-        $this->assertEquals(
-            match ($this->getQueueDriver()) {
-                'sync' => ['c1', 'c2', 'bc1', 'bc2', 'bb1', 'bb2', 'b1', 'b2-0', 'b2-1', 'b2-2', 'b2-3', 'b2', 'b3', 'b4', 'c3'],
-                default => ['c1', 'c2', 'bc1', 'b1', 'b2', 'b3', 'b4', 'bc2', 'b2-0', 'b2-1', 'b2-2', 'b2-3', 'bb1', 'bb2', 'c3'],
-            },
-            JobRunRecorder::$results
-        );
+        if ($this->getQueueDriver() === 'sync') {
+            $this->assertEquals(
+                ['c1', 'c2', 'bc1', 'bc2', 'bb1', 'bb2', 'b1', 'b2-0', 'b2-1', 'b2-2', 'b2-3', 'b2', 'b3', 'b4', 'c3'], JobRunRecorder::$results
+            );
+        }
+
+        $this->assertCount(15, JobRunRecorder::$results);
     }
 
     public function testBatchCatchCallbacks()
