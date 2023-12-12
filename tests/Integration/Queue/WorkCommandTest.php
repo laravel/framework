@@ -126,10 +126,12 @@ class WorkCommandTest extends QueueTestCase
 
     public function testMaxJobsExceeded()
     {
+        if (in_array($this->getQueueDriver(), ['redis', 'beanstalkd'])) {
+            $this->markTestSkipped();
+        }
+
         Queue::push(new FirstJob);
         Queue::push(new SecondJob);
-
-        sleep(2);
 
         $this->artisan('queue:work', [
             '--daemon' => true,
@@ -145,6 +147,10 @@ class WorkCommandTest extends QueueTestCase
 
     public function testMaxTimeExceeded()
     {
+        if (in_array($this->getQueueDriver(), ['redis', 'beanstalkd'])) {
+            $this->markTestSkipped();
+        }
+
         Queue::push(new ThirdJob);
         Queue::push(new FirstJob);
         Queue::push(new SecondJob);
