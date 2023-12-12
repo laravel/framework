@@ -14,9 +14,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Queue;
 use Orchestra\Testbench\Attributes\WithMigration;
-use PHPUnit\Framework\Attributes\Group;
 
-#[Group('queue-dispatch')]
 #[WithMigration('queue')]
 class JobChainingTest extends QueueTestCase
 {
@@ -26,8 +24,9 @@ class JobChainingTest extends QueueTestCase
 
     protected function defineEnvironment($app)
     {
+        parent::defineEnvironment($app);
+
         $app['config']->set([
-            'queue.default' => 'sync',
             'queue.connections.sync1' => ['driver' => 'sync'],
             'queue.connections.sync2' => ['driver' => 'sync'],
         ]);
@@ -55,6 +54,8 @@ class JobChainingTest extends QueueTestCase
             new JobChainingTestSecondJob,
         ]);
 
+        $this->runQueueWorkCommand(['--daemon' => true, '--stop-when-empty' => true]);
+
         $this->assertTrue(JobChainingTestFirstJob::$ran);
         $this->assertTrue(JobChainingTestSecondJob::$ran);
     }
@@ -64,6 +65,8 @@ class JobChainingTest extends QueueTestCase
         JobChainingTestFirstJob::withChain([
             new JobChainingTestSecondJob,
         ])->dispatch();
+
+        $this->runQueueWorkCommand(['--daemon' => true, '--stop-when-empty' => true]);
 
         $this->assertTrue(JobChainingTestFirstJob::$ran);
         $this->assertTrue(JobChainingTestSecondJob::$ran);
@@ -76,6 +79,8 @@ class JobChainingTest extends QueueTestCase
             new JobChainingTestSecondJob,
         ]);
 
+        $this->runQueueWorkCommand(['--daemon' => true, '--stop-when-empty' => true]);
+
         $this->assertTrue(JobChainingTestFirstJob::$ran);
         $this->assertTrue(JobChainingTestSecondJob::$ran);
     }
@@ -87,6 +92,8 @@ class JobChainingTest extends QueueTestCase
             new JobChainingTestSecondJob
         );
 
+        $this->runQueueWorkCommand(['--daemon' => true, '--stop-when-empty' => true]);
+
         $this->assertTrue(JobChainingTestFirstJob::$ran);
         $this->assertTrue(JobChainingTestSecondJob::$ran);
     }
@@ -96,6 +103,8 @@ class JobChainingTest extends QueueTestCase
         JobChainingTestDeletingJob::dispatch()->chain([
             new JobChainingTestSecondJob,
         ]);
+
+        $this->runQueueWorkCommand(['--daemon' => true, '--stop-when-empty' => true]);
 
         $this->assertTrue(JobChainingTestDeletingJob::$ran);
         $this->assertTrue(JobChainingTestSecondJob::$ran);
@@ -108,6 +117,8 @@ class JobChainingTest extends QueueTestCase
             new JobChainingTestThirdJob,
         ]);
 
+        $this->runQueueWorkCommand(['--daemon' => true, '--stop-when-empty' => true]);
+
         $this->assertTrue(JobChainingTestFirstJob::$ran);
         $this->assertTrue(JobChainingTestSecondJob::$ran);
         $this->assertTrue(JobChainingTestThirdJob::$ran);
@@ -119,15 +130,19 @@ class JobChainingTest extends QueueTestCase
             new JobChainingTestSecondJob,
         ]);
 
+        $this->runQueueWorkCommand(['--daemon' => true, '--stop-when-empty' => true]);
+
         $this->assertTrue(JobChainingTestFirstJob::$ran);
         $this->assertTrue(JobChainingTestSecondJob::$ran);
     }
 
     public function testJobsCanBeChainedViaQueue()
     {
-        Queue::connection('sync')->push((new JobChainingTestFirstJob)->chain([
+        Queue::push((new JobChainingTestFirstJob)->chain([
             new JobChainingTestSecondJob,
         ]));
+
+        $this->runQueueWorkCommand(['--daemon' => true, '--stop-when-empty' => true]);
 
         $this->assertTrue(JobChainingTestFirstJob::$ran);
         $this->assertTrue(JobChainingTestSecondJob::$ran);
@@ -135,28 +150,34 @@ class JobChainingTest extends QueueTestCase
 
     public function testSecondJobIsNotFiredIfFirstFailed()
     {
-        Queue::connection('sync')->push((new JobChainingTestFailingJob)->chain([
+        Queue::push((new JobChainingTestFailingJob)->chain([
             new JobChainingTestSecondJob,
         ]));
+
+        $this->runQueueWorkCommand(['--daemon' => true, '--stop-when-empty' => true]);
 
         $this->assertFalse(JobChainingTestSecondJob::$ran);
     }
 
     public function testSecondJobIsNotFiredIfFirstReleased()
     {
-        Queue::connection('sync')->push((new JobChainingTestReleasingJob)->chain([
+        Queue::push((new JobChainingTestReleasingJob)->chain([
             new JobChainingTestSecondJob,
         ]));
+
+        $this->runQueueWorkCommand(['--daemon' => true, '--stop-when-empty' => true]);
 
         $this->assertFalse(JobChainingTestSecondJob::$ran);
     }
 
     public function testThirdJobIsNotFiredIfSecondFails()
     {
-        Queue::connection('sync')->push((new JobChainingTestFirstJob)->chain([
+        Queue::push((new JobChainingTestFirstJob)->chain([
             new JobChainingTestFailingJob,
             new JobChainingTestThirdJob,
         ]));
+
+        $this->runQueueWorkCommand(['--daemon' => true, '--stop-when-empty' => true]);
 
         $this->assertTrue(JobChainingTestFirstJob::$ran);
         $this->assertFalse(JobChainingTestThirdJob::$ran);
@@ -172,6 +193,8 @@ class JobChainingTest extends QueueTestCase
             self::$catchCallbackRan = true;
         })->dispatch();
 
+        $this->runQueueWorkCommand(['--daemon' => true, '--stop-when-empty' => true]);
+
         $this->assertTrue(JobChainingTestFirstJob::$ran);
         $this->assertTrue(static::$catchCallbackRan);
         $this->assertFalse(JobChainingTestSecondJob::$ran);
@@ -183,6 +206,8 @@ class JobChainingTest extends QueueTestCase
             new JobChainingTestSecondJob,
             new JobChainingTestThirdJob,
         ]);
+
+        $this->runQueueWorkCommand(['--daemon' => true, '--stop-when-empty' => true]);
 
         $this->assertSame('some_queue', JobChainingTestFirstJob::$usedQueue);
         $this->assertSame('sync1', JobChainingTestFirstJob::$usedConnection);
@@ -201,6 +226,8 @@ class JobChainingTest extends QueueTestCase
             new JobChainingTestThirdJob,
         ]);
 
+        $this->runQueueWorkCommand(['--daemon' => true, '--stop-when-empty' => true]);
+
         $this->assertSame('some_queue', JobChainingTestFirstJob::$usedQueue);
         $this->assertSame('sync1', JobChainingTestFirstJob::$usedConnection);
 
@@ -218,6 +245,8 @@ class JobChainingTest extends QueueTestCase
             new JobChainingTestThirdJob,
         ]);
 
+        $this->runQueueWorkCommand(['--daemon' => true, '--stop-when-empty' => true]);
+
         $this->assertSame('some_queue', JobChainingTestFirstJob::$usedQueue);
         $this->assertSame('sync1', JobChainingTestFirstJob::$usedConnection);
 
@@ -232,6 +261,8 @@ class JobChainingTest extends QueueTestCase
     {
         JobChainAddingPrependingJob::withChain([new JobChainAddingExistingJob])->dispatch();
 
+        $this->runQueueWorkCommand(['--daemon' => true, '--stop-when-empty' => true]);
+
         $this->assertNotNull(JobChainAddingAddedJob::$ranAt);
         $this->assertNotNull(JobChainAddingExistingJob::$ranAt);
         $this->assertTrue(JobChainAddingAddedJob::$ranAt->isBefore(JobChainAddingExistingJob::$ranAt));
@@ -241,12 +272,16 @@ class JobChainingTest extends QueueTestCase
     {
         JobChainAddingPrependingJob::dispatch();
 
+        $this->runQueueWorkCommand(['--daemon' => true, '--stop-when-empty' => true]);
+
         $this->assertNotNull(JobChainAddingAddedJob::$ranAt);
     }
 
     public function testChainJobsCanBeAppended()
     {
         JobChainAddingAppendingJob::withChain([new JobChainAddingExistingJob])->dispatch();
+
+        $this->runQueueWorkCommand(['--daemon' => true, '--stop-when-empty' => true]);
 
         $this->assertNotNull(JobChainAddingAddedJob::$ranAt);
         $this->assertNotNull(JobChainAddingExistingJob::$ranAt);
@@ -256,6 +291,8 @@ class JobChainingTest extends QueueTestCase
     public function testChainJobsCanBeAppendedWithoutExistingChain()
     {
         JobChainAddingAppendingJob::dispatch();
+
+        $this->runQueueWorkCommand(['--daemon' => true, '--stop-when-empty' => true]);
 
         $this->assertNotNull(JobChainAddingAddedJob::$ranAt);
     }
@@ -274,6 +311,8 @@ class JobChainingTest extends QueueTestCase
             new JobChainingNamedTestJob('c3'),
         ])->dispatch();
 
+        $this->runQueueWorkCommand(['--daemon' => true, '--stop-when-empty' => true]);
+
         $this->assertEquals(['c1', 'c2', 'b1', 'b2', 'b3', 'b4', 'c3'], JobRunRecorder::$results);
     }
 
@@ -290,6 +329,8 @@ class JobChainingTest extends QueueTestCase
             ]),
             new JobChainingNamedTestJob('c3'),
         ])->dispatch();
+
+        $this->runQueueWorkCommand(['--daemon' => true, '--stop-when-empty' => true]);
 
         $this->assertEquals(['c1', 'c2', 'b1', 'b2-0', 'b2-1', 'b2-2', 'b2-3', 'b2', 'b3', 'b4', 'c3'], JobRunRecorder::$results);
     }
@@ -311,6 +352,8 @@ class JobChainingTest extends QueueTestCase
             ]),
             new JobChainingNamedTestJob('c3'),
         ])->dispatch();
+
+        $this->runQueueWorkCommand(['--daemon' => true, '--stop-when-empty' => true]);
 
         $this->assertEquals(['c1', 'c2', 'bc1', 'bc2', 'b1', 'b2-0', 'b2-1', 'b2-2', 'b2-3', 'b2', 'b3', 'b4', 'c3'], JobRunRecorder::$results);
     }
@@ -337,6 +380,8 @@ class JobChainingTest extends QueueTestCase
             new JobChainingNamedTestJob('c3'),
         ])->dispatch();
 
+        $this->runQueueWorkCommand(['--daemon' => true, '--stop-when-empty' => true]);
+
         $this->assertEquals(['c1', 'c2', 'bc1', 'bc2', 'bb1', 'bb2', 'b1', 'b2-0', 'b2-1', 'b2-2', 'b2-3', 'b2', 'b3', 'b4', 'c3'], JobRunRecorder::$results);
     }
 
@@ -350,6 +395,8 @@ class JobChainingTest extends QueueTestCase
             ])->catch(fn () => JobRunRecorder::recordFailure('batch failed')),
             new JobChainingNamedTestJob('c3'),
         ])->catch(fn () => JobRunRecorder::recordFailure('chain failed'))->dispatch();
+
+        $this->runQueueWorkCommand(['--daemon' => true, '--stop-when-empty' => true]);
 
         $this->assertEquals(['c1', 'c2'], JobRunRecorder::$results);
         $this->assertEquals(['batch failed', 'chain failed'], JobRunRecorder::$failures);
@@ -368,6 +415,8 @@ class JobChainingTest extends QueueTestCase
             new JobChainingNamedTestJob('c3'),
         ])->catch(fn () => JobRunRecorder::recordFailure('chain failed'))->dispatch();
 
+        $this->runQueueWorkCommand(['--daemon' => true, '--stop-when-empty' => true]);
+
         $this->assertEquals(['c1', 'c2', 'b1', 'b3', 'c3'], JobRunRecorder::$results);
         // Only the batch failed, but the chain should keep going since the batch allows failures
         $this->assertEquals(['batch failed'], JobRunRecorder::$failures);
@@ -385,6 +434,8 @@ class JobChainingTest extends QueueTestCase
             ])->allowFailures(false)->catch(fn () => JobRunRecorder::recordFailure('batch failed')),
             new JobChainingNamedTestJob('c3'),
         ])->catch(fn () => JobRunRecorder::recordFailure('chain failed'))->dispatch();
+
+        $this->runQueueWorkCommand(['--daemon' => true, '--stop-when-empty' => true]);
 
         $this->assertEquals(['c1', 'c2', 'b1', 'b3'], JobRunRecorder::$results);
         $this->assertEquals(['batch failed', 'chain failed'], JobRunRecorder::$failures);

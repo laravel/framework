@@ -15,19 +15,18 @@ abstract class QueueTestCase extends TestCase
 
     protected function defineEnvironment($app)
     {
-        $this->driver = $app['config']->get('queue.default');
+        $this->driver = $app['config']->get('queue.default', 'sync');
     }
 
-    protected function runQueueWorkCommand(int $times = 1): void
+    protected function runQueueWorkCommand(array $options = [], int $times = 1): void
     {
         if ($this->getQueueDriver() !== 'sync' && $times > 0) {
             $count = 0;
 
             do {
-                $this->artisan('queue:work', [
-                    '--once' => true,
+                $this->artisan('queue:work', array_merge($options, [
                     '--memory' => 1024,
-                ])->assertSuccessful();
+                ]))->assertSuccessful();
 
                 $count++;
             } while ($count < $times);

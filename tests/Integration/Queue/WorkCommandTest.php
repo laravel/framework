@@ -126,8 +126,8 @@ class WorkCommandTest extends QueueTestCase
 
     public function testMaxJobsExceeded()
     {
-        if (in_array($this->getQueueDriver(), ['redis', 'beanstalkd'])) {
-            $this->markTestSkipped();
+        if (in_array($driver = $this->getQueueDriver(), ['redis', 'beanstalkd'])) {
+            $this->markTestSkipped("Test not supported using `{$driver}` driver");
         }
 
         Queue::push(new FirstJob);
@@ -147,8 +147,8 @@ class WorkCommandTest extends QueueTestCase
 
     public function testMaxTimeExceeded()
     {
-        if (in_array($this->getQueueDriver(), ['redis', 'beanstalkd'])) {
-            $this->markTestSkipped();
+        if (in_array($driver = $this->getQueueDriver(), ['redis', 'beanstalkd'])) {
+            $this->markTestSkipped("Test not supported using `{$driver}` driver");
         }
 
         Queue::push(new ThirdJob);
