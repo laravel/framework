@@ -24,15 +24,8 @@ class WorkCommandTest extends QueueTestCase
         });
 
         parent::setUp();
-    }
 
-    protected function defineEnvironment($app)
-    {
-        parent::defineEnvironment($app);
-
-        if ($this->getQueueDriver() === 'sync') {
-            $this->markTestSkipped('Unable to test `queue:work` on `sync` driver');
-        }
+        $this->markTestSkippedWhenUsingSyncQueueDriver();
     }
 
     public function testRunningOneJob()
