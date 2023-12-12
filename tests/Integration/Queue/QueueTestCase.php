@@ -58,7 +58,7 @@ abstract class QueueTestCase extends TestCase
     protected function markTestSkippedWhenUsingQueueDrivers(array $drivers): void
     {
         foreach ($drivers as $driver) {
-            if ($this->getQueueDriver() === $drivers) {
+            if ($this->getQueueDriver() === $driver) {
                 $this->markTestSkipped("Unable to use `{$driver}` queue driver for the test");
             }
         }
