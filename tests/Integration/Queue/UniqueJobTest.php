@@ -21,7 +21,7 @@ class UniqueJobTest extends QueueTestCase
         Bus::fake();
 
         UniqueTestJob::dispatch();
-        $this->runQueueWorkerCommand(['--stop-when-empty' => true]);
+        $this->runQueueWorkerCommand(['--once' => true]);
         Bus::assertDispatched(UniqueTestJob::class);
 
         $this->assertFalse(
@@ -30,7 +30,7 @@ class UniqueJobTest extends QueueTestCase
 
         Bus::assertDispatchedTimes(UniqueTestJob::class);
         UniqueTestJob::dispatch();
-        $this->runQueueWorkerCommand(['--stop-when-empty' => true]);
+        $this->runQueueWorkerCommand(['--once' => true]);
         Bus::assertDispatchedTimes(UniqueTestJob::class);
 
         $this->assertFalse(
@@ -42,7 +42,7 @@ class UniqueJobTest extends QueueTestCase
     {
         UniqueTestJob::$handled = false;
         dispatch($job = new UniqueTestJob);
-        $this->runQueueWorkerCommand(['--stop-when-empty' => true]);
+        $this->runQueueWorkerCommand(['--once' => true]);
 
         $this->assertTrue($job::$handled);
         $this->assertTrue($this->app->get(Cache::class)->lock($this->getLockKey($job), 10)->get());
@@ -93,13 +93,13 @@ class UniqueJobTest extends QueueTestCase
 
         $this->assertFalse($this->app->get(Cache::class)->lock($this->getLockKey($job), 10)->get());
 
-        $this->runQueueWorkerCommand(['--stop-when-empty' => true]);
+        $this->runQueueWorkerCommand(['--once' => true]);
 
         $this->assertTrue($job::$handled);
         $this->assertFalse($this->app->get(Cache::class)->lock($this->getLockKey($job), 10)->get());
 
         UniqueTestReleasedJob::$handled = false;
-        $this->runQueueWorkerCommand(['--stop-when-empty' => true]);
+        $this->runQueueWorkerCommand(['--once' => true]);
 
         $this->assertFalse($job::$handled);
         $this->assertTrue($this->app->get(Cache::class)->lock($this->getLockKey($job), 10)->get());
@@ -115,7 +115,7 @@ class UniqueJobTest extends QueueTestCase
 
         $this->assertFalse($this->app->get(Cache::class)->lock($this->getLockKey($job), 10)->get());
 
-        $this->runQueueWorkerCommand(['--stop-when-empty' => true]);
+        $this->runQueueWorkerCommand(['--once' => true]);
 
         $this->assertTrue($job::$handled);
         $this->assertTrue($this->app->get(Cache::class)->lock($this->getLockKey($job), 10)->get());
