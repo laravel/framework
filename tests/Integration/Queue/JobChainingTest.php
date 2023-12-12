@@ -15,7 +15,7 @@ use Orchestra\Testbench\Attributes\WithMigration;
 use Orchestra\Testbench\TestCase;
 
 #[WithMigration('queue')]
-class JobChainingTest extends TestCase
+class JobChainingTest extends QueueTestCase
 {
     use DatabaseMigrations;
 
