@@ -20,14 +20,12 @@ class JobChainingTest extends QueueTestCase
 
     public static $catchCallbackRan = false;
 
-    protected function getEnvironmentSetUp($app)
+    protected function defineEnvironment($app)
     {
-        $app['config']->set('queue.connections.sync1', [
-            'driver' => 'sync',
-        ]);
-
-        $app['config']->set('queue.connections.sync2', [
-            'driver' => 'sync',
+        $app['config']->set([
+            'queue.default' => 'sync',
+            'queue.connections.sync1' => ['driver' => 'sync'],
+            'queue.connections.sync2' => ['driver' => 'sync'],
         ]);
     }
 
