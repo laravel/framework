@@ -9,15 +9,15 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Orchestra\Testbench\TestCase;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('queue-dispatch')]
 class JobDispatchingTest extends TestCase
 {
     protected function defineEnvironment($app)
     {
         $app['config']->set([
             'queue.default' => 'sync',
-            'queue.connections.sync1' => ['driver' => 'sync'],
-            'queue.connections.sync2' => ['driver' => 'sync'],
         ]);
     }
 

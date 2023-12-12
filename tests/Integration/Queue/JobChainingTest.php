@@ -12,7 +12,9 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Queue;
 use Orchestra\Testbench\Attributes\WithMigration;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('queue-dispatch')]
 #[WithMigration('queue')]
 class JobChainingTest extends QueueTestCase
 {

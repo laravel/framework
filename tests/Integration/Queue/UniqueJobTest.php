@@ -14,11 +14,20 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Bus;
 use Orchestra\Testbench\Attributes\WithMigration;
 use Orchestra\Testbench\TestCase;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('queue-dispatch')]
 #[WithMigration('queue')]
 class UniqueJobTest extends TestCase
 {
     use DatabaseMigrations;
+
+    protected function defineEnvironment($app)
+    {
+        $app['config']->set([
+            'queue.default' => 'sync',
+        ]);
+    }
 
     public function testUniqueJobsAreNotDispatched()
     {
