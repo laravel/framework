@@ -12,12 +12,6 @@ jobs:
   sync:
     runs-on: ubuntu-22.04
 
-    services:
-      dynamodb:
-        image: amazon/dynamodb-local:2.0.0
-        ports:
-          - 8888:8000
-
     strategy:
       fail-fast: true
 
@@ -47,18 +41,10 @@ jobs:
       - name: Execute tests
         run: vendor/bin/phpunit tests/Integration/Queue
         env:
-          DYNAMODB_CACHE_TABLE: laravel_dynamodb_test
-          DYNAMODB_ENDPOINT: "http://localhost:8888"
           QUEUE_CONNECTION: sync
 
   database:
     runs-on: ubuntu-22.04
-
-    services:
-      dynamodb:
-        image: amazon/dynamodb-local:2.0.0
-        ports:
-          - 8888:8000
 
     strategy:
       fail-fast: true
@@ -90,8 +76,6 @@ jobs:
         run: vendor/bin/phpunit tests/Integration/Queue
         env:
           DB_CONNECTION: testing
-          DYNAMODB_CACHE_TABLE: laravel_dynamodb_test
-          DYNAMODB_ENDPOINT: "http://localhost:8888"
           QUEUE_CONNECTION: database
 
   redis:
@@ -103,10 +87,6 @@ jobs:
         ports:
           - 6379:6379
         options: --entrypoint redis-server
-      dynamodb:
-        image: amazon/dynamodb-local:2.0.0
-        ports:
-          - 8888:8000
 
     strategy:
       fail-fast: true
@@ -137,18 +117,10 @@ jobs:
       - name: Execute tests
         run: vendor/bin/phpunit tests/Integration/Queue
         env:
-          DYNAMODB_CACHE_TABLE: laravel_dynamodb_test
-          DYNAMODB_ENDPOINT: "http://localhost:8888"
           QUEUE_CONNECTION: redis
 
   beanstalkd:
     runs-on: ubuntu-22.04
-
-    services:
-      dynamodb:
-        image: amazon/dynamodb-local:2.0.0
-        ports:
-          - 8888:8000
 
     name: Beanstalkd Driver
 
@@ -186,6 +158,4 @@ jobs:
       - name: Execute tests
         run: vendor/bin/phpunit tests/Integration/Queue
         env:
-          DYNAMODB_CACHE_TABLE: laravel_dynamodb_test
-          DYNAMODB_ENDPOINT: "http://localhost:8888"
           QUEUE_CONNECTION: beanstalkd
