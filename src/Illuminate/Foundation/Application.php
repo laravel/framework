@@ -1188,7 +1188,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function getCachedServicesPath()
     {
-        return $this->normalizeCachePath('APP_SERVICES_CACHE', 'cache/services.php');
+        return $this->normalizeCachePath('APP_SERVICES_CACHE', 'framework/cache/services.php');
     }
 
     /**
@@ -1198,7 +1198,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function getCachedPackagesPath()
     {
-        return $this->normalizeCachePath('APP_PACKAGES_CACHE', 'cache/packages.php');
+        return $this->normalizeCachePath('APP_PACKAGES_CACHE', 'framework/cache/packages.php');
     }
 
     /**
@@ -1218,7 +1218,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function getCachedConfigPath()
     {
-        return $this->normalizeCachePath('APP_CONFIG_CACHE', 'cache/config.php');
+        return $this->normalizeCachePath('APP_CONFIG_CACHE', 'framework/cache/config.php');
     }
 
     /**
@@ -1238,7 +1238,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function getCachedRoutesPath()
     {
-        return $this->normalizeCachePath('APP_ROUTES_CACHE', 'cache/routes-v7.php');
+        return $this->normalizeCachePath('APP_ROUTES_CACHE', 'framework/cache/routes-v7.php');
     }
 
     /**
@@ -1258,7 +1258,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function getCachedEventsPath()
     {
-        return $this->normalizeCachePath('APP_EVENTS_CACHE', 'cache/events.php');
+        return $this->normalizeCachePath('APP_EVENTS_CACHE', 'framework/cache/events.php');
     }
 
     /**
@@ -1271,7 +1271,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
     protected function normalizeCachePath($key, $default)
     {
         if (is_null($env = Env::get($key))) {
-            return $this->bootstrapPath($default);
+            return $this->storagePath($default);
         }
 
         return Str::startsWith($env, $this->absoluteCachePathPrefixes)
