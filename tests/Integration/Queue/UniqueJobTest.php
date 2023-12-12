@@ -167,8 +167,6 @@ class UniqueTestReleasedJob extends UniqueTestFailJob
 {
     public $tries = 1;
 
-    public $connection = 'database';
-
     public function handle()
     {
         static::$handled = true;
@@ -180,13 +178,9 @@ class UniqueTestReleasedJob extends UniqueTestFailJob
 class UniqueTestRetryJob extends UniqueTestFailJob
 {
     public $tries = 2;
-
-    public $connection = 'database';
 }
 
 class UniqueUntilStartTestJob extends UniqueTestJob implements ShouldBeUniqueUntilProcessing
 {
     public $tries = 2;
-
-    public $connection = 'database';
 }

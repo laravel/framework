@@ -50,15 +50,28 @@ abstract class QueueTestCase extends TestCase
     }
 
     /**
+     * Mark test as skipped when using given queue drivers.
+     *
+     * @param  array<int, string>  $drivers
+     * @return void
+     */
+    protected function markTestSkippedWhenUsingQueueDrivers(array $drivers): void
+    {
+        foreach ($drivers as $driver) {
+            if ($this->getQueueDriver() === $drivers) {
+                $this->markTestSkipped("Unable to use `{$driver}` queue driver for the test");
+            }
+        }
+    }
+
+    /**
      * Mark test as skipped when using "sync" queue driver.
      *
      * @return void
      */
     protected function markTestSkippedWhenUsingSyncQueueDriver(): void
     {
-        if ($this->getQueueDriver() === 'sync') {
-            $this->markTestSkipped('Unable to use `sync` queue driver for the test');
-        }
+        $this->markTestSkippedWhenUsingQueueDrivers(['sync']);
     }
 
     /**
