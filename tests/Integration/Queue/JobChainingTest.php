@@ -12,7 +12,6 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Queue;
 use Orchestra\Testbench\Attributes\WithMigration;
-use Orchestra\Testbench\TestCase;
 
 #[WithMigration('queue')]
 class JobChainingTest extends QueueTestCase
