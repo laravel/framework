@@ -16,6 +16,15 @@ use Orchestra\Testbench\Attributes\WithMigration;
 #[WithMigration('queue')]
 class UniqueJobTest extends QueueTestCase
 {
+    protected function defineEnvironment($app)
+    {
+        parent::defineEnvironment($app);
+
+        if ($this->getQueueDriver() === 'sync') {
+            $this->markTestSkipped('Unable to test using `sync` driver');
+        }
+    }
+
     public function testUniqueJobsAreNotDispatched()
     {
         Bus::fake();
