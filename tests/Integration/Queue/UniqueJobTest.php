@@ -9,31 +9,19 @@ use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldBeUniqueUntilProcessing;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Bus;
 use Orchestra\Testbench\Attributes\WithMigration;
-use Orchestra\Testbench\TestCase;
-use PHPUnit\Framework\Attributes\Group;
 
-#[Group('queue-dispatch')]
 #[WithMigration('queue')]
-class UniqueJobTest extends TestCase
+class UniqueJobTest extends QueueTestCase
 {
-    use DatabaseMigrations;
-
-    protected function defineEnvironment($app)
-    {
-        $app['config']->set([
-            'queue.default' => 'sync',
-        ]);
-    }
-
     public function testUniqueJobsAreNotDispatched()
     {
         Bus::fake();
 
         UniqueTestJob::dispatch();
+        $this->runQueueWorkerCommand();
         Bus::assertDispatched(UniqueTestJob::class);
 
         $this->assertFalse(
@@ -42,6 +30,7 @@ class UniqueJobTest extends TestCase
 
         Bus::assertDispatchedTimes(UniqueTestJob::class);
         UniqueTestJob::dispatch();
+        $this->runQueueWorkerCommand();
         Bus::assertDispatchedTimes(UniqueTestJob::class);
 
         $this->assertFalse(
@@ -53,6 +42,7 @@ class UniqueJobTest extends TestCase
     {
         UniqueTestJob::$handled = false;
         dispatch($job = new UniqueTestJob);
+        $this->runQueueWorkerCommand();
 
         $this->assertTrue($job::$handled);
         $this->assertTrue($this->app->get(Cache::class)->lock($this->getLockKey($job), 10)->get());
@@ -66,6 +56,7 @@ class UniqueJobTest extends TestCase
 
         try {
             dispatch($job = new UniqueTestFailJob);
+            $this->runQueueWorkerCommand();
         } finally {
             $this->assertTrue($job::$handled);
             $this->assertTrue($this->app->get(Cache::class)->lock($this->getLockKey($job), 10)->get());
@@ -80,19 +71,13 @@ class UniqueJobTest extends TestCase
 
         $this->assertFalse($this->app->get(Cache::class)->lock($this->getLockKey($job), 10)->get());
 
-        $this->artisan('queue:work', [
-            'connection' => 'database',
-            '--once' => true,
-        ]);
+        $this->runQueueWorkerCommand();
 
         $this->assertTrue($job::$handled);
         $this->assertFalse($this->app->get(Cache::class)->lock($this->getLockKey($job), 10)->get());
 
         UniqueTestRetryJob::$handled = false;
-        $this->artisan('queue:work', [
-            'connection' => 'database',
-            '--once' => true,
-        ]);
+        $this->runQueueWorkerCommand();
 
         $this->assertTrue($job::$handled);
         $this->assertTrue($this->app->get(Cache::class)->lock($this->getLockKey($job), 10)->get());
@@ -105,19 +90,13 @@ class UniqueJobTest extends TestCase
 
         $this->assertFalse($this->app->get(Cache::class)->lock($this->getLockKey($job), 10)->get());
 
-        $this->artisan('queue:work', [
-            'connection' => 'database',
-            '--once' => true,
-        ]);
+        $this->runQueueWorkerCommand();
 
         $this->assertTrue($job::$handled);
         $this->assertFalse($this->app->get(Cache::class)->lock($this->getLockKey($job), 10)->get());
 
         UniqueTestReleasedJob::$handled = false;
-        $this->artisan('queue:work', [
-            'connection' => 'database',
-            '--once' => true,
-        ]);
+        $this->runQueueWorkerCommand();
 
         $this->assertFalse($job::$handled);
         $this->assertTrue($this->app->get(Cache::class)->lock($this->getLockKey($job), 10)->get());
@@ -131,10 +110,7 @@ class UniqueJobTest extends TestCase
 
         $this->assertFalse($this->app->get(Cache::class)->lock($this->getLockKey($job), 10)->get());
 
-        $this->artisan('queue:work', [
-            'connection' => 'database',
-            '--once' => true,
-        ]);
+        $this->runQueueWorkerCommand();
 
         $this->assertTrue($job::$handled);
         $this->assertTrue($this->app->get(Cache::class)->lock($this->getLockKey($job), 10)->get());

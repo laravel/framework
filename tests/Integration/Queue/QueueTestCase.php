@@ -2,12 +2,12 @@
 
 namespace Illuminate\Tests\Integration\Queue;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Orchestra\Testbench\TestCase;
 
 abstract class QueueTestCase extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseMigrations;
 
     /**
      * The current database driver.
@@ -21,7 +21,7 @@ abstract class QueueTestCase extends TestCase
         $this->driver = $app['config']->get('queue.default', 'sync');
     }
 
-    protected function runQueueWorkCommand(array $options = [], int $times = 1): void
+    protected function runQueueWorkerCommand(array $options = [], int $times = 1): void
     {
         if ($this->getQueueDriver() !== 'sync' && $times > 0) {
             $count = 0;
