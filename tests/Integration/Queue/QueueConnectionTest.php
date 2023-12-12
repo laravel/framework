@@ -6,13 +6,21 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\DatabaseTransactionsManager;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Foundation\Testing\Concerns\InteractsWithDatabase;
+use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\Bus;
+use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\DB;
 use Mockery as m;
+use Orchestra\Testbench\Attributes\WithMigration;
 use Orchestra\Testbench\TestCase;
 use Throwable;
 
+#[WithMigration('queue')]
 class QueueConnectionTest extends TestCase
 {
+    use DatabaseMigrations;
+
     protected function getEnvironmentSetUp($app)
     {
         $app['config']->set('queue.default', 'sqs');
@@ -71,6 +79,34 @@ class QueueConnectionTest extends TestCase
             // This job was dispatched
         }
     }
+
+    /**
+     * @dataProvider connectionQueueDataProvider
+     */
+    public function testStuff($job, $connection, $queue, $setUp = null)
+    {
+        ($setUp ?? fn () => null)();
+
+        Bus::dispatch($job);
+
+        $jobs = DB::connection()->table('jobs')->get();
+        $this->assertCount(1, $jobs);
+        $payload = json_decode($jobs[0]->payload);
+        $this->assertSame($connection, $payload->connection);
+        $this->assertSame($queue, $payload->queue);
+    }
+
+    public static function connectionQueueDataProvider()
+    {
+        return [
+            'null null' => [new ConnectionAndQueueJob(connection: null, queue: null), null, 'default'],
+            'database null' => [new ConnectionAndQueueJob(connection: 'database', queue: null), 'database', 'default'],
+            'database named-queue' => [new ConnectionAndQueueJob(connection: 'database', queue: 'named-queue'), 'database', 'named-queue'],
+            'database configured-default' => [new ConnectionAndQueueJob(connection: 'database', queue: null), 'database', 'configured-default', function () {
+                Config::set('queue.connections.database.queue', 'configured-default');
+            }],
+        ];
+    }
 }
 
 class QueueConnectionTestJob implements ShouldQueue
@@ -82,5 +118,18 @@ class QueueConnectionTestJob implements ShouldQueue
     public function handle()
     {
         static::$ran = true;
+    }
+}
+
+class ConnectionAndQueueJob implements ShouldQueue
+{
+    public function __construct(public $connection = null, public $queue = null)
+    {
+        //
+    }
+
+    public function handle()
+    {
+        //
     }
 }
