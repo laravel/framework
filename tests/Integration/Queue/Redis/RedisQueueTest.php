@@ -8,7 +8,6 @@ use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
 use Illuminate\Queue\Events\JobQueued;
 use Illuminate\Queue\Jobs\RedisJob;
 use Illuminate\Queue\RedisQueue;
-use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Str;
 use Mockery as m;
@@ -16,7 +15,7 @@ use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 
-class QueueIntegrationTest extends TestCase
+class RedisQueueTest extends TestCase
 {
     use InteractsWithRedis, InteractsWithTime;
 
@@ -64,12 +63,7 @@ class QueueIntegrationTest extends TestCase
     #[DataProvider('redisDriverProvider')]
     public function testExpiredJobsArePopped($driver)
     {
-        config([
-            'database.redis.client' => $driver,
-            'queue.default' => 'redis',
-        ]);
-
-        // $this->setQueue($driver);
+        $this->setQueue($driver);
 
         $jobs = [
             new RedisQueueIntegrationTestJob(0),
@@ -78,15 +72,15 @@ class QueueIntegrationTest extends TestCase
             new RedisQueueIntegrationTestJob(3),
         ];
 
-        Queue::later(1000, $jobs[0]);
-        Queue::later(-200, $jobs[1]);
-        Queue::later(-300, $jobs[2]);
-        Queue::later(-100, $jobs[3]);
+        $this->queue->later(1000, $jobs[0]);
+        $this->queue->later(-200, $jobs[1]);
+        $this->queue->later(-300, $jobs[2]);
+        $this->queue->later(-100, $jobs[3]);
 
-        $this->assertEquals($jobs[2], unserialize(json_decode(Queue::pop()->getRawBody())->data->command));
-        $this->assertEquals($jobs[1], unserialize(json_decode(Queue::pop()->getRawBody())->data->command));
-        $this->assertEquals($jobs[3], unserialize(json_decode(Queue::pop()->getRawBody())->data->command));
-        $this->assertNull(Queue::pop());
+        $this->assertEquals($jobs[2], unserialize(json_decode($this->queue->pop()->getRawBody())->data->command));
+        $this->assertEquals($jobs[1], unserialize(json_decode($this->queue->pop()->getRawBody())->data->command));
+        $this->assertEquals($jobs[3], unserialize(json_decode($this->queue->pop()->getRawBody())->data->command));
+        $this->assertNull($this->queue->pop());
 
         $this->assertEquals(1, $this->redis[$driver]->connection()->zcard('queues:default:delayed'));
         $this->assertEquals(3, $this->redis[$driver]->connection()->zcard('queues:default:reserved'));
