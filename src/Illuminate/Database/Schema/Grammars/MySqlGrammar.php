@@ -774,7 +774,11 @@ class MySqlGrammar extends Grammar
      */
     protected function typeFloat(Fluent $column)
     {
-        return $this->typeDouble($column);
+        if ($column->precision) {
+            return "float({$column->precision})";
+        }
+
+        return 'float';
     }
 
     /**
@@ -785,10 +789,6 @@ class MySqlGrammar extends Grammar
      */
     protected function typeDouble(Fluent $column)
     {
-        if ($column->total && $column->places) {
-            return "double({$column->total}, {$column->places})";
-        }
-
         return 'double';
     }
 

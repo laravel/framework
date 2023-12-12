@@ -708,6 +708,10 @@ class SqlServerGrammar extends Grammar
      */
     protected function typeFloat(Fluent $column)
     {
+        if ($column->precision) {
+            return "float({$column->precision})";
+        }
+
         return 'float';
     }
 
@@ -719,7 +723,7 @@ class SqlServerGrammar extends Grammar
      */
     protected function typeDouble(Fluent $column)
     {
-        return 'float';
+        return 'double precision';
     }
 
     /**
