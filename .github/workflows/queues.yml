@@ -87,7 +87,7 @@ jobs:
   beanstalkd:
     runs-on: ubuntu-22.04
 
-    name: Beanstalk Driver
+    name: Beanstalkd Driver
 
     steps:
       - name: Checkout code
