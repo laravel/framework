@@ -193,8 +193,8 @@ class Number
         }
 
         switch (true) {
-            case $number === 0:
-                return '0';
+            case floatval($number) === 0.0:
+                return $precision > 0 ? static::format(0, $precision, $maxPrecision) : '0';
             case $number < 0:
                 return sprintf('-%s', static::summarize(abs($number), $precision, $maxPrecision, $units));
             case $number >= 1e15:

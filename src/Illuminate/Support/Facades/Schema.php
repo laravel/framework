@@ -22,6 +22,7 @@ namespace Illuminate\Support\Facades;
  * @method static array getColumnListing(string $table)
  * @method static array getColumns(string $table)
  * @method static array getIndexes(string $table)
+ * @method static array getForeignKeys(string $table)
  * @method static void table(string $table, \Closure $callback)
  * @method static void create(string $table, \Closure $callback)
  * @method static void drop(string $table)
