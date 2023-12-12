@@ -93,7 +93,16 @@ class Kernel implements KernelContract
     protected $requestStartedAt;
 
     /**
-     * The priority-sorted list of middleware.
+     * The priority-sorted list of middleware for application.
+     *
+     * Forces non-global middleware to always be in the given order.
+     *
+     * @var string[]
+     */
+    protected $applicationMiddlewarePriority = [];
+
+    /**
+     * The priority-sorted list of middleware for framework.
      *
      * Forces non-global middleware to always be in the given order.
      *
@@ -422,7 +431,7 @@ class Kernel implements KernelContract
      */
     public function prependToMiddlewarePriority($middleware)
     {
-        if (! in_array($middleware, $this->middlewarePriority)) {
+        if (! in_array($middleware, $this->getMiddlewarePriority())) {
             array_unshift($this->middlewarePriority, $middleware);
         }
 
@@ -439,7 +448,7 @@ class Kernel implements KernelContract
      */
     public function appendToMiddlewarePriority($middleware)
     {
-        if (! in_array($middleware, $this->middlewarePriority)) {
+        if (! in_array($middleware, $this->getMiddlewarePriority())) {
             $this->middlewarePriority[] = $middleware;
         }
 
@@ -455,7 +464,7 @@ class Kernel implements KernelContract
      */
     protected function syncMiddlewareToRouter()
     {
-        $this->router->middlewarePriority = $this->middlewarePriority;
+        $this->router->middlewarePriority = $this->getMiddlewarePriority();
 
         foreach ($this->middlewareGroups as $key => $middleware) {
             $this->router->middlewareGroup($key, $middleware);
@@ -473,7 +482,7 @@ class Kernel implements KernelContract
      */
     public function getMiddlewarePriority()
     {
-        return $this->middlewarePriority;
+        return array_merge($this->middlewarePriority, $this->applicationMiddlewarePriority);
     }
 
     /**
