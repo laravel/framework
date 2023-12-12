@@ -197,6 +197,11 @@ abstract class TestCase extends BaseTestCase
 
             ParallelTesting::callTearDownTestCaseCallbacks($this);
 
+            $database = $this->app['db'];
+            foreach (array_keys($database->getConnections()) as $name) {
+                $database->purge($name);
+            }
+
             $this->app->flush();
 
             $this->app = null;
