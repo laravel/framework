@@ -888,6 +888,8 @@ class Builder implements BuilderContract
 
         $column = $column instanceof Expression ? $column->getValue($this->getGrammar()) : $column;
 
+        $column = Str::after($column, "{$this->model->getTable()}.");
+
         // If the model has a mutator for the requested column, we will spin through
         // the results and mutate the values so that the mutated version of these
         // columns are returned as you would expect from these Eloquent models.
