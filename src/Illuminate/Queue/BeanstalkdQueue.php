@@ -7,6 +7,7 @@ use Illuminate\Queue\Jobs\BeanstalkdJob;
 use Pheanstalk\Contract\JobIdInterface;
 use Pheanstalk\Pheanstalk;
 use Pheanstalk\Values\Job;
+use Pheanstalk\Values\JobId;
 use Pheanstalk\Values\TubeName;
 
 class BeanstalkdQueue extends Queue implements QueueContract
@@ -14,7 +15,7 @@ class BeanstalkdQueue extends Queue implements QueueContract
     /**
      * The Pheanstalk instance.
      *
-     * @var \Pheanstalk\Pheanstalk
+     * @var \Pheanstalk\Contract\PheanstalkManagerInterface&\Pheanstalk\Contract\PheanstalkPublisherInterface&\Pheanstalk\Contract\PheanstalkSubscriberInterface  $pheanstalk
      */
     protected $pheanstalk;
 
@@ -42,14 +43,14 @@ class BeanstalkdQueue extends Queue implements QueueContract
     /**
      * Create a new Beanstalkd queue instance.
      *
-     * @param  \Pheanstalk\Pheanstalk  $pheanstalk
+     * @param  \Pheanstalk\Contract\PheanstalkManagerInterface&\Pheanstalk\Contract\PheanstalkPublisherInterface&\Pheanstalk\Contract\PheanstalkSubscriberInterface  $pheanstalk  $pheanstalk
      * @param  string  $default
      * @param  int  $timeToRun
      * @param  int  $blockFor
      * @param  bool  $dispatchAfterCommit
      * @return void
      */
-    public function __construct(Pheanstalk $pheanstalk,
+    public function __construct($pheanstalk,
                                 $default,
                                 $timeToRun,
                                 $blockFor = 0,
@@ -191,7 +192,7 @@ class BeanstalkdQueue extends Queue implements QueueContract
     {
         $this->pheanstalk->useTube(new TubeName($this->getQueue($queue)));
 
-        $this->pheanstalk->delete(new Job($id, ''));
+        $this->pheanstalk->delete(new Job(new JobId($id), ''));
     }
 
     /**
@@ -208,7 +209,7 @@ class BeanstalkdQueue extends Queue implements QueueContract
     /**
      * Get the underlying Pheanstalk instance.
      *
-     * @return \Pheanstalk\Pheanstalk
+     * @return \Pheanstalk\Contract\PheanstalkManagerInterface&\Pheanstalk\Contract\PheanstalkPublisherInterface&\Pheanstalk\Contract\PheanstalkSubscriberInterface  $pheanstalk
      */
     public function getPheanstalk()
     {
