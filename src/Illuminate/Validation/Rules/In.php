@@ -3,8 +3,8 @@
 namespace Illuminate\Validation\Rules;
 
 use BackedEnum;
-use Stringable;
 use Illuminate\Contracts\Support\Arrayable;
+use Stringable;
 use UnitEnum;
 
 class In implements Stringable
