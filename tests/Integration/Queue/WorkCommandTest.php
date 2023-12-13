@@ -36,7 +36,7 @@ class WorkCommandTest extends QueueTestCase
         $this->artisan('queue:work', [
             '--once' => true,
             '--memory' => 1024,
-        ])->assertSuccessful();
+        ])->assertExitCode(0);
 
         $this->assertSame(1, Queue::size());
         $this->assertTrue(FirstJob::$ran);
@@ -53,7 +53,7 @@ class WorkCommandTest extends QueueTestCase
             '--once' => true,
             '--memory' => 1024,
         ])->expectsOutputToContain('2023-01-18 10:10:11')
-            ->assertSuccessful();
+            ->assertExitCode(0);
     }
 
     public function testRunTimestampOutputWithDifferentLogTimezone()
@@ -67,7 +67,7 @@ class WorkCommandTest extends QueueTestCase
             '--once' => true,
             '--memory' => 1024,
         ])->expectsOutputToContain('2023-01-18 12:10:11')
-            ->assertSuccessful();
+            ->assertExitCode(0);
     }
 
     public function testRunTimestampOutputWithSameAppDefaultAndQueueLogDefault()
@@ -81,7 +81,7 @@ class WorkCommandTest extends QueueTestCase
             '--once' => true,
             '--memory' => 1024,
         ])->expectsOutputToContain('2023-01-18 10:10:11')
-            ->assertSuccessful();
+            ->assertExitCode(0);
     }
 
     public function testDaemon()
@@ -93,7 +93,7 @@ class WorkCommandTest extends QueueTestCase
             '--daemon' => true,
             '--stop-when-empty' => true,
             '--memory' => 1024,
-        ])->assertSuccessful();
+        ])->assertExitCode(0);
 
         $this->assertSame(0, Queue::size());
         $this->assertTrue(FirstJob::$ran);
