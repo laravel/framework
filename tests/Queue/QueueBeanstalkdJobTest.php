@@ -8,15 +8,12 @@ use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Jobs\BeanstalkdJob;
 use Mockery as m;
-use PHPUnit\Framework\TestCase;
-use Pheanstalk\Connection;
 use Pheanstalk\Contract\JobIdInterface;
 use Pheanstalk\Contract\PheanstalkManagerInterface;
 use Pheanstalk\Contract\PheanstalkPublisherInterface;
 use Pheanstalk\Contract\PheanstalkSubscriberInterface;
-use Pheanstalk\Contract\SocketFactoryInterface;
-use Pheanstalk\Job;
 use Pheanstalk\Pheanstalk;
+use PHPUnit\Framework\TestCase;
 use stdClass;
 
 class QueueBeanstalkdJobTest extends TestCase

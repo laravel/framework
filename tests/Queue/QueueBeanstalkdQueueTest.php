@@ -7,7 +7,6 @@ use Illuminate\Queue\BeanstalkdQueue;
 use Illuminate\Queue\Jobs\BeanstalkdJob;
 use Illuminate\Support\Str;
 use Mockery as m;
-use PHPUnit\Framework\TestCase;
 use Pheanstalk\Contract\JobIdInterface;
 use Pheanstalk\Contract\PheanstalkManagerInterface;
 use Pheanstalk\Contract\PheanstalkPublisherInterface;
@@ -15,6 +14,7 @@ use Pheanstalk\Contract\PheanstalkSubscriberInterface;
 use Pheanstalk\Pheanstalk;
 use Pheanstalk\Values\Job;
 use Pheanstalk\Values\TubeName;
+use PHPUnit\Framework\TestCase;
 
 class QueueBeanstalkdQueueTest extends TestCase
 {
@@ -127,7 +127,7 @@ class QueueBeanstalkdQueueTest extends TestCase
      */
     private function setQueue($default, $timeToRun, $blockFor = 0)
     {
-         $this->queue = new BeanstalkdQueue(
+        $this->queue = new BeanstalkdQueue(
             m::mock(implode(',', [PheanstalkManagerInterface::class, PheanstalkPublisherInterface::class, PheanstalkSubscriberInterface::class])),
             $default,
             $timeToRun,
