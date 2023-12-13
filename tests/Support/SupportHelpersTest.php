@@ -612,6 +612,35 @@ class SupportHelpersTest extends TestCase
         throw_if(true, new LogicException);
     }
 
+    /**
+     * Test the try_or helper with a successful closure.
+     *
+     * @return void
+     */
+    public function testTryOrWithSuccessfulClosure()
+    {
+        $result = try_or(function () {
+            return 'Success';
+        }, 'Default Value');
+
+        $this->assertEquals('Success', $result);
+    }
+
+    /**
+     * Test the try_or helper with a failing closure.
+     *
+     * @return void
+     */
+    public function testTryOrWithFailingClosure()
+    {
+        $result = try_or(function (){
+            return 10 / 0;
+        }, 'Default Value');
+
+        $this->assertEquals('Default Value', $result);
+    }
+
+
     public function testThrowDefaultException()
     {
         $this->expectException(RuntimeException::class);
