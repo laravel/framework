@@ -416,6 +416,29 @@ if (! function_exists('windows_os')) {
     }
 }
 
+if (! function_exists('try_or')) {
+    /**
+     * Execute the given closure, logging any exceptions and returning a default value if an exception occurs.
+     *
+     * @param  \Closure  $callback  The closure to execute.
+     * @param  mixed  $default  The default value to return in case of an exception.
+     * @return mixed The result of the closure or the default value.
+     */
+    function try_or(\Closure $callback, $default = null)
+    {
+        try {
+            return $callback();
+        } catch (\Throwable $th) {
+            \Illuminate\Support\Facades\Log::error(
+                "Error in {$th->getFile()}, line {$th->getLine()}: {$th->getMessage()}",
+                ['context' => 'try_or']
+            );
+
+            return $default;
+        }
+    }
+}
+
 if (! function_exists('with')) {
     /**
      * Return the given value, optionally passed through the given callback.
