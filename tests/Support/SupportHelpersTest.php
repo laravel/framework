@@ -633,13 +633,12 @@ class SupportHelpersTest extends TestCase
      */
     public function testTryOrWithFailingClosure()
     {
-        $result = try_or(function (){
+        $result = try_or(function () {
             return 10 / 0;
         }, 'Default Value');
 
         $this->assertEquals('Default Value', $result);
     }
-
 
     public function testThrowDefaultException()
     {
