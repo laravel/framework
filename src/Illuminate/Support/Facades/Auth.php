@@ -40,7 +40,7 @@ use RuntimeException;
  * @method static \Symfony\Component\HttpFoundation\Response|null onceBasic(string $field = 'email', array $extraConditions = [])
  * @method static bool attemptWhen(array $credentials = [], array|callable|null $callbacks = null, bool $remember = false)
  * @method static void logoutCurrentDevice()
- * @method static \Illuminate\Contracts\Auth\Authenticatable|null logoutOtherDevices(string $password, string $attribute = 'password')
+ * @method static \Illuminate\Contracts\Auth\Authenticatable|null logoutOtherDevices(string $password)
  * @method static void attempting(mixed $callback)
  * @method static \Illuminate\Contracts\Auth\Authenticatable getLastAttempted()
  * @method static string getName()
