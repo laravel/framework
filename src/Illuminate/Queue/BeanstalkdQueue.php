@@ -4,8 +4,9 @@ namespace Illuminate\Queue;
 
 use Illuminate\Contracts\Queue\Queue as QueueContract;
 use Illuminate\Queue\Jobs\BeanstalkdJob;
-use Pheanstalk\Job as PheanstalkJob;
+use Pheanstalk\Contract\JobIdInterface;
 use Pheanstalk\Pheanstalk;
+use Pheanstalk\Values\Job;
 use Pheanstalk\Values\TubeName;
 
 class BeanstalkdQueue extends Queue implements QueueContract
@@ -172,7 +173,7 @@ class BeanstalkdQueue extends Queue implements QueueContract
 
         $job = $this->pheanstalk->reserveWithTimeout($this->blockFor);
 
-        if ($job instanceof PheanstalkJob) {
+        if ($job instanceof JobIdInterface) {
             return new BeanstalkdJob(
                 $this->container, $this->pheanstalk, $job, $this->connectionName, $queue
             );
@@ -190,7 +191,7 @@ class BeanstalkdQueue extends Queue implements QueueContract
     {
         $this->pheanstalk->useTube(new TubeName($this->getQueue($queue)));
 
-        $this->pheanstalk->delete(new PheanstalkJob($id, ''));
+        $this->pheanstalk->delete(new Job($id, ''));
     }
 
     /**

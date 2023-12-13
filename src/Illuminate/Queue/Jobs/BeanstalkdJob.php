@@ -4,7 +4,7 @@ namespace Illuminate\Queue\Jobs;
 
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Queue\Job as JobContract;
-use Pheanstalk\Job as PheanstalkJob;
+use Pheanstalk\Contract\JobIdInterface;
 use Pheanstalk\Pheanstalk;
 
 class BeanstalkdJob extends Job implements JobContract
@@ -28,12 +28,12 @@ class BeanstalkdJob extends Job implements JobContract
      *
      * @param  \Illuminate\Container\Container  $container
      * @param  \Pheanstalk\Pheanstalk  $pheanstalk
-     * @param  \Pheanstalk\Job  $job
+     * @param  \Pheanstalk\Contract\JobIdInterface  $job
      * @param  string  $connectionName
      * @param  string  $queue
      * @return void
      */
-    public function __construct(Container $container, Pheanstalk $pheanstalk, PheanstalkJob $job, $connectionName, $queue)
+    public function __construct(Container $container, Pheanstalk $pheanstalk, JobIdInterface $job, $connectionName, $queue)
     {
         $this->job = $job;
         $this->queue = $queue;
@@ -126,7 +126,7 @@ class BeanstalkdJob extends Job implements JobContract
     /**
      * Get the underlying Pheanstalk job.
      *
-     * @return \Pheanstalk\Job
+     * @return \Pheanstalk\Contract\JobIdInterface
      */
     public function getPheanstalkJob()
     {
