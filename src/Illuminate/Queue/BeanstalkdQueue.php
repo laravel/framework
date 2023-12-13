@@ -6,6 +6,7 @@ use Illuminate\Contracts\Queue\Queue as QueueContract;
 use Illuminate\Queue\Jobs\BeanstalkdJob;
 use Pheanstalk\Job as PheanstalkJob;
 use Pheanstalk\Pheanstalk;
+use Pheanstalk\Values\TubeName;
 
 class BeanstalkdQueue extends Queue implements QueueContract
 {
@@ -104,7 +105,9 @@ class BeanstalkdQueue extends Queue implements QueueContract
      */
     public function pushRaw($payload, $queue = null, array $options = [])
     {
-        return $this->pheanstalk->useTube($this->getQueue($queue))->put(
+        $this->pheanstalk->useTube(new TubeName($this->getQueue($queue)));
+
+        return $this->pheanstalk->put(
             $payload, Pheanstalk::DEFAULT_PRIORITY, Pheanstalk::DEFAULT_DELAY, $this->timeToRun
         );
     }
@@ -126,7 +129,9 @@ class BeanstalkdQueue extends Queue implements QueueContract
             $queue,
             $delay,
             function ($payload, $queue, $delay) {
-                return $this->pheanstalk->useTube($this->getQueue($queue))->put(
+                $this->pheanstalk->useTube(new TubeName($this->getQueue($queue)));
+
+                return $this->pheanstalk->put(
                     $payload,
                     Pheanstalk::DEFAULT_PRIORITY,
                     $this->secondsUntil($delay),
@@ -165,7 +170,9 @@ class BeanstalkdQueue extends Queue implements QueueContract
     {
         $queue = $this->getQueue($queue);
 
-        $job = $this->pheanstalk->watchOnly($queue)->reserveWithTimeout($this->blockFor);
+        $this->pheanstalk->watch(new TubeName($queue));
+
+        $job = $this->pheanstalk->reserveWithTimeout($this->blockFor);
 
         if ($job instanceof PheanstalkJob) {
             return new BeanstalkdJob(
@@ -183,9 +190,9 @@ class BeanstalkdQueue extends Queue implements QueueContract
      */
     public function deleteMessage($queue, $id)
     {
-        $queue = $this->getQueue($queue);
+        $this->pheanstalk->useTube(new TubeName($this->getQueue($queue)));
 
-        $this->pheanstalk->useTube($queue)->delete(new PheanstalkJob($id, ''));
+        $this->pheanstalk->delete(new PheanstalkJob($id, ''));
     }
 
     /**
