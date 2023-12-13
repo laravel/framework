@@ -30,13 +30,9 @@ class ThrottlesExceptionsWithRedisTest extends TestCase
 
     protected function tearDown(): void
     {
-        parent::tearDown();
-
         $this->tearDownRedis();
 
-        Carbon::setTestNow();
-
-        m::close();
+        parent::tearDown();
     }
 
     public function testCircuitIsOpenedForJobErrors()
