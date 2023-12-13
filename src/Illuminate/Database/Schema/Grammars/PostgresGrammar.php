@@ -115,6 +115,7 @@ class PostgresGrammar extends Grammar
             .'left join pg_type el on el.oid = t.typelem '
             .'left join pg_class ce on ce.oid = el.typrelid '
             ."where ((t.typrelid = 0 and (ce.relkind = 'c' or ce.relkind is null)) or c.relkind = 'c') "
+            ."and not exists (select 1 from pg_depend d where d.objid in (t.oid, t.typelem) and d.deptype = 'e') "
             ."and n.nspname not in ('pg_catalog', 'information_schema')";
     }
 
