@@ -30,6 +30,7 @@ $session = session()->get($__sessionArgs[0]); ?>';
     {
         return '<?php unset($session);
 if (isset($__sessionPrevious) && !empty($__sessionPrevious)) { $session = array_pop($__sessionPrevious); }
+if (isset($__sessionPrevious) && empty($__sessionPrevious)) { unset($__sessionPrevious); }
 endif;
 unset($__sessionArgs); ?>';
     }
