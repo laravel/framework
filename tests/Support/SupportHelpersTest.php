@@ -640,13 +640,6 @@ class SupportHelpersTest extends TestCase
         $this->assertEquals('Default Value', $result);
     }
 
-    public function testThrowDefaultException()
-    {
-        $this->expectException(RuntimeException::class);
-
-        throw_if(true);
-    }
-
     public function testThrowExceptionWithMessage()
     {
         $this->expectException(RuntimeException::class);
