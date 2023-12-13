@@ -8,6 +8,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Support\Env;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Str;
 use Orchestra\Testbench\TestCase;
@@ -17,32 +18,33 @@ use Orchestra\Testbench\TestCase;
  */
 class DynamoBatchTest extends TestCase
 {
-    const DYNAMODB_ENDPOINT = 'http://localhost:8888';
-
-    protected function getEnvironmentSetUp($app)
+    public function setUp(): void
     {
+        $this->afterApplicationCreated(function () {
+            BatchRunRecorder::reset();
+            app(DynamoBatchRepository::class)->createAwsDynamoTable();
+        });
+
+        $this->beforeApplicationDestroyed(function () {
+            app(DynamoBatchRepository::class)->deleteAwsDynamoTable();
+        });
+
+        parent::setUp();
+    }
+
+    protected function defineEnvironment($app)
+    {
+        if (is_null($endpoint = Env::get('DYNAMODB_ENDPOINT'))) {
+            $this->markTestSkipped('Require `dynamodb` to be configured');
+        }
+
         $app['config']->set('queue.batching', [
             'driver' => 'dynamodb',
             'region' => 'us-west-2',
-            'endpoint' => static::DYNAMODB_ENDPOINT,
+            'endpoint' => $endpoint,
             'key' => 'key',
             'secret' => 'secret',
         ]);
-    }
-
-    public function setUp(): void
-    {
-        parent::setUp();
-
-        BatchRunRecorder::reset();
-        app(DynamoBatchRepository::class)->createAwsDynamoTable();
-    }
-
-    public function tearDown(): void
-    {
-        app(DynamoBatchRepository::class)->deleteAwsDynamoTable();
-
-        parent::tearDown();
     }
 
     public function test_running_a_batch()
