@@ -421,6 +421,18 @@ class BusFake implements Fake, QueueingDispatcher
                             ! $chain[$index]($chainedBatch->toPendingBatch())) {
                             return false;
                         }
+                    } elseif ($chain[$index] instanceof Closure) {
+                        [$expectedType, $callback] = [$this->firstClosureParameterType($chain[$index]), $chain[$index]];
+
+                        $chainedJob = unserialize($serializedChainedJob);
+
+                        if (! $chainedJob instanceof $expectedType) {
+                            throw new RuntimeException('The chained job was expected to be of type '.$expectedType.', '.$chainedJob::class.' chained.');
+                        }
+
+                        if (! $callback($chainedJob)) {
+                            return false;
+                        }
                     } elseif (is_string($chain[$index])) {
                         if ($chain[$index] != get_class(unserialize($serializedChainedJob))) {
                             return false;

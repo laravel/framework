@@ -4,15 +4,18 @@ namespace Illuminate\Queue;
 
 use Illuminate\Contracts\Queue\Queue as QueueContract;
 use Illuminate\Queue\Jobs\BeanstalkdJob;
-use Pheanstalk\Job as PheanstalkJob;
+use Pheanstalk\Contract\JobIdInterface;
 use Pheanstalk\Pheanstalk;
+use Pheanstalk\Values\Job;
+use Pheanstalk\Values\JobId;
+use Pheanstalk\Values\TubeName;
 
 class BeanstalkdQueue extends Queue implements QueueContract
 {
     /**
      * The Pheanstalk instance.
      *
-     * @var \Pheanstalk\Pheanstalk
+     * @var \Pheanstalk\Contract\PheanstalkManagerInterface&\Pheanstalk\Contract\PheanstalkPublisherInterface&\Pheanstalk\Contract\PheanstalkSubscriberInterface
      */
     protected $pheanstalk;
 
@@ -40,14 +43,14 @@ class BeanstalkdQueue extends Queue implements QueueContract
     /**
      * Create a new Beanstalkd queue instance.
      *
-     * @param  \Pheanstalk\Pheanstalk  $pheanstalk
+     * @param  \Pheanstalk\Contract\PheanstalkManagerInterface&\Pheanstalk\Contract\PheanstalkPublisherInterface&\Pheanstalk\Contract\PheanstalkSubscriberInterface  $pheanstalk
      * @param  string  $default
      * @param  int  $timeToRun
      * @param  int  $blockFor
      * @param  bool  $dispatchAfterCommit
      * @return void
      */
-    public function __construct(Pheanstalk $pheanstalk,
+    public function __construct($pheanstalk,
                                 $default,
                                 $timeToRun,
                                 $blockFor = 0,
@@ -68,9 +71,7 @@ class BeanstalkdQueue extends Queue implements QueueContract
      */
     public function size($queue = null)
     {
-        $queue = $this->getQueue($queue);
-
-        return (int) $this->pheanstalk->statsTube($queue)->current_jobs_ready;
+        return (int) $this->pheanstalk->statsTube(new TubeName($this->getQueue($queue)))->currentJobsReady;
     }
 
     /**
@@ -104,7 +105,9 @@ class BeanstalkdQueue extends Queue implements QueueContract
      */
     public function pushRaw($payload, $queue = null, array $options = [])
     {
-        return $this->pheanstalk->useTube($this->getQueue($queue))->put(
+        $this->pheanstalk->useTube(new TubeName($this->getQueue($queue)));
+
+        return $this->pheanstalk->put(
             $payload, Pheanstalk::DEFAULT_PRIORITY, Pheanstalk::DEFAULT_DELAY, $this->timeToRun
         );
     }
@@ -126,7 +129,9 @@ class BeanstalkdQueue extends Queue implements QueueContract
             $queue,
             $delay,
             function ($payload, $queue, $delay) {
-                return $this->pheanstalk->useTube($this->getQueue($queue))->put(
+                $this->pheanstalk->useTube(new TubeName($this->getQueue($queue)));
+
+                return $this->pheanstalk->put(
                     $payload,
                     Pheanstalk::DEFAULT_PRIORITY,
                     $this->secondsUntil($delay),
@@ -165,9 +170,11 @@ class BeanstalkdQueue extends Queue implements QueueContract
     {
         $queue = $this->getQueue($queue);
 
-        $job = $this->pheanstalk->watchOnly($queue)->reserveWithTimeout($this->blockFor);
+        $this->pheanstalk->watch(new TubeName($queue));
 
-        if ($job instanceof PheanstalkJob) {
+        $job = $this->pheanstalk->reserveWithTimeout($this->blockFor);
+
+        if ($job instanceof JobIdInterface) {
             return new BeanstalkdJob(
                 $this->container, $this->pheanstalk, $job, $this->connectionName, $queue
             );
@@ -183,9 +190,9 @@ class BeanstalkdQueue extends Queue implements QueueContract
      */
     public function deleteMessage($queue, $id)
     {
-        $queue = $this->getQueue($queue);
+        $this->pheanstalk->useTube(new TubeName($this->getQueue($queue)));
 
-        $this->pheanstalk->useTube($queue)->delete(new PheanstalkJob($id, ''));
+        $this->pheanstalk->delete(new Job(new JobId($id), ''));
     }
 
     /**
@@ -202,7 +209,7 @@ class BeanstalkdQueue extends Queue implements QueueContract
     /**
      * Get the underlying Pheanstalk instance.
      *
-     * @return \Pheanstalk\Pheanstalk
+     * @return \Pheanstalk\Contract\PheanstalkManagerInterface&\Pheanstalk\Contract\PheanstalkPublisherInterface&\Pheanstalk\Contract\PheanstalkSubscriberInterface
      */
     public function getPheanstalk()
     {

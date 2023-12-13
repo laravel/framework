@@ -931,14 +931,10 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         $post->tags()->touch();
 
         foreach ($post->tags()->pluck('tags.updated_at') as $date) {
-            if ($this->driver === 'sqlsrv') {
-                $this->assertSame('2017-10-10 10:10:10.000', $date);
-            } else {
-                $this->assertSame('2017-10-10 10:10:10', $date);
-            }
+            $this->assertSame('2017-10-10 10:10:10', $date->toDateTimeString());
         }
 
-        $this->assertNotSame('2017-10-10 10:10:10', Tag::find(2)->updated_at);
+        $this->assertNotSame('2017-10-10 10:10:10', Tag::find(2)->updated_at?->toDateTimeString());
     }
 
     public function testWherePivotOnString()

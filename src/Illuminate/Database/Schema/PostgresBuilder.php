@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Schema;
 
 use Illuminate\Database\Concerns\ParsesSearchPath;
+use InvalidArgumentException;
 
 class PostgresBuilder extends Builder
 {
@@ -44,13 +45,30 @@ class PostgresBuilder extends Builder
      */
     public function hasTable($table)
     {
-        [$database, $schema, $table] = $this->parseSchemaAndTable($table);
+        [$schema, $table] = $this->parseSchemaAndTable($table);
 
         $table = $this->connection->getTablePrefix().$table;
 
-        return count($this->connection->selectFromWriteConnection(
-            $this->grammar->compileTableExists(), [$database, $schema, $table]
-        )) > 0;
+        foreach ($this->getTables() as $value) {
+            if (strtolower($table) === strtolower($value['name'])
+                && strtolower($schema) === strtolower($value['schema'])) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Get the user-defined types that belong to the database.
+     *
+     * @return array
+     */
+    public function getTypes()
+    {
+        return $this->connection->getPostProcessor()->processTypes(
+            $this->connection->selectFromWriteConnection($this->grammar->compileTypes())
+        );
     }
 
     /**
@@ -151,6 +169,8 @@ class PostgresBuilder extends Builder
     /**
      * Get all of the type names for the database.
      *
+     * @deprecated Will be removed in a future Laravel version.
+     *
      * @return array
      */
     public function getAllTypes()
@@ -168,20 +188,27 @@ class PostgresBuilder extends Builder
     public function dropAllTypes()
     {
         $types = [];
+        $domains = [];
 
-        foreach ($this->getAllTypes() as $row) {
-            $row = (array) $row;
+        $schemas = $this->grammar->escapeNames($this->getSchemas());
 
-            $types[] = reset($row);
+        foreach ($this->getTypes() as $type) {
+            if (! $type['implicit'] && in_array($this->grammar->escapeNames([$type['schema']])[0], $schemas)) {
+                if ($type['type'] === 'domain') {
+                    $domains[] = $type['schema'].'.'.$type['name'];
+                } else {
+                    $types[] = $type['schema'].'.'.$type['name'];
+                }
+            }
         }
 
-        if (empty($types)) {
-            return;
+        if (! empty($types)) {
+            $this->connection->statement($this->grammar->compileDropAllTypes($types));
         }
 
-        $this->connection->statement(
-            $this->grammar->compileDropAllTypes($types)
-        );
+        if (! empty($domains)) {
+            $this->connection->statement($this->grammar->compileDropAllDomains($domains));
+        }
     }
 
     /**
@@ -192,12 +219,12 @@ class PostgresBuilder extends Builder
      */
     public function getColumns($table)
     {
-        [$database, $schema, $table] = $this->parseSchemaAndTable($table);
+        [$schema, $table] = $this->parseSchemaAndTable($table);
 
         $table = $this->connection->getTablePrefix().$table;
 
         $results = $this->connection->selectFromWriteConnection(
-            $this->grammar->compileColumns($database, $schema, $table)
+            $this->grammar->compileColumns($schema, $table)
         );
 
         return $this->connection->getPostProcessor()->processColumns($results);
@@ -211,12 +238,29 @@ class PostgresBuilder extends Builder
      */
     public function getIndexes($table)
     {
-        [, $schema, $table] = $this->parseSchemaAndTable($table);
+        [$schema, $table] = $this->parseSchemaAndTable($table);
 
         $table = $this->connection->getTablePrefix().$table;
 
         return $this->connection->getPostProcessor()->processIndexes(
             $this->connection->selectFromWriteConnection($this->grammar->compileIndexes($schema, $table))
+        );
+    }
+
+    /**
+     * Get the foreign keys for a given table.
+     *
+     * @param  string  $table
+     * @return array
+     */
+    public function getForeignKeys($table)
+    {
+        [$schema, $table] = $this->parseSchemaAndTable($table);
+
+        $table = $this->connection->getTablePrefix().$table;
+
+        return $this->connection->getPostProcessor()->processForeignKeys(
+            $this->connection->selectFromWriteConnection($this->grammar->compileForeignKeys($schema, $table))
         );
     }
 
@@ -233,7 +277,7 @@ class PostgresBuilder extends Builder
     }
 
     /**
-     * Parse the database object reference and extract the database, schema, and table.
+     * Parse the database object reference and extract the schema and table.
      *
      * @param  string  $reference
      * @return array
@@ -242,14 +286,10 @@ class PostgresBuilder extends Builder
     {
         $parts = explode('.', $reference);
 
-        $database = $this->connection->getConfig('database');
-
-        // If the reference contains a database name, we will use that instead of the
-        // default database name for the connection. This allows the database name
-        // to be specified in the query instead of at the full connection level.
-        if (count($parts) === 3) {
+        if (count($parts) > 2) {
             $database = $parts[0];
-            array_shift($parts);
+
+            throw new InvalidArgumentException("Using 3-parts reference is not supported, you may use `Schema::connection('$database')` instead.");
         }
 
         // We will use the default schema unless the schema has been specified in the
@@ -262,7 +302,7 @@ class PostgresBuilder extends Builder
             array_shift($parts);
         }
 
-        return [$database, $schema, $parts[0]];
+        return [$schema, $parts[0]];
     }
 
     /**

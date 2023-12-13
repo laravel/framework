@@ -107,7 +107,7 @@
         "mockery/mockery": "^1.5.1",
         "nyholm/psr7": "^1.2",
         "orchestra/testbench-core": "^9.0",
-        "pda/pheanstalk": "^4.0",
+        "pda/pheanstalk": "^5.0",
         "phpstan/phpstan": "^1.4.7",
         "phpunit/phpunit": "^10.1",
         "predis/predis": "^2.0.2",
