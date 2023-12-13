@@ -37,7 +37,7 @@ class BeanstalkdConnector implements ConnectorInterface
         return Pheanstalk::create(
             $config['host'],
             $config['port'] ?? SocketFactoryInterface::DEFAULT_PORT,
-            new Timeout($config['timeout'] ?? 10), /** @see \Pheanstalk\SocketFactory::DEFAULT_TIMEOUT  */
+            isset($config['timeout']) ? new Timeout($config['timeout']) : null,
         );
     }
 }
