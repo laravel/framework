@@ -1748,6 +1748,83 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertNull($freshNotStoredUser);
     }
 
+    public function testFreshMethodOnModelPreservesSpecifiedColumns()
+    {
+        $now = Carbon::now()->startOfSecond();
+        $nowSerialized = $now->toJSON();
+        $nowWithFractionsSerialized = $now->toJSON();
+        Carbon::setTestNow($now);
+
+        $storedUser1 = EloquentTestUser::create([
+            'id' => 1,
+            'email' => 'taylorotwell@gmail.com',
+            'birthday' => $now,
+        ]);
+        $storedUser1->newQuery()->update([
+            'email' => 'dev@mathieutu.ovh',
+            'name' => 'Mathieu TUDISCO',
+        ]);
+        $freshStoredUser1 = $storedUser1->fresh(columns: [
+            'id',
+            'email',
+            'name',
+        ]);
+
+        $storedUser2 = EloquentTestUser::create([
+            'id' => 2,
+            'email' => 'taylorotwell@gmail.com',
+            'birthday' => $now,
+        ]);
+        $storedUser2->newQuery()->update(['email' => 'dev@mathieutu.ovh']);
+        $freshStoredUser2 = $storedUser2->fresh(columns: [
+            'id',
+            'email',
+            'name',
+        ]);
+
+        $notStoredUser = new EloquentTestUser([
+            'id' => 3,
+            'email' => 'taylorotwell@gmail.com',
+            'birthday' => $now,
+        ]);
+        $freshNotStoredUser = $notStoredUser->fresh();
+
+        $this->assertEquals([
+            'id' => 1,
+            'email' => 'taylorotwell@gmail.com',
+            'birthday' => $nowWithFractionsSerialized,
+            'created_at' => $nowSerialized,
+            'updated_at' => $nowSerialized,
+        ], $storedUser1->toArray());
+        $this->assertEquals([
+            'id' => 1,
+            'name' => 'Mathieu TUDISCO',
+            'email' => 'dev@mathieutu.ovh',
+        ], $freshStoredUser1->toArray());
+        $this->assertInstanceOf(EloquentTestUser::class, $storedUser1);
+
+        $this->assertEquals([
+            'id' => 2,
+            'email' => 'taylorotwell@gmail.com',
+            'birthday' => $nowWithFractionsSerialized,
+            'created_at' => $nowSerialized,
+            'updated_at' => $nowSerialized,
+        ], $storedUser2->toArray());
+        $this->assertEquals([
+            'id' => 2,
+            'name' => null,
+            'email' => 'dev@mathieutu.ovh',
+        ], $freshStoredUser2->toArray());
+        $this->assertInstanceOf(EloquentTestUser::class, $storedUser2);
+
+        $this->assertEquals([
+            'id' => 3,
+            'email' => 'taylorotwell@gmail.com',
+            'birthday' => $nowWithFractionsSerialized,
+        ], $notStoredUser->toArray());
+        $this->assertNull($freshNotStoredUser);
+    }
+
     public function testFreshMethodOnCollection()
     {
         EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
@@ -1768,6 +1845,28 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertCount(2, $refreshedUsers);
         $this->assertSame('Mathieu TUDISCO', $refreshedUsers[0]->name);
         $this->assertSame('dev@mathieutu.ovh', $refreshedUsers[1]->email);
+    }
+
+    public function testFreshMethodOnCollectionPreservesSpecifiedColumns()
+    {
+        EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+        EloquentTestUser::create(['id' => 2, 'email' => 'taylorotwell@gmail.com']);
+
+        $users = EloquentTestUser::all()
+            ->add(new EloquentTestUser(['id' => 3, 'email' => 'taylorotwell@gmail.com']));
+
+        EloquentTestUser::find(1)->update(['name' => 'Mathieu TUDISCO']);
+        EloquentTestUser::find(2)->update(['email' => 'dev@mathieutu.ovh']);
+
+        $this->assertCount(3, $users);
+        $this->assertNotSame('Mathieu TUDISCO', $users[0]->name);
+        $this->assertNotSame('dev@mathieutu.ovh', $users[1]->email);
+
+        $refreshedUsers = $users->fresh(columns: ['id']);
+
+        $this->assertCount(2, $refreshedUsers);
+        $this->assertNull($refreshedUsers[0]->name);
+        $this->assertNull($refreshedUsers[1]->email);
     }
 
     public function testTimestampsUsingDefaultDateFormat()

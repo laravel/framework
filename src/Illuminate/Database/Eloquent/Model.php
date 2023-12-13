@@ -1671,7 +1671,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      * @param  array|string  $with
      * @return static|null
      */
-    public function fresh($with = [])
+    public function fresh($with = [], $columns = ['*'])
     {
         if (! $this->exists) {
             return;
@@ -1680,7 +1680,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         return $this->setKeysForSelectQuery($this->newQueryWithoutScopes())
             ->useWritePdo()
             ->with(is_string($with) ? func_get_args() : $with)
-            ->first();
+            ->first($columns);
     }
 
     /**
