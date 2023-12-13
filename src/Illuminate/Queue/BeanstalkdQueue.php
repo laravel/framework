@@ -43,7 +43,7 @@ class BeanstalkdQueue extends Queue implements QueueContract
     /**
      * Create a new Beanstalkd queue instance.
      *
-     * @param  \Pheanstalk\Contract\PheanstalkManagerInterface&\Pheanstalk\Contract\PheanstalkPublisherInterface&\Pheanstalk\Contract\PheanstalkSubscriberInterface  $pheanstalk  $pheanstalk
+     * @param  \Pheanstalk\Contract\PheanstalkManagerInterface&\Pheanstalk\Contract\PheanstalkPublisherInterface&\Pheanstalk\Contract\PheanstalkSubscriberInterface  $pheanstalk
      * @param  string  $default
      * @param  int  $timeToRun
      * @param  int  $blockFor
