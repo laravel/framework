@@ -182,6 +182,33 @@ class SchemaBuilderTest extends DatabaseTestCase
         $this->assertEmpty(array_diff(['foo', 'bar', 'baz'], array_column($views, 'name')));
     }
 
+    public function testGetAndDropTypes()
+    {
+        if ($this->driver !== 'pgsql') {
+            $this->markTestSkipped('Test requires a PostgreSQL connection.');
+        }
+
+        DB::statement('create type pseudo_foo');
+        DB::statement('create type comp_foo as (f1 int, f2 text)');
+        DB::statement("create type enum_foo as enum ('new', 'open', 'closed')");
+        DB::statement('create type range_foo as range (subtype = float8)');
+        DB::statement('create domain domain_foo as text');
+
+        $types = Schema::getTypes();
+
+        $this->assertCount(11, $types);
+        $this->assertTrue(collect($types)->contains(fn ($type) => $type['name'] === 'pseudo_foo' && $type['type'] === 'pseudo' && ! $type['implicit']));
+        $this->assertTrue(collect($types)->contains(fn ($type) => $type['name'] === 'comp_foo' && $type['type'] === 'composite' && ! $type['implicit']));
+        $this->assertTrue(collect($types)->contains(fn ($type) => $type['name'] === 'enum_foo' && $type['type'] === 'enum' && ! $type['implicit']));
+        $this->assertTrue(collect($types)->contains(fn ($type) => $type['name'] === 'range_foo' && $type['type'] === 'range' && ! $type['implicit']));
+        $this->assertTrue(collect($types)->contains(fn ($type) => $type['name'] === 'domain_foo' && $type['type'] === 'domain' && ! $type['implicit']));
+
+        Schema::dropAllTypes();
+        $types = Schema::getTypes();
+
+        $this->assertEmpty($types);
+    }
+
     public function testGetIndexes()
     {
         Schema::create('foo', function (Blueprint $table) {
