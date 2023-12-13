@@ -103,8 +103,8 @@ trait ConfiguresPrompts
                             ->all();
                     }
 
-                    return collect($this->components->choice($prompt->label, ['' => 'None', ...$options], '', multiple: true))
-                        ->reject('')
+                    return collect($this->components->choice($prompt->label, ['none' => 'None', ...$options], 'none', multiple: true))
+                        ->reject('none')
                         ->values()
                         ->all();
                 }
