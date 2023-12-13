@@ -1,6 +1,11 @@
 # Release Notes for 10.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v10.36.0...10.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v10.37.1...10.x)
+
+## [v10.37.1](https://github.com/laravel/framework/compare/v10.36.0...v10.37.1) - 2023-12-12
+
+* [10.x] Disconnecting the database connection after testing by [@KentarouTakeda](https://github.com/KentarouTakeda) in https://github.com/laravel/framework/pull/49327
+* [10.x] Get user-defined types on PostgreSQL by [@hafezdivandari](https://github.com/hafezdivandari) in https://github.com/laravel/framework/pull/49303
 
 ## [v10.36.0](https://github.com/laravel/framework/compare/v10.37.0...v10.36.0) - 2023-12-12
 
