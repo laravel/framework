@@ -11,17 +11,9 @@ use Illuminate\Queue\CallQueuedHandler;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\Middleware\WithoutOverlapping;
 use Mockery as m;
-use Orchestra\Testbench\TestCase;
 
-class WithoutOverlappingJobsTest extends TestCase
+class WithoutOverlappingJobsTest extends QueueTestCase
 {
-    protected function tearDown(): void
-    {
-        parent::tearDown();
-
-        m::close();
-    }
-
     public function testNonOverlappingJobsAreExecuted()
     {
         OverlappingTestJob::$handled = false;

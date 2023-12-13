@@ -183,6 +183,33 @@ class SchemaBuilderTest extends DatabaseTestCase
         $this->assertEmpty(array_diff(['foo', 'bar', 'baz'], array_column($views, 'name')));
     }
 
+    public function testGetAndDropTypes()
+    {
+        if ($this->driver !== 'pgsql') {
+            $this->markTestSkipped('Test requires a PostgreSQL connection.');
+        }
+
+        DB::statement('create type pseudo_foo');
+        DB::statement('create type comp_foo as (f1 int, f2 text)');
+        DB::statement("create type enum_foo as enum ('new', 'open', 'closed')");
+        DB::statement('create type range_foo as range (subtype = float8)');
+        DB::statement('create domain domain_foo as text');
+
+        $types = Schema::getTypes();
+
+        $this->assertCount(11, $types);
+        $this->assertTrue(collect($types)->contains(fn ($type) => $type['name'] === 'pseudo_foo' && $type['type'] === 'pseudo' && ! $type['implicit']));
+        $this->assertTrue(collect($types)->contains(fn ($type) => $type['name'] === 'comp_foo' && $type['type'] === 'composite' && ! $type['implicit']));
+        $this->assertTrue(collect($types)->contains(fn ($type) => $type['name'] === 'enum_foo' && $type['type'] === 'enum' && ! $type['implicit']));
+        $this->assertTrue(collect($types)->contains(fn ($type) => $type['name'] === 'range_foo' && $type['type'] === 'range' && ! $type['implicit']));
+        $this->assertTrue(collect($types)->contains(fn ($type) => $type['name'] === 'domain_foo' && $type['type'] === 'domain' && ! $type['implicit']));
+
+        Schema::dropAllTypes();
+        $types = Schema::getTypes();
+
+        $this->assertEmpty($types);
+    }
+
     public function testGetIndexes()
     {
         Schema::create('foo', function (Blueprint $table) {
@@ -261,5 +288,52 @@ class SchemaBuilderTest extends DatabaseTestCase
         $this->assertCount(2, $indexes);
         $this->assertTrue(collect($indexes)->contains(fn ($index) => $index['columns'] === ['id'] && $index['primary']));
         $this->assertTrue(collect($indexes)->contains('name', 'articles_body_title_fulltext'));
+    }
+
+    public function testGetForeignKeys()
+    {
+        Schema::create('users', function (Blueprint $table) {
+            $table->id();
+        });
+
+        Schema::create('posts', function (Blueprint $table) {
+            $table->foreignId('user_id')->nullable()->constrained()->cascadeOnUpdate()->nullOnDelete();
+        });
+
+        $foreignKeys = Schema::getForeignKeys('posts');
+
+        $this->assertCount(1, $foreignKeys);
+        $this->assertTrue(collect($foreignKeys)->contains(
+            fn ($foreign) => $foreign['columns'] === ['user_id']
+                && $foreign['foreign_table'] === 'users' && $foreign['foreign_columns'] === ['id']
+                && $foreign['on_update'] === 'cascade' && $foreign['on_delete'] === 'set null'
+        ));
+    }
+
+    public function testGetCompoundForeignKeys()
+    {
+        Schema::create('parent', function (Blueprint $table) {
+            $table->id();
+            $table->integer('a');
+            $table->integer('b');
+
+            $table->unique(['b', 'a']);
+        });
+
+        Schema::create('child', function (Blueprint $table) {
+            $table->integer('c');
+            $table->integer('d');
+
+            $table->foreign(['d', 'c'], 'test_fk')->references(['b', 'a'])->on('parent');
+        });
+
+        $foreignKeys = Schema::getForeignKeys('child');
+
+        $this->assertCount(1, $foreignKeys);
+        $this->assertTrue(collect($foreignKeys)->contains(
+            fn ($foreign) => $foreign['columns'] === ['d', 'c']
+                && $foreign['foreign_table'] === 'parent'
+                && $foreign['foreign_columns'] === ['b', 'a']
+        ));
     }
 }

@@ -241,6 +241,14 @@ class Batch implements Arrayable, JsonSerializable
     {
         $counts = $this->decrementPendingJobs($jobId);
 
+        if ($this->hasProgressCallbacks()) {
+            $batch = $this->fresh();
+
+            collect($this->options['progress'])->each(function ($handler) use ($batch) {
+                $this->invokeHandlerCallback($handler, $batch);
+            });
+        }
+
         if ($counts->pendingJobs === 0) {
             $this->repository->markAsFinished($this->id);
         }
@@ -281,6 +289,16 @@ class Batch implements Arrayable, JsonSerializable
     public function finished()
     {
         return ! is_null($this->finishedAt);
+    }
+
+    /**
+     * Determine if the batch has "progress" callbacks.
+     *
+     * @return bool
+     */
+    public function hasProgressCallbacks()
+    {
+        return isset($this->options['progress']) && ! empty($this->options['progress']);
     }
 
     /**
@@ -326,6 +344,14 @@ class Batch implements Arrayable, JsonSerializable
 
         if ($counts->failedJobs === 1 && ! $this->allowsFailures()) {
             $this->cancel();
+        }
+
+        if ($this->hasProgressCallbacks() && $this->allowsFailures()) {
+            $batch = $this->fresh();
+
+            collect($this->options['progress'])->each(function ($handler) use ($batch, $e) {
+                $this->invokeHandlerCallback($handler, $batch, $e);
+            });
         }
 
         if ($counts->failedJobs === 1 && $this->hasCatchCallbacks()) {

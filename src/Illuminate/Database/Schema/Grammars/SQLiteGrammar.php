@@ -148,6 +148,23 @@ class SQLiteGrammar extends Grammar
     }
 
     /**
+     * Compile the query to determine the foreign keys.
+     *
+     * @param  string  $table
+     * @return string
+     */
+    public function compileForeignKeys($table)
+    {
+        return sprintf(
+            'select group_concat("from") as columns, "table" as foreign_table, '
+            .'group_concat("to") as foreign_columns, on_update, on_delete '
+            .'from (select * from pragma_foreign_key_list(%s) order by id desc, seq) '
+            .'group by id, "table", on_update, on_delete',
+            $this->wrap(str_replace('.', '__', $table))
+        );
+    }
+
+    /**
      * Compile a create table command.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint

@@ -87,7 +87,7 @@ class PostgresGrammar extends Grammar
     {
         return 'select c.relname as name, n.nspname as schema, pg_total_relation_size(c.oid) as size, '
             ."obj_description(c.oid, 'pg_class') as comment from pg_class c, pg_namespace n "
-            ."where c.relkind = 'r' and n.oid = c.relnamespace "
+            ."where c.relkind in ('r', 'p') and n.oid = c.relnamespace and n.nspname not in ('pg_catalog', 'information_schema')"
             .'order by c.relname';
     }
 
@@ -98,7 +98,24 @@ class PostgresGrammar extends Grammar
      */
     public function compileViews()
     {
-        return 'select viewname as name, schemaname as schema, definition from pg_views order by viewname';
+        return "select viewname as name, schemaname as schema, definition from pg_views where schemaname not in ('pg_catalog', 'information_schema') order by viewname";
+    }
+
+    /**
+     * Compile the query to determine the user-defined types.
+     *
+     * @return string
+     */
+    public function compileTypes()
+    {
+        return 'select t.typname as name, n.nspname as schema, t.typtype as type, t.typcategory as category, '
+            ."((t.typinput = 'array_in'::regproc and t.typoutput = 'array_out'::regproc) or t.typtype = 'm') as implicit "
+            .'from pg_type t join pg_namespace n on n.oid = t.typnamespace '
+            .'left join pg_class c on c.oid = t.typrelid '
+            .'left join pg_type el on el.oid = t.typelem '
+            .'left join pg_class ce on ce.oid = el.typrelid '
+            ."where ((t.typrelid = 0 and (ce.relkind = 'c' or ce.relkind is null)) or c.relkind = 'c') "
+            ."and n.nspname not in ('pg_catalog', 'information_schema')";
     }
 
     /**
@@ -184,6 +201,36 @@ class PostgresGrammar extends Grammar
             .'left join pg_attribute a on a.attrelid = i.indrelid and a.attnum = indseq.num '
             .'where tc.relname = %s and tn.nspname = %s '
             .'group by ic.relname, am.amname, i.indisunique, i.indisprimary',
+            $this->quoteString($table),
+            $this->quoteString($schema)
+        );
+    }
+
+    /**
+     * Compile the query to determine the foreign keys.
+     *
+     * @param  string  $schema
+     * @param  string  $table
+     * @return string
+     */
+    public function compileForeignKeys($schema, $table)
+    {
+        return sprintf(
+            'select c.conname as name, '
+            ."string_agg(la.attname, ',' order by conseq.ord) as columns, "
+            .'fn.nspname as foreign_schema, fc.relname as foreign_table, '
+            ."string_agg(fa.attname, ',' order by conseq.ord) as foreign_columns, "
+            .'c.confupdtype as on_update, c.confdeltype as on_delete '
+            .'from pg_constraint c '
+            .'join pg_class tc on c.conrelid = tc.oid '
+            .'join pg_namespace tn on tn.oid = tc.relnamespace '
+            .'join pg_class fc on c.confrelid = fc.oid '
+            .'join pg_namespace fn on fn.oid = fc.relnamespace '
+            .'join lateral unnest(c.conkey) with ordinality as conseq(num, ord) on true '
+            .'join pg_attribute la on la.attrelid = c.conrelid and la.attnum = conseq.num '
+            .'join pg_attribute fa on fa.attrelid = c.confrelid and fa.attnum = c.confkey[conseq.ord] '
+            ."where c.contype = 'f' and tc.relname = %s and tn.nspname = %s "
+            .'group by c.conname, fn.nspname, fc.relname, c.confupdtype, c.confdeltype',
             $this->quoteString($table),
             $this->quoteString($schema)
         );
@@ -474,7 +521,20 @@ class PostgresGrammar extends Grammar
     }
 
     /**
+     * Compile the SQL needed to drop all domains.
+     *
+     * @param  array  $domains
+     * @return string
+     */
+    public function compileDropAllDomains($domains)
+    {
+        return 'drop domain '.implode(',', $this->escapeNames($domains)).' cascade';
+    }
+
+    /**
      * Compile the SQL needed to retrieve all type names.
+     *
+     * @deprecated Will be removed in a future Laravel version.
      *
      * @return string
      */
