@@ -31,6 +31,7 @@ use Illuminate\Database\Eloquent\Casts\AsEnumCollection;
 use Illuminate\Database\Eloquent\Casts\AsStringable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use RuntimeException;
 
@@ -44,13 +45,6 @@ class RealTimeFactory extends Factory
      * @var \Illuminate\Database\Eloquent\Model
      */
     protected $modelInstance;
-
-    /**
-     * The database schema manager for the model.
-     *
-     * @var \Doctrine\DBAL\Schema\AbstractSchemaManager
-     */
-    protected $schema;
 
     /**
      * The table name for the model.
@@ -85,7 +79,6 @@ class RealTimeFactory extends Factory
         $modelName = $this->modelName();
         $this->modelInstance = new $modelName;
         $connection = $this->modelInstance->getConnection();
-        $this->schema = $connection->getDoctrineSchemaManager();
         $this->table = $this->modelInstance->getConnection()->getTablePrefix().$this->modelInstance->getTable();
         $this->registerTypeMappings($connection->getDoctrineConnection()->getDatabasePlatform());
 
@@ -130,7 +123,7 @@ class RealTimeFactory extends Factory
      */
     protected function getColumnsFromModel(): Collection
     {
-        $columns = $this->schema->listTableColumns($this->table);
+        $columns = Schema::getColumns($this->table);
 
         return collect($columns)->keyBy(fn ($column) => $column->getName());
     }
@@ -156,7 +149,7 @@ class RealTimeFactory extends Factory
      */
     protected function isForeignKey(Column $column): bool
     {
-        return collect($this->schema->listTableForeignKeys($this->table))
+        return collect(Schema::getForeignKeys($this->table))
             ->filter(fn ($foreignKey) => in_array($column->getName(), $foreignKey->getLocalColumns()))
             ->isNotEmpty();
     }
@@ -166,7 +159,7 @@ class RealTimeFactory extends Factory
      */
     protected function isPrimaryKey(Column $column): bool
     {
-        return collect($this->schema->listTableIndexes($this->table))
+        return collect(Schema::getIndexes($this->table))
             ->some(fn (Index $index) => $index->isPrimary() && in_array($column->getName(), $index->getColumns()));
     }
 
