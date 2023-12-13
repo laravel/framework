@@ -71,6 +71,8 @@ class PostgresGrammar extends Grammar
     /**
      * Compile the query to determine if a table exists.
      *
+     * @deprecated Will be removed in a future Laravel version.
+     *
      * @return string
      */
     public function compileTableExists()
@@ -160,12 +162,11 @@ class PostgresGrammar extends Grammar
     /**
      * Compile the query to determine the columns.
      *
-     * @param  string  $database
      * @param  string  $schema
      * @param  string  $table
      * @return string
      */
-    public function compileColumns($database, $schema, $table)
+    public function compileColumns($schema, $table)
     {
         return sprintf(
             'select quote_ident(a.attname) as name, t.typname as type_name, format_type(a.atttypid, a.atttypmod) as type, '
