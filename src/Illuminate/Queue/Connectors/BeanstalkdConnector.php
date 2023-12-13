@@ -3,7 +3,6 @@
 namespace Illuminate\Queue\Connectors;
 
 use Illuminate\Queue\BeanstalkdQueue;
-use Pheanstalk\Contract\PheanstalkPublisherInterface;
 use Pheanstalk\Contract\SocketFactoryInterface;
 use Pheanstalk\Pheanstalk;
 use Pheanstalk\Values\Timeout;
