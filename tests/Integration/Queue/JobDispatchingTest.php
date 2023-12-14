@@ -8,19 +8,26 @@ use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
-use Orchestra\Testbench\TestCase;
+use Orchestra\Testbench\Attributes\WithMigration;
 
-class JobDispatchingTest extends TestCase
+#[WithMigration('queue')]
+class JobDispatchingTest extends QueueTestCase
 {
-    protected function tearDown(): void
+    protected function setUp(): void
     {
-        Job::$ran = false;
-        Job::$value = null;
+        $this->beforeApplicationDestroyed(function () {
+            Job::$ran = false;
+            Job::$value = null;
+        });
+
+        parent::setUp();
     }
 
     public function testJobCanUseCustomMethodsAfterDispatch()
     {
         Job::dispatch('test')->replaceValue('new-test');
+
+        $this->runQueueWorkerCommand(['--stop-when-empty' => true]);
 
         $this->assertTrue(Job::$ran);
         $this->assertSame('new-test', Job::$value);
@@ -30,10 +37,14 @@ class JobDispatchingTest extends TestCase
     {
         Job::dispatchIf(false, 'test')->replaceValue('new-test');
 
+        $this->runQueueWorkerCommand(['--stop-when-empty' => true]);
+
         $this->assertFalse(Job::$ran);
         $this->assertNull(Job::$value);
 
         Job::dispatchIf(true, 'test')->replaceValue('new-test');
+
+        $this->runQueueWorkerCommand(['--stop-when-empty' => true]);
 
         $this->assertTrue(Job::$ran);
         $this->assertSame('new-test', Job::$value);
@@ -43,9 +54,13 @@ class JobDispatchingTest extends TestCase
     {
         Job::dispatchIf(fn ($job) => $job instanceof Job ? 0 : 1, 'test')->replaceValue('new-test');
 
+        $this->runQueueWorkerCommand(['--stop-when-empty' => true]);
+
         $this->assertFalse(Job::$ran);
 
         Job::dispatchIf(fn ($job) => $job instanceof Job ? 1 : 0, 'test')->replaceValue('new-test');
+
+        $this->runQueueWorkerCommand(['--stop-when-empty' => true]);
 
         $this->assertTrue(Job::$ran);
     }
@@ -54,10 +69,14 @@ class JobDispatchingTest extends TestCase
     {
         Job::dispatchUnless(true, 'test')->replaceValue('new-test');
 
+        $this->runQueueWorkerCommand(['--stop-when-empty' => true]);
+
         $this->assertFalse(Job::$ran);
         $this->assertNull(Job::$value);
 
         Job::dispatchUnless(false, 'test')->replaceValue('new-test');
+
+        $this->runQueueWorkerCommand(['--stop-when-empty' => true]);
 
         $this->assertTrue(Job::$ran);
         $this->assertSame('new-test', Job::$value);
@@ -67,9 +86,13 @@ class JobDispatchingTest extends TestCase
     {
         Job::dispatchUnless(fn ($job) => $job instanceof Job ? 1 : 0, 'test')->replaceValue('new-test');
 
+        $this->runQueueWorkerCommand(['--stop-when-empty' => true]);
+
         $this->assertFalse(Job::$ran);
 
         Job::dispatchUnless(fn ($job) => $job instanceof Job ? 0 : 1, 'test')->replaceValue('new-test');
+
+        $this->runQueueWorkerCommand(['--stop-when-empty' => true]);
 
         $this->assertTrue(Job::$ran);
     }
