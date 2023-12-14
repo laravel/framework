@@ -26,6 +26,13 @@ class Composer
     protected $workingPath;
 
     /**
+     * The PSR-4 namespaces.
+     *
+     * @var array<string, string> Keys are namespaces, values are directories.
+     */
+    protected array $namespaces;
+
+    /**
      * Create a new Composer manager instance.
      *
      * @param  \Illuminate\Filesystem\Filesystem  $files
@@ -48,7 +55,7 @@ class Composer
      */
     protected function hasPackage($package)
     {
-        $composer = json_decode(file_get_contents($this->findComposerFile()), true);
+        $composer = $this->getConfig();
 
         return array_key_exists($package, $composer['require'] ?? [])
             || array_key_exists($package, $composer['require-dev'] ?? []);
@@ -115,21 +122,17 @@ class Composer
     /**
      * Modify the "composer.json" file contents using the given callback.
      *
-     * @param  callable(array):array  $callback
+     * @param  callable(array<string, mixed>):array<string, mixed>  $callback
      * @return void
      *
      * @throw \RuntimeException
      */
     public function modify(callable $callback)
     {
-        $composerFile = $this->findComposerFile();
-
-        $composer = json_decode(file_get_contents($composerFile), true, 512, JSON_THROW_ON_ERROR);
-
         file_put_contents(
-            $composerFile,
+            $this->findComposerFile(),
             json_encode(
-                call_user_func($callback, $composer),
+                call_user_func($callback, $this->getConfig()),
                 JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
             )
         );
@@ -138,7 +141,7 @@ class Composer
     /**
      * Regenerate the Composer autoloader files.
      *
-     * @param  string|array  $extra
+     * @param  string|array<int, string>  $extra
      * @param  string|null  $composerBinary
      * @return int
      */
@@ -166,7 +169,7 @@ class Composer
      * Get the Composer binary / command for the environment.
      *
      * @param  string|null  $composerBinary
-     * @return array
+     * @return array<int, string>
      */
     public function findComposer($composerBinary = null)
     {
@@ -252,5 +255,39 @@ class Composer
         }
 
         return explode(' ', $output)[2] ?? null;
+    }
+
+    /**
+     * Get the current Composer config.
+     *
+     * @return array<string, mixed>
+     */
+    public function getConfig(): array
+    {
+        return json_decode(
+            json: file_get_contents($this->findComposerFile()),
+            associative: true,
+            depth: 512,
+            flags: JSON_THROW_ON_ERROR,
+        );
+    }
+
+    /**
+     * Get the Composer PSR-4 namespaces.
+     *
+     * @return array<string, string> Keys are namespaces, values are directories.
+     */
+    public function getNamespaces(): array
+    {
+        if (! isset($this->namespaces)) {
+            $config = $this->getConfig();
+
+            $this->namespaces = [
+                ...Arr::get($config, 'autoload.psr-4', []),
+                ...Arr::get($config, 'autoload-dev.psr-4', []),
+            ];
+        }
+
+        return $this->namespaces;
     }
 }
