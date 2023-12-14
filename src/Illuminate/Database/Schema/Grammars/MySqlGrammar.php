@@ -222,10 +222,19 @@ class MySqlGrammar extends Grammar
      */
     protected function compileCreateTable($blueprint, $command, $connection)
     {
+        $tableStructure = $this->getColumns($blueprint);
+
+        if ($primaryKey = $this->getCommandByName($blueprint, 'primary')) {
+            $tableStructure[] = $this->compilePrimary($blueprint, $primaryKey);
+
+            // This to avoid altering the primary key again
+            unset($primaryKey['name']);
+        }
+
         return sprintf('%s table %s (%s)',
             $blueprint->temporary ? 'create temporary' : 'create',
             $this->wrapTable($blueprint),
-            implode(', ', $this->getColumns($blueprint))
+            implode(', ', $tableStructure)
         );
     }
 
@@ -368,6 +377,13 @@ class MySqlGrammar extends Grammar
      */
     public function compilePrimary(Blueprint $blueprint, Fluent $command)
     {
+        if ($blueprint->creating()) {
+            return sprintf('primary key %s(%s)',
+                $command->algorithm ? 'using ' . $command->algorithm : '',
+                $this->columnize($command->columns)
+            );
+        }
+
         return sprintf('alter table %s add primary key %s(%s)',
             $this->wrapTable($blueprint),
             $command->algorithm ? 'using '.$command->algorithm : '',
