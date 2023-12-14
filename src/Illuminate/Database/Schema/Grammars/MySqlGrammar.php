@@ -251,13 +251,13 @@ class MySqlGrammar extends Grammar
         $tableStructure = $this->getColumns($blueprint);
 
         if ($primaryKey = $this->getCommandByName($blueprint, 'primary')) {
-            $tableStructure[] = sprintf('primary key %s(%s)',
+            $tableStructure[] = sprintf(
+                'primary key %s(%s)',
                 $primaryKey->algorithm ? 'using '.$primaryKey->algorithm : '',
                 $this->columnize($primaryKey->columns)
             );
 
-            // Prevents redundant alteration of the primary key.
-            unset($primaryKey['name']);
+            $primaryKey->shouldBeSkipped = true;
         }
 
         return sprintf('%s table %s (%s)',
