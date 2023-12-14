@@ -111,13 +111,15 @@ class Arr
     {
         $results = [];
 
-        array_walk($array, function ($value, $key) use (&$results, $prepend) {
+        foreach ($array as $key => $value) {
             if (is_array($value) && !empty($value)) {
-              $results += static::dot($value, $prepend . $key . ".");
+                // the key of an array is always unique, so we can use array union operator (+)
+                // which is faster than array_merge() function.
+                $results += static::dot($value, $prepend . $key . ".");
             } else {
-              $results[$prepend . $key] = $value;
+                $results[$prepend . $key] = $value;
             }
-        });
+        };
 
         return $results;
     }
