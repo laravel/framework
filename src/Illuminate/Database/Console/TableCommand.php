@@ -212,7 +212,7 @@ class TableCommand extends DatabaseInspectionCommand
             $columns->each(function ($column) {
                 $this->components->twoColumnDetail(
                     $column['column'].' <fg=gray>'.$column['attributes']->implode(', ').'</>',
-                    ($column['default'] ? '<fg=gray>'.$column['default'].'</> ' : '').''.$column['type'].''
+                    (! is_null($column['default']) ? '<fg=gray>'.$column['default'].'</> ' : '').''.$column['type'].''
                 );
             });
 
