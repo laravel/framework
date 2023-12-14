@@ -253,7 +253,7 @@ class MySqlGrammar extends Grammar
         if ($primaryKey = $this->getCommandByName($blueprint, 'primary')) {
             $tableStructure[] = $this->compilePrimary($blueprint, $primaryKey);
 
-            // This to avoid altering the primary key again
+            // Prevents redundant alteration of the primary key.
             unset($primaryKey['name']);
         }
 
