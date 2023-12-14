@@ -405,7 +405,7 @@ class MySqlGrammar extends Grammar
     {
         if ($blueprint->creating()) {
             return sprintf('primary key %s(%s)',
-                $command->algorithm ? 'using ' . $command->algorithm : '',
+                $command->algorithm ? 'using '.$command->algorithm : '',
                 $this->columnize($command->columns)
             );
         }
