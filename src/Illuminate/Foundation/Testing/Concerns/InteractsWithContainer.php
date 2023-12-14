@@ -115,7 +115,7 @@ trait InteractsWithContainer
 
         $this->swap(Vite::class, new class extends Vite
         {
-            public function __invoke($entrypoints, $buildDirectory = null)
+            public function __invoke($entrypoints, $buildDirectory = null, $assetsUrl = null)
             {
                 return new HtmlString('');
             }
