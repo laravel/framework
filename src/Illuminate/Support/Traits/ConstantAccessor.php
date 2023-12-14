@@ -22,5 +22,4 @@ trait ConstantAccessor
 
         return constant("$class::$name");
     }
-    
 }
