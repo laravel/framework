@@ -3,25 +3,26 @@
 namespace Illuminate\Database\Eloquent;
 
 use ArrayAccess;
-use Illuminate\Contracts\Broadcasting\HasBroadcastChannel;
-use Illuminate\Contracts\Queue\QueueableCollection;
-use Illuminate\Contracts\Queue\QueueableEntity;
-use Illuminate\Contracts\Routing\UrlRoutable;
-use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Contracts\Support\CanBeEscapedWhenCastToString;
+use LogicException;
+use JsonSerializable;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
+use Illuminate\Support\ConstantAccessor;
 use Illuminate\Contracts\Support\Jsonable;
+use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Support\Traits\ForwardsCalls;
+use Illuminate\Contracts\Routing\UrlRoutable;
+use Illuminate\Contracts\Queue\QueueableEntity;
+use Illuminate\Database\Eloquent\Relations\Pivot;
+use Illuminate\Contracts\Queue\QueueableCollection;
+use Illuminate\Support\Collection as BaseCollection;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Contracts\Broadcasting\HasBroadcastChannel;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Database\Eloquent\Relations\Concerns\AsPivot;
+use Illuminate\Contracts\Support\CanBeEscapedWhenCastToString;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\Concerns\AsPivot;
-use Illuminate\Database\Eloquent\Relations\HasManyThrough;
-use Illuminate\Database\Eloquent\Relations\Pivot;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Collection as BaseCollection;
-use Illuminate\Support\Str;
-use Illuminate\Support\Traits\ForwardsCalls;
-use JsonSerializable;
-use LogicException;
 
 abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToString, HasBroadcastChannel, Jsonable, JsonSerializable, QueueableEntity, UrlRoutable
 {
@@ -33,7 +34,8 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         Concerns\HasUniqueIds,
         Concerns\HidesAttributes,
         Concerns\GuardsAttributes,
-        ForwardsCalls;
+        ForwardsCalls,
+        ConstantAccessor;
 
     /**
      * The connection name for the model.
