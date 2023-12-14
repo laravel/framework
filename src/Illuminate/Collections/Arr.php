@@ -111,13 +111,13 @@ class Arr
     {
         $results = [];
 
-        foreach ($array as $key => $value) {
-            if (is_array($value) && ! empty($value)) {
-                $results = array_merge($results, static::dot($value, $prepend.$key.'.'));
+        array_walk($array, function ($value, $key) use (&$results, $prepend) {
+            if (is_array($value) && !empty($value)) {
+              $results += static::dot($value, $prepend . $key . ".");
             } else {
-                $results[$prepend.$key] = $value;
+              $results[$prepend . $key] = $value;
             }
-        }
+        });
 
         return $results;
     }
