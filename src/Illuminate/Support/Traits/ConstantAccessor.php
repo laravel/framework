@@ -6,10 +6,10 @@ trait ConstantAccessor
 {
     /**
      * Access a constant of the class using the trait.
-     * 
+     *
      * @param  string  $name  The name of the constant to access.
      * @return mixed The value of the constant.
-     * 
+     *
      * @throws \ReflectionException If the constant does not exist or is not accessible.
      */
     public static function constant(string $name)
