@@ -251,7 +251,10 @@ class MySqlGrammar extends Grammar
         $tableStructure = $this->getColumns($blueprint);
 
         if ($primaryKey = $this->getCommandByName($blueprint, 'primary')) {
-            $tableStructure[] = $this->compilePrimary($blueprint, $primaryKey);
+            $tableStructure[] = sprintf('primary key %s(%s)',
+                $primaryKey->algorithm ? 'using '.$primaryKey->algorithm : '',
+                $this->columnize($primaryKey->columns)
+            );
 
             // Prevents redundant alteration of the primary key.
             unset($primaryKey['name']);
@@ -403,13 +406,6 @@ class MySqlGrammar extends Grammar
      */
     public function compilePrimary(Blueprint $blueprint, Fluent $command)
     {
-        if ($blueprint->creating()) {
-            return sprintf('primary key %s(%s)',
-                $command->algorithm ? 'using '.$command->algorithm : '',
-                $this->columnize($command->columns)
-            );
-        }
-
         return sprintf('alter table %s add primary key %s(%s)',
             $this->wrapTable($blueprint),
             $command->algorithm ? 'using '.$command->algorithm : '',
