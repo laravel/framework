@@ -1,6 +1,10 @@
 # Release Notes for 10.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v10.37.2...10.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v10.37.3...10.x)
+
+## [v10.37.3](https://github.com/laravel/framework/compare/v10.37.2...v10.37.3) - 2023-12-13
+
+* Flush middleware callbacks by [@taylorotwell](https://github.com/taylorotwell) in https://github.com/laravel/framework/commit/bb49a72c1a839b2b19d0fcea4e8b203a122454ef
 
 ## [v10.37.2](https://github.com/laravel/framework/compare/v10.37.1...v10.37.2) - 2023-12-13
 
