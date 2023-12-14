@@ -16,7 +16,7 @@ trait ReflectiveConstants
     {
         $class = static::class;
 
-        if (!defined("$class::$name")) {
+        if (! defined("$class::$name")) {
             throw new \ReflectionException("Constant $class::$name does not exist.");
         }
 
@@ -48,7 +48,7 @@ trait ReflectiveConstants
     {
         $class = static::class;
 
-        if (!defined("$class::$name")) {
+        if (! defined("$class::$name")) {
             throw new \ReflectionException("Constant $class::$name does not exist.");
         }
 
@@ -72,14 +72,14 @@ trait ReflectiveConstants
     /**
      * Get all constants of the class using the trait.
      *
-     * @return array Associative array with constant names as keys and their values.
+     * @return \stdClass An object with constant names as properties and their values.
      */
     public static function getAllConstants()
     {
         $class = static::class;
         $reflection = new \ReflectionClass($class);
 
-        return $reflection->getConstants();
+        return (object) $reflection->getConstants();
     }
 
     /**
