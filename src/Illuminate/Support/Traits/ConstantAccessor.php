@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Support;
+namespace Illuminate\Support\Traits;
 
 trait ConstantAccessor
 {
