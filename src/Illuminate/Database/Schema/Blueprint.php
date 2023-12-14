@@ -130,6 +130,10 @@ class Blueprint
         $this->ensureCommandsAreValid($connection);
 
         foreach ($this->commands as $command) {
+            if ($command->shouldBeSkipped) {
+                continue;
+            }
+
             $method = 'compile'.ucfirst($command->name);
 
             if (method_exists($grammar, $method) || $grammar::hasMacro($method)) {

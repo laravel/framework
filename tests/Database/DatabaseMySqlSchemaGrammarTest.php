@@ -46,6 +46,18 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
 
         $this->assertCount(1, $statements);
         $this->assertSame('alter table `users` add `id` int unsigned not null auto_increment primary key, add `email` varchar(255) not null', $statements[0]);
+
+        $blueprint = new Blueprint('users');
+        $blueprint->create();
+        $blueprint->uuid('id')->primary();
+
+        $conn = $this->getConnection();
+        $conn->shouldReceive('getConfig')->andReturn(null);
+
+        $statements = $blueprint->toSql($conn, $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('create table `users` (`id` char(36) not null, primary key (`id`))', $statements[0]);
     }
 
     public function testAutoIncrementStartingValue()
