@@ -113,6 +113,21 @@ class SupportArrTest extends TestCase
 
         $array = Arr::dot(['name' => 'taylor', 'languages' => ['php' => true]]);
         $this->assertEquals(['name' => 'taylor', 'languages.php' => true], $array);
+
+        $array = Arr::dot(['user' => ['name' => 'Taylor', 'age' => 25, 'languages' => ['PHP', 'C#']]]);
+        $this->assertEquals([
+            'user.name' => 'Taylor',
+            'user.age' => 25,
+            'user.languages.0' =>'PHP',
+            'user.languages.1' => 'C#'
+        ], $array);
+
+        $array = Arr::dot(['foo', 'foo' => ['bar' => 'baz', 'baz' => ['a' => 'b']]]);
+        $this->assertEquals([
+            'foo',
+            'foo.bar' => 'baz',
+            'foo.baz.a' => 'b'
+        ], $array);
     }
 
     public function testUndot()
