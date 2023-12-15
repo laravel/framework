@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Support;
 
 use ArrayObject;
+use Illuminate\Foundation\Console\ConfigShowCommand;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
@@ -100,22 +101,22 @@ class SupportArrTest extends TestCase
     public function testDot()
     {
         $array = Arr::dot(['foo' => ['bar' => 'baz']]);
-        $this->assertEquals(['foo.bar' => 'baz'], $array);
+        $this->assertSame(['foo.bar' => 'baz'], $array);
 
         $array = Arr::dot([]);
-        $this->assertEquals([], $array);
+        $this->assertSame([], $array);
 
         $array = Arr::dot(['foo' => []]);
-        $this->assertEquals(['foo' => []], $array);
+        $this->assertSame(['foo' => []], $array);
 
         $array = Arr::dot(['foo' => ['bar' => []]]);
-        $this->assertEquals(['foo.bar' => []], $array);
+        $this->assertSame(['foo.bar' => []], $array);
 
         $array = Arr::dot(['name' => 'taylor', 'languages' => ['php' => true]]);
-        $this->assertEquals(['name' => 'taylor', 'languages.php' => true], $array);
+        $this->assertSame(['name' => 'taylor', 'languages.php' => true], $array);
 
         $array = Arr::dot(['user' => ['name' => 'Taylor', 'age' => 25, 'languages' => ['PHP', 'C#']]]);
-        $this->assertEquals([
+        $this->assertSame([
             'user.name' => 'Taylor',
             'user.age' => 25,
             'user.languages.0' =>'PHP',
@@ -123,10 +124,18 @@ class SupportArrTest extends TestCase
         ], $array);
 
         $array = Arr::dot(['foo', 'foo' => ['bar' => 'baz', 'baz' => ['a' => 'b']]]);
-        $this->assertEquals([
+        $this->assertSame([
             'foo',
             'foo.bar' => 'baz',
             'foo.baz.a' => 'b',
+        ], $array);
+
+        $array = Arr::dot(['foo' => 'bar', 'empty_array' => [], 'user' => ['name' => 'Taylor'], 'key' => 'value']);
+        $this->assertSame([
+            'foo' => 'bar',
+            'empty_array' => [],
+            'user.name' => 'Taylor',
+            'key' => 'value',
         ], $array);
     }
 
