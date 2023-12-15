@@ -292,13 +292,13 @@ class CacheArrayStoreTest extends TestCase
         $wannabeOwner->forceRelease();
 
         $this->assertFalse($wannabeOwner->release());
-    }    
+    }
 
     public function testOwnerStatusCanBeCheckedAfterRestoringLock()
     {
         $store = new ArrayStore;
         $firstLock = $store->lock('foo', 10);
-        
+
         $this->assertTrue($firstLock->get());
         $owner = $firstLock->owner();
 
