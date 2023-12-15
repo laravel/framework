@@ -15,7 +15,7 @@ class OverrideProvidersForTesting
      */
     public function bootstrap(Application $app)
     {
-        if (! $app->environment('testing')) {
+        if (! $app->runningUnitTests()) {
             return;
         }
 
