@@ -17,6 +17,13 @@ use PHPUnit\Framework\Constraint\LogicalNot as ReverseConstraint;
 trait InteractsWithDatabase
 {
     /**
+     * Determine whether database connection should be disconnected between tests.
+     *
+     * @var bool
+     */
+    protected $disconnectDatabaseConnectionBetweenTests = false;
+
+    /**
      * Assert that a given where condition exists in the database.
      *
      * @param  \Illuminate\Database\Eloquent\Model|string  $table
