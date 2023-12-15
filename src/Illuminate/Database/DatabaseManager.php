@@ -3,7 +3,7 @@
 namespace Illuminate\Database;
 
 use Doctrine\DBAL\Types\Type;
-use Illuminate\Database\Connectors\ConnectionFactory;
+use Illuminate\Contracts\Database\Connectors\ConnectionFactory;
 use Illuminate\Database\Events\ConnectionEstablished;
 use Illuminate\Support\Arr;
 use Illuminate\Support\ConfigurationUrlParser;
@@ -32,7 +32,7 @@ class DatabaseManager implements ConnectionResolverInterface
     /**
      * The database connection factory instance.
      *
-     * @var \Illuminate\Database\Connectors\ConnectionFactory
+     * @var \Illuminate\Contracts\Database\Connectors\ConnectionFactory
      */
     protected $factory;
 
@@ -68,7 +68,7 @@ class DatabaseManager implements ConnectionResolverInterface
      * Create a new database manager instance.
      *
      * @param  \Illuminate\Contracts\Foundation\Application  $app
-     * @param  \Illuminate\Database\Connectors\ConnectionFactory  $factory
+     * @param  \Illuminate\Contracts\Database\Connectors\ConnectionFactory  $factory
      * @return void
      */
     public function __construct($app, ConnectionFactory $factory)
@@ -149,7 +149,7 @@ class DatabaseManager implements ConnectionResolverInterface
             return call_user_func($this->extensions[$driver], $config, $name);
         }
 
-        return $this->factory->make($config, $name);
+        return $this->factory->make($config, $name ?? $this->getDefaultConnection());
     }
 
     /**

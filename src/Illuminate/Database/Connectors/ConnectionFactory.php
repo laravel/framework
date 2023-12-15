@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Connectors;
 
 use Illuminate\Contracts\Container\Container;
+use Illuminate\Contracts\Database\Connectors\ConnectionFactory as ConnectionFactoryContract;
 use Illuminate\Database\Connection;
 use Illuminate\Database\MySqlConnection;
 use Illuminate\Database\PostgresConnection;
@@ -12,7 +13,7 @@ use Illuminate\Support\Arr;
 use InvalidArgumentException;
 use PDOException;
 
-class ConnectionFactory
+class ConnectionFactory implements ConnectionFactoryContract
 {
     /**
      * The IoC container instance.
@@ -39,7 +40,7 @@ class ConnectionFactory
      * @param  string|null  $name
      * @return \Illuminate\Database\Connection
      */
-    public function make(array $config, $name = null)
+    public function make(array $config, $name)
     {
         $config = $this->parseConfig($config, $name);
 

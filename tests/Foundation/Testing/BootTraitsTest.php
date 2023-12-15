@@ -27,6 +27,11 @@ class TestCaseWithTrait extends FoundationTestCase
 {
     use CreatesApplication;
     use TestTrait;
+
+    public function bootstrap()
+    {
+        $this->refreshApplication();
+    }
 }
 
 class BootTraitsTest extends TestCase
@@ -34,6 +39,7 @@ class BootTraitsTest extends TestCase
     public function testSetUpAndTearDownTraits()
     {
         $testCase = new TestCaseWithTrait('foo');
+        $testCase->bootstrap();
 
         $method = new ReflectionMethod($testCase, 'setUpTraits');
         $method->invoke($testCase);
