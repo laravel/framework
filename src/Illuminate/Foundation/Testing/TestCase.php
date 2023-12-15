@@ -191,7 +191,7 @@ abstract class TestCase extends BaseTestCase
 
             if (
                 property_exists($this, 'disconnectDatabaseConnections')
-                && $this->disconnectDatabaseConnectionBetweenTests === true
+                && $this->disconnectDatabaseConnections === true
             ) {
                 DatabaseConnectionFactory::flushState();
             }
