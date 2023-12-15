@@ -27,11 +27,6 @@ class TestCaseWithTrait extends FoundationTestCase
 {
     use CreatesApplication;
     use TestTrait;
-
-    public function bootstrap()
-    {
-        $this->refreshApplication();
-    }
 }
 
 class BootTraitsTest extends TestCase
