@@ -26,6 +26,8 @@ class SchemaBuilderTest extends DatabaseTestCase
 
         Schema::dropAllTables();
 
+        DB::reconnect();
+
         $this->artisan('migrate:install');
 
         Schema::create('table', function (Blueprint $table) {
