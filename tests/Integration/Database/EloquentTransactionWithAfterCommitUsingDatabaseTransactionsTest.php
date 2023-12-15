@@ -19,12 +19,6 @@ class EloquentTransactionWithAfterCommitUsingDatabaseTransactionsTest extends Te
 
     protected function setUp(): void
     {
-        $this->beforeApplicationDestroyed(function () {
-            foreach (array_keys($this->app['db']->getConnections()) as $name) {
-                $this->app['db']->purge($name);
-            }
-        });
-
         parent::setUp();
 
         if ($this->usesSqliteInMemoryDatabaseConnection()) {
