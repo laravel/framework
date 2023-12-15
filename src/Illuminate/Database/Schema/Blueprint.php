@@ -292,6 +292,28 @@ class Blueprint
     }
 
     /**
+     * Specify the charset that should be used for the table.
+     *
+     * @param  string  $charset
+     * @return void
+     */
+    public function charset($charset)
+    {
+        $this->charset = $charset;
+    }
+
+    /**
+     * Specify the collation that should be used for the table.
+     *
+     * @param  string  $collation
+     * @return void
+     */
+    public function collation($collation)
+    {
+        $this->collation = $collation;
+    }
+
+    /**
      * Specify the storage engine that should be used for the table.
      *
      * @param  string  $engine
