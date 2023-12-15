@@ -115,7 +115,7 @@ class Arr
             if (is_array($value) && ! empty($value)) {
                 $results[] = static::dot($value, $prepend.$key.'.');
             } else {
-                $results[0][$prepend.$key] = $value;
+                $results[][$prepend.$key] = $value;
             }
         }
 
