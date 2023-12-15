@@ -131,8 +131,8 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $blueprint->create();
         $blueprint->increments('id');
         $blueprint->string('email');
-        $blueprint->charset = 'utf8mb4';
-        $blueprint->collation = 'utf8mb4_unicode_ci';
+        $blueprint->charset('utf8mb4');
+        $blueprint->collation('utf8mb4_unicode_ci');
 
         $conn = $this->getConnection();
         $conn->shouldReceive('getConfig')->once()->with('engine')->andReturn(null);
