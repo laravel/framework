@@ -2,7 +2,6 @@
 
 namespace Illuminate\Foundation\Testing;
 
-use Illuminate\Container\Container;
 use Illuminate\Contracts\Database\Connectors\ConnectionFactory as ConnectionFactoryContract;
 use Illuminate\Database\Connectors\ConnectionFactory;
 use Illuminate\Support\Arr;
@@ -72,7 +71,7 @@ class DatabaseConnectionFactory implements ConnectionFactoryContract
      */
     public static function flushState(): void
     {
-        foreach(static::$cachedConnections as $connection) {
+        foreach (static::$cachedConnections as $connection) {
             $connection->disconnect();
         }
 
