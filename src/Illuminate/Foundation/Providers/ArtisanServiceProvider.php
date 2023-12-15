@@ -4,6 +4,7 @@ namespace Illuminate\Foundation\Providers;
 
 use Illuminate\Auth\Console\ClearResetsCommand;
 use Illuminate\Cache\Console\CacheTableCommand;
+use App\Console\Commands\ScheduleCalendarCommand;
 use Illuminate\Cache\Console\ClearCommand as CacheClearCommand;
 use Illuminate\Cache\Console\ForgetCommand as CacheForgetCommand;
 use Illuminate\Cache\Console\PruneStaleTagsCommand;
@@ -149,6 +150,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         'RouteList' => RouteListCommand::class,
         'SchemaDump' => DumpCommand::class,
         'Seed' => SeedCommand::class,
+        'ScheduleCalendar' => ScheduleCalendarCommand::class,
         'ScheduleFinish' => ScheduleFinishCommand::class,
         'ScheduleList' => ScheduleListCommand::class,
         'ScheduleRun' => ScheduleRunCommand::class,
