@@ -20,7 +20,7 @@ class DatabaseConnectionFactory implements ConnectionFactoryContract
     protected static array $cachedConnections = [];
 
     public function __construct(
-        protected ConnectionFactory $factory
+        protected ConnectionFactoryContract $factory
     ) {
         //
     }
@@ -40,7 +40,7 @@ class DatabaseConnectionFactory implements ConnectionFactoryContract
             return $this->factory->make($config, $name);
         }
 
-        if (! isset(static::$cachedConnections[$key]) || \is_null((static::$cachedConnections[$key]->getRawPdo() ?? null))) {
+        if (! isset(static::$cachedConnections[$key]) || is_null((static::$cachedConnections[$key]->getRawPdo() ?? null))) {
             return static::$cachedConnections[$key] = $this->factory->make($config, $name);
         }
 
