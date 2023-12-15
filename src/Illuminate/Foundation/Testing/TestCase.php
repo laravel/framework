@@ -124,12 +124,6 @@ abstract class TestCase extends BaseTestCase
     {
         $uses = array_flip(class_uses_recursive(static::class));
 
-        if ($this->app->bound('db.factory')) {
-            tap($this->app['db.factory'], function ($factory) {
-                $this->app->instance('db.factory', new DatabaseConnectionFactory($this->app, $factory));
-            });
-        }
-
         if (isset($uses[RefreshDatabase::class])) {
             $this->refreshDatabase();
         }
