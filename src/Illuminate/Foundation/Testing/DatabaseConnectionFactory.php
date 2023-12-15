@@ -3,7 +3,6 @@
 namespace Illuminate\Foundation\Testing;
 
 use Illuminate\Contracts\Database\Connectors\ConnectionFactory as ConnectionFactoryContract;
-use Illuminate\Database\Connectors\ConnectionFactory;
 use Illuminate\Support\Arr;
 
 /**
@@ -39,7 +38,7 @@ class DatabaseConnectionFactory implements ConnectionFactoryContract
             return $this->factory->make($config, $name);
         }
 
-        if (! isset(static::$cachedConnections[$key]) || is_null((static::$cachedConnections[$key]->getRawPdo() ?? null))) {
+        if (! isset(static::$cachedConnections[$key]) || is_null(static::$cachedConnections[$key]->getRawPdo() ?? null)) {
             return static::$cachedConnections[$key] = $this->factory->make($config, $name);
         }
 
