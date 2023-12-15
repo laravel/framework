@@ -12,6 +12,7 @@ class DatabaseTransactionsManager extends BaseManager
      * @param  callable  $callback
      * @return void
      */
+    #[\Override]
     public function addCallback($callback)
     {
         // If there are no transactions, we'll run the callbacks right away. Also, we'll run it
@@ -29,6 +30,7 @@ class DatabaseTransactionsManager extends BaseManager
      *
      * @return \Illuminate\Support\Collection<int, \Illuminate\Database\DatabaseTransactionRecord>
      */
+    #[\Override]
     public function callbackApplicableTransactions()
     {
         return $this->pendingTransactions->skip(1)->values();
@@ -40,6 +42,7 @@ class DatabaseTransactionsManager extends BaseManager
      * @param  int  $level
      * @return bool
      */
+    #[\Override]
     public function afterCommitCallbacksShouldBeExecuted($level)
     {
         return $level === 1;
