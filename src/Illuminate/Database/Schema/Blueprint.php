@@ -316,12 +316,12 @@ class Blueprint
     /**
      * Specify the character set that should be used for the table.
      *
-     * @param  string  $characterSet
+     * @param  string  $charset
      * @return void
      */
-    public function charset($characterSet)
+    public function charset($charset)
     {
-        $this->charset = $characterSet;
+        $this->charset = $charset;
     }
 
     /**
