@@ -3,7 +3,6 @@
 namespace Illuminate\Tests\Support;
 
 use ArrayObject;
-use Illuminate\Foundation\Console\ConfigShowCommand;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
