@@ -130,7 +130,6 @@ abstract class TestCase extends BaseTestCase
             });
         }
 
-
         if (isset($uses[RefreshDatabase::class])) {
             $this->refreshDatabase();
         }
