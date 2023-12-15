@@ -38,6 +38,7 @@ class DatabaseConnectionFactory extends ConnectionFactory
      * @param  string  $name
      * @return \Illuminate\Database\Connection
      */
+    #[\Override]
     public function make(array $config, $name)
     {
         $key = $name ?? $config['name'];
