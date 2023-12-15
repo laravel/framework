@@ -190,7 +190,7 @@ abstract class TestCase extends BaseTestCase
             ParallelTesting::callTearDownTestCaseCallbacks($this);
 
             if (
-                property_exists($this, 'disconnectDatabaseConnectionBetweenTests')
+                property_exists($this, 'disconnectDatabaseConnections')
                 && $this->disconnectDatabaseConnectionBetweenTests === true
             ) {
                 DatabaseConnectionFactory::flushState();

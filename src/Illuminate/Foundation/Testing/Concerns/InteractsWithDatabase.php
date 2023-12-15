@@ -21,7 +21,7 @@ trait InteractsWithDatabase
      *
      * @var bool
      */
-    protected $disconnectDatabaseConnectionBetweenTests = false;
+    protected $disconnectDatabaseConnections = false;
 
     /**
      * Assert that a given where condition exists in the database.
