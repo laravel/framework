@@ -37,7 +37,7 @@ class ConnectionFactory implements ConnectionFactoryContract
      * Establish a PDO connection based on the configuration.
      *
      * @param  array  $config
-     * @param  string|null  $name
+     * @param  string  $name
      * @return \Illuminate\Database\Connection
      */
     public function make(array $config, $name)
