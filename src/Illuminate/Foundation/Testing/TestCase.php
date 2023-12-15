@@ -126,7 +126,7 @@ abstract class TestCase extends BaseTestCase
 
         if ($this->app->bound('db.factory')) {
             tap($this->app['db.factory'], function ($factory) {
-                $this->app->instance('db.factory', new DatabaseConnectionFactory($factory));
+                $this->app->instance('db.factory', new DatabaseConnectionFactory($app, $factory));
             });
         }
 
