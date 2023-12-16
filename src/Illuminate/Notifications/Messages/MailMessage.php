@@ -139,9 +139,8 @@ class MailMessage extends SimpleMessage implements Renderable
     public function text($textView, array $data = [])
     {
         return $this->view([
-            'html' => is_string($this->view) ? $this->view : null,
+            'html' => is_array($this->view) ? $this->view['html'] ?? null : $this->view,
             'text' => $textView,
-            'raw' => null,
         ], $data);
     }
 
@@ -154,8 +153,6 @@ class MailMessage extends SimpleMessage implements Renderable
     public function raw($rawText)
     {
         return $this->view([
-            'html' => is_string($this->view) ? $this->view : null,
-            'text' => null,
             'raw' => $rawText,
         ]);
     }
