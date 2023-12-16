@@ -72,8 +72,12 @@ class EnvironmentDecryptCommand extends Command
 
         $key = $this->parseKey($key);
 
-        $encryptedFile = ($this->option('env')
-                    ? base_path('.env').'.'.$this->option('env')
+        $env = (null !== $this->option('env')
+            ? $this->option('env')
+            : Env::get('APP_ENV'));
+
+        $encryptedFile = (null !== $env
+                    ? base_path('.env').($env ? '.'.$env : '')
                     : $this->laravel->environmentFilePath()).'.encrypted';
 
         $outputFile = $this->outputFilePath();
@@ -139,8 +143,13 @@ class EnvironmentDecryptCommand extends Command
     protected function outputFilePath()
     {
         $path = Str::finish($this->option('path') ?: base_path(), DIRECTORY_SEPARATOR);
+        $env = (null !== $this->option('env')
+            ? $this->option('env')
+            : Env::get('APP_ENV'));
 
-        $outputFile = $this->option('filename') ?: ('.env'.($this->option('env') ? '.'.$this->option('env') : ''));
+        $outputFile = (null !== $env
+            ? base_path('.env').($env ? '.'.$env : '')
+            : $this->laravel->environmentFilePath());
         $outputFile = ltrim($outputFile, DIRECTORY_SEPARATOR);
 
         return $path.$outputFile;
