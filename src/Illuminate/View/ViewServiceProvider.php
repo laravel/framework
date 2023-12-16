@@ -182,7 +182,11 @@ class ViewServiceProvider extends ServiceProvider
     public function registerMarkdownEngine($resolver)
     {
         $resolver->register('markdown', function () {
-            return new MarkdownEngine($this->app['files'], $this->app[GithubFlavoredMarkdownConverter::class]);
+            return new MarkdownEngine(
+                $this->app['files'],
+                $this->app[GithubFlavoredMarkdownConverter::class],
+                $this->app['view'],
+            );
         });
     }
 }
