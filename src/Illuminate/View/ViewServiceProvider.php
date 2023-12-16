@@ -7,7 +7,9 @@ use Illuminate\View\Compilers\BladeCompiler;
 use Illuminate\View\Engines\CompilerEngine;
 use Illuminate\View\Engines\EngineResolver;
 use Illuminate\View\Engines\FileEngine;
+use Illuminate\View\Engines\MarkdownEngine;
 use Illuminate\View\Engines\PhpEngine;
+use League\CommonMark\GithubFlavoredMarkdownConverter;
 
 class ViewServiceProvider extends ServiceProvider
 {
@@ -118,7 +120,7 @@ class ViewServiceProvider extends ServiceProvider
             // Next, we will register the various view engines with the resolver so that the
             // environment will resolve the engines needed for various views based on the
             // extension of view file. We call a method for each of the view's engines.
-            foreach (['file', 'php', 'blade'] as $engine) {
+            foreach (['file', 'php', 'blade', 'markdown'] as $engine) {
                 $this->{'register'.ucfirst($engine).'Engine'}($resolver);
             }
 
@@ -168,6 +170,19 @@ class ViewServiceProvider extends ServiceProvider
             });
 
             return $compiler;
+        });
+    }
+
+    /**
+     * Register the markdown engine implementation.
+     *
+     * @param  \Illuminate\View\Engines\EngineResolver  $resolver
+     * @return void
+     */
+    public function registerMarkdownEngine($resolver)
+    {
+        $resolver->register('markdown', function () {
+            return new MarkdownEngine($this->app['files'], $this->app[GithubFlavoredMarkdownConverter::class]);
         });
     }
 }
