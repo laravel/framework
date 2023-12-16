@@ -5192,10 +5192,15 @@ SQL;
 
     public function testWhereJsonContainsSqlite()
     {
-        $this->expectException(RuntimeException::class);
+        $builder = $this->getSQLiteBuilder();
+        $builder->select('*')->from('users')->whereJsonContains('options', 'en')->toSql();
+        $this->assertSame('select * from "users" where exists (select 1 from json_each("options") where "json_each"."value" is ?)', $builder->toSql());
+        $this->assertEquals(['en'], $builder->getBindings());
 
         $builder = $this->getSQLiteBuilder();
-        $builder->select('*')->from('users')->whereJsonContains('options->languages', ['en'])->toSql();
+        $builder->select('*')->from('users')->whereJsonContains('users.options->language', 'en')->toSql();
+        $this->assertSame('select * from "users" where exists (select 1 from json_each("users"."options", \'$."language"\') where "json_each"."value" is ?)', $builder->toSql());
+        $this->assertEquals(['en'], $builder->getBindings());
     }
 
     public function testWhereJsonContainsSqlServer()
@@ -5244,10 +5249,15 @@ SQL;
 
     public function testWhereJsonDoesntContainSqlite()
     {
-        $this->expectException(RuntimeException::class);
+        $builder = $this->getSQLiteBuilder();
+        $builder->select('*')->from('users')->whereJsonDoesntContain('options', 'en')->toSql();
+        $this->assertSame('select * from "users" where not exists (select 1 from json_each("options") where "json_each"."value" is ?)', $builder->toSql());
+        $this->assertEquals(['en'], $builder->getBindings());
 
         $builder = $this->getSQLiteBuilder();
-        $builder->select('*')->from('users')->whereJsonDoesntContain('options->languages', ['en'])->toSql();
+        $builder->select('*')->from('users')->whereJsonDoesntContain('users.options->language', 'en')->toSql();
+        $this->assertSame('select * from "users" where not exists (select 1 from json_each("users"."options", \'$."language"\') where "json_each"."value" is ?)', $builder->toSql());
+        $this->assertEquals(['en'], $builder->getBindings());
     }
 
     public function testWhereJsonDoesntContainSqlServer()
