@@ -44,6 +44,7 @@ class MarkdownEngine implements Engine
      *
      * @param  string  $view
      * @param  string|null  $slot
+     * @return void
      */
     public function setLayout($view, $slot = 'slot')
     {

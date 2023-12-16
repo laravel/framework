@@ -5,7 +5,6 @@ namespace Illuminate\Tests\View;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\View\ComponentSlot;
 use Illuminate\View\Engines\MarkdownEngine;
-use Illuminate\View\Engines\PhpEngine;
 use Illuminate\View\Factory;
 use League\CommonMark\GithubFlavoredMarkdownConverter;
 use PHPUnit\Framework\TestCase;
