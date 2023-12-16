@@ -18,6 +18,18 @@ class MakesHttpRequestsTest extends TestCase
         $this->assertSame('previous/url', $this->app['session']->previousUrl());
     }
 
+    public function testFromRouteSetsHeaderAndSession()
+    {
+        $router = $this->app->make(Registrar::class);
+
+        $router->get('previous/url', fn () => 'ok')->name('previous-url');
+
+        $this->fromRoute('previous-url');
+
+        $this->assertSame('http://localhost/previous/url', $this->defaultHeaders['referer']);
+        $this->assertSame('http://localhost/previous/url', $this->app['session']->previousUrl());
+    }
+
     public function testWithTokenSetsAuthorizationHeader()
     {
         $this->withToken('foobar');
