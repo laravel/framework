@@ -43,7 +43,8 @@ class DatabaseConnectionFactory extends ConnectionFactory
     {
         $key = $name ?? $config['name'];
 
-        // SQLite doesn't have any max connections limitation so it should be safe to just create a new connection between tests.
+        // In-Memory Databases doesn't have any max connections limitation so it should be safe to just create a new connection between tests.
+        // Because some tests may be depend on thier volatile, we should always create new connections to avoid carrying over previous data.
         if ($config['driver'] === 'sqlite' && $config['database'] === ':memory:') {
             return $this->factory->make($config, $name);
         }
