@@ -20,7 +20,8 @@ class ShowCommand extends DatabaseInspectionCommand
     protected $signature = 'db:show {--database= : The database connection}
                 {--json : Output the database information as JSON}
                 {--counts : Show the table row count <bg=red;options=bold> Note: This can be slow on large databases </>};
-                {--views : Show the database views <bg=red;options=bold> Note: This can be slow on large databases </>}';
+                {--views : Show the database views <bg=red;options=bold> Note: This can be slow on large databases </>}
+                {--types : Show the user-defined types}';
 
     /**
      * The console command description.
@@ -53,6 +54,10 @@ class ShowCommand extends DatabaseInspectionCommand
 
         if ($this->option('views')) {
             $data['views'] = $this->views($connection, $schema);
+        }
+
+        if ($this->option('types')) {
+            $data['types'] = $this->types($connection, $schema);
         }
 
         $this->display($data);
@@ -99,6 +104,24 @@ class ShowCommand extends DatabaseInspectionCommand
     }
 
     /**
+     * Get information regarding the user-defined types within the database.
+     *
+     * @param  \Illuminate\Database\ConnectionInterface  $connection
+     * @param  \Illuminate\Database\Schema\Builder  $schema
+     * @return \Illuminate\Support\Collection
+     */
+    protected function types(ConnectionInterface $connection, Builder $schema)
+    {
+        return collect($schema->getTypes())
+            ->map(fn ($type) => [
+                'name' => $type['name'],
+                'schema' => $type['schema'],
+                'type' => $type['type'],
+                'category' => $type['category'],
+            ]);
+    }
+
+    /**
      * Render the database information.
      *
      * @param  array  $data
@@ -131,6 +154,7 @@ class ShowCommand extends DatabaseInspectionCommand
         $platform = $data['platform'];
         $tables = $data['tables'];
         $views = $data['views'] ?? null;
+        $types = $data['types'] ?? null;
 
         $this->newLine();
 
@@ -190,6 +214,22 @@ class ShowCommand extends DatabaseInspectionCommand
             $views->each(fn ($view) => $this->components->twoColumnDetail(
                 ($view['schema'] ? $view['schema'].' <fg=gray;options=bold>/</> ' : '').$view['view'],
                 Number::format($view['rows'])
+            ));
+
+            $this->newLine();
+        }
+
+        if ($types && $types->isNotEmpty()) {
+            $hasSchema = ! is_null($types->first()['schema']);
+
+            $this->components->twoColumnDetail(
+                ($hasSchema ? '<fg=green;options=bold>Schema</> <fg=gray;options=bold>/</> ' : '').'<fg=green;options=bold>Type</>',
+                '<fg=green;options=bold>Type</> <fg=gray;options=bold>/</> <fg=green;options=bold>Category</>'
+            );
+
+            $types->each(fn ($type) => $this->components->twoColumnDetail(
+                ($type['schema'] ? $type['schema'].' <fg=gray;options=bold>/</> ' : '').$type['name'],
+                $type['type'].' <fg=gray;options=bold>/</> '.$type['category']
             ));
 
             $this->newLine();
