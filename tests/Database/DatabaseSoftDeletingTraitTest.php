@@ -24,7 +24,7 @@ class DatabaseSoftDeletingTraitTest extends TestCase
         $query->shouldReceive('update')->once()->with([
             'deleted_at' => 'date-time',
             'updated_at' => 'date-time',
-        ]);
+        ])->andReturn(1);
         $model->shouldReceive('syncOriginalAttributes')->once()->with([
             'deleted_at',
             'updated_at',
@@ -33,6 +33,20 @@ class DatabaseSoftDeletingTraitTest extends TestCase
         $model->delete();
 
         $this->assertInstanceOf(Carbon::class, $model->deleted_at);
+    }
+
+    public function testDeleteReturnFalseIfBuilderReturnFalse()
+    {
+        $model = m::mock(DatabaseSoftDeletingTraitStub::class);
+        $model->makePartial();
+        $model->shouldReceive('newModelQuery')->andReturn($query = m::mock(stdClass::class));
+        $query->shouldReceive('where')->once()->with('id', '=', 1)->andReturn($query);
+        $query->shouldReceive('update')->once()->with([
+            'deleted_at' => 'date-time',
+            'updated_at' => 'date-time',
+        ])->andReturn(0);
+        $model->shouldReceive('usesTimestamps')->once()->andReturn(true);
+        $this->assertFalse($model->delete());
     }
 
     public function testRestore()

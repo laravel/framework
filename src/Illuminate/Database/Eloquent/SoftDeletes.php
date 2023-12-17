@@ -89,7 +89,7 @@ trait SoftDeletes
     /**
      * Perform the actual delete query on this model instance.
      *
-     * @return void
+     * @return bool
      */
     protected function runSoftDelete()
     {
@@ -107,11 +107,15 @@ trait SoftDeletes
             $columns[$this->getUpdatedAtColumn()] = $this->fromDateTime($time);
         }
 
-        $query->update($columns);
+        $updated = $query->update($columns);
 
-        $this->syncOriginalAttributes(array_keys($columns));
+        if ($updated) {
+            $this->syncOriginalAttributes(array_keys($columns));
 
-        $this->fireModelEvent('trashed', false);
+            $this->fireModelEvent('trashed', false);
+        }
+
+        return (bool) $updated;
     }
 
     /**
