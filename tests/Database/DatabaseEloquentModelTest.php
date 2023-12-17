@@ -741,6 +741,24 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertTrue($model->save());
     }
 
+    public function testUpdateProcessReturnsFalseIfBuilderUpdateReturnsFalse()
+    {
+        $model = $this->getMockBuilder(EloquentModelStub::class)->onlyMethods(['newModelQuery', 'updateTimestamps'])->getMock();
+
+        $query = m::mock(Builder::class);
+        $query->shouldReceive('where')->once()->with('id', '=', 1);
+        $query->shouldReceive('update')->once()->with(['name' => 'taylor'])->andReturn(0);
+
+        $model->expects($this->once())->method('newModelQuery')->willReturn($query);
+        $model->expects($this->once())->method('updateTimestamps');
+
+        $model->id = 1;
+        $model->syncOriginal();
+        $model->name = 'taylor';
+        $model->exists = true;
+        $this->assertFalse($model->save());
+    }
+
     public function testTimestampsAreReturnedAsObjects()
     {
         $model = $this->getMockBuilder(EloquentDateModelStub::class)->onlyMethods(['getDateFormat'])->getMock();
