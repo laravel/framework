@@ -11,22 +11,23 @@ use Illuminate\Foundation\Http\Middleware\PreventRequestsDuringMaintenance;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Route;
+use Orchestra\Testbench\Attributes\WithEnv;
 use Orchestra\Testbench\Http\Middleware\PreventRequestsDuringMaintenance as TestbenchPreventRequestsDuringMaintenance;
 use Orchestra\Testbench\TestCase;
 use Symfony\Component\HttpFoundation\Cookie;
 
+#[WithEnv('APP_MAINTENANCE_DRIVER', 'file')]
 class MaintenanceModeTest extends TestCase
 {
     protected function setUp(): void
     {
+        $this->beforeApplicationDestroyed(function () {
+            @unlink(storage_path('framework/down'));
+        });
+
         parent::setUp();
 
         $this->withoutMiddleware(TestbenchPreventRequestsDuringMaintenance::class);
-    }
-
-    protected function tearDown(): void
-    {
-        @unlink(storage_path('framework/down'));
     }
 
     public function testBasicMaintenanceModeResponse()

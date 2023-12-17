@@ -15,13 +15,6 @@ use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 class EloquentBelongsToManyTest extends DatabaseTestCase
 {
-    protected function tearDown(): void
-    {
-        parent::tearDown();
-
-        Carbon::setTestNow(null);
-    }
-
     protected function afterRefreshingDatabase()
     {
         Schema::create('users', function (Blueprint $table) {
