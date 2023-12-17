@@ -221,26 +221,6 @@ class ComponentAttributeBag implements ArrayAccess, IteratorAggregate, JsonSeria
     }
 
     /**
-     * Check if the attribute bag is empty.
-     *
-     * @return bool
-     */
-    public function isEmpty(): bool
-    {
-        return (string) $this === '';
-    }
-
-    /**
-     * Check if the attribute bag is not empty.
-     *
-     * @return bool
-     */
-    public function isNotEmpty(): bool
-    {
-        return ! $this->isEmpty();
-    }
-
-    /**
      * Extract prop names from given keys.
      *
      * @param  mixed|array  $keys
@@ -368,6 +348,26 @@ class ComponentAttributeBag implements ArrayAccess, IteratorAggregate, JsonSeria
         }
 
         return $value;
+    }
+
+    /**
+     * Determine if the attribute bag is empty.
+     *
+     * @return bool
+     */
+    public function isEmpty()
+    {
+        return trim((string) $this) === '';
+    }
+
+    /**
+     * Determine if the attribute bag is not empty.
+     *
+     * @return bool
+     */
+    public function isNotEmpty()
+    {
+        return ! $this->isEmpty();
     }
 
     /**
