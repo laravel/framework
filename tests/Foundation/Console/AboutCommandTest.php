@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Foundation\Console;
 
 use Illuminate\Foundation\Console\AboutCommand;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Orchestra\Testbench\Attributes\WithMigration;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -10,6 +11,8 @@ use PHPUnit\Framework\TestCase;
 #[WithMigration]
 class AboutCommandTest extends TestCase
 {
+    use RefreshDatabase;
+
     /**
      * @param  \Closure(bool):mixed  $format
      * @param  mixed  $expected

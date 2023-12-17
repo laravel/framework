@@ -8,15 +8,20 @@ use Illuminate\Foundation\Events\MaintenanceModeDisabled;
 use Illuminate\Foundation\Events\MaintenanceModeEnabled;
 use Illuminate\Foundation\Http\MaintenanceModeBypassCookie;
 use Illuminate\Foundation\Http\Middleware\PreventRequestsDuringMaintenance;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Route;
+use Orchestra\Testbench\Attributes\WithMigration;
 use Orchestra\Testbench\Http\Middleware\PreventRequestsDuringMaintenance as TestbenchPreventRequestsDuringMaintenance;
 use Orchestra\Testbench\TestCase;
 use Symfony\Component\HttpFoundation\Cookie;
 
+#[WithMigration]
 class MaintenanceModeTest extends TestCase
 {
+    use RefreshDatabase;
+
     protected function setUp(): void
     {
         parent::setUp();
