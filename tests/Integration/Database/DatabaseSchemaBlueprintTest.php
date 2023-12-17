@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Integration\Database;
 
-use RuntimeException;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\Grammars\MySqlGrammar;
 use Illuminate\Database\Schema\Grammars\PostgresGrammar;
@@ -11,6 +10,7 @@ use Illuminate\Database\Schema\Grammars\SqlServerGrammar;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Orchestra\Testbench\TestCase;
+use RuntimeException;
 
 class DatabaseSchemaBlueprintTest extends TestCase
 {
