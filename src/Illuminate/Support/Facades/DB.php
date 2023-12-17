@@ -60,7 +60,6 @@ namespace Illuminate\Support\Facades;
  * @method static \Illuminate\Database\Connection setRecordModificationState(bool $value)
  * @method static void forgetRecordModificationState()
  * @method static \Illuminate\Database\Connection useWriteConnectionWhenReading(bool $value = true)
- * @method static bool isDoctrineAvailable()
  * @method static bool usingNativeSchemaOperations()
  * @method static \Doctrine\DBAL\Connection getDoctrineConnection()
  * @method static \PDO getPdo()

@@ -1213,7 +1213,7 @@ class Connection implements ConnectionInterface
      *
      * @return bool
      */
-    public function isDoctrineAvailable()
+    protected function isDoctrineAvailable()
     {
         return class_exists('Doctrine\DBAL\Connection');
     }

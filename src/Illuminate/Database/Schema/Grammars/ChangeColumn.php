@@ -25,13 +25,6 @@ class ChangeColumn
      */
     public static function compile($grammar, Blueprint $blueprint, Fluent $command, Connection $connection)
     {
-        if (! $connection->isDoctrineAvailable()) {
-            throw new RuntimeException(sprintf(
-                'Changing columns for table "%s" requires Doctrine DBAL. Please install the doctrine/dbal package.',
-                $blueprint->getTable()
-            ));
-        }
-
         $doctrineConnection = $connection->getDoctrineConnection();
         $schema = $doctrineConnection->createSchemaManager();
         $databasePlatform = $doctrineConnection->getDatabasePlatform();
