@@ -61,6 +61,6 @@ class SessionTableCommand extends MigrationGeneratorCommand
             '{%s,%s}',
             $this->laravel->joinPaths($this->laravel->databasePath('migrations'), '*_*_*_*_create_'.$table.'_table.php'),
             $this->laravel->joinPaths($this->laravel->databasePath('migrations'), '0001_01_01_000000_create_users_table.php'),
-        )) !== 0;
+        ))) !== 0;
     }
 }
