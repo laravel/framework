@@ -932,6 +932,19 @@ class DatabaseEloquentModelTest extends TestCase
         $model->delete();
     }
 
+    public function testDeleteReturnsFalseIfBuilderDeleteReturnsFalse()
+    {
+        $model = $this->getMockBuilder(Model::class)->onlyMethods(['newModelQuery', 'updateTimestamps', 'touchOwners'])->getMock();
+        $query = m::mock(Builder::class);
+        $query->shouldReceive('where')->once()->with('id', '=', 1)->andReturn($query);
+        $query->shouldReceive('delete')->once()->andReturn(0);
+        $model->expects($this->once())->method('newModelQuery')->willReturn($query);
+        $model->expects($this->once())->method('touchOwners');
+        $model->exists = true;
+        $model->id = 1;
+        $this->assertFalse($model->delete());
+    }
+
     public function testPushNoRelations()
     {
         $model = $this->getMockBuilder(EloquentModelStub::class)->onlyMethods(['newModelQuery', 'updateTimestamps', 'refresh'])->getMock();

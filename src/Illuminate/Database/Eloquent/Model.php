@@ -1404,14 +1404,16 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         // by the timestamp. Then we will go ahead and delete the model instance.
         $this->touchOwners();
 
-        $this->performDeleteOnModel();
+        $deleted = $this->performDeleteOnModel();
 
         // Once the model has been deleted, we will fire off the deleted event so that
         // the developers may hook into post-delete operations. We will then return
-        // a boolean true as the delete is presumably successful on the database.
-        $this->fireModelEvent('deleted', false);
+        // a boolean indicating if the delete was successful on the database.
+        if ($deleted) {
+            $this->fireModelEvent('deleted', false);
+        }
 
-        return true;
+        return (bool) $deleted;
     }
 
     /**
@@ -1455,13 +1457,17 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     /**
      * Perform the actual delete query on this model instance.
      *
-     * @return void
+     * @return bool
      */
     protected function performDeleteOnModel()
     {
-        $this->setKeysForSaveQuery($this->newModelQuery())->delete();
+        $deleted = $this->setKeysForSaveQuery($this->newModelQuery())->delete();
 
-        $this->exists = false;
+        if ($deleted) {
+            $this->exists = false;
+        }
+
+        return $deleted;
     }
 
     /**
