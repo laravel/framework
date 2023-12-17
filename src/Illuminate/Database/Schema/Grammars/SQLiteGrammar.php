@@ -5,6 +5,8 @@ namespace Illuminate\Database\Schema\Grammars;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Schema\ColumnDefinition;
+use Illuminate\Database\Schema\ForeignKeyDefinition;
 use Illuminate\Database\Schema\IndexDefinition;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Fluent;
@@ -136,7 +138,7 @@ class SQLiteGrammar extends Grammar
     public function compileColumns($table)
     {
         return sprintf(
-            "select name, type, not 'notnull' as 'nullable', dflt_value as 'default', pk as 'primary' "
+            'select name, type, not "notnull" as "nullable", dflt_value as "default", pk as "primary" '
             .'from pragma_table_info(%s) order by cid asc',
             $this->wrap(str_replace('.', '__', $table))
         );
@@ -191,39 +193,24 @@ class SQLiteGrammar extends Grammar
             $blueprint->temporary ? 'create temporary' : 'create',
             $this->wrapTable($blueprint),
             implode(', ', $this->getColumns($blueprint)),
-            (string) $this->addForeignKeys($blueprint),
-            (string) $this->addPrimaryKeys($blueprint)
+            $this->addForeignKeys($this->getCommandsByName($blueprint, 'foreign')),
+            $this->addPrimaryKeys($this->getCommandByName($blueprint, 'primary'))
         );
     }
 
     /**
      * Get the foreign key syntax for a table creation statement.
      *
-     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Database\Schema\ForeignKeyDefinition[]  $foreignKeys
      * @return string|null
      */
-    protected function addForeignKeys(Blueprint $blueprint)
+    protected function addForeignKeys($foreignKeys)
     {
-        $foreigns = $this->getCommandsByName($blueprint, 'foreign');
-
-        return collect($foreigns)->reduce(function ($sql, $foreign) {
+        return collect($foreignKeys)->reduce(function ($sql, $foreign) {
             // Once we have all the foreign key commands for the table creation statement
             // we'll loop through each of them and add them to the create table SQL we
             // are building, since SQLite needs foreign keys on the tables creation.
-            $sql .= $this->getForeignKey($foreign);
-
-            if (! is_null($foreign->onDelete)) {
-                $sql .= " on delete {$foreign->onDelete}";
-            }
-
-            // If this foreign key specifies the action to be taken on update we will add
-            // that to the statement here. We'll append it to this SQL and then return
-            // the SQL so we can keep adding any other foreign constraints onto this.
-            if (! is_null($foreign->onUpdate)) {
-                $sql .= " on update {$foreign->onUpdate}";
-            }
-
-            return $sql;
+            return $sql.$this->getForeignKey($foreign);
         }, '');
     }
 
@@ -238,22 +225,35 @@ class SQLiteGrammar extends Grammar
         // We need to columnize the columns that the foreign key is being defined for
         // so that it is a properly formatted list. Once we have done this, we can
         // return the foreign key SQL declaration to the calling method for use.
-        return sprintf(', foreign key(%s) references %s(%s)',
+        $sql = sprintf(', foreign key(%s) references %s(%s)',
             $this->columnize($foreign->columns),
             $this->wrapTable($foreign->on),
             $this->columnize((array) $foreign->references)
         );
+
+        if (! is_null($foreign->onDelete)) {
+            $sql .= " on delete {$foreign->onDelete}";
+        }
+
+        // If this foreign key specifies the action to be taken on update we will add
+        // that to the statement here. We'll append it to this SQL and then return
+        // the SQL so we can keep adding any other foreign constraints onto this.
+        if (! is_null($foreign->onUpdate)) {
+            $sql .= " on update {$foreign->onUpdate}";
+        }
+
+        return $sql;
     }
 
     /**
      * Get the primary key syntax for a table creation statement.
      *
-     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent|null  $primary
      * @return string|null
      */
-    protected function addPrimaryKeys(Blueprint $blueprint)
+    protected function addPrimaryKeys($primary)
     {
-        if (! is_null($primary = $this->getCommandByName($blueprint, 'primary'))) {
+        if (! is_null($primary)) {
             return ", primary key ({$this->columnize($primary->columns)})";
         }
     }
@@ -274,6 +274,97 @@ class SQLiteGrammar extends Grammar
         })->map(function ($column) use ($blueprint) {
             return 'alter table '.$this->wrapTable($blueprint).' '.$column;
         })->all();
+    }
+
+    /**
+     * Compile a change column command into a series of SQL statements.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $command
+     * @param  \Illuminate\Database\Connection  $connection
+     * @return array|string
+     *
+     * @throws \RuntimeException
+     */
+    public function compileChange(Blueprint $blueprint, Fluent $command, Connection $connection)
+    {
+        if (! $connection->usingNativeSchemaOperations()) {
+            return parent::compileChange($blueprint, $command, $connection);
+        }
+
+        $schema = $connection->getSchemaBuilder();
+        $table = $blueprint->getTable();
+
+        $changedColumns = collect($blueprint->getChangedColumns());
+        $columnNames = [];
+        $autoIncrementColumn = null;
+
+        $columns = collect($schema->getColumns($table))
+            ->map(function ($column) use ($blueprint, $changedColumns, &$columnNames, &$autoIncrementColumn) {
+                $column = $changedColumns->first(fn ($col) => $col->name === $column['name'], $column);
+
+                if ($column instanceof Fluent) {
+                    $name = $this->wrap($column);
+                    $columnNames[] = $name;
+                    $autoIncrementColumn = $column->autoIncrement ? $column->name : $autoIncrementColumn;
+
+                    return $this->addModifiers($name.' '.$this->getType($column), $blueprint, $column);
+                } else {
+                    $name = $this->wrap($column['name']);
+                    $columnNames[] = $name;
+                    $autoIncrementColumn = $column['auto_increment'] ? $column['name'] : $autoIncrementColumn;
+
+                    return $this->addModifiers($name.' '.$column['type'], $blueprint,
+                        new ColumnDefinition([
+                            'change' => true,
+                            'type' => $column['type_name'],
+                            'nullable' => $column['nullable'],
+                            'default' => $column['default'],
+                            'autoIncrement' => $column['auto_increment'],
+                            'collation' => $column['collation'],
+                            'comment' => $column['comment'],
+                        ])
+                    );
+                }
+            })->all();
+
+        $foreignKeys = collect($schema->getForeignKeys($table))->map(fn ($foreignKey) => new ForeignKeyDefinition([
+            'columns' => $foreignKey['columns'],
+            'on' => $foreignKey['foreign_table'],
+            'references' => $foreignKey['foreign_columns'],
+            'onUpdate' => $foreignKey['on_update'],
+            'onDelete' => $foreignKey['on_delete'],
+        ]))->all();
+
+        [$primary, $indexes] = collect($schema->getIndexes($table))->map(fn ($index) => new IndexDefinition([
+            'name' => match(true) {
+                $index['primary'] => 'primary',
+                $index['unique'] => 'unique',
+                default => 'index',
+            },
+            'index' => $index['name'],
+            'columns' => $index['columns'],
+        ]))->partition(fn ($index) => $index->name === 'primary');
+
+        $indexes = collect($indexes)->reject(fn ($index) => str_starts_with('sqlite_', $index->index))->map(
+            fn ($index) => $this->{'compile'.ucfirst($index->name)}($blueprint, $index)
+        )->all();
+
+        $tempTable = $this->wrap('__temp__'.$this->getTablePrefix().$table);
+        $table = $this->wrap($this->getTablePrefix().$table);
+        $columnNames = implode(', ', $columnNames);
+
+        return array_merge([
+            sprintf('create table %s (%s%s%s)',
+                $tempTable,
+                implode(', ', $columns),
+                $this->addForeignKeys($foreignKeys),
+                $autoIncrementColumn ? '' :$this->addPrimaryKeys($primary->first())
+            ),
+            sprintf('insert into %s (%s) select %s from %s', $tempTable, $columnNames, $columnNames, $table),
+            sprintf('drop table %s', $table),
+            sprintf('alter table %s rename to %s', $tempTable, $table),
+        ], $indexes);
     }
 
     /**

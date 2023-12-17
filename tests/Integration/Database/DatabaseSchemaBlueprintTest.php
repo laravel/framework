@@ -40,19 +40,15 @@ class DatabaseSchemaBlueprintTest extends TestCase
 
         $queries = $blueprint->toSql(DB::connection(), new SQLiteGrammar);
 
-        // Expect one of the following two query sequences to be present...
         $expected = [
-            [
-                'CREATE TEMPORARY TABLE __temp__users AS SELECT name, age FROM users',
-                'DROP TABLE users',
-                'CREATE TABLE users (name VARCHAR NOT NULL, age INTEGER NOT NULL)',
-                'INSERT INTO users (name, age) SELECT name, age FROM __temp__users',
-                'DROP TABLE __temp__users',
-                'alter table "users" rename column "name" to "first_name"',
-            ],
+            'create table "__temp__users" ("name" varchar not null, "age" integer not null)',
+            'insert into "__temp__users" ("name", "age") select "name", "age" from "users"',
+            'drop table "users"',
+            'alter table "__temp__users" rename to "users"',
+            'alter table "users" rename column "name" to "first_name"',
         ];
 
-        $this->assertContains($queries, $expected);
+        $this->assertEquals($expected, $queries);
     }
 
     public function testRenamingColumnsWorks()
@@ -238,30 +234,24 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $queries = $blueprint->toSql(DB::connection(), new SQLiteGrammar);
 
         $expected = [
-            [
-                'CREATE TEMPORARY TABLE __temp__users AS SELECT age FROM users',
-                'DROP TABLE users',
-                'CREATE TABLE users (age INTEGER NOT NULL COLLATE "RTRIM")',
-                'INSERT INTO users (age) SELECT age FROM __temp__users',
-                'DROP TABLE __temp__users',
-            ],
+            'create table "__temp__users" ("age" integer not null collate \'RTRIM\')',
+            'insert into "__temp__users" ("age") select "age" from "users"',
+            'drop table "users"',
+            'alter table "__temp__users" rename to "users"',
         ];
 
-        $this->assertContains($queries, $expected);
+        $this->assertEquals($expected, $queries);
 
         $queries = $blueprint2->toSql(DB::connection(), new SQLiteGrammar);
 
         $expected = [
-            [
-                'CREATE TEMPORARY TABLE __temp__users AS SELECT age FROM users',
-                'DROP TABLE users',
-                'CREATE TABLE users (age INTEGER NOT NULL COLLATE "NOCASE")',
-                'INSERT INTO users (age) SELECT age FROM __temp__users',
-                'DROP TABLE __temp__users',
-            ],
+            'create table "__temp__users" ("age" integer not null collate \'NOCASE\')',
+            'insert into "__temp__users" ("age") select "age" from "users"',
+            'drop table "users"',
+            'alter table "__temp__users" rename to "users"',
         ];
 
-        $this->assertContains($queries, $expected);
+        $this->assertEquals($expected, $queries);
     }
 
     public function testChangingCharColumnsWork()
@@ -277,23 +267,13 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $queries = $blueprint->toSql(DB::connection(), new SQLiteGrammar);
 
         $expected = [
-            [
-                'CREATE TEMPORARY TABLE __temp__users AS SELECT name FROM users',
-                'DROP TABLE users',
-                'CREATE TABLE users (name CHAR(50) NOT NULL)',
-                'INSERT INTO users (name) SELECT name FROM __temp__users',
-                'DROP TABLE __temp__users',
-            ],
-            [
-                'CREATE TEMPORARY TABLE __temp__users AS SELECT name FROM users',
-                'DROP TABLE users',
-                'CREATE TABLE users (name CHAR(50) NOT NULL COLLATE "BINARY")',
-                'INSERT INTO users (name) SELECT name FROM __temp__users',
-                'DROP TABLE __temp__users',
-            ],
+            'create table "__temp__users" ("name" varchar not null)',
+            'insert into "__temp__users" ("name") select "name" from "users"',
+            'drop table "users"',
+            'alter table "__temp__users" rename to "users"',
         ];
 
-        $this->assertContains($queries, $expected);
+        $this->assertEquals($expected, $queries);
     }
 
     public function testChangingPrimaryAutoincrementColumnsToNonAutoincrementColumnsWork()
@@ -309,16 +289,13 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $queries = $blueprint->toSql(DB::connection(), new SQLiteGrammar);
 
         $expected = [
-            [
-                'CREATE TEMPORARY TABLE __temp__users AS SELECT id FROM users',
-                'DROP TABLE users',
-                'CREATE TABLE users (id BLOB NOT NULL, PRIMARY KEY(id))',
-                'INSERT INTO users (id) SELECT id FROM __temp__users',
-                'DROP TABLE __temp__users',
-            ],
+            'create table "__temp__users" ("id" blob not null, primary key ("id"))',
+            'insert into "__temp__users" ("id") select "id" from "users"',
+            'drop table "users"',
+            'alter table "__temp__users" rename to "users"',
         ];
 
-        $this->assertContains($queries, $expected);
+        $this->assertEquals($expected, $queries);
     }
 
     public function testChangingDoubleColumnsWork()
@@ -334,11 +311,10 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $queries = $blueprint->toSql(DB::connection(), new SQLiteGrammar);
 
         $expected = [
-            'CREATE TEMPORARY TABLE __temp__products AS SELECT price FROM products',
-            'DROP TABLE products',
-            'CREATE TABLE products (price DOUBLE PRECISION NOT NULL)',
-            'INSERT INTO products (price) SELECT price FROM __temp__products',
-            'DROP TABLE __temp__products',
+            'create table "__temp__products" ("price" double not null)',
+            'insert into "__temp__products" ("price") select "price" from "products"',
+            'drop table "products"',
+            'alter table "__temp__products" rename to "products"',
         ];
 
         $this->assertEquals($expected, $queries);
@@ -406,13 +382,11 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $queries = $blueprintMySql->toSql(DB::connection(), new MySqlGrammar);
 
         $expected = [
-            [
-                'alter table `users` modify `name` varchar(255) null',
-                'alter table `users` add unique `users_name_unique`(`name`)',
-            ],
+            'alter table `users` modify `name` varchar(255) null',
+            'alter table `users` add unique `users_name_unique`(`name`)',
         ];
 
-        $this->assertContains($queries, $expected);
+        $this->assertEquals($expected, $queries);
 
         $blueprintPostgres = new Blueprint('users', function ($table) {
             $table->string('name')->nullable()->unique()->change();
@@ -421,14 +395,12 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $queries = $blueprintPostgres->toSql(DB::connection(), new PostgresGrammar);
 
         $expected = [
-            [
-                'alter table "users" alter column "name" type varchar(255), alter column "name" drop not null, alter column "name" drop default, alter column "name" drop identity if exists',
-                'alter table "users" add constraint "users_name_unique" unique ("name")',
-                'comment on column "users"."name" is NULL',
-            ],
+            'alter table "users" alter column "name" type varchar(255), alter column "name" drop not null, alter column "name" drop default, alter column "name" drop identity if exists',
+            'alter table "users" add constraint "users_name_unique" unique ("name")',
+            'comment on column "users"."name" is NULL',
         ];
 
-        $this->assertContains($queries, $expected);
+        $this->assertEquals($expected, $queries);
 
         $blueprintSQLite = new Blueprint('users', function ($table) {
             $table->string('name')->nullable()->unique()->change();
@@ -437,17 +409,14 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $queries = $blueprintSQLite->toSql(DB::connection(), new SQLiteGrammar);
 
         $expected = [
-            [
-                'CREATE TEMPORARY TABLE __temp__users AS SELECT name FROM users',
-                'DROP TABLE users',
-                'CREATE TABLE users (name VARCHAR(255) DEFAULT NULL)',
-                'INSERT INTO users (name) SELECT name FROM __temp__users',
-                'DROP TABLE __temp__users',
-                'create unique index "users_name_unique" on "users" ("name")',
-            ],
+            'create table "__temp__users" ("name" varchar)',
+            'insert into "__temp__users" ("name") select "name" from "users"',
+            'drop table "users"',
+            'alter table "__temp__users" rename to "users"',
+            'create unique index "users_name_unique" on "users" ("name")',
         ];
 
-        $this->assertContains($queries, $expected);
+        $this->assertEquals($expected, $queries);
 
         $blueprintSqlServer = new Blueprint('users', function ($table) {
             $table->string('name')->nullable()->unique()->change();
@@ -456,14 +425,12 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $queries = $blueprintSqlServer->toSql(DB::connection(), new SqlServerGrammar);
 
         $expected = [
-            [
-                "DECLARE @sql NVARCHAR(MAX) = '';SELECT @sql += 'ALTER TABLE [dbo].[users] DROP CONSTRAINT ' + OBJECT_NAME([default_object_id]) + ';' FROM sys.columns WHERE [object_id] = OBJECT_ID('[dbo].[users]') AND [name] in ('name') AND [default_object_id] <> 0;EXEC(@sql)",
-                'alter table "users" alter column "name" nvarchar(255) null',
-                'create unique index "users_name_unique" on "users" ("name")',
-            ],
+            "DECLARE @sql NVARCHAR(MAX) = '';SELECT @sql += 'ALTER TABLE [dbo].[users] DROP CONSTRAINT ' + OBJECT_NAME([default_object_id]) + ';' FROM sys.columns WHERE [object_id] = OBJECT_ID('[dbo].[users]') AND [name] in ('name') AND [default_object_id] <> 0;EXEC(@sql)",
+            'alter table "users" alter column "name" nvarchar(255) null',
+            'create unique index "users_name_unique" on "users" ("name")',
         ];
 
-        $this->assertContains($queries, $expected);
+        $this->assertEquals($expected, $queries);
     }
 
     public function testAddUniqueIndexWithNameWorks()
@@ -479,13 +446,11 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $queries = $blueprintMySql->toSql(DB::connection(), new MySqlGrammar);
 
         $expected = [
-            [
-                'alter table `users` modify `name` varchar(255) null',
-                'alter table `users` add unique `index1`(`name`)',
-            ],
+            'alter table `users` modify `name` varchar(255) null',
+            'alter table `users` add unique `index1`(`name`)',
         ];
 
-        $this->assertContains($queries, $expected);
+        $this->assertEquals($expected, $queries);
 
         $blueprintPostgres = new Blueprint('users', function ($table) {
             $table->unsignedInteger('name')->nullable()->unique('index1')->change();
@@ -508,11 +473,10 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $queries = $blueprintSQLite->toSql(DB::connection(), new SQLiteGrammar);
 
         $expected = [
-            'CREATE TEMPORARY TABLE __temp__users AS SELECT name FROM users',
-            'DROP TABLE users',
-            'CREATE TABLE users (name INTEGER UNSIGNED DEFAULT NULL)',
-            'INSERT INTO users (name) SELECT name FROM __temp__users',
-            'DROP TABLE __temp__users',
+            'create table "__temp__users" ("name" integer)',
+            'insert into "__temp__users" ("name") select "name" from "users"',
+            'drop table "users"',
+            'alter table "__temp__users" rename to "users"',
             'create unique index "index1" on "users" ("name")',
         ];
 
