@@ -337,7 +337,7 @@ class SQLiteGrammar extends Grammar
         ]))->all();
 
         [$primary, $indexes] = collect($schema->getIndexes($table))->map(fn ($index) => new IndexDefinition([
-            'name' => match(true) {
+            'name' => match (true) {
                 $index['primary'] => 'primary',
                 $index['unique'] => 'unique',
                 default => 'index',
@@ -359,7 +359,7 @@ class SQLiteGrammar extends Grammar
                 $tempTable,
                 implode(', ', $columns),
                 $this->addForeignKeys($foreignKeys),
-                $autoIncrementColumn ? '' :$this->addPrimaryKeys($primary->first())
+                $autoIncrementColumn ? '' : $this->addPrimaryKeys($primary->first())
             ),
             sprintf('insert into %s (%s) select %s from %s', $tempTable, $columnNames, $columnNames, $table),
             sprintf('drop table %s', $table),
