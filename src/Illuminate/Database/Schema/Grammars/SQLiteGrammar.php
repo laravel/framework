@@ -17,7 +17,7 @@ class SQLiteGrammar extends Grammar
      *
      * @var string[]
      */
-    protected $modifiers = ['Increment', 'Nullable', 'Default', 'VirtualAs', 'StoredAs'];
+    protected $modifiers = ['Increment', 'Nullable', 'Default', 'Collate', 'VirtualAs', 'StoredAs'];
 
     /**
      * The columns available as serials.
@@ -35,7 +35,22 @@ class SQLiteGrammar extends Grammar
      */
     public function compileTableExists()
     {
-        return "select * from sqlite_master where type = 'table' and name = ?";
+        return "select sql from sqlite_master where type = 'table' and name = ?";
+    }
+
+    /**
+     * Compile the query to determine the SQL text that describes the given object.
+     *
+     * @param  string  $name
+     * @param  string  $type
+     * @return string
+     */
+    public function compileSqlCreateStatement($name, $type = 'table')
+    {
+        return sprintf('select "sql" from sqlite_master where type = %s and name = %s',
+            $this->wrap($type),
+            $this->wrap(str_replace('.', '__', $name))
+        );
     }
 
     /**
@@ -1060,6 +1075,20 @@ class SQLiteGrammar extends Grammar
     {
         if (in_array($column->type, $this->serials) && $column->autoIncrement) {
             return ' primary key autoincrement';
+        }
+    }
+
+    /**
+     * Get the SQL for a collation column modifier.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return string|null
+     */
+    protected function modifyCollate(Blueprint $blueprint, Fluent $column)
+    {
+        if (! is_null($column->collation)) {
+            return " collate '{$column->collation}'";
         }
     }
 
