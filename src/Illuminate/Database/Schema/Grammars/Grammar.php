@@ -165,6 +165,18 @@ abstract class Grammar extends BaseGrammar
     }
 
     /**
+     * Compile a drop foreign key command.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $command
+     * @return string
+     */
+    public function compileDropForeign(Blueprint $blueprint, Fluent $command)
+    {
+        throw new RuntimeException('This database driver does not support dropping foreign keys.');
+    }
+
+    /**
      * Compile the blueprint's added column definitions.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint

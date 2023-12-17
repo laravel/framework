@@ -2,7 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Database;
 
-use BadMethodCallException;
+use RuntimeException;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\Grammars\MySqlGrammar;
 use Illuminate\Database\Schema\Grammars\PostgresGrammar;
@@ -565,8 +565,8 @@ class DatabaseSchemaBlueprintTest extends TestCase
 
     public function testItEnsuresDroppingForeignKeyIsAvailable()
     {
-        $this->expectException(BadMethodCallException::class);
-        $this->expectExceptionMessage("SQLite doesn't support dropping foreign keys (you would need to re-create the table).");
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('This database driver does not support dropping foreign keys.');
 
         Schema::table('users', function (Blueprint $table) {
             $table->dropForeign('something');
