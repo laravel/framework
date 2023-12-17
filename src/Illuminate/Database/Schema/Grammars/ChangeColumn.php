@@ -8,7 +8,6 @@ use Doctrine\DBAL\Types\Type;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Fluent;
-use RuntimeException;
 
 class ChangeColumn
 {
