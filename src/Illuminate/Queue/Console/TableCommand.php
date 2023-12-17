@@ -48,4 +48,23 @@ class TableCommand extends MigrationGeneratorCommand
     {
         return __DIR__.'/stubs/jobs.stub';
     }
+
+    /**
+     * Determine whether a migration for the table already exists.
+     *
+     * @param  string  $table
+     * @return bool
+     */
+    protected function migrationExists($table)
+    {
+        if ($table !== 'jobs') {
+            return parent::migrationExists($table);
+        }
+
+        return count($this->files->glob(sprintf(
+            '{%s,%s}',
+            $this->laravel->joinPaths($this->laravel->databasePath('migrations'), '*_*_*_*_create_'.$table.'_table.php'),
+            $this->laravel->joinPaths($this->laravel->databasePath('migrations'), '0001_01_01_000003_create_jobs_table.php'),
+        ))) !== 0;
+    }
 }
