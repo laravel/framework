@@ -3,7 +3,6 @@
 namespace Illuminate\Database\Migrations;
 
 use Illuminate\Console\View\Components\BulletList;
-use Illuminate\Console\View\Components\Error;
 use Illuminate\Console\View\Components\Info;
 use Illuminate\Console\View\Components\Task;
 use Illuminate\Console\View\Components\TwoColumnDetail;
