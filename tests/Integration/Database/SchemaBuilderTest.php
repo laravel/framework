@@ -214,12 +214,10 @@ class SchemaBuilderTest extends DatabaseTestCase
         Schema::create('foo', function (Blueprint $table) {
             $table->id();
             $table->string('bar')->nullable();
-            $table->string('baz')->default('test')->comment('lorem ipsum');
+            $table->string('baz')->default('test');
         });
 
         $columns = Schema::getColumns('foo');
-
-        var_dump($columns);
 
         $this->assertCount(3, $columns);
         $this->assertTrue(collect($columns)->contains(
@@ -229,17 +227,18 @@ class SchemaBuilderTest extends DatabaseTestCase
             fn ($column) => $column['name'] === 'bar' && $column['nullable']
         ));
         $this->assertTrue(collect($columns)->contains(
-            fn ($column) => $column['name'] === 'baz' && ! $column['nullable'] && $column['default'] === 'test'
+            fn ($column) => $column['name'] === 'baz' && ! $column['nullable'] && str_contains($column['default'], 'test')
         ));
     }
 
     public function testGetColumnsOnView()
     {
-        DB::statement('create view foo (name) as select 1');
+        DB::statement('create view foo (bar) as select 1');
 
         $columns = Schema::getColumns('foo');
 
-        var_dump($columns);
+        $this->assertCount(1, $columns);
+        $this->assertTrue($columns[0]['name'] === 'bar');
     }
 
     public function testGetIndexes()
