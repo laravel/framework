@@ -139,7 +139,7 @@ class SQLiteGrammar extends Grammar
     {
         return sprintf(
             'select name, type, not "notnull" as "nullable", dflt_value as "default", pk as "primary" '
-            .'from pragma_table_info(%s) order by cid asc',
+            .'from pragma_table_xinfo(%s) order by cid asc',
             $this->wrap(str_replace('.', '__', $table))
         );
     }
