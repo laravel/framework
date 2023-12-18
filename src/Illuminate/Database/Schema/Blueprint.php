@@ -240,10 +240,6 @@ class Blueprint
     public function addFluentCommands(Connection $connection, Grammar $grammar)
     {
         foreach ($this->columns as $column) {
-            if ($column->change && ! $connection->usingNativeSchemaOperations()) {
-                continue;
-            }
-
             foreach ($grammar->getFluentCommands() as $commandName) {
                 $this->addCommand($commandName, compact('column'));
             }

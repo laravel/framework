@@ -93,7 +93,7 @@ abstract class Grammar extends BaseGrammar
      */
     public function compileChange(Blueprint $blueprint, Fluent $command, Connection $connection)
     {
-        return ChangeColumn::compile($this, $blueprint, $command, $connection);
+        throw new LogicException('This database driver does not support modifying columns.');
     }
 
     /**

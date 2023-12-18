@@ -2,7 +2,6 @@
 
 namespace Illuminate\Database\Migrations;
 
-use Doctrine\DBAL\Schema\SchemaException;
 use Illuminate\Console\View\Components\BulletList;
 use Illuminate\Console\View\Components\Error;
 use Illuminate\Console\View\Components\Info;
@@ -428,28 +427,19 @@ class Migrator
      */
     protected function pretendToRun($migration, $method)
     {
-        try {
-            $name = get_class($migration);
+        $name = get_class($migration);
 
-            $reflectionClass = new ReflectionClass($migration);
+        $reflectionClass = new ReflectionClass($migration);
 
-            if ($reflectionClass->isAnonymous()) {
-                $name = $this->getMigrationName($reflectionClass->getFileName());
-            }
-
-            $this->write(TwoColumnDetail::class, $name);
-
-            $this->write(BulletList::class, collect($this->getQueries($migration, $method))->map(function ($query) {
-                return $query['query'];
-            }));
-        } catch (SchemaException) {
-            $name = get_class($migration);
-
-            $this->write(Error::class, sprintf(
-                '[%s] failed to dump queries. This may be due to changing database columns using Doctrine, which is not supported while pretending to run migrations.',
-                $name,
-            ));
+        if ($reflectionClass->isAnonymous()) {
+            $name = $this->getMigrationName($reflectionClass->getFileName());
         }
+
+        $this->write(TwoColumnDetail::class, $name);
+
+        $this->write(BulletList::class, collect($this->getQueries($migration, $method))->map(function ($query) {
+            return $query['query'];
+        }));
     }
 
     /**

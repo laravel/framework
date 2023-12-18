@@ -288,10 +288,6 @@ class SQLiteGrammar extends Grammar
      */
     public function compileChange(Blueprint $blueprint, Fluent $command, Connection $connection)
     {
-        if (! $connection->usingNativeSchemaOperations()) {
-            return parent::compileChange($blueprint, $command, $connection);
-        }
-
         $schema = $connection->getSchemaBuilder();
         $table = $blueprint->getTable();
 

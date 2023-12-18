@@ -46,11 +46,13 @@ class Builder
     public static $defaultMorphKeyType = 'int';
 
     /**
-     * Indicates whether Doctrine DBAL usage will be prevented if possible when modifying columns.
+     * Indicates whether Doctrine DBAL usage will be prevented if possible when dropping, renaming, and modifying columns.
+     *
+     * @deprecated Will be removed in a future Laravel version.
      *
      * @var bool
      */
-    public static $alwaysUsesNativeSchemaOperationsIfPossible = true;
+    public static $alwaysUsesNativeSchemaOperationsIfPossible = false;
 
     /**
      * Create a new database Schema manager.
@@ -113,7 +115,9 @@ class Builder
     }
 
     /**
-     * Attempt to use native schema operations for modifying columns, even if Doctrine DBAL is installed.
+     * Attempt to use native schema operations for dropping, renaming, and modifying columns, even if Doctrine DBAL is installed.
+     *
+     * @deprecated Will be removed in a future Laravel version.
      *
      * @param  bool  $value
      * @return void

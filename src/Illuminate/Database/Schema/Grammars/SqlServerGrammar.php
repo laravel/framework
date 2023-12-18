@@ -275,10 +275,6 @@ class SqlServerGrammar extends Grammar
      */
     public function compileChange(Blueprint $blueprint, Fluent $command, Connection $connection)
     {
-        if (! $connection->usingNativeSchemaOperations()) {
-            return parent::compileChange($blueprint, $command, $connection);
-        }
-
         $changes = [$this->compileDropDefaultConstraint($blueprint, $command)];
 
         foreach ($blueprint->getChangedColumns() as $column) {
