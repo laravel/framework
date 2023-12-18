@@ -10,6 +10,240 @@ use Orchestra\Testbench\TestCase;
 
 class MakesHttpRequestsTest extends TestCase
 {
+    public function testGet()
+    {
+        $this->app->make(Registrar::class)->get('test-route', fn () => 'ok');
+
+        $this->get('test-route')
+            ->assertStatus(200)
+            ->assertContent('ok');
+    }
+
+    public function testGetUsingRoute()
+    {
+        $this->app->make(Registrar::class)->get('test-route', fn () => 'ok')->name('test.route');
+
+        $this->getUsingRoute('test.route')
+            ->assertStatus(200)
+            ->assertContent('ok');
+    }
+
+    public function testGetJson()
+    {
+        $this->app->make(Registrar::class)->get('test-route', fn () => 'ok');
+
+        $this->getJson('test-route')
+            ->assertStatus(200)
+            ->assertContent('ok');
+    }
+
+    public function testGetJsonUsingRoute()
+    {
+        $this->app->make(Registrar::class)->get('test-route', fn () => 'ok')->name('test.route');
+
+        $this->getJsonUsingRoute('test.route')
+            ->assertStatus(200)
+            ->assertContent('ok');
+    }
+
+    public function testPost()
+    {
+        $this->app->make(Registrar::class)->post('test-route', fn () => 'ok');
+
+        $this->post('test-route')
+            ->assertStatus(200)
+            ->assertContent('ok');
+    }
+
+    public function testPostUsingRoute()
+    {
+        $this->app->make(Registrar::class)->post('test-route', fn () => 'ok')->name('test.route');
+
+        $this->postUsingRoute('test.route')
+            ->assertStatus(200)
+            ->assertContent('ok');
+    }
+
+    public function testPostJson()
+    {
+        $this->app->make(Registrar::class)->post('test-route', fn () => 'ok');
+
+        $this->postJson('test-route')
+            ->assertStatus(200)
+            ->assertContent('ok');
+    }
+
+    public function testPostJsonUsingRoute()
+    {
+        $this->app->make(Registrar::class)->post('test-route', fn () => 'ok')->name('test.route');
+
+        $this->postJsonUsingRoute('test.route')
+            ->assertStatus(200)
+            ->assertContent('ok');
+    }
+
+    public function testPut()
+    {
+        $this->app->make(Registrar::class)->put('test-route', fn () => 'ok');
+
+        $this->put('test-route')
+            ->assertStatus(200)
+            ->assertContent('ok');
+    }
+
+    public function testPutUsingRoute()
+    {
+        $this->app->make(Registrar::class)->put('test-route', fn () => 'ok')->name('test.route');
+
+        $this->putUsingRoute('test.route')
+            ->assertStatus(200)
+            ->assertContent('ok');
+    }
+
+    public function testPutJson()
+    {
+        $this->app->make(Registrar::class)->put('test-route', fn () => 'ok');
+
+        $this->putJson('test-route')
+            ->assertStatus(200)
+            ->assertContent('ok');
+    }
+
+    public function testPutJsonUsingRoute()
+    {
+        $this->app->make(Registrar::class)->put('test-route', fn () => 'ok')->name('test.route');
+
+        $this->putJsonUsingRoute('test.route')
+            ->assertStatus(200)
+            ->assertContent('ok');
+    }
+
+    public function testPatch()
+    {
+        $this->app->make(Registrar::class)->patch('test-route', fn () => 'ok');
+
+        $this->patch('test-route')
+            ->assertStatus(200)
+            ->assertContent('ok');
+    }
+
+    public function testPatchUsingRoute()
+    {
+        $this->app->make(Registrar::class)->patch('test-route', fn () => 'ok')->name('test.route');
+
+        $this->patchUsingRoute('test.route')
+            ->assertStatus(200)
+            ->assertContent('ok');
+    }
+
+    public function testPatchJson()
+    {
+        $this->app->make(Registrar::class)->patch('test-route', fn () => 'ok');
+
+        $this->patchJson('test-route')
+            ->assertStatus(200)
+            ->assertContent('ok');
+    }
+
+    public function testPatchJsonUsingRoute()
+    {
+        $this->app->make(Registrar::class)->patch('test-route', fn () => 'ok')->name('test.route');
+
+        $this->patchJsonUsingRoute('test.route')
+            ->assertStatus(200)
+            ->assertContent('ok');
+    }
+
+    public function testDelete()
+    {
+        $this->app->make(Registrar::class)->delete('test-route', fn () => 'ok');
+
+        $this->delete('test-route')
+            ->assertStatus(200)
+            ->assertContent('ok');
+    }
+
+    public function testDeleteUsingRoute()
+    {
+        $this->app->make(Registrar::class)->delete('test-route', fn () => 'ok')->name('test.route');
+
+        $this->deleteUsingRoute('test.route')
+            ->assertStatus(200)
+            ->assertContent('ok');
+    }
+
+    public function testDeleteJson()
+    {
+        $this->app->make(Registrar::class)->delete('test-route', fn () => 'ok');
+
+        $this->deleteJson('test-route')
+            ->assertStatus(200)
+            ->assertContent('ok');
+    }
+
+    public function testDeleteJsonUsingRoute()
+    {
+        $this->app->make(Registrar::class)->delete('test-route', fn () => 'ok')->name('test.route');
+
+        $this->deleteJsonUsingRoute('test.route')
+            ->assertStatus(200)
+            ->assertContent('ok');
+    }
+
+    public function testOptions()
+    {
+        $this->app->make(Registrar::class)->options('test-route', fn () => 'ok');
+
+        $this->options('test-route')
+            ->assertStatus(200)
+            ->assertContent('ok');
+    }
+
+    public function testOptionsUsingRoute()
+    {
+        $this->app->make(Registrar::class)->options('test-route', fn () => 'ok')->name('test.route');
+
+        $this->optionsUsingRoute('test.route')
+            ->assertStatus(200)
+            ->assertContent('ok');
+    }
+
+    public function testOptionsJson()
+    {
+        $this->app->make(Registrar::class)->options('test-route', fn () => 'ok');
+
+        $this->optionsJson('test-route')
+            ->assertStatus(200)
+            ->assertContent('ok');
+    }
+
+    public function testOptionsJsonUsingRoute()
+    {
+        $this->app->make(Registrar::class)->options('test-route', fn () => 'ok')->name('test.route');
+
+        $this->optionsJsonUsingRoute('test.route')
+            ->assertStatus(200)
+            ->assertContent('ok');
+    }
+
+    public function testHead()
+    {
+        $this->app->make(Registrar::class)->get('test-route', fn () => 'ok');
+
+        $this->head('test-route')
+            ->assertStatus(200)
+            ->assertContent('');
+    }
+
+    public function testHeadUsingRoute()
+    {
+        $this->app->make(Registrar::class)->get('test-route', fn () => 'ok')->name('test.route');
+
+        $this->headUsingRoute('test.route')
+            ->assertStatus(200)
+            ->assertContent('');
+    }
+
     public function testFromSetsHeaderAndSession()
     {
         $this->from('previous/url');

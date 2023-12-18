@@ -347,6 +347,19 @@ trait MakesHttpRequests
     }
 
     /**
+     * Visit the given route with a GET request.
+     *
+     * @param  string  $name
+     * @param  array  $parameters
+     * @param  array  $headers
+     * @return \Illuminate\Testing\TestResponse
+     */
+    public function getUsingRoute(string $name, $parameters = [], array $headers = [])
+    {
+        return $this->get($this->app['url']->route($name, $parameters), $headers);
+    }
+
+    /**
      * Visit the given URI with a GET request, expecting a JSON response.
      *
      * @param  string  $uri
@@ -357,6 +370,20 @@ trait MakesHttpRequests
     public function getJson($uri, array $headers = [], $options = 0)
     {
         return $this->json('GET', $uri, [], $headers, $options);
+    }
+
+    /**
+     * Visit the given route with a GET request, expecting a JSON response.
+     *
+     * @param  string  $name
+     * @param  array  $parameters
+     * @param  array  $headers
+     * @param  int  $options
+     * @return \Illuminate\Testing\TestResponse
+     */
+    public function getJsonUsingRoute(string $name, $parameters = [], array $headers = [], $options = 0)
+    {
+        return $this->getJson($this->app['url']->route($name, $parameters), $headers, $options);
     }
 
     /**
@@ -376,6 +403,20 @@ trait MakesHttpRequests
     }
 
     /**
+     * Visit the given route with a POST request.
+     *
+     * @param  string  $name
+     * @param  array  $parameters
+     * @param  array  $data
+     * @param  array  $headers
+     * @return \Illuminate\Testing\TestResponse
+     */
+    public function postUsingRoute(string $name, $parameters = [], array $data = [], array $headers = [])
+    {
+        return $this->post($this->app['url']->route($name, $parameters), $data, $headers);
+    }
+
+    /**
      * Visit the given URI with a POST request, expecting a JSON response.
      *
      * @param  string  $uri
@@ -387,6 +428,21 @@ trait MakesHttpRequests
     public function postJson($uri, array $data = [], array $headers = [], $options = 0)
     {
         return $this->json('POST', $uri, $data, $headers, $options);
+    }
+
+    /**
+     * Visit the given route with a POST request, expecting a JSON response.
+     *
+     * @param  string  $name
+     * @param  array  $parameters
+     * @param  array  $data
+     * @param  array  $headers
+     * @param  int  $options
+     * @return \Illuminate\Testing\TestResponse
+     */
+    public function postJsonUsingRoute(string $name, $parameters = [], array $data = [], array $headers = [], $options = 0)
+    {
+        return $this->postJson($this->app['url']->route($name, $parameters), $data, $headers, $options);
     }
 
     /**
@@ -406,6 +462,20 @@ trait MakesHttpRequests
     }
 
     /**
+     * Visit the given route with a PUT request.
+     *
+     * @param  string  $name
+     * @param  array  $parameters
+     * @param  array  $data
+     * @param  array  $headers
+     * @return \Illuminate\Testing\TestResponse
+     */
+    public function putUsingRoute(string $name, $parameters = [], array $data = [], array $headers = [])
+    {
+        return $this->put($this->app['url']->route($name, $parameters), $data, $headers);
+    }
+
+    /**
      * Visit the given URI with a PUT request, expecting a JSON response.
      *
      * @param  string  $uri
@@ -417,6 +487,21 @@ trait MakesHttpRequests
     public function putJson($uri, array $data = [], array $headers = [], $options = 0)
     {
         return $this->json('PUT', $uri, $data, $headers, $options);
+    }
+
+    /**
+     * Visit the given route with a PUT request, expecting a JSON response.
+     *
+     * @param  string  $name
+     * @param  array  $parameters
+     * @param  array  $data
+     * @param  array  $headers
+     * @param  int  $options
+     * @return \Illuminate\Testing\TestResponse
+     */
+    public function putJsonUsingRoute(string $name, $parameters = [], array $data = [], array $headers = [], $options = 0)
+    {
+        return $this->putJson($this->app['url']->route($name, $parameters), $data, $headers, $options);
     }
 
     /**
@@ -436,6 +521,20 @@ trait MakesHttpRequests
     }
 
     /**
+     * Visit the given route with a PATCH request.
+     *
+     * @param  string  $name
+     * @param  array  $parameters
+     * @param  array  $data
+     * @param  array  $headers
+     * @return \Illuminate\Testing\TestResponse
+     */
+    public function patchUsingRoute(string $name, $parameters = [], array $data = [], array $headers = [])
+    {
+        return $this->patch($this->app['url']->route($name, $parameters), $data, $headers);
+    }
+
+    /**
      * Visit the given URI with a PATCH request, expecting a JSON response.
      *
      * @param  string  $uri
@@ -447,6 +546,21 @@ trait MakesHttpRequests
     public function patchJson($uri, array $data = [], array $headers = [], $options = 0)
     {
         return $this->json('PATCH', $uri, $data, $headers, $options);
+    }
+
+    /**
+     * Visit the given route with a PATCH request, expecting a JSON response.
+     *
+     * @param  string  $name
+     * @param  array  $parameters
+     * @param  array  $data
+     * @param  array  $headers
+     * @param  int  $options
+     * @return \Illuminate\Testing\TestResponse
+     */
+    public function patchJsonUsingRoute(string $name, $parameters = [], array $data = [], array $headers = [], $options = 0)
+    {
+        return $this->patchJson($this->app['url']->route($name, $parameters), $data, $headers, $options);
     }
 
     /**
@@ -466,6 +580,20 @@ trait MakesHttpRequests
     }
 
     /**
+     * Visit the given route with a DELETE request.
+     *
+     * @param  string  $name
+     * @param  array  $parameters
+     * @param  array  $data
+     * @param  array  $headers
+     * @return \Illuminate\Testing\TestResponse
+     */
+    public function deleteUsingRoute(string $name, $parameters = [], array $data = [], array $headers = [])
+    {
+        return $this->delete($this->app['url']->route($name, $parameters), $data, $headers);
+    }
+
+    /**
      * Visit the given URI with a DELETE request, expecting a JSON response.
      *
      * @param  string  $uri
@@ -477,6 +605,21 @@ trait MakesHttpRequests
     public function deleteJson($uri, array $data = [], array $headers = [], $options = 0)
     {
         return $this->json('DELETE', $uri, $data, $headers, $options);
+    }
+
+    /**
+     * Visit the given route with a DELETE request, expecting a JSON response.
+     *
+     * @param  string  $name
+     * @param  array  $parameters
+     * @param  array  $data
+     * @param  array  $headers
+     * @param  int  $options
+     * @return \Illuminate\Testing\TestResponse
+     */
+    public function deleteJsonUsingRoute(string $name, $parameters = [], array $data = [], array $headers = [], $options = 0)
+    {
+        return $this->deleteJson($this->app['url']->route($name, $parameters), $data, $headers, $options);
     }
 
     /**
@@ -497,6 +640,20 @@ trait MakesHttpRequests
     }
 
     /**
+     * Visit the given route with an OPTIONS request.
+     *
+     * @param  string  $name
+     * @param  array  $parameters
+     * @param  array  $data
+     * @param  array  $headers
+     * @return \Illuminate\Testing\TestResponse
+     */
+    public function optionsUsingRoute(string $name, $parameters = [], array $data = [], array $headers = [])
+    {
+        return $this->options($this->app['url']->route($name, $parameters), $data, $headers);
+    }
+
+    /**
      * Visit the given URI with an OPTIONS request, expecting a JSON response.
      *
      * @param  string  $uri
@@ -508,6 +665,21 @@ trait MakesHttpRequests
     public function optionsJson($uri, array $data = [], array $headers = [], $options = 0)
     {
         return $this->json('OPTIONS', $uri, $data, $headers, $options);
+    }
+
+    /**
+     * Visit the given route with an OPTIONS request, expecting a JSON response.
+     *
+     * @param  string  $name
+     * @param  array  $parameters
+     * @param  array  $data
+     * @param  array  $headers
+     * @param  int  $options
+     * @return \Illuminate\Testing\TestResponse
+     */
+    public function optionsJsonUsingRoute(string $name, $parameters = [], array $data = [], array $headers = [], $options = 0)
+    {
+        return $this->optionsJson($this->app['url']->route($name, $parameters), $data, $headers, $options);
     }
 
     /**
@@ -524,6 +696,19 @@ trait MakesHttpRequests
         $cookies = $this->prepareCookiesForRequest();
 
         return $this->call('HEAD', $uri, [], $cookies, [], $server);
+    }
+
+    /**
+     * Visit the given route with a HEAD request.
+     *
+     * @param  string  $name
+     * @param  array  $parameters
+     * @param  array  $headers
+     * @return \Illuminate\Testing\TestResponse
+     */
+    public function headUsingRoute(string $name, $parameters = [], array $headers = [])
+    {
+        return $this->head($this->app['url']->route($name, $parameters), $headers);
     }
 
     /**
