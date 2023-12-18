@@ -4,7 +4,6 @@ namespace Illuminate\Support\Facades;
 
 /**
  * @method static \Illuminate\Database\Connection connection(string|null $name = null)
- * @method static void registerDoctrineType(string $class, string $name, string $type)
  * @method static void purge(string|null $name = null)
  * @method static void disconnect(string|null $name = null)
  * @method static \Illuminate\Database\Connection reconnect(string|null $name = null)

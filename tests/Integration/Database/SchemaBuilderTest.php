@@ -2,12 +2,10 @@
 
 namespace Illuminate\Tests\Integration\Database;
 
-use Doctrine\DBAL\Types\Type;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\Grammars\SQLiteGrammar;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Tests\Integration\Database\Fixtures\TinyInteger;
 
 class SchemaBuilderTest extends DatabaseTestCase
 {
@@ -44,14 +42,11 @@ class SchemaBuilderTest extends DatabaseTestCase
         DB::statement('create view foo (id) as select 1');
     }
 
-    public function testRegisterCustomDoctrineType()
+    public function testChangeToTinyInteger()
     {
         if ($this->driver !== 'sqlite') {
             $this->markTestSkipped('Test requires a SQLite connection.');
         }
-
-        Schema::useNativeSchemaOperationsIfPossible(false);
-        Schema::getConnection()->registerDoctrineType(TinyInteger::class, TinyInteger::NAME, 'TINYINT');
 
         Schema::create('test', function (Blueprint $table) {
             $table->string('test_column');
@@ -63,31 +58,7 @@ class SchemaBuilderTest extends DatabaseTestCase
 
         $blueprint->build($this->getConnection(), new SQLiteGrammar);
 
-        $this->assertArrayHasKey(TinyInteger::NAME, Type::getTypesMap());
-        $this->assertSame('tinyint', Schema::getColumnType('test', 'test_column'));
-    }
-
-    public function testRegisterCustomDoctrineTypeASecondTime()
-    {
-        if ($this->driver !== 'sqlite') {
-            $this->markTestSkipped('Test requires a SQLite connection.');
-        }
-
-        Schema::useNativeSchemaOperationsIfPossible(false);
-        Schema::getConnection()->registerDoctrineType(TinyInteger::class, TinyInteger::NAME, 'TINYINT');
-
-        Schema::create('test', function (Blueprint $table) {
-            $table->string('test_column');
-        });
-
-        $blueprint = new Blueprint('test', function (Blueprint $table) {
-            $table->tinyInteger('test_column')->change();
-        });
-
-        $blueprint->build($this->getConnection(), new SQLiteGrammar);
-
-        $this->assertArrayHasKey(TinyInteger::NAME, Type::getTypesMap());
-        $this->assertSame('tinyint', Schema::getColumnType('test', 'test_column'));
+        $this->assertSame('integer', Schema::getColumnType('test', 'test_column'));
     }
 
     public function testChangeToTextColumn()
