@@ -700,6 +700,16 @@ class SupportArrTest extends TestCase
         $this->assertEquals(['first' => 'taylor', 'last' => 'otwell'], $data);
     }
 
+    public function testKeyMap()
+    {
+        $data = ['First' => 'taylor', 'Last' => 'otwell'];
+        $mapped = Arr::keyMap(function ($key) {
+            return strtolower($key);
+        }, $data);
+        $this->assertEquals(['first' => 'taylor', 'last' => 'otwell'], $mapped);
+        $this->assertEquals(['First' => 'taylor', 'Last' => 'otwell'], $data);
+    }
+
     public function testMapWithKeys()
     {
         $data = [
