@@ -566,6 +566,22 @@ class Arr
     }
 
     /**
+     * Run a map over each of the keys in the array.
+     *
+     * @param  array  $array
+     * @param  callable  $callback
+     * @return array
+     */
+    public static function keyMap(array $array, callable $callback)
+    {
+        array_walk($array, function ($value, $key) use (&$return, $callback) {
+            $return[call_user_func($callback, $key)] = $value;
+        });
+
+        return $return;
+    }
+
+    /**
      * Run an associative map over each of the items.
      *
      * The callback should return an associative array with a single key/value pair.
