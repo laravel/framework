@@ -14,13 +14,6 @@ use Orchestra\Testbench\TestCase;
 
 class ThrottlesExceptionsTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        parent::tearDown();
-
-        m::close();
-    }
-
     public function testCircuitIsOpenedForJobErrors()
     {
         $this->assertJobWasReleasedImmediately(CircuitBreakerTestJob::class);
