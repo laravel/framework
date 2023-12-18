@@ -574,6 +574,7 @@ class Arr
      */
     public static function keyMap(array $array, callable $callback)
     {
+        $return = [];
         array_walk($array, function ($value, $key) use (&$return, $callback) {
             $return[call_user_func($callback, $key)] = $value;
         });
