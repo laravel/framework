@@ -209,6 +209,39 @@ class SchemaBuilderTest extends DatabaseTestCase
         $this->assertEmpty($types);
     }
 
+    public function testGetColumns()
+    {
+        Schema::create('foo', function (Blueprint $table) {
+            $table->id();
+            $table->string('bar')->nullable();
+            $table->string('baz')->default('test')->comment('lorem ipsum');
+        });
+
+        $columns = Schema::getColumns('foo');
+
+        var_dump($columns);
+
+        $this->assertCount(3, $columns);
+        $this->assertTrue(collect($columns)->contains(
+            fn ($column) => $column['name'] === 'id' && $column['auto_increment'] && ! $column['nullable']
+        ));
+        $this->assertTrue(collect($columns)->contains(
+            fn ($column) => $column['name'] === 'bar' && $column['nullable']
+        ));
+        $this->assertTrue(collect($columns)->contains(
+            fn ($column) => $column['name'] === 'baz' && ! $column['nullable'] && $column['default'] === 'test'
+        ));
+    }
+
+    public function testGetColumnsOnView()
+    {
+        DB::statement('create view foo (name) as select 1');
+
+        $columns = Schema::getColumns('foo');
+
+        var_dump($columns);
+    }
+
     public function testGetIndexes()
     {
         Schema::create('foo', function (Blueprint $table) {
