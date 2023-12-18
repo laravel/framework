@@ -1201,18 +1201,6 @@ class Connection implements ConnectionInterface
     }
 
     /**
-     * Indicates whether native alter operations will be used when dropping, renaming, or modifying columns, even if Doctrine DBAL is installed.
-     *
-     * @deprecated Will be removed in a future Laravel version.
-     *
-     * @return bool
-     */
-    public function usingNativeSchemaOperations()
-    {
-        return ! class_exists('Doctrine\DBAL\Connection') || SchemaBuilder::$alwaysUsesNativeSchemaOperationsIfPossible;
-    }
-
-    /**
      * Get the Doctrine DBAL database connection instance.
      *
      * @return \Doctrine\DBAL\Connection

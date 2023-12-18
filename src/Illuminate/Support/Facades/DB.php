@@ -95,6 +95,7 @@ namespace Illuminate\Support\Facades;
  * @method static string getTablePrefix()
  * @method static \Illuminate\Database\Connection setTablePrefix(string $prefix)
  * @method static \Illuminate\Database\Grammar withTablePrefix(\Illuminate\Database\Grammar $grammar)
+ * @method static string getServerVersion()
  * @method static void resolverFor(string $driver, \Closure $callback)
  * @method static mixed getResolver(string $driver)
  * @method static mixed transaction(\Closure $callback, int $attempts = 1)
