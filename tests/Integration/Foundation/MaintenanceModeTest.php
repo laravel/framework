@@ -11,7 +11,6 @@ use Illuminate\Foundation\Http\Middleware\PreventRequestsDuringMaintenance;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Route;
-use Orchestra\Testbench\Attributes\WithEnv;
 use Orchestra\Testbench\Http\Middleware\PreventRequestsDuringMaintenance as TestbenchPreventRequestsDuringMaintenance;
 use Orchestra\Testbench\TestCase;
 use Symfony\Component\HttpFoundation\Cookie;
