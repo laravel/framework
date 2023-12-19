@@ -814,7 +814,7 @@ class Str
             if (static::substrCount($callback, '@') > 1) {
                 return [
                     static::beforeLast($callback, '@'),
-                    static::afterLast($callback, '@')
+                    static::afterLast($callback, '@'),
                 ];
             }
 
