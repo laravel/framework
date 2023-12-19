@@ -11,7 +11,7 @@ return [
     |
     | This option controls the default session "driver" that will be used by
     | incoming requests. Laravel supports a variety of storage drivers to
-    | choose from for session storage. Database storage is the default.
+    | choose from for session storage. Cookies will be used by default.
     |
     | Supported: "file", "cookie", "database", "apc",
     |            "memcached", "redis", "dynamodb", "array"
