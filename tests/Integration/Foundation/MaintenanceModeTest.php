@@ -16,7 +16,6 @@ use Orchestra\Testbench\Http\Middleware\PreventRequestsDuringMaintenance as Test
 use Orchestra\Testbench\TestCase;
 use Symfony\Component\HttpFoundation\Cookie;
 
-#[WithEnv('APP_MAINTENANCE_DRIVER', 'file')]
 class MaintenanceModeTest extends TestCase
 {
     protected function setUp(): void
