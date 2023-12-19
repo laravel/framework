@@ -657,6 +657,33 @@ class FoundationViteTest extends TestCase
         $this->cleanViteHotFile('cold');
     }
 
+    public function testViteCanAssetPath()
+    {
+        $this->makeViteManifest([
+            'resources/images/profile.png' => [
+                'src' => 'resources/images/profile.png',
+                'file' => 'assets/profile.versioned.png',
+            ],
+        ], $buildDir = Str::random());
+        $vite = app(Vite::class)->useBuildDirectory($buildDir);
+        $this->app['config']->set('app.asset_url', 'https://cdn.app.com');
+
+        // default behaviour...
+        $this->assertSame("https://cdn.app.com/{$buildDir}/assets/profile.versioned.png", $vite->asset('resources/images/profile.png'));
+
+        // custom behaviour
+        $vite->createAssetPathsUsing(function ($path) {
+            return 'https://tenant-cdn.app.com/'.$path;
+        });
+        $this->assertSame("https://tenant-cdn.app.com/{$buildDir}/assets/profile.versioned.png", $vite->asset('resources/images/profile.png'));
+
+        // restore default behaviour...
+        $vite->createAssetPathsUsing(null);
+        $this->assertSame("https://cdn.app.com/{$buildDir}/assets/profile.versioned.png", $vite->asset('resources/images/profile.png'));
+
+        $this->cleanViteManifest($buildDir);
+    }
+
     public function testViteIsMacroable()
     {
         $this->makeViteManifest([
