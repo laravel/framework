@@ -1,6 +1,30 @@
 # Release Notes for 10.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v10.37.3...10.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v10.38.0...10.x)
+
+## [v10.38.0](https://github.com/laravel/framework/compare/v10.37.3...v10.38.0) - 2023-12-19
+
+* [10.x] Add routeRoute method to test request by [@fragkp](https://github.com/fragkp) in https://github.com/laravel/framework/pull/49366
+* [10.x] Update import & typo by [@chu121su12](https://github.com/chu121su12) in https://github.com/laravel/framework/pull/49370
+* [10.x] Show default `false` values in `db:table` command by [@PerryvanderMeer](https://github.com/PerryvanderMeer) in https://github.com/laravel/framework/pull/49379
+* [10.x] Fix primary key creation for MySQL with `sql_require_primary_key` enabled by [@mtawil](https://github.com/mtawil) in https://github.com/laravel/framework/pull/49374
+* [10.x] Add `charset` and `collation` method to `Blueprint` by [@gcazin](https://github.com/gcazin) in https://github.com/laravel/framework/pull/49396
+* Fixes second run of `about` command on Octane by [@josecl](https://github.com/josecl) in https://github.com/laravel/framework/pull/49387
+* [10.x] Fix bug in ArrayLock getCurrentOwner by [@Joostb](https://github.com/Joostb) in https://github.com/laravel/framework/pull/49393
+* [10.x] Dynamo Batch Repository - Match Default Horizon Sort by [@evan-burrell](https://github.com/evan-burrell) in https://github.com/laravel/framework/pull/49391
+* [10.x] Add Blade `[@session](https://github.com/session)` Directive by [@jrd-lewis](https://github.com/jrd-lewis) in https://github.com/laravel/framework/pull/49339
+* [10.x] Improve `Arr::dot` performance by [@bastien-phi](https://github.com/bastien-phi) in https://github.com/laravel/framework/pull/49386
+* [10.x] Fix assertStatus() parameter order by [@marcovo](https://github.com/marcovo) in https://github.com/laravel/framework/pull/49404
+* [10.x] Only set `defaultCasters` if not previously set by [@inxilpro](https://github.com/inxilpro) in https://github.com/laravel/framework/pull/49402
+* [10.x] Fixes parameter type in `ManagesFrequencies` by [@Lucas-Schmukas](https://github.com/Lucas-Schmukas) in https://github.com/laravel/framework/pull/49399
+* [10.x] Add SQLite support for `whereJsonContains` method by [@danieleambrosino](https://github.com/danieleambrosino) in https://github.com/laravel/framework/pull/49401
+* [10x.] Use native json_validate in Validation by [@gtjamesa](https://github.com/gtjamesa) in https://github.com/laravel/framework/pull/49413
+* [10.x] Introducing `isEmpty` and `isNotEmpty` to `ComponentAttributeBag` by [@devajmeireles](https://github.com/devajmeireles) in https://github.com/laravel/framework/pull/49408
+* [10.x] Drop the primary key if it exists when adding a new primary key by [@KieranFYI](https://github.com/KieranFYI) in https://github.com/laravel/framework/pull/49392
+* [10.x] Improve schema builder `getColumns()` method by [@hafezdivandari](https://github.com/hafezdivandari) in https://github.com/laravel/framework/pull/49416
+* [10.x] Add `MailMessage` helpers for plain text email notifications by [@onlime](https://github.com/onlime) in https://github.com/laravel/framework/pull/49407
+* [10.x] Test Improvements by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/49426
+* [10.x] Add Conditionable to Pipeline by [@shane-zeng](https://github.com/shane-zeng) in https://github.com/laravel/framework/pull/49429
 
 ## [v10.37.3](https://github.com/laravel/framework/compare/v10.37.2...v10.37.3) - 2023-12-13
 
