@@ -3,12 +3,10 @@
 namespace Illuminate\Tests\Integration\Foundation\Console;
 
 use Illuminate\Testing\Assert;
-use Orchestra\Testbench\Attributes\WithEnv;
 use Orchestra\Testbench\TestCase;
 
 use function Orchestra\Testbench\remote;
 
-#[WithEnv('APP_MAINTENANCE_STORE', 'array')]
 class AboutCommandTest extends TestCase
 {
     public function testItCanDisplayAboutCommandAsJson()
@@ -38,7 +36,7 @@ class AboutCommandTest extends TestCase
                 'logs' => ['single'],
                 'mail' => 'smtp',
                 'queue' => 'database',
-                'session' => 'database',
+                'session' => 'cookie',
             ], $output['drivers']);
         });
     }
