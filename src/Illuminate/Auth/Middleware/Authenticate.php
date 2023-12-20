@@ -18,6 +18,13 @@ class Authenticate implements AuthenticatesRequests
     protected $auth;
 
     /**
+     * Define the applying guars
+     * 
+     * @param array
+     */
+    protected $guards = [];
+
+    /**
      * Create a new middleware instance.
      *
      * @param  \Illuminate\Contracts\Auth\Factory  $auth
@@ -72,6 +79,8 @@ class Authenticate implements AuthenticatesRequests
             $guards = [null];
         }
 
+        $this->guards = $guards;
+
         foreach ($guards as $guard) {
             if ($this->auth->guard($guard)->check()) {
                 return $this->auth->shouldUse($guard);
@@ -93,7 +102,7 @@ class Authenticate implements AuthenticatesRequests
     protected function unauthenticated($request, array $guards)
     {
         throw new AuthenticationException(
-            'Unauthenticated.', $guards, $this->redirectTo($request, $guards)
+            'Unauthenticated.', $guards, $this->redirectTo($request)
         );
     }
 
@@ -101,10 +110,9 @@ class Authenticate implements AuthenticatesRequests
      * Get the path the user should be redirected to when they are not authenticated.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param string[]  $guards
      * @return string|null
      */
-    protected function redirectTo(Request $request, array $guards)
+    protected function redirectTo(Request $request)
     {
         //
     }
