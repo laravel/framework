@@ -16,7 +16,7 @@ class ViewMarkdownEngineTest extends TestCase
             new GithubFlavoredMarkdownConverter,
         );
 
-        $expected = <<<MARKDOWN
+        $expected = <<<'MARKDOWN'
         <h1>Markdown Example</h1>
         <p>This is an example <a href="https://daringfireball.net/projects/markdown/">markdown</a> file.</p>
         <ul>
@@ -31,7 +31,7 @@ class ViewMarkdownEngineTest extends TestCase
 
     public function testViewsCanBeRenderedInBasicLayout()
     {
-        $expected = <<<MARKDOWN
+        $expected = <<<'MARKDOWN'
         <h1>Markdown Example</h1>
         <p>This is an example <a href="https://daringfireball.net/projects/markdown/">markdown</a> file.</p>
         <ul>

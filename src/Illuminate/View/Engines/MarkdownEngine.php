@@ -5,8 +5,6 @@ namespace Illuminate\View\Engines;
 use Illuminate\Contracts\View\Engine;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\HtmlString;
-use Illuminate\View\ComponentSlot;
-use Illuminate\View\Factory;
 use League\CommonMark\ConverterInterface;
 use League\CommonMark\Exception\CommonMarkException;
 use League\Config\Exception\ConfigurationExceptionInterface;
