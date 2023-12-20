@@ -266,6 +266,34 @@ trait ReplacesAttributes
     }
 
     /**
+     * Replace all place-holders for the missing_without rule.
+     *
+     * @param  string  $message
+     * @param  string  $attribute
+     * @param  string  $rule
+     * @param  array<int,string>  $parameters
+     * @return string
+     */
+    protected function replaceMissingWithout($message, $attribute, $rule, $parameters)
+    {
+        return $this->replaceMissingWith($message, $attribute, $rule, $parameters);
+    }
+
+    /**
+     * Replace all place-holders for the missing_without_all rule.
+     *
+     * @param  string  $message
+     * @param  string  $attribute
+     * @param  string  $rule
+     * @param  array<int,string>  $parameters
+     * @return string
+     */
+    protected function replaceMissingWithoutAll($message, $attribute, $rule, $parameters)
+    {
+        return $this->replaceMissingWith($message, $attribute, $rule, $parameters);
+    }
+
+    /**
      * Replace all place-holders for the multiple_of rule.
      *
      * @param  string  $message

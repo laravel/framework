@@ -2623,6 +2623,94 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->passes());
     }
 
+    public function testValidateMissingWithout()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.missing_without' => 'The :attribute field must be missing when :values is not present.'], 'en');
+
+        $v = new Validator($trans, ['bar' => '2'], ['foo' => 'missing_without:baz,bar']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => 'yes', 'bar' => '2'], ['foo' => 'missing_without:baz,bar']);
+        $this->assertFalse($v->passes());
+        $this->assertSame('The foo field must be missing when baz / bar is not present.', $v->errors()->first('foo'));
+
+        $v = new Validator($trans, ['foo' => '', 'bar' => '2'], ['foo' => 'missing_without:baz,bar']);
+        $this->assertFalse($v->passes());
+        $this->assertSame('The foo field must be missing when baz / bar is not present.', $v->errors()->first('foo'));
+
+        $v = new Validator($trans, ['foo' => ' ', 'bar' => '2'], ['foo' => 'missing_without:baz,bar']);
+        $this->assertFalse($v->passes());
+        $this->assertSame('The foo field must be missing when baz / bar is not present.', $v->errors()->first('foo'));
+
+        $v = new Validator($trans, ['foo' => null, 'bar' => '2'], ['foo' => 'missing_without:baz,bar']);
+        $this->assertFalse($v->passes());
+        $this->assertSame('The foo field must be missing when baz / bar is not present.', $v->errors()->first('foo'));
+
+        $v = new Validator($trans, ['foo' => [], 'bar' => '2'], ['foo' => 'missing_without:baz,bar']);
+        $this->assertFalse($v->passes());
+        $this->assertSame('The foo field must be missing when baz / bar is not present.', $v->errors()->first('foo'));
+
+        $v = new Validator($trans, ['foo' => new class implements Countable
+        {
+            public function count(): int
+            {
+                return 0;
+            }
+        }, 'bar' => '2', ], ['foo' => 'missing_without:baz,bar']);
+        $this->assertFalse($v->passes());
+        $this->assertSame('The foo field must be missing when baz / bar is not present.', $v->errors()->first('foo'));
+
+        $v = new Validator($trans, ['foo' => 'foo', 'qux' => '1'], ['foo' => 'missing_without:baz,bar']);
+        $this->assertFalse($v->passes());
+        $this->assertSame('The foo field must be missing when baz / bar is not present.', $v->errors()->first('foo'));
+    }
+
+    public function testValidateMissingWithoutAll()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.missing_without_all' => 'The :attribute field must be missing when none of :values are present.'], 'en');
+
+        $v = new Validator($trans, ['qux' => '2'], ['foo' => 'missing_without_all:baz,bar']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['bar' => '2', 'baz' => '2'], ['foo' => 'missing_without_all:baz,bar']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => 'yes'], ['foo' => 'missing_without_all:baz,bar']);
+        $this->assertFalse($v->passes());
+        $this->assertSame('The foo field must be missing when none of baz / bar are present.', $v->errors()->first('foo'));
+
+        $v = new Validator($trans, ['foo' => ''], ['foo' => 'missing_without_all:baz,bar']);
+        $this->assertFalse($v->passes());
+        $this->assertSame('The foo field must be missing when none of baz / bar are present.', $v->errors()->first('foo'));
+
+        $v = new Validator($trans, ['foo' => ' '], ['foo' => 'missing_without_all:baz,bar']);
+        $this->assertFalse($v->passes());
+        $this->assertSame('The foo field must be missing when none of baz / bar are present.', $v->errors()->first('foo'));
+
+        $v = new Validator($trans, ['foo' => null], ['foo' => 'missing_without_all:baz,bar']);
+        $this->assertFalse($v->passes());
+        $this->assertSame('The foo field must be missing when none of baz / bar are present.', $v->errors()->first('foo'));
+
+        $v = new Validator($trans, ['foo' => []], ['foo' => 'missing_without_all:baz,bar']);
+        $this->assertFalse($v->passes());
+        $this->assertSame('The foo field must be missing when none of baz / bar are present.', $v->errors()->first('foo'));
+
+        $v = new Validator($trans, ['foo' => new class implements Countable
+        {
+            public function count(): int
+            {
+                return 0;
+            }
+        }, ], ['foo' => 'missing_without_all:baz,bar']);
+        $this->assertFalse($v->passes());
+        $this->assertSame('The foo field must be missing when none of baz / bar are present.', $v->errors()->first('foo'));
+
+        $v = new Validator($trans, ['foo' => [], 'bar' => '2', 'qux' => '2'], ['foo' => 'missing_without_all:baz,bar']);
+        $this->assertTrue($v->passes());
+    }
+
     public function testValidateDeclinedIf()
     {
         $trans = $this->getIlluminateArrayTranslator();

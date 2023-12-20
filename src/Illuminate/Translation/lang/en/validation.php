@@ -111,6 +111,8 @@ return [
     'missing_unless' => 'The :attribute field must be missing unless :other is :value.',
     'missing_with' => 'The :attribute field must be missing when :values is present.',
     'missing_with_all' => 'The :attribute field must be missing when :values are present.',
+    'missing_without' => 'The :attribute field must be missing when :values is not present.',
+    'missing_without_all' => 'The :attribute field must be missing when none of :values are present.',
     'multiple_of' => 'The :attribute field must be a multiple of :value.',
     'not_in' => 'The selected :attribute is invalid.',
     'not_regex' => 'The :attribute field format is invalid.',

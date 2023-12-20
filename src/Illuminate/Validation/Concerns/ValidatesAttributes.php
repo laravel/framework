@@ -1679,6 +1679,44 @@ trait ValidatesAttributes
     }
 
     /**
+     * Validate that an attribute is missing when any given attribute is missing too.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  array<int, int|string>  $parameters
+     * @return bool
+     */
+    public function validateMissingWithout($attribute, $value, $parameters)
+    {
+        $this->requireParameterCount(1, $parameters, 'missing_without');
+
+        if ($this->anyFailingRequired($parameters)) {
+            return $this->validateMissing($attribute, $value, $parameters);
+        }
+
+        return true;
+    }
+
+    /**
+     * Validate that an attribute is missing when all other attributes are missing too.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  array<int, int|string>  $parameters
+     * @return bool
+     */
+    public function validateMissingWithoutAll($attribute, $value, $parameters)
+    {
+        $this->requireParameterCount(1, $parameters, 'missing_without_all');
+
+        if ($this->allFailingRequired($parameters)) {
+            return $this->validateMissing($attribute, $value, $parameters);
+        }
+
+        return true;
+    }
+
+    /**
      * Validate the value of an attribute is a multiple of a given value.
      *
      * @param  string  $attribute
