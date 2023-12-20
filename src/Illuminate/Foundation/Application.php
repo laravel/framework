@@ -29,6 +29,8 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
+use function Illuminate\Filesystem\join_paths;
+
 class Application extends Container implements ApplicationContract, CachesConfiguration, CachesRoutes, HttpKernelInterface
 {
     use Macroable;
@@ -586,7 +588,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function joinPaths($basePath, $path = '')
     {
-        return $basePath.($path != '' ? DIRECTORY_SEPARATOR.ltrim($path, DIRECTORY_SEPARATOR) : '');
+        return join_paths($basePath, $path);
     }
 
     /**

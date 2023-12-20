@@ -127,6 +127,7 @@
         "files": [
             "src/Illuminate/Collections/helpers.php",
             "src/Illuminate/Events/functions.php",
+            "src/Illuminate/Filesystem/functions.php",
             "src/Illuminate/Foundation/helpers.php",
             "src/Illuminate/Support/helpers.php"
         ],
