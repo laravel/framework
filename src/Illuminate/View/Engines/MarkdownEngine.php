@@ -13,18 +13,11 @@ use League\Config\Exception\ConfigurationExceptionInterface;
 class MarkdownEngine implements Engine
 {
     /**
-     * The view to use for markdown layouts.
+     * The callback used to render/wrap markdown.
      *
-     * @var string
+     * @var callable|null
      */
-    public $layoutName = null;
-
-    /**
-     * The variable to pass rendered markdown to the layout as.
-     *
-     * @var string
-     */
-    public $slotName = 'slot';
+    protected $renderCallback = null;
 
     /**
      * Create a new markdown engine instance.
@@ -35,21 +28,18 @@ class MarkdownEngine implements Engine
     public function __construct(
         public Filesystem $files,
         public ConverterInterface $converter,
-        public Factory $view,
     ) {
     }
 
     /**
-     * Set the layout to render markdown in.
+     * Register a callback to be executed when rendering markdown.
      *
-     * @param  string  $view
-     * @param  string|null  $slot
+     * @param  callable|null  $callback
      * @return void
      */
-    public function setLayout($view, $slot = 'slot')
+    public function renderMarkdownUsing($callback)
     {
-        $this->layoutName = $view;
-        $this->slotName = $slot;
+        $this->renderCallback = $callback;
     }
 
     /**
@@ -64,15 +54,12 @@ class MarkdownEngine implements Engine
      */
     public function get($path, array $data = [])
     {
-        $slot = (string) $this->converter->convert($this->files->get($path));
+        $rendered = $this->converter->convert($this->files->get($path));
 
-        if (! $this->layoutName) {
-            return $slot;
+        if ($this->renderCallback) {
+            return (string) call_user_func($this->renderCallback, $rendered, $data, $path);
         }
 
-        return $this->view->make($this->layoutName, [
-            ...$data,
-            $this->slotName => new ComponentSlot($slot),
-        ]);
+        return (string) $rendered;
     }
 }

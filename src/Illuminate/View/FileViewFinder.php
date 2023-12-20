@@ -40,7 +40,7 @@ class FileViewFinder implements ViewFinderInterface
      *
      * @var string[]
      */
-    protected $extensions = ['blade.php', 'php', 'css', 'html'];
+    protected $extensions = ['blade.php', 'php', 'css', 'html', 'md'];
 
     /**
      * Create a new file view loader instance.
