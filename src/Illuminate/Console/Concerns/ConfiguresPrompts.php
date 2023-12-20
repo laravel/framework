@@ -126,27 +126,29 @@ trait ConfiguresPrompts
      */
     protected function promptUntilValid($prompt, $required, $validate)
     {
-        while (true) {
-            $result = $prompt();
+        $result = $prompt();
 
-            if ($required && ($result === '' || $result === [] || $result === false)) {
-                $this->components->error(is_string($required) ? $required : 'Required.');
+        $handleError = fn ($error) => $this->laravel->runningUnitTests()
+            ? $error
+            : $this->promptUntilValid($prompt, $required, $validate);
 
-                continue;
-            }
+        if ($required && ($result === '' || $result === [] || $result === false)) {
+            $this->components->error($error = is_string($required) ? $required : 'Required.');
 
-            if ($validate) {
-                $error = $validate($result);
-
-                if (is_string($error) && strlen($error) > 0) {
-                    $this->components->error($error);
-
-                    continue;
-                }
-            }
-
-            return $result;
+            return $handleError($error);
         }
+
+        if ($validate) {
+            $error = $validate($result);
+
+            if (is_string($error) && strlen($error) > 0) {
+                $this->components->error($error);
+
+                return $handleError($error);
+            }
+        }
+
+        return $result;
     }
 
     /**
