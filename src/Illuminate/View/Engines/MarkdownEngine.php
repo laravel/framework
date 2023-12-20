@@ -4,6 +4,7 @@ namespace Illuminate\View\Engines;
 
 use Illuminate\Contracts\View\Engine;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\HtmlString;
 use Illuminate\View\ComponentSlot;
 use Illuminate\View\Factory;
 use League\CommonMark\ConverterInterface;
@@ -57,7 +58,7 @@ class MarkdownEngine implements Engine
         $rendered = $this->converter->convert($this->files->get($path));
 
         if ($this->renderCallback) {
-            return (string) call_user_func($this->renderCallback, $rendered, $data, $path);
+            return (string) call_user_func($this->renderCallback, new HtmlString($rendered->getContent()), $rendered->getDocument(), $data, $path);
         }
 
         return (string) $rendered;
