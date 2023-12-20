@@ -12,8 +12,14 @@ if (! function_exists('Illuminate\Filesystem\join_paths')) {
      */
     function join_paths($basePath, string ...$paths)
     {
-        return $basePath.collect($paths)->reject(fn ($path) => empty($path))
-                ->transform(fn ($path) => DIRECTORY_SEPARATOR.ltrim($path, DIRECTORY_SEPARATOR))
-                ->join('');
+        foreach ($paths as $index => $path) {
+            if (empty($path)) {
+                unset($paths[$index]);
+            } else {
+                $paths[$index] = DIRECTORY_SEPARATOR.ltrim($path, DIRECTORY_SEPARATOR);
+            }
+        }
+
+        return $basePath.implode('', $paths);
     }
 }
