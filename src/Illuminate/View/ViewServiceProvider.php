@@ -9,6 +9,7 @@ use Illuminate\View\Engines\EngineResolver;
 use Illuminate\View\Engines\FileEngine;
 use Illuminate\View\Engines\MarkdownEngine;
 use Illuminate\View\Engines\PhpEngine;
+use League\CommonMark\ConverterInterface;
 use League\CommonMark\GithubFlavoredMarkdownConverter;
 
 class ViewServiceProvider extends ServiceProvider
@@ -183,9 +184,10 @@ class ViewServiceProvider extends ServiceProvider
     {
         $resolver->register('markdown', function () {
             return new MarkdownEngine(
-                $this->app['files'],
-                $this->app[GithubFlavoredMarkdownConverter::class],
-                $this->app['view'],
+                $this->app->make('files'),
+                $this->app->bound(ConverterInterface::class)
+                    ? $this->app->make(ConverterInterface::class)
+                    : $this->app->make(GithubFlavoredMarkdownConverter::class),
             );
         });
     }
