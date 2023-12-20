@@ -72,11 +72,13 @@ class EnvironmentDecryptCommand extends Command
 
         $key = $this->parseKey($key);
 
-        $encryptedFile = ($this->option('env')
+        $environmentFile = ($this->option('env')
                     ? base_path('.env').'.'.$this->option('env')
-                    : $this->laravel->environmentFilePath()).'.encrypted';
+                    : $this->laravel->environmentFilePath());
 
-        $outputFile = $this->outputFilePath();
+        $encryptedFile = $environmentFile.'.encrypted';
+
+        $outputFile = $this->outputFilePath(basename($environmentFile));
 
         if (Str::endsWith($outputFile, '.encrypted')) {
             $this->components->error('Invalid filename.');
@@ -136,11 +138,10 @@ class EnvironmentDecryptCommand extends Command
      *
      * @return string
      */
-    protected function outputFilePath()
+    protected function outputFilePath(string $environmentFile)
     {
         $path = Str::finish($this->option('path') ?: base_path(), DIRECTORY_SEPARATOR);
-
-        $outputFile = $this->option('filename') ?: ('.env'.($this->option('env') ? '.'.$this->option('env') : ''));
+        $outputFile = $this->option('filename') ?: $environmentFile;
         $outputFile = ltrim($outputFile, DIRECTORY_SEPARATOR);
 
         return $path.$outputFile;

@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Integration\Console;
 
 use Illuminate\Encryption\Encrypter;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\File;
 use Mockery as m;
 use Orchestra\Testbench\TestCase;
@@ -283,5 +284,30 @@ class EnvironmentDecryptCommandTest extends TestCase
         $this->artisan('env:decrypt', ['--env' => 'production', '--key' => 'abcdefghijklmnop', '--filename' => '.env.staging.encrypted'])
             ->expectsOutputToContain('Invalid filename.')
             ->assertExitCode(1);
+    }
+
+    public function testItWritesToTheCorrectLocationWhenEnvironmentExplicitlySet()
+    {
+        App::loadEnvironmentFrom('.env.testing');
+
+        $this->filesystem->shouldReceive('exists')
+            ->once()
+            ->andReturn(true)
+            ->shouldReceive('exists')
+            ->once()
+            ->andReturn(true)
+            ->shouldReceive('get')
+            ->once()
+            ->andReturn(
+                (new Encrypter($key = Encrypter::generateKey('AES-256-CBC'), 'AES-256-CBC'))
+                    ->encrypt('APP_NAME=Laravel')
+            );
+
+        $this->artisan('env:decrypt', ['--force' => true, '--key' => 'base64:'.base64_encode($key)])
+            ->expectsOutputToContain('Environment successfully decrypted.')
+            ->assertExitCode(0);
+
+        $this->filesystem->shouldHaveReceived('put')
+            ->with(base_path('.env.testing'), 'APP_NAME=Laravel');
     }
 }
