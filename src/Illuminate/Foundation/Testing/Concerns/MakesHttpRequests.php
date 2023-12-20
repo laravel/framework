@@ -711,6 +711,17 @@ trait MakesHttpRequests
     }
 
     /**
+     * Create the request instance used for testing from the given Symfony request.
+     *
+     * @param  \Symfony\Component\HttpFoundation\Request  $symfonyRequest
+     * @return \Illuminate\Http\Request
+     */
+    protected function createTestRequest($symfonyRequest)
+    {
+        return Request::createFromBase($symfonyRequest);
+    }
+
+    /**
      * Create the test response instance from the given response.
      *
      * @param  \Illuminate\Http\Response  $response
@@ -725,16 +736,5 @@ trait MakesHttpRequests
                     : new LoggedExceptionCollection
             );
         });
-    }
-
-    /**
-     * Create the request instance used for testing from the given symfony request.
-     *
-     * @param  \Symfony\Component\HttpFoundation\Request  $symfonyRequest
-     * @return \Illuminate\Http\Request
-     */
-    protected function createTestRequest($symfonyRequest)
-    {
-        return Request::createFromBase($symfonyRequest);
     }
 }
