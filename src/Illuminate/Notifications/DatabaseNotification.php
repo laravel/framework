@@ -3,10 +3,12 @@
 namespace Illuminate\Notifications;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 
 class DatabaseNotification extends Model
 {
+    use HasUuids;
     /**
      * The "type" of the primary key ID.
      *

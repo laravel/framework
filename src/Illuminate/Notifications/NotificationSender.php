@@ -99,11 +99,11 @@ class NotificationSender
             }
 
             $this->withLocale($this->preferredLocale($notifiable, $notification), function () use ($viaChannels, $notifiable, $original) {
-                $notificationId = Str::uuid()->toString();
+
 
                 foreach ((array) $viaChannels as $channel) {
                     if (! ($notifiable instanceof AnonymousNotifiable && $channel === 'database')) {
-                        $this->sendToNotifiable($notifiable, $notificationId, clone $original, $channel);
+                        $this->sendToNotifiable($notifiable, clone $original, $channel);
                     }
                 }
             });
@@ -130,16 +130,12 @@ class NotificationSender
      * Send the given notification to the given notifiable via a channel.
      *
      * @param  mixed  $notifiable
-     * @param  string  $id
      * @param  mixed  $notification
      * @param  string  $channel
      * @return void
      */
-    protected function sendToNotifiable($notifiable, $id, $notification, $channel)
+    protected function sendToNotifiable($notifiable, $notification, $channel)
     {
-        if (! $notification->id) {
-            $notification->id = $id;
-        }
 
         if (! $this->shouldSendNotification($notifiable, $notification, $channel)) {
             return;
@@ -186,14 +182,10 @@ class NotificationSender
         $original = clone $notification;
 
         foreach ($notifiables as $notifiable) {
-            $notificationId = Str::uuid()->toString();
 
             foreach ((array) $original->via($notifiable) as $channel) {
                 $notification = clone $original;
-
-                if (! $notification->id) {
-                    $notification->id = $notificationId;
-                }
+                
 
                 if (! is_null($this->locale)) {
                     $notification->locale = $this->locale;
