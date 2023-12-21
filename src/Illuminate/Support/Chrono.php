@@ -44,7 +44,7 @@ class Chrono
         static::$stamps = [];
         static::$cache = [];
 
-        if ($memory) {
+        if ($memory && function_exists('memory_reset_peak_usage')) {
             memory_reset_peak_usage();
         }
     }
@@ -132,7 +132,7 @@ class Chrono
      *
      * @param  array $stamp  The stamp to dump.
      */
-    public static function dump(array $stamp): void
+    protected static function dump(array $stamp): void
     {
         if (static::$dumpKeys) {
             $stamp = array_intersect_key($stamp, static::$dumpKeys);
