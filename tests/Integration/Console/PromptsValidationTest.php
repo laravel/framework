@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Tests\Testing\Console;
+namespace Illuminate\Tests\Integration\Console;
 
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Console\Kernel;
