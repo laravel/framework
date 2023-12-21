@@ -24,7 +24,10 @@
     "autoload": {
         "psr-4": {
             "Illuminate\\Filesystem\\": ""
-        }
+        },
+        "files": [
+            "functions.php"
+        ]
     },
     "extra": {
         "branch-alias": {

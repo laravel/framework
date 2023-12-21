@@ -158,7 +158,7 @@ class MySqlGrammar extends Grammar
         return sprintf(
             'select column_name as `name`, data_type as `type_name`, column_type as `type`, '
             .'collation_name as `collation`, is_nullable as `nullable`, '
-            .'column_default as `default`, column_comment AS `comment`, extra as `extra` '
+            .'column_default as `default`, column_comment as `comment`, extra as `extra` '
             .'from information_schema.columns where table_schema = %s and table_name = %s '
             .'order by ordinal_position asc',
             $this->quoteString($database),
@@ -248,10 +248,22 @@ class MySqlGrammar extends Grammar
      */
     protected function compileCreateTable($blueprint, $command, $connection)
     {
+        $tableStructure = $this->getColumns($blueprint);
+
+        if ($primaryKey = $this->getCommandByName($blueprint, 'primary')) {
+            $tableStructure[] = sprintf(
+                'primary key %s(%s)',
+                $primaryKey->algorithm ? 'using '.$primaryKey->algorithm : '',
+                $this->columnize($primaryKey->columns)
+            );
+
+            $primaryKey->shouldBeSkipped = true;
+        }
+
         return sprintf('%s table %s (%s)',
             $blueprint->temporary ? 'create temporary' : 'create',
             $this->wrapTable($blueprint),
-            implode(', ', $this->getColumns($blueprint))
+            implode(', ', $tableStructure)
         );
     }
 
