@@ -11,10 +11,7 @@ class ViewMarkdownEngineTest extends TestCase
 {
     public function testViewsMayBeProperlyRendered()
     {
-        $engine = new MarkdownEngine(
-            new Filesystem,
-            new GithubFlavoredMarkdownConverter,
-        );
+        $engine = new MarkdownEngine(new Filesystem, new GithubFlavoredMarkdownConverter);
 
         $expected = <<<'MARKDOWN'
         <h1>Markdown Example</h1>
@@ -31,6 +28,11 @@ class ViewMarkdownEngineTest extends TestCase
 
     public function testViewsCanBeRenderedInBasicLayout()
     {
+        $engine = new MarkdownEngine(new Filesystem, new GithubFlavoredMarkdownConverter);
+        $engine->renderMarkdownUsing(function ($markdown) {
+            return '<html>'.trim($markdown).'</html>';
+        });
+
         $expected = <<<'MARKDOWN'
         <h1>Markdown Example</h1>
         <p>This is an example <a href="https://daringfireball.net/projects/markdown/">markdown</a> file.</p>
@@ -40,11 +42,6 @@ class ViewMarkdownEngineTest extends TestCase
         <li>wonderful.</li>
         </ul>
         MARKDOWN;
-
-        $engine = new MarkdownEngine(new Filesystem, new GithubFlavoredMarkdownConverter, $view);
-        $engine->renderMarkdownUsing(function ($markdown) {
-            return '<html>'.trim($markdown).'</html>';
-        });
 
         $this->assertSame("<html>{$expected}</html>", $engine->get(__DIR__.'/fixtures/markdown.md'));
     }
