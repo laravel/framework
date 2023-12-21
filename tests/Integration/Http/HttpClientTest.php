@@ -24,8 +24,8 @@ class HttpClientTest extends TestCase
     public function testRequestDataDoesNotPersistAfterFlush(): void
     {
         Http::fake([
-                       'https://laravel.com' => Http::response('OK', 200)
-                   ]);
+            'https://laravel.com' => Http::response('OK', 200),
+        ]);
 
         $body = Http::get('https://laravel.com')->body();
 
@@ -34,8 +34,8 @@ class HttpClientTest extends TestCase
         Http::flushFakes();
 
         Http::fake([
-                       'https://laravel.com' => Http::response('Internal Server Error', 500)
-                   ]);
+            'https://laravel.com' => Http::response('Internal Server Error', 500),
+        ]);
 
         $body = Http::get('https://laravel.com')->body();
 
