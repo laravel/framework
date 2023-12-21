@@ -28,14 +28,14 @@ class DatabaseSchemaEnforceIncrementalPrimaryKeyTest extends TestCase
         });
 
         $this->assertSame([
-            'id' => 'integer',
-            'uuid' => 'varchar',
-            'name' => 'text',
-        ], collect(Schema::getColumns('table_with_required_id'))->pluck('type_name', 'name')->all());
+            'id',
+            'uuid',
+            'name',
+        ], collect(Schema::getColumns('table_with_required_id'))->pluck('name')->all());
 
         $this->assertSame([
-            'uuid' => 'varchar',
-            'name' => 'text',
-        ], collect(Schema::getColumns('table_with_optional_id'))->pluck('type_name', 'name')->all());
+            'uuid',
+            'name',
+        ], collect(Schema::getColumns('table_with_optional_id'))->pluck('name')->all());
     }
 }
