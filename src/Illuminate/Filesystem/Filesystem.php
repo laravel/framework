@@ -469,6 +469,16 @@ class Filesystem
     }
 
     /**
+     * @param  string|null  $directory
+     * @param  bool  $recursive
+     * @return bool
+     */
+    public function countFiles($directory = null, $recursive = false)
+    {
+        return count($this->files($directory, $recursive));
+    }
+
+    /**
      * Get the file size of a given file.
      *
      * @param  string  $path

@@ -497,6 +497,14 @@ class FilesystemTest extends TestCase
         $this->assertContains(self::$tempDir.'/bar.txt', $glob);
     }
 
+    public function testCountFilesReturnsCorrectNumberOfFiles()
+    {
+        file_put_contents(self::$tempDir.'/foo.txt', 'foo');
+        file_put_contents(self::$tempDir.'/bar.txt', 'bar');
+        $files = new Filesystem;
+        $this->assertSame(2, $files->countFiles(self::$tempDir));
+    }
+
     public function testAllFilesFindsFiles()
     {
         file_put_contents(self::$tempDir.'/foo.txt', 'foo');

@@ -171,6 +171,18 @@ class FilesystemAdapter implements CloudFilesystemContract
     }
 
     /**
+     * Get count of all files in a directory.
+     *
+     * @param  string|null  $directory
+     * @param  bool  $recursive
+     * @return int
+     */
+    public function countFiles($directory = null, $recursive = false)
+    {
+        return count($this->files($directory, $recursive));
+    }
+
+    /**
      * Determine if a file or directory exists.
      *
      * @param  string  $path

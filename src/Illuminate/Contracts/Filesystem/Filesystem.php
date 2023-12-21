@@ -132,6 +132,15 @@ interface Filesystem
     public function size($path);
 
     /**
+     * Get count of all files in a directory.
+     *
+     * @param  string|null  $directory
+     * @param  bool  $recursive
+     * @return mixed
+     */
+    public function countFiles($directory = null, $recursive = false);
+
+    /**
      * Get the file's last modification time.
      *
      * @param  string  $path
