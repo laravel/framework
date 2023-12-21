@@ -57,7 +57,7 @@ class MarkdownEngine implements Engine
 
         if ($this->renderCallback) {
             $rendered = call_user_func(
-                $this->renderCallback, new HtmlString($rendered->getContent()), $rendered->getDocument(), $data, $path
+                $this->renderCallback, new HtmlString($rendered->getContent()), $rendered, $data, $path
             );
         }
 
