@@ -546,8 +546,6 @@ class FilesystemAdapterTest extends TestCase
         $this->fail('Exception was not thrown.');
     }
 
-<<<<<<< Updated upstream
-=======
     public function testCountFilesInDirectory()
     {
         $this->filesystem->write('file1.txt', 'Hello World');
@@ -558,7 +556,6 @@ class FilesystemAdapterTest extends TestCase
         $this->assertSame(2, $filesystemAdapter->countFiles());
     }
 
->>>>>>> Stashed changes
     public function testGetAllFiles()
     {
         $this->filesystem->write('body.txt', 'Hello World');
