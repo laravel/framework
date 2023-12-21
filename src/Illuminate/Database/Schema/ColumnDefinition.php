@@ -34,5 +34,10 @@ use Illuminate\Support\Fluent;
  */
 class ColumnDefinition extends Fluent
 {
-    //
+    /**
+     * Determine if column should be skipped.
+     *
+     * @var bool
+     */
+    public $shouldBeSkipped = false;
 }
