@@ -4,7 +4,6 @@ namespace Illuminate\Tests\Integration\Database;
 
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\Builder;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\Schema;
 use Orchestra\Testbench\TestCase;
 
