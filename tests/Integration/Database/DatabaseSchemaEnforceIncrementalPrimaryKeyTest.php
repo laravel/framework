@@ -11,7 +11,7 @@ class DatabaseSchemaEnforceIncrementalPrimaryKeyTest extends TestCase
 {
     public function testMigrationsTableHasPrimaryKey()
     {
-        Builder::$enforceIncrementalPrimaryKey = true;
+        Builder::enforcePrimaryKey();
 
         Schema::create('table_with_required_id', function (Blueprint $table) {
             $table->id()->onlyWhenEnforced();
@@ -19,7 +19,7 @@ class DatabaseSchemaEnforceIncrementalPrimaryKeyTest extends TestCase
             $table->text('name');
         });
 
-        Builder::$enforceIncrementalPrimaryKey = false;
+        Builder::optionalPrimaryKey();
 
         Schema::create('table_with_optional_id', function (Blueprint $table) {
             $table->id()->onlyWhenEnforced();

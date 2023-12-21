@@ -120,6 +120,26 @@ class Builder
     }
 
     /**
+     * Set the default to enforce primary key.
+     *
+     * @return void
+     */
+    public static function enforcePrimaryKey()
+    {
+        static::$enforceIncrementalPrimaryKey = true;
+    }
+
+    /**
+     * Set the default to not enforce primary key.
+     *
+     * @return void
+     */
+    public static function optionalPrimaryKey()
+    {
+        static::$enforceIncrementalPrimaryKey = false;
+    }
+
+    /**
      * Attempt to use native schema operations for dropping, renaming, and modifying columns, even if Doctrine DBAL is installed.
      *
      * @param  bool  $value
