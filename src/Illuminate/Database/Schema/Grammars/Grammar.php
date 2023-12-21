@@ -173,6 +173,10 @@ abstract class Grammar extends BaseGrammar
         $columns = [];
 
         foreach ($blueprint->getAddedColumns() as $column) {
+            if ($column->shouldBeSkipped) {
+                continue;
+            }
+
             // Each of the column types has their own compiler functions, which are tasked
             // with turning the column definition into its SQL format for this platform
             // used by the connection. The column's modifiers are compiled and added.

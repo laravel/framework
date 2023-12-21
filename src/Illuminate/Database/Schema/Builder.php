@@ -46,6 +46,13 @@ class Builder
     public static $defaultMorphKeyType = 'int';
 
     /**
+     * Indicates whether incremental primary key is required.
+     *
+     * @var string
+     */
+    public static $enforceIncrementalPrimaryKey = false;
+
+    /**
      * Indicates whether Doctrine DBAL usage will be prevented if possible when dropping, renaming, and modifying columns.
      *
      * @var bool

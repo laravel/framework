@@ -7,5 +7,14 @@ namespace Illuminate\Database\Schema;
  */
 class IdColumnDefinition extends ColumnDefinition
 {
-    //
+    public $shouldBeSkipped = false;
+
+    public function onlyWhenEnforced()
+    {
+        if (Builder::$enforceIncrementalPrimaryKey === false) {
+            $this->shouldBeSkipped = true;
+        }
+
+        return $this;
+    }
 }

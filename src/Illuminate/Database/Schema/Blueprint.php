@@ -714,7 +714,7 @@ class Blueprint
      */
     public function integerIncrements($column)
     {
-        return $this->addColumnDefinition(new IdColumnDefinition($this, [
+        return $this->addColumnDefinition(new IdColumnDefinition([
             'type' => 'integer',
             'name' => $column,
             'autoIncrement' => true,
@@ -730,7 +730,7 @@ class Blueprint
      */
     public function tinyIncrements($column)
     {
-        return $this->addColumnDefinition(new IdColumnDefinition($this, [
+        return $this->addColumnDefinition(new IdColumnDefinition([
             'type' => 'tinyInteger',
             'name' => $column,
             'autoIncrement' => true,
@@ -746,7 +746,7 @@ class Blueprint
      */
     public function smallIncrements($column)
     {
-        return $this->addColumnDefinition(new IdColumnDefinition($this, [
+        return $this->addColumnDefinition(new IdColumnDefinition([
             'type' => 'smallInteger',
             'name' => $column,
             'autoIncrement' => true,
@@ -762,7 +762,7 @@ class Blueprint
      */
     public function mediumIncrements($column)
     {
-        return $this->addColumnDefinition(new IdColumnDefinition($this, [
+        return $this->addColumnDefinition(new IdColumnDefinition([
             'type' => 'mediumInteger',
             'name' => $column,
             'autoIncrement' => true,
@@ -778,7 +778,7 @@ class Blueprint
      */
     public function bigIncrements($column)
     {
-        return $this->addColumnDefinition(new IdColumnDefinition($this, [
+        return $this->addColumnDefinition(new IdColumnDefinition([
             'type' => 'bigInteger',
             'name' => $column,
             'autoIncrement' => true,
