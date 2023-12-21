@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Integration\Mail;
 
-use Illuminate\Contracts\Config\Repository;
 use Orchestra\Testbench\Attributes\WithConfig;
 use Orchestra\Testbench\TestCase;
 use Symfony\Component\Mailer\Transport\RoundRobinTransport;
