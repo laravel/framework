@@ -2498,6 +2498,10 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, ['foo' => 'foo', 'bar' => '2'], ['foo' => 'missing_if:bar,1']);
         $this->assertTrue($v->passes());
+
+        $v = new Validator($trans,['foo' => [0 => ['bar' => 1, 'baz' => 'should be missing']]], ['foo.*.baz' => 'missing_if:foo.*.bar,1']);
+        $this->assertTrue($v->fails());
+        $this->assertSame('The foo.0.baz field must be missing when foo.0.bar is 1.', $v->errors()->first('foo.0.baz'));
     }
 
     public function testValidateMissingUnless()
@@ -2537,6 +2541,10 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, ['foo' => 'foo', 'bar' => '1'], ['foo' => 'missing_unless:bar,1']);
         $this->assertTrue($v->passes());
+
+        $v = new Validator($trans,['foo' => [0 => ['bar' => 0, 'baz' => 'should be missing']]], ['foo.*.baz' => 'missing_unless:foo.*.bar,1']);
+        $this->assertTrue($v->fails());
+        $this->assertSame('The foo.0.baz field must be missing unless foo.0.bar is 1.', $v->errors()->first('foo.0.baz'));
     }
 
     public function testValidateMissingWith()
@@ -2579,6 +2587,10 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, ['foo' => 'foo', 'qux' => '1'], ['foo' => 'missing_with:baz,bar']);
         $this->assertTrue($v->passes());
+
+        $v = new Validator($trans,['foo' => [0 => ['bar' => 1, 'baz' => 'should be missing']]], ['foo.*.baz' => 'missing_with:foo.*.bar,foo.*.fred']);
+        $this->assertTrue($v->fails());
+        $this->assertSame('The foo.0.baz field must be missing when foo.0.bar / foo.0.fred is present.', $v->errors()->first('foo.0.baz'));
     }
 
     public function testValidateMissingWithAll()
@@ -2621,6 +2633,10 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, ['foo' => [], 'bar' => '2', 'qux' => '2'], ['foo' => 'missing_with_all:baz,bar']);
         $this->assertTrue($v->passes());
+
+        $v = new Validator($trans,['foo' => [0 => ['bar' => 1,'fred' => 2, 'baz' => 'should be missing']]], ['foo.*.baz' => 'missing_with_all:foo.*.bar,foo.*.fred']);
+        $this->assertTrue($v->fails());
+        $this->assertSame('The foo.0.baz field must be missing when foo.0.bar / foo.0.fred are present.', $v->errors()->first('foo.0.baz'));
     }
 
     public function testValidateDeclinedIf()
