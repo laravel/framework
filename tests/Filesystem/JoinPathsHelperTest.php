@@ -21,6 +21,7 @@ class JoinPathsHelperTest extends TestCase
     {
         yield ['app/Http/Kernel.php', join_paths('app', 'Http', 'Kernel.php')];
         yield ['app/Http/Kernel.php', join_paths('app', '', 'Http', 'Kernel.php')];
+        yield ['app/Http/Kernel.php', join_paths('app', null, 'Http', 'Kernel.php')];
     }
 
     #[RequiresOperatingSystem('Windows')]
@@ -34,5 +35,6 @@ class JoinPathsHelperTest extends TestCase
     {
         yield ['app\Http\Kernel.php', join_paths('app', 'Http', 'Kernel.php')];
         yield ['app\Http\Kernel.php', join_paths('app', '', 'Http', 'Kernel.php')];
+        yield ['app\Http\Kernel.php', join_paths('app', null, 'Http', 'Kernel.php')];
     }
 }
