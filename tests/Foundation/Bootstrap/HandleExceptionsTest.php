@@ -7,6 +7,7 @@ use Illuminate\Config\Repository as Config;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Bootstrap\HandleExceptions;
 use Illuminate\Log\LogManager;
+use Illuminate\Support\Env;
 use Mockery as m;
 use Monolog\Handler\NullHandler;
 use PHPUnit\Framework\TestCase;
@@ -369,7 +370,7 @@ class HandleExceptionsTest extends TestCase
         $this->app->shouldReceive('runningUnitTests')->andReturn(true);
         $this->app->shouldReceive('hasBeenBootstrapped')->andReturn(true);
 
-        $this->app['config']->set('logging.deprecations.testsuite', true);
+        Env::getRepository()->set('LOG_DEPRECATIONS_WHILE_TESTING', true);
 
         $this->handleExceptions()->handleError(
             E_DEPRECATED,
