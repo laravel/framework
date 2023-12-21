@@ -118,7 +118,7 @@ class HandleExceptions
     {
         return ! class_exists(LogManager::class)
             || ! static::$app->hasBeenBootstrapped()
-            || static::$app->runningUnitTests();
+            || (static::$app->runningUnitTests() && ! static::$app['config']->get('logging.deprecations.testsuite'));
     }
 
     /**

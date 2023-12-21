@@ -11,6 +11,7 @@ use Mockery as m;
 use Monolog\Handler\NullHandler;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
+use RuntimeException;
 
 class HandleExceptionsTest extends TestCase
 {
@@ -327,7 +328,50 @@ class HandleExceptionsTest extends TestCase
 
     public function testIgnoreDeprecationIfLoggerUnresolvable()
     {
-        $this->handleExceptions->handleError(
+        $this->app->shouldReceive('runningUnitTests')->andReturn(false);
+        $this->app->shouldReceive('hasBeenBootstrapped')->andReturn(true);
+
+        $this->handleExceptions()->handleError(
+            E_DEPRECATED,
+            'str_contains(): Passing null to parameter #2 ($needle) of type string is deprecated',
+            '/home/user/laravel/routes/web.php',
+            17
+        );
+    }
+
+    public function testItIgnoreDeprecationLoggingWhenRunningUnitTests()
+    {
+        $resolved = false;
+        $this->app->bind(LogManager::class, function () use (&$resolved) {
+            $resolved = true;
+
+            throw new RuntimeException();
+        });
+        $this->app->shouldReceive('runningUnitTests')->andReturn(true);
+        $this->app->shouldReceive('hasBeenBootstrapped')->andReturn(true);
+
+        $this->handleExceptions()->handleError(
+            E_DEPRECATED,
+            'str_contains(): Passing null to parameter #2 ($needle) of type string is deprecated',
+            '/home/user/laravel/routes/web.php',
+            17
+        );
+
+        $this->assertFalse($resolved);
+    }
+
+    public function testItCanForceViaConfigDeprecationLoggingWhenRunningUnitTests()
+    {
+        $this->app->instance(LogManager::class, tap(m::mock(LogManager::class), function ($mock) {
+            $mock->shouldReceive('channel')->andReturnSelf();
+            $mock->shouldReceive('warning');
+        }));
+        $this->app->shouldReceive('runningUnitTests')->andReturn(true);
+        $this->app->shouldReceive('hasBeenBootstrapped')->andReturn(true);
+
+        $this->app['config']->set('logging.deprecations.testsuite', true);
+
+        $this->handleExceptions()->handleError(
             E_DEPRECATED,
             'str_contains(): Passing null to parameter #2 ($needle) of type string is deprecated',
             '/home/user/laravel/routes/web.php',
