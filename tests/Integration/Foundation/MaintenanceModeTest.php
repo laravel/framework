@@ -19,14 +19,13 @@ class MaintenanceModeTest extends TestCase
 {
     protected function setUp(): void
     {
+        $this->beforeApplicationDestroyed(function () {
+            @unlink(storage_path('framework/down'));
+        });
+
         parent::setUp();
 
         $this->withoutMiddleware(TestbenchPreventRequestsDuringMaintenance::class);
-    }
-
-    protected function tearDown(): void
-    {
-        @unlink(storage_path('framework/down'));
     }
 
     public function testBasicMaintenanceModeResponse()

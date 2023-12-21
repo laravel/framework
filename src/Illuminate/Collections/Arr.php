@@ -109,17 +109,17 @@ class Arr
      */
     public static function dot($array, $prepend = '')
     {
-        $results = [];
+        $results = [[]];
 
         foreach ($array as $key => $value) {
             if (is_array($value) && ! empty($value)) {
-                $results = array_merge($results, static::dot($value, $prepend.$key.'.'));
+                $results[] = static::dot($value, $prepend.$key.'.');
             } else {
-                $results[$prepend.$key] = $value;
+                $results[] = [$prepend.$key => $value];
             }
         }
 
-        return $results;
+        return array_merge(...$results);
     }
 
     /**

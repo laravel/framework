@@ -128,6 +128,10 @@ class Blueprint
         $this->ensureCommandsAreValid($connection);
 
         foreach ($this->commands as $command) {
+            if ($command->shouldBeSkipped) {
+                continue;
+            }
+
             $method = 'compile'.ucfirst($command->name);
 
             if (method_exists($grammar, $method) || $grammar::hasMacro($method)) {
@@ -288,6 +292,28 @@ class Blueprint
     public function innoDb()
     {
         $this->engine('InnoDB');
+    }
+
+    /**
+     * Specify the character set that should be used for the table.
+     *
+     * @param  string  $charset
+     * @return void
+     */
+    public function charset($charset)
+    {
+        $this->charset = $charset;
+    }
+
+    /**
+     * Specify the collation that should be used for the table.
+     *
+     * @param  string  $collation
+     * @return void
+     */
+    public function collation($collation)
+    {
+        $this->collation = $collation;
     }
 
     /**

@@ -352,6 +352,26 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, JsonSerializable, 
     }
 
     /**
+     * Determine if the attribute bag is empty.
+     *
+     * @return bool
+     */
+    public function isEmpty()
+    {
+        return trim((string) $this) === '';
+    }
+
+    /**
+     * Determine if the attribute bag is not empty.
+     *
+     * @return bool
+     */
+    public function isNotEmpty()
+    {
+        return ! $this->isEmpty();
+    }
+
+    /**
      * Get all of the raw attributes.
      *
      * @return array
