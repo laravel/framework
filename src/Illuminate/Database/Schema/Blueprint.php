@@ -1886,4 +1886,36 @@ class Blueprint
             return (bool) $column->change;
         });
     }
+
+    /**
+     * Add nullable creator and updater's user ids to the table.
+     *
+     * @return void
+     */
+    public function authors()
+    {
+        $this->integer('creator_id')->nullable();
+
+        $this->integer('updater_id')->nullable();
+    }
+
+    /**
+     * Add nullable creator's user id to the table.
+     *
+     * @return void
+     */
+    public function creator()
+    {
+        $this->integer('creator_id')->nullable();
+    }
+
+    /**
+     * Add nullable updater's user id to the table.
+     *
+     * @return void
+     */
+    public function updater()
+    {
+        $this->integer('updater_id')->nullable();
+    }
 }
