@@ -162,7 +162,8 @@ class SqlServerGrammar extends Grammar
             .'join sys.schemas as scm on obj.schema_id = scm.schema_id '
             .'left join sys.default_constraints def on col.default_object_id = def.object_id and col.object_id = def.parent_object_id '
             ."left join sys.extended_properties as prop on obj.object_id = prop.major_id and col.column_id = prop.minor_id and prop.name = 'MS_Description' "
-            ."where obj.type = 'U' and obj.name = %s and scm.name = SCHEMA_NAME()",
+            ."where obj.type in ('U', 'V') and obj.name = %s and scm.name = SCHEMA_NAME() "
+            .'order by col.column_id',
             $this->quoteString($table),
         );
     }

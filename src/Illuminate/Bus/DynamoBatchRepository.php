@@ -102,6 +102,7 @@ class DynamoBatchRepository implements BatchRepository
                 ':id' => array_filter(['S' => $before]),
             ]),
             'Limit' => $limit,
+            'ScanIndexForward' => false,
         ]);
 
         return array_map(
