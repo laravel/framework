@@ -662,7 +662,7 @@ class Blueprint
      * Create a new auto-incrementing big integer (8-byte) column on the table.
      *
      * @param  string  $column
-     * @return \Illuminate\Database\Schema\ColumnDefinition
+     * @return \Illuminate\Database\Schema\IdColumnDefinition
      */
     public function id($column = 'id')
     {
@@ -673,22 +673,27 @@ class Blueprint
      * Create a new auto-incrementing integer (4-byte) column on the table.
      *
      * @param  string  $column
-     * @return \Illuminate\Database\Schema\ColumnDefinition
+     * @return \Illuminate\Database\Schema\IdColumnDefinition
      */
     public function increments($column)
     {
-        return $this->unsignedInteger($column, true);
+        return $this->integerIncrements($column);
     }
 
     /**
      * Create a new auto-incrementing integer (4-byte) column on the table.
      *
      * @param  string  $column
-     * @return \Illuminate\Database\Schema\ColumnDefinition
+     * @return \Illuminate\Database\Schema\IdColumnDefinition
      */
     public function integerIncrements($column)
     {
-        return $this->unsignedInteger($column, true);
+        return $this->addColumnDefinition(new IdColumnDefinition($this, [
+            'type' => 'integer',
+            'name' => $column,
+            'autoIncrement' => true,
+            'unsigned' => true,
+        ]));
     }
 
     /**
@@ -699,40 +704,60 @@ class Blueprint
      */
     public function tinyIncrements($column)
     {
-        return $this->unsignedTinyInteger($column, true);
+        return $this->addColumnDefinition(new IdColumnDefinition($this, [
+            'type' => 'tinyInteger',
+            'name' => $column,
+            'autoIncrement' => true,
+            'unsigned' => true,
+        ]));
     }
 
     /**
      * Create a new auto-incrementing small integer (2-byte) column on the table.
      *
      * @param  string  $column
-     * @return \Illuminate\Database\Schema\ColumnDefinition
+     * @return \Illuminate\Database\Schema\IdColumnDefinition
      */
     public function smallIncrements($column)
     {
-        return $this->unsignedSmallInteger($column, true);
+        return $this->addColumnDefinition(new IdColumnDefinition($this, [
+            'type' => 'smallInteger',
+            'name' => $column,
+            'autoIncrement' => true,
+            'unsigned' => true,
+        ]));
     }
 
     /**
      * Create a new auto-incrementing medium integer (3-byte) column on the table.
      *
      * @param  string  $column
-     * @return \Illuminate\Database\Schema\ColumnDefinition
+     * @return \Illuminate\Database\Schema\IdColumnDefinition
      */
     public function mediumIncrements($column)
     {
-        return $this->unsignedMediumInteger($column, true);
+        return $this->addColumnDefinition(new IdColumnDefinition($this, [
+            'type' => 'mediumInteger',
+            'name' => $column,
+            'autoIncrement' => true,
+            'unsigned' => true,
+        ]));
     }
 
     /**
      * Create a new auto-incrementing big integer (8-byte) column on the table.
      *
      * @param  string  $column
-     * @return \Illuminate\Database\Schema\ColumnDefinition
+     * @return \Illuminate\Database\Schema\IdColumnDefinition
      */
     public function bigIncrements($column)
     {
-        return $this->unsignedBigInteger($column, true);
+        return $this->addColumnDefinition(new IdColumnDefinition($this, [
+            'type' => 'bigInteger',
+            'name' => $column,
+            'autoIncrement' => true,
+            'unsigned' => true,
+        ]));
     }
 
     /**
