@@ -156,4 +156,16 @@ class Http extends Facade
             static::swap($fake->stubUrl($url, $callback));
         });
     }
+
+    /**
+     * Flushes all the request data from fakes.
+     *
+     * @return \Illuminate\Http\Client\Factory
+     */
+    public static function flushFakes()
+    {
+        return tap(static::getFacadeRoot(), function ($fake) {
+            static::swap($fake->flushFakes());
+        });
+    }
 }

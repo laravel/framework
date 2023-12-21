@@ -235,6 +235,16 @@ class Factory
     }
 
     /**
+     * Flushes all the request data from fakes.
+     *
+     * @return void
+     */
+    public function flushFakes(): void
+    {
+        $this->stubCallbacks = collect();
+    }
+
+    /**
      * Indicate that an exception should be thrown if any request is not faked.
      *
      * @param  bool  $prevent

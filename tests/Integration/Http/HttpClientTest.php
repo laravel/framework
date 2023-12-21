@@ -20,4 +20,25 @@ class HttpClientTest extends TestCase
 
         $this->assertCount(2, Http::getGlobalMiddleware());
     }
+
+    public function testRequestDataDoesNotPersistAfterFlush(): void
+    {
+        Http::fake([
+                       'https://laravel.com' => Http::response('OK', 200)
+                   ]);
+
+        $body = Http::get('https://laravel.com')->body();
+
+        $this->assertSame('OK', $body);
+
+        Http::flushFakes();
+
+        Http::fake([
+                       'https://laravel.com' => Http::response('Internal Server Error', 500)
+                   ]);
+
+        $body = Http::get('https://laravel.com')->body();
+
+        $this->assertSame('Internal Server Error', $body);
+    }
 }
