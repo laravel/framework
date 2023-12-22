@@ -178,7 +178,7 @@ abstract class Queue
                         ? $job->displayName() : get_class($job);
     }
 
-     /**
+    /**
      * Get the maximum number of attempts for an object-based queue handler.
      *
      * @param  mixed  $job
