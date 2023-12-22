@@ -78,7 +78,7 @@ class DatabaseEloquentWithCastsTest extends TestCase
         $this->assertSame($time1->id, $time2->id);
     }
 
-    public function testThrowsExceptionWhenPrevents()
+    public function testThrowsExceptionIfCastableAttributeWasNotRetrievedAndPreventMissingAttributesIsEnabled()
     {
         Time::create(['time' => now()]);
         $originalMode = Model::preventsAccessingMissingAttributes();
