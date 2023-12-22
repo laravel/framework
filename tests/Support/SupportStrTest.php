@@ -216,6 +216,15 @@ class SupportStrTest extends TestCase
         $this->assertSame('han', Str::before('han0nah', '0'));
         $this->assertSame('han', Str::before('han0nah', 0));
         $this->assertSame('han', Str::before('han2nah', 2));
+        // Ignore Case
+        $this->assertSame('han', Str::before('hannah', 'NAH', true));
+        $this->assertSame('ha', Str::before('hannah', 'N', true));
+        $this->assertSame('ééé ', Str::before('ééé hannah', 'HAN', true));
+        $this->assertSame('hannah', Str::before('hannah', 'XXXX', true));
+        $this->assertSame('hannah', Str::before('hannah', '', true));
+        $this->assertSame('han', Str::before('han0nah', '0', true));
+        $this->assertSame('han', Str::before('han0nah', 0, true));
+        $this->assertSame('han', Str::before('han2nah', 2, true));
     }
 
     public function testStrBeforeLast()
@@ -271,6 +280,15 @@ class SupportStrTest extends TestCase
         $this->assertSame('nah', Str::after('han0nah', '0'));
         $this->assertSame('nah', Str::after('han0nah', 0));
         $this->assertSame('nah', Str::after('han2nah', 2));
+        // Ignore Case
+        $this->assertSame('nah', Str::after('hannah', 'HAN', true));
+        $this->assertSame('nah', Str::after('hannah', 'N', true));
+        $this->assertSame('nah', Str::after('ééé hannah', 'HAN', true));
+        $this->assertSame('hannah', Str::after('hannah', 'XXXX', true));
+        $this->assertSame('hannah', Str::after('hannah', '', true));
+        $this->assertSame('nah', Str::after('han0nah', '0', true));
+        $this->assertSame('nah', Str::after('han0nah', 0, true));
+        $this->assertSame('nah', Str::after('han2nah', 2, true));
     }
 
     public function testStrAfterLast()
