@@ -142,7 +142,7 @@ abstract class Queue
             'uuid' => (string) Str::uuid(),
             'displayName' => $this->getDisplayName($job),
             'job' => 'Illuminate\Queue\CallQueuedHandler@call',
-            'maxTries' => $job->tries ?? null,
+            'maxTries' => $this->getJobTries($job) ?? null,
             'maxExceptions' => $job->maxExceptions ?? null,
             'failOnTimeout' => $job->failOnTimeout ?? false,
             'backoff' => $this->getJobBackoff($job),
@@ -199,6 +199,27 @@ abstract class Queue
                 return $backoff instanceof DateTimeInterface
                                 ? $this->secondsUntil($backoff) : $backoff;
             })->implode(',');
+    }
+
+     /**
+     * Get the maximum number of attempts for an object-based queue handler.
+     *
+     * @param  mixed  $job
+     * @return mixed
+     */
+    public function getJobTries($job)
+    {
+        if (! method_exists($job, 'tries') && ! isset($job->tries)) {
+            return;
+        }
+
+        if (isset($job->tries)) {
+            return $job->tries;
+        }
+
+        if(method_exists($job, 'tries') && !is_null($job->tries())) {
+            return $job->tries();
+        }
     }
 
     /**
