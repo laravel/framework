@@ -178,6 +178,27 @@ abstract class Queue
                         ? $job->displayName() : get_class($job);
     }
 
+     /**
+     * Get the maximum number of attempts for an object-based queue handler.
+     *
+     * @param  mixed  $job
+     * @return mixed
+     */
+    public function getJobTries($job)
+    {
+        if (! method_exists($job, 'tries') && ! isset($job->tries)) {
+            return;
+        }
+
+        if (isset($job->tries)) {
+            return $job->tries;
+        }
+
+        if (method_exists($job, 'tries') && ! is_null($job->tries())) {
+            return $job->tries();
+        }
+    }
+
     /**
      * Get the backoff for an object-based queue handler.
      *
@@ -199,27 +220,6 @@ abstract class Queue
                 return $backoff instanceof DateTimeInterface
                                 ? $this->secondsUntil($backoff) : $backoff;
             })->implode(',');
-    }
-
-     /**
-     * Get the maximum number of attempts for an object-based queue handler.
-     *
-     * @param  mixed  $job
-     * @return mixed
-     */
-    public function getJobTries($job)
-    {
-        if (! method_exists($job, 'tries') && ! isset($job->tries)) {
-            return;
-        }
-
-        if (isset($job->tries)) {
-            return $job->tries;
-        }
-
-        if(method_exists($job, 'tries') && !is_null($job->tries())) {
-            return $job->tries();
-        }
     }
 
     /**
