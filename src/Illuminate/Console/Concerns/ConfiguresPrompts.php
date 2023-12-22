@@ -2,6 +2,7 @@
 
 namespace Illuminate\Console\Concerns;
 
+use Illuminate\Console\PromptValidationException;
 use Laravel\Prompts\ConfirmPrompt;
 use Laravel\Prompts\MultiSearchPrompt;
 use Laravel\Prompts\MultiSelectPrompt;
@@ -126,29 +127,35 @@ trait ConfiguresPrompts
      */
     protected function promptUntilValid($prompt, $required, $validate)
     {
-        $result = $prompt();
+        while (true) {
+            $result = $prompt();
 
-        $handleError = fn ($error) => $this->laravel->runningUnitTests()
-            ? $error
-            : $this->promptUntilValid($prompt, $required, $validate);
+            if ($required && ($result === '' || $result === [] || $result === false)) {
+                $this->components->error(is_string($required) ? $required : 'Required.');
 
-        if ($required && ($result === '' || $result === [] || $result === false)) {
-            $this->components->error($error = is_string($required) ? $required : 'Required.');
-
-            return $handleError($error);
-        }
-
-        if ($validate) {
-            $error = $validate($result);
-
-            if (is_string($error) && strlen($error) > 0) {
-                $this->components->error($error);
-
-                return $handleError($error);
+                if ($this->laravel->runningUnitTests()) {
+                    throw new PromptValidationException();
+                } else {
+                    continue;
+                }
             }
-        }
 
-        return $result;
+            if ($validate) {
+                $error = $validate($result);
+
+                if (is_string($error) && strlen($error) > 0) {
+                    $this->components->error($error);
+
+                    if ($this->laravel->runningUnitTests()) {
+                        throw new PromptValidationException();
+                    } else {
+                        continue;
+                    }
+                }
+            }
+
+            return $result;
+        }
     }
 
     /**
