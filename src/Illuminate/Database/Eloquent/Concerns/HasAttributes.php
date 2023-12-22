@@ -2126,6 +2126,9 @@ trait HasAttributes
         // an appropriate native PHP type dependent upon the associated value
         // given with the key in the pair. Dayle made this comment line up.
         if ($this->hasCast($key)) {
+            if (! array_key_exists($key, $this->attributes)) {
+                $this->throwMissingAttributeExceptionIfApplicable($key);
+            }
             return $this->castAttribute($key, $value);
         }
 
