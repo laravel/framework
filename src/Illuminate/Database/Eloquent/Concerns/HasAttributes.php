@@ -2126,9 +2126,14 @@ trait HasAttributes
         // an appropriate native PHP type dependent upon the associated value
         // given with the key in the pair. Dayle made this comment line up.
         if ($this->hasCast($key)) {
-            if (! array_key_exists($key, $this->attributes)) {
+            // If the key is for a castable primitive type or an enum, but the value is not found in
+            // the retrieved attributes, we may throw an exception that the attribute is missing.
+            if (! array_key_exists($key, $this->attributes)
+                && ($this->isEnumCastable($key) || in_array($this->getCastType($key), static::$primitiveCastTypes))
+            ) {
                 $this->throwMissingAttributeExceptionIfApplicable($key);
             }
+
             return $this->castAttribute($key, $value);
         }
 
