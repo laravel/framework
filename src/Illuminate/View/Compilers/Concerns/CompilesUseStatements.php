@@ -16,6 +16,10 @@ trait CompilesUseStatements
     {
         $expression = preg_replace("/[\(\)]/", '', $expression);
 
+        /**
+         * if it is not start with '[' therefor it is single namespace
+         * and we can use it as it is
+         */
         if (! str_starts_with($expression, '[')) {
             $segments = explode(',', $expression);
 
@@ -25,25 +29,23 @@ trait CompilesUseStatements
             return "<?php use \\{$namespace}{$alias}; ?>";
         }
 
-        $namespaces = str_replace("'", '"', $expression);
-        $namespaces = preg_replace('/\\\\/', '\\', $namespaces);
-        $namespaces = trim($namespaces, '[]');
-        $namespaces = explode(',', $namespaces);
+        /**
+         * it is start with '[' therefore it is array and it may have multiple namespaces
+         * as it won't be valid json we need to parse it manually and get namespaces and aliases
+         * below code is to get namespaces and aliases from [$namespace => $alias, ...] expression
+         * and convert it to valid php use statements like below
+         * use \App\Models\User;
+         * use \App\Models\Post as BlogPost;
+         */
+        $namespaces = explode(',', trim(preg_replace('/\\\\/', '\\', str_replace("'", '"', $expression)), '[]'));
 
         $useStatements = '<?php';
-
         foreach ($namespaces as $namespace) {
-            [$use, $as] = array_pad(explode('=>', $namespace, 2), 2, null);
-            $use = trim($use);
-            $as = $as !== null ? trim($as) : null;
-            $use = str_replace(['"', "'"], '', $use);
-            $as = $as !== null ? str_replace(['"', "'"], '', $as) : null;
+            [$use, $as] = array_pad(explode('=>', $namespace, 2), 2, '');
+            $use = str_replace(['"', "'"], '', trim($use, " '\""));
+            $as = str_replace(['"', "'"], '', trim($as, " '\""));
 
-            if ($as === null) {
-                $useStatements .= ' use \\'.trim($use, " '\"").';';
-            } else {
-                $useStatements .= ' use \\'.trim($use, " '\"").' as '.trim($as, " '\"").';';
-            }
+            $useStatements .= ' use \\'.trim($use, " '\"").($as ? ' as '.trim($as, " '\"") : '').';';
         }
 
         return $useStatements.' ?>';
