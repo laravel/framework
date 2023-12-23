@@ -83,8 +83,12 @@ class Str
      * @param  string  $search
      * @return string
      */
-    public static function after($subject, $search)
+    public static function after($subject, $search, $ignoreCase = false)
     {
+        if($ignoreCase) {
+            return $search === '' ? $subject : array_reverse(preg_split("/$search/i", $subject, 2))[0];
+        }
+
         return $search === '' ? $subject : array_reverse(explode($search, $subject, 2))[0];
     }
 
@@ -142,13 +146,17 @@ class Str
      * @param  string  $search
      * @return string
      */
-    public static function before($subject, $search)
+    public static function before($subject, $search, $ignoreCase = false)
     {
         if ($search === '') {
             return $subject;
         }
 
-        $result = strstr($subject, (string) $search, true);
+        if($ignoreCase) {
+            $result = stristr($subject, (string) $search, true);
+        } else {
+            $result = strstr($subject, (string) $search, true);
+        }
 
         return $result === false ? $subject : $result;
     }
