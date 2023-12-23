@@ -85,7 +85,7 @@ class Str
      */
     public static function after($subject, $search, $ignoreCase = false)
     {
-        if($ignoreCase) {
+        if ($ignoreCase) {
             return $search === '' ? $subject : array_reverse(preg_split("/$search/i", $subject, 2))[0];
         }
 
@@ -152,7 +152,7 @@ class Str
             return $subject;
         }
 
-        if($ignoreCase) {
+        if ($ignoreCase) {
             $result = stristr($subject, (string) $search, true);
         } else {
             $result = strstr($subject, (string) $search, true);
