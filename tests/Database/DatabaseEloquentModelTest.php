@@ -2616,9 +2616,6 @@ class DatabaseEloquentModelTest extends TestCase
         } finally {
             Model::preventAccessingMissingAttributes($originalMode);
         }
-
-
-
     }
 
     public function testUsesOverriddenHandlerWhenAccessingMissingAttributes()
@@ -3432,7 +3429,8 @@ class EloquentModelWithPrimitiveCasts extends Model
     }
 }
 
-enum CastableBackedEnum: string {
+enum CastableBackedEnum: string
+{
     case Value1 = 'value1';
 }
 
