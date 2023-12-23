@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Illuminate\View\Compilers\Concerns;
 
 trait CompilesUseStatements
@@ -12,11 +14,29 @@ trait CompilesUseStatements
      */
     protected function compileUse($expression)
     {
-        $segments = explode(',', preg_replace("/[\(\)]/", '', $expression));
+        $expression = preg_replace("/[\(\)]/", '', $expression);
 
-        $use = trim($segments[0], " '\"");
-        $as = isset($segments[1]) ? ' as '.trim($segments[1], " '\"") : '';
+        if (! str_starts_with($expression, '[')) {
+            $segments = explode(',', $expression);
 
-        return "<?php use \\{$use}{$as}; ?>";
+            $namespace = trim($segments[0], " '\"");
+            $alias = isset($segments[1]) ? ' as '.trim($segments[1], " '\"") : '';
+
+            return "<?php use \\{$namespace}{$alias}; ?>";
+        }
+
+        $namespaces = eval("return $expression;");
+
+        $useStatements = '<?php ';
+
+        $useStatements .= implode(' ', array_map(function ($namespace, $alias) {
+            if (is_numeric($namespace)) {
+                return 'use \\'.trim($alias, " '\"").';';
+            } else {
+                return 'use \\'.trim($namespace, " '\"").' as '.trim($alias, " '\"").';';
+            }
+        }, array_keys($namespaces), $namespaces));
+
+        return $useStatements.' ?>';
     }
 }
