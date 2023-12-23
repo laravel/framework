@@ -30,17 +30,11 @@ trait CompilesUseStatements
         // it is start with '[' therefore it is array and it may have multiple namespaces
         // as it won't be valid json we need to parse it manually and get namespaces and aliases
         // below code is to get namespaces and aliases from [$namespace => $alias, ...] expression
-        // and convert it to valid php use statements like below
-        // use \App\Models\User;
-        // use \App\Models\Post as BlogPost;
-        $namespaces = explode(',', trim(preg_replace('/\\\\/', '\\', str_replace("'", '"', $expression)), '[]'));
+        $namespaces = explode(',', trim(preg_replace('/\\\\/', '\\', $expression), '[]'));
 
         $useStatements = '<?php';
         foreach ($namespaces as $namespace) {
             [$use, $as] = array_pad(explode('=>', $namespace, 2), 2, '');
-            $use = str_replace(['"', "'"], '', trim($use, " '\""));
-            $as = str_replace(['"', "'"], '', trim($as, " '\""));
-
             $useStatements .= ' use \\'.trim($use, " '\"").($as ? ' as '.trim($as, " '\"") : '').';';
         }
 
