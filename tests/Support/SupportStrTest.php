@@ -300,6 +300,10 @@ class SupportStrTest extends TestCase
         $this->assertSame('nah', Str::after('han0nah', '0', true));
         $this->assertSame('nah', Str::after('han0nah', 0, true));
         $this->assertSame('nah', Str::after('han2nah', 2, true));
+        $this->assertSame('nah', Str::after('han.nah', 'HAN.', true));
+        $this->assertSame('.nah', Str::after('han.nah', 'HAN', true));
+        $this->assertSame('nah', Str::after('han\nah', 'HAN\\', true));
+        $this->assertSame('\nah', Str::after('han\nah', 'HAN', true));
         // Ignore Case Flipped
         $this->assertSame('NAH', Str::after('HANNAH', 'han', true));
         $this->assertSame('NAH', Str::after('HANNAH', 'n', true));
@@ -309,6 +313,10 @@ class SupportStrTest extends TestCase
         $this->assertSame('NAH', Str::after('HAN0NAH', '0', true));
         $this->assertSame('NAH', Str::after('HAN0NAH', 0, true));
         $this->assertSame('NAH', Str::after('HAN2NAH', 2, true));
+        $this->assertSame('NAH', Str::after('HAN.NAH', 'han.', true));
+        $this->assertSame('.NAH', Str::after('HAN.NAH', 'han', true));
+        $this->assertSame('NAH', Str::after('HAN\NAH', 'han\\', true));
+        $this->assertSame('\NAH', Str::after('HAN\NAH', 'han', true));
     }
 
     public function testStrAfterLast()
