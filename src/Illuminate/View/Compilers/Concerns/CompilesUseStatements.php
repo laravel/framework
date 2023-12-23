@@ -15,14 +15,9 @@ trait CompilesUseStatements
         $expression = preg_replace("/[\(\)]/", '', $expression);
 
         // if it is not start with '[' therefor it is single namespace
-        // and we can use it as it is
+        // so we need to convert it to $namespace => $alias expression
         if (! str_starts_with($expression, '[')) {
-            $segments = explode(',', $expression);
-
-            $namespace = ltrim(trim($segments[0], " '\""), '\\');
-            $alias = isset($segments[1]) ? ' as '.trim($segments[1], " '\"") : '';
-
-            return "<?php use \\{$namespace}{$alias}; ?>";
+            $namespace = str_replace(',', '=>', $expression);
         }
 
         // it is start with '[' therefore it is array and it may have multiple namespaces
