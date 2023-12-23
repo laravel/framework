@@ -130,19 +130,6 @@ class BatchRepositoryFake implements BatchRepository
     }
 
     /**
-     * Resume the batch that has the given ID.
-     *
-     * @param  string  $batchId
-     * @return void
-     */
-    public function resume(string $batchId)
-    {
-        if (isset($this->batches[$batchId])) {
-            $this->batches[$batchId]->resume();
-        }
-    }
-
-    /**
      * Delete the batch that has the given ID.
      *
      * @param  string  $batchId
