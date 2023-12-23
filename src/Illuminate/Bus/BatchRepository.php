@@ -78,14 +78,6 @@ interface BatchRepository
     public function cancel(string $batchId);
 
     /**
-     * Resume the batch that has the given ID.
-     *
-     * @param  string  $batchId
-     * @return void
-     */
-    public function resume(string $batchId);
-
-    /**
      * Delete the batch that has the given ID.
      *
      * @param  string  $batchId

@@ -309,23 +309,6 @@ class BusBatchTest extends TestCase
         $this->assertTrue($batch->cancelled());
     }
 
-    public function test_batch_can_be_resumed()
-    {
-        $queue = m::mock(Factory::class);
-
-        $batch = $this->createTestBatch($queue);
-
-        $batch->cancel();
-
-        $batch = $batch->fresh();
-
-        $batch->resume();
-
-        $batch = $batch->fresh();
-
-        $this->assertFalse($batch->cancelled());
-    }
-
     public function test_batch_can_be_deleted()
     {
         $queue = m::mock(Factory::class);
