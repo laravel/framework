@@ -86,6 +86,7 @@ class Str
     public static function after($subject, $search, $ignoreCase = false)
     {
         if ($ignoreCase) {
+            $search = preg_quote($search);
             return $search === '' ? $subject : array_reverse(preg_split("/$search/i", $subject, 2))[0];
         }
 
