@@ -134,7 +134,7 @@ trait ConfiguresPrompts
                 $this->components->error(is_string($required) ? $required : 'Required.');
 
                 if ($this->laravel->runningUnitTests()) {
-                    throw new PromptValidationException();
+                    throw new PromptValidationException;
                 } else {
                     continue;
                 }
@@ -147,7 +147,7 @@ trait ConfiguresPrompts
                     $this->components->error($error);
 
                     if ($this->laravel->runningUnitTests()) {
-                        throw new PromptValidationException();
+                        throw new PromptValidationException;
                     } else {
                         continue;
                     }
