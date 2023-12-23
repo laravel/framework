@@ -14,7 +14,7 @@ trait CompilesUseStatements
     {
         $expression = preg_replace("/[\(\)]/", '', $expression);
 
-        // if it is not start with '[' therefor it is single namespace
+        // if it is not start with '[' therefore it is single namespace
         // so we need to convert it to $namespace => $alias expression
         if (! str_starts_with($expression, '[')) {
             $expression = str_replace(',', '=>', $expression);
