@@ -40,12 +40,12 @@ trait CompilesUseStatements
             $as = $as !== null ? str_replace(['"', "'"], '', $as) : null;
 
             if ($as === null) {
-                $useStatements .= ' use \\'.trim($use, " '\"").'; ';
+                $useStatements .= ' use \\'.trim($use, " '\"").';';
             } else {
-                $useStatements .= ' use \\'.trim($use, " '\"").' as '.trim($as, " '\"").'; ';
+                $useStatements .= ' use \\'.trim($use, " '\"").' as '.trim($as, " '\"").';';
             }
         }
 
-        return $useStatements.'?>';
+        return $useStatements.' ?>';
     }
 }
