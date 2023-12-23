@@ -21,7 +21,7 @@ trait CompilesUseStatements
         if (! str_starts_with($expression, '[')) {
             $segments = explode(',', $expression);
 
-            $namespace = trim($segments[0], " '\"");
+            $namespace = ltrim(trim($segments[0], " '\""), '\\');
             $alias = isset($segments[1]) ? ' as '.trim($segments[1], " '\"") : '';
 
             return "<?php use \\{$namespace}{$alias}; ?>";
@@ -35,7 +35,7 @@ trait CompilesUseStatements
         $useStatements = '<?php';
         foreach ($namespaces as $namespace) {
             [$use, $as] = array_pad(explode('=>', $namespace, 2), 2, '');
-            $useStatements .= ' use \\'.trim($use, " '\"").($as ? ' as '.trim($as, " '\"") : '').';';
+            $useStatements .= ' use \\'.ltrim(trim($use, " '\""), '\\').($as ? ' as '.ltrim(trim($as, " '\""), '\\') : '').';';
         }
 
         return $useStatements.' ?>';

@@ -18,9 +18,23 @@ class BladeUseTest extends AbstractBladeTestCase
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
 
+    public function testUseStatementsWithBackslashAtBeginningAreCompiled()
+    {
+        $string = "Foo @use('\SomeNamespace\SomeClass', 'Foo') bar";
+        $expected = "Foo <?php use \SomeNamespace\SomeClass as Foo; ?> bar";
+        $this->assertEquals($expected, $this->compiler->compileString($string));
+    }
+
     public function testUseStatementsWithArrayAreCompiled()
     {
         $string = "Foo @use(['SomeNamespace\SomeClass', 'AnotherNamespace\AnotherClass']) bar";
+        $expected = "Foo <?php use \SomeNamespace\SomeClass; use \AnotherNamespace\AnotherClass; ?> bar";
+        $this->assertEquals($expected, $this->compiler->compileString($string));
+    }
+
+    public function testUseStatementsWithArrayAndBackslashAtBeginningAreCompiled()
+    {
+        $string = "Foo @use(['\SomeNamespace\SomeClass', '\AnotherNamespace\AnotherClass']) bar";
         $expected = "Foo <?php use \SomeNamespace\SomeClass; use \AnotherNamespace\AnotherClass; ?> bar";
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
