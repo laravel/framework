@@ -16,10 +16,8 @@ trait CompilesUseStatements
     {
         $expression = preg_replace("/[\(\)]/", '', $expression);
 
-        /**
-         * if it is not start with '[' therefor it is single namespace
-         * and we can use it as it is
-         */
+        // if it is not start with '[' therefor it is single namespace
+        // and we can use it as it is
         if (! str_starts_with($expression, '[')) {
             $segments = explode(',', $expression);
 
@@ -29,14 +27,12 @@ trait CompilesUseStatements
             return "<?php use \\{$namespace}{$alias}; ?>";
         }
 
-        /**
-         * it is start with '[' therefore it is array and it may have multiple namespaces
-         * as it won't be valid json we need to parse it manually and get namespaces and aliases
-         * below code is to get namespaces and aliases from [$namespace => $alias, ...] expression
-         * and convert it to valid php use statements like below
-         * use \App\Models\User;
-         * use \App\Models\Post as BlogPost;
-         */
+        // it is start with '[' therefore it is array and it may have multiple namespaces
+        // as it won't be valid json we need to parse it manually and get namespaces and aliases
+        // below code is to get namespaces and aliases from [$namespace => $alias, ...] expression
+        // and convert it to valid php use statements like below
+        // use \App\Models\User;
+        // use \App\Models\Post as BlogPost;
         $namespaces = explode(',', trim(preg_replace('/\\\\/', '\\', str_replace("'", '"', $expression)), '[]'));
 
         $useStatements = '<?php';
