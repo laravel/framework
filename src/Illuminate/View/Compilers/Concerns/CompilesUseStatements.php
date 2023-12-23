@@ -17,7 +17,7 @@ trait CompilesUseStatements
         // if it is not start with '[' therefor it is single namespace
         // so we need to convert it to $namespace => $alias expression
         if (! str_starts_with($expression, '[')) {
-            $namespace = str_replace(',', '=>', $expression);
+            $expression = str_replace(',', '=>', $expression);
         }
 
         // it is start with '[' therefore it is array and it may have multiple namespaces
