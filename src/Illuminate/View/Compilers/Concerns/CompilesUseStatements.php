@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace Illuminate\View\Compilers\Concerns;
 
 trait CompilesUseStatements
