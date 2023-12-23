@@ -12,11 +12,30 @@ trait CompilesUseStatements
      */
     protected function compileUse($expression)
     {
-        $segments = explode(',', preg_replace("/[\(\)]/", '', $expression));
+        $expression = preg_replace("/[\(\)]/", '', $expression);
 
-        $use = trim($segments[0], " '\"");
-        $as = isset($segments[1]) ? ' as '.trim($segments[1], " '\"") : '';
+        // if it is not start with '[' therefor it is single namespace
+        // and we can use it as it is
+        if (! str_starts_with($expression, '[')) {
+            $segments = explode(',', $expression);
 
-        return "<?php use \\{$use}{$as}; ?>";
+            $namespace = ltrim(trim($segments[0], " '\""), '\\');
+            $alias = isset($segments[1]) ? ' as '.trim($segments[1], " '\"") : '';
+
+            return "<?php use \\{$namespace}{$alias}; ?>";
+        }
+
+        // it is start with '[' therefore it is array and it may have multiple namespaces
+        // as it won't be valid json we need to parse it manually and get namespaces and aliases
+        // below code is to get namespaces and aliases from [$namespace => $alias, ...] expression
+        $namespaces = explode(',', trim(preg_replace('/\\\\/', '\\', $expression), '[]'));
+
+        $useStatements = '<?php';
+        foreach ($namespaces as $namespace) {
+            [$use, $as] = array_pad(explode('=>', $namespace, 2), 2, '');
+            $useStatements .= ' use \\'.ltrim(trim($use, " '\""), '\\').($as ? ' as '.ltrim(trim($as, " '\""), '\\') : '').';';
+        }
+
+        return $useStatements.' ?>';
     }
 }
