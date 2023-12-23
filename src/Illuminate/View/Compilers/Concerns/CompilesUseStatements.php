@@ -25,18 +25,27 @@ trait CompilesUseStatements
             return "<?php use \\{$namespace}{$alias}; ?>";
         }
 
-        $namespaces = eval("return $expression;");
+        $namespaces = str_replace("'", '"', $expression);
+        $namespaces = preg_replace('/\\\\/', '\\', $namespaces);
+        $namespaces = trim($namespaces, '[]');
+        $namespaces = explode(',', $namespaces);
 
-        $useStatements = '<?php ';
+        $useStatements = '<?php';
 
-        $useStatements .= implode(' ', array_map(function ($namespace, $alias) {
-            if (is_numeric($namespace)) {
-                return 'use \\'.trim($alias, " '\"").';';
+        foreach ($namespaces as $namespace) {
+            [$use, $as] = array_pad(explode('=>', $namespace, 2), 2, null);
+            $use = trim($use);
+            $as = $as !== null ? trim($as) : null;
+            $use = str_replace(['"', "'"], '', $use);
+            $as = $as !== null ? str_replace(['"', "'"], '', $as) : null;
+
+            if ($as === null) {
+                $useStatements .= ' use \\'.trim($use, " '\"").'; ';
             } else {
-                return 'use \\'.trim($namespace, " '\"").' as '.trim($alias, " '\"").';';
+                $useStatements .= ' use \\'.trim($use, " '\"").' as '.trim($as, " '\"").'; ';
             }
-        }, array_keys($namespaces), $namespaces));
+        }
 
-        return $useStatements.' ?>';
+        return $useStatements.'?>';
     }
 }
