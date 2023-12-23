@@ -1761,7 +1761,7 @@ class RoutingRouteTest extends TestCase
         $router = $this->getRouter();
 
         $router->substituteImplicitBindingsUsing(function ($container, $route, $default) {
-            $default = $default();
+            $default();
 
             $model = $route->parameter('bar');
             $model->value = 'otwell';
@@ -1775,6 +1775,42 @@ class RoutingRouteTest extends TestCase
         ]);
 
         $this->assertSame('otwell', $router->dispatch(Request::create('foo/taylor', 'GET'))->getContent());
+    }
+
+    public function testImplicitBindingsWithMultipleClosures()
+    {
+        $router = $this->getRouter();
+
+        $router->substituteImplicitBindingsUsing(function ($container, $route, $default) {
+            $default();
+
+            $model = $route->parameter('bar');
+            $model && $model->value = 'otwell';
+        });
+
+        $router->substituteImplicitBindingsUsing(function ($container, $route, $default) {
+            $default();
+
+            $model = $route->parameter('baz');
+            $model && $model->value = 'taylor';
+        });
+
+        $router->get('foo1/{bar}', [
+            'middleware' => SubstituteBindings::class,
+            'uses' => function (RoutingTestUserModel $bar) {
+                return $bar->value;
+            },
+        ]);
+
+        $router->get('foo2/{baz}', [
+            'middleware' => SubstituteBindings::class,
+            'uses' => function (RoutingTestUserModel $baz) {
+                return $baz->value;
+            },
+        ]);
+
+        $this->assertSame('otwell', $router->dispatch(Request::create('foo1/taylor', 'GET'))->getContent());
+        $this->assertSame('taylor', $router->dispatch(Request::create('foo2/otwell', 'GET'))->getContent());
     }
 
     public function testImplicitBindingsWhereScopedBindingsArePrevented()
