@@ -96,12 +96,31 @@ class TestView
     /**
      * Assert that the response view is missing a piece of bound data.
      *
-     * @param  string  $key
+     * @param  string|array  $key
      * @return $this
      */
     public function assertViewMissing($key)
     {
+        if (is_array($key)) {
+            return $this->assertViewMissingAll($key);
+        }
+
         PHPUnit::assertFalse(Arr::has($this->view->gatherData(), $key));
+
+        return $this;
+    }
+
+    /**
+     * Assert that the response view missing a given list of bound data.
+     *
+     * @param  array  $keys
+     * @return $this
+     */
+    public function assertViewMissingAll(array $keys)
+    {
+        foreach ($keys as $key) {
+            $this->assertViewMissing($key);
+        }
 
         return $this;
     }
