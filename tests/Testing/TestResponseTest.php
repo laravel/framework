@@ -220,6 +220,19 @@ class TestResponseTest extends TestCase
         $response->assertViewMissing('baz');
     }
 
+    public function testAssertViewMissingAll()
+    {
+        $response = $this->makeMockResponse([
+            'render' => 'hello world',
+            'gatherData' => ['foo' => 'bar'],
+        ]);
+
+        $response->assertViewMissingAll([
+            'name',
+            'milwad',
+        ]);
+    }
+
     public function testAssertViewMissingNested()
     {
         $response = $this->makeMockResponse([
