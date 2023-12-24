@@ -1112,6 +1112,21 @@ class TestResponse implements ArrayAccess
     }
 
     /**
+     * Assert that the response view missing a given list of bound data.
+     *
+     * @param  array  $keys
+     * @return $this
+     */
+    public function assertViewMissingAll(array $keys)
+    {
+        foreach ($keys as $key) {
+            $this->assertViewMissing($key);
+        }
+
+        return $this;
+    }
+
+    /**
      * Ensure that the response has a view as its original content.
      *
      * @return $this
