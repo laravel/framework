@@ -350,7 +350,10 @@ class SQLiteGrammar extends Grammar
         $table = $this->wrap($this->getTablePrefix().$table);
         $columnNames = implode(', ', $columnNames);
 
-        return array_merge([
+        $foreignKeyConstraintsEnabled = $connection->scalar('pragma foreign_keys');
+
+        return array_filter(array_merge([
+            $foreignKeyConstraintsEnabled ? $this->compileDisableForeignKeyConstraints() : null,
             sprintf('create table %s (%s%s%s)',
                 $tempTable,
                 implode(', ', $columns),
@@ -360,7 +363,7 @@ class SQLiteGrammar extends Grammar
             sprintf('insert into %s (%s) select %s from %s', $tempTable, $columnNames, $columnNames, $table),
             sprintf('drop table %s', $table),
             sprintf('alter table %s rename to %s', $tempTable, $table),
-        ], $indexes);
+        ], $indexes, [$foreignKeyConstraintsEnabled ? $this->compileEnableForeignKeyConstraints() : null]));
     }
 
     /**

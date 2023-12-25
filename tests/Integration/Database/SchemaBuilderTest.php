@@ -340,4 +340,33 @@ class SchemaBuilderTest extends DatabaseTestCase
                 && $foreign['foreign_columns'] === ['b', 'a']
         ));
     }
+
+    public function testAlteringTableWithForeignKeyConstraintsEnabledOnSqlite()
+    {
+        Schema::enableForeignKeyConstraints();
+
+        Schema::create('parents', function (Blueprint $table) {
+            $table->id();
+            $table->text('name');
+        });
+
+        Schema::create('children', function (Blueprint $table) {
+            $table->foreignId('parent_id')->constrained();
+        });
+
+        $id = DB::table('parents')->insertGetId(['name' => 'foo']);
+        DB::table('children')->insert(['parent_id' => $id]);
+
+        Schema::table('parents', function (Blueprint $table) {
+            $table->string('name')->change();
+        });
+
+        $foreignKeys = Schema::getForeignKeys('children');
+
+        $this->assertCount(1, $foreignKeys);
+        $this->assertTrue(collect($foreignKeys)->contains(
+            fn ($foreign) => $foreign['columns'] === ['parent_id']
+                && $foreign['foreign_table'] === 'parents' && $foreign['foreign_columns'] === ['id']
+        ));
+    }
 }
