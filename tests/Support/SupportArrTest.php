@@ -118,7 +118,7 @@ class SupportArrTest extends TestCase
         $this->assertSame([
             'user.name' => 'Taylor',
             'user.age' => 25,
-            'user.languages.0' =>'PHP',
+            'user.languages.0' => 'PHP',
             'user.languages.1' => 'C#',
         ], $array);
 
