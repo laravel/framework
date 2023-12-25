@@ -37,7 +37,7 @@ class SQLiteGrammar extends Grammar
      */
     public function compileTableExists()
     {
-        return "select sql from sqlite_master where type = 'table' and name = ?";
+        return "select * from sqlite_master where type = 'table' and name = ?";
     }
 
     /**
