@@ -36,7 +36,7 @@ class SQLiteProcessor extends Processor
             $type = strtolower($result->type);
 
             $collation = preg_match('/\b'.preg_quote($result->name)
-                .'\b[^,(]+(?:\([^()]+\)[^,]*)?(?:(?:default|check|as)\s*(?:\(.*?\))?[^,]*)*collate\s+["\']?(\w+)/i',
+                .'\b[^,(]+(?:\([^()]+\)[^,]*)?(?:(?:default|check|as)\s*(?:\(.*?\))?[^,]*)*collate\s+["\'`]?(\w+)/i',
                 $sql, $matches) === 1 ? strtolower($matches[1]) : null;
 
             return [
