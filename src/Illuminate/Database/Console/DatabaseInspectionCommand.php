@@ -22,7 +22,7 @@ abstract class DatabaseInspectionCommand extends Command
     protected function getConnectionName(ConnectionInterface $connection, $database)
     {
         return match (true) {
-            $connection instanceof MySqlConnection && $connection->isMaria()  => 'MariaDB',
+            $connection instanceof MySqlConnection && $connection->isMaria() => 'MariaDB',
             $connection instanceof MySqlConnection => 'MySQL',
             $connection instanceof PostgresConnection => 'PostgreSQL',
             $connection instanceof SQLiteConnection => 'SQLite',
