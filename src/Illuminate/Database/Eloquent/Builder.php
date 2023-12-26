@@ -254,6 +254,27 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Add a where clause on the route key to the query.
+     *
+     * @param  mixed  $key
+     * @return $this
+     */
+    public function whereRouteKey(mixed $key): static
+    {
+        if ($key instanceof Model) {
+            $key = $key->getRouteKey();
+        }
+
+        if (is_array($key) || $key instanceof Arrayable) {
+            $this->query->whereIn($this->model->getRouteKeyName(), $key);
+
+            return $this;
+        }
+
+        return $this->where($this->model->getRouteKeyName(), '=', $key);
+    }
+
+    /**
      * Add a where clause on the primary key to the query.
      *
      * @param  mixed  $id
@@ -280,6 +301,27 @@ class Builder implements BuilderContract
         }
 
         return $this->where($this->model->getQualifiedKeyName(), '!=', $id);
+    }
+
+    /**
+     * Add a where clause on the route key to the query.
+     *
+     * @param  mixed  $key
+     * @return $this
+     */
+    public function whereRouteKeyNot(mixed $key): static
+    {
+        if ($key instanceof Model) {
+            $key = $key->getRouteKey();
+        }
+
+        if (is_array($key) || $key instanceof Arrayable) {
+            $this->query->whereIn($this->model->getRouteKeyName(), $key);
+
+            return $this;
+        }
+
+        return $this->where($this->model->getRouteKeyName(), '!=', $key);
     }
 
     /**
@@ -448,6 +490,18 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Find a model by its route key.
+     *
+     * @param  mixed  $key
+     * @param  string[]|string  $columns
+     * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection|static[]|static|null
+     */
+    public function findByRouteKey(mixed $key, array|string $columns = ['*'])
+    {
+        return $this->whereRouteKey($key)->first($columns);
+    }
+
+    /**
      * Find multiple models by their primary keys.
      *
      * @param  \Illuminate\Contracts\Support\Arrayable|array  $ids
@@ -463,6 +517,24 @@ class Builder implements BuilderContract
         }
 
         return $this->whereKey($ids)->get($columns);
+    }
+
+    /**
+     * Find multiple models by their route keys.
+     *
+     * @param Arrayable|iterable  $keys
+     * @param  string[]|string  $columns
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function findManyByRouteKey(iterable|Arrayable $keys, array|string $columns = ['*']): Collection
+    {
+        $keys = $keys instanceof Arrayable ? $keys->toArray() : $keys;
+
+        if (empty($keys)) {
+            return $this->model->newCollection();
+        }
+
+        return $this->whereRouteKey($keys)->get($columns);
     }
 
     /**
@@ -500,6 +572,28 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Find a model by its route key or throw an exception.
+     *
+     * @param  mixed  $key
+     * @param  string[]|string  $columns
+     * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection|static|static[]
+     *
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException<\Illuminate\Database\Eloquent\Model>
+     */
+    public function findByRouteKeyOrFail(mixed $key, array|string $columns = ['*']): mixed
+    {
+        $result = $this->findByRouteKey($key, $columns);
+
+        if (is_null($result)) {
+            throw (new ModelNotFoundException)->setModel(
+                get_class($this->model), $key
+            );
+        }
+
+        return $result;
+    }
+
+    /**
      * Find a model by its primary key or return fresh model instance.
      *
      * @param  mixed  $id
@@ -509,6 +603,22 @@ class Builder implements BuilderContract
     public function findOrNew($id, $columns = ['*'])
     {
         if (! is_null($model = $this->find($id, $columns))) {
+            return $model;
+        }
+
+        return $this->newModelInstance();
+    }
+
+    /**
+     * Find a model by its route key or return fresh model instance.
+     *
+     * @param  mixed  $key
+     * @param string|string[] $columns
+     * @return \Illuminate\Database\Eloquent\Model|static
+     */
+    public function findByRouteKeyOrNew(mixed $key, array|string $columns = ['*'])
+    {
+        if (! is_null($model = $this->findByRouteKey($key, $columns))) {
             return $model;
         }
 
@@ -532,6 +642,29 @@ class Builder implements BuilderContract
         }
 
         if (! is_null($model = $this->find($id, $columns))) {
+            return $model;
+        }
+
+        return $callback();
+    }
+
+    /**
+     * Find a model by its route key or call a callback.
+     *
+     * @param  mixed  $key
+     * @param  string|string[]|Closure $columns
+     * @param  Closure|null  $callback
+     * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection|static[]|static|mixed
+     */
+    public function findByRouteKeyOr(mixed $key, array|string|Closure $columns = ['*'], Closure $callback = null): mixed
+    {
+        if ($columns instanceof Closure) {
+            $callback = $columns;
+
+            $columns = ['*'];
+        }
+
+        if (! is_null($model = $this->findByRouteKey($key, $columns))) {
             return $model;
         }
 
