@@ -74,5 +74,7 @@ class DatabaseConnectionFactory extends ConnectionFactory
         }
 
         static::$cachedConnections = [];
+
+        RefreshDatabaseState::flushState();
     }
 }
