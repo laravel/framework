@@ -275,6 +275,30 @@ if (! function_exists('config')) {
     }
 }
 
+if (! function_exists('config_or_fail')) {
+    /**
+     * Retrieve a configuration value or fail with an exception if the key does not exist.
+     *
+     * Similar to config helper but throws an exception if the specified configuration key is not found.
+     *
+     * @param  string  $key  The configuration key to retrieve.
+     * @param  string|null  $exceptionMessage  Optional custom message for the thrown exception.
+     * @return mixed The configuration value if the key exists.
+     *
+     * @throws \RuntimeException If the configuration key is not found.
+     */
+    function config_or_fail($key, $exceptionMessage = null)
+    {
+        $value = config($key, '__no_value__');
+
+        if ($value === '__no_value__') {
+            throw new \RuntimeException($exceptionMessage ?: "Configuration key '{$key}' not found.");
+        }
+
+        return $value;
+    }
+}
+
 if (! function_exists('config_path')) {
     /**
      * Get the configuration path.
