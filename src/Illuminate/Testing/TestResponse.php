@@ -1099,7 +1099,7 @@ class TestResponse implements ArrayAccess
     /**
      * Assert that the response view is missing a piece of bound data.
      *
-     * @param  string  $key
+     * @param  string|array  $key
      * @return $this
      */
     public function assertViewMissing($key)
