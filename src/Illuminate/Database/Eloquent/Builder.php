@@ -256,13 +256,19 @@ class Builder implements BuilderContract
     /**
      * Add a where clause on the route key to the query.
      *
-     * @param  string|Model  $key
+     * @param string|Model|iterable<string>|Arrayable<int,string>  $key
      * @return $this
      */
-    public function whereRouteKey(string|Model $key): static
+    public function whereRouteKey(string|Model|iterable|Arrayable $key): static
     {
         if ($key instanceof Model) {
             $key = $key->getRouteKey();
+        }
+
+        if (is_iterable($key) || $key instanceof Arrayable) {
+            $this->query->whereIn($this->model->getQualifiedRouteKeyName(), $key);
+
+            return $this;
         }
 
         return $this->where($this->model->getQualifiedRouteKeyName(), '=', $key);
@@ -300,13 +306,19 @@ class Builder implements BuilderContract
     /**
      * Add a where clause on the route key to the query.
      *
-     * @param  string|Model  $key
+     * @param string|Model|iterable<string>|Arrayable<int,string> $key
      * @return $this
      */
     public function whereRouteKeyNot(string|Model $key): static
     {
         if ($key instanceof Model) {
             $key = $key->getRouteKey();
+        }
+
+        if (is_iterable($key) || $key instanceof Arrayable) {
+            $this->query->whereNotIn($this->model->getQualifiedRouteKeyName(), $key);
+
+            return $this;
         }
 
         return $this->where($this->model->getQualifiedRouteKeyName(), '!=', $key);
@@ -514,7 +526,7 @@ class Builder implements BuilderContract
      * @param  string[]|string  $columns
      * @return \Illuminate\Database\Eloquent\Collection
      */
-    public function findManyByRouteKey(iterable|Arrayable $keys, array|string $columns = ['*']): Collection
+    public function findManyByRouteKey(iterable|Arrayable $keys, array|string $columns = ['*'])
     {
         $keys = $keys instanceof Arrayable ? $keys->toArray() : $keys;
 
