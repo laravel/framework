@@ -10,7 +10,7 @@ if (! function_exists('Illuminate\Filesystem\join_paths')) {
      * @param  string  ...$paths
      * @return string
      */
-    function join_paths($basePath, string ...$paths)
+    function join_paths($basePath, ...$paths)
     {
         foreach ($paths as $index => $path) {
             if (empty($path)) {

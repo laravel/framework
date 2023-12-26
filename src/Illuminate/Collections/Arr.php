@@ -109,7 +109,7 @@ class Arr
      */
     public static function dot($array, $prepend = '')
     {
-        $results = [[]];
+        $results = [];
 
         foreach ($array as $key => $value) {
             if (is_array($value) && ! empty($value)) {
