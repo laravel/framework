@@ -256,7 +256,7 @@ class Builder implements BuilderContract
     /**
      * Add a where clause on the route key to the query.
      *
-     * @param string|Model|iterable<string>|Arrayable<int,string>  $key
+     * @param  string|Model|iterable<string>|Arrayable<int,string>  $key
      * @return $this
      */
     public function whereRouteKey(string|Model|iterable|Arrayable $key): static
@@ -306,7 +306,7 @@ class Builder implements BuilderContract
     /**
      * Add a where clause on the route key to the query.
      *
-     * @param string|Model|iterable<string>|Arrayable<int,string> $key
+     * @param  string|Model|iterable<string>|Arrayable<int,string>  $key
      * @return $this
      */
     public function whereRouteKeyNot(string|Model $key): static
@@ -526,7 +526,7 @@ class Builder implements BuilderContract
     /**
      * Find multiple models by their route keys.
      *
-     * @param Arrayable<int,string>|iterable<string>  $keys
+     * @param  Arrayable<int,string>|iterable<string>  $keys
      * @param  string[]|string  $columns
      * @return \Illuminate\Database\Eloquent\Collection
      */
@@ -629,7 +629,7 @@ class Builder implements BuilderContract
      * Find a model by its route key or return fresh model instance.
      *
      * @param  string|Model|iterable<string>|Arrayable<int,string>  $key
-     * @param string|string[] $columns
+     * @param  string|string[]  $columns
      * @return \Illuminate\Database\Eloquent\Model|static
      */
     public function findByRouteKeyOrNew(string|Model|iterable|Arrayable $key, array|string $columns = ['*'])
@@ -668,7 +668,7 @@ class Builder implements BuilderContract
      * Find a model by its route key or call a callback.
      *
      * @param  string|Model|iterable<string>|Arrayable<int,string>  $key
-     * @param  string|string[]|Closure $columns
+     * @param  string|string[]|Closure  $columns
      * @param  Closure|null  $callback
      * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection|static[]|static|mixed
      */
