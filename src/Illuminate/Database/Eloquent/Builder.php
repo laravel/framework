@@ -256,19 +256,13 @@ class Builder implements BuilderContract
     /**
      * Add a where clause on the route key to the query.
      *
-     * @param  mixed  $key
+     * @param  string|Model  $key
      * @return $this
      */
-    public function whereRouteKey(mixed $key): static
+    public function whereRouteKey(string|Model $key): static
     {
         if ($key instanceof Model) {
             $key = $key->getRouteKey();
-        }
-
-        if (is_array($key) || $key instanceof Arrayable) {
-            $this->query->whereIn($this->model->getRouteKeyName(), $key);
-
-            return $this;
         }
 
         return $this->where($this->model->getRouteKeyName(), '=', $key);
@@ -306,19 +300,13 @@ class Builder implements BuilderContract
     /**
      * Add a where clause on the route key to the query.
      *
-     * @param  mixed  $key
+     * @param  string|Model  $key
      * @return $this
      */
-    public function whereRouteKeyNot(mixed $key): static
+    public function whereRouteKeyNot(string|Model $key): static
     {
         if ($key instanceof Model) {
             $key = $key->getRouteKey();
-        }
-
-        if (is_array($key) || $key instanceof Arrayable) {
-            $this->query->whereIn($this->model->getRouteKeyName(), $key);
-
-            return $this;
         }
 
         return $this->where($this->model->getRouteKeyName(), '!=', $key);
@@ -492,11 +480,11 @@ class Builder implements BuilderContract
     /**
      * Find a model by its route key.
      *
-     * @param  mixed  $key
+     * @param  string  $key
      * @param  string[]|string  $columns
      * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection|static[]|static|null
      */
-    public function findByRouteKey(mixed $key, array|string $columns = ['*'])
+    public function findByRouteKey(string $key, array|string $columns = ['*'])
     {
         return $this->whereRouteKey($key)->first($columns);
     }
@@ -522,7 +510,7 @@ class Builder implements BuilderContract
     /**
      * Find multiple models by their route keys.
      *
-     * @param Arrayable|iterable  $keys
+     * @param Arrayable<int,string>|iterable<string>  $keys
      * @param  string[]|string  $columns
      * @return \Illuminate\Database\Eloquent\Collection
      */
@@ -574,13 +562,13 @@ class Builder implements BuilderContract
     /**
      * Find a model by its route key or throw an exception.
      *
-     * @param  mixed  $key
+     * @param  string  $key
      * @param  string[]|string  $columns
      * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection|static|static[]
      *
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException<\Illuminate\Database\Eloquent\Model>
      */
-    public function findByRouteKeyOrFail(mixed $key, array|string $columns = ['*']): mixed
+    public function findByRouteKeyOrFail(string $key, array|string $columns = ['*']): mixed
     {
         $result = $this->findByRouteKey($key, $columns);
 
@@ -612,11 +600,11 @@ class Builder implements BuilderContract
     /**
      * Find a model by its route key or return fresh model instance.
      *
-     * @param  mixed  $key
+     * @param  string  $key
      * @param string|string[] $columns
      * @return \Illuminate\Database\Eloquent\Model|static
      */
-    public function findByRouteKeyOrNew(mixed $key, array|string $columns = ['*'])
+    public function findByRouteKeyOrNew(string $key, array|string $columns = ['*'])
     {
         if (! is_null($model = $this->findByRouteKey($key, $columns))) {
             return $model;
@@ -651,12 +639,12 @@ class Builder implements BuilderContract
     /**
      * Find a model by its route key or call a callback.
      *
-     * @param  mixed  $key
+     * @param  string  $key
      * @param  string|string[]|Closure $columns
      * @param  Closure|null  $callback
      * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection|static[]|static|mixed
      */
-    public function findByRouteKeyOr(mixed $key, array|string|Closure $columns = ['*'], Closure $callback = null): mixed
+    public function findByRouteKeyOr(string $key, array|string|Closure $columns = ['*'], Closure $callback = null): mixed
     {
         if ($columns instanceof Closure) {
             $callback = $columns;
