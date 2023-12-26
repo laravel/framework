@@ -315,6 +315,16 @@ class Collection extends BaseCollection implements QueueableCollection
     }
 
     /**
+     * Get the array of route keys.
+     *
+     * @return array<int, array-key>
+     */
+    public function modelRouteKeys()
+    {
+        return array_map(fn ($model) => $model->getRouteKey(), $this->items);
+    }
+
+    /**
      * Merge the collection with the given items.
      *
      * @param  iterable<array-key, TModel>  $items

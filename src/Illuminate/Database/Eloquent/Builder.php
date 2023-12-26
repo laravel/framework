@@ -492,12 +492,16 @@ class Builder implements BuilderContract
     /**
      * Find a model by its route key.
      *
-     * @param  string  $key
+     * @param  string|Model|iterable<string>|Arrayable<int,string>  $key
      * @param  string[]|string  $columns
      * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection|static[]|static|null
      */
-    public function findByRouteKey(string $key, array|string $columns = ['*'])
+    public function findByRouteKey(string|Model|iterable|Arrayable $key, array|string $columns = ['*'])
     {
+        if (is_array($key) || $key instanceof Arrayable) {
+            return $this->findManyByRouteKey($key, $columns);
+        }
+
         return $this->whereRouteKey($key)->first($columns);
     }
 
@@ -574,15 +578,27 @@ class Builder implements BuilderContract
     /**
      * Find a model by its route key or throw an exception.
      *
-     * @param  string  $key
+     * @param  string|Model|iterable<string>|Arrayable<int,string>  $key
      * @param  string[]|string  $columns
      * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection|static|static[]
      *
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException<\Illuminate\Database\Eloquent\Model>
      */
-    public function findByRouteKeyOrFail(string $key, array|string $columns = ['*']): mixed
+    public function findByRouteKeyOrFail(string|Model|iterable|Arrayable $key, array|string $columns = ['*']): mixed
     {
         $result = $this->findByRouteKey($key, $columns);
+
+        $key = $key instanceof Arrayable ? $key->toArray() : $key;
+
+        if (is_array($key)) {
+            if (count($result) !== count(array_unique($key))) {
+                throw (new ModelNotFoundException)->setModel(
+                    get_class($this->model), array_diff($key, $result->modelRouteKeys())
+                );
+            }
+
+            return $result;
+        }
 
         if (is_null($result)) {
             throw (new ModelNotFoundException)->setModel(
@@ -612,11 +628,11 @@ class Builder implements BuilderContract
     /**
      * Find a model by its route key or return fresh model instance.
      *
-     * @param  string  $key
+     * @param  string|Model|iterable<string>|Arrayable<int,string>  $key
      * @param string|string[] $columns
      * @return \Illuminate\Database\Eloquent\Model|static
      */
-    public function findByRouteKeyOrNew(string $key, array|string $columns = ['*'])
+    public function findByRouteKeyOrNew(string|Model|iterable|Arrayable $key, array|string $columns = ['*'])
     {
         if (! is_null($model = $this->findByRouteKey($key, $columns))) {
             return $model;
@@ -651,12 +667,12 @@ class Builder implements BuilderContract
     /**
      * Find a model by its route key or call a callback.
      *
-     * @param  string  $key
+     * @param  string|Model|iterable<string>|Arrayable<int,string>  $key
      * @param  string|string[]|Closure $columns
      * @param  Closure|null  $callback
      * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection|static[]|static|mixed
      */
-    public function findByRouteKeyOr(string $key, array|string|Closure $columns = ['*'], Closure $callback = null): mixed
+    public function findByRouteKeyOr(string|Model|iterable|Arrayable $key, array|string|Closure $columns = ['*'], Closure $callback = null): mixed
     {
         if ($columns instanceof Closure) {
             $callback = $columns;

@@ -231,6 +231,22 @@ class DatabaseEloquentCollectionTest extends TestCase
         $this->assertEquals([1, 2, 3], $c->modelKeys());
     }
 
+    public function testCollectionDictionaryReturnsModelRouteKeys()
+    {
+        $one = m::mock(Model::class);
+        $one->shouldReceive('getRouteKey')->andReturn('model_a');
+
+        $two = m::mock(Model::class);
+        $two->shouldReceive('getRouteKey')->andReturn('model_b');
+
+        $three = m::mock(Model::class);
+        $three->shouldReceive('getRouteKey')->andReturn('model_c');
+
+        $c = new Collection([$one, $two, $three]);
+
+        $this->assertEquals(['model_a', 'model_b', 'model_c'], $c->modelRouteKeys());
+    }
+
     public function testCollectionMergesWithGivenCollection()
     {
         $one = m::mock(Model::class);
