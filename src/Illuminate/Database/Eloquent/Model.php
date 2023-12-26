@@ -1907,6 +1907,16 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     }
 
     /**
+     * Get the table qualified route key name.
+     *
+     * @return string
+     */
+    public function getQualifiedRouteKeyName()
+    {
+        return $this->qualifyColumn($this->getRouteKeyName());
+    }
+
+    /**
      * Get the auto-incrementing key type.
      *
      * @return string

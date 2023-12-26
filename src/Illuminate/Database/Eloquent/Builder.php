@@ -265,7 +265,7 @@ class Builder implements BuilderContract
             $key = $key->getRouteKey();
         }
 
-        return $this->where($this->model->getRouteKeyName(), '=', $key);
+        return $this->where($this->model->getQualifiedRouteKeyName(), '=', $key);
     }
 
     /**
@@ -309,7 +309,7 @@ class Builder implements BuilderContract
             $key = $key->getRouteKey();
         }
 
-        return $this->where($this->model->getRouteKeyName(), '!=', $key);
+        return $this->where($this->model->getQualifiedRouteKeyName(), '!=', $key);
     }
 
     /**
