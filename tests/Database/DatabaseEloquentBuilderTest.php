@@ -46,6 +46,19 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertSame('baz', $result);
     }
 
+    public function testFindByRouteKeyMethod()
+    {
+        $builder = m::mock(Builder::class.'[first]', [$this->getMockQueryBuilder()]);
+        $model = $this->getMockModel();
+        $model->shouldReceive('getQualifiedRouteKeyName')->andReturn('foo_table.foo_route_key');
+        $builder->setModel($model);
+        $builder->getQuery()->shouldReceive('where')->once()->with('foo_table.foo_route_key', '=', 'bar');
+        $builder->shouldReceive('first')->with(['column'])->andReturn('baz');
+
+        $result = $builder->findByRouteKey('bar', ['column']);
+        $this->assertSame('baz', $result);
+    }
+
     public function testFindManyMethod()
     {
         // ids are not empty
@@ -83,6 +96,42 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertSame('emptycollection', $result);
     }
 
+    public function testFindManyByRouteKeyMethod()
+    {
+        // ids are not empty
+        $builder = m::mock(Builder::class.'[get]', [$this->getMockQueryBuilder()]);
+        $model = $this->getMockModel();
+        $model->shouldReceive('getQualifiedRouteKeyName')->andReturn('foo_table.foo_route_key');
+        $builder->setModel($model);
+        $builder->getQuery()->shouldReceive('whereIn')->once()->with('foo_table.foo_route_key', ['one', 'two']);
+        $builder->shouldReceive('get')->with(['column'])->andReturn(['baz']);
+
+        $result = $builder->findManyByRouteKey(['one', 'two'], ['column']);
+        $this->assertEquals(['baz'], $result);
+
+        // ids are empty array
+        $builder = m::mock(Builder::class.'[get]', [$this->getMockQueryBuilder()]);
+        $model = $this->getMockModel();
+        $model->shouldReceive('newCollection')->once()->withNoArgs()->andReturn('emptycollection');
+        $builder->setModel($model);
+        $builder->getQuery()->shouldNotReceive('whereIn');
+        $builder->shouldNotReceive('get');
+
+        $result = $builder->findManyByRouteKey([], ['column']);
+        $this->assertSame('emptycollection', $result);
+
+        // ids are empty collection
+        $builder = m::mock(Builder::class.'[get]', [$this->getMockQueryBuilder()]);
+        $model = $this->getMockModel();
+        $model->shouldReceive('newCollection')->once()->withNoArgs()->andReturn('emptycollection');
+        $builder->setModel($model);
+        $builder->getQuery()->shouldNotReceive('whereIn');
+        $builder->shouldNotReceive('get');
+
+        $result = $builder->findManyByRouteKey(collect(), ['column']);
+        $this->assertSame('emptycollection', $result);
+    }
+
     public function testFindOrNewMethodModelFound()
     {
         $model = $this->getMockModel();
@@ -112,6 +161,39 @@ class DatabaseEloquentBuilderTest extends TestCase
 
         $result = $model->findOrNew('bar', ['column']);
         $findResult = $builder->find('bar', ['column']);
+        $this->assertNull($findResult);
+        $this->assertInstanceOf(Model::class, $result);
+    }
+
+    public function testFindByRouteKeyOrNewMethodModelFound()
+    {
+        $model = $this->getMockModel();
+        $model->shouldReceive('getQualifiedRouteKeyName')->once()->andReturn('foo_table.foo_route_key');
+        $model->shouldReceive('findByRouteKeyOrNew')->once()->andReturn('baz');
+
+        $builder = m::mock(Builder::class.'[first]', [$this->getMockQueryBuilder()]);
+        $builder->setModel($model);
+        $builder->getQuery()->shouldReceive('where')->once()->with('foo_table.foo_route_key', '=', 'bar');
+        $builder->shouldReceive('first')->with(['column'])->andReturn('baz');
+
+        $expected = $model->findByRouteKeyOrNew('bar', ['column']);
+        $result = $builder->findByRouteKey('bar', ['column']);
+        $this->assertEquals($expected, $result);
+    }
+
+    public function testFindByRouteKeyOrNewMethodModelNotFound()
+    {
+        $model = $this->getMockModel();
+        $model->shouldReceive('getQualifiedRouteKeyName')->once()->andReturn('foo_table.foo_route_key');
+        $model->shouldReceive('findByRouteKeyOrNew')->once()->andReturn(m::mock(Model::class));
+
+        $builder = m::mock(Builder::class.'[first]', [$this->getMockQueryBuilder()]);
+        $builder->setModel($model);
+        $builder->getQuery()->shouldReceive('where')->once()->with('foo_table.foo_route_key', '=', 'bar');
+        $builder->shouldReceive('first')->with(['column'])->andReturn(null);
+
+        $result = $model->findByRouteKeyOrNew('bar', ['column']);
+        $findResult = $builder->findByRouteKey('bar', ['column']);
         $this->assertNull($findResult);
         $this->assertInstanceOf(Model::class, $result);
     }
@@ -157,6 +239,49 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->getQuery()->shouldReceive('whereIntegerInRaw')->once()->with('foo_table.foo', [1, 2]);
         $builder->shouldReceive('get')->with(['column'])->andReturn(new Collection([$model]));
         $builder->findOrFail(new Collection([1, 2]), ['column']);
+    }
+
+    public function testFindByRouteKeyOrFailMethodThrowsModelNotFoundException()
+    {
+        $this->expectException(ModelNotFoundException::class);
+
+        $builder = m::mock(Builder::class.'[first]', [$this->getMockQueryBuilder()]);
+        $model = $this->getMockModel();
+        $model->shouldReceive('getQualifiedRouteKeyName')->once()->andReturn('foo_table.foo_route_key');
+        $builder->setModel($model);
+        $builder->getQuery()->shouldReceive('where')->once()->with('foo_table.foo_route_key', '=', 'bar');
+        $builder->shouldReceive('first')->with(['column'])->andReturn(null);
+        $builder->findByRouteKeyOrFail('bar', ['column']);
+    }
+
+    public function testFindByRouteKeyOrFailMethodWithManyThrowsModelNotFoundException()
+    {
+        $this->expectException(ModelNotFoundException::class);
+
+        $model = $this->getMockModel();
+        $model->shouldReceive('getQualifiedRouteKeyName')->once()->andReturn('foo_table.foo_route_key');
+        $model->shouldReceive('getRouteKey')->andReturn('model_route_key');
+
+        $builder = m::mock(Builder::class.'[get]', [$this->getMockQueryBuilder()]);
+        $builder->setModel($model);
+        $builder->getQuery()->shouldReceive('whereIn')->once()->with('foo_table.foo_route_key', ['model_route_key', 'other_model_route_key']);
+        $builder->shouldReceive('get')->with(['column'])->andReturn(new Collection([$model]));
+        $builder->findByRouteKeyOrFail(['model_route_key', 'other_model_route_key'], ['column']);
+    }
+
+    public function testFindByRouteKeyOrFailMethodWithManyUsingCollectionThrowsModelNotFoundException()
+    {
+        $this->expectException(ModelNotFoundException::class);
+
+        $model = $this->getMockModel();
+        $model->shouldReceive('getQualifiedRouteKeyName')->once()->andReturn('foo_table.foo_route_key');
+        $model->shouldReceive('getRouteKey')->andReturn('model_route_key');
+
+        $builder = m::mock(Builder::class.'[get]', [$this->getMockQueryBuilder()]);
+        $builder->setModel($model);
+        $builder->getQuery()->shouldReceive('whereIn')->once()->with('foo_table.foo_route_key', ['model_route_key', 'other_model_route_key']);
+        $builder->shouldReceive('get')->with(['column'])->andReturn(new Collection([$model]));
+        $builder->findByRouteKeyOrFail(new Collection(['model_route_key', 'other_model_route_key']), ['column']);
     }
 
     public function testFindOrMethod()
@@ -232,6 +357,79 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertSame('callback result', $result);
     }
 
+    public function testFindByRouteKeyOrMethod()
+    {
+        $builder = m::mock(Builder::class.'[first]', [$this->getMockQueryBuilder()]);
+        $model = $this->getMockModel();
+        $model->shouldReceive('getQualifiedRouteKeyName')->andReturn('foo_table.foo_route_key');
+        $builder->setModel($model);
+        $builder->getQuery()->shouldReceive('where')->with('foo_table.foo_route_key', '=', 'model_route_key_a')->twice();
+        $builder->getQuery()->shouldReceive('where')->with('foo_table.foo_route_key', '=', 'model_route_key_b')->once();
+        $builder->shouldReceive('first')->andReturn($model)->once();
+        $builder->shouldReceive('first')->with(['column'])->andReturn($model)->once();
+        $builder->shouldReceive('first')->andReturn(null)->once();
+
+        $this->assertSame($model, $builder->findByRouteKeyOr('model_route_key_a', fn () => 'callback result'));
+        $this->assertSame($model, $builder->findByRouteKeyOr('model_route_key_a', ['column'], fn () => 'callback result'));
+        $this->assertSame('callback result', $builder->findByRouteKeyOr('model_route_key_b', fn () => 'callback result'));
+    }
+
+    public function testFindByRouteKeyOrMethodWithMany()
+    {
+        $builder = m::mock(Builder::class.'[get]', [$this->getMockQueryBuilder()]);
+        $model1 = $this->getMockModel();
+        $model2 = $this->getMockModel();
+        $model1->shouldReceive('getQualifiedRouteKeyName')->andReturn('foo_table.foo_route_key');
+        $model2->shouldReceive('getQualifiedRouteKeyName')->andReturn('foo_table.foo_route_key');
+        $builder->setModel($model1);
+        $builder->getQuery()->shouldReceive('whereIn')->with('foo_table.foo_route_key', ['model_route_key_a', 'model_route_key_b'])->twice();
+        $builder->getQuery()->shouldReceive('whereIn')->with('foo_table.foo_route_key', ['model_route_key_a', 'model_route_key_b', 'model_route_key_c'])->once();
+        $builder->shouldReceive('get')->andReturn(new Collection([$model1, $model2]))->once();
+        $builder->shouldReceive('get')->with(['column'])->andReturn(new Collection([$model1, $model2]))->once();
+        $builder->shouldReceive('get')->andReturn(null)->once();
+
+        $result = $builder->findByRouteKeyOr(['model_route_key_a', 'model_route_key_b'], fn () => 'callback result');
+        $this->assertInstanceOf(Collection::class, $result);
+        $this->assertSame($model1, $result[0]);
+        $this->assertSame($model2, $result[1]);
+
+        $result = $builder->findByRouteKeyOr(['model_route_key_a', 'model_route_key_b'], ['column'], fn () => 'callback result');
+        $this->assertInstanceOf(Collection::class, $result);
+        $this->assertSame($model1, $result[0]);
+        $this->assertSame($model2, $result[1]);
+
+        $result = $builder->findByRouteKeyOr(['model_route_key_a', 'model_route_key_b', 'model_route_key_c'], fn () => 'callback result');
+        $this->assertSame('callback result', $result);
+    }
+
+    public function testFindByRouteKeyOrMethodWithManyUsingCollection()
+    {
+        $builder = m::mock(Builder::class.'[get]', [$this->getMockQueryBuilder()]);
+        $model1 = $this->getMockModel();
+        $model2 = $this->getMockModel();
+        $model1->shouldReceive('getQualifiedRouteKeyName')->andReturn('foo_table.foo_route_key');
+        $model2->shouldReceive('getQualifiedRouteKeyName')->andReturn('foo_table.foo_route_key');
+        $builder->setModel($model1);
+        $builder->getQuery()->shouldReceive('whereIn')->with('foo_table.foo_route_key', ['model_route_key_a', 'model_route_key_b'])->twice();
+        $builder->getQuery()->shouldReceive('whereIn')->with('foo_table.foo_route_key', ['model_route_key_a', 'model_route_key_b', 'model_route_key_c'])->once();
+        $builder->shouldReceive('get')->andReturn(new Collection([$model1, $model2]))->once();
+        $builder->shouldReceive('get')->with(['column'])->andReturn(new Collection([$model1, $model2]))->once();
+        $builder->shouldReceive('get')->andReturn(null)->once();
+
+        $result = $builder->findByRouteKeyOr(new Collection(['model_route_key_a', 'model_route_key_b']), fn () => 'callback result');
+        $this->assertInstanceOf(Collection::class, $result);
+        $this->assertSame($model1, $result[0]);
+        $this->assertSame($model2, $result[1]);
+
+        $result = $builder->findByRouteKeyOr(new Collection(['model_route_key_a', 'model_route_key_b']), ['column'], fn () => 'callback result');
+        $this->assertInstanceOf(Collection::class, $result);
+        $this->assertSame($model1, $result[0]);
+        $this->assertSame($model2, $result[1]);
+
+        $result = $builder->findByRouteKeyOr(new Collection(['model_route_key_a', 'model_route_key_b', 'model_route_key_c']), fn () => 'callback result');
+        $this->assertSame('callback result', $result);
+    }
+
     public function testFirstOrFailMethodThrowsModelNotFoundException()
     {
         $this->expectException(ModelNotFoundException::class);
@@ -266,6 +464,33 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->shouldReceive('get')->with(['column'])->andReturn('baz');
 
         $result = $builder->find($ids, ['column']);
+        $this->assertSame('baz', $result);
+    }
+
+    public function testFindByRouteKeyWithMany()
+    {
+        $builder = m::mock(Builder::class.'[get]', [$this->getMockQueryBuilder()]);
+        $model = $this->getMockModel();
+        $model->shouldReceive('getQualifiedRouteKeyName')->andReturn('foo_table.foo_route_key');
+        $builder->getQuery()->shouldReceive('whereIn')->once()->with('foo_table.foo_route_key', ['model_route_key_a', 'model_route_key_b']);
+        $builder->setModel($model);
+        $builder->shouldReceive('get')->with(['column'])->andReturn('baz');
+
+        $result = $builder->findByRouteKey(['model_route_key_a', 'model_route_key_b'], ['column']);
+        $this->assertSame('baz', $result);
+    }
+
+    public function testFindByRouteKeyWithManyUsingCollection()
+    {
+        $ids = collect(['model_route_key_a', 'model_route_key_b']);
+        $builder = m::mock(Builder::class.'[get]', [$this->getMockQueryBuilder()]);
+        $model = $this->getMockModel();
+        $model->shouldReceive('getQualifiedRouteKeyName')->andReturn('foo_table.foo_route_key');
+        $builder->getQuery()->shouldReceive('whereIn')->once()->with('foo_table.foo_route_key', ['model_route_key_a', 'model_route_key_b']);
+        $builder->setModel($model);
+        $builder->shouldReceive('get')->with(['column'])->andReturn('baz');
+
+        $result = $builder->findByRouteKey($ids, ['column']);
         $this->assertSame('baz', $result);
     }
 
