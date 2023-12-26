@@ -302,11 +302,13 @@ class Kernel implements KernelContract
     /**
      * Get the name of the cache store that should manage scheduling mutexes.
      *
-     * @return string
+     * @return string|null
      */
     protected function scheduleCache()
     {
-        return $this->app['config']->get('cache.schedule_store', Env::get('SCHEDULE_CACHE_DRIVER'));
+        return $this->app['config']->get('cache.schedule_store', Env::get('SCHEDULE_CACHE_DRIVER', function () {
+            return Env::get('SCHEDULE_CACHE_STORE');
+        }));
     }
 
     /**
