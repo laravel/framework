@@ -25,7 +25,8 @@ class PruneCommand extends Command
                                 {--model=* : Class names of the models to be pruned}
                                 {--except=* : Class names of the models to be excluded from pruning}
                                 {--chunk=1000 : The number of models to retrieve per chunk of models to be deleted}
-                                {--pretend : Display the number of prunable records found instead of deleting them}';
+                                {--pretend : Display the number of prunable records found instead of deleting them}
+                                {--delete-quietly : Delete the model quietly without firing any events}';
 
     /**
      * The console command description.
@@ -98,7 +99,7 @@ class PruneCommand extends Command
             : $this->option('chunk');
 
         $total = $this->isPrunable($model)
-            ? $instance->pruneAll($chunkSize)
+            ? $instance->pruneAll($chunkSize, $this->option('delete-quietly'))
             : 0;
 
         if ($total == 0) {
