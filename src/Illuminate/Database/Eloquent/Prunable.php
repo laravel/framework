@@ -52,7 +52,7 @@ trait Prunable
     {
         $this->pruning();
 
-        if (!empty($deleteQuitely)) {
+        if (! empty($deleteQuitely)) {
             return in_array(SoftDeletes::class, class_uses_recursive(get_class($this)))
                 ? $this->forceDeleteQuietly()
                 : $this->deleteQuietly();
