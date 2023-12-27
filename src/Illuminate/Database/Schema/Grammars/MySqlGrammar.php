@@ -158,7 +158,7 @@ class MySqlGrammar extends Grammar
         return sprintf(
             'select column_name as `name`, data_type as `type_name`, column_type as `type`, '
             .'collation_name as `collation`, is_nullable as `nullable`, '
-            .'column_default as `default`, column_comment AS `comment`, extra as `extra` '
+            .'column_default as `default`, column_comment as `comment`, extra as `extra` '
             .'from information_schema.columns where table_schema = %s and table_name = %s '
             .'order by ordinal_position asc',
             $this->quoteString($database),
@@ -180,6 +180,32 @@ class MySqlGrammar extends Grammar
             .'index_type as `type`, not non_unique as `unique` '
             .'from information_schema.statistics where table_schema = %s and table_name = %s '
             .'group by index_name, index_type, non_unique',
+            $this->quoteString($database),
+            $this->quoteString($table)
+        );
+    }
+
+    /**
+     * Compile the query to determine the foreign keys.
+     *
+     * @param  string  $database
+     * @param  string  $table
+     * @return string
+     */
+    public function compileForeignKeys($database, $table)
+    {
+        return sprintf(
+            'select kc.constraint_name as `name`, '
+            .'group_concat(kc.column_name order by kc.ordinal_position) as `columns`, '
+            .'kc.referenced_table_schema as `foreign_schema`, '
+            .'kc.referenced_table_name as `foreign_table`, '
+            .'group_concat(kc.referenced_column_name order by kc.ordinal_position) as `foreign_columns`, '
+            .'rc.update_rule as `on_update`, '
+            .'rc.delete_rule as `on_delete` '
+            .'from information_schema.key_column_usage kc join information_schema.referential_constraints rc '
+            .'on kc.constraint_schema = rc.constraint_schema and kc.constraint_name = rc.constraint_name '
+            .'where kc.table_schema = %s and kc.table_name = %s and kc.referenced_table_name is not null '
+            .'group by kc.constraint_name, kc.referenced_table_schema, kc.referenced_table_name, rc.update_rule, rc.delete_rule',
             $this->quoteString($database),
             $this->quoteString($table)
         );
@@ -222,10 +248,22 @@ class MySqlGrammar extends Grammar
      */
     protected function compileCreateTable($blueprint, $command, $connection)
     {
+        $tableStructure = $this->getColumns($blueprint);
+
+        if ($primaryKey = $this->getCommandByName($blueprint, 'primary')) {
+            $tableStructure[] = sprintf(
+                'primary key %s(%s)',
+                $primaryKey->algorithm ? 'using '.$primaryKey->algorithm : '',
+                $this->columnize($primaryKey->columns)
+            );
+
+            $primaryKey->shouldBeSkipped = true;
+        }
+
         return sprintf('%s table %s (%s)',
             $blueprint->temporary ? 'create temporary' : 'create',
             $this->wrapTable($blueprint),
-            implode(', ', $this->getColumns($blueprint))
+            implode(', ', $tableStructure)
         );
     }
 

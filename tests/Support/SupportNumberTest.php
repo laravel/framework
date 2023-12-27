@@ -12,6 +12,8 @@ class SupportNumberTest extends TestCase
         $this->needsIntlExtension();
 
         $this->assertSame('0', Number::format(0));
+        $this->assertSame('0', Number::format(0.0));
+        $this->assertSame('0', Number::format(0.00));
         $this->assertSame('1', Number::format(1));
         $this->assertSame('10', Number::format(10));
         $this->assertSame('25', Number::format(25));
@@ -193,6 +195,9 @@ class SupportNumberTest extends TestCase
         $this->assertSame('1 thousand quadrillion quadrillion', Number::forHumans(1000000000000000000000000000000000));
 
         $this->assertSame('0', Number::forHumans(0));
+        $this->assertSame('0', Number::forHumans(0.0));
+        $this->assertSame('0.00', Number::forHumans(0, 2));
+        $this->assertSame('0.00', Number::forHumans(0.0, 2));
         $this->assertSame('-1', Number::forHumans(-1));
         $this->assertSame('-1.00', Number::forHumans(-1, precision: 2));
         $this->assertSame('-10', Number::forHumans(-10));
@@ -246,6 +251,9 @@ class SupportNumberTest extends TestCase
         $this->assertSame('1KQQ', Number::abbreviate(1000000000000000000000000000000000));
 
         $this->assertSame('0', Number::abbreviate(0));
+        $this->assertSame('0', Number::abbreviate(0.0));
+        $this->assertSame('0.00', Number::abbreviate(0, 2));
+        $this->assertSame('0.00', Number::abbreviate(0.0, 2));
         $this->assertSame('-1', Number::abbreviate(-1));
         $this->assertSame('-1.00', Number::abbreviate(-1, precision: 2));
         $this->assertSame('-10', Number::abbreviate(-10));

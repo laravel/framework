@@ -128,4 +128,18 @@ class ViewComponentAttributeBagTest extends TestCase
         $this->assertFalse((bool) $bag->has('name', 'class'));
         $this->assertTrue((bool) $bag->missing('class'));
     }
+
+    public function testAttributeIsEmpty()
+    {
+        $bag = new ComponentAttributeBag([]);
+
+        $this->assertTrue((bool) $bag->isEmpty());
+    }
+
+    public function testAttributeIsNotEmpty()
+    {
+        $bag = new ComponentAttributeBag(['name' => 'test']);
+
+        $this->assertTrue((bool) $bag->isNotEmpty());
+    }
 }
