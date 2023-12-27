@@ -36,6 +36,7 @@ use RuntimeException;
  * @method static \Illuminate\Contracts\Auth\Authenticatable|bool onceUsingId(mixed $id)
  * @method static bool viaRemember()
  * @method static void logout()
+ * @method static bool logoutOnce()
  * @method static \Symfony\Component\HttpFoundation\Response|null basic(string $field = 'email', array $extraConditions = [])
  * @method static \Symfony\Component\HttpFoundation\Response|null onceBasic(string $field = 'email', array $extraConditions = [])
  * @method static bool attemptWhen(array $credentials = [], array|callable|null $callbacks = null, bool $remember = false)
