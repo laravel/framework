@@ -2596,7 +2596,7 @@ class DatabaseEloquentModelTest extends TestCase
                 $exceptionCount++;
             }
 
-            foreach($primitiveCasts as $key => $type) {
+            foreach ($primitiveCasts as $key => $type) {
                 try {
                     $v = $model->{$key};
                 } catch (MissingAttributeException) {
@@ -3405,8 +3405,8 @@ class EloquentModelWithPrimitiveCasts extends Model
     {
         $toReturn = [];
 
-        foreach(static::$primitiveCastTypes as $index => $primitiveCastType) {
-            $toReturn['primitive_cast_' . $index] = $primitiveCastType;
+        foreach (static::$primitiveCastTypes as $index => $primitiveCastType) {
+            $toReturn['primitive_cast_'.$index] = $primitiveCastType;
         }
 
         return $toReturn;
@@ -3419,13 +3419,14 @@ class EloquentModelWithPrimitiveCasts extends Model
         $this->mergeCasts(self::makePrimitiveCastsArray());
     }
 
-    public function getThisIsFineAttribute($value) {
+    public function getThisIsFineAttribute($value)
+    {
         return 'ok';
     }
 
     public function thisIsAlsoFine(): Attribute
     {
-        return Attribute::get(fn() => 'ok');
+        return Attribute::get(fn () => 'ok');
     }
 }
 
