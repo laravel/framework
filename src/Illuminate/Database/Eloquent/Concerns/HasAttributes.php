@@ -2101,7 +2101,7 @@ trait HasAttributes
         }
 
         return is_numeric($attribute) && is_numeric($original)
-            && strcmp((string) $attribute, (string) $original) === 0;
+            && BigDecimal::of($attribute)->isEqualTo($original);
     }
 
     /**
