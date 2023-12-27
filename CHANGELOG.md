@@ -1,6 +1,15 @@
 # Release Notes for 10.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v10.38.2...10.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v10.39.0...10.x)
+
+## [v10.39.0](https://github.com/laravel/framework/compare/v10.38.2...v10.39.0) - 2023-12-27
+
+* [9.x] Support for phpredis 6.0.0 by [@MichalHubatka](https://github.com/MichalHubatka) in https://github.com/laravel/framework/pull/48380
+* [10.x] Dynamic `maxTries` for queued jobs by [@mechelon](https://github.com/mechelon) in https://github.com/laravel/framework/pull/49473
+* [10.x] Avoid TypeError when using json validation rule when PHP < 8.3 by [@Xint0](https://github.com/Xint0) in https://github.com/laravel/framework/pull/49474
+* [10.x] Fix use statement compilation in Blade templates by [@MrPunyapal](https://github.com/MrPunyapal) in https://github.com/laravel/framework/pull/49479
+* [10.x] Allow testing prompts validation by [@cerbero90](https://github.com/cerbero90) in https://github.com/laravel/framework/pull/49447
+* [10.x] Add 'Roundrobin' Symfony mailer transport driver by [@me-shaon](https://github.com/me-shaon) in https://github.com/laravel/framework/pull/49435
 
 ## [v10.38.2](https://github.com/laravel/framework/compare/v10.38.1...v10.38.2) - 2023-12-22
 
