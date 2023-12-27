@@ -3,6 +3,7 @@
 namespace Illuminate\Console\Concerns;
 
 use Illuminate\Console\PromptValidationException;
+use Illuminate\Support\Facades\Validator;
 use Laravel\Prompts\ConfirmPrompt;
 use Laravel\Prompts\MultiSearchPrompt;
 use Laravel\Prompts\MultiSelectPrompt;
@@ -27,6 +28,8 @@ trait ConfiguresPrompts
         Prompt::setOutput($this->output);
 
         Prompt::interactive(($input->isInteractive() && defined('STDIN') && stream_isatty(STDIN)) || $this->laravel->runningUnitTests());
+
+        Prompt::validateUsing($this->validatePrompt(...));
 
         Prompt::fallbackWhen(windows_os() || $this->laravel->runningUnitTests());
 
@@ -166,5 +169,44 @@ trait ConfiguresPrompts
     protected function restorePrompts()
     {
         Prompt::setOutput($this->output);
+    }
+
+    /**
+     * Validate the given prompt.
+     *
+     * @param  Prompt  $prompt
+     * @return ?string
+     */
+    protected function validatePrompt(Prompt $prompt)
+    {
+        if (! $rules = $prompt->validate) {
+            return null;
+        }
+
+        [$alias, $value] = [$prompt->alias(), $prompt->value()];
+
+        $validator = Validator::make([$alias => $value], [$alias => $rules], $this->messages(), $this->attributes());
+
+        return $validator->errors()->first();
+    }
+
+    /**
+     * Get the validation messages.
+     *
+     * @return array
+     */
+    protected function messages()
+    {
+        return [];
+    }
+
+    /**
+     * Get the validation attributes.
+     *
+     * @return array
+     */
+    protected function attributes()
+    {
+        return [];
     }
 }
