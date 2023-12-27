@@ -606,6 +606,15 @@ class AuthGuardTest extends TestCase
         $this->assertNull($guard->getUser());
     }
 
+    public function testLogoutOnce()
+    {
+        $user = m::mock(Authenticatable::class);
+        $guard = $this->getGuard();
+        $guard->setUser($user);
+        $guard->logoutOnce();
+        $this->assertNull($guard->user());
+    }
+
     protected function getGuard()
     {
         [$session, $provider, $request, $cookie, $timebox] = $this->getMocks();

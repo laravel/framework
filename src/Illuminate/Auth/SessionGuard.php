@@ -269,6 +269,20 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     }
 
     /**
+     * Log the current user out for the current request without affecting sessions or cookies.
+     *
+     * @return bool
+     */
+    public function logoutOnce()
+    {
+        $this->user = null;
+
+        $this->loggedOut = true;
+
+        return true;
+    }
+
+    /**
      * Validate a user's credentials.
      *
      * @param  array  $credentials
