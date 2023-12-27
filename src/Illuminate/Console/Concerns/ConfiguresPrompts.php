@@ -183,6 +183,32 @@ trait ConfiguresPrompts
             return null;
         }
 
-        return Validator::make(['answer' => $prompt->value()], ['answer' => $rules])->errors()->first();
+        [$field, $value, $messages, $attributes] = ['answer', $prompt->value(), $this->messages(), $this->attributes()];
+
+        if (is_array($rules) && ! array_is_list($rules)) {
+            [$field => $rules] = $rules;
+        }
+
+        return Validator::make([$field => $value], [$field => $rules], $messages, $attributes)->errors()->first();
+    }
+
+    /**
+     * Get the validation messages.
+     *
+     * @return array
+     */
+    protected function messages()
+    {
+        return [];
+    }
+
+    /**
+     * Get the validation attributes.
+     *
+     * @return array
+     */
+    protected function attributes()
+    {
+        return [];
     }
 }

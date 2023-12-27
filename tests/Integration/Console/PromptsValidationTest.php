@@ -14,22 +14,31 @@ class PromptsValidationTest extends TestCase
     {
         $app[Kernel::class]->registerCommand(new DummyPromptsValidationCommand());
         $app[Kernel::class]->registerCommand(new DummyPromptsWithLaravelRulesCommand());
+        $app[Kernel::class]->registerCommand(new DummyPromptsWithLaravelRulesMessagesAndAttributesCommand());
     }
 
     public function testValidationForPrompts()
     {
         $this
             ->artisan(DummyPromptsValidationCommand::class)
-            ->expectsQuestion('Test', 'bar')
-            ->expectsOutputToContain('error!');
+            ->expectsQuestion('What is your name?', '')
+            ->expectsOutputToContain('Required!');
     }
 
     public function testValidationWithLaravelRules()
     {
         $this
             ->artisan(DummyPromptsWithLaravelRulesCommand::class)
-            ->expectsQuestion('Test', '')
+            ->expectsQuestion('What is your name?', '')
             ->expectsOutputToContain('The answer field is required.');
+    }
+
+    public function testValidationWithLaravelRulesMessagesAndAttributes()
+    {
+        $this
+            ->artisan(DummyPromptsWithLaravelRulesMessagesAndAttributesCommand::class)
+            ->expectsQuestion('What is your name?', '')
+            ->expectsOutputToContain('Your full name is mandatory.');
     }
 }
 
@@ -39,7 +48,7 @@ class DummyPromptsValidationCommand extends Command
 
     public function handle()
     {
-        text('Test', validate: fn ($value) => $value == 'foo' ? '' : 'error!');
+        text('What is your name?', validate: fn ($value) => $value == '' ? 'Required!' : null);
     }
 }
 
@@ -49,6 +58,26 @@ class DummyPromptsWithLaravelRulesCommand extends Command
 
     public function handle()
     {
-        text('Test', validate: 'required');
+        text('What is your name?', validate: 'required');
+    }
+}
+
+class DummyPromptsWithLaravelRulesMessagesAndAttributesCommand extends Command
+{
+    protected $signature = 'prompts-laravel-rules-messages-attributes-test';
+
+    public function handle()
+    {
+        text('What is your name?', validate: ['name' => 'required']);
+    }
+
+    protected function messages()
+    {
+        return ['name.required' => 'Your :attribute is mandatory.'];
+    }
+
+    protected function attributes()
+    {
+        return ['name' => 'full name'];
     }
 }
