@@ -99,6 +99,9 @@ class SupportArrTest extends TestCase
 
     public function testDot()
     {
+        $array = Arr::dot(['foo' => ['bar' => 'baz']]);
+        $this->assertSame(['foo.bar' => 'baz'], $array);
+
         $array = Arr::dot([10 => 100]);
         $this->assertSame([10 => 100], $array);
 
