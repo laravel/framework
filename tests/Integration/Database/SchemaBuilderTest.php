@@ -370,7 +370,9 @@ class SchemaBuilderTest extends DatabaseTestCase
 
     public function testSystemVersionTables()
     {
-        var_dump($this->driver);
+        if ($this->driver !== 'mysql' || ! $this->getConnection()->isMaria()) {
+            $this->markTestSkipped('Test requires a MariaDB connection.');
+        }
 
         DB::statement('create table `test` (`foo` int) WITH system versioning;');
 
