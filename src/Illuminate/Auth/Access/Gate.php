@@ -330,7 +330,7 @@ class Gate implements GateContract
     }
 
     /**
-     * Determine if all of the given abilities should be denied for the current user.
+     * Determine if any of the given abilities should be denied for the current user.
      *
      * @param  iterable|string  $abilities
      * @param  array|mixed  $arguments
