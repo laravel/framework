@@ -21,7 +21,7 @@ trait RoutesNotifications
     /**
      * Send the notification if the given truth test passes.
      *
-     * @param bool  $boolean
+     * @param  bool  $boolean
      * @param  mixed  $instance
      * @return void
      */
@@ -35,7 +35,7 @@ trait RoutesNotifications
     /**
      * Send the notification unless the given truth test passes.
      *
-     * @param bool  $boolean
+     * @param  bool  $boolean
      * @param  mixed  $instance
      * @return void
      */
