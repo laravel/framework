@@ -19,6 +19,34 @@ trait RoutesNotifications
     }
 
     /**
+     * Send the notification if the given truth test passes.
+     *
+     * @param bool $boolean
+     * @param  mixed  $instance
+     * @return void
+     */
+    public function notifyIf($boolean, $instance)
+    {
+        if ($boolean) {
+            app(Dispatcher::class)->send($this, $instance);
+        }
+    }
+
+    /**
+     * Send the notification unless the given truth test passes.
+     *
+     * @param bool $boolean
+     * @param  mixed  $instance
+     * @return void
+     */
+    public function notifyUnless($boolean, $instance)
+    {
+        if (! $boolean) {
+            app(Dispatcher::class)->send($this, $instance);
+        }
+    }
+
+    /**
      * Send the given notification immediately.
      *
      * @param  mixed  $instance
