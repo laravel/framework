@@ -27,10 +27,54 @@ class NotificationRoutesNotificationsTest extends TestCase
         $container->instance(Dispatcher::class, $factory);
         $notifiable = new RoutesNotificationsTestInstance;
         $instance = new stdClass;
-        $factory->shouldReceive('send')->with($notifiable, $instance);
+        $factory->shouldReceive('send')->with($notifiable, $instance)->times(1);
         Container::setInstance($container);
 
         $notifiable->notify($instance);
+    }
+
+    public function testNotificationDispatchesConditionallyWithBoolean()
+    {
+        $notifiable = new RoutesNotificationsTestInstance;
+        $instance = new stdClass;
+
+        $containerOne = new Container;
+        $factoryOne = m::mock(Dispatcher::class);
+        $containerOne->instance(Dispatcher::class, $factoryOne);
+        $factoryOne->shouldReceive('send')->with($notifiable, $instance)->times(1);
+        Container::setInstance($containerOne);
+
+        $notifiable->notifyIf(true, $instance);
+
+        $containerTwo = new Container;
+        $factoryTwo = m::mock(Dispatcher::class);
+        $containerTwo->instance(Dispatcher::class, $factoryTwo);
+        $factoryTwo->shouldNotReceive('send')->with($notifiable, $instance);
+        Container::setInstance($containerTwo);
+
+        $notifiable->notifyIf(false, $instance);
+    }
+
+    public function testNotificationDoesNotDispatchConditionallyWithBoolean()
+    {
+        $notifiable = new RoutesNotificationsTestInstance;
+        $instance = new stdClass;
+
+        $containerOne = new Container;
+        $factoryOne = m::mock(Dispatcher::class);
+        $containerOne->instance(Dispatcher::class, $factoryOne);
+        $factoryOne->shouldReceive('send')->with($notifiable, $instance)->times(1);
+        Container::setInstance($containerOne);
+
+        $notifiable->notifyUnless(false, $instance);
+
+        $containerTwo = new Container;
+        $factoryTwo = m::mock(Dispatcher::class);
+        $containerTwo->instance(Dispatcher::class, $factoryTwo);
+        $factoryTwo->shouldNotReceive('send')->with($notifiable, $instance);
+        Container::setInstance($containerTwo);
+
+        $notifiable->notifyUnless(true, $instance);
     }
 
     public function testNotificationCanBeSentNow()
@@ -40,7 +84,7 @@ class NotificationRoutesNotificationsTest extends TestCase
         $container->instance(Dispatcher::class, $factory);
         $notifiable = new RoutesNotificationsTestInstance;
         $instance = new stdClass;
-        $factory->shouldReceive('sendNow')->with($notifiable, $instance, null);
+        $factory->shouldReceive('sendNow')->with($notifiable, $instance, null)->times(1);
         Container::setInstance($container);
 
         $notifiable->notifyNow($instance);
