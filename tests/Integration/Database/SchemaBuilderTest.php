@@ -367,4 +367,19 @@ class SchemaBuilderTest extends DatabaseTestCase
                 && $foreign['foreign_columns'] === ['b', 'a']
         ));
     }
+
+    public function testSystemVersionTables()
+    {
+        var_dump($this->driver);
+
+        DB::statement('create table `test` (`foo` int) WITH system versioning;');
+
+        $this->assertTrue(Schema::hasTable('test'));
+
+        Schema::dropAllTables();
+
+        $this->artisan('migrate:install');
+
+        DB::statement('create table `test` (`foo` int) WITH system versioning;');
+    }
 }
