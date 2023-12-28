@@ -330,7 +330,7 @@ class AuthAccessGateTest extends TestCase
         $gate = $this->getBasicGate();
 
         $gate->define('allow_1', function ($user) {
-            return false;
+            return true;
         });
         $gate->define('allow_2', function ($user) {
             return true;
