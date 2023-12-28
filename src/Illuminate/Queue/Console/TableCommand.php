@@ -5,6 +5,8 @@ namespace Illuminate\Queue\Console;
 use Illuminate\Console\MigrationGeneratorCommand;
 use Symfony\Component\Console\Attribute\AsCommand;
 
+use function Illuminate\Filesystem\join_paths;
+
 #[AsCommand(name: 'make:queue-table')]
 class TableCommand extends MigrationGeneratorCommand
 {
@@ -63,8 +65,8 @@ class TableCommand extends MigrationGeneratorCommand
 
         return count($this->files->glob(sprintf(
             '{%s,%s}',
-            $this->laravel->joinPaths($this->laravel->databasePath('migrations'), '*_*_*_*_create_'.$table.'_table.php'),
-            $this->laravel->joinPaths($this->laravel->databasePath('migrations'), '0001_01_01_000002_create_jobs_table.php'),
+            join_paths($this->laravel->databasePath('migrations'), '*_*_*_*_create_'.$table.'_table.php'),
+            join_paths($this->laravel->databasePath('migrations'), '0001_01_01_000002_create_jobs_table.php'),
         ))) !== 0;
     }
 }
