@@ -123,4 +123,14 @@ class ForeignKeyDefinition extends Fluent
     {
         return $this->cascadeOnUpdate()->nullOnDelete();
     }
+
+    /**
+     * Indicate that updates should be restricted and deletes should be null.
+     *
+     * @return $this
+     */
+    public function restrictAndNull()
+    {
+        return $this->restrictOnUpdate()->nullOnDelete();
+    }
 }
