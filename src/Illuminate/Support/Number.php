@@ -134,19 +134,6 @@ class Number
     }
 
     /**
-     * Clamp the given number between the given minimum and maximum.
-     *
-     * @param  int|float  $number
-     * @param  int|float  $min
-     * @param  int|float  $max
-     * @return int|float
-     */
-    public static function clamp(int|float $number, int|float $min, int|float $max)
-    {
-        return min(max($number, $min), $max);
-    }
-
-    /**
      * Convert the number to its human readable equivalent.
      *
      * @param  int  $number
@@ -219,6 +206,19 @@ class Number
         $number /= pow(10, $displayExponent);
 
         return trim(sprintf('%s%s', static::format($number, $precision, $maxPrecision), $units[$displayExponent] ?? ''));
+    }
+
+    /**
+     * Clamp the given number between the given minimum and maximum.
+     *
+     * @param  int|float  $number
+     * @param  int|float  $min
+     * @param  int|float  $max
+     * @return int|float
+     */
+    public static function clamp(int|float $number, int|float $min, int|float $max)
+    {
+        return min(max($number, $min), $max);
     }
 
     /**
