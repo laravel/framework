@@ -329,6 +329,17 @@ class SessionStoreTest extends TestCase
         $this->assertEquals(['qu' => 'ux'], $session->only(['qu']));
     }
 
+    public function testExcept()
+    {
+        $session = $this->getSession();
+        $session->put('foo', 'bar');
+        $session->put('bar', 'baz');
+        $session->put('qu', 'ux');
+
+        $this->assertEquals(['foo' => 'bar', 'qu' => 'ux', 'bar' => 'baz'], $session->all());
+        $this->assertEquals(['bar' => 'baz', 'qu' => 'ux'], $session->except(['foo']));
+    }
+
     public function testReplace()
     {
         $session = $this->getSession();
