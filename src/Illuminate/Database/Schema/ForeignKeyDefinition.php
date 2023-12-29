@@ -83,4 +83,14 @@ class ForeignKeyDefinition extends Fluent
     {
         return $this->onDelete('no action');
     }
+
+    /**
+     * Indicate that updates and deletes should cascade.
+     *
+     * @return $this
+     */
+    public function cascadeAlways()
+    {
+        return $this->cascadeOnUpdate()->cascadeOnDelete();
+    }
 }
