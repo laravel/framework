@@ -443,11 +443,6 @@ class Validator implements ValidatorContract
         // rule. Any error messages will be added to the containers with each of
         // the other error messages, returning true if we don't have messages.
         foreach ($this->rules as $attribute => $rules) {
-            if ($this->shouldBeExcluded($attribute)) {
-                $this->removeAttribute($attribute);
-
-                continue;
-            }
 
             if ($this->stopOnFirstFailure && $this->messages->isNotEmpty()) {
                 break;
@@ -466,10 +461,8 @@ class Validator implements ValidatorContract
             }
         }
 
-        foreach ($this->rules as $attribute => $rules) {
-            if ($this->shouldBeExcluded($attribute)) {
-                $this->removeAttribute($attribute);
-            }
+        foreach ($this->excludeAttributes as $attribute) {
+            $this->removeAttribute($attribute);
         }
 
         // Here we will spin through all of the "after" hooks on this validator and
