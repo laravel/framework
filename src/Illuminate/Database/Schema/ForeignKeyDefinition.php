@@ -133,4 +133,14 @@ class ForeignKeyDefinition extends Fluent
     {
         return $this->restrictOnUpdate()->nullOnDelete();
     }
+
+    /**
+     * Indicate that updates should have no-action and deletes should be null.
+     *
+     * @return $this
+     */
+    public function noActionAndNull()
+    {
+        return $this->noActionOnUpdate()->nullOnDelete();
+    }
 }
