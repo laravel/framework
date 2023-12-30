@@ -165,6 +165,29 @@ class PostgresSchemaBuilderTest extends PostgresTestCase
         }));
     }
 
+    public function testDropPartitionedTables()
+    {
+        DB::statement('create table groups (id bigserial, tenant_id bigint, name varchar, primary key (id, tenant_id)) partition by hash (tenant_id)');
+        DB::statement('create table groups_1 partition of groups for values with (modulus 2, remainder 0)');
+        DB::statement('create table groups_2 partition of groups for values with (modulus 2, remainder 1)');
+
+        $tables = array_column(Schema::getTables(), 'name');
+
+        $this->assertContains('groups', $tables);
+        $this->assertContains('groups_1', $tables);
+        $this->assertContains('groups_2', $tables);
+
+        Schema::dropAllTables();
+
+        $this->artisan('migrate:install');
+
+        $tables = array_column(Schema::getTables(), 'name');
+
+        $this->assertNotContains('groups', $tables);
+        $this->assertNotContains('groups_1', $tables);
+        $this->assertNotContains('groups_2', $tables);
+    }
+
     protected function hasView($schema, $table)
     {
         return DB::table('information_schema.views')

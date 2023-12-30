@@ -7,6 +7,7 @@ use Exception;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Log\LogManager;
+use Illuminate\Support\Env;
 use Monolog\Handler\NullHandler;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\ErrorHandler\Error\FatalError;
@@ -118,7 +119,7 @@ class HandleExceptions
     {
         return ! class_exists(LogManager::class)
             || ! static::$app->hasBeenBootstrapped()
-            || static::$app->runningUnitTests();
+            || (static::$app->runningUnitTests() && ! Env::get('LOG_DEPRECATIONS_WHILE_TESTING'));
     }
 
     /**

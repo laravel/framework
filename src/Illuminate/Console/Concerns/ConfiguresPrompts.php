@@ -2,6 +2,7 @@
 
 namespace Illuminate\Console\Concerns;
 
+use Illuminate\Console\PromptValidationException;
 use Laravel\Prompts\ConfirmPrompt;
 use Laravel\Prompts\MultiSearchPrompt;
 use Laravel\Prompts\MultiSelectPrompt;
@@ -132,7 +133,11 @@ trait ConfiguresPrompts
             if ($required && ($result === '' || $result === [] || $result === false)) {
                 $this->components->error(is_string($required) ? $required : 'Required.');
 
-                continue;
+                if ($this->laravel->runningUnitTests()) {
+                    throw new PromptValidationException;
+                } else {
+                    continue;
+                }
             }
 
             if ($validate) {
@@ -141,7 +146,11 @@ trait ConfiguresPrompts
                 if (is_string($error) && strlen($error) > 0) {
                     $this->components->error($error);
 
-                    continue;
+                    if ($this->laravel->runningUnitTests()) {
+                        throw new PromptValidationException;
+                    } else {
+                        continue;
+                    }
                 }
             }
 

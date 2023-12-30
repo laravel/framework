@@ -193,8 +193,8 @@ class Number
         }
 
         switch (true) {
-            case $number === 0:
-                return '0';
+            case floatval($number) === 0.0:
+                return $precision > 0 ? static::format(0, $precision, $maxPrecision) : '0';
             case $number < 0:
                 return sprintf('-%s', static::summarize(abs($number), $precision, $maxPrecision, $units));
             case $number >= 1e15:
@@ -206,6 +206,19 @@ class Number
         $number /= pow(10, $displayExponent);
 
         return trim(sprintf('%s%s', static::format($number, $precision, $maxPrecision), $units[$displayExponent] ?? ''));
+    }
+
+    /**
+     * Clamp the given number between the given minimum and maximum.
+     *
+     * @param  int|float  $number
+     * @param  int|float  $min
+     * @param  int|float  $max
+     * @return int|float
+     */
+    public static function clamp(int|float $number, int|float $min, int|float $max)
+    {
+        return min(max($number, $min), $max);
     }
 
     /**
