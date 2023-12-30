@@ -1370,6 +1370,26 @@ class Str
     }
 
     /**
+     * Split a string using a regular expression or by length.
+     *
+     * @param  string  $value
+     * @param  string|int  $pattern
+     * @param  int  $limit
+     * @param  int  $flags
+     * @return \Illuminate\Support\Collection<int, string>
+     */
+    public static function split($value, $pattern, $limit = -1, $flags = 0)
+    {
+        if (filter_var($pattern, FILTER_VALIDATE_INT) !== false) {
+            return collect(mb_str_split($value, $pattern));
+        }
+
+        $segments = preg_split($pattern, $value, $limit, $flags);
+
+        return ! empty($segments) ? collect($segments) : collect();
+    }
+
+    /**
      * Convert a value to studly caps case.
      *
      * @param  string  $value

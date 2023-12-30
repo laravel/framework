@@ -283,13 +283,7 @@ class Stringable implements JsonSerializable, ArrayAccess
      */
     public function split($pattern, $limit = -1, $flags = 0)
     {
-        if (filter_var($pattern, FILTER_VALIDATE_INT) !== false) {
-            return collect(mb_str_split($this->value, $pattern));
-        }
-
-        $segments = preg_split($pattern, $this->value, $limit, $flags);
-
-        return ! empty($segments) ? collect($segments) : collect();
+        return Str::split($this->value, $pattern, $limit, $flags);
     }
 
     /**
