@@ -101,14 +101,49 @@ class DatabaseManager implements ConnectionResolverInterface
                 $this->makeConnection($database), $type
             );
 
-            if ($this->app->bound('events')) {
-                $this->app['events']->dispatch(
-                    new ConnectionEstablished($this->connections[$name])
-                );
-            }
+            $this->dispatchConnectionEstablishedEvent($this->connections[$name]);
         }
 
         return $this->connections[$name];
+    }
+
+    /**
+     * Get a database connection instance without using the Config Repository.
+     *
+     * @param  string  $name
+     * @param  array  $config
+     * @return \Illuminate\Database\ConnectionInterface
+     */
+
+    public function connectUsing(string $name, array $config): ConnectionInterface
+    {
+        if (isset($this->connections[$name])) {
+            throw new RuntimeException("Cannot establish connection [$name] because another connection already exists.");
+        }
+
+        $connection = $this->factory->make($config, $name);
+
+        $connection = $this->configure($connection, null);
+
+        $this->dispatchConnectionEstablishedEvent($connection);
+
+        $this->connections[$name] = $connection;
+
+        return $this->connections[$name];
+    }
+
+    /**
+     * Establish a fresh connection .
+     *
+     * @param  string  $name
+     * @param  array  $config
+     * @return ConnectionInterface
+     */
+    public function overrideUsing(string $name, array $config): ConnectionInterface
+    {
+        $this->purge($name);
+
+        return $this->connectUsing($name, $config);
     }
 
     /**
@@ -207,6 +242,21 @@ class DatabaseManager implements ConnectionResolverInterface
         $this->registerConfiguredDoctrineTypes($connection);
 
         return $connection;
+    }
+
+    /**
+     * If the event dispatcher is available dispatches the ConnectionEstablished event.
+     *
+     * @param Connection $connection
+     * @return void
+     */
+    protected function dispatchConnectionEstablishedEvent(Connection $connection): void
+    {
+        if (! $this->app->bound('events')) {
+            return;
+        }
+
+        $this->app['events']->dispatch(new ConnectionEstablished($connection));
     }
 
     /**
