@@ -114,7 +114,6 @@ class DatabaseManager implements ConnectionResolverInterface
      * @param  array  $config
      * @return \Illuminate\Database\ConnectionInterface
      */
-
     public function connectUsing(string $name, array $config): ConnectionInterface
     {
         if (isset($this->connections[$name])) {
@@ -247,7 +246,7 @@ class DatabaseManager implements ConnectionResolverInterface
     /**
      * If the event dispatcher is available dispatches the ConnectionEstablished event.
      *
-     * @param Connection $connection
+     * @param  Connection  $connection
      * @return void
      */
     protected function dispatchConnectionEstablishedEvent(Connection $connection): void
