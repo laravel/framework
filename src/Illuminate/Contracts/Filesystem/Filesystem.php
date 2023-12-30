@@ -35,6 +35,14 @@ interface Filesystem
     public function get($path);
 
     /**
+     * Returns the path of a file.
+     *
+     * @param  string  $path
+     * @return string
+     */
+    public function path($path);
+
+    /**
      * Get a resource to read the file.
      *
      * @param  string  $path
