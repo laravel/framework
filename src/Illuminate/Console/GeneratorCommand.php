@@ -202,6 +202,8 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
      */
     protected function qualifyClass($name)
     {
+        $name = str_replace(' ', '', ucwords($name));
+
         $name = ltrim($name, '\\/');
 
         $name = str_replace('/', '\\', $name);
