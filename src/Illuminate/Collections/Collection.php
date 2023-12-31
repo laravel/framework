@@ -1070,7 +1070,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      */
     public function reverse()
     {
-        return new static(static::reverse($this->items, true));
+        return new static(Arr::reverse($this->items, true));
     }
 
     /**
