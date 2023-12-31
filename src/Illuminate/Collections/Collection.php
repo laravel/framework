@@ -967,9 +967,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      */
     public function push(...$values)
     {
-        foreach ($values as $value) {
-            $this->items[] = $value;
-        }
+        array_push($this->items, ...$values);
 
         return $this;
     }
