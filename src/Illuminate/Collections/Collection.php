@@ -422,7 +422,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      */
     public function flip()
     {
-        return new static(array_flip($this->items));
+        return new static(Arr::flip($this->items));
     }
 
     /**

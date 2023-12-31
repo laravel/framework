@@ -482,6 +482,17 @@ class Arr
     }
 
     /**
+     * Flip the items in the array.
+     *
+     * @param  array  $array
+     * @return array
+     */
+    public static function flip($array)
+    {
+        return array_flip($array);
+    }
+
+    /**
      * Get a subset of the items from the given array.
      *
      * @param  array  $array
@@ -490,7 +501,7 @@ class Arr
      */
     public static function only($array, $keys)
     {
-        return array_intersect_key($array, array_flip((array) $keys));
+        return array_intersect_key($array, static::flip((array) $keys));
     }
 
     /**
