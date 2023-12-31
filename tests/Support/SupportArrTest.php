@@ -865,6 +865,15 @@ class SupportArrTest extends TestCase
         $this->assertSame(3, $exceptions);
     }
 
+    public function testReverse()
+    {
+        $data = Arr::reverse(['taylor', 'michael']);
+        $this->assertSame([1 => 'michael', 0 => 'taylor'], $data);
+
+        $data = Arr::reverse(['name' => 'michael', 'framework' => 'laravel']);
+        $this->assertSame(['framework' => 'laravel', 'name' => 'michael'], $data);
+    }
+
     public function testSet()
     {
         $array = ['products' => ['desk' => ['price' => 100]]];
