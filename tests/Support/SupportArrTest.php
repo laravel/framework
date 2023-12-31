@@ -673,6 +673,12 @@ class SupportArrTest extends TestCase
         $this->assertEquals(['taylor' => 'otwell', 'dayle' => 'rees'], Arr::pluck($array, ['user', 1], ['user', 0]));
     }
 
+    public function testFlip()
+    {
+        $data = Arr::flip(['name' => 'michael', 'framework' => 'laravel']);
+        $this->assertEquals(['michael' => 'name', 'laravel' => 'framework'], $data);
+    }
+
     public function testArrayPluckWithNestedArrays()
     {
         $array = [
