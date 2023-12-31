@@ -1068,9 +1068,9 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      *
      * @return static
      */
-    public function reverse()
+    public function reverse($preserveKeys = true)
     {
-        return new static(Arr::reverse($this->items, true));
+        return new static(Arr::reverse($this->items, $preserveKeys));
     }
 
     /**
