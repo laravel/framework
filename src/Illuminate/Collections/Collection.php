@@ -1070,7 +1070,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      */
     public function reverse()
     {
-        return new static(array_reverse($this->items, true));
+        return new static(static::reverse($this->items, true));
     }
 
     /**
@@ -1428,7 +1428,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
                     $values = [data_get($a, $prop), data_get($b, $prop)];
 
                     if (! $ascending) {
-                        $values = array_reverse($values);
+                        $values = Arr::reverse($values);
                     }
 
                     $result = $values[0] <=> $values[1];

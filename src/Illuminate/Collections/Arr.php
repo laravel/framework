@@ -222,7 +222,7 @@ class Arr
             return empty($array) ? value($default) : end($array);
         }
 
-        return static::first(array_reverse($array, true), $callback, $default);
+        return static::first(static::reverse($array, true), $callback, $default);
     }
 
     /**
@@ -686,6 +686,18 @@ class Arr
         }
 
         return $results;
+    }
+
+    /**
+     * Reverse the given array.
+     *
+     * @param  array  $array
+     * @param  bool  $preserveKeys
+     * @return array
+     */
+    public static function reverse($array, $preserveKeys = false)
+    {
+        return array_reverse($array, $preserveKeys);
     }
 
     /**
