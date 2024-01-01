@@ -345,7 +345,9 @@ class Filesystem
             throw new InvalidBase64FileException();
         }
 
-        if (strpos($base64File, 'data:image') !== false) {
+        $data_uri = Str::between($base64File, 'data:', ';');
+        if (str_contains($base64File, $data_uri)) {
+
             $base64File = explode(',', $base64File, 2)[1];
         }
 
@@ -360,7 +362,7 @@ class Filesystem
      */
     public function isBase64File(string $base64)
     {
-        if (strpos($base64, ';base64,') !== false) {
+        if (str_contains($base64, ';base64,')) {
             $base64 = explode(';base64,', $base64)[1];
         }
 
