@@ -5,6 +5,7 @@ namespace Illuminate\Filesystem;
 use ErrorException;
 use FilesystemIterator;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
+use Illuminate\Contracts\Filesystem\InvalidBase64FileException;
 use Illuminate\Support\LazyCollection;
 use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\Macroable;
@@ -38,7 +39,7 @@ class Filesystem
      */
     public function missing($path)
     {
-        return ! $this->exists($path);
+        return !$this->exists($path);
     }
 
     /**
@@ -163,7 +164,7 @@ class Filesystem
      */
     public function lines($path)
     {
-        if (! $this->isFile($path)) {
+        if (!$this->isFile($path)) {
             throw new FileNotFoundException(
                 "File does not exist at path {$path}."
             );
@@ -174,7 +175,7 @@ class Filesystem
 
             $file->setFlags(SplFileObject::DROP_NEW_LINE);
 
-            while (! $file->eof()) {
+            while (!$file->eof()) {
                 yield $file->fgets();
             }
         });
@@ -223,7 +224,7 @@ class Filesystem
         $tempPath = tempnam(dirname($path), basename($path));
 
         // Fix permissions of tempPath because `tempnam()` creates it with permissions set to 0600...
-        if (! is_null($mode)) {
+        if (!is_null($mode)) {
             chmod($tempPath, $mode);
         } else {
             chmod($tempPath, 0777 - umask());
@@ -257,7 +258,7 @@ class Filesystem
     public function prepend($path, $data)
     {
         if ($this->exists($path)) {
-            return $this->put($path, $data.$this->get($path));
+            return $this->put($path, $data . $this->get($path));
         }
 
         return $this->put($path, $data);
@@ -332,6 +333,42 @@ class Filesystem
     }
 
     /**
+     * Create a file from a base64 image
+     *
+     * @param  string  $base64File
+     * @return string
+     */
+    public function fromBase64(string $base64File)
+    {
+        if (!$this->isBase64File($base64File)) {
+            throw new InvalidBase64FileException();
+        }
+
+        if (strpos($base64File, 'data:image') !== false) {
+            $base64File = explode(',', $base64File, 2)[1];
+        }
+
+        $file_data = base64_decode($base64File);
+        return $file_data;
+    }
+
+    /**
+     * Check if base64 is valid
+     *
+     * @param  string  $base64File
+     * @return bool
+     */
+    public function isBase64File(string $base64)
+    {
+        if (strpos($base64, ';base64,') !== false) {
+            $base64 = explode(';base64,', $base64)[1];
+        }
+
+        $decoded = base64_decode($base64, true);
+        return ($decoded !== false) && (strlen($decoded) > 0);
+    }
+
+    /**
      * Copy a file to a new location.
      *
      * @param  string  $path
@@ -352,13 +389,13 @@ class Filesystem
      */
     public function link($target, $link)
     {
-        if (! windows_os()) {
+        if (!windows_os()) {
             return symlink($target, $link);
         }
 
         $mode = $this->isDirectory($target) ? 'J' : 'H';
 
-        exec("mklink /{$mode} ".escapeshellarg($link).' '.escapeshellarg($target));
+        exec("mklink /{$mode} " . escapeshellarg($link) . ' ' . escapeshellarg($target));
     }
 
     /**
@@ -372,7 +409,7 @@ class Filesystem
      */
     public function relativeLink($target, $link)
     {
-        if (! class_exists(SymfonyFilesystem::class)) {
+        if (!class_exists(SymfonyFilesystem::class)) {
             throw new RuntimeException(
                 'To enable support for relative links, please install the symfony/filesystem package.'
             );
@@ -437,7 +474,7 @@ class Filesystem
      */
     public function guessExtension($path)
     {
-        if (! class_exists(MimeTypes::class)) {
+        if (!class_exists(MimeTypes::class)) {
             throw new RuntimeException(
                 'To enable support for guessing extensions, please install the symfony/mime package.'
             );
@@ -510,7 +547,7 @@ class Filesystem
      */
     public function isEmptyDirectory($directory, $ignoreDotFiles = false)
     {
-        return ! Finder::create()->ignoreDotFiles($ignoreDotFiles)->in($directory)->depth(0)->hasResults();
+        return !Finder::create()->ignoreDotFiles($ignoreDotFiles)->in($directory)->depth(0)->hasResults();
     }
 
     /**
@@ -582,7 +619,7 @@ class Filesystem
     public function files($directory, $hidden = false)
     {
         return iterator_to_array(
-            Finder::create()->files()->ignoreDotFiles(! $hidden)->in($directory)->depth(0)->sortByName(),
+            Finder::create()->files()->ignoreDotFiles(!$hidden)->in($directory)->depth(0)->sortByName(),
             false
         );
     }
@@ -597,7 +634,7 @@ class Filesystem
     public function allFiles($directory, $hidden = false)
     {
         return iterator_to_array(
-            Finder::create()->files()->ignoreDotFiles(! $hidden)->in($directory)->sortByName(),
+            Finder::create()->files()->ignoreDotFiles(!$hidden)->in($directory)->sortByName(),
             false
         );
     }
@@ -629,7 +666,7 @@ class Filesystem
      */
     public function ensureDirectoryExists($path, $mode = 0755, $recursive = true)
     {
-        if (! $this->isDirectory($path)) {
+        if (!$this->isDirectory($path)) {
             $this->makeDirectory($path, $mode, $recursive);
         }
     }
@@ -662,7 +699,7 @@ class Filesystem
      */
     public function moveDirectory($from, $to, $overwrite = false)
     {
-        if ($overwrite && $this->isDirectory($to) && ! $this->deleteDirectory($to)) {
+        if ($overwrite && $this->isDirectory($to) && !$this->deleteDirectory($to)) {
             return false;
         }
 
@@ -679,7 +716,7 @@ class Filesystem
      */
     public function copyDirectory($directory, $destination, $options = null)
     {
-        if (! $this->isDirectory($directory)) {
+        if (!$this->isDirectory($directory)) {
             return false;
         }
 
@@ -696,12 +733,12 @@ class Filesystem
             // As we spin through items, we will check to see if the current file is actually
             // a directory or a file. When it is actually a directory we will need to call
             // back into this function recursively to keep copying these nested folders.
-            $target = $destination.'/'.$item->getBasename();
+            $target = $destination . '/' . $item->getBasename();
 
             if ($item->isDir()) {
                 $path = $item->getPathname();
 
-                if (! $this->copyDirectory($path, $target, $options)) {
+                if (!$this->copyDirectory($path, $target, $options)) {
                     return false;
                 }
             }
@@ -709,7 +746,7 @@ class Filesystem
             // If the current items is just a regular file, we will just copy this to the new
             // location and keep looping. If for some reason the copy fails we'll bail out
             // and return false, so the developer is aware that the copy process failed.
-            elseif (! $this->copy($item->getPathname(), $target)) {
+            elseif (!$this->copy($item->getPathname(), $target)) {
                 return false;
             }
         }
@@ -728,7 +765,7 @@ class Filesystem
      */
     public function deleteDirectory($directory, $preserve = false)
     {
-        if (! $this->isDirectory($directory)) {
+        if (!$this->isDirectory($directory)) {
             return false;
         }
 
@@ -738,7 +775,7 @@ class Filesystem
             // If the item is a directory, we can just recurse into the function and
             // delete that sub-directory otherwise we'll just delete the file and
             // keep iterating through each file until the directory is cleaned.
-            if ($item->isDir() && ! $item->isLink()) {
+            if ($item->isDir() && !$item->isLink()) {
                 $this->deleteDirectory($item->getPathname());
             }
 
@@ -752,7 +789,7 @@ class Filesystem
 
         unset($items);
 
-        if (! $preserve) {
+        if (!$preserve) {
             @rmdir($directory);
         }
 
@@ -769,7 +806,7 @@ class Filesystem
     {
         $allDirectories = $this->directories($directory);
 
-        if (! empty($allDirectories)) {
+        if (!empty($allDirectories)) {
             foreach ($allDirectories as $directoryName) {
                 $this->deleteDirectory($directoryName);
             }
