@@ -359,7 +359,7 @@ class Filesystem
      */
     public function isBase64File(string $base64)
     {
-        if (strpos($base64, ';base64,') !== false) {
+        if (str_contains($base64, ';base64,')) {
             $base64 = explode(';base64,', $base64)[1];
         }
 
