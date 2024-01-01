@@ -6,6 +6,7 @@ use ArrayObject;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Number;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use stdClass;
@@ -1259,5 +1260,23 @@ class SupportArrTest extends TestCase
                 'key' => 1,
             ],
         ], Arr::prependKeysWith($array, 'test.'));
+    }
+
+    public function testOf()
+    {
+        $array = [
+            'data' => [
+                'product1' => [
+                    'name' => 'Product 1',
+                    'price' => Number::currency(10),
+                ],
+                'product2' => [
+                    'name' => 'Product 2',
+                    'price' => Number::currency(12),
+                ],
+            ],
+        ];
+
+        $this->assertEquals((object) $array['data']['product1'], Arr::of($array)->data->product1);
     }
 }

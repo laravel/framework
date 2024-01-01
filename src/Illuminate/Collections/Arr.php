@@ -896,4 +896,15 @@ class Arr
 
         return is_array($value) ? $value : [$value];
     }
+
+    /**
+     * Array converts to object.
+     *
+     * @param  array  $array
+     * @return object
+     */
+    public static function of($array)
+    {
+        return (object) array_map(fn ($value) => is_array($value) ? static::of($value) : $value, static::wrap($array));
+    }
 }
