@@ -348,8 +348,7 @@ class Filesystem
             $base64File = explode(',', $base64File, 2)[1];
         }
 
-        $file_data = base64_decode($base64File);
-        return $file_data;
+        return base64_decode($base64File);
     }
 
     /**
