@@ -17,7 +17,7 @@ class ScheduleListCommandTest extends TestCase
     {
         parent::setUp();
 
-        Carbon::setTestNow(now()->startOfYear());
+        Carbon::setTestNow('2023-1-1');
         ScheduleListCommand::resolveTerminalWidthUsing(fn () => 80);
 
         $this->schedule = $this->app->make(Schedule::class);
@@ -120,7 +120,7 @@ class ScheduleListCommandTest extends TestCase
 
         $this->artisan(ScheduleListCommand::class)
             ->assertSuccessful()
-            ->expectsOutput('  * 0 * * 0 1s   php artisan inspire ............... Next Due: 6 days from now')
+            ->expectsOutput('  * 0 * * 0 1s   php artisan inspire ............. Next Due: 1 second from now')
             ->expectsOutput('  * * * * * 2s   php artisan inspire ............ Next Due: 2 seconds from now')
             ->expectsOutput('  * * * * * 5s   php artisan inspire ............ Next Due: 5 seconds from now')
             ->expectsOutput('  * * * * * 10s  php artisan inspire ........... Next Due: 10 seconds from now')
