@@ -502,8 +502,6 @@ class ResourceTest extends TestCase
             'data' => [
                 'id' => 5,
                 'title' => 'Test Title',
-                'average_rating' => null,
-                'minimum_rating' => null,
                 'maximum_rating' => 'Default Value',
             ],
         ]);
