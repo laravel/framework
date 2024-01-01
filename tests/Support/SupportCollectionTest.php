@@ -4065,12 +4065,14 @@ class SupportCollectionTest extends TestCase
             2 => 6,
             3 => ['a', 'b', 'c'],
             4 => ['who' => 'Jonny', 'preposition' => 'from', 'where' => 'Laroe'],
-            5 => 'Jonny from Laroe',
+            5 => 'michael',
+            6 => 'Jonny from Laroe',
         ];
 
         $data = new Collection([4, 5, 6]);
         $data->push(['a', 'b', 'c']);
         $data->push(['who' => 'Jonny', 'preposition' => 'from', 'where' => 'Laroe']);
+        $data->push(name: 'michael');
         $actual = $data->push('Jonny from Laroe')->toArray();
 
         $this->assertSame($expected, $actual);
@@ -4091,12 +4093,15 @@ class SupportCollectionTest extends TestCase
             9 => 'a',
             10 => 'b',
             11 => 'c',
+            12 => 'foo',
+            13 => 'bar',
         ];
 
         $data = new Collection([4, 5, 6]);
         $data->push('Jonny', 'from', 'Laroe');
         $data->push(...[11 => 'Jonny', 12 => 'from', 13 => 'Laroe']);
         $data->push(...collect(['a', 'b', 'c']));
+        $data->push(foo: 'foo', bar: 'bar')->toArray();
         $actual = $data->push(...[])->toArray();
 
         $this->assertSame($expected, $actual);
