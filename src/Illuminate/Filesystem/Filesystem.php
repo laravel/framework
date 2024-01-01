@@ -344,7 +344,7 @@ class Filesystem
             throw new InvalidBase64FileException();
         }
 
-        if (strpos($base64File, 'data:image') !== false) {
+        if (str_contains($base64File, 'data:image')) {
             $base64File = explode(',', $base64File, 2)[1];
         }
 
