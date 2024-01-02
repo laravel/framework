@@ -4,6 +4,7 @@ namespace Illuminate\Container;
 
 use Closure;
 use Illuminate\Contracts\Container\BindingResolutionException;
+use Illuminate\Contracts\Database\Transactional;
 use InvalidArgumentException;
 use ReflectionFunction;
 use ReflectionMethod;
@@ -32,8 +33,16 @@ class BoundMethod
             return static::callClass($container, $callback, $parameters, $defaultMethod);
         }
 
-        return static::callBoundMethod($container, $callback, function () use ($container, $callback, $parameters) {
-            return $callback(...array_values(static::getMethodDependencies($container, $callback, $parameters)));
+        $transactionCallback = static::shouldRunWithinTransaction($container, $callback)
+            ? fn ($callback) => $container->make('db')->transaction(fn () => $callback())
+            : fn ($callback) => $callback();
+
+        return static::callBoundMethod($container, $callback, function () use ($container, $callback, $parameters, $transactionCallback) {
+            return $transactionCallback(function () use ($container, $callback, $parameters) {
+                return $callback(...array_values(static::getMethodDependencies(
+                    $container, $callback, $parameters
+                )));
+            });
         });
     }
 
@@ -198,5 +207,21 @@ class BoundMethod
     protected static function isCallableWithAtSign($callback)
     {
         return is_string($callback) && str_contains($callback, '@');
+    }
+
+    /**
+     * Determine if the method should run inside a database transaction.
+     *
+     * @param  \Illuminate\Container\Container $container
+     * @param  array  $callback
+     * @return bool
+     * @throws \ReflectionException
+     */
+    protected static function shouldRunWithinTransaction($container, $callback)
+    {
+        return is_array($callback)
+            && is_object($callback[0])
+            && count((new ReflectionMethod($callback[0], $callback[1]))->getAttributes(Transactional::class)) > 0
+            && $container->bound('db.transactions');
     }
 }
