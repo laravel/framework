@@ -4,7 +4,7 @@ namespace Illuminate\Routing;
 
 use Closure;
 use Illuminate\Container\Container;
-use Illuminate\Contracts\Database\Transactional;
+use Illuminate\Database\Transactional;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Contracts\CallableDispatcher;
@@ -1389,7 +1389,7 @@ class Route
 
     /**
      * Determine whether the target class method has the given attribute.
-     * 
+     *
      * @param  string  $attribute
      * @return bool
      * @throws \ReflectionException

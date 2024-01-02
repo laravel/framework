@@ -2,9 +2,9 @@
 
 namespace Illuminate\Tests\Integration\Routing;
 
-use Illuminate\Contracts\Database\Transactional;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Transactional;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
