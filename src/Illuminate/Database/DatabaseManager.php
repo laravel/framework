@@ -132,7 +132,7 @@ class DatabaseManager implements ConnectionResolverInterface
     }
 
     /**
-     * Establish a fresh connection .
+     * Establish a fresh connection.
      *
      * @param  string  $name
      * @param  array  $config
