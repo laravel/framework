@@ -5192,7 +5192,7 @@ class ValidationValidatorTest extends TestCase
     {
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['foo' => '-91.0000'], ['foo' => 'latitude']);
-        $this->assetFalse($v->passes());
+        $this->assertFalse($v->passes());
 
         $v = new Validator($trans, ['foo' => '50.0000'], ['foo' => 'latitude']);
         $this->assertTrue($v->passes());
