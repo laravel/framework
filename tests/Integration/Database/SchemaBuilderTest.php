@@ -393,7 +393,7 @@ class SchemaBuilderTest extends DatabaseTestCase
 
         Schema::macro('hasForeignKeyForColumn', function (string $column, string $table, string $foreignTable) {
             return collect(Schema::getForeignKeys($table))
-                ->contains(function (array $foreignKey) use ($column, $table, $foreignTable) {
+                ->contains(function (array $foreignKey) use ($column, $foreignTable) {
                     return collect($foreignKey['columns'])->contains($column)
                         && $foreignKey['foreign_table'] == $foreignTable;
                 });
