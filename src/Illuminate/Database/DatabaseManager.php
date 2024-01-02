@@ -246,7 +246,7 @@ class DatabaseManager implements ConnectionResolverInterface
     /**
      * If the event dispatcher is available dispatches the ConnectionEstablished event.
      *
-     * @param  Connection  $connection
+     * @param  \Illuminate\Database\Connection  $connection
      * @return void
      */
     protected function dispatchConnectionEstablishedEvent(Connection $connection): void
