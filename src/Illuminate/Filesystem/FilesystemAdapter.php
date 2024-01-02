@@ -770,6 +770,25 @@ class FilesystemAdapter implements CloudFilesystemContract
     }
 
     /**
+     * Get a temporary download URL for the file at the given path.
+     *
+     * @param  string  $path
+     * @param  \DateTimeInterface  $expiration
+     * @param  array  $options
+     * @return array
+     *
+     * @throws \RuntimeException
+     */
+    public function temporaryDownloadUrl($path, $expiration, array $options = [])
+    {
+        if (method_exists($this->adapter, 'temporaryDownloadUrl')) {
+            return $this->adapter->temporaryDownloadUrl($path, $expiration, $options);
+        }
+
+        throw new RuntimeException('This driver does not support creating temporary download URLs.');
+    }
+
+    /**
      * Concatenate a path to a URL.
      *
      * @param  string  $url
