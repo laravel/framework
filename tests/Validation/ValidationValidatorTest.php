@@ -5191,32 +5191,32 @@ class ValidationValidatorTest extends TestCase
     public function testValidateLatitude()
     {
         $trans = $this->getIlluminateArrayTranslator();
-        $v = new Validator($trans, ['foo' => '-91.0000'], ['foo' => 'Latitude']);
+        $v = new Validator($trans, ['foo' => '-91.0000'], ['foo' => 'latitude']);
         $this->assetFalse($v->passes());
 
-        $v = new Validator($trans, ['foo' => '50.0000'], ['foo' => 'Latitude']);
+        $v = new Validator($trans, ['foo' => '50.0000'], ['foo' => 'latitude']);
         $this->assertTrue($v->passes());
 
-        $v = new Validator($trans, ['foo' => '91.0000'], ['foo' => 'Latitude']);
+        $v = new Validator($trans, ['foo' => '91.0000'], ['foo' => 'latitude']);
         $this->assertFalse($v->passes());
 
-        $v = new Validator($trans, ['foo' => 'invalid_latitude'], ['foo' => 'Latitude']);
+        $v = new Validator($trans, ['foo' => 'invalid_latitude'], ['foo' => 'latitude']);
         $this->assertFalse($v->passes());
     }
 
     public function testValidateLongitude()
     {
         $trans = $this->getIlluminateArrayTranslator();
-        $v = new Validator($trans, ['foo' => '-181.0000'], ['foo' => 'Longitude']);
+        $v = new Validator($trans, ['foo' => '-181.0000'], ['foo' => 'longitude']);
         $this->assertFalse($v->passes());
 
-        $v = new Validator($trans, ['foo' => '4.402464'], ['foo' => 'Longitude']);
+        $v = new Validator($trans, ['foo' => '4.402464'], ['foo' => 'longitude']);
         $this->assertTrue($v->passes());
 
-        $v = new Validator($trans, ['foo' => '181.0000'], ['foo' => 'Longitude']);
+        $v = new Validator($trans, ['foo' => '181.0000'], ['foo' => 'longitude']);
         $this->assertFalse($v->passes());
 
-        $v = new Validator($trans, ['foo' => 'invalid_longitude'], ['foo' => 'Longitude']);
+        $v = new Validator($trans, ['foo' => 'invalid_longitude'], ['foo' => 'longitude']);
         $this->assertFalse($v->passes());
     }
 
