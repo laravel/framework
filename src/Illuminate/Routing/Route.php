@@ -205,7 +205,7 @@ class Route
         try {
             if ($this->isControllerAction()) {
                 return $this->shouldRunWithinTransaction($this->container)
-                    ? $this->container->make('db')->transaction(fn () => $this->runController())
+                    ? $this->runControllerWithinTransaction()
                     : $this->runController();
             }
 
@@ -263,6 +263,16 @@ class Route
         return $this->controllerDispatcher()->dispatch(
             $this, $this->getController(), $this->getControllerMethod()
         );
+    }
+
+    protected function runControllerWithinTransaction()
+    {
+        $attribute = $this->getTargetAttributes(Transactional::class)[0];
+        $connection = $attribute->getArguments()['connection'] ?? null;
+
+        return $this->container->make('db')->connection($connection)->transaction(function () {
+            return $this->runController();
+        });
     }
 
     /**
@@ -1384,25 +1394,25 @@ class Route
      */
     protected function shouldRunWithinTransaction($container)
     {
-        return $container->bound('db.transactions') && $this->targetHasAttribute(Transactional::class);
+        return $container->bound('db.transactions') && count($this->getTargetAttributes(Transactional::class)) > 0;
     }
 
     /**
-     * Determine whether the target class method has the given attribute.
+     * Get a specific target method attribute.
      *
      * @param  string  $attribute
-     * @return bool
+     * @return array
      * @throws \ReflectionException
      */
-    protected function targetHasAttribute(string $attribute)
+    protected function getTargetAttributes(string $attribute)
     {
         if (is_null($this->getControllerClass())) {
-            return false;
+            return [];
         }
 
-        return count((new ReflectionMethod(
+        return (new ReflectionMethod(
             $this->getControllerClass(),
             $this->getControllerMethod()
-        ))->getAttributes($attribute)) > 0;
+        ))->getAttributes($attribute);
     }
 }
