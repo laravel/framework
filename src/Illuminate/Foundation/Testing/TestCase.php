@@ -77,7 +77,7 @@ abstract class TestCase extends BaseTestCase
      */
     public function createApplication()
     {
-        $app = require Application::inferBaseDirectory() . '/bootstrap/app.php';
+        $app = require Application::inferBaseDirectory().'/bootstrap/app.php';
 
         $app->make(Kernel::class)->bootstrap();
 
