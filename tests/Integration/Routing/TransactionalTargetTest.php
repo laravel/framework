@@ -65,7 +65,8 @@ class TransactionalTargetTest extends DatabaseTestCase
 
     public function testItRollbacksChangesUponFailureInvokableController()
     {
-        Route::get('user', TransactionalTestInvokableController::class);
+        TransactionalTestController::$shouldFail = true;
+        Route::get('user', TransactionalTestController::class);
 
         $this->get('user')->assertStatus(500);
         $this->assertDatabaseMissing('users', ['name' => 'Mateus']);
@@ -90,10 +91,15 @@ class TransactionalTargetTest extends DatabaseTestCase
     }
 }
 
-
 class TransactionalTestController
 {
     public static $shouldFail = false;
+
+    #[Transactional]
+    public function __invoke()
+    {
+        $this->store();
+    }
 
     #[Transactional]
     public function store()
@@ -121,24 +127,12 @@ class TransactionalTestControllerSecondConnection
     }
 }
 
-class TransactionalTestInvokableController
-{
-    #[Transactional]
-    public function __invoke()
-    {
-        TransactionalTestUser::create(['name' => 'Mateus']);
-
-        throw new \Exception();
-    }
-}
-
 class TransactionalTestUser extends Model
 {
     protected $table = 'users';
 
     protected $guarded = [];
 }
-
 
 class TransactionalTestUserSecondConnection extends Model
 {
