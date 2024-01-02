@@ -251,7 +251,7 @@ abstract class TestCase extends BaseTestCase
         HandleExceptions::forgetApp();
         Queue::createPayloadUsing(null);
         Sleep::fake(false);
-        AboutCommand::flush();
+        AboutCommand::flushState();
         TrimStrings::flushState();
 
         if ($this->callbackException) {

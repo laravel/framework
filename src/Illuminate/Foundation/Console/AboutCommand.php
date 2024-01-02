@@ -308,7 +308,7 @@ class AboutCommand extends Command
      *
      * @return void
      */
-    public static function flush()
+    public static function flushState()
     {
         static::$data = [];
 
