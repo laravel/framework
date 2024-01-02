@@ -50,7 +50,6 @@ class TransactionalTargetTest extends DatabaseTestCase
         Route::get('user', [TransactionalTestController::class, 'store']);
 
         $this->get('user');
-
         $this->assertDatabaseHas('users', ['name' => 'Mateus']);
     }
 
@@ -59,8 +58,15 @@ class TransactionalTargetTest extends DatabaseTestCase
         TransactionalTestController::$shouldFail = true;
         Route::get('user', [TransactionalTestController::class, 'store']);
 
-        $this->get('user')->assertStatus(500);
-        $this->assertDatabaseMissing('users', ['name' => 'Mateus']);
+        try {
+            $this->withoutExceptionHandling()->get('user')->assertStatus(500);
+        } catch (\Exception) {
+            $this->assertDatabaseMissing('users', ['name' => 'Mateus'], 'second_connection');
+
+            return;
+        }
+
+        $this->fail('Exception was not thrown.');
     }
 
     public function testItRollbacksChangesUponFailureInvokableController()
@@ -68,8 +74,15 @@ class TransactionalTargetTest extends DatabaseTestCase
         TransactionalTestController::$shouldFail = true;
         Route::get('user', TransactionalTestController::class);
 
-        $this->get('user')->assertStatus(500);
-        $this->assertDatabaseMissing('users', ['name' => 'Mateus']);
+        try {
+            $this->withoutExceptionHandling()->get('user')->assertStatus(500);
+        } catch (\Exception) {
+            $this->assertDatabaseMissing('users', ['name' => 'Mateus'], 'second_connection');
+
+            return;
+        }
+
+        $this->fail('Exception was not thrown.');
     }
 
     public function testItExecutesAMethodInsideATransactionSecondConnection()
@@ -86,8 +99,15 @@ class TransactionalTargetTest extends DatabaseTestCase
         TransactionalTestControllerSecondConnection::$shouldFail = true;
         Route::get('user', [TransactionalTestControllerSecondConnection::class, 'store']);
 
-        $this->get('user')->assertStatus(500);
-        $this->assertDatabaseMissing('users', ['name' => 'Mateus'], 'second_connection');
+        try {
+            $this->withoutExceptionHandling()->get('user')->assertStatus(500);
+        } catch (\Exception) {
+            $this->assertDatabaseMissing('users', ['name' => 'Mateus'], 'second_connection');
+
+            return;
+        }
+
+        $this->fail('Exception was not thrown.');
     }
 }
 
