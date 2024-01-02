@@ -300,4 +300,16 @@ class AboutCommand extends Command
     {
         return (string) Str::of($value)->lower()->snake();
     }
+
+    /**
+     * Flush the registered about data.
+     *
+     * @return void
+     */
+    public static function flush()
+    {
+        static::$data = [];
+
+        static::$customDataResolvers = [];
+    }
 }
