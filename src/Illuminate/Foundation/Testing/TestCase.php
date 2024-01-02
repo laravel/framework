@@ -4,6 +4,7 @@ namespace Illuminate\Foundation\Testing;
 
 use Carbon\CarbonImmutable;
 use Illuminate\Console\Application as Artisan;
+use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Bootstrap\HandleExceptions;
@@ -76,7 +77,11 @@ abstract class TestCase extends BaseTestCase
      */
     public function createApplication()
     {
-        return require Application::inferBaseDirectory() . '/bootstrap/app.php';
+        $app = require Application::inferBaseDirectory() . '/bootstrap/app.php';
+
+        $app->make(Kernel::class)->bootstrap();
+
+        return $app;
     }
 
     /**
