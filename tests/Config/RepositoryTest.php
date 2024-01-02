@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Config;
 
 use Illuminate\Config\Repository;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 
 class RepositoryTest extends TestCase
 {
@@ -142,6 +143,18 @@ class RepositoryTest extends TestCase
     public function testGetWithDefault()
     {
         $this->assertSame('default', $this->repository->get('not-exist', 'default'));
+    }
+
+    public function testGetOrFailReturnsExpectedValue(): void
+    {
+        $this->assertSame('bar', $this->repository->getOrFail('foo'));
+    }
+
+    public function testGetOrFailThrowsExceptionForInvalidKey(): void
+    {
+        $this->expectExceptionObject(new RuntimeException('Expected configuration key [not-exist] does not exist.'));
+
+        $this->repository->getOrFail('not-exist');
     }
 
     public function testSet()

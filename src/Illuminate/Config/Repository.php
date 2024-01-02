@@ -6,6 +6,7 @@ use ArrayAccess;
 use Illuminate\Contracts\Config\Repository as ConfigContract;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Traits\Macroable;
+use RuntimeException;
 
 class Repository implements ArrayAccess, ConfigContract
 {
@@ -54,6 +55,23 @@ class Repository implements ArrayAccess, ConfigContract
         }
 
         return Arr::get($this->items, $key, $default);
+    }
+
+    /**
+     * Get the specified configuration value or throw an exception if the key does not exist.
+     *
+     * @param  array|string  $key
+     * @return mixed
+     *
+     * @throws \RuntimeException
+     */
+    public function getOrFail($key)
+    {
+        if (! $this->has($key)) {
+            throw new RuntimeException("Expected configuration key [$key] does not exist.");
+        }
+
+        return $this->get($key);
     }
 
     /**
