@@ -368,6 +368,7 @@ class Filesystem
         }
 
         $decoded = base64_decode($base64, true);
+
         return ($decoded !== false) && (strlen($decoded) > 0);
     }
 
