@@ -13,7 +13,7 @@ class DatabaseConnectionsTest extends DatabaseTestCase
 {
     public function testEstablishDatabaseConnection()
     {
-        /** @var DatabaseManager $manager */
+        /** @var \Illuminate\Database\DatabaseManager $manager */
         $manager = $this->app->make(DatabaseManager::class);
 
         $connection = $manager->connectUsing('my-phpunit-connection', [
@@ -32,7 +32,7 @@ class DatabaseConnectionsTest extends DatabaseTestCase
 
     public function testThrowExceptionIfConnectionAlreadyExists()
     {
-        /** @var DatabaseManager $manager */
+        /** @var \Illuminate\Database\DatabaseManager $manager */
         $manager = $this->app->make(DatabaseManager::class);
 
         $manager->connectUsing('my-phpunit-connection', [
@@ -50,7 +50,7 @@ class DatabaseConnectionsTest extends DatabaseTestCase
 
     public function testOverrideExistingConnection()
     {
-        /** @var DatabaseManager $manager */
+        /** @var \Illuminate\Database\DatabaseManager $manager */
         $manager = $this->app->make(DatabaseManager::class);
 
         $connection = $manager->connectUsing('my-phpunit-connection', [
@@ -88,7 +88,7 @@ class DatabaseConnectionsTest extends DatabaseTestCase
             $event = $e;
         });
 
-        /** @var DatabaseManager $manager */
+        /** @var \Illuminate\Database\DatabaseManager $manager */
         $manager = $this->app->make(DatabaseManager::class);
 
         $manager->connectUsing('my-phpunit-connection', [
