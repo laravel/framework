@@ -123,6 +123,9 @@ class SupportNumberTest extends TestCase
         $this->assertSame('-$5.00', Number::currency(-5));
         $this->assertSame('$5.00', Number::currency(5.00));
         $this->assertSame('$5.32', Number::currency(5.325));
+
+        $this->assertSame('$5', Number::currency(5.00, digits: 0));
+        $this->assertSame('$6', Number::currency(5.99, digits: 0));
     }
 
     public function testToCurrencyWithDifferentLocale()
