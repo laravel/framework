@@ -2469,7 +2469,7 @@ trait ValidatesAttributes
      */
     public function validateLatitude($attribute, $value)
     {
-        return preg_match('/^[-+]?([1-8]?\d(\.\d+)?|90(\.0+)?)$/', $value);
+        return preg_match('/^[-+]?([1-8]?\d(\.\d+)?|90(\.0+)?)$/', $value) === 1;
     }
 
     /**
