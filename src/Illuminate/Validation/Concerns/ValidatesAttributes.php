@@ -2467,7 +2467,6 @@ trait ValidatesAttributes
      * @param  mixed  $value
      * @return bool
      */
-
     public function validateLatitude($attribute, $value)
     {
         return preg_match('/^[-+]?([1-8]?\d(\.\d+)?|90(\.0+)?)$/', $value);
@@ -2480,12 +2479,10 @@ trait ValidatesAttributes
      * @param  mixed  $value
      * @return bool
      */
-
     public function validateLongitude($attribute, $value)
     {
         return preg_match('/^[-+]?([1-8]?\d(\.\d+)?|180(\.0+)?)$/', $value);
     }
-
 
     /**
      * Get the size of an attribute.
