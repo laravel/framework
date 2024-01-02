@@ -136,7 +136,7 @@ class DatabaseManager implements ConnectionResolverInterface
      *
      * @param  string  $name
      * @param  array  $config
-     * @return ConnectionInterface
+     * @return \Illuminate\Database\ConnectionInterface
      */
     public function overrideUsing(string $name, array $config): ConnectionInterface
     {
