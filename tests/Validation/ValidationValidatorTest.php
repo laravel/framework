@@ -5197,10 +5197,8 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['foo' => '50.0000'], ['foo' => 'Latitude']);
         $this->assertTrue($v->passes());
 
-
         $v = new Validator($trans, ['foo' => '91.0000'], ['foo' => 'Latitude']);
         $this->assertFalse($v->passes());
-
 
         $v = new Validator($trans, ['foo' => 'invalid_latitude'], ['foo' => 'Latitude']);
         $this->assertFalse($v->passes());
@@ -5221,7 +5219,6 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['foo' => 'invalid_longitude'], ['foo' => 'Longitude']);
         $this->assertFalse($v->passes());
     }
-
 
     public function testValidateTimezoneWithAfricaOption()
     {
@@ -8306,32 +8303,32 @@ class ValidationValidatorTest extends TestCase
                     'has_appointment' => ['required', 'bool'],
                     'appointment_date' => ['exclude_if:has_appointment,false', 'required', 'date'],
                 ], [
-                'has_appointment' => false,
-                'appointment_date' => 'should be excluded',
-            ], [
-                'has_appointment' => false,
-            ],
+                    'has_appointment' => false,
+                    'appointment_date' => 'should be excluded',
+                ], [
+                    'has_appointment' => false,
+                ],
             ],
             [
                 [
                     'cat' => ['required', 'string'],
                     'mouse' => ['exclude_if:cat,Tom', 'required', 'file'],
                 ], [
-                'cat' => 'Tom',
-                'mouse' => 'should be excluded',
-            ], [
-                'cat' => 'Tom',
-            ],
+                    'cat' => 'Tom',
+                    'mouse' => 'should be excluded',
+                ], [
+                    'cat' => 'Tom',
+                ],
             ],
             [
                 [
                     'has_appointment' => ['required', 'bool'],
                     'appointment_date' => ['exclude_if:has_appointment,false', 'required', 'date'],
                 ], [
-                'has_appointment' => false,
-            ], [
-                'has_appointment' => false,
-            ],
+                    'has_appointment' => false,
+                ], [
+                    'has_appointment' => false,
+                ],
             ],
             [
                 [
@@ -8352,12 +8349,12 @@ class ValidationValidatorTest extends TestCase
                     'has_appointment' => ['required', 'bool'],
                     'appointment_date' => ['exclude_if:has_appointment,false', 'required', 'date'],
                 ], [
-                'has_appointment' => true,
-                'appointment_date' => '2019-12-13',
-            ], [
-                'has_appointment' => true,
-                'appointment_date' => '2019-12-13',
-            ],
+                    'has_appointment' => true,
+                    'appointment_date' => '2019-12-13',
+                ], [
+                    'has_appointment' => true,
+                    'appointment_date' => '2019-12-13',
+                ],
             ],
             [
                 [
@@ -8365,12 +8362,12 @@ class ValidationValidatorTest extends TestCase
                     'has_doctor_appointment' => ['exclude_if:has_no_appointments,true', 'required', 'bool'],
                     'doctor_appointment_date' => ['exclude_if:has_no_appointments,true', 'exclude_if:has_doctor_appointment,false', 'required', 'date'],
                 ], [
-                'has_no_appointments' => true,
-                'has_doctor_appointment' => true,
-                'doctor_appointment_date' => '2019-12-13',
-            ], [
-                'has_no_appointments' => true,
-            ],
+                    'has_no_appointments' => true,
+                    'has_doctor_appointment' => true,
+                    'doctor_appointment_date' => '2019-12-13',
+                ], [
+                    'has_no_appointments' => true,
+                ],
             ],
             [
                 [
@@ -8378,13 +8375,13 @@ class ValidationValidatorTest extends TestCase
                     'has_doctor_appointment' => ['exclude_if:has_no_appointments,true', 'required', 'bool'],
                     'doctor_appointment_date' => ['exclude_if:has_no_appointments,true', 'exclude_if:has_doctor_appointment,false', 'required', 'date'],
                 ], [
-                'has_no_appointments' => false,
-                'has_doctor_appointment' => false,
-                'doctor_appointment_date' => 'should be excluded',
-            ], [
-                'has_no_appointments' => false,
-                'has_doctor_appointment' => false,
-            ],
+                    'has_no_appointments' => false,
+                    'has_doctor_appointment' => false,
+                    'doctor_appointment_date' => 'should be excluded',
+                ], [
+                    'has_no_appointments' => false,
+                    'has_doctor_appointment' => false,
+                ],
             ],
             'nested-01' => [
                 [
@@ -8483,11 +8480,11 @@ class ValidationValidatorTest extends TestCase
                     'vehicles' => [
                         [
                             'type' => 'car', 'wheels' => [
-                            ['color' => 'red', 'shape' => 'square'],
-                            ['color' => 'blue', 'shape' => 'hexagon'],
-                            ['color' => 'red', 'shape' => 'round', 'junk' => 'no rule, still present'],
-                            ['color' => 'blue', 'shape' => 'triangle'],
-                        ],
+                                ['color' => 'red', 'shape' => 'square'],
+                                ['color' => 'blue', 'shape' => 'hexagon'],
+                                ['color' => 'red', 'shape' => 'round', 'junk' => 'no rule, still present'],
+                                ['color' => 'blue', 'shape' => 'triangle'],
+                            ],
                         ],
                         ['type' => 'boat'],
                     ],
@@ -8495,11 +8492,11 @@ class ValidationValidatorTest extends TestCase
                     'vehicles' => [
                         [
                             'type' => 'car', 'wheels' => [
-                            ['color' => 'red', 'shape' => 'square'],
-                            ['color' => 'blue'],
-                            ['color' => 'red', 'shape' => 'round', 'junk' => 'no rule, still present'],
-                            ['color' => 'blue'],
-                        ],
+                                ['color' => 'red', 'shape' => 'square'],
+                                ['color' => 'blue'],
+                                ['color' => 'red', 'shape' => 'round', 'junk' => 'no rule, still present'],
+                                ['color' => 'blue'],
+                            ],
                         ],
                         ['type' => 'boat'],
                     ],
@@ -8542,21 +8539,21 @@ class ValidationValidatorTest extends TestCase
                     'has_appointment' => ['required', 'bool'],
                     'appointment_date' => ['exclude_if:has_appointment,false', 'required', 'date'],
                 ], [
-                'has_appointment' => true,
-            ], [
-                'appointment_date' => ['validation.required'],
-            ],
+                    'has_appointment' => true,
+                ], [
+                    'appointment_date' => ['validation.required'],
+                ],
             ],
             [
                 [
                     'cat' => ['required', 'string'],
                     'mouse' => ['exclude_if:cat,Tom', 'required', 'file'],
                 ], [
-                'cat' => 'Bob',
-                'mouse' => 'not a file',
-            ], [
-                'mouse' => ['validation.file'],
-            ],
+                    'cat' => 'Bob',
+                    'mouse' => 'not a file',
+                ], [
+                    'mouse' => ['validation.file'],
+                ],
             ],
             [
                 [
@@ -8565,15 +8562,15 @@ class ValidationValidatorTest extends TestCase
                     'appointments.*.date' => ['required', 'date'],
                     'appointments.*.name' => ['required', 'string'],
                 ], [
-                'has_appointments' => true,
-                'appointments' => [
-                    ['date' => 'invalid', 'name' => 'Bob'],
-                    ['date' => '2019-05-15'],
+                    'has_appointments' => true,
+                    'appointments' => [
+                        ['date' => 'invalid', 'name' => 'Bob'],
+                        ['date' => '2019-05-15'],
+                    ],
+                ], [
+                    'appointments.0.date' => ['validation.date'],
+                    'appointments.1.name' => ['validation.required'],
                 ],
-            ], [
-                'appointments.0.date' => ['validation.date'],
-                'appointments.1.name' => ['validation.required'],
-            ],
             ],
             [
                 [
@@ -8581,20 +8578,20 @@ class ValidationValidatorTest extends TestCase
                     'vehicles.*.type' => 'required|in:car,boat',
                     'vehicles.*.wheels' => 'exclude_if:vehicles.*.type,boat|required|numeric',
                 ], [
-                'vehicles' => [
-                    [
-                        'price' => 100,
-                        'type' => 'car',
+                    'vehicles' => [
+                        [
+                            'price' => 100,
+                            'type' => 'car',
+                        ],
+                        [
+                            'price' => 500,
+                            'type' => 'boat',
+                        ],
                     ],
-                    [
-                        'price' => 500,
-                        'type' => 'boat',
-                    ],
+                ], [
+                    'vehicles.0.wheels' => ['validation.required'],
+                    // vehicles.1.wheels is not required, because type is not "car"
                 ],
-            ], [
-                'vehicles.0.wheels' => ['validation.required'],
-                // vehicles.1.wheels is not required, because type is not "car"
-            ],
             ],
             'exclude-validation-error-01' => [
                 [
@@ -8607,11 +8604,11 @@ class ValidationValidatorTest extends TestCase
                     'vehicles' => [
                         [
                             'type' => 'car', 'wheels' => [
-                            ['color' => 'red', 'shape' => 'square'],
-                            ['color' => 'blue', 'shape' => 'hexagon'],
-                            ['color' => 'red', 'shape' => 'hexagon'],
-                            ['color' => 'blue', 'shape' => 'triangle'],
-                        ],
+                                ['color' => 'red', 'shape' => 'square'],
+                                ['color' => 'blue', 'shape' => 'hexagon'],
+                                ['color' => 'red', 'shape' => 'hexagon'],
+                                ['color' => 'blue', 'shape' => 'triangle'],
+                            ],
                         ],
                         ['type' => 'boat', 'wheels' => 'should be excluded'],
                     ],
@@ -8656,11 +8653,11 @@ class ValidationValidatorTest extends TestCase
                     'has_appointment' => ['required', 'bool'],
                     'appointment_date' => ['exclude'],
                 ], [
-                'has_appointment' => false,
-                'appointment_date' => 'should be excluded',
-            ], [
-                'has_appointment' => false,
-            ],
+                    'has_appointment' => false,
+                    'appointment_date' => 'should be excluded',
+                ], [
+                    'has_appointment' => false,
+                ],
             ],
         ];
     }
