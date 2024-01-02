@@ -346,6 +346,7 @@ class Filesystem
         }
 
         $data_uri = Str::between($base64File, 'data:', ';');
+
         if (str_contains($base64File, $data_uri)) {
 
             $base64File = explode(',', $base64File, 2)[1];
