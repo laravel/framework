@@ -4,6 +4,7 @@ namespace Illuminate\Routing;
 
 use Closure;
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Database\Transactional;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Contracts\CallableDispatcher;
@@ -18,6 +19,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 use Laravel\SerializableClosure\SerializableClosure;
 use LogicException;
+use ReflectionMethod;
 use Symfony\Component\Routing\Route as SymfonyRoute;
 
 class Route
@@ -202,7 +204,9 @@ class Route
 
         try {
             if ($this->isControllerAction()) {
-                return $this->runController();
+                return $this->shouldRunWithinTransaction($this->container)
+                    ? $this->container->make('db')->transaction(fn () => $this->runController())
+                    : $this->runController();
             }
 
             return $this->runCallable();
@@ -1369,5 +1373,36 @@ class Route
     public function __get($key)
     {
         return $this->parameter($key);
+    }
+
+    /**
+     * Determine whether the controller action should run inside a transaction.
+     *
+     * @param  \Illuminate\Container\Container $container
+     * @return bool
+     * @throws \ReflectionException
+     */
+    protected function shouldRunWithinTransaction($container)
+    {
+        return $container->bound('db.transactions') && $this->targetHasAttribute(Transactional::class);
+    }
+
+    /**
+     * Determine whether the target class method has the given attribute.
+     * 
+     * @param  string  $attribute
+     * @return bool
+     * @throws \ReflectionException
+     */
+    protected function targetHasAttribute(string $attribute)
+    {
+        if (is_null($this->getControllerClass())) {
+            return false;
+        }
+
+        return count((new ReflectionMethod(
+            $this->getControllerClass(),
+            $this->getControllerMethod()
+        ))->getAttributes($attribute)) > 0;
     }
 }
