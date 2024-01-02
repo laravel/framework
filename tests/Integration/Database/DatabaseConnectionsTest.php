@@ -79,7 +79,7 @@ class DatabaseConnectionsTest extends DatabaseTestCase
 
     public function testEstablishingAConnectionWillDispatchAnEvent()
     {
-        /** @var Dispatcher $dispatcher */
+        /** @var \Illuminate\Events\Dispatcher $dispatcher */
         $dispatcher = $this->app->make(Dispatcher::class);
 
         $event = null;
