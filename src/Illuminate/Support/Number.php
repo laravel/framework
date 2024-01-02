@@ -209,6 +209,19 @@ class Number
     }
 
     /**
+     * Clamp the given number between the given minimum and maximum.
+     *
+     * @param  int|float  $number
+     * @param  int|float  $min
+     * @param  int|float  $max
+     * @return int|float
+     */
+    public static function clamp(int|float $number, int|float $min, int|float $max)
+    {
+        return min(max($number, $min), $max);
+    }
+
+    /**
      * Execute the given callback using the given locale.
      *
      * @param  string  $locale

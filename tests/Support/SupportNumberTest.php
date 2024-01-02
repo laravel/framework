@@ -157,6 +157,15 @@ class SupportNumberTest extends TestCase
         $this->assertSame('1,024 YB', Number::fileSize(1024 ** 9));
     }
 
+    public function testClamp()
+    {
+        $this->assertSame(2, Number::clamp(1, 2, 3));
+        $this->assertSame(3, Number::clamp(5, 2, 3));
+        $this->assertSame(5, Number::clamp(5, 1, 10));
+        $this->assertSame(4.5, Number::clamp(4.5, 1, 10));
+        $this->assertSame(1, Number::clamp(-10, 1, 5));
+    }
+
     public function testToHuman()
     {
         $this->assertSame('1', Number::forHumans(1));

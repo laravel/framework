@@ -105,7 +105,7 @@
         "league/flysystem-sftp-v3": "^3.0",
         "mockery/mockery": "^1.5.1",
         "nyholm/psr7": "^1.2",
-        "orchestra/testbench-core": "^8.15.1",
+        "orchestra/testbench-core": "^8.18",
         "pda/pheanstalk": "^4.0",
         "phpstan/phpstan": "^1.4.7",
         "phpunit/phpunit": "^10.0.7",
@@ -119,12 +119,15 @@
         "psr/simple-cache-implementation": "1.0|2.0|3.0"
     },
     "conflict": {
+        "carbonphp/carbon-doctrine-types": ">=3.0",
+        "doctrine/dbal": ">=4.0",
         "tightenco/collect": "<5.5.33"
     },
     "autoload": {
         "files": [
             "src/Illuminate/Collections/helpers.php",
             "src/Illuminate/Events/functions.php",
+            "src/Illuminate/Filesystem/functions.php",
             "src/Illuminate/Foundation/helpers.php",
             "src/Illuminate/Support/helpers.php"
         ],

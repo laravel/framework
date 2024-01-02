@@ -15,13 +15,6 @@ use Orchestra\Testbench\TestCase;
 
 class CallQueuedHandlerTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        parent::tearDown();
-
-        m::close();
-    }
-
     public function testJobCanBeDispatched()
     {
         CallQueuedHandlerTestJob::$handled = false;

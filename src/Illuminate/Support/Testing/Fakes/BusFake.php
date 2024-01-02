@@ -11,6 +11,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Traits\ReflectsClosures;
 use PHPUnit\Framework\Assert as PHPUnit;
+use RuntimeException;
 
 class BusFake implements Fake, QueueingDispatcher
 {
@@ -419,6 +420,18 @@ class BusFake implements Fake, QueueingDispatcher
 
                         if (! $chainedBatch instanceof ChainedBatch ||
                             ! $chain[$index]($chainedBatch->toPendingBatch())) {
+                            return false;
+                        }
+                    } elseif ($chain[$index] instanceof Closure) {
+                        [$expectedType, $callback] = [$this->firstClosureParameterType($chain[$index]), $chain[$index]];
+
+                        $chainedJob = unserialize($serializedChainedJob);
+
+                        if (! $chainedJob instanceof $expectedType) {
+                            throw new RuntimeException('The chained job was expected to be of type '.$expectedType.', '.$chainedJob::class.' chained.');
+                        }
+
+                        if (! $callback($chainedJob)) {
                             return false;
                         }
                     } elseif (is_string($chain[$index])) {
