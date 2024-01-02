@@ -1092,7 +1092,8 @@ trait HasAttributes
     protected function isDateAttribute($key)
     {
         return in_array($key, $this->getDates(), true) ||
-            $this->isDateCastable($key);
+            $this->isDateCastable($key) ||
+            $this->isDateCastableWithCustomFormat($key);
     }
 
     /**
