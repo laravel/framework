@@ -2463,9 +2463,9 @@ trait ValidatesAttributes
     /**
      * Validate that an attribute is a valid latitude.
      *
-     *@param  string  $attribute
-     *@param  mixed  $value
-     *@return bool
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @return bool
      */
 
     public function validateLatitude($attribute, $value)
@@ -2476,9 +2476,9 @@ trait ValidatesAttributes
     /**
      * Validate that an attribute is a valid longitude.
      *
-     *@param  string  $attribute
-     *@param  mixed  $value
-     *@return bool
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @return bool
      */
 
     public function validateLongitude($attribute, $value)
