@@ -5188,6 +5188,46 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
     }
 
+    public function testValidateLatitude()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => '50.8503'], ['foo' => 'Latitude']);
+        $this->assertTrue($v->passes());
+
+
+        $v = new Validator($trans, ['foo' => '91.0000'], ['foo' => 'Latitude']);
+        $this->assertFalse($v->passes());
+
+
+        $v = new Validator($trans, ['foo' => 'invalid_latitude'], ['foo' => 'Latitude']);
+        $this->assertFalse($v->passes());
+    }
+
+    public function testValidateLongitude()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => '4.402464'], ['foo' => 'Longitude']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => '181.0000'], ['foo' => 'Longitude']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => '-73.935242'], ['foo' => 'Longitude']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => 'invalid_longitude'], ['foo' => 'Longitude']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => ''], ['foo' => 'Longitude']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => null], ['foo' => 'Longitude']);
+        $this->assertFalse($v->passes());
+
+
+    }
+
+
     public function testValidateTimezoneWithAfricaOption()
     {
         $trans = $this->getIlluminateArrayTranslator();

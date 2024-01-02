@@ -2461,6 +2461,33 @@ trait ValidatesAttributes
     }
 
     /**
+     * Validate that an attribute is a valid latitude.
+     *
+     *@param  string  $attribute
+     *@param  mixed  $value
+     *@return bool
+     */
+
+    public function validateLatitude($attribute, $value)
+    {
+        return preg_match('/^[-+]?([1-8]?\d(\.\d+)?|90(\.0+)?)$/', $value);
+    }
+
+    /**
+     * Validate that an attribute is a valid longitude.
+     *
+     *@param  string  $attribute
+     *@param  mixed  $value
+     *@return bool
+     */
+
+    public function validateLongitude($attribute, $value)
+    {
+        return preg_match('/^[-+]?([1-8]?\d(\.\d+)?|180(\.0+)?)$/', $value);
+    }
+
+
+    /**
      * Get the size of an attribute.
      *
      * @param  string  $attribute
