@@ -2481,7 +2481,7 @@ trait ValidatesAttributes
      */
     public function validateLongitude($attribute, $value)
     {
-        return preg_match('/^[-+]?([1-8]?\d(\.\d+)?|180(\.0+)?)$/', $value);
+        return preg_match('/^[-+]?([1-8]?\d(\.\d+)?|180(\.0+)?)$/', $value) === 1;
     }
 
     /**
