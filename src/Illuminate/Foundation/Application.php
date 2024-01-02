@@ -224,9 +224,11 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public static function configure(string $baseDirectory = null)
     {
-        $baseDirectory = $ENV['APP_BASE_PATH'] ?? ($baseDirectory ?: dirname(dirname(
-            debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0]['file']
-        )));
+        $baseDirectory = match (true) {
+            is_string($baseDirectory) => $baseDirectory,
+            isset($_ENV['APP_BASE_PATH']) => $_ENV['APP_BASE_PATH'],
+            default => dirname(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0]['file'], 2),
+        };
 
         return (new Configuration\ApplicationBuilder(new static($baseDirectory)))
             ->withKernels()
