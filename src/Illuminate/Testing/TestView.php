@@ -107,7 +107,7 @@ class TestView
     }
 
     /**
-     * Assert that the view is empty.
+     * Assert that the view's rendered content is empty.
      */
     public function assertViewEmpty()
     {
