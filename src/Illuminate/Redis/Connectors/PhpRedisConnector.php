@@ -199,10 +199,6 @@ class PhpRedisConnector implements Connector
                 $client->setOption(RedisCluster::OPT_SLAVE_FAILOVER, $options['failover']);
             }
 
-            if (! empty($options['name'])) {
-                $client->client('SETNAME', $options['name']);
-            }
-
             if (array_key_exists('serializer', $options)) {
                 $client->setOption(Redis::OPT_SERIALIZER, $options['serializer']);
             }
