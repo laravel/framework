@@ -107,6 +107,16 @@ class TestView
     }
 
     /**
+     * Assert that the view's rendered content is empty.
+     */
+    public function assertViewEmpty()
+    {
+        PHPUnit::assertEmpty($this->rendered);
+
+        return true;
+    }
+
+    /**
      * Assert that the given string is contained within the view.
      *
      * @param  string  $value
