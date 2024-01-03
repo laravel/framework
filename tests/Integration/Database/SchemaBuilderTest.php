@@ -368,6 +368,7 @@ class SchemaBuilderTest extends DatabaseTestCase
             fn ($foreign) => $foreign['columns'] === ['parent_id']
                 && $foreign['foreign_table'] === 'parents' && $foreign['foreign_columns'] === ['id']
         ));
+    }
 
     public function testSystemVersionedTables()
     {
