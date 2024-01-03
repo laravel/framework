@@ -106,11 +106,11 @@ class FileLoader implements Loader
                 $file = "{$path}/vendor/{$namespace}/{$locale}/{$group}.php";
 
                 if ($this->files->exists($file)) {
-                    $lines = array_replace_recursive($lines, $this->files->getRequire($file));
+                    $output = array_replace_recursive($output, $this->files->getRequire($file));
                 }
 
-                return $lines;
-            }, []);
+                return $output;
+            }, $lines);
     }
 
     /**
