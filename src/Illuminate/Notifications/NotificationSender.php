@@ -62,6 +62,17 @@ class NotificationSender
     }
 
     /**
+     * Create a new NotificationSender instance.
+     *
+     * @param  mixed  ...$parameters
+     * @return static
+     */
+    public static function make(...$parameters)
+    {
+        return new static(...$parameters);
+    }
+
+    /**
      * Send the given notification to the given notifiable entities.
      *
      * @param  \Illuminate\Support\Collection|array|mixed  $notifiables
