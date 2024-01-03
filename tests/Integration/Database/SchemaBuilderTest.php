@@ -368,5 +368,21 @@ class SchemaBuilderTest extends DatabaseTestCase
             fn ($foreign) => $foreign['columns'] === ['parent_id']
                 && $foreign['foreign_table'] === 'parents' && $foreign['foreign_columns'] === ['id']
         ));
+
+    public function testSystemVersionedTables()
+    {
+        if ($this->driver !== 'mysql' || ! $this->getConnection()->isMaria()) {
+            $this->markTestSkipped('Test requires a MariaDB connection.');
+        }
+
+        DB::statement('create table `test` (`foo` int) WITH system versioning;');
+
+        $this->assertTrue(Schema::hasTable('test'));
+
+        Schema::dropAllTables();
+
+        $this->artisan('migrate:install');
+
+        DB::statement('create table `test` (`foo` int) WITH system versioning;');
     }
 }

@@ -177,6 +177,33 @@ class DatabaseEloquentModelCustomCastingTest extends DatabaseTestCase
         $this->assertSame((new Decimal('220.987'))->getValue(), $model->price->getValue());
     }
 
+    public function testDirtyOnCustomNumericCasts()
+    {
+        $model = new TestEloquentModelWithCustomCast;
+        $model->price = '123.00';
+        $model->save();
+
+        $this->assertFalse($model->isDirty());
+
+        $model->price = '123.00';
+        $this->assertFalse($model->isDirty('price'));
+
+        $model->price = '123.0';
+        $this->assertFalse($model->isDirty('price'));
+
+        $model->price = '123';
+        $this->assertFalse($model->isDirty('price'));
+
+        $model->price = '00123.00';
+        $this->assertFalse($model->isDirty('price'));
+
+        $model->price = '123.4000';
+        $this->assertTrue($model->isDirty('price'));
+
+        $model->price = '123.0004';
+        $this->assertTrue($model->isDirty('price'));
+    }
+
     public function testSerializableCasts()
     {
         $model = new TestEloquentModelWithCustomCast;
