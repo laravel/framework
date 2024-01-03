@@ -173,7 +173,7 @@ class Handler implements ExceptionHandlerContract
     /**
      * Register a reportable callback to the beginning of the stack.
      *
-     * @param callable $reportUsing
+     * @param  callable  $reportUsing
      * @return \Illuminate\Foundation\Exceptions\ReportableHandler
      */
     public function prependReportable(callable $reportUsing)
@@ -204,7 +204,7 @@ class Handler implements ExceptionHandlerContract
         });
     }
 
-     /**
+    /**
      * Register a renderable callback to the beginning of the stack.
      *
      * @param  callable  $renderUsing
