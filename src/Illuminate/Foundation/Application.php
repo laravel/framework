@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation;
 
 use Closure;
+use Composer\Autoload\ClassLoader;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Console\Kernel as ConsoleKernelContract;
 use Illuminate\Contracts\Foundation\Application as ApplicationContract;
@@ -226,14 +227,26 @@ class Application extends Container implements ApplicationContract, CachesConfig
     {
         $baseDirectory = match (true) {
             is_string($baseDirectory) => $baseDirectory,
-            isset($_ENV['APP_BASE_PATH']) => $_ENV['APP_BASE_PATH'],
-            default => dirname(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0]['file'], 2),
+            default => static::inferBaseDirectory(),
         };
 
         return (new Configuration\ApplicationBuilder(new static($baseDirectory)))
             ->withKernels()
             ->withEvents()
             ->withCommands();
+    }
+
+    /**
+     * Infer the application's base directory from the environment.
+     *
+     * @return string
+     */
+    public static function inferBaseDirectory()
+    {
+        return match (true) {
+            isset($_ENV['APP_BASE_PATH']) => $_ENV['APP_BASE_PATH'],
+            default => dirname(array_keys(ClassLoader::getRegisteredLoaders())[0]),
+        };
     }
 
     /**

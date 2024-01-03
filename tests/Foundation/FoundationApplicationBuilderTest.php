@@ -35,10 +35,10 @@ class FoundationApplicationBuilderTest extends TestCase
         $this->assertSame(__DIR__.'/as-env', $app->basePath());
     }
 
-    public function testBaseDirectoryWithDebugBacktrace()
+    public function testBaseDirectoryWithComposer()
     {
         $app = Application::configure()->create();
 
-        $this->assertSame(dirname(__DIR__), $app->basePath());
+        $this->assertSame(dirname(__DIR__, 2), $app->basePath());
     }
 }
