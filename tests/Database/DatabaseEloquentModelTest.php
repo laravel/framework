@@ -3085,22 +3085,6 @@ class EloquentModelEmptyDestroyStub extends Model
     }
 }
 
-class EloquentModelHydrateRawStub extends Model
-{
-    public static function hydrate(array $items, $connection = null)
-    {
-        return 'hydrated';
-    }
-
-    public function getConnection()
-    {
-        $mock = m::mock(Connection::class);
-        $mock->shouldReceive('select')->once()->with('SELECT ?', ['foo'])->andReturn([]);
-
-        return $mock;
-    }
-}
-
 class EloquentModelWithStub extends Model
 {
     public function newQuery()
