@@ -171,6 +171,23 @@ class Handler implements ExceptionHandlerContract
     }
 
     /**
+     * Register a reportable callback to the beginning of the stack.
+     *
+     * @param callable $reportUsing
+     * @return \Illuminate\Foundation\Exceptions\ReportableHandler
+     */
+    public function prependReportable(callable $reportUsing)
+    {
+        if (! $reportUsing instanceof Closure) {
+            $reportUsing = Closure::fromCallable($reportUsing);
+        }
+
+        return tap(new ReportableHandler($reportUsing), function ($callback) {
+            array_unshift($this->reportCallbacks, $callback);
+        });
+    }
+
+    /**
      * Register a reportable callback.
      *
      * @param  callable  $reportUsing
@@ -185,6 +202,23 @@ class Handler implements ExceptionHandlerContract
         return tap(new ReportableHandler($reportUsing), function ($callback) {
             $this->reportCallbacks[] = $callback;
         });
+    }
+
+     /**
+     * Register a renderable callback to the beginning of the stack.
+     *
+     * @param  callable  $renderUsing
+     * @return $this
+     */
+    public function prependRenderable(callable $renderUsing)
+    {
+        if (! $renderUsing instanceof Closure) {
+            $renderUsing = Closure::fromCallable($renderUsing);
+        }
+
+        array_unshift($this->renderCallbacks, $renderUsing);
+
+        return $this;
     }
 
     /**
