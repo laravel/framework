@@ -82,7 +82,7 @@ class Builder implements BuilderContract
     /**
      * The columns that should be returned.
      *
-     * @var array
+     * @var array|null
      */
     public $columns;
 
