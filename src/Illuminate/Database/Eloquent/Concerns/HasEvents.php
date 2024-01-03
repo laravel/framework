@@ -153,9 +153,8 @@ trait HasEvents
     protected static function registerModelEvent($event, $callback)
     {
         if (isset(static::$dispatcher)) {
-            $name = static::class;
 
-            static::$dispatcher->listen("eloquent.{$event}: {$name}", $callback);
+            static::$dispatcher->listen(static::makeModelEventKey($event), $callback);
         }
     }
 
@@ -186,7 +185,7 @@ trait HasEvents
         }
 
         return ! empty($result) ? $result : static::$dispatcher->{$method}(
-            "eloquent.{$event}: ".static::class, $this
+            static::makeModelEventKey($event), $this
         );
     }
 
@@ -225,6 +224,17 @@ trait HasEvents
         }
 
         return $result;
+    }
+
+    /**
+     * Make model event key for the given event.
+     * 
+     * @param  string  $event
+     * @return string
+     */
+    protected static function makeModelEventKey($event)
+    {
+        return "eloquent.{$event}: ".static::class;
     }
 
     /**
@@ -351,7 +361,7 @@ trait HasEvents
         $instance = new static;
 
         foreach ($instance->getObservableEvents() as $event) {
-            static::$dispatcher->forget("eloquent.{$event}: ".static::class);
+            static::$dispatcher->forget(static::makeModelEventKey($event));
         }
 
         foreach (array_values($instance->dispatchesEvents) as $event) {
