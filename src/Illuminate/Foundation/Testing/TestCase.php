@@ -243,6 +243,7 @@ abstract class TestCase extends BaseTestCase
         $this->originalExceptionHandler = null;
         $this->originalDeprecationHandler = null;
 
+        AboutCommand::flushState();
         Artisan::forgetBootstrappers();
         Component::flushCache();
         Component::forgetComponentsResolver();
@@ -251,7 +252,6 @@ abstract class TestCase extends BaseTestCase
         HandleExceptions::forgetApp();
         Queue::createPayloadUsing(null);
         Sleep::fake(false);
-        AboutCommand::flushState();
         TrimStrings::flushState();
 
         if ($this->callbackException) {
