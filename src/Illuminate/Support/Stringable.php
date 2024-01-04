@@ -78,6 +78,16 @@ class Stringable implements JsonSerializable, ArrayAccess
     }
 
     /**
+     * Convert the given string to APA-style case.
+     *
+     * @return static
+     */
+    public function apa()
+    {
+        return new static(Str::apa($this->value));
+    }
+
+    /**
      * Transliterate a UTF-8 value to ASCII.
      *
      * @param  string  $language
