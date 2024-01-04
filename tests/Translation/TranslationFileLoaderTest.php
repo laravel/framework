@@ -69,6 +69,18 @@ class TranslationFileLoaderTest extends TestCase
         $this->assertEquals(['foo' => 'override', 'baz' => 'boom'], $loader->load('en', 'foo', 'namespace'));
     }
 
+    public function testLoadMethodWithNamespacesProperlyCallsLoaderAndLoadsLocalOverridesKeepingMissingKeys()
+    {
+        $loader = new FileLoader($files = m::mock(Filesystem::class), __DIR__);
+        $files->shouldReceive('exists')->once()->with('bar/en/foo.php')->andReturn(true);
+        $files->shouldReceive('exists')->once()->with(__DIR__.'/vendor/namespace/en/foo.php')->andReturn(true);
+        $files->shouldReceive('getRequire')->once()->with('bar/en/foo.php')->andReturn(['foo' => 'bar', 'citrus' => 'orange']);
+        $files->shouldReceive('getRequire')->once()->with(__DIR__.'/vendor/namespace/en/foo.php')->andReturn(['foo' => 'override', 'baz' => 'boom']);
+        $loader->addNamespace('namespace', 'bar');
+
+        $this->assertEquals(['foo' => 'override', 'citrus' => 'orange', 'baz' => 'boom'], $loader->load('en', 'foo', 'namespace'));
+    }
+
     public function testLoadMethodWithNamespacesProperlyCallsLoaderAndLoadsLocalOverridesWithMultiplePaths()
     {
         $loader = new FileLoader($files = m::mock(Filesystem::class), [__DIR__, __DIR__.'/second']);
@@ -81,6 +93,20 @@ class TranslationFileLoaderTest extends TestCase
         $loader->addNamespace('namespace', 'test-namespace-dir');
 
         $this->assertEquals(['foo' => 'override-2', 'baz' => 'boom-2'], $loader->load('en', 'foo', 'namespace'));
+    }
+
+    public function testLoadMethodWithNamespacesProperlyCallsLoaderAndLoadsLocalOverridesWithMultiplePathsKeepingMissingKeys()
+    {
+        $loader = new FileLoader($files = m::mock(Filesystem::class), [__DIR__, __DIR__.'/second']);
+        $files->shouldReceive('exists')->once()->with('test-namespace-dir/en/foo.php')->andReturn(true);
+        $files->shouldReceive('exists')->once()->with(__DIR__.'/vendor/namespace/en/foo.php')->andReturn(true);
+        $files->shouldReceive('exists')->once()->with(__DIR__.'/second/vendor/namespace/en/foo.php')->andReturn(true);
+        $files->shouldReceive('getRequire')->once()->with('test-namespace-dir/en/foo.php')->andReturn(['foo' => 'bar']);
+        $files->shouldReceive('getRequire')->once()->with(__DIR__.'/vendor/namespace/en/foo.php')->andReturn(['foo' => 'override', 'baz' => 'boom']);
+        $files->shouldReceive('getRequire')->once()->with(__DIR__.'/second/vendor/namespace/en/foo.php')->andReturn(['foo' => 'override-2', 'citrus' => 'orange']);
+        $loader->addNamespace('namespace', 'test-namespace-dir');
+
+        $this->assertEquals(['foo' => 'override-2', 'baz' => 'boom', 'citrus' => 'orange'], $loader->load('en', 'foo', 'namespace'));
     }
 
     public function testEmptyArraysReturnedWhenFilesDontExist()
