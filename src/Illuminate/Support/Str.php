@@ -124,18 +124,13 @@ class Str
         $minorWords = ['and', 'as', 'but', 'for', 'if', 'nor', 'or', 'so', 'yet', 'a', 'an', 'the', 'at', 'by', 'for', 'in', 'of', 'off', 'on', 'per', 'to', 'up', 'via'];
         $endPunctuation = ['.', '!', '?', ':', '—', ','];
 
-        // Split the string into words
         $words = preg_split('/\s+/', $value, -1, PREG_SPLIT_NO_EMPTY);
 
-        // Capitalize the first word
         $words[0] = ucfirst(mb_strtolower($words[0]));
 
-        // Capitalize major words and handle lowercase minor words
         for ($i = 0; $i < count($words); $i++) {
-            // Check if the word is a major word or a minor word
             $lowercaseWord = mb_strtolower($words[$i]);
 
-            // Handle hyphenated major words
             if (str_contains($lowercaseWord, '-')) {
                 $hyphenatedWords = explode('-', $lowercaseWord);
                 $hyphenatedWords = array_map(function ($part) use ($minorWords) {
@@ -143,7 +138,6 @@ class Str
                 }, $hyphenatedWords);
                 $words[$i] = implode('-', $hyphenatedWords);
             } else {
-                // Handle lowercase minor words
                 if (
                     in_array($lowercaseWord, $minorWords) &&
                     mb_strlen($lowercaseWord) <= 3 &&
@@ -156,7 +150,6 @@ class Str
             }
         }
 
-        // Join the words back into a string
         return implode(' ', $words);
     }
 
