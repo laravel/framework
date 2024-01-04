@@ -36,7 +36,7 @@ trait SerializesModels
                 continue;
             }
 
-            $value = $this->getPropertyValue($property);
+            $value = $property->getValue($this);
 
             if ($property->hasDefaultValue() && $value === $property->getDefaultValue()) {
                 continue;
@@ -93,16 +93,5 @@ trait SerializesModels
                 $this, $this->getRestoredPropertyValue($values[$name])
             );
         }
-    }
-
-    /**
-     * Get the property value for the given property.
-     *
-     * @param  \ReflectionProperty  $property
-     * @return mixed
-     */
-    protected function getPropertyValue(ReflectionProperty $property)
-    {
-        return $property->getValue($this);
     }
 }
