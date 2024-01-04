@@ -210,6 +210,6 @@ return [
     |
     */
 
-    'partitioned' => (bool) env('SESSION_PARTITIONED_COOKIE', false),
+    'partitioned' => env('SESSION_PARTITIONED_COOKIE', false),
 
 ];
