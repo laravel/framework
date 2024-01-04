@@ -120,7 +120,6 @@ class Str
      */
     public static function apa($value)
     {
-        // Define minor words to be lowercase
         $minorWords = ['and', 'as', 'but', 'for', 'if', 'nor', 'or', 'so', 'yet', 'a', 'an', 'the', 'at', 'by', 'for', 'in', 'of', 'off', 'on', 'per', 'to', 'up', 'via'];
         $endPunctuation = ['.', '!', '?', ':', '—', ','];
 
