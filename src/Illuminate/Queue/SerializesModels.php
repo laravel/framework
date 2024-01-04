@@ -4,7 +4,6 @@ namespace Illuminate\Queue;
 
 use Illuminate\Queue\Attributes\WithoutRelations;
 use ReflectionClass;
-use ReflectionProperty;
 
 trait SerializesModels
 {
