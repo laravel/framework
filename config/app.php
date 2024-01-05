@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\ServiceProvider;
 
@@ -181,4 +182,17 @@ return [
         // 'Example' => App\Facades\Example::class,
     ])->toArray(),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Trust Proxies Support
+    |--------------------------------------------------------------------------
+    |
+    | If your application is served through load balancers or other reverse proxies,
+    | you may configure their addresses and the headers to trust below.
+    |
+    */
+    'trustedproxy' => [
+        'proxies' => env('TRUSTEDPROXY_PROXIES', '*'),
+        'headers' => env('TRUSTEDPROXY_HEADERS'),
+    ],
 ];
