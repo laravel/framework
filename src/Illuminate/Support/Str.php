@@ -115,7 +115,7 @@ class Str
      * Based on the rules provided by the APA:
      * https://apastyle.apa.org/style-grammar-guidelines/capitalization/title-case
      *
-     * @param string $value
+     * @param  string  $value
      * @return string
      */
     public static function apa($value)
