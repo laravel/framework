@@ -935,7 +935,7 @@ class Str
     /**
      * Generate a random digits with a specified number of places.
      *
-     * @param int $length
+     * @param  int  $length
      * @return int
      * @throws \Exception
      */
