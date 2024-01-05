@@ -1335,10 +1335,10 @@ class SupportStrTest extends TestCase
     {
         $randomDigits = Str::randomDigits(6);
 
-        $this->assertIsInt($randomDigits);
         $this->assertEquals(6, strlen($randomDigits));
-        $this->assertThat($randomDigits, $this->logicalAnd(
-            $this->greaterThanOrEqual(100000),
+
+        $this->assertThat((int)$randomDigits, $this->logicalAnd(
+            $this->greaterThanOrEqual(1),
             $this->lessThanOrEqual(999999)
         ));
     }

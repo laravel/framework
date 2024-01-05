@@ -933,19 +933,18 @@ class Str
     }
 
     /**
-     * Generate a random digits with a specified number of places.
+     * Generate a random digits string that has a specified length.
      *
-     * @param  int  $length
-     * @return int
+     * @param int $length
+     * @return string
      *
      * @throws \Exception
      */
-    public static function randomDigits($length = 16): int
+    public static function randomDigits(int $length = 16): string
     {
-        $min = pow(10, $length - 1);
         $max = pow(10, $length) - 1;
 
-        return random_int($min, $max);
+        return sprintf("%0" . $length . "d", random_int(1, $max));
     }
     /**
      * Set the callable that will be used to generate random strings.
