@@ -6,7 +6,6 @@ use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Events\QueryExecuted;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Testing\Constraints\CountInDatabase;
 use Illuminate\Testing\Constraints\HasInDatabase;
