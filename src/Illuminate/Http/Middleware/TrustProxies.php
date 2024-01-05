@@ -12,7 +12,7 @@ class TrustProxies
      *
      * @var array<int, string>|string|null
      */
-    protected $proxies = '*';
+    protected $proxies;
 
     /**
      * The proxy header mappings.
