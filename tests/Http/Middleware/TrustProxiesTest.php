@@ -326,8 +326,8 @@ class TrustProxiesTest extends TestCase
     {
         $request = $this->createProxiedRequest();
 
-        // trust *all* "X-Forwarded-*" headers
-        $trustedProxy = $this->createTrustedProxy('HEADER_X_FORWARDED_ALL', '192.168.1.1, 192.168.1.2');
+        // trust the default headers
+        $trustedProxy = $this->createTrustedProxy(null, '192.168.1.1, 192.168.1.2');
         $trustedProxy->handle($request, function (Request $request) {
             $this->assertEquals($request->getTrustedHeaderSet(), $this->headerAll,
                 'Assert trusted proxy used all "X-Forwarded-*" header');
