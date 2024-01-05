@@ -507,7 +507,7 @@ class ComponentAttributeBag implements Arrayable, ArrayAccess, IteratorAggregate
         $string = '';
 
         foreach ($this->attributes as $key => $value) {
-            if ($value === false || is_null($value)) {
+            if ($value === false || is_null($value) || is_array($value)) {
                 continue;
             }
 
