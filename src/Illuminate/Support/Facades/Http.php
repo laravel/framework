@@ -6,6 +6,7 @@ use Illuminate\Http\Client\Factory;
 
 /**
  * @method static \Illuminate\Http\Client\Factory globalMiddleware(callable $middleware)
+ * @method static \Illuminate\Http\Client\Factory globalOptions(array $options)
  * @method static \Illuminate\Http\Client\Factory globalRequestMiddleware(callable $middleware)
  * @method static \Illuminate\Http\Client\Factory globalResponseMiddleware(callable $middleware)
  * @method static \GuzzleHttp\Promise\PromiseInterface response(array|string|null $body = null, int $status = 200, array $headers = [])
