@@ -2634,6 +2634,23 @@ class HttpClientTest extends TestCase
         $this->assertSame('', $responses[1]->header('X-Foo'));
     }
 
+    public function testItCanAddGlobalOptions()
+    {
+        $options = [
+            'connect_timeout' => 5,
+            'http_errors' => true,
+            'timeout' => 10,
+            'foo' => 'bar'
+        ];
+
+        $this->factory->globalOptions($options);
+
+        $this->assertSame($this->factory->getOptions()['timeout'], $options['timeout']);
+        $this->assertSame($this->factory->getOptions()['connect_timeout'], $options['connect_timeout']);
+        $this->assertSame($this->factory->getOptions()['http_errors'], $options['http_errors']);
+        $this->assertArrayNotHasKey('foo', $this->factory->getOptions());
+    }
+
     public function testItReturnsResponse(): void
     {
         $this->factory->fake([

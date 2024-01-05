@@ -220,20 +220,21 @@ class PendingRequest
      *
      * @param  \Illuminate\Http\Client\Factory|null  $factory
      * @param  array  $middleware
+     * @param  array  $options
      * @return void
      */
-    public function __construct(Factory $factory = null, $middleware = [])
+    public function __construct(Factory $factory = null, $middleware = [], $options = [])
     {
         $this->factory = $factory;
         $this->middleware = new Collection($middleware);
 
         $this->asJson();
 
-        $this->options = [
+        $this->options = array_merge([
             'connect_timeout' => 10,
             'http_errors' => false,
             'timeout' => 30,
-        ];
+        ], $options);
 
         $this->beforeSendingCallbacks = collect([function (Request $request, array $options, PendingRequest $pendingRequest) {
             $pendingRequest->request = $request;

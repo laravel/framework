@@ -9,6 +9,7 @@ use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\Psr7\Response as Psr7Response;
 use GuzzleHttp\TransferStats;
 use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 use PHPUnit\Framework\Assert as PHPUnit;
@@ -35,6 +36,24 @@ class Factory
      * @var array
      */
     protected $globalMiddleware = [];
+
+    /**
+     * The global options to apply on every request.
+     *
+     * @var array
+     */
+    protected $globalOptions = [];
+
+    /**
+     * The list of allowed global options to apply on every request.
+     *
+     * @var string[]
+     */
+    protected $avaialableGlobalOptions = [
+        'connect_timeout',
+        'http_errors',
+        'timeout'
+    ];
 
     /**
      * The stub callables that will handle requests.
@@ -93,6 +112,19 @@ class Factory
     public function globalMiddleware($middleware)
     {
         $this->globalMiddleware[] = $middleware;
+
+        return $this;
+    }
+
+    /**
+     * Add global options to apply on every request.
+     *
+     * @param array $options
+     * @return $this
+     */
+    public function globalOptions(array $options)
+    {
+        $this->globalOptions = Arr::only($options, $this->avaialableGlobalOptions);
 
         return $this;
     }
@@ -400,7 +432,7 @@ class Factory
      */
     protected function newPendingRequest()
     {
-        return new PendingRequest($this, $this->globalMiddleware);
+        return new PendingRequest($this, $this->globalMiddleware, $this->globalOptions);
     }
 
     /**
