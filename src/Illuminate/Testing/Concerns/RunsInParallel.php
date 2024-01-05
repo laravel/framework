@@ -3,6 +3,7 @@
 namespace Illuminate\Testing\Concerns;
 
 use Illuminate\Contracts\Console\Kernel;
+use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\ParallelTesting;
 use Illuminate\Testing\ParallelConsoleOutput;
 use RuntimeException;
@@ -176,8 +177,7 @@ trait RunsInParallel
                 };
 
                 return $applicationCreator->createApplication();
-            } elseif (file_exists($path = getcwd().'/bootstrap/app.php') ||
-                      file_exists($path = getcwd().'/.laravel/app.php')) {
+            } elseif (file_exists($path = (Application::inferBaseDirectory().'/bootstrap/app.php'))) {
                 $app = require $path;
 
                 $app->make(Kernel::class)->bootstrap();
