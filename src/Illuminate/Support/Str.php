@@ -937,6 +937,7 @@ class Str
      *
      * @param  int  $length
      * @return int
+     *
      * @throws \Exception
      */
     public static function randomDigits($length = 16): int
