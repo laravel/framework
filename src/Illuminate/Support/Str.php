@@ -932,6 +932,12 @@ class Str
         })($length);
     }
 
+    public static function randomDigits($length = 16)
+    {
+        $min = pow(10, $length - 1);
+        $max = pow(10, $length) - 1;
+        return rand($min, $max);
+    }
     /**
      * Set the callable that will be used to generate random strings.
      *
