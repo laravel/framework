@@ -49,7 +49,7 @@ class Factory
      *
      * @var string[]
      */
-    protected $avaialableGlobalOptions = [
+    protected $availableGlobalOptions = [
         'connect_timeout',
         'http_errors',
         'timeout'
@@ -124,7 +124,7 @@ class Factory
      */
     public function globalOptions(array $options)
     {
-        $this->globalOptions = Arr::only($options, $this->avaialableGlobalOptions);
+        $this->globalOptions = Arr::only($options, $this->availableGlobalOptions);
 
         return $this;
     }
