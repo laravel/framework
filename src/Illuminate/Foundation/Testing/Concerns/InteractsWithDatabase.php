@@ -311,7 +311,9 @@ trait InteractsWithDatabase
      */
     public function seed($class = 'Database\\Seeders\\DatabaseSeeder')
     {
-        foreach (Arr::wrap($class) as $class) {
+        $classes = is_array($class) ? $class : func_get_args();
+
+        foreach ($classes as $class) {
             $this->artisan('db:seed', ['--class' => $class, '--no-interaction' => true]);
         }
 
