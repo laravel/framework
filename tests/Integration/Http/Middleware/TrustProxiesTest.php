@@ -4,7 +4,7 @@ namespace Illuminate\Tests\Integration\Http\Middleware;
 
 use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Foundation\Validation\ValidatesRequests;
-use Illuminate\Http\Middleware\HandleCors;
+use Illuminate\Http\Middleware\TrustProxies;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
 use Orchestra\Testbench\TestCase;
@@ -27,7 +27,7 @@ class TrustProxiesTest extends TestCase
     protected function getEnvironmentSetUp($app)
     {
         $kernel = $app->make(Kernel::class);
-        $kernel->prependMiddleware(HandleCors::class);
+        $kernel->prependMiddleware(TrustProxies::class);
 
         $router = $app['router'];
 
