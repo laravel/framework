@@ -134,7 +134,7 @@ class ModelMakeCommand extends GeneratorCommand
      */
     protected function createController()
     {
-        $controller = Str::studly(class_basename($this->argument('name')));
+        $controller = $this->getNameInput();
 
         $modelName = $this->qualifyClass($this->getNameInput());
 
