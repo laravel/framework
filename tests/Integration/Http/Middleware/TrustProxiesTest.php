@@ -5,7 +5,6 @@ namespace Illuminate\Tests\Integration\Http\Middleware;
 use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\Middleware\TrustProxies;
-use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
 use Orchestra\Testbench\TestCase;
 
@@ -35,7 +34,6 @@ class TrustProxiesTest extends TestCase
 
         parent::getEnvironmentSetUp($app);
     }
-
 
     public function testDefaultConfigurationDoesNotTrustAnyProxies()
     {
