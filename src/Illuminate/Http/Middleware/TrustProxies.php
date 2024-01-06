@@ -98,6 +98,7 @@ class TrustProxies
 
         return match ($this->headers) {
             'HEADER_X_FORWARDED_AWS_ELB' => Request::HEADER_X_FORWARDED_AWS_ELB,
+            'HEADER_X_FORWARDED_TRAEFIK' => Request::HEADER_X_FORWARDED_TRAEFIK,
             'HEADER_FORWARDED' => Request::HEADER_FORWARDED,
             'HEADER_X_FORWARDED_FOR' => Request::HEADER_X_FORWARDED_FOR,
             'HEADER_X_FORWARDED_HOST' => Request::HEADER_X_FORWARDED_HOST,
