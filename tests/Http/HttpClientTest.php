@@ -1283,6 +1283,22 @@ class HttpClientTest extends TestCase
         $this->assertSame(401, $response->status());
     }
 
+    public function testOnSuccessDoesntCallClosureOnServerError()
+    {
+        $status = 0;
+        $client = $this->factory->fake([
+            'laravel.com' => $this->factory::response('', 501),
+        ]);
+
+        $response = $client->get('laravel.com')
+            ->onSuccess(function ($response) use (&$status) {
+                $status = $response->status();
+            });
+
+        $this->assertSame(0, $status);
+        $this->assertSame(501, $response->status());
+    }
+
     public function testOnSuccessCallsClosureOnSuccess()
     {
         $status = 0;
