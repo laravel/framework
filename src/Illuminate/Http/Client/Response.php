@@ -220,6 +220,21 @@ class Response implements ArrayAccess
     }
 
     /**
+     * Execute the given callback if the request wat successfull.
+     *
+     * @param  callable  $callback
+     * @return $this
+     */
+    public function onSuccess(callable $callback)
+    {
+        if ($this->successful()) {
+            $callback($this);
+        }
+
+        return $this;
+    }
+
+    /**
      * Get the response cookies.
      *
      * @return \GuzzleHttp\Cookie\CookieJar

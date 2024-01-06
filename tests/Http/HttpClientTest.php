@@ -1235,6 +1235,70 @@ class HttpClientTest extends TestCase
         $this->assertSame(501, $response->status());
     }
 
+    public function testOnSuccessDoesntCallClosureOnInformational()
+    {
+        $status = 0;
+        $client = $this->factory->fake([
+            'laravel.com' => $this->factory::response('', 101),
+        ]);
+
+        $response = $client->get('laravel.com')
+            ->onSuccess(function ($response) use (&$status) {
+                $status = $response->status();
+            });
+
+        $this->assertSame(0, $status);
+        $this->assertSame(101, $response->status());
+    }
+
+    public function testOnSuccessDoesntCallClosureOnRedirection()
+    {
+        $status = 0;
+        $client = $this->factory->fake([
+            'laravel.com' => $this->factory::response('', 301),
+        ]);
+
+        $response = $client->get('laravel.com')
+            ->onSuccess(function ($response) use (&$status) {
+                $status = $response->status();
+            });
+
+        $this->assertSame(0, $status);
+        $this->assertSame(301, $response->status());
+    }
+
+    public function testOnSuccessDoesntCallClosureOnClientError()
+    {
+        $status = 0;
+        $client = $this->factory->fake([
+            'laravel.com' => $this->factory::response('', 401),
+        ]);
+
+        $response = $client->get('laravel.com')
+            ->onSuccess(function ($response) use (&$status) {
+                $status = $response->status();
+            });
+
+        $this->assertSame(0, $status);
+        $this->assertSame(401, $response->status());
+    }
+
+    public function testOnSuccessCallsClosureOnSuccess()
+    {
+        $status = 0;
+        $client = $this->factory->fake([
+            'laravel.com' => $this->factory::response('', 201),
+        ]);
+
+        $response = $client->get('laravel.com')
+            ->onSuccess(function ($response) use (&$status) {
+                $status = $response->status();
+            });
+
+        $this->assertSame(201, $status);
+        $this->assertSame(201, $response->status());
+    }
+
     public function testSinkToFile()
     {
         $this->factory->fakeSequence()->push('abc123');
