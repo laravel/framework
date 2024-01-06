@@ -154,10 +154,10 @@ class ModelMakeCommandTest extends TestCase
         ], 'app/Models/Foo/Bar.php');
 
         $this->assertFileContains([
-            'namespace App\Http\Controllers;',
+            'namespace App\Http\Controllers\Foo;',
             'use Illuminate\Http\Request;',
             'class BarController extends Controller',
-        ], 'app/Http/Controllers/BarController.php');
+        ], 'app/Http/Controllers/Foo/BarController.php');
 
         $this->assertFilenameNotExists('database/factories/FooFactory.php');
         $this->assertFilenameNotExists('database/seeders/FooSeeder.php');
