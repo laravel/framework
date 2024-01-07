@@ -1243,7 +1243,7 @@ class Str
      * @param  string  $value
      * @return string
      */
-    public static function properCase($value)
+    public static function proper($value)
     {
         return mb_convert_case($value, MB_CASE_TITLE, 'UTF-8');
     }
@@ -1256,31 +1256,26 @@ class Str
      */
     public static function title($value)
     {
-        return static::properCase($value);
+        return static::proper($value);
     }
 
     /**
      * Convert the given string to proper case for each word.
      *
      * @param  string  $value
-     * @param  bool  $title
      * @return string
      */
-    public static function headline($value, $title = false)
+    public static function headline($value)
     {
         $parts = explode(' ', $value);
 
-        $method = $title ? 'lower' : 'properCase';
-
         $parts = count($parts) > 1
-            ? array_map([static::class, $method], $parts)
-            : array_map([static::class, $method], static::ucsplit(implode('_', $parts)));
+            ? array_map([static::class, 'proper'], $parts)
+            : array_map([static::class, 'proper'], static::ucsplit(implode('_', $parts)));
 
         $collapsed = static::replace(['-', '_', ' '], '_', implode('_', $parts));
 
-        $headline = implode(' ', array_filter(explode('_', $collapsed)));
-
-        return $title ? static::titleCase($headline) : $headline;
+        return implode(' ', array_filter(explode('_', $collapsed)));
     }
 
     /**
@@ -1291,7 +1286,7 @@ class Str
      * @param  string  $value
      * @return string
      */
-    public static function titleCase($value)
+    public static function apaTitle($value)
     {
         $minorWords = [
             'and', 'as', 'but', 'for', 'if', 'nor', 'or', 'so', 'yet', 'a', 'an',

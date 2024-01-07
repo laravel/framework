@@ -792,9 +792,9 @@ class Stringable implements JsonSerializable, ArrayAccess
      *
      * @return static
      */
-    public function properCase()
+    public function proper()
     {
-        return new static(Str::properCase($this->value));
+        return new static(Str::proper($this->value));
     }
 
     /**
@@ -804,18 +804,17 @@ class Stringable implements JsonSerializable, ArrayAccess
      */
     public function title()
     {
-        return $this->properCase();
+        return $this->proper();
     }
 
     /**
      * Convert the given string to proper case for each word.
      *
-     * @param  bool  $title
      * @return static
      */
-    public function headline($title = false)
+    public function headline()
     {
-        return new static(Str::headline($this->value, $title));
+        return new static(Str::headline($this->value));
     }
 
     /**
@@ -823,9 +822,9 @@ class Stringable implements JsonSerializable, ArrayAccess
      *
      * @return static
      */
-    public function titleCase()
+    public function apaTitle()
     {
-        return new static(Str::titleCase($this->value));
+        return new static(Str::apaTitle($this->value));
     }
 
     /**
