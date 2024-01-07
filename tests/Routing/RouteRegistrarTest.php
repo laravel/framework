@@ -917,6 +917,20 @@ class RouteRegistrarTest extends TestCase
         }
     }
 
+
+    public function testWhereSlugRegistration()
+    {
+        $wheres = ['foo' => '[a-z0-9-_]+', 'bar' => '[a-z0-9-_]+'];
+
+        $this->router->get('/{foo}/{bar}')->whereSlug(['foo', 'bar']);
+        $this->router->get('/api/{bar}/{foo}')->whereSlug(['bar', 'foo']);
+
+        /** @var \Illuminate\Routing\Route $route */
+        foreach ($this->router->getRoutes() as $route) {
+            $this->assertEquals($wheres, $route->wheres);
+        }
+    }
+
     public function testWhereAlphaNumericRegistration()
     {
         $wheres = ['1a2b3c' => '[a-zA-Z0-9]+'];

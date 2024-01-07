@@ -40,6 +40,17 @@ trait CreatesRegularExpressionRouteConstraints
     }
 
     /**
+     * Specify that the given route parameters must have slug format.
+     *
+     * @param  array|string  $parameters
+     * @return $this
+     */
+    public function whereSlug($parameters)
+    {
+        return $this->assignExpressionToParameters($parameters, '[a-z0-9-_]+');
+    }
+
+    /**
      * Specify that the given route parameters must be ULIDs.
      *
      * @param  array|string  $parameters
