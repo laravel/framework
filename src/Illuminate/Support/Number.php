@@ -48,9 +48,13 @@ class Number
      * @param  string|null  $locale
      * @return string
      */
-    public static function spell(int|float $number, ?string $locale = null)
+    public static function spell(int|float $number, ?string $locale = null, ?int $threshold = null)
     {
         static::ensureIntlExtensionIsInstalled();
+
+        if (! is_null($threshold) && $number > $threshold) {
+            return static::format($number, locale: $locale);
+        }
 
         $formatter = new NumberFormatter($locale ?? static::$locale, NumberFormatter::SPELLOUT);
 

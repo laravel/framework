@@ -77,6 +77,17 @@ class SupportNumberTest extends TestCase
         $this->assertSame('trois', Number::spell(3, 'fr'));
     }
 
+    public function testSpelloutWithThreshold()
+    {
+        $this->needsIntlExtension();
+
+        $this->assertSame('ten', Number::spell(10, threshold: 10));
+        $this->assertSame('11', Number::spell(11, threshold: 10));
+
+        $this->assertSame('ten thousand', Number::spell(10000, threshold: 50000));
+        $this->assertSame('100,000', Number::spell(100000, threshold: 50000));
+    }
+
     public function testOrdinal()
     {
         $this->assertSame('1st', Number::ordinal(1));
