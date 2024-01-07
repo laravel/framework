@@ -69,33 +69,33 @@ class SupportStrTest extends TestCase
 
     public function testStringApa()
     {
-        $this->assertSame('Tom and Jerry', Str::apaTitle('tom and jerry'));
-        $this->assertSame('Tom and Jerry', Str::apaTitle('TOM AND JERRY'));
-        $this->assertSame('Tom and Jerry', Str::apaTitle('Tom And Jerry'));
+        $this->assertSame('Tom and Jerry', Str::apa('tom and jerry'));
+        $this->assertSame('Tom and Jerry', Str::apa('TOM AND JERRY'));
+        $this->assertSame('Tom and Jerry', Str::apa('Tom And Jerry'));
 
-        $this->assertSame('Back to the Future', Str::apaTitle('back to the future'));
-        $this->assertSame('Back to the Future', Str::apaTitle('BACK TO THE FUTURE'));
-        $this->assertSame('Back to the Future', Str::apaTitle('Back To The Future'));
+        $this->assertSame('Back to the Future', Str::apa('back to the future'));
+        $this->assertSame('Back to the Future', Str::apa('BACK TO THE FUTURE'));
+        $this->assertSame('Back to the Future', Str::apa('Back To The Future'));
 
-        $this->assertSame('This, Then That', Str::apaTitle('this, then that'));
-        $this->assertSame('This, Then That', Str::apaTitle('THIS, THEN THAT'));
-        $this->assertSame('This, Then That', Str::apaTitle('This, Then That'));
+        $this->assertSame('This, Then That', Str::apa('this, then that'));
+        $this->assertSame('This, Then That', Str::apa('THIS, THEN THAT'));
+        $this->assertSame('This, Then That', Str::apa('This, Then That'));
 
-        $this->assertSame('Bond. James Bond.', Str::apaTitle('bond. james bond.'));
-        $this->assertSame('Bond. James Bond.', Str::apaTitle('BOND. JAMES BOND.'));
-        $this->assertSame('Bond. James Bond.', Str::apaTitle('Bond. James Bond.'));
+        $this->assertSame('Bond. James Bond.', Str::apa('bond. james bond.'));
+        $this->assertSame('Bond. James Bond.', Str::apa('BOND. JAMES BOND.'));
+        $this->assertSame('Bond. James Bond.', Str::apa('Bond. James Bond.'));
 
-        $this->assertSame('Self-Report', Str::apaTitle('self-report'));
-        $this->assertSame('Self-Report', Str::apaTitle('Self-report'));
-        $this->assertSame('Self-Report', Str::apaTitle('SELF-REPORT'));
+        $this->assertSame('Self-Report', Str::apa('self-report'));
+        $this->assertSame('Self-Report', Str::apa('Self-report'));
+        $this->assertSame('Self-Report', Str::apa('SELF-REPORT'));
 
-        $this->assertSame('As the World Turns, So Are the Days of Our Lives', Str::apaTitle('as the world turns, so are the days of our lives'));
-        $this->assertSame('As the World Turns, So Are the Days of Our Lives', Str::apaTitle('AS THE WORLD TURNS, SO ARE THE DAYS OF OUR LIVES'));
-        $this->assertSame('As the World Turns, So Are the Days of Our Lives', Str::apaTitle('As The World Turns, So Are The Days Of Our Lives'));
+        $this->assertSame('As the World Turns, So Are the Days of Our Lives', Str::apa('as the world turns, so are the days of our lives'));
+        $this->assertSame('As the World Turns, So Are the Days of Our Lives', Str::apa('AS THE WORLD TURNS, SO ARE THE DAYS OF OUR LIVES'));
+        $this->assertSame('As the World Turns, So Are the Days of Our Lives', Str::apa('As The World Turns, So Are The Days Of Our Lives'));
 
-        $this->assertSame('To Kill a Mockingbird', Str::apaTitle('to kill a mockingbird'));
-        $this->assertSame('To Kill a Mockingbird', Str::apaTitle('TO KILL A MOCKINGBIRD'));
-        $this->assertSame('To Kill a Mockingbird', Str::apaTitle('To Kill A Mockingbird'));
+        $this->assertSame('To Kill a Mockingbird', Str::apa('to kill a mockingbird'));
+        $this->assertSame('To Kill a Mockingbird', Str::apa('TO KILL A MOCKINGBIRD'));
+        $this->assertSame('To Kill a Mockingbird', Str::apa('To Kill A Mockingbird'));
     }
 
     public function testStringWithoutWordsDoesntProduceError()

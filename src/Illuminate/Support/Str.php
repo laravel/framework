@@ -1286,7 +1286,7 @@ class Str
      * @param  string  $value
      * @return string
      */
-    public static function apaTitle($value)
+    public static function apa($value)
     {
         $minorWords = [
             'and', 'as', 'but', 'for', 'if', 'nor', 'or', 'so', 'yet', 'a', 'an',

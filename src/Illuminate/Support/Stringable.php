@@ -822,9 +822,9 @@ class Stringable implements JsonSerializable, ArrayAccess
      *
      * @return static
      */
-    public function apaTitle()
+    public function apa()
     {
-        return new static(Str::apaTitle($this->value));
+        return new static(Str::apa($this->value));
     }
 
     /**
