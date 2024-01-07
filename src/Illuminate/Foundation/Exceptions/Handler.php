@@ -452,6 +452,8 @@ class Handler implements ExceptionHandlerContract
     {
         $e = $this->mapException($e);
 
+        if (app()->environment() === 'testing') throw $e;
+
         if (method_exists($e, 'render') && $response = $e->render($request)) {
             return Router::toResponse($request, $response);
         }
