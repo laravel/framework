@@ -452,7 +452,7 @@ class Handler implements ExceptionHandlerContract
     {
         $e = $this->mapException($e);
 
-        if (app()->runningUnitTests() && !app()->isProduction()) {
+        if (app()->runningUnitTests() && ! app()->isProduction()) {
             throw $e;
         }
 
