@@ -179,7 +179,7 @@ class SupportTestingQueueFakeTest extends TestCase
     public function testAssertCount()
     {
         $this->fake->push(function () {
-
+            // Do nothing
         });
 
         $this->fake->push($this->job);
