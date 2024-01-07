@@ -78,16 +78,6 @@ class Stringable implements JsonSerializable, ArrayAccess
     }
 
     /**
-     * Convert the given string to APA-style case.
-     *
-     * @return static
-     */
-    public function apa()
-    {
-        return new static(Str::apa($this->value));
-    }
-
-    /**
      * Transliterate a UTF-8 value to ASCII.
      *
      * @param  string  $language
@@ -798,13 +788,44 @@ class Stringable implements JsonSerializable, ArrayAccess
     }
 
     /**
-     * Convert the given string to title case.
+     * Convert the given string to proper case.
+     *
+     * @return static
+     */
+    public function properCase()
+    {
+        return new static(Str::properCase($this->value));
+    }
+
+    /**
+     * Convert the given string to proper case.
      *
      * @return static
      */
     public function title()
     {
-        return new static(Str::title($this->value));
+        return $this->properCase();
+    }
+
+    /**
+     * Convert the given string to proper case for each word.
+     *
+     * @param  bool  $title
+     * @return static
+     */
+    public function headline($title = false)
+    {
+        return new static(Str::headline($this->value, $title));
+    }
+
+    /**
+     * Convert the given string to APA-style title case.
+     *
+     * @return static
+     */
+    public function titleCase()
+    {
+        return new static(Str::titleCase($this->value));
     }
 
     /**
@@ -817,16 +838,6 @@ class Stringable implements JsonSerializable, ArrayAccess
     public function transliterate($unknown = '?', $strict = false)
     {
         return new static(Str::transliterate($this->value, $unknown, $strict));
-    }
-
-    /**
-     * Convert the given string to title case for each word.
-     *
-     * @return static
-     */
-    public function headline()
-    {
-        return new static(Str::headline($this->value));
     }
 
     /**
