@@ -45,6 +45,7 @@ use Illuminate\Support\Testing\Fakes\QueueFake;
  * @method static void assertClosurePushed(callable|int|null $callback = null)
  * @method static void assertClosureNotPushed(callable|null $callback = null)
  * @method static void assertNotPushed(string|\Closure $job, callable|null $callback = null)
+ * @method static void assertCount(int $expectedCount)
  * @method static void assertNothingPushed()
  * @method static \Illuminate\Support\Collection pushed(string $job, callable|null $callback = null)
  * @method static bool hasPushed(string $job)
