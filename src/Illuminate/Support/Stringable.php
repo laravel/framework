@@ -792,19 +792,9 @@ class Stringable implements JsonSerializable, ArrayAccess
      *
      * @return static
      */
-    public function proper()
-    {
-        return new static(Str::proper($this->value));
-    }
-
-    /**
-     * Convert the given string to proper case.
-     *
-     * @return static
-     */
     public function title()
     {
-        return $this->proper();
+        return new static(Str::title($this->value));
     }
 
     /**

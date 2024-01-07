@@ -1243,20 +1243,9 @@ class Str
      * @param  string  $value
      * @return string
      */
-    public static function proper($value)
-    {
-        return mb_convert_case($value, MB_CASE_TITLE, 'UTF-8');
-    }
-
-    /**
-     * Convert the given string to proper case.
-     *
-     * @param  string  $value
-     * @return string
-     */
     public static function title($value)
     {
-        return static::proper($value);
+        return mb_convert_case($value, MB_CASE_TITLE, 'UTF-8');
     }
 
     /**
@@ -1270,8 +1259,8 @@ class Str
         $parts = explode(' ', $value);
 
         $parts = count($parts) > 1
-            ? array_map([static::class, 'proper'], $parts)
-            : array_map([static::class, 'proper'], static::ucsplit(implode('_', $parts)));
+            ? array_map([static::class, 'title'], $parts)
+            : array_map([static::class, 'title'], static::ucsplit(implode('_', $parts)));
 
         $collapsed = static::replace(['-', '_', ' '], '_', implode('_', $parts));
 
