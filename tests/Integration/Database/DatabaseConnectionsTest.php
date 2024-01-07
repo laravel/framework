@@ -62,10 +62,10 @@ class DatabaseConnectionsTest extends DatabaseTestCase
 
         $resultBeforeOverride = $connection->select("SELECT name FROM sqlite_master WHERE type='table';");
 
-        $connection = $manager->overrideUsing('my-phpunit-connection', [
+        $connection = $manager->connectUsing('my-phpunit-connection', [
             'driver' => 'sqlite',
             'database' => ':memory:',
-        ]);
+        ], force: true);
 
         // After purging a connection of a :memory: SQLite database
         // anything that was created before the override will no

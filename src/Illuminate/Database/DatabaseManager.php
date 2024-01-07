@@ -108,41 +108,30 @@ class DatabaseManager implements ConnectionResolverInterface
     }
 
     /**
-     * Get a database connection instance without using the Config Repository.
+     * Get a database connection instance from the given configuration.
      *
      * @param  string  $name
      * @param  array  $config
+     * @param  bool  $force
      * @return \Illuminate\Database\ConnectionInterface
      */
-    public function connectUsing(string $name, array $config): ConnectionInterface
+    public function connectUsing(string $name, array $config, bool $force = false)
     {
-        if (isset($this->connections[$name])) {
-            throw new RuntimeException("Cannot establish connection [$name] because another connection already exists.");
+        if ($force) {
+            $this->purge($name);
         }
 
-        $connection = $this->factory->make($config, $name);
+        if (isset($this->connections[$name])) {
+            throw new RuntimeException("Cannot establish connection [$name] because another connection with that name already exists.");
+        }
 
-        $connection = $this->configure($connection, null);
+        $connection = $this->configure(
+            $this->factory->make($config, $name), null
+        );
 
         $this->dispatchConnectionEstablishedEvent($connection);
 
-        $this->connections[$name] = $connection;
-
-        return $this->connections[$name];
-    }
-
-    /**
-     * Establish a fresh connection.
-     *
-     * @param  string  $name
-     * @param  array  $config
-     * @return \Illuminate\Database\ConnectionInterface
-     */
-    public function overrideUsing(string $name, array $config): ConnectionInterface
-    {
-        $this->purge($name);
-
-        return $this->connectUsing($name, $config);
+        return tap($connection, fn ($connection) => $this->connections[$name] = $connection);
     }
 
     /**
@@ -244,18 +233,20 @@ class DatabaseManager implements ConnectionResolverInterface
     }
 
     /**
-     * If the event dispatcher is available dispatches the ConnectionEstablished event.
+     * Dispatch the ConnectionEstablished event if the event dispatcher is available.
      *
      * @param  \Illuminate\Database\Connection  $connection
      * @return void
      */
-    protected function dispatchConnectionEstablishedEvent(Connection $connection): void
+    protected function dispatchConnectionEstablishedEvent(Connection $connection)
     {
         if (! $this->app->bound('events')) {
             return;
         }
 
-        $this->app['events']->dispatch(new ConnectionEstablished($connection));
+        $this->app['events']->dispatch(
+            new ConnectionEstablished($connection)
+        );
     }
 
     /**
