@@ -1280,7 +1280,7 @@ class Str
 
         $headline = implode(' ', array_filter(explode('_', $collapsed)));
 
-        return $title ? Str::titleCase($headline) : $headline;
+        return $title ? static::titleCase($headline) : $headline;
     }
 
     /**
