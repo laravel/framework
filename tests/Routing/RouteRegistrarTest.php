@@ -917,7 +917,6 @@ class RouteRegistrarTest extends TestCase
         }
     }
 
-
     public function testWhereSlugRegistration()
     {
         $wheres = ['foo' => '[a-z0-9-_]+', 'bar' => '[a-z0-9-_]+'];
