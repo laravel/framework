@@ -46,6 +46,7 @@ class Number
      *
      * @param  int|float  $number
      * @param  string|null  $locale
+     * @param  int|null  $threshold
      * @return string
      */
     public static function spell(int|float $number, ?string $locale = null, ?int $threshold = null)
