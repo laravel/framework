@@ -23,7 +23,8 @@ class PruneCommand extends Command
                                 {--model=* : Class names of the models to be pruned}
                                 {--except=* : Class names of the models to be excluded from pruning}
                                 {--chunk=1000 : The number of models to retrieve per chunk of models to be deleted}
-                                {--pretend : Display the number of prunable records found instead of deleting them}';
+                                {--pretend : Display the number of prunable records found instead of deleting them}
+                                {--default-path=Models : The default path where models are located}';
 
     /**
      * The console command description.
@@ -121,7 +122,7 @@ class PruneCommand extends Command
      */
     protected function getDefaultPath()
     {
-        return app_path('Models');
+        return app_path($this->option('default-path'));
     }
 
     /**
