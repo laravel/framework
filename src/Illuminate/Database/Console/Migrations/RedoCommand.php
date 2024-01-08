@@ -55,11 +55,7 @@ class RedoCommand extends BaseCommand
             return 1;
         }
 
-        $this->call('migrate:rollback', array_filter([
-            '--step' => $this->option('step') ?? 1,
-        ]));
-
-        $this->call('migrate', array_filter([
+        $this->call('migrate:refresh', array_filter([
             '--step' => $this->option('step') ?? 1,
         ]));
 
