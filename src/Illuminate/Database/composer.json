@@ -46,6 +46,7 @@
         "illuminate/events": "Required to use the observers with Eloquent (^10.0).",
         "illuminate/filesystem": "Required to use the migrations (^10.0).",
         "illuminate/pagination": "Required to paginate the result set (^10.0).",
+        "illuminate/refiner": "Required to refine the query by a request query (^10.0).",
         "symfony/finder": "Required to use Eloquent model factories (^6.2)."
     },
     "config": {

@@ -16,6 +16,7 @@ use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\RecordsNotFoundException;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Pagination\Paginator;
+use Illuminate\Refine\RefineQuery;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ForwardsCalls;
@@ -1009,6 +1010,18 @@ class Builder implements BuilderContract
         return collect($orders)
             ->filter(fn ($order) => Arr::has($order, 'direction'))
             ->values();
+    }
+
+    /**
+     * Refines the Query Builder using a refiner class.
+     *
+     * @param  string  $refiner
+     * @param  array|null  $data
+     * @return $this
+     */
+    public function refineBy(string $refiner, array $data = null)
+    {
+        return RefineQuery::make($this, $refiner)->refine($data);
     }
 
     /**

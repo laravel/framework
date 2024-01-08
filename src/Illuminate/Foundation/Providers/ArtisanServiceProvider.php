@@ -61,6 +61,7 @@ use Illuminate\Foundation\Console\OptimizeCommand;
 use Illuminate\Foundation\Console\PackageDiscoverCommand;
 use Illuminate\Foundation\Console\PolicyMakeCommand;
 use Illuminate\Foundation\Console\ProviderMakeCommand;
+use Illuminate\Foundation\Console\RefinerMakeCommand;
 use Illuminate\Foundation\Console\RequestMakeCommand;
 use Illuminate\Foundation\Console\ResourceMakeCommand;
 use Illuminate\Foundation\Console\RouteCacheCommand;
@@ -192,6 +193,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         'ObserverMake' => ObserverMakeCommand::class,
         'PolicyMake' => PolicyMakeCommand::class,
         'ProviderMake' => ProviderMakeCommand::class,
+        'RefinerMake' => RefinerMakeCommand::class,
         'QueueFailedTable' => FailedTableCommand::class,
         'QueueTable' => TableCommand::class,
         'QueueBatchesTable' => BatchesTableCommand::class,
