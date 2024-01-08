@@ -23,7 +23,7 @@ trait WithDatabaseTransaction
     public function withDatabaseTransaction(callable $callback)
     {
         if (isset($this->container)) {
-            return fn() => $this->container->make('db.connection')->transaction($callback);
+            return fn () => $this->container->make('db.connection')->transaction($callback);
         }
 
         return $callback;

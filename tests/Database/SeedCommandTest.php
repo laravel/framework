@@ -126,7 +126,7 @@ class SeedCommandTest extends TestCase
         $resolver->shouldReceive('setDefaultConnection')->once()->with('sqlite');
 
         $connection = m::mock(ConnectionInterface::class);
-        $connection->shouldReceive('transaction')->andReturn(fn($callback) => Assert::assertTrue($callback()));
+        $connection->shouldReceive('transaction')->andReturn(fn ($callback) => Assert::assertTrue($callback()));
 
         $container = m::mock(Container::class);
         $container->shouldReceive('call');
