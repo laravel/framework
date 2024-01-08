@@ -4,6 +4,7 @@ namespace Illuminate\Refine;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+
 use function array_diff;
 use function is_callable;
 
@@ -12,7 +13,7 @@ class RefineQuery
     /**
      * The container resolver.
      *
-     * @var callable(string $abstract): mixed
+     * @var callable(string): mixed
      */
     protected static $resolver;
 

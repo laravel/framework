@@ -2,7 +2,6 @@
 
 namespace Illuminate\Refine;
 
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\ServiceProvider;
 
 class RefineQueryServiceProvider extends ServiceProvider

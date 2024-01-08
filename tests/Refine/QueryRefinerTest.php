@@ -127,7 +127,6 @@ class QueryRefinerTest extends TestCase
 
 class MockModel extends Model
 {
-
 }
 
 class MockRefiner extends Refiner
