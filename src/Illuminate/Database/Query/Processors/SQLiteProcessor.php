@@ -23,22 +23,29 @@ class SQLiteProcessor extends Processor
      * Process the results of a columns query.
      *
      * @param  array  $results
+     * @param  string  $sql
      * @return array
      */
-    public function processColumns($results)
+    public function processColumns($results, $sql = '')
     {
         $hasPrimaryKey = array_sum(array_column($results, 'primary')) === 1;
 
-        return array_map(function ($result) use ($hasPrimaryKey) {
+        return array_map(function ($result) use ($hasPrimaryKey, $sql) {
             $result = (object) $result;
 
             $type = strtolower($result->type);
+
+            $collation = preg_match(
+                '/\b'.preg_quote($result->name).'\b[^,(]+(?:\([^()]+\)[^,]*)?(?:(?:default|check|as)\s*(?:\(.*?\))?[^,]*)*collate\s+["\'`]?(\w+)/i',
+                $sql,
+                $matches
+            ) === 1 ? strtolower($matches[1]) : null;
 
             return [
                 'name' => $result->name,
                 'type_name' => strtok($type, '(') ?: '',
                 'type' => $type,
-                'collation' => null,
+                'collation' => $collation,
                 'nullable' => (bool) $result->nullable,
                 'default' => $result->default,
                 'auto_increment' => $hasPrimaryKey && $result->primary && $type === 'integer',

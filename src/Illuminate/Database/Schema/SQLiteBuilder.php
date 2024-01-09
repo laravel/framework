@@ -52,6 +52,22 @@ class SQLiteBuilder extends Builder
     }
 
     /**
+     * Get the columns for a given table.
+     *
+     * @param  string  $table
+     * @return array
+     */
+    public function getColumns($table)
+    {
+        $table = $this->connection->getTablePrefix().$table;
+
+        return $this->connection->getPostProcessor()->processColumns(
+            $this->connection->selectFromWriteConnection($this->grammar->compileColumns($table)),
+            $this->connection->scalar($this->grammar->compileSqlCreateStatement($table))
+        );
+    }
+
+    /**
      * Get all of the table names for the database.
      *
      * @deprecated Will be removed in a future Laravel version.
