@@ -598,6 +598,21 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     }
 
     /**
+     * Determine if the collection has duplicate items.
+     *
+     * @param  (callable(TValue, TKey): mixed)|string|null  $key
+     * @return bool
+     */
+    public function hasDuplicate($key = null)
+    {
+        if (is_null($key)) {
+            return $this->duplicates($key)->isNotEmpty();
+        }
+        
+        return $this->duplicates()->isNotEmpty();
+    }
+
+    /**
      * Concatenate values of a given key as a string.
      *
      * @param  callable|string  $value
