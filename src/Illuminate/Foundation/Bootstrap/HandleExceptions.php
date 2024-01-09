@@ -9,10 +9,9 @@ use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Log\LogManager;
 use Illuminate\Support\Env;
 use Monolog\Handler\NullHandler;
-use ReflectionFunction;
+use PHPUnit\Runner\ErrorHandler;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\ErrorHandler\Error\FatalError;
-use PHPUnit\Runner\ErrorHandler;
 use Throwable;
 
 class HandleExceptions
