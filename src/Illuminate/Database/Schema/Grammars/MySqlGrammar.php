@@ -359,9 +359,8 @@ class MySqlGrammar extends Grammar
     {
         $version = $connection->getServerVersion();
 
-        if (($connection->isMaria() && version_compare($version, '10.5.2', '<'))
-            || (! $connection->isMaria() && version_compare($version, '8.0.3', '<'))
-        ) {
+        if (($connection->isMaria() && version_compare($version, '10.5.2', '<')) ||
+            (! $connection->isMaria() && version_compare($version, '8.0.3', '<'))) {
             $column = collect($connection->getSchemaBuilder()->getColumns($blueprint->getTable()))
                 ->firstWhere('name', $command->from);
 

@@ -21,7 +21,7 @@ class ShowCommand extends DatabaseInspectionCommand
                 {--json : Output the database information as JSON}
                 {--counts : Show the table row count <bg=red;options=bold> Note: This can be slow on large databases </>}
                 {--views : Show the database views <bg=red;options=bold> Note: This can be slow on large databases </>}
-                {--types : Show the user-defined types}';
+                {--types : Show the user defined types}';
 
     /**
      * The console command description.

@@ -237,7 +237,7 @@ class SQLiteGrammar extends Grammar
 
         // If this foreign key specifies the action to be taken on update we will add
         // that to the statement here. We'll append it to this SQL and then return
-        // the SQL so we can keep adding any other foreign constraints onto this.
+        // this SQL so we can keep adding any other foreign constraints to this.
         if (! is_null($foreign->onUpdate)) {
             $sql .= " on update {$foreign->onUpdate}";
         }
@@ -572,7 +572,7 @@ class SQLiteGrammar extends Grammar
         }
 
         if ($index['primary']) {
-            throw new RuntimeException('Sqlite does not support alter primary key.');
+            throw new RuntimeException('SQLite does not support altering primary keys.');
         }
 
         if ($index['unique']) {

@@ -38,9 +38,7 @@ class TableCommand extends DatabaseInspectionCommand
     public function handle(ConnectionResolverInterface $connections)
     {
         $connection = $connections->connection($this->input->getOption('database'));
-
         $schema = $connection->getSchemaBuilder();
-
         $tables = $schema->getTables();
 
         $tableName = $this->argument('table') ?: select(
