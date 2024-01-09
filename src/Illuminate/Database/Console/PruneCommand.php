@@ -116,13 +116,12 @@ class PruneCommand extends Command
     }
 
     /**
-     * Get the default path where models are located.
+     * Get the path where models are located.
      *
      * @return string
      */
     protected function getPath()
     {
-
         if (! empty($path = $this->option('path'))) {
             return $path;
         }
