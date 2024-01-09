@@ -8,7 +8,9 @@ use Exception;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Container\CircularDependencyException;
 use Illuminate\Contracts\Container\Container as ContainerContract;
+use Illuminate\Contracts\Container\DependencyResolver;
 use LogicException;
+use ReflectionAttribute;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionFunction;
@@ -974,12 +976,25 @@ class Container implements ArrayAccess, ContainerContract
                 continue;
             }
 
-            // If the class is null, it means the dependency is a string or some other
-            // primitive type which we can not resolve since it is not a class and
-            // we will just bomb out with an error since we have no-where to go.
-            $result = is_null(Util::getParameterClassName($dependency))
-                            ? $this->resolvePrimitive($dependency)
-                            : $this->resolveClass($dependency);
+            $resolvers = $dependency->getAttributes(
+                DependencyResolver::class,
+                ReflectionAttribute::IS_INSTANCEOF,
+            );
+
+            if (count($resolvers) > 0) {
+                if (count($resolvers) !== 1) {
+                    throw new LogicException('Parameter cannot have multiple dependency resolvers');
+                }
+
+                $result = array_values($resolvers)[0]->newInstance()->resolve($this);
+            } else {
+                // If the class is null, it means the dependency is a string or some other
+                // primitive type which we can not resolve since it is not a class and
+                // we will just bomb out with an error since we have no-where to go.
+                $result = is_null(Util::getParameterClassName($dependency))
+                                ? $this->resolvePrimitive($dependency)
+                                : $this->resolveClass($dependency);
+            }
 
             if ($dependency->isVariadic()) {
                 $results = array_merge($results, $result);

@@ -2,9 +2,12 @@
 
 namespace Illuminate\Tests\Container;
 
+use Attribute;
 use Illuminate\Container\Container;
 use Illuminate\Container\EntryNotFoundException;
 use Illuminate\Contracts\Container\BindingResolutionException;
+use Illuminate\Contracts\Container\Container as ContainerContract;
+use Illuminate\Contracts\Container\DependencyResolver;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerExceptionInterface;
 use stdClass;
@@ -148,6 +151,24 @@ class ContainerTest extends TestCase
     {
         $container = new Container;
         $this->assertInstanceOf(ContainerConcreteStub::class, $container->make(ContainerConcreteStub::class));
+    }
+
+    public function testDependencyResolverAttributes()
+    {
+        $container = new Container();
+        $result = $container->make(ContainerDependencyResolver::class);
+        $this->assertSame('bar', $result->foo);
+    }
+
+    public function testParametersTakePrecedentOverDependencyResolverAttributes()
+    {
+        $container = new Container();
+
+        $result = $container->make(ContainerDependencyResolver::class, [
+            'foo' => 'baz',
+        ]);
+
+        $this->assertSame('baz', $result->foo);
     }
 
     public function testSharedConcreteResolution()
@@ -716,6 +737,24 @@ class CircularCStub
 class ContainerConcreteStub
 {
     //
+}
+
+class ContainerDependencyResolver
+{
+    public function __construct(
+        #[AlwaysResolveAsBar]
+        public string $foo,
+    ) {
+    }
+}
+
+#[Attribute(Attribute::TARGET_PARAMETER)]
+class AlwaysResolveAsBar implements DependencyResolver
+{
+    public function resolve(ContainerContract $container): mixed
+    {
+        return 'bar';
+    }
 }
 
 interface IContainerContractStub
