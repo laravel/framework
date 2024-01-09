@@ -5,6 +5,7 @@ namespace Illuminate\Database\Schema\Grammars;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Schema\ColumnDefinition;
 use Illuminate\Support\Fluent;
 use RuntimeException;
 
@@ -356,13 +357,39 @@ class MySqlGrammar extends Grammar
      */
     public function compileRenameColumn(Blueprint $blueprint, Fluent $command, Connection $connection)
     {
-        return $connection->usingNativeSchemaOperations()
-            ? sprintf('alter table %s rename column %s to %s',
+        $version = $connection->getServerVersion();
+
+        if (($connection->isMaria() && version_compare($version, '10.5.2', '<')) ||
+            (! $connection->isMaria() && version_compare($version, '8.0.3', '<'))) {
+            $column = collect($connection->getSchemaBuilder()->getColumns($blueprint->getTable()))
+                ->firstWhere('name', $command->from);
+
+            $modifiers = $this->addModifiers($column['type'], $blueprint, new ColumnDefinition([
+                'change' => true,
+                'type' => match ($column['type_name']) {
+                    'bigint' => 'bigInteger',
+                    'int' => 'integer',
+                    'mediumint' => 'mediumInteger',
+                    'smallint' => 'smallInteger',
+                    'tinyint' => 'tinyInteger',
+                    default => $column['type_name'],
+                },
+                'nullable' => $column['nullable'],
+                'default' => $column['default'],
+                'autoIncrement' => $column['auto_increment'],
+                'collation' => $column['collation'],
+                'comment' => $column['comment'],
+            ]));
+
+            return sprintf('alter table %s change %s %s %s',
                 $this->wrapTable($blueprint),
                 $this->wrap($command->from),
-                $this->wrap($command->to)
-            )
-            : parent::compileRenameColumn($blueprint, $command, $connection);
+                $this->wrap($command->to),
+                $modifiers
+            );
+        }
+
+        return parent::compileRenameColumn($blueprint, $command, $connection);
     }
 
     /**
@@ -377,10 +404,6 @@ class MySqlGrammar extends Grammar
      */
     public function compileChange(Blueprint $blueprint, Fluent $command, Connection $connection)
     {
-        if (! $connection->usingNativeSchemaOperations()) {
-            return parent::compileChange($blueprint, $command, $connection);
-        }
-
         $columns = [];
 
         foreach ($blueprint->getChangedColumns() as $column) {

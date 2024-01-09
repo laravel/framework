@@ -3,8 +3,6 @@
 namespace Illuminate\Database\Schema\Grammars;
 
 use BackedEnum;
-use Doctrine\DBAL\Schema\AbstractSchemaManager as SchemaManager;
-use Doctrine\DBAL\Schema\TableDiff;
 use Illuminate\Contracts\Database\Query\Expression;
 use Illuminate\Database\Concerns\CompilesJsonPaths;
 use Illuminate\Database\Connection;
@@ -76,7 +74,11 @@ abstract class Grammar extends BaseGrammar
      */
     public function compileRenameColumn(Blueprint $blueprint, Fluent $command, Connection $connection)
     {
-        return RenameColumn::compile($this, $blueprint, $command, $connection);
+        return sprintf('alter table %s rename column %s to %s',
+            $this->wrapTable($blueprint),
+            $this->wrap($command->from),
+            $this->wrap($command->to)
+        );
     }
 
     /**
@@ -91,7 +93,7 @@ abstract class Grammar extends BaseGrammar
      */
     public function compileChange(Blueprint $blueprint, Fluent $command, Connection $connection)
     {
-        return ChangeColumn::compile($this, $blueprint, $command, $connection);
+        throw new LogicException('This database driver does not support modifying columns.');
     }
 
     /**
@@ -160,6 +162,18 @@ abstract class Grammar extends BaseGrammar
         }
 
         return $sql;
+    }
+
+    /**
+     * Compile a drop foreign key command.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $command
+     * @return string
+     */
+    public function compileDropForeign(Blueprint $blueprint, Fluent $command)
+    {
+        throw new RuntimeException('This database driver does not support dropping foreign keys.');
     }
 
     /**
@@ -317,22 +331,6 @@ abstract class Grammar extends BaseGrammar
         return is_bool($value)
                     ? "'".(int) $value."'"
                     : "'".(string) $value."'";
-    }
-
-    /**
-     * Create an empty Doctrine DBAL TableDiff from the Blueprint.
-     *
-     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
-     * @param  \Doctrine\DBAL\Schema\AbstractSchemaManager  $schema
-     * @return \Doctrine\DBAL\Schema\TableDiff
-     */
-    public function getDoctrineTableDiff(Blueprint $blueprint, SchemaManager $schema)
-    {
-        $tableName = $this->getTablePrefix().$blueprint->getTable();
-
-        $table = $schema->introspectTable($tableName);
-
-        return $schema->createComparator()->compareTables(oldTable: $table, newTable: $table);
     }
 
     /**

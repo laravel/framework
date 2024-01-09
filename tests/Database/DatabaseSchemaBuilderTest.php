@@ -2,10 +2,8 @@
 
 namespace Illuminate\Tests\Database;
 
-use Doctrine\DBAL\Schema\Column;
-use Doctrine\DBAL\Types\Type;
 use Illuminate\Database\Connection;
-use Illuminate\Database\Query\Processors\PostgresProcessor;
+use Illuminate\Database\Query\Processors\Processor;
 use Illuminate\Database\Schema\Builder;
 use Illuminate\Database\Schema\Grammars\Grammar;
 use LogicException;
@@ -50,7 +48,7 @@ class DatabaseSchemaBuilderTest extends TestCase
     {
         $connection = m::mock(Connection::class);
         $grammar = m::mock(stdClass::class);
-        $processor = m::mock(PostgresProcessor::class);
+        $processor = m::mock(Processor::class);
         $connection->shouldReceive('getSchemaGrammar')->andReturn($grammar);
         $connection->shouldReceive('getPostProcessor')->andReturn($processor);
         $builder = new Builder($connection);
@@ -77,16 +75,15 @@ class DatabaseSchemaBuilderTest extends TestCase
     public function testGetColumnTypeAddsPrefix()
     {
         $connection = m::mock(Connection::class);
-        $column = m::mock(Column::class);
-        $type = m::mock(Type::class);
         $grammar = m::mock(Grammar::class);
+        $processor = m::mock(Processor::class);
         $connection->shouldReceive('getSchemaGrammar')->once()->andReturn($grammar);
+        $connection->shouldReceive('getPostProcessor')->andReturn($processor);
+        $processor->shouldReceive('processColumns')->once()->andReturn([['name' => 'id', 'type_name' => 'integer']]);
         $builder = new Builder($connection);
         $connection->shouldReceive('getTablePrefix')->once()->andReturn('prefix_');
-        $connection->shouldReceive('getDoctrineColumn')->once()->with('prefix_users', 'id')->andReturn($column);
-        $connection->shouldReceive('usingNativeSchemaOperations')->once()->andReturn(false);
-        $column->shouldReceive('getType')->once()->andReturn($type);
-        $type->shouldReceive('lookupName')->once()->andReturn('integer');
+        $grammar->shouldReceive('compileColumns')->once()->with('prefix_users')->andReturn('sql');
+        $connection->shouldReceive('selectFromWriteConnection')->once()->with('sql')->andReturn([['name' => 'id', 'type_name' => 'integer']]);
 
         $this->assertSame('integer', $builder->getColumnType('users', 'id'));
     }

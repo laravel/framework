@@ -34,13 +34,8 @@
             "dev-master": "11.x-dev"
         }
     },
-    "conflict": {
-        "carbonphp/carbon-doctrine-types": "<3.0.0|>=4.0",
-        "doctrine/dbal": "<4.0.0|>=5.0"
-    },
     "suggest": {
         "ext-filter": "Required to use the Postgres database driver.",
-        "doctrine/dbal": "Required to rename columns and drop SQLite columns (^4.0).",
         "fakerphp/faker": "Required to use the eloquent factory builder (^1.21).",
         "illuminate/console": "Required to use the database commands (^11.0).",
         "illuminate/events": "Required to use the observers with Eloquent (^11.0).",

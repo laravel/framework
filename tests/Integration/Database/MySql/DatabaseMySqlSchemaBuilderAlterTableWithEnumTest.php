@@ -39,10 +39,10 @@ class DatabaseMySqlSchemaBuilderAlterTableWithEnumTest extends MySqlTestCase
     public function testChangeColumnOnTableWithEnum()
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->unsignedInteger('age')->charset('')->change();
+            $table->unsignedInteger('age')->change();
         });
 
-        $this->assertSame('integer', Schema::getColumnType('users', 'age'));
+        $this->assertSame('int', Schema::getColumnType('users', 'age'));
     }
 
     public function testGetAllTablesAndColumnListing()
