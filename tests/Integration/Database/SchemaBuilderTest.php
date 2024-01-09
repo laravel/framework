@@ -341,7 +341,7 @@ class SchemaBuilderTest extends DatabaseTestCase
         ));
     }
 
-    public function testAlteringTableWithForeignKeyConstraintsEnabledOnSqlite()
+    public function testAlteringTableWithForeignKeyConstraintsEnabled()
     {
         Schema::enableForeignKeyConstraints();
 

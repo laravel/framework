@@ -10,6 +10,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
 use PDO;
+use RuntimeException;
 
 /**
  * @mixin \Illuminate\Database\Connection
