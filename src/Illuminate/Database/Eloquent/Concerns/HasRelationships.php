@@ -149,7 +149,7 @@ trait HasRelationships
         );
     }
 
-     /**
+    /**
      * Define a belongs-to-through relationship.
      *
      * @param  string  $related
@@ -170,7 +170,7 @@ trait HasRelationships
 
         return $this->newHasOneThrough(
             $this->newRelatedInstance($related)->newQuery(), $this, $through,
-            $localKey ?: $this->getKeyName(),  $secondLocalKey ?: $through->getKeyName(),
+            $localKey ?: $this->getKeyName(), $secondLocalKey ?: $through->getKeyName(),
             $firstKey, $secondKey,
         );
     }
