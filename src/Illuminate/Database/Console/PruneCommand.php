@@ -24,9 +24,9 @@ class PruneCommand extends Command
     protected $signature = 'model:prune
                                 {--model=* : Class names of the models to be pruned}
                                 {--except=* : Class names of the models to be excluded from pruning}
+                                {--path=* : Absolute path(s) to directories where models are located}
                                 {--chunk=1000 : The number of models to retrieve per chunk of models to be deleted}
-                                {--pretend : Display the number of prunable records found instead of deleting them}
-                                {--path=* : Absolute path(s) to directories where models are located}';
+                                {--pretend : Display the number of prunable records found instead of deleting them}';
 
     /**
      * The console command description.
@@ -149,12 +149,14 @@ class PruneCommand extends Command
     /**
      * Get the path where models are located.
      *
-     * @return string|string[]
+     * @return string[]|string
      */
     protected function getPath()
     {
         if (! empty($path = $this->option('path'))) {
-            return $path;
+            return collect($path)->map(function ($path) {
+                return base_path($path);
+            })->all();
         }
 
         return app_path('Models');
