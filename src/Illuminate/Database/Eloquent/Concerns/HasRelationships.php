@@ -149,6 +149,32 @@ trait HasRelationships
         );
     }
 
+     /**
+     * Define a belongs-to-through relationship.
+     *
+     * @param  string  $related
+     * @param  string  $through
+     * @param  string|null  $firstKey
+     * @param  string|null  $secondKey
+     * @param  string|null  $localKey
+     * @param  string|null  $secondLocalKey
+     * @return \Illuminate\Database\Eloquent\Relations\HasOneThrough
+     */
+    public function belongsToThrough($related, $through, $firstKey = null, $secondKey = null, $localKey = null, $secondLocalKey = null)
+    {
+        $through = $this->newRelatedThroughInstance($through);
+
+        $firstKey = $firstKey ?: $this->getForeignKey();
+
+        $secondKey = $secondKey ?: $through->getForeignKey();
+
+        return $this->newHasOneThrough(
+            $this->newRelatedInstance($related)->newQuery(), $this, $through,
+            $localKey ?: $this->getKeyName(),  $secondLocalKey ?: $through->getKeyName(),
+            $firstKey, $secondKey,
+        );
+    }
+
     /**
      * Instantiate a new HasOneThrough relationship.
      *
