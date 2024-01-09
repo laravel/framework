@@ -12,7 +12,14 @@ class TrustProxies
      *
      * @var array<int, string>|string|null
      */
-    protected $proxies = '*';
+    protected $proxies;
+
+    /**
+     * The proxies that have been configured to always be trusted.
+     *
+     * @var array<int, string>|string|null
+     */
+    protected static $alwaysTrust;
 
     /**
      * The proxy header mappings.
@@ -113,12 +120,33 @@ class TrustProxies
     }
 
     /**
+     * Specify that all proxies should be trusted.
+     *
+     * @return void
+     */
+    public static function all()
+    {
+        return static::at('*');
+    }
+
+    /**
+     * Specify IP addresses of proxies that should always be trusted.
+     *
+     * @param  array|string  $proxies
+     * @return void
+     */
+    public static function at(array|string $proxies)
+    {
+        static::$alwaysTrust = $proxies;
+    }
+
+    /**
      * Get the trusted proxies.
      *
      * @return array|string|null
      */
     protected function proxies()
     {
-        return $this->proxies;
+        return static::$alwaysTrust ?: $this->proxies;
     }
 }

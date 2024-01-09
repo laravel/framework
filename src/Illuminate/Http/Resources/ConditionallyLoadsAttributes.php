@@ -320,6 +320,10 @@ trait ConditionallyLoadsAttributes
      */
     public function whenAggregated($relationship, $column, $aggregate, $value = null, $default = null)
     {
+        if (func_num_args() < 5) {
+            $default = new MissingValue;
+        }
+
         $attribute = (string) Str::of($relationship)->snake()->append('_')->append($aggregate)->append('_')->finish($column);
 
         if (! isset($this->resource->getAttributes()[$attribute])) {

@@ -8,6 +8,7 @@ use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Bootstrap\HandleExceptions;
+use Illuminate\Foundation\Console\AboutCommand;
 use Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull;
 use Illuminate\Foundation\Http\Middleware\TrimStrings;
 use Illuminate\Queue\Queue;
@@ -239,6 +240,7 @@ abstract class TestCase extends BaseTestCase
         $this->originalExceptionHandler = null;
         $this->originalDeprecationHandler = null;
 
+        AboutCommand::flushState();
         Artisan::forgetBootstrappers();
         Component::flushCache();
         Component::forgetComponentsResolver();
