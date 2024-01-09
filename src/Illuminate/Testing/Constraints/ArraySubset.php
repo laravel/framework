@@ -5,22 +5,23 @@ namespace Illuminate\Testing\Constraints;
 use ArrayObject;
 use PHPUnit\Framework\Constraint\Constraint;
 use SebastianBergmann\Comparator\ComparisonFailure;
+use SebastianBergmann\Exporter\Exporter;
 use Traversable;
 
 /**
  * @internal This class is not meant to be used or overwritten outside the framework itself.
  */
-final class ArraySubset extends Constraint
+final readonly class ArraySubset extends Constraint
 {
     /**
      * @var iterable
      */
-    private $subset;
+    private iterable $subset;
 
     /**
      * @var bool
      */
-    private $strict;
+    private bool $strict;
 
     /**
      * Create a new array subset constraint instance.
@@ -58,9 +59,9 @@ final class ArraySubset extends Constraint
         // type cast $other & $this->subset as an array to allow
         // support in standard array functions.
         $other = $this->toArray($other);
-        $this->subset = $this->toArray($this->subset);
+        $subset = $this->toArray($this->subset);
 
-        $patched = array_replace_recursive($other, $this->subset);
+        $patched = array_replace_recursive($other, $subset);
 
         if ($this->strict) {
             $result = $other === $patched;
@@ -95,7 +96,7 @@ final class ArraySubset extends Constraint
      */
     public function toString(): string
     {
-        return 'has the subset '.$this->exporter()->export($this->subset);
+        return 'has the subset '.(new Exporter)->export($this->subset);
     }
 
     /**

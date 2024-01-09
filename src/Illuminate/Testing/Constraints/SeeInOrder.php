@@ -5,21 +5,21 @@ namespace Illuminate\Testing\Constraints;
 use PHPUnit\Framework\Constraint\Constraint;
 use ReflectionClass;
 
-class SeeInOrder extends Constraint
+readonly class SeeInOrder extends Constraint
 {
     /**
      * The string under validation.
      *
      * @var string
      */
-    protected $content;
+    protected string $content;
 
     /**
      * The last value that failed to pass validation.
      *
      * @var string
      */
-    protected $failedValue;
+    protected string $failedValue;
 
     /**
      * Create a new constraint instance.

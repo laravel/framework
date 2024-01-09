@@ -6,28 +6,28 @@ use Illuminate\Contracts\Database\Query\Expression;
 use Illuminate\Database\Connection;
 use PHPUnit\Framework\Constraint\Constraint;
 
-class HasInDatabase extends Constraint
+readonly class HasInDatabase extends Constraint
 {
     /**
      * Number of records that will be shown in the console in case of failure.
      *
      * @var int
      */
-    protected $show = 3;
+    protected int $show;
 
     /**
      * The database connection.
      *
      * @var \Illuminate\Database\Connection
      */
-    protected $database;
+    protected Connection $database;
 
     /**
      * The data that will be used to narrow the search in the database table.
      *
      * @var array
      */
-    protected $data;
+    protected array $data;
 
     /**
      * Create a new constraint instance.
@@ -41,6 +41,8 @@ class HasInDatabase extends Constraint
         $this->data = $data;
 
         $this->database = $database;
+
+        $this->show = 3;
     }
 
     /**

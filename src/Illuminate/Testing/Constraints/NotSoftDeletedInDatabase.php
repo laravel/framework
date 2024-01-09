@@ -5,35 +5,35 @@ namespace Illuminate\Testing\Constraints;
 use Illuminate\Database\Connection;
 use PHPUnit\Framework\Constraint\Constraint;
 
-class NotSoftDeletedInDatabase extends Constraint
+readonly class NotSoftDeletedInDatabase extends Constraint
 {
     /**
      * Number of records that will be shown in the console in case of failure.
      *
      * @var int
      */
-    protected $show = 3;
+    protected int $show;
 
     /**
      * The database connection.
      *
      * @var \Illuminate\Database\Connection
      */
-    protected $database;
+    protected Connection $database;
 
     /**
      * The data that will be used to narrow the search in the database table.
      *
      * @var array
      */
-    protected $data;
+    protected array $data;
 
     /**
      * The name of the column that indicates soft deletion has occurred.
      *
      * @var string
      */
-    protected $deletedAtColumn;
+    protected string $deletedAtColumn;
 
     /**
      * Create a new constraint instance.
@@ -46,8 +46,12 @@ class NotSoftDeletedInDatabase extends Constraint
     public function __construct(Connection $database, array $data, string $deletedAtColumn)
     {
         $this->database = $database;
+
         $this->data = $data;
+
         $this->deletedAtColumn = $deletedAtColumn;
+
+        $this->show = 3;
     }
 
     /**

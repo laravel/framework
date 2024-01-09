@@ -6,28 +6,28 @@ use Illuminate\Database\Connection;
 use PHPUnit\Framework\Constraint\Constraint;
 use ReflectionClass;
 
-class CountInDatabase extends Constraint
+readonly class CountInDatabase extends Constraint
 {
     /**
      * The database connection.
      *
      * @var \Illuminate\Database\Connection
      */
-    protected $database;
+    protected Connection $database;
 
     /**
      * The expected table entries count that will be checked against the actual count.
      *
      * @var int
      */
-    protected $expectedCount;
+    protected int $expectedCount;
 
     /**
      * The actual table entries count that will be checked against the expected count.
      *
-     * @var int
+     * @var int|null
      */
-    protected $actualCount;
+    protected int|null $actualCount;
 
     /**
      * Create a new constraint instance.
