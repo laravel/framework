@@ -385,4 +385,33 @@ class SchemaBuilderTest extends DatabaseTestCase
 
         DB::statement('create table `test` (`foo` int) WITH system versioning;');
     }
+
+    public function testAddingMacros()
+    {
+        Schema::macro('foo', fn () => 'foo');
+
+        $this->assertEquals('foo', Schema::foo());
+
+        Schema::macro('hasForeignKeyForColumn', function (string $column, string $table, string $foreignTable) {
+            return collect(Schema::getForeignKeys($table))
+                ->contains(function (array $foreignKey) use ($column, $foreignTable) {
+                    return collect($foreignKey['columns'])->contains($column)
+                        && $foreignKey['foreign_table'] == $foreignTable;
+                });
+        });
+
+        Schema::create('questions', function (Blueprint $table) {
+            $table->id();
+            $table->string('body');
+        });
+
+        Schema::create('answers', function (Blueprint $table) {
+            $table->id();
+            $table->string('body');
+            $table->foreignId('question_id')->constrained();
+        });
+
+        $this->assertTrue(Schema::hasForeignKeyForColumn('question_id', 'answers', 'questions'));
+        $this->assertFalse(Schema::hasForeignKeyForColumn('body', 'answers', 'questions'));
+    }
 }
