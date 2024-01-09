@@ -24,7 +24,7 @@ class PruneCommand extends Command
                                 {--except=* : Class names of the models to be excluded from pruning}
                                 {--chunk=1000 : The number of models to retrieve per chunk of models to be deleted}
                                 {--pretend : Display the number of prunable records found instead of deleting them}
-                                {--path=Models : The default path where models are located}';
+                                {--path=* : Absolute path(s) to directories where models are located}';
 
     /**
      * The console command description.
@@ -97,7 +97,7 @@ class PruneCommand extends Command
             throw new InvalidArgumentException('The --models and --except options cannot be combined.');
         }
 
-        return collect((new Finder)->in($this->getDefaultPath())->files()->name('*.php'))
+        return collect((new Finder)->in($this->getPath())->files()->name('*.php'))
             ->map(function ($model) {
                 $namespace = $this->laravel->getNamespace();
 
@@ -120,9 +120,14 @@ class PruneCommand extends Command
      *
      * @return string
      */
-    protected function getDefaultPath()
+    protected function getPath()
     {
-        return app_path($this->option('path'));
+
+        if (! empty($path = $this->option('path'))) {
+            return $path;
+        }
+
+        return app_path('Models');
     }
 
     /**
