@@ -46,12 +46,17 @@ class Number
      *
      * @param  int|float  $number
      * @param  string|null  $locale
+     * @param  int|null  $after
      * @param  int|null  $until
      * @return string
      */
-    public static function spell(int|float $number, ?string $locale = null, ?int $until = null)
+    public static function spell(int|float $number, ?string $locale = null, ?int $after = null, ?int $until = null)
     {
         static::ensureIntlExtensionIsInstalled();
+
+        if (! is_null($after) && $number <= $after) {
+            return static::format($number, locale: $locale);
+        }
 
         if (! is_null($until) && $number >= $until) {
             return static::format($number, locale: $locale);
