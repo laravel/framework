@@ -51,7 +51,7 @@ abstract class Controller
      */
     public function callAction($method, $parameters)
     {
-        return call_user_func_array([$this, $method], $parameters);
+        return $this->{$method}(...array_values($parameters));
     }
 
     /**
