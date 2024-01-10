@@ -209,7 +209,8 @@ class Mailable implements MailableContract, Renderable
                      ->buildTags($message)
                      ->buildMetadata($message)
                      ->runCallbacks($message)
-                     ->buildAttachments($message);
+                     ->buildAttachments($message)
+                     ->beforeSending();
             });
         });
     }
@@ -1770,6 +1771,16 @@ class Mailable implements MailableContract, Renderable
     {
         $this->mailer = $mailer;
 
+        return $this;
+    }
+
+    /**
+     * Register a callback to be called before the mailable is sent.
+     *
+     * @return $this
+     */
+    public function beforeSending()
+    {
         return $this;
     }
 

@@ -1194,6 +1194,32 @@ class MailMailableTest extends TestCase
         $mailable->assertHasMetadata('user_id', 1);
         $mailable->assertHasSubject('test subject');
     }
+
+    public function testBeforeSending()
+    {
+        $view = m::mock(Factory::class);
+
+        $mailer = new Mailer('array', $view, new ArrayTransport);
+
+        $mailable = new class() extends Mailable
+        {
+            public function beforeSending()
+            {
+                throw new \Exception('Do not send mail.');
+            }
+
+            public function build()
+            {
+                $this
+                    ->to('hello@laravel.com')
+                    ->html('Test content');
+            }
+        };
+
+        $this->expectExceptionMessage('Do not send mail.');
+
+        $mailer->send($mailable);
+    }
 }
 
 class MailableHeadersStub extends Mailable
