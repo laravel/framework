@@ -29,7 +29,7 @@ trait ConfiguresPrompts
 
         Prompt::interactive(($input->isInteractive() && defined('STDIN') && stream_isatty(STDIN)) || $this->laravel->runningUnitTests());
 
-        Prompt::validateUsing($this->validatePrompt(...));
+        Prompt::validateUsing(fn (Prompt $prompt) => $this->validatePrompt($prompt->value(), $prompt->validate));
 
         Prompt::fallbackWhen(windows_os() || $this->laravel->runningUnitTests());
 
@@ -143,17 +143,15 @@ trait ConfiguresPrompts
                 }
             }
 
-            if ($validate) {
-                $error = $validate($result);
+            $error = is_callable($validate) ? $validate($result) : $this->validatePrompt($result, $validate);
 
-                if (is_string($error) && strlen($error) > 0) {
-                    $this->components->error($error);
+            if (is_string($error) && strlen($error) > 0) {
+                $this->components->error($error);
 
-                    if ($this->laravel->runningUnitTests()) {
-                        throw new PromptValidationException;
-                    } else {
-                        continue;
-                    }
+                if ($this->laravel->runningUnitTests()) {
+                    throw new PromptValidationException;
+                } else {
+                    continue;
                 }
             }
 
@@ -174,22 +172,25 @@ trait ConfiguresPrompts
     /**
      * Validate the given prompt.
      *
-     * @param  Prompt  $prompt
+     * @param  mixed  $value
+     * @param  mixed  $rules
      * @return ?string
      */
-    protected function validatePrompt(Prompt $prompt)
+    protected function validatePrompt($value, $rules)
     {
-        if (! $rules = $prompt->validate) {
+        if (! $rules) {
             return null;
         }
 
-        [$field, $value, $messages, $attributes] = ['answer', $prompt->value(), $this->messages(), $this->attributes()];
+        $field = 'answer';
 
         if (is_array($rules) && ! array_is_list($rules)) {
-            [$field => $rules] = $rules;
+            [$field, $rules] = [key($rules), current($rules)];
         }
 
-        return Validator::make([$field => $value], [$field => $rules], $messages, $attributes)->errors()->first();
+        return Validator::make([$field => $value], [$field => $rules], $this->messages(), $this->attributes())
+            ->errors()
+            ->first();
     }
 
     /**
