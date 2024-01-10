@@ -75,7 +75,7 @@ jobs:
         with:
           timeout_minutes: 5
           max_attempts: 5
-          command: composer require phpunit/phpunit:~${{ matrix.phpunit }} --dev --no-interaction --no-update
+          command: composer require phpunit/phpunit:^${{ matrix.phpunit }} --dev --no-interaction --no-update
 
       - name: Install dependencies
         uses: nick-fields/retry@v2
