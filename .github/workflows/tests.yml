@@ -40,9 +40,10 @@ jobs:
       fail-fast: true
       matrix:
         php: [8.2, 8.3]
+        phpunit: ['10.5', '11.0']
         stability: [prefer-lowest, prefer-stable]
 
-    name: PHP ${{ matrix.php }} - ${{ matrix.stability }}
+    name: PHP ${{ matrix.php }} - PHPUnit ${{ matrix.phpunit }} - ${{ matrix.stability }}
 
     steps:
       - name: Checkout code
@@ -68,6 +69,13 @@ jobs:
           timeout_minutes: 5
           max_attempts: 5
           command: composer require guzzlehttp/psr7:^2.4 --no-interaction --no-update
+
+      - name: Set PHPUnit
+        uses: nick-fields/retry@v2
+        with:
+          timeout_minutes: 5
+          max_attempts: 5
+          command: composer require phpunit/phpunit:^${{ matrix.phpunit }} --dev --no-interaction --no-update
 
       - name: Install dependencies
         uses: nick-fields/retry@v2
@@ -101,9 +109,10 @@ jobs:
       fail-fast: true
       matrix:
         php: [8.2, 8.3]
+        phpunit: ['10.5', '11.0']
         stability: [prefer-lowest, prefer-stable]
 
-    name: PHP ${{ matrix.php }} - ${{ matrix.stability }} - Windows
+    name: PHP ${{ matrix.php }} - PHPUnit ${{ matrix.phpunit }} - ${{ matrix.stability }} - Windows
 
     steps:
       - name: Set git to use LF
@@ -130,6 +139,13 @@ jobs:
           timeout_minutes: 5
           max_attempts: 5
           command: composer require guzzlehttp/psr7:~2.4 --no-interaction --no-update
+
+      - name: Set PHPUnit
+        uses: nick-fields/retry@v2
+        with:
+          timeout_minutes: 5
+          max_attempts: 5
+          command: composer require phpunit/phpunit:~${{ matrix.phpunit }} --dev --no-interaction --no-update
 
       - name: Install dependencies
         uses: nick-fields/retry@v2
