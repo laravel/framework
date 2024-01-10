@@ -202,7 +202,7 @@ abstract class Factory
     public function raw($attributes = [], ?Model $parent = null)
     {
         $count = $this->getCount();
-        
+
         if ($count === null) {
             return $this->state($attributes)->getExpandedAttributes($parent);
         }
@@ -385,7 +385,7 @@ abstract class Factory
     public function make($attributes = [], ?Model $parent = null)
     {
         $count = $this->getCount();
-   
+
         if (! empty($attributes)) {
             return $this->state($attributes)->make([], $parent);
         }
@@ -731,14 +731,15 @@ abstract class Factory
     }
 
     /**
-     * Get the count variable and maybe convert it to int
+     * Get the count variable and maybe convert it to int.
      *
      * @return int|null
      */
-    protected function getCount() {
+    protected function getCount()
+    {
         $count = $this->count;
 
-        if(is_callable($count)) {
+        if (is_callable($count)) {
             return $count();
         }
 
@@ -811,7 +812,7 @@ abstract class Factory
         };
 
         return $this->model ?? $resolver($this);
-    }    
+    }
 
     /**
      * Specify the callback that should be invoked to guess model names based on factory names.
