@@ -269,9 +269,7 @@ class SQLiteGrammar extends Grammar
     {
         $columns = $this->prefixArray('add column', $this->getColumns($blueprint));
 
-        return collect($columns)->reject(function ($column) {
-            return preg_match('/as \(.*\) stored/', $column) > 0;
-        })->map(function ($column) use ($blueprint) {
+        return collect($columns)->map(function ($column) use ($blueprint) {
             return 'alter table '.$this->wrapTable($blueprint).' '.$column;
         })->all();
     }

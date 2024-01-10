@@ -387,6 +387,24 @@ class SchemaBuilderTest extends DatabaseTestCase
         DB::statement('create table `test` (`foo` int) WITH system versioning;');
     }
 
+    public function testAddingStoredColumnOnSqlite()
+    {
+        if ($this->driver !== 'sqlite') {
+            $this->markTestSkipped('Test requires a SQLite connection.');
+        }
+
+        Schema::create('test', function (Blueprint $table) {
+            $table->integer('price');
+        });
+
+        Schema::table('test', function (Blueprint $table) {
+            $table->integer('virtual_column')->virtualAs('"price" - 5');
+            $table->integer('stored_column')->storedAs('"price" - 5');
+        });
+
+        $this->assertTrue(Schema::hasColumns('test', ['virtual_column', 'stored_column']));
+    }
+
     public function testAddingMacros()
     {
         Schema::macro('foo', fn () => 'foo');
