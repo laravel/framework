@@ -344,4 +344,26 @@ class PendingBatch
             new BatchDispatched($batch)
         );
     }
+
+    /**
+     * Dispatch the batch if the given truth test passes.
+     *
+     * @param  bool|\Closure  $boolean
+     * @return \Illuminate\Bus\Batch|null
+     */
+    public function dispatchIf($boolean)
+    {
+        return value($boolean) ? $this->dispatch() : null;
+    }
+
+    /**
+     * Dispatch the batch unless the given truth test passes.
+     *
+     * @param  bool|\Closure  $boolean
+     * @return \Illuminate\Bus\Batch|null
+     */
+    public function dispatchUnless($boolean)
+    {
+        return ! value($boolean) ? $this->dispatch() : null;
+    }
 }
