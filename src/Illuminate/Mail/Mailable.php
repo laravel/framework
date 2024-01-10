@@ -1775,7 +1775,7 @@ class Mailable implements MailableContract, Renderable
     }
 
     /**
-     * Register a callback to be called before the mailable is sent.
+     * Perform any work that should take place before the mailable is sent.
      *
      * @return $this
      */
