@@ -328,6 +328,7 @@ class HandleExceptions
     {
         while (true) {
             $previousHandler = set_exception_handler(static fn () => null);
+
             restore_exception_handler();
 
             if ($previousHandler === null) {
@@ -339,6 +340,7 @@ class HandleExceptions
 
         while (true) {
             $previousHandler = set_error_handler(static fn () => null);
+
             restore_error_handler();
 
             if ($previousHandler === null) {
