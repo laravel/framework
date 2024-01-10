@@ -3,7 +3,6 @@
 namespace Illuminate\Console\Concerns;
 
 use Illuminate\Console\PromptValidationException;
-use Illuminate\Support\Facades\Validator;
 use Laravel\Prompts\ConfirmPrompt;
 use Laravel\Prompts\MultiSearchPrompt;
 use Laravel\Prompts\MultiSelectPrompt;
@@ -188,9 +187,25 @@ trait ConfiguresPrompts
             [$field, $rules] = [key($rules), current($rules)];
         }
 
-        return Validator::make([$field => $value], [$field => $rules], $this->messages(), $this->attributes())
-            ->errors()
-            ->first();
+        return $this->getValidatorInstance($field, $value, $rules)->errors()->first();
+    }
+
+    /**
+     * Get the validator instance.
+     *
+     * @param  string  $value
+     * @param  mixed  $value
+     * @param  mixed  $rules
+     * @return \Illuminate\Validation\Validator
+     */
+    protected function getValidatorInstance($field, $value, $rules)
+    {
+        return $this->laravel['validator']->make(
+            [$field => $value],
+            [$field => $rules],
+            $this->validationMessages(),
+            $this->validationAttributes(),
+        );
     }
 
     /**
@@ -198,7 +213,7 @@ trait ConfiguresPrompts
      *
      * @return array
      */
-    protected function messages()
+    protected function validationMessages()
     {
         return [];
     }
@@ -208,7 +223,7 @@ trait ConfiguresPrompts
      *
      * @return array
      */
-    protected function attributes()
+    protected function validationAttributes()
     {
         return [];
     }
