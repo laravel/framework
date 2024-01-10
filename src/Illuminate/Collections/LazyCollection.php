@@ -1062,7 +1062,7 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
      */
     public function shuffle()
     {
-        return $this->passthru('shuffle');
+        return $this->passthru('shuffle', []);
     }
 
     /**
