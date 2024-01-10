@@ -75,7 +75,7 @@ class Js implements Htmlable, Stringable
             $data = $data->value;
         }
 
-        $json = static::encode($data, $flags, $depth);
+        $json = (string) static::encode($data, $flags, $depth);
 
         if (is_string($data)) {
             return "'".substr($json, 1, -1)."'";
@@ -90,21 +90,21 @@ class Js implements Htmlable, Stringable
      * @param  mixed  $data
      * @param  int  $flags
      * @param  int  $depth
-     * @return string
+     * @return \Illuminate\Contracts\Support\Htmlable
      *
      * @throws \JsonException
      */
-    public static function encode($data, $flags = 0, $depth = 512)
+    public static function encode($data, $flags = 0, $depth = 512): Htmlable
     {
         if ($data instanceof Jsonable) {
-            return $data->toJson($flags | static::REQUIRED_FLAGS);
+            return new HtmlString($data->toJson($flags | static::REQUIRED_FLAGS));
         }
 
         if ($data instanceof Arrayable && ! ($data instanceof JsonSerializable)) {
             $data = $data->toArray();
         }
 
-        return json_encode($data, $flags | static::REQUIRED_FLAGS, $depth);
+        return new HtmlString(json_encode($data, $flags | static::REQUIRED_FLAGS, $depth));
     }
 
     /**

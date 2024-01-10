@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Support;
 
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
+use Illuminate\Support\HtmlString;
 use Illuminate\Support\Js;
 use Illuminate\Tests\Support\Fixtures\IntBackedEnum;
 use Illuminate\Tests\Support\Fixtures\StringBackedEnum;
@@ -129,5 +130,16 @@ class SupportJsTest extends TestCase
     {
         $this->assertSame('2', (string) Js::from(IntBackedEnum::TWO));
         $this->assertSame("'Hello world'", (string) Js::from(StringBackedEnum::HELLO_WORLD));
+    }
+
+    public function testEncode()
+    {
+        $json = Js::encode(['foo' => 'hello', 'bar' => 'world']);
+
+        $this->assertInstanceOf(HtmlString::class, $json);
+        $this->assertEquals(
+            '{"foo":"hello","bar":"world"}',
+            (string) $json
+        );
     }
 }
