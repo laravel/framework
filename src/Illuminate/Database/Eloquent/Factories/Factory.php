@@ -201,13 +201,15 @@ abstract class Factory
      */
     public function raw($attributes = [], ?Model $parent = null)
     {
-        if ($this->count === null) {
+        $count = $this->getCount();
+        
+        if ($count === null) {
             return $this->state($attributes)->getExpandedAttributes($parent);
         }
 
         return array_map(function () use ($attributes, $parent) {
             return $this->state($attributes)->getExpandedAttributes($parent);
-        }, range(1, $this->count));
+        }, range(1, $count));
     }
 
     /**
@@ -241,7 +243,7 @@ abstract class Factory
     public function createMany(int|iterable|null $records = null)
     {
         if (is_null($records)) {
-            $records = $this->count ?? 1;
+            $records = $this->getCount() ?? 1;
         }
 
         if (is_numeric($records)) {
@@ -382,23 +384,25 @@ abstract class Factory
      */
     public function make($attributes = [], ?Model $parent = null)
     {
+        $count = $this->getCount();
+   
         if (! empty($attributes)) {
             return $this->state($attributes)->make([], $parent);
         }
 
-        if ($this->count === null) {
+        if ($count === null) {
             return tap($this->makeInstance($parent), function ($instance) {
                 $this->callAfterMaking(collect([$instance]));
             });
         }
 
-        if ($this->count < 1) {
+        if ($count < 1) {
             return $this->newModel()->newCollection();
         }
 
         $instances = $this->newModel()->newCollection(array_map(function () use ($parent) {
             return $this->makeInstance($parent);
-        }, range(1, $this->count)));
+        }, range(1, $count)));
 
         $this->callAfterMaking($instances);
 
@@ -718,12 +722,27 @@ abstract class Factory
     /**
      * Specify how many models should be generated.
      *
-     * @param  int|null  $count
+     * @param  int|callable|null  $count
      * @return static
      */
-    public function count(?int $count)
+    public function count(int|callable|null $count)
     {
         return $this->newInstance(['count' => $count]);
+    }
+
+    /**
+     * Get the count variable and maybe convert it to int
+     *
+     * @return int|null
+     */
+    protected function getCount() {
+        $count = $this->count;
+
+        if(is_callable($count)) {
+            return $count();
+        }
+
+        return $count;
     }
 
     /**
@@ -792,7 +811,7 @@ abstract class Factory
         };
 
         return $this->model ?? $resolver($this);
-    }
+    }    
 
     /**
      * Specify the callback that should be invoked to guess model names based on factory names.
