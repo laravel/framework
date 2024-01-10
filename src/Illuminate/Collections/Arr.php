@@ -6,6 +6,7 @@ use ArgumentCountError;
 use ArrayAccess;
 use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
+use Random\Randomizer;
 
 class Arr
 {
@@ -661,24 +662,24 @@ class Arr
             );
         }
 
+        if (empty($array) || (! is_null($number) && $number <= 0)) {
+            return is_null($number) ? null : [];
+        }
+
+        $keys = (new Randomizer)->pickArrayKeys($array, $requested);
+
         if (is_null($number)) {
-            return $array[array_rand($array)];
+            return $array[$keys[0]];
         }
-
-        if ((int) $number === 0) {
-            return [];
-        }
-
-        $keys = array_rand($array, $number);
 
         $results = [];
 
         if ($preserveKeys) {
-            foreach ((array) $keys as $key) {
+            foreach ($keys as $key) {
                 $results[$key] = $array[$key];
             }
         } else {
-            foreach ((array) $keys as $key) {
+            foreach ($keys as $key) {
                 $results[] = $array[$key];
             }
         }
