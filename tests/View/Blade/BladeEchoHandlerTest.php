@@ -81,6 +81,34 @@ class BladeEchoHandlerTest extends AbstractBladeTestCase
     }
 
     /**
+     * @dataProvider handlerWorksWithIterableDataProvider
+     */
+    public function testHandlerWorksWithIterables($blade, $closure, $expectedOutput)
+    {
+        $this->compiler->stringable('iterable', $closure);
+
+        app()->singleton('blade.compiler', function () {
+            return $this->compiler;
+        });
+
+        ob_start();
+        eval(Str::of($this->compiler->compileString($blade))->remove(['<?php', '?>']));
+        $output = ob_get_contents();
+        ob_end_clean();
+
+        $this->assertSame($expectedOutput, $output);
+    }
+
+    public static function handlerWorksWithIterableDataProvider()
+    {
+        return [
+            ['{{[1,"two",3]}}', function (iterable $arr) {
+                return implode(', ', $arr);
+            }, '1, two, 3'],
+        ];
+    }
+
+    /**
      * @dataProvider nonStringableDataProvider
      */
     public function testHandlerWorksWithNonStringables($blade, $expectedOutput)

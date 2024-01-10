@@ -121,7 +121,7 @@ class SQLiteGrammar extends Grammar
     public function compileColumns($table)
     {
         return sprintf(
-            "select name, type, not 'notnull' as 'nullable', dflt_value as 'default', pk as 'primary' "
+            'select name, type, not "notnull" as "nullable", dflt_value as "default", pk as "primary" '
             .'from pragma_table_info(%s) order by cid asc',
             $this->wrap(str_replace('.', '__', $table))
         );
@@ -143,6 +143,23 @@ class SQLiteGrammar extends Grammar
             .'group by name, "unique", "primary"',
             $table = $this->wrap(str_replace('.', '__', $table)),
             $table
+        );
+    }
+
+    /**
+     * Compile the query to determine the foreign keys.
+     *
+     * @param  string  $table
+     * @return string
+     */
+    public function compileForeignKeys($table)
+    {
+        return sprintf(
+            'select group_concat("from") as columns, "table" as foreign_table, '
+            .'group_concat("to") as foreign_columns, on_update, on_delete '
+            .'from (select * from pragma_foreign_key_list(%s) order by id desc, seq) '
+            .'group by id, "table", on_update, on_delete',
+            $this->wrap(str_replace('.', '__', $table))
         );
     }
 

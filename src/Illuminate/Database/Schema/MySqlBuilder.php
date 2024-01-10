@@ -121,6 +121,23 @@ class MySqlBuilder extends Builder
     }
 
     /**
+     * Get the foreign keys for a given table.
+     *
+     * @param  string  $table
+     * @return array
+     */
+    public function getForeignKeys($table)
+    {
+        $table = $this->connection->getTablePrefix().$table;
+
+        return $this->connection->getPostProcessor()->processForeignKeys(
+            $this->connection->selectFromWriteConnection(
+                $this->grammar->compileForeignKeys($this->connection->getDatabaseName(), $table)
+            )
+        );
+    }
+
+    /**
      * Drop all tables from the database.
      *
      * @return void

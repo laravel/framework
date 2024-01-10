@@ -21,6 +21,7 @@ namespace Illuminate\Support\Facades;
  * @method static void ageFlashData()
  * @method static array all()
  * @method static array only(array $keys)
+ * @method static array except(array $keys)
  * @method static bool exists(string|array $key)
  * @method static bool missing(string|array $key)
  * @method static bool has(string|array $key)

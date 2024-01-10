@@ -5,6 +5,8 @@ namespace Illuminate\Console;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Composer;
 
+use function Illuminate\Filesystem\join_paths;
+
 abstract class MigrationGeneratorCommand extends Command
 {
     /**
@@ -114,7 +116,7 @@ abstract class MigrationGeneratorCommand extends Command
     protected function migrationExists($table)
     {
         return count($this->files->glob(
-            $this->laravel->joinPaths($this->laravel->databasePath('migrations'), '*_*_*_*_create_'.$table.'_table.php')
+            join_paths($this->laravel->databasePath('migrations'), '*_*_*_*_create_'.$table.'_table.php')
         )) !== 0;
     }
 }

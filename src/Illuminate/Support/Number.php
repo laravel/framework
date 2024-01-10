@@ -46,11 +46,21 @@ class Number
      *
      * @param  int|float  $number
      * @param  string|null  $locale
+     * @param  int|null  $after
+     * @param  int|null  $until
      * @return string
      */
-    public static function spell(int|float $number, ?string $locale = null)
+    public static function spell(int|float $number, ?string $locale = null, ?int $after = null, ?int $until = null)
     {
         static::ensureIntlExtensionIsInstalled();
+
+        if (! is_null($after) && $number <= $after) {
+            return static::format($number, locale: $locale);
+        }
+
+        if (! is_null($until) && $number >= $until) {
+            return static::format($number, locale: $locale);
+        }
 
         $formatter = new NumberFormatter($locale ?? static::$locale, NumberFormatter::SPELLOUT);
 
@@ -243,6 +253,19 @@ class Number
         $number /= pow(10, $displayExponent);
 
         return trim(sprintf('%s%s', static::format($number, $precision, $maxPrecision), $units[$displayExponent] ?? ''));
+    }
+
+    /**
+     * Clamp the given number between the given minimum and maximum.
+     *
+     * @param  int|float  $number
+     * @param  int|float  $min
+     * @param  int|float  $max
+     * @return int|float
+     */
+    public static function clamp(int|float $number, int|float $min, int|float $max)
+    {
+        return min(max($number, $min), $max);
     }
 
     /**

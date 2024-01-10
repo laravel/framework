@@ -9,6 +9,7 @@ namespace Illuminate\Support\Facades;
  * @method static \Illuminate\Foundation\Vite useIntegrityKey(string|false $key)
  * @method static \Illuminate\Foundation\Vite withEntryPoints(array $entryPoints)
  * @method static \Illuminate\Foundation\Vite useManifestFilename(string $filename)
+ * @method static \Illuminate\Foundation\Vite createAssetPathsUsing(void $resolver)
  * @method static string hotFile()
  * @method static \Illuminate\Foundation\Vite useHotFile(string $path)
  * @method static \Illuminate\Foundation\Vite useBuildDirectory(string $path)

@@ -14,6 +14,7 @@ namespace Illuminate\Support\Facades;
  * @method static bool hasView(string $view)
  * @method static array getTables()
  * @method static array getViews()
+ * @method static array getTypes()
  * @method static bool hasColumn(string $table, string $column)
  * @method static bool hasColumns(string $table, array $columns)
  * @method static void whenTableHasColumn(string $table, string $column, \Closure $callback)
@@ -22,6 +23,7 @@ namespace Illuminate\Support\Facades;
  * @method static array getColumnListing(string $table)
  * @method static array getColumns(string $table)
  * @method static array getIndexes(string $table)
+ * @method static array getForeignKeys(string $table)
  * @method static void table(string $table, \Closure $callback)
  * @method static void create(string $table, \Closure $callback)
  * @method static void drop(string $table)
@@ -37,6 +39,10 @@ namespace Illuminate\Support\Facades;
  * @method static \Illuminate\Database\Connection getConnection()
  * @method static \Illuminate\Database\Schema\Builder setConnection(\Illuminate\Database\Connection $connection)
  * @method static void blueprintResolver(\Closure $resolver)
+ * @method static void macro(string $name, object|callable $macro)
+ * @method static void mixin(object $mixin, bool $replace = true)
+ * @method static bool hasMacro(string $name)
+ * @method static void flushMacros()
  *
  * @see \Illuminate\Database\Schema\Builder
  */
