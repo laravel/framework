@@ -4,8 +4,11 @@ namespace Illuminate\Foundation\Testing;
 
 use Carbon\CarbonImmutable;
 use Illuminate\Console\Application as Artisan;
+use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Bootstrap\HandleExceptions;
+use Illuminate\Foundation\Console\AboutCommand;
 use Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull;
 use Illuminate\Foundation\Http\Middleware\TrimStrings;
 use Illuminate\Queue\Queue;
@@ -71,11 +74,16 @@ abstract class TestCase extends BaseTestCase
     /**
      * Creates the application.
      *
-     * Needs to be implemented by subclasses.
-     *
-     * @return \Symfony\Component\HttpKernel\HttpKernelInterface
+     * @return \Illuminate\Foundation\Application
      */
-    abstract public function createApplication();
+    public function createApplication()
+    {
+        $app = require Application::inferBaseDirectory().'/bootstrap/app.php';
+
+        $app->make(Kernel::class)->bootstrap();
+
+        return $app;
+    }
 
     /**
      * Setup the test environment.
@@ -239,6 +247,7 @@ abstract class TestCase extends BaseTestCase
         $this->originalExceptionHandler = null;
         $this->originalDeprecationHandler = null;
 
+        AboutCommand::flushState();
         Artisan::forgetBootstrappers();
         Component::flushCache();
         Component::forgetComponentsResolver();

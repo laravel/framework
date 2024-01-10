@@ -4,6 +4,7 @@ namespace Illuminate\View;
 
 use ArrayAccess;
 use ArrayIterator;
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\HtmlString;
@@ -15,7 +16,7 @@ use JsonSerializable;
 use Stringable;
 use Traversable;
 
-class ComponentAttributeBag implements ArrayAccess, Htmlable, JsonSerializable, IteratorAggregate, Stringable
+class ComponentAttributeBag implements Arrayable, ArrayAccess, IteratorAggregate, JsonSerializable, Htmlable, Stringable
 {
     use Conditionable, Macroable;
 
@@ -483,6 +484,16 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, JsonSerializable, 
      * @return mixed
      */
     public function jsonSerialize(): mixed
+    {
+        return $this->attributes;
+    }
+
+    /**
+     * Convert the object into an array.
+     *
+     * @return array
+     */
+    public function toArray()
     {
         return $this->attributes;
     }

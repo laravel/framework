@@ -113,13 +113,13 @@ class Arr
 
         foreach ($array as $key => $value) {
             if (is_array($value) && ! empty($value)) {
-                $results[] = static::dot($value, $prepend.$key.'.');
+                $results = array_merge($results, static::dot($value, $prepend.$key.'.'));
             } else {
-                $results[] = [$prepend.$key => $value];
+                $results[$prepend.$key] = $value;
             }
         }
 
-        return array_merge(...$results);
+        return $results;
     }
 
     /**
@@ -476,9 +476,7 @@ class Arr
      */
     public static function prependKeysWith($array, $prependWith)
     {
-        return Collection::make($array)->mapWithKeys(function ($item, $key) use ($prependWith) {
-            return [$prependWith.$key => $item];
-        })->all();
+        return static::mapWithKeys($array, fn ($item, $key) => [$prependWith.$key => $item]);
     }
 
     /**

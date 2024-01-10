@@ -318,27 +318,27 @@ class Gate implements GateContract
     }
 
     /**
-     * Determine if the given ability should be granted for the current user.
+     * Determine if all of the given abilities should be granted for the current user.
      *
-     * @param  string  $ability
+     * @param  iterable|string  $abilities
      * @param  array|mixed  $arguments
      * @return bool
      */
-    public function allows($ability, $arguments = [])
+    public function allows($abilities, $arguments = [])
     {
-        return $this->check($ability, $arguments);
+        return $this->check($abilities, $arguments);
     }
 
     /**
-     * Determine if the given ability should be denied for the current user.
+     * Determine if any of the given abilities should be denied for the current user.
      *
-     * @param  string  $ability
+     * @param  iterable|string  $abilities
      * @param  array|mixed  $arguments
      * @return bool
      */
-    public function denies($ability, $arguments = [])
+    public function denies($abilities, $arguments = [])
     {
-        return ! $this->allows($ability, $arguments);
+        return ! $this->allows($abilities, $arguments);
     }
 
     /**

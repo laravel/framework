@@ -206,7 +206,7 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
      *
      * @param  int  $mode
      * @param  string  $encoding
-     * @return string
+     * @return static
      */
     public function convertCase(int $mode = MB_CASE_FOLD, ?string $encoding = 'UTF-8')
     {
@@ -799,13 +799,33 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     }
 
     /**
-     * Convert the given string to title case.
+     * Convert the given string to proper case.
      *
      * @return static
      */
     public function title()
     {
         return new static(Str::title($this->value));
+    }
+
+    /**
+     * Convert the given string to proper case for each word.
+     *
+     * @return static
+     */
+    public function headline()
+    {
+        return new static(Str::headline($this->value));
+    }
+
+    /**
+     * Convert the given string to APA-style title case.
+     *
+     * @return static
+     */
+    public function apa()
+    {
+        return new static(Str::apa($this->value));
     }
 
     /**
@@ -818,16 +838,6 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     public function transliterate($unknown = '?', $strict = false)
     {
         return new static(Str::transliterate($this->value, $unknown, $strict));
-    }
-
-    /**
-     * Convert the given string to title case for each word.
-     *
-     * @return static
-     */
-    public function headline()
-    {
-        return new static(Str::headline($this->value));
     }
 
     /**

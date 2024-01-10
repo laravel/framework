@@ -285,25 +285,6 @@ class PostgresGrammar extends Grammar
     }
 
     /**
-     * Compile a rename column command.
-     *
-     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
-     * @param  \Illuminate\Support\Fluent  $command
-     * @param  \Illuminate\Database\Connection  $connection
-     * @return array|string
-     */
-    public function compileRenameColumn(Blueprint $blueprint, Fluent $command, Connection $connection)
-    {
-        return $connection->usingNativeSchemaOperations()
-            ? sprintf('alter table %s rename column %s to %s',
-                $this->wrapTable($blueprint),
-                $this->wrap($command->from),
-                $this->wrap($command->to)
-            )
-            : parent::compileRenameColumn($blueprint, $command, $connection);
-    }
-
-    /**
      * Compile a change column command into a series of SQL statements.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
@@ -315,10 +296,6 @@ class PostgresGrammar extends Grammar
      */
     public function compileChange(Blueprint $blueprint, Fluent $command, Connection $connection)
     {
-        if (! $connection->usingNativeSchemaOperations()) {
-            return parent::compileChange($blueprint, $command, $connection);
-        }
-
         $columns = [];
 
         foreach ($blueprint->getChangedColumns() as $column) {
