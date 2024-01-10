@@ -1084,115 +1084,32 @@ class PostgresGrammar extends Grammar
      */
     protected function typeGeometry(Fluent $column)
     {
-        return $this->formatPostGisType('geometry', $column);
-    }
-
-    /**
-     * Create the column definition for a spatial Point type.
-     *
-     * @param  \Illuminate\Support\Fluent  $column
-     * @return string
-     */
-    protected function typePoint(Fluent $column)
-    {
-        return $this->formatPostGisType('point', $column);
-    }
-
-    /**
-     * Create the column definition for a spatial LineString type.
-     *
-     * @param  \Illuminate\Support\Fluent  $column
-     * @return string
-     */
-    protected function typeLineString(Fluent $column)
-    {
-        return $this->formatPostGisType('linestring', $column);
-    }
-
-    /**
-     * Create the column definition for a spatial Polygon type.
-     *
-     * @param  \Illuminate\Support\Fluent  $column
-     * @return string
-     */
-    protected function typePolygon(Fluent $column)
-    {
-        return $this->formatPostGisType('polygon', $column);
-    }
-
-    /**
-     * Create the column definition for a spatial GeometryCollection type.
-     *
-     * @param  \Illuminate\Support\Fluent  $column
-     * @return string
-     */
-    protected function typeGeometryCollection(Fluent $column)
-    {
-        return $this->formatPostGisType('geometrycollection', $column);
-    }
-
-    /**
-     * Create the column definition for a spatial MultiPoint type.
-     *
-     * @param  \Illuminate\Support\Fluent  $column
-     * @return string
-     */
-    protected function typeMultiPoint(Fluent $column)
-    {
-        return $this->formatPostGisType('multipoint', $column);
-    }
-
-    /**
-     * Create the column definition for a spatial MultiLineString type.
-     *
-     * @param  \Illuminate\Support\Fluent  $column
-     * @return string
-     */
-    public function typeMultiLineString(Fluent $column)
-    {
-        return $this->formatPostGisType('multilinestring', $column);
-    }
-
-    /**
-     * Create the column definition for a spatial MultiPolygon type.
-     *
-     * @param  \Illuminate\Support\Fluent  $column
-     * @return string
-     */
-    protected function typeMultiPolygon(Fluent $column)
-    {
-        return $this->formatPostGisType('multipolygon', $column);
-    }
-
-    /**
-     * Create the column definition for a spatial MultiPolygonZ type.
-     *
-     * @param  \Illuminate\Support\Fluent  $column
-     * @return string
-     */
-    protected function typeMultiPolygonZ(Fluent $column)
-    {
-        return $this->formatPostGisType('multipolygonz', $column);
-    }
-
-    /**
-     * Format the column definition for a PostGIS spatial type.
-     *
-     * @param  string  $type
-     * @param  \Illuminate\Support\Fluent  $column
-     * @return string
-     */
-    private function formatPostGisType($type, Fluent $column)
-    {
-        if ($column->isGeometry === null) {
-            return sprintf('geography(%s, %s)', $type, $column->projection ?? '4326');
+        if ($column->subtype) {
+            return sprintf('geometry(%s%s)',
+                strtolower($column->subtype),
+                $column->srid ? ','.$column->srid : ''
+            );
         }
 
-        if ($column->projection !== null) {
-            return sprintf('geometry(%s, %s)', $type, $column->projection);
+        return 'geometry';
+    }
+
+    /**
+     * Create the column definition for a spatial Geography type.
+     *
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return string
+     */
+    protected function typeGeography(Fluent $column)
+    {
+        if ($column->subtype) {
+            return sprintf('geography(%s%s)',
+                strtolower($column->subtype),
+                $column->srid ? ','.$column->srid : ''
+            );
         }
 
-        return "geometry({$type})";
+        return 'geography';
     }
 
     /**

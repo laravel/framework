@@ -1348,100 +1348,26 @@ class Blueprint
      * Create a new geometry column on the table.
      *
      * @param  string  $column
+     * @param  string|null  $subtype
+     * @param  int  $srid
      * @return \Illuminate\Database\Schema\ColumnDefinition
      */
-    public function geometry($column)
+    public function geometry($column, $subtype = null, $srid = 0)
     {
-        return $this->addColumn('geometry', $column);
+        return $this->addColumn('geometry', $column, compact('subtype', 'srid'));
     }
 
     /**
-     * Create a new point column on the table.
+     * Create a new geography column on the table.
      *
      * @param  string  $column
-     * @param  int|null  $srid
+     * @param  string|null  $subtype
+     * @param  int  $srid
      * @return \Illuminate\Database\Schema\ColumnDefinition
      */
-    public function point($column, $srid = null)
+    public function geography($column, $subtype = null, $srid = 4326)
     {
-        return $this->addColumn('point', $column, compact('srid'));
-    }
-
-    /**
-     * Create a new linestring column on the table.
-     *
-     * @param  string  $column
-     * @return \Illuminate\Database\Schema\ColumnDefinition
-     */
-    public function lineString($column)
-    {
-        return $this->addColumn('linestring', $column);
-    }
-
-    /**
-     * Create a new polygon column on the table.
-     *
-     * @param  string  $column
-     * @return \Illuminate\Database\Schema\ColumnDefinition
-     */
-    public function polygon($column)
-    {
-        return $this->addColumn('polygon', $column);
-    }
-
-    /**
-     * Create a new geometrycollection column on the table.
-     *
-     * @param  string  $column
-     * @return \Illuminate\Database\Schema\ColumnDefinition
-     */
-    public function geometryCollection($column)
-    {
-        return $this->addColumn('geometrycollection', $column);
-    }
-
-    /**
-     * Create a new multipoint column on the table.
-     *
-     * @param  string  $column
-     * @return \Illuminate\Database\Schema\ColumnDefinition
-     */
-    public function multiPoint($column)
-    {
-        return $this->addColumn('multipoint', $column);
-    }
-
-    /**
-     * Create a new multilinestring column on the table.
-     *
-     * @param  string  $column
-     * @return \Illuminate\Database\Schema\ColumnDefinition
-     */
-    public function multiLineString($column)
-    {
-        return $this->addColumn('multilinestring', $column);
-    }
-
-    /**
-     * Create a new multipolygon column on the table.
-     *
-     * @param  string  $column
-     * @return \Illuminate\Database\Schema\ColumnDefinition
-     */
-    public function multiPolygon($column)
-    {
-        return $this->addColumn('multipolygon', $column);
-    }
-
-    /**
-     * Create a new multipolygon column on the table.
-     *
-     * @param  string  $column
-     * @return \Illuminate\Database\Schema\ColumnDefinition
-     */
-    public function multiPolygonZ($column)
-    {
-        return $this->addColumn('multipolygonz', $column);
+        return $this->addColumn('geography', $column, compact('subtype', 'srid'));
     }
 
     /**
