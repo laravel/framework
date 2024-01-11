@@ -8,6 +8,8 @@ use Illuminate\Database\Query\Processors\SQLiteProcessor;
 use Illuminate\Database\Schema\Grammars\SQLiteGrammar as SchemaGrammar;
 use Illuminate\Database\Schema\SQLiteBuilder;
 use Illuminate\Database\Schema\SqliteSchemaState;
+use Illuminate\Database\QueryException;
+use Illuminate\Database\SQLiteDatabaseDoesNotExistException;
 use Illuminate\Filesystem\Filesystem;
 
 class SQLiteConnection extends Connection
@@ -31,9 +33,21 @@ class SQLiteConnection extends Connection
             return;
         }
 
-        $enableForeignKeyConstraints
-            ? $this->getSchemaBuilder()->enableForeignKeyConstraints()
-            : $this->getSchemaBuilder()->disableForeignKeyConstraints();
+        $schemaBuilder = $this->getSchemaBuilder();
+
+        try {
+            $enableForeignKeyConstraints
+                ? $schemaBuilder->enableForeignKeyConstraints()
+                : $schemaBuilder->disableForeignKeyConstraints();
+        } catch (QueryException $e) {
+            // Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas tortor
+            // nisl, sollicitudin sit amet tortor in, scelerisque placerat ligula. Pe
+            // llentesque eget nulla non justo egestas aliquet. Vivamus eget rhonc.
+
+            if (! $e->getPrevious() instanceof SQLiteDatabaseDoesNotExistException) {
+                throw $e;
+            }
+        }
     }
 
     /**
