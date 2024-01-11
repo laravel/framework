@@ -38,10 +38,6 @@ class SQLiteConnection extends Connection
                 ? $schemaBuilder->enableForeignKeyConstraints()
                 : $schemaBuilder->disableForeignKeyConstraints();
         } catch (QueryException $e) {
-            // Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas tortor
-            // nisl, sollicitudin sit amet tortor in, scelerisque placerat ligula. Pe
-            // llentesque eget nulla non justo egestas aliquet. Vivamus eget rhonc.
-
             if (! $e->getPrevious() instanceof SQLiteDatabaseDoesNotExistException) {
                 throw $e;
             }
