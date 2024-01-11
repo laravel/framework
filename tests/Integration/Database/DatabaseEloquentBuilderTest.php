@@ -26,6 +26,10 @@ class DatabaseEloquentBuilderTest extends DatabaseTestCase
             protected $fillable = [
                 'name',
             ];
+
+            protected $casts = [
+                'status' => 'integer',
+            ];
         };
 
         $record = $model->newModelQuery()->createAndRefresh([
