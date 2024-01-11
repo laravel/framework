@@ -211,6 +211,11 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     protected static $isBroadcasting = true;
 
     /**
+     * @var string|null
+     */
+    protected static $defaultRouteKeyName = null;
+
+    /**
      * The name of the "created at" column.
      *
      * @var string|null
@@ -495,6 +500,17 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         } finally {
             static::$isBroadcasting = $isBroadcasting;
         }
+    }
+
+    /**
+     * Register the default routing key.
+     *
+     * @param  string|null  $defaultRouteKeyName
+     * @return void
+     */
+    public static function defaultRouteKeyName(?string $defaultRouteKeyName)
+    {
+        static::$defaultRouteKeyName = $defaultRouteKeyName;
     }
 
     /**
@@ -2031,7 +2047,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function getRouteKeyName()
     {
-        return $this->getKeyName();
+        return static::$defaultRouteKeyName ?? $this->getKeyName();
     }
 
     /**
