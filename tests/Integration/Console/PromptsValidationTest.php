@@ -71,12 +71,12 @@ class DummyPromptsWithLaravelRulesMessagesAndAttributesCommand extends Command
         text('What is your name?', validate: ['name' => 'required']);
     }
 
-    protected function messages()
+    protected function validationMessages()
     {
         return ['name.required' => 'Your :attribute is mandatory.'];
     }
 
-    protected function attributes()
+    protected function validationAttributes()
     {
         return ['name' => 'full name'];
     }
