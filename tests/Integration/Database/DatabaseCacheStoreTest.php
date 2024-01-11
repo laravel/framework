@@ -171,7 +171,7 @@ class DatabaseCacheStoreTest extends DatabaseTestCase
         $originalConfiguration = config('database');
 
         app('config')->set('database.default', 'sqlite');
-        app('config')->set('database.connections.sqlite.database', __DIR__ .'/non-existing-file');
+        app('config')->set('database.connections.sqlite.database', __DIR__.'/non-existing-file');
 
         $store = $this->getStore();
         $this->assertInstanceOf(SQLiteConnection::class, $store->getConnection());

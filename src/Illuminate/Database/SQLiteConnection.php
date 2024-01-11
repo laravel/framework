@@ -8,8 +8,6 @@ use Illuminate\Database\Query\Processors\SQLiteProcessor;
 use Illuminate\Database\Schema\Grammars\SQLiteGrammar as SchemaGrammar;
 use Illuminate\Database\Schema\SQLiteBuilder;
 use Illuminate\Database\Schema\SqliteSchemaState;
-use Illuminate\Database\QueryException;
-use Illuminate\Database\SQLiteDatabaseDoesNotExistException;
 use Illuminate\Filesystem\Filesystem;
 
 class SQLiteConnection extends Connection
