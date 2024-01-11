@@ -729,6 +729,7 @@ class Arr
             if ($keysOld[0] === $keysNew[0]) {
                 $keyOld = array_shift($keysOld);
                 array_shift($keysNew);
+
                 return $rename($arr[$keyOld], $keysOld, $keysNew);
             }
             if (array_key_exists($keysNew[0], $arr)) {
