@@ -294,10 +294,27 @@ class SupportNumberTest extends TestCase
         $this->assertSame('-1KQ', Number::abbreviate(-1000000000000000000));
     }
 
+    public function testCents()
+    {
+        $this->assertSame(10000, Number::cents(100));
+        $this->assertSame(-36550, Number::cents(-365.50));
+        $this->assertSame(150, Number::cents(15000, false));
+    }
+
+    public function testCoordinates()
+    {
+        $this->assertSame(36163911000000, Number::coordinate(36163911));
+        $this->assertSame(-86797372000000, Number::coordinate(-86797372));
+        $this->assertSame(36163911, Number::coordinate(36.163911));
+        $this->assertSame(-86797372, Number::coordinate(-86.797372));
+        $this->assertSame(36163911, Number::coordinate(36163911000000, false));
+        $this->assertSame(-86797372, Number::coordinate(-86797372000000, false));
+    }
+
     protected function needsIntlExtension()
     {
-        if (! extension_loaded('intl')) {
-            $this->markTestSkipped('The intl extension is not installed. Please install the extension to enable '.__CLASS__);
+        if (!extension_loaded('intl')) {
+            $this->markTestSkipped('The intl extension is not installed. Please install the extension to enable ' . __CLASS__);
         }
     }
 }
