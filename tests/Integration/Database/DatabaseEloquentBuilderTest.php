@@ -37,8 +37,10 @@ class DatabaseEloquentBuilderTest extends DatabaseTestCase
             'status' => '1',
         ]);
 
-        $this->assertIsInt($record->id);
+        $this->assertNotNull($record->id);
         $this->assertSame('Taylor Otwell', $record->name);
         $this->assertSame(1, $record->status);
+        $this->assertNotNull($record->created_at);
+        $this->assertNotNull($record->updated_at);
     }
 }
