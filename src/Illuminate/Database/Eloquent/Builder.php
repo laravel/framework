@@ -1032,7 +1032,7 @@ class Builder implements BuilderContract
      */
     public function createAndRefresh(array $attributes = [])
     {
-        return $this->create($attributes)->refresh();
+        return $this->getConnection()->transaction(fn () => $this->create($attributes)->fresh());
     }
 
     /**
