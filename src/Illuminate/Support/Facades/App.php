@@ -3,7 +3,7 @@
 namespace Illuminate\Support\Facades;
 
 /**
- * @method static void configure(string|null $baseDirectory = null)
+ * @method static \Illuminate\Foundation\Configuration\ApplicationBuilder configure(string|null $baseDirectory = null)
  * @method static string inferBaseDirectory()
  * @method static string version()
  * @method static void bootstrapWith(string[] $bootstrappers)
