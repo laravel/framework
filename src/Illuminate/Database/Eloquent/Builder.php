@@ -1032,10 +1032,7 @@ class Builder implements BuilderContract
      */
     public function createAndRefresh(array $attributes = [])
     {
-        return tap($this->newModelInstance($attributes), function ($instance) {
-            $instance->save();
-            $instance->refresh();
-        });
+        return $this->create($attributes)->refresh();
     }
 
     /**
