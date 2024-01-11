@@ -19,7 +19,8 @@ class DatabaseEloquentBuilderTest extends DatabaseTestCase
             $table->timestamps();
         });
 
-        $model = new class extends Model {
+        $model = new class extends Model
+        {
             protected $table = 'sample';
 
             protected $fillable = [
