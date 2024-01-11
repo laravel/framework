@@ -21,6 +21,10 @@ class DatabaseEloquentBuilderTest extends DatabaseTestCase
 
         $model = new class extends Model {
             protected $table = 'sample';
+
+            protected $fillable = [
+                'name',
+            ];
         };
 
         $record = $model->newModelQuery()->createAndRefresh([
