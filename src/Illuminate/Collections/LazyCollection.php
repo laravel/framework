@@ -1058,12 +1058,11 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     /**
      * Shuffle the items in the collection.
      *
-     * @param  int|null  $seed
      * @return static
      */
-    public function shuffle($seed = null)
+    public function shuffle()
     {
-        return $this->passthru('shuffle', func_get_args());
+        return $this->passthru('shuffle', []);
     }
 
     /**
