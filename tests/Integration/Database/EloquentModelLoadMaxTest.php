@@ -102,4 +102,3 @@ class Related2 extends Model
         return $this->belongsTo(BaseModel::class);
     }
 }
-
