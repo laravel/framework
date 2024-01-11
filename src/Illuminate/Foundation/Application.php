@@ -14,6 +14,7 @@ use Illuminate\Contracts\Http\Kernel as HttpKernelContract;
 use Illuminate\Events\EventServiceProvider;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Bootstrap\LoadEnvironmentVariables;
+use Illuminate\Foundation\Configuration\ApplicationBuilder;
 use Illuminate\Foundation\Events\LocaleUpdated;
 use Illuminate\Http\Request;
 use Illuminate\Log\LogServiceProvider;
@@ -221,9 +222,8 @@ class Application extends Container implements ApplicationContract, CachesConfig
      * Begin configuring a new Laravel application instance.
      *
      * @param  string|null  $baseDirectory
-     * @return \Illuminate\Foundation\Configuration\ApplicationBuilder
      */
-    public static function configure(string $baseDirectory = null)
+    public static function configure(string $baseDirectory = null): ApplicationBuilder
     {
         $baseDirectory = match (true) {
             is_string($baseDirectory) => $baseDirectory,
