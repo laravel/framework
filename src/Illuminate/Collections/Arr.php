@@ -687,6 +687,65 @@ class Arr
     }
 
     /**
+     * Rename a key of the array with a new one using optional "dot" notation.
+     *
+     * When using dot notation, the difference between keys must be only one level and the new key must not already exist in the array.
+     *
+     * @param  array  $array
+     * @param  string|int  $oldKey
+     * @param  string|int  $newKey
+     * @return array
+     *
+     * @throws \InvalidArgumentException
+     */
+    public static function renameKey(&$array, $oldKey, $newKey)
+    {
+        if($oldKey === $newKey || !self::has($array, $oldKey)) {
+            return $array;
+        }
+
+        if(self::has($array, $newKey)){
+            throw new InvalidArgumentException(
+                "The new key '{$newKey}' already exists in the array."
+            );
+        }
+
+        $keysOld = explode('.', $oldKey);
+        $keysNew = explode('.', $newKey);
+
+        // ensure that the count of keys is same and there is only 1 different level between the keys
+        if(count($keysOld) !== count($keysNew) || count(array_diff($keysOld, $keysNew)) !== 1){
+            throw new InvalidArgumentException(
+                "The new key '{$newKey}' is not a valid replacement for '{$oldKey}'."
+            );
+        }
+
+        while(end($keysOld) === end($keysNew)){
+            array_pop($keysOld);
+            array_pop($keysNew);
+        }
+
+
+        $rename = function (&$arr, $keysOld, $keysNew) use (&$rename, $oldKey, $newKey) {
+            if($keysOld[0] === $keysNew[0]){
+                $keyOld = array_shift($keysOld);
+                array_shift($keysNew);
+                return $rename($arr[$keyOld], $keysOld, $keysNew);
+            }
+            if(array_key_exists($keysNew[0], $arr)){
+                throw new InvalidArgumentException(
+                    "The new key '{$newKey}' is not a valid replacement for '{$oldKey}'. The part '{$keysNew[0]}' of the new key already exists in the array."
+                );
+            }
+            $arr[$keysNew[0]] = $arr[$keysOld[0]];
+            unset($arr[$keysOld[0]]);
+            return $arr;
+        };
+
+        return $rename($array, $keysOld, $keysNew);
+    }
+
+    /**
      * Set an array item to a given value using "dot" notation.
      *
      * If no key is given to the method, the entire array will be replaced.

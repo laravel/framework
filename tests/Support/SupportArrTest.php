@@ -1260,4 +1260,45 @@ class SupportArrTest extends TestCase
             ],
         ], Arr::prependKeysWith($array, 'test.'));
     }
+
+    public function testRenameKey()
+    {
+        $arr = [
+            'id' => '123',
+            'data' => [
+                'name' => 'John',
+                'age' => 30,
+                'keys' => [
+                    'key' => 1,
+                ],
+                'ext_keys' => [
+                    'key' => 1,
+                ],
+            ],
+        ];
+
+        $throwException = false;
+        try {
+            Arr::renameKey($arr, 'data.keys.key', 'data.new_keys.new_key');
+        } catch (InvalidArgumentException) {
+            $throwException = true;
+        }
+        $this->assertTrue($throwException, 'Exception should be thrown when the count of different keys is not 1');
+
+        $throwException = false;
+        try {
+            Arr::renameKey($arr, 'data.keys.key', 'data.ext_keys.key');
+        } catch (InvalidArgumentException $e) {
+            $throwException = true;
+        }
+        $this->assertTrue($throwException, 'Exception should be thrown when the new key conflicts with an existing key');
+
+        Arr::renameKey($arr, 'data.keys.key', 'data.new_keys.key');
+        $this->assertArrayHasKey('new_keys', $arr['data']);
+        $this->assertArrayNotHasKey('keys', $arr['data']);
+
+        Arr::renameKey($arr, 'id', 'new_id');
+        $this->assertArrayHasKey('new_id', $arr);
+        $this->assertArrayNotHasKey('id', $arr);
+    }
 }
