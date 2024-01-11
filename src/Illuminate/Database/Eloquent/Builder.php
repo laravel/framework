@@ -1025,6 +1025,20 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Save a new model and return the fresh model instance reloaded.
+     *
+     * @param  array  $attributes
+     * @return \Illuminate\Database\Eloquent\Model|$this
+     */
+    public function createAndRefresh(array $attributes = [])
+    {
+        return tap($this->newModelInstance($attributes), function ($instance) {
+            $instance->save();
+            $instance->refresh();
+        });
+    }
+
+    /**
      * Save a new model and return the instance. Allow mass-assignment.
      *
      * @param  array  $attributes
