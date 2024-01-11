@@ -31,9 +31,17 @@ class SQLiteConnection extends Connection
             return;
         }
 
-        $enableForeignKeyConstraints
-            ? $this->getSchemaBuilder()->enableForeignKeyConstraints()
-            : $this->getSchemaBuilder()->disableForeignKeyConstraints();
+        $schemaBuilder = $this->getSchemaBuilder();
+
+        try {
+            $enableForeignKeyConstraints
+                ? $schemaBuilder->enableForeignKeyConstraints()
+                : $schemaBuilder->disableForeignKeyConstraints();
+        } catch (QueryException $e) {
+            if (! $e->getPrevious() instanceof SQLiteDatabaseDoesNotExistException) {
+                throw $e;
+            }
+        }
     }
 
     /**
