@@ -159,17 +159,7 @@ trait ConfiguresPrompts
     }
 
     /**
-     * Restore the prompts output.
-     *
-     * @return void
-     */
-    protected function restorePrompts()
-    {
-        Prompt::setOutput($this->output);
-    }
-
-    /**
-     * Validate the given prompt.
+     * Validate the given prompt value using the validator.
      *
      * @param  mixed  $value
      * @param  mixed  $rules
@@ -178,7 +168,7 @@ trait ConfiguresPrompts
     protected function validatePrompt($value, $rules)
     {
         if (! $rules) {
-            return null;
+            return;
         }
 
         $field = 'answer';
@@ -187,7 +177,7 @@ trait ConfiguresPrompts
             [$field, $rules] = [key($rules), current($rules)];
         }
 
-        return $this->getValidatorInstance($field, $value, $rules)->errors()->first();
+        return $this->getPromptValidatorInstance($field, $value, $rules)->errors()->first();
     }
 
     /**
@@ -198,7 +188,7 @@ trait ConfiguresPrompts
      * @param  mixed  $rules
      * @return \Illuminate\Validation\Validator
      */
-    protected function getValidatorInstance($field, $value, $rules)
+    protected function getPromptValidatorInstance($field, $value, $rules)
     {
         return $this->laravel['validator']->make(
             [$field => $value],
@@ -209,7 +199,7 @@ trait ConfiguresPrompts
     }
 
     /**
-     * Get the validation messages.
+     * Get the validation messages that should be used during prompt validation.
      *
      * @return array
      */
@@ -219,12 +209,22 @@ trait ConfiguresPrompts
     }
 
     /**
-     * Get the validation attributes.
+     * Get the validation attributes that should be used during prompt validation.
      *
      * @return array
      */
     protected function validationAttributes()
     {
         return [];
+    }
+
+    /**
+     * Restore the prompts output.
+     *
+     * @return void
+     */
+    protected function restorePrompts()
+    {
+        Prompt::setOutput($this->output);
     }
 }
