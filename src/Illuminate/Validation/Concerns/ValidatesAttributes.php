@@ -256,6 +256,13 @@ trait ValidatesAttributes
             $date = $this->getDateTimestamp($this->getValue($parameters[0]));
         }
 
+        if (is_null($date)
+            && array_key_exists($parameters[0], $this->rules)
+            && is_null($this->getValue($parameters[0]))
+        ) {
+            return true;
+        }
+
         return $this->compare($this->getDateTimestamp($value), $date, $operator);
     }
 
