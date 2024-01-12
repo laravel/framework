@@ -15,6 +15,7 @@ class PromptsValidationTest extends TestCase
         $app[Kernel::class]->registerCommand(new DummyPromptsValidationCommand());
         $app[Kernel::class]->registerCommand(new DummyPromptsWithLaravelRulesCommand());
         $app[Kernel::class]->registerCommand(new DummyPromptsWithLaravelRulesMessagesAndAttributesCommand());
+        $app[Kernel::class]->registerCommand(new DummyPromptsWithLaravelRulesCommandWithInlineMessagesAndAttibutesCommand());
     }
 
     public function testValidationForPrompts()
@@ -25,12 +26,20 @@ class PromptsValidationTest extends TestCase
             ->expectsOutputToContain('Required!');
     }
 
-    public function testValidationWithLaravelRules()
+    public function testValidationWithLaravelRulesAndNoCustomization()
     {
         $this
             ->artisan(DummyPromptsWithLaravelRulesCommand::class)
             ->expectsQuestion('What is your name?', '')
             ->expectsOutputToContain('The answer field is required.');
+    }
+
+    public function testValidationWithLaravelRulesInlineMessagesAndAttributes()
+    {
+        $this
+            ->artisan(DummyPromptsWithLaravelRulesCommandWithInlineMessagesAndAttibutesCommand::class)
+            ->expectsQuestion('What is your name?', '')
+            ->expectsOutputToContain('Your full name is mandatory.');
     }
 
     public function testValidationWithLaravelRulesMessagesAndAttributes()
@@ -59,6 +68,20 @@ class DummyPromptsWithLaravelRulesCommand extends Command
     public function handle()
     {
         text('What is your name?', validate: 'required');
+    }
+}
+
+class DummyPromptsWithLaravelRulesCommandWithInlineMessagesAndAttibutesCommand extends Command
+{
+    protected $signature = 'prompts-laravel-rules-inline-test';
+
+    public function handle()
+    {
+        text('What is your name?', validate: literal(
+            rules: ['name' => 'required'],
+            messages: ['name.required' => 'Your :attribute is mandatory.'],
+            attributes: ['name' => 'full name'],
+        ));
     }
 }
 

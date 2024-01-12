@@ -12,6 +12,7 @@ use Laravel\Prompts\SearchPrompt;
 use Laravel\Prompts\SelectPrompt;
 use Laravel\Prompts\SuggestPrompt;
 use Laravel\Prompts\TextPrompt;
+use stdClass;
 use Symfony\Component\Console\Input\InputInterface;
 
 trait ConfiguresPrompts
@@ -167,6 +168,13 @@ trait ConfiguresPrompts
      */
     protected function validatePrompt($value, $rules)
     {
+        if ($rules instanceof stdClass) {
+            $messages = $rules->messages ?? [];
+            $attributes = $rules->attributes ?? [];
+            $rules = $rules->rules ?? null;
+        }
+
+
         if (! $rules) {
             return;
         }
@@ -177,7 +185,9 @@ trait ConfiguresPrompts
             [$field, $rules] = [key($rules), current($rules)];
         }
 
-        return $this->getPromptValidatorInstance($field, $value, $rules)->errors()->first();
+        return $this->getPromptValidatorInstance(
+            $field, $value, $rules, $messages ?? [], $attributes ?? []
+        )->errors()->first();
     }
 
     /**
@@ -186,15 +196,17 @@ trait ConfiguresPrompts
      * @param  string  $value
      * @param  mixed  $value
      * @param  mixed  $rules
+     * @param  array  $messages
+     * @param  array  $attributes
      * @return \Illuminate\Validation\Validator
      */
-    protected function getPromptValidatorInstance($field, $value, $rules)
+    protected function getPromptValidatorInstance($field, $value, $rules, array $messages = [], array $attributes = [])
     {
         return $this->laravel['validator']->make(
             [$field => $value],
             [$field => $rules],
-            $this->validationMessages(),
-            $this->validationAttributes(),
+            empty($messages) ? $this->validationMessages() : $messages,
+            empty($attributes) ? $this->validationAttributes() : $attributes,
         );
     }
 
