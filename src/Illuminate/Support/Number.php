@@ -18,6 +18,17 @@ class Number
     protected static $locale = 'en';
 
     /**
+     * Create a new fluent Number instance.
+     *
+     * @param  string  $locale
+     * @return void
+     */
+    public function __construct(string $locale = 'en')
+    {
+        static::$locale = $locale;
+    }
+
+    /**
      * Format the given number according to the current locale.
      *
      * @param  int|float  $number
@@ -256,6 +267,27 @@ class Number
     public static function useLocale(string $locale)
     {
         static::$locale = $locale;
+    }
+
+    /**
+     * Create a new fluent Number instance.
+     *
+     * @param  string  $locale
+     * @return \Illuminate\Support\Number
+     */
+    public static function usingLocale(string $locale)
+    {
+        return new static($locale);
+    }
+
+    /**
+     * Get the locale in use for this instance.
+     *
+     * @return string
+     */
+    public static function getLocale()
+    {
+        return static::$locale;
     }
 
     /**
