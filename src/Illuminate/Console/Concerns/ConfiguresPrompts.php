@@ -174,7 +174,6 @@ trait ConfiguresPrompts
             $rules = $rules->rules ?? null;
         }
 
-
         if (! $rules) {
             return;
         }
