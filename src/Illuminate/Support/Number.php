@@ -265,8 +265,10 @@ class Number
      */
     protected static function ensureIntlExtensionIsInstalled()
     {
+        $caller = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1]['function'];
+
         if (! extension_loaded('intl')) {
-            throw new RuntimeException('The "intl" PHP extension is required to use this method.');
+            throw new RuntimeException('The "intl" PHP extension is required to use the method: ' . $caller);
         }
     }
 }
