@@ -266,9 +266,9 @@ class Number
     protected static function ensureIntlExtensionIsInstalled()
     {
         if (! extension_loaded('intl')) {
-            $caller = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1]['function'];
+            $method = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1]['function'];
 
-            throw new RuntimeException('The "intl" PHP extension is required to use the method: '.$caller);
+            throw new RuntimeException('The "intl" PHP extension is required to use the ['.$method.'] method.');
         }
     }
 }
