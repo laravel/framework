@@ -124,4 +124,9 @@ class DatabaseSoftDeletingTraitStub
     {
         return 1;
     }
+
+    public function getDirty()
+    {
+        return [];
+    }
 }
