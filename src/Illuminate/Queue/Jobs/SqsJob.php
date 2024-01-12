@@ -52,7 +52,7 @@ class SqsJob extends Job implements JobContract
         parent::release($delay);
 
         $this->sqs->changeMessageVisibility([
-            'QueueUrl' => $this->queue,
+            'Endpoint' => $this->queue,
             'ReceiptHandle' => $this->job['ReceiptHandle'],
             'VisibilityTimeout' => $delay,
         ]);
@@ -68,7 +68,7 @@ class SqsJob extends Job implements JobContract
         parent::delete();
 
         $this->sqs->deleteMessage([
-            'QueueUrl' => $this->queue, 'ReceiptHandle' => $this->job['ReceiptHandle'],
+            'Endpoint' => $this->queue, 'ReceiptHandle' => $this->job['ReceiptHandle'],
         ]);
     }
 

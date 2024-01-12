@@ -70,7 +70,7 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
     public function size($queue = null)
     {
         $response = $this->sqs->getQueueAttributes([
-            'QueueUrl' => $this->getQueue($queue),
+            'Endpoint' => $this->getQueue($queue),
             'AttributeNames' => ['ApproximateNumberOfMessages'],
         ]);
 
@@ -111,7 +111,7 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
     public function pushRaw($payload, $queue = null, array $options = [])
     {
         return $this->sqs->sendMessage([
-            'QueueUrl' => $this->getQueue($queue), 'MessageBody' => $payload,
+            'Endpoint' => $this->getQueue($queue), 'MessageBody' => $payload,
         ])->get('MessageId');
     }
 
@@ -133,7 +133,7 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
             $delay,
             function ($payload, $queue, $delay) {
                 return $this->sqs->sendMessage([
-                    'QueueUrl' => $this->getQueue($queue),
+                    'Endpoint' => $this->getQueue($queue),
                     'MessageBody' => $payload,
                     'DelaySeconds' => $this->secondsUntil($delay),
                 ])->get('MessageId');
@@ -169,7 +169,7 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
     public function pop($queue = null)
     {
         $response = $this->sqs->receiveMessage([
-            'QueueUrl' => $queue = $this->getQueue($queue),
+            'Endpoint' => $queue = $this->getQueue($queue),
             'AttributeNames' => ['ApproximateReceiveCount'],
         ]);
 
@@ -191,7 +191,7 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
     {
         return tap($this->size($queue), function () use ($queue) {
             $this->sqs->purgeQueue([
-                'QueueUrl' => $this->getQueue($queue),
+                'Endpoint' => $this->getQueue($queue),
             ]);
         });
     }
