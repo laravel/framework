@@ -273,7 +273,7 @@ class Number
      * Create a new fluent Number instance.
      *
      * @param  string  $locale
-     * @return \Illuminate\Support\Number
+     * @return self
      */
     public static function usingLocale(string $locale)
     {
