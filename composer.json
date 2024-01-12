@@ -94,7 +94,7 @@
     "require-dev": {
         "ext-gmp": "*",
         "ably/ably-php": "^1.0",
-        "aws/aws-sdk-php": "^3.235.5",
+        "aws/aws-sdk-php": "3.288.1",
         "doctrine/dbal": "^3.5.1",
         "fakerphp/faker": "^1.21",
         "guzzlehttp/guzzle": "^7.5",
