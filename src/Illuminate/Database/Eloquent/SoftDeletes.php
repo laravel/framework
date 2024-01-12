@@ -89,10 +89,14 @@ trait SoftDeletes
     /**
      * Perform the actual delete query on this model instance.
      *
-     * @return void
+     * @return bool
      */
     protected function runSoftDelete()
     {
+        if ($this->fireModelEvent('trashing') === false) {
+            return false;
+        }
+
         $query = $this->setKeysForSaveQuery($this->newModelQuery());
 
         $time = $this->freshTimestamp();
@@ -107,11 +111,17 @@ trait SoftDeletes
             $columns[$this->getUpdatedAtColumn()] = $this->fromDateTime($time);
         }
 
-        $query->update($columns);
+        foreach ($this->getDirty() as $attribute => $value) {
+            $columns[$attribute] = $value;
+        }
+
+        $result = $query->update($columns);
 
         $this->syncOriginalAttributes(array_keys($columns));
 
         $this->fireModelEvent('trashed', false);
+
+        return $result;
     }
 
     /**
@@ -160,6 +170,17 @@ trait SoftDeletes
     public function trashed()
     {
         return ! is_null($this->{$this->getDeletedAtColumn()});
+    }
+
+    /**
+     * Register a "softDeleting" model event callback with the dispatcher.
+     *
+     * @param  \Closure|string  $callback
+     * @return void
+     */
+    public static function softDeleting($callback)
+    {
+        static::registerModelEvent('trashing', $callback);
     }
 
     /**
