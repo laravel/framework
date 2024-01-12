@@ -12,6 +12,7 @@ use Laravel\Prompts\SearchPrompt;
 use Laravel\Prompts\SelectPrompt;
 use Laravel\Prompts\SuggestPrompt;
 use Laravel\Prompts\TextPrompt;
+use stdClass;
 use Symfony\Component\Console\Input\InputInterface;
 
 trait ConfiguresPrompts
@@ -27,6 +28,8 @@ trait ConfiguresPrompts
         Prompt::setOutput($this->output);
 
         Prompt::interactive(($input->isInteractive() && defined('STDIN') && stream_isatty(STDIN)) || $this->laravel->runningUnitTests());
+
+        Prompt::validateUsing(fn (Prompt $prompt) => $this->validatePrompt($prompt->value(), $prompt->validate));
 
         Prompt::fallbackWhen(windows_os() || $this->laravel->runningUnitTests());
 
@@ -140,22 +143,91 @@ trait ConfiguresPrompts
                 }
             }
 
-            if ($validate) {
-                $error = $validate($result);
+            $error = is_callable($validate) ? $validate($result) : $this->validatePrompt($result, $validate);
 
-                if (is_string($error) && strlen($error) > 0) {
-                    $this->components->error($error);
+            if (is_string($error) && strlen($error) > 0) {
+                $this->components->error($error);
 
-                    if ($this->laravel->runningUnitTests()) {
-                        throw new PromptValidationException;
-                    } else {
-                        continue;
-                    }
+                if ($this->laravel->runningUnitTests()) {
+                    throw new PromptValidationException;
+                } else {
+                    continue;
                 }
             }
 
             return $result;
         }
+    }
+
+    /**
+     * Validate the given prompt value using the validator.
+     *
+     * @param  mixed  $value
+     * @param  mixed  $rules
+     * @return ?string
+     */
+    protected function validatePrompt($value, $rules)
+    {
+        if ($rules instanceof stdClass) {
+            $messages = $rules->messages ?? [];
+            $attributes = $rules->attributes ?? [];
+            $rules = $rules->rules ?? null;
+        }
+
+
+        if (! $rules) {
+            return;
+        }
+
+        $field = 'answer';
+
+        if (is_array($rules) && ! array_is_list($rules)) {
+            [$field, $rules] = [key($rules), current($rules)];
+        }
+
+        return $this->getPromptValidatorInstance(
+            $field, $value, $rules, $messages ?? [], $attributes ?? []
+        )->errors()->first();
+    }
+
+    /**
+     * Get the validator instance that should be used to validate prompts.
+     *
+     * @param  string  $value
+     * @param  mixed  $value
+     * @param  mixed  $rules
+     * @param  array  $messages
+     * @param  array  $attributes
+     * @return \Illuminate\Validation\Validator
+     */
+    protected function getPromptValidatorInstance($field, $value, $rules, array $messages = [], array $attributes = [])
+    {
+        return $this->laravel['validator']->make(
+            [$field => $value],
+            [$field => $rules],
+            empty($messages) ? $this->validationMessages() : $messages,
+            empty($attributes) ? $this->validationAttributes() : $attributes,
+        );
+    }
+
+    /**
+     * Get the validation messages that should be used during prompt validation.
+     *
+     * @return array
+     */
+    protected function validationMessages()
+    {
+        return [];
+    }
+
+    /**
+     * Get the validation attributes that should be used during prompt validation.
+     *
+     * @return array
+     */
+    protected function validationAttributes()
+    {
+        return [];
     }
 
     /**
