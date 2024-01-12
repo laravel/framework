@@ -2,6 +2,8 @@
 
 namespace Illuminate\Foundation\Providers;
 
+use Illuminate\Console\Scheduling\Schedule;
+use Illuminate\Contracts\Console\Kernel as ConsoleKernel;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Foundation\MaintenanceMode as MaintenanceModeContract;
@@ -69,11 +71,24 @@ class FoundationServiceProvider extends AggregateServiceProvider
     {
         parent::register();
 
+        $this->registerConsoleSchedule();
         $this->registerDumper();
         $this->registerRequestValidation();
         $this->registerRequestSignatureValidation();
         $this->registerExceptionTracking();
         $this->registerMaintenanceModeManager();
+    }
+
+    /**
+     * Register the console schedule implementation.
+     *
+     * @return void
+     */
+    public function registerConsoleSchedule()
+    {
+        $this->app->singleton(Schedule::class, function ($app) {
+            return $app->make(ConsoleKernel::class)->resolveConsoleSchedule();
+        });
     }
 
     /**

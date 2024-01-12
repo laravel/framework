@@ -162,6 +162,10 @@ trait CompilesEchos
             return call_user_func($this->echoHandlers[get_class($value)], $value);
         }
 
+        if (is_iterable($value) && isset($this->echoHandlers['iterable'])) {
+            return call_user_func($this->echoHandlers['iterable'], $value);
+        }
+
         return $value;
     }
 }

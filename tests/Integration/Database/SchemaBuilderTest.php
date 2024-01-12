@@ -2,12 +2,10 @@
 
 namespace Illuminate\Tests\Integration\Database;
 
-use Doctrine\DBAL\Types\Type;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\Grammars\SQLiteGrammar;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Tests\Integration\Database\Fixtures\TinyInteger;
 
 class SchemaBuilderTest extends DatabaseTestCase
 {
@@ -44,13 +42,11 @@ class SchemaBuilderTest extends DatabaseTestCase
         DB::statement('create view foo (id) as select 1');
     }
 
-    public function testRegisterCustomDoctrineType()
+    public function testChangeToTinyInteger()
     {
         if ($this->driver !== 'sqlite') {
             $this->markTestSkipped('Test requires a SQLite connection.');
         }
-
-        Schema::getConnection()->registerDoctrineType(TinyInteger::class, TinyInteger::NAME, 'TINYINT');
 
         Schema::create('test', function (Blueprint $table) {
             $table->string('test_column');
@@ -62,30 +58,7 @@ class SchemaBuilderTest extends DatabaseTestCase
 
         $blueprint->build($this->getConnection(), new SQLiteGrammar);
 
-        $this->assertArrayHasKey(TinyInteger::NAME, Type::getTypesMap());
-        $this->assertSame('tinyinteger', Schema::getColumnType('test', 'test_column'));
-    }
-
-    public function testRegisterCustomDoctrineTypeASecondTime()
-    {
-        if ($this->driver !== 'sqlite') {
-            $this->markTestSkipped('Test requires a SQLite connection.');
-        }
-
-        Schema::getConnection()->registerDoctrineType(TinyInteger::class, TinyInteger::NAME, 'TINYINT');
-
-        Schema::create('test', function (Blueprint $table) {
-            $table->string('test_column');
-        });
-
-        $blueprint = new Blueprint('test', function (Blueprint $table) {
-            $table->tinyInteger('test_column')->change();
-        });
-
-        $blueprint->build($this->getConnection(), new SQLiteGrammar);
-
-        $this->assertArrayHasKey(TinyInteger::NAME, Type::getTypesMap());
-        $this->assertSame('tinyinteger', Schema::getColumnType('test', 'test_column'));
+        $this->assertSame('integer', Schema::getColumnType('test', 'test_column'));
     }
 
     public function testChangeToTextColumn()
@@ -105,9 +78,9 @@ class SchemaBuilderTest extends DatabaseTestCase
 
             $queries = $blueprint->toSql($this->getConnection(), $this->getConnection()->getSchemaGrammar());
 
-            $uppercase = strtoupper($type);
+            $uppercase = strtolower($type);
 
-            $expected = ["ALTER TABLE test CHANGE test_column test_column $uppercase NOT NULL"];
+            $expected = ["alter table `test` modify `test_column` $uppercase not null"];
 
             $this->assertEquals($expected, $queries);
         }
@@ -130,9 +103,9 @@ class SchemaBuilderTest extends DatabaseTestCase
 
             $queries = $blueprint->toSql($this->getConnection(), $this->getConnection()->getSchemaGrammar());
 
-            $uppercase = strtoupper($type);
+            $lowercase = strtolower($type);
 
-            $expected = ["ALTER TABLE test CHANGE test_column test_column $uppercase NOT NULL"];
+            $expected = ["alter table `test` modify `test_column` $lowercase not null"];
 
             $this->assertEquals($expected, $queries);
         }
@@ -366,5 +339,98 @@ class SchemaBuilderTest extends DatabaseTestCase
                 && $foreign['foreign_table'] === 'parent'
                 && $foreign['foreign_columns'] === ['b', 'a']
         ));
+    }
+
+    public function testAlteringTableWithForeignKeyConstraintsEnabled()
+    {
+        Schema::enableForeignKeyConstraints();
+
+        Schema::create('parents', function (Blueprint $table) {
+            $table->id();
+            $table->text('name');
+        });
+
+        Schema::create('children', function (Blueprint $table) {
+            $table->foreignId('parent_id')->constrained();
+        });
+
+        $id = DB::table('parents')->insertGetId(['name' => 'foo']);
+        DB::table('children')->insert(['parent_id' => $id]);
+
+        Schema::table('parents', function (Blueprint $table) {
+            $table->string('name')->change();
+        });
+
+        $foreignKeys = Schema::getForeignKeys('children');
+
+        $this->assertCount(1, $foreignKeys);
+        $this->assertTrue(collect($foreignKeys)->contains(
+            fn ($foreign) => $foreign['columns'] === ['parent_id']
+                && $foreign['foreign_table'] === 'parents' && $foreign['foreign_columns'] === ['id']
+        ));
+    }
+
+    public function testSystemVersionedTables()
+    {
+        if ($this->driver !== 'mysql' || ! $this->getConnection()->isMaria()) {
+            $this->markTestSkipped('Test requires a MariaDB connection.');
+        }
+
+        DB::statement('create table `test` (`foo` int) WITH system versioning;');
+
+        $this->assertTrue(Schema::hasTable('test'));
+
+        Schema::dropAllTables();
+
+        $this->artisan('migrate:install');
+
+        DB::statement('create table `test` (`foo` int) WITH system versioning;');
+    }
+
+    public function testAddingStoredColumnOnSqlite()
+    {
+        if ($this->driver !== 'sqlite') {
+            $this->markTestSkipped('Test requires a SQLite connection.');
+        }
+
+        Schema::create('test', function (Blueprint $table) {
+            $table->integer('price');
+        });
+
+        Schema::table('test', function (Blueprint $table) {
+            $table->integer('virtual_column')->virtualAs('"price" - 5');
+            $table->integer('stored_column')->storedAs('"price" - 5');
+        });
+
+        $this->assertTrue(Schema::hasColumns('test', ['virtual_column', 'stored_column']));
+    }
+
+    public function testAddingMacros()
+    {
+        Schema::macro('foo', fn () => 'foo');
+
+        $this->assertEquals('foo', Schema::foo());
+
+        Schema::macro('hasForeignKeyForColumn', function (string $column, string $table, string $foreignTable) {
+            return collect(Schema::getForeignKeys($table))
+                ->contains(function (array $foreignKey) use ($column, $foreignTable) {
+                    return collect($foreignKey['columns'])->contains($column)
+                        && $foreignKey['foreign_table'] == $foreignTable;
+                });
+        });
+
+        Schema::create('questions', function (Blueprint $table) {
+            $table->id();
+            $table->string('body');
+        });
+
+        Schema::create('answers', function (Blueprint $table) {
+            $table->id();
+            $table->string('body');
+            $table->foreignId('question_id')->constrained();
+        });
+
+        $this->assertTrue(Schema::hasForeignKeyForColumn('question_id', 'answers', 'questions'));
+        $this->assertFalse(Schema::hasForeignKeyForColumn('body', 'answers', 'questions'));
     }
 }

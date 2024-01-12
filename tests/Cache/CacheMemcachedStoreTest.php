@@ -6,11 +6,10 @@ use Illuminate\Cache\MemcachedStore;
 use Illuminate\Support\Carbon;
 use Memcached;
 use Mockery as m;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @requires extension memcached
- */
+#[RequiresPhpExtension('memcached')]
 class CacheMemcachedStoreTest extends TestCase
 {
     protected function tearDown(): void
@@ -25,7 +24,7 @@ class CacheMemcachedStoreTest extends TestCase
         $memcache = $this->getMockBuilder(Memcached::class)->onlyMethods(['get', 'getResultCode'])->getMock();
         $memcache->expects($this->once())->method('get')->with($this->equalTo('foo:bar'))->willReturn(null);
         $memcache->expects($this->once())->method('getResultCode')->willReturn(1);
-        $store = new MemcachedStore($memcache, 'foo');
+        $store = new MemcachedStore($memcache, 'foo:');
         $this->assertNull($store->get('bar'));
     }
 
@@ -47,7 +46,7 @@ class CacheMemcachedStoreTest extends TestCase
             'fizz', 'buzz', 'norf',
         ]);
         $memcache->expects($this->once())->method('getResultCode')->willReturn(0);
-        $store = new MemcachedStore($memcache, 'foo');
+        $store = new MemcachedStore($memcache, 'foo:');
         $this->assertEquals([
             'foo' => 'fizz',
             'bar' => 'buzz',
@@ -115,9 +114,9 @@ class CacheMemcachedStoreTest extends TestCase
     public function testGetAndSetPrefix()
     {
         $store = new MemcachedStore(new Memcached, 'bar');
-        $this->assertSame('bar:', $store->getPrefix());
+        $this->assertSame('bar', $store->getPrefix());
         $store->setPrefix('foo');
-        $this->assertSame('foo:', $store->getPrefix());
+        $this->assertSame('foo', $store->getPrefix());
         $store->setPrefix(null);
         $this->assertEmpty($store->getPrefix());
     }

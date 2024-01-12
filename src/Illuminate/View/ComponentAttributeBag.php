@@ -12,9 +12,10 @@ use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\Macroable;
 use IteratorAggregate;
 use JsonSerializable;
+use Stringable;
 use Traversable;
 
-class ComponentAttributeBag implements ArrayAccess, IteratorAggregate, JsonSerializable, Htmlable
+class ComponentAttributeBag implements ArrayAccess, IteratorAggregate, JsonSerializable, Htmlable, Stringable
 {
     use Conditionable, Macroable;
 

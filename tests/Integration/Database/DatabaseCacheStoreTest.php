@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Database;
 
+use Illuminate\Database\SQLiteConnection;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -163,6 +164,19 @@ class DatabaseCacheStoreTest extends DatabaseTestCase
         $store->forgetIfExpired('foo');
 
         $this->assertDatabaseHas($this->getCacheTableName(), ['key' => $this->withCachePrefix('foo')]);
+    }
+
+    public function testResolvingSQLiteConnectionDoesNotThrowExceptions()
+    {
+        $originalConfiguration = config('database');
+
+        app('config')->set('database.default', 'sqlite');
+        app('config')->set('database.connections.sqlite.database', __DIR__.'/non-existing-file');
+
+        $store = $this->getStore();
+        $this->assertInstanceOf(SQLiteConnection::class, $store->getConnection());
+
+        app('config')->set('database', $originalConfiguration);
     }
 
     /**

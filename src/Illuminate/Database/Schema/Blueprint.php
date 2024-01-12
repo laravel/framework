@@ -2,13 +2,11 @@
 
 namespace Illuminate\Database\Schema;
 
-use BadMethodCallException;
 use Closure;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Schema\Grammars\Grammar;
-use Illuminate\Database\SQLiteConnection;
 use Illuminate\Support\Fluent;
 use Illuminate\Support\Traits\Macroable;
 
@@ -156,20 +154,7 @@ class Blueprint
      */
     protected function ensureCommandsAreValid(Connection $connection)
     {
-        if ($connection instanceof SQLiteConnection) {
-            if ($this->commandsNamed(['dropColumn', 'renameColumn'])->count() > 1
-                && ! $connection->usingNativeSchemaOperations()) {
-                throw new BadMethodCallException(
-                    "SQLite doesn't support multiple calls to dropColumn / renameColumn in a single modification."
-                );
-            }
-
-            if ($this->commandsNamed(['dropForeign'])->count() > 0) {
-                throw new BadMethodCallException(
-                    "SQLite doesn't support dropping foreign keys (you would need to re-create the table)."
-                );
-            }
-        }
+        //
     }
 
     /**
@@ -259,10 +244,6 @@ class Blueprint
     public function addFluentCommands(Connection $connection, Grammar $grammar)
     {
         foreach ($this->columns as $column) {
-            if ($column->change && ! $connection->usingNativeSchemaOperations()) {
-                continue;
-            }
-
             foreach ($grammar->getFluentCommands() as $commandName) {
                 $this->addCommand($commandName, compact('column'));
             }
@@ -1006,28 +987,23 @@ class Blueprint
      * Create a new float column on the table.
      *
      * @param  string  $column
-     * @param  int  $total
-     * @param  int  $places
-     * @param  bool  $unsigned
+     * @param  int  $precision
      * @return \Illuminate\Database\Schema\ColumnDefinition
      */
-    public function float($column, $total = 8, $places = 2, $unsigned = false)
+    public function float($column, $precision = 53)
     {
-        return $this->addColumn('float', $column, compact('total', 'places', 'unsigned'));
+        return $this->addColumn('float', $column, compact('precision'));
     }
 
     /**
      * Create a new double column on the table.
      *
      * @param  string  $column
-     * @param  int|null  $total
-     * @param  int|null  $places
-     * @param  bool  $unsigned
      * @return \Illuminate\Database\Schema\ColumnDefinition
      */
-    public function double($column, $total = null, $places = null, $unsigned = false)
+    public function double($column)
     {
-        return $this->addColumn('double', $column, compact('total', 'places', 'unsigned'));
+        return $this->addColumn('double', $column);
     }
 
     /**
@@ -1036,51 +1012,11 @@ class Blueprint
      * @param  string  $column
      * @param  int  $total
      * @param  int  $places
-     * @param  bool  $unsigned
      * @return \Illuminate\Database\Schema\ColumnDefinition
      */
-    public function decimal($column, $total = 8, $places = 2, $unsigned = false)
+    public function decimal($column, $total = 8, $places = 2)
     {
-        return $this->addColumn('decimal', $column, compact('total', 'places', 'unsigned'));
-    }
-
-    /**
-     * Create a new unsigned float column on the table.
-     *
-     * @param  string  $column
-     * @param  int  $total
-     * @param  int  $places
-     * @return \Illuminate\Database\Schema\ColumnDefinition
-     */
-    public function unsignedFloat($column, $total = 8, $places = 2)
-    {
-        return $this->float($column, $total, $places, true);
-    }
-
-    /**
-     * Create a new unsigned double column on the table.
-     *
-     * @param  string  $column
-     * @param  int  $total
-     * @param  int  $places
-     * @return \Illuminate\Database\Schema\ColumnDefinition
-     */
-    public function unsignedDouble($column, $total = null, $places = null)
-    {
-        return $this->double($column, $total, $places, true);
-    }
-
-    /**
-     * Create a new unsigned decimal column on the table.
-     *
-     * @param  string  $column
-     * @param  int  $total
-     * @param  int  $places
-     * @return \Illuminate\Database\Schema\ColumnDefinition
-     */
-    public function unsignedDecimal($column, $total = 8, $places = 2)
-    {
-        return $this->decimal($column, $total, $places, true);
+        return $this->addColumn('decimal', $column, compact('total', 'places'));
     }
 
     /**

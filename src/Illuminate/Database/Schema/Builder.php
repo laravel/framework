@@ -5,11 +5,14 @@ namespace Illuminate\Database\Schema;
 use Closure;
 use Illuminate\Container\Container;
 use Illuminate\Database\Connection;
+use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
 use LogicException;
 
 class Builder
 {
+    use Macroable;
+
     /**
      * The database connection instance.
      *
@@ -44,13 +47,6 @@ class Builder
      * @var string
      */
     public static $defaultMorphKeyType = 'int';
-
-    /**
-     * Indicates whether Doctrine DBAL usage will be prevented if possible when dropping, renaming, and modifying columns.
-     *
-     * @var bool
-     */
-    public static $alwaysUsesNativeSchemaOperationsIfPossible = false;
 
     /**
      * Create a new database Schema manager.
@@ -110,17 +106,6 @@ class Builder
     public static function morphUsingUlids()
     {
         return static::defaultMorphKeyType('ulid');
-    }
-
-    /**
-     * Attempt to use native schema operations for dropping, renaming, and modifying columns, even if Doctrine DBAL is installed.
-     *
-     * @param  bool  $value
-     * @return void
-     */
-    public static function useNativeSchemaOperationsIfPossible(bool $value = true)
-    {
-        static::$alwaysUsesNativeSchemaOperationsIfPossible = $value;
     }
 
     /**
@@ -309,12 +294,6 @@ class Builder
      */
     public function getColumnType($table, $column, $fullDefinition = false)
     {
-        if (! $this->connection->usingNativeSchemaOperations()) {
-            $table = $this->connection->getTablePrefix().$table;
-
-            return $this->connection->getDoctrineColumn($table, $column)->getType()->getName();
-        }
-
         $columns = $this->getColumns($table);
 
         foreach ($columns as $value) {

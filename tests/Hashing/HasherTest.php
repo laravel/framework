@@ -8,6 +8,7 @@ use Illuminate\Hashing\Argon2IdHasher;
 use Illuminate\Hashing\ArgonHasher;
 use Illuminate\Hashing\BcryptHasher;
 use Illuminate\Hashing\HashManager;
+use PHPUnit\Framework\Attributes\Depends;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 
@@ -82,9 +83,7 @@ class HasherTest extends TestCase
         $this->assertTrue($this->hashManager->isHashed($value));
     }
 
-    /**
-     * @depends testBasicBcryptHashing
-     */
+    #[Depends('testBasicBcryptHashing')]
     public function testBasicBcryptVerification()
     {
         $this->expectException(RuntimeException::class);
@@ -94,9 +93,7 @@ class HasherTest extends TestCase
         (new BcryptHasher(['verify' => true]))->check('password', $argonHashed);
     }
 
-    /**
-     * @depends testBasicArgon2iHashing
-     */
+    #[Depends('testBasicArgon2iHashing')]
     public function testBasicArgon2iVerification()
     {
         $this->expectException(RuntimeException::class);
@@ -106,9 +103,7 @@ class HasherTest extends TestCase
         (new ArgonHasher(['verify' => true]))->check('password', $bcryptHashed);
     }
 
-    /**
-     * @depends testBasicArgon2idHashing
-     */
+    #[Depends('testBasicArgon2idHashing')]
     public function testBasicArgon2idVerification()
     {
         $this->expectException(RuntimeException::class);

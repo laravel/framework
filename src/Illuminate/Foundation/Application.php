@@ -3,7 +3,9 @@
 namespace Illuminate\Foundation;
 
 use Closure;
+use Composer\Autoload\ClassLoader;
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Console\Kernel as ConsoleKernelContract;
 use Illuminate\Contracts\Foundation\Application as ApplicationContract;
 use Illuminate\Contracts\Foundation\CachesConfiguration;
 use Illuminate\Contracts\Foundation\CachesRoutes;
@@ -23,6 +25,8 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 use RuntimeException;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -40,7 +44,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      *
      * @var string
      */
-    const VERSION = '10.38.2';
+    const VERSION = '11.x-dev';
 
     /**
      * The base path for the Laravel installation.
@@ -48,6 +52,13 @@ class Application extends Container implements ApplicationContract, CachesConfig
      * @var string
      */
     protected $basePath;
+
+    /**
+     * The array of registered callbacks.
+     *
+     * @var callable[]
+     */
+    protected $registeredCallbacks = [];
 
     /**
      * Indicates if the application has been bootstrapped before.
@@ -204,6 +215,38 @@ class Application extends Container implements ApplicationContract, CachesConfig
         $this->registerBaseBindings();
         $this->registerBaseServiceProviders();
         $this->registerCoreContainerAliases();
+    }
+
+    /**
+     * Begin configuring a new Laravel application instance.
+     *
+     * @param  string|null  $baseDirectory
+     * @return \Illuminate\Foundation\Configuration\ApplicationBuilder
+     */
+    public static function configure(string $baseDirectory = null)
+    {
+        $baseDirectory = match (true) {
+            is_string($baseDirectory) => $baseDirectory,
+            default => static::inferBaseDirectory(),
+        };
+
+        return (new Configuration\ApplicationBuilder(new static($baseDirectory)))
+            ->withKernels()
+            ->withEvents()
+            ->withCommands();
+    }
+
+    /**
+     * Infer the application's base directory from the environment.
+     *
+     * @return string
+     */
+    public static function inferBaseDirectory()
+    {
+        return match (true) {
+            isset($_ENV['APP_BASE_PATH']) => $_ENV['APP_BASE_PATH'],
+            default => dirname(array_keys(ClassLoader::getRegisteredLoaders())[0]),
+        };
     }
 
     /**
@@ -402,6 +445,16 @@ class Application extends Container implements ApplicationContract, CachesConfig
     public function bootstrapPath($path = '')
     {
         return $this->joinPaths($this->bootstrapPath, $path);
+    }
+
+    /**
+     * Get the path to the service provider list in the bootstrap directory.
+     *
+     * @return string
+     */
+    public function getBootstrapProvidersPath()
+    {
+        return $this->bootstrapPath('providers.php');
     }
 
     /**
@@ -750,6 +803,17 @@ class Application extends Container implements ApplicationContract, CachesConfig
     }
 
     /**
+     * Register a new registered listener.
+     *
+     * @param  callable  $callback
+     * @return void
+     */
+    public function registered($callback)
+    {
+        $this->registeredCallbacks[] = $callback;
+    }
+
+    /**
      * Register all of the configured providers.
      *
      * @return void
@@ -763,6 +827,8 @@ class Application extends Container implements ApplicationContract, CachesConfig
 
         (new ProviderRepository($this, new Filesystem, $this->getCachedServicesPath()))
                     ->load($providers->collapse()->toArray());
+
+        $this->fireAppCallbacks($this->registeredCallbacks);
     }
 
     /**
@@ -1084,6 +1150,41 @@ class Application extends Container implements ApplicationContract, CachesConfig
     public function handle(SymfonyRequest $request, int $type = self::MAIN_REQUEST, bool $catch = true): SymfonyResponse
     {
         return $this[HttpKernelContract::class]->handle(Request::createFromBase($request));
+    }
+
+    /**
+     * Handle the incoming HTTP request and send the response to the browser.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return void
+     */
+    public function handleRequest(Request $request)
+    {
+        $kernel = $this->make(HttpKernelContract::class);
+
+        $response = $kernel->handle($request)->send();
+
+        $kernel->terminate($request, $response);
+    }
+
+    /**
+     * Handle the incoming Artisan command.
+     *
+     * @param  \Symfony\Component\Console\Input\InputInterface  $input
+     * @return int
+     */
+    public function handleCommand(InputInterface $input)
+    {
+        $kernel = $this->make(ConsoleKernelContract::class);
+
+        $status = $kernel->handle(
+            $input,
+            new ConsoleOutput
+        );
+
+        $kernel->terminate($input, $status);
+
+        return $status;
     }
 
     /**

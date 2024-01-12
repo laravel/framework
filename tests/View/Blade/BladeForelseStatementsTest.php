@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\View\Blade;
 
 use Illuminate\Contracts\View\ViewCompilationException;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class BladeForelseStatementsTest extends AbstractBladeTestCase
 {
@@ -80,9 +81,7 @@ empty
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
 
-    /**
-     * @dataProvider invalidForelseStatementsDataProvider
-     */
+    #[DataProvider('invalidForelseStatementsDataProvider')]
     public function testForelseStatementsThrowHumanizedMessageWhenInvalidStatement($initialStatement)
     {
         $this->expectException(ViewCompilationException::class);

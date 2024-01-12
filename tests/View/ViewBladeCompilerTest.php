@@ -6,6 +6,7 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\View\Compilers\BladeCompiler;
 use InvalidArgumentException;
 use Mockery as m;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class ViewBladeCompilerTest extends TestCase
@@ -122,11 +123,10 @@ class ViewBladeCompilerTest extends TestCase
     }
 
     /**
-     * @dataProvider appendViewPathDataProvider
-     *
      * @param  string  $content
      * @param  string  $compiled
      */
+    #[DataProvider('appendViewPathDataProvider')]
     public function testIncludePathToTemplate($content, $compiled)
     {
         $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);

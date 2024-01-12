@@ -3,7 +3,6 @@
 namespace Illuminate\Database;
 
 use Exception;
-use Illuminate\Database\PDO\SQLiteDriver;
 use Illuminate\Database\Query\Grammars\SQLiteGrammar as QueryGrammar;
 use Illuminate\Database\Query\Processors\SQLiteProcessor;
 use Illuminate\Database\Schema\Grammars\SQLiteGrammar as SchemaGrammar;
@@ -32,9 +31,17 @@ class SQLiteConnection extends Connection
             return;
         }
 
-        $enableForeignKeyConstraints
-            ? $this->getSchemaBuilder()->enableForeignKeyConstraints()
-            : $this->getSchemaBuilder()->disableForeignKeyConstraints();
+        $schemaBuilder = $this->getSchemaBuilder();
+
+        try {
+            $enableForeignKeyConstraints
+                ? $schemaBuilder->enableForeignKeyConstraints()
+                : $schemaBuilder->disableForeignKeyConstraints();
+        } catch (QueryException $e) {
+            if (! $e->getPrevious() instanceof SQLiteDatabaseDoesNotExistException) {
+                throw $e;
+            }
+        }
     }
 
     /**
@@ -120,16 +127,6 @@ class SQLiteConnection extends Connection
     protected function getDefaultPostProcessor()
     {
         return new SQLiteProcessor;
-    }
-
-    /**
-     * Get the Doctrine DBAL driver.
-     *
-     * @return \Illuminate\Database\PDO\SQLiteDriver
-     */
-    protected function getDoctrineDriver()
-    {
-        return new SQLiteDriver;
     }
 
     /**

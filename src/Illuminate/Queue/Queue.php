@@ -347,7 +347,7 @@ abstract class Queue
      */
     protected function shouldDispatchAfterCommit($job)
     {
-        if (is_object($job) && $job instanceof ShouldQueueAfterCommit) {
+        if ($job instanceof ShouldQueueAfterCommit) {
             return true;
         }
 

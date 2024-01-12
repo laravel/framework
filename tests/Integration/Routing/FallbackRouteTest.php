@@ -55,8 +55,13 @@ class FallbackRouteTest extends TestCase
         })->where('any', '.*');
 
         $this->assertStringContainsString('one', $this->get('/one')->getContent());
-        $this->assertStringContainsString('wildcard', $this->get('/non-existing')->getContent());
-        $this->assertEquals(200, $this->get('/non-existing')->getStatusCode());
+
+        tap($this->get('/non-existing'), function ($response) {
+            $this->assertStringContainsString('wildcard', $response->getContent());
+            $this->assertEquals(200, $response->getStatusCode());
+
+            $this->assertSame('non-existing', $response->baseRequest->route('any'));
+        });
     }
 
     public function testNoRoutes()

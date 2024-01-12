@@ -4,9 +4,10 @@ namespace Illuminate\Validation\Rules;
 
 use BackedEnum;
 use Illuminate\Contracts\Support\Arrayable;
+use Stringable;
 use UnitEnum;
 
-class In
+class In implements Stringable
 {
     /**
      * The name of the rule.

@@ -5,7 +5,6 @@ namespace Illuminate\Database\Console;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Database\Events\DatabaseBusy;
-use Illuminate\Support\Composer;
 use Symfony\Component\Console\Attribute\AsCommand;
 
 #[AsCommand(name: 'db:monitor')]
@@ -46,11 +45,10 @@ class MonitorCommand extends DatabaseInspectionCommand
      *
      * @param  \Illuminate\Database\ConnectionResolverInterface  $connection
      * @param  \Illuminate\Contracts\Events\Dispatcher  $events
-     * @param  \Illuminate\Support\Composer  $composer
      */
-    public function __construct(ConnectionResolverInterface $connection, Dispatcher $events, Composer $composer)
+    public function __construct(ConnectionResolverInterface $connection, Dispatcher $events)
     {
-        parent::__construct($composer);
+        parent::__construct();
 
         $this->connection = $connection;
         $this->events = $events;

@@ -22,6 +22,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\LazyCollection;
 use Illuminate\Support\Str;
+use Illuminate\Support\Traits\Dumpable;
 use Illuminate\Support\Traits\ForwardsCalls;
 use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
@@ -30,7 +31,7 @@ use RuntimeException;
 
 class Builder implements BuilderContract
 {
-    use BuildsQueries, ExplainsQueries, ForwardsCalls, Macroable {
+    use BuildsQueries, Dumpable, ExplainsQueries, ForwardsCalls, Macroable {
         __call as macroCall;
     }
 
@@ -82,7 +83,7 @@ class Builder implements BuilderContract
     /**
      * The columns that should be returned.
      *
-     * @var array
+     * @var array|null
      */
     public $columns;
 
@@ -1379,7 +1380,7 @@ class Builder implements BuilderContract
      * Add a "where date" statement to the query.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
-     * @param  string  $operator
+     * @param  \DateTimeInterface|string|null  $operator
      * @param  \DateTimeInterface|string|null  $value
      * @param  string  $boolean
      * @return $this
@@ -1403,7 +1404,7 @@ class Builder implements BuilderContract
      * Add an "or where date" statement to the query.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
-     * @param  string  $operator
+     * @param  \DateTimeInterface|string|null  $operator
      * @param  \DateTimeInterface|string|null  $value
      * @return $this
      */
@@ -1420,7 +1421,7 @@ class Builder implements BuilderContract
      * Add a "where time" statement to the query.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
-     * @param  string  $operator
+     * @param  \DateTimeInterface|string|null  $operator
      * @param  \DateTimeInterface|string|null  $value
      * @param  string  $boolean
      * @return $this
@@ -1444,7 +1445,7 @@ class Builder implements BuilderContract
      * Add an "or where time" statement to the query.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
-     * @param  string  $operator
+     * @param  \DateTimeInterface|string|null  $operator
      * @param  \DateTimeInterface|string|null  $value
      * @return $this
      */
@@ -1461,7 +1462,7 @@ class Builder implements BuilderContract
      * Add a "where day" statement to the query.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
-     * @param  string  $operator
+     * @param  \DateTimeInterface|string|int|null  $operator
      * @param  \DateTimeInterface|string|int|null  $value
      * @param  string  $boolean
      * @return $this
@@ -1489,7 +1490,7 @@ class Builder implements BuilderContract
      * Add an "or where day" statement to the query.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
-     * @param  string  $operator
+     * @param  \DateTimeInterface|string|int|null  $operator
      * @param  \DateTimeInterface|string|int|null  $value
      * @return $this
      */
@@ -1506,7 +1507,7 @@ class Builder implements BuilderContract
      * Add a "where month" statement to the query.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
-     * @param  string  $operator
+     * @param  \DateTimeInterface|string|int|null  $operator
      * @param  \DateTimeInterface|string|int|null  $value
      * @param  string  $boolean
      * @return $this
@@ -1534,7 +1535,7 @@ class Builder implements BuilderContract
      * Add an "or where month" statement to the query.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
-     * @param  string  $operator
+     * @param  \DateTimeInterface|string|int|null  $operator
      * @param  \DateTimeInterface|string|int|null  $value
      * @return $this
      */
@@ -1551,7 +1552,7 @@ class Builder implements BuilderContract
      * Add a "where year" statement to the query.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
-     * @param  string  $operator
+     * @param  \DateTimeInterface|string|int|null  $operator
      * @param  \DateTimeInterface|string|int|null  $value
      * @param  string  $boolean
      * @return $this
@@ -1575,7 +1576,7 @@ class Builder implements BuilderContract
      * Add an "or where year" statement to the query.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
-     * @param  string  $operator
+     * @param  \DateTimeInterface|string|int|null  $operator
      * @param  \DateTimeInterface|string|int|null  $value
      * @return $this
      */
@@ -2763,11 +2764,11 @@ class Builder implements BuilderContract
      * @param  \Closure|int|null  $total
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
-    public function paginate($perPage = 15, $columns = ['*'], $pageName = 'page', $page = null)
+    public function paginate($perPage = 15, $columns = ['*'], $pageName = 'page', $page = null, $total = null)
     {
         $page = $page ?: Paginator::resolveCurrentPage($pageName);
 
-        $total = func_num_args() === 5 ? value(func_get_arg(4)) : $this->getCountForPagination();
+        $total = value($total) ?? $this->getCountForPagination();
 
         $perPage = $perPage instanceof Closure ? $perPage($total) : $perPage;
 
@@ -3904,11 +3905,16 @@ class Builder implements BuilderContract
     /**
      * Dump the current SQL and bindings.
      *
+     * @param  mixed  ...$args
      * @return $this
      */
-    public function dump()
+    public function dump(...$args)
     {
-        dump($this->toSql(), $this->getBindings());
+        dump(
+            $this->toSql(),
+            $this->getBindings(),
+            ...$args,
+        );
 
         return $this;
     }

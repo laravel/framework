@@ -465,7 +465,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
     public function testAddingFloat()
     {
         $blueprint = new Blueprint('users');
-        $blueprint->float('foo', 5, 2);
+        $blueprint->float('foo', 5);
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
@@ -475,11 +475,11 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
     public function testAddingDouble()
     {
         $blueprint = new Blueprint('users');
-        $blueprint->double('foo', 15, 8);
+        $blueprint->double('foo');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertSame('alter table "users" add column "foo" float not null', $statements[0]);
+        $this->assertSame('alter table "users" add column "foo" double not null', $statements[0]);
     }
 
     public function testAddingDecimal()
@@ -882,10 +882,11 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $blueprint->integer('discounted_stored')->storedAs('"price" - 5')->nullable(false);
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertCount(2, $statements);
+        $this->assertCount(3, $statements);
         $expected = [
             'alter table "products" add column "price" integer not null',
             'alter table "products" add column "discounted_virtual" integer not null as ("price" - 5)',
+            'alter table "products" add column "discounted_stored" integer not null as ("price" - 5) stored',
         ];
         $this->assertSame($expected, $statements);
     }

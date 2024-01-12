@@ -7,7 +7,6 @@ namespace Illuminate\Support\Facades;
  * @method static void defaultMorphKeyType(string $type)
  * @method static void morphUsingUuids()
  * @method static void morphUsingUlids()
- * @method static void useNativeSchemaOperationsIfPossible(bool $value = true)
  * @method static bool createDatabase(string $name)
  * @method static bool dropDatabaseIfExists(string $name)
  * @method static bool hasTable(string $table)
@@ -39,6 +38,10 @@ namespace Illuminate\Support\Facades;
  * @method static \Illuminate\Database\Connection getConnection()
  * @method static \Illuminate\Database\Schema\Builder setConnection(\Illuminate\Database\Connection $connection)
  * @method static void blueprintResolver(\Closure $resolver)
+ * @method static void macro(string $name, object|callable $macro)
+ * @method static void mixin(object $mixin, bool $replace = true)
+ * @method static bool hasMacro(string $name)
+ * @method static void flushMacros()
  *
  * @see \Illuminate\Database\Schema\Builder
  */

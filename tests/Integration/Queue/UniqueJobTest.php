@@ -13,6 +13,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Bus;
 use Orchestra\Testbench\Attributes\WithMigration;
 
+#[WithMigration]
 #[WithMigration('cache')]
 #[WithMigration('queue')]
 class UniqueJobTest extends QueueTestCase
@@ -131,7 +132,7 @@ class UniqueJobTest extends QueueTestCase
 
     protected function getLockKey($job)
     {
-        return 'laravel_unique_job:'.(is_string($job) ? $job : get_class($job));
+        return 'laravel_unique_job:'.(is_string($job) ? $job : get_class($job)).':';
     }
 }
 

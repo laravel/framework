@@ -102,6 +102,12 @@ class SupportArrTest extends TestCase
         $array = Arr::dot(['foo' => ['bar' => 'baz']]);
         $this->assertSame(['foo.bar' => 'baz'], $array);
 
+        $array = Arr::dot([10 => 100]);
+        $this->assertSame([10 => 100], $array);
+
+        $array = Arr::dot(['foo' => [10 => 100]]);
+        $this->assertSame(['foo.10' => 100], $array);
+
         $array = Arr::dot([]);
         $this->assertSame([], $array);
 
@@ -901,12 +907,28 @@ class SupportArrTest extends TestCase
         $this->assertEquals([1 => 'hAz'], Arr::set($array, 1, 'hAz'));
     }
 
-    public function testShuffleWithSeed()
+    public function testShuffle()
     {
-        $this->assertEquals(
-            Arr::shuffle(range(0, 100, 10), 1234),
-            Arr::shuffle(range(0, 100, 10), 1234)
+        $input = ['a', 'b', 'c', 'd', 'e', 'f'];
+
+        $this->assertNotEquals(
+            $input,
+            Arr::shuffle($input)
         );
+
+        $this->assertNotEquals(
+            Arr::shuffle($input),
+            Arr::shuffle($input)
+        );
+    }
+
+    public function testShuffleKeepsSameValues()
+    {
+        $input = ['a', 'b', 'c', 'd', 'e', 'f'];
+        $shuffled = Arr::shuffle($input);
+        sort($shuffled);
+
+        $this->assertEquals($input, $shuffled);
     }
 
     public function testEmptyShuffle()

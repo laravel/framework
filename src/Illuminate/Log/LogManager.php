@@ -502,6 +502,22 @@ class LogManager implements LoggerInterface
     }
 
     /**
+     * Flush the log context on all currently resolved channels.
+     *
+     * @return $this
+     */
+    public function withoutContext()
+    {
+        foreach ($this->channels as $channel) {
+            if (method_exists($channel, 'withoutContext')) {
+                $channel->withoutContext();
+            }
+        }
+
+        return $this;
+    }
+
+    /**
      * Flush the shared context.
      *
      * @return $this

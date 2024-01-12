@@ -303,6 +303,7 @@ abstract class Facade
             'Request' => Request::class,
             'Response' => Response::class,
             'Route' => Route::class,
+            'Schedule' => Schedule::class,
             'Schema' => Schema::class,
             'Session' => Session::class,
             'Storage' => Storage::class,

@@ -279,6 +279,22 @@ class QueueFake extends QueueManager implements Fake, Queue
     }
 
     /**
+     * Assert the total count of jobs that were pushed.
+     *
+     * @param  int  $expectedCount
+     * @return void
+     */
+    public function assertCount($expectedCount)
+    {
+        $actualCount = collect($this->jobs)->flatten(1)->count();
+
+        PHPUnit::assertSame(
+            $expectedCount, $actualCount,
+            "Expected {$expectedCount} jobs to be pushed, but found {$actualCount} instead."
+        );
+    }
+
+    /**
      * Assert that no jobs were pushed.
      *
      * @return void

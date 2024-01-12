@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Support;
 
 use Exception;
 use Illuminate\Support\Str;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\UuidInterface;
 use ReflectionClass;
@@ -65,6 +66,37 @@ class SupportStrTest extends TestCase
         $this->assertSame('Orwell 1984', Str::headline('orwell   1984'));
         $this->assertSame('Orwell 1984', Str::headline('-orwell-1984 -'));
         $this->assertSame('Orwell 1984', Str::headline(' orwell_- 1984 '));
+    }
+
+    public function testStringApa()
+    {
+        $this->assertSame('Tom and Jerry', Str::apa('tom and jerry'));
+        $this->assertSame('Tom and Jerry', Str::apa('TOM AND JERRY'));
+        $this->assertSame('Tom and Jerry', Str::apa('Tom And Jerry'));
+
+        $this->assertSame('Back to the Future', Str::apa('back to the future'));
+        $this->assertSame('Back to the Future', Str::apa('BACK TO THE FUTURE'));
+        $this->assertSame('Back to the Future', Str::apa('Back To The Future'));
+
+        $this->assertSame('This, Then That', Str::apa('this, then that'));
+        $this->assertSame('This, Then That', Str::apa('THIS, THEN THAT'));
+        $this->assertSame('This, Then That', Str::apa('This, Then That'));
+
+        $this->assertSame('Bond. James Bond.', Str::apa('bond. james bond.'));
+        $this->assertSame('Bond. James Bond.', Str::apa('BOND. JAMES BOND.'));
+        $this->assertSame('Bond. James Bond.', Str::apa('Bond. James Bond.'));
+
+        $this->assertSame('Self-Report', Str::apa('self-report'));
+        $this->assertSame('Self-Report', Str::apa('Self-report'));
+        $this->assertSame('Self-Report', Str::apa('SELF-REPORT'));
+
+        $this->assertSame('As the World Turns, So Are the Days of Our Lives', Str::apa('as the world turns, so are the days of our lives'));
+        $this->assertSame('As the World Turns, So Are the Days of Our Lives', Str::apa('AS THE WORLD TURNS, SO ARE THE DAYS OF OUR LIVES'));
+        $this->assertSame('As the World Turns, So Are the Days of Our Lives', Str::apa('As The World Turns, So Are The Days Of Our Lives'));
+
+        $this->assertSame('To Kill a Mockingbird', Str::apa('to kill a mockingbird'));
+        $this->assertSame('To Kill a Mockingbird', Str::apa('TO KILL A MOCKINGBIRD'));
+        $this->assertSame('To Kill a Mockingbird', Str::apa('To Kill A Mockingbird'));
     }
 
     public function testStringWithoutWordsDoesntProduceError()
@@ -287,17 +319,13 @@ class SupportStrTest extends TestCase
         $this->assertSame('foo', Str::afterLast('----foo', '---'));
     }
 
-    /**
-     * @dataProvider strContainsProvider
-     */
+    #[DataProvider('strContainsProvider')]
     public function testStrContains($haystack, $needles, $expected, $ignoreCase = false)
     {
         $this->assertEquals($expected, Str::contains($haystack, $needles, $ignoreCase));
     }
 
-    /**
-     * @dataProvider strContainsAllProvider
-     */
+    #[DataProvider('strContainsAllProvider')]
     public function testStrContainsAll($haystack, $needles, $expected, $ignoreCase = false)
     {
         $this->assertEquals($expected, Str::containsAll($haystack, $needles, $ignoreCase));
@@ -441,17 +469,13 @@ class SupportStrTest extends TestCase
         $this->assertFalse(Str::isUrl('invalid url'));
     }
 
-    /**
-     * @dataProvider validUuidList
-     */
+    #[DataProvider('validUuidList')]
     public function testIsUuidWithValidUuid($uuid)
     {
         $this->assertTrue(Str::isUuid($uuid));
     }
 
-    /**
-     * @dataProvider invalidUuidList
-     */
+    #[DataProvider('invalidUuidList')]
     public function testIsUuidWithInvalidUuid($uuid)
     {
         $this->assertFalse(Str::isUuid($uuid));
@@ -529,6 +553,17 @@ class SupportStrTest extends TestCase
     {
         $this->assertEquals(11, Str::length('foo bar baz'));
         $this->assertEquals(11, Str::length('foo bar baz', 'UTF-8'));
+    }
+
+    public function testNumbers()
+    {
+        $this->assertSame('5551234567', Str::numbers('(555) 123-4567'));
+        $this->assertSame('443', Str::numbers('L4r4v3l!'));
+        $this->assertSame('', Str::numbers('Laravel!'));
+
+        $arrayValue = ['(555) 123-4567', 'L4r4v3l', 'Laravel!'];
+        $arrayExpected = ['5551234567', '443', ''];
+        $this->assertSame($arrayExpected, Str::numbers($arrayValue));
     }
 
     public function testRandom()
@@ -1076,9 +1111,7 @@ class SupportStrTest extends TestCase
         $this->assertSame('', Str::repeat('', 5));
     }
 
-    /**
-     * @dataProvider specialCharacterProvider
-     */
+    #[DataProvider('specialCharacterProvider')]
     public function testTransliterate(string $value, string $expected): void
     {
         $this->assertSame($expected, Str::transliterate($value));
@@ -1104,9 +1137,7 @@ class SupportStrTest extends TestCase
         $this->assertSame('Hello', Str::transliterate('🎂', 'Hello'));
     }
 
-    /**
-     * @dataProvider specialCharacterProvider
-     */
+    #[DataProvider('specialCharacterProvider')]
     public function testTransliterateStrict(string $value, string $expected): void
     {
         $this->assertSame($expected, Str::transliterate($value, '?', true));

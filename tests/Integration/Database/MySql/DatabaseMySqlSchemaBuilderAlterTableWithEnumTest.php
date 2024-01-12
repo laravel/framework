@@ -4,12 +4,12 @@ namespace Illuminate\Tests\Integration\Database\MySql;
 
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use stdClass;
 
-/**
- * @requires extension pdo_mysql
- * @requires OS Linux|Darwin
- */
+#[RequiresOperatingSystem('Linux|Darwin')]
+#[RequiresPhpExtension('pdo_mysql')]
 class DatabaseMySqlSchemaBuilderAlterTableWithEnumTest extends MySqlTestCase
 {
     protected function afterRefreshingDatabase()
@@ -39,10 +39,10 @@ class DatabaseMySqlSchemaBuilderAlterTableWithEnumTest extends MySqlTestCase
     public function testChangeColumnOnTableWithEnum()
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->unsignedInteger('age')->charset('')->change();
+            $table->unsignedInteger('age')->change();
         });
 
-        $this->assertSame('integer', Schema::getColumnType('users', 'age'));
+        $this->assertSame('int', Schema::getColumnType('users', 'age'));
     }
 
     public function testGetAllTablesAndColumnListing()

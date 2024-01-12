@@ -246,6 +246,17 @@ class Store implements Session
     }
 
     /**
+     * Get all the session data except for a specified array of items.
+     *
+     * @param  array  $keys
+     * @return array
+     */
+    public function except(array $keys)
+    {
+        return Arr::except($this->attributes, $keys);
+    }
+
+    /**
      * Checks if a key exists.
      *
      * @param  string|array  $key

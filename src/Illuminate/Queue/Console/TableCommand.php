@@ -5,7 +5,9 @@ namespace Illuminate\Queue\Console;
 use Illuminate\Console\MigrationGeneratorCommand;
 use Symfony\Component\Console\Attribute\AsCommand;
 
-#[AsCommand(name: 'queue:table')]
+use function Illuminate\Filesystem\join_paths;
+
+#[AsCommand(name: 'make:queue-table')]
 class TableCommand extends MigrationGeneratorCommand
 {
     /**
@@ -13,7 +15,14 @@ class TableCommand extends MigrationGeneratorCommand
      *
      * @var string
      */
-    protected $name = 'queue:table';
+    protected $name = 'make:queue-table';
+
+    /**
+     * The console command name aliases.
+     *
+     * @var array
+     */
+    protected $aliases = ['queue:table'];
 
     /**
      * The console command description.
@@ -40,5 +49,24 @@ class TableCommand extends MigrationGeneratorCommand
     protected function migrationStubFile()
     {
         return __DIR__.'/stubs/jobs.stub';
+    }
+
+    /**
+     * Determine whether a migration for the table already exists.
+     *
+     * @param  string  $table
+     * @return bool
+     */
+    protected function migrationExists($table)
+    {
+        if ($table !== 'jobs') {
+            return parent::migrationExists($table);
+        }
+
+        return count($this->files->glob(sprintf(
+            '{%s,%s}',
+            join_paths($this->laravel->databasePath('migrations'), '*_*_*_*_create_'.$table.'_table.php'),
+            join_paths($this->laravel->databasePath('migrations'), '0001_01_01_000002_create_jobs_table.php'),
+        ))) !== 0;
     }
 }

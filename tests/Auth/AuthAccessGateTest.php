@@ -8,6 +8,7 @@ use Illuminate\Auth\Access\HandlesAuthorization;
 use Illuminate\Auth\Access\Response;
 use Illuminate\Container\Container;
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
@@ -325,6 +326,47 @@ class AuthAccessGateTest extends TestCase
         $this->assertTrue($gate->denies('deny'));
     }
 
+    public function testArrayAbilitiesInAllows()
+    {
+        $gate = $this->getBasicGate();
+
+        $gate->define('allow_1', function ($user) {
+            return true;
+        });
+        $gate->define('allow_2', function ($user) {
+            return true;
+        });
+        $gate->define('deny', function ($user) {
+            return false;
+        });
+
+        $this->assertTrue($gate->allows(['allow_1']));
+        $this->assertTrue($gate->allows(['allow_1', 'allow_2']));
+        $this->assertFalse($gate->allows(['allow_1', 'allow_2', 'deny']));
+        $this->assertFalse($gate->allows(['deny', 'allow_1', 'allow_2']));
+    }
+
+    public function testArrayAbilitiesInDenies()
+    {
+        $gate = $this->getBasicGate();
+
+        $gate->define('deny_1', function ($user) {
+            return false;
+        });
+        $gate->define('deny_2', function ($user) {
+            return false;
+        });
+        $gate->define('allow', function ($user) {
+            return true;
+        });
+
+        $this->assertTrue($gate->denies(['deny_1']));
+        $this->assertTrue($gate->denies(['deny_1', 'deny_2']));
+        $this->assertTrue($gate->denies(['deny_1', 'allow']));
+        $this->assertTrue($gate->denies(['allow', 'deny_1']));
+        $this->assertFalse($gate->denies(['allow']));
+    }
+
     public function testCurrentUserThatIsOnGateAlwaysInjectedIntoClosureCallbacks()
     {
         $gate = $this->getBasicGate();
@@ -555,9 +597,7 @@ class AuthAccessGateTest extends TestCase
         $this->assertSame(3, $counter);
     }
 
-    /**
-     * @dataProvider notCallableDataProvider
-     */
+    #[DataProvider('notCallableDataProvider')]
     public function testDefineSecondParameterShouldBeStringOrCallable($callback)
     {
         $this->expectException(InvalidArgumentException::class);
@@ -1036,12 +1076,11 @@ class AuthAccessGateTest extends TestCase
     }
 
     /**
-     * @dataProvider hasAbilitiesTestDataProvider
-     *
      * @param  array  $abilitiesToSet
      * @param  array|string  $abilitiesToCheck
      * @param  bool  $expectedHasValue
      */
+    #[DataProvider('hasAbilitiesTestDataProvider')]
     public function testHasAbilities($abilitiesToSet, $abilitiesToCheck, $expectedHasValue)
     {
         $gate = $this->getBasicGate();
