@@ -149,26 +149,32 @@ class Number
     /**
      * Convert the number to its human readable equivalent.
      *
-     * @param  int  $number
-     * @param  int  $precision
-     * @param  int|null  $maxPrecision
+     * @param int|float $number
+     * @param int $precision
+     * @param int|null $maxPrecision
+     * @param bool $abbreviate
+     * @param array $numberAbbreviations
      * @return string
      */
-    public static function forHumans(int|float $number, int $precision = 0, ?int $maxPrecision = null, bool $abbreviate = false)
+    public static function forHumans(int|float $number, int $precision = 0, ?int $maxPrecision = null, bool $abbreviate = false, array $numberAbbreviations = [
+        3 => ' thousand',
+        6 => ' million',
+        9 => ' billion',
+        12 => ' trillion',
+        15 => ' quadrillion',
+    ])
     {
-        return static::summarize($number, $precision, $maxPrecision, $abbreviate ? [
-            3 => 'K',
-            6 => 'M',
-            9 => 'B',
-            12 => 'T',
-            15 => 'Q',
-        ] : [
-            3 => ' thousand',
-            6 => ' million',
-            9 => ' billion',
-            12 => ' trillion',
-            15 => ' quadrillion',
-        ]);
+        if ($abbreviate) {
+            $numberAbbreviations = [
+                3 => 'K',
+                6 => 'M',
+                9 => 'B',
+                12 => 'T',
+                15 => 'Q',
+            ];
+        }
+
+        return static::summarize($number, $precision, $maxPrecision, $numberAbbreviations);
     }
 
     /**
