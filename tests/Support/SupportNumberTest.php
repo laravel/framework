@@ -238,6 +238,25 @@ class SupportNumberTest extends TestCase
         $this->assertSame('-1 thousand quadrillion', Number::forHumans(-1000000000000000000));
     }
 
+    public function testScientificNotation()
+    {
+        $this->needsIntlExtension();
+
+        // Test cases with default precision
+        $this->assertSame('0E0', Number::scientificNotation(0));
+        $this->assertSame('1E0', Number::scientificNotation(1));
+        $this->assertSame('1E1', Number::scientificNotation(10));
+        $this->assertSame('1.23E2', Number::scientificNotation(123));
+        $this->assertSame('1.2345E6', Number::scientificNotation(1234500));
+        $this->assertSame('1.23456789E9', Number::scientificNotation(1234567890));
+
+        // Test cases with custom precision
+        $this->assertSame('1.00E0', Number::scientificNotation(1, precision: 2));
+        $this->assertSame('1.23E2', Number::scientificNotation(123, precision: 2));
+        $this->assertSame('1.2346E6', Number::scientificNotation(1234567, precision: 4));
+        $this->assertSame('1.234568E9', Number::scientificNotation(1234567890, precision: 6));
+    }
+
     public function testSummarize()
     {
         $this->assertSame('1', Number::abbreviate(1));

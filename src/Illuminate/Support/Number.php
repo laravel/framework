@@ -182,6 +182,25 @@ class Number
     }
 
     /**
+     * @param float|int $number
+     * @param int|null $precision
+     * @param string|null $locale
+     * @return false|string
+     */
+    public static function scientificNotation(int|float $number, ?int $precision = null, ?string $locale = null)
+    {
+        static::ensureIntlExtensionIsInstalled();
+
+        $formatter = new NumberFormatter($locale ?? static::$locale, NumberFormatter::SCIENTIFIC);
+
+        if (!is_null($precision)) {
+            $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, $precision);
+        }
+
+        return $formatter->format($number);
+    }
+
+    /**
      * Convert the number to its human readable equivalent.
      *
      * @param  int  $number
