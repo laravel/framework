@@ -1641,6 +1641,49 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testFrequenciesOnNullCollection($collection)
+    {
+        $data = new $collection;
+        $this->assertNull($data->frequencies());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testFrequencies($collection)
+    {
+        $data = new $collection([1, 2, 3, 4, 4, 5]);
+        $this->assertEquals([1 => 1, 2 => 1, 3 => 1, 4 => 2, 5 => 1], $data->frequencies()->all());
+
+        // works with mix of primitives
+        $data = new $collection([1, '1', 2, '2', true, false, 3]);
+        $this->assertEquals([1 => 3, 2 => 2, 0 => 1, 3 => 1], $data->frequencies()->all());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testFrequenciesValueByKey($collection)
+    {
+        $data = new $collection([
+            (object) ['foo' => 1],
+            (object) ['foo' => 1],
+            (object) ['foo' => 2],
+            (object) ['foo' => 4],
+        ]);
+        $data2 = new Collection([
+            ['foo' => 1],
+            ['foo' => 1],
+            ['foo' => 2],
+            ['foo' => 4],
+        ]);
+        $this->assertEquals([1 => 2, 2 => 1, 4 => 1], $data->frequencies('foo')->all());
+        $this->assertEquals($data2->frequencies('foo'), $data->frequencies('foo'));
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testEach($collection)
     {
         $c = new $collection($original = [1, 2, 'foo' => 'bar', 'bam' => 'baz']);
