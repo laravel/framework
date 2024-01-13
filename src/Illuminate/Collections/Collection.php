@@ -442,6 +442,34 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     }
 
     /**
+     * Retrieve frequency of items from the collection.
+     *
+     * @param  (callable(TValue): bool)|string|null  $callback
+     * @param  bool  $strict
+     * @return static
+     */
+    public function frequencies($key = null)
+    {
+        if ($this->count() === 0) {
+            return null;
+        }
+
+        $collection = isset($key) ? $this->pluck($key) : $this;
+
+        $counts = new static;
+
+        $collection->each(function ($value) use (&$counts) {
+            if (! in_array(gettype($value), ['boolean', 'integer', 'string'])) {
+                return;
+            }
+
+            $counts[$value] = isset($counts[$value]) ? $counts[$value] + 1 : 1;
+        });
+
+        return $counts;
+    }
+
+    /**
      * Get an item from the collection by key.
      *
      * @template TGetDefault

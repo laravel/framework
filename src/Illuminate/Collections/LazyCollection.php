@@ -511,6 +511,18 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     }
 
     /**
+     * Retrieve frequency of items from the collection.
+     *
+     * @param  (callable(TValue): bool)|string|null  $callback
+     * @param  bool  $strict
+     * @return static
+     */
+    public function frequencies($key = null)
+    {
+        return $this->collect()->frequencies($key);
+    }
+
+    /**
      * Get an item by key.
      *
      * @template TGetDefault
