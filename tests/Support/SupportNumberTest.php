@@ -238,6 +238,27 @@ class SupportNumberTest extends TestCase
         $this->assertSame('-1 thousand quadrillion', Number::forHumans(-1000000000000000000));
     }
 
+    public function testForHumansWithCustomSuffixes()
+    {
+        $this->assertSame('1', Number::forHumansWithCustomSuffixes(1));
+        $this->assertSame('1.00', Number::forHumansWithCustomSuffixes(1, precision: 2));
+        $this->assertSame('10', Number::forHumansWithCustomSuffixes(10));
+        $this->assertSame('100', Number::forHumansWithCustomSuffixes(100));
+        $this->assertSame('1K Custom', Number::forHumansWithCustomSuffixes(1000, suffixes: ['K' => ' Custom']));
+        $this->assertSame('1.00K Custom', Number::forHumansWithCustomSuffixes(1000, precision: 2, suffixes: ['K' => ' Custom']));
+        $this->assertSame('1K Custom', Number::forHumansWithCustomSuffixes(1230, suffixes: ['K' => ' Custom']));
+        $this->assertSame('1.2K Custom', Number::forHumansWithCustomSuffixes(1230, maxPrecision: 1, suffixes: ['K' => ' Custom']));
+        $this->assertSame('1M Custom', Number::forHumansWithCustomSuffixes(1000000, suffixes: ['M' => ' Custom']));
+        $this->assertSame('1B Custom', Number::forHumansWithCustomSuffixes(1000000000, suffixes: ['B' => ' Custom']));
+        $this->assertSame('1T Custom', Number::forHumansWithCustomSuffixes(1000000000000, suffixes: ['T' => ' Custom']));
+        $this->assertSame('1Q Custom', Number::forHumansWithCustomSuffixes(1000000000000000, suffixes: ['Q' => ' Custom']));
+        $this->assertSame('1KQ Custom', Number::forHumansWithCustomSuffixes(1000000000000000000, suffixes: ['KQ' => ' Custom']));
+        $this->assertSame('1MQ Custom', Number::forHumansWithCustomSuffixes(1000000000000000000000, suffixes: ['MQ' => ' Custom']));
+        $this->assertSame('1BQ Custom', Number::forHumansWithCustomSuffixes(1000000000000000000000000, suffixes: ['BQ' => ' Custom']));
+        $this->assertSame('1TQ Custom', Number::forHumansWithCustomSuffixes(1000000000000000000000000000, suffixes: ['TQ' => ' Custom']));
+        $this->assertSame('1QQ Custom', Number::forHumansWithCustomSuffixes(1000000000000000000000000000000, suffixes: ['QQ' => ' Custom']));
+        $this->assertSame('1KQQ Custom', Number::forHumansWithCustomSuffixes(1000000000000000000000000000000000, suffixes: ['KQQ' => ' Custom']));
+    }
     public function testSummarize()
     {
         $this->assertSame('1', Number::abbreviate(1));

@@ -182,6 +182,18 @@ class Number
     }
 
     /**
+     * @param int|float $number
+     * @param int $precision
+     * @param int|null $maxPrecision
+     * @param array $suffixes
+     * @return false|string
+     */
+    public static function forHumansWithCustomSuffixes(int|float $number, int $precision = 0, ?int $maxPrecision = null, array $suffixes = [])
+    {
+        return static::summarize($number, $precision, $maxPrecision, $suffixes);
+    }
+
+    /**
      * Convert the number to its human readable equivalent.
      *
      * @param  int  $number
