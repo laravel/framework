@@ -1282,7 +1282,6 @@ class Stringable implements JsonSerializable, ArrayAccess
      * Get the underlying string value as an integer.
      *
      * @param  int  $base
-     *
      * @return int
      */
     public function toInteger($base = 10)
