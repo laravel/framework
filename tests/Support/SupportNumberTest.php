@@ -300,4 +300,12 @@ class SupportNumberTest extends TestCase
             $this->markTestSkipped('The intl extension is not installed. Please install the extension to enable '.__CLASS__);
         }
     }
+    public function testParse()
+    {
+
+        $this->assertSame(1234.56, Number::parse('1.234,56','de_DE'));
+        $this->assertSame(144.33, Number::parse('144,33','fr_FR'));
+        $this->assertSame(14.0, Number::parse('14.00'));
+
+    }
 }

@@ -271,4 +271,19 @@ class Number
             throw new RuntimeException('The "intl" PHP extension is required to use the ['.$method.'] method.');
         }
     }
+
+    /**
+     * Parse the given number using the current locale.
+     * @param  string  $number
+     * @param  string|null  $locale
+     * @return float|int
+     */
+    public static function parse(string $number, ?string $locale = null): float|int
+    {
+        static::ensureIntlExtensionIsInstalled();
+
+        $formatter = new NumberFormatter($locale ?? static::$locale, NumberFormatter::DECIMAL);
+
+        return $formatter->parse($number);
+    }
 }
