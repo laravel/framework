@@ -6,6 +6,7 @@ use Closure;
 use Exception;
 use Illuminate\Contracts\Notifications\Dispatcher as NotificationDispatcher;
 use Illuminate\Contracts\Notifications\Factory as NotificationFactory;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Contracts\Translation\HasLocalePreference;
 use Illuminate\Notifications\AnonymousNotifiable;
 use Illuminate\Support\Collection;
@@ -454,6 +455,10 @@ class NotificationFake implements Fake, NotificationDispatcher, NotificationFact
      */
     public function send($notifiables, $notification)
     {
+        if ($notification instanceof ShouldQueue) {
+            return $this->queue($notifiables, $notification);
+        }
+
         $this->sendNow($notifiables, $notification);
     }
 
@@ -507,10 +512,9 @@ class NotificationFake implements Fake, NotificationDispatcher, NotificationFact
      *
      * @param  \Illuminate\Support\Collection|array|mixed  $notifiables
      * @param  mixed  $notification
-     * @param  array|null  $channels
      * @return void
      */
-    protected function queue($notifiables, $notification, array $channels = null)
+    protected function queue($notifiables, $notification)
     {
         if (! $notifiables instanceof Collection && ! is_array($notifiables)) {
             $notifiables = [$notifiables];
@@ -521,8 +525,6 @@ class NotificationFake implements Fake, NotificationDispatcher, NotificationFact
                 $notification->id = Str::uuid()->toString();
             }
 
-            $notifiableChannels = $channels ?: $notification->via($notifiable);
-
             if (method_exists($notification, 'shouldSend')) {
                 $notifiableChannels = array_filter(
                     $notifiableChannels,
@@ -530,13 +532,8 @@ class NotificationFake implements Fake, NotificationDispatcher, NotificationFact
                 );
             }
 
-            if (empty($notifiableChannels)) {
-                continue;
-            }
-
             $this->queuedNotifications[get_class($notifiable)][$notifiable->getKey()][get_class($notification)][] = [
                 'notification' => $notification,
-                'channels' => $notifiableChannels,
                 'notifiable' => $notifiable,
                 'locale' => $notification->locale ?? $this->locale ?? value(function () use ($notifiable) {
                     if ($notifiable instanceof HasLocalePreference) {
