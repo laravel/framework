@@ -3,6 +3,8 @@
 namespace Illuminate\Tests\Support;
 
 use Exception;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Contracts\Translation\HasLocalePreference;
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Notifications\AnonymousNotifiable;
@@ -374,5 +376,20 @@ class LocalizedUserStub extends User implements HasLocalePreference
     public function preferredLocale()
     {
         return 'au';
+    }
+}
+
+class QueuableNotificationStub extends Notification implements ShouldQueue
+{
+    use Queueable;
+
+    /**
+     * Get the notification's delivery channels.
+     *
+     * @return array<int, string>
+     */
+    public function via(object $notifiable): array
+    {
+        return ['mail'];
     }
 }
