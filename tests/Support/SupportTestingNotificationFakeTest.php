@@ -221,6 +221,126 @@ class SupportTestingNotificationFakeTest extends TestCase
 
         $this->fake->assertNotSentTo($user, NotificationWithFalsyShouldSendStub::class);
     }
+
+    public function testAssertQueuedCount()
+    {
+        try {
+            $this->fake->assertQueuedCount(2);
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertStringContainsString('The total number of notifications queued was 0 instead of 2.', $e->getMessage());
+        }
+
+        $this->fake->send($this->user, new QueuableNotificationStub);
+        $this->fake->send($this->user, new QueuableNotificationStub);
+        $this->fake->send($this->user, new NotificationStub);
+
+        $this->fake->assertQueuedCount(2);
+    }
+
+    public function testAssertQueued()
+    {
+        try {
+            $this->fake->assertQueued($this->user, QueuableNotificationStub::class);
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertStringContainsString('The expected [Illuminate\Tests\Support\QueuableNotificationStub] notification was not queued.', $e->getMessage());
+        }
+
+        $this->fake->send($this->user, new QueuableNotificationStub);
+
+        $this->fake->assertQueued($this->user, QueuableNotificationStub::class);
+    }
+
+    public function testAssertNothingQueued()
+    {
+        $this->fake->assertNothingQueued();
+
+        $this->fake->send($this->user, new QueuableNotificationStub);
+
+        try {
+            $this->fake->assertNothingQueued();
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertStringContainsString('Notifications were queued unexpectedly.', $e->getMessage());
+        }
+    }
+
+    public function testAssertQueuedUsingClosure()
+    {
+        $this->fake->send($this->user, new QueuableNotificationStub);
+
+        $this->fake->assertQueued($this->user, QueuableNotificationStub::class, function (QueuableNotificationStub $notification) {
+            return true;
+        });
+    }
+
+    public function testAssertNotQueued()
+    {
+        $this->fake->assertNotQueued($this->user, QueuableNotificationStub::class);
+
+        $this->fake->send($this->user, new QueuableNotificationStub);
+
+        try {
+            $this->fake->assertNotQueued($this->user, QueuableNotificationStub::class);
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertStringContainsString('The unexpected [Illuminate\Tests\Support\QueuableNotificationStub] notification was queued.', $e->getMessage());
+        }
+    }
+
+    public function testAssertNotQueuedUsingClosure()
+    {
+        $this->fake->send($this->user, new QueuableNotificationStub);
+
+        try {
+            $this->fake->assertNotQueued($this->user, QueuableNotificationStub::class, function (QueuableNotificationStub $notification) {
+                return true;
+            });
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertStringContainsString('The unexpected [Illuminate\Tests\Support\QueuableNotificationStub] notification was queued.', $e->getMessage());
+        }
+    }
+
+    public function testAssertNothingOutgoing()
+    {
+        $this->fake->assertNothingOutgoing();
+
+        $this->fake->send($this->user, new QueuableNotificationStub);
+
+        try {
+            $this->fake->assertNothingOutgoing();
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertStringContainsString('Notifications were queued unexpectedly.', $e->getMessage());
+        }
+
+        $this->fake->send($this->user, new NotificationStub);
+
+        try {
+            $this->fake->assertNothingOutgoing();
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertStringContainsString('Notifications were sent unexpectedly.', $e->getMessage());
+        }
+    }
+
+    public function testAssertOutgoingCount()
+    {
+        $this->fake->send($this->user, new QueuableNotificationStub);
+
+        try {
+            $this->fake->assertOutgoingCount(2);
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertStringContainsString('The total number of outgoing notifications was 1 instead of 2.', $e->getMessage());
+        }
+
+        $this->fake->send($this->user, new NotificationStub);
+
+        $this->fake->assertOutgoingCount(2);
+    }
 }
 
 class NotificationStub extends Notification

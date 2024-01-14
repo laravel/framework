@@ -26,6 +26,13 @@ class NotificationFake implements Fake, NotificationDispatcher, NotificationFact
     protected $notifications = [];
 
     /**
+     * All of the notifications that have been queued.
+     *
+     * @var array
+     */
+    protected $queuedNotifications = [];
+
+    /**
      * Locale used when sending notifications.
      *
      * @var string|null
@@ -222,6 +229,129 @@ class NotificationFake implements Fake, NotificationDispatcher, NotificationFact
     }
 
     /**
+     * Assert the total count of notification that were queued.
+     *
+     * @param  int  $expectedCount
+     * @return void
+     */
+    public function assertQueuedCount($expectedCount)
+    {
+        $actualCount = collect($this->queuedNotifications)->flatten(3)->count();
+
+        PHPUnit::assertSame(
+            $expectedCount, $actualCount,
+            "The total number of notifications queued was {$actualCount} instead of {$expectedCount}."
+        );
+    }
+
+    /**
+     * Assert if a notification was queued based on a truth-test callback.
+     *
+     * @param  mixed  $notifiable
+     * @param  string|\Closure  $notification
+     * @param  callable|null  $callback
+     * @return void
+     *
+     * @throws \Exception
+     */
+    public function assertQueued($notifiable, $notification, $callback = null)
+    {
+        if (is_array($notifiable) || $notifiable instanceof Collection) {
+            if (count($notifiable) === 0) {
+                throw new Exception('No notifiable given.');
+            }
+
+            foreach ($notifiable as $singleNotifiable) {
+                $this->assertQueued($singleNotifiable, $notification, $callback);
+            }
+
+            return;
+        }
+
+        if ($notification instanceof Closure) {
+            [$notification, $callback] = [$this->firstClosureParameterType($notification), $notification];
+        }
+
+        PHPUnit::assertTrue(
+            $this->queued($notifiable, $notification, $callback)->count() > 0,
+            "The expected [{$notification}] notification was not queued."
+        );
+    }
+
+    /**
+     * Assert if a notification was not queued based on a truth-test callback.
+     *
+     * @param  mixed  $notifiable
+     * @param  string|\Closure  $notification
+     * @param  callable|null  $callback
+     * @return void
+     *
+     * @throws \Exception
+     */
+    public function assertNotQueued($notifiable, $notification, $callback = null)
+    {
+        if (is_array($notifiable) || $notifiable instanceof Collection) {
+            if (count($notifiable) === 0) {
+                throw new Exception('No notifiable given.');
+            }
+
+            foreach ($notifiable as $singleNotifiable) {
+                $this->assertNotQueued($singleNotifiable, $notification, $callback);
+            }
+
+            return;
+        }
+
+        if ($notification instanceof Closure) {
+            [$notification, $callback] = [$this->firstClosureParameterType($notification), $notification];
+        }
+
+        PHPUnit::assertCount(
+            0, $this->queued($notifiable, $notification, $callback),
+            "The unexpected [{$notification}] notification was queued."
+        );
+    }
+
+    /**
+     * Assert that no notifications were queued.
+     *
+     * @return void
+     */
+    public function assertNothingQueued()
+    {
+        PHPUnit::assertEmpty($this->queuedNotifications, 'Notifications were queued unexpectedly.');
+    }
+
+    /**
+     * Assert that no notifications were sent or queued to be sent.
+     *
+     * @return void
+     */
+    public function assertNothingOutgoing()
+    {
+        $this->assertNothingSent();
+        $this->assertNothingQueued();
+    }
+
+    /**
+     * Assert the total number of notifications that were sent or queued.
+     *
+     * @param  int  $count
+     * @return void
+     */
+    public function assertOutgoingCount($count)
+    {
+        $total = collect($this->notifications)
+            ->concat($this->queuedNotifications)
+            ->count();
+
+        PHPUnit::assertSame(
+            $count, $total,
+            "The total number of outgoing notifications was {$total} instead of {$count}."
+        );
+    }
+
+    /**
      * Get all of the notifications matching a truth-test callback.
      *
      * @param  mixed  $notifiable
@@ -245,6 +375,29 @@ class NotificationFake implements Fake, NotificationDispatcher, NotificationFact
     }
 
     /**
+     * Get all of the queued notifications matching a truth-test callback.
+     *
+     * @param  mixed  $notifiable
+     * @param  string  $notification
+     * @param  callable|null  $callback
+     * @return \Illuminate\Support\Collection
+     */
+    public function queued($notifiable, $notification, $callback = null)
+    {
+        if (! $this->hasQueued($notifiable, $notification)) {
+            return collect();
+        }
+
+        $callback = $callback ?: fn () => true;
+
+        $notifications = collect($this->queuedNotificationsFor($notifiable, $notification));
+
+        return $notifications->filter(
+            fn ($arguments) => $callback(...array_values($arguments))
+        )->pluck('notification');
+    }
+
+    /**
      * Determine if there are more notifications left to inspect.
      *
      * @param  mixed  $notifiable
@@ -257,6 +410,18 @@ class NotificationFake implements Fake, NotificationDispatcher, NotificationFact
     }
 
     /**
+     * Check if there are queued notifications for a specific notifiable and notification.
+     *
+     * @param  mixed  $notifiable
+     * @param  string  $notification
+     * @return bool
+     */
+    public function hasQueued($notifiable, $notification)
+    {
+        return ! empty($this->queuedNotificationsFor($notifiable, $notification));
+    }
+
+    /**
      * Get all of the notifications for a notifiable entity by type.
      *
      * @param  mixed  $notifiable
@@ -266,6 +431,18 @@ class NotificationFake implements Fake, NotificationDispatcher, NotificationFact
     protected function notificationsFor($notifiable, $notification)
     {
         return $this->notifications[get_class($notifiable)][$notifiable->getKey()][$notification] ?? [];
+    }
+
+    /**
+     * Get all of the queued notifications for a notifiable entity by type.
+     *
+     * @param  mixed  $notifiable
+     * @param  string  $notification
+     * @return array
+     */
+    protected function queuedNotificationsFor($notifiable, $notification)
+    {
+        return $this->queuedNotifications[get_class($notifiable)][$notifiable->getKey()][$notification] ?? [];
     }
 
     /**
@@ -321,6 +498,51 @@ class NotificationFake implements Fake, NotificationDispatcher, NotificationFact
                         return $notifiable->preferredLocale();
                     }
                 }),
+            ];
+        }
+    }
+
+    /**
+     * Queue the given notification.
+     *
+     * @param  \Illuminate\Support\Collection|array|mixed  $notifiables
+     * @param  mixed  $notification
+     * @param  array|null  $channels
+     * @return void
+     */
+    protected function queue($notifiables, $notification, array $channels = null)
+    {
+        if (! $notifiables instanceof Collection && ! is_array($notifiables)) {
+            $notifiables = [$notifiables];
+        }
+
+        foreach ($notifiables as $notifiable) {
+            if (! $notification->id) {
+                $notification->id = Str::uuid()->toString();
+            }
+
+            $notifiableChannels = $channels ?: $notification->via($notifiable);
+
+            if (method_exists($notification, 'shouldSend')) {
+                $notifiableChannels = array_filter(
+                    $notifiableChannels,
+                    fn ($channel) => $notification->shouldSend($notifiable, $channel) !== false
+                );
+            }
+
+            if (empty($notifiableChannels)) {
+                continue;
+            }
+
+            $this->queuedNotifications[get_class($notifiable)][$notifiable->getKey()][get_class($notification)][] = [
+                'notification' => $notification,
+                'channels' => $notifiableChannels,
+                'notifiable' => $notifiable,
+                'locale' => $notification->locale ?? $this->locale ?? value(function () use ($notifiable) {
+                        if ($notifiable instanceof HasLocalePreference) {
+                            return $notifiable->preferredLocale();
+                        }
+                    }),
             ];
         }
     }
