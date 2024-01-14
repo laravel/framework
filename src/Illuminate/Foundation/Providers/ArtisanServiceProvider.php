@@ -59,6 +59,7 @@ use Illuminate\Foundation\Console\ObserverMakeCommand;
 use Illuminate\Foundation\Console\OptimizeClearCommand;
 use Illuminate\Foundation\Console\OptimizeCommand;
 use Illuminate\Foundation\Console\PackageDiscoverCommand;
+use Illuminate\Foundation\Console\PintCommand;
 use Illuminate\Foundation\Console\PolicyMakeCommand;
 use Illuminate\Foundation\Console\ProviderMakeCommand;
 use Illuminate\Foundation\Console\RequestMakeCommand;
@@ -131,6 +132,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         'Optimize' => OptimizeCommand::class,
         'OptimizeClear' => OptimizeClearCommand::class,
         'PackageDiscover' => PackageDiscoverCommand::class,
+        'Pint' => PintCommand::class,
         'PruneStaleTagsCommand' => PruneStaleTagsCommand::class,
         'QueueClear' => QueueClearCommand::class,
         'QueueFailed' => ListFailedQueueCommand::class,
