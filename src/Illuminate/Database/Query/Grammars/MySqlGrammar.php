@@ -151,7 +151,7 @@ class MySqlGrammar extends Grammar
 
         array_unshift($orders, [
             'column' => $query->groupLimit['column'],
-            'direction' => 'asc'
+            'direction' => 'asc',
         ]);
 
         $query->orders = $orders;
