@@ -294,6 +294,13 @@ class SupportNumberTest extends TestCase
         $this->assertSame('-1KQ', Number::abbreviate(-1000000000000000000));
     }
 
+    public function testRoman()
+    {
+        $this->assertSame('I', Number::roman(1));
+        $this->assertSame('CDLVI', Number::roman(456));
+        $this->assertSame('MMMCLXXXVIII', Number::roman(3188));
+    }
+
     protected function needsIntlExtension()
     {
         if (! extension_loaded('intl')) {

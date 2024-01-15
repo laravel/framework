@@ -3,6 +3,7 @@
 namespace Illuminate\Support;
 
 use Illuminate\Support\Traits\Macroable;
+use InvalidArgumentException;
 use NumberFormatter;
 use RuntimeException;
 
@@ -229,6 +230,51 @@ class Number
     public static function clamp(int|float $number, int|float $min, int|float $max)
     {
         return min(max($number, $min), $max);
+    }
+
+    /**
+     * Convert the given number to its roman numeral equivalent.
+     *
+     * @param  int  $number
+     * @return string
+     *
+     * @throws InvalidArgumentException
+     */
+    public static function roman(int $number)
+    {
+        if ($number < 1 || $number > 3999) {
+            throw new InvalidArgumentException('The number must be a positive integer greater than 0 and less than or equal to 3999.');
+        }
+
+        $romanSymbols = [
+            'M' => 1000,
+            'CM' => 900,
+            'D' => 500,
+            'CD' => 400,
+            'C' => 100,
+            'XC' => 90,
+            'L' => 50,
+            'XL' => 40,
+            'X' => 10,
+            'IX' => 9,
+            'V' => 5,
+            'IV' => 4,
+            'I' => 1
+        ];
+
+        $result = '';
+
+        while ($number > 0) {
+            foreach ($romanSymbols as $romanSymbol => $int) {
+                if($number >= $int) {
+                    $number -= $int;
+                    $result .= $romanSymbol;
+                    break;
+                }
+            }
+        }
+
+        return $result;
     }
 
     /**
