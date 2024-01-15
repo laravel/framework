@@ -496,6 +496,54 @@ class JobChainingTest extends QueueTestCase
 
         $this->assertEquals('sync1', $batch->connection());
     }
+
+    public function testJobsAreChainedWhenDispatchIfIsTrue()
+    {
+        JobChainingTestFirstJob::withChain([
+            new JobChainingTestSecondJob,
+        ])->dispatchIf(true);
+
+        $this->runQueueWorkerCommand(['--stop-when-empty' => true]);
+
+        $this->assertTrue(JobChainingTestFirstJob::$ran);
+        $this->assertTrue(JobChainingTestSecondJob::$ran);
+    }
+
+    public function testJobsAreNotChainedWhenDispatchIfIsFalse()
+    {
+        JobChainingTestFirstJob::withChain([
+            new JobChainingTestSecondJob,
+        ])->dispatchIf(false);
+
+        $this->runQueueWorkerCommand(['--stop-when-empty' => true]);
+
+        $this->assertFalse(JobChainingTestFirstJob::$ran);
+        $this->assertFalse(JobChainingTestSecondJob::$ran);
+    }
+
+    public function testJobsAreChainedWhenDispatchUnlessIsFalse()
+    {
+        JobChainingTestFirstJob::withChain([
+            new JobChainingTestSecondJob,
+        ])->dispatchUnless(false);
+
+        $this->runQueueWorkerCommand(['--stop-when-empty' => true]);
+
+        $this->assertTrue(JobChainingTestFirstJob::$ran);
+        $this->assertTrue(JobChainingTestSecondJob::$ran);
+    }
+
+    public function testJobsAreNotChainedWhenDispatchUnlessIsTrue()
+    {
+        JobChainingTestFirstJob::withChain([
+            new JobChainingTestSecondJob,
+        ])->dispatchUnless(true);
+
+        $this->runQueueWorkerCommand(['--stop-when-empty' => true]);
+
+        $this->assertFalse(JobChainingTestFirstJob::$ran);
+        $this->assertFalse(JobChainingTestSecondJob::$ran);
+    }
 }
 
 class JobChainingTestFirstJob implements ShouldQueue

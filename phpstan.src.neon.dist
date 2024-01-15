@@ -13,5 +13,6 @@ parameters:
     - "#should always throw an exception or terminate script execution#"
     - "#Instantiated class [a-zA-Z0-9\\\\_]+ not found.#"
     - "#Unsafe usage of new static#"
+    - "#has an uninitialized readonly property#"
   excludePaths:
     - "src/Illuminate/Testing/ParallelRunner.php"

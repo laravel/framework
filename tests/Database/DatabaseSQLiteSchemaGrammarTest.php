@@ -882,10 +882,11 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $blueprint->integer('discounted_stored')->storedAs('"price" - 5')->nullable(false);
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertCount(2, $statements);
+        $this->assertCount(3, $statements);
         $expected = [
             'alter table "products" add column "price" integer not null',
             'alter table "products" add column "discounted_virtual" integer not null as ("price" - 5)',
+            'alter table "products" add column "discounted_stored" integer not null as ("price" - 5) stored',
         ];
         $this->assertSame($expected, $statements);
     }

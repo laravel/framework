@@ -221,7 +221,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      * Begin configuring a new Laravel application instance.
      *
      * @param  string|null  $baseDirectory
-     * @return \Illuminate\Foundation\ApplicationBuilder
+     * @return \Illuminate\Foundation\Configuration\ApplicationBuilder
      */
     public static function configure(string $baseDirectory = null)
     {

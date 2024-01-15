@@ -889,10 +889,9 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     /**
      * Shuffle the items in the collection.
      *
-     * @param  int|null  $seed
      * @return static
      */
-    public function shuffle($seed = null);
+    public function shuffle();
 
     /**
      * Create chunks representing a "sliding window" view of the items in the collection.

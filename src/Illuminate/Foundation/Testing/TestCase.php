@@ -253,7 +253,7 @@ abstract class TestCase extends BaseTestCase
         Component::forgetComponentsResolver();
         Component::forgetFactory();
         ConvertEmptyStringsToNull::flushState();
-        HandleExceptions::forgetApp();
+        HandleExceptions::flushState();
         Queue::createPayloadUsing(null);
         Sleep::fake(false);
         TrimStrings::flushState();
