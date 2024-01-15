@@ -4162,6 +4162,29 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->fails());
     }
 
+    public function testValidateLuhn()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+
+        $v = new Validator($trans, ['x' => '4242424242424242'], ['x' => 'luhn']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => 4242424242424242], ['x' => 'luhn']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => 4_242_424_242_424_242], ['x' => 'luhn']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => '554'], ['x' => 'luhn']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => '555'], ['x' => 'luhn']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['x' => 'asdf'], ['x' => 'luhn']);
+        $this->assertFalse($v->passes());
+    }
+
     public function testValidateMacAddress()
     {
         $trans = $this->getIlluminateArrayTranslator();

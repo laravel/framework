@@ -1410,6 +1410,38 @@ trait ValidatesAttributes
     }
 
     /**
+     * Validate that an attribute is a valid luhn number.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @return bool
+     */
+    public function validateLuhn($attribute, $value)
+    {
+        if (! is_numeric($value)) {
+            return false;
+        }
+
+        $value = (string) $value;
+
+        $sum = 0;
+
+        $length = strlen($value);
+
+        for ($position = 1 - ($length % 2); $position < $length; $position += 2) {
+            $sum += $value[$position];
+        }
+
+        for ($position = ($length % 2); $position < $length; $position += 2) {
+            $number = $value[$position] * 2;
+
+            $sum += $number < 10 ? $number : $number - 9;
+        }
+
+        return $sum % 10 === 0;
+    }
+
+    /**
      * Validate that an attribute is a valid MAC address.
      *
      * @param  string  $attribute
