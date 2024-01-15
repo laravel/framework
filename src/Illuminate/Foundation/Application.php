@@ -1144,7 +1144,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function routesAreCached()
     {
-        return $this['files']->exists($this->getCachedRoutesPath());
+        return is_file($this->getCachedRoutesPath());
     }
 
     /**
@@ -1164,7 +1164,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function eventsAreCached()
     {
-        return $this['files']->exists($this->getCachedEventsPath());
+        return is_file($this->getCachedEventsPath());
     }
 
     /**
