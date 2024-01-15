@@ -16,9 +16,9 @@ class StubPublishCommand extends Command
      * @var string
      */
     protected $signature = 'stub:publish
-                    {name? : Published stubs will be limited to files that start with this name}
                     {--existing : Publish and overwrite only the files that have already been published}
-                    {--force : Overwrite any existing files}';
+                    {--force : Overwrite any existing files}
+                    {--only= : Published stubs will be limited to files that start with the given value}';
 
     /**
      * The console command description.
@@ -84,15 +84,15 @@ class StubPublishCommand extends Command
             realpath(__DIR__.'/../../Routing/Console/stubs/middleware.stub') => 'middleware.stub',
         ];
 
-        if ($this->hasArgument('name')) {
+        if ($this->option('only')) {
             $stubs = array_filter(
                 $stubs,
-                fn ($name) => str_starts_with($name, strtolower($this->argument('name'))),
+                fn ($name) => str_starts_with($name, strtolower($this->option('only'))),
             );
         }
 
         if (count($stubs) === 0) {
-            $this->components->error('No stubs matched the given name.');
+            $this->components->error('No stubs matched the given options.');
 
             return self::FAILURE;
         }
