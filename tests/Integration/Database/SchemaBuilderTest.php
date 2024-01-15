@@ -6,7 +6,9 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\Grammars\SQLiteGrammar;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Orchestra\Testbench\Attributes\DisconnectDatabaseConnections;
 
+#[DisconnectDatabaseConnections]
 class SchemaBuilderTest extends DatabaseTestCase
 {
     protected function destroyDatabaseMigrations()
@@ -23,8 +25,6 @@ class SchemaBuilderTest extends DatabaseTestCase
         });
 
         Schema::dropAllTables();
-
-        DB::reconnect();
 
         $this->artisan('migrate:install');
 
