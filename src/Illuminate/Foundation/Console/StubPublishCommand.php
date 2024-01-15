@@ -16,6 +16,7 @@ class StubPublishCommand extends Command
      * @var string
      */
     protected $signature = 'stub:publish
+                    {name? : Published stubs will be limited to files that start with this name}
                     {--existing : Publish and overwrite only the files that have already been published}
                     {--force : Overwrite any existing files}';
 
@@ -82,6 +83,13 @@ class StubPublishCommand extends Command
             realpath(__DIR__.'/../../Routing/Console/stubs/controller.stub') => 'controller.stub',
             realpath(__DIR__.'/../../Routing/Console/stubs/middleware.stub') => 'middleware.stub',
         ];
+
+        if ($this->hasArgument('name')) {
+            $stubs = array_filter(
+                $stubs,
+                fn ($name) => str_starts_with($name, strtolower($this->argument('name'))),
+            );
+        }
 
         $this->laravel['events']->dispatch($event = new PublishingStubs($stubs));
 
