@@ -56,6 +56,7 @@ class DatabaseEloquentHasManyThroughCreateOrFirstTest extends TestCase
     {
         $parent = new HasManyThroughCreateOrFirstTestParentModel();
         $parent->id = 123;
+        $parent->exists = true;
         $this->mockConnectionForModel($parent, 'SQLite');
         $parent->getConnection()->shouldReceive('transactionLevel')->andReturn(0);
         $parent->getConnection()->shouldReceive('getName')->andReturn('sqlite');
@@ -102,6 +103,7 @@ class DatabaseEloquentHasManyThroughCreateOrFirstTest extends TestCase
     {
         $parent = new HasManyThroughCreateOrFirstTestParentModel();
         $parent->id = 123;
+        $parent->exists = true;
         $this->mockConnectionForModel($parent, 'SQLite', [789]);
         $parent->getConnection()->shouldReceive('transactionLevel')->andReturn(0);
         $parent->getConnection()->shouldReceive('getName')->andReturn('sqlite');
@@ -135,6 +137,7 @@ class DatabaseEloquentHasManyThroughCreateOrFirstTest extends TestCase
     {
         $parent = new HasManyThroughCreateOrFirstTestParentModel();
         $parent->id = 123;
+        $parent->exists = true;
         $this->mockConnectionForModel($parent, 'SQLite');
         $parent->getConnection()->shouldReceive('transactionLevel')->andReturn(0);
         $parent->getConnection()->shouldReceive('getName')->andReturn('sqlite');
@@ -173,6 +176,7 @@ class DatabaseEloquentHasManyThroughCreateOrFirstTest extends TestCase
     {
         $parent = new HasManyThroughCreateOrFirstTestParentModel();
         $parent->id = 123;
+        $parent->exists = true;
         $this->mockConnectionForModel($parent, 'SQLite');
         $parent->getConnection()->shouldReceive('transactionLevel')->andReturn(0);
         $parent->getConnection()->shouldReceive('getName')->andReturn('sqlite');
@@ -228,6 +232,7 @@ class DatabaseEloquentHasManyThroughCreateOrFirstTest extends TestCase
     {
         $parent = new HasManyThroughCreateOrFirstTestParentModel();
         $parent->id = 123;
+        $parent->exists = true;
         $this->mockConnectionForModel($parent, 'SQLite', [789]);
         $parent->getConnection()->shouldReceive('transactionLevel')->andReturn(0);
         $parent->getConnection()->shouldReceive('getName')->andReturn('sqlite');
@@ -264,6 +269,7 @@ class DatabaseEloquentHasManyThroughCreateOrFirstTest extends TestCase
     {
         $parent = new HasManyThroughCreateOrFirstTestParentModel();
         $parent->id = 123;
+        $parent->exists = true;
         $this->mockConnectionForModel($parent, 'SQLite');
         $parent->getConnection()->shouldReceive('transactionLevel')->andReturn(0);
         $parent->getConnection()->shouldReceive('getName')->andReturn('sqlite');
@@ -310,6 +316,7 @@ class DatabaseEloquentHasManyThroughCreateOrFirstTest extends TestCase
     {
         $parent = new HasManyThroughCreateOrFirstTestParentModel();
         $parent->id = 123;
+        $parent->exists = true;
         $this->mockConnectionForModel($parent, 'SQLite');
         $parent->getConnection()->shouldReceive('transactionLevel')->andReturn(0);
         $parent->getConnection()->shouldReceive('getName')->andReturn('sqlite');

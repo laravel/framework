@@ -114,6 +114,7 @@ class DatabaseEloquentBelongsToManyCreateOrFirstTest extends TestCase
     {
         $source = new BelongsToManyCreateOrFirstTestSourceModel();
         $source->id = 123;
+        $source->exists = true;
         $this->mockConnectionForModels(
             [$source, new BelongsToManyCreateOrFirstTestRelatedModel()],
             'SQLite',
@@ -157,6 +158,7 @@ class DatabaseEloquentBelongsToManyCreateOrFirstTest extends TestCase
     {
         $source = new BelongsToManyCreateOrFirstTestSourceModel();
         $source->id = 123;
+        $source->exists = true;
         $this->mockConnectionForModels(
             [$source, new BelongsToManyCreateOrFirstTestRelatedModel()],
             'SQLite',
@@ -227,6 +229,7 @@ class DatabaseEloquentBelongsToManyCreateOrFirstTest extends TestCase
     {
         $source = new BelongsToManyCreateOrFirstTestSourceModel();
         $source->id = 123;
+        $source->exists = true;
         $this->mockConnectionForModels(
             [$source, new BelongsToManyCreateOrFirstTestRelatedModel()],
             'SQLite',
@@ -309,6 +312,7 @@ class DatabaseEloquentBelongsToManyCreateOrFirstTest extends TestCase
             }
         };
         $source->id = 123;
+        $source->exists = true;
         $this->mockConnectionForModels(
             [$source, new BelongsToManyCreateOrFirstTestRelatedModel()],
             'SQLite',

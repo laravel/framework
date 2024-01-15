@@ -60,6 +60,14 @@ class Grammar extends BaseGrammar
             return $this->compileUnionAggregate($query);
         }
 
+        if (isset($query->groupLimit)) {
+            if (is_null($query->columns)) {
+                $query->columns = ['*'];
+            }
+
+            return $this->compileGroupLimit($query);
+        }
+
         // If the query does not have any columns set, we'll set the columns to the
         // * character to just get all of the columns from the database. Then we
         // can build the query and concatenate all the pieces together as one.
@@ -915,6 +923,68 @@ class Grammar extends BaseGrammar
     protected function compileLimit(Builder $query, $limit)
     {
         return 'limit '.(int) $limit;
+    }
+
+    /**
+     * Compile a group limit clause.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @return string
+     */
+    protected function compileGroupLimit(Builder $query)
+    {
+        $selectBindings = array_merge($query->getRawBindings()['select'], $query->getRawBindings()['order']);
+
+        $query->setBindings($selectBindings, 'select');
+        $query->setBindings([], 'order');
+
+        $limit = (int) $query->groupLimit['value'];
+
+        $offset = $query->offset;
+
+        if (isset($offset)) {
+            $offset = (int) $offset;
+            $limit += $offset;
+
+            $query->offset = null;
+        }
+
+        $components = $this->compileComponents($query);
+
+        $components['columns'] .= $this->compileRowNumber($query->groupLimit['column'], $components['orders'] ?? '');
+
+        unset($components['orders']);
+
+        $table = $this->wrap('laravel_table');
+        $row = $this->wrap('laravel_row');
+
+        $sql = $this->concatenate($components);
+
+        $sql = 'select * from ('.$sql.') as '.$table.' where '.$row.' <= '.$limit;
+
+        if (isset($offset)) {
+            $sql .= ' and '.$row.' > '.$offset;
+        }
+
+        return $sql.' order by '.$row;
+    }
+
+    /**
+     * Compile a row number clause.
+     *
+     * @param  string  $partition
+     * @param  string  $orders
+     * @return string
+     */
+    protected function compileRowNumber($partition, $orders)
+    {
+        $partition = 'partition by '.$this->wrap($partition);
+
+        $over = trim($partition.' '.$orders);
+
+        $row = $this->wrap('laravel_row');
+
+        return ', row_number() over ('.$over.') as '.$row;
     }
 
     /**
