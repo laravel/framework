@@ -2764,7 +2764,7 @@ class Builder implements BuilderContract
             return $this->processor->processSelect($this, $this->runSelect());
         }));
 
-        if (!isset($this->groupLimit)) {
+        if (! isset($this->groupLimit)) {
             return $items;
         }
 
