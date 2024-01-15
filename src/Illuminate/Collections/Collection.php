@@ -1366,6 +1366,33 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     }
 
     /**
+     * Recursively sort the collection by keys and values.
+     *
+     * @param int $options
+     * @param bool $descending
+     * @return static
+     */
+    public function sortRecursive($options = SORT_REGULAR, $descending = false)
+    {
+        $items = $this->items;
+
+        return new static(Arr::sortRecursive($items, $options = SORT_REGULAR, $descending = false));
+    }
+
+    /**
+     * Recursively sort the collection by keys and values in descending order.
+     *
+     * @param int $options
+     * @return static
+     */
+    public function sortRecursiveDesc($options = SORT_REGULAR)
+    {
+        $items = $this->items;
+
+        return new static(Arr::sortRecursiveDesc($items, $options = SORT_REGULAR));
+    }
+
+    /**
      * Sort the collection using the given callback.
      *
      * @param  array<array-key, (callable(TValue, TValue): mixed)|(callable(TValue, TKey): mixed)|string|array{string, string}>|(callable(TValue, TKey): mixed)|string  $callback
