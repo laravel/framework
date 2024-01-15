@@ -91,6 +91,12 @@ class StubPublishCommand extends Command
             );
         }
 
+        if (count($stubs) === 0) {
+            $this->components->error('No stubs matched the given name.');
+
+            return self::FAILURE;
+        }
+
         $this->laravel['events']->dispatch($event = new PublishingStubs($stubs));
 
         foreach ($event->stubs as $from => $to) {
