@@ -4,6 +4,7 @@ namespace Illuminate\Database\Query\Grammars;
 
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Str;
+use PDO;
 
 class MySqlGrammar extends Grammar
 {
@@ -92,6 +93,82 @@ class MySqlGrammar extends Grammar
             'force' => "force index ({$indexHint->index})",
             default => "ignore index ({$indexHint->index})",
         };
+    }
+
+    /**
+     * Compile a group limit clause.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @return string
+     */
+    protected function compileGroupLimit(Builder $query)
+    {
+        return $this->useLegacyGroupLimit($query)
+            ? $this->compileLegacyGroupLimit($query)
+            : parent::compileGroupLimit($query);
+    }
+
+    /**
+     * Determine whether to use a legacy group limit clause for MySQL < 8.0.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @return bool
+     */
+    public function useLegacyGroupLimit(Builder $query)
+    {
+        $version = $query->getConnection()->getReadPdo()->getAttribute(PDO::ATTR_SERVER_VERSION);
+
+        return ! $query->getConnection()->isMaria() && version_compare($version, '8.0.11') < 0;
+    }
+
+    /**
+     * Compile a group limit clause for MySQL < 8.0.
+     *
+     * Derived from https://softonsofa.com/tweaking-eloquent-relations-how-to-get-n-related-models-per-parent/.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @return string
+     */
+    protected function compileLegacyGroupLimit(Builder $query)
+    {
+        $limit = (int) $query->groupLimit['value'];
+        $offset = $query->offset;
+
+        if (isset($offset)) {
+            $offset = (int) $offset;
+            $limit += $offset;
+
+            $query->offset = null;
+        }
+
+        $column = last(explode('.', $query->groupLimit['column']));
+        $column = $this->wrap($column);
+
+        $partition = ', @laravel_row := if(@laravel_group = '.$column.', @laravel_row + 1, 1) as `laravel_row`';
+        $partition .= ', @laravel_group := '.$column;
+
+        $orders = (array) $query->orders;
+
+        array_unshift($orders, [
+            'column' => $query->groupLimit['column'],
+            'direction' => 'asc'
+        ]);
+
+        $query->orders = $orders;
+
+        $components = $this->compileComponents($query);
+
+        $sql = $this->concatenate($components);
+
+        $from = '(select @laravel_row := 0, @laravel_group := 0) as `laravel_vars`, ('.$sql.') as `laravel_table`';
+
+        $sql = 'select `laravel_table`.*'.$partition.' from '.$from.' having `laravel_row` <= '.$limit;
+
+        if (isset($offset)) {
+            $sql .= ' and `laravel_row` > '.$offset;
+        }
+
+        return $sql.' order by `laravel_row`';
     }
 
     /**

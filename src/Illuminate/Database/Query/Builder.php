@@ -153,6 +153,13 @@ class Builder implements BuilderContract
     public $limit;
 
     /**
+     * The maximum number of records to return per group.
+     *
+     * @var array
+     */
+    public $groupLimit;
+
+    /**
      * The number of records to skip.
      *
      * @var int
@@ -2445,6 +2452,22 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Add a "group limit" clause to the query.
+     *
+     * @param  int  $value
+     * @param  string  $column
+     * @return $this
+     */
+    public function groupLimit($value, $column)
+    {
+        if ($value >= 0) {
+            $this->groupLimit = compact('value', 'column');
+        }
+
+        return $this;
+    }
+
+    /**
      * Set the limit and offset for a given page.
      *
      * @param  int  $page
@@ -2737,9 +2760,13 @@ class Builder implements BuilderContract
      */
     public function get($columns = ['*'])
     {
-        return collect($this->onceWithColumns(Arr::wrap($columns), function () {
+        $items = collect($this->onceWithColumns(Arr::wrap($columns), function () {
             return $this->processor->processSelect($this, $this->runSelect());
         }));
+
+        return isset($this->groupLimit)
+            ? $this->withoutGroupLimitKeys($items)
+            : $items;
     }
 
     /**
@@ -2752,6 +2779,32 @@ class Builder implements BuilderContract
         return $this->connection->select(
             $this->toSql(), $this->getBindings(), ! $this->useWritePdo
         );
+    }
+
+    /**
+     * Remove the group limit keys from the results in the collection.
+     *
+     * @param  \Illuminate\Support\Collection  $items
+     * @return \Illuminate\Support\Collection
+     */
+    protected function withoutGroupLimitKeys($items)
+    {
+        $keysToRemove = ['laravel_row'];
+
+        if (is_string($this->groupLimit['column'])) {
+            $column = last(explode('.', $this->groupLimit['column']));
+
+            $keysToRemove[] = '@laravel_group := '.$this->grammar->wrap($column);
+            $keysToRemove[] = '@laravel_group := '.$this->grammar->wrap('pivot_'.$column);
+        }
+
+        $items->each(function ($item) use ($keysToRemove) {
+            foreach ($keysToRemove as $key) {
+                unset($item->$key);
+            }
+        });
+
+        return $items;
     }
 
     /**

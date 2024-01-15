@@ -5,6 +5,7 @@ namespace Illuminate\Database\Query\Grammars;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use PDO;
 
 class SQLiteGrammar extends Grammar
 {
@@ -182,6 +183,25 @@ class SQLiteGrammar extends Grammar
         [$field, $path] = $this->wrapJsonFieldAndPath($column);
 
         return 'json_type('.$field.$path.') is not null';
+    }
+
+    /**
+     * Compile a group limit clause.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @return string
+     */
+    protected function compileGroupLimit(Builder $query)
+    {
+        $version = $query->getConnection()->getReadPdo()->getAttribute(PDO::ATTR_SERVER_VERSION);
+
+        if (version_compare($version, '3.25.0') >= 0) {
+            return parent::compileGroupLimit($query);
+        }
+
+        $query->groupLimit = null;
+
+        return $this->compileSelect($query);
     }
 
     /**
