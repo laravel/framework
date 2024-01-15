@@ -132,7 +132,6 @@ class MySqlGrammar extends Grammar
     protected function compileLegacyGroupLimit(Builder $query)
     {
         $limit = (int) $query->groupLimit['value'];
-
         $offset = $query->offset;
 
         if (isset($offset)) {
@@ -143,16 +142,17 @@ class MySqlGrammar extends Grammar
         }
 
         $column = last(explode('.', $query->groupLimit['column']));
-
         $column = $this->wrap($column);
 
         $partition = ', @laravel_row := if(@laravel_group = '.$column.', @laravel_row + 1, 1) as `laravel_row`';
-
         $partition .= ', @laravel_group := '.$column;
 
         $orders = (array) $query->orders;
 
-        array_unshift($orders, ['column' => $query->groupLimit['column'], 'direction' => 'asc']);
+        array_unshift($orders, [
+            'column' => $query->groupLimit['column'],
+            'direction' => 'asc'
+        ]);
 
         $query->orders = $orders;
 

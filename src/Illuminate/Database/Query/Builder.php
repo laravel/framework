@@ -2764,10 +2764,31 @@ class Builder implements BuilderContract
             return $this->processor->processSelect($this, $this->runSelect());
         }));
 
-        if (! isset($this->groupLimit)) {
-            return $items;
-        }
+        return isset($this->groupLimit)
+            ? $this->withoutGroupLimitKeys($items)
+            : $items;
+    }
 
+    /**
+     * Run the query as a "select" statement against the connection.
+     *
+     * @return array
+     */
+    protected function runSelect()
+    {
+        return $this->connection->select(
+            $this->toSql(), $this->getBindings(), ! $this->useWritePdo
+        );
+    }
+
+    /**
+     * Remove the group limit keys from the results in the collection.
+     *
+     * @param  \Illuminate\Support\Collection  $items
+     * @return \Illuminate\Support\Collection
+     */
+    protected function withoutGroupLimitKeys($items)
+    {
         $keysToRemove = ['laravel_row'];
 
         if (is_string($this->groupLimit['column'])) {
@@ -2784,18 +2805,6 @@ class Builder implements BuilderContract
         });
 
         return $items;
-    }
-
-    /**
-     * Run the query as a "select" statement against the connection.
-     *
-     * @return array
-     */
-    protected function runSelect()
-    {
-        return $this->connection->select(
-            $this->toSql(), $this->getBindings(), ! $this->useWritePdo
-        );
     }
 
     /**

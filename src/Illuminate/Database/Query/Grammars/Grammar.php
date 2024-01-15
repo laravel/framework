@@ -60,6 +60,9 @@ class Grammar extends BaseGrammar
             return $this->compileUnionAggregate($query);
         }
 
+        // If a "group limit" is in place, we will need to compile the SQL to use a
+        // different syntax. This primarily supports limits on eager loads using
+        // Eloquent. We'll also set the columns if they have not been defined.
         if (isset($query->groupLimit)) {
             if (is_null($query->columns)) {
                 $query->columns = ['*'];
@@ -939,7 +942,6 @@ class Grammar extends BaseGrammar
         $query->setBindings([], 'order');
 
         $limit = (int) $query->groupLimit['value'];
-
         $offset = $query->offset;
 
         if (isset($offset)) {
@@ -951,7 +953,10 @@ class Grammar extends BaseGrammar
 
         $components = $this->compileComponents($query);
 
-        $components['columns'] .= $this->compileRowNumber($query->groupLimit['column'], $components['orders'] ?? '');
+        $components['columns'] .= $this->compileRowNumber(
+            $query->groupLimit['column'],
+            $components['orders'] ?? ''
+        );
 
         unset($components['orders']);
 
@@ -978,13 +983,9 @@ class Grammar extends BaseGrammar
      */
     protected function compileRowNumber($partition, $orders)
     {
-        $partition = 'partition by '.$this->wrap($partition);
+        $over = trim('partition by '.$this->wrap($partition).' '.$orders);
 
-        $over = trim($partition.' '.$orders);
-
-        $row = $this->wrap('laravel_row');
-
-        return ', row_number() over ('.$over.') as '.$row;
+        return ', row_number() over ('.$over.') as '.$this->wrap('laravel_row');
     }
 
     /**
