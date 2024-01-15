@@ -214,15 +214,15 @@ class Worker
         pcntl_signal(SIGALRM, function () use ($job, $options) {
             if ($job) {
                 $this->markJobAsFailedIfWillExceedMaxAttempts(
-                    $job->getConnectionName(), $job, (int) $options->maxTries, $e = $this->timeoutExceededException($job)
+                    $job, (int) $options->maxTries, $e = $this->timeoutExceededException($job)
                 );
 
                 $this->markJobAsFailedIfWillExceedMaxExceptions(
-                    $job->getConnectionName(), $job, $e
+                    $job, $e
                 );
 
                 $this->markJobAsFailedIfItShouldFailOnTimeout(
-                    $job->getConnectionName(), $job, $e
+                    $job, $e
                 );
 
                 $this->events->dispatch(new JobTimedOut(
@@ -426,7 +426,7 @@ class Worker
             $this->raiseBeforeJobEvent($connectionName, $job);
 
             $this->markJobAsFailedIfAlreadyExceedsMaxAttempts(
-                $connectionName, $job, (int) $options->maxTries
+                $job, (int) $options->maxTries
             );
 
             if ($job->isDeleted()) {
@@ -463,11 +463,11 @@ class Worker
             // go ahead and mark it as failed now so we do not have to release this again.
             if (! $job->hasFailed()) {
                 $this->markJobAsFailedIfWillExceedMaxAttempts(
-                    $connectionName, $job, (int) $options->maxTries, $e
+                    $job, (int) $options->maxTries, $e
                 );
 
                 $this->markJobAsFailedIfWillExceedMaxExceptions(
-                    $connectionName, $job, $e
+                    $job, $e
                 );
             }
 
