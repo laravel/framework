@@ -60,6 +60,8 @@ class ClearCommand extends Command
 
             return 1;
         }
+
+        return 0;
     }
 
     /**
