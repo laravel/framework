@@ -3,11 +3,12 @@
 namespace Illuminate\Http\Resources\Json;
 
 use Countable;
+use JsonSerializable;
+use IteratorAggregate;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\AbstractPaginator;
 use Illuminate\Http\Resources\CollectsResources;
 use Illuminate\Pagination\AbstractCursorPaginator;
-use Illuminate\Pagination\AbstractPaginator;
-use IteratorAggregate;
 
 class ResourceCollection extends JsonResource implements Countable, IteratorAggregate
 {
@@ -95,7 +96,7 @@ class ResourceCollection extends JsonResource implements Countable, IteratorAggr
      * Transform the resource into a JSON array.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return array|\Illuminate\Contracts\Support\Arrayable|\JsonSerializable
+     * @return array|\Illuminate\Contracts\Support\Arrayable|JsonSerializable
      */
     public function toArray(Request $request)
     {

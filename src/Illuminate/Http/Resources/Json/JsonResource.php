@@ -3,16 +3,16 @@
 namespace Illuminate\Http\Resources\Json;
 
 use ArrayAccess;
-use Illuminate\Container\Container;
-use Illuminate\Contracts\Routing\UrlRoutable;
-use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Contracts\Support\Responsable;
-use Illuminate\Database\Eloquent\JsonEncodingException;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
-use Illuminate\Http\Resources\ConditionallyLoadsAttributes;
-use Illuminate\Http\Resources\DelegatesToResource;
 use JsonSerializable;
+use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Container\Container;
+use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Contracts\Routing\UrlRoutable;
+use Illuminate\Contracts\Support\Responsable;
+use Illuminate\Http\Resources\DelegatesToResource;
+use Illuminate\Database\Eloquent\JsonEncodingException;
+use Illuminate\Http\Resources\ConditionallyLoadsAttributes;
 
 class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRoutable
 {
@@ -121,7 +121,7 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
      * Transform the resource into an array.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return array|\Illuminate\Contracts\Support\Arrayable|\JsonSerializable
+     * @return array|\Illuminate\Contracts\Support\Arrayable|JsonSerializable
      */
     public function toArray(Request $request)
     {
