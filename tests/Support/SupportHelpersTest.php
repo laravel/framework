@@ -1148,7 +1148,6 @@ class SupportHelpersTest extends TestCase
         $this->assertEquals(1, literal(1));
         $this->assertEquals('taylor', literal('taylor'));
         $this->assertEquals((object) ['name' => 'Taylor', 'role' => 'Developer'], literal(name: 'Taylor', role: 'Developer'));
-
     }
 
     public static function providesPregReplaceArrayData()
