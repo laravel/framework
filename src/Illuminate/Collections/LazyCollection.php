@@ -1354,6 +1354,29 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     }
 
     /**
+     * Recursively sort an array by keys and values.
+     *
+     * @param  int  $options
+     * @param  bool  $descending
+     * @return static
+     */
+    public function sortRecursive($options = SORT_REGULAR, $descending = false)
+    {
+        return $this->passthru('sortRecursive', func_get_args());
+    }
+
+    /**
+     * Recursively sort an array by keys and values in descending order.
+     *
+     * @param  int  $options
+     * @return static
+     */
+    public function sortRecursiveDesc($options = SORT_REGULAR)
+    {
+        return $this->passthru('sortRecursiveDesc', func_get_args());
+    }
+
+    /**
      * Sort the collection using the given callback.
      *
      * @param  array<array-key, (callable(TValue, TValue): mixed)|(callable(TValue, TKey): mixed)|string|array{string, string}>|(callable(TValue, TKey): mixed)|string  $callback

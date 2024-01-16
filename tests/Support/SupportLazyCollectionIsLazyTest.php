@@ -1154,6 +1154,28 @@ class SupportLazyCollectionIsLazyTest extends TestCase
         });
     }
 
+    public function testLazySortRecursiveDescIsLazy(): void
+    {
+        $this->assertDoesNotEnumerate(function ($collection) {
+            $collection->sortRecursiveDesc();
+        });
+
+        $this->assertEnumeratesOnce(function ($collection) {
+            $collection->sortRecursiveDesc()->all();
+        });
+    }
+
+    public function testLazySortRecursiveIsLazy(): void
+    {
+        $this->assertDoesNotEnumerate(function ($collection) {
+            $collection->sortRecursive();
+        });
+
+        $this->assertEnumeratesOnce(function ($collection) {
+            $collection->sortRecursive()->all();
+        });
+    }
+
     public function testSortDescIsLazy()
     {
         $this->assertDoesNotEnumerate(function ($collection) {
