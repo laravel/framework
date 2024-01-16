@@ -238,7 +238,7 @@ class Number
      * @param  int|float  $number
      * @param  int|float  $min
      * @param  int|float  $max
-     * @param  bool       $inclusive
+     * @param  bool  $inclusive
      * @return bool
      */
 
