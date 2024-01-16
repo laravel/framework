@@ -182,6 +182,26 @@ class SupportNumberTest extends TestCase
         $this->assertSame(1, Number::clamp(-10, 1, 5));
     }
 
+    public function testWithinRange()
+    {
+        $this->assertTrue(Number::withinRange(50, 0, 100));
+        $this->assertTrue(Number::withinRange(0, 0, 100));
+        $this->assertTrue(Number::withinRange(100, 0, 100));
+        $this->assertFalse(Number::withinRange(101, 0, 100));
+        $this->assertFalse(Number::withinRange(-1, 0, 100));
+
+        $this->assertTrue(Number::withinRange(1, 0, 100, inclusive: false));
+        $this->assertTrue(Number::withinRange(99, 0, 100, inclusive: false));
+        $this->assertFalse(Number::withinRange(0, 0, 100, inclusive: false));
+        $this->assertFalse(Number::withinRange(100, 0, 100, inclusive: false));
+
+        $this->assertTrue(Number::withinRange(50.5, 0.5, 100.5));
+        $this->assertTrue(Number::withinRange(0.0, 0.0, 100.0));
+        $this->assertTrue(Number::withinRange(100.0, 0.0, 100.0));
+        $this->assertFalse(Number::withinRange(100.1, 0.0, 100.0));
+        $this->assertFalse(Number::withinRange(-1.9, 0.0, 100.0));
+    }
+
     public function testToHuman()
     {
         $this->assertSame('1', Number::forHumans(1));

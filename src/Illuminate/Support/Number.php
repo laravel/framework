@@ -233,6 +233,25 @@ class Number
     }
 
     /**
+     * Check if a given number is within a specified range.
+     *
+     * @param  int|float  $number
+     * @param  int|float  $min
+     * @param  int|float  $max
+     * @param  bool       $inclusive
+     * @return bool
+     */
+
+    public static function withinRange(int|float $number, int|float $min, int|float $max, bool $inclusive = true)
+    {
+        if ($inclusive) {
+            return $min <= $number && $number <= $max;
+        }
+
+        return $min < $number && $number < $max;
+    }
+
+    /**
      * Execute the given callback using the given locale.
      *
      * @param  string  $locale
