@@ -241,7 +241,6 @@ class Number
      * @param  bool  $inclusive
      * @return bool
      */
-
     public static function withinRange(int|float $number, int|float $min, int|float $max, bool $inclusive = true)
     {
         if ($inclusive) {
