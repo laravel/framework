@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Process;
 
-class StubPublishedCommandTest extends TestCase
+class StubPublishCommandTest extends TestCase
 {
     public function testItCanPublishedStubFiles()
     {
