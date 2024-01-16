@@ -95,7 +95,7 @@ class ResourceCollection extends JsonResource implements Countable, IteratorAggr
      * Transform the resource into a JSON array.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return array|\Illuminate\Contracts\Support\Arrayable|\JsonSerializable
+     * @return array<int|string, mixed>
      */
     public function toArray(Request $request)
     {
