@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Integration\Generators;
 
-use Illuminate\Support\Facades\Event;
-use Illuminate\Support\Facades\Process;
 use Illuminate\Foundation\Events\PublishingStubs;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Process;
 
 class StubPublishedCommandTest extends TestCase
 {
@@ -42,7 +42,7 @@ class StubPublishedCommandTest extends TestCase
             ->assertExitCode(0)
             ->expectsOutputToContain('Stubs published successfully.');
 
-        $this->assertNotEquals(Process::run('cat ' . $existingStubFile)->output(), $data);
+        $this->assertNotEquals(Process::run('cat '.$existingStubFile)->output(), $data);
     }
 
     private function getAllStubs()
