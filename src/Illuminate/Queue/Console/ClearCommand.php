@@ -57,9 +57,9 @@ class ClearCommand extends Command
             $this->components->info('Cleared '.$count.' '.Str::plural('job', $count).' from the ['.$queueName.'] queue');
         } else {
             $this->components->error('Clearing queues is not supported on ['.(new ReflectionClass($queue))->getShortName().']');
-        }
 
-        return 0;
+            return 1;
+        }
     }
 
     /**
