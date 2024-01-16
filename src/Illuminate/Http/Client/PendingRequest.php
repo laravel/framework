@@ -78,7 +78,7 @@ class PendingRequest
     /**
      * The raw body for the request.
      *
-     * @var string
+     * @var string|\Psr\Http\Message\StreamInterface
      */
     protected $pendingBody;
 
@@ -259,7 +259,7 @@ class PendingRequest
     /**
      * Attach a raw body to the request.
      *
-     * @param  string  $content
+     * @param  string|\Psr\Http\Message\StreamInterface  $content
      * @param  string  $contentType
      * @return $this
      */
