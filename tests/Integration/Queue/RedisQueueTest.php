@@ -6,6 +6,7 @@ use Illuminate\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
 use Illuminate\Queue\Events\JobQueued;
+use Illuminate\Queue\Events\JobQueueing;
 use Illuminate\Queue\Jobs\RedisJob;
 use Illuminate\Queue\RedisQueue;
 use Illuminate\Support\InteractsWithTime;
@@ -200,7 +201,7 @@ class RedisQueueTest extends TestCase
         $job = new RedisQueueIntegrationTestJob(10);
         $this->queue->later(-10, $job);
 
-        $this->container->shouldHaveReceived('bound')->with('events')->once();
+        $this->container->shouldHaveReceived('bound')->with('events')->twice();
 
         // Pop and check it is popped correctly
         $before = $this->currentTime();
@@ -278,7 +279,7 @@ class RedisQueueTest extends TestCase
         // Make an expired reserved job
         $failed = new RedisQueueIntegrationTestJob(-20);
         $this->queue->push($failed);
-        $this->container->shouldHaveReceived('bound')->with('events')->once();
+        $this->container->shouldHaveReceived('bound')->with('events')->twice();
 
         $beforeFailPop = $this->currentTime();
         $this->queue->pop();
@@ -287,7 +288,7 @@ class RedisQueueTest extends TestCase
         // Push an item into queue
         $job = new RedisQueueIntegrationTestJob(10);
         $this->queue->push($job);
-        $this->container->shouldHaveReceived('bound')->with('events')->times(2);
+        $this->container->shouldHaveReceived('bound')->with('events')->times(4);
 
         // Pop and check it is popped correctly
         $before = $this->currentTime();
@@ -326,7 +327,7 @@ class RedisQueueTest extends TestCase
         // Push an item into queue
         $job = new RedisQueueIntegrationTestJob(10);
         $this->queue->push($job);
-        $this->container->shouldHaveReceived('bound')->with('events')->once();
+        $this->container->shouldHaveReceived('bound')->with('events')->twice();
 
         // Pop and check it is popped correctly
         $before = $this->currentTime();
@@ -466,19 +467,24 @@ class RedisQueueTest extends TestCase
      * @param  string  $driver
      */
     #[DataProvider('redisDriverProvider')]
-    public function testPushJobQueuedEvent($driver)
+    public function testPushJobQueueingAndJobQueuedEvents($driver)
     {
         $events = m::mock(Dispatcher::class);
+        $events->shouldReceive('dispatch')->withArgs(function (JobQueueing $jobQueuing) {
+            $this->assertInstanceOf(RedisQueueIntegrationTestJob::class, $jobQueuing->job);
+
+            return true;
+        })->andReturnNull()->once();
         $events->shouldReceive('dispatch')->withArgs(function (JobQueued $jobQueued) {
             $this->assertInstanceOf(RedisQueueIntegrationTestJob::class, $jobQueued->job);
-            $this->assertIsString(RedisQueueIntegrationTestJob::class, $jobQueued->id);
+            $this->assertIsString($jobQueued->id);
 
             return true;
         })->andReturnNull()->once();
 
         $container = m::mock(Container::class);
-        $container->shouldReceive('bound')->with('events')->andReturn(true)->once();
-        $container->shouldReceive('offsetGet')->with('events')->andReturn($events)->once();
+        $container->shouldReceive('bound')->with('events')->andReturn(true)->twice();
+        $container->shouldReceive('offsetGet')->with('events')->andReturn($events)->twice();
 
         $queue = new RedisQueue($this->redis[$driver]);
         $queue->setContainer($container);
@@ -493,11 +499,12 @@ class RedisQueueTest extends TestCase
     public function testBulkJobQueuedEvent($driver)
     {
         $events = m::mock(Dispatcher::class);
+        $events->shouldReceive('dispatch')->with(m::type(JobQueueing::class))->andReturnNull()->times(3);
         $events->shouldReceive('dispatch')->with(m::type(JobQueued::class))->andReturnNull()->times(3);
 
         $container = m::mock(Container::class);
-        $container->shouldReceive('bound')->with('events')->andReturn(true)->times(3);
-        $container->shouldReceive('offsetGet')->with('events')->andReturn($events)->times(3);
+        $container->shouldReceive('bound')->with('events')->andReturn(true)->times(6);
+        $container->shouldReceive('offsetGet')->with('events')->andReturn($events)->times(6);
 
         $queue = new RedisQueue($this->redis[$driver]);
         $queue->setContainer($container);
