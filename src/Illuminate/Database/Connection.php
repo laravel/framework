@@ -20,7 +20,9 @@ use Illuminate\Database\Query\Processors\Processor;
 use Illuminate\Database\Schema\Builder as SchemaBuilder;
 use Illuminate\Support\Arr;
 use Illuminate\Support\InteractsWithTime;
+use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
+use InvalidArgumentException;
 use PDO;
 use PDOStatement;
 use RuntimeException;
@@ -1318,7 +1320,7 @@ class Connection implements ConnectionInterface
     }
 
     /**
-     * Get the PDO driver name.
+     * Get the driver name from the configuration options.
      *
      * @return string
      */
@@ -1610,6 +1612,56 @@ class Connection implements ConnectionInterface
     public function getServerVersion(): string
     {
         return $this->getPdo()->getAttribute(PDO::ATTR_SERVER_VERSION);
+    }
+
+    /**
+     * Determine if the connection matches the given driver name and version.
+     *
+     * @template TValue
+     *
+     * @param  string|array|\Closure(string,string): TValue  $driver
+     * @param  string|null  $operator
+     * @param  string|null  $version
+     * @return bool|TValue
+     */
+    public function is(string|array|Closure $driver, ?string $operator = null, ?string $version = null)
+    {
+        if (func_num_args() === 2 || (! is_string($driver) && func_num_args() === 3)) {
+            throw new InvalidArgumentException('Illegal arguments combination.');
+        }
+
+        $actualDriver = $this->getDriverName() ?? $this->getPdo()->getAttribute(PDO::ATTR_DRIVER_NAME);
+        $actualVersion = $this->getConfig('version') ?? $this->getServerVersion();
+
+        [$actualDriver, $actualVersion] = match (true) {
+            Str::contains($actualVersion, 'MariaDB') => ['mariadb', Str::between($actualVersion, '5.5.5-', '-MariaDB')],
+            Str::contains($actualVersion, ['vitess', 'PlanetScale']) => ['vitess', Str::before($actualVersion, '-')],
+            default => [strtolower($actualDriver), $actualVersion],
+        };
+
+        if ($driver instanceof Closure) {
+            return $driver($actualDriver, $actualVersion);
+        }
+
+        if (is_array($driver)) {
+            foreach ($driver as $key => $value) {
+                [$name, $operator, $version] = match (true) {
+                    is_string($key) => [$key, $value[0], $value[1]],
+                    is_array($value) => $value,
+                    default => [$value, null, null],
+                };
+
+                if (strtolower($name) === $actualDriver
+                    && (! $operator || ! $version || version_compare($actualVersion, $version, $operator))) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        return strtolower($driver) === $actualDriver
+            && (! $operator || ! $version || version_compare($actualVersion, $version, $operator));
     }
 
     /**

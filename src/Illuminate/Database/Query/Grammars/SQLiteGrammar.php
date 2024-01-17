@@ -5,7 +5,6 @@ namespace Illuminate\Database\Query\Grammars;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
-use PDO;
 
 class SQLiteGrammar extends Grammar
 {
@@ -193,9 +192,7 @@ class SQLiteGrammar extends Grammar
      */
     protected function compileGroupLimit(Builder $query)
     {
-        $version = $query->getConnection()->getReadPdo()->getAttribute(PDO::ATTR_SERVER_VERSION);
-
-        if (version_compare($version, '3.25.0') >= 0) {
+        if ($query->getConnection()->is('sqlite', '>=', '3.25.0')) {
             return parent::compileGroupLimit($query);
         }
 

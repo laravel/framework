@@ -357,10 +357,7 @@ class MySqlGrammar extends Grammar
      */
     public function compileRenameColumn(Blueprint $blueprint, Fluent $command, Connection $connection)
     {
-        $version = $connection->getServerVersion();
-
-        if (($connection->isMaria() && version_compare($version, '10.5.2', '<')) ||
-            (! $connection->isMaria() && version_compare($version, '8.0.3', '<'))) {
+        if ($connection->is([['mariadb', '<', '10.5.2'], ['mysql', '<', '8.0.3']])) {
             $column = collect($connection->getSchemaBuilder()->getColumns($blueprint->getTable()))
                 ->firstWhere('name', $command->from);
 

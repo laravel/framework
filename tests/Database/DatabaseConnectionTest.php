@@ -528,6 +528,84 @@ class DatabaseConnectionTest extends TestCase
         $this->assertEquals(1.23, $log[0]['time']);
     }
 
+    public function testIsWithConfig()
+    {
+        $connection = new Connection(m::mock(PDO::class), config: ['driver' => 'mysql', 'version' => '5.7.2']);
+
+        $this->assertTrue($connection->is('mysql'));
+        $this->assertTrue($connection->is('mysql', '<', '8.0.11'));
+        $this->assertTrue($connection->is([['mysql', '<', '8.0.11'], ['sqlite', '>=', '3.5.0']]));
+        $this->assertTrue($connection->is(['mysql' => ['<', '8.0.11'], 'sqlite' => ['>=', '3.5.0']]));
+        $this->assertTrue($connection->is(['mysql', 'sqlite']));
+        $this->assertTrue($connection->is(
+            fn ($driver, $version) => $driver === 'mysql' && version_compare($version, '8.0.11', '<')
+        ));
+        $this->assertEquals(['mysql', '5.7.2'], $connection->is(fn ($driver, $version) => [$driver, $version]));
+
+        $this->assertFalse($connection->is('mariadb'));
+        $this->assertFalse($connection->is('mysql', '>=', '8.0.11'));
+        $this->assertFalse($connection->is([['mysql', '>', '8.0.11'], ['sqlite', '>=', '3.5.0']]));
+        $this->assertFalse($connection->is(['sqlsrv' => ['<', '8.0.11'], 'vitess' => ['>=', '3.5.0']]));
+        $this->assertFalse($connection->is(['vitess', 'sqlite']));
+        $this->assertFalse($connection->is(
+            fn ($driver, $version) => $driver === 'pgsql' && version_compare($version, '8.0.11', '<')
+        ));
+    }
+
+    public function testIsWithPDO()
+    {
+        $pdo = m::mock(PDO::class);
+        $pdo->shouldReceive('getAttribute')->with(PDO::ATTR_DRIVER_NAME)->andReturn('mysql');
+        $pdo->shouldReceive('getAttribute')->with(PDO::ATTR_SERVER_VERSION)->andReturn('5.5.5-10.5.2-MariaDB');
+        $connection = new Connection($pdo, config: []);
+
+        $this->assertTrue($connection->is('mariadb'));
+        $this->assertTrue($connection->is('mariadb', '<', '10.10.10'));
+        $this->assertTrue($connection->is([['mysql', '>', '8.0.11'], ['mariadb', '>=', '9.5.0']]));
+        $this->assertTrue($connection->is(['mysql' => ['>', '8.0.11'], 'mariadb' => ['>=', '9.5.0']]));
+        $this->assertTrue($connection->is(['mariadb', 'sqlite']));
+        $this->assertTrue($connection->is(
+            fn ($driver, $version) => $driver === 'mariadb' && version_compare($version, '10.10.10', '<')
+        ));
+        $this->assertEquals(['mariadb', '10.5.2'], $connection->is(fn ($driver, $version) => [$driver, $version]));
+
+        $this->assertFalse($connection->is('mysql'));
+        $this->assertFalse($connection->is('mysql', '>=', '8.0.11'));
+        $this->assertFalse($connection->is([['mysql', '>', '8.0.11'], ['sqlite', '>=', '3.5.0']]));
+        $this->assertFalse($connection->is(['sqlsrv' => ['<', '8.0.11'], 'vitess' => ['>=', '3.5.0']]));
+        $this->assertFalse($connection->is(['vitess', 'sqlite']));
+        $this->assertFalse($connection->is(
+            fn ($driver, $version) => $driver === 'pgsql' && version_compare($version, '8.0.11', '<')
+        ));
+    }
+
+    public function testIsWithStringException()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        $connection = new Connection(m::mock(PDO::class));
+
+        $connection->is('mysql', '8.0.11');
+    }
+
+    public function testIsWithArrayException()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        $connection = new Connection(m::mock(PDO::class));
+
+        $connection->is(['mysql'], '<', '8.0.11');
+    }
+
+    public function testIsWithClosureException()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        $connection = new Connection(m::mock(PDO::class));
+
+        $connection->is(fn () => 'mysql', '<', '8.0.11');
+    }
+
     protected function getMockConnection($methods = [], $pdo = null)
     {
         $pdo = $pdo ?: new DatabaseConnectionTestMockPDO;

@@ -255,25 +255,16 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
      */
     protected function getLockForPopping()
     {
-        $databaseEngine = $this->database->getPdo()->getAttribute(PDO::ATTR_DRIVER_NAME);
-        $databaseVersion = $this->database->getConfig('version') ?? $this->database->getPdo()->getAttribute(PDO::ATTR_SERVER_VERSION);
-
-        if (Str::of($databaseVersion)->contains('MariaDB')) {
-            $databaseEngine = 'mariadb';
-            $databaseVersion = Str::before(Str::after($databaseVersion, '5.5.5-'), '-');
-        } elseif (Str::of($databaseVersion)->contains(['vitess', 'PlanetScale'])) {
-            $databaseEngine = 'vitess';
-            $databaseVersion = Str::before($databaseVersion, '-');
-        }
-
-        if (($databaseEngine === 'mysql' && version_compare($databaseVersion, '8.0.1', '>=')) ||
-            ($databaseEngine === 'mariadb' && version_compare($databaseVersion, '10.6.0', '>=')) ||
-            ($databaseEngine === 'pgsql' && version_compare($databaseVersion, '9.5', '>=')) ||
-            ($databaseEngine === 'vitess' && version_compare($databaseVersion, '19.0', '>='))) {
+        if ($this->database->is([
+            ['mysql', '>=', '8.0.1'],
+            ['mariadb', '>=', '10.6.0'],
+            ['pgsql', '>=', '9.5'],
+            ['vitess', '>=', '19.0'],
+        ])) {
             return 'FOR UPDATE SKIP LOCKED';
         }
 
-        if ($databaseEngine === 'sqlsrv') {
+        if ($this->database->is('sqlsrv')) {
             return 'with(rowlock,updlock,readpast)';
         }
 
