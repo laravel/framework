@@ -822,7 +822,22 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      */
     public function mapWithKeys(callable $callback)
     {
-        return new static(Arr::mapWithKeys($this->items, $callback));
+        return new static($this->mapIntoArray($callback));
+    }
+
+    /**
+     * Return an associative array by mapping over each of the items
+     *
+     * The callback should return an associative array with a single key/value pair.
+     *
+     * @template TMapWithKeysKey of array-key
+     * @template TMapWithKeysValue
+     *
+     * @param  callable(TValue, TKey): array<TMapWithKeysKey, TMapWithKeysValue>  $callback
+     */
+    public function mapIntoArray(callable $callback): array
+    {
+        return Arr::mapWithKeys($this->items, $callback);
     }
 
     /**
