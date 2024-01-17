@@ -8,8 +8,6 @@ use Illuminate\Database\Connection;
 use Illuminate\Queue\Jobs\DatabaseJob;
 use Illuminate\Queue\Jobs\DatabaseJobRecord;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Str;
-use PDO;
 
 class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
 {

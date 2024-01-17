@@ -9,8 +9,6 @@ use Illuminate\Database\Schema\Grammars\MySqlGrammar as SchemaGrammar;
 use Illuminate\Database\Schema\MySqlBuilder;
 use Illuminate\Database\Schema\MySqlSchemaState;
 use Illuminate\Filesystem\Filesystem;
-use Illuminate\Support\Str;
-use PDO;
 
 class MySqlConnection extends Connection
 {
