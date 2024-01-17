@@ -329,6 +329,7 @@ abstract class Queue
             return $this->container->make('db.transactions')->addCallback(
                 function () use ($payload, $queue, $delay, $callback, $job) {
                     $this->raiseJobQueueingEvent($job, $payload);
+
                     return tap($callback($payload, $queue, $delay), function ($jobId) use ($job, $payload) {
                         $this->raiseJobQueuedEvent($jobId, $job, $payload);
                     });
@@ -337,6 +338,7 @@ abstract class Queue
         }
 
         $this->raiseJobQueueingEvent($job, $payload);
+
         return tap($callback($payload, $queue, $delay), function ($jobId) use ($job, $payload) {
             $this->raiseJobQueuedEvent($jobId, $job, $payload);
         });
