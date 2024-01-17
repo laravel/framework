@@ -189,7 +189,7 @@ class SQLiteGrammar extends Grammar
      */
     public function compileCreate(Blueprint $blueprint, Fluent $command)
     {
-        $primaryKey = tap($this->getCommandByName($blueprint, 'primary'), fn($pk) => $pk?->shouldBeSkipped());
+        $primaryKey = tap($this->getCommandByName($blueprint, 'primary'), fn ($pk) => $pk?->shouldBeSkipped());
 
         $foreignKeys = tap($this->getCommandsByName($blueprint, 'foreign'),
             fn ($commands) => collect($commands)->each->shouldBeSkipped()
