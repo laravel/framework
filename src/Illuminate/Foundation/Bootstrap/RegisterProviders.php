@@ -79,4 +79,16 @@ class RegisterProviders
             array_merge(static::$merge, $providers)
         )));
     }
+
+    /**
+     * Flush the bootstrapper's global state.
+     *
+     * @return void
+     */
+    public static function flushState()
+    {
+        static::$bootstrapProviderPath = null;
+
+        static::$merge = [];
+    }
 }

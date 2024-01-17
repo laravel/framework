@@ -8,6 +8,7 @@ use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Bootstrap\HandleExceptions;
+use Illuminate\Foundation\Bootstrap\RegisterProviders;
 use Illuminate\Foundation\Console\AboutCommand;
 use Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull;
 use Illuminate\Foundation\Http\Middleware\TrimStrings;
@@ -248,6 +249,7 @@ abstract class TestCase extends BaseTestCase
         ConvertEmptyStringsToNull::flushState();
         HandleExceptions::flushState();
         Queue::createPayloadUsing(null);
+        RegisterProviders::flushState();
         Sleep::fake(false);
         TrimStrings::flushState();
 
