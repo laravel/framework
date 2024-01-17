@@ -45,7 +45,7 @@ class QueueBeanstalkdQueueTest extends TestCase
         $this->queue->push('foo', ['data'], 'stack');
         $this->queue->push('foo', ['data']);
 
-        $this->container->shouldHaveReceived('bound')->with('events')->times(2);
+        $this->container->shouldHaveReceived('bound')->with('events')->times(4);
 
         Str::createUuidsNormally();
     }
@@ -67,7 +67,7 @@ class QueueBeanstalkdQueueTest extends TestCase
         $this->queue->later(5, 'foo', ['data'], 'stack');
         $this->queue->later(5, 'foo', ['data']);
 
-        $this->container->shouldHaveReceived('bound')->with('events')->times(2);
+        $this->container->shouldHaveReceived('bound')->with('events')->times(4);
 
         Str::createUuidsNormally();
     }
