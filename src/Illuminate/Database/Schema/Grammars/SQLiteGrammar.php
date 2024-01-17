@@ -189,12 +189,18 @@ class SQLiteGrammar extends Grammar
      */
     public function compileCreate(Blueprint $blueprint, Fluent $command)
     {
+        $primaryKey = tap($this->getCommandByName($blueprint, 'primary'), fn($pk) => $pk?->shouldBeSkipped());
+
+        $foreignKeys = tap($this->getCommandsByName($blueprint, 'foreign'),
+            fn ($commands) => collect($commands)->each->shouldBeSkipped()
+        );
+
         return sprintf('%s table %s (%s%s%s)',
             $blueprint->temporary ? 'create temporary' : 'create',
             $this->wrapTable($blueprint),
             implode(', ', $this->getColumns($blueprint)),
-            $this->addForeignKeys($this->getCommandsByName($blueprint, 'foreign')),
-            $this->addPrimaryKeys($this->getCommandByName($blueprint, 'primary'))
+            $this->addForeignKeys($foreignKeys),
+            $this->addPrimaryKeys($primaryKey)
         );
     }
 
@@ -419,7 +425,7 @@ class SQLiteGrammar extends Grammar
      */
     public function compileForeign(Blueprint $blueprint, Fluent $command)
     {
-        // Handled on table creation...
+        throw new RuntimeException('This database driver does not support adding foreign key constraints.');
     }
 
     /**
