@@ -88,6 +88,7 @@ class RegisterProviders
     public static function flushState()
     {
         static::$bootstrapProviderPath = null;
+
         static::$merge = [];
     }
 }
