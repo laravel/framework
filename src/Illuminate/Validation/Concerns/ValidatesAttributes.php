@@ -2404,7 +2404,7 @@ trait ValidatesAttributes
      */
     public function validateString($attribute, $value)
     {
-        return is_string($value);
+        return (string) $value == $value;
     }
 
     /**
