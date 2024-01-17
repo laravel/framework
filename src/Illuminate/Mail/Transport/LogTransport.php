@@ -33,15 +33,40 @@ class LogTransport implements TransportInterface
      */
     public function send(RawMessage $message, Envelope $envelope = null): ?SentMessage
     {
-        $string = $message->toString();
+        $string = str($message->toString());
 
-        if (str_contains($string, 'Content-Transfer-Encoding: quoted-printable')) {
-            $string = quoted_printable_decode($string);
+        if ($string->contains('Content-Type: multipart/')) {
+            $boundary = $string
+                ->after('boundary=')
+                ->before("\r\n")
+                ->prepend('--')
+                ->append("\r\n");
+
+            $string = $string
+                ->explode($boundary)
+                ->map($this->decodeQuotedPrintableContent(...))
+                ->implode($boundary);
+        } elseif ($string->contains('Content-Transfer-Encoding: quoted-printable')) {
+            $string = $this->decodeQuotedPrintableContent($string);
         }
 
         $this->logger->debug($string);
 
         return new SentMessage($message, $envelope ?? Envelope::create($message));
+    }
+
+    protected function decodeQuotedPrintableContent(string $part): string
+    {
+        if (! str_contains($part, 'Content-Transfer-Encoding: quoted-printable')) {
+            return $part;
+        }
+
+        [$headers, $content] = explode("\r\n\r\n", $part, 2);
+
+        return implode("\r\n\r\n", [
+            $headers,
+            quoted_printable_decode($content),
+        ]);
     }
 
     /**
