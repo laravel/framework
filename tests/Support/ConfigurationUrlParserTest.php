@@ -134,7 +134,7 @@ class ConfigurationUrlParserTest extends TestCase
                 ],
             ],
             'query params from URL are used as extra params' => [
-                'url' => 'mysql://foo:bar@localhost/database?charset=UTF-8',
+                'mysql://foo:bar@localhost/database?charset=UTF-8',
                 [
                     'driver' => 'mysql',
                     'database' => 'database',

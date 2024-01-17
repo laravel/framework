@@ -2157,7 +2157,7 @@ trait HasAttributes
         }
 
         return is_numeric($attribute) && is_numeric($original)
-            && BigDecimal::of($attribute)->isEqualTo($original);
+            && strcmp((string) $attribute, (string) $original) === 0;
     }
 
     /**

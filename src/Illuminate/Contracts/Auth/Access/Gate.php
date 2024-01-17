@@ -59,20 +59,20 @@ interface Gate
     /**
      * Determine if all of the given abilities should be granted for the current user.
      *
-     * @param  iterable|string  $abilities
+     * @param  iterable|string  $ability
      * @param  array|mixed  $arguments
      * @return bool
      */
-    public function allows($abilities, $arguments = []);
+    public function allows($ability, $arguments = []);
 
     /**
      * Determine if any of the given abilities should be denied for the current user.
      *
-     * @param  iterable|string  $abilities
+     * @param  iterable|string  $ability
      * @param  array|mixed  $arguments
      * @return bool
      */
-    public function denies($abilities, $arguments = []);
+    public function denies($ability, $arguments = []);
 
     /**
      * Determine if all of the given abilities should be granted for the current user.
