@@ -2799,6 +2799,10 @@ class ValidationValidatorTest extends TestCase
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['x' => ['blah' => 'test']], ['x' => 'string']);
         $this->assertFalse($v->passes());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['x' => 1234], ['x' => 'string']);
+        $this->assertTrue($v->passes());
     }
 
     public function testValidateJson()
