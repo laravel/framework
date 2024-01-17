@@ -91,4 +91,3 @@ class RegisterProviders
         static::$merge = [];
     }
 }
-}
