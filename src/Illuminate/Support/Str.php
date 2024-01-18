@@ -86,7 +86,7 @@ class Str
     public static function after($subject, $search)
     {
         if ($search === '') {
-                return $subject;
+            return $subject;
         }
         $pos = strpos($subject, $search);
         return $pos === false ? $subject : substr($subject, $pos + strlen($search));
