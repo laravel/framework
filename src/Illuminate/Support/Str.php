@@ -89,13 +89,13 @@ class Str
             return $subject;
         }
 
-        $position = strpos($subject, (string) $search);
+        $position = mb_strpos($subject, (string) $search);
 
         if ($position === false) {
             return $subject;
         }
 
-        return substr($subject, $position + strlen($search));
+        return mb_substr($subject, $position + strlen($search));
     }
 
     /**
