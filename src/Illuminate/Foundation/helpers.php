@@ -733,9 +733,10 @@ if (! function_exists('rescue')) {
      * @param  callable(): TRescueValue  $callback
      * @param  (callable(\Throwable): TRescueFallback)|TRescueFallback  $rescue
      * @param  bool|callable  $report
+     * @param  null|array<string, (callable(\Throwable): TRescueFallback)|TRescueFallback>  $catch
      * @return TRescueValue|TRescueFallback
      */
-    function rescue(callable $callback, $rescue = null, $report = true)
+    function rescue(callable $callback, $rescue = null, $report = true, $catch = null)
     {
         try {
             return $callback();
@@ -744,7 +745,11 @@ if (! function_exists('rescue')) {
                 report($e);
             }
 
-            return value($rescue, $e);
+            return match (true) {
+                is_array($catch) && array_key_exists(get_class($e), $catch) => value($catch[get_class($e)], $e),
+                is_array($catch) && array_key_exists('default', $catch) => value($catch['default'], $e),
+                default => value($rescue, $e),
+            };
         }
     }
 }
