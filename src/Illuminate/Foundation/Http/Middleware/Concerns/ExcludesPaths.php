@@ -12,16 +12,6 @@ trait ExcludesPaths
     protected $except = [];
 
     /**
-     * Get the URIs that should be excluded.
-     *
-     * @return array
-     */
-    public function getExcludedPaths()
-    {
-        return $this->except;
-    }
-
-    /**
      * Determine if the request has a URI that should be excluded.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -40,5 +30,15 @@ trait ExcludesPaths
         }
 
         return false;
+    }
+
+    /**
+     * Get the URIs that should be excluded.
+     *
+     * @return array
+     */
+    public function getExcludedPaths()
+    {
+        return $this->except;
     }
 }
