@@ -5,6 +5,7 @@ namespace Illuminate\Database\Eloquent\Concerns;
 use BackedEnum;
 use Brick\Math\BigDecimal;
 use Brick\Math\Exception\MathException as BrickMathException;
+use Brick\Math\Exception\NumberFormatException as BrickNumberFormatException;
 use Brick\Math\RoundingMode;
 use Carbon\CarbonImmutable;
 use Carbon\CarbonInterface;
@@ -2100,8 +2101,12 @@ trait HasAttributes
             return $this->fromEncryptedString($attribute) === $this->fromEncryptedString($original);
         }
 
-        return is_numeric($attribute) && is_numeric($original)
-            && strcmp((string) $attribute, (string) $original) === 0;
+        try {
+            return BigDecimal::of($attribute)->isEqualTo($original);
+        }
+        catch (BrickNumberFormatException $e) {
+            return false
+        }
     }
 
     /**
