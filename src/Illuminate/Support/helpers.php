@@ -6,6 +6,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Env;
 use Illuminate\Support\HigherOrderTapProxy;
 use Illuminate\Support\Optional;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Sleep;
 use Illuminate\Support\Str;
 
@@ -259,6 +260,25 @@ if (! function_exists('retry')) {
 
             goto beginning;
         }
+    }
+}
+
+if (!function_exists('set_env_value')) {
+    /**
+     * Set the value of an environment variable.
+     *
+     * @param  string  $key
+     * @param  mixed  $value
+     * @param  bool  $storeWithQuotes
+     * @return void
+     */
+    function set_env_value($key, $value, $storeWithQuotes = false)
+    {
+        $envFile = app()->environmentFilePath();
+        $contents = File::get($envFile);
+        $newValue = $storeWithQuotes ? '"' . $value . '"' : $value;
+        $newContents = preg_replace("/^{$key}=.*/m", "{$key}={$newValue}", $contents);
+        File::put($envFile, $newContents);
     }
 }
 
