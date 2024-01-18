@@ -88,8 +88,14 @@ class Str
         if ($search === '') {
             return $subject;
         }
-        $pos = strpos($subject, $search);
-        return $pos === false ? $subject : substr($subject, $pos + strlen($search));
+
+        $position = strpos($subject, (string) $search);
+
+        if ($position === false) {
+            return $subject;
+        }
+
+        return substr($subject, $position + strlen($search));
     }
 
     /**
