@@ -2,6 +2,7 @@
 
 namespace Illuminate\Mail\Transport;
 
+use Illuminate\Support\Str;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\SentMessage;
@@ -33,7 +34,7 @@ class LogTransport implements TransportInterface
      */
     public function send(RawMessage $message, Envelope $envelope = null): ?SentMessage
     {
-        $string = str($message->toString());
+        $string = Str::of($message->toString());
 
         if ($string->contains('Content-Type: multipart/')) {
             $boundary = $string
@@ -50,12 +51,18 @@ class LogTransport implements TransportInterface
             $string = $this->decodeQuotedPrintableContent($string);
         }
 
-        $this->logger->debug($string);
+        $this->logger->debug((string) $string);
 
         return new SentMessage($message, $envelope ?? Envelope::create($message));
     }
 
-    protected function decodeQuotedPrintableContent(string $part): string
+    /**
+     * Decode the given quoted printable content.
+     *
+     * @param  string  $part
+     * @return string
+     */
+    protected function decodeQuotedPrintableContent(string $part)
     {
         if (! str_contains($part, 'Content-Transfer-Encoding: quoted-printable')) {
             return $part;
