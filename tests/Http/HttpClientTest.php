@@ -6,6 +6,7 @@ use Exception;
 use GuzzleHttp\Middleware;
 use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\Psr7\Response as Psr7Response;
+use GuzzleHttp\Psr7\Utils;
 use GuzzleHttp\TransferStats;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Support\Arrayable;
@@ -347,6 +348,26 @@ class HttpClientTest extends TestCase
 
         $fakeRequest = function (Request $request) use ($body) {
             self::assertSame($body, $request->body());
+            self::assertContains('text/plain', $request->header('Content-Type'));
+
+            return ['my' => 'response'];
+        };
+
+        $this->factory->fake($fakeRequest);
+
+        $this->factory->withBody($body, 'text/plain')->send('post', 'http://foo.com/api');
+    }
+
+    public function testSendStreamRequestBody()
+    {
+        $string = 'Look at me, i am a stream!!';
+        $resource = fopen('php://temp', 'w');
+        fwrite($resource, $string);
+        rewind($resource);
+        $body = Utils::streamFor($resource);
+
+        $fakeRequest = function (Request $request) use ($string) {
+            self::assertSame($string, $request->body());
             self::assertContains('text/plain', $request->header('Content-Type'));
 
             return ['my' => 'response'];
