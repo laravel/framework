@@ -56,7 +56,7 @@ class Rule
      */
     public static function unless($condition, $rules, $defaultRules = [])
     {
-        return new ConditionalRules(! $condition, $rules, $defaultRules);
+        return new ConditionalRules($condition, $defaultRules, $rules);
     }
 
     /**
