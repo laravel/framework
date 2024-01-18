@@ -2102,7 +2102,7 @@ trait HasAttributes
         }
 
         try {
-            return BigDecimal::of($attribute)->isEqualTo($original);
+            return $original !== null && BigDecimal::of($attribute)->isEqualTo($original);
         } catch (BrickNumberFormatException $e) {
             return false;
         }
