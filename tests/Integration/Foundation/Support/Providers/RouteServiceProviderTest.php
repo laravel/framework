@@ -2,6 +2,9 @@
 
 namespace Illuminate\Tests\Integration\Foundation\Support\Providers;
 
+use Illuminate\Foundation\Application;
+use Illuminate\Foundation\Configuration\Exceptions;
+use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Testing\Assert;
@@ -16,7 +19,19 @@ class RouteServiceProviderTest extends TestCase
      */
     protected function resolveApplication()
     {
-        return require __DIR__.'/bootstrap.php';
+        return Application::configure(static::applicationBasePath())
+            ->withProviders()
+            ->withRouting(
+                using: function () {
+                    Route::get('login', fn () => 'Login')->name('login');
+                }
+            )
+            ->withMiddleware(function (Middleware $middleware) {
+                //
+            })
+            ->withExceptions(function (Exceptions $exceptions) {
+                //
+            })->create();
     }
 
     /**
