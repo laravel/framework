@@ -105,7 +105,7 @@ abstract class Grammar extends BaseGrammar
      */
     public function compilePrimary(Blueprint $blueprint, Fluent $command)
     {
-        throw new RuntimeException('This database driver does not support adding primary key.');
+        throw new RuntimeException('This database driver does not support adding a primary key.');
     }
 
     /**
