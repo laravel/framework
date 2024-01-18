@@ -2102,10 +2102,10 @@ trait HasAttributes
         }
 
         try {
-            return $original !== null && BigDecimal::of($attribute)->isEqualTo($original);
-        } catch (BrickNumberFormatException $e) {
             return is_numeric($attribute) && is_numeric($original)
-                && strcmp((string) $attribute, (string) $original) === 0;
+                && BigDecimal::of($attribute)->isEqualTo($original);
+        } catch (BrickNumberFormatException $e) {
+            return false;
         }
     }
 
