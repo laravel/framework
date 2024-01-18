@@ -168,7 +168,7 @@ class ModelMakeCommand extends GeneratorCommand
      *
      * @return string
      */
-    protected function getStub()
+    protected function getStub(): string
     {
         if ($this->option('pivot')) {
             return $this->resolveStubPath('/stubs/model.pivot.stub');
@@ -176,6 +176,10 @@ class ModelMakeCommand extends GeneratorCommand
 
         if ($this->option('morph-pivot')) {
             return $this->resolveStubPath('/stubs/model.morph-pivot.stub');
+        }
+
+        if (! $this->option('factory')) {
+            return $this->resolveStubPath('/stubs/model.no-factory.stub');
         }
 
         return $this->resolveStubPath('/stubs/model.stub');
