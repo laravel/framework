@@ -90,7 +90,7 @@ class RouteServiceProvider extends ServiceProvider
      */
     public static function loadRoutesUsing(Closure $routesCallback)
     {
-        static::$alwaysLoadRoutesUsing = $routesCallback;
+        self::$alwaysLoadRoutesUsing = $routesCallback;
     }
 
     /**
@@ -134,9 +134,11 @@ class RouteServiceProvider extends ServiceProvider
      */
     protected function loadRoutes()
     {
-        if (! is_null(static::$alwaysLoadRoutesUsing)) {
-            $this->app->call(static::$alwaysLoadRoutesUsing);
-        } elseif (! is_null($this->loadRoutesUsing)) {
+        if (! is_null(self::$alwaysLoadRoutesUsing)) {
+            $this->app->call(self::$alwaysLoadRoutesUsing);
+        }
+
+        if (! is_null($this->loadRoutesUsing)) {
             $this->app->call($this->loadRoutesUsing);
         } elseif (method_exists($this, 'map')) {
             $this->app->call([$this, 'map']);
