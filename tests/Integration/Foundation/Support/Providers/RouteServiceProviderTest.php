@@ -49,7 +49,7 @@ class RouteServiceProviderTest extends TestCase
 
     public function test_it_can_uses_routes_registered_using_configuration_file()
     {
-        $this->get('dashboard')
+        $this->get(route('dashboard'))
             ->assertOk()
             ->assertSee('Hello');
     }
