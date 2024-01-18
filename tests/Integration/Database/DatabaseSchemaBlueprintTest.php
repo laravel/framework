@@ -91,7 +91,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
             $table->double('amount')->nullable()->invisible()->after('name')->change();
             $table->timestamp('added_at', 4)->nullable(false)->useCurrent()->useCurrentOnUpdate()->change();
             $table->enum('difficulty', ['easy', 'hard'])->default('easy')->charset('utf8mb4')->collation('unicode')->change();
-            $table->multiPolygon('positions')->srid(1234)->storedAs('expression')->change();
+            $table->geometry('positions', 'multipolygon', 1234)->storedAs('expression')->change();
             $table->string('old_name', 50)->renameTo('new_name')->change();
             $table->bigIncrements('id')->first()->from(10)->comment('my comment')->change();
         });
@@ -101,7 +101,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
             .'modify `amount` double null invisible after `name`, '
             .'modify `added_at` timestamp(4) not null default CURRENT_TIMESTAMP(4) on update CURRENT_TIMESTAMP(4), '
             ."modify `difficulty` enum('easy', 'hard') character set utf8mb4 collate 'unicode' not null default 'easy', "
-            .'modify `positions` multipolygon as (expression) stored srid 1234, '
+            .'modify `positions` multipolygon srid 1234 as (expression) stored, '
             .'change `old_name` `new_name` varchar(50) not null, '
             ."modify `id` bigint unsigned not null auto_increment primary key comment 'my comment' first",
             'alter table `users` auto_increment = 10',
@@ -155,12 +155,12 @@ class DatabaseSchemaBlueprintTest extends TestCase
         ], $blueprint->toSql($connection, new PostgresGrammar));
 
         $blueprint = new Blueprint('users', function ($table) {
-            $table->point('foo')->isGeometry()->projection(1234)->change();
+            $table->geometry('foo', 'point', 1234)->change();
         });
 
         $this->assertEquals([
             'alter table "users" '
-            .'alter column "foo" type geometry(point, 1234), '
+            .'alter column "foo" type geometry(point,1234), '
             .'alter column "foo" set not null, '
             .'alter column "foo" drop default, '
             .'alter column "foo" drop identity if exists',

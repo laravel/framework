@@ -411,7 +411,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
     public function testAddingFluentSpatialIndex()
     {
         $blueprint = new Blueprint('geo');
-        $blueprint->point('coordinates')->spatialIndex();
+        $blueprint->geometry('coordinates', 'point')->spatialIndex();
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(2, $statements);
@@ -1174,10 +1174,20 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $this->assertSame('alter table `geo` add `coordinates` geometry not null', $statements[0]);
     }
 
+    public function testAddingGeography()
+    {
+        $blueprint = new Blueprint('geo');
+        $blueprint->geography('coordinates');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table `geo` add `coordinates` geometry srid 4326 not null', $statements[0]);
+    }
+
     public function testAddingPoint()
     {
         $blueprint = new Blueprint('geo');
-        $blueprint->point('coordinates');
+        $blueprint->geometry('coordinates', 'point');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
@@ -1187,27 +1197,27 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
     public function testAddingPointWithSrid()
     {
         $blueprint = new Blueprint('geo');
-        $blueprint->point('coordinates', 4326);
+        $blueprint->geometry('coordinates', 'point', 4326);
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertSame('alter table `geo` add `coordinates` point not null srid 4326', $statements[0]);
+        $this->assertSame('alter table `geo` add `coordinates` point srid 4326 not null', $statements[0]);
     }
 
     public function testAddingPointWithSridColumn()
     {
         $blueprint = new Blueprint('geo');
-        $blueprint->point('coordinates', 4326)->after('id');
+        $blueprint->geometry('coordinates', 'point', 4326)->after('id');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertSame('alter table `geo` add `coordinates` point not null srid 4326 after `id`', $statements[0]);
+        $this->assertSame('alter table `geo` add `coordinates` point srid 4326 not null after `id`', $statements[0]);
     }
 
     public function testAddingLineString()
     {
         $blueprint = new Blueprint('geo');
-        $blueprint->linestring('coordinates');
+        $blueprint->geometry('coordinates', 'linestring');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
@@ -1217,7 +1227,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
     public function testAddingPolygon()
     {
         $blueprint = new Blueprint('geo');
-        $blueprint->polygon('coordinates');
+        $blueprint->geometry('coordinates', 'polygon');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
@@ -1227,7 +1237,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
     public function testAddingGeometryCollection()
     {
         $blueprint = new Blueprint('geo');
-        $blueprint->geometrycollection('coordinates');
+        $blueprint->geometry('coordinates', 'geometrycollection');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
@@ -1237,7 +1247,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
     public function testAddingMultiPoint()
     {
         $blueprint = new Blueprint('geo');
-        $blueprint->multipoint('coordinates');
+        $blueprint->geometry('coordinates', 'multipoint');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
@@ -1247,7 +1257,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
     public function testAddingMultiLineString()
     {
         $blueprint = new Blueprint('geo');
-        $blueprint->multilinestring('coordinates');
+        $blueprint->geometry('coordinates', 'multilinestring');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
@@ -1257,7 +1267,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
     public function testAddingMultiPolygon()
     {
         $blueprint = new Blueprint('geo');
-        $blueprint->multipolygon('coordinates');
+        $blueprint->geometry('coordinates', 'multipolygon');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
