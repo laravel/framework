@@ -2103,9 +2103,8 @@ trait HasAttributes
 
         try {
             return BigDecimal::of($attribute)->isEqualTo($original);
-        }
-        catch (BrickNumberFormatException $e) {
-            return false
+        } catch (BrickNumberFormatException $e) {
+            return false;
         }
     }
 
