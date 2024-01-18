@@ -20,7 +20,9 @@ class RouteServiceProviderTest extends TestCase
     protected function resolveApplication()
     {
         return Application::configure(static::applicationBasePath())
-            ->withProviders()
+            ->withProviders([
+                AppRouteServiceProvider::class,
+            ])
             ->withRouting(
                 using: function () {
                     Route::get('login', fn () => 'Login')->name('login');
@@ -32,19 +34,6 @@ class RouteServiceProviderTest extends TestCase
             ->withExceptions(function (Exceptions $exceptions) {
                 //
             })->create();
-    }
-
-    /**
-     * Get package providers.
-     *
-     * @param  \Illuminate\Foundation\Application  $app
-     * @return array<int, class-string<\Illuminate\Support\ServiceProvider>>
-     */
-    protected function getPackageProviders($app)
-    {
-        return [
-            AppRouteServiceProvider::class,
-        ];
     }
 
     public function test_it_can_register_multiple_route_service_providers()
