@@ -16,6 +16,7 @@ use Illuminate\Queue\Queue;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\Facades\ParallelTesting;
+use Illuminate\Support\Once;
 use Illuminate\Support\Sleep;
 use Illuminate\Support\Str;
 use Illuminate\View\Component;
@@ -248,6 +249,7 @@ abstract class TestCase extends BaseTestCase
         Component::forgetFactory();
         ConvertEmptyStringsToNull::flushState();
         HandleExceptions::flushState();
+        Once::flush();
         Queue::createPayloadUsing(null);
         RegisterProviders::flushState();
         Sleep::fake(false);
