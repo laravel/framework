@@ -116,7 +116,7 @@ class RouteListCommand extends Command
             return $this->getRouteInformation($route);
         })->filter()->all();
 
-        if (($sort = $this->option('sort')) !== null) {
+        if (in_array($sort = strtolower($this->option('sort')), $this->getColumns())) {
             $routes = $this->sortRoutes($sort, $routes);
         } else {
             $routes = $this->sortRoutes('uri', $routes);
