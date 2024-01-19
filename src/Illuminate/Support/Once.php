@@ -11,14 +11,14 @@ class Once
      *
      * @var static|null
      */
-    protected static $instance = null;
+    protected static ?self $instance = null;
 
     /**
      * Indicates if the once instance is enabled.
      *
      * @var bool
      */
-    protected static $enabled = true;
+    protected static bool $enabled = true;
 
     /**
      * Create a new once instance.
@@ -36,7 +36,7 @@ class Once
      *
      * @return static
      */
-    public static function instance(): static
+    public static function instance()
     {
         return static::$instance ??= new static(new WeakMap);
     }

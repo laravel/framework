@@ -203,7 +203,7 @@ if (! function_exists('once')) {
      *
      * @template  TReturnType
      *
-     * @param  (callable(): TReturnType)  $callback
+     * @param  callable(): TReturnType  $callback
      * @return TReturnType
      */
     function once(callable $callback)
