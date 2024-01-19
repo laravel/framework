@@ -1,0 +1,8 @@
+<?php
+
+namespace App\Enums;
+
+enum {{enum_name}}: int
+{
+    case Example = 1;
+}
