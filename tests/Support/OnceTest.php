@@ -56,10 +56,20 @@ class OnceTest extends TestCase
         $instance = new MyClass();
 
         $first = $instance->rand();
+
         Once::flush();
+
         $second = $instance->rand();
 
         $this->assertNotSame($first, $second);
+
+        Once::disable();
+        Once::flush();
+
+        $first = $instance->rand();
+        $second = $instance->rand();
+
+        $this->assertSame($first, $second);
     }
 
     public function testNotMemoizedWhenObjectIsGarbageCollected()
