@@ -28,7 +28,7 @@ class Onceable
      * @param  array<int, array<string, mixed>>  $trace
      * @return static|null
      */
-    public static function tryFrom(array $trace, callable $callable)
+    public static function tryFromTrace(array $trace, callable $callable)
     {
         if (! is_null($hash = static::hashFromTrace($trace))) {
             $object = static::objectFromTrace($trace);
