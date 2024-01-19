@@ -42,13 +42,40 @@ class Once
     }
 
     /**
-     * Flush the once instance.
+     * Get the value of the given onceable.
+     *
+     * @param  Onceable  $onceable
+     * @return mixed
+     */
+    public function value(Onceable $onceable)
+    {
+        if (! static::$enabled) {
+            return call_user_func($onceable->callable);
+        }
+
+        $object = $onceable->object ?: $this;
+
+        $hash = $onceable->hash;
+
+        if (isset($this->values[$object][$hash])) {
+            return $this->values[$object][$hash];
+        }
+
+        if (! isset($this->values[$object])) {
+            $this->values[$object] = [];
+        }
+
+        return $this->values[$object][$hash] = call_user_func($onceable->callable);
+    }
+
+    /**
+     * Re-enable the once instance if it was disabled.
      *
      * @return void
      */
-    public static function flush()
+    public static function enable()
     {
-        static::$instance = null;
+        static::$enabled = true;
     }
 
     /**
@@ -62,38 +89,12 @@ class Once
     }
 
     /**
-     * Re-enable the once instance, if it was disabled.
+     * Flush the once instance.
      *
      * @return void
      */
-    public static function enable()
+    public static function flush()
     {
-        static::$enabled = true;
-    }
-
-    /**
-     * Get the value of the given onceable.
-     *
-     * @param  Onceable  $onceable
-     * @return mixed
-     */
-    public function value(Onceable $onceable)
-    {
-        if (! static::$enabled) {
-            return call_user_func($onceable->callable);
-        }
-
-        $object = $onceable->object ?: $this;
-        $hash = $onceable->hash;
-
-        if (isset($this->values[$object][$hash])) {
-            return $this->values[$object][$hash];
-        }
-
-        if (! isset($this->values[$object])) {
-            $this->values[$object] = [];
-        }
-
-        return $this->values[$object][$hash] = call_user_func($onceable->callable);
+        static::$instance = null;
     }
 }
