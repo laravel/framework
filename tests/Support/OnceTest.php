@@ -120,6 +120,16 @@ class OnceTest extends TestCase
         $this->assertSame($results[0], $results[1]);
     }
 
+    public function testUsageOfThis()
+    {
+        $instance = new MyClass();
+
+        $first = $instance->callRand();
+        $second = $instance->callRand();
+
+        $this->assertSame($first, $second);
+    }
+
     public function testInvokables()
     {
         $invokable = new class
@@ -355,5 +365,10 @@ class MyClass
     public static function staticRand()
     {
         return once(fn () => rand(1, PHP_INT_MAX));
+    }
+
+    public function callRand()
+    {
+        return once(fn () => $this->rand());
     }
 }
