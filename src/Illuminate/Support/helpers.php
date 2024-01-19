@@ -310,6 +310,20 @@ if (! function_exists('tap')) {
     }
 }
 
+if (! function_exists('map')) {
+    /**
+     * Call the given Closure with the given value then return new value.
+     *
+     * @param  mixed  $value
+     * @param  callable  $callback
+     * @return mixed
+     */
+    function map($value, $callback)
+    {
+        return $callback($value);
+    }
+}
+
 if (! function_exists('throw_if')) {
     /**
      * Throw the given exception if the given condition is true.
