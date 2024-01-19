@@ -2,14 +2,8 @@
 
 namespace Illuminate\Tests\Support;
 
-use Carbon\CarbonInterval;
-use Exception;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Once;
-use Illuminate\Support\Sleep;
-use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\TestCase;
-use RuntimeException;
 
 class OnceTest extends TestCase
 {
@@ -23,7 +17,8 @@ class OnceTest extends TestCase
 
     public function testResultIsMemoized()
     {
-        $instance = new class {
+        $instance = new class
+        {
             public function rand()
             {
                 return once(fn () => rand(1, PHP_INT_MAX));
@@ -38,7 +33,8 @@ class OnceTest extends TestCase
 
     public function testCallableIsOnlyCalledOnce()
     {
-        $instance = new class {
+        $instance = new class
+        {
             public int $count = 0;
 
             public function increment()
@@ -81,7 +77,8 @@ class OnceTest extends TestCase
 
     public function testResultIsNotMemoizedWhenUsesChange()
     {
-        $instance = new class() {
+        $instance = new class()
+        {
             public function rand(string $letter)
             {
                 return once(function () use ($letter) {
@@ -178,14 +175,16 @@ class OnceTest extends TestCase
 
     public function testResultIsMemoizedWhenCalledFromMethodsWithSameName()
     {
-        $instanceA = new class {
+        $instanceA = new class
+        {
             public function rand()
             {
                 return once(fn () => rand(1, PHP_INT_MAX));
             }
         };
 
-        $instanceB = new class {
+        $instanceB = new class
+        {
             public function rand()
             {
                 return once(fn () => rand(1, PHP_INT_MAX));
@@ -200,10 +199,11 @@ class OnceTest extends TestCase
 
     public function testRecursiveOnceCalls()
     {
-        $instance = new class {
+        $instance = new class
+        {
             public function rand()
             {
-                return once(fn() => once(fn() => rand(1, PHP_INT_MAX)));
+                return once(fn () => once(fn () => rand(1, PHP_INT_MAX)));
             }
         };
 

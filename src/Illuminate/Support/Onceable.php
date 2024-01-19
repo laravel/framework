@@ -37,7 +37,7 @@ class Onceable
     /**
      * Computes the object of the onceable from the given trace, if any.
      *
-     * @param  array<int, array<string, mixed>> $trace
+     * @param  array<int, array<string, mixed>>  $trace
      * @return object|null
      */
     protected static function objectFromTrace(array $trace)
@@ -58,7 +58,7 @@ class Onceable
             $trace[1]['args']
         );
 
-        $prefix = ($trace[1]['class'] ?? '') . $trace[1]['function'];
+        $prefix = ($trace[1]['class'] ?? '').$trace[1]['function'];
 
         if (str_contains($prefix, '{closure}')) {
             $prefix = $trace[0]['line'];

@@ -2,7 +2,6 @@
 
 namespace Illuminate\Support;
 
-use Illuminate\Foundation\Auth\User;
 use WeakMap;
 
 class Once
