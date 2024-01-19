@@ -2,8 +2,6 @@
 
 namespace Illuminate\Support;
 
-use Illuminate\Support\Exceptions\UntraceableOnceException;
-
 class Onceable
 {
     /**
