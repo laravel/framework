@@ -114,7 +114,7 @@ class OnceTest extends TestCase
     {
         $invokable = new class
         {
-            static $count = 0;
+            public static $count = 0;
 
             public function __invoke()
             {
@@ -122,7 +122,7 @@ class OnceTest extends TestCase
             }
         };
 
-        $instance = new class ($invokable)
+        $instance = new class($invokable)
         {
             public function __construct(protected $invokable)
             {
