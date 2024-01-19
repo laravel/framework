@@ -42,15 +42,13 @@ class Once
     }
 
     /**
-     * Flush the once instance, and re-enable it if it was disabled.
+     * Flush the once instance.
      *
      * @return void
      */
     public static function flush()
     {
         static::$instance = null;
-
-        static::$enabled = true;
     }
 
     /**

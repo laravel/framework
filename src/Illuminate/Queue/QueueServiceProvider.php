@@ -18,6 +18,7 @@ use Illuminate\Queue\Failed\FileFailedJobProvider;
 use Illuminate\Queue\Failed\NullFailedJobProvider;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Facade;
+use Illuminate\Support\Once;
 use Illuminate\Support\ServiceProvider;
 use Laravel\SerializableClosure\SerializableClosure;
 
@@ -33,6 +34,7 @@ class QueueServiceProvider extends ServiceProvider implements DeferrableProvider
     public function register()
     {
         $this->configureSerializableClosureUses();
+        $this->configureOnce();
 
         $this->registerManager();
         $this->registerConnection();
@@ -63,6 +65,21 @@ class QueueServiceProvider extends ServiceProvider implements DeferrableProvider
 
             return $data;
         });
+    }
+
+    /**
+     * Configure the once instance to flush after each job.
+     *
+     * @return void
+     */
+    public function configureOnce()
+    {
+        $this->app['events']->listen([
+            Events\JobProcessed::class,
+            Events\JobExceptionOccurred::class,
+            Events\JobReleasedAfterException::class,
+            Events\JobFailed::class,
+        ], fn () => Once::flush());
     }
 
     /**
