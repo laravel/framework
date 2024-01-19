@@ -4,11 +4,7 @@ namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Concerns\CreatesMatchingTest;
 use Illuminate\Console\GeneratorCommand;
-use Illuminate\Foundation\Inspiring;
-use Illuminate\Support\Facades\File;
-use Illuminate\Support\Str;
 use Symfony\Component\Console\Attribute\AsCommand;
-use Symfony\Component\Console\Input\InputOption;
 
 #[AsCommand(name: 'make:enum')]
 class EnumMakeCommand extends GeneratorCommand
@@ -62,7 +58,6 @@ class EnumMakeCommand extends GeneratorCommand
         );
     }
 
-
     /**
      * Get the default namespace for the generator.
      *
@@ -70,12 +65,12 @@ class EnumMakeCommand extends GeneratorCommand
      */
     protected function getDefaultNamespace($rootNamespace)
     {
-        return $rootNamespace . '\Enums';
+        return $rootNamespace.'\Enums';
     }
 
     protected function replaceClass($stub, $name)
     {
-        $class = str_replace($this->getNamespace($name) . '\\', '', $name);
+        $class = str_replace($this->getNamespace($name).'\\', '', $name);
 
         return str_replace('{{enum_name}}', $class, $stub);
     }
