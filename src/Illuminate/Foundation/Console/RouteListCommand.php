@@ -112,9 +112,10 @@ class RouteListCommand extends Command
      */
     protected function getRoutes()
     {
-        $routes = collect($this->router->getRoutes())->map(function ($route) {
-            return $this->getRouteInformation($route);
-        })->filter()->all();
+        $routes = collect($this->router->getRoutes())
+            ->map(fn ($route) => $this->getRouteInformation($route))
+            ->filter()
+            ->all();
 
         if (in_array($sort = strtolower($this->option('sort')), $this->getColumns())) {
             $routes = $this->sortRoutes($sort, $routes);
