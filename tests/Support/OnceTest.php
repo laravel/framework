@@ -159,6 +159,22 @@ class OnceTest extends TestCase
         $this->assertSame($first, $second);
     }
 
+    public function testFirstClassCallableSyntaxWithArraySyntax()
+    {
+        $instance = new class
+        {
+            public function rand()
+            {
+                return once([MyClass::class, 'staticRand']);
+            }
+        };
+
+        $first = $instance->rand();
+        $second = $instance->rand();
+
+        $this->assertSame($first, $second);
+    }
+
     public function testStaticMemoization()
     {
         $first = MyClass::staticRand();
