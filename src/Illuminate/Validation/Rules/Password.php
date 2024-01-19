@@ -42,7 +42,7 @@ class Password implements Rule, DataAwareRule, ValidatorAwareRule
      *
      * @var int
      */
-    protected $max;
+    protected $max = 72;
 
     /**
      * If the password requires at least one uppercase and one lowercase letter.
@@ -218,7 +218,7 @@ class Password implements Rule, DataAwareRule, ValidatorAwareRule
      */
     public function max($size)
     {
-        $this->max = $size;
+        $this->max = (int) $size;
 
         return $this;
     }
@@ -312,16 +312,12 @@ class Password implements Rule, DataAwareRule, ValidatorAwareRule
 
         $validator = Validator::make(
             $this->data,
-            [$attribute => array_merge(['string', 'min:'.$this->min], $this->customRules)],
+            [$attribute => array_merge(['string', 'min:'.$this->min, 'max:'.$this->max], $this->customRules)],
             $this->validator->customMessages,
             $this->validator->customAttributes
         )->after(function ($validator) use ($attribute, $value) {
             if (! is_string($value)) {
                 return;
-            }
-
-            if ($this->max && mb_strlen($value) > $this->max) {
-                $validator->addFailure($attribute, 'max.string');
             }
 
             if ($this->mixedCase && ! preg_match('/(\p{Ll}+.*\p{Lu})|(\p{Lu}+.*\p{Ll})/u', $value)) {

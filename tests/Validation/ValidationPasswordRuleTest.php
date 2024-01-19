@@ -44,6 +44,10 @@ class ValidationPasswordRuleTest extends TestCase
 
     public function testMax()
     {
+        $this->fails(Password::min(2), [str_repeat('a', 73)], [
+            'validation.max.string',
+        ]);
+
         $this->fails(Password::min(2)->max(4), ['aaaaa', '11111111'], [
             'validation.max.string',
         ]);
@@ -139,7 +143,7 @@ class ValidationPasswordRuleTest extends TestCase
             '%HurHUnw7zM!',
             'rundeliekend',
             '7Z^k5EvqQ9g%c!Jt9$ufnNpQy#Kf',
-            'NRs*Gz2@hSmB$vVBSPDfqbRtEzk4nF7ZAbM29VMW$BPD%b2U%3VmJAcrY5eZGVxP%z%apnwSX',
+            'NRs*Gz2@hSmB$vVBSPDfqbRtEzk4nF7ZAbM29VMW$BPD%b2U%3VmJAcrY5eZGVxP%z%apnwS',
         ]);
     }
 
