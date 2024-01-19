@@ -18,6 +18,13 @@ class Number
     protected static $locale = 'en';
 
     /**
+     * The callback that should be used to generate random numbers.
+     *
+     * @var callable|null
+     */
+    protected static $randomNumberFactory;
+
+    /**
      * Format the given number according to the current locale.
      *
      * @param  int|float  $number
@@ -230,6 +237,76 @@ class Number
     public static function clamp(int|float $number, int|float $min, int|float $max)
     {
         return min(max($number, $min), $max);
+    }
+
+    /**
+     * Generate random numbers.
+     *
+     * @param int $min
+     * @param int $max
+     *
+     * @return int
+     */
+    public static function random(int $min, int $max): int
+    {
+        return (static::$randomNumberFactory ?? function (int $min, int $max) {
+            return mt_rand($min, $max);
+        })($min, $max);
+    }
+
+    /**
+     * Set the callable that will be used to generate random numbers.
+     *
+     * @param  callable|null  $factory
+     * @return void
+     */
+    public static function createRandomNumbersUsing(callable $factory = null)
+    {
+        static::$randomNumberFactory = $factory;
+    }
+
+    /**
+     * Set the sequence that will be used to generate random numbers.
+     *
+     * @param  array  $sequence
+     * @param  callable|null  $whenMissing
+     * @return void
+     */
+    public static function createRandomNumbersUsingSequence(array $sequence, $whenMissing = null)
+    {
+        $next = 0;
+
+        $whenMissing ??= function (int $min, int $max) use (&$next) {
+            $factoryCache = static::$randomNumberFactory;
+
+            static::$randomNumberFactory = null;
+
+            $randomNumber = static::random($min, $max);
+
+            static::$randomNumberFactory = $factoryCache;
+
+            $next++;
+
+            return $randomNumber;
+        };
+
+        static::createRandomNumbersUsing(function (int $min, int $max) use (&$next, $sequence, $whenMissing) {
+            if (array_key_exists($next, $sequence)) {
+                return $sequence[$next++]($min, $max);
+            }
+
+            return $whenMissing($min, $max);
+        });
+    }
+
+    /**
+     * Indicate that random numbers should be created normally and not using a custom factory.
+     *
+     * @return void
+     */
+    public static function createRandomNumbersNormally()
+    {
+        static::$randomNumberFactory = null;
     }
 
     /**

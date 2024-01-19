@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Support;
 
+use Exception;
 use Illuminate\Support\Number;
 use PHPUnit\Framework\TestCase;
 
@@ -292,6 +293,57 @@ class SupportNumberTest extends TestCase
         $this->assertSame('-1.1T', Number::abbreviate(-1100000000000, maxPrecision: 1));
         $this->assertSame('-1Q', Number::abbreviate(-1000000000000000));
         $this->assertSame('-1KQ', Number::abbreviate(-1000000000000000000));
+    }
+
+    public function testRandomNumberFactoryCanBeSet()
+    {
+        Number::createRandomNumbersUsing(fn (int $min, int $max) => $min - 1);
+
+        $this->assertSame(4, Number::random(5, 10));
+        $this->assertSame(9, Number::random(10, 50));
+
+        Number::createRandomNumbersNormally();
+
+        $this->assertNotSame(4, Number::random(5, 10));
+    }
+
+    public function testItCanSpecifyASequenceOfRandomStringsToUtilise()
+    {
+        Number::createRandomNumbersUsingSequence([
+            0 => fn (int $min, int $max) => $min - 1,
+            // 1 => just generate a random one here...
+            2 => fn (int $min, int $max) => $min - 5,
+            3 => fn (int $min, int $max) => $min - 10,
+            // ... => continue to generate random numbers...
+        ]);
+
+        $this->assertSame(4, Number::random(5, 10));
+        $this->assertNotSame(4, Number::random(5, 10));
+        $this->assertSame(0, Number::random(5, 10));
+        $this->assertSame(-5, Number::random(5, 10));
+        $this->assertTrue(Number::random(5, 10) > 4);
+        $this->assertTrue(Number::random(5, 10) > 4);
+
+        Number::createRandomNumbersNormally();
+    }
+
+    public function testItCanSpecifyAFallbackForARandomStringSequence()
+    {
+        Number::createRandomNumbersUsingSequence([
+            fn (int $min, int $max) => $min - 1,
+            fn (int $min, int $max) => $min - 5
+        ], fn () => throw new Exception('Out of random numbers.'));
+
+        Number::random(5, 10);
+        Number::random(5, 10);
+
+        try {
+            $this->expectExceptionMessage('Out of random numbers.');
+            Number::random(5, 10);
+            $this->fail();
+        } finally {
+            Number::createRandomNumbersNormally();
+        }
     }
 
     protected function needsIntlExtension()
