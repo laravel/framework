@@ -200,7 +200,7 @@ class Password implements Rule, DataAwareRule, ValidatorAwareRule
     }
 
     /**
-     * Sets the minimum size of the password.
+     * Set the minimum size of the password.
      *
      * @param  int  $size
      * @return $this
@@ -211,7 +211,7 @@ class Password implements Rule, DataAwareRule, ValidatorAwareRule
     }
 
     /**
-     * Sets the maximum size of the password.
+     * Set the maximum size of the password.
      *
      * @param  int  $size
      * @return $this
