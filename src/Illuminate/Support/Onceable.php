@@ -2,6 +2,9 @@
 
 namespace Illuminate\Support;
 
+use Closure;
+use Laravel\SerializableClosure\Support\ReflectionClosure;
+
 class Onceable
 {
     /**
@@ -28,7 +31,7 @@ class Onceable
      */
     public static function tryFromTrace(array $trace, callable $callable)
     {
-        if (! is_null($hash = static::hashFromTrace($trace))) {
+        if (! is_null($hash = static::hashFromTrace($trace, $callable))) {
             $object = static::objectFromTrace($trace);
 
             return new static($hash, $object, $callable);
@@ -52,15 +55,15 @@ class Onceable
      * @param  array<int, array<string, mixed>>  $trace
      * @return string|null
      */
-    protected static function hashFromTrace(array $trace)
+    protected static function hashFromTrace(array $trace, callable $callable)
     {
         if (str_contains($trace[0]['file'] ?? '', 'eval()\'d code')) {
             return null;
         }
 
-        $arguments = array_map(
+        $uses = array_map(
             fn (mixed $argument) => is_object($argument) ? spl_object_hash($argument) : $argument,
-            $trace[1]['args'] ?? [],
+            $callable instanceof Closure ? (new ReflectionClosure($callable))->getClosureUsedVariables() : [],
         );
 
         $prefix = ($trace[1]['class'] ?? '').$trace[1]['function'];
@@ -69,6 +72,6 @@ class Onceable
             $prefix = $trace[0]['line'];
         }
 
-        return md5($prefix.serialize($arguments));
+        return md5($prefix.serialize($uses));
     }
 }

@@ -15,7 +15,7 @@ class OnceTest extends TestCase
         Once::enable();
     }
 
-    public function testResultIsMemoized()
+    public function testResultMemoization()
     {
         $instance = new class
         {
@@ -31,7 +31,7 @@ class OnceTest extends TestCase
         $this->assertSame($first, $second);
     }
 
-    public function testCallableIsOnlyCalledOnce()
+    public function testCallableIsCalledOnce()
     {
         $instance = new class
         {
@@ -51,7 +51,7 @@ class OnceTest extends TestCase
         $this->assertSame(1, $instance->count);
     }
 
-    public function testResultIsNotMemoizedWhenFlushed()
+    public function testFlush()
     {
         $instance = new MyClass();
 
@@ -62,7 +62,7 @@ class OnceTest extends TestCase
         $this->assertNotSame($first, $second);
     }
 
-    public function testResultIsNotMemoizedWhenObjectIsGarbageCollected()
+    public function testNotMemoizedWhenObjectIsGarbageCollected()
     {
         $instance = new MyClass();
 
@@ -75,7 +75,7 @@ class OnceTest extends TestCase
         $this->assertNotSame($first, $second);
     }
 
-    public function testResultIsNotMemoizedWhenUsesChange()
+    public function testIsNotMemoizedWhenCallableUsesChanges()
     {
         $instance = new class()
         {
@@ -96,9 +96,70 @@ class OnceTest extends TestCase
         $second = $instance->rand('a');
 
         $this->assertSame($first, $second);
+
+        $results = [];
+        $letter = 'a';
+
+        a:
+        $results[] = once(fn () => $letter.rand(1, 10000000));
+
+        if (count($results) < 2) {
+            goto a;
+        }
+
+        $this->assertSame($results[0], $results[1]);
     }
 
-    public function testResultIsMemoizedWhenCalledStatically()
+    public function testInvokables()
+    {
+        $invokable = new class
+        {
+            static $count = 0;
+
+            public function __invoke()
+            {
+                return static::$count = static::$count + 1;
+            }
+        };
+
+        $instance = new class ($invokable)
+        {
+            public function __construct(protected $invokable)
+            {
+            }
+
+            public function call()
+            {
+                return once($this->invokable);
+            }
+        };
+
+        $first = $instance->call();
+        $second = $instance->call();
+        $third = $instance->call();
+
+        $this->assertSame($first, $second);
+        $this->assertSame($first, $third);
+        $this->assertSame(1, $invokable::$count);
+    }
+
+    public function testFirstClassCallableSyntax()
+    {
+        $instance = new class
+        {
+            public function rand()
+            {
+                return once(MyClass::staticRand(...));
+            }
+        };
+
+        $first = $instance->rand();
+        $second = $instance->rand();
+
+        $this->assertSame($first, $second);
+    }
+
+    public function testStaticMemoization()
     {
         $first = MyClass::staticRand();
         $second = MyClass::staticRand();
@@ -106,7 +167,7 @@ class OnceTest extends TestCase
         $this->assertSame($first, $second);
     }
 
-    public function testResultIsMemoizedWhenCalledWithinAClosure()
+    public function testMemoizationWhenOnceIsWithinClosure()
     {
         $resolver = fn () => once(fn () => rand(1, PHP_INT_MAX));
 
@@ -116,7 +177,7 @@ class OnceTest extends TestCase
         $this->assertSame($first, $second);
     }
 
-    public function testResultIsMemoizedWhenCalledGlobally()
+    public function testMemoizationOnGlobalFunctions()
     {
         $first = my_rand();
         $second = my_rand();
@@ -124,7 +185,7 @@ class OnceTest extends TestCase
         $this->assertSame($first, $second);
     }
 
-    public function testResultIsNotMemoizedWhenOnceIsDisabled()
+    public function testDisable()
     {
         Once::disable();
 
@@ -134,7 +195,7 @@ class OnceTest extends TestCase
         $this->assertNotSame($first, $second);
     }
 
-    public function testResultMayBeMemoizedTemporarily()
+    public function testTemporaryDisable()
     {
         $first = my_rand();
         $second = my_rand();
@@ -152,7 +213,7 @@ class OnceTest extends TestCase
         $this->assertSame($first, $fourth);
     }
 
-    public function testResultIsNotMemoizedWhenCalledWithinEvals()
+    public function testMemoizationWithinEvals()
     {
         $firstResolver = eval('return fn () => once( function () { return random_int(1, 1000); } ) ;');
 
@@ -172,14 +233,13 @@ class OnceTest extends TestCase
         $this->assertNotSame($third, $fourth);
     }
 
-    public function testResultIsDifferentWhenCalledFromSameLine()
+    public function testMemoizationOnSameLine()
     {
         $this->markTestSkipped('This test shows a limitation of the current implementation.');
 
-        $first = once(fn () => rand(1, PHP_INT_MAX));
-        $second = once(fn () => rand(1, PHP_INT_MAX));
+        $result = [once(fn () => rand(1, PHP_INT_MAX)), once(fn () => rand(1, PHP_INT_MAX))];
 
-        $this->assertNotSame($first, $second);
+        $this->assertNotSame($result[0], $result[1]);
     }
 
     public function testResultIsDifferentWhenCalledFromDifferentClosures()

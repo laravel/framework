@@ -213,7 +213,7 @@ if (! function_exists('once')) {
             $callback,
         );
 
-        return $onceable ? Once::instance()->value($onceable) : $callback();
+        return $onceable ? Once::instance()->value($onceable) : call_user_func($callback);
     }
 }
 

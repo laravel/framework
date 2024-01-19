@@ -80,7 +80,7 @@ class Once
     public function value(Onceable $onceable)
     {
         if (! static::$enabled) {
-            return value($onceable->callable);
+            return call_user_func($onceable->callable);
         }
 
         $object = $onceable->object ?: $this;
@@ -94,6 +94,6 @@ class Once
             $this->values[$object] = [];
         }
 
-        return $this->values[$object][$hash] = value($onceable->callable);
+        return $this->values[$object][$hash] = call_user_func($onceable->callable);
     }
 }
