@@ -2,13 +2,15 @@
 
 namespace Illuminate\Support;
 
+use Illuminate\Support\Exceptions\UntraceableOnceException;
+
 class Onceable
 {
     /**
      * Create a new onceable instance.
      *
      * @param  string  $hash
-     * @param  mixed  $object
+     * @param  object|null  $object
      * @param  callable  $callable
      * @return void
      */
@@ -21,17 +23,18 @@ class Onceable
     }
 
     /**
-     * Creates a new onceable instance from the given trace.
+     * Tries to create a new onceable instance from the given trace.
      *
      * @param  array<int, array<string, mixed>>  $trace
-     * @return static
+     * @return static|null
      */
-    public static function fromTrace(array $trace, callable $callable)
+    public static function tryFrom(array $trace, callable $callable)
     {
-        $hash = static::hashFromTrace($trace);
-        $object = static::objectFromTrace($trace);
+        if (! is_null($hash = static::hashFromTrace($trace))) {
+            $object = static::objectFromTrace($trace);
 
-        return new static($hash, $object, $callable);
+            return new static($hash, $object, $callable);
+        }
     }
 
     /**
@@ -49,13 +52,17 @@ class Onceable
      * Computes the hash of the onceable from the given trace.
      *
      * @param  array<int, array<string, mixed>>  $trace
-     * @return string
+     * @return string|null
      */
-    public static function hashFromTrace(array $trace)
+    protected static function hashFromTrace(array $trace)
     {
+        if (str_contains($trace[0]['file'] ?? '', 'eval()\'d code')) {
+            return null;
+        }
+
         $arguments = array_map(
             fn (mixed $argument) => is_object($argument) ? spl_object_hash($argument) : $argument,
-            $trace[1]['args']
+            $trace[1]['args'] ?? [],
         );
 
         $prefix = ($trace[1]['class'] ?? '').$trace[1]['function'];

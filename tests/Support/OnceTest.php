@@ -152,14 +152,33 @@ class OnceTest extends TestCase
         $this->assertSame($first, $fourth);
     }
 
-    public function testResultMayBeMemoizedWithinEval()
+    public function testResultIsNotMemoizedWhenCalledWithinEvals()
     {
-        $resolver = eval('return fn () => once( function () { return random_int(1, 1000); } ) ;');
+        $firstResolver = eval('return fn () => once( function () { return random_int(1, 1000); } ) ;');
 
-        $first = $resolver();
-        $second = $resolver();
+        $firstA = $firstResolver();
+        $firstB = $firstResolver();
 
-        $this->assertSame($first, $second);
+        $secondResolver = eval('return fn () => fn () => once( function () { return random_int(1, 1000); } ) ;');
+
+        $secondA = $secondResolver()();
+        $secondB = $secondResolver()();
+
+        $third = eval('return once( function () { return random_int(1, 1000); } ) ;');
+        $fourth = eval('return once( function () { return random_int(1, 1000); } ) ;');
+
+        $this->assertNotSame($firstA, $firstB);
+        $this->assertNotSame($secondA, $secondB);
+        $this->assertNotSame($third, $fourth);
+    }
+
+    public function testResultIsDifferentWhenCalledFromSameLine()
+    {
+        $this->markTestSkipped('This test shows a limitation of the current implementation.');
+
+        $first = once(fn () => rand(1, PHP_INT_MAX)); $second = once(fn () => rand(1, PHP_INT_MAX));
+
+        $this->assertNotSame($first, $second);
     }
 
     public function testResultIsDifferentWhenCalledFromDifferentClosures()

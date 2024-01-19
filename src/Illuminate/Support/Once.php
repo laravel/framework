@@ -23,8 +23,7 @@ class Once
     /**
      * Create a new once instance.
      *
-     * @param  \WeakMap<object, Onceable>  $values
-     * @param  bool  $enabled
+     * @param  \WeakMap<object, array<string, mixed>>  $values
      * @return void
      */
     protected function __construct(protected WeakMap $values)

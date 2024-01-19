@@ -208,12 +208,12 @@ if (! function_exists('once')) {
      */
     function once(callable $callback)
     {
-        $onceable = Onceable::fromTrace(
+        $onceable = Onceable::tryFrom(
             debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT, 2),
             $callback,
         );
 
-        return Once::instance()->value($onceable);
+        return $onceable ? Once::instance()->value($onceable) : $callback();
     }
 }
 
