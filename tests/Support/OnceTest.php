@@ -176,7 +176,8 @@ class OnceTest extends TestCase
     {
         $this->markTestSkipped('This test shows a limitation of the current implementation.');
 
-        $first = once(fn () => rand(1, PHP_INT_MAX)); $second = once(fn () => rand(1, PHP_INT_MAX));
+        $first = once(fn () => rand(1, PHP_INT_MAX));
+        $second = once(fn () => rand(1, PHP_INT_MAX));
 
         $this->assertNotSame($first, $second);
     }
