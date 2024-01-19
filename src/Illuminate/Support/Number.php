@@ -242,9 +242,8 @@ class Number
     /**
      * Generate random numbers.
      *
-     * @param int $min
-     * @param int $max
-     *
+     * @param  int  $min
+     * @param  int  $max
      * @return int
      */
     public static function random(int $min, int $max): int

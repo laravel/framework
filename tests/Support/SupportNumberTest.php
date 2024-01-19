@@ -331,7 +331,7 @@ class SupportNumberTest extends TestCase
     {
         Number::createRandomNumbersUsingSequence([
             fn (int $min, int $max) => $min - 1,
-            fn (int $min, int $max) => $min - 5
+            fn (int $min, int $max) => $min - 5,
         ], fn () => throw new Exception('Out of random numbers.'));
 
         Number::random(5, 10);
