@@ -318,7 +318,27 @@ class OnceTest extends TestCase
 
         $this->assertSame($first, $second);
     }
+
+    public function testGlobalClosures()
+    {
+        $first = $GLOBALS['onceable1']();
+        $second = $GLOBALS['onceable1']();
+
+        $this->assertSame($first, $second);
+
+        $third = $GLOBALS['onceable2']();
+        $fourth = $GLOBALS['onceable2']();
+
+        $this->assertSame($third, $fourth);
+
+        $this->assertNotSame($first, $third);
+    }
 }
+
+$letter = 'a';
+
+$GLOBALS['onceable1'] = fn () => once(fn () => $letter.rand(1, PHP_INT_MAX));
+$GLOBALS['onceable2'] = fn () => once(fn () => $letter.rand(1, PHP_INT_MAX));
 
 function my_rand()
 {

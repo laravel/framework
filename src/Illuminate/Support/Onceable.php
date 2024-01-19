@@ -66,12 +66,13 @@ class Onceable
             $callable instanceof Closure ? (new ReflectionClosure($callable))->getClosureUsedVariables() : [],
         );
 
-        $prefix = ($trace[1]['class'] ?? '').$trace[1]['function'];
-
-        if (str_contains($prefix, '{closure}')) {
-            $prefix = $trace[0]['line'];
-        }
-
-        return md5($prefix.serialize($uses));
+        return md5(sprintf(
+            '%s@%s%s:%s (%s)',
+            $trace[0]['file'],
+            isset($trace[1]['class']) ? ($trace[1]['class'].'@') : '',
+            $trace[1]['function'],
+            $trace[0]['line'],
+            serialize($uses),
+        ));
     }
 }
