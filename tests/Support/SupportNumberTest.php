@@ -307,7 +307,7 @@ class SupportNumberTest extends TestCase
         $this->assertNotSame(4, Number::random(5, 10));
     }
 
-    public function testItCanSpecifyASequenceOfRandomStringsToUtilise()
+    public function testItCanSpecifyASequenceOfRandomNumbersToUtilise()
     {
         Number::createRandomNumbersUsingSequence([
             0 => fn (int $min, int $max) => $min - 1,
@@ -327,7 +327,7 @@ class SupportNumberTest extends TestCase
         Number::createRandomNumbersNormally();
     }
 
-    public function testItCanSpecifyAFallbackForARandomStringSequence()
+    public function testItCanSpecifyAFallbackForARandomNumberSequence()
     {
         Number::createRandomNumbersUsingSequence([
             fn (int $min, int $max) => $min - 1,
