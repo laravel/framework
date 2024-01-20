@@ -29,13 +29,6 @@ class Repository implements ArrayAccess, CacheContract
     }
 
     /**
-     * The cache configuration options.
-     *
-     * @var array
-     */
-    protected $config = [];
-
-    /**
      * The cache store implementation.
      *
      * @var \Illuminate\Contracts\Cache\Store
@@ -57,13 +50,20 @@ class Repository implements ArrayAccess, CacheContract
     protected $default = 3600;
 
     /**
+     * The cache store configuration options.
+     *
+     * @var array
+     */
+    protected $config = [];
+
+    /**
      * Create a new cache repository instance.
      *
      * @param  \Illuminate\Contracts\Cache\Store  $store
      * @param  array  $config
      * @return void
      */
-    public function __construct(Store $store, $config = [])
+    public function __construct(Store $store, array $config = [])
     {
         $this->store = $store;
         $this->config = $config;
@@ -540,16 +540,6 @@ class Repository implements ArrayAccess, CacheContract
     }
 
     /**
-     * Get the cache name.
-     *
-     * @return string|null
-     */
-    protected function getName()
-    {
-        return Arr::get($this->config, 'name');
-    }
-
-    /**
      * Calculate the number of seconds for the given TTL.
      *
      * @param  \DateTimeInterface|\DateInterval|int  $ttl
@@ -564,6 +554,16 @@ class Repository implements ArrayAccess, CacheContract
         }
 
         return (int) ($duration > 0 ? $duration : 0);
+    }
+
+    /**
+     * Get the name of the cache store.
+     *
+     * @return string|null
+     */
+    protected function getName()
+    {
+        return $this->config['store'] ?? null;
     }
 
     /**

@@ -88,7 +88,7 @@ class CacheManager implements FactoryContract
             throw new InvalidArgumentException("Cache store [{$name}] is not defined.");
         }
 
-        $config = Arr::add($config, 'name', $name);
+        $config = Arr::add($config, 'store', $name);
 
         if (isset($this->customCreators[$config['driver']])) {
             return $this->callCustomCreator($config);
@@ -288,7 +288,7 @@ class CacheManager implements FactoryContract
      */
     public function repository(Store $store, array $config)
     {
-        return tap(new Repository($store, Arr::only($config, ['name'])), function ($repository) {
+        return tap(new Repository($store, Arr::only($config, ['store'])), function ($repository) {
             $this->setEventDispatcher($repository);
         });
     }
