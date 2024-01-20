@@ -62,7 +62,7 @@ class Notification extends Facade
      */
     public static function routes(array $channels)
     {
-        $notifiable = new AnonymousNotifiable();
+        $notifiable = new AnonymousNotifiable;
 
         foreach ($channels as $channel => $route) {
             $notifiable->route($channel, $route);
