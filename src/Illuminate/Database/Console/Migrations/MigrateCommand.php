@@ -202,7 +202,7 @@ class MigrateCommand extends BaseCommand implements Isolatable
         if (! $this->option('force') && ! $this->option('no-interaction')) {
             $this->components->warn("The database '{$connection->getDatabaseName()}' does not exist on the '{$connection->getName()}' connection.");
 
-            if (! confirm('Would you like to create it?', default: false)) {
+            if (! confirm('Would you like to create it?', default: true)) {
                 return false;
             }
         }
