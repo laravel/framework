@@ -180,7 +180,7 @@ class CacheManager implements FactoryContract
      */
     protected function createNullDriver()
     {
-        return $this->repository(new NullStore, $config);
+        return $this->repository(new NullStore, []);
     }
 
     /**
