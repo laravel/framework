@@ -116,6 +116,13 @@ class Middleware
     protected $throttleWithRedis = false;
 
     /**
+     * Indicates if sessions should be authenticated for the "web" middleware group.
+     *
+     * @var bool
+     */
+    protected $authenticatedSessions = false;
+
+    /**
      * The default middleware aliases.
      *
      * @var array
@@ -425,14 +432,15 @@ class Middleware
     public function getMiddlewareGroups()
     {
         $middleware = [
-            'web' => [
+            'web' => array_values(array_filter([
                 \Illuminate\Cookie\Middleware\EncryptCookies::class,
                 \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
                 \Illuminate\Session\Middleware\StartSession::class,
                 \Illuminate\View\Middleware\ShareErrorsFromSession::class,
                 \Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class,
                 \Illuminate\Routing\Middleware\SubstituteBindings::class,
-            ],
+                $this->authenticatedSessions ? 'auth.session' : null,
+            ])),
 
             'api' => array_values(array_filter([
                 $this->statefulApi ? \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class : null,
@@ -550,6 +558,18 @@ class Middleware
     public function throttleWithRedis()
     {
         $this->throttleWithRedis = true;
+
+        return $this;
+    }
+
+    /**
+     * Indicate that sessions should be authenticated for the "web" middleware group.
+     *
+     * @return $this
+     */
+    public function withAuthenticatedSessions()
+    {
+        $this->authenticatedSessions = true;
 
         return $this;
     }
