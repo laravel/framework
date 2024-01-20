@@ -5,6 +5,13 @@ namespace Illuminate\Cache\Events;
 abstract class CacheEvent
 {
     /**
+     * The name of the cache.
+     *
+     * @var string|null
+     */
+    public $cacheName;
+
+    /**
      * The key of the event.
      *
      * @var string
@@ -21,12 +28,14 @@ abstract class CacheEvent
     /**
      * Create a new event instance.
      *
+     * @param  string|null  $cacheName
      * @param  string  $key
      * @param  array  $tags
      * @return void
      */
-    public function __construct($key, array $tags = [])
+    public function __construct($cacheName, $key, array $tags = [])
     {
+        $this->cacheName = $cacheName;
         $this->key = $key;
         $this->tags = $tags;
     }
