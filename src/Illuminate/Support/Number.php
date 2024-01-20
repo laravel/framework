@@ -249,7 +249,7 @@ class Number
     public static function random(int $min, int $max): int
     {
         return (static::$randomNumberFactory ?? function (int $min, int $max) {
-            return mt_rand($min, $max);
+            return random_int($min, $max);
         })($min, $max);
     }
 
