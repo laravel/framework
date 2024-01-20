@@ -30,7 +30,6 @@ class RouteFileRegistrar
      */
     public function register($routes)
     {
-
         require $routes;
     }
 }
