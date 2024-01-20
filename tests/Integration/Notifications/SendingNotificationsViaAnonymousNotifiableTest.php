@@ -28,6 +28,20 @@ class SendingNotificationsViaAnonymousNotifiableTest extends TestCase
         ], $_SERVER['__notifiable.route']);
     }
 
+    public function testAnonymousNotifiableWithMultipleRoutes()
+    {
+        $_SERVER['__notifiable.route'] = [];
+
+        NotificationFacade::routes([
+            'testchannel' => 'enzo',
+            'anothertestchannel' => 'enzo@deepblue.com',
+        ])->notify(new TestMailNotificationForAnonymousNotifiable());
+
+        $this->assertEquals([
+            'enzo', 'enzo@deepblue.com',
+        ], $_SERVER['__notifiable.route']);
+    }
+
     public function testFaking()
     {
         $fake = NotificationFacade::fake();
