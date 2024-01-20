@@ -16,6 +16,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\ForwardsCalls;
 use Illuminate\Support\Traits\Macroable;
+use ReflectionFunction;
 use Throwable;
 
 /**
@@ -446,7 +447,7 @@ abstract class Factory
                 return $this->parentResolvers();
             }], $states->all()));
         })->reduce(function ($carry, $state) use ($parent) {
-            if ($state instanceof Closure) {
+            if ($state instanceof Closure && ! (new ReflectionFunction($state))->isStatic()) {
                 $state = $state->bindTo($this);
             }
 
