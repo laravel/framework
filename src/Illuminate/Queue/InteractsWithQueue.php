@@ -147,11 +147,13 @@ trait InteractsWithQueue
             "Job was expected to be released, but was not."
         );
 
-        PHPUnit::assertSame(
-            $delay,
-            $this->job->releaseDelay,
-            "Expected job to be released with delay of [{$delay}] seconds, but was released with delay of [{$this->job->releaseDelay}] seconds."
-        );
+        if (! is_null($delay)) {
+            PHPUnit::assertSame(
+                $delay,
+                $this->job->releaseDelay,
+                "Expected job to be released with delay of [{$delay}] seconds, but was released with delay of [{$this->job->releaseDelay}] seconds."
+            );
+        }
 
         return $this;
     }
@@ -163,7 +165,7 @@ trait InteractsWithQueue
      */
     private function ensureQueueInteractionsHaveBeenFaked()
     {
-        if ($this->job instanceof FakeJob) {
+        if (! $this->job instanceof FakeJob) {
             throw new RuntimeException('Queue interactions have not been faked.');
         }
     }
