@@ -540,6 +540,21 @@ class Str
     }
 
     /**
+     * Determine if a given value is a valid Slug.
+     *
+     * @param  mixed  $value
+     * @return bool
+     */
+    public static function isSlug($value)
+    {
+        if (! is_string($value)) {
+            return false;
+        }
+
+        return preg_match('/^[a-z0-9]+(?:-[a-z0-9]+|_[a-z0-9]+)*$/', $value) === 1;
+    }
+
+    /**
      * Convert a string to kebab case.
      *
      * @param  string  $value
@@ -860,7 +875,8 @@ class Str
                 ']', '|', ':', ';',
             ] : null,
             'spaces' => $spaces === true ? [' '] : null,
-        ]))->filter()->each(fn ($c) => $password->push($c[random_int(0, count($c) - 1)])
+        ]))->filter()->each(
+            fn ($c) => $password->push($c[random_int(0, count($c) - 1)])
         )->flatten();
 
         $length = $length - $password->count();
