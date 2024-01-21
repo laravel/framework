@@ -105,7 +105,7 @@ trait InteractsWithQueue
 
         PHPUnit::assertTrue(
             $this->job->isDeleted(),
-            "Job was expected to be deleted, but was not."
+            'Job was expected to be deleted, but was not.'
         );
 
         return $this;
@@ -122,7 +122,7 @@ trait InteractsWithQueue
 
         PHPUnit::assertTrue(
             $this->job->hasFailed(),
-            "Job was expected to be manually failed, but was not."
+            'Job was expected to be manually failed, but was not.'
         );
 
         return $this;
@@ -144,7 +144,7 @@ trait InteractsWithQueue
 
         PHPUnit::assertTrue(
             $this->job->isReleased(),
-            "Job was expected to be released, but was not."
+            'Job was expected to be released, but was not.'
         );
 
         if (! is_null($delay)) {
