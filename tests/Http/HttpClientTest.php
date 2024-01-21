@@ -2680,6 +2680,53 @@ class HttpClientTest extends TestCase
         $this->assertInstanceOf(TestResponse::class, $response);
         $this->assertSame('expected content', $response->body());
     }
+
+    public function testItCanHaveGlobalDefaultValues()
+    {
+        $factory = new Factory;
+        $timeout = null;
+        $allowRedirects = null;
+        $headers = null;
+        $factory->fake(function ($request, $options) use (&$timeout, &$allowRedirects, &$headers, $factory) {
+            $timeout = $options['timeout'];
+            $allowRedirects = $options['allow_redirects'];
+            $headers = $request->headers();
+
+            return $factory->response('');
+        });
+
+        $factory->get('https://laravel.com');
+        $this->assertSame(30, $timeout);
+        $this->assertSame(['max' => 5, 'protocols' => ['http', 'https'], 'strict' => false, 'referer' => false, 'track_redirects' => false], $allowRedirects);
+        $this->assertNull($headers['X-Foo'] ?? null);
+
+        $factory->globalOptions([
+            'timeout' => 5,
+            'allow_redirects' => false,
+            'headers' => [
+                'X-Foo' => 'true',
+            ],
+        ]);
+
+        $factory->get('https://laravel.com');
+        $this->assertSame(5, $timeout);
+        $this->assertFalse($allowRedirects);
+        $this->assertSame(['true'], $headers['X-Foo']);
+
+        $factory->globalOptions([
+            'timeout' => 10,
+            'headers' => [
+                'X-Foo' => 'false',
+                'X-Bar' => 'true',
+            ],
+        ]);
+
+        $factory->get('https://laravel.com');
+        $this->assertSame(10, $timeout);
+        $this->assertSame(['max' => 5, 'protocols' => ['http', 'https'], 'strict' => false, 'referer' => false, 'track_redirects' => false], $allowRedirects);
+        $this->assertSame(['false'], $headers['X-Foo']);
+        $this->assertSame(['true'], $headers['X-Bar']);
+    }
 }
 
 class CustomFactory extends Factory
