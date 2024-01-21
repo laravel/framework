@@ -92,19 +92,6 @@ class Factory
     }
 
     /**
-     * Set options to apply to every request.
-     *
-     * @param  array  $options
-     * @return $this
-     */
-    public function globalOptions($options)
-    {
-        $this->globalOptions = $options;
-
-        return $this;
-    }
-
-    /**
      * Add middleware to apply to every request.
      *
      * @param  callable  $middleware
@@ -139,6 +126,19 @@ class Factory
     public function globalResponseMiddleware($middleware)
     {
         $this->globalMiddleware[] = Middleware::mapResponse($middleware);
+
+        return $this;
+    }
+
+    /**
+     * Set the options to apply to every request.
+     *
+     * @param  array  $options
+     * @return $this
+     */
+    public function globalOptions($options)
+    {
+        $this->globalOptions = $options;
 
         return $this;
     }
