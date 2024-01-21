@@ -58,9 +58,7 @@ class RuleMakeCommand extends GeneratorCommand
             ? '/stubs/rule.implicit.stub'
             : '/stubs/rule.stub';
 
-        return file_exists($customPath = $this->laravel->basePath(trim($stub, '/')))
-            ? $customPath
-            : __DIR__.$stub;
+        return $this->resolveStubPath($stub);
     }
 
     /**
