@@ -14,6 +14,8 @@ class RouteListCommandTest extends TestCase
 {
     protected Application $app;
 
+    protected Router $router;
+
     protected function tearDown(): void
     {
         m::close();
@@ -29,9 +31,9 @@ class RouteListCommandTest extends TestCase
             'testing',
         );
 
-        $router = new Router(m::mock('Illuminate\Events\Dispatcher'));
+        $this->router = new Router(m::mock('Illuminate\Events\Dispatcher'));
 
-        $kernel = new class($laravel, $router) extends Kernel
+        $kernel = new class($laravel, $this->router) extends Kernel
         {
             protected $middlewareGroups = [
                 'web' => ['Middleware 1', 'Middleware 2', 'Middleware 5'],
@@ -52,15 +54,15 @@ class RouteListCommandTest extends TestCase
             return $kernel;
         });
 
-        $router->get('/example', function () {
+        $this->router->get('/example', function () {
             return 'Hello World';
         })->middleware('exampleMiddleware');
 
-        $router->get('/example-group', function () {
+        $this->router->get('/example-group', function () {
             return 'Hello Group';
         })->middleware(['web', 'auth']);
 
-        $command = new RouteListCommand($router);
+        $command = new RouteListCommand($this->router);
         $command->setLaravel($laravel);
 
         $this->app->addCommands([$command]);
@@ -144,6 +146,24 @@ class RouteListCommandTest extends TestCase
         $output = $this->app->output();
 
         $expectedOrder = '[{"domain":null,"method":"GET|HEAD","uri":"example","name":null,"action":"Closure","middleware":["exampleMiddleware"]},{"domain":null,"method":"GET|HEAD","uri":"example-group","name":null,"action":"Closure","middleware":["Middleware 5","Middleware 1","Middleware 4","Middleware 2","Middleware 3"]}]';
+
+        $this->assertJsonStringEqualsJsonString($expectedOrder, $output);
+    }
+
+    public function testRoutesAreSortedByDefaultKeyIfSortingKeyIsPassedIncorrectly()
+    {
+        $this->router->get('/b', function () {
+            return 'Hello World';
+        });
+
+        $this->router->get('/a', function () {
+            return 'Hello World';
+        });
+
+        $this->app->call('route:list', ['--json' => true, '--sort' => 'foo', '-vv' => true]);
+        $output = $this->app->output();
+
+        $expectedOrder = '[{"domain":null,"method":"GET|HEAD","uri":"a","name":null,"action":"Closure","middleware":[]},{"domain":null,"method":"GET|HEAD","uri":"b","name":null,"action":"Closure","middleware":[]},{"domain":null,"method":"GET|HEAD","uri":"example","name":null,"action":"Closure","middleware":["exampleMiddleware"]},{"domain":null,"method":"GET|HEAD","uri":"example-group","name":null,"action":"Closure","middleware":["Middleware 5","Middleware 1","Middleware 4","Middleware 2","Middleware 3"]}]';
 
         $this->assertJsonStringEqualsJsonString($expectedOrder, $output);
     }
