@@ -71,7 +71,7 @@ class FoundationHelpersTest extends TestCase
             }, catch: [
                 TypeError::class => 'typeerror rescued!',
                 Exception::class => 'exception rescued!',
-                RuntimeException::class => 'runtime rescued',
+                RuntimeException::class => 'runtime rescued!',
             ])
         );
 
