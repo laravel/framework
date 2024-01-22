@@ -90,7 +90,8 @@
         "illuminate/testing": "self.version",
         "illuminate/translation": "self.version",
         "illuminate/validation": "self.version",
-        "illuminate/view": "self.version"
+        "illuminate/view": "self.version",
+        "spatie/once": "*"
     },
     "require-dev": {
         "ext-gmp": "*",
@@ -115,15 +116,11 @@
         "symfony/psr-http-message-bridge": "^7.0"
     },
     "conflict": {
-        "illuminate/collections": "<11.0.0",
         "tightenco/collect": "<5.5.33"
     },
     "provide": {
         "psr/container-implementation": "1.1|2.0",
         "psr/simple-cache-implementation": "1.0|2.0|3.0"
-    },
-    "replace": {
-        "spatie/once": "*"
     },
     "autoload": {
         "files": [
