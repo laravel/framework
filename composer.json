@@ -114,12 +114,15 @@
         "symfony/http-client": "^7.0",
         "symfony/psr-http-message-bridge": "^7.0"
     },
+    "conflict": {
+        "tightenco/collect": "<5.5.33"
+    },
     "provide": {
         "psr/container-implementation": "1.1|2.0",
         "psr/simple-cache-implementation": "1.0|2.0|3.0"
     },
-    "conflict": {
-        "tightenco/collect": "<5.5.33"
+    "replace": {
+        "spatie/once": "*"
     },
     "autoload": {
         "files": [

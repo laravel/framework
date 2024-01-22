@@ -29,6 +29,9 @@
     "conflict": {
         "tightenco/collect": "<5.5.33"
     },
+    "replace": {
+        "spatie/once": "*"
+    },
     "autoload": {
         "psr-4": {
             "Illuminate\\Support\\": ""
