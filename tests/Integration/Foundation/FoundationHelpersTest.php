@@ -3,10 +3,13 @@
 namespace Illuminate\Tests\Integration\Foundation;
 
 use Exception;
+use TypeError;
+use RuntimeException;
 use Illuminate\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
+use InvalidArgumentException;
 use Orchestra\Testbench\TestCase;
 
 class FoundationHelpersTest extends TestCase
@@ -49,6 +52,52 @@ class FoundationHelpersTest extends TestCase
             rescue(function () use ($testClass) {
                 $testClass->test([]);
             }, 'rescued!')
+        );
+
+        $this->assertEquals(
+            'typeerror rescued!',
+            rescue(function () use ($testClass) {
+                $testClass->test([]);
+            }, catch: [
+                Exception::class => 'exception rescued!',
+                TypeError::class => 'typeerror rescued!',
+            ])
+        );
+
+        $this->assertEquals(
+            'exception rescued!',
+            rescue(function () {
+                throw new RuntimeException();
+            }, catch: [
+                TypeError::class => 'typeerror rescued!',
+                Exception::class => 'exception rescued!',
+                RuntimeException::class => 'runtime rescued',
+            ])
+        );
+
+        $this->assertEquals(
+            'default rescued!',
+            rescue(function () {
+                throw new InvalidArgumentException();
+            }, catch: [
+                TypeError::class => 'typeerror rescued!',
+                Exception::class => 'exception rescued!',
+                RuntimeException::class => 'runtime rescued!',
+                'default' => 'default rescued!',
+            ])
+        );
+
+        $this->assertEquals(
+            'none from catch rescued!',
+            rescue(function () {
+                throw new InvalidArgumentException();
+            }, 
+            'none from catch rescued',
+            catch: [
+                TypeError::class => 'typeerror rescued!',
+                Exception::class => 'exception rescued!',
+                RuntimeException::class => 'runtime rescued!',
+            ])
         );
     }
 
