@@ -3,14 +3,14 @@
 namespace Illuminate\Tests\Integration\Foundation;
 
 use Exception;
-use TypeError;
-use RuntimeException;
 use Illuminate\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
 use Orchestra\Testbench\TestCase;
+use RuntimeException;
+use TypeError;
 
 class FoundationHelpersTest extends TestCase
 {
@@ -92,12 +92,12 @@ class FoundationHelpersTest extends TestCase
             rescue(function () {
                 throw new InvalidArgumentException();
             }, 
-            'none from catch rescued!',
-            catch: [
-                TypeError::class => 'typeerror rescued!',
-                Exception::class => 'exception rescued!',
-                RuntimeException::class => 'runtime rescued!',
-            ])
+                'none from catch rescued!',
+                catch: [
+                    TypeError::class => 'typeerror rescued!',
+                    Exception::class => 'exception rescued!',
+                    RuntimeException::class => 'runtime rescued!',
+                ])
         );
     }
 
