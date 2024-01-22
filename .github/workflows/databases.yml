@@ -149,7 +149,7 @@ jobs:
         image: postgres:14
         env:
           POSTGRES_DB: laravel
-          POSTGRES_USER: laravel
+          POSTGRES_USER: forge
           POSTGRES_PASSWORD: password
         ports:
           - 5432:5432
@@ -185,6 +185,7 @@ jobs:
         run: vendor/bin/phpunit tests/Integration/Database
         env:
           DB_CONNECTION: pgsql
+          DB_USERNAME: forge
           DB_PASSWORD: password
 
   mssql:
