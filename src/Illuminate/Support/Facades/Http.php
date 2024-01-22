@@ -8,6 +8,7 @@ use Illuminate\Http\Client\Factory;
  * @method static \Illuminate\Http\Client\Factory globalMiddleware(callable $middleware)
  * @method static \Illuminate\Http\Client\Factory globalRequestMiddleware(callable $middleware)
  * @method static \Illuminate\Http\Client\Factory globalResponseMiddleware(callable $middleware)
+ * @method static \Illuminate\Http\Client\Factory globalOptions(array $options)
  * @method static \GuzzleHttp\Promise\PromiseInterface response(array|string|null $body = null, int $status = 200, array $headers = [])
  * @method static \Illuminate\Http\Client\ResponseSequence sequence(array $responses = [])
  * @method static \Illuminate\Http\Client\Factory allowStrayRequests()
