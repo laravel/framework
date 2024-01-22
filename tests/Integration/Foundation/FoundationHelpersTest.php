@@ -65,7 +65,7 @@ class FoundationHelpersTest extends TestCase
         );
 
         $this->assertEquals(
-            'exception rescued!',
+            'runtime rescued!',
             rescue(function () {
                 throw new RuntimeException();
             }, catch: [
