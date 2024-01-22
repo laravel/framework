@@ -425,6 +425,14 @@ class SupportStrTest extends TestCase
         $this->assertEquals('foo-bar-baz', Str::wrap('-bar-', 'foo', 'baz'));
     }
 
+    public function testUnwrap()
+    {
+        $this->assertEquals('value', Str::unwrap('"value"', '"'));
+        $this->assertEquals('value', Str::unwrap('"value', '"'));
+        $this->assertEquals('value', Str::unwrap('value"', '"'));
+        $this->assertEquals('bar', Str::unwrap('foo-bar-baz', 'foo-', '-baz'));
+    }
+
     public function testIs()
     {
         $this->assertTrue(Str::is('/', '/'));

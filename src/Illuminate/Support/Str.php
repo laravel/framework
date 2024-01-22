@@ -391,6 +391,27 @@ class Str
     }
 
     /**
+     * Unwrap the string with the given strings.
+     *
+     * @param  string  $value
+     * @param  string  $before
+     * @param  string|null  $after
+     * @return string
+     */
+    public static function unwrap($value, $before, $after = null)
+    {
+        if (static::startsWith($value, $before)) {
+            $value = static::substr($value, static::length($before));
+        }
+
+        if (static::endsWith($value, $after ??= $before)) {
+            $value = static::substr($value, 0, -static::length($after));
+        }
+
+        return $value;
+    }
+
+    /**
      * Determine if a given string matches a given pattern.
      *
      * @param  string|iterable<string>  $pattern
