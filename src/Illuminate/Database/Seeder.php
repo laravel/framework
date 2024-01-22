@@ -49,6 +49,22 @@ abstract class Seeder
 
             $name = get_class($seeder);
 
+            if (
+                method_exists($this, 'skip') &&
+                ($this->container ? $this->container->call([$this, 'skip']) : $this->skip())
+            ) {
+                if ($silent === false && isset($this->command)) {
+                    with(new TwoColumnDetail($this->command->getOutput()))->render(
+                        $name,
+                        '<fg=blue;options=bold>SKIPPED</>'
+                    );
+                }
+
+                static::$called[] = $class;
+
+                continue;
+            }
+
             if ($silent === false && isset($this->command)) {
                 with(new TwoColumnDetail($this->command->getOutput()))->render(
                     $name,

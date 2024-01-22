@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Database;
 
+use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Container\Container;
 use Illuminate\Database\Seeder;
@@ -26,6 +27,23 @@ class TestDepsSeeder extends Seeder
     }
 }
 
+class TestSkipSeeder extends Seeder
+{
+    public function __construct(protected $skip)
+    {
+    }
+
+    public function skip()
+    {
+        return $this->skip;
+    }
+
+    public function run()
+    {
+        throw new Exception('Test failed');
+    }
+}
+
 class DatabaseSeederTest extends TestCase
 {
     protected function tearDown(): void
@@ -46,6 +64,29 @@ class DatabaseSeederTest extends TestCase
         $child->shouldReceive('setContainer')->once()->with($container)->andReturn($child);
         $child->shouldReceive('setCommand')->once()->with($command)->andReturn($child);
         $child->shouldReceive('__invoke')->once();
+
+        $seeder->call('ClassName');
+    }
+
+    public function testSkipsSeeder()
+    {
+        $seeder = new TestSkipSeeder(true);
+        $seeder->setContainer($container = m::mock(Container::class));
+        $output = m::mock(OutputInterface::class);
+        $output->shouldNotReceive('writeln')->withArgs(function ($message) {
+            return str_contains($message, '<fg=yellow;options=bold>RUNNING</>');
+        });
+        $output->shouldReceive('writeln')->withArgs(function ($message) {
+            return str_contains($message, '<fg=blue;options=bold>SKIPPED</>');
+        })->once();
+        $command = m::mock(Command::class);
+        $command->shouldReceive('getOutput')->once()->andReturn($output);
+        $seeder->setCommand($command);
+        $container->shouldReceive('make')->once()->with('ClassName')->andReturn($child = m::mock(Seeder::class));
+        $container->shouldReceive('call')->once()->andReturnUsing(fn ($callback) => $callback());
+        $child->shouldReceive('setContainer')->once()->with($container)->andReturn($child);
+        $child->shouldReceive('setCommand')->once()->with($command)->andReturn($child);
+        $child->shouldReceive('__invoke')->never();
 
         $seeder->call('ClassName');
     }
