@@ -92,7 +92,7 @@ class FoundationHelpersTest extends TestCase
             rescue(function () {
                 throw new InvalidArgumentException();
             }, 
-            'none from catch rescued',
+            'none from catch rescued!',
             catch: [
                 TypeError::class => 'typeerror rescued!',
                 Exception::class => 'exception rescued!',
