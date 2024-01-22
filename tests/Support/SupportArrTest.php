@@ -907,24 +907,34 @@ class SupportArrTest extends TestCase
         $this->assertEquals([1 => 'hAz'], Arr::set($array, 1, 'hAz'));
     }
 
-    public function testShuffle()
+    public function testShuffleProducesDifferentShuffles()
     {
-        $input = ['a', 'b', 'c', 'd', 'e', 'f'];
+        $input = range('a', 'z');
 
-        $this->assertNotEquals(
-            $input,
-            Arr::shuffle($input)
+        $this->assertFalse(
+            Arr::shuffle($input) === Arr::shuffle($input) && Arr::shuffle($input) === Arr::shuffle($input),
+            "The shuffles produced the same output each time, which shouldn't happen."
+        );
+    }
+
+    public function testShuffleActuallyShuffles()
+    {
+        $input = range('a', 'z');
+
+        $this->assertFalse(
+            Arr::shuffle($input) === Arr::shuffle($input) && Arr::shuffle($input) === Arr::shuffle($input),
+            "The shuffles produced the same output each time, which shouldn't happen."
         );
 
-        $this->assertNotEquals(
-            Arr::shuffle($input),
-            Arr::shuffle($input)
+        $this->assertFalse(
+            Arr::shuffle($input) === $input && Arr::shuffle($input) === $input,
+            "The shuffles were unshuffled each time, which shouldn't happen."
         );
     }
 
     public function testShuffleKeepsSameValues()
     {
-        $input = ['a', 'b', 'c', 'd', 'e', 'f'];
+        $input = range('a', 'z');
         $shuffled = Arr::shuffle($input);
         sort($shuffled);
 
