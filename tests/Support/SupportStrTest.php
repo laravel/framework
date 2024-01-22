@@ -431,6 +431,7 @@ class SupportStrTest extends TestCase
         $this->assertEquals('value', Str::unwrap('"value', '"'));
         $this->assertEquals('value', Str::unwrap('value"', '"'));
         $this->assertEquals('bar', Str::unwrap('foo-bar-baz', 'foo-', '-baz'));
+        $this->assertEquals('some: "json"', Str::unwrap('{some: "json"}', '{', '}'));
     }
 
     public function testIs()
