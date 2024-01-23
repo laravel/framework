@@ -410,6 +410,7 @@ class HandleExceptionsTest extends TestCase
 
         $instance->bootstrap($newApp = tap(m::mock(Application::class), function ($app) {
             $app->expects('environment')->andReturn(true);
+            $app->expects('terminating');
         }));
 
         $this->assertNotSame($this->app, $appResolver());

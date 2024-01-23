@@ -43,9 +43,14 @@ class HandleExceptions
 
         error_reporting(-1);
 
-        set_error_handler($this->forwardsTo('handleError'));
+        $originalErrorHandler = set_error_handler($this->forwardsTo('handleError'));
 
-        set_exception_handler($this->forwardsTo('handleException'));
+        $originalExceptionHandler = set_exception_handler($this->forwardsTo('handleException'));
+
+        $app->terminating(static function () use ($originalErrorHandler, $originalExceptionHandler): void {
+            set_error_handler($originalErrorHandler);
+            set_exception_handler($originalExceptionHandler);
+        });
 
         register_shutdown_function($this->forwardsTo('handleShutdown'));
 
