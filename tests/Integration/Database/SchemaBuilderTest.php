@@ -256,6 +256,10 @@ class SchemaBuilderTest extends DatabaseTestCase
             && ! $indexes[0]['unique']
             && ! $indexes[0]['primary']
         );
+        $this->assertTrue(Schema::hasIndex('foo', 'my_index'));
+        $this->assertTrue(Schema::hasIndex('foo', ['bar']));
+        $this->assertFalse(Schema::hasIndex('foo', 'my_index', 'primary'));
+        $this->assertFalse(Schema::hasIndex('foo', ['bar'], 'unique'));
     }
 
     public function testGetUniqueIndexes()
@@ -277,6 +281,11 @@ class SchemaBuilderTest extends DatabaseTestCase
         $this->assertTrue(collect($indexes)->contains(
             fn ($index) => $index['name'] === 'foo_baz_bar_unique' && $index['columns'] === ['baz', 'bar'] && $index['unique']
         ));
+        $this->assertTrue(Schema::hasIndex('foo', 'foo_baz_bar_unique'));
+        $this->assertTrue(Schema::hasIndex('foo', 'foo_baz_bar_unique', 'unique'));
+        $this->assertTrue(Schema::hasIndex('foo', ['bar', 'baz']));
+        $this->assertTrue(Schema::hasIndex('foo', ['bar', 'baz'], 'unique'));
+        $this->assertFalse(Schema::hasIndex('foo', ['bar', 'baz'], 'primary'));
     }
 
     public function testGetIndexesWithCompositeKeys()
