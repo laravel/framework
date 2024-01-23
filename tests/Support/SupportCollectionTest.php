@@ -2085,18 +2085,18 @@ class SupportCollectionTest extends TestCase
                 1 => [
                     'name' => 'jane',
                     'age' => 25,
-                ]
+                ],
             ],
             'repositories' => [
                 ['id' => 1],
-                ['id' => 0]
+                ['id' => 0],
             ],
             30 => [
                 2 => 'a',
                 1 => 'b',
                 0 => 'c',
             ],
-            20 => [2, 1, 0,]
+            20 => [2, 1, 0]
         ]);
 
         $this->assertEquals($expect, $data->sortRecursiveDesc());
