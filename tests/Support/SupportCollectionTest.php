@@ -2096,7 +2096,7 @@ class SupportCollectionTest extends TestCase
                 1 => 'b',
                 0 => 'c',
             ],
-            20 => [2, 1, 0]
+            20 => [2, 1, 0],
         ]);
 
         $this->assertEquals($expect, $data->sortRecursiveDesc());
