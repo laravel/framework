@@ -2016,7 +2016,7 @@ class SupportCollectionTest extends TestCase
             ],
         ]);
 
-        $expect = new $collection([
+        $expect = [
             20 => [0, 1, 2],
             30 => [
                 0 => 'c',
@@ -2038,9 +2038,9 @@ class SupportCollectionTest extends TestCase
                     'numbers' => [0, 1, 2],
                 ],
             ],
-        ]);
+        ];
 
-        $this->assertEquals($expect, $data->sortRecursive());
+        $this->assertEquals($expect, $data->sortRecursive()->all());
     }
 
     #[DataProvider('collectionClassProvider')]
@@ -2075,7 +2075,7 @@ class SupportCollectionTest extends TestCase
             ],
         ]);
 
-        $expect = new $collection([
+        $expect = [
             'users' => [
                 [
                     'numbers' => [2, 1, 0],
@@ -2097,9 +2097,9 @@ class SupportCollectionTest extends TestCase
                 0 => 'c',
             ],
             20 => [2, 1, 0],
-        ]);
+        ];
 
-        $this->assertEquals($expect, $data->sortRecursiveDesc());
+        $this->assertEquals($expect, $data->sortRecursiveDesc()->all());
     }
 
     /**
