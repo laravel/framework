@@ -256,11 +256,7 @@ class Handler implements ExceptionHandlerContract
      */
     public function dontReport(array|string $exceptions)
     {
-        foreach (Arr::wrap($exceptions) as $exception) {
-            return $this->ignore($exception);
-        }
-
-        return $this;
+        return $this->ignore($exceptions);
     }
 
     /**
