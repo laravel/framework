@@ -1,6 +1,21 @@
 # Release Notes for 10.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v10.41.0...10.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v10.42.0...10.x)
+
+## [v10.42.0](https://github.com/laravel/framework/compare/v10.41.0...v10.42.0) - 2024-01-23
+
+* [10.x] Switch to hash_equals in `File::hasSameHash()` by [@simonhamp](https://github.com/simonhamp) in https://github.com/laravel/framework/pull/49721
+* [10.x] fix Rule::unless for callable $condition by [@dbakan](https://github.com/dbakan) in https://github.com/laravel/framework/pull/49726
+* [10.x] Adds JobQueueing event by [@dmason30](https://github.com/dmason30) in https://github.com/laravel/framework/pull/49722
+* [10.x] Fix decoding issue in MailLogTransport by [@rojtjo](https://github.com/rojtjo) in https://github.com/laravel/framework/pull/49727
+* [10.x] Implement "max" validation rule for passwords by [@angelej](https://github.com/angelej) in https://github.com/laravel/framework/pull/49739
+* [10.x] Add multiple channels/routes to AnonymousNotifiable at once by [@iamgergo](https://github.com/iamgergo) in https://github.com/laravel/framework/pull/49745
+* [10.x] Sort service providers alphabetically by [@buismaarten](https://github.com/buismaarten) in https://github.com/laravel/framework/pull/49762
+* [10.x] Global default options for the http factory by [@timacdonald](https://github.com/timacdonald) in https://github.com/laravel/framework/pull/49767
+* [10.x] Only use `Carbon` if accessed from Laravel or also uses `illuminate/support` by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/49772
+* [10.x] Add `Str::unwrap` by [@stevebauman](https://github.com/stevebauman) in https://github.com/laravel/framework/pull/49779
+* [10.x] Allow Uuid and Ulid in Carbon::createFromId() by [@kylekatarnls](https://github.com/kylekatarnls) in https://github.com/laravel/framework/pull/49783
+* [10.x] Test Improvements by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/49785
 
 ## [v10.41.0](https://github.com/laravel/framework/compare/v10.40.0...v10.41.0) - 2024-01-16
 
