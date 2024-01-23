@@ -193,15 +193,20 @@ class SchemaBuilderTest extends DatabaseTestCase
         DB::statement("create type enum_foo as enum ('new', 'open', 'closed')");
         DB::statement('create type range_foo as range (subtype = float8)');
         DB::statement('create domain domain_foo as text');
+        DB::statement('create type base_foo');
+        DB::statement("create function foo_in(cstring) returns base_foo language internal immutable strict parallel safe as 'int2in'");
+        DB::statement("create function foo_out(base_foo) returns cstring language internal immutable strict parallel safe as 'int2out'");
+        DB::statement('create type base_foo (input = foo_in, output = foo_out)');
 
         $types = Schema::getTypes();
 
-        $this->assertCount(11, $types);
+        $this->assertCount(13, $types);
         $this->assertTrue(collect($types)->contains(fn ($type) => $type['name'] === 'pseudo_foo' && $type['type'] === 'pseudo' && ! $type['implicit']));
         $this->assertTrue(collect($types)->contains(fn ($type) => $type['name'] === 'comp_foo' && $type['type'] === 'composite' && ! $type['implicit']));
         $this->assertTrue(collect($types)->contains(fn ($type) => $type['name'] === 'enum_foo' && $type['type'] === 'enum' && ! $type['implicit']));
         $this->assertTrue(collect($types)->contains(fn ($type) => $type['name'] === 'range_foo' && $type['type'] === 'range' && ! $type['implicit']));
         $this->assertTrue(collect($types)->contains(fn ($type) => $type['name'] === 'domain_foo' && $type['type'] === 'domain' && ! $type['implicit']));
+        $this->assertTrue(collect($types)->contains(fn ($type) => $type['name'] === 'base_foo' && $type['type'] === 'base' && ! $type['implicit']));
 
         Schema::dropAllTypes();
         $types = Schema::getTypes();
