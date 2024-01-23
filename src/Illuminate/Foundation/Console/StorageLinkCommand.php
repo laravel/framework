@@ -15,7 +15,8 @@ class StorageLinkCommand extends Command
      */
     protected $signature = 'storage:link
                 {--relative : Create the symbolic link using relative paths}
-                {--force : Recreate existing symbolic links}';
+                {--force : Recreate existing symbolic links}
+                {--delete : Delete any existing symbolic links}';
 
     /**
      * The console command description.
@@ -34,6 +35,16 @@ class StorageLinkCommand extends Command
         $relative = $this->option('relative');
 
         foreach ($this->links() as $link => $target) {
+            if ($this->option('delete')) {
+                if (file_exists($link) && is_link($link)) {
+                    $this->laravel->make('files')->delete($link);
+
+                    $this->components->info("The [$link] link has been deleted.");
+                }
+
+                continue;
+            }
+
             if (file_exists($link) && ! $this->isRemovableSymlink($link, $this->option('force'))) {
                 $this->components->error("The [$link] link already exists.");
                 continue;
