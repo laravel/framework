@@ -385,7 +385,7 @@ class Handler implements ExceptionHandlerContract
     public function stopIgnoring($exceptions)
     {
         $exceptions = is_string($exceptions) ? func_get_args() : $exceptions;
-        
+
         $this->dontReport = collect($this->dontReport)
                 ->reject(fn ($ignored) => in_array($ignored, $exceptions))->values()->all();
 
