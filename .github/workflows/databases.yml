@@ -16,7 +16,7 @@ jobs:
         image: mysql:5.7
         env:
           MYSQL_ALLOW_EMPTY_PASSWORD: yes
-          MYSQL_DATABASE: forge
+          MYSQL_DATABASE: laravel
         ports:
           - 3306:3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
@@ -51,7 +51,6 @@ jobs:
         run: vendor/bin/phpunit tests/Integration/Database
         env:
           DB_CONNECTION: mysql
-          DB_USERNAME: root
           MYSQL_COLLATION: utf8mb4_unicode_ci
 
   mysql_8:
@@ -62,7 +61,7 @@ jobs:
         image: mysql:8
         env:
           MYSQL_ALLOW_EMPTY_PASSWORD: yes
-          MYSQL_DATABASE: forge
+          MYSQL_DATABASE: laravel
         ports:
           - 3306:3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
@@ -97,7 +96,6 @@ jobs:
         run: vendor/bin/phpunit tests/Integration/Database
         env:
           DB_CONNECTION: mysql
-          DB_USERNAME: root
 
   mariadb:
     runs-on: ubuntu-22.04
@@ -107,7 +105,7 @@ jobs:
         image: mariadb:10
         env:
           MYSQL_ALLOW_EMPTY_PASSWORD: yes
-          MYSQL_DATABASE: forge
+          MYSQL_DATABASE: laravel
         ports:
           - 3306:3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
@@ -142,7 +140,6 @@ jobs:
         run: vendor/bin/phpunit tests/Integration/Database
         env:
           DB_CONNECTION: mariadb
-          DB_USERNAME: root
 
   pgsql:
     runs-on: ubuntu-22.04
@@ -151,7 +148,7 @@ jobs:
       postgresql:
         image: postgres:14
         env:
-          POSTGRES_DB: forge
+          POSTGRES_DB: laravel
           POSTGRES_USER: forge
           POSTGRES_PASSWORD: password
         ports:
@@ -188,6 +185,7 @@ jobs:
         run: vendor/bin/phpunit tests/Integration/Database
         env:
           DB_CONNECTION: pgsql
+          DB_USERNAME: forge
           DB_PASSWORD: password
 
   mssql:
