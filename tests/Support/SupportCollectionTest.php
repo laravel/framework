@@ -1984,9 +1984,7 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals(['T10', 'T2', 'T1'], $data->values()->all());
     }
 
-    /**
-     * @dataProvider collectionClassProvider
-     */
+    #[DataProvider('collectionClassProvider')]
     public function testSortRecursive($collection): void
     {
         $data = new $collection([
@@ -2045,9 +2043,7 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals($expect, $data->sortRecursive());
     }
 
-    /**
-     * @dataProvider collectionClassProvider
-     */
+    #[DataProvider('collectionClassProvider')]
     public function testSortRecursiveDesc($collection): void
     {
         $data = new $collection([
@@ -2080,25 +2076,25 @@ class SupportCollectionTest extends TestCase
         ]);
 
         $expect = new $collection([
-            "users" => [
+            'users' => [
                 [
-                    "numbers" => [2, 1, 0],
-                    "name" => "joe",
-                    "mail" => "joe@example.com",
+                    'numbers' => [2, 1, 0],
+                    'name' => 'joe',
+                    'mail' => 'joe@example.com',
                 ],
                 1 => [
-                    "name" => "jane",
-                    "age" => 25,
+                    'name' => 'jane',
+                    'age' => 25,
                 ]
             ],
-            "repositories" => [
-                ["id" => 1],
-                ["id" => 0]
+            'repositories' => [
+                ['id' => 1],
+                ['id' => 0]
             ],
             30 => [
-                2 => "a",
-                1 => "b",
-                0 => "c",
+                2 => 'a',
+                1 => 'b',
+                0 => 'c',
             ],
             20 => [2, 1, 0,]
         ]);
