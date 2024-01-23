@@ -5,15 +5,15 @@ namespace Illuminate\Foundation\Console;
 use Illuminate\Console\Command;
 use Symfony\Component\Console\Attribute\AsCommand;
 
-#[AsCommand(name: 'storage:delete-links')]
-class StorageDeleteLinksCommand extends Command
+#[AsCommand(name: 'storage:unlink')]
+class StorageUnlinkCommand extends Command
 {
     /**
      * The console command signature.
      *
      * @var string
      */
-    protected $signature = 'storage:delete-links';
+    protected $signature = 'storage:unlink';
 
     /**
      * The console command description.
