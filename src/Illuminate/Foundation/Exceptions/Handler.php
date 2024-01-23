@@ -379,16 +379,18 @@ class Handler implements ExceptionHandlerContract
     /**
      * Remove the given exception class from the list of exceptions that should be ignored.
      *
-     * @param  string  $exception
+     * @param  string|array  $exceptions
      * @return $this
      */
-    public function stopIgnoring(string $exception)
+    public function stopIgnoring($exceptions)
     {
+        $exceptions = is_string($exceptions) ? func_get_args() : $exceptions;
+        
         $this->dontReport = collect($this->dontReport)
-                ->reject(fn ($ignored) => $ignored === $exception)->values()->all();
+                ->reject(fn ($ignored) => in_array($ignored, $exceptions))->values()->all();
 
         $this->internalDontReport = collect($this->internalDontReport)
-                ->reject(fn ($ignored) => $ignored === $exception)->values()->all();
+                ->reject(fn ($ignored) => in_array($ignored, $exceptions))->values()->all();
 
         return $this;
     }
