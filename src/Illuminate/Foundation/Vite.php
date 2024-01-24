@@ -803,4 +803,14 @@ class Vite implements Htmlable
     {
         return $this->__invoke($this->entryPoints)->toHtml();
     }
+
+    /**
+     * Flush the global state.
+     *
+     * @return void
+     */
+    public static function flushState()
+    {
+        static::$manifests = [];
+    }
 }

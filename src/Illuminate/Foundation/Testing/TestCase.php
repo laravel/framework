@@ -25,6 +25,7 @@ use Illuminate\Foundation\Bootstrap\RegisterProviders;
 use Illuminate\Foundation\Console\AboutCommand;
 use Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull;
 use Illuminate\Foundation\Http\Middleware\TrimStrings;
+use Illuminate\Foundation\Vite;
 use Illuminate\Queue\Queue;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Facade;
@@ -280,6 +281,7 @@ abstract class TestCase extends BaseTestCase
         Sleep::fake(false);
         TrimStrings::flushState();
         VerifyEmail::flushState();
+        Vite::flushState();
 
         if ($this->callbackException) {
             throw $this->callbackException;
