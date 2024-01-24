@@ -29,6 +29,7 @@ use Illuminate\Foundation\Vite;
 use Illuminate\Http\Middleware\TrustProxies;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Mail\Mailable;
+use Illuminate\Pagination\AbstractPaginator;
 use Illuminate\Queue\Queue;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Facade;
@@ -260,6 +261,7 @@ abstract class TestCase extends BaseTestCase
         $this->originalDeprecationHandler = null;
 
         AboutCommand::flushState();
+        AbstractPaginator::flushState();
         Artisan::forgetBootstrappers();
         Authenticate::redirectUsing(null);
         AuthenticationException::redirectUsing(null);

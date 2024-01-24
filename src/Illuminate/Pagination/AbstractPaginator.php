@@ -84,28 +84,28 @@ abstract class AbstractPaginator implements Htmlable, Stringable
     /**
      * The current path resolver callback.
      *
-     * @var \Closure
+     * @var \Closure|null
      */
     protected static $currentPathResolver;
 
     /**
      * The current page resolver callback.
      *
-     * @var \Closure
+     * @var \Closure|null
      */
     protected static $currentPageResolver;
 
     /**
      * The query string resolver callback.
      *
-     * @var \Closure
+     * @var \Closure|null
      */
     protected static $queryStringResolver;
 
     /**
      * The view factory resolver callback.
      *
-     * @var \Closure
+     * @var \Closure|null
      */
     protected static $viewFactoryResolver;
 
@@ -794,5 +794,20 @@ abstract class AbstractPaginator implements Htmlable, Stringable
     public function __toString()
     {
         return (string) $this->render();
+    }
+
+    /**
+     * Flush the global state.
+     *
+     * @return void
+     */
+    public static function flushState()
+    {
+        static::$currentPathResolver = null;
+        static::$currentPageResolver = null;
+        static::$queryStringResolver = null;
+        static::$viewFactoryResolver = null;
+        static::$defaultView = 'pagination::tailwind';
+        static::$defaultSimpleView = 'pagination::simple-tailwind';
     }
 }
