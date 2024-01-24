@@ -16,6 +16,7 @@ use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Database\Connection;
 use Illuminate\Database\DatabaseServiceProvider;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Bootstrap\HandleExceptions;
@@ -257,6 +258,7 @@ abstract class TestCase extends BaseTestCase
         Artisan::forgetBootstrappers();
         Authenticate::redirectUsing(null);
         AuthenticationException::redirectUsing(null);
+        Builder::flushState();
         Component::flushCache();
         Component::forgetComponentsResolver();
         Component::forgetFactory();

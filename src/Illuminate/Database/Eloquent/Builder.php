@@ -2048,4 +2048,14 @@ class Builder implements BuilderContract
     {
         $this->query = clone $this->query;
     }
+
+    /**
+     * Flush the global state.
+     *
+     * @return void
+     */
+    public static function flushState()
+    {
+        static::$macros = [];
+    }
 }
