@@ -27,6 +27,7 @@ use Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull;
 use Illuminate\Foundation\Http\Middleware\TrimStrings;
 use Illuminate\Foundation\Vite;
 use Illuminate\Http\Middleware\TrustProxies;
+use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Queue\Queue;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Facade;
@@ -272,6 +273,7 @@ abstract class TestCase extends BaseTestCase
         EncryptCookies::flushState();
         HandleExceptions::flushState();
         Json::flushState();
+        JsonResource::wrap('data');
         Once::flush();
         Queue::createPayloadUsing(null);
         RedirectIfAuthenticated::redirectUsing(null);
