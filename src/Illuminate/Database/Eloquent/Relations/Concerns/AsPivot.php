@@ -51,9 +51,6 @@ trait AsPivot
             ->forceFill($attributes)
             ->syncOriginal();
 
-        // We store off the parent instance so we will access the timestamp column names
-        // for the model, since the pivot model timestamps aren't easily configurable
-        // from the developer's point of view. We can use the parents to get these.
         $instance->pivotParent = $parent;
 
         $instance->exists = $exists;
@@ -223,30 +220,6 @@ trait AsPivot
     public function hasTimestampAttributes($attributes = null)
     {
         return array_key_exists($this->getCreatedAtColumn(), $attributes ?? $this->attributes);
-    }
-
-    /**
-     * Get the name of the "created at" column.
-     *
-     * @return string
-     */
-    public function getCreatedAtColumn()
-    {
-        return $this->pivotParent
-            ? $this->pivotParent->getCreatedAtColumn()
-            : parent::getCreatedAtColumn();
-    }
-
-    /**
-     * Get the name of the "updated at" column.
-     *
-     * @return string
-     */
-    public function getUpdatedAtColumn()
-    {
-        return $this->pivotParent
-            ? $this->pivotParent->getUpdatedAtColumn()
-            : parent::getUpdatedAtColumn();
     }
 
     /**
