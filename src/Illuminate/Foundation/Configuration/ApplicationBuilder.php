@@ -7,10 +7,13 @@ use Illuminate\Contracts\Console\Kernel as ConsoleKernel;
 use Illuminate\Contracts\Http\Kernel as HttpKernel;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Bootstrap\RegisterProviders;
+use Illuminate\Foundation\Events\DiagnosingHealth;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as AppEventServiceProvider;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as AppRouteServiceProvider;
 use Illuminate\Support\Facades\Broadcast;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\View;
 use Laravel\Folio\Folio;
 
 class ApplicationBuilder
@@ -120,11 +123,12 @@ class ApplicationBuilder
         ?string $commands = null,
         ?string $channels = null,
         ?string $pages = null,
+        ?string $health = null,
         string $apiPrefix = 'api',
         ?callable $then = null)
     {
         if (is_null($using) && (is_string($web) || is_string($api))) {
-            $using = $this->buildRoutingCallback($web, $api, $pages, $apiPrefix, $then);
+            $using = $this->buildRoutingCallback($web, $api, $pages, $health, $apiPrefix, $then);
         }
 
         AppRouteServiceProvider::loadRoutesUsing($using);
@@ -150,6 +154,7 @@ class ApplicationBuilder
      * @param  string|null  $web
      * @param  string|null  $api
      * @param  string|null  $pages
+     * @param  string|null  $health
      * @param  string  $apiPrefix
      * @param  callable|null  $then
      * @return \Closure
@@ -157,10 +162,11 @@ class ApplicationBuilder
     protected function buildRoutingCallback(?string $web,
         ?string $api,
         ?string $pages,
+        ?string $health,
         string $apiPrefix,
         ?callable $then)
     {
-        return function () use ($web, $api, $pages, $apiPrefix, $then) {
+        return function () use ($web, $api, $pages, $health, $apiPrefix, $then) {
             if (is_string($api) && realpath($api) !== false) {
                 Route::middleware('api')->prefix($apiPrefix)->group($api);
             }
@@ -173,6 +179,14 @@ class ApplicationBuilder
                 realpath($pages) !== false &&
                 class_exists(Folio::class)) {
                 Folio::route($pages, middleware: $this->pageMiddleware);
+            }
+
+            if (is_string($health)) {
+                Route::middleware('web')->get($health, function () {
+                    Event::dispatch(new DiagnosingHealth);
+
+                    return View::file(__DIR__.'/../resources/health-up.blade.php');
+                });
             }
 
             if (is_callable($then)) {
