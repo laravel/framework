@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation\Testing;
 
 use Carbon\CarbonImmutable;
+use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Console\Application as Artisan;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Database\Connection;
@@ -254,6 +255,7 @@ abstract class TestCase extends BaseTestCase
         Once::flush();
         Queue::createPayloadUsing(null);
         RegisterProviders::flushState();
+        ResetPassword::flushState();
         Sleep::fake(false);
         TrimStrings::flushState();
 

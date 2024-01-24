@@ -121,4 +121,15 @@ class ResetPassword extends Notification
     {
         static::$toMailCallback = $callback;
     }
+
+    /**
+     * Flush the global state.
+     *
+     * @return void
+     */
+    public static function flushState()
+    {
+        static::$toMailCallback = null;
+        static::$createUrlCallback = null;
+    }
 }
