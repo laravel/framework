@@ -4,6 +4,7 @@ namespace Illuminate\Foundation\Testing;
 
 use Carbon\CarbonImmutable;
 use Illuminate\Auth\Notifications\ResetPassword;
+use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Console\Application as Artisan;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Database\Connection;
@@ -258,6 +259,7 @@ abstract class TestCase extends BaseTestCase
         ResetPassword::flushState();
         Sleep::fake(false);
         TrimStrings::flushState();
+        VerifyEmail::flushState();
 
         if ($this->callbackException) {
             throw $this->callbackException;
