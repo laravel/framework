@@ -183,7 +183,7 @@ class Mailable implements MailableContract, Renderable
     /**
      * The callback that should be invoked while building the view data.
      *
-     * @var callable
+     * @var callable|null
      */
     public static $viewDataCallback;
 
@@ -1789,10 +1789,10 @@ class Mailable implements MailableContract, Renderable
     /**
      * Register a callback to be called while building the view data.
      *
-     * @param  callable  $callback
+     * @param  callable|null  $callback
      * @return void
      */
-    public static function buildViewDataUsing(callable $callback)
+    public static function buildViewDataUsing(callable|null $callback)
     {
         static::$viewDataCallback = $callback;
     }

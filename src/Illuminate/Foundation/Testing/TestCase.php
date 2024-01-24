@@ -28,6 +28,7 @@ use Illuminate\Foundation\Http\Middleware\TrimStrings;
 use Illuminate\Foundation\Vite;
 use Illuminate\Http\Middleware\TrustProxies;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Mail\Mailable;
 use Illuminate\Queue\Queue;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Facade;
@@ -274,6 +275,7 @@ abstract class TestCase extends BaseTestCase
         HandleExceptions::flushState();
         Json::flushState();
         JsonResource::wrap('data');
+        Mailable::buildViewDataUsing(null);
         Once::flush();
         Queue::createPayloadUsing(null);
         RedirectIfAuthenticated::redirectUsing(null);
