@@ -110,4 +110,14 @@ class DatabaseServiceProvider extends ServiceProvider
             return new QueueEntityResolver;
         });
     }
+
+    /**
+     * Flush the global state.
+     *
+     * @return void
+     */
+    public static function flushState()
+    {
+        static::$fakers = [];
+    }
 }

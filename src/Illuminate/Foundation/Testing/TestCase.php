@@ -15,6 +15,7 @@ use Illuminate\Container\Container;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Database\Connection;
+use Illuminate\Database\DatabaseServiceProvider;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Bootstrap\HandleExceptions;
@@ -262,6 +263,7 @@ abstract class TestCase extends BaseTestCase
         Connection::flushState();
         Container::setInstance(null);
         ConvertEmptyStringsToNull::flushState();
+        DatabaseServiceProvider::flushState();
         EncryptCookies::flushState();
         HandleExceptions::flushState();
         Once::flush();
