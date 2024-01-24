@@ -1,11 +1,13 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Illuminate\Tests\Database;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use Mockery as m;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentBelongsToManyWithoutTouchingTest extends TestCase
@@ -55,7 +57,6 @@ class Article extends Model
     protected $table = 'articles';
     protected $fillable = ['id', 'title'];
     protected $touches = ['user'];
-
 
     public function users(): BelongsToMany
     {
