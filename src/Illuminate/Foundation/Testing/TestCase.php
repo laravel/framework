@@ -11,6 +11,7 @@ use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Console\Application as Artisan;
 use Illuminate\Console\Scheduling\ScheduleListCommand;
 use Illuminate\Console\Signals;
+use Illuminate\Container\Container;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Eloquent\Model;
@@ -258,6 +259,7 @@ abstract class TestCase extends BaseTestCase
         Component::forgetComponentsResolver();
         Component::forgetFactory();
         Connection::flushState();
+        Container::setInstance(null);
         ConvertEmptyStringsToNull::flushState();
         HandleExceptions::flushState();
         Once::flush();
