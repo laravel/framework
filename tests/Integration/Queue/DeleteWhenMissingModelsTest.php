@@ -144,8 +144,7 @@ abstract class HandlingServiceJob implements ShouldQueue
 
     public function __construct(
         public readonly Model $model,
-    )
-    {
+    ) {
     }
 
     public function handle(Service $service): void
