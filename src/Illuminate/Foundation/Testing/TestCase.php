@@ -6,6 +6,7 @@ use Carbon\CarbonImmutable;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Console\Application as Artisan;
+use Illuminate\Console\Scheduling\ScheduleListCommand;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Eloquent\Model;
@@ -257,6 +258,7 @@ abstract class TestCase extends BaseTestCase
         Queue::createPayloadUsing(null);
         RegisterProviders::flushState();
         ResetPassword::flushState();
+        ScheduleListCommand::resolveTerminalWidthUsing(null);
         Sleep::fake(false);
         TrimStrings::flushState();
         VerifyEmail::flushState();
