@@ -67,18 +67,6 @@ class MySqlGrammar extends Grammar
     }
 
     /**
-     * Compile the query to determine the list of tables.
-     *
-     * @deprecated Will be removed in a future Laravel version.
-     *
-     * @return string
-     */
-    public function compileTableExists()
-    {
-        return "select * from information_schema.tables where table_schema = ? and table_name = ? and table_type = 'BASE TABLE'";
-    }
-
-    /**
      * Compile the query to determine the tables.
      *
      * @param  string  $database
@@ -109,42 +97,6 @@ class MySqlGrammar extends Grammar
             .'order by table_name',
             $this->quoteString($database)
         );
-    }
-
-    /**
-     * Compile the SQL needed to retrieve all table names.
-     *
-     * @deprecated Will be removed in a future Laravel version.
-     *
-     * @return string
-     */
-    public function compileGetAllTables()
-    {
-        return 'SHOW FULL TABLES WHERE table_type = \'BASE TABLE\'';
-    }
-
-    /**
-     * Compile the SQL needed to retrieve all view names.
-     *
-     * @deprecated Will be removed in a future Laravel version.
-     *
-     * @return string
-     */
-    public function compileGetAllViews()
-    {
-        return 'SHOW FULL TABLES WHERE table_type = \'VIEW\'';
-    }
-
-    /**
-     * Compile the query to determine the list of columns.
-     *
-     * @deprecated Will be removed in a future Laravel version.
-     *
-     * @return string
-     */
-    public function compileColumnListing()
-    {
-        return 'select column_name as `column_name` from information_schema.columns where table_schema = ? and table_name = ?';
     }
 
     /**

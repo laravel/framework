@@ -69,18 +69,6 @@ class PostgresGrammar extends Grammar
     }
 
     /**
-     * Compile the query to determine if a table exists.
-     *
-     * @deprecated Will be removed in a future Laravel version.
-     *
-     * @return string
-     */
-    public function compileTableExists()
-    {
-        return "select * from information_schema.tables where table_catalog = ? and table_schema = ? and table_name = ? and table_type = 'BASE TABLE'";
-    }
-
-    /**
      * Compile the query to determine the tables.
      *
      * @return string
@@ -119,44 +107,6 @@ class PostgresGrammar extends Grammar
             ."where ((t.typrelid = 0 and (ce.relkind = 'c' or ce.relkind is null)) or c.relkind = 'c') "
             ."and not exists (select 1 from pg_depend d where d.objid in (t.oid, t.typelem) and d.deptype = 'e') "
             ."and n.nspname not in ('pg_catalog', 'information_schema')";
-    }
-
-    /**
-     * Compile the SQL needed to retrieve all table names.
-     *
-     * @deprecated Will be removed in a future Laravel version.
-     *
-     * @param  string|array  $searchPath
-     * @return string
-     */
-    public function compileGetAllTables($searchPath)
-    {
-        return "select tablename, concat('\"', schemaname, '\".\"', tablename, '\"') as qualifiedname from pg_catalog.pg_tables where schemaname in ('".implode("','", (array) $searchPath)."')";
-    }
-
-    /**
-     * Compile the SQL needed to retrieve all view names.
-     *
-     * @deprecated Will be removed in a future Laravel version.
-     *
-     * @param  string|array  $searchPath
-     * @return string
-     */
-    public function compileGetAllViews($searchPath)
-    {
-        return "select viewname, concat('\"', schemaname, '\".\"', viewname, '\"') as qualifiedname from pg_catalog.pg_views where schemaname in ('".implode("','", (array) $searchPath)."')";
-    }
-
-    /**
-     * Compile the query to determine the list of columns.
-     *
-     * @deprecated Will be removed in a future Laravel version.
-     *
-     * @return string
-     */
-    public function compileColumnListing()
-    {
-        return 'select column_name from information_schema.columns where table_catalog = ? and table_schema = ? and table_name = ?';
     }
 
     /**
@@ -508,18 +458,6 @@ class PostgresGrammar extends Grammar
     public function compileDropAllDomains($domains)
     {
         return 'drop domain '.implode(',', $this->escapeNames($domains)).' cascade';
-    }
-
-    /**
-     * Compile the SQL needed to retrieve all type names.
-     *
-     * @deprecated Will be removed in a future Laravel version.
-     *
-     * @return string
-     */
-    public function compileGetAllTypes()
-    {
-        return 'select distinct pg_type.typname from pg_type inner join pg_enum on pg_enum.enumtypid = pg_type.oid';
     }
 
     /**

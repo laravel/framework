@@ -67,18 +67,6 @@ class SqlServerGrammar extends Grammar
     }
 
     /**
-     * Compile the query to determine if a table exists.
-     *
-     * @deprecated Will be removed in a future Laravel version.
-     *
-     * @return string
-     */
-    public function compileTableExists()
-    {
-        return "select * from sys.sysobjects where id = object_id(?) and xtype in ('U', 'V')";
-    }
-
-    /**
      * Compile the query to determine the tables.
      *
      * @return string
@@ -103,43 +91,6 @@ class SqlServerGrammar extends Grammar
         return 'select name, SCHEMA_NAME(v.schema_id) as [schema], definition from sys.views as v '
             .'inner join sys.sql_modules as m on v.object_id = m.object_id '
             .'order by name';
-    }
-
-    /**
-     * Compile the SQL needed to retrieve all table names.
-     *
-     * @deprecated Will be removed in a future Laravel version.
-     *
-     * @return string
-     */
-    public function compileGetAllTables()
-    {
-        return "select name, type from sys.tables where type = 'U'";
-    }
-
-    /**
-     * Compile the SQL needed to retrieve all view names.
-     *
-     * @deprecated Will be removed in a future Laravel version.
-     *
-     * @return string
-     */
-    public function compileGetAllViews()
-    {
-        return "select name, type from sys.objects where type = 'V'";
-    }
-
-    /**
-     * Compile the query to determine the list of columns.
-     *
-     * @deprecated Will be removed in a future Laravel version.
-     *
-     * @param  string  $table
-     * @return string
-     */
-    public function compileColumnListing($table)
-    {
-        return "select name from sys.columns where object_id = object_id('$table')";
     }
 
     /**
