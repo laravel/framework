@@ -20,7 +20,7 @@ class StorageUnlinkCommand extends Command
      *
      * @var string
      */
-    protected $description = 'Delete existing links configured for the application';
+    protected $description = 'Delete existing symbolic links configured for the application';
 
     /**
      * Execute the console command.
