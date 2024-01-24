@@ -29,18 +29,6 @@ class SQLiteGrammar extends Grammar
     protected $serials = ['bigInteger', 'integer', 'mediumInteger', 'smallInteger', 'tinyInteger'];
 
     /**
-     * Compile the query to determine if a table exists.
-     *
-     * @deprecated Will be removed in a future Laravel version.
-     *
-     * @return string
-     */
-    public function compileTableExists()
-    {
-        return "select * from sqlite_master where type = 'table' and name = ?";
-    }
-
-    /**
      * Compile the query to determine the SQL text that describes the given object.
      *
      * @param  string  $name
@@ -90,43 +78,6 @@ class SQLiteGrammar extends Grammar
     public function compileViews()
     {
         return "select name, sql as definition from sqlite_master where type = 'view' order by name";
-    }
-
-    /**
-     * Compile the SQL needed to retrieve all table names.
-     *
-     * @deprecated Will be removed in a future Laravel version.
-     *
-     * @return string
-     */
-    public function compileGetAllTables()
-    {
-        return 'select type, name from sqlite_master where type = \'table\' and name not like \'sqlite_%\'';
-    }
-
-    /**
-     * Compile the SQL needed to retrieve all view names.
-     *
-     * @deprecated Will be removed in a future Laravel version.
-     *
-     * @return string
-     */
-    public function compileGetAllViews()
-    {
-        return 'select type, name from sqlite_master where type = \'view\'';
-    }
-
-    /**
-     * Compile the query to determine the list of columns.
-     *
-     * @deprecated Will be removed in a future Laravel version.
-     *
-     * @param  string  $table
-     * @return string
-     */
-    public function compileColumnListing($table)
-    {
-        return 'pragma table_info('.$this->wrap(str_replace('.', '__', $table)).')';
     }
 
     /**
