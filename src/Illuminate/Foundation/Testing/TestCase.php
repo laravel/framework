@@ -13,6 +13,7 @@ use Illuminate\Console\Scheduling\ScheduleListCommand;
 use Illuminate\Console\Signals;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Console\Kernel;
+use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Application;
@@ -261,6 +262,7 @@ abstract class TestCase extends BaseTestCase
         Connection::flushState();
         Container::setInstance(null);
         ConvertEmptyStringsToNull::flushState();
+        EncryptCookies::flushState();
         HandleExceptions::flushState();
         Once::flush();
         Queue::createPayloadUsing(null);

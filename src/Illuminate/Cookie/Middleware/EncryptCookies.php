@@ -240,4 +240,15 @@ class EncryptCookies
     {
         return static::$serialize;
     }
+
+    /**
+     * Flush the global state.
+     *
+     * @return void
+     */
+    public static function flushState()
+    {
+        static::$neverEncrypt = [];
+        static::$serialize = false;
+    }
 }
