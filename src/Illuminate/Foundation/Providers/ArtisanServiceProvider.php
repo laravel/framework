@@ -33,6 +33,7 @@ use Illuminate\Foundation\Console\BroadcastingInstallCommand;
 use Illuminate\Foundation\Console\CastMakeCommand;
 use Illuminate\Foundation\Console\ChannelListCommand;
 use Illuminate\Foundation\Console\ChannelMakeCommand;
+use Illuminate\Foundation\Console\ClassMakeCommand;
 use Illuminate\Foundation\Console\ClearCompiledCommand;
 use Illuminate\Foundation\Console\ComponentMakeCommand;
 use Illuminate\Foundation\Console\ConfigCacheCommand;
@@ -51,6 +52,7 @@ use Illuminate\Foundation\Console\EventGenerateCommand;
 use Illuminate\Foundation\Console\EventListCommand;
 use Illuminate\Foundation\Console\EventMakeCommand;
 use Illuminate\Foundation\Console\ExceptionMakeCommand;
+use Illuminate\Foundation\Console\InterfaceMakeCommand;
 use Illuminate\Foundation\Console\JobMakeCommand;
 use Illuminate\Foundation\Console\KeyGenerateCommand;
 use Illuminate\Foundation\Console\LangPublishCommand;
@@ -178,6 +180,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         'CastMake' => CastMakeCommand::class,
         'ChannelList' => ChannelListCommand::class,
         'ChannelMake' => ChannelMakeCommand::class,
+        'ClassMake' => ClassMakeCommand::class,
         'ComponentMake' => ComponentMakeCommand::class,
         'ConfigPublish' => ConfigPublishCommand::class,
         'ConsoleMake' => ConsoleMakeCommand::class,
@@ -187,6 +190,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         'EventMake' => EventMakeCommand::class,
         'ExceptionMake' => ExceptionMakeCommand::class,
         'FactoryMake' => FactoryMakeCommand::class,
+        'InterfaceMake' => InterfaceMakeCommand::class,
         'JobMake' => JobMakeCommand::class,
         'LangPublish' => LangPublishCommand::class,
         'ListenerMake' => ListenerMakeCommand::class,
@@ -331,6 +335,18 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
      *
      * @return void
      */
+    protected function registerClassMakeCommand()
+    {
+        $this->app->singleton(ClassMakeCommand::class, function ($app) {
+            return new ClassMakeCommand($app['files']);
+        });
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
     protected function registerComponentMakeCommand()
     {
         $this->app->singleton(ComponentMakeCommand::class, function ($app) {
@@ -443,6 +459,18 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
     {
         $this->app->singleton(EventClearCommand::class, function ($app) {
             return new EventClearCommand($app['files']);
+        });
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerInterfaceMakeCommand()
+    {
+        $this->app->singleton(InterfaceMakeCommand::class, function ($app) {
+            return new InterfaceMakeCommand($app['files']);
         });
     }
 
