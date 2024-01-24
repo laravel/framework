@@ -26,6 +26,7 @@ use Illuminate\Foundation\Console\AboutCommand;
 use Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull;
 use Illuminate\Foundation\Http\Middleware\TrimStrings;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
+use Illuminate\Foundation\Support\Providers\RouteServiceProvider;
 use Illuminate\Foundation\Vite;
 use Illuminate\Http\Middleware\TrustProxies;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -287,6 +288,7 @@ abstract class TestCase extends BaseTestCase
         RedirectIfAuthenticated::redirectUsing(null);
         RegisterProviders::flushState();
         ResetPassword::flushState();
+        RouteServiceProvider::loadRoutesUsing(null);
         ScheduleListCommand::resolveTerminalWidthUsing(null);
         Signals::resolveAvailabilityUsing(null);
         Sleep::fake(false);
