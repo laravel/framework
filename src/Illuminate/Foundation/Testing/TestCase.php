@@ -35,6 +35,7 @@ use Illuminate\Pagination\AbstractCursorPaginator;
 use Illuminate\Pagination\AbstractPaginator;
 use Illuminate\Queue\Queue;
 use Illuminate\Queue\Worker;
+use Illuminate\Routing\Middleware\ThrottleRequests;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\Facades\ParallelTesting;
@@ -292,6 +293,7 @@ abstract class TestCase extends BaseTestCase
         ScheduleListCommand::resolveTerminalWidthUsing(null);
         Signals::resolveAvailabilityUsing(null);
         Sleep::fake(false);
+        ThrottleRequests::shouldHashKeys();
         TrimStrings::flushState();
         TrustProxies::flushState();
         VerifyCsrfToken::flushState();
