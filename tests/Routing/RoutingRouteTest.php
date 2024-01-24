@@ -23,6 +23,8 @@ use Illuminate\Routing\Contracts\CallableDispatcher as CallableDispatcherContrac
 use Illuminate\Routing\Contracts\ControllerDispatcher as ControllerDispatcherContract;
 use Illuminate\Routing\Controller;
 use Illuminate\Routing\ControllerDispatcher;
+use Illuminate\Routing\Events\PreparingResponse;
+use Illuminate\Routing\Events\ResponsePrepared;
 use Illuminate\Routing\Events\Routing;
 use Illuminate\Routing\Exceptions\UrlGenerationException;
 use Illuminate\Routing\Middleware\SubstituteBindings;
@@ -403,6 +405,19 @@ class RoutingRouteTest extends TestCase
         $this->assertArrayHasKey('as', $route->getAction());
         $this->assertSame('foo', $route->getAction('as'));
         $this->assertNull($route->getAction('unknown_property'));
+    }
+
+    public function testRouteGetControllerClass()
+    {
+        $router = $this->getRouter();
+
+        $controllerRoute = $router->get('foo/bar')->uses(RouteTestControllerStub::class.'@index');
+        $closureRoute = $router->get('foo', function () {
+            return 'foo';
+        });
+
+        $this->assertSame(RouteTestControllerStub::class, $controllerRoute->getControllerClass());
+        $this->assertNull($closureRoute->getControllerClass());
     }
 
     public function testResolvingBindingParameters()
@@ -1741,6 +1756,27 @@ class RoutingRouteTest extends TestCase
         $this->assertSame('taylor', $router->dispatch(Request::create('foo/taylor', 'GET'))->getContent());
     }
 
+    public function testImplicitBindingsWithClosure()
+    {
+        $router = $this->getRouter();
+
+        $router->substituteImplicitBindingsUsing(function ($container, $route, $default) {
+            $default = $default();
+
+            $model = $route->parameter('bar');
+            $model->value = 'otwell';
+        });
+
+        $router->get('foo/{bar}', [
+            'middleware' => SubstituteBindings::class,
+            'uses' => function (RoutingTestUserModel $bar) {
+                return $bar->value;
+            },
+        ]);
+
+        $this->assertSame('otwell', $router->dispatch(Request::create('foo/taylor', 'GET'))->getContent());
+    }
+
     public function testImplicitBindingsWhereScopedBindingsArePrevented()
     {
         $router = $this->getRouter();
@@ -1868,6 +1904,29 @@ class RoutingRouteTest extends TestCase
         $this->assertEquals(302, $response->getStatusCode());
     }
 
+    public function testImplicitBindingsWithMissingModelHandledByMissingOnGroupLevel()
+    {
+        $router = $this->getRouter();
+        $router->as('foo.')
+            ->missing(fn () => new RedirectResponse('/', 302))
+            ->group(function () use ($router) {
+                $router->get('foo/{bar}', [
+                    'middleware' => SubstituteBindings::class,
+                    'uses' => function (RouteModelBindingNullStub $bar = null) {
+                        $this->assertInstanceOf(RouteModelBindingNullStub::class, $bar);
+
+                        return $bar->first();
+                    },
+                ]);
+            });
+
+        $request = Request::create('foo/taylor', 'GET');
+
+        $response = $router->dispatch($request);
+        $this->assertTrue($response->isRedirect('/'));
+        $this->assertEquals(302, $response->getStatusCode());
+    }
+
     public function testImplicitBindingsWithOptionalParameterWithNoKeyInUri()
     {
         $router = $this->getRouter();
@@ -1878,6 +1937,20 @@ class RoutingRouteTest extends TestCase
             },
         ]);
         $router->dispatch(Request::create('foo', 'GET'))->getContent();
+    }
+
+    public function testImplicitBindingsWithOptionalParameterUsingEnumIsAlwaysCastedToEnum()
+    {
+        include_once 'Enums.php';
+
+        $router = $this->getRouter();
+        $router->get('foo/{bar?}', [
+            'middleware' => SubstituteBindings::class,
+            'uses' => function (?\Illuminate\Tests\Routing\CategoryBackedEnum $bar = null) {
+                $this->assertInstanceOf(CategoryBackedEnum::class, $bar);
+            },
+        ]);
+        $router->dispatch(Request::create('foo/people', 'GET'))->getContent();
     }
 
     public function testImplicitBindingsWithOptionalParameterWithNonExistingKeyInUri()
@@ -2142,11 +2215,45 @@ class RoutingRouteTest extends TestCase
         ], $route->middleware());
     }
 
-    protected function getRouter()
+    public function testItDispatchesEventsWhilePreparingRequest()
     {
+        $events = new Dispatcher;
+        $preparing = [];
+        $prepared = [];
+        $events->listen(PreparingResponse::class, function ($event) use (&$preparing) {
+            $preparing[] = $event;
+        });
+        $events->listen(ResponsePrepared::class, function ($event) use (&$prepared) {
+            $prepared[] = $event;
+        });
         $container = new Container;
+        $container->instance(Dispatcher::class, $events);
+        $router = $this->getRouter($container);
+        $router->get('foo/bar', function () {
+            return 'hello';
+        });
+        $request = Request::create('foo/bar', 'GET');
 
-        $router = new Router(new Dispatcher, $container);
+        $response = $router->dispatch($request);
+
+        $this->assertSame('hello', $response->getContent());
+        $this->assertCount(2, $preparing);
+        $this->assertSame($request, $preparing[0]->request);
+        $this->assertSame('hello', $preparing[0]->response);
+        $this->assertSame($request, $preparing[1]->request);
+        $this->assertSame($response, $preparing[1]->response);
+        $this->assertCount(2, $prepared);
+        $this->assertSame($request, $prepared[0]->request);
+        $this->assertSame($response, $prepared[0]->response);
+        $this->assertSame($request, $prepared[1]->request);
+        $this->assertSame($response, $prepared[1]->response);
+    }
+
+    protected function getRouter($container = null)
+    {
+        $container ??= new Container;
+
+        $router = new Router($container->make(Dispatcher::class), $container);
 
         $container->singleton(Registrar::class, function () use ($router) {
             return $router;

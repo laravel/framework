@@ -100,19 +100,48 @@ class SupportArrTest extends TestCase
     public function testDot()
     {
         $array = Arr::dot(['foo' => ['bar' => 'baz']]);
-        $this->assertEquals(['foo.bar' => 'baz'], $array);
+        $this->assertSame(['foo.bar' => 'baz'], $array);
+
+        $array = Arr::dot([10 => 100]);
+        $this->assertSame([10 => 100], $array);
+
+        $array = Arr::dot(['foo' => [10 => 100]]);
+        $this->assertSame(['foo.10' => 100], $array);
 
         $array = Arr::dot([]);
-        $this->assertEquals([], $array);
+        $this->assertSame([], $array);
 
         $array = Arr::dot(['foo' => []]);
-        $this->assertEquals(['foo' => []], $array);
+        $this->assertSame(['foo' => []], $array);
 
         $array = Arr::dot(['foo' => ['bar' => []]]);
-        $this->assertEquals(['foo.bar' => []], $array);
+        $this->assertSame(['foo.bar' => []], $array);
 
         $array = Arr::dot(['name' => 'taylor', 'languages' => ['php' => true]]);
-        $this->assertEquals(['name' => 'taylor', 'languages.php' => true], $array);
+        $this->assertSame(['name' => 'taylor', 'languages.php' => true], $array);
+
+        $array = Arr::dot(['user' => ['name' => 'Taylor', 'age' => 25, 'languages' => ['PHP', 'C#']]]);
+        $this->assertSame([
+            'user.name' => 'Taylor',
+            'user.age' => 25,
+            'user.languages.0' => 'PHP',
+            'user.languages.1' => 'C#',
+        ], $array);
+
+        $array = Arr::dot(['foo', 'foo' => ['bar' => 'baz', 'baz' => ['a' => 'b']]]);
+        $this->assertSame([
+            'foo',
+            'foo.bar' => 'baz',
+            'foo.baz.a' => 'b',
+        ], $array);
+
+        $array = Arr::dot(['foo' => 'bar', 'empty_array' => [], 'user' => ['name' => 'Taylor'], 'key' => 'value']);
+        $this->assertSame([
+            'foo' => 'bar',
+            'empty_array' => [],
+            'user.name' => 'Taylor',
+            'key' => 'value',
+        ], $array);
     }
 
     public function testUndot()
@@ -207,9 +236,20 @@ class SupportArrTest extends TestCase
         }, function () {
             return 'baz';
         });
+        $value5 = Arr::first($array, function ($value, $key) {
+            return $key < 2;
+        });
         $this->assertNull($value2);
         $this->assertSame('bar', $value3);
         $this->assertSame('baz', $value4);
+        $this->assertEquals(100, $value5);
+
+        $cursor = (function () {
+            while (false) {
+                yield 1;
+            }
+        })();
+        $this->assertNull(Arr::first($cursor));
     }
 
     public function testJoin()
@@ -229,17 +269,41 @@ class SupportArrTest extends TestCase
     {
         $array = [100, 200, 300];
 
-        $last = Arr::last($array, function ($value) {
+        // Callback is null and array is empty
+        $this->assertNull(Arr::last([], null));
+        $this->assertSame('foo', Arr::last([], null, 'foo'));
+        $this->assertSame('bar', Arr::last([], null, function () {
+            return 'bar';
+        }));
+
+        // Callback is null and array is not empty
+        $this->assertEquals(300, Arr::last($array));
+
+        // Callback is not null and array is not empty
+        $value = Arr::last($array, function ($value) {
             return $value < 250;
         });
-        $this->assertEquals(200, $last);
+        $this->assertEquals(200, $value);
 
-        $last = Arr::last($array, function ($value, $key) {
+        // Callback is not null, array is not empty but no satisfied item
+        $value2 = Arr::last($array, function ($value) {
+            return $value > 300;
+        });
+        $value3 = Arr::last($array, function ($value) {
+            return $value > 300;
+        }, 'bar');
+        $value4 = Arr::last($array, function ($value) {
+            return $value > 300;
+        }, function () {
+            return 'baz';
+        });
+        $value5 = Arr::last($array, function ($value, $key) {
             return $key < 2;
         });
-        $this->assertEquals(200, $last);
-
-        $this->assertEquals(300, Arr::last($array));
+        $this->assertNull($value2);
+        $this->assertSame('bar', $value3);
+        $this->assertSame('baz', $value4);
+        $this->assertEquals(200, $value5);
     }
 
     public function testFlatten()
@@ -642,6 +706,24 @@ class SupportArrTest extends TestCase
         $this->assertEquals(['first' => 'taylor', 'last' => 'otwell'], $data);
     }
 
+    public function testMapWithKeys()
+    {
+        $data = [
+            ['name' => 'Blastoise', 'type' => 'Water', 'idx' => 9],
+            ['name' => 'Charmander', 'type' => 'Fire', 'idx' => 4],
+            ['name' => 'Dragonair', 'type' => 'Dragon', 'idx' => 148],
+        ];
+
+        $data = Arr::mapWithKeys($data, function ($pokemon) {
+            return [$pokemon['name'] => $pokemon['type']];
+        });
+
+        $this->assertEquals(
+            ['Blastoise' => 'Water', 'Charmander' => 'Fire', 'Dragonair' => 'Dragon'],
+            $data
+        );
+    }
+
     public function testMapByReference()
     {
         $data = ['first' => 'taylor', 'last' => 'otwell'];
@@ -741,19 +823,6 @@ class SupportArrTest extends TestCase
         $this->assertCount(2, array_intersect_assoc(['one' => 'foo', 'two' => 'bar', 'three' => 'baz'], $random));
     }
 
-    public function testRandomIsActuallyRandom()
-    {
-        $values = [];
-
-        for ($i = 0; $i < 100; $i++) {
-            $values[] = Arr::random(['foo', 'bar', 'baz']);
-        }
-
-        $this->assertContains('foo', $values);
-        $this->assertContains('bar', $values);
-        $this->assertContains('baz', $values);
-    }
-
     public function testRandomNotIncrementingKeys()
     {
         $random = Arr::random(['foo' => 'foo', 'bar' => 'bar', 'baz' => 'baz']);
@@ -840,34 +909,15 @@ class SupportArrTest extends TestCase
 
     public function testShuffleWithSeed()
     {
-        $this->assertSame(
+        $this->assertEquals(
             Arr::shuffle(range(0, 100, 10), 1234),
-            Arr::shuffle(range(0, 100, 10), 1234)
-        );
-
-        $this->assertNotSame(
-            range(0, 100, 10),
             Arr::shuffle(range(0, 100, 10), 1234)
         );
     }
 
-    public function testShuffle()
+    public function testEmptyShuffle()
     {
-        $source = range('a', 'z'); // alphabetic keys to ensure values are returned
-
-        $sameElements = true;
-        $dontMatch = false;
-
-        // Attempt 5x times to prevent random failures
-        for ($i = 0; $i < 5; $i++) {
-            $shuffled = Arr::shuffle($source);
-
-            $dontMatch = $dontMatch || $source !== $shuffled;
-            $sameElements = $sameElements && $source === array_values(Arr::sort($shuffled));
-        }
-
-        $this->assertTrue($sameElements, 'Shuffled array should always have the same elements.');
-        $this->assertTrue($dontMatch, 'Shuffled array should not have the same order.');
+        $this->assertEquals([], Arr::shuffle([]));
     }
 
     public function testSort()

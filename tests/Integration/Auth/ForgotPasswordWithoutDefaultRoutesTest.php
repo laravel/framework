@@ -39,8 +39,7 @@ class ForgotPasswordWithoutDefaultRoutesTest extends TestCase
         })->name('custom.password.reset');
     }
 
-    /** @test */
-    public function it_cannot_send_forgot_password_email()
+    public function testItCannotSendForgotPasswordEmail()
     {
         $this->expectException('Symfony\Component\Routing\Exception\RouteNotFoundException');
         $this->expectExceptionMessage('Route [password.reset] not defined.');
@@ -66,8 +65,7 @@ class ForgotPasswordWithoutDefaultRoutesTest extends TestCase
         );
     }
 
-    /** @test */
-    public function it_can_send_forgot_password_email_via_create_url_using()
+    public function testItCanSendForgotPasswordEmailViaCreateUrlUsing()
     {
         Notification::fake();
 
@@ -94,8 +92,7 @@ class ForgotPasswordWithoutDefaultRoutesTest extends TestCase
         );
     }
 
-    /** @test */
-    public function it_can_send_forgot_password_email_via_to_mail_using()
+    public function testItCanSendForgotPasswordEmailViaToMailUsing()
     {
         Notification::fake();
 

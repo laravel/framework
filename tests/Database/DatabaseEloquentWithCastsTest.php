@@ -3,6 +3,8 @@
 namespace Illuminate\Tests\Database;
 
 use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Database\Eloquent\MissingAttributeException;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use PHPUnit\Framework\TestCase;
 
@@ -32,6 +34,12 @@ class DatabaseEloquentWithCastsTest extends TestCase
             $table->time('time');
             $table->timestamps();
         });
+
+        $this->schema()->create('unique_times', function ($table) {
+            $table->increments('id');
+            $table->time('time')->unique();
+            $table->timestamps();
+        });
     }
 
     public function testWithFirstOrNew()
@@ -59,6 +67,32 @@ class DatabaseEloquentWithCastsTest extends TestCase
         $this->assertSame($time1->id, $time2->id);
     }
 
+    public function testWithCreateOrFirst()
+    {
+        $time1 = UniqueTime::query()->withCasts(['time' => 'string'])
+            ->createOrFirst(['time' => '07:30']);
+
+        $time2 = UniqueTime::query()->withCasts(['time' => 'string'])
+            ->createOrFirst(['time' => '07:30']);
+
+        $this->assertSame($time1->id, $time2->id);
+    }
+
+    public function testThrowsExceptionIfCastableAttributeWasNotRetrievedAndPreventMissingAttributesIsEnabled()
+    {
+        Time::create(['time' => now()]);
+        $originalMode = Model::preventsAccessingMissingAttributes();
+        Model::preventAccessingMissingAttributes();
+
+        $this->expectException(MissingAttributeException::class);
+        try {
+            $time = Time::query()->select('id')->first();
+            $this->assertNull($time->time);
+        } finally {
+            Model::preventAccessingMissingAttributes($originalMode);
+        }
+    }
+
     /**
      * Get a database connection instance.
      *
@@ -81,6 +115,15 @@ class DatabaseEloquentWithCastsTest extends TestCase
 }
 
 class Time extends Eloquent
+{
+    protected $guarded = [];
+
+    protected $casts = [
+        'time' => 'datetime',
+    ];
+}
+
+class UniqueTime extends Eloquent
 {
     protected $guarded = [];
 

@@ -3,18 +3,12 @@
 namespace Illuminate\Tests\Console;
 
 use Illuminate\Console\OutputStyle;
-use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 
 class OutputStyleTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     public function testDetectsNewLine()
     {
         $bufferedOutput = new BufferedOutput();

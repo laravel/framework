@@ -1,7 +1,7 @@
 version: '3'
 services:
   dynamodb:
-    image: amazon/dynamodb-local
+    image: amazon/dynamodb-local:2.0.0
     ports:
       - "8000:8000"
     command: ["-jar", "DynamoDBLocal.jar", "-sharedDb", "-inMemory"]
@@ -20,6 +20,32 @@ services:
     ports:
       - "3306:3306"
     restart: always
+  # postgres:
+  #   image: postgres:15
+  #   environment:
+  #     POSTGRES_PASSWORD: "secret"
+  #     POSTGRES_DB: "forge"
+  #   ports:
+  #     - "5432:5432"
+  #   restart: always
+  # mariadb:
+  #   image: mariadb:11
+  #   environment:
+  #     MARIADB_ALLOW_EMPTY_ROOT_PASSWORD: "yes"
+  #     MARIADB_ROOT_PASSWORD: ""
+  #     MARIADB_DATABASE: "forge"
+  #     MARIADB_ROOT_HOST: "%"
+  #   ports:
+  #     - "3306:3306"
+  #   restart: always
+  # mssql:
+  #   image: mcr.microsoft.com/mssql/server:2019-latest
+  #   environment:
+  #     ACCEPT_EULA: "Y"
+  #     SA_PASSWORD: "Forge123"
+  #   ports:
+  #     - "1433:1433"
+  #   restart: always
   redis:
     image: redis:7.0-alpine
     ports:

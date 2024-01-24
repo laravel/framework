@@ -96,7 +96,7 @@ class EnvironmentEncryptCommandTest extends TestCase
             ->assertExitCode(1);
     }
 
-    public function testItFailsWhenEncyptionFileExists()
+    public function testItFailsWhenEncryptionFileExists()
     {
         $this->filesystem->shouldReceive('exists')->andReturn(true);
 

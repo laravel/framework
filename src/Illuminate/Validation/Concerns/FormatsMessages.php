@@ -38,9 +38,9 @@ trait FormatsMessages
         $customKey = "validation.custom.{$attribute}.{$lowerRule}";
 
         $customMessage = $this->getCustomMessageFromTranslator(
-                in_array($rule, $this->sizeRules)
-                    ? [$customKey.".{$this->getAttributeType($attribute)}", $customKey]
-                    : $customKey
+            in_array($rule, $this->sizeRules)
+                ? [$customKey.".{$this->getAttributeType($attribute)}", $customKey]
+                : $customKey
         );
 
         // First we check for a custom defined validation message for the attribute
@@ -440,6 +440,10 @@ trait FormatsMessages
     {
         if (isset($this->customValues[$attribute][$value])) {
             return $this->customValues[$attribute][$value];
+        }
+
+        if (is_array($value)) {
+            return 'array';
         }
 
         $key = "validation.values.{$attribute}.{$value}";

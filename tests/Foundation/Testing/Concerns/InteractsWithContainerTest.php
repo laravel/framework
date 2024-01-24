@@ -13,7 +13,7 @@ class InteractsWithContainerTest extends TestCase
     {
         $instance = $this->withoutVite();
 
-        $this->assertSame('', app(Vite::class)(['resources/js/app.js']));
+        $this->assertSame('', app(Vite::class)(['resources/js/app.js'])->toHtml());
         $this->assertSame($this, $instance);
     }
 
@@ -75,19 +75,19 @@ class InteractsWithContainerTest extends TestCase
 
     public function testForgetMock()
     {
-        $this->mock(IntanceStub::class)
+        $this->mock(InstanceStub::class)
             ->shouldReceive('execute')
             ->once()
             ->andReturn('bar');
 
-        $this->assertSame('bar', $this->app->make(IntanceStub::class)->execute());
+        $this->assertSame('bar', $this->app->make(InstanceStub::class)->execute());
 
-        $this->forgetMock(IntanceStub::class);
-        $this->assertSame('foo', $this->app->make(IntanceStub::class)->execute());
+        $this->forgetMock(InstanceStub::class);
+        $this->assertSame('foo', $this->app->make(InstanceStub::class)->execute());
     }
 }
 
-class IntanceStub
+class InstanceStub
 {
     public function execute()
     {

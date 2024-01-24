@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Database\Eloquent\Factories\Factory;
+
 use function PHPStan\Testing\assertType;
 
 /**
@@ -74,11 +75,15 @@ assertType('Illuminate\Database\Eloquent\Model', $factory->createOneQuietly(func
 assertType('Illuminate\Database\Eloquent\Collection<int, Illuminate\Database\Eloquent\Model>', $factory->createMany(
     [['string' => 'string']]
 ));
+assertType('Illuminate\Database\Eloquent\Collection<int, Illuminate\Database\Eloquent\Model>', $factory->createMany(3));
+assertType('Illuminate\Database\Eloquent\Collection<int, Illuminate\Database\Eloquent\Model>', $factory->createMany());
 
 // assertType('Illuminate\Database\Eloquent\Collection<int, User>', $factory->createManyQuietly([['string' => 'string']]));
 assertType('Illuminate\Database\Eloquent\Collection<int, Illuminate\Database\Eloquent\Model>', $factory->createManyQuietly(
     [['string' => 'string']]
 ));
+assertType('Illuminate\Database\Eloquent\Collection<int, Illuminate\Database\Eloquent\Model>', $factory->createManyQuietly(3));
+assertType('Illuminate\Database\Eloquent\Collection<int, Illuminate\Database\Eloquent\Model>', $factory->createManyQuietly());
 
 // assertType('Illuminate\Database\Eloquent\Collection<int, User>|User', $factory->create());
 // assertType('Illuminate\Database\Eloquent\Collection<int, User>|User', $factory->create([
@@ -112,8 +117,8 @@ assertType('Illuminate\Database\Eloquent\Collection<int, Illuminate\Database\Elo
 // assertType('Closure(): Illuminate\Database\Eloquent\Collection<int, User>|User', $factory->lazy([
 //     'string' => 'string',
 // ]));
-assertType('Closure(): Illuminate\Database\Eloquent\Collection<int, Illuminate\Database\Eloquent\Model>|Illuminate\Database\Eloquent\Model', $factory->lazy());
-assertType('Closure(): Illuminate\Database\Eloquent\Collection<int, Illuminate\Database\Eloquent\Model>|Illuminate\Database\Eloquent\Model', $factory->lazy([
+assertType('Closure(): (Illuminate\Database\Eloquent\Collection<int, Illuminate\Database\Eloquent\Model>|Illuminate\Database\Eloquent\Model)', $factory->lazy());
+assertType('Closure(): (Illuminate\Database\Eloquent\Collection<int, Illuminate\Database\Eloquent\Model>|Illuminate\Database\Eloquent\Model)', $factory->lazy([
     'string' => 'string',
 ]));
 

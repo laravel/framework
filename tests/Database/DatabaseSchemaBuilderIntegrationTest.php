@@ -87,7 +87,10 @@ class DatabaseSchemaBuilderIntegrationTest extends TestCase
             $table->string('name')->index();
         });
 
-        $this->assertArrayHasKey('table1_name_index', $this->db->connection()->getDoctrineSchemaManager()->listTableIndexes('example_table1'));
+        $this->assertContains(
+            'table1_name_index',
+            array_column($this->db->connection()->getSchemaBuilder()->getIndexes('table1'), 'name')
+        );
     }
 
     public function testHasColumnAndIndexWithPrefixIndexEnabled()
@@ -104,7 +107,10 @@ class DatabaseSchemaBuilderIntegrationTest extends TestCase
             $table->string('name')->index();
         });
 
-        $this->assertArrayHasKey('example_table1_name_index', $this->db->connection()->getDoctrineSchemaManager()->listTableIndexes('example_table1'));
+        $this->assertContains(
+            'example_table1_name_index',
+            array_column($this->db->connection()->getSchemaBuilder()->getIndexes('table1'), 'name')
+        );
     }
 
     public function testDropColumnWithTablePrefix()

@@ -2,6 +2,8 @@
 
 namespace Illuminate\Tests\Integration\Routing;
 
+use Illuminate\Foundation\Auth\User;
+use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Support\Facades\Route;
 use Orchestra\Testbench\TestCase;
 
@@ -33,6 +35,19 @@ class RouteRedirectTest extends TestCase
             'route redirect with two optional replacements' => ['users/{user?}/{repo?}', 'members/{user?}', '/users/22', '/members/22'],
             'route redirect with two optional replacements that switch position' => ['users/{user?}/{switch?}', 'members/{switch?}/{user?}', '/users/11/22', '/members/22/11'],
         ];
+    }
+
+    public function testRouteRedirectWithExplicitRouteModelBinding()
+    {
+        $this->withoutExceptionHandling();
+        Route::middleware([SubstituteBindings::class])->group(function () {
+            Route::redirect('users/{user}', 'users/{user}/overview');
+        });
+        Route::bind('user', fn ($id) => (new User())->setAttribute('id', '999'));
+
+        $response = $this->get('users/1');
+
+        $response->assertRedirect('users/999/overview');
     }
 
     public function testToRouteHelper()

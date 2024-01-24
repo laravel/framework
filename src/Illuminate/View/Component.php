@@ -143,6 +143,10 @@ abstract class Component
         }
 
         $resolver = function ($view) {
+            if ($view instanceof ViewContract) {
+                return $view;
+            }
+
             return $this->extractBladeViewFromString($view);
         };
 
@@ -324,11 +328,16 @@ abstract class Component
         return array_merge([
             'data',
             'render',
+            'resolve',
             'resolveView',
             'shouldRender',
             'view',
             'withName',
             'withAttributes',
+            'flushCache',
+            'forgetFactory',
+            'forgetComponentsResolver',
+            'resolveComponentsUsing',
         ], $this->except);
     }
 

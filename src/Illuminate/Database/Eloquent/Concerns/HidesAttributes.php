@@ -77,7 +77,7 @@ trait HidesAttributes
         $this->hidden = array_diff($this->hidden, $attributes);
 
         if (! empty($this->visible)) {
-            $this->visible = array_merge($this->visible, $attributes);
+            $this->visible = array_values(array_unique(array_merge($this->visible, $attributes)));
         }
 
         return $this;
@@ -103,9 +103,9 @@ trait HidesAttributes
      */
     public function makeHidden($attributes)
     {
-        $this->hidden = array_merge(
+        $this->hidden = array_values(array_unique(array_merge(
             $this->hidden, is_array($attributes) ? $attributes : func_get_args()
-        );
+        )));
 
         return $this;
     }

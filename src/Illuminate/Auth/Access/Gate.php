@@ -69,6 +69,13 @@ class Gate implements GateContract
     protected $stringCallbacks = [];
 
     /**
+     * The default denial response for gates and policies.
+     *
+     * @var \Illuminate\Auth\Access\Response|null
+     */
+    protected $defaultDenialResponse;
+
+    /**
      * The callback to be used to guess policy names.
      *
      * @var callable|null
@@ -87,9 +94,13 @@ class Gate implements GateContract
      * @param  callable|null  $guessPolicyNamesUsingCallback
      * @return void
      */
-    public function __construct(Container $container, callable $userResolver, array $abilities = [],
-                                array $policies = [], array $beforeCallbacks = [], array $afterCallbacks = [],
-                                callable $guessPolicyNamesUsingCallback = null)
+    public function __construct(Container $container,
+        callable $userResolver,
+        array $abilities = [],
+        array $policies = [],
+        array $beforeCallbacks = [],
+        array $afterCallbacks = [],
+        callable $guessPolicyNamesUsingCallback = null)
     {
         $this->policies = $policies;
         $this->container = $container;
@@ -307,9 +318,9 @@ class Gate implements GateContract
     }
 
     /**
-     * Determine if the given ability should be granted for the current user.
+     * Determine if all of the given abilities should be granted for the current user.
      *
-     * @param  string  $ability
+     * @param  iterable|string  $ability
      * @param  array|mixed  $arguments
      * @return bool
      */
@@ -319,9 +330,9 @@ class Gate implements GateContract
     }
 
     /**
-     * Determine if the given ability should be denied for the current user.
+     * Determine if any of the given abilities should be denied for the current user.
      *
-     * @param  string  $ability
+     * @param  iterable|string  $ability
      * @param  array|mixed  $arguments
      * @return bool
      */
@@ -398,7 +409,9 @@ class Gate implements GateContract
                 return $result;
             }
 
-            return $result ? Response::allow() : Response::deny();
+            return $result
+                ? Response::allow()
+                : ($this->defaultDenialResponse ?? Response::deny());
         } catch (AuthorizationException $e) {
             return $e->toResponse();
         }
@@ -855,6 +868,19 @@ class Gate implements GateContract
     public function policies()
     {
         return $this->policies;
+    }
+
+    /**
+     * Set the default denial response for gates and policies.
+     *
+     * @param  \Illuminate\Auth\Access\Response  $response
+     * @return $this
+     */
+    public function defaultDenialResponse(Response $response)
+    {
+        $this->defaultDenialResponse = $response;
+
+        return $this;
     }
 
     /**

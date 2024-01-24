@@ -39,6 +39,7 @@ namespace Illuminate\Support\Facades;
  * @method static \Illuminate\Routing\UrlGenerator setSessionResolver(callable $sessionResolver)
  * @method static \Illuminate\Routing\UrlGenerator setKeyResolver(callable $keyResolver)
  * @method static \Illuminate\Routing\UrlGenerator withKeyResolver(callable $keyResolver)
+ * @method static \Illuminate\Routing\UrlGenerator resolveMissingNamedRoutesUsing(callable $missingNamedRouteResolver)
  * @method static string getRootControllerNamespace()
  * @method static \Illuminate\Routing\UrlGenerator setRootControllerNamespace(string $rootNamespace)
  * @method static void macro(string $name, object|callable $macro)

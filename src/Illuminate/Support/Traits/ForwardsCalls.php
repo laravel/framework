@@ -51,11 +51,7 @@ trait ForwardsCalls
     {
         $result = $this->forwardCallTo($object, $method, $parameters);
 
-        if ($result === $object) {
-            return $this;
-        }
-
-        return $result;
+        return $result === $object ? $this : $result;
     }
 
     /**

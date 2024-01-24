@@ -5,6 +5,8 @@ namespace Illuminate\Support\Facades;
 /**
  * @method static bool shouldBlock()
  * @method static string|null blockDriver()
+ * @method static int defaultRouteBlockLockSeconds()
+ * @method static int defaultRouteBlockWaitSeconds()
  * @method static array getSessionConfig()
  * @method static string getDefaultDriver()
  * @method static void setDefaultDriver(string $name)
@@ -19,6 +21,7 @@ namespace Illuminate\Support\Facades;
  * @method static void ageFlashData()
  * @method static array all()
  * @method static array only(array $keys)
+ * @method static array except(array $keys)
  * @method static bool exists(string|array $key)
  * @method static bool missing(string|array $key)
  * @method static bool has(string|array $key)

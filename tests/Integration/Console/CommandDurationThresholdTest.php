@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Integration\Console;
 use Carbon\CarbonInterval;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Config;
 use Orchestra\Testbench\TestCase;
 use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\Console\Output\ConsoleOutput;
@@ -176,5 +177,33 @@ class CommandDurationThresholdTest extends TestCase
 
         $kernel->terminate($input, 21);
         $this->assertNull($kernel->commandStartedAt());
+    }
+
+    public function testUsesTheConfiguredDateTimezone()
+    {
+        Config::set('app.timezone', 'UTC');
+        $startedAt = null;
+        $kernel = $this->app[Kernel::class];
+        $kernel->command('foo', fn () => null);
+        $kernel->whenCommandLifecycleIsLongerThan(0, function ($started) use (&$startedAt) {
+            $startedAt = $started;
+        });
+
+        Config::set('app.timezone', 'Australia/Melbourne');
+        Carbon::setTestNow(Carbon::now());
+        $kernel->handle($input = new StringInput('foo'), new ConsoleOutput);
+
+        Carbon::setTestNow(now()->addMinute());
+        $kernel->terminate($input, 21);
+
+        $this->assertSame('Australia/Melbourne', $startedAt->timezone->getName());
+    }
+
+    public function testItHandlesCallingTerminateWithoutHandle()
+    {
+        $this->app[Kernel::class]->terminate(new StringInput('foo'), 21);
+
+        // this is a placeholder just to show that the above did not throw an exception.
+        $this->assertTrue(true);
     }
 }

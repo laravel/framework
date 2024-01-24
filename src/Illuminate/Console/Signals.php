@@ -84,7 +84,7 @@ class Signals
     /**
      * Unregister the current signal handlers.
      *
-     * @return array<int, array<int, callable(int $signal): void>>
+     * @return void
      */
     public function unregister()
     {

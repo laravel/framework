@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Schema;
 
 class EloquentPivotSerializationTest extends DatabaseTestCase
 {
-    protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
+    protected function afterRefreshingDatabase()
     {
         Schema::create('users', function (Blueprint $table) {
             $table->increments('id');
@@ -182,9 +182,13 @@ class PivotSerializationTestTag extends Model
 class PivotSerializationTestCollaborator extends Pivot
 {
     public $table = 'project_users';
+
+    public $timestamps = false;
 }
 
 class PivotSerializationTestTagAttachment extends MorphPivot
 {
     public $table = 'taggables';
+
+    public $timestamps = false;
 }

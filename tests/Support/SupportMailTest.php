@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Support;
 
+use Illuminate\Mail\Mailable;
 use Illuminate\Support\Facades\Mail;
 use Orchestra\Testbench\TestCase;
 
@@ -27,5 +28,28 @@ class SupportMailTest extends TestCase
         Mail::fake();
 
         $this->assertEquals('it works!', Mail::test('foo'));
+    }
+
+    public function testEmailSent()
+    {
+        Mail::fake();
+        Mail::assertNothingSent();
+
+        Mail::to('hello@laravel.com')->send(new TestMail());
+
+        Mail::assertSent(TestMail::class);
+    }
+}
+
+class TestMail extends Mailable
+{
+    /**
+     * Build the message.
+     *
+     * @return $this
+     */
+    public function build()
+    {
+        return $this->view('view');
     }
 }

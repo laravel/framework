@@ -35,6 +35,7 @@ use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalHasAttrib
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalMerging;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalPivotRelationship;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalRelationship;
+use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalRelationshipAggregates;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalRelationshipCounts;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithoutWrap;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithUnlessOptionalData;
@@ -445,6 +446,63 @@ class ResourceTest extends TestCase
                 'id' => 5,
                 'author' => ['name' => 'jrrmartin'],
                 'author_name' => 'jrrmartin',
+            ],
+        ]);
+    }
+
+    public function testResourcesMayLoadOptionalRelationshipAggregates()
+    {
+        Route::get('/', function () {
+            $post = new Post([
+                'id' => 5,
+                'title' => 'Test Title',
+                'comments_avg_rating' => 3.8,
+                'comments_min_rating' => 2,
+                'comments_max_rating' => 5,
+            ]);
+
+            return new PostResourceWithOptionalRelationshipAggregates($post);
+        });
+
+        $response = $this->withoutExceptionHandling()->get(
+            '/', ['Accept' => 'application/json']
+        );
+
+        $response->assertStatus(200);
+
+        $response->assertExactJson([
+            'data' => [
+                'id' => 5,
+                'title' => 'Test Title',
+                'average_rating' => 3.8,
+                'minimum_rating' => 2,
+                'maximum_rating' => '5 ratings',
+            ],
+        ]);
+    }
+
+    public function testResourcesMayHaveOptionalRelationshipAggregates()
+    {
+        Route::get('/', function () {
+            $post = new Post([
+                'id' => 5,
+                'title' => 'Test Title',
+            ]);
+
+            return new PostResourceWithOptionalRelationshipAggregates($post);
+        });
+
+        $response = $this->withoutExceptionHandling()->get(
+            '/', ['Accept' => 'application/json']
+        );
+
+        $response->assertStatus(200);
+
+        $response->assertExactJson([
+            'data' => [
+                'id' => 5,
+                'title' => 'Test Title',
+                'maximum_rating' => 'Default Value',
             ],
         ]);
     }
@@ -1160,7 +1218,7 @@ class ResourceTest extends TestCase
         });
     }
 
-    public function testCollectionResourceWithPaginationInfomation()
+    public function testCollectionResourceWithPaginationInformation()
     {
         $posts = collect([
             new Post(['id' => 5, 'title' => 'Test Title']),
@@ -1191,7 +1249,7 @@ class ResourceTest extends TestCase
         ]);
     }
 
-    public function testResourceWithPaginationInfomation()
+    public function testResourceWithPaginationInformation()
     {
         $posts = collect([
             new Post(['id' => 5, 'title' => 'Test Title']),
@@ -1286,7 +1344,7 @@ class ResourceTest extends TestCase
         $response->assertJson(['data' => $data]);
     }
 
-    public function testKeysArePreservedInAnAnonymousColletionIfTheResourceIsFlaggedToPreserveKeys()
+    public function testKeysArePreservedInAnAnonymousCollectionIfTheResourceIsFlaggedToPreserveKeys()
     {
         $data = Collection::make([
             [
@@ -1535,6 +1593,29 @@ class ResourceTest extends TestCase
 
         $this->assertEquals([
             'Taylor', 'Mohamed', 'Jeffrey',
+        ], $results);
+    }
+
+    public function testMergeValuesMayFallbackToDefaults()
+    {
+        $filter = new class
+        {
+            use ConditionallyLoadsAttributes;
+
+            public function work()
+            {
+                return $this->filter([
+                    $this->mergeUnless(false, ['Taylor', 'Mohamed'], ['First', 'Second']),
+                    $this->mergeWhen(false, ['Adam', 'Matt'], ['Abigail', 'Lydia']),
+                    'Jeffrey',
+                ]);
+            }
+        };
+
+        $results = $filter->work();
+
+        $this->assertEquals([
+            'Taylor', 'Mohamed', 'Abigail', 'Lydia', 'Jeffrey',
         ], $results);
     }
 

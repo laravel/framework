@@ -3,8 +3,9 @@
 namespace Illuminate\Console\View\Components;
 
 use Symfony\Component\Console\Output\OutputInterface;
-use function Termwind\terminal;
 use Throwable;
+
+use function Termwind\terminal;
 
 class Task extends Component
 {

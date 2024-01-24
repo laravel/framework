@@ -167,13 +167,14 @@ class PostgresConnector extends Connector implements ConnectorInterface
         // name than the database used for "information_schema" queries. This is
         // typically the case if using "pgbouncer" type software when pooling.
         $database = $connect_via_database ?? $database;
+        $port = $connect_via_port ?? $port ?? null;
 
         $dsn = "pgsql:{$host}dbname='{$database}'";
 
         // If a port was specified, we will add it to this Postgres DSN connections
         // format. Once we have done that we are ready to return this connection
         // string back out for usage, as this has been fully constructed here.
-        if (isset($config['port'])) {
+        if (! is_null($port)) {
             $dsn .= ";port={$port}";
         }
 

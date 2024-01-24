@@ -8,10 +8,12 @@ use Illuminate\Contracts\Validation\InvokableRule;
 use Illuminate\Contracts\Validation\Rule;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Contracts\Validation\ValidatorAwareRule;
-use Illuminate\Translation\PotentiallyTranslatedString;
+use Illuminate\Translation\CreatesPotentiallyTranslatedStrings;
 
 class InvokableValidationRule implements Rule, ValidatorAwareRule
 {
+    use CreatesPotentiallyTranslatedStrings;
+
     /**
      * The invokable that validates the attribute.
      *
@@ -62,14 +64,12 @@ class InvokableValidationRule implements Rule, ValidatorAwareRule
      * Create a new implicit or explicit Invokable validation rule.
      *
      * @param  \Illuminate\Contracts\Validation\ValidationRule|\Illuminate\Contracts\Validation\InvokableRule  $invokable
-     * @return \Illuminate\Contracts\Validation\Rule
+     * @return \Illuminate\Contracts\Validation\Rule|\Illuminate\Validation\InvokableValidationRule
      */
     public static function make($invokable)
     {
         if ($invokable->implicit ?? false) {
-            return new class($invokable) extends InvokableValidationRule implements ImplicitRule
-            {
-                //
+            return new class($invokable) extends InvokableValidationRule implements ImplicitRule {
             };
         }
 
@@ -152,53 +152,5 @@ class InvokableValidationRule implements Rule, ValidatorAwareRule
         $this->validator = $validator;
 
         return $this;
-    }
-
-    /**
-     * Create a pending potentially translated string.
-     *
-     * @param  string  $attribute
-     * @param  string|null  $message
-     * @return \Illuminate\Translation\PotentiallyTranslatedString
-     */
-    protected function pendingPotentiallyTranslatedString($attribute, $message)
-    {
-        $destructor = $message === null
-            ? fn ($message) => $this->messages[] = $message
-            : fn ($message) => $this->messages[$attribute] = $message;
-
-        return new class($message ?? $attribute, $this->validator->getTranslator(), $destructor) extends PotentiallyTranslatedString
-        {
-            /**
-             * The callback to call when the object destructs.
-             *
-             * @var \Closure
-             */
-            protected $destructor;
-
-            /**
-             * Create a new pending potentially translated string.
-             *
-             * @param  string  $message
-             * @param  \Illuminate\Contracts\Translation\Translator  $translator
-             * @param  \Closure  $destructor
-             */
-            public function __construct($message, $translator, $destructor)
-            {
-                parent::__construct($message, $translator);
-
-                $this->destructor = $destructor;
-            }
-
-            /**
-             * Handle the object's destruction.
-             *
-             * @return void
-             */
-            public function __destruct()
-            {
-                ($this->destructor)($this->toString());
-            }
-        };
     }
 }

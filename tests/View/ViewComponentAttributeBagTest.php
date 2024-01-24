@@ -113,13 +113,33 @@ class ViewComponentAttributeBagTest extends TestCase
         $this->assertSame('required="required" x-data=""', (string) $bag);
     }
 
-    public function testAttibuteExistence()
+    public function testAttributeExistence()
     {
         $bag = new ComponentAttributeBag(['name' => 'test']);
 
         $this->assertTrue((bool) $bag->has('name'));
+        $this->assertTrue((bool) $bag->has(['name']));
+        $this->assertTrue((bool) $bag->hasAny(['class', 'name']));
+        $this->assertTrue((bool) $bag->hasAny('class', 'name'));
         $this->assertFalse((bool) $bag->missing('name'));
         $this->assertFalse((bool) $bag->has('class'));
+        $this->assertFalse((bool) $bag->has(['class']));
+        $this->assertFalse((bool) $bag->has(['name', 'class']));
+        $this->assertFalse((bool) $bag->has('name', 'class'));
         $this->assertTrue((bool) $bag->missing('class'));
+    }
+
+    public function testAttributeIsEmpty()
+    {
+        $bag = new ComponentAttributeBag([]);
+
+        $this->assertTrue((bool) $bag->isEmpty());
+    }
+
+    public function testAttributeIsNotEmpty()
+    {
+        $bag = new ComponentAttributeBag(['name' => 'test']);
+
+        $this->assertTrue((bool) $bag->isNotEmpty());
     }
 }

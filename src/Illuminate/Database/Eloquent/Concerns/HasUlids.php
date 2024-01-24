@@ -8,19 +8,23 @@ use Illuminate\Support\Str;
 trait HasUlids
 {
     /**
-     * Boot the trait.
+     * Initialize the trait.
      *
      * @return void
      */
-    public static function bootHasUlids()
+    public function initializeHasUlids()
     {
-        static::creating(function (self $model) {
-            foreach ($model->uniqueIds() as $column) {
-                if (empty($model->{$column})) {
-                    $model->{$column} = $model->newUniqueId();
-                }
-            }
-        });
+        $this->usesUniqueIds = true;
+    }
+
+    /**
+     * Get the columns that should receive a unique identifier.
+     *
+     * @return array
+     */
+    public function uniqueIds()
+    {
+        return [$this->getKeyName()];
     }
 
     /**
@@ -54,16 +58,6 @@ trait HasUlids
         }
 
         return parent::resolveRouteBindingQuery($query, $value, $field);
-    }
-
-    /**
-     * Get the columns that should receive a unique identifier.
-     *
-     * @return array
-     */
-    public function uniqueIds()
-    {
-        return [$this->getKeyName()];
     }
 
     /**

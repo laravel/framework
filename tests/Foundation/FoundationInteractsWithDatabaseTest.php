@@ -238,6 +238,21 @@ class FoundationInteractsWithDatabaseTest extends TestCase
         $this->assertSoftDeleted($model, ['name' => 'Tailwind']);
     }
 
+    public function testAssertSoftDeletedInDatabaseDoesNotFindModePassedViaFcnWithCustomColumnResults()
+    {
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage('The table is empty.');
+
+        $model = new CustomProductStub(['id' => 1, 'name' => 'Laravel']);
+        $this->data = ['id' => 1];
+
+        $builder = $this->mockCountBuilder(0, 'trashed_at');
+
+        $builder->shouldReceive('get')->andReturn(collect());
+
+        $this->assertSoftDeleted(CustomProductStub::class, ['id' => $model->id]);
+    }
+
     public function testAssertNotSoftDeletedInDatabaseFindsResults()
     {
         $this->mockCountBuilder(1);
@@ -305,6 +320,21 @@ class FoundationInteractsWithDatabaseTest extends TestCase
         $this->assertNotSoftDeleted($model, ['name' => 'Tailwind']);
     }
 
+    public function testAssertNotSoftDeletedInDatabaseDoesNotFindModelPassedViaFcnWithCustomColumnResults()
+    {
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage('The table is empty.');
+
+        $model = new CustomProductStub(['id' => 1, 'name' => 'Laravel']);
+        $this->data = ['id' => 1];
+
+        $builder = $this->mockCountBuilder(0, 'trashed_at');
+
+        $builder->shouldReceive('get')->andReturn(collect());
+
+        $this->assertNotSoftDeleted(CustomProductStub::class, ['id' => $model->id]);
+    }
+
     public function testAssertExistsPassesWhenFindsResults()
     {
         $this->data = ['id' => 1];
@@ -321,6 +351,12 @@ class FoundationInteractsWithDatabaseTest extends TestCase
         $this->assertEquals($this->table, $this->getTable(ProductStub::class));
         $this->assertEquals($this->table, $this->getTable(new ProductStub));
         $this->assertEquals($this->table, $this->getTable($this->table));
+    }
+
+    public function testGetTableCustomizedDeletedAtColumnName()
+    {
+        $this->assertEquals('trashed_at', $this->getDeletedAtColumn(CustomProductStub::class));
+        $this->assertEquals('trashed_at', $this->getDeletedAtColumn(new CustomProductStub()));
     }
 
     public function testExpectsDatabaseQueryCount()
@@ -385,6 +421,31 @@ class FoundationInteractsWithDatabaseTest extends TestCase
         } catch (ExpectationFailedException $e) {
             $this->assertSame("Expected 3 database queries on the [testing] connection. 4 occurred.\nFailed asserting that 3 is identical to 4.", $e->getMessage());
         }
+
+        $case = new class('foo') extends TestingTestCase
+        {
+            use CreatesApplication;
+
+            public function testExpectsDatabaseQueryCount()
+            {
+                $this->expectsDatabaseQueryCount(4);
+                $this->expectsDatabaseQueryCount(1, 'mysql');
+
+                DB::pretend(function ($db) {
+                    $db->table('foo')->count();
+                    $db->table('foo')->count();
+                    $db->table('foo')->count();
+                });
+
+                DB::connection('mysql')->pretend(function ($db) {
+                    $db->table('foo')->count();
+                });
+            }
+        };
+
+        $case->setUp();
+        $case->testExpectsDatabaseQueryCount();
+        $case->tearDown();
     }
 
     protected function mockCountBuilder($countResult, $deletedAtColumn = 'deleted_at')

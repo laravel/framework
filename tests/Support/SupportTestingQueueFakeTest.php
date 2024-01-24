@@ -176,6 +176,18 @@ class SupportTestingQueueFakeTest extends TestCase
         $this->fake->assertPushed(JobStub::class, 2);
     }
 
+    public function testAssertCount()
+    {
+        $this->fake->push(function () {
+            // Do nothing
+        });
+
+        $this->fake->push($this->job);
+        $this->fake->push($this->job);
+
+        $this->fake->assertCount(3);
+    }
+
     public function testAssertNothingPushed()
     {
         $this->fake->assertNothingPushed();
@@ -374,6 +386,37 @@ class SupportTestingQueueFakeTest extends TestCase
         $fake->assertNotPushed(JobStub::class);
         $fake->assertPushed(JobToFakeStub::class);
     }
+
+    public function testItCanSerializeAndRestoreJobs()
+    {
+        // confirm that the default behavior is maintained
+        $this->fake->push(new JobWithSerialization('hello'));
+        $this->fake->assertPushed(JobWithSerialization::class, fn ($job) => $job->value === 'hello');
+
+        $job = new JobWithSerialization('hello');
+
+        $fake = new QueueFake(new Application);
+        $fake->serializeAndRestore();
+        $fake->push($job);
+
+        $fake->assertPushed(
+            JobWithSerialization::class,
+            fn ($job) => $job->value === 'hello-serialized-unserialized'
+        );
+    }
+
+    public function testItCanFakePushedJobsWithClassAndPayload()
+    {
+        $fake = new QueueFake(new Application, ['JobStub']);
+
+        $this->assertTrue($fake->shouldFakeJob('JobStub'));
+
+        $fake->push('JobStub', ['job' => 'payload']);
+
+        $fake->assertPushed('JobStub');
+        $fake->assertPushed('JobStub', 1);
+        $fake->assertPushed('JobStub', fn ($job, $queue, $payload) => $payload === ['job' => 'payload']);
+    }
 }
 
 class JobStub
@@ -422,5 +465,24 @@ class JobWithChainAndParameterStub
     public function handle()
     {
         //
+    }
+}
+
+class JobWithSerialization
+{
+    use Queueable;
+
+    public function __construct(public $value)
+    {
+    }
+
+    public function __serialize(): array
+    {
+        return ['value' => $this->value.'-serialized'];
+    }
+
+    public function __unserialize(array $data): void
+    {
+        $this->value = $data['value'].'-unserialized';
     }
 }

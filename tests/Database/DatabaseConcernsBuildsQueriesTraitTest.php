@@ -9,7 +9,11 @@ class DatabaseConcernsBuildsQueriesTraitTest extends TestCase
 {
     public function testTapCallbackInstance()
     {
-        $mock = $this->getMockForTrait(BuildsQueries::class);
+        $mock = new class
+        {
+            use BuildsQueries;
+        };
+
         $mock->tap(function ($builder) use ($mock) {
             $this->assertEquals($mock, $builder);
         });

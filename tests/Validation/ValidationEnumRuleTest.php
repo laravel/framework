@@ -11,11 +11,11 @@ use Illuminate\Validation\ValidationServiceProvider;
 use Illuminate\Validation\Validator;
 use PHPUnit\Framework\TestCase;
 
-include 'Enums.php';
+include_once 'Enums.php';
 
 class ValidationEnumRuleTest extends TestCase
 {
-    public function testvalidationPassesWhenPassingCorrectEnum()
+    public function testValidationPassesWhenPassingCorrectEnum()
     {
         $v = new Validator(
             resolve('translator'),
@@ -32,7 +32,7 @@ class ValidationEnumRuleTest extends TestCase
         $this->assertFalse($v->fails());
     }
 
-    public function testvalidationPassesWhenPassingInstanceOfEnum()
+    public function testValidationPassesWhenPassingInstanceOfEnum()
     {
         $v = new Validator(
             resolve('translator'),
@@ -47,7 +47,7 @@ class ValidationEnumRuleTest extends TestCase
         $this->assertFalse($v->fails());
     }
 
-    public function testvalidationPassesWhenPassingInstanceOfPureEnum()
+    public function testValidationPassesWhenPassingInstanceOfPureEnum()
     {
         $v = new Validator(
             resolve('translator'),

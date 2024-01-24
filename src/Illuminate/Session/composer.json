@@ -22,7 +22,7 @@
         "illuminate/filesystem": "^10.0",
         "illuminate/support": "^10.0",
         "symfony/finder": "^6.2",
-        "symfony/http-foundation": "^6.2"
+        "symfony/http-foundation": "^6.4"
     },
     "autoload": {
         "psr-4": {

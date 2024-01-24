@@ -104,6 +104,35 @@ class DatabaseConnectionTest extends TestCase
         $this->assertIsNumeric($log[0]['time']);
     }
 
+    public function testSelectResultsetsReturnsMultipleRowset()
+    {
+        $pdo = $this->getMockBuilder(DatabaseConnectionTestMockPDO::class)->onlyMethods(['prepare'])->getMock();
+        $writePdo = $this->getMockBuilder(DatabaseConnectionTestMockPDO::class)->onlyMethods(['prepare'])->getMock();
+        $writePdo->expects($this->never())->method('prepare');
+        $statement = $this->getMockBuilder('PDOStatement')
+            ->onlyMethods(['setFetchMode', 'execute', 'fetchAll', 'bindValue', 'nextRowset'])
+            ->getMock();
+        $statement->expects($this->once())->method('setFetchMode');
+        $statement->expects($this->once())->method('bindValue')->with(1, 'foo', 2);
+        $statement->expects($this->once())->method('execute');
+        $statement->expects($this->atLeastOnce())->method('fetchAll')->willReturn(['boom']);
+        $statement->expects($this->atLeastOnce())->method('nextRowset')->willReturnCallback(function () {
+            static $i = 1;
+
+            return ++$i <= 2;
+        });
+        $pdo->expects($this->once())->method('prepare')->with('CALL a_procedure(?)')->willReturn($statement);
+        $mock = $this->getMockConnection(['prepareBindings'], $writePdo);
+        $mock->setReadPdo($pdo);
+        $mock->expects($this->once())->method('prepareBindings')->with($this->equalTo(['foo']))->willReturn(['foo']);
+        $results = $mock->selectResultsets('CALL a_procedure(?)', ['foo']);
+        $this->assertEquals([['boom'], ['boom']], $results);
+        $log = $mock->getQueryLog();
+        $this->assertSame('CALL a_procedure(?)', $log[0]['query']);
+        $this->assertEquals(['foo'], $log[0]['bindings']);
+        $this->assertIsNumeric($log[0]['time']);
+    }
+
     public function testInsertCallsTheStatementMethod()
     {
         $connection = $this->getMockConnection(['statement']);
@@ -383,7 +412,6 @@ class DatabaseConnectionTest extends TestCase
     public function testRunMethodRetriesOnFailure()
     {
         $method = (new ReflectionClass(Connection::class))->getMethod('run');
-        $method->setAccessible(true);
 
         $pdo = $this->createMock(DatabaseConnectionTestMockPDO::class);
         $mock = $this->getMockConnection(['tryAgainIfCausedByLostConnection'], $pdo);
@@ -400,7 +428,6 @@ class DatabaseConnectionTest extends TestCase
         $this->expectExceptionMessage('(Connection: conn, SQL: ) (Connection: , SQL: )');
 
         $method = (new ReflectionClass(Connection::class))->getMethod('run');
-        $method->setAccessible(true);
 
         $pdo = $this->getMockBuilder(DatabaseConnectionTestMockPDO::class)->onlyMethods(['beginTransaction'])->getMock();
         $mock = $this->getMockConnection(['tryAgainIfCausedByLostConnection'], $pdo);
@@ -473,6 +500,32 @@ class DatabaseConnectionTest extends TestCase
         $schema = $connection->getSchemaBuilder();
         $this->assertInstanceOf(Builder::class, $schema);
         $this->assertSame($connection, $schema->getConnection());
+    }
+
+    public function testGetRawQueryLog()
+    {
+        $mock = $this->getMockConnection(['getQueryLog']);
+        $mock->expects($this->once())->method('getQueryLog')->willReturn([
+            [
+                'query' => 'select * from tbl where col = ?',
+                'bindings' => [
+                    0 => 'foo',
+                ],
+                'time' => 1.23,
+            ],
+        ]);
+
+        $queryGrammar = $this->createMock(Grammar::class);
+        $queryGrammar->expects($this->once())
+            ->method('substituteBindingsIntoRawSql')
+            ->with('select * from tbl where col = ?', ['foo'])
+            ->willReturn("select * from tbl where col = 'foo'");
+        $mock->setQueryGrammar($queryGrammar);
+
+        $log = $mock->getRawQueryLog();
+
+        $this->assertEquals("select * from tbl where col = 'foo'", $log[0]['raw_query']);
+        $this->assertEquals(1.23, $log[0]['time']);
     }
 
     protected function getMockConnection($methods = [], $pdo = null)

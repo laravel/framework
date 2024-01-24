@@ -69,6 +69,8 @@ class SqlServerGrammar extends Grammar
     /**
      * Compile the query to determine if a table exists.
      *
+     * @deprecated Will be removed in a future Laravel version.
+     *
      * @return string
      */
     public function compileTableExists()
@@ -77,7 +79,60 @@ class SqlServerGrammar extends Grammar
     }
 
     /**
+     * Compile the query to determine the tables.
+     *
+     * @return string
+     */
+    public function compileTables()
+    {
+        return 'select t.name as name, SCHEMA_NAME(t.schema_id) as [schema], sum(u.total_pages) * 8 * 1024 as size '
+            .'from sys.tables as t '
+            .'join sys.partitions as p on p.object_id = t.object_id '
+            .'join sys.allocation_units as u on u.container_id = p.hobt_id '
+            .'group by t.name, t.schema_id '
+            .'order by t.name';
+    }
+
+    /**
+     * Compile the query to determine the views.
+     *
+     * @return string
+     */
+    public function compileViews()
+    {
+        return 'select name, SCHEMA_NAME(v.schema_id) as [schema], definition from sys.views as v '
+            .'inner join sys.sql_modules as m on v.object_id = m.object_id '
+            .'order by name';
+    }
+
+    /**
+     * Compile the SQL needed to retrieve all table names.
+     *
+     * @deprecated Will be removed in a future Laravel version.
+     *
+     * @return string
+     */
+    public function compileGetAllTables()
+    {
+        return "select name, type from sys.tables where type = 'U'";
+    }
+
+    /**
+     * Compile the SQL needed to retrieve all view names.
+     *
+     * @deprecated Will be removed in a future Laravel version.
+     *
+     * @return string
+     */
+    public function compileGetAllViews()
+    {
+        return "select name, type from sys.objects where type = 'V'";
+    }
+
+    /**
      * Compile the query to determine the list of columns.
+     *
+     * @deprecated Will be removed in a future Laravel version.
      *
      * @param  string  $table
      * @return string
@@ -85,6 +140,83 @@ class SqlServerGrammar extends Grammar
     public function compileColumnListing($table)
     {
         return "select name from sys.columns where object_id = object_id('$table')";
+    }
+
+    /**
+     * Compile the query to determine the columns.
+     *
+     * @param  string  $table
+     * @return string
+     */
+    public function compileColumns($table)
+    {
+        return sprintf(
+            'select col.name, type.name as type_name, '
+            .'col.max_length as length, col.precision as precision, col.scale as places, '
+            .'col.is_nullable as nullable, def.definition as [default], '
+            .'col.is_identity as autoincrement, col.collation_name as collation, '
+            .'cast(prop.value as nvarchar(max)) as comment '
+            .'from sys.columns as col '
+            .'join sys.types as type on col.user_type_id = type.user_type_id '
+            .'join sys.objects as obj on col.object_id = obj.object_id '
+            .'join sys.schemas as scm on obj.schema_id = scm.schema_id '
+            .'left join sys.default_constraints def on col.default_object_id = def.object_id and col.object_id = def.parent_object_id '
+            ."left join sys.extended_properties as prop on obj.object_id = prop.major_id and col.column_id = prop.minor_id and prop.name = 'MS_Description' "
+            ."where obj.type in ('U', 'V') and obj.name = %s and scm.name = SCHEMA_NAME() "
+            .'order by col.column_id',
+            $this->quoteString($table),
+        );
+    }
+
+    /**
+     * Compile the query to determine the indexes.
+     *
+     * @param  string  $table
+     * @return string
+     */
+    public function compileIndexes($table)
+    {
+        return sprintf(
+            "select idx.name as name, string_agg(col.name, ',') within group (order by idxcol.key_ordinal) as columns, "
+            .'idx.type_desc as [type], idx.is_unique as [unique], idx.is_primary_key as [primary] '
+            .'from sys.indexes as idx '
+            .'join sys.tables as tbl on idx.object_id = tbl.object_id '
+            .'join sys.schemas as scm on tbl.schema_id = scm.schema_id '
+            .'join sys.index_columns as idxcol on idx.object_id = idxcol.object_id and idx.index_id = idxcol.index_id '
+            .'join sys.columns as col on idxcol.object_id = col.object_id and idxcol.column_id = col.column_id '
+            .'where tbl.name = %s and scm.name = SCHEMA_NAME() '
+            .'group by idx.name, idx.type_desc, idx.is_unique, idx.is_primary_key',
+            $this->quoteString($table),
+        );
+    }
+
+    /**
+     * Compile the query to determine the foreign keys.
+     *
+     * @param  string  $table
+     * @return string
+     */
+    public function compileForeignKeys($table)
+    {
+        return sprintf(
+            'select fk.name as name, '
+            ."string_agg(lc.name, ',') within group (order by fkc.constraint_column_id) as columns, "
+            .'fs.name as foreign_schema, ft.name as foreign_table, '
+            ."string_agg(fc.name, ',') within group (order by fkc.constraint_column_id) as foreign_columns, "
+            .'fk.update_referential_action_desc as on_update, '
+            .'fk.delete_referential_action_desc as on_delete '
+            .'from sys.foreign_keys as fk '
+            .'join sys.foreign_key_columns as fkc on fkc.constraint_object_id = fk.object_id '
+            .'join sys.tables as lt on lt.object_id = fk.parent_object_id '
+            .'join sys.schemas as ls on lt.schema_id = ls.schema_id '
+            .'join sys.columns as lc on fkc.parent_object_id = lc.object_id and fkc.parent_column_id = lc.column_id '
+            .'join sys.tables as ft on ft.object_id = fk.referenced_object_id '
+            .'join sys.schemas as fs on ft.schema_id = fs.schema_id '
+            .'join sys.columns as fc on fkc.referenced_object_id = fc.object_id and fkc.referenced_column_id = fc.column_id '
+            .'where lt.name = %s and ls.name = SCHEMA_NAME() '
+            .'group by fk.name, fs.name, ft.name, fk.update_referential_action_desc, fk.delete_referential_action_desc',
+            $this->quoteString($table)
+        );
     }
 
     /**
@@ -475,26 +607,6 @@ class SqlServerGrammar extends Grammar
             FROM sys.views;
 
             EXEC sp_executesql @sql;";
-    }
-
-    /**
-     * Compile the SQL needed to retrieve all table names.
-     *
-     * @return string
-     */
-    public function compileGetAllTables()
-    {
-        return "select name, type from sys.tables where type = 'U'";
-    }
-
-    /**
-     * Compile the SQL needed to retrieve all view names.
-     *
-     * @return string
-     */
-    public function compileGetAllViews()
-    {
-        return "select name, type from sys.objects where type = 'V'";
     }
 
     /**
@@ -937,7 +1049,7 @@ class SqlServerGrammar extends Grammar
      */
     protected function typeComputed(Fluent $column)
     {
-        return "as ({$column->expression})";
+        return "as ({$this->getValue($column->expression)})";
     }
 
     /**

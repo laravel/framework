@@ -47,7 +47,7 @@ class Line extends Component
         ]);
 
         $this->renderView('line', array_merge(static::$styles[$style], [
-            'marginTop' => ($this->output instanceof NewLineAware && $this->output->newLineWritten()) ? 0 : 1,
+            'marginTop' => $this->output instanceof NewLineAware ? max(0, 2 - $this->output->newLinesWritten()) : 1,
             'content' => $string,
         ]), $verbosity);
     }

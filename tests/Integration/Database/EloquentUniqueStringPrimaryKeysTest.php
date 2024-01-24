@@ -11,12 +11,19 @@ use Illuminate\Support\Str;
 
 class EloquentUniqueStringPrimaryKeysTest extends DatabaseTestCase
 {
-    protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
+    protected function afterRefreshingDatabase()
     {
         Schema::create('users', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->uuid('foo');
             $table->uuid('bar');
+            $table->timestamps();
+        });
+
+        Schema::create('foo', function (Blueprint $table) {
+            $table->uuid('id')->primary();
+            $table->string('email')->unique();
+            $table->string('name');
             $table->timestamps();
         });
 
@@ -73,6 +80,58 @@ class EloquentUniqueStringPrimaryKeysTest extends DatabaseTestCase
 
         $this->assertTrue(Str::isUuid($user->uuid));
     }
+
+    public function testModelWithUuidPrimaryKeyCanBeCreatedQuietly()
+    {
+        $user = new ModelWithUuidPrimaryKey();
+
+        $user->saveQuietly();
+
+        $this->assertTrue(Str::isUuid($user->id));
+        $this->assertTrue(Str::isUuid($user->foo));
+        $this->assertTrue(Str::isUuid($user->bar));
+    }
+
+    public function testModelWithUlidPrimaryKeyCanBeCreatedQuietly()
+    {
+        $user = new ModelWithUlidPrimaryKey();
+
+        $user->saveQuietly();
+
+        $this->assertTrue(Str::isUlid($user->id));
+        $this->assertTrue(Str::isUlid($user->foo));
+        $this->assertTrue(Str::isUlid($user->bar));
+    }
+
+    public function testModelWithoutUuidPrimaryKeyCanBeCreatedQuietly()
+    {
+        $user = new ModelWithoutUuidPrimaryKey();
+
+        $user->saveQuietly();
+
+        $this->assertTrue(is_int($user->id));
+        $this->assertTrue(Str::isUuid($user->foo));
+        $this->assertTrue(Str::isUuid($user->bar));
+    }
+
+    public function testModelWithCustomUuidPrimaryKeyNameCanBeCreatedQuietly()
+    {
+        $user = new ModelWithCustomUuidPrimaryKeyName();
+
+        $user->saveQuietly();
+
+        $this->assertTrue(Str::isUuid($user->uuid));
+    }
+
+    public function testUpsertWithUuidPrimaryKey()
+    {
+        ModelUpsertWithUuidPrimaryKey::create(['email' => 'foo', 'name' => 'bar']);
+        ModelUpsertWithUuidPrimaryKey::create(['name' => 'bar1', 'email' => 'foo2']);
+
+        ModelUpsertWithUuidPrimaryKey::upsert([['email' => 'foo3', 'name' => 'bar'], ['name' => 'bar2', 'email' => 'foo2']], ['email']);
+
+        $this->assertEquals(3, ModelUpsertWithUuidPrimaryKey::count());
+    }
 }
 
 class ModelWithUuidPrimaryKey extends Eloquent
@@ -86,6 +145,20 @@ class ModelWithUuidPrimaryKey extends Eloquent
     public function uniqueIds()
     {
         return [$this->getKeyName(), 'foo', 'bar'];
+    }
+}
+
+class ModelUpsertWithUuidPrimaryKey extends Eloquent
+{
+    use HasUuids;
+
+    protected $table = 'foo';
+
+    protected $guarded = [];
+
+    public function uniqueIds()
+    {
+        return [$this->getKeyName()];
     }
 }
 

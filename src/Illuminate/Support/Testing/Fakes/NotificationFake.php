@@ -14,7 +14,7 @@ use Illuminate\Support\Traits\Macroable;
 use Illuminate\Support\Traits\ReflectsClosures;
 use PHPUnit\Framework\Assert as PHPUnit;
 
-class NotificationFake implements NotificationDispatcher, NotificationFactory
+class NotificationFake implements Fake, NotificationDispatcher, NotificationFactory
 {
     use Macroable, ReflectsClosures;
 
@@ -306,10 +306,10 @@ class NotificationFake implements NotificationDispatcher, NotificationFactory
                     $notifiableChannels,
                     fn ($channel) => $notification->shouldSend($notifiable, $channel) !== false
                 );
+            }
 
-                if (empty($notifiableChannels)) {
-                    continue;
-                }
+            if (empty($notifiableChannels)) {
+                continue;
             }
 
             $this->notifications[get_class($notifiable)][$notifiable->getKey()][get_class($notification)][] = [

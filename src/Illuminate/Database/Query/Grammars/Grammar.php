@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Query\Grammars;
 
+use Illuminate\Contracts\Database\Query\Expression;
 use Illuminate\Database\Concerns\CompilesJsonPaths;
 use Illuminate\Database\Grammar as BaseGrammar;
 use Illuminate\Database\Query\Builder;
@@ -246,7 +247,7 @@ class Grammar extends BaseGrammar
      */
     protected function whereRaw(Builder $query, $where)
     {
-        return $where['sql'];
+        return $where['sql'] instanceof Expression ? $where['sql']->getValue($this) : $where['sql'];
     }
 
     /**
@@ -504,7 +505,7 @@ class Grammar extends BaseGrammar
         // Here we will calculate what portion of the string we need to remove. If this
         // is a join clause query, we need to remove the "on" portion of the SQL and
         // if it is a normal query we need to take the leading "where" of queries.
-        $offset = $query instanceof JoinClause ? 3 : 6;
+        $offset = $where['query'] instanceof JoinClause ? 3 : 6;
 
         return '('.substr($this->compileWheres($where['query']), $offset).')';
     }
@@ -620,7 +621,7 @@ class Grammar extends BaseGrammar
      */
     public function prepareBindingForJsonContains($binding)
     {
-        return json_encode($binding);
+        return json_encode($binding, JSON_UNESCAPED_UNICODE);
     }
 
     /**
@@ -707,6 +708,18 @@ class Grammar extends BaseGrammar
     }
 
     /**
+     * Compile a clause based on an expression.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
+     * @return string
+     */
+    public function whereExpression(Builder $query, $where)
+    {
+        return $where['column']->getValue($this);
+    }
+
+    /**
      * Compile the "group by" portions of the query.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
@@ -742,21 +755,16 @@ class Grammar extends BaseGrammar
         // If the having clause is "raw", we can just return the clause straight away
         // without doing any more processing on it. Otherwise, we will compile the
         // clause into SQL based on the components that make it up from builder.
-        if ($having['type'] === 'Raw') {
-            return $having['sql'];
-        } elseif ($having['type'] === 'between') {
-            return $this->compileHavingBetween($having);
-        } elseif ($having['type'] === 'Null') {
-            return $this->compileHavingNull($having);
-        } elseif ($having['type'] === 'NotNull') {
-            return $this->compileHavingNotNull($having);
-        } elseif ($having['type'] === 'bit') {
-            return $this->compileHavingBit($having);
-        } elseif ($having['type'] === 'Nested') {
-            return $this->compileNestedHavings($having);
-        }
-
-        return $this->compileBasicHaving($having);
+        return match ($having['type']) {
+            'Raw' => $having['sql'],
+            'between' => $this->compileHavingBetween($having),
+            'Null' => $this->compileHavingNull($having),
+            'NotNull' => $this->compileHavingNotNull($having),
+            'bit' => $this->compileHavingBit($having),
+            'Expression' => $this->compileHavingExpression($having),
+            'Nested' => $this->compileNestedHavings($having),
+            default => $this->compileBasicHaving($having),
+        };
     }
 
     /**
@@ -832,6 +840,17 @@ class Grammar extends BaseGrammar
         $parameter = $this->parameter($having['value']);
 
         return '('.$column.' '.$having['operator'].' '.$parameter.') != 0';
+    }
+
+    /**
+     * Compile a having clause involving an expression.
+     *
+     * @param  array  $having
+     * @return string
+     */
+    protected function compileHavingExpression($having)
+    {
+        return $having['column']->getValue($this);
     }
 
     /**
@@ -1062,7 +1081,13 @@ class Grammar extends BaseGrammar
      */
     public function compileInsertUsing(Builder $query, array $columns, string $sql)
     {
-        return "insert into {$this->wrapTable($query->from)} ({$this->columnize($columns)}) $sql";
+        $table = $this->wrapTable($query->from);
+
+        if (empty($columns) || $columns === ['*']) {
+            return "insert into {$table} $sql";
+        }
+
+        return "insert into {$table} ({$this->columnize($columns)}) $sql";
     }
 
     /**
@@ -1324,6 +1349,44 @@ class Grammar extends BaseGrammar
     protected function removeLeadingBoolean($value)
     {
         return preg_replace('/and |or /i', '', $value, 1);
+    }
+
+    /**
+     * Substitute the given bindings into the given raw SQL query.
+     *
+     * @param  string  $sql
+     * @param  array  $bindings
+     * @return string
+     */
+    public function substituteBindingsIntoRawSql($sql, $bindings)
+    {
+        $bindings = array_map(fn ($value) => $this->escape($value), $bindings);
+
+        $query = '';
+
+        $isStringLiteral = false;
+
+        for ($i = 0; $i < strlen($sql); $i++) {
+            $char = $sql[$i];
+            $nextChar = $sql[$i + 1] ?? null;
+
+            // Single quotes can be escaped as '' according to the SQL standard while
+            // MySQL uses \'. Postgres has operators like ?| that must get encoded
+            // in PHP like ??|. We should skip over the escaped characters here.
+            if (in_array($char.$nextChar, ["\'", "''", '??'])) {
+                $query .= $char.$nextChar;
+                $i += 1;
+            } elseif ($char === "'") { // Starting / leaving string literal...
+                $query .= $char;
+                $isStringLiteral = ! $isStringLiteral;
+            } elseif ($char === '?' && ! $isStringLiteral) { // Substitutable binding...
+                $query .= array_shift($bindings) ?? '?';
+            } else { // Normal character...
+                $query .= $char;
+            }
+        }
+
+        return $query;
     }
 
     /**

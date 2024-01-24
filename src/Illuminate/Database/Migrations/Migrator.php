@@ -332,7 +332,7 @@ class Migrator
             return [];
         }
 
-        return tap($this->resetMigrations($migrations, $paths, $pretend), function () {
+        return tap($this->resetMigrations($migrations, Arr::wrap($paths), $pretend), function () {
             if ($this->output) {
                 $this->output->writeln('');
             }
@@ -438,6 +438,7 @@ class Migrator
             }
 
             $this->write(TwoColumnDetail::class, $name);
+
             $this->write(BulletList::class, collect($this->getQueries($migration, $method))->map(function ($query) {
                 return $query['query'];
             }));
@@ -525,7 +526,9 @@ class Migrator
         $migration = static::$requiredPathCache[$path] ??= $this->files->getRequire($path);
 
         if (is_object($migration)) {
-            return clone $migration;
+            return method_exists($migration, '__construct')
+                    ? $this->files->getRequire($path)
+                    : clone $migration;
         }
 
         return new $class;

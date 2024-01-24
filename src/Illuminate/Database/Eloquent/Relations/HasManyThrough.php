@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithDictionary;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\UniqueConstraintViolationException;
 
 class HasManyThrough extends Relation
 {
@@ -79,6 +80,24 @@ class HasManyThrough extends Relation
         $this->secondLocalKey = $secondLocalKey;
 
         parent::__construct($query, $throughParent);
+    }
+
+    /**
+     * Convert the relationship to a "has one through" relationship.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOneThrough
+     */
+    public function one()
+    {
+        return HasOneThrough::noConstraints(fn () => new HasOneThrough(
+            $this->getQuery(),
+            $this->farParent,
+            $this->throughParent,
+            $this->getFirstKeyName(),
+            $this->secondKey,
+            $this->getLocalKeyName(),
+            $this->getSecondLocalKeyName(),
+        ));
     }
 
     /**
@@ -233,15 +252,48 @@ class HasManyThrough extends Relation
      * Get the first related model record matching the attributes or instantiate it.
      *
      * @param  array  $attributes
+     * @param  array  $values
      * @return \Illuminate\Database\Eloquent\Model
      */
-    public function firstOrNew(array $attributes)
+    public function firstOrNew(array $attributes = [], array $values = [])
     {
-        if (is_null($instance = $this->where($attributes)->first())) {
-            $instance = $this->related->newInstance($attributes);
+        if (! is_null($instance = $this->where($attributes)->first())) {
+            return $instance;
         }
 
-        return $instance;
+        return $this->related->newInstance(array_merge($attributes, $values));
+    }
+
+    /**
+     * Get the first record matching the attributes. If the record is not found, create it.
+     *
+     * @param  array  $attributes
+     * @param  array  $values
+     * @return \Illuminate\Database\Eloquent\Model
+     */
+    public function firstOrCreate(array $attributes = [], array $values = [])
+    {
+        if (! is_null($instance = (clone $this)->where($attributes)->first())) {
+            return $instance;
+        }
+
+        return $this->createOrFirst(array_merge($attributes, $values));
+    }
+
+    /**
+     * Attempt to create the record. If a unique constraint violation occurs, attempt to find the matching record.
+     *
+     * @param  array  $attributes
+     * @param  array  $values
+     * @return \Illuminate\Database\Eloquent\Model
+     */
+    public function createOrFirst(array $attributes = [], array $values = [])
+    {
+        try {
+            return $this->getQuery()->withSavepointIfNeeded(fn () => $this->create(array_merge($attributes, $values)));
+        } catch (UniqueConstraintViolationException $exception) {
+            return $this->where($attributes)->first() ?? throw $exception;
+        }
     }
 
     /**
@@ -253,11 +305,11 @@ class HasManyThrough extends Relation
      */
     public function updateOrCreate(array $attributes, array $values = [])
     {
-        $instance = $this->firstOrNew($attributes);
-
-        $instance->fill($values)->save();
-
-        return $instance;
+        return tap($this->firstOrCreate($attributes, $values), function ($instance) use ($values) {
+            if (! $instance->wasRecentlyCreated) {
+                $instance->fill($values)->save();
+            }
+        });
     }
 
     /**
@@ -546,6 +598,24 @@ class HasManyThrough extends Relation
         $alias ??= $this->getRelated()->getKeyName();
 
         return $this->prepareQueryBuilder()->chunkById($count, $callback, $column, $alias);
+    }
+
+    /**
+     * Execute a callback over each item while chunking by ID.
+     *
+     * @param  callable  $callback
+     * @param  int  $count
+     * @param  string|null  $column
+     * @param  string|null  $alias
+     * @return bool
+     */
+    public function eachById(callable $callback, $count = 1000, $column = null, $alias = null)
+    {
+        $column = $column ?? $this->getRelated()->getQualifiedKeyName();
+
+        $alias = $alias ?? $this->getRelated()->getKeyName();
+
+        return $this->prepareQueryBuilder()->eachById($callback, $count, $column, $alias);
     }
 
     /**

@@ -6,7 +6,9 @@ use Closure;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Js;
+use Illuminate\Support\Number;
 use Illuminate\Support\Str;
+use Illuminate\Support\Testing\Fakes\Fake;
 use Mockery;
 use Mockery\LegacyMockInterface;
 use RuntimeException;
@@ -45,11 +47,11 @@ abstract class Facade
         $accessor = static::getFacadeAccessor();
 
         if (static::$app->resolved($accessor) === true) {
-            $callback(static::getFacadeRoot());
+            $callback(static::getFacadeRoot(), static::$app);
         }
 
-        static::$app->afterResolving($accessor, function ($service) use ($callback) {
-            $callback($service);
+        static::$app->afterResolving($accessor, function ($service, $app) use ($callback) {
+            $callback($service, $app);
         });
     }
 
@@ -184,6 +186,19 @@ abstract class Facade
     }
 
     /**
+     * Determines whether a "fake" has been set as the facade instance.
+     *
+     * @return bool
+     */
+    protected static function isFake()
+    {
+        $name = static::getFacadeAccessor();
+
+        return isset(static::$resolvedInstance[$name]) &&
+               static::$resolvedInstance[$name] instanceof Fake;
+    }
+
+    /**
      * Get the root object behind the facade.
      *
      * @return mixed
@@ -279,6 +294,7 @@ abstract class Facade
             'Log' => Log::class,
             'Mail' => Mail::class,
             'Notification' => Notification::class,
+            'Number' => Number::class,
             'Password' => Password::class,
             'Process' => Process::class,
             'Queue' => Queue::class,

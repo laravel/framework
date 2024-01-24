@@ -5,6 +5,7 @@ namespace Illuminate\Database\Schema;
 use BadMethodCallException;
 use Closure;
 use Illuminate\Database\Connection;
+use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Schema\Grammars\Grammar;
 use Illuminate\Database\SQLiteConnection;
@@ -129,6 +130,10 @@ class Blueprint
         $this->ensureCommandsAreValid($connection);
 
         foreach ($this->commands as $command) {
+            if ($command->shouldBeSkipped) {
+                continue;
+            }
+
             $method = 'compile'.ucfirst($command->name);
 
             if (method_exists($grammar, $method) || $grammar::hasMacro($method)) {
@@ -284,6 +289,50 @@ class Blueprint
     public function create()
     {
         return $this->addCommand('create');
+    }
+
+    /**
+     * Specify the storage engine that should be used for the table.
+     *
+     * @param  string  $engine
+     * @return void
+     */
+    public function engine($engine)
+    {
+        $this->engine = $engine;
+    }
+
+    /**
+     * Specify that the InnoDB storage engine should be used for the table (MySQL only).
+     *
+     * @param  string  $engine
+     * @return void
+     */
+    public function innoDb()
+    {
+        $this->engine('InnoDB');
+    }
+
+    /**
+     * Specify the character set that should be used for the table.
+     *
+     * @param  string  $charset
+     * @return void
+     */
+    public function charset($charset)
+    {
+        $this->charset = $charset;
+    }
+
+    /**
+     * Specify the collation that should be used for the table.
+     *
+     * @param  string  $collation
+     * @return void
+     */
+    public function collation($collation)
+    {
+        $this->collation = $collation;
     }
 
     /**
@@ -938,9 +987,19 @@ class Blueprint
             $model = new $model;
         }
 
-        return $model->getKeyType() === 'int' && $model->getIncrementing()
-                    ? $this->foreignId($column ?: $model->getForeignKey())
-                    : $this->foreignUuid($column ?: $model->getForeignKey());
+        $column = $column ?: $model->getForeignKey();
+
+        if ($model->getKeyType() === 'int' && $model->getIncrementing()) {
+            return $this->foreignId($column);
+        }
+
+        $modelTraits = class_uses_recursive($model);
+
+        if (in_array(HasUlids::class, $modelTraits, true)) {
+            return $this->foreignUlid($column);
+        }
+
+        return $this->foreignUuid($column);
     }
 
     /**
@@ -1772,6 +1831,16 @@ class Blueprint
     public function getTable()
     {
         return $this->table;
+    }
+
+    /**
+     * Get the table prefix.
+     *
+     * @return string
+     */
+    public function getPrefix()
+    {
+        return $this->prefix;
     }
 
     /**

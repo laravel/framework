@@ -144,7 +144,7 @@ class ValidationRuleParser
      */
     protected function explodeWildcardRules($results, $attribute, $rules)
     {
-        $pattern = str_replace('\*', '[^\.]*', preg_quote($attribute));
+        $pattern = str_replace('\*', '[^\.]*', preg_quote($attribute, '/'));
 
         $data = ValidationData::initializeAndGatherData($attribute, $this->data);
 
@@ -310,7 +310,7 @@ class ValidationRuleParser
     }
 
     /**
-     * Expand and conditional rules in the given array of rules.
+     * Expand the conditional rules in the given array of rules.
      *
      * @param  array  $rules
      * @param  array  $data

@@ -64,9 +64,13 @@ trait CallsCommands
     {
         $arguments['command'] = $command;
 
-        return $this->resolveCommand($command)->run(
+        $result = $this->resolveCommand($command)->run(
             $this->createInputFromArguments($arguments), $output
         );
+
+        $this->restorePrompts();
+
+        return $result;
     }
 
     /**

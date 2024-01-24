@@ -12,6 +12,7 @@ use Illuminate\Mail\Transport\LogTransport;
 use Illuminate\Mail\Transport\SesTransport;
 use Illuminate\Mail\Transport\SesV2Transport;
 use Illuminate\Support\Arr;
+use Illuminate\Support\ConfigurationUrlParser;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
@@ -20,6 +21,7 @@ use Symfony\Component\Mailer\Bridge\Mailgun\Transport\MailgunTransportFactory;
 use Symfony\Component\Mailer\Bridge\Postmark\Transport\PostmarkTransportFactory;
 use Symfony\Component\Mailer\Transport\Dsn;
 use Symfony\Component\Mailer\Transport\FailoverTransport;
+use Symfony\Component\Mailer\Transport\RoundRobinTransport;
 use Symfony\Component\Mailer\Transport\SendmailTransport;
 use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport;
 use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransportFactory;
@@ -375,6 +377,34 @@ class MailManager implements FactoryContract
     }
 
     /**
+     * Create an instance of the Symfony Roundrobin Transport driver.
+     *
+     * @param  array  $config
+     * @return \Symfony\Component\Mailer\Transport\RoundRobinTransport
+     */
+    protected function createRoundrobinTransport(array $config)
+    {
+        $transports = [];
+
+        foreach ($config['mailers'] as $name) {
+            $config = $this->getConfig($name);
+
+            if (is_null($config)) {
+                throw new InvalidArgumentException("Mailer [{$name}] is not defined.");
+            }
+
+            // Now, we will check if the "driver" key exists and if it does we will set
+            // the transport configuration parameter in order to offer compatibility
+            // with any Laravel <= 6.x application style mail configuration files.
+            $transports[] = $this->app['config']['mail.driver']
+                ? $this->createSymfonyTransport(array_merge($config, ['transport' => $name]))
+                : $this->createSymfonyTransport($config);
+        }
+
+        return new RoundRobinTransport($transports);
+    }
+
+    /**
      * Create an instance of the Log Transport driver.
      *
      * @param  array  $config
@@ -446,9 +476,17 @@ class MailManager implements FactoryContract
         // Here we will check if the "driver" key exists and if it does we will use
         // the entire mail configuration file as the "driver" config in order to
         // provide "BC" for any Laravel <= 6.x style mail configuration files.
-        return $this->app['config']['mail.driver']
+        $config = $this->app['config']['mail.driver']
             ? $this->app['config']['mail']
             : $this->app['config']["mail.mailers.{$name}"];
+
+        if (isset($config['url'])) {
+            $config = array_merge($config, (new ConfigurationUrlParser)->parseConfiguration($config));
+
+            $config['transport'] = Arr::pull($config, 'driver');
+        }
+
+        return $config;
     }
 
     /**

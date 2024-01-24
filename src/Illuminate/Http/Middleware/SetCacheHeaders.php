@@ -4,10 +4,30 @@ namespace Illuminate\Http\Middleware;
 
 use Closure;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class SetCacheHeaders
 {
+    /**
+     * Specify the options for the middleware.
+     *
+     * @param  array|string  $options
+     * @return string
+     */
+    public static function using($options)
+    {
+        if (is_string($options)) {
+            return static::class.':'.$options;
+        }
+
+        return collect($options)
+            ->map(fn ($value, $key) => is_int($key) ? $value : "{$key}={$value}")
+            ->map(fn ($value) => Str::finish($value, ';'))
+            ->pipe(fn ($options) => rtrim(static::class.':'.$options->implode(''), ';'));
+    }
+
     /**
      * Add cache related HTTP headers.
      *
@@ -22,7 +42,7 @@ class SetCacheHeaders
     {
         $response = $next($request);
 
-        if (! $request->isMethodCacheable() || (! $response->getContent() && ! $response instanceof BinaryFileResponse)) {
+        if (! $request->isMethodCacheable() || (! $response->getContent() && ! $response instanceof BinaryFileResponse && ! $response instanceof StreamedResponse)) {
             return $response;
         }
 

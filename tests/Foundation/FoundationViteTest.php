@@ -657,6 +657,33 @@ class FoundationViteTest extends TestCase
         $this->cleanViteHotFile('cold');
     }
 
+    public function testViteCanAssetPath()
+    {
+        $this->makeViteManifest([
+            'resources/images/profile.png' => [
+                'src' => 'resources/images/profile.png',
+                'file' => 'assets/profile.versioned.png',
+            ],
+        ], $buildDir = Str::random());
+        $vite = app(Vite::class)->useBuildDirectory($buildDir);
+        $this->app['config']->set('app.asset_url', 'https://cdn.app.com');
+
+        // default behaviour...
+        $this->assertSame("https://cdn.app.com/{$buildDir}/assets/profile.versioned.png", $vite->asset('resources/images/profile.png'));
+
+        // custom behaviour
+        $vite->createAssetPathsUsing(function ($path) {
+            return 'https://tenant-cdn.app.com/'.$path;
+        });
+        $this->assertSame("https://tenant-cdn.app.com/{$buildDir}/assets/profile.versioned.png", $vite->asset('resources/images/profile.png'));
+
+        // restore default behaviour...
+        $vite->createAssetPathsUsing(null);
+        $this->assertSame("https://cdn.app.com/{$buildDir}/assets/profile.versioned.png", $vite->asset('resources/images/profile.png'));
+
+        $this->cleanViteManifest($buildDir);
+    }
+
     public function testViteIsMacroable()
     {
         $this->makeViteManifest([
@@ -829,7 +856,7 @@ class FoundationViteTest extends TestCase
             .'<link rel="modulepreload" href="https://example.com/'.$buildDir.'/assets/import.versioned.js" general="attribute" crossorigin data-persistent-across-pages="YES" keep-me empty-string="" zero="0" />'
             .'<link rel="stylesheet" href="https://example.com/'.$buildDir.'/assets/app.versioned.css" />'
             .'<script type="module" src="https://example.com/'.$buildDir.'/assets/app.versioned.js"></script>',
-        $result->toHtml());
+            $result->toHtml());
 
         $this->assertSame([
             "https://example.com/$buildDir/assets/app.versioned.css" => [
@@ -1041,7 +1068,7 @@ class FoundationViteTest extends TestCase
             .'<link rel="modulepreload" href="https://example.com/'.$buildDir.'/assets/app.versioned.js" nonce="expected-nonce" />'
             .'<link rel="stylesheet" href="https://example.com/'.$buildDir.'/assets/app.versioned.css" nonce="expected-nonce" />'
             .'<script type="module" src="https://example.com/'.$buildDir.'/assets/app.versioned.js" nonce="expected-nonce"></script>',
-        $result->toHtml());
+            $result->toHtml());
 
         $this->assertSame([
             "https://example.com/$buildDir/assets/app.versioned.css" => [
@@ -1088,7 +1115,7 @@ class FoundationViteTest extends TestCase
             .'<link rel="modulepreload" href="https://example.com/'.$buildDir.'/assets/app.versioned.js" crossorigin="script-crossorigin" />'
             .'<link rel="stylesheet" href="https://example.com/'.$buildDir.'/assets/app.versioned.css" crossorigin="style-crossorigin" />'
             .'<script type="module" src="https://example.com/'.$buildDir.'/assets/app.versioned.js" crossorigin="script-crossorigin"></script>',
-        $result->toHtml());
+            $result->toHtml());
 
         $this->assertSame([
             "https://example.com/$buildDir/assets/app.versioned.css" => [
@@ -1127,7 +1154,7 @@ class FoundationViteTest extends TestCase
         $this->assertSame(
             '<link rel="modulepreload" href="https://example.com/'.$buildDir.'/assets/app-from-custom-manifest.versioned.js" />'
             .'<script type="module" src="https://example.com/'.$buildDir.'/assets/app-from-custom-manifest.versioned.js"></script>',
-        $result->toHtml());
+            $result->toHtml());
 
         unlink(public_path("{$buildDir}/custom-manifest.json"));
         rmdir(public_path($buildDir));
@@ -1137,21 +1164,21 @@ class FoundationViteTest extends TestCase
     {
         $buildDir = Str::random();
         $this->makeViteManifest([
-            'resources/js/app.css' =>  [
-                'file' =>  'assets/app-versioned.css',
-                'src' =>  'resources/js/app.css',
+            'resources/js/app.css' => [
+                'file' => 'assets/app-versioned.css',
+                'src' => 'resources/js/app.css',
             ],
-            'resources/js/Pages/Welcome.vue' =>  [
-                'file' =>  'assets/Welcome-versioned.js',
-                'src' =>  'resources/js/Pages/Welcome.vue',
-                'imports' =>  [
+            'resources/js/Pages/Welcome.vue' => [
+                'file' => 'assets/Welcome-versioned.js',
+                'src' => 'resources/js/Pages/Welcome.vue',
+                'imports' => [
                     'resources/js/app.js',
                 ],
             ],
-            'resources/js/app.js' =>  [
-                'file' =>  'assets/app-versioned.js',
-                'src' =>  'resources/js/app.js',
-                'css' =>  [
+            'resources/js/app.js' => [
+                'file' => 'assets/app-versioned.js',
+                'src' => 'resources/js/app.js',
+                'css' => [
                     'assets/app-versioned.css',
                 ],
             ],
@@ -1166,7 +1193,7 @@ class FoundationViteTest extends TestCase
             .'<link rel="stylesheet" href="https://example.com/'.$buildDir.'/assets/app-versioned.css" />'
             .'<script type="module" src="https://example.com/'.$buildDir.'/assets/app-versioned.js"></script>'
             .'<script type="module" src="https://example.com/'.$buildDir.'/assets/Welcome-versioned.js"></script>',
-        $result->toHtml());
+            $result->toHtml());
 
         $this->assertSame([
             "https://example.com/$buildDir/assets/app-versioned.css" => [
@@ -1182,6 +1209,31 @@ class FoundationViteTest extends TestCase
         ], ViteFacade::preloadedAssets());
 
         $this->cleanViteManifest($buildDir);
+    }
+
+    public function testItRetrievesAssetContent()
+    {
+        $this->makeViteManifest();
+
+        $this->makeAsset('/app.versioned.js', 'some content');
+
+        $content = ViteFacade::content('resources/js/app.js');
+
+        $this->assertSame('some content', $content);
+
+        $this->cleanAsset('/app.versioned.js');
+
+        $this->cleanViteManifest();
+    }
+
+    public function testItThrowsWhenUnableToFindFileToRetrieveContent()
+    {
+        $this->makeViteManifest();
+
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('Unable to locate file from Vite manifest: '.public_path('build/assets/app.versioned.js'));
+
+        ViteFacade::content('resources/js/app.js');
     }
 
     protected function makeViteManifest($contents = null, $path = 'build')
@@ -1243,6 +1295,26 @@ class FoundationViteTest extends TestCase
         if (file_exists(public_path($path))) {
             rmdir(public_path($path));
         }
+    }
+
+    protected function makeAsset($asset, $content)
+    {
+        $path = public_path('build/assets');
+
+        if (! file_exists($path)) {
+            mkdir($path, recursive: true);
+        }
+
+        file_put_contents($path.'/'.$asset, $content);
+    }
+
+    protected function cleanAsset($asset)
+    {
+        $path = public_path('build/assets');
+
+        unlink($path.$asset);
+
+        rmdir($path);
     }
 
     protected function makeViteHotFile($path = null)

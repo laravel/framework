@@ -4,14 +4,13 @@ namespace {{ namespace }};
 
 use {{ rootNamespace }}Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 
 class {{ class }} extends Controller
 {
     /**
      * Handle the incoming request.
      */
-    public function __invoke(Request $request): Response
+    public function __invoke(Request $request)
     {
         //
     }

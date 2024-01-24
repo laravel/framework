@@ -195,6 +195,8 @@ class Arr
             foreach ($array as $item) {
                 return $item;
             }
+
+            return value($default);
         }
 
         foreach ($array as $key => $value) {
@@ -474,9 +476,7 @@ class Arr
      */
     public static function prependKeysWith($array, $prependWith)
     {
-        return Collection::make($array)->mapWithKeys(function ($item, $key) use ($prependWith) {
-            return [$prependWith.$key => $item];
-        })->all();
+        return static::mapWithKeys($array, fn ($item, $key) => [$prependWith.$key => $item]);
     }
 
     /**
@@ -564,6 +564,35 @@ class Arr
     }
 
     /**
+     * Run an associative map over each of the items.
+     *
+     * The callback should return an associative array with a single key/value pair.
+     *
+     * @template TKey
+     * @template TValue
+     * @template TMapWithKeysKey of array-key
+     * @template TMapWithKeysValue
+     *
+     * @param  array<TKey, TValue>  $array
+     * @param  callable(TValue, TKey): array<TMapWithKeysKey, TMapWithKeysValue>  $callback
+     * @return array
+     */
+    public static function mapWithKeys(array $array, callable $callback)
+    {
+        $result = [];
+
+        foreach ($array as $key => $value) {
+            $assoc = $callback($value, $key);
+
+            foreach ($assoc as $mapKey => $mapValue) {
+                $result[$mapKey] = $mapValue;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
      * Push an item onto the beginning of an array.
      *
      * @param  array  $array
@@ -633,30 +662,28 @@ class Arr
         }
 
         if (is_null($number)) {
-            return head(array_slice($array, random_int(0, $count - 1), 1));
+            return $array[array_rand($array)];
         }
 
         if ((int) $number === 0) {
             return [];
         }
 
-        $keys = array_keys($array);
-        $count = count($keys);
-        $selected = [];
+        $keys = array_rand($array, $number);
 
-        for ($i = $count - 1; $i >= $count - $number; $i--) {
-            $j = random_int(0, $i);
+        $results = [];
 
-            if ($preserveKeys) {
-                $selected[$keys[$j]] = $array[$keys[$j]];
-            } else {
-                $selected[] = $array[$keys[$j]];
+        if ($preserveKeys) {
+            foreach ((array) $keys as $key) {
+                $results[$key] = $array[$key];
             }
-
-            $keys[$j] = $keys[$i];
+        } else {
+            foreach ((array) $keys as $key) {
+                $results[] = $array[$key];
+            }
         }
 
-        return $selected;
+        return $results;
     }
 
     /**
@@ -708,25 +735,15 @@ class Arr
      */
     public static function shuffle($array, $seed = null)
     {
-        if (! is_null($seed)) {
+        if (is_null($seed)) {
+            shuffle($array);
+        } else {
             mt_srand($seed);
             shuffle($array);
             mt_srand();
-
-            return $array;
         }
 
-        $keys = array_keys($array);
-
-        for ($i = count($keys) - 1; $i > 0; $i--) {
-            $j = random_int(0, $i);
-            $shuffled[] = $array[$keys[$j]];
-            $keys[$j] = $keys[$i];
-        }
-
-        $shuffled[] = $array[$keys[0]];
-
-        return $shuffled;
+        return $array;
     }
 
     /**
@@ -780,6 +797,18 @@ class Arr
         }
 
         return $array;
+    }
+
+    /**
+     * Recursively sort an array by keys and values in descending order.
+     *
+     * @param  array  $array
+     * @param  int  $options
+     * @return array
+     */
+    public static function sortRecursiveDesc($array, $options = SORT_REGULAR)
+    {
+        return static::sortRecursive($array, $options, true);
     }
 
     /**

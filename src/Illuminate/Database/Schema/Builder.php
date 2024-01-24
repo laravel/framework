@@ -5,11 +5,14 @@ namespace Illuminate\Database\Schema;
 use Closure;
 use Illuminate\Container\Container;
 use Illuminate\Database\Connection;
+use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
 use LogicException;
 
 class Builder
 {
+    use Macroable;
+
     /**
      * The database connection instance.
      *
@@ -159,9 +162,80 @@ class Builder
     {
         $table = $this->connection->getTablePrefix().$table;
 
-        return count($this->connection->selectFromWriteConnection(
-            $this->grammar->compileTableExists(), [$table]
-        )) > 0;
+        foreach ($this->getTables() as $value) {
+            if (strtolower($table) === strtolower($value['name'])) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Determine if the given view exists.
+     *
+     * @param  string  $view
+     * @return bool
+     */
+    public function hasView($view)
+    {
+        $view = $this->connection->getTablePrefix().$view;
+
+        foreach ($this->getViews() as $value) {
+            if (strtolower($view) === strtolower($value['name'])) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Get the tables that belong to the database.
+     *
+     * @return array
+     */
+    public function getTables()
+    {
+        return $this->connection->getPostProcessor()->processTables(
+            $this->connection->selectFromWriteConnection($this->grammar->compileTables())
+        );
+    }
+
+    /**
+     * Get the views that belong to the database.
+     *
+     * @return array
+     */
+    public function getViews()
+    {
+        return $this->connection->getPostProcessor()->processViews(
+            $this->connection->selectFromWriteConnection($this->grammar->compileViews())
+        );
+    }
+
+    /**
+     * Get the user-defined types that belong to the database.
+     *
+     * @return array
+     */
+    public function getTypes()
+    {
+        throw new LogicException('This database driver does not support user-defined types.');
+    }
+
+    /**
+     * Get all of the table names for the database.
+     *
+     * @deprecated Will be removed in a future Laravel version.
+     *
+     * @return array
+     *
+     * @throws \LogicException
+     */
+    public function getAllTables()
+    {
+        throw new LogicException('This database driver does not support getting all tables.');
     }
 
     /**
@@ -233,13 +307,26 @@ class Builder
      *
      * @param  string  $table
      * @param  string  $column
+     * @param  bool  $fullDefinition
      * @return string
      */
-    public function getColumnType($table, $column)
+    public function getColumnType($table, $column, $fullDefinition = false)
     {
-        $table = $this->connection->getTablePrefix().$table;
+        if (! $this->connection->usingNativeSchemaOperations()) {
+            $table = $this->connection->getTablePrefix().$table;
 
-        return $this->connection->getDoctrineColumn($table, $column)->getType()->getName();
+            return $this->connection->getDoctrineColumn($table, $column)->getType()->getName();
+        }
+
+        $columns = $this->getColumns($table);
+
+        foreach ($columns as $value) {
+            if (strtolower($value['name']) === $column) {
+                return $fullDefinition ? $value['type'] : $value['type_name'];
+            }
+        }
+
+        throw new InvalidArgumentException("There is no column with name '$column' on table '$table'.");
     }
 
     /**
@@ -250,11 +337,52 @@ class Builder
      */
     public function getColumnListing($table)
     {
-        $results = $this->connection->selectFromWriteConnection($this->grammar->compileColumnListing(
-            $this->connection->getTablePrefix().$table
-        ));
+        return array_column($this->getColumns($table), 'name');
+    }
 
-        return $this->connection->getPostProcessor()->processColumnListing($results);
+    /**
+     * Get the columns for a given table.
+     *
+     * @param  string  $table
+     * @return array
+     */
+    public function getColumns($table)
+    {
+        $table = $this->connection->getTablePrefix().$table;
+
+        return $this->connection->getPostProcessor()->processColumns(
+            $this->connection->selectFromWriteConnection($this->grammar->compileColumns($table))
+        );
+    }
+
+    /**
+     * Get the indexes for a given table.
+     *
+     * @param  string  $table
+     * @return array
+     */
+    public function getIndexes($table)
+    {
+        $table = $this->connection->getTablePrefix().$table;
+
+        return $this->connection->getPostProcessor()->processIndexes(
+            $this->connection->selectFromWriteConnection($this->grammar->compileIndexes($table))
+        );
+    }
+
+    /**
+     * Get the foreign keys for a given table.
+     *
+     * @param  string  $table
+     * @return array
+     */
+    public function getForeignKeys($table)
+    {
+        $table = $this->connection->getTablePrefix().$table;
+
+        return $this->connection->getPostProcessor()->processForeignKeys(
+            $this->connection->selectFromWriteConnection($this->grammar->compileForeignKeys($table))
+        );
     }
 
     /**
@@ -362,18 +490,6 @@ class Builder
     }
 
     /**
-     * Get all of the table names for the database.
-     *
-     * @return void
-     *
-     * @throws \LogicException
-     */
-    public function getAllTables()
-    {
-        throw new LogicException('This database driver does not support getting all tables.');
-    }
-
-    /**
      * Rename a table on the schema.
      *
      * @param  string  $from
@@ -421,11 +537,11 @@ class Builder
     {
         $this->disableForeignKeyConstraints();
 
-        $result = $callback();
-
-        $this->enableForeignKeyConstraints();
-
-        return $result;
+        try {
+            return $callback();
+        } finally {
+            $this->enableForeignKeyConstraints();
+        }
     }
 
     /**

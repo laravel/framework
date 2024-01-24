@@ -4,16 +4,18 @@ namespace Illuminate\Tests\Integration\Database\EloquentMorphEagerLoadingTest;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 class EloquentMorphEagerLoadingTest extends DatabaseTestCase
 {
-    protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
+    protected function afterRefreshingDatabase()
     {
         Schema::create('users', function (Blueprint $table) {
             $table->increments('id');
+            $table->softDeletes();
         });
 
         Schema::create('posts', function (Blueprint $table) {
@@ -25,6 +27,12 @@ class EloquentMorphEagerLoadingTest extends DatabaseTestCase
             $table->increments('video_id');
         });
 
+        Schema::create('actions', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('target_type');
+            $table->integer('target_id');
+        });
+
         Schema::create('comments', function (Blueprint $table) {
             $table->increments('id');
             $table->string('commentable_type');
@@ -32,6 +40,7 @@ class EloquentMorphEagerLoadingTest extends DatabaseTestCase
         });
 
         $user = User::create();
+        $user2 = User::forceCreate(['deleted_at' => now()]);
 
         $post = tap((new Post)->user()->associate($user))->save();
 
@@ -39,6 +48,9 @@ class EloquentMorphEagerLoadingTest extends DatabaseTestCase
 
         (new Comment)->commentable()->associate($post)->save();
         (new Comment)->commentable()->associate($video)->save();
+
+        (new Action)->target()->associate($video)->save();
+        (new Action)->target()->associate($user2)->save();
     }
 
     public function testWithMorphLoading()
@@ -49,9 +61,13 @@ class EloquentMorphEagerLoadingTest extends DatabaseTestCase
             }])
             ->get();
 
+        $this->assertCount(2, $comments);
+
         $this->assertTrue($comments[0]->relationLoaded('commentable'));
+        $this->assertInstanceOf(Post::class, $comments[0]->getRelation('commentable'));
         $this->assertTrue($comments[0]->commentable->relationLoaded('user'));
         $this->assertTrue($comments[1]->relationLoaded('commentable'));
+        $this->assertInstanceOf(Video::class, $comments[1]->getRelation('commentable'));
     }
 
     public function testWithMorphLoadingWithSingleRelation()
@@ -64,6 +80,30 @@ class EloquentMorphEagerLoadingTest extends DatabaseTestCase
 
         $this->assertTrue($comments[0]->relationLoaded('commentable'));
         $this->assertTrue($comments[0]->commentable->relationLoaded('user'));
+    }
+
+    public function testMorphLoadingMixedWithTrashedRelations()
+    {
+        $action = Action::query()
+            ->with('target')
+            ->get();
+
+        $this->assertCount(2, $action);
+
+        $this->assertTrue($action[0]->relationLoaded('target'));
+        $this->assertInstanceOf(Video::class, $action[0]->getRelation('target'));
+        $this->assertTrue($action[1]->relationLoaded('target'));
+        $this->assertInstanceOf(User::class, $action[1]->getRelation('target'));
+    }
+}
+
+class Action extends Model
+{
+    public $timestamps = false;
+
+    public function target()
+    {
+        return $this->morphTo()->withTrashed();
     }
 }
 
@@ -90,6 +130,8 @@ class Post extends Model
 
 class User extends Model
 {
+    use SoftDeletes;
+
     public $timestamps = false;
 }
 

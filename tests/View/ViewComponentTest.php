@@ -5,6 +5,7 @@ namespace Illuminate\Tests\View;
 use Illuminate\View\Component;
 use Illuminate\View\ComponentAttributeBag;
 use PHPUnit\Framework\TestCase;
+use ReflectionMethod;
 
 class ViewComponentTest extends TestCase
 {
@@ -17,6 +18,44 @@ class ViewComponentTest extends TestCase
         $this->assertEquals(10, $variables['votes']);
         $this->assertSame('world', $variables['hello']());
         $this->assertSame('taylor', $variables['hello']('taylor'));
+    }
+
+    public function testIgnoredMethodsAreNotExposedToViewData()
+    {
+        $component = new class extends Component
+        {
+            protected $except = ['goodbye'];
+
+            public function render()
+            {
+                return 'test';
+            }
+
+            public function hello()
+            {
+                return 'hello world';
+            }
+
+            public function goodbye()
+            {
+                return 'goodbye';
+            }
+        };
+
+        $data = $component->data();
+
+        $this->assertArrayHasKey('hello', $data);
+        $this->assertArrayNotHasKey('goodbye', $data);
+
+        $reflectionMethod = new ReflectionMethod($component, 'ignoredMethods');
+
+        $reflectionMethod->setAccessible(true);
+
+        $ignoredMethods = $reflectionMethod->invoke($component);
+
+        foreach ($ignoredMethods as $method) {
+            $this->assertArrayNotHasKey($method, $data);
+        }
     }
 
     public function testAttributeParentInheritance()

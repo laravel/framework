@@ -4,9 +4,7 @@ namespace {{ namespace }};
 
 use {{ namespacedModel }};
 use {{ rootNamespace }}Http\Controllers\Controller;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use {{ namespacedParentModel }};
 
 class {{ class }} extends Controller
@@ -30,7 +28,7 @@ class {{ class }} extends Controller
     /**
      * Display the resource.
      */
-    public function show({{ parentModel }} ${{ parentModelVariable }}): Response
+    public function show({{ parentModel }} ${{ parentModelVariable }})
     {
         //
     }
@@ -38,7 +36,7 @@ class {{ class }} extends Controller
     /**
      * Show the form for editing the resource.
      */
-    public function edit({{ parentModel }} ${{ parentModelVariable }}): Response
+    public function edit({{ parentModel }} ${{ parentModelVariable }})
     {
         //
     }
@@ -46,7 +44,7 @@ class {{ class }} extends Controller
     /**
      * Update the resource in storage.
      */
-    public function update(Request $request, {{ parentModel }} ${{ parentModelVariable }}): RedirectResponse
+    public function update(Request $request, {{ parentModel }} ${{ parentModelVariable }})
     {
         //
     }

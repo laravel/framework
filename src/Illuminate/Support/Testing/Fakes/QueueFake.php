@@ -11,7 +11,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Traits\ReflectsClosures;
 use PHPUnit\Framework\Assert as PHPUnit;
 
-class QueueFake extends QueueManager implements Queue
+class QueueFake extends QueueManager implements Fake, Queue
 {
     use ReflectsClosures;
 
@@ -20,7 +20,7 @@ class QueueFake extends QueueManager implements Queue
      *
      * @var \Illuminate\Contracts\Queue\Queue
      */
-    protected $queue;
+    public $queue;
 
     /**
      * The job types that should be intercepted instead of pushed to the queue.
@@ -42,6 +42,13 @@ class QueueFake extends QueueManager implements Queue
      * @var array
      */
     protected $jobs = [];
+
+    /**
+     * Indicates if items should be serialized and restored when pushed to the queue.
+     *
+     * @var bool
+     */
+    protected bool $serializeAndRestore = false;
 
     /**
      * Create a new fake queue instance.
@@ -272,6 +279,22 @@ class QueueFake extends QueueManager implements Queue
     }
 
     /**
+     * Assert the total count of jobs that were pushed.
+     *
+     * @param  int  $expectedCount
+     * @return void
+     */
+    public function assertCount($expectedCount)
+    {
+        $actualCount = collect($this->jobs)->flatten(1)->count();
+
+        PHPUnit::assertSame(
+            $expectedCount, $actualCount,
+            "Expected {$expectedCount} jobs to be pushed, but found {$actualCount} instead."
+        );
+    }
+
+    /**
      * Assert that no jobs were pushed.
      *
      * @return void
@@ -352,7 +375,7 @@ class QueueFake extends QueueManager implements Queue
             }
 
             $this->jobs[is_object($job) ? get_class($job) : $job][] = [
-                'job' => $job,
+                'job' => $this->serializeAndRestore ? $this->serializeAndRestoreJob($job) : $job,
                 'queue' => $queue,
                 'data' => $data,
             ];
@@ -380,7 +403,7 @@ class QueueFake extends QueueManager implements Queue
         }
 
         return $this->jobsToFake->contains(
-            fn ($jobToFake) => $job instanceof ((string) $jobToFake)
+            fn ($jobToFake) => $job instanceof ((string) $jobToFake) || $job === (string) $jobToFake
         );
     }
 
@@ -489,6 +512,30 @@ class QueueFake extends QueueManager implements Queue
     public function pushedJobs()
     {
         return $this->jobs;
+    }
+
+    /**
+     * Specify if jobs should be serialized and restored when being "pushed" to the queue.
+     *
+     * @param  bool  $serializeAndRestore
+     * @return $this
+     */
+    public function serializeAndRestore(bool $serializeAndRestore = true)
+    {
+        $this->serializeAndRestore = $serializeAndRestore;
+
+        return $this;
+    }
+
+    /**
+     * Serialize and unserialize the job to simulate the queueing process.
+     *
+     * @param  mixed  $job
+     * @return mixed
+     */
+    protected function serializeAndRestoreJob($job)
+    {
+        return unserialize(serialize($job));
     }
 
     /**

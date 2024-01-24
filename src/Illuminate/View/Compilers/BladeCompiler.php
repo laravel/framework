@@ -30,9 +30,11 @@ class BladeCompiler extends Compiler implements CompilerInterface
         Concerns\CompilesLayouts,
         Concerns\CompilesLoops,
         Concerns\CompilesRawPhp,
+        Concerns\CompilesSessions,
         Concerns\CompilesStacks,
         Concerns\CompilesStyles,
         Concerns\CompilesTranslations,
+        Concerns\CompilesUseStatements,
         ReflectsClosures;
 
     /**
@@ -55,6 +57,13 @@ class BladeCompiler extends Compiler implements CompilerInterface
      * @var array
      */
     protected $conditions = [];
+
+    /**
+     * The registered string preparation callbacks.
+     *
+     * @var array
+     */
+    protected $prepareStringsForCompilationUsing = [];
 
     /**
      * All of the registered precompilers.
@@ -249,11 +258,17 @@ class BladeCompiler extends Compiler implements CompilerInterface
     {
         [$this->footer, $result] = [[], ''];
 
+        foreach ($this->prepareStringsForCompilationUsing as $callback) {
+            $value = $callback($value);
+        }
+
+        $value = $this->storeUncompiledBlocks($value);
+
         // First we will compile the Blade component tags. This is a precompile style
         // step which compiles the component Blade tags into @component directives
         // that may be used by Blade. Then we should call any other precompilers.
         $value = $this->compileComponentTags(
-            $this->compileComments($this->storeUncompiledBlocks($value))
+            $this->compileComments($value)
         );
 
         foreach ($this->precompilers as $precompiler) {
@@ -319,7 +334,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
 
         return tap($view->render(), function () use ($view, $deleteCachedView) {
             if ($deleteCachedView) {
-                unlink($view->getPath());
+                @unlink($view->getPath());
             }
         });
     }
@@ -945,6 +960,19 @@ class BladeCompiler extends Compiler implements CompilerInterface
     public function getCustomDirectives()
     {
         return $this->customDirectives;
+    }
+
+    /**
+     * Indicate that the following callable should be used to prepare strings for compilation.
+     *
+     * @param  callable  $callback
+     * @return $this
+     */
+    public function prepareStringsForCompilationUsing(callable $callback)
+    {
+        $this->prepareStringsForCompilationUsing[] = $callback;
+
+        return $this;
     }
 
     /**

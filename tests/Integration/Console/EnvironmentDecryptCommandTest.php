@@ -50,7 +50,7 @@ class EnvironmentDecryptCommandTest extends TestCase
             ->assertExitCode(1);
     }
 
-    public function testItFailsWhenEncyptionFileCannotBeFound()
+    public function testItFailsWhenEncryptionFileCannotBeFound()
     {
         $this->filesystem->shouldReceive('exists')->andReturn(true);
 
@@ -116,7 +116,7 @@ class EnvironmentDecryptCommandTest extends TestCase
 
     public function testItGeneratesTheEnvironmentFileWithKeyFromEnvironment()
     {
-        putenv('LARAVEL_ENV_ENCRYPTION_KEY=ponmlkjihgfedcbaponmlkjihgfedcba');
+        $_SERVER['LARAVEL_ENV_ENCRYPTION_KEY'] = 'ponmlkjihgfedcbaponmlkjihgfedcba';
 
         $this->filesystem->shouldReceive('exists')
             ->once()
@@ -137,6 +137,8 @@ class EnvironmentDecryptCommandTest extends TestCase
 
         $this->filesystem->shouldHaveReceived('put')
             ->with(base_path('.env'), 'APP_NAME="Laravel Three"');
+
+        unset($_SERVER['LARAVEL_ENV_ENCRYPTION_KEY']);
     }
 
     public function testItGeneratesTheEnvironmentFileWhenForcing()

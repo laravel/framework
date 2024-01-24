@@ -26,6 +26,20 @@ class AuthenticateWithBasicAuth
     }
 
     /**
+     * Specify the guard and field for the middleware.
+     *
+     * @param  string|null  $guard
+     * @param  string|null  $field
+     * @return string
+     *
+     * @named-arguments-supported
+     */
+    public static function using($guard = null, $field = null)
+    {
+        return static::class.':'.implode(',', func_get_args());
+    }
+
+    /**
      * Handle an incoming request.
      *
      * @param  \Illuminate\Http\Request  $request

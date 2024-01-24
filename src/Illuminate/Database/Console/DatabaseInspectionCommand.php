@@ -16,6 +16,8 @@ use Symfony\Component\Process\Exception\ProcessSignaledException;
 use Symfony\Component\Process\Exception\RuntimeException;
 use Symfony\Component\Process\Process;
 
+use function Laravel\Prompts\confirm;
+
 abstract class DatabaseInspectionCommand extends Command
 {
     /**
@@ -206,7 +208,7 @@ abstract class DatabaseInspectionCommand extends Command
     protected function ensureDependenciesExist()
     {
         return tap(interface_exists('Doctrine\DBAL\Driver'), function ($dependenciesExist) {
-            if (! $dependenciesExist && $this->components->confirm('Inspecting database information requires the Doctrine DBAL (doctrine/dbal) package. Would you like to install it?')) {
+            if (! $dependenciesExist && confirm('Inspecting database information requires the Doctrine DBAL (doctrine/dbal) package. Would you like to install it?', default: false)) {
                 $this->installDependencies();
             }
         });
@@ -222,7 +224,7 @@ abstract class DatabaseInspectionCommand extends Command
     protected function installDependencies()
     {
         $command = collect($this->composer->findComposer())
-            ->push('require doctrine/dbal')
+            ->push('require doctrine/dbal:^3.5.1')
             ->implode(' ');
 
         $process = Process::fromShellCommandline($command, null, null, null, null);

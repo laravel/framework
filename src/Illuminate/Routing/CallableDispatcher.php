@@ -8,7 +8,7 @@ use ReflectionFunction;
 
 class CallableDispatcher implements CallableDispatcherContract
 {
-    use RouteDependencyResolverTrait;
+    use ResolvesRouteDependencies;
 
     /**
      * The container instance.

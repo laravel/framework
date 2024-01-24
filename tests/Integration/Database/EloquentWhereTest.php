@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Schema;
 
 class EloquentWhereTest extends DatabaseTestCase
 {
-    protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
+    protected function afterRefreshingDatabase()
     {
         Schema::create('users', function (Blueprint $table) {
             $table->increments('id');
@@ -138,7 +138,7 @@ class EloquentWhereTest extends DatabaseTestCase
         $this->assertCount(2, $users);
     }
 
-    public function testWhereInCanAcceptQueriable()
+    public function testWhereInCanAcceptQueryable()
     {
         $user1 = UserWhereTest::create([
             'name' => 'test-name1',

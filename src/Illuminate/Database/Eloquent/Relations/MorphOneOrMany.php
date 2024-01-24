@@ -68,6 +68,20 @@ abstract class MorphOneOrMany extends HasOneOrMany
     }
 
     /**
+     * Create a new instance of the related model. Allow mass-assignment.
+     *
+     * @param  array  $attributes
+     * @return \Illuminate\Database\Eloquent\Model
+     */
+    public function forceCreate(array $attributes = [])
+    {
+        $attributes[$this->getForeignKeyName()] = $this->getParentKey();
+        $attributes[$this->getMorphType()] = $this->morphClass;
+
+        return $this->related->forceCreate($attributes);
+    }
+
+    /**
      * Set the foreign ID and type for creating a related model.
      *
      * @param  \Illuminate\Database\Eloquent\Model  $model

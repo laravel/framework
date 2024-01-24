@@ -30,7 +30,6 @@ class DatabaseMigrationMakeCommandTest extends TestCase
         $creator->shouldReceive('create')->once()
                 ->with('create_foo', __DIR__.DIRECTORY_SEPARATOR.'migrations', 'foo', true)
                 ->andReturn(__DIR__.'/migrations/2021_04_23_110457_create_foo.php');
-        $composer->shouldReceive('dumpAutoloads')->once();
 
         $this->runCommand($command, ['name' => 'create_foo']);
     }

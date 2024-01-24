@@ -206,7 +206,7 @@ class AblyBroadcaster extends Broadcaster
     /**
      * Get the public token value from the Ably key.
      *
-     * @return mixed
+     * @return string
      */
     protected function getPublicToken()
     {
@@ -216,7 +216,7 @@ class AblyBroadcaster extends Broadcaster
     /**
      * Get the private token value from the Ably key.
      *
-     * @return mixed
+     * @return string
      */
     protected function getPrivateToken()
     {

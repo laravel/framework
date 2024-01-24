@@ -8,29 +8,13 @@ use Illuminate\Support\Str;
 trait HasUuids
 {
     /**
-     * Generate a primary UUID for the model.
+     * Initialize the trait.
      *
      * @return void
      */
-    public static function bootHasUuids()
+    public function initializeHasUuids()
     {
-        static::creating(function (self $model) {
-            foreach ($model->uniqueIds() as $column) {
-                if (empty($model->{$column})) {
-                    $model->{$column} = $model->newUniqueId();
-                }
-            }
-        });
-    }
-
-    /**
-     * Generate a new UUID for the model.
-     *
-     * @return string
-     */
-    public function newUniqueId()
-    {
-        return (string) Str::orderedUuid();
+        $this->usesUniqueIds = true;
     }
 
     /**
@@ -41,6 +25,16 @@ trait HasUuids
     public function uniqueIds()
     {
         return [$this->getKeyName()];
+    }
+
+    /**
+     * Generate a new UUID for the model.
+     *
+     * @return string
+     */
+    public function newUniqueId()
+    {
+        return (string) Str::orderedUuid();
     }
 
     /**

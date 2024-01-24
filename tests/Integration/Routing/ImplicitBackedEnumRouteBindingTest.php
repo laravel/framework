@@ -5,10 +5,15 @@ namespace Illuminate\Tests\Integration\Routing;
 use Illuminate\Support\Facades\Route;
 use Orchestra\Testbench\TestCase;
 
-include 'Enums.php';
+include_once 'Enums.php';
 
 class ImplicitBackedEnumRouteBindingTest extends TestCase
 {
+    protected function defineEnvironment($app): void
+    {
+        $app['config']->set(['app.key' => 'AckfSECXIvnK5r28GVIWUAxmbBSjTsmF']);
+    }
+
     public function testWithRouteCachingEnabled()
     {
         $this->defineCacheRoutes(<<<PHP
