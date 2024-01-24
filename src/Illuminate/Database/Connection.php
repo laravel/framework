@@ -1634,4 +1634,14 @@ class Connection implements ConnectionInterface
     {
         return static::$resolvers[$driver] ?? null;
     }
+
+    /**
+     * Flush the connection resolvers.
+     *
+     * @return void
+     */
+    public static function flushState()
+    {
+        static::$resolvers = [];
+    }
 }

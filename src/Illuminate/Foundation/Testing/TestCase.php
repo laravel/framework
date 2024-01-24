@@ -5,6 +5,7 @@ namespace Illuminate\Foundation\Testing;
 use Carbon\CarbonImmutable;
 use Illuminate\Console\Application as Artisan;
 use Illuminate\Contracts\Console\Kernel;
+use Illuminate\Database\Connection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Bootstrap\HandleExceptions;
@@ -247,6 +248,7 @@ abstract class TestCase extends BaseTestCase
         Component::flushCache();
         Component::forgetComponentsResolver();
         Component::forgetFactory();
+        Connection::flushState();
         ConvertEmptyStringsToNull::flushState();
         HandleExceptions::flushState();
         Once::flush();
