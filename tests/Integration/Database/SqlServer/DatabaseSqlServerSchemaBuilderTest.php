@@ -5,7 +5,6 @@ namespace Illuminate\Tests\Integration\Database\SqlServer;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
-use stdClass;
 
 class DatabaseSqlServerSchemaBuilderTest extends SqlServerTestCase
 {
