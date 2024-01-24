@@ -70,10 +70,10 @@ class RedirectIfAuthenticated
     /**
      * Specify the callback that should be used to generate the redirect path.
      *
-     * @param  callable  $redirectToCallback
+     * @param  callable|null  $redirectToCallback
      * @return void
      */
-    public static function redirectUsing(callable $redirectToCallback)
+    public static function redirectUsing(callable|null $redirectToCallback)
     {
         static::$redirectToCallback = $redirectToCallback;
     }

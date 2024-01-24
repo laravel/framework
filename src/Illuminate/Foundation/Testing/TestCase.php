@@ -5,6 +5,7 @@ namespace Illuminate\Foundation\Testing;
 use Carbon\CarbonImmutable;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Auth\Middleware\Authenticate;
+use Illuminate\Auth\Middleware\RedirectIfAuthenticated;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Console\Application as Artisan;
@@ -261,6 +262,7 @@ abstract class TestCase extends BaseTestCase
         HandleExceptions::flushState();
         Once::flush();
         Queue::createPayloadUsing(null);
+        RedirectIfAuthenticated::redirectUsing(null);
         RegisterProviders::flushState();
         ResetPassword::flushState();
         ScheduleListCommand::resolveTerminalWidthUsing(null);
