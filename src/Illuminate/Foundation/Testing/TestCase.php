@@ -36,6 +36,7 @@ use Illuminate\Pagination\AbstractPaginator;
 use Illuminate\Queue\Queue;
 use Illuminate\Queue\Worker;
 use Illuminate\Routing\Middleware\ThrottleRequests;
+use Illuminate\Routing\Middleware\ValidateSignature;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\Facades\ParallelTesting;
@@ -296,6 +297,7 @@ abstract class TestCase extends BaseTestCase
         ThrottleRequests::shouldHashKeys();
         TrimStrings::flushState();
         TrustProxies::flushState();
+        ValidateSignature::flushState();
         VerifyCsrfToken::flushState();
         VerifyEmail::flushState();
         Vite::flushState();
