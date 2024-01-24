@@ -37,7 +37,7 @@ class ClassMakeCommand extends GeneratorCommand
      */
     protected function getStub()
     {
-        if ( $this->option('invokable')) {
+        if ($this->option('invokable')) {
             return __DIR__.'/stubs/class.invokable.stub';
         }
 
