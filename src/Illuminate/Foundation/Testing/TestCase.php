@@ -7,6 +7,7 @@ use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Console\Application as Artisan;
 use Illuminate\Console\Scheduling\ScheduleListCommand;
+use Illuminate\Console\Signals;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Eloquent\Model;
@@ -259,6 +260,7 @@ abstract class TestCase extends BaseTestCase
         RegisterProviders::flushState();
         ResetPassword::flushState();
         ScheduleListCommand::resolveTerminalWidthUsing(null);
+        Signals::resolveAvailabilityUsing(null);
         Sleep::fake(false);
         TrimStrings::flushState();
         VerifyEmail::flushState();
