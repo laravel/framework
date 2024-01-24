@@ -51,4 +51,15 @@ class Json
     {
         static::$decoder = $decoder;
     }
+
+    /**
+     * Flush the global state.
+     *
+     * @return void
+     */
+    public static function flushState()
+    {
+        static::$encoder = null;
+        static::$decoder = null;
+    }
 }

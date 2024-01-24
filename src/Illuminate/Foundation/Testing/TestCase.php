@@ -17,6 +17,7 @@ use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Database\Connection;
 use Illuminate\Database\DatabaseServiceProvider;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Json;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Bootstrap\HandleExceptions;
@@ -268,6 +269,7 @@ abstract class TestCase extends BaseTestCase
         DatabaseServiceProvider::flushState();
         EncryptCookies::flushState();
         HandleExceptions::flushState();
+        Json::flushState();
         Once::flush();
         Queue::createPayloadUsing(null);
         RedirectIfAuthenticated::redirectUsing(null);
