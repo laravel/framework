@@ -299,6 +299,19 @@ class ApplicationBuilder
     }
 
     /**
+     * Register a callback to be invoked when the application's service providers are registered.
+     *
+     * @param  callable  $callback
+     * @return $this
+     */
+    public function registered(callable $callback)
+    {
+        $this->app->registered($callback);
+
+        return $this;
+    }
+
+    /**
      * Register a callback to be invoked when the application is "booting".
      *
      * @param  callable  $callback
