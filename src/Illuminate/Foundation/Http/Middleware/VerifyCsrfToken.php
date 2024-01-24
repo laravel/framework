@@ -230,4 +230,14 @@ class VerifyCsrfToken
     {
         return EncryptCookies::serialized('XSRF-TOKEN');
     }
+
+    /**
+     * Flush the global state.
+     *
+     * @return void
+     */
+    public static function flushState()
+    {
+        static::$neverVerify = [];
+    }
 }

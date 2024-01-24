@@ -25,6 +25,7 @@ use Illuminate\Foundation\Bootstrap\RegisterProviders;
 use Illuminate\Foundation\Console\AboutCommand;
 use Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull;
 use Illuminate\Foundation\Http\Middleware\TrimStrings;
+use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Foundation\Vite;
 use Illuminate\Http\Middleware\TrustProxies;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -291,6 +292,7 @@ abstract class TestCase extends BaseTestCase
         Sleep::fake(false);
         TrimStrings::flushState();
         TrustProxies::flushState();
+        VerifyCsrfToken::flushState();
         VerifyEmail::flushState();
         Vite::flushState();
         Worker::flushState();
