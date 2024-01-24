@@ -4,6 +4,7 @@ namespace Illuminate\Foundation\Testing;
 
 use Carbon\CarbonImmutable;
 use Illuminate\Auth\AuthenticationException;
+use Illuminate\Auth\Middleware\Authenticate;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Console\Application as Artisan;
@@ -250,6 +251,7 @@ abstract class TestCase extends BaseTestCase
 
         AboutCommand::flushState();
         Artisan::forgetBootstrappers();
+        Authenticate::redirectUsing(null);
         AuthenticationException::redirectUsing(null);
         Component::flushCache();
         Component::forgetComponentsResolver();
