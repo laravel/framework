@@ -1827,5 +1827,8 @@ class Str
         static::$snakeCache = [];
         static::$camelCache = [];
         static::$studlyCache = [];
+        static::$uuidFactory = null;
+        static::$ulidFactory = null;
+        static::$randomStringFactory = null;
     }
 }
