@@ -203,7 +203,7 @@ class Builder
     }
 
     /**
-     * Get the table listing.
+     * Get the names of the tables that belong to the database.
      *
      * @return array
      */
@@ -381,7 +381,7 @@ class Builder
     }
 
     /**
-     * Get the index listing for a given table.
+     * Get the names of the indexes for a given table.
      *
      * @param  string  $table
      * @return array
