@@ -32,6 +32,7 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Pagination\AbstractCursorPaginator;
 use Illuminate\Pagination\AbstractPaginator;
 use Illuminate\Queue\Queue;
+use Illuminate\Queue\Worker;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\Facades\ParallelTesting;
@@ -292,6 +293,7 @@ abstract class TestCase extends BaseTestCase
         TrustProxies::flushState();
         VerifyEmail::flushState();
         Vite::flushState();
+        Worker::flushState();
 
         if ($this->callbackException) {
             throw $this->callbackException;

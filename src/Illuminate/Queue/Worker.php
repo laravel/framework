@@ -873,4 +873,14 @@ class Worker
     {
         $this->manager = $manager;
     }
+
+    /**
+     * Flush the global state.
+     *
+     * @return void
+     */
+    public static function flushState()
+    {
+        static::$popCallbacks = [];
+    }
 }
