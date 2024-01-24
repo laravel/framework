@@ -1636,7 +1636,7 @@ class Connection implements ConnectionInterface
     }
 
     /**
-     * Flush the connection resolvers.
+     * Flush the global state.
      *
      * @return void
      */
