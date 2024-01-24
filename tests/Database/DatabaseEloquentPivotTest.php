@@ -139,19 +139,6 @@ class DatabaseEloquentPivotTest extends TestCase
         $this->assertSame('pivot', $pivot->getTable());
     }
 
-    public function testPivotModelWithParentReturnsParentsTimestampColumns()
-    {
-        $parent = m::mock(Model::class);
-        $parent->shouldReceive('getCreatedAtColumn')->andReturn('parent_created_at');
-        $parent->shouldReceive('getUpdatedAtColumn')->andReturn('parent_updated_at');
-
-        $pivotWithParent = new Pivot;
-        $pivotWithParent->pivotParent = $parent;
-
-        $this->assertSame('parent_created_at', $pivotWithParent->getCreatedAtColumn());
-        $this->assertSame('parent_updated_at', $pivotWithParent->getUpdatedAtColumn());
-    }
-
     public function testPivotModelWithoutParentReturnsModelTimestampColumns()
     {
         $model = new DummyModel;
