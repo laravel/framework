@@ -246,4 +246,18 @@ trait SoftDeletes
     {
         return $this->qualifyColumn($this->getDeletedAtColumn());
     }
+
+    /**
+     * Get a new query to restore one or more models by their queueable IDs.
+     *
+     * @param  array|int  $ids
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function newQueryForRestoration($ids): Builder
+    {
+        return $this
+            ->newQueryWithoutScopes()
+            ->whereKey($ids)
+            ->whereNull($this->getDeletedAtColumn());
+    }
 }
