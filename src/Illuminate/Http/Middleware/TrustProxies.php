@@ -149,4 +149,14 @@ class TrustProxies
     {
         return static::$alwaysTrust ?: $this->proxies;
     }
+
+    /**
+     * Flush the global state.
+     *
+     * @return void
+     */
+    public static function flushState()
+    {
+        static::$alwaysTrust = null;
+    }
 }
