@@ -68,7 +68,7 @@ class StorageLinkCommand extends Command
     protected function links()
     {
         if ($name = $this->argument('name')) {
-            if (! $link = $this->laravel['config']["filesystems.links.".$name] ?? null) {
+            if (! $link = $this->laravel['config']['filesystems.links.'.$name] ?? null) {
                 $this->components->error("No link have been configured for the [$name] name.");
 
                 return [];
