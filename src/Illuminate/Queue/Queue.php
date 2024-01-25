@@ -327,20 +327,20 @@ abstract class Queue
         if ($this->shouldDispatchAfterCommit($job) &&
             $this->container->bound('db.transactions')) {
             return $this->container->make('db.transactions')->addCallback(
-                function () use ($payload, $queue, $delay, $callback, $job) {
-                    $this->raiseJobQueueingEvent($job, $payload);
+                function () use ($queue, $delay, $job, $payload, $callback) {
+                    $this->raiseJobQueueingEvent($queue, $delay, $job, $payload);
 
-                    return tap($callback($payload, $queue, $delay), function ($jobId) use ($job, $payload) {
-                        $this->raiseJobQueuedEvent($jobId, $job, $payload);
+                    return tap($callback($payload, $queue, $delay), function ($jobId) use ($queue, $delay, $job, $payload) {
+                        $this->raiseJobQueuedEvent($queue, $delay, $jobId, $job, $payload);
                     });
                 }
             );
         }
 
-        $this->raiseJobQueueingEvent($job, $payload);
+        $this->raiseJobQueueingEvent($queue, $delay, $job, $payload);
 
-        return tap($callback($payload, $queue, $delay), function ($jobId) use ($job, $payload) {
-            $this->raiseJobQueuedEvent($jobId, $job, $payload);
+        return tap($callback($payload, $queue, $delay), function ($jobId) use ($queue, $delay, $job, $payload) {
+            $this->raiseJobQueuedEvent($queue, $delay, $jobId, $job, $payload);
         });
     }
 
@@ -370,29 +370,33 @@ abstract class Queue
     /**
      * Raise the job queueing event.
      *
+     * @param  string  $queue
+     * @param  \DateTimeInterface|\DateInterval|int|null  $delay
      * @param  \Closure|string|object  $job
      * @param  string  $payload
      * @return void
      */
-    protected function raiseJobQueueingEvent($job, $payload)
+    protected function raiseJobQueueingEvent($queue, $delay, $job, $payload)
     {
         if ($this->container->bound('events')) {
-            $this->container['events']->dispatch(new JobQueueing($this->connectionName, $job, $payload));
+            $this->container['events']->dispatch(new JobQueueing($this->connectionName, $queue, $delay, $job, $payload));
         }
     }
 
     /**
      * Raise the job queued event.
      *
+     * @param  string  $queue
+     * @param  \DateTimeInterface|\DateInterval|int|null  $delay
      * @param  string|int|null  $jobId
      * @param  \Closure|string|object  $job
      * @param  string  $payload
      * @return void
      */
-    protected function raiseJobQueuedEvent($jobId, $job, $payload)
+    protected function raiseJobQueuedEvent($queue, $delay, $jobId, $job, $payload)
     {
         if ($this->container->bound('events')) {
-            $this->container['events']->dispatch(new JobQueued($this->connectionName, $jobId, $job, $payload));
+            $this->container['events']->dispatch(new JobQueued($this->connectionName, $queue, $delay, $jobId, $job, $payload));
         }
     }
 

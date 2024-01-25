@@ -2,8 +2,6 @@
 
 namespace Illuminate\Queue\Events;
 
-use RuntimeException;
-
 class JobQueued
 {
     /**
@@ -12,6 +10,20 @@ class JobQueued
      * @var string
      */
     public $connectionName;
+
+    /**
+     * The queue name the job is queued on.
+     *
+     * @var string
+     */
+    public $queue;
+
+    /**
+     * The delay used to queue the job.
+     *
+     * @var \DateTimeInterface|\DateInterval|int|null
+     */
+    public $delay;
 
     /**
      * The job ID.
@@ -30,7 +42,7 @@ class JobQueued
     /**
      * The job payload.
      *
-     * @var string|null
+     * @var string
      */
     public $payload;
 
@@ -38,14 +50,18 @@ class JobQueued
      * Create a new event instance.
      *
      * @param  string  $connectionName
+     * @param  string  $queue
+     * @param  \DateTimeInterface|\DateInterval|int|null  $delay
      * @param  string|int|null  $id
      * @param  \Closure|string|object  $job
-     * @param  string|null  $payload
+     * @param  string  $payload
      * @return void
      */
-    public function __construct($connectionName, $id, $job, $payload = null)
+    public function __construct($connectionName, $queue, $delay, $id, $job, $payload)
     {
         $this->connectionName = $connectionName;
+        $this->queue = $queue;
+        $this->delay = $delay;
         $this->id = $id;
         $this->job = $job;
         $this->payload = $payload;
@@ -58,10 +74,6 @@ class JobQueued
      */
     public function payload()
     {
-        if ($this->payload === null) {
-            throw new RuntimeException('The job payload was not provided when the event was dispatched.');
-        }
-
         return json_decode($this->payload, true, flags: JSON_THROW_ON_ERROR);
     }
 }
