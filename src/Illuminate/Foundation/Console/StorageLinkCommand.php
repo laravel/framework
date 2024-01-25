@@ -33,7 +33,7 @@ class StorageLinkCommand extends Command
     {
         $relative = $this->option('relative');
 
-        foreach ($this->links() as $link => $target) {
+        foreach ($this->links() as [$link, $target]) {
             if (file_exists($link) && ! $this->isRemovableSymlink($link, $this->option('force'))) {
                 $this->components->error("The [$link] link already exists.");
                 continue;
@@ -60,8 +60,12 @@ class StorageLinkCommand extends Command
      */
     protected function links()
     {
-        return $this->laravel['config']['filesystems.links'] ??
-               [public_path('storage') => storage_path('app/public')];
+        return $this->laravel['config']['filesystems.links'] ?? [
+            'public' => [
+                'link' => public_path('storage'),
+                'target' => storage_path('app/public'),
+            ],
+        ];
     }
 
     /**
