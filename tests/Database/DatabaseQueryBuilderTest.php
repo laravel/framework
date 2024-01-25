@@ -2893,20 +2893,20 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->from('users')->insertOrIgnore(['email' => 'foo']);
     }
 
-    public function testInsertOrIgnoreUpdateMethod()
+    public function testInsertOrIgnoreUsingMethod()
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('does not support');
         $builder = $this->getBuilder();
-        $builder->from('users')->insertOrIgnoreUpdate(['email' => 'foo']);
+        $builder->from('users')->insertOrIgnoreUsing(['email' => 'foo']);
     }
 
-    public function testSqlServerInsertOrIgnoreUpdateMethod()
+    public function testSqlServerInsertOrIgnoreUsingMethod()
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('does not support');
         $builder = $this->getSqlServerBuilder();
-        $builder->from('users')->insertOrIgnoreUpdate(['email' => 'foo']);
+        $builder->from('users')->insertOrIgnoreUsing(['email' => 'foo']);
     }
 
     public function testMySqlInsertOrIgnoreUsingMethod()
