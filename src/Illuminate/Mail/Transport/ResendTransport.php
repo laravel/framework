@@ -5,6 +5,7 @@ namespace Illuminate\Mail\Transport;
 use Exception;
 use Resend\Contracts\Client;
 use Symfony\Component\Mailer\Envelope;
+use Symfony\Component\Mailer\Exception\TransportException;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\AbstractTransport;
 use Symfony\Component\Mime\Address;
@@ -96,8 +97,8 @@ class ResendTransport extends AbstractTransport
                 'attachments' => $attachments,
             ]);
         } catch (Exception $exception) {
-            throw new Exception(
-                $exception->getMessage(),
+            throw new TransportException(
+                sprintf('Request to Resend API failed. Reason: %s.', $exception->getMessage()),
                 is_int($exception->getCode()) ? $exception->getCode() : 0,
                 $exception
             );
