@@ -403,26 +403,14 @@ class Builder
     {
         $type = is_null($type) ? $type : strtolower($type);
 
-        if (is_array($index)) {
-            sort($index);
-        }
-
         foreach ($this->getIndexes($table) as $value) {
             $typeMatches = is_null($type)
                 || ($type === 'primary' && $value['primary'])
                 || ($type === 'unique' && $value['unique'])
                 || $type === $value['type'];
 
-            if ($value['name'] === $index && $typeMatches) {
+            if (($value['name'] === $index || $value['columns'] === $index) && $typeMatches) {
                 return true;
-            }
-
-            if (is_array($index)) {
-                sort($value['columns']);
-
-                if ($value['columns'] === $index && $typeMatches) {
-                    return true;
-                }
             }
         }
 
