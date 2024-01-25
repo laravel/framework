@@ -810,6 +810,16 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     }
 
     /**
+     * Resolves class names contained in collection to an instance using service container.
+     *
+     * @return $this|Collection<class-string>
+     */
+    public function mapToInstance(?array $parameters = [])
+    {
+        return $this->map(fn($class) => app($class, $parameters));
+    }
+
+    /**
      * Run an associative map over each of the items.
      *
      * The callback should return an associative array with a single key/value pair.

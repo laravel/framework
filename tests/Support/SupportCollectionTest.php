@@ -3163,6 +3163,20 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testMapToInstance($collection)
+    {
+        $data = new $collection([
+            Container::class,
+        ]);
+
+        $data = $data->mapToInstance();
+
+        $this->assertInstanceOf(Container::class, $data->first());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testMapWithKeysIntegerKeys($collection)
     {
         $data = new $collection([
