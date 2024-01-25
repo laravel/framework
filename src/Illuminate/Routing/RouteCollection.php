@@ -70,12 +70,12 @@ class RouteCollection extends AbstractRouteCollection
 
     /**
     *
-    * @param  \Illuminate\Routing\Route  $route
-    * @return string
-    */
+     * @param  \Illuminate\Routing\Route  $route
+     * @return string
+     */
     protected function parseDomainAndUri($route)
     {
-        if(!is_null($route->getDomain())) {
+        if (! is_null($route->getDomain())) {
             return str($route->getDomain())
                 ->append('/', $route->uri())
                 ->whenEndsWith('//', fn ($str) => str($str)->replace('//', '/'))
