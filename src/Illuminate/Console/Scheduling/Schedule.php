@@ -90,7 +90,7 @@ class Schedule
      *
      * @var array<int, string>
      */
-    protected $allowedEventProperties = [
+    protected $allowableEventProperties = [
         'onOneServer',
         'timezone',
         'user',
@@ -420,7 +420,7 @@ class Schedule
     public function withEventDefaults(array $defaults, $callback = null)
     {
         foreach ($defaults as $key => $value) {
-            if (! in_array($key, $this->allowedEventProperties)) {
+            if (! in_array($key, $this->allowableEventProperties)) {
                 throw new InvalidArgumentException("Invalid attribute: {$key}");
             }
         }
