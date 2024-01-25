@@ -203,6 +203,16 @@ class Builder
     }
 
     /**
+     * Get the names of the tables that belong to the database.
+     *
+     * @return array
+     */
+    public function getTableListing()
+    {
+        return array_column($this->getTables(), 'name');
+    }
+
+    /**
      * Get the views that belong to the database.
      *
      * @return array
@@ -368,6 +378,55 @@ class Builder
         return $this->connection->getPostProcessor()->processIndexes(
             $this->connection->selectFromWriteConnection($this->grammar->compileIndexes($table))
         );
+    }
+
+    /**
+     * Get the names of the indexes for a given table.
+     *
+     * @param  string  $table
+     * @return array
+     */
+    public function getIndexListing($table)
+    {
+        return array_column($this->getIndexes($table), 'name');
+    }
+
+    /**
+     * Determine if the given table has a given index.
+     *
+     * @param  string  $table
+     * @param  string|array  $index
+     * @param  string|null  $type
+     * @return bool
+     */
+    public function hasIndex($table, $index, $type = null)
+    {
+        $type = is_null($type) ? $type : strtolower($type);
+
+        if (is_array($index)) {
+            sort($index);
+        }
+
+        foreach ($this->getIndexes($table) as $value) {
+            $typeMatches = is_null($type)
+                || ($type === 'primary' && $value['primary'])
+                || ($type === 'unique' && $value['unique'])
+                || $type === $value['type'];
+
+            if ($value['name'] === $index && $typeMatches) {
+                return true;
+            }
+
+            if (is_array($index)) {
+                sort($value['columns']);
+
+                if ($value['columns'] === $index && $typeMatches) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     /**
