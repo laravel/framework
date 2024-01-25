@@ -28,18 +28,36 @@ class JobQueueing
     public $payload;
 
     /**
+     * The queue name the job is queued on.
+     *
+     * @var string|null
+     */
+    public $queue;
+
+    /**
+     * The delay used to queue the job.
+     *
+     * @var \DateTimeInterface|\DateInterval|int|null
+     */
+    public $delay;
+
+    /**
      * Create a new event instance.
      *
      * @param  string  $connectionName
      * @param  \Closure|string|object  $job
      * @param  string|null  $payload
+     * @param  string|null  $queue
+     * @param  \DateTimeInterface|\DateInterval|int|null  $delay
      * @return void
      */
-    public function __construct($connectionName, $job, $payload = null)
+    public function __construct($connectionName, $job, $payload = null, $queue = null, $delay = null)
     {
         $this->connectionName = $connectionName;
         $this->job = $job;
         $this->payload = $payload;
+        $this->queue = $queue;
+        $this->delay = $delay;
     }
 
     /**
