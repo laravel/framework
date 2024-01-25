@@ -1894,7 +1894,6 @@ class DatabaseEloquentModelTest extends TestCase
         EloquentModelStub::flushEventListeners();
     }
 
-
     public function testModelObserversCanBeAttachedToModelsWithStringUsingAttribute()
     {
         EloquentModelWithObserveAttributeStub::setEventDispatcher($events = m::mock(Dispatcher::class));
