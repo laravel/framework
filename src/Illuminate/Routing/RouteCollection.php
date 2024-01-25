@@ -69,7 +69,6 @@ class RouteCollection extends AbstractRouteCollection
     }
 
     /**
-    *
      * @param  \Illuminate\Routing\Route  $route
      * @return string
      */
