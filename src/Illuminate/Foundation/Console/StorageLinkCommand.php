@@ -35,7 +35,6 @@ class StorageLinkCommand extends Command
         $relative = $this->option('relative');
 
         foreach ($this->links() as $name => $linkConfig) {
-
             if ($link = $linkConfig['link'] ?? null && $target = $linkConfig['target'] ?? null) {
                 $this->components->error("The $name link is not configured properly.");
                 continue;
