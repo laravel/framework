@@ -59,13 +59,30 @@ class RouteCollection extends AbstractRouteCollection
      */
     protected function addToCollections($route)
     {
-        $domainAndUri = $route->getDomain().$route->uri();
+        $domainAndUri = $this->parseDomainAndUri($route);
 
         foreach ($route->methods() as $method) {
             $this->routes[$method][$domainAndUri] = $route;
         }
 
         $this->allRoutes[$method.$domainAndUri] = $route;
+    }
+
+    /**
+    *
+    * @param  \Illuminate\Routing\Route  $route
+    * @return string
+    */
+    protected function parseDomainAndUri($route)
+    {
+        if(!is_null($route->getDomain())) {
+            return str($route->getDomain())
+                ->append('/', $route->uri())
+                ->whenEndsWith('//', fn ($str) => str($str)->replace('//', '/'))
+                ->value();
+        }
+
+        return $route->getDomain().$route->uri();
     }
 
     /**
