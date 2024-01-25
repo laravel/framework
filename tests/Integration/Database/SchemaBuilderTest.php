@@ -288,9 +288,9 @@ class SchemaBuilderTest extends DatabaseTestCase
         ));
         $this->assertTrue(Schema::hasIndex('foo', 'foo_baz_bar_unique'));
         $this->assertTrue(Schema::hasIndex('foo', 'foo_baz_bar_unique', 'unique'));
-        $this->assertTrue(Schema::hasIndex('foo', ['bar', 'baz']));
-        $this->assertTrue(Schema::hasIndex('foo', ['bar', 'baz'], 'unique'));
-        $this->assertFalse(Schema::hasIndex('foo', ['bar', 'baz'], 'primary'));
+        $this->assertTrue(Schema::hasIndex('foo', ['baz', 'bar']));
+        $this->assertTrue(Schema::hasIndex('foo', ['baz', 'bar'], 'unique'));
+        $this->assertFalse(Schema::hasIndex('foo', ['baz', 'bar'], 'primary'));
     }
 
     public function testGetIndexesWithCompositeKeys()
@@ -333,6 +333,26 @@ class SchemaBuilderTest extends DatabaseTestCase
         $this->assertCount(2, $indexes);
         $this->assertTrue(collect($indexes)->contains(fn ($index) => $index['columns'] === ['id'] && $index['primary']));
         $this->assertTrue(collect($indexes)->contains('name', 'articles_body_title_fulltext'));
+    }
+
+    public function testHasIndexOrder()
+    {
+        Schema::create('foo', function (Blueprint $table) {
+            $table->integer('bar');
+            $table->integer('baz');
+            $table->integer('qux');
+
+            $table->unique(['bar', 'baz']);
+            $table->index(['baz', 'bar']);
+            $table->index(['baz', 'qux']);
+        });
+
+        $this->assertTrue(Schema::hasIndex('foo', ['bar', 'baz']));
+        $this->assertTrue(Schema::hasIndex('foo', ['bar', 'baz'], 'unique'));
+        $this->assertTrue(Schema::hasIndex('foo', ['baz', 'bar']));
+        $this->assertFalse(Schema::hasIndex('foo', ['baz', 'bar'], 'unique'));
+        $this->assertTrue(Schema::hasIndex('foo', ['baz', 'qux']));
+        $this->assertFalse(Schema::hasIndex('foo', ['qux', 'baz']));
     }
 
     public function testGetForeignKeys()
