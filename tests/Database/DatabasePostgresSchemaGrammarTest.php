@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Database;
 
 use Illuminate\Database\Connection;
+use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\Builder;
 use Illuminate\Database\Schema\ForeignIdColumnDefinition;
@@ -413,6 +414,17 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
             'alter table "users" add constraint "users_laravel_idea_id_foreign" foreign key ("laravel_idea_id") references "laravel_ideas" ("id")',
             'alter table "users" add constraint "users_team_id_foreign" foreign key ("team_id") references "teams" ("id")',
             'alter table "users" add constraint "users_team_column_id_foreign" foreign key ("team_column_id") references "teams" ("id")',
+        ], $statements);
+    }
+
+    public function testAddingForeignIdSpecifyingIndexNameInConstraint()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->foreignId('company_id')->constrained(indexName: 'my_index');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertSame([
+            'alter table "users" add column "company_id" bigint not null',
+            'alter table "users" add constraint "my_index" foreign key ("company_id") references "companies" ("id")',
         ], $statements);
     }
 
@@ -946,6 +958,13 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
         $this->assertCount(1, $statements);
         $this->assertSame('alter table "users" add column "foo" integer null, add column "bar" boolean not null generated always as (foo is not null)', $statements[0]);
+
+        $blueprint = new Blueprint('users');
+        $blueprint->integer('foo')->nullable();
+        $blueprint->boolean('bar')->virtualAs(new Expression('foo is not null'));
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table "users" add column "foo" integer null, add column "bar" boolean not null generated always as (foo is not null)', $statements[0]);
     }
 
     public function testAddingStoredAs()
@@ -953,6 +972,13 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $blueprint = new Blueprint('users');
         $blueprint->integer('foo')->nullable();
         $blueprint->boolean('bar')->storedAs('foo is not null');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table "users" add column "foo" integer null, add column "bar" boolean not null generated always as (foo is not null) stored', $statements[0]);
+
+        $blueprint = new Blueprint('users');
+        $blueprint->integer('foo')->nullable();
+        $blueprint->boolean('bar')->storedAs(new Expression('foo is not null'));
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
         $this->assertCount(1, $statements);
         $this->assertSame('alter table "users" add column "foo" integer null, add column "bar" boolean not null generated always as (foo is not null) stored', $statements[0]);
@@ -1175,11 +1201,11 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $this->assertSame('select * from information_schema.tables where table_catalog = ? and table_schema = ? and table_name = ? and table_type = \'BASE TABLE\'', $statement);
     }
 
-    public function testCompileColumnListing()
+    public function testCompileColumns()
     {
-        $statement = $this->getGrammar()->compileColumnListing();
+        $statement = $this->getGrammar()->compileColumns('db', 'public', 'table');
 
-        $this->assertSame('select column_name from information_schema.columns where table_catalog = ? and table_schema = ? and table_name = ?', $statement);
+        $this->assertStringContainsString("where c.relname = 'table' and n.nspname = 'public'", $statement);
     }
 
     protected function getConnection()

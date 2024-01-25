@@ -267,38 +267,6 @@ class SqlServerGrammar extends Grammar
     }
 
     /**
-     * Move the order bindings to be after the "select" statement to account for an order by subquery.
-     *
-     * @param  \Illuminate\Database\Query\Builder  $query
-     * @return array
-     */
-    protected function sortBindingsForSubqueryOrderBy($query)
-    {
-        return Arr::sort($query->bindings, function ($bindings, $key) {
-            return array_search($key, ['select', 'order', 'from', 'join', 'where', 'groupBy', 'having', 'union', 'unionOrder']);
-        });
-    }
-
-    /**
-     * Compile the limit / offset row constraint for a query.
-     *
-     * @param  \Illuminate\Database\Query\Builder  $query
-     * @return string
-     */
-    protected function compileRowConstraint($query)
-    {
-        $start = (int) $query->offset + 1;
-
-        if ($query->limit > 0) {
-            $finish = (int) $query->offset + (int) $query->limit;
-
-            return "between {$start} and {$finish}";
-        }
-
-        return ">= {$start}";
-    }
-
-    /**
      * Compile a delete statement without joins into SQL.
      *
      * @param  \Illuminate\Database\Query\Builder  $query

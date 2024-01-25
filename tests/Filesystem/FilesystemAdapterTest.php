@@ -184,6 +184,20 @@ class FilesystemAdapterTest extends TestCase
         $this->assertNull($filesystemAdapter->get('file.txt'));
     }
 
+    public function testJsonReturnsDecodedJsonData()
+    {
+        $this->filesystem->write('file.json', '{"foo": "bar"}');
+        $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
+        $this->assertSame(['foo' => 'bar'], $filesystemAdapter->json('file.json'));
+    }
+
+    public function testJsonReturnsNullIfJsonDataIsInvalid()
+    {
+        $this->filesystem->write('file.json', '{"foo":');
+        $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
+        $this->assertNull($filesystemAdapter->json('file.json'));
+    }
+
     public function testMimeTypeNotDetected()
     {
         $this->filesystem->write('unknown.mime-type', '');

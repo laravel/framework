@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Database;
 
 use Illuminate\Database\Connection;
+use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\ForeignIdColumnDefinition;
 use Illuminate\Database\Schema\Grammars\SqlServerGrammar;
@@ -363,6 +364,17 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
             'alter table "users" add constraint "users_laravel_idea_id_foreign" foreign key ("laravel_idea_id") references "laravel_ideas" ("id")',
             'alter table "users" add constraint "users_team_id_foreign" foreign key ("team_id") references "teams" ("id")',
             'alter table "users" add constraint "users_team_column_id_foreign" foreign key ("team_column_id") references "teams" ("id")',
+        ], $statements);
+    }
+
+    public function testAddingForeignIdSpecifyingIndexNameInConstraint()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->foreignId('company_id')->constrained(indexName: 'my_index');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertSame([
+            'alter table "users" add "company_id" bigint not null',
+            'alter table "users" add constraint "my_index" foreign key ("company_id") references "companies" ("id")',
         ], $statements);
     }
 
@@ -897,6 +909,14 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $blueprint->integer('price');
         $blueprint->computed('discounted_virtual', 'price - 5');
         $blueprint->computed('discounted_stored', 'price - 5')->persisted();
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table "products" add "price" int not null, "discounted_virtual" as (price - 5), "discounted_stored" as (price - 5) persisted', $statements[0]);
+
+        $blueprint = new Blueprint('products');
+        $blueprint->integer('price');
+        $blueprint->computed('discounted_virtual', new Expression('price - 5'));
+        $blueprint->computed('discounted_stored', new Expression('price - 5'))->persisted();
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
         $this->assertCount(1, $statements);
         $this->assertSame('alter table "products" add "price" int not null, "discounted_virtual" as (price - 5), "discounted_stored" as (price - 5) persisted', $statements[0]);

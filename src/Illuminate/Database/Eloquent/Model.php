@@ -106,7 +106,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     public $exists = false;
 
     /**
-     * Indicates if the model was inserted during the current request lifecycle.
+     * Indicates if the model was inserted during the object's lifecycle.
      *
      * @var bool
      */
@@ -746,7 +746,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      *
      * @param  array|string  $relations
      * @param  string  $column
-     * @param  string  $function
+     * @param  string|null  $function
      * @return $this
      */
     public function loadAggregate($relations, $column, $function = null)
@@ -834,7 +834,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      * @param  string  $relation
      * @param  array  $relations
      * @param  string  $column
-     * @param  string  $function
+     * @param  string|null  $function
      * @return $this
      */
     public function loadMorphAggregate($relation, $relations, $column, $function = null)
@@ -951,10 +951,8 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     protected function incrementOrDecrement($column, $amount, $extra, $method)
     {
-        $query = $this->newQueryWithoutRelationships();
-
         if (! $this->exists) {
-            return $query->{$method}($column, $amount, $extra);
+            return $this->newQueryWithoutRelationships()->{$method}($column, $amount, $extra);
         }
 
         $this->{$column} = $this->isClassDeviable($column)
@@ -967,7 +965,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
             return false;
         }
 
-        return tap($this->setKeysForSaveQuery($query)->{$method}($column, $amount, $extra), function () use ($column) {
+        return tap($this->setKeysForSaveQuery($this->newQueryWithoutScopes())->{$method}($column, $amount, $extra), function () use ($column) {
             $this->syncChanges();
 
             $this->fireModelEvent('updated', false);
@@ -1209,7 +1207,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         // Once we have run the update operation, we will fire the "updated" event for
         // this model instance. This will allow developers to hook into these after
         // models are updated, giving them a chance to do any special processing.
-        $dirty = $this->getDirty();
+        $dirty = $this->getDirtyForUpdate();
 
         if (count($dirty) > 0) {
             $this->setKeysForSaveQuery($query)->update($dirty);
@@ -1276,6 +1274,10 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     protected function performInsert(Builder $query)
     {
+        if ($this->usesUniqueIds()) {
+            $this->setUniqueIds();
+        }
+
         if ($this->fireModelEvent('creating') === false) {
             return false;
         }
@@ -1285,10 +1287,6 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         // convenience. After, we will just continue saving these model instances.
         if ($this->usesTimestamps()) {
             $this->updateTimestamps();
-        }
-
-        if ($this->usesUniqueIds()) {
-            $this->setUniqueIds();
         }
 
         // If the model has an incrementing key, we can use the "insertGetId" method on
@@ -1725,6 +1723,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
             $this->getKeyName(),
             $this->getCreatedAtColumn(),
             $this->getUpdatedAtColumn(),
+            ...$this->uniqueIds(),
         ]));
 
         $attributes = Arr::except(
@@ -1823,7 +1822,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     /**
      * Get the connection resolver instance.
      *
-     * @return \Illuminate\Database\ConnectionResolverInterface
+     * @return \Illuminate\Database\ConnectionResolverInterface|null
      */
     public static function getConnectionResolver()
     {
@@ -2319,7 +2318,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function __call($method, $parameters)
     {
-        if (in_array($method, ['increment', 'decrement'])) {
+        if (in_array($method, ['increment', 'decrement', 'incrementQuietly', 'decrementQuietly'])) {
             return $this->$method(...$parameters);
         }
 

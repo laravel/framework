@@ -24,6 +24,13 @@ class ThrottleRequests
     protected $limiter;
 
     /**
+     * Indicates if the rate limiter keys should be hashed.
+     *
+     * @var bool
+     */
+    protected static $shouldHashKeys = true;
+
+    /**
      * Create a new request throttler.
      *
      * @param  \Illuminate\Cache\RateLimiter  $limiter
@@ -32,6 +39,32 @@ class ThrottleRequests
     public function __construct(RateLimiter $limiter)
     {
         $this->limiter = $limiter;
+    }
+
+    /**
+     * Specify the named rate limiter to use for the middleware.
+     *
+     * @param  string  $name
+     * @return string
+     */
+    public static function using($name)
+    {
+        return static::class.':'.$name;
+    }
+
+    /**
+     * Specify the rate limiter configuration for the middleware.
+     *
+     * @param  int  $maxAttempts
+     * @param  int  $decayMinutes
+     * @param  string  $prefix
+     * @return string
+     *
+     * @named-arguments-supported
+     */
+    public static function with($maxAttempts = 60, $decayMinutes = 1, $prefix = '')
+    {
+        return static::class.':'.implode(',', func_get_args());
     }
 
     /**
@@ -94,7 +127,7 @@ class ThrottleRequests
             $next,
             collect(Arr::wrap($limiterResponse))->map(function ($limit) use ($limiterName) {
                 return (object) [
-                    'key' => md5($limiterName.$limit->key),
+                    'key' => self::$shouldHashKeys ? md5($limiterName.$limit->key) : $limiterName.':'.$limit->key,
                     'maxAttempts' => $limit->maxAttempts,
                     'decayMinutes' => $limit->decayMinutes,
                     'responseCallback' => $limit->responseCallback,
@@ -167,9 +200,9 @@ class ThrottleRequests
     protected function resolveRequestSignature($request)
     {
         if ($user = $request->user()) {
-            return sha1($user->getAuthIdentifier());
+            return $this->formatIdentifier($user->getAuthIdentifier());
         } elseif ($route = $request->route()) {
-            return sha1($route->getDomain().'|'.$request->ip());
+            return $this->formatIdentifier($route->getDomain().'|'.$request->ip());
         }
 
         throw new RuntimeException('Unable to generate the request signature. Route unavailable.');
@@ -182,7 +215,7 @@ class ThrottleRequests
      * @param  string  $key
      * @param  int  $maxAttempts
      * @param  callable|null  $responseCallback
-     * @return \Illuminate\Http\Exceptions\ThrottleRequestsException
+     * @return \Illuminate\Http\Exceptions\ThrottleRequestsException|\Illuminate\Http\Exceptions\HttpResponseException
      */
     protected function buildException($request, $key, $maxAttempts, $responseCallback = null)
     {
@@ -272,5 +305,27 @@ class ThrottleRequests
     protected function calculateRemainingAttempts($key, $maxAttempts, $retryAfter = null)
     {
         return is_null($retryAfter) ? $this->limiter->retriesLeft($key, $maxAttempts) : 0;
+    }
+
+    /**
+     * Format the given identifier based on the configured hashing settings.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    private function formatIdentifier($value)
+    {
+        return self::$shouldHashKeys ? sha1($value) : $value;
+    }
+
+    /**
+     * Specify whether rate limiter keys should be hashed.
+     *
+     * @param  bool  $shouldHashKeys
+     * @return void
+     */
+    public static function shouldHashKeys(bool $shouldHashKeys = true)
+    {
+        self::$shouldHashKeys = $shouldHashKeys;
     }
 }

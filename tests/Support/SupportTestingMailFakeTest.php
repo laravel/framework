@@ -133,6 +133,21 @@ class SupportTestingMailFakeTest extends TestCase
         $this->fake->assertSent(MailableStub::class, 2);
     }
 
+    public function testAssertSentCount()
+    {
+        $this->fake->to('taylor@laravel.com')->send($this->mailable);
+        $this->fake->to('taylor@laravel.com')->send($this->mailable);
+
+        try {
+            $this->fake->assertSentCount(1);
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertStringContainsString('The total number of mailables sent was 2 instead of 1.', $e->getMessage());
+        }
+
+        $this->fake->assertSentCount(2);
+    }
+
     public function testAssertQueued()
     {
         try {
@@ -160,6 +175,21 @@ class SupportTestingMailFakeTest extends TestCase
         }
 
         $this->fake->assertQueued(MailableStub::class, 2);
+    }
+
+    public function testAssertQueuedCount()
+    {
+        $this->fake->to('taylor@laravel.com')->queue($this->mailable);
+        $this->fake->to('taylor@laravel.com')->queue($this->mailable);
+
+        try {
+            $this->fake->assertQueuedCount(1);
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertStringContainsString('The total number of mailables queued was 2 instead of 1.', $e->getMessage());
+        }
+
+        $this->fake->assertQueuedCount(2);
     }
 
     public function testSendQueuesAMailableThatShouldBeQueued()
@@ -202,6 +232,24 @@ class SupportTestingMailFakeTest extends TestCase
         } catch (ExpectationFailedException $e) {
             $this->assertStringContainsString('The following mailables were queued unexpectedly: Illuminate\Tests\Support\MailableStub', $e->getMessage());
         }
+    }
+
+    public function testAssertOutgoingCount()
+    {
+        $this->fake->assertNothingOutgoing();
+
+        $this->fake->to('taylor@laravel.com')->queue($this->mailable);
+
+        try {
+            $this->fake->assertOutgoingCount(2);
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertStringContainsString('The total number of outgoing mailables was 1 instead of 2.', $e->getMessage());
+        }
+
+        $this->fake->to('taylor@laravel.com')->send($this->mailable);
+
+        $this->fake->assertOutgoingCount(2);
     }
 
     public function testAssertQueuedWithClosure()

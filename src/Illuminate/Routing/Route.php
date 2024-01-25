@@ -268,6 +268,10 @@ class Route
      */
     public function getController()
     {
+        if (! $this->isControllerAction()) {
+            return null;
+        }
+
         if (! $this->controller) {
             $class = $this->getControllerClass();
 
@@ -579,7 +583,7 @@ class Route
     {
         $key = array_search($parameter, array_keys($this->parameters));
 
-        if ($key === 0) {
+        if ($key === 0 || $key === false) {
             return;
         }
 
@@ -1136,7 +1140,7 @@ class Route
     }
 
     /**
-     * Get the middleware should be removed from the route.
+     * Get the middleware that should be removed from the route.
      *
      * @return array
      */

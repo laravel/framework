@@ -7,12 +7,13 @@ use Illuminate\Database\Eloquent\Casts\AsCollection;
 use Illuminate\Database\Eloquent\Casts\AsStringable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
 class DatabaseCustomCastsTest extends DatabaseTestCase
 {
-    protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
+    protected function afterRefreshingDatabase()
     {
         Schema::create('test_eloquent_model_with_custom_casts', function (Blueprint $table) {
             $table->increments('id');
@@ -20,6 +21,7 @@ class DatabaseCustomCastsTest extends DatabaseTestCase
             $table->json('array_object_json');
             $table->text('collection');
             $table->string('stringable');
+            $table->string('password');
             $table->timestamps();
         });
 
@@ -41,6 +43,7 @@ class DatabaseCustomCastsTest extends DatabaseTestCase
         $model->array_object_json = ['name' => 'Taylor'];
         $model->collection = collect(['name' => 'Taylor']);
         $model->stringable = Str::of('Taylor');
+        $model->password = Hash::make('secret');
 
         $model->save();
 
@@ -50,6 +53,7 @@ class DatabaseCustomCastsTest extends DatabaseTestCase
         $this->assertEquals(['name' => 'Taylor'], $model->array_object_json->toArray());
         $this->assertEquals(['name' => 'Taylor'], $model->collection->toArray());
         $this->assertSame('Taylor', (string) $model->stringable);
+        $this->assertTrue(Hash::check('secret', $model->password));
 
         $model->array_object['age'] = 34;
         $model->array_object['meta']['title'] = 'Developer';
@@ -78,6 +82,27 @@ class DatabaseCustomCastsTest extends DatabaseTestCase
             ],
             $model->array_object_json->toArray()
         );
+    }
+
+    public function test_custom_casting_using_create()
+    {
+        $model = TestEloquentModelWithCustomCasts::create([
+            'array_object' => ['name' => 'Taylor'],
+            'array_object_json' => ['name' => 'Taylor'],
+            'collection' => collect(['name' => 'Taylor']),
+            'stringable' => Str::of('Taylor'),
+            'password' => Hash::make('secret'),
+        ]);
+
+        $model->save();
+
+        $model = $model->fresh();
+
+        $this->assertEquals(['name' => 'Taylor'], $model->array_object->toArray());
+        $this->assertEquals(['name' => 'Taylor'], $model->array_object_json->toArray());
+        $this->assertEquals(['name' => 'Taylor'], $model->collection->toArray());
+        $this->assertSame('Taylor', (string) $model->stringable);
+        $this->assertTrue(Hash::check('secret', $model->password));
     }
 
     public function test_custom_casting_nullable_values()
@@ -147,6 +172,7 @@ class TestEloquentModelWithCustomCasts extends Model
         'array_object_json' => AsArrayObject::class,
         'collection' => AsCollection::class,
         'stringable' => AsStringable::class,
+        'password' => 'hashed',
     ];
 }
 

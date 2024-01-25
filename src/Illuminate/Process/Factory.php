@@ -212,6 +212,8 @@ class Factory
             $times, $count,
             "An expected process ran {$count} times instead of {$times} times."
         );
+
+        return $this;
     }
 
     /**
@@ -269,6 +271,21 @@ class Factory
     public function pool(callable $callback)
     {
         return new Pool($this, $callback);
+    }
+
+    /**
+     * Start defining a series of piped processes.
+     *
+     * @param  callable|array  $callback
+     * @return \Illuminate\Contracts\Process\ProcessResult
+     */
+    public function pipe(callable|array $callback, ?callable $output = null)
+    {
+        return is_array($callback)
+            ? (new Pipe($this, fn ($pipe) => collect($callback)->each(
+                fn ($command) => $pipe->command($command)
+            )))->run(output: $output)
+            : (new Pipe($this, $callback))->run(output: $output);
     }
 
     /**

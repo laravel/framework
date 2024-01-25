@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Eloquent\Relations\Concerns\AsPivot;
 use Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithDictionary;
 use Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithPivotTable;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
 
@@ -135,7 +136,7 @@ class BelongsToMany extends Relation
      *
      * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @param  \Illuminate\Database\Eloquent\Model  $parent
-     * @param  string  $table
+     * @param  string|class-string<\Illuminate\Database\Eloquent\Model>  $table
      * @param  string  $foreignPivotKey
      * @param  string  $relatedPivotKey
      * @param  string  $parentKey
@@ -609,7 +610,7 @@ class BelongsToMany extends Relation
     }
 
     /**
-     * Get the first related record matching the attributes or create it.
+     * Get the first record matching the attributes. If the record is not found, create it.
      *
      * @param  array  $attributes
      * @param  array  $values
@@ -621,13 +622,43 @@ class BelongsToMany extends Relation
     {
         if (is_null($instance = (clone $this)->where($attributes)->first())) {
             if (is_null($instance = $this->related->where($attributes)->first())) {
-                $instance = $this->create(array_merge($attributes, $values), $joining, $touch);
+                $instance = $this->createOrFirst($attributes, $values, $joining, $touch);
             } else {
-                $this->attach($instance, $joining, $touch);
+                try {
+                    $this->getQuery()->withSavepointIfNeeded(fn () => $this->attach($instance, $joining, $touch));
+                } catch (UniqueConstraintViolationException) {
+                    // Nothing to do, the model was already attached...
+                }
             }
         }
 
         return $instance;
+    }
+
+    /**
+     * Attempt to create the record. If a unique constraint violation occurs, attempt to find the matching record.
+     *
+     * @param  array  $attributes
+     * @param  array  $values
+     * @param  array  $joining
+     * @param  bool  $touch
+     * @return \Illuminate\Database\Eloquent\Model
+     */
+    public function createOrFirst(array $attributes = [], array $values = [], array $joining = [], $touch = true)
+    {
+        try {
+            return $this->getQuery()->withSavePointIfNeeded(fn () => $this->create(array_merge($attributes, $values), $joining, $touch));
+        } catch (UniqueConstraintViolationException $e) {
+            // ...
+        }
+
+        try {
+            return tap($this->related->where($attributes)->first() ?? throw $e, function ($instance) use ($joining, $touch) {
+                $this->getQuery()->withSavepointIfNeeded(fn () => $this->attach($instance, $joining, $touch));
+            });
+        } catch (UniqueConstraintViolationException $e) {
+            return (clone $this)->useWritePdo()->where($attributes)->first() ?? throw $e;
+        }
     }
 
     /**
@@ -641,19 +672,13 @@ class BelongsToMany extends Relation
      */
     public function updateOrCreate(array $attributes, array $values = [], array $joining = [], $touch = true)
     {
-        if (is_null($instance = (clone $this)->where($attributes)->first())) {
-            if (is_null($instance = $this->related->where($attributes)->first())) {
-                return $this->create(array_merge($attributes, $values), $joining, $touch);
-            } else {
-                $this->attach($instance, $joining, $touch);
+        return tap($this->firstOrCreate($attributes, $values, $joining, $touch), function ($instance) use ($values) {
+            if (! $instance->wasRecentlyCreated) {
+                $instance->fill($values);
+
+                $instance->save(['touch' => false]);
             }
-        }
-
-        $instance->fill($values);
-
-        $instance->save(['touch' => false]);
-
-        return $instance;
+        });
     }
 
     /**
@@ -1154,6 +1179,10 @@ class BelongsToMany extends Relation
      */
     public function touch()
     {
+        if ($this->related->isIgnoringTouch()) {
+            return;
+        }
+
         $columns = [
             $this->related->getUpdatedAtColumn() => $this->related->freshTimestampString(),
         ];

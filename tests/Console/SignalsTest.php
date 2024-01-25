@@ -4,7 +4,6 @@ namespace Illuminate\Tests\Console;
 
 use Illuminate\Console\Signals;
 use Illuminate\Tests\Console\Fixtures\FakeSignalsRegistry;
-use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
 class SignalsTest extends TestCase
@@ -25,7 +24,7 @@ class SignalsTest extends TestCase
     {
         $this->state = null;
 
-        m::close();
+        parent::tearDown();
     }
 
     public function testRegister()

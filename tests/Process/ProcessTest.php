@@ -6,18 +6,12 @@ use Illuminate\Contracts\Process\ProcessResult;
 use Illuminate\Process\Exceptions\ProcessFailedException;
 use Illuminate\Process\Exceptions\ProcessTimedOutException;
 use Illuminate\Process\Factory;
-use Mockery as m;
 use OutOfBoundsException;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 
 class ProcessTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     public function testSuccessfulProcess()
     {
         $factory = new Factory;
@@ -326,7 +320,7 @@ class ProcessTest extends TestCase
         $result = $factory->run('ls -la');
     }
 
-    public function testStrayProcessesCanBePreventedWithStringComand()
+    public function testStrayProcessesCanBePreventedWithStringCommand()
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Attempted process [');
@@ -424,17 +418,129 @@ class ProcessTest extends TestCase
         $this->assertEquals("Hello World\n", $result->errorOutput());
     }
 
-    public function testRealProcessesCanThrow()
+    public function testFakeProcessesCanThrowWithoutOutput()
+    {
+        $this->expectException(ProcessFailedException::class);
+        $this->expectExceptionMessage(<<<'EOT'
+            The command "exit 1;" failed.
+
+            Exit Code: 1
+            EOT
+        );
+
+        $factory = new Factory;
+        $factory->fake(fn () => $factory->result(exitCode: 1));
+        $result = $factory->path(__DIR__)->run('exit 1;');
+
+        $result->throw();
+    }
+
+    public function testRealProcessesCanThrowWithoutOutput()
     {
         if (windows_os()) {
             $this->markTestSkipped('Requires Linux.');
         }
 
         $this->expectException(ProcessFailedException::class);
-        $this->expectExceptionMessage('The process "echo "Hello World" >&2; exit 1;" failed.');
+        $this->expectExceptionMessage(<<<'EOT'
+            The command "exit 1;" failed.
+
+            Exit Code: 1
+            EOT
+        );
+
+        $factory = new Factory;
+        $result = $factory->path(__DIR__)->run('exit 1;');
+
+        $result->throw();
+    }
+
+    public function testFakeProcessesCanThrowWithErrorOutput()
+    {
+        $this->expectException(ProcessFailedException::class);
+        $this->expectExceptionMessage(<<<'EOT'
+            The command "echo "Hello World" >&2; exit 1;" failed.
+
+            Exit Code: 1
+
+            Error Output:
+            ================
+            Hello World
+            EOT
+        );
+
+        $factory = new Factory;
+        $factory->fake(fn () => $factory->result(errorOutput: 'Hello World', exitCode: 1));
+        $result = $factory->path(__DIR__)->run('echo "Hello World" >&2; exit 1;');
+
+        $result->throw();
+    }
+
+    public function testRealProcessesCanThrowWithErrorOutput()
+    {
+        if (windows_os()) {
+            $this->markTestSkipped('Requires Linux.');
+        }
+
+        $this->expectException(ProcessFailedException::class);
+        $this->expectExceptionMessage(<<<'EOT'
+            The command "echo "Hello World" >&2; exit 1;" failed.
+
+            Exit Code: 1
+
+            Error Output:
+            ================
+            Hello World
+            EOT
+        );
 
         $factory = new Factory;
         $result = $factory->path(__DIR__)->run('echo "Hello World" >&2; exit 1;');
+
+        $result->throw();
+    }
+
+    public function testFakeProcessesCanThrowWithOutput()
+    {
+        $this->expectException(ProcessFailedException::class);
+        $this->expectExceptionMessage(<<<'EOT'
+            The command "echo "Hello World" >&1; exit 1;" failed.
+
+            Exit Code: 1
+
+            Output:
+            ================
+            Hello World
+            EOT
+        );
+
+        $factory = new Factory;
+        $factory->fake(fn () => $factory->result(output: 'Hello World', exitCode: 1));
+        $result = $factory->path(__DIR__)->run('echo "Hello World" >&1; exit 1;');
+
+        $result->throw();
+    }
+
+    public function testRealProcessesCanThrowWithOutput()
+    {
+        if (windows_os()) {
+            $this->markTestSkipped('Requires Linux.');
+        }
+
+        $this->expectException(ProcessFailedException::class);
+        $this->expectExceptionMessage(<<<'EOT'
+            The command "echo "Hello World" >&1; exit 1;" failed.
+
+            Exit Code: 1
+
+            Output:
+            ================
+            Hello World
+            EOT
+        );
+
+        $factory = new Factory;
+        $result = $factory->path(__DIR__)->run('echo "Hello World" >&1; exit 1;');
 
         $result->throw();
     }
@@ -494,6 +600,82 @@ class ProcessTest extends TestCase
         $result = $factory->input('foobar')->run('cat');
 
         $this->assertSame('foobar', $result->output());
+    }
+
+    public function testProcessPipe()
+    {
+        if (windows_os()) {
+            $this->markTestSkipped('Requires Linux.');
+        }
+
+        $factory = new Factory;
+        $factory->fake([
+            'cat *' => "Hello, world\nfoo\nbar",
+        ]);
+
+        $pipe = $factory->pipe(function ($pipe) {
+            $pipe->command('cat test');
+            $pipe->command('grep -i "foo"');
+        });
+
+        $this->assertSame("foo\n", $pipe->output());
+    }
+
+    public function testProcessPipeFailed()
+    {
+        if (windows_os()) {
+            $this->markTestSkipped('Requires Linux.');
+        }
+
+        $factory = new Factory;
+        $factory->fake([
+            'cat *' => $factory->result(exitCode: 1),
+        ]);
+
+        $pipe = $factory->pipe(function ($pipe) {
+            $pipe->command('cat test');
+            $pipe->command('grep -i "foo"');
+        });
+
+        $this->assertTrue($pipe->failed());
+    }
+
+    public function testProcessSimplePipe()
+    {
+        if (windows_os()) {
+            $this->markTestSkipped('Requires Linux.');
+        }
+
+        $factory = new Factory;
+        $factory->fake([
+            'cat *' => "Hello, world\nfoo\nbar",
+        ]);
+
+        $pipe = $factory->pipe([
+            'cat test',
+            'grep -i "foo"',
+        ]);
+
+        $this->assertSame("foo\n", $pipe->output());
+    }
+
+    public function testProcessSimplePipeFailed()
+    {
+        if (windows_os()) {
+            $this->markTestSkipped('Requires Linux.');
+        }
+
+        $factory = new Factory;
+        $factory->fake([
+            'cat *' => $factory->result(exitCode: 1),
+        ]);
+
+        $pipe = $factory->pipe([
+            'cat test',
+            'grep -i "foo"',
+        ]);
+
+        $this->assertTrue($pipe->failed());
     }
 
     public function testFakeInvokedProcessOutputWithLatestOutput()

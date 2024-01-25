@@ -71,7 +71,7 @@ interface Repository extends CacheInterface
      * @template TCacheValue
      *
      * @param  string  $key
-     * @param  \DateTimeInterface|\DateInterval|int|null  $ttl
+     * @param  \DateTimeInterface|\DateInterval|\Closure|int|null  $ttl
      * @param  \Closure(): TCacheValue  $callback
      * @return TCacheValue
      */

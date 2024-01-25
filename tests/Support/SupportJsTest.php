@@ -125,9 +125,6 @@ class SupportJsTest extends TestCase
         );
     }
 
-    /**
-     * @requires PHP >= 8.1
-     */
     public function testBackedEnums()
     {
         $this->assertSame('2', (string) Js::from(IntBackedEnum::TWO));

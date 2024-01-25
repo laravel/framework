@@ -372,6 +372,29 @@ class DatabaseSchemaBlueprintTest extends TestCase
         ], $blueprint->toSql($connection, new MySqlGrammar));
     }
 
+    public function testGenerateRelationshipColumnWithUlidModel()
+    {
+        require_once __DIR__.'/stubs/EloquentModelUlidStub.php';
+
+        $base = new Blueprint('posts', function (Blueprint $table) {
+            $table->foreignIdFor('EloquentModelUlidStub');
+        });
+
+        $connection = m::mock(Connection::class);
+
+        $blueprint = clone $base;
+
+        $this->assertEquals([
+            'alter table "posts" add column "eloquent_model_ulid_stub_id" char(26) not null',
+        ], $blueprint->toSql($connection, new PostgresGrammar));
+
+        $blueprint = clone $base;
+
+        $this->assertEquals([
+            'alter table `posts` add `eloquent_model_ulid_stub_id` char(26) not null',
+        ], $blueprint->toSql($connection, new MySqlGrammar()));
+    }
+
     public function testDropRelationshipColumnWithIncrementalModel()
     {
         $base = new Blueprint('posts', function ($table) {

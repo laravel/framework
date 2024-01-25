@@ -112,7 +112,7 @@ class BroadcastManager implements FactoryContract
      */
     public function channelRoutes(array $attributes = null)
     {
-        return $this->routes($attributes);
+        $this->routes($attributes);
     }
 
     /**

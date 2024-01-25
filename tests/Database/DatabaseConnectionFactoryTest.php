@@ -90,9 +90,7 @@ class DatabaseConnectionFactoryTest extends TestCase
     {
         $connection = $this->db->getConnection();
         $pdo = new ReflectionProperty(get_class($connection), 'pdo');
-        $pdo->setAccessible(true);
         $readPdo = new ReflectionProperty(get_class($connection), 'readPdo');
-        $readPdo->setAccessible(true);
 
         $this->assertNotInstanceOf(PDO::class, $pdo->getValue($connection));
         $this->assertNotInstanceOf(PDO::class, $readPdo->getValue($connection));
@@ -102,9 +100,7 @@ class DatabaseConnectionFactoryTest extends TestCase
     {
         $connection = $this->db->getConnection('read_write');
         $pdo = new ReflectionProperty(get_class($connection), 'pdo');
-        $pdo->setAccessible(true);
         $readPdo = new ReflectionProperty(get_class($connection), 'readPdo');
-        $readPdo->setAccessible(true);
 
         $this->assertNotInstanceOf(PDO::class, $pdo->getValue($connection));
         $this->assertNotInstanceOf(PDO::class, $readPdo->getValue($connection));

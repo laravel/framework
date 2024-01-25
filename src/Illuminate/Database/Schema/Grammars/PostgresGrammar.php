@@ -79,13 +79,162 @@ class PostgresGrammar extends Grammar
     }
 
     /**
+     * Compile the query to determine the tables.
+     *
+     * @return string
+     */
+    public function compileTables()
+    {
+        return 'select c.relname as name, n.nspname as schema, pg_total_relation_size(c.oid) as size, '
+            ."obj_description(c.oid, 'pg_class') as comment from pg_class c, pg_namespace n "
+            ."where c.relkind in ('r', 'p') and n.oid = c.relnamespace and n.nspname not in ('pg_catalog', 'information_schema') "
+            .'order by c.relname';
+    }
+
+    /**
+     * Compile the query to determine the views.
+     *
+     * @return string
+     */
+    public function compileViews()
+    {
+        return "select viewname as name, schemaname as schema, definition from pg_views where schemaname not in ('pg_catalog', 'information_schema') order by viewname";
+    }
+
+    /**
+     * Compile the query to determine the user-defined types.
+     *
+     * @return string
+     */
+    public function compileTypes()
+    {
+        return 'select t.typname as name, n.nspname as schema, t.typtype as type, t.typcategory as category, '
+            ."((t.typinput = 'array_in'::regproc and t.typoutput = 'array_out'::regproc) or t.typtype = 'm') as implicit "
+            .'from pg_type t join pg_namespace n on n.oid = t.typnamespace '
+            .'left join pg_class c on c.oid = t.typrelid '
+            .'left join pg_type el on el.oid = t.typelem '
+            .'left join pg_class ce on ce.oid = el.typrelid '
+            ."where ((t.typrelid = 0 and (ce.relkind = 'c' or ce.relkind is null)) or c.relkind = 'c') "
+            ."and not exists (select 1 from pg_depend d where d.objid in (t.oid, t.typelem) and d.deptype = 'e') "
+            ."and n.nspname not in ('pg_catalog', 'information_schema')";
+    }
+
+    /**
+     * Compile the SQL needed to retrieve all table names.
+     *
+     * @deprecated Will be removed in a future Laravel version.
+     *
+     * @param  string|array  $searchPath
+     * @return string
+     */
+    public function compileGetAllTables($searchPath)
+    {
+        return "select tablename, concat('\"', schemaname, '\".\"', tablename, '\"') as qualifiedname from pg_catalog.pg_tables where schemaname in ('".implode("','", (array) $searchPath)."')";
+    }
+
+    /**
+     * Compile the SQL needed to retrieve all view names.
+     *
+     * @deprecated Will be removed in a future Laravel version.
+     *
+     * @param  string|array  $searchPath
+     * @return string
+     */
+    public function compileGetAllViews($searchPath)
+    {
+        return "select viewname, concat('\"', schemaname, '\".\"', viewname, '\"') as qualifiedname from pg_catalog.pg_views where schemaname in ('".implode("','", (array) $searchPath)."')";
+    }
+
+    /**
      * Compile the query to determine the list of columns.
+     *
+     * @deprecated Will be removed in a future Laravel version.
      *
      * @return string
      */
     public function compileColumnListing()
     {
         return 'select column_name from information_schema.columns where table_catalog = ? and table_schema = ? and table_name = ?';
+    }
+
+    /**
+     * Compile the query to determine the columns.
+     *
+     * @param  string  $database
+     * @param  string  $schema
+     * @param  string  $table
+     * @return string
+     */
+    public function compileColumns($database, $schema, $table)
+    {
+        return sprintf(
+            'select a.attname as name, t.typname as type_name, format_type(a.atttypid, a.atttypmod) as type, '
+            .'(select tc.collcollate from pg_catalog.pg_collation tc where tc.oid = a.attcollation) as collation, '
+            .'not a.attnotnull as nullable, '
+            .'(select pg_get_expr(adbin, adrelid) from pg_attrdef where c.oid = pg_attrdef.adrelid and pg_attrdef.adnum = a.attnum) as default, '
+            .'col_description(c.oid, a.attnum) as comment '
+            .'from pg_attribute a, pg_class c, pg_type t, pg_namespace n '
+            .'where c.relname = %s and n.nspname = %s and a.attnum > 0 and a.attrelid = c.oid and a.atttypid = t.oid and n.oid = c.relnamespace '
+            .'order by a.attnum',
+            $this->quoteString($table),
+            $this->quoteString($schema)
+        );
+    }
+
+    /**
+     * Compile the query to determine the indexes.
+     *
+     * @param  string  $schema
+     * @param  string  $table
+     * @return string
+     */
+    public function compileIndexes($schema, $table)
+    {
+        return sprintf(
+            "select ic.relname as name, string_agg(a.attname, ',' order by indseq.ord) as columns, "
+            .'am.amname as "type", i.indisunique as "unique", i.indisprimary as "primary" '
+            .'from pg_index i '
+            .'join pg_class tc on tc.oid = i.indrelid '
+            .'join pg_namespace tn on tn.oid = tc.relnamespace '
+            .'join pg_class ic on ic.oid = i.indexrelid '
+            .'join pg_am am on am.oid = ic.relam '
+            .'join lateral unnest(i.indkey) with ordinality as indseq(num, ord) on true '
+            .'left join pg_attribute a on a.attrelid = i.indrelid and a.attnum = indseq.num '
+            .'where tc.relname = %s and tn.nspname = %s '
+            .'group by ic.relname, am.amname, i.indisunique, i.indisprimary',
+            $this->quoteString($table),
+            $this->quoteString($schema)
+        );
+    }
+
+    /**
+     * Compile the query to determine the foreign keys.
+     *
+     * @param  string  $schema
+     * @param  string  $table
+     * @return string
+     */
+    public function compileForeignKeys($schema, $table)
+    {
+        return sprintf(
+            'select c.conname as name, '
+            ."string_agg(la.attname, ',' order by conseq.ord) as columns, "
+            .'fn.nspname as foreign_schema, fc.relname as foreign_table, '
+            ."string_agg(fa.attname, ',' order by conseq.ord) as foreign_columns, "
+            .'c.confupdtype as on_update, c.confdeltype as on_delete '
+            .'from pg_constraint c '
+            .'join pg_class tc on c.conrelid = tc.oid '
+            .'join pg_namespace tn on tn.oid = tc.relnamespace '
+            .'join pg_class fc on c.confrelid = fc.oid '
+            .'join pg_namespace fn on fn.oid = fc.relnamespace '
+            .'join lateral unnest(c.conkey) with ordinality as conseq(num, ord) on true '
+            .'join pg_attribute la on la.attrelid = c.conrelid and la.attnum = conseq.num '
+            .'join pg_attribute fa on fa.attrelid = c.confrelid and fa.attnum = c.confkey[conseq.ord] '
+            ."where c.contype = 'f' and tc.relname = %s and tn.nspname = %s "
+            .'group by c.conname, fn.nspname, fc.relname, c.confupdtype, c.confdeltype',
+            $this->quoteString($table),
+            $this->quoteString($schema)
+        );
     }
 
     /**
@@ -373,29 +522,20 @@ class PostgresGrammar extends Grammar
     }
 
     /**
-     * Compile the SQL needed to retrieve all table names.
+     * Compile the SQL needed to drop all domains.
      *
-     * @param  string|array  $searchPath
+     * @param  array  $domains
      * @return string
      */
-    public function compileGetAllTables($searchPath)
+    public function compileDropAllDomains($domains)
     {
-        return "select tablename, concat('\"', schemaname, '\".\"', tablename, '\"') as qualifiedname from pg_catalog.pg_tables where schemaname in ('".implode("','", (array) $searchPath)."')";
-    }
-
-    /**
-     * Compile the SQL needed to retrieve all view names.
-     *
-     * @param  string|array  $searchPath
-     * @return string
-     */
-    public function compileGetAllViews($searchPath)
-    {
-        return "select viewname, concat('\"', schemaname, '\".\"', viewname, '\"') as qualifiedname from pg_catalog.pg_views where schemaname in ('".implode("','", (array) $searchPath)."')";
+        return 'drop domain '.implode(',', $this->escapeNames($domains)).' cascade';
     }
 
     /**
      * Compile the SQL needed to retrieve all type names.
+     *
+     * @deprecated Will be removed in a future Laravel version.
      *
      * @return string
      */
@@ -427,7 +567,7 @@ class PostgresGrammar extends Grammar
      */
     public function compileDropPrimary(Blueprint $blueprint, Fluent $command)
     {
-        $index = $this->wrap("{$blueprint->getTable()}_pkey");
+        $index = $this->wrap("{$blueprint->getPrefix()}{$blueprint->getTable()}_pkey");
 
         return 'alter table '.$this->wrapTable($blueprint)." drop constraint {$index}";
     }
@@ -1157,7 +1297,7 @@ class PostgresGrammar extends Grammar
         }
 
         if (! is_null($column->virtualAs)) {
-            return " generated always as ({$column->virtualAs})";
+            return " generated always as ({$this->getValue($column->virtualAs)})";
         }
     }
 
@@ -1181,7 +1321,7 @@ class PostgresGrammar extends Grammar
         }
 
         if (! is_null($column->storedAs)) {
-            return " generated always as ({$column->storedAs}) stored";
+            return " generated always as ({$this->getValue($column->storedAs)}) stored";
         }
     }
 

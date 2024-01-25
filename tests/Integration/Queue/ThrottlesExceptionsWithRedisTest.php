@@ -10,6 +10,7 @@ use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
 use Illuminate\Queue\CallQueuedHandler;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\Middleware\ThrottlesExceptionsWithRedis;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use Mockery as m;
 use Orchestra\Testbench\TestCase;
@@ -23,25 +24,22 @@ class ThrottlesExceptionsWithRedisTest extends TestCase
         parent::setUp();
 
         $this->setUpRedis();
+
+        Carbon::setTestNow(now());
     }
 
     protected function tearDown(): void
     {
-        parent::tearDown();
-
         $this->tearDownRedis();
 
-        m::close();
+        parent::tearDown();
     }
 
     public function testCircuitIsOpenedForJobErrors()
     {
         $this->assertJobWasReleasedImmediately(CircuitBreakerWithRedisTestJob::class, $key = Str::random());
         $this->assertJobWasReleasedImmediately(CircuitBreakerWithRedisTestJob::class, $key);
-
-        retry(2, function () use ($key) {
-            $this->assertJobWasReleasedWithDelay(CircuitBreakerWithRedisTestJob::class, $key);
-        });
+        $this->assertJobWasReleasedWithDelay(CircuitBreakerWithRedisTestJob::class, $key);
     }
 
     public function testCircuitStaysClosedForSuccessfulJobs()
@@ -57,10 +55,7 @@ class ThrottlesExceptionsWithRedisTest extends TestCase
         $this->assertJobRanSuccessfully(CircuitBreakerWithRedisSuccessfulJob::class, $key);
         $this->assertJobWasReleasedImmediately(CircuitBreakerWithRedisTestJob::class, $key);
         $this->assertJobWasReleasedImmediately(CircuitBreakerWithRedisTestJob::class, $key);
-
-        retry(2, function () use ($key) {
-            $this->assertJobWasReleasedWithDelay(CircuitBreakerWithRedisTestJob::class, $key);
-        });
+        $this->assertJobWasReleasedWithDelay(CircuitBreakerWithRedisTestJob::class, $key);
     }
 
     protected function assertJobWasReleasedImmediately($class, $key)

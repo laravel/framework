@@ -10,7 +10,7 @@ use stdClass;
 
 class ValidationProhibitedIfTest extends TestCase
 {
-    public function testItClousureReturnsFormatsAStringVersionOfTheRule()
+    public function testItReturnsStringVersionOfRuleWhenCast()
     {
         $rule = new ProhibitedIf(function () {
             return true;
@@ -33,15 +33,15 @@ class ValidationProhibitedIfTest extends TestCase
         $this->assertSame('', (string) $rule);
     }
 
-    public function testItOnlyCallableAndBooleanAreAcceptableArgumentsOfTheRule()
+    public function testItValidatesCallableAndBooleanAreAcceptableArguments()
     {
-        $rule = new ProhibitedIf(false);
-
-        $rule = new ProhibitedIf(true);
+        new ProhibitedIf(false);
+        new ProhibitedIf(true);
+        new ProhibitedIf(fn () => true);
 
         foreach ([1, 1.1, 'phpinfo', new stdClass] as $condition) {
             try {
-                $rule = new ProhibitedIf($condition);
+                new ProhibitedIf($condition);
                 $this->fail('The ProhibitedIf constructor must not accept '.gettype($condition));
             } catch (InvalidArgumentException $exception) {
                 $this->assertEquals('The provided condition must be a callable or boolean.', $exception->getMessage());
@@ -49,11 +49,11 @@ class ValidationProhibitedIfTest extends TestCase
         }
     }
 
-    public function testItReturnedRuleIsNotSerializable()
+    public function testItThrowsExceptionIfRuleIsNotSerializable()
     {
         $this->expectException(Exception::class);
 
-        $rule = serialize(new ProhibitedIf(function () {
+        serialize(new ProhibitedIf(function () {
             return true;
         }));
     }

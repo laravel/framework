@@ -84,7 +84,7 @@ class SqlServerConnection implements ServerInfoAwareConnection
     /**
      * Begin a new database transaction.
      *
-     * @return void
+     * @return bool
      */
     public function beginTransaction()
     {
@@ -94,7 +94,7 @@ class SqlServerConnection implements ServerInfoAwareConnection
     /**
      * Commit a database transaction.
      *
-     * @return void
+     * @return bool
      */
     public function commit()
     {
@@ -104,7 +104,7 @@ class SqlServerConnection implements ServerInfoAwareConnection
     /**
      * Rollback a database transaction.
      *
-     * @return void
+     * @return bool
      */
     public function rollBack()
     {

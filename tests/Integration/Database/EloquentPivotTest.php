@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Schema;
 
 class EloquentPivotTest extends DatabaseTestCase
 {
-    protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
+    protected function afterRefreshingDatabase()
     {
         Schema::create('users', function (Blueprint $table) {
             $table->increments('id');
@@ -34,6 +34,12 @@ class EloquentPivotTest extends DatabaseTestCase
             $table->integer('user_id');
             $table->integer('project_id');
             $table->text('permissions')->nullable();
+        });
+
+        Schema::create('subscriptions', function (Blueprint $table) {
+            $table->integer('user_id');
+            $table->integer('project_id');
+            $table->string('status');
         });
     }
 
@@ -60,11 +66,43 @@ class EloquentPivotTest extends DatabaseTestCase
             $this->assertSame('project_id', $pivot->getForeignKey());
         });
     }
+
+    public function testPivotValuesCanBeSetFromRelationDefinition()
+    {
+        $user = PivotTestUser::forceCreate(['email' => 'taylor@laravel.com']);
+        $active = PivotTestProject::forceCreate(['name' => 'Active Project']);
+        $inactive = PivotTestProject::forceCreate(['name' => 'Inactive Project']);
+
+        $this->assertSame('active', $user->activeSubscriptions()->newPivot()->status);
+        $this->assertSame('inactive', $user->inactiveSubscriptions()->newPivot()->status);
+
+        $user->activeSubscriptions()->attach($active);
+        $user->inactiveSubscriptions()->attach($inactive);
+
+        $this->assertSame('active', $user->activeSubscriptions->first()->pivot->status);
+        $this->assertSame('inactive', $user->inactiveSubscriptions->first()->pivot->status);
+    }
 }
 
 class PivotTestUser extends Model
 {
     public $table = 'users';
+
+    public function activeSubscriptions()
+    {
+        return $this->belongsToMany(PivotTestProject::class, 'subscriptions', 'user_id', 'project_id')
+                    ->withPivotValue('status', 'active')
+                    ->withPivot('status')
+                    ->using(PivotTestSubscription::class);
+    }
+
+    public function inactiveSubscriptions()
+    {
+        return $this->belongsToMany(PivotTestProject::class, 'subscriptions', 'user_id', 'project_id')
+                    ->withPivotValue('status', 'inactive')
+                    ->withPivot('status')
+                    ->using(PivotTestSubscription::class);
+    }
 }
 
 class PivotTestProject extends Model
@@ -91,6 +129,8 @@ class PivotTestCollaborator extends Pivot
 {
     public $table = 'collaborators';
 
+    public $timestamps = false;
+
     protected $casts = [
         'permissions' => 'json',
     ];
@@ -100,9 +140,22 @@ class PivotTestContributor extends Pivot
 {
     public $table = 'contributors';
 
+    public $timestamps = false;
+
     public $incrementing = true;
 
     protected $casts = [
         'permissions' => 'json',
+    ];
+}
+
+class PivotTestSubscription extends Pivot
+{
+    public $table = 'subscriptions';
+
+    public $timestamps = false;
+
+    protected $attributes = [
+        'status' => 'active',
     ];
 }

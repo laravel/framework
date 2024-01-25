@@ -85,6 +85,23 @@ class QueuedEventsTest extends TestCase
         $d->dispatch('some.event', ['foo', 'bar']);
     }
 
+    public function testDelayIsSetByWithDelay()
+    {
+        $d = new Dispatcher;
+        $queue = m::mock(Queue::class);
+
+        $queue->shouldReceive('connection')->once()->with(null)->andReturnSelf();
+
+        $queue->shouldReceive('laterOn')->once()->with(null, 20, m::type(CallQueuedListener::class));
+
+        $d->setQueueResolver(function () use ($queue) {
+            return $queue;
+        });
+
+        $d->listen('some.event', TestDispatcherGetDelay::class.'@handle');
+        $d->dispatch('some.event', ['foo', 'bar']);
+    }
+
     public function testQueueIsSetByGetQueueDynamically()
     {
         $d = new Dispatcher;
@@ -125,6 +142,23 @@ class QueuedEventsTest extends TestCase
             ['shouldUseRedisConnection' => true],
             'bar',
         ]);
+    }
+
+    public function testDelayIsSetByWithDelayDynamically()
+    {
+        $d = new Dispatcher;
+        $queue = m::mock(Queue::class);
+
+        $queue->shouldReceive('connection')->once()->with(null)->andReturnSelf();
+
+        $queue->shouldReceive('laterOn')->once()->with(null, 60, m::type(CallQueuedListener::class));
+
+        $d->setQueueResolver(function () use ($queue) {
+            return $queue;
+        });
+
+        $d->listen('some.event', TestDispatcherGetDelayDynamically::class.'@handle');
+        $d->dispatch('some.event', [['useHighDelay' => true], 'bar']);
     }
 
     public function testQueuePropagateRetryUntilAndMaxExceptions()
@@ -219,6 +253,21 @@ class TestDispatcherGetConnection implements ShouldQueue
     }
 }
 
+class TestDispatcherGetDelay implements ShouldQueue
+{
+    public $delay = 10;
+
+    public function handle()
+    {
+        //
+    }
+
+    public function withDelay()
+    {
+        return 20;
+    }
+}
+
 class TestDispatcherOptions implements ShouldQueue
 {
     public $maxExceptions = 1;
@@ -297,5 +346,24 @@ class TestDispatcherGetQueueDynamically implements ShouldQueue
         }
 
         return 'p99';
+    }
+}
+
+class TestDispatcherGetDelayDynamically implements ShouldQueue
+{
+    public $delay = 10;
+
+    public function handle()
+    {
+        //
+    }
+
+    public function withDelay($event)
+    {
+        if ($event['useHighDelay']) {
+            return 60;
+        }
+
+        return 20;
     }
 }

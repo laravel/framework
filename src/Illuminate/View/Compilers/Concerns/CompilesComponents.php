@@ -4,6 +4,7 @@ namespace Illuminate\View\Compilers\Concerns;
 
 use Illuminate\Contracts\Support\CanBeEscapedWhenCastToString;
 use Illuminate\Support\Str;
+use Illuminate\View\AnonymousComponent;
 use Illuminate\View\ComponentAttributeBag;
 
 trait CompilesComponents
@@ -29,7 +30,9 @@ trait CompilesComponents
 
         $component = trim($component, '\'"');
 
-        $hash = static::newComponentHash($component);
+        $hash = static::newComponentHash(
+            $component === AnonymousComponent::class ? $component.':'.trim($alias, '\'"') : $component
+        );
 
         if (Str::contains($component, ['::class', '\\'])) {
             return static::compileClassComponentOpening($component, $alias, $data, $hash);
@@ -64,6 +67,7 @@ trait CompilesComponents
     {
         return implode("\n", [
             '<?php if (isset($component)) { $__componentOriginal'.$hash.' = $component; } ?>',
+            '<?php if (isset($attributes)) { $__attributesOriginal'.$hash.' = $attributes; } ?>',
             '<?php $component = '.$component.'::resolve('.($data ?: '[]').' + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>',
             '<?php $component->withName('.$alias.'); ?>',
             '<?php if ($component->shouldRender()): ?>',
@@ -91,6 +95,10 @@ trait CompilesComponents
         $hash = array_pop(static::$componentHashStack);
 
         return $this->compileEndComponent()."\n".implode("\n", [
+            '<?php endif; ?>',
+            '<?php if (isset($__attributesOriginal'.$hash.')): ?>',
+            '<?php $attributes = $__attributesOriginal'.$hash.'; ?>',
+            '<?php unset($__attributesOriginal'.$hash.'); ?>',
             '<?php endif; ?>',
             '<?php if (isset($__componentOriginal'.$hash.')): ?>',
             '<?php $component = $__componentOriginal'.$hash.'; ?>',

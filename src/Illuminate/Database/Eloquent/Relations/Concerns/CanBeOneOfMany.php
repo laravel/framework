@@ -96,11 +96,16 @@ trait CanBeOneOfMany
 
             $subQuery = $this->newOneOfManySubQuery(
                 $this->getOneOfManySubQuerySelectColumns(),
-                $column, $aggregate
+                array_merge([$column], $previous['columns'] ?? []),
+                $aggregate,
             );
 
             if (isset($previous)) {
-                $this->addOneOfManyJoinSubQuery($subQuery, $previous['subQuery'], $previous['column']);
+                $this->addOneOfManyJoinSubQuery(
+                    $subQuery,
+                    $previous['subQuery'],
+                    $previous['columns'],
+                );
             }
 
             if (isset($closure)) {
@@ -112,12 +117,16 @@ trait CanBeOneOfMany
             }
 
             if (array_key_last($columns) == $column) {
-                $this->addOneOfManyJoinSubQuery($this->query, $subQuery, $column);
+                $this->addOneOfManyJoinSubQuery(
+                    $this->query,
+                    $subQuery,
+                    array_merge([$column], $previous['columns'] ?? []),
+                );
             }
 
             $previous = [
                 'subQuery' => $subQuery,
-                'column' => $column,
+                'columns' => array_merge([$column], $previous['columns'] ?? []),
             ];
         }
 
@@ -177,11 +186,11 @@ trait CanBeOneOfMany
      * Get a new query for the related model, grouping the query by the given column, often the foreign key of the relationship.
      *
      * @param  string|array  $groupBy
-     * @param  string|null  $column
+     * @param  array<string>|null  $columns
      * @param  string|null  $aggregate
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    protected function newOneOfManySubQuery($groupBy, $column = null, $aggregate = null)
+    protected function newOneOfManySubQuery($groupBy, $columns = null, $aggregate = null)
     {
         $subQuery = $this->query->getModel()
             ->newQuery()
@@ -191,11 +200,21 @@ trait CanBeOneOfMany
             $subQuery->groupBy($this->qualifyRelatedColumn($group));
         }
 
-        if (! is_null($column)) {
-            $subQuery->selectRaw($aggregate.'('.$subQuery->getQuery()->grammar->wrap($subQuery->qualifyColumn($column)).') as '.$subQuery->getQuery()->grammar->wrap($column.'_aggregate'));
+        if (! is_null($columns)) {
+            foreach ($columns as $key => $column) {
+                $aggregatedColumn = $subQuery->getQuery()->grammar->wrap($subQuery->qualifyColumn($column));
+
+                if ($key === 0) {
+                    $aggregatedColumn = "{$aggregate}({$aggregatedColumn})";
+                } else {
+                    $aggregatedColumn = "min({$aggregatedColumn})";
+                }
+
+                $subQuery->selectRaw($aggregatedColumn.' as '.$subQuery->getQuery()->grammar->wrap($column.'_aggregate'));
+            }
         }
 
-        $this->addOneOfManySubQueryConstraints($subQuery, $groupBy, $column, $aggregate);
+        $this->addOneOfManySubQueryConstraints($subQuery, $groupBy, $columns, $aggregate);
 
         return $subQuery;
     }
@@ -205,7 +224,7 @@ trait CanBeOneOfMany
      *
      * @param  \Illuminate\Database\Eloquent\Builder  $parent
      * @param  \Illuminate\Database\Eloquent\Builder  $subQuery
-     * @param  string  $on
+     * @param  array<string>  $on
      * @return void
      */
     protected function addOneOfManyJoinSubQuery(Builder $parent, Builder $subQuery, $on)
@@ -214,7 +233,9 @@ trait CanBeOneOfMany
             $subQuery->applyBeforeQueryCallbacks();
 
             $parent->joinSub($subQuery, $this->relationName, function ($join) use ($on) {
-                $join->on($this->qualifySubSelectColumn($on.'_aggregate'), '=', $this->qualifyRelatedColumn($on));
+                foreach ($on as $onColumn) {
+                    $join->on($this->qualifySubSelectColumn($onColumn.'_aggregate'), '=', $this->qualifyRelatedColumn($onColumn));
+                }
 
                 $this->addOneOfManyJoinSubQueryConstraints($join, $on);
             });

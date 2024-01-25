@@ -217,7 +217,6 @@ class CookieTest extends TestCase
     private function getQueuedPropertyValue(CookieJar $cookieJar)
     {
         $property = (new ReflectionObject($cookieJar))->getProperty('queued');
-        $property->setAccessible(true);
 
         return $property->getValue($cookieJar);
     }

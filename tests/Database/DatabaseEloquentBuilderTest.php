@@ -1460,6 +1460,25 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertEquals(['larry', '90210', '90220', 'fooside dr', 29], $builder->getBindings());
     }
 
+    public function testHasWithConstraintsWithOrWhereAndSubqueryInRelationFromClause()
+    {
+        EloquentBuilderTestModelParentStub::resolveRelationUsing('addressAsExpression', function ($model) {
+            return $model->address()->fromSub(EloquentBuilderTestModelCloseRelatedStub::query(), 'eloquent_builder_test_model_close_related_stubs');
+        });
+
+        $model = new EloquentBuilderTestModelParentStub;
+
+        $builder = $model->where('name', 'larry');
+        $builder->whereHas('addressAsExpression', function ($q) {
+            $q->where('zipcode', '90210');
+            $q->orWhere('zipcode', '90220');
+            $q->having('street', '=', 'fooside dr');
+        })->where('age', 29);
+
+        $this->assertSame('select * from "eloquent_builder_test_model_parent_stubs" where "name" = ? and exists (select * from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id" and ("zipcode" = ? or "zipcode" = ?) having "street" = ?) and "age" = ?', $builder->toSql());
+        $this->assertEquals(['larry', '90210', '90220', 'fooside dr', 29], $builder->getBindings());
+    }
+
     public function testHasWithConstraintsAndJoinAndHavingInSubquery()
     {
         $model = new EloquentBuilderTestModelParentStub;
@@ -1660,6 +1679,15 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertEquals([$relatedModel->getMorphClass(), $relatedModel->getKey()], $builder->getBindings());
     }
 
+    public function testWhereMorphedToNull()
+    {
+        $model = new EloquentBuilderTestModelParentStub;
+        $this->mockConnectionForModel($model, '');
+
+        $builder = $model->whereMorphedTo('morph', null);
+        $this->assertSame('select * from "eloquent_builder_test_model_parent_stubs" where "morph_type" is null', $builder->toSql());
+    }
+
     public function testWhereNotMorphedTo()
     {
         $model = new EloquentBuilderTestModelParentStub;
@@ -1686,6 +1714,17 @@ class DatabaseEloquentBuilderTest extends TestCase
 
         $this->assertSame('select * from "eloquent_builder_test_model_parent_stubs" where "bar" = ? or ("morph_type" = ? and "morph_id" = ?)', $builder->toSql());
         $this->assertEquals(['baz', $relatedModel->getMorphClass(), $relatedModel->getKey()], $builder->getBindings());
+    }
+
+    public function testOrWhereMorphedToNull()
+    {
+        $model = new EloquentBuilderTestModelParentStub;
+        $this->mockConnectionForModel($model, '');
+
+        $builder = $model->where('bar', 'baz')->orWhereMorphedTo('morph', null);
+
+        $this->assertSame('select * from "eloquent_builder_test_model_parent_stubs" where "bar" = ? or "morph_type" is null', $builder->toSql());
+        $this->assertEquals(['baz'], $builder->getBindings());
     }
 
     public function testOrWhereNotMorphedTo()
@@ -2194,6 +2233,59 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertNotSame($builder, $clone);
         $this->assertSame('select * from "users"', $builder->toSql());
         $this->assertSame('select * from "users" where "email" = ?', $clone->toSql());
+    }
+
+    public function testToRawSql()
+    {
+        $query = m::mock(BaseBuilder::class);
+        $query->shouldReceive('toRawSql')
+            ->andReturn('select * from "users" where "email" = \'foo\'');
+
+        $builder = new Builder($query);
+
+        $this->assertSame('select * from "users" where "email" = \'foo\'', $builder->toRawSql());
+    }
+
+    public function testPassthruMethodsCallsAreNotCaseSensitive()
+    {
+        $query = m::mock(BaseBuilder::class);
+
+        $mockResponse = 'select 1';
+        $query
+            ->shouldReceive('toRawSql')
+            ->andReturn($mockResponse)
+            ->times(3);
+
+        $builder = new Builder($query);
+
+        $this->assertSame('select 1', $builder->TORAWSQL());
+        $this->assertSame('select 1', $builder->toRawSql());
+        $this->assertSame('select 1', $builder->toRawSQL());
+    }
+
+    public function testPassthruArrayElementsMustAllBeLowercase()
+    {
+        $builder = new class(m::mock(BaseBuilder::class)) extends Builder
+        {
+            // expose protected member for test
+            public function getPassthru(): array
+            {
+                return $this->passthru;
+            }
+        };
+
+        $passthru = $builder->getPassthru();
+
+        foreach ($passthru as $method) {
+            $lowercaseMethod = strtolower($method);
+
+            $this->assertSame(
+                $lowercaseMethod,
+                $method,
+                'Eloquent\\Builder relies on lowercase method names in $passthru array to correctly mimic PHP case-insensitivity on method dispatch.'.
+                    'If you are adding a new method to the $passthru array, make sure the name is lowercased.'
+            );
+        }
     }
 
     protected function mockConnectionForModel($model, $database)

@@ -11,6 +11,7 @@ use Illuminate\Contracts\Container\Container as ContainerContract;
 use LogicException;
 use ReflectionClass;
 use ReflectionException;
+use ReflectionFunction;
 use ReflectionParameter;
 use TypeError;
 
@@ -648,8 +649,8 @@ class Container implements ArrayAccess, ContainerContract
     {
         $pushedToBuildStack = false;
 
-        if (is_array($callback) && ! in_array(
-            $className = (is_string($callback[0]) ? $callback[0] : get_class($callback[0])),
+        if (($className = $this->getClassForCallable($callback)) && ! in_array(
+            $className,
             $this->buildStack,
             true
         )) {
@@ -665,6 +666,30 @@ class Container implements ArrayAccess, ContainerContract
         }
 
         return $result;
+    }
+
+    /**
+     * Get the class name for the given callback, if one can be determined.
+     *
+     * @param  callable|string  $callback
+     * @return string|false
+     */
+    protected function getClassForCallable($callback)
+    {
+        if (PHP_VERSION_ID >= 80200) {
+            if (is_callable($callback) &&
+                ! ($reflector = new ReflectionFunction($callback(...)))->isAnonymous()) {
+                return $reflector->getClosureScopeClass()->name ?? false;
+            }
+
+            return false;
+        }
+
+        if (! is_array($callback)) {
+            return false;
+        }
+
+        return is_string($callback[0]) ? $callback[0] : get_class($callback[0]);
     }
 
     /**
@@ -766,11 +791,9 @@ class Container implements ArrayAccess, ContainerContract
         // We're ready to instantiate an instance of the concrete type registered for
         // the binding. This will instantiate the types, as well as resolve any of
         // its "nested" dependencies recursively until all have gotten resolved.
-        if ($this->isBuildable($concrete, $abstract)) {
-            $object = $this->build($concrete);
-        } else {
-            $object = $this->make($concrete);
-        }
+        $object = $this->isBuildable($concrete, $abstract)
+            ? $this->build($concrete)
+            : $this->make($concrete);
 
         // If we defined any extenders for this type, we'll need to spin through them
         // and apply them to the object being built. This allows for the extension

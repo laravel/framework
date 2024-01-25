@@ -47,9 +47,11 @@ class NestedRules
                 $nested[$attribute.'.'.$key] = $rule;
             }
 
-            return $parser->explode($nested);
+            $rules = $nested;
+        } else {
+            $rules = [$attribute => $rules];
         }
 
-        return $parser->explode([$attribute => $rules]);
+        return $parser->explode(ValidationRuleParser::filterConditionalRules($rules, $data));
     }
 }

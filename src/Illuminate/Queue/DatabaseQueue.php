@@ -118,7 +118,7 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
      * @param  string  $job
      * @param  mixed  $data
      * @param  string|null  $queue
-     * @return void
+     * @return mixed
      */
     public function later($delay, $job, $data = '', $queue = null)
     {
@@ -268,7 +268,8 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
 
         if (($databaseEngine === 'mysql' && version_compare($databaseVersion, '8.0.1', '>=')) ||
             ($databaseEngine === 'mariadb' && version_compare($databaseVersion, '10.6.0', '>=')) ||
-            ($databaseEngine === 'pgsql' && version_compare($databaseVersion, '9.5', '>='))) {
+            ($databaseEngine === 'pgsql' && version_compare($databaseVersion, '9.5', '>=')) ||
+            ($databaseEngine === 'vitess' && version_compare($databaseVersion, '19.0', '>='))) {
             return 'FOR UPDATE SKIP LOCKED';
         }
 

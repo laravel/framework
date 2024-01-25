@@ -11,21 +11,27 @@ class ValidationRuleParserTest extends TestCase
 {
     public function testConditionalRulesAreProperlyExpandedAndFiltered()
     {
+        $isAdmin = true;
+
         $rules = ValidationRuleParser::filterConditionalRules([
-            'name' => Rule::when(true, ['required', 'min:2']),
-            'email' => Rule::when(false, ['required', 'min:2']),
-            'password' => Rule::when(true, 'required|min:2'),
-            'username' => ['required', Rule::when(true, ['min:2'])],
-            'address' => ['required', Rule::when(false, ['min:2'])],
+            'name' => Rule::when($isAdmin, ['required', 'min:2']),
+            'email' => Rule::unless($isAdmin, ['required', 'min:2']),
+            'password' => Rule::when($isAdmin, 'required|min:2'),
+            'username' => ['required', Rule::when($isAdmin, ['min:2'])],
+            'address' => ['required', Rule::unless($isAdmin, ['min:2'])],
             'city' => ['required', Rule::when(function (Fluent $input) {
                 return true;
             }, ['min:2'])],
-            'state' => ['required', Rule::when(true, function (Fluent $input) {
+            'state' => ['required', Rule::when($isAdmin, function (Fluent $input) {
                 return 'min:2';
             })],
-            'zip' => ['required', Rule::when(false, [], function (Fluent $input) {
+            'zip' => ['required', Rule::when($isAdmin, function (Fluent $input) {
                 return ['min:2'];
             })],
+            'when_cb_true' => Rule::when(fn () => true, ['required'], ['nullable']),
+            'when_cb_false' => Rule::when(fn () => false, ['required'], ['nullable']),
+            'unless_cb_true' => Rule::unless(fn () => true, ['required'], ['nullable']),
+            'unless_cb_false' => Rule::unless(fn () => false, ['required'], ['nullable']),
         ]);
 
         $this->assertEquals([
@@ -37,21 +43,29 @@ class ValidationRuleParserTest extends TestCase
             'city' => ['required', 'min:2'],
             'state' => ['required', 'min:2'],
             'zip' => ['required', 'min:2'],
+            'when_cb_true' => ['required'],
+            'when_cb_false' => ['nullable'],
+            'unless_cb_true' => ['nullable'],
+            'unless_cb_false' => ['required'],
         ], $rules);
     }
 
     public function testEmptyRulesArePreserved()
     {
+        $isAdmin = true;
+
         $rules = ValidationRuleParser::filterConditionalRules([
             'name' => [],
             'email' => '',
-            'password' => Rule::when(true, 'required|min:2'),
+            'password' => Rule::when($isAdmin, 'required|min:2'),
+            'gender' => Rule::unless($isAdmin, 'required'),
         ]);
 
         $this->assertEquals([
             'name' => [],
             'email' => '',
             'password' => ['required', 'min:2'],
+            'gender' => [],
         ], $rules);
     }
 
@@ -64,12 +78,14 @@ class ValidationRuleParserTest extends TestCase
 
     public function testConditionalRulesWithDefault()
     {
+        $isAdmin = true;
+
         $rules = ValidationRuleParser::filterConditionalRules([
-            'name' => Rule::when(true, ['required', 'min:2'], ['string', 'max:10']),
-            'email' => Rule::when(false, ['required', 'min:2'], ['string', 'max:10']),
-            'password' => Rule::when(false, 'required|min:2', 'string|max:10'),
-            'username' => ['required', Rule::when(true, ['min:2'], ['string', 'max:10'])],
-            'address' => ['required', Rule::when(false, ['min:2'], ['string', 'max:10'])],
+            'name' => Rule::when($isAdmin, ['required', 'min:2'], ['string', 'max:10']),
+            'email' => Rule::unless($isAdmin, ['required', 'min:2'], ['string', 'max:10']),
+            'password' => Rule::unless($isAdmin, 'required|min:2', 'string|max:10'),
+            'username' => ['required', Rule::when($isAdmin, ['min:2'], ['string', 'max:10'])],
+            'address' => ['required', Rule::unless($isAdmin, ['min:2'], ['string', 'max:10'])],
         ]);
 
         $this->assertEquals([
@@ -83,10 +99,12 @@ class ValidationRuleParserTest extends TestCase
 
     public function testEmptyConditionalRulesArePreserved()
     {
+        $isAdmin = true;
+
         $rules = ValidationRuleParser::filterConditionalRules([
-            'name' => Rule::when(true, '', ['string', 'max:10']),
-            'email' => Rule::when(false, ['required', 'min:2'], []),
-            'password' => Rule::when(false, 'required|min:2', 'string|max:10'),
+            'name' => Rule::when($isAdmin, '', ['string', 'max:10']),
+            'email' => Rule::unless($isAdmin, ['required', 'min:2']),
+            'password' => Rule::unless($isAdmin, 'required|min:2', 'string|max:10'),
         ]);
 
         $this->assertEquals([
@@ -197,6 +215,28 @@ class ValidationRuleParserTest extends TestCase
 
         $this->assertEquals(['name' => ['required']], $results->rules);
         $this->assertEquals([], $results->implicitAttributes);
+    }
+
+    public function testExplodeHandlesForwardSlashesInWildcardRule()
+    {
+        $parser = (new ValidationRuleParser([
+            'redirects' => [
+                'directory/subdirectory/file' => [
+                    'directory/subdirectory/redirectedfile',
+                ],
+            ],
+        ]));
+
+        $results = $parser->explode([
+            'redirects.directory/subdirectory/file.*' => 'string',
+        ]);
+
+        $this->assertEquals([
+            'redirects.directory/subdirectory/file.0' => ['string'],
+        ], $results->rules);
+        $this->assertEquals([
+            'redirects.directory/subdirectory/file.*' => ['redirects.directory/subdirectory/file.0'],
+        ], $results->implicitAttributes);
     }
 
     public function testExplodeHandlesArraysOfNestedRules()

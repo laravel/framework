@@ -9,6 +9,8 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
+use function Laravel\Prompts\select;
+
 #[AsCommand(name: 'make:test')]
 class TestMakeCommand extends GeneratorCommand
 {
@@ -125,18 +127,18 @@ class TestMakeCommand extends GeneratorCommand
             return;
         }
 
-        $type = $this->components->choice('Which type of test would you like', [
-            'feature',
-            'unit',
-            'pest feature',
-            'pest unit',
-        ], default: 0);
+        $type = select('Which type of test would you like?', [
+            'feature' => 'Feature (PHPUnit)',
+            'unit' => 'Unit (PHPUnit)',
+            'pest-feature' => 'Feature (Pest)',
+            'pest-unit' => 'Unit (Pest)',
+        ]);
 
         match ($type) {
             'feature' => null,
             'unit' => $input->setOption('unit', true),
-            'pest feature' => $input->setOption('pest', true),
-            'pest unit' => tap($input)->setOption('pest', true)->setOption('unit', true),
+            'pest-feature' => $input->setOption('pest', true),
+            'pest-unit' => tap($input)->setOption('pest', true)->setOption('unit', true),
         };
     }
 }

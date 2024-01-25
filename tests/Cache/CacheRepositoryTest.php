@@ -58,6 +58,13 @@ class CacheRepositoryTest extends TestCase
         $this->assertEquals(['foo' => 'default', 'bar' => 'baz'], $repo->get(['foo' => 'default', 'bar']));
     }
 
+    public function testGetReturnsMultipleValuesFromCacheWhenGivenAnArrayOfOneTwoThree()
+    {
+        $repo = $this->getRepository();
+        $repo->getStore()->shouldReceive('many')->once()->with([1, 2, 3])->andReturn([1 => null, 2 => null, 3 => null]);
+        $this->assertEquals([1 => null, 2 => null, 3 => null], $repo->get([1, 2, 3]));
+    }
+
     public function testDefaultValueIsReturned()
     {
         $repo = $this->getRepository();

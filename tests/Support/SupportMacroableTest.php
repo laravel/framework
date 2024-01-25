@@ -118,6 +118,47 @@ class SupportMacroableTest extends TestCase
 
         $instance::flushMethod();
     }
+
+    public function testMacroWithArguments()
+    {
+        $this->macroable::macro('concatenate', function ($arg1, $arg2) {
+            return $arg1.' '.$arg2;
+        });
+
+        $result = $this->macroable::concatenate('Hello', 'World');
+        $this->assertSame('Hello World', $result);
+    }
+
+    public function testMacroWithDefaultArguments()
+    {
+        $this->macroable::macro('greet', function ($name = 'Guest') {
+            return 'Hello, '.$name;
+        });
+
+        $this->assertSame('Hello, Guest', $this->macroable::greet());
+        $this->assertSame('Hello, Saleh', $this->macroable::greet('Saleh'));
+    }
+
+    public function testCallingUndefinedMacroThrowsException()
+    {
+        $this->expectException(BadMethodCallException::class);
+
+        $this->macroable::nonExistentMacro();
+    }
+
+    public function testMethodConflictDoesNotThrowException()
+    {
+        $this->macroable::macro('existingMethod', function () {
+            return 'oldMethod';
+        });
+
+        // Replacing existing macro.
+        $this->macroable::macro('existingMethod', function () {
+            return 'newMethod';
+        });
+
+        $this->assertSame('newMethod', $this->macroable::existingMethod());
+    }
 }
 
 class EmptyMacroable

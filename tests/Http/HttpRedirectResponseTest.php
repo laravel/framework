@@ -75,6 +75,18 @@ class HttpRedirectResponseTest extends TestCase
         $response->withInput();
     }
 
+    public function testWithCookies()
+    {
+        $response = new RedirectResponse('foo.bar');
+        $response->setRequest(Request::create('/', 'GET', ['name' => 'Taylor', 'age' => 26]));
+        $response->withCookies([
+            new Cookie('name', 'milwad'),
+        ]);
+
+        $this->assertEquals('name', $response->headers->getCookies()[0]->getName());
+        $this->assertEquals('milwad', $response->headers->getCookies()[0]->getValue());
+    }
+
     public function testOnlyInputOnRedirect()
     {
         $response = new RedirectResponse('foo.bar');

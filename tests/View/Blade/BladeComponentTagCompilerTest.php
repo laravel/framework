@@ -100,13 +100,13 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
     {
         $this->mockViewFactory();
 
-        $result = $this->compiler(['alert' => TestAlertComponent::class])->compileTags('<div><x-alert type="foo" limit="5" @click="foo" wire:click="changePlan(\'{{ $plan }}\')" required /><x-alert /></div>');
+        $result = $this->compiler(['alert' => TestAlertComponent::class])->compileTags('<div><x-alert type="foo" limit="5" @click="foo" wire:click="changePlan(\'{{ $plan }}\')" required x-intersect.margin.-50%.0px="visibleSection = \'profile\'" /><x-alert /></div>');
 
         $this->assertSame("<div>##BEGIN-COMPONENT-CLASS##@component('Illuminate\Tests\View\Blade\TestAlertComponent', 'alert', [])
 <?php if (isset(\$attributes) && \$attributes instanceof Illuminate\View\ComponentAttributeBag && \$constructor = (new ReflectionClass(Illuminate\Tests\View\Blade\TestAlertComponent::class))->getConstructor()): ?>
 <?php \$attributes = \$attributes->except(collect(\$constructor->getParameters())->map->getName()->all()); ?>
 <?php endif; ?>
-<?php \$component->withAttributes(['type' => 'foo','limit' => '5','@click' => 'foo','wire:click' => 'changePlan(\''.e(\$plan).'\')','required' => true]); ?>\n".
+<?php \$component->withAttributes(['type' => 'foo','limit' => '5','@click' => 'foo','wire:click' => 'changePlan(\''.e(\$plan).'\')','required' => true,'x-intersect.margin.-50%.0px' => 'visibleSection = \'profile\'']); ?>\n".
 "@endComponentClass##END-COMPONENT-CLASS####BEGIN-COMPONENT-CLASS##@component('Illuminate\Tests\View\Blade\TestAlertComponent', 'alert', [])
 <?php if (isset(\$attributes) && \$attributes instanceof Illuminate\View\ComponentAttributeBag && \$constructor = (new ReflectionClass(Illuminate\Tests\View\Blade\TestAlertComponent::class))->getConstructor()): ?>
 <?php \$attributes = \$attributes->except(collect(\$constructor->getParameters())->map->getName()->all()); ?>
@@ -715,7 +715,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         $component->shouldReceive('shouldRender')->once()->andReturn(true);
         $component->shouldReceive('resolveView')->once()->andReturn('');
         $component->shouldReceive('data')->once()->andReturn([]);
-        $component->shouldReceive('withAttributes')->once();
+        $component->shouldReceive('withAttributes')->with(['attributes' => new ComponentAttributeBag(['other' => 'ok'])])->once();
 
         Component::resolveComponentsUsing(fn () => $component);
 
@@ -730,7 +730,57 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         eval(" ?> $template <?php ");
         ob_get_clean();
 
-        $this->assertNull($attributes->get('userId'));
+        $this->assertSame($attributes->get('userId'), 'bar');
+        $this->assertSame($attributes->get('other'), 'ok');
+    }
+
+    public function testOriginalAttributesAreRestoredAfterRenderingChildComponentWithProps()
+    {
+        $container = new Container;
+        $container->instance(Application::class, $app = m::mock(Application::class));
+        $container->instance(Factory::class, $factory = m::mock(Factory::class));
+        $container->alias(Factory::class, 'view');
+        $app->shouldReceive('getNamespace')->never()->andReturn('App\\');
+        $factory->shouldReceive('exists')->never();
+
+        Container::setInstance($container);
+
+        $attributes = new ComponentAttributeBag(['userId' => 'bar', 'other' => 'ok']);
+
+        $containerComponent = m::mock(Component::class);
+        $containerComponent->shouldReceive('withName')->with('container')->once();
+        $containerComponent->shouldReceive('shouldRender')->once()->andReturn(true);
+        $containerComponent->shouldReceive('resolveView')->once()->andReturn('');
+        $containerComponent->shouldReceive('data')->once()->andReturn([]);
+        $containerComponent->shouldReceive('withAttributes')->once();
+
+        $profileComponent = m::mock(Component::class);
+        $profileComponent->shouldReceive('withName')->with('profile')->once();
+        $profileComponent->shouldReceive('shouldRender')->once()->andReturn(true);
+        $profileComponent->shouldReceive('resolveView')->once()->andReturn('');
+        $profileComponent->shouldReceive('data')->once()->andReturn([]);
+        $profileComponent->shouldReceive('withAttributes')->with(['attributes' => new ComponentAttributeBag(['other' => 'ok'])])->once();
+
+        Component::resolveComponentsUsing(fn ($component) => match ($component) {
+            TestContainerComponent::class => $containerComponent,
+            TestProfileComponent::class => $profileComponent,
+        });
+
+        $__env = m::mock(\Illuminate\View\Factory::class);
+        $__env->shouldReceive('startComponent')->twice();
+        $__env->shouldReceive('renderComponent')->twice();
+
+        $template = $this->compiler([
+            'container' => TestContainerComponent::class,
+            'profile' => TestProfileComponent::class,
+        ])->compileTags('<x-container><x-profile {{ $attributes }} /></x-container>');
+        $template = $this->compiler->compileString($template);
+
+        ob_start();
+        eval(" ?> $template <?php ");
+        ob_get_clean();
+
+        $this->assertSame($attributes->get('userId'), 'bar');
         $this->assertSame($attributes->get('other'), 'ok');
     }
 
@@ -795,5 +845,13 @@ class TestInputComponent extends Component
     public function render()
     {
         return 'input';
+    }
+}
+
+class TestContainerComponent extends Component
+{
+    public function render()
+    {
+        return 'container';
     }
 }

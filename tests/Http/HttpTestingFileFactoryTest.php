@@ -95,9 +95,11 @@ class HttpTestingFileFactoryTest extends TestCase
 
         $imagePath = $image->getRealPath();
 
-        $this->assertSame('image/x-ms-bmp', mime_content_type($imagePath));
-
-        $this->assertSame('image/bmp', getimagesize($imagePath)['mime']);
+        if (version_compare(PHP_VERSION, '8.3.0-dev', '>=')) {
+            $this->assertSame('image/bmp', mime_content_type($imagePath));
+        } else {
+            $this->assertSame('image/x-ms-bmp', mime_content_type($imagePath));
+        }
     }
 
     public function testCreateWithMimeType()
@@ -114,6 +116,29 @@ class HttpTestingFileFactoryTest extends TestCase
             'video/webm',
             (new FileFactory)->create('someaudio.webm')->getMimeType()
         );
+    }
+
+    /** @dataProvider generateImageDataProvider */
+    public function testCallingCreateWithoutGDLoadedThrowsAnException(string $fileExtension, string $driver)
+    {
+        if ($this->isGDSupported($driver)) {
+            $this->markTestSkipped("Requires no {$driver}");
+        }
+
+        $this->expectException(\LogicException::class);
+        (new FileFactory)->image("test.{$fileExtension}");
+    }
+
+    public static function generateImageDataProvider(): array
+    {
+        return [
+            'jpeg' => ['jpeg', 'JPEG Support'],
+            'png' => ['png', 'PNG Support'],
+            'gif' => ['gif', 'GIF Create Support'],
+            'webp' => ['webp', 'WebP Support'],
+            'wbmp' => ['wbmp', 'WBMP Support'],
+            'bmp' => ['bmp', 'BMP Support'],
+        ];
     }
 
     /**

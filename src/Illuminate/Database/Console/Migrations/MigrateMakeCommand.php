@@ -103,7 +103,7 @@ class MigrateMakeCommand extends BaseCommand implements PromptsForMissingInput
      * @param  string  $name
      * @param  string  $table
      * @param  bool  $create
-     * @return string
+     * @return void
      */
     protected function writeMigration($name, $table, $create)
     {
@@ -138,7 +138,7 @@ class MigrateMakeCommand extends BaseCommand implements PromptsForMissingInput
     protected function promptForMissingArgumentsUsing()
     {
         return [
-            'name' => 'What should the migration be named?',
+            'name' => ['What should the migration be named?', 'E.g. create_flights_table'],
         ];
     }
 }

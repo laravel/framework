@@ -7,7 +7,7 @@ trait Dispatchable
     /**
      * Dispatch the event with the given arguments.
      *
-     * @return void
+     * @return mixed
      */
     public static function dispatch()
     {
@@ -19,7 +19,7 @@ trait Dispatchable
      *
      * @param  bool  $boolean
      * @param  mixed  ...$arguments
-     * @return void
+     * @return mixed
      */
     public static function dispatchIf($boolean, ...$arguments)
     {
@@ -33,7 +33,7 @@ trait Dispatchable
      *
      * @param  bool  $boolean
      * @param  mixed  ...$arguments
-     * @return void
+     * @return mixed
      */
     public static function dispatchUnless($boolean, ...$arguments)
     {

@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Database;
 use BadMethodCallException;
 use Closure;
 use DateTime;
+use Illuminate\Contracts\Database\Query\ConditionExpression;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Query\Builder;
@@ -14,6 +15,7 @@ use Illuminate\Database\Query\Grammars\MySqlGrammar;
 use Illuminate\Database\Query\Grammars\PostgresGrammar;
 use Illuminate\Database\Query\Grammars\SQLiteGrammar;
 use Illuminate\Database\Query\Grammars\SqlServerGrammar;
+use Illuminate\Database\Query\JoinClause;
 use Illuminate\Database\Query\Processors\MySqlProcessor;
 use Illuminate\Database\Query\Processors\PostgresProcessor;
 use Illuminate\Database\Query\Processors\Processor;
@@ -769,7 +771,14 @@ class DatabaseQueryBuilderTest extends TestCase
         $period = now()->toPeriod(now()->addDay());
         $builder->select('*')->from('users')->whereBetween('created_at', $period);
         $this->assertSame('select * from "users" where "created_at" between ? and ?', $builder->toSql());
-        $this->assertEquals($period->toArray(), $builder->getBindings());
+        $this->assertEquals([$period->start, $period->end], $builder->getBindings());
+
+        // custom long carbon period date
+        $builder = $this->getBuilder();
+        $period = now()->toPeriod(now()->addMonth());
+        $builder->select('*')->from('users')->whereBetween('created_at', $period);
+        $this->assertSame('select * from "users" where "created_at" between ? and ?', $builder->toSql());
+        $this->assertEquals([$period->start, $period->end], $builder->getBindings());
 
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->whereBetween('id', collect([1, 2]));
@@ -1411,6 +1420,19 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([0 => 1], $builder->getBindings());
     }
 
+    public function testBasicWhereNullExpressionsMysql()
+    {
+        $builder = $this->getMysqlBuilder();
+        $builder->select('*')->from('users')->whereNull(new Raw('id'));
+        $this->assertSame('select * from `users` where id is null', $builder->toSql());
+        $this->assertEquals([], $builder->getBindings());
+
+        $builder = $this->getMysqlBuilder();
+        $builder->select('*')->from('users')->where('id', '=', 1)->orWhereNull(new Raw('id'));
+        $this->assertSame('select * from `users` where `id` = ? or id is null', $builder->toSql());
+        $this->assertEquals([0 => 1], $builder->getBindings());
+    }
+
     public function testJsonWhereNullMysql()
     {
         $builder = $this->getMySqlBuilder();
@@ -1422,6 +1444,20 @@ class DatabaseQueryBuilderTest extends TestCase
     {
         $builder = $this->getMySqlBuilder();
         $builder->select('*')->from('users')->whereNotNull('items->id');
+        $this->assertSame('select * from `users` where (json_extract(`items`, \'$."id"\') is not null AND json_type(json_extract(`items`, \'$."id"\')) != \'NULL\')', $builder->toSql());
+    }
+
+    public function testJsonWhereNullExpressionMysql()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->whereNull(new Raw('items->id'));
+        $this->assertSame('select * from `users` where (json_extract(`items`, \'$."id"\') is null OR json_type(json_extract(`items`, \'$."id"\')) = \'NULL\')', $builder->toSql());
+    }
+
+    public function testJsonWhereNotNullExpressionMysql()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->whereNotNull(new Raw('items->id'));
         $this->assertSame('select * from `users` where (json_extract(`items`, \'$."id"\') is not null AND json_type(json_extract(`items`, \'$."id"\')) != \'NULL\')', $builder->toSql());
     }
 
@@ -1796,6 +1832,22 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getBuilder();
         $builder->select(['category', new Raw('count(*) as "total"')])->from('item')->where('department', '=', 'popular')->groupBy('category')->havingNotNull('total');
         $this->assertSame('select "category", count(*) as "total" from "item" where "department" = ? group by "category" having "total" is not null', $builder->toSql());
+    }
+
+    public function testHavingExpression()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->having(
+            new class() implements ConditionExpression
+            {
+                public function getValue(\Illuminate\Database\Grammar $grammar)
+                {
+                    return '1 = 1';
+                }
+            }
+        );
+        $this->assertSame('select * from "users" having 1 = 1', $builder->toSql());
+        $this->assertSame([], $builder->getBindings());
     }
 
     public function testHavingShortcut()
@@ -2398,6 +2450,18 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals(['1', 10000], $builder->getBindings());
     }
 
+    public function testJoinWithNestedOnCondition()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('users.id')->from('users')->join('contacts', function (JoinClause $j) {
+            return $j
+                ->on('users.id', 'contacts.id')
+                ->addNestedWhereQuery($this->getBuilder()->where('contacts.id', 1));
+        });
+        $this->assertSame('select "users"."id" from "users" inner join "contacts" on "users"."id" = "contacts"."id" and ("contacts"."id" = ?)', $builder->toSql());
+        $this->assertEquals([1], $builder->getBindings());
+    }
+
     public function testJoinSub()
     {
         $builder = $this->getBuilder();
@@ -2761,6 +2825,21 @@ class DatabaseQueryBuilderTest extends TestCase
             ['foo'],
             function (Builder $query) {
                 $query->select(['bar'])->from('table2')->where('foreign_id', '=', 5);
+            }
+        );
+
+        $this->assertEquals(1, $result);
+    }
+
+    public function testInsertUsingWithEmptyColumns()
+    {
+        $builder = $this->getBuilder();
+        $builder->getConnection()->shouldReceive('affectingStatement')->once()->with('insert into "table1" select * from "table2" where "foreign_id" = ?', [5])->andReturn(1);
+
+        $result = $builder->from('table1')->insertUsing(
+            [],
+            function (Builder $query) {
+                $query->from('table2')->where('foreign_id', '=', 5);
             }
         );
 
@@ -3324,11 +3403,11 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testPreservedAreAppliedByInsertUsing()
     {
         $builder = $this->getBuilder();
-        $builder->getConnection()->shouldReceive('affectingStatement')->once()->with('insert into "users" () select *', []);
+        $builder->getConnection()->shouldReceive('affectingStatement')->once()->with('insert into "users" ("email") select *', []);
         $builder->beforeQuery(function ($builder) {
             $builder->from('users');
         });
-        $builder->insertUsing([], $this->getBuilder());
+        $builder->insertUsing(['email'], $this->getBuilder());
     }
 
     public function testPreservedAreAppliedByUpsert()
@@ -4342,6 +4421,26 @@ SQL;
         }, 'table.id', 'table_id');
     }
 
+    public function testChunkPaginatesUsingIdDesc()
+    {
+        $builder = $this->getMockQueryBuilder();
+        $builder->orders[] = ['column' => 'foobar', 'direction' => 'desc'];
+
+        $chunk1 = collect([(object) ['someIdField' => 10], (object) ['someIdField' => 1]]);
+        $chunk2 = collect([]);
+        $builder->shouldReceive('forPageBeforeId')->once()->with(2, 0, 'someIdField')->andReturnSelf();
+        $builder->shouldReceive('forPageBeforeId')->once()->with(2, 1, 'someIdField')->andReturnSelf();
+        $builder->shouldReceive('get')->times(2)->andReturn($chunk1, $chunk2);
+
+        $callbackAssertor = m::mock(stdClass::class);
+        $callbackAssertor->shouldReceive('doSomething')->once()->with($chunk1);
+        $callbackAssertor->shouldReceive('doSomething')->never()->with($chunk2);
+
+        $builder->chunkByIdDesc(2, function ($results) use ($callbackAssertor) {
+            $callbackAssertor->doSomething($results);
+        }, 'someIdField');
+    }
+
     public function testPaginate()
     {
         $perPage = 16;
@@ -4454,6 +4553,30 @@ SQL;
             'path' => $path,
             'pageName' => $pageName,
         ]), $result);
+    }
+
+    public function testPaginateWithTotalOverride()
+    {
+        $perPage = 16;
+        $columns = ['id', 'name'];
+        $pageName = 'page-name';
+        $page = 1;
+        $builder = $this->getMockQueryBuilder();
+        $path = 'http://foo.bar?page=3';
+
+        $results = collect([['id' => 3, 'name' => 'Taylor'], ['id' => 5, 'name' => 'Mohamed']]);
+
+        $builder->shouldReceive('getCountForPagination')->never();
+        $builder->shouldReceive('forPage')->once()->with($page, $perPage)->andReturnSelf();
+        $builder->shouldReceive('get')->once()->andReturn($results);
+
+        Paginator::currentPathResolver(function () use ($path) {
+            return $path;
+        });
+
+        $result = $builder->paginate($perPage, $columns, $pageName, $page, 10);
+
+        $this->assertEquals(10, $result->total());
     }
 
     public function testCursorPaginate()
@@ -4922,7 +5045,7 @@ SQL;
 
         $builder->shouldReceive('get')->once()->andReturnUsing(function () use ($builder, $results, $ts) {
             $this->assertEquals(
-                '(select "id", "start_time" as "created_at", \'video\' as type from "videos" where ("start_time" < ?)) union (select "id", "created_at", \'news\' as type from "news" where ("start_time" < ?)) order by "created_at" asc limit 17',
+                '(select "id", "start_time" as "created_at", \'video\' as type from "videos" where ("start_time" < ?)) union (select "id", "created_at", \'news\' as type from "news" where ("start_time" < ?)) order by "created_at" desc limit 17',
                 $builder->toSql());
             $this->assertEquals([$ts], $builder->bindings['where']);
             $this->assertEquals([$ts], $builder->bindings['union']);
@@ -4990,6 +5113,22 @@ SQL;
         ]), $result);
     }
 
+    public function testWhereExpression()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('orders')->where(
+            new class() implements ConditionExpression
+            {
+                public function getValue(\Illuminate\Database\Grammar $grammar)
+                {
+                    return '1 = 1';
+                }
+            }
+        );
+        $this->assertSame('select * from "orders" where 1 = 1', $builder->toSql());
+        $this->assertSame([], $builder->getBindings());
+    }
+
     public function testWhereRowValues()
     {
         $builder = $this->getBuilder();
@@ -5053,10 +5192,15 @@ SQL;
 
     public function testWhereJsonContainsSqlite()
     {
-        $this->expectException(RuntimeException::class);
+        $builder = $this->getSQLiteBuilder();
+        $builder->select('*')->from('users')->whereJsonContains('options', 'en')->toSql();
+        $this->assertSame('select * from "users" where exists (select 1 from json_each("options") where "json_each"."value" is ?)', $builder->toSql());
+        $this->assertEquals(['en'], $builder->getBindings());
 
         $builder = $this->getSQLiteBuilder();
-        $builder->select('*')->from('users')->whereJsonContains('options->languages', ['en'])->toSql();
+        $builder->select('*')->from('users')->whereJsonContains('users.options->language', 'en')->toSql();
+        $this->assertSame('select * from "users" where exists (select 1 from json_each("users"."options", \'$."language"\') where "json_each"."value" is ?)', $builder->toSql());
+        $this->assertEquals(['en'], $builder->getBindings());
     }
 
     public function testWhereJsonContainsSqlServer()
@@ -5105,10 +5249,15 @@ SQL;
 
     public function testWhereJsonDoesntContainSqlite()
     {
-        $this->expectException(RuntimeException::class);
+        $builder = $this->getSQLiteBuilder();
+        $builder->select('*')->from('users')->whereJsonDoesntContain('options', 'en')->toSql();
+        $this->assertSame('select * from "users" where not exists (select 1 from json_each("options") where "json_each"."value" is ?)', $builder->toSql());
+        $this->assertEquals(['en'], $builder->getBindings());
 
         $builder = $this->getSQLiteBuilder();
-        $builder->select('*')->from('users')->whereJsonDoesntContain('options->languages', ['en'])->toSql();
+        $builder->select('*')->from('users')->whereJsonDoesntContain('users.options->language', 'en')->toSql();
+        $this->assertSame('select * from "users" where not exists (select 1 from json_each("users"."options", \'$."language"\') where "json_each"."value" is ?)', $builder->toSql());
+        $this->assertEquals(['en'], $builder->getBindings());
     }
 
     public function testWhereJsonDoesntContainSqlServer()
@@ -5542,6 +5691,22 @@ SQL;
 
         $this->assertSame('select * from "users" order by "email" asc', $clone->toSql());
         $this->assertEquals([], $clone->getBindings());
+    }
+
+    public function testToRawSql()
+    {
+        $connection = m::mock(ConnectionInterface::class);
+        $connection->shouldReceive('prepareBindings')
+            ->with(['foo'])
+            ->andReturn(['foo']);
+        $grammar = m::mock(Grammar::class)->makePartial();
+        $grammar->shouldReceive('substituteBindingsIntoRawSql')
+            ->with('select * from "users" where "email" = ?', ['foo'])
+            ->andReturn('select * from "users" where "email" = \'foo\'');
+        $builder = new Builder($connection, $grammar, m::mock(Processor::class));
+        $builder->select('*')->from('users')->where('email', 'foo');
+
+        $this->assertSame('select * from "users" where "email" = \'foo\'', $builder->toRawSql());
     }
 
     protected function getConnection()

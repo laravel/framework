@@ -435,13 +435,14 @@ class DatabaseEloquentCollectionTest extends TestCase
         $one->shouldReceive('getKey')->andReturn(1);
 
         $two = m::mock(Model::class);
-        $two->shouldReceive('getKey')->andReturn('2');
+        $two->shouldReceive('getKey')->andReturn(2);
 
         $three = m::mock(Model::class);
         $three->shouldReceive('getKey')->andReturn(3);
 
         $c = new Collection([$one, $two, $three]);
 
+        $this->assertEquals($c, $c->except(null));
         $this->assertEquals(new Collection([$one, $three]), $c->except(2));
         $this->assertEquals(new Collection([$one]), $c->except([2, 3]));
     }

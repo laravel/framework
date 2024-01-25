@@ -78,7 +78,25 @@ class ConsoleApplicationTest extends TestCase
         $this->assertSame($outputOfCallingArrayInput, $outputOfCallingStringInput);
     }
 
-    public function testCommandInputPromptingWorksCorrectly()
+    public function testCommandInputPromptsWhenRequiredArgumentIsMissing()
+    {
+        $app = new Application(
+            $laravel = new \Illuminate\Foundation\Application(__DIR__),
+            $events = m::mock(Dispatcher::class, ['dispatch' => null, 'fire' => null]),
+            'testing'
+        );
+
+        $app->addCommands([$command = new FakeCommandWithInputPrompting()]);
+
+        $command->setLaravel($laravel);
+
+        $statusCode = $app->call('fake-command-for-testing');
+
+        $this->assertTrue($command->prompted);
+        $this->assertSame(0, $statusCode);
+    }
+
+    public function testCommandInputDoesntPromptWhenRequiredArgumentIsPassed()
     {
         $app = new Application(
             $app = new \Illuminate\Foundation\Application(__DIR__),
@@ -86,12 +104,13 @@ class ConsoleApplicationTest extends TestCase
             'testing'
         );
 
-        $app->addCommands([new FakeCommandWithInputPrompting(false)]);
+        $app->addCommands([$command = new FakeCommandWithInputPrompting()]);
 
         $statusCode = $app->call('fake-command-for-testing', [
             'name' => 'foo',
         ]);
 
+        $this->assertFalse($command->prompted);
         $this->assertSame(0, $statusCode);
     }
 

@@ -2,6 +2,7 @@
 
 namespace Illuminate\Queue\Console;
 
+use Carbon\CarbonInterval;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Queue\Job;
@@ -216,7 +217,7 @@ class WorkCommand extends Command
             return $this->output->writeln(' <fg=yellow;options=bold>RUNNING</>');
         }
 
-        $runTime = number_format((microtime(true) - $this->latestStartedAt) * 1000, 2).'ms';
+        $runTime = $this->formatRunTime($this->latestStartedAt);
 
         $dots = max(terminal()->width() - mb_strlen($job->resolveName()) - (
             $this->output->isVerbose() ? (mb_strlen($job->getJobId()) + 1) : 0
@@ -247,6 +248,21 @@ class WorkCommand extends Command
         }
 
         return Carbon::now();
+    }
+
+    /**
+     * Given a start time, format the total run time for human readability.
+     *
+     * @param  float  $startTime
+     * @return string
+     */
+    protected function formatRunTime($startTime)
+    {
+        $runTime = (microtime(true) - $startTime) * 1000;
+
+        return $runTime > 1000
+            ? CarbonInterval::milliseconds($runTime)->cascade()->forHumans(short: true)
+            : number_format($runTime, 2).'ms';
     }
 
     /**

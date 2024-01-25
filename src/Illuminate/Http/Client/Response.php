@@ -85,7 +85,7 @@ class Response implements ArrayAccess
     /**
      * Get the JSON decoded body of the response as an object.
      *
-     * @return object|array
+     * @return object|null
      */
     public function object()
     {
@@ -338,9 +338,8 @@ class Response implements ArrayAccess
      */
     public function throwUnlessStatus($statusCode)
     {
-        if (is_callable($statusCode) &&
-            ! $statusCode($this->status(), $this)) {
-            return $this->throw();
+        if (is_callable($statusCode)) {
+            return $statusCode($this->status(), $this) ? $this : $this->throw();
         }
 
         return $this->status() === $statusCode ? $this : $this->throw();

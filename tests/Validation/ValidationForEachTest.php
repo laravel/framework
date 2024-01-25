@@ -6,7 +6,6 @@ use Illuminate\Translation\ArrayLoader;
 use Illuminate\Translation\Translator;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Validator;
-use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
 class ValidationForEachTest extends TestCase
@@ -257,9 +256,67 @@ class ValidationForEachTest extends TestCase
         ], $v->getMessageBag()->toArray());
     }
 
-    protected function getTranslator()
+    public function testConditionalRulesCanBeAddedToForEachWithAssociativeArray()
     {
-        return m::mock(TranslatorContract::class);
+        $v = new Validator(
+            $this->getIlluminateArrayTranslator(),
+            [
+                'foo' => [
+                    ['bar' => true],
+                    ['bar' => false],
+                ],
+            ],
+            [
+                'foo.*' => Rule::forEach(fn (mixed $value, string $attribute) => [
+                    'bar' => Rule::when(true, ['accepted'], ['declined']),
+                ]),
+            ]
+        );
+
+        $this->assertEquals([
+            'foo.1.bar' => ['validation.accepted'],
+        ], $v->getMessageBag()->toArray());
+    }
+
+    public function testConditionalRulesCanBeAddedToForEachWithList()
+    {
+        $v = new Validator(
+            $this->getIlluminateArrayTranslator(),
+            [
+                'foo' => [
+                    ['bar' => true],
+                    ['bar' => false],
+                ],
+            ],
+            [
+                'foo.*.bar' => Rule::forEach(fn (mixed $value, string $attribute) => [
+                    Rule::when(true, ['accepted'], ['declined']),
+                ]),
+            ]);
+
+        $this->assertEquals([
+            'foo.1.bar' => ['validation.accepted'],
+        ], $v->getMessageBag()->toArray());
+    }
+
+    public function testConditionalRulesCanBeAddedToForEachWithObject()
+    {
+        $v = new Validator(
+            $this->getIlluminateArrayTranslator(),
+            [
+                'foo' => [
+                    ['bar' => true],
+                    ['bar' => false],
+                ],
+            ],
+            [
+                'foo.*.bar' => Rule::forEach(fn (mixed $value, string $attribute) => Rule::when(true, ['accepted'], ['declined']),
+                ),
+            ]);
+
+        $this->assertEquals([
+            'foo.1.bar' => ['validation.accepted'],
+        ], $v->getMessageBag()->toArray());
     }
 
     public function getIlluminateArrayTranslator()

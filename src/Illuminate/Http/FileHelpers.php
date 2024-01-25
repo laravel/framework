@@ -53,4 +53,14 @@ trait FileHelpers
 
         return $path.$hash.$extension;
     }
+
+    /**
+     * Get the dimensions of the image (if applicable).
+     *
+     * @return array|null
+     */
+    public function dimensions()
+    {
+        return @getimagesize($this->getRealPath());
+    }
 }

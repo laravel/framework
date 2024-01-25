@@ -16,7 +16,8 @@ use Traversable;
 
 /**
  * @template TKey of array-key
- * @template TValue
+ *
+ * @template-covariant TValue
  *
  * @implements \Illuminate\Support\Enumerable<TKey, TValue>
  */
@@ -1044,7 +1045,7 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
      *
      * @param  TValue|(callable(TValue,TKey): bool)  $value
      * @param  bool  $strict
-     * @return TKey|bool
+     * @return TKey|false
      */
     public function search($value, $strict = false)
     {
@@ -1430,7 +1431,21 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     public function take($limit)
     {
         if ($limit < 0) {
-            return $this->passthru('take', func_get_args());
+            return new static(function () use ($limit) {
+                $limit = abs($limit);
+                $ringBuffer = [];
+                $position = 0;
+
+                foreach ($this as $key => $value) {
+                    $ringBuffer[$position] = [$key, $value];
+                    $position = ($position + 1) % $limit;
+                }
+
+                for ($i = 0, $end = min($limit, count($ringBuffer)); $i < $end; $i++) {
+                    $pointer = ($position + $i) % $limit;
+                    yield $ringBuffer[$pointer][0] => $ringBuffer[$pointer][1];
+                }
+            });
         }
 
         return new static(function () use ($limit) {
@@ -1735,6 +1750,8 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
      */
     protected function now()
     {
-        return time();
+        return class_exists(Carbon::class)
+            ? Carbon::now()->timestamp
+            : time();
     }
 }

@@ -237,6 +237,26 @@ class SessionManager extends Manager
     }
 
     /**
+     * Get the maximum number of seconds the session lock should be held for.
+     *
+     * @return int
+     */
+    public function defaultRouteBlockLockSeconds()
+    {
+        return $this->config->get('session.block_lock_seconds', 10);
+    }
+
+    /**
+     * Get the maximum number of seconds to wait while attempting to acquire a route block session lock.
+     *
+     * @return int
+     */
+    public function defaultRouteBlockWaitSeconds()
+    {
+        return $this->config->get('session.block_wait_seconds', 10);
+    }
+
+    /**
      * Get the session configuration.
      *
      * @return array

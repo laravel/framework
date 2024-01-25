@@ -54,6 +54,8 @@ trait ParsesLogConfiguration
      *
      * @param  array  $config
      * @return int
+     *
+     * @throws \InvalidArgumentException
      */
     protected function actionLevel(array $config)
     {

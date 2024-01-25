@@ -27,6 +27,18 @@ class Authorize
     }
 
     /**
+     * Specify the ability and models for the middleware.
+     *
+     * @param  string  $ability
+     * @param  string  ...$models
+     * @return string
+     */
+    public static function using($ability, ...$models)
+    {
+        return static::class.':'.implode(',', [$ability, ...$models]);
+    }
+
+    /**
      * Handle an incoming request.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -74,10 +86,10 @@ class Authorize
     {
         if ($this->isClassName($model)) {
             return trim($model);
-        } else {
-            return $request->route($model, null) ??
-                ((preg_match("/^['\"](.*)['\"]$/", trim($model), $matches)) ? $matches[1] : null);
         }
+
+        return $request->route($model, null) ??
+            ((preg_match("/^['\"](.*)['\"]$/", trim($model), $matches)) ? $matches[1] : null);
     }
 
     /**

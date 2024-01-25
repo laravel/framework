@@ -10,7 +10,7 @@ use Illuminate\Support\Str;
 
 class EloquentUpdateTest extends DatabaseTestCase
 {
-    protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
+    protected function afterRefreshingDatabase()
     {
         Schema::create('test_model1', function (Blueprint $table) {
             $table->increments('id');
@@ -117,6 +117,24 @@ class EloquentUpdateTest extends DatabaseTestCase
         $models = TestUpdateModel3::withoutGlobalScopes()->orderBy('id')->get();
         $this->assertEquals(1, $models[0]->counter);
         $this->assertEquals(0, $models[1]->counter);
+    }
+
+    public function testIncrementOrDecrementIgnoresGlobalScopes()
+    {
+        /** @var TestUpdateModel3 $deletedModel */
+        $deletedModel = tap(TestUpdateModel3::create([
+            'counter' => 0,
+        ]), fn ($model) => $model->delete());
+
+        $deletedModel->increment('counter');
+
+        $this->assertEquals(1, $deletedModel->counter);
+
+        $deletedModel->fresh();
+        $this->assertEquals(1, $deletedModel->counter);
+
+        $deletedModel->decrement('counter');
+        $this->assertEquals(0, $deletedModel->fresh()->counter);
     }
 }
 

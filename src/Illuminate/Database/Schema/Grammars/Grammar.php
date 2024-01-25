@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Schema\Grammars;
 
+use BackedEnum;
 use Doctrine\DBAL\Schema\AbstractSchemaManager as SchemaManager;
 use Doctrine\DBAL\Schema\TableDiff;
 use Illuminate\Contracts\Database\Query\Expression;
@@ -309,6 +310,10 @@ abstract class Grammar extends BaseGrammar
             return $this->getValue($value);
         }
 
+        if ($value instanceof BackedEnum) {
+            return "'{$value->value}'";
+        }
+
         return is_bool($value)
                     ? "'".(int) $value."'"
                     : "'".(string) $value."'";
@@ -323,11 +328,11 @@ abstract class Grammar extends BaseGrammar
      */
     public function getDoctrineTableDiff(Blueprint $blueprint, SchemaManager $schema)
     {
-        $table = $this->getTablePrefix().$blueprint->getTable();
+        $tableName = $this->getTablePrefix().$blueprint->getTable();
 
-        return tap(new TableDiff($table), function ($tableDiff) use ($schema, $table) {
-            $tableDiff->fromTable = $schema->introspectTable($table);
-        });
+        $table = $schema->introspectTable($tableName);
+
+        return new TableDiff(tableName: $tableName, fromTable: $table);
     }
 
     /**

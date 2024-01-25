@@ -4,6 +4,7 @@ namespace Illuminate\Validation;
 
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Traits\Macroable;
+use Illuminate\Validation\Rules\Can;
 use Illuminate\Validation\Rules\Dimensions;
 use Illuminate\Validation\Rules\Enum;
 use Illuminate\Validation\Rules\ExcludeIf;
@@ -21,7 +22,19 @@ class Rule
     use Macroable;
 
     /**
-     * Create a new conditional rule set.
+     * Get a can constraint builder instance.
+     *
+     * @param  string  $ability
+     * @param  mixed  ...$arguments
+     * @return \Illuminate\Validation\Rules\Can
+     */
+    public static function can($ability, ...$arguments)
+    {
+        return new Can($ability, $arguments);
+    }
+
+    /**
+     * Apply the given rules if the given condition is truthy.
      *
      * @param  callable|bool  $condition
      * @param  array|string|\Closure  $rules
@@ -31,6 +44,19 @@ class Rule
     public static function when($condition, $rules, $defaultRules = [])
     {
         return new ConditionalRules($condition, $rules, $defaultRules);
+    }
+
+    /**
+     * Apply the given rules if the given condition is falsy.
+     *
+     * @param  callable|bool  $condition
+     * @param  array|string|\Closure  $rules
+     * @param  array|string|\Closure  $defaultRules
+     * @return \Illuminate\Validation\ConditionalRules
+     */
+    public static function unless($condition, $rules, $defaultRules = [])
+    {
+        return new ConditionalRules($condition, $defaultRules, $rules);
     }
 
     /**

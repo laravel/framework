@@ -67,6 +67,37 @@ class SupportStrTest extends TestCase
         $this->assertSame('Orwell 1984', Str::headline(' orwell_- 1984 '));
     }
 
+    public function testStringApa()
+    {
+        $this->assertSame('Tom and Jerry', Str::apa('tom and jerry'));
+        $this->assertSame('Tom and Jerry', Str::apa('TOM AND JERRY'));
+        $this->assertSame('Tom and Jerry', Str::apa('Tom And Jerry'));
+
+        $this->assertSame('Back to the Future', Str::apa('back to the future'));
+        $this->assertSame('Back to the Future', Str::apa('BACK TO THE FUTURE'));
+        $this->assertSame('Back to the Future', Str::apa('Back To The Future'));
+
+        $this->assertSame('This, Then That', Str::apa('this, then that'));
+        $this->assertSame('This, Then That', Str::apa('THIS, THEN THAT'));
+        $this->assertSame('This, Then That', Str::apa('This, Then That'));
+
+        $this->assertSame('Bond. James Bond.', Str::apa('bond. james bond.'));
+        $this->assertSame('Bond. James Bond.', Str::apa('BOND. JAMES BOND.'));
+        $this->assertSame('Bond. James Bond.', Str::apa('Bond. James Bond.'));
+
+        $this->assertSame('Self-Report', Str::apa('self-report'));
+        $this->assertSame('Self-Report', Str::apa('Self-report'));
+        $this->assertSame('Self-Report', Str::apa('SELF-REPORT'));
+
+        $this->assertSame('As the World Turns, So Are the Days of Our Lives', Str::apa('as the world turns, so are the days of our lives'));
+        $this->assertSame('As the World Turns, So Are the Days of Our Lives', Str::apa('AS THE WORLD TURNS, SO ARE THE DAYS OF OUR LIVES'));
+        $this->assertSame('As the World Turns, So Are the Days of Our Lives', Str::apa('As The World Turns, So Are The Days Of Our Lives'));
+
+        $this->assertSame('To Kill a Mockingbird', Str::apa('to kill a mockingbird'));
+        $this->assertSame('To Kill a Mockingbird', Str::apa('TO KILL A MOCKINGBIRD'));
+        $this->assertSame('To Kill a Mockingbird', Str::apa('To Kill A Mockingbird'));
+    }
+
     public function testStringWithoutWordsDoesntProduceError()
     {
         $nbsp = chr(0xC2).chr(0xA0);
@@ -172,8 +203,8 @@ class SupportStrTest extends TestCase
         $this->assertSame('...abc...', Str::excerpt('z  abc  d', 'b', ['radius' => 1]));
         $this->assertSame('[...]is a beautiful morn[...]', Str::excerpt('This is a beautiful morning', 'beautiful', ['omission' => '[...]', 'radius' => 5]));
         $this->assertSame(
-            'This is the ultimate supercalifragilisticexpialidoceous very looooooooooooooooooong looooooooooooong beautiful morning with amazing sunshine and awesome tempera[...]',
-            Str::excerpt('This is the ultimate supercalifragilisticexpialidoceous very looooooooooooooooooong looooooooooooong beautiful morning with amazing sunshine and awesome temperatures. So what are you gonna do about it?', 'very',
+            'This is the ultimate supercalifragilisticexpialidocious very looooooooooooooooooong looooooooooooong beautiful morning with amazing sunshine and awesome tempera[...]',
+            Str::excerpt('This is the ultimate supercalifragilisticexpialidocious very looooooooooooooooooong looooooooooooong beautiful morning with amazing sunshine and awesome temperatures. So what are you gonna do about it?', 'very',
                 ['omission' => '[...]'],
             ));
 
@@ -203,6 +234,7 @@ class SupportStrTest extends TestCase
         $this->assertSame('...ocê e...', Str::excerpt('Como você está', 'Ê', ['radius' => 2]));
         $this->assertSame('João...', Str::excerpt('João Antônio ', 'jo', ['radius' => 2]));
         $this->assertSame('João Antô...', Str::excerpt('João Antônio', 'JOÃO', ['radius' => 5]));
+        $this->assertNull(Str::excerpt('', '/'));
     }
 
     public function testStrBefore()
@@ -302,11 +334,40 @@ class SupportStrTest extends TestCase
         $this->assertEquals($expected, Str::containsAll($haystack, $needles, $ignoreCase));
     }
 
+    public function testConvertCase()
+    {
+        // Upper Case Conversion
+        $this->assertSame('HELLO', Str::convertCase('hello', MB_CASE_UPPER));
+        $this->assertSame('WORLD', Str::convertCase('WORLD', MB_CASE_UPPER));
+
+        // Lower Case Conversion
+        $this->assertSame('hello', Str::convertCase('HELLO', MB_CASE_LOWER));
+        $this->assertSame('world', Str::convertCase('WORLD', MB_CASE_LOWER));
+
+        // Case Folding
+        $this->assertSame('hello', Str::convertCase('HeLLo', MB_CASE_FOLD));
+        $this->assertSame('world', Str::convertCase('WoRLD', MB_CASE_FOLD));
+
+        // Multi-byte String
+        $this->assertSame('ÜÖÄ', Str::convertCase('üöä', MB_CASE_UPPER, 'UTF-8'));
+        $this->assertSame('üöä', Str::convertCase('ÜÖÄ', MB_CASE_LOWER, 'UTF-8'));
+
+        // Unsupported Mode
+        $this->expectException(\ValueError::class);
+        Str::convertCase('Hello', -1);
+    }
+
     public function testParseCallback()
     {
+        $this->assertEquals(['Class', 'method'], Str::parseCallback('Class@method'));
         $this->assertEquals(['Class', 'method'], Str::parseCallback('Class@method', 'foo'));
         $this->assertEquals(['Class', 'foo'], Str::parseCallback('Class', 'foo'));
         $this->assertEquals(['Class', null], Str::parseCallback('Class'));
+
+        $this->assertEquals(["Class@anonymous\0/laravel/382.php:8$2ec", 'method'], Str::parseCallback("Class@anonymous\0/laravel/382.php:8$2ec@method"));
+        $this->assertEquals(["Class@anonymous\0/laravel/382.php:8$2ec", 'method'], Str::parseCallback("Class@anonymous\0/laravel/382.php:8$2ec@method", 'foo'));
+        $this->assertEquals(["Class@anonymous\0/laravel/382.php:8$2ec", 'foo'], Str::parseCallback("Class@anonymous\0/laravel/382.php:8$2ec", 'foo'));
+        $this->assertEquals(["Class@anonymous\0/laravel/382.php:8$2ec", null], Str::parseCallback("Class@anonymous\0/laravel/382.php:8$2ec"));
     }
 
     public function testSlug()
@@ -340,7 +401,6 @@ class SupportStrTest extends TestCase
     {
         $reflection = new ReflectionClass(Str::class);
         $property = $reflection->getProperty('snakeCache');
-        $property->setAccessible(true);
 
         Str::flushCache();
         $this->assertEmpty($property->getValue());
@@ -363,6 +423,15 @@ class SupportStrTest extends TestCase
     {
         $this->assertEquals('"value"', Str::wrap('value', '"'));
         $this->assertEquals('foo-bar-baz', Str::wrap('-bar-', 'foo', 'baz'));
+    }
+
+    public function testUnwrap()
+    {
+        $this->assertEquals('value', Str::unwrap('"value"', '"'));
+        $this->assertEquals('value', Str::unwrap('"value', '"'));
+        $this->assertEquals('value', Str::unwrap('value"', '"'));
+        $this->assertEquals('bar', Str::unwrap('foo-bar-baz', 'foo-', '-baz'));
+        $this->assertEquals('some: "json"', Str::unwrap('{some: "json"}', '{', '}'));
     }
 
     public function testIs()
@@ -404,6 +473,12 @@ class SupportStrTest extends TestCase
         $this->assertFalse(Str::is('', 0));
         $this->assertFalse(Str::is([null], 0));
         $this->assertTrue(Str::is([null], null));
+    }
+
+    public function testIsUrl()
+    {
+        $this->assertTrue(Str::isUrl('https://laravel.com'));
+        $this->assertFalse(Str::isUrl('invalid url'));
     }
 
     /**
@@ -504,8 +579,7 @@ class SupportStrTest extends TestCase
         $this->assertIsString(Str::random());
     }
 
-    /** @test */
-    public function TestWhetherTheNumberOfGeneratedCharactersIsEquallyDistributed()
+    public function testWhetherTheNumberOfGeneratedCharactersIsEquallyDistributed()
     {
         $results = [];
         // take 6.200.000 samples, because there are 62 different characters
@@ -570,7 +644,9 @@ class SupportStrTest extends TestCase
     public function testReplace()
     {
         $this->assertSame('foo bar laravel', Str::replace('baz', 'laravel', 'foo bar baz'));
+        $this->assertSame('foo bar laravel', Str::replace('baz', 'laravel', 'foo bar Baz', false));
         $this->assertSame('foo bar baz 8.x', Str::replace('?', '8.x', 'foo bar baz ?'));
+        $this->assertSame('foo bar baz 8.x', Str::replace('x', '8.x', 'foo bar baz X', false));
         $this->assertSame('foo/bar/baz', Str::replace(' ', '/', 'foo bar baz'));
         $this->assertSame('foo bar baz', Str::replace(['?1', '?2', '?3'], ['foo', 'bar', 'baz'], '?1 ?2 ?3'));
         $this->assertSame(['foo', 'bar', 'baz'], Str::replace(collect(['?1', '?2', '?3']), collect(['foo', 'bar', 'baz']), collect(['?1', '?2', '?3'])));
@@ -587,6 +663,8 @@ class SupportStrTest extends TestCase
         // Test for associative array support
         $this->assertSame('foo/bar', Str::replaceArray('?', [1 => 'foo', 2 => 'bar'], '?/?'));
         $this->assertSame('foo/bar', Str::replaceArray('?', ['x' => 'foo', 'y' => 'bar'], '?/?'));
+        // Test does not crash on bad input
+        $this->assertSame('?', Str::replaceArray('?', [(object) ['foo' => 'bar']], '?'));
     }
 
     public function testReplaceFirst()
@@ -602,6 +680,19 @@ class SupportStrTest extends TestCase
         $this->assertSame('Jönköping Malmö', Str::replaceFirst('', 'yyy', 'Jönköping Malmö'));
     }
 
+    public function testReplaceStart()
+    {
+        $this->assertSame('foobar foobar', Str::replaceStart('bar', 'qux', 'foobar foobar'));
+        $this->assertSame('foo/bar? foo/bar?', Str::replaceStart('bar?', 'qux?', 'foo/bar? foo/bar?'));
+        $this->assertSame('quxbar foobar', Str::replaceStart('foo', 'qux', 'foobar foobar'));
+        $this->assertSame('qux? foo/bar?', Str::replaceStart('foo/bar?', 'qux?', 'foo/bar? foo/bar?'));
+        $this->assertSame('bar foobar', Str::replaceStart('foo', '', 'foobar foobar'));
+        $this->assertSame('1', Str::replaceStart(0, '1', '0'));
+        // Test for multibyte string support
+        $this->assertSame('xxxnköping Malmö', Str::replaceStart('Jö', 'xxx', 'Jönköping Malmö'));
+        $this->assertSame('Jönköping Malmö', Str::replaceStart('', 'yyy', 'Jönköping Malmö'));
+    }
+
     public function testReplaceLast()
     {
         $this->assertSame('foobar fooqux', Str::replaceLast('bar', 'qux', 'foobar foobar'));
@@ -612,6 +703,20 @@ class SupportStrTest extends TestCase
         // Test for multibyte string support
         $this->assertSame('Malmö Jönkxxxping', Str::replaceLast('ö', 'xxx', 'Malmö Jönköping'));
         $this->assertSame('Malmö Jönköping', Str::replaceLast('', 'yyy', 'Malmö Jönköping'));
+    }
+
+    public function testReplaceEnd()
+    {
+        $this->assertSame('foobar fooqux', Str::replaceEnd('bar', 'qux', 'foobar foobar'));
+        $this->assertSame('foo/bar? foo/qux?', Str::replaceEnd('bar?', 'qux?', 'foo/bar? foo/bar?'));
+        $this->assertSame('foobar foo', Str::replaceEnd('bar', '', 'foobar foobar'));
+        $this->assertSame('foobar foobar', Str::replaceEnd('xxx', 'yyy', 'foobar foobar'));
+        $this->assertSame('foobar foobar', Str::replaceEnd('', 'yyy', 'foobar foobar'));
+        $this->assertSame('fooxxx foobar', Str::replaceEnd('xxx', 'yyy', 'fooxxx foobar'));
+
+        // // Test for multibyte string support
+        $this->assertSame('Malmö Jönköping', Str::replaceEnd('ö', 'xxx', 'Malmö Jönköping'));
+        $this->assertSame('Malmö Jönkyyy', Str::replaceEnd('öping', 'yyy', 'Malmö Jönköping'));
     }
 
     public function testRemove()
@@ -670,6 +775,7 @@ class SupportStrTest extends TestCase
         $this->assertSame('だ', Str::squish('   だ    '));
         $this->assertSame('ム', Str::squish('   ム    '));
         $this->assertSame('laravel php framework', Str::squish('laravelㅤㅤㅤphpㅤframework'));
+        $this->assertSame('laravel php framework', Str::squish('laravelᅠᅠᅠᅠᅠᅠᅠᅠᅠᅠphpᅠᅠframework'));
     }
 
     public function testStudly()
@@ -788,11 +894,39 @@ class SupportStrTest extends TestCase
         $this->assertSame(1, Str::substrCount('laravelPHPFramework', 'a', -10, -3));
     }
 
+    public function testPosition()
+    {
+        $this->assertSame(7, Str::position('Hello, World!', 'W'));
+        $this->assertSame(10, Str::position('This is a test string.', 'test'));
+        $this->assertSame(23, Str::position('This is a test string, test again.', 'test', 15));
+        $this->assertSame(0, Str::position('Hello, World!', 'Hello'));
+        $this->assertSame(7, Str::position('Hello, World!', 'World!'));
+        $this->assertSame(10, Str::position('This is a tEsT string.', 'tEsT', 0, 'UTF-8'));
+        $this->assertSame(7, Str::position('Hello, World!', 'W', -6));
+        $this->assertSame(18, Str::position('Äpfel, Birnen und Kirschen', 'Kirschen', -10, 'UTF-8'));
+        $this->assertSame(9, Str::position('@%€/=!"][$', '$', 0, 'UTF-8'));
+        $this->assertFalse(Str::position('Hello, World!', 'w', 0, 'UTF-8'));
+        $this->assertFalse(Str::position('Hello, World!', 'X', 0, 'UTF-8'));
+        $this->assertFalse(Str::position('', 'test'));
+        $this->assertFalse(Str::position('Hello, World!', 'X'));
+    }
+
     public function testSubstrReplace()
     {
         $this->assertSame('12:00', Str::substrReplace('1200', ':', 2, 0));
         $this->assertSame('The Laravel Framework', Str::substrReplace('The Framework', 'Laravel ', 4, 0));
         $this->assertSame('Laravel – The PHP Framework for Web Artisans', Str::substrReplace('Laravel Framework', '– The PHP Framework for Web Artisans', 8));
+    }
+
+    public function testTake()
+    {
+        $this->assertSame('ab', Str::take('abcdef', 2));
+        $this->assertSame('ef', Str::take('abcdef', -2));
+        $this->assertSame('', Str::take('abcdef', 0));
+        $this->assertSame('', Str::take('', 2));
+        $this->assertSame('abcdef', Str::take('abcdef', 10));
+        $this->assertSame('abcdef', Str::take('abcdef', 6));
+        $this->assertSame('ü', Str::take('üöä', 1));
     }
 
     public function testLcfirst()
@@ -891,6 +1025,14 @@ class SupportStrTest extends TestCase
 
         $this->assertEquals(1, Str::wordCount('МАМА', 'абвгдеёжзийклмнопрстуфхцчшщъыьэюяАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ'));
         $this->assertEquals(3, Str::wordCount('МАМА МЫЛА РАМУ', 'абвгдеёжзийклмнопрстуфхцчшщъыьэюяАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ'));
+    }
+
+    public function testWordWrap()
+    {
+        $this->assertEquals('Hello<br />World', Str::wordWrap('Hello World', 3, '<br />'));
+        $this->assertEquals('Hel<br />lo<br />Wor<br />ld', Str::wordWrap('Hello World', 3, '<br />', true));
+
+        $this->assertEquals('❤Multi<br />Byte☆❤☆❤☆❤', Str::wordWrap('❤Multi Byte☆❤☆❤☆❤', 3, '<br />'));
     }
 
     public static function validUuidList()
@@ -1112,9 +1254,121 @@ class SupportStrTest extends TestCase
         }
     }
 
+    public function testItCanFreezeUlids()
+    {
+        $this->assertNotSame((string) Str::ulid(), (string) Str::ulid());
+        $this->assertNotSame(Str::ulid(), Str::ulid());
+
+        $ulid = Str::freezeUlids();
+
+        $this->assertSame($ulid, Str::ulid());
+        $this->assertSame(Str::ulid(), Str::ulid());
+        $this->assertSame((string) $ulid, (string) Str::ulid());
+        $this->assertSame((string) Str::ulid(), (string) Str::ulid());
+
+        Str::createUlidsNormally();
+
+        $this->assertNotSame(Str::ulid(), Str::ulid());
+        $this->assertNotSame((string) Str::ulid(), (string) Str::ulid());
+    }
+
+    public function testItCanFreezeUlidsInAClosure()
+    {
+        $ulids = [];
+
+        $ulid = Str::freezeUlids(function ($ulid) use (&$ulids) {
+            $ulids[] = $ulid;
+            $ulids[] = Str::ulid();
+            $ulids[] = Str::ulid();
+        });
+
+        $this->assertSame($ulid, $ulids[0]);
+        $this->assertSame((string) $ulid, (string) $ulids[0]);
+        $this->assertSame((string) $ulids[0], (string) $ulids[1]);
+        $this->assertSame($ulids[0], $ulids[1]);
+        $this->assertSame((string) $ulids[0], (string) $ulids[1]);
+        $this->assertSame($ulids[1], $ulids[2]);
+        $this->assertSame((string) $ulids[1], (string) $ulids[2]);
+        $this->assertNotSame(Str::ulid(), Str::ulid());
+        $this->assertNotSame((string) Str::ulid(), (string) Str::ulid());
+
+        Str::createUlidsNormally();
+    }
+
+    public function testItCreatesUlidsNormallyAfterFailureWithinFreezeMethod()
+    {
+        try {
+            Str::freezeUlids(function () {
+                Str::createUlidsUsing(fn () => Str::of('1234'));
+                $this->assertSame('1234', (string) Str::ulid());
+                throw new \Exception('Something failed');
+            });
+        } catch (\Exception) {
+            $this->assertNotSame('1234', (string) Str::ulid());
+        }
+    }
+
+    public function testItCanSpecifyASequenceOfUlidsToUtilise()
+    {
+        Str::createUlidsUsingSequence([
+            0 => ($zeroth = Str::ulid()),
+            1 => ($first = Str::ulid()),
+            // just generate a random one here...
+            3 => ($third = Str::ulid()),
+            // continue to generate random ulids...
+        ]);
+
+        $retrieved = Str::ulid();
+        $this->assertSame($zeroth, $retrieved);
+        $this->assertSame((string) $zeroth, (string) $retrieved);
+
+        $retrieved = Str::ulid();
+        $this->assertSame($first, $retrieved);
+        $this->assertSame((string) $first, (string) $retrieved);
+
+        $retrieved = Str::ulid();
+        $this->assertFalse(in_array($retrieved, [$zeroth, $first, $third], true));
+        $this->assertFalse(in_array((string) $retrieved, [(string) $zeroth, (string) $first, (string) $third], true));
+
+        $retrieved = Str::ulid();
+        $this->assertSame($third, $retrieved);
+        $this->assertSame((string) $third, (string) $retrieved);
+
+        $retrieved = Str::ulid();
+        $this->assertFalse(in_array($retrieved, [$zeroth, $first, $third], true));
+        $this->assertFalse(in_array((string) $retrieved, [(string) $zeroth, (string) $first, (string) $third], true));
+
+        Str::createUlidsNormally();
+    }
+
+    public function testItCanSpecifyAFallbackForAUlidSequence()
+    {
+        Str::createUlidsUsingSequence(
+            [Str::ulid(), Str::ulid()],
+            fn () => throw new Exception('Out of Ulids'),
+        );
+        Str::ulid();
+        Str::ulid();
+
+        try {
+            $this->expectExceptionMessage('Out of Ulids');
+            Str::ulid();
+            $this->fail();
+        } finally {
+            Str::createUlidsNormally();
+        }
+    }
+
     public function testPasswordCreation()
     {
         $this->assertTrue(strlen(Str::password()) === 32);
+
+        $this->assertStringNotContainsString(' ', Str::password());
+        $this->assertStringContainsString(' ', Str::password(spaces: true));
+
+        $this->assertTrue(
+            Str::of(Str::password())->contains(['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'])
+        );
     }
 }
 

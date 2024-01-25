@@ -4,24 +4,18 @@ namespace Illuminate\Console;
 
 use Closure;
 use Illuminate\Console\Events\ArtisanStarting;
-use Illuminate\Console\Events\CommandFinished;
-use Illuminate\Console\Events\CommandStarting;
 use Illuminate\Contracts\Console\Application as ApplicationContract;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\ProcessUtils;
 use Symfony\Component\Console\Application as SymfonyApplication;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
-use Symfony\Component\Console\ConsoleEvents;
-use Symfony\Component\Console\Event\ConsoleCommandEvent;
-use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 use Symfony\Component\Console\Exception\CommandNotFoundException;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\Console\Output\BufferedOutput;
-use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Process\PhpExecutableFinder;
 
 class Application extends SymfonyApplication implements ApplicationContract
@@ -80,40 +74,7 @@ class Application extends SymfonyApplication implements ApplicationContract
 
         $this->events->dispatch(new ArtisanStarting($this));
 
-        $this->rerouteSymfonyCommandEvents();
-
         $this->bootstrap();
-    }
-
-    /**
-     * Re-route the Symfony command events to their Laravel counterparts.
-     *
-     * @return void
-     */
-    protected function rerouteSymfonyCommandEvents()
-    {
-        $this->setDispatcher($dispatcher = new EventDispatcher);
-
-        $dispatcher->addListener(ConsoleEvents::COMMAND, function (ConsoleCommandEvent $event) {
-            $this->events->dispatch(
-                new CommandStarting(
-                    $event->getCommand()->getName(),
-                    $event->getInput(),
-                    $event->getOutput(),
-                )
-            );
-        });
-
-        $dispatcher->addListener(ConsoleEvents::TERMINATE, function (ConsoleTerminateEvent $event) {
-            $this->events->dispatch(
-                new CommandFinished(
-                    $event->getCommand()->getName(),
-                    $event->getInput(),
-                    $event->getOutput(),
-                    $event->getExitCode(),
-                )
-            );
-        });
     }
 
     /**

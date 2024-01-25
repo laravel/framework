@@ -385,7 +385,7 @@ class AssertTest extends TestCase
         $assert->where('baz', 'invalid');
     }
 
-    public function testAssertWhereFailsWhenMachingLoosely()
+    public function testAssertWhereFailsWhenMatchingLoosely()
     {
         $assert = AssertableJson::fromArray([
             'bar' => 1,

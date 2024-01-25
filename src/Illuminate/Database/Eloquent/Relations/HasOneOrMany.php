@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithDictionary;
+use Illuminate\Database\UniqueConstraintViolationException;
 
 abstract class HasOneOrMany extends Relation
 {
@@ -226,7 +227,7 @@ abstract class HasOneOrMany extends Relation
     }
 
     /**
-     * Get the first related record matching the attributes or create it.
+     * Get the first record matching the attributes. If the record is not found, create it.
      *
      * @param  array  $attributes
      * @param  array  $values
@@ -234,11 +235,27 @@ abstract class HasOneOrMany extends Relation
      */
     public function firstOrCreate(array $attributes = [], array $values = [])
     {
-        if (is_null($instance = $this->where($attributes)->first())) {
-            $instance = $this->create(array_merge($attributes, $values));
+        if (is_null($instance = (clone $this)->where($attributes)->first())) {
+            $instance = $this->createOrFirst($attributes, $values);
         }
 
         return $instance;
+    }
+
+    /**
+     * Attempt to create the record. If a unique constraint violation occurs, attempt to find the matching record.
+     *
+     * @param  array  $attributes
+     * @param  array  $values
+     * @return \Illuminate\Database\Eloquent\Model
+     */
+    public function createOrFirst(array $attributes = [], array $values = [])
+    {
+        try {
+            return $this->getQuery()->withSavepointIfNeeded(fn () => $this->create(array_merge($attributes, $values)));
+        } catch (UniqueConstraintViolationException $e) {
+            return $this->useWritePdo()->where($attributes)->first() ?? throw $e;
+        }
     }
 
     /**
@@ -250,10 +267,10 @@ abstract class HasOneOrMany extends Relation
      */
     public function updateOrCreate(array $attributes, array $values = [])
     {
-        return tap($this->firstOrNew($attributes), function ($instance) use ($values) {
-            $instance->fill($values);
-
-            $instance->save();
+        return tap($this->firstOrCreate($attributes, $values), function ($instance) use ($values) {
+            if (! $instance->wasRecentlyCreated) {
+                $instance->fill($values)->save();
+            }
         });
     }
 
@@ -348,6 +365,17 @@ abstract class HasOneOrMany extends Relation
         $attributes[$this->getForeignKeyName()] = $this->getParentKey();
 
         return $this->related->forceCreate($attributes);
+    }
+
+    /**
+     * Create a new instance of the related model with mass assignment without raising model events.
+     *
+     * @param  array  $attributes
+     * @return \Illuminate\Database\Eloquent\Model
+     */
+    public function forceCreateQuietly(array $attributes = [])
+    {
+        return Model::withoutEvents(fn () => $this->forceCreate($attributes));
     }
 
     /**

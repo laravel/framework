@@ -30,11 +30,12 @@
         "egulias/email-validator": "^3.2.1|^4.0",
         "fruitcake/php-cors": "^1.2",
         "guzzlehttp/uri-template": "^1.0",
+        "laravel/prompts": "^0.1.9",
         "laravel/serializable-closure": "^1.3",
         "league/commonmark": "^2.2.1",
         "league/flysystem": "^3.8.0",
         "monolog/monolog": "^3.0",
-        "nesbot/carbon": "^2.62.1",
+        "nesbot/carbon": "^2.67",
         "nunomaduro/termwind": "^1.13",
         "psr/container": "^1.1.1|^2.0.1",
         "psr/log": "^1.0|^2.0|^3.0",
@@ -43,7 +44,7 @@
         "symfony/console": "^6.2",
         "symfony/error-handler": "^6.2",
         "symfony/finder": "^6.2",
-        "symfony/http-foundation": "^6.2",
+        "symfony/http-foundation": "^6.4",
         "symfony/http-kernel": "^6.2",
         "symfony/mailer": "^6.2",
         "symfony/mime": "^6.2",
@@ -103,26 +104,30 @@
         "league/flysystem-read-only": "^3.3",
         "league/flysystem-sftp-v3": "^3.0",
         "mockery/mockery": "^1.5.1",
-        "orchestra/testbench-core": "^8.0",
+        "nyholm/psr7": "^1.2",
+        "orchestra/testbench-core": "^8.18",
         "pda/pheanstalk": "^4.0",
-        "phpstan/phpdoc-parser": "^1.15",
         "phpstan/phpstan": "^1.4.7",
         "phpunit/phpunit": "^10.0.7",
         "predis/predis": "^2.0.2",
         "symfony/cache": "^6.2",
-        "symfony/http-client": "^6.2.4"
+        "symfony/http-client": "^6.2.4",
+        "symfony/psr-http-message-bridge": "^2.0"
     },
     "provide": {
         "psr/container-implementation": "1.1|2.0",
         "psr/simple-cache-implementation": "1.0|2.0|3.0"
     },
     "conflict": {
+        "carbonphp/carbon-doctrine-types": ">=3.0",
+        "doctrine/dbal": ">=4.0",
         "tightenco/collect": "<5.5.33"
     },
     "autoload": {
         "files": [
             "src/Illuminate/Collections/helpers.php",
             "src/Illuminate/Events/functions.php",
+            "src/Illuminate/Filesystem/functions.php",
             "src/Illuminate/Foundation/helpers.php",
             "src/Illuminate/Support/helpers.php"
         ],
