@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Integration\Console;
 
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Support\Facades\Schedule as ScheduleFacade;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 
@@ -19,6 +20,17 @@ class CommandWithDefaultsTest extends TestCase
         $schedule->call('/path/to/command');
         $schedule->call(SomeJob::class);
         $events = $schedule->events();
+        $this->assertSame($value, $events[0]->{$property});
+        $this->assertSame($value, $events[1]->{$property});
+    }
+
+    #[DataProvider('allowedPropertiesProvider')]
+    public function testWithDefaultsInAStaticContext(string $property, $value)
+    {
+        ScheduleFacade::withEventDefaults([$property => $value]);
+        ScheduleFacade::call('/path/to/command');
+        ScheduleFacade::call(SomeJob::class);
+        $events = ScheduleFacade::events();
         $this->assertSame($value, $events[0]->{$property});
         $this->assertSame($value, $events[1]->{$property});
     }
