@@ -829,16 +829,6 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     }
 
     /**
-     * Resolves class names contained in collection to an instance using service container.
-     *
-     * @return $this|Collection
-     */
-    public function mapInstance(?array $parameters = [])
-    {
-        return $this->passthru('mapInstance', func_get_args());
-    }
-
-    /**
      * Merge the collection with the given items.
      *
      * @param  \Illuminate\Contracts\Support\Arrayable<TKey, TValue>|iterable<TKey, TValue>  $items
