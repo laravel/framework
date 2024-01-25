@@ -5,6 +5,7 @@ namespace Illuminate\Support;
 use ArrayAccess;
 use ArrayIterator;
 use Illuminate\Contracts\Support\CanBeEscapedWhenCastToString;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Traits\EnumeratesValues;
 use Illuminate\Support\Traits\Macroable;
 use stdClass;
@@ -816,7 +817,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      */
     public function mapToInstance(?array $parameters = [])
     {
-        return $this->map(fn ($class) => app($class, $parameters));
+        return $this->map(fn ($class) => App::make($class, $parameters));
     }
 
     /**
