@@ -14,6 +14,7 @@ class StorageLinkCommand extends Command
      * @var string
      */
     protected $signature = 'storage:link
+                {name? : The name of the link}
                 {--relative : Create the symbolic link using relative paths}
                 {--force : Recreate existing symbolic links}';
 
@@ -60,6 +61,18 @@ class StorageLinkCommand extends Command
      */
     protected function links()
     {
+        if ($name = $this->argument('name')) {
+            $link = $this->laravel['config']["filesystems.links.".$name] ?? false;
+
+            if (! $link) {
+                $this->components->error("No link have been configured for the [$name] name.");
+
+                return [];
+            }
+
+            return [$link];
+        }
+
         return $this->laravel['config']['filesystems.links'] ?? [
             'public' => [
                 'link' => public_path('storage'),
