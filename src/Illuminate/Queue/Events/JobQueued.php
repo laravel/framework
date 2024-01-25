@@ -42,7 +42,7 @@ class JobQueued
     /**
      * The amount of time the job was delayed.
      *
-     * @var \DateTimeInterface|\DateInterval|int|null
+     * @var int|null
      */
     public $delay;
 
@@ -54,7 +54,7 @@ class JobQueued
      * @param  string|int|null  $id
      * @param  \Closure|string|object  $job
      * @param  string  $payload
-     * @param  \DateTimeInterface|\DateInterval|int|null  $delay
+     * @param  int|null  $delay
      * @return void
      */
     public function __construct($connectionName, $queue, $id, $job, $payload, $delay)
