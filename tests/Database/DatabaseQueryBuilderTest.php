@@ -2898,7 +2898,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('does not support');
         $builder = $this->getBuilder();
-        $builder->from('users')->insertOrIgnoreUsing(['email' => 'foo']);
+        $builder->from('users')->insertOrIgnoreUsing(['email' => 'foo'], 'bar');
     }
 
     public function testSqlServerInsertOrIgnoreUsingMethod()
@@ -2906,12 +2906,13 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('does not support');
         $builder = $this->getSqlServerBuilder();
-        $builder->from('users')->insertOrIgnoreUsing(['email' => 'foo']);
+        $builder->from('users')->insertOrIgnoreUsing(['email' => 'foo'], 'bar');
     }
 
     public function testMySqlInsertOrIgnoreUsingMethod()
     {
         $builder = $this->getMySqlBuilder();
+        $builder->getConnection()->shouldReceive('getDatabaseName');
         $builder->getConnection()->shouldReceive('affectingStatement')->once()->with('insert ignore into "table1" ("foo") select "bar" from "table2" where "foreign_id" = ?', [5])->andReturn(1);
 
         $result = $builder->from('table1')->insertOrIgnoreUsing(
@@ -2927,6 +2928,7 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testMySqlInsertOrIgnoreUsingWithEmptyColumns()
     {
         $builder = $this->getMySqlBuilder();
+        $builder->getConnection()->shouldReceive('getDatabaseName');
         $builder->getConnection()->shouldReceive('affectingStatement')->once()->with('insert ignore into "table1" select * from "table2" where "foreign_id" = ?', [5])->andReturn(1);
 
         $result = $builder->from('table1')->insertOrIgnoreUsing(
@@ -2986,6 +2988,7 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testSQLiteInsertOrIgnoreUsingMethod()
     {
         $builder = $this->getSQLiteBuilder();
+        $builder->getConnection()->shouldReceive('getDatabaseName');
         $builder->getConnection()->shouldReceive('affectingStatement')->once()->with('insert or ignore into "table1" ("foo") select "bar" from "table2" where "foreign_id" = ?', [5])->andReturn(1);
 
         $result = $builder->from('table1')->insertOrIgnoreUsing(
@@ -3001,6 +3004,7 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testSQLiteInsertOrIgnoreUsingWithEmptyColumns()
     {
         $builder = $this->getSQLiteBuilder();
+        $builder->getConnection()->shouldReceive('getDatabaseName');
         $builder->getConnection()->shouldReceive('affectingStatement')->once()->with('insert or ignore into "table1" select * from "table2" where "foreign_id" = ?', [5])->andReturn(1);
 
         $result = $builder->from('table1')->insertOrIgnoreUsing(
