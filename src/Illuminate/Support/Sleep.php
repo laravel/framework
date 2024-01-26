@@ -403,7 +403,7 @@ class Sleep
         }
 
         foreach (static::$sequence as $duration) {
-            PHPUnit::assertSame(0, $duration->totalMicroseconds, vsprintf('Unexpected sleep duration of [%s] found.', [
+            PHPUnit::assertSame(0, (int) $duration->totalMicroseconds, vsprintf('Unexpected sleep duration of [%s] found.', [
                 $duration->cascade()->forHumans([
                     'options' => 0,
                     'minimumUnit' => 'microsecond',
