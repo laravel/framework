@@ -77,7 +77,7 @@ jobs:
         with:
           timeout_minutes: 5
           max_attempts: 5
-          command: composer require nesbot/carbon:^3.0.0-beta.3@beta --no-interaction --no-update
+          command: composer require nesbot/carbon:^3.0 --no-interaction --no-update
 
       - name: Set PHPUnit
         uses: nick-fields/retry@v2
