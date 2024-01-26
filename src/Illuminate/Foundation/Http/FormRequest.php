@@ -115,10 +115,8 @@ class FormRequest extends Request implements ValidatesWhenResolved
      */
     protected function createDefaultValidator(ValidationFactory $factory)
     {
-        $rules = method_exists($this, 'rules') ? $this->container->call([$this, 'rules']) : [];
-
         $validator = $factory->make(
-            $this->validationData(), $rules,
+            $this->validationData(), $this->getRules(),
             $this->messages(), $this->attributes()
         )->stopOnFirstFailure($this->stopOnFirstFailure);
 
@@ -131,6 +129,15 @@ class FormRequest extends Request implements ValidatesWhenResolved
         return $validator;
     }
 
+    /**
+     * Get the validator rules for this form request.
+     *
+     * @return array
+     */
+    protected function getRules()
+    {
+        return method_exists($this, 'rules') ? $this->container->call([$this, 'rules']) : [];
+    }
     /**
      * Get data to be validated from the request.
      *

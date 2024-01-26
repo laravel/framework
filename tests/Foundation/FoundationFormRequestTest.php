@@ -151,8 +151,7 @@ class FoundationFormRequestTest extends TestCase
 
     public function testAfterMethod()
     {
-        $request = new class extends FormRequest
-        {
+        $request = new class extends FormRequest {
             public $value = 'value-from-request';
 
             public function rules()
@@ -162,8 +161,7 @@ class FoundationFormRequestTest extends TestCase
 
             protected function failedValidation(Validator $validator)
             {
-                throw new class($validator) extends Exception
-                {
+                throw new class($validator) extends Exception {
                     public function __construct(public $validator)
                     {
                         //
@@ -176,7 +174,7 @@ class FoundationFormRequestTest extends TestCase
                 return [
                     new AfterValidationRule($dep->value),
                     new InvokableAfterValidationRule($this->value),
-                    fn ($validator) => $validator->errors()->add('closure', 'true'),
+                    fn($validator) => $validator->errors()->add('closure', 'true'),
                 ];
             }
         };
@@ -211,6 +209,22 @@ class FoundationFormRequestTest extends TestCase
         $request->validateResolved();
 
         $this->assertEquals([], $request->all());
+    }
+
+    public function testRequestWithGetRules()
+    {
+        FoundationTestFormRequestWithGetRules::$useRuleSet = 'a';
+        $request = $this->createRequest(['a' => 1], FoundationTestFormRequestWithGetRules::class);
+
+        $request->validateResolved();
+        $this->assertEquals(['a' => 1], $request->all());
+
+        $this->expectException(ValidationException::class);
+        FoundationTestFormRequestWithGetRules::$useRuleSet = 'b';
+
+        $request = $this->createRequest(['a' => 1], FoundationTestFormRequestWithGetRules::class);
+
+        $request->validateResolved();
     }
 
     /**
@@ -256,7 +270,7 @@ class FoundationFormRequestTest extends TestCase
         $request = $class::create('/', 'GET', $payload);
 
         return $request->setRedirector($this->createMockRedirector($request))
-                       ->setContainer($container);
+            ->setContainer($container);
     }
 
     /**
@@ -268,7 +282,7 @@ class FoundationFormRequestTest extends TestCase
     protected function createValidationFactory($container)
     {
         $translator = m::mock(Translator::class)->shouldReceive('get')
-                       ->zeroOrMoreTimes()->andReturn('error')->getMock();
+            ->zeroOrMoreTimes()->andReturn('error')->getMock();
 
         return new ValidationFactory($translator, $container);
     }
@@ -284,13 +298,13 @@ class FoundationFormRequestTest extends TestCase
         $redirector = $this->mocks['redirector'] = m::mock(Redirector::class);
 
         $redirector->shouldReceive('getUrlGenerator')->zeroOrMoreTimes()
-                   ->andReturn($generator = $this->createMockUrlGenerator());
+            ->andReturn($generator = $this->createMockUrlGenerator());
 
         $redirector->shouldReceive('to')->zeroOrMoreTimes()
-                   ->andReturn($this->createMockRedirectResponse());
+            ->andReturn($this->createMockRedirectResponse());
 
         $generator->shouldReceive('previous')->zeroOrMoreTimes()
-                  ->andReturn('previous');
+            ->andReturn('previous');
 
         return $redirector;
     }
@@ -482,3 +496,24 @@ class FoundationTestFormRequestWithoutRulesMethod extends FormRequest
         return true;
     }
 }
+
+
+class FoundationTestFormRequestWithGetRules extends FormRequest
+{
+    public static $useRuleSet = 'a';
+
+    protected function getRules(): array
+    {
+        if (self::$useRuleSet === 'a') {
+            return [
+                'a' => ['required', 'int', 'min:1']
+            ];
+        } else {
+            return [
+                'a' => ['required', 'int', 'min:2'],
+            ];
+        }
+    }
+}
+
+;
