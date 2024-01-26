@@ -23,7 +23,7 @@ class MySqlProcessor extends Processor
                 'nullable' => $result->nullable === 'YES',
                 'default' => $result->default,
                 'auto_increment' => $result->extra === 'auto_increment',
-                'comment' => $result->comment,
+                'comment' => $result->comment ?: null,
             ];
         }, $results);
     }

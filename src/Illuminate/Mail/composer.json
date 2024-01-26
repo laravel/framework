@@ -37,6 +37,7 @@
     },
     "suggest": {
         "aws/aws-sdk-php": "Required to use the SES mail driver (^3.235.5).",
+        "resend/resend-php": "Required to enable support for the Resend mail transport (^0.10.0).",
         "symfony/http-client": "Required to use the Symfony API mail transports (^7.0).",
         "symfony/mailgun-mailer": "Required to enable support for the Mailgun mail transport (^7.0).",
         "symfony/postmark-mailer": "Required to enable support for the Postmark mail transport (^7.0)."

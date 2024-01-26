@@ -166,15 +166,20 @@ class SchemaBuilderTest extends DatabaseTestCase
         DB::statement("create type enum_foo as enum ('new', 'open', 'closed')");
         DB::statement('create type range_foo as range (subtype = float8)');
         DB::statement('create domain domain_foo as text');
+        DB::statement('create type base_foo');
+        DB::statement("create function foo_in(cstring) returns base_foo language internal immutable strict parallel safe as 'int2in'");
+        DB::statement("create function foo_out(base_foo) returns cstring language internal immutable strict parallel safe as 'int2out'");
+        DB::statement('create type base_foo (input = foo_in, output = foo_out)');
 
         $types = Schema::getTypes();
 
-        $this->assertCount(11, $types);
+        $this->assertCount(13, $types);
         $this->assertTrue(collect($types)->contains(fn ($type) => $type['name'] === 'pseudo_foo' && $type['type'] === 'pseudo' && ! $type['implicit']));
         $this->assertTrue(collect($types)->contains(fn ($type) => $type['name'] === 'comp_foo' && $type['type'] === 'composite' && ! $type['implicit']));
         $this->assertTrue(collect($types)->contains(fn ($type) => $type['name'] === 'enum_foo' && $type['type'] === 'enum' && ! $type['implicit']));
         $this->assertTrue(collect($types)->contains(fn ($type) => $type['name'] === 'range_foo' && $type['type'] === 'range' && ! $type['implicit']));
         $this->assertTrue(collect($types)->contains(fn ($type) => $type['name'] === 'domain_foo' && $type['type'] === 'domain' && ! $type['implicit']));
+        $this->assertTrue(collect($types)->contains(fn ($type) => $type['name'] === 'base_foo' && $type['type'] === 'base' && ! $type['implicit']));
 
         Schema::dropAllTypes();
         $types = Schema::getTypes();
@@ -229,6 +234,10 @@ class SchemaBuilderTest extends DatabaseTestCase
             && ! $indexes[0]['unique']
             && ! $indexes[0]['primary']
         );
+        $this->assertTrue(Schema::hasIndex('foo', 'my_index'));
+        $this->assertTrue(Schema::hasIndex('foo', ['bar']));
+        $this->assertFalse(Schema::hasIndex('foo', 'my_index', 'primary'));
+        $this->assertFalse(Schema::hasIndex('foo', ['bar'], 'unique'));
     }
 
     public function testGetUniqueIndexes()
@@ -250,6 +259,11 @@ class SchemaBuilderTest extends DatabaseTestCase
         $this->assertTrue(collect($indexes)->contains(
             fn ($index) => $index['name'] === 'foo_baz_bar_unique' && $index['columns'] === ['baz', 'bar'] && $index['unique']
         ));
+        $this->assertTrue(Schema::hasIndex('foo', 'foo_baz_bar_unique'));
+        $this->assertTrue(Schema::hasIndex('foo', 'foo_baz_bar_unique', 'unique'));
+        $this->assertTrue(Schema::hasIndex('foo', ['baz', 'bar']));
+        $this->assertTrue(Schema::hasIndex('foo', ['baz', 'bar'], 'unique'));
+        $this->assertFalse(Schema::hasIndex('foo', ['baz', 'bar'], 'primary'));
     }
 
     public function testGetIndexesWithCompositeKeys()
@@ -292,6 +306,26 @@ class SchemaBuilderTest extends DatabaseTestCase
         $this->assertCount(2, $indexes);
         $this->assertTrue(collect($indexes)->contains(fn ($index) => $index['columns'] === ['id'] && $index['primary']));
         $this->assertTrue(collect($indexes)->contains('name', 'articles_body_title_fulltext'));
+    }
+
+    public function testHasIndexOrder()
+    {
+        Schema::create('foo', function (Blueprint $table) {
+            $table->integer('bar');
+            $table->integer('baz');
+            $table->integer('qux');
+
+            $table->unique(['bar', 'baz']);
+            $table->index(['baz', 'bar']);
+            $table->index(['baz', 'qux']);
+        });
+
+        $this->assertTrue(Schema::hasIndex('foo', ['bar', 'baz']));
+        $this->assertTrue(Schema::hasIndex('foo', ['bar', 'baz'], 'unique'));
+        $this->assertTrue(Schema::hasIndex('foo', ['baz', 'bar']));
+        $this->assertFalse(Schema::hasIndex('foo', ['baz', 'bar'], 'unique'));
+        $this->assertTrue(Schema::hasIndex('foo', ['baz', 'qux']));
+        $this->assertFalse(Schema::hasIndex('foo', ['qux', 'baz']));
     }
 
     public function testGetForeignKeys()
