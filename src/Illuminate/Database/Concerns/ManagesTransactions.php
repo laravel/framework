@@ -122,7 +122,7 @@ trait ManagesTransactions
         foreach ($this->beforeStartingTransaction as $beforeStartingTransactionCallback) {
             $beforeStartingTransactionCallback($this);
         }
-        
+
         $this->createTransaction();
 
         $this->transactions++;
