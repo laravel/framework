@@ -34,17 +34,18 @@ class StorageLinkCommand extends Command
     {
         $relative = $this->option('relative');
 
-
         foreach ($this->links() as $name => $linkConfig) {
             $link = $linkConfig['link'] ?? null;
             $target = $linkConfig['target'] ?? null;
             if (! $link || ! $target) {
                 $this->components->error("The $name link is not configured properly.");
+
                 continue;
             }
 
             if (file_exists($link) && ! $this->isRemovableSymlink($link, $this->option('force'))) {
                 $this->components->error("The [$link] link already exists.");
+
                 continue;
             }
 
@@ -90,10 +91,6 @@ class StorageLinkCommand extends Command
 
     /**
      * Determine if the provided path is a symlink that can be removed.
-     *
-     * @param  string  $link
-     * @param  bool  $force
-     * @return bool
      */
     protected function isRemovableSymlink(string $link, bool $force): bool
     {
