@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\Factories\Sequence;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Tests\Database\Fixtures\Models\Money\Price;
+use Illuminate\Tests\Database\Fixtures\SomePath\Models\SomeModel;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
@@ -579,6 +580,10 @@ class DatabaseEloquentFactoryTest extends TestCase
         $factory = Price::factory();
 
         $this->assertSame(Price::class, $factory->modelName());
+
+        $factory = SomeModel::factory();
+
+        $this->assertSame(SomeModel::class, $factory->modelName());
     }
 
     public function test_resolve_non_app_nested_model_factories()

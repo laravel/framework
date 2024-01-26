@@ -786,6 +786,10 @@ abstract class Factory
 
             $appNamespace = static::appNamespace();
 
+            if (class_exists($appNamespace.$namespacedFactoryBasename)) {
+                return $appNamespace.$namespacedFactoryBasename;
+            }
+
             return class_exists($appNamespace.'Models\\'.$namespacedFactoryBasename)
                         ? $appNamespace.'Models\\'.$namespacedFactoryBasename
                         : $appNamespace.$factoryBasename;
