@@ -31,8 +31,10 @@ class StorageUnlinkCommand extends Command
     public function handle()
     {
         foreach ($this->links() as $name => $linkConfig) {
-            if ($link = $linkConfig['link'] ?? null) {
+            $link = $linkConfig['link'] ?? null;
+            if (! $link) {
                 $this->components->error("The $name link is not configured properly.");
+
                 continue;
             }
 
@@ -54,7 +56,8 @@ class StorageUnlinkCommand extends Command
     protected function links()
     {
         if ($name = $this->argument('name')) {
-            if (! $link = $this->laravel['config']['filesystems.links.'.$name] ?? null) {
+            $link = $this->laravel['config']['filesystems.links.'.$name] ?? null;
+            if (! $link) {
                 $this->components->error("No link have been configured for the [$name] name.");
 
                 return [];
