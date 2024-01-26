@@ -34,8 +34,11 @@ class StorageLinkCommand extends Command
     {
         $relative = $this->option('relative');
 
+
         foreach ($this->links() as $name => $linkConfig) {
-            if ($link = $linkConfig['link'] ?? null && $target = $linkConfig['target'] ?? null) {
+            $link = $linkConfig['link'] ?? null;
+            $target = $linkConfig['target'] ?? null;
+            if (! $link || ! $target) {
                 $this->components->error("The $name link is not configured properly.");
                 continue;
             }
@@ -67,7 +70,8 @@ class StorageLinkCommand extends Command
     protected function links()
     {
         if ($name = $this->argument('name')) {
-            if (! $link = $this->laravel['config']['filesystems.links.'.$name] ?? null) {
+            $link = $this->laravel['config']['filesystems.links.'.$name] ?? null;
+            if (! $link) {
                 $this->components->error("No link have been configured for the [$name] name.");
 
                 return [];
