@@ -13,7 +13,8 @@ class StorageUnlinkCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'storage:unlink';
+    protected $signature = 'storage:unlink
+                {name? : The name of the link}';
 
     /**
      * The console command description.
@@ -29,7 +30,12 @@ class StorageUnlinkCommand extends Command
      */
     public function handle()
     {
-        foreach ($this->links() as $link => $target) {
+        foreach ($this->links() as $name => $linkConfig) {
+            if ($link = $linkConfig['link'] ?? null) {
+                $this->components->error("The $name link is not configured properly.");
+                continue;
+            }
+
             if (! file_exists($link) || ! is_link($link)) {
                 continue;
             }
@@ -47,7 +53,21 @@ class StorageUnlinkCommand extends Command
      */
     protected function links()
     {
-        return $this->laravel['config']['filesystems.links'] ??
-               [public_path('storage') => storage_path('app/public')];
+        if ($name = $this->argument('name')) {
+            if (! $link = $this->laravel['config']['filesystems.links.'.$name] ?? null) {
+                $this->components->error("No link have been configured for the [$name] name.");
+
+                return [];
+            }
+
+            return [$name => $link];
+        }
+
+        return $this->laravel['config']['filesystems.links'] ?? [
+            'public' => [
+                'link' => public_path('storage'),
+                'target' => storage_path('app/public'),
+            ],
+        ];
     }
 }
