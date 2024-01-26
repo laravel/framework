@@ -214,15 +214,15 @@ class Worker
         pcntl_signal(SIGALRM, function () use ($job, $options) {
             if ($job) {
                 $this->markJobAsFailedIfWillExceedMaxAttempts(
-                    $job->getConnectionName(), $job, (int) $options->maxTries, $e = $this->timeoutExceededException($job)
+                    $job, (int) $options->maxTries, $e = $this->timeoutExceededException($job)
                 );
 
                 $this->markJobAsFailedIfWillExceedMaxExceptions(
-                    $job->getConnectionName(), $job, $e
+                    $job, $e
                 );
 
                 $this->markJobAsFailedIfItShouldFailOnTimeout(
-                    $job->getConnectionName(), $job, $e
+                    $job, $e
                 );
 
                 $this->events->dispatch(new JobTimedOut(
@@ -426,7 +426,7 @@ class Worker
             $this->raiseBeforeJobEvent($connectionName, $job);
 
             $this->markJobAsFailedIfAlreadyExceedsMaxAttempts(
-                $connectionName, $job, (int) $options->maxTries
+                $job, (int) $options->maxTries
             );
 
             if ($job->isDeleted()) {
@@ -463,7 +463,7 @@ class Worker
             // go ahead and mark it as failed now so we do not have to release this again.
             if (! $job->hasFailed()) {
                 $this->markJobAsFailedIfWillExceedMaxAttempts(
-                    $connectionName, $job, (int) $options->maxTries, $e
+                    $job, (int) $options->maxTries, $e
                 );
 
                 $this->markJobAsFailedIfWillExceedMaxExceptions(
@@ -495,14 +495,13 @@ class Worker
      *
      * This will likely be because the job previously exceeded a timeout.
      *
-     * @param  string  $connectionName
      * @param  \Illuminate\Contracts\Queue\Job  $job
      * @param  int  $maxTries
      * @return void
      *
      * @throws \Throwable
      */
-    protected function markJobAsFailedIfAlreadyExceedsMaxAttempts($connectionName, $job, $maxTries)
+    protected function markJobAsFailedIfAlreadyExceedsMaxAttempts($job, $maxTries)
     {
         $maxTries = ! is_null($job->maxTries()) ? $job->maxTries() : $maxTries;
 
@@ -524,13 +523,12 @@ class Worker
     /**
      * Mark the given job as failed if it has exceeded the maximum allowed attempts.
      *
-     * @param  string  $connectionName
      * @param  \Illuminate\Contracts\Queue\Job  $job
      * @param  int  $maxTries
      * @param  \Throwable  $e
      * @return void
      */
-    protected function markJobAsFailedIfWillExceedMaxAttempts($connectionName, $job, $maxTries, Throwable $e)
+    protected function markJobAsFailedIfWillExceedMaxAttempts($job, $maxTries, Throwable $e)
     {
         $maxTries = ! is_null($job->maxTries()) ? $job->maxTries() : $maxTries;
 
@@ -546,12 +544,11 @@ class Worker
     /**
      * Mark the given job as failed if it has exceeded the maximum allowed attempts.
      *
-     * @param  string  $connectionName
      * @param  \Illuminate\Contracts\Queue\Job  $job
      * @param  \Throwable  $e
      * @return void
      */
-    protected function markJobAsFailedIfWillExceedMaxExceptions($connectionName, $job, Throwable $e)
+    protected function markJobAsFailedIfWillExceedMaxExceptions($job, Throwable $e)
     {
         if (! $this->cache || is_null($uuid = $job->uuid()) ||
             is_null($maxExceptions = $job->maxExceptions())) {
@@ -572,12 +569,11 @@ class Worker
     /**
      * Mark the given job as failed if it should fail on timeouts.
      *
-     * @param  string  $connectionName
      * @param  \Illuminate\Contracts\Queue\Job  $job
      * @param  \Throwable  $e
      * @return void
      */
-    protected function markJobAsFailedIfItShouldFailOnTimeout($connectionName, $job, Throwable $e)
+    protected function markJobAsFailedIfItShouldFailOnTimeout($job, Throwable $e)
     {
         if (method_exists($job, 'shouldFailOnTimeout') ? $job->shouldFailOnTimeout() : false) {
             $this->failJob($job, $e);
