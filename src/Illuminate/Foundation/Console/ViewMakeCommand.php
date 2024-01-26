@@ -220,7 +220,7 @@ class ViewMakeCommand extends GeneratorCommand
         }
 
         return $this->option('pest') || (
-            function_exists('\Pest\\version') && file_exists(base_path('tests') . '/Pest.php')
+            function_exists('\Pest\\version') && file_exists(base_path('tests').'/Pest.php')
         );
     }
 
