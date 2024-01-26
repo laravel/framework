@@ -111,6 +111,7 @@
         "phpstan/phpstan": "^1.4.7",
         "phpunit/phpunit": "^10.5|^11.0",
         "predis/predis": "^2.0.2",
+        "resend/resend-php": "^0.10.0",
         "symfony/cache": "^7.0",
         "symfony/http-client": "^7.0",
         "symfony/psr-http-message-bridge": "^7.0"
@@ -180,6 +181,7 @@
         "predis/predis": "Required to use the predis connector (^2.0.2).",
         "psr/http-message": "Required to allow Storage::put to accept a StreamInterface (^1.0).",
         "pusher/pusher-php-server": "Required to use the Pusher broadcast driver (^6.0|^7.0).",
+        "resend/resend-php": "Required to enable support for the Resend mail transport (^0.10.0).",
         "symfony/cache": "Required to PSR-6 cache bridge (^7.0).",
         "symfony/filesystem": "Required to enable support for relative symbolic links (^7.0).",
         "symfony/http-client": "Required to enable support for the Symfony API mail transports (^7.0).",
