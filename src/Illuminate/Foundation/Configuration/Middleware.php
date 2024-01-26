@@ -15,7 +15,7 @@ class Middleware
      *
      * @var array
      */
-    protected $global;
+    protected $global = [];
 
     /**
      * The middleware that should be prepended to the global middleware stack.
@@ -111,7 +111,7 @@ class Middleware
     /**
      * Indicates if Redis throttling should be applied.
      *
-     * @var array
+     * @var bool
      */
     protected $throttleWithRedis = false;
 
