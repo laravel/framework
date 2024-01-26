@@ -4245,17 +4245,17 @@ class SupportCollectionTest extends TestCase
 
         $this->assertEquals([
             ['first' => 'Taylor', 'email' => 'taylorotwell@gmail.com'],
-            ['first' => 'Jess', 'email' => 'jessarcher@gmail.com']
+            ['first' => 'Jess', 'email' => 'jessarcher@gmail.com'],
         ], $data->select(['first', 'email'])->all());
 
         $this->assertEquals([
             ['first' => 'Taylor', 'email' => 'taylorotwell@gmail.com'],
-            ['first' => 'Jess', 'email' => 'jessarcher@gmail.com']
+            ['first' => 'Jess', 'email' => 'jessarcher@gmail.com'],
         ], $data->select('first', 'email')->all());
 
         $this->assertEquals([
             ['first' => 'Taylor', 'email' => 'taylorotwell@gmail.com'],
-            ['first' => 'Jess', 'email' => 'jessarcher@gmail.com']
+            ['first' => 'Jess', 'email' => 'jessarcher@gmail.com'],
         ], $data->select(collect(['first', 'email']))->all());
     }
 
