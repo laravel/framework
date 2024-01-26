@@ -27,8 +27,8 @@ trait LazilyRefreshDatabase
             $this->baseRefreshDatabase();
         };
 
-        $database->beforeExecuting($callback);
         $database->beforeStartingTransaction($callback);
+        $database->beforeExecuting($callback);
 
         $this->beforeApplicationDestroyed(function () {
             RefreshDatabaseState::$lazilyRefreshed = false;

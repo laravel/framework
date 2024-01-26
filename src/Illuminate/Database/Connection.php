@@ -183,18 +183,18 @@ class Connection implements ConnectionInterface
     protected $pretending = false;
 
     /**
-     * All of the callbacks that should be invoked before a query is executed.
-     *
-     * @var \Closure[]
-     */
-    protected $beforeExecutingCallbacks = [];
-
-    /**
      * All of the callbacks that should be invoked before a transaction is started.
      *
      * @var \Closure[]
      */
     protected $beforeStartingTransaction = [];
+
+    /**
+     * All of the callbacks that should be invoked before a query is executed.
+     *
+     * @var \Closure[]
+     */
+    protected $beforeExecutingCallbacks = [];
 
     /**
      * The instance of Doctrine connection.
@@ -1029,19 +1029,6 @@ class Connection implements ConnectionInterface
     }
 
     /**
-     * Register a hook to be run just before a database query is executed.
-     *
-     * @param  \Closure  $callback
-     * @return $this
-     */
-    public function beforeExecuting(Closure $callback)
-    {
-        $this->beforeExecutingCallbacks[] = $callback;
-
-        return $this;
-    }
-
-    /**
      * Register a hook to be run just before a database transaction is started.
      *
      * @param  \Closure  $callback
@@ -1050,6 +1037,19 @@ class Connection implements ConnectionInterface
     public function beforeStartingTransaction(Closure $callback)
     {
         $this->beforeStartingTransaction[] = $callback;
+
+        return $this;
+    }
+
+    /**
+     * Register a hook to be run just before a database query is executed.
+     *
+     * @param  \Closure  $callback
+     * @return $this
+     */
+    public function beforeExecuting(Closure $callback)
+    {
+        $this->beforeExecutingCallbacks[] = $callback;
 
         return $this;
     }

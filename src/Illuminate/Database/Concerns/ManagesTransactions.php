@@ -119,8 +119,8 @@ trait ManagesTransactions
      */
     public function beginTransaction()
     {
-        foreach ($this->beforeStartingTransaction as $beforeStartingTransactionCallback) {
-            $beforeStartingTransactionCallback($this);
+        foreach ($this->beforeStartingTransaction as $callback) {
+            $callback($this);
         }
 
         $this->createTransaction();
