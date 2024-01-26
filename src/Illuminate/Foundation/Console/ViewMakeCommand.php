@@ -130,7 +130,7 @@ class ViewMakeCommand extends GeneratorCommand
      */
     protected function handleTestCreation($path): bool
     {
-        if (! $this->option('test') && ! $this->option('pest')) {
+        if (! $this->option('test') && ! $this->option('pest') && ! $this->option('phpunit')) {
             return false;
         }
 
@@ -201,11 +201,27 @@ class ViewMakeCommand extends GeneratorCommand
      */
     protected function getTestStub()
     {
-        $stubName = 'view.'.($this->option('pest') ? 'pest' : 'test').'.stub';
+        $stubName = 'view.'.($this->usingPest() ? 'pest' : 'test').'.stub';
 
         return file_exists($customPath = $this->laravel->basePath("stubs/$stubName"))
             ? $customPath
             : __DIR__.'/stubs/'.$stubName;
+    }
+
+    /**
+     * Determines if Pest is being used.
+     *
+     * @return bool
+     */
+    protected function usingPest()
+    {
+        if ($this->option('phpunit')) {
+            return false;
+        }
+
+        return $this->option('pest') || (
+            function_exists('\Pest\\version') && file_exists(base_path('tests') . '/Pest.php')
+        );
     }
 
     /**
