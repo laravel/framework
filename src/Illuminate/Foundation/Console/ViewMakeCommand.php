@@ -209,22 +209,6 @@ class ViewMakeCommand extends GeneratorCommand
     }
 
     /**
-     * Determines if Pest is being used.
-     *
-     * @return bool
-     */
-    protected function usingPest()
-    {
-        if ($this->option('phpunit')) {
-            return false;
-        }
-
-        return $this->option('pest') || (
-            function_exists('\Pest\\version') && file_exists(base_path('tests').'/Pest.php')
-        );
-    }
-
-    /**
      * Get the view name for the test.
      *
      * @return string
@@ -235,6 +219,22 @@ class ViewMakeCommand extends GeneratorCommand
             ->replace('/', '.')
             ->lower()
             ->value();
+    }
+
+    /**
+     * Determine if Pest is being used by the application.
+     *
+     * @return bool
+     */
+    protected function usingPest()
+    {
+        if ($this->option('phpunit')) {
+            return false;
+        }
+
+        return $this->option('pest') ||
+            (function_exists('\Pest\\version') &&
+             file_exists(base_path('tests').'/Pest.php'));
     }
 
     /**

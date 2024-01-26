@@ -140,7 +140,7 @@ class TestMakeCommand extends GeneratorCommand
     }
 
     /**
-     * Determines if Pest is being used.
+     * Determine if Pest is being used by the application.
      *
      * @return bool
      */
@@ -150,8 +150,8 @@ class TestMakeCommand extends GeneratorCommand
             return false;
         }
 
-        return $this->option('pest') || (
-            function_exists('\Pest\\version') && file_exists(base_path('tests').'/Pest.php')
-        );
+        return $this->option('pest') ||
+            (function_exists('\Pest\\version') &&
+             file_exists(base_path('tests').'/Pest.php'));
     }
 }
