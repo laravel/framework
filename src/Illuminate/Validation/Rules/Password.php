@@ -321,6 +321,10 @@ class Password implements Rule, DataAwareRule, ValidatorAwareRule
             }
 
             if ($this->max && mb_strlen($value) > $this->max) {
+                $validator->addReplacer('max.string', function ($message, $attribute, $rule, $parameters, $validator) {
+                    return str_replace(':max', $validator->getDisplayableAttribute($this->max), $message);
+                });
+
                 $validator->addFailure($attribute, 'max.string');
             }
 
