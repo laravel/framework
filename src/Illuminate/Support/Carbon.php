@@ -3,6 +3,7 @@
 namespace Illuminate\Support;
 
 use Carbon\Carbon as BaseCarbon;
+use Carbon\CarbonImmutable as BaseCarbonImmutable;
 use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\Dumpable;
 use Ramsey\Uuid\Uuid;
@@ -13,12 +14,18 @@ class Carbon extends BaseCarbon
     use Conditionable, Dumpable;
 
     /**
-     * Create a Carbon instance from a given ordered UUID or ULID.
-     *
-     * @param  \Ramsey\Uuid\Uuid|\Symfony\Component\Uid\Ulid|string  $id
-     * @return \Illuminate\Support\Carbon
+     * {@inheritdoc}
      */
-    public static function createFromId($id)
+    public static function setTestNow(mixed $testNow = null): void
+    {
+        BaseCarbon::setTestNow($testNow);
+        BaseCarbonImmutable::setTestNow($testNow);
+    }
+
+    /**
+     * Create a Carbon instance from a given ordered UUID or ULID.
+     */
+    public static function createFromId(Uuid|Ulid|string $id): static
     {
         if (is_string($id)) {
             $id = Ulid::isValid($id) ? Ulid::fromString($id) : Uuid::fromString($id);
