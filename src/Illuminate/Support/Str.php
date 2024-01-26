@@ -1710,6 +1710,30 @@ class Str
     }
 
     /**
+     * Determine if given value is Nil UUID
+     *
+     * @param string $uuid
+     *
+     * @return bool
+     */
+    public static function isNilUuid(string $uuid): bool
+    {
+        return Uuid::NIL === $uuid;
+    }
+
+    /**
+     * Determine if given value is Max UUID
+     *
+     * @param string $uuid
+     *
+     * @return bool
+     */
+    public static function isMaxUuid(string $uuid): bool
+    {
+        return Uuid::MAX === $uuid;
+    }
+
+    /**
      * Generate a ULID.
      *
      * @param  \DateTimeInterface|null  $time

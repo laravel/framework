@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Support;
 use Exception;
 use Illuminate\Support\Str;
 use PHPUnit\Framework\TestCase;
+use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 use ReflectionClass;
 
@@ -1237,6 +1238,26 @@ class SupportStrTest extends TestCase
         $this->assertFalse(in_array((string) $retrieved, [(string) $zeroth, (string) $first, (string) $third], true));
 
         Str::createUuidsNormally();
+    }
+
+    public function testIsNilUuid()
+    {
+        $this->assertTrue(str::isNilUuid(Uuid::NIL));
+    }
+
+    public function testIsNotNilUuid()
+    {
+        $this->assertFalse(str::isNilUuid(Str::uuid()));
+    }
+
+    public function testIsMaxUuid()
+    {
+        $this->assertTrue(str::isMaxUuid(Uuid::MAX));
+    }
+
+    public function testIsNotMaxUuid()
+    {
+        $this->assertFalse(str::isMaxUuid(Str::uuid()));
     }
 
     public function testItCanSpecifyAFallbackForASequence()
