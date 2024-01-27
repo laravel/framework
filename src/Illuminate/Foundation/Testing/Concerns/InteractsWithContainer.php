@@ -2,7 +2,6 @@
 
 namespace Illuminate\Foundation\Testing\Concerns;
 
-use Closure;
 use Illuminate\Foundation\Mix;
 use Illuminate\Foundation\Vite;
 use Illuminate\Support\Facades\Facade;
@@ -55,10 +54,10 @@ trait InteractsWithContainer
      * Mock an instance of an object in the container.
      *
      * @param  string  $abstract
-     * @param  \Closure|null  $mock
+     * @param  mixed  ...$args
      * @return \Mockery\MockInterface
      */
-    protected function mock($abstract, Closure $mock = null)
+    protected function mock($abstract, ...$args)
     {
         return $this->instance($abstract, Mockery::mock(...array_filter(func_get_args())));
     }
@@ -67,10 +66,10 @@ trait InteractsWithContainer
      * Mock a partial instance of an object in the container.
      *
      * @param  string  $abstract
-     * @param  \Closure|null  $mock
+     * @param  mixed  ...$args
      * @return \Mockery\MockInterface
      */
-    protected function partialMock($abstract, Closure $mock = null)
+    protected function partialMock($abstract, ...$args)
     {
         return $this->instance($abstract, Mockery::mock(...array_filter(func_get_args()))->makePartial());
     }
@@ -79,10 +78,10 @@ trait InteractsWithContainer
      * Spy an instance of an object in the container.
      *
      * @param  string  $abstract
-     * @param  \Closure|null  $mock
+     * @param  mixed  ...$args
      * @return \Mockery\MockInterface
      */
-    protected function spy($abstract, Closure $mock = null)
+    protected function spy($abstract, ...$args)
     {
         return $this->instance($abstract, Mockery::spy(...array_filter(func_get_args())));
     }

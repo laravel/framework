@@ -85,10 +85,50 @@ class InteractsWithContainerTest extends TestCase
         $this->forgetMock(InstanceStub::class);
         $this->assertSame('foo', $this->app->make(InstanceStub::class)->execute());
     }
+
+    public function testMock()
+    {
+        $this->mock(InstanceStub::class, function (MockInterface $mock) {
+            $mock->shouldReceive('execute')
+                ->once()
+                ->andReturn('bar');
+        });
+        $this->assertSame('bar', $this->app->make(InstanceStub::class)->execute());
+        $this->assertNull($this->app->make(InstanceStub::class)->property);
+
+        $this->mock(InstanceStub::class)
+            ->shouldReceive('execute')
+            ->once()
+            ->andReturn('baz');
+        $this->assertSame('baz', $this->app->make(InstanceStub::class)->execute());
+        $this->assertNull($this->app->make(InstanceStub::class)->property);
+
+        $this->mock(InstanceStub::class, ['bar'], function (MockInterface $mock) {
+            $mock->shouldReceive('execute')
+                ->once()
+                ->andReturn('bar');
+        });
+        $this->assertSame('bar', $this->app->make(InstanceStub::class)->execute());
+        $this->assertSame('bar', $this->app->make(InstanceStub::class)->property);
+
+        $this->mock(InstanceStub::class, ['baz'])
+            ->shouldReceive('execute')
+            ->once()
+            ->andReturn('baz');
+        $this->assertSame('baz', $this->app->make(InstanceStub::class)->execute());
+        $this->assertSame('baz', $this->app->make(InstanceStub::class)->property);
+    }
 }
 
 class InstanceStub
 {
+    public ?string $property = null;
+
+    public function __construct($param = 'foo')
+    {
+        $this->property = $param;
+    }
+
     public function execute()
     {
         return 'foo';
