@@ -816,7 +816,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      */
     public function mapToInstance(?array $parameters = [])
     {
-        return $this->map(fn($class) => app($class, $parameters));
+        return $this->map(fn ($class) => app($class, $parameters));
     }
 
     /**
