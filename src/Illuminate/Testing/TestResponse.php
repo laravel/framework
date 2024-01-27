@@ -9,6 +9,7 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Cookie\CookieValuePrefix;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
@@ -26,6 +27,8 @@ use LogicException;
 use PHPUnit\Framework\ExpectationFailedException;
 use ReflectionProperty;
 use Symfony\Component\HttpFoundation\Cookie;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\StreamedJsonResponse;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
@@ -529,6 +532,11 @@ class TestResponse implements ArrayAccess
         PHPUnit::assertSame($value, $this->streamedContent());
 
         return $this;
+    }
+
+    public function assertStreamedJsonContent($value)
+    {
+        return $this->assertStreamedContent(json_encode($value, JSON_THROW_ON_ERROR));
     }
 
     /**
@@ -1564,7 +1572,8 @@ class TestResponse implements ArrayAccess
             return $this->streamedContent;
         }
 
-        if (! $this->baseResponse instanceof StreamedResponse) {
+        if (! $this->baseResponse instanceof StreamedResponse
+            && ! $this->baseResponse instanceof StreamedJsonResponse) {
             PHPUnit::fail('The response is not a streamed response.');
         }
 
@@ -1579,6 +1588,36 @@ class TestResponse implements ArrayAccess
         ob_end_clean();
 
         return $this->streamedContent;
+    }
+
+    public function streamedJsonResponse()
+    {
+        if (! is_null($this->streamedContent)) {
+            return $this->streamedContent;
+        }
+
+        if (! $this->baseResponse instanceof StreamedJsonResponse) {
+            PHPUnit::fail('The response is not a streamed JSON response.');
+        }
+
+        ob_start(function (string $buffer): string {
+            $this->streamedContent .= $buffer;
+
+            return '';
+        });
+        $this->sendContent();
+        ob_end_clean();
+
+        /** @var TestResponse $this */
+        $this->baseResponse = new JsonResponse(
+            $this->streamedContent,
+            $this->baseResponse->getStatusCode(),
+            $this->baseResponse->headers->all(),
+            0,
+            true
+        );
+
+        return $this;
     }
 
     /**
