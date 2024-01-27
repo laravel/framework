@@ -2,17 +2,18 @@
 
 namespace Illuminate\Validation\Rules;
 
+use Closure;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Validation\DataAwareRule;
-use Illuminate\Contracts\Validation\Rule;
 use Illuminate\Contracts\Validation\UncompromisedVerifier;
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Contracts\Validation\ValidatorAwareRule;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Traits\Conditionable;
 use InvalidArgumentException;
 
-class Password implements Rule, DataAwareRule, ValidatorAwareRule
+class Password implements ValidationRule, DataAwareRule, ValidatorAwareRule
 {
     use Conditionable;
 
@@ -147,10 +148,10 @@ class Password implements Rule, DataAwareRule, ValidatorAwareRule
     public static function default()
     {
         $password = is_callable(static::$defaultCallback)
-                            ? call_user_func(static::$defaultCallback)
-                            : static::$defaultCallback;
+            ? call_user_func(static::$defaultCallback)
+            : static::$defaultCallback;
 
-        return $password instanceof Rule ? $password : static::min(8);
+        return $password instanceof ValidationRule ? $password : static::min(8);
     }
 
     /**
@@ -299,17 +300,8 @@ class Password implements Rule, DataAwareRule, ValidatorAwareRule
         return $this;
     }
 
-    /**
-     * Determine if the validation rule passes.
-     *
-     * @param  string  $attribute
-     * @param  mixed  $value
-     * @return bool
-     */
-    public function passes($attribute, $value)
+    public function validate(string $attribute, mixed $value, Closure $fail): void
     {
-        $this->messages = [];
-
         $validator = Validator::make(
             $this->data,
             [$attribute => [
@@ -343,41 +335,16 @@ class Password implements Rule, DataAwareRule, ValidatorAwareRule
         });
 
         if ($validator->fails()) {
-            return $this->fail($validator->messages()->all());
+            foreach ($validator->messages()->all() as $message) {
+                $fail($message);
+            }
         }
 
-        if ($this->uncompromised && ! Container::getInstance()->make(UncompromisedVerifier::class)->verify([
+        if (! $validator->fails() && $this->uncompromised && ! Container::getInstance()->make(UncompromisedVerifier::class)->verify([
             'value' => $value,
             'threshold' => $this->compromisedThreshold,
         ])) {
-            $validator->addFailure($attribute, 'password.uncompromised');
-
-            return $this->fail($validator->messages()->all());
+            $fail('validation.password.uncompromised')->translate();
         }
-
-        return true;
-    }
-
-    /**
-     * Get the validation error message.
-     *
-     * @return array
-     */
-    public function message()
-    {
-        return $this->messages;
-    }
-
-    /**
-     * Adds the given failures, and return false.
-     *
-     * @param  array|string  $messages
-     * @return bool
-     */
-    protected function fail($messages)
-    {
-        $this->messages = array_merge($this->messages, Arr::wrap($messages));
-
-        return false;
     }
 }
