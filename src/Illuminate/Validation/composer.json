@@ -1,48 +1,48 @@
 {
-  "name": "illuminate/validation",
-  "description": "The Illuminate Validation package.",
-  "license": "MIT",
-  "homepage": "https://laravel.com",
-  "support": {
-    "issues": "https://github.com/laravel/framework/issues",
-    "source": "https://github.com/laravel/framework"
-  },
-  "authors": [
-    {
-      "name": "Taylor Otwell",
-      "email": "taylor@laravel.com"
-    }
-  ],
-  "require": {
-    "php": "^8.1",
-    "ext-filter": "*",
-    "ext-mbstring": "*",
-    "brick/math": "^0.9.3|^0.10.2|^0.11|^0.12",
-    "egulias/email-validator": "^3.2.5|^4.0",
-    "illuminate/collections": "^10.0",
-    "illuminate/container": "^10.0",
-    "illuminate/contracts": "^10.0",
-    "illuminate/macroable": "^10.0",
-    "illuminate/support": "^10.0",
-    "illuminate/translation": "^10.0",
-    "symfony/http-foundation": "^6.4",
-    "symfony/mime": "^6.2"
-  },
-  "autoload": {
-    "psr-4": {
-      "Illuminate\\Validation\\": ""
-    }
-  },
-  "extra": {
-    "branch-alias": {
-      "dev-master": "10.x-dev"
-    }
-  },
-  "suggest": {
-    "illuminate/database": "Required to use the database presence verifier (^10.0)."
-  },
-  "config": {
-    "sort-packages": true
-  },
-  "minimum-stability": "dev"
+    "name": "illuminate/validation",
+    "description": "The Illuminate Validation package.",
+    "license": "MIT",
+    "homepage": "https://laravel.com",
+    "support": {
+        "issues": "https://github.com/laravel/framework/issues",
+        "source": "https://github.com/laravel/framework"
+    },
+    "authors": [
+        {
+            "name": "Taylor Otwell",
+            "email": "taylor@laravel.com"
+        }
+    ],
+    "require": {
+        "php": "^8.1",
+        "ext-filter": "*",
+        "ext-mbstring": "*",
+        "brick/math": "^0.9.3|^0.10.2|^0.11",
+        "egulias/email-validator": "^3.2.5|^4.0",
+        "illuminate/collections": "^10.0",
+        "illuminate/container": "^10.0",
+        "illuminate/contracts": "^10.0",
+        "illuminate/macroable": "^10.0",
+        "illuminate/support": "^10.0",
+        "illuminate/translation": "^10.0",
+        "symfony/http-foundation": "^6.4",
+        "symfony/mime": "^6.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "Illuminate\\Validation\\": ""
+        }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "10.x-dev"
+        }
+    },
+    "suggest": {
+        "illuminate/database": "Required to use the database presence verifier (^10.0)."
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "dev"
 }
