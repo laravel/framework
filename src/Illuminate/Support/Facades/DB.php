@@ -52,6 +52,7 @@ namespace Illuminate\Support\Facades;
  * @method static float totalQueryDuration()
  * @method static void resetTotalQueryDuration()
  * @method static void reconnectIfMissingConnection()
+ * @method static \Illuminate\Database\Connection beforeStartingTransaction(\Closure $callback)
  * @method static \Illuminate\Database\Connection beforeExecuting(\Closure $callback)
  * @method static void listen(\Closure $callback)
  * @method static \Illuminate\Contracts\Database\Query\Expression raw(mixed $value)

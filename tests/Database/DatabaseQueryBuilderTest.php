@@ -2893,6 +2893,137 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->from('users')->insertOrIgnore(['email' => 'foo']);
     }
 
+    public function testInsertOrIgnoreUsingMethod()
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('does not support');
+        $builder = $this->getBuilder();
+        $builder->from('users')->insertOrIgnoreUsing(['email' => 'foo'], 'bar');
+    }
+
+    public function testSqlServerInsertOrIgnoreUsingMethod()
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('does not support');
+        $builder = $this->getSqlServerBuilder();
+        $builder->from('users')->insertOrIgnoreUsing(['email' => 'foo'], 'bar');
+    }
+
+    public function testMySqlInsertOrIgnoreUsingMethod()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->getConnection()->shouldReceive('getDatabaseName');
+        $builder->getConnection()->shouldReceive('affectingStatement')->once()->with('insert ignore into `table1` (`foo`) select `bar` from `table2` where `foreign_id` = ?', [0 => 5])->andReturn(1);
+
+        $result = $builder->from('table1')->insertOrIgnoreUsing(
+            ['foo'],
+            function (Builder $query) {
+                $query->select(['bar'])->from('table2')->where('foreign_id', '=', 5);
+            }
+        );
+
+        $this->assertEquals(1, $result);
+    }
+
+    public function testMySqlInsertOrIgnoreUsingWithEmptyColumns()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->getConnection()->shouldReceive('getDatabaseName');
+        $builder->getConnection()->shouldReceive('affectingStatement')->once()->with('insert ignore into `table1` select * from `table2` where `foreign_id` = ?', [0 => 5])->andReturn(1);
+
+        $result = $builder->from('table1')->insertOrIgnoreUsing(
+            [],
+            function (Builder $query) {
+                $query->from('table2')->where('foreign_id', '=', 5);
+            }
+        );
+
+        $this->assertEquals(1, $result);
+    }
+
+    public function testMySqlInsertOrIgnoreUsingInvalidSubquery()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $builder = $this->getMySqlBuilder();
+        $builder->from('table1')->insertOrIgnoreUsing(['foo'], ['bar']);
+    }
+
+    public function testPostgresInsertOrIgnoreUsingMethod()
+    {
+        $builder = $this->getPostgresBuilder();
+        $builder->getConnection()->shouldReceive('affectingStatement')->once()->with('insert into "table1" ("foo") select "bar" from "table2" where "foreign_id" = ? on conflict do nothing', [5])->andReturn(1);
+
+        $result = $builder->from('table1')->insertOrIgnoreUsing(
+            ['foo'],
+            function (Builder $query) {
+                $query->select(['bar'])->from('table2')->where('foreign_id', '=', 5);
+            }
+        );
+
+        $this->assertEquals(1, $result);
+    }
+
+    public function testPostgresInsertOrIgnoreUsingWithEmptyColumns()
+    {
+        $builder = $this->getPostgresBuilder();
+        $builder->getConnection()->shouldReceive('affectingStatement')->once()->with('insert into "table1" select * from "table2" where "foreign_id" = ? on conflict do nothing', [5])->andReturn(1);
+
+        $result = $builder->from('table1')->insertOrIgnoreUsing(
+            [],
+            function (Builder $query) {
+                $query->from('table2')->where('foreign_id', '=', 5);
+            }
+        );
+
+        $this->assertEquals(1, $result);
+    }
+
+    public function testPostgresInsertOrIgnoreUsingInvalidSubquery()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $builder = $this->getPostgresBuilder();
+        $builder->from('table1')->insertOrIgnoreUsing(['foo'], ['bar']);
+    }
+
+    public function testSQLiteInsertOrIgnoreUsingMethod()
+    {
+        $builder = $this->getSQLiteBuilder();
+        $builder->getConnection()->shouldReceive('getDatabaseName');
+        $builder->getConnection()->shouldReceive('affectingStatement')->once()->with('insert or ignore into "table1" ("foo") select "bar" from "table2" where "foreign_id" = ?', [5])->andReturn(1);
+
+        $result = $builder->from('table1')->insertOrIgnoreUsing(
+            ['foo'],
+            function (Builder $query) {
+                $query->select(['bar'])->from('table2')->where('foreign_id', '=', 5);
+            }
+        );
+
+        $this->assertEquals(1, $result);
+    }
+
+    public function testSQLiteInsertOrIgnoreUsingWithEmptyColumns()
+    {
+        $builder = $this->getSQLiteBuilder();
+        $builder->getConnection()->shouldReceive('getDatabaseName');
+        $builder->getConnection()->shouldReceive('affectingStatement')->once()->with('insert or ignore into "table1" select * from "table2" where "foreign_id" = ?', [5])->andReturn(1);
+
+        $result = $builder->from('table1')->insertOrIgnoreUsing(
+            [],
+            function (Builder $query) {
+                $query->from('table2')->where('foreign_id', '=', 5);
+            }
+        );
+
+        $this->assertEquals(1, $result);
+    }
+
+    public function testSQLiteInsertOrIgnoreUsingInvalidSubquery()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $builder = $this->getSQLiteBuilder();
+        $builder->from('table1')->insertOrIgnoreUsing(['foo'], ['bar']);
+    }
+
     public function testInsertGetIdMethod()
     {
         $builder = $this->getBuilder();
