@@ -92,9 +92,10 @@ trait Macroable
 
         if ($macro instanceof Closure) {
             $macro = $macro->bindTo(null, static::class);
+            return $macro(...$parameters);
         }
 
-        return $macro(...$parameters);
+        return $macro;
     }
 
     /**
@@ -118,8 +119,9 @@ trait Macroable
 
         if ($macro instanceof Closure) {
             $macro = $macro->bindTo($this, static::class);
+            return $macro(...$parameters);
         }
 
-        return $macro(...$parameters);
+        return $macro;
     }
 }
