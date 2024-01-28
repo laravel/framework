@@ -34,6 +34,23 @@ trait HasGlobalScopes
     }
 
     /**
+     * Register multiple global scopes on the model.
+     *
+     * @param  array  $scopes
+     * @return void
+     */
+    public static function addGlobalScopes(array $scopes)
+    {
+        foreach ($scopes as $key => $scope) {
+            if (is_string($key)) {
+                static::addGlobalScope($key, $scope);
+            } else {
+                static::addGlobalScope($scope);
+            }
+        }
+    }
+
+    /**
      * Determine if a model has a global scope.
      *
      * @param  \Illuminate\Database\Eloquent\Scope|string  $scope

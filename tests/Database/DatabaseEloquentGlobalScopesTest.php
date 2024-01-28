@@ -59,6 +59,14 @@ class DatabaseEloquentGlobalScopesTest extends TestCase
         $this->assertEquals([1], $query->getBindings());
     }
 
+    public function testGlobalScopesCanBeRegisteredViaArray()
+    {
+        $model = new EloquentGlobalScopesArrayTestModel;
+        $query = $model->newQuery();
+        $this->assertSame('select * from "table" where "active" = ? order by "name" asc', $query->toSql());
+        $this->assertEquals([1], $query->getBindings());
+    }
+
     public function testClosureGlobalScopeCanBeRemoved()
     {
         $model = new EloquentClosureGlobalScopesTestModel;
@@ -205,6 +213,21 @@ class EloquentClassNameGlobalScopesTestModel extends Model
     public static function boot()
     {
         static::addGlobalScope(ActiveScope::class);
+
+        parent::boot();
+    }
+}
+
+class EloquentGlobalScopesArrayTestModel extends Model
+{
+    protected $table = 'table';
+
+    public static function boot()
+    {
+        static::addGlobalScopes([
+            'active_scope' => new ActiveScope,
+            fn ($query) => $query->orderBy('name'),
+        ]);
 
         parent::boot();
     }
