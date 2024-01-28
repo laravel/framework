@@ -33,6 +33,22 @@ class BusDispatcherTest extends TestCase
         $dispatcher->dispatch(m::mock(ShouldQueue::class));
     }
 
+    public function testMultipleCommandsThatShouldQueueAreQueued()
+    {
+        $container = new Container;
+        $dispatcher = new Dispatcher($container, function () {
+            $mock = m::mock(Queue::class);
+            $mock->shouldReceive('push')->twice();
+
+            return $mock;
+        });
+
+        $dispatcher->dispatchMany([
+            m::mock(ShouldQueue::class),
+            m::mock(ShouldQueue::class),
+        ]);
+    }
+
     public function testCommandsThatShouldQueueIsQueuedUsingCustomHandler()
     {
         $container = new Container;

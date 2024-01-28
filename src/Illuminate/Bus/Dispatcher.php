@@ -74,8 +74,21 @@ class Dispatcher implements QueueingDispatcher
     public function dispatch($command)
     {
         return $this->queueResolver && $this->commandShouldBeQueued($command)
-                        ? $this->dispatchToQueue($command)
-                        : $this->dispatchNow($command);
+            ? $this->dispatchToQueue($command)
+            : $this->dispatchNow($command);
+    }
+
+    /**
+     * Dispatch multiple commands to their appropriate handler.
+     *
+     * @param  iterable  $commands
+     * @return mixed
+     */
+    public function dispatchMany(iterable $commands)
+    {
+        foreach ($commands as $command) {
+            $this->dispatch($command);
+        }
     }
 
     /**
