@@ -1590,36 +1590,6 @@ class TestResponse implements ArrayAccess
         return $this->streamedContent;
     }
 
-    public function streamedJsonResponse()
-    {
-        if (! is_null($this->streamedContent)) {
-            return $this->streamedContent;
-        }
-
-        if (! $this->baseResponse instanceof StreamedJsonResponse) {
-            PHPUnit::fail('The response is not a streamed JSON response.');
-        }
-
-        ob_start(function (string $buffer): string {
-            $this->streamedContent .= $buffer;
-
-            return '';
-        });
-        $this->sendContent();
-        ob_end_clean();
-
-        /** @var TestResponse $this */
-        $this->baseResponse = new JsonResponse(
-            $this->streamedContent,
-            $this->baseResponse->getStatusCode(),
-            $this->baseResponse->headers->all(),
-            0,
-            true
-        );
-
-        return $this;
-    }
-
     /**
      * Set the previous exceptions on the response.
      *
