@@ -29,7 +29,6 @@ interface View extends Renderable
      */
     public function getData();
 
-
     /**
      * Get the evaluated contents of a given fragment.
      *
@@ -37,7 +36,6 @@ interface View extends Renderable
      * @return string
      */
     public function fragment($fragment);
-
 
     /**
      * Get the evaluated contents for a given array of fragments or return all fragments.
@@ -47,7 +45,6 @@ interface View extends Renderable
      */
     public function fragments(?array $fragments = null);
 
-
     /**
      * Get the evaluated contents of a given fragment if the given condition is true.
      *
@@ -56,7 +53,6 @@ interface View extends Renderable
      * @return string
      */
     public function fragmentIf($boolean, $fragment);
-
 
     /**
      * Get the evaluated contents for a given array of fragments if the given condition is true.
