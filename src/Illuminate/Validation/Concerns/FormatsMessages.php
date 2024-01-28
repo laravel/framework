@@ -219,7 +219,7 @@ trait FormatsMessages
         // We assume that the attributes present in the file array are files so that
         // means that if the attribute does not have a numeric rule and the files
         // list doesn't have it we'll just consider it a string by elimination.
-        return match(true) {
+        return match (true) {
             $this->hasRule($attribute, $this->numericRules) => 'numeric',
             $this->hasRule($attribute, ['Array']) => 'array',
             $this->getValue($attribute) instanceof UploadedFile => 'file',
