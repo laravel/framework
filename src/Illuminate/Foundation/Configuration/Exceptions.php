@@ -4,6 +4,7 @@ namespace Illuminate\Foundation\Configuration;
 
 use Closure;
 use Illuminate\Foundation\Exceptions\Handler;
+use Illuminate\Support\Arr;
 
 class Exceptions
 {
