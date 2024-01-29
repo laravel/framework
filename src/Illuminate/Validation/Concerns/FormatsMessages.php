@@ -3,9 +3,9 @@
 namespace Illuminate\Validation\Concerns;
 
 use Closure;
-use Symfony\Component\HttpFoundation\File\File;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 trait FormatsMessages
