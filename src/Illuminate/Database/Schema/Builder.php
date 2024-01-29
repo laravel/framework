@@ -461,6 +461,40 @@ class Builder
     }
 
     /**
+     * Create a pivot table for the given models.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model|string  $model1
+     * @param  \Illuminate\Database\Eloquent\Model|string  $model2
+     * @param  \Closure|null  $callback
+     * @return void;
+     */
+    public function createPivotFor($model1, $model2, Closure $callback = null)
+    {
+        if ($model1 instanceof Model) {
+            $model1 = $model1::class;
+        }
+        $tables[] = Str::snake(Str::singular(class_basename($model1)));
+
+        if ($model2 instanceof Model) {
+            $model2 = $model2::class;
+        }
+        $tables[] = Str::snake(Str::singular(class_basename($model2)));
+
+        sort($tables);
+        $table = strtolower(implode('_', $tables));
+
+        $this->build(tap($this->createBlueprint($table), function ($blueprint) use ($callback, $model1, $model2) {
+            $blueprint->create();
+            $blueprint->foreignIdFor($model1)->constrained();
+            $blueprint->foreignIdFor($model2)->constrained();
+
+            if (!is_null($callback)) {
+                $callback($blueprint);
+            }
+        }));
+    }
+
+    /**
      * Drop a table from the schema.
      *
      * @param  string  $table
@@ -468,6 +502,33 @@ class Builder
      */
     public function drop($table)
     {
+        $this->build(tap($this->createBlueprint($table), function ($blueprint) {
+            $blueprint->drop();
+        }));
+    }
+
+    /**
+     * Drop a pivot table for the given models.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model|string  $model1
+     * @param  \Illuminate\Database\Eloquent\Model|string  $model2
+     * @return void;
+     */
+    public function dropPivotFor($model1, $model2)
+    {
+        if ($model1 instanceof Model) {
+            $model1 = $model1::class;
+        }
+        $tables[] = Str::snake(Str::singular(class_basename($model1)));
+
+        if ($model2 instanceof Model) {
+            $model2 = $model2::class;
+        }
+        $tables[] = Str::snake(Str::singular(class_basename($model2)));
+
+        sort($tables);
+        $table = strtolower(implode('_', $tables));
+
         $this->build(tap($this->createBlueprint($table), function ($blueprint) {
             $blueprint->drop();
         }));
