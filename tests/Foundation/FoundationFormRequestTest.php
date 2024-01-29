@@ -497,7 +497,6 @@ class FoundationTestFormRequestWithoutRulesMethod extends FormRequest
     }
 }
 
-
 class FoundationTestFormRequestWithGetRules extends FormRequest
 {
     public static $useRuleSet = 'a';
@@ -515,5 +514,3 @@ class FoundationTestFormRequestWithGetRules extends FormRequest
         }
     }
 }
-
-;
