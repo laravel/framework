@@ -2,8 +2,9 @@
 
 namespace Illuminate\Tests\Validation;
 
+use Closure;
 use Illuminate\Container\Container;
-use Illuminate\Contracts\Validation\Rule as RuleContract;
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Translation\ArrayLoader;
 use Illuminate\Translation\Translator;
@@ -312,16 +313,13 @@ class ValidationPasswordRuleTest extends TestCase
             }
         };
 
-        $ruleObject = new class implements RuleContract
+        $ruleObject = new class implements ValidationRule
         {
-            public function passes($attribute, $value)
+            public function validate(string $attribute, mixed $value, Closure $fail): void
             {
-                return $value === 'aa';
-            }
-
-            public function message()
-            {
-                return 'Custom rule object failed';
+                if ($value !== 'aa') {
+                    $fail('Custom rule object failed');
+                }
             }
         };
 
