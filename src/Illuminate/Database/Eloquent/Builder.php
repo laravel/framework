@@ -1969,9 +1969,7 @@ class Builder implements BuilderContract
             return $this->toBase()->{$method}(...$parameters);
         }
 
-        $this->forwardCallTo($this->query, $method, $parameters);
-
-        return $this;
+        return $this->forwardCallTo($this->query, $method, $parameters);
     }
 
     /**
