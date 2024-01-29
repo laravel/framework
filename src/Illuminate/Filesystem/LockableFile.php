@@ -2,7 +2,6 @@
 
 namespace Illuminate\Filesystem;
 
-use Exception;
 use Illuminate\Contracts\Filesystem\LockTimeoutException;
 
 class LockableFile
