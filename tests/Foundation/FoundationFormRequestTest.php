@@ -507,7 +507,7 @@ class FoundationTestFormRequestWithGetRules extends FormRequest
     {
         if (self::$useRuleSet === 'a') {
             return [
-                'a' => ['required', 'int', 'min:1']
+                'a' => ['required', 'int', 'min:1'],
             ];
         } else {
             return [
