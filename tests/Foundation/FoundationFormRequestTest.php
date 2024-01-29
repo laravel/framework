@@ -306,7 +306,7 @@ class FoundationFormRequestTest extends TestCase
                    ->andReturn($this->createMockRedirectResponse());
 
         $generator->shouldReceive('previous')->zeroOrMoreTimes()
-                   ->andReturn('previous');
+                  ->andReturn('previous');
 
         return $redirector;
     }
