@@ -5,7 +5,6 @@ namespace Illuminate\Database\Query\Grammars;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
-use PDO;
 
 class SQLiteGrammar extends Grammar
 {

@@ -4,7 +4,6 @@ namespace Illuminate\Database\Query\Grammars;
 
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Str;
-use PDO;
 
 class MySqlGrammar extends Grammar
 {
