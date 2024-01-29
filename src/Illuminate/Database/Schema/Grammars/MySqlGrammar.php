@@ -327,7 +327,9 @@ class MySqlGrammar extends Grammar
                     default => $column['type_name'],
                 },
                 'nullable' => $column['nullable'],
-                'default' => $column['default'],
+                'default' => $column['default'] && str_starts_with(strtolower($column['default']), 'current_timestamp')
+                    ? new Expression($column['default'])
+                    : $column['default'],
                 'autoIncrement' => $column['auto_increment'],
                 'collation' => $column['collation'],
                 'comment' => $column['comment'],

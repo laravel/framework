@@ -111,6 +111,26 @@ class SchemaBuilderTest extends DatabaseTestCase
         }
     }
 
+    public function testRenameColumnWithDefault()
+    {
+        Schema::create('test', static function (Blueprint $table) {
+            $table->timestamp('foo')->useCurrent();
+            $table->string('bar')->default('value');
+        });
+
+        $columns = Schema::getColumns('test');
+        $defaultFoo = collect($columns)->firstWhere('name', 'foo')['default'];
+        $defaultBar = collect($columns)->firstWhere('name', 'bar')['default'];
+
+        Schema::table('test', static function (Blueprint $table) {
+            $table->renameColumn('foo', 'new_foo');
+            $table->renameColumn('bar', 'new_bar');
+        });
+
+        $this->assertEquals(collect(Schema::getColumns('test'))->firstWhere('name', 'new_foo')['default'], $defaultFoo);
+        $this->assertEquals(collect(Schema::getColumns('test'))->firstWhere('name', 'new_bar')['default'], $defaultBar);
+    }
+
     public function testGetTables()
     {
         Schema::create('foo', function (Blueprint $table) {
