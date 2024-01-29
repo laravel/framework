@@ -151,7 +151,8 @@ class FoundationFormRequestTest extends TestCase
 
     public function testAfterMethod()
     {
-        $request = new class extends FormRequest {
+        $request = new class extends FormRequest
+        {
             public $value = 'value-from-request';
 
             public function rules()
@@ -161,7 +162,8 @@ class FoundationFormRequestTest extends TestCase
 
             protected function failedValidation(Validator $validator)
             {
-                throw new class($validator) extends Exception {
+                throw new class($validator) extends Exception
+                {
                     public function __construct(public $validator)
                     {
                         //
@@ -174,7 +176,7 @@ class FoundationFormRequestTest extends TestCase
                 return [
                     new AfterValidationRule($dep->value),
                     new InvokableAfterValidationRule($this->value),
-                    fn($validator) => $validator->errors()->add('closure', 'true'),
+                    fn ($validator) => $validator->errors()->add('closure', 'true'),
                 ];
             }
         };
