@@ -132,7 +132,7 @@ class ControllerMakeCommand extends GeneratorCommand
         if ($baseControllerExists) {
             $replace["use {$controllerNamespace}\Controller;\n"] = '';
         } else {
-            $replace[" extends Controller"] = '';
+            $replace[' extends Controller'] = '';
             $replace["use {$rootNamespace}Http\Controllers\Controller;\n"] = '';
         }
 
