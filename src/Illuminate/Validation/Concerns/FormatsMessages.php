@@ -222,7 +222,7 @@ trait FormatsMessages
         return match (true) {
             $this->hasRule($attribute, $this->numericRules) => 'numeric',
             $this->hasRule($attribute, ['Array']) => 'array',
-            $this->getValue($attribute) instanceof UploadedFile => 'file',
+            $this->getValue($attribute) instanceof UploadedFile,
             $this->getValue($attribute) instanceof File => 'file',
             default => 'string',
         };
