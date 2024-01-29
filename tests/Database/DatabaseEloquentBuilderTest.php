@@ -2268,6 +2268,20 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertSame('select 1', $builder->toRawSQL());
     }
 
+    public function testPassthruMethodsCallsReturnsTheResultOfTheForwardedCall(){
+        $query = m::mock(BaseBuilder::class);
+
+        $mockResponse = 1;
+        $query
+            ->shouldReceive('getCountForPagination')
+            ->andReturn($mockResponse)
+            ->once();
+
+        $builder = new Builder($query);
+
+        $this->assertSame(1, $builder->getCountForPagination());
+    }
+
     public function testPassthruArrayElementsMustAllBeLowercase()
     {
         $builder = new class(m::mock(BaseBuilder::class)) extends Builder
