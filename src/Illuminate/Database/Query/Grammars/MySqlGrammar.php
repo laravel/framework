@@ -116,7 +116,7 @@ class MySqlGrammar extends Grammar
      */
     public function useLegacyGroupLimit(Builder $query)
     {
-        $version = $query->getConnection()->getReadPdo()->getAttribute(PDO::ATTR_SERVER_VERSION);
+        $version = $query->getConnection()->getServerVersion();
 
         return ! $query->getConnection()->isMaria() && version_compare($version, '8.0.11') < 0;
     }
