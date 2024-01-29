@@ -57,7 +57,7 @@ class CliDumper extends BaseCliDumper
         $this->basePath = $basePath;
         $this->output = $output;
         $this->compiledViewPath = $compiledViewPath;
-        
+
         $this->setColors($this->supportsColors());
     }
 
