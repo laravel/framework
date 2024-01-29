@@ -532,6 +532,12 @@ class TestResponse implements ArrayAccess
         return $this;
     }
 
+    /**
+     * Assert that the given array matches the streamed JSON response content.
+     *
+     * @param  array  $value
+     * @return $this
+     */
     public function assertStreamedJsonContent($value)
     {
         return $this->assertStreamedContent(json_encode($value, JSON_THROW_ON_ERROR));
