@@ -1039,7 +1039,11 @@ class MySqlGrammar extends Grammar
 
         return sprintf('%s%s',
             $subtype ?? 'geometry',
-            $column->srid ? ' srid '.$column->srid : ''
+            match (true) {
+                $column->srid && $this->connection?->isMaria() => ' ref_system_id='.$column->srid,
+                (bool) $column->srid => ' srid '.$column->srid,
+                default => '',
+            }
         );
     }
 
