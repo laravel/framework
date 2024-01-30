@@ -17,7 +17,7 @@ trait LazilyRefreshDatabase
     {
         $database = $this->app->make('db');
 
-        $database->beforeExecuting(function () {
+        $callback = function () {
             if (RefreshDatabaseState::$lazilyRefreshed) {
                 return;
             }
@@ -25,7 +25,10 @@ trait LazilyRefreshDatabase
             RefreshDatabaseState::$lazilyRefreshed = true;
 
             $this->baseRefreshDatabase();
-        });
+        };
+
+        $database->beforeStartingTransaction($callback);
+        $database->beforeExecuting($callback);
 
         $this->beforeApplicationDestroyed(function () {
             RefreshDatabaseState::$lazilyRefreshed = false;
