@@ -17,7 +17,9 @@ jobs:
 
       - name: Remove optional "v" prefix
         id: version
-        run: VERSION=${{ inputs.version }} echo "::set-output name=version::${VERSION#v}"
+        run: |
+          VERSION=${{ inputs.version }}
+          echo "version=${VERSION#v}" >> "$GITHUB_OUTPUT"
 
       - name: Update Application.php version
         run: |
@@ -34,15 +36,11 @@ jobs:
           host: 104.248.56.26
           username: forge
           key: ${{ secrets.SSH_PRIVATE_KEY_SPLITTER }}
-
-      - name: Change directory
-        run: cd laravel-${{ github.ref_name }}
-
-      - name: Pull in latest changes
-        run: git pull origin ${{ github.ref_name }}
-
-      - name: Run release script
-        run: bash bin/release v${{ steps.version.outputs.version }}
+          script: |
+            cd laravel-${{ github.ref_name }}
+            git pull origin ${{ github.ref_name }}
+            bash bin/release v${{ steps.version.outputs.version }}
+          script_stop: true
 
       - name: Generate release notes
         id: notes
