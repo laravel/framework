@@ -25,12 +25,9 @@ jobs:
         run: sed -i "s/const VERSION = '.*';/const VERSION = '${{ steps.version.outputs.version }}';/g" src/Illuminate/Foundation/Application.php
 
       - name: Commit version change
-        uses: EndBug/add-and-commit@v9
+        uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          add: src/Illuminate/Foundation/Application.php
-          default_author: github_actions
-          message: "Update version to v${{ steps.version.outputs.version }}"
-          push: origin ${{ github.ref_name }}
+          commit_message: "Update version to v${{ steps.version.outputs.version }}"
 
       - name: SSH into splitter server
         uses: appleboy/ssh-action@master
