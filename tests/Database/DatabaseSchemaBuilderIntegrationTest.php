@@ -130,6 +130,35 @@ class DatabaseSchemaBuilderIntegrationTest extends TestCase
         $this->assertFalse($this->schemaBuilder()->hasColumn('pandemic_table', 'covid19'));
     }
 
+    public function testCreateAndDropPivotTable()
+    {
+        require_once __DIR__.'/stubs/EloquentModelUuidStub.php';
+
+        $this->schemaBuilder()->createPivotFor(\Illuminate\Foundation\Auth\User::class, \EloquentModelUuidStub::class);
+
+        $this->assertTrue($this->schemaBuilder()->hasTable('eloquent_model_uuid_stub_user'));
+        $this->assertTrue($this->schemaBuilder()->hasColumn('eloquent_model_uuid_stub_user', 'user_id'));
+
+        $this->schemaBuilder()->dropPivotFor(\Illuminate\Foundation\Auth\User::class, \EloquentModelUuidStub::class);
+        $this->assertFalse($this->schemaBuilder()->hasTable('eloquent_model_uuid_stub_user'));
+    }
+
+    public function testCreatePivotTableWithCallback()
+    {
+        require_once __DIR__.'/stubs/EloquentModelUuidStub.php';
+
+        $this->schemaBuilder()->createPivotFor(
+            \Illuminate\Foundation\Auth\User::class,
+            \EloquentModelUuidStub::class,
+            function (Blueprint $table) {
+                $table->string('some_other_data');
+            }
+        );
+
+        $this->assertTrue($this->schemaBuilder()->hasTable('eloquent_model_uuid_stub_user'));
+        $this->assertTrue($this->schemaBuilder()->hasColumn('eloquent_model_uuid_stub_user', 'some_other_data'));
+    }
+
     private function schemaBuilder()
     {
         return $this->db->connection()->getSchemaBuilder();
