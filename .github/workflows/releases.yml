@@ -22,6 +22,8 @@ jobs:
       - name: Update Application.php version
         run: |
           sed -i "s/const VERSION = '.*';/const VERSION = '${{ steps.version.outputs.version }}';/g" src/Illuminate/Foundation/Application.php
+          git config --global user.name 'Taylor Otwell'
+          git config --global user.email 'taylorotwell@users.noreply.github.com'
           git add src/Illuminate/Foundation/Application.php
           git commit -m "Update version to v${{ steps.version.outputs.version }}"
           git push origin ${{ github.ref_name }}
