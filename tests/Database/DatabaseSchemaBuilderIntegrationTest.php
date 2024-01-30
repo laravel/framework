@@ -148,7 +148,7 @@ class DatabaseSchemaBuilderIntegrationTest extends TestCase
         require_once __DIR__.'/stubs/EloquentModelUuidStub.php';
 
         $this->schemaBuilder()->createPivotFor(
-            \Illuminate\Foundation\Auth\User::class,
+            new \Illuminate\Foundation\Auth\User,
             \EloquentModelUuidStub::class,
             function (Blueprint $table) {
                 $table->string('some_other_data');
