@@ -599,7 +599,7 @@ trait QueriesRelationships
      * Add subselect queries to include an aggregate value for a relationship.
      *
      * @param  mixed  $relations
-     * @param  string|\Illuminate\Contracts\Database\Query\Expression  $column
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
      * @param  string  $function
      * @return $this
      */
@@ -723,7 +723,7 @@ trait QueriesRelationships
      * Add subselect queries to include the max of the relation's column.
      *
      * @param  string|array  $relation
-     * @param  string|\Illuminate\Contracts\Database\Query\Expression  $column
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
      * @return $this
      */
     public function withMax($relation, $column)
@@ -735,7 +735,7 @@ trait QueriesRelationships
      * Add subselect queries to include the min of the relation's column.
      *
      * @param  string|array  $relation
-     * @param  string|\Illuminate\Contracts\Database\Query\Expression  $column
+     * @param  \Illuminate\Contracts\Database\Query\Expression|strins  $column
      * @return $this
      */
     public function withMin($relation, $column)
@@ -747,7 +747,7 @@ trait QueriesRelationships
      * Add subselect queries to include the sum of the relation's column.
      *
      * @param  string|array  $relation
-     * @param  string|\Illuminate\Contracts\Database\Query\Expression  $column
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
      * @return $this
      */
     public function withSum($relation, $column)
@@ -759,7 +759,7 @@ trait QueriesRelationships
      * Add subselect queries to include the average of the relation's column.
      *
      * @param  string|array  $relation
-     * @param  string|\Illuminate\Contracts\Database\Query\Expression  $column
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
      * @return $this
      */
     public function withAvg($relation, $column)
