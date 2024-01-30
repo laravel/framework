@@ -38,7 +38,7 @@ jobs:
           script: |
             cd laravel-${{ github.ref_name }}
             git pull origin ${{ github.ref_name }}
-            bash ./bin/release v${{ steps.version.outputs.version }}
+            bash ./bin/release.sh v${{ steps.version.outputs.version }}
           script_stop: true
 
       - name: Generate release notes
