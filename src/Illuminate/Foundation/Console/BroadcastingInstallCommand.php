@@ -56,7 +56,7 @@ class BroadcastingInstallCommand extends Command
             if (! str_contains($bootstrapScript, 'echo.js')) {
                 file_put_contents(
                     $bootstrapScriptPath,
-                    $bootstrapScript.PHP_EOL.file_get_contents(__DIR__.'/stubs/echo-bootstrap-js.stub')
+                    trim($bootstrapScript.PHP_EOL.file_get_contents(__DIR__.'/stubs/echo-bootstrap-js.stub')).PHP_EOL,
                 );
             }
         }
