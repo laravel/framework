@@ -264,7 +264,7 @@ class SQLiteGrammar extends Grammar
                             'change' => true,
                             'type' => $column['type_name'],
                             'nullable' => $column['nullable'],
-                            'default' => $column['default'],
+                            'default' => $column['default'] ? new Expression($column['default']) : null,
                             'autoIncrement' => $column['auto_increment'],
                             'collation' => $column['collation'],
                             'comment' => $column['comment'],

@@ -320,6 +320,31 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $this->assertEquals($expected, $queries);
     }
 
+    public function testChangingColumnsWithDefaultWorks()
+    {
+        DB::connection()->getSchemaBuilder()->create('products', function (Blueprint $table) {
+            $table->integer('changed_col');
+            $table->timestamp('timestamp_col')->useCurrent();
+            $table->integer('integer_col')->default(123);
+            $table->string('string_col')->default('value');
+        });
+
+        $blueprint = new Blueprint('products', function ($table) {
+            $table->text('changed_col')->change();
+        });
+
+        $queries = $blueprint->toSql(DB::connection(), new SQLiteGrammar);
+
+        $expected = [
+            'create table "__temp__products" ("changed_col" text not null, "timestamp_col" datetime not null default CURRENT_TIMESTAMP, "integer_col" integer not null default \'123\', "string_col" varchar not null default \'value\')',
+            'insert into "__temp__products" ("changed_col", "timestamp_col", "integer_col", "string_col") select "changed_col", "timestamp_col", "integer_col", "string_col" from "products"',
+            'drop table "products"',
+            'alter table "__temp__products" rename to "products"',
+        ];
+
+        $this->assertEquals($expected, $queries);
+    }
+
     public function testRenameIndexWorks()
     {
         DB::connection()->getSchemaBuilder()->create('users', function ($table) {

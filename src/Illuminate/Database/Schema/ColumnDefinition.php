@@ -10,7 +10,7 @@ use Illuminate\Support\Fluent;
  * @method $this autoIncrement() Set INTEGER columns as auto-increment (primary key)
  * @method $this change() Change the column
  * @method $this charset(string $charset) Specify a character set for the column (MySQL)
- * @method $this collation(string $collation) Specify a collation for the column (MySQL/PostgreSQL/SQL Server)
+ * @method $this collation(string $collation) Specify a collation for the column
  * @method $this comment(string $comment) Add a comment to the column (MySQL/PostgreSQL)
  * @method $this default(mixed $value) Specify a "default" value for the column
  * @method $this first() Place the column "first" in the table (MySQL)
