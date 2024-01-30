@@ -735,7 +735,7 @@ trait QueriesRelationships
      * Add subselect queries to include the min of the relation's column.
      *
      * @param  string|array  $relation
-     * @param  \Illuminate\Contracts\Database\Query\Expression|strins  $column
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
      * @return $this
      */
     public function withMin($relation, $column)
