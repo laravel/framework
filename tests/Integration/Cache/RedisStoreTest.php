@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Cache;
 
+use DateTime;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Redis;
@@ -133,6 +134,27 @@ class RedisStoreTest extends TestCase
 
         sleep(2);
 
+        Cache::store('redis')->tags(['votes'])->flushStale();
+
+        $keyCount = Cache::store('redis')->connection()->keys('*');
+        $this->assertEquals(0, count($keyCount));
+    }
+
+    public function testPastTtlTagEntriesAreNotAdded()
+    {
+        Cache::store('redis')->clear();
+
+        Cache::store('redis')->tags(['votes'])->add('person-1', 0, new DateTime('yesterday'));
+
+        $keyCount = Cache::store('redis')->connection()->keys('*');
+        $this->assertEquals(0, count($keyCount));
+    }
+
+    public function testPutPastTtlTagEntriesProperlyTurnStale()
+    {
+        Cache::store('redis')->clear();
+
+        Cache::store('redis')->tags(['votes'])->put('person-1', 0, new DateTime('yesterday'));
         Cache::store('redis')->tags(['votes'])->flushStale();
 
         $keyCount = Cache::store('redis')->connection()->keys('*');
