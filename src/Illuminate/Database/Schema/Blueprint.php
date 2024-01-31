@@ -7,6 +7,7 @@ use Illuminate\Database\Connection;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Schema\Grammars\Grammar;
+use Illuminate\Database\Schema\Grammars\MySqlGrammar;
 use Illuminate\Support\Fluent;
 use Illuminate\Support\Traits\Macroable;
 
@@ -187,7 +188,7 @@ class Blueprint
             array_unshift($this->commands, $this->createCommand('change'));
         }
 
-        $this->addFluentIndexes();
+        $this->addFluentIndexes($connection, $grammar);
 
         $this->addFluentCommands($connection, $grammar);
     }
@@ -195,12 +196,21 @@ class Blueprint
     /**
      * Add the index commands fluently specified on columns.
      *
+     * @param  \Illuminate\Database\Connection  $connection
+     * @param  \Illuminate\Database\Schema\Grammars\Grammar  $grammar
      * @return void
      */
-    protected function addFluentIndexes()
+    protected function addFluentIndexes(Connection $connection, Grammar $grammar)
     {
         foreach ($this->columns as $column) {
             foreach (['primary', 'unique', 'index', 'fulltext', 'fullText', 'spatialIndex'] as $index) {
+                // If the column is supposed to be changed to an auto increment column and
+                // the specified index is primary, there is no need to add a command on
+                // MySQL, as it will be handled during the column definition instead.
+                if ($index === 'primary' && $column->autoIncrement && $column->change && $grammar instanceof MySqlGrammar) {
+                    continue 2;
+                }
+
                 // If the index has been specified on the given column, but is simply equal
                 // to "true" (boolean), no name has been specified for this index so the
                 // index method can be called without a name and it will generate one.

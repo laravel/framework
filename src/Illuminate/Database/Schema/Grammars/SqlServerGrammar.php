@@ -987,7 +987,7 @@ class SqlServerGrammar extends Grammar
     protected function modifyIncrement(Blueprint $blueprint, Fluent $column)
     {
         if (! $column->change && in_array($column->type, $this->serials) && $column->autoIncrement) {
-            return ' identity primary key';
+            return $this->hasCommand($blueprint, 'primary') ? ' identity' : ' identity primary key';
         }
     }
 

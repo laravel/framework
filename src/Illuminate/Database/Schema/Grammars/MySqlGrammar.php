@@ -1232,7 +1232,9 @@ class MySqlGrammar extends Grammar
     protected function modifyIncrement(Blueprint $blueprint, Fluent $column)
     {
         if (in_array($column->type, $this->serials) && $column->autoIncrement) {
-            return ' auto_increment primary key';
+            return $this->hasCommand($blueprint, 'primary') || ($column->change && ! $column->primary)
+                ? ' auto_increment'
+                : ' auto_increment primary key';
         }
     }
 

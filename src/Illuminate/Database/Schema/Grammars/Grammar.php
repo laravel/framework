@@ -242,7 +242,7 @@ abstract class Grammar extends BaseGrammar
     }
 
     /**
-     * Get the primary key command if it exists on the blueprint.
+     * Get the command with a given name if it exists on the blueprint.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  string  $name
@@ -269,6 +269,24 @@ abstract class Grammar extends BaseGrammar
         return array_filter($blueprint->getCommands(), function ($value) use ($name) {
             return $value->name == $name;
         });
+    }
+
+    /*
+     * Determine if a command with a given name exists on the blueprint.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  string  $name
+     * @return bool
+     */
+    protected function hasCommand(Blueprint $blueprint, $name)
+    {
+        foreach ($blueprint->getCommands() as $command) {
+            if ($command->name === $name) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
