@@ -7,11 +7,19 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     /**
+     * Get table name.
+     */
+    public function getTable(): string
+    {
+        return '{{ table }}';
+    }
+
+    /**
      * Run the migrations.
      */
     public function up(): void
     {
-        Schema::table('{{ table }}', function (Blueprint $table) {
+        Schema::table($this->getTable(), function (Blueprint $table) {
             //
         });
     }
@@ -21,7 +29,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('{{ table }}', function (Blueprint $table) {
+        Schema::table($this->getTable(), function (Blueprint $table) {
             //
         });
     }
