@@ -201,7 +201,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
 
         $this->assertEquals([
             "alter table `users` change `name` `title` varchar(255) collate 'utf8mb4_unicode_ci' null default 'foo'",
-            "alter table `users` change `id` `key` bigint unsigned not null auto_increment primary key comment 'lorem ipsum'",
+            "alter table `users` change `id` `key` bigint unsigned not null auto_increment comment 'lorem ipsum'",
         ], $blueprint->toSql($connection, new MySqlGrammar));
     }
 
@@ -222,7 +222,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
 
         $this->assertEquals([
             "alter table `users` change `name` `title` varchar(255) collate 'utf8mb4_unicode_ci' null default 'foo'",
-            "alter table `users` change `id` `key` bigint unsigned not null auto_increment primary key comment 'lorem ipsum'",
+            "alter table `users` change `id` `key` bigint unsigned not null auto_increment comment 'lorem ipsum'",
         ], $blueprint->toSql($connection, new MySqlGrammar));
     }
 

@@ -103,7 +103,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
             ."modify `difficulty` enum('easy', 'hard') character set utf8mb4 collate 'unicode' not null default 'easy', "
             .'modify `positions` multipolygon srid 1234 as (expression) stored, '
             .'change `old_name` `new_name` varchar(50) not null, '
-            ."modify `id` bigint unsigned not null auto_increment primary key comment 'my comment' first",
+            ."modify `id` bigint unsigned not null auto_increment comment 'my comment' first",
             'alter table `users` auto_increment = 10',
         ], $blueprint->toSql($connection, new MySqlGrammar));
     }
