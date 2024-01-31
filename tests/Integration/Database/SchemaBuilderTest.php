@@ -188,12 +188,16 @@ class SchemaBuilderTest extends DatabaseTestCase
 
     public function testAddingAutoIncrementColumn()
     {
+        if ($this->driver === 'sqlite') {
+            $this->markTestSkipped('Adding a primary column is not supported on SQLite.');
+        }
+
         Schema::create('test', function (Blueprint $table) {
             $table->string('name');
         });
 
         Schema::table('test', function (Blueprint $table) {
-            $table->bigIncrements('id');
+            $table->bigIncrements('id')->primary;
         });
 
         $this->assertTrue(collect(Schema::getColumns('test'))->firstWhere('name', 'id')['auto_increment']);
