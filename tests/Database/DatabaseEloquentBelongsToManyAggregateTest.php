@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Database;
 
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model as Eloquent;
+use Illuminate\Database\Query\Expression;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentBelongsToManyAggregateTest extends TestCase
@@ -43,6 +44,17 @@ class DatabaseEloquentBelongsToManyAggregateTest extends TestCase
             ->first();
 
         $this->assertEquals(1200, $order->total_allocated);
+    }
+
+    public function testWithSumExpression()
+    {
+        $this->seedData();
+
+        $order = BelongsToManyAggregateTestTestTransaction::query()
+            ->withSum('allocatedTo as total_allocated', new Expression('allocations.amount * 2'))
+            ->first();
+
+        $this->assertEquals(2400, $order->total_allocated);
     }
 
     /**
