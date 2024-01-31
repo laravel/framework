@@ -2,8 +2,12 @@
 
 namespace Illuminate\Database\Schema;
 
+use Illuminate\Database\Concerns\UsesSchemaAwareTables;
+
 class SqlServerBuilder extends Builder
 {
+    use UsesSchemaAwareTables;
+
     /**
      * Create a database in the schema.
      *
@@ -53,7 +57,7 @@ class SqlServerBuilder extends Builder
     }
 
     /**
-     * Drop all tables from the database.
+     * Get all tables from the database.
      *
      * @deprecated Will be removed in a future Laravel version.
      *
@@ -79,4 +83,28 @@ class SqlServerBuilder extends Builder
             $this->grammar->compileGetAllViews()
         );
     }
+
+    /**
+     * Get the schemas for the connection.
+     *
+     * @return array
+     */
+    protected function getSchemas()
+    {
+        return $this->parseSearchPath(
+            $this->connection->getConfig('search_path') ?: $this->connection->getConfig('schema') ?: 'public'
+        );
+    }
+
+    /**
+     * Get the default schema for the connection
+     *
+     * @return string
+     */
+    public function getDefaultSchema()
+    {
+        $this->connection->getConfig('default_schema') ?: 'dbo';
+    }
+
+
 }

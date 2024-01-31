@@ -69,8 +69,6 @@ class SqlServerGrammar extends Grammar
     /**
      * Compile the query to determine if a table exists.
      *
-     * @deprecated Will be removed in a future Laravel version.
-     *
      * @return string
      */
     public function compileTableExists()

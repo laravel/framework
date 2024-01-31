@@ -3,10 +3,11 @@
 namespace Illuminate\Database\Schema;
 
 use Illuminate\Database\Concerns\ParsesSearchPath;
+use Illuminate\Database\Concerns\UsesSchemaAwareTables;
 
 class PostgresBuilder extends Builder
 {
-    use ParsesSearchPath {
+    use ParsesSearchPath, UsesSchemaAwareTables {
         parseSearchPath as baseParseSearchPath;
     }
 
@@ -34,23 +35,6 @@ class PostgresBuilder extends Builder
         return $this->connection->statement(
             $this->grammar->compileDropDatabaseIfExists($name)
         );
-    }
-
-    /**
-     * Determine if the given table exists.
-     *
-     * @param  string  $table
-     * @return bool
-     */
-    public function hasTable($table)
-    {
-        [$database, $schema, $table] = $this->parseSchemaAndTable($table);
-
-        $table = $this->connection->getTablePrefix().$table;
-
-        return count($this->connection->selectFromWriteConnection(
-            $this->grammar->compileTableExists(), [$database, $schema, $table]
-        )) > 0;
     }
 
     /**
@@ -206,22 +190,13 @@ class PostgresBuilder extends Builder
     }
 
     /**
-     * Get the columns for a given table.
+     * Get the default schema for the connection
      *
-     * @param  string  $table
-     * @return array
+     * @return string
      */
-    public function getColumns($table)
+    public function getDefaultSchema()
     {
-        [$database, $schema, $table] = $this->parseSchemaAndTable($table);
-
-        $table = $this->connection->getTablePrefix().$table;
-
-        $results = $this->connection->selectFromWriteConnection(
-            $this->grammar->compileColumns($database, $schema, $table)
-        );
-
-        return $this->connection->getPostProcessor()->processColumns($results);
+        return $this->getSchemas()[0];
     }
 
     /**
@@ -270,38 +245,6 @@ class PostgresBuilder extends Builder
         );
     }
 
-    /**
-     * Parse the database object reference and extract the database, schema, and table.
-     *
-     * @param  string  $reference
-     * @return array
-     */
-    protected function parseSchemaAndTable($reference)
-    {
-        $parts = explode('.', $reference);
-
-        $database = $this->connection->getConfig('database');
-
-        // If the reference contains a database name, we will use that instead of the
-        // default database name for the connection. This allows the database name
-        // to be specified in the query instead of at the full connection level.
-        if (count($parts) === 3) {
-            $database = $parts[0];
-            array_shift($parts);
-        }
-
-        // We will use the default schema unless the schema has been specified in the
-        // query. If the schema has been specified in the query then we can use it
-        // instead of a default schema configured in the connection search path.
-        $schema = $this->getSchemas()[0];
-
-        if (count($parts) === 2) {
-            $schema = $parts[0];
-            array_shift($parts);
-        }
-
-        return [$database, $schema, $parts[0]];
-    }
 
     /**
      * Parse the "search_path" configuration value into an array.
