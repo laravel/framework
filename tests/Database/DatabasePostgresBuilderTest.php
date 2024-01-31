@@ -49,7 +49,7 @@ class DatabasePostgresBuilderTest extends TestCase
     public function testHasTableWhenSchemaUnqualifiedAndSearchPathMissing()
     {
         $tables = [
-            ['name' => 'foo', 'schema' => 'public']
+            ['name' => 'foo', 'schema' => 'public'],
         ];
 
         $connection = $this->getConnection();
@@ -75,7 +75,7 @@ class DatabasePostgresBuilderTest extends TestCase
     public function testHasTableWhenSchemaUnqualifiedAndSearchPathFilled()
     {
         $tables = [
-            ['name' => 'foo', 'schema' => 'myapp']
+            ['name' => 'foo', 'schema' => 'myapp'],
         ];
         $connection = $this->getConnection();
         $connection->shouldReceive('getConfig')->with('search_path')->andReturn('myapp,public');
@@ -99,7 +99,7 @@ class DatabasePostgresBuilderTest extends TestCase
     public function testHasTableWhenSchemaUnqualifiedAndSearchPathFallbackFilled()
     {
         $tables = [
-            ['name' => 'foo', 'schema' => 'myapp']
+            ['name' => 'foo', 'schema' => 'myapp'],
         ];
         $connection = $this->getConnection();
         $connection->shouldReceive('getConfig')->with('search_path')->andReturn(null);
@@ -124,7 +124,7 @@ class DatabasePostgresBuilderTest extends TestCase
     public function testHasTableWhenSchemaUnqualifiedAndSearchPathIsUserVariable()
     {
         $tables = [
-            ['name' => 'foo', 'schema' => 'foouser']
+            ['name' => 'foo', 'schema' => 'foouser'],
         ];
 
         $connection = $this->getConnection();
@@ -150,7 +150,7 @@ class DatabasePostgresBuilderTest extends TestCase
     public function testHasTableWhenSchemaQualifiedAndSearchPathMismatches()
     {
         $tables = [
-            ['name' => 'foo', 'schema' => 'myapp']
+            ['name' => 'foo', 'schema' => 'myapp'],
         ];
 
         $connection = $this->getConnection();
@@ -176,7 +176,7 @@ class DatabasePostgresBuilderTest extends TestCase
     public function testHasTableWhenDatabaseAndSchemaQualifiedAndSearchPathMismatches()
     {
         $tables = [
-            ['name' => 'foo', 'schema' => 'myapp']
+            ['name' => 'foo', 'schema' => 'myapp'],
         ];
 
         $connection = $this->getConnection();

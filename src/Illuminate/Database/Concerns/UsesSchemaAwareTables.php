@@ -84,5 +84,4 @@ trait UsesSchemaAwareTables
 
         return [$database, $schema, $parts[0]];
     }
-
 }

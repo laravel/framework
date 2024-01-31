@@ -192,7 +192,6 @@ class DatabaseSqlServerBuilderTest extends TestCase
         $builder->getColumnListing('[my_schema].[foo]');
     }
 
-
     public function testGetColumnWhenDatabaseAndSchemaQualifiedAndDefaultSchemaIsDifferent()
     {
         $connection = $this->getConnection();
@@ -306,7 +305,6 @@ SQL;
 
         $this->assertFalse($builder->hasColumn('foo', 'bar'));
     }
-
 
     public function testHasColumnWithQualifiedSchemaAndDefaultSchemaNoColumnsFound()
     {
