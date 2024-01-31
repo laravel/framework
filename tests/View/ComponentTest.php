@@ -307,7 +307,8 @@ class ComponentTest extends TestCase
         $this->assertNotSame($this->viewFactory, $getFactory($inline));
     }
 
-    public function testComponentSlotIsEmpty() {
+    public function testComponentSlotIsEmpty()
+    {
         $slot = new ComponentSlot;
 
         $anotherSlot = new ComponentSlot('<!-- test -->');
