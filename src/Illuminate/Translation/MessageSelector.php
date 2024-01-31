@@ -48,6 +48,30 @@ class MessageSelector
     }
 
     /**
+     * The regex for the condition part of a segment
+     *
+     * @return string
+     */
+    private function conditionRegex()
+    {
+        // The number can either be a number (with optional decimal part and optional sign + or -)
+        // Or it can be a single '*'
+        $numberRegex = '(?:(?:[-+]?\d+(?:\.\d+)?)|\*)';
+
+        // The condition can be either two parameters: to and from. Or just one parameter (exact value)
+        // In case of two parameters, they have to be separated with a ',' (whitespace around the comma is optional)
+        // In case of one paramter, the parameter will be captured in the 'from' capture group
+        $conditionParameterRegex = "(?<from>{$numberRegex})(?:\s*,\s*(?<to>{$numberRegex}))?";
+
+        // The condition parameters need to be surrounded with either {} or [].
+        // It also needs to be at the start of the string
+        // Whitespace around the brackets is optional
+        // In order to make sure the starting bracket type matches the ending bracket type, we have to use an |
+        // This means that the group names 'from' and 'to' are repeated. So make sure to use the regex J flag!
+        return "^\s*(?:\{\s*{$conditionParameterRegex}\s*\}|\[\s*{$conditionParameterRegex}\s*\])";
+    }
+
+    /**
      * Get the translation string if the condition matches.
      *
      * @param  string  $part
@@ -56,19 +80,16 @@ class MessageSelector
      */
     private function extractFromString($part, $number)
     {
-        preg_match('/^[\{\[]([^\[\]\{\}]*)[\}\]](.*)/s', $part, $matches);
-
-        if (count($matches) !== 3) {
+        if(preg_match('/' . $this->conditionRegex() . '(?<value>.*)/sJ', $part, $matches) == false) {
             return null;
         }
 
-        $condition = $matches[1];
+        $from = $matches['from'];
+        $to = $matches['to'];
 
-        $value = $matches[2];
+        $value = $matches['value'];
 
-        if (str_contains($condition, ',')) {
-            [$from, $to] = explode(',', $condition, 2);
-
+        if (! empty($to)) {
             if ($to === '*' && $number >= $from) {
                 return $value;
             } elseif ($from === '*' && $number <= $to) {
@@ -78,7 +99,7 @@ class MessageSelector
             }
         }
 
-        return $condition == $number ? $value : null;
+        return $from == $number ? $value : null;
     }
 
     /**
@@ -90,7 +111,7 @@ class MessageSelector
     private function stripConditions($segments)
     {
         return collect($segments)
-            ->map(fn ($part) => preg_replace('/^[\{\[]([^\[\]\{\}]*)[\}\]]/', '', $part))
+            ->map(fn ($part) => preg_replace('/' . $this->conditionRegex() . '/J', '', $part))
             ->all();
     }
 
