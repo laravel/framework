@@ -1089,8 +1089,10 @@ class PostgresGrammar extends Grammar
      */
     protected function modifyDefault(Blueprint $blueprint, Fluent $column)
     {
-        if ($column->change && ! $column->autoIncrement) {
-            return is_null($column->default) ? 'drop default' : 'set default '.$this->getDefaultValue($column->default);
+        if ($column->change) {
+            if (! $column->autoIncrement || ! is_null($column->generatedAs)) {
+                return is_null($column->default) ? 'drop default' : 'set default '.$this->getDefaultValue($column->default);
+            }
         }
 
         if (! is_null($column->default)) {
