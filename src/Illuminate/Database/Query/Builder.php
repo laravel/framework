@@ -3407,6 +3407,25 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Insert new records into the table using a subquery while ignoring errors.
+     *
+     * @param  array  $columns
+     * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder|string  $query
+     * @return int
+     */
+    public function insertOrIgnoreUsing(array $columns, $query)
+    {
+        $this->applyBeforeQueryCallbacks();
+
+        [$sql, $bindings] = $this->createSub($query);
+
+        return $this->connection->affectingStatement(
+            $this->grammar->compileInsertOrIgnoreUsing($this, $columns, $sql),
+            $this->cleanBindings($bindings)
+        );
+    }
+
+    /**
      * Update records in the database.
      *
      * @param  array  $values
