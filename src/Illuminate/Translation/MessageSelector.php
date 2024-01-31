@@ -80,7 +80,7 @@ class MessageSelector
      */
     private function extractFromString($part, $number)
     {
-        if(preg_match('/'.$this->conditionRegex().'(?<value>.*)/sJ', $part, $matches) == false) {
+        if (preg_match('/'.$this->conditionRegex().'(?<value>.*)/sJ', $part, $matches) == false) {
             return null;
         }
 
