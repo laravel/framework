@@ -2631,7 +2631,7 @@ trait ValidatesAttributes
     }
 
     /**
-     * Register a binding with the container.
+     * Validating a value to be FQDN (Fully Qualified Domain Name)
      *
      * @param  string  $attribute
      * @param  mixed  $value
