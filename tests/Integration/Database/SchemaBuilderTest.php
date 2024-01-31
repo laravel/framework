@@ -150,6 +150,10 @@ class SchemaBuilderTest extends DatabaseTestCase
 
     public function testModifyingAutoIncrementColumn()
     {
+        if ($this->driver === 'sqlsrv') {
+            $this->markTestSkipped('Changing a primary column is not supported on SQL Server.');
+        }
+
         Schema::create('test', function (Blueprint $table) {
             $table->increments('id');
         });

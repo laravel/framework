@@ -731,7 +731,7 @@ class PostgresGrammar extends Grammar
      */
     protected function typeInteger(Fluent $column)
     {
-        return $column->autoIncrement && is_null($column->generatedAs) ? 'serial' : 'integer';
+        return $column->autoIncrement && is_null($column->generatedAs) && ! $column->change ? 'serial' : 'integer';
     }
 
     /**
@@ -742,7 +742,7 @@ class PostgresGrammar extends Grammar
      */
     protected function typeBigInteger(Fluent $column)
     {
-        return $column->autoIncrement && is_null($column->generatedAs) ? 'bigserial' : 'bigint';
+        return $column->autoIncrement && is_null($column->generatedAs) && ! $column->change ? 'bigserial' : 'bigint';
     }
 
     /**
@@ -775,7 +775,7 @@ class PostgresGrammar extends Grammar
      */
     protected function typeSmallInteger(Fluent $column)
     {
-        return $column->autoIncrement && is_null($column->generatedAs) ? 'smallserial' : 'smallint';
+        return $column->autoIncrement && is_null($column->generatedAs) && ! $column->change ? 'smallserial' : 'smallint';
     }
 
     /**
