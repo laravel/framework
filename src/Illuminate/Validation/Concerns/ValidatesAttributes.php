@@ -2631,7 +2631,7 @@ trait ValidatesAttributes
     }
 
     /**
-     * Validating a value to be FQDN (Fully Qualified Domain Name)
+     * Validating a value to be FQDN (Fully Qualified Domain Name).
      *
      * @param  string  $attribute
      * @param  mixed  $value
