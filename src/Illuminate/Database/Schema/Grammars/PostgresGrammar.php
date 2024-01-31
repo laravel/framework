@@ -1089,7 +1089,7 @@ class PostgresGrammar extends Grammar
      */
     protected function modifyDefault(Blueprint $blueprint, Fluent $column)
     {
-        if ($column->change) {
+        if ($column->change && ! $column->autoIncrement) {
             return is_null($column->default) ? 'drop default' : 'set default '.$this->getDefaultValue($column->default);
         }
 
@@ -1183,7 +1183,7 @@ class PostgresGrammar extends Grammar
         }
 
         if ($column->change) {
-            $changes = ['drop identity if exists'];
+            $changes = $column->autoIncrement && is_null($sql) ? [] : ['drop identity if exists'];
 
             if (! is_null($sql)) {
                 $changes[] = 'add '.$sql;

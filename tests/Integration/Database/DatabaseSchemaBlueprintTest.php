@@ -119,10 +119,8 @@ class DatabaseSchemaBlueprintTest extends TestCase
 
         $this->assertEquals([
             'alter table "users" '
-            .'alter column "code" type serial, '
-            .'alter column "code" set not null, '
-            .'alter column "code" drop default, '
-            .'alter column "code" drop identity if exists',
+            .'alter column "code" type integer, '
+            .'alter column "code" set not null',
             'alter sequence users_code_seq restart with 10',
             'comment on column "users"."code" is \'my comment\'',
         ], $blueprint->toSql($connection, new PostgresGrammar));

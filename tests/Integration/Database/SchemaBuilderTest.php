@@ -171,8 +171,8 @@ class SchemaBuilderTest extends DatabaseTestCase
 
     public function testModifyingColumnToAutoIncrementColumn()
     {
-        if ($this->driver === 'sqlsrv') {
-            $this->markTestSkipped('Changing a column to auto increment is not supported on SQL Server.');
+        if (in_array($this->driver,  ['pgsql', 'sqlsrv'])) {
+            $this->markTestSkipped('Changing a column to auto increment is not supported on PostgreSQL and SQL Server.');
         }
 
         Schema::create('test', function (Blueprint $table) {
