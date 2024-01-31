@@ -103,7 +103,7 @@ class SqlServerBuilder extends Builder
      */
     public function getDefaultSchema()
     {
-        $this->connection->getConfig('default_schema') ?: 'dbo';
+        return $this->connection->getConfig('default_schema') ?: 'dbo';
     }
 
 

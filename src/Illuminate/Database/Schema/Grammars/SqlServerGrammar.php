@@ -73,7 +73,7 @@ class SqlServerGrammar extends Grammar
      */
     public function compileTableExists()
     {
-        return "select * from sys.sysobjects where id = object_id(?) and xtype in ('U', 'V')";
+        return "select * from information_schema.tables where table_catalog = ? and table_schema = ? and table_name = ? and table_type = 'BASE TABLE'";
     }
 
     /**
@@ -143,26 +143,33 @@ class SqlServerGrammar extends Grammar
     /**
      * Compile the query to determine the columns.
      *
+     * @param  string  $database
+     * @param  string  $schema
      * @param  string  $table
      * @return string
      */
-    public function compileColumns($table)
+    public function compileColumns($database, $schema, $table)
     {
-        return sprintf(
-            'select col.name, type.name as type_name, '
-            .'col.max_length as length, col.precision as precision, col.scale as places, '
-            .'col.is_nullable as nullable, def.definition as [default], '
-            .'col.is_identity as autoincrement, col.collation_name as collation, '
-            .'cast(prop.value as nvarchar(max)) as comment '
-            .'from sys.columns as col '
-            .'join sys.types as type on col.user_type_id = type.user_type_id '
-            .'join sys.objects as obj on col.object_id = obj.object_id '
-            .'join sys.schemas as scm on obj.schema_id = scm.schema_id '
-            .'left join sys.default_constraints def on col.default_object_id = def.object_id and col.object_id = def.parent_object_id '
-            ."left join sys.extended_properties as prop on obj.object_id = prop.major_id and col.column_id = prop.minor_id and prop.name = 'MS_Description' "
-            ."where obj.type in ('U', 'V') and obj.name = %s and scm.name = SCHEMA_NAME() "
-            .'order by col.column_id',
+        $sql = <<<SQL
+select col.name, type.name as type_name,
+col.max_length as length, col.precision as precision, col.scale as places,
+col.is_nullable as nullable, def.definition as [default],
+col.is_identity as autoincrement, col.collation_name as collation,
+cast(prop.value as nvarchar(max)) as comment
+from sys.columns as col
+join sys.types as type on col.user_type_id = type.user_type_id
+join sys.objects as obj on col.object_id = obj.object_id
+join sys.schemas as scm on obj.schema_id = scm.schema_id
+left join sys.default_constraints def on col.default_object_id = def.object_id and col.object_id = def.parent_object_id
+left join sys.extended_properties as prop on obj.object_id = prop.major_id and col.column_id = prop.minor_id and prop.name = 'MS_Description'
+where obj.type in ('U', 'V')
+and obj.[name] = %s
+and scm.[name] = %s
+SQL;
+
+        return sprintf($sql,
             $this->quoteString($table),
+            $this->quoteString($schema),
         );
     }
 
