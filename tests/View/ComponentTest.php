@@ -11,6 +11,7 @@ use Illuminate\Contracts\View\Factory as FactoryContract;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\HtmlString;
 use Illuminate\View\Component;
+use Illuminate\View\ComponentSlot;
 use Illuminate\View\Factory;
 use Illuminate\View\View;
 use Mockery as m;
@@ -304,6 +305,45 @@ class ComponentTest extends TestCase
 
         Component::forgetFactory();
         $this->assertNotSame($this->viewFactory, $getFactory($inline));
+    }
+
+    public function testComponentSlotIsEmpty() {
+        $slot = new ComponentSlot;
+
+        $anotherSlot = new ComponentSlot('<!-- test -->');
+
+        $linebreakingSlot = new ComponentSlot("\n  \t");
+
+        $moreComplexSlot = new ComponentSlot('<!--
+        <p>Look at this cool image:</p>
+        <img border="0" src="pic_trulli.jpg" alt="Trulli">
+        -->');
+
+        $this->assertTrue((bool) $slot->isEmpty());
+
+        $this->assertTrue((bool) $anotherSlot->isEmpty());
+
+        $this->assertTrue((bool) $linebreakingSlot->isEmpty());
+
+        $this->assertTrue((bool) $moreComplexSlot->isEmpty());
+    }
+
+    public function testComponentSlotIsNotEmpty()
+    {
+        $slot = new ComponentSlot('test');
+
+        $anotherSlot = new ComponentSlot('test<!-- test -->');
+
+        $moreComplexSlot = new ComponentSlot('t<!--
+        <p>Look at this cool image:</p>
+        <img border="0" src="pic_trulli.jpg" alt="Trulli">
+        -->est');
+
+        $this->assertTrue((bool) $slot->isNotEmpty());
+
+        $this->assertTrue((bool) $anotherSlot->isNotEmpty());
+
+        $this->assertTrue((bool) $moreComplexSlot->isNotEmpty());
     }
 }
 
