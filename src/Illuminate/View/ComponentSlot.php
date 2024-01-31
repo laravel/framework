@@ -64,7 +64,7 @@ class ComponentSlot implements Htmlable
      */
     public function isEmpty()
     {
-        return $this->contents === '';
+        return trim(preg_replace('/<!--([\s\S]*?)-->/', '', $this->contents)) === '';
     }
 
     /**
