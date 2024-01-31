@@ -171,7 +171,7 @@ class SchemaBuilderTest extends DatabaseTestCase
 
     public function testModifyingColumnToAutoIncrementColumn()
     {
-        if (in_array($this->driver,  ['pgsql', 'sqlsrv'])) {
+        if (in_array($this->driver, ['pgsql', 'sqlsrv'])) {
             $this->markTestSkipped('Changing a column to auto increment is not supported on PostgreSQL and SQL Server.');
         }
 
