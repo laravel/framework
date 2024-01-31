@@ -192,7 +192,7 @@ class SchemaBuilderTest extends DatabaseTestCase
 
     public function testModifyingColumnToAutoIncrementColumnOnPgsql()
     {
-        if ($this->driver === 'pgsql') {
+        if ($this->driver !== 'pgsql') {
             $this->markTestSkipped('Test requires a PostgreSQL connection.');
         }
 
