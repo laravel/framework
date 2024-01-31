@@ -224,7 +224,7 @@ class DatabaseSqlServerBuilderTest extends TestCase
         $connection->shouldReceive('getTablePrefix');
         $connection->shouldReceive('getConfig')->with('database')->andReturn('laravel');
 
-        $expectedSsql = <<<SQL
+        $expectedSql = <<<SQL
 select col.name, type.name as type_name,
 col.max_length as length, col.precision as precision, col.scale as places,
 col.is_nullable as nullable, def.definition as [default],
@@ -242,7 +242,7 @@ and scm.[name] = N'dbo'
 SQL;
 
         $connection->shouldReceive('selectFromWriteConnection')
-            ->with($expectedSsql)
+            ->with($expectedSql)
             ->andReturn([['name' => 'bar']]);
         $processor = m::mock(SqlServerProcessor::class);
         $connection->shouldReceive('getPostProcessor')->andReturn($processor);
@@ -261,7 +261,7 @@ SQL;
         $connection->shouldReceive('getTablePrefix');
         $connection->shouldReceive('getConfig')->with('database')->andReturn('laravel');
 
-        $expectedSsql = <<<SQL
+        $expectedSql = <<<SQL
 select col.name, type.name as type_name,
 col.max_length as length, col.precision as precision, col.scale as places,
 col.is_nullable as nullable, def.definition as [default],
@@ -279,7 +279,7 @@ and scm.[name] = N'my_default_schema'
 SQL;
 
         $connection->shouldReceive('selectFromWriteConnection')
-            ->with($expectedSsql)
+            ->with($expectedSql)
             ->andReturn([]);
         $processor = m::mock(SqlServerProcessor::class);
         $connection->shouldReceive('getPostProcessor')->andReturn($processor);
@@ -298,7 +298,7 @@ SQL;
         $connection->shouldReceive('getTablePrefix');
         $connection->shouldReceive('getConfig')->with('database')->andReturn('laravel');
 
-        $expectedSsql = <<<SQL
+        $expectedSql = <<<SQL
 select col.name, type.name as type_name,
 col.max_length as length, col.precision as precision, col.scale as places,
 col.is_nullable as nullable, def.definition as [default],
@@ -316,7 +316,7 @@ and scm.[name] = N'my_schema'
 SQL;
 
         $connection->shouldReceive('selectFromWriteConnection')
-            ->with($expectedSsql)
+            ->with($expectedSql)
             ->andReturn([]);
         $processor = m::mock(SqlServerProcessor::class);
         $connection->shouldReceive('getPostProcessor')->andReturn($processor);
