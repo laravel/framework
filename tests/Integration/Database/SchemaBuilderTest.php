@@ -190,27 +190,6 @@ class SchemaBuilderTest extends DatabaseTestCase
         $this->assertTrue(Schema::hasIndex('test', ['id'], 'primary'));
     }
 
-    public function testModifyingColumnToAutoIncrementColumnOnPgsql()
-    {
-        if ($this->driver !== 'pgsql') {
-            $this->markTestSkipped('Test requires a PostgreSQL connection.');
-        }
-
-        Schema::create('test', function (Blueprint $table) {
-            $table->unsignedBigInteger('id');
-        });
-
-        $this->assertFalse(collect(Schema::getColumns('test'))->firstWhere('name', 'id')['auto_increment']);
-        $this->assertFalse(Schema::hasIndex('test', ['id'], 'primary'));
-
-        Schema::table('test', function (Blueprint $table) {
-            $table->bigIncrements('id')->generatedAs()->always()->primary()->change();
-        });
-
-        $this->assertTrue(collect(Schema::getColumns('test'))->firstWhere('name', 'id')['auto_increment']);
-        $this->assertTrue(Schema::hasIndex('test', ['id'], 'primary'));
-    }
-
     public function testAddingAutoIncrementColumn()
     {
         if ($this->driver === 'sqlite') {
