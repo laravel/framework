@@ -2629,4 +2629,18 @@ trait ValidatesAttributes
 
         return $value;
     }
+
+    /**
+     * Register a binding with the container.
+     *
+     * @param  string $attribute
+     * @param  mixed  $value
+     * @return bool
+     */
+    public function validateFqdn($attribute, $value)
+    {
+        $pattern = '/^(?!:\/\/)(?=.{1,255}$)((.{1,63}\.){1,127}(?![0-9]*$)[a-z0-9-]+\.?)$/i';
+
+        return preg_match($pattern, $value);
+    }
 }
