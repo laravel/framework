@@ -51,6 +51,13 @@ trait UsesSchemaAwareTables
     {
         $parts = explode('.', $reference);
 
+        // In order to be fully backward compatibel with previous version where users
+        // may have used square brackets with the identifiers in SQLServer grammar
+        // e.g. "schema.[table1]". We shall trim the parts for their occurrence.
+        $parts = array_map(function($part) {
+            return trim($part, '[]');
+        }, $parts);
+
         $database = $this->connection->getConfig('database');
 
         // If the reference contains a database name, we will use that instead of the

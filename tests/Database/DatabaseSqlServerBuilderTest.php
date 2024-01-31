@@ -81,6 +81,27 @@ class DatabaseSqlServerBuilderTest extends TestCase
         $builder->hasTable('foo');
     }
 
+    public function testHasTableWithQualifiedAndEscapedNames()
+    {
+        $connection = $this->getConnection();
+        $grammar = m::mock(SqlServerGrammar::class);
+        $connection->shouldReceive('getSchemaGrammar')->once()->andReturn($grammar);
+        $grammar->shouldReceive('compileTableExists')->andReturn(
+            "select * from information_schema.tables where table_catalog = ? and table_schema = ? and table_name = ? and table_type = 'BASE TABLE'"
+        );
+        $connection->shouldReceive('selectFromWriteConnection')->with(
+            "select * from information_schema.tables where table_catalog = ? and table_schema = ? and table_name = ? and table_type = 'BASE TABLE'",
+            ['laravel', 'my_schema', 'foo']
+        )->andReturn(['countable_result']);
+        $connection->shouldReceive('getTablePrefix');
+        $connection->shouldReceive('getConfig')->with('database')->andReturn('laravel');
+        $connection->shouldReceive('getConfig')->with('default_schema')->andReturn(null);
+        $builder = $this->getBuilder($connection);
+
+        $this->assertTrue($builder->hasTable('[my_schema].[foo]'));
+    }
+
+
     public function testHasTableWhenSchemaQualifiedAndDefaultSchemaIsDifferent()
     {
         $connection = $this->getConnection();
@@ -174,6 +195,26 @@ class DatabaseSqlServerBuilderTest extends TestCase
 
         $builder->getColumnListing('my_schema.foo');
     }
+
+    public function testGetColumnListingWhenSchemaQualifiedAndEscapedAndDefaultSchemaIsDifferent()
+    {
+        // escaped schema and table name by using brackets []
+        $connection = $this->getConnection();
+        $connection->shouldReceive('getConfig')->with('default_schema')->andReturn('my_default_schema');
+        $grammar = m::mock(SqlServerGrammar::class);
+        $connection->shouldReceive('getSchemaGrammar')->once()->andReturn($grammar);
+        $grammar->shouldReceive('compileColumns')->with('laravel', 'my_schema', 'foo')->andReturn('sql');
+        $connection->shouldReceive('selectFromWriteConnection')->with('sql')->andReturn(['countable_result']);
+        $connection->shouldReceive('getTablePrefix');
+        $connection->shouldReceive('getConfig')->with('database')->andReturn('laravel');
+        $processor = m::mock(SqlServerProcessor::class);
+        $connection->shouldReceive('getPostProcessor')->andReturn($processor);
+        $processor->shouldReceive('processColumns')->andReturn([['name' => 'some_column']]);
+        $builder = $this->getBuilder($connection);
+
+        $builder->getColumnListing('[my_schema].[foo]');
+    }
+
 
     public function testGetColumnWhenDatabaseAndSchemaQualifiedAndDefaultSchemaIsDifferent()
     {
@@ -288,6 +329,7 @@ SQL;
 
         $this->assertFalse($builder->hasColumn('foo', 'bar'));
     }
+
 
     public function testHasColumnWithQualifiedSchemaAndDefaultSchemaNoColumnsFound()
     {
