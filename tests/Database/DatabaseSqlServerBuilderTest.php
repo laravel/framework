@@ -45,7 +45,7 @@ class DatabaseSqlServerBuilderTest extends TestCase
         $tables = [
             ['name' => 'my_table1', 'schema' => 'dbo'],
             ['name' => 'my_table1', 'schema' => 'my_schema'],
-            ['name' => 'my_table2', 'schema' => 'my_schema']
+            ['name' => 'my_table2', 'schema' => 'my_schema'],
         ];
 
         $connection = $this->getConnection();
@@ -53,7 +53,7 @@ class DatabaseSqlServerBuilderTest extends TestCase
         $grammar = m::mock(SqlServerGrammar::class);
         $connection->shouldReceive('getSchemaGrammar')->once()->andReturn($grammar);
         $grammar->shouldReceive('compileTables')->andReturn('sql');
-        $connection->shouldReceive('selectFromWriteConnection')->with("sql")->andReturn($tables);
+        $connection->shouldReceive('selectFromWriteConnection')->with('sql')->andReturn($tables);
         $connection->shouldReceive('getTablePrefix');
         $connection->shouldReceive('getConfig')->with('database')->andReturn('laravel');
         $connection->shouldReceive('getConfig')->with('default_schema')->andReturn(null);
@@ -88,11 +88,11 @@ class DatabaseSqlServerBuilderTest extends TestCase
         ];
 
         $connection = $this->getConnection();
-        $connection->shouldReceive('getConfig')->with('default_schema')->andReturn("my_default_schema");
+        $connection->shouldReceive('getConfig')->with('default_schema')->andReturn('my_default_schema');
         $grammar = m::mock(SqlServerGrammar::class);
         $connection->shouldReceive('getSchemaGrammar')->once()->andReturn($grammar);
         $grammar->shouldReceive('compileTables')->andReturn('sql');
-        $connection->shouldReceive('selectFromWriteConnection')->with("sql")->andReturn($tables);
+        $connection->shouldReceive('selectFromWriteConnection')->with('sql')->andReturn($tables);
         $connection->shouldReceive('getTablePrefix');
         $connection->shouldReceive('getConfig')->with('database')->andReturn('laravel');
         $connection->shouldReceive('getConfig')->with('default_schema')->andReturn(null);
@@ -242,7 +242,7 @@ class DatabaseSqlServerBuilderTest extends TestCase
         $connection->shouldReceive('getTablePrefix');
         $connection->shouldReceive('getConfig')->with('database')->andReturn('laravel');
 
-        $expectedSql = <<<SQL
+        $expectedSql = <<<'SQL'
 select col.name, type.name as type_name,
 col.max_length as length, col.precision as precision, col.scale as places,
 col.is_nullable as nullable, def.definition as [default],
@@ -279,7 +279,7 @@ SQL;
         $connection->shouldReceive('getTablePrefix');
         $connection->shouldReceive('getConfig')->with('database')->andReturn('laravel');
 
-        $expectedSql = <<<SQL
+        $expectedSql = <<<'SQL'
 select col.name, type.name as type_name,
 col.max_length as length, col.precision as precision, col.scale as places,
 col.is_nullable as nullable, def.definition as [default],
@@ -317,7 +317,7 @@ SQL;
         $connection->shouldReceive('getTablePrefix');
         $connection->shouldReceive('getConfig')->with('database')->andReturn('laravel');
 
-        $expectedSql = <<<SQL
+        $expectedSql = <<<'SQL'
 select col.name, type.name as type_name,
 col.max_length as length, col.precision as precision, col.scale as places,
 col.is_nullable as nullable, def.definition as [default],

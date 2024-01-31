@@ -18,17 +18,26 @@ class DatabasePostgresSchemaBuilderTest extends TestCase
 
     public function testHasTable()
     {
+        $tables = [
+            ["name" => "prefix_table", "schema" => "public"]
+        ];
+
         $connection = m::mock(Connection::class);
         $grammar = m::mock(PostgresGrammar::class);
+        $processor = m::mock(PostgresProcessor::class);
+        $processor->shouldReceive('processTables')->andReturn($tables);
+
+        $connection->shouldReceive('getPostProcessor')->andReturn($processor);
         $connection->shouldReceive('getDatabaseName')->andReturn('db');
         $connection->shouldReceive('getSchemaGrammar')->andReturn($grammar);
         $connection->shouldReceive('getConfig')->with('database')->andReturn('db');
         $connection->shouldReceive('getConfig')->with('schema')->andReturn('schema');
         $connection->shouldReceive('getConfig')->with('search_path')->andReturn('public');
         $builder = new PostgresBuilder($connection);
-        $grammar->shouldReceive('compileTableExists')->once()->andReturn('sql');
+        $grammar->shouldReceive('compileTables')->andReturn('sql');
+        $connection->shouldReceive('selectFromWriteConnection')->with('sql')->andReturn($tables);
+
         $connection->shouldReceive('getTablePrefix')->once()->andReturn('prefix_');
-        $connection->shouldReceive('selectFromWriteConnection')->once()->with('sql', ['db', 'public', 'prefix_table'])->andReturn(['prefix_table']);
 
         $this->assertTrue($builder->hasTable('table'));
     }

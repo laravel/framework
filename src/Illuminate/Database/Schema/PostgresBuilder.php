@@ -190,7 +190,7 @@ class PostgresBuilder extends Builder
     }
 
     /**
-     * Get the default schema for the connection
+     * Get the default schema for the connection.
      *
      * @return string
      */
@@ -244,7 +244,6 @@ class PostgresBuilder extends Builder
             $this->connection->getConfig('search_path') ?: $this->connection->getConfig('schema') ?: 'public'
         );
     }
-
 
     /**
      * Parse the "search_path" configuration value into an array.

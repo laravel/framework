@@ -152,7 +152,7 @@ class SqlServerGrammar extends Grammar
      */
     public function compileColumns($database, $schema, $table)
     {
-        $sql = <<<SQL
+        $sql = <<<'SQL'
 select col.name, type.name as type_name,
 col.max_length as length, col.precision as precision, col.scale as places,
 col.is_nullable as nullable, def.definition as [default],

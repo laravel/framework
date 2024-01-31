@@ -4,19 +4,17 @@ namespace Illuminate\Database\Concerns;
 
 trait UsesSchemaAwareTables
 {
-
     /**
      * Get the columns for a given table.
      *
-     * @param string $table
-     *
+     * @param  string  $table
      * @return array
      */
     public function getColumns($table)
     {
         [$database, $schema, $table] = $this->parseSchemaAndTable($table);
 
-        $table = $this->connection->getTablePrefix() . $table;
+        $table = $this->connection->getTablePrefix().$table;
 
         $results = $this->connection->selectFromWriteConnection(
             $this->grammar->compileColumns($database, $schema, $table)
@@ -28,15 +26,14 @@ trait UsesSchemaAwareTables
     /**
      * Determine if the given table exists.
      *
-     * @param string $table
-     *
+     * @param  string  $table
      * @return bool
      */
     public function hasTable($table)
     {
         [, $schema, $table] = $this->parseSchemaAndTable($table);
 
-        $table = $this->connection->getTablePrefix() . $table;
+        $table = $this->connection->getTablePrefix().$table;
 
         foreach ($this->getTables() as $value) {
             if (strtolower($table) === strtolower($value['name']) &&
@@ -51,8 +48,7 @@ trait UsesSchemaAwareTables
     /**
      * Parse the database object reference and extract the database, schema, and table.
      *
-     * @param string $reference
-     *
+     * @param  string  $reference
      * @return array
      */
     protected function parseSchemaAndTable($reference)

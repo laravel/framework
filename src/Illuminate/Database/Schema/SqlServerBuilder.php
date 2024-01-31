@@ -85,19 +85,7 @@ class SqlServerBuilder extends Builder
     }
 
     /**
-     * Get the schemas for the connection.
-     *
-     * @return array
-     */
-    protected function getSchemas()
-    {
-        return $this->parseSearchPath(
-            $this->connection->getConfig('search_path') ?: $this->connection->getConfig('schema') ?: 'public'
-        );
-    }
-
-    /**
-     * Get the default schema for the connection
+     * Get the default schema for the connection.
      *
      * @return string
      */
@@ -105,6 +93,4 @@ class SqlServerBuilder extends Builder
     {
         return $this->connection->getConfig('default_schema') ?: 'dbo';
     }
-
-
 }
