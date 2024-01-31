@@ -48,95 +48,154 @@ class DatabasePostgresBuilderTest extends TestCase
 
     public function testHasTableWhenSchemaUnqualifiedAndSearchPathMissing()
     {
+        $tables = [
+            ["name" => "foo", "schema"=>"public"]
+        ];
+
         $connection = $this->getConnection();
         $connection->shouldReceive('getConfig')->with('search_path')->andReturn(null);
         $connection->shouldReceive('getConfig')->with('schema')->andReturn(null);
         $grammar = m::mock(PostgresGrammar::class);
         $connection->shouldReceive('getSchemaGrammar')->once()->andReturn($grammar);
-        $grammar->shouldReceive('compileTableExists')->andReturn("select * from information_schema.tables where table_catalog = ? and table_schema = ? and table_name = ? and table_type = 'BASE TABLE'");
-        $connection->shouldReceive('selectFromWriteConnection')->with("select * from information_schema.tables where table_catalog = ? and table_schema = ? and table_name = ? and table_type = 'BASE TABLE'", ['laravel', 'public', 'foo'])->andReturn(['countable_result']);
+
+        $processor = m::mock(PostgresProcessor::class);
+        $connection->shouldReceive('getPostProcessor')->andReturn($processor);
+        $processor->shouldReceive('processTables')->andReturn($tables);
+        $grammar->shouldReceive('compileTables')->andReturn('sql');
+        $connection->shouldReceive('selectFromWriteConnection')->with('sql')->andReturn($tables);
+
         $connection->shouldReceive('getTablePrefix');
         $connection->shouldReceive('getConfig')->with('database')->andReturn('laravel');
         $builder = $this->getBuilder($connection);
 
-        $builder->hasTable('foo');
+        $this->assertTrue($builder->hasTable('foo'));
+        $this->assertFalse($builder->hasTable('bar'));
     }
 
     public function testHasTableWhenSchemaUnqualifiedAndSearchPathFilled()
     {
+        $tables = [
+            ["name" => "foo", "schema"=>"myapp"]
+        ];
         $connection = $this->getConnection();
         $connection->shouldReceive('getConfig')->with('search_path')->andReturn('myapp,public');
         $grammar = m::mock(PostgresGrammar::class);
         $connection->shouldReceive('getSchemaGrammar')->once()->andReturn($grammar);
-        $grammar->shouldReceive('compileTableExists')->andReturn("select * from information_schema.tables where table_catalog = ? and table_schema = ? and table_name = ? and table_type = 'BASE TABLE'");
-        $connection->shouldReceive('selectFromWriteConnection')->with("select * from information_schema.tables where table_catalog = ? and table_schema = ? and table_name = ? and table_type = 'BASE TABLE'", ['laravel', 'myapp', 'foo'])->andReturn(['countable_result']);
+
+        $processor = m::mock(PostgresProcessor::class);
+        $connection->shouldReceive('getPostProcessor')->andReturn($processor);
+        $processor->shouldReceive('processTables')->andReturn($tables);
+        $grammar->shouldReceive('compileTables')->andReturn('sql');
+        $connection->shouldReceive('selectFromWriteConnection')->with('sql')->andReturn($tables);
+
         $connection->shouldReceive('getTablePrefix');
         $connection->shouldReceive('getConfig')->with('database')->andReturn('laravel');
         $builder = $this->getBuilder($connection);
 
-        $builder->hasTable('foo');
+        $this->assertTrue($builder->hasTable('foo'));
+        $this->assertFalse($builder->hasTable('bar'));
     }
 
     public function testHasTableWhenSchemaUnqualifiedAndSearchPathFallbackFilled()
     {
+        $tables = [
+            ["name" => "foo", "schema"=>"myapp"]
+        ];
         $connection = $this->getConnection();
         $connection->shouldReceive('getConfig')->with('search_path')->andReturn(null);
         $connection->shouldReceive('getConfig')->with('schema')->andReturn(['myapp', 'public']);
         $grammar = m::mock(PostgresGrammar::class);
         $connection->shouldReceive('getSchemaGrammar')->once()->andReturn($grammar);
-        $grammar->shouldReceive('compileTableExists')->andReturn("select * from information_schema.tables where table_catalog = ? and table_schema = ? and table_name = ? and table_type = 'BASE TABLE'");
-        $connection->shouldReceive('selectFromWriteConnection')->with("select * from information_schema.tables where table_catalog = ? and table_schema = ? and table_name = ? and table_type = 'BASE TABLE'", ['laravel', 'myapp', 'foo'])->andReturn(['countable_result']);
+
+        $processor = m::mock(PostgresProcessor::class);
+        $connection->shouldReceive('getPostProcessor')->andReturn($processor);
+        $processor->shouldReceive('processTables')->andReturn($tables);
+        $grammar->shouldReceive('compileTables')->andReturn('sql');
+        $connection->shouldReceive('selectFromWriteConnection')->with('sql')->andReturn($tables);
+
         $connection->shouldReceive('getTablePrefix');
         $connection->shouldReceive('getConfig')->with('database')->andReturn('laravel');
         $builder = $this->getBuilder($connection);
 
-        $builder->hasTable('foo');
+        $this->assertTrue($builder->hasTable('foo'));
+        $this->assertFalse($builder->hasTable('bar'));
     }
 
     public function testHasTableWhenSchemaUnqualifiedAndSearchPathIsUserVariable()
     {
+        $tables = [
+            ["name" => "foo", "schema"=>"foouser"]
+        ];
+
         $connection = $this->getConnection();
         $connection->shouldReceive('getConfig')->with('username')->andReturn('foouser');
         $connection->shouldReceive('getConfig')->with('search_path')->andReturn('$user');
         $grammar = m::mock(PostgresGrammar::class);
         $connection->shouldReceive('getSchemaGrammar')->once()->andReturn($grammar);
-        $grammar->shouldReceive('compileTableExists')->andReturn("select * from information_schema.tables where table_catalog = ? and table_schema = ? and table_name = ? and table_type = 'BASE TABLE'");
-        $connection->shouldReceive('selectFromWriteConnection')->with("select * from information_schema.tables where table_catalog = ? and table_schema = ? and table_name = ? and table_type = 'BASE TABLE'", ['laravel', 'foouser', 'foo'])->andReturn(['countable_result']);
+
+        $processor = m::mock(PostgresProcessor::class);
+        $connection->shouldReceive('getPostProcessor')->andReturn($processor);
+        $processor->shouldReceive('processTables')->andReturn($tables);
+        $grammar->shouldReceive('compileTables')->andReturn('sql');
+        $connection->shouldReceive('selectFromWriteConnection')->with('sql')->andReturn($tables);
+
         $connection->shouldReceive('getTablePrefix');
         $connection->shouldReceive('getConfig')->with('database')->andReturn('laravel');
         $builder = $this->getBuilder($connection);
 
-        $builder->hasTable('foo');
+        $this->assertTrue($builder->hasTable('foo'));
+        $this->assertFalse($builder->hasTable('bar'));
     }
 
     public function testHasTableWhenSchemaQualifiedAndSearchPathMismatches()
     {
+        $tables = [
+            ["name" => "foo", "schema"=>"myapp"]
+        ];
+
         $connection = $this->getConnection();
         $connection->shouldReceive('getConfig')->with('search_path')->andReturn('public');
         $grammar = m::mock(PostgresGrammar::class);
         $connection->shouldReceive('getSchemaGrammar')->once()->andReturn($grammar);
-        $grammar->shouldReceive('compileTableExists')->andReturn("select * from information_schema.tables where table_catalog = ? and table_schema = ? and table_name = ? and table_type = 'BASE TABLE'");
-        $connection->shouldReceive('selectFromWriteConnection')->with("select * from information_schema.tables where table_catalog = ? and table_schema = ? and table_name = ? and table_type = 'BASE TABLE'", ['laravel', 'myapp', 'foo'])->andReturn(['countable_result']);
+
+        $processor = m::mock(PostgresProcessor::class);
+        $connection->shouldReceive('getPostProcessor')->andReturn($processor);
+        $processor->shouldReceive('processTables')->andReturn($tables);
+        $grammar->shouldReceive('compileTables')->andReturn('sql');
+        $connection->shouldReceive('selectFromWriteConnection')->with('sql')->andReturn($tables);
+
         $connection->shouldReceive('getTablePrefix');
         $connection->shouldReceive('getConfig')->with('database')->andReturn('laravel');
         $builder = $this->getBuilder($connection);
 
-        $builder->hasTable('myapp.foo');
+        $this->assertTrue($builder->hasTable('myapp.foo'));
+        $this->assertFalse($builder->hasTable('public.foo'));
     }
 
+    // this test may be unnecessary. Postgres does not allow to run queries over databases.
     public function testHasTableWhenDatabaseAndSchemaQualifiedAndSearchPathMismatches()
     {
+        $tables = [
+            ["name" => "foo", "schema"=>"myapp"]
+        ];
+
         $connection = $this->getConnection();
         $connection->shouldReceive('getConfig')->with('search_path')->andReturn('public');
         $grammar = m::mock(PostgresGrammar::class);
         $connection->shouldReceive('getSchemaGrammar')->once()->andReturn($grammar);
-        $grammar->shouldReceive('compileTableExists')->andReturn("select * from information_schema.tables where table_catalog = ? and table_schema = ? and table_name = ? and table_type = 'BASE TABLE'");
-        $connection->shouldReceive('selectFromWriteConnection')->with("select * from information_schema.tables where table_catalog = ? and table_schema = ? and table_name = ? and table_type = 'BASE TABLE'", ['mydatabase', 'myapp', 'foo'])->andReturn(['countable_result']);
+
+        $processor = m::mock(PostgresProcessor::class);
+        $connection->shouldReceive('getPostProcessor')->andReturn($processor);
+        $processor->shouldReceive('processTables')->andReturn($tables);
+        $grammar->shouldReceive('compileTables')->andReturn("sql");
+        $connection->shouldReceive('selectFromWriteConnection')->with('sql')->andReturn($tables);
+
         $connection->shouldReceive('getTablePrefix');
         $connection->shouldReceive('getConfig')->with('database')->andReturn('laravel');
         $builder = $this->getBuilder($connection);
 
-        $builder->hasTable('mydatabase.myapp.foo');
+        $this->assertTrue($builder->hasTable('mydatabase.myapp.foo'));
+        $this->assertFalse($builder->hasTable('mydatabase.laravel.foo'));
     }
 
     public function testGetColumnListingWhenSchemaUnqualifiedAndSearchPathMissing()

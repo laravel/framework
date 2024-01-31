@@ -40,106 +40,83 @@ class DatabaseSqlServerBuilderTest extends TestCase
         $builder->dropDatabaseIfExists('my_database_a');
     }
 
-    public function testHasTableWhenSchemaUnqualifiedAndDefaultSchemaFallback()
+    public function testHasTableDefaultSchemaFallback()
     {
+        $tables = [
+            ['name' => 'my_table1', 'schema' => 'dbo'],
+            ['name' => 'my_table1', 'schema' => 'my_schema'],
+            ['name' => 'my_table2', 'schema' => 'my_schema']
+        ];
+
         $connection = $this->getConnection();
-        $connection->shouldReceive('getConfig')->with('schema')->andReturn(null);
+        $connection->shouldReceive('getConfig')->with('default_schema')->andReturn(null);
         $grammar = m::mock(SqlServerGrammar::class);
         $connection->shouldReceive('getSchemaGrammar')->once()->andReturn($grammar);
-        $grammar->shouldReceive('compileTableExists')->andReturn(
-            "select * from information_schema.tables where table_catalog = ? and table_schema = ? and table_name = ? and table_type = 'BASE TABLE'"
-        );
-        $connection->shouldReceive('selectFromWriteConnection')->with(
-            "select * from information_schema.tables where table_catalog = ? and table_schema = ? and table_name = ? and table_type = 'BASE TABLE'",
-            ['laravel', 'dbo', 'foo']
-        )->andReturn(['countable_result']);
+        $grammar->shouldReceive('compileTables')->andReturn('sql');
+        $connection->shouldReceive('selectFromWriteConnection')->with("sql")->andReturn($tables);
         $connection->shouldReceive('getTablePrefix');
         $connection->shouldReceive('getConfig')->with('database')->andReturn('laravel');
         $connection->shouldReceive('getConfig')->with('default_schema')->andReturn(null);
+        $processor = m::mock(SqlServerProcessor::class);
+        $processor->shouldReceive('processTables')
+            ->with($tables)
+            ->andReturn($tables);
+        $connection->shouldReceive('getPostProcessor')->andReturn($processor);
         $builder = $this->getBuilder($connection);
 
-        $builder->hasTable('foo');
+        $this->assertFalse($builder->hasTable('foo'));
+        $this->assertFalse($builder->hasTable('[foo]'));
+        $this->assertFalse($builder->hasTable('my_table2'));
+        $this->assertFalse($builder->hasTable('my_schema.my_table3'));
+        $this->assertFalse($builder->hasTable('my_schema2.my_table1'));
+
+        $this->assertTrue($builder->hasTable('my_table1'));
+        $this->assertTrue($builder->hasTable('my_schema.my_table1'));
+        $this->assertTrue($builder->hasTable('dbo.my_table1'));
+        $this->assertTrue($builder->hasTable('my_schema.my_table2'));
+        $this->assertTrue($builder->hasTable('[my_schema].[my_table2]'));
+        $this->assertTrue($builder->hasTable('[dbo].my_table1'));
     }
 
-    public function testHasTableWhenSchemaUnqualifiedAndDefaultSchemaFilled()
+    public function testHasTableDefaultSchema()
     {
+        $tables = [
+            ['name' => 'my_table1', 'schema' => 'dbo'],
+            ['name' => 'my_table1', 'schema' => 'my_schema'],
+            ['name' => 'my_table2', 'schema' => 'my_schema'],
+            ['name' => 'my_table3', 'schema' => 'my_default_schema'],
+        ];
+
         $connection = $this->getConnection();
+        $connection->shouldReceive('getConfig')->with('default_schema')->andReturn("my_default_schema");
         $grammar = m::mock(SqlServerGrammar::class);
         $connection->shouldReceive('getSchemaGrammar')->once()->andReturn($grammar);
-        $grammar->shouldReceive('compileTableExists')->andReturn(
-            "select * from information_schema.tables where table_catalog = ? and table_schema = ? and table_name = ? and table_type = 'BASE TABLE'"
-        );
-        $connection->shouldReceive('selectFromWriteConnection')->with(
-            "select * from information_schema.tables where table_catalog = ? and table_schema = ? and table_name = ? and table_type = 'BASE TABLE'",
-            ['laravel', 'my_schema', 'foo']
-        )->andReturn(['countable_result']);
-        $connection->shouldReceive('getTablePrefix');
-        $connection->shouldReceive('getConfig')->with('database')->andReturn('laravel');
-        $connection->shouldReceive('getConfig')->with('default_schema')->andReturn('my_schema');
-        $builder = $this->getBuilder($connection);
-
-        $builder->hasTable('foo');
-    }
-
-    public function testHasTableWithQualifiedAndEscapedNames()
-    {
-        $connection = $this->getConnection();
-        $grammar = m::mock(SqlServerGrammar::class);
-        $connection->shouldReceive('getSchemaGrammar')->once()->andReturn($grammar);
-        $grammar->shouldReceive('compileTableExists')->andReturn(
-            "select * from information_schema.tables where table_catalog = ? and table_schema = ? and table_name = ? and table_type = 'BASE TABLE'"
-        );
-        $connection->shouldReceive('selectFromWriteConnection')->with(
-            "select * from information_schema.tables where table_catalog = ? and table_schema = ? and table_name = ? and table_type = 'BASE TABLE'",
-            ['laravel', 'my_schema', 'foo']
-        )->andReturn(['countable_result']);
+        $grammar->shouldReceive('compileTables')->andReturn('sql');
+        $connection->shouldReceive('selectFromWriteConnection')->with("sql")->andReturn($tables);
         $connection->shouldReceive('getTablePrefix');
         $connection->shouldReceive('getConfig')->with('database')->andReturn('laravel');
         $connection->shouldReceive('getConfig')->with('default_schema')->andReturn(null);
+        $processor = m::mock(SqlServerProcessor::class);
+        $processor->shouldReceive('processTables')
+            ->with($tables)
+            ->andReturn($tables);
+        $connection->shouldReceive('getPostProcessor')->andReturn($processor);
         $builder = $this->getBuilder($connection);
 
-        $this->assertTrue($builder->hasTable('[my_schema].[foo]'));
-    }
+        $this->assertFalse($builder->hasTable('foo'));
+        $this->assertFalse($builder->hasTable('[foo]'));
+        $this->assertFalse($builder->hasTable('my_table2'));
+        $this->assertFalse($builder->hasTable('my_schema.my_table3'));
+        $this->assertFalse($builder->hasTable('my_schema2.my_table1'));
+        $this->assertFalse($builder->hasTable('my_table1'));
 
-
-    public function testHasTableWhenSchemaQualifiedAndDefaultSchemaIsDifferent()
-    {
-        $connection = $this->getConnection();
-        $connection->shouldReceive('getConfig')->with('default_schema')->andReturn('my_default_schema');
-        $grammar = m::mock(SqlServerGrammar::class);
-        $connection->shouldReceive('getSchemaGrammar')->once()->andReturn($grammar);
-        $grammar->shouldReceive('compileTableExists')->andReturn(
-            "select * from information_schema.tables where table_catalog = ? and table_schema = ? and table_name = ? and table_type = 'BASE TABLE'"
-        );
-        $connection->shouldReceive('selectFromWriteConnection')->with(
-            "select * from information_schema.tables where table_catalog = ? and table_schema = ? and table_name = ? and table_type = 'BASE TABLE'",
-            ['laravel', 'my_schema', 'foo']
-        )->andReturn(['countable_result']);
-        $connection->shouldReceive('getTablePrefix');
-        $connection->shouldReceive('getConfig')->with('database')->andReturn('laravel');
-        $builder = $this->getBuilder($connection);
-
-        $builder->hasTable('my_schema.foo');
-    }
-
-    public function testHasTableWhenDatabaseAndSchemaQualifiedAndDefaultSchemaIsDifferent()
-    {
-        $connection = $this->getConnection();
-        $connection->shouldReceive('getConfig')->with('default_schema')->andReturn('my_default_schema');
-        $grammar = m::mock(SqlServerGrammar::class);
-        $connection->shouldReceive('getSchemaGrammar')->once()->andReturn($grammar);
-        $grammar->shouldReceive('compileTableExists')->andReturn(
-            "select * from information_schema.tables where table_catalog = ? and table_schema = ? and table_name = ? and table_type = 'BASE TABLE'"
-        );
-        $connection->shouldReceive('selectFromWriteConnection')->with(
-            "select * from information_schema.tables where table_catalog = ? and table_schema = ? and table_name = ? and table_type = 'BASE TABLE'",
-            ['mydatabase', 'my_schema', 'foo']
-        )->andReturn(['countable_result']);
-        $connection->shouldReceive('getTablePrefix');
-        $connection->shouldReceive('getConfig')->with('database')->andReturn('laravel');
-        $builder = $this->getBuilder($connection);
-
-        $builder->hasTable('mydatabase.my_schema.foo');
+        $this->assertTrue($builder->hasTable('my_schema.my_table1'));
+        $this->assertTrue($builder->hasTable('dbo.my_table1'));
+        $this->assertTrue($builder->hasTable('my_schema.my_table2'));
+        $this->assertTrue($builder->hasTable('[my_schema].[my_table2]'));
+        $this->assertTrue($builder->hasTable('[dbo].my_table1'));
+        $this->assertTrue($builder->hasTable('[my_default_schema].my_table3'));
+        $this->assertTrue($builder->hasTable('my_table3'));
     }
 
     public function testGetColumnListingWhenSchemaUnqualifiedAndDefaultSchemaMissing()

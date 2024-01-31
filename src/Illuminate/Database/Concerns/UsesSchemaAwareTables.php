@@ -8,14 +8,15 @@ trait UsesSchemaAwareTables
     /**
      * Get the columns for a given table.
      *
-     * @param  string  $table
+     * @param string $table
+     *
      * @return array
      */
     public function getColumns($table)
     {
         [$database, $schema, $table] = $this->parseSchemaAndTable($table);
 
-        $table = $this->connection->getTablePrefix().$table;
+        $table = $this->connection->getTablePrefix() . $table;
 
         $results = $this->connection->selectFromWriteConnection(
             $this->grammar->compileColumns($database, $schema, $table)
@@ -27,24 +28,31 @@ trait UsesSchemaAwareTables
     /**
      * Determine if the given table exists.
      *
-     * @param  string  $table
+     * @param string $table
+     *
      * @return bool
      */
     public function hasTable($table)
     {
-        [$database, $schema, $table] = $this->parseSchemaAndTable($table);
+        [, $schema, $table] = $this->parseSchemaAndTable($table);
 
-        $table = $this->connection->getTablePrefix().$table;
+        $table = $this->connection->getTablePrefix() . $table;
 
-        return count($this->connection->selectFromWriteConnection(
-                $this->grammar->compileTableExists(), [$database, $schema, $table]
-            )) > 0;
+        foreach ($this->getTables() as $value) {
+            if (strtolower($table) === strtolower($value['name']) &&
+                strtolower($schema) === strtolower($value['schema'])) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
      * Parse the database object reference and extract the database, schema, and table.
      *
-     * @param  string  $reference
+     * @param string $reference
+     *
      * @return array
      */
     protected function parseSchemaAndTable($reference)
@@ -54,7 +62,7 @@ trait UsesSchemaAwareTables
         // In order to be fully backward compatibel with previous version where users
         // may have used square brackets with the identifiers in SQLServer grammar
         // e.g. "schema.[table1]". We shall trim the parts for their occurrence.
-        $parts = array_map(function($part) {
+        $parts = array_map(function ($part) {
             return trim($part, '[]');
         }, $parts);
 
