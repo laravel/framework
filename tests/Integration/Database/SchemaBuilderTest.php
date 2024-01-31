@@ -131,6 +131,83 @@ class SchemaBuilderTest extends DatabaseTestCase
         $this->assertEquals(collect(Schema::getColumns('test'))->firstWhere('name', 'new_bar')['default'], $defaultBar);
     }
 
+    public function testCompoundPrimaryWithAutoIncrement()
+    {
+        if ($this->driver === 'sqlite') {
+            $this->markTestSkipped('Compound primary key with an auto increment column is not supported on SQLite.');
+        }
+
+        Schema::create('test', function (Blueprint $table) {
+            $table->id();
+            $table->uuid();
+
+            $table->primary(['id', 'uuid']);
+        });
+
+        $this->assertTrue(collect(Schema::getColumns('test'))->firstWhere('name', 'id')['auto_increment']);
+        $this->assertTrue(Schema::hasIndex('test', ['id', 'uuid'], 'primary'));
+    }
+
+    public function testModifyingAutoIncrementColumn()
+    {
+        if ($this->driver === 'sqlsrv') {
+            $this->markTestSkipped('Changing a primary column is not supported on SQL Server.');
+        }
+
+        Schema::create('test', function (Blueprint $table) {
+            $table->increments('id');
+        });
+
+        $this->assertTrue(collect(Schema::getColumns('test'))->firstWhere('name', 'id')['auto_increment']);
+        $this->assertTrue(Schema::hasIndex('test', ['id'], 'primary'));
+
+        Schema::table('test', function (Blueprint $table) {
+            $table->bigIncrements('id')->change();
+        });
+
+        $this->assertTrue(collect(Schema::getColumns('test'))->firstWhere('name', 'id')['auto_increment']);
+        $this->assertTrue(Schema::hasIndex('test', ['id'], 'primary'));
+    }
+
+    public function testModifyingColumnToAutoIncrementColumn()
+    {
+        if (in_array($this->driver, ['pgsql', 'sqlsrv'])) {
+            $this->markTestSkipped('Changing a column to auto increment is not supported on PostgreSQL and SQL Server.');
+        }
+
+        Schema::create('test', function (Blueprint $table) {
+            $table->unsignedBigInteger('id');
+        });
+
+        $this->assertFalse(collect(Schema::getColumns('test'))->firstWhere('name', 'id')['auto_increment']);
+        $this->assertFalse(Schema::hasIndex('test', ['id'], 'primary'));
+
+        Schema::table('test', function (Blueprint $table) {
+            $table->bigIncrements('id')->primary()->change();
+        });
+
+        $this->assertTrue(collect(Schema::getColumns('test'))->firstWhere('name', 'id')['auto_increment']);
+        $this->assertTrue(Schema::hasIndex('test', ['id'], 'primary'));
+    }
+
+    public function testAddingAutoIncrementColumn()
+    {
+        if ($this->driver === 'sqlite') {
+            $this->markTestSkipped('Adding a primary column is not supported on SQLite.');
+        }
+
+        Schema::create('test', function (Blueprint $table) {
+            $table->string('name');
+        });
+
+        Schema::table('test', function (Blueprint $table) {
+            $table->bigIncrements('id')->primary;
+        });
+
+        $this->assertTrue(collect(Schema::getColumns('test'))->firstWhere('name', 'id')['auto_increment']);
+        $this->assertTrue(Schema::hasIndex('test', ['id'], 'primary'));
+    }
+
     public function testGetTables()
     {
         Schema::create('foo', function (Blueprint $table) {

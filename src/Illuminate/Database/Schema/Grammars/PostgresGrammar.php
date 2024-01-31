@@ -731,7 +731,7 @@ class PostgresGrammar extends Grammar
      */
     protected function typeInteger(Fluent $column)
     {
-        return $column->autoIncrement && is_null($column->generatedAs) ? 'serial' : 'integer';
+        return $column->autoIncrement && is_null($column->generatedAs) && ! $column->change ? 'serial' : 'integer';
     }
 
     /**
@@ -742,7 +742,7 @@ class PostgresGrammar extends Grammar
      */
     protected function typeBigInteger(Fluent $column)
     {
-        return $column->autoIncrement && is_null($column->generatedAs) ? 'bigserial' : 'bigint';
+        return $column->autoIncrement && is_null($column->generatedAs) && ! $column->change ? 'bigserial' : 'bigint';
     }
 
     /**
@@ -775,7 +775,7 @@ class PostgresGrammar extends Grammar
      */
     protected function typeSmallInteger(Fluent $column)
     {
-        return $column->autoIncrement && is_null($column->generatedAs) ? 'smallserial' : 'smallint';
+        return $column->autoIncrement && is_null($column->generatedAs) && ! $column->change ? 'smallserial' : 'smallint';
     }
 
     /**
@@ -1090,7 +1090,9 @@ class PostgresGrammar extends Grammar
     protected function modifyDefault(Blueprint $blueprint, Fluent $column)
     {
         if ($column->change) {
-            return is_null($column->default) ? 'drop default' : 'set default '.$this->getDefaultValue($column->default);
+            if (! $column->autoIncrement || ! is_null($column->generatedAs)) {
+                return is_null($column->default) ? 'drop default' : 'set default '.$this->getDefaultValue($column->default);
+            }
         }
 
         if (! is_null($column->default)) {
@@ -1108,6 +1110,7 @@ class PostgresGrammar extends Grammar
     protected function modifyIncrement(Blueprint $blueprint, Fluent $column)
     {
         if (! $column->change
+            && ! $this->hasCommand($blueprint, 'primary')
             && (in_array($column->type, $this->serials) || ($column->generatedAs !== null))
             && $column->autoIncrement) {
             return ' primary key';
@@ -1182,7 +1185,7 @@ class PostgresGrammar extends Grammar
         }
 
         if ($column->change) {
-            $changes = ['drop identity if exists'];
+            $changes = $column->autoIncrement && is_null($sql) ? [] : ['drop identity if exists'];
 
             if (! is_null($sql)) {
                 $changes[] = 'add '.$sql;

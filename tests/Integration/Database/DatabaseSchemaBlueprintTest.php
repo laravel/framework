@@ -103,7 +103,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
             ."modify `difficulty` enum('easy', 'hard') character set utf8mb4 collate 'unicode' not null default 'easy', "
             .'modify `positions` multipolygon srid 1234 as (expression) stored, '
             .'change `old_name` `new_name` varchar(50) not null, '
-            ."modify `id` bigint unsigned not null auto_increment primary key comment 'my comment' first",
+            ."modify `id` bigint unsigned not null auto_increment comment 'my comment' first",
             'alter table `users` auto_increment = 10',
         ], $blueprint->toSql($connection, new MySqlGrammar));
     }
@@ -119,10 +119,8 @@ class DatabaseSchemaBlueprintTest extends TestCase
 
         $this->assertEquals([
             'alter table "users" '
-            .'alter column "code" type serial, '
-            .'alter column "code" set not null, '
-            .'alter column "code" drop default, '
-            .'alter column "code" drop identity if exists',
+            .'alter column "code" type integer, '
+            .'alter column "code" set not null',
             'alter sequence users_code_seq restart with 10',
             'comment on column "users"."code" is \'my comment\'',
         ], $blueprint->toSql($connection, new PostgresGrammar));
