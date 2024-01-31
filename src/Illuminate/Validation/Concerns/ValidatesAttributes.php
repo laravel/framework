@@ -2633,7 +2633,7 @@ trait ValidatesAttributes
     /**
      * Register a binding with the container.
      *
-     * @param  string $attribute
+     * @param  string  $attribute
      * @param  mixed  $value
      * @return bool
      */
