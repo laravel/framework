@@ -954,7 +954,7 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     }
 
     /**
-     * Get the values for the specified keys from an array.
+     * Select specific values from the items within the collection.
      *
      * @param  \Illuminate\Support\Enumerable<array-key, TKey>|array<array-key, TKey>|string  $keys
      * @return static
@@ -973,6 +973,7 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
             } else {
                 foreach ($this as $item) {
                     $itemKeys = array_flip($keys);
+
                     $result = [];
 
                     foreach ($item as $key => $value) {
