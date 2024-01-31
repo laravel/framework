@@ -117,8 +117,10 @@ class ModelMakeCommandTest extends TestCase
         $this->assertMigrationFileContains([
             'use Illuminate\Database\Migrations\Migration;',
             'return new class extends Migration',
-            'Schema::create(\'foos\', function (Blueprint $table) {',
-            'Schema::dropIfExists(\'foos\');',
+            'function getTable()',
+            'return \'foos\'',
+            'Schema::create($this->getTable(), function (Blueprint $table) {',
+            'Schema::dropIfExists($this->getTable());',
         ], 'create_foos_table.php');
 
         $this->assertFilenameNotExists('app/Http/Controllers/FooController.php');

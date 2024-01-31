@@ -12,7 +12,9 @@ class MigrateMakeCommandTest extends TestCase
         $this->assertMigrationFileContains([
             'use Illuminate\Database\Migrations\Migration;',
             'return new class extends Migration',
-            'Schema::table(\'foos\', function (Blueprint $table) {',
+            'function getTable()',
+            'return \'foos\'',
+            'Schema::table($this->getTable(), function (Blueprint $table) {',
         ], 'add_bar_to_foos_table.php');
     }
 
@@ -24,7 +26,9 @@ class MigrateMakeCommandTest extends TestCase
         $this->assertMigrationFileContains([
             'use Illuminate\Database\Migrations\Migration;',
             'return new class extends Migration',
-            'Schema::table(\'foobar\', function (Blueprint $table) {',
+            'function getTable()',
+            'return \'foobar\'',
+            'Schema::table($this->getTable(), function (Blueprint $table) {',
         ], 'add_bar_to_foos_table.php');
     }
 
@@ -36,8 +40,10 @@ class MigrateMakeCommandTest extends TestCase
         $this->assertMigrationFileContains([
             'use Illuminate\Database\Migrations\Migration;',
             'return new class extends Migration',
-            'Schema::create(\'foos\', function (Blueprint $table) {',
-            'Schema::dropIfExists(\'foos\');',
+            'function getTable()',
+            'return \'foos\'',
+            'Schema::create($this->getTable(), function (Blueprint $table) {',
+            'Schema::dropIfExists($this->getTable());',
         ], 'create_foos_table.php');
     }
 
@@ -49,8 +55,10 @@ class MigrateMakeCommandTest extends TestCase
         $this->assertMigrationFileContains([
             'use Illuminate\Database\Migrations\Migration;',
             'return new class extends Migration',
-            'Schema::create(\'foobar\', function (Blueprint $table) {',
-            'Schema::dropIfExists(\'foobar\');',
+            'function getTable()',
+            'return \'foobar\'',
+            'Schema::create($this->getTable(), function (Blueprint $table) {',
+            'Schema::dropIfExists($this->getTable());',
         ], 'foos_table.php');
     }
 }
