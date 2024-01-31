@@ -48,7 +48,7 @@ class MessageSelector
     }
 
     /**
-     * The regex for the condition part of a segment
+     * The regex for the condition part of a segment.
      *
      * @return string
      */
@@ -80,7 +80,7 @@ class MessageSelector
      */
     private function extractFromString($part, $number)
     {
-        if(preg_match('/' . $this->conditionRegex() . '(?<value>.*)/sJ', $part, $matches) == false) {
+        if(preg_match('/'.$this->conditionRegex().'(?<value>.*)/sJ', $part, $matches) == false) {
             return null;
         }
 
@@ -111,7 +111,7 @@ class MessageSelector
     private function stripConditions($segments)
     {
         return collect($segments)
-            ->map(fn ($part) => preg_replace('/' . $this->conditionRegex() . '/J', '', $part))
+            ->map(fn ($part) => preg_replace('/'.$this->conditionRegex().'/J', '', $part))
             ->all();
     }
 
