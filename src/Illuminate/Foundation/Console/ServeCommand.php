@@ -140,17 +140,12 @@ class ServeCommand extends Command
             return in_array($key, static::$passthroughVariables) ? [$key => $value] : [$key => false];
         })->all());
 
-        if (function_exists('pcntl_signal')) {
-            $cleanup = function ($signo) use ($process) {
-                if ($process->isRunning()) {
-                    $process->stop(10, $signo);
-                }
-                exit;
-            };
-            pcntl_signal(SIGINT, $cleanup);
-            pcntl_signal(SIGTERM, $cleanup);
-            pcntl_signal(SIGHUP, $cleanup);
-        }
+        $this->trap([SIGTERM, SIGINT, SIGHUP, SIGUSR1, SIGUSR2, SIGQUIT], function ($signo) use ($process) {
+            if ($process->isRunning()) {
+                $process->stop(10, $signo);
+            }
+            exit;
+        });
 
         $process->start($this->handleProcessOutput());
 
