@@ -3423,7 +3423,7 @@ class Builder implements BuilderContract
 
             [$query, $bindings] = $this->parseSub($value);
 
-            return ['value' => new Expression("({$query})"), 'bindings' => $bindings];
+            return ['value' => new Expression("({$query})"), 'bindings' => fn () => $bindings];
         });
 
         $sql = $this->grammar->compileUpdate($this, $values->map(fn ($value) => $value['value'])->all());

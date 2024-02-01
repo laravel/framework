@@ -1183,6 +1183,8 @@ class Grammar extends BaseGrammar
     {
         $cleanBindings = Arr::except($bindings, ['select', 'join']);
 
+        $values = Arr::flatten(array_map(fn ($value) => value($value), $values));
+
         return array_values(
             array_merge($bindings['join'], $values, Arr::flatten($cleanBindings))
         );
