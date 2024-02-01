@@ -83,4 +83,17 @@ class TranslatorTest extends TestCase
 
         $this->app['translator']->handleMissingKeysUsing(null);
     }
+
+    public function testValidatorDoesntTriggerMissingKeys(): void
+    {
+        $_SERVER['__missing_translation_key_locale'] = [];
+
+        $this->app['translator']->handleMissingKeysUsing(function ($key, $replacements, $locale): void {
+            $_SERVER['__missing_translation_key_locale'][] = $key;
+        });
+
+        $this->app['validator']->make(['foo' => 'bar'], ['baz' => 'required'])->passes();
+
+        $this->assertEquals([], $_SERVER['__missing_translation_key_locale']);
+    }
 }
