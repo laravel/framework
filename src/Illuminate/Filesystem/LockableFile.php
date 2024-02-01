@@ -55,7 +55,7 @@ class LockableFile
         $dir = dirname($path);
 
         clearstatcache(true, $dir);
-        
+
         if (! is_dir($dir)) {
             mkdir($dir, 0777, true);
         }
