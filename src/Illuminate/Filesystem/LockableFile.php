@@ -47,11 +47,17 @@ class LockableFile
      *
      * @param  string  $path
      * @return void
+     *
+     * @throws \Exception
      */
     protected function ensureDirectoryExists($path)
     {
-        if (! file_exists(dirname($path))) {
-            @mkdir(dirname($path), 0777, true);
+        $dir = dirname($path);
+
+        clearstatcache(true, $dir);
+        
+        if (! is_dir($dir)) {
+            mkdir($dir, 0777, true);
         }
     }
 
