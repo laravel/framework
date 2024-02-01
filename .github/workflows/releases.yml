@@ -51,15 +51,14 @@ jobs:
 
       - name: Cleanup release notes
         run: |
-          sed -i '/## What\'\''s Changed/q' ${{ steps.notes.outputs.release-notes }}
-          sed -i '/## Contributors/,$d' ${{ steps.notes.outputs.release-notes }}
+          sed -i '/## What'"'"'s Changed/d' ${{ steps.notes.outputs.release-notes }}
+          sed -i '/## New Contributors/,//d' ${{ steps.notes.outputs.release-notes }}
 
       - name: Create release
-        id: create_release
-        uses: actions/create-release@v1
+        uses:  softprops/action-gh-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: v${{ steps.version.outputs.version }}
-          release_name: v${{ steps.version.outputs.version }}
+          name: v${{ steps.version.outputs.version }}
           body: ${{ steps.notes.outputs.release-notes }}
