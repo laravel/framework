@@ -19,7 +19,7 @@ class DatabasePostgresSchemaBuilderTest extends TestCase
     public function testHasTable()
     {
         $tables = [
-            ["name" => "prefix_table", "schema" => 'public'],
+            ["name" => 'prefix_table', "schema" => 'public'],
         ];
 
         $connection = m::mock(Connection::class);
