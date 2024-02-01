@@ -3491,7 +3491,7 @@ class Builder implements BuilderContract
 
         $values = collect($values)->map(function ($value) {
             if (! $value instanceof Builder) {
-                return ['value' => $value, 'bindings' => [$value]];
+                return ['value' => $value, 'bindings' => $value];
             }
 
             [$query, $bindings] = $this->parseSub($value);
@@ -3502,7 +3502,7 @@ class Builder implements BuilderContract
         $sql = $this->grammar->compileUpdate($this, $values->map(fn ($value) => $value['value'])->all());
 
         return $this->connection->update($sql, $this->cleanBindings(
-            $this->grammar->prepareBindingsForUpdate($this->bindings, $values->pluck('bindings')->flatten(1)->all())
+            $this->grammar->prepareBindingsForUpdate($this->bindings, $values->map(fn ($value) => $value['bindings'])->all())
         ));
     }
 
