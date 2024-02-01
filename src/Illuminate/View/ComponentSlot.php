@@ -60,10 +60,13 @@ class ComponentSlot implements Htmlable
     /**
      * Determine if the slot is empty.
      *
+     * HTML comments and whitespace will be trimmed out.
+     *
      * @return bool
      */
     public function isEmpty()
     {
+        // replace everything between <!-- and --> with empty string
         return trim(preg_replace('/<!--([\s\S]*?)-->/', '', $this->contents)) === '';
     }
 
