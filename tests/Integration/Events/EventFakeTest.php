@@ -166,6 +166,14 @@ class EventFakeTest extends TestCase
 
         Post::observe(new PostObserver);
 
+        Post::listen('*', function (){
+            // do something
+        });
+
+        Post::listen(['saved', 'deleted'], function (){
+            // do something
+        });
+
         (new Post)->save();
 
         Event::assertListening('event', 'listener');
@@ -177,6 +185,9 @@ class EventFakeTest extends TestCase
         Event::assertListening(NonImportantEvent::class, Closure::class);
         Event::assertListening('eloquent.saving: '.Post::class, PostObserver::class.'@saving');
         Event::assertListening('eloquent.saving: '.Post::class, [PostObserver::class, 'saving']);
+        Event::assertListening('eloquent.created: '.Post::class, Closure::class);
+        Event::assertListening('eloquent.saved: '.Post::class, Closure::class);
+        Event::assertListening('eloquent.deleted: '.Post::class, Closure::class);
         Event::assertListening('event', InvokableEventSubscriber::class);
     }
 

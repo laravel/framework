@@ -228,6 +228,24 @@ trait HasEvents
     }
 
     /**
+     * Register events with the dispatcher.
+     *
+     * @param  array|string  $events
+     * @param  \Illuminate\Events\QueuedClosure|\Closure|string|array  $callback
+     * @return void
+     */
+    public static function listen($events, $callback)
+    {
+        if ($events === '*') {
+            $events = (new static)->getObservableEvents();
+        }
+
+        foreach (Arr::wrap($events) as $event) {
+            static::registerModelEvent($event, $callback);
+        }
+    }
+
+    /**
      * Register a retrieved model event with the dispatcher.
      *
      * @param  \Illuminate\Events\QueuedClosure|\Closure|string|array  $callback
