@@ -166,11 +166,11 @@ class EventFakeTest extends TestCase
 
         Post::observe(new PostObserver);
 
-        Post::listen('*', function (){
+        Post::listen('*', function () {
             // do something
         });
 
-        Post::listen(['saved', 'deleted'], function (){
+        Post::listen(['saved', 'deleted'], function () {
             // do something
         });
 
