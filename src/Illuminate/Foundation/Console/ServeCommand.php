@@ -89,6 +89,18 @@ class ServeCommand extends Command
 
         $process = $this->startProcess($hasEnvironment);
 
+        if (function_exists('pcntl_signal')) {
+            $cleanup = function ($signo) use ($process) {
+                if ($process->isRunning()) {
+                    $process->stop(10, $signo);
+                }
+                exit();
+            };
+            pcntl_signal(SIGINT, $cleanup);
+            pcntl_signal(SIGTERM, $cleanup);
+            pcntl_signal(SIGHUP, $cleanup);
+        }
+        
         while ($process->isRunning()) {
             if ($hasEnvironment) {
                 clearstatcache(false, $environmentFile);
