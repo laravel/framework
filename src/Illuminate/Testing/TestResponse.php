@@ -26,6 +26,7 @@ use LogicException;
 use PHPUnit\Framework\ExpectationFailedException;
 use ReflectionProperty;
 use Symfony\Component\HttpFoundation\Cookie;
+use Symfony\Component\HttpFoundation\StreamedJsonResponse;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
@@ -529,6 +530,17 @@ class TestResponse implements ArrayAccess
         PHPUnit::assertSame($value, $this->streamedContent());
 
         return $this;
+    }
+
+    /**
+     * Assert that the given array matches the streamed JSON response content.
+     *
+     * @param  array  $value
+     * @return $this
+     */
+    public function assertStreamedJsonContent($value)
+    {
+        return $this->assertStreamedContent(json_encode($value, JSON_THROW_ON_ERROR));
     }
 
     /**
@@ -1564,7 +1576,8 @@ class TestResponse implements ArrayAccess
             return $this->streamedContent;
         }
 
-        if (! $this->baseResponse instanceof StreamedResponse) {
+        if (! $this->baseResponse instanceof StreamedResponse
+            && ! $this->baseResponse instanceof StreamedJsonResponse) {
             PHPUnit::fail('The response is not a streamed response.');
         }
 

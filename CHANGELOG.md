@@ -1,6 +1,35 @@
 # Release Notes for 10.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v10.42.0...10.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v10.43.0...10.x)
+
+## [v10.43.0](https://github.com/laravel/framework/compare/v10.42.0...v10.43.0) - 2024-01-30
+
+* [10.x] Add storage:unlink command by [@salkovmx](https://github.com/salkovmx) in https://github.com/laravel/framework/pull/49795
+* [10.x] Unify `\Illuminate\Log\LogManager` method definition comments with `\Psr\Logger\Interface` by [@eusonlito](https://github.com/eusonlito) in https://github.com/laravel/framework/pull/49805
+* [10.x] class-name string argument for global scopes by [@emargareten](https://github.com/emargareten) in https://github.com/laravel/framework/pull/49802
+* [10.x] Add `hasIndex()` and minor Schema enhancements by [@hafezdivandari](https://github.com/hafezdivandari) in https://github.com/laravel/framework/pull/49796
+* [10.x] Do not touch `BelongsToMany` relation when using `withoutTouching` by [@mateusjunges](https://github.com/mateusjunges) in https://github.com/laravel/framework/pull/49798
+* [10.x] Check properties on mailables are initialized before sharing with the view by [@j3j5](https://github.com/j3j5) in https://github.com/laravel/framework/pull/49813
+* [10.x] Remove duplicate actions/checkout from queue workflow by [@Jubeki](https://github.com/Jubeki) in https://github.com/laravel/framework/pull/49828
+* [10.x] Add `insertOrIgnoreUsing` for Eloquent by [@trovster](https://github.com/trovster) in https://github.com/laravel/framework/pull/49827
+* [10.x] Make `hasIndex()` Order-sensitive  by [@hafezdivandari](https://github.com/hafezdivandari) in https://github.com/laravel/framework/pull/49840
+* [10.x] Release action by [@driesvints](https://github.com/driesvints) in https://github.com/laravel/framework/pull/49838
+* [10.x] Add MariaDb1060Platform by [@driesvints](https://github.com/driesvints) in https://github.com/laravel/framework/pull/49848
+* [10.x] Unified Pivot and Model Doc Block `$guarded` by [@eusonlito](https://github.com/eusonlito) in https://github.com/laravel/framework/pull/49851
+* [10.x] Introducing `beforeStartingTransaction` callback and use it in `LazilyRefreshDatabase` by [@pascalbaljet](https://github.com/pascalbaljet) in https://github.com/laravel/framework/pull/49853
+* [10.x] fix password max validation message by [@MrPunyapal](https://github.com/MrPunyapal) in https://github.com/laravel/framework/pull/49861
+* [10.x] Fix validation message used for max file size by [@mateusjunges](https://github.com/mateusjunges) in https://github.com/laravel/framework/pull/49879
+* Update README.md by [@foremtehan](https://github.com/foremtehan) in https://github.com/laravel/framework/pull/49878
+* [10.x] Adds `FormRequest[@getRules](https://github.com/getRules)()` method by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/49860
+* [10.x] add addGlobalScopes method by [@emargareten](https://github.com/emargareten) in https://github.com/laravel/framework/pull/49880
+* [10.x] Allow brick/math 0.12 by [@LogicSatinn](https://github.com/LogicSatinn) in https://github.com/laravel/framework/pull/49883
+* [10.x] Add support for streamed JSON Response by [@pelmered](https://github.com/pelmered) in https://github.com/laravel/framework/pull/49873
+* [10.x] Using the native fopen exception in LockableFile.php by [@eusonlito](https://github.com/eusonlito) in https://github.com/laravel/framework/pull/49895
+* [10.x] Fix LazilyRefreshDatabase when testing artisan commands by [@iamgergo](https://github.com/iamgergo) in https://github.com/laravel/framework/pull/49914
+* [10.x] Fix expressions in with-functions doing aggregates by [@tpetry](https://github.com/tpetry) in https://github.com/laravel/framework/pull/49912
+* [10.x] Fix redis tag entries never becoming stale if cache ttl is past time by [@jagers](https://github.com/jagers) in https://github.com/laravel/framework/pull/49864
+* [10.x] Fix - The `Translator` may incorrectly report the locale of a missing translation key by [@VicGUTT](https://github.com/VicGUTT) in https://github.com/laravel/framework/pull/49900
+* [10.x] fix Before/After validation rules by [@MrPunyapal](https://github.com/MrPunyapal) in https://github.com/laravel/framework/pull/49871
 
 ## [v10.42.0](https://github.com/laravel/framework/compare/v10.41.0...v10.42.0) - 2024-01-23
 

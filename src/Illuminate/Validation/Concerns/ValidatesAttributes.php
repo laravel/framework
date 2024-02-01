@@ -253,13 +253,13 @@ trait ValidatesAttributes
         }
 
         if (is_null($date = $this->getDateTimestamp($parameters[0]))) {
-            $secondValue = $this->getValue($parameters[0]);
+            $comparedValue = $this->getValue($parameters[0]);
 
-            if (! is_null($secondValue) && ! is_string($secondValue) && ! is_numeric($secondValue) && ! $secondValue instanceof DateTimeInterface) {
+            if (! is_null($comparedValue) && ! is_string($comparedValue) && ! is_numeric($comparedValue) && ! $comparedValue instanceof DateTimeInterface) {
                 return false;
             }
 
-            $date = $this->getDateTimestamp($secondValue);
+            $date = $this->getDateTimestamp($comparedValue);
         }
 
         return $this->compare($this->getDateTimestamp($value), $date, $operator);

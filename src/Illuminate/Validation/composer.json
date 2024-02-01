@@ -17,7 +17,7 @@
         "php": "^8.1",
         "ext-filter": "*",
         "ext-mbstring": "*",
-        "brick/math": "^0.9.3|^0.10.2|^0.11",
+        "brick/math": "^0.9.3|^0.10.2|^0.11|^0.12",
         "egulias/email-validator": "^3.2.5|^4.0",
         "illuminate/collections": "^10.0",
         "illuminate/container": "^10.0",
