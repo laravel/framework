@@ -94,13 +94,13 @@ class ServeCommand extends Command
                 if ($process->isRunning()) {
                     $process->stop(10, $signo);
                 }
-                exit();
+                exit;
             };
             pcntl_signal(SIGINT, $cleanup);
             pcntl_signal(SIGTERM, $cleanup);
             pcntl_signal(SIGHUP, $cleanup);
         }
-        
+
         while ($process->isRunning()) {
             if ($hasEnvironment) {
                 clearstatcache(false, $environmentFile);
