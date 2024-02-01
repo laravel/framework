@@ -255,7 +255,7 @@ trait ValidatesAttributes
         if (is_null($date = $this->getDateTimestamp($parameters[0]))) {
             $secondValue = $this->getValue($parameters[0]);
 
-            if (! is_string($secondValue) && ! is_numeric($secondValue) && ! $secondValue instanceof DateTimeInterface) {
+            if (! is_null($secondValue) && ! is_string($secondValue) && ! is_numeric($secondValue) && ! $secondValue instanceof DateTimeInterface) {
                 return false;
             }
 
