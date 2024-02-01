@@ -2504,6 +2504,40 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertSame('select * from "prefix_users" inner join (select * from "contacts") as "prefix_sub" on "prefix_users"."id" = "prefix_sub"."id"', $builder->toSql());
     }
 
+    public function testJoinSubWithCrossDatabaseQuery()
+    {
+        // Create another database connection and builder.
+        $connection2 = m::mock(ConnectionInterface::class);
+        $connection2->shouldReceive('getDatabaseName')->andReturn('database2');
+        $builder2 = new Builder($connection2, new Grammar, m::mock(Processor::class));
+
+        // Create subquery that use another databases.
+        // Case1: 'from' property is string
+        $subquery = $builder2
+                  ->from('posts')
+                  ->select('user_id, title');
+
+        $builder = $this->getBuilder();
+        $builder->from('users')->joinSub($subquery, 'sub', function ($join) {
+            $join->on('users.id', '=', 'sub.user_id');
+        });
+
+        $this->assertSame('select * from "users" inner join (select "user_id, title" from "database2"."posts") as "sub" on "users"."id" = "sub"."user_id"', $builder->toSql());
+
+        // Create subquery that use another databases.
+        // Case2: 'from' property is Expression
+        $subquery = $builder2
+                  ->from(new Raw('database2.posts'))  // set Expression
+                  ->select('user_id, title');
+
+        $builder = $this->getBuilder();
+        $builder->from('users')->joinSub($subquery, 'sub', function ($join) {
+            $join->on('users.id', '=', 'sub.user_id');
+        });
+
+        $this->assertSame('select * from "users" inner join (select "user_id, title" from database2.posts) as "sub" on "users"."id" = "sub"."user_id"', $builder->toSql());
+    }
+
     public function testLeftJoinSub()
     {
         $builder = $this->getBuilder();

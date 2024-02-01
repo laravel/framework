@@ -394,7 +394,7 @@ class Builder implements BuilderContract
             $this->getConnection()->getDatabaseName()) {
             $databaseName = $query->getConnection()->getDatabaseName();
 
-            if (! str_starts_with($query->from, $databaseName) && ! str_contains($query->from, '.')) {
+            if (is_string($query->from) && ! str_starts_with($query->from, $databaseName) && ! str_contains($query->from, '.')) {
                 $query->from($databaseName.'.'.$query->from);
             }
         }
