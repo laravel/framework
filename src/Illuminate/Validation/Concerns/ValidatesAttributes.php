@@ -255,11 +255,15 @@ trait ValidatesAttributes
         if (is_null($date = $this->getDateTimestamp($parameters[0]))) {
             $comparedValue = $this->getValue($parameters[0]);
 
-            if (! is_null($comparedValue) && ! is_string($comparedValue) && ! is_numeric($comparedValue) && ! $comparedValue instanceof DateTimeInterface) {
+            if (! is_string($comparedValue) && ! is_numeric($comparedValue) && ! $comparedValue instanceof DateTimeInterface) {
                 return false;
             }
 
             $date = $this->getDateTimestamp($comparedValue);
+
+            if (is_null($date)) {
+                return true;
+            }
         }
 
         return $this->compare($this->getDateTimestamp($value), $date, $operator);
