@@ -484,14 +484,51 @@ class Middleware
     }
 
     /**
-     * Configure the string trimming middleware.
+     * Configure where authenticated users are redirected after authentication.
      *
-     * @param  array  $except
+     * @param  callable  $redirectTo
      * @return $this
      */
-    public function trimStrings(array $except = [])
+    public function redirectUsersUsing(callable $redirectTo)
     {
-        TrimStrings::except($except);
+        return $this->auth(redirectTo: $redirectTo);
+    }
+
+    /**
+     * Configure where guests are redirected if not authenticated.
+     *
+     * @param  callable  $redirectTo
+     * @return $this
+     */
+    public function redirectGuestsUsing(callable $redirectTo)
+    {
+        return $this->guest(redirectTo: $redirectTo);
+    }
+
+    /**
+     * Configure the behavior of the authentication middleware.
+     *
+     * @param  callable  $redirectTo
+     * @return $this
+     */
+    protected function auth(callable $redirectTo)
+    {
+        Authenticate::redirectUsing($redirectTo);
+        AuthenticateSession::redirectUsing($redirectTo);
+        AuthenticationException::redirectUsing($redirectTo);
+
+        return $this;
+    }
+
+    /**
+     * Configure the behavior of the "guest" middleware.
+     *
+     * @param  callable  $redirectTo
+     * @return $this
+     */
+    protected function guest(callable $redirectTo)
+    {
+        RedirectIfAuthenticated::redirectUsing($redirectTo);
 
         return $this;
     }
@@ -523,29 +560,14 @@ class Middleware
     }
 
     /**
-     * Configure the behavior of the authentication middleware.
+     * Configure the string trimming middleware.
      *
-     * @param  callable  $redirectTo
+     * @param  array  $except
      * @return $this
      */
-    public function auth(callable $redirectTo)
+    public function trimStrings(array $except = [])
     {
-        Authenticate::redirectUsing($redirectTo);
-        AuthenticateSession::redirectUsing($redirectTo);
-        AuthenticationException::redirectUsing($redirectTo);
-
-        return $this;
-    }
-
-    /**
-     * Configure the behavior of the "guest" middleware.
-     *
-     * @param  callable  $redirectTo
-     * @return $this
-     */
-    public function guest(callable $redirectTo)
-    {
-        RedirectIfAuthenticated::redirectUsing($redirectTo);
+        TrimStrings::except($except);
 
         return $this;
     }
@@ -555,7 +577,7 @@ class Middleware
      *
      * @return $this
      */
-    public function withTrustedHosts()
+    public function trustHosts()
     {
         $this->trustHosts = true;
 
@@ -567,7 +589,7 @@ class Middleware
      *
      * @return $this
      */
-    public function withStatefulApi()
+    public function statefulApi()
     {
         $this->statefulApi = true;
 
@@ -581,7 +603,7 @@ class Middleware
      * @param  bool  $redis
      * @return $this
      */
-    public function withThrottledApi($limiter = 'api', $redis = false)
+    public function throttleApi($limiter = 'api', $redis = false)
     {
         $this->apiLimiter = $limiter;
 
@@ -609,7 +631,7 @@ class Middleware
      *
      * @return $this
      */
-    public function withAuthenticatedSessions()
+    public function authenticateSessions()
     {
         $this->authenticatedSessions = true;
 
