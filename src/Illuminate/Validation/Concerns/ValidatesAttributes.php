@@ -259,11 +259,12 @@ trait ValidatesAttributes
                 return false;
             }
 
-            $date = $this->getDateTimestamp($comparedValue);
-
-            if (is_null($date)) {
+            if (is_null($comparedValue)) {
                 return true;
             }
+
+            $date = $this->getDateTimestamp($comparedValue);
+
         }
 
         return $this->compare($this->getDateTimestamp($value), $date, $operator);
