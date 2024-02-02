@@ -121,7 +121,8 @@
     "conflict": {
         "carbonphp/carbon-doctrine-types": ">=3.0",
         "doctrine/dbal": ">=4.0",
-        "tightenco/collect": "<5.5.33"
+        "tightenco/collect": "<5.5.33",
+        "phpunit/phpunit": ">=11.0.0"
     },
     "autoload": {
         "files": [
