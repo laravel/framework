@@ -5,6 +5,9 @@ namespace Illuminate\Foundation\Configuration;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Auth\Middleware\Authenticate;
 use Illuminate\Auth\Middleware\RedirectIfAuthenticated;
+use Illuminate\Foundation\Http\Middleware\TrimStrings;
+use Illuminate\Foundation\Http\Middleware\ValidateCsrfToken;
+use Illuminate\Routing\Middleware\ValidateSignature;
 use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Support\Arr;
 
@@ -478,6 +481,45 @@ class Middleware
         }
 
         return $middleware;
+    }
+
+    /**
+     * Configure the string trimming middleware.
+     *
+     * @param  array  $except
+     * @return $this
+     */
+    public function trimStrings(array $except = [])
+    {
+        TrimStrings::except($except);
+
+        return $this;
+    }
+
+    /**
+     * Configure the CSRF token validation middleware.
+     *
+     * @param  array  $except
+     * @return $this
+     */
+    public function validateCsrfTokens(array $except = [])
+    {
+        ValidateCsrfToken::except($except);
+
+        return $this;
+    }
+
+    /**
+     * Configure the URL signature validation middleware.
+     *
+     * @param  array  $except
+     * @return $this
+     */
+    public function validateSignatures(array $except = [])
+    {
+        ValidateSignature::except($except);
+
+        return $this;
     }
 
     /**
