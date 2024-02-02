@@ -21,6 +21,14 @@ class ComponentSlot implements Htmlable
     protected $contents;
 
     /**
+     * The slot sanitizer.
+     *
+     * @var callable
+     */
+    protected $sanitizerResolver;
+
+
+    /**
      * Create a new slot instance.
      *
      * @param  string  $contents
@@ -32,6 +40,9 @@ class ComponentSlot implements Htmlable
         $this->contents = $contents;
 
         $this->withAttributes($attributes);
+
+        // default sanitizer, return the input as it is
+        $this->sanitizerResolver = fn($input) => $input;
     }
 
     /**
@@ -58,6 +69,25 @@ class ComponentSlot implements Htmlable
     }
 
     /**
+     * Setup the sanitizer for the slot.
+     *
+     * @param  null|string|callable  $callable
+     * @return $this
+     */
+    public function sanitize(null|string|callable $callable = null)
+    {
+        if (is_string($callable) && !function_exists($callable)) {
+            throw new \InvalidArgumentException("Callable does not exist.");
+        }
+
+        $this->sanitizerResolver =
+            $callable ??
+            fn($input) => trim(preg_replace("/<!--([\s\S]*?)-->/", "", $input)); // replace everything between <!-- and --> with empty string
+
+        return $this;
+    }
+
+    /**
      * Determine if the slot is empty.
      *
      * HTML comments and whitespace will be trimmed out.
@@ -66,8 +96,9 @@ class ComponentSlot implements Htmlable
      */
     public function isEmpty()
     {
-        // replace everything between <!-- and --> with empty string
-        return trim(preg_replace('/<!--([\s\S]*?)-->/', '', $this->contents)) === '';
+        return filter_var($this->contents, FILTER_CALLBACK, [
+          "options" => $this->sanitizerResolver
+        ]) === '';
     }
 
     /**
