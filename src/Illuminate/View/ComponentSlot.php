@@ -27,7 +27,6 @@ class ComponentSlot implements Htmlable
      */
     protected $sanitizerResolver;
 
-
     /**
      * Create a new slot instance.
      *
@@ -42,7 +41,7 @@ class ComponentSlot implements Htmlable
         $this->withAttributes($attributes);
 
         // default sanitizer, return the input as it is
-        $this->sanitizerResolver = fn($input) => $input;
+        $this->sanitizerResolver = fn ($input) => $input;
     }
 
     /**
@@ -76,13 +75,13 @@ class ComponentSlot implements Htmlable
      */
     public function sanitize(null|string|callable $callable = null)
     {
-        if (is_string($callable) && !function_exists($callable)) {
+        if (is_string($callable) && ! function_exists($callable)) {
             throw new \InvalidArgumentException("Callable does not exist.");
         }
 
         $this->sanitizerResolver =
             $callable ??
-            fn($input) => trim(preg_replace("/<!--([\s\S]*?)-->/", "", $input)); // replace everything between <!-- and --> with empty string
+            fn ($input) => trim(preg_replace("/<!--([\s\S]*?)-->/", '', $input)); // replace everything between <!-- and --> with empty string
 
         return $this;
     }
@@ -97,7 +96,7 @@ class ComponentSlot implements Htmlable
     public function isEmpty()
     {
         return filter_var($this->contents, FILTER_CALLBACK, [
-          "options" => $this->sanitizerResolver
+            'options' => $this->sanitizerResolver
         ]) === '';
     }
 
