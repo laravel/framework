@@ -5987,17 +5987,15 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['x' => ['a' => ['v' => 'c']], 'y' => 'invalid'], ['x' => 'date', 'y' => 'date|before:x']);
         $this->assertTrue($v->fails());
 
-        $v = new Validator($trans, ['y' => '1970-01-01'], ['x' => 'nullable|date', 'y' => 'nullable|date|after:x']);
+        $v = new Validator($trans, ['x' => '1970-01-01'], ['x' => 'nullable|date', 'y' => 'nullable|date|after:x']);
         $this->assertTrue($v->passes());
 
         $v = new Validator($trans, ['x' => null, 'y' => '1970-01-01'], ['x' => 'nullable|date', 'y' => 'nullable|date|after:x']);
         $this->assertTrue($v->passes());
 
-        // with start_at,ends_at it passes
         $v = new Validator($trans, ['dates' => [['start_at' => '2024-02-02 12:00:00', 'ends_at' => '2024-02-02 12:00:00']]], ['dates.*.start_at' => 'date', 'dates.*.ends_at' => 'date|after:start_at']);
         $this->assertTrue($v->passes());
 
-        // with x,y it faiils (looks weird)
         $v = new Validator($trans, ['dates' => [['x' => '2024-02-02 12:00:00', 'y' => '2024-02-02 12:00:00']]], ['dates.*.x' => 'date', 'dates.*.y' => 'date|after:x']);
         $this->assertTrue($v->passes());
     }
