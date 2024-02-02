@@ -493,6 +493,20 @@ class Arr
     }
 
     /**
+     * Select an array of values from an array.
+     *
+     * @param  array  $array
+     * @param  array|string  $keys
+     * @return array
+     */
+    public static function select($array, $keys)
+    {
+        return static::map($array, function ($item) use ($keys) {
+            return array_intersect_key($item, array_flip((array) $keys));
+        });
+    }
+
+    /**
      * Pluck an array of values from an array.
      *
      * @param  iterable  $array
