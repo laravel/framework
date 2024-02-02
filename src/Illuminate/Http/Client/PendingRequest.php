@@ -921,7 +921,7 @@ class PendingRequest
                     }
                 });
             } catch (ConnectException $e) {
-                $this->dispatchConnectionFailedEvent();
+                $this->dispatchConnectionFailedEvent(new Request($e->getRequest()));
 
                 throw new ConnectionException($e->getMessage(), 0, $e);
             }
@@ -1010,7 +1010,7 @@ class PendingRequest
             })
             ->otherwise(function (OutOfBoundsException|TransferException $e) {
                 if ($e instanceof ConnectException) {
-                    $this->dispatchConnectionFailedEvent();
+                    $this->dispatchConnectionFailedEvent(new Request($e->getRequest()));
                 }
 
                 return $e instanceof RequestException && $e->hasResponse() ? $this->populateResponse($this->newResponse($e->getResponse())) : $e;
@@ -1405,8 +1405,7 @@ class PendingRequest
      */
     protected function dispatchResponseReceivedEvent(Response $response)
     {
-        if (! ($dispatcher = $this->factory?->getDispatcher()) ||
-            ! $this->request) {
+        if (! ($dispatcher = $this->factory?->getDispatcher()) || ! $this->request) {
             return;
         }
 
@@ -1416,12 +1415,13 @@ class PendingRequest
     /**
      * Dispatch the ConnectionFailed event if a dispatcher is available.
      *
+     * @param  \Illuminate\Http\Client\Request  $request
      * @return void
      */
-    protected function dispatchConnectionFailedEvent()
+    protected function dispatchConnectionFailedEvent(Request $request)
     {
         if ($dispatcher = $this->factory?->getDispatcher()) {
-            $dispatcher->dispatch(new ConnectionFailed($this->request));
+            $dispatcher->dispatch(new ConnectionFailed($request));
         }
     }
 

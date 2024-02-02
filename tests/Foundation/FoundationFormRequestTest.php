@@ -213,6 +213,22 @@ class FoundationFormRequestTest extends TestCase
         $this->assertEquals([], $request->all());
     }
 
+    public function testRequestWithGetRules()
+    {
+        FoundationTestFormRequestWithGetRules::$useRuleSet = 'a';
+        $request = $this->createRequest(['a' => 1], FoundationTestFormRequestWithGetRules::class);
+
+        $request->validateResolved();
+        $this->assertEquals(['a' => 1], $request->all());
+
+        $this->expectException(ValidationException::class);
+        FoundationTestFormRequestWithGetRules::$useRuleSet = 'b';
+
+        $request = $this->createRequest(['a' => 1], FoundationTestFormRequestWithGetRules::class);
+
+        $request->validateResolved();
+    }
+
     /**
      * Catch the given exception thrown from the executor, and return it.
      *
@@ -480,5 +496,23 @@ class FoundationTestFormRequestWithoutRulesMethod extends FormRequest
     public function authorize()
     {
         return true;
+    }
+}
+
+class FoundationTestFormRequestWithGetRules extends FormRequest
+{
+    public static $useRuleSet = 'a';
+
+    protected function validationRules(): array
+    {
+        if (self::$useRuleSet === 'a') {
+            return [
+                'a' => ['required', 'int', 'min:1'],
+            ];
+        } else {
+            return [
+                'a' => ['required', 'int', 'min:2'],
+            ];
+        }
     }
 }

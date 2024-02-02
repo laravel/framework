@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\RelationNotFoundException;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Query\Builder as BaseBuilder;
+use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\Query\Processors\Processor;
 use Illuminate\Support\Carbon;
@@ -1278,6 +1279,15 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertSame('select "eloquent_builder_test_model_parent_stubs".*, (select min("eloquent_builder_test_model_close_related_stubs"."price") from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "foo_min_price" from "eloquent_builder_test_model_parent_stubs"', $builder->toSql());
     }
 
+    public function testWithMinExpression()
+    {
+        $model = new EloquentBuilderTestModelParentStub;
+
+        $builder = $model->withMin('foo', new Expression('price - discount'));
+
+        $this->assertSame('select "eloquent_builder_test_model_parent_stubs".*, (select min(price - discount) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "foo_min_price_discount" from "eloquent_builder_test_model_parent_stubs"', $builder->toSql());
+    }
+
     public function testWithMinOnBelongsToMany()
     {
         $model = new EloquentBuilderTestModelParentStub;
@@ -1300,6 +1310,42 @@ class DatabaseEloquentBuilderTest extends TestCase
         $sql = preg_replace($aliasRegex, $alias, $sql);
 
         $this->assertSame('select "self_related_stubs".*, (select min("self_alias_hash"."created_at") from "self_related_stubs" as "self_alias_hash" where "self_related_stubs"."id" = "self_alias_hash"."parent_id") as "child_foos_min_created_at" from "self_related_stubs"', $sql);
+    }
+
+    public function testWithMax()
+    {
+        $model = new EloquentBuilderTestModelParentStub;
+
+        $builder = $model->withMax('foo', 'price');
+
+        $this->assertSame('select "eloquent_builder_test_model_parent_stubs".*, (select max("eloquent_builder_test_model_close_related_stubs"."price") from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "foo_max_price" from "eloquent_builder_test_model_parent_stubs"', $builder->toSql());
+    }
+
+    public function testWithMaxExpression()
+    {
+        $model = new EloquentBuilderTestModelParentStub;
+
+        $builder = $model->withMax('foo', new Expression('price - discount'));
+
+        $this->assertSame('select "eloquent_builder_test_model_parent_stubs".*, (select max(price - discount) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "foo_max_price_discount" from "eloquent_builder_test_model_parent_stubs"', $builder->toSql());
+    }
+
+    public function testWithAvg()
+    {
+        $model = new EloquentBuilderTestModelParentStub;
+
+        $builder = $model->withAvg('foo', 'price');
+
+        $this->assertSame('select "eloquent_builder_test_model_parent_stubs".*, (select avg("eloquent_builder_test_model_close_related_stubs"."price") from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "foo_avg_price" from "eloquent_builder_test_model_parent_stubs"', $builder->toSql());
+    }
+
+    public function testWitAvgExpression()
+    {
+        $model = new EloquentBuilderTestModelParentStub;
+
+        $builder = $model->withAvg('foo', new Expression('price - discount'));
+
+        $this->assertSame('select "eloquent_builder_test_model_parent_stubs".*, (select avg(price - discount) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "foo_avg_price_discount" from "eloquent_builder_test_model_parent_stubs"', $builder->toSql());
     }
 
     public function testWithCountAndConstraintsAndHaving()
