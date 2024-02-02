@@ -87,8 +87,8 @@ class ExceptionMakeCommand extends GeneratorCommand
             return;
         }
 
-        $input->setOption('report', confirm("Should the exception have a report method?", default: false));
-        $input->setOption('render', confirm("Should the exception have a render method?", default: false));
+        $input->setOption('report', confirm('Should the exception have a report method?', default: false));
+        $input->setOption('render', confirm('Should the exception have a render method?', default: false));
     }
 
     /**
