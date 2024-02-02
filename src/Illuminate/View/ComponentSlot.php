@@ -76,7 +76,7 @@ class ComponentSlot implements Htmlable
     public function sanitize(null|string|callable $callable = null)
     {
         if (is_string($callable) && ! function_exists($callable)) {
-            throw new \InvalidArgumentException("Callable does not exist.");
+            throw new \InvalidArgumentException('Callable does not exist.');
         }
 
         $this->sanitizerResolver =
@@ -96,7 +96,7 @@ class ComponentSlot implements Htmlable
     public function isEmpty()
     {
         return filter_var($this->contents, FILTER_CALLBACK, [
-            'options' => $this->sanitizerResolver
+            'options' => $this->sanitizerResolver,
         ]) === '';
     }
 
