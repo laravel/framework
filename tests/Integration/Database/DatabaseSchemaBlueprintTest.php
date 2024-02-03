@@ -210,7 +210,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
         });
 
         $this->assertEquals([
-            "DECLARE @sql NVARCHAR(MAX) = '';SELECT @sql += 'ALTER TABLE \"users\" DROP CONSTRAINT ' + OBJECT_NAME([default_object_id]) + ';' FROM sys.columns WHERE [object_id] = OBJECT_ID(\"users\") AND [name] in ('foo') AND [default_object_id] <> 0;EXEC(@sql)",
+            "DECLARE @sql NVARCHAR(MAX) = '';SELECT @sql += 'ALTER TABLE \"users\" DROP CONSTRAINT ' + OBJECT_NAME([default_object_id]) + ';' FROM sys.columns WHERE [object_id] = OBJECT_ID(N'users') AND [name] in ('foo') AND [default_object_id] <> 0;EXEC(@sql)",
             'alter table "users" alter column "foo" int not null',
         ], $blueprint->toSql($connection, new SqlServerGrammar));
     }
