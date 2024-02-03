@@ -1328,7 +1328,7 @@ trait HasAttributes
      */
     public function fromEncryptedString($value)
     {
-        return (static::$encrypter ?? Crypt::getFacadeRoot())->decrypt($value, false);
+        return static::currentEncrypter()->decrypt($value, false);
     }
 
     /**
@@ -1340,7 +1340,7 @@ trait HasAttributes
      */
     protected function castAttributeAsEncryptedString($key, $value)
     {
-        return (static::$encrypter ?? Crypt::getFacadeRoot())->encrypt($value, false);
+        return static::currentEncrypter()->encrypt($value, false);
     }
 
     /**
@@ -1352,6 +1352,16 @@ trait HasAttributes
     public static function encryptUsing($encrypter)
     {
         static::$encrypter = $encrypter;
+    }
+
+    /**
+     * Get the current encrypter being used by the model.
+     *
+     * @return \Illuminate\Contracts\Encryption\Encrypter
+     */
+    protected static function currentEncrypter()
+    {
+        return static::$encrypter ?? Crypt::getFacadeRoot();
     }
 
     /**
@@ -2145,7 +2155,7 @@ trait HasAttributes
             }
 
             return abs($this->castAttribute($key, $attribute) - $this->castAttribute($key, $original)) < PHP_FLOAT_EPSILON * 4;
-        } elseif ($this->isEncryptedCastable($key)) {
+        } elseif ($this->isEncryptedCastable($key) && ! empty(static::currentEncrypter()->getPreviousKeys())) {
             return false;
         } elseif ($this->hasCast($key, static::$primitiveCastTypes)) {
             return $this->castAttribute($key, $attribute) ===
@@ -2155,7 +2165,10 @@ trait HasAttributes
         } elseif ($this->isClassCastable($key) && Str::startsWith($this->getCasts()[$key], [AsEnumArrayObject::class, AsEnumCollection::class])) {
             return $this->fromJson($attribute) === $this->fromJson($original);
         } elseif ($this->isClassCastable($key) && $original !== null && Str::startsWith($this->getCasts()[$key], [AsEncryptedArrayObject::class, AsEncryptedCollection::class])) {
-            // return $this->fromEncryptedString($attribute) === $this->fromEncryptedString($original);
+            if (empty(static::currentEncrypter()->getPreviousKeys())) {
+                return $this->fromEncryptedString($attribute) === $this->fromEncryptedString($original);
+            }
+
             return false;
         }
 
