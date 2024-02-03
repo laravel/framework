@@ -91,9 +91,10 @@ class ComponentSlot implements Htmlable
 
         $resolver =
             $callable ??
-            fn ($input) => trim(preg_replace("/<!--([\s\S]*?)-->/", '', $input)); // replace everything between <!-- and --> with empty string
+            fn ($input) => trim(preg_replace("/<!--([\s\S]*?)-->/", '', $input));
+            // replace everything between <!-- and --> with empty string
 
-        return filter_var($this->contents, FILTER_CALLBACK, ['options' => $resolver,]) === '';
+        return filter_var($this->contents, FILTER_CALLBACK, ['options' => $resolver]) === '';
     }
 
     /**
