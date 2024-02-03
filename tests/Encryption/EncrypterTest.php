@@ -26,6 +26,18 @@ class EncrypterTest extends TestCase
         $this->assertSame('foo', $e->decryptString($encrypted));
     }
 
+    public function testRawStringEncryptionWithPreviousKeys()
+    {
+        $previous = new Encrypter(str_repeat('b', 16));
+        $previousValue = $previous->encryptString('foo');
+
+        $new = new Encrypter(str_repeat('a', 16));
+        $new->previousKeys([str_repeat('b', 16)]);
+
+        $decrypted = $new->decryptString($previousValue);
+        $this->assertSame('foo', $decrypted);
+    }
+
     public function testEncryptionUsingBase64EncodedKey()
     {
         $e = new Encrypter(random_bytes(16));
