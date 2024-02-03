@@ -126,7 +126,9 @@ return [
     'key' => env('APP_KEY'),
 
     'previous_keys' => [
-        // Previous encryption keys to be used for decryption...
+        ...array_filter(
+            explode(',', env('APP_PREVIOUS_KEYS', ''))
+        ),
     ],
 
     /*
