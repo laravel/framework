@@ -126,7 +126,7 @@ return [
     'key' => env('APP_KEY'),
 
     'previous_keys' => [
-        // Previous / legacy encryption keys...
+        // Previous encryption keys to be used for decryption...
     ],
 
     /*
