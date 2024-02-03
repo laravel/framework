@@ -2,12 +2,11 @@
 
 namespace Illuminate\Testing\Constraints;
 
-use PHPUnit\Framework\Constraint\Constraint;
-use PHPUnit\Runner\Version;
 use Illuminate\Database\Connection;
+use PHPUnit\Framework\Constraint\Constraint;
 
 class NotSoftDeletedInDatabase extends Constraint
-    {
+{
     /**
      * Number of records that will be shown in the console in case of failure.
      *

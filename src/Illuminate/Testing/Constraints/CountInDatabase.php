@@ -2,9 +2,8 @@
 
 namespace Illuminate\Testing\Constraints;
 
-use PHPUnit\Framework\Constraint\Constraint;
-use PHPUnit\Runner\Version;
 use Illuminate\Database\Connection;
+use PHPUnit\Framework\Constraint\Constraint;
 use ReflectionClass;
 
 class CountInDatabase extends Constraint

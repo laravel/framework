@@ -2,10 +2,9 @@
 
 namespace Illuminate\Testing\Constraints;
 
-use PHPUnit\Framework\Constraint\Constraint;
-use PHPUnit\Runner\Version;
 use Illuminate\Contracts\Database\Query\Expression;
 use Illuminate\Database\Connection;
+use PHPUnit\Framework\Constraint\Constraint;
 
 class HasInDatabase extends Constraint
 {

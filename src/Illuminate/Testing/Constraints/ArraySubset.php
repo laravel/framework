@@ -2,9 +2,8 @@
 
 namespace Illuminate\Testing\Constraints;
 
-use PHPUnit\Framework\Constraint\Constraint;
-use PHPUnit\Runner\Version;
 use ArrayObject;
+use PHPUnit\Framework\Constraint\Constraint;
 use SebastianBergmann\Comparator\ComparisonFailure;
 use SebastianBergmann\Exporter\Exporter;
 use Traversable;
@@ -139,4 +138,3 @@ class ArraySubset extends Constraint
         return (array) $other;
     }
 }
-

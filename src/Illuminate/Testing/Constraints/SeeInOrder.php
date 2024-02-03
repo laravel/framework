@@ -3,11 +3,10 @@
 namespace Illuminate\Testing\Constraints;
 
 use PHPUnit\Framework\Constraint\Constraint;
-use PHPUnit\Runner\Version;
 use ReflectionClass;
 
 class SeeInOrder extends Constraint
-    {
+{
     /**
      * The string under validation.
      *
