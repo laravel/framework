@@ -10,6 +10,8 @@ namespace Illuminate\Support\Facades;
  * @method static mixed decrypt(string $payload, bool $unserialize = true)
  * @method static string decryptString(string $payload)
  * @method static string getKey()
+ * @method static array getAllKeys()
+ * @method static \Illuminate\Encryption\Encrypter previousKeys(array $keys)
  *
  * @see \Illuminate\Encryption\Encrypter
  */
