@@ -60,6 +60,28 @@ class PostgresBuilder extends Builder
     }
 
     /**
+     * Determine if the given view exists.
+     *
+     * @param  string  $view
+     * @return bool
+     */
+    public function hasView($view)
+    {
+        [$schema, $view] = $this->parseSchemaAndTable($view);
+
+        $view = $this->connection->getTablePrefix().$view;
+
+        foreach ($this->getViews() as $value) {
+            if (strtolower($view) === strtolower($value['name'])
+                && strtolower($schema) === strtolower($value['schema'])) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Get the user-defined types that belong to the database.
      *
      * @return array
@@ -239,7 +261,7 @@ class PostgresBuilder extends Builder
         if (count($parts) > 2) {
             $database = $parts[0];
 
-            throw new InvalidArgumentException("Using 3-parts reference is not supported, you may use `Schema::connection('$database')` instead.");
+            throw new InvalidArgumentException("Using three-part reference is not supported, you may use `Schema::connection('$database')` instead.");
         }
 
         // We will use the default schema unless the schema has been specified in the
