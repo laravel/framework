@@ -13,12 +13,12 @@ class ArraySubset extends Constraint
     /**
      * @var iterable
      */
-    protected iterable $subset;
+    protected $subset;
 
     /**
      * @var bool
      */
-    protected bool $strict;
+    protected $strict;
 
     /**
      * Create a new array subset constraint instance.
@@ -56,9 +56,9 @@ class ArraySubset extends Constraint
         // type cast $other & $this->subset as an array to allow
         // support in standard array functions.
         $other = $this->toArray($other);
-        $subset = $this->toArray($this->subset);
+        $this->subset = $this->toArray($this->subset);
 
-        $patched = array_replace_recursive($other, $subset);
+        $patched = array_replace_recursive($other, $this->subset);
 
         if ($this->strict) {
             $result = $other === $patched;

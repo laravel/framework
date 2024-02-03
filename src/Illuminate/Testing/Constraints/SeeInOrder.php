@@ -12,14 +12,14 @@ class SeeInOrder extends Constraint
      *
      * @var string
      */
-    protected string $content;
+    protected $content;
 
     /**
      * The last value that failed to pass validation.
      *
      * @var string
      */
-    protected string $failedValue;
+    protected $failedValue;
 
     /**
      * Create a new constraint instance.

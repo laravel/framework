@@ -12,28 +12,28 @@ class NotSoftDeletedInDatabase extends Constraint
      *
      * @var int
      */
-    protected int $show;
+    protected $show = 3;
 
     /**
      * The database connection.
      *
      * @var \Illuminate\Database\Connection
      */
-    protected Connection $database;
+    protected $database;
 
     /**
      * The data that will be used to narrow the search in the database table.
      *
      * @var array
      */
-    protected array $data;
+    protected $data;
 
     /**
      * The name of the column that indicates soft deletion has occurred.
      *
      * @var string
      */
-    protected string $deletedAtColumn;
+    protected $deletedAtColumn;
 
     /**
      * Create a new constraint instance.
@@ -46,12 +46,8 @@ class NotSoftDeletedInDatabase extends Constraint
     public function __construct(Connection $database, array $data, string $deletedAtColumn)
     {
         $this->database = $database;
-
         $this->data = $data;
-
         $this->deletedAtColumn = $deletedAtColumn;
-
-        $this->show = 3;
     }
 
     /**

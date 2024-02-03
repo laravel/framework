@@ -13,21 +13,21 @@ class HasInDatabase extends Constraint
      *
      * @var int
      */
-    protected int $show;
+    protected $show = 3;
 
     /**
      * The database connection.
      *
      * @var \Illuminate\Database\Connection
      */
-    protected Connection $database;
+    protected $database;
 
     /**
      * The data that will be used to narrow the search in the database table.
      *
      * @var array
      */
-    protected array $data;
+    protected $data;
 
     /**
      * Create a new constraint instance.
@@ -41,8 +41,6 @@ class HasInDatabase extends Constraint
         $this->data = $data;
 
         $this->database = $database;
-
-        $this->show = 3;
     }
 
     /**

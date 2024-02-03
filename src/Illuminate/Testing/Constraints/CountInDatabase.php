@@ -13,21 +13,21 @@ class CountInDatabase extends Constraint
      *
      * @var \Illuminate\Database\Connection
      */
-    protected Connection $database;
+    protected $database;
 
     /**
      * The expected table entries count that will be checked against the actual count.
      *
      * @var int
      */
-    protected int $expectedCount;
+    protected $expectedCount;
 
     /**
      * The actual table entries count that will be checked against the expected count.
      *
-     * @var int|null
+     * @var int
      */
-    protected int|null $actualCount;
+    protected $actualCount;
 
     /**
      * Create a new constraint instance.
