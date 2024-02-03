@@ -5992,6 +5992,9 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, ['dates' => [['start_at' => '2024-02-02 12:00:00', 'ends_at' => '2024-02-02 12:00:00']]], ['dates.*.start_at' => 'date', 'dates.*.ends_at' => 'date|after:start_at']);
         $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['date_end' => '2021-09-17 13:28:47'], ['date_start' => 'nullable|date', 'date_end' => 'nullable|date|after_or_equal:date_start']);
+        $this->assertTrue($v->passes());
     }
 
     public function testBeforeAndAfterWithFormat()
