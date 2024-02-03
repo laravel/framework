@@ -121,9 +121,13 @@ return [
     |
     */
 
+    'cipher' => 'AES-256-CBC',
+
     'key' => env('APP_KEY'),
 
-    'cipher' => 'AES-256-CBC',
+    'previous_keys' => [
+        // Previous encryption keys to be used for decryption...
+    ],
 
     /*
     |--------------------------------------------------------------------------
