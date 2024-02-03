@@ -18,6 +18,13 @@ class Encrypter implements EncrypterContract, StringEncrypter
     protected $key;
 
     /**
+     * The previous / legacy encryption keys.
+     *
+     * @var array
+     */
+    protected $previousKeys;
+
+    /**
      * The algorithm used for encryption.
      *
      * @var string
@@ -159,9 +166,15 @@ class Encrypter implements EncrypterContract, StringEncrypter
         // Here we will decrypt the value. If we are able to successfully decrypt it
         // we will then unserialize it and return it out to the caller. If we are
         // unable to decrypt this value we will throw out an exception message.
-        $decrypted = \openssl_decrypt(
-            $payload['value'], strtolower($this->cipher), $this->key, 0, $iv, $tag ?? ''
-        );
+        foreach ([$this->key, ...array_reverse($this->previousKeys)] as $key) {
+            $decrypted = \openssl_decrypt(
+                $payload['value'], strtolower($this->cipher), $key, 0, $iv, $tag ?? ''
+            );
+
+            if ($decrypted !== false) {
+                break;
+            }
+        }
 
         if ($decrypted === false) {
             throw new DecryptException('Could not decrypt the data.');
@@ -288,5 +301,18 @@ class Encrypter implements EncrypterContract, StringEncrypter
     public function getKey()
     {
         return $this->key;
+    }
+
+    /**
+     * Set the previous / legacy encryption keys that should be utilized if decryption fails.
+     *
+     * @param  array  $key
+     * @return $this
+     */
+    public function previousKeys(array $keys)
+    {
+        $this->previousKeys = $keys;
+
+        return $this;
     }
 }
