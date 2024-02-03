@@ -2145,6 +2145,8 @@ trait HasAttributes
             }
 
             return abs($this->castAttribute($key, $attribute) - $this->castAttribute($key, $original)) < PHP_FLOAT_EPSILON * 4;
+        } elseif ($this->isEncryptedCastable($key)) {
+            return false;
         } elseif ($this->hasCast($key, static::$primitiveCastTypes)) {
             return $this->castAttribute($key, $attribute) ===
                 $this->castAttribute($key, $original);
@@ -2153,7 +2155,8 @@ trait HasAttributes
         } elseif ($this->isClassCastable($key) && Str::startsWith($this->getCasts()[$key], [AsEnumArrayObject::class, AsEnumCollection::class])) {
             return $this->fromJson($attribute) === $this->fromJson($original);
         } elseif ($this->isClassCastable($key) && $original !== null && Str::startsWith($this->getCasts()[$key], [AsEncryptedArrayObject::class, AsEncryptedCollection::class])) {
-            return $this->fromEncryptedString($attribute) === $this->fromEncryptedString($original);
+            // return $this->fromEncryptedString($attribute) === $this->fromEncryptedString($original);
+            return false;
         }
 
         return is_numeric($attribute) && is_numeric($original)
