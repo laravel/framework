@@ -323,6 +323,16 @@ class Encrypter implements EncrypterContract, StringEncrypter
     }
 
     /**
+     * Get the previous encryption keys.
+     *
+     * @return array
+     */
+    public function getPreviousKeys()
+    {
+        return $this->previousKeys;
+    }
+
+    /**
      * Set the previous / legacy encryption keys that should be utilized if decryption fails.
      *
      * @param  array  $key
