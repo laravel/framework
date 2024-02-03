@@ -11,6 +11,7 @@ use Illuminate\Contracts\View\Factory as FactoryContract;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\HtmlString;
 use Illuminate\View\Component;
+use Illuminate\View\ComponentSlot;
 use Illuminate\View\Factory;
 use Illuminate\View\View;
 use Mockery as m;
@@ -304,6 +305,65 @@ class ComponentTest extends TestCase
 
         Component::forgetFactory();
         $this->assertNotSame($this->viewFactory, $getFactory($inline));
+    }
+
+    public function testComponentSlotIsEmpty()
+    {
+        $slot = new ComponentSlot();
+
+        $this->assertTrue((bool) $slot->isEmpty());
+    }
+
+    public function testComponentSlotSanitizedEmpty()
+    {
+        // default sanitizer should remove all html tags
+        $slot = new ComponentSlot('<!-- test -->');
+
+        $linebreakingSlot = new ComponentSlot("\n  \t");
+
+        $moreComplexSlot = new ComponentSlot('<!--
+        <p>commented HTML</p>
+        <img border="0" src="" alt="">
+        -->');
+
+        $this->assertTrue((bool) $slot->sanitizedEmpty());
+        $this->assertTrue((bool) $linebreakingSlot->sanitizedEmpty('trim'));
+        $this->assertTrue((bool) $moreComplexSlot->sanitizedEmpty());
+    }
+
+    public function testComponentSlotSanitizedNotEmpty()
+    {
+        // default sanitizer should remove all html tags
+        $slot = new ComponentSlot('<!-- test -->not empty');
+
+        $linebreakingSlot = new ComponentSlot("\ntest  \t");
+
+        $moreComplexSlot = new ComponentSlot('before<!--
+        <p>commented HTML</p>
+        <img border="0" src="" alt="">
+        -->after');
+
+        $this->assertTrue((bool) $slot->sanitizedNotEmpty());
+        $this->assertTrue((bool) $linebreakingSlot->sanitizedNotEmpty('trim'));
+        $this->assertTrue((bool) $moreComplexSlot->sanitizedNotEmpty());
+    }
+
+    public function testComponentSlotIsNotEmpty()
+    {
+        $slot = new ComponentSlot('test');
+
+        $anotherSlot = new ComponentSlot('test<!-- test -->');
+
+        $moreComplexSlot = new ComponentSlot('t<!--
+        <p>Look at this cool image:</p>
+        <img border="0" src="pic_trulli.jpg" alt="Trulli">
+        -->est');
+
+        $this->assertTrue((bool) $slot->sanitizedNotEmpty());
+
+        $this->assertTrue((bool) $anotherSlot->sanitizedNotEmpty());
+
+        $this->assertTrue((bool) $moreComplexSlot->sanitizedNotEmpty());
     }
 }
 
