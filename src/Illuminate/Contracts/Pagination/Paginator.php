@@ -121,4 +121,12 @@ interface Paginator
      * @return string
      */
     public function render($view = null, $data = []);
+
+    /**
+     * Get the total number of items available.
+     *
+     * @return int
+    */
+    public function total();
+
 }
