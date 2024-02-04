@@ -4231,6 +4231,37 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testSelect($collection)
+    {
+        $data = new $collection([
+            ['first' => 'Taylor', 'last' => 'Otwell', 'email' => 'taylorotwell@gmail.com'],
+            ['first' => 'Jess', 'last' => 'Archer', 'email' => 'jessarcher@gmail.com'],
+        ]);
+
+        $this->assertEquals($data->all(), $data->select(null)->all());
+        $this->assertEquals([['first' => 'Taylor'], ['first' => 'Jess']], $data->select(['first', 'missing'])->all());
+        $this->assertEquals([['first' => 'Taylor'], ['first' => 'Jess']], $data->select('first', 'missing')->all());
+        $this->assertEquals([['first' => 'Taylor'], ['first' => 'Jess']], $data->select(collect(['first', 'missing']))->all());
+
+        $this->assertEquals([
+            ['first' => 'Taylor', 'email' => 'taylorotwell@gmail.com'],
+            ['first' => 'Jess', 'email' => 'jessarcher@gmail.com'],
+        ], $data->select(['first', 'email'])->all());
+
+        $this->assertEquals([
+            ['first' => 'Taylor', 'email' => 'taylorotwell@gmail.com'],
+            ['first' => 'Jess', 'email' => 'jessarcher@gmail.com'],
+        ], $data->select('first', 'email')->all());
+
+        $this->assertEquals([
+            ['first' => 'Taylor', 'email' => 'taylorotwell@gmail.com'],
+            ['first' => 'Jess', 'email' => 'jessarcher@gmail.com'],
+        ], $data->select(collect(['first', 'email']))->all());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testGettingAvgItemsFromCollection($collection)
     {
         $c = new $collection([(object) ['foo' => 10], (object) ['foo' => 20]]);
