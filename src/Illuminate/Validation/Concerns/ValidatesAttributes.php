@@ -483,6 +483,30 @@ trait ValidatesAttributes
     }
 
     /**
+     * Validate that an attribute is true.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @return bool
+     */
+    public function validateTrue($attribute, $value)
+    {
+        return $this->validateBoolean($attribute, $value) && (bool) $value === true;
+    }
+
+    /**
+     * Validate that an attribute is false.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @return bool
+     */
+    public function validateFalse($attribute, $value)
+    {
+        return $this->validateBoolean($attribute, $value) && (bool) $value === false;
+    }
+
+    /**
      * Validate that an attribute has a matching confirmation.
      *
      * @param  string  $attribute

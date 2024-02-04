@@ -2902,6 +2902,74 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->passes());
     }
 
+    public function testValidateTrue()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => 'no'], ['foo' => 'True']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => 'yes'], ['foo' => 'True']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => 'false'], ['foo' => 'True']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => 'true'], ['foo' => 'True']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => false], ['foo' => 'True']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => '0'], ['foo' => 'True']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => 0], ['foo' => 'True']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => true], ['foo' => 'True']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => '1'], ['foo' => 'True']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => 1], ['foo' => 'True']);
+        $this->assertTrue($v->passes());
+    }
+
+    public function testValidateFalse()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => 'no'], ['foo' => 'False']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => 'yes'], ['foo' => 'False']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => 'false'], ['foo' => 'False']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => 'true'], ['foo' => 'False']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => true], ['foo' => 'False']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => '1'], ['foo' => 'False']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => 1], ['foo' => 'False']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => false], ['foo' => 'False']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => '0'], ['foo' => 'False']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => 0], ['foo' => 'False']);
+        $this->assertTrue($v->passes());
+    }
+
     public function testValidateNumeric()
     {
         $trans = $this->getIlluminateArrayTranslator();
