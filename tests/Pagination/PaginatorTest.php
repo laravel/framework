@@ -70,4 +70,37 @@ class PaginatorTest extends TestCase
         $this->assertInstanceOf(Paginator::class, $p);
         $this->assertSame(['1', '2', '3'], $p->items());
     }
+    public function testTotalReturnsTotalCount()
+    {
+      $data = ['item1', 'item2', 'item3', 'item4'];
+      $perPage = 2;
+
+      $p = new Paginator($data, count($data), $perPage);
+
+      $this->assertSame(4, $p->total());
+    }
+
+    public function testTotalWithCollection()
+    {
+      $data = collect(['item1', 'item2', 'item3', 'item4']);
+      $perPage = 2;
+
+      $p = new Paginator($data, $data->count(), $perPage);
+
+      $this->assertSame(4, $p->total());
+    }
+
+    public function testTotalWithQueryBuilder()
+    {
+        $query = $this->createMock(\Illuminate\Database\Query\Builder::class);
+
+        $totalItems = 15;
+        $perPage = 15;
+        $p = new Paginator($query, $perPage, null, ['total' => $totalItems]);
+
+        $this->assertSame($totalItems, $p->total());
+    }
+
+
+
 }

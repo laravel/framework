@@ -173,4 +173,17 @@ class Paginator extends AbstractPaginator implements Arrayable, ArrayAccess, Cou
     {
         return json_encode($this->jsonSerialize(), $options);
     }
+
+    /**
+     * Get the total number of items available.
+     *
+     * @return int
+     */
+    public function total()
+    {
+        if ($this->items instanceof \Illuminate\Support\Collection) {
+            return $this->items->count();
+          }
+        return $this->items->total();
+    }
 }
