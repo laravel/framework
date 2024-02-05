@@ -3,17 +3,26 @@
 namespace Illuminate\Foundation\Configuration;
 
 use Closure;
+use Illuminate\Console\Application as Artisan;
 use Illuminate\Contracts\Console\Kernel as ConsoleKernel;
 use Illuminate\Contracts\Http\Kernel as HttpKernel;
 use Illuminate\Foundation\Application;
+use Illuminate\Foundation\Bootstrap\HandleExceptions;
 use Illuminate\Foundation\Bootstrap\RegisterProviders;
+use Illuminate\Foundation\Console\AboutCommand;
 use Illuminate\Foundation\Events\DiagnosingHealth;
+use Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull;
+use Illuminate\Foundation\Http\Middleware\TrimStrings;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as AppEventServiceProvider;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as AppRouteServiceProvider;
+use Illuminate\Queue\Queue;
 use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\View;
+use Illuminate\Support\Once;
+use Illuminate\Support\Sleep;
+use Illuminate\View\Component;
 use Laravel\Folio\Folio;
 
 class ApplicationBuilder
@@ -30,6 +39,27 @@ class ApplicationBuilder
      */
     public function __construct(protected Application $app)
     {
+    }
+
+    /**
+     * Flush the application's global state.
+     *
+     * @return void
+     */
+    public static function flushState(): void
+    {
+        AboutCommand::flushState();
+        Artisan::forgetBootstrappers();
+        Component::flushCache();
+        Component::forgetComponentsResolver();
+        Component::forgetFactory();
+        ConvertEmptyStringsToNull::flushState();
+        HandleExceptions::flushState();
+        Once::flush();
+        Queue::createPayloadUsing(null);
+        RegisterProviders::flushState();
+        Sleep::fake(false);
+        TrimStrings::flushState();
     }
 
     /**
