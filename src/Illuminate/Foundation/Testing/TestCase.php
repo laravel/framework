@@ -3,24 +3,14 @@
 namespace Illuminate\Foundation\Testing;
 
 use Carbon\CarbonImmutable;
-use Illuminate\Console\Application as Artisan;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Application;
-use Illuminate\Foundation\Bootstrap\HandleExceptions;
-use Illuminate\Foundation\Bootstrap\RegisterProviders;
 use Illuminate\Foundation\Configuration\ApplicationBuilder;
-use Illuminate\Foundation\Console\AboutCommand;
-use Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull;
-use Illuminate\Foundation\Http\Middleware\TrimStrings;
-use Illuminate\Queue\Queue;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\Facades\ParallelTesting;
-use Illuminate\Support\Once;
-use Illuminate\Support\Sleep;
 use Illuminate\Support\Str;
-use Illuminate\View\Component;
 use Mockery;
 use Mockery\Exception\InvalidCountException;
 use PHPUnit\Framework\TestCase as BaseTestCase;
