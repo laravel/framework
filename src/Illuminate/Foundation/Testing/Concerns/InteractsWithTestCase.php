@@ -214,7 +214,6 @@ trait InteractsWithTestCase
         return $uses;
     }
 
-
     /**
      * Clean up the testing environment before the next test case.
      *
