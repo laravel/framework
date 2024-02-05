@@ -2314,7 +2314,8 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertSame('select 1', $builder->toRawSQL());
     }
 
-    public function testPassthruMethodsCallsReturnsTheResultOfTheForwardedCall(){
+    public function testPassthruMethodsCallsReturnsTheResultOfTheForwardedCall()
+    {
         $query = m::mock(BaseBuilder::class);
 
         $mockResponse = 1;

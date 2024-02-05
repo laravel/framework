@@ -1970,7 +1970,7 @@ class Builder implements BuilderContract
         }
 
         $result = $this->forwardCallTo($this->query, $method, $parameters);
-        if($result === $this->query) {
+        if ($result === $this->query) {
             return $this;
         }
 
