@@ -124,6 +124,11 @@ class PendingMail
         return $this->mailer->send($this->fill($mailable));
     }
 
+    public function sendNow(MailableContract $mailable)
+    {
+        return $this->mailer->sendNow($this->fill($mailable));
+    }
+
     /**
      * Push the given mailable onto the queue.
      *

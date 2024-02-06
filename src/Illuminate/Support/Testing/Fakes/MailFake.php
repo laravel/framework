@@ -426,19 +426,37 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
      */
     public function send($view, array $data = [], $callback = null)
     {
+        return $this->sendMail($view, $view instanceof ShouldQueue, $data);
+    }
+
+    protected function sendMail($view, $shouldSync, array $data = [])
+    {
         if (! $view instanceof Mailable) {
             return;
         }
 
         $view->mailer($this->currentMailer);
 
-        if ($view instanceof ShouldQueue) {
+        if ($shouldSync) {
             return $this->queue($view, $data);
         }
 
         $this->currentMailer = null;
 
         $this->mailables[] = $view;
+    }
+
+    /**
+     * Send a new message using a view.
+     *
+     * @param  \Illuminate\Contracts\Mail\Mailable|string|array  $mailable
+     * @param  array  $data
+     * @param  \Closure|string|null  $callback
+     * @return void
+     */
+    public function sendNow($mailable, array $data = [], $callback = null)
+    {
+        return $this->sendMail($mailable, false);
     }
 
     /**

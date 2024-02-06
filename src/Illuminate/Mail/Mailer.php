@@ -357,6 +357,15 @@ class Mailer implements MailerContract, MailQueueContract
                         : $mailable->mailer($this->name)->send($this);
     }
 
+    public function sendNow($mailable, array $data = [], $callback = null)
+    {
+        if ($mailable instanceof MailableContract) {
+            return $mailable->mailer($this->name)->send($this);
+        }
+
+        return $this->send($mailable, $data, $callback);
+    }
+
     /**
      * Parse the given view name or array.
      *
