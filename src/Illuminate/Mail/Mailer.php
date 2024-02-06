@@ -358,6 +358,23 @@ class Mailer implements MailerContract, MailQueueContract
     }
 
     /**
+     * Send a new message synchronously using a view.
+     *
+     * @param  \Illuminate\Contracts\Mail\Mailable|string|array  $view
+     * @param  array  $data
+     * @param  \Closure|string|null  $callback
+     * @return \Illuminate\Mail\SentMessage|null
+     */
+    public function sendNow($mailable, array $data = [], $callback = null)
+    {
+        if ($mailable instanceof MailableContract) {
+            return $mailable->mailer($this->name)->send($this);
+        }
+
+        return $this->send($mailable, $data, $callback);
+    }
+
+    /**
      * Parse the given view name or array.
      *
      * @param  \Closure|array|string  $view
