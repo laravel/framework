@@ -1302,4 +1302,18 @@ class SupportStringableTest extends TestCase
         $this->assertTrue(isset($str[2]));
         $this->assertFalse(isset($str[10]));
     }
+
+    public function testToBase64()
+    {
+        $this->assertSame(base64_encode('foo'), $this->stringable('foo')->toBase64());
+        $this->assertSame(base64_encode('foobar'), $this->stringable('foobar')->toBase64());
+        $this->assertSame(base64_encode('foobarbaz'), $this->stringable('foobarbaz')->toBase64());
+    }
+
+    public function testFromBase64()
+    {
+        $this->assertSame('foo', $this->stringable(base64_encode('foo'))->fromBase64());
+        $this->assertSame('foobar', $this->stringable(base64_encode('foobar'))->fromBase64());
+        $this->assertSame('foobarbaz', $this->stringable(base64_encode('foobarbaz'))->fromBase64());
+    }
 }
