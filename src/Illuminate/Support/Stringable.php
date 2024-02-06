@@ -1247,6 +1247,27 @@ class Stringable implements JsonSerializable, ArrayAccess
     }
 
     /**
+     * Base64 encode the string.
+     *
+     * @return void
+     */
+    public function toBase64()
+    {
+        return new static(base64_encode($this->value));
+    }
+
+    /**
+     * Decode the string from base64.
+     *
+     * @param boolean $strict
+     * @return void
+     */
+    public function fromBase64($strict = false)
+    {
+        return new static(base64_decode($this->value, $strict));
+    }
+
+    /**
      * Dump the string.
      *
      * @return $this
