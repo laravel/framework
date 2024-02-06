@@ -1259,7 +1259,7 @@ class Stringable implements JsonSerializable, ArrayAccess
     /**
      * Decode the string from base64.
      *
-     * @param bool $strict
+     * @param  bool  $strict
      * @return void
      */
     public function fromBase64($strict = false)
