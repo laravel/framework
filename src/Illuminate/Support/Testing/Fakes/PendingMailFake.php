@@ -29,6 +29,11 @@ class PendingMailFake extends PendingMail
         $this->mailer->send($this->fill($mailable));
     }
 
+    public function sendNow(Mailable $mailable)
+    {
+        $this->mailer->sendNow($this->fill($mailable));
+    }
+
     /**
      * Push the given mailable onto the queue.
      *
