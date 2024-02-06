@@ -597,6 +597,21 @@ class Kernel implements KernelContract
     }
 
     /**
+     * Set the application's middleware priorities.
+     *
+     * @param  array  $priorities
+     * @return $this
+     */
+    public function setMiddlewarePriorities(array $priorities)
+    {
+        $this->middlewarePriority = $priorities;
+
+        $this->syncMiddlewareToRouter();
+
+        return $this;
+    }
+
+    /**
      * Get the Laravel application instance.
      *
      * @return \Illuminate\Contracts\Foundation\Application

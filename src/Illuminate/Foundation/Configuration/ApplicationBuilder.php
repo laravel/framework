@@ -213,6 +213,10 @@ class ApplicationBuilder
             $kernel->setGlobalMiddleware($middleware->getGlobalMiddleware());
             $kernel->setMiddlewareGroups($middleware->getMiddlewareGroups());
             $kernel->setMiddlewareAliases($middleware->getMiddlewareAliases());
+
+            if ($priorities = $middleware->getMiddlewarePriorities()) {
+                $kernel->setMiddlewarePriorities($priorities);
+            }
         });
 
         return $this;

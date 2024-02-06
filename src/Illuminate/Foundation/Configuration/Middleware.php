@@ -153,6 +153,13 @@ class Middleware
     protected $customAliases = [];
 
     /**
+     * The custom middleware priorities.
+     *
+     * @var array
+     */
+    protected $customPriorities = [];
+
+    /**
      * Prepend middleware to the application's global middleware stack.
      *
      * @param  array|string  $middleware
@@ -656,5 +663,28 @@ class Middleware
                 : \Illuminate\Routing\Middleware\ThrottleRequests::class,
             'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         ];
+    }
+
+    /**
+     * Define the priority-sorted list of middleware.
+     *
+     * @param  array  $priorities
+     * @return $this
+     */
+    public function priority(array $priorities)
+    {
+        $this->customPriorities = $priorities;
+
+        return $this;
+    }
+
+    /**
+     * Get the priority-sorted list of middleware.
+     *
+     * @return array
+     */
+    public function getMiddlewarePriorities()
+    {
+        return $this->customPriorities;
     }
 }
