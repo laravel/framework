@@ -1305,15 +1305,15 @@ class SupportStringableTest extends TestCase
 
     public function testToBase64()
     {
-        $this->assertSame(base64_encode('foo'), $this->stringable('foo')->toBase64());
-        $this->assertSame(base64_encode('foobar'), $this->stringable('foobar')->toBase64());
-        $this->assertSame(base64_encode('foobarbaz'), $this->stringable('foobarbaz')->toBase64());
+        $this->assertSame(base64_encode('foo'), (string) $this->stringable('foo')->toBase64());
+        $this->assertSame(base64_encode('foobar'), (string) $this->stringable('foobar')->toBase64());
+        $this->assertSame(base64_encode('foobarbaz'), (string) $this->stringable('foobarbaz')->toBase64());
     }
 
     public function testFromBase64()
     {
-        $this->assertSame('foo', $this->stringable(base64_encode('foo'))->fromBase64());
-        $this->assertSame('foobar', $this->stringable(base64_encode('foobar'))->fromBase64());
-        $this->assertSame('foobarbaz', $this->stringable(base64_encode('foobarbaz'))->fromBase64());
+        $this->assertSame('foo', (string) $this->stringable(base64_encode('foo'))->fromBase64());
+        $this->assertSame('foobar', (string) $this->stringable(base64_encode('foobar'))->fromBase64());
+        $this->assertSame('foobarbaz', (string) $this->stringable(base64_encode('foobarbaz'))->fromBase64());
     }
 }
