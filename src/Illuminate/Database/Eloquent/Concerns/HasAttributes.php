@@ -211,7 +211,9 @@ trait HasAttributes
         // as these attributes are not really in the attributes array, but are run
         // when we need to array or JSON the model for convenience to the coder.
         foreach ($this->getArrayableAppends() as $key) {
-            $attributes[$key] = $this->mutateAttributeForArray($key, null);
+            if (! array_key_exists($key, $attributes)) {
+                $attributes[$key] = $this->mutateAttributeForArray($key, null);
+            }
         }
 
         return $attributes;

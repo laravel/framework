@@ -2039,18 +2039,28 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertSame('camelCased', $model->camelCased);
         $this->assertSame('StudlyCased', $model->StudlyCased);
 
-        $this->assertEquals(['is_admin', 'camelCased', 'StudlyCased'], $model->getAppends());
+        $this->assertEquals(['is_admin', 'camelCased', 'StudlyCased', 'name'], $model->getAppends());
 
         $this->assertTrue($model->hasAppended('is_admin'));
         $this->assertTrue($model->hasAppended('camelCased'));
         $this->assertTrue($model->hasAppended('StudlyCased'));
         $this->assertFalse($model->hasAppended('not_appended'));
 
-        $model->setHidden(['is_admin', 'camelCased', 'StudlyCased']);
+        $model->setHidden(['is_admin', 'camelCased', 'StudlyCased', 'name']);
         $this->assertEquals([], $model->toArray());
 
         $model->setVisible([]);
         $this->assertEquals([], $model->toArray());
+    }
+
+    public function testAppendingOfAccessors()
+    {
+        $model = new EloquentModelAppendsStub;
+
+        $model->setRawAttributes(['name' => 'taylor otwell']);
+
+        $this->assertSame('Taylor Otwell', $model->name);
+        $this->assertSame('Taylor Otwell', $model->toArray()['name']);
     }
 
     public function testGetMutatedAttributes()
@@ -3136,7 +3146,7 @@ class EloquentModelBootingTestStub extends Model
 
 class EloquentModelAppendsStub extends Model
 {
-    protected $appends = ['is_admin', 'camelCased', 'StudlyCased'];
+    protected $appends = ['is_admin', 'camelCased', 'StudlyCased', 'name'];
 
     public function getIsAdminAttribute()
     {
@@ -3151,6 +3161,11 @@ class EloquentModelAppendsStub extends Model
     public function getStudlyCasedAttribute()
     {
         return 'StudlyCased';
+    }
+
+    protected function name(): Attribute
+    {
+        return Attribute::get(fn ($value) => ucwords($value));
     }
 }
 
