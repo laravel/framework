@@ -4,6 +4,8 @@ namespace Illuminate\Concurrency;
 
 use Illuminate\Process\Factory as ProcessFactory;
 use Illuminate\Support\MultipleInstanceManager;
+use RuntimeException;
+use Spatie\Fork\Fork;
 
 /**
  * @mixin \Illuminate\Contracts\Concurrency\Driver
@@ -33,6 +35,21 @@ class ConcurrencyManager extends MultipleInstanceManager
     }
 
     /**
+     * Create an instance of the fork concurrency driver.
+     *
+     * @param  array  $config
+     * @return \Illuminate\Concurrency\SyncDriver
+     */
+    public function createForkDriver(array $config)
+    {
+        if (! class_exists(Fork::class)) {
+            throw new RuntimeException('Please install the "spatie/fork" Composer package in order to utilize the "fork" driver.');
+        }
+
+        return new ForkDriver;
+    }
+
+    /**
      * Create an instance of the sync concurrency driver.
      *
      * @param  array  $config
@@ -50,7 +67,7 @@ class ConcurrencyManager extends MultipleInstanceManager
      */
     public function getDefaultInstance()
     {
-        return $this->app['config']['concurrency.default'];
+        return $this->app['config']['concurrency.default'] ?? 'process';
     }
 
     /**
