@@ -2,10 +2,10 @@
 
 namespace Illuminate\Support\Facades;
 
-use Illuminate\Concurrency\Factory;
+use Illuminate\Concurrency\ConcurrencyManager;
 
 /**
- * @see \Illuminate\Concurrency\Factory
+ * @see \Illuminate\Concurrency\ConcurrencyManager
  */
 class Concurrency extends Facade
 {
@@ -16,6 +16,6 @@ class Concurrency extends Facade
      */
     protected static function getFacadeAccessor()
     {
-        return Factory::class;
+        return ConcurrencyManager::class;
     }
 }

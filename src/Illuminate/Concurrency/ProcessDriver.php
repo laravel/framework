@@ -8,16 +8,19 @@ use Illuminate\Process\Pool;
 use Illuminate\Support\Arr;
 use Laravel\SerializableClosure\SerializableClosure;
 
-class Factory
+class ProcessDriver
 {
     /**
-     * Create a new concurrency factory instance.
+     * Create a new process based concurrency driver.
      */
     public function __construct(protected ProcessFactory $processFactory)
     {
         //
     }
 
+    /**
+     * Run the given tasks concurrently and return an array containing the results.
+     */
     public function run(Closure|array $tasks): array
     {
         $results = $this->processFactory->pool(function (Pool $pool) use ($tasks) {
@@ -42,7 +45,7 @@ class Factory
     }
 
     /**
-     * Start the given task(s) in the background.
+     * Start the given tasks in the background.
      */
     public function background(Closure|array $tasks): void
     {
