@@ -32,9 +32,9 @@ class Factory
             $result = json_decode($result->output(), true);
 
             if (! $result['successful']) {
-                $exceptionClass = $result['exception'];
-
-                throw new $exceptionClass($result['message']);
+                throw new $result['exception'](
+                    $result['message']
+                );
             }
 
             return unserialize($result['result']);
