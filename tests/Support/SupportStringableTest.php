@@ -1313,7 +1313,7 @@ class SupportStringableTest extends TestCase
     public function testFromBase64()
     {
         $this->assertSame('foo', (string) $this->stringable(base64_encode('foo'))->fromBase64());
-        $this->assertSame('foobar', (string) $this->stringable(base64_encode('foobar'))->fromBase64());
+        $this->assertSame('foobar', (string) $this->stringable(base64_encode('foobar'))->fromBase64(true));
         $this->assertSame('foobarbaz', (string) $this->stringable(base64_encode('foobarbaz'))->fromBase64());
     }
 }
