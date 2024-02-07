@@ -253,9 +253,15 @@ trait ValidatesAttributes
         }
 
         if (is_null($date = $this->getDateTimestamp($parameters[0]))) {
+            $dateAttributes = explode(' ', $parameters[0]);
             $comparedValue = $this->getValue($parameters[0]);
 
-            if (! is_string($comparedValue) && ! is_numeric($comparedValue) && ! $comparedValue instanceof DateTimeInterface) {
+            if (count($dateAttributes) > 1) {
+                $key = array_shift($dateAttributes);
+                $comparedValue = implode(' ', [$this->getValue($key), ...$dateAttributes]);
+            }
+
+            if (! is_null($comparedValue) && ! is_string($comparedValue) && ! is_numeric($comparedValue) && ! $comparedValue instanceof DateTimeInterface) {
                 return false;
             }
 
