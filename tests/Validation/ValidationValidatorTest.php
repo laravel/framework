@@ -5986,6 +5986,21 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, ['x' => ['a' => ['v' => 'c']], 'y' => 'invalid'], ['x' => 'date', 'y' => 'date|before:x']);
         $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['x' => '1970-01-01'], ['x' => 'nullable|date', 'y' => 'nullable|date|after:x']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['dates' => [['start_at' => '2024-02-02 12:00:00', 'ends_at' => '2024-02-02 12:00:00']]], ['dates.*.start_at' => 'date', 'dates.*.ends_at' => 'date|after:start_at']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['date_end' => '2021-09-17 13:28:47'], ['date_start' => 'nullable|date', 'date_end' => 'nullable|date|after_or_equal:date_start']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['date_end' => '2024-01-05 00:00:01', 'date_start' => '2024-01-04 00:00:00'], ['date_start' => 'date', 'date_end' => 'date|after:date_start +1 day']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['date_end' => '2024-01-05 00:00:01', 'date_start' => '2024-01-04 00:00:00'], ['date_start' => 'date', 'date_end' => 'date|after:date_start +1day']);
+        $this->assertTrue($v->passes());
     }
 
     public function testBeforeAndAfterWithFormat()
