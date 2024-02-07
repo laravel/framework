@@ -1536,6 +1536,29 @@ class Str
     }
 
     /**
+     * Base64 encode the string.
+     *
+     * @param  string  $string
+     * @return string
+     */
+    public static function toBase64($string): string
+    {
+        return base64_encode($string);
+    }
+
+    /**
+     * Decode the string from base64.
+     *
+     * @param  string  $string
+     * @param  boolean  $strict
+     * @return void
+     */
+    public static function fromBase64($string, $strict = false)
+    {
+        return base64_decode($string, $strict);
+    }
+
+    /**
      * Make a string's first character lowercase.
      *
      * @param  string  $string
