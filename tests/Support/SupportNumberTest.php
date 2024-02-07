@@ -64,6 +64,19 @@ class SupportNumberTest extends TestCase
         Number::useLocale('en');
     }
 
+    public function testFormatWithAppPrecision()
+    {
+        $this->needsIntlExtension();
+
+        $this->assertSame('100,000', Number::format(100000));
+
+        Number::usePrecision(2);
+
+        $this->assertSame('100,000.00', Number::format(100000));
+
+        Number::usePrecision(0);
+    }
+
     public function testSpellout()
     {
         $this->assertSame('ten', Number::spell(10));
@@ -124,6 +137,19 @@ class SupportNumberTest extends TestCase
         $this->assertSame('0.1235%', Number::percentage(0.12345, precision: 4));
     }
 
+    public function testToPercentWithAppPrecision()
+    {
+        $this->needsIntlExtension();
+
+        $this->assertSame('100%', Number::percentage(100));
+
+        Number::usePrecision(2);
+
+        $this->assertSame('100.00%', Number::percentage(100));
+
+        Number::usePrecision(0);
+    }
+
     public function testToCurrency()
     {
         $this->needsIntlExtension();
@@ -171,6 +197,17 @@ class SupportNumberTest extends TestCase
         $this->assertSame('1 ZB', Number::fileSize(1024 ** 7));
         $this->assertSame('1 YB', Number::fileSize(1024 ** 8));
         $this->assertSame('1,024 YB', Number::fileSize(1024 ** 9));
+    }
+
+    public function testBytesToHumanWithAppPrecision()
+    {
+        $this->assertSame('2 KB', Number::fileSize(2048));
+
+        Number::usePrecision(2);
+
+        $this->assertSame('2.00 KB', Number::fileSize(2048));
+
+        Number::usePrecision(0);
     }
 
     public function testClamp()
@@ -238,6 +275,17 @@ class SupportNumberTest extends TestCase
         $this->assertSame('-1 thousand quadrillion', Number::forHumans(-1000000000000000000));
     }
 
+    public function testToHumanWithAppPrecision()
+    {
+        $this->assertSame('1 thousand', Number::forHumans(1000));
+
+        Number::usePrecision(2);
+
+        $this->assertSame('1.00 thousand', Number::forHumans(1000));
+
+        Number::usePrecision(0);
+    }
+
     public function testSummarize()
     {
         $this->assertSame('1', Number::abbreviate(1));
@@ -292,6 +340,17 @@ class SupportNumberTest extends TestCase
         $this->assertSame('-1.1T', Number::abbreviate(-1100000000000, maxPrecision: 1));
         $this->assertSame('-1Q', Number::abbreviate(-1000000000000000));
         $this->assertSame('-1KQ', Number::abbreviate(-1000000000000000000));
+    }
+
+    public function testSummarizeWithAppPrecision()
+    {
+        $this->assertSame('1K', Number::abbreviate(1000));
+
+        Number::usePrecision(2);
+
+        $this->assertSame('1.00K', Number::abbreviate(1000));
+
+        Number::usePrecision(0);
     }
 
     protected function needsIntlExtension()

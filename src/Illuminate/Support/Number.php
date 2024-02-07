@@ -18,6 +18,13 @@ class Number
     protected static $locale = 'en';
 
     /**
+     * The current default precision.
+     *
+     * @var int
+     */
+    protected static $precision = 0;
+
+    /**
      * Format the given number according to the current locale.
      *
      * @param  int|float  $number
@@ -36,6 +43,8 @@ class Number
             $formatter->setAttribute(NumberFormatter::MAX_FRACTION_DIGITS, $maxPrecision);
         } elseif (! is_null($precision)) {
             $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, $precision);
+        } elseif (! is_float($number)) {
+            $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, static::$precision);
         }
 
         return $formatter->format($number);
@@ -92,7 +101,7 @@ class Number
      * @param  string|null  $locale
      * @return string|false
      */
-    public static function percentage(int|float $number, int $precision = 0, ?int $maxPrecision = null, ?string $locale = null)
+    public static function percentage(int|float $number, ?int $precision = null, ?int $maxPrecision = null, ?string $locale = null)
     {
         static::ensureIntlExtensionIsInstalled();
 
@@ -101,7 +110,7 @@ class Number
         if (! is_null($maxPrecision)) {
             $formatter->setAttribute(NumberFormatter::MAX_FRACTION_DIGITS, $maxPrecision);
         } else {
-            $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, $precision);
+            $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, $precision ?? static::$precision);
         }
 
         return $formatter->format($number / 100);
@@ -132,7 +141,7 @@ class Number
      * @param  int|null  $maxPrecision
      * @return string
      */
-    public static function fileSize(int|float $bytes, int $precision = 0, ?int $maxPrecision = null)
+    public static function fileSize(int|float $bytes, ?int $precision = null, ?int $maxPrecision = null)
     {
         $units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
 
@@ -140,7 +149,7 @@ class Number
             $bytes /= 1024;
         }
 
-        return sprintf('%s %s', static::format($bytes, $precision, $maxPrecision), $units[$i]);
+        return sprintf('%s %s', static::format($bytes, $precision ?? static::$precision, $maxPrecision), $units[$i]);
     }
 
     /**
@@ -151,9 +160,9 @@ class Number
      * @param  int|null  $maxPrecision
      * @return bool|string
      */
-    public static function abbreviate(int|float $number, int $precision = 0, ?int $maxPrecision = null)
+    public static function abbreviate(int|float $number, ?int $precision = null, ?int $maxPrecision = null)
     {
-        return static::forHumans($number, $precision, $maxPrecision, abbreviate: true);
+        return static::forHumans($number, $precision ?? static::$precision, $maxPrecision, abbreviate: true);
     }
 
     /**
@@ -165,9 +174,9 @@ class Number
      * @param  bool  $abbreviate
      * @return bool|string
      */
-    public static function forHumans(int|float $number, int $precision = 0, ?int $maxPrecision = null, bool $abbreviate = false)
+    public static function forHumans(int|float $number, ?int $precision = null, ?int $maxPrecision = null, bool $abbreviate = false)
     {
-        return static::summarize($number, $precision, $maxPrecision, $abbreviate ? [
+        return static::summarize($number, $precision ?? static::$precision, $maxPrecision, $abbreviate ? [
             3 => 'K',
             6 => 'M',
             9 => 'B',
@@ -257,6 +266,17 @@ class Number
     public static function useLocale(string $locale)
     {
         static::$locale = $locale;
+    }
+
+    /**
+     * Set the default precision.
+     *
+     * @param  int  $precision
+     * @return void
+     */
+    public static function usePrecision(int $precision)
+    {
+        static::$precision = $precision;
     }
 
     /**
