@@ -5896,7 +5896,7 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->fails());
     }
 
-    public function testBeforeAndAfter()
+    public function testBeforeAndAfter2345()
     {
         date_default_timezone_set('UTC');
         $trans = $this->getIlluminateArrayTranslator();
@@ -6000,6 +6000,9 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->passes());
 
         $v = new Validator($trans, ['date_end' => '2024-01-05 00:00:01', 'date_start' => '2024-01-04 00:00:00'], ['date_start' => 'date', 'date_end' => 'date|after:date_start +1day']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['date_start' => '2024-01-04 00:00:00', 'date_end' => '2024-01-05 00:00:01'], ['date_start' => 'date|before:date_end -1 day', 'date_end' => 'date']);
         $this->assertTrue($v->passes());
     }
 
