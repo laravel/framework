@@ -2222,6 +2222,31 @@ class RoutingRouteTest extends TestCase
         $this->assertEquals(302, $response->getStatusCode());
     }
 
+    public function testRoutePermanentRedirectRemovesQueryStringByDefault()
+    {
+        $container = new Container;
+        $router = new Router(new Dispatcher, $container);
+        $container->singleton(Registrar::class, function () use ($router) {
+            return $router;
+        });
+        $request = Request::create('contact_us?laravel=iscool', 'GET');
+        $container->singleton(Request::class, function () use ($request) {
+            return $request;
+        });
+        $urlGenerator = new UrlGenerator(new RouteCollection, $request);
+        $container->singleton(UrlGenerator::class, function () use ($urlGenerator) {
+            return $urlGenerator;
+        });
+        $router->get('contact_us', function () {
+            throw new Exception('Route should not be reachable.');
+        });
+        $router->permanentRedirect('contact_us', 'contact');
+
+        $response = $router->dispatch($request);
+        $this->assertTrue($response->isRedirect('contact'));
+        $this->assertEquals(301, $response->getStatusCode());
+    }
+
     public function testRouteRedirectPreservesQueryParameters()
     {
         $container = new Container;
@@ -2245,6 +2270,31 @@ class RoutingRouteTest extends TestCase
         $response = $router->dispatch($request);
         $this->assertTrue($response->isRedirect('contact?laravel=iscool'));
         $this->assertEquals(302, $response->getStatusCode());
+    }
+
+    public function testRoutePermanentRedirectPreservesQueryParameters()
+    {
+        $container = new Container;
+        $router = new Router(new Dispatcher, $container);
+        $container->singleton(Registrar::class, function () use ($router) {
+            return $router;
+        });
+        $request = Request::create('contact_us?laravel=iscool', 'GET');
+        $container->singleton(Request::class, function () use ($request) {
+            return $request;
+        });
+        $urlGenerator = new UrlGenerator(new RouteCollection, $request);
+        $container->singleton(UrlGenerator::class, function () use ($urlGenerator) {
+            return $urlGenerator;
+        });
+        $router->get('contact_us', function () {
+            throw new Exception('Route should not be reachable.');
+        });
+        $router->permanentRedirect('contact_us', 'contact', preserveQueryParameters: true);
+
+        $response = $router->dispatch($request);
+        $this->assertTrue($response->isRedirect('contact?laravel=iscool'));
+        $this->assertEquals(301, $response->getStatusCode());
     }
 
     public function testRouteRedirectPreservesQueryParametersWithOriginal()
