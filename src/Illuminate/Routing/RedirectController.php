@@ -23,7 +23,22 @@ class RedirectController extends Controller
 
         $destination = $parameters->get('destination');
 
-        $parameters->forget('status')->forget('destination');
+        if($parameters->get('preserve') && $queryParameters = $request->query->all()) {
+            $components = parse_url(preg_replace('/\{.*?\?\}/', '', $destination));
+            
+            if (isset($components['query'])) {
+                parse_str(html_entity_decode($components['query']), $qs);
+
+                $query = array_replace($qs, $queryParameters);
+                $queryString = http_build_query($query, '', '&');
+            } else {
+                $queryString = http_build_query($queryParameters, '', '&');
+            }
+
+            $destination = $destination .'?'.$queryString;
+        }
+
+        $parameters->forget('status')->forget('destination')->forget('preserve');
 
         $route = (new Route('GET', $destination, [
             'as' => 'laravel_route_redirect_destination',

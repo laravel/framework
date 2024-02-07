@@ -254,11 +254,12 @@ class Router implements BindingRegistrar, RegistrarContract
      * @param  int  $status
      * @return \Illuminate\Routing\Route
      */
-    public function redirect($uri, $destination, $status = 302)
+    public function redirect($uri, $destination, $status = 302, bool $preserveQueryParameters = false)
     {
         return $this->any($uri, '\Illuminate\Routing\RedirectController')
                 ->defaults('destination', $destination)
-                ->defaults('status', $status);
+                ->defaults('status', $status)
+                ->defaults('preserve', $preserveQueryParameters);
     }
 
     /**
@@ -268,9 +269,9 @@ class Router implements BindingRegistrar, RegistrarContract
      * @param  string  $destination
      * @return \Illuminate\Routing\Route
      */
-    public function permanentRedirect($uri, $destination)
+    public function permanentRedirect($uri, $destination, bool $preserveQueryParameters = false)
     {
-        return $this->redirect($uri, $destination, 301);
+        return $this->redirect($uri, $destination, 301, $preserveQueryParameters);
     }
 
     /**
