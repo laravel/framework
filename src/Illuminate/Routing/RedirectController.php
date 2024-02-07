@@ -23,9 +23,9 @@ class RedirectController extends Controller
 
         $destination = $parameters->get('destination');
 
-        if($parameters->get('preserve') && $queryParameters = $request->query->all()) {
+        if ($parameters->get('preserve') && $queryParameters = $request->query->all()) {
             $components = parse_url(preg_replace('/\{.*?\?\}/', '', $destination));
-            
+
             if (isset($components['query'])) {
                 parse_str(html_entity_decode($components['query']), $qs);
 
