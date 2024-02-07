@@ -2197,6 +2197,206 @@ class RoutingRouteTest extends TestCase
         $this->assertEquals(301, $response->getStatusCode());
     }
 
+    public function testRouteRedirectRemovesQueryStringByDefault()
+    {
+        $container = new Container;
+        $router = new Router(new Dispatcher, $container);
+        $container->singleton(Registrar::class, function () use ($router) {
+            return $router;
+        });
+        $request = Request::create('contact_us?laravel=iscool', 'GET');
+        $container->singleton(Request::class, function () use ($request) {
+            return $request;
+        });
+        $urlGenerator = new UrlGenerator(new RouteCollection, $request);
+        $container->singleton(UrlGenerator::class, function () use ($urlGenerator) {
+            return $urlGenerator;
+        });
+        $router->get('contact_us', function () {
+            throw new Exception('Route should not be reachable.');
+        });
+        $router->redirect('contact_us', 'contact');
+
+        $response = $router->dispatch($request);
+        $this->assertTrue($response->isRedirect('contact'));
+        $this->assertEquals(302, $response->getStatusCode());
+    }
+
+    public function testRouteRedirectPreservesQueryParameters()
+    {
+        $container = new Container;
+        $router = new Router(new Dispatcher, $container);
+        $container->singleton(Registrar::class, function () use ($router) {
+            return $router;
+        });
+        $request = Request::create('contact_us?laravel=iscool', 'GET');
+        $container->singleton(Request::class, function () use ($request) {
+            return $request;
+        });
+        $urlGenerator = new UrlGenerator(new RouteCollection, $request);
+        $container->singleton(UrlGenerator::class, function () use ($urlGenerator) {
+            return $urlGenerator;
+        });
+        $router->get('contact_us', function () {
+            throw new Exception('Route should not be reachable.');
+        });
+        $router->redirect('contact_us', 'contact', preserveQueryParameters: true);
+
+        $response = $router->dispatch($request);
+        $this->assertTrue($response->isRedirect('contact?laravel=iscool'));
+        $this->assertEquals(302, $response->getStatusCode());
+    }
+
+    public function testRouteRedirectPreservesQueryParametersWithOriginal()
+    {
+        $container = new Container;
+        $router = new Router(new Dispatcher, $container);
+        $container->singleton(Registrar::class, function () use ($router) {
+            return $router;
+        });
+        $request = Request::create('contact_us?laravel=iscool', 'GET');
+        $container->singleton(Request::class, function () use ($request) {
+            return $request;
+        });
+        $urlGenerator = new UrlGenerator(new RouteCollection, $request);
+        $container->singleton(UrlGenerator::class, function () use ($urlGenerator) {
+            return $urlGenerator;
+        });
+        $router->get('contact_us', function () {
+            throw new Exception('Route should not be reachable.');
+        });
+        $router->redirect('contact_us', 'contact?ref=contact_us', preserveQueryParameters: true);
+
+        $response = $router->dispatch($request);
+        $this->assertTrue($response->isRedirect('contact?ref=contact_us&laravel=iscool'));
+        $this->assertEquals(302, $response->getStatusCode());
+    }
+
+    public function testRouteRedirectRemovesQueryStringByDefaultButKeepsOriginal()
+    {
+        $container = new Container;
+        $router = new Router(new Dispatcher, $container);
+        $container->singleton(Registrar::class, function () use ($router) {
+            return $router;
+        });
+        $request = Request::create('contact_us?laravel=iscool', 'GET');
+        $container->singleton(Request::class, function () use ($request) {
+            return $request;
+        });
+        $urlGenerator = new UrlGenerator(new RouteCollection, $request);
+        $container->singleton(UrlGenerator::class, function () use ($urlGenerator) {
+            return $urlGenerator;
+        });
+        $router->get('contact_us', function () {
+            throw new Exception('Route should not be reachable.');
+        });
+        $router->redirect('contact_us', 'contact?ref=contact_us', preserveQueryParameters: false);
+
+        $response = $router->dispatch($request);
+        $this->assertTrue($response->isRedirect('contact?ref=contact_us'));
+        $this->assertEquals(302, $response->getStatusCode());
+    }
+
+    public function testRouteRedirectPreservesQueryParametersWithParameters()
+    {
+        $container = new Container;
+        $router = new Router(new Dispatcher, $container);
+        $container->singleton(Registrar::class, function () use ($router) {
+            return $router;
+        });
+        $request = Request::create('olduser/1?laravel=iscool', 'GET');
+        $container->singleton(Request::class, function () use ($request) {
+            return $request;
+        });
+        $urlGenerator = new UrlGenerator(new RouteCollection, $request);
+        $container->singleton(UrlGenerator::class, function () use ($urlGenerator) {
+            return $urlGenerator;
+        });
+        $router->get('olduser/{user}', function () {
+            throw new Exception('Route should not be reachable.');
+        });
+        $router->redirect('olduser/{user}', 'user/{user}', preserveQueryParameters: true);
+
+        $response = $router->dispatch($request);
+        $this->assertTrue($response->isRedirect('user/1?laravel=iscool'));
+        $this->assertEquals(302, $response->getStatusCode());
+    }
+
+    public function testRouteRedirectPreservesQueryParametersWithOprionalParameters()
+    {
+        $container = new Container;
+        $router = new Router(new Dispatcher, $container);
+        $container->singleton(Registrar::class, function () use ($router) {
+            return $router;
+        });
+        $request = Request::create('olduser/1?laravel=iscool', 'GET');
+        $container->singleton(Request::class, function () use ($request) {
+            return $request;
+        });
+        $urlGenerator = new UrlGenerator(new RouteCollection, $request);
+        $container->singleton(UrlGenerator::class, function () use ($urlGenerator) {
+            return $urlGenerator;
+        });
+        $router->get('olduser/{user?}', function () {
+            throw new Exception('Route should not be reachable.');
+        });
+        $router->redirect('olduser/{user?}', 'user/{user?}', preserveQueryParameters: true);
+
+        $response = $router->dispatch($request);
+        $this->assertTrue($response->isRedirect('user/1?laravel=iscool'));
+        $this->assertEquals(302, $response->getStatusCode());
+    }
+
+    public function testRouteRedirectPreservesQueryParametersWithOriginalWithOprionalParameters()
+    {
+        $container = new Container;
+        $router = new Router(new Dispatcher, $container);
+        $container->singleton(Registrar::class, function () use ($router) {
+            return $router;
+        });
+        $request = Request::create('olduser/1?laravel=iscool', 'GET');
+        $container->singleton(Request::class, function () use ($request) {
+            return $request;
+        });
+        $urlGenerator = new UrlGenerator(new RouteCollection, $request);
+        $container->singleton(UrlGenerator::class, function () use ($urlGenerator) {
+            return $urlGenerator;
+        });
+        $router->get('olduser/{user?}', function () {
+            throw new Exception('Route should not be reachable.');
+        });
+        $router->redirect('olduser/{user?}', 'user/{user?}?ref=olduser', preserveQueryParameters: true);
+
+        $response = $router->dispatch($request);
+        $this->assertTrue($response->isRedirect('user/1?ref=olduser&laravel=iscool'));
+        $this->assertEquals(302, $response->getStatusCode());
+    }
+
+    public function testRouteRedirectRemovesQueryParametersButKeepsOriginalWithOprionalParameters()
+    {
+        $container = new Container;
+        $router = new Router(new Dispatcher, $container);
+        $container->singleton(Registrar::class, function () use ($router) {
+            return $router;
+        });
+        $request = Request::create('olduser/1?laravel=iscool', 'GET');
+        $container->singleton(Request::class, function () use ($request) {
+            return $request;
+        });
+        $urlGenerator = new UrlGenerator(new RouteCollection, $request);
+        $container->singleton(UrlGenerator::class, function () use ($urlGenerator) {
+            return $urlGenerator;
+        });
+        $router->get('olduser/{user?}', function () {
+            throw new Exception('Route should not be reachable.');
+        });
+        $router->redirect('olduser/{user?}', 'user/{user?}?ref=olduser', preserveQueryParameters: false);
+
+        $response = $router->dispatch($request);
+        $this->assertTrue($response->isRedirect('user/1?ref=olduser'));
+        $this->assertEquals(302, $response->getStatusCode());
+    }
+
     public function testRouteCanMiddlewareCanBeAssigned()
     {
         $route = new Route(['GET'], '/', []);

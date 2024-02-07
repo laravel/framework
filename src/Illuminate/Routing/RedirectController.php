@@ -31,11 +31,12 @@ class RedirectController extends Controller
 
                 $query = array_replace($qs, $queryParameters);
                 $queryString = http_build_query($query, '', '&');
+                $destination = Str::beforeLast($destination, '?');
             } else {
                 $queryString = http_build_query($queryParameters, '', '&');
             }
 
-            $destination = $destination .'?'.$queryString;
+            $destination = $destination.'?'.$queryString;
         }
 
         $parameters->forget('status')->forget('destination')->forget('preserve');
