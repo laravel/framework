@@ -486,49 +486,24 @@ class Middleware
     /**
      * Configure where authenticated users are redirected after authentication.
      *
-     * @param  callable  $redirectTo
+     * @param  callable|string  $users
+     * @param  callable|string  $guests
      * @return $this
      */
-    public function redirectUsersUsing(callable $redirectTo)
+    public function redirectTo(callable|string $guests = null, callable|string $users = null)
     {
-        return $this->auth(redirectTo: $redirectTo);
-    }
+        $guests = is_string($guests) ? fn () => $guests : $guests;
+        $users = is_string($users) ? fn () => $users : $users;
 
-    /**
-     * Configure where guests are redirected if not authenticated.
-     *
-     * @param  callable  $redirectTo
-     * @return $this
-     */
-    public function redirectGuestsUsing(callable $redirectTo)
-    {
-        return $this->guest(redirectTo: $redirectTo);
-    }
+        if ($guests) {
+            Authenticate::redirectUsing($guests);
+            AuthenticateSession::redirectUsing($guests);
+            AuthenticationException::redirectUsing($guests);
+        }
 
-    /**
-     * Configure the behavior of the authentication middleware.
-     *
-     * @param  callable  $redirectTo
-     * @return $this
-     */
-    protected function auth(callable $redirectTo)
-    {
-        Authenticate::redirectUsing($redirectTo);
-        AuthenticateSession::redirectUsing($redirectTo);
-        AuthenticationException::redirectUsing($redirectTo);
-
-        return $this;
-    }
-
-    /**
-     * Configure the behavior of the "guest" middleware.
-     *
-     * @param  callable  $redirectTo
-     * @return $this
-     */
-    protected function guest(callable $redirectTo)
-    {
-        RedirectIfAuthenticated::redirectUsing($redirectTo);
+        if ($users) {
+            RedirectIfAuthenticated::redirectUsing($users);
+        }
 
         return $this;
     }

@@ -32,4 +32,18 @@ interface Encrypter
      * @return string
      */
     public function getKey();
+
+    /**
+     * Get the current encryption key and all previous encryption keys.
+     *
+     * @return array
+     */
+    public function getAllKeys();
+
+    /**
+     * Get the previous encryption keys.
+     *
+     * @return array
+     */
+    public function getPreviousKeys();
 }
