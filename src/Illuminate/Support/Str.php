@@ -1550,7 +1550,7 @@ class Str
      * Decode the string from base64.
      *
      * @param  string  $string
-     * @param  boolean  $strict
+     * @param  bool  $strict
      * @return void
      */
     public static function fromBase64($string, $strict = false)
