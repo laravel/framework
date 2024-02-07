@@ -1,0 +1,9 @@
+<?php
+
+namespace {{ namespace }};
+
+enum {{ class }}: string
+{
+
+}
+
