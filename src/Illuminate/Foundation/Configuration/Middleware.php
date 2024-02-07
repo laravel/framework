@@ -484,10 +484,21 @@ class Middleware
     }
 
     /**
-     * Configure where authenticated users are redirected after authentication.
+     * Configure where guests are redirected by the authentication middleware.
      *
-     * @param  callable|string  $users
+     * @param  callable|string  $redirect
+     * @return $this
+     */
+    public function redirectGuestsTo(callable|string $redirect)
+    {
+        return $this->redirectTo(guests: $redirect);
+    }
+
+    /**
+     * Configure where users are redirected by the authentication and guest middleware.
+     *
      * @param  callable|string  $guests
+     * @param  callable|string  $users
      * @return $this
      */
     public function redirectTo(callable|string $guests = null, callable|string $users = null)
