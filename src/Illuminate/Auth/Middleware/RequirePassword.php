@@ -93,8 +93,9 @@ class RequirePassword
      */
     protected function shouldConfirmPassword($request, $passwordTimeoutSeconds = null)
     {
-        $confirmedAt = time() - $request->session()->get('auth.password_confirmed_at', 0);
-
+        $identifier = $request->user()->getUniqueIdentifierForUser();
+        $key = "auth.password_confirmed_at.$identifier";
+        $confirmedAt = time() - cache($key, 0);
         return $confirmedAt > ($passwordTimeoutSeconds ?? $this->passwordTimeout);
     }
 }

@@ -102,4 +102,16 @@ trait Authenticatable
     {
         return $this->rememberTokenName;
     }
+
+    /**
+     * Get the unique identifier for the user.
+     *
+     * @return string
+     */
+    public function getUniqueIdentifierForUser()
+    {
+        $identifierValue = $this->getAuthIdentifier();
+        $className = class_basename($this::class);
+        return $className . "." . $identifierValue;
+    }
 }
