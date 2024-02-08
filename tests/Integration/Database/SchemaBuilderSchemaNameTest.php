@@ -3,7 +3,6 @@
 namespace Illuminate\Tests\Integration\Database;
 
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Database\Schema\Builder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -26,11 +25,13 @@ class SchemaBuilderSchemaNameTest extends DatabaseTestCase
 
     protected function defineEnvironment($app)
     {
-        $this->app['config']->set(
-            'database.connections.without-prefix', $this->app['config']->get('database.connections.'.$this->driver)
+        parent::defineEnvironment($app);
+
+        $app['config']->set(
+            'database.connections.without-prefix', $app['config']->get('database.connections.'.$this->driver)
         );
-        $this->app['config']->set('database.connections.with-prefix', $this->app['config']->get('database.connections.without-prefix'));
-        $this->app['config']->set('database.connections.with-prefix.prefix', 'example_');
+        $app['config']->set('database.connections.with-prefix', $app['config']->get('database.connections.without-prefix'));
+        $app['config']->set('database.connections.with-prefix.prefix', 'example_');
     }
 
     #[DataProvider('connectionProvider')]
