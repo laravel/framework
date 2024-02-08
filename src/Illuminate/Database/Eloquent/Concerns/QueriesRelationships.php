@@ -630,8 +630,8 @@ trait QueriesRelationships
             $relation = $this->getRelationWithoutConstraints($name);
 
             if ($function) {
-                if ($this->getGrammar()->isExpression($column)) {
-                    $aggregateColumn = $this->getGrammar()->getValue($column);
+                if ($this->getQuery()->getGrammar()->isExpression($column)) {
+                    $aggregateColumn = $this->getQuery()->getGrammar()->getValue($column);
                 } else {
                     $hashedColumn = $this->getRelationHashedColumn($column, $relation);
 
@@ -642,7 +642,7 @@ trait QueriesRelationships
 
                 $expression = $function === 'exists' ? $aggregateColumn : sprintf('%s(%s)', $function, $aggregateColumn);
             } else {
-                $expression = $this->getGrammar()->getValue($column);
+                $expression = $this->getQuery()->getGrammar()->getValue($column);
             }
 
             // Here, we will grab the relationship sub-query and prepare to add it to the main query
@@ -671,7 +671,7 @@ trait QueriesRelationships
             // the query builder. Then, we will return the builder instance back to the developer
             // for further constraint chaining that needs to take place on the query as needed.
             $alias ??= Str::snake(
-                preg_replace('/[^[:alnum:][:space:]_]/u', '', "$name $function {$this->getGrammar()->getValue($column)}")
+                preg_replace('/[^[:alnum:][:space:]_]/u', '', "$name $function {$this->getQuery()->getGrammar()->getValue($column)}")
             );
 
             if ($function === 'exists') {
