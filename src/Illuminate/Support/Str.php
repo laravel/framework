@@ -1536,7 +1536,7 @@ class Str
     }
 
     /**
-     * Base64 encode the string.
+     * Convert the given string to Base64 encoding.
      *
      * @param  string  $string
      * @return string
@@ -1547,7 +1547,7 @@ class Str
     }
 
     /**
-     * Decode the string from base64.
+     * Decode the given Base64 encoded string.
      *
      * @param  string  $string
      * @param  bool  $strict
