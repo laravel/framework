@@ -1247,7 +1247,7 @@ class Stringable implements JsonSerializable, ArrayAccess
     }
 
     /**
-     * Base64 encode the string.
+     * Convert the string to Base64 encoding.
      *
      * @return void
      */
@@ -1257,7 +1257,7 @@ class Stringable implements JsonSerializable, ArrayAccess
     }
 
     /**
-     * Decode the string from base64.
+     * Decode the Base64 encoded string.
      *
      * @param  bool  $strict
      * @return void
