@@ -127,7 +127,7 @@ class ApplicationBuilder
         string $apiPrefix = 'api',
         ?callable $then = null)
     {
-        if (is_null($using) && (is_string($web) || is_string($api))) {
+        if (is_null($using) && (is_string($web) || is_string($api) || is_string($pages) || is_string($health)) || is_callable($then)) {
             $using = $this->buildRoutingCallback($web, $api, $pages, $health, $apiPrefix, $then);
         }
 
