@@ -198,16 +198,18 @@ class ApplicationBuilder
     /**
      * Register the global middleware, middleware groups, and middleware aliases for the application.
      *
-     * @param  callable  $callback
+     * @param  callable|null  $callback
      * @return $this
      */
-    public function withMiddleware(callable $callback)
+    public function withMiddleware(?callable $callback = null)
     {
         $this->app->afterResolving(HttpKernel::class, function ($kernel) use ($callback) {
             $middleware = (new Middleware)
                 ->redirectTo(fn () => route('login'));
 
-            $callback($middleware);
+            if (! is_null($callback)) {
+                $callback($middleware);
+            }
 
             $this->pageMiddleware = $middleware->getPageMiddleware();
             $kernel->setGlobalMiddleware($middleware->getGlobalMiddleware());
