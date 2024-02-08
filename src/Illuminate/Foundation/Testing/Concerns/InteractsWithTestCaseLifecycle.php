@@ -26,7 +26,7 @@ use Illuminate\View\Component;
 use Mockery;
 use Mockery\Exception\InvalidCountException;
 
-trait InteractsWithTestCase
+trait InteractsWithTestCaseLifecycle
 {
     /**
      * The Illuminate application instance.
