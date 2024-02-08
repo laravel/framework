@@ -33,9 +33,11 @@ class SchemaBuilderSchemaNameTest extends DatabaseTestCase
         $this->app['config']->set('database.connections.with-prefix.prefix', 'example_');
     }
 
-    #[DataProvider('schemaProvider')]
-    public function testCreate(Builder $schema)
+    #[DataProvider('connectionProvider')]
+    public function testCreate($connection)
     {
+        $schema = Schema::connection($connection);
+
         $schema->create('my_schema.table', function (Blueprint $table) {
             $table->id();
         });
@@ -46,11 +48,11 @@ class SchemaBuilderSchemaNameTest extends DatabaseTestCase
         $this->assertFalse($schema->hasTable('table'));
     }
 
-    public static function schemaProvider(): array
+    public static function connectionProvider(): array
     {
         return [
-            'without prefix' => [Schema::connection('without-prefix')],
-            'with prefix' => [Schema::connection('with-prefix')]
+            'without prefix' => ['without-prefix'],
+            'with prefix' => ['with-prefix'],
         ];
     }
 }
