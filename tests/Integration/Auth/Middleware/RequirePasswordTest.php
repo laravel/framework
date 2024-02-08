@@ -7,11 +7,35 @@ use Illuminate\Contracts\Config\Repository;
 use Illuminate\Contracts\Routing\Registrar;
 use Illuminate\Contracts\Routing\UrlGenerator;
 use Illuminate\Http\Response;
-use Illuminate\Session\Middleware\StartSession;
+use Illuminate\Support\Str;
+use Illuminate\Tests\Integration\Auth\Fixtures\Models\AuthenticationTestUser;
+use Orchestra\Testbench\Factories\UserFactory;
 use Orchestra\Testbench\TestCase;
 
 class RequirePasswordTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->withoutExceptionHandling();
+
+        UserFactory::new()->create();
+
+        $this->user = AuthenticationTestUser::first();
+    }
+
+    protected function defineEnvironment($app)
+    {
+        $app['config']->set('app.key', Str::random(32));
+        $app['config']->set('auth.providers.users.model', AuthenticationTestUser::class);
+    }
+
+    protected function defineDatabaseMigrations()
+    {
+        $this->loadLaravelMigrations();
+    }
+
     public function testItCanGenerateDefinitionViaStaticMethod()
     {
         $signature = (string) RequirePassword::using('route.name');
@@ -33,9 +57,11 @@ class RequirePasswordTest extends TestCase
 
         $router->get('test-route', function (): Response {
             return new Response('foobar');
-        })->middleware([StartSession::class, RequirePassword::class]);
+        })->middleware([RequirePassword::class]);
 
-        $response = $this->withSession(['auth.password_confirmed_at' => time()])->get('test-route');
+        $identifier = $this->user->getUniqueIdentifierForUser();
+        cache(["auth.password_confirmed_at.$identifier" => time()]);
+        $response = $this->actingAs($this->user)->get('test-route');
 
         $response->assertOk();
         $response->assertSeeText('foobar');
@@ -54,9 +80,12 @@ class RequirePasswordTest extends TestCase
 
         $router->get('test-route', function (): Response {
             return new Response('foobar');
-        })->middleware([StartSession::class, RequirePassword::class]);
+        })->middleware([RequirePassword::class]);
 
-        $response = $this->withSession(['auth.password_confirmed_at' => time() - 10801])->get('test-route');
+        $identifier = $this->user->getUniqueIdentifierForUser();
+        cache(["auth.password_confirmed_at.$identifier" => time() - 10801]);
+
+        $response = $this->actingAs($this->user)->get('test-route');
 
         $response->assertStatus(302);
         $response->assertRedirect($this->app->make(UrlGenerator::class)->route('password.confirm'));
@@ -75,9 +104,11 @@ class RequirePasswordTest extends TestCase
 
         $router->get('test-route', function (): Response {
             return new Response('foobar');
-        })->middleware([StartSession::class, RequirePassword::class.':my-password.confirm']);
+        })->middleware([RequirePassword::class.':my-password.confirm']);
 
-        $response = $this->withSession(['auth.password_confirmed_at' => time() - 10801])->get('test-route');
+        $identifier = $this->user->getUniqueIdentifierForUser();
+        cache(["auth.password_confirmed_at.$identifier" => time() - 10801]);
+        $response = $this->actingAs($this->user)->get('test-route');
 
         $response->assertStatus(302);
         $response->assertRedirect($this->app->make(UrlGenerator::class)->route('my-password.confirm'));
@@ -96,18 +127,29 @@ class RequirePasswordTest extends TestCase
 
         $router->get('test-route', function (): Response {
             return new Response('foobar');
-        })->middleware([StartSession::class, RequirePassword::class]);
+        })->middleware([RequirePassword::class]);
 
         $this->app->make(Repository::class)->set('auth.password_timeout', 500);
 
-        $response = $this->withSession(['auth.password_confirmed_at' => time() - 495])->get('test-route');
+        $identifier = $this->user->getUniqueIdentifierForUser();
+        cache(["auth.password_confirmed_at.$identifier" => time() - 495]);
+        $response = $this->actingAs($this->user)->get('test-route');
 
         $response->assertOk();
         $response->assertSeeText('foobar');
 
-        $response = $this->withSession(['auth.password_confirmed_at' => time() - 501])->get('test-route');
+        cache(["auth.password_confirmed_at.$identifier" => time() - 501]);
+        $response = $this->actingAs($this->user)->get('test-route');
 
         $response->assertStatus(302);
         $response->assertRedirect($this->app->make(UrlGenerator::class)->route('password.confirm'));
+    }
+
+    protected function tearDown(): void
+    {
+        $identifier = $this->user->getUniqueIdentifierForUser();
+        cache()->forget("auth.password_confirmed_at.$identifier");
+
+        parent::tearDown();
     }
 }
