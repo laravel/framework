@@ -24,16 +24,11 @@ class SchemaBuilderSchemaNameTest extends DatabaseTestCase
         }
     }
 
-    protected function destroyDatabaseMigrations()
-    {
-        $this->artisan('db:wipe', ['--database' => 'without-prefix']);
-        $this->artisan('db:wipe', ['--database' => 'with-prefix']);
-    }
-
     protected function defineEnvironment($app)
     {
         parent::defineEnvironment($app);
 
+        $app['config']->set('database.connections.pgsql.search_path', 'public,my_schema');
         $app['config']->set('database.connections.without-prefix', $app['config']->get('database.connections.'.$this->driver));
         $app['config']->set('database.connections.with-prefix', $app['config']->get('database.connections.without-prefix'));
         $app['config']->set('database.connections.with-prefix.prefix', 'example_');
