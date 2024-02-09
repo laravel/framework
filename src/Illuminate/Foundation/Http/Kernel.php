@@ -597,14 +597,14 @@ class Kernel implements KernelContract
     }
 
     /**
-     * Set the application's middleware priorities.
+     * Set the application's middleware priority.
      *
-     * @param  array  $priorities
+     * @param  array  $priority
      * @return $this
      */
-    public function setMiddlewarePriorities(array $priorities)
+    public function setMiddlewarePriority(array $priority)
     {
-        $this->middlewarePriority = $priorities;
+        $this->middlewarePriority = $priority;
 
         $this->syncMiddlewareToRouter();
 

@@ -214,8 +214,8 @@ class ApplicationBuilder
             $kernel->setMiddlewareGroups($middleware->getMiddlewareGroups());
             $kernel->setMiddlewareAliases($middleware->getMiddlewareAliases());
 
-            if ($priorities = $middleware->getMiddlewarePriorities()) {
-                $kernel->setMiddlewarePriorities($priorities);
+            if ($priorities = $middleware->getMiddlewarePriority()) {
+                $kernel->setMiddlewarePriority($priorities);
             }
         });
 

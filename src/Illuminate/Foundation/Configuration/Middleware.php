@@ -153,11 +153,11 @@ class Middleware
     protected $customAliases = [];
 
     /**
-     * The custom middleware priorities.
+     * The custom middleware priority definition.
      *
      * @var array
      */
-    protected $customPriorities = [];
+    protected $priority = [];
 
     /**
      * Prepend middleware to the application's global middleware stack.
@@ -666,25 +666,25 @@ class Middleware
     }
 
     /**
-     * Define the priority-sorted list of middleware.
+     * Define the middleware priority for the application.
      *
-     * @param  array  $priorities
+     * @param  array  $priority
      * @return $this
      */
-    public function priority(array $priorities)
+    public function priority(array $priority)
     {
-        $this->customPriorities = $priorities;
+        $this->priority = $priority;
 
         return $this;
     }
 
     /**
-     * Get the priority-sorted list of middleware.
+     * Get the middleware priority for the application.
      *
      * @return array
      */
-    public function getMiddlewarePriorities()
+    public function getMiddlewarePriority()
     {
-        return $this->customPriorities;
+        return $this->priority;
     }
 }
