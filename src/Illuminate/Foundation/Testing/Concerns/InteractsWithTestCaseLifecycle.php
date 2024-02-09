@@ -146,8 +146,14 @@ trait InteractsWithTestCaseLifecycle
         $this->afterApplicationCreatedCallbacks = [];
         $this->beforeApplicationDestroyedCallbacks = [];
 
-        $this->originalExceptionHandler = null;
-        $this->originalDeprecationHandler = null;
+
+        if (property_exists($this, 'originalExceptionHandler')) {
+            $this->originalExceptionHandler = null;
+        }
+
+        if (property_exists($this, 'originalDeprecationHandler')) {
+            $this->originalDeprecationHandler = null;
+        }
 
         AboutCommand::flushState();
         Artisan::forgetBootstrappers();
