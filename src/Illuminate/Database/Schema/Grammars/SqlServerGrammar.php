@@ -491,9 +491,10 @@ class SqlServerGrammar extends Grammar
      */
     public function compileRename(Blueprint $blueprint, Fluent $command)
     {
-        $from = $this->wrapTable($blueprint);
-
-        return "sp_rename {$from}, ".$this->wrapTable($command->to);
+        return sprintf('sp_rename %s, %s',
+            $this->quoteString($this->wrapTable($blueprint)),
+            $this->wrapTable($command->to)
+        );
     }
 
     /**
