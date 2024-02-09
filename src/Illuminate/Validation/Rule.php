@@ -37,8 +37,8 @@ class Rule
      * Apply the given rules if the given condition is truthy.
      *
      * @param  callable|bool  $condition
-     * @param  array|string|\Closure  $rules
-     * @param  array|string|\Closure  $defaultRules
+     * @param  \Illuminate\Contracts\Validation\ValidationRule|\Illuminate\Contracts\Validation\InvokableRule|\Illuminate\Contracts\Validation\Rule|\Closure|array|string  $rules
+     * @param  \Illuminate\Contracts\Validation\ValidationRule|\Illuminate\Contracts\Validation\InvokableRule|\Illuminate\Contracts\Validation\Rule|\Closure|array|string  $defaultRules
      * @return \Illuminate\Validation\ConditionalRules
      */
     public static function when($condition, $rules, $defaultRules = [])
@@ -50,8 +50,8 @@ class Rule
      * Apply the given rules if the given condition is falsy.
      *
      * @param  callable|bool  $condition
-     * @param  array|string|\Closure  $rules
-     * @param  array|string|\Closure  $defaultRules
+     * @param  \Illuminate\Contracts\Validation\ValidationRule|\Illuminate\Contracts\Validation\InvokableRule|\Illuminate\Contracts\Validation\Rule|\Closure|array|string  $rules
+     * @param  \Illuminate\Contracts\Validation\ValidationRule|\Illuminate\Contracts\Validation\InvokableRule|\Illuminate\Contracts\Validation\Rule|\Closure|array|string  $defaultRules
      * @return \Illuminate\Validation\ConditionalRules
      */
     public static function unless($condition, $rules, $defaultRules = [])
