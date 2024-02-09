@@ -66,7 +66,7 @@ class SchemaBuilderSchemaNameTest extends DatabaseTestCase
         $this->assertTrue($schema->hasTable('table'));
         $this->assertFalse($schema->hasTable('my_table'));
 
-        $schema->rename('my_schema.table', 'my_schema.new_table');
+        $schema->rename('my_schema.table', 'new_table');
         $schema->rename('table', 'my_table');
 
         $this->assertTrue($schema->hasTable('my_schema.new_table'));
