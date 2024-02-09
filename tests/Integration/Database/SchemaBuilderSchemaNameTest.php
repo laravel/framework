@@ -345,6 +345,21 @@ class SchemaBuilderSchemaNameTest extends DatabaseTestCase
     }
 
     #[DataProvider('connectionProvider')]
+    public function testHasView($connection)
+    {
+        $connection = DB::connection($connection);
+        $schema = $connection->getSchemaBuilder();
+
+        $connection->statement('create view my_schema.view (name) as select 1');
+        $connection->statement('create view my_view (name) as select 1');
+
+        $this->assertTrue($schema->hasView('my_schema.view'));
+        $this->assertTrue($schema->hasView('my_view'));
+        $this->assertTrue($schema->hasColumn('my_schema.view', 'name'));
+        $this->assertTrue($schema->hasColumn('my_view', 'name'));
+    }
+
+    #[DataProvider('connectionProvider')]
     public function testComment($connection)
     {
         if ($this->driver !== 'pgsql') {
