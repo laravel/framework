@@ -276,7 +276,7 @@ class SchemaBuilderSchemaNameTest extends DatabaseTestCase
     {
         $schema = Schema::connection($connection);
 
-        $schema->create('my_table', function (Blueprint $table) {
+        $schema->create('my_tables', function (Blueprint $table) {
             $table->id();
         });
         $schema->create('my_schema.table', function (Blueprint $table) {
@@ -290,7 +290,7 @@ class SchemaBuilderSchemaNameTest extends DatabaseTestCase
 
         $this->assertTrue(collect($schema->getForeignKeys('my_schema.table'))->contains(
             fn ($foreign) => $foreign['columns'] === ['my_table_id']
-                && $foreign['foreign_table'] === 'my_table' && in_array($foreign['foreign_schema'], ['public', 'dbo'])
+                && $foreign['foreign_table'] === 'my_tables' && in_array($foreign['foreign_schema'], ['public', 'dbo'])
                 && $foreign['foreign_columns'] === ['id']
         ));
 
