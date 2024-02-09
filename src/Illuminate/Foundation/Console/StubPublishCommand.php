@@ -43,6 +43,8 @@ class StubPublishCommand extends Command
             __DIR__.'/stubs/class.stub' => 'class.stub',
             __DIR__.'/stubs/class.invokable.stub' => 'class.invokable.stub',
             __DIR__.'/stubs/console.stub' => 'console.stub',
+            __DIR__.'/stubs/enum.stub' => 'enum.stub',
+            __DIR__.'/stubs/enum.backed.stub' => 'enum.backed.stub',
             __DIR__.'/stubs/event.stub' => 'event.stub',
             __DIR__.'/stubs/job.queued.stub' => 'job.queued.stub',
             __DIR__.'/stubs/job.stub' => 'job.stub',
