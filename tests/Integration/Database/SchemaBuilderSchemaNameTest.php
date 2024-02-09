@@ -43,8 +43,6 @@ class SchemaBuilderSchemaNameTest extends DatabaseTestCase
             $table->id();
         });
 
-        var_dump($schema->getTables());
-
         $this->assertTrue($schema->hasTable('my_schema.table'));
         $this->assertFalse($schema->hasTable('table'));
     }
@@ -173,7 +171,7 @@ class SchemaBuilderSchemaNameTest extends DatabaseTestCase
         $schema->table('my_schema.table', function (Blueprint $table) {
             $table->renameColumn('title', 'new_title');
         });
-        $schema->table('my_table', function (Blueprint $table) {
+        $schema->table('table', function (Blueprint $table) {
             $table->renameColumn('name', 'new_name');
         });
 
@@ -182,7 +180,7 @@ class SchemaBuilderSchemaNameTest extends DatabaseTestCase
         $this->assertFalse($schema->hasColumn('table', 'name'));
         $this->assertTrue($schema->hasColumn('table', 'new_name'));
         $this->assertStringContainsString('default schema title', collect($schema->getColumns('my_schema.table'))->firstWhere('name', 'new_title')['default']);
-        $this->assertStringContainsString('default name', collect($schema->getColumns('my_table'))->firstWhere('name', 'new_name')['default']);
+        $this->assertStringContainsString('default name', collect($schema->getColumns('table'))->firstWhere('name', 'new_name')['default']);
     }
 
     #[DataProvider('connectionProvider')]
@@ -245,12 +243,12 @@ class SchemaBuilderSchemaNameTest extends DatabaseTestCase
         $this->assertTrue($schema->hasIndex('my_table', ['email'], 'unique'));
         $this->assertTrue($schema->hasIndex('my_table', ['name']));
 
-        $schema->create('my_schema.table', function (Blueprint $table) {
+        $schema->table('my_schema.table', function (Blueprint $table) {
             $table->dropPrimary(['schema_code']);
             $table->dropUnique(['schema_email']);
             $table->dropIndex(['schema_name']);
         });
-        $schema->create('my_table', function (Blueprint $table) {
+        $schema->table('my_table', function (Blueprint $table) {
             $table->dropPrimary(['code']);
             $table->dropUnique(['email']);
             $table->dropIndex(['name']);
