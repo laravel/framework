@@ -306,7 +306,7 @@ class SchemaBuilderSchemaNameTest extends DatabaseTestCase
         $schema->table('my_schema.table', function (Blueprint $table) {
             $table->dropForeign(['my_table_id']);
         });
-        $schema->create('table', function (Blueprint $table) {
+        $schema->table('table', function (Blueprint $table) {
             $table->dropForeign(['table_id']);
         });
 
