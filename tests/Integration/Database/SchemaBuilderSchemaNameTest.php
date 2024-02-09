@@ -48,6 +48,49 @@ class SchemaBuilderSchemaNameTest extends DatabaseTestCase
         $this->assertFalse($schema->hasTable('table'));
     }
 
+    #[DataProvider('connectionProvider')]
+    public function testDrop($connection)
+    {
+        $schema = Schema::connection($connection);
+
+        $schema->create('my_schema.table', function (Blueprint $table) {
+            $table->id();
+        });
+        $schema->create('table', function (Blueprint $table) {
+            $table->id();
+        });
+
+        $this->assertTrue($schema->hasTable('my_schema.table'));
+        $this->assertTrue($schema->hasTable('table'));
+
+        $schema->drop('my_schema.table');
+
+        $this->assertFalse($schema->hasTable('my_schema.table'));
+        $this->assertTrue($schema->hasTable('table'));
+    }
+
+    #[DataProvider('connectionProvider')]
+    public function testDropIfExists($connection)
+    {
+        $schema = Schema::connection($connection);
+
+        $schema->create('my_schema.table', function (Blueprint $table) {
+            $table->id();
+        });
+        $schema->create('table', function (Blueprint $table) {
+            $table->id();
+        });
+
+        $this->assertTrue($schema->hasTable('my_schema.table'));
+        $this->assertTrue($schema->hasTable('table'));
+
+        $schema->dropIfExists('my_schema.table');
+        $schema->dropIfExists('my_schema.fake_table');
+
+        $this->assertFalse($schema->hasTable('my_schema.table'));
+        $this->assertTrue($schema->hasTable('table'));
+    }
+
     public static function connectionProvider(): array
     {
         return [
