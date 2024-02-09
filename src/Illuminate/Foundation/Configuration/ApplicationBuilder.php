@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Contracts\Console\Kernel as ConsoleKernel;
 use Illuminate\Contracts\Http\Kernel as HttpKernel;
 use Illuminate\Foundation\Application;
+use Illuminate\Foundation\Bootstrap\RegisterFacades;
 use Illuminate\Foundation\Bootstrap\RegisterProviders;
 use Illuminate\Foundation\Events\DiagnosingHealth;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as AppEventServiceProvider;
@@ -67,6 +68,19 @@ class ApplicationBuilder
                 ? $this->app->getBootstrapProvidersPath()
                 : null
         );
+
+        return $this;
+    }
+
+    /**
+     * Register additional facades.
+     *
+     * @param  array  $facades
+     * @return $this
+     */
+    public function withFacades(array $facades = [])
+    {
+        RegisterFacades::merge($facades);
 
         return $this;
     }
