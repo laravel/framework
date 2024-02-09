@@ -272,6 +272,49 @@ class SchemaBuilderSchemaNameTest extends DatabaseTestCase
     }
 
     #[DataProvider('connectionProvider')]
+    public function testForeignKeys($connection)
+    {
+        $schema = Schema::connection($connection);
+
+        $schema->create('my_table', function (Blueprint $table) {
+            $table->id();
+        });
+        $schema->create('my_schema.table', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('my_table_id')->constrained();
+        });
+        $schema->create('table', function (Blueprint $table) {
+            $table->unsignedBigInteger('table_id');
+            $table->foreign('table_id')->references('id')->on('my_schema.table');
+        });
+
+        $this->assertTrue(collect($schema->getForeignKeys('my_schema.table'))->contains(
+            fn ($foreign) => $foreign['columns'] === ['my_table_id']
+                && $foreign['foreign_table'] === 'my_table' && in_array($foreign['foreign_schema'], ['public', 'dbo'])
+                && $foreign['foreign_columns'] === ['id']
+        ));
+
+        $fk = $schema->getForeignKeys('table');
+        var_dump($fk);
+
+        $this->assertTrue(collect($fk)->contains(
+            fn ($foreign) => $foreign['columns'] === ['table_id']
+                && $foreign['foreign_table'] === 'table' && $foreign['foreign_schema'] === 'my_schema'
+                && $foreign['foreign_columns'] === ['id']
+        ));
+
+        $schema->table('my_schema.table', function (Blueprint $table) {
+            $table->dropForeign(['my_table_id']);
+        });
+        $schema->create('table', function (Blueprint $table) {
+            $table->dropForeign(['table_id']);
+        });
+
+        $this->assertEmpty($schema->getForeignKeys('my_schema.table'));
+        $this->assertEmpty($schema->getForeignKeys('table'));
+    }
+
+    #[DataProvider('connectionProvider')]
     public function testComment($connection)
     {
         if ($this->driver !== 'pgsql') {
