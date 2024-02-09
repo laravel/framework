@@ -223,35 +223,51 @@ class SchemaBuilderSchemaNameTest extends DatabaseTestCase
         $schema = Schema::connection($connection);
 
         $schema->create('my_schema.table', function (Blueprint $table) {
-            $table->string('schema_code')->primary();
-            $table->string('schema_email')->unique();
-            $table->integer('schema_name')->index();
+            $table->id('code');//->primary();
+            $table->string('email')->unique();
+            $table->integer('name')->index();
+            $table->integer('title')->index();
         });
         $schema->create('my_table', function (Blueprint $table) {
             $table->string('code')->primary();
             $table->string('email')->unique();
             $table->integer('name')->index();
+            $table->integer('title')->index();
         });
 
         var_dump($schema->getIndexListing('my_schema.table'));
         var_dump($schema->getIndexListing('my_table'));
 
-        $this->assertTrue($schema->hasIndex('my_schema.table', ['schema_code'], 'primary'));
-        $this->assertTrue($schema->hasIndex('my_schema.table', ['schema_email'], 'unique'));
-        $this->assertTrue($schema->hasIndex('my_schema.table', ['schema_name']));
+        $this->assertTrue($schema->hasIndex('my_schema.table', ['code'], 'primary'));
+        $this->assertTrue($schema->hasIndex('my_schema.table', ['email'], 'unique'));
+        $this->assertTrue($schema->hasIndex('my_schema.table', ['name']));
         $this->assertTrue($schema->hasIndex('my_table', ['code'], 'primary'));
         $this->assertTrue($schema->hasIndex('my_table', ['email'], 'unique'));
         $this->assertTrue($schema->hasIndex('my_table', ['name']));
 
         $schema->table('my_schema.table', function (Blueprint $table) {
-            $table->dropPrimary(['schema_code']);
-            $table->dropUnique(['schema_email']);
-            $table->dropIndex(['schema_name']);
+            $table->renameIndex('my_schema_table_title_index', 'my_schema_table_new_title_index');
+        });
+        $schema->table('my_table', function (Blueprint $table) {
+            $table->renameIndex('my_table_title_index', 'my_table_new_title_index');
+        });
+
+        $this->assertTrue($schema->hasIndex('my_schema.table', 'my_schema_table_new_title_index'));
+        $this->assertFalse($schema->hasIndex('my_schema.table', 'my_schema_table_title_index'));
+        $this->assertTrue($schema->hasIndex('my_table', 'my_table_new_title_index'));
+        $this->assertFalse($schema->hasIndex('my_table', 'my_table_title_index'));
+
+        $schema->table('my_schema.table', function (Blueprint $table) {
+            $table->dropPrimary(['code']);
+            $table->dropUnique(['email']);
+            $table->dropIndex(['name']);
+            $table->dropIndex('my_schema_table_new_title_index');
         });
         $schema->table('my_table', function (Blueprint $table) {
             $table->dropPrimary(['code']);
             $table->dropUnique(['email']);
             $table->dropIndex(['name']);
+            $table->dropIndex('my_table_new_title_index');
         });
 
         $this->assertEmpty($schema->getIndexListing('my_schema.table'));
