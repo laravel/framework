@@ -1370,6 +1370,18 @@ class SupportStrTest extends TestCase
             Str::of(Str::password())->contains(['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'])
         );
     }
+
+    public function testToBase64()
+    {
+        $this->assertSame(base64_encode('foo'), Str::toBase64('foo'));
+        $this->assertSame(base64_encode('foobar'), Str::toBase64('foobar'));
+    }
+
+    public function testFromBase64()
+    {
+        $this->assertSame('foo', Str::fromBase64(base64_encode('foo')));
+        $this->assertSame('foobar', Str::fromBase64(base64_encode('foobar'), true));
+    }
 }
 
 class StringableObjectStub
