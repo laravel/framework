@@ -2,30 +2,30 @@
 
 namespace Illuminate\Foundation\Testing\Concerns;
 
-use Mockery;
 use Carbon\CarbonImmutable;
+use Illuminate\Console\Application as Artisan;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Bootstrap\HandleExceptions;
+use Illuminate\Foundation\Bootstrap\RegisterProviders;
+use Illuminate\Foundation\Console\AboutCommand;
+use Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull;
+use Illuminate\Foundation\Http\Middleware\TrimStrings;
+use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\DatabaseTruncation;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Foundation\Testing\WithoutMiddleware;
 use Illuminate\Queue\Queue;
-use Illuminate\Support\Str;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Facade;
+use Illuminate\Support\Facades\ParallelTesting;
 use Illuminate\Support\Once;
 use Illuminate\Support\Sleep;
-use Illuminate\Support\Carbon;
+use Illuminate\Support\Str;
 use Illuminate\View\Component;
-use Illuminate\Support\Facades\Facade;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Foundation\Testing\WithFaker;
+use Mockery;
 use Mockery\Exception\InvalidCountException;
-use Illuminate\Console\Application as Artisan;
-use Illuminate\Foundation\Console\AboutCommand;
-use Illuminate\Support\Facades\ParallelTesting;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithoutMiddleware;
-use Illuminate\Foundation\Bootstrap\HandleExceptions;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
-use Illuminate\Foundation\Testing\DatabaseTruncation;
-use Illuminate\Foundation\Bootstrap\RegisterProviders;
-use Illuminate\Foundation\Http\Middleware\TrimStrings;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
-use Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull;
 
 trait InteractsWithTestCaseLifecycle
 {
