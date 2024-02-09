@@ -326,9 +326,9 @@ class ComponentTest extends TestCase
         <img border="0" src="" alt="">
         -->');
 
-        $this->assertTrue((bool) $slot->sanitizedEmpty());
-        $this->assertTrue((bool) $linebreakingSlot->sanitizedEmpty('trim'));
-        $this->assertTrue((bool) $moreComplexSlot->sanitizedEmpty());
+        $this->assertFalse((bool) $slot->hasActualContent());
+        $this->assertFalse((bool) $linebreakingSlot->hasActualContent('trim'));
+        $this->assertFalse((bool) $moreComplexSlot->hasActualContent());
     }
 
     public function testComponentSlotSanitizedNotEmpty()
@@ -343,9 +343,9 @@ class ComponentTest extends TestCase
         <img border="0" src="" alt="">
         -->after');
 
-        $this->assertTrue((bool) $slot->sanitizedNotEmpty());
-        $this->assertTrue((bool) $linebreakingSlot->sanitizedNotEmpty('trim'));
-        $this->assertTrue((bool) $moreComplexSlot->sanitizedNotEmpty());
+        $this->assertTrue((bool) $slot->hasActualContent());
+        $this->assertTrue((bool) $linebreakingSlot->hasActualContent('trim'));
+        $this->assertTrue((bool) $moreComplexSlot->hasActualContent());
     }
 
     public function testComponentSlotIsNotEmpty()
@@ -359,11 +359,9 @@ class ComponentTest extends TestCase
         <img border="0" src="pic_trulli.jpg" alt="Trulli">
         -->est');
 
-        $this->assertTrue((bool) $slot->sanitizedNotEmpty());
-
-        $this->assertTrue((bool) $anotherSlot->sanitizedNotEmpty());
-
-        $this->assertTrue((bool) $moreComplexSlot->sanitizedNotEmpty());
+        $this->assertTrue((bool) $slot->hasActualContent());
+        $this->assertTrue((bool) $anotherSlot->hasActualContent());
+        $this->assertTrue((bool) $moreComplexSlot->hasActualContent());
     }
 }
 

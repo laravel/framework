@@ -3,6 +3,7 @@
 namespace Illuminate\View;
 
 use Illuminate\Contracts\Support\Htmlable;
+use InvalidArgumentException;
 
 class ComponentSlot implements Htmlable
 {
@@ -78,34 +79,22 @@ class ComponentSlot implements Htmlable
     }
 
     /**
-     * Determine if the slot is empty after being sanitized.
+     * Determine if the slot has non-comment content.
      *
-     * @param  null|string|callable  $callable
+     * @param  callable|string|null  $callable
      * @return bool
      */
-    public function sanitizedEmpty(null|string|callable $callable = null)
+    public function hasActualContent(callable|string|null $callable = null)
     {
         if (is_string($callable) && ! function_exists($callable)) {
-            throw new \InvalidArgumentException('Callable does not exist.');
+            throw new InvalidArgumentException('Callable does not exist.');
         }
 
-        $resolver =
-            $callable ??
-            fn ($input) => trim(preg_replace("/<!--([\s\S]*?)-->/", '', $input));
-        // replace everything between <!-- and --> with empty string
-
-        return filter_var($this->contents, FILTER_CALLBACK, ['options' => $resolver]) === '';
-    }
-
-    /**
-     * Determine if the slot is not empty after being sanitized.
-     *
-     * @param  null|string|callable  $callable
-     * @return bool
-     */
-    public function sanitizedNotEmpty(null|string|callable $callable = null)
-    {
-        return ! $this->sanitizedEmpty($callable);
+        return filter_var(
+            $this->contents,
+            FILTER_CALLBACK,
+            ['options' => $callable ?? fn ($input) => trim(preg_replace("/<!--([\s\S]*?)-->/", '', $input))]
+        ) !== '';
     }
 
     /**
