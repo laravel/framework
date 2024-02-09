@@ -184,6 +184,37 @@ class SchemaBuilderSchemaNameTest extends DatabaseTestCase
     }
 
     #[DataProvider('connectionProvider')]
+    public function testModifyColumns($connection)
+    {
+        $schema = Schema::connection($connection);
+
+        $schema->create('my_schema.table', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->integer('count');
+        });
+        $schema->create('my_table', function (Blueprint $table) {
+            $table->id();
+            $table->string('title');
+            $table->integer('count');
+        });
+
+        $schema->table('my_schema.table', function (Blueprint $table) {
+            $table->string('name')->default('default schema name')->change();
+            $table->bigInteger('count')->change();
+        });
+        $schema->table('my_table', function (Blueprint $table) {
+            $table->string('title')->default('default title')->change();
+            $table->bigInteger('count')->change();
+        });
+
+        $this->assertStringContainsString('default schema name', collect($schema->getColumns('my_schema.table'))->firstWhere('name', 'name')['default']);
+        $this->assertStringContainsString('default title', collect($schema->getColumns('my_table'))->firstWhere('name', 'title')['default']);
+        $this->assertEquals('bigint', $schema->getColumnType('my_schema.table', 'count'));
+        $this->assertEquals('bigint', $schema->getColumnType('my_table', 'count'));
+    }
+
+    #[DataProvider('connectionProvider')]
     public function testDropColumns($connection)
     {
         $schema = Schema::connection($connection);
@@ -294,10 +325,7 @@ class SchemaBuilderSchemaNameTest extends DatabaseTestCase
                 && $foreign['foreign_columns'] === ['id']
         ));
 
-        $fk = $schema->getForeignKeys('table');
-        var_dump($fk);
-
-        $this->assertTrue(collect($fk)->contains(
+        $this->assertTrue(collect($schema->getForeignKeys('table'))->contains(
             fn ($foreign) => $foreign['columns'] === ['table_id']
                 && $foreign['foreign_table'] === 'table' && $foreign['foreign_schema'] === 'my_schema'
                 && $foreign['foreign_columns'] === ['id']
