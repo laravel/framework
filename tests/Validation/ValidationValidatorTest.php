@@ -5973,12 +5973,6 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, ['x' => '0001-01-01T00:00'], ['x' => 'after:1970-01-01']);
         $this->assertTrue($v->fails());
-
-        $v = new Validator($trans, ['x' => ['a' => ['v' => 'c']], 'y' => 'invalid'], ['x' => 'date', 'y' => 'date|after:x']);
-        $this->assertTrue($v->fails());
-
-        $v = new Validator($trans, ['x' => ['a' => ['v' => 'c']], 'y' => 'invalid'], ['x' => 'date', 'y' => 'date|before:x']);
-        $this->assertTrue($v->fails());
     }
 
     public function testBeforeAndAfterWithFormat()

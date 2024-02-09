@@ -73,7 +73,7 @@ class SqlServerGrammar extends Grammar
      */
     public function compileTables()
     {
-        return 'select t.name as name, SCHEMA_NAME(t.schema_id) as [schema], sum(u.total_pages) * 8 * 1024 as size '
+        return 'select t.name as name, schema_name(t.schema_id) as [schema], sum(u.total_pages) * 8 * 1024 as size '
             .'from sys.tables as t '
             .'join sys.partitions as p on p.object_id = t.object_id '
             .'join sys.allocation_units as u on u.container_id = p.hobt_id '
@@ -88,7 +88,7 @@ class SqlServerGrammar extends Grammar
      */
     public function compileViews()
     {
-        return 'select name, SCHEMA_NAME(v.schema_id) as [schema], definition from sys.views as v '
+        return 'select name, schema_name(v.schema_id) as [schema], definition from sys.views as v '
             .'inner join sys.sql_modules as m on v.object_id = m.object_id '
             .'order by name';
     }
@@ -96,10 +96,11 @@ class SqlServerGrammar extends Grammar
     /**
      * Compile the query to determine the columns.
      *
+     * @param  string  $schema
      * @param  string  $table
      * @return string
      */
-    public function compileColumns($table)
+    public function compileColumns($schema, $table)
     {
         return sprintf(
             'select col.name, type.name as type_name, '
@@ -113,19 +114,21 @@ class SqlServerGrammar extends Grammar
             .'join sys.schemas as scm on obj.schema_id = scm.schema_id '
             .'left join sys.default_constraints def on col.default_object_id = def.object_id and col.object_id = def.parent_object_id '
             ."left join sys.extended_properties as prop on obj.object_id = prop.major_id and col.column_id = prop.minor_id and prop.name = 'MS_Description' "
-            ."where obj.type in ('U', 'V') and obj.name = %s and scm.name = SCHEMA_NAME() "
+            ."where obj.type in ('U', 'V') and obj.name = %s and scm.name = %s "
             .'order by col.column_id',
             $this->quoteString($table),
+            $schema ? $this->quoteString($schema) : 'schema_name()',
         );
     }
 
     /**
      * Compile the query to determine the indexes.
      *
+     * @param  string  $schema
      * @param  string  $table
      * @return string
      */
-    public function compileIndexes($table)
+    public function compileIndexes($schema, $table)
     {
         return sprintf(
             "select idx.name as name, string_agg(col.name, ',') within group (order by idxcol.key_ordinal) as columns, "
@@ -135,19 +138,21 @@ class SqlServerGrammar extends Grammar
             .'join sys.schemas as scm on tbl.schema_id = scm.schema_id '
             .'join sys.index_columns as idxcol on idx.object_id = idxcol.object_id and idx.index_id = idxcol.index_id '
             .'join sys.columns as col on idxcol.object_id = col.object_id and idxcol.column_id = col.column_id '
-            .'where tbl.name = %s and scm.name = SCHEMA_NAME() '
+            .'where tbl.name = %s and scm.name = %s '
             .'group by idx.name, idx.type_desc, idx.is_unique, idx.is_primary_key',
             $this->quoteString($table),
+            $schema ? $this->quoteString($schema) : 'schema_name()',
         );
     }
 
     /**
      * Compile the query to determine the foreign keys.
      *
+     * @param  string  $schema
      * @param  string  $table
      * @return string
      */
-    public function compileForeignKeys($table)
+    public function compileForeignKeys($schema, $table)
     {
         return sprintf(
             'select fk.name as name, '
@@ -164,9 +169,10 @@ class SqlServerGrammar extends Grammar
             .'join sys.tables as ft on ft.object_id = fk.referenced_object_id '
             .'join sys.schemas as fs on ft.schema_id = fs.schema_id '
             .'join sys.columns as fc on fkc.referenced_object_id = fc.object_id and fkc.referenced_column_id = fc.column_id '
-            .'where lt.name = %s and ls.name = SCHEMA_NAME() '
+            .'where lt.name = %s and ls.name = %s '
             .'group by fk.name, fs.name, ft.name, fk.update_referential_action_desc, fk.delete_referential_action_desc',
-            $this->quoteString($table)
+            $this->quoteString($table),
+            $schema ? $this->quoteString($schema) : 'schema_name()',
         );
     }
 
@@ -351,8 +357,8 @@ class SqlServerGrammar extends Grammar
      */
     public function compileDropIfExists(Blueprint $blueprint, Fluent $command)
     {
-        return sprintf('if exists (select * from sys.sysobjects where id = object_id(%s, \'U\')) drop table %s',
-            "'".str_replace("'", "''", $this->getTablePrefix().$blueprint->getTable())."'",
+        return sprintf('if object_id(%s, \'U\') is not null drop table %s',
+            $this->quoteString($this->getTablePrefix().$blueprint->getTable()),
             $this->wrapTable($blueprint)
         );
     }
@@ -396,12 +402,13 @@ class SqlServerGrammar extends Grammar
             ? "'".collect($blueprint->getChangedColumns())->pluck('name')->implode("','")."'"
             : "'".implode("','", $command->columns)."'";
 
-        $tableName = $this->getTablePrefix().$blueprint->getTable();
+        $table = $this->wrapTable($blueprint);
+        $tableName = $this->quoteString($this->getTablePrefix().$blueprint->getTable());
 
         $sql = "DECLARE @sql NVARCHAR(MAX) = '';";
-        $sql .= "SELECT @sql += 'ALTER TABLE [dbo].[{$tableName}] DROP CONSTRAINT ' + OBJECT_NAME([default_object_id]) + ';' ";
+        $sql .= "SELECT @sql += 'ALTER TABLE $table DROP CONSTRAINT ' + OBJECT_NAME([default_object_id]) + ';' ";
         $sql .= 'FROM sys.columns ';
-        $sql .= "WHERE [object_id] = OBJECT_ID('[dbo].[{$tableName}]') AND [name] in ({$columns}) AND [default_object_id] <> 0;";
+        $sql .= "WHERE [object_id] = OBJECT_ID($tableName) AND [name] in ($columns) AND [default_object_id] <> 0;";
         $sql .= 'EXEC(@sql)';
 
         return $sql;

@@ -1093,6 +1093,8 @@ class PostgresGrammar extends Grammar
             if (! $column->autoIncrement || ! is_null($column->generatedAs)) {
                 return is_null($column->default) ? 'drop default' : 'set default '.$this->getDefaultValue($column->default);
             }
+
+            return null;
         }
 
         if (! is_null($column->default)) {
