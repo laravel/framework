@@ -25,6 +25,7 @@ use Illuminate\Support\Str;
 use Illuminate\View\Component;
 use Mockery;
 use Mockery\Exception\InvalidCountException;
+use Throwable;
 
 trait InteractsWithTestCaseLifecycle
 {
