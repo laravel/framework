@@ -1261,16 +1261,16 @@ class SupportArrTest extends TestCase
         ], Arr::prependKeysWith($array, 'test.'));
     }
 
-    public function testLimit()
+    public function testTake()
     {
         $array = [1, 2, 3, 4, 5, 6];
 
         $this->assertEquals([
             1, 2, 3,
-        ], Arr::limit($array, 3));
+        ], Arr::take($array, 3));
 
         $this->assertEquals([
             4, 5, 6,
-        ], Arr::limit($array, -3));
+        ], Arr::take($array, -3));
     }
 }

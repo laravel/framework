@@ -232,7 +232,7 @@ class Arr
      * @param  int  $limit
      * @return array
      */
-    public static function limit($array, $limit)
+    public static function take($array, $limit)
     {
         if ($limit < 0) {
             return array_slice($array, $limit, abs($limit));
