@@ -350,16 +350,16 @@ class SchemaBuilderSchemaNameTest extends DatabaseTestCase
         $connection = DB::connection($connection);
         $schema = $connection->getSchemaBuilder();
 
-        $connection->statement('create view "my_schema"."view" (name) as select 1');
-        $connection->statement('create view my_view (name) as select 1');
+        $connection->statement('create view '.$connection->getSchemaGrammar()->wrapTable('my_schema.view').' (name) as select 1');
+        $connection->statement('create view '.$connection->getSchemaGrammar()->wrapTable('my_view').' (name) as select 1');
 
         $this->assertTrue($schema->hasView('my_schema.view'));
         $this->assertTrue($schema->hasView('my_view'));
         $this->assertTrue($schema->hasColumn('my_schema.view', 'name'));
         $this->assertTrue($schema->hasColumn('my_view', 'name'));
 
-        $connection->statement('drop view "my_schema"."view"');
-        $connection->statement('drop view my_view');
+        $connection->statement('drop view '.$connection->getSchemaGrammar()->wrapTable('my_schema.view'));
+        $connection->statement('drop view '.$connection->getSchemaGrammar()->wrapTable('my_view'));
 
         $this->assertFalse($schema->hasView('my_schema.view'));
         $this->assertFalse($schema->hasView('my_view'));
