@@ -4,7 +4,11 @@ namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\GeneratorCommand;
 use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
+
+use function Laravel\Prompts\select;
 
 #[AsCommand(name: 'make:enum')]
 class EnumMakeCommand extends GeneratorCommand
@@ -52,7 +56,7 @@ class EnumMakeCommand extends GeneratorCommand
      */
     protected function getDefaultNamespace($rootNamespace)
     {
-        return $rootNamespace.'\\Enums';
+        return $rootNamespace;
     }
 
     /**
@@ -77,6 +81,30 @@ class EnumMakeCommand extends GeneratorCommand
     }
 
     /**
+     * Interact further with the user if they were prompted for missing arguments.
+     *
+     * @param  \Symfony\Component\Console\Input\InputInterface  $input
+     * @param  \Symfony\Component\Console\Output\OutputInterface  $output
+     * @return void
+     */
+    protected function afterPromptingForMissingArguments(InputInterface $input, OutputInterface $output)
+    {
+        if ($this->didReceiveOptions($input)) {
+            return;
+        }
+
+        $type = select('Which type of enum would you like?', [
+            'pure' => 'Pure enum',
+            'string' => 'Backed enum (String)',
+            'int' => 'Backed enum (Integer)',
+        ]);
+
+        if ($type !== 'pure') {
+            $input->setOption($type, true);
+        }
+    }
+
+    /**
      * Get the console command arguments.
      *
      * @return array
@@ -85,7 +113,7 @@ class EnumMakeCommand extends GeneratorCommand
     {
         return [
             ['string', 's', InputOption::VALUE_NONE, 'Generate a string backed enum.'],
-            ['int', 'i', InputOption::VALUE_NONE, 'Generate an int backed enum.'],
+            ['int', 'i', InputOption::VALUE_NONE, 'Generate an integer backed enum.'],
             ['force', 'f', InputOption::VALUE_NONE, 'Create the enum even if the enum already exists'],
         ];
     }
