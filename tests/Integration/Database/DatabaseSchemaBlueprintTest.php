@@ -190,7 +190,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
         });
 
         $this->assertEquals([
-            "DECLARE @sql NVARCHAR(MAX) = '';SELECT @sql += 'ALTER TABLE \"users\" DROP CONSTRAINT ' + OBJECT_NAME([default_object_id]) + ';' FROM sys.columns WHERE [object_id] = OBJECT_ID(N'users') AND [name] in ('added_at') AND [default_object_id] <> 0;EXEC(@sql)",
+            "DECLARE @sql NVARCHAR(MAX) = '';SELECT @sql += 'ALTER TABLE \"users\" DROP CONSTRAINT ' + OBJECT_NAME([default_object_id]) + ';' FROM sys.columns WHERE [object_id] = OBJECT_ID(N'\"users\"') AND [name] in ('added_at') AND [default_object_id] <> 0;EXEC(@sql)",
             'alter table "users" alter column "added_at" datetime2(4) not null',
             'alter table "users" add default CURRENT_TIMESTAMP for "added_at"',
         ], $blueprint->toSql($connection, new SqlServerGrammar));
@@ -200,7 +200,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
         });
 
         $this->assertEquals([
-            "DECLARE @sql NVARCHAR(MAX) = '';SELECT @sql += 'ALTER TABLE \"users\" DROP CONSTRAINT ' + OBJECT_NAME([default_object_id]) + ';' FROM sys.columns WHERE [object_id] = OBJECT_ID(N'users') AND [name] in ('name') AND [default_object_id] <> 0;EXEC(@sql)",
+            "DECLARE @sql NVARCHAR(MAX) = '';SELECT @sql += 'ALTER TABLE \"users\" DROP CONSTRAINT ' + OBJECT_NAME([default_object_id]) + ';' FROM sys.columns WHERE [object_id] = OBJECT_ID(N'\"users\"') AND [name] in ('name') AND [default_object_id] <> 0;EXEC(@sql)",
             'alter table "users" alter column "name" nchar(40) collate unicode null',
             'alter table "users" add default \'easy\' for "name"',
         ], $blueprint->toSql($connection, new SqlServerGrammar));
@@ -210,7 +210,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
         });
 
         $this->assertEquals([
-            "DECLARE @sql NVARCHAR(MAX) = '';SELECT @sql += 'ALTER TABLE \"users\" DROP CONSTRAINT ' + OBJECT_NAME([default_object_id]) + ';' FROM sys.columns WHERE [object_id] = OBJECT_ID(N'users') AND [name] in ('foo') AND [default_object_id] <> 0;EXEC(@sql)",
+            "DECLARE @sql NVARCHAR(MAX) = '';SELECT @sql += 'ALTER TABLE \"users\" DROP CONSTRAINT ' + OBJECT_NAME([default_object_id]) + ';' FROM sys.columns WHERE [object_id] = OBJECT_ID(N'\"users\"') AND [name] in ('foo') AND [default_object_id] <> 0;EXEC(@sql)",
             'alter table "users" alter column "foo" int not null',
         ], $blueprint->toSql($connection, new SqlServerGrammar));
     }
@@ -448,7 +448,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $queries = $blueprintSqlServer->toSql(DB::connection(), new SqlServerGrammar);
 
         $expected = [
-            "DECLARE @sql NVARCHAR(MAX) = '';SELECT @sql += 'ALTER TABLE \"users\" DROP CONSTRAINT ' + OBJECT_NAME([default_object_id]) + ';' FROM sys.columns WHERE [object_id] = OBJECT_ID(N'users') AND [name] in ('name') AND [default_object_id] <> 0;EXEC(@sql)",
+            "DECLARE @sql NVARCHAR(MAX) = '';SELECT @sql += 'ALTER TABLE \"users\" DROP CONSTRAINT ' + OBJECT_NAME([default_object_id]) + ';' FROM sys.columns WHERE [object_id] = OBJECT_ID(N'\"users\"') AND [name] in ('name') AND [default_object_id] <> 0;EXEC(@sql)",
             'alter table "users" alter column "name" nvarchar(255) null',
             'create unique index "users_name_unique" on "users" ("name")',
         ];
@@ -512,7 +512,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $queries = $blueprintSqlServer->toSql(DB::connection(), new SqlServerGrammar);
 
         $expected = [
-            "DECLARE @sql NVARCHAR(MAX) = '';SELECT @sql += 'ALTER TABLE \"users\" DROP CONSTRAINT ' + OBJECT_NAME([default_object_id]) + ';' FROM sys.columns WHERE [object_id] = OBJECT_ID(N'users') AND [name] in ('name') AND [default_object_id] <> 0;EXEC(@sql)",
+            "DECLARE @sql NVARCHAR(MAX) = '';SELECT @sql += 'ALTER TABLE \"users\" DROP CONSTRAINT ' + OBJECT_NAME([default_object_id]) + ';' FROM sys.columns WHERE [object_id] = OBJECT_ID(N'\"users\"') AND [name] in ('name') AND [default_object_id] <> 0;EXEC(@sql)",
             'alter table "users" alter column "name" int null',
             'create unique index "index1" on "users" ("name")',
         ];
