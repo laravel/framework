@@ -27,6 +27,7 @@ use Illuminate\Support\Testing\Fakes\MailFake;
  * @method static \Illuminate\Mail\SentMessage|null plain(string $view, array $data, mixed $callback)
  * @method static string render(string|array $view, array $data = [])
  * @method static \Illuminate\Mail\SentMessage|null send(\Illuminate\Contracts\Mail\Mailable|string|array $view, array $data = [], \Closure|string|null $callback = null)
+ * @method static \Illuminate\Mail\SentMessage|null sendNow(\Illuminate\Contracts\Mail\Mailable|string|array $mailable, array $data = [], \Closure|string|null $callback = null)
  * @method static mixed queue(\Illuminate\Contracts\Mail\Mailable|string|array $view, string|null $queue = null)
  * @method static mixed onQueue(string $queue, \Illuminate\Contracts\Mail\Mailable $view)
  * @method static mixed queueOn(string $queue, \Illuminate\Contracts\Mail\Mailable $view)
