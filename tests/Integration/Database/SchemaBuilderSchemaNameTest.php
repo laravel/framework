@@ -210,8 +210,10 @@ class SchemaBuilderSchemaNameTest extends DatabaseTestCase
 
         $this->assertStringContainsString('default schema name', collect($schema->getColumns('my_schema.table'))->firstWhere('name', 'name')['default']);
         $this->assertStringContainsString('default title', collect($schema->getColumns('my_table'))->firstWhere('name', 'title')['default']);
-        $this->assertEquals('bigint', $schema->getColumnType('my_schema.table', 'count'));
-        $this->assertEquals('bigint', $schema->getColumnType('my_table', 'count'));
+        $this->assertEquals($this->driver === 'sqlsrv' ? 'nvarchar' : 'varchar', $schema->getColumnType('my_schema.table', 'name'));
+        $this->assertEquals($this->driver === 'sqlsrv' ? 'nvarchar' : 'varchar', $schema->getColumnType('my_table', 'title'));
+        $this->assertEquals($this->driver === 'pgsql' ? 'int8' : 'bigint', $schema->getColumnType('my_schema.table', 'count'));
+        $this->assertEquals($this->driver === 'pgsql' ? 'int8' : 'bigint', $schema->getColumnType('my_table', 'count'));
     }
 
     #[DataProvider('connectionProvider')]
