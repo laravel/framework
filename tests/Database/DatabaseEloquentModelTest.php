@@ -15,7 +15,7 @@ use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Connection;
 use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
-use Illuminate\Database\Eloquent\Attributes\Observe;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\ArrayObject;
 use Illuminate\Database\Eloquent\Casts\AsArrayObject;
@@ -3355,13 +3355,13 @@ class EloquentNonPrimaryUlidModelStub extends EloquentModelStub
     }
 }
 
-#[Observe(EloquentTestObserverStub::class)]
+#[ObservedBy(EloquentTestObserverStub::class)]
 class EloquentModelWithObserveAttributeStub extends EloquentModelStub
 {
     //
 }
 
-#[Observe([EloquentTestObserverStub::class])]
+#[ObservedBy([EloquentTestObserverStub::class])]
 class EloquentModelWithObserveAttributeUsingArrayStub extends EloquentModelStub
 {
     //

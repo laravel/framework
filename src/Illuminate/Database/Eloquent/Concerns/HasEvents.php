@@ -3,7 +3,7 @@
 namespace Illuminate\Database\Eloquent\Concerns;
 
 use Illuminate\Contracts\Events\Dispatcher;
-use Illuminate\Database\Eloquent\Attributes\Observe;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Events\NullDispatcher;
 use Illuminate\Support\Arr;
 use InvalidArgumentException;
@@ -48,7 +48,7 @@ trait HasEvents
     {
         $reflectionClass = new ReflectionClass(static::class);
 
-        return collect($reflectionClass->getAttributes(Observe::class))
+        return collect($reflectionClass->getAttributes(ObservedBy::class))
             ->map(fn ($attribute) => $attribute->getArguments())
             ->flatten()
             ->all();
