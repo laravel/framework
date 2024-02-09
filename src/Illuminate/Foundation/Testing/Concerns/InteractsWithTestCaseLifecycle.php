@@ -146,7 +146,6 @@ trait InteractsWithTestCaseLifecycle
         $this->afterApplicationCreatedCallbacks = [];
         $this->beforeApplicationDestroyedCallbacks = [];
 
-
         if (property_exists($this, 'originalExceptionHandler')) {
             $this->originalExceptionHandler = null;
         }
