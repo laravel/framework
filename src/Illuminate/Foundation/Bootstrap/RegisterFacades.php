@@ -58,7 +58,7 @@ class RegisterFacades
     /**
      * Merge the given facades into the facade configuration before registration.
      *
-     * @param  array $facades
+     * @param  array  $facades
      * @return void
      */
     public static function merge(array $facades)
