@@ -426,32 +426,7 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
      */
     public function send($view, array $data = [], $callback = null)
     {
-        return $this->sendMail($view, $view instanceof ShouldQueue, $data);
-    }
-
-    /**
-     * Send a new message using a view.
-     *
-     * @param  \Illuminate\Contracts\Mail\Mailable|string|array  $view
-     * @param  bool  $shouldSync
-     * @param  array  $data
-     * @return mixed|void
-     */
-    protected function sendMail($view, $shouldSync, array $data = [])
-    {
-        if (! $view instanceof Mailable) {
-            return;
-        }
-
-        $view->mailer($this->currentMailer);
-
-        if ($shouldSync) {
-            return $this->queue($view, $data);
-        }
-
-        $this->currentMailer = null;
-
-        $this->mailables[] = $view;
+        return $this->sendMail($view, $view instanceof ShouldQueue);
     }
 
     /**
@@ -464,11 +439,35 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
      */
     public function sendNow($mailable, array $data = [], $callback = null)
     {
-        return $this->sendMail($mailable, false);
+        return $this->sendMail($mailable, shouldQueue: false);
     }
 
     /**
-     * Queue a new e-mail message for sending.
+     * Send a new message using a view.
+     *
+     * @param  \Illuminate\Contracts\Mail\Mailable|string|array  $view
+     * @param  bool  $shouldQueue
+     * @return mixed|void
+     */
+    protected function sendMail($view, $shouldQueue = false)
+    {
+        if (! $view instanceof Mailable) {
+            return;
+        }
+
+        $view->mailer($this->currentMailer);
+
+        if ($shouldQueue) {
+            return $this->queue($view);
+        }
+
+        $this->currentMailer = null;
+
+        $this->mailables[] = $view;
+    }
+
+    /**
+     * Queue a new message for sending.
      *
      * @param  \Illuminate\Contracts\Mail\Mailable|string|array  $view
      * @param  string|null  $queue

@@ -367,11 +367,9 @@ class Mailer implements MailerContract, MailQueueContract
      */
     public function sendNow($mailable, array $data = [], $callback = null)
     {
-        if ($mailable instanceof MailableContract) {
-            return $mailable->mailer($this->name)->send($this);
-        }
-
-        return $this->send($mailable, $data, $callback);
+        return $mailable instanceof MailableContract
+            ? $mailable->mailer($this->name)->send($this)
+            : $this->send($mailable, $data, $callback);
     }
 
     /**
@@ -467,7 +465,7 @@ class Mailer implements MailerContract, MailQueueContract
     }
 
     /**
-     * Queue a new e-mail message for sending.
+     * Queue a new mail message for sending.
      *
      * @param  \Illuminate\Contracts\Mail\Mailable|string|array  $view
      * @param  string|null  $queue
@@ -489,7 +487,7 @@ class Mailer implements MailerContract, MailQueueContract
     }
 
     /**
-     * Queue a new e-mail message for sending on the given queue.
+     * Queue a new mail message for sending on the given queue.
      *
      * @param  string  $queue
      * @param  \Illuminate\Contracts\Mail\Mailable  $view
@@ -501,7 +499,7 @@ class Mailer implements MailerContract, MailQueueContract
     }
 
     /**
-     * Queue a new e-mail message for sending on the given queue.
+     * Queue a new mail message for sending on the given queue.
      *
      * This method didn't match rest of framework's "onQueue" phrasing. Added "onQueue".
      *
@@ -515,7 +513,7 @@ class Mailer implements MailerContract, MailQueueContract
     }
 
     /**
-     * Queue a new e-mail message for sending after (n) seconds.
+     * Queue a new mail message for sending after (n) seconds.
      *
      * @param  \DateTimeInterface|\DateInterval|int  $delay
      * @param  \Illuminate\Contracts\Mail\Mailable  $view
@@ -536,7 +534,7 @@ class Mailer implements MailerContract, MailQueueContract
     }
 
     /**
-     * Queue a new e-mail message for sending after (n) seconds on the given queue.
+     * Queue a new mail message for sending after (n) seconds on the given queue.
      *
      * @param  string  $queue
      * @param  \DateTimeInterface|\DateInterval|int  $delay
