@@ -404,6 +404,19 @@ class Middleware
     }
 
     /**
+     * Define the middleware priority for the application.
+     *
+     * @param  array  $priority
+     * @return $this
+     */
+    public function priority(array $priority)
+    {
+        $this->priority = $priority;
+
+        return $this;
+    }
+
+    /**
      * Get the global middleware.
      *
      * @return array
@@ -663,19 +676,6 @@ class Middleware
                 : \Illuminate\Routing\Middleware\ThrottleRequests::class,
             'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         ];
-    }
-
-    /**
-     * Define the middleware priority for the application.
-     *
-     * @param  array  $priority
-     * @return $this
-     */
-    public function priority(array $priority)
-    {
-        $this->priority = $priority;
-
-        return $this;
     }
 
     /**
