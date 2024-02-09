@@ -254,7 +254,10 @@ class ServeCommand extends Command
                 $this->newLine();
 
                 $this->serverRunningHasBeenDisplayed = true;
-            } elseif (str($line)->contains(' Accepted')) {
+            } elseif (
+                !str($line)->contains(' Accepted: ') &&
+                str($line)->contains(' Accepted')
+            ) {
                 $requestPort = $this->getRequestPortFromLine($line);
 
                 $this->requestsPool[$requestPort] = [
