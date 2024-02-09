@@ -22,7 +22,7 @@ trait HasGlobalScopes
     }
 
     /**
-     * Resolve the observe class names from the attributes.
+     * Resolve the global scope class names from the attributes.
      *
      * @return array
      */
