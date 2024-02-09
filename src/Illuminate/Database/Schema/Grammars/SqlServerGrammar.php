@@ -358,7 +358,7 @@ class SqlServerGrammar extends Grammar
     public function compileDropIfExists(Blueprint $blueprint, Fluent $command)
     {
         return sprintf('if object_id(%s, \'U\') is not null drop table %s',
-            $this->quoteString($this->getTablePrefix().$blueprint->getTable()),
+            $this->quoteString($this->wrapTable($blueprint)),
             $this->wrapTable($blueprint)
         );
     }
@@ -403,7 +403,7 @@ class SqlServerGrammar extends Grammar
             : "'".implode("','", $command->columns)."'";
 
         $table = $this->wrapTable($blueprint);
-        $tableName = $this->quoteString($this->getTablePrefix().$blueprint->getTable());
+        $tableName = $this->quoteString($this->wrapTable($blueprint));
 
         $sql = "DECLARE @sql NVARCHAR(MAX) = '';";
         $sql .= "SELECT @sql += 'ALTER TABLE $table DROP CONSTRAINT ' + OBJECT_NAME([default_object_id]) + ';' ";
