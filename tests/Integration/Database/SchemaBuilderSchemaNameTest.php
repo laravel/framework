@@ -154,6 +154,38 @@ class SchemaBuilderSchemaNameTest extends DatabaseTestCase
     }
 
     #[DataProvider('connectionProvider')]
+    public function testRenameColumns($connection)
+    {
+        $schema = Schema::connection($connection);
+
+        $schema->create('my_schema.table', function (Blueprint $table) {
+            $table->id();
+            $table->string('title')->default('default schema title');
+        });
+        $schema->create('table', function (Blueprint $table) {
+            $table->id();
+            $table->string('name')->default('default name');
+        });
+
+        $this->assertTrue($schema->hasColumn('my_schema.table', 'title'));
+        $this->assertTrue($schema->hasColumn('table', 'name'));
+
+        $schema->table('my_schema.table', function (Blueprint $table) {
+            $table->renameColumn('title', 'new_title');
+        });
+        $schema->table('my_table', function (Blueprint $table) {
+            $table->renameColumn('name', 'new_name');
+        });
+
+        $this->assertFalse($schema->hasColumn('my_schema.table', 'title'));
+        $this->assertTrue($schema->hasColumn('my_schema.table', 'new_title'));
+        $this->assertFalse($schema->hasColumn('table', 'name'));
+        $this->assertTrue($schema->hasColumn('table', 'new_name'));
+        $this->assertStringContainsString('default schema title', collect($schema->getColumns('my_schema.table'))->firstWhere('name', 'new_title')['default']);
+        $this->assertStringContainsString('default name', collect($schema->getColumns('my_table'))->firstWhere('name', 'new_name')['default']);
+    }
+
+    #[DataProvider('connectionProvider')]
     public function testDropColumns($connection)
     {
         $schema = Schema::connection($connection);
@@ -185,6 +217,47 @@ class SchemaBuilderSchemaNameTest extends DatabaseTestCase
         $this->assertFalse($schema->hasColumn('table', 'title'));
         $this->assertStringContainsString('default schema title', collect($schema->getColumns('my_schema.table'))->firstWhere('name', 'title')['default']);
         $this->assertStringContainsString('10', collect($schema->getColumns('table'))->firstWhere('name', 'count')['default']);
+    }
+
+    #[DataProvider('connectionProvider')]
+    public function testAddAndRenameAndDropIndexes($connection)
+    {
+        $schema = Schema::connection($connection);
+
+        $schema->create('my_schema.table', function (Blueprint $table) {
+            $table->string('schema_code')->primary();
+            $table->string('schema_email')->unique();
+            $table->integer('schema_name')->index();
+        });
+        $schema->create('my_table', function (Blueprint $table) {
+            $table->string('code')->primary();
+            $table->string('email')->unique();
+            $table->integer('name')->index();
+        });
+
+        var_dump($schema->getIndexListing('my_schema.table'));
+        var_dump($schema->getIndexListing('my_table'));
+
+        $this->assertTrue($schema->hasIndex('my_schema.table', ['schema_code'], 'primary'));
+        $this->assertTrue($schema->hasIndex('my_schema.table', ['schema_email'], 'unique'));
+        $this->assertTrue($schema->hasIndex('my_schema.table', ['schema_name']));
+        $this->assertTrue($schema->hasIndex('my_table', ['code'], 'primary'));
+        $this->assertTrue($schema->hasIndex('my_table', ['email'], 'unique'));
+        $this->assertTrue($schema->hasIndex('my_table', ['name']));
+
+        $schema->create('my_schema.table', function (Blueprint $table) {
+            $table->dropPrimary(['schema_code']);
+            $table->dropUnique(['schema_email']);
+            $table->dropIndex(['schema_name']);
+        });
+        $schema->create('my_table', function (Blueprint $table) {
+            $table->dropPrimary(['code']);
+            $table->dropUnique(['email']);
+            $table->dropIndex(['name']);
+        });
+
+        $this->assertEmpty($schema->getIndexListing('my_schema.table'));
+        $this->assertEmpty($schema->getIndexListing('my_table'));
     }
 
     public static function connectionProvider(): array
