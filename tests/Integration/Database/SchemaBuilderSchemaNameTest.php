@@ -218,7 +218,7 @@ class SchemaBuilderSchemaNameTest extends DatabaseTestCase
     }
 
     #[DataProvider('connectionProvider')]
-    public function testAddAndRenameAndDropIndexes($connection)
+    public function testIndexes($connection)
     {
         $schema = Schema::connection($connection);
 
@@ -234,9 +234,6 @@ class SchemaBuilderSchemaNameTest extends DatabaseTestCase
             $table->integer('name')->index();
             $table->integer('title')->index();
         });
-
-        var_dump($schema->getIndexListing('my_schema.table'));
-        var_dump($schema->getIndexListing('my_table'));
 
         $this->assertTrue($schema->hasIndex('my_schema.table', ['code'], 'primary'));
         $this->assertTrue($schema->hasIndex('my_schema.table', ['email'], 'unique'));
@@ -272,6 +269,57 @@ class SchemaBuilderSchemaNameTest extends DatabaseTestCase
 
         $this->assertEmpty($schema->getIndexListing('my_schema.table'));
         $this->assertEmpty($schema->getIndexListing('my_table'));
+    }
+
+    #[DataProvider('connectionProvider')]
+    public function testComment($connection)
+    {
+        if ($this->driver !== 'pgsql') {
+            $this->markTestSkipped('Test requires a PostgreSQL connection.');
+        }
+
+        $schema = Schema::connection($connection);
+
+        $schema->create('my_schema.table', function (Blueprint $table) {
+            $table->comment('comment on schema table');
+            $table->string('name')->comment('comment on schema column');
+        });
+        $schema->create('table', function (Blueprint $table) {
+            $table->comment('comment on table');
+            $table->string('name')->comment('comment on column');
+        });
+
+        $this->assertEquals('comment on schema table',
+            collect($schema->getTables())->first(fn ($table) => $table['name'] === 'table' && $table['schema'] === 'my_schema')['comment']
+        );
+        $this->assertEquals('comment on schema column',
+            collect($schema->getColumns('my_schema.table'))->firstWhere('name', 'name')['comment']
+        );
+        $this->assertEquals('comment on table',
+            collect($schema->getTables())->first(fn ($table) => $table['name'] === 'table' && $table['schema'] === 'public')['comment']
+        );
+        $this->assertEquals('comment on column',
+            collect($schema->getColumns('table'))->firstWhere('name', 'name')['comment']
+        );
+    }
+
+    #[DataProvider('connectionProvider')]
+    public function testAutoIncrementStartingValue($connection)
+    {
+        if ($this->driver !== 'pgsql') {
+            $this->markTestSkipped('Test requires a PostgreSQL connection.');
+        }
+
+        $this->expectNotToPerformAssertions();
+
+        $schema = Schema::connection($connection);
+
+        $schema->create('my_schema.table', function (Blueprint $table) {
+            $table->increments('code')->from(25);
+        });
+        $schema->create('table', function (Blueprint $table) {
+            $table->increments('code')->from(15);
+        });
     }
 
     public static function connectionProvider(): array
