@@ -19,10 +19,9 @@ class SchemaBuilderSchemaNameTest extends DatabaseTestCase
             DB::connection('without-prefix')->statement('create schema if not exists my_schema');
             DB::connection('with-prefix')->statement('create schema if not exists my_schema');
         } else if ($this->driver === 'sqlsrv') {
-            DB::connection('without-prefix')->statement("if schema_id('my_schema') is null create schema my_schema");
-            DB::connection('with-prefix')->statement("if schema_id('my_schema') is null create schema my_schema");
+            DB::connection('without-prefix')->statement("if schema_id('my_schema') is null begin exec('create schema my_schema') end");
+            DB::connection('with-prefix')->statement("if schema_id('my_schema') is null begin exec('create schema my_schema') end");
         }
-
     }
 
     protected function defineEnvironment($app)
