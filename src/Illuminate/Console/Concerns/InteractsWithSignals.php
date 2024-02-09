@@ -30,7 +30,7 @@ trait InteractsWithSignals
                 $this->getApplication()->getSignalRegistry(),
             );
 
-            collect(Arr::wrap($signals))
+            collect(Arr::wrap(value($signals)))
                 ->each(fn ($signal) => $this->signals->register($signal, $callback));
         });
     }
