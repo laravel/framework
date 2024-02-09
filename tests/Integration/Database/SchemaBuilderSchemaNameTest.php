@@ -15,21 +15,21 @@ class SchemaBuilderSchemaNameTest extends DatabaseTestCase
             $this->markTestSkipped('Test requires a PostgreSQL or SQL Server connection.');
         }
 
-        DB::statement('create schema my_schema');
-    }
+        if ($this->driver === 'pgsql') {
+            DB::connection('without-prefix')->statement('create schema if not exists my_schema');
+            DB::connection('with-prefix')->statement('create schema if not exists my_schema');
+        } else if ($this->driver === 'sqlsrv') {
+            DB::connection('without-prefix')->statement("if schema_id('my_schema') is null create schema my_schema");
+            DB::connection('with-prefix')->statement("if schema_id('my_schema') is null create schema my_schema");
+        }
 
-    protected function destroyDatabaseMigrations()
-    {
-        DB::statement('drop schema my_schema');
     }
 
     protected function defineEnvironment($app)
     {
         parent::defineEnvironment($app);
 
-        $app['config']->set(
-            'database.connections.without-prefix', $app['config']->get('database.connections.'.$this->driver)
-        );
+        $app['config']->set('database.connections.without-prefix', $app['config']->get('database.connections.'.$this->driver));
         $app['config']->set('database.connections.with-prefix', $app['config']->get('database.connections.without-prefix'));
         $app['config']->set('database.connections.with-prefix.prefix', 'example_');
     }
