@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Query\Grammars;
 
 use Illuminate\Database\Query\Builder;
+use Illuminate\Database\Query\JoinLateralClause;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 
@@ -383,6 +384,18 @@ class PostgresGrammar extends Grammar
 
             return $this->wrap($column).' = '.$this->parameter($value);
         })->implode(', ');
+    }
+
+    /**
+     * Compile a "lateral join" clause.
+     *
+     * @param  \Illuminate\Database\Query\JoinLateralClause  $join
+     * @param  string  $expression
+     * @return string
+     */
+    public function compileJoinLateral(JoinLateralClause $join, string $expression): string
+    {
+        return trim("{$join->type} join lateral {$expression} on true");
     }
 
     /**
