@@ -44,7 +44,11 @@ abstract class Grammar
     public function wrapTable($table)
     {
         if (! $this->isExpression($table)) {
-            return $this->wrap($this->tablePrefix.$table, true);
+            $table = str_contains($table, '.')
+                ? substr_replace($table, '.'.$this->tablePrefix, strrpos($table, '.'), 1)
+                : $this->tablePrefix.$table;
+
+            return $this->wrap($table, true);
         }
 
         return $this->getValue($table);
