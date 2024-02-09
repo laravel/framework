@@ -49,6 +49,7 @@ class SchemaBuilderSchemaNameTest extends DatabaseTestCase
         $this->assertFalse($schema->hasTable('table'));
     }
 
+    #[DataProvider('connectionProvider')]
     public function testRename($connection)
     {
         $schema = Schema::connection($connection);
@@ -118,6 +119,7 @@ class SchemaBuilderSchemaNameTest extends DatabaseTestCase
         $this->assertTrue($schema->hasTable('table'));
     }
 
+    #[DataProvider('connectionProvider')]
     public function testAddColumns($connection)
     {
         $schema = Schema::connection($connection);
