@@ -399,7 +399,7 @@ class SchemaBuilderSchemaNameTest extends DatabaseTestCase
     {
         return [
             'without prefix' => ['without-prefix'],
-            // 'with prefix' => ['with-prefix'],
+            'with prefix' => ['with-prefix'],
         ];
     }
 }
