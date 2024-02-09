@@ -223,7 +223,7 @@ class SchemaBuilderSchemaNameTest extends DatabaseTestCase
         $schema = Schema::connection($connection);
 
         $schema->create('my_schema.table', function (Blueprint $table) {
-            $table->id('code');//->primary();
+            $table->string('code')->primary();
             $table->string('email')->unique();
             $table->integer('name')->index();
             $table->integer('title')->index();

@@ -216,7 +216,7 @@ class SqlServerGrammar extends Grammar
     public function compileRenameColumn(Blueprint $blueprint, Fluent $command, Connection $connection)
     {
         return sprintf("sp_rename %s, %s, N'COLUMN'",
-            $this->quoteString($this->wrapTable($blueprint).'.'.$command->from),
+            $this->quoteString($this->wrapTable($blueprint).'.'.$this->wrap($command->from)),
             $this->wrap($command->to)
         );
     }
@@ -507,7 +507,7 @@ class SqlServerGrammar extends Grammar
     public function compileRenameIndex(Blueprint $blueprint, Fluent $command)
     {
         return sprintf("sp_rename %s, %s, N'INDEX'",
-            $this->quoteString($this->wrapTable($blueprint).'.'.$command->from),
+            $this->quoteString($this->wrapTable($blueprint).'.'.$this->wrap($command->from)),
             $this->wrap($command->to)
         );
     }
