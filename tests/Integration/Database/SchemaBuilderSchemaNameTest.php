@@ -275,29 +275,32 @@ class SchemaBuilderSchemaNameTest extends DatabaseTestCase
         $this->assertTrue($schema->hasIndex('my_table', ['email'], 'unique'));
         $this->assertTrue($schema->hasIndex('my_table', ['name']));
 
-        $schema->table('my_schema.table', function (Blueprint $table) {
-            $table->renameIndex('my_schema_table_title_index', 'my_schema_table_new_title_index');
+        $schemaIndexName = $connection === 'with-prefix' ? 'my_schema_example_table_title_index' : 'my_schema_table_title_index';
+        $indexName = $connection === 'with-prefix' ? 'example_my_table_title_index' : 'my_table_title_index';
+
+        $schema->table('my_schema.table', function (Blueprint $table) use ($schemaIndexName) {
+            $table->renameIndex($schemaIndexName, 'schema_new_index_name');
         });
-        $schema->table('my_table', function (Blueprint $table) {
-            $table->renameIndex('my_table_title_index', 'my_table_new_title_index');
+        $schema->table('my_table', function (Blueprint $table) use ($indexName) {
+            $table->renameIndex($indexName, 'new_index_name');
         });
 
-        $this->assertTrue($schema->hasIndex('my_schema.table', 'my_schema_table_new_title_index'));
-        $this->assertFalse($schema->hasIndex('my_schema.table', 'my_schema_table_title_index'));
-        $this->assertTrue($schema->hasIndex('my_table', 'my_table_new_title_index'));
-        $this->assertFalse($schema->hasIndex('my_table', 'my_table_title_index'));
+        $this->assertTrue($schema->hasIndex('my_schema.table', 'schema_new_index_name'));
+        $this->assertFalse($schema->hasIndex('my_schema.table', $schemaIndexName));
+        $this->assertTrue($schema->hasIndex('my_table', 'new_index_name'));
+        $this->assertFalse($schema->hasIndex('my_table', $indexName));
 
         $schema->table('my_schema.table', function (Blueprint $table) {
             $table->dropPrimary(['code']);
             $table->dropUnique(['email']);
             $table->dropIndex(['name']);
-            $table->dropIndex('my_schema_table_new_title_index');
+            $table->dropIndex('schema_new_index_name');
         });
         $schema->table('my_table', function (Blueprint $table) {
             $table->dropPrimary(['code']);
             $table->dropUnique(['email']);
             $table->dropIndex(['name']);
-            $table->dropIndex('my_table_new_title_index');
+            $table->dropIndex('new_index_name');
         });
 
         $this->assertEmpty($schema->getIndexListing('my_schema.table'));
@@ -320,6 +323,8 @@ class SchemaBuilderSchemaNameTest extends DatabaseTestCase
             $table->unsignedBigInteger('table_id');
             $table->foreign('table_id')->references('id')->on('my_schema.table');
         });
+
+        var_dump($schema->getForeignKeys('my_schema.table'));
 
         $this->assertTrue(collect($schema->getForeignKeys('my_schema.table'))->contains(
             fn ($foreign) => $foreign['columns'] === ['my_table_id']
@@ -382,6 +387,8 @@ class SchemaBuilderSchemaNameTest extends DatabaseTestCase
             $table->comment('comment on table');
             $table->string('name')->comment('comment on column');
         });
+
+        var_dump($schema->getTables());
 
         $this->assertEquals('comment on schema table',
             collect($schema->getTables())->first(fn ($table) => $table['name'] === 'table' && $table['schema'] === 'my_schema')['comment']
