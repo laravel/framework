@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation\Testing;
 
 use Illuminate\Contracts\Console\Kernel;
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Application;
 use PHPUnit\Framework\TestCase as BaseTestCase;
 use Throwable;
@@ -29,6 +30,10 @@ abstract class TestCase extends BaseTestCase
     public function createApplication()
     {
         $app = require Application::inferBasePath().'/bootstrap/app.php';
+
+        if ($app->configurationIsCached()) {
+            (new Filesystem())->delete($app->getCachedConfigPath());
+        }
 
         $app->make(Kernel::class)->bootstrap();
 
