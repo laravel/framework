@@ -892,6 +892,17 @@ trait HasRelationships
         return $model->unsetRelations();
     }
 
+    public function withRelations(array $relations)
+    {
+        $model = $this->withoutRelations();
+
+        foreach ($relations as $relation) {
+            $model->setRelation($relation, $this->getRelation($relation));
+        }
+
+        return $model;
+    }
+
     /**
      * Unset all the loaded relations for the instance.
      *
