@@ -254,20 +254,14 @@ class ServeCommand extends Command
                 $this->newLine();
 
                 $this->serverRunningHasBeenDisplayed = true;
-            } elseif (str($line)->contains(' Accepted')) {
-                $requestPort = $this->getRequestPortFromLine($line);
-
+            } elseif (str($line)->contains(' Accepted') && $requestPort = $this->getRequestPortFromLine($line)) {
                 $this->requestsPool[$requestPort] = [
                     $this->getDateFromLine($line),
                     false,
                 ];
-            } elseif (str($line)->contains([' [200]: GET '])) {
-                $requestPort = $this->getRequestPortFromLine($line);
-
+            } elseif (str($line)->contains([' [200]: GET ']) && $requestPort = $this->getRequestPortFromLine($line)) {
                 $this->requestsPool[$requestPort][1] = trim(explode('[200]: GET', $line)[1]);
-            } elseif (str($line)->contains(' Closing')) {
-                $requestPort = $this->getRequestPortFromLine($line);
-
+            } elseif (str($line)->contains(' Closing') && $requestPort = $this->getRequestPortFromLine($line)) {
                 if (empty($this->requestsPool[$requestPort])) {
                     return;
                 }
@@ -329,13 +323,13 @@ class ServeCommand extends Command
      * Get the request port from the given PHP server output.
      *
      * @param  string  $line
-     * @return int
+     * @return int|null
      */
     protected function getRequestPortFromLine($line)
     {
         preg_match('/:(\d+)\s(?:(?:\w+$)|(?:\[.*))/', $line, $matches);
 
-        return (int) $matches[1];
+        return isset($matches[1]) ? (int) $matches[1] : null;
     }
 
     /**
