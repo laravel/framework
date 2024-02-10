@@ -64,7 +64,7 @@ class ApplicationBuilder
             $providers = require $bootstrapProviderPath;
         }
 
-        RegisterProviders::merge(array_filter($providers, fn($provider) => class_exists($provider)));
+        RegisterProviders::merge(array_filter($providers, fn ($provider) => class_exists($provider)));
 
         return $this;
     }
