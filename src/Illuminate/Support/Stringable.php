@@ -235,15 +235,32 @@ class Stringable implements JsonSerializable, ArrayAccess
     }
 
     /**
+     * Alias for the `exactly` function.
+     *
+     * @param  \Illuminate\Support\Stringable|string  $value
+     * @param  bool  $ignoreCase
+     * @return bool
+     */
+    public function equals($value, $ignoreCase = false)
+    {
+        return $this->exactly($value, $ignoreCase);
+    }
+
+    /**
      * Determine if the string is an exact match with the given value.
      *
      * @param  \Illuminate\Support\Stringable|string  $value
+     * @param  bool  $ignoreCase
      * @return bool
      */
-    public function exactly($value)
+    public function exactly($value, $ignoreCase = false)
     {
         if ($value instanceof Stringable) {
             $value = $value->toString();
+        }
+
+        if ($ignoreCase) {
+            return strtolower($this->value) === strtolower($value);
         }
 
         return $this->value === $value;
