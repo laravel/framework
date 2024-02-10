@@ -324,17 +324,18 @@ class SchemaBuilderSchemaNameTest extends DatabaseTestCase
             $table->foreign('table_id')->references('id')->on('my_schema.table');
         });
 
-        var_dump($schema->getForeignKeys('my_schema.table'));
+        $schemaTableName = $connection === 'with-prefix' ? 'example_table' : 'table';
+        $tableName = $connection === 'with-prefix' ? 'example_my_tables' : 'my_tables';
 
         $this->assertTrue(collect($schema->getForeignKeys('my_schema.table'))->contains(
             fn ($foreign) => $foreign['columns'] === ['my_table_id']
-                && $foreign['foreign_table'] === 'my_tables' && in_array($foreign['foreign_schema'], ['public', 'dbo'])
+                && $foreign['foreign_table'] === $tableName && in_array($foreign['foreign_schema'], ['public', 'dbo'])
                 && $foreign['foreign_columns'] === ['id']
         ));
 
         $this->assertTrue(collect($schema->getForeignKeys('table'))->contains(
             fn ($foreign) => $foreign['columns'] === ['table_id']
-                && $foreign['foreign_table'] === 'table' && $foreign['foreign_schema'] === 'my_schema'
+                && $foreign['foreign_table'] === $schemaTableName && $foreign['foreign_schema'] === 'my_schema'
                 && $foreign['foreign_columns'] === ['id']
         ));
 
@@ -388,16 +389,17 @@ class SchemaBuilderSchemaNameTest extends DatabaseTestCase
             $table->string('name')->comment('comment on column');
         });
 
-        var_dump($schema->getTables());
+        $tables = collect($schema->getTables());
+        $tableName = $connection === 'with-prefix' ? 'example_table' : 'table';
 
         $this->assertEquals('comment on schema table',
-            collect($schema->getTables())->first(fn ($table) => $table['name'] === 'table' && $table['schema'] === 'my_schema')['comment']
+            $tables->first(fn ($table) => $table['name'] === $tableName && $table['schema'] === 'my_schema')['comment']
+        );
+        $this->assertEquals('comment on table',
+            $tables->first(fn ($table) => $table['name'] === $tableName && $table['schema'] === 'public')['comment']
         );
         $this->assertEquals('comment on schema column',
             collect($schema->getColumns('my_schema.table'))->firstWhere('name', 'name')['comment']
-        );
-        $this->assertEquals('comment on table',
-            collect($schema->getTables())->first(fn ($table) => $table['name'] === 'table' && $table['schema'] === 'public')['comment']
         );
         $this->assertEquals('comment on column',
             collect($schema->getColumns('table'))->firstWhere('name', 'name')['comment']
