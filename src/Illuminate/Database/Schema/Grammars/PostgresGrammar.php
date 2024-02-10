@@ -230,7 +230,9 @@ class PostgresGrammar extends Grammar
     {
         if ($command->column->autoIncrement
             && $value = $command->column->get('startingValue', $command->column->get('from'))) {
-            return 'alter sequence '.$blueprint->getPrefix().$blueprint->getTable().'_'.$command->column->name.'_seq restart with '.$value;
+            $table = last(explode('.', $blueprint->getTable()));
+
+            return 'alter sequence '.$blueprint->getPrefix().$table.'_'.$command->column->name.'_seq restart with '.$value;
         }
     }
 
