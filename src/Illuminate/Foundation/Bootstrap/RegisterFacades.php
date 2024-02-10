@@ -64,7 +64,17 @@ class RegisterFacades
     public static function merge(array $facades)
     {
         static::$merge = array_filter(array_unique(
-            $facades
+            array_merge(static::$merge, $facades)
         ));
+    }
+
+    /**
+     * Flush the bootstrapper's global state.
+     *
+     * @return void
+     */
+    public static function flushState()
+    {
+        static::$merge = [];
     }
 }

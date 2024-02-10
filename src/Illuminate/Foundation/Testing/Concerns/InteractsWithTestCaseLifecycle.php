@@ -6,6 +6,7 @@ use Carbon\CarbonImmutable;
 use Illuminate\Console\Application as Artisan;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Bootstrap\HandleExceptions;
+use Illuminate\Foundation\Bootstrap\RegisterFacades;
 use Illuminate\Foundation\Bootstrap\RegisterProviders;
 use Illuminate\Foundation\Console\AboutCommand;
 use Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull;
@@ -159,6 +160,7 @@ trait InteractsWithTestCaseLifecycle
         Once::flush();
         Queue::createPayloadUsing(null);
         RegisterProviders::flushState();
+        RegisterFacades::flushState();
         Sleep::fake(false);
         TrimStrings::flushState();
 
