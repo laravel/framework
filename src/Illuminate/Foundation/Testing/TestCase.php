@@ -31,8 +31,10 @@ abstract class TestCase extends BaseTestCase
     {
         $app = require Application::inferBasePath().'/bootstrap/app.php';
 
-        if ($app->configurationIsCached()) {
+        if ($app->configurationIsCached() && !$app->runningUnitTests()) {
             (new Filesystem())->delete($app->getCachedConfigPath());
+
+            $this->refreshApplication();
         }
 
         $app->make(Kernel::class)->bootstrap();
