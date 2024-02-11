@@ -22,7 +22,7 @@ class ProviderMakeCommandTest extends TestCase
         ], 'app/Providers/FooServiceProvider.php');
 
         $this->assertEquals(require $this->app->getBootstrapProvidersPath(), [
-            'App\Providers\FooServiceProvider'  
+            'App\Providers\FooServiceProvider',
         ]);
     }
 }
