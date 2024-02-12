@@ -166,6 +166,8 @@ class Builder implements BuilderContract
      * @param  string  $identifier
      * @param  \Illuminate\Database\Eloquent\Scope|\Closure|null  $scope
      * @return $this
+     *
+     * @throws \InvalidArgumentException
      */
     public function withGlobalScope($identifier, $scope = null)
     {
