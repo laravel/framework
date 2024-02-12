@@ -163,11 +163,15 @@ class Builder implements BuilderContract
      * Register a new global scope.
      *
      * @param  string  $identifier
-     * @param  \Illuminate\Database\Eloquent\Scope|\Closure  $scope
+     * @param  \Illuminate\Database\Eloquent\Scope|\Closure|null  $scope
      * @return $this
      */
-    public function withGlobalScope($identifier, $scope)
+    public function withGlobalScope($identifier, $scope = null)
     {
+        if (is_null($scope) && class_exists($identifier) && is_subclass_of($identifier, Scope::class)) {
+            $scope = new $identifier;
+        }
+        
         $this->scopes[$identifier] = $scope;
 
         if (method_exists($scope, 'extend')) {
