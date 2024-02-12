@@ -151,6 +151,21 @@ class TestResponse implements ArrayAccess
     }
 
     /**
+     * Assert that the response has not the given status code.
+     *
+     * @param  int  $status
+     * @return $this
+     */
+    public function assertStatusNot($status)
+    {
+        $message = $this->statusMessageWithDetails($status, $actual = $this->getStatusCode());
+
+        PHPUnit::assertNotSame($status, $actual, $message);
+
+        return $this;
+    }
+
+    /**
      * Get an assertion message for a status assertion containing extra details when available.
      *
      * @param  string|int  $expected
