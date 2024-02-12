@@ -19,6 +19,7 @@ use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ForwardsCalls;
+use InvalidArgumentException;
 use ReflectionClass;
 use ReflectionMethod;
 
@@ -170,6 +171,10 @@ class Builder implements BuilderContract
     {
         if (is_null($scope) && class_exists($identifier) && is_subclass_of($identifier, Scope::class)) {
             $scope = new $identifier;
+        }
+
+        if (is_null($scope)) {
+            throw new InvalidArgumentException('Global scope must be an instance of Closure or Scope or identifier must be a class name of a class extending '.Scope::class);
         }
 
         $this->scopes[$identifier] = $scope;
@@ -917,7 +922,7 @@ class Builder implements BuilderContract
      * @param  \Closure|int|null  $total
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      *
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function paginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null)
     {
