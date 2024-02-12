@@ -251,18 +251,18 @@ class OnceTest extends TestCase
 
     public function testMemoizationWithinEvals()
     {
-        $firstResolver = eval('return fn () => once( function () { return random_int(1, 1000); } ) ;');
+        $firstResolver = eval('return fn () => once( function () { return random_int(1, PHP_INT_MAX); } ) ;');
 
         $firstA = $firstResolver();
         $firstB = $firstResolver();
 
-        $secondResolver = eval('return fn () => fn () => once( function () { return random_int(1, 1000); } ) ;');
+        $secondResolver = eval('return fn () => fn () => once( function () { return random_int(1, PHP_INT_MAX); } ) ;');
 
         $secondA = $secondResolver()();
         $secondB = $secondResolver()();
 
-        $third = eval('return once( function () { return random_int(1, 1000); } ) ;');
-        $fourth = eval('return once( function () { return random_int(1, 1000); } ) ;');
+        $third = eval('return once( function () { return random_int(1, PHP_INT_MAX); } ) ;');
+        $fourth = eval('return once( function () { return random_int(1, PHP_INT_MAX); } ) ;');
 
         $this->assertNotSame($firstA, $firstB);
         $this->assertNotSame($secondA, $secondB);
