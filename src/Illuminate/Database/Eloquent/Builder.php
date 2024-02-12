@@ -171,7 +171,7 @@ class Builder implements BuilderContract
         if (is_null($scope) && class_exists($identifier) && is_subclass_of($identifier, Scope::class)) {
             $scope = new $identifier;
         }
-        
+
         $this->scopes[$identifier] = $scope;
 
         if (method_exists($scope, 'extend')) {
