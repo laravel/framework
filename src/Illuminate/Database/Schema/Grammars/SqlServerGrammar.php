@@ -215,8 +215,8 @@ class SqlServerGrammar extends Grammar
      */
     public function compileRenameColumn(Blueprint $blueprint, Fluent $command, Connection $connection)
     {
-        return sprintf("sp_rename '%s', %s, 'COLUMN'",
-            $this->wrap($blueprint->getTable().'.'.$command->from),
+        return sprintf("sp_rename %s, %s, N'COLUMN'",
+            $this->quoteString($this->wrapTable($blueprint).'.'.$this->wrap($command->from)),
             $this->wrap($command->to)
         );
     }
@@ -358,7 +358,7 @@ class SqlServerGrammar extends Grammar
     public function compileDropIfExists(Blueprint $blueprint, Fluent $command)
     {
         return sprintf('if object_id(%s, \'U\') is not null drop table %s',
-            $this->quoteString($this->getTablePrefix().$blueprint->getTable()),
+            $this->quoteString($this->wrapTable($blueprint)),
             $this->wrapTable($blueprint)
         );
     }
@@ -403,7 +403,7 @@ class SqlServerGrammar extends Grammar
             : "'".implode("','", $command->columns)."'";
 
         $table = $this->wrapTable($blueprint);
-        $tableName = $this->quoteString($this->getTablePrefix().$blueprint->getTable());
+        $tableName = $this->quoteString($this->wrapTable($blueprint));
 
         $sql = "DECLARE @sql NVARCHAR(MAX) = '';";
         $sql .= "SELECT @sql += 'ALTER TABLE $table DROP CONSTRAINT ' + OBJECT_NAME([default_object_id]) + ';' ";
@@ -491,9 +491,10 @@ class SqlServerGrammar extends Grammar
      */
     public function compileRename(Blueprint $blueprint, Fluent $command)
     {
-        $from = $this->wrapTable($blueprint);
-
-        return "sp_rename {$from}, ".$this->wrapTable($command->to);
+        return sprintf('sp_rename %s, %s',
+            $this->quoteString($this->wrapTable($blueprint)),
+            $this->wrapTable($command->to)
+        );
     }
 
     /**
@@ -505,8 +506,8 @@ class SqlServerGrammar extends Grammar
      */
     public function compileRenameIndex(Blueprint $blueprint, Fluent $command)
     {
-        return sprintf("sp_rename N'%s', %s, N'INDEX'",
-            $this->wrap($blueprint->getTable().'.'.$command->from),
+        return sprintf("sp_rename %s, %s, N'INDEX'",
+            $this->quoteString($this->wrapTable($blueprint).'.'.$this->wrap($command->from)),
             $this->wrap($command->to)
         );
     }

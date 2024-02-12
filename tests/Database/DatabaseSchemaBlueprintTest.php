@@ -181,7 +181,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $this->assertEquals(['alter table "users" rename column "foo" to "bar"'], $blueprint->toSql($connection, new SQLiteGrammar));
 
         $blueprint = clone $base;
-        $this->assertEquals(['sp_rename \'"users"."foo"\', "bar", \'COLUMN\''], $blueprint->toSql($connection, new SqlServerGrammar));
+        $this->assertEquals(['sp_rename N\'"users"."foo"\', "bar", N\'COLUMN\''], $blueprint->toSql($connection, new SqlServerGrammar));
     }
 
     public function testNativeRenameColumnOnMysql57()
