@@ -260,7 +260,7 @@ class Stringable implements JsonSerializable, ArrayAccess
         }
 
         if ($ignoreCase) {
-            return strtolower($this->value) === strtolower($value);
+            return mb_strtolower($this->value) === mb_strtolower($value);
         }
 
         return $this->value === $value;
