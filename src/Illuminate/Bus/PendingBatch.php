@@ -3,7 +3,6 @@
 namespace Illuminate\Bus;
 
 use Closure;
-use Illuminate\Bus\BatchRepository;
 use Illuminate\Bus\Events\BatchDispatched;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher as EventDispatcher;
@@ -299,7 +298,7 @@ class PendingBatch
     /**
      * Stores the batch.
      *
-     * @param  BatchRepository $repository
+     * @param  BatchRepository  $repository
      * @return \Illuminate\Bus\Batch
      */
     protected function store($repository)
