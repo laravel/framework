@@ -440,10 +440,10 @@ class HttpClientTest extends TestCase
     {
         $xml = <<<XML
         <?xml version="1.0" encoding="utf-8"?>
-        <mock_data>
-            <foo>foo</foo>
-            <bar>bar</bar>
-        </mock_data>
+        <user>
+            <name>Taylor</name>
+            <title>Laravel Developer</title>
+        </user>
         XML;
 
         $this->factory->fake();
