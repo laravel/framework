@@ -2,7 +2,11 @@
 
 namespace {{ namespace }};
 
+use Illuminate\Support\Traits\MagicalEnum;
+
 enum {{ class }}: {{ type }}
 {
+    use MagicalEnum;
+
     //
 }
