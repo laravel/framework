@@ -436,6 +436,27 @@ class HttpClientTest extends TestCase
         });
     }
 
+    public function testCanSendXml()
+    {
+        $xml = <<<XML
+        <?xml version="1.0" encoding="utf-8"?>
+        <mock_data>
+            <foo>foo</foo>
+            <bar>bar</bar>
+        </mock_data>
+        XML;
+
+        $this->factory->fake();
+
+        $this->factory->asXml()->post('http://foo.com/xml', $xml);
+
+        $this->factory->assertSent(function (Request $request) use($xml) {
+            return $request->url() === 'http://foo.com/xml' &&
+                   $request->hasHeader('Content-Type', 'text/xml') &&
+                   $request->body() === $xml;
+        });
+    }
+
     public function testCanSendArrayableFormData()
     {
         $this->factory->fake();

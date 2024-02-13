@@ -295,6 +295,16 @@ class PendingRequest
     }
 
     /**
+     * Indicate the request contains XML.
+     *
+     * @return $this
+     */
+    public function asXml()
+    {
+        return $this->bodyFormat('xml')->contentType('text/xml');
+    }
+
+    /**
      * Attach a file to the request.
      *
      * @param  string|array  $name
@@ -790,7 +800,7 @@ class PendingRequest
      * Issue a POST request to the given URL.
      *
      * @param  string  $url
-     * @param  array  $data
+     * @param  array|string  $data
      * @return \Illuminate\Http\Client\Response
      */
     public function post(string $url, $data = [])
@@ -818,7 +828,7 @@ class PendingRequest
      * Issue a PUT request to the given URL.
      *
      * @param  string  $url
-     * @param  array  $data
+     * @param  array|string  $data
      * @return \Illuminate\Http\Client\Response
      */
     public function put(string $url, $data = [])
@@ -832,7 +842,7 @@ class PendingRequest
      * Issue a DELETE request to the given URL.
      *
      * @param  string  $url
-     * @param  array  $data
+     * @param  array|string  $data
      * @return \Illuminate\Http\Client\Response
      */
     public function delete(string $url, $data = [])
@@ -958,6 +968,10 @@ class PendingRequest
                 $options[$this->bodyFormat] = $this->parseMultipartBodyFormat($options[$this->bodyFormat]);
             } elseif ($this->bodyFormat === 'body') {
                 $options[$this->bodyFormat] = $this->pendingBody;
+            } elseif ($this->bodyFormat === 'xml') {
+                $options['body'] = $options['xml'];
+                unset($options['xml']);
+                $this->bodyFormat('body');
             }
 
             if (is_array($options[$this->bodyFormat])) {
