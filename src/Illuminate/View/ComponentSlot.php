@@ -3,8 +3,8 @@
 namespace Illuminate\View;
 
 use Illuminate\Contracts\Support\Htmlable;
-use Stringable;
 use InvalidArgumentException;
+use Stringable;
 
 class ComponentSlot implements Htmlable, Stringable
 {
