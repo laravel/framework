@@ -438,7 +438,7 @@ class HttpClientTest extends TestCase
 
     public function testCanSendXml()
     {
-        $xml = <<<XML
+        $xml = <<<'XML'
         <?xml version="1.0" encoding="utf-8"?>
         <user>
             <name>Taylor</name>
@@ -450,7 +450,7 @@ class HttpClientTest extends TestCase
 
         $this->factory->asXml()->post('http://foo.com/xml', $xml);
 
-        $this->factory->assertSent(function (Request $request) use($xml) {
+        $this->factory->assertSent(function (Request $request) use ($xml) {
             return $request->url() === 'http://foo.com/xml' &&
                    $request->hasHeader('Content-Type', 'text/xml') &&
                    $request->body() === $xml;
