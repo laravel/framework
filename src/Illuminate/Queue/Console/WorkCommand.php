@@ -104,9 +104,11 @@ class WorkCommand extends Command
         if($this->downForMaintenance() && ! $this->option('force')) {
             $this->components->warn("The application is in maintenance mode.");
 
-            if (confirm('Would you like to force the worker to run?', default: false)) {
-                $this->input->setOption('force', true);
+            if (! confirm('Would you like to force the worker to run?', default: false)) {
+                return false;
             }
+
+            $this->input->setOption('force', true);
         }
 
         // We'll listen to the processed and failed events so we can write information
