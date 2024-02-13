@@ -517,7 +517,17 @@ class Arr
     public static function select($array, $keys)
     {
         return static::map($array, function ($item) use ($keys) {
-            return array_intersect_key($item, array_flip((array) $keys));
+            $result = [];
+
+            foreach ($keys as $key) {
+                if (Arr::accessible($item) && Arr::exists($item, $key)) {
+                    $result[$key] = $item[$key];
+                } elseif (is_object($item) && isset($item->{$key})) {
+                    $result[$key] = $item->{$key};
+                }
+            }
+
+            return $result;
         });
     }
 
