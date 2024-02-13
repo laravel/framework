@@ -1,6 +1,35 @@
 # Release Notes for 10.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v10.43.0...10.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v10.44.0...10.x)
+
+## [v10.44.0](https://github.com/laravel/framework/compare/v10.43.0...v10.44.0) - 2024-02-13
+
+* [10.x] Fix empty request for HTTP connection exception by [@driesvints](https://github.com/driesvints) in https://github.com/laravel/framework/pull/49924
+* [10.x] Add Collection::select() method by [@morrislaptop](https://github.com/morrislaptop) in https://github.com/laravel/framework/pull/49845
+* [10.x] Refactor `getPreviousUrlFromSession` method in UrlGenerator by [@milwad-dev](https://github.com/milwad-dev) in https://github.com/laravel/framework/pull/49944
+* [10.x] Add POSIX compliant cleanup to artisan serve by [@Tofandel](https://github.com/Tofandel) in https://github.com/laravel/framework/pull/49943
+* [10.x] Fix infinite loop when global scopes query contains aggregates by [@mateusjunges](https://github.com/mateusjunges) in https://github.com/laravel/framework/pull/49972
+* [10.x] Adds PHPUnit 11 as conflict by [@nunomaduro](https://github.com/nunomaduro) in https://github.com/laravel/framework/pull/49957
+* Revert "[10.x] fix Before/After validation rules" by [@taylorotwell](https://github.com/taylorotwell) in https://github.com/laravel/framework/pull/50013
+* [10.x] Fix the phpdoc for replaceMatches in Str and Stringable helpers by [@joke2k](https://github.com/joke2k) in https://github.com/laravel/framework/pull/49990
+* [10.x] Added `setAbly()` method for `AblyBroadcaster` by [@Rijoanul-Shanto](https://github.com/Rijoanul-Shanto) in https://github.com/laravel/framework/pull/49981
+* [10.x] Fix in appendExceptionToException method exception type check by [@t1nkl](https://github.com/t1nkl) in https://github.com/laravel/framework/pull/49958
+* [10.x] DB command: add sqlcmd -C flag when 'trust_server_certificate' is set by [@hulkur](https://github.com/hulkur) in https://github.com/laravel/framework/pull/49952
+* Allows Setup and Teardown actions to be reused in alternative TestCase for Laravel by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/49973
+* [10.x] Add `toBase64()` and `fromBase64()` methods to Stringable and Str classes by [@mtownsend5512](https://github.com/mtownsend5512) in https://github.com/laravel/framework/pull/49984
+* [10.x] Allows to defer resolving pcntl only if it's available by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/50024
+* [10.x] Fixes missing `Throwable` import and handle if `originalExceptionHandler` or `originalDeprecationHandler` property isn't used by alternative TestCase by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/50021
+* [10.x] Type hinting for conditional validation rules by [@lorenzolosa](https://github.com/lorenzolosa) in https://github.com/laravel/framework/pull/50017
+* [10.x] Introduce new `Arr::take()` helper by [@ryangjchandler](https://github.com/ryangjchandler) in https://github.com/laravel/framework/pull/50015
+* [10.x] Improved Handling of Empty Component Slots with HTML Comments or Line Breaks by [@comes](https://github.com/comes) in https://github.com/laravel/framework/pull/49966
+* [10.x] Introduce Observe attribute for models by [@emargareten](https://github.com/emargareten) in https://github.com/laravel/framework/pull/49843
+* [10.x] Add ScopedBy attribute for models by [@emargareten](https://github.com/emargareten) in https://github.com/laravel/framework/pull/50034
+* [10.x] Update reserved names in `GeneratorCommand` by [@xurshudyan](https://github.com/xurshudyan) in https://github.com/laravel/framework/pull/50043
+* [10.x] fix Validator::validated get nullable array by [@helitik](https://github.com/helitik) in https://github.com/laravel/framework/pull/50056
+* [10.x] Pass Herd specific env variables to "artisan serve" by [@mpociot](https://github.com/mpociot) in https://github.com/laravel/framework/pull/50069
+* Remove regex case insensitivity modifier in UUID detection to speed it up slightly by [@maximal](https://github.com/maximal) in https://github.com/laravel/framework/pull/50067
+* [10.x] HTTP retry method can accept array as first param by [@me-shaon](https://github.com/me-shaon) in https://github.com/laravel/framework/pull/50064
+* [10.x] Fix DB::afterCommit() broken in tests using DatabaseTransactions by [@oprypkhantc](https://github.com/oprypkhantc) in https://github.com/laravel/framework/pull/50068
 
 ## [v10.43.0](https://github.com/laravel/framework/compare/v10.42.0...v10.43.0) - 2024-01-30
 
