@@ -11,8 +11,6 @@ use Illuminate\Tests\Support\Fixtures\MagicalUnitEnum;
 use Illuminate\Tests\Support\Fixtures\StringBackedMagicalEnum;
 use PHPUnit\Framework\TestCase;
 
-include_once 'Enums.php';
-
 class SupportMagicalEnumTest extends TestCase
 {
 
