@@ -1858,6 +1858,34 @@ class HttpClientTest extends TestCase
         ]);
     }
 
+    public function testRequestsWillBeWaitingSleepMillisecondsReceivedInBackoffArray()
+    {
+        Sleep::fake();
+
+        $this->factory->fake([
+            '*' => $this->factory->sequence()
+                ->push(['error'], 500)
+                ->push(['error'], 500)
+                ->push(['error'], 500)
+                ->push(['ok'], 200),
+        ]);
+
+        $this->factory
+            ->retry([50, 100, 200], 0, null, true)
+            ->get('http://foo.com/get');
+
+        $this->factory->assertSentCount(4);
+
+        // Make sure we waited 300ms for the first two attempts
+        Sleep::assertSleptTimes(3);
+
+        Sleep::assertSequence([
+            Sleep::usleep(50_000),
+            Sleep::usleep(100_000),
+            Sleep::usleep(200_000),
+        ]);
+    }
+
     public function testMiddlewareRunsWhenFaked()
     {
         $this->factory->fake(function (Request $request) {
