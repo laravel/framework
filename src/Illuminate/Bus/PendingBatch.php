@@ -296,29 +296,6 @@ class PendingBatch
     }
 
     /**
-     * Stores the batch.
-     *
-     * @param  BatchRepository  $repository
-     * @return \Illuminate\Bus\Batch
-     */
-    protected function store($repository)
-    {
-        $batch = $repository->store($this);
-
-        collect($this->beforeCallbacks())->each(function ($handler) use ($batch) {
-            try {
-                return $handler($batch);
-            } catch (Throwable $e) {
-                if (function_exists('report')) {
-                    report($e);
-                }
-            }
-        });
-
-        return $batch;
-    }
-
-    /**
      * Dispatch the batch.
      *
      * @return \Illuminate\Bus\Batch
@@ -413,5 +390,28 @@ class PendingBatch
     public function dispatchUnless($boolean)
     {
         return ! value($boolean) ? $this->dispatch() : null;
+    }
+
+    /**
+     * Store the batch using the given repository.
+     *
+     * @param  \Illuminate\Bus\BatchRepository  $repository
+     * @return \Illuminate\Bus\Batch
+     */
+    protected function store($repository)
+    {
+        $batch = $repository->store($this);
+
+        collect($this->beforeCallbacks())->each(function ($handler) use ($batch) {
+            try {
+                return $handler($batch);
+            } catch (Throwable $e) {
+                if (function_exists('report')) {
+                    report($e);
+                }
+            }
+        });
+
+        return $batch;
     }
 }
