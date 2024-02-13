@@ -40,6 +40,8 @@ class DatabaseTransactionsManagerTest extends TestCase
         $manager->begin('foo', 2);
         $manager->commit('foo', 2, 1);
 
+        $this->assertCount(0, $manager->callbackApplicableTransactions());
+
         $manager->begin('foo', 2);
 
         $this->assertCount(1, $manager->callbackApplicableTransactions());
