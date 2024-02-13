@@ -101,8 +101,8 @@ class WorkCommand extends Command
             return $this->worker->sleep($this->option('sleep'));
         }
 
-        if($this->downForMaintenance() && ! $this->option('force')) {
-            $this->components->warn("The application is in maintenance mode.");
+        if ($this->downForMaintenance() && ! $this->option('force')) {
+            $this->components->warn('The application is in maintenance mode.');
 
             if (! confirm('Would you like to force the worker to run?', default: false)) {
                 return false;
