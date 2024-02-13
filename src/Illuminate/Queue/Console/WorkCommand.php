@@ -16,6 +16,7 @@ use Illuminate\Support\InteractsWithTime;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Terminal;
 
+use function Laravel\Prompts\confirm;
 use function Termwind\terminal;
 
 #[AsCommand(name: 'queue:work')]
@@ -98,6 +99,10 @@ class WorkCommand extends Command
     {
         if ($this->downForMaintenance() && $this->option('once')) {
             return $this->worker->sleep($this->option('sleep'));
+        }
+
+        if($this->downForMaintenance() && !$this->option('force')) {
+            $this->components->warn("The application is in maintenance mode.");
         }
 
         // We'll listen to the processed and failed events so we can write information
