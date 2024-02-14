@@ -155,7 +155,7 @@ trait MagicalEnum
      *
      * @return array
      */
-    public static function reverseArray(): array
+    public static function toReverseArray(): array
     {
         self::ensureEnum();
 

@@ -123,9 +123,9 @@ class SupportMagicalEnumTest extends TestCase
 
     public function testReverseArray(): void
     {
-        $this->assertEquals([1 => 'ONE', 2 => 'TOW', 3 => 'THREE'], IntBackedMagicalEnum::reverseArray());
-        $this->assertEquals(['Otwell' => 'Taylor', 'Framework' => 'Laravel'], stringBackedMagicalEnum::reverseArray());
-        $this->assertEquals(['A', 'B', 'C', 'D'], MagicalUnitEnum::reverseArray());
+        $this->assertEquals([1 => 'ONE', 2 => 'TOW', 3 => 'THREE'], IntBackedMagicalEnum::toReverseArray());
+        $this->assertEquals(['Otwell' => 'Taylor', 'Framework' => 'Laravel'], stringBackedMagicalEnum::toReverseArray());
+        $this->assertEquals(['A', 'B', 'C', 'D'], MagicalUnitEnum::toReverseArray());
 
         $this->expectException(BadMethodCallException::class);
         $instance = new class {
