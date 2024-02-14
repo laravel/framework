@@ -17,7 +17,7 @@ class ContextServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->singleton(Repository::class);
+        $this->app->scoped(Repository::class);
     }
 
     /**
@@ -46,8 +46,6 @@ class ContextServiceProvider extends ServiceProvider
         });
 
         $this->app['events']->listen(function (JobProcessing $event) {
-            $context = $this->app[Repository::class]->flush();
-
             [
                 'data' => $data,
                 'hidden' => $hidden,
@@ -56,9 +54,9 @@ class ContextServiceProvider extends ServiceProvider
                 'hidden' => [],
             ];
 
-            $context->add($data)->addHidden($hidden);
-
-            $this->app['events']->dispatch(new Hydrated($context));
+            $this->app['events']->dispatch(new Hydrated(
+                $this->app[Repository::class]->add($data)->addHidden($hidden)
+            ));
         });
     }
 }
