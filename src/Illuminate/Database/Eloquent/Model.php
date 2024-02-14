@@ -2397,4 +2397,38 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
 
         $this->initializeTraits();
     }
+
+    /**
+     * Where on fields of model and find data on the db
+     * easy to search and get all data from db
+     * $model : pass model that want to query on the db for example Product model
+     * $limit : pass number of data that you want to return
+     */
+    public function whereOnFields($model,$limit = null)
+    { 
+        $where_builder = new $model;
+
+        if($model instanceof $this)
+        {
+            foreach($model->toArray() as $key => $filds)
+            {
+     
+                if(!is_null($filds))
+                {
+                    $where_builder = $where_builder->where((string)$key , (string)$filds);
+                }
+            }
+    
+            if(!is_null($limit))
+            {
+                $where_builder = $where_builder->limit($limit);
+            }
+    
+            return $where_builder;
+        }
+     
+    }
+
+
+ 
 }
