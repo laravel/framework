@@ -21,10 +21,10 @@ class PredisConnection extends Connection implements ConnectionContract
     /**
      * Create a new Predis connection.
      *
-     * @param  \Predis\Client  $client
+     * @param \Predis\Client $client
      * @return void
      */
-    public function __construct($client)
+    public function __construct(\Predis\Client $client)
     {
         $this->client = $client;
     }
