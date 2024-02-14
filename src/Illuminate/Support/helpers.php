@@ -91,8 +91,8 @@ if (! function_exists('class_uses_recursive')) {
 
         $results = [];
 
-        foreach (array_reverse(class_parents($class) ?: []) + [$class => $class] as $class) {
-            $results += trait_uses_recursive($class);
+        foreach (array_reverse(class_parents($class) ?: []) + [$class => $class] as $_class) {
+            $results += trait_uses_recursive($_class);
         }
 
         return array_unique($results);
@@ -362,12 +362,12 @@ if (! function_exists('trait_uses_recursive')) {
     /**
      * Returns all traits used by a trait and its traits.
      *
-     * @param  object|string  $trait
+     * @param  object|string  $currentTrait
      * @return array
      */
-    function trait_uses_recursive($trait)
+    function trait_uses_recursive($currentTrait)
     {
-        $traits = class_uses($trait) ?: [];
+        $traits = class_uses($currentTrait) ?: [];
 
         foreach ($traits as $trait) {
             $traits += trait_uses_recursive($trait);
