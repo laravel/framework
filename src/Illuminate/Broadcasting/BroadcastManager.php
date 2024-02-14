@@ -279,17 +279,6 @@ class BroadcastManager implements FactoryContract
      * @param  array  $config
      * @return \Illuminate\Contracts\Broadcasting\Broadcaster
      */
-    protected function createReverbDriver(array $config)
-    {
-        return new PusherBroadcaster($this->pusher($config));
-    }
-
-    /**
-     * Create an instance of the driver.
-     *
-     * @param  array  $config
-     * @return \Illuminate\Contracts\Broadcasting\Broadcaster
-     */
     protected function createPusherDriver(array $config)
     {
         return new PusherBroadcaster($this->pusher($config));
