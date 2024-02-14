@@ -13,7 +13,6 @@ use PHPUnit\Framework\TestCase;
 
 class SupportMagicalEnumTest extends TestCase
 {
-
     public function testIsEnum(): void
     {
         $this->assertTrue(IntBackedMagicalEnum::isEnum());
@@ -21,7 +20,8 @@ class SupportMagicalEnumTest extends TestCase
 
     public function testIsEnumWhenTraitAddToClass(): void
     {
-        $instance = new class {
+        $instance = new class
+        {
             use MagicalEnum;
         };
 
@@ -34,7 +34,8 @@ class SupportMagicalEnumTest extends TestCase
         $this->assertFalse(MagicalUnitEnum::isBackedEnum());
 
         $this->expectException(BadMethodCallException::class);
-        $instance = new class {
+        $instance = new class
+        {
             use MagicalEnum;
         };
 
@@ -54,7 +55,8 @@ class SupportMagicalEnumTest extends TestCase
         $this->assertNull(MagicalUnitEnum::getBackingType());
 
         $this->expectException(BadMethodCallException::class);
-        $instance = new class {
+        $instance = new class
+        {
             use MagicalEnum;
         };
 
@@ -72,7 +74,8 @@ class SupportMagicalEnumTest extends TestCase
         $this->assertTrue(IntBackedMagicalEnum::isTraitUsed(ExampleTrait::class));
         $this->assertFalse(StringBackedMagicalEnum::isTraitUsed(ExampleTrait::class));
 
-        $instance = new class {
+        $instance = new class
+        {
             use MagicalEnum, ExampleTrait;
         };
 
@@ -86,7 +89,8 @@ class SupportMagicalEnumTest extends TestCase
         $this->assertEquals(['A', 'B', 'C', 'D'], MagicalUnitEnum::names());
 
         $this->expectException(BadMethodCallException::class);
-        $instance = new class {
+        $instance = new class
+        {
             use MagicalEnum;
         };
 
@@ -101,7 +105,8 @@ class SupportMagicalEnumTest extends TestCase
         $this->assertEquals([], MagicalUnitEnum::values());
 
         $this->expectException(BadMethodCallException::class);
-        $instance = new class {
+        $instance = new class
+        {
             use MagicalEnum;
         };
         $this->assertNotEquals(['A', 'B', 'C', 'D'], $instance::names());
@@ -114,7 +119,8 @@ class SupportMagicalEnumTest extends TestCase
         $this->assertEquals(['A', 'B', 'C', 'D'], MagicalUnitEnum::toArray());
 
         $this->expectException(BadMethodCallException::class);
-        $instance = new class {
+        $instance = new class
+        {
             use MagicalEnum;
         };
 
@@ -128,7 +134,8 @@ class SupportMagicalEnumTest extends TestCase
         $this->assertEquals(['A', 'B', 'C', 'D'], MagicalUnitEnum::toReverseArray());
 
         $this->expectException(BadMethodCallException::class);
-        $instance = new class {
+        $instance = new class
+        {
             use MagicalEnum;
         };
 
@@ -147,7 +154,6 @@ class SupportMagicalEnumTest extends TestCase
         $this->assertFalse(MagicalUnitEnum::hasCase('Z'));
     }
 
-
     public function testIsValidEnumValue(): void
     {
         $this->assertTrue(IntBackedMagicalEnum::isValidEnumValue(2));
@@ -159,7 +165,8 @@ class SupportMagicalEnumTest extends TestCase
         $this->assertFalse(MagicalUnitEnum::isValidEnumValue('A'));
 
         $this->expectException(BadMethodCallException::class);
-        $instance = new class {
+        $instance = new class
+        {
             use MagicalEnum;
         };
 

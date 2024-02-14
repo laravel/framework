@@ -40,7 +40,6 @@ trait MagicalEnum
         return (new \ReflectionEnum(self::class))->isBacked();
     }
 
-
     /**
      *  Retrieves the enumeration type (int,string).
      *
@@ -54,9 +53,9 @@ trait MagicalEnum
     }
 
     /**
-     * Checks if the enumeration type implements a specified interface
+     * Checks if the enumeration type implements a specified interface.
      *
-     * @param string $interfaceName
+     * @param  string  $interfaceName
      * @return bool
      */
     public static function isImplementsInterface(string $interfaceName): bool
@@ -67,9 +66,9 @@ trait MagicalEnum
     }
 
     /**
-     * Checks if a specified trait is used in the current enum
+     * Checks if a specified trait is used in the current enum.
      *
-     * @param string $traitName
+     * @param  string  $traitName
      * @return bool
      */
     public static function isTraitUsed(string $traitName): bool
@@ -103,11 +102,10 @@ trait MagicalEnum
             : [];
     }
 
-
     /**
      * Checks if the enumeration type has a specific case by name.
      *
-     * @param string $name
+     * @param  string  $name
      * @return bool
      */
     public static function hasCase(string $name): bool
@@ -120,7 +118,7 @@ trait MagicalEnum
     /**
      * Validates a value for an enumeration type.
      *
-     * @param string|int $value
+     * @param  string|int  $value
      * @return bool
      */
     public static function isValidEnumValue(string|int $value): bool
