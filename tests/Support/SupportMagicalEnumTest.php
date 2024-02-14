@@ -156,6 +156,8 @@ class SupportMagicalEnumTest extends TestCase
         $this->assertTrue(StringBackedMagicalEnum::isValidEnumValue('Framework'));
         $this->assertFalse(StringBackedMagicalEnum::isValidEnumValue('Forge'));
 
+        $this->assertFalse(MagicalUnitEnum::isValidEnumValue('A'));
+
         $this->expectException(BadMethodCallException::class);
         $instance = new class {
             use MagicalEnum;
