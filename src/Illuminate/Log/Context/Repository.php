@@ -3,7 +3,7 @@
 namespace Illuminate\Log\Context;
 
 use Illuminate\Contracts\Container\Container;
-use Illuminate\Foundation\Application;
+use Illuminate\Events\Dispatcher;
 use Illuminate\Log\Context\Events\Dehydrating;
 use Illuminate\Log\Context\Events\Hydrated;
 use Illuminate\Support\Traits\Macroable;
@@ -14,11 +14,11 @@ class Repository
     use Macroable;
 
     /**
-     * The container instance.
+     * The event dispatcher.
      *
-     * @var \Illuminate\Foundation\Application
+     * @var \Illuminate\Events\Dispatcher
      */
-    protected $app;
+    protected $events;
 
     /**
      * The contextual data.
@@ -37,9 +37,9 @@ class Repository
     /**
      * Create a new Context instance.
      */
-    public function __construct(Application $app)
+    public function __construct(Dispatcher $events)
     {
-        $this->app = $app;
+        $this->events = $events;
     }
 
     /**
@@ -274,7 +274,7 @@ class Repository
      */
     public function dehydrating($callback)
     {
-        $this->app['events']->listen(fn (Dehydrating $event) => $callback($this));
+        $this->events->listen(fn (Dehydrating $event) => $callback($this));
 
         return $this;
     }
@@ -287,7 +287,7 @@ class Repository
      */
     public function hydrated($callback)
     {
-        $this->app['events']->listen(fn (Hydrated $event) => $callback($this));
+        $this->events->listen(fn (Hydrated $event) => $callback($this));
 
         return $this;
     }
@@ -354,19 +354,6 @@ class Repository
         $this->data = [];
 
         $this->hidden = [];
-
-        return $this;
-    }
-
-    /**
-     * Set the application instance.
-     *
-     * @param  \Illuminate\Foundation\Application  $app
-     * @return $this
-     */
-    public function setApplication($app)
-    {
-        $this->app = $app;
 
         return $this;
     }
