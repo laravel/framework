@@ -1114,6 +1114,54 @@ class SupportStrTest extends TestCase
         $this->assertSame("<a href=\"https://laravel.com\"><strong>Laravel</strong></a>\n", Str::inlineMarkdown('[**Laravel**](https://laravel.com)'));
     }
 
+    public function testRawHTMLEscapedInMarkdownByDefault()
+    {
+        $this->assertSame(
+            "&lt;script&gt;alert('Hello World!');&lt;/script&gt;\n",
+            Str::markdown("<script>alert('Hello World!');</script>")
+        );
+
+        $this->assertSame(
+            "&lt;img src=x onerror='alert(\"Hello World!\")'&gt;\n",
+            Str::markdown("<img src=x onerror='alert(\"Hello World!\")'>")
+        );
+
+        $this->assertSame(
+            "&lt;script&gt;alert('Hello World!');&lt;/script&gt;\n",
+            Str::inlineMarkdown("<script>alert('Hello World!');</script>")
+        );
+
+        $this->assertSame(
+            "&lt;img src=x onerror='alert(\"Hello World!\")'&gt;\n",
+            Str::inlineMarkdown("<img src=x onerror='alert(\"Hello World!\")'>")
+        );
+    }
+
+    public function testOverrideMarkdownOptions()
+    {
+        // <script> tags are always blocked with the GithubFlavoredMarkdownConverter
+        $this->assertSame(
+            "&lt;script>alert('Hello World!');&lt;/script>\n",
+            Str::markdown("<script>alert('Hello World!');</script>", ['html_input' => 'allow'])
+        );
+
+        $this->assertSame(
+            "<img src=x onerror='alert(\"Hello World!\")'>\n",
+            Str::markdown("<img src=x onerror='alert(\"Hello World!\")'>", ['html_input' => 'allow'])
+        );
+
+        // <script> tags are always blocked with the GithubFlavoredMarkdownConverter
+        $this->assertSame(
+            "&lt;script>alert('Hello World!');&lt;/script>\n",
+            Str::inlineMarkdown("<script>alert('Hello World!');</script>", ['html_input' => 'allow'])
+        );
+
+        $this->assertSame(
+            "<img src=x onerror='alert(\"Hello World!\")'>\n",
+            Str::inlineMarkdown("<img src=x onerror='alert(\"Hello World!\")'>", ['html_input' => 'allow'])
+        );
+    }
+
     public function testRepeat()
     {
         $this->assertSame('aaaaa', Str::repeat('a', 5));

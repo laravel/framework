@@ -639,6 +639,12 @@ class Str
      */
     public static function markdown($string, array $options = [])
     {
+        $options = array_merge([
+            'html_input' => 'escape',
+            'allow_unsafe_links' => false,
+            'max_nesting_level' => 50,
+        ], $options);
+
         $converter = new GithubFlavoredMarkdownConverter($options);
 
         return (string) $converter->convert($string);
@@ -653,6 +659,12 @@ class Str
      */
     public static function inlineMarkdown($string, array $options = [])
     {
+        $options = array_merge([
+            'html_input' => 'escape',
+            'allow_unsafe_links' => false,
+            'max_nesting_level' => 50,
+        ], $options);
+
         $environment = new Environment($options);
 
         $environment->addExtension(new GithubFlavoredMarkdownExtension());
