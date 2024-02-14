@@ -120,10 +120,10 @@ trait MagicalEnum
     /**
      * Validates a value for an enumeration type.
      *
-     * @param string $value
+     * @param string|int $value
      * @return bool
      */
-    public static function isValidEnumValue(string $value): bool
+    public static function isValidEnumValue(string|int $value): bool
     {
         self::ensureEnum();
 
@@ -131,7 +131,7 @@ trait MagicalEnum
             return self::tryFrom($value) !== null;
         }
 
-        return in_array($value, self::names(), true);
+        return false;
     }
 
     /**
