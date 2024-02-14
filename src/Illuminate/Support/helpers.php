@@ -191,9 +191,13 @@ if (! function_exists('optional')) {
     {
         if (is_null($callback)) {
             return new Optional($value);
-        } elseif (! is_null($value)) {
+        }
+
+        if (! is_null($value)) {
             return $callback($value);
         }
+
+        return null;
     }
 }
 
