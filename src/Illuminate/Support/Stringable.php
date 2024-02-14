@@ -205,7 +205,7 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
      * Convert the case of a string.
      *
      * @param  int  $mode
-     * @param  string  $encoding
+     * @param  string|null  $encoding
      * @return static
      */
     public function convertCase(int $mode = MB_CASE_FOLD, ?string $encoding = 'UTF-8')
@@ -1260,7 +1260,7 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     /**
      * Convert the string to Base64 encoding.
      *
-     * @return void
+     * @return static
      */
     public function toBase64()
     {
@@ -1271,7 +1271,7 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
      * Decode the Base64 encoded string.
      *
      * @param  bool  $strict
-     * @return void
+     * @return static
      */
     public function fromBase64($strict = false)
     {
