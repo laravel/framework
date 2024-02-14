@@ -51,12 +51,6 @@ trait ManagesTransactions
                     $this->transactions,
                     max(0, $this->transactions - 1),
                 ];
-
-                $this->transactionsManager?->commit(
-                    $this->getName(),
-                    $levelBeingCommitted,
-                    $this->transactions
-                );
             } catch (Throwable $e) {
                 $this->handleCommitTransactionException(
                     $e, $currentAttempt, $attempts
@@ -64,6 +58,12 @@ trait ManagesTransactions
 
                 continue;
             }
+
+            $this->transactionsManager?->commit(
+                $this->getName(),
+                $levelBeingCommitted,
+                $this->transactions
+            );
 
             $this->fireConnectionEvent('committed');
 
