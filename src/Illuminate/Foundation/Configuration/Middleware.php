@@ -255,8 +255,8 @@ class Middleware
     public function appendToGroup(string $group, array|string $middleware)
     {
         $this->groupAppends[$group] = array_merge(
-            Arr::wrap($middleware),
-            $this->groupAppends[$group] ?? []
+            $this->groupAppends[$group] ?? [],
+            Arr::wrap($middleware)
         );
 
         return $this;
