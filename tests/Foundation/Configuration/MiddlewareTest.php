@@ -96,4 +96,43 @@ class MiddlewareTest extends TestCase
             '192.168.1.4',
         ], $method->invoke($middleware));
     }
+
+    public function testTrustHeaders()
+    {
+        $configuration = new Middleware();
+        $middleware = new TrustProxies;
+
+        $reflection = new ReflectionClass($middleware);
+        $method = $reflection->getMethod('headers');
+        $method->setAccessible(true);
+
+        $property = $reflection->getProperty('headers');
+        $property->setAccessible(true);
+
+        $this->assertEquals(Request::HEADER_X_FORWARDED_FOR |
+            Request::HEADER_X_FORWARDED_HOST |
+            Request::HEADER_X_FORWARDED_PORT |
+            Request::HEADER_X_FORWARDED_PROTO |
+            Request::HEADER_X_FORWARDED_AWS_ELB, $method->invoke($middleware));
+
+        $property->setValue($middleware, Request::HEADER_X_FORWARDED_AWS_ELB);
+
+        $this->assertEquals(Request::HEADER_X_FORWARDED_AWS_ELB, $method->invoke($middleware));
+
+        $configuration->trustProxies(withHeaders: Request::HEADER_X_FORWARDED_FOR);
+
+        $this->assertEquals(Request::HEADER_X_FORWARDED_FOR, $method->invoke($middleware));
+
+        $configuration->trustProxies([
+            '192.168.1.3',
+            '192.168.1.4',
+        ], Request::HEADER_X_FORWARDED_FOR |
+            Request::HEADER_X_FORWARDED_HOST |
+            Request::HEADER_X_FORWARDED_PORT
+        );
+
+        $this->assertEquals(Request::HEADER_X_FORWARDED_FOR |
+            Request::HEADER_X_FORWARDED_HOST |
+            Request::HEADER_X_FORWARDED_PORT, $method->invoke($middleware));
+    }
 }

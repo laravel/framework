@@ -15,14 +15,7 @@ class TrustProxies
     protected $proxies;
 
     /**
-     * The proxies that have been configured to always be trusted.
-     *
-     * @var array<int, string>|string|null
-     */
-    protected static $alwaysTrust;
-
-    /**
-     * The proxy header mappings.
+     * The trusted proxies headers for the application.
      *
      * @var int
      */
@@ -31,6 +24,20 @@ class TrustProxies
                          Request::HEADER_X_FORWARDED_PORT |
                          Request::HEADER_X_FORWARDED_PROTO |
                          Request::HEADER_X_FORWARDED_AWS_ELB;
+
+    /**
+     * The proxies that have been configured to always be trusted.
+     *
+     * @var array<int, string>|string|null
+     */
+    protected static $alwaysTrustProxies;
+
+    /**
+     * The proxies headers that have been configured to always be trusted.
+     *
+     * @var int|null
+     */
+    protected static $alwaysTrustHeaders;
 
     /**
      * Handle an incoming request.
@@ -103,11 +110,13 @@ class TrustProxies
      */
     protected function getTrustedHeaderNames()
     {
-        if (is_int($this->headers)) {
-            return $this->headers;
+        $headers = $this->headers();
+
+        if (is_int($headers)) {
+            return $headers;
         }
 
-        return match ($this->headers) {
+        return match ($headers) {
             'HEADER_X_FORWARDED_AWS_ELB' => Request::HEADER_X_FORWARDED_AWS_ELB,
             'HEADER_FORWARDED' => Request::HEADER_FORWARDED,
             'HEADER_X_FORWARDED_FOR' => Request::HEADER_X_FORWARDED_FOR,
@@ -127,7 +136,28 @@ class TrustProxies
      */
     public static function at(array|string $proxies)
     {
-        static::$alwaysTrust = $proxies;
+        static::$alwaysTrustProxies = $proxies;
+    }
+
+    /**
+     * Specify the headers that should always be trusted.
+     *
+     * @param  int  $headers
+     * @return void
+     */
+    public static function withHeaders(int $headers)
+    {
+        static::$alwaysTrustHeaders = $headers;
+    }
+
+    /**
+     * Get the trusted headers.
+     *
+     * @return int
+     */
+    protected function headers()
+    {
+        return static::$alwaysTrustHeaders ?: $this->headers;
     }
 
     /**
@@ -137,7 +167,7 @@ class TrustProxies
      */
     protected function proxies()
     {
-        return static::$alwaysTrust ?: $this->proxies;
+        return static::$alwaysTrustProxies ?: $this->proxies;
     }
 
     /**
@@ -147,6 +177,7 @@ class TrustProxies
      */
     public static function flushState()
     {
-        static::$alwaysTrust = null;
+        static::$alwaysTrustHeaders = null;
+        static::$alwaysTrustProxies = null;
     }
 }
