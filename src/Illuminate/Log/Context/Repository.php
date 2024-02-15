@@ -2,7 +2,6 @@
 
 namespace Illuminate\Log\Context;
 
-use Illuminate\Contracts\Container\Container;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Log\Context\Events\Dehydrating;
 use Illuminate\Log\Context\Events\Hydrated;
