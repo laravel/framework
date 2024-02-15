@@ -4,7 +4,6 @@ namespace Illuminate\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Illuminate\Support\Arr;
 
 class TrustProxies
 {
