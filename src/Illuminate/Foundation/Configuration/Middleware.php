@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Configuration;
 
+use Closure;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Auth\Middleware\Authenticate;
 use Illuminate\Auth\Middleware\RedirectIfAuthenticated;
@@ -548,12 +549,16 @@ class Middleware
     /**
      * Configure the string trimming middleware.
      *
-     * @param  array  $except
+     * @param  array<int, (\Closure(\Illuminate\Http\Request): bool)|string>  $except
      * @return $this
      */
     public function trimStrings(array $except = [])
     {
-        TrimStrings::except($except);
+        [$skipWhen, $except] = collect($except)->partition(fn ($value) => $value instanceof Closure);
+
+        $skipWhen->each(fn (Closure $callback) => TrimStrings::skipWhen($callback));
+
+        TrimStrings::except($except->all());
 
         return $this;
     }
