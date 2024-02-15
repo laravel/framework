@@ -548,7 +548,7 @@ class Middleware
     }
 
     /**
-     * Configure the empty string conversion to null middleware.
+     * Configure the empty string conversion middleware.
      *
      * @param  array<int, (\Closure(\Illuminate\Http\Request): bool)>  $except
      * @return $this
