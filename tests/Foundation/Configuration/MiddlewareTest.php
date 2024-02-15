@@ -17,6 +17,7 @@ class MiddlewareTest extends TestCase
     {
         parent::tearDown();
 
+        EncryptCookies::flushState();
         TrimStrings::flushState();
     }
 
