@@ -8,6 +8,7 @@ use Illuminate\Auth\Middleware\Authenticate;
 use Illuminate\Auth\Middleware\RedirectIfAuthenticated;
 use Illuminate\Foundation\Http\Middleware\TrimStrings;
 use Illuminate\Foundation\Http\Middleware\ValidateCsrfToken;
+use Illuminate\Http\Middleware\TrustProxies;
 use Illuminate\Routing\Middleware\ValidateSignature;
 use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Support\Arr;
@@ -571,6 +572,19 @@ class Middleware
     public function trustHosts()
     {
         $this->trustHosts = true;
+
+        return $this;
+    }
+
+    /**
+     * Configure the trusted proxies for the application.
+     *
+     * @param  array<int, string>|string  $at
+     * @return $this
+     */
+    public function trustProxies(array|string $at)
+    {
+        TrustProxies::at($at);
 
         return $this;
     }

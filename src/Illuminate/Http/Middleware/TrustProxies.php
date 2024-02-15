@@ -4,6 +4,7 @@ namespace Illuminate\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 
 class TrustProxies
 {
@@ -120,16 +121,6 @@ class TrustProxies
     }
 
     /**
-     * Specify that all proxies should be trusted.
-     *
-     * @return void
-     */
-    public static function all()
-    {
-        return static::at('*');
-    }
-
-    /**
      * Specify IP addresses of proxies that should always be trusted.
      *
      * @param  array|string  $proxies
@@ -148,5 +139,15 @@ class TrustProxies
     protected function proxies()
     {
         return static::$alwaysTrust ?: $this->proxies;
+    }
+
+    /**
+     * Flush the state of the middleware.
+     *
+     * @return void
+     */
+    public static function flushState()
+    {
+        static::$alwaysTrust = null;
     }
 }
