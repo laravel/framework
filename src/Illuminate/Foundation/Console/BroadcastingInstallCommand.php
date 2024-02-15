@@ -103,7 +103,7 @@ class BroadcastingInstallCommand extends Command
     }
 
     /**
-     * Install Laravel Reverb into the application.
+     * Install Laravel Reverb into the application if desired.
      *
      * @return void
      */
