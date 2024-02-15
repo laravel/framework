@@ -549,7 +549,7 @@ class Middleware
     /**
      * Configure the string trimming middleware.
      *
-     * @param  array  $except
+     * @param  array<int, (\Closure(\Illuminate\Http\Request): bool)|string>  $except
      * @return $this
      */
     public function trimStrings(array $except = [])
