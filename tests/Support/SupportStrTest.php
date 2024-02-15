@@ -1027,6 +1027,85 @@ class SupportStrTest extends TestCase
         $this->assertEquals(3, Str::wordCount('МАМА МЫЛА РАМУ', 'абвгдеёжзийклмнопрстуфхцчшщъыьэюяАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ'));
     }
 
+    public function testRichWordCountWithHtmlContentAndUrls()
+    {
+        $content = "Hello, world! This is a <b>bold</b> statement with an &amp; entity, plus a link to <a href='https://example.com'>example.com</a> and another link to www.example.org. Here's a number: 12345.";
+
+        $expectedWords = [
+            'Hello',
+            'world',
+            'This',
+            'is',
+            'a',
+            'bold',
+            'statement',
+            'with',
+            'an',
+            'entity',
+            'plus',
+            'a',
+            'link',
+            'to',
+            'examplecom',
+            'and',
+            'another',
+            'link',
+            'to',
+            'Heres',
+            'a',
+            'number',
+            '12345',
+            'www.example.org',
+        ];
+
+        $this->assertEquals($expectedWords, Str::richWords($content));
+
+        $this->assertEquals(24, Str::richWordCount($content), 'The word count did not match the expected value.');
+
+    }
+
+    public function testRichWordCountWithComplexHtmlContent()
+    {
+        $content = "Check this out: <div>This <i>content</i> has <sup>HTML</sup> tags, including <a href='http://example.com'>links</a> and <span>&#169; symbols</span>.</div> Final count should include numbers like 2024.";
+
+        $expectedCount = 19;
+        $actualCount = Str::richWordCount($content);
+
+        $this->assertEquals($expectedCount, $actualCount, 'The word count did not match the expected value.');
+    }
+
+    public function testRichWordCountWithInternationalCharacters()
+    {
+        $content = 'Привет мир! This is a test with international characters: café, naïve, résumé, and a Chinese phrase 中文短语.';
+
+        $expectedCount = 17;
+        $actualCount = Str::richWordCount($content);
+
+        $this->assertEquals($expectedCount, $actualCount, 'The word count did not match the expected value.');
+    }
+
+    public function testRichWordCountWithHtmlTables()
+    {
+        $content = "<table>
+                    <tr>
+                        <th>Header 1</th>
+                        <th>Header 2</th>
+                    </tr>
+                    <tr>
+                        <td>Data &amp; more data</td>
+                        <td>Visit <a href='https://example.com'>Example</a></td>
+                    </tr>
+                    <tr>
+                        <td colspan='2'>A combined cell with numbers 123 and symbols &copy;</td>
+                    </tr>
+                </table>";
+
+        $expectedCount = 17;
+        $actualCount = Str::richWordCount($content);
+
+        $this->assertEquals($expectedCount, $actualCount, 'The word count did not match the expected value.');
+    }
+
     public function testWordWrap()
     {
         $this->assertEquals('Hello<br />World', Str::wordWrap('Hello World', 3, '<br />'));

@@ -1604,6 +1604,51 @@ class Str
     }
 
     /**
+     * Extract the words from a string that contains rich content.
+     *
+     * @param  string  $string
+     * @return array
+     */
+    public static function richWords (string $string) {
+        // Initial cleanup and HTML entity replacement
+        $withoutHtmlEntities = preg_replace('/&([a-z0-9]+|#[0-9]{1,6}|#x[0-9a-f]{1,6});/i', ' ', $string);
+        $replacements = ['<sup>', '</sup>', '<sub>', '</sub>'];
+        $withoutHtmlEntities = str_replace($replacements, '', $withoutHtmlEntities);
+
+        // Replace all HTML tags
+        $withoutHtmlEntities = preg_replace('/<\/?\w+>/', ' rich-editor-tag ', $withoutHtmlEntities);
+
+        // Remove unwanted characters except spaces, preserving international characters and numbers
+        $withoutHtmlEntities = strip_tags($withoutHtmlEntities);
+        $withoutHtmlEntities = str_replace('rich-editor-tag', ' ', $withoutHtmlEntities);
+
+        // Remove URLs, but keep them as 'words' for the count
+        preg_match_all('/\b(?:https?:\/\/|www)\S+\b/', $withoutHtmlEntities, $urlMatches);
+        $withoutHtmlEntities = preg_replace('/\b(?:https?:\/\/|www)\S+\b/', ' ', $withoutHtmlEntities);
+
+        // Remove punctuation and other non-word characters, but keep spaces, numbers, and international characters
+        $withoutHtmlEntities = preg_replace('/[^a-zA-Z0-9\s\p{L}]+/u', '', $withoutHtmlEntities);
+
+        // Extract words, numbers, and international characters as separate 'words'
+        $words = preg_split('/\s+/', trim($withoutHtmlEntities));
+
+        // Combine words with URLs found
+        $words = array_merge($words, $urlMatches[0]);
+
+        return array_filter($words, fn ($word) => $word !== '');
+    }
+
+    /**
+     * Get the number of words from a string that contains rich content.
+     *
+     * @param  string  $string
+     * @return int
+     */
+    public static function richWordCount(string $string) {
+        return count(self::richWords($string));
+    }
+
+    /**
      * Wrap a string to a given number of characters.
      *
      * @param  string  $string

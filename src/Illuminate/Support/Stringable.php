@@ -1200,6 +1200,26 @@ class Stringable implements JsonSerializable, ArrayAccess
     }
 
     /**
+     * Extract the words from a string that contains rich content.
+     *
+     * @return array
+     */
+    public function richWords()
+    {
+        return Str::richWords($this->value);
+    }
+
+    /**
+     * Get the number of words from a string that contains rich content.
+     *
+     * @return int
+     */
+    public function richWordCount()
+    {
+        return Str::richWordCount($this->value);
+    }
+
+    /**
      * Wrap a string to a given number of characters.
      *
      * @param  int  $characters
