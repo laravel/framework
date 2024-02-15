@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Foundation\Configuration;
 
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Foundation\Http\Middleware\TrimStrings;
+use Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull;
 use Illuminate\Http\Request;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
@@ -14,7 +15,58 @@ class MiddlewareTest extends TestCase
     {
         parent::tearDown();
 
+        ConvertEmptyStringsToNull::flushState();
         TrimStrings::flushState();
+    }
+
+    public function testConvertEmptyStringsToNull()
+    {
+        $configuration = new Middleware();
+        $middleware = new ConvertEmptyStringsToNull();
+
+        $configuration->convertEmptyStringsToNull(except: [
+            fn (Request $request) => $request->has('skip-all-1'),
+            fn (Request $request) => $request->has('skip-all-2'),
+        ]);
+
+        $symfonyRequest = new SymfonyRequest([
+            'aaa' => '  123  ',
+            'bbb' => '',
+        ]);
+
+        $symfonyRequest->server->set('REQUEST_METHOD', 'GET');
+        $request = Request::createFromBase($symfonyRequest);
+
+        $request = $middleware->handle($request, fn (Request $request) => $request);
+
+        $this->assertSame('  123  ', $request->get('aaa'));
+        $this->assertNull($request->get('bbb'));
+
+        $symfonyRequest = new SymfonyRequest([
+            'aaa' => '  123  ',
+            'bbb' => '',
+            'skip-all-1' => 'true',
+        ]);
+        $symfonyRequest->server->set('REQUEST_METHOD', 'GET');
+        $request = Request::createFromBase($symfonyRequest);
+
+        $request = $middleware->handle($request, fn (Request $request) => $request);
+
+        $this->assertSame('  123  ', $request->get('aaa'));
+        $this->assertSame('', $request->get('bbb'));
+
+        $symfonyRequest = new SymfonyRequest([
+            'aaa' => '  123  ',
+            'bbb' => '',
+            'skip-all-2' => 'true',
+        ]);
+        $symfonyRequest->server->set('REQUEST_METHOD', 'GET');
+        $request = Request::createFromBase($symfonyRequest);
+
+        $request = $middleware->handle($request, fn (Request $request) => $request);
+
+        $this->assertSame('  123  ', $request->get('aaa'));
+        $this->assertSame('', $request->get('bbb'));
     }
 
     public function testTrimStrings()
