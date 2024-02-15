@@ -183,13 +183,10 @@ class Repository implements ArrayAccess, ConfigContract
 
     /**
      * Get the specified configuration value as a Collection.
-     * 
-     * @template TKey of array-key
-     * @template TValue
      *
      * @param  array|string  $key
      * @param  mixed  $default
-     * @return \Illuminate\Support\Collection<TKey, TValue>
+     * @return \Illuminate\Support\Collection
      */
     public function collect($key, $default = null): Collection
     {

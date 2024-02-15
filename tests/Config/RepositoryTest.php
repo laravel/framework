@@ -269,7 +269,7 @@ class RepositoryTest extends TestCase
             collect($this->repository->collect('this-key-does-not-exist', 'default')),
             $this->repository->collect('this-key-does-not-exist', 'default')
         );
-        
+
         $this->assertTrue($this->repository->collect('this-key-does-not-exist')->isEmpty());
 
         $this->assertEquals(
