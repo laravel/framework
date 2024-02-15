@@ -252,4 +252,29 @@ class RepositoryTest extends TestCase
 
         $this->assertSame('macroable', $this->repository->foo());
     }
+
+    public function testCollect()
+    {
+        $this->assertEquals(
+            collect($this->repository->get('foo')),
+            $this->repository->collect('foo')
+        );
+
+        $this->assertEquals(
+            collect($this->repository->get('associate')),
+            $this->repository->collect('associate')
+        );
+
+        $this->assertEquals(
+            collect($this->repository->collect('this-key-does-not-exist', 'default')),
+            $this->repository->collect('this-key-does-not-exist', 'default')
+        );
+        
+        $this->assertTrue($this->repository->collect('this-key-does-not-exist')->isEmpty());
+
+        $this->assertEquals(
+            collect($this->repository->get(['foo', 'bar'])),
+            $this->repository->collect(['foo', 'bar'])
+        );
+    }
 }

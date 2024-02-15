@@ -5,6 +5,7 @@ namespace Illuminate\Config;
 use ArrayAccess;
 use Illuminate\Contracts\Config\Repository as ConfigContract;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Traits\Macroable;
 
 class Repository implements ArrayAccess, ConfigContract
@@ -178,5 +179,20 @@ class Repository implements ArrayAccess, ConfigContract
     public function offsetUnset($key): void
     {
         $this->set($key, null);
+    }
+
+    /**
+     * Get the specified configuration value as a Collection.
+     * 
+     * @template TKey of array-key
+     * @template TValue
+     *
+     * @param  array|string  $key
+     * @param  mixed  $default
+     * @return \Illuminate\Support\Collection<TKey, TValue>
+     */
+    public function collect($key, $default = null): Collection
+    {
+        return collect($this->get($key, $default));
     }
 }
