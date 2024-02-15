@@ -28,7 +28,7 @@ class ContextServiceProvider extends ServiceProvider
     public function boot()
     {
         Queue::createPayloadUsing(function ($connection, $queue, $payload) {
-            $context = $this->app[Repository::class];
+            $context = app(Repository::class);
 
             $this->app['events']->dispatch(new Dehydrating($context));
 
@@ -55,7 +55,7 @@ class ContextServiceProvider extends ServiceProvider
             ];
 
             $this->app['events']->dispatch(new Hydrated(
-                $this->app[Repository::class]->add($data)->addHidden($hidden)
+                app(Repository::class)->add($data)->addHidden($hidden)
             ));
         });
     }
