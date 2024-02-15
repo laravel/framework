@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Console;
 
+use Composer\InstalledVersions;
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Process;
@@ -108,14 +109,18 @@ class BroadcastingInstallCommand extends Command
      */
     protected function installReverb()
     {
+        if (InstalledVersions::isInstalled('laravel/reverb')) {
+            return;
+        }
+
         $install = confirm('Would you like to install Laravel Reverb?', default: true);
 
-        if(! $install) {
+        if (! $install) {
             return;
         }
 
         $this->requireComposerPackages($this->option('composer'), [
-            'laravel/reverb:@dev',
+            'laravel/reverb:@beta',
         ]);
 
         $php = (new PhpExecutableFinder())->find(false) ?: 'php';
