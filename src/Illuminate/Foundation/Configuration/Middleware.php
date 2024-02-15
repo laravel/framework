@@ -8,6 +8,7 @@ use Illuminate\Auth\Middleware\Authenticate;
 use Illuminate\Auth\Middleware\RedirectIfAuthenticated;
 use Illuminate\Foundation\Http\Middleware\TrimStrings;
 use Illuminate\Foundation\Http\Middleware\ValidateCsrfToken;
+use Illuminate\Http\Middleware\TrustHosts;
 use Illuminate\Routing\Middleware\ValidateSignature;
 use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Support\Arr;
@@ -566,11 +567,17 @@ class Middleware
     /**
      * Indicate that the trusted host middleware should be enabled.
      *
+     * @param  array<int, string>|null  $at
+     * @param  bool  $subdomains
      * @return $this
      */
-    public function trustHosts()
+    public function trustHosts(array $at = null, bool $subdomains = true)
     {
         $this->trustHosts = true;
+
+        if (is_array($at)) {
+            TrustHosts::at($at, $subdomains);
+        }
 
         return $this;
     }
