@@ -19,3 +19,10 @@ $middleware->trustProxies(at: [
 $middleware->trustProxies(at: '*', withHeaders: Request::HEADER_X_FORWARDED_AWS_ELB);
 
 $middleware->trustProxies(withHeaders: Request::HEADER_X_FORWARDED_AWS_ELB);
+
+$middleware->encryptCookies();
+$middleware->encryptCookies([
+    'cookie1',
+    'cookie2',
+]);
+

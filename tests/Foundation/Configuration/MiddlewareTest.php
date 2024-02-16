@@ -2,10 +2,13 @@
 
 namespace Illuminate\Tests\Foundation\Configuration;
 
+use Illuminate\Contracts\Encryption\Encrypter;
+use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Foundation\Http\Middleware\TrimStrings;
 use Illuminate\Http\Middleware\TrustProxies;
 use Illuminate\Http\Request;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
@@ -17,6 +20,7 @@ class MiddlewareTest extends TestCase
         parent::tearDown();
 
         TrustProxies::flushState();
+        EncryptCookies::flushState();
         TrimStrings::flushState();
     }
 
@@ -134,5 +138,23 @@ class MiddlewareTest extends TestCase
         $this->assertEquals(Request::HEADER_X_FORWARDED_FOR |
             Request::HEADER_X_FORWARDED_HOST |
             Request::HEADER_X_FORWARDED_PORT, $method->invoke($middleware));
+    }
+
+    public function testEncryptCookies()
+    {
+        $configuration = new Middleware();
+        $encrypter = Mockery::mock(Encrypter::class);
+        $middleware = new EncryptCookies($encrypter);
+
+        $this->assertFalse($middleware->isDisabled('aaa'));
+        $this->assertFalse($middleware->isDisabled('bbb'));
+
+        $configuration->encryptCookies(except: [
+            'aaa',
+            'bbb',
+        ]);
+
+        $this->assertTrue($middleware->isDisabled('aaa'));
+        $this->assertTrue($middleware->isDisabled('bbb'));
     }
 }
