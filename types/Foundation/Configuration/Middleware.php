@@ -25,4 +25,3 @@ $middleware->encryptCookies([
     'cookie1',
     'cookie2',
 ]);
-
