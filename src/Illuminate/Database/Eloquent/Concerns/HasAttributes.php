@@ -72,6 +72,13 @@ trait HasAttributes
     protected $casts = [];
 
     /**
+     * The attributes that are generated.
+     *
+     * @var array
+     */
+    protected $generated = [];
+
+    /**
      * The attributes that have been cast using custom classes.
      *
      * @var array
