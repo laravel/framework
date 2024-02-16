@@ -240,4 +240,16 @@ class EncryptCookies
     {
         return static::$serialize;
     }
+
+    /**
+     * Flush the middleware's global state.
+     *
+     * @return void
+     */
+    public static function flushState()
+    {
+        static::$neverEncrypt = [];
+
+        static::$serialize = false;
+    }
 }
