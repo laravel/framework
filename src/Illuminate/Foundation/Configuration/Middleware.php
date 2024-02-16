@@ -7,6 +7,7 @@ use Illuminate\Auth\AuthenticationException;
 use Illuminate\Auth\Middleware\Authenticate;
 use Illuminate\Auth\Middleware\RedirectIfAuthenticated;
 use Illuminate\Cookie\Middleware\EncryptCookies;
+use Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull;
 use Illuminate\Foundation\Http\Middleware\TrimStrings;
 use Illuminate\Foundation\Http\Middleware\ValidateCsrfToken;
 use Illuminate\Routing\Middleware\ValidateSignature;
@@ -556,6 +557,19 @@ class Middleware
     public function validateSignatures(array $except = [])
     {
         ValidateSignature::except($except);
+
+        return $this;
+    }
+
+    /**
+     * Configure the empty string conversion middleware.
+     *
+     * @param  array<int, (\Closure(\Illuminate\Http\Request): bool)>  $except
+     * @return $this
+     */
+    public function convertEmptyStringsToNull(array $except = [])
+    {
+        collect($except)->each(fn (Closure $callback) => ConvertEmptyStringsToNull::skipWhen($callback));
 
         return $this;
     }
