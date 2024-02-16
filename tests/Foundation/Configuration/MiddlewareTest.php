@@ -24,6 +24,8 @@ class MiddlewareTest extends TestCase
     {
         parent::tearDown();
 
+        Mockery::close();
+
         Container::setInstance(null);
         ConvertEmptyStringsToNull::flushState();
         EncryptCookies::flushState();
@@ -215,7 +217,7 @@ class MiddlewareTest extends TestCase
         $this->assertEquals(['^(.+\.)?laravel\.test$'], $middleware->hosts());
 
         app()['config'] = Mockery::mock(Repository::class);
-        app()['config']->shouldReceive('get')->with('app.url', null)->once()->andReturn('http://laravel.test');
+        app()['config']->shouldReceive('get')->with('app.url', null)->times(3)->andReturn('http://laravel.test');
 
         $configuration->trustHosts(at: ['my.test']);
         $this->assertEquals(['my.test', '^(.+\.)?laravel\.test$'], $middleware->hosts());
