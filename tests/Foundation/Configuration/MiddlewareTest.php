@@ -182,7 +182,7 @@ class MiddlewareTest extends TestCase
 
         $this->assertEquals(Request::HEADER_X_FORWARDED_AWS_ELB, $method->invoke($middleware));
 
-        $configuration->trustProxies(withHeaders: Request::HEADER_X_FORWARDED_FOR);
+        $configuration->trustProxies(headers: Request::HEADER_X_FORWARDED_FOR);
 
         $this->assertEquals(Request::HEADER_X_FORWARDED_FOR, $method->invoke($middleware));
 

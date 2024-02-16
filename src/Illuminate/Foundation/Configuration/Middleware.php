@@ -615,17 +615,17 @@ class Middleware
      * Configure the trusted proxies for the application.
      *
      * @param  array<int, string>|string|null  $at
-     * @param  int|null  $withHeaders
+     * @param  int|null  $headers
      * @return $this
      */
-    public function trustProxies(array|string $at = null, int $withHeaders = null)
+    public function trustProxies(array|string $at = null, int $headers = null)
     {
         if (! is_null($at)) {
             TrustProxies::at($at);
         }
 
-        if (! is_null($withHeaders)) {
-            TrustProxies::withHeaders($withHeaders);
+        if (! is_null($headers)) {
+            TrustProxies::withHeaders($headers);
         }
 
         return $this;

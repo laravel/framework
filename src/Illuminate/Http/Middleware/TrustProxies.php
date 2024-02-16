@@ -129,28 +129,6 @@ class TrustProxies
     }
 
     /**
-     * Specify IP addresses of proxies that should always be trusted.
-     *
-     * @param  array|string  $proxies
-     * @return void
-     */
-    public static function at(array|string $proxies)
-    {
-        static::$alwaysTrustProxies = $proxies;
-    }
-
-    /**
-     * Specify the headers that should always be trusted.
-     *
-     * @param  int  $headers
-     * @return void
-     */
-    public static function withHeaders(int $headers)
-    {
-        static::$alwaysTrustHeaders = $headers;
-    }
-
-    /**
      * Get the trusted headers.
      *
      * @return int
@@ -168,6 +146,28 @@ class TrustProxies
     protected function proxies()
     {
         return static::$alwaysTrustProxies ?: $this->proxies;
+    }
+
+    /**
+     * Specify the IP addresses of proxies that should always be trusted.
+     *
+     * @param  array|string  $proxies
+     * @return void
+     */
+    public static function at(array|string $proxies)
+    {
+        static::$alwaysTrustProxies = $proxies;
+    }
+
+    /**
+     * Specify the proxy headers that should always be trusted.
+     *
+     * @param  int  $headers
+     * @return void
+     */
+    public static function withHeaders(int $headers)
+    {
+        static::$alwaysTrustHeaders = $headers;
     }
 
     /**
