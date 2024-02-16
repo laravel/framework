@@ -26,6 +26,7 @@ use Illuminate\Support\Str;
 use Illuminate\View\Component;
 use Mockery;
 use Mockery\Exception\InvalidCountException;
+use PHPUnit\Metadata\Annotation\Parser\Registry as PHPUnitRegistry;
 use Throwable;
 
 trait InteractsWithTestCaseLifecycle
@@ -229,7 +230,6 @@ trait InteractsWithTestCaseLifecycle
     public static function tearDownAfterClassUsingTestCase()
     {
         foreach ([
-            \PHPUnit\Util\Annotation\Registry::class,
             \PHPUnit\Metadata\Annotation\Parser\Registry::class,
         ] as $class) {
             if (class_exists($class)) {
