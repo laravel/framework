@@ -4,8 +4,8 @@ namespace Illuminate\Tests\Foundation\Configuration;
 
 use Illuminate\Config\Repository;
 use Illuminate\Container\Container;
-use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Encryption\Encrypter;
+use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Foundation\Http\Middleware\TrimStrings;
