@@ -40,9 +40,8 @@ class LoadEnvironmentVariables
      */
     protected function checkForSpecificEnvironmentFile($app)
     {
-        if ($app->runningInConsole() &&
-            ($input = new ArgvInput)->hasParameterOption('--env') &&
-            $this->setEnvironmentFilePath($app, $app->environmentFile().'.'.$input->getParameterOption('--env'))) {
+        if ($app->runningInConsole() && ($envOption = $this->getEnvironmentOptionFromConsole())) {
+            $this->setEnvironmentFilePath($app, $app->environmentFile() . '.' . $envOption);
             return;
         }
 
@@ -55,6 +54,22 @@ class LoadEnvironmentVariables
         $this->setEnvironmentFilePath(
             $app, $app->environmentFile().'.'.$environment
         );
+    }
+
+    /**
+    * Get the environment option from console input, if provided.
+    *
+    * @return string|null The environment option value if provided, null otherwise.
+    */
+    protected function getEnvironmentOptionsFromConsole()
+    {
+        $input = new ArgvInput;
+
+        if($input->hasParameterOption('--env')) {
+            return $input->getParameterOption('--env');
+        }
+
+        return null;
     }
 
     /**
