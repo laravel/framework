@@ -41,9 +41,7 @@ class TrustHosts
     {
         return is_array(static::$alwaysTrust)
             ? static::$alwaysTrust
-            : [
-                $this->allSubdomainsOfApplicationUrl(),
-            ];
+            : [$this->allSubdomainsOfApplicationUrl()];
     }
 
     /**
@@ -63,7 +61,7 @@ class TrustHosts
     }
 
     /**
-     * Specify the hosts that should be always trusted.
+     * Specify the hosts that should always be trusted.
      *
      * @param  array<int, string>  $hosts
      * @param  bool  $subdomains
