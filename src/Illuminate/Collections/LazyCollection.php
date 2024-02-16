@@ -522,7 +522,7 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     public function get($key, $default = null)
     {
         if (is_null($key)) {
-            return;
+            return value($default);
         }
 
         foreach ($this as $outerKey => $outerValue) {

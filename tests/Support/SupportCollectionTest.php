@@ -5524,6 +5524,7 @@ class SupportCollectionTest extends TestCase
     public function testGetWithDefaultValue($collection)
     {
         $data = new $collection(['name' => 'taylor', 'framework' => 'laravel']);
+        $this->assertEquals('34', $data->get(null, 34));
         $this->assertEquals('34', $data->get('age', 34));
     }
 
@@ -5533,10 +5534,8 @@ class SupportCollectionTest extends TestCase
     public function testGetWithCallbackAsDefaultValue($collection)
     {
         $data = new $collection(['name' => 'taylor', 'framework' => 'laravel']);
-        $result = $data->get('email', function () {
-            return 'taylor@example.com';
-        });
-        $this->assertEquals('taylor@example.com', $result);
+        $this->assertSame('taylor@example.com', $data->get(null, fn () => 'taylor@example.com'));
+        $this->assertSame('taylor@example.com', $data->get('email', fn () => 'taylor@example.com'));
     }
 
     /**
