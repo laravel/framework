@@ -480,6 +480,60 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     }
 
     /**
+     * Get the item before the specified key in the collection.
+     *
+     * @template TBeforeDefault
+     *
+     * @param  TKey|null  $key
+     * @param  TBeforeDefault|(\Closure(): TBeforeDefault)  $default
+     * @return TValue|TBeforeDefault
+     */
+    public function before($key, $default = null)
+    {
+        if (array_key_first($this->items) === $key) {
+            return value($default);
+        }
+
+        $prevItem = null;
+
+        foreach ($this->items as $k => $item) {
+            if ($k === $key) {
+                return $prevItem;
+            }
+
+            $prevItem = $item;
+        }
+
+        return value($default);
+    }
+
+    /**
+     * Get the item after the specified key in the collection.
+     *
+     * @template TAfterDefault
+     *
+     * @param  TKey|null  $key
+     * @param  TAfterDefault|(\Closure(): TAfterDefault)  $default
+     * @return TValue|TAfterDefault
+     */
+    public function after($key, $default = null)
+    {
+        $found = false;
+
+        foreach ($this->items as $k => $item) {
+            if ($found) {
+                return $item;
+            }
+
+            if ($k === $key) {
+                $found = true;
+            }
+        }
+
+        return value($default);
+    }
+
+    /**
      * Group an associative array by a field or using a callback.
      *
      * @param  (callable(TValue, TKey): array-key)|array|string  $groupBy

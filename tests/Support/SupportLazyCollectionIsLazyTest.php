@@ -449,6 +449,20 @@ class SupportLazyCollectionIsLazyTest extends TestCase
         });
     }
 
+    public function testBeforeIsLazy()
+    {
+        $this->assertEnumerates(5, function ($collection) {
+            $collection->before(4);
+        });
+    }
+
+    public function testAfterIsLazy()
+    {
+        $this->assertEnumerates(6, function ($collection) {
+            $collection->after(4);
+        });
+    }
+
     public function testGroupByIsLazy()
     {
         $this->assertDoesNotEnumerate(function ($collection) {

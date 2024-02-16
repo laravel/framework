@@ -5542,6 +5542,52 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testBefore($collection)
+    {
+        $collection = new $collection([
+            'mon' => 'Monday',
+            'tue' => 'Tuesday',
+            'wed' => 'Wednesday',
+        ]);
+
+        $this->assertNull($collection->before(null));
+        $this->assertNull($collection->before('not-exist'));
+        $this->assertNull($collection->before('mon'));
+
+        $this->assertSame('default', $collection->before('not-exist', 'default'));
+        $this->assertSame('default', $collection->before('not-exist', fn () => 'default'));
+        $this->assertSame('default', $collection->before('mon', 'default'));
+        $this->assertSame('default', $collection->before('mon', fn () => 'default'));
+
+        $this->assertSame('Monday', $collection->before('tue'));
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testAfter($collection)
+    {
+        $collection = new $collection([
+            'mon' => 'Monday',
+            'tue' => 'Tuesday',
+            'wed' => 'Wednesday',
+        ]);
+
+        $this->assertNull($collection->after(null));
+        $this->assertNull($collection->after('not-exist'));
+        $this->assertNull($collection->after('wed'));
+
+        $this->assertSame('default', $collection->after('not-exist', 'default'));
+        $this->assertSame('default', $collection->after('not-exist', fn () => 'default'));
+        $this->assertSame('default', $collection->after('wed', 'default'));
+        $this->assertSame('default', $collection->after('wed', fn () => 'default'));
+
+        $this->assertSame('Wednesday', $collection->after('tue'));
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testWhereNull($collection)
     {
         $data = new $collection([
