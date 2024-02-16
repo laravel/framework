@@ -2,11 +2,15 @@
 
 namespace Illuminate\Tests\Foundation\Configuration;
 
+use Illuminate\Config\Repository;
+use Illuminate\Container\Container;
 use Illuminate\Contracts\Encryption\Encrypter;
+use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull;
 use Illuminate\Foundation\Http\Middleware\TrimStrings;
+use Illuminate\Http\Middleware\TrustHosts;
 use Illuminate\Http\Request;
 use Mockery;
 use PHPUnit\Framework\TestCase;
@@ -18,6 +22,7 @@ class MiddlewareTest extends TestCase
     {
         parent::tearDown();
 
+        Container::setInstance(null);
         ConvertEmptyStringsToNull::flushState();
         EncryptCookies::flushState();
         TrimStrings::flushState();
@@ -111,6 +116,42 @@ class MiddlewareTest extends TestCase
         $this->assertSame('  123  ', $request->get('aaa'));
         $this->assertSame('  456  ', $request->get('bbb'));
         $this->assertSame('  789  ', $request->get('ccc'));
+    }
+
+    public function testTrustHosts()
+    {
+        $app = Mockery::mock(Application::class);
+        $configuration = new Middleware();
+        $middleware = new class($app) extends TrustHosts
+        {
+            protected function allSubdomainsOfApplicationUrl()
+            {
+                return '^(.+\.)?laravel\.test$';
+            }
+        };
+
+        $this->assertEquals(['^(.+\.)?laravel\.test$'], $middleware->hosts());
+
+        $configuration->trustHosts();
+        $this->assertEquals(['^(.+\.)?laravel\.test$'], $middleware->hosts());
+
+        app()['config'] = Mockery::mock(Repository::class);
+        app()['config']->shouldReceive('get')->with('app.url', null)->once()->andReturn('http://laravel.test');
+
+        $configuration->trustHosts(at: ['my.test']);
+        $this->assertEquals(['my.test', '^(.+\.)?laravel\.test$'], $middleware->hosts());
+
+        $configuration->trustHosts(at: ['my.test']);
+        $this->assertEquals(['my.test', '^(.+\.)?laravel\.test$'], $middleware->hosts());
+
+        $configuration->trustHosts(at: ['my.test'], subdomains: false);
+        $this->assertEquals(['my.test'], $middleware->hosts());
+
+        $configuration->trustHosts(at: []);
+        $this->assertEquals(['^(.+\.)?laravel\.test$'], $middleware->hosts());
+
+        $configuration->trustHosts(at: [], subdomains: false);
+        $this->assertEquals([], $middleware->hosts());
     }
 
     public function testEncryptCookies()

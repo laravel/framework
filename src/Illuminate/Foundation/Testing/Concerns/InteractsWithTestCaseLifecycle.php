@@ -17,6 +17,7 @@ use Illuminate\Foundation\Testing\DatabaseTruncation;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\WithoutMiddleware;
+use Illuminate\Http\Middleware\TrustHosts;
 use Illuminate\Queue\Queue;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Facade;
@@ -170,6 +171,7 @@ trait InteractsWithTestCaseLifecycle
         RegisterProviders::flushState();
         Sleep::fake(false);
         TrimStrings::flushState();
+        TrustHosts::flushState();
 
         if ($this->callbackException) {
             throw $this->callbackException;
