@@ -61,7 +61,7 @@ class LoadEnvironmentVariables
     *
     * @return string|null The environment option value if provided, null otherwise.
     */
-    protected function getEnvironmentOptionsFromConsole()
+    protected function getEnvironmentOptionFromConsole()
     {
         $input = new ArgvInput;
 
