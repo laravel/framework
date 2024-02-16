@@ -1551,7 +1551,7 @@ class Str
      *
      * @param  string  $string
      * @param  bool  $strict
-     * @return string
+     * @return string|false
      */
     public static function fromBase64($string, $strict = false)
     {
