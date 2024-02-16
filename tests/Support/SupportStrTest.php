@@ -1384,6 +1384,55 @@ class SupportStrTest extends TestCase
         $this->assertSame('foo', Str::fromBase64(base64_encode('foo')));
         $this->assertSame('foobar', Str::fromBase64(base64_encode('foobar'), true));
     }
+
+    public function testConjunction()
+    {
+        $this->assertSame('a', Str::conjunction('machine'));
+        $this->assertSame('an', Str::conjunction('item'));
+        $this->assertSame('List a machine', Str::conjunction('List %s machine'));
+        $this->assertSame('List an item', Str::conjunction('List %s item'));
+        $this->assertSame('book a  hotel', Str::conjunction('book %s  hotel'));
+    }
+
+    /**
+     * @dataProvider strConjunctionProvider
+     */
+    public function testConjunctionWord($word, $string)
+    {
+        $this->assertSame($word, Str::conjunction($string));
+    }
+
+    public static function strConjunctionProvider(): array
+    {
+        return [
+            ['an', 'appointment'],
+            ['an', 'espresso'],
+            ['an', 'igloo'],
+            ['an', 'ostrich'],
+            ['an', 'xray'],
+            ['a', 'book'],
+            ['a', 'candle'],
+            ['a', 'dog'],
+            ['a', 'fox'],
+            ['a', 'giraffe'],
+            ['a', 'hotel'],
+            ['a', 'jousting stick'],
+            ['a', 'kilo'],
+            ['a', 'laravel helper'],
+            ['a', 'milkshake'],
+            ['a', 'nose'],
+            ['a', 'pianno'],
+            ['a', 'quick'],
+            ['a', 'radio'],
+            ['a', 'slide'],
+            ['a', 'toaster'],
+            ['a', 'uniform'],
+            ['a', 'violin'],
+            ['a', 'whisky'],
+            ['a', 'yak shave'],
+            ['a', 'zoo'],
+        ];
+    }
 }
 
 class StringableObjectStub

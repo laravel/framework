@@ -243,6 +243,34 @@ class Str
     }
 
     /**
+     * Get the "an" or "a" conjunction for the word that it precedes,
+     * or substute the conjunction into the string if a sprintf format string is provided.
+     *
+     * @param  string  $string
+     * @return string
+     */
+    public static function conjunction($string)
+    {
+        $vowelSounds = ['a', 'e', 'i', 'o', 'x'];
+
+        $makeConjunction = fn ($subsequentWord) => Str::startsWith(
+            Str::lower(trim($subsequentWord)),
+            $vowelSounds,
+        )
+            ? _('an')
+            : _('a');
+
+        if (Str::contains($string, '%s')) {
+            return sprintf(
+                $string,
+                $makeConjunction(Str::substr($string, Str::position($string, '%s') + 2)),
+            );
+        }
+
+        return $makeConjunction($string);
+    }
+
+    /**
      * Determine if a given string contains a given substring.
      *
      * @param  string  $haystack
