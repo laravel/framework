@@ -934,4 +934,53 @@ class Arr
 
         return is_array($value) ? $value : [$value];
     }
+
+    /**
+     * Filters an array by its keys using exact matches, wildcards, or regular expressions.
+     *
+     * @param array $array The source array to filter.
+     * @param array $patterns An array of keys or patterns to match against the array's keys.
+     * @param bool $wildcard Indicates whether to use wildcard matching (true) or exact matching (false).
+     * @param bool $caseSensitive Indicates whether the key matching should be case-sensitive.
+     * @param bool $exclude If true, excludes the matched keys instead of including them.
+     * @param bool $useRegex Indicates whether to use regular expressions for matching keys.
+     * @return array The filtered array.
+     */
+    public static function filterKeys(
+        array $array,
+        array $patterns,
+        bool $wildcard = false,
+        bool $caseSensitive = true,
+        bool $exclude = false,
+        bool $useRegex = false
+    ): array
+    {
+        $filteredArray = [];
+
+        foreach ($array as $key => $value) {
+            $matched = false;
+            foreach ($patterns as $pattern) {
+                if ($useRegex) {
+                    // Regular expression matching
+                    $matched = preg_match($pattern, $key);
+                } else if ($wildcard) {
+                    // Wildcard matching
+                    $matched = fnmatch($pattern, $key, $caseSensitive ? 0 : FNM_CASEFOLD);
+                } else {
+                    // Exact matching
+                    $matched = $caseSensitive ? $key === $pattern : strtolower($key) === strtolower($pattern);
+                }
+
+                if ($matched) {
+                    break;
+                }
+            }
+
+            if (($matched && !$exclude) || (!$matched && $exclude)) {
+                $filteredArray[$key] = $value;
+            }
+        }
+
+        return $filteredArray;
+    }
 }
