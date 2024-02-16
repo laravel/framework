@@ -722,6 +722,24 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $this->assertSame('alter table "users" add "created_at" datetimeoffset null, "updated_at" datetimeoffset null', $statements[0]);
     }
 
+    public function testAddingRequiredTimestamps()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->requiredTimestamps();
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table "users" add "created_at" datetime not null, "updated_at" datetime not null', $statements[0]);
+    }
+
+    public function testAddingRequiredTimestampsWithPrecision()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->requiredTimestamps(1);
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table "users" add "created_at" datetime2(1) not null, "updated_at" datetime2(1) not null', $statements[0]);
+    }
+
     public function testAddingRememberToken()
     {
         $blueprint = new Blueprint('users');

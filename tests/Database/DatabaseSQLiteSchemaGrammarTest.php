@@ -669,6 +669,30 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         ], $statements);
     }
 
+    public function testAddingRequiredTimestamps()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->requiredTimestamps();
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertCount(2, $statements);
+        $this->assertEquals([
+            'alter table "users" add column "created_at" datetime not null',
+            'alter table "users" add column "updated_at" datetime not null',
+        ], $statements);
+    }
+
+    public function testAddingRequiredTimestampsWithPrecision()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->requiredTimestamps(1);
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertCount(2, $statements);
+        $this->assertEquals([
+            'alter table "users" add column "created_at" datetime not null',
+            'alter table "users" add column "updated_at" datetime not null',
+        ], $statements);
+    }
+
     public function testAddingTimestampsTz()
     {
         $blueprint = new Blueprint('users');

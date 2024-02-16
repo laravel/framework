@@ -1250,6 +1250,19 @@ class Blueprint
     }
 
     /**
+     * Add required creation and update timestamps to the table.
+     *
+     * @param  int|null  $precision
+     * @return void
+     */
+    public function requiredTimestamps($precision = 0)
+    {
+        $this->timestamp('created_at', $precision);
+
+        $this->timestamp('updated_at', $precision);
+    }
+
+    /**
      * Add creation and update timestampTz columns to the table.
      *
      * @param  int|null  $precision
