@@ -1268,6 +1268,46 @@ class Stringable implements JsonSerializable, ArrayAccess
     }
 
     /**
+     * URL-encodes the string.
+     *
+     * @return static
+     */
+    public function urlencode()
+    {
+        return new static(urlencode($this->value));
+    }
+
+    /**
+     * Decodes URL-encoded string.
+     *
+     * @return static
+     */
+    public function urldecode()
+    {
+        return new static(urldecode($this->value));
+    }
+
+    /**
+     * URL-encode according to RFC 3986.
+     *
+     * @return static
+     */
+    public function rawurlencode()
+    {
+        return new static(rawurlencode($this->value));
+    }
+
+    /**
+     * Decode URL-encoded string according to RFC 3986.
+     *
+     * @return static
+     */
+    public function rawurldecode()
+    {
+        return new static(rawurldecode($this->value));
+    }
+
+    /**
      * Dump the string.
      *
      * @return $this

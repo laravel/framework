@@ -1316,4 +1316,36 @@ class SupportStringableTest extends TestCase
         $this->assertSame('foobar', (string) $this->stringable(base64_encode('foobar'))->fromBase64(true));
         $this->assertSame('foobarbaz', (string) $this->stringable(base64_encode('foobarbaz'))->fromBase64());
     }
+
+    public function testUrlEncode()
+    {
+        $this->assertSame('Laravel', (string) $this->stringable('Laravel')->urlencode());
+        $this->assertSame('laravel+11', (string) $this->stringable('laravel 11')->urlencode());
+        $this->assertSame('touch%C3%A9', (string) $this->stringable('touché')->urlencode());
+        $this->assertSame('%E2%98%86', (string) $this->stringable('☆')->urlencode());
+    }
+
+    public function testUrlDecode()
+    {
+        $this->assertSame('Laravel', (string) $this->stringable('Laravel')->urldecode());
+        $this->assertSame('laravel 11', (string) $this->stringable('laravel+11')->urldecode());
+        $this->assertSame('touché', (string) $this->stringable('touch%C3%A9')->urldecode());
+        $this->assertSame('☆', (string) $this->stringable('%E2%98%86')->urldecode());
+    }
+
+    public function testRawUrlEncode()
+    {
+        $this->assertSame('Laravel', (string) $this->stringable('Laravel')->rawurlencode());
+        $this->assertSame('laravel%2011', (string) $this->stringable('laravel 11')->rawurlencode());
+        $this->assertSame('touch%C3%A9', (string) $this->stringable('touché')->rawurlencode());
+        $this->assertSame('%E2%98%86', (string) $this->stringable('☆')->rawurlencode());
+    }
+
+    public function testRawUrlDecode()
+    {
+        $this->assertSame('Laravel', (string) $this->stringable('Laravel')->rawurldecode());
+        $this->assertSame('laravel 11', (string) $this->stringable('laravel%2011')->rawurldecode());
+        $this->assertSame('touché', (string) $this->stringable('touch%C3%A9')->rawurldecode());
+        $this->assertSame('☆', (string) $this->stringable('%E2%98%86')->rawurldecode());
+    }
 }

@@ -1559,6 +1559,50 @@ class Str
     }
 
     /**
+     * URL-encodes the given string.
+     *
+     * @param  string  $string
+     * @return string
+     */
+    public static function urlencode($string)
+    {
+        return urlencode($string);
+    }
+
+    /**
+     * Decodes the given URL-encoded string.
+     *
+     * @param  string  $string
+     * @return string
+     */
+    public static function urldecode($string)
+    {
+        return urldecode($string);
+    }
+
+    /**
+     * URL-encode the given string according to RFC 3986.
+     *
+     * @param  string  $string
+     * @return string
+     */
+    public static function rawurlencode($string)
+    {
+        return rawurlencode($string);
+    }
+
+    /**
+     * Decode the given URL-encoded string according to RFC 3986.
+     *
+     * @param  string  $string
+     * @return string
+     */
+    public static function rawurldecode($string)
+    {
+        return rawurldecode($string);
+    }
+
+    /**
      * Make a string's first character lowercase.
      *
      * @param  string  $string
