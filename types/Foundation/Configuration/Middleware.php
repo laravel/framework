@@ -25,6 +25,11 @@ $middleware->trustProxies(at: '*', withHeaders: Request::HEADER_X_FORWARDED_AWS_
 
 $middleware->trustProxies(withHeaders: Request::HEADER_X_FORWARDED_AWS_ELB);
 
+$middleware->trustHosts();
+$middleware->trustHosts(at: ['laravel.test']);
+$middleware->trustHosts(at: ['laravel.test'], subdomains: false);
+
+
 $middleware->encryptCookies();
 $middleware->encryptCookies([
     'cookie1',
