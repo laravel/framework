@@ -522,7 +522,7 @@ class Middleware
     }
 
     /**
-     * Configure the encrypt cookies middleware.
+     * Configure the cookie encryption middleware.
      *
      * @param  array<int, string>  $except
      * @return $this
