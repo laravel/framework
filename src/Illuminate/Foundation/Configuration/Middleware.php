@@ -7,6 +7,7 @@ use Illuminate\Auth\AuthenticationException;
 use Illuminate\Auth\Middleware\Authenticate;
 use Illuminate\Auth\Middleware\RedirectIfAuthenticated;
 use Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull;
+use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\TrimStrings;
 use Illuminate\Foundation\Http\Middleware\ValidateCsrfToken;
 use Illuminate\Routing\Middleware\ValidateSignature;
@@ -517,6 +518,19 @@ class Middleware
         if ($users) {
             RedirectIfAuthenticated::redirectUsing($users);
         }
+
+        return $this;
+    }
+
+    /**
+     * Configure the cookie encryption middleware.
+     *
+     * @param  array<int, string>  $except
+     * @return $this
+     */
+    public function encryptCookies(array $except = [])
+    {
+        EncryptCookies::except($except);
 
         return $this;
     }
