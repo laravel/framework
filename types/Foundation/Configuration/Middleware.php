@@ -29,7 +29,6 @@ $middleware->trustHosts();
 $middleware->trustHosts(at: ['laravel.test']);
 $middleware->trustHosts(at: ['laravel.test'], subdomains: false);
 
-
 $middleware->encryptCookies();
 $middleware->encryptCookies([
     'cookie1',

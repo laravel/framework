@@ -10,8 +10,8 @@ use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull;
 use Illuminate\Foundation\Http\Middleware\TrimStrings;
-use Illuminate\Http\Middleware\TrustProxies;
 use Illuminate\Http\Middleware\TrustHosts;
+use Illuminate\Http\Middleware\TrustProxies;
 use Illuminate\Http\Request;
 use Mockery;
 use PHPUnit\Framework\TestCase;
@@ -196,7 +196,7 @@ class MiddlewareTest extends TestCase
             Request::HEADER_X_FORWARDED_HOST |
             Request::HEADER_X_FORWARDED_PORT, $method->invoke($middleware));
     }
-  
+
     public function testTrustHosts()
     {
         $app = Mockery::mock(Application::class);
