@@ -103,15 +103,11 @@ trait RunsInParallel
      */
     public function execute(): int
     {
-        $phpHandlerClass = class_exists(\PHPUnit\TextUI\Configuration\PhpHandler::class)
-            ? \PHPUnit\TextUI\Configuration\PhpHandler::class
-            : \PHPUnit\TextUI\XmlConfiguration\PhpHandler::class;
-
         $configuration = $this->options instanceof \ParaTest\Options
             ? $this->options->configuration
             : $this->options->configuration();
 
-        (new $phpHandlerClass)->handle($configuration->php());
+        (new PhpHandler())->handle($configuration->php());
 
         $this->forEachProcess(function () {
             ParallelTesting::callSetUpProcessCallbacks();
