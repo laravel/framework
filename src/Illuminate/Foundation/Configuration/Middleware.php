@@ -11,6 +11,7 @@ use Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull;
 use Illuminate\Foundation\Http\Middleware\TrimStrings;
 use Illuminate\Foundation\Http\Middleware\ValidateCsrfToken;
 use Illuminate\Http\Middleware\TrustHosts;
+use Illuminate\Http\Middleware\TrustProxies;
 use Illuminate\Routing\Middleware\ValidateSignature;
 use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Support\Arr;
@@ -605,6 +606,26 @@ class Middleware
 
         if (is_array($at)) {
             TrustHosts::at($at, $subdomains);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Configure the trusted proxies for the application.
+     *
+     * @param  array<int, string>|string|null  $at
+     * @param  int|null  $headers
+     * @return $this
+     */
+    public function trustProxies(array|string $at = null, int $headers = null)
+    {
+        if (! is_null($at)) {
+            TrustProxies::at($at);
+        }
+
+        if (! is_null($headers)) {
+            TrustProxies::withHeaders($headers);
         }
 
         return $this;

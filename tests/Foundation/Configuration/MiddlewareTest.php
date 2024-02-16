@@ -11,9 +11,11 @@ use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull;
 use Illuminate\Foundation\Http\Middleware\TrimStrings;
 use Illuminate\Http\Middleware\TrustHosts;
+use Illuminate\Http\Middleware\TrustProxies;
 use Illuminate\Http\Request;
 use Mockery;
 use PHPUnit\Framework\TestCase;
+use ReflectionClass;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 
 class MiddlewareTest extends TestCase
@@ -22,10 +24,13 @@ class MiddlewareTest extends TestCase
     {
         parent::tearDown();
 
+        Mockery::close();
+
         Container::setInstance(null);
         ConvertEmptyStringsToNull::flushState();
         EncryptCookies::flushState();
         TrimStrings::flushState();
+        TrustProxies::flushState();
     }
 
     public function testConvertEmptyStringsToNull()
@@ -118,6 +123,82 @@ class MiddlewareTest extends TestCase
         $this->assertSame('  789  ', $request->get('ccc'));
     }
 
+    public function testTrustProxies()
+    {
+        $configuration = new Middleware();
+        $middleware = new TrustProxies;
+
+        $reflection = new ReflectionClass($middleware);
+        $method = $reflection->getMethod('proxies');
+        $method->setAccessible(true);
+
+        $property = $reflection->getProperty('proxies');
+        $property->setAccessible(true);
+
+        $this->assertNull($method->invoke($middleware));
+
+        $property->setValue($middleware, [
+            '192.168.1.1',
+            '192.168.1.2',
+        ]);
+
+        $this->assertEquals([
+            '192.168.1.1',
+            '192.168.1.2',
+        ], $method->invoke($middleware));
+
+        $configuration->trustProxies(at: '*');
+        $this->assertEquals('*', $method->invoke($middleware));
+
+        $configuration->trustProxies(at: [
+            '192.168.1.3',
+            '192.168.1.4',
+        ]);
+        $this->assertEquals([
+            '192.168.1.3',
+            '192.168.1.4',
+        ], $method->invoke($middleware));
+    }
+
+    public function testTrustHeaders()
+    {
+        $configuration = new Middleware();
+        $middleware = new TrustProxies;
+
+        $reflection = new ReflectionClass($middleware);
+        $method = $reflection->getMethod('headers');
+        $method->setAccessible(true);
+
+        $property = $reflection->getProperty('headers');
+        $property->setAccessible(true);
+
+        $this->assertEquals(Request::HEADER_X_FORWARDED_FOR |
+            Request::HEADER_X_FORWARDED_HOST |
+            Request::HEADER_X_FORWARDED_PORT |
+            Request::HEADER_X_FORWARDED_PROTO |
+            Request::HEADER_X_FORWARDED_AWS_ELB, $method->invoke($middleware));
+
+        $property->setValue($middleware, Request::HEADER_X_FORWARDED_AWS_ELB);
+
+        $this->assertEquals(Request::HEADER_X_FORWARDED_AWS_ELB, $method->invoke($middleware));
+
+        $configuration->trustProxies(headers: Request::HEADER_X_FORWARDED_FOR);
+
+        $this->assertEquals(Request::HEADER_X_FORWARDED_FOR, $method->invoke($middleware));
+
+        $configuration->trustProxies([
+            '192.168.1.3',
+            '192.168.1.4',
+        ], Request::HEADER_X_FORWARDED_FOR |
+            Request::HEADER_X_FORWARDED_HOST |
+            Request::HEADER_X_FORWARDED_PORT
+        );
+
+        $this->assertEquals(Request::HEADER_X_FORWARDED_FOR |
+            Request::HEADER_X_FORWARDED_HOST |
+            Request::HEADER_X_FORWARDED_PORT, $method->invoke($middleware));
+    }
+
     public function testTrustHosts()
     {
         $app = Mockery::mock(Application::class);
@@ -136,7 +217,7 @@ class MiddlewareTest extends TestCase
         $this->assertEquals(['^(.+\.)?laravel\.test$'], $middleware->hosts());
 
         app()['config'] = Mockery::mock(Repository::class);
-        app()['config']->shouldReceive('get')->with('app.url', null)->once()->andReturn('http://laravel.test');
+        app()['config']->shouldReceive('get')->with('app.url', null)->times(3)->andReturn('http://laravel.test');
 
         $configuration->trustHosts(at: ['my.test']);
         $this->assertEquals(['my.test', '^(.+\.)?laravel\.test$'], $middleware->hosts());
