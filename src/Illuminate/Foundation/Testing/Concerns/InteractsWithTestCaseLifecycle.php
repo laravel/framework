@@ -229,16 +229,10 @@ trait InteractsWithTestCaseLifecycle
      */
     public static function tearDownAfterClassUsingTestCase()
     {
-        foreach ([
-            \PHPUnit\Metadata\Annotation\Parser\Registry::class,
-        ] as $class) {
-            if (class_exists($class)) {
-                (function () {
-                    $this->classDocBlocks = [];
-                    $this->methodDocBlocks = [];
-                })->call($class::getInstance());
-            }
-        }
+        (function () {
+            $this->classDocBlocks = [];
+            $this->methodDocBlocks = [];
+        })->call(PHPUnitRegistry::getInstance());
     }
 
     /**
