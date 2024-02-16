@@ -5,6 +5,7 @@ namespace Illuminate\Http\Concerns;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Date;
+use Illuminate\Support\Str;
 use SplFileInfo;
 use stdClass;
 use Symfony\Component\HttpFoundation\InputBag;
@@ -56,12 +57,8 @@ trait InteractsWithInput
     {
         $header = $this->header('Authorization', '');
 
-        $position = strrpos($header, 'Bearer ');
-
-        if ($position !== false) {
-            $header = substr($header, $position + 7);
-
-            return str_contains($header, ',') ? strstr($header, ',', true) : $header;
+        if (Str::contains($header, 'Bearer ')) {
+            return (string) Str::of($header)->afterLast('Bearer ')->before(',');
         }
     }
 
