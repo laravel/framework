@@ -50,6 +50,16 @@ trait CompilesHelpers
     }
 
     /**
+     * Compile the delete method statements into valid PHP.
+     *
+     * @return string
+     */
+    protected function compileDelete()
+    {
+        return "<?php echo method_field('delete'); ?>";
+    }
+
+    /**
      * Compile the "vite" statements into valid PHP.
      *
      * @param  string|null  $arguments
