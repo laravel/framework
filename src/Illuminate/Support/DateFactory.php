@@ -123,9 +123,13 @@ class DateFactory
     {
         if (is_callable($handler) && is_object($handler)) {
             return static::useCallable($handler);
-        } elseif (is_string($handler)) {
+        }
+
+        if (is_string($handler)) {
             return static::useClass($handler);
-        } elseif ($handler instanceof Factory) {
+        }
+
+        if ($handler instanceof Factory) {
             return static::useFactory($handler);
         }
 
