@@ -1259,10 +1259,10 @@ class Builder implements BuilderContract
     /**
      * Add a where LIKE 'expression%' statement to the query.
      *
-     * @param  $column
-     * @param  $value
-     * @param  $boolean
-     * @param  $not
+     * @param  string  $column
+     * @param  mixed  $value
+     * @param  string  $boolean
+     * @param  bool  $not
      * @return $this
      */
     public function whereStartsWith($column, $value, $boolean = 'and', $not = false)
@@ -1275,8 +1275,8 @@ class Builder implements BuilderContract
     /**
      * Add an or where LIKE 'expression%' statement to the query.
      *
-     * @param  $column
-     * @param  $value
+     * @param  string  $column
+     * @param  mixed  $value
      * @return $this
      */
     public function orWhereStartsWith($column, $value)
@@ -1287,9 +1287,9 @@ class Builder implements BuilderContract
     /**
      * Add a where NOT LIKE 'expression%' statement to the query.
      *
-     * @param  $column
-     * @param  $value
-     * @param  $boolean
+     * @param  string  $column
+     * @param  mixed  $value
+     * @param  string  $boolean
      * @return $this
      */
     public function whereNotStartsWith($column, $value, $boolean = 'and')
@@ -1300,8 +1300,8 @@ class Builder implements BuilderContract
     /**
      * Add an or where NOT LIKE 'expression%' statement to the query.
      *
-     * @param  $column
-     * @param  $value
+     * @param  string  $column
+     * @param  mixed  $value
      * @return $this
      */
     public function orWhereNotStartsWith($column, $value)
@@ -1312,10 +1312,10 @@ class Builder implements BuilderContract
     /**
      * Add a where LIKE '%expression' statement to the query.
      *
-     * @param  $column
-     * @param  $value
-     * @param  $boolean
-     * @param  $not
+     * @param  string  $column
+     * @param  mixed  $value
+     * @param  string  $boolean
+     * @param  bool  $not
      * @return $this
      */
     public function whereEndsWith($column, $value, $boolean = 'and', $not = false)
@@ -1328,8 +1328,8 @@ class Builder implements BuilderContract
     /**
      * Add an or where LIKE '%expression' statement to the query.
      *
-     * @param  $column
-     * @param  $value
+     * @param  string  $column
+     * @param  mixed  $value
      * @return $this
      */
     public function orWhereEndsWith($column, $value)
@@ -1340,9 +1340,9 @@ class Builder implements BuilderContract
     /**
      *  Add a where NOT LIKE '%expression' statement to the query.
      *
-     * @param  $column
-     * @param  $value
-     * @param  $boolean
+     * @param  string  $column
+     * @param  mixed  $value
+     * @param  string  $boolean
      * @return $this
      */
     public function whereNotEndsWith($column, $value, $boolean = 'and')
@@ -1353,8 +1353,8 @@ class Builder implements BuilderContract
     /**
      * Add an or where NOT LIKE '%expression' statement to the query.
      *
-     * @param  $column
-     * @param  $value
+     * @param  string  $column
+     * @param  mixed  $value
      * @return $this
      */
     public function orWhereNotEndsWith($column, $value)
@@ -1365,10 +1365,10 @@ class Builder implements BuilderContract
     /**
      * Add a where LIKE '%expression%' statement to the query.
      *
-     * @param  $column
-     * @param  $value
-     * @param  $boolean
-     * @param  $not
+     * @param  string  $column
+     * @param  mixed  $value
+     * @param  string  $boolean
+     * @param  bool  $not
      * @return $this
      */
     public function whereContains($column, $value, $boolean = 'and', $not = false)
@@ -1381,8 +1381,8 @@ class Builder implements BuilderContract
     /**
      * Add an or where LIKE '%expression%' statement to the query.
      *
-     * @param  $column
-     * @param  $value
+     * @param  string  $column
+     * @param  mixed  $value
      * @return $this
      */
     public function orWhereContains($column, $value)
@@ -1393,9 +1393,9 @@ class Builder implements BuilderContract
     /**
      * Add a where NOT LIKE '%expression%' statement to the query.
      *
-     * @param  $column
-     * @param  $value
-     * @param  $boolean
+     * @param  string  $column
+     * @param  mixed  $value
+     * @param  string  $boolean
      * @return $this
      */
     public function whereNotContains($column, $value, $boolean = 'and')
@@ -1406,8 +1406,8 @@ class Builder implements BuilderContract
     /**
      * Add an OR where NOT LIKE '%expression%' statement to the query.
      *
-     * @param  $column
-     * @param  $value
+     * @param  string  $column
+     * @param  mixed  $value
      * @return $this
      */
     public function orWhereNotContains($column, $value)
