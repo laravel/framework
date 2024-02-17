@@ -922,6 +922,120 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals(['foo', 'bar'], $builder->getBindings());
     }
 
+    public function testWhereStartsWith(): void
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereStartsWith('name', 'foo');
+        $this->assertSame('select * from "users" where "name" LIKE ?', $builder->toSql());
+        $this->assertEquals(['foo%'], $builder->getBindings());
+    }
+
+    public function testWhereNotStartsWith(): void
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereNotStartsWith('name', 'foo');
+        $this->assertSame('select * from "users" where "name" NOT LIKE ?', $builder->toSql());
+        $this->assertEquals(['foo%'], $builder->getBindings());
+    }
+
+    public function testOrWhereStartsWith(): void
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')
+            ->whereStartsWith('name', 'foo')
+            ->orWhereStartsWith('last_name', 'bar');
+
+        $this->assertSame('select * from "users" where "name" LIKE ? or "last_name" LIKE ?', $builder->toSql());
+        $this->assertEquals(['foo%', 'bar%'], $builder->getBindings());
+    }
+
+    public function testOrWhereNotStartsWith(): void
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')
+            ->whereStartsWith('name', 'foo')
+            ->orWhereNotStartsWith('last_name', 'bar');
+
+        $this->assertSame('select * from "users" where "name" LIKE ? or "last_name" NOT LIKE ?', $builder->toSql());
+        $this->assertEquals(['foo%', 'bar%'], $builder->getBindings());
+    }
+
+    public function testWhereEndsWith(): void
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereEndsWith('name', 'foo');
+        $this->assertSame('select * from "users" where "name" LIKE ?', $builder->toSql());
+        $this->assertEquals(['%foo'], $builder->getBindings());
+    }
+
+    public function testWhereNotEndsWith(): void
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereNotEndsWith('name', 'foo');
+        $this->assertSame('select * from "users" where "name" NOT LIKE ?', $builder->toSql());
+        $this->assertEquals(['%foo'], $builder->getBindings());
+    }
+
+    public function testOrWhereEndsWith(): void
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')
+            ->whereEndsWith('name', 'foo')
+            ->orWhereEndsWith('last_name', 'bar');
+
+        $this->assertSame('select * from "users" where "name" LIKE ? or "last_name" LIKE ?', $builder->toSql());
+        $this->assertEquals(['%foo', '%bar'], $builder->getBindings());
+    }
+
+    public function testOrWhereNotEndsWith(): void
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')
+            ->whereEndsWith('name', 'foo')
+            ->orWhereNotEndsWith('last_name', 'bar');
+
+        $this->assertSame('select * from "users" where "name" LIKE ? or "last_name" NOT LIKE ?', $builder->toSql());
+        $this->assertEquals(['%foo', '%bar'], $builder->getBindings());
+    }
+
+    public function testWhereContains(): void
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereContains('name', 'foo');
+        $this->assertSame('select * from "users" where "name" LIKE ?', $builder->toSql());
+        $this->assertEquals(['%foo%'], $builder->getBindings());
+    }
+
+    public function testWhereNotContains(): void
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereNotContains('name', 'foo');
+        $this->assertSame('select * from "users" where "name" NOT LIKE ?', $builder->toSql());
+        $this->assertEquals(['%foo%'], $builder->getBindings());
+    }
+
+    public function testOrWhereContains(): void
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')
+            ->whereContains('name', 'foo')
+            ->orWhereContains('last_name', 'bar');
+
+        $this->assertSame('select * from "users" where "name" LIKE ? or "last_name" LIKE ?', $builder->toSql());
+        $this->assertEquals(['%foo%', '%bar%'], $builder->getBindings());
+    }
+
+    public function testOrWhereNotContains(): void
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')
+            ->whereContains('name', 'foo')
+            ->orWhereNotContains('last_name', 'bar');
+
+        $this->assertSame('select * from "users" where "name" LIKE ? or "last_name" NOT LIKE ?', $builder->toSql());
+        $this->assertEquals(['%foo%', '%bar%'], $builder->getBindings());
+    }
+
     public function testRawWheres()
     {
         $builder = $this->getBuilder();
