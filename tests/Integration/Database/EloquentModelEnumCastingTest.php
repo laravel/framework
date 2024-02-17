@@ -2,6 +2,8 @@
 
 namespace Illuminate\Tests\Integration\Database;
 
+use Illuminate\Database\Eloquent\Casts\AsBitmaskEnumArrayObject;
+use Illuminate\Database\Eloquent\Casts\AsBitmaskEnumCollection;
 use Illuminate\Database\Eloquent\Casts\AsEnumArrayObject;
 use Illuminate\Database\Eloquent\Casts\AsEnumCollection;
 use Illuminate\Database\Eloquent\Model;
@@ -23,6 +25,8 @@ class EloquentModelEnumCastingTest extends DatabaseTestCase
             $table->integer('integer_status')->nullable();
             $table->json('integer_status_collection')->nullable();
             $table->json('integer_status_array')->nullable();
+            $table->integer('bitmask_collection')->nullable();
+            $table->integer('bitmask_array')->nullable();
             $table->string('arrayable_status')->nullable();
         });
 
@@ -41,6 +45,8 @@ class EloquentModelEnumCastingTest extends DatabaseTestCase
             'integer_status' => 1,
             'integer_status_collection' => json_encode([1, 2]),
             'integer_status_array' => json_encode([1, 2]),
+            'bitmask_collection' => 5,
+            'bitmask_array' => 5,
             'arrayable_status' => 'pending',
         ]);
 
@@ -52,6 +58,8 @@ class EloquentModelEnumCastingTest extends DatabaseTestCase
         $this->assertEquals(IntegerStatus::pending, $model->integer_status);
         $this->assertEquals([IntegerStatus::pending, IntegerStatus::done], $model->integer_status_collection->all());
         $this->assertEquals([IntegerStatus::pending, IntegerStatus::done], $model->integer_status_array->toArray());
+        $this->assertEquals([IntegerBitmask::bitmask_value_one, IntegerBitmask::bitmask_value_four], $model->bitmask_collection->all());
+        $this->assertEquals([IntegerBitmask::bitmask_value_one, IntegerBitmask::bitmask_value_four], $model->bitmask_array->toArray());
         $this->assertEquals(ArrayableStatus::pending, $model->arrayable_status);
     }
 
@@ -64,6 +72,8 @@ class EloquentModelEnumCastingTest extends DatabaseTestCase
             'integer_status' => null,
             'integer_status_collection' => null,
             'integer_status_array' => null,
+            'bitmask_collection' => null,
+            'bitmask_array' => null,
             'arrayable_status' => null,
         ]);
 
@@ -75,6 +85,8 @@ class EloquentModelEnumCastingTest extends DatabaseTestCase
         $this->assertEquals(null, $model->integer_status);
         $this->assertEquals(null, $model->integer_status_collection);
         $this->assertEquals(null, $model->integer_status_array);
+        $this->assertEquals(null, $model->bitmask_collection);
+        $this->assertEquals(null, $model->bitmask_array);
         $this->assertEquals(null, $model->arrayable_status);
     }
 
@@ -87,6 +99,8 @@ class EloquentModelEnumCastingTest extends DatabaseTestCase
             'integer_status' => IntegerStatus::pending,
             'integer_status_collection' => [IntegerStatus::pending, IntegerStatus::done],
             'integer_status_array' => [IntegerStatus::pending, IntegerStatus::done],
+            'bitmask_collection' => [IntegerBitmask::bitmask_value_one, IntegerBitmask::bitmask_value_four],
+            'bitmask_array' => [IntegerBitmask::bitmask_value_one, IntegerBitmask::bitmask_value_four],
             'arrayable_status' => ArrayableStatus::pending,
         ]);
 
@@ -97,6 +111,8 @@ class EloquentModelEnumCastingTest extends DatabaseTestCase
             'integer_status' => 1,
             'integer_status_collection' => [1, 2],
             'integer_status_array' => [1, 2],
+            'bitmask_collection' => [1, 4],
+            'bitmask_array' => [1, 4],
             'arrayable_status' => [
                 'name' => 'pending',
                 'value' => 'pending',
@@ -114,6 +130,8 @@ class EloquentModelEnumCastingTest extends DatabaseTestCase
             'integer_status' => null,
             'integer_status_collection' => null,
             'integer_status_array' => null,
+            'bitmask_collection' => null,
+            'bitmask_array' => null,
             'arrayable_status' => null,
         ]);
 
@@ -124,6 +142,8 @@ class EloquentModelEnumCastingTest extends DatabaseTestCase
             'integer_status' => null,
             'integer_status_collection' => null,
             'integer_status_array' => null,
+            'bitmask_collection' => null,
+            'bitmask_array' => null,
             'arrayable_status' => null,
         ], $model->toArray());
     }
@@ -137,6 +157,8 @@ class EloquentModelEnumCastingTest extends DatabaseTestCase
             'integer_status' => IntegerStatus::pending,
             'integer_status_collection' => [IntegerStatus::pending, IntegerStatus::done],
             'integer_status_array' => [IntegerStatus::pending, IntegerStatus::done],
+            'bitmask_collection' => [IntegerBitmask::bitmask_value_one, IntegerBitmask::bitmask_value_four],
+            'bitmask_array' => [IntegerBitmask::bitmask_value_one, IntegerBitmask::bitmask_value_four],
             'arrayable_status' => ArrayableStatus::pending,
         ]);
 
@@ -150,6 +172,8 @@ class EloquentModelEnumCastingTest extends DatabaseTestCase
             'integer_status' => 1,
             'integer_status_collection' => json_encode([1, 2]),
             'integer_status_array' => json_encode([1, 2]),
+            'bitmask_collection' => 5,
+            'bitmask_array' => 5,
             'arrayable_status' => 'pending',
         ], collect(DB::table('enum_casts')->where('id', $model->id)->first())->map(function ($value) {
             return str_replace(', ', ',', $value);
@@ -165,6 +189,8 @@ class EloquentModelEnumCastingTest extends DatabaseTestCase
             'integer_status' => 1,
             'integer_status_collection' => [1, 2],
             'integer_status_array' => [1, 2],
+            'bitmask_collection' => [1, 4],
+            'bitmask_array' => [1, 4],
             'arrayable_status' => 'pending',
         ]);
 
@@ -178,6 +204,8 @@ class EloquentModelEnumCastingTest extends DatabaseTestCase
             'integer_status' => 1,
             'integer_status_collection' => json_encode([1, 2]),
             'integer_status_array' => json_encode([1, 2]),
+            'bitmask_collection' => 5,
+            'bitmask_array' => 5,
             'arrayable_status' => 'pending',
         ], collect(DB::table('enum_casts')->where('id', $model->id)->first())->map(function ($value) {
             return str_replace(', ', ',', $value);
@@ -193,6 +221,8 @@ class EloquentModelEnumCastingTest extends DatabaseTestCase
             'integer_status' => null,
             'integer_status_collection' => null,
             'integer_status_array' => null,
+            'bitmask_collection' => null,
+            'bitmask_array' => null,
             'arrayable_status' => null,
         ]);
 
@@ -206,6 +236,8 @@ class EloquentModelEnumCastingTest extends DatabaseTestCase
             'integer_status' => null,
             'integer_status_collection' => null,
             'integer_status_array' => null,
+            'bitmask_collection' => null,
+            'bitmask_array' => null,
             'arrayable_status' => null,
         ], DB::table('enum_casts')->where('id', $model->id)->first());
     }
@@ -304,6 +336,8 @@ class EloquentModelEnumCastingTestModel extends Model
         'integer_status' => IntegerStatus::class,
         'integer_status_collection' => AsEnumCollection::class.':'.IntegerStatus::class,
         'integer_status_array' => AsEnumArrayObject::class.':'.IntegerStatus::class,
+        'bitmask_collection' => AsBitmaskEnumCollection::class.':'.IntegerBitmask::class,
+        'bitmask_array' => AsBitmaskEnumArrayObject::class.':'.IntegerBitmask::class,
         'arrayable_status' => ArrayableStatus::class,
     ];
 }

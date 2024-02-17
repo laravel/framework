@@ -18,6 +18,14 @@ enum IntegerStatus: int
     case done = 2;
 }
 
+enum IntegerBitmask: int
+{
+    case bitmask_value_one = 1;
+    case bitmask_value_two = 2;
+    case bitmask_value_four = 4;
+    case bitmask_value_eight = 8;
+}
+
 enum ArrayableStatus: string implements Arrayable
 {
     case pending = 'pending';
