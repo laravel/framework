@@ -1257,6 +1257,165 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Add a where LIKE 'expression%' statement to the query.
+     *
+     * @param  $column
+     * @param  $value
+     * @param  $boolean
+     * @param  $not
+     * @return  $this|Builder
+     */
+    public function whereStartsWith($column, $value, $boolean = 'and', $not = false)
+    {
+        return $not === false
+            ? $this->where($column, 'LIKE', "{$value}%", $boolean)
+            : $this->where($column, 'NOT LIKE', "{$value}%", $boolean);
+    }
+
+    /**
+     * Add an or where LIKE 'expression%' statement to the query.
+     *
+     * @param  $column
+     * @param  $value
+     * @return  $this|Builder
+     */
+    public function orWhereStartsWith($column, $value)
+    {
+        return $this->whereStartsWith($column, $value, 'or');
+    }
+
+    /**
+     * Add a where NOT LIKE 'expression%' statement to the query.
+     *
+     * @param  $column
+     * @param  $value
+     * @param  $boolean
+     * @return $this|Builder
+     */
+    public function whereNotStartsWith($column, $value, $boolean = 'and')
+    {
+        return $this->whereStartsWith($column, $value, $boolean, true);
+    }
+
+    /**
+     * Add an or where NOT LIKE 'expression%' statement to the query.
+     *
+     * @param $column
+     * @param $value
+     * @return $this|Builder
+     */
+    public function orWhereNotStartsWith($column, $value)
+    {
+        return $this->whereNotStartsWith($column, $value, 'or');
+    }
+
+    /**
+     * Add a where LIKE '%expression' statement to the query.
+     *
+     * @param  $column
+     * @param  $value
+     * @param  $boolean
+     * @param  $not
+     * @return $this|Builder
+     */
+    public function whereEndsWith($column, $value, $boolean = 'and', $not = false)
+    {
+        return $not === false
+            ? $this->where($column, 'LIKE', "%{$value}", $boolean)
+            : $this->where($column, 'NOT LIKE', "%{$value}", $boolean);
+    }
+
+    /**
+     * Add an or where LIKE '%expression' statement to the query.
+     *
+     * @param  $column
+     * @param  $value
+     * @return $this|Builder
+     */
+    public function orWhereEndsWith($column, $value)
+    {
+        return $this->whereEndsWith($column, $value, 'or');
+    }
+
+    /**
+     *  Add a where NOT LIKE '%expression' statement to the query.
+     *
+     * @param  $column
+     * @param  $value
+     * @param  $boolean
+     * @return  $this|Builder
+     */
+    public function whereNotEndsWith($column, $value, $boolean = 'and')
+    {
+        return $this->whereEndsWith($column, $value, $boolean, true);
+    }
+
+    /**
+     * Add an or where NOT LIKE '%expression' statement to the query.
+     *
+     * @param  $column
+     * @param  $value
+     * @return  $this|Builder
+     */
+    public function orWhereNotEndsWith($column, $value)
+    {
+        return $this->whereNotEndsWith($column, $value, 'or');
+    }
+
+    /**
+     * Add a where LIKE '%expression%' statement to the query.
+     *
+     * @param  $column
+     * @param  $value
+     * @param  $boolean
+     * @param  $not
+     * @return  $this|Builder
+     */
+    public function whereContains($column, $value, $boolean = 'and', $not = false)
+    {
+        return $not === false
+            ? $this->where($column, 'LIKE', "%{$value}%", $boolean)
+            : $this->where($column, 'NOT LIKE', "%{$value}%", $boolean);
+    }
+
+    /**
+     * Add an or where LIKE '%expression%' statement to the query.
+     *
+     * @param  $column
+     * @param  $value
+     * @return  void
+     */
+    public function orWhereContains($column, $value)
+    {
+        $this->whereContains($column, $value, 'or');
+    }
+
+    /**
+     * Add a where NOT LIKE '%expression%' statement to the query.
+     *
+     * @param $column
+     * @param $value
+     * @param $boolean
+     * @return $this|Builder
+     */
+    public function whereNotContains($column, $value, $boolean = 'and')
+    {
+        return $this->whereContains($column, $value, $boolean, true);
+    }
+
+    /**
+     * Add an OR where NOT LIKE '%expression%' statement to the query.
+     *
+     * @param  $column
+     * @param  $value
+     * @return  $this|Builder
+     */
+    public function orWhereNotContains($column, $value)
+    {
+        return $this->whereNotContains($column, $value, 'or');
+    }
+
+    /**
      * Add a where between statement to the query.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
