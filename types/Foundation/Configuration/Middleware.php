@@ -21,9 +21,9 @@ $middleware->trustProxies(at: [
     '192.168.1.2',
 ]);
 
-$middleware->trustProxies(at: '*', withHeaders: Request::HEADER_X_FORWARDED_AWS_ELB);
+$middleware->trustProxies(at: '*', headers: Request::HEADER_X_FORWARDED_AWS_ELB);
 
-$middleware->trustProxies(withHeaders: Request::HEADER_X_FORWARDED_AWS_ELB);
+$middleware->trustProxies(headers: Request::HEADER_X_FORWARDED_AWS_ELB);
 
 $middleware->trustHosts();
 $middleware->trustHosts(at: ['laravel.test']);
