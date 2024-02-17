@@ -645,7 +645,6 @@ class Middleware
         return $this;
     }
 
-
     /**
      * Indicate that Sanctum's frontend state middleware should be enabled.
      *

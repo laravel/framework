@@ -28,7 +28,6 @@ class PreventRequestsDuringMaintenance
      */
     protected static $neverPrevent = [];
 
-
     /**
      * Create a new middleware instance.
      *
