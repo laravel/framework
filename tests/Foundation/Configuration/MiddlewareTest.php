@@ -6,9 +6,11 @@ use Illuminate\Config\Repository;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Encryption\Encrypter;
 use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\Foundation\MaintenanceMode;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull;
+use Illuminate\Foundation\Http\Middleware\PreventRequestsDuringMaintenance;
 use Illuminate\Foundation\Http\Middleware\TrimStrings;
 use Illuminate\Http\Middleware\TrustHosts;
 use Illuminate\Http\Middleware\TrustProxies;
@@ -251,5 +253,29 @@ class MiddlewareTest extends TestCase
 
         $this->assertTrue($middleware->isDisabled('aaa'));
         $this->assertTrue($middleware->isDisabled('bbb'));
+    }
+
+    public function testPreventRequestsDuringMaintenance()
+    {
+        $configuration = new Middleware();
+        $mode = Mockery::mock(MaintenanceMode::class);
+        $mode->shouldReceive('active')->andReturn(true);
+        $mode->shouldReceive('date')->andReturn([]);
+        $app = Mockery::mock(Application::class);
+        $app->shouldReceive('maintenanceMode')->andReturn($mode);
+        $middleware = new PreventRequestsDuringMaintenance($app);
+
+        $reflection = new ReflectionClass($middleware);
+        $method = $reflection->getMethod('inExceptArray');
+
+        $symfonyRequest = new SymfonyRequest();
+        $symfonyRequest->server->set('REQUEST_METHOD', 'GET');
+        $symfonyRequest->server->set('REQUEST_URI', 'metrics/requests');
+
+        $request = Request::createFromBase($symfonyRequest);
+        $this->assertFalse($method->invoke($middleware, $request));
+
+        $configuration->preventRequestsDuringMaintenance(['metrics/*']);
+        $this->assertTrue($method->invoke($middleware, $request));
     }
 }
