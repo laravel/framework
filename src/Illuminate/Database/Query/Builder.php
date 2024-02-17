@@ -1263,7 +1263,7 @@ class Builder implements BuilderContract
      * @param  $value
      * @param  $boolean
      * @param  $not
-     * @return  $this|Builder
+     * @return $this
      */
     public function whereStartsWith($column, $value, $boolean = 'and', $not = false)
     {
@@ -1277,7 +1277,7 @@ class Builder implements BuilderContract
      *
      * @param  $column
      * @param  $value
-     * @return  $this|Builder
+     * @return $this
      */
     public function orWhereStartsWith($column, $value)
     {
@@ -1290,7 +1290,7 @@ class Builder implements BuilderContract
      * @param  $column
      * @param  $value
      * @param  $boolean
-     * @return $this|Builder
+     * @return $this
      */
     public function whereNotStartsWith($column, $value, $boolean = 'and')
     {
@@ -1300,9 +1300,9 @@ class Builder implements BuilderContract
     /**
      * Add an or where NOT LIKE 'expression%' statement to the query.
      *
-     * @param $column
-     * @param $value
-     * @return $this|Builder
+     * @param  $column
+     * @param  $value
+     * @return $this
      */
     public function orWhereNotStartsWith($column, $value)
     {
@@ -1316,7 +1316,7 @@ class Builder implements BuilderContract
      * @param  $value
      * @param  $boolean
      * @param  $not
-     * @return $this|Builder
+     * @return $this
      */
     public function whereEndsWith($column, $value, $boolean = 'and', $not = false)
     {
@@ -1330,7 +1330,7 @@ class Builder implements BuilderContract
      *
      * @param  $column
      * @param  $value
-     * @return $this|Builder
+     * @return $this
      */
     public function orWhereEndsWith($column, $value)
     {
@@ -1343,7 +1343,7 @@ class Builder implements BuilderContract
      * @param  $column
      * @param  $value
      * @param  $boolean
-     * @return  $this|Builder
+     * @return $this
      */
     public function whereNotEndsWith($column, $value, $boolean = 'and')
     {
@@ -1355,7 +1355,7 @@ class Builder implements BuilderContract
      *
      * @param  $column
      * @param  $value
-     * @return  $this|Builder
+     * @return $this
      */
     public function orWhereNotEndsWith($column, $value)
     {
@@ -1369,7 +1369,7 @@ class Builder implements BuilderContract
      * @param  $value
      * @param  $boolean
      * @param  $not
-     * @return  $this|Builder
+     * @return $this
      */
     public function whereContains($column, $value, $boolean = 'and', $not = false)
     {
@@ -1383,20 +1383,20 @@ class Builder implements BuilderContract
      *
      * @param  $column
      * @param  $value
-     * @return  void
+     * @return $this
      */
     public function orWhereContains($column, $value)
     {
-        $this->whereContains($column, $value, 'or');
+        return $this->whereContains($column, $value, 'or');
     }
 
     /**
      * Add a where NOT LIKE '%expression%' statement to the query.
      *
-     * @param $column
-     * @param $value
-     * @param $boolean
-     * @return $this|Builder
+     * @param  $column
+     * @param  $value
+     * @param  $boolean
+     * @return $this
      */
     public function whereNotContains($column, $value, $boolean = 'and')
     {
@@ -1408,7 +1408,7 @@ class Builder implements BuilderContract
      *
      * @param  $column
      * @param  $value
-     * @return  $this|Builder
+     * @return $this
      */
     public function orWhereNotContains($column, $value)
     {
