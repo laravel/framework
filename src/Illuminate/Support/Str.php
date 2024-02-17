@@ -1313,7 +1313,7 @@ class Str
 
         $words[0] = ucfirst(mb_strtolower($words[0]));
 
-        for ($i = 0; $i < count($words); $i++) {
+        for ($i = 0, $iMax = count($words); $i < $iMax; $i++) {
             $lowercaseWord = mb_strtolower($words[$i]);
 
             if (str_contains($lowercaseWord, '-')) {
@@ -1324,14 +1324,12 @@ class Str
                 }, $hyphenatedWords);
 
                 $words[$i] = implode('-', $hyphenatedWords);
+            } elseif (in_array($lowercaseWord, $minorWords) &&
+                mb_strlen($lowercaseWord) <= 3 &&
+                ! ($i === 0 || in_array(mb_substr($words[$i - 1], -1), $endPunctuation))) {
+                $words[$i] = $lowercaseWord;
             } else {
-                if (in_array($lowercaseWord, $minorWords) &&
-                    mb_strlen($lowercaseWord) <= 3 &&
-                    ! ($i === 0 || in_array(mb_substr($words[$i - 1], -1), $endPunctuation))) {
-                    $words[$i] = $lowercaseWord;
-                } else {
-                    $words[$i] = ucfirst($lowercaseWord);
-                }
+                $words[$i] = ucfirst($lowercaseWord);
             }
         }
 
