@@ -922,7 +922,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals(['foo', 'bar'], $builder->getBindings());
     }
 
-    public function testWhereStartsWith(): void
+    public function testWhereStartsWith()
     {
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->whereStartsWith('name', 'foo');
@@ -930,7 +930,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals(['foo%'], $builder->getBindings());
     }
 
-    public function testWhereNotStartsWith(): void
+    public function testWhereNotStartsWith()
     {
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->whereNotStartsWith('name', 'foo');
@@ -938,7 +938,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals(['foo%'], $builder->getBindings());
     }
 
-    public function testOrWhereStartsWith(): void
+    public function testOrWhereStartsWith()
     {
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')
@@ -949,7 +949,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals(['foo%', 'bar%'], $builder->getBindings());
     }
 
-    public function testOrWhereNotStartsWith(): void
+    public function testOrWhereNotStartsWith()
     {
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')
@@ -960,7 +960,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals(['foo%', 'bar%'], $builder->getBindings());
     }
 
-    public function testWhereEndsWith(): void
+    public function testWhereEndsWith()
     {
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->whereEndsWith('name', 'foo');
@@ -968,7 +968,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals(['%foo'], $builder->getBindings());
     }
 
-    public function testWhereNotEndsWith(): void
+    public function testWhereNotEndsWith()
     {
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->whereNotEndsWith('name', 'foo');
@@ -976,7 +976,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals(['%foo'], $builder->getBindings());
     }
 
-    public function testOrWhereEndsWith(): void
+    public function testOrWhereEndsWith()
     {
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')
@@ -987,7 +987,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals(['%foo', '%bar'], $builder->getBindings());
     }
 
-    public function testOrWhereNotEndsWith(): void
+    public function testOrWhereNotEndsWith()
     {
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')
@@ -998,7 +998,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals(['%foo', '%bar'], $builder->getBindings());
     }
 
-    public function testWhereContains(): void
+    public function testWhereContains()
     {
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->whereContains('name', 'foo');
@@ -1006,7 +1006,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals(['%foo%'], $builder->getBindings());
     }
 
-    public function testWhereNotContains(): void
+    public function testWhereNotContains()
     {
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->whereNotContains('name', 'foo');
@@ -1014,7 +1014,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals(['%foo%'], $builder->getBindings());
     }
 
-    public function testOrWhereContains(): void
+    public function testOrWhereContains()
     {
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')
@@ -1025,7 +1025,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals(['%foo%', '%bar%'], $builder->getBindings());
     }
 
-    public function testOrWhereNotContains(): void
+    public function testOrWhereNotContains()
     {
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')
