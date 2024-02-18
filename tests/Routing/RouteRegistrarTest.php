@@ -886,7 +886,7 @@ class RouteRegistrarTest extends TestCase
         };
         $this->router->resource('users', RouteRegistrarControllerStub::class)
                      ->middleware([
-                        'index' => [$one , 'two'],
+                         'index' => [$one , 'two'],
                      ])
                      ->withoutMiddleware('one');
 

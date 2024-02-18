@@ -613,18 +613,18 @@ class ResourceRegistrar
     {
         $name = $this->getResourceRouteName($resource, $method, $options);
 
-        $action = ['as' => $name, 'uses' => $controller . '@' . $method];
+        $action = ['as' => $name, 'uses' => $controller.'@'.$method];
 
         if (isset($options['middleware'])) {
             $middlewares = $options['middleware'];
             $middlewaresIsArray = is_array($middlewares);
             $middlewaresIsList = $middlewaresIsArray && array_is_list($middlewares);
 
-            if ($middlewaresIsList || !$middlewaresIsArray ) {
+            if ($middlewaresIsList || ! $middlewaresIsArray ) {
                 $action['middleware'] = $middlewares;
             }
 
-            if (!$middlewaresIsList && isset($middlewares[$method])) {
+            if (! $middlewaresIsList && isset($middlewares[$method])) {
                 $action['middleware'] = $middlewares[$method];
             }
         }
