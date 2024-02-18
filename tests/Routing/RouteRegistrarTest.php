@@ -875,6 +875,25 @@ class RouteRegistrarTest extends TestCase
         $this->assertEquals(['one'], $this->getRoute()->excludedMiddleware());
     }
 
+    public function testResourceWithMiddlewarePerAction()
+    {
+        $this->router->resource('users', RouteRegistrarControllerStub::class)
+                     ->middleware([
+                        'index' => ['one', 'two'],
+                     ])
+                     ->withoutMiddleware('one');
+
+
+        $this->seeResponse('deleted', Request::create('users/id', 'DELETE'));
+
+        $routes = $this->router->getRoutes()->get();
+
+        $this->assertEquals(['one', 'two'], $routes[0]->middleware());
+        $this->assertEquals(['one'], $routes[0]->excludedMiddleware());
+        $this->assertEquals([], $routes[1]->middleware());
+        $this->assertEquals(['one'], $routes[1]->excludedMiddleware());
+    }
+
     public function testResourceWheres()
     {
         $wheres = [

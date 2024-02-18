@@ -152,7 +152,9 @@ class PendingResourceRegistration
         $middleware = Arr::wrap($middleware);
 
         foreach ($middleware as $key => $value) {
-            $middleware[$key] = (string) $value;
+            $middleware[$key] = is_array($value) && array_is_list($value)
+                ? $value
+                : (string) $value;
         }
 
         $this->options['middleware'] = $middleware;
