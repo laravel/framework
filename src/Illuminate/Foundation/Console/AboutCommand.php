@@ -149,7 +149,7 @@ class AboutCommand extends Command
             ];
         });
 
-        $this->output->writeln(strip_tags(json_encode($output,JSON_PRETTY_PRINT)));
+        $this->output->writeln(strip_tags(json_encode($output, JSON_PRETTY_PRINT)));
     }
 
     /**
