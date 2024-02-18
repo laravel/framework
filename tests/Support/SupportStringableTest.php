@@ -65,7 +65,7 @@ class SupportStringableTest extends TestCase
     public function testIsIpv4()
     {
         $this->assertTrue($this->stringable('127.0.0.1')->isIpv4());
-        
+
         $this->assertFalse($this->stringable('2001:0db8:85a3:08d3:1319:8a2e:0370:7334')->isIpv4());
         $this->assertFalse($this->stringable('invalid ip')->isIpv4());
     }
