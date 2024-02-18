@@ -1844,4 +1844,21 @@ class Str
         static::$camelCache = [];
         static::$studlyCache = [];
     }
+
+    /**
+     * Interpolate a string with given values.
+     *
+     * @param string $value Template string containing placeholders.
+     * @param  array  $data Associative array of placeholders and their replacement values.
+     * @param string $prefix Placeholder prefix, e.g., '{'.
+     * @param string $suffix Placeholder suffix, e.g., '}'.
+     * @return string
+     */
+    public static function interpolate(string $value, array $data, string $prefix = '{', string $suffix = '}'): string
+    {
+        foreach ($data as $key => $replacement) {
+            $value = str_replace($prefix . $key . $suffix, $replacement, $value);
+        }
+        return $value;
+    }
 }
