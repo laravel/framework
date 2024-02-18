@@ -6,6 +6,7 @@ use ArrayAccess;
 use Illuminate\Contracts\Config\Repository as ConfigContract;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Traits\Macroable;
+use Webmozart\Assert\Assert;
 
 class Repository implements ArrayAccess, ConfigContract
 {
@@ -178,5 +179,63 @@ class Repository implements ArrayAccess, ConfigContract
     public function offsetUnset($key): void
     {
         $this->set($key, null);
+    }
+
+    public function string(string $key): string
+    {
+        $value = $this->get($key);
+
+        Assert::string($value, message: sprintf(
+            "Configuration value for key [%s] must be a string, %s given.", $key, gettype($value))
+        );
+
+        return $value;
+    }
+
+    /**
+     * @return array<array-key, mixed>
+     */
+    public function array(string $key): array
+    {
+        $value = $this->get($key);
+
+        Assert::isArray($value, message: sprintf(
+            "Configuration value for key [%s] must be an array, %s given.", $key, gettype($value))
+        );
+
+        return $value;
+    }
+
+    public function boolean(string $key): bool
+    {
+        $value = $this->get($key);
+
+        Assert::boolean($value, message: sprintf(
+            "Configuration value for key [%s] must be a boolean, %s given.", $key, gettype($value))
+        );
+
+        return $value;
+    }
+
+    public function integer(string $key): int
+    {
+        $value = $this->get($key);
+
+        Assert::integer($value, message: sprintf(
+            "Configuration value for key [%s] must be an integer, %s given.", $key, gettype($value))
+        );
+
+        return $value;
+    }
+
+    public function float(string $key): float
+    {
+        $value = $this->get($key);
+
+        Assert::float($value, message: sprintf(
+            "Configuration value for key [%s] must be a float, %s given.", $key, gettype($value))
+        );
+
+        return $value;
     }
 }
