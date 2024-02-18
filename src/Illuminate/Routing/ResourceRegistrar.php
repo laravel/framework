@@ -617,14 +617,16 @@ class ResourceRegistrar
 
         if (isset($options['middleware'])) {
             $middlewares = $options['middleware'];
-            $middlewaresIsList = is_array($middlewares) && array_is_list($middlewares);
+            $middlewaresIsArray = is_array($middlewares);
+            $middlewaresIsList = $middlewaresIsArray && array_is_list($middlewares);
 
-            if ($middlewaresIsList) {
+            if ($middlewaresIsList || !$middlewaresIsArray ) {
                 $action['middleware'] = $middlewares;
-            } elseif (!$middlewaresIsList && isset($middlewares[$method])) {
-                $action['middleware'] = $middlewares[$method];
             }
 
+            if (!$middlewaresIsList && isset($middlewares[$method])) {
+                $action['middleware'] = $middlewares[$method];
+            }
         }
 
         if (isset($options['excluded_middleware'])) {

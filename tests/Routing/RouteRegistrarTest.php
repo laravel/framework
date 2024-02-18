@@ -877,9 +877,16 @@ class RouteRegistrarTest extends TestCase
 
     public function testResourceWithMiddlewarePerAction()
     {
+        $one = new class implements Stringable
+        {
+            public function __toString()
+            {
+                return 'one';
+            }
+        };
         $this->router->resource('users', RouteRegistrarControllerStub::class)
                      ->middleware([
-                        'index' => ['one', 'two'],
+                        'index' => [$one , 'two'],
                      ])
                      ->withoutMiddleware('one');
 
