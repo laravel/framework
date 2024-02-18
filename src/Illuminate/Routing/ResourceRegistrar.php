@@ -620,7 +620,7 @@ class ResourceRegistrar
             $middlewaresIsArray = is_array($middlewares);
             $middlewaresIsList = $middlewaresIsArray && array_is_list($middlewares);
 
-            if ($middlewaresIsList || ! $middlewaresIsArray ) {
+            if ($middlewaresIsList || ! $middlewaresIsArray) {
                 $action['middleware'] = $middlewares;
             }
 
