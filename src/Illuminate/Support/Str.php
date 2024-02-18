@@ -561,6 +561,51 @@ class Str
     }
 
     /**
+     * Determine if a given string is valid IP.
+     *
+     * @param  mixed  $value
+     * @return bool
+     */
+    public static function isIp($value)
+    {
+        if (! is_string($value)) {
+            return false;
+        }
+
+        return filter_var($value, FILTER_VALIDATE_IP) !== false;
+    }
+
+    /**
+     * Determine if a given string is valid IPv4.
+     *
+     * @param  mixed  $value
+     * @return bool
+     */
+    public static function isIpv4($value)
+    {
+        if (! is_string($value)) {
+            return false;
+        }
+
+        return filter_var($value, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) !== false;
+    }
+
+    /**
+     * Determine if a given string is valid IPv6.
+     *
+     * @param  mixed  $value
+     * @return bool
+     */
+    public static function isIpv6($value)
+    {
+        if (! is_string($value)) {
+            return false;
+        }
+
+        return filter_var($value, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) !== false;
+    }
+
+    /**
      * Convert a string to kebab case.
      *
      * @param  string  $value

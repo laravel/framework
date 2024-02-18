@@ -51,6 +51,39 @@ class SupportStringableTest extends TestCase
         $this->assertFalse($this->stringable('01GJSNW9MAF-792C0XYY8RX6ssssss-QFT')->isUlid());
     }
 
+    public function testIsIp()
+    {
+        $this->assertTrue($this->stringable('127.0.0.1')->isIp());
+        $this->assertTrue($this->stringable('2001:0db8:85a3:08d3:1319:8a2e:0370:7334')->isIp());
+
+        $this->assertFalse($this->stringable('invalid ip')->isIp());
+        $this->assertFalse($this->stringable('192.168.1')->isIp());
+        $this->assertFalse($this->stringable('192.168.1.1.1')->isIp());
+        $this->assertFalse($this->stringable('256.256.256.256')->isIp());
+    }
+
+    public function testIsIpv4()
+    {
+        $this->assertTrue($this->stringable('127.0.0.1')->isIpv4());
+        
+        $this->assertFalse($this->stringable('2001:0db8:85a3:08d3:1319:8a2e:0370:7334')->isIpv4());
+        $this->assertFalse($this->stringable('invalid ip')->isIpv4());
+    }
+
+    public function testIsIpv6()
+    {
+        $this->assertTrue($this->stringable('2001:0db8:85a3:08d3:1319:8a2e:0370:7334')->isIpv6());
+        $this->assertTrue($this->stringable('2001:db8::1')->isIpv6());
+        $this->assertTrue($this->stringable('fe80::1')->isIpv6());
+        $this->assertTrue($this->stringable('::1')->isIpv6());
+
+        $this->assertFalse($this->stringable('127.0.0.1')->isIpv6());
+        $this->assertFalse($this->stringable('invalid ip')->isIpv6());
+        $this->assertFalse($this->stringable(':::')->isIpv6());
+        $this->assertFalse($this->stringable('2001:0db8:85a3:08d3:1319:8a2e:0370:7334:1')->isIpv6());
+        $this->assertFalse($this->stringable('::invalid::')->isIpv6());
+    }
+
     public function testIsJson()
     {
         $this->assertTrue($this->stringable('1')->isJson());

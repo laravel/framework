@@ -365,6 +365,36 @@ class Stringable implements JsonSerializable, ArrayAccess
     }
 
     /**
+     * Determine if a given string is valid IP.
+     *
+     * @return bool
+     */
+    public function isIp()
+    {
+        return Str::isIp($this->value);
+    }
+
+    /**
+     * Determine if a given string is valid IPv4.
+     *
+     * @return bool
+     */
+    public function isIpv4()
+    {
+        return Str::isIpv4($this->value);
+    }
+
+    /**
+     * Determine if a given string is valid IPv6.
+     *
+     * @return bool
+     */
+    public function isIpv6()
+    {
+        return Str::isIpv6($this->value);
+    }
+
+    /**
      * Determine if the given string is empty.
      *
      * @return bool
