@@ -185,9 +185,11 @@ class Repository implements ArrayAccess, ConfigContract
     {
         $value = $this->get($key);
 
-        Assert::string($value, message: sprintf(
-            "Configuration value for key [%s] must be a string, %s given.", $key, gettype($value))
-        );
+        if (!is_string($value)) {
+            throw new \InvalidArgumentException(
+                sprintf("Configuration value for key [%s] must be a string, %s given.", $key, gettype($value))
+            );
+        }
 
         return $value;
     }
@@ -199,9 +201,11 @@ class Repository implements ArrayAccess, ConfigContract
     {
         $value = $this->get($key);
 
-        Assert::isArray($value, message: sprintf(
-            "Configuration value for key [%s] must be an array, %s given.", $key, gettype($value))
-        );
+        if (!is_array($value)) {
+            throw new \InvalidArgumentException(
+                sprintf("Configuration value for key [%s] must be an array, %s given.", $key, gettype($value))
+            );
+        }
 
         return $value;
     }
@@ -210,9 +214,11 @@ class Repository implements ArrayAccess, ConfigContract
     {
         $value = $this->get($key);
 
-        Assert::boolean($value, message: sprintf(
-            "Configuration value for key [%s] must be a boolean, %s given.", $key, gettype($value))
-        );
+        if(!is_bool($value)) {
+            throw new \InvalidArgumentException(
+                sprintf("Configuration value for key [%s] must be a boolean, %s given.", $key, gettype($value))
+            );
+        }
 
         return $value;
     }
@@ -221,9 +227,11 @@ class Repository implements ArrayAccess, ConfigContract
     {
         $value = $this->get($key);
 
-        Assert::integer($value, message: sprintf(
-            "Configuration value for key [%s] must be an integer, %s given.", $key, gettype($value))
-        );
+        if (!is_int($value)) {
+            throw new \InvalidArgumentException(
+                sprintf("Configuration value for key [%s] must be an integer, %s given.", $key, gettype($value))
+            );
+        }
 
         return $value;
     }
@@ -232,9 +240,11 @@ class Repository implements ArrayAccess, ConfigContract
     {
         $value = $this->get($key);
 
-        Assert::float($value, message: sprintf(
-            "Configuration value for key [%s] must be a float, %s given.", $key, gettype($value))
-        );
+        if (!is_float($value)) {
+            throw new \InvalidArgumentException(
+                sprintf("Configuration value for key [%s] must be a float, %s given.", $key, gettype($value))
+            );
+        }
 
         return $value;
     }

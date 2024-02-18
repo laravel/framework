@@ -3,8 +3,8 @@
 namespace Illuminate\Tests\Config;
 
 use Illuminate\Config\Repository;
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
-use Webmozart\Assert\InvalidArgumentException;
 
 class RepositoryTest extends TestCase
 {
