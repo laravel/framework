@@ -6,7 +6,6 @@ use ArrayAccess;
 use Illuminate\Contracts\Config\Repository as ConfigContract;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Traits\Macroable;
-use Webmozart\Assert\Assert;
 
 class Repository implements ArrayAccess, ConfigContract
 {
@@ -185,9 +184,9 @@ class Repository implements ArrayAccess, ConfigContract
     {
         $value = $this->get($key);
 
-        if (!is_string($value)) {
+        if (! is_string($value)) {
             throw new \InvalidArgumentException(
-                sprintf("Configuration value for key [%s] must be a string, %s given.", $key, gettype($value))
+                sprintf('Configuration value for key [%s] must be a string, %s given.', $key, gettype($value))
             );
         }
 
@@ -201,9 +200,9 @@ class Repository implements ArrayAccess, ConfigContract
     {
         $value = $this->get($key);
 
-        if (!is_array($value)) {
+        if (! is_array($value)) {
             throw new \InvalidArgumentException(
-                sprintf("Configuration value for key [%s] must be an array, %s given.", $key, gettype($value))
+                sprintf('Configuration value for key [%s] must be an array, %s given.', $key, gettype($value))
             );
         }
 
@@ -214,9 +213,9 @@ class Repository implements ArrayAccess, ConfigContract
     {
         $value = $this->get($key);
 
-        if(!is_bool($value)) {
+        if (! is_bool($value)) {
             throw new \InvalidArgumentException(
-                sprintf("Configuration value for key [%s] must be a boolean, %s given.", $key, gettype($value))
+                sprintf('Configuration value for key [%s] must be a boolean, %s given.', $key, gettype($value))
             );
         }
 
@@ -227,9 +226,9 @@ class Repository implements ArrayAccess, ConfigContract
     {
         $value = $this->get($key);
 
-        if (!is_int($value)) {
+        if (! is_int($value)) {
             throw new \InvalidArgumentException(
-                sprintf("Configuration value for key [%s] must be an integer, %s given.", $key, gettype($value))
+                sprintf('Configuration value for key [%s] must be an integer, %s given.', $key, gettype($value))
             );
         }
 
@@ -240,9 +239,9 @@ class Repository implements ArrayAccess, ConfigContract
     {
         $value = $this->get($key);
 
-        if (!is_float($value)) {
+        if (! is_float($value)) {
             throw new \InvalidArgumentException(
-                sprintf("Configuration value for key [%s] must be a float, %s given.", $key, gettype($value))
+                sprintf('Configuration value for key [%s] must be a float, %s given.', $key, gettype($value))
             );
         }
 
