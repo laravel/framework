@@ -357,7 +357,7 @@ class FoundationInteractsWithDatabaseTest extends TestCase
 
     public function testGetQualifiedTableNameFromModel()
     {
-        $expectedTableNameWithConnection = 'test_connection.' . $this->table;
+        $expectedTableNameWithConnection = 'test_connection.'.$this->table;
 
         $model = new ProductStub;
         $model->setConnection('test_connection');
