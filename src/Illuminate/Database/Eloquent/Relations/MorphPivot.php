@@ -69,7 +69,7 @@ class MorphPivot extends Pivot
 
         return tap($query->delete(), function () {
             $this->exists = false;
-            
+
             $this->fireModelEvent('deleted', false);
         });
     }
