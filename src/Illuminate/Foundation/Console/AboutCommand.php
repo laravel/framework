@@ -134,7 +134,7 @@ class AboutCommand extends Command
     }
 
     /**
-     * Display the application information as JSON.
+     * Display the application information as PRETTY JSON.
      *
      * @param  \Illuminate\Support\Collection  $data
      * @return void
