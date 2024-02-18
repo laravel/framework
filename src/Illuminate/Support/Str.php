@@ -561,7 +561,7 @@ class Str
     }
 
     /**
-     * Determine if a given string is valid IP.
+     * Determine if a given value is a valid IP.
      *
      * @param  mixed  $value
      * @return bool
@@ -576,7 +576,7 @@ class Str
     }
 
     /**
-     * Determine if a given string is valid IPv4.
+     * Determine if a given value is a valid IPv4.
      *
      * @param  mixed  $value
      * @return bool
@@ -591,7 +591,7 @@ class Str
     }
 
     /**
-     * Determine if a given string is valid IPv6.
+     * Determine if a given value is a valid IPv6.
      *
      * @param  mixed  $value
      * @return bool

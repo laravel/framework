@@ -365,7 +365,7 @@ class Stringable implements JsonSerializable, ArrayAccess
     }
 
     /**
-     * Determine if a given string is valid IP.
+     * Determine if a given value is a valid IP.
      *
      * @return bool
      */
@@ -375,7 +375,7 @@ class Stringable implements JsonSerializable, ArrayAccess
     }
 
     /**
-     * Determine if a given string is valid IPv4.
+     * Determine if a given value is a valid IPv4.
      *
      * @return bool
      */
@@ -385,7 +385,7 @@ class Stringable implements JsonSerializable, ArrayAccess
     }
 
     /**
-     * Determine if a given string is valid IPv6.
+     * Determine if a given value is a valid IPv6.
      *
      * @return bool
      */
