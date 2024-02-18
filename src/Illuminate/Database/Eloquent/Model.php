@@ -1861,6 +1861,23 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     }
 
     /**
+     * Get the fully qualified table name for the model.
+     *
+     * @return string
+     */
+    public function getQualifiedTableName()
+    {
+        $connection = $this->getConnectionName();
+        $table = $this->getTable();
+
+        if ($connection) {
+            return $connection . '.' . $table;
+        }
+
+        return $table;
+    }
+
+    /**
      * Set the table associated with the model.
      *
      * @param  string  $table

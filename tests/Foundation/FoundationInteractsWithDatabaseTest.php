@@ -30,6 +30,8 @@ class FoundationInteractsWithDatabaseTest extends TestCase
     protected function setUp(): void
     {
         $this->connection = m::mock(Connection::class);
+
+        $this->connection->shouldReceive('getName')->andReturn('test_connection');
     }
 
     protected function tearDown(): void
@@ -351,6 +353,21 @@ class FoundationInteractsWithDatabaseTest extends TestCase
         $this->assertEquals($this->table, $this->getTable(ProductStub::class));
         $this->assertEquals($this->table, $this->getTable(new ProductStub));
         $this->assertEquals($this->table, $this->getTable($this->table));
+    }
+
+    public function testGetQualifiedTableNameFromModel()
+    {
+        $expectedTableNameWithConnection = 'test_connection.' . $this->table;
+
+        $model = new ProductStub;
+        $model->setConnection('test_connection');
+
+        $this->assertEquals($expectedTableNameWithConnection, $model->getQualifiedTableName());
+
+        $defaultModel = new ProductStub;
+
+        $expectedDefaultTableName = $defaultModel->getTable();
+        $this->assertEquals($expectedDefaultTableName, $defaultModel->getQualifiedTableName());
     }
 
     public function testGetTableCustomizedDeletedAtColumnName()
