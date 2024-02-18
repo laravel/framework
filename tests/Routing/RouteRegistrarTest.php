@@ -890,7 +890,6 @@ class RouteRegistrarTest extends TestCase
                      ])
                      ->withoutMiddleware('one');
 
-
         $this->seeResponse('deleted', Request::create('users/id', 'DELETE'));
 
         $routes = $this->router->getRoutes()->get();
