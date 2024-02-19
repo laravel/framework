@@ -17,7 +17,7 @@ use Illuminate\Support\Traits\Macroable;
 
 abstract class Relation implements BuilderContract
 {
-    use ForwardsCalls, Conditionable, Tappable, Macroable {
+    use Conditionable, ForwardsCalls, Macroable, Tappable {
         Macroable::__call as macroCall;
     }
 
