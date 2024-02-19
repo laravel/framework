@@ -137,4 +137,17 @@ class Exceptions
 
         return $this;
     }
+
+    /**
+     * Indicate that the given exception class should not be ignored.
+     *
+     * @param  array<int, class-string<\Throwable>>|class-string<\Throwable>  $class
+     * @return $this
+     */
+    public function stopIgnoring(array|string $class)
+    {
+        $this->handler->stopIgnoring($class);
+
+        return $this;
+    }
 }
