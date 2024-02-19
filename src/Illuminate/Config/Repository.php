@@ -180,6 +180,14 @@ class Repository implements ArrayAccess, ConfigContract
         $this->set($key, null);
     }
 
+
+    /**
+     * Get the specified configuration value typed as a string.
+     * If the value isn't a string it should throw an exception.
+     *
+     * @param  string  $key
+     * @return string
+     */
     public function string(string $key): string
     {
         $value = $this->get($key);
@@ -194,6 +202,10 @@ class Repository implements ArrayAccess, ConfigContract
     }
 
     /**
+     * Get the specified configuration value typed as an array.
+     * If the value isn't an array it should throw an exception.
+     *
+     * @param  string  $key
      * @return array<array-key, mixed>
      */
     public function array(string $key): array
@@ -209,6 +221,14 @@ class Repository implements ArrayAccess, ConfigContract
         return $value;
     }
 
+
+    /**
+     * Get the specified configuration value typed as a boolean.
+     * If the value isn't a boolean it should throw an exception.
+     *
+     * @param  string  $key
+     * @return bool
+     */
     public function boolean(string $key): bool
     {
         $value = $this->get($key);
@@ -222,6 +242,13 @@ class Repository implements ArrayAccess, ConfigContract
         return $value;
     }
 
+    /**
+     * Get the specified configuration value typed as an integer.
+     * If the value isn't an integer it should throw an exception.
+     *
+     * @param  string  $key
+     * @return int
+     */
     public function integer(string $key): int
     {
         $value = $this->get($key);
@@ -235,6 +262,14 @@ class Repository implements ArrayAccess, ConfigContract
         return $value;
     }
 
+
+    /**
+     * Get the specified configuration value typed as a float.
+     * If the value isn't a float it should throw an exception.
+     *
+     * @param  string  $key
+     * @return float
+     */
     public function float(string $key): float
     {
         $value = $this->get($key);

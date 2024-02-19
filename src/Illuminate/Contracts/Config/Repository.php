@@ -54,34 +54,4 @@ interface Repository
      * @return void
      */
     public function push($key, $value);
-
-    /**
-     * Get the specified configuration value typed as a string.
-     * If the value isn't a string it should throw an exception.
-     */
-    public function string(string $key): string;
-
-    /**
-     * Get the specified configuration value typed as an array.
-     * If the value isn't an array it should throw an exception.
-     */
-    public function array(string $key): array;
-
-    /**
-     * Get the specified configuration value typed as an integer.
-     * If the value isn't an integer it should throw an exception.
-     */
-    public function integer(string $key): int;
-
-    /**
-     * Get the specified configuration value typed as a boolean.
-     * If the value isn't a boolean it should throw an exception.
-     */
-    public function boolean(string $key): bool;
-
-    /**
-     * Get the specified configuration value typed as a float.
-     * If the value isn't a float it should throw an exception.
-     */
-    public function float(string $key): float;
 }
