@@ -172,4 +172,14 @@ class PreventRequestsDuringMaintenance
             array_merge(static::$neverPrevent, Arr::wrap($uris))
         ));
     }
+
+    /**
+     * Flush the state of the middleware.
+     *
+     * @return void
+     */
+    public static function flushState()
+    {
+        static::$neverPrevent = [];
+    }
 }

@@ -31,6 +31,7 @@ class MiddlewareTest extends TestCase
         Container::setInstance(null);
         ConvertEmptyStringsToNull::flushState();
         EncryptCookies::flushState();
+        PreventRequestsDuringMaintenance::flushState();
         TrimStrings::flushState();
         TrustProxies::flushState();
     }
@@ -258,6 +259,7 @@ class MiddlewareTest extends TestCase
     public function testPreventRequestsDuringMaintenance()
     {
         $configuration = new Middleware();
+
         $mode = Mockery::mock(MaintenanceMode::class);
         $mode->shouldReceive('active')->andReturn(true);
         $mode->shouldReceive('date')->andReturn([]);

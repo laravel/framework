@@ -211,13 +211,13 @@ class VerifyCsrfToken
     /**
      * Indicate that the given URIs should be excluded from CSRF verification.
      *
-     * @param  array|string  $paths
+     * @param  array|string  $uris
      * @return void
      */
-    public static function except($paths)
+    public static function except($uris)
     {
         static::$neverVerify = array_values(array_unique(
-            array_merge(static::$neverVerify, Arr::wrap($paths))
+            array_merge(static::$neverVerify, Arr::wrap($uris))
         ));
     }
 
