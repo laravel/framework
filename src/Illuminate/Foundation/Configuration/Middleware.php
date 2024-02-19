@@ -633,7 +633,7 @@ class Middleware
     }
 
     /**
-     * Configure the middleware to prevent requests during maintenance.
+     * Configure the middleware that prevents requests during maintenance mode.
      *
      * @param  array<int, string>  $except
      * @return $this
