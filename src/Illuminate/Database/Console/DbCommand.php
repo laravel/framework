@@ -130,7 +130,7 @@ class DbCommand extends Command
     public function getCommand(array $connection)
     {
         return [
-            'mysql' => 'mysql', 
+            'mysql' => 'mysql',
             'mariadb' => 'mysql',
             'pgsql' => 'psql',
             'sqlite' => 'sqlite3',
