@@ -63,8 +63,8 @@ class SchemaBuilderTest extends DatabaseTestCase
 
     public function testChangeToTextColumn()
     {
-        if ($this->driver !== 'mysql') {
-            $this->markTestSkipped('Test requires a MySQL connection.');
+        if (! in_array($this->driver, ['mysql', 'mariadb'])) {
+            $this->markTestSkipped('Test requires a MySQL or a MariaDB connection.');
         }
 
         Schema::create('test', function (Blueprint $table) {
@@ -88,8 +88,8 @@ class SchemaBuilderTest extends DatabaseTestCase
 
     public function testChangeTextColumnToTextColumn()
     {
-        if ($this->driver !== 'mysql') {
-            $this->markTestSkipped('Test requires a MySQL connection.');
+        if (! in_array($this->driver, ['mysql', 'mariadb'])) {
+            $this->markTestSkipped('Test requires a MySQL or a MariaDB connection.');
         }
 
         Schema::create('test', static function (Blueprint $table) {
@@ -227,7 +227,7 @@ class SchemaBuilderTest extends DatabaseTestCase
 
         $this->assertEmpty(array_diff(['foo', 'bar', 'baz'], array_column($tables, 'name')));
 
-        if (in_array($this->driver, ['mysql', 'pgsql'])) {
+        if (in_array($this->driver, ['mysql', 'mariadb', 'pgsql'])) {
             $this->assertNotEmpty(array_filter($tables, function ($table) {
                 return $table['name'] === 'foo' && $table['comment'] === 'This is a comment';
             }));
@@ -386,8 +386,8 @@ class SchemaBuilderTest extends DatabaseTestCase
 
     public function testGetFullTextIndexes()
     {
-        if (! in_array($this->driver, ['pgsql', 'mysql'])) {
-            $this->markTestSkipped('Test requires a MySQL or a PostgreSQL connection.');
+        if (! in_array($this->driver, ['mysql', 'mariadb', 'pgsql'])) {
+            $this->markTestSkipped('Test requires a MySQL, a MariaDB, or a PostgreSQL connection.');
         }
 
         Schema::create('articles', function (Blueprint $table) {
@@ -503,7 +503,7 @@ class SchemaBuilderTest extends DatabaseTestCase
 
     public function testSystemVersionedTables()
     {
-        if ($this->driver !== 'mysql' || ! $this->getConnection()->isMaria()) {
+        if ($this->driver !== 'mariadb') {
             $this->markTestSkipped('Test requires a MariaDB connection.');
         }
 

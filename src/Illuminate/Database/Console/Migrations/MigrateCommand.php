@@ -148,7 +148,7 @@ class MigrateCommand extends BaseCommand implements Isolatable
                 if (
                     $e->getPrevious() instanceof PDOException &&
                     $e->getPrevious()->getCode() === 1049 &&
-                    $connection->getDriverName() === 'mysql') {
+                    in_array($connection->getDriverName(), ['mysql', 'mariadb'])) {
                     return $this->createMissingMysqlDatabase($connection);
                 }
 
