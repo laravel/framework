@@ -148,6 +148,26 @@ class ProcessTest extends TestCase
         $this->assertTrue($result->successful());
     }
 
+    public function testBasicProcessFakeWithMultiLineCommand()
+    {
+        $factory = new Factory;
+
+        $factory->preventStrayProcesses();
+
+        $factory->fake([
+            '*' => 'The output',
+        ]);
+
+        $result = $factory->run(<<<'COMMAND'
+        git clone --depth 1 \
+              --single-branch \
+              --branch main \
+              git://some-url .
+        COMMAND);
+
+        $this->assertSame(0, $result->exitCode());
+    }
+
     public function testProcessFakeExitCodes()
     {
         $factory = new Factory;

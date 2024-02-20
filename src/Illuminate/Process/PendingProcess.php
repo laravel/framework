@@ -348,7 +348,7 @@ class PendingProcess
     protected function fakeFor(string $command)
     {
         return collect($this->fakeHandlers)
-                ->first(fn ($handler, $pattern) => Str::is($pattern, $command));
+                ->first(fn ($handler, $pattern) => $pattern === '*' || Str::is($pattern, $command));
     }
 
     /**
