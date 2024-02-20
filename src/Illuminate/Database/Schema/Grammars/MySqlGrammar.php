@@ -46,7 +46,7 @@ class MySqlGrammar extends Grammar
         $charset = $connection->getConfig('charset');
         $collation = $connection->getConfig('collation');
 
-        if (!$charset || !$collation) {
+        if (! $charset || ! $collation) {
             return sprintf(
                 'create database %s',
                 $this->wrapValue($name),
