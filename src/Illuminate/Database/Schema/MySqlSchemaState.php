@@ -15,6 +15,7 @@ class MySqlSchemaState extends SchemaState
      * @param  \Illuminate\Database\Connection  $connection
      * @param  string  $path
      * @return void
+     *
      * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
      * @throws Exception
      */
@@ -36,6 +37,7 @@ class MySqlSchemaState extends SchemaState
      *
      * @param  string  $path
      * @return void
+     *
      * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
      */
     protected function removeAutoIncrementingState(string $path)
@@ -52,6 +54,7 @@ class MySqlSchemaState extends SchemaState
      *
      * @param  string  $path
      * @return void
+     *
      * @throws Exception
      */
     protected function appendMigrationData(string $path)
@@ -148,6 +151,7 @@ class MySqlSchemaState extends SchemaState
      * @param  callable  $output
      * @param  array  $variables
      * @return \Symfony\Component\Process\Process
+     *
      * @throws Exception
      */
     protected function executeDumpProcess(Process $process, $output, array $variables)
