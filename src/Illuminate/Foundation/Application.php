@@ -757,12 +757,10 @@ class Application extends Container implements ApplicationContract, CachesConfig
     public function registerConfiguredProviders()
     {
         $providers = Collection::make($this->make('config')->get('app.providers'))
-                        ->partition(fn ($provider) => str_starts_with($provider, 'Illuminate\\'));
+            ->merge($this->make(PackageManifest::class)->providers())
+            ->toArray();
 
-        $providers->splice(1, 0, [$this->make(PackageManifest::class)->providers()]);
-
-        (new ProviderRepository($this, new Filesystem, $this->getCachedServicesPath()))
-                    ->load($providers->collapse()->toArray());
+        (new ProviderRepository($this, new Filesystem, $this->getCachedServicesPath()))->load($providers);
     }
 
     /**
