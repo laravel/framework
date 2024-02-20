@@ -10,12 +10,14 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\MultipleRecordsFoundException;
 use Illuminate\Database\Query\Expression;
+use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\ForwardsCalls;
 use Illuminate\Support\Traits\Macroable;
+use Illuminate\Support\Traits\Tappable;
 
 abstract class Relation implements BuilderContract
 {
-    use ForwardsCalls, Macroable {
+    use Conditionable, ForwardsCalls, Macroable, Tappable {
         Macroable::__call as macroCall;
     }
 
