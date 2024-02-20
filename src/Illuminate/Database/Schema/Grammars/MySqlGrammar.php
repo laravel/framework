@@ -56,8 +56,8 @@ class MySqlGrammar extends Grammar
         return sprintf(
             'create database %s default character set %s default collate %s',
             $this->wrapValue($name),
-            $this->wrapValue($connection->getConfig('charset')),
-            $this->wrapValue($connection->getConfig('collation')),
+            $this->wrapValue($charset),
+            $this->wrapValue($collation),
         );
     }
 
