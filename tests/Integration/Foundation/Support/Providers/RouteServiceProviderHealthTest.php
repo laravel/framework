@@ -32,4 +32,3 @@ class RouteServiceProviderHealthTest extends TestCase
         $this->get('/up')->assertOk();
     }
 }
-
