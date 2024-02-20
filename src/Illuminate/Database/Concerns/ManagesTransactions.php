@@ -42,8 +42,9 @@ trait ManagesTransactions
             }
 
             try {
+                $this->fireConnectionEvent('committing');
+
                 if ($this->transactions == 1) {
-                    $this->fireConnectionEvent('committing');
                     $this->getPdo()->commit();
                 }
 
@@ -198,8 +199,9 @@ trait ManagesTransactions
      */
     public function commit()
     {
+        $this->fireConnectionEvent('committing');
+
         if ($this->transactionLevel() == 1) {
-            $this->fireConnectionEvent('committing');
             $this->getPdo()->commit();
         }
 
