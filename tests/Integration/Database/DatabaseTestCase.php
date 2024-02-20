@@ -32,10 +32,5 @@ abstract class DatabaseTestCase extends TestCase
         $connection = $app['config']->get('database.default');
 
         $this->driver = $app['config']->get("database.connections.$connection.driver");
-
-        // TODO: Adjust orchestra/testbench-core/laravel/config/database.php
-        if ($connection === 'mariadb') {
-            $this->driver = 'mariadb';
-        }
     }
 }
