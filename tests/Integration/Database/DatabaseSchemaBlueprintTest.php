@@ -406,7 +406,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
 
         $expected = [
             'alter table `users` modify `name` varchar(255) null',
-            'alter table `users` add unique `users_name_unique`(`name`)',
+            'alter table `users` add unique `users_name_unique` (`name`)',
         ];
 
         $this->assertEquals($expected, $queries);
@@ -470,7 +470,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
 
         $expected = [
             'alter table `users` modify `name` varchar(255) null',
-            'alter table `users` add unique `index1`(`name`)',
+            'alter table `users` add unique `index1` (`name`)',
         ];
 
         $this->assertEquals($expected, $queries);

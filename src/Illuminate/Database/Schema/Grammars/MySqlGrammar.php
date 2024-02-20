@@ -203,14 +203,14 @@ class MySqlGrammar extends Grammar
     {
         $tableStructure = $this->getColumns($blueprint);
 
-        if ($primaryKey = $this->getCommandByName($blueprint, 'primary')) {
-            $tableStructure[] = sprintf(
-                'primary key %s(%s)',
-                $primaryKey->algorithm ? 'using '.$primaryKey->algorithm : '',
-                $this->columnize($primaryKey->columns)
-            );
+        foreach (['index', 'fulltext', 'spatialIndex', 'primary', 'unique'] as $index) {
+            foreach ($this->getCommandsByName($blueprint, $index) as $command) {
+                $method = 'compile'.ucfirst($index);
 
-            $primaryKey->shouldBeSkipped = true;
+                $tableStructure[] = $this->$method($blueprint, $command);
+
+                $command->shouldBeSkipped = true;
+            }
         }
 
         return sprintf('%s table %s (%s)',
@@ -383,11 +383,9 @@ class MySqlGrammar extends Grammar
      */
     public function compilePrimary(Blueprint $blueprint, Fluent $command)
     {
-        return sprintf('alter table %s add primary key %s(%s)',
-            $this->wrapTable($blueprint),
-            $command->algorithm ? 'using '.$command->algorithm : '',
-            $this->columnize($command->columns)
-        );
+        $command->index(null);
+
+        return $this->compileKey($blueprint, $command, 'primary key');
     }
 
     /**
@@ -448,11 +446,11 @@ class MySqlGrammar extends Grammar
      */
     protected function compileKey(Blueprint $blueprint, Fluent $command, $type)
     {
-        return sprintf('alter table %s add %s %s%s(%s)',
-            $this->wrapTable($blueprint),
+        return sprintf('%s%s%s %s(%s)',
+            $blueprint->creating() ? '' : 'alter table '.$this->wrapTable($blueprint).' add ',
             $type,
-            $this->wrap($command->index),
-            $command->algorithm ? ' using '.$command->algorithm : '',
+            $command->index ? ' '.$this->wrap($command->index) : '',
+            $command->algorithm ? 'using '.$command->algorithm : '',
             $this->columnize($command->columns)
         );
     }

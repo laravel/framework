@@ -148,6 +148,23 @@ class SchemaBuilderTest extends DatabaseTestCase
         $this->assertTrue(Schema::hasIndex('test', ['id', 'uuid'], 'primary'));
     }
 
+    public function testNonPrimaryAutoIncrementColumn()
+    {
+        if ($this->driver === 'sqlite') {
+            $this->markTestSkipped('non-primary auto-increment column is not supported on SQLite.');
+        }
+
+        Schema::create('test', function (Blueprint $table) {
+            $table->uuid()->primary();
+            $table->id()->unique();
+        });
+
+        $this->assertTrue(collect(Schema::getColumns('test'))->firstWhere('name', 'id')['auto_increment']);
+        $this->assertTrue(Schema::hasIndex('test', ['uuid'], 'primary'));
+        $this->assertTrue(Schema::hasIndex('test', ['id'], 'unique'));
+        $this->assertTrue(Schema::hasIndex('test', 'test_id_unique', 'unique'));
+    }
+
     public function testModifyingAutoIncrementColumn()
     {
         if ($this->driver === 'sqlsrv') {

@@ -365,7 +365,7 @@ class DatabaseMariaDbSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertSame('alter table `users` add unique `bar`(`foo`)', $statements[0]);
+        $this->assertSame('alter table `users` add unique `bar` (`foo`)', $statements[0]);
     }
 
     public function testAddingIndex()
@@ -375,7 +375,7 @@ class DatabaseMariaDbSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertSame('alter table `users` add index `baz`(`foo`, `bar`)', $statements[0]);
+        $this->assertSame('alter table `users` add index `baz` (`foo`, `bar`)', $statements[0]);
     }
 
     public function testAddingIndexWithAlgorithm()
@@ -395,7 +395,7 @@ class DatabaseMariaDbSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertSame('alter table `users` add fulltext `users_body_fulltext`(`body`)', $statements[0]);
+        $this->assertSame('alter table `users` add fulltext `users_body_fulltext` (`body`)', $statements[0]);
     }
 
     public function testAddingSpatialIndex()
@@ -405,7 +405,7 @@ class DatabaseMariaDbSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertSame('alter table `geo` add spatial index `geo_coordinates_spatialindex`(`coordinates`)', $statements[0]);
+        $this->assertSame('alter table `geo` add spatial index `geo_coordinates_spatialindex` (`coordinates`)', $statements[0]);
     }
 
     public function testAddingFluentSpatialIndex()
@@ -415,7 +415,7 @@ class DatabaseMariaDbSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(2, $statements);
-        $this->assertSame('alter table `geo` add spatial index `geo_coordinates_spatialindex`(`coordinates`)', $statements[1]);
+        $this->assertSame('alter table `geo` add spatial index `geo_coordinates_spatialindex` (`coordinates`)', $statements[1]);
     }
 
     public function testAddingRawIndex()
@@ -425,7 +425,48 @@ class DatabaseMariaDbSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertSame('alter table `users` add index `raw_index`((function(column)))', $statements[0]);
+        $this->assertSame('alter table `users` add index `raw_index` ((function(column)))', $statements[0]);
+    }
+
+    public function testAddingIndexesOnCreate()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->create();
+        $blueprint->integer('col1');
+        $blueprint->integer('col2');
+        $blueprint->integer('col3');
+        $blueprint->string('col4');
+        $blueprint->geometry('col5');
+        $blueprint->primary('col1');
+        $blueprint->unique('col2');
+        $blueprint->index('col3');
+        $blueprint->fullText('col4');
+        $blueprint->spatialIndex('col5');
+
+        $conn = $this->getConnection();
+        $conn->shouldReceive('getConfig')->andReturn(null);
+
+        $statements = $blueprint->toSql($conn, $this->getGrammar());
+
+        $this->assertEquals(['create table `users` (`col1` int not null, `col2` int not null, `col3` int not null, `col4` varchar(255) not null, `col5` geometry not null, index `users_col3_index` (`col3`), fulltext `users_col4_fulltext` (`col4`), spatial index `users_col5_spatialindex` (`col5`), primary key (`col1`), unique `users_col2_unique` (`col2`))'], $statements);
+    }
+
+    public function testFluentAddingIndexesOnCreate()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->create();
+        $blueprint->integer('col1')->primary();
+        $blueprint->integer('col2')->unique();
+        $blueprint->integer('col3')->index();
+        $blueprint->string('col4')->fulltext();
+        $blueprint->geometry('col5')->spatialIndex();
+
+        $conn = $this->getConnection();
+        $conn->shouldReceive('getConfig')->andReturn(null);
+
+        $statements = $blueprint->toSql($conn, $this->getGrammar());
+
+        $this->assertEquals(['create table `users` (`col1` int not null, `col2` int not null, `col3` int not null, `col4` varchar(255) not null, `col5` geometry not null, index `users_col3_index` (`col3`), fulltext `users_col4_fulltext` (`col4`), spatial index `users_col5_spatialindex` (`col5`), primary key (`col1`), unique `users_col2_unique` (`col2`))'], $statements);
     }
 
     public function testAddingForeignKey()
