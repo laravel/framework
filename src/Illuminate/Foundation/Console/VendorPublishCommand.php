@@ -410,6 +410,6 @@ class VendorPublishCommand extends Command
      */
     public static function flushState()
     {
-        static::$updateMigrationDate = true;
+        static::$updateMigrationsDate = true;
     }
 }
