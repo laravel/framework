@@ -130,14 +130,21 @@ class Number
      * @param  int|float  $bytes
      * @param  int  $precision
      * @param  int|null  $maxPrecision
+     * @param  bool $useSiUnits
      * @return string
      */
-    public static function fileSize(int|float $bytes, int $precision = 0, ?int $maxPrecision = null)
+    public static function fileSize(int|float $bytes, int $precision = 0, ?int $maxPrecision = null, ?bool $useSiUnits = false)
     {
-        $units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
-
-        for ($i = 0; ($bytes / 1024) > 0.9 && ($i < count($units) - 1); $i++) {
-            $bytes /= 1024;
+        if ($useSiUnits) {
+            $units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+            $divisor = 1000;
+        } else {
+            $units = ['B', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB'];
+            $divisor = 1024;
+        }
+        
+        for ($i = 0; ($bytes / $divisor) > 0.9 && ($i < count($units) - 1); $i++) {
+            $bytes /= $divisor;
         }
 
         return sprintf('%s %s', static::format($bytes, $precision, $maxPrecision), $units[$i]);
