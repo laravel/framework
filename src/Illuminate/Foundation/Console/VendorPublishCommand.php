@@ -69,7 +69,7 @@ class VendorPublishCommand extends Command
     protected $description = 'Publish any publishable assets from vendor packages';
 
     /**
-     * Indicates if the migrations date should be updated.
+     * Indicates if migration dates should be updated while publishing.
      *
      * @var bool
      */
