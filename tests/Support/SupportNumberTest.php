@@ -297,8 +297,8 @@ class SupportNumberTest extends TestCase
     public function testIsInt()
     {
         $this->assertTrue(Number::isInt(1));
-        $this->assertTrue( Number::isInt(0));
-        $this->assertTrue( Number::isInt(-1));
+        $this->assertTrue(Number::isInt(0));
+        $this->assertTrue(Number::isInt(-1));
         $this->assertFalse(Number::isInt(1.1));
         $this->assertFalse(Number::isInt(0.1));
         $this->assertFalse(Number::isInt(-1.1));
