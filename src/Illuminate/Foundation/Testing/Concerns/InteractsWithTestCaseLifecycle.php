@@ -9,7 +9,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Bootstrap\HandleExceptions;
 use Illuminate\Foundation\Bootstrap\RegisterProviders;
 use Illuminate\Foundation\Console\AboutCommand;
-use Illuminate\Foundation\Console\VendorPublishCommand;
 use Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull;
 use Illuminate\Foundation\Http\Middleware\TrimStrings;
 use Illuminate\Foundation\Http\Middleware\ValidateCsrfToken;
@@ -177,7 +176,6 @@ trait InteractsWithTestCaseLifecycle
         TrustProxies::flushState();
         TrustHosts::flushState();
         ValidateCsrfToken::flushState();
-        VendorPublishCommand::flushState();
 
         if ($this->callbackException) {
             throw $this->callbackException;

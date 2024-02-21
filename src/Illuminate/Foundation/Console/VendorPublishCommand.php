@@ -73,7 +73,7 @@ class VendorPublishCommand extends Command
      *
      * @var bool
      */
-    protected static $updateMigrationsDate = true;
+    protected static $updateMigrationDates = true;
 
     /**
      * Create a new command instance.
@@ -348,7 +348,7 @@ class VendorPublishCommand extends Command
      */
     protected function ensureMigrationNameIsUpToDate($from, $to)
     {
-        if (static::$updateMigrationsDate === false) {
+        if (static::$updateMigrationDates === false) {
             return $to;
         }
 
@@ -394,22 +394,12 @@ class VendorPublishCommand extends Command
     }
 
     /**
-     * Intructs the command to not update the migrations date on publish.
+     * Intructs the command to not update the dates on migrations when publishing.
      *
      * @return void
      */
-    public static function dontUpdateMigrationsDate()
+    public static function dontUpdateMigrationDates()
     {
-        static::$updateMigrationsDate = false;
-    }
-
-    /**
-     * Flush the global state of the command.
-     *
-     * @return void
-     */
-    public static function flushState()
-    {
-        static::$updateMigrationsDate = true;
+        static::$updateMigrationDates = false;
     }
 }
