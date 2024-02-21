@@ -44,6 +44,7 @@ use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Str;
 use Illuminate\Support\Stringable;
+use Illuminate\Support\ValidatedInput;
 use InvalidArgumentException;
 use LogicException;
 use Mockery as m;
@@ -622,6 +623,18 @@ class DatabaseEloquentModelTest extends TestCase
         $_SERVER['__eloquent.saved'] = false;
         $model = EloquentModelSaveStub::make(['name' => 'taylor']);
         $this->assertFalse($_SERVER['__eloquent.saved']);
+        $this->assertSame('taylor', $model->name);
+    }
+
+    public function testMakeMethodAllowsSafeObject()
+    {
+        $model = EloquentModelSaveStub::make(new ValidatedInput(['name' => 'taylor']));
+        $this->assertSame('taylor', $model->name);
+    }
+
+    public function testConstructorAllowsSafeObject()
+    {
+        $model = new EloquentModelSaveStub(new ValidatedInput(['name' => 'taylor']));
         $this->assertSame('taylor', $model->name);
     }
 
@@ -1432,6 +1445,35 @@ class DatabaseEloquentModelTest extends TestCase
         $model->fill(['name' => 'foo', 'age' => 'bar']);
         $this->assertSame('foo', $model->name);
         $this->assertSame('bar', $model->age);
+    }
+
+    public function testFillingWithSafeObject()
+    {
+        $model = new EloquentModelStub;
+        $model->fill(new ValidatedInput(['name' => 'foo', 'age' => 'bar']));
+        $this->assertSame('foo', $model->name);
+        $this->assertSame('bar', $model->age);
+    }
+
+    public function testFillingTotallyGuardedModelWithSafeObject()
+    {
+        $model = new EloquentModelStub;
+        $model->guard(['*']);
+        $model->fill(new ValidatedInput(['name' => 'foo', 'age' => 'bar']));
+        $this->assertSame('foo', $model->name);
+        $this->assertSame('bar', $model->age);
+        $this->assertFalse($model::isUnguarded());
+    }
+
+    public function testFillingWithSafeObjectPreservesGuardedState()
+    {
+        $model = new EloquentModelStub;
+        $model->guard(['*']);
+        $model::unguard();
+        $model->fill(new ValidatedInput(['name' => 'foo', 'age' => 'bar']));
+        $this->assertSame('foo', $model->name);
+        $this->assertSame('bar', $model->age);
+        $this->assertTrue($model::isUnguarded());
     }
 
     public function testQualifyColumn()

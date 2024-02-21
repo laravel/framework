@@ -151,10 +151,10 @@ class Builder implements BuilderContract
     /**
      * Create and return an un-saved model instance.
      *
-     * @param  array  $attributes
+     * @param  array|\Illuminate\Support\ValidatedInput  $attributes
      * @return \Illuminate\Database\Eloquent\Model|static
      */
-    public function make(array $attributes = [])
+    public function make($attributes = [])
     {
         return $this->newModelInstance($attributes);
     }
@@ -1017,10 +1017,10 @@ class Builder implements BuilderContract
     /**
      * Save a new model and return the instance.
      *
-     * @param  array  $attributes
+     * @param  array|\Illuminate\Support\ValidatedInput  $attributes
      * @return \Illuminate\Database\Eloquent\Model|$this
      */
-    public function create(array $attributes = [])
+    public function create($attributes = [])
     {
         return tap($this->newModelInstance($attributes), function ($instance) {
             $instance->save();
