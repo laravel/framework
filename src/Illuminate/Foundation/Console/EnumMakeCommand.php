@@ -49,17 +49,6 @@ class EnumMakeCommand extends GeneratorCommand
     }
 
     /**
-     * Get the default namespace for the class.
-     *
-     * @param  string  $rootNamespace
-     * @return string
-     */
-    protected function getDefaultNamespace($rootNamespace)
-    {
-        return $rootNamespace;
-    }
-
-    /**
      * Build the class with the given name.
      *
      * @param  string  $name
