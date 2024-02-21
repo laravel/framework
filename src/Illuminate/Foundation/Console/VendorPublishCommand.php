@@ -394,7 +394,7 @@ class VendorPublishCommand extends Command
     }
 
     /**
-     * Intructs the command to not update the dates on migrations when publishing.
+     * Intruct the command to not update the dates on migrations when publishing.
      *
      * @return void
      */
