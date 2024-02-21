@@ -7,9 +7,6 @@ use Illuminate\Contracts\Cache\Repository as Cache;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @group debug
- */
 class CacheRateLimiterTest extends TestCase
 {
     protected function tearDown(): void

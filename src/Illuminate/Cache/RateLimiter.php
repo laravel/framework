@@ -94,7 +94,7 @@ class RateLimiter
     public function tooManyAttempts($key, $maxAttempts)
     {
         if ($this->attempts($key) >= $maxAttempts) {
-            if ($this->cache->has($this->cleanRateLimiterKey($key) . ':timer')) {
+            if ($this->cache->has($this->cleanRateLimiterKey($key).':timer')) {
                 return true;
             }
 
@@ -212,7 +212,7 @@ class RateLimiter
 
         $this->resetAttempts($key);
 
-        $this->cache->forget($key . ':timer');
+        $this->cache->forget($key.':timer');
     }
 
     /**
@@ -225,7 +225,7 @@ class RateLimiter
     {
         $key = $this->cleanRateLimiterKey($key);
 
-        return max(0, $this->cache->get($key . ':timer') - $this->currentTime());
+        return max(0, $this->cache->get($key.':timer') - $this->currentTime());
     }
 
     /**
