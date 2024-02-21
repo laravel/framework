@@ -294,6 +294,20 @@ class SupportNumberTest extends TestCase
         $this->assertSame('-1KQ', Number::abbreviate(-1000000000000000000));
     }
 
+    public function testIsInt()
+    {
+        $this->assertSame(true, Number::isInt(1));
+        $this->assertSame(true, Number::isInt(0));
+        $this->assertSame(true, Number::isInt(-1));
+        $this->assertSame(false, Number::isInt(1.1));
+        $this->assertSame(false, Number::isInt(0.1));
+        $this->assertSame(false, Number::isInt(-1.1));
+        $this->assertSame(false, Number::isInt('1'));
+        $this->assertSame(false, Number::isInt('0'));
+        $this->assertSame(false, Number::isInt('-1'));
+        $this->assertSame(false, Number::isInt('1.1'));
+    }
+
     protected function needsIntlExtension()
     {
         if (! extension_loaded('intl')) {
