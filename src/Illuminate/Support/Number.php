@@ -272,4 +272,15 @@ class Number
             throw new RuntimeException('The "intl" PHP extension is required to use the ['.$method.'] method.');
         }
     }
+
+    /**
+     * Determines if a number is numeric.
+     *
+     * @param  int|float|string  $number
+     * @return bool
+     */
+    public static function isInt(int|float|string $number): bool
+    {
+        return is_int($number);
+    }
 }
