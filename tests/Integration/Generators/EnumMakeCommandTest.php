@@ -16,4 +16,15 @@ class EnumMakeCommandTest extends TestCase
             'enum StatusEnum',
         ], 'app/StatusEnum.php');
     }
+
+    public function testItCanGenerateEnumFileWithString()
+    {
+        $this->artisan('make:enum', ['name' => 'StatusEnum', '--string' => true])
+            ->assertExitCode(0);
+
+        $this->assertFileContains([
+            'namespace App;',
+            'enum StatusEnum: string',
+        ], 'app/StatusEnum.php');
+    }
 }
