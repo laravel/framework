@@ -159,18 +159,34 @@ class SupportNumberTest extends TestCase
         $this->assertSame('0 B', Number::fileSize(0));
         $this->assertSame('0.00 B', Number::fileSize(0, precision: 2));
         $this->assertSame('1 B', Number::fileSize(1));
-        $this->assertSame('1 KB', Number::fileSize(1024));
-        $this->assertSame('2 KB', Number::fileSize(2048));
-        $this->assertSame('2.00 KB', Number::fileSize(2048, precision: 2));
-        $this->assertSame('1.23 KB', Number::fileSize(1264, precision: 2));
-        $this->assertSame('1.234 KB', Number::fileSize(1264.12345, maxPrecision: 3));
-        $this->assertSame('1.234 KB', Number::fileSize(1264, 3));
-        $this->assertSame('5 GB', Number::fileSize(1024 * 1024 * 1024 * 5));
-        $this->assertSame('10 TB', Number::fileSize((1024 ** 4) * 10));
-        $this->assertSame('10 PB', Number::fileSize((1024 ** 5) * 10));
-        $this->assertSame('1 ZB', Number::fileSize(1024 ** 7));
-        $this->assertSame('1 YB', Number::fileSize(1024 ** 8));
-        $this->assertSame('1,024 YB', Number::fileSize(1024 ** 9));
+        $this->assertSame('1 KiB', Number::fileSize(1024));
+        $this->assertSame('2 KiB', Number::fileSize(2048));
+        $this->assertSame('2.00 KiB', Number::fileSize(2048, precision: 2));
+        $this->assertSame('1.23 KiB', Number::fileSize(1264, precision: 2));
+        $this->assertSame('1.234 KiB', Number::fileSize(1264.12345, maxPrecision: 3));
+        $this->assertSame('1.234 KiB', Number::fileSize(1264, 3));
+        $this->assertSame('5 GiB', Number::fileSize(1024 * 1024 * 1024 * 5));
+        $this->assertSame('10 TiB', Number::fileSize((1024 ** 4) * 10));
+        $this->assertSame('10 PiB', Number::fileSize((1024 ** 5) * 10));
+        $this->assertSame('1 ZiB', Number::fileSize(1024 ** 7));
+        $this->assertSame('1 YiB', Number::fileSize(1024 ** 8));
+        $this->assertSame('1,024 YiB', Number::fileSize(1024 ** 9));
+
+        $this->assertSame('0 B', Number::fileSize(0, useSiUnits: true));
+        $this->assertSame('0.00 B', Number::fileSize(0, precision: 2, useSiUnits: true));
+        $this->assertSame('1 B', Number::fileSize(1, useSiUnits: true));
+        $this->assertSame('1 KB', Number::fileSize(1000, useSiUnits: true));
+        $this->assertSame('2 KB', Number::fileSize(2000, useSiUnits: true));
+        $this->assertSame('2.05 KB', Number::fileSize(2048, precision: 2, useSiUnits: true));
+        $this->assertSame('1.26 KB', Number::fileSize(1264, precision: 2, useSiUnits: true));
+        $this->assertSame('1.264 KB', Number::fileSize(1264.12345, maxPrecision: 3, useSiUnits: true));
+        $this->assertSame('1.264 KB', Number::fileSize(1264, 3, useSiUnits: true));
+        $this->assertSame('5 GB', Number::fileSize(1000 * 1000 * 1000 * 5, useSiUnits: true));
+        $this->assertSame('10 TB', Number::fileSize((1000 ** 4) * 10, useSiUnits: true));
+        $this->assertSame('10 PB', Number::fileSize((1000 ** 5) * 10, useSiUnits: true));
+        $this->assertSame('1 ZB', Number::fileSize(1000 ** 7, useSiUnits: true));
+        $this->assertSame('1 YB', Number::fileSize(1000 ** 8, useSiUnits: true));
+        $this->assertSame('1,238 YB', Number::fileSize(1024 ** 9, useSiUnits: true));
     }
 
     public function testClamp()
