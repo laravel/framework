@@ -120,9 +120,9 @@ class RateLimiter
      * Increment the counter for a given key for a given decay time by a custom
      * amount.
      *
-     * @param string $key
-     * @param int $decaySeconds
-     * @param int $step
+     * @param  string  $key
+     * @param  int  $decaySeconds
+     * @param  int  $step
      * @return int
      */
     public function increment($key, $decaySeconds = 60, $step = 1)
@@ -130,7 +130,7 @@ class RateLimiter
         $key = $this->cleanRateLimiterKey($key);
 
         $this->cache->add(
-            $key . ':timer',
+            $key.':timer',
             $this->availableAt($decaySeconds),
             $decaySeconds
         );
@@ -139,7 +139,7 @@ class RateLimiter
 
         $hits = (int) $this->cache->increment($key, $step);
 
-        if (!$added && $hits == 1) {
+        if (! $added && $hits == 1) {
             $this->cache->put($key, 1, $decaySeconds);
         }
 
