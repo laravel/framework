@@ -7,6 +7,7 @@ use ErrorException;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Foundation\Http\MaintenanceModeBypassCookie;
 use Illuminate\Foundation\Http\Middleware\Concerns\ExcludesPaths;
+use Illuminate\Support\Arr;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class PreventRequestsDuringMaintenance
@@ -19,6 +20,13 @@ class PreventRequestsDuringMaintenance
      * @var \Illuminate\Contracts\Foundation\Application
      */
     protected $app;
+
+    /**
+     * The URIs that should be accessible during maintenance.
+     *
+     * @var array
+     */
+    protected static $neverPrevent = [];
 
     /**
      * Create a new middleware instance.
@@ -140,5 +148,38 @@ class PreventRequestsDuringMaintenance
         }
 
         return $headers;
+    }
+
+    /**
+     * Get the URIs that should be excluded.
+     *
+     * @return array
+     */
+    public function getExcludedPaths()
+    {
+        return array_merge($this->except, static::$neverPrevent);
+    }
+
+    /**
+     * Indicate that the given URIs should always be accessible.
+     *
+     * @param  array|string  $uris
+     * @return void
+     */
+    public static function except($uris)
+    {
+        static::$neverPrevent = array_values(array_unique(
+            array_merge(static::$neverPrevent, Arr::wrap($uris))
+        ));
+    }
+
+    /**
+     * Flush the state of the middleware.
+     *
+     * @return void
+     */
+    public static function flushState()
+    {
+        static::$neverPrevent = [];
     }
 }

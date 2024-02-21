@@ -8,6 +8,7 @@ use Illuminate\Auth\Middleware\Authenticate;
 use Illuminate\Auth\Middleware\RedirectIfAuthenticated;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull;
+use Illuminate\Foundation\Http\Middleware\PreventRequestsDuringMaintenance;
 use Illuminate\Foundation\Http\Middleware\TrimStrings;
 use Illuminate\Foundation\Http\Middleware\ValidateCsrfToken;
 use Illuminate\Http\Middleware\TrustHosts;
@@ -627,6 +628,19 @@ class Middleware
         if (! is_null($headers)) {
             TrustProxies::withHeaders($headers);
         }
+
+        return $this;
+    }
+
+    /**
+     * Configure the middleware that prevents requests during maintenance mode.
+     *
+     * @param  array<int, string>  $except
+     * @return $this
+     */
+    public function preventRequestsDuringMaintenance(array $except = [])
+    {
+        PreventRequestsDuringMaintenance::except($except);
 
         return $this;
     }
