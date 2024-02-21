@@ -180,7 +180,6 @@ class Repository implements ArrayAccess, ConfigContract
         $this->set($key, null);
     }
 
-
     /**
      * Get the specified configuration value typed as a string.
      * If the value isn't a string it should throw an exception.
@@ -221,7 +220,6 @@ class Repository implements ArrayAccess, ConfigContract
         return $value;
     }
 
-
     /**
      * Get the specified configuration value typed as a boolean.
      * If the value isn't a boolean it should throw an exception.
@@ -261,7 +259,6 @@ class Repository implements ArrayAccess, ConfigContract
 
         return $value;
     }
-
 
     /**
      * Get the specified configuration value typed as a float.
