@@ -1384,6 +1384,22 @@ class SupportStrTest extends TestCase
         $this->assertSame('foo', Str::fromBase64(base64_encode('foo')));
         $this->assertSame('foobar', Str::fromBase64(base64_encode('foobar'), true));
     }
+    
+    public function testDotify()
+    {
+        $this->assertEquals('foo', Str::dotify('foo'));
+        $this->assertEquals('foo', Str::dotify('foo[]'));
+        $this->assertEquals('foo', Str::dotify('foo[][]'));
+        $this->assertEquals('foo', Str::dotify('foo[""]'));
+        $this->assertEquals('foo', Str::dotify('foo['));
+        $this->assertEquals('foo', Str::dotify('foo]'));
+        
+        $this->assertEquals('foo.*', Str::dotify('foo[*]'));
+        $this->assertEquals('foo.0', Str::dotify('foo[0]'));
+        $this->assertEquals('foo.bar', Str::dotify('foo[bar]'));
+        $this->assertEquals('foo.bar.baz', Str::dotify('foo[bar][baz]'));
+        $this->assertEquals('foo.bar.baz', Str::dotify('foo[\'bar\']["baz"]'));
+    }
 }
 
 class StringableObjectStub

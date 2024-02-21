@@ -43,6 +43,13 @@ class Str
      * @var array
      */
     protected static $studlyCache = [];
+    
+    /**
+     * The cache of dotified words.
+     *
+     * @var array
+     */
+    protected static $dotifyCache = [];
 
     /**
      * The callback that should be used to generate UUIDs.
@@ -1832,6 +1839,30 @@ class Str
 
         return $ulid;
     }
+    
+    /**
+     * Converts an array notation string to its dot notation equivalent.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    public static function dotify($value)
+    {
+        if (isset(static::$dotifyCache[$value])) {
+            return static::$dotifyCache[$value];
+        }
+        
+        $value = str_replace([ "'", '"' ], '', $value);
+        $value = str_replace('][', '.', $value);
+        $value = str_replace('[', '.', $value);
+        
+        static::$dotifyCache[$value] = trim(
+            rtrim($value, ']'),
+            '.'
+        );
+        
+        return static::$dotifyCache[$value];
+    }
 
     /**
      * Remove all strings from the casing caches.
@@ -1843,5 +1874,6 @@ class Str
         static::$snakeCache = [];
         static::$camelCache = [];
         static::$studlyCache = [];
+        static::$dotifyCache = [];
     }
 }
