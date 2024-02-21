@@ -1273,12 +1273,12 @@ class BelongsToMany extends Relation
     /**
      * Create a new instance of the related model.
      *
-     * @param  array  $attributes
+     * @param  array|\Illuminate\Support\ValidatedInput  $attributes
      * @param  array  $joining
      * @param  bool  $touch
      * @return \Illuminate\Database\Eloquent\Model
      */
-    public function create(array $attributes = [], array $joining = [], $touch = true)
+    public function create($attributes = [], array $joining = [], $touch = true)
     {
         $instance = $this->related->newInstance($attributes);
 

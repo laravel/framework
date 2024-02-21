@@ -1008,13 +1008,13 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     /**
      * Update the model in the database within a transaction.
      *
-     * @param  array  $attributes
+     * @param  array|\Illuminate\Support\ValidatedInput  $attributes
      * @param  array  $options
      * @return bool
      *
      * @throws \Throwable
      */
-    public function updateOrFail(array $attributes = [], array $options = [])
+    public function updateOrFail($attributes = [], array $options = [])
     {
         if (! $this->exists) {
             return false;
@@ -1026,11 +1026,11 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     /**
      * Update the model in the database without raising any events.
      *
-     * @param  array  $attributes
+     * @param  array|\Illuminate\Support\ValidatedInput  $attributes
      * @param  array  $options
      * @return bool
      */
-    public function updateQuietly(array $attributes = [], array $options = [])
+    public function updateQuietly($attributes = [], array $options = [])
     {
         if (! $this->exists) {
             return false;
