@@ -171,6 +171,14 @@ class ApplicationBuilder
                 Route::middleware('api')->prefix($apiPrefix)->group($api);
             }
 
+            if (is_string($health)) {
+                Route::middleware('web')->get($health, function () {
+                    Event::dispatch(new DiagnosingHealth);
+
+                    return View::file(__DIR__.'/../resources/health-up.blade.php');
+                });
+            }
+
             if (is_string($web) && realpath($web) !== false) {
                 Route::middleware('web')->group($web);
             }
@@ -179,14 +187,6 @@ class ApplicationBuilder
                 realpath($pages) !== false &&
                 class_exists(Folio::class)) {
                 Folio::route($pages, middleware: $this->pageMiddleware);
-            }
-
-            if (is_string($health)) {
-                Route::middleware('web')->get($health, function () {
-                    Event::dispatch(new DiagnosingHealth);
-
-                    return View::file(__DIR__.'/../resources/health-up.blade.php');
-                });
             }
 
             if (is_callable($then)) {
