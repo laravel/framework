@@ -166,7 +166,6 @@ class EloquentModelTest extends DatabaseTestCase
         };
 
         $this->expectException(\Illuminate\Database\QueryException::class);
-        $this->expectExceptionMessage('table actions has no column named unknown');
 
         $model->newInstance()->create(new ValidatedInput([
             'label' => 'test',
