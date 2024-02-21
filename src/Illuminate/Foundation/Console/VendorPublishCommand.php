@@ -69,6 +69,13 @@ class VendorPublishCommand extends Command
     protected $description = 'Publish any publishable assets from vendor packages';
 
     /**
+     * Indicates if migration dates should be updated while publishing.
+     *
+     * @var bool
+     */
+    protected static $updateMigrationDates = true;
+
+    /**
      * Create a new command instance.
      *
      * @param  \Illuminate\Filesystem\Filesystem  $files
@@ -341,6 +348,10 @@ class VendorPublishCommand extends Command
      */
     protected function ensureMigrationNameIsUpToDate($from, $to)
     {
+        if (static::$updateMigrationDates === false) {
+            return $to;
+        }
+
         $from = realpath($from);
 
         foreach (ServiceProvider::publishableMigrationPaths() as $path) {
@@ -380,5 +391,15 @@ class VendorPublishCommand extends Command
             $from,
             $to,
         ));
+    }
+
+    /**
+     * Intruct the command to not update the dates on migrations when publishing.
+     *
+     * @return void
+     */
+    public static function dontUpdateMigrationDates()
+    {
+        static::$updateMigrationDates = false;
     }
 }
