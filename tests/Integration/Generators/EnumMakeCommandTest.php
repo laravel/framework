@@ -19,12 +19,23 @@ class EnumMakeCommandTest extends TestCase
 
     public function testItCanGenerateEnumFileWithString()
     {
-        $this->artisan('make:enum', ['name' => 'StatusEnum', '--string' => true])
+        $this->artisan('make:enum', ['name' => 'StringEnum', '--string' => true])
             ->assertExitCode(0);
 
         $this->assertFileContains([
             'namespace App;',
-            'enum StatusEnum: string',
-        ], 'app/StatusEnum.php');
+            'enum StringEnum: string',
+        ], 'app/StringEnum.php');
+    }
+
+    public function testItCanGenerateEnumFileWithInt()
+    {
+        $this->artisan('make:enum', ['name' => 'IntEnum', '--int' => true])
+            ->assertExitCode(0);
+
+        $this->assertFileContains([
+            'namespace App;',
+            'enum IntEnum: int',
+        ], 'app/IntEnum.php');
     }
 }
