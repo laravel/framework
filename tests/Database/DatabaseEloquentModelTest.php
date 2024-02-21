@@ -7,12 +7,15 @@ use DateTimeImmutable;
 use DateTimeInterface;
 use Exception;
 use Foo\Bar\EloquentModelNamespacedStub;
+use Illuminate\Contracts\Database\Eloquent\Castable;
+use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 use Illuminate\Contracts\Database\Eloquent\CastsInboundAttributes;
 use Illuminate\Contracts\Encryption\Encrypter;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Connection;
 use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\ArrayObject;
 use Illuminate\Database\Eloquent\Casts\AsArrayObject;
@@ -22,6 +25,7 @@ use Illuminate\Database\Eloquent\Casts\AsEncryptedCollection;
 use Illuminate\Database\Eloquent\Casts\AsEnumArrayObject;
 use Illuminate\Database\Eloquent\Casts\AsEnumCollection;
 use Illuminate\Database\Eloquent\Casts\AsStringable;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
@@ -1890,6 +1894,26 @@ class DatabaseEloquentModelTest extends TestCase
         EloquentModelStub::flushEventListeners();
     }
 
+    public function testModelObserversCanBeAttachedToModelsWithStringUsingAttribute()
+    {
+        EloquentModelWithObserveAttributeStub::setEventDispatcher($events = m::mock(Dispatcher::class));
+        $events->shouldReceive('dispatch');
+        $events->shouldReceive('listen')->once()->with('eloquent.creating: Illuminate\Tests\Database\EloquentModelWithObserveAttributeStub', EloquentTestObserverStub::class.'@creating');
+        $events->shouldReceive('listen')->once()->with('eloquent.saved: Illuminate\Tests\Database\EloquentModelWithObserveAttributeStub', EloquentTestObserverStub::class.'@saved');
+        $events->shouldReceive('forget');
+        EloquentModelWithObserveAttributeStub::flushEventListeners();
+    }
+
+    public function testModelObserversCanBeAttachedToModelsThroughAnArrayUsingAttribute()
+    {
+        EloquentModelWithObserveAttributeUsingArrayStub::setEventDispatcher($events = m::mock(Dispatcher::class));
+        $events->shouldReceive('dispatch');
+        $events->shouldReceive('listen')->once()->with('eloquent.creating: Illuminate\Tests\Database\EloquentModelWithObserveAttributeUsingArrayStub', EloquentTestObserverStub::class.'@creating');
+        $events->shouldReceive('listen')->once()->with('eloquent.saved: Illuminate\Tests\Database\EloquentModelWithObserveAttributeUsingArrayStub', EloquentTestObserverStub::class.'@saved');
+        $events->shouldReceive('forget');
+        EloquentModelWithObserveAttributeUsingArrayStub::flushEventListeners();
+    }
+
     public function testThrowExceptionOnAttachingNotExistsModelObserverWithString()
     {
         $this->expectException(InvalidArgumentException::class);
@@ -2576,6 +2600,45 @@ class DatabaseEloquentModelTest extends TestCase
         }
     }
 
+    public function testThrowsWhenAccessingMissingAttributesWhichArePrimitiveCasts()
+    {
+        $originalMode = Model::preventsAccessingMissingAttributes();
+        Model::preventAccessingMissingAttributes();
+
+        $model = new EloquentModelWithPrimitiveCasts(['id' => 1]);
+        $model->exists = true;
+
+        $exceptionCount = 0;
+        $primitiveCasts = EloquentModelWithPrimitiveCasts::makePrimitiveCastsArray();
+        try {
+            try {
+                $this->assertEquals(null, $model->backed_enum);
+            } catch (MissingAttributeException) {
+                $exceptionCount++;
+            }
+
+            foreach ($primitiveCasts as $key => $type) {
+                try {
+                    $v = $model->{$key};
+                } catch (MissingAttributeException) {
+                    $exceptionCount++;
+                }
+            }
+
+            $this->assertInstanceOf(Address::class, $model->address);
+
+            $this->assertEquals(1, $model->id);
+            $this->assertEquals('ok', $model->this_is_fine);
+            $this->assertEquals('ok', $model->this_is_also_fine);
+
+            // Primitive castables, enum castable
+            $expectedExceptionCount = count($primitiveCasts) + 1;
+            $this->assertEquals($expectedExceptionCount, $exceptionCount);
+        } finally {
+            Model::preventAccessingMissingAttributes($originalMode);
+        }
+    }
+
     public function testUsesOverriddenHandlerWhenAccessingMissingAttributes()
     {
         $originalMode = Model::preventsAccessingMissingAttributes();
@@ -3043,22 +3106,6 @@ class EloquentModelEmptyDestroyStub extends Model
     }
 }
 
-class EloquentModelHydrateRawStub extends Model
-{
-    public static function hydrate(array $items, $connection = null)
-    {
-        return 'hydrated';
-    }
-
-    public function getConnection()
-    {
-        $mock = m::mock(Connection::class);
-        $mock->shouldReceive('select')->once()->with('SELECT ?', ['foo'])->andReturn([]);
-
-        return $mock;
-    }
-}
-
 class EloquentModelWithStub extends Model
 {
     public function newQuery()
@@ -3308,6 +3355,18 @@ class EloquentNonPrimaryUlidModelStub extends EloquentModelStub
     }
 }
 
+#[ObservedBy(EloquentTestObserverStub::class)]
+class EloquentModelWithObserveAttributeStub extends EloquentModelStub
+{
+    //
+}
+
+#[ObservedBy([EloquentTestObserverStub::class])]
+class EloquentModelWithObserveAttributeUsingArrayStub extends EloquentModelStub
+{
+    //
+}
+
 class EloquentModelSavingEventStub
 {
     //
@@ -3348,4 +3407,72 @@ class Uppercase implements CastsInboundAttributes
 class CustomCollection extends BaseCollection
 {
     //
+}
+
+class EloquentModelWithPrimitiveCasts extends Model
+{
+    public $fillable = ['id'];
+
+    public $casts = [
+        'backed_enum' => CastableBackedEnum::class,
+        'address' => Address::class,
+    ];
+
+    public static function makePrimitiveCastsArray(): array
+    {
+        $toReturn = [];
+
+        foreach (static::$primitiveCastTypes as $index => $primitiveCastType) {
+            $toReturn['primitive_cast_'.$index] = $primitiveCastType;
+        }
+
+        return $toReturn;
+    }
+
+    public function __construct(array $attributes = [])
+    {
+        parent::__construct($attributes);
+
+        $this->mergeCasts(self::makePrimitiveCastsArray());
+    }
+
+    public function getThisIsFineAttribute($value)
+    {
+        return 'ok';
+    }
+
+    public function thisIsAlsoFine(): Attribute
+    {
+        return Attribute::get(fn () => 'ok');
+    }
+}
+
+enum CastableBackedEnum: string
+{
+    case Value1 = 'value1';
+}
+
+class Address implements Castable
+{
+    public static function castUsing(array $arguments): CastsAttributes
+    {
+        return new class implements CastsAttributes
+        {
+            public function get(Model $model, string $key, mixed $value, array $attributes): Address
+            {
+                return new Address(
+                    $attributes['address_line_one'],
+                    $attributes['address_line_two']
+                );
+            }
+
+            public function set(Model $model, string $key, mixed $value, array $attributes): array
+            {
+                return [
+                    'address_line_one' => $value->lineOne,
+                    'address_line_two' => $value->lineTwo,
+                ];
+            }
+        };
+    }
 }

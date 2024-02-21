@@ -2039,6 +2039,16 @@ trait HasAttributes
     }
 
     /**
+     * Get the attributes that have been changed since the last sync for an update operation.
+     *
+     * @return array
+     */
+    protected function getDirtyForUpdate()
+    {
+        return $this->getDirty();
+    }
+
+    /**
      * Get the attributes that were changed when the model was last saved.
      *
      * @return array
@@ -2116,6 +2126,13 @@ trait HasAttributes
         // an appropriate native PHP type dependent upon the associated value
         // given with the key in the pair. Dayle made this comment line up.
         if ($this->hasCast($key)) {
+            if (static::preventsAccessingMissingAttributes() &&
+                ! array_key_exists($key, $this->attributes) &&
+                ($this->isEnumCastable($key) ||
+                 in_array($this->getCastType($key), static::$primitiveCastTypes))) {
+                $this->throwMissingAttributeExceptionIfApplicable($key);
+            }
+
             return $this->castAttribute($key, $value);
         }
 

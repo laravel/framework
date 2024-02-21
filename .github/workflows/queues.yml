@@ -1,0 +1,160 @@
+name: queues
+
+on:
+  push:
+    branches:
+      - master
+      - '*.x'
+  pull_request:
+
+jobs:
+  sync:
+    runs-on: ubuntu-22.04
+
+    strategy:
+      fail-fast: true
+
+    name: Sync Driver
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.1
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_mysql, :php-psr
+          tools: composer:v2
+          coverage: none
+
+      - name: Install dependencies
+        uses: nick-fields/retry@v2
+        with:
+          timeout_minutes: 5
+          max_attempts: 5
+          command: composer update --prefer-stable --prefer-dist --no-interaction --no-progress
+
+      - name: Execute tests
+        run: vendor/bin/phpunit tests/Integration/Queue
+        env:
+          QUEUE_CONNECTION: sync
+
+  database:
+    runs-on: ubuntu-22.04
+
+    strategy:
+      fail-fast: true
+
+    name: Database Driver
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.1
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_mysql, :php-psr
+          tools: composer:v2
+          coverage: none
+
+      - name: Install dependencies
+        uses: nick-fields/retry@v2
+        with:
+          timeout_minutes: 5
+          max_attempts: 5
+          command: composer update --prefer-stable --prefer-dist --no-interaction --no-progress
+
+      - name: Execute tests
+        run: vendor/bin/phpunit tests/Integration/Queue
+        env:
+          DB_CONNECTION: testing
+          QUEUE_CONNECTION: database
+
+  redis:
+    runs-on: ubuntu-22.04
+
+    services:
+      redis:
+        image: redis:7.0
+        ports:
+          - 6379:6379
+        options: --entrypoint redis-server
+
+    strategy:
+      fail-fast: true
+
+    name: Redis Driver
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.1
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_mysql, :php-psr
+          tools: composer:v2
+          coverage: none
+
+      - name: Install dependencies
+        uses: nick-fields/retry@v2
+        with:
+          timeout_minutes: 5
+          max_attempts: 5
+          command: composer update --prefer-stable --prefer-dist --no-interaction --no-progress
+
+      - name: Execute tests
+        run: vendor/bin/phpunit tests/Integration/Queue
+        env:
+          QUEUE_CONNECTION: redis
+
+  beanstalkd:
+    runs-on: ubuntu-22.04
+
+    name: Beanstalkd Driver
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Download & Extract beanstalkd
+        run: curl -L https://github.com/beanstalkd/beanstalkd/archive/refs/tags/v1.13.tar.gz | tar xz
+      
+      - name: Make beanstalkd
+        run: make
+        working-directory: beanstalkd-1.13
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.1
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_mysql, :php-psr
+          tools: composer:v2
+          coverage: none
+
+      - name: Install dependencies
+        uses: nick-fields/retry@v2
+        with:
+          timeout_minutes: 5
+          max_attempts: 5
+          command: composer update --prefer-stable --prefer-dist --no-interaction --no-progress
+
+      - name: Daemonize beanstalkd
+        run: ./beanstalkd-1.13/beanstalkd &
+
+      - name: Execute tests
+        run: vendor/bin/phpunit tests/Integration/Queue
+        env:
+          QUEUE_CONNECTION: beanstalkd

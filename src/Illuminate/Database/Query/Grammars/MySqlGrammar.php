@@ -107,6 +107,19 @@ class MySqlGrammar extends Grammar
     }
 
     /**
+     * Compile an insert ignore statement using a subquery into SQL.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $columns
+     * @param  string  $sql
+     * @return string
+     */
+    public function compileInsertOrIgnoreUsing(Builder $query, array $columns, string $sql)
+    {
+        return Str::replaceFirst('insert', 'insert ignore', $this->compileInsertUsing($query, $columns, $sql));
+    }
+
+    /**
      * Compile a "JSON contains" statement into SQL.
      *
      * @param  string  $column

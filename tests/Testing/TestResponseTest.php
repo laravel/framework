@@ -28,6 +28,7 @@ use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Cookie;
+use Symfony\Component\HttpFoundation\StreamedJsonResponse;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class TestResponseTest extends TestCase
@@ -283,6 +284,49 @@ class TestResponseTest extends TestCase
         } catch (AssertionFailedError $e) {
             $this->assertSame('Failed asserting that two strings are identical.', $e->getMessage());
         }
+    }
+
+    public function testAssertStreamedJsonContent()
+    {
+        $response = TestResponse::fromBaseResponse(
+            new StreamedJsonResponse([
+                'data' => $this->yieldTestModels(),
+            ])
+        );
+
+        $response->assertStreamedJsonContent([
+            'data' => [
+                ['id' => 1],
+                ['id' => 2],
+                ['id' => 3],
+            ],
+        ]);
+
+        try {
+            $response->assertStreamedJsonContent([
+                'data' => [
+                    ['id' => 1],
+                    ['id' => 2],
+                ],
+            ]);
+            $this->fail('xxxx');
+        } catch (AssertionFailedError $e) {
+            $this->assertSame('Failed asserting that two strings are identical.', $e->getMessage());
+        }
+
+        try {
+            $response->assertStreamedContent('not expected response string');
+            $this->fail('xxxx');
+        } catch (AssertionFailedError $e) {
+            $this->assertSame('Failed asserting that two strings are identical.', $e->getMessage());
+        }
+    }
+
+    public function yieldTestModels()
+    {
+        yield new TestModel(['id' => 1]);
+        yield new TestModel(['id' => 2]);
+        yield new TestModel(['id' => 3]);
     }
 
     public function testAssertSee()
@@ -596,7 +640,7 @@ class TestResponseTest extends TestCase
         );
 
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage("Expected response status code [405] but received 200.\nFailed asserting that 405 is identical to 200.");
+        $this->expectExceptionMessage("Expected response status code [405] but received 200.\nFailed asserting that 200 is identical to 405.");
 
         $response->assertMethodNotAllowed();
     }
@@ -614,7 +658,7 @@ class TestResponseTest extends TestCase
         );
 
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage("Expected response status code [406] but received 200.\nFailed asserting that 406 is identical to 200.");
+        $this->expectExceptionMessage("Expected response status code [406] but received 200.\nFailed asserting that 200 is identical to 406.");
 
         $response->assertNotAcceptable();
         $this->fail();
@@ -665,7 +709,7 @@ class TestResponseTest extends TestCase
         );
 
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage("Expected response status code [400] but received 200.\nFailed asserting that 400 is identical to 200.");
+        $this->expectExceptionMessage("Expected response status code [400] but received 200.\nFailed asserting that 200 is identical to 400.");
 
         $response->assertBadRequest();
         $this->fail();
@@ -684,7 +728,7 @@ class TestResponseTest extends TestCase
         );
 
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage("Expected response status code [408] but received 200.\nFailed asserting that 408 is identical to 200.");
+        $this->expectExceptionMessage("Expected response status code [408] but received 200.\nFailed asserting that 200 is identical to 408.");
 
         $response->assertRequestTimeout();
         $this->fail();
@@ -703,7 +747,7 @@ class TestResponseTest extends TestCase
         );
 
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage("Expected response status code [402] but received 200.\nFailed asserting that 402 is identical to 200.");
+        $this->expectExceptionMessage("Expected response status code [402] but received 200.\nFailed asserting that 200 is identical to 402.");
 
         $response->assertPaymentRequired();
         $this->fail();
@@ -722,7 +766,7 @@ class TestResponseTest extends TestCase
         );
 
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage("Expected response status code [301] but received 200.\nFailed asserting that 301 is identical to 200.");
+        $this->expectExceptionMessage("Expected response status code [301] but received 200.\nFailed asserting that 200 is identical to 301.");
 
         $response->assertMovedPermanently();
         $this->fail();
@@ -741,7 +785,7 @@ class TestResponseTest extends TestCase
         );
 
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage("Expected response status code [302] but received 200.\nFailed asserting that 302 is identical to 200.");
+        $this->expectExceptionMessage("Expected response status code [302] but received 200.\nFailed asserting that 200 is identical to 302.");
 
         $response->assertFound();
         $this->fail();
@@ -760,7 +804,7 @@ class TestResponseTest extends TestCase
         );
 
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage("Expected response status code [304] but received 200.\nFailed asserting that 304 is identical to 200.");
+        $this->expectExceptionMessage("Expected response status code [304] but received 200.\nFailed asserting that 200 is identical to 304.");
 
         $response->assertNotModified();
         $this->fail();
@@ -779,7 +823,7 @@ class TestResponseTest extends TestCase
         );
 
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage("Expected response status code [307] but received 200.\nFailed asserting that 307 is identical to 200.");
+        $this->expectExceptionMessage("Expected response status code [307] but received 200.\nFailed asserting that 200 is identical to 307.");
 
         $response->assertTemporaryRedirect();
         $this->fail();
@@ -798,7 +842,7 @@ class TestResponseTest extends TestCase
         );
 
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage("Expected response status code [308] but received 200.\nFailed asserting that 308 is identical to 200.");
+        $this->expectExceptionMessage("Expected response status code [308] but received 200.\nFailed asserting that 200 is identical to 308.");
 
         $response->assertPermanentRedirect();
         $this->fail();
@@ -817,7 +861,7 @@ class TestResponseTest extends TestCase
         );
 
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage("Expected response status code [409] but received 200.\nFailed asserting that 409 is identical to 200.");
+        $this->expectExceptionMessage("Expected response status code [409] but received 200.\nFailed asserting that 200 is identical to 409.");
 
         $response->assertConflict();
         $this->fail();
@@ -836,7 +880,7 @@ class TestResponseTest extends TestCase
         );
 
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage("Expected response status code [410] but received 200.\nFailed asserting that 410 is identical to 200.");
+        $this->expectExceptionMessage("Expected response status code [410] but received 200.\nFailed asserting that 200 is identical to 410.");
 
         $response->assertGone();
     }
@@ -854,7 +898,7 @@ class TestResponseTest extends TestCase
         );
 
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage("Expected response status code [429] but received 200.\nFailed asserting that 429 is identical to 200.");
+        $this->expectExceptionMessage("Expected response status code [429] but received 200.\nFailed asserting that 200 is identical to 429.");
 
         $response->assertTooManyRequests();
         $this->fail();
@@ -873,7 +917,7 @@ class TestResponseTest extends TestCase
         );
 
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage("Expected response status code [202] but received 200.\nFailed asserting that 202 is identical to 200.");
+        $this->expectExceptionMessage("Expected response status code [202] but received 200.\nFailed asserting that 200 is identical to 202.");
 
         $response->assertAccepted();
         $this->fail();
@@ -920,7 +964,7 @@ class TestResponseTest extends TestCase
         );
 
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage("Expected response status code [500] but received 200.\nFailed asserting that 500 is identical to 200.");
+        $this->expectExceptionMessage("Expected response status code [500] but received 200.\nFailed asserting that 200 is identical to 500.");
 
         $response->assertInternalServerError();
     }
@@ -938,7 +982,7 @@ class TestResponseTest extends TestCase
         );
 
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage("Expected response status code [503] but received 200.\nFailed asserting that 503 is identical to 200.");
+        $this->expectExceptionMessage("Expected response status code [503] but received 200.\nFailed asserting that 200 is identical to 503.");
 
         $response->assertServiceUnavailable();
     }
@@ -1498,6 +1542,54 @@ class TestResponseTest extends TestCase
         $testResponse = TestResponse::fromBaseResponse(new Response);
 
         $testResponse->assertValid();
+    }
+
+    public function testAssertingKeyIsInvalidErrorMessage()
+    {
+        app()->instance('session.store', $store = new Store('test-session', new ArraySessionHandler(1)));
+        $store->put('errors', $errorBag = new ViewErrorBag);
+        $testResponse = TestResponse::fromBaseResponse(new Response);
+
+        try {
+            $testResponse->assertInvalid(['input_name']);
+            $this->fail();
+        } catch (AssertionFailedError $e) {
+            $this->assertStringStartsWith("Failed to find a validation error in session for key: 'input_name'", $e->getMessage());
+        }
+
+        try {
+            $testResponse->assertInvalid(['input_name' => 'Expected error message.']);
+            $this->fail();
+        } catch (AssertionFailedError $e) {
+            $this->assertStringStartsWith("Failed to find a validation error in session for key: 'input_name'", $e->getMessage());
+        }
+    }
+
+    public function testInvalidWithListOfErrors()
+    {
+        app()->instance('session.store', $store = new Store('test-session', new ArraySessionHandler(1)));
+
+        $store->put('errors', $errorBag = new ViewErrorBag);
+
+        $errorBag->put('default', new MessageBag([
+            'first_name' => [
+                'Your first name is required',
+                'Your first name must be at least 1 character',
+            ],
+        ]));
+
+        $testResponse = TestResponse::fromBaseResponse(new Response);
+
+        $testResponse->assertInvalid(['first_name' => 'Your first name is required']);
+        $testResponse->assertInvalid(['first_name' => 'Your first name must be at least 1 character']);
+        $testResponse->assertInvalid(['first_name' => ['Your first name is required', 'Your first name must be at least 1 character']]);
+
+        try {
+            $testResponse->assertInvalid(['first_name' => ['Your first name is required', 'FOO']]);
+            $this->fail();
+        } catch (AssertionFailedError $e) {
+            $this->assertStringStartsWith("Failed to find a validation error for key and message: 'first_name' => 'FOO'", $e->getMessage());
+        }
     }
 
     public function testAssertJsonValidationErrorsCustomErrorsName()

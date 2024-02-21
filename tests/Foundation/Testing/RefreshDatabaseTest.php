@@ -2,54 +2,55 @@
 
 namespace Illuminate\Tests\Foundation\Testing;
 
+use Illuminate\Contracts\Console\Kernel as ConsoleKernelContract;
+use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithConsole;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\RefreshDatabaseState;
 use Mockery as m;
-use Orchestra\Testbench\Concerns\Testing;
+use Orchestra\Testbench\Concerns\ApplicationTestingHooks;
 use Orchestra\Testbench\Foundation\Application as Testbench;
 use PHPUnit\Framework\TestCase;
-use ReflectionMethod;
 
 use function Orchestra\Testbench\package_path;
 
 class RefreshDatabaseTest extends TestCase
 {
-    protected $traitObject;
+    use ApplicationTestingHooks;
+    use InteractsWithConsole;
+    use RefreshDatabase;
+
+    public $dropViews = false;
+
+    public $dropTypes = false;
 
     protected function setUp(): void
     {
         RefreshDatabaseState::$migrated = false;
 
-        $this->traitObject = m::mock(RefreshDatabaseTestMockClass::class)->makePartial();
-        $this->traitObject->setUp();
+        $this->setUpTheApplicationTestingHooks();
+        $this->withoutMockingConsoleOutput();
     }
 
     protected function tearDown(): void
     {
-        $this->traitObject->tearDown();
+        $this->tearDownTheApplicationTestingHooks();
 
-        if ($container = m::getContainer()) {
-            $this->addToAssertionCount($container->mockery_getExpectationCount());
-        }
-
-        m::close();
+        RefreshDatabaseState::$migrated = false;
     }
 
-    private function __reflectAndSetupAccessibleForProtectedTraitMethod($methodName)
+    protected function refreshApplication()
     {
-        $migrateFreshUsingReflection = new ReflectionMethod(
-            get_class($this->traitObject),
-            $methodName
+        $this->app = Testbench::create(
+            basePath: package_path('vendor/orchestra/testbench-core/laravel'),
         );
-
-        return $migrateFreshUsingReflection;
     }
 
     public function testRefreshTestDatabaseDefault()
     {
-        $this->traitObject
-            ->shouldReceive('artisan')
+        $this->app->instance(ConsoleKernelContract::class, $kernel = m::spy(ConsoleKernel::class));
+
+        $kernel->shouldReceive('call')
             ->once()
             ->with('migrate:fresh', [
                 '--drop-views' => false,
@@ -57,17 +58,16 @@ class RefreshDatabaseTest extends TestCase
                 '--seed' => false,
             ]);
 
-        $refreshTestDatabaseReflection = $this->__reflectAndSetupAccessibleForProtectedTraitMethod('refreshTestDatabase');
-
-        $refreshTestDatabaseReflection->invoke($this->traitObject);
+        $this->refreshTestDatabase();
     }
 
     public function testRefreshTestDatabaseWithDropViewsOption()
     {
-        $this->traitObject->dropViews = true;
+        $this->dropViews = true;
 
-        $this->traitObject
-            ->shouldReceive('artisan')
+        $this->app->instance(ConsoleKernelContract::class, $kernel = m::spy(ConsoleKernel::class));
+
+        $kernel->shouldReceive('call')
             ->once()
             ->with('migrate:fresh', [
                 '--drop-views' => true,
@@ -75,17 +75,16 @@ class RefreshDatabaseTest extends TestCase
                 '--seed' => false,
             ]);
 
-        $refreshTestDatabaseReflection = $this->__reflectAndSetupAccessibleForProtectedTraitMethod('refreshTestDatabase');
-
-        $refreshTestDatabaseReflection->invoke($this->traitObject);
+        $this->refreshTestDatabase();
     }
 
     public function testRefreshTestDatabaseWithDropTypesOption()
     {
-        $this->traitObject->dropTypes = true;
+        $this->dropTypes = true;
 
-        $this->traitObject
-            ->shouldReceive('artisan')
+        $this->app->instance(ConsoleKernelContract::class, $kernel = m::spy(ConsoleKernel::class));
+
+        $kernel->shouldReceive('call')
             ->once()
             ->with('migrate:fresh', [
                 '--drop-views' => false,
@@ -93,52 +92,6 @@ class RefreshDatabaseTest extends TestCase
                 '--seed' => false,
             ]);
 
-        $refreshTestDatabaseReflection = $this->__reflectAndSetupAccessibleForProtectedTraitMethod('refreshTestDatabase');
-
-        $refreshTestDatabaseReflection->invoke($this->traitObject);
-    }
-}
-
-class RefreshDatabaseTestMockClass
-{
-    use InteractsWithConsole;
-    use RefreshDatabase;
-    use Testing;
-
-    public $dropViews = false;
-
-    public $dropTypes = false;
-
-    public function setUp()
-    {
-        RefreshDatabaseState::$migrated = false;
-
-        $this->app = $this->refreshApplication();
-        $this->withoutMockingConsoleOutput();
-    }
-
-    public function tearDown()
-    {
-        RefreshDatabaseState::$migrated = false;
-
-        $this->callBeforeApplicationDestroyedCallbacks();
-        $this->app?->flush();
-    }
-
-    protected function setUpTraits()
-    {
-        return [];
-    }
-
-    protected function setUpTheTestEnvironmentTraitToBeIgnored(string $use): bool
-    {
-        return true;
-    }
-
-    public function refreshApplication()
-    {
-        return Testbench::create(
-            basePath: package_path('vendor/orchestra/testbench-core/laravel')
-        );
+        $this->refreshTestDatabase();
     }
 }

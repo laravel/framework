@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Database;
 
 use Illuminate\Database\Capsule\Manager;
 use Illuminate\Database\Connection;
+use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\ForeignIdColumnDefinition;
 use Illuminate\Database\Schema\Grammars\SQLiteGrammar;
@@ -163,20 +164,19 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
             $table->index(['name', 'email'], 'index1');
         });
 
-        $manager = $db->getConnection()->getDoctrineSchemaManager();
-        $details = $manager->listTableDetails('prefix_users');
-        $this->assertTrue($details->hasIndex('index1'));
-        $this->assertFalse($details->hasIndex('index2'));
+        $indexes = $schema->getIndexListing('users');
+
+        $this->assertContains('index1', $indexes);
+        $this->assertNotContains('index2', $indexes);
 
         $schema->table('users', function (Blueprint $table) {
             $table->renameIndex('index1', 'index2');
         });
 
-        $details = $manager->listTableDetails('prefix_users');
-        $this->assertFalse($details->hasIndex('index1'));
-        $this->assertTrue($details->hasIndex('index2'));
-
-        $this->assertEquals(['name', 'email'], $details->getIndex('index2')->getUnquotedColumns());
+        $this->assertFalse($schema->hasIndex('users', 'index1'));
+        $this->assertTrue(collect($schema->getIndexes('users'))->contains(
+            fn ($index) => $index['name'] === 'index2' && $index['columns'] === ['name', 'email']
+        ));
     }
 
     public function testAddingPrimaryKey()
@@ -886,6 +886,19 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
             'alter table "products" add column "discounted_virtual" integer not null as ("price" - 5)',
         ];
         $this->assertSame($expected, $statements);
+    }
+
+    public function testAddingGeneratedColumnByExpression()
+    {
+        $blueprint = new Blueprint('products');
+        $blueprint->create();
+        $blueprint->integer('price');
+        $blueprint->integer('discounted_virtual')->virtualAs(new Expression('"price" - 5'));
+        $blueprint->integer('discounted_stored')->storedAs(new Expression('"price" - 5'));
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('create table "products" ("price" integer not null, "discounted_virtual" integer as ("price" - 5), "discounted_stored" integer as ("price" - 5) stored)', $statements[0]);
     }
 
     public function testGrammarsAreMacroable()

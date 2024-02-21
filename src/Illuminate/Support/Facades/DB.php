@@ -4,6 +4,7 @@ namespace Illuminate\Support\Facades;
 
 /**
  * @method static \Illuminate\Database\Connection connection(string|null $name = null)
+ * @method static \Illuminate\Database\ConnectionInterface connectUsing(string $name, array $config, bool $force = false)
  * @method static void registerDoctrineType(string $class, string $name, string $type)
  * @method static void purge(string|null $name = null)
  * @method static void disconnect(string|null $name = null)
@@ -51,6 +52,7 @@ namespace Illuminate\Support\Facades;
  * @method static float totalQueryDuration()
  * @method static void resetTotalQueryDuration()
  * @method static void reconnectIfMissingConnection()
+ * @method static \Illuminate\Database\Connection beforeStartingTransaction(\Closure $callback)
  * @method static \Illuminate\Database\Connection beforeExecuting(\Closure $callback)
  * @method static void listen(\Closure $callback)
  * @method static \Illuminate\Contracts\Database\Query\Expression raw(mixed $value)

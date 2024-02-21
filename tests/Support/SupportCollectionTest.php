@@ -19,12 +19,14 @@ use InvalidArgumentException;
 use IteratorAggregate;
 use JsonSerializable;
 use Mockery as m;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use stdClass;
 use Symfony\Component\VarDumper\VarDumper;
 use Traversable;
 use UnexpectedValueException;
+use WeakMap;
 
 include_once 'Enums.php';
 
@@ -2333,7 +2335,7 @@ class SupportCollectionTest extends TestCase
      */
     public function testPluckDuplicateKeysExist($collection)
     {
-        $data = new collection([
+        $data = new $collection([
             ['brand' => 'Tesla', 'color' => 'red'],
             ['brand' => 'Pagani', 'color' => 'white'],
             ['brand' => 'Tesla', 'color' => 'black'],
@@ -2955,6 +2957,19 @@ class SupportCollectionTest extends TestCase
         $object->foo = 'bar';
         $data = new $collection($object);
         $this->assertEquals(['foo' => 'bar'], $data->all());
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testConstructMethodFromWeakMap($collection)
+    {
+        $this->expectException('InvalidArgumentException');
+
+        $map = new WeakMap();
+        $object = new stdClass;
+        $object->foo = 'bar';
+        $map[$object] = 3;
+
+        $data = new $collection($map);
     }
 
     public function testSplice()
@@ -4211,6 +4226,99 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals(['first' => 'Taylor', 'email' => 'taylorotwell@gmail.com'], $data->only(['first', 'email'])->all());
         $this->assertEquals(['first' => 'Taylor', 'email' => 'taylorotwell@gmail.com'], $data->only('first', 'email')->all());
         $this->assertEquals(['first' => 'Taylor', 'email' => 'taylorotwell@gmail.com'], $data->only(collect(['first', 'email']))->all());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testSelectWithArrays($collection)
+    {
+        $data = new $collection([
+            ['first' => 'Taylor', 'last' => 'Otwell', 'email' => 'taylorotwell@gmail.com'],
+            ['first' => 'Jess', 'last' => 'Archer', 'email' => 'jessarcher@gmail.com'],
+        ]);
+
+        $this->assertEquals($data->all(), $data->select(null)->all());
+        $this->assertEquals([['first' => 'Taylor'], ['first' => 'Jess']], $data->select(['first', 'missing'])->all());
+        $this->assertEquals([['first' => 'Taylor'], ['first' => 'Jess']], $data->select('first', 'missing')->all());
+        $this->assertEquals([['first' => 'Taylor'], ['first' => 'Jess']], $data->select(collect(['first', 'missing']))->all());
+
+        $this->assertEquals([
+            ['first' => 'Taylor', 'email' => 'taylorotwell@gmail.com'],
+            ['first' => 'Jess', 'email' => 'jessarcher@gmail.com'],
+        ], $data->select(['first', 'email'])->all());
+
+        $this->assertEquals([
+            ['first' => 'Taylor', 'email' => 'taylorotwell@gmail.com'],
+            ['first' => 'Jess', 'email' => 'jessarcher@gmail.com'],
+        ], $data->select('first', 'email')->all());
+
+        $this->assertEquals([
+            ['first' => 'Taylor', 'email' => 'taylorotwell@gmail.com'],
+            ['first' => 'Jess', 'email' => 'jessarcher@gmail.com'],
+        ], $data->select(collect(['first', 'email']))->all());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testSelectWithArrayAccess($collection)
+    {
+        $data = new $collection([
+            new TestArrayAccessImplementation(['first' => 'Taylor', 'last' => 'Otwell', 'email' => 'taylorotwell@gmail.com']),
+            new TestArrayAccessImplementation(['first' => 'Jess', 'last' => 'Archer', 'email' => 'jessarcher@gmail.com']),
+        ]);
+
+        $this->assertEquals($data->all(), $data->select(null)->all());
+        $this->assertEquals([['first' => 'Taylor'], ['first' => 'Jess']], $data->select(['first', 'missing'])->all());
+        $this->assertEquals([['first' => 'Taylor'], ['first' => 'Jess']], $data->select('first', 'missing')->all());
+        $this->assertEquals([['first' => 'Taylor'], ['first' => 'Jess']], $data->select(collect(['first', 'missing']))->all());
+
+        $this->assertEquals([
+            ['first' => 'Taylor', 'email' => 'taylorotwell@gmail.com'],
+            ['first' => 'Jess', 'email' => 'jessarcher@gmail.com'],
+        ], $data->select(['first', 'email'])->all());
+
+        $this->assertEquals([
+            ['first' => 'Taylor', 'email' => 'taylorotwell@gmail.com'],
+            ['first' => 'Jess', 'email' => 'jessarcher@gmail.com'],
+        ], $data->select('first', 'email')->all());
+
+        $this->assertEquals([
+            ['first' => 'Taylor', 'email' => 'taylorotwell@gmail.com'],
+            ['first' => 'Jess', 'email' => 'jessarcher@gmail.com'],
+        ], $data->select(collect(['first', 'email']))->all());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testSelectWithObjects($collection)
+    {
+        $data = new $collection([
+            (object) ['first' => 'Taylor', 'last' => 'Otwell', 'email' => 'taylorotwell@gmail.com'],
+            (object) ['first' => 'Jess', 'last' => 'Archer', 'email' => 'jessarcher@gmail.com'],
+        ]);
+
+        $this->assertEquals($data->all(), $data->select(null)->all());
+        $this->assertEquals([['first' => 'Taylor'], ['first' => 'Jess']], $data->select(['first', 'missing'])->all());
+        $this->assertEquals([['first' => 'Taylor'], ['first' => 'Jess']], $data->select('first', 'missing')->all());
+        $this->assertEquals([['first' => 'Taylor'], ['first' => 'Jess']], $data->select(collect(['first', 'missing']))->all());
+
+        $this->assertEquals([
+            ['first' => 'Taylor', 'email' => 'taylorotwell@gmail.com'],
+            ['first' => 'Jess', 'email' => 'jessarcher@gmail.com'],
+        ], $data->select(['first', 'email'])->all());
+
+        $this->assertEquals([
+            ['first' => 'Taylor', 'email' => 'taylorotwell@gmail.com'],
+            ['first' => 'Jess', 'email' => 'jessarcher@gmail.com'],
+        ], $data->select('first', 'email')->all());
+
+        $this->assertEquals([
+            ['first' => 'Taylor', 'email' => 'taylorotwell@gmail.com'],
+            ['first' => 'Jess', 'email' => 'jessarcher@gmail.com'],
+        ], $data->select(collect(['first', 'email']))->all());
     }
 
     /**
@@ -5630,6 +5738,19 @@ class SupportCollectionTest extends TestCase
         $data = $collection::make([new \Error, new \Error, new $collection]);
         $this->expectException(UnexpectedValueException::class);
         $data->ensure(\Throwable::class);
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testEnsureForMultipleTypes($collection)
+    {
+        $data = $collection::make([new \Error, 123]);
+        $data->ensure([\Throwable::class, 'int']);
+
+        $data = $collection::make([new \Error, new \Error, new $collection]);
+        $this->expectException(UnexpectedValueException::class);
+        $data->ensure([\Throwable::class, 'int']);
     }
 
     /**

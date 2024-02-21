@@ -293,4 +293,36 @@ class CacheArrayStoreTest extends TestCase
 
         $this->assertFalse($wannabeOwner->release());
     }
+
+    public function testOwnerStatusCanBeCheckedAfterRestoringLock()
+    {
+        $store = new ArrayStore;
+        $firstLock = $store->lock('foo', 10);
+
+        $this->assertTrue($firstLock->get());
+        $owner = $firstLock->owner();
+
+        $secondLock = $store->restoreLock('foo', $owner);
+        $this->assertTrue($secondLock->isOwnedByCurrentProcess());
+    }
+
+    public function testOtherOwnerDoesNotOwnLockAfterRestore()
+    {
+        $store = new ArrayStore;
+        $firstLock = $store->lock('foo', 10);
+
+        $this->assertTrue($firstLock->get());
+
+        $secondLock = $store->restoreLock('foo', 'other_owner');
+
+        $this->assertFalse($secondLock->isOwnedByCurrentProcess());
+    }
+
+    public function testRestoringNonExistingLockDoesNotOwnAnything()
+    {
+        $store = new ArrayStore;
+        $firstLock = $store->restoreLock('foo', 'owner');
+
+        $this->assertFalse($firstLock->isOwnedByCurrentProcess());
+    }
 }

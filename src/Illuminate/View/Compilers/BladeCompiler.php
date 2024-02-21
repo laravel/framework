@@ -30,9 +30,11 @@ class BladeCompiler extends Compiler implements CompilerInterface
         Concerns\CompilesLayouts,
         Concerns\CompilesLoops,
         Concerns\CompilesRawPhp,
+        Concerns\CompilesSessions,
         Concerns\CompilesStacks,
         Concerns\CompilesStyles,
         Concerns\CompilesTranslations,
+        Concerns\CompilesUseStatements,
         ReflectsClosures;
 
     /**
@@ -332,7 +334,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
 
         return tap($view->render(), function () use ($view, $deleteCachedView) {
             if ($deleteCachedView) {
-                unlink($view->getPath());
+                @unlink($view->getPath());
             }
         });
     }

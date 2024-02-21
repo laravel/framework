@@ -24,7 +24,7 @@
         "ext-session": "*",
         "ext-tokenizer": "*",
         "composer-runtime-api": "^2.2",
-        "brick/math": "^0.9.3|^0.10.2|^0.11",
+        "brick/math": "^0.9.3|^0.10.2|^0.11|^0.12",
         "doctrine/inflector": "^2.0.5",
         "dragonmantank/cron-expression": "^3.3.2",
         "egulias/email-validator": "^3.2.1|^4.0",
@@ -44,7 +44,7 @@
         "symfony/console": "^6.2",
         "symfony/error-handler": "^6.2",
         "symfony/finder": "^6.2",
-        "symfony/http-foundation": "^6.3",
+        "symfony/http-foundation": "^6.4",
         "symfony/http-kernel": "^6.2",
         "symfony/mailer": "^6.2",
         "symfony/mime": "^6.2",
@@ -105,7 +105,7 @@
         "league/flysystem-sftp-v3": "^3.0",
         "mockery/mockery": "^1.5.1",
         "nyholm/psr7": "^1.2",
-        "orchestra/testbench-core": "^8.12",
+        "orchestra/testbench-core": "^8.18",
         "pda/pheanstalk": "^4.0",
         "phpstan/phpstan": "^1.4.7",
         "phpunit/phpunit": "^10.0.7",
@@ -119,12 +119,16 @@
         "psr/simple-cache-implementation": "1.0|2.0|3.0"
     },
     "conflict": {
-        "tightenco/collect": "<5.5.33"
+        "carbonphp/carbon-doctrine-types": ">=3.0",
+        "doctrine/dbal": ">=4.0",
+        "tightenco/collect": "<5.5.33",
+        "phpunit/phpunit": ">=11.0.0"
     },
     "autoload": {
         "files": [
             "src/Illuminate/Collections/helpers.php",
             "src/Illuminate/Events/functions.php",
+            "src/Illuminate/Filesystem/functions.php",
             "src/Illuminate/Foundation/helpers.php",
             "src/Illuminate/Support/helpers.php"
         ],

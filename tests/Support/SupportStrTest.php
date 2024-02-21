@@ -67,6 +67,39 @@ class SupportStrTest extends TestCase
         $this->assertSame('Orwell 1984', Str::headline(' orwell_- 1984 '));
     }
 
+    public function testStringApa()
+    {
+        $this->assertSame('Tom and Jerry', Str::apa('tom and jerry'));
+        $this->assertSame('Tom and Jerry', Str::apa('TOM AND JERRY'));
+        $this->assertSame('Tom and Jerry', Str::apa('Tom And Jerry'));
+
+        $this->assertSame('Back to the Future', Str::apa('back to the future'));
+        $this->assertSame('Back to the Future', Str::apa('BACK TO THE FUTURE'));
+        $this->assertSame('Back to the Future', Str::apa('Back To The Future'));
+
+        $this->assertSame('This, Then That', Str::apa('this, then that'));
+        $this->assertSame('This, Then That', Str::apa('THIS, THEN THAT'));
+        $this->assertSame('This, Then That', Str::apa('This, Then That'));
+
+        $this->assertSame('Bond. James Bond.', Str::apa('bond. james bond.'));
+        $this->assertSame('Bond. James Bond.', Str::apa('BOND. JAMES BOND.'));
+        $this->assertSame('Bond. James Bond.', Str::apa('Bond. James Bond.'));
+
+        $this->assertSame('Self-Report', Str::apa('self-report'));
+        $this->assertSame('Self-Report', Str::apa('Self-report'));
+        $this->assertSame('Self-Report', Str::apa('SELF-REPORT'));
+
+        $this->assertSame('As the World Turns, So Are the Days of Our Lives', Str::apa('as the world turns, so are the days of our lives'));
+        $this->assertSame('As the World Turns, So Are the Days of Our Lives', Str::apa('AS THE WORLD TURNS, SO ARE THE DAYS OF OUR LIVES'));
+        $this->assertSame('As the World Turns, So Are the Days of Our Lives', Str::apa('As The World Turns, So Are The Days Of Our Lives'));
+
+        $this->assertSame('To Kill a Mockingbird', Str::apa('to kill a mockingbird'));
+        $this->assertSame('To Kill a Mockingbird', Str::apa('TO KILL A MOCKINGBIRD'));
+        $this->assertSame('To Kill a Mockingbird', Str::apa('To Kill A Mockingbird'));
+
+        $this->assertSame('', Str::apa(''));
+    }
+
     public function testStringWithoutWordsDoesntProduceError()
     {
         $nbsp = chr(0xC2).chr(0xA0);
@@ -328,9 +361,15 @@ class SupportStrTest extends TestCase
 
     public function testParseCallback()
     {
+        $this->assertEquals(['Class', 'method'], Str::parseCallback('Class@method'));
         $this->assertEquals(['Class', 'method'], Str::parseCallback('Class@method', 'foo'));
         $this->assertEquals(['Class', 'foo'], Str::parseCallback('Class', 'foo'));
         $this->assertEquals(['Class', null], Str::parseCallback('Class'));
+
+        $this->assertEquals(["Class@anonymous\0/laravel/382.php:8$2ec", 'method'], Str::parseCallback("Class@anonymous\0/laravel/382.php:8$2ec@method"));
+        $this->assertEquals(["Class@anonymous\0/laravel/382.php:8$2ec", 'method'], Str::parseCallback("Class@anonymous\0/laravel/382.php:8$2ec@method", 'foo'));
+        $this->assertEquals(["Class@anonymous\0/laravel/382.php:8$2ec", 'foo'], Str::parseCallback("Class@anonymous\0/laravel/382.php:8$2ec", 'foo'));
+        $this->assertEquals(["Class@anonymous\0/laravel/382.php:8$2ec", null], Str::parseCallback("Class@anonymous\0/laravel/382.php:8$2ec"));
     }
 
     public function testSlug()
@@ -386,6 +425,15 @@ class SupportStrTest extends TestCase
     {
         $this->assertEquals('"value"', Str::wrap('value', '"'));
         $this->assertEquals('foo-bar-baz', Str::wrap('-bar-', 'foo', 'baz'));
+    }
+
+    public function testUnwrap()
+    {
+        $this->assertEquals('value', Str::unwrap('"value"', '"'));
+        $this->assertEquals('value', Str::unwrap('"value', '"'));
+        $this->assertEquals('value', Str::unwrap('value"', '"'));
+        $this->assertEquals('bar', Str::unwrap('foo-bar-baz', 'foo-', '-baz'));
+        $this->assertEquals('some: "json"', Str::unwrap('{some: "json"}', '{', '}'));
     }
 
     public function testIs()
@@ -1323,6 +1371,18 @@ class SupportStrTest extends TestCase
         $this->assertTrue(
             Str::of(Str::password())->contains(['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'])
         );
+    }
+
+    public function testToBase64()
+    {
+        $this->assertSame(base64_encode('foo'), Str::toBase64('foo'));
+        $this->assertSame(base64_encode('foobar'), Str::toBase64('foobar'));
+    }
+
+    public function testFromBase64()
+    {
+        $this->assertSame('foo', Str::fromBase64(base64_encode('foo')));
+        $this->assertSame('foobar', Str::fromBase64(base64_encode('foobar'), true));
     }
 }
 

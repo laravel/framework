@@ -33,10 +33,10 @@ class DefaultProviders
             \Illuminate\Mail\MailServiceProvider::class,
             \Illuminate\Notifications\NotificationServiceProvider::class,
             \Illuminate\Pagination\PaginationServiceProvider::class,
+            \Illuminate\Auth\Passwords\PasswordResetServiceProvider::class,
             \Illuminate\Pipeline\PipelineServiceProvider::class,
             \Illuminate\Queue\QueueServiceProvider::class,
             \Illuminate\Redis\RedisServiceProvider::class,
-            \Illuminate\Auth\Passwords\PasswordResetServiceProvider::class,
             \Illuminate\Session\SessionServiceProvider::class,
             \Illuminate\Translation\TranslationServiceProvider::class,
             \Illuminate\Validation\ValidationServiceProvider::class,
@@ -70,7 +70,7 @@ class DefaultProviders
         foreach ($replacements as $from => $to) {
             $key = $current->search($from);
 
-            $current = $key ? $current->replace([$key => $to]) : $current;
+            $current = is_int($key) ? $current->replace([$key => $to]) : $current;
         }
 
         return new static($current->values()->toArray());

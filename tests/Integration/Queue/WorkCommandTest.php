@@ -4,51 +4,41 @@ namespace Illuminate\Tests\Integration\Queue;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Carbon;
-use Orchestra\Testbench\TestCase;
-use Queue;
+use Illuminate\Support\Facades\Queue;
+use Orchestra\Testbench\Attributes\WithMigration;
 
-class WorkCommandTest extends TestCase
+#[WithMigration('queue')]
+class WorkCommandTest extends QueueTestCase
 {
-    protected function getEnvironmentSetUp($app)
+    use DatabaseMigrations;
+
+    protected function setUp(): void
     {
-        $app['db']->connection()->getSchemaBuilder()->create('jobs', function (Blueprint $table) {
-            $table->bigIncrements('id');
-            $table->string('queue');
-            $table->longText('payload');
-            $table->tinyInteger('attempts')->unsigned();
-            $table->unsignedInteger('reserved_at')->nullable();
-            $table->unsignedInteger('available_at');
-            $table->unsignedInteger('created_at');
-            $table->index(['queue', 'reserved_at']);
+        $this->beforeApplicationDestroyed(function () {
+            FirstJob::$ran = false;
+            SecondJob::$ran = false;
+            ThirdJob::$ran = false;
         });
-    }
 
-    protected function tearDown(): void
-    {
-        $this->app['db']->connection()->getSchemaBuilder()->drop('jobs');
+        parent::setUp();
 
-        parent::tearDown();
-
-        FirstJob::$ran = false;
-        SecondJob::$ran = false;
-        ThirdJob::$ran = false;
+        $this->markTestSkippedWhenUsingSyncQueueDriver();
     }
 
     public function testRunningOneJob()
     {
-        Queue::connection('database')->push(new FirstJob);
-        Queue::connection('database')->push(new SecondJob);
+        Queue::push(new FirstJob);
+        Queue::push(new SecondJob);
 
         $this->artisan('queue:work', [
-            'connection' => 'database',
             '--once' => true,
             '--memory' => 1024,
         ])->assertExitCode(0);
 
-        $this->assertSame(1, Queue::connection('database')->size());
+        $this->assertSame(1, Queue::size());
         $this->assertTrue(FirstJob::$ran);
         $this->assertFalse(SecondJob::$ran);
     }
@@ -57,10 +47,9 @@ class WorkCommandTest extends TestCase
     {
         // queue.output_timezone not set at all
         $this->travelTo(Carbon::create(2023, 1, 18, 10, 10, 11));
-        Queue::connection('database')->push(new FirstJob);
+        Queue::push(new FirstJob);
 
         $this->artisan('queue:work', [
-            'connection' => 'database',
             '--once' => true,
             '--memory' => 1024,
         ])->expectsOutputToContain('2023-01-18 10:10:11')
@@ -72,10 +61,9 @@ class WorkCommandTest extends TestCase
         $this->app['config']->set('queue.output_timezone', 'Europe/Helsinki');
 
         $this->travelTo(Carbon::create(2023, 1, 18, 10, 10, 11));
-        Queue::connection('database')->push(new FirstJob);
+        Queue::push(new FirstJob);
 
         $this->artisan('queue:work', [
-            'connection' => 'database',
             '--once' => true,
             '--memory' => 1024,
         ])->expectsOutputToContain('2023-01-18 12:10:11')
@@ -87,10 +75,9 @@ class WorkCommandTest extends TestCase
         $this->app['config']->set('queue.output_timezone', 'UTC');
 
         $this->travelTo(Carbon::create(2023, 1, 18, 10, 10, 11));
-        Queue::connection('database')->push(new FirstJob);
+        Queue::push(new FirstJob);
 
         $this->artisan('queue:work', [
-            'connection' => 'database',
             '--once' => true,
             '--memory' => 1024,
         ])->expectsOutputToContain('2023-01-18 10:10:11')
@@ -99,72 +86,72 @@ class WorkCommandTest extends TestCase
 
     public function testDaemon()
     {
-        Queue::connection('database')->push(new FirstJob);
-        Queue::connection('database')->push(new SecondJob);
+        Queue::push(new FirstJob);
+        Queue::push(new SecondJob);
 
         $this->artisan('queue:work', [
-            'connection' => 'database',
             '--daemon' => true,
             '--stop-when-empty' => true,
             '--memory' => 1024,
         ])->assertExitCode(0);
 
-        $this->assertSame(0, Queue::connection('database')->size());
+        $this->assertSame(0, Queue::size());
         $this->assertTrue(FirstJob::$ran);
         $this->assertTrue(SecondJob::$ran);
     }
 
     public function testMemoryExceeded()
     {
-        Queue::connection('database')->push(new FirstJob);
-        Queue::connection('database')->push(new SecondJob);
+        Queue::push(new FirstJob);
+        Queue::push(new SecondJob);
 
         $this->artisan('queue:work', [
-            'connection' => 'database',
             '--daemon' => true,
             '--stop-when-empty' => true,
             '--memory' => 0.1,
         ])->assertExitCode(12);
 
         // Memory limit isn't checked until after the first job is attempted.
-        $this->assertSame(1, Queue::connection('database')->size());
+        $this->assertSame(1, Queue::size());
         $this->assertTrue(FirstJob::$ran);
         $this->assertFalse(SecondJob::$ran);
     }
 
     public function testMaxJobsExceeded()
     {
-        Queue::connection('database')->push(new FirstJob);
-        Queue::connection('database')->push(new SecondJob);
+        $this->markTestSkippedWhenUsingQueueDrivers(['redis', 'beanstalkd']);
+
+        Queue::push(new FirstJob);
+        Queue::push(new SecondJob);
 
         $this->artisan('queue:work', [
-            'connection' => 'database',
             '--daemon' => true,
             '--stop-when-empty' => true,
             '--max-jobs' => 1,
         ]);
 
         // Memory limit isn't checked until after the first job is attempted.
-        $this->assertSame(1, Queue::connection('database')->size());
+        $this->assertSame(1, Queue::size());
         $this->assertTrue(FirstJob::$ran);
         $this->assertFalse(SecondJob::$ran);
     }
 
     public function testMaxTimeExceeded()
     {
-        Queue::connection('database')->push(new ThirdJob);
-        Queue::connection('database')->push(new FirstJob);
-        Queue::connection('database')->push(new SecondJob);
+        $this->markTestSkippedWhenUsingQueueDrivers(['redis', 'beanstalkd']);
+
+        Queue::push(new ThirdJob);
+        Queue::push(new FirstJob);
+        Queue::push(new SecondJob);
 
         $this->artisan('queue:work', [
-            'connection' => 'database',
             '--daemon' => true,
             '--stop-when-empty' => true,
             '--max-time' => 1,
         ]);
 
         // Memory limit isn't checked until after the first job is attempted.
-        $this->assertSame(2, Queue::connection('database')->size());
+        $this->assertSame(2, Queue::size());
         $this->assertTrue(ThirdJob::$ran);
         $this->assertFalse(FirstJob::$ran);
         $this->assertFalse(SecondJob::$ran);

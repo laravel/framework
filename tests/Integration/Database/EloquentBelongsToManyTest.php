@@ -22,7 +22,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         Carbon::setTestNow(null);
     }
 
-    protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
+    protected function afterRefreshingDatabase()
     {
         Schema::create('users', function (Blueprint $table) {
             $table->increments('id');

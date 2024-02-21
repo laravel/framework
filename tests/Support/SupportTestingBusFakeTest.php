@@ -4,6 +4,8 @@ namespace Illuminate\Tests\Support;
 
 use Illuminate\Bus\Batch;
 use Illuminate\Bus\Queueable;
+use Illuminate\Container\Container;
+use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Contracts\Bus\QueueingDispatcher;
 use Illuminate\Support\Testing\Fakes\BatchRepositoryFake;
 use Illuminate\Support\Testing\Fakes\BusFake;
@@ -468,6 +470,10 @@ class SupportTestingBusFakeTest extends TestCase
 
     public function testAssertChained()
     {
+        Container::setInstance($container = new Container);
+
+        $container->instance(Dispatcher::class, $this->fake);
+
         $this->fake->chain([
             new ChainedJobStub,
         ])->dispatch();
@@ -485,6 +491,60 @@ class SupportTestingBusFakeTest extends TestCase
             ChainedJobStub::class,
             OtherBusJobStub::class,
         ]);
+
+        $this->fake->chain([
+            new ChainedJobStub,
+            $this->fake->batch([
+                new OtherBusJobStub,
+                new OtherBusJobStub,
+            ]),
+            new ChainedJobStub,
+        ])->dispatch();
+
+        $this->fake->assertChained([
+            ChainedJobStub::class,
+            $this->fake->chainedBatch(function ($pendingBatch) {
+                return $pendingBatch->jobs->count() === 2;
+            }),
+            ChainedJobStub::class,
+        ]);
+
+        $this->fake->assertChained([
+            new ChainedJobStub,
+            $this->fake->chainedBatch(function ($pendingBatch) {
+                return $pendingBatch->jobs->count() === 2;
+            }),
+            new ChainedJobStub,
+        ]);
+
+        $this->fake->chain([
+            $this->fake->batch([
+                new OtherBusJobStub,
+                new OtherBusJobStub,
+            ]),
+            new ChainedJobStub,
+            new ChainedJobStub,
+        ])->dispatch();
+
+        $this->fake->assertChained([
+            $this->fake->chainedBatch(function ($pendingBatch) {
+                return $pendingBatch->jobs->count() === 2;
+            }),
+            ChainedJobStub::class,
+            ChainedJobStub::class,
+        ]);
+
+        $this->fake->chain([
+            new ChainedJobStub(123),
+            new ChainedJobStub(456),
+        ])->dispatch();
+
+        $this->fake->assertChained([
+            fn (ChainedJobStub $job) => $job->id === 123,
+            fn (ChainedJobStub $job) => $job->id === 456,
+        ]);
+
+        Container::setInstance(null);
     }
 
     public function testAssertDispatchedWithIgnoreClass()
@@ -727,6 +787,13 @@ class BusJobStub
 class ChainedJobStub
 {
     use Queueable;
+
+    public $id;
+
+    public function __construct($id = null)
+    {
+        $this->id = $id;
+    }
 }
 
 class OtherBusJobStub

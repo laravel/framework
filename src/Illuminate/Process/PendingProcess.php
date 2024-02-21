@@ -237,6 +237,9 @@ class PendingProcess
      * @param  array<array-key, string>|string|null  $command
      * @param  callable|null  $output
      * @return \Illuminate\Contracts\Process\ProcessResult
+     *
+     * @throws \Illuminate\Process\Exceptions\ProcessTimedOutException
+     * @throws \RuntimeException
      */
     public function run(array|string $command = null, callable $output = null)
     {
@@ -345,7 +348,7 @@ class PendingProcess
     protected function fakeFor(string $command)
     {
         return collect($this->fakeHandlers)
-                ->first(fn ($handler, $pattern) => Str::is($pattern, $command));
+                ->first(fn ($handler, $pattern) => $pattern === '*' || Str::is($pattern, $command));
     }
 
     /**

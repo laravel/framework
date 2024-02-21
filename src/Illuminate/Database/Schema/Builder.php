@@ -5,11 +5,14 @@ namespace Illuminate\Database\Schema;
 use Closure;
 use Illuminate\Container\Container;
 use Illuminate\Database\Connection;
+use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
 use LogicException;
 
 class Builder
 {
+    use Macroable;
+
     /**
      * The database connection instance.
      *
@@ -159,9 +162,90 @@ class Builder
     {
         $table = $this->connection->getTablePrefix().$table;
 
-        return count($this->connection->selectFromWriteConnection(
-            $this->grammar->compileTableExists(), [$table]
-        )) > 0;
+        foreach ($this->getTables() as $value) {
+            if (strtolower($table) === strtolower($value['name'])) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Determine if the given view exists.
+     *
+     * @param  string  $view
+     * @return bool
+     */
+    public function hasView($view)
+    {
+        $view = $this->connection->getTablePrefix().$view;
+
+        foreach ($this->getViews() as $value) {
+            if (strtolower($view) === strtolower($value['name'])) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Get the tables that belong to the database.
+     *
+     * @return array
+     */
+    public function getTables()
+    {
+        return $this->connection->getPostProcessor()->processTables(
+            $this->connection->selectFromWriteConnection($this->grammar->compileTables())
+        );
+    }
+
+    /**
+     * Get the names of the tables that belong to the database.
+     *
+     * @return array
+     */
+    public function getTableListing()
+    {
+        return array_column($this->getTables(), 'name');
+    }
+
+    /**
+     * Get the views that belong to the database.
+     *
+     * @return array
+     */
+    public function getViews()
+    {
+        return $this->connection->getPostProcessor()->processViews(
+            $this->connection->selectFromWriteConnection($this->grammar->compileViews())
+        );
+    }
+
+    /**
+     * Get the user-defined types that belong to the database.
+     *
+     * @return array
+     */
+    public function getTypes()
+    {
+        throw new LogicException('This database driver does not support user-defined types.');
+    }
+
+    /**
+     * Get all of the table names for the database.
+     *
+     * @deprecated Will be removed in a future Laravel version.
+     *
+     * @return array
+     *
+     * @throws \LogicException
+     */
+    public function getAllTables()
+    {
+        throw new LogicException('This database driver does not support getting all tables.');
     }
 
     /**
@@ -282,6 +366,73 @@ class Builder
     }
 
     /**
+     * Get the indexes for a given table.
+     *
+     * @param  string  $table
+     * @return array
+     */
+    public function getIndexes($table)
+    {
+        $table = $this->connection->getTablePrefix().$table;
+
+        return $this->connection->getPostProcessor()->processIndexes(
+            $this->connection->selectFromWriteConnection($this->grammar->compileIndexes($table))
+        );
+    }
+
+    /**
+     * Get the names of the indexes for a given table.
+     *
+     * @param  string  $table
+     * @return array
+     */
+    public function getIndexListing($table)
+    {
+        return array_column($this->getIndexes($table), 'name');
+    }
+
+    /**
+     * Determine if the given table has a given index.
+     *
+     * @param  string  $table
+     * @param  string|array  $index
+     * @param  string|null  $type
+     * @return bool
+     */
+    public function hasIndex($table, $index, $type = null)
+    {
+        $type = is_null($type) ? $type : strtolower($type);
+
+        foreach ($this->getIndexes($table) as $value) {
+            $typeMatches = is_null($type)
+                || ($type === 'primary' && $value['primary'])
+                || ($type === 'unique' && $value['unique'])
+                || $type === $value['type'];
+
+            if (($value['name'] === $index || $value['columns'] === $index) && $typeMatches) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Get the foreign keys for a given table.
+     *
+     * @param  string  $table
+     * @return array
+     */
+    public function getForeignKeys($table)
+    {
+        $table = $this->connection->getTablePrefix().$table;
+
+        return $this->connection->getPostProcessor()->processForeignKeys(
+            $this->connection->selectFromWriteConnection($this->grammar->compileForeignKeys($table))
+        );
+    }
+
+    /**
      * Modify a table on the schema.
      *
      * @param  string  $table
@@ -383,18 +534,6 @@ class Builder
     public function dropAllTypes()
     {
         throw new LogicException('This database driver does not support dropping all types.');
-    }
-
-    /**
-     * Get all of the table names for the database.
-     *
-     * @return array
-     *
-     * @throws \LogicException
-     */
-    public function getAllTables()
-    {
-        throw new LogicException('This database driver does not support getting all tables.');
     }
 
     /**

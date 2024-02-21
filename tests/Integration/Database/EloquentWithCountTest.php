@@ -9,7 +9,7 @@ use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 class EloquentWithCountTest extends DatabaseTestCase
 {
-    protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
+    protected function afterRefreshingDatabase()
     {
         Schema::create('one', function (Blueprint $table) {
             $table->increments('id');

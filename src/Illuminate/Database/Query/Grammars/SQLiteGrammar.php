@@ -147,6 +147,31 @@ class SQLiteGrammar extends Grammar
     }
 
     /**
+     * Compile a "JSON contains" statement into SQL.
+     *
+     * @param  string  $column
+     * @param  mixed  $value
+     * @return string
+     */
+    protected function compileJsonContains($column, $value)
+    {
+        [$field, $path] = $this->wrapJsonFieldAndPath($column);
+
+        return 'exists (select 1 from json_each('.$field.$path.') where '.$this->wrap('json_each.value').' is '.$value.')';
+    }
+
+    /**
+     * Prepare the binding for a "JSON contains" statement.
+     *
+     * @param  mixed  $binding
+     * @return mixed
+     */
+    public function prepareBindingForJsonContains($binding)
+    {
+        return $binding;
+    }
+
+    /**
      * Compile a "JSON contains key" statement into SQL.
      *
      * @param  string  $column
@@ -185,6 +210,19 @@ class SQLiteGrammar extends Grammar
     public function compileInsertOrIgnore(Builder $query, array $values)
     {
         return Str::replaceFirst('insert', 'insert or ignore', $this->compileInsert($query, $values));
+    }
+
+    /**
+     * Compile an insert ignore statement using a subquery into SQL.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $columns
+     * @param  string  $sql
+     * @return string
+     */
+    public function compileInsertOrIgnoreUsing(Builder $query, array $columns, string $sql)
+    {
+        return Str::replaceFirst('insert', 'insert or ignore', $this->compileInsertUsing($query, $columns, $sql));
     }
 
     /**

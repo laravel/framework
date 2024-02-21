@@ -318,9 +318,9 @@ class Gate implements GateContract
     }
 
     /**
-     * Determine if the given ability should be granted for the current user.
+     * Determine if all of the given abilities should be granted for the current user.
      *
-     * @param  string  $ability
+     * @param  iterable|string  $ability
      * @param  array|mixed  $arguments
      * @return bool
      */
@@ -330,9 +330,9 @@ class Gate implements GateContract
     }
 
     /**
-     * Determine if the given ability should be denied for the current user.
+     * Determine if any of the given abilities should be denied for the current user.
      *
-     * @param  string  $ability
+     * @param  iterable|string  $ability
      * @param  array|mixed  $arguments
      * @return bool
      */

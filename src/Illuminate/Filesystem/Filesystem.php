@@ -268,11 +268,12 @@ class Filesystem
      *
      * @param  string  $path
      * @param  string  $data
+     * @param  bool  $lock
      * @return int
      */
-    public function append($path, $data)
+    public function append($path, $data, $lock = false)
     {
-        return file_put_contents($path, $data, FILE_APPEND);
+        return file_put_contents($path, $data, FILE_APPEND | ($lock ? LOCK_EX : 0));
     }
 
     /**
@@ -545,7 +546,7 @@ class Filesystem
     {
         $hash = @md5_file($firstFile);
 
-        return $hash && $hash === @md5_file($secondFile);
+        return $hash && hash_equals($hash, (string) @md5_file($secondFile));
     }
 
     /**

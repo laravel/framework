@@ -1,0 +1,64 @@
+name: manual release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release'
+        required: true
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Remove optional "v" prefix
+        id: version
+        run: |
+          VERSION=${{ inputs.version }}
+          echo "version=${VERSION#v}" >> "$GITHUB_OUTPUT"
+
+      - name: Update Application.php version
+        run: sed -i "s/const VERSION = '.*';/const VERSION = '${{ steps.version.outputs.version }}';/g" src/Illuminate/Foundation/Application.php
+
+      - name: Commit version change
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "Update version to v${{ steps.version.outputs.version }}"
+
+      - name: SSH into splitter server
+        uses: appleboy/ssh-action@master
+        with:
+          host: 104.248.56.26
+          username: forge
+          key: ${{ secrets.SSH_PRIVATE_KEY_SPLITTER }}
+          script: |
+            cd laravel-${{ github.ref_name }}
+            git pull origin ${{ github.ref_name }}
+            bash ./bin/release.sh v${{ steps.version.outputs.version }}
+          script_stop: true
+
+      - name: Generate release notes
+        id: notes
+        uses: RedCrafter07/release-notes-action@main
+        with:
+          tag-name: v${{ steps.version.outputs.version }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ github.ref_name }}
+
+      - name: Cleanup release notes
+        run: |
+          sed -i '/## What'"'"'s Changed/d' ${{ steps.notes.outputs.release-notes }}
+          sed -i '/## New Contributors/,//d' ${{ steps.notes.outputs.release-notes }}
+
+      - name: Create release
+        uses:  softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ steps.version.outputs.version }}
+          name: v${{ steps.version.outputs.version }}
+          body: ${{ steps.notes.outputs.release-notes }}
