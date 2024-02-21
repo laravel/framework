@@ -384,6 +384,8 @@ class PendingProcess
      * @param  callable|null  $output
      * @param  \Closure  $fake
      * @return \Illuminate\Process\FakeInvokedProcess
+     *
+     * @throw \LogicException
      */
     protected function resolveAsynchronousFake(string $command, ?callable $output, Closure $fake)
     {
