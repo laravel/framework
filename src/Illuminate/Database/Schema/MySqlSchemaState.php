@@ -2,7 +2,6 @@
 
 namespace Illuminate\Database\Schema;
 
-use Exception;
 use Illuminate\Database\Connection;
 use Illuminate\Support\Str;
 use Symfony\Component\Process\Process;
@@ -17,7 +16,7 @@ class MySqlSchemaState extends SchemaState
      * @return void
      *
      * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
-     * @throws Exception
+     * @throws \Exception
      */
     public function dump(Connection $connection, $path)
     {
@@ -55,7 +54,7 @@ class MySqlSchemaState extends SchemaState
      * @param  string  $path
      * @return void
      *
-     * @throws Exception
+     * @throws \Exception
      */
     protected function appendMigrationData(string $path)
     {
@@ -152,7 +151,7 @@ class MySqlSchemaState extends SchemaState
      * @param  array  $variables
      * @return \Symfony\Component\Process\Process
      *
-     * @throws Exception
+     * @throws \Exception
      */
     protected function executeDumpProcess(Process $process, $output, array $variables)
     {
