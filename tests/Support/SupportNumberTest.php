@@ -296,16 +296,30 @@ class SupportNumberTest extends TestCase
 
     public function testIsInt()
     {
-        $this->assertSame(true, Number::isInt(1));
-        $this->assertSame(true, Number::isInt(0));
-        $this->assertSame(true, Number::isInt(-1));
-        $this->assertSame(false, Number::isInt(1.1));
-        $this->assertSame(false, Number::isInt(0.1));
-        $this->assertSame(false, Number::isInt(-1.1));
-        $this->assertSame(false, Number::isInt('1'));
-        $this->assertSame(false, Number::isInt('0'));
-        $this->assertSame(false, Number::isInt('-1'));
-        $this->assertSame(false, Number::isInt('1.1'));
+        $this->assertTrue(Number::isInt(1));
+        $this->assertTrue( Number::isInt(0));
+        $this->assertTrue( Number::isInt(-1));
+        $this->assertFalse(Number::isInt(1.1));
+        $this->assertFalse(Number::isInt(0.1));
+        $this->assertFalse(Number::isInt(-1.1));
+        $this->assertFalse(Number::isInt('1'));
+        $this->assertFalse(Number::isInt('0'));
+        $this->assertFalse(Number::isInt('-1'));
+        $this->assertFalse(Number::isInt('1.1'));
+    }
+
+    public function testIsFloat()
+    {
+        $this->assertFalse(Number::isFloat(1));
+        $this->assertFalse(Number::isFloat(0));
+        $this->assertFalse(Number::isFloat(-1));
+        $this->assertTrue(Number::isFloat(1.1));
+        $this->assertTrue(Number::isFloat(0.1));
+        $this->assertTrue(Number::isFloat(-1.1));
+        $this->assertFalse(Number::isFloat('1'));
+        $this->assertFalse(Number::isFloat('0'));
+        $this->assertFalse(Number::isFloat('-1'));
+        $this->assertFalse(Number::isFloat('1.1'));
     }
 
     protected function needsIntlExtension()
