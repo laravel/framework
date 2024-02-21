@@ -33,50 +33,6 @@ class MySqlConnector extends Connector implements ConnectorInterface
     }
 
     /**
-     * Configure the connection.
-     *
-     * @param  \PDO  $connection
-     * @param  array  $config
-     * @return void
-     */
-    protected function configureConnection(PDO $connection, array $config)
-    {
-        $statements = [];
-
-        // First, we set the transaction isolation level.
-        if (isset($config['isolation_level'])) {
-            $statements[] = sprintf('SESSION TRANSACTION ISOLATION LEVEL %s', $config['isolation_level']);
-        }
-
-        // Now, we set the charset and possibly the collation.
-        if (isset($config['charset'])) {
-            if (isset($config['collation'])) {
-                $statements[] = sprintf("NAMES '%s' COLLATE '%s'", $config['charset'], $config['collation']);
-            } else {
-                $statements[] = sprintf("NAMES '%s'", $config['charset']);
-            }
-        }
-
-        // Next, we will check to see if a timezone has been specified in this config
-        // and if it has we will issue a statement to modify the timezone with the
-        // database. Setting this DB timezone is an optional configuration item.
-        if (isset($config['timezone'])) {
-            $statements[] = sprintf("time_zone='%s'", $config['timezone']);
-        }
-
-        // Next, we set the correct sql_mode mode according to the config.
-        $sqlMode = $this->getSqlMode($connection, $config);
-        if (null !== $sqlMode) {
-            $statements[] = sprintf("SESSION sql_mode='%s'", $sqlMode);
-        }
-
-        // Finally, execute a single SET command with all our statements.
-        if ([] !== $statements) {
-            $connection->exec(sprintf('SET %s;', implode(', ', $statements)));
-        }
-    }
-
-    /**
      * Create a DSN string from a configuration.
      *
      * Chooses socket or host/port based on the 'unix_socket' config value.
@@ -126,6 +82,44 @@ class MySqlConnector extends Connector implements ConnectorInterface
         return isset($port)
                     ? "mysql:host={$host};port={$port};dbname={$database}"
                     : "mysql:host={$host};dbname={$database}";
+    }
+
+    /**
+     * Configure the given PDO connection.
+     *
+     * @param  \PDO  $connection
+     * @param  array  $config
+     * @return void
+     */
+    protected function configureConnection(PDO $connection, array $config)
+    {
+        $statements = [];
+
+        if (isset($config['isolation_level'])) {
+            $statements[] = sprintf('SESSION TRANSACTION ISOLATION LEVEL %s', $config['isolation_level']);
+        }
+
+        if (isset($config['charset'])) {
+            if (isset($config['collation'])) {
+                $statements[] = sprintf("NAMES '%s' COLLATE '%s'", $config['charset'], $config['collation']);
+            } else {
+                $statements[] = sprintf("NAMES '%s'", $config['charset']);
+            }
+        }
+
+        if (isset($config['timezone'])) {
+            $statements[] = sprintf("time_zone='%s'", $config['timezone']);
+        }
+
+        $sqlMode = $this->getSqlMode($connection, $config);
+
+        if ($sqlMode !== null) {
+            $statements[] = sprintf("SESSION sql_mode='%s'", $sqlMode);
+        }
+
+        if ($statements !== []) {
+            $connection->exec(sprintf('SET %s;', implode(', ', $statements)));
+        }
     }
 
     /**
