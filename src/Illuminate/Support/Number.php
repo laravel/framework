@@ -283,4 +283,15 @@ class Number
     {
         return is_int($number);
     }
+
+    /**
+     * Determines if a number is float.
+     *
+     * @param  int|float|string  $number
+     * @return bool
+     */
+    public static function isFloat(int|float|string $number): bool
+    {
+        return is_float($number);
+    }
 }
