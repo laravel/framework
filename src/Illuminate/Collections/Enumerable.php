@@ -1154,6 +1154,13 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     public function pad($size, $value);
 
     /**
+     * Create a collection by using this collection for keys as well as values.
+     *
+     * @return static<TValue, TValue>
+     */
+    public function mirror();
+
+    /**
      * Get the values iterator.
      *
      * @return \Traversable<TKey, TValue>

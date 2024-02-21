@@ -1678,6 +1678,16 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     }
 
     /**
+     * Create a collection by using this collection for keys as well as values.
+     *
+     * @return static<TValue, TValue>
+     */
+    public function mirror()
+    {
+        return new static(array_combine($this->items, $this->items));
+    }
+
+    /**
      * Get an iterator for the items.
      *
      * @return \ArrayIterator<TKey, TValue>

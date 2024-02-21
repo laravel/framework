@@ -4158,6 +4158,17 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testMirror($collection)
+    {
+        $c = new $collection(['value', 'value2']);
+        $c = $c->mirror();
+
+        $this->assertEquals(['value' => 'value', 'value2' => 'value2'], $c->all());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testGettingMaxItemsFromCollection($collection)
     {
         $c = new $collection([(object) ['foo' => 10], (object) ['foo' => 20]]);

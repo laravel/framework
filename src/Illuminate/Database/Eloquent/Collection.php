@@ -629,6 +629,16 @@ class Collection extends BaseCollection implements QueueableCollection
     }
 
     /**
+     * Create a collection by using this collection for keys as well as values.
+     *
+     * @return \Illuminate\Support\Collection<mixed, mixed>
+     */
+    public function mirror()
+    {
+        return $this->toBase()->mirror();
+    }
+
+    /**
      * Get an array with the values of a given key.
      *
      * @param  string|array<array-key, string>  $value

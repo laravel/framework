@@ -1685,6 +1685,16 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     }
 
     /**
+     * Create a collection by using this collection for keys as well as values.
+     *
+     * @return static<TValue, TValue>
+     */
+    public function mirror()
+    {
+        return $this->passthru('mirror', []);
+    }
+
+    /**
      * Get the values iterator.
      *
      * @return \Traversable<TKey, TValue>
