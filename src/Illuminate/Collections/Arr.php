@@ -516,9 +516,7 @@ class Arr
      */
     public static function select($array, $keys)
     {
-        if (is_string($keys)) {
-            $keys = [$keys];
-        }
+        $keys = static::wrap($keys);
         
         return static::map($array, function ($item) use ($keys) {
             $result = [];
