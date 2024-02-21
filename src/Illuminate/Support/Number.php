@@ -130,7 +130,7 @@ class Number
      * @param  int|float  $bytes
      * @param  int  $precision
      * @param  int|null  $maxPrecision
-     * @param  bool $useSiUnits
+     * @param  bool  $useSiUnits
      * @return string
      */
     public static function fileSize(int|float $bytes, int $precision = 0, ?int $maxPrecision = null, ?bool $useSiUnits = false)
@@ -142,7 +142,7 @@ class Number
             $units = ['B', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB'];
             $divisor = 1024;
         }
-        
+
         for ($i = 0; ($bytes / $divisor) > 0.9 && ($i < count($units) - 1); $i++) {
             $bytes /= $divisor;
         }
