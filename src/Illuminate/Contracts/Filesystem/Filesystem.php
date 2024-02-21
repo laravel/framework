@@ -53,6 +53,16 @@ interface Filesystem
     public function put($path, $contents, $options = []);
 
     /**
+     * Store the uploaded file on the disk.
+     *
+     * @param  \Illuminate\Http\File|\Illuminate\Http\UploadedFile|string  $path
+     * @param  \Illuminate\Http\File|\Illuminate\Http\UploadedFile|string|array|null  $file
+     * @param  mixed  $options
+     * @return string|false
+     */
+    public function putFile($path, $file, $options = []);
+
+    /**
      * Write a new file using a stream.
      *
      * @param  string  $path
