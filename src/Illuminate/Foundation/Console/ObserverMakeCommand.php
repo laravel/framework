@@ -102,9 +102,15 @@ class ObserverMakeCommand extends GeneratorCommand
      */
     protected function getStub()
     {
-        return $this->option('model')
-            ? $this->resolveStubPath('/stubs/observer.stub')
-            : $this->resolveStubPath('/stubs/observer.plain.stub');
+        if ($this->option('model') && $this->option('softDelete')) {
+            $this->resolveStubPath('/stubs/observer.soft-delete.stub');
+        }
+
+        if ($this->option('model')) {
+            $this->resolveStubPath('/stubs/observer.stub');
+        }
+
+        return $this->resolveStubPath('/stubs/observer.plain.stub');
     }
 
     /**
