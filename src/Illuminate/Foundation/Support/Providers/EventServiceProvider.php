@@ -33,6 +33,13 @@ class EventServiceProvider extends ServiceProvider
     protected $observers = [];
 
     /**
+     * The configured event discovery paths.
+     *
+     * @var array|null
+     */
+    protected static $eventDiscoveryPaths;
+
+    /**
      * Register the application's event listeners.
      *
      * @return void
@@ -149,9 +156,20 @@ class EventServiceProvider extends ServiceProvider
      */
     protected function discoverEventsWithin()
     {
-        return [
+        return static::$eventDiscoveryPaths ?: [
             $this->app->path('Listeners'),
         ];
+    }
+
+    /**
+     * Set the globally configured event discovery paths.
+     *
+     * @param  array  $paths
+     * @return void
+     */
+    public static function setEventDiscoveryPaths(array $paths)
+    {
+        static::$eventDiscoveryPaths = $paths;
     }
 
     /**
