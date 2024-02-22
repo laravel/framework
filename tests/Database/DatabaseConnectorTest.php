@@ -36,10 +36,8 @@ class DatabaseConnectorTest extends TestCase
         $connection = m::mock(PDO::class);
         $connector->expects($this->once())->method('getOptions')->with($this->equalTo($config))->willReturn(['options']);
         $connector->expects($this->once())->method('createConnection')->with($this->equalTo($dsn), $this->equalTo($config), $this->equalTo(['options']))->willReturn($connection);
-        $statement = m::mock(PDOStatement::class);
-        $connection->shouldReceive('prepare')->once()->with('set names \'utf8\' collate \'utf8_unicode_ci\'')->andReturn($statement);
-        $statement->shouldReceive('execute')->once();
-        $connection->shouldReceive('exec')->zeroOrMoreTimes();
+        $connection->shouldReceive('exec')->once()->with('use `bar`;')->andReturn(true);
+        $connection->shouldReceive('exec')->once()->with("SET NAMES 'utf8' COLLATE 'utf8_unicode_ci';")->andReturn(true);
         $result = $connector->connect($config);
 
         $this->assertSame($result, $connection);
@@ -63,11 +61,8 @@ class DatabaseConnectorTest extends TestCase
         $connection = m::mock(PDO::class);
         $connector->expects($this->once())->method('getOptions')->with($this->equalTo($config))->willReturn(['options']);
         $connector->expects($this->once())->method('createConnection')->with($this->equalTo($dsn), $this->equalTo($config), $this->equalTo(['options']))->willReturn($connection);
-        $statement = m::mock(PDOStatement::class);
-        $connection->shouldReceive('prepare')->once()->with('set names \'utf8\' collate \'utf8_unicode_ci\'')->andReturn($statement);
-        $connection->shouldReceive('prepare')->once()->with('SET SESSION TRANSACTION ISOLATION LEVEL REPEATABLE READ')->andReturn($statement);
-        $statement->shouldReceive('execute')->zeroOrMoreTimes();
-        $connection->shouldReceive('exec')->zeroOrMoreTimes();
+        $connection->shouldReceive('exec')->once()->with('use `bar`;')->andReturn(true);
+        $connection->shouldReceive('exec')->once()->with("SET SESSION TRANSACTION ISOLATION LEVEL REPEATABLE READ, NAMES 'utf8' COLLATE 'utf8_unicode_ci';")->andReturn(true);
         $result = $connector->connect($config);
 
         $this->assertSame($result, $connection);

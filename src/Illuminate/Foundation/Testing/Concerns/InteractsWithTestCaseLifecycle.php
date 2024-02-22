@@ -10,6 +10,7 @@ use Illuminate\Foundation\Bootstrap\HandleExceptions;
 use Illuminate\Foundation\Bootstrap\RegisterProviders;
 use Illuminate\Foundation\Console\AboutCommand;
 use Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull;
+use Illuminate\Foundation\Http\Middleware\PreventRequestsDuringMaintenance;
 use Illuminate\Foundation\Http\Middleware\TrimStrings;
 use Illuminate\Foundation\Http\Middleware\ValidateCsrfToken;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
@@ -169,6 +170,7 @@ trait InteractsWithTestCaseLifecycle
         EncryptCookies::flushState();
         HandleExceptions::flushState();
         Once::flush();
+        PreventRequestsDuringMaintenance::flushState();
         Queue::createPayloadUsing(null);
         RegisterProviders::flushState();
         Sleep::fake(false);
