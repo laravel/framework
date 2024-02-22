@@ -518,41 +518,43 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
 
         $fillable = $this->fillableFromArray($attributes);
 
-        foreach ($fillable as $key => $value) {
-            // The developers may choose to place some attributes in the "fillable" array
-            // which means only those attributes may be set through mass assignment to
-            // the model, and all others will just get ignored for security reasons.
-            if ($this->isFillable($key)) {
-                $this->setAttribute($key, $value);
-            } elseif ($totallyGuarded || static::preventsSilentlyDiscardingAttributes()) {
+        try {
+            foreach ($fillable as $key => $value) {
+                // The developers may choose to place some attributes in the "fillable" array
+                // which means only those attributes may be set through mass assignment to
+                // the model, and all others will just get ignored for security reasons.
+                if ($this->isFillable($key)) {
+                    $this->setAttribute($key, $value);
+                } elseif ($totallyGuarded || static::preventsSilentlyDiscardingAttributes()) {
+                    if (isset(static::$discardedAttributeViolationCallback)) {
+                        call_user_func(static::$discardedAttributeViolationCallback, $this, [$key]);
+                    } else {
+                        throw new MassAssignmentException(sprintf(
+                            'Add [%s] to fillable property to allow mass assignment on [%s].',
+                            $key, get_class($this)
+                        ));
+                    }
+                }
+            }
+
+            if (count($attributes) !== count($fillable) &&
+                static::preventsSilentlyDiscardingAttributes()) {
+                $keys = array_diff(array_keys($attributes), array_keys($fillable));
+
                 if (isset(static::$discardedAttributeViolationCallback)) {
-                    call_user_func(static::$discardedAttributeViolationCallback, $this, [$key]);
+                    call_user_func(static::$discardedAttributeViolationCallback, $this, $keys);
                 } else {
                     throw new MassAssignmentException(sprintf(
-                        'Add [%s] to fillable property to allow mass assignment on [%s].',
-                        $key, get_class($this)
+                        'Add fillable property [%s] to allow mass assignment on [%s].',
+                        implode(', ', $keys),
+                        get_class($this)
                     ));
                 }
             }
-        }
-
-        if (count($attributes) !== count($fillable) &&
-            static::preventsSilentlyDiscardingAttributes()) {
-            $keys = array_diff(array_keys($attributes), array_keys($fillable));
-
-            if (isset(static::$discardedAttributeViolationCallback)) {
-                call_user_func(static::$discardedAttributeViolationCallback, $this, $keys);
-            } else {
-                throw new MassAssignmentException(sprintf(
-                    'Add fillable property [%s] to allow mass assignment on [%s].',
-                    implode(', ', $keys),
-                    get_class($this)
-                ));
+        } finally {
+            if (! $wasUnguarded) {
+                static::reguard();
             }
-        }
-
-        if (! $wasUnguarded) {
-            static::reguard();
         }
 
         return $this;
