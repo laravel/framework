@@ -88,7 +88,7 @@ class UpsertionCreator
     }
 
     /**
-     * Get the upsertions folder path
+     * Get the upsertions folder path.
      *
      * @return string
      */

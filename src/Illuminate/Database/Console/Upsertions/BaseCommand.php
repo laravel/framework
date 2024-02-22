@@ -118,7 +118,6 @@ abstract class BaseCommand extends Command
      * Render the initial select for all upsert files.
      *
      * @param  bool  $shouldShowSelect
-     *
      * @return void
      */
     private function selectAllUpserts($shouldShowSelect = true)

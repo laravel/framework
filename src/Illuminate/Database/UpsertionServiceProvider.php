@@ -62,7 +62,7 @@ class UpsertionServiceProvider extends ServiceProvider implements DeferrableProv
     {
         $path = database_path('/upsertions');
 
-        if (!is_dir($path)) {
+        if (! is_dir($path)) {
             File::makeDirectory($path);
         }
     }
