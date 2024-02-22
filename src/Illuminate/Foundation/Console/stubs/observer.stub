@@ -29,20 +29,4 @@ class {{ class }}
     {
         //
     }
-
-    /**
-     * Handle the {{ model }} "restored" event.
-     */
-    public function restored({{ model }} ${{ modelVariable }}): void
-    {
-        //
-    }
-
-    /**
-     * Handle the {{ model }} "force deleted" event.
-     */
-    public function forceDeleted({{ model }} ${{ modelVariable }}): void
-    {
-        //
-    }
 }
