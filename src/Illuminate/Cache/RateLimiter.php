@@ -117,8 +117,7 @@ class RateLimiter
     }
 
     /**
-     * Increment the counter for a given key for a given decay time by a custom
-     * amount.
+     * Increment the counter for a given key for a given decay time by a custom amount.
      *
      * @param  string  $key
      * @param  int  $decaySeconds
