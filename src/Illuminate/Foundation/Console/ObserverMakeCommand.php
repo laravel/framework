@@ -147,6 +147,7 @@ class ObserverMakeCommand extends GeneratorCommand
         return [
             ['force', 'f', InputOption::VALUE_NONE, 'Create the class even if the observer already exists'],
             ['model', 'm', InputOption::VALUE_OPTIONAL, 'The model that the observer applies to'],
+            ['softDelete', 'sd', InputOption::VALUE_NONE, 'Create observer with soft deletes events'],
         ];
     }
 
