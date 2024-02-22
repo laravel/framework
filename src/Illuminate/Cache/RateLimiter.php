@@ -130,9 +130,7 @@ class RateLimiter
         $key = $this->cleanRateLimiterKey($key);
 
         $this->cache->add(
-            $key.':timer',
-            $this->availableAt($decaySeconds),
-            $decaySeconds
+            $key.':timer', $this->availableAt($decaySeconds), $decaySeconds
         );
 
         $added = $this->cache->add($key, 0, $decaySeconds);
