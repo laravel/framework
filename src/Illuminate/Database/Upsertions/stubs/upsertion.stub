@@ -1,0 +1,22 @@
+<?php
+
+use Illuminate\Database\Upsertions\Upsertion;
+
+return new class extends Upsertion
+{
+    /**
+     * The condition to run the upsertion.
+     */
+    public function shouldRun(): bool
+    {
+        return false;
+    }
+
+    /**
+     * Running the upsertion.
+     */
+    public function run(): void
+    {
+        //
+    }
+};

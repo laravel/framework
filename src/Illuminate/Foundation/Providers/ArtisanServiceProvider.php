@@ -26,6 +26,8 @@ use Illuminate\Database\Console\Seeds\SeederMakeCommand;
 use Illuminate\Database\Console\ShowCommand;
 use Illuminate\Database\Console\ShowModelCommand;
 use Illuminate\Database\Console\TableCommand as DatabaseTableCommand;
+use Illuminate\Database\Console\Upsertions\UpsertCommand;
+use Illuminate\Database\Console\Upsertions\UpsertionMakeCommand;
 use Illuminate\Database\Console\WipeCommand;
 use Illuminate\Foundation\Console\AboutCommand;
 use Illuminate\Foundation\Console\CastMakeCommand;
@@ -208,6 +210,8 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         'TestMake' => TestMakeCommand::class,
         'VendorPublish' => VendorPublishCommand::class,
         'ViewMake' => ViewMakeCommand::class,
+        'UpsertionMake' => UpsertionMakeCommand::class,
+        'Upsert' => UpsertCommand::class,
     ];
 
     /**
