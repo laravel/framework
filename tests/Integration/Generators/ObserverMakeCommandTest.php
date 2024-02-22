@@ -31,8 +31,6 @@ class ObserverMakeCommandTest extends TestCase
             'public function created(Foo $foo)',
             'public function updated(Foo $foo)',
             'public function deleted(Foo $foo)',
-            'public function restored(Foo $foo)',
-            'public function forceDeleted(Foo $foo)',
         ], 'app/Observers/FooObserver.php');
     }
 }
