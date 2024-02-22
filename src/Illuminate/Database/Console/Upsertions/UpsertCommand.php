@@ -34,7 +34,7 @@ class UpsertCommand extends BaseCommand
     }
 
     /**
-     * Run all found upsertion files
+     * Run all found upsertion files.
      *
      * @return void
      */

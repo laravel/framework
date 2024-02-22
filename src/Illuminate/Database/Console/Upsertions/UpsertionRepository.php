@@ -7,14 +7,14 @@ use Symfony\Component\Finder\Finder;
 class UpsertionRepository
 {
     /**
-     * The found upserter files inside the configured directory
+     * The found upserter files inside the configured directory.
      *
      * @var SplFileInfo[]
      */
     public $foundUpsertions = [];
 
     /**
-     * The selected files to upsert
+     * The selected files to upsert.
      *
      * @var SplFileInfo[]
      */
@@ -33,7 +33,7 @@ class UpsertionRepository
     }
 
     /**
-     * Get the classnames of files as an associative array
+     * Get the classnames of files as an associative array.
      *
      * @param  SplFileInfo[]  $files
      * @return array
@@ -51,7 +51,7 @@ class UpsertionRepository
     }
 
     /**
-     * Get files by path
+     * Get files by path.
      *
      * @param  string[]  $filePaths
      * @return SplFileInfo[]

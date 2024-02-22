@@ -32,7 +32,6 @@ class UpsertionServiceProvider extends ServiceProvider implements DeferrableProv
         $this->createUpsertionsDirectory();
     }
 
-
     /**
      * Register the given commands.
      *
@@ -55,7 +54,7 @@ class UpsertionServiceProvider extends ServiceProvider implements DeferrableProv
     }
 
     /**
-     * Create the Upsertions directory
+     * Create the upsertions directory.
      *
      * @return void
      */

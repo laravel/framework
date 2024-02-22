@@ -43,7 +43,7 @@ abstract class BaseCommand extends Command
     }
 
     /**
-     * Initialize the command flow
+     * Initialize the command flow.
      *
      * @return void
      */
@@ -57,7 +57,7 @@ abstract class BaseCommand extends Command
     }
 
     /**
-     * Render the initial selecting functionality
+     * Render the initial selecting functionality.
      *
      * @return void
      */
@@ -83,7 +83,7 @@ abstract class BaseCommand extends Command
     }
 
     /**
-     * Render the multisearch to select which upsert files to run
+     * Render the multisearch to select which upsert files to run.
      *
      * @return void
      */
@@ -115,7 +115,7 @@ abstract class BaseCommand extends Command
     }
 
     /**
-     * Render the initial select for all upsert files
+     * Render the initial select for all upsert files.
      *
      * @param  bool  $shouldShowSelect
      *
@@ -163,7 +163,7 @@ abstract class BaseCommand extends Command
     }
 
     /**
-     * Render the found upsert files table and a select to run upserts
+     * Render the found upsert files table and a select to run upserts.
      *
      * @return void
      */
