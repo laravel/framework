@@ -4,6 +4,7 @@ namespace Illuminate\Database\Console\Upsertions;
 
 use function Laravel\Prompts\outro;
 use function Laravel\Prompts\progress;
+use Symfony\Component\Console\Attribute\AsCommand;
 
 #[AsCommand(name: 'upsert')]
 class UpsertCommand extends BaseCommand

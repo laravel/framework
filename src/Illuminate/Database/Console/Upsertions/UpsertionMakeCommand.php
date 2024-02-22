@@ -4,6 +4,7 @@ namespace Illuminate\Database\Console\Upsertions;
 
 use Illuminate\Console\Command;
 use Illuminate\Database\Upsertions\UpsertionCreator;
+use Symfony\Component\Console\Attribute\AsCommand;
 
 use function Laravel\Prompts\outro;
 use function Laravel\Prompts\text;
