@@ -436,6 +436,32 @@ class SupportStrTest extends TestCase
         $this->assertEquals('some: "json"', Str::unwrap('{some: "json"}', '{', '}'));
     }
 
+    public function testIndent()
+    {
+        $this->assertEquals('value', Str::indent('value', 0));
+        $this->assertEquals('    value', Str::indent('value', 4));
+
+        $this->assertEquals(
+            <<<HTML
+                <div>
+                    Foo
+
+                    Bar
+                </div>
+            HTML,
+            Str::indent(
+                <<<HTML
+                <div>
+                    Foo
+
+                    Bar
+                </div>
+                HTML,
+                4
+            ),
+        );
+    }
+
     public function testIs()
     {
         $this->assertTrue(Str::is('/', '/'));

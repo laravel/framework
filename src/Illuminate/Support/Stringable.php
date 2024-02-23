@@ -1237,6 +1237,18 @@ class Stringable implements JsonSerializable, ArrayAccess
     }
 
     /**
+     * Indent all non-empty lines in the string by the given amount of spaces.
+     * 
+     * @param  int  $amount
+     * @return static
+     */
+    public function indent(int $amount): static
+    {
+        return new static(Str::indent($this->value, $amount));
+    }
+
+
+    /**
      * Convert the string into a `HtmlString` instance.
      *
      * @return \Illuminate\Support\HtmlString

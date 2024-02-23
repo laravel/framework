@@ -1184,6 +1184,33 @@ class SupportStringableTest extends TestCase
         $this->assertEquals('some: "json"', $this->stringable('{some: "json"}')->unwrap('{', '}'));
     }
 
+    public function testIndent()
+    {
+        $this->assertEquals('value', $this->stringable('value')->indent(0));
+        $this->assertEquals('    value', $this->stringable('value')->indent(4));
+
+        $this->assertEquals(
+            <<<HTML
+                <div>
+                    Foo
+
+                    Bar
+                </div>
+            HTML,
+            $this
+                ->stringable(
+                    <<<HTML
+                    <div>
+                        Foo
+
+                        Bar
+                    </div>
+                    HTML,
+                )
+                ->indent(4),
+        );
+    }
+
     public function testToHtmlString()
     {
         $this->assertEquals(

@@ -412,6 +412,24 @@ class Str
     }
 
     /**
+     * Indent all non-empty lines in the string by the given amount of spaces.
+     * 
+     * @param  string  $value
+     * @param  int  $amount
+     * @return string
+     */
+    public static function indent(string $value, int $amount): string
+    {
+        $lines = explode(PHP_EOL, $value);
+
+        foreach ($lines as $key => $line) {
+            $lines[$key] = ($line === '') ? '' : str_repeat(' ', $amount).$line;
+        }
+
+        return implode(PHP_EOL, $lines);
+    }
+
+    /**
      * Determine if a given string matches a given pattern.
      *
      * @param  string|iterable<string>  $pattern
