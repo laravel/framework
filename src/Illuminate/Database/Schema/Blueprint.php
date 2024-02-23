@@ -1333,6 +1333,17 @@ class Blueprint
     }
 
     /**
+     * Create a new native UUID column on the table.
+     *
+     * @param  string  $column
+     * @return \Illuminate\Database\Schema\ColumnDefinition
+     */
+    public function nativeUuid($column = 'uuid')
+    {
+        return $this->addColumn('nativeUuid', $column);
+    }
+
+    /**
      * Create a new IP address column on the table.
      *
      * @param  string  $column

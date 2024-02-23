@@ -210,6 +210,17 @@ abstract class Grammar extends BaseGrammar
     }
 
     /**
+     * Create the column definition for a native uuid type.
+     *
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return string
+     */
+    protected function typeNativeUuid(Fluent $column)
+    {
+        throw new RuntimeException('This database driver does not support the native UUID type.');
+    }
+
+    /**
      * Create the column definition for a generated, computed column type.
      *
      * @param  \Illuminate\Support\Fluent  $column

@@ -10,6 +10,7 @@ use Illuminate\Database\Schema\Grammars\MySqlGrammar;
 use Illuminate\Tests\Database\Fixtures\Enums\Foo;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 
 class DatabaseMySqlSchemaGrammarTest extends TestCase
 {
@@ -1122,6 +1123,16 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
             'alter table `users` add constraint `users_team_id_foreign` foreign key (`team_id`) references `teams` (`id`)',
             'alter table `users` add constraint `users_team_column_id_foreign` foreign key (`team_column_id`) references `teams` (`id`)',
         ], $statements);
+    }
+
+    public function testAddingNativeUuid()
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('This database driver does not support the native UUID type.');
+
+        $blueprint = new Blueprint('users');
+        $blueprint->nativeUuid('foo');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
     }
 
     public function testAddingIpAddress()

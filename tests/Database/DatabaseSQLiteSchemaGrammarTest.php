@@ -742,6 +742,16 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         ], $statements);
     }
 
+    public function testAddingNativeUuid()
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('This database driver does not support the native UUID type.');
+
+        $blueprint = new Blueprint('users');
+        $blueprint->nativeUuid('foo');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+    }
+
     public function testAddingIpAddress()
     {
         $blueprint = new Blueprint('users');

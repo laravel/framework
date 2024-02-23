@@ -889,6 +889,17 @@ class SqlServerGrammar extends Grammar
     }
 
     /**
+     * Create the column definition for a native uuid type.
+     *
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return string
+     */
+    protected function typeNativeUuid(Fluent $column)
+    {
+        return $this->typeUuid($column);
+    }
+
+    /**
      * Create the column definition for an IP address type.
      *
      * @param  \Illuminate\Support\Fluent  $column

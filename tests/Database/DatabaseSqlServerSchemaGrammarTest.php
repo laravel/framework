@@ -783,6 +783,16 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         ], $statements);
     }
 
+    public function testAddingNativeUuid()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->nativeUuid('foo');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table "users" add "foo" uniqueidentifier not null', $statements[0]);
+    }
+
     public function testAddingIpAddress()
     {
         $blueprint = new Blueprint('users');
