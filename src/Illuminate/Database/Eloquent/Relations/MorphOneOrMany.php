@@ -4,6 +4,7 @@ namespace Illuminate\Database\Eloquent\Relations;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\ValidatedInput;
 
 abstract class MorphOneOrMany extends HasOneOrMany
 {
@@ -70,10 +71,10 @@ abstract class MorphOneOrMany extends HasOneOrMany
     /**
      * Create a new instance of the related model. Allow mass-assignment.
      *
-     * @param  array|\Illuminate\Support\ValidatedInput  $attributes
+     * @param  array|ValidatedInput  $attributes
      * @return \Illuminate\Database\Eloquent\Model
      */
-    public function forceCreate($attributes = [])
+    public function forceCreate(array|ValidatedInput $attributes = [])
     {
         $attributes[$this->getForeignKeyName()] = $this->getParentKey();
         $attributes[$this->getMorphType()] = $this->morphClass;
