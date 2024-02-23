@@ -8,6 +8,7 @@ use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldBeUniqueUntilProcessing;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Bus;
@@ -129,6 +130,22 @@ class UniqueJobTest extends QueueTestCase
         $this->assertTrue($this->app->get(Cache::class)->lock($this->getLockKey($job), 10)->get());
     }
 
+    public function testLockIsReleasedForJobsWithMissingModels()
+    {
+        $this->markTestSkippedWhenUsingSyncQueueDriver();
+
+        UniqueUntilStartTestJob::$handled = false;
+
+        dispatch($job = new UniqueWithModelMissing);
+
+        $this->assertFalse($this->app->get(Cache::class)->lock($this->getLockKey($job), 10)->get());
+
+        $this->runQueueWorkerCommand(['--once' => true]);
+
+        $this->assertFalse($job::$handled);
+        $this->assertTrue($this->app->get(Cache::class)->lock($this->getLockKey($job), 10)->get());
+    }
+
     protected function getLockKey($job)
     {
         return 'laravel_unique_job:'.(is_string($job) ? $job : get_class($job));
@@ -183,4 +200,14 @@ class UniqueTestRetryJob extends UniqueTestFailJob
 class UniqueUntilStartTestJob extends UniqueTestJob implements ShouldBeUniqueUntilProcessing
 {
     public $tries = 2;
+}
+
+class UniqueWithModelMissing extends UniqueTestJob implements ShouldQueue, ShouldBeUnique
+{
+    public $deleteWhenMissingModels = true;
+
+    public function __wakeup()
+    {
+        throw new ModelNotFoundException('test error');
+    }
 }

@@ -4,13 +4,10 @@ namespace Illuminate\Queue;
 
 use Exception;
 use Illuminate\Bus\Batchable;
-use Illuminate\Bus\UniqueLock;
 use Illuminate\Contracts\Bus\Dispatcher;
-use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Encryption\Encrypter;
 use Illuminate\Contracts\Queue\Job;
-use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldBeUniqueUntilProcessing;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Pipeline\Pipeline;
@@ -60,17 +57,19 @@ class CallQueuedHandler
                 $job, $this->getCommand($data)
             );
         } catch (ModelNotFoundException $e) {
+            $this->ensureUniqueJobLockIsReleased($data);
+
             return $this->handleModelNotFound($job, $e);
         }
 
         if ($command instanceof ShouldBeUniqueUntilProcessing) {
-            $this->ensureUniqueJobLockIsReleased($command);
+            $this->ensureUniqueJobLockIsReleased($data);
         }
 
         $this->dispatchThroughMiddleware($job, $command);
 
         if (! $job->isReleased() && ! $command instanceof ShouldBeUniqueUntilProcessing) {
-            $this->ensureUniqueJobLockIsReleased($command);
+            $this->ensureUniqueJobLockIsReleased($data);
         }
 
         if (! $job->hasFailed() && ! $job->isReleased()) {
@@ -84,6 +83,32 @@ class CallQueuedHandler
     }
 
     /**
+     * Get the unserialized object from the given payload.
+     *
+     * @param  string  $key
+     * @param  array  $data
+     * @return mixed
+     */
+    protected function getUnserializedItem(string $key, array $data)
+    {
+        if (isset($data[$key])) {
+            if (
+                str_starts_with($data[$key], 'O:') ||
+                $data[$key] == 'N;'
+            ) {
+                return unserialize($data[$key]);
+            }
+
+            if ($this->container->bound(Encrypter::class)) {
+                return unserialize($this->container[Encrypter::class]
+                                        ->decrypt($data[$key]));
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Get the command from the given payload.
      *
      * @param  array  $data
@@ -93,15 +118,23 @@ class CallQueuedHandler
      */
     protected function getCommand(array $data)
     {
-        if (str_starts_with($data['command'], 'O:')) {
-            return unserialize($data['command']);
-        }
-
-        if ($this->container->bound(Encrypter::class)) {
-            return unserialize($this->container[Encrypter::class]->decrypt($data['command']));
+        $command = $this->getUnserializedItem('command', $data);
+        if ($command !== null) {
+            return $command;
         }
 
         throw new RuntimeException('Unable to extract job payload.');
+    }
+
+    /**
+     * Get the unique handler from the given payload.
+     *
+     * @param  array  $data
+     * @return \Illuminate\Queue\UniqueHandler|null
+     */
+    protected function getUniqueHandler(array $data)
+    {
+        return $this->getUnserializedItem('uniqueHandler', $data);
     }
 
     /**
@@ -196,13 +229,14 @@ class CallQueuedHandler
     /**
      * Ensure the lock for a unique job is released.
      *
-     * @param  mixed  $command
+     * @param  array  $data
      * @return void
      */
-    protected function ensureUniqueJobLockIsReleased($command)
+    protected function ensureUniqueJobLockIsReleased($data)
     {
-        if ($command instanceof ShouldBeUnique) {
-            (new UniqueLock($this->container->make(Cache::class)))->release($command);
+        $handler = $this->getUniqueHandler($data);
+        if ($handler !== null) {
+            $handler->withContainer($this->container)->release();
         }
     }
 
@@ -246,7 +280,7 @@ class CallQueuedHandler
         $command = $this->getCommand($data);
 
         if (! $command instanceof ShouldBeUniqueUntilProcessing) {
-            $this->ensureUniqueJobLockIsReleased($command);
+            $this->ensureUniqueJobLockIsReleased($data);
         }
 
         if ($command instanceof \__PHP_Incomplete_Class) {

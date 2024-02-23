@@ -139,6 +139,8 @@ abstract class Queue
      */
     protected function createObjectPayload($job, $queue)
     {
+        $handler = UniqueHandler::forJob($job);
+
         $payload = $this->withCreatePayloadHooks($queue, [
             'uuid' => (string) Str::uuid(),
             'displayName' => $this->getDisplayName($job),
@@ -150,17 +152,27 @@ abstract class Queue
             'timeout' => $job->timeout ?? null,
             'retryUntil' => $this->getJobExpiration($job),
             'data' => [
+                'uniqueHandler' => $handler,
                 'commandName' => $job,
                 'command' => $job,
             ],
         ]);
 
-        $command = $this->jobShouldBeEncrypted($job) && $this->container->bound(Encrypter::class)
-                    ? $this->container[Encrypter::class]->encrypt(serialize(clone $job))
-                    : serialize(clone $job);
+        $handler = serialize($handler);
+        $command = serialize($job);
+
+        if (
+            $this->jobShouldBeEncrypted($job) &&
+            $this->container->bound(Encrypter::class)
+        ) {
+            $encrypter = $this->container[Encrypter::class];
+            $handler = $encrypter->encrypt($handler);
+            $command = $encrypter->encrypt($command);
+        }
 
         return array_merge($payload, [
             'data' => array_merge($payload['data'], [
+                'uniqueHandler' => $handler,
                 'commandName' => get_class($job),
                 'command' => $command,
             ]),
