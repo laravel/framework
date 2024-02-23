@@ -51,8 +51,8 @@ jobs:
 
       - name: Cleanup release notes
         run: |
-          sed -i '/## What'"'"'s Changed/d' ${{ steps.notes.outputs.release-notes }}
-          sed -i '/## New Contributors/,//d' ${{ steps.notes.outputs.release-notes }}
+          sed -i '/## What/d' ${{ steps.notes.outputs.release-notes }}
+          sed -i '/## New Contributors/,$d' ${{ steps.notes.outputs.release-notes }}
 
       - name: Create release
         uses:  softprops/action-gh-release@v1
