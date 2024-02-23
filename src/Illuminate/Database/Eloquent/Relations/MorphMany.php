@@ -67,10 +67,10 @@ class MorphMany extends MorphOneOrMany
     /**
      * Create a new instance of the related model. Allow mass-assignment.
      *
-     * @param  array  $attributes
+     * @param  array|\Illuminate\Support\ValidatedInput  $attributes
      * @return \Illuminate\Database\Eloquent\Model
      */
-    public function forceCreate(array $attributes = [])
+    public function forceCreate($attributes = [])
     {
         $attributes[$this->getMorphType()] = $this->morphClass;
 
@@ -80,10 +80,10 @@ class MorphMany extends MorphOneOrMany
     /**
      * Create a new instance of the related model with mass assignment without raising model events.
      *
-     * @param  array  $attributes
+     * @param  array|\Illuminate\Support\ValidatedInput  $attributes
      * @return \Illuminate\Database\Eloquent\Model
      */
-    public function forceCreateQuietly(array $attributes = [])
+    public function forceCreateQuietly($attributes = [])
     {
         return Model::withoutEvents(fn () => $this->forceCreate($attributes));
     }
