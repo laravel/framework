@@ -49,7 +49,7 @@ class EloquentUpdateTest extends DatabaseTestCase
 
     public function testUpdateAllowsSafeObject()
     {
-        $model = TestUpdateModel2::create([
+        $model = TestUpdateModel1::create([
             'name' => Str::random(),
         ]);
 

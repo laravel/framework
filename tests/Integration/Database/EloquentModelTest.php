@@ -161,13 +161,13 @@ class EloquentModelTest extends DatabaseTestCase
         $model = new class extends Model
         {
             protected $table = 'actions';
-            protected $fillable = ['label'];
+            protected $fillable = [];
             public $timestamps = false;
         };
 
         $this->expectException(\Illuminate\Database\QueryException::class);
 
-        $model->newInstance()->create(new ValidatedInput([
+        $model->newInstance()->forceCreate(new ValidatedInput([
             'label' => 'test',
             'unknown' => 'column',
         ]));
