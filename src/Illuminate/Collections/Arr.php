@@ -4,6 +4,7 @@ namespace Illuminate\Support;
 
 use ArgumentCountError;
 use ArrayAccess;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
 
@@ -632,6 +633,23 @@ class Arr
         }
 
         return $result;
+    }
+
+    /**
+     * paginate the given array.
+     *
+     * @param  array  $items
+     * @param  int  $perPage
+     * @param  int|null  $page
+     * @param  array  $options
+     * @return LengthAwarePaginator
+     */
+    public static function paginate($items, $perPage = 5, $page = null, $options = []): LengthAwarePaginator
+    {
+        $page = $page ?: (LengthAwarePaginator::resolveCurrentPage() ?: 1);
+        $items = collect(self::wrap($items));
+
+        return new LengthAwarePaginator($items->forPage($page, $perPage), $items->count(), $perPage, $page, $options);
     }
 
     /**
