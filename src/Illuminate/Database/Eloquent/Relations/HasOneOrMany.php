@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithDictionary;
 use Illuminate\Database\UniqueConstraintViolationException;
+use Illuminate\Support\ValidatedInput;
 
 abstract class HasOneOrMany extends Relation
 {
@@ -46,10 +47,10 @@ abstract class HasOneOrMany extends Relation
     /**
      * Create and return an un-saved instance of the related model.
      *
-     * @param  array|\Illuminate\Support\ValidatedInput  $attributes
+     * @param  array|ValidatedInput  $attributes
      * @return \Illuminate\Database\Eloquent\Model
      */
-    public function make($attributes = [])
+    public function make(array|ValidatedInput $attributes = [])
     {
         return tap($this->related->newInstance($attributes), function ($instance) {
             $this->setForeignAttributesForCreate($instance);
@@ -331,10 +332,10 @@ abstract class HasOneOrMany extends Relation
     /**
      * Create a new instance of the related model.
      *
-     * @param  array|\Illuminate\Support\ValidatedInput  $attributes
+     * @param  array|ValidatedInput  $attributes
      * @return \Illuminate\Database\Eloquent\Model
      */
-    public function create($attributes = [])
+    public function create(array|ValidatedInput $attributes = [])
     {
         return tap($this->related->newInstance($attributes), function ($instance) {
             $this->setForeignAttributesForCreate($instance);
@@ -346,10 +347,10 @@ abstract class HasOneOrMany extends Relation
     /**
      * Create a new instance of the related model without raising any events to the parent model.
      *
-     * @param  array|\Illuminate\Support\ValidatedInput  $attributes
+     * @param  array|ValidatedInput  $attributes
      * @return \Illuminate\Database\Eloquent\Model
      */
-    public function createQuietly($attributes = [])
+    public function createQuietly(array|ValidatedInput $attributes = [])
     {
         return Model::withoutEvents(fn () => $this->create($attributes));
     }
@@ -357,10 +358,10 @@ abstract class HasOneOrMany extends Relation
     /**
      * Create a new instance of the related model. Allow mass-assignment.
      *
-     * @param  array|\Illuminate\Support\ValidatedInput  $attributes
+     * @param  array|ValidatedInput  $attributes
      * @return \Illuminate\Database\Eloquent\Model
      */
-    public function forceCreate($attributes = [])
+    public function forceCreate(array|ValidatedInput $attributes = [])
     {
         $attributes[$this->getForeignKeyName()] = $this->getParentKey();
 
@@ -370,10 +371,10 @@ abstract class HasOneOrMany extends Relation
     /**
      * Create a new instance of the related model with mass assignment without raising model events.
      *
-     * @param  array|\Illuminate\Support\ValidatedInput  $attributes
+     * @param  array|ValidatedInput  $attributes
      * @return \Illuminate\Database\Eloquent\Model
      */
-    public function forceCreateQuietly($attributes = [])
+    public function forceCreateQuietly(array|ValidatedInput $attributes = [])
     {
         return Model::withoutEvents(fn () => $this->forceCreate($attributes));
     }

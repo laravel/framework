@@ -19,6 +19,7 @@ use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ForwardsCalls;
+use Illuminate\Support\ValidatedInput;
 use ReflectionClass;
 use ReflectionMethod;
 
@@ -151,10 +152,10 @@ class Builder implements BuilderContract
     /**
      * Create and return an un-saved model instance.
      *
-     * @param  array|\Illuminate\Support\ValidatedInput $attributes
+     * @param  array|ValidatedInput $attributes
      * @return \Illuminate\Database\Eloquent\Model|static
      */
-    public function make($attributes = [])
+    public function make(array|ValidatedInput $attributes = [])
     {
         return $this->newModelInstance($attributes);
     }
@@ -1017,10 +1018,10 @@ class Builder implements BuilderContract
     /**
      * Save a new model and return the instance.
      *
-     * @param  array|\Illuminate\Support\ValidatedInput $attributes
+     * @param  array|ValidatedInput $attributes
      * @return \Illuminate\Database\Eloquent\Model|$this
      */
-    public function create($attributes = [])
+    public function create(array|ValidatedInput $attributes = [])
     {
         return tap($this->newModelInstance($attributes), function ($instance) {
             $instance->save();
@@ -1030,10 +1031,10 @@ class Builder implements BuilderContract
     /**
      * Save a new model and return the instance. Allow mass-assignment.
      *
-     * @param  array|\Illuminate\Support\ValidatedInput $attributes
+     * @param  array|ValidatedInput $attributes
      * @return \Illuminate\Database\Eloquent\Model|$this
      */
-    public function forceCreate($attributes)
+    public function forceCreate(array|ValidatedInput $attributes)
     {
         return $this->model->unguarded(function () use ($attributes) {
             return $this->newModelInstance()->create($attributes);
@@ -1043,10 +1044,10 @@ class Builder implements BuilderContract
     /**
      * Save a new model instance with mass assignment without raising model events.
      *
-     * @param  array|\Illuminate\Support\ValidatedInput $attributes
+     * @param  array|ValidatedInput $attributes
      * @return \Illuminate\Database\Eloquent\Model|$this
      */
-    public function forceCreateQuietly($attributes = [])
+    public function forceCreateQuietly(array|ValidatedInput $attributes = [])
     {
         return Model::withoutEvents(fn () => $this->forceCreate($attributes));
     }
