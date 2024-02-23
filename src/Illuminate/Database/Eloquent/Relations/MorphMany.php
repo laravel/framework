@@ -4,6 +4,7 @@ namespace Illuminate\Database\Eloquent\Relations;
 
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\ValidatedInput;
 
 class MorphMany extends MorphOneOrMany
 {
@@ -67,10 +68,10 @@ class MorphMany extends MorphOneOrMany
     /**
      * Create a new instance of the related model. Allow mass-assignment.
      *
-     * @param  array|\Illuminate\Support\ValidatedInput  $attributes
+     * @param  array|ValidatedInput  $attributes
      * @return \Illuminate\Database\Eloquent\Model
      */
-    public function forceCreate($attributes = [])
+    public function forceCreate(array|ValidatedInput $attributes = [])
     {
         $attributes[$this->getMorphType()] = $this->morphClass;
 
@@ -80,10 +81,10 @@ class MorphMany extends MorphOneOrMany
     /**
      * Create a new instance of the related model with mass assignment without raising model events.
      *
-     * @param  array|\Illuminate\Support\ValidatedInput  $attributes
+     * @param  array|ValidatedInput  $attributes
      * @return \Illuminate\Database\Eloquent\Model
      */
-    public function forceCreateQuietly($attributes = [])
+    public function forceCreateQuietly(array|ValidatedInput $attributes = [])
     {
         return Model::withoutEvents(fn () => $this->forceCreate($attributes));
     }
