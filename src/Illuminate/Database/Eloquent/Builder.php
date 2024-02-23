@@ -152,7 +152,7 @@ class Builder implements BuilderContract
     /**
      * Create and return an un-saved model instance.
      *
-     * @param  array|ValidatedInput $attributes
+     * @param  array|ValidatedInput  $attributes
      * @return \Illuminate\Database\Eloquent\Model|static
      */
     public function make(array|ValidatedInput $attributes = [])
@@ -1018,7 +1018,7 @@ class Builder implements BuilderContract
     /**
      * Save a new model and return the instance.
      *
-     * @param  array|ValidatedInput $attributes
+     * @param  array|ValidatedInput  $attributes
      * @return \Illuminate\Database\Eloquent\Model|$this
      */
     public function create(array|ValidatedInput $attributes = [])
@@ -1031,7 +1031,7 @@ class Builder implements BuilderContract
     /**
      * Save a new model and return the instance. Allow mass-assignment.
      *
-     * @param  array|ValidatedInput $attributes
+     * @param  array|ValidatedInput  $attributes
      * @return \Illuminate\Database\Eloquent\Model|$this
      */
     public function forceCreate(array|ValidatedInput $attributes)
@@ -1044,7 +1044,7 @@ class Builder implements BuilderContract
     /**
      * Save a new model instance with mass assignment without raising model events.
      *
-     * @param  array|ValidatedInput $attributes
+     * @param  array|ValidatedInput  $attributes
      * @return \Illuminate\Database\Eloquent\Model|$this
      */
     public function forceCreateQuietly(array|ValidatedInput $attributes = [])
@@ -1055,7 +1055,7 @@ class Builder implements BuilderContract
     /**
      * Update records in the database.
      *
-     * @param  array $values
+     * @param  array  $values
      * @return int
      */
     public function update(array $values)
@@ -1066,7 +1066,7 @@ class Builder implements BuilderContract
     /**
      * Insert new records or update the existing ones.
      *
-     * @param  array $values
+     * @param  array  $values
      * @param  array|string  $uniqueBy
      * @param  array|null  $update
      * @return int
