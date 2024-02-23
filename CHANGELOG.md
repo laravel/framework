@@ -1,6 +1,15 @@
 # Release Notes for 10.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v10.45.0...10.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v10.45.1...10.x)
+
+## [v10.45.1](https://github.com/laravel/framework/compare/v10.45.0...v10.45.1) - 2024-02-21
+
+### What's Changed
+
+* Fix typehint for ResetPassword::toMailUsing() by [@KKSzymanowski](https://github.com/KKSzymanowski) in https://github.com/laravel/framework/pull/50163
+* [10.x] Fix Process::fake() never matching multi-line commands by [@SjorsO](https://github.com/SjorsO) in https://github.com/laravel/framework/pull/50164
+
+**Full Changelog**: https://github.com/laravel/framework/compare/v10.45.0...v10.45.1
 
 ## [v10.45.0](https://github.com/laravel/framework/compare/v10.44.0...v10.45.0) - 2024-02-20
 
