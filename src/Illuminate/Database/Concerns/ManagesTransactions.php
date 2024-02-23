@@ -41,16 +41,15 @@ trait ManagesTransactions
                 continue;
             }
 
+            $levelBeingCommitted = $this->transactions;
+
             try {
                 if ($this->transactions == 1) {
                     $this->fireConnectionEvent('committing');
                     $this->getPdo()->commit();
                 }
 
-                [$levelBeingCommitted, $this->transactions] = [
-                    $this->transactions,
-                    max(0, $this->transactions - 1),
-                ];
+                $this->transactions = max(0, $this->transactions - 1);
             } catch (Throwable $e) {
                 $this->handleCommitTransactionException(
                     $e, $currentAttempt, $attempts
