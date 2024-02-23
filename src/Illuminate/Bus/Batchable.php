@@ -98,7 +98,7 @@ trait Batchable
             $failedJobs,
             $failedJobIds,
             $options,
-            $createdAt ?? CarbonImmutable::now()->toImmutable(),
+            $createdAt ?? CarbonImmutable::now(),
             $cancelledAt,
             $finishedAt,
         );
