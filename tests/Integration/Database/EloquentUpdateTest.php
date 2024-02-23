@@ -53,11 +53,11 @@ class EloquentUpdateTest extends DatabaseTestCase
             'name' => Str::random(),
         ]);
 
-        $model->update(new ValidatedInput(['job' => 'Developer']));
+        $model->update(new ValidatedInput(['title' => 'Developer']));
 
         $model->refresh();
 
-        $this->assertSame('Developer', $model->job);
+        $this->assertSame('Developer', $model->title);
     }
 
     public function testUpdateWithLimitsAndOrders()
