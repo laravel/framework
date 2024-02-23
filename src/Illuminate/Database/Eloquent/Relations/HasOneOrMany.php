@@ -46,10 +46,10 @@ abstract class HasOneOrMany extends Relation
     /**
      * Create and return an un-saved instance of the related model.
      *
-     * @param  array  $attributes
+     * @param  array|\Illuminate\Support\ValidatedInput  $attributes
      * @return \Illuminate\Database\Eloquent\Model
      */
-    public function make(array $attributes = [])
+    public function make($attributes = [])
     {
         return tap($this->related->newInstance($attributes), function ($instance) {
             $this->setForeignAttributesForCreate($instance);
@@ -331,10 +331,10 @@ abstract class HasOneOrMany extends Relation
     /**
      * Create a new instance of the related model.
      *
-     * @param  array  $attributes
+     * @param  array|\Illuminate\Support\ValidatedInput  $attributes
      * @return \Illuminate\Database\Eloquent\Model
      */
-    public function create(array $attributes = [])
+    public function create($attributes = [])
     {
         return tap($this->related->newInstance($attributes), function ($instance) {
             $this->setForeignAttributesForCreate($instance);
@@ -346,10 +346,10 @@ abstract class HasOneOrMany extends Relation
     /**
      * Create a new instance of the related model without raising any events to the parent model.
      *
-     * @param  array  $attributes
+     * @param  array|\Illuminate\Support\ValidatedInput  $attributes
      * @return \Illuminate\Database\Eloquent\Model
      */
-    public function createQuietly(array $attributes = [])
+    public function createQuietly($attributes = [])
     {
         return Model::withoutEvents(fn () => $this->create($attributes));
     }
@@ -357,10 +357,10 @@ abstract class HasOneOrMany extends Relation
     /**
      * Create a new instance of the related model. Allow mass-assignment.
      *
-     * @param  array  $attributes
+     * @param  array|\Illuminate\Support\ValidatedInput  $attributes
      * @return \Illuminate\Database\Eloquent\Model
      */
-    public function forceCreate(array $attributes = [])
+    public function forceCreate($attributes = [])
     {
         $attributes[$this->getForeignKeyName()] = $this->getParentKey();
 
@@ -370,10 +370,10 @@ abstract class HasOneOrMany extends Relation
     /**
      * Create a new instance of the related model with mass assignment without raising model events.
      *
-     * @param  array  $attributes
+     * @param  array|\Illuminate\Support\ValidatedInput  $attributes
      * @return \Illuminate\Database\Eloquent\Model
      */
-    public function forceCreateQuietly(array $attributes = [])
+    public function forceCreateQuietly($attributes = [])
     {
         return Model::withoutEvents(fn () => $this->forceCreate($attributes));
     }

@@ -7,6 +7,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
+use Illuminate\Support\ValidatedInput;
 
 class EloquentModelTest extends DatabaseTestCase
 {
@@ -125,6 +126,51 @@ class EloquentModelTest extends DatabaseTestCase
             'end' => '2024-01-01 00:00:00',
             'analyze' => true,
         ]);
+    }
+
+    public function testCreateModelWithSafeObject()
+    {
+        Schema::create('actions', function (Blueprint $table) {
+            $table->id();
+            $table->string('label');
+        });
+
+        $model = new class extends Model
+        {
+            protected $table = 'actions';
+            protected $fillable = ['label'];
+            public $timestamps = false;
+        };
+
+        $model->newInstance()->create(new ValidatedInput([
+            'label' => 'test',
+        ]));
+
+        $this->assertDatabaseHas('actions', [
+            'label' => 'test',
+        ]);
+    }
+
+    public function testCreateModelWithSafeObjectThrowsExceptionForUnknownColumn()
+    {
+        Schema::create('actions', function (Blueprint $table) {
+            $table->id();
+            $table->string('label');
+        });
+
+        $model = new class extends Model
+        {
+            protected $table = 'actions';
+            protected $fillable = ['label'];
+            public $timestamps = false;
+        };
+
+        $this->expectException(\Illuminate\Database\QueryException::class);
+
+        $model->newInstance()->create(new ValidatedInput([
+            'label' => 'test',
+            'unknown' => 'column',
+        ]));
     }
 }
 

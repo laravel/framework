@@ -228,10 +228,10 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     /**
      * Create a new Eloquent model instance.
      *
-     * @param  array  $attributes
+     * @param  array|\Illuminate\Support\ValidatedInput  $attributes
      * @return void
      */
-    public function __construct(array $attributes = [])
+    public function __construct($attributes = [])
     {
         $this->bootIfNotBooted();
 
@@ -501,14 +501,18 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     /**
      * Fill the model with an array of attributes.
      *
-     * @param  array  $attributes
+     * @param  array|\Illuminate\Support\ValidatedInput  $attributes
      * @return $this
      *
      * @throws \Illuminate\Database\Eloquent\MassAssignmentException
      */
-    public function fill(array $attributes)
+    public function fill($attributes)
     {
         $totallyGuarded = $this->totallyGuarded();
+
+        if ($attributes instanceof \Illuminate\Support\ValidatedInput) {
+            $attributes = $attributes->all();
+        }
 
         $fillable = $this->fillableFromArray($attributes);
 
@@ -551,10 +555,10 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     /**
      * Fill the model with an array of attributes. Force mass assignment.
      *
-     * @param  array  $attributes
+     * @param  array|\Illuminate\Support\ValidatedInput  $attributes
      * @return $this
      */
-    public function forceFill(array $attributes)
+    public function forceFill($attributes)
     {
         return static::unguarded(fn () => $this->fill($attributes));
     }
@@ -590,7 +594,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     /**
      * Create a new instance of the given model.
      *
-     * @param  array  $attributes
+     * @param  array|\Illuminate\Support\ValidatedInput  $attributes
      * @param  bool  $exists
      * @return static
      */
@@ -611,7 +615,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
 
         $model->mergeCasts($this->casts);
 
-        $model->fill((array) $attributes);
+        $model->fill($attributes);
 
         return $model;
     }
@@ -982,11 +986,11 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     /**
      * Update the model in the database.
      *
-     * @param  array  $attributes
+     * @param  array|\Illuminate\Support\ValidatedInput  $attributes
      * @param  array  $options
      * @return bool
      */
-    public function update(array $attributes = [], array $options = [])
+    public function update($attributes = [], array $options = [])
     {
         if (! $this->exists) {
             return false;
@@ -998,13 +1002,13 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     /**
      * Update the model in the database within a transaction.
      *
-     * @param  array  $attributes
+     * @param  array|\Illuminate\Support\ValidatedInput  $attributes
      * @param  array  $options
      * @return bool
      *
      * @throws \Throwable
      */
-    public function updateOrFail(array $attributes = [], array $options = [])
+    public function updateOrFail($attributes = [], array $options = [])
     {
         if (! $this->exists) {
             return false;
@@ -1016,11 +1020,11 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     /**
      * Update the model in the database without raising any events.
      *
-     * @param  array  $attributes
+     * @param  array|\Illuminate\Support\ValidatedInput  $attributes
      * @param  array  $options
      * @return bool
      */
-    public function updateQuietly(array $attributes = [], array $options = [])
+    public function updateQuietly($attributes = [], array $options = [])
     {
         if (! $this->exists) {
             return false;

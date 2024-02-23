@@ -151,10 +151,10 @@ class Builder implements BuilderContract
     /**
      * Create and return an un-saved model instance.
      *
-     * @param  array  $attributes
+     * @param  array|\Illuminate\Support\ValidatedInput $attributes
      * @return \Illuminate\Database\Eloquent\Model|static
      */
-    public function make(array $attributes = [])
+    public function make($attributes = [])
     {
         return $this->newModelInstance($attributes);
     }
@@ -1017,10 +1017,10 @@ class Builder implements BuilderContract
     /**
      * Save a new model and return the instance.
      *
-     * @param  array  $attributes
+     * @param  array|\Illuminate\Support\ValidatedInput $attributes
      * @return \Illuminate\Database\Eloquent\Model|$this
      */
-    public function create(array $attributes = [])
+    public function create($attributes = [])
     {
         return tap($this->newModelInstance($attributes), function ($instance) {
             $instance->save();
@@ -1030,10 +1030,10 @@ class Builder implements BuilderContract
     /**
      * Save a new model and return the instance. Allow mass-assignment.
      *
-     * @param  array  $attributes
+     * @param  array|\Illuminate\Support\ValidatedInput $attributes
      * @return \Illuminate\Database\Eloquent\Model|$this
      */
-    public function forceCreate(array $attributes)
+    public function forceCreate($attributes)
     {
         return $this->model->unguarded(function () use ($attributes) {
             return $this->newModelInstance()->create($attributes);
@@ -1043,10 +1043,10 @@ class Builder implements BuilderContract
     /**
      * Save a new model instance with mass assignment without raising model events.
      *
-     * @param  array  $attributes
+     * @param  array|\Illuminate\Support\ValidatedInput $attributes
      * @return \Illuminate\Database\Eloquent\Model|$this
      */
-    public function forceCreateQuietly(array $attributes = [])
+    public function forceCreateQuietly($attributes = [])
     {
         return Model::withoutEvents(fn () => $this->forceCreate($attributes));
     }
@@ -1054,7 +1054,7 @@ class Builder implements BuilderContract
     /**
      * Update records in the database.
      *
-     * @param  array  $values
+     * @param  array $values
      * @return int
      */
     public function update(array $values)
@@ -1065,7 +1065,7 @@ class Builder implements BuilderContract
     /**
      * Insert new records or update the existing ones.
      *
-     * @param  array  $values
+     * @param  array $values
      * @param  array|string  $uniqueBy
      * @param  array|null  $update
      * @return int

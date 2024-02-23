@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
+use Illuminate\Support\ValidatedInput;
 
 class EloquentUpdateTest extends DatabaseTestCase
 {
@@ -44,6 +45,19 @@ class EloquentUpdateTest extends DatabaseTestCase
         TestUpdateModel1::where('title', 'Ms.')->delete();
 
         $this->assertCount(0, TestUpdateModel1::all());
+    }
+
+    public function testUpdateAllowsSafeObject()
+    {
+        $model = TestUpdateModel2::create([
+            'name' => Str::random(),
+        ]);
+
+        $model->update(new ValidatedInput(['job' => 'Developer']));
+
+        $model->refresh();
+
+        $this->assertSame('Developer', $model->job);
     }
 
     public function testUpdateWithLimitsAndOrders()
