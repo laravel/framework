@@ -35,7 +35,7 @@ trait Batchable
         }
 
         if ($this->batchId) {
-            return Container::getInstance()->make(BatchRepository::class)->find($this->batchId);
+            return Container::getInstance()->make(BatchRepository::class)?->find($this->batchId);
         }
     }
 
