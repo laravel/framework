@@ -70,10 +70,10 @@ abstract class MorphOneOrMany extends HasOneOrMany
     /**
      * Create a new instance of the related model. Allow mass-assignment.
      *
-     * @param  array  $attributes
+     * @param  array|\Illuminate\Support\ValidatedInput  $attributes
      * @return \Illuminate\Database\Eloquent\Model
      */
-    public function forceCreate(array $attributes = [])
+    public function forceCreate($attributes = [])
     {
         $attributes[$this->getForeignKeyName()] = $this->getParentKey();
         $attributes[$this->getMorphType()] = $this->morphClass;
