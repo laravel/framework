@@ -19,6 +19,13 @@ use Laravel\Folio\Folio;
 class ApplicationBuilder
 {
     /**
+     * The service provider that are marked for registration.
+     *
+     * @var array
+     */
+    protected array $pendingProviders = [];
+
+    /**
      * The Folio / page middleware that have been defined by the user.
      *
      * @var array
@@ -74,13 +81,22 @@ class ApplicationBuilder
     /**
      * Register the core event service provider for the application.
      *
+     * @param  array  $discover
      * @return $this
      */
-    public function withEvents()
+    public function withEvents(array $discover = [])
     {
-        $this->app->booting(function () {
-            $this->app->register(AppEventServiceProvider::class);
-        });
+        if (count($discover) > 0) {
+            AppEventServiceProvider::setEventDiscoveryPaths($discover);
+        }
+
+        if (! isset($this->pendingProviders[AppEventServiceProvider::class])) {
+            $this->app->booting(function () {
+                $this->app->register(AppEventServiceProvider::class);
+            });
+        }
+
+        $this->pendingProviders[AppEventServiceProvider::class] = true;
 
         return $this;
     }
