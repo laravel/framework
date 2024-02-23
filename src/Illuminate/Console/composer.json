@@ -29,7 +29,10 @@
     "autoload": {
         "psr-4": {
             "Illuminate\\Console\\": ""
-        }
+        },
+        "files": [
+            "functions.php"
+        ]
     },
     "extra": {
         "branch-alias": {

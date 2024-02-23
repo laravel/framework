@@ -126,6 +126,7 @@
     },
     "autoload": {
         "files": [
+            "src/Illuminate/Console/functions.php",
             "src/Illuminate/Collections/helpers.php",
             "src/Illuminate/Events/functions.php",
             "src/Illuminate/Filesystem/functions.php",

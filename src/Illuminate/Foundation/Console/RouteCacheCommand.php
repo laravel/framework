@@ -8,6 +8,8 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Routing\RouteCollection;
 use Symfony\Component\Console\Attribute\AsCommand;
 
+use function Illuminate\Console\checked_var_export;
+
 #[AsCommand(name: 'route:cache')]
 class RouteCacheCommand extends Command
 {
@@ -106,6 +108,6 @@ class RouteCacheCommand extends Command
     {
         $stub = $this->files->get(__DIR__.'/stubs/routes.stub');
 
-        return str_replace('{{routes}}', var_export($routes->compile(), true), $stub);
+        return str_replace('{{routes}}', checked_var_export($routes->compile()), $stub);
     }
 }

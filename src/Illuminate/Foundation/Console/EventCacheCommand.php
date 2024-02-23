@@ -6,6 +6,8 @@ use Illuminate\Console\Command;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider;
 use Symfony\Component\Console\Attribute\AsCommand;
 
+use function Illuminate\Console\checked_var_export;
+
 #[AsCommand(name: 'event:cache')]
 class EventCacheCommand extends Command
 {
@@ -34,7 +36,7 @@ class EventCacheCommand extends Command
 
         file_put_contents(
             $this->laravel->getCachedEventsPath(),
-            '<?php return '.var_export($this->getEvents(), true).';'
+            '<?php return '.checked_var_export($this->getEvents()).';'
         );
 
         $this->components->info('Events cached successfully.');

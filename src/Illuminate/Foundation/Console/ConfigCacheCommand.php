@@ -9,6 +9,8 @@ use LogicException;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Throwable;
 
+use function Illuminate\Console\checked_var_export;
+
 #[AsCommand(name: 'config:cache')]
 class ConfigCacheCommand extends Command
 {
@@ -62,7 +64,7 @@ class ConfigCacheCommand extends Command
         $configPath = $this->laravel->getCachedConfigPath();
 
         $this->files->put(
-            $configPath, '<?php return '.var_export($config, true).';'.PHP_EOL
+            $configPath, '<?php return '.checked_var_export($config).';'.PHP_EOL
         );
 
         try {
