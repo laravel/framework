@@ -191,6 +191,12 @@ class ApplicationBuilder
                 Route::middleware('web')->get($health, function () {
                     Event::dispatch(new DiagnosingHealth);
 
+                    if (request()->isJson()) {
+                        return response()->json([
+                            'status' => true
+                        ]);
+                    }
+
                     return View::file(__DIR__.'/../resources/health-up.blade.php');
                 });
             }

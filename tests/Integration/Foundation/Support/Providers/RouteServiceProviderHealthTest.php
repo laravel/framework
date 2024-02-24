@@ -17,7 +17,7 @@ class RouteServiceProviderHealthTest extends TestCase
     {
         return Application::configure(static::applicationBasePath())
             ->withRouting(
-                web: __DIR__.'/fixtures/web.php',
+                web: __DIR__ . '/fixtures/web.php',
                 health: '/up',
             )->create();
     }
@@ -30,5 +30,10 @@ class RouteServiceProviderHealthTest extends TestCase
     public function test_it_can_load_health_page()
     {
         $this->get('/up')->assertOk();
+    }
+
+    public function test_it_returns_json_response_for_api()
+    {
+        $this->getJson('/up')->assertOk()->assertJson(['status' => true]);
     }
 }
