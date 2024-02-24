@@ -4,7 +4,9 @@ namespace Illuminate\Validation\Rules;
 
 use Illuminate\Contracts\Validation\Rule;
 use Illuminate\Contracts\Validation\ValidatorAwareRule;
+use Illuminate\Support\Arr;
 use TypeError;
+use UnitEnum;
 
 class Enum implements Rule, ValidatorAwareRule
 {
@@ -21,6 +23,16 @@ class Enum implements Rule, ValidatorAwareRule
      * @var \Illuminate\Validation\Validator
      */
     protected $validator;
+
+    /**
+     * Cases considered as valid
+     */
+    private array $only = [];
+
+    /**
+     * Cases considered as invalid
+     */
+    private array $except = [];
 
     /**
      * Create a new rule instance.
@@ -43,7 +55,7 @@ class Enum implements Rule, ValidatorAwareRule
     public function passes($attribute, $value)
     {
         if ($value instanceof $this->type) {
-            return true;
+            return $this->isDesirable($value);
         }
 
         if (is_null($value) || ! enum_exists($this->type) || ! method_exists($this->type, 'tryFrom')) {
@@ -51,7 +63,7 @@ class Enum implements Rule, ValidatorAwareRule
         }
 
         try {
-            return ! is_null($this->type::tryFrom($value));
+            return ! is_null($value = $this->type::tryFrom($value)) && $this->isDesirable($value);
         } catch (TypeError) {
             return false;
         }
@@ -82,5 +94,34 @@ class Enum implements Rule, ValidatorAwareRule
         $this->validator = $validator;
 
         return $this;
+    }
+
+    /**
+     * Set specific cases to be valid
+     */
+    public function only(array|UnitEnum $enums): static
+    {
+        $this->only = Arr::wrap($enums);
+
+        return $this;
+    }
+
+    /**
+     * Set specific cases to be invalid
+     */
+    public function except(array|UnitEnum $enums): static
+    {
+        $this->except = Arr::wrap($enums);
+
+        return $this;
+    }
+
+    private function isDesirable(mixed $value): bool
+    {
+        return match (true) {
+            !empty($this->only) => in_array(needle: $value, haystack: $this->only, strict: true),
+            !empty($this->except) => !in_array(needle: $value, haystack: $this->except, strict: true),
+            default => true,
+        };
     }
 }
