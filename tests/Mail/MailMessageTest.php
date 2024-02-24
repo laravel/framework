@@ -176,6 +176,24 @@ class MailMessageTest extends TestCase
         unlink($path);
     }
 
+    public function testEmbedPathWithCustomName()
+    {
+        file_put_contents($path = __DIR__.'/foo.jpg', 'bar');
+
+        $cid = $this->message->embed($path, 'laravel.jpg');
+
+        $this->assertStringStartsWith('cid:', $cid);
+        $name = Str::after($cid, 'cid:');
+        $attachment = $this->message->getSymfonyMessage()->getAttachments()[0];
+        $headers = $attachment->getPreparedHeaders()->toArray();
+        $this->assertSame('bar', $attachment->getBody());
+        $this->assertSame("Content-Type: image/jpeg; name={$name}", $headers[0]);
+        $this->assertSame('Content-Transfer-Encoding: base64', $headers[1]);
+        $this->assertSame("Content-Disposition: inline; name={$name}; filename={$name}", $headers[2]);
+
+        unlink($path);
+    }
+
     public function testDataEmbed()
     {
         $cid = $this->message->embedData('bar', 'foo.jpg', 'image/png');

@@ -333,9 +333,11 @@ class Message
      * Embed a file in the message and get the CID.
      *
      * @param  string|\Illuminate\Contracts\Mail\Attachable|\Illuminate\Mail\Attachment  $file
+     * @param  string|null  $name custom filename when $file is a string path
+     *
      * @return string
      */
-    public function embed($file)
+    public function embed($file, $name = null)
     {
         if ($file instanceof Attachable) {
             $file = $file->toMailAttachment();
@@ -362,7 +364,7 @@ class Message
             );
         }
 
-        $cid = Str::random(10);
+        $cid = $name ?? Str::random(10);
 
         $this->message->addPart(
             (new DataPart(new File($file), $cid))->asInline()
