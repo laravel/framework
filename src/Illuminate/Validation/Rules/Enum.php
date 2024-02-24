@@ -98,6 +98,8 @@ class Enum implements Rule, ValidatorAwareRule
 
     /**
      * Set specific cases to be valid.
+     *
+     * @param UnitEnum[]|UnitEnum $enums
      */
     public function only(array|UnitEnum $enums): static
     {
@@ -108,6 +110,8 @@ class Enum implements Rule, ValidatorAwareRule
 
     /**
      * Set specific cases to be invalid.
+     *
+     * @param UnitEnum[]|UnitEnum $enums
      */
     public function except(array|UnitEnum $enums): static
     {
