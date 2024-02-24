@@ -257,8 +257,8 @@ class Str
             Str::lower(trim($subsequentWord)),
             $vowelSounds,
         )
-            ? _('an')
-            : _('a');
+            ? 'an'
+            : 'a';
 
         if (Str::contains($string, '%s')) {
             return sprintf(
