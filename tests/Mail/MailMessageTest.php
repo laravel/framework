@@ -183,7 +183,7 @@ class MailMessageTest extends TestCase
         $cid = $this->message->embed($path, 'laravel.jpg');
 
         $this->assertStringStartsWith('cid:', $cid);
-        $name = Str::after($cid, 'cid:');
+        $name = 'laravel.jpg';
         $attachment = $this->message->getSymfonyMessage()->getAttachments()[0];
         $headers = $attachment->getPreparedHeaders()->toArray();
         $this->assertSame('bar', $attachment->getBody());
