@@ -9,9 +9,9 @@
 
 ## About Laravel
 
-> **Note:** This repository contains the core code of the Laravel framework. If you want to build an application using Laravel, visit the main [Laravel repository](https://github.com/laravel/laravel).
+> **Note:** This repository contains the core code of the Laravel framework. To build an application using Laravel, visit the main [Laravel repository](https://github.com/laravel/laravel).
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable, creative experience to be truly fulfilling. Laravel attempts to take the pain out of development by easing common tasks used in the majority of web projects, such as:
+Laravel is a web application framework with expressive, elegant syntax. Development must be an enjoyable, creative experience to be truly fulfilling. Laravel attempts to take the pain out of development by easing common tasks used in the majority of web projects, such as:
 
 - [Simple, fast routing engine](https://laravel.com/docs/routing).
 - [Powerful dependency injection container](https://laravel.com/docs/container).
@@ -24,7 +24,7 @@ Laravel is accessible, yet powerful, providing tools needed for large, robust ap
 
 ## Learning Laravel
 
-Laravel has the most extensive and thorough documentation and video tutorial library of any modern web application framework. The [Laravel documentation](https://laravel.com/docs) is in-depth and complete, making it a breeze to get started learning the framework.
+Laravel has the most thorough documentation and video tutorial library of any modern web application framework. The [Laravel documentation](https://laravel.com/docs) is in-depth and complete, making it a breeze to learn the framework.
 
 You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
 
@@ -36,7 +36,7 @@ Thank you for considering contributing to the Laravel framework! The contributio
 
 ## Code of Conduct
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+To ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
 
 ## Security Vulnerabilities
 
