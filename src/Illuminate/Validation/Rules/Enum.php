@@ -120,7 +120,7 @@ class Enum implements Rule, ValidatorAwareRule
     {
         return match (true) {
             ! empty($this->only) => in_array(needle: $value, haystack: $this->only, strict: true),
-            ! empty($this->except) => !in_array(needle: $value, haystack: $this->except, strict: true),
+            ! empty($this->except) => ! in_array(needle: $value, haystack: $this->except, strict: true),
             default => true,
         };
     }
