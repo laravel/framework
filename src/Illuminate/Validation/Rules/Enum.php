@@ -25,12 +25,12 @@ class Enum implements Rule, ValidatorAwareRule
     protected $validator;
 
     /**
-     * Cases considered as valid
+     * Cases considered as valid.
      */
     private array $only = [];
 
     /**
-     * Cases considered as invalid
+     * Cases considered as invalid.
      */
     private array $except = [];
 
@@ -97,7 +97,7 @@ class Enum implements Rule, ValidatorAwareRule
     }
 
     /**
-     * Set specific cases to be valid
+     * Set specific cases to be valid.
      */
     public function only(array|UnitEnum $enums): static
     {
@@ -107,7 +107,7 @@ class Enum implements Rule, ValidatorAwareRule
     }
 
     /**
-     * Set specific cases to be invalid
+     * Set specific cases to be invalid.
      */
     public function except(array|UnitEnum $enums): static
     {
@@ -119,8 +119,8 @@ class Enum implements Rule, ValidatorAwareRule
     private function isDesirable(mixed $value): bool
     {
         return match (true) {
-            !empty($this->only) => in_array(needle: $value, haystack: $this->only, strict: true),
-            !empty($this->except) => !in_array(needle: $value, haystack: $this->except, strict: true),
+            ! empty($this->only) => in_array(needle: $value, haystack: $this->only, strict: true),
+            ! empty($this->except) => !in_array(needle: $value, haystack: $this->except, strict: true),
             default => true,
         };
     }
