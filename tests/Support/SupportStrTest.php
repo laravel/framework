@@ -1387,11 +1387,10 @@ class SupportStrTest extends TestCase
 
     public function testConjunction()
     {
-        $this->assertSame('a', Str::conjunction('machine'));
-        $this->assertSame('an', Str::conjunction('item'));
         $this->assertSame('List a machine', Str::conjunction('List %s machine'));
         $this->assertSame('List an item', Str::conjunction('List %s item'));
         $this->assertSame('book a  hotel', Str::conjunction('book %s  hotel'));
+        $this->assertSame('a git merge', Str::conjunction('%s git merge'));
     }
 
     /**
