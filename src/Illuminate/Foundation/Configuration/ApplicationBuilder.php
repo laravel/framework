@@ -193,7 +193,7 @@ class ApplicationBuilder
 
                     if (request()->isJson()) {
                         return response()->json([
-                            'status' => true
+                            'status' => true,
                         ]);
                     }
 

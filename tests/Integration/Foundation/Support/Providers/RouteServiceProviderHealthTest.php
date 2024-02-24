@@ -17,7 +17,7 @@ class RouteServiceProviderHealthTest extends TestCase
     {
         return Application::configure(static::applicationBasePath())
             ->withRouting(
-                web: __DIR__ . '/fixtures/web.php',
+                web: __DIR__.'/fixtures/web.php',
                 health: '/up',
             )->create();
     }
