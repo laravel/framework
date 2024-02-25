@@ -18,7 +18,7 @@ class BroadcastEvent implements ShouldQueue
      * The event instance.
      */
     public mixed $event;
-    
+
     /**
      * The number of times the job may be attempted.
      */
