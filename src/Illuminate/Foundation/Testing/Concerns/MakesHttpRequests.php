@@ -399,7 +399,7 @@ trait MakesHttpRequests
      */
     public function postXml($uri, $xmlBody, array $headers = [])
     {
-        $headers = $this->transformHeadersToServerVars(array_merge($this->defaultHeaders,$headers,['Content-Type' => 'text/xml;charset=utf-8']));
+        $headers = array_merge($headers, ['Content-Type' => 'text/xml;charset=utf-8']);
         $server = $this->transformHeadersToServerVars($headers);
         return $this->call('POST', $uri, [], [], [], $server, $xmlBody);
     }
