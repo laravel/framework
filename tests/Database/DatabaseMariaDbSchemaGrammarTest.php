@@ -57,7 +57,7 @@ class DatabaseMariaDbSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($conn, $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertSame('create table `users` (`id` char(36) not null, primary key (`id`))', $statements[0]);
+        $this->assertSame('create table `users` (`id` uuid not null, primary key (`id`))', $statements[0]);
     }
 
     public function testAutoIncrementStartingValue()
@@ -1090,7 +1090,7 @@ class DatabaseMariaDbSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertSame('alter table `users` add `foo` char(36) not null', $statements[0]);
+        $this->assertSame('alter table `users` add `foo` uuid not null', $statements[0]);
     }
 
     public function testAddingUuidDefaultsColumnName()
@@ -1100,7 +1100,7 @@ class DatabaseMariaDbSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertSame('alter table `users` add `uuid` char(36) not null', $statements[0]);
+        $this->assertSame('alter table `users` add `uuid` uuid not null', $statements[0]);
     }
 
     public function testAddingForeignUuid()
@@ -1116,7 +1116,7 @@ class DatabaseMariaDbSchemaGrammarTest extends TestCase
 
         $this->assertInstanceOf(ForeignIdColumnDefinition::class, $foreignUuid);
         $this->assertSame([
-            'alter table `users` add `foo` char(36) not null, add `company_id` char(36) not null, add `laravel_idea_id` char(36) not null, add `team_id` char(36) not null, add `team_column_id` char(36) not null',
+            'alter table `users` add `foo` uuid not null, add `company_id` uuid not null, add `laravel_idea_id` uuid not null, add `team_id` uuid not null, add `team_column_id` uuid not null',
             'alter table `users` add constraint `users_company_id_foreign` foreign key (`company_id`) references `companies` (`id`)',
             'alter table `users` add constraint `users_laravel_idea_id_foreign` foreign key (`laravel_idea_id`) references `laravel_ideas` (`id`)',
             'alter table `users` add constraint `users_team_id_foreign` foreign key (`team_id`) references `teams` (`id`)',
