@@ -6,6 +6,7 @@ use ArrayAccess;
 use Illuminate\Contracts\Config\Repository as ConfigContract;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Traits\Macroable;
+use InvalidArgumentException;
 
 class Repository implements ArrayAccess, ConfigContract
 {
@@ -75,6 +76,106 @@ class Repository implements ArrayAccess, ConfigContract
         }
 
         return $config;
+    }
+
+    /**
+     * Get the specified string configuration value.
+     *
+     * @param  string  $key
+     * @param  mixed  $default
+     * @return string
+     */
+    public function string(string $key, $default = null): string
+    {
+        $value = $this->get($key, $default);
+
+        if (! is_string($value)) {
+            throw new InvalidArgumentException(
+                sprintf('Configuration value for key [%s] must be a string, %s given.', $key, gettype($value))
+            );
+        }
+
+        return $value;
+    }
+
+    /**
+     * Get the specified integer configuration value.
+     *
+     * @param  string  $key
+     * @param  mixed  $default
+     * @return int
+     */
+    public function integer(string $key, $default = null): int
+    {
+        $value = $this->get($key, $default);
+
+        if (! is_int($value)) {
+            throw new InvalidArgumentException(
+                sprintf('Configuration value for key [%s] must be an integer, %s given.', $key, gettype($value))
+            );
+        }
+
+        return $value;
+    }
+
+    /**
+     * Get the specified float configuration value.
+     *
+     * @param  string  $key
+     * @param  mixed  $default
+     * @return float
+     */
+    public function float(string $key, $default = null): float
+    {
+        $value = $this->get($key, $default);
+
+        if (! is_float($value)) {
+            throw new InvalidArgumentException(
+                sprintf('Configuration value for key [%s] must be a float, %s given.', $key, gettype($value))
+            );
+        }
+
+        return $value;
+    }
+
+    /**
+     * Get the specified boolean configuration value.
+     *
+     * @param  string  $key
+     * @param  mixed  $default
+     * @return bool
+     */
+    public function boolean(string $key, $default = null): bool
+    {
+        $value = $this->get($key, $default);
+
+        if (! is_bool($value)) {
+            throw new InvalidArgumentException(
+                sprintf('Configuration value for key [%s] must be a boolean, %s given.', $key, gettype($value))
+            );
+        }
+
+        return $value;
+    }
+
+    /**
+     * Get the specified array configuration value.
+     *
+     * @param  string  $key
+     * @param  mixed  $default
+     * @return array<array-key, mixed>
+     */
+    public function array(string $key, $default = null): array
+    {
+        $value = $this->get($key, $default);
+
+        if (! is_array($value)) {
+            throw new InvalidArgumentException(
+                sprintf('Configuration value for key [%s] must be an array, %s given.', $key, gettype($value))
+            );
+        }
+
+        return $value;
     }
 
     /**
