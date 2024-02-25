@@ -28,14 +28,14 @@ class Enum implements Rule, ValidatorAwareRule
      *
      * @var array
      */
-    protected array $only = [];
+    protected $only = [];
 
     /**
      * The cases that should be considered invalid.
      *
      * @var array
      */
-    protected array $except = [];
+    protected $except = [];
 
     /**
      * Create a new rule instance.
@@ -104,7 +104,7 @@ class Enum implements Rule, ValidatorAwareRule
      * @param  mixed  $value
      * @return bool
      */
-    protected function isDesirable(mixed $value): bool
+    protected function isDesirable(mixed $value)
     {
         return match (true) {
             ! empty($this->only) => in_array(needle: $value, haystack: $this->only, strict: true),
