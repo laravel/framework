@@ -6,7 +6,6 @@ use Illuminate\Contracts\Validation\Rule;
 use Illuminate\Contracts\Validation\ValidatorAwareRule;
 use Illuminate\Support\Arr;
 use TypeError;
-use UnitEnum;
 
 class Enum implements Rule, ValidatorAwareRule
 {
@@ -25,12 +24,16 @@ class Enum implements Rule, ValidatorAwareRule
     protected $validator;
 
     /**
-     * Cases considered as valid.
+     * The cases that should be considered valid.
+     *
+     * @var array
      */
     private array $only = [];
 
     /**
-     * Cases considered as invalid.
+     * The cases that should be considered invalid.
+     *
+     * @var array
      */
     private array $except = [];
 
@@ -63,10 +66,51 @@ class Enum implements Rule, ValidatorAwareRule
         }
 
         try {
-            return ! is_null($value = $this->type::tryFrom($value)) && $this->isDesirable($value);
+            $value = $this->type::tryFrom($value);
+
+            return ! is_null($value) && $this->isDesirable($value);
         } catch (TypeError) {
             return false;
         }
+    }
+
+    /**
+     * Specify the cases that should be considered valid.
+     *
+     * @param  \UnitEnum[]|\UnitEnum  $values
+     */
+    public function only($values): static
+    {
+        $this->only = Arr::wrap($values);
+
+        return $this;
+    }
+
+    /**
+     * Specify the cases that should be considered invalid.
+     *
+     * @param  \UnitEnum[]|\UnitEnum  $values
+     */
+    public function except($values): static
+    {
+        $this->except = Arr::wrap($values);
+
+        return $this;
+    }
+
+    /**
+     * Determine if the given case is a valid case based on the only / except values.
+     *
+     * @param  mixed  $value
+     * @return bool
+     */
+    private function isDesirable(mixed $value): bool
+    {
+        return match (true) {
+            ! empty($this->only) => in_array(needle: $value, haystack: $this->only, strict: true),
+            ! empty($this->except) => ! in_array(needle: $value, haystack: $this->except, strict: true),
+            default => true,
+        };
     }
 
     /**
@@ -94,38 +138,5 @@ class Enum implements Rule, ValidatorAwareRule
         $this->validator = $validator;
 
         return $this;
-    }
-
-    /**
-     * Set specific cases to be valid.
-     *
-     * @param  UnitEnum[]|UnitEnum  $enums
-     */
-    public function only(array|UnitEnum $enums): static
-    {
-        $this->only = Arr::wrap($enums);
-
-        return $this;
-    }
-
-    /**
-     * Set specific cases to be invalid.
-     *
-     * @param  UnitEnum[]|UnitEnum  $enums
-     */
-    public function except(array|UnitEnum $enums): static
-    {
-        $this->except = Arr::wrap($enums);
-
-        return $this;
-    }
-
-    private function isDesirable(mixed $value): bool
-    {
-        return match (true) {
-            ! empty($this->only) => in_array(needle: $value, haystack: $this->only, strict: true),
-            ! empty($this->except) => ! in_array(needle: $value, haystack: $this->except, strict: true),
-            default => true,
-        };
     }
 }
