@@ -78,6 +78,101 @@ class Repository implements ArrayAccess, ConfigContract
     }
 
     /**
+     * Get the specified string configuration value.
+     *
+     * @param  string  $key
+     * @return string
+     */
+    public function string(string $key): string
+    {
+        $value = $this->get($key);
+
+        if (! is_string($value)) {
+            throw new \InvalidArgumentException(
+                sprintf('Configuration value for key [%s] must be a string, %s given.', $key, gettype($value))
+            );
+        }
+
+        return $value;
+    }
+
+    /**
+     * Get the specified integer configuration value.
+     *
+     * @param  string  $key
+     * @return int
+     */
+    public function integer(string $key): int
+    {
+        $value = $this->get($key);
+
+        if (! is_int($value)) {
+            throw new \InvalidArgumentException(
+                sprintf('Configuration value for key [%s] must be an integer, %s given.', $key, gettype($value))
+            );
+        }
+
+        return $value;
+    }
+
+    /**
+     * Get the specified float configuration value.
+     *
+     * @param  string  $key
+     * @return float
+     */
+    public function float(string $key): float
+    {
+        $value = $this->get($key);
+
+        if (! is_float($value)) {
+            throw new \InvalidArgumentException(
+                sprintf('Configuration value for key [%s] must be a float, %s given.', $key, gettype($value))
+            );
+        }
+
+        return $value;
+    }
+
+    /**
+     * Get the specified boolean configuration value.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    public function boolean(string $key): bool
+    {
+        $value = $this->get($key);
+
+        if (! is_bool($value)) {
+            throw new \InvalidArgumentException(
+                sprintf('Configuration value for key [%s] must be a boolean, %s given.', $key, gettype($value))
+            );
+        }
+
+        return $value;
+    }
+
+    /**
+     * Get the specified array configuration value.
+     *
+     * @param  string  $key
+     * @return array<array-key, mixed>
+     */
+    public function array(string $key): array
+    {
+        $value = $this->get($key);
+
+        if (! is_array($value)) {
+            throw new \InvalidArgumentException(
+                sprintf('Configuration value for key [%s] must be an array, %s given.', $key, gettype($value))
+            );
+        }
+
+        return $value;
+    }
+
+    /**
      * Set a given configuration value.
      *
      * @param  array|string  $key
@@ -178,105 +273,5 @@ class Repository implements ArrayAccess, ConfigContract
     public function offsetUnset($key): void
     {
         $this->set($key, null);
-    }
-
-    /**
-     * Get the specified configuration value typed as a string.
-     * If the value isn't a string it should throw an exception.
-     *
-     * @param  string  $key
-     * @return string
-     */
-    public function string(string $key): string
-    {
-        $value = $this->get($key);
-
-        if (! is_string($value)) {
-            throw new \InvalidArgumentException(
-                sprintf('Configuration value for key [%s] must be a string, %s given.', $key, gettype($value))
-            );
-        }
-
-        return $value;
-    }
-
-    /**
-     * Get the specified configuration value typed as an array.
-     * If the value isn't an array it should throw an exception.
-     *
-     * @param  string  $key
-     * @return array<array-key, mixed>
-     */
-    public function array(string $key): array
-    {
-        $value = $this->get($key);
-
-        if (! is_array($value)) {
-            throw new \InvalidArgumentException(
-                sprintf('Configuration value for key [%s] must be an array, %s given.', $key, gettype($value))
-            );
-        }
-
-        return $value;
-    }
-
-    /**
-     * Get the specified configuration value typed as a boolean.
-     * If the value isn't a boolean it should throw an exception.
-     *
-     * @param  string  $key
-     * @return bool
-     */
-    public function boolean(string $key): bool
-    {
-        $value = $this->get($key);
-
-        if (! is_bool($value)) {
-            throw new \InvalidArgumentException(
-                sprintf('Configuration value for key [%s] must be a boolean, %s given.', $key, gettype($value))
-            );
-        }
-
-        return $value;
-    }
-
-    /**
-     * Get the specified configuration value typed as an integer.
-     * If the value isn't an integer it should throw an exception.
-     *
-     * @param  string  $key
-     * @return int
-     */
-    public function integer(string $key): int
-    {
-        $value = $this->get($key);
-
-        if (! is_int($value)) {
-            throw new \InvalidArgumentException(
-                sprintf('Configuration value for key [%s] must be an integer, %s given.', $key, gettype($value))
-            );
-        }
-
-        return $value;
-    }
-
-    /**
-     * Get the specified configuration value typed as a float.
-     * If the value isn't a float it should throw an exception.
-     *
-     * @param  string  $key
-     * @return float
-     */
-    public function float(string $key): float
-    {
-        $value = $this->get($key);
-
-        if (! is_float($value)) {
-            throw new \InvalidArgumentException(
-                sprintf('Configuration value for key [%s] must be a float, %s given.', $key, gettype($value))
-            );
-        }
-
-        return $value;
     }
 }
