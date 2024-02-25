@@ -594,7 +594,7 @@ class Builder implements BuilderContract
      * @param  string  $type
      * @return $this
      */
-    public function joinLateral($query, string $as, string $type = 'inner'): static
+    public function joinLateral($query, string $as, string $type = 'inner')
     {
         [$query, $bindings] = $this->createSub($query);
 
@@ -614,7 +614,7 @@ class Builder implements BuilderContract
      * @param  string  $as
      * @return $this
      */
-    public function leftJoinLateral($query, string $as): static
+    public function leftJoinLateral($query, string $as)
     {
         return $this->joinLateral($query, $as, 'left');
     }

@@ -387,18 +387,6 @@ class PostgresGrammar extends Grammar
     }
 
     /**
-     * Compile a "lateral join" clause.
-     *
-     * @param  \Illuminate\Database\Query\JoinLateralClause  $join
-     * @param  string  $expression
-     * @return string
-     */
-    public function compileJoinLateral(JoinLateralClause $join, string $expression): string
-    {
-        return trim("{$join->type} join lateral {$expression} on true");
-    }
-
-    /**
      * Compile an "upsert" statement into SQL.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
@@ -420,6 +408,18 @@ class PostgresGrammar extends Grammar
         })->implode(', ');
 
         return $sql.$columns;
+    }
+
+    /**
+     * Compile a "lateral join" clause.
+     *
+     * @param  \Illuminate\Database\Query\JoinLateralClause  $join
+     * @param  string  $expression
+     * @return string
+     */
+    public function compileJoinLateral(JoinLateralClause $join, string $expression): string
+    {
+        return trim("{$join->type} join lateral {$expression} on true");
     }
 
     /**
