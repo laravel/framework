@@ -104,7 +104,7 @@ class Enum implements Rule, ValidatorAwareRule
      * @param  mixed  $value
      * @return bool
      */
-    protected function isDesirable(mixed $value)
+    protected function isDesirable($value)
     {
         return match (true) {
             ! empty($this->only) => in_array(needle: $value, haystack: $this->only, strict: true),
