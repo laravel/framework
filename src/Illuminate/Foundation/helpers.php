@@ -812,6 +812,19 @@ if (! function_exists('route')) {
     }
 }
 
+if (! function_exists('route_path')) {
+    /**
+     * Get the path to the routes folder.
+     *
+     * @param  string  $path
+     * @return string
+     */
+    function route_path($path = '')
+    {
+        return app()->routePath($path);
+    }
+}
+
 if (! function_exists('secure_asset')) {
     /**
      * Generate an asset path for the application.
