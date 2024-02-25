@@ -39,6 +39,8 @@ class BroadcastingInstallCommand extends Command
      */
     public function handle()
     {
+        $this->call('config:publish', ['name' => 'broadcasting']);
+
         // Install channel routes file...
         if (file_exists($broadcastingRoutesPath = $this->laravel->basePath('routes/channels.php')) &&
             ! $this->option('force')) {
