@@ -78,8 +78,9 @@ class Enum implements Rule, ValidatorAwareRule
      * Specify the cases that should be considered valid.
      *
      * @param  \UnitEnum[]|\UnitEnum  $values
+     * @return $this
      */
-    public function only($values): static
+    public function only($values)
     {
         $this->only = Arr::wrap($values);
 
@@ -90,8 +91,9 @@ class Enum implements Rule, ValidatorAwareRule
      * Specify the cases that should be considered invalid.
      *
      * @param  \UnitEnum[]|\UnitEnum  $values
+     * @return $this
      */
-    public function except($values): static
+    public function except($values)
     {
         $this->except = Arr::wrap($values);
 
