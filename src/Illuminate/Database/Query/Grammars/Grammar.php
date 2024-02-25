@@ -7,6 +7,7 @@ use Illuminate\Database\Concerns\CompilesJsonPaths;
 use Illuminate\Database\Grammar as BaseGrammar;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\JoinClause;
+use Illuminate\Database\Query\JoinLateralClause;
 use Illuminate\Support\Arr;
 use RuntimeException;
 
@@ -182,8 +183,26 @@ class Grammar extends BaseGrammar
 
             $tableAndNestedJoins = is_null($join->joins) ? $table : '('.$table.$nestedJoins.')';
 
+            if ($join instanceof JoinLateralClause) {
+                return $this->compileJoinLateral($join, $tableAndNestedJoins);
+            }
+
             return trim("{$join->type} join {$tableAndNestedJoins} {$this->compileWheres($join)}");
         })->implode(' ');
+    }
+
+    /**
+     * Compile a "lateral join" clause.
+     *
+     * @param  \Illuminate\Database\Query\JoinLateralClause  $join
+     * @param  string  $expression
+     * @return string
+     *
+     * @throws \RuntimeException
+     */
+    public function compileJoinLateral(JoinLateralClause $join, string $expression): string
+    {
+        throw new RuntimeException('This database engine does not support lateral joins.');
     }
 
     /**

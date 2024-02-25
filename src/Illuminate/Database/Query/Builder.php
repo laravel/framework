@@ -587,6 +587,39 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Add a lateral join clause to the query.
+     *
+     * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder|string  $query
+     * @param  string  $as
+     * @param  string  $type
+     * @return $this
+     */
+    public function joinLateral($query, string $as, string $type = 'inner')
+    {
+        [$query, $bindings] = $this->createSub($query);
+
+        $expression = '('.$query.') as '.$this->grammar->wrapTable($as);
+
+        $this->addBinding($bindings, 'join');
+
+        $this->joins[] = $this->newJoinLateralClause($this, $type, new Expression($expression));
+
+        return $this;
+    }
+
+    /**
+     * Add a lateral left join to the query.
+     *
+     * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder|string  $query
+     * @param  string  $as
+     * @return $this
+     */
+    public function leftJoinLateral($query, string $as)
+    {
+        return $this->joinLateral($query, $as, 'left');
+    }
+
+    /**
      * Add a left join to the query.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $table
@@ -723,6 +756,19 @@ class Builder implements BuilderContract
     protected function newJoinClause(self $parentQuery, $type, $table)
     {
         return new JoinClause($parentQuery, $type, $table);
+    }
+
+    /**
+     * Get a new join lateral clause.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $parentQuery
+     * @param  string  $type
+     * @param  string  $table
+     * @return \Illuminate\Database\Query\JoinLateralClause
+     */
+    protected function newJoinLateralClause(self $parentQuery, $type, $table)
+    {
+        return new JoinLateralClause($parentQuery, $type, $table);
     }
 
     /**
