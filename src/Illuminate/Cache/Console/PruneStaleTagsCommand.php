@@ -38,7 +38,7 @@ class PruneStaleTagsCommand extends Command
         if (! $cache->getStore() instanceof RedisStore) {
             $this->components->error('Pruning cache tags is only necessary when using Redis.');
 
-            return 1;
+            return;
         }
 
         $cache->flushStaleTags();
