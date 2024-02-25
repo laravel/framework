@@ -15,6 +15,11 @@ class BroadcastEvent implements ShouldQueue
     use Queueable;
 
     /**
+     * The event instance.
+     */
+    public mixed $event;
+    
+    /**
      * The number of times the job may be attempted.
      */
     public ?int $tries;
@@ -39,8 +44,9 @@ class BroadcastEvent implements ShouldQueue
      *
      * @return void
      */
-    public function __construct(public mixed $event)
+    public function __construct(mixed $event)
     {
+        $this->event = $event;
         $this->tries = property_exists($event, 'tries') ? $event->tries : null;
         $this->timeout = property_exists($event, 'timeout') ? $event->timeout : null;
         $this->backoff = property_exists($event, 'backoff') ? $event->backoff : null;
