@@ -8,7 +8,6 @@ use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Database\Eloquent\JsonEncodingException;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\ConditionallyLoadsAttributes;
 use Illuminate\Http\Resources\DelegatesToResource;
@@ -41,16 +40,12 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
      */
     public $additional = [];
 
-
     /**
      * Set true if the resource should be streamed.
      *
-     * @var boolean
+     * @var bool
      */
     public $stream = false;
-
-
-
 
     /**
      * The "data" wrapper that should be applied.
@@ -253,8 +248,10 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
      */
     public function toResponse($request)
     {
-        if ($this->stream)
+        if ($this->stream) {
             return (new StreamedResourceResponse($this))->toResponse($request);
+        }
+
         return (new ResourceResponse($this))->toResponse($request);
     }
 

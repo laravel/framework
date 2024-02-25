@@ -3,13 +3,10 @@
 namespace Illuminate\Http\Resources\Json;
 
 use Generator;
-use Illuminate\Contracts\Support\Responsable;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 
 class StreamedResourceResponse extends ResourceResponse
 {
-
     /**
      * The underlying resource.
      *
@@ -36,7 +33,10 @@ class StreamedResourceResponse extends ResourceResponse
      */
     public function toResponse($request)
     {
-        if (!$this->resource->stream) return parent::toResponse($request);
+        if (! method_exists($this->resource, 'toStream')) {
+            return parent::toResponse($request);
+        }
+
         return tap(response()->streamJson(
             $this->wrap(
                 $this->resource->toStream($request),
