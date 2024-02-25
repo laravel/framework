@@ -385,6 +385,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
         $this->instance('path.database', $this->databasePath());
         $this->instance('path.public', $this->publicPath());
         $this->instance('path.resources', $this->resourcePath());
+        $this->instance('path.routes', $this->routePath());
         $this->instance('path.storage', $this->storagePath());
 
         $this->useBootstrapPath(value(function () {
@@ -616,6 +617,17 @@ class Application extends Container implements ApplicationContract, CachesConfig
     public function resourcePath($path = '')
     {
         return $this->joinPaths($this->basePath('resources'), $path);
+    }
+
+    /**
+     * Get the path to the routes directory.
+     *
+     * @param  string  $path
+     * @return string
+     */
+    public function routePath($path = '')
+    {
+        return $this->joinPaths($this->basePath('routes'), $path);
     }
 
     /**
