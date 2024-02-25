@@ -41,6 +41,17 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
      */
     public $additional = [];
 
+
+    /**
+     * Set true if the resource should be streamed.
+     *
+     * @var boolean
+     */
+    public $stream = false;
+
+
+
+
     /**
      * The "data" wrapper that should be applied.
      *
@@ -57,6 +68,7 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
     public function __construct($resource)
     {
         $this->resource = $resource;
+        $this->stream = method_exists($this, 'toStream');
     }
 
     /**
@@ -191,10 +203,10 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
      * Customize the response for a request.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \Illuminate\Http\JsonResponse  $response
+     * @param  \Illuminate\Http\JsonResponse|\Symfony\Component\HttpFoundationStreamedJsonResponse  $response
      * @return void
      */
-    public function withResponse(Request $request, JsonResponse $response)
+    public function withResponse(Request $request, $response)
     {
         //
     }
@@ -241,6 +253,8 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
      */
     public function toResponse($request)
     {
+        if ($this->stream)
+            return (new StreamedResourceResponse($this))->toResponse($request);
         return (new ResourceResponse($this))->toResponse($request);
     }
 

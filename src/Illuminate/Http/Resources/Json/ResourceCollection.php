@@ -103,6 +103,19 @@ class ResourceCollection extends JsonResource implements Countable, IteratorAggr
     }
 
     /**
+     * Transform the colection into a generator.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return Generator
+     */
+    public function toStream(Request $request)
+    {
+        foreach ($this->collection as $item) {
+            yield $this->filter($item->toArray($request));
+        }
+    }
+
+    /**
      * Create an HTTP response that represents the object.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -127,7 +140,7 @@ class ResourceCollection extends JsonResource implements Countable, IteratorAggr
     {
         if ($this->preserveAllQueryParameters) {
             $this->resource->appends($request->query());
-        } elseif (! is_null($this->queryParameters)) {
+        } elseif (!is_null($this->queryParameters)) {
             $this->resource->appends($this->queryParameters);
         }
 
