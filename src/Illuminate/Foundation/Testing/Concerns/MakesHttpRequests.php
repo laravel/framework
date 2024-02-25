@@ -390,6 +390,21 @@ trait MakesHttpRequests
     }
 
     /**
+     * Visit the given URI with a POST request, expecting an XML response.
+     *
+     * @param  string  $uri
+     * @param  string  $xmlBody
+     * @param  array  $headers
+     * @return \Illuminate\Testing\TestResponse
+     */
+    public function postXml($uri, $xmlBody, array $headers = [])
+    {
+        $headers = $this->transformHeadersToServerVars(array_merge($this->defaultHeaders,$headers,['Content-Type' => 'text/xml;charset=utf-8']));
+        $server = $this->transformHeadersToServerVars($headers);
+        return $this->call('POST', $uri, [], [], [], $server, $xmlBody);
+    }
+
+    /**
      * Visit the given URI with a PUT request.
      *
      * @param  string  $uri
