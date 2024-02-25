@@ -401,6 +401,7 @@ trait MakesHttpRequests
     {
         $headers = array_merge($headers, ['Content-Type' => 'text/xml;charset=utf-8']);
         $server = $this->transformHeadersToServerVars($headers);
+        
         return $this->call('POST', $uri, [], [], [], $server, $xmlBody);
     }
 
