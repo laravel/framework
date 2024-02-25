@@ -82,11 +82,12 @@ class Repository implements ArrayAccess, ConfigContract
      * Get the specified string configuration value.
      *
      * @param  string  $key
+     * @param  mixed  $default
      * @return string
      */
-    public function string(string $key): string
+    public function string(string $key, $default = null): string
     {
-        $value = $this->get($key);
+        $value = $this->get($key, $default);
 
         if (! is_string($value)) {
             throw new InvalidArgumentException(
@@ -101,11 +102,12 @@ class Repository implements ArrayAccess, ConfigContract
      * Get the specified integer configuration value.
      *
      * @param  string  $key
+     * @param  mixed  $default
      * @return int
      */
-    public function integer(string $key): int
+    public function integer(string $key, $default = null): int
     {
-        $value = $this->get($key);
+        $value = $this->get($key, $default);
 
         if (! is_int($value)) {
             throw new InvalidArgumentException(
@@ -120,11 +122,12 @@ class Repository implements ArrayAccess, ConfigContract
      * Get the specified float configuration value.
      *
      * @param  string  $key
+     * @param  mixed  $default
      * @return float
      */
-    public function float(string $key): float
+    public function float(string $key, $default = null): float
     {
-        $value = $this->get($key);
+        $value = $this->get($key, $default);
 
         if (! is_float($value)) {
             throw new InvalidArgumentException(
@@ -139,11 +142,12 @@ class Repository implements ArrayAccess, ConfigContract
      * Get the specified boolean configuration value.
      *
      * @param  string  $key
+     * @param  mixed  $default
      * @return bool
      */
-    public function boolean(string $key): bool
+    public function boolean(string $key, $default = null): bool
     {
-        $value = $this->get($key);
+        $value = $this->get($key, $default);
 
         if (! is_bool($value)) {
             throw new InvalidArgumentException(
@@ -158,11 +162,12 @@ class Repository implements ArrayAccess, ConfigContract
      * Get the specified array configuration value.
      *
      * @param  string  $key
+     * @param  mixed  $default
      * @return array<array-key, mixed>
      */
-    public function array(string $key): array
+    public function array(string $key, $default = null): array
     {
-        $value = $this->get($key);
+        $value = $this->get($key, $default);
 
         if (! is_array($value)) {
             throw new InvalidArgumentException(
