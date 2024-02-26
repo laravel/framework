@@ -148,10 +148,10 @@ class ResourceTest extends TestCase
     public function testResourceCollectionThatHaveWrap()
     {
         Route::get('/', function () {
-            return PostResourceWithWrap::collection(collect([new Post([
+            return new PostResourceWithWrap(new Post([
                 'id' => 5,
                 'title' => 'Test Title',
-            ])]));
+            ]));
         });
 
         $response = $this->withoutExceptionHandling()->get(
@@ -162,10 +162,8 @@ class ResourceTest extends TestCase
 
         $response->assertJson([
             'posts' => [
-                [
-                    'id' => 5,
-                    'title' => 'Test Title',
-                ],
+                'id' => 5,
+                'title' => 'Test Title',
             ],
         ]);
     }
