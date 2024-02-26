@@ -39,6 +39,7 @@ use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalRelations
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalRelationshipCounts;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithoutWrap;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithUnlessOptionalData;
+use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithWrap;
 use Illuminate\Tests\Integration\Http\Fixtures\ReallyEmptyPostResource;
 use Illuminate\Tests\Integration\Http\Fixtures\ResourceWithPreservedKeys;
 use Illuminate\Tests\Integration\Http\Fixtures\SerializablePostResource;
@@ -141,6 +142,31 @@ class ResourceTest extends TestCase
         $response->assertJson([
             'id' => 5,
             'title' => 'Test Title',
+        ]);
+    }
+
+    public function testResourceCollectionThatHaveWrap()
+    {
+        Route::get('/', function () {
+            return PostResourceWithWrap::collect(collect([new Post([
+                'id' => 5,
+                'title' => 'Test Title',
+            ])]));
+        });
+
+        $response = $this->withoutExceptionHandling()->get(
+            '/', ['Accept' => 'application/json']
+        );
+
+        $response->assertStatus(200);
+
+        $response->assertJson([
+            'posts' => [
+                [
+                    'id' => 5,
+                    'title' => 'Test Title',
+                ],
+            ],
         ]);
     }
 
