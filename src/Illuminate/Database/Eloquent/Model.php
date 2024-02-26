@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Eloquent;
 
 use ArrayAccess;
+use ArrayObject;
 use Illuminate\Contracts\Broadcasting\HasBroadcastChannel;
 use Illuminate\Contracts\Queue\QueueableCollection;
 use Illuminate\Contracts\Queue\QueueableEntity;
@@ -1662,7 +1663,15 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function jsonSerialize(): mixed
     {
-        return $this->toArray();
+        $attributes = $this->toArray();
+
+        foreach (array_keys($this->getCasts()) as $key) {
+            if ($this->isArrayObjectCastable($key) && is_array($attributes[$key] ?? null)) {
+                $attributes[$key] = new ArrayObject($attributes[$key]);
+            }
+        }
+
+        return $attributes;
     }
 
     /**

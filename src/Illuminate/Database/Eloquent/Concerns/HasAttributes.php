@@ -10,6 +10,7 @@ use Carbon\CarbonImmutable;
 use Carbon\CarbonInterface;
 use DateTimeImmutable;
 use DateTimeInterface;
+use Illuminate\Contracts\Database\Eloquent\ArrayObjectCastable;
 use Illuminate\Contracts\Database\Eloquent\Castable;
 use Illuminate\Contracts\Database\Eloquent\CastsInboundAttributes;
 use Illuminate\Contracts\Support\Arrayable;
@@ -1583,6 +1584,25 @@ trait HasAttributes
     protected function isEncryptedCastable($key)
     {
         return $this->hasCast($key, ['encrypted', 'encrypted:array', 'encrypted:collection', 'encrypted:json', 'encrypted:object']);
+    }
+
+    /**
+     * Determine whether a value is array object castable for inbound manipulation.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    protected function isArrayObjectCastable($key)
+    {
+        $casts = $this->getCasts();
+
+        if (! array_key_exists($key, $casts)) {
+            return false;
+        }
+
+        $castType = $this->parseCasterClass($casts[$key]);
+
+        return class_exists($castType) && is_subclass_of($castType, ArrayObjectCastable::class);
     }
 
     /**

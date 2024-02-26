@@ -2,11 +2,11 @@
 
 namespace Illuminate\Database\Eloquent\Casts;
 
-use Illuminate\Contracts\Database\Eloquent\Castable;
+use Illuminate\Contracts\Database\Eloquent\ArrayObjectCastable;
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 use Illuminate\Support\Facades\Crypt;
 
-class AsEncryptedArrayObject implements Castable
+class AsEncryptedArrayObject implements ArrayObjectCastable
 {
     /**
      * Get the caster class to use when casting from / to this cast target.
@@ -30,7 +30,7 @@ class AsEncryptedArrayObject implements Castable
             public function set($model, $key, $value, $attributes)
             {
                 if (! is_null($value)) {
-                    return [$key => Crypt::encryptString(Json::encode($value))];
+                    return [$key => Crypt::encryptString(Json::encode(is_array($value) ? new ArrayObject($value) : $value))];
                 }
 
                 return null;

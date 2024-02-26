@@ -2,10 +2,10 @@
 
 namespace Illuminate\Database\Eloquent\Casts;
 
-use Illuminate\Contracts\Database\Eloquent\Castable;
+use Illuminate\Contracts\Database\Eloquent\ArrayObjectCastable;
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 
-class AsArrayObject implements Castable
+class AsArrayObject implements ArrayObjectCastable
 {
     /**
      * Get the caster class to use when casting from / to this cast target.
@@ -30,7 +30,7 @@ class AsArrayObject implements Castable
 
             public function set($model, $key, $value, $attributes)
             {
-                return [$key => Json::encode($value)];
+                return [$key => Json::encode(is_array($value) ? new ArrayObject($value) : $value)];
             }
 
             public function serialize($model, string $key, $value, array $attributes)

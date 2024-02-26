@@ -408,6 +408,37 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertTrue($model->isDirty('asEnumArrayObjectAttribute'));
     }
 
+    public function testEmptyArrayObjectSerializesAsJsonObject()
+    {
+        $this->encrypter = m::mock(Encrypter::class);
+        Crypt::swap($this->encrypter);
+        Model::$encrypter = null;
+
+        $this->encrypter->expects('encryptString')
+            ->times(3)
+            ->with('{}')
+            ->andReturn('encrypted-array-object');
+
+        $this->encrypter->expects('decryptString')
+            ->once()
+            ->with('encrypted-array-object')
+            ->andReturn('{}');
+
+        $model = new EloquentModelCastingStub;
+        $model->forceFill([
+            'asarrayobjectAttribute' => [],
+            'asEncryptedArrayObjectAttribute' => [],
+        ]);
+
+        $this->assertInstanceOf(ArrayObject::class, $model->asarrayobjectAttribute);
+        $this->assertEquals('{}', json_encode($model->asarrayobjectAttribute));
+
+        $this->assertInstanceOf(ArrayObject::class, $model->asEncryptedArrayObjectAttribute);
+        $this->assertEquals('{}', json_encode($model->asEncryptedArrayObjectAttribute));
+
+        $this->assertEquals('{"asarrayobjectAttribute":{},"asEncryptedArrayObjectAttribute":{}}', json_encode($model));
+    }
+
     public function testHasCastsOnEnumAttribute()
     {
         $model = new EloquentModelEnumCastingStub();
