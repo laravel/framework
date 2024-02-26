@@ -29,7 +29,7 @@ class PruneStaleTagsCommand extends Command
      * Execute the console command.
      *
      * @param  \Illuminate\Cache\CacheManager  $cache
-     * @return void
+     * @return int|null
      */
     public function handle(CacheManager $cache)
     {
