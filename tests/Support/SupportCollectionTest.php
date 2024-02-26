@@ -2158,7 +2158,7 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals($data->pluck('item')->toArray(), $expected);
 
         setlocale(LC_ALL, 'de_DE');
-        
+
         sort($expected, SORT_LOCALE_STRING);
         $data = $data->sortBy(['item'], SORT_LOCALE_STRING);
         $this->assertEquals($data->pluck('item')->toArray(), $expected);

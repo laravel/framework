@@ -1428,6 +1428,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      * Sort the collection using multiple comparisons.
      *
      * @param  array<array-key, (callable(TValue, TValue): mixed)|(callable(TValue, TKey): mixed)|string|array{string, string}>  $comparisons
+     * @param  int  $options
      * @return static
      */
     protected function sortByMany(array $comparisons = [], int $options = SORT_REGULAR)
