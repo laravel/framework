@@ -1634,7 +1634,7 @@ class Str
     }
 
     /**
-     * Generate a time-ordered UUID (version 4).
+     * Generate a time-ordered modification of the v4 UUID (called COMB) containing a time stamp.
      *
      * @return \Ramsey\Uuid\UuidInterface
      */
