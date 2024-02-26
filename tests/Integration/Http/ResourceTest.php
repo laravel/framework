@@ -148,7 +148,7 @@ class ResourceTest extends TestCase
     public function testResourceCollectionThatHaveWrap()
     {
         Route::get('/', function () {
-            return PostResourceWithWrap::collect(collect([new Post([
+            return PostResourceWithWrap::collection(collect([new Post([
                 'id' => 5,
                 'title' => 'Test Title',
             ])]));
