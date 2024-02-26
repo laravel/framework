@@ -18,7 +18,6 @@ class ConfigPublishCommand extends Command
      */
     protected $signature = 'config:publish
                     {name? : The name of the configuration file to publish}
-                    {--all : Publish all configuration files}
                     {--force : Overwrite any existing configuration files}';
 
     /**
@@ -36,14 +35,6 @@ class ConfigPublishCommand extends Command
     public function handle()
     {
         $config = $this->getBaseConfigurationFiles();
-
-        if (is_null($this->argument('name')) && $this->option('all')) {
-            foreach ($config as $key => $file) {
-                $this->publish($key, $file, $this->laravel->configPath().'/'.$key.'.php');
-            }
-
-            return;
-        }
 
         $name = (string) (is_null($this->argument('name')) ? select(
             label: 'Which configuration file would you like to publish?',
