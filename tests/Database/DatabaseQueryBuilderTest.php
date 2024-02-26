@@ -3592,6 +3592,23 @@ class DatabaseQueryBuilderTest extends TestCase
         ], $sqlite->compileTruncate($builder));
     }
 
+    public function testTruncateMethodWithPrefix()
+    {
+        $builder = $this->getBuilder();
+        $builder->getGrammar()->setTablePrefix('prefix_');
+        $builder->getConnection()->shouldReceive('statement')->once()->with('truncate table "prefix_users"', []);
+        $builder->from('users')->truncate();
+
+        $sqlite = new SQLiteGrammar;
+        $sqlite->setTablePrefix('prefix_');
+        $builder = $this->getBuilder();
+        $builder->from('users');
+        $this->assertEquals([
+            'delete from sqlite_sequence where name = ?' => ['prefix_users'],
+            'delete from "prefix_users"' => [],
+        ], $sqlite->compileTruncate($builder));
+    }
+
     public function testPreserveAddsClosureToArray()
     {
         $builder = $this->getBuilder();
