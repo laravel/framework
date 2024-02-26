@@ -145,29 +145,6 @@ class ResourceTest extends TestCase
         ]);
     }
 
-    public function testResourceCollectionThatHaveWrap()
-    {
-        Route::get('/', function () {
-            return new PostResourceWithWrap(new Post([
-                'id' => 5,
-                'title' => 'Test Title',
-            ]));
-        });
-
-        $response = $this->withoutExceptionHandling()->get(
-            '/', ['Accept' => 'application/json']
-        );
-
-        $response->assertStatus(200);
-
-        $response->assertJson([
-            'posts' => [
-                'id' => 5,
-                'title' => 'Test Title',
-            ],
-        ]);
-    }
-
     public function testResourcesMayHaveOptionalValues()
     {
         Route::get('/', function () {
@@ -1757,5 +1734,33 @@ class ResourceTest extends TestCase
             ->get('/', ['Accept' => 'application/json'])
             ->assertStatus(200)
             ->assertExactJson($expectedJson);
+    }
+
+    // This method must be at the end of the file because the method intends to
+    // change the wrapper key from "data" to "posts" and this makes all the previous
+    // test methods fail.
+    public function testResourceCollectionThatHaveWrap()
+    {
+        Route::get('/', function () {
+            return PostResourceWithWrap::collection(collect([new Post([
+                'id' => 5,
+                'title' => 'Test Title',
+            ])]));
+        });
+
+        $response = $this->withoutExceptionHandling()->get(
+            '/', ['Accept' => 'application/json']
+        );
+
+        $response->assertStatus(200);
+
+        $response->assertJson([
+            'posts' => [
+                [
+                    'id' => 5,
+                    'title' => 'Test Title',
+                ]
+            ],
+        ]);
     }
 }
