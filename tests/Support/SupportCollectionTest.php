@@ -2109,8 +2109,7 @@ class SupportCollectionTest extends TestCase
         $data = $data->sortBy([['item', 'desc']], SORT_NUMERIC);
         $this->assertEquals($data->pluck('item')->toArray(), $expected);
 
-
-        $data = new $collection([['item' => 'img1'], ['item' =>'img101'], ['item' => 'img10'], ['item' => 'img11']]);
+        $data = new $collection([['item' => 'img1'], ['item' => 'img101'], ['item' => 'img10'], ['item' => 'img11']]);
         $expected = $data->pluck('item')->toArray();
 
         sort($expected, SORT_NUMERIC);
@@ -2125,8 +2124,7 @@ class SupportCollectionTest extends TestCase
         $data = $data->sortBy(['item'], SORT_NATURAL);
         $this->assertEquals($data->pluck('item')->toArray(), $expected);
 
-
-        $data = new $collection([['item' => 'img1'], ['item' =>'Img101'], ['item' => 'img10'], ['item' => 'Img11']]);
+        $data = new $collection([['item' => 'img1'], ['item' => 'Img101'], ['item' => 'img10'], ['item' => 'Img11']]);
         $expected = $data->pluck('item')->toArray();
 
         sort($expected);
@@ -2145,8 +2143,7 @@ class SupportCollectionTest extends TestCase
         $data = $data->sortBy(['item'], SORT_FLAG_CASE | SORT_NUMERIC);
         $this->assertEquals($data->pluck('item')->toArray(), $expected);
 
-
-        $data = new $collection([['item' => 'Österreich'], ['item' =>'Oesterreich'], ['item' => 'Zeta']]);
+        $data = new $collection([['item' => 'Österreich'], ['item' => 'Oesterreich'], ['item' => 'Zeta']]);
         $expected = $data->pluck('item')->toArray();
 
         sort($expected);
@@ -2162,7 +2159,6 @@ class SupportCollectionTest extends TestCase
         sort($expected, SORT_LOCALE_STRING);
         $data = $data->sortBy(['item'], SORT_LOCALE_STRING);
         $this->assertEquals($data->pluck('item')->toArray(), $expected);
-
     }
 
     /**
