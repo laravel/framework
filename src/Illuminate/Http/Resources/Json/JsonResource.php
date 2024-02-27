@@ -82,10 +82,6 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
             if (property_exists(static::class, 'preserveKeys')) {
                 $collection->preserveKeys = (new static([]))->preserveKeys === true;
             }
-
-            if (property_exists(static::class, 'wrap')) {
-                $collection::$wrap = static::$wrap;
-            }
         });
     }
 
