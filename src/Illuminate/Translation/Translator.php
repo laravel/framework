@@ -188,7 +188,7 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
      * @param  string|null  $locale
      * @return string
      */
-    public function choice($key, $number, array $replace = [], $locale = null)
+    public function choice(string $key, $number, array $replace = [], $locale = null)
     {
         $line = $this->get(
             $key, $replace, $locale = $this->localeForChoice($locale)
