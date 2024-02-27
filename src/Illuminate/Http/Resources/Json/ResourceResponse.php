@@ -109,7 +109,7 @@ class ResourceResponse implements Responsable
         if ($this->resource instanceof AnonymousResourceCollection) {
             return $this->resource->collects::$wrap;
         }
-        
+
         return get_class($this->resource)::$wrap;
     }
 
