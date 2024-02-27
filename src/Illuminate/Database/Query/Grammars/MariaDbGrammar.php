@@ -9,17 +9,6 @@ use RuntimeException;
 class MariaDbGrammar extends MySqlGrammar
 {
     /**
-     * Determine whether to use a legacy group limit clause for MySQL < 8.0.
-     *
-     * @param  \Illuminate\Database\Query\Builder  $query
-     * @return bool
-     */
-    public function useLegacyGroupLimit(Builder $query)
-    {
-        return false;
-    }
-
-    /**
      * Compile a "lateral join" clause.
      *
      * @param  \Illuminate\Database\Query\JoinLateralClause  $join
@@ -31,5 +20,16 @@ class MariaDbGrammar extends MySqlGrammar
     public function compileJoinLateral(JoinLateralClause $join, string $expression): string
     {
         throw new RuntimeException('This database engine does not support lateral joins.');
+    }
+
+    /**
+     * Determine whether to use a legacy group limit clause for MySQL < 8.0.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @return bool
+     */
+    public function useLegacyGroupLimit(Builder $query)
+    {
+        return false;
     }
 }
