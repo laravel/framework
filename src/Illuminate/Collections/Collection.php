@@ -1468,8 +1468,6 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
                             default => $values[0] <=> $values[1],
                         };
                     }
-
-//                    $result = $values[0] <=> $values[1];
                 }
 
                 if ($result === 0) {
