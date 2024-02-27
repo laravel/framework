@@ -108,8 +108,13 @@ class FileSessionHandler implements SessionHandlerInterface
                     ->ignoreDotFiles(true)
                     ->date('<= now - '.$lifetime.' seconds');
 
+        $deletedSessions = 0;
+
         foreach ($files as $file) {
             $this->files->delete($file->getRealPath());
+            $deletedSessions++;
         }
+
+        return $deletedSessions;
     }
 }
