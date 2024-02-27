@@ -48,10 +48,6 @@ class BcryptHasher extends AbstractHasher implements HasherContract
             'cost' => $this->cost($options),
         ]);
 
-        if ($hash === false) {
-            throw new RuntimeException('Bcrypt hashing not supported.');
-        }
-
         return $hash;
     }
 
