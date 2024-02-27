@@ -281,7 +281,9 @@ class PendingProcess
             return tap($this->resolveAsynchronousFake($command, $output, $fake), function (FakeInvokedProcess $process) {
                 $this->factory->recordIfRecording($this, $process->predictProcessResult());
             });
-        } elseif ($this->factory->isRecording() && $this->factory->preventingStrayProcesses()) {
+        }
+
+        if ($this->factory->isRecording() && $this->factory->preventingStrayProcesses()) {
             throw new RuntimeException('Attempted process ['.$command.'] without a matching fake.');
         }
 
@@ -404,7 +406,9 @@ class PendingProcess
                     ->runsFor(iterations: 0)
                     ->exitCode($result->exitCode())
             ))->withOutputHandler($output);
-        } elseif ($result instanceof FakeProcessResult) {
+        }
+
+        if ($result instanceof FakeProcessResult) {
             return (new FakeInvokedProcess(
                 $command,
                 (new FakeProcessDescription)
@@ -413,9 +417,13 @@ class PendingProcess
                     ->runsFor(iterations: 0)
                     ->exitCode($result->exitCode())
             ))->withOutputHandler($output);
-        } elseif ($result instanceof FakeProcessDescription) {
+        }
+
+        if ($result instanceof FakeProcessDescription) {
             return (new FakeInvokedProcess($command, $result))->withOutputHandler($output);
-        } elseif ($result instanceof FakeProcessSequence) {
+        }
+
+        if ($result instanceof FakeProcessSequence) {
             return $this->resolveAsynchronousFake($command, $output, fn () => $result());
         }
 
