@@ -137,10 +137,10 @@ class Mode
      */
     protected function driver(): string
     {
-        if (is_null($driver = $this->driver)) {
-            $this->driver = $this->connection->getPdo()->getAttribute(PDO::ATTR_DRIVER_NAME);
+        if (! is_null($driver = $this->driver)) {
+            return $driver;
         }
 
-        return $driver;
+        return $this->driver = $this->connection->getPdo()->getAttribute(PDO::ATTR_DRIVER_NAME);
     }
 }

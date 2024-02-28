@@ -66,7 +66,7 @@ class EloquentFetchModeTest extends DatabaseTestCase
         $this->assertEquals('Joseph', $results['Developer-3']->name);
     }
 
-    public function testUnbufferedCursor(): void
+    public function testBuffered(): void
     {
         if ($this->driver !== 'mysql') {
             $this->markTestSkipped('Test requires a MySQL connection.');
