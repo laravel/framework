@@ -200,6 +200,19 @@ class CacheArrayStoreTest extends TestCase
         $this->assertTrue($lock->acquire());
     }
 
+    public function testIsLocked()
+    {
+        Carbon::setTestNow(Carbon::now());
+
+        $store = new ArrayStore;
+        $lock = $store->lock('foo', 10);
+
+        $this->assertFalse($lock->isLocked());
+        $lock->acquire();
+
+        $this->assertTrue($store->lock('foo', 10)->isLocked());
+    }
+
     public function testLockExpirationLowerBoundary()
     {
         Carbon::setTestNow(Carbon::now());

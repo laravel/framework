@@ -154,6 +154,16 @@ abstract class Lock implements LockContract
     }
 
     /**
+     * Determine whether this lock has already been locked.
+     *
+     * @return bool
+     */
+    public function isLocked()
+    {
+        return false === (! $this->getCurrentOwner());
+    }
+
+    /**
      * Specify the number of milliseconds to sleep in between blocked lock acquisition attempts.
      *
      * @param  int  $milliseconds
