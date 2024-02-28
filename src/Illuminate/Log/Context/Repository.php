@@ -365,7 +365,7 @@ class Repository
     }
 
     /**
-     * Handle unserailize exceptions using the given callback.
+     * Handle unserialize exceptions using the given callback.
      *
      * @param  callable  $callback
      * @return static
@@ -373,6 +373,20 @@ class Repository
     public function handleUnserializeExceptionUsing($callback)
     {
         $this->handleUnserializeExceptionUsing = $callback;
+
+        return $this;
+    }
+
+    /**
+     * Flush all state.
+     *
+     * @return $this
+     */
+    public function flush()
+    {
+        $this->data = [];
+
+        $this->hidden = [];
 
         return $this;
     }
@@ -405,7 +419,7 @@ class Repository
      *
      * @internal
      *
-     * @param  ?string  $context
+     * @param  ?array  $context
      * @return $this
      */
     public function hydrate($context)
@@ -456,19 +470,5 @@ class Repository
         }
 
         throw $e;
-    }
-
-    /**
-     * Flush all state.
-     *
-     * @return $this
-     */
-    public function flush()
-    {
-        $this->data = [];
-
-        $this->hidden = [];
-
-        return $this;
     }
 }
