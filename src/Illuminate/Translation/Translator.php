@@ -141,6 +141,7 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
     public function get($key, array $replace = [], $locale = null, $fallback = true)
     {
         $locale = $locale ?: $this->locale;
+        $key = (string) $key;
 
         // For JSON translations, there is only one file per locale, so we will simply load
         // that file and then we will be ready to check the array for the key. These are
