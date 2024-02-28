@@ -142,7 +142,7 @@ class Repository implements ArrayAccess, ConfigContract
      * Get the specified boolean configuration value.
      *
      * @param  string  $key
-     * @param  bool  $default
+     * @param  (\Closure():(bool|null))|bool|null  $default
      * @return bool
      */
     public function boolean(string $key, $default = null): bool
