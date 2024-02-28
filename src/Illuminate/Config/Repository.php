@@ -82,7 +82,7 @@ class Repository implements ArrayAccess, ConfigContract
      * Get the specified string configuration value.
      *
      * @param  string  $key
-     * @param  string  $default
+     * @param  (\Closure():(string|null))|string|null  $default
      * @return string
      */
     public function string(string $key, $default = null): string
