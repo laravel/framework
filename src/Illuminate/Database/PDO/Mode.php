@@ -10,14 +10,14 @@ class Mode
 {
     protected string|null $name = null;
 
-    protected string $driver;
+    protected string|null $driver = null;
 
     public function __construct(
         protected ConnectionInterface $connection,
         protected array $arguments = [],
         protected array $prepareArguments = [],
     ) {
-        $this->driver = $this->connection->getPdo()->getAttribute(PDO::ATTR_DRIVER_NAME);
+        //
     }
 
     /**
@@ -89,7 +89,7 @@ class Mode
      */
     public function bufferedCursor(bool $buffered = true): self
     {
-        if ($this->driver !== 'mysql') {
+        if ($this->driver() !== 'mysql') {
             throw new RuntimeException('Buffered cursor requires a MySQL connection.');
         }
 
@@ -107,7 +107,7 @@ class Mode
      */
     public function scrollableCursor(int $nth = 1): self
     {
-        if (! in_array($this->driver, ['pgsql', 'sqlsrv'])) {
+        if (! in_array($this->driver(), ['pgsql', 'sqlsrv'])) {
             throw new RuntimeException('Scrollable cursor requires a PostgreSQL or SQL Server connection.');
         }
 
@@ -117,5 +117,19 @@ class Mode
         $this->prepareArguments = [PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL];
 
         return $this;
+    }
+
+    /**
+     * Get the driver of this PDO connection.
+     *
+     * @return string
+     */
+    protected function driver(): string
+    {
+        if (is_null($driver = $this->driver)) {
+            $this->driver = $this->connection->getPdo()->getAttribute(PDO::ATTR_DRIVER_NAME);
+        }
+
+        return $driver;
     }
 }
