@@ -1222,6 +1222,7 @@ class Blueprint
     {
         return $this->addColumn('timestampTz', $column, compact('precision'));
     }
+    
     /**
      * Add nullable named creation and update timestamps to the table.
      *
@@ -1236,6 +1237,7 @@ class Blueprint
 
         $this->timestamp($updatedAtColumn, $precision)->nullable();
     }
+    
     /**
      * Add nullable creation and update timestamps to the table.
      *
