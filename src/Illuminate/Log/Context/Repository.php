@@ -466,6 +466,8 @@ class Repository
         }
 
         if ($e instanceof ModelNotFoundException) {
+            report($e);
+
             return null;
         }
 
