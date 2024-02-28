@@ -1225,6 +1225,8 @@ class Blueprint
     /**
      * Add nullable named creation and update timestamps to the table.
      *
+     * @param  string  $createdAtColumn
+     * @param  string  $updatedAtColumn
      * @param  int|null  $precision
      * @return void
      */
