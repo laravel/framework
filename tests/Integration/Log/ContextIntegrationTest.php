@@ -159,6 +159,8 @@ class ContextIntegrationTest extends TestCase
 
         $this->assertSame('replaced value 1', Context::get('model'));
         $this->assertSame('replaced value 2', Context::getHidden('other'));
+
+        Context::handleUnserializeExceptionUsing(null);
     }
 }
 

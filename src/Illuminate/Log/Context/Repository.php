@@ -42,7 +42,7 @@ class Repository
      *
      * @var callable|null
      */
-    protected $handleUnserializeExceptionUsing;
+    protected static $handleUnserializeExceptionUsing;
 
     /**
      * Create a new Context instance.
@@ -374,12 +374,12 @@ class Repository
     /**
      * Handle unserialize exceptions using the given callback.
      *
-     * @param  callable  $callback
+     * @param  callable|null $callback
      * @return static
      */
     public function handleUnserializeExceptionUsing($callback)
     {
-        $this->handleUnserializeExceptionUsing = $callback;
+        static::$handleUnserializeExceptionUsing = $callback;
 
         return $this;
     }
@@ -468,8 +468,8 @@ class Repository
      */
     protected function handleUnserializeException($e, $key, $value, $hidden)
     {
-        if ($this->handleUnserializeExceptionUsing !== null) {
-            return ($this->handleUnserializeExceptionUsing)($e, $key, $value, $hidden);
+        if (static::$handleUnserializeExceptionUsing !== null) {
+            return (static::$handleUnserializeExceptionUsing)($e, $key, $value, $hidden);
         }
 
         if ($e instanceof ModelNotFoundException) {
