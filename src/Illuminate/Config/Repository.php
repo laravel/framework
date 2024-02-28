@@ -102,7 +102,7 @@ class Repository implements ArrayAccess, ConfigContract
      * Get the specified integer configuration value.
      *
      * @param  string  $key
-     * @param  int  $default
+     * @param  (\Closure():(int|null))|int|null  $default
      * @return int
      */
     public function integer(string $key, $default = null): int
