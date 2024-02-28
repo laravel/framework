@@ -430,7 +430,7 @@ class Repository
      */
     public function hydrate($context)
     {
-        $unserialize = function ($value, $key, $type) {
+        $unserialize = function ($value, $key, $hidden) {
             try {
                 return tap($this->getRestoredPropertyValue(unserialize($value)), function ($value) {
                     if ($value instanceof __PHP_Incomplete_Class) {
