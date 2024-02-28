@@ -16,13 +16,6 @@ class ContextIntegrationTest extends TestCase
 {
     use DatabaseMigrations;
 
-    /**
-     * The current database driver.
-     *
-     * @return string
-     */
-    protected $driver;
-
     protected function setUp(): void
     {
         $this->beforeApplicationDestroyed(function () {
