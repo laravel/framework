@@ -3109,7 +3109,7 @@ class Builder implements BuilderContract
         $this->applyBeforeQueryCallbacks();
 
         $results = $this->connection->select(
-            $this->grammar->compileExists($this), $this->getBindings(), ! $this->useWritePdo
+            $this->grammar->compileExists($this), $this->getBindings(), ! $this->useWritePdo, $this->fetchMode
         );
 
         // If the results have rows, we will get the row and see if the exists column is a

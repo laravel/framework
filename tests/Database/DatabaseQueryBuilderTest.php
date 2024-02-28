@@ -8,6 +8,7 @@ use DateTime;
 use Illuminate\Contracts\Database\Query\ConditionExpression;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
+use Illuminate\Database\PDO\Mode;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\Expression as Raw;
 use Illuminate\Database\Query\Grammars\Grammar;
@@ -1346,31 +1347,31 @@ class DatabaseQueryBuilderTest extends TestCase
     {
         $expected = 'select count(*) as aggregate from ((select * from `posts`) union (select * from `videos`)) as `temp_table`';
         $builder = $this->getMySqlBuilder();
-        $builder->getConnection()->shouldReceive('select')->once()->with($expected, [], true);
+        $builder->getConnection()->shouldReceive('select')->once()->with($expected, [], true, null);
         $builder->getProcessor()->shouldReceive('processSelect')->once();
         $builder->from('posts')->union($this->getMySqlBuilder()->from('videos'))->count();
 
         $expected = 'select count(*) as aggregate from ((select `id` from `posts`) union (select `id` from `videos`)) as `temp_table`';
         $builder = $this->getMySqlBuilder();
-        $builder->getConnection()->shouldReceive('select')->once()->with($expected, [], true);
+        $builder->getConnection()->shouldReceive('select')->once()->with($expected, [], true, null);
         $builder->getProcessor()->shouldReceive('processSelect')->once();
         $builder->from('posts')->select('id')->union($this->getMySqlBuilder()->from('videos')->select('id'))->count();
 
         $expected = 'select count(*) as aggregate from ((select * from "posts") union (select * from "videos")) as "temp_table"';
         $builder = $this->getPostgresBuilder();
-        $builder->getConnection()->shouldReceive('select')->once()->with($expected, [], true);
+        $builder->getConnection()->shouldReceive('select')->once()->with($expected, [], true, null);
         $builder->getProcessor()->shouldReceive('processSelect')->once();
         $builder->from('posts')->union($this->getPostgresBuilder()->from('videos'))->count();
 
         $expected = 'select count(*) as aggregate from (select * from (select * from "posts") union select * from (select * from "videos")) as "temp_table"';
         $builder = $this->getSQLiteBuilder();
-        $builder->getConnection()->shouldReceive('select')->once()->with($expected, [], true);
+        $builder->getConnection()->shouldReceive('select')->once()->with($expected, [], true, null);
         $builder->getProcessor()->shouldReceive('processSelect')->once();
         $builder->from('posts')->union($this->getSQLiteBuilder()->from('videos'))->count();
 
         $expected = 'select count(*) as aggregate from (select * from (select * from [posts]) as [temp_table] union select * from (select * from [videos]) as [temp_table]) as [temp_table]';
         $builder = $this->getSqlServerBuilder();
-        $builder->getConnection()->shouldReceive('select')->once()->with($expected, [], true);
+        $builder->getConnection()->shouldReceive('select')->once()->with($expected, [], true, null);
         $builder->getProcessor()->shouldReceive('processSelect')->once();
         $builder->from('posts')->union($this->getSqlServerBuilder()->from('videos'))->count();
     }
@@ -1380,7 +1381,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $expected = 'select count(*) as aggregate from (select (select `count(*)` from `videos` where `posts`.`id` = `videos`.`post_id`) as `videos_count` from `posts` having `videos_count` > ?) as `temp_table`';
         $builder = $this->getMySqlBuilder();
         $builder->getConnection()->shouldReceive('getDatabaseName');
-        $builder->getConnection()->shouldReceive('select')->once()->with($expected, [0 => 1], true)->andReturn([['aggregate' => 1]]);
+        $builder->getConnection()->shouldReceive('select')->once()->with($expected, [0 => 1], true, null)->andReturn([['aggregate' => 1]]);
         $builder->getProcessor()->shouldReceive('processSelect')->once()->andReturnUsing(function ($builder, $results) {
             return $results;
         });
@@ -1862,7 +1863,7 @@ class DatabaseQueryBuilderTest extends TestCase
     {
         $builder = $this->getBuilder();
         $query = 'select "category", count(*) as "total" from "item" where "department" = ? group by "category" having "total" > ?';
-        $builder->getConnection()->shouldReceive('select')->once()->with($query, ['popular', 3], true)->andReturn([['category' => 'rock', 'total' => 5]]);
+        $builder->getConnection()->shouldReceive('select')->once()->with($query, ['popular', 3], true, null)->andReturn([['category' => 'rock', 'total' => 5]]);
         $builder->getProcessor()->shouldReceive('processSelect')->andReturnUsing(function ($builder, $results) {
             return $results;
         });
@@ -1873,7 +1874,7 @@ class DatabaseQueryBuilderTest extends TestCase
         // Using \Raw value
         $builder = $this->getBuilder();
         $query = 'select "category", count(*) as "total" from "item" where "department" = ? group by "category" having "total" > 3';
-        $builder->getConnection()->shouldReceive('select')->once()->with($query, ['popular'], true)->andReturn([['category' => 'rock', 'total' => 5]]);
+        $builder->getConnection()->shouldReceive('select')->once()->with($query, ['popular'], true, null)->andReturn([['category' => 'rock', 'total' => 5]]);
         $builder->getProcessor()->shouldReceive('processSelect')->andReturnUsing(function ($builder, $results) {
             return $results;
         });
@@ -2659,7 +2660,7 @@ class DatabaseQueryBuilderTest extends TestCase
     {
         $builder = $this->getBuilder();
         $builder->getConnection()->shouldReceive('select')->once()->with('select * from "users" where "id" = ? limit 1', [1], true, null)->andReturn([['foo' => 'bar']]);
-        $builder->getProcessor()->shouldReceive('processSelect')->once()->with($builder, [['foo' => 'bar']])->andReturnUsing(function ($query, $results) {
+        $builder->getProcessor()->shouldReceive('processSelect')->once()->with(m::type(Builder::class), [['foo' => 'bar']])->andReturnUsing(function ($query, $results) {
             return $results;
         });
         $results = $builder->from('users')->find(1);
@@ -2683,7 +2684,7 @@ class DatabaseQueryBuilderTest extends TestCase
     {
         $builder = $this->getBuilder();
         $builder->getConnection()->shouldReceive('select')->once()->with('select * from "users" where "id" = ? limit 1', [1], true, null)->andReturn([['foo' => 'bar']]);
-        $builder->getProcessor()->shouldReceive('processSelect')->once()->with($builder, [['foo' => 'bar']])->andReturnUsing(function ($query, $results) {
+        $builder->getProcessor()->shouldReceive('processSelect')->once()->with(m::type(Builder::class), [['foo' => 'bar']])->andReturnUsing(function ($query, $results) {
             return $results;
         });
         $results = $builder->from('users')->where('id', '=', 1)->first();
@@ -2693,16 +2694,16 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testPluckMethodGetsCollectionOfColumnValues()
     {
         $builder = $this->getBuilder();
-        $builder->getConnection()->shouldReceive('select')->once()->andReturn([['foo' => 'bar'], ['foo' => 'baz']]);
-        $builder->getProcessor()->shouldReceive('processSelect')->once()->with($builder, [['foo' => 'bar'], ['foo' => 'baz']])->andReturnUsing(function ($query, $results) {
+        $builder->getConnection()->shouldReceive('select')->once()->andReturn(['bar', 'baz']);
+        $builder->getProcessor()->shouldReceive('processSelect')->once()->with(m::type(Builder::class), ['bar', 'baz'])->andReturnUsing(function ($query, $results) {
             return $results;
         });
         $results = $builder->from('users')->where('id', '=', 1)->pluck('foo');
         $this->assertEquals(['bar', 'baz'], $results->all());
 
         $builder = $this->getBuilder();
-        $builder->getConnection()->shouldReceive('select')->once()->andReturn([['id' => 1, 'foo' => 'bar'], ['id' => 10, 'foo' => 'baz']]);
-        $builder->getProcessor()->shouldReceive('processSelect')->once()->with($builder, [['id' => 1, 'foo' => 'bar'], ['id' => 10, 'foo' => 'baz']])->andReturnUsing(function ($query, $results) {
+        $builder->getConnection()->shouldReceive('select')->once()->andReturn([1 => 'bar', 10 => 'baz']);
+        $builder->getProcessor()->shouldReceive('processSelect')->once()->with(m::type(Builder::class), [1 => 'bar', 10 => 'baz'])->andReturnUsing(function ($query, $results) {
             return $results;
         });
         $results = $builder->from('users')->where('id', '=', 1)->pluck('foo', 'id');
@@ -2713,8 +2714,8 @@ class DatabaseQueryBuilderTest extends TestCase
     {
         // Test without glue.
         $builder = $this->getBuilder();
-        $builder->getConnection()->shouldReceive('select')->once()->andReturn([['foo' => 'bar'], ['foo' => 'baz']]);
-        $builder->getProcessor()->shouldReceive('processSelect')->once()->with($builder, [['foo' => 'bar'], ['foo' => 'baz']])->andReturnUsing(function ($query, $results) {
+        $builder->getConnection()->shouldReceive('select')->once()->andReturn(['bar', 'baz']);
+        $builder->getProcessor()->shouldReceive('processSelect')->once()->with(m::type(Builder::class), ['bar', 'baz'])->andReturnUsing(function ($query, $results) {
             return $results;
         });
         $results = $builder->from('users')->where('id', '=', 1)->implode('foo');
@@ -2722,8 +2723,8 @@ class DatabaseQueryBuilderTest extends TestCase
 
         // Test with glue.
         $builder = $this->getBuilder();
-        $builder->getConnection()->shouldReceive('select')->once()->andReturn([['foo' => 'bar'], ['foo' => 'baz']]);
-        $builder->getProcessor()->shouldReceive('processSelect')->once()->with($builder, [['foo' => 'bar'], ['foo' => 'baz']])->andReturnUsing(function ($query, $results) {
+        $builder->getConnection()->shouldReceive('select')->once()->andReturn(['bar', 'baz']);
+        $builder->getProcessor()->shouldReceive('processSelect')->once()->with(m::type(Builder::class), ['bar', 'baz'])->andReturnUsing(function ($query, $results) {
             return $results;
         });
         $results = $builder->from('users')->where('id', '=', 1)->implode('foo', ',');
@@ -2734,7 +2735,7 @@ class DatabaseQueryBuilderTest extends TestCase
     {
         $builder = $this->getBuilder();
         $builder->getConnection()->shouldReceive('select')->once()->with('select "foo" from "users" where "id" = ? limit 1', [1], true, null)->andReturn([['foo' => 'bar']]);
-        $builder->getProcessor()->shouldReceive('processSelect')->once()->with($builder, [['foo' => 'bar']])->andReturn([['foo' => 'bar']]);
+        $builder->getProcessor()->shouldReceive('processSelect')->once()->with(m::type(Builder::class), [['foo' => 'bar']])->andReturn([['foo' => 'bar']]);
         $results = $builder->from('users')->where('id', '=', 1)->value('foo');
         $this->assertSame('bar', $results);
     }
@@ -2743,7 +2744,7 @@ class DatabaseQueryBuilderTest extends TestCase
     {
         $builder = $this->getBuilder();
         $builder->getConnection()->shouldReceive('select')->once()->with('select UPPER("foo") from "users" where "id" = ? limit 1', [1], true, null)->andReturn([['UPPER("foo")' => 'BAR']]);
-        $builder->getProcessor()->shouldReceive('processSelect')->once()->with($builder, [['UPPER("foo")' => 'BAR']])->andReturn([['UPPER("foo")' => 'BAR']]);
+        $builder->getProcessor()->shouldReceive('processSelect')->once()->with(m::type(Builder::class), [['UPPER("foo")' => 'BAR']])->andReturn([['UPPER("foo")' => 'BAR']]);
         $results = $builder->from('users')->where('id', '=', 1)->rawValue('UPPER("foo")');
         $this->assertSame('BAR', $results);
     }
@@ -4349,12 +4350,12 @@ SQL;
     {
         $builder = $this->getMySqlBuilderWithProcessor();
         $builder->getConnection()->shouldReceive('select')->once()
-            ->with(m::any(), m::any(), false);
+            ->with(m::any(), m::any(), false, null);
         $builder->select('*')->from('foo')->where('bar', '=', 'baz')->lock()->get();
 
         $builder = $this->getMySqlBuilderWithProcessor();
         $builder->getConnection()->shouldReceive('select')->once()
-            ->with(m::any(), m::any(), false);
+            ->with(m::any(), m::any(), false, null);
         $builder->select('*')->from('foo')->where('bar', '=', 'baz')->lock(false)->get();
     }
 
@@ -5975,6 +5976,10 @@ SQL;
     {
         $connection = m::mock(ConnectionInterface::class);
         $connection->shouldReceive('getDatabaseName')->andReturn('database');
+        $connection->shouldReceive('getPdo')->andReturn(
+            m::mock(\PDO::class)->shouldReceive('getAttribute')->andReturn('test')->getMock()
+        );
+        $connection->shouldReceive('getMode')->andReturn(new Mode($connection));
 
         return $connection;
     }
