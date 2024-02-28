@@ -122,7 +122,7 @@ class Repository implements ArrayAccess, ConfigContract
      * Get the specified float configuration value.
      *
      * @param  string  $key
-     * @param  float  $default
+     * @param  (\Closure():(float|null))|float|null  $default
      * @return float
      */
     public function float(string $key, $default = null): float
