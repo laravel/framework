@@ -4,16 +4,19 @@ namespace Illuminate\Tests\Log;
 
 use Exception;
 use Illuminate\Contracts\Debug\ExceptionHandler;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Log\Context\Events\Dehydrating;
 use Illuminate\Log\Context\Events\Hydrated;
 use Illuminate\Log\Context\Repository;
 use Illuminate\Support\Facades\Context;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Orchestra\Testbench\TestCase;
 use RuntimeException;
+use User;
 
 class ContextTest extends TestCase
 {
@@ -80,6 +83,92 @@ class ContextTest extends TestCase
         $this->assertSame(1, Context::get('one'));
         $this->assertSame(99, Context::get('two'));
         $this->assertSame(3, Context::get('three'));
+    }
+
+    public function test_it_can_modify_context_while_dehydrating_without_impacting_global_instance()
+    {
+        Context::add('one', 1);
+        Context::dehydrating(function (Repository $context) {
+            $context->add('one', 99);
+        });
+
+        $dehydrated = Context::dehydrate();
+        $this->assertSame(1, Context::get('one'));
+
+        Context::hydrate($dehydrated);
+        $this->assertSame(99, Context::get('one'));
+    }
+
+    public function test_dehydrate_returns_null_when_empty()
+    {
+        $this->assertNull(Context::dehydrate());
+    }
+
+    public function test_hydrating_null_triggers_hydrating_event()
+    {
+        $called = false;
+        Context::hydrated(function () use (&$called) {
+            $called = true;
+        });
+
+        Context::hydrate(null);
+
+        $this->assertTrue($called);
+    }
+
+    public function test_it_can_serilize_values()
+    {
+        Context::add([
+            'string' => 'string',
+            'bool' => false,
+            'int' => 5,
+            'float' => 5.5,
+            'null' => null,
+            'array' => [1, 2, 3],
+            'hash' => ['foo' => 'bar'],
+            'object' => (object) ['foo' => 'bar'],
+            'enum' => Suit::Clubs,
+            'backed_enum' => StringBackedSuit::Clubs,
+        ]);
+        Context::addHidden('number', 55);
+
+        $dehydrated = Context::dehydrate();
+
+        $this->assertSame([
+            'data' => [
+                'string' => 's:6:"string";',
+                'bool' => 'b:0;',
+                'bool' => 'b:0;',
+                'int' => 'i:5;',
+                'float' => 'd:5.5;',
+                'null' => 'N;',
+                'array' => 'a:3:{i:0;i:1;i:1;i:2;i:2;i:3;}',
+                'hash' => 'a:1:{s:3:"foo";s:3:"bar";}',
+                'object' => 'O:8:"stdClass":1:{s:3:"foo";s:3:"bar";}',
+                'enum' => 'E:31:"Illuminate\Tests\Log\Suit:Clubs";',
+                'backed_enum' => 'E:43:"Illuminate\Tests\Log\StringBackedSuit:Clubs";',
+           ],
+            'hidden' => [
+                'number' => 'i:55;',
+            ],
+        ], $dehydrated);
+
+        Context::flush();
+        $this->assertNull(Context::get('string'));
+
+        Context::hydrate($dehydrated);
+
+        $this->assertSame(Context::get('string'), 'string');
+        $this->assertSame(Context::get('bool'), false);
+        $this->assertSame(Context::get('int'), 5);
+        $this->assertSame(Context::get('float'), 5.5);
+        $this->assertSame(Context::get('null'), null);
+        $this->assertSame(Context::get('array'), [1, 2, 3]);
+        $this->assertSame(Context::get('hash'), ['foo' => 'bar']);
+        $this->assertEquals(Context::get('object'), (object) ['foo' => 'bar']);
+        $this->assertSame(Context::get('enum'), Suit::Clubs);
+        $this->assertSame(Context::get('backed_enum'), StringBackedSuit::Clubs);
+        $this->assertSame(Context::getHidden('number'), 55);
     }
 
     public function test_it_can_push_to_list()
@@ -302,4 +391,9 @@ enum StringBackedSuit: string
     case Diamonds = 'diamonds';
     case Clubs = 'clubs';
     case Spades = 'spades';
+}
+
+class ContextModel extends Model
+{
+    //
 }

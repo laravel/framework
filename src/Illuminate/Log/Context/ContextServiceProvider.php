@@ -6,6 +6,7 @@ use Illuminate\Log\Context\Events\Dehydrating;
 use Illuminate\Log\Context\Events\Hydrated;
 use Illuminate\Queue\Events\JobProcessing;
 use Illuminate\Queue\Queue;
+use Illuminate\Support\Facades\Context;
 use Illuminate\Support\ServiceProvider;
 
 class ContextServiceProvider extends ServiceProvider
@@ -28,35 +29,16 @@ class ContextServiceProvider extends ServiceProvider
     public function boot()
     {
         Queue::createPayloadUsing(function ($connection, $queue, $payload) {
-            $context = app(Repository::class);
+            $context = Context::dehydrate();
 
-            $this->app['events']->dispatch(new Dehydrating($context));
-
-            if ($context->all() === [] && $context->allHidden() === []) {
-                return $payload;
-            }
-
-            return [
+            return $context === null ? $payload : [
                 ...$payload,
-                'illuminate:log:context' => [
-                    'data' => $context->all(),
-                    'hidden' => $context->allHidden(),
-                ],
+                'illuminate:log:context' => $context,
             ];
         });
 
         $this->app['events']->listen(function (JobProcessing $event) {
-            [
-                'data' => $data,
-                'hidden' => $hidden,
-            ] = $event->job->payload()['illuminate:log:context'] ?? [
-                'data' => [],
-                'hidden' => [],
-            ];
-
-            $this->app['events']->dispatch(new Hydrated(
-                app(Repository::class)->add($data)->addHidden($hidden)
-            ));
+            Context::hydrate($event->job->payload()['illuminate:log:context'] ?? null);
         });
     }
 }

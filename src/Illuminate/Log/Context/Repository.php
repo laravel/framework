@@ -2,15 +2,20 @@
 
 namespace Illuminate\Log\Context;
 
-use Illuminate\Events\Dispatcher;
+use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Log\Context\Events\Dehydrating;
 use Illuminate\Log\Context\Events\Hydrated;
+use Illuminate\Queue\Attributes\WithoutRelations;
+use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Traits\Macroable;
 use RuntimeException;
-
+use Throwable;
+use __PHP_Incomplete_Class;
 class Repository
 {
-    use Macroable;
+    use Macroable, SerializesModels;
 
     /**
      * The event dispatcher.
@@ -32,6 +37,13 @@ class Repository
      * @var array<string, mixed>
      */
     protected $hidden = [];
+
+    /**
+     * Callback to handle unserialize exceptions.
+     *
+     * @var callable|null
+     */
+    protected $handleUnserializeExceptionUsing;
 
     /**
      * Create a new Context instance.
@@ -273,7 +285,7 @@ class Repository
      */
     public function dehydrating($callback)
     {
-        $this->events->listen(fn (Dehydrating $event) => $callback($this));
+        $this->events->listen(fn (Dehydrating $event) => $callback($event->context));
 
         return $this;
     }
@@ -286,7 +298,7 @@ class Repository
      */
     public function hydrated($callback)
     {
-        $this->events->listen(fn (Hydrated $event) => $callback($this));
+        $this->events->listen(fn (Hydrated $event) => $callback($event->context));
 
         return $this;
     }
@@ -341,6 +353,105 @@ class Repository
         }
 
         return false;
+    }
+
+    /**
+     * Determine if the repository is empty.
+     *
+     * @return bool
+     */
+    public function isEmpty()
+    {
+        return $this->all() === [] && $this->allHidden() === [];
+    }
+
+    /**
+     * Handle unserailize exceptions using the given callback.
+     *
+     * @param  callable  $callback
+     * @return static
+     */
+    public function handleUnserializeExceptionUsing($callback)
+    {
+        $this->handleUnserializeExceptionUsing = $callback;
+
+        return $this;
+    }
+
+    /**
+     * Dehydrate the context data.
+     *
+     * @internal
+     *
+     * @return ?array
+     */
+    public function dehydrate()
+    {
+        $instance = (new static($this->events))
+            ->add($this->all())
+            ->addHidden($this->allHidden());
+
+        $instance->events->dispatch(new Dehydrating($instance));
+
+        $serialize = fn ($value) => serialize($instance->getSerializedPropertyValue($value, withRelations: false));
+
+        return $instance->isEmpty() ? null : [
+            'data' => array_map($serialize, $instance->all()),
+            'hidden' => array_map($serialize, $instance->allHidden()),
+        ];
+    }
+
+    /**
+     * Hydrate the context instance.
+     *
+     * @internal
+     *
+     * @param ?string  $context
+     * @return $this
+     */
+    public function hydrate($context)
+    {
+        $unserialize = function ($value) {
+            try {
+                return tap($this->getRestoredPropertyValue(unserialize($value)), function ($value) {
+                    if ($value instanceof __PHP_Incomplete_Class) {
+                        throw new RuntimeException('Value is incomplete class: '.json_encode($value));
+                    }
+                });
+            } catch (Throwable $e) {
+                return $this->handleUnserializeException($e);
+            }
+        };
+
+        [$data, $hidden] = [
+            array_map($unserialize, $context['data'] ?? []),
+            array_map($unserialize, $context['hidden'] ?? []),
+        ];
+
+        $this->events->dispatch(new Hydrated(
+            $this->flush()->add($data)->addHidden($hidden)
+        ));
+
+        return $this;
+    }
+
+    /**
+     * Handle exceptions while unserializing.
+     *
+     * @param  \Throwable  $e
+     * @return mixed
+     */
+    protected function handleUnserializeException($e)
+    {
+        if ($this->handleUnserializeExceptionUsing !== null) {
+            return ($this->handleUnserializeExceptionUsing)($e);
+        }
+
+        if ($e instanceof ModelNotFoundException) {
+            return null;
+        }
+
+        throw $e;
     }
 
     /**
