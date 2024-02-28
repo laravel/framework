@@ -8,8 +8,18 @@ use RuntimeException;
 
 class Mode
 {
+    /**
+     * The name of the mode.
+     *
+     * @var string|null
+     */
     protected string|null $name = null;
 
+    /**
+     * The driver of the PDO connection.
+     *
+     * @var string|null
+     */
     protected string|null $driver = null;
 
     public function __construct(
@@ -81,16 +91,17 @@ class Mode
     }
 
     /**
-     * Use an unbuffered cursor, which is useful for cursoring over large data sets. Note that
-     * the row count is not available for unbuffered cursors until the last row is fetched.
+     * Use a different buffer mode.
+     *
+     * See: https://www.php.net/manual/en/mysqlinfo.concepts.buffering.php
      *
      * @param  bool  $buffered
      * @return $this
      */
-    public function bufferedCursor(bool $buffered = true): self
+    public function buffered(bool $buffered = true): self
     {
         if ($this->driver() !== 'mysql') {
-            throw new RuntimeException('Buffered cursor requires a MySQL connection.');
+            throw new RuntimeException('Buffered mode requires a MySQL connection.');
         }
 
         $this->name = __FUNCTION__;

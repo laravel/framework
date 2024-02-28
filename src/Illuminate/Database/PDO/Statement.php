@@ -72,7 +72,7 @@ class Statement
     }
 
     /**
-     * Route undefined functions to the underlying PDO statement.
+     * Route other functions to the underlying PDO statement.
      *
      * @param string $method
      * @param mixed $parameters

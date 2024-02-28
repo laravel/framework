@@ -74,7 +74,7 @@ class EloquentFetchModeTest extends DatabaseTestCase
 
         $results = User::query()
             ->select(['title', 'name'])
-            ->mode(DB::mode()->bufferedCursor(false))
+            ->mode(DB::mode()->buffered(false))
             ->cursor();
 
         $this->assertCount(7, $results->all());
