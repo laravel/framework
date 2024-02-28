@@ -880,7 +880,7 @@ class Builder implements BuilderContract
      * Get a collection with the values of a given column.
      *
      * @param  string|\Illuminate\Contracts\Database\Query\Expression  $column
-     * @param  string|null  $key
+     * @param  string|\Illuminate\Contracts\Database\Query\Expression|null  $key
      * @return \Illuminate\Support\Collection
      */
     public function pluck($column, $key = null)

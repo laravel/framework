@@ -435,5 +435,14 @@ class QueryBuilderTest extends DatabaseTestCase
         $this->assertSame([
             'Lorem Ipsum.' => 'Bar Post',
         ], DB::table('posts')->pluck('title', 'content')->toArray());
+
+        // Test custom query calculations.
+        $this->assertSame([
+            2 => 'FOO POST',
+            4 => 'BAR POST',
+        ], DB::table('posts')->pluck(
+            DB::raw('UPPER(title)'),
+            DB::raw('2 * id')
+        )->toArray());
     }
 }
