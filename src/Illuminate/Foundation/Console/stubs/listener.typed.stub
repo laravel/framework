@@ -2,6 +2,7 @@
 
 namespace {{ namespace }};
 
+use {{ eventNamespace }};
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 
@@ -18,7 +19,7 @@ class {{ class }}
     /**
      * Handle the event.
      */
-    public function handle(object $event): void
+    public function handle({{ event }} $event): void
     {
         //
     }
