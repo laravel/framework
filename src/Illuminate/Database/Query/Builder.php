@@ -15,7 +15,7 @@ use Illuminate\Database\Concerns\ExplainsQueries;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Relations\Relation;
-use Illuminate\Database\FetchMode;
+use Illuminate\Database\PDO\Mode;
 use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\Query\Processors\Processor;
 use Illuminate\Pagination\Paginator;
@@ -240,9 +240,9 @@ class Builder implements BuilderContract
     public $useWritePdo = false;
 
     /**
-     * @var FetchMode|null
+     * @var Mode|null
      */
-    public FetchMode|null $fetchMode = null;
+    public Mode|null $fetchMode = null;
 
     /**
      * Create a new query builder instance.
@@ -2818,8 +2818,6 @@ class Builder implements BuilderContract
 
         $items = collect($clone->processor->processSelect($clone, $clone->runSelect()));
 
-        return $items;
-
         return isset($this->groupLimit)
             ? $this->withoutGroupLimitKeys($items)
             : $items;
@@ -3082,7 +3080,7 @@ class Builder implements BuilderContract
     {
         $clone = $this->clone();
 
-        $clone->mode(is_null($key) ? FetchMode::column() : FetchMode::pair());
+        $clone->mode(is_null($key) ? $this->connection->getMode()->column() : $this->connection->getMode()->pair());
 
         $clone->columns = is_null($key) ? [$column] : [$key, $column];
 
@@ -3705,10 +3703,10 @@ class Builder implements BuilderContract
     /**
      * Set the fetch mode for the query.
      *
-     * @param  FetchMode  $fetchMode
+     * @param  Mode  $fetchMode
      * @return $this
      */
-    public function mode(FetchMode $fetchMode)
+    public function mode(Mode $fetchMode)
     {
         $this->fetchMode = $fetchMode;
 

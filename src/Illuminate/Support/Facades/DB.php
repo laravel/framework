@@ -4,6 +4,7 @@ namespace Illuminate\Support\Facades;
 
 /**
  * @method static \Illuminate\Database\Connection connection(string|null $name = null)
+ * @method static \Illuminate\Database\PDO\Mode mode()
  * @method static \Illuminate\Database\ConnectionInterface connectUsing(string $name, array $config, bool $force = false)
  * @method static void purge(string|null $name = null)
  * @method static void disconnect(string|null $name = null)
@@ -43,7 +44,6 @@ namespace Illuminate\Support\Facades;
  * @method static bool unprepared(string $query)
  * @method static array pretend(\Closure $callback)
  * @method static mixed withoutPretending(\Closure $callback)
- * @method static void bindValues(\PDOStatement $statement, array $bindings)
  * @method static array prepareBindings(array $bindings)
  * @method static void logQuery(string $query, array $bindings, float|null $time = null)
  * @method static void whenQueryingForLongerThan(\DateTimeInterface|\Carbon\CarbonInterval|float|int $threshold, callable $handler)

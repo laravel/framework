@@ -3,6 +3,7 @@
 namespace Illuminate\Database;
 
 use Closure;
+use Illuminate\Database\PDO\Mode;
 
 interface ConnectionInterface
 {
@@ -53,7 +54,7 @@ interface ConnectionInterface
      * @param  bool  $useReadPdo
      * @return array
      */
-    public function select($query, $bindings = [], $useReadPdo = true, FetchMode $fetchMode = null);
+    public function select($query, $bindings = [], $useReadPdo = true, Mode $mode = null);
 
     /**
      * Run a select statement against the database and returns a generator.
@@ -61,10 +62,10 @@ interface ConnectionInterface
      * @param  string  $query
      * @param  array  $bindings
      * @param  bool  $useReadPdo
-     * @param \Illuminate\Database\FetchMode|null $fetchMode
+     * @param \Illuminate\Database\PDO\Mode|null $mode
      * @return \Generator
      */
-    public function cursor($query, $bindings = [], $useReadPdo = true, FetchMode $fetchMode = null);
+    public function cursor($query, $bindings = [], $useReadPdo = true, Mode $mode = null);
 
     /**
      * Run an insert statement against the database.
@@ -180,4 +181,11 @@ interface ConnectionInterface
      * @return string
      */
     public function getDatabaseName();
+
+    /**
+     * Get the default fetch mode.
+     *
+     * @return int
+     */
+    public function getDefaultFetchMode();
 }

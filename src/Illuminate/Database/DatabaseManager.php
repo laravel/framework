@@ -100,6 +100,16 @@ class DatabaseManager implements ConnectionResolverInterface
     }
 
     /**
+     * Get the PDO mode for the database connection.
+     *
+     * @return \Illuminate\Database\PDO\Mode
+     */
+    public function mode()
+    {
+        return $this->connection()->getMode();
+    }
+
+    /**
      * Get a database connection instance from the given configuration.
      *
      * @param  string  $name
