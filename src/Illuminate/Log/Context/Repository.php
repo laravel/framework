@@ -2,9 +2,9 @@
 
 namespace Illuminate\Log\Context;
 
-use Illuminate\Events\Dispatcher;
 use __PHP_Incomplete_Class;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Events\Dispatcher;
 use Illuminate\Log\Context\Events\Dehydrating;
 use Illuminate\Log\Context\Events\Hydrated;
 use Illuminate\Queue\SerializesModels;
@@ -306,7 +306,6 @@ class Repository
         return $this->all() === [] && $this->allHidden() === [];
     }
 
-
     /**
      * Execute the given callback when context is about to be dehydrated.
      *
@@ -374,7 +373,7 @@ class Repository
     /**
      * Handle unserialize exceptions using the given callback.
      *
-     * @param  callable|null $callback
+     * @param  callable|null  $callback
      * @return static
      */
     public function handleUnserializeExceptionUsing($callback)
