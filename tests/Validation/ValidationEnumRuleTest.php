@@ -9,6 +9,7 @@ use Illuminate\Translation\Translator;
 use Illuminate\Validation\Rules\Enum;
 use Illuminate\Validation\ValidationServiceProvider;
 use Illuminate\Validation\Validator;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 include_once 'Enums.php';
@@ -97,9 +98,7 @@ class ValidationEnumRuleTest extends TestCase
         $this->assertTrue($v->passes());
     }
 
-    /**
-     * @dataProvider conditionalCasesDataProvider
-     */
+    #[DataProvider('conditionalCasesDataProvider')]
     public function testValidationPassesWhenOnlyCasesProvided(
         IntegerStatus|int $enum,
         array|IntegerStatus $only,
@@ -118,9 +117,7 @@ class ValidationEnumRuleTest extends TestCase
         $this->assertSame($expected, $v->passes());
     }
 
-    /**
-     * @dataProvider conditionalCasesDataProvider
-     */
+    #[DataProvider('conditionalCasesDataProvider')]
     public function testValidationPassesWhenExceptCasesProvided(
         int|IntegerStatus $enum,
         array|IntegerStatus $except,
