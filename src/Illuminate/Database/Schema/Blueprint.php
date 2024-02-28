@@ -1222,7 +1222,18 @@ class Blueprint
     {
         return $this->addColumn('timestampTz', $column, compact('precision'));
     }
+    /**
+     * Add nullable name creation and update timestamps to the table.
+     *
+     * @param  int|null  $precision
+     * @return void
+     */
+    public function namedTimestamps($createdAtColumn, $updatedAtColumn, $precision = 0)
+    {
+        $this->timestamp($createdAtColumn, $precision)->nullable();
 
+        $this->timestamp($updatedAtColumn, $precision)->nullable();
+    }
     /**
      * Add nullable creation and update timestamps to the table.
      *
