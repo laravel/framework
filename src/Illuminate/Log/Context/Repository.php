@@ -438,7 +438,17 @@ class Repository
                     }
                 });
             } catch (Throwable $e) {
-                return $this->handleUnserializeException($e, $key, $value, $type);
+                if (static::$handleUnserializeExceptionUsing !== null) {
+                    return (static::$handleUnserializeExceptionUsing)($e, $key, $value, $hidden);
+                }
+
+                if ($e instanceof ModelNotFoundException) {
+                    report($e);
+
+                    return null;
+                }
+
+                throw $e;
             }
         };
 
@@ -452,31 +462,5 @@ class Repository
         ));
 
         return $this;
-    }
-
-    /**
-     * Handle exceptions while unserializing.
-     *
-     * @internal
-     *
-     * @param  \Throwable  $e
-     * @param  string  $key
-     * @param  string  $value
-     * @param  bool  $hidden
-     * @return mixed
-     */
-    protected function handleUnserializeException($e, $key, $value, $hidden)
-    {
-        if (static::$handleUnserializeExceptionUsing !== null) {
-            return (static::$handleUnserializeExceptionUsing)($e, $key, $value, $hidden);
-        }
-
-        if ($e instanceof ModelNotFoundException) {
-            report($e);
-
-            return null;
-        }
-
-        throw $e;
     }
 }
