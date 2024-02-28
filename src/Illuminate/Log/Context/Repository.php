@@ -323,7 +323,7 @@ class Repository
     }
 
     /**
-     * Determine if a given key can used as a stack.
+     * Determine if a given key can be used as a stack.
      */
     public function isStackable($key)
     {
@@ -339,7 +339,7 @@ class Repository
     }
 
     /**
-     * Determine if a given key can used as a hidden stack.
+     * Determine if a given key can be used as a hidden stack.
      */
     public function isHiddenStackable($key)
     {
