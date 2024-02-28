@@ -463,7 +463,7 @@ class SqlServerGrammar extends Grammar
             $compiledSql .= 'when matched then update set '.$update.' ';
         }
 
-        $compiledSql .= 'when not matched then insert ('.$columns.') values ('.$columns .');';
+        $compiledSql .= 'when not matched then insert ('.$columns.') values ('.$columns.');';
 
         return $compiledSql;
     }

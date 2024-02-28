@@ -285,15 +285,15 @@ class SQLiteGrammar extends Grammar
     {
         $sql = $this->compileInsertUsing($query, $columns, $sql);
 
-        $sql .= ' on conflict (' . $this->columnize($uniqueBy) . ') do update set ';
+        $sql .= ' on conflict ('.$this->columnize($uniqueBy).') do update set ';
 
         $columns = collect($update)->map(function ($value, $key) {
             return is_numeric($key)
-                ? $this->wrap($value) . ' = ' . $this->wrap('excluded') . '.' . $this->wrap($value)
-                : $this->wrap($key) . ' = ' . $this->parameter($value);
+                ? $this->wrap($value).' = '.$this->wrap('excluded').'.'.$this->wrap($value)
+                : $this->wrap($key).' = '.$this->parameter($value);
         })->implode(', ');
 
-        return $sql . $columns;
+        return $sql.$columns;
     }
 
     /**
