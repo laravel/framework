@@ -2,8 +2,8 @@
 
 namespace Illuminate\Log\Context;
 
+use Illuminate\Events\Dispatcher;
 use __PHP_Incomplete_Class;
-use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Log\Context\Events\Dehydrating;
 use Illuminate\Log\Context\Events\Hydrated;
@@ -277,6 +277,37 @@ class Repository
     }
 
     /**
+     * Retrieve all the values.
+     *
+     * @return array<string, mixed>
+     */
+    public function all()
+    {
+        return $this->data;
+    }
+
+    /**
+     * Retrieve all the hidden values.
+     *
+     * @return array<string, mixed>
+     */
+    public function allHidden()
+    {
+        return $this->hidden;
+    }
+
+    /**
+     * Determine if the repository is empty.
+     *
+     * @return bool
+     */
+    public function isEmpty()
+    {
+        return $this->all() === [] && $this->allHidden() === [];
+    }
+
+
+    /**
      * Execute the given callback when context is about to be dehydrated.
      *
      * @param  callable  $callback
@@ -303,29 +334,12 @@ class Repository
     }
 
     /**
-     * Retrieve all the values.
-     *
-     * @return array<string, mixed>
-     */
-    public function all()
-    {
-        return $this->data;
-    }
-
-    /**
-     * Retrieve all the hidden values.
-     *
-     * @return array<string, mixed>
-     */
-    public function allHidden()
-    {
-        return $this->hidden;
-    }
-
-    /**
      * Determine if a given key can be used as a stack.
+     *
+     * @param  string  $key
+     * @return bool
      */
-    public function isStackable($key)
+    protected function isStackable($key)
     {
         if (! $this->has($key)) {
             return true;
@@ -340,8 +354,11 @@ class Repository
 
     /**
      * Determine if a given key can be used as a hidden stack.
+     *
+     * @param  string  $key
+     * @return bool
      */
-    public function isHiddenStackable($key)
+    protected function isHiddenStackable($key)
     {
         if (! $this->hasHidden($key)) {
             return true;
@@ -352,16 +369,6 @@ class Repository
         }
 
         return false;
-    }
-
-    /**
-     * Determine if the repository is empty.
-     *
-     * @return bool
-     */
-    public function isEmpty()
-    {
-        return $this->all() === [] && $this->allHidden() === [];
     }
 
     /**
