@@ -272,6 +272,31 @@ class SQLiteGrammar extends Grammar
     }
 
     /**
+     * Compile an "upsert" statement using a subquery into SQL.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $columns
+     * @param  string  $sql
+     * @param  array  $uniqueBy
+     * @param  array  $update
+     * @return string
+     */
+    public function compileUpsertUsing(Builder $query, array $columns, string $sql, array $uniqueBy, array $update)
+    {
+        $sql = $this->compileInsertUsing($query, $columns, $sql);
+
+        $sql .= ' on conflict (' . $this->columnize($uniqueBy) . ') do update set ';
+
+        $columns = collect($update)->map(function ($value, $key) {
+            return is_numeric($key)
+                ? $this->wrap($value) . ' = ' . $this->wrap('excluded') . '.' . $this->wrap($value)
+                : $this->wrap($key) . ' = ' . $this->parameter($value);
+        })->implode(', ');
+
+        return $sql . $columns;
+    }
+
+    /**
      * Group the nested JSON columns.
      *
      * @param  array  $values

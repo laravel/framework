@@ -3263,6 +3263,154 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals(2, $result);
     }
 
+    public function testUpsertUsingMethod()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->getConnection()
+            ->shouldReceive('getDatabaseName')->andReturn('test')
+            ->shouldReceive('getConfig')->with('use_upsert_alias')->andReturn(false)
+            ->shouldReceive('affectingStatement')->once()->with('insert into `users` (`email`, `name`) select `column1`, `column2` from `table2` where `foreign_id` = ? on duplicate key update `email` = values(`email`), `name` = values(`name`)', [5])->andReturn(2);
+        $result = $builder->from('users')->upsertUsing(['email', 'name'], function (Builder $query) {
+            $query->select(['column1', 'column2'])->from('table2')->where('foreign_id', '=', 5);
+        }, 'email');
+        $this->assertEquals(2, $result);
+
+        $builder = $this->getMySqlBuilder();
+        $builder->getConnection()
+            ->shouldReceive('getDatabaseName')->andReturn('test')
+            ->shouldReceive('getConfig')->with('use_upsert_alias')->andReturn(true)
+            ->shouldReceive('affectingStatement')->once()->with('insert into `users` (`email`, `name`) select `column1`, `column2` from `table2` where `foreign_id` = ? as laravel_upsert_alias on duplicate key update `email` = `laravel_upsert_alias`.`email`, `name` = `laravel_upsert_alias`.`name`', [5])->andReturn(2);
+        $result = $builder->from('users')->upsertUsing(['email', 'name'], function (Builder $query) {
+            $query->select(['column1', 'column2'])->from('table2')->where('foreign_id', '=', 5);
+        }, 'email');
+        $this->assertEquals(2, $result);
+
+        $builder = $this->getPostgresBuilder();
+        $builder->getConnection()->shouldReceive('affectingStatement')->once()->with('insert into "users" ("email", "name") select "column1", "column2" from "table2" where "foreign_id" = ? on conflict ("email") do update set "email" = "excluded"."email", "name" = "excluded"."name"', [5])->andReturn(2);
+        $result = $builder->from('users')->upsertUsing(['email', 'name'], function (Builder $query) {
+            $query->select(['column1', 'column2'])->from('table2')->where('foreign_id', '=', 5);
+        }, 'email');
+        $this->assertEquals(2, $result);
+
+        $builder = $this->getSQLiteBuilder();
+        $builder->getConnection()
+            ->shouldReceive('getDatabaseName')->andReturn('test')
+            ->shouldReceive('affectingStatement')->once()->with('insert into "users" ("email", "name") select "column1", "column2" from "table2" where "foreign_id" = ? on conflict ("email") do update set "email" = "excluded"."email", "name" = "excluded"."name"', [5])->andReturn(2);
+        $result = $builder->from('users')->upsertUsing(['email', 'name'], function (Builder $query) {
+            $query->select(['column1', 'column2'])->from('table2')->where('foreign_id', '=', 5);
+        }, 'email');
+        $this->assertEquals(2, $result);
+
+        $builder = $this->getSqlServerBuilder();
+        $builder->getConnection()->shouldReceive('affectingStatement')->once()->with('merge [users] using (select [column1], [column2] from [table2] where [foreign_id] = ?) [laravel_source] ([email], [name]) on [laravel_source].[email] = [users].[email] when matched then update set [email] = [laravel_source].[email], [name] = [laravel_source].[name] when not matched then insert ([email], [name]) values ([email], [name]);', [5])->andReturn(2);
+        $result = $builder->from('users')->upsertUsing(['email', 'name'], function (Builder $query) {
+            $query->select(['column1', 'column2'])->from('table2')->where('foreign_id', '=', 5);
+        }, 'email');
+        $this->assertEquals(2, $result);
+    }
+
+    public function testUpsertUsingMethodWithUpdateColumns()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->getConnection()
+            ->shouldReceive('getDatabaseName')->andReturn('test')
+            ->shouldReceive('getConfig')->with('use_upsert_alias')->andReturn(false)
+            ->shouldReceive('affectingStatement')->once()->with('insert into `users` (`email`, `name`) select `column1`, `column2` from `table2` on duplicate key update `name` = values(`name`)', [])->andReturn(1);
+        $result = $builder->from('users')->upsertUsing(['email', 'name'], function (Builder $query) {
+            $query->select(['column1', 'column2'])->from('table2');
+        }, 'email', ['name']);
+        $this->assertEquals(1, $result);
+
+        $builder = $this->getMySqlBuilder();
+        $builder->getConnection()
+            ->shouldReceive('getDatabaseName')->andReturn('test')
+            ->shouldReceive('getConfig')->with('use_upsert_alias')->andReturn(false)
+            ->shouldReceive('affectingStatement')->once()->with('insert into `users` (`email`, `name`) select `column1`, `column2` from `table2` on duplicate key update `name` = ?', ['New name'])->andReturn(1);
+        $result = $builder->from('users')->upsertUsing(['email', 'name'], function (Builder $query) {
+            $query->select(['column1', 'column2'])->from('table2');
+        }, 'email', ['name' => 'New name']);
+        $this->assertEquals(1, $result);
+
+        $builder = $this->getMySqlBuilder();
+        $builder->getConnection()
+            ->shouldReceive('getDatabaseName')->andReturn('test')
+            ->shouldReceive('getConfig')->with('use_upsert_alias')->andReturn(false)
+            ->shouldReceive('affectingStatement')->once()->with('insert into `users` (`email`, `name`) select `column1`, `column2` from `table2` on duplicate key update `name` = concat(`name`, " 2")', [])->andReturn(1);
+        $result = $builder->from('users')->upsertUsing(['email', 'name'], function (Builder $query) {
+            $query->select(['column1', 'column2'])->from('table2');
+        }, 'email', ['name' => new Raw('concat(`name`, " 2")')]);
+        $this->assertEquals(1, $result);
+
+        $builder = $this->getPostgresBuilder();
+        $builder->getConnection()->shouldReceive('affectingStatement')->once()->with('insert into "users" ("email", "name") select "column1", "column2" from "table2" on conflict ("email") do update set "name" = "excluded"."name"', [])->andReturn(1);
+        $result = $builder->from('users')->upsertUsing(['email', 'name'], function (Builder $query) {
+            $query->select(['column1', 'column2'])->from('table2');
+        }, 'email', ['name']);
+        $this->assertEquals(1, $result);
+
+        $builder = $this->getPostgresBuilder();
+        $builder->getConnection()->shouldReceive('affectingStatement')->once()->with('insert into "users" ("email", "name") select "column1", "column2" from "table2" on conflict ("email") do update set "name" = ?', ['New name'])->andReturn(1);
+        $result = $builder->from('users')->upsertUsing(['email', 'name'], function (Builder $query) {
+            $query->select(['column1', 'column2'])->from('table2');
+        }, 'email', ['name' => 'New name']);
+        $this->assertEquals(1, $result);
+
+        $builder = $this->getPostgresBuilder();
+        $builder->getConnection()->shouldReceive('affectingStatement')->once()->with('insert into "users" ("email", "name") select "column1", "column2" from "table2" on conflict ("email") do update set "name" = concat("name", \' 2\')', [])->andReturn(1);
+        $result = $builder->from('users')->upsertUsing(['email', 'name'], function (Builder $query) {
+            $query->select(['column1', 'column2'])->from('table2');
+        }, 'email', ['name' => new Raw('concat("name", \' 2\')')]);
+        $this->assertEquals(1, $result);
+
+        $builder = $this->getSQLiteBuilder();
+        $builder->getConnection()
+            ->shouldReceive('getDatabaseName')->andReturn('test')
+            ->shouldReceive('affectingStatement')->once()->with('insert into "users" ("email", "name") select "column1", "column2" from "table2" on conflict ("email") do update set "name" = "excluded"."name"', [])->andReturn(1);
+        $result = $builder->from('users')->upsertUsing(['email', 'name'], function (Builder $query) {
+            $query->select(['column1', 'column2'])->from('table2');
+        }, 'email', ['name']);
+        $this->assertEquals(1, $result);
+
+        $builder = $this->getSQLiteBuilder();
+        $builder->getConnection()
+            ->shouldReceive('getDatabaseName')->andReturn('test')
+            ->shouldReceive('affectingStatement')->once()->with('insert into "users" ("email", "name") select "column1", "column2" from "table2" on conflict ("email") do update set "name" = ?', ['New name'])->andReturn(1);
+        $result = $builder->from('users')->upsertUsing(['email', 'name'], function (Builder $query) {
+            $query->select(['column1', 'column2'])->from('table2');
+        }, 'email', ['name' => 'New name']);
+        $this->assertEquals(1, $result);
+
+        $builder = $this->getSQLiteBuilder();
+        $builder->getConnection()
+            ->shouldReceive('getDatabaseName')->andReturn('test')
+            ->shouldReceive('affectingStatement')->once()->with('insert into "users" ("email", "name") select "column1", "column2" from "table2" on conflict ("email") do update set "name" = concat("name", \' 2\')', [])->andReturn(1);
+        $result = $builder->from('users')->upsertUsing(['email', 'name'], function (Builder $query) {
+            $query->select(['column1', 'column2'])->from('table2');
+        }, 'email', ['name' => new Raw('concat("name", \' 2\')')]);
+        $this->assertEquals(1, $result);
+
+        $builder = $this->getSqlServerBuilder();
+        $builder->getConnection()->shouldReceive('affectingStatement')->once()->with('merge [users] using (select [column1], [column2] from [table2]) [laravel_source] ([email], [name]) on [laravel_source].[email] = [users].[email] when matched then update set [name] = [laravel_source].[name] when not matched then insert ([email], [name]) values ([email], [name]);', [])->andReturn(1);
+        $result = $builder->from('users')->upsertUsing(['email', 'name'], function (Builder $query) {
+            $query->select(['column1', 'column2'])->from('table2');
+        }, 'email', ['name']);
+        $this->assertEquals(1, $result);
+
+        $builder = $this->getSqlServerBuilder();
+        $builder->getConnection()->shouldReceive('affectingStatement')->once()->with('merge [users] using (select [column1], [column2] from [table2]) [laravel_source] ([email], [name]) on [laravel_source].[email] = [users].[email] when matched then update set [name] = ? when not matched then insert ([email], [name]) values ([email], [name]);', ['New name'])->andReturn(1);
+        $result = $builder->from('users')->upsertUsing(['email', 'name'], function (Builder $query) {
+            $query->select(['column1', 'column2'])->from('table2');
+        }, 'email', ['name' => 'New name']);
+        $this->assertEquals(1, $result);
+
+        $builder = $this->getSqlServerBuilder();
+        $builder->getConnection()->shouldReceive('affectingStatement')->once()->with('merge [users] using (select [column1], [column2] from [table2]) [laravel_source] ([email], [name]) on [laravel_source].[email] = [users].[email] when matched then update set [name] = concat([name], " 2") when not matched then insert ([email], [name]) values ([email], [name]);', [])->andReturn(1);
+        $result = $builder->from('users')->upsertUsing(['email', 'name'], function (Builder $query) {
+            $query->select(['column1', 'column2'])->from('table2');
+        }, 'email', ['name' => new Raw('concat([name], " 2")')]);
+        $this->assertEquals(1, $result);
+    }
+
     public function testUpdateMethodWithJoins()
     {
         $builder = $this->getBuilder();

@@ -3575,6 +3575,44 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Insert new records or update the existing ones using a subquery.
+     *
+     * @param  array  $columns
+     * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder|string  $query
+     * @param  array|string  $uniqueBy
+     * @param  array|null  $update
+     * @return int
+     */
+    public function upsertUsing(array $columns, $query, $uniqueBy, $update = null)
+    {
+        if (empty($columns)) {
+            return 0;
+        }
+
+        if ($update === []) {
+            return (int) $this->insertUsing($columns, $query);
+        }
+
+        $update ??= $columns;
+
+        $this->applyBeforeQueryCallbacks();
+
+        [$sql, $bindings] = $this->createSub($query);
+
+        $bindings = $this->cleanBindings(array_merge(
+            $bindings,
+            collect($update)->reject(function ($value, $key) {
+                return is_int($key);
+            })->all()
+        ));
+
+        return $this->connection->affectingStatement(
+            $this->grammar->compileUpsertUsing($this, $columns, $sql, (array) $uniqueBy, $update),
+            $bindings
+        );
+    }
+
+    /**
      * Increment a column's value by a given amount.
      *
      * @param  string  $column
