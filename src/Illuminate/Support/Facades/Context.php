@@ -23,11 +23,14 @@ namespace Illuminate\Support\Facades;
  * @method static array allHidden()
  * @method static void isStackable(void $key)
  * @method static void isHiddenStackable(void $key)
+ * @method static bool isEmpty()
+ * @method static \Illuminate\Log\Context\Repository handleUnserializeExceptionUsing(callable $callback)
  * @method static \Illuminate\Log\Context\Repository flush()
  * @method static void macro(string $name, object|callable $macro)
  * @method static void mixin(object $mixin, bool $replace = true)
  * @method static bool hasMacro(string $name)
  * @method static void flushMacros()
+ * @method static \Illuminate\Database\Eloquent\Model restoreModel(\Illuminate\Contracts\Database\ModelIdentifier $value)
  *
  * @see \Illuminate\Log\Context\Repository
  */
