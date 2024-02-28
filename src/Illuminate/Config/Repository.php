@@ -162,7 +162,7 @@ class Repository implements ArrayAccess, ConfigContract
      * Get the specified array configuration value.
      *
      * @param  string  $key
-     * @param  array<array-key, mixed>  $default
+     * @param  (\Closure():(array<array-key, mixed>|null))|array<array-key, mixed>|null  $default
      * @return array<array-key, mixed>
      */
     public function array(string $key, $default = null): array
