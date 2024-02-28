@@ -8,10 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\Context;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Tests\Integration\Database\DatabaseTestCase;
-use Orchestra\Testbench\Attributes\WithMigration;
 use Orchestra\Testbench\TestCase;
 use RuntimeException;
 
@@ -148,7 +145,7 @@ class ContextIntegrationTest extends TestCase
                 'model' => 'bad data',
             ],
             'hidden' => [
-                'other' => 'more bad data'
+                'other' => 'more bad data',
             ],
         ];
 
@@ -156,10 +153,12 @@ class ContextIntegrationTest extends TestCase
             if ($key === 'model') {
                 $this->assertSame('bad data', $value);
                 $this->assertFalse($hidden);
+
                 return 'replaced value 1';
             } else {
                 $this->assertSame('more bad data', $value);
                 $this->assertTrue($hidden);
+
                 return 'replaced value 2';
             }
         });

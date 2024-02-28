@@ -2,8 +2,6 @@
 
 namespace Illuminate\Log\Context;
 
-use Illuminate\Log\Context\Events\Dehydrating;
-use Illuminate\Log\Context\Events\Hydrated;
 use Illuminate\Queue\Events\JobProcessing;
 use Illuminate\Queue\Queue;
 use Illuminate\Support\Facades\Context;

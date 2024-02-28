@@ -2,17 +2,16 @@
 
 namespace Illuminate\Log\Context;
 
+use __PHP_Incomplete_Class;
 use Illuminate\Contracts\Events\Dispatcher;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Log\Context\Events\Dehydrating;
 use Illuminate\Log\Context\Events\Hydrated;
-use Illuminate\Queue\Attributes\WithoutRelations;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Traits\Macroable;
 use RuntimeException;
 use Throwable;
-use __PHP_Incomplete_Class;
+
 class Repository
 {
     use Macroable, SerializesModels;
@@ -406,7 +405,7 @@ class Repository
      *
      * @internal
      *
-     * @param ?string  $context
+     * @param  ?string  $context
      * @return $this
      */
     public function hydrate($context)

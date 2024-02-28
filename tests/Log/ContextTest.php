@@ -10,13 +10,11 @@ use Illuminate\Log\Context\Events\Dehydrating;
 use Illuminate\Log\Context\Events\Hydrated;
 use Illuminate\Log\Context\Repository;
 use Illuminate\Support\Facades\Context;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Orchestra\Testbench\TestCase;
 use RuntimeException;
-use User;
 
 class ContextTest extends TestCase
 {
@@ -147,7 +145,7 @@ class ContextTest extends TestCase
                 'object' => 'O:8:"stdClass":1:{s:3:"foo";s:3:"bar";}',
                 'enum' => 'E:31:"Illuminate\Tests\Log\Suit:Clubs";',
                 'backed_enum' => 'E:43:"Illuminate\Tests\Log\StringBackedSuit:Clubs";',
-           ],
+            ],
             'hidden' => [
                 'number' => 'i:55;',
             ],
