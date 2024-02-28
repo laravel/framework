@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Log;
 
+use ErrorException;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
@@ -123,6 +124,49 @@ class ContextIntegrationTest extends TestCase
         $this->expectExceptionMessage('Value is incomplete class: {"__PHP_Incomplete_Class_Name":"App\\\\MyContextClass"}');
 
         Context::hydrate($dehydrated);
+    }
+
+    public function test_it_throws_generic_unserialize_exceptions()
+    {
+        $dehydrated = [
+            'data' => [
+                'model' => 'bad data',
+            ],
+            'hidden' => [],
+        ];
+
+        $this->expectException(ErrorException::class);
+        $this->expectExceptionMessage('unserialize(): Error at offset 0 of 8 bytes');
+
+        Context::hydrate($dehydrated);
+    }
+
+    public function test_it_can_handle_unserialize_exceptions_manually()
+    {
+        $dehydrated = [
+            'data' => [
+                'model' => 'bad data',
+            ],
+            'hidden' => [
+                'other' => 'more bad data'
+            ],
+        ];
+
+        Context::handleUnserializeExceptionUsing(function ($e, $key, $value, $hidden) {
+            if ($key === 'model') {
+                $this->assertSame('bad data', $value);
+                $this->assertFalse($hidden);
+                return 'replaced value 1';
+            } else {
+                $this->assertSame('more bad data', $value);
+                $this->assertTrue($hidden);
+                return 'replaced value 2';
+            }
+        });
+        Context::hydrate($dehydrated);
+
+        $this->assertSame('replaced value 1', Context::get('model'));
+        $this->assertSame('replaced value 2', Context::getHidden('other'));
     }
 }
 

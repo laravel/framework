@@ -411,7 +411,7 @@ class Repository
      */
     public function hydrate($context)
     {
-        $unserialize = function ($value) {
+        $unserialize = function ($value, $key, $type) {
             try {
                 return tap($this->getRestoredPropertyValue(unserialize($value)), function ($value) {
                     if ($value instanceof __PHP_Incomplete_Class) {
@@ -419,13 +419,13 @@ class Repository
                     }
                 });
             } catch (Throwable $e) {
-                return $this->handleUnserializeException($e);
+                return $this->handleUnserializeException($e, $key, $value, $type);
             }
         };
 
         [$data, $hidden] = [
-            array_map($unserialize, $context['data'] ?? []),
-            array_map($unserialize, $context['hidden'] ?? []),
+            collect($context['data'] ?? [])->map(fn ($value, $key) => $unserialize($value, $key, false))->all(),
+            collect($context['hidden'] ?? [])->map(fn ($value, $key) => $unserialize($value, $key, true))->all(),
         ];
 
         $this->events->dispatch(new Hydrated(
@@ -438,13 +438,18 @@ class Repository
     /**
      * Handle exceptions while unserializing.
      *
+     * @internal
+     *
      * @param  \Throwable  $e
+     * @param  string  $key
+     * @param  string  $value
+     * @param  bool  $hidden
      * @return mixed
      */
-    protected function handleUnserializeException($e)
+    protected function handleUnserializeException($e, $key, $value, $hidden)
     {
         if ($this->handleUnserializeExceptionUsing !== null) {
-            return ($this->handleUnserializeExceptionUsing)($e);
+            return ($this->handleUnserializeExceptionUsing)($e, $key, $value, $hidden);
         }
 
         if ($e instanceof ModelNotFoundException) {
