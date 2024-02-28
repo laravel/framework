@@ -15,6 +15,7 @@ use Illuminate\Database\Concerns\ExplainsQueries;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Database\FetchMode;
 use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\Query\Processors\Processor;
 use Illuminate\Pagination\Paginator;
@@ -237,6 +238,11 @@ class Builder implements BuilderContract
      * @var bool
      */
     public $useWritePdo = false;
+
+    /**
+     * @var FetchMode|null
+     */
+    public FetchMode|null $fetchMode = null;
 
     /**
      * Create a new query builder instance.
@@ -2806,9 +2812,13 @@ class Builder implements BuilderContract
      */
     public function get($columns = ['*'])
     {
-        $items = collect($this->onceWithColumns(Arr::wrap($columns), function () {
-            return $this->processor->processSelect($this, $this->runSelect());
-        }));
+        $clone = $this->clone();
+
+        $clone->columns ??= Arr::wrap($columns);
+
+        $items = collect($clone->processor->processSelect($clone, $clone->runSelect()));
+
+        return $items;
 
         return isset($this->groupLimit)
             ? $this->withoutGroupLimitKeys($items)
@@ -2823,7 +2833,7 @@ class Builder implements BuilderContract
     protected function runSelect()
     {
         return $this->connection->select(
-            $this->toSql(), $this->getBindings(), ! $this->useWritePdo
+            $this->toSql(), $this->getBindings(), ! $this->useWritePdo, $this->fetchMode
         );
     }
 
@@ -3042,7 +3052,7 @@ class Builder implements BuilderContract
 
         return new LazyCollection(function () {
             yield from $this->connection->cursor(
-                $this->toSql(), $this->getBindings(), ! $this->useWritePdo
+                $this->toSql(), $this->getBindings(), ! $this->useWritePdo, $this->fetchMode
             );
         });
     }
@@ -3064,109 +3074,19 @@ class Builder implements BuilderContract
     /**
      * Get a collection instance containing the values of a given column.
      *
-     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
-     * @param  string|null  $key
+     * @param \Illuminate\Contracts\Database\Query\Expression|string $column
+     * @param \Illuminate\Contracts\Database\Query\Expression|string|null $key
      * @return \Illuminate\Support\Collection
      */
     public function pluck($column, $key = null)
     {
-        // First, we will need to select the results of the query accounting for the
-        // given columns / key. Once we have the results, we will be able to take
-        // the results and get the exact data that was requested for the query.
-        $queryResult = $this->onceWithColumns(
-            is_null($key) ? [$column] : [$column, $key],
-            function () {
-                return $this->processor->processSelect(
-                    $this, $this->runSelect()
-                );
-            }
-        );
+        $clone = $this->clone();
 
-        if (empty($queryResult)) {
-            return collect();
-        }
+        $clone->mode(is_null($key) ? FetchMode::column() : FetchMode::pair());
 
-        // If the columns are qualified with a table or have an alias, we cannot use
-        // those directly in the "pluck" operations since the results from the DB
-        // are only keyed by the column itself. We'll strip the table out here.
-        $column = $this->stripTableForPluck($column);
+        $clone->columns = is_null($key) ? [$column] : [$key, $column];
 
-        $key = $this->stripTableForPluck($key);
-
-        return is_array($queryResult[0])
-                    ? $this->pluckFromArrayColumn($queryResult, $column, $key)
-                    : $this->pluckFromObjectColumn($queryResult, $column, $key);
-    }
-
-    /**
-     * Strip off the table name or alias from a column identifier.
-     *
-     * @param  string  $column
-     * @return string|null
-     */
-    protected function stripTableForPluck($column)
-    {
-        if (is_null($column)) {
-            return $column;
-        }
-
-        $columnString = $column instanceof ExpressionContract
-            ? $this->grammar->getValue($column)
-            : $column;
-
-        $separator = str_contains(strtolower($columnString), ' as ') ? ' as ' : '\.';
-
-        return last(preg_split('~'.$separator.'~i', $columnString));
-    }
-
-    /**
-     * Retrieve column values from rows represented as objects.
-     *
-     * @param  array  $queryResult
-     * @param  string  $column
-     * @param  string  $key
-     * @return \Illuminate\Support\Collection
-     */
-    protected function pluckFromObjectColumn($queryResult, $column, $key)
-    {
-        $results = [];
-
-        if (is_null($key)) {
-            foreach ($queryResult as $row) {
-                $results[] = $row->$column;
-            }
-        } else {
-            foreach ($queryResult as $row) {
-                $results[$row->$key] = $row->$column;
-            }
-        }
-
-        return collect($results);
-    }
-
-    /**
-     * Retrieve column values from rows represented as arrays.
-     *
-     * @param  array  $queryResult
-     * @param  string  $column
-     * @param  string  $key
-     * @return \Illuminate\Support\Collection
-     */
-    protected function pluckFromArrayColumn($queryResult, $column, $key)
-    {
-        $results = [];
-
-        if (is_null($key)) {
-            foreach ($queryResult as $row) {
-                $results[] = $row[$column];
-            }
-        } else {
-            foreach ($queryResult as $row) {
-                $results[$row[$key]] = $row[$column];
-            }
-        }
-
-        return collect($results);
+        return collect($clone->processor->processSelect($clone, $clone->runSelect()));
     }
 
     /**
@@ -3372,30 +3292,6 @@ class Builder implements BuilderContract
         }
 
         return $this;
-    }
-
-    /**
-     * Execute the given callback while selecting the given columns.
-     *
-     * After running the callback, the columns are reset to the original value.
-     *
-     * @param  array  $columns
-     * @param  callable  $callback
-     * @return mixed
-     */
-    protected function onceWithColumns($columns, $callback)
-    {
-        $original = $this->columns;
-
-        if (is_null($original)) {
-            $this->columns = $columns;
-        }
-
-        $result = $callback();
-
-        $this->columns = $original;
-
-        return $result;
     }
 
     /**
@@ -3803,6 +3699,20 @@ class Builder implements BuilderContract
     public function raw($value)
     {
         return $this->connection->raw($value);
+    }
+
+
+    /**
+     * Set the fetch mode for the query.
+     *
+     * @param  FetchMode  $fetchMode
+     * @return $this
+     */
+    public function mode(FetchMode $fetchMode)
+    {
+        $this->fetchMode = $fetchMode;
+
+        return $this;
     }
 
     /**

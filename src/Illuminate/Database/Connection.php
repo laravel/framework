@@ -391,11 +391,13 @@ class Connection implements ConnectionInterface
      * @param  string  $query
      * @param  array  $bindings
      * @param  bool  $useReadPdo
+     * @param  \Illuminate\Database\FetchMode|null  $fetchMode
      * @return array
      */
-    public function select($query, $bindings = [], $useReadPdo = true)
+    public function select($query, $bindings = [], $useReadPdo = true, FetchMode $fetchMode = null)
     {
-        return $this->run($query, $bindings, function ($query, $bindings) use ($useReadPdo) {
+//        dump($query, $fetchMode);
+        return $this->run($query, $bindings, function ($query, $bindings) use ($useReadPdo, $fetchMode) {
             if ($this->pretending()) {
                 return [];
             }
@@ -403,15 +405,16 @@ class Connection implements ConnectionInterface
             // For select statements, we'll simply execute the query and return an array
             // of the database result set. Each element in the array will be a single
             // row from the database table, and will either be an array or objects.
-            $statement = $this->prepared(
+            $statement = new Statement($this->prepared(
                 $this->getPdoForSelect($useReadPdo)->prepare($query)
-            );
+            ));
 
-            $this->bindValues($statement, $this->prepareBindings($bindings));
+            // @TODO move to statement obj
+            $this->bindValues($statement->statement(), $this->prepareBindings($bindings));
 
             $statement->execute();
 
-            return $statement->fetchAll();
+            return $statement->fetchAll($fetchMode);
         });
     }
 
@@ -454,9 +457,10 @@ class Connection implements ConnectionInterface
      * @param  string  $query
      * @param  array  $bindings
      * @param  bool  $useReadPdo
+     * @param  \Illuminate\Database\FetchMode|null $fetchMode
      * @return \Generator
      */
-    public function cursor($query, $bindings = [], $useReadPdo = true)
+    public function cursor($query, $bindings = [], $useReadPdo = true, FetchMode $fetchMode = null)
     {
         $statement = $this->run($query, $bindings, function ($query, $bindings) use ($useReadPdo) {
             if ($this->pretending()) {
@@ -466,11 +470,12 @@ class Connection implements ConnectionInterface
             // First we will create a statement for the query. Then, we will set the fetch
             // mode and prepare the bindings for the query. Once that's done we will be
             // ready to execute the query against the database and return the cursor.
-            $statement = $this->prepared($this->getPdoForSelect($useReadPdo)
-                              ->prepare($query));
+            $statement = new Statement($this->prepared(
+                $this->getPdoForSelect($useReadPdo)->prepare($query)
+            ));
 
             $this->bindValues(
-                $statement, $this->prepareBindings($bindings)
+                $statement->statement(), $this->prepareBindings($bindings)
             );
 
             // Next, we'll execute the query against the database and return the statement
@@ -481,7 +486,7 @@ class Connection implements ConnectionInterface
             return $statement;
         });
 
-        while ($record = $statement->fetch()) {
+        while ($record = $statement->fetch($fetchMode)) {
             yield $record;
         }
     }
