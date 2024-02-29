@@ -146,8 +146,3 @@ class ContextIntegrationTest extends TestCase
         Context::handleUnserializeExceptionUsing(null);
     }
 }
-
-class User extends Model
-{
-    protected $guarded = [];
-}
