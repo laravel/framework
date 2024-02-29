@@ -519,7 +519,7 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
      *
      * @param  (callable(TValue, TKey): array-key)|array|string  $groupBy
      * @param  bool  $preserveKeys
-     * @return static<array-key, static<array-key, TValue>>
+     * @return static<array-key, static<TKey, TValue>>
      */
     public function groupBy($groupBy, $preserveKeys = false);
 
