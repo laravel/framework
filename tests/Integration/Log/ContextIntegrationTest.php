@@ -18,25 +18,6 @@ class ContextIntegrationTest extends TestCase
 {
     use DatabaseMigrations;
 
-    protected function setUp(): void
-    {
-        $this->beforeApplicationDestroyed(function () {
-            foreach (array_keys($this->app['db']->getConnections()) as $name) {
-                $this->app['db']->purge($name);
-            }
-        });
-
-        parent::setUp();
-    }
-
-    protected function afterRefreshingDatabase()
-    {
-        Schema::create('users', function (Blueprint $table) {
-            $table->increments('id');
-            $table->string('name');
-            $table->timestamps();
-        });
-    }
 
     public function test_it_handles_eloquent()
     {
