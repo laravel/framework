@@ -3699,7 +3699,6 @@ class Builder implements BuilderContract
         return $this->connection->raw($value);
     }
 
-
     /**
      * Set the fetch mode for the query.
      *

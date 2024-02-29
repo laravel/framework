@@ -108,4 +108,3 @@ class EloquentFetchModeTest extends DatabaseTestCase
         ];
     }
 }
-
