@@ -10,6 +10,7 @@ use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\Context;
 use Illuminate\Support\Facades\Schema;
 use Orchestra\Testbench\Attributes\WithMigration;
+use Orchestra\Testbench\Factories\UserFactory;
 use Orchestra\Testbench\TestCase;
 use RuntimeException;
 
@@ -18,10 +19,9 @@ class ContextIntegrationTest extends TestCase
 {
     use DatabaseMigrations;
 
-
     public function test_it_handles_eloquent()
     {
-        $user = User::create(['name' => 'Tim']);
+        $user = UserFactory::new()->create(['name' => 'Tim']);
 
         Context::add('model', $user);
         Context::add('number', 55);
@@ -29,7 +29,7 @@ class ContextIntegrationTest extends TestCase
 
         $this->assertSame([
             'data' => [
-                'model' => 'O:45:"Illuminate\Contracts\Database\ModelIdentifier":5:{s:5:"class";s:37:"Illuminate\Tests\Integration\Log\User";s:2:"id";i:1;s:9:"relations";a:0:{}s:10:"connection";s:7:"testing";s:15:"collectionClass";N;}',
+                'model' => 'O:45:"Illuminate\Contracts\Database\ModelIdentifier":5:{s:5:"class";s:31:"Illuminate\Foundation\Auth\User";s:2:"id";i:1;s:9:"relations";a:0:{}s:10:"connection";s:7:"testing";s:15:"collectionClass";N;}',
                 'number' => 'i:55;',
             ],
             'hidden' => [],
@@ -47,7 +47,7 @@ class ContextIntegrationTest extends TestCase
 
     public function test_it_ignores_deleted_models_when_hydrating()
     {
-        $user = User::create(['name' => 'Tim']);
+        $user = UserFactory::new()->create(['name' => 'Tim']);
 
         Context::add('model', $user);
         Context::add('number', 55);
@@ -66,7 +66,7 @@ class ContextIntegrationTest extends TestCase
 
     public function test_it_ignores_deleted_models_within_collections_when_hydrating()
     {
-        $user = User::create(['name' => 'Tim']);
+        $user = UserFactory::new()->create(['name' => 'Tim']);
 
         Context::add('models', User::all());
         Context::add('number', 55);
