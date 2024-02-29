@@ -17,7 +17,7 @@ namespace Illuminate\Support\Facades;
  * @method static array getViews()
  * @method static array getTypes()
  * @method static bool hasColumn(string $table, string $column)
- * @method static bool hasColumns(string $table, array $columns)
+ * @method static bool hasColumns(string $table, array $columns, bool $strict = false)
  * @method static void whenTableHasColumn(string $table, string $column, \Closure $callback)
  * @method static void whenTableDoesntHaveColumn(string $table, string $column, \Closure $callback)
  * @method static string getColumnType(string $table, string $column, bool $fullDefinition = false)
