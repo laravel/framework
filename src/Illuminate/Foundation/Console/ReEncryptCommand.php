@@ -73,7 +73,7 @@ class ReEncryptCommand extends Command
                 $data = [];
 
                 foreach ($columns as $column) {
-                    if (is_null($row->{$column})) {
+                    if (!is_string($row->{$column})) {
                         continue;
                     }
 
