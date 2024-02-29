@@ -130,6 +130,7 @@ class ApplicationBuilder
      * @param  string|null  $channels
      * @param  string|null  $pages
      * @param  string|null  $apiPrefix
+     * @param  string|null  $webPrefix
      * @param  callable|null  $then
      * @return $this
      */
@@ -141,10 +142,11 @@ class ApplicationBuilder
         ?string $pages = null,
         ?string $health = null,
         string $apiPrefix = 'api',
+        string $webPrefix = '',
         ?callable $then = null)
     {
         if (is_null($using) && (is_string($web) || is_string($api) || is_string($pages) || is_string($health)) || is_callable($then)) {
-            $using = $this->buildRoutingCallback($web, $api, $pages, $health, $apiPrefix, $then);
+            $using = $this->buildRoutingCallback($web, $api, $pages, $health, $apiPrefix, $webPrefix, $then);
         }
 
         AppRouteServiceProvider::loadRoutesUsing($using);
@@ -172,6 +174,7 @@ class ApplicationBuilder
      * @param  string|null  $pages
      * @param  string|null  $health
      * @param  string  $apiPrefix
+     * @param  string  $webPrefix
      * @param  callable|null  $then
      * @return \Closure
      */
@@ -180,9 +183,10 @@ class ApplicationBuilder
         ?string $pages,
         ?string $health,
         string $apiPrefix,
+        string $webPrefix,
         ?callable $then)
     {
-        return function () use ($web, $api, $pages, $health, $apiPrefix, $then) {
+        return function () use ($web, $api, $pages, $health, $apiPrefix, $webPrefix, $then) {
             if (is_string($api) && realpath($api) !== false) {
                 Route::middleware('api')->prefix($apiPrefix)->group($api);
             }
@@ -196,7 +200,7 @@ class ApplicationBuilder
             }
 
             if (is_string($web) && realpath($web) !== false) {
-                Route::middleware('web')->group($web);
+                Route::middleware('web')->prefix($webPrefix)->group($web);
             }
 
             if (is_string($pages) &&
