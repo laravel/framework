@@ -67,6 +67,7 @@ use Illuminate\Foundation\Console\OptimizeCommand;
 use Illuminate\Foundation\Console\PackageDiscoverCommand;
 use Illuminate\Foundation\Console\PolicyMakeCommand;
 use Illuminate\Foundation\Console\ProviderMakeCommand;
+use Illuminate\Foundation\Console\CryptRefreshCommand;
 use Illuminate\Foundation\Console\RequestMakeCommand;
 use Illuminate\Foundation\Console\ResourceMakeCommand;
 use Illuminate\Foundation\Console\RouteCacheCommand;
@@ -189,6 +190,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         'ConfigPublish' => ConfigPublishCommand::class,
         'ConsoleMake' => ConsoleMakeCommand::class,
         'ControllerMake' => ControllerMakeCommand::class,
+        'CryptRefresh' => CryptRefreshCommand::class,
         'Docs' => DocsCommand::class,
         'EnumMake' => EnumMakeCommand::class,
         'EventGenerate' => EventGenerateCommand::class,
