@@ -467,7 +467,7 @@ class Connection implements ConnectionInterface
      * @param  string  $query
      * @param  array  $bindings
      * @param  bool  $useReadPdo
-     * @param  \Illuminate\Database\PDO\Mode|null $mode
+     * @param  \Illuminate\Database\PDO\Mode|null  $mode
      * @return \Generator
      */
     public function cursor($query, $bindings = [], $useReadPdo = true, Mode $mode = null)

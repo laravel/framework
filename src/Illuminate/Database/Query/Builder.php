@@ -3072,8 +3072,8 @@ class Builder implements BuilderContract
     /**
      * Get a collection instance containing the values of a given column.
      *
-     * @param \Illuminate\Contracts\Database\Query\Expression|string $column
-     * @param \Illuminate\Contracts\Database\Query\Expression|string|null $key
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string|null  $key
      * @return \Illuminate\Support\Collection
      */
     public function pluck($column, $key = null)

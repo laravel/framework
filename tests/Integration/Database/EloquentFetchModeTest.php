@@ -2,14 +2,9 @@
 
 namespace Illuminate\Tests\Integration\Database;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Str;
-use Illuminate\Tests\Integration\Database\Fixtures\Post;
-use Illuminate\Tests\Integration\Database\Fixtures\PostStringyKey;
 use Illuminate\Tests\Integration\Database\Fixtures\User;
 use PHPUnit\Framework\Attributes\DataProvider;
 
@@ -108,7 +103,7 @@ class EloquentFetchModeTest extends DatabaseTestCase
     {
         return [
             'Every' => [1, ['Taylor', 'Graham', 'Dries', 'Tetiana', 'Mohamed', 'Lucas', 'Joseph']],
-            'Every 2nd' => [2, ['Graham','Tetiana','Lucas']],
+            'Every 2nd' => [2, ['Graham', 'Tetiana', 'Lucas']],
             'Every 3rd' => [3, ['Dries', 'Lucas']],
         ];
     }

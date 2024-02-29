@@ -53,7 +53,7 @@ class Mode
     /**
      * Retrieve a single column.
      *
-     * @param int  $position
+     * @param  int  $position
      * @return self
      */
     public function column(int $position = 0): self
@@ -113,7 +113,7 @@ class Mode
     /**
      * Use a scrollable cursor, which allows every nth row to be fetched.
      *
-     * @param int $nth
+     * @param  int  $nth
      * @return $this
      */
     public function scrollableCursor(int $nth = 1): self

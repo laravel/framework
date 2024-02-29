@@ -29,7 +29,7 @@ class Statement
     /**
      * Fetch the next row from a result set.
      *
-     * @param \Illuminate\Database\PDO\Mode|null $mode
+     * @param  \Illuminate\Database\PDO\Mode|null  $mode
      * @return mixed
      */
     public function fetch(Mode $mode = null): mixed
@@ -40,7 +40,7 @@ class Statement
     /**
      * Fetch all the rows from a result set.
      *
-     * @param \Illuminate\Database\PDO\Mode|null $mode
+     * @param  \Illuminate\Database\PDO\Mode|null  $mode
      * @return array|false
      */
     public function fetchAll(Mode $mode = null): array|false
@@ -74,8 +74,8 @@ class Statement
     /**
      * Route other functions to the underlying PDO statement.
      *
-     * @param string $method
-     * @param mixed $parameters
+     * @param  string  $method
+     * @param  mixed  $parameters
      * @return mixed
      */
     public function __call($method, $parameters): mixed
