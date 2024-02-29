@@ -267,10 +267,15 @@ class Builder
      *
      * @param  string  $table
      * @param  array  $columns
+     * @param  bool  $strict
      * @return bool
      */
-    public function hasColumns($table, array $columns)
+    public function hasColumns($table, array $columns, bool $strict = false)
     {
+        if ($strict){
+            return $this->getColumnListing($table) === $columns;
+        }
+
         $tableColumns = array_map('strtolower', $this->getColumnListing($table));
 
         foreach ($columns as $column) {

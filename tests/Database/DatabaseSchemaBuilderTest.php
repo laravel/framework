@@ -65,10 +65,15 @@ class DatabaseSchemaBuilderTest extends TestCase
         $grammar = m::mock(stdClass::class);
         $connection->shouldReceive('getSchemaGrammar')->andReturn($grammar);
         $builder = m::mock(Builder::class.'[getColumnListing]', [$connection]);
-        $builder->shouldReceive('getColumnListing')->with('users')->twice()->andReturn(['id', 'firstname']);
+        $builder->shouldReceive('getColumnListing')->with('users')->times(6)->andReturn(['id', 'firstname']);
 
         $this->assertTrue($builder->hasColumns('users', ['id', 'firstname']));
         $this->assertFalse($builder->hasColumns('users', ['id', 'address']));
+
+        $this->assertTrue($builder->hasColumns('users',['id','firstname'],true));
+        $this->assertFalse($builder->hasColumns('users',['id'],true));
+        $this->assertFalse($builder->hasColumns('users',['firstname','id'],true));
+        $this->assertFalse($builder->hasColumns('users',['id','FirstName'],true));
     }
 
     public function testGetColumnTypeAddsPrefix()
