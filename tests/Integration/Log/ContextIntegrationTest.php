@@ -6,7 +6,8 @@ use ErrorException;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Illuminate\Foundation\Auth\User;
+use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Facades\Context;
 use Illuminate\Support\Facades\Schema;
 use Orchestra\Testbench\Attributes\WithMigration;
@@ -17,7 +18,7 @@ use RuntimeException;
 #[WithMigration]
 class ContextIntegrationTest extends TestCase
 {
-    use DatabaseMigrations;
+    use LazilyRefreshDatabase;
 
     public function test_it_handles_eloquent()
     {
