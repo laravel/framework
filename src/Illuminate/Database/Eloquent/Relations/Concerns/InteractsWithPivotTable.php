@@ -154,6 +154,7 @@ trait InteractsWithPivotTable
             if (! is_array($attributes)) {
                 [$id, $attributes] = [$attributes, []];
             }
+
             if ($id instanceof BackedEnum) {
                 $id = $id->value;
             }
