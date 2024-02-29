@@ -51,7 +51,7 @@ class ApiInstallCommand extends Command
 
         if ($this->confirm('One new migration has been published. Would like to run pending migrations now?', false)) {
             $this->call('migrate');
-        };
+        }
 
         $this->components->info('API scaffolding installed. Please add the [Laravel\Sanctum\HasApiTokens] trait to your User model.');
     }
