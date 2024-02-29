@@ -9,9 +9,11 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\Context;
 use Illuminate\Support\Facades\Schema;
+use Orchestra\Testbench\Attributes\WithMigration;
 use Orchestra\Testbench\TestCase;
 use RuntimeException;
 
+#[WithMigration]
 class ContextIntegrationTest extends TestCase
 {
     use DatabaseMigrations;
