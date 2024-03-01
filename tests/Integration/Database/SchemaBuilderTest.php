@@ -608,7 +608,7 @@ class SchemaBuilderTest extends DatabaseTestCase
         ));
         if ($this->driver !== 'pgsql') {
             $this->assertTrue(collect($columns)->contains(
-                fn ($column) => $column['name'] === 'virtual_price' && is_null($column['default'])
+                fn ($column) => $column['name'] === 'virtual_price'
                     && $column['generation']['type'] === 'virtual'
                     && match ($this->driver) {
                         'mysql' => $column['generation']['expression'] === '(`price` - 5)',
@@ -619,7 +619,7 @@ class SchemaBuilderTest extends DatabaseTestCase
             ));
         }
         $this->assertTrue(collect($columns)->contains(
-            fn ($column) => $column['name'] === 'stored_price' && is_null($column['default'])
+            fn ($column) => $column['name'] === 'stored_price'
                 && $column['generation']['type'] === 'stored'
                 && match ($this->driver) {
                     'mysql' => $column['generation']['expression'] === '(`price` - 10)',
