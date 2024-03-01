@@ -17,9 +17,9 @@ class DatabaseSQLiteProcessorTest extends TestCase
             ['name' => 'is_active', 'type' => 'tinyint(1)', 'nullable' => '0', 'default' => '1', 'primary' => '0'],
         ];
         $expected = [
-            ['name' => 'id', 'type_name' => 'integer', 'type' => 'integer', 'collation' => null, 'nullable' => false, 'default' => '', 'auto_increment' => true, 'comment' => null],
-            ['name' => 'name', 'type_name' => 'varchar', 'type' => 'varchar', 'collation' => null, 'nullable' => true, 'default' => 'foo', 'auto_increment' => false, 'comment' => null],
-            ['name' => 'is_active', 'type_name' => 'tinyint', 'type' => 'tinyint(1)', 'collation' => null, 'nullable' => false, 'default' => '1', 'auto_increment' => false, 'comment' => null],
+            ['name' => 'id', 'type_name' => 'integer', 'type' => 'integer', 'collation' => null, 'nullable' => false, 'default' => '', 'auto_increment' => true, 'comment' => null, 'generation' => null],
+            ['name' => 'name', 'type_name' => 'varchar', 'type' => 'varchar', 'collation' => null, 'nullable' => true, 'default' => 'foo', 'auto_increment' => false, 'comment' => null, 'generation' => null],
+            ['name' => 'is_active', 'type_name' => 'tinyint', 'type' => 'tinyint(1)', 'collation' => null, 'nullable' => false, 'default' => '1', 'auto_increment' => false, 'comment' => null, 'generation' => null],
         ];
 
         $this->assertEquals($expected, $processor->processColumns($listing));

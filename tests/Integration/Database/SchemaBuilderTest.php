@@ -6,7 +6,6 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\Grammars\SQLiteGrammar;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Str;
 
 class SchemaBuilderTest extends DatabaseTestCase
 {
@@ -608,13 +607,24 @@ class SchemaBuilderTest extends DatabaseTestCase
             $this->assertTrue(collect($columns)->contains(
                 fn ($column) => $column['name'] === 'virtual_price' && is_null($column['default'])
                     && $column['generation']['type'] === 'virtual'
-                    && Str::wrap($column['generation']['expression'], '(', ')') === '(price - 5)'
+                    && match ($this->driver) {
+                        'mysql' => $column['generation']['expression'] === '(`price` - 5)',
+                        'mariadb' => $column['generation']['expression'] === '`price` - 5',
+                        'sqlsrv' => $column['generation']['expression'] === '([price]-(5))',
+                        default => $column['generation']['expression'] === 'price - 5',
+                    }
             ));
         }
         $this->assertTrue(collect($columns)->contains(
             fn ($column) => $column['name'] === 'stored_price' && is_null($column['default'])
                 && $column['generation']['type'] === 'stored'
-                && Str::wrap($column['generation']['expression'], '(', ')') === '(price - 10)'
+                && match ($this->driver) {
+                    'mysql' => $column['generation']['expression'] === '(`price` - 10)',
+                    'mariadb' => $column['generation']['expression'] === '`price` - 10',
+                    'sqlsrv' => $column['generation']['expression'] === '([price]-(10))',
+                    'pgsql' => $column['generation']['expression'] === '(price - 10)',
+                    default => $column['generation']['expression'] === 'price - 10',
+                }
         ));
     }
 

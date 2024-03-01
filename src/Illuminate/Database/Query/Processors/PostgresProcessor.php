@@ -97,7 +97,7 @@ class PostgresProcessor extends Processor
                 'type' => $result->type,
                 'collation' => $result->collation,
                 'nullable' => (bool) $result->nullable,
-                'default' => $result->genrated ? null : $result->default,
+                'default' => $result->generated ? null : $result->default,
                 'auto_increment' => $autoincrement,
                 'comment' => $result->comment,
                 'generation' => $result->generated ? [
