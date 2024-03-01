@@ -237,12 +237,12 @@ class Number
      *
      * @param  int|float  $number
      * @param  int  $maxDecimals
-     *
      * @return float
      */
     public static function trim(int|float $number, int $maxDecimals)
     {
         $divisor = pow(10, $maxDecimals);
+
         return floor($number * $divisor) / $divisor;
     }
 
