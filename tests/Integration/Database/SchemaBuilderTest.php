@@ -600,6 +600,8 @@ class SchemaBuilderTest extends DatabaseTestCase
 
         $columns = Schema::getColumns('test');
 
+        var_dump($columns);
+
         $this->assertTrue(collect($columns)->contains(
             fn ($column) => $column['name'] === 'price' && is_null($column['generation'])
         ));
