@@ -344,6 +344,10 @@ class MySqlGrammar extends Grammar
                 'autoIncrement' => $column['auto_increment'],
                 'collation' => $column['collation'],
                 'comment' => $column['comment'],
+                'virtualAs' => ! is_null($column['generation']) && $column['generation']['type'] === 'virtual'
+                    ? $column['generation']['expression'] : null,
+                'storedAs' => ! is_null($column['generation']) && $column['generation']['type'] === 'stored'
+                    ? $column['generation']['expression'] : null,
             ]));
 
             return sprintf('alter table %s change %s %s %s',
