@@ -1890,6 +1890,19 @@ trait HasAttributes
     }
 
     /**
+     * Get a subset of the model's attributes that aren't in the given array.
+     *
+     * @param  array|string  $attributes
+     * @return array
+     */
+    public function except($attributes)
+    {
+        $attributes = is_array($attributes) ? $attributes : func_get_args();
+
+        return Arr::except($this->getAttributes(), $attributes);
+    }
+
+    /**
      * Sync the original attributes with the current.
      *
      * @return $this
