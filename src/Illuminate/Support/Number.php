@@ -249,7 +249,7 @@ class Number
         $parts = explode('.', (string) $number);
         $currentPrecision = strlen($parts[1]);
 
-        if ( !is_null($maxPrecision)) {
+        if (! is_null($maxPrecision)) {
             $formatter->setAttribute(NumberFormatter::MAX_FRACTION_DIGITS,
                 min($currentPrecision, $maxPrecision));
         } else {
