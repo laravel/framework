@@ -184,7 +184,7 @@ class SupportNumberTest extends TestCase
 
     public function testTrim()
     {
-        $this->assertSame(0.12, Number::trim(0.123456789));
+        $this->assertSame(0.12, Number::trim(0.123456789, 2));
         $this->assertSame(0.1234, Number::trim(0.123456789, 4));
         $this->assertSame(0.123456, Number::trim(0.123456789, 6));
         $this->assertSame(0.123456789, Number::trim(0.123456789, 12));

@@ -236,27 +236,14 @@ class Number
      * Trim the number of decimal places to not exceed the precision.
      *
      * @param  int|float  $number
-     * @param  int  $precision
-     * @param  int|null  $maxPrecision
-     * @param  string|null  $locale
-     * @return string|false
+     * @param  int  $maxDecimals
+     *
+     * @return float
      */
-    public static function trim(int|float $number, int $precision, ?int $maxPrecision = null, ?string $locale = null)
+    public static function trim(int|float $number, int $maxDecimals)
     {
-        $formatter = new NumberFormatter($locale, NumberFormatter::PATTERN_DECIMAL);
-        $formatter->setAttribute(NumberFormatter::ROUNDING_MODE, NumberFormatter::ROUND_DOWN);
-
-        $parts = explode('.', (string) $number);
-        $currentPrecision = strlen($parts[1]);
-
-        if (! is_null($maxPrecision)) {
-            $formatter->setAttribute(NumberFormatter::MAX_FRACTION_DIGITS,
-                min($currentPrecision, $maxPrecision));
-        } else {
-            $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, min($currentPrecision, $precision));
-        }
-
-        return $formatter->format($number);
+        $divisor = pow(10, $maxDecimals);
+        return floor($number * $divisor) / $divisor;
     }
 
     /**
