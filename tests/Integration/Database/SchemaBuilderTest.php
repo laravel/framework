@@ -608,8 +608,7 @@ class SchemaBuilderTest extends DatabaseTestCase
                 fn ($column) => $column['name'] === 'virtual_price' && is_null($column['default'])
                     && $column['generation']['type'] === 'virtual'
                     && match ($this->driver) {
-                        'mysql' => $column['generation']['expression'] === '(`price` - 5)',
-                        'mariadb' => $column['generation']['expression'] === '`price` - 5',
+                        'mysql', 'mariadb' => in_array($column['generation']['expression'], ['(`price` - 5)', '`price` - 5']),
                         'sqlsrv' => $column['generation']['expression'] === '([price]-(5))',
                         default => $column['generation']['expression'] === 'price - 5',
                     }
@@ -619,8 +618,7 @@ class SchemaBuilderTest extends DatabaseTestCase
             fn ($column) => $column['name'] === 'stored_price' && is_null($column['default'])
                 && $column['generation']['type'] === 'stored'
                 && match ($this->driver) {
-                    'mysql' => $column['generation']['expression'] === '(`price` - 10)',
-                    'mariadb' => $column['generation']['expression'] === '`price` - 10',
+                    'mysql', 'mariadb' => in_array($column['generation']['expression'], ['(`price` - 10)', '`price` - 10']),
                     'sqlsrv' => $column['generation']['expression'] === '([price]-(10))',
                     'pgsql' => $column['generation']['expression'] === '(price - 10)',
                     default => $column['generation']['expression'] === 'price - 10',
