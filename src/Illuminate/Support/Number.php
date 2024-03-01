@@ -241,7 +241,7 @@ class Number
      * @param  string|null  $locale
      * @return string|false
      */
-    public function trim(int|float $number, int $precision = 2, ?int $maxPrecision = null, ?string $locale = null)
+    public static function trim(int|float $number, int $precision = 2, ?int $maxPrecision = null, ?string $locale = null)
     {
         $formatter = new NumberFormatter($locale, NumberFormatter::PATTERN_DECIMAL);
         $formatter->setAttribute(NumberFormatter::ROUNDING_MODE, NumberFormatter::ROUND_DOWN);
@@ -249,10 +249,10 @@ class Number
         $parts = explode('.', (string) $number);
         $currentPrecision = strlen($parts[1]);
 
-        if (!is_null($maxPrecision)) {
+        if ( !is_null($maxPrecision)) {
             $formatter->setAttribute(NumberFormatter::MAX_FRACTION_DIGITS,
                 min($currentPrecision, $maxPrecision));
-        } elseif (!is_null($precision)) {
+        } elseif ( !is_null($precision)) {
             $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, min($currentPrecision, $precision));
         }
 
