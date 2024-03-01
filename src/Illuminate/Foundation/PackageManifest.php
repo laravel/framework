@@ -118,23 +118,56 @@ class PackageManifest
      */
     public function build()
     {
-        $packages = [];
+        $packages = $this->getInstalledPackages();
 
-        if ($this->files->exists($path = $this->vendorPath.'/composer/installed.json')) {
+        $ignore = $this->packagesToIgnore();
+        $ignoreAll = in_array('*', $ignore);
+
+        $configurations = $this->getConfigurations($packages, $ignore, $ignoreAll);
+
+        $this->write($configurations);
+    }
+
+    /**
+     * Get the installed packages for the application.
+     *
+     * @return array|mixed
+     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
+     */
+    protected function getInstalledPackages()
+    {
+        $path = $this->vendorPath.'/composer/installed.json';
+
+        if ($this->files->exists($path)) {
             $installed = json_decode($this->files->get($path), true);
-
-            $packages = $installed['packages'] ?? $installed;
+            return $installed['packages'] ?? $installed;
         }
 
-        $ignoreAll = in_array('*', $ignore = $this->packagesToIgnore());
+        return [];
+    }
 
-        $this->write(collect($packages)->mapWithKeys(function ($package) {
-            return [$this->format($package['name']) => $package['extra']['laravel'] ?? []];
-        })->each(function ($configuration) use (&$ignore) {
-            $ignore = array_merge($ignore, $configuration['dont-discover'] ?? []);
-        })->reject(function ($configuration, $package) use ($ignore, $ignoreAll) {
-            return $ignoreAll || in_array($package, $ignore);
-        })->filter()->all());
+    /**
+     * Get the configurations for all the packages.
+     *
+     * @param  array  $packages
+     * @param  array  $ignore
+     * @param  bool   $ignoreAll
+     * @return array
+     */
+    protected function getConfigurations(array $packages, array $ignore, bool $ignoreAll)
+    {
+        return collect($packages)
+            ->mapWithKeys(function ($package) {
+                return [$this->format($package['name']) => $package['extra']['laravel'] ?? []];
+            })
+            ->each(function ($configuration) use (&$ignore) {
+                $ignore = array_merge($ignore, $configuration['dont-discover'] ?? []);
+            })
+            ->reject(function ($configuration, $package) use ($ignore, $ignoreAll) {
+                return $ignoreAll || in_array($package, $ignore);
+            })
+            ->filter()
+            ->all();
     }
 
     /**
