@@ -19,6 +19,7 @@ class KeyGenerateCommand extends Command
      */
     protected $signature = 'key:generate
                     {--show : Display the key instead of modifying files}
+                    {--rotate : Append the existing key to the list of previous keys}
                     {--force : Force the operation to run when in production}';
 
     /**
@@ -79,6 +80,10 @@ class KeyGenerateCommand extends Command
             return false;
         }
 
+        if (strlen($currentKey) !== 0 && $this->option('rotate')) {
+            $this->rotateExistingKeysWith($currentKey);
+        }
+
         if (! $this->writeNewEnvironmentFileWith($key)) {
             return false;
         }
@@ -112,6 +117,37 @@ class KeyGenerateCommand extends Command
     }
 
     /**
+     * Rotates application keys in the Laravel environment file.
+     *
+     * @param $currentKey
+     * @return void
+     */
+    protected function rotateExistingKeysWith($currentKey)
+    {
+        $previousKeys = [$currentKey, ...$this->laravel['config']['app.previous_keys'] ?? []];
+
+        $newLine = 'APP_PREVIOUS_KEYS='.join(',', $previousKeys);
+
+        $replaced = preg_replace(
+            $this->previousKeysReplacementPattern(),
+            $newLine,
+            $input = file_get_contents($this->laravel->environmentFilePath())
+        );
+
+        if ($replaced === $input || $replaced === null) {
+            file_put_contents(
+                $this->laravel->environmentFilePath(),
+                PHP_EOL.$newLine,
+                FILE_APPEND
+            );
+
+            return;
+        }
+
+        file_put_contents($this->laravel->environmentFilePath(), $replaced);
+    }
+
+    /**
      * Get a regex pattern that will match env APP_KEY with any random key.
      *
      * @return string
@@ -121,5 +157,17 @@ class KeyGenerateCommand extends Command
         $escaped = preg_quote('='.$this->laravel['config']['app.key'], '/');
 
         return "/^APP_KEY{$escaped}/m";
+    }
+
+    /**
+     * Get a regex pattern that will match env APP_PREVIOUS_KEYS with any set of previous keys.
+     *
+     * @return string
+     */
+    protected function previousKeysReplacementPattern()
+    {
+        $escaped = preg_quote('='.implode(',', $this->laravel['config']['app.previous_keys'] ?? []), '/');
+
+        return "/^APP_PREVIOUS_KEYS{$escaped}/m";
     }
 }
