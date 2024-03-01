@@ -6,6 +6,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\Grammars\SQLiteGrammar;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
 
 class SchemaBuilderTest extends DatabaseTestCase
 {
@@ -534,6 +535,87 @@ class SchemaBuilderTest extends DatabaseTestCase
         });
 
         $this->assertTrue(Schema::hasColumns('test', ['virtual_column', 'stored_column']));
+    }
+
+    public function testModifyingStoredColumnOnSqlite()
+    {
+        if ($this->driver !== 'sqlite') {
+            $this->markTestSkipped('Test requires a SQLite connection.');
+        }
+
+        Schema::create('test', function (Blueprint $table) {
+            $table->integer('price');
+            $table->integer('virtual_price')->virtualAs('price - 2');
+            $table->integer('stored_price')->storedAs('price - 4');
+            $table->integer('virtual_price_changed')->virtualAs('price - 6');
+            $table->integer('stored_price_changed')->storedAs('price - 8');
+        });
+
+        DB::table('test')->insert(['price' => 100]);
+
+        Schema::table('test', function (Blueprint $table) {
+            $table->integer('virtual_price_changed')->virtualAs('price - 5')->change();
+            $table->integer('stored_price_changed')->storedAs('price - 7')->change();
+        });
+
+        $this->assertEquals(
+            ['price' => 100, 'virtual_price' => 98, 'stored_price' => 96, 'virtual_price_changed' => 95, 'stored_price_changed' => 93],
+            (array) DB::table('test')->first()
+        );
+
+        $columns = Schema::getColumns('test');
+
+        $this->assertTrue(collect($columns)->contains(
+            fn ($column) => $column['name'] === 'virtual_price' && $column['generation']['type'] === 'virtual'
+                && $column['generation']['expression'] === 'price - 2'
+        ));
+        $this->assertTrue(collect($columns)->contains(
+            fn ($column) => $column['name'] === 'stored_price' && $column['generation']['type'] === 'stored'
+                && $column['generation']['expression'] === 'price - 4'
+        ));
+        $this->assertTrue(collect($columns)->contains(
+            fn ($column) => $column['name'] === 'virtual_price_changed' && $column['generation']['type'] === 'virtual'
+                && $column['generation']['expression'] === 'price - 5'
+        ));
+        $this->assertTrue(collect($columns)->contains(
+            fn ($column) => $column['name'] === 'stored_price_changed' && $column['generation']['type'] === 'stored'
+                && $column['generation']['expression'] === 'price - 7'
+        ));
+    }
+
+    public function testGettingGeneratedColumns()
+    {
+        Schema::create('test', function (Blueprint $table) {
+            $table->integer('price');
+
+            if ($this->driver === 'sqlsrv') {
+                $table->computed('virtual_price', 'price - 5');
+                $table->computed('stored_price', 'price - 10')->persisted();
+            } else {
+                if ($this->driver !== 'pgsql') {
+                    $table->integer('virtual_price')->virtualAs('price - 5');
+                }
+                $table->integer('stored_price')->storedAs('price - 10');
+            }
+        });
+
+        $columns = Schema::getColumns('test');
+
+        $this->assertTrue(collect($columns)->contains(
+            fn ($column) => $column['name'] === 'price' && is_null($column['generation'])
+        ));
+        if ($this->driver !== 'pgsql') {
+            $this->assertTrue(collect($columns)->contains(
+                fn ($column) => $column['name'] === 'virtual_price' && is_null($column['default'])
+                    && $column['generation']['type'] === 'virtual'
+                    && Str::wrap($column['generation']['expression'], '(', ')') === '(price - 5)'
+            ));
+        }
+        $this->assertTrue(collect($columns)->contains(
+            fn ($column) => $column['name'] === 'stored_price' && is_null($column['default'])
+                && $column['generation']['type'] === 'stored'
+                && Str::wrap($column['generation']['expression'], '(', ')') === '(price - 10)'
+        ));
     }
 
     public function testAddingMacros()
