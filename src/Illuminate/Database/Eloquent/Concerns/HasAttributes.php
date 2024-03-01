@@ -479,6 +479,17 @@ trait HasAttributes
     }
 
     /**
+     * Determine if the model has the given attribute loaded
+     *
+     * @param string $key
+     * @return boolean
+     */
+    public function hasAttribute($key)
+    {
+        return array_key_exists($key, $this->attributes);
+    }
+
+    /**
      * Get a plain attribute (not a relationship).
      *
      * @param  string  $key

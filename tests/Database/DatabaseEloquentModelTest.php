@@ -2763,6 +2763,14 @@ class DatabaseEloquentModelTest extends TestCase
         );
     }
 
+    public function testHasAttribute()
+    {
+        $model = new EloquentModelStub(['id' => 1]);
+
+        $this->assertTrue($model->hasAttribute('id'));
+        $this->assertFalse($model->hasAttribute('name'));
+    }
+
     public function testGetOriginalCastsAttributes()
     {
         $model = new EloquentModelCastingStub;
