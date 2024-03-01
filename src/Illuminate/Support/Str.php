@@ -1409,7 +1409,7 @@ class Str
             return static::$snakeCache[$key][$delimiter];
         }
 
-        if (! ctype_lower($value)) {
+        if (! ctype_lower((string) $value)) {
             $value = preg_replace('/\s+/u', '', ucwords($value));
 
             $value = static::lower(preg_replace('/(.)(?=[A-Z])/u', '$1'.$delimiter, $value));
