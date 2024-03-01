@@ -119,7 +119,7 @@ class KeyGenerateCommand extends Command
     /**
      * Rotates application keys in the Laravel environment file.
      *
-     * @param $currentKey
+     * @param  $currentKey
      * @return void
      */
     protected function rotateExistingKeysWith($currentKey)
