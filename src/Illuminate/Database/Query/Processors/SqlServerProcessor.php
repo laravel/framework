@@ -82,6 +82,10 @@ class SqlServerProcessor extends Processor
                 'default' => $result->default,
                 'auto_increment' => (bool) $result->autoincrement,
                 'comment' => $result->comment,
+                'generation' => $result->expression ? [
+                    'type' => $result->persisted ? 'stored' : 'virtual',
+                    'expression' => $result->expression,
+                ] : null,
             ];
         }, $results);
     }
