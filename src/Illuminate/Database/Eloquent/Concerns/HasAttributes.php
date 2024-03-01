@@ -479,9 +479,9 @@ trait HasAttributes
     }
 
     /**
-     * Determine if the model has the given attribute loaded
+     * Determine if the model has the given attribute loaded.
      *
-     * @param string $key
+     * @param  string $key
      * @return boolean
      */
     public function hasAttribute($key)
