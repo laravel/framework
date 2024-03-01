@@ -182,6 +182,14 @@ class SupportNumberTest extends TestCase
         $this->assertSame(1, Number::clamp(-10, 1, 5));
     }
 
+    public function testTrim()
+    {
+        $this->assertSame(0.12, Number::trim(0.123456789));
+        $this->assertSame(0.1234, Number::trim(0.123456789, 4));
+        $this->assertSame(0.123456, Number::trim(0.123456789, 6));
+        $this->assertSame(0.123456789, Number::trim(0.123456789, 12));
+    }
+
     public function testToHuman()
     {
         $this->assertSame('1', Number::forHumans(1));
