@@ -1298,7 +1298,7 @@ class Str
      */
     public static function apa($value)
     {
-        if ($value === '') {
+        if (trim($value) === '') {
             return $value;
         }
 
