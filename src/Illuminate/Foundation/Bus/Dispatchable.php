@@ -4,6 +4,7 @@ namespace Illuminate\Foundation\Bus;
 
 use Closure;
 use Illuminate\Contracts\Bus\Dispatcher;
+use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Support\Fluent;
 
 trait Dispatchable
@@ -39,6 +40,28 @@ trait Dispatchable
         return value($boolean)
             ? new PendingDispatch(new static(...$arguments))
             : new Fluent;
+    }
+
+    /**
+     * Dispatch the job with the given arguments unless the job is already queued.
+     *
+     * @see \Illuminate\Queue\Middleware\Debounced::handle()
+     */
+    // todo - add \DateTimeInterface|\DateInterval as accepted types for wait
+    public static function dispatchDebounced(int $wait, ...$arguments): PendingDispatch
+    {
+        $dispatchable = new static(...$arguments);
+        $key = 'debounced.' . get_class($dispatchable);
+
+        if ($dispatchable instanceof ShouldBeUnique && method_exists($dispatchable, 'uniqueId')) {
+            // use the uniqueId to debounce by if defined
+            $key .= '.uniqueBy.' . $dispatchable->uniqueId();
+        }
+
+        cache()->forever($key, now()->addSeconds($wait)->toISOString());
+        cache()->increment($key . '.count');
+
+        return (new PendingDispatch($dispatchable))->delay($wait);
     }
 
     /**
