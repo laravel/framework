@@ -1188,7 +1188,7 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testWhereMultiple()
     {
         $builder = $this->getBuilder();
-        $builder->select('*')->from('users')->whereMultiple(['last_name', 'email'], 'LIKE','%Otwell%');
+        $builder->select('*')->from('users')->whereMultiple(['last_name', 'email'], 'like','%Otwell%');
         $this->assertSame('select * from "users" where ("last_name" like ? or "email" like ?)', $builder->toSql());
         $this->assertEquals(['%Otwell%', '%Otwell%'], $builder->getBindings());
 
@@ -1203,8 +1203,8 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals(['%Otwell%', '%Otwell%'], $builder->getBindings());
 
         $builder = $this->getBuilder();
-        $builder->select('*')->from('users')->whereMultiple(['last_name', 'email'],'NOT LIKE', '%Otwell%', 'and');
-        $this->assertSame('select * from "users" where ("last_name" NOT LIKE ? and "email" NOT LIKE ?)', $builder->toSql());
+        $builder->select('*')->from('users')->whereMultiple(['last_name', 'email'],'not like', '%Otwell%', 'and');
+        $this->assertSame('select * from "users" where ("last_name" not like ? and "email" not like ?)', $builder->toSql());
         $this->assertEquals(['%Otwell%', '%Otwell%'], $builder->getBindings());
     }
 
