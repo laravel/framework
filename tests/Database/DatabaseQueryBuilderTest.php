@@ -1189,7 +1189,7 @@ class DatabaseQueryBuilderTest extends TestCase
     {
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->whereMultiple(['last_name', 'email'], 'LIKE','%Otwell%');
-        $this->assertSame('select * from "users" where ("last_name" like "%Otwell%" or "email" like "%Otwell%")');
+        $this->assertSame('select * from "users" where ("last_name" like "%Otwell%" or "email" like "%Otwell%")', $builder->toSql());
         $this->assertEquals(['%Otwell%', '%Otwell%'], $builder->getBindings());
     }
 
