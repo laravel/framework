@@ -2110,19 +2110,16 @@ class Builder implements BuilderContract
      */
     public function whereMultiple($columns, $operator = null, $value = null, $columnsBoolean = 'or', $boolean = 'and')
     {
-        if (
-            func_num_args() > 2 && func_num_args() < 5
+        $isOperatorMissing = func_num_args() === 3
             && in_array($value, ['and', 'or'])
-            && $this->invalidOperator($operator)
-        ) {
-            $columnsBoolean = $value;
+            && $this->invalidOperator($operator);
 
-            // Set the value to null to prepare the value and the operator successfully.
-            $value = null;
+        if ($isOperatorMissing) {
+            $columnsBoolean = $value;
         }
 
         [$value, $operator] = $this->prepareValueAndOperator(
-            $value, $operator, func_num_args() > 2 && func_num_args() < 5
+            $value, $operator, func_num_args() === 2 || $isOperatorMissing
         );
 
         $value = $this->flattenValue($value);
