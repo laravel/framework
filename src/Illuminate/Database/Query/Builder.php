@@ -2096,6 +2096,67 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Add a "where" clause to the query for each passed column with the same value.
+     *
+     * @param  string[]  $columns
+     * @param  string  $operator
+     * @param  array  $value
+     * @param  string  $columnsBoolean Boolean type between columns
+     *                                 (column1 = 'foo' or column2 = 'foo')
+     *                                 or
+     *                                 (column1 = 'bar' and column2 = 'bar')
+     * @param  string  $boolean
+     * @return $this
+     */
+    public function whereMultiple($columns, $operator = null, $value = null, $columnsBoolean = 'or', $boolean = 'and')
+    {
+        if (
+            func_num_args() > 2 && func_num_args() < 5
+            && in_array($value, ['and', 'or'])
+            && $this->invalidOperator($operator)
+        ) {
+            $columnsBoolean = $value;
+
+            // Set the value to null to prepare the value and the operator successfully.
+            $value = null;
+        }
+
+        [$value, $operator] = $this->prepareValueAndOperator(
+            $value, $operator, func_num_args() > 2 && func_num_args() < 5
+        );
+
+        $value = $this->flattenValue($value);
+
+        $closure = function ($query) use ($columns, $operator, $value, $columnsBoolean) {
+            foreach ($columns as $column) {
+                $query->where($column, $operator, $value, $columnsBoolean);
+            }
+        };
+
+        $closure($query = $this->newQuery());
+        $this->addNestedWhereQuery($query, $boolean);
+
+        return $this;
+    }
+
+    /**
+     * Add an "or where" clause to the query for each passed column with the same value.
+     *
+     * @param  string[]  $columns
+     * @param  string  $operator
+     * @param  array  $value
+     * @param  string  $columnsBoolean Boolean type between columns
+     *                                 (column1 = 'foo' or column2 = 'foo')
+     *                                 or
+     *                                 (column1 = 'bar' and column2 = 'bar')
+     * @return $this
+     */
+    public function orWhereMultiple($columns, $operator = null, $value = null, $columnsBoolean = 'or')
+    {
+        return $this->whereMultiple($columns, $operator, $value, $columnsBoolean, 'or');
+    }
+
+    /**
      * Add a "group by" clause to the query.
      *
      * @param  array|\Illuminate\Contracts\Database\Query\Expression|string  ...$groups
