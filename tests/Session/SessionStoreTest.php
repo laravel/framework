@@ -37,6 +37,51 @@ class SessionStoreTest extends TestCase
         $this->assertTrue($session->has('baz'));
     }
 
+    public function testSessionTypedGetters(): void
+    {
+        $session = $this->getSession();
+        $session->getHandler()->shouldReceive('read')->once()->with($this->getSessionId())->andReturn(serialize([
+            'integer' => 12,
+            'array' => ['name' => 'taylor'],
+            'boolean' => true,
+            'float' => 12.34,
+            'string' => 'Taylor Otwell',
+        ]));
+        $session->start();
+
+        $this->assertSame(12, $session->integer('integer'));
+        $this->assertSame(['name' => 'taylor'], $session->array('array'));
+        $this->assertTrue($session->boolean('boolean'));
+        $this->assertSame(12.34, $session->float('float'));
+        $this->assertSame('Taylor Otwell', $session->string('string'));
+    }
+
+    public function testSessionTypedGettersWithWrongTypes(): void
+    {
+        $session = $this->getSession();
+        $session->getHandler()->shouldReceive('read')->once()->with($this->getSessionId())->andReturn(serialize([
+            'integer' => '12',
+            'array' => null,
+            'boolean' => 'true',
+            'float' => '12.34',
+            'string' => 12,
+        ]));
+        $session->start();
+
+        $this->assertTypeError(fn () => $session->integer('integer'), 'integer');
+        $this->assertTypeError(fn () => $session->array('array'), 'array');
+        $this->assertTypeError(fn () => $session->boolean('boolean'), 'boolean');
+        $this->assertTypeError(fn () => $session->flloat('float'), 'float');
+        $this->assertTypeError(fn () => $session->string('string'), 'string');
+    }
+
+    private function assertTypeError(callable $callback, string $expectedType): void
+    {
+        $this->expectException(\TypeError::class);
+        $this->expectExceptionMessageMatches("/(.*) must be (.*) $expectedType/");
+        $callback();
+    }
+
     public function testSessionMigration()
     {
         $session = $this->getSession();
