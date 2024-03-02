@@ -14,6 +14,7 @@ use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldBeUniqueUntilProcessing;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Pipeline\Pipeline;
+use Illuminate\Queue\Middleware\Debounced;
 use ReflectionClass;
 use RuntimeException;
 
@@ -118,7 +119,11 @@ class CallQueuedHandler
         }
 
         return (new Pipeline($this->container))->send($command)
-                ->through(array_merge(method_exists($command, 'middleware') ? $command->middleware() : [], $command->middleware ?? []))
+                ->through(array_merge(
+                    method_exists($command, 'middleware') ? $command->middleware() : [],
+                        $command->middleware ?? [],
+                    [new Debounced()]
+                ))
                 ->then(function ($command) use ($job) {
                     return $this->dispatcher->dispatchNow(
                         $command, $this->resolveHandler($job, $command)
