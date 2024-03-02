@@ -71,15 +71,18 @@ class SessionStoreTest extends TestCase
         $this->assertTypeError(fn () => $session->integer('integer'), 'integer');
         $this->assertTypeError(fn () => $session->array('array'), 'array');
         $this->assertTypeError(fn () => $session->boolean('boolean'), 'boolean');
-        $this->assertTypeError(fn () => $session->flloat('float'), 'float');
+        $this->assertTypeError(fn () => $session->float('float'), 'float');
         $this->assertTypeError(fn () => $session->string('string'), 'string');
     }
 
     private function assertTypeError(callable $callback, string $expectedType): void
     {
-        $this->expectException(\TypeError::class);
-        $this->expectExceptionMessageMatches("/(.*) must be (.*) $expectedType/");
-        $callback();
+        try {
+            $callback();
+            $this->fail("Expected TypeError for $expectedType type.");
+        } catch (\TypeError $e) {
+            $this->assertMatchesRegularExpression("/Session value for key \[(.*)\] must be (.*) {$expectedType}, (.*) given./", $e->getMessage());
+        }
     }
 
     public function testSessionMigration()
