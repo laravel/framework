@@ -2101,10 +2101,10 @@ class Builder implements BuilderContract
      * @param  string[]  $columns
      * @param  string  $operator
      * @param  array  $value
-     * @param  string  $columnsBoolean Boolean type between columns
-     *                                 (column1 = 'foo' or column2 = 'foo')
-     *                                 or
-     *                                 (column1 = 'bar' and column2 = 'bar')
+     * @param  string  $columnsBoolean  Boolean type between columns
+     *                                  (column1 = 'foo' or column2 = 'foo')
+     *                                  or
+     *                                  (column1 = 'bar' and column2 = 'bar')
      * @param  string  $boolean
      * @return $this
      */
@@ -2142,10 +2142,10 @@ class Builder implements BuilderContract
      * @param  string[]  $columns
      * @param  string  $operator
      * @param  array  $value
-     * @param  string  $columnsBoolean Boolean type between columns
-     *                                 (column1 = 'foo' or column2 = 'foo')
-     *                                 or
-     *                                 (column1 = 'bar' and column2 = 'bar')
+     * @param  string  $columnsBoolean  Boolean type between columns
+     *                                  (column1 = 'foo' or column2 = 'foo')
+     *                                  or
+     *                                  (column1 = 'bar' and column2 = 'bar')
      * @return $this
      */
     public function orWhereMultiple($columns, $operator = null, $value = null, $columnsBoolean = 'or')
