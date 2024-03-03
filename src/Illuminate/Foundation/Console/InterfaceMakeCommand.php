@@ -59,7 +59,7 @@ class InterfaceMakeCommand extends GeneratorCommand
     protected function getOptions()
     {
         return [
-            ['force', 'f', InputOption::VALUE_NONE, 'Create the class even if the class already exists'],
+            ['force', 'f', InputOption::VALUE_NONE, 'Create the interface even if the interface already exists'],
         ];
     }
 }
