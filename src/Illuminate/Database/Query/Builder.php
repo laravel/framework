@@ -2172,8 +2172,6 @@ class Builder implements BuilderContract
             $value, $operator, empty($value) && $this->invalidOperator($operator)
         );
 
-        $value = $this->flattenValue($value);
-
         $this->whereNested(function ($query) use ($columns, $operator, $value, $columnsBoolean) {
             foreach ($columns as $column) {
                 $query->where($column, $operator, $value, $columnsBoolean);
