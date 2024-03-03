@@ -13,6 +13,7 @@ use Illuminate\Queue\Events\JobPopping;
 use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Queue\Events\JobProcessing;
 use Illuminate\Queue\Events\JobReleasedAfterException;
+use Illuminate\Queue\Events\JobReleasedAfterTimeOut;
 use Illuminate\Queue\Events\JobTimedOut;
 use Illuminate\Queue\Events\Looping;
 use Illuminate\Queue\Events\WorkerStopping;
@@ -213,21 +214,31 @@ class Worker
         // signals supported in recent versions of PHP to accomplish it conveniently.
         pcntl_signal(SIGALRM, function () use ($job, $options) {
             if ($job) {
-                $this->markJobAsFailedIfWillExceedMaxAttempts(
-                    $job->getConnectionName(), $job, (int) $options->maxTries, $e = $this->timeoutExceededException($job)
-                );
+                try {
+                    $this->markJobAsFailedIfWillExceedMaxAttempts(
+                        $job->getConnectionName(), $job, (int) $options->maxTries, $e = $this->timeoutExceededException($job)
+                    );
 
-                $this->markJobAsFailedIfWillExceedMaxExceptions(
-                    $job->getConnectionName(), $job, $e
-                );
+                    $this->markJobAsFailedIfWillExceedMaxExceptions(
+                        $job->getConnectionName(), $job, $e
+                    );
 
-                $this->markJobAsFailedIfItShouldFailOnTimeout(
-                    $job->getConnectionName(), $job, $e
-                );
+                    $this->markJobAsFailedIfItShouldFailOnTimeout(
+                        $job->getConnectionName(), $job, $e
+                    );
 
-                $this->events->dispatch(new JobTimedOut(
-                    $job->getConnectionName(), $job
-                ));
+                    $this->events->dispatch(new JobTimedOut(
+                        $job->getConnectionName(), $job
+                    ));
+                } finally {
+                    if (! $job->isDeleted() && ! $job->isReleased() && ! $job->hasFailed()) {
+                        $job->release($this->calculateBackoff($job, $options));
+        
+                        $this->events->dispatch(new JobReleasedAfterTimeOut(
+                            $job->getConnectionName(), $job
+                        ));
+                    }
+                }
             }
 
             $this->kill(static::EXIT_ERROR, $options);
