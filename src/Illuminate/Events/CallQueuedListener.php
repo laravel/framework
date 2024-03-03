@@ -76,6 +76,13 @@ class CallQueuedListener implements ShouldQueue
     public $shouldBeEncrypted = false;
 
     /**
+     * Indicates if the job should fail if the timeout is exceeded.
+     *
+     * @var bool
+     */
+    public $failOnTimeout = false;
+
+    /**
      * Create a new job instance.
      *
      * @param  string  $class
