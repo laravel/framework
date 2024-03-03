@@ -2096,11 +2096,69 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Add a "where" clause to the query for each passed column with the same value
+     * to check if all passed columns match the value.
+     *
+     * @param  string[]  $columns
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @param  string  $boolean
+     * @return $this
+     */
+    public function whereAll($columns, $operator = null, $value = null, $boolean = 'and')
+    {
+        return $this->whereMultiple($columns, $operator, $value, 'and', $boolean);
+    }
+
+    /**
+     * Add an "or where" clause to the query for each passed column with the same value
+     * to check if all passed columns match the value.
+     *
+     * @param  string[]  $columns
+     * @param  string  $operator
+     * @param  mixed  $value
+     * @return $this
+     */
+    public function orWhereAll($columns, $operator = null, $value = null)
+    {
+        return $this->whereAll($columns, $operator, $value, 'or');
+    }
+
+    /**
+     * Add a "where" clause to the query for each passed column with the same value
+     * to check if any of passed columns matches the value.
+     *
+     * @param  string[]  $columns
+     * @param  string  $operator
+     * @param  mixed  $value
+     * @param  string  $boolean
+     * @return $this
+     */
+    public function whereAny($columns, $operator = null, $value = null, $boolean = 'and')
+    {
+        return $this->whereMultiple($columns, $operator, $value, 'or', $boolean);
+    }
+
+    /**
+     * Add an "or where" clause to the query for each passed column with the same value
+     * to check if any of passed columns matches the value.
+     *
+     * @param  string[]  $columns
+     * @param  string  $operator
+     * @param  mixed  $value
+     * @return $this
+     */
+    public function orWhereAny($columns, $operator = null, $value = null)
+    {
+        return $this->whereAny($columns, $operator, $value, 'or');
+    }
+
+    /**
      * Add a "where" clause to the query for each passed column with the same value.
      *
      * @param  string[]  $columns
      * @param  string  $operator
-     * @param  array  $value
+     * @param  mixed  $value
      * @param  string  $columnsBoolean  Boolean type between columns
      *                                  (column1 = 'foo' or column2 = 'foo')
      *                                  or
@@ -2108,30 +2166,19 @@ class Builder implements BuilderContract
      * @param  string  $boolean
      * @return $this
      */
-    public function whereMultiple($columns, $operator = null, $value = null, $columnsBoolean = 'or', $boolean = 'and')
+    private function whereMultiple($columns, $operator = null, $value = null, $columnsBoolean = 'and', $boolean = 'and')
     {
-        $isOperatorMissing = func_num_args() === 3
-            && in_array($value, ['and', 'or'])
-            && $this->invalidOperator($operator);
-
-        if ($isOperatorMissing) {
-            $columnsBoolean = $value;
-        }
-
         [$value, $operator] = $this->prepareValueAndOperator(
-            $value, $operator, func_num_args() === 2 || $isOperatorMissing
+            $value, $operator, empty($value) && $this->invalidOperator($operator)
         );
 
         $value = $this->flattenValue($value);
 
-        $closure = function ($query) use ($columns, $operator, $value, $columnsBoolean) {
+        $this->whereNested(function ($query) use ($columns, $operator, $value, $columnsBoolean) {
             foreach ($columns as $column) {
                 $query->where($column, $operator, $value, $columnsBoolean);
             }
-        };
-
-        $closure($query = $this->newQuery());
-        $this->addNestedWhereQuery($query, $boolean);
+        }, $boolean);
 
         return $this;
     }
