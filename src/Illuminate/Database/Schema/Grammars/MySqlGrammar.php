@@ -1022,6 +1022,17 @@ class MySqlGrammar extends Grammar
      */
     protected function typeBinary(Fluent $column)
     {
+        return 'binary';
+    }
+
+    /**
+     * Create the column definition for a blob type.
+     *
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return string
+     */
+    protected function typeBlob(Fluent $column)
+    {
         return 'blob';
     }
 

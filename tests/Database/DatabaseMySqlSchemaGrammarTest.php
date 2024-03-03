@@ -1090,6 +1090,16 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
+        $this->assertSame('alter table `users` add `foo` binary not null', $statements[0]);
+    }
+
+    public function testAddingBlob()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->blob('foo');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
         $this->assertSame('alter table `users` add `foo` blob not null', $statements[0]);
     }
 

@@ -1334,6 +1334,17 @@ class Blueprint
     }
 
     /**
+     * Create a new blob column on the table.
+     *
+     * @param  string  $column
+     * @return \Illuminate\Database\Schema\ColumnDefinition
+     */
+    public function blob($column)
+    {
+        return $this->addColumn('blob', $column);
+    }
+
+    /**
      * Create a new UUID column on the table.
      *
      * @param  string  $column
