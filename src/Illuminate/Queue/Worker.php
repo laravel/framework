@@ -233,7 +233,7 @@ class Worker
                 } finally {
                     if (! $job->isDeleted() && ! $job->isReleased() && ! $job->hasFailed()) {
                         $job->release($this->calculateBackoff($job, $options));
-        
+
                         $this->events->dispatch(new JobReleasedAfterTimeOut(
                             $job->getConnectionName(), $job
                         ));
