@@ -80,10 +80,10 @@ class RedisStoreTest extends TestCase
     {
         Cache::store('redis')->clear();
 
-        $result = Cache::store('redis')->put('foo', 10,10);
+        $result = Cache::store('redis')->put('foo', 10, 10);
         $this->assertTrue($result);
 
-        $result = Cache::store('redis')->put('foo', 10,0);
+        $result = Cache::store('redis')->put('foo', 10, 0);
         $this->assertTrue($result);
 
         $value = Cache::store('redis')->get('foo');
