@@ -517,6 +517,7 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
                     'Provider' => 'E.g. ElasticServiceProvider',
                     'Request' => 'E.g. StorePodcastRequest',
                     'Resource' => 'E.g. UserResource',
+                    'Resource Collection' => 'E.g. UserCollection',
                     'Rule' => 'E.g. Uppercase',
                     'Scope' => 'E.g. TrendingScope',
                     'Seeder' => 'E.g. UserSeeder',

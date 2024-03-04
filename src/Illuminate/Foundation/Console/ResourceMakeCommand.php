@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\GeneratorCommand;
+use Illuminate\Support\Str;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputOption;
 
@@ -37,8 +38,17 @@ class ResourceMakeCommand extends GeneratorCommand
      */
     public function handle()
     {
-        if ($this->collection()) {
-            $this->type = 'Resource collection';
+        if(!$this->option()) {
+            $this->createResource();
+        }
+
+        if ($this->option('all')) {
+            $this->createResource();
+            $this->input->setOption('collection', true);
+        }
+
+        if($this->collection()) {
+            $this->createCollection();
         }
 
         parent::handle();
@@ -92,6 +102,30 @@ class ResourceMakeCommand extends GeneratorCommand
     }
 
     /**
+     * Create a resource for the model.
+     */
+    protected function createResource()
+    {
+        $resource = Str::studly(class_basename($this->argument('name')));
+
+        $this->call('make:resource', [
+            'name' => $resource,
+        ]);
+    }
+
+    /**
+     * Create a resource collection for the model.
+     */
+    protected function createCollection()
+    {
+        $collectionName = str_ends_with($this->argument('name'), 'Resource')
+            ? str_replace('Resource', 'Collection', $this->argument('name'))
+            : "{$this->argument('name')}Collection";
+        $this->type = 'Resource collection';
+        $this->input->setArgument('name', $collectionName);
+    }
+
+    /**
      * Get the console command options.
      *
      * @return array
@@ -101,6 +135,7 @@ class ResourceMakeCommand extends GeneratorCommand
         return [
             ['force', 'f', InputOption::VALUE_NONE, 'Create the class even if the resource already exists'],
             ['collection', 'c', InputOption::VALUE_NONE, 'Create a resource collection'],
+            ['all', 'a', InputOption::VALUE_NONE, 'Generate both: resource and its collection'],
         ];
     }
 }
