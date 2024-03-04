@@ -2096,8 +2096,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     * Add a "where" clause to the query for each passed column with the same value
-     * to check if all passed columns match the value.
+     * Add a "where" clause to the query for multiple columns with "and" conditions between them.
      *
      * @param  string[]  $columns
      * @param  mixed  $operator
@@ -2121,8 +2120,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     * Add an "or where" clause to the query for each passed column with the same value
-     * to check if all passed columns match the value.
+     * Add an "or where" clause to the query for multiple columns with "and" conditions between them.
      *
      * @param  string[]  $columns
      * @param  string  $operator
@@ -2135,8 +2133,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     * Add a "where" clause to the query for each passed column with the same value
-     * to check if any of passed columns matches the value.
+     * Add an "where" clause to the query for multiple columns with "or" conditions between them.
      *
      * @param  string[]  $columns
      * @param  string  $operator
@@ -2160,8 +2157,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     * Add an "or where" clause to the query for each passed column with the same value
-     * to check if any of passed columns matches the value.
+     * Add an "or where" clause to the query for multiple columns with "or" conditions between them.
      *
      * @param  string[]  $columns
      * @param  string  $operator
