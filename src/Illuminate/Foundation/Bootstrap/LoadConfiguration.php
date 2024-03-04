@@ -92,8 +92,11 @@ class LoadConfiguration
 
         if (isset($base[$name])) {
             $config = array_merge($base[$name], $config);
-            if (($option = $this->smartMergeOption($name)) && isset($config[$option])) {
-                $config[$option] = array_merge($base[$name][$option], $config[$option]);
+
+            foreach ($this->mergeableOptions($name) as $option) {
+                if (isset($config[$option])) {
+                    $config[$option] = array_merge($base[$name][$option], $config[$option]);
+                }
             }
 
             unset($base[$name]);
@@ -105,23 +108,22 @@ class LoadConfiguration
     }
 
     /**
-     * Return the option within the configuration file
-     * which allows another level of merging.
+     * Get the options within the configuration file that should be merged again.
      *
      * @param  string  $name
-     * @return string|null
+     * @return array
      */
-    protected function smartMergeOption($name)
+    protected function mergeableOptions($name)
     {
         return [
-            'broadcasting' => 'connections',
-            'cache' => 'stores',
-            'database' => 'connections',
-            'filesystems' => 'disks',
-            'logging' => 'channels',
-            'mail' => 'mailers',
-            'queue' => 'connections',
-        ][$name] ?? null;
+            'broadcasting' => ['connections'],
+            'cache' => ['stores'],
+            'database' => ['connections'],
+            'filesystems' => ['disks'],
+            'logging' => ['channels'],
+            'mail' => ['mailers'],
+            'queue' => ['connections'],
+        ][$name] ?? [];
     }
 
     /**
