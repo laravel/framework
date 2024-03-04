@@ -1272,6 +1272,8 @@ class Blueprint
      * Create a new binary column on the table.
      *
      * @param  string  $column
+     * @param  int|null  $length
+     * @param  bool  $fixed
      * @return \Illuminate\Database\Schema\ColumnDefinition
      */
     public function binary($column, $length = null, $fixed = false)
