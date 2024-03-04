@@ -38,7 +38,7 @@ class ResourceMakeCommand extends GeneratorCommand
      */
     public function handle()
     {
-        if(!$this->collection() && !$this->option('all')) {
+        if (! $this->collection() && ! $this->option('all')) {
             $this->createResource();
         }
 
@@ -47,7 +47,7 @@ class ResourceMakeCommand extends GeneratorCommand
             $this->input->setOption('collection', true);
         }
 
-        if($this->collection()) {
+        if ($this->collection()) {
             $this->createCollection();
         }
     }
