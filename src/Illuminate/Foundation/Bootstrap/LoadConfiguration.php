@@ -92,7 +92,7 @@ class LoadConfiguration
 
         if (isset($base[$name])) {
             $config = array_merge($base[$name], $config);
-            if ($option = $this->smartMergeOption($name) && isset($config[$option])) {
+            if (($option = $this->smartMergeOption($name)) && isset($config[$option])) {
                 $config[$option] = array_merge($base[$name][$option], $config[$option]);
             }
 
