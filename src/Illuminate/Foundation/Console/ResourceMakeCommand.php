@@ -50,8 +50,6 @@ class ResourceMakeCommand extends GeneratorCommand
         if($this->collection()) {
             $this->createCollection();
         }
-
-        parent::handle();
     }
 
     /**
@@ -106,11 +104,7 @@ class ResourceMakeCommand extends GeneratorCommand
      */
     protected function createResource()
     {
-        $resource = Str::studly(class_basename($this->argument('name')));
-
-        $this->call('make:resource', [
-            'name' => $resource,
-        ]);
+        parent::handle();
     }
 
     /**
@@ -123,6 +117,8 @@ class ResourceMakeCommand extends GeneratorCommand
             : "{$this->argument('name')}Collection";
         $this->type = 'Resource collection';
         $this->input->setArgument('name', $collectionName);
+
+        parent::handle();
     }
 
     /**
