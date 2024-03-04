@@ -55,7 +55,7 @@ use WeakMap;
  */
 trait EnumeratesValues
 {
-    use Conditionable, Dumpable;
+    use Conditionable;
 
     /**
      * Indicates that the object's string representation should be escaped when __toString is invoked.
@@ -196,6 +196,19 @@ trait EnumeratesValues
     public function some($key, $operator = null, $value = null)
     {
         return $this->contains(...func_get_args());
+    }
+
+    /**
+     * Dump the given arguments and terminate execution.
+     *
+     * @param  mixed  ...$args
+     * @return never
+     */
+    public function dd(...$args)
+    {
+        $this->dump(...$args);
+
+        dd();
     }
 
     /**
