@@ -1,7 +1,6 @@
 <?php
 
 namespace Illuminate\Tests\Validation {
-
     use Illuminate\Database\Capsule\Manager as DB;
     use Illuminate\Database\Eloquent\Model as Eloquent;
     use Illuminate\Translation\ArrayLoader;
@@ -347,7 +346,6 @@ namespace Illuminate\Tests\Validation {
 }
 
 namespace {
-
     use Illuminate\Database\Eloquent\Model as Eloquent;
 
     class GlobalModelNamespace extends Eloquent
