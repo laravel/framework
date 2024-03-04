@@ -2077,9 +2077,7 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals([1 => ['sort' => 1], 0 => ['sort' => 2]], $data->all());
     }
 
-    /**
-     * @dataProvider collectionClassProvider
-     */
+    #[DataProvider('collectionClassProvider')]
     public function testSortByMany($collection)
     {
         $data = new $collection([['item' => '1'], ['item' => '10'], ['item' => 5], ['item' => 20]]);
