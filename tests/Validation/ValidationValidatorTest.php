@@ -167,6 +167,35 @@ class ValidationValidatorTest extends TestCase
         $this->assertSame(['foo' => 'bar'], $v->validate());
     }
 
+    public function testValidatedThrowsOnFail()
+    {
+        $this->expectException(ValidationException::class);
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => 'bar'], ['baz' => 'required']);
+
+        $v->validated();
+    }
+
+    public function testValidatedThrowsOnFailEvenAfterPassesCall()
+    {
+        $this->expectException(ValidationException::class);
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => 'bar'], ['baz' => 'required']);
+
+        $v->passes();
+        $v->validated();
+    }
+
+    public function testValidatedDoesntThrowOnPass()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => 'bar'], ['foo' => 'required']);
+
+        $this->assertSame(['foo' => 'bar'], $v->validated());
+    }
+
     public function testHasFailedValidationRules()
     {
         $trans = $this->getIlluminateArrayTranslator();

@@ -577,7 +577,11 @@ class Validator implements ValidatorContract
      */
     public function validated()
     {
-        throw_if($this->invalid(), $this->exception, $this);
+        if (! $this->messages) {
+            $this->passes();
+        }
+
+        throw_if($this->messages->isNotEmpty(), $this->exception, $this);
 
         $results = [];
 
