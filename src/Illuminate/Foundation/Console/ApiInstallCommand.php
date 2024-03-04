@@ -49,7 +49,7 @@ class ApiInstallCommand extends Command
             $this->uncommentApiRoutesFile();
         }
 
-        if ($this->confirm('One new migration has been published. Would like to run pending migrations now?', false)) {
+        if ($this->confirm('One new migration has been published. Would you like to run the pending database migrations?', false)) {
             $this->call('migrate');
         }
 
