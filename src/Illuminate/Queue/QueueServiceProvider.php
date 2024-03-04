@@ -4,6 +4,7 @@ namespace Illuminate\Queue;
 
 use Aws\DynamoDb\DynamoDbClient;
 use Illuminate\Contracts\Debug\ExceptionHandler;
+use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Queue\Connectors\BeanstalkdConnector;
 use Illuminate\Queue\Connectors\DatabaseConnector;
@@ -11,11 +12,13 @@ use Illuminate\Queue\Connectors\NullConnector;
 use Illuminate\Queue\Connectors\RedisConnector;
 use Illuminate\Queue\Connectors\SqsConnector;
 use Illuminate\Queue\Connectors\SyncConnector;
+use Illuminate\Queue\Events\JobExceptionOccurred;
 use Illuminate\Queue\Failed\DatabaseFailedJobProvider;
 use Illuminate\Queue\Failed\DatabaseUuidFailedJobProvider;
 use Illuminate\Queue\Failed\DynamoDbFailedJobProvider;
 use Illuminate\Queue\Failed\FileFailedJobProvider;
 use Illuminate\Queue\Failed\NullFailedJobProvider;
+use Illuminate\Queue\Jobs\JobName;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\ServiceProvider;
@@ -76,7 +79,21 @@ class QueueServiceProvider extends ServiceProvider implements DeferrableProvider
             // Once we have an instance of the queue manager, we will register the various
             // resolvers for the queue connectors. These connectors are responsible for
             // creating the classes that accept queue configs and instantiate queues.
-            return tap(new QueueManager($app), function ($manager) {
+            return tap(new QueueManager($app), function (QueueManager $manager) {
+                $manager->exceptionOccurred(function (JobExceptionOccurred $event) {
+                    [$class, $method] = JobName::parse($event->job->payload());
+
+                    $key = 'debounced.' . get_class($class);
+
+                    if ($class instanceof ShouldBeUnique && method_exists($class, 'uniqueId')) {
+                        // use the uniqueId to debounce by if defined
+                        $key .= '.uniqueBy.' . $class->uniqueId();
+                    }
+
+                    // todo extract this and add logic to handle if there's already existing debounced jobs
+                    cache()->forget($key);
+                    cache()->forget($key . '.count');
+                });
                 $this->registerConnectors($manager);
             });
         });
