@@ -64,7 +64,7 @@ jobs:
           REDIS_LIBS: liblz4-dev, liblzf-dev, libzstd-dev
 
       - name: Set minimum PHP 8.2 versions
-        uses: nick-fields/retry@v2
+        uses: nick-fields/retry@v3
         with:
           timeout_minutes: 5
           max_attempts: 5
@@ -78,7 +78,7 @@ jobs:
           command: composer require phpunit/phpunit:^${{ matrix.phpunit }} --dev --no-interaction --no-update
 
       - name: Install dependencies
-        uses: nick-fields/retry@v2
+        uses: nick-fields/retry@v3
         with:
           timeout_minutes: 5
           max_attempts: 5
@@ -134,7 +134,7 @@ jobs:
           coverage: none
 
       - name: Set Minimum PHP 8.2 Versions
-        uses: nick-fields/retry@v2
+        uses: nick-fields/retry@v3
         with:
           timeout_minutes: 5
           max_attempts: 5
@@ -148,7 +148,7 @@ jobs:
           command: composer require phpunit/phpunit:~${{ matrix.phpunit }} --dev --no-interaction --no-update
 
       - name: Install dependencies
-        uses: nick-fields/retry@v2
+        uses: nick-fields/retry@v3
         with:
           timeout_minutes: 5
           max_attempts: 5

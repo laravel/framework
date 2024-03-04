@@ -5,10 +5,13 @@ namespace Illuminate\Validation\Rules;
 use Illuminate\Contracts\Validation\Rule;
 use Illuminate\Contracts\Validation\ValidatorAwareRule;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Traits\Conditionable;
 use TypeError;
 
 class Enum implements Rule, ValidatorAwareRule
 {
+    use Conditionable;
+
     /**
      * The type of the enum.
      *
