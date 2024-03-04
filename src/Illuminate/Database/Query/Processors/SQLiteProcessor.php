@@ -27,6 +27,7 @@ class SQLiteProcessor extends Processor
             ) === 1 ? strtolower($matches[1]) : null;
 
             $isGenerated = in_array($result->extra, [2, 3]);
+
             $expression = $isGenerated && preg_match(
                 '/\b'.preg_quote($result->name).'\b[^,]+\s+as\s+\(((?:[^()]+|\((?:[^()]+|\([^()]*\))*\))*)\)/i',
                 $sql,
