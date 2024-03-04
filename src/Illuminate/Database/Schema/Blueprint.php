@@ -1274,9 +1274,9 @@ class Blueprint
      * @param  string  $column
      * @return \Illuminate\Database\Schema\ColumnDefinition
      */
-    public function binary($column)
+    public function binary($column, $length = null, $fixed = false)
     {
-        return $this->addColumn('binary', $column);
+        return $this->addColumn('binary', $column, compact('length', 'fixed'));
     }
 
     /**

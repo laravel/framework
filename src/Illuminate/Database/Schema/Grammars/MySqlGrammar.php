@@ -999,6 +999,10 @@ class MySqlGrammar extends Grammar
      */
     protected function typeBinary(Fluent $column)
     {
+        if ($column->length) {
+            return $column->fixed ? "binary({$column->length})" : "varbinary({$column->length})";
+        }
+
         return 'blob';
     }
 
