@@ -49,7 +49,11 @@ class ApiInstallCommand extends Command
             $this->uncommentApiRoutesFile();
         }
 
-        $this->components->info('API scaffolding installed. Please add the "Laravel\Sanctum\HasApiTokens" trait to your User model.');
+        if ($this->confirm('One new database migration has been published. Would you like to run all pending database migrations?', false)) {
+            $this->call('migrate');
+        }
+
+        $this->components->info('API scaffolding installed. Please add the [Laravel\Sanctum\HasApiTokens] trait to your User model.');
     }
 
     /**
