@@ -113,7 +113,11 @@ class ResourceMakeCommand extends GeneratorCommand
     protected function createCollection()
     {
         $this->type = 'Resource collection';
-        $baseName = str_replace(['Resource', 'Collection'], '', $this->argument('name'));
+
+        $baseName = str_ends_with($this->argument('name'), 'Collection')
+            ? Str::replaceLast('Collection', '', $this->argument('name'))
+            : $this->argument('name');
+
         $this->input->setArgument('name', "{$baseName}Collection");
 
         parent::handle();
