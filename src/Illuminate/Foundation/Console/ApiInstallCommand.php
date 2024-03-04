@@ -93,14 +93,18 @@ class ApiInstallCommand extends Command
             'laravel/sanctum:^4.0',
         ]);
 
-        $php = (new PhpExecutableFinder())->find(false) ?: 'php';
+        $migrationPublished = collect(scandir($this->laravel->databasePath('migrations')))->contains(function ($migration) {
+            return preg_match('/\d{4}_\d{2}_\d{2}_\d{6}_create_personal_access_tokens_table.php/', $migration);
+        });
 
-        $result = Process::run([
-            $php,
-            defined('ARTISAN_BINARY') ? ARTISAN_BINARY : 'artisan',
-            'vendor:publish',
-            '--provider',
-            'Laravel\\Sanctum\\SanctumServiceProvider',
-        ]);
+        if (! $migrationPublished) {
+            Process::run([
+                (new PhpExecutableFinder())->find(false) ?: 'php',
+                defined('ARTISAN_BINARY') ? ARTISAN_BINARY : 'artisan',
+                'vendor:publish',
+                '--provider',
+                'Laravel\\Sanctum\\SanctumServiceProvider',
+            ]);
+        }
     }
 }
