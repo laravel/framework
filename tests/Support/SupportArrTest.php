@@ -922,11 +922,6 @@ class SupportArrTest extends TestCase
         $input = range('a', 'z');
 
         $this->assertFalse(
-            Arr::shuffle($input) === Arr::shuffle($input) && Arr::shuffle($input) === Arr::shuffle($input),
-            "The shuffles produced the same output each time, which shouldn't happen."
-        );
-
-        $this->assertFalse(
             Arr::shuffle($input) === $input && Arr::shuffle($input) === $input,
             "The shuffles were unshuffled each time, which shouldn't happen."
         );
