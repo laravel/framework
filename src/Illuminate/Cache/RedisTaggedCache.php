@@ -19,15 +19,13 @@ class RedisTaggedCache extends TaggedCache
         if ($ttl !== null) {
             $seconds = $this->getSeconds($ttl);
 
-            if ($seconds <= 0) {
-                return false;
+            if ($seconds > 0) {
+                $this->tags->addEntry(
+                    $this->itemKey($key),
+                    $seconds
+                );
             }
         }
-
-        $this->tags->addEntry(
-            $this->itemKey($key),
-            $seconds
-        );
 
         return parent::add($key, $value, $ttl);
     }
@@ -48,14 +46,12 @@ class RedisTaggedCache extends TaggedCache
 
         $seconds = $this->getSeconds($ttl);
 
-        if ($seconds <= 0) {
-            return false;
+        if ($seconds > 0) {
+            $this->tags->addEntry(
+                $this->itemKey($key),
+                $seconds
+            );
         }
-
-        $this->tags->addEntry(
-            $this->itemKey($key),
-            $seconds
-        );
 
         return parent::put($key, $value, $ttl);
     }
