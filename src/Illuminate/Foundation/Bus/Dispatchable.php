@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation\Bus;
 
 use Closure;
+use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Support\Fluent;
@@ -51,6 +52,13 @@ trait Dispatchable
     public static function dispatchDebounced(int $wait, ...$arguments): PendingDispatch
     {
         $dispatchable = new static(...$arguments);
+
+        if (!in_array(Queueable::class, class_uses_recursive(static::class), true)) {
+            throw new \InvalidArgumentException(
+                'Debounced jobs must use the ' . class_basename(Queueable::class) .  ' trait.'
+            );
+        }
+
         $key = 'debounced.' . get_class($dispatchable);
 
         if ($dispatchable instanceof ShouldBeUnique && method_exists($dispatchable, 'uniqueId')) {
