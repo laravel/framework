@@ -89,7 +89,7 @@ class SQLiteGrammar extends Grammar
     public function compileColumns($table)
     {
         return sprintf(
-            'select name, type, not "notnull" as "nullable", dflt_value as "default", pk as "primary" '
+            'select name, type, not "notnull" as "nullable", dflt_value as "default", pk as "primary", hidden as "extra" '
             .'from pragma_table_xinfo(%s) order by cid asc',
             $this->wrap(str_replace('.', '__', $table))
         );
@@ -250,14 +250,22 @@ class SQLiteGrammar extends Grammar
 
                 if ($column instanceof Fluent) {
                     $name = $this->wrap($column);
-                    $columnNames[] = $name;
                     $autoIncrementColumn = $column->autoIncrement ? $column->name : $autoIncrementColumn;
+
+                    if (is_null($column->virtualAs) && is_null($column->virtualAsJson) &&
+                        is_null($column->storedAs) && is_null($column->storedAsJson)) {
+                        $columnNames[] = $name;
+                    }
 
                     return $this->addModifiers($name.' '.$this->getType($column), $blueprint, $column);
                 } else {
                     $name = $this->wrap($column['name']);
-                    $columnNames[] = $name;
                     $autoIncrementColumn = $column['auto_increment'] ? $column['name'] : $autoIncrementColumn;
+                    $isGenerated = ! is_null($column['generation']);
+
+                    if (! $isGenerated) {
+                        $columnNames[] = $name;
+                    }
 
                     return $this->addModifiers($name.' '.$column['type'], $blueprint,
                         new ColumnDefinition([
@@ -268,6 +276,10 @@ class SQLiteGrammar extends Grammar
                             'autoIncrement' => $column['auto_increment'],
                             'collation' => $column['collation'],
                             'comment' => $column['comment'],
+                            'virtualAs' => $isGenerated && $column['generation']['type'] === 'virtual'
+                                ? $column['generation']['expression'] : null,
+                            'storedAs' => $isGenerated && $column['generation']['type'] === 'stored'
+                                ? $column['generation']['expression'] : null,
                         ])
                     );
                 }

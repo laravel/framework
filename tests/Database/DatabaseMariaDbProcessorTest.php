@@ -16,9 +16,9 @@ class DatabaseMariaDbProcessorTest extends TestCase
             ['name' => 'email', 'type_name' => 'varchar', 'type' => 'varchar(100)', 'collation' => 'collate', 'nullable' => 'YES', 'default' => 'NULL', 'extra' => 'on update CURRENT_TIMESTAMP', 'comment' => 'NULL'],
         ];
         $expected = [
-            ['name' => 'id', 'type_name' => 'bigint', 'type' => 'bigint', 'collation' => 'collate', 'nullable' => true, 'default' => '', 'auto_increment' => true, 'comment' => 'bar'],
-            ['name' => 'name', 'type_name' => 'varchar', 'type' => 'varchar(100)', 'collation' => 'collate', 'nullable' => false, 'default' => 'foo', 'auto_increment' => false, 'comment' => ''],
-            ['name' => 'email', 'type_name' => 'varchar', 'type' => 'varchar(100)', 'collation' => 'collate', 'nullable' => true, 'default' => 'NULL', 'auto_increment' => false, 'comment' => 'NULL'],
+            ['name' => 'id', 'type_name' => 'bigint', 'type' => 'bigint', 'collation' => 'collate', 'nullable' => true, 'default' => '', 'auto_increment' => true, 'comment' => 'bar', 'generation' => null],
+            ['name' => 'name', 'type_name' => 'varchar', 'type' => 'varchar(100)', 'collation' => 'collate', 'nullable' => false, 'default' => 'foo', 'auto_increment' => false, 'comment' => '', 'generation' => null],
+            ['name' => 'email', 'type_name' => 'varchar', 'type' => 'varchar(100)', 'collation' => 'collate', 'nullable' => true, 'default' => 'NULL', 'auto_increment' => false, 'comment' => 'NULL', 'generation' => null],
         ];
         $this->assertEquals($expected, $processor->processColumns($listing));
 

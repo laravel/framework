@@ -97,9 +97,16 @@ class PostgresProcessor extends Processor
                 'type' => $result->type,
                 'collation' => $result->collation,
                 'nullable' => (bool) $result->nullable,
-                'default' => $autoincrement ? null : $result->default,
+                'default' => $result->generated ? null : $result->default,
                 'auto_increment' => $autoincrement,
                 'comment' => $result->comment,
+                'generation' => $result->generated ? [
+                    'type' => match ($result->generated) {
+                        's' => 'stored',
+                        default => null,
+                    },
+                    'expression' => $result->default,
+                ] : null,
             ];
         }, $results);
     }

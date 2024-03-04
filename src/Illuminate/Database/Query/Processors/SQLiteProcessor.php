@@ -26,6 +26,14 @@ class SQLiteProcessor extends Processor
                 $matches
             ) === 1 ? strtolower($matches[1]) : null;
 
+            $isGenerated = in_array($result->extra, [2, 3]);
+
+            $expression = $isGenerated && preg_match(
+                '/\b'.preg_quote($result->name).'\b[^,]+\s+as\s+\(((?:[^()]+|\((?:[^()]+|\([^()]*\))*\))*)\)/i',
+                $sql,
+                $matches
+            ) === 1 ? $matches[1] : null;
+
             return [
                 'name' => $result->name,
                 'type_name' => strtok($type, '(') ?: '',
@@ -35,6 +43,14 @@ class SQLiteProcessor extends Processor
                 'default' => $result->default,
                 'auto_increment' => $hasPrimaryKey && $result->primary && $type === 'integer',
                 'comment' => null,
+                'generation' => $isGenerated ? [
+                    'type' => match ((int) $result->extra) {
+                        3 => 'stored',
+                        2 => 'virtual',
+                        default => null,
+                    },
+                    'expression' => $expression,
+                ] : null,
             ];
         }, $results);
     }
