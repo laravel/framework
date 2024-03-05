@@ -283,6 +283,23 @@ class SQLiteGrammar extends Grammar
      */
     public function compileUpsertUsing(Builder $query, array $columns, string $sql, array $uniqueBy, array $update)
     {
+        // To avoid potential parser ambiguity, when an INSERT statement to which UPSERT
+        // is attached takes its values from a SELECT statement, the SELECT statement
+        // should always include a WHERE clause, event if it is just "WHERE true".
+        if (! Str::contains($sql, 'where')) {
+            $fromClausePosition = strpos($sql, 'from');
+            $afterFromTablePosition = strpos($sql, ' ',  $fromClausePosition + strlen('from '));
+
+            if ($afterFromTablePosition === false) {
+                $afterFromTablePosition = strlen($sql);
+            }
+
+            $before = substr($sql, 0, $afterFromTablePosition);
+            $after = substr($sql, $afterFromTablePosition);
+
+            $sql = $before.' where true'.$after;
+        }
+
         $sql = $this->compileInsertUsing($query, $columns, $sql);
 
         $sql .= ' on conflict ('.$this->columnize($uniqueBy).') do update set ';
