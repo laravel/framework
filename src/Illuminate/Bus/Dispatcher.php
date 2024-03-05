@@ -4,8 +4,10 @@ namespace Illuminate\Bus;
 
 use Closure;
 use Illuminate\Contracts\Bus\QueueingDispatcher;
+use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Queue\Queue;
+use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\PendingChain;
 use Illuminate\Pipeline\Pipeline;
@@ -202,7 +204,16 @@ class Dispatcher implements QueueingDispatcher
      */
     protected function commandShouldBeQueued($command)
     {
-        return $command instanceof ShouldQueue;
+        if(!$command instanceof ShouldQueue) {
+            return false;
+        }
+
+        if ($command instanceof ShouldBeUnique) {
+            return (new UniqueLock(\Illuminate\Container\Container::getInstance()->make(Cache::class)))
+                ->acquire($command);
+        }
+
+        return true;
     }
 
     /**

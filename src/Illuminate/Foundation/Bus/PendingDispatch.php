@@ -2,11 +2,7 @@
 
 namespace Illuminate\Foundation\Bus;
 
-use Illuminate\Bus\UniqueLock;
-use Illuminate\Container\Container;
 use Illuminate\Contracts\Bus\Dispatcher;
-use Illuminate\Contracts\Cache\Repository as Cache;
-use Illuminate\Contracts\Queue\ShouldBeUnique;
 
 class PendingDispatch
 {
@@ -150,21 +146,6 @@ class PendingDispatch
     }
 
     /**
-     * Determine if the job should be dispatched.
-     *
-     * @return bool
-     */
-    protected function shouldDispatch()
-    {
-        if (! $this->job instanceof ShouldBeUnique) {
-            return true;
-        }
-
-        return (new UniqueLock(Container::getInstance()->make(Cache::class)))
-                    ->acquire($this->job);
-    }
-
-    /**
      * Dynamically proxy methods to the underlying job.
      *
      * @param  string  $method
@@ -185,9 +166,7 @@ class PendingDispatch
      */
     public function __destruct()
     {
-        if (! $this->shouldDispatch()) {
-            return;
-        } elseif ($this->afterResponse) {
+        if ($this->afterResponse) {
             app(Dispatcher::class)->dispatchAfterResponse($this->job);
         } else {
             app(Dispatcher::class)->dispatch($this->job);
