@@ -116,9 +116,10 @@ class LoadConfiguration
     protected function mergeableOptions($name)
     {
         return [
+            'auth' => ['guards', 'providers', 'passwords'],
             'broadcasting' => ['connections'],
             'cache' => ['stores'],
-            'database' => ['connections'],
+            'database' => ['connections', 'redis'],
             'filesystems' => ['disks'],
             'logging' => ['channels'],
             'mail' => ['mailers'],
