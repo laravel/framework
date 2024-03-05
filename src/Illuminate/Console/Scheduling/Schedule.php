@@ -212,10 +212,6 @@ class Schedule
             throw new RuntimeException('Cache driver not available. Scheduling unique jobs not supported.');
         }
 
-        if (! (new UniqueLock(Container::getInstance()->make(Cache::class)))->acquire($job)) {
-            return;
-        }
-
         $this->getDispatcher()->dispatch(
             $job->onConnection($connection)->onQueue($queue)
         );
