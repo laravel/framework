@@ -936,4 +936,26 @@ class Arr
 
         return is_array($value) ? $value : [$value];
     }
+
+    /**
+     * Convert all keys in the given associative array to lowercase.
+     *
+     * @param array $array The input array.
+     * @return array The array with all keys converted to lowercase.
+     */
+    public static function lowercaseKeys(array $array): array
+    {
+        return array_change_key_case($array, CASE_LOWER);
+    }
+
+    /**
+     * Convert all keys in the given associative array to uppercase.
+     *
+     * @param array $array The input array.
+     * @return array The array with all keys converted to uppercase.
+     */
+    public static function uppercaseKeys(array $array): array
+    {
+        return array_change_key_case($array, CASE_UPPER);
+    }
 }
