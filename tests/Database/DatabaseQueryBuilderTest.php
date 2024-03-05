@@ -3365,7 +3365,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getSQLiteBuilder();
         $builder->getConnection()
             ->shouldReceive('getDatabaseName')->andReturn('test')
-            ->shouldReceive('affectingStatement')->once()->with('insert into "users" ("email", "name") select "column1", "column2" from "table2" on conflict ("email") do update set "name" = "excluded"."name"', [])->andReturn(1);
+            ->shouldReceive('affectingStatement')->once()->with('insert into "users" ("email", "name") select "column1", "column2" from "table2" where true on conflict ("email") do update set "name" = "excluded"."name"', [])->andReturn(1);
         $result = $builder->from('users')->upsertUsing(['email', 'name'], function (Builder $query) {
             $query->select(['column1', 'column2'])->from('table2');
         }, 'email', ['name']);
@@ -3374,7 +3374,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getSQLiteBuilder();
         $builder->getConnection()
             ->shouldReceive('getDatabaseName')->andReturn('test')
-            ->shouldReceive('affectingStatement')->once()->with('insert into "users" ("email", "name") select "column1", "column2" from "table2" on conflict ("email") do update set "name" = ?', ['New name'])->andReturn(1);
+            ->shouldReceive('affectingStatement')->once()->with('insert into "users" ("email", "name") select "column1", "column2" from "table2" where true on conflict ("email") do update set "name" = ?', ['New name'])->andReturn(1);
         $result = $builder->from('users')->upsertUsing(['email', 'name'], function (Builder $query) {
             $query->select(['column1', 'column2'])->from('table2');
         }, 'email', ['name' => 'New name']);
@@ -3383,7 +3383,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getSQLiteBuilder();
         $builder->getConnection()
             ->shouldReceive('getDatabaseName')->andReturn('test')
-            ->shouldReceive('affectingStatement')->once()->with('insert into "users" ("email", "name") select "column1", "column2" from "table2" on conflict ("email") do update set "name" = concat("name", \' 2\')', [])->andReturn(1);
+            ->shouldReceive('affectingStatement')->once()->with('insert into "users" ("email", "name") select "column1", "column2" from "table2" where true on conflict ("email") do update set "name" = concat("name", \' 2\')', [])->andReturn(1);
         $result = $builder->from('users')->upsertUsing(['email', 'name'], function (Builder $query) {
             $query->select(['column1', 'column2'])->from('table2');
         }, 'email', ['name' => new Raw('concat("name", \' 2\')')]);
