@@ -4,11 +4,14 @@ namespace Illuminate\Bus;
 
 use Carbon\CarbonImmutable;
 use Illuminate\Container\Container;
+use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Str;
 use Illuminate\Support\Testing\Fakes\BatchFake;
 
 trait Batchable
 {
+    use InteractsWithQueue;
+
     /**
      * The batch ID (if applicable).
      *

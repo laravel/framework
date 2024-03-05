@@ -183,8 +183,7 @@ class CallQueuedHandler
     {
         $uses = class_uses_recursive($command);
 
-        if (! in_array(Batchable::class, $uses) ||
-            ! in_array(InteractsWithQueue::class, $uses)) {
+        if (! in_array(Batchable::class, $uses)) {
             return;
         }
 
