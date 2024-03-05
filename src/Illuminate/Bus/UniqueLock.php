@@ -44,6 +44,21 @@ class UniqueLock
     }
 
     /**
+     * Check if the lock for the given job is already acquired.
+     *
+     * @param  mixed  $job
+     * @return bool
+     */
+    public function isAcquired($job)
+    {
+        $cache = method_exists($job, 'uniqueVia')
+                    ? $job->uniqueVia()
+                    : $this->cache;
+
+        return (bool) $cache->lock($this->getKey($job))->get();
+    }
+
+    /**
      * Release the lock for the given job.
      *
      * @param  mixed  $job

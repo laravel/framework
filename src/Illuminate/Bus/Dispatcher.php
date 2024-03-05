@@ -87,14 +87,19 @@ class Dispatcher implements QueueingDispatcher
      *
      * @param  mixed  $command
      * @param  mixed  $handler
+     * @param  bool  $checkLocks
      * @return mixed
      */
-    public function dispatchSync($command, $handler = null)
+    public function dispatchSync($command, $handler = null, $checkLocks = true)
     {
         if ($this->queueResolver &&
             $this->commandShouldBeQueued($command) &&
             method_exists($command, 'onConnection')) {
-            return $this->dispatchToQueue($command->onConnection('sync'));
+            return $this->dispatchToQueue($command->onConnection('sync'), $checkLocks);
+        }
+
+        if($checkLocks && ! $this->shouldDispatch($command)) {
+            return null;
         }
 
         return $this->dispatchNow($command, $handler);
@@ -197,6 +202,27 @@ class Dispatcher implements QueueingDispatcher
     }
 
     /**
+     * Determine if the job should be dispatched.
+     *
+     * @param mixed $command
+     * @param bool $shouldLock
+     * @return bool
+     */
+    protected function shouldDispatch($command, $shouldLock = true)
+    {
+        if (! $command instanceof ShouldBeUnique) {
+            return true;
+        }
+
+        $lock = (new UniqueLock(\Illuminate\Container\Container::getInstance()->make(Cache::class)));
+        if ($shouldLock) {
+            return $lock->acquire($command);
+        } else {
+            return ! $lock->isAcquired($command);
+        }
+    }
+
+    /**
      * Determine if the given command should be queued.
      *
      * @param  mixed  $command
@@ -204,28 +230,24 @@ class Dispatcher implements QueueingDispatcher
      */
     protected function commandShouldBeQueued($command)
     {
-        if(!$command instanceof ShouldQueue) {
-            return false;
-        }
-
-        if ($command instanceof ShouldBeUnique) {
-            return (new UniqueLock(\Illuminate\Container\Container::getInstance()->make(Cache::class)))
-                ->acquire($command);
-        }
-
-        return true;
+        return $command instanceof ShouldQueue;
     }
 
     /**
      * Dispatch a command to its appropriate handler behind a queue.
      *
      * @param  mixed  $command
+     * @param  bool  $checkLocks
      * @return mixed
      *
      * @throws \RuntimeException
      */
-    public function dispatchToQueue($command)
+    public function dispatchToQueue($command, $checkLocks = true)
     {
+        if($checkLocks && ! $this->shouldDispatch($command)) {
+            return null;
+        }
+
         $connection = $command->connection ?? null;
 
         $queue = call_user_func($this->queueResolver, $connection);
@@ -274,8 +296,12 @@ class Dispatcher implements QueueingDispatcher
      */
     public function dispatchAfterResponse($command, $handler = null)
     {
+        if(! $this->shouldDispatch($command)) {
+            return;
+        }
+
         $this->container->terminating(function () use ($command, $handler) {
-            $this->dispatchSync($command, $handler);
+            $this->dispatchSync($command, $handler, false);
         });
     }
 
