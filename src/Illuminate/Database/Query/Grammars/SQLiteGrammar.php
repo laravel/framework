@@ -288,7 +288,7 @@ class SQLiteGrammar extends Grammar
         // should always include a WHERE clause, event if it is just "WHERE true".
         if (! Str::contains($sql, 'where')) {
             $fromClausePosition = strpos($sql, 'from');
-            $afterFromTablePosition = strpos($sql, ' ',  $fromClausePosition + strlen('from '));
+            $afterFromTablePosition = strpos($sql, ' ', $fromClausePosition + strlen('from '));
 
             if ($afterFromTablePosition === false) {
                 $afterFromTablePosition = strlen($sql);
