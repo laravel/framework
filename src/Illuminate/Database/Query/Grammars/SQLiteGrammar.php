@@ -286,9 +286,9 @@ class SQLiteGrammar extends Grammar
         // To avoid potential parser ambiguity, when an INSERT statement to which UPSERT
         // is attached takes its values from a SELECT statement, the SELECT statement
         // should always include a WHERE clause, even if that's just "WHERE true".
-        if (! Str::contains($sql, 'where')) {
-            $fromClausePosition = strpos($sql, 'from');
-            $afterFromTablePosition = strpos($sql, ' ', $fromClausePosition + strlen('from '));
+        if (! Str::contains($sql, ' where ')) {
+            $fromClausePosition = strpos($sql, ' from ');
+            $afterFromTablePosition = strpos($sql, ' ', $fromClausePosition + strlen(' from '));
 
             if ($afterFromTablePosition === false) {
                 $afterFromTablePosition = strlen($sql);
