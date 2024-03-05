@@ -59,6 +59,10 @@ class FoundationServiceProvider extends AggregateServiceProvider
             $this->publishes([
                 __DIR__.'/../Exceptions/views' => $this->app->resourcePath('views/errors/'),
             ], 'laravel-errors');
+
+            $this->publishes([
+                __DIR__.'/../resources/health-up.blade.php' => $this->app->resourcePath('views/'),
+            ], 'laravel-health-up');
         }
     }
 
