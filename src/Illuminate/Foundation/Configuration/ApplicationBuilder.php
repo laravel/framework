@@ -191,6 +191,10 @@ class ApplicationBuilder
                 Route::middleware('web')->get($health, function () {
                     Event::dispatch(new DiagnosingHealth);
 
+                    if (file_exists(resource_path('views/health-up.blade.php'))) {
+                        return View::file(resource_path('views/health-up.blade.php'));
+                    }
+
                     return View::file(__DIR__.'/../resources/health-up.blade.php');
                 });
             }
