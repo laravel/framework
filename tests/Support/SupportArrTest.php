@@ -1309,4 +1309,42 @@ class SupportArrTest extends TestCase
             ],
         ], Arr::select($array, 'name'));
     }
+
+    public function testLowercaseKeys()
+    {
+        $inputArray = [
+            'Name' => 'John',
+            'Age' => 25,
+            'City' => 'New York',
+        ];
+
+        $resultArray = Arr::lowercaseKeys($inputArray);
+
+        $expectedArray = [
+            'name' => 'John',
+            'age' => 25,
+            'city' => 'New York',
+        ];
+
+        $this->assertSame($expectedArray, $resultArray);
+    }
+
+    public function testUppercaseKeys()
+    {
+        $inputArray = [
+            'Name' => 'John',
+            'Age' => 25,
+            'City' => 'New York',
+        ];
+
+        $resultArray = Arr::uppercaseKeys($inputArray);
+
+        $expectedArray = [
+            'NAME' => 'John',
+            'AGE' => 25,
+            'CITY' => 'New York',
+        ];
+
+        $this->assertSame($expectedArray, $resultArray);
+    }
 }
