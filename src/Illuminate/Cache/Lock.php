@@ -88,17 +88,14 @@ abstract class Lock implements LockContract
      */
     public function get($callback = null)
     {
-        $result = $this->acquire();
-
-        if ($result && is_callable($callback)) {
-            try {
+        // If a callable is passed, only check whether the lock is available.
+        if (is_callable($callback)) {
+            $owner = $this->getCurrentOwner();
+            if (empty($owner) || $owner === $this->owner()) {
                 return $callback();
-            } finally {
-                $this->release();
             }
         }
-
-        return $result;
+        return $this->acquire();
     }
 
     /**
