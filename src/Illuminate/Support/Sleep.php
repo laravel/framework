@@ -21,6 +21,13 @@ class Sleep
     public static $fakeSleepCallbacks = [];
 
     /**
+     * Keep carbon's "now" in sync when sleeping.
+     *
+     * @var bool
+     */
+    protected static $syncWithCarbon = false;
+
+    /**
      * The total duration to sleep.
      *
      * @var \Carbon\CarbonInterval
@@ -259,6 +266,10 @@ class Sleep
         if (static::$fake) {
             static::$sequence[] = $this->duration;
 
+            if (static::$syncWithCarbon) {
+                Carbon::setTestNow(Carbon::now()->add($this->duration));
+            }
+
             foreach (static::$fakeSleepCallbacks as $callback) {
                 $callback($this->duration);
             }
@@ -317,6 +328,7 @@ class Sleep
 
         static::$sequence = [];
         static::$fakeSleepCallbacks = [];
+        static::$syncWithCarbon = false;
     }
 
     /**
@@ -457,5 +469,15 @@ class Sleep
     public static function whenFakingSleep($callback)
     {
         static::$fakeSleepCallbacks[] = $callback;
+    }
+
+    /**
+     * Indicate that Carbon's "now" should be kept in sync when sleeping.
+     *
+     * @return void
+     */
+    public static function syncWithCarbon($value = true)
+    {
+        static::$syncWithCarbon = $value;
     }
 }
