@@ -55,19 +55,19 @@ trait Dispatchable
 
         if (!in_array(Queueable::class, class_uses_recursive(static::class), true)) {
             throw new \InvalidArgumentException(
-                'Debounced jobs must use the ' . class_basename(Queueable::class) .  ' trait.'
+                'Debounced jobs must use the '.class_basename(Queueable::class). ' trait.'
             );
         }
 
-        $key = 'debounced.' . get_class($dispatchable);
+        $key = 'debounced.'.get_class($dispatchable);
 
         if ($dispatchable instanceof ShouldBeUnique && method_exists($dispatchable, 'uniqueId')) {
             // use the uniqueId to debounce by if defined
-            $key .= '.uniqueBy.' . $dispatchable->uniqueId();
+            $key .= '.uniqueBy.'.$dispatchable->uniqueId();
         }
 
         cache()->forever($key, now()->addSeconds($wait)->toISOString());
-        cache()->increment($key . '.count');
+        cache()->increment($key.'.count');
 
         return (new PendingDispatch($dispatchable))->delay($wait);
     }

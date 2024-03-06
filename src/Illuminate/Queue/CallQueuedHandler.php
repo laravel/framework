@@ -121,7 +121,7 @@ class CallQueuedHandler
         return (new Pipeline($this->container))->send($command)
                 ->through(array_merge(
                     method_exists($command, 'middleware') ? $command->middleware() : [],
-                        $command->middleware ?? [],
+                    $command->middleware ?? [],
                     [new Debounced()]
                 ))
                 ->then(function ($command) use ($job) {

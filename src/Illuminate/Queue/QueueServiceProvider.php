@@ -118,15 +118,15 @@ class QueueServiceProvider extends ServiceProvider implements DeferrableProvider
         $manager->exceptionOccurred(function (JobExceptionOccurred $event) {
             [$class, $method] = JobName::parse($event->job->payload()['job']);
 
-            $key = 'debounced.' . get_class($class);
+            $key = 'debounced.'.get_class($class);
 
             if ($class instanceof ShouldBeUnique && method_exists($class, 'uniqueId')) {
                 // use the uniqueId to debounce by if defined
-                $key .= '.uniqueBy.' . $class->uniqueId();
+                $key .= '.uniqueBy.'.$class->uniqueId();
             }
 
             cache()->forget($key);
-            cache()->forget($key . '.count');
+            cache()->forget($key.'.count');
         });
     }
 
