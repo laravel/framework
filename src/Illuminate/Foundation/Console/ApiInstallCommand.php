@@ -20,14 +20,15 @@ class ApiInstallCommand extends Command
      */
     protected $signature = 'install:api
                     {--composer=global : Absolute path to the Composer binary which should be used to install packages}
-                    {--force : Overwrite any existing API routes file}';
+                    {--force : Overwrite any existing API routes file}
+                    {--passport : Install Laravel Passport instead of Laravel Sanctum}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Create an API routes file and install Laravel Sanctum';
+    protected $description = 'Create an API routes file and install Laravel Sanctum or Laravel Passport';
 
     /**
      * Execute the console command.
@@ -36,7 +37,11 @@ class ApiInstallCommand extends Command
      */
     public function handle()
     {
-        $this->installSanctum();
+        if ($this->option('passport')) {
+            $this->installPassport();
+        } else {
+            $this->installSanctum();
+        }
 
         if (file_exists($apiRoutesPath = $this->laravel->basePath('routes/api.php')) &&
             ! $this->option('force')) {
@@ -46,14 +51,30 @@ class ApiInstallCommand extends Command
 
             copy(__DIR__.'/stubs/api-routes.stub', $apiRoutesPath);
 
+            if ($this->option('passport')) {
+                (new Filesystem)->replaceInFile(
+                    'auth:sanctum',
+                    'auth:api',
+                    $apiRoutesPath,
+                );
+            }
+
             $this->uncommentApiRoutesFile();
         }
 
-        if ($this->confirm('One new database migration has been published. Would you like to run all pending database migrations?', false)) {
-            $this->call('migrate');
-        }
+        if ($this->option('passport')) {
+            $this->call('passport:install', [
+                '--uuids' => $this->confirm('Would you like to use UUIDs for all client IDs?'),
+            ]);
 
-        $this->components->info('API scaffolding installed. Please add the [Laravel\Sanctum\HasApiTokens] trait to your User model.');
+            $this->components->info('API scaffolding installed. Please add the [Laravel\Passport\HasApiTokens] trait to your User model.');
+        } else {
+            if ($this->confirm('One new database migration has been published. Would you like to run all pending database migrations?', false)) {
+                $this->call('migrate');
+            }
+
+            $this->components->info('API scaffolding installed. Please add the [Laravel\Sanctum\HasApiTokens] trait to your User model.');
+        }
     }
 
     /**
@@ -110,5 +131,17 @@ class ApiInstallCommand extends Command
                 'Laravel\\Sanctum\\SanctumServiceProvider',
             ]);
         }
+    }
+
+    /**
+     * Install Laravel Passport into the application.
+     *
+     * @return void
+     */
+    protected function installPassport()
+    {
+        $this->requireComposerPackages($this->option('composer'), [
+            'laravel/passport:^12.0',
+        ]);
     }
 }
