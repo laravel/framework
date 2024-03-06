@@ -2,9 +2,9 @@
 
 namespace Illuminate\Support;
 
-use Carbon\Carbon;
 use Carbon\CarbonInterval;
 use DateInterval;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Traits\Macroable;
 use PHPUnit\Framework\Assert as PHPUnit;
 use RuntimeException;
