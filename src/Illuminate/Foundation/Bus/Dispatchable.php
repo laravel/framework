@@ -59,16 +59,6 @@ trait Dispatchable
             );
         }
 
-//        // todo - what if it's set later on the PendingDispatch
-//        // ::dispatch($podcast)->onConnection('sqs')->onQueue('processing');
-//        if (($dispatchable->connection ?? config('queue.default')) === 'sync') {
-//            if (config('app.debug') && app()->isLocal()) {
-//                throw new \LogicException('Debounced jobs must not run in');
-//            }
-//
-//            return self::dispatchSync(...$arguments);
-//        }
-
         $key = 'debounced.' . get_class($dispatchable);
 
         if ($dispatchable instanceof ShouldBeUnique && method_exists($dispatchable, 'uniqueId')) {
