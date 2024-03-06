@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Illuminate\Queue\Middleware;
 
@@ -11,8 +11,8 @@ use Illuminate\Support\Carbon;
 class Debounced
 {
     /**
-     * @param InteractsWithQueue|mixed $job
-     * @param $next
+     * @param  InteractsWithQueue|mixed  $job
+     * @param  $next
      *
      * @return mixed|void
      */
@@ -27,33 +27,33 @@ class Debounced
             return;
         }
 
-        $key = 'debounced.' . get_class($job);
+        $key = 'debounced.'.get_class($job);
 
         if ($job instanceof ShouldBeUnique && method_exists($job, 'uniqueId')) {
             // use the uniqueId to debounce by if defined
-            $key .= '.uniqueBy.' . $job->uniqueId();
+            $key .= '.uniqueBy.'.$job->uniqueId();
         }
 
         $intendedExecutionTime = cache()->pull($key);
 
         if (
             // if there's a value for this key, this is a debounced job
-            !is_null($intendedExecutionTime) &&
-            !in_array(InteractsWithQueue::class, class_uses_recursive($job), true)
+            ! is_null($intendedExecutionTime) &&
+            ! in_array(InteractsWithQueue::class, class_uses_recursive($job), true)
         ) {
             // using the class-string so there's a hard reference
             $traitName = class_basename(InteractsWithQueue::class);
             throw new \InvalidArgumentException("The Debounced jobs must use the $traitName trait.");
         }
 
-        $count = cache()->pull($key . '.count', 1);
+        $count = cache()->pull($key.'.count', 1);
 
         if ($count > 1) {
             // this is an earlier job, so we should delete it
             $job->delete();
 
             // decrement the count
-            cache()->forever($key . '.count', $count - 1);
+            cache()->forever($key.'.count', $count - 1);
             return;
         }
 
