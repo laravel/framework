@@ -18,6 +18,15 @@ class Debounced
      */
     public function handle(mixed $job, $next)
     {
+        if (($job->connection ?? config('queue.default')) === 'sync') {
+            if (config('app.debug') && app()->isLocal()) {
+                throw new \LogicException('Debounced jobs must not run on the sync queue.');
+            }
+
+            $next($job);
+            return;
+        }
+
         $key = 'debounced.' . get_class($job);
 
         if ($job instanceof ShouldBeUnique && method_exists($job, 'uniqueId')) {
