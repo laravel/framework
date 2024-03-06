@@ -34,7 +34,13 @@ class Debounced
             $key .= '.uniqueBy.' . $job->uniqueId();
         }
 
-        if (!in_array(InteractsWithQueue::class, class_uses_recursive($job), true)) {
+        $intendedExecutionTime = cache()->pull($key);
+
+        if (
+            // if there's a value for this key, this is a debounced job
+            !is_null($intendedExecutionTime) &&
+            !in_array(InteractsWithQueue::class, class_uses_recursive($job), true)
+        ) {
             // using the class-string so there's a hard reference
             $traitName = class_basename(InteractsWithQueue::class);
             throw new \InvalidArgumentException("The Debounced jobs must use the $traitName trait.");
@@ -51,7 +57,7 @@ class Debounced
             return;
         }
 
-        if ($intendedExecutionTime = cache()->pull($key)) {
+        if ($intendedExecutionTime) {
             $intendedExecutionTime = Carbon::parse($intendedExecutionTime);
 
             if ($intendedExecutionTime->gt(now())) {
