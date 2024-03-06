@@ -76,24 +76,15 @@ class QueueServiceProvider extends ServiceProvider implements DeferrableProvider
     protected function registerManager()
     {
         $this->app->singleton('queue', function ($app) {
-            // Once we have an instance of the queue manager, we will register the various
-            // resolvers for the queue connectors. These connectors are responsible for
-            // creating the classes that accept queue configs and instantiate queues.
             return tap(new QueueManager($app), function (QueueManager $manager) {
-                $manager->exceptionOccurred(function (JobExceptionOccurred $event) {
-                    [$class, $method] = JobName::parse($event->job->payload());
-
-                    $key = 'debounced.' . get_class($class);
-
-                    if ($class instanceof ShouldBeUnique && method_exists($class, 'uniqueId')) {
-                        // use the uniqueId to debounce by if defined
-                        $key .= '.uniqueBy.' . $class->uniqueId();
-                    }
-
-                    // todo extract this and add logic to handle if there's already existing debounced jobs
-                    cache()->forget($key);
-                    cache()->forget($key . '.count');
-                });
+                // We will register the various exception handlers for the queue.
+                // These handlers will fire when an exception is thrown
+                // when the worker has attempted to process a job.
+                // This will let us clean up any side effects.
+                $this->registerExceptionHandlers($manager);
+                // We will register the various resolvers for the queue connectors.
+                // These connectors are responsible for creating the classes
+                // that accept queue configs and instantiate queues.
                 $this->registerConnectors($manager);
             });
         });
@@ -108,6 +99,34 @@ class QueueServiceProvider extends ServiceProvider implements DeferrableProvider
     {
         $this->app->singleton('queue.connection', function ($app) {
             return $app['queue']->connection();
+        });
+    }
+
+    /**
+     * Register the event handler for queue exceptions.
+     *
+     * @param  \Illuminate\Queue\QueueManager  $manager
+     *
+     * @return void
+     *
+     * @see \Illuminate\Queue\Middleware\Debounced::handle
+     * @see \Illuminate\Foundation\Bus\Dispatchable::dispatchDebounced
+     */
+    protected function registerExceptionHandlers(QueueManager $manager)
+    {
+        // When a job fails, we will clean up the cache to avoid cluttering the cache
+        $manager->exceptionOccurred(function (JobExceptionOccurred $event) {
+            [$class, $method] = JobName::parse($event->job->payload()['job']);
+
+            $key = 'debounced.' . get_class($class);
+
+            if ($class instanceof ShouldBeUnique && method_exists($class, 'uniqueId')) {
+                // use the uniqueId to debounce by if defined
+                $key .= '.uniqueBy.' . $class->uniqueId();
+            }
+
+            cache()->forget($key);
+            cache()->forget($key . '.count');
         });
     }
 
