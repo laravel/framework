@@ -22,7 +22,7 @@ class ApiInstallCommand extends Command
                     {--composer=global : Absolute path to the Composer binary which should be used to install packages}
                     {--force : Overwrite any existing API routes file}
                     {--passport : Install Laravel Passport instead of Laravel Sanctum}
-                    {--ignore-migrate-prompt : Ignore the prompt to run pending migrations}';
+                    {--without-migration-prompt : Do not prompt to run pending migrations}';
 
     /**
      * The console command description.
@@ -70,7 +70,7 @@ class ApiInstallCommand extends Command
 
             $this->components->info('API scaffolding installed. Please add the [Laravel\Passport\HasApiTokens] trait to your User model.');
         } else {
-            if (! $this->option('ignore-migrate-prompt')) {
+            if (! $this->option('without-migration-prompt')) {
                 if ($this->confirm('One new database migration has been published. Would you like to run all pending database migrations?', true)) {
                     $this->call('migrate');
                 }
