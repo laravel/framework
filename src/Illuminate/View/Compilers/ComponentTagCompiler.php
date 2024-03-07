@@ -810,9 +810,9 @@ class ComponentTagCompiler
                     return "'{$attribute}' => {$value}";
                 }
 
-                return "'{$attribute}' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(" . (
-                    ($attribute === 'attributes') ? $value : ('$componentData[\'data\'][\'' . Str::camel($attribute) . '\'] ?? null')
-                ) . ')';
+                return "'{$attribute}' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(".(
+                    ($attribute === 'attributes') ? $value : ('$componentData[\'data\'][\''.Str::camel($attribute).'\'] ?? null')
+                ).')';
             })
             ->implode(',');
     }
