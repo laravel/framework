@@ -490,7 +490,7 @@ class Middleware
     }
 
     /**
-     * Configure where guests are redirected by the authentication middleware.
+     * Configure where guests are redirected by the "auth" middleware.
      *
      * @param  callable|string  $redirect
      * @return $this
@@ -501,7 +501,7 @@ class Middleware
     }
 
     /**
-     * Configure where users are redirected by the authentication middleware.
+     * Configure where users are redirected by the "guest" middleware.
      *
      * @param  callable|string  $redirect
      * @return $this
