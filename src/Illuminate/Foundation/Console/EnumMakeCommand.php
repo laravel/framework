@@ -49,6 +49,17 @@ class EnumMakeCommand extends GeneratorCommand
     }
 
     /**
+     * Get the default namespace for the class.
+     *
+     * @param  string  $rootNamespace
+     * @return string
+     */
+    protected function getDefaultNamespace($rootNamespace)
+    {
+        return is_dir(app_path('Enums')) ? $rootNamespace.'\\Enums' : $rootNamespace;
+    }
+
+    /**
      * Build the class with the given name.
      *
      * @param  string  $name
