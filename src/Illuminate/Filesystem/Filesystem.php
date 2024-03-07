@@ -16,8 +16,7 @@ use Symfony\Component\Mime\MimeTypes;
 
 class Filesystem
 {
-    use Conditionable;
-    use Macroable;
+    use Conditionable, Macroable;
 
     /**
      * Determine if a file or directory exists.
