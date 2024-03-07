@@ -3,7 +3,7 @@
 set -e
 set -x
 
-CURRENT_BRANCH="master"
+CURRENT_BRANCH="11.x"
 
 function split()
 {
