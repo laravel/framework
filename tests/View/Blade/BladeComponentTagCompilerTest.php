@@ -394,7 +394,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 <?php if (isset(\$attributes) && \$attributes instanceof Illuminate\View\ComponentAttributeBag && \$constructor = (new ReflectionClass(Illuminate\Tests\View\Blade\TestProfileComponent::class))->getConstructor()): ?>
 <?php \$attributes = \$attributes->except(collect(\$constructor->getParameters())->map->getName()->all()); ?>
 <?php endif; ?>
-<?php \$component->withAttributes(['class' => 'bar','attributes' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(\$componentData['data']['attributes'] ?? null),'wire:model' => 'foo']); ?> @endComponentClass##END-COMPONENT-CLASS##", trim($result));
+<?php \$component->withAttributes(['class' => 'bar','attributes' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(\$attributes),'wire:model' => 'foo']); ?> @endComponentClass##END-COMPONENT-CLASS##", trim($result));
     }
 
     public function testSelfClosingComponentCanReceiveAttributeBag()
@@ -407,7 +407,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 <?php if (isset(\$attributes) && \$attributes instanceof Illuminate\View\ComponentAttributeBag && \$constructor = (new ReflectionClass(Illuminate\Tests\View\Blade\TestAlertComponent::class))->getConstructor()): ?>
 <?php \$attributes = \$attributes->except(collect(\$constructor->getParameters())->map->getName()->all()); ?>
 <?php endif; ?>
-<?php \$component->withAttributes(['class' => 'bar','attributes' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(\$componentData['data']['attributes'] ?? null),'wire:model' => 'foo']); ?>\n".
+<?php \$component->withAttributes(['class' => 'bar','attributes' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(\$attributes->merge(['class' => 'test'])),'wire:model' => 'foo']); ?>\n".
             '@endComponentClass##END-COMPONENT-CLASS##</div>', trim($result));
     }
 

@@ -776,9 +776,16 @@ class ComponentTagCompiler
     {
         return collect($attributes)
                 ->map(function (string $value, string $attribute) use ($escapeBound) {
-                    return $escapeBound && isset($this->boundAttributes[$attribute]) && $value !== 'true' && ! is_numeric($value)
-                                ? "'{$attribute}' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute({$value})"
-                                : "'{$attribute}' => {$value}";
+                    if (
+                        (! $escapeBound) ||
+                        (! isset($this->boundAttributes[$attribute])) ||
+                        ($value === 'true') ||
+                        is_numeric($value)
+                    ) {
+                        return "'{$attribute}' => {$value}";
+                    }
+
+                    return "'{$attribute}' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute({$value})";
                 })
                 ->implode(',');
     }
@@ -794,9 +801,18 @@ class ComponentTagCompiler
     {
         return collect($attributes)
             ->map(function (string $value, string $attribute) use ($escapeBound) {
-                return $escapeBound && isset($this->boundAttributes[$attribute]) && $value !== 'true' && ! is_numeric($value)
-                    ? "'{$attribute}' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(\$componentData['data']['" . Str::camel($attribute) . '\'] ?? null)'
-                    : "'{$attribute}' => {$value}";
+                if (
+                    (! $escapeBound) ||
+                    (! isset($this->boundAttributes[$attribute])) ||
+                    ($value === 'true') ||
+                    is_numeric($value)
+                ) {
+                    return "'{$attribute}' => {$value}";
+                }
+
+                return "'{$attribute}' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(" . (
+                    ($attribute === 'attributes') ? $value : ('$componentData[\'data\'][\'' . Str::camel($attribute) . '\'] ?? null')
+                ) . ')';
             })
             ->implode(',');
     }
