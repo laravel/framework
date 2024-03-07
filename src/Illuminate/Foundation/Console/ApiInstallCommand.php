@@ -71,7 +71,7 @@ class ApiInstallCommand extends Command
             $this->components->info('API scaffolding installed. Please add the [Laravel\Passport\HasApiTokens] trait to your User model.');
         } else {
             if (! $this->option('ignore-migrate-prompt')) {
-                if ($this->confirm('One new database migration has been published. Would you like to run all pending database migrations?', false)) {
+                if ($this->confirm('One new database migration has been published. Would you like to run all pending database migrations?', true)) {
                     $this->call('migrate');
                 }
             }
