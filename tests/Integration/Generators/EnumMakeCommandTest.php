@@ -12,9 +12,9 @@ class EnumMakeCommandTest extends TestCase
             ->assertExitCode(0);
 
         $this->assertFileContains([
-            'namespace App;',
+            'namespace App\Enums;',
             'enum StatusEnum',
-        ], 'app/StatusEnum.php');
+        ], 'app/Enums/StatusEnum.php');
     }
 
     public function testItCanGenerateEnumFileWithString()
@@ -23,9 +23,9 @@ class EnumMakeCommandTest extends TestCase
             ->assertExitCode(0);
 
         $this->assertFileContains([
-            'namespace App;',
+            'namespace App\Enums;',
             'enum StringEnum: string',
-        ], 'app/StringEnum.php');
+        ], 'app/Enums/StringEnum.php');
     }
 
     public function testItCanGenerateEnumFileWithInt()
@@ -34,8 +34,8 @@ class EnumMakeCommandTest extends TestCase
             ->assertExitCode(0);
 
         $this->assertFileContains([
-            'namespace App;',
+            'namespace App\Enums;',
             'enum IntEnum: int',
-        ], 'app/IntEnum.php');
+        ], 'app/Enums/IntEnum.php');
     }
 }
