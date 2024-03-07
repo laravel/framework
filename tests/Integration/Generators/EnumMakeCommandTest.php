@@ -2,6 +2,7 @@
 
 namespace Integration\Generators;
 
+use Illuminate\Support\Facades\File;
 use Illuminate\Tests\Integration\Generators\TestCase;
 
 class EnumMakeCommandTest extends TestCase
@@ -37,5 +38,18 @@ class EnumMakeCommandTest extends TestCase
             'namespace App;',
             'enum IntEnum: int',
         ], 'app/IntEnum.php');
+    }
+
+    public function testItCanGenerateEnumFileInEnumsFolder()
+    {
+        File::makeDirectory(app_path() . '\\Enums', force: true);
+
+        $this->artisan('make:enum', ['name' => 'ImplicitEnum'])
+            ->assertExitCode(0);
+
+        $this->assertFileContains([
+            'namespace App\Enums;',
+            'enum ImplicitEnum',
+        ], 'app/Enums/ImplicitEnum.php');
     }
 }
