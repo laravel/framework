@@ -56,7 +56,7 @@ class EnumMakeCommand extends GeneratorCommand
      */
     protected function getDefaultNamespace($rootNamespace)
     {
-        return $rootNamespace . '\\Enums';
+        return $rootNamespace.'\\Enums';
     }
 
     /**
