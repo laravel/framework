@@ -19,10 +19,10 @@
         "ext-filter": "*",
         "ext-mbstring": "*",
         "doctrine/inflector": "^2.0",
-        "illuminate/collections": "^11.0",
-        "illuminate/conditionable": "^11.0",
-        "illuminate/contracts": "^11.0",
-        "illuminate/macroable": "^11.0",
+        "illuminate/collections": "^12.0",
+        "illuminate/conditionable": "^12.0",
+        "illuminate/contracts": "^12.0",
+        "illuminate/macroable": "^12.0",
         "nesbot/carbon": "^2.72.2|^3.0",
         "voku/portable-ascii": "^2.0"
     },
@@ -42,11 +42,11 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "11.x-dev"
+            "dev-master": "12.x-dev"
         }
     },
     "suggest": {
-        "illuminate/filesystem": "Required to use the composer class (^11.0).",
+        "illuminate/filesystem": "Required to use the composer class (^12.0).",
         "league/commonmark": "Required to use Str::markdown() and Stringable::markdown() (^2.0.2).",
         "ramsey/uuid": "Required to use Str::uuid() (^4.7).",
         "symfony/process": "Required to use the composer class (^7.0).",
