@@ -21,7 +21,7 @@ class Sleep
     public static $fakeSleepCallbacks = [];
 
     /**
-     * Keep carbon's "now" in sync when sleeping.
+     * Keep Carbon's "now" in sync when sleeping.
      *
      * @var bool
      */
