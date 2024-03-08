@@ -792,22 +792,24 @@ class ComponentTagCompiler
      */
     protected function attributesToStringWithExistingComponentData(array $attributes, $escapeBound = true)
     {
-        return collect($attributes)
-            ->map(function (string $value, string $attribute) use ($escapeBound) {
-                if (
-                    (! $escapeBound) ||
-                    (! isset($this->boundAttributes[$attribute])) ||
-                    ($value === 'true') ||
-                    is_numeric($value)
-                ) {
-                    return "'{$attribute}' => {$value}";
-                }
+        $results = [];
 
-                return "'{$attribute}' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(".(
-                    ($attribute === 'attributes') ? $value : ('$componentData[\'data\'][\''.Str::camel($attribute).'\'] ?? null')
-                ).')';
-            })
-            ->implode(',');
+        foreach ($attributes as $attribute => $value) {
+            if (! $escapeBound ||
+                ! isset($this->boundAttributes[$attribute]) ||
+                $value === 'true' ||
+                is_numeric($value)) {
+                $results[] = "'{$attribute}' => {$value}";
+
+                continue;
+            }
+
+            $results[] = "'{$attribute}' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(".(
+                ($attribute === 'attributes') ? $value : ('$componentData[\'data\'][\''.Str::camel($attribute).'\'] ?? null')
+            ).')';
+        }
+
+        return implode(',', $results);
     }
 
     /**
