@@ -20,6 +20,12 @@ class ContextIntegrationTest extends TestCase
 {
     use LazilyRefreshDatabase;
 
+    public function test_it_can_hydrate_null()
+    {
+        Context::hydrate(null);
+        $this->assertEquals([], Context::all());
+    }
+
     public function test_it_handles_eloquent()
     {
         $user = UserFactory::new()->create(['name' => 'Tim']);
