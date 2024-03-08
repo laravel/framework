@@ -145,7 +145,7 @@ class BroadcastingInstallCommand extends Command
      */
     protected function installNodeDependencies()
     {
-        if (! confirm('Would you like to install and build Node dependencies?', default: true)) {
+        if (! confirm('Would you like to install and build the Node dependencies required for broadcasting?', default: true)) {
             return;
         }
 
@@ -169,6 +169,7 @@ class BroadcastingInstallCommand extends Command
         }
 
         Process::command(implode(' && ', $commands))
+            ->path(base_path())
             ->tty(true)
             ->run();
     }
