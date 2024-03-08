@@ -24,7 +24,7 @@ namespace Illuminate\Support\Facades;
  * @method static void isStackable(void $key)
  * @method static void isHiddenStackable(void $key)
  * @method static bool isEmpty()
- * @method static \Illuminate\Log\Context\Repository handleUnserializeExceptionUsing(callable $callback)
+ * @method static \Illuminate\Log\Context\Repository handleUnserializeExceptionsUsing(callable $callback)
  * @method static \Illuminate\Log\Context\Repository flush()
  * @method static void macro(string $name, object|callable $macro)
  * @method static void mixin(object $mixin, bool $replace = true)

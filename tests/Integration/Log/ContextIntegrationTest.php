@@ -126,7 +126,7 @@ class ContextIntegrationTest extends TestCase
             ],
         ];
 
-        Context::handleUnserializeExceptionUsing(function ($e, $key, $value, $hidden) {
+        Context::handleUnserializeExceptionsUsing(function ($e, $key, $value, $hidden) {
             if ($key === 'model') {
                 $this->assertSame('bad data', $value);
                 $this->assertFalse($hidden);
@@ -144,6 +144,6 @@ class ContextIntegrationTest extends TestCase
         $this->assertSame('replaced value 1', Context::get('model'));
         $this->assertSame('replaced value 2', Context::getHidden('other'));
 
-        Context::handleUnserializeExceptionUsing(null);
+        Context::handleUnserializeExceptionsUsing(null);
     }
 }

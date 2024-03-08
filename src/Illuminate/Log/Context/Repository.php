@@ -17,7 +17,7 @@ class Repository
     use Macroable, SerializesModels;
 
     /**
-     * The event dispatcher.
+     * The event dispatcher instance.
      *
      * @var \Illuminate\Events\Dispatcher
      */
@@ -38,11 +38,11 @@ class Repository
     protected $hidden = [];
 
     /**
-     * Callback to handle unserialize exceptions.
+     * The callback that should handle unserialize exceptions.
      *
      * @var callable|null
      */
-    protected static $handleUnserializeExceptionUsing;
+    protected static $handleUnserializeExceptionsUsing;
 
     /**
      * Create a new Context instance.
@@ -64,7 +64,7 @@ class Repository
     }
 
     /**
-     * Determine if the given key exists as hidden.
+     * Determine if the given key exists within the hidden context data.
      *
      * @param  string  $key
      * @return bool
@@ -75,7 +75,7 @@ class Repository
     }
 
     /**
-     * Retrieve all the values.
+     * Retrieve all the context data.
      *
      * @return array<string, mixed>
      */
@@ -85,7 +85,7 @@ class Repository
     }
 
     /**
-     * Retrieve all the hidden values.
+     * Retrieve all the hidden context data.
      *
      * @return array<string, mixed>
      */
@@ -139,7 +139,7 @@ class Repository
     }
 
     /**
-     * Set the given key's value.
+     * Add a context value.
      *
      * @param  string|array<string, mixed>  $key
      * @param  mixed  $value
@@ -157,7 +157,7 @@ class Repository
     }
 
     /**
-     * Set the given key's value as hidden.
+     * Add a hidden context value.
      *
      * @param  string|array<string, mixed>  $key
      * @param  mixed  $value
@@ -175,7 +175,7 @@ class Repository
     }
 
     /**
-     * Forget the given key's context.
+     * Forget the given context key.
      *
      * @param  string|array<int, string>  $key
      * @return $this
@@ -190,7 +190,7 @@ class Repository
     }
 
     /**
-     * Forget the given key's hidden context.
+     * Forget the given hidden context key.
      *
      * @param  string|array<int, string>  $key
      * @return $this
@@ -205,7 +205,7 @@ class Repository
     }
 
     /**
-     * Set the given key's value if it does not yet exist.
+     * Add a context value if it does not exist yet.
      *
      * @param  string  $key
      * @param  mixed  $value
@@ -221,7 +221,7 @@ class Repository
     }
 
     /**
-     * Set the given key's value as hidden if it does not yet exist.
+     * Add a hidden context value if it does not exist yet.
      *
      * @param  string  $key
      * @param  mixed  $value
@@ -258,7 +258,7 @@ class Repository
     }
 
     /**
-     * Push the given values onto the key's hidden stack.
+     * Push the given hidden values onto the key's stack.
      *
      * @param  string  $key
      * @param  mixed  ...$values
@@ -286,15 +286,8 @@ class Repository
      */
     protected function isStackable($key)
     {
-        if (! $this->has($key)) {
-            return true;
-        }
-
-        if (is_array($this->data[$key]) && array_is_list($this->data[$key])) {
-            return true;
-        }
-
-        return false;
+        return ! $this->has($key) ||
+            (is_array($this->data[$key]) && array_is_list($this->data[$key]));
     }
 
     /**
@@ -305,15 +298,8 @@ class Repository
      */
     protected function isHiddenStackable($key)
     {
-        if (! $this->hasHidden($key)) {
-            return true;
-        }
-
-        if (is_array($this->hidden[$key]) && array_is_list($this->hidden[$key])) {
-            return true;
-        }
-
-        return false;
+        return ! $this->hasHidden($key) ||
+            (is_array($this->hidden[$key]) && array_is_list($this->hidden[$key]));
     }
 
     /**
@@ -358,9 +344,9 @@ class Repository
      * @param  callable|null  $callback
      * @return static
      */
-    public function handleUnserializeExceptionUsing($callback)
+    public function handleUnserializeExceptionsUsing($callback)
     {
-        static::$handleUnserializeExceptionUsing = $callback;
+        static::$handleUnserializeExceptionsUsing = $callback;
 
         return $this;
     }
@@ -419,8 +405,8 @@ class Repository
                     }
                 });
             } catch (Throwable $e) {
-                if (static::$handleUnserializeExceptionUsing !== null) {
-                    return (static::$handleUnserializeExceptionUsing)($e, $key, $value, $hidden);
+                if (static::$handleUnserializeExceptionsUsing !== null) {
+                    return (static::$handleUnserializeExceptionsUsing)($e, $key, $value, $hidden);
                 }
 
                 if ($e instanceof ModelNotFoundException) {
