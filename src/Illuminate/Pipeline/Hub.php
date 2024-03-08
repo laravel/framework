@@ -53,7 +53,9 @@ class Hub implements HubContract
      */
     public function pipeline($name, Closure $callback)
     {
-        $this->pipelines[$name] = $callback;
+        if(!isset($this->pipelines[$name])){
+            $this->pipelines[$name] = $callback;
+        }
     }
 
     /**
