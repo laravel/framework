@@ -90,14 +90,30 @@ class ConfigurationUrlParser
     /**
      * Get the database name from the URL.
      *
-     * @param  array  $url
+     * @param array $url
      * @return string|null
      */
     protected function getDatabase($url)
     {
         $path = $url['path'] ?? null;
 
-        return $path && $path !== '/' ? substr($path, 1) : null;
+        $pairs = explode(';', $path);
+
+        $databaseName = null;
+
+        // Iterate over each pair
+        foreach ($pairs as $pair) {
+            // Split the pair into key and value
+            list($key, $value) = explode('=', $pair, 2); // Limit to 2 elements to ensure it splits only on the first '='
+
+            // Check if the key matches 'Database', case-insensitively
+            if (strcasecmp($key, 'Database') === 0) {
+                $databaseName = $value;
+                break; // Stop the loop once we've found the database name
+            }
+        }
+
+        return $databaseName;
     }
 
     /**
