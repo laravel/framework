@@ -2,7 +2,7 @@
 
 namespace Illuminate\Log\Context\Events;
 
-class Dehydrating
+class ContextDehydrating
 {
     /**
      * The context instance.
