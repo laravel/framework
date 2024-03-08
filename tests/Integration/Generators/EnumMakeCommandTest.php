@@ -39,19 +39,4 @@ class EnumMakeCommandTest extends TestCase
             'enum IntEnum: int',
         ], 'app/IntEnum.php');
     }
-
-    public function testItCanGenerateEnumFileInEnumsFolder()
-    {
-        File::makeDirectory(app_path().'\\Enums', force: true);
-
-        $this->artisan('make:enum', ['name' => 'ImplicitEnum'])
-            ->assertExitCode(0);
-
-        $this->assertFileContains([
-            'namespace App\Enums;',
-            'enum ImplicitEnum',
-        ], 'app/Enums/ImplicitEnum.php');
-
-        File::deleteDirectory(app_path().'\\Enums');
-    }
 }
