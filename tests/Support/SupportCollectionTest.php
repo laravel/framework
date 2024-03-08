@@ -2036,6 +2036,14 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals([['name' => 'taylor'], ['name' => 'dayle']], array_values($data->all()));
     }
 
+    #[DataProvider('collectionClassProvider')]
+    public function testSortByStringDesc($collection)
+    {
+        $data = new $collection([['id' => 1, 'name' => 'foo'], ['id' => 2, 'name' => 'bar']]);
+        $data = $data->sortByDesc(['id']);
+        $this->assertEquals([['id' => 2, 'name' => 'bar'], ['id' => 1, 'name' => 'foo']], array_values($data->all()));
+    }
+
     /**
      * @dataProvider collectionClassProvider
      */
