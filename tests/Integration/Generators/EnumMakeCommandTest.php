@@ -42,7 +42,7 @@ class EnumMakeCommandTest extends TestCase
 
     public function testItCanGenerateEnumFileInEnumsFolder()
     {
-        File::makeDirectory(app_path() . '\\Enums', force: true);
+        File::makeDirectory(app_path().'\\Enums', force: true);
 
         $this->artisan('make:enum', ['name' => 'ImplicitEnum'])
             ->assertExitCode(0);
@@ -51,5 +51,7 @@ class EnumMakeCommandTest extends TestCase
             'namespace App\Enums;',
             'enum ImplicitEnum',
         ], 'app/Enums/ImplicitEnum.php');
+
+        File::deleteDirectory(app_path().'\\Enums');
     }
 }
