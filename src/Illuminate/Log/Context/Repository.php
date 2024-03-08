@@ -408,7 +408,9 @@ class Repository
                 }
 
                 if ($e instanceof ModelNotFoundException) {
-                    report($e);
+                    if (function_exists('report')) {
+                        report($e);
+                    }
 
                     return null;
                 }
