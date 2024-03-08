@@ -2031,9 +2031,9 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals([['name' => 'dayle'], ['name' => 'taylor']], array_values($data->all()));
 
         $data = new $collection([['name' => 'taylor'], ['name' => 'dayle']]);
-        $data = $data->sortBy('name', SORT_STRING);
+        $data = $data->sortBy('name', SORT_STRING, true);
 
-        $this->assertEquals([['name' => 'dayle'], ['name' => 'taylor']], array_values($data->all()));
+        $this->assertEquals([['name' => 'taylor'], ['name' => 'dayle']], array_values($data->all()));
     }
 
     /**
@@ -2075,6 +2075,88 @@ class SupportCollectionTest extends TestCase
         $data = $data->sortBy([['sort', 'asc']]);
 
         $this->assertEquals([1 => ['sort' => 1], 0 => ['sort' => 2]], $data->all());
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testSortByMany($collection)
+    {
+        $data = new $collection([['item' => '1'], ['item' => '10'], ['item' => 5], ['item' => 20]]);
+        $expected = $data->pluck('item')->toArray();
+
+        sort($expected);
+        $data = $data->sortBy(['item']);
+        $this->assertEquals($data->pluck('item')->toArray(), $expected);
+
+        rsort($expected);
+        $data = $data->sortBy([['item', 'desc']]);
+        $this->assertEquals($data->pluck('item')->toArray(), $expected);
+
+        sort($expected, SORT_STRING);
+        $data = $data->sortBy(['item'], SORT_STRING);
+        $this->assertEquals($data->pluck('item')->toArray(), $expected);
+
+        rsort($expected, SORT_STRING);
+        $data = $data->sortBy([['item', 'desc']], SORT_STRING);
+        $this->assertEquals($data->pluck('item')->toArray(), $expected);
+
+        sort($expected, SORT_NUMERIC);
+        $data = $data->sortBy(['item'], SORT_NUMERIC);
+        $this->assertEquals($data->pluck('item')->toArray(), $expected);
+
+        rsort($expected, SORT_NUMERIC);
+        $data = $data->sortBy([['item', 'desc']], SORT_NUMERIC);
+        $this->assertEquals($data->pluck('item')->toArray(), $expected);
+
+        $data = new $collection([['item' => 'img1'], ['item' => 'img101'], ['item' => 'img10'], ['item' => 'img11']]);
+        $expected = $data->pluck('item')->toArray();
+
+        sort($expected, SORT_NUMERIC);
+        $data = $data->sortBy(['item'], SORT_NUMERIC);
+        $this->assertEquals($data->pluck('item')->toArray(), $expected);
+
+        sort($expected);
+        $data = $data->sortBy(['item']);
+        $this->assertEquals($data->pluck('item')->toArray(), $expected);
+
+        sort($expected, SORT_NATURAL);
+        $data = $data->sortBy(['item'], SORT_NATURAL);
+        $this->assertEquals($data->pluck('item')->toArray(), $expected);
+
+        $data = new $collection([['item' => 'img1'], ['item' => 'Img101'], ['item' => 'img10'], ['item' => 'Img11']]);
+        $expected = $data->pluck('item')->toArray();
+
+        sort($expected);
+        $data = $data->sortBy(['item']);
+        $this->assertEquals($data->pluck('item')->toArray(), $expected);
+
+        sort($expected, SORT_NATURAL | SORT_FLAG_CASE);
+        $data = $data->sortBy(['item'], SORT_NATURAL | SORT_FLAG_CASE);
+        $this->assertEquals($data->pluck('item')->toArray(), $expected);
+
+        sort($expected, SORT_FLAG_CASE | SORT_STRING);
+        $data = $data->sortBy(['item'], SORT_FLAG_CASE | SORT_STRING);
+        $this->assertEquals($data->pluck('item')->toArray(), $expected);
+
+        sort($expected, SORT_FLAG_CASE | SORT_NUMERIC);
+        $data = $data->sortBy(['item'], SORT_FLAG_CASE | SORT_NUMERIC);
+        $this->assertEquals($data->pluck('item')->toArray(), $expected);
+
+        $data = new $collection([['item' => 'Österreich'], ['item' => 'Oesterreich'], ['item' => 'Zeta']]);
+        $expected = $data->pluck('item')->toArray();
+
+        sort($expected);
+        $data = $data->sortBy(['item']);
+        $this->assertEquals($data->pluck('item')->toArray(), $expected);
+
+        sort($expected, SORT_LOCALE_STRING);
+        $data = $data->sortBy(['item'], SORT_LOCALE_STRING);
+        $this->assertEquals($data->pluck('item')->toArray(), $expected);
+
+        setlocale(LC_ALL, 'de_DE');
+
+        sort($expected, SORT_LOCALE_STRING);
+        $data = $data->sortBy(['item'], SORT_LOCALE_STRING);
+        $this->assertEquals($data->pluck('item')->toArray(), $expected);
     }
 
     /**

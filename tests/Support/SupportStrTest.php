@@ -98,6 +98,7 @@ class SupportStrTest extends TestCase
         $this->assertSame('To Kill a Mockingbird', Str::apa('To Kill A Mockingbird'));
 
         $this->assertSame('', Str::apa(''));
+        $this->assertSame('   ', Str::apa('   '));
     }
 
     public function testStringWithoutWordsDoesntProduceError()
