@@ -3,7 +3,7 @@
 namespace Illuminate\Log;
 
 use Closure;
-use Illuminate\Log\Context\Repository;
+use Illuminate\Log\Context\Repository as ContextRepository;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
 use Monolog\Formatter\LineFormatter;
@@ -139,13 +139,13 @@ class LogManager implements LoggerInterface
                 return $this->channels[$name] = tap($this->tap($name, new Logger($logger, $this->app['events']))
                     ->withContext($this->sharedContext))
                     ->pushProcessor(function ($record) {
-                        if (! $this->app->bound(Repository::class)) {
+                        if (! $this->app->bound(ContextRepository::class)) {
                             return $record;
                         }
 
                         return $record->with(extra: [
                             ...$record->extra,
-                            ...$this->app[Repository::class]->all(),
+                            ...$this->app[ContextRepository::class]->all(),
                         ]);
                     });
             });

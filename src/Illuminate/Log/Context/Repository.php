@@ -53,6 +53,92 @@ class Repository
     }
 
     /**
+     * Determine if the given key exists.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    public function has($key)
+    {
+        return array_key_exists($key, $this->data);
+    }
+
+    /**
+     * Determine if the given key exists as hidden.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    public function hasHidden($key)
+    {
+        return array_key_exists($key, $this->hidden);
+    }
+
+    /**
+     * Retrieve all the values.
+     *
+     * @return array<string, mixed>
+     */
+    public function all()
+    {
+        return $this->data;
+    }
+
+    /**
+     * Retrieve all the hidden values.
+     *
+     * @return array<string, mixed>
+     */
+    public function allHidden()
+    {
+        return $this->hidden;
+    }
+
+    /**
+     * Retrieve the given key's value.
+     *
+     * @param  string  $key
+     * @return mixed
+     */
+    public function get($key)
+    {
+        return $this->data[$key] ?? null;
+    }
+
+    /**
+     * Retrieve the given key's hidden value.
+     *
+     * @param  string  $key
+     * @return mixed
+     */
+    public function getHidden($key)
+    {
+        return $this->hidden[$key] ?? null;
+    }
+
+    /**
+     * Retrieve only the values of the given keys.
+     *
+     * @param  array<int, string>  $keys
+     * @return array<string, mixed>
+     */
+    public function only($keys)
+    {
+        return array_intersect_key($this->data, array_flip($keys));
+    }
+
+    /**
+     * Retrieve only the hidden values of the given keys.
+     *
+     * @param  array<int, string>  $keys
+     * @return array<string, mixed>
+     */
+    public function onlyHidden($keys)
+    {
+        return array_intersect_key($this->hidden, array_flip($keys));
+    }
+
+    /**
      * Set the given key's value.
      *
      * @param  string|array<string, mixed>  $key
@@ -151,68 +237,6 @@ class Repository
     }
 
     /**
-     * Retrieve the given key's value.
-     *
-     * @param  string  $key
-     * @return mixed
-     */
-    public function get($key)
-    {
-        return $this->data[$key] ?? null;
-    }
-
-    /**
-     * Retrieve the given key's hidden value.
-     *
-     * @param  string  $key
-     * @return mixed
-     */
-    public function getHidden($key)
-    {
-        return $this->hidden[$key] ?? null;
-    }
-
-    /**
-     * Retrieve only the values of the given keys.
-     *
-     * @param  array<int, string>  $keys
-     * @return array<string, mixed>
-     */
-    public function only($keys)
-    {
-        return array_reduce($keys, function ($carry, $key) {
-            if (! $this->has($key)) {
-                return $carry;
-            }
-
-            return [
-                ...$carry,
-                ...[$key => $this->get($key)],
-            ];
-        }, []);
-    }
-
-    /**
-     * Retrieve only the hidden values of the given keys.
-     *
-     * @param  array<int, string>  $keys
-     * @return array<string, mixed>
-     */
-    public function onlyHidden($keys)
-    {
-        return array_reduce($keys, function ($carry, $key) {
-            if (! $this->hasHidden($key)) {
-                return $carry;
-            }
-
-            return [
-                ...$carry,
-                ...[$key => $this->getHidden($key)],
-            ];
-        }, []);
-    }
-
-    /**
      * Push the given values onto the key's stack.
      *
      * @param  string  $key
@@ -250,84 +274,6 @@ class Repository
             ...$this->hidden[$key] ?? [],
             ...$values,
         ];
-
-        return $this;
-    }
-
-    /**
-     * Determine if the given key exists.
-     *
-     * @param  string  $key
-     * @return bool
-     */
-    public function has($key)
-    {
-        return array_key_exists($key, $this->data);
-    }
-
-    /**
-     * Determine if the given key exists as hidden.
-     *
-     * @param  string  $key
-     * @return bool
-     */
-    public function hasHidden($key)
-    {
-        return array_key_exists($key, $this->hidden);
-    }
-
-    /**
-     * Retrieve all the values.
-     *
-     * @return array<string, mixed>
-     */
-    public function all()
-    {
-        return $this->data;
-    }
-
-    /**
-     * Retrieve all the hidden values.
-     *
-     * @return array<string, mixed>
-     */
-    public function allHidden()
-    {
-        return $this->hidden;
-    }
-
-    /**
-     * Determine if the repository is empty.
-     *
-     * @return bool
-     */
-    public function isEmpty()
-    {
-        return $this->all() === [] && $this->allHidden() === [];
-    }
-
-    /**
-     * Execute the given callback when context is about to be dehydrated.
-     *
-     * @param  callable  $callback
-     * @return $this
-     */
-    public function dehydrating($callback)
-    {
-        $this->events->listen(fn (Dehydrating $event) => $callback($event->context));
-
-        return $this;
-    }
-
-    /**
-     * Execute the given callback when context has been hydrated.
-     *
-     * @param  callable  $callback
-     * @return $this
-     */
-    public function hydrated($callback)
-    {
-        $this->events->listen(fn (Hydrated $event) => $callback($event->context));
 
         return $this;
     }
@@ -371,6 +317,42 @@ class Repository
     }
 
     /**
+     * Determine if the repository is empty.
+     *
+     * @return bool
+     */
+    public function isEmpty()
+    {
+        return $this->all() === [] && $this->allHidden() === [];
+    }
+
+    /**
+     * Execute the given callback when context is about to be dehydrated.
+     *
+     * @param  callable  $callback
+     * @return $this
+     */
+    public function dehydrating($callback)
+    {
+        $this->events->listen(fn (Dehydrating $event) => $callback($event->context));
+
+        return $this;
+    }
+
+    /**
+     * Execute the given callback when context has been hydrated.
+     *
+     * @param  callable  $callback
+     * @return $this
+     */
+    public function hydrated($callback)
+    {
+        $this->events->listen(fn (Hydrated $event) => $callback($event->context));
+
+        return $this;
+    }
+
+    /**
      * Handle unserialize exceptions using the given callback.
      *
      * @param  callable|null  $callback
@@ -391,7 +373,6 @@ class Repository
     public function flush()
     {
         $this->data = [];
-
         $this->hidden = [];
 
         return $this;
