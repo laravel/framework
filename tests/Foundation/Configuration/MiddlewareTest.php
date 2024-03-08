@@ -12,6 +12,7 @@ use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull;
 use Illuminate\Foundation\Http\Middleware\PreventRequestsDuringMaintenance;
 use Illuminate\Foundation\Http\Middleware\TrimStrings;
+use Illuminate\Foundation\Http\Middleware\ValidateCsrfToken;
 use Illuminate\Http\Middleware\TrustHosts;
 use Illuminate\Http\Middleware\TrustProxies;
 use Illuminate\Http\Request;
@@ -279,5 +280,21 @@ class MiddlewareTest extends TestCase
 
         $configuration->preventRequestsDuringMaintenance(['metrics/*']);
         $this->assertTrue($method->invoke($middleware, $request));
+    }
+
+    public function testNeverAddHttpCookie()
+    {
+        $configuration = new Middleware();
+        $app = Mockery::mock(Application::class);
+        $encrypter = Mockery::mock(Encrypter::class);
+        $middleware = new ValidateCsrfToken($app, $encrypter);
+
+        $this->assertTrue($middleware->shouldAddXsrfTokenCookie());
+
+        $configuration->neverAddHttpCookie();
+        $this->assertFalse($middleware->shouldAddXsrfTokenCookie());
+
+        $configuration->neverAddHttpCookie(false);
+        $this->assertTrue($middleware->shouldAddXsrfTokenCookie());
     }
 }

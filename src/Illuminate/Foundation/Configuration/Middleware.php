@@ -552,6 +552,19 @@ class Middleware
     }
 
     /**
+     * Configure if we want to add the CSRF token to the http cookie.
+     *
+     * @param  bool  $status
+     * @return $this
+     */
+    public function neverAddHttpCookie(bool $status = true)
+    {
+        ValidateCsrfToken::neverAddHttpCookie($status);
+
+        return $this;
+    }
+
+    /**
      * Configure the URL signature validation middleware.
      *
      * @param  array  $except

@@ -42,6 +42,13 @@ class VerifyCsrfToken
     protected static $neverVerify = [];
 
     /**
+     * Indicates whether the XSRF-TOKEN cookie should never be set on the response globally.
+     *
+     * @var bool
+     */
+    protected static $neverAddHttpCookie = false;
+
+    /**
      * Indicates whether the XSRF-TOKEN cookie should be set on the response.
      *
      * @var bool
@@ -162,7 +169,7 @@ class VerifyCsrfToken
      */
     public function shouldAddXsrfTokenCookie()
     {
-        return $this->addHttpCookie;
+        return ! static::$neverAddHttpCookie && $this->addHttpCookie;
     }
 
     /**
@@ -222,6 +229,17 @@ class VerifyCsrfToken
     }
 
     /**
+     * Indicate that the CSRF token should not be added to the response cookies.
+     *
+     * @param  bool  $status
+     * @return void
+     */
+    public static function neverAddHttpCookie(bool $status = true)
+    {
+        static::$neverAddHttpCookie = $status;
+    }
+
+    /**
      * Determine if the cookie contents should be serialized.
      *
      * @return bool
@@ -239,5 +257,7 @@ class VerifyCsrfToken
     public static function flushState()
     {
         static::$neverVerify = [];
+
+        static::$neverAddHttpCookie = false;
     }
 }
