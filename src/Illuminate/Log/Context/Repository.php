@@ -147,11 +147,10 @@ class Repository
      */
     public function add($key, $value = null)
     {
-        $values = is_array($key) ? $key : [$key => $value];
-
-        foreach ($values as $key => $value) {
-            $this->data[$key] = $value;
-        }
+        $this->data = array_merge(
+            $this->data,
+            is_array($key) ? $key : [$key => $value]
+        );
 
         return $this;
     }
@@ -165,11 +164,10 @@ class Repository
      */
     public function addHidden($key, $value = null)
     {
-        $values = is_array($key) ? $key : [$key => $value];
-
-        foreach ($values as $key => $value) {
-            $this->hidden[$key] = $value;
-        }
+        $this->hidden = array_merge(
+            $this->hidden,
+            is_array($key) ? $key : [$key => $value]
+        );
 
         return $this;
     }
@@ -352,7 +350,7 @@ class Repository
     }
 
     /**
-     * Flush all state.
+     * Flush all context data.
      *
      * @return $this
      */
