@@ -279,6 +279,7 @@ abstract class Facade
             'Bus' => Bus::class,
             'Cache' => Cache::class,
             'Config' => Config::class,
+            'Context' => Context::class,
             'Cookie' => Cookie::class,
             'Crypt' => Crypt::class,
             'Date' => Date::class,
