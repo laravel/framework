@@ -46,7 +46,7 @@ class BroadcastingInstallCommand extends Command
             ! $this->option('force')) {
             $this->components->error('Broadcasting routes file already exists.');
         } else {
-            $this->components->info("Published 'channels' routes file.");
+            $this->components->info("Published 'channels' route file.");
 
             copy(__DIR__.'/stubs/broadcasting-routes.stub', $broadcastingRoutesPath);
 
