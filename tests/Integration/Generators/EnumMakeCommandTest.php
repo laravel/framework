@@ -2,7 +2,6 @@
 
 namespace Integration\Generators;
 
-use Illuminate\Support\Facades\File;
 use Illuminate\Tests\Integration\Generators\TestCase;
 
 class EnumMakeCommandTest extends TestCase
