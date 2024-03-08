@@ -153,12 +153,12 @@ class BroadcastingInstallCommand extends Command
 
         if (file_exists(base_path('pnpm-lock.yaml'))) {
             $commands = [
-                'pnpm add laravel-echo pusher-js',
+                'pnpm add --save-dev laravel-echo pusher-js',
                 'pnpm run build',
             ];
         } elseif (file_exists(base_path('yarn.lock'))) {
             $commands = [
-                'yarn add laravel-echo pusher-js',
+                'yarn add --dev laravel-echo pusher-js',
                 'yarn run build',
             ];
         } else {
