@@ -761,7 +761,11 @@ class Gate implements GateContract
 
             $method = $this->formatAbilityToMethod($ability);
 
-            return $this->callPolicyMethod($policy, $method, $user, $arguments);
+            $result = $this->callPolicyMethod($policy, $method, $user, $arguments);
+
+            return $this->callPolicyAfter(
+                $policy, $user, $ability, $result, $arguments
+            );
         };
     }
 
@@ -783,6 +787,25 @@ class Gate implements GateContract
         if ($this->canBeCalledWithUser($user, $policy, 'before')) {
             return $policy->before($user, $ability, ...$arguments);
         }
+    }
+
+    /**
+     * Call the "after" method on the given policy, if applicable.
+     *
+     * @param  mixed  $policy
+     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
+     * @param  string  $ability
+     * @param  mixed  $result
+     * @param  array  $arguments
+     * @return mixed
+     */
+    protected function callPolicyAfter($policy, $user, $ability, $result, $arguments)
+    {
+        if (method_exists($policy, 'after') && $this->canBeCalledWithUser($user, $policy, 'after')) {
+            return $policy->after($user, $ability, $result, ...$arguments);
+        }
+
+        return $result;
     }
 
     /**
