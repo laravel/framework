@@ -249,7 +249,7 @@ trait EnumeratesValues
      */
     public function dumpArray()
     {
-        (new static(func_get_args()))
+        (new Collection(func_get_args()))
             ->push($this->all())
             ->each(function ($item) {
                 VarDumper::dump(
