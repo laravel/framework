@@ -64,6 +64,13 @@ class SimpleMessage
     public $actionUrl;
 
     /**
+     * The color of the action button.
+     *
+     * @var string
+     */
+    public $actionColor;
+
+    /**
      * The name of the mailer that should send the notification.
      *
      * @var string
@@ -247,12 +254,14 @@ class SimpleMessage
      *
      * @param  string  $text
      * @param  string  $url
+     * @param  string|null  $color
      * @return $this
      */
-    public function action($text, $url)
+    public function action($text, $url, $color = null)
     {
         $this->actionText = $text;
         $this->actionUrl = $url;
+        $this->actionColor = $color;
 
         return $this;
     }
@@ -286,6 +295,7 @@ class SimpleMessage
             'outroLines' => $this->outroLines,
             'actionText' => $this->actionText,
             'actionUrl' => $this->actionUrl,
+            'actionColor' => $this->actionColor,
             'displayableActionUrl' => str_replace(['mailto:', 'tel:'], '', $this->actionUrl ?? ''),
         ];
     }
