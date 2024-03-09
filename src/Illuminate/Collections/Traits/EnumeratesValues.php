@@ -239,7 +239,10 @@ trait EnumeratesValues
         (new static(func_get_args()))
             ->push($this->all())
             ->each(function ($item) {
-                VarDumper::dump(method_exists($item, 'toArray') ? $item->toArray() : $item);
+                VarDumper::dump(
+                    is_object($item) && method_exists($item, 'toArray')
+                        ? $item->toArray()
+                        : $item);
             });
 
         return $this;
