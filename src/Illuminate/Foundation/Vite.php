@@ -652,7 +652,9 @@ class Vite implements Htmlable
      */
     protected function hotAsset($asset)
     {
-        return rtrim(file_get_contents($this->hotFile())).'/'.$asset;
+        $hotURL = parse_url(file_get_contents($this->hotFile()));
+        $hotURLNew = str_replace('//' . $hotURL['host'], '//' . app(Request::class)->getHost(), file_get_contents($this->hotFile()));
+        return rtrim($hotURLNew) . '/' . $asset;
     }
 
     /**
