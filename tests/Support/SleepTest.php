@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Support;
 use Carbon\CarbonInterval;
 use Exception;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Sleep;
 use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\TestCase;
@@ -562,5 +563,34 @@ class SleepTest extends TestCase
         Sleep::for(1)->millisecond();
 
         $this->assertTrue(true);
+    }
+
+    public function testItDoesNotSyncCarbon()
+    {
+        Carbon::setTestNow('2000-01-01 00:00:00');
+        Sleep::fake();
+
+        Sleep::for(5)->minutes()
+            ->and(3)->seconds();
+
+        Sleep::assertSequence([
+            Sleep::for(303)->seconds(),
+        ]);
+        $this->assertSame('2000-01-01 00:00:00', Date::now()->toDateTimeString());
+    }
+
+    public function testItCanSyncCarbon()
+    {
+        Carbon::setTestNow('2000-01-01 00:00:00');
+        Sleep::fake();
+        Sleep::syncWithCarbon();
+
+        Sleep::for(5)->minutes()
+            ->and(3)->seconds();
+
+        Sleep::assertSequence([
+            Sleep::for(303)->seconds(),
+        ]);
+        $this->assertSame('2000-01-01 00:05:03', Date::now()->toDateTimeString());
     }
 }

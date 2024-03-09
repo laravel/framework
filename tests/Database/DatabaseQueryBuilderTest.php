@@ -1185,6 +1185,68 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals(['Car Plane'], $builder->getBindings());
     }
 
+    public function testWhereAll()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereAll(['last_name', 'email'], '%Otwell%');
+        $this->assertSame('select * from "users" where ("last_name" = ? and "email" = ?)', $builder->toSql());
+        $this->assertEquals(['%Otwell%', '%Otwell%'], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereAll(['last_name', 'email'], 'not like', '%Otwell%');
+        $this->assertSame('select * from "users" where ("last_name" not like ? and "email" not like ?)', $builder->toSql());
+        $this->assertEquals(['%Otwell%', '%Otwell%'], $builder->getBindings());
+    }
+
+    public function testOrWhereAll()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('first_name', 'like', '%Taylor%')->orWhereAll(['last_name', 'email'], 'like', '%Otwell%');
+        $this->assertSame('select * from "users" where "first_name" like ? or ("last_name" like ? and "email" like ?)', $builder->toSql());
+        $this->assertEquals(['%Taylor%', '%Otwell%', '%Otwell%'], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('first_name', 'like', '%Taylor%')->whereAll(['last_name', 'email'], 'like', '%Otwell%', 'or');
+        $this->assertSame('select * from "users" where "first_name" like ? or ("last_name" like ? and "email" like ?)', $builder->toSql());
+        $this->assertEquals(['%Taylor%', '%Otwell%', '%Otwell%'], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('first_name', 'like', '%Taylor%')->orWhereAll(['last_name', 'email'], '%Otwell%');
+        $this->assertSame('select * from "users" where "first_name" like ? or ("last_name" = ? and "email" = ?)', $builder->toSql());
+        $this->assertEquals(['%Taylor%', '%Otwell%', '%Otwell%'], $builder->getBindings());
+    }
+
+    public function testWhereAny()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereAny(['last_name', 'email'], 'like', '%Otwell%');
+        $this->assertSame('select * from "users" where ("last_name" like ? or "email" like ?)', $builder->toSql());
+        $this->assertEquals(['%Otwell%', '%Otwell%'], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereAny(['last_name', 'email'], '%Otwell%');
+        $this->assertSame('select * from "users" where ("last_name" = ? or "email" = ?)', $builder->toSql());
+        $this->assertEquals(['%Otwell%', '%Otwell%'], $builder->getBindings());
+    }
+
+    public function testOrWhereAny()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('first_name', 'like', '%Taylor%')->orWhereAny(['last_name', 'email'], 'like', '%Otwell%');
+        $this->assertSame('select * from "users" where "first_name" like ? or ("last_name" like ? or "email" like ?)', $builder->toSql());
+        $this->assertEquals(['%Taylor%', '%Otwell%', '%Otwell%'], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('first_name', 'like', '%Taylor%')->whereAny(['last_name', 'email'], 'like', '%Otwell%', 'or');
+        $this->assertSame('select * from "users" where "first_name" like ? or ("last_name" like ? or "email" like ?)', $builder->toSql());
+        $this->assertEquals(['%Taylor%', '%Otwell%', '%Otwell%'], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('first_name', 'like', '%Taylor%')->orWhereAny(['last_name', 'email'], '%Otwell%');
+        $this->assertSame('select * from "users" where "first_name" like ? or ("last_name" = ? or "email" = ?)', $builder->toSql());
+        $this->assertEquals(['%Taylor%', '%Otwell%', '%Otwell%'], $builder->getBindings());
+    }
+
     public function testUnions()
     {
         $builder = $this->getBuilder();

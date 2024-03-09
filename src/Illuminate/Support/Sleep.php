@@ -2,7 +2,6 @@
 
 namespace Illuminate\Support;
 
-use Carbon\Carbon;
 use Carbon\CarbonInterval;
 use DateInterval;
 use Illuminate\Support\Traits\Macroable;
@@ -19,6 +18,13 @@ class Sleep
      * @var array
      */
     public static $fakeSleepCallbacks = [];
+
+    /**
+     * Keep Carbon's "now" in sync when sleeping.
+     *
+     * @var bool
+     */
+    protected static $syncWithCarbon = false;
 
     /**
      * The total duration to sleep.
@@ -259,6 +265,10 @@ class Sleep
         if (static::$fake) {
             static::$sequence[] = $this->duration;
 
+            if (static::$syncWithCarbon) {
+                Carbon::setTestNow(Carbon::now()->add($this->duration));
+            }
+
             foreach (static::$fakeSleepCallbacks as $callback) {
                 $callback($this->duration);
             }
@@ -317,6 +327,7 @@ class Sleep
 
         static::$sequence = [];
         static::$fakeSleepCallbacks = [];
+        static::$syncWithCarbon = false;
     }
 
     /**
@@ -457,5 +468,15 @@ class Sleep
     public static function whenFakingSleep($callback)
     {
         static::$fakeSleepCallbacks[] = $callback;
+    }
+
+    /**
+     * Indicate that Carbon's "now" should be kept in sync when sleeping.
+     *
+     * @return void
+     */
+    public static function syncWithCarbon($value = true)
+    {
+        static::$syncWithCarbon = $value;
     }
 }

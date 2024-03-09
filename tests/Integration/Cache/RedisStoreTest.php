@@ -76,6 +76,20 @@ class RedisStoreTest extends TestCase
         $this->assertNan(Cache::store('redis')->get('foo'));
     }
 
+    public function testItCanExpireWithZeroTTL()
+    {
+        Cache::store('redis')->clear();
+
+        $result = Cache::store('redis')->put('foo', 10, 10);
+        $this->assertTrue($result);
+
+        $result = Cache::store('redis')->put('foo', 10, 0);
+        $this->assertTrue($result);
+
+        $value = Cache::store('redis')->get('foo');
+        $this->assertNull($value);
+    }
+
     public function testTagsCanBeAccessed()
     {
         Cache::store('redis')->clear();
@@ -145,6 +159,9 @@ class RedisStoreTest extends TestCase
         Cache::store('redis')->clear();
 
         Cache::store('redis')->tags(['votes'])->add('person-1', 0, new DateTime('yesterday'));
+
+        $value = Cache::store('redis')->tags(['votes'])->get('person-1');
+        $this->assertNull($value);
 
         $keyCount = Cache::store('redis')->connection()->keys('*');
         $this->assertEquals(0, count($keyCount));
