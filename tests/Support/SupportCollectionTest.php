@@ -4614,22 +4614,22 @@ class SupportCollectionTest extends TestCase
         });
 
         $collection = new Collection([
-            (new Model())->forceFill(['id' => 1]),
+            1,
             (new Model())->forceFill(['id' => 2]),
-            (new Model())->forceFill(['id' => 3]),
+            'three',
         ]);
 
         $collection->dumpArray(
             (new Model())->forceFill(['id' => 4]),
-            (new Model())->forceFill(['id' => 5]),
+            5,
         );
 
         $this->assertSame([
-            ['id' => 1],
+            1,
             ['id' => 2],
-            ['id' => 3],
+            'three',
             ['id' => 4],
-            ['id' => 5],
+            5,
         ], $log->all());
 
         VarDumper::setHandler(null);
