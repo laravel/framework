@@ -241,7 +241,6 @@ trait EnumeratesValues
         return $this;
     }
 
-
     /**
      * Dump the items in array format.
      *
