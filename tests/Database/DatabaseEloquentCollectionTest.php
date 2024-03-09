@@ -12,6 +12,7 @@ use LogicException;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use stdClass;
+use Symfony\Component\VarDumper\VarDumper;
 
 class DatabaseEloquentCollectionTest extends TestCase
 {
@@ -89,6 +90,35 @@ class DatabaseEloquentCollectionTest extends TestCase
         $this->assertTrue($c->contains('id', 1));
         $this->assertTrue($c->contains('id', '>=', 2));
         $this->assertFalse($c->contains('id', '>', 2));
+    }
+
+    public function testDumpArray($collection)
+    {
+        $log = new Collection;
+        VarDumper::setHandler(function ($value) use ($log) {
+            $log->add($value);
+        });
+
+        $collection = new Collection([
+            (new TestEloquentCollectionModel())->forceFill(['id' => 1]),
+            (new TestEloquentCollectionModel())->forceFill(['id' => 2]),
+            (new TestEloquentCollectionModel())->forceFill(['id' => 3]),
+        ]);
+
+        $collection->dumpArray(
+            (new TestEloquentCollectionModel())->forceFill(['id' => 4]),
+            (new TestEloquentCollectionModel())->forceFill(['id' => 5]),
+        );
+
+        $this->assertSame([
+            ['id' => 1],
+            ['id' => 2],
+            ['id' => 3],
+            ['id' => 4],
+            ['id' => 5],
+        ], $log->all());
+
+        VarDumper::setHandler(null);
     }
 
     public function testContainsIndicatesIfModelInArray()
