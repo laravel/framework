@@ -4606,6 +4606,9 @@ class SupportCollectionTest extends TestCase
         VarDumper::setHandler(null);
     }
 
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testDumpArray($collection)
     {
         $log = new Collection;
@@ -4613,13 +4616,11 @@ class SupportCollectionTest extends TestCase
             $log->add($value);
         });
 
-        $collection = new Collection([
+        (new $collection([
             'one',
             (new Model())->forceFill(['id' => 2]),
             3,
-        ]);
-
-        $collection->dumpArray(
+        ]))->dumpArray(
             (new Model())->forceFill(['id' => 4]),
             'five',
         );
