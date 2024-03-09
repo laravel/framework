@@ -249,12 +249,9 @@ trait EnumeratesValues
     public function dumpArray()
     {
         (new Collection(func_get_args()))
-            ->push($this->all())
+            ->push($this->toArray())
             ->each(function ($item) {
-                VarDumper::dump(
-                    is_object($item) && method_exists($item, 'toArray')
-                        ? $item->toArray()
-                        : $item);
+                VarDumper::dump($item);
             });
 
         return $this;

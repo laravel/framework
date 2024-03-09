@@ -4621,16 +4621,18 @@ class SupportCollectionTest extends TestCase
             new TestArrayableObject,
             3,
         ]))->dumpArray(
-            new TestArrayableObject,
-            'five',
+            'dump'
+            'array',
         );
 
         $this->assertSame([
-            'one',
-            ['foo' => 'bar'],
-            3,
-            ['foo' => 'bar'],
-            'five',
+            'dump',
+            'array',
+            [
+                'one',
+                ['foo' => 'bar'],
+                3,
+            ],
         ], $log->all());
 
         VarDumper::setHandler(null);
