@@ -4606,6 +4606,35 @@ class SupportCollectionTest extends TestCase
         VarDumper::setHandler(null);
     }
 
+    public function testDumpArray($collection)
+    {
+        $log = new Collection;
+        VarDumper::setHandler(function ($value) use ($log) {
+            $log->add($value);
+        });
+
+        $collection = new Collection([
+            (new Model())->forceFill(['id' => 1]),
+            (new Model())->forceFill(['id' => 2]),
+            (new Model())->forceFill(['id' => 3]),
+        ]);
+
+        $collection->dumpArray(
+            (new Model())->forceFill(['id' => 4]),
+            (new Model())->forceFill(['id' => 5]),
+        );
+
+        $this->assertSame([
+            ['id' => 1],
+            ['id' => 2],
+            ['id' => 3],
+            ['id' => 4],
+            ['id' => 5],
+        ], $log->all());
+
+        VarDumper::setHandler(null);
+    }
+
     /**
      * @dataProvider collectionClassProvider
      */

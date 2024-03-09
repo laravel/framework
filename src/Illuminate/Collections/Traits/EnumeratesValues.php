@@ -228,6 +228,23 @@ trait EnumeratesValues
         return $this;
     }
 
+
+    /**
+     * Dump the items in array format.
+     *
+     * @return $this
+     */
+    public function dumpArray()
+    {
+        (new static(func_get_args()))
+            ->push($this->all())
+            ->each(function ($item) {
+                VarDumper::dump(method_exists($item, 'toArray') ? $item->toArray() : $item);
+            });
+
+        return $this;
+    }
+
     /**
      * Execute a callback over each item.
      *

@@ -9,7 +9,6 @@ use Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithDictionary;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection as BaseCollection;
 use LogicException;
-use Symfony\Component\VarDumper\VarDumper;
 
 /**
  * @template TKey of array-key
@@ -303,22 +302,6 @@ class Collection extends BaseCollection implements QueueableCollection
         }
 
         return parent::contains(fn ($model) => $model->getKey() == $key);
-    }
-
-    /**
-     * Dump the items in array format.
-     *
-     * @return $this
-     */
-    public function dumpArray()
-    {
-        (new static(func_get_args()))
-            ->push($this->all())
-            ->each(function ($item) {
-                VarDumper::dump($item->toArray());
-            });
-
-        return $this;
     }
 
     /**
