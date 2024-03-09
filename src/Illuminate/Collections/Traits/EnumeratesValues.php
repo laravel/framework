@@ -213,6 +213,19 @@ trait EnumeratesValues
     }
 
     /**
+     * Dump the items and end the script.
+     *
+     * @param  mixed  ...$args
+     * @return never
+     */
+    public function ddArray(...$args)
+    {
+        $this->dumpArray(...$args);
+
+        exit(1);
+    }
+
+    /**
      * Dump the items.
      *
      * @return $this
