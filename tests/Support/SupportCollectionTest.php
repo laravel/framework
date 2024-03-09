@@ -4621,7 +4621,7 @@ class SupportCollectionTest extends TestCase
             new TestArrayableObject,
             3,
         ]))->dumpArray(
-            'dump'
+            'dump',
             'array',
         );
 
