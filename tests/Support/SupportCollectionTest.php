@@ -9,7 +9,6 @@ use CachingIterator;
 use Exception;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\ItemNotFoundException;
@@ -4619,18 +4618,18 @@ class SupportCollectionTest extends TestCase
 
         (new $collection([
             'one',
-            (new Model())->forceFill(['id' => 2]),
+            new TestArrayableObject,
             3,
         ]))->dumpArray(
-            (new Model())->forceFill(['id' => 4]),
+            new TestArrayableObject,
             'five',
         );
 
         $this->assertSame([
             'one',
-            ['id' => 2],
+            ['foo' => 'bar'],
             3,
-            ['id' => 4],
+            ['foo' => 'bar'],
             'five',
         ], $log->all());
 
