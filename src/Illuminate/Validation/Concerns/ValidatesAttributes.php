@@ -42,9 +42,7 @@ trait ValidatesAttributes
      */
     public function validateAccepted($attribute, $value)
     {
-        $acceptable = ['yes', 'on', '1', 1, true, 'true'];
-
-        return $this->validateRequired($attribute, $value) && in_array($value, $acceptable, true);
+        return $this->validateRequired($attribute, $value) && filter_var($value, FILTER_VALIDATE_BOOL);
     }
 
     /**
@@ -57,14 +55,12 @@ trait ValidatesAttributes
      */
     public function validateAcceptedIf($attribute, $value, $parameters)
     {
-        $acceptable = ['yes', 'on', '1', 1, true, 'true'];
-
         $this->requireParameterCount(2, $parameters, 'accepted_if');
 
         [$values, $other] = $this->parseDependentRuleParameters($parameters);
 
         if (in_array($other, $values, is_bool($other) || is_null($other))) {
-            return $this->validateRequired($attribute, $value) && in_array($value, $acceptable, true);
+            return $this->validateRequired($attribute, $value) && filter_var($value, FILTER_VALIDATE_BOOL);
         }
 
         return true;
@@ -81,9 +77,8 @@ trait ValidatesAttributes
      */
     public function validateDeclined($attribute, $value)
     {
-        $acceptable = ['no', 'off', '0', 0, false, 'false'];
-
-        return $this->validateRequired($attribute, $value) && in_array($value, $acceptable, true);
+        return $this->validateRequired($attribute, $value)
+            && filter_var($value, FILTER_VALIDATE_BOOL, FILTER_NULL_ON_FAILURE) === false;
     }
 
     /**
@@ -96,14 +91,13 @@ trait ValidatesAttributes
      */
     public function validateDeclinedIf($attribute, $value, $parameters)
     {
-        $acceptable = ['no', 'off', '0', 0, false, 'false'];
-
         $this->requireParameterCount(2, $parameters, 'declined_if');
 
         [$values, $other] = $this->parseDependentRuleParameters($parameters);
 
         if (in_array($other, $values, is_bool($other) || is_null($other))) {
-            return $this->validateRequired($attribute, $value) && in_array($value, $acceptable, true);
+            return $this->validateRequired($attribute, $value)
+                && filter_var($value, FILTER_VALIDATE_BOOL, FILTER_NULL_ON_FAILURE) === false;
         }
 
         return true;
