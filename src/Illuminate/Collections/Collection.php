@@ -1493,7 +1493,9 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
         if (is_array($callback) && ! is_callable($callback)) {
             foreach ($callback as $index => $key) {
                 $comparison = Arr::wrap($key);
+
                 $comparison[1] = 'desc';
+
                 $callback[$index] = $comparison;
             }
         }
