@@ -2426,6 +2426,9 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['foo' => 'true'], ['foo' => 'Declined']);
         $this->assertFalse($v->passes());
 
+        $v = new Validator($trans, ['foo' => 'just_string'], ['foo' => 'Declined']);
+        $this->assertFalse($v->passes());
+
         $v = new Validator($trans, ['foo' => 'no'], ['foo' => 'Declined']);
         $this->assertTrue($v->passes());
 
@@ -2684,6 +2687,9 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
 
         $v = new Validator($trans, ['foo' => 'true', 'bar' => 'aaa'], ['foo' => 'declined_if:bar,aaa']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => 'just_string', 'bar' => 'aaa'], ['foo' => 'declined_if:bar,aaa']);
         $this->assertFalse($v->passes());
 
         $v = new Validator($trans, ['foo' => 'no', 'bar' => 'aaa'], ['foo' => 'declined_if:bar,aaa']);
