@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Process;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Process\PhpExecutableFinder;
 
+use function Illuminate\Filesystem\join_paths;
 use function Laravel\Prompts\confirm;
 
 #[AsCommand(name: 'install:broadcasting')]
@@ -53,9 +54,11 @@ class BroadcastingInstallCommand extends Command
             $this->uncommentChannelsRoutesFile();
         }
 
+        $installReverb = $this->shouldInstallReverb();
+
         // Install bootstrapping...
         if (! file_exists($echoScriptPath = $this->laravel->resourcePath('js/echo.js'))) {
-            copy(__DIR__.'/stubs/echo-js.stub', $echoScriptPath);
+            copy(join_paths(__DIR__, 'stubs', $installReverb ? 'echo-js.stub' : 'echo.js.pusher.stub'), $echoScriptPath);
         }
 
         if (file_exists($bootstrapScriptPath = $this->laravel->resourcePath('js/bootstrap.js'))) {
@@ -71,7 +74,9 @@ class BroadcastingInstallCommand extends Command
             }
         }
 
-        $this->installReverb();
+        if ($installReverb) {
+            $this->performReverbInstallation();
+        }
 
         $this->installNodeDependencies();
     }
@@ -111,15 +116,9 @@ class BroadcastingInstallCommand extends Command
      *
      * @return void
      */
-    protected function installReverb()
+    protected function performReverbInstallation()
     {
         if (InstalledVersions::isInstalled('laravel/reverb')) {
-            return;
-        }
-
-        $install = confirm('Would you like to install Laravel Reverb?', default: true);
-
-        if (! $install) {
             return;
         }
 
@@ -136,6 +135,20 @@ class BroadcastingInstallCommand extends Command
         ]);
 
         $this->components->info('Reverb installed successfully.');
+    }
+
+    /**
+     * Determine if Reverb should be installed.
+     *
+     * @return bool
+     */
+    public function shouldInstallReverb()
+    {
+        if (InstalledVersions::isInstalled('laravel/reverb')) {
+            return true;
+        }
+
+        return confirm('Would you like to install Laravel Reverb?', default: true);
     }
 
     /**
