@@ -101,6 +101,45 @@ trait EloquentTransactionWithAfterCommitTests
         $this->assertTrue($user1->exists);
         $this->assertEquals(1, $observer::$calledTimes, 'Failed to assert the observer was called once.');
     }
+
+    public function testTransactionCallbackExceptions()
+    {
+        [$firstObject, $secondObject] = [
+            new EloquentTransactionWithAfterCommitTestsTestObjectForTransactions(),
+            new EloquentTransactionWithAfterCommitTestsTestObjectForTransactions(),
+        ];
+
+        $rootTransactionLevel = DB::transactionLevel();
+
+        // After commit callbacks may fail with an exception. When they do, the rest of the callbacks are not
+        // executed. It's important that the transaction would already be committed by that point, so the
+        // transaction level should be modified before executing any callbacks. Also, exceptions in the
+        // callbacks should not affect the connection's transaction level.
+        $this->assertThrows(function () use ($rootTransactionLevel, $secondObject, $firstObject) {
+            DB::transaction(function () use ($rootTransactionLevel, $firstObject, $secondObject) {
+                DB::transaction(function () use ($rootTransactionLevel, $firstObject) {
+                    $this->assertSame($rootTransactionLevel + 2, DB::transactionLevel());
+
+                    DB::afterCommit(function () use ($rootTransactionLevel, $firstObject) {
+                        $this->assertSame($rootTransactionLevel, DB::transactionLevel());
+
+                        $firstObject->handle();
+                    });
+                });
+
+                $this->assertSame($rootTransactionLevel + 1, DB::transactionLevel());
+
+                DB::afterCommit(fn () => throw new \RuntimeException());
+                DB::afterCommit(fn () => $secondObject->handle());
+            });
+        }, \RuntimeException::class);
+
+        $this->assertSame($rootTransactionLevel, DB::transactionLevel());
+
+        $this->assertTrue($firstObject->ran);
+        $this->assertFalse($secondObject->ran);
+        $this->assertEquals(1, $firstObject->runs);
+    }
 }
 
 class EloquentTransactionWithAfterCommitTestsUserObserver
@@ -148,5 +187,18 @@ class EloquentTransactionWithAfterCommitTestsJob implements ShouldQueue
                 ['email' => $this->email, 'token' => sha1($this->email), 'created_at' => now()],
             ]);
         });
+    }
+}
+
+class EloquentTransactionWithAfterCommitTestsTestObjectForTransactions
+{
+    public $ran = false;
+
+    public $runs = 0;
+
+    public function handle()
+    {
+        $this->ran = true;
+        $this->runs++;
     }
 }
