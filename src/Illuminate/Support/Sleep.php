@@ -319,15 +319,16 @@ class Sleep
      * Stay awake and capture any attempts to sleep.
      *
      * @param  bool  $value
+     * @param  bool  $syncWithCarbon
      * @return void
      */
-    public static function fake($value = true)
+    public static function fake($value = true, $syncWithCarbon = false)
     {
         static::$fake = $value;
 
         static::$sequence = [];
         static::$fakeSleepCallbacks = [];
-        static::$syncWithCarbon = false;
+        static::$syncWithCarbon = $syncWithCarbon;
     }
 
     /**
