@@ -141,7 +141,7 @@ class Exceptions
     /**
      * Register the callable that determines if the exception handler response should be JSON.
      *
-     * @param  callable(\Illuminate\Http\Request $request, \Throwable): bool $callback
+     * @param  callable(\Illuminate\Http\Request $request, \Throwable): bool  $callback
      * @return $this
      */
     public function shouldReturnJsonWhen(callable $callback)
