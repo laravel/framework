@@ -39,7 +39,7 @@ class Factory
     /**
      * The options to apply to every request.
      *
-     * @var array
+     * @var \Closure|array
      */
     protected $globalOptions = [];
 
@@ -133,7 +133,7 @@ class Factory
     /**
      * Set the options to apply to every request.
      *
-     * @param  array  $options
+     * @param  \Closure|array  $options
      * @return $this
      */
     public function globalOptions($options)
@@ -420,7 +420,7 @@ class Factory
      */
     protected function newPendingRequest()
     {
-        return (new PendingRequest($this, $this->globalMiddleware))->withOptions($this->globalOptions);
+        return (new PendingRequest($this, $this->globalMiddleware))->withOptions(value($this->globalOptions));
     }
 
     /**

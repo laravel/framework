@@ -3011,7 +3011,7 @@ class HttpClientTest extends TestCase
         $this->assertFalse($allowRedirects);
         $this->assertSame(['true'], $headers['X-Foo']);
 
-        $factory->globalOptions([
+        $factory->globalOptions(fn () => [
             'timeout' => 10,
             'headers' => [
                 'X-Foo' => 'false',

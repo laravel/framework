@@ -50,6 +50,7 @@ jobs:
             Illuminate\\Support\\Facades\\Bus \
             Illuminate\\Support\\Facades\\Cache \
             Illuminate\\Support\\Facades\\Config \
+            Illuminate\\Support\\Facades\\Context \
             Illuminate\\Support\\Facades\\Cookie \
             Illuminate\\Support\\Facades\\Crypt \
             Illuminate\\Support\\Facades\\DB \

@@ -47,7 +47,7 @@ class BroadcastingInstallCommand extends Command
             ! $this->option('force')) {
             $this->components->error('Broadcasting routes file already exists.');
         } else {
-            $this->components->info('Published broadcasting routes file.');
+            $this->components->info("Published 'channels' route file.");
 
             copy(__DIR__.'/stubs/broadcasting-routes.stub', $broadcastingRoutesPath);
 
@@ -77,6 +77,8 @@ class BroadcastingInstallCommand extends Command
         if ($installReverb) {
             $this->performReverbInstallation();
         }
+
+        $this->installNodeDependencies();
     }
 
     /**
@@ -147,5 +149,41 @@ class BroadcastingInstallCommand extends Command
         }
 
         return confirm('Would you like to install Laravel Reverb?', default: true);
+    }
+  
+    /**
+     * Install and build Node dependencies.
+     *
+     * @return void
+     */
+    protected function installNodeDependencies()
+    {
+        if (! confirm('Would you like to install and build the Node dependencies required for broadcasting?', default: true)) {
+            return;
+        }
+
+        $this->components->info('Installing and building Node dependencies.');
+
+        if (file_exists(base_path('pnpm-lock.yaml'))) {
+            $commands = [
+                'pnpm add --save-dev laravel-echo pusher-js',
+                'pnpm run build',
+            ];
+        } elseif (file_exists(base_path('yarn.lock'))) {
+            $commands = [
+                'yarn add --dev laravel-echo pusher-js',
+                'yarn run build',
+            ];
+        } else {
+            $commands = [
+                'npm install --save-dev laravel-echo pusher-js',
+                'npm run build',
+            ];
+        }
+
+        Process::command(implode(' && ', $commands))
+            ->path(base_path())
+            ->tty(true)
+            ->run();
     }
 }
