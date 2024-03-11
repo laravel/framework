@@ -150,7 +150,7 @@ class BroadcastingInstallCommand extends Command
 
         return confirm('Would you like to install Laravel Reverb?', default: true);
     }
-  
+
     /**
      * Install and build Node dependencies.
      *
