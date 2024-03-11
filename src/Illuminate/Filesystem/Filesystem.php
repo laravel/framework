@@ -347,7 +347,7 @@ class Filesystem
      *
      * @param  string  $target
      * @param  string  $link
-     * @return void
+     * @return bool|null
      */
     public function link($target, $link)
     {
