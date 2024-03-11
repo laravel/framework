@@ -177,6 +177,6 @@ class Repository implements ArrayAccess, ConfigContract
      */
     public function offsetUnset($key): void
     {
-        $this->set($key, null);
+        $this->set($key);
     }
 }
