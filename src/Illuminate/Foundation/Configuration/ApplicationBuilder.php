@@ -188,9 +188,19 @@ class ApplicationBuilder
             }
 
             if (is_string($health)) {
-                Route::middleware('web')->get($health, function () {
-                    Event::dispatch(new DiagnosingHealth);
+                Event::dispatch(new DiagnosingHealth());
 
+                if (is_string($api)) {
+                    Route::middleware('api')->get($apiPrefix.$health, function () {
+                        return response()->json([
+                            'status' => 'Application Up',
+                            'message' => 'HTTP request received.',
+                            'rendered_in_ms' => round((microtime(true) - LARAVEL_START) * 1000),
+                        ]);
+                    });
+                }
+
+                Route::middleware('web')->get($health, function () {
                     return View::file(__DIR__.'/../resources/health-up.blade.php');
                 });
             }
