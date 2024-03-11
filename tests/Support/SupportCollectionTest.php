@@ -1221,6 +1221,22 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals(['value' => 'foo'], $c->value('pivot'));
         $this->assertEquals('foo', $c->value('pivot.value'));
         $this->assertEquals('bar', $c->where('id', 2)->value('pivot.value'));
+
+        $c = new $collection([
+            ['id' => '1', 'is_happy' => true],
+            ['id' => '2', 'is_happy' => 'true'],
+            ['id' => '3', 'is_happy' => '1'],
+            ['id' => '4', 'is_happy' => false],
+            ['id' => '5', 'is_happy' => 'false'],
+            ['id' => '6', 'is_happy' => '0'],
+        ]);
+
+        $this->assertTrue($c->where('id', '1')->value('is_happy'));
+        $this->assertFalse($c->where('id', '4')->value('is_happy'));
+        $this->assertEquals('true', $c->where('id', '2')->value('is_happy'));
+        $this->assertEquals('false', $c->where('id', '5')->value('is_happy'));
+        $this->assertEquals('1', $c->where('id', '3')->value('is_happy'));
+        $this->assertEquals('0', $c->where('id', '6')->value('is_happy'));
     }
 
     /**
