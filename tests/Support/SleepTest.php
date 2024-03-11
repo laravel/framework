@@ -597,11 +597,11 @@ class SleepTest extends TestCase
 
     #[TestWith([
         'syncWithCarbon' => true,
-        'datetime' => '2000-01-01 00:05:03'
+        'datetime' => '2000-01-01 00:05:03',
     ])]
     #[TestWith([
         'syncWithCarbon' => false,
-        'datetime' => '2000-01-01 00:00:00'
+        'datetime' => '2000-01-01 00:00:00',
     ])]
     public function testFakeCanSetSyncWithCarbon(bool $syncWithCarbon, string $datetime)
     {
