@@ -39,9 +39,7 @@ trait InteractsWithQueue
      */
     public function delete()
     {
-        if ($this->job) {
-            return $this->job->delete();
-        }
+        $this->job?->delete();
     }
 
     /**
@@ -57,9 +55,7 @@ trait InteractsWithQueue
         }
 
         if ($exception instanceof Throwable || is_null($exception)) {
-            if ($this->job) {
-                return $this->job->fail($exception);
-            }
+            $this->job?->fail($exception);
         } else {
             throw new InvalidArgumentException('The fail method requires a string or an instance of Throwable.');
         }
@@ -77,9 +73,7 @@ trait InteractsWithQueue
             ? $this->secondsUntil($delay)
             : $delay;
 
-        if ($this->job) {
-            return $this->job->release($delay);
-        }
+        $this->job?->release($delay);
     }
 
     /**
