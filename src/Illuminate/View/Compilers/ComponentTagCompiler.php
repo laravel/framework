@@ -804,8 +804,10 @@ class ComponentTagCompiler
                 continue;
             }
 
+            $camelCaseAttribute = Str::camel($attribute);
+
             $results[] = "'{$attribute}' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(".(
-                ($attribute === 'attributes') ? $value : ('array_key_exists(\''.Str::camel($attribute).'\', $componentData[\'data\'] ?? []) ? ($componentData[\'data\'][\''.Str::camel($attribute).'\'] ?? null) : ' . $value)
+                ($attribute === 'attributes') ? $value : ('array_key_exists(\''.$camelCaseAttribute.'\', $componentData[\'data\'] ?? []) ? ($componentData[\'data\'][\''.$camelCaseAttribute.'\'] ?? null) : ' . $value)
             ).')';
         }
 
