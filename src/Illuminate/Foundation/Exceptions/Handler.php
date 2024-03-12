@@ -381,19 +381,6 @@ class Handler implements ExceptionHandlerContract
     }
 
     /**
-     * Register the callable that determines if the exception handler response should be JSON.
-     *
-     * @param  callable(\Illuminate\Http\Request $request, \Throwable): bool  $callback
-     * @return $this
-     */
-    public function shouldReturnJsonWhen($callback)
-    {
-        $this->shouldReturnJsonWhenCallback = $callback;
-
-        return $this;
-    }
-
-    /**
      * Determine if the exception is in the "do not report" list.
      *
      * @param  \Throwable  $e
@@ -743,6 +730,19 @@ class Handler implements ExceptionHandlerContract
         return $this->shouldReturnJsonWhenCallback
             ? call_user_func($this->shouldReturnJsonWhenCallback, $request, $e)
             : $request->expectsJson();
+    }
+
+    /**
+     * Register the callable that determines if the exception handler response should be JSON.
+     *
+     * @param  callable(\Illuminate\Http\Request $request, \Throwable): bool  $callback
+     * @return $this
+     */
+    public function shouldReturnJsonWhen($callback)
+    {
+        $this->shouldReturnJsonWhenCallback = $callback;
+
+        return $this;
     }
 
     /**
