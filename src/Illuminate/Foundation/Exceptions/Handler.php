@@ -597,7 +597,7 @@ class Handler implements ExceptionHandlerContract
     protected function finalizeRenderedResponse($request, $response, Throwable $e)
     {
         return $this->finalizeResponseCallback
-            ? call_user_func($this->finalizeResponseCallback, $e, $request, $response)
+            ? call_user_func($this->finalizeResponseCallback, $response, $e, $request)
             : $response;
     }
 
