@@ -4,7 +4,7 @@ namespace Illuminate\Log\Context;
 
 use __PHP_Incomplete_Class;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Events\Dispatcher;
+use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Log\Context\Events\ContextDehydrating as Dehydrating;
 use Illuminate\Log\Context\Events\ContextHydrated as Hydrated;
 use Illuminate\Queue\SerializesModels;
@@ -46,6 +46,8 @@ class Repository
 
     /**
      * Create a new Context instance.
+     *
+     *
      */
     public function __construct(Dispatcher $events)
     {
