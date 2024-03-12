@@ -804,6 +804,13 @@ class DatabaseEloquentFactoryTest extends TestCase
         $this->assertSame(2, FactoryTestUser::count());
     }
 
+    public function test_returns_first_instance_if_already_exists()
+    {
+        $user = FactoryTestUserFactory::new()->create();
+        $user2 = FactoryTestUserFactory::new()->firstOrCreate();
+        $this->assertSame($user->id, $user2->id);
+    }
+
     /**
      * Get a database connection instance.
      *
