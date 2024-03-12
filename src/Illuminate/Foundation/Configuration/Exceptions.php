@@ -144,9 +144,9 @@ class Exceptions
      * @param  callable(\Illuminate\Http\Request $request, \Throwable): bool  $callback
      * @return $this
      */
-    public function shouldReturnJsonWhen(callable $callback)
+    public function shouldRenderJsonWhen(callable $callback)
     {
-        $this->handler->shouldReturnJsonWhen($callback);
+        $this->handler->shouldRenderJsonWhen($callback);
 
         return $this;
     }

@@ -39,18 +39,18 @@ class ExceptionsTest extends TestCase
         $this->assertNotContains(ModelNotFoundException::class, $handler->getDontReport());
     }
 
-    public function testShouldReturnJsonWhen()
+    public function testShouldRenderJsonWhen()
     {
         $exceptions = new Exceptions(new Handler(new Container));
 
         $shouldReturnJson = (fn () => $this->shouldReturnJson(new Request, new Exception()))->call($exceptions->handler);
         $this->assertFalse($shouldReturnJson);
 
-        $exceptions->shouldReturnJsonWhen(fn () => true);
+        $exceptions->shouldRenderJsonWhen(fn () => true);
         $shouldReturnJson = (fn () => $this->shouldReturnJson(new Request, new Exception()))->call($exceptions->handler);
         $this->assertTrue($shouldReturnJson);
 
-        $exceptions->shouldReturnJsonWhen(fn () => false);
+        $exceptions->shouldRenderJsonWhen(fn () => false);
         $shouldReturnJson = (fn () => $this->shouldReturnJson(new Request, new Exception()))->call($exceptions->handler);
         $this->assertFalse($shouldReturnJson);
     }

@@ -189,7 +189,7 @@ class FoundationExceptionsHandlerTest extends TestCase
 
         $request = $this->request;
 
-        $this->handler->shouldReturnJsonWhen(function ($r, $e) use ($request, $exception) {
+        $this->handler->shouldRenderJsonWhen(function ($r, $e) use ($request, $exception) {
             $this->assertSame($request, $r);
             $this->assertSame($exception, $e);
 
@@ -199,7 +199,7 @@ class FoundationExceptionsHandlerTest extends TestCase
         $shouldReturnJson = (fn () => $this->shouldReturnJson($request, $exception))->call($this->handler);
         $this->assertTrue($shouldReturnJson);
 
-        $this->handler->shouldReturnJsonWhen(function ($r, $e) use ($request, $exception) {
+        $this->handler->shouldRenderJsonWhen(function ($r, $e) use ($request, $exception) {
             $this->assertSame($request, $r);
             $this->assertSame($exception, $e);
 
