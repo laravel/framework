@@ -3,8 +3,8 @@
 namespace Illuminate\Log\Context;
 
 use __PHP_Incomplete_Class;
+use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Events\Dispatcher;
 use Illuminate\Log\Context\Events\ContextDehydrating as Dehydrating;
 use Illuminate\Log\Context\Events\ContextHydrated as Hydrated;
 use Illuminate\Queue\SerializesModels;
