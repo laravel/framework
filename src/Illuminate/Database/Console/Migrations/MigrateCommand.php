@@ -31,7 +31,8 @@ class MigrateCommand extends BaseCommand implements Isolatable
                 {--pretend : Dump the SQL queries that would be run}
                 {--seed : Indicates if the seed task should be re-run}
                 {--seeder= : The class name of the root seeder}
-                {--step : Force the migrations to be run so they can be rolled back individually}';
+                {--step : Force the migrations to be run so they can be rolled back individually}
+                {--graceful : Return a successful exit code even if an error occurs}';
 
     /**
      * The console command description.
@@ -80,6 +81,28 @@ class MigrateCommand extends BaseCommand implements Isolatable
             return 1;
         }
 
+        try {
+            $this->runMigrations();
+        } catch (Throwable $e) {
+            if ($this->option('graceful')) {
+                $this->components->warn($e->getMessage());
+
+                return 0;
+            }
+
+            throw $e;
+        }
+
+        return 0;
+    }
+
+    /**
+     * Run the pending migrations.
+     *
+     * @return void
+     */
+    protected function runMigrations()
+    {
         $this->migrator->usingConnection($this->option('database'), function () {
             $this->prepareDatabase();
 
@@ -102,8 +125,6 @@ class MigrateCommand extends BaseCommand implements Isolatable
                 ]);
             }
         });
-
-        return 0;
     }
 
     /**
