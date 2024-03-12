@@ -258,11 +258,11 @@ class ComponentTagCompiler
             $parameters = $data->all();
         }
 
-        return "##BEGIN-COMPONENT-CLASS##@component('{$class}', '{$component}', \$componentData = [".$this->attributesToString($parameters, $escapeBound = false).'])
+        return "##BEGIN-COMPONENT-CLASS##@component('{$class}', '{$component}', [".$this->attributesToString($parameters, $escapeBound = false).'])
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass('.$class.'::class))->getConstructor()): ?>
 <?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['.$this->attributesToStringWithExistingComponentData($attributes->all(), $escapeAttributes = $class !== DynamicComponent::class && ! is_subclass_of($class, DynamicComponent::class)).']); ?>';
+<?php $component->withAttributes(['.$this->attributesToString($attributes->all(), $escapeAttributes = $class !== DynamicComponent::class).']); ?>';
     }
 
     /**
@@ -781,35 +781,6 @@ class ComponentTagCompiler
                                 : "'{$attribute}' => {$value}";
                 })
                 ->implode(',');
-    }
-
-    /**
-     * Convert an array of attributes to a string using existing component data that has already been evaluated.
-     *
-     * @param  array  $attributes
-     * @param  bool  $escapeBound
-     * @return string
-     */
-    protected function attributesToStringWithExistingComponentData(array $attributes, $escapeBound = true)
-    {
-        $results = [];
-
-        foreach ($attributes as $attribute => $value) {
-            if (! $escapeBound ||
-                ! isset($this->boundAttributes[$attribute]) ||
-                $value === 'true' ||
-                is_numeric($value)) {
-                $results[] = "'{$attribute}' => {$value}";
-
-                continue;
-            }
-
-            $results[] = "'{$attribute}' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(".(
-                ($attribute === 'attributes') ? $value : ('$componentData[\'data\'][\''.Str::camel($attribute).'\'] ?? null')
-            ).')';
-        }
-
-        return implode(',', $results);
     }
 
     /**
