@@ -150,6 +150,8 @@ class SyncQueueJob implements ShouldQueue
 {
     use InteractsWithQueue;
 
+    public string $connection = 'sync';
+
     public function handle()
     {
         throw new LogicException($this->getValueFromJob('extra'));
