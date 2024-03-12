@@ -117,7 +117,7 @@
         "symfony/psr-http-message-bridge": "^7.0"
     },
     "conflict": {
-        "mockery/mockery": ">=1.6.8",
+        "mockery/mockery": "1.6.8",
         "tightenco/collect": "<5.5.33"
     },
     "provide": {
