@@ -747,7 +747,6 @@ class Middleware
             'password.confirm' => \Illuminate\Auth\Middleware\RequirePassword::class,
             'precognitive' => \Illuminate\Foundation\Http\Middleware\HandlePrecognitiveRequests::class,
             'signed' => \Illuminate\Routing\Middleware\ValidateSignature::class,
-            'subscribed' => \Spark\Http\Middleware\VerifyBillableIsSubscribed::class,
             'throttle' => $this->throttleWithRedis
                 ? \Illuminate\Routing\Middleware\ThrottleRequestsWithRedis::class
                 : \Illuminate\Routing\Middleware\ThrottleRequests::class,
