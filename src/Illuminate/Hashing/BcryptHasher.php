@@ -4,6 +4,7 @@ namespace Illuminate\Hashing;
 
 use Illuminate\Contracts\Hashing\Hasher as HasherContract;
 use RuntimeException;
+use ValueError;
 
 class BcryptHasher extends AbstractHasher implements HasherContract
 {
@@ -44,15 +45,13 @@ class BcryptHasher extends AbstractHasher implements HasherContract
      */
     public function make($value, array $options = [])
     {
-        $hash = password_hash($value, PASSWORD_BCRYPT, [
-            'cost' => $this->cost($options),
-        ]);
-
-        if ($hash === false) {
+        try {
+            return password_hash($value, PASSWORD_BCRYPT, [
+                'cost' => $this->cost($options),
+            ]);
+        } catch (ValueError) {
             throw new RuntimeException('Bcrypt hashing not supported.');
         }
-
-        return $hash;
     }
 
     /**
