@@ -578,7 +578,7 @@ class Route
      * Get the parent parameter of the given parameter.
      *
      * @param  string  $parameter
-     * @return string
+     * @return string|null
      */
     public function parentOfParameter($parameter)
     {
