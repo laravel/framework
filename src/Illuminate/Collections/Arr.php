@@ -643,7 +643,7 @@ class Arr
      * @param  callable(mixed...): TMapSpreadValue  $callback
      * @return array<TKey, TMapSpreadValue>
      */
-    public function mapSpread(array $array, callable $callback)
+    public static function mapSpread(array $array, callable $callback)
     {
         return static::map($array, function ($chunk, $key) use ($callback) {
             $chunk[] = $key;
