@@ -32,7 +32,7 @@ class MigrateCommand extends BaseCommand implements Isolatable
                 {--seed : Indicates if the seed task should be re-run}
                 {--seeder= : The class name of the root seeder}
                 {--step : Force the migrations to be run so they can be rolled back individually}
-                {--graceful : Returns a zero exit code if when errors occur}';
+                {--graceful : Return a successful exit code even if an error occurs}';
 
     /**
      * The console command description.
