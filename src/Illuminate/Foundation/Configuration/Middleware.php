@@ -490,7 +490,7 @@ class Middleware
     }
 
     /**
-     * Configure where guests are redirected by the authentication middleware.
+     * Configure where guests are redirected by the "auth" middleware.
      *
      * @param  callable|string  $redirect
      * @return $this
@@ -498,6 +498,17 @@ class Middleware
     public function redirectGuestsTo(callable|string $redirect)
     {
         return $this->redirectTo(guests: $redirect);
+    }
+
+    /**
+     * Configure where users are redirected by the "guest" middleware.
+     *
+     * @param  callable|string  $redirect
+     * @return $this
+     */
+    public function redirectUsersTo(callable|string $redirect)
+    {
+        return $this->redirectTo(users: $redirect);
     }
 
     /**
