@@ -97,7 +97,7 @@ class MigrateCommand extends BaseCommand implements Isolatable
     }
 
     /**
-     * Runs the pending migrations.
+     * Run the pending migrations.
      *
      * @return void
      */
