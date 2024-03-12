@@ -545,7 +545,15 @@ class Migrator
         return Collection::make($paths)->flatMap(function ($path) {
             return str_ends_with($path, '.php') ? [$path] : $this->files->glob($path.'/*_*.php');
         })->filter()->values()->keyBy(function ($file) {
-            return $this->getMigrationName($file);
+            static $uniqueNameCheck = [];
+            $shortName = $this->getMigrationName($file);
+            if (isset($uniqueNameCheck[$shortName])) {
+                $this->write(Error::class, "Duplicate migration filenames: " . $uniqueNameCheck[$shortName]);
+                $this->write(Error::class, "Duplicate migration filenames: " . $file);
+                exit;
+            }
+            $uniqueNameCheck[$shortName] = $file;
+            return $shortName;
         })->sortBy(function ($file, $key) {
             return $key;
         })->all();
