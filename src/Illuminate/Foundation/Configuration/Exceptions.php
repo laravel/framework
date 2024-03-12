@@ -139,6 +139,19 @@ class Exceptions
     }
 
     /**
+     * Register the callable that determines if the exception handler response should be JSON.
+     *
+     * @param  callable(\Illuminate\Http\Request $request, \Throwable): bool  $callback
+     * @return $this
+     */
+    public function shouldRenderJsonWhen(callable $callback)
+    {
+        $this->handler->shouldRenderJsonWhen($callback);
+
+        return $this;
+    }
+
+    /**
      * Indicate that the given exception class should not be ignored.
      *
      * @param  array<int, class-string<\Throwable>>|class-string<\Throwable>  $class

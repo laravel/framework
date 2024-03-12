@@ -166,6 +166,52 @@ class FoundationExceptionsHandlerTest extends TestCase
         $this->handler->report(new CustomException('Exception message'));
     }
 
+    public function testShouldReturnJson()
+    {
+        $this->request->shouldReceive('expectsJson')->once()->andReturn(true);
+        $e = new Exception('My custom error message');
+
+        $request = $this->request;
+
+        $shouldReturnJson = (fn () => $this->shouldReturnJson($request, $e))->call($this->handler);
+        $this->assertTrue($shouldReturnJson);
+
+        $this->request->shouldReceive('expectsJson')->once()->andReturn(false);
+
+        $shouldReturnJson = (fn () => $this->shouldReturnJson($request, $e))->call($this->handler);
+        $this->assertFalse($shouldReturnJson);
+    }
+
+    public function testShouldReturnJsonWhen()
+    {
+        $this->request->shouldReceive('expectsJson')->never();
+        $exception = new Exception('My custom error message');
+
+        $request = $this->request;
+
+        $this->handler->shouldRenderJsonWhen(function ($r, $e) use ($request, $exception) {
+            $this->assertSame($request, $r);
+            $this->assertSame($exception, $e);
+
+            return true;
+        });
+
+        $shouldReturnJson = (fn () => $this->shouldReturnJson($request, $exception))->call($this->handler);
+        $this->assertTrue($shouldReturnJson);
+
+        $this->handler->shouldRenderJsonWhen(function ($r, $e) use ($request, $exception) {
+            $this->assertSame($request, $r);
+            $this->assertSame($exception, $e);
+
+            return false;
+        });
+
+        $shouldReturnJson = (fn () => $this->shouldReturnJson($request, $exception))->call($this->handler);
+        $this->assertFalse($shouldReturnJson);
+
+        $this->assertSame(6, Assert::getCount());
+    }
+
     public function testReturnsJsonWithStackTraceWhenAjaxRequestAndDebugTrue()
     {
         $this->config->shouldReceive('get')->with('app.debug', null)->once()->andReturn(true);
