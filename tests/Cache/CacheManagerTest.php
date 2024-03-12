@@ -75,7 +75,7 @@ class CacheManagerTest extends TestCase
         $this->assertFalse($app->bound(Dispatcher::class));
 
         $cacheManager = new CacheManager($app);
-        $repo = $cacheManager->repository($theStore = new NullStore);
+        $repo = $cacheManager->repository($theStore = new NullStore, []);
 
         $this->assertNull($repo->getEventDispatcher());
         $this->assertSame($theStore, $repo->getStore());
@@ -87,7 +87,7 @@ class CacheManagerTest extends TestCase
         $this->assertSame($theStore, $repo->getStore());
 
         $cacheManager = new CacheManager($app);
-        $repo = $cacheManager->repository(new NullStore);
+        $repo = $cacheManager->repository(new NullStore, []);
         // now that the $app has a Dispatcher, the newly born repository will also have one.
         $this->assertNotNull($repo->getEventDispatcher());
     }

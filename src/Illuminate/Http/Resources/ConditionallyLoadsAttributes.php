@@ -295,7 +295,7 @@ trait ConditionallyLoadsAttributes
 
         $attribute = (string) Str::of($relationship)->snake()->finish('_count');
 
-        if (! isset($this->resource->getAttributes()[$attribute])) {
+        if (! array_key_exists($attribute, $this->resource->getAttributes())) {
             return value($default);
         }
 
@@ -328,7 +328,7 @@ trait ConditionallyLoadsAttributes
 
         $attribute = (string) Str::of($relationship)->snake()->append('_')->append($aggregate)->append('_')->finish($column);
 
-        if (! isset($this->resource->getAttributes()[$attribute])) {
+        if (! array_key_exists($attribute, $this->resource->getAttributes())) {
             return value($default);
         }
 

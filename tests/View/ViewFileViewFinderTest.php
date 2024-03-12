@@ -6,6 +6,7 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\View\FileViewFinder;
 use InvalidArgumentException;
 use Mockery as m;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class ViewFileViewFinderTest extends TestCase
@@ -153,9 +154,7 @@ class ViewFileViewFinderTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider pathsProvider
-     */
+    #[DataProvider('pathsProvider')]
     public function testNormalizedPaths($originalPath, $exceptedPath)
     {
         $finder = $this->getFinder();

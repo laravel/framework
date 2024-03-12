@@ -21,6 +21,8 @@ class FoundationViteTest extends TestCase
     {
         $this->cleanViteManifest();
         $this->cleanViteHotFile();
+
+        parent::tearDown();
     }
 
     public function testViteWithJsOnly()

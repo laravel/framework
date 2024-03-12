@@ -92,8 +92,8 @@ class RedisQueueTest extends TestCase
      *
      * @throws \Exception
      */
-    #[RequiresPhpExtension('pcntl')]
     #[DataProvider('redisDriverProvider')]
+    #[RequiresPhpExtension('pcntl')]
     public function testBlockingPop($driver)
     {
         $this->tearDownRedis();

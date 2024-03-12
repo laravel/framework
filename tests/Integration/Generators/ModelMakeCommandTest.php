@@ -69,7 +69,7 @@ class ModelMakeCommandTest extends TestCase
         $this->assertFileContains([
             'namespace App\Http\Controllers;',
             'use Illuminate\Http\Request;',
-            'class FooController extends Controller',
+            'class FooController',
         ], 'app/Http/Controllers/FooController.php');
 
         $this->assertFileNotContains([
@@ -156,7 +156,7 @@ class ModelMakeCommandTest extends TestCase
         $this->assertFileContains([
             'namespace App\Http\Controllers;',
             'use Illuminate\Http\Request;',
-            'class BarController extends Controller',
+            'class BarController',
         ], 'app/Http/Controllers/BarController.php');
 
         $this->assertFilenameNotExists('database/factories/FooFactory.php');

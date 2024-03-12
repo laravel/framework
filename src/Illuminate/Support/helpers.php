@@ -5,6 +5,8 @@ use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Env;
 use Illuminate\Support\HigherOrderTapProxy;
+use Illuminate\Support\Once;
+use Illuminate\Support\Onceable;
 use Illuminate\Support\Optional;
 use Illuminate\Support\Sleep;
 use Illuminate\Support\Str;
@@ -152,6 +154,22 @@ if (! function_exists('filled')) {
     }
 }
 
+if (! function_exists('literal')) {
+    /**
+     * Return a new literal or anonymous object using named arguments.
+     *
+     * @return \stdClass
+     */
+    function literal(...$arguments)
+    {
+        if (count($arguments) === 1 && array_is_list($arguments)) {
+            return $arguments[0];
+        }
+
+        return (object) $arguments;
+    }
+}
+
 if (! function_exists('object_get')) {
     /**
      * Get an item from an object using "dot" notation.
@@ -176,6 +194,26 @@ if (! function_exists('object_get')) {
         }
 
         return $object;
+    }
+}
+
+if (! function_exists('once')) {
+    /**
+     * Ensures a callable is only called once, and returns the result on subsequent calls.
+     *
+     * @template  TReturnType
+     *
+     * @param  callable(): TReturnType  $callback
+     * @return TReturnType
+     */
+    function once(callable $callback)
+    {
+        $onceable = Onceable::tryFromTrace(
+            debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT, 2),
+            $callback,
+        );
+
+        return $onceable ? Once::instance()->value($onceable) : call_user_func($callback);
     }
 }
 

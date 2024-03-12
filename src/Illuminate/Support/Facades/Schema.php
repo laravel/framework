@@ -7,7 +7,6 @@ namespace Illuminate\Support\Facades;
  * @method static void defaultMorphKeyType(string $type)
  * @method static void morphUsingUuids()
  * @method static void morphUsingUlids()
- * @method static void useNativeSchemaOperationsIfPossible(bool $value = true)
  * @method static bool createDatabase(string $name)
  * @method static bool dropDatabaseIfExists(string $name)
  * @method static bool hasTable(string $table)

@@ -32,13 +32,17 @@ class CookieValuePrefix
      *
      * @param  string  $cookieName
      * @param  string  $cookieValue
-     * @param  string  $key
+     * @param  array  $keys
      * @return string|null
      */
-    public static function validate($cookieName, $cookieValue, $key)
+    public static function validate($cookieName, $cookieValue, array $keys)
     {
-        $hasValidPrefix = str_starts_with($cookieValue, static::create($cookieName, $key));
+        foreach ($keys as $key) {
+            $hasValidPrefix = str_starts_with($cookieValue, static::create($cookieName, $key));
 
-        return $hasValidPrefix ? static::remove($cookieValue) : null;
+            if ($hasValidPrefix) {
+                return static::remove($cookieValue);
+            }
+        }
     }
 }

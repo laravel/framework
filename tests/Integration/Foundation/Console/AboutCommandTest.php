@@ -31,12 +31,12 @@ class AboutCommandTest extends TestCase
 
             Assert::assertArraySubset([
                 'broadcasting' => 'log',
-                'cache' => 'file',
+                'cache' => 'database',
                 'database' => 'testing',
                 'logs' => ['single'],
-                'mail' => 'smtp',
-                'queue' => 'sync',
-                'session' => 'file',
+                'mail' => 'log',
+                'queue' => 'database',
+                'session' => 'cookie',
             ], $output['drivers']);
         });
     }

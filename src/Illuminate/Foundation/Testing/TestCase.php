@@ -2,6 +2,8 @@
 
 namespace Illuminate\Foundation\Testing;
 
+use Illuminate\Contracts\Console\Kernel;
+use Illuminate\Foundation\Application;
 use PHPUnit\Framework\TestCase as BaseTestCase;
 use Throwable;
 
@@ -22,11 +24,16 @@ abstract class TestCase extends BaseTestCase
     /**
      * Creates the application.
      *
-     * Needs to be implemented by subclasses.
-     *
-     * @return \Symfony\Component\HttpKernel\HttpKernelInterface
+     * @return \Illuminate\Foundation\Application
      */
-    abstract public function createApplication();
+    public function createApplication()
+    {
+        $app = require Application::inferBasePath().'/bootstrap/app.php';
+
+        $app->make(Kernel::class)->bootstrap();
+
+        return $app;
+    }
 
     /**
      * Setup the test environment.
@@ -53,21 +60,15 @@ abstract class TestCase extends BaseTestCase
     /**
      * {@inheritdoc}
      */
-    protected function runTest(): mixed
+    protected function transformException(Throwable $error): Throwable
     {
-        $result = null;
+        $response = static::$latestResponse ?? null;
 
-        try {
-            $result = parent::runTest();
-        } catch (Throwable $e) {
-            if (! is_null(static::$latestResponse)) {
-                static::$latestResponse->transformNotSuccessfulException($e);
-            }
-
-            throw $e;
+        if (! is_null($response)) {
+            $response->transformNotSuccessfulException($error);
         }
 
-        return $result;
+        return $error;
     }
 
     /**

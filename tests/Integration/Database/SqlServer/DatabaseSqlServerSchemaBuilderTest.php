@@ -5,7 +5,6 @@ namespace Illuminate\Tests\Integration\Database\SqlServer;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
-use stdClass;
 
 class DatabaseSqlServerSchemaBuilderTest extends SqlServerTestCase
 {
@@ -25,20 +24,19 @@ class DatabaseSqlServerSchemaBuilderTest extends SqlServerTestCase
         DB::statement('drop view if exists users_view');
     }
 
-    public function testGetAllTables()
+    public function testGetTables()
     {
         DB::statement('create view users_view AS select name, age from users');
 
-        $rows = Schema::getAllTables();
+        $rows = Schema::getTables();
 
-        $this->assertContainsOnlyInstancesOf(stdClass::class, $rows);
         $this->assertGreaterThanOrEqual(2, count($rows));
         $this->assertTrue(
-            collect($rows)->contains(fn ($row) => $row->name === 'migrations' && $row->type === 'U '),
+            collect($rows)->contains('name', 'migrations'),
             'Failed asserting that table "migrations" was returned.'
         );
         $this->assertTrue(
-            collect($rows)->contains(fn ($row) => $row->name === 'users' && $row->type === 'U '),
+            collect($rows)->contains('name', 'users'),
             'Failed asserting that table "users" was returned.'
         );
         $this->assertFalse(
@@ -52,20 +50,18 @@ class DatabaseSqlServerSchemaBuilderTest extends SqlServerTestCase
         $this->assertSame(['id', 'name', 'age', 'color'], Schema::getColumnListing('users'));
     }
 
-    public function testGetAllViews()
+    public function testGetViews()
     {
         DB::statement('create view users_view AS select name, age from users');
 
-        $rows = Schema::getAllViews();
+        $rows = Schema::getViews();
 
-        $this->assertContainsOnlyInstancesOf(stdClass::class, $rows);
         $this->assertCount(1, $rows);
-        $this->assertSame('users_view', $rows[0]->name);
-        $this->assertSame('V ', $rows[0]->type);
+        $this->assertSame('users_view', $rows[0]['name']);
     }
 
-    public function testGetAllViewsWhenNoneExist()
+    public function testGetViewsWhenNoneExist()
     {
-        $this->assertSame([], Schema::getAllViews());
+        $this->assertSame([], Schema::getViews());
     }
 }

@@ -185,6 +185,25 @@ class SQLiteGrammar extends Grammar
     }
 
     /**
+     * Compile a group limit clause.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @return string
+     */
+    protected function compileGroupLimit(Builder $query)
+    {
+        $version = $query->getConnection()->getServerVersion();
+
+        if (version_compare($version, '3.25.0') >= 0) {
+            return parent::compileGroupLimit($query);
+        }
+
+        $query->groupLimit = null;
+
+        return $this->compileSelect($query);
+    }
+
+    /**
      * Compile an update statement into SQL.
      *
      * @param  \Illuminate\Database\Query\Builder  $query

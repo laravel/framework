@@ -140,7 +140,7 @@ class CircuitBreakerWithRedisTestJob
 
     public function middleware()
     {
-        return [(new ThrottlesExceptionsWithRedis(2, 10))->by($this->key)];
+        return [(new ThrottlesExceptionsWithRedis(2, 10 * 60))->by($this->key)];
     }
 }
 
@@ -164,6 +164,6 @@ class CircuitBreakerWithRedisSuccessfulJob
 
     public function middleware()
     {
-        return [(new ThrottlesExceptionsWithRedis(2, 10))->by($this->key)];
+        return [(new ThrottlesExceptionsWithRedis(2, 10 * 60))->by($this->key)];
     }
 }

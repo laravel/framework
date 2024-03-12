@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\Expression as Raw;
 use Illuminate\Database\Query\Grammars\Grammar;
+use Illuminate\Database\Query\Grammars\MariaDbGrammar;
 use Illuminate\Database\Query\Grammars\MySqlGrammar;
 use Illuminate\Database\Query\Grammars\PostgresGrammar;
 use Illuminate\Database\Query\Grammars\SQLiteGrammar;
@@ -2634,6 +2635,16 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->from('users')->joinLateral(['foo'], 'sub');
     }
 
+    public function testJoinLateralMariaDb()
+    {
+        $this->expectException(RuntimeException::class);
+        $builder = $this->getMariaDbBuilder();
+        $builder->getConnection()->shouldReceive('getDatabaseName');
+        $builder->from('users')->joinLateral(function ($q) {
+            $q->from('contacts')->whereColumn('contracts.user_id', 'users.id');
+        }, 'sub')->toSql();
+    }
+
     public function testJoinLateralSQLite()
     {
         $this->expectException(RuntimeException::class);
@@ -3482,6 +3493,15 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getBuilder();
         $builder->getConnection()->shouldReceive('update')->once()->with('update "users" set "email" = foo, "name" = ? where "id" = ?', ['bar', 1])->andReturn(1);
         $result = $builder->from('users')->where('id', '=', 1)->update(['email' => new Raw('foo'), 'name' => 'bar']);
+        $this->assertEquals(1, $result);
+    }
+
+    public function testUpdateMethodWorksWithQueryAsValue()
+    {
+        $builder = $this->getBuilder();
+        $builder->getConnection()->shouldReceive('update')->once()->with('update "users" set "credits" = (select sum(credits) from "transactions" where "transactions"."user_id" = "users"."id" and "type" = ?) where "id" = ?', ['foo', 1])->andReturn(1);
+        $result = $builder->from('users')->where('id', '=', 1)->update(['credits' => $this->getBuilder()->from('transactions')->selectRaw('sum(credits)')->whereColumn('transactions.user_id', 'users.id')->where('type', 'foo')]);
+
         $this->assertEquals(1, $result);
     }
 
@@ -6057,6 +6077,14 @@ SQL;
     protected function getMySqlBuilder()
     {
         $grammar = new MySqlGrammar;
+        $processor = m::mock(Processor::class);
+
+        return new Builder(m::mock(ConnectionInterface::class), $grammar, $processor);
+    }
+
+    protected function getMariaDbBuilder()
+    {
+        $grammar = new MariaDbGrammar;
         $processor = m::mock(Processor::class);
 
         return new Builder(m::mock(ConnectionInterface::class), $grammar, $processor);

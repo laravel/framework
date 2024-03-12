@@ -148,7 +148,7 @@ class MigrateCommand extends BaseCommand implements Isolatable
                 if (
                     $e->getPrevious() instanceof PDOException &&
                     $e->getPrevious()->getCode() === 1049 &&
-                    $connection->getDriverName() === 'mysql') {
+                    in_array($connection->getDriverName(), ['mysql', 'mariadb'])) {
                     return $this->createMissingMysqlDatabase($connection);
                 }
 
@@ -175,9 +175,9 @@ class MigrateCommand extends BaseCommand implements Isolatable
             return false;
         }
 
-        $this->components->warn('The SQLite database does not exist: '.$path);
+        $this->components->warn('The SQLite database configured for this application does not exist: '.$path);
 
-        if (! confirm('Would you like to create it?', default: false)) {
+        if (! confirm('Would you like to create it?', default: true)) {
             return false;
         }
 
@@ -202,7 +202,7 @@ class MigrateCommand extends BaseCommand implements Isolatable
         if (! $this->option('force') && ! $this->option('no-interaction')) {
             $this->components->warn("The database '{$connection->getDatabaseName()}' does not exist on the '{$connection->getName()}' connection.");
 
-            if (! confirm('Would you like to create it?', default: false)) {
+            if (! confirm('Would you like to create it?', default: true)) {
                 return false;
             }
         }

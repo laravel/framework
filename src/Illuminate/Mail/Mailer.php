@@ -358,6 +358,21 @@ class Mailer implements MailerContract, MailQueueContract
     }
 
     /**
+     * Send a new message synchronously using a view.
+     *
+     * @param  \Illuminate\Contracts\Mail\Mailable|string|array  $view
+     * @param  array  $data
+     * @param  \Closure|string|null  $callback
+     * @return \Illuminate\Mail\SentMessage|null
+     */
+    public function sendNow($mailable, array $data = [], $callback = null)
+    {
+        return $mailable instanceof MailableContract
+            ? $mailable->mailer($this->name)->send($this)
+            : $this->send($mailable, $data, $callback);
+    }
+
+    /**
      * Parse the given view name or array.
      *
      * @param  \Closure|array|string  $view
@@ -450,7 +465,7 @@ class Mailer implements MailerContract, MailQueueContract
     }
 
     /**
-     * Queue a new e-mail message for sending.
+     * Queue a new mail message for sending.
      *
      * @param  \Illuminate\Contracts\Mail\Mailable|string|array  $view
      * @param  string|null  $queue
@@ -472,7 +487,7 @@ class Mailer implements MailerContract, MailQueueContract
     }
 
     /**
-     * Queue a new e-mail message for sending on the given queue.
+     * Queue a new mail message for sending on the given queue.
      *
      * @param  string  $queue
      * @param  \Illuminate\Contracts\Mail\Mailable  $view
@@ -484,7 +499,7 @@ class Mailer implements MailerContract, MailQueueContract
     }
 
     /**
-     * Queue a new e-mail message for sending on the given queue.
+     * Queue a new mail message for sending on the given queue.
      *
      * This method didn't match rest of framework's "onQueue" phrasing. Added "onQueue".
      *
@@ -498,7 +513,7 @@ class Mailer implements MailerContract, MailQueueContract
     }
 
     /**
-     * Queue a new e-mail message for sending after (n) seconds.
+     * Queue a new mail message for sending after (n) seconds.
      *
      * @param  \DateTimeInterface|\DateInterval|int  $delay
      * @param  \Illuminate\Contracts\Mail\Mailable  $view
@@ -519,7 +534,7 @@ class Mailer implements MailerContract, MailQueueContract
     }
 
     /**
-     * Queue a new e-mail message for sending after (n) seconds on the given queue.
+     * Queue a new mail message for sending after (n) seconds on the given queue.
      *
      * @param  string  $queue
      * @param  \DateTimeInterface|\DateInterval|int  $delay

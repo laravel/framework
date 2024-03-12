@@ -22,6 +22,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\LazyCollection;
 use Illuminate\Support\Str;
+use Illuminate\Support\Traits\Dumpable;
 use Illuminate\Support\Traits\ForwardsCalls;
 use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
@@ -30,7 +31,7 @@ use RuntimeException;
 
 class Builder implements BuilderContract
 {
-    use BuildsQueries, ExplainsQueries, ForwardsCalls, Macroable {
+    use BuildsQueries, Dumpable, ExplainsQueries, ForwardsCalls, Macroable {
         __call as macroCall;
     }
 
@@ -150,6 +151,13 @@ class Builder implements BuilderContract
      * @var int
      */
     public $limit;
+
+    /**
+     * The maximum number of records to return per group.
+     *
+     * @var array
+     */
+    public $groupLimit;
 
     /**
      * The number of records to skip.
@@ -2564,6 +2572,22 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Add a "group limit" clause to the query.
+     *
+     * @param  int  $value
+     * @param  string  $column
+     * @return $this
+     */
+    public function groupLimit($value, $column)
+    {
+        if ($value >= 0) {
+            $this->groupLimit = compact('value', 'column');
+        }
+
+        return $this;
+    }
+
+    /**
      * Set the limit and offset for a given page.
      *
      * @param  int  $page
@@ -2856,9 +2880,13 @@ class Builder implements BuilderContract
      */
     public function get($columns = ['*'])
     {
-        return collect($this->onceWithColumns(Arr::wrap($columns), function () {
+        $items = collect($this->onceWithColumns(Arr::wrap($columns), function () {
             return $this->processor->processSelect($this, $this->runSelect());
         }));
+
+        return isset($this->groupLimit)
+            ? $this->withoutGroupLimitKeys($items)
+            : $items;
     }
 
     /**
@@ -2874,6 +2902,32 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Remove the group limit keys from the results in the collection.
+     *
+     * @param  \Illuminate\Support\Collection  $items
+     * @return \Illuminate\Support\Collection
+     */
+    protected function withoutGroupLimitKeys($items)
+    {
+        $keysToRemove = ['laravel_row'];
+
+        if (is_string($this->groupLimit['column'])) {
+            $column = last(explode('.', $this->groupLimit['column']));
+
+            $keysToRemove[] = '@laravel_group := '.$this->grammar->wrap($column);
+            $keysToRemove[] = '@laravel_group := '.$this->grammar->wrap('pivot_'.$column);
+        }
+
+        $items->each(function ($item) use ($keysToRemove) {
+            foreach ($keysToRemove as $key) {
+                unset($item->$key);
+            }
+        });
+
+        return $items;
+    }
+
+    /**
      * Paginate the given query into a simple paginator.
      *
      * @param  int|\Closure  $perPage
@@ -2883,11 +2937,11 @@ class Builder implements BuilderContract
      * @param  \Closure|int|null  $total
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
-    public function paginate($perPage = 15, $columns = ['*'], $pageName = 'page', $page = null)
+    public function paginate($perPage = 15, $columns = ['*'], $pageName = 'page', $page = null, $total = null)
     {
         $page = $page ?: Paginator::resolveCurrentPage($pageName);
 
-        $total = func_num_args() === 5 ? value(func_get_arg(4)) : $this->getCountForPagination();
+        $total = value($total) ?? $this->getCountForPagination();
 
         $perPage = $perPage instanceof Closure ? $perPage($total) : $perPage;
 
@@ -3555,10 +3609,20 @@ class Builder implements BuilderContract
     {
         $this->applyBeforeQueryCallbacks();
 
-        $sql = $this->grammar->compileUpdate($this, $values);
+        $values = collect($values)->map(function ($value) {
+            if (! $value instanceof Builder) {
+                return ['value' => $value, 'bindings' => $value];
+            }
+
+            [$query, $bindings] = $this->parseSub($value);
+
+            return ['value' => new Expression("({$query})"), 'bindings' => fn () => $bindings];
+        });
+
+        $sql = $this->grammar->compileUpdate($this, $values->map(fn ($value) => $value['value'])->all());
 
         return $this->connection->update($sql, $this->cleanBindings(
-            $this->grammar->prepareBindingsForUpdate($this->bindings, $values)
+            $this->grammar->prepareBindingsForUpdate($this->bindings, $values->map(fn ($value) => $value['bindings'])->all())
         ));
     }
 
@@ -4043,11 +4107,16 @@ class Builder implements BuilderContract
     /**
      * Dump the current SQL and bindings.
      *
+     * @param  mixed  ...$args
      * @return $this
      */
-    public function dump()
+    public function dump(...$args)
     {
-        dump($this->toSql(), $this->getBindings());
+        dump(
+            $this->toSql(),
+            $this->getBindings(),
+            ...$args,
+        );
 
         return $this;
     }

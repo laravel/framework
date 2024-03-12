@@ -314,6 +314,22 @@ class SqlServerGrammar extends Grammar
     }
 
     /**
+     * Compile a row number clause.
+     *
+     * @param  string  $partition
+     * @param  string  $orders
+     * @return string
+     */
+    protected function compileRowNumber($partition, $orders)
+    {
+        if (empty($orders)) {
+            $orders = 'order by (select 0)';
+        }
+
+        return parent::compileRowNumber($partition, $orders);
+    }
+
+    /**
      * Compile the "offset" portions of the query.
      *
      * @param  \Illuminate\Database\Query\Builder  $query

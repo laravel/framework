@@ -13,14 +13,41 @@ class PromptsValidationTest extends TestCase
     protected function defineEnvironment($app)
     {
         $app[Kernel::class]->registerCommand(new DummyPromptsValidationCommand());
+        $app[Kernel::class]->registerCommand(new DummyPromptsWithLaravelRulesCommand());
+        $app[Kernel::class]->registerCommand(new DummyPromptsWithLaravelRulesMessagesAndAttributesCommand());
+        $app[Kernel::class]->registerCommand(new DummyPromptsWithLaravelRulesCommandWithInlineMessagesAndAttibutesCommand());
     }
 
     public function testValidationForPrompts()
     {
         $this
             ->artisan(DummyPromptsValidationCommand::class)
-            ->expectsQuestion('Test', 'bar')
-            ->expectsOutputToContain('error!');
+            ->expectsQuestion('What is your name?', '')
+            ->expectsOutputToContain('Required!');
+    }
+
+    public function testValidationWithLaravelRulesAndNoCustomization()
+    {
+        $this
+            ->artisan(DummyPromptsWithLaravelRulesCommand::class)
+            ->expectsQuestion('What is your name?', '')
+            ->expectsOutputToContain('The answer field is required.');
+    }
+
+    public function testValidationWithLaravelRulesInlineMessagesAndAttributes()
+    {
+        $this
+            ->artisan(DummyPromptsWithLaravelRulesCommandWithInlineMessagesAndAttibutesCommand::class)
+            ->expectsQuestion('What is your name?', '')
+            ->expectsOutputToContain('Your full name is mandatory.');
+    }
+
+    public function testValidationWithLaravelRulesMessagesAndAttributes()
+    {
+        $this
+            ->artisan(DummyPromptsWithLaravelRulesMessagesAndAttributesCommand::class)
+            ->expectsQuestion('What is your name?', '')
+            ->expectsOutputToContain('Your full name is mandatory.');
     }
 }
 
@@ -30,6 +57,50 @@ class DummyPromptsValidationCommand extends Command
 
     public function handle()
     {
-        text('Test', validate: fn ($value) => $value == 'foo' ? '' : 'error!');
+        text('What is your name?', validate: fn ($value) => $value == '' ? 'Required!' : null);
+    }
+}
+
+class DummyPromptsWithLaravelRulesCommand extends Command
+{
+    protected $signature = 'prompts-laravel-rules-test';
+
+    public function handle()
+    {
+        text('What is your name?', validate: 'required');
+    }
+}
+
+class DummyPromptsWithLaravelRulesCommandWithInlineMessagesAndAttibutesCommand extends Command
+{
+    protected $signature = 'prompts-laravel-rules-inline-test';
+
+    public function handle()
+    {
+        text('What is your name?', validate: literal(
+            rules: ['name' => 'required'],
+            messages: ['name.required' => 'Your :attribute is mandatory.'],
+            attributes: ['name' => 'full name'],
+        ));
+    }
+}
+
+class DummyPromptsWithLaravelRulesMessagesAndAttributesCommand extends Command
+{
+    protected $signature = 'prompts-laravel-rules-messages-attributes-test';
+
+    public function handle()
+    {
+        text('What is your name?', validate: ['name' => 'required']);
+    }
+
+    protected function validationMessages()
+    {
+        return ['name.required' => 'Your :attribute is mandatory.'];
+    }
+
+    protected function validationAttributes()
+    {
+        return ['name' => 'full name'];
     }
 }

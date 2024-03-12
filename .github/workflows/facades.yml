@@ -25,8 +25,8 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          extensions: :php-psr
-          php-version: 8.1
+          php-version: 8.2
+          extensions: :php-psr          
           tools: composer:v2
           coverage: none
 
@@ -50,6 +50,7 @@ jobs:
             Illuminate\\Support\\Facades\\Bus \
             Illuminate\\Support\\Facades\\Cache \
             Illuminate\\Support\\Facades\\Config \
+            Illuminate\\Support\\Facades\\Context \
             Illuminate\\Support\\Facades\\Cookie \
             Illuminate\\Support\\Facades\\Crypt \
             Illuminate\\Support\\Facades\\DB \

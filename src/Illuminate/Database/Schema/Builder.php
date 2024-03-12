@@ -49,13 +49,6 @@ class Builder
     public static $defaultMorphKeyType = 'int';
 
     /**
-     * Indicates whether Doctrine DBAL usage will be prevented if possible when dropping, renaming, and modifying columns.
-     *
-     * @var bool
-     */
-    public static $alwaysUsesNativeSchemaOperationsIfPossible = false;
-
-    /**
      * Create a new database Schema manager.
      *
      * @param  \Illuminate\Database\Connection  $connection
@@ -113,17 +106,6 @@ class Builder
     public static function morphUsingUlids()
     {
         return static::defaultMorphKeyType('ulid');
-    }
-
-    /**
-     * Attempt to use native schema operations for dropping, renaming, and modifying columns, even if Doctrine DBAL is installed.
-     *
-     * @param  bool  $value
-     * @return void
-     */
-    public static function useNativeSchemaOperationsIfPossible(bool $value = true)
-    {
-        static::$alwaysUsesNativeSchemaOperationsIfPossible = $value;
     }
 
     /**
@@ -235,20 +217,6 @@ class Builder
     }
 
     /**
-     * Get all of the table names for the database.
-     *
-     * @deprecated Will be removed in a future Laravel version.
-     *
-     * @return array
-     *
-     * @throws \LogicException
-     */
-    public function getAllTables()
-    {
-        throw new LogicException('This database driver does not support getting all tables.');
-    }
-
-    /**
      * Determine if the given table has a given column.
      *
      * @param  string  $table
@@ -322,12 +290,6 @@ class Builder
      */
     public function getColumnType($table, $column, $fullDefinition = false)
     {
-        if (! $this->connection->usingNativeSchemaOperations()) {
-            $table = $this->connection->getTablePrefix().$table;
-
-            return $this->connection->getDoctrineColumn($table, $column)->getType()->getName();
-        }
-
         $columns = $this->getColumns($table);
 
         foreach ($columns as $value) {

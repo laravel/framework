@@ -319,15 +319,16 @@ class Sleep
      * Stay awake and capture any attempts to sleep.
      *
      * @param  bool  $value
+     * @param  bool  $syncWithCarbon
      * @return void
      */
-    public static function fake($value = true)
+    public static function fake($value = true, $syncWithCarbon = false)
     {
         static::$fake = $value;
 
         static::$sequence = [];
         static::$fakeSleepCallbacks = [];
-        static::$syncWithCarbon = false;
+        static::$syncWithCarbon = $syncWithCarbon;
     }
 
     /**
@@ -414,7 +415,7 @@ class Sleep
         }
 
         foreach (static::$sequence as $duration) {
-            PHPUnit::assertSame(0, $duration->totalMicroseconds, vsprintf('Unexpected sleep duration of [%s] found.', [
+            PHPUnit::assertSame(0, (int) $duration->totalMicroseconds, vsprintf('Unexpected sleep duration of [%s] found.', [
                 $duration->cascade()->forHumans([
                     'options' => 0,
                     'minimumUnit' => 'microsecond',

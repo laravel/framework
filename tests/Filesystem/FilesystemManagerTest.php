@@ -6,6 +6,7 @@ use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Filesystem\FilesystemManager;
 use Illuminate\Foundation\Application;
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
 use PHPUnit\Framework\TestCase;
 
 class FilesystemManagerTest extends TestCase
@@ -98,9 +99,7 @@ class FilesystemManagerTest extends TestCase
         }
     }
 
-    /**
-     * @requires OS Linux|Darwin
-     */
+    #[RequiresOperatingSystem('Linux|Darwin')]
     public function testCanBuildScopedDisksWithVisibility()
     {
         try {

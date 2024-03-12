@@ -158,4 +158,23 @@ class DatabaseUserProvider implements UserProvider
             $credentials['password'], $user->getAuthPassword()
         );
     }
+
+    /**
+     * Rehash the user's password if required and supported.
+     *
+     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
+     * @param  array  $credentials
+     * @param  bool  $force
+     * @return void
+     */
+    public function rehashPasswordIfRequired(UserContract $user, array $credentials, bool $force = false)
+    {
+        if (! $this->hasher->needsRehash($user->getAuthPassword()) && ! $force) {
+            return;
+        }
+
+        $this->connection->table($this->table)
+            ->where($user->getAuthIdentifierName(), $user->getAuthIdentifier())
+            ->update([$user->getAuthPasswordName() => $this->hasher->make($credentials['password'])]);
+    }
 }

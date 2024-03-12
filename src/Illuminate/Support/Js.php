@@ -7,8 +7,9 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Contracts\Support\Jsonable;
 use JsonSerializable;
+use Stringable;
 
-class Js implements Htmlable
+class Js implements Htmlable, Stringable
 {
     /**
      * The JavaScript string.
