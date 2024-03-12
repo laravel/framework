@@ -635,6 +635,23 @@ class Arr
     }
 
     /**
+     * Run a map over each nested chunk of items.
+     *
+     * @template TMapSpreadValue
+     *
+     * @param  callable(mixed...): TMapSpreadValue  $callback
+     * @return array<TKey, TMapSpreadValue>
+     */
+    public function mapSpread(callable $callback)
+    {
+        return static::map(function ($chunk, $key) use ($callback) {
+            $chunk[] = $key;
+
+            return $callback(...$chunk);
+        });
+    }
+
+    /**
      * Push an item onto the beginning of an array.
      *
      * @param  array  $array

@@ -733,6 +733,27 @@ class SupportArrTest extends TestCase
         $this->assertEquals(['first' => 'taylor', 'last' => 'otwell'], $data);
     }
 
+    public function testMapSpread()
+    {
+        $c = [[1, 'a'], [2, 'b']];
+
+        $result = Arr::mapSpread(function ($number, $character) {
+            return "{$number}-{$character}";
+        });
+        $this->assertEquals(['1-a', '2-b'], $result);
+
+        $result = Arr::mapSpread(function ($number, $character, $key) {
+            return "{$number}-{$character}-{$key}";
+        });
+        $this->assertEquals(['1-a-0', '2-b-1'], $result);
+
+        $c = [[1, 'a'], [2, 'b']];
+        $result = Arr::mapSpread(function ($number, $character, $key) {
+            return "{$number}-{$character}-{$key}";
+        });
+        $this->assertEquals(['1-a-0', '2-b-1'], $result);
+    }
+
     public function testPrepend()
     {
         $array = Arr::prepend(['one', 'two', 'three', 'four'], 'zero');
