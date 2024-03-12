@@ -21,6 +21,17 @@ class Exceptions
     /**
      * Register a reportable callback.
      *
+     * @param  callable  $using
+     * @return \Illuminate\Foundation\Exceptions\ReportableHandler
+     */
+    public function report(callable $using)
+    {
+        return $this->handler->reportable($using);
+    }
+
+    /**
+     * Register a reportable callback.
+     *
      * @param  callable  $reportUsing
      * @return \Illuminate\Foundation\Exceptions\ReportableHandler
      */
@@ -32,12 +43,38 @@ class Exceptions
     /**
      * Register a renderable callback.
      *
+     * @param  callable  $using
+     * @return $this
+     */
+    public function render(callable $using)
+    {
+        $this->handler->renderable($using);
+
+        return $this;
+    }
+
+    /**
+     * Register a renderable callback.
+     *
      * @param  callable  $renderUsing
      * @return $this
      */
     public function renderable(callable $renderUsing)
     {
         $this->handler->renderable($renderUsing);
+
+        return $this;
+    }
+
+    /**
+     * Register a callback to prepare the final, rendered exception response.
+     *
+     * @param  callable  $using
+     * @return $this
+     */
+    public function respond(callable $using)
+    {
+        $this->handler->respondUsing($using);
 
         return $this;
     }

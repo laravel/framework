@@ -109,6 +109,13 @@ class Handler implements ExceptionHandlerContract
     protected $shouldRenderJsonWhenCallback;
 
     /**
+     * The callback that prepares responses to be returned to the browser.
+     *
+     * @var callable|null
+     */
+    protected $finalizeResponseCallback;
+
+    /**
      * The registered exception mappings.
      *
      * @var array<string, \Closure>
@@ -554,25 +561,57 @@ class Handler implements ExceptionHandlerContract
         $e = $this->mapException($e);
 
         if (method_exists($e, 'render') && $response = $e->render($request)) {
-            return Router::toResponse($request, $response);
+            return $this->finalizeRenderedResponse(
+                $request,
+                Router::toResponse($request, $response),
+                $e
+            );
         }
 
         if ($e instanceof Responsable) {
-            return $e->toResponse($request);
+            return $this->finalizeRenderedResponse($request, $e->toResponse($request), $e);
         }
 
         $e = $this->prepareException($e);
 
         if ($response = $this->renderViaCallbacks($request, $e)) {
-            return $response;
+            return $this->finalizeRenderedResponse($request, $response, $e);
         }
 
-        return match (true) {
+        return $this->finalizeRenderedResponse($request, match (true) {
             $e instanceof HttpResponseException => $e->getResponse(),
             $e instanceof AuthenticationException => $this->unauthenticated($request, $e),
             $e instanceof ValidationException => $this->convertValidationExceptionToResponse($e, $request),
             default => $this->renderExceptionResponse($request, $e),
-        };
+        }, $e);
+    }
+
+    /**
+     * Prepare the final, rendered response to be returned to the browser.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Symfony\Component\HttpFoundation\Response  $response
+     * @param  \Throwable  $e
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    protected function finalizeRenderedResponse($request, $response, Throwable $e)
+    {
+        return $this->finalizeResponseCallback
+            ? call_user_func($this->finalizeResponseCallback, $request, $response, $e)
+            : $response;
+    }
+
+    /**
+     * Prepare the final, rendered response for an exception using the given callback.
+     *
+     * @param  callable  $callback
+     * @return $this
+     */
+    public function respondUsing($callback)
+    {
+        $this->finalizeResponseCallback = $callback;
+
+        return $this;
     }
 
     /**
