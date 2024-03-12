@@ -307,7 +307,7 @@ abstract class Factory
     {
         $model = $this->modelName();
 
-        if(! is_null($result = $model::where($attributes)->first())) {
+        if (! is_null($result = $model::where($attributes)->first())) {
             return $result;
         }
 
