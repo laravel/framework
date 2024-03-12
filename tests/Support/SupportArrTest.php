@@ -746,12 +746,6 @@ class SupportArrTest extends TestCase
             return "{$number}-{$character}-{$key}";
         });
         $this->assertEquals(['1-a-0', '2-b-1'], $result);
-
-        $c = [[1, 'a'], [2, 'b']];
-        $result = Arr::mapSpread($c, function ($number, $character, $key) {
-            return "{$number}-{$character}-{$key}";
-        });
-        $this->assertEquals(['1-a-0', '2-b-1'], $result);
     }
 
     public function testPrepend()
