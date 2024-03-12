@@ -98,7 +98,7 @@ class Builder implements BuilderContract
     /**
      * The table which the query is targeting.
      *
-     * @var string
+     * @var \Illuminate\Database\Query\Expression|string
      */
     public $from;
 
