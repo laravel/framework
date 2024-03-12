@@ -548,8 +548,8 @@ class Migrator
             static $uniqueNameCheck = [];
             $shortName = $this->getMigrationName($file);
             if (isset($uniqueNameCheck[$shortName])) {
-                $this->write(Error::class, "Duplicate migration filenames: ".$uniqueNameCheck[$shortName]);
-                $this->write(Error::class, "Duplicate migration filenames: ".$file);
+                $this->write(Error::class, 'Duplicate migration filenames: '.$uniqueNameCheck[$shortName]);
+                $this->write(Error::class, 'Duplicate migration filenames: '.$file);
                 exit;
             }
             $uniqueNameCheck[$shortName] = $file;
