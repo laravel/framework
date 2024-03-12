@@ -805,7 +805,7 @@ class ComponentTagCompiler
             }
 
             $results[] = "'{$attribute}' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(".(
-                ($attribute === 'attributes') ? $value : ('$componentData[\'data\'][\''.Str::camel($attribute).'\'] ?? ' . $value)
+                ($attribute === 'attributes') ? $value : ('array_key_exists(\''.Str::camel($attribute).'\', $componentData[\'data\'] ?? []) ? ($componentData[\'data\'][\''.Str::camel($attribute).'\'] ?? null) : ' . $value)
             ).')';
         }
 
