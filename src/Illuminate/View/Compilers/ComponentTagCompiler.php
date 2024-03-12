@@ -262,7 +262,7 @@ class ComponentTagCompiler
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass('.$class.'::class))->getConstructor()): ?>
 <?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['.$this->attributesToStringWithExistingComponentData($attributes->all(), $escapeAttributes = $class !== DynamicComponent::class).']); ?>';
+<?php $component->withAttributes(['.$this->attributesToStringWithExistingComponentData($attributes->all(), $escapeAttributes = $class !== DynamicComponent::class && ! is_subclass_of($class, DynamicComponent::class)).']); ?>';
     }
 
     /**
