@@ -478,7 +478,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 <?php if (isset(\$attributes) && \$attributes instanceof Illuminate\View\ComponentAttributeBag && \$constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
 <?php \$attributes = \$attributes->except(collect(\$constructor->getParameters())->map->getName()->all()); ?>
 <?php endif; ?>
-<?php \$component->withAttributes(['name' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(array_key_exists('src', $componentData['data'] ?? []) ? (\$componentData['data']['src'] ?? null) : 'Taylor'),'age' => 31,'wire:model' => 'foo']); ?>\n".
+<?php \$component->withAttributes(['name' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(array_key_exists('name', $componentData['data'] ?? []) ? (\$componentData['data']['name'] ?? null) : 'Taylor'),'age' => 31,'wire:model' => 'foo']); ?>\n".
 '@endComponentClass##END-COMPONENT-CLASS##', trim($result));
     }
 
@@ -497,7 +497,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 <?php if (isset(\$attributes) && \$attributes instanceof Illuminate\View\ComponentAttributeBag && \$constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
 <?php \$attributes = \$attributes->except(collect(\$constructor->getParameters())->map->getName()->all()); ?>
 <?php endif; ?>
-<?php \$component->withAttributes(['name' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(array_key_exists('src', $componentData['data'] ?? []) ? (\$componentData['data']['src'] ?? null) : 'Taylor'),'age' => 31,'wire:model' => 'foo']); ?>\n".
+<?php \$component->withAttributes(['name' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(array_key_exists('name', $componentData['data'] ?? []) ? (\$componentData['data']['name'] ?? null) : 'Taylor'),'age' => 31,'wire:model' => 'foo']); ?>\n".
 '@endComponentClass##END-COMPONENT-CLASS##', trim($result));
     }
 
@@ -516,7 +516,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 <?php if (isset(\$attributes) && \$attributes instanceof Illuminate\View\ComponentAttributeBag && \$constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
 <?php \$attributes = \$attributes->except(collect(\$constructor->getParameters())->map->getName()->all()); ?>
 <?php endif; ?>
-<?php \$component->withAttributes(['name' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(array_key_exists('src', $componentData['data'] ?? []) ? (\$componentData['data']['src'] ?? null) : 'Taylor'),'age' => 31,'wire:model' => 'foo']); ?>\n".
+<?php \$component->withAttributes(['name' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(array_key_exists('name', $componentData['data'] ?? []) ? (\$componentData['data']['name'] ?? null) : 'Taylor'),'age' => 31,'wire:model' => 'foo']); ?>\n".
 '@endComponentClass##END-COMPONENT-CLASS##', trim($result));
     }
 
@@ -550,7 +550,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 <?php if (isset(\$attributes) && \$attributes instanceof Illuminate\View\ComponentAttributeBag && \$constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
 <?php \$attributes = \$attributes->except(collect(\$constructor->getParameters())->map->getName()->all()); ?>
 <?php endif; ?>
-<?php \$component->withAttributes(['name' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(array_key_exists('src', $componentData['data'] ?? []) ? (\$componentData['data']['src'] ?? null) : 'Taylor'),'age' => 31,'wire:model' => 'foo']); ?>\n".
+<?php \$component->withAttributes(['name' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(array_key_exists('name', $componentData['data'] ?? []) ? (\$componentData['data']['name'] ?? null) : 'Taylor'),'age' => 31,'wire:model' => 'foo']); ?>\n".
             '@endComponentClass##END-COMPONENT-CLASS##', trim($result));
     }
 
@@ -584,7 +584,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 <?php if (isset(\$attributes) && \$attributes instanceof Illuminate\View\ComponentAttributeBag && \$constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
 <?php \$attributes = \$attributes->except(collect(\$constructor->getParameters())->map->getName()->all()); ?>
 <?php endif; ?>
-<?php \$component->withAttributes(['name' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(array_key_exists('src', $componentData['data'] ?? []) ? (\$componentData['data']['src'] ?? null) : 'Taylor'),'age' => 31,'wire:model' => 'foo']); ?>\n".
+<?php \$component->withAttributes(['name' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(array_key_exists('name', $componentData['data'] ?? []) ? (\$componentData['data']['name'] ?? null) : 'Taylor'),'age' => 31,'wire:model' => 'foo']); ?>\n".
             '@endComponentClass##END-COMPONENT-CLASS##', trim($result));
     }
 
