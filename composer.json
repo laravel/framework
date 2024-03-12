@@ -104,7 +104,7 @@
         "league/flysystem-path-prefixing": "^3.3",
         "league/flysystem-read-only": "^3.3",
         "league/flysystem-sftp-v3": "^3.0",
-        "mockery/mockery": "^1.6.7",
+        "mockery/mockery": "^1.6",
         "nyholm/psr7": "^1.2",
         "orchestra/testbench-core": "^9.0",
         "pda/pheanstalk": "^5.0",
