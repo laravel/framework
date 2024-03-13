@@ -163,6 +163,11 @@ class BroadcastingInstallCommand extends Command
                 'yarn add --dev laravel-echo pusher-js',
                 'yarn run build',
             ];
+        } elseif (file_exists(base_path('bun.lockb'))) {
+            $commands = [
+                'bun add --dev laravel-echo pusher-js',
+                'bun run build',
+            ];
         } else {
             $commands = [
                 'npm install --save-dev laravel-echo pusher-js',
