@@ -1414,7 +1414,7 @@ class Str
         (?<!^) # don't match the beginning of a string
         (
             (?<=[^\p{Lu}])[\p{Lu}\p{M}]+(?=\p{M}?[^\p{Ll}]\p{M}?\p{L}) # string of upper-case (like an abbreviation)
-            | (?<=\p{Lu}{2})[\p{Lu}\p{M}](?=\p{M}?[^\p{Lu}]) # the final upper-case in a sequence
+            | (?<=\p{Lu}{2})[\p{Lu}\p{M}](?=\p{M}?\p{Ll}) # the final upper-case in a sequence
             | (?<=[^\p{Lu}])[\p{Lu}\p{M}](?=\p{M}?\p{Ll}) # first upper-case in a capitalized sequence
         )
         /ux

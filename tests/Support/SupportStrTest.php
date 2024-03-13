@@ -759,10 +759,11 @@ class SupportStrTest extends TestCase
         $this->assertSame('laravel_php_framework_', Str::snake('LaravelPhpFramework_', '_'));
         $this->assertSame('laravel_php_framework', Str::snake('laravel php Framework'));
         $this->assertSame('laravel_php_frame_work', Str::snake('laravel php FrameWork'));
-        // prevent breaking changes
+        // changes in Laravel 12
         $this->assertSame('foo_bar', Str::snake('foo-bar'));
         $this->assertSame('foo_bar', Str::snake('Foo-Bar'));
         $this->assertSame('foo_bar', Str::snake('Foo_Bar'));
+        $this->assertSame('foo_bar', Str::snake('FOO BAR'));
         $this->assertSame('żółta_łódka', Str::snake('ŻółtaŁódka'));
     }
 
