@@ -326,7 +326,7 @@ trait EnumeratesValues
     {
         $allowedTypes = is_array($type) ? $type : [$type];
 
-        return $this->each(function ($item) use ($allowedTypes) {
+        return $this->each(function ($item, $index) use ($allowedTypes) {
             $itemType = get_debug_type($item);
 
             foreach ($allowedTypes as $allowedType) {
@@ -336,7 +336,7 @@ trait EnumeratesValues
             }
 
             throw new UnexpectedValueException(
-                sprintf("Collection should only include [%s] items, but '%s' found.", implode(', ', $allowedTypes), $itemType)
+                sprintf("Collection should only include [%s] items, but '%s' found at position %d.", implode(', ', $allowedTypes), $itemType, $index)
             );
         });
     }

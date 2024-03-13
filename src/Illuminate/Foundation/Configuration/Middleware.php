@@ -737,7 +737,7 @@ class Middleware
      */
     protected function defaultAliases()
     {
-        return [
+        $aliases = [
             'auth' => \Illuminate\Auth\Middleware\Authenticate::class,
             'auth.basic' => \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class,
             'auth.session' => \Illuminate\Session\Middleware\AuthenticateSession::class,
@@ -747,12 +747,17 @@ class Middleware
             'password.confirm' => \Illuminate\Auth\Middleware\RequirePassword::class,
             'precognitive' => \Illuminate\Foundation\Http\Middleware\HandlePrecognitiveRequests::class,
             'signed' => \Illuminate\Routing\Middleware\ValidateSignature::class,
-            'subscribed' => \Spark\Http\Middleware\VerifyBillableIsSubscribed::class,
             'throttle' => $this->throttleWithRedis
                 ? \Illuminate\Routing\Middleware\ThrottleRequestsWithRedis::class
                 : \Illuminate\Routing\Middleware\ThrottleRequests::class,
             'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         ];
+
+        if (class_exists(\Spark\Http\Middleware\VerifyBillableIsSubscribed::class)) {
+            $aliases['subscribed'] = \Spark\Http\Middleware\VerifyBillableIsSubscribed::class;
+        }
+
+        return $aliases;
     }
 
     /**

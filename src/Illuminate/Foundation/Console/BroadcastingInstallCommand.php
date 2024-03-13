@@ -49,9 +49,9 @@ class BroadcastingInstallCommand extends Command
             $this->components->info("Published 'channels' route file.");
 
             copy(__DIR__.'/stubs/broadcasting-routes.stub', $broadcastingRoutesPath);
-
-            $this->uncommentChannelsRoutesFile();
         }
+
+        $this->uncommentChannelsRoutesFile();
 
         // Install bootstrapping...
         if (! file_exists($echoScriptPath = $this->laravel->resourcePath('js/echo.js'))) {
@@ -63,7 +63,7 @@ class BroadcastingInstallCommand extends Command
                 $bootstrapScriptPath
             );
 
-            if (! str_contains($bootstrapScript, 'echo.js')) {
+            if (! str_contains($bootstrapScript, './echo')) {
                 file_put_contents(
                     $bootstrapScriptPath,
                     trim($bootstrapScript.PHP_EOL.file_get_contents(__DIR__.'/stubs/echo-bootstrap-js.stub')).PHP_EOL,
@@ -93,6 +93,8 @@ class BroadcastingInstallCommand extends Command
                 'channels: ',
                 $appBootstrapPath,
             );
+        } elseif (str_contains($content, 'channels: ')) {
+            return;
         } elseif (str_contains($content, 'commands: __DIR__.\'/../routes/console.php\',')) {
             (new Filesystem)->replaceInFile(
                 'commands: __DIR__.\'/../routes/console.php\',',
@@ -168,9 +170,17 @@ class BroadcastingInstallCommand extends Command
             ];
         }
 
-        Process::command(implode(' && ', $commands))
-            ->path(base_path())
-            ->tty(true)
-            ->run();
+        $command = Process::command(implode(' && ', $commands))
+                        ->path(base_path());
+
+        if (! windows_os()) {
+            $command->tty(true);
+        }
+
+        if ($command->run()->failed()) {
+            $this->components->warn("Node dependency installation failed. Please run the following commands manually: \n\n".implode(' && ', $commands));
+        } else {
+            $this->components->info('Node dependencies installed successfully.');
+        }
     }
 }
