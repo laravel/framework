@@ -749,7 +749,7 @@ class SupportStrTest extends TestCase
 
     public function testSnake()
     {
-        $this->assertSame('laravel_p_h_p_framework', Str::snake('LaravelPHPFramework'));
+        $this->assertSame('laravel_php_framework', Str::snake('LaravelPHPFramework'));
         $this->assertSame('laravel_php_framework', Str::snake('LaravelPhpFramework'));
         $this->assertSame('laravel php framework', Str::snake('LaravelPhpFramework', ' '));
         $this->assertSame('laravel_php_framework', Str::snake('Laravel Php Framework'));
@@ -760,10 +760,10 @@ class SupportStrTest extends TestCase
         $this->assertSame('laravel_php_framework', Str::snake('laravel php Framework'));
         $this->assertSame('laravel_php_frame_work', Str::snake('laravel php FrameWork'));
         // prevent breaking changes
-        $this->assertSame('foo-bar', Str::snake('foo-bar'));
-        $this->assertSame('foo-_bar', Str::snake('Foo-Bar'));
-        $this->assertSame('foo__bar', Str::snake('Foo_Bar'));
-        $this->assertSame('żółtałódka', Str::snake('ŻółtaŁódka'));
+        $this->assertSame('foo_bar', Str::snake('foo-bar'));
+        $this->assertSame('foo_bar', Str::snake('Foo-Bar'));
+        $this->assertSame('foo_bar', Str::snake('Foo_Bar'));
+        $this->assertSame('żółta_łódka', Str::snake('ŻółtaŁódka'));
     }
 
     public function testSquish()

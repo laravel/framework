@@ -1409,11 +1409,19 @@ class Str
             return static::$snakeCache[$key][$delimiter];
         }
 
-        if (! ctype_lower($value)) {
-            $value = preg_replace('/\s+/u', '', ucwords($value));
+        $pattern = <<<'REGEXP'
+        /
+        (?<!^) # don't match the beginning of a string
+        (
+            (?<=[^\p{Lu}])[\p{Lu}\p{M}]+(?=\p{M}?[^\p{Ll}]\p{M}?\p{L}) # string of upper-case (like an abbreviation)
+            | (?<=\p{Lu}{2})[\p{Lu}\p{M}](?=\p{M}?[^\p{Lu}]) # the final upper-case in a sequence
+            | (?<=[^\p{Lu}])[\p{Lu}\p{M}](?=\p{M}?\p{Ll}) # first upper-case in a capitalized sequence
+        )
+        /ux
+        REGEXP;
 
-            $value = static::lower(preg_replace('/(.)(?=[A-Z])/u', '$1'.$delimiter, $value));
-        }
+        $value = preg_replace($pattern, ' $1', trim($value));
+        $value = preg_replace('/[^\p{L}]+/u', $delimiter, self::lower($value));
 
         return static::$snakeCache[$key][$delimiter] = $value;
     }
