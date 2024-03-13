@@ -181,11 +181,12 @@ class Arr
     /**
      * Return the first element in an array passing a given truth test.
      *
+     * @template TKey
      * @template TValue
      * @template TFirstDefault
      *
-     * @param  iterable<TValue>  $array
-     * @param  (callable(TValue): bool)|null  $callback
+     * @param  iterable<TKey, TValue>  $array
+     * @param  (callable(TValue, TKey): bool)|null  $callback
      * @param  TFirstDefault|(\Closure(): TFirstDefault)  $default
      * @return TValue|TFirstDefault
      */
