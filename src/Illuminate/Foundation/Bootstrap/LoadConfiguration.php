@@ -119,7 +119,7 @@ class LoadConfiguration
             'auth' => ['guards', 'providers', 'passwords'],
             'broadcasting' => ['connections'],
             'cache' => ['stores'],
-            'database' => ['connections', 'redis'],
+            'database' => ['connections'],
             'filesystems' => ['disks'],
             'logging' => ['channels'],
             'mail' => ['mailers'],
