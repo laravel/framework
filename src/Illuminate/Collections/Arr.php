@@ -181,10 +181,13 @@ class Arr
     /**
      * Return the first element in an array passing a given truth test.
      *
-     * @param  iterable  $array
-     * @param  callable|null  $callback
-     * @param  mixed  $default
-     * @return mixed
+     * @template TValue
+     * @template TFirstDefault
+     *
+     * @param  iterable<TValue>  $array
+     * @param  (callable(TValue): bool)|null  $callback
+     * @param  TFirstDefault|(\Closure(): TFirstDefault)  $default
+     * @return TValue|TFirstDefault
      */
     public static function first($array, callable $callback = null, $default = null)
     {
