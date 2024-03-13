@@ -97,7 +97,7 @@ jobs:
       - name: Store artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: linux-logs
+          name: linux-logs-${{ matrix.php }}-${{ matrix.stability }}
           path: |
             vendor/orchestra/testbench-core/laravel/storage/logs
             !vendor/**/.gitignore
@@ -163,7 +163,7 @@ jobs:
       - name: Store artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: windows-logs
+          name: windows-logs-${{ matrix.php }}-${{ matrix.stability }}
           path: |
             vendor/orchestra/testbench-core/laravel/storage/logs
             !vendor/**/.gitignore
