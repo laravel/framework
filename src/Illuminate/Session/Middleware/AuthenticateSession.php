@@ -44,7 +44,7 @@ class AuthenticateSession implements AuthenticatesSessions
      */
     public function handle($request, Closure $next)
     {
-        if (! $request->hasSession() || ! $request->user()) {
+        if (! $request->hasSession() || ! $request->user() || ! $request->user()->getAuthPassword()) {
             return $next($request);
         }
 
