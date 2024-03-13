@@ -93,7 +93,7 @@ class BroadcastingInstallCommand extends Command
                 'channels: ',
                 $appBootstrapPath,
             );
-        }  elseif (str_contains($content, 'channels: ')) {
+        } elseif (str_contains($content, 'channels: ')) {
             return;
         } elseif (str_contains($content, 'commands: __DIR__.\'/../routes/console.php\',')) {
             (new Filesystem)->replaceInFile(
