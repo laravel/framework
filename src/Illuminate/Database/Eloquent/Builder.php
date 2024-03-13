@@ -1028,6 +1028,22 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Save many new models and return the collection of instances.
+     *
+     * @param  array $arrayOfArrays
+     * @return \Illuminate\Support\Collection
+     */
+    public function createMany(array $arrayOfArrays) {
+        $items = collect();
+
+        foreach ($arrayOfArrays as $attributes){
+            $items->push($this->create($attributes));
+        }
+
+        return $items;
+    }
+
+    /**
      * Save a new model and return the instance. Allow mass-assignment.
      *
      * @param  array  $attributes
