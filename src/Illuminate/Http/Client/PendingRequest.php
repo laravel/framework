@@ -768,11 +768,17 @@ class PendingRequest
      */
     public function get(string $url, $query = null)
     {
+        if (! is_array($query)) {
+            parse_str($query ?: "", $query);
+        }
+
         $url_query = parse_url($url, PHP_URL_QUERY);
-        parse_str($url_query, $url_query);
+        parse_str($url_query ?: "", $url_query);
+
+        $full_query = array_merge($url_query, $query);
 
         return $this->send('GET', $url, func_num_args() === 1 ? [] : [
-            'query' => array_merge($query, $url_query),
+            'query' => $full_query,
         ]);
     }
 
