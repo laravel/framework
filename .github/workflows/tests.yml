@@ -97,7 +97,7 @@ jobs:
       - name: Store artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: logs
+          name: linux-logs
           path: |
             vendor/orchestra/testbench-core/laravel/storage/logs
             !vendor/**/.gitignore
@@ -163,7 +163,7 @@ jobs:
       - name: Store artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: logs
+          name: windows-logs
           path: |
             vendor/orchestra/testbench-core/laravel/storage/logs
             !vendor/**/.gitignore
