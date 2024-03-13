@@ -95,7 +95,7 @@ jobs:
           AWS_SECRET_ACCESS_KEY: randomSecret
 
       - name: Store artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: logs
           path: |
@@ -161,7 +161,7 @@ jobs:
           AWS_SECRET_ACCESS_KEY: random_secret
 
       - name: Store artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: logs
           path: |
