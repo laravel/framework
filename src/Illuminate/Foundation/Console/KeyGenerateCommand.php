@@ -114,12 +114,26 @@ class KeyGenerateCommand extends Command
     /**
      * Get a regex pattern that will match env APP_KEY with any random key.
      *
+     * @param  string $key
      * @return string
      */
-    protected function keyReplacementPattern()
+    protected function keyReplacementPattern($key = 'app.key')
     {
-        $escaped = preg_quote('='.$this->laravel['config']['app.key'], '/');
+        $configValue = $this->laravel['config'][$key];
+        $stringValue = is_array($configValue)
+            ? implode(',', $configValue)
+            : $configValue;
 
-        return "/^APP_KEY{$escaped}/m";
+        $escaped = preg_quote('='.$stringValue, '/');
+
+        return "/^{$this->enviornmentKeyName($key)}{$escaped}/m";
+    }
+
+    /**
+     * Get string formated as enviornment key style
+     */
+    protected function enviornmentKeyName($key)
+    {
+        return strtoupper(str_replace('.', '_', $key));
     }
 }
