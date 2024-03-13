@@ -175,7 +175,7 @@ class BroadcastingInstallCommand extends Command
             $command->tty(true);
         }
 
-        if($command->run()->failed()) {
+        if ($command->run()->failed()) {
             $this->components->warn("Node dependencies installation couldn't complete. Please run the following commands manually: \n\n" . implode(" && ", $commands));
         } else {
             $this->components->info("Node dependencies installed successfully.");
