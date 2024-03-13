@@ -27,7 +27,7 @@ class KeyRotateCommandTest extends TestCase
 
     protected function tearDown(): void
     {
-        File::delete(__DIR__.'/.env');
+        File::delete(__DIR__.DIRECTORY_SEPARATOR.'.env');
 
         parent::tearDown();
     }
@@ -38,7 +38,7 @@ class KeyRotateCommandTest extends TestCase
         $originalPreviousKeys = ['old-key-1', 'old-key-2'];
 
         File::put(
-            __DIR__.'/.env',
+            __DIR__.DIRECTORY_SEPARATOR.'.env',
             "APP_KEY=".$currentKey."\nAPP_PREVIOUS_KEYS=".implode(',', $originalPreviousKeys)
         );
         

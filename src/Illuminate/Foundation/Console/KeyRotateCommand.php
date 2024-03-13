@@ -38,7 +38,7 @@ class KeyRotateCommand extends KeyGenerateCommand
 
         $keys = [
             'app.key' => $key,
-            'app.previous_keys' => $previousKeys
+            'app.previous_keys' => $previousKeys,
         ];
 
         if ($this->option('show')) {
@@ -51,7 +51,7 @@ class KeyRotateCommand extends KeyGenerateCommand
 
         $this->laravel['config']['app.key'] = $key;
         $this->laravel['config']['app.previous_keys'] = $previousKeys;
-    
+
         $this->components->info('Appliction key successfully rotated');
     }
 

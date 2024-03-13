@@ -114,7 +114,7 @@ class KeyGenerateCommand extends Command
     /**
      * Get a regex pattern that will match env APP_KEY with any random key.
      *
-     * @param  string $key
+     * @param  string  $key
      * @return string
      */
     protected function keyReplacementPattern($key = 'app.key')
@@ -130,7 +130,7 @@ class KeyGenerateCommand extends Command
     }
 
     /**
-     * Get string formated as enviornment key style
+     * Get string formated as enviornment key style.
      */
     protected function enviornmentKeyName($key)
     {
