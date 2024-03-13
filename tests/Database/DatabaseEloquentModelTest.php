@@ -2010,6 +2010,17 @@ class DatabaseEloquentModelTest extends TestCase
         EloquentModelWithObserveAttributeUsingArrayStub::flushEventListeners();
     }
 
+    public function testModelObserversCanBeAttachedToModelsWithObservableTraitUsingAttribute()
+    {
+        EloquentModelWithObserveAttributeAndObservableTraitStub::setEventDispatcher($events = m::mock(Dispatcher::class));
+        $events->shouldReceive('dispatch');
+        $events->shouldReceive('listen')->once()->with('eloquent.creating: Illuminate\Tests\Database\EloquentModelWithObserveAttributeAndObservableTraitStub', EloquentTestObserverStub::class.'@creating');
+        $events->shouldReceive('listen')->once()->with('eloquent.saved: Illuminate\Tests\Database\EloquentModelWithObserveAttributeAndObservableTraitStub', EloquentTestObserverStub::class.'@saved');
+        $events->shouldReceive('listen')->once()->with('eloquent.foo: Illuminate\Tests\Database\EloquentModelWithObserveAttributeAndObservableTraitStub', EloquentTestObserverStub::class.'@foo');
+        $events->shouldReceive('forget');
+        EloquentModelWithObserveAttributeAndObservableTraitStub::flushEventListeners();
+    }
+
     public function testThrowExceptionOnAttachingNotExistsModelObserverWithString()
     {
         $this->expectException(InvalidArgumentException::class);
@@ -3036,6 +3047,11 @@ class EloquentTestObserverStub
     {
         //
     }
+
+    public function foo()
+    {
+        //
+    }
 }
 
 class EloquentTestAnotherObserverStub
@@ -3541,6 +3557,20 @@ class EloquentModelWithObserveAttributeStub extends EloquentModelStub
 class EloquentModelWithObserveAttributeUsingArrayStub extends EloquentModelStub
 {
     //
+}
+
+#[ObservedBy(EloquentTestObserverStub::class)]
+class EloquentModelWithObserveAttributeAndObservableTraitStub extends EloquentModelStub
+{
+    use ObservableTrait;
+}
+
+trait ObservableTrait
+{
+    public function initializeObservableTrait()
+    {
+        $this->addObservableEvents('foo');
+    }
 }
 
 class EloquentModelSavingEventStub

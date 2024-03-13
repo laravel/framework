@@ -30,16 +30,6 @@ trait HasEvents
     protected $observables = [];
 
     /**
-     * Boot the has event trait for a model.
-     *
-     * @return void
-     */
-    public static function bootHasEvents()
-    {
-        static::observe(static::resolveObserveAttributes());
-    }
-
-    /**
      * Resolve the observe class names from the attributes.
      *
      * @return array

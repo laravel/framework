@@ -312,6 +312,10 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
                 );
             }
         }
+
+        // register observers at the very end because observers registration may need
+        // some attributes initialized in model traits (typically observables)
+        static::observe(static::resolveObserveAttributes());
     }
 
     /**
