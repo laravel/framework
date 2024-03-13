@@ -168,9 +168,17 @@ class BroadcastingInstallCommand extends Command
             ];
         }
 
-        Process::command(implode(' && ', $commands))
-            ->path(base_path())
-            ->tty(true)
-            ->run();
+        $command = Process::command(implode(' && ', $commands))
+                        ->path(base_path());
+
+        if (strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN') {
+            $command->tty(true);
+        }
+
+        if($command->run()->failed()) {
+            $this->components->warn("Node dependencies installation couldn't complete. Please run the following commands manually: \n\n" . implode(" && ", $commands));
+        } else {
+            $this->components->info("Node dependencies installed successfully.");
+        }
     }
 }
