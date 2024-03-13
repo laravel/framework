@@ -1421,7 +1421,7 @@ class Str
         REGEXP;
 
         $value = preg_replace($pattern, ' $1', trim($value));
-        $value = preg_replace('/[^\p{L}]+/u', $delimiter, self::lower($value));
+        $value = preg_replace('/[^\p{L}0-9]+/u', $delimiter, self::lower($value));
 
         return static::$snakeCache[$key][$delimiter] = $value;
     }

@@ -754,11 +754,17 @@ class SupportStrTest extends TestCase
         $this->assertSame('laravel php framework', Str::snake('LaravelPhpFramework', ' '));
         $this->assertSame('laravel_php_framework', Str::snake('Laravel Php Framework'));
         $this->assertSame('laravel_php_framework', Str::snake('Laravel    Php      Framework   '));
+
+        // ensure numbers are handled properly
+        $this->assertSame('foo_bar1', Str::snake('FooBar1'));
+        $this->assertSame('foobar1', Str::snake('Foobar1'));
+
         // ensure cache keys don't overlap
         $this->assertSame('laravel__php__framework', Str::snake('LaravelPhpFramework', '__'));
         $this->assertSame('laravel_php_framework_', Str::snake('LaravelPhpFramework_', '_'));
         $this->assertSame('laravel_php_framework', Str::snake('laravel php Framework'));
         $this->assertSame('laravel_php_frame_work', Str::snake('laravel php FrameWork'));
+
         // changes in Laravel 12
         $this->assertSame('foo_bar', Str::snake('foo-bar'));
         $this->assertSame('foo_bar', Str::snake('Foo-Bar'));
