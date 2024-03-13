@@ -286,7 +286,7 @@ class CacheManager implements FactoryContract
      * @param  array  $config
      * @return \Illuminate\Cache\Repository
      */
-    public function repository(Store $store, array $config)
+    public function repository(Store $store, array $config = [])
     {
         return tap(new Repository($store, Arr::only($config, ['store'])), function ($repository) {
             $this->setEventDispatcher($repository);
