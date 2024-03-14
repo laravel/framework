@@ -81,7 +81,7 @@ class InteractsWithExceptionHandlingTest extends TestCase
             ->withoutExceptionHandling();
 
         Route::get('/', function () {
-            report(new Exception('Test exception'));
+            rescue(fn () => throw new Exception('Test exception'));
         });
 
         $this->expectException(Exception::class);
@@ -99,7 +99,7 @@ class InteractsWithExceptionHandlingTest extends TestCase
             ->withExceptionHandling();
 
         Route::get('/', function () {
-            report(new Exception('Test exception'));
+            rescue(fn () => throw new Exception('Test exception'));
         });
 
         $this->expectException(Exception::class);
