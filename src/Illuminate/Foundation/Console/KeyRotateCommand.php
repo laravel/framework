@@ -3,7 +3,6 @@
 namespace Illuminate\Foundation\Console;
 
 use Symfony\Component\Console\Attribute\AsCommand;
-use Illuminate\Foundation\Console\KeyGenerateCommand;
 
 #[AsCommand(name: 'key:rotate')]
 class KeyRotateCommand extends KeyGenerateCommand
@@ -64,7 +63,7 @@ class KeyRotateCommand extends KeyGenerateCommand
                 $input = $this->prepareEnviornmentInputWith($key, $value, $input);
             } catch (\Exception $e) {
                 $this->error($e->getMessage());
-                
+
                 return false;
             }
 
