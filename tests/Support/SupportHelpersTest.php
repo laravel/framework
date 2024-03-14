@@ -1039,13 +1039,8 @@ class SupportHelpersTest extends TestCase
         $this->assertEquals(10, with(5, function ($five) {
             return $five + 5;
         }));
-    }
 
-    public function testChain()
-    {
-        $this->assertEquals(10, chain(10));
-
-        $this->assertEquals(10, chain(5, function ($five) {
+        $this->assertEquals(10, with(5, function ($five) {
             return $five + 5;
         }, function ($ten) {
             return $ten * 2;
