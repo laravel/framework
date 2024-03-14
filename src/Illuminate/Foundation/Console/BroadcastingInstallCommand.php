@@ -188,7 +188,7 @@ class BroadcastingInstallCommand extends Command
         }
 
         $command = Process::command(implode(' && ', $commands))
-            ->path(base_path());
+                        ->path(base_path());
 
         if (! windows_os()) {
             $command->tty(true);
