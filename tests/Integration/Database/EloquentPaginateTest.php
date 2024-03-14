@@ -96,6 +96,17 @@ class EloquentPaginateTest extends DatabaseTestCase
         $this->assertEquals(5, $query->count());
         $this->assertEquals(5, $query->paginate()->total());
     }
+
+    public function testPaginationWithUnion()
+    {
+        for ($i = 1; $i <= 3; $i++) {
+            Post::create(['title' => 'Hello world']);
+            Post::create(['title' => 'Goodbye world']);
+        }
+
+        $result = Post::query()->unionAll(Post::query())->orderBy('title', 'desc')->paginate(1);
+        $this->assertEquals(1, $result->count());
+    }
 }
 
 class Post extends Model
