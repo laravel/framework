@@ -1,4 +1,6 @@
 <!--
+ADD A THOROUGH DESCRIPTION TO YOUR PULL REQUEST
+
 Please only send a pull request to branches that are currently supported: https://laravel.com/docs/releases#support-policy 
 
 If you are unsure which branch your pull request should be sent to, please read: https://laravel.com/docs/contributions#which-branch
