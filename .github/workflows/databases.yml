@@ -51,7 +51,7 @@ jobs:
         run: vendor/bin/phpunit tests/Integration/Database
         env:
           DB_CONNECTION: mysql
-          MYSQL_COLLATION: utf8mb4_unicode_ci
+          DB_COLLATION: utf8mb4_unicode_ci
 
   mysql_8:
     runs-on: ubuntu-22.04
