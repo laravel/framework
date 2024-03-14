@@ -42,16 +42,15 @@ class BroadcastingInstallCommand extends Command
         $this->call('config:publish', ['name' => 'broadcasting']);
 
         // Install channel routes file...
-        if (file_exists($broadcastingRoutesPath = $this->laravel->basePath('routes/channels.php')) &&
-            ! $this->option('force')) {
-            $this->components->error('Broadcasting routes file already exists.');
-        } else {
+        if (! file_exists($broadcastingRoutesPath = $this->laravel->basePath('routes/channels.php')) || $this->option('force')) {
             $this->components->info("Published 'channels' route file.");
 
             copy(__DIR__.'/stubs/broadcasting-routes.stub', $broadcastingRoutesPath);
         }
 
         $this->uncommentChannelsRoutesFile();
+        $this->updateBroadcastingConfiguration();
+        $this->enableBroadcastServiceProvider();
 
         // Install bootstrapping...
         if (! file_exists($echoScriptPath = $this->laravel->resourcePath('js/echo.js'))) {
@@ -101,10 +100,61 @@ class BroadcastingInstallCommand extends Command
                 'commands: __DIR__.\'/../routes/console.php\','.PHP_EOL.'        channels: __DIR__.\'/../routes/channels.php\',',
                 $appBootstrapPath,
             );
-        } else {
-            $this->components->warn('Unable to automatically add channel route definition to bootstrap file. Channel route file should be registered manually.');
+        }
+    }
 
+    /**
+     * Update the broadcasting.php configuration file.
+     *
+     * @return void
+     */
+    protected function updateBroadcastingConfiguration()
+    {
+        if ($this->laravel->config->has('broadcasting.connections.reverb')) {
             return;
+        }
+
+        (new Filesystem)->replaceInFile(
+            "'connections' => [\n",
+            <<<'CONFIG'
+            'connections' => [
+
+                    'reverb' => [
+                        'driver' => 'reverb',
+                        'key' => env('REVERB_APP_KEY'),
+                        'secret' => env('REVERB_APP_SECRET'),
+                        'app_id' => env('REVERB_APP_ID'),
+                        'options' => [
+                            'host' => env('REVERB_HOST'),
+                            'port' => env('REVERB_PORT', 443),
+                            'scheme' => env('REVERB_SCHEME', 'https'),
+                            'useTLS' => env('REVERB_SCHEME', 'https') === 'https',
+                        ],
+                        'client_options' => [
+                            // Guzzle client options: https://docs.guzzlephp.org/en/stable/request-options.html
+                        ],
+                    ],
+
+            CONFIG,
+            app()->configPath('broadcasting.php')
+        );
+    }
+
+    /**
+     * Uncomment the "BroadcastServiceProvider" in the application configuration.
+     *
+     * @return void
+     */
+    protected function enableBroadcastServiceProvider()
+    {
+        $config = ($filesystem = new Filesystem)->get(app()->configPath('app.php'));
+
+        if (str_contains($config, '// App\Providers\BroadcastServiceProvider::class')) {
+            $filesystem->replaceInFile(
+                '// App\Providers\BroadcastServiceProvider::class',
+                'App\Providers\BroadcastServiceProvider::class',
+                app()->configPath('app.php'),
+            );
         }
     }
 
@@ -126,7 +176,7 @@ class BroadcastingInstallCommand extends Command
         }
 
         $this->requireComposerPackages($this->option('composer'), [
-            'laravel/reverb:@beta',
+            'laravel/reverb:dev-fix/reverb-install',
         ]);
 
         $php = (new PhpExecutableFinder())->find(false) ?: 'php';
@@ -176,7 +226,7 @@ class BroadcastingInstallCommand extends Command
         }
 
         $command = Process::command(implode(' && ', $commands))
-                        ->path(base_path());
+            ->path(base_path());
 
         if (! windows_os()) {
             $command->tty(true);
