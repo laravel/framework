@@ -3071,11 +3071,11 @@ class Builder implements BuilderContract
         }
 
         $without = $this->unions
-            ? ['orders', 'unionOrders', 'limit', 'unionLimit', 'offset', 'unionOffset']
+            ? ['orders', , 'limit', 'unionLimit', 'offset', 'unionOffset']
             : ['columns', 'orders', 'limit', 'offset'];
 
         return $this->cloneWithout($without)
-                    ->cloneWithoutBindings($this->unions ? ['order', 'unionOrder'] : ['select', 'order'])
+                    ->cloneWithoutBindings($this->unions ? ['order'] : ['select', 'order'])
                     ->setAggregate('count', $this->withoutSelectAliases($columns))
                     ->get()->all();
     }
