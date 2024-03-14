@@ -20,6 +20,11 @@ trait InteractsWithExceptionHandling
     protected $originalExceptionHandler;
 
     /**
+     * Whether to throw or not, exceptions reported to the exception handler.
+     */
+    protected $throwReportedExceptions = false;
+
+    /**
      * Restore exception handling.
      *
      * @return $this
@@ -55,6 +60,26 @@ trait InteractsWithExceptionHandling
     }
 
     /**
+     * Throw exceptions reported to the exception handler.
+     *
+     * @return $this
+     */
+    protected function throwReportedExceptions()
+    {
+        $handler = app(ExceptionHandler::class);
+
+        property_exists($handler, 'throwReportedExceptions')
+            ? $handler->throwReportedExceptions = true
+            : $handler->reportable(function (Throwable $e) {
+                throw $e;
+            });
+
+        $this->throwReportedExceptions = true;
+
+        return $this;
+    }
+
+    /**
      * Disable exception handling for the test.
      *
      * @param  array  $except
@@ -66,8 +91,10 @@ trait InteractsWithExceptionHandling
             $this->originalExceptionHandler = app(ExceptionHandler::class);
         }
 
-        $this->app->instance(ExceptionHandler::class, new class($this->originalExceptionHandler, $except) implements ExceptionHandler
+        $this->app->instance(ExceptionHandler::class, new class($this->originalExceptionHandler, $except, $this->throwReportedExceptions) implements ExceptionHandler
         {
+            public $throwReportedExceptions;
+
             protected $except;
             protected $originalHandler;
 
@@ -76,12 +103,14 @@ trait InteractsWithExceptionHandling
              *
              * @param  \Illuminate\Contracts\Debug\ExceptionHandler  $originalHandler
              * @param  array  $except
+             * @param  bool  $throwReportedExceptions
              * @return void
              */
-            public function __construct($originalHandler, $except = [])
+            public function __construct($originalHandler, $except, $throwReportedExceptions)
             {
                 $this->except = $except;
                 $this->originalHandler = $originalHandler;
+                $this->throwReportedExceptions = $throwReportedExceptions;
             }
 
             /**
@@ -94,7 +123,9 @@ trait InteractsWithExceptionHandling
              */
             public function report(Throwable $e)
             {
-                //
+                if ($this->throwReportedExceptions) {
+                    throw $e;
+                }
             }
 
             /**
