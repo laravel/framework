@@ -189,7 +189,6 @@ jobs:
           DB_CONNECTION: pgsql
           DB_USERNAME: forge
           DB_PASSWORD: password
-          DB_COLLATION: (null)
 
   mssql:
     runs-on: ubuntu-20.04
@@ -236,4 +235,3 @@ jobs:
           DB_DATABASE: master
           DB_USERNAME: SA
           DB_PASSWORD: Forge123
-          DB_COLLATION: (null)
