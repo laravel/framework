@@ -460,9 +460,10 @@ if (! function_exists('with')) {
      *
      * @template TValue
      * @template TReturn
+     * @template TCallback of callable(TValue): (TReturn)
      *
      * @param  TValue  $value
-     * @param  array<callable(TValue): (TReturn)>  $callbacks
+     * @param  TCallback  ...$callbacks
      * @return TReturn
      */
     function with($value, ...$callbacks)
