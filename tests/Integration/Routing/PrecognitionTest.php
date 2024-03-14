@@ -544,7 +544,7 @@ class PrecognitionTest extends TestCase
 
         $response->assertStatus(422);
         $response->assertExactJson([
-            'message' => 'The nested.0.name field is required.',
+            'message' => 'There was one error with the given data.',
             'errors' => [
                 'nested' => [
                     [
@@ -580,7 +580,7 @@ class PrecognitionTest extends TestCase
 
         $response->assertStatus(422);
         $response->assertExactJson([
-            'message' => 'The nested.0.name field is required.',
+            'message' => 'There was one error with the given data.',
             'errors' => [
                 'nested' => [
                     [
@@ -611,7 +611,7 @@ class PrecognitionTest extends TestCase
 
         $response->assertStatus(422);
         $response->assertExactJson([
-            'message' => 'The nested.0.name field is required.',
+            'message' => 'There was one error with the given data.',
             'errors' => [
                 'nested' => [
                     [
@@ -642,7 +642,7 @@ class PrecognitionTest extends TestCase
 
         $response->assertStatus(422);
         $response->assertExactJson([
-            'message' => 'The nested.0.name field is required.',
+            'message' => 'There was one error with the given data.',
             'errors' => [
                 'nested' => [
                     [
@@ -690,7 +690,7 @@ class PrecognitionTest extends TestCase
 
         $response->assertStatus(422);
         $response->assertExactJson([
-            'message' => 'The escaped.dot field is required.',
+            'message' => 'There was one error with the given data.',
             'errors' => [
                 'escaped.dot' => [
                     'The escaped.dot field is required.',
@@ -720,7 +720,7 @@ class PrecognitionTest extends TestCase
 
         $response->assertStatus(422);
         $response->assertExactJson([
-            'message' => 'The escaped.dot field is required.',
+            'message' => 'There was one error with the given data.',
             'errors' => [
                 'escaped.dot' => [
                     'The escaped.dot field is required.',
@@ -745,7 +745,7 @@ class PrecognitionTest extends TestCase
 
         $response->assertStatus(422);
         $response->assertExactJson([
-            'message' => 'The escaped.dot field is required.',
+            'message' => 'There was one error with the given data.',
             'errors' => [
                 'escaped.dot' => [
                     'The escaped.dot field is required.',
@@ -770,7 +770,7 @@ class PrecognitionTest extends TestCase
 
         $response->assertStatus(422);
         $response->assertExactJson([
-            'message' => 'The escaped.dot field is required.',
+            'message' => 'There was one error with the given data.',
             'errors' => [
                 'escaped.dot' => [
                     'The escaped.dot field is required.',
