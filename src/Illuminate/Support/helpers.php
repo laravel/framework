@@ -463,7 +463,7 @@ if (! function_exists('with')) {
      *
      * @param  TValue  $value
      * @param  array<callable(TValue): (TReturn)>  $callbacks
-     * @return ($callbacks is empty ? TValue : TReturn)
+     * @return TReturn
      */
     function with($value, ...$callbacks)
     {
