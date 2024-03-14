@@ -1049,7 +1049,8 @@ class SupportHelpersTest extends TestCase
             return $five + 5;
         }, function ($ten) {
             return $ten * 2;
-        }, new class {
+        }, new class
+        {
             public function __invoke($twenty): int
             {
                 return $twenty * 3;
