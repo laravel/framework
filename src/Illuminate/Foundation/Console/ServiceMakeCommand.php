@@ -7,7 +7,7 @@ use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputOption;
 
 #[AsCommand(name: 'make:service')]
-class ServiceMakeCommand  extends GeneratorCommand
+class ServiceMakeCommand extends GeneratorCommand
 {
     /**
      * The console command name.

@@ -2,7 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Generators;
 
-class ServiceMakeCommandTest  extends TestCase
+class ServiceMakeCommandTest extends TestCase
 {
     protected $files = [
         'app/FooService.php',
