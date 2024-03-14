@@ -91,15 +91,11 @@ class ValidationException extends Exception
             return 'The given data was invalid.';
         }
 
-        $message = array_shift($messages);
+        $amount = count($messages);
 
-        if ($additional = count($messages)) {
-            $pluralized = $additional === 1 ? 'error' : 'errors';
+        $pluralized = $amount === 1 ? 'was one error' : "were {$amount} errors";
 
-            $message .= " (and {$additional} more {$pluralized})";
-        }
-
-        return $message;
+        return "There {$pluralized} with the given data.";
     }
 
     /**

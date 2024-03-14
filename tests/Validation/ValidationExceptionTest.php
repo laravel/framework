@@ -21,14 +21,14 @@ class ValidationExceptionTest extends TestCase
     {
         $exception = $this->getException([], ['foo' => 'required']);
 
-        $this->assertSame('validation.required', $exception->getMessage());
+        $this->assertSame('There was one error with the given data.', $exception->getMessage());
     }
 
     public function testExceptionSummarizesTwoErrors()
     {
         $exception = $this->getException([], ['foo' => 'required', 'bar' => 'required']);
 
-        $this->assertSame('validation.required (and 1 more error)', $exception->getMessage());
+        $this->assertSame('There were 2 errors with the given data.', $exception->getMessage());
     }
 
     public function testExceptionSummarizesThreeOrMoreErrors()
@@ -39,7 +39,7 @@ class ValidationExceptionTest extends TestCase
             'baz' => 'required',
         ]);
 
-        $this->assertSame('validation.required (and 2 more errors)', $exception->getMessage());
+        $this->assertSame('There were 3 errors with the given data.', $exception->getMessage());
     }
 
     public function testExceptionErrorZeroErrors()
