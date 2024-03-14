@@ -22,7 +22,6 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\LazyCollection;
 use Illuminate\Support\Str;
-use Illuminate\Support\Traits\Dumpable;
 use Illuminate\Support\Traits\ForwardsCalls;
 use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
@@ -31,7 +30,7 @@ use RuntimeException;
 
 class Builder implements BuilderContract
 {
-    use BuildsQueries, Dumpable, ExplainsQueries, ForwardsCalls, Macroable {
+    use BuildsQueries, ExplainsQueries, ForwardsCalls, Macroable {
         __call as macroCall;
     }
 
