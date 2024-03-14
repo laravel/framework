@@ -96,7 +96,7 @@ class KeyGenerateCommand extends Command
     {
         $previousKeys = implode(',', $this->laravel['config']['app.previous_keys']);
 
-        $newPreviousKeys = $this->laravel['config']['app.key'] . ($previousKeys ? ",$previousKeys" : '');
+        $newPreviousKeys = $this->laravel['config']['app.key'].($previousKeys ? ",$previousKeys" : '');
 
         $replaced = preg_replace(
             $this->previousKeyAddPattern($previousKeys),
