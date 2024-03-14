@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Cache\RateLimiter;
 use Illuminate\Contracts\Redis\Factory as Redis;
 use Illuminate\Redis\Limiters\DurationLimiter;
+use Illuminate\Contracts\Config\Repository as Config;
 
 class ThrottleRequestsWithRedis extends ThrottleRequests
 {
@@ -31,17 +32,27 @@ class ThrottleRequestsWithRedis extends ThrottleRequests
     public $remaining = [];
 
     /**
+     * The number of remaining slots by key.
+     *
+     * @var array
+     */
+    public $whitelist = [];
+
+    /**
      * Create a new request throttler.
      *
      * @param  \Illuminate\Cache\RateLimiter  $limiter
      * @param  \Illuminate\Contracts\Redis\Factory  $redis
+     * @param  \Illuminate\Contracts\Config\Repository $config
      * @return void
      */
-    public function __construct(RateLimiter $limiter, Redis $redis)
+    public function __construct(RateLimiter $limiter, Redis $redis, Config $config)
     {
         parent::__construct($limiter);
 
         $this->redis = $redis;
+
+        $this->whitelist = explode(',',$config->get('whitelist.throttle',''));
     }
 
     /**
@@ -56,9 +67,11 @@ class ThrottleRequestsWithRedis extends ThrottleRequests
      */
     protected function handleRequest($request, Closure $next, array $limits)
     {
-        foreach ($limits as $limit) {
-            if ($this->tooManyAttempts($limit->key, $limit->maxAttempts, $limit->decaySeconds)) {
-                throw $this->buildException($request, $limit->key, $limit->maxAttempts, $limit->responseCallback);
+        if (!in_array($request->ip(), $this->whitelist, true)) {
+            foreach ($limits as $limit) {
+                if ($this->tooManyAttempts($limit->key, $limit->maxAttempts, $limit->decaySeconds)) {
+                    throw $this->buildException($request, $limit->key, $limit->maxAttempts, $limit->responseCallback);
+                }
             }
         }
 
