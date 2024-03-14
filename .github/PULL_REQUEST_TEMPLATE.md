@@ -1,5 +1,5 @@
 <!--
-ADD A THOROUGH DESCRIPTION TO YOUR PULL REQUEST
+ALWAYS ADD A THOROUGH DESCRIPTION TO YOUR PULL REQUEST
 
 Please only send a pull request to branches that are currently supported: https://laravel.com/docs/releases#support-policy 
 
