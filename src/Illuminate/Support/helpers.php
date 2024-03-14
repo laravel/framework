@@ -487,6 +487,7 @@ if (! function_exists('with')) {
                 $value = $callback($value);
             }
         }
+
         return $value;
     }
 }
