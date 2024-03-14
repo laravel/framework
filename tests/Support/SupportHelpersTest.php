@@ -1041,6 +1041,22 @@ class SupportHelpersTest extends TestCase
         }));
     }
 
+    public function testChain()
+    {
+        $this->assertEquals(10, chain(10));
+
+        $this->assertEquals(10, chain(5, function ($five) {
+            return $five + 5;
+        }, function ($ten) {
+            return $ten * 2;
+        }, new class {
+            public function __invoke($twenty): int
+            {
+                return $twenty * 3;
+            }
+        }, fn ($sixty) => $sixty / 6));
+    }
+
     public function testAppendConfig()
     {
         $this->assertSame([10000 => 'name', 10001 => 'family'], append_config([1 => 'name', 2 => 'family']));

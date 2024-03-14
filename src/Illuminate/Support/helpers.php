@@ -469,4 +469,24 @@ if (! function_exists('with')) {
     {
         return is_null($callback) ? $value : $callback($value);
     }
+
+    /**
+     * Return the given value, optionally passed through the callbacks.
+     *
+     * @template TValue
+     * @template TReturn
+     *
+     * @param TValue $value
+     * @param (callable(TValue): (TReturn)) $callbacks
+     * @return ($callbacks is empty ? TValue : TReturn)
+     */
+    function chain($value, ...$callbacks)
+    {
+        foreach ($callbacks as $callback) {
+            if (is_callable($callback)) {
+                $value = $callback($value);
+            }
+        }
+        return $value;
+    }
 }
