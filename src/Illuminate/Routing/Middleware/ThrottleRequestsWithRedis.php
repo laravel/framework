@@ -6,7 +6,7 @@ use Closure;
 use Illuminate\Cache\RateLimiter;
 use Illuminate\Contracts\Redis\Factory as Redis;
 use Illuminate\Redis\Limiters\DurationLimiter;
-use Illuminate\Contracts\Config\Repository as Config;
+use Illuminate\Support\Facades\Config;
 
 class ThrottleRequestsWithRedis extends ThrottleRequests
 {
@@ -43,16 +43,15 @@ class ThrottleRequestsWithRedis extends ThrottleRequests
      *
      * @param  \Illuminate\Cache\RateLimiter  $limiter
      * @param  \Illuminate\Contracts\Redis\Factory  $redis
-     * @param  \Illuminate\Contracts\Config\Repository $config
      * @return void
      */
-    public function __construct(RateLimiter $limiter, Redis $redis, Config $config)
+    public function __construct(RateLimiter $limiter, Redis $redis)
     {
         parent::__construct($limiter);
 
         $this->redis = $redis;
 
-        $this->whitelist = explode(',',$config->get('whitelist.throttle',''));
+        $this->whitelist = explode(',', Config::get('whitelist.throttle',''));
     }
 
     /**

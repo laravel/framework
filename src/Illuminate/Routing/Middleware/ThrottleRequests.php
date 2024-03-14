@@ -5,10 +5,10 @@ namespace Illuminate\Routing\Middleware;
 use Closure;
 use Illuminate\Cache\RateLimiter;
 use Illuminate\Cache\RateLimiting\Unlimited;
-use Illuminate\Contracts\Config\Repository as Config;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Exceptions\ThrottleRequestsException;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\InteractsWithTime;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\Response;
@@ -42,13 +42,12 @@ class ThrottleRequests
      * Create a new request throttler.
      *
      * @param  \Illuminate\Cache\RateLimiter  $limiter
-     * @param \Illuminate\Contracts\Config\Repository $config
      * @return void
      */
-    public function __construct(RateLimiter $limiter, Config $config)
+    public function __construct(RateLimiter $limiter)
     {
         $this->limiter = $limiter;
-        $this->whitelist = explode(',',$config->get('whitelist.throttle',''));
+        $this->whitelist = explode(',',Config::get('whitelist.throttle',''));
     }
 
     /**
