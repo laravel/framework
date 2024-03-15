@@ -1243,7 +1243,7 @@ class Router implements BindingRegistrar, RegistrarContract
      */
     public function input($key, $default = null)
     {
-        return $this->current()->parameter($key, $default);
+        return $this->current()?->parameter($key, $default);
     }
 
     /**
