@@ -127,7 +127,7 @@ class ControllerMakeCommand extends GeneratorCommand
             $replace['abort(404);'] = '//';
         }
 
-        $baseControllerExists = file_exists(app_path('Http/Controllers/Controller.php'));
+        $baseControllerExists = file_exists($this->getPath("{$rootNamespace}Http\Controllers\Controller"));
 
         if ($baseControllerExists) {
             $replace["use {$controllerNamespace}\Controller;\n"] = '';
