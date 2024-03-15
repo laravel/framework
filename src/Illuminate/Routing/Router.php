@@ -1302,7 +1302,7 @@ class Router implements BindingRegistrar, RegistrarContract
      */
     public function currentRouteName()
     {
-        return $this->current() ? $this->current()->getName() : null;
+        return $this->current()?->getName();
     }
 
     /**
