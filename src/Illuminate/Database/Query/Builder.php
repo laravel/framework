@@ -2821,7 +2821,7 @@ class Builder implements BuilderContract
     /**
      * Invoke the "after query" modification callbacks.
      *
-     * @param  mixed $result
+     * @param  mixed  $result
      * @return void
      */
     public function applyAfterQueryCallbacks($result)
