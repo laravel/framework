@@ -11,7 +11,7 @@ trait HasDatabaseNotifications
      */
     public function notifications()
     {
-        return $this->morphMany(DatabaseNotification::class, 'notifiable')->latest();
+        return $this->setConnection($this->getNotifiableConnectionName())->morphMany(DatabaseNotification::class, 'notifiable')->latest();
     }
 
     /**
@@ -32,5 +32,16 @@ trait HasDatabaseNotifications
     public function unreadNotifications()
     {
         return $this->notifications()->unread();
+    }
+
+    /**
+     * Get updatable notifiable connection property
+     *
+     * @return string
+     */
+
+    public function getNotifiableConnectionName()
+    {
+        return $this->notifiableConnection ?: $this->connection;
     }
 }
