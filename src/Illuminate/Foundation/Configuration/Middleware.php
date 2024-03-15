@@ -342,6 +342,18 @@ class Middleware
      */
     protected function modifyGroup(string $group, array|string $append, array|string $prepend, array|string $remove, array $replace)
     {
+        $aliases = [];
+
+        if($append && !isset($append[0])){
+            $aliases = array_merge($aliases,($append));
+            $append = array_values($append);
+        }
+
+        if($prepend && !isset($prepend[0])){
+            $aliases = array_merge($aliases,($prepend));
+            $prepend = array_values($prepend);
+        }
+
         if (! empty($append)) {
             $this->appendToGroup($group, $append);
         }
@@ -359,6 +371,8 @@ class Middleware
                 $this->replaceInGroup($group, $search, $replace);
             }
         }
+
+        $this->alias($aliases);
 
         return $this;
     }
@@ -384,7 +398,7 @@ class Middleware
      */
     public function alias(array $aliases)
     {
-        $this->customAliases = $aliases;
+        $this->customAliases = array_merge($this->customAliases, $aliases);
 
         return $this;
     }
