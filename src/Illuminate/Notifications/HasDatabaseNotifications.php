@@ -11,7 +11,9 @@ trait HasDatabaseNotifications
      */
     public function notifications()
     {
-        return $this->setConnection($this->getNotifiableConnectionName())->morphMany(DatabaseNotification::class, 'notifiable')->latest();
+        return $this->setConnection($this->getNotifiableConnectionName())
+                    ->morphMany(DatabaseNotification::class, 'notifiable')
+                    ->latest();
     }
 
     /**
