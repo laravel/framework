@@ -344,13 +344,13 @@ class Middleware
     {
         $aliases = [];
 
-        if($append && !isset($append[0])){
-            $aliases = array_merge($aliases,($append));
+        if ($append && ! isset($append[0])) {
+            $aliases = array_merge($aliases, $append);
             $append = array_values($append);
         }
 
-        if($prepend && !isset($prepend[0])){
-            $aliases = array_merge($aliases,($prepend));
+        if ($prepend && ! isset($prepend[0])) {
+            $aliases = array_merge($aliases, $prepend);
             $prepend = array_values($prepend);
         }
 
