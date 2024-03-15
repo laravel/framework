@@ -50,6 +50,10 @@ class ApiInstallCommand extends Command
         } else {
             $this->components->info('Published API routes file.');
 
+            $routesDir = $this->laravel->basePath('routes');
+            if (! file_exists($routesDir)) {
+                mkdir($routesDir);
+            }
             copy(__DIR__.'/stubs/api-routes.stub', $apiRoutesPath);
 
             if ($this->option('passport')) {
