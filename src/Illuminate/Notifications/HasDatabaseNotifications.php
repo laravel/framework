@@ -37,7 +37,7 @@ trait HasDatabaseNotifications
     }
 
     /**
-     * Get updatable notifiable connection property
+     * Get updatable notifiable connection property.
      *
      * @return string
      */
