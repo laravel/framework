@@ -39,7 +39,6 @@ trait HasDatabaseNotifications
      *
      * @return string
      */
-
     public function getNotifiableConnectionName()
     {
         return $this->notifiableConnection ?: $this->connection;
