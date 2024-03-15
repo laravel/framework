@@ -1,15 +1,17 @@
 <?php
 
-use Illuminate\Contracts\Support\DeferringDisplayableValue;
-use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Env;
-use Illuminate\Support\HigherOrderTapProxy;
+use Illuminate\Support\Str;
 use Illuminate\Support\Once;
+use Illuminate\Mail\Markdown;
+use Illuminate\Support\Sleep;
 use Illuminate\Support\Onceable;
 use Illuminate\Support\Optional;
-use Illuminate\Support\Sleep;
-use Illuminate\Support\Str;
+use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Support\HigherOrderTapProxy;
+use Illuminate\Contracts\Support\DeferringDisplayableValue;
+use Illuminate\Contracts\View\Factory as ViewFactory;
 
 if (! function_exists('append_config')) {
     /**
@@ -470,3 +472,28 @@ if (! function_exists('with')) {
         return is_null($callback) ? $value : $callback($value);
     }
 }
+
+if (! function_exists('markdown')) {
+    /**
+     * Create a new Markdown instance.
+     *
+     * @param ViewFactory|null $view
+     * @param array $options
+     * @return \Illuminate\Mail\Markdown|mixed
+     */
+    function markdown(?ViewFactory $view = null, array $options = [])
+    {
+        if (func_num_args() === 0) {
+            return new class
+            {
+                public function __call($method, $parameters)
+                {
+                    return Markdown::$method(...$parameters);
+                }
+            };
+        }
+
+        return new Markdown($view, $options);
+    }
+}
+
