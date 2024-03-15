@@ -105,12 +105,13 @@ class ApplicationBuilder
      * Register the braodcasting services for the application.
      *
      * @param  string  $channels
+     * @param  array  $attributes
      * @return $this
      */
-    public function withBroadcasting(string $channels)
+    public function withBroadcasting(string $channels, array $attributes = [])
     {
-        $this->app->booted(function () use ($channels) {
-            Broadcast::routes();
+        $this->app->booted(function () use ($channels, $attributes) {
+            Broadcast::routes(! empty($attributes) ? $attributes : null);
 
             if (file_exists($channels)) {
                 require $channels;
