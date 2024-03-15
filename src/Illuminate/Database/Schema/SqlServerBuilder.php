@@ -1,6 +1,7 @@
 <?php
 
 namespace Illuminate\Database\Schema;
+
 use InvalidArgumentException;
 
 class SqlServerBuilder extends Builder
