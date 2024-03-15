@@ -20,7 +20,6 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ForwardsCalls;
-use Laravel\SerializableClosure\Support\ReflectionClosure;
 use ReflectionClass;
 use ReflectionMethod;
 
@@ -732,7 +731,6 @@ class Builder implements BuilderContract
      * Invoke the "after query" modification callbacks.
      *
      * @param  mixed $result
-     *
      * @return void
      */
     public function applyAfterQueryCallbacks($result)

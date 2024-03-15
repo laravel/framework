@@ -26,7 +26,6 @@ use Illuminate\Support\Traits\Dumpable;
 use Illuminate\Support\Traits\ForwardsCalls;
 use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
-use Laravel\SerializableClosure\Support\ReflectionClosure;
 use LogicException;
 use RuntimeException;
 
@@ -2823,7 +2822,6 @@ class Builder implements BuilderContract
      * Invoke the "after query" modification callbacks.
      *
      * @param  mixed $result
-     *
      * @return void
      */
     public function applyAfterQueryCallbacks($result)
