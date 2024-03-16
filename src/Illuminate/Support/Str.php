@@ -781,7 +781,7 @@ class Str
      */
     public static function overwriteEmpty($value, $overwrite = '-')
     {
-        if (is_string($value) && static::squish($value) === '') {
+        if (is_string($value) && blank($value)) {
             return $overwrite;
         }
 
