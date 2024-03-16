@@ -2178,7 +2178,7 @@ class Builder implements BuilderContract
 
     /**
      * Add an "where concat" clause to the query.
-     * 
+     *
      * @param  string[]  $columns
      * @param  string  $operator
      * @param  mixed  $value
@@ -2193,7 +2193,7 @@ class Builder implements BuilderContract
             $value, $operator, func_num_args() === 2
         );
         
-        $this->wheres[] = compact('type','columns','operator', 'value', 'boolean');
+        $this->wheres[] = compact('type', 'columns', 'operator', 'value', 'boolean');
 
         $this->addBinding($value, 'where');
 
@@ -2202,7 +2202,7 @@ class Builder implements BuilderContract
 
     /**
      * Add an "or where concat" clause to the query.
-     * 
+     *
      * @param  string[]  $columns
      * @param  string  $operator
      * @param  mixed  $value
