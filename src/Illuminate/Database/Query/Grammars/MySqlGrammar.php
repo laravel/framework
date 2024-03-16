@@ -15,6 +15,14 @@ class MySqlGrammar extends Grammar
      */
     protected $operators = ['sounds like'];
 
+    protected function whereConcat(Builder $query, $where)
+    {
+        $value = $this->parameter($where['value']);
+        $operator = $where['operator'];
+        $columns = collect($where['columns'])->map(fn ($column) => Str::of($column)->trim()->isEmpty() ? '" "' : $this->wrap($column))->implode(', ');
+        return "concat({$columns}) {$operator} {$value}";
+    }
+
     /**
      * Add a "where null" clause to the query.
      *
