@@ -2201,6 +2201,19 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Add an "or where concat" clause to the query.
+     * 
+     * @param  string[]  $columns
+     * @param  string  $operator
+     * @param  mixed  $value
+     * @return $this
+     */
+    public function orWhereConcat($columns, $operator = '=', $value = null)
+    {
+        return $this->whereConcat($columns, $operator, $value, 'or');
+    }
+
+    /**
      * Add a "group by" clause to the query.
      *
      * @param  array|\Illuminate\Contracts\Database\Query\Expression|string  ...$groups
