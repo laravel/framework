@@ -2188,11 +2188,11 @@ class Builder implements BuilderContract
     public function whereConcat($columns, $operator = '=', $value = null, $boolean = 'and')
     {
         $type = 'Concat';
-        
+
         [$value, $operator] = $this->prepareValueAndOperator(
             $value, $operator, func_num_args() === 2
         );
-        
+
         $this->wheres[] = compact('type', 'columns', 'operator', 'value', 'boolean');
 
         $this->addBinding($value, 'where');
