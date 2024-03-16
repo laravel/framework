@@ -996,7 +996,7 @@ class Builder implements BuilderContract
             yield is_callable($callback)
                 ? array_map($callback, $cursorPaginator->items())
                 : $cursorPaginator->items();
-        } while ($cursorPaginator->hasMorePages() && $cursorPaginator = $this->cursorPaginate($perPage, $columns, 'cursor', $cursorPaginator->nextCursor()));
+        } while ($cursorPaginator->hasMorePages() && $cursorPaginator = $this->cursorPaginate($perPage, $columns, $cursorName, $cursorPaginator->nextCursor()));
     }
 
     /**
