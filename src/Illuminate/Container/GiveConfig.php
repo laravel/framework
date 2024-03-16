@@ -11,11 +11,10 @@ class GiveConfig
         protected string $configKey,
         protected mixed $default = null,
     ) {
-	}
-
-    public function resolve($container): mixed
-	{
-        return $container->get('config')->get($this->configKey, $this->default);
     }
 
+    public function resolve($container): mixed
+    {
+        return $container->get('config')->get($this->configKey, $this->default);
+    }
 }
