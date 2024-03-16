@@ -1033,6 +1033,7 @@ class Container implements ArrayAccess, ContainerContract
 
         if (count($attributes = $parameter->getAttributes(GiveConfig::class))) {
             $instance = $attributes[0]->newInstance();
+
             return $instance->resolve($this);
         }
 
