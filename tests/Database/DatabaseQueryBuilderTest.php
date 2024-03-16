@@ -1261,6 +1261,19 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals(['%Otwell%'], $builder->getBindings());
     }
 
+    public function testOrWhereConcat()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->whereConcat(['first_name', ' ', 'last_name'], 'like', '%Taylor%')->orWhereConcat(['first_name', ' ', 'last_name'], 'like', '%Otwell%');
+        $this->assertSame('select * from `users` where concat(`first_name`, " ", `last_name`) like ? or concat(`first_name`, " ", `last_name`) like ?', $builder->toSql());
+        $this->assertEquals(['%Taylor%', '%Otwell%'], $builder->getBindings());
+
+        $builder = $this->getSQLiteBuilder();
+        $builder->select('*')->from('users')->whereConcat(['first_name', ' ', 'last_name'], 'like', '%Taylor%')->orWhereConcat(['first_name', ' ', 'last_name'], 'like', '%Otwell%');
+        $this->assertSame('select * from "users" where "first_name" || \' \' || "last_name" like ? or "first_name" || \' \' || "last_name" like ?', $builder->toSql());
+        $this->assertEquals(['%Taylor%', '%Otwell%'], $builder->getBindings());
+    }
+
     public function testUnions()
     {
         $builder = $this->getBuilder();
