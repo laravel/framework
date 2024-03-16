@@ -42,6 +42,13 @@ class SQLiteGrammar extends Grammar
         return 'select * from ('.$sql.')';
     }
 
+    /**
+     * Add a "where concat" clause to the query.
+     * 
+     * @param Builder $query
+     * @param array $where
+     * @return string
+     */
     protected function whereConcat(Builder $query, $where)
     {
         $value = $this->parameter($where['value']);
