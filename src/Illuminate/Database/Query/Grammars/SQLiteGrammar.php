@@ -42,6 +42,14 @@ class SQLiteGrammar extends Grammar
         return 'select * from ('.$sql.')';
     }
 
+    protected function whereConcat(Builder $query, $where)
+    {
+        $value = $this->parameter($where['value']);
+        $operator = $where['operator'];
+        $columns = collect($where['columns'])->map(fn ($column) => Str::of($column)->trim()->isEmpty() ? "' '" : $this->wrap($column))->implode(' || ');
+        return "{$columns} {$operator} {$value}";
+    }
+
     /**
      * Compile a "where date" clause.
      *
