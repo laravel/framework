@@ -15,7 +15,7 @@ class Enum implements Rule, ValidatorAwareRule
     /**
      * The type of the enum.
      *
-     * @var string
+     * @var class-string
      */
     protected $type;
 
@@ -43,7 +43,7 @@ class Enum implements Rule, ValidatorAwareRule
     /**
      * Create a new rule instance.
      *
-     * @param  string  $type
+     * @param  class-string  $type
      * @return void
      */
     public function __construct($type)
