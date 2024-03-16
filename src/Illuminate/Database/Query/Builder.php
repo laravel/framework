@@ -2176,6 +2176,15 @@ class Builder implements BuilderContract
         return $this->whereAny($columns, $operator, $value, 'or');
     }
 
+    /**
+     * Add an "where concat" clause to the query.
+     * 
+     * @param  string[]  $columns
+     * @param  string  $operator
+     * @param  mixed  $value
+     * @param  string  $boolean
+     * @return $this
+     */
     public function whereConcat($columns, $operator = '=', $value = null, $boolean = 'and')
     {
         $type = 'Concat';
