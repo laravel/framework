@@ -989,7 +989,7 @@ class Builder implements BuilderContract
      * @param callable|null $callback
      * @return \Generator
      */
-    public function cursorPaginateItemsGenerator($perPage = null, $columns = ['*'], $cursorName = 'cursor', ?callable $callback = null)
+    public function cursorPaginateItemsGenerator($perPage = null, $columns = ['*'], $cursorName = 'cursor', $callback = null)
     {
         $cursorPaginator = $this->cursorPaginate($perPage, $columns, $cursorName);
         do {
