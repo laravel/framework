@@ -1031,6 +1031,11 @@ class Container implements ArrayAccess, ContainerContract
             return Util::unwrapIfClosure($concrete, $this);
         }
 
+        if (count($attributes = $parameter->getAttributes(GiveConfig::class))) {
+            $instance = $attributes[0]->newInstance();
+            return $instance->resolve($this);
+        }
+
         if ($parameter->isDefaultValueAvailable()) {
             return $parameter->getDefaultValue();
         }
