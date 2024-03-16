@@ -519,6 +519,17 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     }
 
     /**
+     * Overwrite empty string with a desired string
+     *
+     * @param  mixed  $overwrite
+     * @return static
+     */
+    public function overwriteEmpty($overwrite = '-')
+    {
+        return new static(Str::overwriteEmpty($this->value, $overwrite));
+    }
+
+    /**
      * Pad both sides of the string with another.
      *
      * @param  int  $length

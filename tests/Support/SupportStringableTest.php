@@ -1280,6 +1280,17 @@ class SupportStringableTest extends TestCase
         $this->assertSame('5551234567', (string) $this->stringable('(555) 123-4567')->numbers());
     }
 
+    public function testOverwriteEmpty()
+    {
+        $this->assertSame('-', $this->stringable('' )->overwriteEmpty()->toString());
+        $this->assertSame('-', $this->stringable('        ')->overwriteEmpty('-')->toString());
+        $this->assertSame('N/A', $this->stringable(PHP_EOL)->overwriteEmpty('N/A')->toString());
+        $this->assertSame(0, $this->stringable(null)->overwriteEmpty(0)->toInteger());
+
+        $this->assertSame('0', $this->stringable('0')->overwriteEmpty('N/A')->toString());
+        $this->assertSame(0, $this->stringable(0)->overwriteEmpty('-')->toInteger());
+    }
+
     public function testToDate()
     {
         $current = Carbon::create(2020, 1, 1, 16, 30, 25);

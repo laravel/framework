@@ -773,6 +773,26 @@ class Str
     }
 
     /**
+     * Overwrite empty value with a desired string
+     *
+     * @param  mixed  $value
+     * @param  mixed  $overwrite
+     * @return mixed
+     */
+    public static function overwriteEmpty($value, $overwrite = '-')
+    {
+        if (is_string($value) && static::squish($value) === '') {
+            return $overwrite;
+        }
+
+        if (is_null($value)) {
+            return $overwrite;
+        }
+
+        return $value;
+    }
+
+    /**
      * Pad both sides of a string with another.
      *
      * @param  string  $value

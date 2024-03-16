@@ -578,6 +578,19 @@ class SupportStrTest extends TestCase
         $this->assertSame($arrayExpected, Str::numbers($arrayValue));
     }
 
+    public function testOverwriteEmpty()
+    {
+        $this->assertSame('-', Str::overwriteEmpty(''));
+        $this->assertSame('-', Str::overwriteEmpty('        ', '-'));
+        $this->assertSame('-', Str::overwriteEmpty('     ' . PHP_EOL .   '   ', '-'));
+        $this->assertSame('N/A', Str::overwriteEmpty(PHP_EOL, 'N/A'));
+        $this->assertSame(0, Str::overwriteEmpty(null, 0));
+
+        $this->assertSame('0', Str::overwriteEmpty('0', 'N/A'));
+        $this->assertSame(0, Str::overwriteEmpty(0, '-'));
+        $this->assertSame([], Str::overwriteEmpty([], '-'));
+    }
+
     public function testRandom()
     {
         $this->assertEquals(16, strlen(Str::random()));
