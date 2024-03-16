@@ -76,9 +76,9 @@ class ArgonHasher extends AbstractHasher implements HasherContract
     /**
      * Get the algorithm that should be used for hashing.
      *
-     * @return int
+     * @return string
      */
-    protected function algorithm()
+    protected function algorithm(): string
     {
         return PASSWORD_ARGON2I;
     }
