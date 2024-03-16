@@ -981,6 +981,25 @@ class Builder implements BuilderContract
     }
 
     /**
+     * An easy way to loop data items.
+     *
+     * @param int|null $perPage
+     * @param array|string $columns
+     * @param string $cursorName
+     * @param callable|null $callback
+     * @return \Generator
+     */
+    public function cursorPaginateItemsGenerator($perPage = null, $columns = ['*'], $cursorName = 'cursor', $callback = null)
+    {
+        $cursorPaginator = $this->cursorPaginate($perPage, $columns, $cursorName);
+        do {
+            yield is_callable($callback)
+                ? array_map($callback, $cursorPaginator->items())
+                : $cursorPaginator->items();
+        } while ($cursorPaginator->hasMorePages() && $cursorPaginator = $this->cursorPaginate($perPage, $columns, 'cursor', $cursorPaginator->nextCursor()));
+    }
+
+    /**
      * Ensure the proper order by required for cursor pagination.
      *
      * @param  bool  $shouldReverse
