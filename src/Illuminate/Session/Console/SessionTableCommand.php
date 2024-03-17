@@ -59,10 +59,15 @@ class SessionTableCommand extends MigrationGeneratorCommand
      */
     protected function migrationExists($table)
     {
-        return count($this->files->glob(sprintf(
-            '{%s,%s}',
+        foreach ([
             join_paths($this->laravel->databasePath('migrations'), '*_*_*_*_create_'.$table.'_table.php'),
             join_paths($this->laravel->databasePath('migrations'), '0001_01_01_000000_create_users_table.php'),
-        ))) !== 0;
+        ] as $path) {
+            if (count($this->files->glob($path)) !== 0) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
