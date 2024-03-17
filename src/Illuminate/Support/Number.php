@@ -110,8 +110,8 @@ class Number
     /**
      * Calculate the percentage value of given number.
      *
-     * @param  int|float  $percentage
      * @param  int|float  $of
+     * @param  int|float  $percentage
      * @return float
      */
     public static function percentageOf(int|float $of, int|float $percentage)
