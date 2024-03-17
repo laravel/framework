@@ -1471,11 +1471,11 @@ class Builder implements BuilderContract
     }
 
     /**
-     * Add a where statement to the query after converting the date to app.timezone
+     * Add a where statement to the query after converting the date to app.timezone.
      *
-     * @param string $column
-     * @param string|Carbon $operator
-     * @param Carbon|null $date
+     * @param  string  $column
+     * @param  string|Carbon  $operator
+     * @param  Carbon|null  $date
      * @return $this
      *
      * @throws InvalidArgumentException
@@ -1486,10 +1486,10 @@ class Builder implements BuilderContract
             $date, $operator, func_num_args() === 2
         );
 
-        if( ! ($date instanceof Carbon) ) {
+        if (! ($date instanceof Carbon)) {
             throw new InvalidArgumentException('Date must be a instance of Carbon');
         }
-        if($date->timezone->getName() != config('app.timezone')) {
+        if ($date->timezone->getName() != config('app.timezone')) {
             $date->setTimezone(config('app.timezone'));
         }
 
@@ -1497,11 +1497,11 @@ class Builder implements BuilderContract
     }
 
     /**
-     * Add an "or where" statement to the query after converting the date to app.timezone
+     * Add an "or where" statement to the query after converting the date to app.timezone.
      *
-     * @param string $column
-     * @param string|Carbon $operator
-     * @param Carbon|null $date
+     * @param  string  $column
+     * @param  string|Carbon  $operator
+     * @param  Carbon|null  $date
      * @return $this
      *
      * @throws InvalidArgumentException
@@ -1512,10 +1512,10 @@ class Builder implements BuilderContract
             $date, $operator, func_num_args() === 2
         );
 
-        if( ! ($date instanceof Carbon) ) {
+        if (! ($date instanceof Carbon)) {
             throw new InvalidArgumentException('Date must be a instance of Carbon');
         }
-        if($date->timezone->getName() != config('app.timezone')) {
+        if ($date->timezone->getName() != config('app.timezone')) {
             $date->setTimezone(config('app.timezone'));
         }
 
