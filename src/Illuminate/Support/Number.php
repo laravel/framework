@@ -116,7 +116,7 @@ class Number
      */
     public static function percentageOf(int|float $of, int|float $percentage)
     {
-        return ($percentage / 100) * $of;
+        return (abs($percentage) / 100) * $of;
     }
 
     /**

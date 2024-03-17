@@ -124,6 +124,16 @@ class SupportNumberTest extends TestCase
         $this->assertSame('0.1235%', Number::percentage(0.12345, precision: 4));
     }
 
+    public function testToPercentageOf()
+    {
+        $this->assertSame(0.1, Number::percentageOf(1, 10));
+        $this->assertSame(1, Number::percentageOf(5, 20));
+        $this->assertSame(10, Number::percentageOf(5, 200));
+        $this->assertSame(0.07, Number::percentageOf(5, 1.4));
+        $this->assertSame(0.513, Number::percentageOf(4.5, 11.4));
+        $this->assertSame(-15, Number::percentageOf(-10, 150));
+    }
+
     public function testToCurrency()
     {
         $this->needsIntlExtension();
