@@ -108,6 +108,18 @@ class Number
     }
 
     /**
+     * Calculate the percentage value of given number.
+     *
+     * @param  int|float  $percentage
+     * @param  int|float  $of
+     * @return float
+     */
+    public static function percentageOf(int|float $of, int|float $percentage)
+    {
+        return ($percentage / 100) * $of;
+    }
+
+    /**
      * Convert the given number to its currency equivalent.
      *
      * @param  int|float  $number
