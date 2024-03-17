@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Query;
 
 use BackedEnum;
+use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 use Closure;
 use DateTimeInterface;
@@ -1467,6 +1468,58 @@ class Builder implements BuilderContract
         );
 
         return $this->whereDate($column, $operator, $value, 'or');
+    }
+
+    /**
+     * Add a where statement to the query after converting the date to app.timezone
+     *
+     * @param string $column
+     * @param string|Carbon $operator
+     * @param Carbon|null $date
+     * @return $this
+     *
+     * @throws InvalidArgumentException
+     */
+    public function whereDateTime(string $column, string|Carbon $operator, Carbon|null $date = null)
+    {
+        [$date, $operator] = $this->prepareValueAndOperator(
+            $date, $operator, func_num_args() === 2
+        );
+
+        if( ! ($date instanceof Carbon) ) {
+            throw new InvalidArgumentException('Date must be a instance of Carbon');
+        }
+        if($date->timezone->getName() != config('app.timezone')) {
+            $date->setTimezone(config('app.timezone'));
+        }
+
+        return $this->where($column, $operator, $date->toDateTimeString());
+    }
+
+    /**
+     * Add an "or where" statement to the query after converting the date to app.timezone
+     *
+     * @param string $column
+     * @param string|Carbon $operator
+     * @param Carbon|null $date
+     * @return $this
+     *
+     * @throws InvalidArgumentException
+     */
+    public function orWhereDateTime(string $column, string|Carbon $operator, Carbon|null $date = null)
+    {
+        [$date, $operator] = $this->prepareValueAndOperator(
+            $date, $operator, func_num_args() === 2
+        );
+
+        if( ! ($date instanceof Carbon) ) {
+            throw new InvalidArgumentException('Date must be a instance of Carbon');
+        }
+        if($date->timezone->getName() != config('app.timezone')) {
+            $date->setTimezone(config('app.timezone'));
+        }
+
+        return $this->where($column, $operator, $date->toDateTimeString(), 'or');
     }
 
     /**

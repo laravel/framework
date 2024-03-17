@@ -311,6 +311,24 @@ class QueryBuilderTest extends DatabaseTestCase
         $this->assertSame(2, DB::table('posts')->where('id', 1)->orWhereDate('created_at', new Carbon('2018-01-02'))->count());
     }
 
+    public function testWhereDateTime()
+    {
+        $this->assertSame(1, DB::table('posts')->whereDateTime('created_at', new Carbon('2017-11-12 13:14:15'))->count());
+        $this->assertSame(1, DB::table('posts')->whereDateTime('created_at', '>', new Carbon('2018-01-01'))->count());
+        $this->assertSame(config('app.timezone'), 'UTC');
+        $this->assertSame(0, DB::table('posts')->whereDateTime('created_at', '>', new Carbon('2018-01-02 00:00:00', 'America/Chicago'))->count());
+        $this->assertSame(1, DB::table('posts')->whereDateTime('created_at', '>', new Carbon('2018-01-02 00:00:00', 'UTC'))->count());
+    }
+
+    public function testOrWhereDateTime()
+    {
+        $this->assertSame(2, DB::table('posts')->where('id', 1)->orWhereDateTime('created_at', new Carbon('2018-01-02 03:04:05'))->count());
+        $this->assertSame(2, DB::table('posts')->where('id', 1)->orWhereDateTime('created_at', '>', new Carbon('2018-01-01'))->count());
+        $this->assertSame(config('app.timezone'), 'UTC');
+        $this->assertSame(1, DB::table('posts')->where('id', 1)->orWhereDateTime('created_at', '>', new Carbon('2018-01-02 00:00:00', 'America/Chicago'))->count());
+        $this->assertSame(2, DB::table('posts')->where('id', 1)->orWhereDateTime('created_at', '>', new Carbon('2018-01-02 00:00:00', 'UTC'))->count());
+    }
+
     public function testWhereDay()
     {
         $this->assertSame(1, DB::table('posts')->whereDay('created_at', '02')->count());
