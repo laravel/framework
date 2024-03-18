@@ -42,10 +42,23 @@ class EnumMakeCommand extends GeneratorCommand
     protected function getStub()
     {
         if ($this->option('string') || $this->option('int')) {
-            return __DIR__.'/stubs/enum.backed.stub';
+            return $this->resolveStubPath('/stubs/enum.backed.stub');
         }
 
-        return __DIR__.'/stubs/enum.stub';
+        return $this->resolveStubPath('/stubs/enum.stub');
+    }
+
+    /**
+     * Resolve the fully-qualified path to the stub.
+     *
+     * @param  string  $stub
+     * @return string
+     */
+    protected function resolveStubPath($stub)
+    {
+        return file_exists($customPath = $this->laravel->basePath(trim($stub, '/')))
+                        ? $customPath
+                        : __DIR__.$stub;
     }
 
     /**
