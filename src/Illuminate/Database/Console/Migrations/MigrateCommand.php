@@ -10,10 +10,12 @@ use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Database\SQLiteDatabaseDoesNotExistException;
 use Illuminate\Database\SqlServerConnection;
 use PDOException;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Throwable;
 
 use function Laravel\Prompts\confirm;
 
+#[AsCommand(name: 'migrate')]
 class MigrateCommand extends BaseCommand implements Isolatable
 {
     use ConfirmableTrait;
