@@ -12,6 +12,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
+use League\Flysystem\Config;
 use League\Flysystem\FilesystemAdapter as FlysystemAdapter;
 use League\Flysystem\FilesystemOperator;
 use League\Flysystem\Ftp\FtpAdapter;
@@ -29,6 +30,7 @@ use League\Flysystem\UnableToReadFile;
 use League\Flysystem\UnableToRetrieveMetadata;
 use League\Flysystem\UnableToSetVisibility;
 use League\Flysystem\UnableToWriteFile;
+use League\Flysystem\UrlGeneration\PublicUrlGenerator;
 use League\Flysystem\Visibility;
 use PHPUnit\Framework\Assert as PHPUnit;
 use Psr\Http\Message\StreamInterface;
@@ -664,6 +666,8 @@ class FilesystemAdapter implements CloudFilesystemContract
 
         if (method_exists($adapter, 'getUrl')) {
             return $adapter->getUrl($path);
+        } elseif ($adapter instanceof PublicUrlGenerator) {
+            return $adapter->publicUrl($path, new Config());
         } elseif (method_exists($this->driver, 'getUrl')) {
             return $this->driver->getUrl($path);
         } elseif ($adapter instanceof FtpAdapter || $adapter instanceof SftpAdapter) {
