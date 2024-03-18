@@ -7,7 +7,7 @@ use Symfony\Component\Console\Attribute\AsCommand;
 
 use function Illuminate\Filesystem\join_paths;
 
-#[AsCommand(name: 'make:queue-batches-table')]
+#[AsCommand(name: 'make:queue-batches-table', aliases: ['queue:batches-table'])]
 class BatchesTableCommand extends MigrationGeneratorCommand
 {
     /**
