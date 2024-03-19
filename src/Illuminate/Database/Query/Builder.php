@@ -2069,7 +2069,7 @@ class Builder implements BuilderContract
         // Prepend the table name to the column name, if we're using joins.
         $table = $this->joins ? "$this->from." : '';
 
-        $this->where($table . Str::snake($segment), '=', $parameters[$index], $bool);
+        $this->where($table.Str::snake($segment), '=', $parameters[$index], $bool);
     }
 
     /**
