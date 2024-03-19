@@ -3941,23 +3941,23 @@ class SupportCollectionTest extends TestCase
         ]);
 
         $this->assertEquals($data->all(), $data->select(null)->all());
-        $this->assertEquals([['first' => 'Taylor'], ['first' => 'Jess']], $data->select(['first', 'missing'])->all());
-        $this->assertEquals([['first' => 'Taylor'], ['first' => 'Jess']], $data->select('first', 'missing')->all());
-        $this->assertEquals([['first' => 'Taylor'], ['first' => 'Jess']], $data->select(collect(['first', 'missing']))->all());
+        $this->assertEquals( (object) [['first' => 'Taylor'], ['first' => 'Jess']], $data->select(['first', 'missing'])->all());
+        $this->assertEquals( (object) [['first' => 'Taylor'], ['first' => 'Jess']], $data->select('first', 'missing')->all());
+        $this->assertEquals( (object) [['first' => 'Taylor'], ['first' => 'Jess']], $data->select(collect(['first', 'missing']))->all());
 
         $this->assertEquals([
-            ['first' => 'Taylor', 'email' => 'taylorotwell@gmail.com'],
-            ['first' => 'Jess', 'email' => 'jessarcher@gmail.com'],
+            (object) ['first' => 'Taylor', 'email' => 'taylorotwell@gmail.com'],
+            (object) ['first' => 'Jess', 'email' => 'jessarcher@gmail.com'],
         ], $data->select(['first', 'email'])->all());
 
         $this->assertEquals([
-            ['first' => 'Taylor', 'email' => 'taylorotwell@gmail.com'],
-            ['first' => 'Jess', 'email' => 'jessarcher@gmail.com'],
+            (object) ['first' => 'Taylor', 'email' => 'taylorotwell@gmail.com'],
+            (object) ['first' => 'Jess', 'email' => 'jessarcher@gmail.com'],
         ], $data->select('first', 'email')->all());
 
         $this->assertEquals([
-            ['first' => 'Taylor', 'email' => 'taylorotwell@gmail.com'],
-            ['first' => 'Jess', 'email' => 'jessarcher@gmail.com'],
+            (object) ['first' => 'Taylor', 'email' => 'taylorotwell@gmail.com'],
+            (object) ['first' => 'Jess', 'email' => 'jessarcher@gmail.com'],
         ], $data->select(collect(['first', 'email']))->all());
     }
 
