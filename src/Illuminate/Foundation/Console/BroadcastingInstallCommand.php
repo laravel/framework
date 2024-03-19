@@ -42,16 +42,14 @@ class BroadcastingInstallCommand extends Command
         $this->call('config:publish', ['name' => 'broadcasting']);
 
         // Install channel routes file...
-        if (file_exists($broadcastingRoutesPath = $this->laravel->basePath('routes/channels.php')) &&
-            ! $this->option('force')) {
-            $this->components->error('Broadcasting routes file already exists.');
-        } else {
+        if (! file_exists($broadcastingRoutesPath = $this->laravel->basePath('routes/channels.php')) || $this->option('force')) {
             $this->components->info("Published 'channels' route file.");
 
             copy(__DIR__.'/stubs/broadcasting-routes.stub', $broadcastingRoutesPath);
         }
 
         $this->uncommentChannelsRoutesFile();
+        $this->enableBroadcastServiceProvider();
 
         // Install bootstrapping...
         if (! file_exists($echoScriptPath = $this->laravel->resourcePath('js/echo.js'))) {
@@ -101,10 +99,24 @@ class BroadcastingInstallCommand extends Command
                 'commands: __DIR__.\'/../routes/console.php\','.PHP_EOL.'        channels: __DIR__.\'/../routes/channels.php\',',
                 $appBootstrapPath,
             );
-        } else {
-            $this->components->warn('Unable to automatically add channel route definition to bootstrap file. Channel route file should be registered manually.');
+        }
+    }
 
-            return;
+    /**
+     * Uncomment the "BroadcastServiceProvider" in the application configuration.
+     *
+     * @return void
+     */
+    protected function enableBroadcastServiceProvider()
+    {
+        $config = ($filesystem = new Filesystem)->get(app()->configPath('app.php'));
+
+        if (str_contains($config, '// App\Providers\BroadcastServiceProvider::class')) {
+            $filesystem->replaceInFile(
+                '// App\Providers\BroadcastServiceProvider::class',
+                'App\Providers\BroadcastServiceProvider::class',
+                app()->configPath('app.php'),
+            );
         }
     }
 

@@ -85,10 +85,10 @@ class RouteServiceProvider extends ServiceProvider
     /**
      * Register the callback that will be used to load the application's routes.
      *
-     * @param  \Closure  $routesCallback
+     * @param  \Closure|null  $routesCallback
      * @return void
      */
-    public static function loadRoutesUsing(Closure $routesCallback)
+    public static function loadRoutesUsing(?Closure $routesCallback)
     {
         self::$alwaysLoadRoutesUsing = $routesCallback;
     }

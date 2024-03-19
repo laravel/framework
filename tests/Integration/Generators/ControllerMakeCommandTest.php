@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Integration\Generators;
 class ControllerMakeCommandTest extends TestCase
 {
     protected $files = [
+        'app/Http/Controllers/Controller.php',
         'app/Http/Controllers/FooController.php',
         'app/Models/Bar.php',
         'app/Models/Foo.php',
@@ -23,7 +24,31 @@ class ControllerMakeCommandTest extends TestCase
         ], 'app/Http/Controllers/FooController.php');
 
         $this->assertFileNotContains([
+            'class FooController extends Controller',
             'public function __invoke(Request $request)',
+        ], 'app/Http/Controllers/FooController.php');
+
+        $this->assertFilenameNotExists('tests/Feature/Http/Controllers/FooControllerTest.php');
+    }
+
+    public function testItCanGenerateControllerFileWhenBaseControllerExists()
+    {
+        $this->artisan('make:controller', ['name' => 'Controller'])
+            ->assertExitCode(0);
+
+        $this->artisan('make:controller', ['name' => 'FooController'])
+            ->assertExitCode(0);
+
+        $this->assertFileContains([
+            'namespace App\Http\Controllers;',
+            'use Illuminate\Http\Request;',
+            'class Controller',
+        ], 'app/Http/Controllers/Controller.php');
+
+        $this->assertFileContains([
+            'namespace App\Http\Controllers;',
+            'use Illuminate\Http\Request;',
+            'class FooController extends Controller',
         ], 'app/Http/Controllers/FooController.php');
 
         $this->assertFilenameNotExists('tests/Feature/Http/Controllers/FooControllerTest.php');
