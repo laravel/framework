@@ -3912,9 +3912,9 @@ class SupportCollectionTest extends TestCase
         ]);
 
         $this->assertEquals($data->all(), $data->select(null)->all());
-        $this->assertEquals( (object) [['first' => 'Taylor'], ['first' => 'Jess']], $data->select(['first', 'missing'])->all());
-        $this->assertEquals( (object) [['first' => 'Taylor'], ['first' => 'Jess']], $data->select('first', 'missing')->all());
-        $this->assertEquals( (object) [['first' => 'Taylor'], ['first' => 'Jess']], $data->select(collect(['first', 'missing']))->all());
+        $this->assertEquals([ (object) ['first' => 'Taylor'], (object) ['first' => 'Jess']], $data->select(['first', 'missing'])->all());
+        $this->assertEquals([ (object) ['first' => 'Taylor'], (object) ['first' => 'Jess']], $data->select('first', 'missing')->all());
+        $this->assertEquals([ (object) ['first' => 'Taylor'], (object) ['first' => 'Jess']], $data->select(collect(['first', 'missing']))->all());
 
         $this->assertEquals([
             (object) ['first' => 'Taylor', 'email' => 'taylorotwell@gmail.com'],
@@ -3941,9 +3941,9 @@ class SupportCollectionTest extends TestCase
         ]);
 
         $this->assertEquals($data->all(), $data->select(null)->all());
-        $this->assertEquals( (object) [['first' => 'Taylor'], ['first' => 'Jess']], $data->select(['first', 'missing'])->all());
-        $this->assertEquals( (object) [['first' => 'Taylor'], ['first' => 'Jess']], $data->select('first', 'missing')->all());
-        $this->assertEquals( (object) [['first' => 'Taylor'], ['first' => 'Jess']], $data->select(collect(['first', 'missing']))->all());
+        $this->assertEquals([ (object) ['first' => 'Taylor'], (object) ['first' => 'Jess']], $data->select(['first', 'missing'])->all());
+        $this->assertEquals([ (object) ['first' => 'Taylor'], (object) ['first' => 'Jess']], $data->select('first', 'missing')->all());
+        $this->assertEquals([ (object) ['first' => 'Taylor'], (object) ['first' => 'Jess']], $data->select(collect(['first', 'missing']))->all());
 
         $this->assertEquals([
             (object) ['first' => 'Taylor', 'email' => 'taylorotwell@gmail.com'],
