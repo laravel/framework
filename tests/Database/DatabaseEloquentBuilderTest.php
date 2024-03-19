@@ -2030,6 +2030,25 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertEquals($expected, $query->toSql());
     }
 
+    public function testWhereDynamic()
+    {
+        $model = new EloquentBuilderTestModelParentStub;
+        $builder = $model->whereFoo('bar');
+
+        $this->assertSame('select * from "eloquent_builder_test_model_parent_stubs" where "foo" = ?', $builder->toSql());
+        $this->assertEquals(['bar'], $builder->getBindings());
+    }
+
+    public function testWhereDynamicWithJoin()
+    {
+        $model = new EloquentBuilderTestModelParentStub;
+        $builder = $model->join('xyz', 'abc', '=', 'def')
+            ->whereFoo('bar');
+
+        $this->assertSame('select * from "eloquent_builder_test_model_parent_stubs" inner join "xyz" on "abc" = "def" where "eloquent_builder_test_model_parent_stubs"."foo" = ?', $builder->toSql());
+        $this->assertEquals(['bar'], $builder->getBindings());
+    }
+
     public function testLatestWithoutColumnWithCreatedAt()
     {
         $model = $this->getMockModel();

@@ -2059,7 +2059,10 @@ class Builder implements BuilderContract
         // clause on the query. Then we'll increment the parameter index values.
         $bool = strtolower($connector);
 
-        $this->where(Str::snake($segment), '=', $parameters[$index], $bool);
+        // Prepend the table name to the column name, if we're using joins.
+        $table = count($this->joins ?? []) ? "$this->from." : '';
+
+        $this->where($table.Str::snake($segment), '=', $parameters[$index], $bool);
     }
 
     /**
