@@ -53,6 +53,10 @@ class BroadcastingInstallCommand extends Command
 
         // Install bootstrapping...
         if (! file_exists($echoScriptPath = $this->laravel->resourcePath('js/echo.js'))) {
+            if (! is_dir($directory = $this->laravel->resourcePath('js'))) {
+                mkdir($directory, 0755, true);
+            }
+
             copy(__DIR__.'/stubs/echo-js.stub', $echoScriptPath);
         }
 
