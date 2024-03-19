@@ -534,7 +534,7 @@ class Arr
                 }
             }
 
-            return $result;
+            return is_object($item) ? (object) $result : $result;
         });
     }
 

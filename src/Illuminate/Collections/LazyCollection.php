@@ -982,7 +982,7 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
                         }
                     }
 
-                    yield $result;
+                    yield is_object($item) ? (object) $result : $result;
                 }
             }
         });
