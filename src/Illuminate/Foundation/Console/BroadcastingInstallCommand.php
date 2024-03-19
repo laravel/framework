@@ -23,7 +23,9 @@ class BroadcastingInstallCommand extends Command
      */
     protected $signature = 'install:broadcasting
                     {--composer=global : Absolute path to the Composer binary which should be used to install packages}
-                    {--force : Overwrite any existing broadcasting routes file}';
+                    {--force : Overwrite any existing broadcasting routes file}
+                    {--without-reverb : Do not prompt to install Laravel Reverb}
+                    {--without-node : Do not prompt to install Node dependencies}';
 
     /**
      * The console command description.
@@ -127,7 +129,7 @@ class BroadcastingInstallCommand extends Command
      */
     protected function installReverb()
     {
-        if (InstalledVersions::isInstalled('laravel/reverb')) {
+        if ($this->option('without-reverb') || InstalledVersions::isInstalled('laravel/reverb')) {
             return;
         }
 
@@ -159,7 +161,7 @@ class BroadcastingInstallCommand extends Command
      */
     protected function installNodeDependencies()
     {
-        if (! confirm('Would you like to install and build the Node dependencies required for broadcasting?', default: true)) {
+        if ($this->option('without-reverb') || ! confirm('Would you like to install and build the Node dependencies required for broadcasting?', default: true)) {
             return;
         }
 
@@ -188,7 +190,7 @@ class BroadcastingInstallCommand extends Command
         }
 
         $command = Process::command(implode(' && ', $commands))
-                        ->path(base_path());
+            ->path(base_path());
 
         if (! windows_os()) {
             $command->tty(true);
