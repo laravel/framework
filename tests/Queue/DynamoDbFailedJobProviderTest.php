@@ -94,7 +94,7 @@ class DynamoDbFailedJobProviderTest extends TestCase
                 'queue' => 'queue',
                 'payload' => 'payload',
                 'exception' => 'exception',
-                'failed_at' => Carbon::createFromTimestamp($time)->format(DateTimeInterface::ISO8601),
+                'failed_at' => Carbon::createFromTimestamp($time)->format(DateTimeInterface::ATOM),
             ],
         ], $response);
     }
@@ -135,7 +135,7 @@ class DynamoDbFailedJobProviderTest extends TestCase
                 'queue' => 'queue',
                 'payload' => 'payload',
                 'exception' => 'exception',
-                'failed_at' => Carbon::createFromTimestamp($time)->format(DateTimeInterface::ISO8601),
+                'failed_at' => Carbon::createFromTimestamp($time)->format(DateTimeInterface::ATOM),
             ], $response
         );
     }
