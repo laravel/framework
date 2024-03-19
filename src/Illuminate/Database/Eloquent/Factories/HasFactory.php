@@ -2,6 +2,9 @@
 
 namespace Illuminate\Database\Eloquent\Factories;
 
+/**
+ * @template TFactory of \Illuminate\Database\Eloquent\Factories\Factory
+ */
 trait HasFactory
 {
     /**
@@ -9,7 +12,7 @@ trait HasFactory
      *
      * @param  callable|array|int|null  $count
      * @param  callable|array  $state
-     * @return \Illuminate\Database\Eloquent\Factories\Factory<static>
+     * @return TFactory
      */
     public static function factory($count = null, $state = [])
     {
@@ -23,10 +26,14 @@ trait HasFactory
     /**
      * Create a new factory instance for the model.
      *
-     * @return \Illuminate\Database\Eloquent\Factories\Factory<static>
+     * @return TFactory|null
      */
     protected static function newFactory()
     {
-        //
+        if (! isset(static::$factory)) {
+            return null;
+        }
+
+        return static::$factory::new();
     }
 }
