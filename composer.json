@@ -149,11 +149,6 @@
             "Illuminate\\Tests\\": "tests/"
         }
     },
-    "extra": {
-        "branch-alias": {
-            "dev-master": "11.x-dev"
-        }
-    },
     "suggest": {
         "ext-apcu": "Required to use the APC cache driver.",
         "ext-fileinfo": "Required to use the Filesystem class.",
