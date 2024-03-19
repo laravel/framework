@@ -120,7 +120,7 @@ class DynamoDbFailedJobProvider implements FailedJobProviderInterface
                 'exception' => $result['exception']['S'],
                 'failed_at' => Carbon::createFromTimestamp(
                     (int) $result['failed_at']['N']
-                )->format(DateTimeInterface::ISO8601),
+                )->format(DateTimeInterface::ATOM),
             ];
         })->all();
     }
@@ -153,7 +153,7 @@ class DynamoDbFailedJobProvider implements FailedJobProviderInterface
             'exception' => $result['Item']['exception']['S'],
             'failed_at' => Carbon::createFromTimestamp(
                 (int) $result['Item']['failed_at']['N']
-            )->format(DateTimeInterface::ISO8601),
+            )->format(DateTimeInterface::ATOM),
         ];
     }
 
