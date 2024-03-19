@@ -563,6 +563,20 @@ class SupportArrTest extends TestCase
         $this->assertFalse(Arr::isList(['foo' => 'bar', 'baz' => 'qux']));
     }
 
+    public function testIsSequential()
+    {
+        $this->assertTrue(Arr::isSequential([1, 2, 3, 4, 5, 6, 7, 8, 9]));
+        $this->assertTrue(Arr::isSequential([4, 5, 6, 7, 8, 9, 10, 11]));
+        $this->assertTrue(Arr::isSequential(['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i']));
+        $this->assertTrue(Arr::isSequential([1 => 'a', 2 => 'b', 3 => 'c', 4 => 'd', 5 => 'e', 6 => 'f', 7 => 'g', 8 => 'h', 9 => 'i']));
+
+        $this->assertFalse(Arr::isSequential([]));
+        $this->assertFalse(Arr::isSequential([1, 3, 4, 5, 6, 7, 8, 9]));
+        $this->assertFalse(Arr::isSequential(['a', 'c', 'd', 'e', 'f', 'g', 'h', 'i']));
+        $this->assertFalse(Arr::isSequential([1 => 'a', 2 => 'c', 3 => 'd', 4 => 'e', 5 => 'f', 6 => 'g', 7 => 'h', 8 => 'h', 10 => 'i']));
+        $this->assertFalse(Arr::isSequential([1, 2, 3, 'd', 5, 6, 7, 8, 9]));
+    }
+
     public function testOnly()
     {
         $array = ['name' => 'Desk', 'price' => 100, 'orders' => 10];

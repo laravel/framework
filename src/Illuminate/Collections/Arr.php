@@ -450,6 +450,42 @@ class Arr
     }
 
     /**
+     * Determine if an array is sequentially continuous (numerically or alphabetically).
+     *
+     * @param  array  $array
+     * @return bool
+     */
+    public static function isSequential($array)
+    {
+        if (empty($array)) {
+            return false;
+        }
+
+        $isNumeric = count(array_filter($array, 'is_numeric')) == count($array);
+
+        $isAlphabetic = count(array_filter($array, static fn ($value) => ctype_alpha((string) $value))) == count($array);
+
+        if (! $isNumeric && ! $isAlphabetic) {
+            return false;
+        }
+
+        $numericValues = $isNumeric
+            ? $array
+            : array_map(static fn ($item) => ord(strtolower($item)) - ord('a') + 1, $array);
+
+        if (count($numericValues) !== count(array_unique($numericValues))) {
+            return false;
+        }
+
+        sort($numericValues);
+
+        $min = min($numericValues);
+        $max = max($numericValues);
+
+        return ($max - $min) === (count($numericValues) - 1);
+    }
+
+    /**
      * Join all items using a string. The final items can use a separate glue string.
      *
      * @param  array  $array
