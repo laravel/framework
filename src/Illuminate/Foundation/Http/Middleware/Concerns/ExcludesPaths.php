@@ -5,13 +5,6 @@ namespace Illuminate\Foundation\Http\Middleware\Concerns;
 trait ExcludesPaths
 {
     /**
-     * The URIs that should be excluded.
-     *
-     * @var array<int, string>
-     */
-    protected $except = [];
-
-    /**
      * Determine if the request has a URI that should be excluded.
      *
      * @param  \Illuminate\Http\Request  $request
