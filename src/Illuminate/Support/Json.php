@@ -63,6 +63,7 @@ class Json implements Arrayable, Jsonable, JsonSerializable, Stringable, Respons
      * Retrieves a value from the underlying JSON data.
      *
      * @template TDefault
+     *
      * @param  array-key  $key
      * @param  TDefault  $default
      * @return TDefault|mixed|null
@@ -91,7 +92,7 @@ class Json implements Arrayable, Jsonable, JsonSerializable, Stringable, Respons
      */
     public function missing($key)
     {
-        return !$this->has($key);
+        return ! $this->has($key);
     }
 
     /**
@@ -113,7 +114,7 @@ class Json implements Arrayable, Jsonable, JsonSerializable, Stringable, Respons
      */
     public function missingKey($key)
     {
-        return !$this->hasKey($key);
+        return ! $this->hasKey($key);
     }
 
     /**
@@ -166,7 +167,7 @@ class Json implements Arrayable, Jsonable, JsonSerializable, Stringable, Respons
      */
     public function toArray(): array
     {
-        return array_map(fn($value) => $value instanceof Arrayable ? $value->toArray() : $value, $this->items);
+        return array_map(fn ($value) => $value instanceof Arrayable ? $value->toArray() : $value, $this->items);
     }
 
     /**

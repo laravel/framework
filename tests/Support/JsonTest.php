@@ -3,9 +3,10 @@
 namespace Illuminate\Tests\Support;
 
 use Illuminate\Support\Collection;
+use Illuminate\Support\Json;
 use JsonException;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Support\Json;
+
 use function json_encode;
 
 class JsonTest extends TestCase
@@ -90,18 +91,20 @@ JSON, $json->toJson(JSON_PRETTY_PRINT));
 
     public function testToJsonOrFail()
     {
-        $a = new class {
+        $a = new class
+        {
             public $otherObject;
         };
 
-        $b = new class {
+        $b = new class
+        {
             public $otherObject;
         };
 
         $a->otherObject = $b;
         $b->otherObject = $a;
 
-        $json = new Json(["😓" => $a]);
+        $json = new Json(['😓' => $a]);
 
         $this->expectException(JsonException::class);
 
