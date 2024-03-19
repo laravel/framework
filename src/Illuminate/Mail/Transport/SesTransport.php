@@ -50,6 +50,11 @@ class SesTransport extends AbstractTransport implements Stringable
         $options = $this->options;
 
         if ($message->getOriginalMessage() instanceof Message) {
+            if ($header = $message->getOriginalMessage()->getHeaders()->get('X-SES-LIST-MANAGEMENT-OPTIONS')) {
+                if (preg_match("/^(contactListName=)*(?<ContactListName>[^;]+)(;\s?topicName=(?<TopicName>.+))?$/ix", $header->getBodyAsString(), $listManagementOptions)) {
+                    $options['ListManagementOptions'] = array_filter($listManagementOptions, fn ($e) => \in_array($e, ['ContactListName', 'TopicName']), \ARRAY_FILTER_USE_KEY);
+                }
+            }
             foreach ($message->getOriginalMessage()->getHeaders()->all() as $header) {
                 if ($header instanceof MetadataHeader) {
                     $options['Tags'][] = ['Name' => $header->getKey(), 'Value' => $header->getValue()];
