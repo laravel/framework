@@ -32,6 +32,6 @@ trait ExcludesPaths
      */
     public function getExcludedPaths()
     {
-        return $this->except;
+        return $this->except ?? [];
     }
 }
