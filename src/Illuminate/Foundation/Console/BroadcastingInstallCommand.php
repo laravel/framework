@@ -161,7 +161,7 @@ class BroadcastingInstallCommand extends Command
      */
     protected function installNodeDependencies()
     {
-        if ($this->option('without-reverb') || ! confirm('Would you like to install and build the Node dependencies required for broadcasting?', default: true)) {
+        if ($this->option('without-node') || ! confirm('Would you like to install and build the Node dependencies required for broadcasting?', default: true)) {
             return;
         }
 
