@@ -386,7 +386,7 @@ class RouteRegistrarTest extends TestCase
     {
         $this->router->domain('{account}.myapp.com')->group(function ($router) {
             $router->get('users', 'UsersController@index');
-        },[
+        }, [
             'namespace' => 'App\Http\Controllers\Custom',
         ]);
 
