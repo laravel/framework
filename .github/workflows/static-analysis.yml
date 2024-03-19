@@ -40,3 +40,6 @@ jobs:
 
       - name: Execute type checking
         run: vendor/bin/phpstan --configuration="phpstan.${{ matrix.directory }}.neon.dist"
+
+      - name: Check composer dependencies
+        run: vendor/bin/composer-dependency-analyser
