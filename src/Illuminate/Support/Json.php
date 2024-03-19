@@ -39,11 +39,12 @@ class Json implements Arrayable, Jsonable, JsonSerializable, Stringable, Respons
      *
      * @param  array-key  $key
      * @param  mixed  $value
+     * @param  bool  $overwrite
      * @return void
      */
-    public function set($key, $value): void
+    public function set($key, $value, $overwrite = true): void
     {
-        Arr::set($this->items, $key, $value);
+        data_set($this->items, $key, $value, $overwrite);
     }
 
     /**
@@ -55,9 +56,7 @@ class Json implements Arrayable, Jsonable, JsonSerializable, Stringable, Respons
      */
     public function fill($key, $value)
     {
-        if ($this->missing($key)) {
-            $this->set($key, $value);
-        }
+        $this->set($key, $value, false);
     }
 
     /**
@@ -70,7 +69,7 @@ class Json implements Arrayable, Jsonable, JsonSerializable, Stringable, Respons
      */
     public function get($key, $default = null)
     {
-        return Arr::get($this->items, $key, $default);
+        return data_get($this->items, $key, $default);
     }
 
     /**
