@@ -187,11 +187,12 @@ class RouteRegistrar
      * Create a route group with shared attributes.
      *
      * @param  \Closure|array|string  $callback
+     * @param  array  $options
      * @return $this
      */
-    public function group($callback)
+    public function group($callback, array $options = [])
     {
-        $this->router->group($this->attributes, $callback);
+        $this->router->group($this->attributes + $options, $callback);
 
         return $this;
     }

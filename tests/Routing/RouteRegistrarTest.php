@@ -382,6 +382,18 @@ class RouteRegistrarTest extends TestCase
         $this->assertSame('{account}.myapp.com', $this->getRoute()->getDomain());
     }
 
+    public function testCanRegisterGroupWithDomainAndExtraOptions()
+    {
+        $this->router->domain('{account}.myapp.com')->group(function ($router) {
+            $router->get('users', 'UsersController@index');
+        },[
+            'namespace' => 'App\Http\Controllers\Custom',
+        ]);
+
+        $this->assertSame('{account}.myapp.com', $this->getRoute()->getDomain());
+        $this->assertSame('App\Http\Controllers\Custom', $this->getRoute()->getAction()['namespace']);
+    }
+
     public function testCanRegisterGroupWithDomainAndNamePrefix()
     {
         $this->router->domain('{account}.myapp.com')->name('api.')->group(function ($router) {
