@@ -57,7 +57,7 @@ class BroadcastingInstallCommand extends Command
             if (! is_dir($directory)) {
                 mkdir($directory, 0755, true);
             }
-            
+
             copy(__DIR__.'/stubs/echo-js.stub', $echoScriptPath);
         }
 
