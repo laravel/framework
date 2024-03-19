@@ -33,7 +33,8 @@
         }
     },
     "suggest": {
-        "symfony/var-dumper": "Required to use the dump method (^7.0)."
+        "symfony/var-dumper": "Required to use the dump method (^7.0).",
+        "symfony/http-foundation": "Required to transform Json into an HTTP response (^7.0)"
     },
     "config": {
         "sort-packages": true
