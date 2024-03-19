@@ -7,7 +7,7 @@ use Symfony\Component\Console\Attribute\AsCommand;
 
 use function Illuminate\Filesystem\join_paths;
 
-#[AsCommand(name: 'make:queue-failed-table')]
+#[AsCommand(name: 'make:queue-failed-table', aliases: ['queue:failed-table'])]
 class FailedTableCommand extends MigrationGeneratorCommand
 {
     /**

@@ -6,10 +6,15 @@ use Illuminate\Console\Application;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Foundation\Application as ApplicationContract;
+use Illuminate\Events\Dispatcher as EventsDispatcher;
+use Illuminate\Foundation\Application as FoundationApplication;
 use Illuminate\Tests\Console\Fixtures\FakeCommandWithInputPrompting;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
+use Symfony\Component\Console\Exception\CommandNotFoundException;
+use Throwable;
 
 class ConsoleApplicationTest extends TestCase
 {
@@ -49,6 +54,68 @@ class ConsoleApplicationTest extends TestCase
         $result = $app->resolve('foo');
 
         $this->assertEquals($command, $result);
+    }
+
+    public function testResolvingCommandsWithAliasViaAttribute()
+    {
+        $container = new FoundationApplication();
+        $app = new Application($container, new EventsDispatcher($container), $container->version());
+        $app->resolve(CommandWithAliasViaAttribute::class);
+        $app->setContainerCommandLoader();
+
+        $this->assertInstanceOf(CommandWithAliasViaAttribute::class, $app->get('command-name'));
+        $this->assertInstanceOf(CommandWithAliasViaAttribute::class, $app->get('command-alias'));
+        $this->assertArrayHasKey('command-name', $app->all());
+        $this->assertArrayHasKey('command-alias', $app->all());
+    }
+
+    public function testResolvingCommandsWithAliasViaProperty()
+    {
+        $container = new FoundationApplication();
+        $app = new Application($container, new EventsDispatcher($container), $container->version());
+        $app->resolve(CommandWithAliasViaProperty::class);
+        $app->setContainerCommandLoader();
+
+        $this->assertInstanceOf(CommandWithAliasViaProperty::class, $app->get('command-name'));
+        $this->assertInstanceOf(CommandWithAliasViaProperty::class, $app->get('command-alias'));
+        $this->assertArrayHasKey('command-name', $app->all());
+        $this->assertArrayHasKey('command-alias', $app->all());
+    }
+
+    public function testResolvingCommandsWithNoAliasViaAttribute()
+    {
+        $container = new FoundationApplication();
+        $app = new Application($container, new EventsDispatcher($container), $container->version());
+        $app->resolve(CommandWithNoAliasViaAttribute::class);
+        $app->setContainerCommandLoader();
+
+        $this->assertInstanceOf(CommandWithNoAliasViaAttribute::class, $app->get('command-name'));
+        try {
+            $app->get('command-alias');
+            $this->fail();
+        } catch (Throwable $e) {
+            $this->assertInstanceOf(CommandNotFoundException::class, $e);
+        }
+        $this->assertArrayHasKey('command-name', $app->all());
+        $this->assertArrayNotHasKey('command-alias', $app->all());
+    }
+
+    public function testResolvingCommandsWithNoAliasViaProperty()
+    {
+        $container = new FoundationApplication();
+        $app = new Application($container, new EventsDispatcher($container), $container->version());
+        $app->resolve(CommandWithNoAliasViaProperty::class);
+        $app->setContainerCommandLoader();
+
+        $this->assertInstanceOf(CommandWithNoAliasViaProperty::class, $app->get('command-name'));
+        try {
+            $app->get('command-alias');
+            $this->fail();
+        } catch (Throwable $e) {
+            $this->assertInstanceOf(CommandNotFoundException::class, $e);
+        }
+        $this->assertArrayHasKey('command-name', $app->all());
+        $this->assertArrayNotHasKey('command-alias', $app->all());
     }
 
     public function testCallFullyStringCommandLine()
@@ -123,4 +190,26 @@ class ConsoleApplicationTest extends TestCase
             $app, $events, 'test-version',
         ])->getMock();
     }
+}
+
+#[AsCommand('command-name')]
+class CommandWithNoAliasViaAttribute extends Command
+{
+    //
+}
+#[AsCommand('command-name', aliases: ['command-alias'])]
+class CommandWithAliasViaAttribute extends Command
+{
+    //
+}
+
+class CommandWithNoAliasViaProperty extends Command
+{
+    public $name = 'command-name';
+}
+
+class CommandWithAliasViaProperty extends Command
+{
+    public $name = 'command-name';
+    public $aliases = ['command-alias'];
 }

@@ -7,7 +7,7 @@ use Symfony\Component\Console\Attribute\AsCommand;
 
 use function Illuminate\Filesystem\join_paths;
 
-#[AsCommand(name: 'make:session-table')]
+#[AsCommand(name: 'make:session-table', aliases: ['session:table'])]
 class SessionTableCommand extends MigrationGeneratorCommand
 {
     /**
