@@ -4,6 +4,8 @@ namespace Illuminate\Foundation\Testing\Concerns;
 
 use Closure;
 use Illuminate\Contracts\Debug\ExceptionHandler;
+use Illuminate\Foundation\Exceptions\ReportableHandler;
+use Illuminate\Support\Arr;
 use Illuminate\Testing\Assert;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\Console\Application as ConsoleApplication;
@@ -20,9 +22,9 @@ trait InteractsWithExceptionHandling
     protected $originalExceptionHandler;
 
     /**
-     * Whether to throw or not, exceptions reported to the exception handler.
+     * The list of reported exceptions that should be thrown.
      */
-    protected $throwReportedExceptions = false;
+    protected $throwReportedExceptions = [];
 
     /**
      * Restore exception handling.
@@ -62,19 +64,30 @@ trait InteractsWithExceptionHandling
     /**
      * Throw exceptions reported to the exception handler.
      *
+     * @param  array<int, class-string<\Throwable>>|string|null  $exceptions
      * @return $this
      */
-    protected function throwReportedExceptions()
+    protected function throwReportedExceptions(array|string $exceptions = null)
     {
+        $exceptions = Arr::wrap($exceptions);
+
+        $this->throwReportedExceptions = array_unique(array_merge(
+            $this->throwReportedExceptions,
+            $exceptions ?: [Throwable::class],
+        ));
+
         $handler = app(ExceptionHandler::class);
+        $throwReportedExceptions = $this->throwReportedExceptions;
 
         property_exists($handler, 'throwReportedExceptions')
-            ? $handler->throwReportedExceptions = true
-            : $handler->reportable(function (Throwable $e) {
-                throw $e;
-            });
-
-        $this->throwReportedExceptions = true;
+            ? $handler->throwReportedExceptions = $throwReportedExceptions
+            : (fn () => $this->reportCallbacks = [
+                    new ReportableHandler(function (Throwable $e) use ($throwReportedExceptions) {
+                        if (collect($throwReportedExceptions)->contains(fn ($class) => $e instanceof $class)) {
+                            throw $e;
+                        }
+                    }), ...$this->reportCallbacks,
+                ])->call($handler);
 
         return $this;
     }
@@ -123,7 +136,7 @@ trait InteractsWithExceptionHandling
              */
             public function report(Throwable $e)
             {
-                if ($this->throwReportedExceptions) {
+                if (collect($this->throwReportedExceptions)->contains(fn ($class) => $e instanceof $class)) {
                     throw $e;
                 }
             }
