@@ -39,7 +39,7 @@ class FileBasedMaintenanceMode implements MaintenanceModeContract
      */
     public function active(): bool
     {
-        return file_exists($this->path());
+        return is_file($this->path());
     }
 
     /**
