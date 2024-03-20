@@ -30,6 +30,8 @@ use PHPUnit\Framework\TestCase;
 use RuntimeException;
 use stdClass;
 
+include_once 'Enums.php';
+
 class DatabaseQueryBuilderTest extends TestCase
 {
     protected $called;
@@ -4472,6 +4474,14 @@ SQL;
         $builder->addBinding(['bar', 'baz'], 'having');
         $builder->addBinding(['foo'], 'where');
         $this->assertEquals(['foo', 'bar', 'baz'], $builder->getBindings());
+    }
+
+    public function testAddBindingWithEnum()
+    {
+        $builder = $this->getBuilder();
+        $builder->addBinding(IntegerStatus::done);
+        $builder->addBinding([NonBackedStatus::done]);
+        $this->assertEquals([2, 'done'], $builder->getBindings());
     }
 
     public function testMergeBuilders()
