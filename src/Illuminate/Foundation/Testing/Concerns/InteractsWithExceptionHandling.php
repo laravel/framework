@@ -82,12 +82,12 @@ trait InteractsWithExceptionHandling
         property_exists($handler, 'throwReportedExceptions')
             ? $handler->throwReportedExceptions = $throwReportedExceptions
             : (fn () => $this->reportCallbacks = [
-                    new ReportableHandler(function (Throwable $e) use ($throwReportedExceptions) {
-                        if (collect($throwReportedExceptions)->contains(fn ($class) => $e instanceof $class)) {
-                            throw $e;
-                        }
-                    }), ...$this->reportCallbacks,
-                ])->call($handler);
+                new ReportableHandler(function (Throwable $e) use ($throwReportedExceptions) {
+                    if (collect($throwReportedExceptions)->contains(fn ($class) => $e instanceof $class)) {
+                        throw $e;
+                    }
+                }), ...$this->reportCallbacks,
+            ])->call($handler);
 
         return $this;
     }
