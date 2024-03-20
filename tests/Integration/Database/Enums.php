@@ -18,6 +18,13 @@ enum IntegerStatus: int
     case done = 2;
 }
 
+enum NonBackedStatus
+{
+    case draft;
+    case pending;
+    case done;
+}
+
 enum ArrayableStatus: string implements Arrayable
 {
     case pending = 'pending';
