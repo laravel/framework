@@ -493,6 +493,10 @@ abstract class ServiceProvider
             return false;
         }
 
+        if (function_exists('opcache_invalidate')) {
+            opcache_invalidate($path, true);
+        }
+
         $providers = collect(require $path)
             ->merge([$provider])
             ->unique()
