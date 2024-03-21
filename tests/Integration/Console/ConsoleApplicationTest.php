@@ -15,7 +15,7 @@ class ConsoleApplicationTest extends TestCase
 {
     protected function setUp(): void
     {
-        Artisan::starting(function ($artisan) use ($commands) {
+        Artisan::starting(function ($artisan) {
             $artisan->resolveCommands([
                 FooCommandStub::class,
                 ZondaCommandStub::class,
