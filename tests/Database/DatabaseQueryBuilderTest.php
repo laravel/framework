@@ -2038,6 +2038,23 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([4], $builder->getBindings());
     }
 
+    public function testGetCountForPaginationWithUnionAllAndBindings()
+    {
+        $builder = $this->getBuilder();
+        $builder->from('users')->selectSub(function ($q) {
+            $q->select('body')->from('posts')->where('id', 4);
+        }, 'post')->unionAll();
+
+        $builder->getConnection()->shouldReceive('select')->once()->with('select count(*) as aggregate from "users"', [], true)->andReturn([['aggregate' => 1]]);
+        $builder->getProcessor()->shouldReceive('processSelect')->once()->andReturnUsing(function ($builder, $results) {
+            return $results;
+        });
+
+        $count = $builder->getCountForPagination();
+        $this->assertEquals(1, $count);
+        $this->assertEquals([4], $builder->getBindings());
+    }
+
     public function testGetCountForPaginationWithColumnAliases()
     {
         $builder = $this->getBuilder();
@@ -4197,7 +4214,7 @@ SQL;
     {
         $builder = $this->getSqlServerBuilder();
         $builder->select('*')->from('users')->take(10);
-        $this->assertSame('select top 10 * from [users]', $builder->toSql());
+        $this->assertSame('select * from [users] offset 0 rows fetch next 10 rows only', $builder->toSql());
 
         $builder = $this->getSqlServerBuilder();
         $builder->select('*')->from('users')->skip(10)->orderBy('email', 'desc');
@@ -4210,6 +4227,26 @@ SQL;
         $builder = $this->getSqlServerBuilder();
         $builder->select('*')->from('users')->skip(11)->take(10)->orderBy('email', 'desc');
         $this->assertSame('select * from [users] order by [email] desc offset 11 rows fetch next 10 rows only', $builder->toSql());
+
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('users');
+        $builder2 = $this->getSqlServerBuilder();
+        $builder2->select('*')->from('users');
+        $builder->unionAll($builder2);
+
+        $results = collect([['test' => 'foo'], ['test' => 'bar']]);
+        $builder->shouldReceive('getCountForPagination')->once()->andReturn(2);
+        $builder->shouldReceive('forPage')->once()->with(1, 2)->andReturnSelf();
+        $builder->shouldReceive('get')->once()->andReturnUsing(function () use ($builder, $results) {
+            $this->assertEquals(
+                'select * from "foobar" where ("test" > ?) order by "test" asc limit 17',
+                $builder->toSql());
+            $this->assertEquals(['bar'], $builder->bindings['where']);
+
+            return $results;
+        });
+
+        $result = $builder->paginate(2);
 
         $builder = $this->getSqlServerBuilder();
         $subQuery = function ($query) {
