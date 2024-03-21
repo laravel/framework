@@ -3,7 +3,6 @@
 namespace Illuminate\Tests\Integration\Mail;
 
 use Illuminate\Mail\Mailable;
-use Illuminate\Support\Facades\View;
 use Orchestra\Testbench\TestCase;
 
 class RenderingMailWithLocaleTest extends TestCase
