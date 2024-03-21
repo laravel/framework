@@ -4,15 +4,20 @@ namespace Illuminate\Tests\Integration\Foundation\Testing\Concerns;
 
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
+use Orchestra\Testbench\Attributes\WithMigration;
 use Orchestra\Testbench\TestCase;
 
+#[WithMigration]
 class InteractsWithAuthenticationTest extends TestCase
 {
-    protected function getEnvironmentSetUp($app)
+    use RefreshDatabase;
+
+    protected function defineEnvironment($app)
     {
         $app['config']->set('auth.providers.users.model', AuthenticationTestUser::class);
 
@@ -23,16 +28,13 @@ class InteractsWithAuthenticationTest extends TestCase
         ]);
     }
 
-    protected function setUp(): void
+    protected function afterRefreshingDatabase()
     {
-        parent::setUp();
+        Schema::table('users', function (Blueprint $table) {
+            $table->renameColumn('name', 'username');
+        });
 
-        Schema::create('users', function (Blueprint $table) {
-            $table->increments('id');
-            $table->string('email');
-            $table->string('username');
-            $table->string('password');
-            $table->string('remember_token')->default(null)->nullable();
+        Schema::table('users', function (Blueprint $table) {
             $table->tinyInteger('is_active')->default(0);
         });
 
