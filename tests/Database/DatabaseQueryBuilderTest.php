@@ -4214,7 +4214,7 @@ SQL;
     {
         $builder = $this->getSqlServerBuilder();
         $builder->select('*')->from('users')->take(10);
-        $this->assertSame('select * from [users] offset 0 rows fetch next 10 rows only', $builder->toSql());
+        $this->assertSame('select top 10 * from [users]', $builder->toSql());
 
         $builder = $this->getSqlServerBuilder();
         $builder->select('*')->from('users')->skip(10)->orderBy('email', 'desc');
