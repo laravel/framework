@@ -309,7 +309,6 @@ class SqlServerGrammar extends Grammar
             $sql .= 'order by (SELECT 0) ';
         }
 
-
         if (! $query->offset > 0) {
             $sql .= 'offset 0 rows ';
         }
