@@ -3,18 +3,20 @@
 namespace Illuminate\Tests\Integration\Auth;
 
 use Illuminate\Auth\Notifications\ResetPassword;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
 use Illuminate\Tests\Integration\Auth\Fixtures\AuthenticationTestUser;
-use Orchestra\Testbench\Concerns\WithLaravelMigrations;
+use Orchestra\Testbench\Attributes\WithMigration;
 use Orchestra\Testbench\Factories\UserFactory;
 use Orchestra\Testbench\TestCase;
 
+#[WithMigration]
 class ForgotPasswordWithoutDefaultRoutesTest extends TestCase
 {
-    use WithLaravelMigrations;
+    use RefreshDatabase;
 
     protected function tearDown(): void
     {
