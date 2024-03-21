@@ -9,23 +9,13 @@ use Illuminate\Http\Exceptions\ThrottleRequestsException;
 use Illuminate\Routing\Middleware\ThrottleRequests;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Route;
+use Orchestra\Testbench\Attributes\WithConfig;
 use Orchestra\Testbench\TestCase;
 use Throwable;
 
+#[WithConfig('hashing.driver', 'bcrypt')]
 class ThrottleRequestsTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        parent::tearDown();
-
-        Carbon::setTestNow(null);
-    }
-
-    public function getEnvironmentSetUp($app)
-    {
-        $app['config']->set('hashing', ['driver' => 'bcrypt']);
-    }
-
     public function testLockOpensImmediatelyAfterDecay()
     {
         Carbon::setTestNow(Carbon::create(2018, 1, 1, 0, 0, 0));
