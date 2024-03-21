@@ -14,13 +14,6 @@ use Orchestra\Testbench\TestCase;
 
 class CookieTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        parent::tearDown();
-
-        Carbon::setTestNow(null);
-    }
-
     public function test_cookie_is_sent_back_with_proper_expire_time_when_should_expire_on_close()
     {
         $this->app['config']->set('session.expire_on_close', true);
