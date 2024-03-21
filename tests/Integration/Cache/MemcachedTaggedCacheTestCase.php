@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Integration\Cache;
 
 use Illuminate\Support\Facades\Cache;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 
 #[RequiresPhpExtension('memcached')]
 class MemcachedTaggedCacheTestCase extends MemcachedIntegrationTestCase
