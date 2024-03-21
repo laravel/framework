@@ -2,12 +2,12 @@
 
 namespace Illuminate\Tests\Integration\Cache;
 
-use Illuminate\Support\Str;
-use Aws\Exception\AwsException;
 use Aws\DynamoDb\DynamoDbClient;
-use Orchestra\Testbench\TestCase;
-use Illuminate\Support\Facades\Cache;
+use Aws\Exception\AwsException;
 use Illuminate\Contracts\Cache\Repository;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Str;
+use Orchestra\Testbench\TestCase;
 use Orchestra\Testbench\Attributes\RequiresEnv;
 
 #[RequiresEnv('DYNAMODB_CACHE_TABLE')]
