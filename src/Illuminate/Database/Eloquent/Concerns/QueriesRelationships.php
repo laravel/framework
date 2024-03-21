@@ -1,4 +1,4 @@
-<?php
+x<?php
 
 namespace Illuminate\Database\Eloquent\Concerns;
 
@@ -477,7 +477,7 @@ trait QueriesRelationships
 
         return $this->where(function ($query) use ($relation, $model) {
             $query->where($relation->getMorphType(), $model->getMorphClass())
-                ->where($relation->getForeignKeyName(), $relation->getOwnerKeyName());
+                ->where($relation->getForeignKeyName(), $relation->getRelatedKeyFrom($model));
         }, null, null, $boolean);
     }
 
@@ -506,7 +506,7 @@ trait QueriesRelationships
 
         return $this->whereNot(function ($query) use ($relation, $model) {
             $query->where($relation->getMorphType(), '<=>', $model->getMorphClass())
-                ->where($relation->getForeignKeyName(), '<=>', $relation->getOwnerKeyName());
+                ->where($relation->getForeignKeyName(), '<=>', $relation->getRelatedKeyFrom($model));
         }, null, null, $boolean);
     }
 
