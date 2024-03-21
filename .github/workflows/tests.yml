@@ -62,7 +62,7 @@ jobs:
           REDIS_LIBS: liblz4-dev, liblzf-dev, libzstd-dev
 
       - name: Set Framework version
-        run: composer config version "11.x-dev"
+        run: composer config version "12.x-dev"
 
       - name: Set minimum PHP 8.2 versions
         uses: nick-fields/retry@v3
@@ -133,7 +133,7 @@ jobs:
           coverage: none
 
       - name: Set Framework version
-        run: composer config version "11.x-dev"
+        run: composer config version "12.x-dev"
 
       - name: Set Minimum PHP 8.2 Versions
         uses: nick-fields/retry@v3
