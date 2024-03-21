@@ -7,8 +7,8 @@ use Aws\Exception\AwsException;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
-use Orchestra\Testbench\TestCase;
 use Orchestra\Testbench\Attributes\RequiresEnv;
+use Orchestra\Testbench\TestCase;
 
 #[RequiresEnv('DYNAMODB_CACHE_TABLE')]
 class DynamoDbStoreTest extends TestCase

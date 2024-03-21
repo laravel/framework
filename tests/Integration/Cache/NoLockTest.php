@@ -3,8 +3,8 @@
 namespace Illuminate\Tests\Integration\Cache;
 
 use Illuminate\Support\Facades\Cache;
-use Orchestra\Testbench\TestCase;
 use Orchestra\Testbench\Attributes\WithConfig;
+use Orchestra\Testbench\TestCase;
 
 #[WithConfig('cache.default', 'null')]
 #[WithConfig('cache.stores.null', ['driver' => 'null'])]

@@ -4,8 +4,8 @@ namespace Illuminate\Tests\Integration\Cache;
 
 use Exception;
 use Illuminate\Support\Facades\Cache;
-use Orchestra\Testbench\TestCase;
 use Orchestra\Testbench\Attributes\WithConfig;
+use Orchestra\Testbench\TestCase;
 
 #[WithConfig('cache.default', 'file')]
 class FileCacheLockTest extends TestCase
