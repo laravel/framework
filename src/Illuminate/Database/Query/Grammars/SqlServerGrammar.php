@@ -311,8 +311,7 @@ class SqlServerGrammar extends Grammar
         }
 
         if (empty($query->orders) && empty($query->unionOrders)) {
-            // Limits do not work when there is no order by in the query.
-            return '';
+            $query->orders[] = ['sql' => '(SELECT 0)'];
         }
 
         $sql = '';
