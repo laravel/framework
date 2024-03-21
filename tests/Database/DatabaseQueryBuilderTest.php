@@ -2874,7 +2874,7 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testSqlServerExists()
     {
         $builder = $this->getSqlServerBuilder();
-        $builder->getConnection()->shouldReceive('select')->once()->with('select 1 [exists] from [users] order by (SELECT 0) offset 0 rows fetch 1 rows only', [], true)->andReturn([['exists' => 1]]);
+        $builder->getConnection()->shouldReceive('select')->once()->with('select 1 [exists] from [users] order by (SELECT 0) offset 0 rows fetch next 1 rows only', [], true)->andReturn([['exists' => 1]]);
         $results = $builder->from('users')->exists();
         $this->assertTrue($results);
     }
@@ -4197,7 +4197,7 @@ SQL;
     {
         $builder = $this->getSqlServerBuilder();
         $builder->select('*')->from('users')->take(10);
-        $this->assertSame('select top 10 * from [users]', $builder->toSql());
+        $this->assertSame('select * from [users] order by (SELECT 0) offset 0 rows fetch next 10 rows only', $builder->toSql());
 
         $builder = $this->getSqlServerBuilder();
         $builder->select('*')->from('users')->skip(10)->orderBy('email', 'desc');
