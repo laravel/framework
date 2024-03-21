@@ -2874,7 +2874,7 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testSqlServerExists()
     {
         $builder = $this->getSqlServerBuilder();
-        $builder->getConnection()->shouldReceive('select')->once()->with('select top 1 1 [exists] from [users]', [], true)->andReturn([['exists' => 1]]);
+        $builder->getConnection()->shouldReceive('select')->once()->with('select 1 [exists] from [users] order by (SELECT 0) offset 0 rows fetch 1 rows only', [], true)->andReturn([['exists' => 1]]);
         $results = $builder->from('users')->exists();
         $this->assertTrue($results);
     }
