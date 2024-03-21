@@ -24,9 +24,12 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: 8.2
-          extensions: :php-psr          
+          extensions: :php-psr
           tools: composer:v2
           coverage: none
+
+      - name: Set Framework version
+        run: composer config version "11.x-dev"
 
       - name: Install dependencies
         uses: nick-fields/retry@v3
