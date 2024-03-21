@@ -344,19 +344,19 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
 
     /**
      * Get a stub file for the generator from a stub option.
-     * 
+     *
      * @return string|null
      */
     protected function getStubOption()
     {
-        if(! $this->hasOption('stub') || ! $this->option('stub')) {
+        if (! $this->hasOption('stub') || ! $this->option('stub')) {
             return null;
         }
 
         $stub = str_replace(['\\', '/'], DIRECTORY_SEPARATOR, trim($this->option('stub')));
 
         return match (true) {
-            file_exists($namedStub = $this->laravel->basePath('stubs'. DIRECTORY_SEPARATOR .$stub.'.stub')) => $namedStub,
+            file_exists($namedStub = $this->laravel->basePath('stubs'.DIRECTORY_SEPARATOR.$stub.'.stub')) => $namedStub,
             file_exists($stubPath = $stub) => $stubPath,
             default => null,
         };
