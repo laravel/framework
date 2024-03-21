@@ -93,11 +93,11 @@ class MySqlConnector extends Connector implements ConnectorInterface
      */
     protected function configureConnection(PDO $connection, array $config)
     {
-        $statements = [];
-
         if (isset($config['isolation_level'])) {
-            $statements[] = sprintf('SESSION TRANSACTION ISOLATION LEVEL %s', $config['isolation_level']);
+            $connection->exec(sprintf('SET SESSION TRANSACTION ISOLATION LEVEL %s;', $config['isolation_level']));
         }
+
+        $statements = [];
 
         if (isset($config['charset'])) {
             if (isset($config['collation'])) {
