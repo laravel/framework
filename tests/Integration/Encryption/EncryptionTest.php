@@ -3,7 +3,6 @@
 namespace Illuminate\Tests\Integration\Encryption;
 
 use Illuminate\Encryption\Encrypter;
-use Illuminate\Encryption\EncryptionServiceProvider;
 use Orchestra\Testbench\Attributes\WithConfig;
 use Orchestra\Testbench\TestCase;
 use RuntimeException;
