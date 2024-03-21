@@ -44,7 +44,7 @@ class ArtisanCommandTest extends TestCase
             ]);
 
             $this->table(['Name', 'Email'], [
-                ['Taylor Otwell', 'taylor@laravel.com',]
+                ['Taylor Otwell', 'taylor@laravel.com'],
             ]);
 
             $this->confirm('Do you want to continue?', true);
