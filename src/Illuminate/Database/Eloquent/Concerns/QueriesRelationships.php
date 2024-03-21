@@ -1,4 +1,4 @@
-x<?php
+<?php
 
 namespace Illuminate\Database\Eloquent\Concerns;
 
