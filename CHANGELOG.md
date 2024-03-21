@@ -1,6 +1,11 @@
 # Release Notes for 10.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v10.48.3...10.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v10.48.4...10.x)
+
+## [v10.48.4](https://github.com/laravel/framework/compare/v10.48.3...v10.48.4) - 2024-03-21
+
+* [10.x] Fix `Collection::concat()` return type by @axlon in https://github.com/laravel/framework/pull/50669
+* [10.x] Fix command alias registration and usage by @crynobone in https://github.com/laravel/framework/pull/50695
 
 ## [v10.48.3](https://github.com/laravel/framework/compare/v10.48.2...v10.48.3) - 2024-03-15
 
