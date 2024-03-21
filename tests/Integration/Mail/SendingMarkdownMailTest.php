@@ -7,7 +7,6 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Mail\Markdown;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\View;
 use Orchestra\Testbench\TestCase;
 
 class SendingMarkdownMailTest extends TestCase
@@ -16,8 +15,8 @@ class SendingMarkdownMailTest extends TestCase
     {
         $app['config']->set('mail.driver', 'array');
 
-        View::addNamespace('mail', __DIR__.'/Fixtures');
-        View::addLocation(__DIR__.'/Fixtures');
+        $app['view']->addNamespace('mail', __DIR__.'/Fixtures')
+            ->addLocation(__DIR__.'/Fixtures');
     }
 
     public function testMailIsSent()

@@ -35,6 +35,13 @@ class VerifyCsrfToken
     protected $encrypter;
 
     /**
+     * The URIs that should be excluded.
+     *
+     * @var array<int, string>
+     */
+    protected $except = [];
+
+    /**
      * The globally ignored URIs that should be excluded from CSRF verification.
      *
      * @var array

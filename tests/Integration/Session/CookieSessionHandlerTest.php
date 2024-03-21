@@ -20,7 +20,7 @@ class CookieSessionHandlerTest extends TestCase
         $this->assertEquals(0, $sessionValueCookie->getExpiresTime());
     }
 
-    protected function getEnvironmentSetUp($app)
+    protected function defineEnvironment($app)
     {
         $app['config']->set('app.key', Str::random(32));
         $app['config']->set('session.driver', 'cookie');

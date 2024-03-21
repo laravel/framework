@@ -37,11 +37,22 @@ class ClassMakeCommand extends GeneratorCommand
      */
     protected function getStub()
     {
-        if ($this->option('invokable')) {
-            return __DIR__.'/stubs/class.invokable.stub';
-        }
+        return $this->option('invokable')
+            ? $this->resolveStubPath('/stubs/class.invokable.stub')
+            : $this->resolveStubPath('/stubs/class.stub');
+    }
 
-        return __DIR__.'/stubs/class.stub';
+    /**
+     * Resolve the fully-qualified path to the stub.
+     *
+     * @param  string  $stub
+     * @return string
+     */
+    protected function resolveStubPath($stub)
+    {
+        return file_exists($customPath = $this->laravel->basePath(trim($stub, '/')))
+            ? $customPath
+            : __DIR__.$stub;
     }
 
     /**

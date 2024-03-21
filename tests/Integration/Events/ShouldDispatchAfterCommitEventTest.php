@@ -5,7 +5,6 @@ namespace Illuminate\Tests\Integration\Events;
 use Illuminate\Contracts\Events\ShouldDispatchAfterCommit;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
-use Mockery as m;
 use Orchestra\Testbench\TestCase;
 
 class ShouldDispatchAfterCommitEventTest extends TestCase
@@ -15,8 +14,6 @@ class ShouldDispatchAfterCommitEventTest extends TestCase
         TransactionUnawareTestEvent::$ran = false;
         ShouldDispatchAfterCommitTestEvent::$ran = false;
         AnotherShouldDispatchAfterCommitTestEvent::$ran = false;
-
-        m::close();
 
         parent::tearDown();
     }
