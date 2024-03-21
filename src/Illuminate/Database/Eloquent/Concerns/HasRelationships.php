@@ -768,7 +768,7 @@ trait HasRelationships
         $morphMap = Relation::morphMap();
 
         if (! empty($morphMap) && in_array(static::class, $morphMap)) {
-            return array_search(static::class, $morphMap, true);
+            return $morphMap[array_search(static::class, $morphMap, true)];
         }
 
         if (static::class === Pivot::class) {
