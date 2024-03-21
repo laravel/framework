@@ -96,7 +96,7 @@ class MySqlConnector extends Connector implements ConnectorInterface
         $statements = [];
 
         if (isset($config['isolation_level'])) {
-            $statements[] = sprintf('SESSION TRANSACTION ISOLATION LEVEL %s', $config['isolation_level']);
+            $connection->exec(sprintf('SET SESSION TRANSACTION ISOLATION LEVEL %s;', $config['isolation_level']));
         }
 
         if (isset($config['charset'])) {
