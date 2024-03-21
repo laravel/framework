@@ -28,6 +28,9 @@ jobs:
           tools: composer:v2
           coverage: none
 
+      - name: Set Framework version
+        run: composer config version "10.x-dev"
+
       - name: Install dependencies
         uses: nick-fields/retry@v3
         with:
