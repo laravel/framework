@@ -132,19 +132,9 @@ jobs:
           tools: composer:v2
           coverage: none
 
-<<<<<<< HEAD
-=======
       - name: Set Framework version
         run: composer config version "11.x-dev"
 
-      - name: Set Minimum PHP 8.1 Versions
-        uses: nick-fields/retry@v3
-        with:
-          timeout_minutes: 5
-          max_attempts: 5
-          command: composer require symfony/css-selector:~6.0 --no-interaction --no-update
-
->>>>>>> 10.x
       - name: Set Minimum PHP 8.2 Versions
         uses: nick-fields/retry@v3
         with:
