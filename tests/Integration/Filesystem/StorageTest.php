@@ -5,11 +5,10 @@ namespace Illuminate\Tests\Integration\Filesystem;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 use Orchestra\Testbench\TestCase;
+use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
 use Symfony\Component\Process\Process;
 
-/**
- * @requires OS Linux|Darwin
- */
+#[RequiresOperatingSystem('Linux|DAR')]
 class StorageTest extends TestCase
 {
     protected $stubFile;
