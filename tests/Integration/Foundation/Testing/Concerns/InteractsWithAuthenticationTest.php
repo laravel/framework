@@ -3,7 +3,7 @@
 namespace Illuminate\Tests\Integration\Foundation\Testing\Concerns;
 
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Foundation\Auth\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -19,8 +19,6 @@ class InteractsWithAuthenticationTest extends TestCase
 
     protected function defineEnvironment($app)
     {
-        $app['config']->set('auth.providers.users.model', AuthenticationTestUser::class);
-
         $app['config']->set('auth.guards.api', [
             'driver' => 'token',
             'provider' => 'users',
@@ -38,7 +36,7 @@ class InteractsWithAuthenticationTest extends TestCase
             $table->tinyInteger('is_active')->default(0);
         });
 
-        AuthenticationTestUser::create([
+        User::forceCreate([
             'username' => 'taylorotwell',
             'email' => 'taylorotwell@laravel.com',
             'password' => bcrypt('password'),
@@ -52,7 +50,7 @@ class InteractsWithAuthenticationTest extends TestCase
             return 'Hello '.$request->user()->username;
         })->middleware(['auth']);
 
-        $user = AuthenticationTestUser::where('username', '=', 'taylorotwell')->first();
+        $user = User::where('username', '=', 'taylorotwell')->first();
 
         $this->actingAs($user)
             ->get('/me')
@@ -70,33 +68,11 @@ class InteractsWithAuthenticationTest extends TestCase
             return $request->user();
         });
 
-        $user = AuthenticationTestUser::where('username', '=', 'taylorotwell')->first();
+        $user = User::where('username', '=', 'taylorotwell')->first();
 
         $this->actingAs($user, 'api')
             ->get('/me')
             ->assertSuccessful()
             ->assertSeeText('Hello taylorotwell');
     }
-}
-
-class AuthenticationTestUser extends Authenticatable
-{
-    public $table = 'users';
-    public $timestamps = false;
-
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var string[]
-     */
-    protected $guarded = [];
-
-    /**
-     * The attributes that should be hidden for arrays.
-     *
-     * @var string[]
-     */
-    protected $hidden = [
-        'password', 'remember_token',
-    ];
 }
