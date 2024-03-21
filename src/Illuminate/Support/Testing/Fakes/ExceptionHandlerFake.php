@@ -71,7 +71,7 @@ class ExceptionHandlerFake implements ExceptionHandler, Fake
     public function assertReported(Closure|string $exception)
     {
         $message = sprintf(
-            "The expected [%s] exception was not reported.",
+            'The expected [%s] exception was not reported.',
             is_string($exception) ? $exception : $this->firstClosureParameterType($exception)
         );
 
@@ -107,7 +107,7 @@ class ExceptionHandlerFake implements ExceptionHandler, Fake
         }
 
         throw new ExpectationFailedException(sprintf(
-            "The expected [%s] exception was not reported.",
+            'The expected [%s] exception was not reported.',
             is_string($exception) ? $exception : $this->firstClosureParameterType($exception)
         ));
     }
