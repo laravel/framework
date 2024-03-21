@@ -16,7 +16,7 @@ class ShouldDispatchAfterCommitEventTest extends TestCase
         ShouldDispatchAfterCommitTestEvent::$ran = false;
         AnotherShouldDispatchAfterCommitTestEvent::$ran = false;
 
-        m::close();
+        parent::tearDown();
     }
 
     public function testEventIsDispatchedIfThereIsNoTransaction()
