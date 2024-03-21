@@ -257,7 +257,7 @@ class PhpRedisCacheLockTest extends TestCase
         $lock->release();
         $this->assertNull($store->lockConnection()->get($store->getPrefix().'foo'));
     }
-    
+
     #[RequiresPhpExtension('Lzf')]
     public function testRedisLockCanBeAcquiredAndReleasedWithSerializationAndCompression()
     {
