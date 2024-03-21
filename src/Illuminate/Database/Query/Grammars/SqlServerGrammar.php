@@ -306,11 +306,19 @@ class SqlServerGrammar extends Grammar
     {
         $limit = (int) $limit;
 
-        if ($limit && $query->offset > 0) {
-            return "fetch next {$limit} rows only";
+        if (! $limit) {
+            return '';
         }
 
-        return '';
+        $sql = '';
+
+        if (! $query->offset > 0) {
+            $sql .= 'offset 0 rows ';
+        }
+
+        $sql .= "fetch next {$limit} rows only";
+
+        return $sql;
     }
 
     /**
