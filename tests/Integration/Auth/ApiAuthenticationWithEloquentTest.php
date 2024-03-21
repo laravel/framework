@@ -13,11 +13,10 @@ use Orchestra\Testbench\TestCase;
  */
 class ApiAuthenticationWithEloquentTest extends TestCase
 {
-    protected function getEnvironmentSetUp($app)
+    protected function defineEnvironment($app)
     {
         // Auth configuration
         $app['config']->set('auth.defaults.guard', 'api');
-        $app['config']->set('auth.providers.users.model', User::class);
 
         $app['config']->set('auth.guards.api', [
             'driver' => 'token',
@@ -58,9 +57,4 @@ class ApiAuthenticationWithEloquentTest extends TestCase
             throw $e;
         }
     }
-}
-
-class User extends FoundationUser
-{
-    //
 }
