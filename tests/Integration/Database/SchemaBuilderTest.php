@@ -138,7 +138,7 @@ class SchemaBuilderTest extends DatabaseTestCase
             .'modify `not_null_column_to_not_null` text not null, '
             .'modify `not_null_column_to_nullable` text null, '
             .'modify `nullable_column_to_nullable` text null, '
-            .'modify `nullable_column_to_not_null` text not null'
+            .'modify `nullable_column_to_not_null` text not null',
         ];
 
         $this->assertEquals($expected, $queries);
