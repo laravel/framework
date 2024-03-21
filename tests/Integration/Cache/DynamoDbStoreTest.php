@@ -2,24 +2,17 @@
 
 namespace Illuminate\Tests\Integration\Cache;
 
-use Aws\DynamoDb\DynamoDbClient;
-use Aws\Exception\AwsException;
-use Illuminate\Contracts\Cache\Repository;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
+use Aws\Exception\AwsException;
+use Aws\DynamoDb\DynamoDbClient;
 use Orchestra\Testbench\TestCase;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Contracts\Cache\Repository;
+use Orchestra\Testbench\Attributes\RequiresEnv;
 
+#[RequiresEnv('DYNAMODB_CACHE_TABLE')]
 class DynamoDbStoreTest extends TestCase
 {
-    protected function setUp(): void
-    {
-        if (! env('DYNAMODB_CACHE_TABLE')) {
-            $this->markTestSkipped('DynamoDB not configured.');
-        }
-
-        parent::setUp();
-    }
-
     public function testItemsCanBeStoredAndRetrieved()
     {
         Cache::driver('dynamodb')->put('name', 'Taylor', 10);

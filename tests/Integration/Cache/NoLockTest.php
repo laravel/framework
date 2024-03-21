@@ -4,26 +4,12 @@ namespace Illuminate\Tests\Integration\Cache;
 
 use Illuminate\Support\Facades\Cache;
 use Orchestra\Testbench\TestCase;
+use Orchestra\Testbench\Attributes\WithConfig;
 
+#[WithConfig('cache.default', 'null')]
+#[WithConfig('cache.stores.null', ['driver' => 'null'])]
 class NoLockTest extends TestCase
 {
-    /**
-     * Define environment setup.
-     *
-     * @param  \Illuminate\Foundation\Application  $app
-     * @return void
-     */
-    protected function getEnvironmentSetUp($app)
-    {
-        $app['config']->set('cache.default', 'null');
-
-        $app['config']->set('cache.stores', [
-            'null' => [
-                'driver' => 'null',
-            ],
-        ]);
-    }
-
     public function testLocksCanAlwaysBeAcquiredAndReleased()
     {
         Cache::lock('foo')->forceRelease();

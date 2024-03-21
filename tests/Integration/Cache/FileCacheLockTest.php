@@ -5,20 +5,11 @@ namespace Illuminate\Tests\Integration\Cache;
 use Exception;
 use Illuminate\Support\Facades\Cache;
 use Orchestra\Testbench\TestCase;
+use Orchestra\Testbench\Attributes\WithConfig;
 
+#[WithConfig('cache.default', 'file')]
 class FileCacheLockTest extends TestCase
 {
-    /**
-     * Define environment setup.
-     *
-     * @param  \Illuminate\Foundation\Application  $app
-     * @return void
-     */
-    protected function getEnvironmentSetUp($app)
-    {
-        $app['config']->set('cache.default', 'file');
-    }
-
     public function testLocksCanBeAcquiredAndReleased()
     {
         Cache::lock('foo')->forceRelease();
