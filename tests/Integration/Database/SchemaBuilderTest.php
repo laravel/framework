@@ -111,6 +111,70 @@ class SchemaBuilderTest extends DatabaseTestCase
         }
     }
 
+    public function testModifyNullableColumn()
+    {
+        if (! in_array($this->driver, ['mysql', 'mariadb'])) {
+            $this->markTestSkipped('Test requires a MySQL or a MariaDB connection.');
+        }
+
+        Schema::create('test', static function (Blueprint $table) {
+            $table->string('not_null_column_to_not_null');
+            $table->string('not_null_column_to_nullable');
+            $table->string('nullable_column_to_nullable')->nullable();
+            $table->string('nullable_column_to_not_null')->nullable();
+        });
+
+        $blueprint = new Blueprint('test', function ($table) {
+            $table->text('not_null_column_to_not_null')->change();
+            $table->text('not_null_column_to_nullable')->nullable()->change();
+            $table->text('nullable_column_to_nullable')->nullable()->change();
+            $table->text('nullable_column_to_not_null')->change();
+        });
+
+        $queries = $blueprint->toSql($this->getConnection(), $this->getConnection()->getSchemaGrammar());
+
+        $expected = [
+            'alter table `test` '
+            .'modify `not_null_column_to_not_null` text not null, '
+            .'modify `not_null_column_to_nullable` text null, '
+            .'modify `nullable_column_to_nullable` text null, '
+            .'modify `nullable_column_to_not_null` text not null',
+        ];
+
+        $this->assertEquals($expected, $queries);
+    }
+
+    public function testChangeNullableColumn()
+    {
+        Schema::create('test', function (Blueprint $table) {
+            $table->string('not_null_column_to_not_null');
+            $table->string('not_null_column_to_nullable');
+            $table->string('nullable_column_to_nullable')->nullable();
+            $table->string('nullable_column_to_not_null')->nullable();
+        });
+
+        $columns = collect(Schema::getColumns('test'));
+
+        $this->assertFalse($columns->firstWhere('name', 'not_null_column_to_not_null')['nullable']);
+        $this->assertFalse($columns->firstWhere('name', 'not_null_column_to_nullable')['nullable']);
+        $this->assertTrue($columns->firstWhere('name', 'nullable_column_to_nullable')['nullable']);
+        $this->assertTrue($columns->firstWhere('name', 'nullable_column_to_not_null')['nullable']);
+
+        Schema::table('test', function (Blueprint $table) {
+            $table->text('not_null_column_to_not_null')->change();
+            $table->text('not_null_column_to_nullable')->nullable()->change();
+            $table->text('nullable_column_to_nullable')->nullable()->change();
+            $table->text('nullable_column_to_not_null')->change();
+        });
+
+        $columns = collect(Schema::getColumns('test'));
+
+        $this->assertFalse($columns->firstWhere('name', 'not_null_column_to_not_null')['nullable']);
+        $this->assertTrue($columns->firstWhere('name', 'not_null_column_to_nullable')['nullable']);
+        $this->assertTrue($columns->firstWhere('name', 'nullable_column_to_nullable')['nullable']);
+        $this->assertFalse($columns->firstWhere('name', 'nullable_column_to_not_null')['nullable']);
+    }
+
     public function testRenameColumnWithDefault()
     {
         Schema::create('test', static function (Blueprint $table) {
