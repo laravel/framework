@@ -15,10 +15,10 @@ use Illuminate\Support\Facades\Context;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use Mockery as m;
 use Orchestra\Testbench\TestCase;
 use RuntimeException;
 use Symfony\Component\VarDumper\VarDumper;
-use Mockery as m;
 
 class ContextTest extends TestCase
 {
@@ -412,11 +412,11 @@ class ContextTest extends TestCase
         Context::reloadFromCache();
 
         $this->assertSame([
-            'foo' => 123
+            'foo' => 123,
         ], Context::all());
 
         $this->assertSame([
-            'bar' => 123
+            'bar' => 123,
         ], Context::allHidden());
     }
 

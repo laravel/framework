@@ -280,7 +280,7 @@ class Repository
     /**
      * Cache the values of context.
      *
-     * @param \DateTimeInterface|\DateInterval|int|null $ttl
+     * @param  \DateTimeInterface|\DateInterval|int|null  $ttl
      * @return $this
      */
     public function cache($ttl = null)
