@@ -8,7 +8,6 @@ use Illuminate\Support\Facades\Exceptions;
 use Illuminate\Support\Testing\Fakes\ExceptionHandlerFake;
 use Illuminate\Testing\Assert;
 use Illuminate\Validation\ValidationException;
-use RuntimeException;
 use Symfony\Component\Console\Application as ConsoleApplication;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Throwable;
