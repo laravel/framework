@@ -2,6 +2,8 @@
 
 namespace Illuminate\Console\Concerns;
 
+use function Illuminate\Filesystem\join_paths;
+
 trait HasStubOption
 {
     /**
