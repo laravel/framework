@@ -241,6 +241,8 @@ class Repository
      * @param  string  $key
      * @param  mixed  ...$values
      * @return $this
+     *
+     * @throws \RuntimeException
      */
     public function push($key, ...$values)
     {
@@ -262,6 +264,8 @@ class Repository
      * @param  string  $key
      * @param  mixed  ...$values
      * @return $this
+     *
+     * @throws \RuntimeException
      */
     public function pushHidden($key, ...$values)
     {
@@ -393,6 +397,8 @@ class Repository
      *
      * @param  ?array  $context
      * @return $this
+     *
+     * @throws \RuntimeException
      */
     public function hydrate($context)
     {
