@@ -9,13 +9,14 @@ use Illuminate\Log\Context\Events\ContextDehydrating as Dehydrating;
 use Illuminate\Log\Context\Events\ContextHydrated as Hydrated;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\Macroable;
 use RuntimeException;
 use Throwable;
 
 class Repository
 {
-    use Macroable, SerializesModels;
+    use Conditionable, Macroable, SerializesModels;
 
     /**
      * The event dispatcher instance.
@@ -241,6 +242,8 @@ class Repository
      * @param  string  $key
      * @param  mixed  ...$values
      * @return $this
+     *
+     * @throws \RuntimeException
      */
     public function push($key, ...$values)
     {
@@ -262,6 +265,8 @@ class Repository
      * @param  string  $key
      * @param  mixed  ...$values
      * @return $this
+     *
+     * @throws \RuntimeException
      */
     public function pushHidden($key, ...$values)
     {
@@ -441,6 +446,8 @@ class Repository
      *
      * @param  ?array  $context
      * @return $this
+     *
+     * @throws \RuntimeException
      */
     public function hydrate($context)
     {
