@@ -2,14 +2,17 @@
 
 namespace Illuminate\Tests\Integration\Support;
 
+use Exception;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Foundation\Exceptions\Handler;
 use Illuminate\Support\Facades\Exceptions;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Testing\Fakes\ExceptionHandlerFake;
 use InvalidArgumentException;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\ExpectationFailedException;
 use RuntimeException;
+use Throwable;
 
 class ExceptionsFacadeTest extends TestCase
 {
@@ -181,11 +184,238 @@ class ExceptionsFacadeTest extends TestCase
         $this->assertInstanceOf(Handler::class, $fake->handler());
     }
 
-    public function testResolvesExceptionHandlerAsSingleton()
+    public function testReportedExceptionsAreNotThrownByDefault()
     {
-        $this->assertSame(
-            Exceptions::getFacadeRoot(),
-            Exceptions::getFacadeRoot()
-        );
+        report(new Exception('Test exception'));
+
+        $this->assertTrue(true);
+    }
+
+    public function testReportedExceptionsAreNotThrownByDefaultWithExceptionHandling()
+    {
+        Route::get('/', function () {
+            report(new Exception('Test exception'));
+        });
+
+        $this->get('/')->assertStatus(200);
+    }
+
+    public function testReportedExceptionsAreNotThrownByDefaultWithoutExceptionHandling()
+    {
+        $this->withoutExceptionHandling();
+
+        Route::get('/', function () {
+            report(new Exception('Test exception'));
+        });
+
+        $this->get('/')->assertStatus(200);
+    }
+
+    public function testThrowOnReport()
+    {
+        Exceptions::fake()->throwOnReport();
+
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('Test exception');
+
+        report(new Exception('Test exception'));
+    }
+
+    public function testThrowOnReportWithExceptionHandling()
+    {
+        Exceptions::fake()->throwOnReport();
+
+        Route::get('/', function () {
+            report(new Exception('Test exception'));
+        });
+
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('Test exception');
+
+        $this->get('/');
+    }
+
+    public function testThrowOnReportWithoutExceptionHandling()
+    {
+        Exceptions::fake()->throwOnReport();
+
+        $this->withoutExceptionHandling();
+
+        Route::get('/', function () {
+            report(new Exception('Test exception'));
+        });
+
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('Test exception');
+
+        $this->get('/');
+    }
+
+    public function testThrowOnReportRegardlessOfTheCallingOrderOfWithoutExceptionHandling()
+    {
+        Exceptions::fake()->throwOnReport();
+
+        $this
+            ->withoutExceptionHandling()
+            ->withExceptionHandling()
+            ->withoutExceptionHandling();
+
+        Route::get('/', function () {
+            rescue(fn () => throw new Exception('Test exception'));
+        });
+
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('Test exception');
+
+        $this->get('/');
+    }
+
+    public function testThrowOnReportRegardlessOfTheCallingOrderOfWithExceptionHandling()
+    {
+        Exceptions::fake()->throwOnReport();
+
+        $this->withoutExceptionHandling()
+            ->withExceptionHandling()
+            ->withoutExceptionHandling()
+            ->withExceptionHandling();
+
+        Route::get('/', function () {
+            rescue(fn () => throw new Exception('Test exception'));
+        });
+
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('Test exception');
+
+        $this->get('/');
+    }
+
+    public function testThrowOnReportWithFakedExceptions()
+    {
+        Exceptions::fake([InvalidArgumentException::class])->throwOnReport();
+
+        $this->expectException(InvalidArgumentException::class);
+
+        report(new Exception('Test exception'));
+        report(new RuntimeException('Test exception'));
+        report(new InvalidArgumentException('Test exception'));
+    }
+
+    public function testThrowOnReporEvenWhenAppReportablesReturnFalse()
+    {
+        app(ExceptionHandler::class)->reportable(function (Throwable $e) {
+            return false;
+        });
+
+        Exceptions::fake()->throwOnReport();
+
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('Test exception');
+
+        report(new Exception('Test exception'));
+    }
+
+    public function testThrowOnReportLeaveAppReportablesUntouched()
+    {
+        app(ExceptionHandler::class)->reportable(function (Throwable $e) {
+            throw new InvalidArgumentException($e->getMessage());
+        });
+
+        Exceptions::fake([RuntimeException::class])->throwOnReport();
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('My exception message');
+
+        report(new Exception('My exception message'));
+    }
+
+    public function testThrowReportedExceptions()
+    {
+        Exceptions::fake();
+
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('Test exception');
+
+        report(new Exception('Test exception'));
+
+        Exceptions::throwReported();
+    }
+
+    public function testThrowReportedExceptionsWithFakedExceptions()
+    {
+        Exceptions::fake([InvalidArgumentException::class]);
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Test exception');
+
+        report(new RuntimeException('Test exception'));
+        report(new InvalidArgumentException('Test exception'));
+
+        Exceptions::throwReported();
+    }
+
+    public function testThrowReportedExceptionsWhenThereIsNone()
+    {
+        Exceptions::fake();
+
+        Exceptions::throwReported();
+
+        Exceptions::fake([InvalidArgumentException::class]);
+
+        report(new RuntimeException('Test exception'));
+
+        Exceptions::throwReported();
+
+        $this->doesNotPerformAssertions();
+    }
+
+    public function testFlowBetweenFakeAndTestExceptionHandling()
+    {
+        $this->assertInstanceOf(Handler::class, app(ExceptionHandler::class));
+
+        Exceptions::fake();
+        $this->assertInstanceOf(ExceptionHandlerFake::class, app(ExceptionHandler::class));
+        $this->assertInstanceOf(Handler::class, Exceptions::fake()->handler());
+        $this->assertFalse((new \ReflectionClass(Exceptions::fake()->handler()))->isAnonymous());
+
+        Exceptions::fake();
+        $this->assertInstanceOf(ExceptionHandlerFake::class, app(ExceptionHandler::class));
+        $this->assertInstanceOf(Handler::class, Exceptions::fake()->handler());
+        $this->assertFalse((new \ReflectionClass(Exceptions::fake()->handler()))->isAnonymous());
+
+        $this->withoutExceptionHandling();
+        $this->assertInstanceOf(ExceptionHandlerFake::class, app(ExceptionHandler::class));
+        $this->assertInstanceOf(ExceptionHandler::class, Exceptions::fake()->handler());
+        $this->assertTrue((new \ReflectionClass(Exceptions::fake()->handler()))->isAnonymous());
+
+        $this->withExceptionHandling();
+        $this->assertInstanceOf(ExceptionHandlerFake::class, app(ExceptionHandler::class));
+        $this->assertInstanceOf(ExceptionHandler::class, Exceptions::fake()->handler());
+        $this->assertFalse((new \ReflectionClass(Exceptions::fake()->handler()))->isAnonymous());
+
+        Exceptions::fake();
+        $this->assertInstanceOf(ExceptionHandlerFake::class, app(ExceptionHandler::class));
+        $this->assertInstanceOf(Handler::class, Exceptions::fake()->handler());
+        $this->assertFalse((new \ReflectionClass(Exceptions::fake()->handler()))->isAnonymous());
+    }
+
+    public function testFlowBetweenTestExceptionHandlingAndFake()
+    {
+        $this->withoutExceptionHandling();
+        $this->assertTrue((new \ReflectionClass(app(ExceptionHandler::class)))->isAnonymous());
+
+        Exceptions::fake();
+        $this->assertInstanceOf(ExceptionHandlerFake::class, app(ExceptionHandler::class));
+        $this->assertInstanceOf(ExceptionHandler::class, Exceptions::fake()->handler());
+        $this->assertTrue((new \ReflectionClass(Exceptions::fake()->handler()))->isAnonymous());
+
+        Exceptions::fake();
+        $this->assertInstanceOf(ExceptionHandlerFake::class, app(ExceptionHandler::class));
+        $this->assertInstanceOf(ExceptionHandler::class, Exceptions::fake()->handler());
+        $this->assertTrue((new \ReflectionClass(Exceptions::fake()->handler()))->isAnonymous());
+
+        $this->withExceptionHandling();
+        $this->assertInstanceOf(ExceptionHandlerFake::class, app(ExceptionHandler::class));
+        $this->assertInstanceOf(Handler::class, Exceptions::fake()->handler());
+        $this->assertFalse((new \ReflectionClass(Exceptions::fake()->handler()))->isAnonymous());
     }
 }

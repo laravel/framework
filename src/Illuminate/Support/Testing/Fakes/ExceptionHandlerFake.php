@@ -20,9 +20,14 @@ class ExceptionHandlerFake implements ExceptionHandler, Fake
     /**
      * All of the exceptions that have been reported.
      *
-     * @var array<int, class-string<\Throwable>>
+     * @var array<int, \Throwable>
      */
     protected $reported = [];
+
+    /**
+     * If the fake should throw exceptions when they are reported.
+     */
+    protected $throwOnReport = false;
 
     /**
      * Create a new mail fake.
@@ -126,7 +131,11 @@ class ExceptionHandlerFake implements ExceptionHandler, Fake
             $this->reported[] = $e;
         }
 
-        return $this->handler->report($e);
+        if ($this->isFakedException($e) && $this->throwOnReport) {
+            throw $e;
+        }
+
+        $this->handler->report($e);
     }
 
     /**
@@ -161,7 +170,48 @@ class ExceptionHandlerFake implements ExceptionHandler, Fake
      */
     public function renderForConsole($output, Throwable $e)
     {
-        return $this->handler->renderForConsole($output, $e);
+        $this->handler->renderForConsole($output, $e);
+    }
+
+    /**
+     * Throw exceptions when they are reported.
+     *
+     * @return $this
+     */
+    public function throwOnReport()
+    {
+        $this->throwOnReport = true;
+
+        return $this;
+    }
+
+    /**
+     * Throw all of the exceptions that have been reported.
+     *
+     * @return $this
+     *
+     * @throws \Throwable
+     */
+    public function throwReported()
+    {
+        foreach ($this->reported as $e) {
+            throw $e;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Set the "original" handler that should be used by the fake.
+     *
+     * @param  \Illuminate\Contracts\Debug\ExceptionHandler  $handler
+     * @return $this
+     */
+    public function setHandler(ExceptionHandler $handler)
+    {
+        $this->handler = $handler;
+
+        return $this;
     }
 
     /**

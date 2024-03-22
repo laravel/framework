@@ -4,8 +4,11 @@ namespace Illuminate\Foundation\Testing\Concerns;
 
 use Closure;
 use Illuminate\Contracts\Debug\ExceptionHandler;
+use Illuminate\Support\Facades\Exceptions;
+use Illuminate\Support\Testing\Fakes\ExceptionHandlerFake;
 use Illuminate\Testing\Assert;
 use Illuminate\Validation\ValidationException;
+use RuntimeException;
 use Symfony\Component\Console\Application as ConsoleApplication;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Throwable;
@@ -27,7 +30,11 @@ trait InteractsWithExceptionHandling
     protected function withExceptionHandling()
     {
         if ($this->originalExceptionHandler) {
-            $this->app->instance(ExceptionHandler::class, $this->originalExceptionHandler);
+            $currentExceptionHandler = app(ExceptionHandler::class);
+
+            $currentExceptionHandler instanceof ExceptionHandlerFake
+                ? $currentExceptionHandler->setHandler($this->originalExceptionHandler)
+                : $this->app->instance(ExceptionHandler::class, $this->originalExceptionHandler);
         }
 
         return $this;
@@ -63,10 +70,14 @@ trait InteractsWithExceptionHandling
     protected function withoutExceptionHandling(array $except = [])
     {
         if ($this->originalExceptionHandler == null) {
-            $this->originalExceptionHandler = app(ExceptionHandler::class);
+            $currentExceptionHandler = app(ExceptionHandler::class);
+
+            $this->originalExceptionHandler = $currentExceptionHandler instanceof ExceptionHandlerFake
+                ? $currentExceptionHandler->handler()
+                : $currentExceptionHandler;
         }
 
-        $this->app->instance(ExceptionHandler::class, new class($this->originalExceptionHandler, $except) implements ExceptionHandler
+        $exceptionHandler = new class($this->originalExceptionHandler, $except) implements ExceptionHandler
         {
             protected $except;
             protected $originalHandler;
@@ -145,7 +156,13 @@ trait InteractsWithExceptionHandling
             {
                 (new ConsoleApplication)->renderThrowable($e, $output);
             }
-        });
+        };
+
+        $currentExceptionHandler = app(ExceptionHandler::class);
+
+        $currentExceptionHandler instanceof ExceptionHandlerFake
+            ? $currentExceptionHandler->setHandler($exceptionHandler)
+            : $this->app->instance(ExceptionHandler::class, $exceptionHandler);
 
         return $this;
     }
