@@ -3,6 +3,7 @@
 namespace Illuminate\Support\Facades;
 
 use Illuminate\Contracts\Debug\ExceptionHandler;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Testing\Fakes\ExceptionHandlerFake;
 use Illuminate\Support\Testing\Fakes\MailFake;
 
@@ -39,15 +40,16 @@ class Exceptions extends Facade
     /**
      * Replace the bound instance with a fake.
      *
+     * @param  array<int, class-string<\Throwable>>|class-string<\Throwable>  $exceptions
      * @return \Illuminate\Support\Testing\Fakes\ExceptionHandlerFake
      */
-    public static function fake()
+    public static function fake(array|string $exceptions = [])
     {
         $exceptionHandler = static::isFake()
             ? static::getFacadeRoot()->handler()
             : static::getFacadeRoot();
 
-        return tap(new ExceptionHandlerFake($exceptionHandler), function ($fake) {
+        return tap(new ExceptionHandlerFake($exceptionHandler, Arr::wrap($exceptions)), function ($fake) {
             static::swap($fake);
         });
     }

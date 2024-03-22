@@ -28,10 +28,12 @@ class ExceptionHandlerFake implements ExceptionHandler, Fake
      * Create a new mail fake.
      *
      * @param  \Illuminate\Contracts\Debug\ExceptionHandler  $handler
+     * @param  array<int, class-string<\Throwable>>  $exceptions
      * @return void
      */
     public function __construct(
-        protected ExceptionHandler $handler
+        protected ExceptionHandler $handler,
+        protected array $exceptions = [],
     ) {
         //
     }
@@ -120,7 +122,7 @@ class ExceptionHandlerFake implements ExceptionHandler, Fake
      */
     public function report($e)
     {
-        if ($this->shouldReport($e)) {
+        if ($this->shouldReport($e) && $this->isFakedException($e)) {
             $this->reported[] = $e;
         }
 
@@ -172,5 +174,16 @@ class ExceptionHandlerFake implements ExceptionHandler, Fake
     public function __call(string $method, array $parameters)
     {
         return $this->forwardCallTo($this->handler, $method, $parameters);
+    }
+
+    /**
+     * Determine if the given exception is faked.
+     *
+     * @param  \Throwable  $e
+     * @return bool
+     */
+    protected function isFakedException(Throwable $e)
+    {
+        return count($this->exceptions) === 0 || in_array(get_class($e), $this->exceptions, true);
     }
 }

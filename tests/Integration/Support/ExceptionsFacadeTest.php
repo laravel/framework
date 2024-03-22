@@ -25,6 +25,23 @@ class ExceptionsFacadeTest extends TestCase
         Exceptions::assertReported(fn (RuntimeException $e) => $e->getMessage() === 'test 2');
     }
 
+    public function testFakeAssertReportedWithFakedExceptions()
+    {
+        Exceptions::fake([
+            RuntimeException::class,
+        ]);
+
+        Exceptions::report(new RuntimeException('test 1'));
+        report(new RuntimeException('test 2'));
+        report(new InvalidArgumentException('test 3'));
+
+        Exceptions::assertReported(RuntimeException::class);
+        Exceptions::assertReported(fn (RuntimeException $e) => $e->getMessage() === 'test 1');
+        Exceptions::assertReported(fn (RuntimeException $e) => $e->getMessage() === 'test 2');
+
+        Exceptions::assertNotReported(InvalidArgumentException::class);
+    }
+
     public function testFakeAssertReportedAsStringMayFail()
     {
         $this->expectException(ExpectationFailedException::class);
@@ -49,6 +66,20 @@ class ExceptionsFacadeTest extends TestCase
         Exceptions::assertReported(fn (InvalidArgumentException $e) => $e->getMessage() === 'test 2');
     }
 
+    public function testFakeAssertReportedWithFakedExceptionsMayFail()
+    {
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage('The expected [RuntimeException] exception was not reported.');
+
+        Exceptions::fake(InvalidArgumentException::class);
+
+        Exceptions::report(new InvalidArgumentException('test 1'));
+        report(new RuntimeException('test 2'));
+
+        Exceptions::assertReported(InvalidArgumentException::class);
+        Exceptions::assertReported(RuntimeException::class);
+    }
+
     public function testFakeAssertNotReported()
     {
         Exceptions::fake();
@@ -61,6 +92,18 @@ class ExceptionsFacadeTest extends TestCase
         Exceptions::assertNotReported(fn (InvalidArgumentException $e) => $e->getMessage() === 'test 2');
         Exceptions::assertNotReported(fn (InvalidArgumentException $e) => $e->getMessage() === 'test 3');
         Exceptions::assertNotReported(fn (InvalidArgumentException $e) => $e->getMessage() === 'test 4');
+    }
+
+    public function testFakeAssertNotReportedWithFakedExceptions()
+    {
+        Exceptions::fake([
+            InvalidArgumentException::class,
+        ]);
+
+        report(new RuntimeException('test 2'));
+
+        Exceptions::assertNotReported(InvalidArgumentException::class);
+        Exceptions::assertNotReported(RuntimeException::class);
     }
 
     public function testFakeAssertNotReportedMayFail()
@@ -98,6 +141,17 @@ class ExceptionsFacadeTest extends TestCase
     public function testFakeAssertNothingReported()
     {
         Exceptions::fake();
+
+        Exceptions::assertNothingReported();
+    }
+
+    public function testFakeAssertNothingReportedWithFakedExceptions()
+    {
+        Exceptions::fake([
+            InvalidArgumentException::class,
+        ]);
+
+        report(new RuntimeException('test 1'));
 
         Exceptions::assertNothingReported();
     }
