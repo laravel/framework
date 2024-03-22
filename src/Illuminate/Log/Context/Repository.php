@@ -15,7 +15,7 @@ use Throwable;
 
 class Repository
 {
-    use Macroable, SerializesModels, Conditionable;
+    use Conditionable, Macroable, SerializesModels;
 
     /**
      * The event dispatcher instance.
