@@ -5,7 +5,6 @@ namespace Illuminate\Support\Facades;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Testing\Fakes\ExceptionHandlerFake;
-use Illuminate\Support\Testing\Fakes\MailFake;
 
 /**
  * @method static void register()
