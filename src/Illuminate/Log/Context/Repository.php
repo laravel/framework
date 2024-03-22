@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Log\Context\Events\ContextDehydrating as Dehydrating;
 use Illuminate\Log\Context\Events\ContextHydrated as Hydrated;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Traits\Macroable;
 use RuntimeException;
 use Throwable;
@@ -274,6 +275,54 @@ class Repository
         ];
 
         return $this;
+    }
+
+    /**
+     * Cache the values of context.
+     *
+     * @param \DateTimeInterface|\DateInterval|int|null $ttl
+     * @return $this
+     */
+    public function cache($ttl = null)
+    {
+        Cache::add('illuminate:log:context', $this->dehydrate(), $ttl);
+
+        return $this;
+    }
+
+    /**
+     * Hydrate the context from cache.
+     *
+     * @return $this
+     */
+    public function reloadFromCache()
+    {
+        return $this->hydrate(Cache::get('illuminate:log:context'));
+    }
+
+    /**
+     * Dump the values from context.
+     *
+     * @return $this
+     */
+    public function dump()
+    {
+        dump([
+            'data' => $this->all(),
+            'hidden' => $this->allHidden(),
+        ]);
+
+        return $this;
+    }
+
+    /**
+     * Add the current request in context.
+     *
+     * @return $this
+     */
+    public function withRequest()
+    {
+        return $this->add('request', request()->all());
     }
 
     /**

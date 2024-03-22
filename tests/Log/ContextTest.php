@@ -6,15 +6,19 @@ use Exception;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
+use Illuminate\Http\Request;
 use Illuminate\Log\Context\Events\ContextDehydrating as Dehydrating;
 use Illuminate\Log\Context\Events\ContextHydrated as Hydrated;
 use Illuminate\Log\Context\Repository;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Context;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Orchestra\Testbench\TestCase;
 use RuntimeException;
+use Symfony\Component\VarDumper\VarDumper;
+use Mockery as m;
 
 class ContextTest extends TestCase
 {
@@ -372,6 +376,91 @@ class ContextTest extends TestCase
 
         file_put_contents($path, '');
         Str::createUuidsNormally();
+    }
+
+    public function test_it_can_cache_context()
+    {
+        Context::add('foo', 123);
+        Context::addHidden('bar', 123);
+
+        Context::cache();
+
+        $this->assertSame(123, Context::get('foo'));
+        $this->assertSame(123, Context::getHidden('bar'));
+
+        Context::flush();
+
+        $this->assertSame([
+            'data' => [
+                'foo' => 'i:123;',
+            ],
+            'hidden' => [
+                'bar' => 'i:123;',
+            ],
+        ], Cache::get('illuminate:log:context'));
+    }
+
+    public function test_it_can_reload_from_cache_context()
+    {
+        Context::add('foo', 123);
+        Context::addHidden('bar', 123);
+
+        Context::cache();
+
+        Context::flush();
+
+        Context::reloadFromCache();
+
+        $this->assertSame([
+            'foo' => 123
+        ], Context::all());
+
+        $this->assertSame([
+            'bar' => 123
+        ], Context::allHidden());
+    }
+
+    public function test_it_can_dump_context()
+    {
+        $dumps = [];
+
+        VarDumper::setHandler(function ($value) use (&$dumps) {
+            $dumps[] = $value;
+        });
+
+        Context::add('foo', 123);
+        Context::addHidden('bar', 123);
+        Context::dump();
+
+        $this->assertSame([
+            'data' => [
+                'foo' => 123,
+            ],
+            'hidden' => [
+                'bar' => 123,
+            ],
+        ], $dumps[0]);
+
+        VarDumper::setHandler(null);
+    }
+
+    public function test_it_can_attach_request_to_context()
+    {
+        Context::withRequest();
+
+        $this->assertSame([], Context::get('request'));
+
+        $request = m::mock(Request::class);
+        $request->shouldReceive('all')
+            ->andReturn(['foo' => 'bar']);
+        $request->shouldReceive('setUserResolver')
+            ->andReturn(null);
+
+        $this->app->instance('request', $request);
+
+        Context::withRequest();
+
+        $this->assertSame(['foo' => 'bar'], Context::get('request'));
     }
 }
 
