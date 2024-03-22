@@ -4,9 +4,11 @@ namespace Illuminate\Tests\Integration\Support;
 
 use Exception;
 use Illuminate\Contracts\Debug\ExceptionHandler;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Exceptions\Handler;
 use Illuminate\Support\Facades\Exceptions;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Testing\Fakes\ExceptionHandlerFake;
 use InvalidArgumentException;
 use Orchestra\Testbench\TestCase;
@@ -26,6 +28,25 @@ class ExceptionsFacadeTest extends TestCase
         Exceptions::assertReported(RuntimeException::class);
         Exceptions::assertReported(fn (RuntimeException $e) => $e->getMessage() === 'test 1');
         Exceptions::assertReported(fn (RuntimeException $e) => $e->getMessage() === 'test 2');
+    }
+
+    public function testShouldNotReportExceptionsAreNotReported()
+    {
+        Exceptions::fake();
+
+        Route::get('/302', function () {
+            Validator::validate(['name' => ''], ['name' => 'required']);
+        });
+
+        $this->get('/302')->assertStatus(302);
+
+        Route::get('/404', function () {
+            throw new ModelNotFoundException();
+        });
+
+        $this->get('/404')->assertStatus(404);
+
+        Exceptions::assertNothingReported();
     }
 
     public function testFakeAssertReportedWithFakedExceptions()
@@ -213,12 +234,31 @@ class ExceptionsFacadeTest extends TestCase
 
     public function testThrowOnReport()
     {
-        Exceptions::fake()->throwOnReport();
+        Exceptions::throwOnReport();
 
         $this->expectException(Exception::class);
         $this->expectExceptionMessage('Test exception');
 
         report(new Exception('Test exception'));
+    }
+
+    public function testThrowOnReportDoesNotThrowExceptionsThatShouldNotBeReported()
+    {
+        Exceptions::throwOnReport();
+
+        Route::get('/302', function () {
+            Validator::validate(['name' => ''], ['name' => 'required']);
+        });
+
+        $this->get('/302')->assertStatus(302);
+
+        Route::get('/404', function () {
+            throw new ModelNotFoundException();
+        });
+
+        $this->get('/404')->assertStatus(404);
+
+        $this->doesNotPerformAssertions();
     }
 
     public function testThrowOnReportWithExceptionHandling()
@@ -272,7 +312,7 @@ class ExceptionsFacadeTest extends TestCase
 
     public function testThrowOnReportRegardlessOfTheCallingOrderOfWithExceptionHandling()
     {
-        Exceptions::fake()->throwOnReport();
+        Exceptions::throwOnReport();
 
         $this->withoutExceptionHandling()
             ->withExceptionHandling()
@@ -292,6 +332,17 @@ class ExceptionsFacadeTest extends TestCase
     public function testThrowOnReportWithFakedExceptions()
     {
         Exceptions::fake([InvalidArgumentException::class])->throwOnReport();
+
+        $this->expectException(InvalidArgumentException::class);
+
+        report(new Exception('Test exception'));
+        report(new RuntimeException('Test exception'));
+        report(new InvalidArgumentException('Test exception'));
+    }
+
+    public function testThrowOnReportWithFakedExceptionsFromFacade()
+    {
+        Exceptions::throwOnReport([InvalidArgumentException::class]);
 
         $this->expectException(InvalidArgumentException::class);
 

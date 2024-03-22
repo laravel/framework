@@ -29,7 +29,6 @@ use Illuminate\Support\Testing\Fakes\ExceptionHandlerFake;
  * @method static void assertReported(\Closure|string $exception)
  * @method static void assertNotReported(\Closure|string $exception)
  * @method static void renderForConsole(\Symfony\Component\Console\Output\OutputInterface $output, \Throwable $e)
- * @method static \Illuminate\Support\Testing\Fakes\ExceptionHandlerFake throwOnReport()
  * @method static \Illuminate\Support\Testing\Fakes\ExceptionHandlerFake throwReported()
  * @method static \Illuminate\Support\Testing\Fakes\ExceptionHandlerFake setHandler(\Illuminate\Contracts\Debug\ExceptionHandler $handler)
  *
@@ -54,6 +53,17 @@ class Exceptions extends Facade
         return tap(new ExceptionHandlerFake($exceptionHandler, Arr::wrap($exceptions)), function ($fake) {
             static::swap($fake);
         });
+    }
+
+    /**
+     * Throw exceptions when they are reported.
+     *
+     * @param  array<int, class-string<\Throwable>>|class-string<\Throwable>  $exceptions
+     * @return \Illuminate\Support\Testing\Fakes\ExceptionHandlerFake
+     */
+    public static function throwOnReport(array|string $exceptions = [])
+    {
+        return static::fake($exceptions)->throwOnReport();
     }
 
     /**

@@ -8,6 +8,7 @@ use Illuminate\Support\Traits\ForwardsCalls;
 use Illuminate\Support\Traits\ReflectsClosures;
 use Illuminate\Testing\Assert;
 use PHPUnit\Framework\ExpectationFailedException;
+use ReflectionClass;
 use Throwable;
 
 /**
@@ -129,10 +130,10 @@ class ExceptionHandlerFake implements ExceptionHandler, Fake
     {
         if ($this->shouldReport($e) && $this->isFakedException($e)) {
             $this->reported[] = $e;
-        }
 
-        if ($this->isFakedException($e) && $this->throwOnReport) {
-            throw $e;
+            if ($this->throwOnReport) {
+                throw $e;
+            }
         }
 
         $this->handler->report($e);
@@ -146,7 +147,7 @@ class ExceptionHandlerFake implements ExceptionHandler, Fake
      */
     public function shouldReport($e)
     {
-        return $this->handler->shouldReport($e);
+        return $this->runningWithoutExceptionHandling() || $this->handler->shouldReport($e);
     }
 
     /**
@@ -235,5 +236,15 @@ class ExceptionHandlerFake implements ExceptionHandler, Fake
     protected function isFakedException(Throwable $e)
     {
         return count($this->exceptions) === 0 || in_array(get_class($e), $this->exceptions, true);
+    }
+
+    /**
+     * Determine if the handler is running without exception handling.
+     *
+     * @return bool
+     */
+    protected function runningWithoutExceptionHandling()
+    {
+        return (new ReflectionClass($this->handler))->isAnonymous();
     }
 }
