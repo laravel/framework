@@ -7,6 +7,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Contracts\Container\Container;
+use Laravel\SerializableClosure\SerializableClosure;
 
 class CallQueuedClosure implements ShouldQueue
 {
@@ -15,7 +16,7 @@ class CallQueuedClosure implements ShouldQueue
     /**
      * The serializable Closure instance.
      *
-     * @var \Illuminate\Queue\SerializableClosure
+     * @var \Laravel\SerializableClosure\SerializableClosure
      */
     public $closure;
 
@@ -29,7 +30,7 @@ class CallQueuedClosure implements ShouldQueue
     /**
      * Create a new job instance.
      *
-     * @param  \Illuminate\Queue\SerializableClosure  $closure
+     * @param  \Laravel\SerializableClosure\SerializableClosure  $closure
      * @return void
      */
     public function __construct(SerializableClosure $closure)

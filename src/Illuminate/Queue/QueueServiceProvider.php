@@ -3,7 +3,6 @@
 namespace Illuminate\Queue;
 
 use Illuminate\Support\Str;
-use Opis\Closure\SerializableClosure;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Queue\Connectors\SqsConnector;
 use Illuminate\Queue\Connectors\NullConnector;
@@ -15,6 +14,8 @@ use Illuminate\Queue\Failed\NullFailedJobProvider;
 use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Queue\Connectors\BeanstalkdConnector;
 use Illuminate\Queue\Failed\DatabaseFailedJobProvider;
+use Laravel\SerializableClosure\SerializableClosure;
+use RuntimeException;
 
 class QueueServiceProvider extends ServiceProvider implements DeferrableProvider
 {
@@ -30,7 +31,7 @@ class QueueServiceProvider extends ServiceProvider implements DeferrableProvider
         $this->registerWorker();
         $this->registerListener();
         $this->registerFailedJobServices();
-        $this->registerOpisSecurityKey();
+        $this->registerSerializableClosureSecurityKey();
     }
 
     /**
@@ -209,17 +210,47 @@ class QueueServiceProvider extends ServiceProvider implements DeferrableProvider
     }
 
     /**
-     * Configure Opis Closure signing for security.
+     * Configure Serializable Closure signing for security.
      *
      * @return void
      */
-    protected function registerOpisSecurityKey()
+    protected function registerSerializableClosureSecurityKey()
     {
-        if (Str::startsWith($key = $this->app['config']->get('app.key'), 'base64:')) {
-            $key = base64_decode(substr($key, 7));
+        $config = $this->app->make('config')->get('app');
+        if (! class_exists(SerializableClosure::class) || empty($config['key'])) {
+            return;
         }
+        SerializableClosure::setSecretKey($this->parseKey($config));
+    }
 
-        SerializableClosure::setSecretKey($key);
+    /**
+     * Parse the encryption key.
+     *
+     * @param  array  $config
+     * @return string
+     */
+    protected function parseKey(array $config)
+    {
+        if (Str::startsWith($key = $this->key($config), $prefix = 'base64:')) {
+            $key = base64_decode(Str::after($key, $prefix));
+        }
+        return $key;
+    }
+    /**
+     * Extract the encryption key from the given configuration.
+     *
+     * @param  array  $config
+     * @return string
+     *
+     * @throws RuntimeException
+     */
+    protected function key(array $config)
+    {
+        return tap($config['key'], function ($key) {
+            if (empty($key)) {
+                throw new RuntimeException('No application encryption key has been specified.');
+            }
+        });
     }
 
     /**
