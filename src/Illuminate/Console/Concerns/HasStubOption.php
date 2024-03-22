@@ -39,7 +39,7 @@ trait HasStubOption
         $stub = str_replace(['\\', '/'], DIRECTORY_SEPARATOR, trim($this->option('stub')));
 
         return match (true) {
-            file_exists($namedStub = $this->laravel->basePath('stubs'.DIRECTORY_SEPARATOR.$stub.'.stub')) => $namedStub,
+            file_exists($namedStub = $this->laravel->basePath(join_paths('stubs', $stub.'.stub'))) => $namedStub,
             file_exists($stubPath = $stub) => $stubPath,
             default => null,
         };
