@@ -281,8 +281,8 @@ class ValidationRuleParser
     protected static function parseParameters($rule, $parameter)
     {
         return array_map(function ($param) {
-            return str_replace('\\\\', '\\', $param); 
-        },
+                return str_replace('\\\\', '\\', $param);
+            },
             static::ruleIsRegex($rule) ? [$parameter] : str_getcsv(str_replace('\\', '\\\\', $parameter), ',', '"', '\\')
         );
     }
