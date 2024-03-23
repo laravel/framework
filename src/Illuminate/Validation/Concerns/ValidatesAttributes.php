@@ -700,7 +700,7 @@ trait ValidatesAttributes
 
         $latIsCorrect = with(
             $point($parameters[0] ?? 'lat', 0),
-            fn ($lat) => $this->validateLongitude($attribute, $lat)
+            fn ($lat) => $this->validateLatitude($attribute, $lat)
         );
         $lngIsCorrect = with(
             $point($parameters[1] ?? 'lng', 1),
