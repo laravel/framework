@@ -101,7 +101,7 @@ trait InteractsWithContentTypes
 
                 $type = strtolower($type);
 
-                if ($this->matchesType($type, $accept) || $accept === strtok($type, '/').'/*') {
+                if (self::matchesType($type, $accept) || $accept === strtok($type, '/').'/*') {
                     return $contentType;
                 }
             }
