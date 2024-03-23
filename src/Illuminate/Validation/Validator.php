@@ -292,14 +292,14 @@ class Validator implements ValidatorContract
      *
      * @var string[]
      */
-    protected $numericRules = ['Numeric', 'Integer', 'Decimal'];
+    protected $numericRules = ['Numeric', 'Integer', 'Decimal', 'Latitude', 'Longitude', 'GeoPoint'];
 
     /**
      * The default numeric related validation rules.
      *
      * @var string[]
      */
-    protected $defaultNumericRules = ['Numeric', 'Integer', 'Decimal'];
+    protected $defaultNumericRules = ['Numeric', 'Integer', 'Decimal', 'Latitude', 'Longitude', 'GeoPoint'];
 
     /**
      * The current placeholder for dots in rule keys.

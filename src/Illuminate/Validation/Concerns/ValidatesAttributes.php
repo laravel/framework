@@ -31,6 +31,11 @@ use ValueError;
 
 trait ValidatesAttributes
 {
+    private const LATITUDE_MIN = -90;
+    private const LATITUDE_MAX = 90;
+    private const LONGITUDE_MIN = -180;
+    private const LONGITUDE_MAX = 180;
+
     /**
      * Validate that an attribute was "accepted".
      *
@@ -624,6 +629,85 @@ trait ValidatesAttributes
 
         return $decimals >= $parameters[0] &&
                $decimals <= $parameters[1];
+    }
+
+    /**
+     * Validate that an attribute is valid latitude position.
+     *
+     * @param  string  $attribute
+     * @param  int|float  $value
+     * @return bool
+     */
+    public function validateLatitude($attribute, $value)
+    {
+        return $this->validCoordinate($attribute, $value, self::LATITUDE_MIN, self::LATITUDE_MAX);
+    }
+
+    /**
+     * Validate that an attribute is valid longitude position.
+     *
+     * @param  string  $attribute
+     * @param  int|float  $value
+     * @return bool
+     */
+    public function validateLongitude($attribute, $value)
+    {
+        return $this->validCoordinate($attribute, $value, self::LONGITUDE_MIN, self::LONGITUDE_MAX);
+    }
+
+    /**
+     * Validate that an attribute is valid coordinate position.
+     *
+     * @param  string  $attribute
+     * @param  int|float  $value
+     * @param  int|float  $min
+     * @param  int|float  $max
+     * @return bool
+     */
+    private function validCoordinate($attribute, $value, $min, $max)
+    {
+        if ($this->validateNumeric($attribute, $value)) {
+            return $this->validateBetween($attribute, (float) $value, [$min, $max]);
+        }
+
+        return false;
+    }
+
+    /**
+     * Validate that an attribute is valid geo point.
+     *
+     * @param  string  $attribute
+     * @param  string|array<int|string, int|float>  $value
+     * @param  array<int, int|float|string>  $parameters
+     * @return bool
+     */
+    public function validateGeoPoint($attribute, $value, $parameters)
+    {
+        $valueIsString = is_string($value) && ($parameters[0] ?? null) === 'string';
+        $valueIsArray = is_array($value);
+        $useIndexes = ($parameters[0] ?? null) === 'array';
+
+        if ($valueIsString) {
+            $separator = $parameters[1] ?? ',';
+            $value = @explode($separator, $value) ?: [];
+        }
+
+        $point = static fn (string $field, int $index) => match (true) {
+            $valueIsArray && $useIndexes, $valueIsString => $value[$index] ?? null,
+            $valueIsArray => $value[$field] ?? null,
+            default => null
+        };
+
+        $latIsCorrect = with(
+            $point($parameters[0] ?? 'lat', 0),
+            fn ($lat) => $this->validateLongitude($attribute, $lat)
+        );
+        $lngIsCorrect = with(
+            $point($parameters[1] ?? 'lng', 1),
+            fn ($lng) => $this->validateLongitude($attribute, $lng)
+        );
+
+        return $latIsCorrect && $lngIsCorrect;
     }
 
     /**

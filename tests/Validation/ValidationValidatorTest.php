@@ -3184,6 +3184,99 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->passes());
     }
 
+    public function testValidateLatitude()
+    {
+        $v = fn ($value) => new Validator(
+            $this->getIlluminateArrayTranslator(),
+            ['lat' => $value],
+            ['lat' => 'latitude']
+        );
+
+        $this->assertFalse($v('latitude')->passes());
+        $this->assertFalse($v([])->passes());
+        $this->assertFalse($v(600)->passes());
+        $this->assertFalse($v(-140)->passes());
+        $this->assertFalse($v(-1337.337)->passes());
+        $this->assertFalse($v(560.550)->passes());
+        $this->assertFalse($v(-90.000001)->passes());
+        $this->assertFalse($v(90.000001)->passes());
+
+        $this->assertTrue($v('50')->passes());
+        $this->assertTrue($v(50.50)->passes());
+        $this->assertTrue($v(-50)->passes());
+        $this->assertTrue($v(13.7892798798)->passes());
+        $this->assertTrue($v(-89.999999999)->passes());
+        $this->assertTrue($v(89.999999999)->passes());
+    }
+
+    public function testValidateLongitude()
+    {
+        $v = fn ($value) => new Validator(
+            $this->getIlluminateArrayTranslator(),
+            ['lat' => $value],
+            ['lat' => 'longitude']
+        );
+
+        $this->assertFalse($v('longitude')->passes());
+        $this->assertFalse($v([])->passes());
+        $this->assertFalse($v(-180.000001)->passes());
+        $this->assertFalse($v(180.000001)->passes());
+        $this->assertFalse($v('331.2232')->passes());
+
+        $this->assertTrue($v('50')->passes());
+        $this->assertTrue($v(50.50)->passes());
+        $this->assertTrue($v(-179.9999999)->passes());
+        $this->assertTrue($v(179.9999999)->passes());
+        $this->assertTrue($v(13.7892798798)->passes());
+    }
+
+    public function testValidateGeoPoint()
+    {
+        $v = fn ($value, $parameters = null) => new Validator(
+            $this->getIlluminateArrayTranslator(),
+            ['point' => $value],
+            ['point' => rtrim("geo_point:$parameters", ':')]
+        );
+
+        // default fields (lat, lng)
+        $this->assertFalse($v([])->passes());
+        $this->assertFalse($v('22.378973289,54.892371981')->passes());
+        $this->assertFalse($v(['lat' => 22.378973289])->passes());
+        $this->assertFalse($v(['lng' => 54.892371981])->passes());
+        $this->assertFalse($v(['lat' => 189.893217911, 'lng' => 254.892371981])->passes());
+        $this->assertFalse($v(['ltt' => 18.893217911, 'lgg' => 54.892371981])->passes());
+        $this->assertTrue($v(['lat' => 18.893217911, 'lng' => 54.892371981])->passes());
+
+        // custom fields
+        $fields = 'foo,bar';
+        $this->assertFalse($v([], $fields)->passes());
+        $this->assertFalse($v('22.378973289,54.892371981')->passes());
+        $this->assertFalse($v(['foo' => 22.378973289], $fields)->passes());
+        $this->assertFalse($v(['bar' => 54.892371981], $fields)->passes());
+        $this->assertFalse($v(['lat' => 189.893217911, 'lng' => 254.892371981], $fields)->passes());
+        $this->assertFalse($v(['foo' => 189.893217911, 'bar' => 254.892371981], $fields)->passes());
+        $this->assertFalse($v(['lat' => 18.893217911, 'lng' => 54.892371981], $fields)->passes());
+        $this->assertTrue($v(['foo' => 18.893217911, 'bar' => 54.892371981], $fields)->passes());
+
+        // indexed array
+        $this->assertFalse($v([], 'array')->passes());
+        $this->assertFalse($v('22.378973289,54.892371981')->passes());
+        $this->assertFalse($v([0 => 22.378973289], 'array')->passes());
+        $this->assertFalse($v([1 => 54.892371981], 'array')->passes());
+        $this->assertFalse($v([0 => 222.378973289, 1 => 254.892371981], 'array')->passes());
+        $this->assertFalse($v([3 => 18.893217911, 4 => 54.892371981], 'array')->passes());
+        $this->assertTrue($v([0 => 18.893217911, 1 => 54.892371981], 'array')->passes());
+
+        // string
+        $this->assertFalse($v([], 'string')->passes());
+        $this->assertFalse($v('22.378973289', 'string')->passes());
+        $this->assertFalse($v('222.378973289,254.892371981', 'string')->passes());
+        $this->assertTrue($v('22.378973289,54.892371981', 'string')->passes());
+        // string with custom separator
+        $this->assertTrue($v('22.378973289*54.892371981', 'string,*')->passes());
+        $this->assertTrue($v('22.378973289#54.892371981', 'string,#')->passes());
+    }
+
     public function testValidateInt()
     {
         $trans = $this->getIlluminateArrayTranslator();
