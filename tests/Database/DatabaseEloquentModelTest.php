@@ -1441,6 +1441,16 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertSame('stub.column', $model->qualifyColumn('column'));
     }
 
+    public function testQualifyColumnStatically()
+    {
+        $this->assertSame('stub.column', EloquentModelStub::getQualifiedColumn('column'));
+    }
+
+    public function testQualifyColumnsStatically()
+    {
+        $this->assertEquals(['stub.column', 'stub.name'], EloquentModelStub::getQualifiedColumns(['column', 'name']));
+    }
+
     public function testForceFillMethodFillsGuardedAttributes()
     {
         $model = (new EloquentModelSaveStub)->forceFill(['id' => 21]);
