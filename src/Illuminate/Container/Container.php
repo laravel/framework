@@ -891,7 +891,6 @@ class Container implements ArrayAccess, ContainerContract
      * @return mixed
      *
      * @throws \Illuminate\Contracts\Container\BindingResolutionException
-     *
      * @throws \ReflectionException
      */
     public function build($concrete)
