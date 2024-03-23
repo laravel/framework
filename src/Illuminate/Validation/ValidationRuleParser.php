@@ -280,7 +280,11 @@ class ValidationRuleParser
      */
     protected static function parseParameters($rule, $parameter)
     {
-        return static::ruleIsRegex($rule) ? [$parameter] : str_getcsv($parameter);
+        $uniquePlaceholder = '__' . uniqid() . '__';
+        $parameters = static::ruleIsRegex($rule) ? [$parameter] : str_getcsv(
+            str_replace('\\\\', $uniquePlaceholder, trim($parameter, '"'))
+        );
+        return str_replace($uniquePlaceholder, '\\\\', $parameters);
     }
 
     /**
