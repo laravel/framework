@@ -3740,6 +3740,12 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, ['name' => ['foo', []]], ['name' => 'Array|In:foo,bar']);
         $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['a' => 'b\\'], ['a' => "not_in:b\\"]);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['a' => 'b\\c'], ['a' => "not_in:b\\c"]);
+        $this->assertFalse($v->passes());
     }
 
     public function testValidateNotIn()
