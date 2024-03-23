@@ -284,7 +284,7 @@ class ValidationRuleParser
         $parameters = static::ruleIsRegex($rule) ? [$parameter] : str_getcsv(
             str_replace('\\\\', $uniquePlaceholder, trim($parameter, '"'))
         );
-        
+
         return str_replace($uniquePlaceholder, '\\\\', $parameters);
     }
 
