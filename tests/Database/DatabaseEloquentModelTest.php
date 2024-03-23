@@ -1441,6 +1441,13 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertSame('stub.column', $model->qualifyColumn('column'));
     }
 
+    public function testQualifyColumns()
+    {
+        $model = new EloquentModelStub;
+
+        $this->assertEquals(['stub.column', 'stub.name'], $model->qualifyColumns(['column', 'name']));
+    }
+
     public function testQualifyColumnStatically()
     {
         $this->assertSame('stub.column', EloquentModelStub::getQualifiedColumn('column'));
