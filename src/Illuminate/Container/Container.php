@@ -673,6 +673,8 @@ class Container implements ArrayAccess, ContainerContract
      *
      * @param  callable|string  $callback
      * @return string|false
+     *
+     * @throws \ReflectionException
      */
     protected function getClassForCallable($callback)
     {
@@ -889,7 +891,8 @@ class Container implements ArrayAccess, ContainerContract
      * @return mixed
      *
      * @throws \Illuminate\Contracts\Container\BindingResolutionException
-     * @throws \Illuminate\Contracts\Container\CircularDependencyException
+     *
+     * @throws \ReflectionException
      */
     public function build($concrete)
     {
