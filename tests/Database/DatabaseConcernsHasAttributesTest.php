@@ -32,6 +32,12 @@ class HasAttributesWithoutConstructor
         return new Attribute(function () {
         });
     }
+
+    private function ignoredAttribute(): Attribute
+    {
+        return new Attribute(function () {
+        });
+    }
 }
 
 class HasAttributesWithConstructorArguments extends HasAttributesWithoutConstructor
