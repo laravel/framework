@@ -358,6 +358,32 @@ class Arr
     }
 
     /**
+     * Get an array piece from a nested array or collection.
+     *
+     * @param  \ArrayAccess|array  $array
+     * @param  string|int|null  $key
+     * @param  mixed  $default
+     * @return mixed
+     */
+    public static function getNested($array, $key, $default = null)
+    {
+        foreach ($array as $k => $value) {
+            if ($k === $key) {
+                return value([$key => $value]);
+            }
+
+            if (is_array($value)) {
+                $result = self::getNested($value, $key);
+                if ($result) {
+                    return value($result);
+                }
+            }
+        }
+
+        return $default;
+    }
+
+    /**
      * Check if an item or items exist in an array using "dot" notation.
      *
      * @param  \ArrayAccess|array  $array
