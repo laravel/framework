@@ -39,7 +39,7 @@ trait InteractsWithContentTypes
     }
 
     /**
-     * Determines whether the current requests accepts a given content type.
+     * Determines whether the current request accepts a given content type.
      *
      * @param  string|array  $contentTypes
      * @return bool
@@ -117,7 +117,7 @@ trait InteractsWithContentTypes
     {
         $acceptable = $this->getAcceptableContentTypes();
 
-        return count($acceptable) === 0 || (
+        return empty($acceptable) || (
             isset($acceptable[0]) && ($acceptable[0] === '*/*' || $acceptable[0] === '*')
         );
     }
