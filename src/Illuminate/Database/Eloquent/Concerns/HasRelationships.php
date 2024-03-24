@@ -887,9 +887,7 @@ trait HasRelationships
      */
     public function withoutRelations()
     {
-        $model = clone $this;
-
-        return $model->unsetRelations();
+        return (clone $this)->unsetRelations();
     }
 
     /**
