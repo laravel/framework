@@ -633,12 +633,12 @@ trait HasAttributes
             return static::$attributeMutatorCache[get_class($this)][$key] = false;
         }
 
-        $method = new ReflectionMethod($this, $method);
+        $reflectionMethod = new ReflectionMethod($this, $method);
 
-        $returnType = $method->getReturnType();
+        $returnType = $reflectionMethod->getReturnType();
 
         return static::$attributeMutatorCache[get_class($this)][$key] =
-                    $method->isPublic() &&
+                    $reflectionMethod->isPublic() &&
                     $returnType instanceof ReflectionNamedType &&
                     $returnType->getName() === Attribute::class;
     }
@@ -1076,12 +1076,12 @@ trait HasAttributes
             return static::$setAttributeMutatorCache[$class][$key] = false;
         }
 
-        $method = new ReflectionMethod($this, $method);
+        $reflectionMethod = new ReflectionMethod($this, $method);
 
-        $returnType = $method->getReturnType();
+        $returnType = $reflectionMethod->getReturnType();
 
         return static::$setAttributeMutatorCache[$class][$key] =
-                    $method->isPublic() &&
+                    $reflectionMethod->isPublic() &&
                     $returnType instanceof ReflectionNamedType &&
                     $returnType->getName() === Attribute::class &&
                     is_callable($this->{$method}()->set);
