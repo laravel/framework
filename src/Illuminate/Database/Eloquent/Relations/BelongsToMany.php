@@ -1192,6 +1192,7 @@ class BelongsToMany extends Relation
         // to the parent models. This will help us keep any caching synced up here.
         if (count($ids = $this->allRelatedIds()) > 0) {
             $whereIn = $this->whereInMethod($this->related, $this->relatedKey);
+
             $this->getRelated()->newQueryWithoutRelationships()->{$whereIn}($this->relatedKey, $ids)->update($columns);
         }
     }
