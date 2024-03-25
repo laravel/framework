@@ -27,6 +27,7 @@ use Illuminate\Support\Testing\Fakes\ExceptionHandlerFake;
  * @method static \Illuminate\Contracts\Debug\ExceptionHandler handler()
  * @method static void assertNothingReported()
  * @method static void assertReported(\Closure|string $exception)
+ * @method static void assertReportedCount(int $count)
  * @method static void assertNotReported(\Closure|string $exception)
  * @method static void renderForConsole(\Symfony\Component\Console\Output\OutputInterface $output, \Throwable $e)
  * @method static \Illuminate\Support\Testing\Fakes\ExceptionHandlerFake throwReported()

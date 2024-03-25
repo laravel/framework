@@ -7,6 +7,7 @@ use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Support\Traits\ForwardsCalls;
 use Illuminate\Support\Traits\ReflectsClosures;
 use Illuminate\Testing\Assert;
+use PHPUnit\Framework\Assert as PHPUnit;
 use PHPUnit\Framework\ExpectationFailedException;
 use ReflectionClass;
 use Throwable;
@@ -97,6 +98,22 @@ class ExceptionHandlerFake implements ExceptionHandler, Fake
                 fn (Throwable $e) => $this->firstClosureParameterType($exception) === get_class($e)
                     && $exception($e) === true,
             ), $message,
+        );
+    }
+
+    /**
+     * Assert the number of exceptions that have been reported.
+     *
+     * @param  int  $count
+     * @return void
+     */
+    public function assertReportedCount(int $count)
+    {
+        $total = collect($this->reported)->count();
+
+        PHPUnit::assertSame(
+            $count, $total,
+            "The total number of exceptions reported was {$total} instead of {$count}."
         );
     }
 

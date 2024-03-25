@@ -28,25 +28,30 @@ class ExceptionsFacadeTest extends TestCase
         Exceptions::assertReported(RuntimeException::class);
         Exceptions::assertReported(fn (RuntimeException $e) => $e->getMessage() === 'test 1');
         Exceptions::assertReported(fn (RuntimeException $e) => $e->getMessage() === 'test 2');
+        Exceptions::assertReportedCount(2);
     }
 
-    public function testShouldNotReportExceptionsAreNotReported()
+    public function testFakeAssertReportedCount()
     {
         Exceptions::fake();
 
-        Route::get('/302', function () {
-            Validator::validate(['name' => ''], ['name' => 'required']);
-        });
+        Exceptions::report(new RuntimeException('test 1'));
+        report(new RuntimeException('test 2'));
 
-        $this->get('/302')->assertStatus(302);
+        Exceptions::assertReportedCount(2);
+    }
 
-        Route::get('/404', function () {
-            throw new ModelNotFoundException();
-        });
+    public function testFakeAssertReportedCountMayFail()
+    {
+        Exceptions::fake();
 
-        $this->get('/404')->assertStatus(404);
+        Exceptions::report(new RuntimeException('test 1'));
+        report(new RuntimeException('test 2'));
 
-        Exceptions::assertNothingReported();
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage('The total number of exceptions reported was 2 instead of 1.');
+
+        Exceptions::assertReportedCount(1);
     }
 
     public function testFakeAssertReportedWithFakedExceptions()
@@ -64,6 +69,7 @@ class ExceptionsFacadeTest extends TestCase
         Exceptions::assertReported(fn (RuntimeException $e) => $e->getMessage() === 'test 2');
 
         Exceptions::assertNotReported(InvalidArgumentException::class);
+        Exceptions::assertReportedCount(2);
     }
 
     public function testFakeAssertReportedAsStringMayFail()
@@ -75,6 +81,7 @@ class ExceptionsFacadeTest extends TestCase
 
         Exceptions::report(new RuntimeException('test 1'));
 
+        Exceptions::assertReportedCount(1);
         Exceptions::assertReported(InvalidArgumentException::class);
     }
 
@@ -87,6 +94,7 @@ class ExceptionsFacadeTest extends TestCase
 
         Exceptions::report(new RuntimeException('test 1'));
 
+        Exceptions::assertReportedCount(1);
         Exceptions::assertReported(fn (InvalidArgumentException $e) => $e->getMessage() === 'test 2');
     }
 
@@ -116,6 +124,8 @@ class ExceptionsFacadeTest extends TestCase
         Exceptions::assertNotReported(fn (InvalidArgumentException $e) => $e->getMessage() === 'test 2');
         Exceptions::assertNotReported(fn (InvalidArgumentException $e) => $e->getMessage() === 'test 3');
         Exceptions::assertNotReported(fn (InvalidArgumentException $e) => $e->getMessage() === 'test 4');
+
+        Exceptions::assertReportedCount(2);
     }
 
     public function testFakeAssertNotReportedWithFakedExceptions()
@@ -259,6 +269,8 @@ class ExceptionsFacadeTest extends TestCase
         $this->get('/404')->assertStatus(404);
 
         $this->doesNotPerformAssertions();
+
+        Exceptions::assertReportedCount(0);
     }
 
     public function testThrowOnReportWithExceptionHandling()
@@ -348,6 +360,8 @@ class ExceptionsFacadeTest extends TestCase
 
         report(new Exception('Test exception'));
         report(new RuntimeException('Test exception'));
+        Exceptions::assertReportedCount(0);
+
         report(new InvalidArgumentException('Test exception'));
     }
 
@@ -417,6 +431,68 @@ class ExceptionsFacadeTest extends TestCase
         Exceptions::throwReported();
 
         $this->doesNotPerformAssertions();
+    }
+
+    public function testFakingExceptionsThatShouldNotBeReportedWithExceptionHandling()
+    {
+        Exceptions::fake();
+
+        Route::get('/302', function () {
+            Validator::validate(['name' => ''], ['name' => 'required']);
+        });
+
+        $this->get('/302')->assertStatus(302);
+
+        Route::get('/404', function () {
+            throw new ModelNotFoundException();
+        });
+
+        $this->get('/404')->assertStatus(404);
+
+        report(new ModelNotFoundException());
+
+        Exceptions::assertNothingReported();
+    }
+
+    public function testFakingExceptionsThatShouldNotBeReportedWithRescueAndWithoutExceptionHandling()
+    {
+        Exceptions::fake();
+
+        $this->withoutExceptionHandling();
+
+        Route::get('/validation', function () {
+            rescue(fn () => Validator::validate(['name' => ''], ['name' => 'required']));
+        });
+
+        $this->get('/validation')->assertStatus(200);
+
+        Route::get('/model', function () {
+            rescue(fn () => throw new ModelNotFoundException());
+        });
+
+        $this->get('/model')->assertStatus(200);
+
+        rescue(fn () => throw new ModelNotFoundException());
+
+        Exceptions::assertReportedCount(3);
+    }
+
+    public function testRescue()
+    {
+        Exceptions::fake();
+
+        rescue(fn () => throw new Exception('Test exception'));
+
+        Exceptions::assertReported(Exception::class);
+    }
+
+    public function testRescueWithoutReport()
+    {
+        Exceptions::fake();
+
+        rescue(fn () => throw new Exception('Test exception'), null, false);
+
+        Exceptions::assertNothingReported();
     }
 
     public function testFlowBetweenFakeAndTestExceptionHandling()
