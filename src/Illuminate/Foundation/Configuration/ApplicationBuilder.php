@@ -124,16 +124,16 @@ class ApplicationBuilder
     /**
      * Register the routing services for the application.
      *
-     * @param Closure|null $using
-     * @param string|null $web
-     * @param string|null $api
-     * @param string|null $commands
-     * @param string|null $channels
-     * @param string|null $pages
-     * @param string|null $health
-     * @param string $apiPrefix
-     * @param string|null $domain
-     * @param callable|null $then
+     * @param  Closure|null   $using
+     * @param  string|null    $web
+     * @param  string|null    $api
+     * @param  string|null    $commands
+     * @param  string|null    $channels
+     * @param  string|null    $pages
+     * @param  string|null    $health
+     * @param  string         $apiPrefix
+     * @param  string|null    $domain
+     * @param  callable|null  $then
      * @return $this
      */
     public function withRouting(?Closure $using = null,
@@ -171,13 +171,13 @@ class ApplicationBuilder
     /**
      * Create the routing callback for the application.
      *
-     * @param string|null $web
-     * @param string|null $api
-     * @param string|null $pages
-     * @param string|null $health
-     * @param string $apiPrefix
-     * @param string|null $domain
-     * @param callable|null $then
+     * @param  string|null    $web
+     * @param  string|null    $api
+     * @param  string|null    $pages
+     * @param  string|null    $health
+     * @param  string         $apiPrefix
+     * @param  string|null    $domain
+     * @param  callable|null  $then
      * @return Closure
      */
     protected function buildRoutingCallback(?string $web,
@@ -193,7 +193,7 @@ class ApplicationBuilder
                 Route::middleware('api')->prefix($apiPrefix)->group($api);
             }
 
-            if (is_string($api) && realpath($api) !== false && !is_null($domain) && is_string($domain)) {
+            if (is_string($api) && realpath($api) !== false && ! is_null($domain) && is_string($domain)) {
                 Route::middleware('api')->domain($domain)->prefix($apiPrefix)->group($api);
             }
 
@@ -209,7 +209,7 @@ class ApplicationBuilder
                 Route::middleware('web')->group($web);
             }
 
-            if (is_string($web) && realpath($web) !== false && !is_null($domain) && is_string($domain)) {
+            if (is_string($web) && realpath($web) !== false && ! is_null($domain) && is_string($domain)) {
                 Route::middleware('web')->domain($domain)->group($web);
             }
 
