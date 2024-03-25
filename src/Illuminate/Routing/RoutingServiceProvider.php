@@ -6,7 +6,7 @@ use Illuminate\Support\ServiceProvider;
 use Psr\Http\Message\ResponseInterface;
 use Zend\Diactoros\Response as PsrResponse;
 use Psr\Http\Message\ServerRequestInterface;
-use Symfony\Bridge\PsrHttpMessage\Factory\DiactorosFactory;
+use Laminas\Diactoros\ServerRequestFactory;
 use Illuminate\Contracts\View\Factory as ViewFactoryContract;
 use Illuminate\Contracts\Routing\ResponseFactory as ResponseFactoryContract;
 use Illuminate\Routing\Contracts\ControllerDispatcher as ControllerDispatcherContract;
@@ -136,8 +136,23 @@ class RoutingServiceProvider extends ServiceProvider
      */
     protected function registerPsrResponse()
     {
-        $this->app->bind(ResponseInterface::class, function () {
-            return new PsrResponse;
+        $this->app->bind(ServerRequestInterface::class, function ($app) {
+            // Based on DiactorosFactory::createRequest()
+            // See https://github.com/jakegibs617/drupal-sandbox/blob/master/vendor/symfony/psr-http-message-bridge/Factory/DiactorosFactory.php#L84
+            // TODO: Bryant, I'm unsure of $body and $files...
+            $symfonyRequest = $app->make('request');
+            $server = $symfonyRequest->server->all();
+            $query = $symfonyRequest->query->all();
+            $body = $symfonyRequest->request->all();
+            $cookies = $symfonyRequest->cookies->all();
+            $files = $symfonyRequest->files->all();
+            return (new ServerRequestFactory)->fromGlobals(
+                $server,
+                $query,
+                $body,
+                $cookies,
+                $files
+            );
         });
     }
 
