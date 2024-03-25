@@ -124,15 +124,15 @@ class ApplicationBuilder
     /**
      * Register the routing services for the application.
      *
-     * @param  Closure|null   $using
-     * @param  string|null    $web
-     * @param  string|null    $api
-     * @param  string|null    $commands
-     * @param  string|null    $channels
-     * @param  string|null    $pages
-     * @param  string|null    $health
-     * @param  string         $apiPrefix
-     * @param  string|null    $domain
+     * @param Closure|null $using
+     * @param string|null $web
+     * @param string|null $api
+     * @param string|null $commands
+     * @param string|null $channels
+     * @param string|null $pages
+     * @param string|null $health
+     * @param string $apiPrefix
+     * @param string|null $domain
      * @param  callable|null  $then
      * @return $this
      */
@@ -171,12 +171,12 @@ class ApplicationBuilder
     /**
      * Create the routing callback for the application.
      *
-     * @param  string|null    $web
-     * @param  string|null    $api
-     * @param  string|null    $pages
-     * @param  string|null    $health
-     * @param  string         $apiPrefix
-     * @param  string|null    $domain
+     * @param string|null $web
+     * @param string|null $api
+     * @param string|null $pages
+     * @param string|null $health
+     * @param string $apiPrefix
+     * @param string|null $domain
      * @param  callable|null  $then
      * @return Closure
      */
