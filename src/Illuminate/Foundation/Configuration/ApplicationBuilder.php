@@ -181,11 +181,16 @@ class ApplicationBuilder
         ?string $pages,
         ?string $health,
         string $apiPrefix,
+        ?string $domain,
         ?callable $then)
     {
         return function () use ($web, $api, $pages, $health, $apiPrefix, $then) {
-            if (is_string($api) && realpath($api) !== false) {
+            if (is_string($api) && realpath($api) !== false && is_null($domain)) {
                 Route::middleware('api')->prefix($apiPrefix)->group($api);
+            }
+
+            if (is_string($api) && realpath($api) !== false && !is_null($domain) && is_string($domain)) {
+                Route::middleware('api')->domain($domain)->prefix($apiPrefix)->group($api);
             }
 
             if (is_string($health)) {
@@ -196,8 +201,12 @@ class ApplicationBuilder
                 });
             }
 
-            if (is_string($web) && realpath($web) !== false) {
+            if (is_string($web) && realpath($web) !== false && is_null($domain)) {
                 Route::middleware('web')->group($web);
+            }
+
+            if (is_string($web) && realpath($web) !== false && !is_null($domain) && is_string($domain)) {
+                Route::middleware('web')->domain($domain)->group($web);
             }
 
             if (is_string($pages) &&
@@ -274,7 +283,7 @@ class ApplicationBuilder
     protected function withCommandRouting(array $paths)
     {
         $this->app->afterResolving(ConsoleKernel::class, function ($kernel) use ($paths) {
-            $this->app->booted(fn () => $kernel->addCommandRoutePaths($paths));
+            $kernel->setCommandRoutePaths($paths);
         });
     }
 
