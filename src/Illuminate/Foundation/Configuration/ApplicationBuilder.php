@@ -168,21 +168,6 @@ class ApplicationBuilder
     }
 
     /**
-     * Register the scheduling services for the application.
-     *
-     * @param  callable(Schedule $schedule): void  $callback
-     * @return $this
-     */
-    public function withSchedule(callable $callback)
-    {
-        $this->app->afterResolving(ConsoleKernel::class, function (ConsoleKernel $kernel) use ($callback) {
-            Artisan::starting(fn () => $callback($this->app->make(Schedule::class)));
-        });
-
-        return $this;
-    }
-
-    /**
      * Create the routing callback for the application.
      *
      * @param  string|null  $web
@@ -293,6 +278,21 @@ class ApplicationBuilder
         $this->app->afterResolving(ConsoleKernel::class, function ($kernel) use ($paths) {
             $this->app->booted(fn () => $kernel->addCommandRoutePaths($paths));
         });
+    }
+
+    /**
+     * Register the scheduled tasks for the application.
+     *
+     * @param  callable(Schedule $schedule): void  $callback
+     * @return $this
+     */
+    public function withSchedule(callable $callback)
+    {
+        $this->app->afterResolving(ConsoleKernel::class, function (ConsoleKernel $kernel) use ($callback) {
+            Artisan::starting(fn () => $callback($this->app->make(Schedule::class)));
+        });
+
+        return $this;
     }
 
     /**
