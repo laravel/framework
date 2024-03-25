@@ -82,9 +82,7 @@ if (! function_exists('abort_unless')) {
      */
     function abort_unless($boolean, $code, $message = '', array $headers = [])
     {
-        if (! $boolean) {
-            abort($code, $message, $headers);
-        }
+        abourt_if(! $boolean);
     }
 }
 
@@ -693,9 +691,7 @@ if (! function_exists('report_unless')) {
      */
     function report_unless($boolean, $exception)
     {
-        if (! $boolean) {
-            report($exception);
-        }
+        report_if(! $boolean, $exception);
     }
 }
 
