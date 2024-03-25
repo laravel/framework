@@ -257,9 +257,11 @@ class ApplicationBuilder
             [$commands, $paths] = collect($commands)->partition(fn ($command) => class_exists($command));
             [$routes, $paths] = $paths->partition(fn ($path) => is_file($path));
 
-            $kernel->addCommands($commands->all());
-            $kernel->addCommandPaths($paths->all());
-            $kernel->addCommandRoutePaths($routes->all());
+            $this->app->booted(static function () use ($kernel, $commands, $paths, $routes) {
+                $kernel->addCommands($commands->all());
+                $kernel->addCommandPaths($paths->all());
+                $kernel->addCommandRoutePaths($routes->all());
+            });
         });
 
         return $this;
