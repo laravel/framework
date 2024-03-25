@@ -38,10 +38,11 @@ use Psr\Log\LogLevel;
 use Symfony\Component\Console\Application as ConsoleApplication;
 use Symfony\Component\Console\Exception\CommandNotFoundException;
 use Symfony\Component\ErrorHandler\ErrorRenderer\HtmlErrorRenderer;
-use Symfony\Component\HttpFoundation\Exception\SuspiciousOperationException;
+use Symfony\Component\HttpFoundation\Exception\RequestExceptionInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse as SymfonyRedirectResponse;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -143,7 +144,7 @@ class Handler implements ExceptionHandlerContract
         ModelNotFoundException::class,
         MultipleRecordsFoundException::class,
         RecordsNotFoundException::class,
-        SuspiciousOperationException::class,
+        RequestExceptionInterface::class,
         TokenMismatchException::class,
         ValidationException::class,
     ];
@@ -630,7 +631,7 @@ class Handler implements ExceptionHandlerContract
             ),
             $e instanceof AuthorizationException && ! $e->hasStatus() => new AccessDeniedHttpException($e->getMessage(), $e),
             $e instanceof TokenMismatchException => new HttpException(419, $e->getMessage(), $e),
-            $e instanceof SuspiciousOperationException => new NotFoundHttpException('Bad hostname provided.', $e),
+            $e instanceof RequestExceptionInterface => new BadRequestHttpException('Bad request.', $e),
             $e instanceof RecordsNotFoundException => new NotFoundHttpException('Not found.', $e),
             default => $e,
         };
