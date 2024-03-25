@@ -274,9 +274,7 @@ class ApplicationBuilder
     protected function withCommandRouting(array $paths)
     {
         $this->app->afterResolving(ConsoleKernel::class, function ($kernel) use ($paths) {
-            $this->app->booted(function () use ($kernel, $paths) {
-                $kernel->addCommandRoutePaths($paths);
-            });
+            $this->app->booted(fn () => $kernel->addCommandRoutePaths($paths));
         });
     }
 
