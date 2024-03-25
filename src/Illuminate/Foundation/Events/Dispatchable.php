@@ -37,9 +37,7 @@ trait Dispatchable
      */
     public static function dispatchUnless($boolean, ...$arguments)
     {
-        if (! $boolean) {
-            return event(new static(...$arguments));
-        }
+        return self::dispatchIf(! $boolean, ...$arguments);
     }
 
     /**

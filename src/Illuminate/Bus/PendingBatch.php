@@ -389,7 +389,7 @@ class PendingBatch
      */
     public function dispatchUnless($boolean)
     {
-        return ! value($boolean) ? $this->dispatch() : null;
+        return $this->dispatchIf(! value($boolean));
     }
 
     /**
