@@ -82,7 +82,7 @@ if (! function_exists('abort_unless')) {
      */
     function abort_unless($boolean, $code, $message = '', array $headers = [])
     {
-        abort_if(! $boolean);
+        abort_if(! $boolean, $code, $message, $headers);
     }
 }
 
