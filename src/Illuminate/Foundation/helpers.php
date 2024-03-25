@@ -311,7 +311,7 @@ if (! function_exists('cookie')) {
             return $cookie;
         }
 
-        return $cookie->make($name, $value, $minutes, $path, $domain, $secure, $httpOnly, $raw, $sameSite);
+        return $cookie->make($name, [$value, $minutes, $path, $domain, $secure, $httpOnly, $raw, $sameSite]);
     }
 }
 
@@ -793,7 +793,7 @@ if (! function_exists('response')) {
             return $factory;
         }
 
-        return $factory->make($content, $status, $headers);
+        return $factory->make($content, [$status, $headers]);
     }
 }
 
