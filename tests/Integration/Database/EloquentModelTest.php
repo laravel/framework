@@ -126,6 +126,26 @@ class EloquentModelTest extends DatabaseTestCase
             'analyze' => true,
         ]);
     }
+
+    public function testProperlyMarkModelWithUpdateAttempt()
+    {
+        $user = TestModel2::create([
+            'name' => $originalName = Str::random(),
+            'title' => Str::random(),
+        ]);
+
+        $this->assertTrue($user->wasRecentlyCreated);
+        $this->assertFalse($user->hadUpdateAttempt);
+        $this->assertFalse($user->wasChanged());
+
+        $user->update(['name' => $originalName]);
+        $this->assertTrue($user->hadUpdateAttempt);
+        $this->assertFalse($user->wasChanged());
+
+        $user->update(['name' => Str::random()]);
+        $this->assertTrue($user->hadUpdateAttempt);
+        $this->assertTrue($user->wasChanged());
+    }
 }
 
 class TestModel1 extends Model

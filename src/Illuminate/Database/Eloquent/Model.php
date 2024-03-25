@@ -114,6 +114,14 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     public $wasRecentlyCreated = false;
 
     /**
+     * Indicates if the model had an update attempt during the object's lifecycle.
+     * Usefull when user updates the model but the model is not dirty
+     *
+     * @var bool
+     */
+    public $hadUpdateAttempt = false;
+
+    /**
      * Indicates that the object's string representation should be escaped when __toString is invoked.
      *
      * @var bool
@@ -1133,6 +1141,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         if ($this->exists) {
             $saved = $this->isDirty() ?
                 $this->performUpdate($query) : true;
+            $this->hadUpdateAttempt = true;
         }
 
         // If the model is brand new, we'll insert it into our database and set the
