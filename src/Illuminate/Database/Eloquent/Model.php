@@ -115,7 +115,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
 
     /**
      * Indicates if the model had an update attempt during the object's lifecycle.
-     * Useful when user updates the model but the model is not dirty
+     * Useful when user updates the model but the model is not dirty.
      *
      * @var bool
      */
