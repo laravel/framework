@@ -2331,6 +2331,10 @@ trait HasAttributes
         $instance = is_object($class) ? $class : new $class;
 
         return collect((new ReflectionClass($instance))->getMethods())->filter(function ($method) use ($instance) {
+            if ($method->getNumberOfRequiredParameters() > 0) {
+                return false;
+            }
+
             $returnType = $method->getReturnType();
 
             if ($returnType instanceof ReflectionNamedType &&
