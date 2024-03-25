@@ -7,6 +7,7 @@ use ArrayIterator;
 use Countable;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Env;
+use Illuminate\Support\Numeral;
 use Illuminate\Support\Optional;
 use Illuminate\Support\Sleep;
 use Illuminate\Support\Stringable;
@@ -708,6 +709,27 @@ class SupportHelpersTest extends TestCase
         $strAccessor = str();
         $this->assertTrue((new ReflectionClass($strAccessor))->isAnonymous());
         $this->assertSame((string) $strAccessor, '');
+    }
+
+    public function testNum()
+    {
+        $numerable = num(10);
+
+        $this->assertInstanceOf(Numeral::class, $numerable);
+        $this->assertSame(10, $numerable->value());
+        $this->assertSame('10', (string) $numerable);
+
+        $numerable = num($value = null);
+        $this->assertInstanceOf(Numeral::class, $numerable);
+        $this->assertTrue($numerable->isZero());
+
+        $numAccessor = num();
+        $this->assertTrue((new ReflectionClass($numAccessor))->isAnonymous());
+        $this->assertSame($numAccessor->add(10, 5), 15);
+
+        $numAccessor = num();
+        $this->assertTrue((new ReflectionClass($numAccessor))->isAnonymous());
+        $this->assertSame($numAccessor->value(), 0);
     }
 
     public function testTap()

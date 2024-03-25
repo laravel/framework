@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Number;
 use Illuminate\Support\Str;
 
 class DatabaseCustomCastsTest extends DatabaseTestCase
@@ -22,6 +23,8 @@ class DatabaseCustomCastsTest extends DatabaseTestCase
             $table->text('collection');
             $table->string('stringable');
             $table->string('password');
+            $table->integer('numeral_int');
+            $table->float('numeral_float');
             $table->timestamps();
         });
 
@@ -31,6 +34,8 @@ class DatabaseCustomCastsTest extends DatabaseTestCase
             $table->json('array_object_json')->nullable();
             $table->text('collection')->nullable();
             $table->string('stringable')->nullable();
+            $table->integer('numeral_int')->nullable();
+            $table->float('numeral_float')->nullable();
             $table->timestamps();
         });
     }
@@ -44,6 +49,8 @@ class DatabaseCustomCastsTest extends DatabaseTestCase
         $model->collection = collect(['name' => 'Taylor']);
         $model->stringable = Str::of('Taylor');
         $model->password = Hash::make('secret');
+        $model->numeral_int = Number::of(123);
+        $model->numeral_float = Number::of(123.45);
 
         $model->save();
 
@@ -54,6 +61,8 @@ class DatabaseCustomCastsTest extends DatabaseTestCase
         $this->assertEquals(['name' => 'Taylor'], $model->collection->toArray());
         $this->assertSame('Taylor', (string) $model->stringable);
         $this->assertTrue(Hash::check('secret', $model->password));
+        $this->assertSame(123, $model->numeral_int->value());
+        $this->assertSame(123.45, $model->numeral_float->value());
 
         $model->array_object['age'] = 34;
         $model->array_object['meta']['title'] = 'Developer';
@@ -92,6 +101,8 @@ class DatabaseCustomCastsTest extends DatabaseTestCase
             'collection' => collect(['name' => 'Taylor']),
             'stringable' => Str::of('Taylor'),
             'password' => Hash::make('secret'),
+            'numeral_int' => Number::of(123),
+            'numeral_float' => Number::of(123.45),
         ]);
 
         $model->save();
@@ -103,6 +114,8 @@ class DatabaseCustomCastsTest extends DatabaseTestCase
         $this->assertEquals(['name' => 'Taylor'], $model->collection->toArray());
         $this->assertSame('Taylor', (string) $model->stringable);
         $this->assertTrue(Hash::check('secret', $model->password));
+        $this->assertSame(123, $model->numeral_int->value());
+        $this->assertSame(123.45, $model->numeral_float->value());
     }
 
     public function test_custom_casting_nullable_values()
@@ -113,6 +126,8 @@ class DatabaseCustomCastsTest extends DatabaseTestCase
         $model->array_object_json = null;
         $model->collection = collect();
         $model->stringable = null;
+        $model->numeral_int = null;
+        $model->numeral_float = null;
 
         $model->save();
 
@@ -122,6 +137,8 @@ class DatabaseCustomCastsTest extends DatabaseTestCase
         $this->assertEmpty($model->array_object_json);
         $this->assertEmpty($model->collection);
         $this->assertSame('', (string) $model->stringable);
+        $this->assertSame(0, $model->numeral_int->value());
+        $this->assertSame(0.0, $model->numeral_float->value());
 
         $model->array_object = ['name' => 'John'];
         $model->array_object['name'] = 'Taylor';

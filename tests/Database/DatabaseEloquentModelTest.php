@@ -24,6 +24,7 @@ use Illuminate\Database\Eloquent\Casts\AsEncryptedArrayObject;
 use Illuminate\Database\Eloquent\Casts\AsEncryptedCollection;
 use Illuminate\Database\Eloquent\Casts\AsEnumArrayObject;
 use Illuminate\Database\Eloquent\Casts\AsEnumCollection;
+use Illuminate\Database\Eloquent\Casts\AsNumeral;
 use Illuminate\Database\Eloquent\Casts\AsStringable;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Collection;
@@ -42,6 +43,8 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\InteractsWithTime;
+use Illuminate\Support\Number;
+use Illuminate\Support\Numeral;
 use Illuminate\Support\Str;
 use Illuminate\Support\Stringable;
 use InvalidArgumentException;
@@ -259,6 +262,24 @@ class DatabaseEloquentModelTest extends TestCase
 
         $model->asStringableAttribute = Str::of('foo baz');
         $this->assertTrue($model->isDirty('asStringableAttribute'));
+    }
+
+    public function testDirtyOnCastedNumeral()
+    {
+        $model = new EloquentModelCastingStub;
+        $model->setRawAttributes([
+            'asNumeralAttribute' => 123,
+        ]);
+        $model->syncOriginal();
+
+        $this->assertInstanceOf(Numeral::class, $model->asNumeralAttribute);
+        $this->assertFalse($model->isDirty('asNumeralAttribute'));
+
+        $model->asNumeralAttribute = Number::of(123);
+        $this->assertFalse($model->isDirty('asNumeralAttribute'));
+
+        $model->asNumeralAttribute = Number::of(456);
+        $this->assertTrue($model->isDirty('asNumeralAttribute'));
     }
 
     // public function testDirtyOnCastedEncryptedCollection()
@@ -3409,6 +3430,7 @@ class EloquentModelCastingStub extends Model
             'datetimeAttribute' => 'datetime',
             'asarrayobjectAttribute' => AsArrayObject::class,
             'asStringableAttribute' => AsStringable::class,
+            'asNumeralAttribute' => AsNumeral::class,
             'asCustomCollectionAttribute' => AsCollection::using(CustomCollection::class),
             'asEncryptedArrayObjectAttribute' => AsEncryptedArrayObject::class,
             'asEncryptedCustomCollectionAttribute' => AsEncryptedCollection::using(CustomCollection::class),

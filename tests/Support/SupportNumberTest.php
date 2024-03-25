@@ -3,11 +3,185 @@
 namespace Illuminate\Tests\Support;
 
 use Illuminate\Support\Number;
+use Illuminate\Support\Numeral;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 
 class SupportNumberTest extends TestCase
 {
+    public function testReturnNumeral()
+    {
+        $this->assertInstanceOf(Numeral::class, Number::of(1));
+    }
+
+    public function testIsNumeric()
+    {
+        $this->assertTrue(Number::isNumeric(1));
+        $this->assertTrue(Number::isNumeric(1.0));
+        $this->assertTrue(Number::isNumeric('1'));
+        $this->assertTrue(Number::isNumeric('1.0'));
+        $this->assertTrue(Number::isNumeric('1.0e10'));
+        $this->assertTrue(Number::isNumeric('1.0e-10'));
+
+        $this->assertFalse(Number::isNumeric('Not a number'));
+        $this->assertFalse(Number::isNumeric(new \stdClass()));
+        $this->assertFalse(Number::isNumeric([]));
+        $this->assertFalse(Number::isNumeric(null));
+        $this->assertFalse(Number::isNumeric(true));
+        $this->assertFalse(Number::isNumeric(false));
+    }
+
+    public function testIsEven()
+    {
+        foreach (range(0, 100) as $number) {
+            if ($number % 2 === 0) {
+                $this->assertTrue(Number::isEven($number));
+            } else {
+                $this->assertFalse(Number::isEven($number));
+            }
+        }
+    }
+
+    public function testIsOdd()
+    {
+        foreach (range(0, 100) as $number) {
+            if ($number % 2 !== 0) {
+                $this->assertTrue(Number::isOdd($number));
+            } else {
+                $this->assertFalse(Number::isOdd($number));
+            }
+        }
+    }
+
+    public function testIsFloat()
+    {
+        $this->assertTrue(Number::isFloat(1.0));
+        $this->assertTrue(Number::isFloat(1.1));
+        $this->assertTrue(Number::isFloat(1.0e10));
+        $this->assertTrue(Number::isFloat(1.0e-10));
+
+        $this->assertFalse(Number::isFloat(1));
+        $this->assertFalse(Number::isFloat('1.0'));
+        $this->assertFalse(Number::isFloat('Not a number'));
+    }
+
+    public function testIsInt()
+    {
+        $this->assertTrue(Number::isInt(1));
+        $this->assertTrue(Number::isInt(0));
+        $this->assertTrue(Number::isInt(-1));
+
+        $this->assertFalse(Number::isInt(1.0));
+        $this->assertFalse(Number::isInt(1.1));
+        $this->assertFalse(Number::isInt(1.0e10));
+        $this->assertFalse(Number::isInt(1.0e-10));
+        $this->assertFalse(Number::isInt('1'));
+        $this->assertFalse(Number::isInt('Not a number'));
+    }
+
+    public function testIsPositive()
+    {
+        $this->assertTrue(Number::isPositive(1));
+        $this->assertTrue(Number::isPositive(1.0));
+        $this->assertTrue(Number::isPositive(1.1));
+        $this->assertTrue(Number::isPositive(1.0e10));
+        $this->assertTrue(Number::isPositive(1.0e-10));
+
+        $this->assertFalse(Number::isPositive(0));
+        $this->assertFalse(Number::isPositive(-1));
+        $this->assertFalse(Number::isPositive(-1.0));
+        $this->assertFalse(Number::isPositive(-1.1));
+        $this->assertFalse(Number::isPositive(-1.0e10));
+        $this->assertFalse(Number::isPositive(-1.0e-10));
+    }
+
+    public function testIsPositiveInt()
+    {
+        $this->assertTrue(Number::isPositiveInt(1));
+
+        $this->assertFalse(Number::isPositiveInt(1.0));
+        $this->assertFalse(Number::isPositiveInt(1.1));
+        $this->assertFalse(Number::isPositiveInt(1.0e10));
+        $this->assertFalse(Number::isPositiveInt(1.0e-10));
+        $this->assertFalse(Number::isPositiveInt(0));
+        $this->assertFalse(Number::isPositiveInt(-1));
+        $this->assertFalse(Number::isPositiveInt(-1.0));
+        $this->assertFalse(Number::isPositiveInt(-1.1));
+        $this->assertFalse(Number::isPositiveInt(-1.0e10));
+        $this->assertFalse(Number::isPositiveInt(-1.0e-10));
+    }
+
+    public function testIsPositiveFloat()
+    {
+        $this->assertTrue(Number::isPositiveFloat(1));
+        $this->assertTrue(Number::isPositiveFloat(1.0));
+        $this->assertTrue(Number::isPositiveFloat(1.1));
+        $this->assertTrue(Number::isPositiveFloat(1.0e10));
+        $this->assertTrue(Number::isPositiveFloat(1.0e-10));
+
+        $this->assertFalse(Number::isPositiveFloat(0));
+        $this->assertFalse(Number::isPositiveFloat(-1));
+        $this->assertFalse(Number::isPositiveFloat(-1.0));
+        $this->assertFalse(Number::isPositiveFloat(-1.1));
+        $this->assertFalse(Number::isPositiveFloat(-1.0e10));
+        $this->assertFalse(Number::isPositiveFloat(-1.0e-10));
+    }
+
+    public function isNegative()
+    {
+        $this->assertTrue(Number::isNegative(-1));
+
+        $this->assertFalse(Number::isNegative(1));
+        $this->assertFalse(Number::isNegative(1.0));
+        $this->assertFalse(Number::isNegative(1.1));
+        $this->assertFalse(Number::isNegative(1.0e10));
+        $this->assertFalse(Number::isNegative(1.0e-10));
+        $this->assertFalse(Number::isNegative(0));
+    }
+
+    public function testIsNegativeInt()
+    {
+        $this->assertTrue(Number::isNegativeInt(-1));
+
+        $this->assertFalse(Number::isNegativeInt(1));
+        $this->assertFalse(Number::isNegativeInt(1.0));
+        $this->assertFalse(Number::isNegativeInt(1.1));
+        $this->assertFalse(Number::isNegativeInt(1.0e10));
+        $this->assertFalse(Number::isNegativeInt(1.0e-10));
+        $this->assertFalse(Number::isNegativeInt(0));
+        $this->assertFalse(Number::isNegativeInt(-1.0));
+        $this->assertFalse(Number::isNegativeInt(-1.1));
+        $this->assertFalse(Number::isNegativeInt(-1.0e10));
+        $this->assertFalse(Number::isNegativeInt(-1.0e-10));
+    }
+
+    public function testIsNegativeFloat()
+    {
+        $this->assertTrue(Number::isNegativeFloat(-1));
+        $this->assertTrue(Number::isNegativeFloat(-1.0));
+        $this->assertTrue(Number::isNegativeFloat(-1.1));
+        $this->assertTrue(Number::isNegativeFloat(-1.0e10));
+        $this->assertTrue(Number::isNegativeFloat(-1.0e-10));
+
+        $this->assertFalse(Number::isNegativeFloat(1));
+        $this->assertFalse(Number::isNegativeFloat(1.0));
+        $this->assertFalse(Number::isNegativeFloat(1.1));
+        $this->assertFalse(Number::isNegativeFloat(1.0e10));
+        $this->assertFalse(Number::isNegativeFloat(1.0e-10));
+        $this->assertFalse(Number::isNegativeFloat(0));
+    }
+
+    public function testIsZero()
+    {
+        $this->assertTrue(Number::isZero(0));
+        $this->assertTrue(Number::isZero(0.0));
+
+        $this->assertFalse(Number::isZero(1));
+        $this->assertFalse(Number::isZero(1.0));
+        $this->assertFalse(Number::isZero(-1));
+        $this->assertFalse(Number::isZero(-1.0));
+    }
+
     #[RequiresPhpExtension('intl')]
     public function testFormat()
     {
@@ -285,5 +459,113 @@ class SupportNumberTest extends TestCase
         $this->assertSame('-1.1T', Number::abbreviate(-1100000000000, maxPrecision: 1));
         $this->assertSame('-1Q', Number::abbreviate(-1000000000000000));
         $this->assertSame('-1KQ', Number::abbreviate(-1000000000000000000));
+    }
+
+    public function testLen()
+    {
+        $this->assertSame(1, Number::len(0));
+        $this->assertSame(1, Number::len(1));
+        $this->assertSame(1, Number::len(9));
+
+        $this->assertSame(2, Number::len(10));
+        $this->assertSame(2, Number::len(99));
+
+        $this->assertSame(3, Number::len(100));
+        $this->assertSame(3, Number::len(999));
+
+        $this->assertSame(4, Number::len(1000));
+        $this->assertSame(4, Number::len(9999));
+
+        $this->assertSame(5, Number::len(10000));
+        $this->assertSame(5, Number::len(99999));
+
+        $this->assertSame(3, Number::len(0.1));
+        $this->assertSame(3, Number::len(0.9));
+
+        $this->assertSame(4, Number::len(-1.0));
+        $this->assertSame(4, Number::len(-9.9));
+
+        $this->assertNull(Number::len('Not a number'));
+    }
+
+    public function testRandom()
+    {
+        foreach (range(0, 100) as $i) {
+            $random = Number::random();
+            $this->assertIsInt($random);
+            $this->assertGreaterThanOrEqual(0, $random);
+            $this->assertLessThanOrEqual(PHP_INT_MAX, $random);
+        }
+    }
+
+    public function testRandomWithMinAndMax()
+    {
+        foreach (range(0, 100) as $i) {
+            $random = Number::randomBetween(10, 20);
+            $this->assertIsInt($random);
+            $this->assertGreaterThanOrEqual(10, $random);
+            $this->assertLessThanOrEqual(20, $random);
+        }
+    }
+
+    public function testGreatestCommonDivisor()
+    {
+        $this->assertSame(1, Number::gcd(1, 1));
+        $this->assertSame(1, Number::gcd(1, 2));
+        $this->assertSame(1, Number::gcd(2, 1));
+        $this->assertSame(2, Number::gcd(2, 2));
+        $this->assertSame(2, Number::gcd(2, 4));
+        $this->assertSame(2, Number::gcd(4, 2));
+        $this->assertSame(2, Number::gcd(4, 6));
+        $this->assertSame(2, Number::gcd(6, 4));
+        $this->assertSame(3, Number::gcd(3, 3));
+        $this->assertSame(3, Number::gcd(3, 6));
+        $this->assertSame(3, Number::gcd(6, 3));
+        $this->assertSame(3, Number::gcd(6, 9));
+        $this->assertSame(3, Number::gcd(9, 6));
+        $this->assertSame(3, Number::gcd(9, 12));
+        $this->assertSame(3, Number::gcd(12, 9));
+        $this->assertSame(3, Number::gcd(12, 15));
+        $this->assertSame(3, Number::gcd(15, 12));
+        $this->assertSame(3, Number::gcd(15, 18));
+        $this->assertSame(3, Number::gcd(18, 15));
+    }
+
+    public function testLowestCommonMultiplier()
+    {
+        $this->assertSame(1, Number::lcm(1, 1));
+        $this->assertSame(2, Number::lcm(1, 2));
+        $this->assertSame(2, Number::lcm(2, 1));
+        $this->assertSame(2, Number::lcm(2, 2));
+        $this->assertSame(4, Number::lcm(2, 4));
+        $this->assertSame(4, Number::lcm(4, 2));
+        $this->assertSame(12, Number::lcm(4, 6));
+        $this->assertSame(12, Number::lcm(6, 4));
+        $this->assertSame(3, Number::lcm(3, 3));
+        $this->assertSame(6, Number::lcm(3, 6));
+        $this->assertSame(6, Number::lcm(6, 3));
+        $this->assertSame(6, Number::lcm(6, 9));
+        $this->assertSame(6, Number::lcm(9, 6));
+        $this->assertSame(12, Number::lcm(9, 12));
+        $this->assertSame(12, Number::lcm(12, 9));
+        $this->assertSame(12, Number::lcm(12, 15));
+        $this->assertSame(12, Number::lcm(15, 12));
+        $this->assertSame(30, Number::lcm(15, 18));
+        $this->assertSame(30, Number::lcm(18, 15));
+    }
+
+    public function testFactorial()
+    {
+        $this->assertSame(1, Number::factorial(0));
+        $this->assertSame(1, Number::factorial(1));
+        $this->assertSame(2, Number::factorial(2));
+        $this->assertSame(6, Number::factorial(3));
+        $this->assertSame(24, Number::factorial(4));
+        $this->assertSame(120, Number::factorial(5));
+        $this->assertSame(720, Number::factorial(6));
+        $this->assertSame(5040, Number::factorial(7));
+        $this->assertSame(40320, Number::factorial(8));
+        $this->assertSame(362880, Number::factorial(9));
+        $this->assertSame(3628800, Number::factorial(10));
     }
 }

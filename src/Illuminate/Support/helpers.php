@@ -5,6 +5,8 @@ use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Env;
 use Illuminate\Support\HigherOrderTapProxy;
+use Illuminate\Support\Number;
+use Illuminate\Support\Numeral;
 use Illuminate\Support\Once;
 use Illuminate\Support\Onceable;
 use Illuminate\Support\Optional;
@@ -325,6 +327,33 @@ if (! function_exists('str')) {
         }
 
         return Str::of($string);
+    }
+}
+
+if (! function_exists('num')) {
+    /**
+     * Get a new Numeral object from the given number.
+     *
+     * @param  int|float|null  $number
+     * @return \Illuminate\Support\Numeral|mixed
+     */
+    function num($number = null)
+    {
+        if (func_num_args() === 0) {
+            return new class {
+                public function __call($method, $parameters)
+                {
+                    return Numeral::$method(...$parameters);
+                }
+
+                public function value()
+                {
+                    return 0;
+                }
+            };
+        }
+
+        return Number::of($number);
     }
 }
 
