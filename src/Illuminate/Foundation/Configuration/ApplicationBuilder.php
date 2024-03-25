@@ -3,6 +3,8 @@
 namespace Illuminate\Foundation\Configuration;
 
 use Closure;
+use Illuminate\Console\Application as Artisan;
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Contracts\Console\Kernel as ConsoleKernel;
 use Illuminate\Contracts\Http\Kernel as HttpKernel;
 use Illuminate\Foundation\Application;
@@ -161,6 +163,21 @@ class ApplicationBuilder
         if (is_string($channels) && realpath($channels) !== false) {
             $this->withBroadcasting($channels);
         }
+
+        return $this;
+    }
+
+    /**
+     * Register the scheduling services for the application.
+     *
+     * @param  callable(Schedule $schedule): void  $callback
+     * @return $this
+     */
+    public function withSchedule(callable $callback)
+    {
+        $this->app->afterResolving(ConsoleKernel::class, function (ConsoleKernel $kernel) use ($callback) {
+            Artisan::starting(fn () => $callback($this->app->make(Schedule::class)));
+        });
 
         return $this;
     }
