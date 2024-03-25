@@ -170,6 +170,13 @@ trait HasAttributes
     protected static $setAttributeMutatorCache = [];
 
     /**
+     * The cache of the "Attribute" dynamically defined attributes for each class.
+     *
+     * @var array
+     */
+    protected static $dynamicAttributeMutatorCache = [];
+
+    /**
      * The cache of the converted cast types.
      *
      * @var array
@@ -684,7 +691,7 @@ trait HasAttributes
             return $this->attributeCastCache[$key];
         }
 
-        $attribute = $this->{Str::camel($key)}();
+        $attribute = $this->getMarkedAttribute($key);
 
         $value = call_user_func($attribute->get ?: function ($value) {
             return $value;
@@ -1102,7 +1109,7 @@ trait HasAttributes
      */
     protected function setAttributeMarkedMutatedAttributeValue($key, $value)
     {
-        $attribute = $this->{Str::camel($key)}();
+        $attribute = $this->getMarkedAttribute($key);
 
         $callback = $attribute->set ?: function ($value) use ($key) {
             $this->attributes[$key] = $value;
@@ -2346,5 +2353,44 @@ trait HasAttributes
 
             return false;
         })->map->name->values()->all();
+    }
+
+    /**
+     * Add the given dynamic attribute mutator.
+     *
+     * @param string $name
+     * @param Attribute $attribute
+     *
+     * @return void
+     */
+    public static function addDynamicAttributeMutator($name, $attribute)
+    {
+        static::$attributeMutatorCache[static::class][$name] = true;
+
+        if ($attribute->get) {
+            static::$getAttributeMutatorCache[static::class][$name] = true;
+        }
+
+        if ($attribute->set) {
+            static::$setAttributeMutatorCache[static::class][$name] = true;
+        }
+
+        static::$dynamicAttributeMutatorCache[static::class][$name] = $attribute;
+    }
+
+    /**
+     * Returns the marked attribute for the given attribute name.
+     *
+     * @param string $name
+     *
+     * @return Attribute
+     */
+    protected function getMarkedAttribute($name)
+    {
+        if ($attribute = static::$dynamicAttributeMutatorCache[static::class][$name] ?? null) {
+            return $attribute;
+        }
+
+        return $this->{Str::camel($name)}();
     }
 }
