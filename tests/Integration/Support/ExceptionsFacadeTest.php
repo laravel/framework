@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Support;
 
+use ErrorException;
 use Exception;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -544,5 +545,37 @@ class ExceptionsFacadeTest extends TestCase
         $this->assertInstanceOf(ExceptionHandlerFake::class, app(ExceptionHandler::class));
         $this->assertInstanceOf(Handler::class, Exceptions::fake()->handler());
         $this->assertFalse((new \ReflectionClass(Exceptions::fake()->handler()))->isAnonymous());
+    }
+
+    public function testWithDeprecationHandling()
+    {
+        Exceptions::fake();
+
+        Route::get('/', function () {
+            str_contains(null, null);
+        });
+
+        $this->get('/')->assertStatus(200);
+
+        Exceptions::assertNothingReported();
+    }
+
+    public function testWithoutDeprecationHandler()
+    {
+        Exceptions::fake();
+
+        $this->withoutDeprecationHandling();
+
+        Route::get('/', function () {
+            str_contains(null, null);
+        });
+
+        $this->get('/')->assertStatus(500);
+
+        Exceptions::assertReported(function (ErrorException $e) {
+            return $e->getMessage() === 'str_contains(): Passing null to parameter #1 ($haystack) of type string is deprecated';
+        });
+
+        Exceptions::assertReportedCount(1);
     }
 }
