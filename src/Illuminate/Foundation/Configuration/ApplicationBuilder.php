@@ -19,14 +19,14 @@ use Laravel\Folio\Folio;
 class ApplicationBuilder
 {
     /**
-     * The service provider that are marked for registration.
+     * The service provider that is marked for registration.
      *
      * @var array
      */
     protected array $pendingProviders = [];
 
     /**
-     * The Folio / page middleware that have been defined by the user.
+     * The Folio / page middleware that has been defined by the user.
      *
      * @var array
      */
@@ -44,7 +44,7 @@ class ApplicationBuilder
      *
      * @return $this
      */
-    public function withKernels()
+    public function withKernels(): static
     {
         $this->app->singleton(
             \Illuminate\Contracts\Http\Kernel::class,
@@ -66,7 +66,7 @@ class ApplicationBuilder
      * @param  bool  $withBootstrapProviders
      * @return $this
      */
-    public function withProviders(array $providers = [], bool $withBootstrapProviders = true)
+    public function withProviders(array $providers = [], bool $withBootstrapProviders = true): static
     {
         RegisterProviders::merge(
             $providers,
@@ -108,7 +108,7 @@ class ApplicationBuilder
      * @param  array  $attributes
      * @return $this
      */
-    public function withBroadcasting(string $channels, array $attributes = [])
+    public function withBroadcasting(string $channels, array $attributes = []): static
     {
         $this->app->booted(function () use ($channels, $attributes) {
             Broadcast::routes(! empty($attributes) ? $attributes : null);
@@ -124,14 +124,16 @@ class ApplicationBuilder
     /**
      * Register the routing services for the application.
      *
-     * @param  \Closure|null  $using
-     * @param  string|null  $web
-     * @param  string|null  $api
-     * @param  string|null  $commands
-     * @param  string|null  $channels
-     * @param  string|null  $pages
-     * @param  string  $apiPrefix
-     * @param  callable|null  $then
+     * @param Closure|null $using
+     * @param string|null $web
+     * @param string|null $api
+     * @param string|null $commands
+     * @param string|null $channels
+     * @param string|null $pages
+     * @param string|null $health
+     * @param string $apiPrefix
+     * @param string|null $domain
+     * @param callable|null $then
      * @return $this
      */
     public function withRouting(?Closure $using = null,
@@ -142,10 +144,11 @@ class ApplicationBuilder
         ?string $pages = null,
         ?string $health = null,
         string $apiPrefix = 'api',
-        ?callable $then = null)
+        ?string $domain = null,
+        ?callable $then = null): static
     {
-        if (is_null($using) && (is_string($web) || is_string($api) || is_string($pages) || is_string($health)) || is_callable($then)) {
-            $using = $this->buildRoutingCallback($web, $api, $pages, $health, $apiPrefix, $then);
+        if (is_null($using) && (is_string($web) || is_string($api) || is_string($pages) || is_string($health) || is_string($domain)) || is_callable($then)) {
+            $using = $this->buildRoutingCallback($web, $api, $pages, $health, $apiPrefix, $domain, $then);
         }
 
         AppRouteServiceProvider::loadRoutesUsing($using);
@@ -168,13 +171,14 @@ class ApplicationBuilder
     /**
      * Create the routing callback for the application.
      *
-     * @param  string|null  $web
-     * @param  string|null  $api
-     * @param  string|null  $pages
-     * @param  string|null  $health
-     * @param  string  $apiPrefix
-     * @param  callable|null  $then
-     * @return \Closure
+     * @param string|null $web
+     * @param string|null $api
+     * @param string|null $pages
+     * @param string|null $health
+     * @param string $apiPrefix
+     * @param string|null $domain
+     * @param callable|null $then
+     * @return Closure
      */
     protected function buildRoutingCallback(?string $web,
         ?string $api,
@@ -182,9 +186,9 @@ class ApplicationBuilder
         ?string $health,
         string $apiPrefix,
         ?string $domain,
-        ?callable $then)
+        ?callable $then): Closure
     {
-        return function () use ($web, $api, $pages, $health, $apiPrefix, $then) {
+        return function () use ($web, $api, $pages, $health, $apiPrefix, $domain, $then) {
             if (is_string($api) && realpath($api) !== false && is_null($domain)) {
                 Route::middleware('api')->prefix($apiPrefix)->group($api);
             }
@@ -227,7 +231,7 @@ class ApplicationBuilder
      * @param  callable|null  $callback
      * @return $this
      */
-    public function withMiddleware(?callable $callback = null)
+    public function withMiddleware(?callable $callback = null): static
     {
         $this->app->afterResolving(HttpKernel::class, function ($kernel) use ($callback) {
             $middleware = (new Middleware)
@@ -256,7 +260,7 @@ class ApplicationBuilder
      * @param  array  $commands
      * @return $this
      */
-    public function withCommands(array $commands = [])
+    public function withCommands(array $commands = []): static
     {
         if (empty($commands)) {
             $commands = [$this->app->path('Console/Commands')];
@@ -280,7 +284,7 @@ class ApplicationBuilder
      * @param  array  $paths
      * @return $this
      */
-    protected function withCommandRouting(array $paths)
+    protected function withCommandRouting(array $paths): static
     {
         $this->app->afterResolving(ConsoleKernel::class, function ($kernel) use ($paths) {
             $kernel->setCommandRoutePaths($paths);
@@ -293,7 +297,7 @@ class ApplicationBuilder
      * @param  callable|null  $using
      * @return $this
      */
-    public function withExceptions(?callable $using = null)
+    public function withExceptions(?callable $using = null): static
     {
         $this->app->singleton(
             \Illuminate\Contracts\Debug\ExceptionHandler::class,
@@ -316,7 +320,7 @@ class ApplicationBuilder
      * @param  array  $bindings
      * @return $this
      */
-    public function withBindings(array $bindings)
+    public function withBindings(array $bindings): static
     {
         return $this->registered(function ($app) use ($bindings) {
             foreach ($bindings as $abstract => $concrete) {
@@ -331,7 +335,7 @@ class ApplicationBuilder
      * @param  array  $singletons
      * @return $this
      */
-    public function withSingletons(array $singletons)
+    public function withSingletons(array $singletons): static
     {
         return $this->registered(function ($app) use ($singletons) {
             foreach ($singletons as $abstract => $concrete) {
@@ -350,7 +354,7 @@ class ApplicationBuilder
      * @param  callable  $callback
      * @return $this
      */
-    public function registered(callable $callback)
+    public function registered(callable $callback): static
     {
         $this->app->registered($callback);
 
@@ -363,7 +367,7 @@ class ApplicationBuilder
      * @param  callable  $callback
      * @return $this
      */
-    public function booting(callable $callback)
+    public function booting(callable $callback): static
     {
         $this->app->booting($callback);
 
@@ -376,7 +380,7 @@ class ApplicationBuilder
      * @param  callable  $callback
      * @return $this
      */
-    public function booted(callable $callback)
+    public function booted(callable $callback): static
     {
         $this->app->booted($callback);
 
@@ -386,9 +390,9 @@ class ApplicationBuilder
     /**
      * Get the application instance.
      *
-     * @return \Illuminate\Foundation\Application
+     * @return Application
      */
-    public function create()
+    public function create(): Application
     {
         return $this->app;
     }
