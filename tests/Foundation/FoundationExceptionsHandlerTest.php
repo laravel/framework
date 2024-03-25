@@ -359,15 +359,15 @@ class FoundationExceptionsHandlerTest extends TestCase
         $this->assertEquals($argumentExpected, $argumentActual);
     }
 
-    public function testSuspiciousOperationReturns404WithoutReporting()
+    public function testSuspiciousOperationReturns400WithoutReporting()
     {
         $this->config->shouldReceive('get')->with('app.debug', null)->once()->andReturn(true);
         $this->request->shouldReceive('expectsJson')->once()->andReturn(true);
 
         $response = $this->handler->render($this->request, new SuspiciousOperationException('Invalid method override "__CONSTRUCT"'));
 
-        $this->assertEquals(404, $response->getStatusCode());
-        $this->assertStringContainsString('"message": "Bad hostname provided."', $response->getContent());
+        $this->assertEquals(400, $response->getStatusCode());
+        $this->assertStringContainsString('"message": "Bad request."', $response->getContent());
 
         $logger = m::mock(LoggerInterface::class);
         $this->container->instance(LoggerInterface::class, $logger);
