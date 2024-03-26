@@ -691,7 +691,7 @@ trait HasAttributes
             return $this->attributeCastCache[$key];
         }
 
-        $attribute = $this->getMarkedAttribute($key);
+        $attribute = $this->getMarkedAttributeMutator($key);
 
         $value = call_user_func($attribute->get ?: function ($value) {
             return $value;
@@ -1109,7 +1109,7 @@ trait HasAttributes
      */
     protected function setAttributeMarkedMutatedAttributeValue($key, $value)
     {
-        $attribute = $this->getMarkedAttribute($key);
+        $attribute = $this->getMarkedAttributeMutator($key);
 
         $callback = $attribute->set ?: function ($value) use ($key) {
             $this->attributes[$key] = $value;
@@ -2385,7 +2385,7 @@ trait HasAttributes
      *
      * @return Attribute
      */
-    protected function getMarkedAttribute($name)
+    protected function getMarkedAttributeMutator($name)
     {
         if ($attribute = static::$dynamicAttributeMutatorCache[static::class][$name] ?? null) {
             return $attribute;
