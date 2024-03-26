@@ -65,7 +65,7 @@ class Number
      */
     public static function isFloat($value): bool
     {
-        return is_float($value + 0);
+        return self::isNumeric($value) && is_float($value + 0);
     }
 
     /**
@@ -75,7 +75,7 @@ class Number
      */
     public static function isInt($value): bool
     {
-        return is_int($value + 0);
+        return self::isNumeric($value) && is_int($value + 0);
     }
 
     /**
@@ -145,7 +145,7 @@ class Number
      */
     public static function isZero($value): bool
     {
-        return $value === 0;
+        return (int) $value === 0;
     }
 
     /**

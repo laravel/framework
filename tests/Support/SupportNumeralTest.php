@@ -112,19 +112,19 @@ class SupportNumeralTest extends TestCase
         $this->assertSame('100,000.124', $this->numeral(100000.1236)->format(maxPrecision: 3)->value());
         $this->assertSame('123,456,789', $this->numeral(123456789)->format()->value());
 
-        $this->assertSame('-1', $this->numeral(-1)->format());
-        $this->assertSame('-10', $this->numeral(-10)->format());
-        $this->assertSame('-25', $this->numeral(-25)->format());
+        $this->assertSame('-1', $this->numeral(-1)->format()->value());
+        $this->assertSame('-10', $this->numeral(-10)->format()->value());
+        $this->assertSame('-25', $this->numeral(-25)->format()->value());
 
-        $this->assertSame('0.2', $this->numeral(0.2)->format());
-        $this->assertSame('0.20', $this->numeral(0.2)->format(2));
-        $this->assertSame('0.123', $this->numeral(0.1234)->format(maxPrecision: 3));
-        $this->assertSame('1.23', $this->numeral(1.23)->format());
-        $this->assertSame('-1.23', $this->numeral(-1.23)->format());
-        $this->assertSame('123.456', $this->numeral(123.456)->format());
+        $this->assertSame('0.2', $this->numeral(0.2)->format()->value());
+        $this->assertSame('0.20', $this->numeral(0.2)->format(2)->value());
+        $this->assertSame('0.123', $this->numeral(0.1234)->format(maxPrecision: 3)->value());
+        $this->assertSame('1.23', $this->numeral(1.23)->format()->value());
+        $this->assertSame('-1.23', $this->numeral(-1.23)->format()->value());
+        $this->assertSame('123.456', $this->numeral(123.456)->format()->value());
 
-        $this->assertSame('∞', $this->numeral(INF)->format());
-        $this->assertSame('NaN', $this->numeral(NAN)->format());
+        $this->assertSame('∞', $this->numeral(INF)->format()->value());
+        $this->assertSame('NaN', $this->numeral(NAN)->format()->value());
     }
 
     #[RequiresPhpExtension('intl')]
@@ -151,14 +151,18 @@ class SupportNumeralTest extends TestCase
 
     public function testSpellout()
     {
-        $this->assertSame('ten', $this->numeral()->spell(10)->value());
-        $this->assertSame('one point two', $this->numeral()->spell(1.2)->value());
+        $this->assertSame('ten', $this->numeral(10)->spell()->value());
+        $this->assertSame('one point two', $this->numeral(1.2)->spell()->value());
     }
 
     #[RequiresPhpExtension('intl')]
     public function testSpelloutWithLocale()
     {
-        $this->assertSame('trois', $this->numeral()->spell(3, 'fr')->value());
+        $this->assertSame('trois', $this->numeral(3)->spell('fr')->value());
+        $this->assertSame('drei', $this->numeral(3)->spell('de')->value());
+        $this->assertSame('tres', $this->numeral(3)->spell('es')->value());
+        $this->assertSame('три', $this->numeral(3)->spell('ru')->value());
+        $this->assertSame('tre', $this->numeral(3)->spell('it')->value());
     }
 
     #[RequiresPhpExtension('intl')]
@@ -255,10 +259,10 @@ class SupportNumeralTest extends TestCase
 
     public function testToHuman()
     {
-        $this->assertSame('1', $this->numeral(1)->forHumans(1)->value());
+        $this->assertSame('1.0', $this->numeral(1)->forHumans(1)->value());
         $this->assertSame('1.00', $this->numeral(1)->forHumans(2)->value());
-        $this->assertSame('10', $this->numeral(10)->forHumans(10)->value());
-        $this->assertSame('100', $this->numeral(100)->forHumans(100)->value());
+        $this->assertSame('10', $this->numeral(10)->forHumans()->value());
+        $this->assertSame('100', $this->numeral(100)->forHumans()->value());
         $this->assertSame('1 thousand', $this->numeral(1000)->forHumans()->value());
         $this->assertSame('1.00 thousand', $this->numeral(1000)->forHumans(2)->value());
         $this->assertSame('1 thousand', $this->numeral(1000)->forHumans(maxPrecision: 2)->value());
@@ -292,10 +296,10 @@ class SupportNumeralTest extends TestCase
 
         $this->assertSame('0', $this->numeral(0)->forHumans()->value());
         $this->assertSame('0', $this->numeral(0.0)->forHumans()->value());
-        $this->assertSame('0.00', $this->numeral(0)->forHumans(2));
-        $this->assertSame('0.00', $this->numeral(0.0)->forHumans(2));
+        $this->assertSame('0.00', $this->numeral(0)->forHumans(2)->value());
+        $this->assertSame('0.00', $this->numeral(0.0)->forHumans(2)->value());
         $this->assertSame('-1', $this->numeral(-1)->forHumans()->value());
-        $this->assertSame('-1.00', $this->numeral(-1)->forHumans(2));
+        $this->assertSame('-1.00', $this->numeral(-1)->forHumans(2)->value());
         $this->assertSame('-10', $this->numeral(-10)->forHumans()->value());
         $this->assertSame('-100', $this->numeral(-100)->forHumans()->value());
         $this->assertSame('-1 thousand', $this->numeral(-1000)->forHumans()->value());
@@ -333,7 +337,7 @@ class SupportNumeralTest extends TestCase
         $this->assertSame('1M', $this->numeral(1234567)->abbreviate()->value());
         $this->assertSame('1B', $this->numeral(1234567890)->abbreviate()->value());
         $this->assertSame('1T', $this->numeral(1234567890123)->abbreviate()->value());
-        $this->assertSame('1.23T', $this->numeral(1234567890123)->abbreviate(2));
+        $this->assertSame('1.23T', $this->numeral(1234567890123)->abbreviate(2)->value());
         $this->assertSame('1Q', $this->numeral(1234567890123456)->abbreviate()->value());
         $this->assertSame('1.23KQ', $this->numeral(1234567890123456789)->abbreviate(2)->value());
         $this->assertSame('490K', $this->numeral(489939)->abbreviate()->value());
@@ -369,7 +373,7 @@ class SupportNumeralTest extends TestCase
     {
         $this->assertSame(3, $this->numeral(3)->max(2)->value());
         $this->assertSame(3, $this->numeral(3)->max(3)->value());
-        $this->assertSame(3, $this->numeral(3)->max(4)->value());
+        $this->assertSame(4, $this->numeral(3)->max(4)->value());
 
         $this->assertSame(11.0, $this->numeral(11.0)->max(5.4)->value());
         $this->assertSame(11.0, $this->numeral(11.0)->max(11.0)->value());
@@ -380,7 +384,7 @@ class SupportNumeralTest extends TestCase
     {
         $this->assertSame(3, $this->numeral(3)->min(4)->value());
         $this->assertSame(3, $this->numeral(3)->min(3)->value());
-        $this->assertSame(3, $this->numeral(3)->min(2)->value());
+        $this->assertSame(2, $this->numeral(3)->min(2)->value());
 
         $this->assertSame(11.0, $this->numeral(11.0)->min(11.1)->value());
         $this->assertSame(11.0, $this->numeral(11.0)->min(11.0)->value());
@@ -389,11 +393,11 @@ class SupportNumeralTest extends TestCase
 
     public function testClamp()
     {
-        $this->assertSame(2, $this->numeral(1)->clamp(2, 3));
-        $this->assertSame(3, $this->numeral(5)->clamp(2, 3));
-        $this->assertSame(5, $this->numeral(5)->clamp(1, 10));
-        $this->assertSame(4.5, $this->numeral(4.5)->clamp(1, 10));
-        $this->assertSame(1, $this->numeral(-10)->clamp(1, 5));
+        $this->assertSame(2, $this->numeral(1)->clamp(2, 3)->value());
+        $this->assertSame(3, $this->numeral(5)->clamp(2, 3)->value());
+        $this->assertSame(5, $this->numeral(5)->clamp(1, 10)->value());
+        $this->assertSame(4.5, $this->numeral(4.5)->clamp(1, 10)->value());
+        $this->assertSame(1, $this->numeral(-10)->clamp(1, 5)->value());
     }
 
     public function testSum()
@@ -468,9 +472,9 @@ class SupportNumeralTest extends TestCase
     public function testEquals()
     {
         $this->assertTrue($this->numeral(3)->equals(3));
-        $this->assertTrue($this->numeral(3)->equals(3.0));
-        $this->assertTrue($this->numeral(3.0)->equals(3));
 
+        $this->assertFalse($this->numeral(3.0)->equals(3));
+        $this->assertFalse($this->numeral(3)->equals(3.0));
         $this->assertFalse($this->numeral(3)->equals(4));
         $this->assertFalse($this->numeral(3)->equals(3.1));
         $this->assertFalse($this->numeral(3.1)->equals(3));
@@ -499,12 +503,12 @@ class SupportNumeralTest extends TestCase
         $this->assertTrue($this->numeral(3)->greaterThan(-1.0));
         $this->assertTrue($this->numeral(3.1)->greaterThan(-1));
         $this->assertTrue($this->numeral(3.1)->greaterThan(-1.0));
-        $this->assertTrue($this->numeral(-3)->greaterThan(-3));
         $this->assertTrue($this->numeral(-3)->greaterThan(-5));
         $this->assertTrue($this->numeral(-3)->greaterThan(-5.0));
         $this->assertTrue($this->numeral(-3.1)->greaterThan(-5));
         $this->assertTrue($this->numeral(-3.1)->greaterThan(-5.0));
 
+        $this->assertFalse($this->numeral(-3)->greaterThan(-3));
         $this->assertFalse($this->numeral(3)->greaterThan(3));
         $this->assertFalse($this->numeral(3)->greaterThan(3.1));
         $this->assertFalse($this->numeral(3.1)->greaterThan(3.1));
@@ -610,16 +614,16 @@ class SupportNumeralTest extends TestCase
         $this->assertTrue($this->numeral(-3)->between(-4, -3));
         $this->assertTrue($this->numeral(-3)->between(-3, -3));
         $this->assertTrue($this->numeral(3)->between(-4, 4));
-        $this->assertTrue($this->numeral(3)->between(4, -4));
+        $this->assertTrue($this->numeral(3)->between(2, 4));
         $this->assertTrue($this->numeral(-3)->between(-4, 4));
-        $this->assertTrue($this->numeral(-3)->between(4, -4));
 
+        $this->assertFalse($this->numeral(-3)->between(4, -4));
+        $this->assertFalse($this->numeral(3)->between(4, -4));
         $this->assertFalse($this->numeral(3)->between(4, 5));
         $this->assertFalse($this->numeral(3)->between(1, 2));
         $this->assertFalse($this->numeral(-3)->between(-2, -1));
         $this->assertFalse($this->numeral(-3)->between(-1, -2));
         $this->assertFalse($this->numeral(3)->between(4, 2));
-        $this->assertFalse($this->numeral(3)->between(2, 4));
         $this->assertFalse($this->numeral(-3)->between(4, 2));
         $this->assertFalse($this->numeral(-3)->between(2, 4));
     }
@@ -658,18 +662,22 @@ class SupportNumeralTest extends TestCase
 
     public function testCeil()
     {
-        $this->assertSame(4, $this->numeral(3.1)->ceil()->value());
+        $this->assertSame(4.0, $this->numeral(3.1)->ceil()->value());
+        $this->assertSame(4, $this->numeral(3.1)->ceil()->toInt()->value());
     }
 
     public function testFloor()
     {
-        $this->assertSame(3, $this->numeral(3.9)->floor()->value());
+        $this->assertSame(3.0, $this->numeral(3.9)->floor()->value());
+        $this->assertSame(3, $this->numeral(3.9)->floor()->toInt()->value());
     }
 
     public function testRound()
     {
-        $this->assertSame(3, $this->numeral(3.1)->round()->value());
-        $this->assertSame(4, $this->numeral(3.9)->round()->value());
+        $this->assertSame(3, $this->numeral(3.1)->round()->toInt()->value());
+        $this->assertSame(3.0, $this->numeral(3.1)->round()->value());
+        $this->assertSame(4, $this->numeral(3.9)->round()->toInt()->value());
+        $this->assertSame(4.0, $this->numeral(3.9)->round()->value());
         $this->assertSame(3.1, $this->numeral(3.14159)->round(1)->value());
         $this->assertSame(3.14, $this->numeral(3.14159)->round(2)->value());
         $this->assertSame(3.142, $this->numeral(3.14159)->round(3)->value());
@@ -682,14 +690,15 @@ class SupportNumeralTest extends TestCase
         $this->assertSame(1, $this->numeral(3)->len());
         $this->assertSame(1, $this->numeral(3.0)->len());
         $this->assertSame(2, $this->numeral(30)->len());
-        $this->assertSame(3, $this->numeral(30.0)->len());
+        $this->assertSame(2, $this->numeral(30.0)->len());
         $this->assertSame(3, $this->numeral(300)->len());
-        $this->assertSame(4, $this->numeral(300.0)->len());
+        $this->assertSame(3, $this->numeral(300.0)->len());
     }
 
     public function testSqrt()
     {
-        $this->assertSame(3, $this->numeral(9)->sqrt()->value());
+        $this->assertSame(3, $this->numeral(9)->sqrt()->toInt()->value());
+        $this->assertSame(3.0, $this->numeral(9)->sqrt()->value());
         $this->assertSame(3.0, $this->numeral(9.0)->sqrt()->value());
     }
 
@@ -708,13 +717,13 @@ class SupportNumeralTest extends TestCase
     public function testMod()
     {
         $this->assertSame(1, $this->numeral(10)->mod(3)->value());
-        $this->assertSame(1.0, $this->numeral(10.0)->mod(3)->value());
+        $this->assertSame(1, $this->numeral(10.0)->mod(3)->value());
     }
 
     public function testLog()
     {
-        $this->assertSame(4.6051701859881, $this->numeral(100)->log()->value());
-        $this->assertSame(4.6051701859881, $this->numeral(100.0)->log()->value());
+        $this->assertSame(4.605170185988092, $this->numeral(100)->log()->value());
+        $this->assertSame(4.605170185988092, $this->numeral(100.0)->log()->value());
     }
 
     public function testLog10()
@@ -725,98 +734,100 @@ class SupportNumeralTest extends TestCase
 
     public function testLog1p()
     {
-        $this->assertSame(4.6151205168413, $this->numeral(100)->log1p()->value());
-        $this->assertSame(4.6151205168413, $this->numeral(100.0)->log1p()->value());
+        $this->assertSame(4.61512051684126, $this->numeral(100)->log1p()->value());
+        $this->assertSame(4.61512051684126, $this->numeral(100.0)->log1p()->value());
     }
 
     public function testExp()
     {
-        $this->assertSame(20.085536923188, $this->numeral(3)->exp()->value());
-        $this->assertSame(20.085536923188, $this->numeral(3.0)->exp()->value());
+        $this->assertSame(20.085536923187668, $this->numeral(3)->exp()->value());
+        $this->assertSame(20.085536923187668, $this->numeral(3.0)->exp()->value());
     }
 
     public function testExpm1()
     {
-        $this->assertSame(19.085536923188, $this->numeral(3)->expm1()->value());
-        $this->assertSame(19.085536923188, $this->numeral(3.0)->expm1()->value());
+        $this->assertSame(19.085536923187668, $this->numeral(3)->expm1()->value());
+        $this->assertSame(19.085536923187668, $this->numeral(3.0)->expm1()->value());
     }
 
     public function testCos()
     {
-        $this->assertSame(-0.98999249660045, $this->numeral(3)->cos()->value());
-        $this->assertSame(-0.98999249660045, $this->numeral(3.0)->cos()->value());
+        $this->assertSame(-0.9899924966004454, $this->numeral(3)->cos()->value());
+        $this->assertSame(-0.9899924966004454, $this->numeral(3.0)->cos()->value());
     }
 
     public function testSin()
     {
-        $this->assertSame(0.14112000805987, $this->numeral(3)->sin()->value());
-        $this->assertSame(0.14112000805987, $this->numeral(3.0)->sin()->value());
+        $this->assertSame(0.1411200080598672, $this->numeral(3)->sin()->value());
+        $this->assertSame(0.1411200080598672, $this->numeral(3.0)->sin()->value());
     }
 
     public function testTan()
     {
-        $this->assertSame(-0.14254654307428, $this->numeral(3)->tan()->value());
-        $this->assertSame(-0.14254654307428, $this->numeral(3.0)->tan()->value());
+        $this->assertSame(-0.1425465430742778, $this->numeral(3)->tan()->value());
+        $this->assertSame(-0.1425465430742778, $this->numeral(3.0)->tan()->value());
     }
 
     public function testAcos()
     {
-        $this->assertSame(0.14159265358979, $this->numeral(0.1)->acos()->value());
-        $this->assertSame(0.14159265358979, $this->numeral(0.1)->acos()->value());
+        $this->assertSame(1.4706289056333368, $this->numeral(0.1)->acos()->value());
+        $this->assertSame(1.4706289056333368, $this->numeral(0.1)->acos()->value());
     }
 
     public function testAsin()
     {
-        $this->assertSame(0.10016742116156, $this->numeral(0.1)->asin()->value());
-        $this->assertSame(0.10016742116156, $this->numeral(0.1)->asin()->value());
+        $this->assertSame(0.1001674211615598, $this->numeral(0.1)->asin()->value());
+        $this->assertSame(0.1001674211615598, $this->numeral(0.1)->asin()->value());
     }
 
     public function testAtan()
     {
-        $this->assertSame(0.099668652491162, $this->numeral(0.1)->atan()->value());
-        $this->assertSame(0.099668652491162, $this->numeral(0.1)->atan()->value());
+        $this->assertSame(0.09966865249116204, $this->numeral(0.1)->atan()->value());
+        $this->assertSame(0.09966865249116204, $this->numeral(0.1)->atan()->value());
     }
 
     public function testAtan2()
     {
-        $this->assertSame(0.24497866312686, $this->numeral(0.1)->atan2(0.2)->value());
-        $this->assertSame(0.24497866312686, $this->numeral(0.1)->atan2(0.2)->value());
+        $this->assertSame(0.7853981633974483, $this->numeral(1)->atan2(1)->value());
+        $this->assertSame(0.7853981633974483, $this->numeral(1.0)->atan2(1)->value());
+        $this->assertSame(0.7853981633974483, $this->numeral(1)->atan2(1.0)->value());
+        $this->assertSame(0.7853981633974483, $this->numeral(1.0)->atan2(1.0)->value());
     }
 
     public function testCosh()
     {
-        $this->assertSame(1.600286857702, $this->numeral(3)->cosh()->value());
-        $this->assertSame(1.600286857702, $this->numeral(3.0)->cosh()->value());
+        $this->assertSame(10.067661995777765, $this->numeral(3)->cosh()->value());
+        $this->assertSame(10.067661995777765, $this->numeral(3.0)->cosh()->value());
     }
 
     public function testSinh()
     {
-        $this->assertSame(10.01787492741, $this->numeral(3)->sinh()->value());
-        $this->assertSame(10.01787492741, $this->numeral(3.0)->sinh()->value());
+        $this->assertSame(10.017874927409903, $this->numeral(3)->sinh()->value());
+        $this->assertSame(10.017874927409903, $this->numeral(3.0)->sinh()->value());
     }
 
     public function testTanh()
     {
-        $this->assertSame(0.99505475368673, $this->numeral(3)->tanh()->value());
-        $this->assertSame(0.99505475368673, $this->numeral(3.0)->tanh()->value());
+        $this->assertSame(0.9950547536867305, $this->numeral(3)->tanh()->value());
+        $this->assertSame(0.9950547536867305, $this->numeral(3.0)->tanh()->value());
     }
 
     public function testAcosh()
     {
-        $this->assertSame(1.7627471740391, $this->numeral(3)->acosh()->value());
-        $this->assertSame(1.7627471740391, $this->numeral(3.0)->acosh()->value());
+        $this->assertSame(1.762747174039086, $this->numeral(3)->acosh()->value());
+        $this->assertSame(1.762747174039086, $this->numeral(3.0)->acosh()->value());
     }
 
     public function testAsinh()
     {
-        $this->assertSame(1.8184464592321, $this->numeral(3)->asinh()->value());
-        $this->assertSame(1.8184464592321, $this->numeral(3.0)->asinh()->value());
+        $this->assertSame(1.8184464592320668, $this->numeral(3)->asinh()->value());
+        $this->assertSame(1.8184464592320668, $this->numeral(3.0)->asinh()->value());
     }
 
     public function testAtanh()
     {
-        $this->assertSame(1.0986122886681, $this->numeral(0.8)->atanh()->value());
-        $this->assertSame(1.0986122886681, $this->numeral(0.8)->atanh()->value());
+        $this->assertSame(1.0986122886681098, $this->numeral(0.8)->atanh()->value());
+        $this->assertSame(1.0986122886681098, $this->numeral(0.8)->atanh()->value());
     }
 
     public function testGreatestCommonDivisor()
@@ -849,9 +860,9 @@ class SupportNumeralTest extends TestCase
     public function testLowestCommonMultiplier()
     {
         $this->assertSame(6, $this->numeral(3)->lcm(2)->value());
-        $this->assertSame(6, $this->numeral(3.0)->lcm(2)->value());
-        $this->assertSame(6, $this->numeral(3)->lcm(2.0)->value());
-        $this->assertSame(6, $this->numeral(3.0)->lcm(2.0)->value());
+        $this->assertSame(6.0, $this->numeral(3.0)->lcm(2)->value());
+        $this->assertSame(6.0, $this->numeral(3)->lcm(2.0)->value());
+        $this->assertSame(6.0, $this->numeral(3.0)->lcm(2.0)->value());
         $this->assertSame(1, $this->numeral(1)->lcm(1)->value());
         $this->assertSame(2, $this->numeral(1)->lcm(2)->value());
         $this->assertSame(2, $this->numeral(2)->lcm(1)->value());
@@ -860,35 +871,34 @@ class SupportNumeralTest extends TestCase
         $this->assertSame(4, $this->numeral(4)->lcm(2)->value());
         $this->assertSame(6, $this->numeral(2)->lcm(3)->value());
         $this->assertSame(6, $this->numeral(3)->lcm(2)->value());
-        $this->assertSame(6, $this->numeral(3)->lcm(3)->value());
+        $this->assertSame(3, $this->numeral(3)->lcm(3)->value());
         $this->assertSame(6, $this->numeral(3)->lcm(6)->value());
         $this->assertSame(6, $this->numeral(6)->lcm(3)->value());
         $this->assertSame(6, $this->numeral(6)->lcm(6)->value());
         $this->assertSame(12, $this->numeral(3)->lcm(4)->value());
         $this->assertSame(12, $this->numeral(4)->lcm(3)->value());
-        $this->assertSame(12, $this->numeral(4)->lcm(4)->value());
+        $this->assertSame(4, $this->numeral(4)->lcm(4)->value());
         $this->assertSame(12, $this->numeral(4)->lcm(6)->value());
         $this->assertSame(12, $this->numeral(6)->lcm(4)->value());
-        $this->assertSame(12, $this->numeral(6)->lcm(6)->value());
+        $this->assertSame(6, $this->numeral(6)->lcm(6)->value());
         $this->assertSame(15, $this->numeral(3)->lcm(5)->value());
         $this->assertSame(15, $this->numeral(5)->lcm(3)->value());
-        $this->assertSame(15, $this->numeral(5)->lcm(5)->value());
+        $this->assertSame(5, $this->numeral(5)->lcm(5)->value());
     }
 
     public function testFactorial()
     {
-        // repeat the following code for each test case
-        $this->assertSame(1, $this->numeral(0)->factorial());
-        $this->assertSame(1, $this->numeral(1)->factorial());
-        $this->assertSame(2, $this->numeral(2)->factorial());
-        $this->assertSame(6, $this->numeral(3)->factorial());
-        $this->assertSame(24, $this->numeral(4)->factorial());
-        $this->assertSame(120, $this->numeral(5)->factorial());
-        $this->assertSame(720, $this->numeral(6)->factorial());
-        $this->assertSame(5040, $this->numeral(7)->factorial());
-        $this->assertSame(40320, $this->numeral(8)->factorial());
-        $this->assertSame(362880, $this->numeral(9)->factorial());
-        $this->assertSame(3628800, $this->numeral(10)->factorial());
+        $this->assertSame(1, $this->numeral(0)->factorial()->value());
+        $this->assertSame(1, $this->numeral(1)->factorial()->value());
+        $this->assertSame(2, $this->numeral(2)->factorial()->value());
+        $this->assertSame(6, $this->numeral(3)->factorial()->value());
+        $this->assertSame(24, $this->numeral(4)->factorial()->value());
+        $this->assertSame(120, $this->numeral(5)->factorial()->value());
+        $this->assertSame(720, $this->numeral(6)->factorial()->value());
+        $this->assertSame(5040, $this->numeral(7)->factorial()->value());
+        $this->assertSame(40320, $this->numeral(8)->factorial()->value());
+        $this->assertSame(362880, $this->numeral(9)->factorial()->value());
+        $this->assertSame(3628800, $this->numeral(10)->factorial()->value());
     }
 
     public function testCopySign()
@@ -913,14 +923,14 @@ class SupportNumeralTest extends TestCase
     public function testToString()
     {
         $this->assertSame('3', $this->numeral(3)->toString());
-        $this->assertSame('11.0', $this->numeral(11.0)->toString());
+        $this->assertSame('11', $this->numeral(11.0)->toString());
     }
 
     public function testToInt()
     {
-        $this->assertSame(3, $this->numeral(3)->toInt());
-        $this->assertSame(11, $this->numeral(11.0)->toInt());
-        $this->assertSame(-3, $this->numeral(-3)->toInt());
-        $this->assertSame(-11, $this->numeral(-11.0)->toInt());
+        $this->assertSame(3, $this->numeral(3)->toInt()->value());
+        $this->assertSame(11, $this->numeral(11.0)->toInt()->value());
+        $this->assertSame(-3, $this->numeral(-3)->toInt()->value());
+        $this->assertSame(-11, $this->numeral(-11.0)->toInt()->value());
     }
 }

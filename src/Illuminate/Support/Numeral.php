@@ -133,7 +133,7 @@ class Numeral implements BaseStringable
     {
         $result = Number::format($this->value, $precision, $maxPrecision, $locale);
 
-        return $result ? str($result) : false;
+        return $result !== false ? str($result) : false;
     }
 
     /**
@@ -212,7 +212,7 @@ class Numeral implements BaseStringable
     {
         $result = Number::abbreviate($this->value, $precision, $maxPrecision);
 
-        return $result ? str($result) : false;
+        return $result !== false ? str($result) : false;
     }
 
     /**
@@ -227,7 +227,7 @@ class Numeral implements BaseStringable
     {
         $result = Number::forHumans($this->value, $precision, $maxPrecision, $abbreviate);
 
-        return $result ? str($result) : false;
+        return $result !== false ? str($result) : false;
     }
 
     /**
@@ -242,7 +242,7 @@ class Numeral implements BaseStringable
     {
         $result = Number::summarize($number, $precision, $maxPrecision, $units);
 
-        return $result ? str($result) : false;
+        return $result !== false ? str($result) : false;
     }
 
     /**
@@ -670,6 +670,14 @@ class Numeral implements BaseStringable
      */
     public function copySign(int|float|self $from): static
     {
+        if ($this->isNegative()) {
+            if (Number::isPositive($from)) {
+                return new static($this->negate());
+            }
+
+            return new static($this->value);
+        }
+
         return new static($this->value * (Number::of($from)->isNegative() ? -1 : 1));
     }
 
@@ -723,7 +731,7 @@ class Numeral implements BaseStringable
      */
     public function toString(): string
     {
-        return (string) $this->value();
+        return (string) $this->format();
     }
 
     /**
