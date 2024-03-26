@@ -222,6 +222,10 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
             Str::endsWith($size, 'mb') => $value * 1000,
             Str::endsWith($size, 'gb') => $value * 1000000,
             Str::endsWith($size, 'tb') => $value * 1000000000,
+            Str::endsWith($size, 'KiB') => $value * 1,
+            Str::endsWith($size, 'MiB') => $value * 1024,
+            Str::endsWith($size, 'GiB') => $value * 1048576,
+            Str::endsWith($size, 'TiB') => $value * 1073741824,
             default => throw new InvalidArgumentException('Invalid file size suffix.'),
         });
     }
