@@ -28,6 +28,8 @@ class ExceptionHandlerFake implements ExceptionHandler, Fake
 
     /**
      * If the fake should throw exceptions when they are reported.
+     *
+     * @var bool
      */
     protected $throwOnReport = false;
 
