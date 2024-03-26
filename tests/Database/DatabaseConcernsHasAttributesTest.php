@@ -21,6 +21,18 @@ class DatabaseConcernsHasAttributesTest extends TestCase
         $attributes = $instance->getMutatedAttributes();
         $this->assertEquals(['some_attribute'], $attributes);
     }
+
+    public function testWithDynamicRegistration()
+    {
+        $instance = new HasAttributesWithDynamicRegistration([
+            'some_attribute' => new Attribute(function () {
+
+            })
+        ]);
+
+        $attributes = $instance->getMutatedAttributes();
+        $this->assertEquals(['some_attribute'], $attributes);
+    }
 }
 
 class HasAttributesWithoutConstructor
@@ -38,5 +50,15 @@ class HasAttributesWithConstructorArguments extends HasAttributesWithoutConstruc
 {
     public function __construct($someValue)
     {
+    }
+}
+
+class HasAttributesWithDynamicRegistration extends HasAttributesWithoutConstructor
+{
+    public function __construct($attributes)
+    {
+        foreach ($attributes as $name => $attribute) {
+            $this->addDynamicAttributeMutator($name, $attribute);
+        }
     }
 }
