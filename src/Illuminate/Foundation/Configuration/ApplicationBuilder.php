@@ -290,9 +290,7 @@ class ApplicationBuilder
      */
     public function withSchedule(callable $callback)
     {
-        $this->app->afterResolving(ConsoleKernel::class, function (ConsoleKernel $kernel) use ($callback) {
-            Artisan::starting(fn () => $callback($this->app->make(Schedule::class)));
-        });
+        Artisan::starting(fn () => $callback($this->app->make(Schedule::class)));
 
         return $this;
     }
