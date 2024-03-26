@@ -1628,3 +1628,4 @@ class Application extends Container implements ApplicationContract, CachesConfig
         throw new RuntimeException('Unable to detect application namespace.');
     }
 }
+
