@@ -276,9 +276,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
         $this->singleton(Mix::class);
 
         $this->singleton(PackageManifest::class, fn () => new PackageManifest(
-            new Filesystem,
-            $this->basePath(),
-            $this->getCachedPackagesPath()
+            new Filesystem, $this->basePath(), $this->getCachedPackagesPath()
         ));
     }
 
@@ -306,11 +304,11 @@ class Application extends Container implements ApplicationContract, CachesConfig
         $this->hasBeenBootstrapped = true;
 
         foreach ($bootstrappers as $bootstrapper) {
-            $this['events']->dispatch('bootstrapping: ' . $bootstrapper, [$this]);
+            $this['events']->dispatch('bootstrapping: '.$bootstrapper, [$this]);
 
             $this->make($bootstrapper)->bootstrap($this);
 
-            $this['events']->dispatch('bootstrapped: ' . $bootstrapper, [$this]);
+            $this['events']->dispatch('bootstrapped: '.$bootstrapper, [$this]);
         }
     }
 
@@ -323,8 +321,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
     public function afterLoadingEnvironment(Closure $callback)
     {
         $this->afterBootstrapping(
-            LoadEnvironmentVariables::class,
-            $callback
+            LoadEnvironmentVariables::class, $callback
         );
     }
 
@@ -337,7 +334,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function beforeBootstrapping($bootstrapper, Closure $callback)
     {
-        $this['events']->listen('bootstrapping: ' . $bootstrapper, $callback);
+        $this['events']->listen('bootstrapping: '.$bootstrapper, $callback);
     }
 
     /**
@@ -349,7 +346,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function afterBootstrapping($bootstrapper, Closure $callback)
     {
-        $this['events']->listen('bootstrapped: ' . $bootstrapper, $callback);
+        $this['events']->listen('bootstrapped: '.$bootstrapper, $callback);
     }
 
     /**
@@ -394,14 +391,14 @@ class Application extends Container implements ApplicationContract, CachesConfig
 
         $this->useBootstrapPath(value(function () {
             return is_dir($directory = $this->basePath('.laravel'))
-                ? $directory
-                : $this->basePath('bootstrap');
+                        ? $directory
+                        : $this->basePath('bootstrap');
         }));
 
         $this->useLangPath(value(function () {
             return is_dir($directory = $this->resourcePath('lang'))
-                ? $directory
-                : $this->basePath('lang');
+                        ? $directory
+                        : $this->basePath('lang');
         }));
     }
 
@@ -703,7 +700,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function environmentFilePath()
     {
-        return $this->environmentPath() . DIRECTORY_SEPARATOR . $this->environmentFile();
+        return $this->environmentPath().DIRECTORY_SEPARATOR.$this->environmentFile();
     }
 
     /**
@@ -778,7 +775,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function runningConsoleCommand(...$commands)
     {
-        if (!$this->runningInConsole()) {
+        if (! $this->runningInConsole()) {
             return false;
         }
 
@@ -844,7 +841,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function register($provider, $force = false)
     {
-        if (($registered = $this->getProvider($provider)) && !$force) {
+        if (($registered = $this->getProvider($provider)) && ! $force) {
             return $registered;
         }
 
@@ -959,7 +956,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function loadDeferredProvider($service)
     {
-        if (!$this->isDeferredService($service)) {
+        if (! $this->isDeferredService($service)) {
             return;
         }
 
@@ -968,7 +965,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
         // If the service provider has not already been loaded and registered we can
         // register it with the application and remove the service from this list
         // of deferred services, since it will already be loaded on subsequent.
-        if (!isset($this->loadedProviders[$provider])) {
+        if (! isset($this->loadedProviders[$provider])) {
             $this->registerDeferredProvider($provider, $service);
         }
     }
@@ -991,7 +988,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
 
         $this->register($instance = new $provider($this));
 
-        if (!$this->isBooted()) {
+        if (! $this->isBooted()) {
             $this->booting(function () use ($instance) {
                 $this->bootProvider($instance);
             });
@@ -1035,7 +1032,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     protected function loadDeferredProviderIfNeeded($abstract)
     {
-        if ($this->isDeferredService($abstract) && !isset($this->instances[$abstract])) {
+        if ($this->isDeferredService($abstract) && ! isset($this->instances[$abstract])) {
             $this->loadDeferredProvider($abstract);
         }
     }
@@ -1199,7 +1196,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
     public function shouldSkipMiddleware()
     {
         return $this->bound('middleware.disable') &&
-            $this->make('middleware.disable') === true;
+               $this->make('middleware.disable') === true;
     }
 
     /**
@@ -1296,8 +1293,8 @@ class Application extends Container implements ApplicationContract, CachesConfig
         }
 
         return Str::startsWith($env, $this->absoluteCachePathPrefixes)
-            ? $env
-            : $this->basePath($env);
+                ? $env
+                : $this->basePath($env);
     }
 
     /**
@@ -1614,7 +1611,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function getNamespace()
     {
-        if (!is_null($this->namespace)) {
+        if (! is_null($this->namespace)) {
             return $this->namespace;
         }
 
