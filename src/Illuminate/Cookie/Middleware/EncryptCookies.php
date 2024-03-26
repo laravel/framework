@@ -136,7 +136,7 @@ class EncryptCookies
             }
 
             $response->headers->setCookie($this->duplicate(
-                $cookie, $this->encrypter->encrypt($cookie->getValue(), static::serialized($cookie->getName()))
+                $cookie, $this->encrypter->encrypt($cookie->getValue() ?? '', static::serialized($cookie->getName()))
             ));
         }
 
