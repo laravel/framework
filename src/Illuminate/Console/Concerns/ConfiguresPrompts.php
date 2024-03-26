@@ -64,8 +64,8 @@ trait ConfiguresPrompts
             }
 
             return $this->promptUntilValid(
-                fn () => collect($this->components->choice($prompt->label, ['' => 'None', ...$prompt->options], 'None', multiple: true))
-                    ->reject('')
+                fn () => collect($this->components->choice($prompt->label, ['none' => 'None', ...$prompt->options], 'none', multiple: true))
+                    ->reject('none')
                     ->all(),
                 $prompt->required,
                 $prompt->validate
@@ -104,8 +104,8 @@ trait ConfiguresPrompts
                             ->all();
                     }
 
-                    return collect($this->components->choice($prompt->label, ['' => 'None', ...$options], '', multiple: true))
-                        ->reject('')
+                    return collect($this->components->choice($prompt->label, ['none' => 'None', ...$options], 'none', multiple: true))
+                        ->reject('none')
                         ->values()
                         ->all();
                 }
