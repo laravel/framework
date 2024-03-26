@@ -2358,9 +2358,8 @@ trait HasAttributes
     /**
      * Add the given dynamic attribute mutator.
      *
-     * @param string $name
-     * @param Attribute $attribute
-     *
+     * @param  string  $name
+     * @param  Attribute  $attribute
      * @return void
      */
     public static function addDynamicAttributeMutator($name, $attribute)
@@ -2381,8 +2380,7 @@ trait HasAttributes
     /**
      * Returns the marked attribute for the given attribute name.
      *
-     * @param string $name
-     *
+     * @param  string  $name
      * @return Attribute
      */
     protected function getMarkedAttributeMutator($name)
