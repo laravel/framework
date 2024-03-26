@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Integration\Foundation\Configuration;
 
-use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Console\Scheduling\ScheduleListCommand;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Carbon;
