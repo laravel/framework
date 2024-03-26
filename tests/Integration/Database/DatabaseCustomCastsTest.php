@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Integration\Database;
 
 use Illuminate\Database\Eloquent\Casts\AsArrayObject;
 use Illuminate\Database\Eloquent\Casts\AsCollection;
+use Illuminate\Database\Eloquent\Casts\AsNumeral;
 use Illuminate\Database\Eloquent\Casts\AsStringable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
@@ -137,8 +138,8 @@ class DatabaseCustomCastsTest extends DatabaseTestCase
         $this->assertEmpty($model->array_object_json);
         $this->assertEmpty($model->collection);
         $this->assertSame('', (string) $model->stringable);
-        $this->assertSame(0, $model->numeral_int->value());
-        $this->assertSame(0.0, $model->numeral_float->value());
+        $this->assertNull($model->numeral_int);
+        $this->assertNull($model->numeral_float);
 
         $model->array_object = ['name' => 'John'];
         $model->array_object['name'] = 'Taylor';
@@ -189,6 +190,8 @@ class TestEloquentModelWithCustomCasts extends Model
         'array_object_json' => AsArrayObject::class,
         'collection' => AsCollection::class,
         'stringable' => AsStringable::class,
+        'numeral_int' => AsNumeral::class,
+        'numeral_float' => AsNumeral::class,
         'password' => 'hashed',
     ];
 }
@@ -212,5 +215,7 @@ class TestEloquentModelWithCustomCastsNullable extends Model
         'array_object_json' => AsArrayObject::class,
         'collection' => AsCollection::class,
         'stringable' => AsStringable::class,
+        'numeral_int' => AsNumeral::class,
+        'numeral_float' => AsNumeral::class,
     ];
 }
