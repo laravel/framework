@@ -725,11 +725,11 @@ class SupportHelpersTest extends TestCase
 
         $numAccessor = num();
         $this->assertTrue((new ReflectionClass($numAccessor))->isAnonymous());
-        $this->assertSame($numAccessor->add(10, 5), 15);
+        $this->assertSame(9, $numAccessor->len(100000000));
 
         $numAccessor = num();
         $this->assertTrue((new ReflectionClass($numAccessor))->isAnonymous());
-        $this->assertSame($numAccessor->value(), 0);
+        $this->assertSame(0, $numAccessor->value());
     }
 
     public function testTap()

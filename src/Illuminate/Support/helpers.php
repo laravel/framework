@@ -343,7 +343,7 @@ if (! function_exists('num')) {
             return new class {
                 public function __call($method, $parameters)
                 {
-                    return Numeral::$method(...$parameters);
+                    return Number::$method(...$parameters);
                 }
 
                 public function value()
