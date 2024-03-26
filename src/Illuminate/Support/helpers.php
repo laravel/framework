@@ -340,7 +340,8 @@ if (! function_exists('num')) {
     function num($number = null)
     {
         if (func_num_args() === 0) {
-            return new class {
+            return new class
+            {
                 public function __call($method, $parameters)
                 {
                     return Number::$method(...$parameters);

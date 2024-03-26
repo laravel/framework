@@ -322,7 +322,7 @@ class Number
      * @param  array  $units
      * @return string|false
      */
-    protected static function summarize(int|float $number, int $precision = 0, ?int $maxPrecision = null, array $units = [])
+    public static function summarize(int|float $number, int $precision = 0, ?int $maxPrecision = null, array $units = [])
     {
         if (empty($units)) {
             $units = [
@@ -364,14 +364,14 @@ class Number
     }
 
     /**
-     * Counts the length of a numeral
+     * Counts the length of a numeral.
      *
-     * @param $value
+     * @param  $value
      * @return int|null
      */
     public static function len($value): ?int
     {
-        if(self::isNumeric($value) === false) {
+        if (self::isNumeric($value) === false) {
             return null;
         }
 
@@ -379,7 +379,7 @@ class Number
     }
 
     /**
-     * Returns a random number using the Randomizer class from PHP
+     * Returns a random number using the Randomizer class from PHP.
      */
     public static function random(): Numeral
     {
@@ -387,7 +387,7 @@ class Number
     }
 
     /**
-     * Returns a random number between the given min and max values
+     * Returns a random number between the given min and max values.
      */
     public static function randomBetween(int $min, int $max): Numeral
     {

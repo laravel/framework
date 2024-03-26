@@ -18,7 +18,7 @@ class Numeral implements BaseStringable
     /**
      * Create a new numeral instance.
      *
-     * @param $value
+     * @param  $value
      */
     public function __construct($value = 0)
     {
@@ -438,7 +438,7 @@ class Numeral implements BaseStringable
      */
     public function cbrt(): self
     {
-        return new static($this->value ** (1/3));
+        return new static($this->value ** (1 / 3));
     }
 
     /**
