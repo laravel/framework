@@ -34,7 +34,7 @@ class ExceptionHandlerFake implements ExceptionHandler, Fake
     protected $throwOnReport = false;
 
     /**
-     * Create a new mail fake.
+     * Create a new exception handler fake.
      *
      * @param  \Illuminate\Contracts\Debug\ExceptionHandler  $handler
      * @param  array<int, class-string<\Throwable>>  $exceptions
