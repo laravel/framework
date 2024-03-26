@@ -26,8 +26,7 @@ class DatabaseConcernsHasAttributesTest extends TestCase
     {
         $instance = new HasAttributesWithDynamicRegistration([
             'some_attribute' => new Attribute(function () {
-
-            })
+            }),
         ]);
 
         $attributes = $instance->getMutatedAttributes();
