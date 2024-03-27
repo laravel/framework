@@ -16,7 +16,7 @@ trait InteractsWithConsole
     public $mockConsoleOutput = true;
 
     /**
-     * Indicates if the command is expected to output anything or not.
+     * Indicates if the command is expected to output anything.
      *
      * @var bool|null
      */
