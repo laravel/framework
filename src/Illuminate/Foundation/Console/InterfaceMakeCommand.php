@@ -35,7 +35,7 @@ class InterfaceMakeCommand extends GeneratorCommand
      *
      * @return string
      */
-    protected function getStub()
+    protected function getStub(): string
     {
         return __DIR__.'/stubs/interface.stub';
     }
@@ -46,9 +46,9 @@ class InterfaceMakeCommand extends GeneratorCommand
      * @param  string  $rootNamespace
      * @return string
      */
-    protected function getDefaultNamespace($rootNamespace)
+    protected function getDefaultNamespace($rootNamespace): string
     {
-        return $rootNamespace;
+        return $rootNamespace.'\\Interfaces';
     }
 
     /**
@@ -56,7 +56,7 @@ class InterfaceMakeCommand extends GeneratorCommand
      *
      * @return array
      */
-    protected function getOptions()
+    protected function getOptions(): array
     {
         return [
             ['force', 'f', InputOption::VALUE_NONE, 'Create the interface even if the interface already exists'],
