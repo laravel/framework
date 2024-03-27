@@ -49,8 +49,8 @@ class NullSessionHandler implements SessionHandlerInterface
     /**
      * {@inheritdoc}
      */
-    public function gc($lifetime): bool
+    public function gc($lifetime): int
     {
-        return true;
+        return 0;
     }
 }
