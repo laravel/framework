@@ -170,7 +170,7 @@ class Vite implements Htmlable
     /**
      * Resolve asset paths using the provided resolver.
      *
-     * @param  callable|null  $urlResolver
+     * @param  callable|null  $resolver
      * @return $this
      */
     public function createAssetPathsUsing($resolver)
