@@ -132,21 +132,21 @@ if (! function_exists('ensure')) {
     /**
      * Ensure that the value is of the expected type.
      *
-     * @template TEnsureOfType
+     * @template TEnsureOfClass
      *
-     * @param  class-string<TEnsureOfType>  $type
-     * @return TEnsureOfType
+     * @param  class-string<TEnsureOfClass>  $type
+     * @return TEnsureOfClass
      *
      * @throws \UnexpectedValueException
      */
-    function ensure(mixed $value, string $type): mixed
+    function ensure(mixed $value, string $class): mixed
     {
-        if ($value instanceof $type) {
+        if ($value instanceof $class) {
             return $value;
         }
 
         throw new UnexpectedValueException(
-            sprintf('Expected value of type %s, %s given', $type, get_debug_type($value))
+            sprintf('Expected value of class %s, %s given', $class, get_debug_type($value))
         );
     }
 }

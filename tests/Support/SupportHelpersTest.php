@@ -1157,7 +1157,7 @@ class SupportHelpersTest extends TestCase
         $this->assertSame($stringable, ensure($stringable, Stringable::class));
 
         $this->expectException(UnexpectedValueException::class);
-        $this->expectExceptionMessage('Expected value of type Illuminate\Support\Stringable, Illuminate\Support\Collection given');
+        $this->expectExceptionMessage('Expected value of class Illuminate\Support\Stringable, Illuminate\Support\Collection given');
         ensure(collect(), Stringable::class);
     }
 
