@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Tests\Database\Fixtures\Enums\Bar;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
@@ -85,6 +86,16 @@ class DatabaseEloquentBelongsToTest extends TestCase
         $relation->addEagerConstraints($models);
     }
 
+    public function testIdsInEagerConstraintsCanBeBackedEnum()
+    {
+        $relation = $this->getRelation();
+        $relation->getRelated()->shouldReceive('getKeyName')->andReturn('id');
+        $relation->getRelated()->shouldReceive('getKeyType')->andReturn('int');
+        $relation->getQuery()->shouldReceive('whereIntegerInRaw')->once()->with('relation.id', [5, 'foreign.value']);
+        $models = [new EloquentBelongsToModelStub, new EloquentBelongsToModelStubWithBackedEnumCast];
+        $relation->addEagerConstraints($models);
+    }
+
     public function testRelationIsProperlyInitialized()
     {
         $relation = $this->getRelation();
@@ -119,6 +130,15 @@ class DatabaseEloquentBelongsToTest extends TestCase
             }
         };
 
+        $result4 = new class extends Model
+        {
+            protected $casts = [
+                'id' => Bar::class,
+            ];
+
+            protected $attributes = ['id' => 5];
+        };
+
         $model1 = new EloquentBelongsToModelStub;
         $model1->foreign_key = 1;
         $model2 = new EloquentBelongsToModelStub;
@@ -131,11 +151,18 @@ class DatabaseEloquentBelongsToTest extends TestCase
                 return '3';
             }
         };
-        $models = $relation->match([$model1, $model2, $model3], new Collection([$result1, $result2, $result3]), 'foo');
+        $model4 = new EloquentBelongsToModelStub;
+        $model4->foreign_key = 5;
+        $models = $relation->match(
+            [$model1, $model2, $model3, $model4],
+            new Collection([$result1, $result2, $result3, $result4]),
+            'foo'
+        );
 
         $this->assertEquals(1, $models[0]->foo->getAttribute('id'));
         $this->assertEquals(2, $models[1]->foo->getAttribute('id'));
         $this->assertSame('3', (string) $models[2]->foo->getAttribute('id'));
+        $this->assertEquals(5, $models[3]->foo->getAttribute('id')->value);
     }
 
     public function testAssociateMethodSetsForeignKeyOnModel()
@@ -402,4 +429,15 @@ class EloquentBelongsToModelStubWithZeroId extends Model
 class MissingEloquentBelongsToModelStub extends Model
 {
     public $foreign_key;
+}
+
+class EloquentBelongsToModelStubWithBackedEnumCast extends Model
+{
+    protected $casts = [
+        'foreign_key' => Bar::class,
+    ];
+
+    public $attributes = [
+        'foreign_key' => 5,
+    ];
 }

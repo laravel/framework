@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Eloquent\Relations;
 
+use BackedEnum;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
@@ -375,7 +376,9 @@ class BelongsTo extends Relation
      */
     protected function getForeignKeyFrom(Model $model)
     {
-        return $model->{$this->foreignKey};
+        $foreignKey = $model->{$this->foreignKey};
+
+        return $foreignKey instanceof BackedEnum ? $foreignKey->value : $foreignKey;
     }
 
     /**
