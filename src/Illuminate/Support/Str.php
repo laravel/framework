@@ -1427,6 +1427,24 @@ class Str
         return trim($value, $charlist);
     }
 
+    public static function ltrim($value, $charlist = null)
+    {
+        if ($charlist === null) {
+            return preg_replace('~^[\s\x{FEFF}\x{200B}]+~u', '', $value);
+        }
+
+        return ltrim($value, $charlist);
+    }
+
+    public static function rtrim($value, $charlist = null)
+    {
+        if ($charlist === null) {
+            return preg_replace('~[\s\x{FEFF}\x{200B}]+$~u', '', $value);
+        }
+
+        return rtrim($value, $charlist);
+    }
+
     /**
      * Remove all "extra" blank space from the given string.
      *
