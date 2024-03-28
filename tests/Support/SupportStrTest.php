@@ -1374,6 +1374,28 @@ class SupportStrTest extends TestCase
         );
     }
 
+    public function testPasswordCreationCustomLetters()
+    {
+        Str::createPasswordsUsingLetters(['a', 'b', 'c']);
+        $this->assertSame(1, preg_match('/^[abcABC]{32}$/', Str::password(32, true, false, false, false)));
+
+        Str::createPasswordsUsingLowercaseLetters(['f', 'o', 'o']);
+        Str::createPasswordsUsingUppercaseLetters(['B', 'A', 'R']);
+        $this->assertSame(1, preg_match('/^[fooBAR]{32}$/', Str::password(32, true, false, false, false)));
+    }
+
+    public function testPasswordCreationCustomNumbers()
+    {
+        Str::createPasswordsUsingNumbers(['1', '2', '3']);
+        $this->assertSame(1, preg_match('/^[123]{32}$/', Str::password(32, false, true, false, false)));
+    }
+
+    public function testPasswordCreationCustomSymbols()
+    {
+        Str::createPasswordsUsingSymbols(['(', '*', ')']);
+        $this->assertSame(1, preg_match('/^[()*]{32}$/', Str::password(32, false, false, true, false)));
+    }
+
     public function testToBase64()
     {
         $this->assertSame(base64_encode('foo'), Str::toBase64('foo'));
