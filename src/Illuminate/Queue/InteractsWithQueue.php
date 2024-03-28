@@ -95,6 +95,23 @@ trait InteractsWithQueue
     }
 
     /**
+     * Assert that the job was not deleted from the queue nor was manually failed nor was released back to queue.
+     *
+     * @return $this
+     */
+    public function assertFinished()
+    {
+        $this->ensureQueueInteractionsHaveBeenFaked();
+
+        PHPUnit::assertTrue(
+            ! $this->job->isDeleted() && ! $this->job->hasFailed() && $this->job->isReleased(),
+            'Job was expected to be finished, but was not.'
+        );
+
+        return $this;
+    }
+
+    /**
      * Assert that the job was deleted from the queue.
      *
      * @return $this
