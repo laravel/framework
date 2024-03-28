@@ -288,6 +288,38 @@ if (! function_exists('config_path')) {
     }
 }
 
+if (! function_exists('context')) {
+    /**
+     * Get / set the specified context value.
+     *
+     * @param  array|string|null  $key
+     * @return mixed|\Illuminate\Log\Context\Repository
+     *
+     * @throws \InvalidArgumentException
+     */
+    function context($key)
+    {
+        $context = app(\Illuminate\Log\Context\Repository::class);
+
+        if (is_null($key)) {
+            return $context;
+        }
+
+        if (is_array($key)) {
+
+            if (count($key) !== 1) {
+                throw new InvalidArgumentException(
+                    'When setting a value in the context, you must pass only one array of key / value pairs.'
+                );
+            }
+
+            return $context->add($key);
+        }
+
+        return $context->get($key);
+    }
+}
+
 if (! function_exists('cookie')) {
     /**
      * Create a new cookie instance.
