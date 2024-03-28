@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation\Configuration;
 
 use Closure;
+use Illuminate\Cache\RateLimiter;
 use Illuminate\Console\Application as Artisan;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Contracts\Console\Kernel as ConsoleKernel;
@@ -240,6 +241,19 @@ class ApplicationBuilder
             }
         });
 
+        return $this;
+    }
+
+    /**
+     * Register the rate limiting providers for the application.
+     *
+     * @param  callable|null  $callback
+     * @return $this
+     */
+    public function withRateLimiting(?callable $callback = null)
+    {
+        $this->app->booted(fn () => $callback($this->app->make(RateLimiter::class)));
+        
         return $this;
     }
 
