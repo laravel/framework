@@ -2690,7 +2690,7 @@ class Builder implements BuilderContract
 
         $this->unions[] = compact('query', 'all');
 
-        $this->addBinding($query->getBindings(), 'union');
+        $this->addUnionBinding($query->getBindings());
 
         return $this;
     }
@@ -3941,6 +3941,36 @@ class Builder implements BuilderContract
             ));
         } else {
             $this->bindings[$type][] = $this->castBinding($value);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Add a union binding to the query.
+     *
+     * @param  mixed  $value
+     * @param  int  $index
+     * @return $this
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function addUnionBinding($value, $index = null)
+    {
+        $unionBindings = [];
+        if (is_array($value)) {
+            $unionBindings = array_values(array_map(
+                [$this, 'castBinding'],
+                $value,
+            ));
+        } else {
+            $unionBindings[] = $this->castBinding($value);
+        }
+
+        if (is_null($index)) {
+            $this->bindings['union'][] = $unionBindings;
+        } else {
+            $this->bindings['union'][$index] = array_merge($this->bindings['union'][$index], $unionBindings);
         }
 
         return $this;
