@@ -357,6 +357,18 @@ class EventsDispatcherTest extends TestCase
         $this->assertSame('baz', $_SERVER['__event.test']);
     }
 
+    public function testClassesWithCustomEmitsWork()
+    {
+        unset($_SERVER['__event.test']);
+        $d = new Dispatcher;
+        $d->listen("event_with_custom_emit", function () {
+            $_SERVER['__event.test'] = 'biz';
+        });
+        $d->dispatch(new EventWithCustomEmit);
+
+        $this->assertSame('biz', $_SERVER['__event.test']);
+    }
+
     public function testClassesWorkWithAnonymousListeners()
     {
         unset($_SERVER['__event.test']);
@@ -626,6 +638,15 @@ class TestListenerInvokey
 class ExampleEvent
 {
     //
+}
+
+class EventWithCustomEmit
+{
+    public function emitAs()
+    {
+        return 'event_with_custom_emit';
+    }
+
 }
 
 interface SomeEventInterface
