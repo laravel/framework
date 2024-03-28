@@ -883,7 +883,11 @@ class BelongsToMany extends Relation
             $models = $builder->eagerLoadRelations($models);
         }
 
-        return $this->related->newCollection($models);
+        $models = $this->related->newCollection($models);
+
+        $this->query->applyAfterQueryCallbacks($models);
+
+        return $models;
     }
 
     /**
