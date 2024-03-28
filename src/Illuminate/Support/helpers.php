@@ -130,11 +130,11 @@ if (! function_exists('e')) {
 
 if (! function_exists('ensure')) {
     /**
-     * Ensure that the value is of the expected type.
+     * Ensure that the value is of the expected class.
      *
      * @template TEnsureOfClass
      *
-     * @param  class-string<TEnsureOfClass>  $type
+     * @param  class-string<TEnsureOfClass>  $class
      * @return TEnsureOfClass
      *
      * @throws \UnexpectedValueException
