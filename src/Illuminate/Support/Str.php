@@ -66,6 +66,48 @@ class Str
     protected static $randomStringFactory;
 
     /**
+     * The lowercase letters that should be used to generate random passwords.
+     *
+     * @var array
+     */
+    protected static array $passwordLettersLowercase = [
+        'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k',
+        'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v',
+        'w', 'x', 'y', 'z',
+    ];
+
+    /**
+     * The uppercase letters that should be used to generate random passwords.
+     *
+     * @var array
+     */
+    protected static array $passwordLettersUppercase = [
+        'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K',
+        'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V',
+        'W', 'X', 'Y', 'Z',
+    ];
+
+    /**
+     * The numbers that should be used to generate random passwords.
+     *
+     * @var array
+     */
+    protected static array $passwordNumbers = [
+        '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+    ];
+
+    /**
+     * The symbols that should be used to generate random passwords.
+     *
+     * @var array
+     */
+    protected static array $passwordSymbols = [
+        '~', '!', '#', '$', '%', '^', '&', '*', '(', ')', '-',
+        '_', '.', ',', '<', '>', '?', '/', '\\', '{', '}', '[',
+        ']', '|', ':', ';',
+    ];
+
+    /**
      * Get a new stringable object from the given string.
      *
      * @param  string  $string
@@ -885,6 +927,62 @@ class Str
     }
 
     /**
+     * Set the letters that will be used when generating passwords.
+     *
+     * @param  array  $letters
+     * @return void
+     */
+    public static function createPasswordsUsingLetters(array $letters)
+    {
+        static::createPasswordsUsingLowercaseLetters(array_map(strtolower(...), $letters));
+        static::createPasswordsUsingUppercaseLetters(array_map(strtoupper(...), $letters));
+    }
+
+    /**
+     * Set the uppercase letters that will be used when generating passwords.
+     *
+     * @param  array  $letters
+     * @return void
+     */
+    public static function createPasswordsUsingUppercaseLetters(array $letters)
+    {
+        static::$passwordLettersUppercase = $letters;
+    }
+
+    /**
+     * Set the lowercase letters that will be used when generating passwords.
+     *
+     * @param  array  $letters
+     * @return void
+     */
+    public static function createPasswordsUsingLowercaseLetters(array $letters)
+    {
+        static::$passwordLettersLowercase = $letters;
+    }
+
+    /**
+     * Set the numbers that will be used when generating passwords.
+     *
+     * @param  array  $numbers
+     * @return void
+     */
+    public static function createPasswordsUsingNumbers(array $numbers)
+    {
+        static::$passwordNumbers = $numbers;
+    }
+
+    /**
+     * Set the symbols that will be used when generating passwords.
+     *
+     * @param  array  $symbols
+     * @return void
+     */
+    public static function createPasswordsUsingSymbols(array $symbols)
+    {
+        static::$passwordSymbols = $symbols;
+    }
+
+    /**
      * Generate a random, secure password.
      *
      * @param  int  $length
@@ -900,20 +998,11 @@ class Str
 
         $options = (new Collection([
             'letters' => $letters === true ? [
-                'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k',
-                'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v',
-                'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G',
-                'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R',
-                'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
+                ...static::$passwordLettersLowercase,
+                ...static::$passwordLettersUppercase,
             ] : null,
-            'numbers' => $numbers === true ? [
-                '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
-            ] : null,
-            'symbols' => $symbols === true ? [
-                '~', '!', '#', '$', '%', '^', '&', '*', '(', ')', '-',
-                '_', '.', ',', '<', '>', '?', '/', '\\', '{', '}', '[',
-                ']', '|', ':', ';',
-            ] : null,
+            'numbers' => $numbers === true ? static::$passwordNumbers : null,
+            'symbols' => $symbols === true ? static::$passwordSymbols : null,
             'spaces' => $spaces === true ? [' '] : null,
         ]))->filter()->each(fn ($c) => $password->push($c[random_int(0, count($c) - 1)])
         )->flatten();
