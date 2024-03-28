@@ -209,6 +209,13 @@ class Builder implements BuilderContract
     public $beforeQueryCallbacks = [];
 
     /**
+     * The callbacks that should be invoked after retrieving data from the database.
+     *
+     * @var array
+     */
+    protected $afterQueryCallbacks = [];
+
+    /**
      * All of the available clause operators.
      *
      * @var string[]
@@ -2873,6 +2880,32 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Register a closure to be invoked after the query is executed.
+     *
+     * @param  \Closure  $callback
+     * @return $this
+     */
+    public function afterQuery(Closure $callback)
+    {
+        $this->afterQueryCallbacks[] = $callback;
+
+        return $this;
+    }
+
+    /**
+     * Invoke the "after query" modification callbacks.
+     *
+     * @param  mixed  $result
+     * @return void
+     */
+    public function applyAfterQueryCallbacks($result)
+    {
+        foreach ($this->afterQueryCallbacks as $afterQueryCallback) {
+            $afterQueryCallback($result);
+        }
+    }
+
+    /**
      * Execute the query as a "select" statement.
      *
      * @param  array|string  $columns
@@ -2884,9 +2917,11 @@ class Builder implements BuilderContract
             return $this->processor->processSelect($this, $this->runSelect());
         }));
 
-        return isset($this->groupLimit)
-            ? $this->withoutGroupLimitKeys($items)
-            : $items;
+        $items = isset($this->groupLimit) ? $this->withoutGroupLimitKeys($items) : $items;
+
+        $this->applyAfterQueryCallbacks($items);
+
+        return $items;
     }
 
     /**
