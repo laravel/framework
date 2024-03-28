@@ -147,15 +147,21 @@ class ExceptionHandlerFake implements ExceptionHandler, Fake
      */
     public function report($e)
     {
-        if ($this->shouldReport($e) && $this->isFakedException($e)) {
-            $this->reported[] = $e;
+        if ($this->isFakedException($e) === false) {
+            $this->handler->report($e);
 
-            if ($this->throwOnReport) {
-                throw $e;
-            }
+            return;
         }
 
-        $this->handler->report($e);
+        if ($this->shouldReport($e) === false) {
+            return;
+        }
+
+        $this->reported[] = $e;
+
+        if ($this->throwOnReport) {
+            throw $e;
+        }
     }
 
     /**
@@ -206,13 +212,13 @@ class ExceptionHandlerFake implements ExceptionHandler, Fake
     }
 
     /**
-     * Throw all of the exceptions that have been reported.
+     * Throw the first reported exception.
      *
      * @return $this
      *
      * @throws \Throwable
      */
-    public function throwReported()
+    public function throwFirstReported()
     {
         foreach ($this->reported as $e) {
             throw $e;

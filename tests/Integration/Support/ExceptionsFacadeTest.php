@@ -380,6 +380,19 @@ class ExceptionsFacadeTest extends TestCase
         report(new Exception('Test exception'));
     }
 
+    public function testAppReportablesAreNotCalledIfExceptionIsNotFaked()
+    {
+        app(ExceptionHandler::class)->reportable(function (Throwable $e) {
+            throw new InvalidArgumentException($e->getMessage());
+        });
+
+        Exceptions::fake([RuntimeException::class, Exception::class]);
+
+        report(new Exception('My exception message'));
+
+        Exceptions::assertReported(Exception::class);
+    }
+
     public function testThrowOnReportLeaveAppReportablesUntouched()
     {
         app(ExceptionHandler::class)->reportable(function (Throwable $e) {
@@ -403,7 +416,7 @@ class ExceptionsFacadeTest extends TestCase
 
         report(new Exception('Test exception'));
 
-        Exceptions::throwReported();
+        Exceptions::throwFirstReported();
     }
 
     public function testThrowReportedExceptionsWithFakedExceptions()
@@ -416,20 +429,20 @@ class ExceptionsFacadeTest extends TestCase
         report(new RuntimeException('Test exception'));
         report(new InvalidArgumentException('Test exception'));
 
-        Exceptions::throwReported();
+        Exceptions::throwFirstReported();
     }
 
     public function testThrowReportedExceptionsWhenThereIsNone()
     {
         Exceptions::fake();
 
-        Exceptions::throwReported();
+        Exceptions::throwFirstReported();
 
         Exceptions::fake([InvalidArgumentException::class]);
 
         report(new RuntimeException('Test exception'));
 
-        Exceptions::throwReported();
+        Exceptions::throwFirstReported();
 
         $this->doesNotPerformAssertions();
     }
