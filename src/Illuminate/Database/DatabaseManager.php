@@ -81,9 +81,9 @@ class DatabaseManager implements ConnectionResolverInterface
      */
     public function connection($name = null)
     {
-        [$database, $type] = $this->parseConnectionName($name);
+        $name = $name ?: $this->getDefaultConnection();
 
-        $name = $name ?: $database;
+        [$database, $type] = $this->parseConnectionName($name);
 
         // If we haven't created this connection, we'll create it based on the config
         // provided in the application. Once we've created the connections we will
@@ -134,8 +134,6 @@ class DatabaseManager implements ConnectionResolverInterface
      */
     protected function parseConnectionName($name)
     {
-        $name = $name ?: $this->getDefaultConnection();
-
         return Str::endsWith($name, ['::read', '::write'])
                             ? explode('::', $name, 2) : [$name, null];
     }
