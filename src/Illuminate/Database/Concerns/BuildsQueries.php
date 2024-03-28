@@ -379,11 +379,11 @@ trait BuildsQueries
         $orders = $this->ensureOrderForCursorPagination(! is_null($cursor) && $cursor->pointsToPreviousItems());
 
         if (! is_null($cursor)) {
-            $addCursorConditions = function (self $builder, $previousColumn, $i) use (&$addCursorConditions, $cursor, $orders) {
+            $addCursorConditions = function (self $builder, $previousColumn, $originalColumn, $i) use (&$addCursorConditions, $cursor, $orders) {
                 $unionBuilders = isset($builder->unions) ? collect($builder->unions)->pluck('query') : collect();
 
                 if (! is_null($previousColumn)) {
-                    $originalColumn = $this->getOriginalColumnNameForCursorPagination($this, $previousColumn);
+                    $originalColumn ??= $this->getOriginalColumnNameForCursorPagination($this, $previousColumn);
 
                     $builder->where(
                         Str::contains($originalColumn, ['(', ')']) ? new Expression($originalColumn) : $originalColumn,
@@ -393,7 +393,7 @@ trait BuildsQueries
 
                     $unionBuilders->each(function ($unionBuilder) use ($previousColumn, $cursor) {
                         $unionBuilder->where(
-                            $this->getOriginalColumnNameForCursorPagination($this, $previousColumn),
+                            $this->getOriginalColumnNameForCursorPagination($unionBuilder, $previousColumn),
                             '=',
                             $cursor->parameter($previousColumn)
                         );
@@ -414,22 +414,23 @@ trait BuildsQueries
                     );
 
                     if ($i < $orders->count() - 1) {
-                        $builder->orWhere(function (self $builder) use ($addCursorConditions, $column, $i) {
-                            $addCursorConditions($builder, $column, $i + 1);
+                        $builder->orWhere(function (self $builder) use ($addCursorConditions, $column, $originalColumn, $i) {
+                            $addCursorConditions($builder, $column, $originalColumn, $i + 1);
                         });
                     }
 
                     $unionBuilders->each(function ($unionBuilder) use ($column, $direction, $cursor, $i, $orders, $addCursorConditions) {
                         $unionBuilder->where(function ($unionBuilder) use ($column, $direction, $cursor, $i, $orders, $addCursorConditions) {
+                            $originalColumn = $this->getOriginalColumnNameForCursorPagination($unionBuilder, $column);
                             $unionBuilder->where(
-                                $this->getOriginalColumnNameForCursorPagination($this, $column),
+                                $originalColumn,
                                 $direction === 'asc' ? '>' : '<',
                                 $cursor->parameter($column)
                             );
 
                             if ($i < $orders->count() - 1) {
-                                $unionBuilder->orWhere(function (self $builder) use ($addCursorConditions, $column, $i) {
-                                    $addCursorConditions($builder, $column, $i + 1);
+                                $unionBuilder->orWhere(function (self $builder) use ($addCursorConditions, $column, $originalColumn, $i) {
+                                    $addCursorConditions($builder, $column, $originalColumn, $i + 1);
                                 });
                             }
 
@@ -439,7 +440,7 @@ trait BuildsQueries
                 });
             };
 
-            $addCursorConditions($this, null, 0);
+            $addCursorConditions($this, null, null, 0);
         }
 
         $this->limit($perPage + 1);
