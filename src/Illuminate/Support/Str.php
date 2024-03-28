@@ -1418,6 +1418,13 @@ class Str
         return static::$snakeCache[$key][$delimiter] = $value;
     }
 
+    /**
+     * Remove all whitespace from both ends of a string.
+     *
+     * @param  string  $value
+     * @param  string|null  $charlist
+     * @return string
+     */
     public static function trim($value, $charlist = null)
     {
         if ($charlist === null) {
@@ -1427,6 +1434,13 @@ class Str
         return trim($value, $charlist);
     }
 
+    /**
+     * Remove all whitespace from the beginning of a string.
+     *
+     * @param  string  $value
+     * @param  string|null  $charlist
+     * @return string
+     */
     public static function ltrim($value, $charlist = null)
     {
         if ($charlist === null) {
@@ -1436,6 +1450,13 @@ class Str
         return ltrim($value, $charlist);
     }
 
+    /**
+     * Remove all whitespace from the end of a string.
+     *
+     * @param  string  $value
+     * @param  string|null  $charlist
+     * @return string
+     */
     public static function rtrim($value, $charlist = null)
     {
         if ($charlist === null) {
