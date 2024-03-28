@@ -227,7 +227,7 @@ class ApplicationBuilder
                 ->redirectGuestsTo(fn () => route('login'));
 
             if (! is_null($callback)) {
-                $callback($middleware);
+                $callback($middleware, $this->app);
             }
 
             $this->pageMiddleware = $middleware->getPageMiddleware();
@@ -285,12 +285,12 @@ class ApplicationBuilder
     /**
      * Register the scheduled tasks for the application.
      *
-     * @param  callable(Schedule $schedule): void  $callback
+     * @param  callable(Schedule $schedule, Application $app): void  $callback
      * @return $this
      */
     public function withSchedule(callable $callback)
     {
-        Artisan::starting(fn () => $callback($this->app->make(Schedule::class)));
+        Artisan::starting(fn () => $callback($this->app->make(Schedule::class), $this->app));
 
         return $this;
     }
@@ -312,7 +312,7 @@ class ApplicationBuilder
 
         $this->app->afterResolving(
             \Illuminate\Foundation\Exceptions\Handler::class,
-            fn ($handler) => $using(new Exceptions($handler)),
+            fn ($handler) => $using(new Exceptions($handler), $this->app),
         );
 
         return $this;
