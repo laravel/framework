@@ -476,8 +476,10 @@ trait QueriesRelationships
         }
 
         return $this->where(function ($query) use ($relation, $model) {
+            $ownerKeyName = $relation->getOwnerKeyName() ?? $model->getKeyName();
+
             $query->where($relation->getMorphType(), $model->getMorphClass())
-                ->where($relation->getForeignKeyName(), $model->getKey());
+                ->where($relation->getForeignKeyName(), $model->{$ownerKeyName});
         }, null, null, $boolean);
     }
 
@@ -505,8 +507,10 @@ trait QueriesRelationships
         }
 
         return $this->whereNot(function ($query) use ($relation, $model) {
+            $ownerKeyName = $relation->getOwnerKeyName() ?? $model->getKeyName();
+
             $query->where($relation->getMorphType(), '<=>', $model->getMorphClass())
-                ->where($relation->getForeignKeyName(), '<=>', $model->getKey());
+                ->where($relation->getForeignKeyName(), '<=>', $model->{$ownerKeyName});
         }, null, null, $boolean);
     }
 
