@@ -163,14 +163,14 @@ class ArtisanCommandTest extends TestCase
              ->assertExitCode(0);
     }
 
-    public function test_console_command_that_passes_if_outputs_something()
+    public function test_console_command_that_passes_if_it_outputs_something()
     {
         $this->artisan('contains')
             ->expectsOutput()
             ->assertExitCode(0);
     }
 
-    public function test_console_command_that_passes_if_outputs_is_something_and_is_the_expected_output()
+    public function test_console_command_that_passes_if_it_outputs_something_and_it_is_the_expected_output()
     {
         $this->artisan('contains')
             ->expectsOutput()
@@ -178,7 +178,7 @@ class ArtisanCommandTest extends TestCase
             ->assertExitCode(0);
     }
 
-    public function test_console_command_that_fail_if_doesnt_output_something()
+    public function test_console_command_that_fails_if_doesnt_output_something()
     {
         $this->expectException(InvalidCountException::class);
 
@@ -189,7 +189,7 @@ class ArtisanCommandTest extends TestCase
         m::close();
     }
 
-    public function test_console_command_that_fail_if_doesnt_output_something_and_is_not_the_expected_output()
+    public function test_console_command_that_fails_if_it_doesnt_output_something_and_it_is_not_the_expected_output()
     {
         $this->expectException(AssertionFailedError::class);
 
@@ -201,14 +201,14 @@ class ArtisanCommandTest extends TestCase
         });
     }
 
-    public function test_console_command_that_passes_if_does_not_output_anything()
+    public function test_console_command_that_passes_if_it_does_not_output_anything()
     {
         $this->artisan('exit', ['code' => 0])
             ->doesntExpectOutput()
             ->assertExitCode(0);
     }
 
-    public function test_console_command_that_passes_if_does_not_output_anything_and_is_not_the_expected_output()
+    public function test_console_command_that_passes_if_it_does_not_output_anything_and_it_is_not_the_expected_output()
     {
         $this->artisan('exit', ['code' => 0])
             ->doesntExpectOutput()
@@ -216,7 +216,7 @@ class ArtisanCommandTest extends TestCase
             ->assertExitCode(0);
     }
 
-    public function test_console_command_that_passes_if_expects_output_and_there_is_interactions()
+    public function test_console_command_that_passes_if_it_expects_output_and_there_is_interactions()
     {
         $this->artisan('interactions', ['--no-interaction' => true])
             ->expectsOutput()
@@ -226,7 +226,7 @@ class ArtisanCommandTest extends TestCase
             ->assertExitCode(0);
     }
 
-    public function test_console_command_that_fails_if_doesnt_expect_output_but__there_is_interactions()
+    public function test_console_command_that_fails_if_it_doesnt_expect_output_but_there_is_interactions()
     {
         $this->expectException(InvalidCountException::class);
 
@@ -240,7 +240,7 @@ class ArtisanCommandTest extends TestCase
         m::close();
     }
 
-    public function test_console_command_that_fails_if_doesnt_expect_output_but_outputs_something()
+    public function test_console_command_that_fails_if_it_doesnt_expect_output_but_outputs_something()
     {
         $this->expectException(InvalidCountException::class);
 
