@@ -306,7 +306,6 @@ if (! function_exists('context')) {
         }
 
         if (is_array($key)) {
-
             if (count($key) !== 1) {
                 throw new InvalidArgumentException(
                     'When setting a value in the context, you must pass only one array of key / value pairs.'
