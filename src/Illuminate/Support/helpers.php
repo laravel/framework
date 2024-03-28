@@ -10,6 +10,7 @@ use Illuminate\Support\Onceable;
 use Illuminate\Support\Optional;
 use Illuminate\Support\Sleep;
 use Illuminate\Support\Str;
+use UnexpectedValueException;
 
 if (! function_exists('append_config')) {
     /**
@@ -124,6 +125,29 @@ if (! function_exists('e')) {
         }
 
         return htmlspecialchars($value ?? '', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8', $doubleEncode);
+    }
+}
+
+if (! function_exists('ensure')) {
+    /**
+     * Ensure that the value is of the expected type.
+     *
+     * @template TEnsureOfType
+     *
+     * @param  class-string<TEnsureOfType>  $type
+     * @return TEnsureOfType
+     *
+     * @throws \UnexpectedValueException
+     */
+    function ensure(mixed $value, string $type): mixed
+    {
+        if ($value instanceof $type) {
+            return $value;
+        }
+
+        throw new UnexpectedValueException(
+            sprintf('Expected value of type %s, %s given', $type, get_debug_type($value))
+        );
     }
 }
 

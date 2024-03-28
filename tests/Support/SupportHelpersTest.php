@@ -21,6 +21,7 @@ use ReflectionClass;
 use RuntimeException;
 use stdClass;
 use Traversable;
+use UnexpectedValueException;
 
 class SupportHelpersTest extends TestCase
 {
@@ -1148,6 +1149,16 @@ class SupportHelpersTest extends TestCase
         $this->assertEquals(1, literal(1));
         $this->assertEquals('taylor', literal('taylor'));
         $this->assertEquals((object) ['name' => 'Taylor', 'role' => 'Developer'], literal(name: 'Taylor', role: 'Developer'));
+    }
+
+    public function testEnsure(): void
+    {
+        $stringable = str('string-value');
+        $this->assertSame($stringable, ensure($stringable, Stringable::class));
+
+        $this->expectException(UnexpectedValueException::class);
+        $this->expectExceptionMessage('Expected value of type Illuminate\Support\Stringable, Illuminate\Support\Collection given');
+        ensure(collect(), Stringable::class);
     }
 
     public static function providesPregReplaceArrayData()
