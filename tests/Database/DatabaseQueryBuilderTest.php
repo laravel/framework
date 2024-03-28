@@ -5275,7 +5275,7 @@ SQL;
                 '(select "id", "start_time" as "created_at", \'video\' as type from "videos" where ("start_time" > ?)) union (select "id", "created_at", \'news\' as type from "news" where ("start_time" > ?)) order by "created_at" asc limit 17',
                 $builder->toSql());
             $this->assertEquals([$ts], $builder->bindings['where']);
-            $this->assertEquals([$ts], $builder->bindings['union']);
+            $this->assertEquals([[$ts]], $builder->bindings['union']);
 
             return $results;
         });
@@ -5324,7 +5324,7 @@ SQL;
                 '(select "id", "start_time" as "created_at", \'video\' as type from "videos" where ("start_time" > ?)) union (select "id", "created_at", \'news\' as type from "news" where "extra" = ? and ("start_time" > ?)) union (select "id", "created_at", \'podcast\' as type from "podcasts" where "extra" = ? and ("start_time" > ?)) order by "created_at" asc limit 17',
                 $builder->toSql());
             $this->assertEquals([$ts], $builder->bindings['where']);
-            $this->assertEquals(['first', $ts, 'second', $ts], $builder->bindings['union']);
+            $this->assertEquals([['first', $ts], ['second', $ts]], $builder->bindings['union']);
 
             return $results;
         });
@@ -5371,7 +5371,7 @@ SQL;
                 '(select "id", "is_published", "start_time" as "created_at", \'video\' as type from "videos" where "is_published" = ? and ("start_time" > ?)) union (select "id", "is_published", "created_at", \'news\' as type from "news" where "is_published" = ? and ("start_time" > ?)) order by case when (id = 3 and type="news" then 0 else 1 end), "created_at" asc limit 17',
                 $builder->toSql());
             $this->assertEquals([true, $ts], $builder->bindings['where']);
-            $this->assertEquals([true, $ts], $builder->bindings['union']);
+            $this->assertEquals([[true, $ts]], $builder->bindings['union']);
 
             return $results;
         });
@@ -5418,7 +5418,7 @@ SQL;
                 '(select "id", "start_time" as "created_at", \'video\' as type from "videos" where ("start_time" < ?)) union (select "id", "created_at", \'news\' as type from "news" where ("start_time" < ?)) order by "created_at" desc limit 17',
                 $builder->toSql());
             $this->assertEquals([$ts], $builder->bindings['where']);
-            $this->assertEquals([$ts], $builder->bindings['union']);
+            $this->assertEquals([[$ts]], $builder->bindings['union']);
 
             return $results;
         });
@@ -5465,7 +5465,7 @@ SQL;
                 '(select "id", "start_time" as "created_at", \'video\' as type from "videos" where ("start_time" < ? or ("start_time" = ? and ("id" > ?)))) union (select "id", "created_at", \'news\' as type from "news" where ("start_time" < ? or ("start_time" = ? and ("id" > ?)))) order by "created_at" desc, "id" asc limit 17',
                 $builder->toSql());
             $this->assertEquals([$ts, $ts, 1], $builder->bindings['where']);
-            $this->assertEquals([$ts, $ts, 1], $builder->bindings['union']);
+            $this->assertEquals([[$ts, $ts, 1]], $builder->bindings['union']);
 
             return $results;
         });
