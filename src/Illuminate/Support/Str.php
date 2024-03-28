@@ -1418,6 +1418,15 @@ class Str
         return static::$snakeCache[$key][$delimiter] = $value;
     }
 
+    public static function trim($value, $charlist = null)
+    {
+        if ($charlist === null) {
+            return preg_replace('~^[\s\x{FEFF}\x{200B}]+|[\s\x{FEFF}\x{200B}]+$~u', '', $value);
+        }
+
+        return trim($value, $charlist);
+    }
+
     /**
      * Remove all "extra" blank space from the given string.
      *
@@ -1426,7 +1435,7 @@ class Str
      */
     public static function squish($value)
     {
-        return preg_replace('~(\s|\x{3164}|\x{1160})+~u', ' ', preg_replace('~^[\s\x{FEFF}]+|[\s\x{FEFF}]+$~u', '', $value));
+        return preg_replace('~(\s|\x{3164}|\x{1160})+~u', ' ', static::trim($value));
     }
 
     /**

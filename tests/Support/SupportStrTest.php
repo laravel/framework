@@ -766,6 +766,25 @@ class SupportStrTest extends TestCase
         $this->assertSame('żółtałódka', Str::snake('ŻółtaŁódka'));
     }
 
+    public function testTrim()
+    {
+        $this->assertSame('foo bar', Str::trim('   foo bar   '));
+        $this->assertSame('foo bar', Str::trim('foo bar   '));
+        $this->assertSame('foo bar', Str::trim('   foo bar'));
+        $this->assertSame('foo bar', Str::trim('foo bar'));
+        $this->assertSame(' foo bar ', Str::trim(' foo bar ', ''));
+        $this->assertSame('foo bar', Str::trim(' foo bar ', ' '));
+        $this->assertSame('foo  bar', Str::trim('-foo  bar_', '-_'));
+
+        $this->assertSame('foo    bar', Str::trim(" foo    bar "));
+
+        $this->assertSame('123', Str::trim('   123    '));
+        $this->assertSame('だ', Str::trim('だ'));
+        $this->assertSame('ム', Str::trim('ム'));
+        $this->assertSame('だ', Str::trim('   だ    '));
+        $this->assertSame('ム', Str::trim('   ム    '));
+    }
+
     public function testSquish()
     {
         $this->assertSame('laravel php framework', Str::squish(' laravel   php  framework '));
