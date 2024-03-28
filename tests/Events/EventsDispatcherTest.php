@@ -361,7 +361,7 @@ class EventsDispatcherTest extends TestCase
     {
         unset($_SERVER['__event.test']);
         $d = new Dispatcher;
-        $d->listen("event_with_custom_emit", function () {
+        $d->listen('event_with_custom_emit', function () {
             $_SERVER['__event.test'] = 'biz';
         });
         $d->dispatch(new EventWithCustomEmit);
@@ -646,7 +646,6 @@ class EventWithCustomEmit
     {
         return 'event_with_custom_emit';
     }
-
 }
 
 interface SomeEventInterface
