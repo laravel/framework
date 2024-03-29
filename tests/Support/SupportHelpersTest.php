@@ -1151,14 +1151,38 @@ class SupportHelpersTest extends TestCase
         $this->assertEquals((object) ['name' => 'Taylor', 'role' => 'Developer'], literal(name: 'Taylor', role: 'Developer'));
     }
 
-    public function testEnsure(): void
+    public function testEnsureForScalar(): void
     {
-        $stringable = str('string-value');
-        $this->assertSame($stringable, ensure($stringable, Stringable::class));
+        $this->assertEquals(1, ensure(1, 'int'));
 
         $this->expectException(UnexpectedValueException::class);
-        $this->expectExceptionMessage('Expected value of class Illuminate\Support\Stringable, Illuminate\Support\Collection given');
-        ensure(collect(), Stringable::class);
+        $this->expectExceptionMessage('Expected value of string, but int found');
+        ensure(1, 'string');
+    }
+
+    public function testEnsureForObjects(): void
+    {
+        $obj = new stdClass;
+        $this->assertSame($obj, ensure($obj, stdClass::class));
+
+        $this->expectException(UnexpectedValueException::class);
+        $this->expectExceptionMessage('Expected value of Illuminate\Support\Stringable, but stdClass found');
+        ensure($obj, Stringable::class);
+    }
+
+    public function testEnsureForInheritance(): void
+    {
+        $error = new \Error;
+        $this->assertSame($error, ensure($error, \Throwable::class));
+    }
+
+    public function testEnsureForMultipleTypes(): void
+    {
+        $error = new \Error;
+        $this->assertSame($error, ensure($error, [\Throwable::class, 'int']));
+
+        $this->expectExceptionMessage('Expected value of Throwable, int, but string found');
+        ensure('string', [\Throwable::class, 'int']);
     }
 
     public static function providesPregReplaceArrayData()
