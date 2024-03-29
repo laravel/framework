@@ -4,6 +4,7 @@ use Illuminate\Contracts\Support\DeferringDisplayableValue;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Env;
+use Illuminate\Support\Fluent;
 use Illuminate\Support\HigherOrderTapProxy;
 use Illuminate\Support\Once;
 use Illuminate\Support\Onceable;
@@ -468,5 +469,21 @@ if (! function_exists('with')) {
     function with($value, callable $callback = null)
     {
         return is_null($callback) ? $value : $callback($value);
+    }
+}
+
+if (! function_exists('fluent')) {
+    /**
+     * Create a fluent object from the given value.
+     *
+     * @template TValue
+     * @template TReturn
+     *
+     * @param  \Illuminate\Contracts\Support\Arrayable<TKey, TValue>|iterable<TKey, TValue>|null  $value
+     * @return Fluent<TKey, TValue>
+     */
+    function fluent($value)
+    {
+        return new Fluent($value);
     }
 }
