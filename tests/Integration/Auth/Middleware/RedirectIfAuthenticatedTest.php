@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Integration\Auth\Middleware;
 
 use Illuminate\Auth\Middleware\RedirectIfAuthenticated;
 use Illuminate\Contracts\Routing\Registrar;
+use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Tests\Integration\Auth\Fixtures\AuthenticationTestUser;
 use Orchestra\Testbench\Factories\UserFactory;
@@ -22,7 +23,7 @@ class RedirectIfAuthenticatedTest extends TestCase
 
         $this->router->get('/login', function () {
             return response('Login Form');
-        })->middleware(RedirectIfAuthenticated::class);
+        })->middleware(RedirectIfAuthenticated::class.':web');
 
         UserFactory::new()->create();
 
@@ -97,5 +98,20 @@ class RedirectIfAuthenticatedTest extends TestCase
 
         $response->assertOk();
         $response->assertSee('Login Form');
+    }
+
+    public function testRedirectToCallback()
+    {
+        $this->router->get('/custom', function () {
+            return response('Custom');
+        })->name('custom');
+
+        RedirectIfAuthenticated::redirectUsing(function (Request $request, ?string $guard): string {
+            return $guard === 'web' ? route('custom') : '/home';
+        });
+
+        $response = $this->actingAs($this->user)->get('/login');
+
+        $response->assertRedirect('/custom');
     }
 }
