@@ -132,4 +132,94 @@ class TrimStringsTest extends TestCase
             $this->assertEquals('This title contains a combination of zero-width non-breakable space and zero-width spaces characters at the beginning and the end', $req->title);
         });
     }
+
+    /**
+     * Test leading invisible character are trimmed [U+200E].
+     */
+    public function test_leading_invisible_characters_are_trimmed()
+    {
+        $request = new Request;
+
+        $request->merge([
+            'title' => '‎This title contains a invisible character at the beginning',
+        ]);
+
+        $middleware = new TrimStrings;
+
+        $middleware->handle($request, function ($req) {
+            $this->assertEquals('This title contains a invisible character at the beginning', $req->title);
+        });
+    }
+
+    /**
+     * Test trailing invisible character are trimmed [U+200E].
+     */
+    public function test_trailing_invisible_characters_are_trimmed()
+    {
+        $request = new Request;
+
+        $request->merge([
+            'title' => 'This title contains a invisible character at the end‎',
+        ]);
+
+        $middleware = new TrimStrings;
+
+        $middleware->handle($request, function ($req) {
+            $this->assertEquals('This title contains a invisible character at the end', $req->title);
+        });
+    }
+
+    /**
+     * Test leading multiple invisible character are trimmed [U+200E].
+     */
+    public function test_leading_multiple_invisible_characters_are_trimmed()
+    {
+        $request = new Request;
+
+        $request->merge([
+            'title' => '‎‎This title contains a invisible character at the beginning',
+        ]);
+
+        $middleware = new TrimStrings;
+
+        $middleware->handle($request, function ($req) {
+            $this->assertEquals('This title contains a invisible character at the beginning', $req->title);
+        });
+    }
+
+    /**
+     * Test trailing multiple invisible character are trimmed [U+200E].
+     */
+    public function test_trailing_multiple_invisible_characters_are_trimmed()
+    {
+        $request = new Request;
+
+        $request->merge([
+            'title' => 'This title contains a invisible character at the end‎‎',
+        ]);
+
+        $middleware = new TrimStrings;
+
+        $middleware->handle($request, function ($req) {
+            $this->assertEquals('This title contains a invisible character at the end', $req->title);
+        });
+    }
+
+    /**
+     * Test combination of leading and trailing multiple invisible characters are trimmed [U+200E].
+     */
+    public function test_combination_of_leading_and_trailing_multiple_invisible_characters_are_trimmed()
+    {
+        $request = new Request;
+
+        $request->merge([
+            'title' => '‎‎This title contains a combination of a invisible character at beginning and the end‎‎',
+        ]);
+
+        $middleware = new TrimStrings;
+
+        $middleware->handle($request, function ($req) {
+            $this->assertEquals('This title contains a combination of a invisible character at beginning and the end', $req->title);
+        });
+    }
 }
