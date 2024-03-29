@@ -297,6 +297,36 @@ abstract class Factory
     }
 
     /**
+     * Bulk create a collection of models and persist them to the database with one database hit (using QueryBuilder).
+     *
+     * @param  (callable(array<string, mixed>): array<string, mixed>)|array<string, mixed>  $attributes
+     * @param  \Illuminate\Database\Eloquent\Model|null  $parent
+     * @return int|bool
+     */
+    public function bulkCreate($attributes = [], ?Model $parent = null)
+    {
+        if (! empty($attributes)) {
+            return $this->state($attributes)->bulkCreate([], $parent);
+        }
+
+        $instances = $this->make($attributes, $parent);
+
+        if ($instances instanceof Model) {
+            $instances = collect([$instances]);
+        }
+
+        $modelName = $this->modelName();
+
+        $count = $instances->count();
+        for ($i = 0; $i < $count; $i++) {
+            $instances[$i] = $instances[$i]->getAttributes();
+        }
+        $instances = $instances->toArray();
+
+        return $modelName::insert($instances);
+    }
+
+    /**
      * Create a collection of models and persist them to the database without dispatching any model events.
      *
      * @param  (callable(array<string, mixed>): array<string, mixed>)|array<string, mixed>  $attributes

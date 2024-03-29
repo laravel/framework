@@ -142,6 +142,18 @@ class DatabaseEloquentFactoryTest extends TestCase
         $this->assertCount(10, $users);
     }
 
+    public function test_basic_model_can_be_bulk_created()
+    {
+        DB::connection()->enableQueryLog();
+        $result = FactoryTestUserFactory::times(100)->bulkCreate();
+        $queries = DB::getQueryLog();
+        $usersCount = FactoryTestUser::count();
+
+        $this->assertTrue($result);
+        $this->assertCount(1, $queries);
+        $this->assertEquals(100, $usersCount);
+    }
+
     public function test_expanded_closure_attributes_are_resolved_and_passed_to_closures()
     {
         $user = FactoryTestUserFactory::new()->create([
