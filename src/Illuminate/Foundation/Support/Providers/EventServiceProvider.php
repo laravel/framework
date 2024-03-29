@@ -40,6 +40,13 @@ class EventServiceProvider extends ServiceProvider
     protected static $eventDiscoveryPaths;
 
     /**
+     * Indicates if event discovery should be enabled.
+     *
+     * @var bool
+     */
+    protected static $shouldDiscoverEvents = true;
+
+    /**
      * Register the application's event listeners.
      *
      * @return void
@@ -127,7 +134,7 @@ class EventServiceProvider extends ServiceProvider
      */
     public function shouldDiscoverEvents()
     {
-        return get_class($this) === __CLASS__;
+        return static::$shouldDiscoverEvents && get_class($this) === __CLASS__;
     }
 
     /**
@@ -170,6 +177,17 @@ class EventServiceProvider extends ServiceProvider
     public static function setEventDiscoveryPaths(array $paths)
     {
         static::$eventDiscoveryPaths = $paths;
+    }
+
+    /**
+     * Set the event discovery status.
+     *
+     * @param  bool  $enable
+     * @return void
+     */
+    public static function setShouldDiscoverEvents(bool $enable)
+    {
+        static::$shouldDiscoverEvents = $enable;
     }
 
     /**
