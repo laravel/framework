@@ -798,6 +798,8 @@ class SupportStrTest extends TestCase
                 bar
             ')
         );
+
+        $this->assertSame("\xE9", Str::trim(" \xE9 "));
     }
 
     public function testLtrim()
@@ -817,6 +819,7 @@ class SupportStrTest extends TestCase
                 foo bar
             ')
         );
+        $this->assertSame("\xE9 ", Str::ltrim(" \xE9 "));
     }
 
     public function testRtrim()
@@ -836,6 +839,8 @@ class SupportStrTest extends TestCase
                 foo bar
             ')
         );
+
+        $this->assertSame(" \xE9", Str::rtrim(" \xE9 "));
     }
 
     public function testSquish()
