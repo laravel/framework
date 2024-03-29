@@ -476,11 +476,8 @@ if (! function_exists('fluent')) {
     /**
      * Create a fluent object from the given value.
      *
-     * @template TValue
-     * @template TReturn
-     *
-     * @param  \Illuminate\Contracts\Support\Arrayable<TKey, TValue>|iterable<TKey, TValue>|null  $value
-     * @return Fluent<TKey, TValue>
+     * @param  object|array  $value
+     * @return Fluent
      */
     function fluent($value)
     {
