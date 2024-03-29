@@ -76,7 +76,7 @@ class Headers
     /**
      * Set the headers for this message.
      *
-     * @param  array  $references
+     * @param  array  $text
      * @return $this
      */
     public function text(array $text)
