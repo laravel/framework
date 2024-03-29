@@ -233,7 +233,7 @@ class MigrateCommand extends BaseCommand implements Isolatable
             $this->components->warn("The database '{$connection->getDatabaseName()}' does not exist on the '{$connection->getName()}' connection.");
 
             if (! confirm('Would you like to create it?', default: true)) {
-                $this->components->info('Operation cancelled! No database was created.');
+                $this->components->info('Operation cancelled. No database was created.');
 
                 throw new RuntimeException('Database was not created. Aborting migration.');
             }
