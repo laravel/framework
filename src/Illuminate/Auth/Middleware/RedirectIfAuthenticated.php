@@ -28,7 +28,7 @@ class RedirectIfAuthenticated
 
         foreach ($guards as $guard) {
             if (Auth::guard($guard)->check()) {
-                return redirect($this->redirectTo($request));
+                return redirect($this->redirectTo($request, $guard));
             }
         }
 
@@ -38,10 +38,10 @@ class RedirectIfAuthenticated
     /**
      * Get the path the user should be redirected to when they are authenticated.
      */
-    protected function redirectTo(Request $request): ?string
+    protected function redirectTo(Request $request, ?string $guard): ?string
     {
         return static::$redirectToCallback
-            ? call_user_func(static::$redirectToCallback, $request)
+            ? call_user_func(static::$redirectToCallback, $request, $guard)
             : $this->defaultRedirectUri();
     }
 
