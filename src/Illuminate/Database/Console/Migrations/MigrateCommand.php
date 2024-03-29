@@ -57,7 +57,7 @@ class MigrateCommand extends BaseCommand implements Isolatable
     /**
      * Flag to indicate if the database exists.
      *
-     * @var boolean
+     * @var bool
      */
     protected $databaseExists = true;
 
@@ -217,6 +217,7 @@ class MigrateCommand extends BaseCommand implements Isolatable
 
             if (! confirm('Would you like to create it?', default: false)) {
                 $this->components->info('Operation cancelled! No database was created.');
+
                 return false;
             }
         }
