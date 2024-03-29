@@ -408,13 +408,12 @@ class ApplicationBuilder
      * Registers the service provider if not already registered.
      *
      * @param  string  $serviceProvider
-     *
      * @return void
      */
     protected function registerServiceProvider(string $serviceProvider)
     {
         if (! isset($this->pendingProviders[$serviceProvider])) {
-            $this->app->booting(fn() => $this->app->register($serviceProvider));
+            $this->app->booting(fn () => $this->app->register($serviceProvider));
         }
 
         $this->pendingProviders[$serviceProvider] = true;

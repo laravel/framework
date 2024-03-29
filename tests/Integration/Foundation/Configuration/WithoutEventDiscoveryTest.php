@@ -15,7 +15,6 @@ class WithoutEventDiscoveryTest extends TestCase
             ->create();
     }
 
-
     public function testDisablesEventDiscovery()
     {
         $this->assertFalse(
