@@ -783,6 +783,21 @@ class SupportStrTest extends TestCase
         $this->assertSame('ム', Str::trim('ム'));
         $this->assertSame('だ', Str::trim('   だ    '));
         $this->assertSame('ム', Str::trim('   ム    '));
+
+        $this->assertSame(
+            'foo bar',
+            Str::trim('
+                foo bar
+            ')
+        );
+        $this->assertSame(
+            'foo
+                bar',
+            Str::trim('
+                foo
+                bar
+            ')
+        );
     }
 
     public function testLtrim()
@@ -794,6 +809,14 @@ class SupportStrTest extends TestCase
         $this->assertSame('ム', Str::ltrim('ム'));
         $this->assertSame('だ    ', Str::ltrim('   だ    '));
         $this->assertSame('ム    ', Str::ltrim('   ム    '));
+
+        $this->assertSame(
+            'foo bar
+            ',
+            Str::ltrim('
+                foo bar
+            ')
+        );
     }
 
     public function testRtrim()
@@ -805,6 +828,14 @@ class SupportStrTest extends TestCase
         $this->assertSame('ム', Str::rtrim('ム'));
         $this->assertSame('   だ', Str::rtrim('   だ    '));
         $this->assertSame('   ム', Str::rtrim('   ム    '));
+
+        $this->assertSame(
+            '
+                foo bar',
+            Str::rtrim('
+                foo bar
+            ')
+        );
     }
 
     public function testSquish()
