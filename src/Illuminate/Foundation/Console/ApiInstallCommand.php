@@ -100,6 +100,8 @@ class ApiInstallCommand extends Command
                 'api: ',
                 $appBootstrapPath,
             );
+        } elseif (str_contains($content, 'api:')) {
+            $this->components->warn('API route definition is already registered to bootstrap file.');
         } elseif (str_contains($content, 'web: __DIR__.\'/../routes/web.php\',')) {
             (new Filesystem)->replaceInFile(
                 'web: __DIR__.\'/../routes/web.php\',',
