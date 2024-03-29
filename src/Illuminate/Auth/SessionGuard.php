@@ -254,6 +254,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
 
         if ($this->validate($credentials)) {
             $this->setUser($this->lastAttempted);
+            $this->rehashPasswordIfRequired($this->lastAttempted, $credentials);
 
             return true;
         }
