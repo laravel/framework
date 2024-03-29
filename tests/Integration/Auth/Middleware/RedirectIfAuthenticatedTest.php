@@ -26,13 +26,6 @@ class RedirectIfAuthenticatedTest extends TestCase
 
         UserFactory::new()->create();
 
-        $user = AuthenticationTestUser::first();
-        $this->router->get('/login', function () {
-            return response('Login Form');
-        })->middleware(RedirectIfAuthenticated::class);
-
-        UserFactory::new()->create();
-
         $this->user = AuthenticationTestUser::first();
     }
 
