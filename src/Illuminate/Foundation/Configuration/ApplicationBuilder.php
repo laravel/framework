@@ -97,6 +97,15 @@ class ApplicationBuilder
         return $this;
     }
 
+    public function withoutEventDiscovery()
+    {
+        AppEventServiceProvider::setShouldDiscoverEvents(false);
+
+        $this->registerServiceProvider(AppEventServiceProvider::class);
+
+        return $this;
+    }
+
     /**
      * Register the braodcasting services for the application.
      *
