@@ -776,7 +776,7 @@ class SupportStrTest extends TestCase
         $this->assertSame('foo bar', Str::trim(' foo bar ', ' '));
         $this->assertSame('foo  bar', Str::trim('-foo  bar_', '-_'));
 
-        $this->assertSame('foo    bar', Str::trim(" foo    bar "));
+        $this->assertSame('foo    bar', Str::trim(' foo    bar '));
 
         $this->assertSame('123', Str::trim('   123    '));
         $this->assertSame('だ', Str::trim('だ'));
@@ -787,7 +787,7 @@ class SupportStrTest extends TestCase
 
     public function testLtrim()
     {
-        $this->assertSame('foo    bar ', Str::ltrim(" foo    bar "));
+        $this->assertSame('foo    bar ', Str::ltrim(' foo    bar '));
 
         $this->assertSame('123    ', Str::ltrim('   123    '));
         $this->assertSame('だ', Str::ltrim('だ'));
@@ -798,7 +798,7 @@ class SupportStrTest extends TestCase
 
     public function testRtrim()
     {
-        $this->assertSame(' foo    bar', Str::rtrim(" foo    bar "));
+        $this->assertSame(' foo    bar', Str::rtrim(' foo    bar '));
 
         $this->assertSame('   123', Str::rtrim('   123    '));
         $this->assertSame('だ', Str::rtrim('だ'));
