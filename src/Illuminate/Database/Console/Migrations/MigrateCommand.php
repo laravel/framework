@@ -10,6 +10,7 @@ use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Database\SQLiteDatabaseDoesNotExistException;
 use Illuminate\Database\SqlServerConnection;
 use PDOException;
+use RuntimeException;
 use Throwable;
 
 use function Laravel\Prompts\confirm;
@@ -53,13 +54,6 @@ class MigrateCommand extends BaseCommand implements Isolatable
      * @var \Illuminate\Contracts\Events\Dispatcher
      */
     protected $dispatcher;
-
-    /**
-     * Flag to indicate if the database exists.
-     *
-     * @var bool
-     */
-    protected $databaseExists = true;
 
     /**
      * Create a new migration command instance.
@@ -120,7 +114,7 @@ class MigrateCommand extends BaseCommand implements Isolatable
      */
     protected function prepareDatabase()
     {
-        if (! $this->repositoryExists() && $this->databaseExists) {
+        if (! $this->repositoryExists()) {
             $this->components->info('Preparing database.');
 
             $this->components->task('Creating migration table', function () {
@@ -130,10 +124,6 @@ class MigrateCommand extends BaseCommand implements Isolatable
             });
 
             $this->newLine();
-        }
-
-        if (! $this->databaseExists) {
-            throw new RuntimeException('Database was not created. Aborting migration.');
         }
 
         if (! $this->migrator->hasRunAnyMigrations() && ! $this->option('pretend')) {
@@ -151,7 +141,7 @@ class MigrateCommand extends BaseCommand implements Isolatable
         return retry(2, fn () => $this->migrator->repositoryExists(), 0, function ($e) {
             try {
                 if ($e->getPrevious() instanceof SQLiteDatabaseDoesNotExistException) {
-                    return $this->databaseExists = $this->createMissingSqliteDatabase($e->getPrevious()->path);
+                    return $this->createMissingSqliteDatabase($e->getPrevious()->path);
                 }
 
                 $connection = $this->migrator->resolveConnection($this->option('database'));
@@ -160,7 +150,7 @@ class MigrateCommand extends BaseCommand implements Isolatable
                     $e->getPrevious() instanceof PDOException &&
                     $e->getPrevious()->getCode() === 1049 &&
                     $connection->getDriverName() === 'mysql') {
-                    return $this->databaseExists = $this->createMissingMysqlDatabase($connection);
+                    return $this->createMissingMysqlDatabase($connection);
                 }
 
                 return false;
@@ -175,6 +165,8 @@ class MigrateCommand extends BaseCommand implements Isolatable
      *
      * @param  string  $path
      * @return bool
+     *
+     * @throws \RuntimeException
      */
     protected function createMissingSqliteDatabase($path)
     {
@@ -191,7 +183,7 @@ class MigrateCommand extends BaseCommand implements Isolatable
         if (! confirm('Would you like to create it?', default: false)) {
             $this->components->info('Operation cancelled! No database was created.');
 
-            return false;
+            throw new RuntimeException('Database was not created. Aborting migration.');
         }
 
         return touch($path);
@@ -201,6 +193,8 @@ class MigrateCommand extends BaseCommand implements Isolatable
      * Create a missing MySQL database.
      *
      * @return bool
+     *
+     * @throws \RuntimeException
      */
     protected function createMissingMysqlDatabase($connection)
     {
@@ -218,7 +212,7 @@ class MigrateCommand extends BaseCommand implements Isolatable
             if (! confirm('Would you like to create it?', default: false)) {
                 $this->components->info('Operation cancelled! No database was created.');
 
-                return false;
+                throw new RuntimeException('Database was not created. Aborting migration.');
             }
         }
 
