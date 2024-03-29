@@ -92,13 +92,7 @@ class ApplicationBuilder
             AppEventServiceProvider::setEventDiscoveryPaths($discover);
         }
 
-        if (! isset($this->pendingProviders[AppEventServiceProvider::class])) {
-            $this->app->booting(function () {
-                $this->app->register(AppEventServiceProvider::class);
-            });
-        }
-
-        $this->pendingProviders[AppEventServiceProvider::class] = true;
+        $this->registerServiceProvider(AppEventServiceProvider::class);
 
         return $this;
     }
@@ -399,5 +393,21 @@ class ApplicationBuilder
     public function create()
     {
         return $this->app;
+    }
+
+    /**
+     * Registers the service provider if not already registered.
+     *
+     * @param  string  $serviceProvider
+     *
+     * @return void
+     */
+    protected function registerServiceProvider(string $serviceProvider)
+    {
+        if (! isset($this->pendingProviders[$serviceProvider])) {
+            $this->app->booting(fn() => $this->app->register($serviceProvider));
+        }
+
+        $this->pendingProviders[$serviceProvider] = true;
     }
 }
