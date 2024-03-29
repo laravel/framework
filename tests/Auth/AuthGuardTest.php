@@ -623,6 +623,7 @@ class AuthGuardTest extends TestCase
         });
         $guard->getProvider()->shouldReceive('retrieveByCredentials')->once()->with(['foo'])->andReturn($user);
         $guard->getProvider()->shouldReceive('validateCredentials')->once()->with($user, ['foo'])->andReturn(true);
+        $guard->getProvider()->shouldReceive('rehashPasswordIfRequired')->with($user, ['foo'])->once();
         $guard->shouldReceive('setUser')->once()->with($user);
         $this->assertTrue($guard->once(['foo']));
     }
@@ -637,6 +638,7 @@ class AuthGuardTest extends TestCase
         });
         $guard->getProvider()->shouldReceive('retrieveByCredentials')->once()->with(['foo'])->andReturn($user);
         $guard->getProvider()->shouldReceive('validateCredentials')->once()->with($user, ['foo'])->andReturn(false);
+        $guard->getProvider()->shouldNotReceive('rehashPasswordIfRequired');
         $this->assertFalse($guard->once(['foo']));
     }
 
