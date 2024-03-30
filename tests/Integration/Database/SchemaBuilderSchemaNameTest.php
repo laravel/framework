@@ -435,6 +435,8 @@ class SchemaBuilderSchemaNameTest extends DatabaseTestCase
         $connection = DB::connection($connection);
         $schema = $connection->getSchemaBuilder();
 
+        var_dump($connection->select('SELECT * FROM sysusers'));
+
         $this->assertEquals('dbo', $connection->scalar('select schema_name()'));
 
         $connection->statement('alter user dbo with default_schema=my_schema');
