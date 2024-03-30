@@ -8,8 +8,8 @@ use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Foundation\Application as ApplicationContract;
 use Illuminate\Events\Dispatcher as EventsDispatcher;
 use Illuminate\Foundation\Application as FoundationApplication;
-use Illuminate\Tests\Console\Fixtures\FakeCommandWithInputPrompting;
 use Illuminate\Tests\Console\Fixtures\FakeCommandWithArrayInputPrompting;
+use Illuminate\Tests\Console\Fixtures\FakeCommandWithInputPrompting;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -211,7 +211,7 @@ class ConsoleApplicationTest extends TestCase
         $app->addCommands([$command = new FakeCommandWithArrayInputPrompting()]);
 
         $statusCode = $app->call('fake-command-for-testing-array', [
-            'arguments' => [ 'foo', 'bar', 'baz', ],
+            'arguments' => ['foo', 'bar', 'baz'],
         ]);
 
         $this->assertFalse($command->prompted);
