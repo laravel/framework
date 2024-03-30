@@ -454,6 +454,18 @@ if (! function_exists('windows_os')) {
     }
 }
 
+if (! function_exists('linux_os')) {
+    /**
+     * Determine whether the current environment is Linux based.
+     *
+     * @return bool
+     */
+    function linux_os()
+    {
+        return PHP_OS_FAMILY === 'Linux';
+    }
+}
+
 if (! function_exists('with')) {
     /**
      * Return the given value, optionally passed through the given callback.

@@ -426,7 +426,7 @@ class ProcessTest extends TestCase
 
     public function testRealProcessesCanHaveErrorOutput()
     {
-        if (windows_os()) {
+        if (! linux_os()) {
             $this->markTestSkipped('Requires Linux.');
         }
 
@@ -457,7 +457,7 @@ class ProcessTest extends TestCase
 
     public function testRealProcessesCanThrowWithoutOutput()
     {
-        if (windows_os()) {
+        if (! linux_os()) {
             $this->markTestSkipped('Requires Linux.');
         }
 
@@ -498,7 +498,7 @@ class ProcessTest extends TestCase
 
     public function testRealProcessesCanThrowWithErrorOutput()
     {
-        if (windows_os()) {
+        if (! linux_os()) {
             $this->markTestSkipped('Requires Linux.');
         }
 
@@ -543,7 +543,7 @@ class ProcessTest extends TestCase
 
     public function testRealProcessesCanThrowWithOutput()
     {
-        if (windows_os()) {
+        if (! linux_os()) {
             $this->markTestSkipped('Requires Linux.');
         }
 
@@ -567,7 +567,7 @@ class ProcessTest extends TestCase
 
     public function testRealProcessesCanTimeout()
     {
-        if (windows_os()) {
+        if (! linux_os()) {
             $this->markTestSkipped('Requires Linux.');
         }
 
@@ -584,7 +584,7 @@ class ProcessTest extends TestCase
 
     public function testRealProcessesCanThrowIfTrue()
     {
-        if (windows_os()) {
+        if (! linux_os()) {
             $this->markTestSkipped('Requires Linux.');
         }
 
@@ -598,7 +598,7 @@ class ProcessTest extends TestCase
 
     public function testRealProcessesDoesntThrowIfFalse()
     {
-        if (windows_os()) {
+        if (! linux_os()) {
             $this->markTestSkipped('Requires Linux.');
         }
 
@@ -612,7 +612,7 @@ class ProcessTest extends TestCase
 
     public function testRealProcessesCanUseStandardInput()
     {
-        if (windows_os()) {
+        if (! linux_os()) {
             $this->markTestSkipped('Requires Linux.');
         }
 
@@ -624,7 +624,7 @@ class ProcessTest extends TestCase
 
     public function testProcessPipe()
     {
-        if (windows_os()) {
+        if (! linux_os()) {
             $this->markTestSkipped('Requires Linux.');
         }
 
@@ -643,7 +643,7 @@ class ProcessTest extends TestCase
 
     public function testProcessPipeFailed()
     {
-        if (windows_os()) {
+        if (! linux_os()) {
             $this->markTestSkipped('Requires Linux.');
         }
 
@@ -662,7 +662,7 @@ class ProcessTest extends TestCase
 
     public function testProcessSimplePipe()
     {
-        if (windows_os()) {
+        if (! linux_os()) {
             $this->markTestSkipped('Requires Linux.');
         }
 
@@ -681,7 +681,7 @@ class ProcessTest extends TestCase
 
     public function testProcessSimplePipeFailed()
     {
-        if (windows_os()) {
+        if (! linux_os()) {
             $this->markTestSkipped('Requires Linux.');
         }
 
