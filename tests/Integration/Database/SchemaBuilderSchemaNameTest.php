@@ -425,6 +425,37 @@ class SchemaBuilderSchemaNameTest extends DatabaseTestCase
         });
     }
 
+    #[DataProvider('connectionProvider')]
+    public function testHasTable($connection)
+    {
+        if ($this->driver !== 'sqlsrv') {
+            $this->markTestSkipped('Test requires a SQL Server connection.');
+        }
+
+        $connection = DB::connection($connection);
+        $schema = $connection->getSchemaBuilder();
+
+        $this->assertEquals('dbo', $connection->scalar('select schema_name()'));
+
+        var_dump($connection->scalar('select current_user'));
+
+        $connection->statement('alter user SA with default_schema=my_schema');
+
+        $this->assertEquals('my_schema', $connection->scalar('select schema_name()'));
+
+        $schema->create('table', function (Blueprint $table) {
+            $table->id();
+        });
+
+        $this->assertTrue($schema->hasTable('table'));
+        $this->assertTrue($schema->hasTable('my_schema.table'));
+        $this->assertFalse($schema->hasTable('dbo.table'));
+
+        $connection->statement('alter user SA with default_schema=dbo');
+
+        $this->assertEquals('dbo', $connection->scalar('select schema_name()'));
+    }
+
     public static function connectionProvider(): array
     {
         return [
