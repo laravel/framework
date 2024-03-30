@@ -67,6 +67,16 @@ class SqlServerGrammar extends Grammar
     }
 
     /**
+     * Compile the query to determine the name of the default schema of the caller.
+     *
+     * @return string
+     */
+    public function compileDefaultSchema()
+    {
+        return 'select schema_name()';
+    }
+
+    /**
      * Compile the query to determine the tables.
      *
      * @return string
