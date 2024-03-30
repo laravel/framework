@@ -435,7 +435,7 @@ class SchemaBuilderSchemaNameTest extends DatabaseTestCase
         $connection = DB::connection($connection);
         $schema = $connection->getSchemaBuilder();
 
-        var_dump($connection->select('SELECT * FROM sysusers'));
+        var_dump($connection->select('SELECT * FROM syslogins'));
 
         $this->assertEquals('dbo', $connection->scalar('select schema_name()'));
 
