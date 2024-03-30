@@ -659,7 +659,7 @@ trait QueriesRelationships
             // If the query contains certain elements like orderings / more than one column selected
             // then we will remove those elements from the query so that it will execute properly
             // when given to the database. Otherwise, we may receive SQL errors or poor syntax.
-            $query->orders = null;
+            $query->orders = is_countable($query->orders) && count($query->orders) > 1 ? [$query->orders[0]] : $query->orders;
             $query->setBindings([], 'order');
 
             if (count($query->columns) > 1) {
