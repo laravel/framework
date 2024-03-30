@@ -5,8 +5,8 @@ namespace Illuminate\Bus;
 use Closure;
 use Illuminate\Queue\CallQueuedClosure;
 use Illuminate\Support\Arr;
-use RuntimeException;
 use PHPUnit\Framework\Assert as PHPUnit;
+use RuntimeException;
 
 trait Queueable
 {

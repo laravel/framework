@@ -420,9 +420,9 @@ class SupportTestingQueueFakeTest extends TestCase
 
     public function testAssertChainUsingClassesOrObjectsArray()
     {
-        ($job = new JobWithChainStub([
+        $job = new JobWithChainStub([
             new JobStub,
-        ]));
+        ]);
 
         $job->assertChain([
             JobStub::class,
