@@ -43,10 +43,6 @@ if (! function_exists('blank')) {
      */
     function blank($value)
     {
-        if (is_null($value)) {
-            return true;
-        }
-
         if (is_string($value)) {
             return trim($value) === '';
         }
