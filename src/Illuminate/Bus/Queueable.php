@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Queue\CallQueuedClosure;
 use Illuminate\Support\Arr;
 use RuntimeException;
+use PHPUnit\Framework\Assert as PHPUnit;
 
 trait Queueable
 {
@@ -272,5 +273,44 @@ trait Queueable
         collect($this->chainCatchCallbacks)->each(function ($callback) use ($e) {
             $callback($e);
         });
+    }
+
+    /**
+     * Assert that the job has the chained jobs.
+     *
+     * @param  array  $expectedChain
+     * @return void
+     */
+    public function assertChain($expectedChain)
+    {
+        PHPUnit::assertTrue(
+            collect($expectedChain)->isNotEmpty(),
+            'The expected chain can not be empty.'
+        );
+
+        if (collect($expectedChain)->contains(fn ($job) => is_object($job))) {
+            $expectedChain = collect($expectedChain)->map(fn ($job) => serialize($job))->all();
+        } else {
+            $chain = collect($this->chained)->map(fn ($job) => get_class(unserialize($job)))->all();
+        }
+
+        PHPUnit::assertTrue(
+            $expectedChain === ($chain ?? $this->chained),
+            'The job does not have the expected chain.'
+        );
+    }
+
+    /**
+     * Assert that the job has no chained jobs.
+     *
+     * @param  array  $expectedChain
+     * @return void
+     */
+    public function assertNoChain()
+    {
+        PHPUnit::assertEmpty(
+            $this->chained,
+            'The job has chained jobs.'
+        );
     }
 }
