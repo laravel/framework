@@ -830,6 +830,18 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     }
 
     /**
+     * Eager load related column value on the model.
+     *
+     * @param  array|string  $relations
+     * @param  string  $column
+     * @return $this
+     */
+    public function loadAttribute($relations, $column)
+    {
+        return $this->loadAggregate($relations, $column, 'attribute');
+    }
+
+    /**
      * Eager load relationship column aggregation on the polymorphic relation of a model.
      *
      * @param  string  $relation
