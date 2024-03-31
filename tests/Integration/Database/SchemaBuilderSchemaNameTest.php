@@ -434,7 +434,7 @@ class SchemaBuilderSchemaNameTest extends DatabaseTestCase
         $connection = DB::connection($connection);
         $schema = $connection->getSchemaBuilder();
 
-        $connection->statement("create login [sample] with password = 'password'");
+        $connection->statement("create login [sample] with password = 'Passw0rd'");
         $connection->statement('create user [sample] for login [sample]');
         $connection->statement('alter user [sample] with default_schema = my_schema');
         // GRANT CREATE TABLE TO [sample];
@@ -445,7 +445,7 @@ class SchemaBuilderSchemaNameTest extends DatabaseTestCase
 
         config([
             'database.connections.sqlsrv.username' => 'sample',
-            'database.connections.sqlsrv.password' => 'password',
+            'database.connections.sqlsrv.password' => 'Passw0rd',
         ]);
 
         $this->assertEquals('my_schema', $connection->scalar('select schema_name()'));
