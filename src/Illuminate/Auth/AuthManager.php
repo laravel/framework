@@ -330,6 +330,21 @@ class AuthManager implements FactoryContract
     }
 
     /**
+     * Get the guard that authenticates the user's use.
+     * 
+     * @return string|null
+     */
+    public function getGuardName()
+    {
+        foreach (array_keys($this->app['config']['auth.guards']) as $guard) {
+            if ($this->guard($guard)->check()) {
+                return $guard;
+            }
+        }
+        return null;
+    }
+
+    /**
      * Dynamically call the default driver instance.
      *
      * @param  string  $method
