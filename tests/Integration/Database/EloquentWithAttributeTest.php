@@ -25,12 +25,29 @@ class EloquentWithAttributeTest extends DatabaseTestCase
     public function testItBasic()
     {
         $one = Model1::create();
-        $one->twos()->Create(['column_name' => 'value']);
+        $one->twos()->create(['column_name' => 'value']);
 
         $results = Model1::withAttribute('twos', 'column_name');
 
         $this->assertEquals([
             ['id' => 1, 'twos_attribute_column_name' => 'value'],
+        ], $results->get()->toArray());
+    }
+
+    public function testSorting()
+    {
+        $one = Model1::create();
+        $one->twos()->createMany([
+            ['column_name' => 'value1'],
+            ['column_name' => 'value2'],
+            ['column_name' => 'value3'],
+            ['column_name' => 'value4'],
+        ]);
+
+        $results = Model1::withAttribute(['twos' => fn ($q) => $q->latest('id')], 'column_name');
+
+        $this->assertEquals([
+            ['id' => 4, 'twos_attribute_column_name' => 'value4']
         ], $results->get()->toArray());
     }
 }
