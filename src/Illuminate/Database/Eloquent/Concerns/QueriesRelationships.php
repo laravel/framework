@@ -659,7 +659,7 @@ trait QueriesRelationships
             // If the query contains certain elements like orderings / more than one column selected
             // then we will remove those elements from the query so that it will execute properly
             // when given to the database. Otherwise, we may receive SQL errors or poor syntax.
-            if ($function !== null) {
+            if ($function !== 'attribute') {
                 $query->orders = null;
                 $query->setBindings([], 'order');
             }
@@ -789,7 +789,7 @@ trait QueriesRelationships
      */
     public function withAttribute($relation, $column)
     {
-        return $this->withAggregate($relation, $column);
+        return $this->withAggregate($relation, $column, 'attribute');
     }
 
     /**
