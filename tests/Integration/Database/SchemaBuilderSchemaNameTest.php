@@ -435,10 +435,10 @@ class SchemaBuilderSchemaNameTest extends DatabaseTestCase
         $db = DB::connection($connection);
         $schema = $db->getSchemaBuilder();
 
-        $db->statement("create login my_user with password = 'Passw0rd'");
-        $db->statement('create user my_user for login my_user');
+        $db->statement("if suser_id(N'my_user') is null create login my_user with password = 'Passw0rd'");
+        $db->statement("if suser_id(N'my_user') is null create user my_user for login my_user");
+        $db->statement('grant create table to my_user');
         $db->statement("alter user my_user with default_schema = my_schema execute as user='my_user'");
-        // GRANT CREATE TABLE TO [my_user];
         // GRANT SELECT ON SCHEMA::role TO [my_user];
         // GRANT SELECT, INSERT, UPDATE, DELETE, REFERENCES, ALTER ON SCHEMA::my_schema TO [my_user];
         // GRANT CREATE TABLE TO [my_user];
