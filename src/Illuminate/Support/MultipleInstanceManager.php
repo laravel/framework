@@ -4,7 +4,6 @@ namespace Illuminate\Support;
 
 use Closure;
 use InvalidArgumentException;
-use RuntimeException;
 
 abstract class MultipleInstanceManager
 {
@@ -64,7 +63,7 @@ abstract class MultipleInstanceManager
     abstract public function getInstanceConfig($name);
 
     /**
-     * Get an instance instance by name.
+     * Get an instance by name.
      *
      * @param  string|null  $name
      * @return mixed
