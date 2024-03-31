@@ -437,7 +437,7 @@ class SchemaBuilderSchemaNameTest extends DatabaseTestCase
 
         $db->statement("create login my_user with password = 'Passw0rd'");
         $db->statement('create user my_user for login my_user');
-        $db->statement('alter user my_user with default_schema = my_schema');
+        $db->statement("alter user my_user with default_schema = my_schema execute as user='my_user'");
         // GRANT CREATE TABLE TO [my_user];
         // GRANT SELECT ON SCHEMA::role TO [my_user];
         // GRANT SELECT, INSERT, UPDATE, DELETE, REFERENCES, ALTER ON SCHEMA::my_schema TO [my_user];
