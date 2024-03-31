@@ -684,7 +684,7 @@ trait QueriesRelationships
                 )->withCasts([$alias => 'bool']);
             } else {
                 $this->selectSub(
-                    $function ? $query : $query->limit(1),
+                    is_null($function) || $function === 'attribute' ? $query->limit(1) : $query,
                     $alias
                 );
             }
