@@ -4,6 +4,7 @@ namespace Illuminate\Support;
 
 use Closure;
 use InvalidArgumentException;
+use RuntimeException;
 
 abstract class MultipleInstanceManager
 {
@@ -104,7 +105,7 @@ abstract class MultipleInstanceManager
         }
 
         if (! array_key_exists('driver', $config)) {
-            throw new \RuntimeException("Instance [{$name}] does not specify a driver.");
+            throw new RuntimeException("Instance [{$name}] does not specify a driver.");
         }
 
         if (isset($this->customCreators[$config['driver']])) {
