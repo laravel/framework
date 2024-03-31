@@ -781,6 +781,18 @@ trait QueriesRelationships
     }
 
     /**
+     * Add subselect queries to include the column of the relation.
+     *
+     * @param  string|array  $relation
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
+     * @return $this
+     */
+    public function withAttribute($relation, $column)
+    {
+        return $this->withAggregate($relation, $column);
+    }
+
+    /**
      * Add the "has" condition where clause to the query.
      *
      * @param  \Illuminate\Database\Eloquent\Builder  $hasQuery
