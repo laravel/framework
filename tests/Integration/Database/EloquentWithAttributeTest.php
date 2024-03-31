@@ -18,7 +18,7 @@ class EloquentWithAttributeTest extends DatabaseTestCase
         Schema::create('two', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('one_id');
-            $table->string('attribute');
+            $table->string('column');
         });
     }
 
@@ -27,10 +27,10 @@ class EloquentWithAttributeTest extends DatabaseTestCase
         $one = Model1::create();
         $one->twos()->Create(['attribute' => 'value']);
 
-        $results = Model1::withAttribute('twos', 'attribute');
+        $results = Model1::withAttribute('twos', 'column');
 
         $this->assertEquals([
-            ['id' => 1, 'twos_attribute' => 'value'],
+            ['id' => 1, 'twos_attribute_column' => 'value'],
         ], $results->get()->toArray());
     }
 }
