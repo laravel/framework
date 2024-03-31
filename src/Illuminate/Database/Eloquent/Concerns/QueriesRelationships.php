@@ -629,7 +629,7 @@ trait QueriesRelationships
 
             $relation = $this->getRelationWithoutConstraints($name);
 
-            if ($function && $function !== 'attribute') {
+            if ($function) {
                 if ($this->getQuery()->getGrammar()->isExpression($column)) {
                     $aggregateColumn = $this->getQuery()->getGrammar()->getValue($column);
                 } else {
@@ -659,8 +659,8 @@ trait QueriesRelationships
             // If the query contains certain elements like orderings / more than one column selected
             // then we will remove those elements from the query so that it will execute properly
             // when given to the database. Otherwise, we may receive SQL errors or poor syntax.
-            // we can allow orderings on the sub-select if the function is 'attribute'
-            if ($function !== 'attribute') {
+            // we can allow orderings on the sub-select if the function is 'null'
+            if ($function !== null) {
                 $query->orders = null;
                 $query->setBindings([], 'order');
             }
@@ -684,7 +684,7 @@ trait QueriesRelationships
                 )->withCasts([$alias => 'bool']);
             } else {
                 $this->selectSub(
-                    is_null($function) || $function === 'attribute' ? $query->limit(1) : $query,
+                    $function ? $query : $query->limit(1),
                     $alias
                 );
             }
@@ -790,7 +790,7 @@ trait QueriesRelationships
      */
     public function withAttribute($relation, $column)
     {
-        return $this->withAggregate($relation, $column, 'attribute');
+        return $this->withAggregate($relation, $column);
     }
 
     /**
