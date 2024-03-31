@@ -838,7 +838,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function loadAttribute($relations, $column)
     {
-        return $this->loadAggregate($relations, $column, 'attribute');
+        return $this->loadAggregate($relations, $column);
     }
 
     /**
