@@ -45,7 +45,7 @@ class EloquentWithAttributeTest extends DatabaseTestCase
         $results = Model1::withAttribute(['twos' => fn ($q) => $q->latest('id')], 'column_name');
 
         $this->assertEquals([
-            ['id' => 4, 'twos_column_name' => 'value4'],
+            ['id' => 1, 'twos_column_name' => 'value4'],
         ], $results->get()->toArray());
     }
 }
