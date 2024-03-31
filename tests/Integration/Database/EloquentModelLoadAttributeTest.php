@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Tests\Integration\Database\EloquentModelLoadSumTest;
+namespace Illuminate\Tests\Integration\Database\EloquentModelLoadAttributeTest;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
@@ -35,25 +35,25 @@ class EloquentModelLoadAttributeTest extends DatabaseTestCase
         Related2::create(['base_model_id' => 1, 'column_name' => 'value2']);
     }
 
-    public function testLoadSumSingleRelation()
+    public function testLoadAttributeSingleRelation()
     {
         $model = BaseModel::first();
 
         DB::enableQueryLog();
 
-        $model->loadSum('related1', 'column_name');
+        $model->loadAttribute('related1', 'column_name');
 
         $this->assertCount(1, DB::getQueryLog());
         $this->assertEquals('value1', $model->related1_attribute_column_name);
     }
 
-    public function testLoadSumMultipleRelations()
+    public function testLoadAttributeMultipleRelations()
     {
         $model = BaseModel::first();
 
         DB::enableQueryLog();
 
-        $model->loadSum(['related1', 'related2'], 'column_name');
+        $model->loadAttribute(['related1', 'related2'], 'column_name');
 
         $this->assertCount(1, DB::getQueryLog());
         $this->assertEquals('value1', $model->related1_attribute_column_name);
