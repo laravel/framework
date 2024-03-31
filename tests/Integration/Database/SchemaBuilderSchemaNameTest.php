@@ -431,12 +431,13 @@ class SchemaBuilderSchemaNameTest extends DatabaseTestCase
         if ($this->driver !== 'sqlsrv') {
             $this->markTestSkipped('Test requires a SQL Server connection.');
         }
-        $connection = DB::connection($connection);
-        $schema = $connection->getSchemaBuilder();
 
-        $connection->statement("create login my_user with password = 'Passw0rd'");
-        $connection->statement('create user my_user for login my_user');
-        $connection->statement('alter user my_user with default_schema = my_schema');
+        $db = DB::connection($connection);
+        $schema = $db->getSchemaBuilder();
+
+        $db->statement("create login my_user with password = 'Passw0rd'");
+        $db->statement('create user my_user for login my_user');
+        $db->statement('alter user my_user with default_schema = my_schema');
         // GRANT CREATE TABLE TO [my_user];
         // GRANT SELECT ON SCHEMA::role TO [my_user];
         // GRANT SELECT, INSERT, UPDATE, DELETE, REFERENCES, ALTER ON SCHEMA::my_schema TO [my_user];
@@ -444,11 +445,11 @@ class SchemaBuilderSchemaNameTest extends DatabaseTestCase
         // GRANT ALTER ON SCHEMA::my_schema TO [my_user];
 
         config([
-            'database.connections.sqlsrv.username' => 'my_user',
-            'database.connections.sqlsrv.password' => 'Passw0rd',
+            'database.connections.'.$connection.'.username' => 'my_user',
+            'database.connections.'.$connection.'.password' => 'Passw0rd',
         ]);
 
-        $this->assertEquals('my_schema', $connection->scalar('select schema_name()'));
+        $this->assertEquals('my_schema', $db->scalar('select schema_name()'));
 
         $schema->create('table', function (Blueprint $table) {
             $table->id();
