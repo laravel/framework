@@ -650,7 +650,7 @@ class Kernel implements KernelContract
      */
     protected function getFileNamespacePath(SplFileInfo $file): array
     {
-        $matchingNamespaces = array_filter($this->availableNamespaces(), function ($path) use ($file) {
+        $matchingNamespaces = array_filter($this->getAvailableNamespaces(), function ($path) use ($file) {
             return Str::contains($file->getRealPath(), $path);
         });
 
@@ -671,7 +671,7 @@ class Kernel implements KernelContract
      *
      * @return array
      */
-    protected function availableNamespaces(): array
+    protected function getAvailableNamespaces(): array
     {
         $composer = json_decode(file_get_contents($this->app->basePath('composer.json')), true);
 
