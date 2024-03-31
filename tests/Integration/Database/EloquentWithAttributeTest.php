@@ -25,7 +25,7 @@ class EloquentWithAttributeTest extends DatabaseTestCase
     public function testItBasic()
     {
         $one = Model1::create();
-        $one->twos()->Create(['attribute' => 'value']);
+        $one->twos()->Create(['column' => 'value']);
 
         $results = Model1::withAttribute('twos', 'column');
 
