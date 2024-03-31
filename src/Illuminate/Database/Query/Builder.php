@@ -2880,9 +2880,11 @@ class Builder implements BuilderContract
      */
     public function get($columns = ['*'])
     {
-        $items = collect($this->onceWithColumns(Arr::wrap($columns), function () {
-            return $this->processor->processSelect($this, $this->runSelect());
-        }));
+        $clone = $this->clone();
+
+        $clone->columns ??= Arr::wrap($columns);
+
+        $items = collect($this->processor->processSelect($clone, $clone->runSelect()));
 
         return isset($this->groupLimit)
             ? $this->withoutGroupLimitKeys($items)
@@ -3147,13 +3149,13 @@ class Builder implements BuilderContract
         // First, we will need to select the results of the query accounting for the
         // given columns / key. Once we have the results, we will be able to take
         // the results and get the exact data that was requested for the query.
-        $queryResult = $this->onceWithColumns(
-            is_null($key) ? [$column] : [$column, $key],
-            function () {
-                return $this->processor->processSelect(
-                    $this, $this->runSelect()
-                );
-            }
+
+        $clone = $this->clone();
+
+        $clone->columns ??= is_null($key) ? [$column] : [$column, $key];
+
+        $queryResult = $this->processor->processSelect(
+            $clone, $clone->runSelect()
         );
 
         if (empty($queryResult)) {
@@ -3456,6 +3458,8 @@ class Builder implements BuilderContract
      * @param  array  $columns
      * @param  callable  $callback
      * @return mixed
+     *
+     * @deprecated Will be removed in a future Laravel version. Copy your context with `$query->clone()` instead.
      */
     protected function onceWithColumns($columns, $callback)
     {
