@@ -37,10 +37,12 @@ class EloquentWithAttributeTest extends DatabaseTestCase
     public function testSorting()
     {
         $one = Model1::create();
-        $one->twos()->create(['column_name' => 'value1']);
-        $one->twos()->create(['column_name' => 'value2']);
-        $one->twos()->create(['column_name' => 'value3']);
-        $one->twos()->create(['column_name' => 'value4']);
+        $one->twos()->createMany([
+            ['column_name' => 'value1'],
+            ['column_name' => 'value2'],
+            ['column_name' => 'value3'],
+            ['column_name' => 'value4'],
+        ]);
 
         $results = Model1::withAttribute(['twos' => fn ($q) => $q->latest('id')], 'column_name');
 
