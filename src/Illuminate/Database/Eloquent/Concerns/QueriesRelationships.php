@@ -629,7 +629,7 @@ trait QueriesRelationships
 
             $relation = $this->getRelationWithoutConstraints($name);
 
-            if ($function) {
+            if ($function && $function !== 'attribute') {
                 if ($this->getQuery()->getGrammar()->isExpression($column)) {
                     $aggregateColumn = $this->getQuery()->getGrammar()->getValue($column);
                 } else {
@@ -659,8 +659,11 @@ trait QueriesRelationships
             // If the query contains certain elements like orderings / more than one column selected
             // then we will remove those elements from the query so that it will execute properly
             // when given to the database. Otherwise, we may receive SQL errors or poor syntax.
-            $query->orders = null;
-            $query->setBindings([], 'order');
+            // we can allow orderings on the sub-select if the function is 'attribute'
+            if ($function !== 'attribute') {
+                $query->orders = null;
+                $query->setBindings([], 'order');
+            }
 
             if (count($query->columns) > 1) {
                 $query->columns = [$query->columns[0]];
@@ -681,7 +684,7 @@ trait QueriesRelationships
                 )->withCasts([$alias => 'bool']);
             } else {
                 $this->selectSub(
-                    $function ? $query : $query->limit(1),
+                    is_null($function) || $function === 'attribute' ? $query->limit(1) : $query,
                     $alias
                 );
             }
@@ -776,6 +779,18 @@ trait QueriesRelationships
     public function withExists($relation)
     {
         return $this->withAggregate($relation, '*', 'exists');
+    }
+
+    /**
+     * Add subselect queries to include the column of the relation.
+     *
+     * @param  string|array  $relation
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
+     * @return $this
+     */
+    public function withAttribute($relation, $column)
+    {
+        return $this->withAggregate($relation, $column, 'attribute');
     }
 
     /**
