@@ -2,11 +2,10 @@
 
 namespace Illuminate\Foundation\Console;
 
-use ErrorException;
-use ReflectionException;
 use Carbon\CarbonInterval;
 use Closure;
 use DateTimeInterface;
+use ErrorException;
 use Illuminate\Console\Application as Artisan;
 use Illuminate\Console\Command;
 use Illuminate\Console\Events\CommandFinished;
@@ -22,6 +21,7 @@ use Illuminate\Support\Env;
 use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Str;
 use ReflectionClass;
+use ReflectionException;
 use SplFileInfo;
 use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
@@ -641,11 +641,11 @@ class Kernel implements KernelContract
     {
         $this->app[ExceptionHandler::class]->renderForConsole($output, $e);
     }
+
     /**
      * Returns a tuple with the namespace and path of the file.
      *
      * @param SplFileInfo $file
-     *
      * @return array
      */
     protected function getFileNamespacePath(SplFileInfo $file): array
