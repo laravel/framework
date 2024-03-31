@@ -425,6 +425,40 @@ class SchemaBuilderSchemaNameTest extends DatabaseTestCase
         });
     }
 
+    #[DataProvider('connectionProvider')]
+    public function testHasTable($connection)
+    {
+        if ($this->driver !== 'sqlsrv') {
+            $this->markTestSkipped('Test requires a SQL Server connection.');
+        }
+        $connection = DB::connection($connection);
+        $schema = $connection->getSchemaBuilder();
+
+        $connection->statement("create login [sample] with password = 'sample'");
+        $connection->statement("create user [sample] for login [sample]");
+        $connection->statement("alter user [sample] with default_schema = my_schema");
+        // GRANT CREATE TABLE TO [sample];
+        // GRANT SELECT ON SCHEMA::role TO [sample];
+        // GRANT SELECT, INSERT, UPDATE, DELETE, REFERENCES, ALTER ON SCHEMA::sample TO [sample];
+        // GRANT CREATE TABLE TO [sample];
+        // GRANT ALTER ON SCHEMA::sample TO [sample];
+
+        config([
+            'database.connections.sqlsrv.username' => 'sample',
+            'database.connections.sqlsrv.password' => 'sample',
+        ]);
+
+        $this->assertEquals('my_schema', $connection->scalar('select schema_name()'));
+
+        $schema->create('table', function (Blueprint $table) {
+            $table->id();
+        });
+
+        $this->assertTrue($schema->hasTable('table'));
+        $this->assertTrue($schema->hasTable('my_schema.table'));
+        $this->assertFalse($schema->hasTable('dbo.table'));
+    }
+
     public static function connectionProvider(): array
     {
         return [
