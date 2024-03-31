@@ -94,6 +94,7 @@ abstract class MultipleInstanceManager
      * @return mixed
      *
      * @throws \InvalidArgumentException
+     * @throws \RuntimeException
      */
     protected function resolve($name)
     {
@@ -104,20 +105,20 @@ abstract class MultipleInstanceManager
         }
 
         if (! array_key_exists('driver', $config)) {
-            throw new RuntimeException("Instance [{$name}] does not specify a driver.");
+            throw new \RuntimeException("Instance [{$name}] does not specify a driver.");
         }
 
         if (isset($this->customCreators[$config['driver']])) {
             return $this->callCustomCreator($config);
-        } else {
-            $driverMethod = 'create'.ucfirst($config['driver']).'Driver';
-
-            if (method_exists($this, $driverMethod)) {
-                return $this->{$driverMethod}($config);
-            } else {
-                throw new InvalidArgumentException("Instance driver [{$config['driver']}] is not supported.");
-            }
         }
+
+        $driverMethod = 'create'.ucfirst($config['driver']).'Driver';
+
+        if (method_exists($this, $driverMethod)) {
+            return $this->{$driverMethod}($config);
+        }
+
+        throw new InvalidArgumentException("Instance driver [{$config['driver']}] is not supported.");
     }
 
     /**
