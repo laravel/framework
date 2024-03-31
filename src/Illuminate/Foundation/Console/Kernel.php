@@ -2,6 +2,8 @@
 
 namespace Illuminate\Foundation\Console;
 
+use ErrorException;
+use ReflectionException;
 use Carbon\CarbonInterval;
 use Closure;
 use DateTimeInterface;
@@ -73,6 +75,13 @@ class Kernel implements KernelContract
      * @var array
      */
     protected $commandPaths = [];
+
+    /**
+     * The namespaces that have been discovered for auto-loading.
+     *
+     * @var array
+     */
+    protected $discoveredNamespaces = [];
 
     /**
      * The paths where Artisan "routes" should be automatically discovered.
@@ -361,16 +370,18 @@ class Kernel implements KernelContract
             array_unique(array_merge($this->loadedPaths, $paths))
         );
 
-        $namespace = $this->app->getNamespace();
-
         foreach (Finder::create()->in($paths)->files() as $file) {
-            $command = $this->commandClassFromFile($file, $namespace);
+            $command = $this->commandClassFromFile($file);
 
-            if (is_subclass_of($command, Command::class) &&
-                ! (new ReflectionClass($command))->isAbstract()) {
-                Artisan::starting(function ($artisan) use ($command) {
-                    $artisan->resolve($command);
-                });
+            try {
+                if (is_subclass_of($command, Command::class) &&
+                    ! (new ReflectionClass($command))->isAbstract()) {
+                    Artisan::starting(function ($artisan) use ($command) {
+                        $artisan->resolve($command);
+                    });
+                }
+            } catch (ErrorException|ReflectionException) {
+                continue;
             }
         }
     }
@@ -382,12 +393,14 @@ class Kernel implements KernelContract
      * @param  string  $namespace
      * @return string
      */
-    protected function commandClassFromFile(SplFileInfo $file, string $namespace): string
+    protected function commandClassFromFile(SplFileInfo $file): string
     {
+        [$namespace, $path] = $this->getFileNamespacePath($file);
+
         return $namespace.str_replace(
             ['/', '.php'],
             ['\\', ''],
-            Str::after($file->getRealPath(), realpath(app_path()).DIRECTORY_SEPARATOR)
+            Str::after($file->getRealPath(), realpath($path).DIRECTORY_SEPARATOR)
         );
     }
 
@@ -627,5 +640,45 @@ class Kernel implements KernelContract
     protected function renderException($output, Throwable $e)
     {
         $this->app[ExceptionHandler::class]->renderForConsole($output, $e);
+    }
+    /**
+     * Returns a tuple with the namespace and path of the file.
+     *
+     * @param SplFileInfo $file
+     *
+     * @return array
+     */
+    protected function getFileNamespacePath(SplFileInfo $file): array
+    {
+        $matchingNamespaces = array_filter($this->availableNamespaces(), function ($path) use ($file) {
+            return Str::contains($file->getRealPath(), $path);
+        });
+
+        /**
+         * Since the matching namespace is already sorted by the length,
+         * we can just take the first match that has the longest overlap with path.
+         */
+        return match (count($matchingNamespaces)) {
+            0 => [$this->app->getNamespace(), $this->app->basePath()],
+            default => [array_key_first($matchingNamespaces), $matchingNamespaces[array_key_first($matchingNamespaces)]],
+        };
+    }
+
+    /**
+     * Returns the namespaces that have been discovered for auto-loading.
+     *
+     * Preferably this would be moved to the Application itself, since it requires the same data.
+     *
+     * @return array
+     */
+    protected function availableNamespaces(): array
+    {
+        $composer = json_decode(file_get_contents($this->app->basePath('composer.json')), true);
+
+        $discoveredNamespaces = (array) data_get($composer, 'autoload.psr-4');
+
+        uasort($discoveredNamespaces, fn ($a, $b) => strlen($a) < strlen($b));
+
+        return $this->discoveredNamespaces = $discoveredNamespaces;
     }
 }
