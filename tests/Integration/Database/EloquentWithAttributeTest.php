@@ -30,7 +30,7 @@ class EloquentWithAttributeTest extends DatabaseTestCase
         $results = Model1::withAttribute('twos', 'column_name');
 
         $this->assertEquals([
-            ['id' => 1, 'twos_column_name' => 'value'],
+            ['id' => 1, 'twos_attribute_column_name' => 'value'],
         ], $results->get()->toArray());
     }
 
@@ -45,7 +45,7 @@ class EloquentWithAttributeTest extends DatabaseTestCase
         $results = Model1::withAttribute(['twos' => fn ($q) => $q->latest('id')], 'column_name');
 
         $this->assertEquals([
-            ['id' => 1, 'twos_column_name' => 'value4'],
+            ['id' => 1, 'twos_attribute_column_name' => 'value4'],
         ], $results->get()->toArray());
     }
 }
