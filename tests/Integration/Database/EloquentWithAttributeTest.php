@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Tests\Integration\Database\EloquentwithAttributeTest;
+namespace Illuminate\Tests\Integration\Database\EloquentWithAttributeTest;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
