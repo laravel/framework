@@ -18,19 +18,19 @@ class EloquentWithAttributeTest extends DatabaseTestCase
         Schema::create('two', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('one_id');
-            $table->string('column');
+            $table->string('column_name');
         });
     }
 
     public function testItBasic()
     {
         $one = Model1::create();
-        $one->twos()->Create(['column' => 'value']);
+        $one->twos()->Create(['column_name' => 'value']);
 
-        $results = Model1::withAttribute('twos', 'column');
+        $results = Model1::withAttribute('twos', 'column_name');
 
         $this->assertEquals([
-            ['id' => 1, 'twos_attribute_column' => 'value'],
+            ['id' => 1, 'twos_attribute_column_name' => 'value'],
         ], $results->get()->toArray());
     }
 }
