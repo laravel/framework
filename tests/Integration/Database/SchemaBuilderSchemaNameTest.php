@@ -443,10 +443,10 @@ class SchemaBuilderSchemaNameTest extends DatabaseTestCase
         }
         $db->statement("alter user my_user with default_schema = my_schema execute as user='my_user'");
         $db->statement('grant create table to my_user');
-        // GRANT SELECT ON SCHEMA::role TO [my_user];
+        // $db->statement('grant select on SCHEMA::role to my_user');
         $db->statement('grant select, insert, update, delete, references, alter on SCHEMA::my_schema to my_user');
-        // GRANT CREATE TABLE TO [my_user];
-        // GRANT ALTER ON SCHEMA::my_schema TO [my_user];
+        $db->statement('grant create table to my_user');
+        $db->statement('grant alter on SCHEMA::my_schema to my_user');
 
         config([
             'database.connections.'.$connection.'.username' => 'my_user',
