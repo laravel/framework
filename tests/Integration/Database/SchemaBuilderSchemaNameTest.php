@@ -441,12 +441,13 @@ class SchemaBuilderSchemaNameTest extends DatabaseTestCase
         } catch(\Illuminate\Database\QueryException $e) {
             //
         }
-        $db->statement("alter user my_user with default_schema = my_schema execute as user='my_user'");
+
         $db->statement('grant create table to my_user');
         // $db->statement('grant select on SCHEMA::role to my_user');
         $db->statement('grant select, insert, update, delete, references, alter on SCHEMA::my_schema to my_user');
-        $db->statement('grant create table to my_user');
+        // $db->statement('grant create table to my_user');
         $db->statement('grant alter on SCHEMA::my_schema to my_user');
+        $db->statement("alter user my_user with default_schema = my_schema execute as user='my_user'");
 
         config([
             'database.connections.'.$connection.'.username' => 'my_user',
