@@ -38,6 +38,16 @@ class SqlServerGrammar extends Grammar
     protected $fluentCommands = ['Default'];
 
     /**
+     * Compile a query to determine the name of the default schema.
+     *
+     * @return string
+     */
+    public function compileDefaultSchema()
+    {
+        return 'select schema_name()';
+    }
+
+    /**
      * Compile a create database command.
      *
      * @param  string  $name
