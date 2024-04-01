@@ -289,7 +289,7 @@ if (! function_exists('config_path')) {
     }
 }
 
-if (!function_exists('context')) {
+if (! function_exists('context')) {
     /**
      * Get / set the specified context value.
      *
