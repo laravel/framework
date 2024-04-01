@@ -715,32 +715,6 @@ class Builder implements BuilderContract
     }
 
     /**
-     * Register a closure to be invoked after the query is executed.
-     *
-     * @param  \Closure  $callback
-     * @return $this
-     */
-    public function afterQuery(Closure $callback)
-    {
-        $this->afterQueryCallbacks[] = $callback;
-
-        return $this;
-    }
-
-    /**
-     * Invoke the "after query" modification callbacks.
-     *
-     * @param  mixed  $result
-     * @return void
-     */
-    public function applyAfterQueryCallbacks($result)
-    {
-        foreach ($this->afterQueryCallbacks as $afterQueryCallback) {
-            $afterQueryCallback($result);
-        }
-    }
-
-    /**
      * Execute the query as a "select" statement.
      *
      * @param  array|string  $columns
@@ -759,9 +733,7 @@ class Builder implements BuilderContract
 
         $models = $builder->getModel()->newCollection($models);
 
-        $this->applyAfterQueryCallbacks($models);
-
-        return $models;
+        return $this->applyAfterQueryCallbacks($models);
     }
 
     /**
@@ -888,6 +860,34 @@ class Builder implements BuilderContract
     protected function isNestedUnder($relation, $name)
     {
         return str_contains($name, '.') && str_starts_with($name, $relation.'.');
+    }
+
+    /**
+     * Register a closure to be invoked after the query is executed.
+     *
+     * @param  \Closure  $callback
+     * @return $this
+     */
+    public function afterQuery(Closure $callback)
+    {
+        $this->afterQueryCallbacks[] = $callback;
+
+        return $this;
+    }
+
+    /**
+     * Invoke the "after query" modification callbacks.
+     *
+     * @param  mixed  $result
+     * @return mixed
+     */
+    public function applyAfterQueryCallbacks($result)
+    {
+        foreach ($this->afterQueryCallbacks as $afterQueryCallback) {
+            $result = $afterQueryCallback($result) ?: $result;
+        }
+
+        return $result;
     }
 
     /**

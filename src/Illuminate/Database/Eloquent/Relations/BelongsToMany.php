@@ -885,9 +885,7 @@ class BelongsToMany extends Relation
 
         $models = $this->related->newCollection($models);
 
-        $this->query->applyAfterQueryCallbacks($models);
-
-        return $models;
+        return $this->query->applyAfterQueryCallbacks($models);
     }
 
     /**

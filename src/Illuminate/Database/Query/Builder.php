@@ -2704,6 +2704,34 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Register a closure to be invoked after the query is executed.
+     *
+     * @param  \Closure  $callback
+     * @return $this
+     */
+    public function afterQuery(Closure $callback)
+    {
+        $this->afterQueryCallbacks[] = $callback;
+
+        return $this;
+    }
+
+    /**
+     * Invoke the "after query" modification callbacks.
+     *
+     * @param  mixed  $result
+     * @return mixed
+     */
+    public function applyAfterQueryCallbacks($result)
+    {
+        foreach ($this->afterQueryCallbacks as $afterQueryCallback) {
+            $result = $afterQueryCallback($result) ?: $result;
+        }
+
+        return $result;
+    }
+
+    /**
      * Get the SQL representation of the query.
      *
      * @return string
@@ -2806,32 +2834,6 @@ class Builder implements BuilderContract
     }
 
     /**
-     * Register a closure to be invoked after the query is executed.
-     *
-     * @param  \Closure  $callback
-     * @return $this
-     */
-    public function afterQuery(Closure $callback)
-    {
-        $this->afterQueryCallbacks[] = $callback;
-
-        return $this;
-    }
-
-    /**
-     * Invoke the "after query" modification callbacks.
-     *
-     * @param  mixed  $result
-     * @return void
-     */
-    public function applyAfterQueryCallbacks($result)
-    {
-        foreach ($this->afterQueryCallbacks as $afterQueryCallback) {
-            $afterQueryCallback($result);
-        }
-    }
-
-    /**
      * Execute the query as a "select" statement.
      *
      * @param  array|string  $columns
@@ -2843,11 +2845,9 @@ class Builder implements BuilderContract
             return $this->processor->processSelect($this, $this->runSelect());
         }));
 
-        $items = isset($this->groupLimit) ? $this->withoutGroupLimitKeys($items) : $items;
-
-        $this->applyAfterQueryCallbacks($items);
-
-        return $items;
+        return $this->applyAfterQueryCallbacks(
+            isset($this->groupLimit) ? $this->withoutGroupLimitKeys($items) : $items
+        );
     }
 
     /**
