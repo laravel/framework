@@ -424,11 +424,11 @@ class SupportTestingQueueFakeTest extends TestCase
             new JobStub,
         ]);
 
-        $job->assertChain([
+        $job->assertHasChain([
             JobStub::class,
         ]);
 
-        $job->assertChain([
+        $job->assertHasChain([
             new JobStub(),
         ]);
     }
@@ -437,7 +437,7 @@ class SupportTestingQueueFakeTest extends TestCase
     {
         $job = new JobWithChainStub([]);
 
-        $job->assertNoChain();
+        $job->assertDoesntHaveChain();
     }
 
     public function testAssertChainErrorHandling()
@@ -447,14 +447,14 @@ class SupportTestingQueueFakeTest extends TestCase
         ]);
 
         try {
-            $job->assertChain([]);
+            $job->assertHasChain([]);
             $this->fail();
         } catch (ExpectationFailedException $e) {
             $this->assertStringContainsString('The expected chain can not be empty.', $e->getMessage());
         }
 
         try {
-            $job->assertChain([
+            $job->assertHasChain([
                 new JobStub,
                 new JobStub,
             ]);
@@ -464,7 +464,7 @@ class SupportTestingQueueFakeTest extends TestCase
         }
 
         try {
-            $job->assertChain([
+            $job->assertHasChain([
                 JobStub::class,
                 JobStub::class,
             ]);
@@ -474,7 +474,7 @@ class SupportTestingQueueFakeTest extends TestCase
         }
 
         try {
-            $job->assertNoChain();
+            $job->assertDoesntHaveChain();
             $this->fail();
         } catch (ExpectationFailedException $e) {
             $this->assertStringContainsString('The job has chained jobs.', $e->getMessage());
