@@ -17,7 +17,7 @@ class TrustHosts
     /**
      * The trusted hosts that have been configured to always be trusted.
      *
-     * @var array<int, string>|null
+     * @var array<int, string>|(callable(): array<int, string>)|null
      */
     protected static $alwaysTrust;
 
@@ -46,17 +46,21 @@ class TrustHosts
      */
     public function hosts()
     {
-        if (is_array(static::$alwaysTrust)) {
-            $hosts = static::$alwaysTrust;
-
-            if (static::$subdomains) {
-                $hosts[] = $this->allSubdomainsOfApplicationUrl();
-            }
-
-            return $hosts;
+        if (is_null(static::$alwaysTrust)) {
+            return [$this->allSubdomainsOfApplicationUrl()];
         }
 
-        return [$this->allSubdomainsOfApplicationUrl()];
+        $hosts = match (true) {
+            is_array(static::$alwaysTrust) => static::$alwaysTrust,
+            is_callable(static::$alwaysTrust) => call_user_func(static::$alwaysTrust),
+            default => [],
+        };
+
+        if (static::$subdomains) {
+            $hosts[] = $this->allSubdomainsOfApplicationUrl();
+        }
+
+        return $hosts;
     }
 
     /**
@@ -78,11 +82,11 @@ class TrustHosts
     /**
      * Specify the hosts that should always be trusted.
      *
-     * @param  array<int, string>  $hosts
+     * @param  array<int, string>|(callable(): array<int, string>)  $hosts
      * @param  bool  $subdomains
      * @return void
      */
-    public static function at(array $hosts, bool $subdomains = true)
+    public static function at(array|callable $hosts, bool $subdomains = true)
     {
         static::$alwaysTrust = $hosts;
         static::$subdomains = $subdomains;

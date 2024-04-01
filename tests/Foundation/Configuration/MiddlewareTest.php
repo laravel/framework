@@ -222,16 +222,25 @@ class MiddlewareTest extends TestCase
         $configuration->trustHosts(at: ['my.test']);
         $this->assertEquals(['my.test', '^(.+\.)?laravel\.test$'], $middleware->hosts());
 
-        $configuration->trustHosts(at: ['my.test']);
+        $configuration->trustHosts(at: static fn () => ['my.test']);
         $this->assertEquals(['my.test', '^(.+\.)?laravel\.test$'], $middleware->hosts());
 
         $configuration->trustHosts(at: ['my.test'], subdomains: false);
         $this->assertEquals(['my.test'], $middleware->hosts());
 
+        $configuration->trustHosts(at: static fn () => ['my.test'], subdomains: false);
+        $this->assertEquals(['my.test'], $middleware->hosts());
+
         $configuration->trustHosts(at: []);
         $this->assertEquals(['^(.+\.)?laravel\.test$'], $middleware->hosts());
 
+        $configuration->trustHosts(at: static fn () => []);
+        $this->assertEquals(['^(.+\.)?laravel\.test$'], $middleware->hosts());
+
         $configuration->trustHosts(at: [], subdomains: false);
+        $this->assertEquals([], $middleware->hosts());
+
+        $configuration->trustHosts(at: static fn () => [], subdomains: false);
         $this->assertEquals([], $middleware->hosts());
     }
 
