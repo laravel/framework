@@ -731,9 +731,9 @@ class Builder implements BuilderContract
             $models = $builder->eagerLoadRelations($models);
         }
 
-        $models = $builder->getModel()->newCollection($models);
-
-        return $this->applyAfterQueryCallbacks($models);
+        return $this->applyAfterQueryCallbacks(
+            $builder->getModel()->newCollection($models)
+        );
     }
 
     /**
