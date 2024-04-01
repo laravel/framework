@@ -276,7 +276,7 @@ trait Queueable
     }
 
     /**
-     * Assert that the job has the chained jobs.
+     * Assert that the job has the given chain of jobs attached to it.
      *
      * @param  array  $expectedChain
      * @return void
@@ -301,9 +301,8 @@ trait Queueable
     }
 
     /**
-     * Assert that the job has no chained jobs.
+     * Assert that the job has no remaining chained jobs.
      *
-     * @param  array  $expectedChain
      * @return void
      */
     public function assertNoChain()
