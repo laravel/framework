@@ -296,8 +296,6 @@ if (! function_exists('context')) {
      * @param  array|string|null  $key
      * @param  mixed  $default
      * @return mixed|\Illuminate\Log\Context\Repository
-     *
-     * @throws \InvalidArgumentException
      */
     function context($key, $default = null)
     {
@@ -306,12 +304,6 @@ if (! function_exists('context')) {
         }
 
         if (is_array($key)) {
-            if (count($key) !== 1) {
-                throw new InvalidArgumentException(
-                    'When setting a value in the context, you must pass only one array of key / value pairs.'
-                );
-            }
-
             return app(ContextRepository::class)->add($key);
         }
 
