@@ -30,6 +30,18 @@ class ClassMakeCommand extends GeneratorCommand
      */
     protected $type = 'Class';
 
+    protected function replaceClass($stub, $name)
+    {
+        $stub = parent::replaceClass($stub, $name);
+
+        $extends = '';
+        if ($this->option('extends')) {
+            $extends = 'extends ' . $this->option('extends');
+        }
+
+        return str_replace(['dummy:extends', '{{ extends }}'], $extends, $stub);
+    }
+
     /**
      * Get the stub file for the generator.
      *
@@ -76,6 +88,7 @@ class ClassMakeCommand extends GeneratorCommand
         return [
             ['invokable', 'i', InputOption::VALUE_NONE, 'Generate a single method, invokable class'],
             ['force', 'f', InputOption::VALUE_NONE, 'Create the class even if the class already exists'],
+            ['extends', null, InputOption::VALUE_OPTIONAL, 'Namespaced class name to extend'],
         ];
     }
 }

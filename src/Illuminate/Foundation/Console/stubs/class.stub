@@ -2,7 +2,7 @@
 
 namespace {{ namespace }};
 
-class {{ class }}
+class {{ class }} {{ extends }}
 {
     /**
      * Create a new class instance.
