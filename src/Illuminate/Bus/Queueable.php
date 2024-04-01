@@ -281,7 +281,7 @@ trait Queueable
      * @param  array  $expectedChain
      * @return void
      */
-    public function assertChain($expectedChain)
+    public function assertHasChain($expectedChain)
     {
         PHPUnit::assertTrue(
             collect($expectedChain)->isNotEmpty(),
@@ -305,11 +305,8 @@ trait Queueable
      *
      * @return void
      */
-    public function assertNoChain()
+    public function assertDoesntHaveChain()
     {
-        PHPUnit::assertEmpty(
-            $this->chained,
-            'The job has chained jobs.'
-        );
+        PHPUnit::assertEmpty($this->chained, 'The job has chained jobs.');
     }
 }
