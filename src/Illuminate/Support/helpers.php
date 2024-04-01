@@ -155,6 +155,19 @@ if (! function_exists('filled')) {
     }
 }
 
+if (! function_exists('fluent')) {
+    /**
+     * Create an Fluent object from the given value.
+     *
+     * @param  object|array  $value
+     * @return \Illuminate\Support\Fluent
+     */
+    function fluent($value)
+    {
+        return new Fluent($value);
+    }
+}
+
 if (! function_exists('literal')) {
     /**
      * Return a new literal or anonymous object using named arguments.
@@ -469,18 +482,5 @@ if (! function_exists('with')) {
     function with($value, callable $callback = null)
     {
         return is_null($callback) ? $value : $callback($value);
-    }
-}
-
-if (! function_exists('fluent')) {
-    /**
-     * Create a fluent object from the given value.
-     *
-     * @param  object|array  $value
-     * @return Fluent
-     */
-    function fluent($value)
-    {
-        return new Fluent($value);
     }
 }
