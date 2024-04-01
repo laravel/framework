@@ -4,6 +4,7 @@ use Illuminate\Contracts\Support\DeferringDisplayableValue;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Env;
+use Illuminate\Support\Fluent;
 use Illuminate\Support\HigherOrderTapProxy;
 use Illuminate\Support\Once;
 use Illuminate\Support\Onceable;
@@ -151,6 +152,19 @@ if (! function_exists('filled')) {
     function filled($value)
     {
         return ! blank($value);
+    }
+}
+
+if (! function_exists('fluent')) {
+    /**
+     * Create an Fluent object from the given value.
+     *
+     * @param  object|array  $value
+     * @return \Illuminate\Support\Fluent
+     */
+    function fluent($value)
+    {
+        return new Fluent($value);
     }
 }
 
