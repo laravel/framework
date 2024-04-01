@@ -22,7 +22,7 @@ class TrustHosts
     protected static $alwaysTrust;
 
     /**
-     * Whether to trust subdomains of the application url.
+     * Indicates whether subdomains of the application URL should be trusted.
      *
      * @var bool|null
      */
