@@ -4,6 +4,7 @@ namespace Illuminate\Foundation\Http\Middleware;
 
 use Closure;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 
 class TrimStrings extends TransformsRequest
 {
@@ -65,7 +66,7 @@ class TrimStrings extends TransformsRequest
             return $value;
         }
 
-        return preg_replace('~^[\s\x{FEFF}\x{200B}\x{200E}]+|[\s\x{FEFF}\x{200B}\x{200E}]+$~u', '', $value) ?? trim($value);
+        return Str::trim($value);
     }
 
     /**

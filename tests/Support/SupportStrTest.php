@@ -766,6 +766,83 @@ class SupportStrTest extends TestCase
         $this->assertSame('żółtałódka', Str::snake('ŻółtaŁódka'));
     }
 
+    public function testTrim()
+    {
+        $this->assertSame('foo bar', Str::trim('   foo bar   '));
+        $this->assertSame('foo bar', Str::trim('foo bar   '));
+        $this->assertSame('foo bar', Str::trim('   foo bar'));
+        $this->assertSame('foo bar', Str::trim('foo bar'));
+        $this->assertSame(' foo bar ', Str::trim(' foo bar ', ''));
+        $this->assertSame('foo bar', Str::trim(' foo bar ', ' '));
+        $this->assertSame('foo  bar', Str::trim('-foo  bar_', '-_'));
+
+        $this->assertSame('foo    bar', Str::trim(' foo    bar '));
+
+        $this->assertSame('123', Str::trim('   123    '));
+        $this->assertSame('だ', Str::trim('だ'));
+        $this->assertSame('ム', Str::trim('ム'));
+        $this->assertSame('だ', Str::trim('   だ    '));
+        $this->assertSame('ム', Str::trim('   ム    '));
+
+        $this->assertSame(
+            'foo bar',
+            Str::trim('
+                foo bar
+            ')
+        );
+        $this->assertSame(
+            'foo
+                bar',
+            Str::trim('
+                foo
+                bar
+            ')
+        );
+
+        $this->assertSame("\xE9", Str::trim(" \xE9 "));
+    }
+
+    public function testLtrim()
+    {
+        $this->assertSame('foo    bar ', Str::ltrim(' foo    bar '));
+
+        $this->assertSame('123    ', Str::ltrim('   123    '));
+        $this->assertSame('だ', Str::ltrim('だ'));
+        $this->assertSame('ム', Str::ltrim('ム'));
+        $this->assertSame('だ    ', Str::ltrim('   だ    '));
+        $this->assertSame('ム    ', Str::ltrim('   ム    '));
+
+        $this->assertSame(
+            'foo bar
+            ',
+            Str::ltrim('
+                foo bar
+            ')
+        );
+        $this->assertSame("\xE9 ", Str::ltrim(" \xE9 "));
+    }
+
+    public function testRtrim()
+    {
+        $this->assertSame(' foo    bar', Str::rtrim(' foo    bar '));
+
+        $this->assertSame('   123', Str::rtrim('   123    '));
+        $this->assertSame('だ', Str::rtrim('だ'));
+        $this->assertSame('ム', Str::rtrim('ム'));
+        $this->assertSame('   だ', Str::rtrim('   だ    '));
+        $this->assertSame('   ム', Str::rtrim('   ム    '));
+
+        $this->assertSame(
+            '
+                foo bar',
+            Str::rtrim('
+                foo bar
+            ')
+        );
+
+        $this->assertSame(" \xE9", Str::rtrim(" \xE9 "));
+    }
+
     public function testSquish()
     {
         $this->assertSame('laravel php framework', Str::squish(' laravel   php  framework '));
