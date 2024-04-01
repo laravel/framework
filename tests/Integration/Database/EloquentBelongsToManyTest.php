@@ -65,6 +65,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
             $table->integer('tag_id')->default(0);
             $table->string('tag_name')->default('')->nullable();
             $table->string('flag')->default('')->nullable();
+            $table->string('isActive')->default('')->nullable();
             $table->timestamps();
         });
 
@@ -982,6 +983,19 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         $this->assertEquals($relationTag->getAttributes(), $tag->getAttributes());
 
         $relationTag = $post->tags()->wherePivot('flag', '=', true)->first();
+        $this->assertEquals($relationTag->getAttributes(), $tag->getAttributes());
+    }
+
+    public function testOrWherePivotOnBoolean()
+    {
+        $tag = Tag::create(['name' => Str::random()])->fresh();
+        $post = Post::create(['title' => Str::random()]);
+
+        DB::table('posts_tags')->insert([
+            ['post_id' => $post->id, 'tag_id' => $tag->id, 'flag' => true, 'isActive' => false],
+        ]);
+
+        $relationTag = $post->tags()->wherePivot('isActive', false)->orWherePivot('flag', true)->first();
         $this->assertEquals($relationTag->getAttributes(), $tag->getAttributes());
     }
 
