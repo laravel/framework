@@ -16,6 +16,7 @@ use Illuminate\Foundation\Bus\PendingClosureDispatch;
 use Illuminate\Foundation\Bus\PendingDispatch;
 use Illuminate\Foundation\Mix;
 use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Log\Context\Repository as ContextRepository;
 use Illuminate\Queue\CallQueuedClosure;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Date;
@@ -285,6 +286,36 @@ if (! function_exists('config_path')) {
     function config_path($path = '')
     {
         return app()->configPath($path);
+    }
+}
+
+if (!function_exists('context')) {
+    /**
+     * Get / set the specified context value.
+     *
+     * @param  array|string|null  $key
+     * @param  mixed  $default
+     * @return mixed|\Illuminate\Log\Context\Repository
+     *
+     * @throws \InvalidArgumentException
+     */
+    function context($key, $default = null)
+    {
+        if (is_null($key)) {
+            return app(ContextRepository::class);
+        }
+
+        if (is_array($key)) {
+            if (count($key) !== 1) {
+                throw new InvalidArgumentException(
+                    'When setting a value in the context, you must pass only one array of key / value pairs.'
+                );
+            }
+
+            return app(ContextRepository::class)->add($key);
+        }
+
+        return app(ContextRepository::class)->get($key, $default);
     }
 }
 
