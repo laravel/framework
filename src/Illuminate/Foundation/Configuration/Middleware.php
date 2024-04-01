@@ -608,15 +608,15 @@ class Middleware
     /**
      * Indicate that the trusted host middleware should be enabled.
      *
-     * @param  array<int, string>|null  $at
+     * @param  array<int, string>|(callable(): array<int, string>)|null  $at
      * @param  bool  $subdomains
      * @return $this
      */
-    public function trustHosts(array $at = null, bool $subdomains = true)
+    public function trustHosts(array|callable $at = null, bool $subdomains = true)
     {
         $this->trustHosts = true;
 
-        if (is_array($at)) {
+        if (! is_null($at)) {
             TrustHosts::at($at, $subdomains);
         }
 
