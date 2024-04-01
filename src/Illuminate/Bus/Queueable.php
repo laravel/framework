@@ -24,27 +24,6 @@ trait Queueable
     public $queue;
 
     /**
-     * The name of the connection the chain should be sent to.
-     *
-     * @var string|null
-     */
-    public $chainConnection;
-
-    /**
-     * The name of the queue the chain should be sent to.
-     *
-     * @var string|null
-     */
-    public $chainQueue;
-
-    /**
-     * The callbacks to be executed on chain failure.
-     *
-     * @var array|null
-     */
-    public $chainCatchCallbacks;
-
-    /**
      * The number of seconds before the job should be made available.
      *
      * @var \DateTimeInterface|\DateInterval|array|int|null
@@ -71,6 +50,27 @@ trait Queueable
      * @var array
      */
     public $chained = [];
+
+    /**
+     * The name of the connection the chain should be sent to.
+     *
+     * @var string|null
+     */
+    public $chainConnection;
+
+    /**
+     * The name of the queue the chain should be sent to.
+     *
+     * @var string|null
+     */
+    public $chainQueue;
+
+    /**
+     * The callbacks to be executed on chain failure.
+     *
+     * @var array|null
+     */
+    public $chainCatchCallbacks;
 
     /**
      * Set the desired connection for the job.
