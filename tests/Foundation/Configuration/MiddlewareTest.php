@@ -219,9 +219,6 @@ class MiddlewareTest extends TestCase
         $configuration->trustHosts();
         $this->assertEquals(['^(.+\.)?laravel\.test$'], $middleware->hosts());
 
-        app()['config'] = Mockery::mock(Repository::class);
-        app()['config']->shouldReceive('get')->with('app.url', null)->times(3)->andReturn('http://laravel.test');
-
         $configuration->trustHosts(at: ['my.test']);
         $this->assertEquals(['my.test', '^(.+\.)?laravel\.test$'], $middleware->hosts());
 

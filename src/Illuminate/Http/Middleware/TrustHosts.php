@@ -22,6 +22,13 @@ class TrustHosts
     protected static $alwaysTrust;
 
     /**
+     * Whether to trust subdomains of the application url.
+     *
+     * @var bool|null
+     */
+    protected static $subdomains;
+
+    /**
      * Create a new middleware instance.
      *
      * @param  \Illuminate\Contracts\Foundation\Application  $app
@@ -39,9 +46,17 @@ class TrustHosts
      */
     public function hosts()
     {
-        return is_array(static::$alwaysTrust)
-            ? static::$alwaysTrust
-            : [$this->allSubdomainsOfApplicationUrl()];
+        if (is_array(static::$alwaysTrust)) {
+            $hosts = static::$alwaysTrust;
+
+            if (static::$subdomains) {
+                $hosts[] = $this->allSubdomainsOfApplicationUrl();
+            }
+
+            return $hosts;
+        }
+
+        return [$this->allSubdomainsOfApplicationUrl()];
     }
 
     /**
@@ -69,13 +84,8 @@ class TrustHosts
      */
     public static function at(array $hosts, bool $subdomains = true)
     {
-        if ($subdomains) {
-            if ($host = parse_url(config('app.url'), PHP_URL_HOST)) {
-                $hosts[] = '^(.+\.)?'.preg_quote($host).'$';
-            }
-        }
-
         static::$alwaysTrust = $hosts;
+        static::$subdomains = $subdomains;
     }
 
     /**
@@ -109,5 +119,6 @@ class TrustHosts
     public static function flushState()
     {
         static::$alwaysTrust = null;
+        static::$subdomains = null;
     }
 }
