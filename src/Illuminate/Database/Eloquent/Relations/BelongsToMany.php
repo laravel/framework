@@ -65,7 +65,7 @@ class BelongsToMany extends Relation
     /**
      * The pivot table columns to retrieve.
      *
-     * @var array
+     * @var array<string|\Illuminate\Contracts\Database\Query\Expression>
      */
     protected $pivotColumns = [];
 
@@ -356,7 +356,7 @@ class BelongsToMany extends Relation
     /**
      * Set a where clause for a pivot table column.
      *
-     * @param  string  $column
+     * @param  string|\Illuminate\Contracts\Database\Query\Expression  $column
      * @param  mixed  $operator
      * @param  mixed  $value
      * @param  string  $boolean
@@ -372,7 +372,7 @@ class BelongsToMany extends Relation
     /**
      * Set a "where between" clause for a pivot table column.
      *
-     * @param  string  $column
+     * @param  string|\Illuminate\Contracts\Database\Query\Expression  $column
      * @param  array  $values
      * @param  string  $boolean
      * @param  bool  $not
@@ -386,7 +386,7 @@ class BelongsToMany extends Relation
     /**
      * Set a "or where between" clause for a pivot table column.
      *
-     * @param  string  $column
+     * @param  string|\Illuminate\Contracts\Database\Query\Expression  $column
      * @param  array  $values
      * @return $this
      */
@@ -398,7 +398,7 @@ class BelongsToMany extends Relation
     /**
      * Set a "where pivot not between" clause for a pivot table column.
      *
-     * @param  string  $column
+     * @param  string|\Illuminate\Contracts\Database\Query\Expression  $column
      * @param  array  $values
      * @param  string  $boolean
      * @return $this
@@ -411,7 +411,7 @@ class BelongsToMany extends Relation
     /**
      * Set a "or where not between" clause for a pivot table column.
      *
-     * @param  string  $column
+     * @param  string|\Illuminate\Contracts\Database\Query\Expression  $column
      * @param  array  $values
      * @return $this
      */
@@ -423,7 +423,7 @@ class BelongsToMany extends Relation
     /**
      * Set a "where in" clause for a pivot table column.
      *
-     * @param  string  $column
+     * @param  string|\Illuminate\Contracts\Database\Query\Expression  $column
      * @param  mixed  $values
      * @param  string  $boolean
      * @param  bool  $not
@@ -439,7 +439,7 @@ class BelongsToMany extends Relation
     /**
      * Set an "or where" clause for a pivot table column.
      *
-     * @param  string  $column
+     * @param  string|\Illuminate\Contracts\Database\Query\Expression  $column
      * @param  mixed  $operator
      * @param  mixed  $value
      * @return $this
@@ -454,7 +454,7 @@ class BelongsToMany extends Relation
      *
      * In addition, new pivot records will receive this value.
      *
-     * @param  string|array  $column
+     * @param  string|\Illuminate\Contracts\Database\Query\Expression|array<string, string>  $column
      * @param  mixed  $value
      * @return $this
      *
@@ -494,7 +494,7 @@ class BelongsToMany extends Relation
     /**
      * Set a "where not in" clause for a pivot table column.
      *
-     * @param  string  $column
+     * @param  string|\Illuminate\Contracts\Database\Query\Expression  $column
      * @param  mixed  $values
      * @param  string  $boolean
      * @return $this
@@ -519,7 +519,7 @@ class BelongsToMany extends Relation
     /**
      * Set a "where null" clause for a pivot table column.
      *
-     * @param  string  $column
+     * @param  string|\Illuminate\Contracts\Database\Query\Expression  $column
      * @param  string  $boolean
      * @param  bool  $not
      * @return $this
@@ -534,7 +534,7 @@ class BelongsToMany extends Relation
     /**
      * Set a "where not null" clause for a pivot table column.
      *
-     * @param  string  $column
+     * @param  string|\Illuminate\Contracts\Database\Query\Expression  $column
      * @param  string  $boolean
      * @return $this
      */
@@ -546,7 +546,7 @@ class BelongsToMany extends Relation
     /**
      * Set a "or where null" clause for a pivot table column.
      *
-     * @param  string  $column
+     * @param  string|\Illuminate\Contracts\Database\Query\Expression  $column
      * @param  bool  $not
      * @return $this
      */
@@ -558,7 +558,7 @@ class BelongsToMany extends Relation
     /**
      * Set a "or where not null" clause for a pivot table column.
      *
-     * @param  string  $column
+     * @param  string|\Illuminate\Contracts\Database\Query\Expression  $column
      * @return $this
      */
     public function orWherePivotNotNull($column)
@@ -569,7 +569,7 @@ class BelongsToMany extends Relation
     /**
      * Add an "order by" clause for a pivot table column.
      *
-     * @param  string  $column
+     * @param  string|\Illuminate\Contracts\Database\Query\Expression  $column
      * @param  string  $direction
      * @return $this
      */
@@ -1558,11 +1558,15 @@ class BelongsToMany extends Relation
     /**
      * Qualify the given column name by the pivot table.
      *
-     * @param  string  $column
-     * @return string
+     * @param  string|\Illuminate\Contracts\Database\Query\Expression  $column
+     * @return string|\Illuminate\Contracts\Database\Query\Expression
      */
     public function qualifyPivotColumn($column)
     {
+        if ($this->getGrammar()->isExpression($column)) {
+            return $column;
+        }
+
         return str_contains($column, '.')
                     ? $column
                     : $this->table.'.'.$column;
