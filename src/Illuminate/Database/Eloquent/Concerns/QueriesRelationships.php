@@ -659,7 +659,7 @@ trait QueriesRelationships
             // If the query contains certain elements like orderings / more than one column selected
             // then we will remove those elements from the query so that it will execute properly
             // when given to the database. Otherwise, we may receive SQL errors or poor syntax.
-            if ($function){
+            if ($function) {
                 $query->orders = null;
                 $query->setBindings([], 'order');
             }
