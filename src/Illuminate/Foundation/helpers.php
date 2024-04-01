@@ -299,15 +299,11 @@ if (! function_exists('context')) {
      */
     function context($key, $default = null)
     {
-        if (is_null($key)) {
-            return app(ContextRepository::class);
-        }
-
-        if (is_array($key)) {
-            return app(ContextRepository::class)->add($key);
-        }
-
-        return app(ContextRepository::class)->get($key, $default);
+        return match (true) {
+            is_null($key) => app(ContextRepository::class),
+            is_array($key) => app(ContextRepository::class)->add($key),
+            default => app(ContextRepository::class)->get($key, $default),
+        };
     }
 }
 
