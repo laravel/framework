@@ -4,7 +4,7 @@ namespace Illuminate\Database\Connectors;
 
 use PDO;
 
-class MariaDbConnector extends MySqlConnector implements ConnectorInterface
+class MariaDbConnector extends MySqlConnector
 {
     /**
      * Get the sql_mode value.
