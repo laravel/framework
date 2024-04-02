@@ -395,12 +395,14 @@ trait BuildsQueries
                     );
 
                     $unionBuilders->each(function ($unionBuilder) use ($previousColumn, $cursor) {
+                        $unionWheres = $unionBuilder->getRawBindings()['where'];
                         $unionBuilder->where(
                             $this->getOriginalColumnNameForCursorPagination($this, $previousColumn),
                             '=',
                             $cursor->parameter($previousColumn)
                         );
 
+                        $this->addBinding($unionWheres, 'union');
                         $this->addBinding($unionBuilder->getRawBindings()['where'], 'union');
                     });
                 }
