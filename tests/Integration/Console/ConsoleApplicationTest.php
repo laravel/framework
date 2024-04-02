@@ -116,9 +116,10 @@ class ConsoleApplicationTest extends TestCase
 
         $app->singleton(
             ConsoleKernelContract::class,
-            fn () => tap((new \Illuminate\Foundation\Console\Kernel($app, $app->make('events')))->addCommandPaths([
-                __DIR__.'/Fixtures',
-            ])),
+            fn () => (new \Illuminate\Foundation\Console\Kernel($app, $app->make('events')))
+                ->addCommandPaths([
+                    __DIR__ . '/Fixtures',
+                ]),
         );
 
         return $app;
