@@ -37,7 +37,7 @@ trait PromptsForMissingInput
     protected function promptForMissingArguments(InputInterface $input, OutputInterface $output)
     {
         $prompted = collect($this->getDefinition()->getArguments())
-            ->filter(fn ($argument) => $argument->isRequired() && empty($input->getArgument($argument->getName())))
+            ->filter(fn ($argument) => $argument->isRequired() && (is_null($input->getArgument($argument->getName())) || (is_array($input->getArgument($argument->getName())) && count($input->getArgument($argument->getName())) === 0)))
             ->filter(fn ($argument) => $argument->getName() !== 'command')
             ->each(function ($argument) use ($input) {
                 $label = $this->promptForMissingArgumentsUsing()[$argument->getName()] ??
