@@ -1118,7 +1118,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
             ['post_id' => $post->id, 'tag_id' => $tag2->id, 'flag' => null, 'isActive' => false],
         ]);
 
-        $relationTag = $post->tagsWithExtraPivot()->wherePivotNotNull('flag')->orWherePivotNull('isActive')->first();
+        $relationTag = $post->tagsWithExtraPivot()->wherePivotNotNull('flag')->orWherePivotNotNull('isActive')->first();
         $this->assertEquals($relationTag->getAttributes(), $tag1->getAttributes());
     }
 
