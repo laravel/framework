@@ -75,14 +75,7 @@ class ConsoleApplicationTest extends TestCase
 
     public function testCommandClassResolverCanBeUpdated()
     {
-        $container = $this->getMockBuilder(FoundationApplication::class)
-            ->disableOriginalConstructor()
-            ->setConstructorArgs([__DIR__])
-            ->getMock();
-
-        $app = spy(new Application($container, new EventsDispatcher($container), "1"));
-        $container->instance(Application::class, $app);
-
+        $container = new FoundationApplication();
         $dispatcher = new EventsDispatcher($container);
 
         $kernel = new Kernel($container, $dispatcher);
