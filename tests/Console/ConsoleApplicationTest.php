@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Console;
 
 use SplFileInfo;
+use ReflectionClass;
 use Illuminate\Support\Str;
 use Illuminate\Console\Command;
 use Illuminate\Console\Application;
@@ -93,7 +94,11 @@ class ConsoleApplicationTest extends TestCase
 
         $kernel::guessCommandClassesUsing($callback);
 
-        $kernel->addCommandPaths([__DIR__ . '/Fixtures']);
+        $instance = new ReflectionClass($kernel);
+        $property = $instance->getProperty('commandClassResolver');
+        $property->setAccessible(true);
+
+        $this->assertSame($callback, $property->getValue($kernel));
     }
 
     public function testResolvingCommandsWithAliasViaProperty()

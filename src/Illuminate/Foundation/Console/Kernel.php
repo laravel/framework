@@ -485,7 +485,6 @@ class Kernel implements KernelContract
         if (! $this->commandsLoaded) {
             $this->commands();
 
-
             if ($this->shouldDiscoverCommands()) {
                 $this->discoverCommands();
             }

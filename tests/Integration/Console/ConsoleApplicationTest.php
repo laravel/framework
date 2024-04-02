@@ -2,6 +2,9 @@
 
 namespace Illuminate\Tests\Integration\Console;
 
+use SplFileInfo;
+use Illuminate\Support\Str;
+use Illuminate\Foundation\Application;
 use Illuminate\Console\Application as Artisan;
 use Illuminate\Console\Command;
 use Illuminate\Console\Scheduling\Schedule;
@@ -10,12 +13,14 @@ use Illuminate\Foundation\Console\QueuedCommand;
 use Illuminate\Support\Facades\Queue;
 use Orchestra\Testbench\TestCase;
 use Symfony\Component\Console\Attribute\AsCommand;
+use Illuminate\Contracts\Http\Kernel as HttpKernelContract;
+use Illuminate\Contracts\Console\Kernel as ConsoleKernelContract;
 
 class ConsoleApplicationTest extends TestCase
 {
     protected function setUp(): void
     {
-        Artisan::starting(function ($artisan) {
+        Artisan::starting(function (Artisan $artisan) {
             $artisan->resolveCommands([
                 FooCommandStub::class,
                 ZondaCommandStub::class,
@@ -94,6 +99,29 @@ class ConsoleApplicationTest extends TestCase
         $this->artisan('foo:schedule');
 
         $this->assertTrue($this->app->resolved(Schedule::class));
+    }
+
+    public function testCommandClassResolver()
+    {
+        $this->artisan('foo:command');
+    }
+
+    public function resolveApplicationConsoleKernel($app)
+    {
+        $callback = function (SplFileInfo $file) {
+            return "Illuminate\\Tests\\Integration\\Console\\Fixtures\\" . Str::before(ucfirst($file->getFilename()), '.php');
+        };
+
+        \Illuminate\Foundation\Console\Kernel::guessCommandClassesUsing($callback);
+
+        $app->singleton(
+            ConsoleKernelContract::class,
+            fn () => tap((new \Illuminate\Foundation\Console\Kernel($app, $app->make('events')))->addCommandPaths([
+                __DIR__.'/Fixtures',
+            ])),
+        );
+
+        return $app;
     }
 
     public function testArtisanQueue()
