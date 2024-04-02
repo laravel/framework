@@ -999,6 +999,23 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         $this->assertEquals($relationTag->getAttributes(), $tag->getAttributes());
     }
 
+    public function testWherePivotNotBetween()
+    {
+        $tag = Tag::create(['name' => Str::random()])->fresh();
+        $post = Post::create(['title' => Str::random()]);
+
+        DB::table('posts_tags')->insert([
+            ['post_id' => $post->id, 'tag_id' => $tag->id, 'flag' => true, 'isActive' => false],
+        ]);
+
+        $relationTag = $post->tags()
+            ->wherePivotNotBetween('isActive', true)
+            ->orWherePivotNotBetween('flag', false)
+            ->first();
+
+        $this->assertEquals($relationTag->getAttributes(), $tag->getAttributes());
+    }
+
     public function testWherePivotInMethod()
     {
         $tag = Tag::create(['name' => Str::random()])->fresh();
@@ -1095,13 +1112,13 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         $post = Post::create(['title' => Str::random()]);
 
         DB::table('posts_tags')->insert([
-            ['post_id' => $post->id, 'tag_id' => $tag1->id, 'flag' => 'foo'],
+            ['post_id' => $post->id, 'tag_id' => $tag1->id, 'flag' => 'foo', 'isActive' => true],
         ]);
         DB::table('posts_tags')->insert([
-            ['post_id' => $post->id, 'tag_id' => $tag2->id, 'flag' => null],
+            ['post_id' => $post->id, 'tag_id' => $tag2->id, 'flag' => null, 'isActive' => false],
         ]);
 
-        $relationTag = $post->tagsWithExtraPivot()->wherePivotNotNull('flag')->first();
+        $relationTag = $post->tagsWithExtraPivot()->wherePivotNotNull('flag')->orWherePivotNull('isActive')->first();
         $this->assertEquals($relationTag->getAttributes(), $tag1->getAttributes());
     }
 
