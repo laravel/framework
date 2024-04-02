@@ -1012,6 +1012,11 @@ class Builder implements BuilderContract
             ->values();
     }
 
+    protected function getUnionBuilders()
+    {
+        return isset($this->query->unions) ? collect($this->query->unions)->pluck('query') : collect();
+    }
+
     /**
      * Save a new model and return the instance.
      *

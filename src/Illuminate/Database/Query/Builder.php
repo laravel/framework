@@ -2972,6 +2972,11 @@ class Builder implements BuilderContract
             ->values();
     }
 
+    protected function getUnionBuilders()
+    {
+        return isset($this->unions) ? collect($this->unions)->pluck('query') : collect();
+    }
+
     /**
      * Get the count of the total records for the paginator.
      *
