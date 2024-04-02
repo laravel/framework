@@ -85,8 +85,7 @@ class ConsoleApplicationTest extends TestCase
 
         $dispatcher = new EventsDispatcher($container);
 
-        $kernel = spy(new Kernel($container, $dispatcher))
-            ->shouldAllowMockingProtectedMethods();
+        $kernel = new Kernel($container, $dispatcher);
 
         $callback = function (SplFileInfo $file) {
             return "Illuminate\\Tests\\Console\\Fixtures\\" . Str::before(ucfirst($file->getFilename()), '.php');
