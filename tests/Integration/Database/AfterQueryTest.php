@@ -76,6 +76,92 @@ class AfterQueryTest extends DatabaseTestCase
         $this->assertEqualsCanonicalizing($afterQueryIds->toArray(), $users->pluck('id')->toArray());
     }
 
+    public function testAfterQueryOnEloquentCursor()
+    {
+        AfterQueryUser::create();
+        AfterQueryUser::create();
+
+        $afterQueryIds = collect();
+
+        $users = AfterQueryUser::query()
+            ->afterQuery(function (Collection $users) use ($afterQueryIds) {
+                $afterQueryIds->push(...$users->pluck('id')->all());
+
+                foreach ($users as $user) {
+                    $this->assertInstanceOf(AfterQueryUser::class, $user);
+                }
+            })
+            ->cursor();
+
+        $this->assertCount(2, $users);
+        $this->assertEqualsCanonicalizing($afterQueryIds->toArray(), $users->pluck('id')->toArray());
+    }
+
+    public function testAfterQueryOnBaseBuilderCursor()
+    {
+        AfterQueryUser::create();
+        AfterQueryUser::create();
+
+        $afterQueryIds = collect();
+
+        $users = AfterQueryUser::query()
+            ->toBase()
+            ->afterQuery(function (Collection $users) use ($afterQueryIds) {
+                $afterQueryIds->push(...$users->pluck('id')->all());
+
+                foreach ($users as $user) {
+                    $this->assertNotInstanceOf(AfterQueryUser::class, $user);
+                }
+            })
+            ->cursor();
+
+        $this->assertCount(2, $users);
+        $this->assertEqualsCanonicalizing($afterQueryIds->toArray(), $users->pluck('id')->toArray());
+    }
+
+    public function testAfterQueryOnEloquentPluck()
+    {
+        AfterQueryUser::create();
+        AfterQueryUser::create();
+
+        $afterQueryIds = collect();
+
+        $userIds = AfterQueryUser::query()
+            ->afterQuery(function (Collection $userIds) use ($afterQueryIds) {
+                $afterQueryIds->push(...$userIds->all());
+
+                foreach ($userIds as $userId) {
+                    $this->assertIsInt($userId);
+                }
+            })
+            ->pluck('id');
+
+        $this->assertCount(2, $userIds);
+        $this->assertEqualsCanonicalizing($afterQueryIds->toArray(), $userIds->toArray());
+    }
+
+    public function testAfterQueryOnBaseBuilderPluck()
+    {
+        AfterQueryUser::create();
+        AfterQueryUser::create();
+
+        $afterQueryIds = collect();
+
+        $userIds = AfterQueryUser::query()
+            ->toBase()
+            ->afterQuery(function (Collection $userIds) use ($afterQueryIds) {
+                $afterQueryIds->push(...$userIds->all());
+
+                foreach ($userIds as $userId) {
+                    $this->assertIsInt($userId);
+                }
+            })
+            ->pluck('id');
+
+        $this->assertCount(2, $userIds);
+        $this->assertEqualsCanonicalizing($afterQueryIds->toArray(), $userIds->toArray());
+    }
+
     public function testAfterQueryHookOnBelongsToManyRelationship()
     {
         $user = AfterQueryUser::create();

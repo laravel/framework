@@ -3075,10 +3075,12 @@ class Builder implements BuilderContract
             $this->columns = ['*'];
         }
 
-        return new LazyCollection(function () {
+        return (new LazyCollection(function () {
             yield from $this->connection->cursor(
                 $this->toSql(), $this->getBindings(), ! $this->useWritePdo
             );
+        }))->each(function ($item) {
+            $this->applyAfterQueryCallbacks(collect([$item]));
         });
     }
 
@@ -3128,9 +3130,13 @@ class Builder implements BuilderContract
 
         $key = $this->stripTableForPluck($key);
 
-        return is_array($queryResult[0])
+        $results = is_array($queryResult[0])
                     ? $this->pluckFromArrayColumn($queryResult, $column, $key)
                     : $this->pluckFromObjectColumn($queryResult, $column, $key);
+
+        $this->applyAfterQueryCallbacks($results);
+
+        return $results;
     }
 
     /**

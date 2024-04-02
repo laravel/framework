@@ -898,7 +898,11 @@ class Builder implements BuilderContract
     public function cursor()
     {
         return $this->applyScopes()->query->cursor()->map(function ($record) {
-            return $this->newModelInstance()->newFromBuilder($record);
+            $model = $this->newModelInstance()->newFromBuilder($record);
+
+            $this->applyAfterQueryCallbacks($this->newModelInstance()->newCollection([$model]));
+
+            return $model;
         });
     }
 
@@ -938,9 +942,13 @@ class Builder implements BuilderContract
             return $results;
         }
 
-        return $results->map(function ($value) use ($column) {
+        $results = $results->map(function ($value) use ($column) {
             return $this->model->newFromBuilder([$column => $value])->{$column};
         });
+
+        $this->applyAfterQueryCallbacks($results);
+
+        return $results;
     }
 
     /**
