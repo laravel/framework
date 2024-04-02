@@ -379,7 +379,7 @@ trait BuildsQueries
         $orders = $this->ensureOrderForCursorPagination(! is_null($cursor) && $cursor->pointsToPreviousItems());
 
         // Reset the union bindings so we can add the cursor where in the correct position.
-        $this->bindings['union'] = [];
+        $this->setBindings([], 'union');
 
         if (! is_null($cursor)) {
             $addCursorConditions = function (self $builder, $previousColumn, $i) use (&$addCursorConditions, $cursor, $orders) {
