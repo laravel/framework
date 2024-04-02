@@ -3079,8 +3079,8 @@ class Builder implements BuilderContract
             yield from $this->connection->cursor(
                 $this->toSql(), $this->getBindings(), ! $this->useWritePdo
             );
-        }))->each(function ($item) {
-            $this->applyAfterQueryCallbacks(collect([$item]));
+        }))->map(function ($item) {
+            return $this->applyAfterQueryCallbacks(collect([$item]))->first();
         });
     }
 
@@ -3130,13 +3130,11 @@ class Builder implements BuilderContract
 
         $key = $this->stripTableForPluck($key);
 
-        $results = is_array($queryResult[0])
+        return $this->applyAfterQueryCallbacks(
+            is_array($queryResult[0])
                     ? $this->pluckFromArrayColumn($queryResult, $column, $key)
-                    : $this->pluckFromObjectColumn($queryResult, $column, $key);
-
-        $this->applyAfterQueryCallbacks($results);
-
-        return $results;
+                    : $this->pluckFromObjectColumn($queryResult, $column, $key)
+        );
     }
 
     /**

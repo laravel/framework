@@ -76,35 +76,6 @@ class AfterQueryTest extends DatabaseTestCase
         $this->assertEqualsCanonicalizing($afterQueryIds->toArray(), $users->pluck('id')->toArray());
     }
 
-    public function testAfterQueryOnEloquentBuilderCanAlterReturnedResult()
-    {
-        AfterQueryUser::create();
-        AfterQueryUser::create();
-
-        $users = AfterQueryUser::query()
-            ->afterQuery(function () {
-                return collect(['foo', 'bar']);
-            })
-            ->get();
-
-        $this->assertEquals(collect(['foo', 'bar']), $users);
-    }
-
-    public function testAfterQueryOnBaseBuilderCanAlterReturnedResult()
-    {
-        AfterQueryUser::create();
-        AfterQueryUser::create();
-
-        $users = AfterQueryUser::query()
-            ->toBase()
-            ->afterQuery(function () {
-                return collect(['foo', 'bar']);
-            })
-            ->get();
-
-        $this->assertEquals(collect(['foo', 'bar']), $users);
-    }
-
     public function testAfterQueryOnEloquentCursor()
     {
         AfterQueryUser::create();
@@ -238,6 +209,127 @@ class AfterQueryTest extends DatabaseTestCase
 
         $this->assertCount(2, $teamMates);
         $this->assertEqualsCanonicalizing($afterQueryIds->toArray(), $teamMates->pluck('id')->toArray());
+    }
+
+    public function testAfterQueryOnEloquentBuilderCanAlterReturnedResult()
+    {
+        $firstUser = AfterQueryUser::create();
+        $secondUser = AfterQueryUser::create();
+
+        $users = AfterQueryUser::query()
+            ->afterQuery(function () {
+                return collect(['foo', 'bar']);
+            })
+            ->get();
+
+        $this->assertEquals(collect(['foo', 'bar']), $users);
+
+        $users = AfterQueryUser::query()
+            ->afterQuery(function () {
+                return collect(['foo', 'bar']);
+            })
+            ->pluck('id');
+
+        $this->assertEquals(collect(['foo', 'bar']), $users);
+
+        $users = AfterQueryUser::query()
+            ->afterQuery(function ($users) use ($firstUser) {
+                return $users->first()->is($firstUser) ? collect(['foo', 'bar']) : collect(['bar', 'foo']);
+            })
+            ->cursor();
+
+        $this->assertEquals(collect(['foo', 'bar']), $users->collect());
+
+        $firstPost = AfterQueryPost::create();
+        $secondPost = AfterQueryPost::create();
+
+        $firstUser->posts()->attach($firstPost);
+        $firstUser->posts()->attach($secondPost);
+
+        $posts = $firstUser->posts()
+            ->afterQuery(function () {
+                return collect(['foo', 'bar']);
+            })
+            ->get();
+
+        $this->assertEquals(collect(['foo', 'bar']), $posts);
+
+        $user = AfterQueryUser::create();
+        $team = AfterQueryTeam::create(['owner_id' => $user->id]);
+
+        AfterQueryUser::create(['team_id' => $team->id]);
+        AfterQueryUser::create(['team_id' => $team->id]);
+
+        $teamMates = $user->teamMates()
+            ->afterQuery(function () {
+                return collect(['foo', 'bar']);
+            })
+            ->get();
+
+        $this->assertEquals(collect(['foo', 'bar']), $teamMates);
+    }
+
+    public function testAfterQueryOnBaseBuilderCanAlterReturnedResult()
+    {
+        $firstUser = AfterQueryUser::create();
+        $secondUser = AfterQueryUser::create();
+
+        $users = AfterQueryUser::query()
+            ->toBase()
+            ->afterQuery(function () {
+                return collect(['foo', 'bar']);
+            })
+            ->get();
+
+        $this->assertEquals(collect(['foo', 'bar']), $users);
+
+        $users = AfterQueryUser::query()
+            ->toBase()
+            ->afterQuery(function () {
+                return collect(['foo', 'bar']);
+            })
+            ->pluck('id');
+
+        $this->assertEquals(collect(['foo', 'bar']), $users);
+
+        $users = AfterQueryUser::query()
+            ->toBase()
+            ->afterQuery(function ($users) use ($firstUser) {
+                return $users->first()->id === $firstUser->id ? collect(['foo', 'bar']) : collect(['bar', 'foo']);
+            })
+            ->cursor();
+
+        $this->assertEquals(collect(['foo', 'bar']), $users->collect());
+
+        $firstPost = AfterQueryPost::create();
+        $secondPost = AfterQueryPost::create();
+
+        $firstUser->posts()->attach($firstPost);
+        $firstUser->posts()->attach($secondPost);
+
+        $posts = $firstUser->posts()
+            ->toBase()
+            ->afterQuery(function () {
+                return collect(['foo', 'bar']);
+            })
+            ->get();
+
+        $this->assertEquals(collect(['foo', 'bar']), $posts);
+
+        $user = AfterQueryUser::create();
+        $team = AfterQueryTeam::create(['owner_id' => $user->id]);
+
+        AfterQueryUser::create(['team_id' => $team->id]);
+        AfterQueryUser::create(['team_id' => $team->id]);
+
+        $teamMates = $user->teamMates()
+            ->toBase()
+            ->afterQuery(function () {
+                return collect(['foo', 'bar']);
+            })
+            ->get();
+
+        $this->assertEquals(collect(['foo', 'bar']), $teamMates);
     }
 }
 
