@@ -44,6 +44,13 @@ class ThrottlesExceptions
     protected $retryAfterMinutes = 0;
 
     /**
+     * The callback that determines if the exception should be reported.
+     *
+     * @var callable
+     */
+    protected $reportCallback;
+
+    /**
      * The callback that determines if rate limiting should apply.
      *
      * @var callable
@@ -101,10 +108,27 @@ class ThrottlesExceptions
                 throw $throwable;
             }
 
+            if ($this->reportCallback && call_user_func($this->reportCallback, $throwable)) {
+                report($throwable);
+            }
+
             $this->limiter->hit($jobKey, $this->decaySeconds);
 
             return $job->release($this->retryAfterMinutes * 60);
         }
+    }
+
+    /**
+     * Report exceptions and optionally specify a callback that should determine if the exception should be reported.
+     *
+     * @param  callable|null  $callback
+     * @return $this
+     */
+    public function report(?callable $callback = null)
+    {
+        $this->reportCallback = $callback ?? fn () => true;
+
+        return $this;
     }
 
     /**
