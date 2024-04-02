@@ -378,6 +378,9 @@ trait BuildsQueries
 
         $orders = $this->ensureOrderForCursorPagination(! is_null($cursor) && $cursor->pointsToPreviousItems());
 
+        // Reset the union bindings so we can add the cursor where in the correct position.
+        $this->bindings['union'] = [];
+
         if (! is_null($cursor)) {
             $addCursorConditions = function (self $builder, $previousColumn, $i) use (&$addCursorConditions, $cursor, $orders) {
                 $unionBuilders = isset($builder->unions) ? collect($builder->unions)->pluck('query') : collect();
@@ -420,7 +423,8 @@ trait BuildsQueries
                     }
 
                     $unionBuilders->each(function ($unionBuilder) use ($column, $direction, $cursor, $i, $orders, $addCursorConditions) {
-                        $unionBuilder->where(function ($unionBuilder) use ($column, $direction, $cursor, $i, $orders, $addCursorConditions) {
+                        $unionWheres = $unionBuilder->getRawBindings()['where'];
+                        $unionBuilder->where(function ($unionBuilder) use ($column, $direction, $cursor, $i, $orders, $addCursorConditions, $unionWheres) {
                             $unionBuilder->where(
                                 $this->getOriginalColumnNameForCursorPagination($this, $column),
                                 $direction === 'asc' ? '>' : '<',
@@ -433,6 +437,7 @@ trait BuildsQueries
                                 });
                             }
 
+                            $this->addBinding($unionWheres, 'union');
                             $this->addBinding($unionBuilder->getRawBindings()['where'], 'union');
                         });
                     });
