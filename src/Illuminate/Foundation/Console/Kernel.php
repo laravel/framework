@@ -125,6 +125,13 @@ class Kernel implements KernelContract
     ];
 
     /**
+     * The callback to be used to guess command names.
+     *
+     * @var callable
+     */
+    protected static $commandClassResolver;
+
+    /**
      * Create a new console kernel instance.
      *
      * @param  \Illuminate\Contracts\Foundation\Application  $app
@@ -361,13 +368,12 @@ class Kernel implements KernelContract
             array_unique(array_merge($this->loadedPaths, $paths))
         );
 
-        $namespace = $this->app->getNamespace();
-
         foreach (Finder::create()->in($paths)->files() as $file) {
-            $command = $this->commandClassFromFile($file, $namespace);
+            $command = $this->commandClassFromFile($file);
 
             if (is_subclass_of($command, Command::class) &&
                 ! (new ReflectionClass($command))->isAbstract()) {
+
                 Artisan::starting(function ($artisan) use ($command) {
                     $artisan->resolve($command);
                 });
@@ -378,17 +384,21 @@ class Kernel implements KernelContract
     /**
      * Extract the command class name from the given file path.
      *
-     * @param  \SplFileInfo  $file
-     * @param  string  $namespace
+     * @param SplFileInfo $file
+     *
      * @return string
      */
-    protected function commandClassFromFile(SplFileInfo $file, string $namespace): string
+    protected function commandClassFromFile(SplFileInfo $file): string
     {
-        return $namespace.str_replace(
-            ['/', '.php'],
-            ['\\', ''],
-            Str::after($file->getRealPath(), realpath(app_path()).DIRECTORY_SEPARATOR)
-        );
+        $resolver = static::$commandClassResolver ?? function (SplFileInfo $file) {
+            return $this->app->getNamespace() . str_replace(
+                    ['/', '.php'],
+                    ['\\', ''],
+                    Str::after($file->getRealPath(), realpath(app_path()) . DIRECTORY_SEPARATOR)
+                );
+        };
+
+        return $resolver($file);
     }
 
     /**
@@ -475,6 +485,7 @@ class Kernel implements KernelContract
         if (! $this->commandsLoaded) {
             $this->commands();
 
+
             if ($this->shouldDiscoverCommands()) {
                 $this->discoverCommands();
             }
@@ -523,6 +534,16 @@ class Kernel implements KernelContract
     protected function shouldDiscoverCommands()
     {
         return get_class($this) === __CLASS__;
+    }
+
+    /**
+     * @param callable(SplFileInfo): class-string<Command> $callback
+     *
+     * @return void
+     */
+    public static function guessCommandClassesUsing(callable $callback)
+    {
+        static::$commandClassResolver = $callback;
     }
 
     /**

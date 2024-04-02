@@ -2,8 +2,11 @@
 
 namespace Illuminate\Tests\Console;
 
-use Illuminate\Console\Application;
+use SplFileInfo;
+use Illuminate\Support\Str;
 use Illuminate\Console\Command;
+use Illuminate\Console\Application;
+use Illuminate\Foundation\Console\Kernel;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Foundation\Application as ApplicationContract;
 use Illuminate\Events\Dispatcher as EventsDispatcher;
@@ -67,6 +70,30 @@ class ConsoleApplicationTest extends TestCase
         $this->assertInstanceOf(CommandWithAliasViaAttribute::class, $app->get('command-alias'));
         $this->assertArrayHasKey('command-name', $app->all());
         $this->assertArrayHasKey('command-alias', $app->all());
+    }
+
+    public function testCommandClassResolverCanBeUpdated()
+    {
+        $container = $this->getMockBuilder(FoundationApplication::class)
+            ->disableOriginalConstructor()
+            ->setConstructorArgs([__DIR__])
+            ->getMock();
+
+        $app = spy(new Application($container, new EventsDispatcher($container), "1"));
+        $container->instance(Application::class, $app);
+
+        $dispatcher = new EventsDispatcher($container);
+
+        $kernel = spy(new Kernel($container, $dispatcher))
+            ->shouldAllowMockingProtectedMethods();
+
+        $callback = function (SplFileInfo $file) {
+            return "Illuminate\\Tests\\Console\\Fixtures\\" . Str::before(ucfirst($file->getFilename()), '.php');
+        };
+
+        $kernel::guessCommandClassesUsing($callback);
+
+        $kernel->addCommandPaths([__DIR__ . '/Fixtures']);
     }
 
     public function testResolvingCommandsWithAliasViaProperty()
@@ -148,7 +175,7 @@ class ConsoleApplicationTest extends TestCase
     public function testCommandInputPromptsWhenRequiredArgumentIsMissing()
     {
         $app = new Application(
-            $laravel = new \Illuminate\Foundation\Application(__DIR__),
+            $laravel = new FoundationApplication(__DIR__),
             $events = m::mock(Dispatcher::class, ['dispatch' => null, 'fire' => null]),
             'testing'
         );
@@ -166,7 +193,7 @@ class ConsoleApplicationTest extends TestCase
     public function testCommandInputDoesntPromptWhenRequiredArgumentIsPassed()
     {
         $app = new Application(
-            $app = new \Illuminate\Foundation\Application(__DIR__),
+            $app = new FoundationApplication(__DIR__),
             $events = m::mock(Dispatcher::class, ['dispatch' => null, 'fire' => null]),
             'testing'
         );
