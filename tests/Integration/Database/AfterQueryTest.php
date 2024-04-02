@@ -76,6 +76,35 @@ class AfterQueryTest extends DatabaseTestCase
         $this->assertEqualsCanonicalizing($afterQueryIds->toArray(), $users->pluck('id')->toArray());
     }
 
+    public function testAfterQueryOnEloquentBuilderCanAlterReturnedResult()
+    {
+        AfterQueryUser::create();
+        AfterQueryUser::create();
+
+        $users = AfterQueryUser::query()
+            ->afterQuery(function () {
+                return collect(['foo', 'bar']);
+            })
+            ->get();
+
+        $this->assertEquals(collect(['foo', 'bar']), $users);
+    }
+
+    public function testAfterQueryOnBaseBuilderCanAlterReturnedResult()
+    {
+        AfterQueryUser::create();
+        AfterQueryUser::create();
+
+        $users = AfterQueryUser::query()
+            ->toBase()
+            ->afterQuery(function () {
+                return collect(['foo', 'bar']);
+            })
+            ->get();
+
+        $this->assertEquals(collect(['foo', 'bar']), $users);
+    }
+
     public function testAfterQueryOnEloquentCursor()
     {
         AfterQueryUser::create();
