@@ -1009,8 +1009,8 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         ]);
 
         $relationTag = $post->tags()
-            ->wherePivotNotBetween('isActive', [true, false])
-            ->orWherePivotNotBetween('flag', [true, false])
+            ->wherePivotNotBetween('isActive', ['true', 'false'])
+            ->orWherePivotNotBetween('flag', ['true', 'false'])
             ->first();
 
         $this->assertEquals($relationTag->getAttributes(), $tag->getAttributes());
