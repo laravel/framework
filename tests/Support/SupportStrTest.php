@@ -1196,6 +1196,9 @@ class SupportStrTest extends TestCase
 
     public function testRepeat()
     {
+        $this->assertEquals('', Str::repeat('Hello', -2));
+        $this->assertSame('',Str::repeat('Hello', 0));
+        $this->assertSame('Hello',Str::repeat('Hello', 1));
         $this->assertSame('aaaaa', Str::repeat('a', 5));
         $this->assertSame('', Str::repeat('', 5));
     }
