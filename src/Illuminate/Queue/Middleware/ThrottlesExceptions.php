@@ -119,19 +119,6 @@ class ThrottlesExceptions
     }
 
     /**
-     * Report exceptions and optionally specify a callback that should determine if the exception should be reported.
-     *
-     * @param  callable|null  $callback
-     * @return $this
-     */
-    public function report(?callable $callback = null)
-    {
-        $this->reportCallback = $callback ?? fn () => true;
-
-        return $this;
-    }
-
-    /**
      * Specify a callback that should determine if rate limiting behavior should apply.
      *
      * @param  callable  $callback
@@ -208,6 +195,19 @@ class ThrottlesExceptions
     public function byJob()
     {
         $this->byJob = true;
+
+        return $this;
+    }
+
+    /**
+     * Report exceptions and optionally specify a callback that determines if the exception should be reported.
+     *
+     * @param  callable|null  $callback
+     * @return $this
+     */
+    public function report(?callable $callback = null)
+    {
+        $this->reportCallback = $callback ?? fn () => true;
 
         return $this;
     }
