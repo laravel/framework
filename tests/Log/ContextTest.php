@@ -114,7 +114,7 @@ class ContextTest extends TestCase
         $this->assertTrue($called);
     }
 
-    public function test_it_can_serilize_values()
+    public function test_it_can_serialize_values()
     {
         Context::add([
             'string' => 'string',
