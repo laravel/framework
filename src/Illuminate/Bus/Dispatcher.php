@@ -120,7 +120,7 @@ class Dispatcher implements QueueingDispatcher
             $callback = function ($command) use ($handler) {
                 $method = method_exists($handler, 'handle') ? 'handle' : (method_exists($command, '__invoke') ? '__invoke' : null);
 
-                if (!$method) {
+                if (! $method) {
                     throw new Exception('Job is incompleted: No handle or __invoke method.');
                 }
 
@@ -130,7 +130,7 @@ class Dispatcher implements QueueingDispatcher
             $callback = function ($command) {
                 $method = method_exists($command, 'handle') ? 'handle' : (method_exists($command, '__invoke') ? '__invoke' : null);
 
-                if (!$method) {
+                if (! $method) {
                     throw new Exception('Job is incompleted: No handle or __invoke method.');
                 }
 
