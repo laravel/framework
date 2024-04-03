@@ -50,6 +50,11 @@ class SetCacheHeaders
             $options = $this->parseOptions($options);
         }
 
+        if (isset($options['if_successful']) && ! $response->isSuccessful()) {
+            return $response;
+        }
+        unset($options['if_successful']);
+
         if (isset($options['etag']) && $options['etag'] === true) {
             $options['etag'] = $response->getEtag() ?? md5($response->getContent());
         }
