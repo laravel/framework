@@ -255,9 +255,7 @@ class ThrottleRequestsTest extends TestCase
 
         Route::get('/', fn () => 'ok')->middleware(['auth', ThrottleRequests::using('rateLimiting')]);
 
-        $user = User::make()->forceFill([
-            'rateLimiting' => 1,
-        ]);
+        $user = User::make()->forceFill([]);
 
         $this->withoutExceptionHandling()->actingAs($user)->get('/');
     }
