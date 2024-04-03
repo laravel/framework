@@ -6,6 +6,7 @@ use Illuminate\Cache\RateLimiter;
 use Illuminate\Cache\RateLimiting\GlobalLimit;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Container\Container;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Exceptions\ThrottleRequestsException;
@@ -20,8 +21,11 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use Throwable;
 
 #[WithConfig('hashing.driver', 'bcrypt')]
+#[WithMigration]
 class ThrottleRequestsTest extends TestCase
 {
+    use RefreshDatabase;
+
     public function testLockOpensImmediatelyAfterDecay()
     {
         Carbon::setTestNow(Carbon::create(2018, 1, 1, 0, 0, 0));
@@ -255,7 +259,15 @@ class ThrottleRequestsTest extends TestCase
 
         Route::get('/', fn () => 'ok')->middleware(['auth', ThrottleRequests::using('rateLimiting')]);
 
-        $user = User::make()->forceFill([]);
+        // The reason we're enabling strict mode and actually creating a user is to ensure we never even try to access
+        // a property within the user model that does not exist. If an application is in strict mode and there is
+        // no matching rate limiter, it should throw a rate limiter exception, not a property access exception.
+        Model::shouldBeStrict();
+        $user = User::forceCreate([
+            'name' => 'Mateus',
+            'email' => 'mateus@example.org',
+            'password' => 'password',
+        ]);
 
         $this->withoutExceptionHandling()->actingAs($user)->get('/');
     }
