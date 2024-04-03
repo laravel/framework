@@ -60,6 +60,16 @@ class EventFake implements Dispatcher, Fake
     }
 
     /**
+     * Get the events that have been pushed.
+     *
+     * @return array
+     */
+    public function pushedEvents()
+    {
+        return $this->events;
+    }
+
+    /**
      * Specify the events that should be dispatched instead of faked.
      *
      * @param  array|string  $eventsToDispatch
