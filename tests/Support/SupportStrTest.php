@@ -8,6 +8,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\UuidInterface;
 use ReflectionClass;
+use ValueError;
 
 class SupportStrTest extends TestCase
 {
@@ -1196,11 +1197,13 @@ class SupportStrTest extends TestCase
 
     public function testRepeat()
     {
-        $this->assertEquals('', Str::repeat('Hello', -2));
-        $this->assertSame('',Str::repeat('Hello', 0));
-        $this->assertSame('Hello',Str::repeat('Hello', 1));
+        $this->assertSame('', Str::repeat('Hello', 0));
+        $this->assertSame('Hello', Str::repeat('Hello', 1));
         $this->assertSame('aaaaa', Str::repeat('a', 5));
         $this->assertSame('', Str::repeat('', 5));
+
+        $this->expectException(ValueError::class);
+        Str::repeat('Hello', -2);
     }
 
     #[DataProvider('specialCharacterProvider')]
