@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Database;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\Builder;
+use Illuminate\Database\Schema\Grammars\MariaDbGrammar;
 use Illuminate\Database\Schema\Grammars\MySqlGrammar;
 use Illuminate\Database\Schema\Grammars\PostgresGrammar;
 use Illuminate\Database\Schema\Grammars\SQLiteGrammar;
@@ -229,7 +230,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
             "alter table `users` change `name` `title` varchar(255) collate 'utf8mb4_unicode_ci' null default 'foo'",
             "alter table `users` change `id` `key` bigint unsigned not null auto_increment comment 'lorem ipsum'",
             'alter table `users` change `generated` `new_generated` int as (expression) stored not null',
-        ], $blueprint->toSql($connection, new MySqlGrammar));
+        ], $blueprint->toSql($connection, new MariaDbGrammar));
     }
 
     public function testDropColumn()
