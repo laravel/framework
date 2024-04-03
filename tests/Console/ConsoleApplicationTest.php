@@ -161,6 +161,7 @@ class ConsoleApplicationTest extends TestCase
         $statusCode = $app->call('fake-command-for-testing');
 
         $this->assertTrue($command->prompted);
+        $this->assertSame('foo', $command->argument('name'));
         $this->assertSame(0, $statusCode);
     }
 
@@ -179,6 +180,7 @@ class ConsoleApplicationTest extends TestCase
         ]);
 
         $this->assertFalse($command->prompted);
+        $this->assertSame('foo', $command->argument('name'));
         $this->assertSame(0, $statusCode);
     }
 
@@ -197,6 +199,7 @@ class ConsoleApplicationTest extends TestCase
         $statusCode = $app->call('fake-command-for-testing-array');
 
         $this->assertTrue($command->prompted);
+        $this->assertSame(['foo'], $command->argument('names'));
         $this->assertSame(0, $statusCode);
     }
 
@@ -211,10 +214,11 @@ class ConsoleApplicationTest extends TestCase
         $app->addCommands([$command = new FakeCommandWithArrayInputPrompting()]);
 
         $statusCode = $app->call('fake-command-for-testing-array', [
-            'arguments' => ['foo', 'bar', 'baz'],
+            'names' => ['foo', 'bar', 'baz'],
         ]);
 
         $this->assertFalse($command->prompted);
+        $this->assertSame(['foo', 'bar', 'baz'], $command->argument('names'));
         $this->assertSame(0, $statusCode);
     }
 

@@ -10,7 +10,7 @@ use Symfony\Component\Console\Input\InputInterface;
 
 class FakeCommandWithArrayInputPrompting extends Command implements PromptsForMissingInput
 {
-    protected $signature = 'fake-command-for-testing-array {arguments* : arguments}';
+    protected $signature = 'fake-command-for-testing-array {names* : An array argument}';
 
     public $prompted = false;
 
