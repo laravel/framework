@@ -62,11 +62,19 @@ class TrimStrings extends TransformsRequest
     {
         $except = array_merge($this->except, static::$neverTrim);
 
-        if (in_array($key, $except, true) || ! is_string($value)) {
+        if ($this->skipTrim($key, $except) || ! is_string($value)) {
             return $value;
         }
 
         return Str::trim($value);
+    }
+
+    /**
+     * Determine if the given key should be skipped.
+     */
+    protected function skipTrim($key, $except)
+    {
+        return in_array($key, $except, true);
     }
 
     /**
