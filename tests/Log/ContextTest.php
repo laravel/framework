@@ -354,6 +354,19 @@ class ContextTest extends TestCase
         Context::pushHidden('foo', 2);
     }
 
+    public function test_it_can_pull()
+    {
+        Context::add('foo', 'data');
+
+        $this->assertSame('data', Context::pull('foo'));
+        $this->assertNull(Context::get('foo'));
+
+        Context::addHidden('foo', 'data');
+
+        $this->assertSame('data', Context::pullHidden('foo'));
+        $this->assertNull(Context::getHidden('foo'));
+    }
+
     public function test_it_adds_context_to_logged_exceptions()
     {
         $path = storage_path('logs/laravel.log');

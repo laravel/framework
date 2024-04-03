@@ -9,6 +9,8 @@ namespace Illuminate\Support\Facades;
  * @method static array allHidden()
  * @method static mixed get(string $key, mixed $default = null)
  * @method static mixed getHidden(string $key, mixed $default = null)
+ * @method static mixed pull(string $key, mixed $default = null)
+ * @method static mixed pullHidden(string $key, mixed $default = null)
  * @method static array only(array $keys)
  * @method static array onlyHidden(array $keys)
  * @method static \Illuminate\Log\Context\Repository add(string|array $key, mixed $value = null)
