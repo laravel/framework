@@ -245,10 +245,10 @@ class ThrottleRequestsTest extends TestCase
 
         Route::get('/', fn () => 'ok')->middleware(ThrottleRequests::using('test'));
 
-        $this->get('/');
+        $this->withoutExceptionHandling()->get('/');
     }
 
-    public function itFailsIfNamedLimiterDoesNotExistAndAuthenticatedUserDoesNotHaveFallbackProperty()
+    public function testItFailsIfNamedLimiterDoesNotExistAndAuthenticatedUserDoesNotHaveFallbackProperty()
     {
         $this->expectException(InvalidNamedRateLimiterException::class);
         $this->expectExceptionMessage('Named rate limiter [rateLimiting] is not defined.');
@@ -259,7 +259,7 @@ class ThrottleRequestsTest extends TestCase
             'rateLimiting' => 1,
         ]);
 
-        $this->get('/');
+        $this->withoutExceptionHandling()->actingAs($user)->get('/');
     }
 
     public function testItFallbacksToUserPropertyWhenThereIsNoNamedLimiterWhenAuthenticated()
