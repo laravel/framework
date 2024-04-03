@@ -117,13 +117,21 @@ class Dispatcher implements QueueingDispatcher
 
         if ($handler || $handler = $this->getCommandHandler($command)) {
             $callback = function ($command) use ($handler) {
-                $method = method_exists($handler, 'handle') ? 'handle' : '__invoke';
+                $method = method_exists($command, 'handle') ? 'handle' : (method_exists($command, '__invoke') ? '__invoke' : null);
+
+                if (!$method) {
+                    throw new Exception('Job is incompleted: No handle or __invoke method.');
+                }
 
                 return $handler->{$method}($command);
             };
         } else {
             $callback = function ($command) {
-                $method = method_exists($command, 'handle') ? 'handle' : '__invoke';
+                $method = method_exists($command, 'handle') ? 'handle' : (method_exists($command, '__invoke') ? '__invoke' : null);
+
+                if (!$method) {
+                    throw new Exception('Job is incompleted: No handle or __invoke method.');
+                }
 
                 return $this->container->call([$command, $method]);
             };
