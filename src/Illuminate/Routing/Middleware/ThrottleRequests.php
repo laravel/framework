@@ -177,6 +177,7 @@ class ThrottleRequests
      * @param  \Illuminate\Http\Request  $request
      * @param  int|string  $maxAttempts
      * @return int
+     * @throws \Illuminate\Routing\Exceptions\InvalidNamedRateLimiterException
      */
     protected function resolveMaxAttempts($request, $maxAttempts)
     {
@@ -184,11 +185,17 @@ class ThrottleRequests
             $maxAttempts = explode('|', $maxAttempts, 2)[$request->user() ? 1 : 0];
         }
 
-        if (! is_numeric($maxAttempts) && $request->user() && array_key_exists($maxAttempts, $request->user()->getAttributes())) {
+        if (
+            ! is_numeric($maxAttempts) &&
+            $request->user() &&
+            array_key_exists($maxAttempts, $request->user()->getAttributes())
+        ) {
             $maxAttempts = $request->user()->{$maxAttempts};
         }
 
-        if (! is_numeric($maxAttempts) && is_string($maxAttempts) && is_null($this->limiter->limiter($maxAttempts))) {
+        // If by this time we still don't have a numeric value, it means there was no matching rate limiter,
+        // and that the attribute in the authenticated model either did not exist or was invalid.
+        if (! is_numeric($maxAttempts)) {
             throw InvalidNamedRateLimiterException::forLimiter($maxAttempts);
         }
 
