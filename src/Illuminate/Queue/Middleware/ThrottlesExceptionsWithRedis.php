@@ -54,6 +54,10 @@ class ThrottlesExceptionsWithRedis extends ThrottlesExceptions
                 throw $throwable;
             }
 
+            if ($this->reportCallback && call_user_func($this->reportCallback, $throwable)) {
+                report($throwable);
+            }
+
             $this->limiter->acquire();
 
             return $job->release($this->retryAfterMinutes * 60);
