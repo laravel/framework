@@ -196,7 +196,11 @@ class ThrottleRequests
         // If by this time we still don't have a numeric value, it means there was no matching rate limiter,
         // and that the attribute in the authenticated model either did not exist or was invalid.
         if (! is_numeric($maxAttempts)) {
-            throw InvalidNamedRateLimiterException::forLimiter($maxAttempts);
+            if (is_null($request->user())) {
+                throw InvalidNamedRateLimiterException::forLimiter($maxAttempts);
+            }
+
+            throw InvalidNamedRateLimiterException::forLimiterAndUser($maxAttempts, get_class($request->user()));
         }
 
         return (int) $maxAttempts;

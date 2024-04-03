@@ -16,4 +16,16 @@ class InvalidNamedRateLimiterException extends Exception
     {
         return new static("Named rate limiter [{$limiter}] is not defined.");
     }
+
+    /**
+     * Create a new exception for an invalid rate limiter based on a model property.
+     *
+     * @param  string $limiter
+     * @param  class-string $model
+     * @return static
+     */
+    public static function forLimiterAndUser(string $limiter, string $model)
+    {
+        return new static("Named rate limiter [{$model}::{$limiter}] is not defined.");
+    }
 }
