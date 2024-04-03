@@ -2,6 +2,7 @@
 
 namespace Illuminate\Bus;
 
+use Exception;
 use Closure;
 use Illuminate\Contracts\Bus\QueueingDispatcher;
 use Illuminate\Contracts\Container\Container;
