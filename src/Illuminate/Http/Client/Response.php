@@ -132,7 +132,7 @@ class Response implements ArrayAccess, Stringable
      */
     public function status()
     {
-        return (int) $this->response->getStatusCode();
+        return $this->response->getStatusCode();
     }
 
     /**

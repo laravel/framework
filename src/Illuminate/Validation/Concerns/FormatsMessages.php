@@ -407,7 +407,7 @@ trait FormatsMessages
             8 => 'eighth',
             9 => 'ninth',
             10 => 'tenth',
-        ][(int) $value] ?? 'other';
+        ][$value] ?? 'other';
     }
 
     /**
