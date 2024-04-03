@@ -44,7 +44,7 @@ class EnumMakeCommandTest extends TestCase
         $enumsFolderPath = app_path('Enums');
 
         $isFolderCreated = false;
-        if (!is_dir($enumsFolderPath)) {
+        if (! is_dir($enumsFolderPath)) {
             mkdir($enumsFolderPath, 0777, true);
             $isFolderCreated = true;
         }
@@ -69,7 +69,7 @@ class EnumMakeCommandTest extends TestCase
         $enumerationsFolderPath = app_path('Enumerations');
 
         $isFolderCreated = false;
-        if (!is_dir($enumerationsFolderPath)) {
+        if (! is_dir($enumerationsFolderPath)) {
             mkdir($enumerationsFolderPath, 0777, true);
             $isFolderCreated = true;
         }
