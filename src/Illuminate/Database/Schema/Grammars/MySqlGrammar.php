@@ -331,7 +331,7 @@ class MySqlGrammar extends Grammar
     }
 
     /**
-     * Compile a rename column command for legacy versions.
+     * Compile a rename column command for legacy versions of MySQL.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Illuminate\Support\Fluent  $command
