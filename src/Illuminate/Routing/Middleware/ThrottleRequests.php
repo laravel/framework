@@ -7,6 +7,7 @@ use Illuminate\Cache\RateLimiter;
 use Illuminate\Cache\RateLimiting\Unlimited;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Exceptions\ThrottleRequestsException;
+use Illuminate\Routing\Exceptions\InvalidNamedRateLimiterException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\InteractsWithTime;
 use RuntimeException;
@@ -78,6 +79,7 @@ class ThrottleRequests
      * @return \Symfony\Component\HttpFoundation\Response
      *
      * @throws \Illuminate\Http\Exceptions\ThrottleRequestsException
+     * @throws \Illuminate\Routing\Exceptions\InvalidNamedRateLimiterException
      */
     public function handle($request, Closure $next, $maxAttempts = 60, $decayMinutes = 1, $prefix = '')
     {
@@ -182,8 +184,12 @@ class ThrottleRequests
             $maxAttempts = explode('|', $maxAttempts, 2)[$request->user() ? 1 : 0];
         }
 
-        if (! is_numeric($maxAttempts) && $request->user()) {
+        if (! is_numeric($maxAttempts) && $request->user() && array_key_exists($maxAttempts, $request->user()->getAttributes())) {
             $maxAttempts = $request->user()->{$maxAttempts};
+        }
+
+        if (! is_numeric($maxAttempts) && is_string($maxAttempts) && is_null($this->limiter->limiter($maxAttempts))) {
+            throw InvalidNamedRateLimiterException::forLimiter($maxAttempts);
         }
 
         return (int) $maxAttempts;
