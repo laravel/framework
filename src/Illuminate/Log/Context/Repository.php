@@ -8,7 +8,6 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Log\Context\Events\ContextDehydrating as Dehydrating;
 use Illuminate\Log\Context\Events\ContextHydrated as Hydrated;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\Macroable;
 use RuntimeException;
@@ -73,11 +72,9 @@ class Repository
      */
     public function hasAny($keys)
     {
-        $keys = is_array($keys) ? $keys : func_get_args();
-
-        $input = $this->all();
-
-        return Arr::hasAny($input, $keys);
+        return collect(is_array($keys) ? $keys : func_get_args())
+            ->filter(fn ($key) => ! is_null($this->get($key)))
+            ->count() >= 1;
     }
 
     /**
@@ -99,11 +96,9 @@ class Repository
      */
     public function hasAnyHidden($keys)
     {
-        $keys = is_array($keys) ? $keys : func_get_args();
-
-        $input = $this->allHidden();
-
-        return Arr::hasAny($input, $keys);
+        return collect(is_array($keys) ? $keys : func_get_args())
+            ->filter(fn ($key) => ! is_null($this->getHidden($key)))
+            ->count() >= 1;
     }
 
     /**
