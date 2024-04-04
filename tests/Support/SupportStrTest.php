@@ -1201,7 +1201,10 @@ class SupportStrTest extends TestCase
         $this->assertSame('Hello', Str::repeat('Hello', 1));
         $this->assertSame('aaaaa', Str::repeat('a', 5));
         $this->assertSame('', Str::repeat('', 5));
+    }
 
+    public function testRepeatWhenTimesIsNegative()
+    {
         $this->expectException(ValueError::class);
         Str::repeat('Hello', -2);
     }
