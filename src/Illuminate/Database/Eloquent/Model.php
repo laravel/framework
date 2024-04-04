@@ -1014,6 +1014,19 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     }
 
     /**
+     * Create a model in the database without raising any events.
+     *
+     * @param  array  $attributes
+     * @return \Illuminate\Database\Eloquent\Model
+     */
+    public static function createQuietly(array $attributes = [])
+    {
+        return static::withoutEvents(function () use ($attributes) {
+            return $this->create($attributes);
+        });
+    }
+
+    /**
      * Update the model in the database without raising any events.
      *
      * @param  array  $attributes
