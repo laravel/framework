@@ -213,10 +213,6 @@ class FoundationServiceProvider extends AggregateServiceProvider
     {
         $this->loadViewsFrom(__DIR__.'/../resources/exceptions/renderer', 'laravel-exceptions-renderer');
 
-        $this->callAfterResolving(BladeCompiler::class, function (BladeCompiler $blade) {
-            $blade->anonymousComponentPath(__DIR__.'/../resources/exceptions/components', 'laravel-exceptions-renderer');
-        });
-
         $this->app->singleton(Renderer::class, function (Application $app) {
             $debug = $app['config']->get('app.debug');
 
