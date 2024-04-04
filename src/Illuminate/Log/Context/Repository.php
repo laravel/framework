@@ -72,9 +72,7 @@ class Repository
      */
     public function hasAny($keys)
     {
-        return collect(is_array($keys) ? $keys : func_get_args())
-            ->filter(fn ($key) => ! is_null($this->get($key)))
-            ->isNotEmpty();
+        return collect($this->data)->hasAny(is_array($keys) ? $keys : func_get_args());
     }
 
     /**
@@ -96,9 +94,7 @@ class Repository
      */
     public function hasAnyHidden($keys)
     {
-        return collect(is_array($keys) ? $keys : func_get_args())
-            ->filter(fn ($key) => ! is_null($this->getHidden($key)))
-            ->isNotEmpty();
+        return collect($this->hidden)->hasAny(is_array($keys) ? $keys : func_get_args());
     }
 
     /**
