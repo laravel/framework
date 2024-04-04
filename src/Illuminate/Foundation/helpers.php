@@ -911,6 +911,22 @@ if (! function_exists('to_route')) {
     }
 }
 
+if (! function_exists('intended_to_route')) {
+    /**
+     * Create a new intended redirect response to a named route.
+     *
+     * @param  string  $route
+     * @param  mixed  $parameters
+     * @param  int  $status
+     * @param  array  $headers
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    function intended_to_route($route, $parameters = [], $status = 302, $headers = [], $secure = null)
+    {
+        return redirect()->intended(route($route, $parameters), $status, $headers, $secure);
+    }
+}
+
 if (! function_exists('today')) {
     /**
      * Create a new Carbon instance for the current date.
