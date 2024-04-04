@@ -252,7 +252,6 @@ class BladeMapper
      */
     protected function addStatementLineNumbers(string $value)
     {
-
         $shouldInsertLineNumbers = preg_match_all(
             '/\B@(@?\w+(?:::\w+)?)([ \t]*)(\( ( (?>[^()]+) | (?3) )* \))?/x',
             $value,
