@@ -2,7 +2,6 @@
 
 namespace Illuminate\Foundation\Exceptions\Renderer;
 
-use ReflectionClass;
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
 
 class Frame
@@ -32,13 +31,15 @@ class Frame
      * Create a new trace frame instance.
      *
      * @param  \Symfony\Component\ErrorHandler\Exception\FlattenException  $exception
-     * @param  array{file: string, line: int, class?: string, type?: string, function?: string}
+     * @param  array<string, string>  $classMap
+     * @param  array{file: string, line: int, class?: string, type?: string, function?: string}  $frame
      * @param  string  $basePath
      * @return void
      */
-    public function __construct(FlattenException $exception, array $frame, string $basePath)
+    public function __construct(FlattenException $exception, array $classMap, array $frame, string $basePath)
     {
         $this->exception = $exception;
+        $this->classMap = $classMap;
         $this->frame = $frame;
         $this->basePath = $basePath;
     }
@@ -51,17 +52,21 @@ class Frame
     public function source()
     {
         return match (true) {
-            ! empty($this->frame['class']) => value(function () {
-                $reflector = new ReflectionClass($this->frame['class']);
-
-                if ($reflector->getFileName() === realpath($this->frame['file'])) {
-                    return $this->frame['class'];
-                }
-
-                return str_replace($this->basePath.'/', '', $this->frame['file']);
-            }),
-            default => str_replace($this->basePath.'/', '', $this->frame['file']),
+            is_string($this->class()) => $this->class(),
+            default => $this->file(),
         };
+    }
+
+    /**
+     * Get the frame class.
+     *
+     * @return string|null
+     */
+    public function class()
+    {
+        $class = array_search((string) realpath($this->frame['file']), $this->classMap, true);
+
+        return $class === false ? null : $class;
     }
 
     /**
@@ -71,7 +76,7 @@ class Frame
      */
     public function file()
     {
-        return $this->frame['file'];
+        return str_replace($this->basePath.'/', '', $this->frame['file']);
     }
 
     /**

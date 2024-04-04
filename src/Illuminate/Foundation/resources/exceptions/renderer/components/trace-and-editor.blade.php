@@ -1,7 +1,7 @@
 <x-laravel-exceptions-renderer::card class="mt-6 overflow-x-auto">
     <div
         class="grid grid-cols-1 gap-6 sm:grid-cols-3"
-        style="height: 800px"
+        style="height: 500px"
         x-data="{
             includeVendorFrames: false,
             index: {{ $exception->defaultFrame() }},

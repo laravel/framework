@@ -6,10 +6,11 @@ use Illuminate\Contracts\View\Factory;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\View\Compilers\BladeCompiler;
-use Illuminate\View\Engines\PhpEngine;
 use Illuminate\View\ViewException;
 use ReflectionClass;
+use ReflectionProperty;
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
+use Throwable;
 
 /*
  * This file contains parts of https://github.com/spatie/laravel-ignition.
@@ -46,7 +47,7 @@ class BladeMapper
     /**
      * The view factory instance.
      *
-     * @var \Illuminate\View\Factory
+     * @var \Illuminate\Contracts\View\Factory
      */
     protected $factory;
 
@@ -88,7 +89,7 @@ class BladeMapper
 
         $trace = Collection::make($exception->getTrace())
             ->map(function ($frame) {
-                if ($originalPath = $this->findCompiledView(Arr::get($frame, 'file', ''))) {
+                if ($originalPath = $this->findCompiledView((string) Arr::get($frame, 'file', ''))) {
                     $frame['file'] = $originalPath;
                     $frame['line'] = $this->detectLineNumber($frame['file'], $frame['line']);
                 }
@@ -142,25 +143,6 @@ class BladeMapper
         }
 
         return $knownPaths;
-    }
-
-    /**
-     * Get the view data from the exception.
-     *
-     * @param  \Throwable  $exception
-     * @return array
-     */
-    protected function getViewData(Throwable $exception)
-    {
-        foreach ($exception->getTrace() as $frame) {
-            if (Arr::get($frame, 'class') === PhpEngine::class) {
-                $data = Arr::get($frame, 'args.1', []);
-
-                return $this->filterViewData($data);
-            }
-        }
-
-        return [];
     }
 
     /**

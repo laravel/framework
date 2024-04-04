@@ -7,6 +7,8 @@
                 <x-laravel-exceptions-renderer::header :$exception />
 
                 <x-laravel-exceptions-renderer::trace-and-editor :$exception />
+
+                <x-laravel-exceptions-renderer::context :$exception />
             </div>
         </main>
     </div>

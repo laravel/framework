@@ -3,7 +3,7 @@
         <div>
             <div class="text-xs text-gray-500 dark:text-gray-400">
                 <div class="mb-2">
-                    <span class="text-gray-900 dark:text-gray-300">{{ $frame->source() }}</span>
+                    <span class="text-gray-900 dark:text-gray-300">{{ $frame->file() }}</span>
                     <span class="italic text-gray-500 dark:text-gray-400">:{{ $frame->line() }}</span>
                 </div>
             </div>

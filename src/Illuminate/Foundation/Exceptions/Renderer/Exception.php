@@ -2,7 +2,7 @@
 
 namespace Illuminate\Foundation\Exceptions\Renderer;
 
-use Illuminate\Foundation\Exceptions\Renderer\Mappers\BladeMapper;
+use Composer\Autoload\ClassLoader;
 use Illuminate\Http\Request;
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
 
@@ -30,15 +30,6 @@ class Exception
     protected $request;
 
     /**
-     * The mappers to apply to the exception.
-     *
-     * @var array<int, class-string>
-     */
-    protected $mappers = [
-        BladeMapper::class,
-    ];
-
-    /**
      * Creates a new exception renderer instance.
      *
      * @param  \Symfony\Component\ErrorHandler\Exception\FlattenException  $exception
@@ -53,29 +44,9 @@ class Exception
     }
 
     /**
-     * Get the request method.
-     *
-     * @return string
-     */
-    public function requestMethod()
-    {
-        return $this->request->method();
-    }
-
-    /**
-     * Get the request URI.
-     *
-     * @return string
-     */
-    public function requestUri()
-    {
-        return $this->request->path();
-    }
-
-    /**
      * Get the exception title.
      *
-     * @return int
+     * @return string
      */
     public function title()
     {
@@ -123,8 +94,20 @@ class Exception
      */
     public function frames()
     {
-        return collect(array_map(function (array $trace) {
-            return new Frame($this->exception, $trace, $this->basePath);
-        }, $this->exception->getTrace()));
+        $classMap = once(fn () => array_map(function ($path) {
+            return (string) realpath($path);
+        }, array_values(ClassLoader::getRegisteredLoaders())[0]->getClassMap()));
+
+        return collect(array_map(
+            fn (array $trace) => new Frame($this->exception, $classMap, $trace, $this->basePath), $this->exception->getTrace(),
+        ));
+    }
+
+    /**
+     * Get the request.
+     */
+    public function request()
+    {
+        return $this->request;
     }
 }
