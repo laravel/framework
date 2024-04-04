@@ -533,6 +533,9 @@ class SupportStrTest extends TestCase
     public function testKebab()
     {
         $this->assertSame('laravel-php-framework', Str::kebab('LaravelPhpFramework'));
+        $this->assertSame('laravel-php-framework', Str::kebab('Laravel Php Framework'));
+        $this->assertSame('laravel❤-php-framework', Str::kebab('Laravel ❤ Php Framework'));
+        $this->assertSame('', Str::kebab(''));
     }
 
     public function testLower()
