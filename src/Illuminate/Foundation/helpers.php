@@ -919,11 +919,13 @@ if (! function_exists('intended_to_route')) {
      * @param  mixed  $parameters
      * @param  int  $status
      * @param  array  $headers
+     * @param  bool|null  $secure
+     * @param  bool|null  $absolute
      * @return \Illuminate\Http\RedirectResponse
      */
-    function intended_to_route($route, $parameters = [], $status = 302, $headers = [], $secure = null)
+    function intended_to_route($route, $parameters = [], $status = 302, $headers = [], $secure = null, $absolute = true)
     {
-        return redirect()->intended(route($route, $parameters), $status, $headers, $secure);
+        return redirect()->intended(route($route, $parameters, $absolute), $status, $headers, $secure);
     }
 }
 
