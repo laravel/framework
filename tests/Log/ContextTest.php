@@ -206,6 +206,17 @@ class ContextTest extends TestCase
         $this->assertFalse(Context::has('unset'));
     }
 
+    public function test_it_can_check_if_context_has_any_been_set()
+    {
+        Context::add('one', '1');
+        Context::add('two', '2');
+        Context::add('foo', 'bar');
+
+        $this->assertTrue(Context::hasAny(['foo', 'one', 'two']));
+        $this->assertTrue(Context::hasAny('two'));
+        $this->assertFalse(Context::hasAny('unset'));
+    }
+
     public function test_it_can_get_all_values()
     {
         Context::add('foo', 'bar');
