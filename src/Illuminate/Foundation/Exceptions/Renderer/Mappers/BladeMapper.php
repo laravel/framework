@@ -78,8 +78,12 @@ class BladeMapper
      */
     public function map(FlattenException $exception)
     {
-        if ($exception->getClass() === ViewException::class) {
-            $exception = $exception->getPrevious() ?? $exception;
+        while ($exception->getClass() === ViewException::class) {
+            if (($previous = $exception->getPrevious()) === null) {
+                break;
+            }
+
+            $exception = $previous;
         }
 
         $trace = Collection::make($exception->getTrace())
