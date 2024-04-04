@@ -450,7 +450,7 @@ class Batch implements Arrayable, JsonSerializable
      * @param  \Throwable|null  $e
      * @return void
      */
-    protected function invokeHandlerCallback($handler, Batch $batch, Throwable $e = null)
+    protected function invokeHandlerCallback($handler, Batch $batch, ?Throwable $e = null)
     {
         try {
             return $handler($batch, $e);

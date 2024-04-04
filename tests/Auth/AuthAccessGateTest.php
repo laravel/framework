@@ -786,7 +786,7 @@ class AuthAccessGateTest extends TestCase
 
     public function testAllowsIfCallbackAcceptsGuestsWhenAuthenticated()
     {
-        $response = $this->getBasicGate()->allowIf(function (stdClass $user = null) {
+        $response = $this->getBasicGate()->allowIf(function (?stdClass $user = null) {
             return $user !== null;
         });
 
@@ -797,7 +797,7 @@ class AuthAccessGateTest extends TestCase
     {
         $gate = $this->getBasicGate()->forUser(null);
 
-        $response = $gate->allowIf(function (stdClass $user = null) {
+        $response = $gate->allowIf(function (?stdClass $user = null) {
             return $user === null;
         });
 
@@ -924,7 +924,7 @@ class AuthAccessGateTest extends TestCase
 
     public function testDenyIfCallbackAcceptsGuestsWhenAuthenticated()
     {
-        $response = $this->getBasicGate()->denyIf(function (stdClass $user = null) {
+        $response = $this->getBasicGate()->denyIf(function (?stdClass $user = null) {
             return $user === null;
         });
 
@@ -935,7 +935,7 @@ class AuthAccessGateTest extends TestCase
     {
         $gate = $this->getBasicGate()->forUser(null);
 
-        $response = $gate->denyIf(function (stdClass $user = null) {
+        $response = $gate->denyIf(function (?stdClass $user = null) {
             return $user !== null;
         });
 

@@ -561,7 +561,7 @@ class Validator implements ValidatorContract
      * @param  array|null  $keys
      * @return \Illuminate\Support\ValidatedInput|array
      */
-    public function safe(array $keys = null)
+    public function safe(?array $keys = null)
     {
         return is_array($keys)
                 ? (new ValidatedInput($this->validated()))->only($keys)
@@ -1428,7 +1428,7 @@ class Validator implements ValidatorContract
      * @param  callable|null  $formatter
      * @return $this
      */
-    public function setImplicitAttributesFormatter(callable $formatter = null)
+    public function setImplicitAttributesFormatter(?callable $formatter = null)
     {
         $this->implicitAttributesFormatter = $formatter;
 

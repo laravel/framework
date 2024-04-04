@@ -75,7 +75,7 @@ class SymfonySessionDecorator implements SessionInterface
     /**
      * {@inheritdoc}
      */
-    public function invalidate(int $lifetime = null): bool
+    public function invalidate(?int $lifetime = null): bool
     {
         $this->store->invalidate();
 
@@ -85,7 +85,7 @@ class SymfonySessionDecorator implements SessionInterface
     /**
      * {@inheritdoc}
      */
-    public function migrate(bool $destroy = false, int $lifetime = null): bool
+    public function migrate(bool $destroy = false, ?int $lifetime = null): bool
     {
         $this->store->migrate($destroy);
 
