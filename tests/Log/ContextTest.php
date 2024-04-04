@@ -217,6 +217,17 @@ class ContextTest extends TestCase
         $this->assertFalse(Context::hasAny('unset'));
     }
 
+    public function test_it_can_check_if_context_has_any_hidden_been_set()
+    {
+        Context::addHidden('one', '1');
+        Context::addHidden('two', '2');
+        Context::addHidden('foo', 'bar');
+
+        $this->assertTrue(Context::hasAnyHidden(['foo', 'one', 'two']));
+        $this->assertTrue(Context::hasAnyHidden('two'));
+        $this->assertFalse(Context::hasAnyHidden('unset'));
+    }
+
     public function test_it_can_get_all_values()
     {
         Context::add('foo', 'bar');
