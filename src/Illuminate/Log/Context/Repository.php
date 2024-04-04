@@ -74,7 +74,7 @@ class Repository
     {
         return collect(is_array($keys) ? $keys : func_get_args())
             ->filter(fn ($key) => ! is_null($this->get($key)))
-            ->count() >= 1;
+            ->isNotEmpty();
     }
 
     /**
@@ -98,7 +98,7 @@ class Repository
     {
         return collect(is_array($keys) ? $keys : func_get_args())
             ->filter(fn ($key) => ! is_null($this->getHidden($key)))
-            ->count() >= 1;
+            ->isNotEmpty();
     }
 
     /**
