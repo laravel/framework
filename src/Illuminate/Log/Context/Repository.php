@@ -242,11 +242,7 @@ class Repository
      */
     public function addIf($key, $value)
     {
-        if (! $this->has($key)) {
-            $this->add($key, $value);
-        }
-
-        return $this;
+        return $this->unless($this->has($key), fn () => $this->add($key, $value));
     }
 
     /**
@@ -258,11 +254,7 @@ class Repository
      */
     public function addHiddenIf($key, $value)
     {
-        if (! $this->hasHidden($key)) {
-            $this->addHidden($key, $value);
-        }
-
-        return $this;
+        return $this->unless($this->hasHidden($key), fn () => $this->addHidden($key, $value));
     }
 
     /**
