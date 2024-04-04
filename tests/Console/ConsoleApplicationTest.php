@@ -8,6 +8,7 @@ use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Foundation\Application as ApplicationContract;
 use Illuminate\Events\Dispatcher as EventsDispatcher;
 use Illuminate\Foundation\Application as FoundationApplication;
+use Illuminate\Tests\Console\Fixtures\FakeCommandWithArrayInputPrompting;
 use Illuminate\Tests\Console\Fixtures\FakeCommandWithInputPrompting;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -160,6 +161,7 @@ class ConsoleApplicationTest extends TestCase
         $statusCode = $app->call('fake-command-for-testing');
 
         $this->assertTrue($command->prompted);
+        $this->assertSame('foo', $command->argument('name'));
         $this->assertSame(0, $statusCode);
     }
 
@@ -178,6 +180,45 @@ class ConsoleApplicationTest extends TestCase
         ]);
 
         $this->assertFalse($command->prompted);
+        $this->assertSame('foo', $command->argument('name'));
+        $this->assertSame(0, $statusCode);
+    }
+
+    public function testCommandInputPromptsWhenRequiredArgumentsAreMissing()
+    {
+        $app = new Application(
+            $laravel = new \Illuminate\Foundation\Application(__DIR__),
+            $events = m::mock(Dispatcher::class, ['dispatch' => null, 'fire' => null]),
+            'testing'
+        );
+
+        $app->addCommands([$command = new FakeCommandWithArrayInputPrompting()]);
+
+        $command->setLaravel($laravel);
+
+        $statusCode = $app->call('fake-command-for-testing-array');
+
+        $this->assertTrue($command->prompted);
+        $this->assertSame(['foo'], $command->argument('names'));
+        $this->assertSame(0, $statusCode);
+    }
+
+    public function testCommandInputDoesntPromptWhenRequiredArgumentsArePassed()
+    {
+        $app = new Application(
+            $app = new \Illuminate\Foundation\Application(__DIR__),
+            $events = m::mock(Dispatcher::class, ['dispatch' => null, 'fire' => null]),
+            'testing'
+        );
+
+        $app->addCommands([$command = new FakeCommandWithArrayInputPrompting()]);
+
+        $statusCode = $app->call('fake-command-for-testing-array', [
+            'names' => ['foo', 'bar', 'baz'],
+        ]);
+
+        $this->assertFalse($command->prompted);
+        $this->assertSame(['foo', 'bar', 'baz'], $command->argument('names'));
         $this->assertSame(0, $statusCode);
     }
 
