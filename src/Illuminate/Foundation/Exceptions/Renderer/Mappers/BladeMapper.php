@@ -92,9 +92,6 @@ class BladeMapper
                 return $frame;
             })->toArray();
 
-        $exception->setLine($trace[0]['line'] = $this->detectLineNumber($exception->getFile(), $exception->getLine()));
-        $exception->setFile($trace[0]['file']);
-
         return tap($exception, fn () => (fn () => $this->trace = $trace)->call($exception));
     }
 
