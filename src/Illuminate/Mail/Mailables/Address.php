@@ -25,7 +25,7 @@ class Address
      * @param  string|null  $name
      * @return void
      */
-    public function __construct(string $address, string $name = null)
+    public function __construct(string $address, ?string $name = null)
     {
         $this->address = $address;
         $this->name = $name;
