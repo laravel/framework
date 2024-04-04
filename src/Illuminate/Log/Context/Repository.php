@@ -8,7 +8,6 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Log\Context\Events\ContextDehydrating as Dehydrating;
 use Illuminate\Log\Context\Events\ContextHydrated as Hydrated;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\Macroable;
 use RuntimeException;
