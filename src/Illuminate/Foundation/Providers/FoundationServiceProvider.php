@@ -6,11 +6,14 @@ use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Contracts\Console\Kernel as ConsoleKernel;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Foundation\MaintenanceMode as MaintenanceModeContract;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\Grammar;
 use Illuminate\Foundation\Console\CliDumper;
+use Illuminate\Foundation\Exceptions\Renderer\Mappers\BladeMapper;
+use Illuminate\Foundation\Exceptions\Renderer\Renderer;
 use Illuminate\Foundation\Http\HtmlDumper;
 use Illuminate\Foundation\MaintenanceModeManager;
 use Illuminate\Foundation\Precognition;
@@ -23,6 +26,8 @@ use Illuminate\Support\Facades\URL;
 use Illuminate\Testing\LoggedExceptionCollection;
 use Illuminate\Testing\ParallelTestingServiceProvider;
 use Illuminate\Validation\ValidationException;
+use Illuminate\View\Compilers\BladeCompiler;
+use Symfony\Component\ErrorHandler\ErrorRenderer\HtmlErrorRenderer;
 use Symfony\Component\VarDumper\Caster\StubCaster;
 use Symfony\Component\VarDumper\Cloner\AbstractCloner;
 
@@ -76,6 +81,7 @@ class FoundationServiceProvider extends AggregateServiceProvider
         $this->registerRequestValidation();
         $this->registerRequestSignatureValidation();
         $this->registerExceptionTracking();
+        $this->registerExceptionsRenderer();
         $this->registerMaintenanceModeManager();
     }
 
@@ -195,6 +201,31 @@ class FoundationServiceProvider extends AggregateServiceProvider
                 $this->app->make(LoggedExceptionCollection::class)
                         ->push($event->context['exception']);
             }
+        });
+    }
+
+    /**
+     * Register the exceptions renderer service.
+     *
+     * @return void
+     */
+    protected function registerExceptionsRenderer()
+    {
+        $this->loadViewsFrom(__DIR__.'/../resources/exceptions/renderer', 'laravel-exceptions-renderer');
+
+        $this->callAfterResolving(BladeCompiler::class, function (BladeCompiler $blade) {
+            $blade->anonymousComponentPath(__DIR__ . '/../resources/exceptions/components', 'laravel-exceptions-renderer');
+        });
+
+        $this->app->singleton(Renderer::class, function (Application $app) {
+            $debug = $app['config']->get('app.debug');
+
+            return new Renderer(
+                $app->make(Factory::class),
+                new HtmlErrorRenderer($debug),
+                $app->make(BladeMapper::class),
+                $app->basePath(),
+            );
         });
     }
 

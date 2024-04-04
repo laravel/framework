@@ -75,6 +75,16 @@ abstract class Compiler
     }
 
     /**
+     * Get the cache path for the compiled views.
+     *
+     * @return string
+     */
+    public function getCachePath()
+    {
+        return $this->cachePath;
+    }
+
+    /**
      * Get the path to the compiled version of a view.
      *
      * @param  string  $path

@@ -18,6 +18,7 @@ use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\MultipleRecordsFoundException;
 use Illuminate\Database\RecordsNotFoundException;
+use Illuminate\Foundation\Exceptions\Renderer\Renderer;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -833,9 +834,11 @@ class Handler implements ExceptionHandlerContract
         try {
             return config('app.debug') && app()->has(ExceptionRenderer::class)
                         ? $this->renderExceptionWithCustomRenderer($e)
-                        : $this->renderExceptionWithSymfony($e, config('app.debug'));
+                        : $this->renderException($e);
         } catch (Throwable $e) {
-            return $this->renderExceptionWithSymfony($e, config('app.debug'));
+            return rescue(fn () => $this->renderException($e), function () use ($e) {
+                return $this->renderExceptionWithSymfony($e);
+            });
         }
     }
 
@@ -851,17 +854,27 @@ class Handler implements ExceptionHandlerContract
     }
 
     /**
-     * Render an exception to a string using Symfony.
+     * Render an exception to a string using Symfony's HTML error renderer.
      *
      * @param  \Throwable  $e
-     * @param  bool  $debug
      * @return string
      */
-    protected function renderExceptionWithSymfony(Throwable $e, $debug)
+    protected function renderExceptionWithSymfony(Throwable $e)
     {
-        $renderer = new HtmlErrorRenderer($debug);
+        $renderer = new HtmlErrorRenderer(config('app.debug'));
 
         return $renderer->render($e)->getAsString();
+    }
+
+    /**
+     * Render an exception to a string.
+     *
+     * @param  \Throwable  $e
+     * @return string
+     */
+    protected function renderException(Throwable $e)
+    {
+        return $this->container->make(Renderer::class)->render(request(), $e);
     }
 
     /**
