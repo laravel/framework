@@ -92,6 +92,21 @@ class Repository
     }
 
     /**
+     * Determine if the context contains any of the given keys.
+     *
+     * @param  string|array  $keys
+     * @return bool
+     */
+    public function hasAnyHidden($keys)
+    {
+        $keys = is_array($keys) ? $keys : func_get_args();
+
+        $input = $this->allHidden();
+
+        return Arr::hasAny($input, $keys);
+    }
+
+    /**
      * Retrieve all the context data.
      *
      * @return array<string, mixed>
