@@ -405,6 +405,16 @@ class EventFake implements Dispatcher, Fake
     }
 
     /**
+     * Get the events that have been dispatched.
+     *
+     * @return array
+     */
+    public function dispatchedEvents()
+    {
+        return $this->events;
+    }
+
+    /**
      * Handle dynamic method calls to the dispatcher.
      *
      * @param  string  $method
