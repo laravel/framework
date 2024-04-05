@@ -302,4 +302,41 @@ class ThrottleRequestsTest extends TestCase
             $this->assertEquals(Carbon::now()->addSeconds(2)->getTimestamp(), $e->getHeaders()['X-RateLimit-Reset']);
         }
     }
+
+    public function testItFallbacksToUserAccessorWhenThereIsNoNamedLimiterWhenAuthenticated()
+    {
+        $user = UserWithAcessor::make();
+
+        Carbon::setTestNow(Carbon::create(2018, 1, 1, 0, 0, 0));
+
+        // The `rateLimiting` named limiter does not exist, but the `rateLimiting` accessor (not property!)
+        // on the User model does, so it should fallback to that accessor within the authenticated model.
+        Route::get('/', fn () => 'yes')->middleware(['auth', ThrottleRequests::using('rateLimiting')]);
+
+        $response = $this->withoutExceptionHandling()->actingAs($user)->get('/');
+        $this->assertSame('yes', $response->getContent());
+        $this->assertEquals(1, $response->headers->get('X-RateLimit-Limit'));
+        $this->assertEquals(0, $response->headers->get('X-RateLimit-Remaining'));
+
+        Carbon::setTestNow(Carbon::create(2018, 1, 1, 0, 0, 58));
+
+        try {
+            $this->withoutExceptionHandling()->actingAs($user)->get('/');
+        } catch (Throwable $e) {
+            $this->assertInstanceOf(ThrottleRequestsException::class, $e);
+            $this->assertEquals(429, $e->getStatusCode());
+            $this->assertEquals(1, $e->getHeaders()['X-RateLimit-Limit']);
+            $this->assertEquals(0, $e->getHeaders()['X-RateLimit-Remaining']);
+            $this->assertEquals(2, $e->getHeaders()['Retry-After']);
+            $this->assertEquals(Carbon::now()->addSeconds(2)->getTimestamp(), $e->getHeaders()['X-RateLimit-Reset']);
+        }
+    }
+}
+
+class UserWithAcessor extends User
+{
+    public function getRateLimitingAttribute(): int
+    {
+        return 1;
+    }
 }
