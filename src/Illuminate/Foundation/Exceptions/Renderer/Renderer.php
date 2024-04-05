@@ -18,6 +18,13 @@ class Renderer
     protected $viewFactory;
 
     /**
+     * The exception listener instance.
+     *
+     * @var \Illuminate\Foundation\Exceptions\Renderer\Listener
+     */
+    protected $listener;
+
+    /**
      * The HTML error renderer instance.
      *
      * @var \Symfony\Component\ErrorHandler\ErrorRenderer\HtmlErrorRenderer
@@ -42,6 +49,7 @@ class Renderer
      * Creates a new exception renderer instance.
      *
      * @param  \Illuminate\Contracts\View\Factory  $viewFactory
+     * @param  \Illuminate\Foundation\Exceptions\Renderer\Listener  $listener
      * @param  \Symfony\Component\ErrorHandler\ErrorRenderer\HtmlErrorRenderer  $htmlErrorRenderer
      * @param  \Illuminate\Foundation\Exceptions\Renderer\Mappers\BladeMapper  $bladeMapper
      * @param  string  $basePath
@@ -49,11 +57,13 @@ class Renderer
      */
     public function __construct(
         Factory $viewFactory,
+        Listener $listener,
         HtmlErrorRenderer $htmlErrorRenderer,
         BladeMapper $bladeMapper,
         string $basePath
     ) {
         $this->viewFactory = $viewFactory;
+        $this->listener = $listener;
         $this->htmlErrorRenderer = $htmlErrorRenderer;
         $this->bladeMapper = $bladeMapper;
         $this->basePath = $basePath;
@@ -73,7 +83,7 @@ class Renderer
         );
 
         return $this->viewFactory->make('laravel-exceptions-renderer::show', [
-            'exception' => new Exception($flattenException, $request, $this->basePath),
+            'exception' => new Exception($flattenException, $request, $this->listener, $this->basePath),
         ])->render();
     }
 }

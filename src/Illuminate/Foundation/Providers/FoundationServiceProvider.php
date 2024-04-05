@@ -12,6 +12,7 @@ use Illuminate\Contracts\View\Factory;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\Grammar;
 use Illuminate\Foundation\Console\CliDumper;
+use Illuminate\Foundation\Exceptions\Renderer\Listener;
 use Illuminate\Foundation\Exceptions\Renderer\Mappers\BladeMapper;
 use Illuminate\Foundation\Exceptions\Renderer\Renderer;
 use Illuminate\Foundation\Http\HtmlDumper;
@@ -64,6 +65,8 @@ class FoundationServiceProvider extends AggregateServiceProvider
                 __DIR__.'/../Exceptions/views' => $this->app->resourcePath('views/errors/'),
             ], 'laravel-errors');
         }
+
+        $this->app->make(Listener::class)->register($this->app->make(Dispatcher::class));
     }
 
     /**
@@ -213,15 +216,20 @@ class FoundationServiceProvider extends AggregateServiceProvider
         $this->loadViewsFrom(__DIR__.'/../resources/exceptions/renderer', 'laravel-exceptions-renderer');
 
         $this->app->singleton(Renderer::class, function (Application $app) {
-            $debug = $app['config']->get('app.debug');
+            $errorRenderer = new HtmlErrorRenderer(
+                $app['config']->get('app.debug'),
+            );
 
             return new Renderer(
                 $app->make(Factory::class),
-                new HtmlErrorRenderer($debug),
+                $app->make(Listener::class),
+                $errorRenderer,
                 $app->make(BladeMapper::class),
                 $app->basePath(),
             );
         });
+
+        $this->app->singleton(Listener::class);
     }
 
     /**

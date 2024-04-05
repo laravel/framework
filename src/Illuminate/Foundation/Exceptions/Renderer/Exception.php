@@ -16,18 +16,25 @@ class Exception
     protected $exception;
 
     /**
-     * The application's base path.
-     *
-     * @var string
-     */
-    protected $basePath;
-
-    /**
      * The current request instance.
      *
      * @var \Illuminate\Http\Request
      */
     protected $request;
+
+    /**
+     * The exception listener instance.
+     *
+     * @var \Illuminate\Foundation\Exceptions\Renderer\Listener
+     */
+    protected $listener;
+
+    /**
+     * The application's base path.
+     *
+     * @var string
+     */
+    protected $basePath;
 
     /**
      * Creates a new exception renderer instance.
@@ -36,10 +43,11 @@ class Exception
      * @param  string  $basePath
      * @return void
      */
-    public function __construct(FlattenException $exception, Request $request, string $basePath)
+    public function __construct(FlattenException $exception, Request $request, Listener $listener, string $basePath)
     {
         $this->exception = $exception;
         $this->request = $request;
+        $this->listener = $listener;
         $this->basePath = $basePath;
     }
 
@@ -104,10 +112,22 @@ class Exception
     }
 
     /**
-     * Get the request.
+     * Get the exception's request instance.
+     *
+     * @return \Illuminate\Http\Request
      */
     public function request()
     {
         return $this->request;
+    }
+
+    /**
+     * Get the exception listener instance.
+     *
+     * @return \Illuminate\Foundation\Exceptions\Renderer\Listener
+     */
+    public function listener()
+    {
+        return $this->listener;
     }
 }
