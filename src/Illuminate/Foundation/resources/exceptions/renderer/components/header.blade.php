@@ -6,7 +6,7 @@
         <div>
             <div>
                 <span class="rounded-md bg-gray-200 px-2 py-1 text-xs font-medium leading-5 text-gray-900 dark:bg-gray-800 dark:text-gray-300">
-                    {{ $exception->request()->method() }} {{ $exception->request()->url() . $exception->request()->path() }}
+                    {{ $exception->request()->method() }} {{ $exception->request()->url() }}
                 </span>
             </div>
             <div>
