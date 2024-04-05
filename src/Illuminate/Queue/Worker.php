@@ -228,6 +228,10 @@ class Worker
                 $this->events->dispatch(new JobTimedOut(
                     $job->getConnectionName(), $job
                 ));
+
+                if ($job->hasFailed()) {
+                    $this->exceptions->report($e);
+                }
             }
 
             $this->kill(static::EXIT_ERROR, $options);
