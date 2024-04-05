@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation\Exceptions\Renderer;
 
 use Composer\Autoload\ClassLoader;
+use Illuminate\Foundation\Bootstrap\HandleExceptions;
 use Illuminate\Http\Request;
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
 
@@ -106,8 +107,15 @@ class Exception
             return (string) realpath($path);
         }, array_values(ClassLoader::getRegisteredLoaders())[0]->getClassMap()));
 
+        $trace = $this->exception->getTrace();
+
+        if (($trace[1]['class'] ?? '') === HandleExceptions::class) {
+            array_shift($trace);
+            array_shift($trace);
+        }
+
         return collect(array_map(
-            fn (array $trace) => new Frame($this->exception, $classMap, $trace, $this->basePath), $this->exception->getTrace(),
+            fn (array $trace) => new Frame($this->exception, $classMap, $trace, $this->basePath), $trace,
         ));
     }
 
