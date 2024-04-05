@@ -9,7 +9,6 @@ use Illuminate\Contracts\Validation\Rule;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Contracts\Validation\ValidatorAwareRule;
 use Illuminate\Translation\CreatesPotentiallyTranslatedStrings;
-use Illuminate\Validation\StopOnFailureException;
 
 class InvokableValidationRule implements Rule, ValidatorAwareRule
 {

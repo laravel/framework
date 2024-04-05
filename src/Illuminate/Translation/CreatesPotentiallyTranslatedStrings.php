@@ -99,7 +99,7 @@ trait CreatesPotentiallyTranslatedStrings
             }
 
             /**
-             * Stop if a failure happened
+             * Stop if a failure happened.
              *
              * @param  bool  $stopOnFailure
              * @return $this
