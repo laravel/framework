@@ -21,6 +21,7 @@ class DatabaseEloquentBelongsToManyWithCastedAttributesTest extends TestCase
     {
         $relation = $this->getRelation();
         $model1 = m::mock(Model::class);
+        $model1->shouldReceive('hasAttribute')->passthru();
         $model1->shouldReceive('getAttribute')->with('parent_key')->andReturn(1);
         $model1->shouldReceive('getAttribute')->with('foo')->passthru();
         $model1->shouldReceive('hasGetMutator')->andReturn(false);
@@ -29,6 +30,7 @@ class DatabaseEloquentBelongsToManyWithCastedAttributesTest extends TestCase
         $model1->shouldReceive('getRelationValue', 'relationLoaded', 'relationResolver', 'setRelation', 'isRelation')->passthru();
 
         $model2 = m::mock(Model::class);
+        $model2->shouldReceive('hasAttribute')->passthru();
         $model2->shouldReceive('getAttribute')->with('parent_key')->andReturn(2);
         $model2->shouldReceive('getAttribute')->with('foo')->passthru();
         $model2->shouldReceive('hasGetMutator')->andReturn(false);

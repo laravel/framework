@@ -3024,6 +3024,19 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertNull($user->getOriginal('name'));
         $this->assertNull($user->getAttribute('name'));
     }
+
+    public function testHasAttribute()
+    {
+        $user = new EloquentModelStub([
+            'name' => 'Mateus',
+        ]);
+
+        $this->assertTrue($user->hasAttribute('name'));
+        $this->assertTrue($user->hasAttribute('password'));
+        $this->assertTrue($user->hasAttribute('castedFloat'));
+        $this->assertFalse($user->hasAttribute('nonexistent'));
+        $this->assertFalse($user->hasAttribute('belongsToStub'));
+    }
 }
 
 class EloquentTestObserverStub
