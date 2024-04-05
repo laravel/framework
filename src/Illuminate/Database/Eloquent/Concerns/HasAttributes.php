@@ -436,7 +436,7 @@ trait HasAttributes
     /**
      * Determine whether an attribute exists on the model.
      *
-     * @param  string $key
+     * @param  string  $key
      * @return bool
      */
     public function hasAttribute($key)
