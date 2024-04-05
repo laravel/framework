@@ -43,14 +43,14 @@ class Listener
      */
     public function onQueryExecuted(QueryExecuted $event)
     {
+        if (count($this->queries) === 100) {
+            return;
+        }
+
         $this->queries[] = [
             'connectionName' => $event->connectionName,
             'time' => $event->time,
             'sql' => $event->sql,
         ];
-
-        if (count($this->queries) >= 101) {
-            array_shift($this->queries);
-        }
     }
 }

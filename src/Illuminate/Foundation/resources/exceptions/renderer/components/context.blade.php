@@ -65,7 +65,7 @@
     <div class="grid grid-cols-1 gap-6 sm:grid-cols-3">
         <table class="table-auto">
             <tbody>
-                @if (count($exception->listener()->queries()) === 1)
+                @if (count($exception->listener()->queries()) === 100)
                     <tr>
                         <td class="border px-4 py-2" colspan="3">Only the first 100 queries are displayed</td>
                     </tr>
