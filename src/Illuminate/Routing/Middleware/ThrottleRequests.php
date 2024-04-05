@@ -187,8 +187,7 @@ class ThrottleRequests
 
         if (
             ! is_numeric($maxAttempts) &&
-            $request->user() &&
-            $request->user()->hasAttribute($maxAttempts)
+            $request->user()?->hasAttribute($maxAttempts)
         ) {
             $maxAttempts = $request->user()->{$maxAttempts};
         }
