@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\View;
 use Laravel\Folio\Folio;
+use Symfony\Component\Console\Output\ConsoleOutput;
 
 class ApplicationBuilder
 {
@@ -354,6 +355,19 @@ class ApplicationBuilder
                 }
             }
         });
+    }
+
+    /**
+     * Register the application's console output instance.
+     *
+     * @param ConsoleOutput $consoleOutput
+     * @return $this
+     */
+    public function withConsoleOutput(ConsoleOutput $consoleOutput)
+    {
+        $this->app->setConsoleOutput($consoleOutput);
+
+        return $this;
     }
 
     /**

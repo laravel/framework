@@ -188,6 +188,11 @@ class Application extends Container implements ApplicationContract, CachesConfig
     protected $isRunningInConsole;
 
     /**
+     * @var ConsoleOutput|null
+     */
+    protected $consoleOutput = null;
+
+    /**
      * The application namespace.
      *
      * @var string
@@ -1182,12 +1187,38 @@ class Application extends Container implements ApplicationContract, CachesConfig
 
         $status = $kernel->handle(
             $input,
-            new ConsoleOutput
+            $this->getConsoleOutput()
         );
 
         $kernel->terminate($input, $status);
 
         return $status;
+    }
+
+    /**
+     * Gets the console output to use when running console commands.
+     * If none has been set, a new ConsoleOutput will be created.
+     *
+     * @return ConsoleOutput
+     */
+    public function getConsoleOutput()
+    {
+        if (is_null($this->consoleOutput)) {
+            $this->consoleOutput = new ConsoleOutput;
+        }
+
+        return $this->consoleOutput;
+    }
+
+    /**
+     * Sets the console output to use when running console commands.
+     *
+     * @param ConsoleOutput $output
+     * @return void
+     */
+    public function setConsoleOutput(ConsoleOutput $output)
+    {
+        $this->consoleOutput = $output;
     }
 
     /**
