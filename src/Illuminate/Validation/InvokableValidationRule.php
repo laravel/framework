@@ -9,6 +9,7 @@ use Illuminate\Contracts\Validation\Rule;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Contracts\Validation\ValidatorAwareRule;
 use Illuminate\Translation\CreatesPotentiallyTranslatedStrings;
+use Illuminate\Validation\StopOnFailureException;
 
 class InvokableValidationRule implements Rule, ValidatorAwareRule
 {
@@ -98,12 +99,12 @@ class InvokableValidationRule implements Rule, ValidatorAwareRule
         $method = $this->invokable instanceof ValidationRule
                         ? 'validate'
                         : '__invoke';
-
-        $this->invokable->{$method}($attribute, $value, function ($attribute, $message = null) {
-            $this->failed = true;
-
-            return $this->pendingPotentiallyTranslatedString($attribute, $message);
-        });
+        try {
+            $this->invokable->{$method}($attribute, $value, function ($attribute, $message = null) {
+                return $this->pendingPotentiallyTranslatedString($attribute, $message);
+            });
+        } catch (StopOnFailureException) {
+        }
 
         return ! $this->failed;
     }
