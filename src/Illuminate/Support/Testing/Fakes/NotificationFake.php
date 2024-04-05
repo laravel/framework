@@ -323,7 +323,7 @@ class NotificationFake implements Fake, NotificationDispatcher, NotificationFact
             $this->notifications[get_class($notifiable)][$notifiable->getKey()][get_class($notification)][] = [
                 'notification' => $this->serializeAndRestore && $notification instanceof ShouldQueue
                     ? $this->serializeAndRestoreNotification($notification)
-                    : $notifiable,
+                    : $notification,
                 'channels' => $notifiableChannels,
                 'notifiable' => $notifiable,
                 'locale' => $notification->locale ?? $this->locale ?? value(function () use ($notifiable) {
