@@ -279,11 +279,11 @@ class NotificationWithSerialization extends NotificationStub implements ShouldQu
 
     public function __serialize(): array
     {
-        return ['value' => $this->value .'-serialized'];
+        return ['value' => $this->value.'-serialized'];
     }
 
     public function __unserialize(array $data): void
     {
-        $this->value = $data['value'] .'-unserialized';
+        $this->value = $data['value'].'-unserialized';
     }
 }
