@@ -6,12 +6,11 @@
 
 <script defer>
     document.addEventListener('DOMContentLoaded', (event) => {
-
         document.querySelectorAll('#frame-{{ $exception->defaultFrame() }}' + ' code').forEach((el) => {
             hljs.highlightElement(el)
-            hljs.initLineNumbersOnLoad()
-
             hljs.highlightAll()
+
+            hljs.initLineNumbersOnLoad()
         })
     })
 

@@ -28,6 +28,13 @@ class Frame
     protected $basePath;
 
     /**
+     * The class map for the application.
+     *
+     * @var array<string, string>
+     */
+    protected $classMap;
+
+    /**
      * Create a new trace frame instance.
      *
      * @param  \Symfony\Component\ErrorHandler\Exception\FlattenException  $exception
