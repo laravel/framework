@@ -60,16 +60,6 @@ class EventFake implements Dispatcher, Fake
     }
 
     /**
-     * Get the events that have been pushed.
-     *
-     * @return array
-     */
-    public function pushedEvents()
-    {
-        return $this->events;
-    }
-
-    /**
      * Specify the events that should be dispatched instead of faked.
      *
      * @param  array|string  $eventsToDispatch
@@ -412,6 +402,16 @@ class EventFake implements Dispatcher, Fake
     public function until($event, $payload = [])
     {
         return $this->dispatch($event, $payload, true);
+    }
+
+    /**
+     * Get the events that have been dispatched.
+     *
+     * @return array
+     */
+    public function dispatchedEvents()
+    {
+        return $this->events;
     }
 
     /**
