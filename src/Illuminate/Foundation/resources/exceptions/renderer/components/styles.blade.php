@@ -1,7 +1,5 @@
-<link rel="preconnect" href="https://fonts.bunny.net" />
 <link href="//fonts.bunny.net/css?family=figtree:400,600&display=swap" rel="stylesheet" />
-
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css" />
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css" />
 
 <style>
     .hljs {
@@ -14,9 +12,6 @@
         color: #2d3748;
         border-right-color: transparent;
         margin-right: 5px;
-    }
-
-    .hljs-ln-line {
     }
 
     .hljs-ln-n {
@@ -50,10 +45,6 @@
 </style>
 
 @foreach ($exception->frames() as $frame)
-    @php
-        /** @var \Illuminate\Foundation\Exceptions\Renderer\Frame $frame */
-    @endphp
-
     <style>
         #frame-{{ $loop->index }} .hljs-ln-line[data-line-number='{{ $frame->line() }}'] {
             background-color: rgba(239, 68, 68, 0.4);
