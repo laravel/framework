@@ -27,6 +27,13 @@ class BugCommand extends Command
     protected $description = 'Start to create a bug report';
 
     /**
+     * The issue url.
+     *
+     * @var string
+     */
+    protected $url = 'https://github.com/laravel/framework/issues/new';
+
+    /**
      * Execute the console command.
      *
      * @return int
@@ -63,11 +70,13 @@ class BugCommand extends Command
     {
         $dbInfo = config('database.default') . "-" . DB::connection()->getPdo()->getAttribute(\PDO::ATTR_SERVER_VERSION);
 
-        $url = "https://github.com/laravel/framework/issues/new?assignees=&labels=&projects=&template=Bug_report.yml";
-        $url .= "&laravel_version=" . $this->laravel->version();
-        $url .= "&php_version=" . phpversion();
-        $url .= "&database_info=" . $dbInfo;
-
-        return $url;
+        return implode([$this->url, '?', http_build_query([
+            'assignees' => null,
+            'labels' => null,
+            'template' => 'Bug_report.yml',
+            'laravel_version=' => $this->laravel->version(),
+            'php_version' => phpversion(),
+            'database_info' => $dbInfo
+        ])]);
     }
 }
