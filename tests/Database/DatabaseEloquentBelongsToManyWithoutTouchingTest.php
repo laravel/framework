@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Query\Grammars\Grammar;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use stdClass;
 
 class DatabaseEloquentBelongsToManyWithoutTouchingTest extends TestCase
 {
@@ -32,7 +33,9 @@ class DatabaseEloquentBelongsToManyWithoutTouchingTest extends TestCase
             $parent->shouldReceive('getAttribute')->with('id')->andReturn(1);
             $builder->shouldReceive('getModel')->andReturn($related);
             $builder->shouldReceive('where');
-            $builder->shouldReceive('getGrammar')->andReturn(m::mock(Grammar::class, ['isExpression' => false]));
+            $builder->shouldReceive('getQuery')->andReturn(
+                m::mock(stdClass::class, ['getGrammar' => m::mock(Grammar::class, ['isExpression' => false])])
+            );
             $relation = new BelongsToMany($builder, $parent, 'article_users', 'user_id', 'article_id', 'id', 'id');
             $builder->shouldReceive('update')->never();
 

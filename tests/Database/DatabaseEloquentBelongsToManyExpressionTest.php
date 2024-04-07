@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Database;
 
+use Exception;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
@@ -50,6 +51,31 @@ class DatabaseEloquentBelongsToManyExpressionTest extends TestCase
 
         $this->assertCount(1, $tags);
         $this->assertEquals(3, $tags->first()->getKey());
+    }
+
+    public function testGlobalScopesAreAppliedToBelongsToManyRelation(): void
+    {
+        $this->seedData();
+        $post = DatabaseEloquentBelongsToManyExpressionTestTestPost::query()->firstOrFail();
+        DatabaseEloquentBelongsToManyExpressionTestTestTag::addGlobalScope(
+            'default',
+            static fn () => throw new Exception('Default global scope.')
+        );
+
+        $this->expectExceptionMessage('Default global scope.');
+        $post->tags()->get();
+    }
+
+    public function testGlobalScopesCanBeRemovedFromBelongsToManyRelation(): void
+    {
+        $this->seedData();
+        $post = DatabaseEloquentBelongsToManyExpressionTestTestPost::query()->firstOrFail();
+        DatabaseEloquentBelongsToManyExpressionTestTestTag::addGlobalScope(
+            'default',
+            static fn () => throw new Exception('Default global scope.')
+        );
+
+        $this->assertNotEmpty($post->tags()->withoutGlobalScopes()->get());
     }
 
     /**
