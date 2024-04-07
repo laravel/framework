@@ -707,6 +707,23 @@ class SupportArrTest extends TestCase
         $this->assertEquals(['first' => 'taylor', 'last' => 'otwell'], $data);
     }
 
+    public function testMapWithEmptyArray()
+    {
+        $mapped = Arr::map([], static function ($value, $key) {
+            return $key.'-'.$value;
+        });
+        $this->assertEquals([], $mapped);
+    }
+
+    public function testMapNullValues()
+    {
+        $data = ['first' => 'taylor', 'last' => null];
+        $mapped = Arr::map($data, static function ($value, $key) {
+            return $key.'-'.$value;
+        });
+        $this->assertEquals(['first' => 'first-taylor', 'last' => 'last-'], $mapped);
+    }
+
     public function testMapWithKeys()
     {
         $data = [
