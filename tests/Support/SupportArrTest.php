@@ -772,7 +772,7 @@ class SupportArrTest extends TestCase
         $array = Arr::prepend(['one', 'two'], ['zero']);
         $this->assertEquals([['zero'], 'one', 'two'], $array);
 
-        $array = Arr::prepend(['one', 'two'], ['zero'],'key');
+        $array = Arr::prepend(['one', 'two'], ['zero'], 'key');
         $this->assertEquals(['key' => ['zero'], 'one', 'two'], $array);
     }
 
