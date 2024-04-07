@@ -17,7 +17,7 @@ class BugCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'bug {--title= : The title of bug}';
+    protected $signature = 'bug';
 
     /**
      * The console command description.
