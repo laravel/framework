@@ -112,7 +112,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
     /**
      * The commands to be registered.
      *
-     * @var array   
+     * @var array
      */
     protected $commands = [
         'About' => AboutCommand::class,

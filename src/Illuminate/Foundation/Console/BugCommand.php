@@ -23,7 +23,7 @@ class BugCommand extends Command
      *
      * @var string
      */
-    protected $description = ''; // TODO
+    protected $description = 'Start to create a bug report';
 
     /**
      * Execute the console command.
