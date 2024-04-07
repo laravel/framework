@@ -5,6 +5,7 @@ body:
     attributes:
       value: "Please read [our full contribution guide](https://laravel.com/docs/contributions#bug-reports) before submitting bug reports. If you notice improper DocBlock, PHPStan, or IDE warnings while using Laravel, do not create a GitHub issue. Instead, please submit a pull request to fix the problem."
   - type: input
+    id: laravel_version
     attributes:
       label: Laravel Version
       description: Provide the Laravel version that you are using. [Please ensure it is still supported.](https://laravel.com/docs/releases#support-policy)
@@ -12,6 +13,7 @@ body:
     validations:
       required: true
   - type: input
+    id: php_version
     attributes:
       label: PHP Version
       description: Provide the PHP version that you are using.
@@ -19,6 +21,7 @@ body:
     validations:
       required: true
   - type: input
+    id: database_info
     attributes:
       label: Database Driver & Version
       description: If applicable, provide the database driver and version you are using.
