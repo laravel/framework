@@ -9,6 +9,7 @@ use Illuminate\Support\Collection;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use stdClass;
+use TypeError;
 
 class SupportArrTest extends TestCase
 {
@@ -758,6 +759,29 @@ class SupportArrTest extends TestCase
 
         $array = Arr::prepend(['one' => 1, 'two' => 2], 0, null);
         $this->assertEquals([null => 0, 'one' => 1, 'two' => 2], $array);
+
+        $array = Arr::prepend(['one', 'two'], null, '');
+        $this->assertEquals(['' => null, 'one', 'two'], $array);
+
+        $array = Arr::prepend([], 'zero');
+        $this->assertEquals(['zero'], $array);
+
+        $array = Arr::prepend([''], 'zero');
+        $this->assertEquals(['zero', ''], $array);
+
+        $array = Arr::prepend(['one', 'two'], ['zero']);
+        $this->assertEquals([['zero'], 'one', 'two'], $array);
+
+        $array = Arr::prepend(['one', 'two'], ['zero'], 'key');
+        $this->assertEquals(['key' => ['zero'], 'one', 'two'], $array);
+    }
+
+    public function testPrependWhenKeyIsArray()
+    {
+        $this->expectException(TypeError::class);
+        $this->expectExceptionMessage('Illegal offset type');
+
+        Arr::prepend(['one' => 1, 'two' => 2], 'zero', [0]);
     }
 
     public function testPull()
