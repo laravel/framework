@@ -29,6 +29,7 @@ body:
     validations:
       required: false
   - type: textarea
+    id: description
     attributes:
       label: Description
       description: Provide a detailed description of the issue you are facing.
