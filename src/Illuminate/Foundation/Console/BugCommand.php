@@ -5,6 +5,7 @@ namespace Illuminate\Foundation\Console;
 use Closure;
 use Illuminate\Console\Command;
 use Illuminate\Support\Composer;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Symfony\Component\Console\Attribute\AsCommand;
 
@@ -32,7 +33,37 @@ class BugCommand extends Command
      */
     public function handle()
     {
+        $osCommand = $this->detectOsName();
+        $url = $this->getUrl();
+
+        exec("$osCommand $url");
 
         return 0;
+    }
+
+    /**
+     * @return string
+     */
+    public function detectOsName(): string
+    {
+        return match (PHP_OS_FAMILY) {
+            'Windows' => 'start',
+            'Linux', 'Darwin' => 'xdg-open',
+        };
+    }
+
+    /**
+     * @return string
+     */
+    public function getUrl(): string
+    {
+        $dbInfo = config('database.default') . "-" . (string)DB::connection()->getPdo()->getAttribute(\PDO::ATTR_SERVER_VERSION);
+
+        $url = "https://github.com/laravel/framework/issues/new?assignees=&labels=&projects=&template=Bug_report.yml";
+        $url .= "&laravel_version=" . $this->laravel->version();
+        $url .= "&php_version=" . phpversion();
+        $url .= "&database_info=" . $dbInfo;
+
+        return $url;
     }
 }
