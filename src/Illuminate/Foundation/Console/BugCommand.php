@@ -57,7 +57,7 @@ class BugCommand extends Command
      */
     public function getUrl(): string
     {
-        $dbInfo = config('database.default') . "-" . (string)DB::connection()->getPdo()->getAttribute(\PDO::ATTR_SERVER_VERSION);
+        $dbInfo = config('database.default') . "-" . DB::connection()->getPdo()->getAttribute(\PDO::ATTR_SERVER_VERSION);
 
         $url = "https://github.com/laravel/framework/issues/new?assignees=&labels=&projects=&template=Bug_report.yml";
         $url .= "&laravel_version=" . $this->laravel->version();
