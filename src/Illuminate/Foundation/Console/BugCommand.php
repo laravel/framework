@@ -2,11 +2,8 @@
 
 namespace Illuminate\Foundation\Console;
 
-use Closure;
 use Illuminate\Console\Command;
-use Illuminate\Support\Composer;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 use Symfony\Component\Console\Attribute\AsCommand;
 
 #[AsCommand(name: 'bug')]
@@ -68,7 +65,7 @@ class BugCommand extends Command
      */
     protected function getUrl()
     {
-        $dbInfo = config('database.default') . "-" . DB::connection()->getPdo()->getAttribute(\PDO::ATTR_SERVER_VERSION);
+        $dbInfo = config('database.default').'-'.DB::connection()->getPdo()->getAttribute(\PDO::ATTR_SERVER_VERSION);
 
         return implode([$this->url, '?', http_build_query([
             'assignees' => null,
@@ -76,7 +73,7 @@ class BugCommand extends Command
             'template' => 'Bug_report.yml',
             'laravel_version=' => $this->laravel->version(),
             'php_version' => phpversion(),
-            'database_info' => $dbInfo
+            'database_info' => $dbInfo,
         ])]);
     }
 }
