@@ -38,7 +38,7 @@ class NotificationFake implements Fake, NotificationDispatcher, NotificationFact
      *
      * @var bool
      */
-    protected bool $serializeAndRestore = false;
+    protected $serializeAndRestore = false;
 
     /**
      * Assert if a notification was sent on-demand based on a truth-test callback.
