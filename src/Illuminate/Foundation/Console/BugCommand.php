@@ -55,6 +55,7 @@ class BugCommand extends Command
         return match (PHP_OS_FAMILY) {
             'Windows' => 'start',
             'Linux', 'Darwin' => 'xdg-open',
+            'default' => '',
         };
     }
 
