@@ -17,7 +17,7 @@ class AboutCommandTest extends TestCase
             Assert::assertArraySubset([
                 'application_name' => 'Laravel',
                 'php_version' => PHP_VERSION,
-                'environment' => 'workbench',
+                'environment' => 'testing',
                 'debug_mode' => true,
                 'url' => 'localhost',
                 'maintenance_mode' => false,
