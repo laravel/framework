@@ -42,9 +42,11 @@ class BugCommand extends Command
     }
 
     /**
+     * Detect the OS name and get the current command.
+     *
      * @return string
      */
-    public function detectOsName(): string
+    protected function detectOsName()
     {
         return match (PHP_OS_FAMILY) {
             'Windows' => 'start',
@@ -53,9 +55,11 @@ class BugCommand extends Command
     }
 
     /**
+     * Get the full url.
+     *
      * @return string
      */
-    public function getUrl(): string
+    protected function getUrl()
     {
         $dbInfo = config('database.default') . "-" . DB::connection()->getPdo()->getAttribute(\PDO::ATTR_SERVER_VERSION);
 
