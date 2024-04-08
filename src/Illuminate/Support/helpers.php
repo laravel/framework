@@ -278,7 +278,7 @@ if (! function_exists('retry')) {
      * @param  callable|null  $when
      * @return mixed
      *
-     * @throws \Exception
+     * @throws \Throwable
      */
     function retry($times, callable $callback, $sleepMilliseconds = 0, $when = null)
     {
@@ -298,7 +298,7 @@ if (! function_exists('retry')) {
 
         try {
             return $callback($attempts);
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             if ($times < 1 || ($when && ! $when($e))) {
                 throw $e;
             }

@@ -712,7 +712,7 @@ class Vite implements Htmlable
     }
 
     /**
-     * Get the the manifest file for the given build directory.
+     * Get the manifest file for the given build directory.
      *
      * @param  string  $buildDirectory
      * @return array

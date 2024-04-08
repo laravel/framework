@@ -964,7 +964,7 @@ class Router implements BindingRegistrar, RegistrarContract
     }
 
     /**
-     * Register a callback to to run after implicit bindings are substituted.
+     * Register a callback to run after implicit bindings are substituted.
      *
      * @param  callable  $callback
      * @return $this
