@@ -1055,7 +1055,11 @@ class PendingRequest
         }
 
         if ($attempt < $this->tries && $shouldRetry) {
-            $options['delay'] = value($this->retryDelay, $attempt, $response->toException());
+            $options['delay'] = value(
+                $this->retryDelay,
+                $attempt,
+                $response instanceof Response ? $response->toException() : $response
+            );
 
             return $this->makePromise($method, $url, $options, $attempt + 1);
         }
