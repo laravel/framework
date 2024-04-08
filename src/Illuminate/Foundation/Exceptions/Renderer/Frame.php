@@ -14,6 +14,13 @@ class Frame
     protected $exception;
 
     /**
+     * The application's class map.
+     *
+     * @var array<string, string>
+     */
+    protected $classMap;
+
+    /**
      * The frame's raw data from the "flatten" exception.
      *
      * @var array{file: string, line: int, class?: string, type?: string, function?: string}
@@ -26,13 +33,6 @@ class Frame
      * @var string
      */
     protected $basePath;
-
-    /**
-     * The class map for the application.
-     *
-     * @var array<string, string>
-     */
-    protected $classMap;
 
     /**
      * Create a new trace frame instance.
