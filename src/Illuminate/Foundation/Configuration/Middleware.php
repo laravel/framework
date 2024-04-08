@@ -303,7 +303,6 @@ class Middleware
     /**
      * Modify the middleware in the "web" group.
      *
-     * @param  string  $group
      * @param  array|string  $append
      * @param  array|string  $prepend
      * @param  array|string  $remove
@@ -318,7 +317,6 @@ class Middleware
     /**
      * Modify the middleware in the "api" group.
      *
-     * @param  string  $group
      * @param  array|string  $append
      * @param  array|string  $prepend
      * @param  array|string  $remove

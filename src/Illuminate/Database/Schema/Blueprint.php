@@ -296,7 +296,6 @@ class Blueprint
     /**
      * Specify that the InnoDB storage engine should be used for the table (MySQL only).
      *
-     * @param  string  $engine
      * @return void
      */
     public function innoDb()
