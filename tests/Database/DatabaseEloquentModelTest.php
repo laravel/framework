@@ -10,9 +10,11 @@ use Foo\Bar\EloquentModelNamespacedStub;
 use Illuminate\Contracts\Database\Eloquent\Castable;
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 use Illuminate\Contracts\Database\Eloquent\CastsInboundAttributes;
+use Illuminate\Contracts\Database\Eloquent\HasVirtualColumns;
 use Illuminate\Contracts\Encryption\Encrypter;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Connection;
+use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
@@ -2854,6 +2856,28 @@ class DatabaseEloquentModelTest extends TestCase
         }
     }
 
+    public function testModelIsRefreshedWhenHasVirtualColumnsAndWasRecentlyCreated(): void
+    {
+        $model = m::mock(EloquentVirtualColumnsStub::class)->makePartial();
+        $builder = m::mock(Builder::class);
+        $builder->shouldReceive('insertGetId')->once()->andReturn(1);
+        $builder->shouldReceive('getConnection')->once();
+        $model->shouldReceive('newModelQuery')->once()->andReturn($builder);
+        $model->shouldReceive('refresh')->once();
+
+        $model->save();
+    }
+
+    public function testModelIsNotRefreshedWhenHasVirtualColumnsAndIsUpdated(): void
+    {
+        $model = m::mock(EloquentVirtualColumnsStub::class)->makePartial();
+        $model->exists = true;
+        $model->shouldReceive('newModelQuery')->once()->andReturn(m::mock(Builder::class));
+        $model->shouldReceive('refresh');
+
+        $model->save();
+    }
+
     protected function addMockConnection($model)
     {
         $model->setConnectionResolver($resolver = m::mock(ConnectionResolverInterface::class));
@@ -3039,6 +3063,10 @@ class DatabaseEloquentModelTest extends TestCase
     }
 }
 
+class EloquentVirtualColumnsStub extends Model implements HasVirtualColumns
+{
+    public $timestamps = false;
+}
 class EloquentTestObserverStub
 {
     public function creating()

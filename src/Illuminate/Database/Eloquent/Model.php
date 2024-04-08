@@ -4,6 +4,7 @@ namespace Illuminate\Database\Eloquent;
 
 use ArrayAccess;
 use Illuminate\Contracts\Broadcasting\HasBroadcastChannel;
+use Illuminate\Contracts\Database\Eloquent\HasVirtualColumns;
 use Illuminate\Contracts\Queue\QueueableCollection;
 use Illuminate\Contracts\Queue\QueueableEntity;
 use Illuminate\Contracts\Routing\UrlRoutable;
@@ -1185,6 +1186,12 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         }
 
         $this->syncOriginal();
+
+        // virtual columns have to be retrieved from the database,
+        // if model is marked as a virtual columns owner
+        if ($this instanceof HasVirtualColumns) {
+            $this->refresh();
+        }
     }
 
     /**
