@@ -9,6 +9,7 @@ use Illuminate\Support\Collection;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use stdClass;
+use TypeError;
 
 class SupportArrTest extends TestCase
 {
