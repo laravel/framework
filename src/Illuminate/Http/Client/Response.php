@@ -277,7 +277,6 @@ class Response implements ArrayAccess, Stringable
     /**
      * Throw an exception if a server or client error occurred.
      *
-     * @param  \Closure|null  $callback
      * @return $this
      *
      * @throws \Illuminate\Http\Client\RequestException
@@ -301,7 +300,6 @@ class Response implements ArrayAccess, Stringable
      * Throw an exception if a server or client error occurred and the given condition evaluates to true.
      *
      * @param  \Closure|bool  $condition
-     * @param  \Closure|null  $throwCallback
      * @return $this
      *
      * @throws \Illuminate\Http\Client\RequestException
