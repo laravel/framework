@@ -71,6 +71,7 @@ trait DetectsLostConnections
             'SQLSTATE[HY000] [2002] The requested address is not valid in its context',
             'SQLSTATE[HY000] [2002] A socket operation was attempted to an unreachable network',
             'SQLSTATE[HY000]: General error: 3989',
+            'went away',
         ]);
     }
 }
