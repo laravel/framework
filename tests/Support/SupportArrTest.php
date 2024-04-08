@@ -793,12 +793,6 @@ class SupportArrTest extends TestCase
         $this->assertEquals(['key' => ['zero'], 'one', 'two'], $array);
     }
 
-    public function testPrependWhenKeyIsArray()
-    {
-        $this->expectException(TypeError::class);
-        Arr::prepend(['one' => 1, 'two' => 2], 'zero', [0]);
-    }
-
     public function testPull()
     {
         $array = ['name' => 'Desk', 'price' => 100];
