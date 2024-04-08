@@ -11,7 +11,7 @@ class AboutCommandTest extends TestCase
 {
     public function testItCanDisplayAboutCommandAsJson()
     {
-        $process = remote('about --json', ['APP_ENV' => 'local')->mustRun();
+        $process = remote('about --json', ['APP_ENV' => 'local'])->mustRun();
 
         tap(json_decode($process->getOutput(), true), function ($output) {
             Assert::assertArraySubset([
