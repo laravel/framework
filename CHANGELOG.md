@@ -4,8 +4,6 @@
 
 ## [v10.48.5](https://github.com/laravel/framework/compare/v10.48.4...v10.48.5) - 2024-04-09
 
-### What's Changed
-
 * [10.x] Prevent Redis connection error report flood on queue worker by [@kasus](https://github.com/kasus) in https://github.com/laravel/framework/pull/50812
 * [10.x] Laravel 10x optional withSize for hasTable by [@apspan](https://github.com/apspan) in https://github.com/laravel/framework/pull/50888
 * [10.x] Add `serializeAndRestore()` to `NotificationFake` by [@dbpolito](https://github.com/dbpolito) in https://github.com/laravel/framework/pull/50935
