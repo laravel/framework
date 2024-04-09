@@ -420,7 +420,9 @@ class Factory
      */
     public function createPendingRequest()
     {
-        return $this->newPendingRequest();
+        return tap($this->newPendingRequest(), function ($request) {
+            $request->stub($this->stubCallbacks)->preventStrayRequests($this->preventStrayRequests);
+        });
     }
 
     /**
@@ -466,8 +468,6 @@ class Factory
             return $this->macroCall($method, $parameters);
         }
 
-        return tap($this->newPendingRequest(), function ($request) {
-            $request->stub($this->stubCallbacks)->preventStrayRequests($this->preventStrayRequests);
-        })->{$method}(...$parameters);
+        return $this->createPendingRequest()->{$method}(...$parameters);
     }
 }
