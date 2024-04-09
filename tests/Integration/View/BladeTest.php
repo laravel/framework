@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\View;
 use Illuminate\View\Component;
 use Orchestra\Testbench\TestCase;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 
@@ -24,6 +25,29 @@ class BladeTest extends TestCase
         $result = Blade::render($longString.'{{ $name }}', ['name' => 'a']);
 
         $this->assertSame($longString.'a', $result);
+    }
+
+    #[RunInSeparateProcess]
+    public function test_rendering_blade_long_maxpathlen_string_with_exact_length()
+    {
+        // The PHP_MAXPATHLEN restriction is only active, if
+        // open_basedir is set and active. Otherwise, the check
+        // for the PHP_MAXPATHLEN is not active.
+        if (ini_get('open_basedir') === '') {
+            $openBaseDir = windows_os() ? explode('\\', __DIR__)[0].'\\'.';'.sys_get_temp_dir() : '/';
+            $iniSet = ini_set(
+                'open_basedir',
+                $openBaseDir
+            );
+
+            $this->assertNotFalse($iniSet, 'Could not set config for open_basedir.');
+        }
+
+        $longString = str_repeat('x', PHP_MAXPATHLEN);
+
+        $result = Blade::render($longString);
+
+        $this->assertSame($longString, $result);
     }
 
     public function test_rendering_blade_component_instance()

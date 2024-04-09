@@ -20,6 +20,7 @@ use Illuminate\Http\Client\Factory;
  * @method static void assertSentCount(int $count)
  * @method static void assertSequencesAreEmpty()
  * @method static \Illuminate\Support\Collection recorded(callable $callback = null)
+ * @method static \Illuminate\Http\Client\PendingRequest createPendingRequest()
  * @method static \Illuminate\Contracts\Events\Dispatcher|null getDispatcher()
  * @method static array getGlobalMiddleware()
  * @method static void macro(string $name, object|callable $macro)

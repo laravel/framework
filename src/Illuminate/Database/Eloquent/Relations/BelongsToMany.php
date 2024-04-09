@@ -1563,7 +1563,7 @@ class BelongsToMany extends Relation
      */
     public function qualifyPivotColumn($column)
     {
-        if ($this->getGrammar()->isExpression($column)) {
+        if ($this->query->getQuery()->getGrammar()->isExpression($column)) {
             return $column;
         }
 
