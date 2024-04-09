@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Casts\AsEncryptedArrayObject;
 use Illuminate\Database\Eloquent\Casts\AsEncryptedCollection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Schema;
@@ -33,6 +34,8 @@ class EloquentModelEncryptedCastingTest extends DatabaseTestCase
             $table->increments('id');
             $table->string('secret', 1000)->nullable();
             $table->text('secret_array')->nullable();
+            $table->text('secret_date')->nullable();
+            $table->text('secret_datetime')->nullable();
             $table->text('secret_json')->nullable();
             $table->text('secret_object')->nullable();
             $table->text('secret_collection')->nullable();
@@ -181,6 +184,52 @@ class EloquentModelEncryptedCastingTest extends DatabaseTestCase
         ]);
     }
 
+    public function testDateIsCastable()
+    {
+        $this->encrypter->expects('encrypt')
+            ->with('2024-04-01 00:00:00', false)
+            ->andReturn('encrypted-secret-date-string');
+        $this->encrypter->expects('decrypt')
+            ->twice()
+            ->with('encrypted-secret-date-string', false)
+            ->andReturn('2024-04-01 00:00:00');
+
+        /** @var \Illuminate\Tests\Integration\Database\EncryptedCast $subject */
+        $subject = EncryptedCast::create([
+            'secret_date' => Carbon::parse('2024-04-01'),
+        ]);
+
+        $this->assertInstanceOf(Carbon::class, $subject->secret_date);
+        $this->assertTrue($subject->secret_date->isSameAs('Y-m-d H:i:s', Carbon::parse('2024-04-01')));
+        $this->assertDatabaseHas('encrypted_casts', [
+            'id' => $subject->id,
+            'secret_date' => 'encrypted-secret-date-string',
+        ]);
+    }
+
+    public function testDateTimeIsCastable()
+    {
+        $this->encrypter->expects('encrypt')
+            ->with('2024-04-01 12:34:56', false)
+            ->andReturn('encrypted-secret-datetime-string');
+        $this->encrypter->expects('decrypt')
+            ->twice()
+            ->with('encrypted-secret-datetime-string', false)
+            ->andReturn('2024-04-01 12:34:56');
+
+        /** @var \Illuminate\Tests\Integration\Database\EncryptedCast $subject */
+        $subject = EncryptedCast::create([
+            'secret_datetime' => Carbon::parse('2024-04-01 12:34:56'),
+        ]);
+
+        $this->assertInstanceOf(Carbon::class, $subject->secret_datetime);
+        $this->assertTrue($subject->secret_datetime->isSameAs('Y-m-d H:i:s', Carbon::parse('2024-04-01 12:34:56')));
+        $this->assertDatabaseHas('encrypted_casts', [
+            'id' => $subject->id,
+            'secret_datetime' => 'encrypted-secret-datetime-string',
+        ]);
+    }
+
     public function testAsEncryptedCollection()
     {
         $this->encrypter->expects('encryptString')
@@ -322,6 +371,8 @@ class EloquentModelEncryptedCastingTest extends DatabaseTestCase
 /**
  * @property $secret
  * @property $secret_array
+ * @property $secret_date
+ * @property $secret_datetime
  * @property $secret_json
  * @property $secret_object
  * @property $secret_collection
@@ -334,6 +385,8 @@ class EncryptedCast extends Model
     public $casts = [
         'secret' => 'encrypted',
         'secret_array' => 'encrypted:array',
+        'secret_date' => 'encrypted:date',
+        'secret_datetime' => 'encrypted:datetime',
         'secret_json' => 'encrypted:json',
         'secret_object' => 'encrypted:object',
         'secret_collection' => 'encrypted:collection',

@@ -104,6 +104,8 @@ trait HasAttributes
         'encrypted',
         'encrypted:array',
         'encrypted:collection',
+        'encrypted:date',
+        'encrypted:datetime',
         'encrypted:json',
         'encrypted:object',
         'float',
@@ -1630,7 +1632,7 @@ trait HasAttributes
      */
     protected function isDateCastable($key)
     {
-        return $this->hasCast($key, ['date', 'datetime', 'immutable_date', 'immutable_datetime']);
+        return $this->hasCast($key, ['date', 'datetime', 'immutable_date', 'immutable_datetime', 'encrypted:date', 'encrypted:datetime']);
     }
 
     /**
@@ -1663,7 +1665,7 @@ trait HasAttributes
      */
     protected function isEncryptedCastable($key)
     {
-        return $this->hasCast($key, ['encrypted', 'encrypted:array', 'encrypted:collection', 'encrypted:json', 'encrypted:object']);
+        return $this->hasCast($key, ['encrypted', 'encrypted:array', 'encrypted:collection', 'encrypted:date', 'encrypted:datetime', 'encrypted:json', 'encrypted:object']);
     }
 
     /**
