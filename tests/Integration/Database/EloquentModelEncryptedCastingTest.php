@@ -227,7 +227,6 @@ class EloquentModelEncryptedCastingTest extends DatabaseTestCase
             ->with('encrypted-secret-datetime-string', false)
             ->andReturn($databaseValue);
 
-
         /** @var \Illuminate\Tests\Integration\Database\EncryptedCast $subject */
         $subject = EncryptedCast::create([
             'secret_datetime' => Carbon::parse('2024-04-01 12:34:56'),
