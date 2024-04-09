@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Exceptions\ThrottleRequestsException;
-use Illuminate\Routing\Exceptions\InvalidNamedRateLimiterException;
+use Illuminate\Routing\Exceptions\MissingRateLimiterException;
 use Illuminate\Routing\Middleware\ThrottleRequests;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Route;
@@ -244,7 +244,7 @@ class ThrottleRequestsTest extends TestCase
 
     public function testItFailsIfNamedLimiterDoesNotExist()
     {
-        $this->expectException(InvalidNamedRateLimiterException::class);
+        $this->expectException(MissingRateLimiterException::class);
         $this->expectExceptionMessage('Named rate limiter [test] is not defined.');
 
         Route::get('/', fn () => 'ok')->middleware(ThrottleRequests::using('test'));
@@ -254,7 +254,7 @@ class ThrottleRequestsTest extends TestCase
 
     public function testItFailsIfNamedLimiterDoesNotExistAndAuthenticatedUserDoesNotHaveFallbackProperty()
     {
-        $this->expectException(InvalidNamedRateLimiterException::class);
+        $this->expectException(MissingRateLimiterException::class);
         $this->expectExceptionMessage('Named rate limiter [' . User::class . '::rateLimiting] is not defined.');
 
         Route::get('/', fn () => 'ok')->middleware(['auth', ThrottleRequests::using('rateLimiting')]);

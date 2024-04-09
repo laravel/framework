@@ -4,7 +4,7 @@ namespace Illuminate\Routing\Exceptions;
 
 use Exception;
 
-class InvalidNamedRateLimiterException extends Exception
+class MissingRateLimiterException extends Exception
 {
     /**
      * Create a new exception for invalid named rate limiter.
@@ -14,7 +14,7 @@ class InvalidNamedRateLimiterException extends Exception
      */
     public static function forLimiter(string $limiter)
     {
-        return new static("Named rate limiter [{$limiter}] is not defined.");
+        return new static("Rate limiter [{$limiter}] is not defined.");
     }
 
     /**
@@ -26,6 +26,6 @@ class InvalidNamedRateLimiterException extends Exception
      */
     public static function forLimiterAndUser(string $limiter, string $model)
     {
-        return new static("Named rate limiter [{$model}::{$limiter}] is not defined.");
+        return new static("Rate limiter [{$model}::{$limiter}] is not defined.");
     }
 }
