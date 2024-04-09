@@ -2405,7 +2405,7 @@ class EloquentTestTag extends Eloquent
 
     public function posts()
     {
-        return $this->morphedByMany(EloquentTestPost::class, 'taggable', null, null, 'tag_id');
+        return $this->morphedByMany(EloquentTestPost::class, 'taggable');
     }
 }
 
