@@ -20,8 +20,8 @@ class MissingRateLimiterException extends Exception
     /**
      * Create a new exception for an invalid rate limiter based on a model property.
      *
-     * @param  string $limiter
-     * @param  class-string $model
+     * @param  string  $limiter
+     * @param  class-string  $model
      * @return static
      */
     public static function forLimiterAndUser(string $limiter, string $model)

@@ -177,6 +177,7 @@ class ThrottleRequests
      * @param  \Illuminate\Http\Request  $request
      * @param  int|string  $maxAttempts
      * @return int
+     *
      * @throws \Illuminate\Routing\Exceptions\MissingRateLimiterException
      */
     protected function resolveMaxAttempts($request, $maxAttempts)
