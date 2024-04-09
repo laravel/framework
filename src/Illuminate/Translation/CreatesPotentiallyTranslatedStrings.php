@@ -22,7 +22,7 @@ trait CreatesPotentiallyTranslatedStrings
         $onFailure = function ($potentiallyTranslatedString) {
             $this->failed = true;
 
-            // Unsetting this object here ensures the exception that is thrown in the destructor is caught.
+            // Unsetting this object ensures the exception thrown in the destructor is caught...
             unset($potentiallyTranslatedString);
         };
 
