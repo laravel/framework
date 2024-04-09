@@ -726,6 +726,16 @@ class DatabaseEloquentIntegrationTest extends TestCase
                 $this->assertSame($tag->id, $model->id);
             }
         );
+
+        $tag = EloquentTestTag::create(['id' => 2, 'name' => 'Article']);
+        $post = EloquentTestPost::create(['id' => 3, 'name' => 'Parent Post', 'user_id' => 1]);
+        $post->tags()->attach($tag);
+
+        $tag->posts()->eachById(
+            function (EloquentTestPost $model) use ($post) {
+                $this->assertSame($post->id, $model->id);
+            }
+        );
     }
 
     public function testPluck()
@@ -2392,6 +2402,11 @@ class EloquentTestTag extends Eloquent
 {
     protected $table = 'tags';
     protected $guarded = [];
+
+    public function posts()
+    {
+        return $this->morphedByMany(EloquentTestPost::class, 'taggable', null, null, 'tag_id');
+    }
 }
 
 class EloquentTestFriendLevel extends Eloquent
