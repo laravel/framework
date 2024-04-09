@@ -702,9 +702,23 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertSame([[' First', 0], [' Second', 1], [' Third', 2]], $users);
     }
 
-    public function testEachByIdWithDifferentKeys()
+    public function testEachByIdWithDifferentKeysMorphMany()
     {
-        $post = EloquentTestPost::create(['id' => 2, 'email' => 'taylorotwel@gmail.com']);
+        $user = EloquentTestUser::create(['id' => 2, 'email' => 'taylorotwel@gmail.com']);
+        (new EloquentTestPhoto)->imageable()->associate($user)->fill(['name' => 'Morph Photo'])->save();
+
+        $photo = $user->photos->first();
+
+        $user->photos()->eachById(
+            function (EloquentTestPhoto $model) use ($photo) {
+                $this->assertSame($photo->id, $model->id);
+            }
+        );
+    }
+
+    public function testEachIdWithDifferentKeysMorphToMany()
+    {
+        $post = EloquentTestPost::create(['id' => 2, 'name' => 'Parent Post', 'user_id' => 1]);
         $tag = $post->tags()->create(['id' => 1, 'name' => 'News']);
 
         $post->tags()->eachById(
