@@ -4,6 +4,7 @@ namespace Illuminate\Support\Testing\Fakes;
 
 use Closure;
 use Illuminate\Contracts\Debug\ExceptionHandler;
+use Illuminate\Foundation\Testing\Concerns\WithoutExceptionHandlingHandler;
 use Illuminate\Support\Traits\ForwardsCalls;
 use Illuminate\Support\Traits\ReflectsClosures;
 use Illuminate\Testing\Assert;
@@ -193,7 +194,7 @@ class ExceptionHandlerFake implements ExceptionHandler, Fake
      */
     protected function runningWithoutExceptionHandling()
     {
-        return (new ReflectionClass($this->handler))->isAnonymous();
+        return $this->handler instanceof WithoutExceptionHandlingHandler;
     }
 
     /**

@@ -76,8 +76,7 @@ trait InteractsWithExceptionHandling
                 : $currentExceptionHandler;
         }
 
-        $exceptionHandler = new class($this->originalExceptionHandler, $except) implements ExceptionHandler
-        {
+        $exceptionHandler = new class($this->originalExceptionHandler, $except) implements ExceptionHandler, WithoutExceptionHandlingHandler {
             protected $except;
             protected $originalHandler;
 
