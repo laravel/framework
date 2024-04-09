@@ -154,16 +154,19 @@ class Schedule
      */
     public function job($job, $queue = null, $connection = null)
     {
-        $jobObject = is_string($job) ? Container::getInstance()->make($job) : $job;
-        $jobName = method_exists($jobObject, 'displayName') ? $jobObject->displayName() : $jobObject::class;
+        $instance = is_string($job)
+            ? Container::getInstance()->make($job)
+            : $job;
 
-        return $this->call(function () use ($jobObject, $queue, $connection) {
-            if ($jobObject instanceof ShouldQueue) {
-                $this->dispatchToQueue($jobObject, $queue ?? $jobObject->queue, $connection ?? $jobObject->connection);
-            } else {
-                $this->dispatchNow($jobObject);
-            }
-        })->name($jobName);
+        $name = method_exists($instance, 'displayName')
+            ? $instance->displayName()
+            : $instance::class;
+
+        return $this->call(function () use ($instance, $queue, $connection) {
+            $instance instanceof ShouldQueue
+                ? $this->dispatchToQueue($instance, $queue ?? $instance->queue, $connection ?? $instance->connection)
+                : $this->dispatchNow($instance);
+        })->name($name);
     }
 
     /**
