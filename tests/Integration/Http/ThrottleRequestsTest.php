@@ -6,18 +6,26 @@ use Illuminate\Cache\RateLimiter;
 use Illuminate\Cache\RateLimiting\GlobalLimit;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Container\Container;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Auth\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Exceptions\ThrottleRequestsException;
+use Illuminate\Routing\Exceptions\MissingRateLimiterException;
 use Illuminate\Routing\Middleware\ThrottleRequests;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Route;
 use Orchestra\Testbench\Attributes\WithConfig;
+use Orchestra\Testbench\Attributes\WithMigration;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Throwable;
 
 #[WithConfig('hashing.driver', 'bcrypt')]
+#[WithMigration]
 class ThrottleRequestsTest extends TestCase
 {
+    use RefreshDatabase;
+
     public function testLockOpensImmediatelyAfterDecay()
     {
         Carbon::setTestNow(Carbon::create(2018, 1, 1, 0, 0, 0));
@@ -232,5 +240,103 @@ class ThrottleRequestsTest extends TestCase
 
         $response = $this->get('/');
         $response->assertOk();
+    }
+
+    public function testItFailsIfNamedLimiterDoesNotExist()
+    {
+        $this->expectException(MissingRateLimiterException::class);
+        $this->expectExceptionMessage('Rate limiter [test] is not defined.');
+
+        Route::get('/', fn () => 'ok')->middleware(ThrottleRequests::using('test'));
+
+        $this->withoutExceptionHandling()->get('/');
+    }
+
+    public function testItFailsIfNamedLimiterDoesNotExistAndAuthenticatedUserDoesNotHaveFallbackProperty()
+    {
+        $this->expectException(MissingRateLimiterException::class);
+        $this->expectExceptionMessage('Rate limiter [' . User::class . '::rateLimiting] is not defined.');
+
+        Route::get('/', fn () => 'ok')->middleware(['auth', ThrottleRequests::using('rateLimiting')]);
+
+        // The reason we're enabling strict mode and actually creating a user is to ensure we never even try to access
+        // a property within the user model that does not exist. If an application is in strict mode and there is
+        // no matching rate limiter, it should throw a rate limiter exception, not a property access exception.
+        Model::shouldBeStrict();
+        $user = User::forceCreate([
+            'name' => 'Mateus',
+            'email' => 'mateus@example.org',
+            'password' => 'password',
+        ]);
+
+        $this->withoutExceptionHandling()->actingAs($user)->get('/');
+    }
+
+    public function testItFallbacksToUserPropertyWhenThereIsNoNamedLimiterWhenAuthenticated()
+    {
+        $user = User::make()->forceFill([
+            'rateLimiting' => 1,
+        ]);
+
+        Carbon::setTestNow(Carbon::create(2018, 1, 1, 0, 0, 0));
+
+        // The `rateLimiting` named limiter does not exist, but the `rateLimiting` property on the
+        // User model does, so it should fallback to that property within the authenticated model.
+        Route::get('/', fn () => 'yes')->middleware(['auth', ThrottleRequests::using('rateLimiting')]);
+
+        $response = $this->withoutExceptionHandling()->actingAs($user)->get('/');
+        $this->assertSame('yes', $response->getContent());
+        $this->assertEquals(1, $response->headers->get('X-RateLimit-Limit'));
+        $this->assertEquals(0, $response->headers->get('X-RateLimit-Remaining'));
+
+        Carbon::setTestNow(Carbon::create(2018, 1, 1, 0, 0, 58));
+
+        try {
+            $this->withoutExceptionHandling()->actingAs($user)->get('/');
+        } catch (Throwable $e) {
+            $this->assertInstanceOf(ThrottleRequestsException::class, $e);
+            $this->assertEquals(429, $e->getStatusCode());
+            $this->assertEquals(1, $e->getHeaders()['X-RateLimit-Limit']);
+            $this->assertEquals(0, $e->getHeaders()['X-RateLimit-Remaining']);
+            $this->assertEquals(2, $e->getHeaders()['Retry-After']);
+            $this->assertEquals(Carbon::now()->addSeconds(2)->getTimestamp(), $e->getHeaders()['X-RateLimit-Reset']);
+        }
+    }
+
+    public function testItFallbacksToUserAccessorWhenThereIsNoNamedLimiterWhenAuthenticated()
+    {
+        $user = UserWithAcessor::make();
+
+        Carbon::setTestNow(Carbon::create(2018, 1, 1, 0, 0, 0));
+
+        // The `rateLimiting` named limiter does not exist, but the `rateLimiting` accessor (not property!)
+        // on the User model does, so it should fallback to that accessor within the authenticated model.
+        Route::get('/', fn () => 'yes')->middleware(['auth', ThrottleRequests::using('rateLimiting')]);
+
+        $response = $this->withoutExceptionHandling()->actingAs($user)->get('/');
+        $this->assertSame('yes', $response->getContent());
+        $this->assertEquals(1, $response->headers->get('X-RateLimit-Limit'));
+        $this->assertEquals(0, $response->headers->get('X-RateLimit-Remaining'));
+
+        Carbon::setTestNow(Carbon::create(2018, 1, 1, 0, 0, 58));
+
+        try {
+            $this->withoutExceptionHandling()->actingAs($user)->get('/');
+        } catch (Throwable $e) {
+            $this->assertInstanceOf(ThrottleRequestsException::class, $e);
+            $this->assertEquals(429, $e->getStatusCode());
+            $this->assertEquals(1, $e->getHeaders()['X-RateLimit-Limit']);
+            $this->assertEquals(0, $e->getHeaders()['X-RateLimit-Remaining']);
+            $this->assertEquals(2, $e->getHeaders()['Retry-After']);
+            $this->assertEquals(Carbon::now()->addSeconds(2)->getTimestamp(), $e->getHeaders()['X-RateLimit-Reset']);
+        }
+    }
+}
+
+class UserWithAcessor extends User
+{
+    public function getRateLimitingAttribute(): int
+    {
+        return 1;
     }
 }
