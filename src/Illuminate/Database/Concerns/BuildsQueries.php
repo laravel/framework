@@ -394,6 +394,10 @@ trait BuildsQueries
                         $cursor->parameter($previousColumn)
                     );
 
+                    // It looks like there is no scenario where both
+                    //  - previousColumn is set
+                    //  - and the $builder has unions
+                    //  when previousColumn is set, the builder is a fresh instance in a where clause.
                     $unionBuilders->each(function ($unionBuilder) use ($previousColumn, $cursor) {
                         $unionBuilder->where(
                             $this->getOriginalColumnNameForCursorPagination($this, $previousColumn),
@@ -405,20 +409,20 @@ trait BuildsQueries
                     });
                 }
 
-                $builder->where(function (self $builder) use ($addCursorConditions, $cursor, $orders, $i, $unionBuilders) {
+                $builder->where(function (self $secondBuilder) use ($addCursorConditions, $cursor, $orders, $i, $unionBuilders) {
                     ['column' => $column, 'direction' => $direction] = $orders[$i];
 
                     $originalColumn = $this->getOriginalColumnNameForCursorPagination($this, $column);
 
-                    $builder->where(
+                    $secondBuilder->where(
                         Str::contains($originalColumn, ['(', ')']) ? new Expression($originalColumn) : $originalColumn,
                         $direction === 'asc' ? '>' : '<',
                         $cursor->parameter($column)
                     );
 
                     if ($i < $orders->count() - 1) {
-                        $builder->orWhere(function (self $builder) use ($addCursorConditions, $column, $i) {
-                            $addCursorConditions($builder, $column, $i + 1);
+                        $secondBuilder->orWhere(function (self $thirdBuilder) use ($addCursorConditions, $column, $i) {
+                            $addCursorConditions($thirdBuilder, $column, $i + 1);
                         });
                     }
 
@@ -432,8 +436,8 @@ trait BuildsQueries
                             );
 
                             if ($i < $orders->count() - 1) {
-                                $unionBuilder->orWhere(function (self $builder) use ($addCursorConditions, $column, $i) {
-                                    $addCursorConditions($builder, $column, $i + 1);
+                                $unionBuilder->orWhere(function (self $fourthBuilder) use ($addCursorConditions, $column, $i) {
+                                    $addCursorConditions($fourthBuilder, $column, $i + 1);
                                 });
                             }
 
