@@ -58,22 +58,6 @@ class ExceptionHandlerFake implements ExceptionHandler, Fake
     }
 
     /**
-     * Assert nothing has been reported.
-     *
-     * @return void
-     */
-    public function assertNothingReported()
-    {
-        Assert::assertEmpty(
-            $this->reported,
-            sprintf(
-                'The following exceptions were reported: %s.',
-                implode(', ', array_map('get_class', $this->reported)),
-            ),
-        );
-    }
-
-    /**
      * Assert if an exception of the given type has been reported.
      *
      * @param  \Closure|string  $exception
@@ -140,6 +124,22 @@ class ExceptionHandlerFake implements ExceptionHandler, Fake
     }
 
     /**
+     * Assert nothing has been reported.
+     *
+     * @return void
+     */
+    public function assertNothingReported()
+    {
+        Assert::assertEmpty(
+            $this->reported,
+            sprintf(
+                'The following exceptions were reported: %s.',
+                implode(', ', array_map('get_class', $this->reported)),
+            ),
+        );
+    }
+
+    /**
      * Report or log an exception.
      *
      * @param  \Throwable  $e
@@ -147,13 +147,13 @@ class ExceptionHandlerFake implements ExceptionHandler, Fake
      */
     public function report($e)
     {
-        if ($this->isFakedException($e) === false) {
+        if (! $this->isFakedException($e)) {
             $this->handler->report($e);
 
             return;
         }
 
-        if ($this->shouldReport($e) === false) {
+        if (! $this->shouldReport($e)) {
             return;
         }
 
@@ -165,6 +165,17 @@ class ExceptionHandlerFake implements ExceptionHandler, Fake
     }
 
     /**
+     * Determine if the given exception is faked.
+     *
+     * @param  \Throwable  $e
+     * @return bool
+     */
+    protected function isFakedException(Throwable $e)
+    {
+        return count($this->exceptions) === 0 || in_array(get_class($e), $this->exceptions, true);
+    }
+
+    /**
      * Determine if the exception should be reported.
      *
      * @param  \Throwable  $e
@@ -173,6 +184,16 @@ class ExceptionHandlerFake implements ExceptionHandler, Fake
     public function shouldReport($e)
     {
         return $this->runningWithoutExceptionHandling() || $this->handler->shouldReport($e);
+    }
+
+    /**
+     * Determine if the handler is running without exception handling.
+     *
+     * @return bool
+     */
+    protected function runningWithoutExceptionHandling()
+    {
+        return (new ReflectionClass($this->handler))->isAnonymous();
     }
 
     /**
@@ -250,26 +271,5 @@ class ExceptionHandlerFake implements ExceptionHandler, Fake
     public function __call(string $method, array $parameters)
     {
         return $this->forwardCallTo($this->handler, $method, $parameters);
-    }
-
-    /**
-     * Determine if the given exception is faked.
-     *
-     * @param  \Throwable  $e
-     * @return bool
-     */
-    protected function isFakedException(Throwable $e)
-    {
-        return count($this->exceptions) === 0 || in_array(get_class($e), $this->exceptions, true);
-    }
-
-    /**
-     * Determine if the handler is running without exception handling.
-     *
-     * @return bool
-     */
-    protected function runningWithoutExceptionHandling()
-    {
-        return (new ReflectionClass($this->handler))->isAnonymous();
     }
 }

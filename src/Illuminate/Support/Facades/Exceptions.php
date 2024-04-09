@@ -57,17 +57,6 @@ class Exceptions extends Facade
     }
 
     /**
-     * Throw exceptions when they are reported.
-     *
-     * @param  array<int, class-string<\Throwable>>|class-string<\Throwable>  $exceptions
-     * @return \Illuminate\Support\Testing\Fakes\ExceptionHandlerFake
-     */
-    public static function throwOnReport(array|string $exceptions = [])
-    {
-        return static::fake($exceptions)->throwOnReport();
-    }
-
-    /**
      * Get the registered name of the component.
      *
      * @return string

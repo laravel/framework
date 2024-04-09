@@ -245,7 +245,7 @@ class ExceptionsFacadeTest extends TestCase
 
     public function testThrowOnReport()
     {
-        Exceptions::throwOnReport();
+        Exceptions::fake()->throwOnReport();
 
         $this->expectException(Exception::class);
         $this->expectExceptionMessage('Test exception');
@@ -255,7 +255,7 @@ class ExceptionsFacadeTest extends TestCase
 
     public function testThrowOnReportDoesNotThrowExceptionsThatShouldNotBeReported()
     {
-        Exceptions::throwOnReport();
+        Exceptions::fake()->throwOnReport();
 
         Route::get('/302', function () {
             Validator::validate(['name' => ''], ['name' => 'required']);
@@ -325,7 +325,7 @@ class ExceptionsFacadeTest extends TestCase
 
     public function testThrowOnReportRegardlessOfTheCallingOrderOfWithExceptionHandling()
     {
-        Exceptions::throwOnReport();
+        Exceptions::fake()->throwOnReport();
 
         $this->withoutExceptionHandling()
             ->withExceptionHandling()
@@ -355,7 +355,7 @@ class ExceptionsFacadeTest extends TestCase
 
     public function testThrowOnReportWithFakedExceptionsFromFacade()
     {
-        Exceptions::throwOnReport([InvalidArgumentException::class]);
+        Exceptions::fake([InvalidArgumentException::class])->throwOnReport();
 
         $this->expectException(InvalidArgumentException::class);
 
