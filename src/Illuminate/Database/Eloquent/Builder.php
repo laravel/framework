@@ -108,6 +108,7 @@ class Builder implements BuilderContract
         'getbindings',
         'getconnection',
         'getgrammar',
+        'getrawbindings',
         'implode',
         'insert',
         'insertgetid',
