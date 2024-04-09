@@ -43,7 +43,7 @@ trait CreatesPotentiallyTranslatedStrings
             protected $destructor;
 
             /**
-             * The callback to call when rule should fail.
+             * The callback to call when the rule should fail.
              *
              * @var \Closure
              */
