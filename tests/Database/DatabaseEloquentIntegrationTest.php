@@ -702,6 +702,18 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertSame([[' First', 0], [' Second', 1], [' Third', 2]], $users);
     }
 
+    public function testEachByIdWithDifferentKeys()
+    {
+        $user = EloquentTestUser::create(['id' => 2, 'email' => 'taylorotwel@gmail.com']);
+        $photo = (new EloquentTestPhoto)->imageable()->associate($user)->fill(['name' => 'Morph Photo'])->save();
+
+        $user->photos()->eachById(
+            function (EloquentTestPhoto $model) use ($photo) {
+                $this->assertSame($photo->id, $model->id);
+            }
+        );
+    }
+
     public function testPluck()
     {
         EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
