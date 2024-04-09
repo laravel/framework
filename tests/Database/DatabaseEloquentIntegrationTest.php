@@ -709,6 +709,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         $photo = $user->photos->first();
 
+        $this->assertCount(1, $user->photos);
         $user->photos()->eachById(
             function (EloquentTestPhoto $model) use ($photo) {
                 $this->assertSame($photo->id, $model->id);
@@ -721,6 +722,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $post = EloquentTestPost::create(['id' => 2, 'name' => 'Parent Post', 'user_id' => 1]);
         $tag = $post->tags()->create(['id' => 1, 'name' => 'News']);
 
+        $this->assertCount(1, $post->tags);
         $post->tags()->eachById(
             function (EloquentTestTag $model) use ($tag) {
                 $this->assertSame($tag->id, $model->id);
@@ -731,6 +733,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $post = EloquentTestPost::create(['id' => 3, 'name' => 'Parent Post', 'user_id' => 1]);
         $post->tags()->attach($tag);
 
+        $this->assertCount(1, $tag->posts);
         $tag->posts()->eachById(
             function (EloquentTestPost $model) use ($post) {
                 $this->assertSame($post->id, $model->id);
