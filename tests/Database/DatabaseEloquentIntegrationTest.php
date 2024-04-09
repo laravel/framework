@@ -704,12 +704,12 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
     public function testEachByIdWithDifferentKeys()
     {
-        $user = EloquentTestUser::create(['id' => 2, 'email' => 'taylorotwel@gmail.com']);
-        $photo = (new EloquentTestPhoto)->imageable()->associate($user)->fill(['name' => 'Morph Photo'])->save();
+        $post = EloquentTestPost::create(['id' => 2, 'email' => 'taylorotwel@gmail.com']);
+        $tag = $post->tags()->create(['id' => 1, 'name' => 'News']);
 
-        $user->photos()->eachById(
-            function (EloquentTestPhoto $model) use ($photo) {
-                $this->assertSame($photo->id, $model->id);
+        $post->tags()->eachById(
+            function (EloquentTestTag $model) use ($tag) {
+                $this->assertSame($tag->id, $model->id);
             }
         );
     }
