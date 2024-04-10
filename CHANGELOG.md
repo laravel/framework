@@ -1,6 +1,10 @@
 # Release Notes for 10.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v10.48.6...10.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v10.48.7...10.x)
+
+## [v10.48.7](https://github.com/laravel/framework/compare/v10.48.6...v10.48.7) - 2024-04-10
+
+* Fix more query builder methods by [@taylorotwell](https://github.com/taylorotwell) in https://github.com/laravel/framework/commit/95ef230339b15321493a08327f250c0760c95376
 
 ## [v10.48.6](https://github.com/laravel/framework/compare/v10.48.5...v10.48.6) - 2024-04-10
 
