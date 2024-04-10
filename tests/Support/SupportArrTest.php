@@ -7,7 +7,12 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Random\Engine\Mt19937;
+use Random\Engine\PcgOneseq128XslRr64;
+use Random\Engine\Secure;
+use Random\Engine\Xoshiro256StarStar;
 use stdClass;
 
 class SupportArrTest extends TestCase
@@ -843,46 +848,57 @@ class SupportArrTest extends TestCase
         $this->assertSame('foo=bar&bar=', Arr::query(['foo' => 'bar', 'bar' => '']));
     }
 
-    public function testRandom()
+    #[DataProvider('engines')]
+    public function testRandom($engine)
     {
-        $random = Arr::random(['foo', 'bar', 'baz']);
+        $random = Arr::random(['foo', 'bar', 'baz'], engine: $engine);
         $this->assertContains($random, ['foo', 'bar', 'baz']);
 
-        $random = Arr::random(['foo', 'bar', 'baz'], 0);
+        $random = Arr::random(['foo', 'bar', 'baz'], 0, engine: $engine);
         $this->assertIsArray($random);
         $this->assertCount(0, $random);
 
-        $random = Arr::random(['foo', 'bar', 'baz'], 1);
+        $random = Arr::random(['foo', 'bar', 'baz'], 1, engine: $engine);
         $this->assertIsArray($random);
         $this->assertCount(1, $random);
         $this->assertContains($random[0], ['foo', 'bar', 'baz']);
 
-        $random = Arr::random(['foo', 'bar', 'baz'], 2);
+        $random = Arr::random(['foo', 'bar', 'baz'], 2, engine: $engine);
         $this->assertIsArray($random);
         $this->assertCount(2, $random);
         $this->assertContains($random[0], ['foo', 'bar', 'baz']);
         $this->assertContains($random[1], ['foo', 'bar', 'baz']);
 
-        $random = Arr::random(['foo', 'bar', 'baz'], '0');
+        $random = Arr::random(['foo', 'bar', 'baz'], '0', engine: $engine);
         $this->assertIsArray($random);
         $this->assertCount(0, $random);
 
-        $random = Arr::random(['foo', 'bar', 'baz'], '1');
+        $random = Arr::random(['foo', 'bar', 'baz'], '1', engine: $engine);
         $this->assertIsArray($random);
         $this->assertCount(1, $random);
         $this->assertContains($random[0], ['foo', 'bar', 'baz']);
 
-        $random = Arr::random(['foo', 'bar', 'baz'], '2');
+        $random = Arr::random(['foo', 'bar', 'baz'], '2', engine: $engine);
         $this->assertIsArray($random);
         $this->assertCount(2, $random);
         $this->assertContains($random[0], ['foo', 'bar', 'baz']);
         $this->assertContains($random[1], ['foo', 'bar', 'baz']);
 
         // preserve keys
-        $random = Arr::random(['one' => 'foo', 'two' => 'bar', 'three' => 'baz'], 2, true);
+        $random = Arr::random(['one' => 'foo', 'two' => 'bar', 'three' => 'baz'], 2, true, $engine);
         $this->assertIsArray($random);
         $this->assertCount(2, $random);
         $this->assertCount(2, array_intersect_assoc(['one' => 'foo', 'two' => 'bar', 'three' => 'baz'], $random));
+    }
+
+    public static function engines(): array
+    {
+        return [
+            'null' => [null], // Secure Engine will be used
+            'Mt19937' => [new Mt19937()],
+            'PcgOneseq128XslRr64' => [new PcgOneseq128XslRr64()],
+            'Xoshiro256StarStar' => [new Xoshiro256StarStar()],
+        ];
     }
 
     public function testRandomNotIncrementingKeys()
