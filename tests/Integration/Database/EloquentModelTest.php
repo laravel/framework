@@ -199,4 +199,4 @@ class Product extends Model
 
     protected $fillable = ['price'];
     public $timestamps = false;
-};
+}
