@@ -1026,11 +1026,11 @@ class PendingRequest
     /**
      * Handle the response of an asynchronous request.
      *
-     * @param  \Illuminate\Http\Client\Response  $response
-     * @param  string  $method
-     * @param  string  $url
-     * @param  array  $options
-     * @param  int  $attempt
+     * @param Response|ConnectionException|TransferException $response
+     * @param string $method
+     * @param string $url
+     * @param array $options
+     * @param int $attempt
      * @return mixed
      */
     protected function handlePromiseResponse(Response|ConnectionException|TransferException $response, $method, $url, $options, $attempt)
