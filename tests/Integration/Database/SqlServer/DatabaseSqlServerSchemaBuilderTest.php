@@ -21,6 +21,7 @@ class DatabaseSqlServerSchemaBuilderTest extends SqlServerTestCase
     protected function destroyDatabaseMigrations()
     {
         Schema::drop('users');
+        Schema::dropIfExists('computed');
         DB::statement('drop view if exists users_view');
     }
 
@@ -63,5 +64,13 @@ class DatabaseSqlServerSchemaBuilderTest extends SqlServerTestCase
     public function testGetViewsWhenNoneExist()
     {
         $this->assertSame([], Schema::getViews());
+    }
+
+    public function testComputedColumnsListing()
+    {
+        DB::statement('create table dbo.computed (id int identity (1,1) not null, computed as id + 1)');
+
+        $userColumns = Schema::getColumns('users');
+        $this->assertNull($userColumns[1]['generation']);
     }
 }
