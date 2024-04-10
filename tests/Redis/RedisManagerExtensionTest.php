@@ -129,6 +129,7 @@ class RedisManagerExtensionTest extends TestCase
             $mock = m::mock(Connector::class);
             $mock->shouldReceive('connect')->andReturn('single-connection');
             $mock->shouldReceive('connectToCluster')->andReturn('cluster-connection');
+
             return $mock;
         });
 
@@ -169,6 +170,7 @@ class RedisManagerExtensionTest extends TestCase
             $mock = m::mock(Connector::class);
             $mock->shouldReceive('connect')->andReturn('single-connection');
             $mock->shouldReceive('connectToCluster')->andReturn('cluster-connection');
+
             return $mock;
         });
 
