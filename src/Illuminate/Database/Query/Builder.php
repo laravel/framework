@@ -3081,7 +3081,7 @@ class Builder implements BuilderContract
             );
         }))->map(function ($item) {
             return $this->applyAfterQueryCallbacks(collect([$item]))->first();
-        });
+        })->reject(fn ($item) => is_null($item));
     }
 
     /**

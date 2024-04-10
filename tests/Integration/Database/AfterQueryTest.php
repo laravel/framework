@@ -240,6 +240,14 @@ class AfterQueryTest extends DatabaseTestCase
 
         $this->assertEquals(collect(['foo', 'bar']), $users->collect());
 
+        $users = AfterQueryUser::query()
+            ->afterQuery(function ($users) use ($firstUser) {
+                return $users->where('id', '!=', $firstUser->id);
+            })
+            ->cursor();
+
+        $this->assertEquals([$secondUser->id], $users->collect()->pluck('id')->all());
+
         $firstPost = AfterQueryPost::create();
         $secondPost = AfterQueryPost::create();
 
@@ -300,6 +308,15 @@ class AfterQueryTest extends DatabaseTestCase
             ->cursor();
 
         $this->assertEquals(collect(['foo', 'bar']), $users->collect());
+
+        $users = AfterQueryUser::query()
+            ->toBase()
+            ->afterQuery(function ($users) use ($firstUser) {
+                return $users->where('id', '!=', $firstUser->id);
+            })
+            ->cursor();
+
+        $this->assertEquals([$secondUser->id], $users->collect()->pluck('id')->all());
 
         $firstPost = AfterQueryPost::create();
         $secondPost = AfterQueryPost::create();
