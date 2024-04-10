@@ -113,6 +113,17 @@ class ViewComponentAttributeBagTest extends TestCase
         $this->assertSame('required="required" x-data=""', (string) $bag);
     }
 
+    public function testItMakesAnExceptionForLivewireWireAttributes()
+    {
+        $bag = new ComponentAttributeBag([
+            'wire:loading' => true,
+            'wire:loading.remove' => true,
+            'wire:poll' => true,
+        ]);
+
+        $this->assertSame('wire:loading="" wire:loading.remove="" wire:poll=""', (string) $bag);
+    }
+
     public function testAttributeExistence()
     {
         $bag = new ComponentAttributeBag(['name' => 'test']);

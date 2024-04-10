@@ -3,11 +3,10 @@
 namespace Illuminate\Tests\Database;
 
 use Illuminate\Database\Capsule\Manager as DB;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use PHPUnit\Framework\TestCase;
 
-class DatabaseEloquentBelongsToManyChunkByIdTest extends TestCase
+class DatabaseEloquentBelongsToManyEachByIdTest extends TestCase
 {
     protected function setUp(): void
     {
@@ -50,31 +49,16 @@ class DatabaseEloquentBelongsToManyChunkByIdTest extends TestCase
         });
     }
 
-    public function testBelongsToChunkById()
+    public function testBelongsToEachById()
     {
         $this->seedData();
 
-        $user = BelongsToManyChunkByIdTestTestUser::query()->first();
+        $user = BelongsToManyEachByIdTestTestUser::query()->first();
         $i = 0;
 
-        $user->articles()->chunkById(1, function (Collection $collection) use (&$i) {
+        $user->articles()->eachById(function (BelongsToManyEachByIdTestTestArticle $model) use (&$i) {
             $i++;
-            $this->assertEquals($i, $collection->first()->id);
-        });
-
-        $this->assertSame(3, $i);
-    }
-
-    public function testBelongsToChunkByIdDesc()
-    {
-        $this->seedData();
-
-        $user = BelongsToManyChunkByIdTestTestUser::query()->first();
-        $i = 0;
-
-        $user->articles()->chunkByIdDesc(1, function (Collection $collection) use (&$i) {
-            $this->assertEquals(3 - $i, $collection->first()->id);
-            $i++;
+            $this->assertEquals($i, $model->id);
         });
 
         $this->assertSame(3, $i);
@@ -97,8 +81,8 @@ class DatabaseEloquentBelongsToManyChunkByIdTest extends TestCase
      */
     protected function seedData()
     {
-        $user = BelongsToManyChunkByIdTestTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
-        BelongsToManyChunkByIdTestTestArticle::query()->insert([
+        $user = BelongsToManyEachByIdTestTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+        BelongsToManyEachByIdTestTestArticle::query()->insert([
             ['id' => 1, 'title' => 'Another title'],
             ['id' => 2, 'title' => 'Another title'],
             ['id' => 3, 'title' => 'Another title'],
@@ -128,7 +112,7 @@ class DatabaseEloquentBelongsToManyChunkByIdTest extends TestCase
     }
 }
 
-class BelongsToManyChunkByIdTestTestUser extends Eloquent
+class BelongsToManyEachByIdTestTestUser extends Eloquent
 {
     protected $table = 'users';
     protected $fillable = ['id', 'email'];
@@ -136,11 +120,11 @@ class BelongsToManyChunkByIdTestTestUser extends Eloquent
 
     public function articles()
     {
-        return $this->belongsToMany(BelongsToManyChunkByIdTestTestArticle::class, 'article_user', 'user_id', 'article_id');
+        return $this->belongsToMany(BelongsToManyEachByIdTestTestArticle::class, 'article_user', 'user_id', 'article_id');
     }
 }
 
-class BelongsToManyChunkByIdTestTestArticle extends Eloquent
+class BelongsToManyEachByIdTestTestArticle extends Eloquent
 {
     protected $table = 'articles';
     protected $keyType = 'string';

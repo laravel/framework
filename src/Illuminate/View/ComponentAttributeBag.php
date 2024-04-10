@@ -502,8 +502,7 @@ class ComponentAttributeBag implements ArrayAccess, IteratorAggregate, JsonSeria
             }
 
             if ($value === true) {
-                // Exception for Alpine...
-                $value = $key === 'x-data' ? '' : $key;
+                $value = $key === 'x-data' || str_starts_with($key, 'wire:') ? '' : $key;
             }
 
             $string .= ' '.$key.'="'.str_replace('"', '\\"', trim($value)).'"';
