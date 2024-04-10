@@ -100,7 +100,6 @@ class DatabaseEloquentIntegrationTest extends TestCase
             });
 
             $this->schema($connection)->create('friends', function ($table) {
-                $table->increments('id');
                 $table->integer('user_id');
                 $table->integer('friend_id');
                 $table->integer('friend_level_id')->nullable();
@@ -701,21 +700,6 @@ class DatabaseEloquentIntegrationTest extends TestCase
                 $users[] = [$user->name, $i];
             }, 2, 'name');
         $this->assertSame([[' First', 0], [' Second', 1], [' Third', 2]], $users);
-    }
-
-    public function testEachByIdOnPivotWithIncrementId()
-    {
-        $user = EloquentTestUser::create(['id' => 2, 'email' => 'taylorotwel@gmail.com']);
-        $user2 = EloquentTestUser::create(['id' => 3, 'email' => 'abigailotwel@gmail.com']);;
-        $user->friends()->attach($user2);
-
-        $user->friends()->eachById(
-            function (EloquentTestUser $model) use (&$models) {
-                $models[] = $model;
-            }
-        );
-
-        $this->assertSame($user2->id, $models[0]->id);
     }
 
     public function testPluck()
