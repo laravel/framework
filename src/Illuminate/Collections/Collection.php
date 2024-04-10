@@ -7,6 +7,7 @@ use ArrayIterator;
 use Illuminate\Contracts\Support\CanBeEscapedWhenCastToString;
 use Illuminate\Support\Traits\EnumeratesValues;
 use Illuminate\Support\Traits\Macroable;
+use Random\Engine;
 use stdClass;
 use Traversable;
 
@@ -1048,21 +1049,22 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      *
      * @param  (callable(self<TKey, TValue>): int)|int|null  $number
      * @param  bool  $preserveKeys
+     * @param  Engine|null $engine
      * @return static<int, TValue>|TValue
      *
      * @throws \InvalidArgumentException
      */
-    public function random($number = null, $preserveKeys = false)
+    public function random($number = null, $preserveKeys = false, $engine = null)
     {
         if (is_null($number)) {
             return Arr::random($this->items);
         }
 
         if (is_callable($number)) {
-            return new static(Arr::random($this->items, $number($this), $preserveKeys));
+            return new static(Arr::random($this->items, $number($this), $preserveKeys, $engine));
         }
 
-        return new static(Arr::random($this->items, $number, $preserveKeys));
+        return new static(Arr::random($this->items, $number, $preserveKeys, $engine));
     }
 
     /**

@@ -11,6 +11,7 @@ use Illuminate\Support\Traits\EnumeratesValues;
 use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
 use IteratorAggregate;
+use Random\Engine;
 use stdClass;
 use Traversable;
 
@@ -1009,11 +1010,13 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
      * Get one or a specified number of items randomly from the collection.
      *
      * @param  int|null  $number
+     * @param  bool $preserveKeys
+     * @param  Engine|null $engine
      * @return static<int, TValue>|TValue
      *
      * @throws \InvalidArgumentException
      */
-    public function random($number = null)
+    public function random($number = null, $preserveKeys = false, $engine = null)
     {
         $result = $this->collect()->random(...func_get_args());
 
