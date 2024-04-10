@@ -1010,8 +1010,8 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
      * Get one or a specified number of items randomly from the collection.
      *
      * @param  int|null  $number
-     * @param  bool $preserveKeys
-     * @param  Engine|null $engine
+     * @param  bool  $preserveKeys
+     * @param  Engine|null  $engine
      * @return static<int, TValue>|TValue
      *
      * @throws \InvalidArgumentException

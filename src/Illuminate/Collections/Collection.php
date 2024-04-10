@@ -1049,7 +1049,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      *
      * @param  (callable(self<TKey, TValue>): int)|int|null  $number
      * @param  bool  $preserveKeys
-     * @param  Engine|null $engine
+     * @param  Engine|null  $engine
      * @return static<int, TValue>|TValue
      *
      * @throws \InvalidArgumentException

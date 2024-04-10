@@ -711,7 +711,7 @@ class Arr
      * @param  array  $array
      * @param  int|null  $number
      * @param  bool  $preserveKeys
-     * @param  Engine|null $engine
+     * @param  Engine|null  $engine
      * @return mixed
      *
      * @throws \InvalidArgumentException
