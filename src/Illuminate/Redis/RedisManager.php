@@ -106,6 +106,14 @@ class RedisManager implements Factory
 
         $options = $this->config['options'] ?? [];
 
+        $cluster_enabled = $this->config['cluster_enabled'] ?? false;
+
+        if ($cluster_enabled) {
+            if (isset($this->config['clusters'][$name])) {
+                return $this->resolveCluster($name);
+            }
+        }
+
         if (isset($this->config[$name])) {
             return $this->connector()->connect(
                 $this->parseConnectionConfiguration($this->config[$name]),
