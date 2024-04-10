@@ -89,6 +89,92 @@ class RedisManagerExtensionTest extends TestCase
 
         $redis->resolve($name);
     }
+
+    public function testResolvesToClusterWhenClusterEnabled()
+    {
+        $app = new Application;
+        $clusterConfig = [
+            'default' => [
+                'host' => 'default-host',
+                'port' => 'default-port',
+                'database' => 0,
+                'timeout' => 0.5,
+            ],
+            'clusters' => [
+                'default' => [
+                    [
+                        'host' => 'cluster-host-1',
+                        'port' => 'cluster-port-2',
+                        'database' => 0,
+                        'timeout' => 0.5,
+                    ],
+                    [
+                        'host' => 'cluster-host-2',
+                        'port' => 'cluster-port-3',
+                        'database' => 0,
+                        'timeout' => 0.5,
+                    ],
+                ],
+            ],
+            'options' => [
+                'cluster' => 'redis',
+                'prefix' => 'laravel_database_',
+            ],
+            'cluster_enabled' => true,
+        ];
+
+        $redis = new RedisManager($app, 'predis', $clusterConfig);
+
+        $redis->extend('predis', function () {
+            $mock = m::mock(Connector::class);
+            $mock->shouldReceive('connect')->andReturn('single-connection');
+            $mock->shouldReceive('connectToCluster')->andReturn('cluster-connection');
+            return $mock;
+        });
+
+        // Assert that the manager resolves to a cluster connection when cluster_enabled is true
+        $this->assertSame('cluster-connection', $redis->resolve());
+    }
+
+    public function testResolvesToSingleConnectionWhenClusterIsDefinedButDisabled()
+    {
+        $app = new Application;
+        $config = [
+            'default' => [
+                'host' => 'default-host',
+                'port' => 'default-port',
+                'database' => 0,
+                'timeout' => 0.5,
+            ],
+            'clusters' => [
+                'default' => [
+                    [
+                        'host' => 'cluster-host',
+                        'port' => 'cluster-port',
+                        'database' => 0,
+                        'timeout' => 0.5,
+                    ],
+                ],
+            ],
+            'options' => [
+                'cluster' => 'redis',
+                'prefix' => 'laravel_database_',
+            ],
+            'cluster_enabled' => false, // Explicitly set to false
+        ];
+
+        $redis = new RedisManager($app, 'predis', $config);
+
+        $redis->extend('predis', function () {
+            $mock = m::mock(Connector::class);
+            $mock->shouldReceive('connect')->andReturn('single-connection');
+            $mock->shouldReceive('connectToCluster')->andReturn('cluster-connection');
+            return $mock;
+        });
+
+        // Assert that the manager resolves to a single connection when cluster_enabled is false
+        $this->assertSame('single-connection', $redis->resolve());
+    }
 }
 
 class FakeRedisConnector implements Connector
