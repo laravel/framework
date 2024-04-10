@@ -157,7 +157,7 @@ class RouteListCommand extends Command
      */
     protected function sortRoutes($sort, array $routes)
     {
-	if (Str::contains($sort, ",")) {
+	    if (Str::contains($sort, ",")) {
             $sortArr = explode(",", $sort);
             return collect($routes)
                 ->sortBy($sortArr)
