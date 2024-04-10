@@ -59,6 +59,18 @@ class Limit
     }
 
     /**
+     * Create a new rate limit using seconds as decay time.
+     *
+     * @param  int  $decaySeconds
+     * @param  int  $maxAttempts
+     * @return static
+     */
+    public static function perSeconds($decaySeconds, $maxAttempts)
+    {
+        return new static('', $maxAttempts, $decaySeconds);
+    }
+
+    /**
      * Create a new rate limit.
      *
      * @param  int  $maxAttempts

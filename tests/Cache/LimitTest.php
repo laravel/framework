@@ -18,6 +18,10 @@ class LimitTest extends TestCase
         $this->assertSame(1, $limit->decaySeconds);
         $this->assertSame(3, $limit->maxAttempts);
 
+        $limit = Limit::perSeconds(5, 1);
+        $this->assertSame(5, $limit->decaySeconds);
+        $this->assertSame(1, $limit->maxAttempts);
+
         $limit = Limit::perMinute(3);
         $this->assertSame(60, $limit->decaySeconds);
         $this->assertSame(3, $limit->maxAttempts);
