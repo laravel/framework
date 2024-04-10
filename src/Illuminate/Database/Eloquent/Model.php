@@ -1689,7 +1689,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     }
 
     /**
-     * Reload the current model instance with fresh attributes from the database.
+     * Reload the current model instance with fresh attributes and relationships from the database.
      *
      * @return $this
      */
@@ -1699,12 +1699,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
             return $this;
         }
 
-        $this->setRawAttributes(
-            $this->setKeysForSelectQuery($this->newQueryWithoutScopes())
-                ->useWritePdo()
-                ->firstOrFail()
-                ->attributes
-        );
+        $this->refreshRawAttributes();
 
         $this->load(collect($this->relations)->reject(function ($relation) {
             return $relation instanceof Pivot
@@ -1714,6 +1709,21 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         $this->syncOriginal();
 
         return $this;
+    }
+
+    /**
+     * Reload the current model instance with fresh attributes from the database.
+     *
+     * @return void
+     */
+    protected function refreshRawAttributes()
+    {
+        $this->setRawAttributes(
+            $this->setKeysForSelectQuery($this->newQueryWithoutScopes())
+                ->useWritePdo()
+                ->firstOrFail()
+                ->attributes
+        );
     }
 
     /**

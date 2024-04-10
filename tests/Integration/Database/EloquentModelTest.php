@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Database;
 
+use Illuminate\Database\Eloquent\Concerns\HasGeneratedColumns;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Carbon;
@@ -126,6 +127,55 @@ class EloquentModelTest extends DatabaseTestCase
             'analyze' => true,
         ]);
     }
+
+    public function testHasGeneratedColumns()
+    {
+        Schema::create('products', function (Blueprint $table) {
+            $table->id();
+            $table->integer('price');
+
+            if ($this->driver === 'sqlsrv') {
+                $table->computed('tax', 'price * 0.6');
+                $table->computed('total', 'price * 1.6')->persisted();
+            } else {
+                if ($this->driver === 'pgsql') {
+                    $table->integer('tax')->storedAs('price * 0.6');
+                } else {
+                    $table->integer('tax')->virtualAs('price * 0.6');
+                }
+                $table->integer('total')->storedAs('price * 1.6');
+            }
+        });
+
+        Product::saved(function ($product) {
+            $this->assertEquals(20, $product->price);
+            $this->assertEquals(12, $product->tax);
+            $this->assertEquals(32, $product->total);
+        });
+
+        $instance = Product::create(['price' => 20]);
+
+        $this->assertEquals(20, $instance->price);
+        $this->assertEquals(12, $instance->tax);
+        $this->assertEquals(32, $instance->total);
+
+        Product::flushEventListeners();
+        Product::saved(function ($product) {
+            $this->assertTrue($product->isDirty('price'));
+            $this->assertTrue($product->isDirty('tax'));
+            $this->assertTrue($product->isDirty('total'));
+            $this->assertEquals(10, $product->price);
+            $this->assertEquals(6, $product->tax);
+            $this->assertEquals(16, $product->total);
+        });
+
+        $instance->update(['price' => 10]);
+
+        $this->assertEquals(10, $instance->price);
+        $this->assertEquals(6, $instance->tax);
+        $this->assertEquals(16, $instance->total);
+        $this->assertFalse($instance->isDirty());
+    }
 }
 
 class TestModel1 extends Model
@@ -142,3 +192,11 @@ class TestModel2 extends Model
     public $timestamps = false;
     protected $guarded = [];
 }
+
+class Product extends Model
+{
+    use HasGeneratedColumns;
+
+    protected $fillable = ['price'];
+    public $timestamps = false;
+};
