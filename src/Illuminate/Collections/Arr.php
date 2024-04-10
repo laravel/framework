@@ -6,6 +6,7 @@ use ArgumentCountError;
 use ArrayAccess;
 use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
+use Random\Engine;
 use Random\Randomizer;
 
 class Arr
@@ -710,11 +711,12 @@ class Arr
      * @param  array  $array
      * @param  int|null  $number
      * @param  bool  $preserveKeys
+     * @param  Engine|null $engine
      * @return mixed
      *
      * @throws \InvalidArgumentException
      */
-    public static function random($array, $number = null, $preserveKeys = false)
+    public static function random($array, $number = null, $preserveKeys = false, $engine = null)
     {
         $requested = is_null($number) ? 1 : $number;
 
@@ -730,7 +732,7 @@ class Arr
             return is_null($number) ? null : [];
         }
 
-        $keys = (new Randomizer)->pickArrayKeys($array, $requested);
+        $keys = (new Randomizer($engine))->pickArrayKeys($array, $requested);
 
         if (is_null($number)) {
             return $array[$keys[0]];
