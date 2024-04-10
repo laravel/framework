@@ -20,7 +20,7 @@ use Symfony\Component\Console\Output\BufferedOutput;
 class PendingCommand
 {
     use Conditionable;
-    
+
     /**
      * The test being run.
      *
