@@ -45,8 +45,8 @@ class SupportStrTest extends TestCase
         $this->assertSame('Laravel123', Str::title('laravel123'));
         $this->assertSame('Laravel123', Str::title('Laravel123'));
 
-        $longString = 'lorem ipsum ' . str_repeat('dolor sit amet ', 1000);
-        $expectedResult = 'Lorem Ipsum Dolor Sit Amet ' . str_repeat('Dolor Sit Amet ', 999);
+        $longString = 'lorem ipsum '.str_repeat('dolor sit amet ', 1000);
+        $expectedResult = 'Lorem Ipsum Dolor Sit Amet '.str_repeat('Dolor Sit Amet ', 999);
         $this->assertSame($expectedResult, Str::title($longString));
     }
 
