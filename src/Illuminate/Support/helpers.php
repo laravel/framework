@@ -4,6 +4,7 @@ use Illuminate\Contracts\Support\DeferringDisplayableValue;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Env;
+use Illuminate\Support\Fluent;
 use Illuminate\Support\HigherOrderTapProxy;
 use Illuminate\Support\Once;
 use Illuminate\Support\Onceable;
@@ -154,6 +155,19 @@ if (! function_exists('filled')) {
     }
 }
 
+if (! function_exists('fluent')) {
+    /**
+     * Create an Fluent object from the given value.
+     *
+     * @param  object|array  $value
+     * @return \Illuminate\Support\Fluent
+     */
+    function fluent($value)
+    {
+        return new Fluent($value);
+    }
+}
+
 if (! function_exists('literal')) {
     /**
      * Return a new literal or anonymous object using named arguments.
@@ -225,7 +239,7 @@ if (! function_exists('optional')) {
      * @param  callable|null  $callback
      * @return mixed
      */
-    function optional($value = null, callable $callback = null)
+    function optional($value = null, ?callable $callback = null)
     {
         if (is_null($callback)) {
             return new Optional($value);
@@ -264,7 +278,7 @@ if (! function_exists('retry')) {
      * @param  callable|null  $when
      * @return mixed
      *
-     * @throws \Exception
+     * @throws \Throwable
      */
     function retry($times, callable $callback, $sleepMilliseconds = 0, $when = null)
     {
@@ -284,7 +298,7 @@ if (! function_exists('retry')) {
 
         try {
             return $callback($attempts);
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             if ($times < 1 || ($when && ! $when($e))) {
                 throw $e;
             }
@@ -465,7 +479,7 @@ if (! function_exists('with')) {
      * @param  (callable(TValue): (TReturn))|null  $callback
      * @return ($callback is null ? TValue : TReturn)
      */
-    function with($value, callable $callback = null)
+    function with($value, ?callable $callback = null)
     {
         return is_null($callback) ? $value : $callback($value);
     }

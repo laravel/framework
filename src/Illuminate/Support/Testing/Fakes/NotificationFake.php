@@ -6,6 +6,7 @@ use Closure;
 use Exception;
 use Illuminate\Contracts\Notifications\Dispatcher as NotificationDispatcher;
 use Illuminate\Contracts\Notifications\Factory as NotificationFactory;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Contracts\Translation\HasLocalePreference;
 use Illuminate\Notifications\AnonymousNotifiable;
 use Illuminate\Support\Collection;
@@ -31,6 +32,13 @@ class NotificationFake implements Fake, NotificationDispatcher, NotificationFact
      * @var string|null
      */
     public $locale;
+
+    /**
+     * Indicates if notifications should be serialized and restored when pushed to the queue.
+     *
+     * @var bool
+     */
+    protected $serializeAndRestore = false;
 
     /**
      * Assert if a notification was sent on-demand based on a truth-test callback.
@@ -288,7 +296,7 @@ class NotificationFake implements Fake, NotificationDispatcher, NotificationFact
      * @param  array|null  $channels
      * @return void
      */
-    public function sendNow($notifiables, $notification, array $channels = null)
+    public function sendNow($notifiables, $notification, ?array $channels = null)
     {
         if (! $notifiables instanceof Collection && ! is_array($notifiables)) {
             $notifiables = [$notifiables];
@@ -313,7 +321,9 @@ class NotificationFake implements Fake, NotificationDispatcher, NotificationFact
             }
 
             $this->notifications[get_class($notifiable)][$notifiable->getKey()][get_class($notification)][] = [
-                'notification' => $notification,
+                'notification' => $this->serializeAndRestore && $notification instanceof ShouldQueue
+                    ? $this->serializeAndRestoreNotification($notification)
+                    : $notification,
                 'channels' => $notifiableChannels,
                 'notifiable' => $notifiable,
                 'locale' => $notification->locale ?? $this->locale ?? value(function () use ($notifiable) {
@@ -347,6 +357,30 @@ class NotificationFake implements Fake, NotificationDispatcher, NotificationFact
         $this->locale = $locale;
 
         return $this;
+    }
+
+    /**
+     * Specify if notification should be serialized and restored when being "pushed" to the queue.
+     *
+     * @param  bool  $serializeAndRestore
+     * @return $this
+     */
+    public function serializeAndRestore(bool $serializeAndRestore = true)
+    {
+        $this->serializeAndRestore = $serializeAndRestore;
+
+        return $this;
+    }
+
+    /**
+     * Serialize and unserialize the notification to simulate the queueing process.
+     *
+     * @param  mixed  $notification
+     * @return mixed
+     */
+    protected function serializeAndRestoreNotification($notification)
+    {
+        return unserialize(serialize($notification));
     }
 
     /**

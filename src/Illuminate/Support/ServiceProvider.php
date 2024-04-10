@@ -485,7 +485,7 @@ abstract class ServiceProvider
      * @param  string  $path
      * @return bool
      */
-    public static function addProviderToBootstrapFile(string $provider, string $path = null)
+    public static function addProviderToBootstrapFile(string $provider, ?string $path = null)
     {
         $path ??= app()->getBootstrapProvidersPath();
 

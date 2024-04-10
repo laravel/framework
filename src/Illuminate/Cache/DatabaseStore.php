@@ -388,6 +388,17 @@ class DatabaseStore implements LockProvider, Store
     }
 
     /**
+     * Set the cache key prefix.
+     *
+     * @param  string  $prefix
+     * @return void
+     */
+    public function setPrefix($prefix)
+    {
+        $this->prefix = $prefix;
+    }
+
+    /**
      * Serialize the given value.
      *
      * @param  mixed  $value

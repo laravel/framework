@@ -324,41 +324,54 @@ class MySqlGrammar extends Grammar
 
         if (($connection->isMaria() && version_compare($version, '10.5.2', '<')) ||
             (! $connection->isMaria() && version_compare($version, '8.0.3', '<'))) {
-            $column = collect($connection->getSchemaBuilder()->getColumns($blueprint->getTable()))
-                ->firstWhere('name', $command->from);
-
-            $modifiers = $this->addModifiers($column['type'], $blueprint, new ColumnDefinition([
-                'change' => true,
-                'type' => match ($column['type_name']) {
-                    'bigint' => 'bigInteger',
-                    'int' => 'integer',
-                    'mediumint' => 'mediumInteger',
-                    'smallint' => 'smallInteger',
-                    'tinyint' => 'tinyInteger',
-                    default => $column['type_name'],
-                },
-                'nullable' => $column['nullable'],
-                'default' => $column['default'] && str_starts_with(strtolower($column['default']), 'current_timestamp')
-                    ? new Expression($column['default'])
-                    : $column['default'],
-                'autoIncrement' => $column['auto_increment'],
-                'collation' => $column['collation'],
-                'comment' => $column['comment'],
-                'virtualAs' => ! is_null($column['generation']) && $column['generation']['type'] === 'virtual'
-                    ? $column['generation']['expression'] : null,
-                'storedAs' => ! is_null($column['generation']) && $column['generation']['type'] === 'stored'
-                    ? $column['generation']['expression'] : null,
-            ]));
-
-            return sprintf('alter table %s change %s %s %s',
-                $this->wrapTable($blueprint),
-                $this->wrap($command->from),
-                $this->wrap($command->to),
-                $modifiers
-            );
+            return $this->compileLegacyRenameColumn($blueprint, $command, $connection);
         }
 
         return parent::compileRenameColumn($blueprint, $command, $connection);
+    }
+
+    /**
+     * Compile a rename column command for legacy versions of MySQL.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $command
+     * @param  \Illuminate\Database\Connection  $connection
+     * @return string
+     */
+    protected function compileLegacyRenameColumn(Blueprint $blueprint, Fluent $command, Connection $connection)
+    {
+        $column = collect($connection->getSchemaBuilder()->getColumns($blueprint->getTable()))
+            ->firstWhere('name', $command->from);
+
+        $modifiers = $this->addModifiers($column['type'], $blueprint, new ColumnDefinition([
+            'change' => true,
+            'type' => match ($column['type_name']) {
+                'bigint' => 'bigInteger',
+                'int' => 'integer',
+                'mediumint' => 'mediumInteger',
+                'smallint' => 'smallInteger',
+                'tinyint' => 'tinyInteger',
+                default => $column['type_name'],
+            },
+            'nullable' => $column['nullable'],
+            'default' => $column['default'] && str_starts_with(strtolower($column['default']), 'current_timestamp')
+                ? new Expression($column['default'])
+                : $column['default'],
+            'autoIncrement' => $column['auto_increment'],
+            'collation' => $column['collation'],
+            'comment' => $column['comment'],
+            'virtualAs' => ! is_null($column['generation']) && $column['generation']['type'] === 'virtual'
+                ? $column['generation']['expression'] : null,
+            'storedAs' => ! is_null($column['generation']) && $column['generation']['type'] === 'stored'
+                ? $column['generation']['expression'] : null,
+        ]));
+
+        return sprintf('alter table %s change %s %s %s',
+            $this->wrapTable($blueprint),
+            $this->wrap($command->from),
+            $this->wrap($command->to),
+            $modifiers
+        );
     }
 
     /**

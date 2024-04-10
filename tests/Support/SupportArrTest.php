@@ -38,11 +38,26 @@ class SupportArrTest extends TestCase
 
     public function testCollapse()
     {
+        // Normal case: a two-dimensional array with different elements
         $data = [['foo', 'bar'], ['baz']];
         $this->assertEquals(['foo', 'bar', 'baz'], Arr::collapse($data));
 
+        // Case including numeric and string elements
         $array = [[1], [2], [3], ['foo', 'bar'], collect(['baz', 'boom'])];
         $this->assertEquals([1, 2, 3, 'foo', 'bar', 'baz', 'boom'], Arr::collapse($array));
+
+        // Case with empty two-dimensional arrays
+        $emptyArray = [[], [], []];
+        $this->assertEquals([], Arr::collapse($emptyArray));
+
+        // Case with both empty arrays and arrays with elements
+        $mixedArray = [[], [1, 2], [], ['foo', 'bar']];
+        $this->assertEquals([1, 2, 'foo', 'bar'], Arr::collapse($mixedArray));
+
+        // Case including collections and arrays
+        $collection = collect(['baz', 'boom']);
+        $mixedArray = [[1], [2], [3], ['foo', 'bar'], $collection];
+        $this->assertEquals([1, 2, 3, 'foo', 'bar', 'baz', 'boom'], Arr::collapse($mixedArray));
     }
 
     public function testCrossJoin()
@@ -706,6 +721,23 @@ class SupportArrTest extends TestCase
         $this->assertEquals(['first' => 'taylor', 'last' => 'otwell'], $data);
     }
 
+    public function testMapWithEmptyArray()
+    {
+        $mapped = Arr::map([], static function ($value, $key) {
+            return $key.'-'.$value;
+        });
+        $this->assertEquals([], $mapped);
+    }
+
+    public function testMapNullValues()
+    {
+        $data = ['first' => 'taylor', 'last' => null];
+        $mapped = Arr::map($data, static function ($value, $key) {
+            return $key.'-'.$value;
+        });
+        $this->assertEquals(['first' => 'first-taylor', 'last' => 'last-'], $mapped);
+    }
+
     public function testMapWithKeys()
     {
         $data = [
@@ -758,6 +790,21 @@ class SupportArrTest extends TestCase
 
         $array = Arr::prepend(['one' => 1, 'two' => 2], 0, null);
         $this->assertEquals([null => 0, 'one' => 1, 'two' => 2], $array);
+
+        $array = Arr::prepend(['one', 'two'], null, '');
+        $this->assertEquals(['' => null, 'one', 'two'], $array);
+
+        $array = Arr::prepend([], 'zero');
+        $this->assertEquals(['zero'], $array);
+
+        $array = Arr::prepend([''], 'zero');
+        $this->assertEquals(['zero', ''], $array);
+
+        $array = Arr::prepend(['one', 'two'], ['zero']);
+        $this->assertEquals([['zero'], 'one', 'two'], $array);
+
+        $array = Arr::prepend(['one', 'two'], ['zero'], 'key');
+        $this->assertEquals(['key' => ['zero'], 'one', 'two'], $array);
     }
 
     public function testPull()

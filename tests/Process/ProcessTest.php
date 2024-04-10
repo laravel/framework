@@ -7,6 +7,7 @@ use Illuminate\Process\Exceptions\ProcessFailedException;
 use Illuminate\Process\Exceptions\ProcessTimedOutException;
 use Illuminate\Process\Factory;
 use OutOfBoundsException;
+use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 
@@ -424,12 +425,9 @@ class ProcessTest extends TestCase
         $this->assertTrue(true);
     }
 
+    #[RequiresOperatingSystem('Linux|DAR')]
     public function testRealProcessesCanHaveErrorOutput()
     {
-        if (windows_os()) {
-            $this->markTestSkipped('Requires Linux.');
-        }
-
         $factory = new Factory;
         $result = $factory->path(__DIR__)->run('echo "Hello World" >&2; exit 1;');
 
@@ -455,12 +453,9 @@ class ProcessTest extends TestCase
         $result->throw();
     }
 
+    #[RequiresOperatingSystem('Linux|DAR')]
     public function testRealProcessesCanThrowWithoutOutput()
     {
-        if (windows_os()) {
-            $this->markTestSkipped('Requires Linux.');
-        }
-
         $this->expectException(ProcessFailedException::class);
         $this->expectExceptionMessage(<<<'EOT'
             The command "exit 1;" failed.
@@ -496,12 +491,9 @@ class ProcessTest extends TestCase
         $result->throw();
     }
 
+    #[RequiresOperatingSystem('Linux|DAR')]
     public function testRealProcessesCanThrowWithErrorOutput()
     {
-        if (windows_os()) {
-            $this->markTestSkipped('Requires Linux.');
-        }
-
         $this->expectException(ProcessFailedException::class);
         $this->expectExceptionMessage(<<<'EOT'
             The command "echo "Hello World" >&2; exit 1;" failed.
@@ -541,12 +533,9 @@ class ProcessTest extends TestCase
         $result->throw();
     }
 
+    #[RequiresOperatingSystem('Linux|DAR')]
     public function testRealProcessesCanThrowWithOutput()
     {
-        if (windows_os()) {
-            $this->markTestSkipped('Requires Linux.');
-        }
-
         $this->expectException(ProcessFailedException::class);
         $this->expectExceptionMessage(<<<'EOT'
             The command "echo "Hello World" >&1; exit 1;" failed.
@@ -565,12 +554,9 @@ class ProcessTest extends TestCase
         $result->throw();
     }
 
+    #[RequiresOperatingSystem('Linux|DAR')]
     public function testRealProcessesCanTimeout()
     {
-        if (windows_os()) {
-            $this->markTestSkipped('Requires Linux.');
-        }
-
         $this->expectException(ProcessTimedOutException::class);
         $this->expectExceptionMessage(
             'The process "sleep 2; exit 1;" exceeded the timeout of 1 seconds.'
@@ -582,12 +568,9 @@ class ProcessTest extends TestCase
         $result->throw();
     }
 
+    #[RequiresOperatingSystem('Linux|DAR')]
     public function testRealProcessesCanThrowIfTrue()
     {
-        if (windows_os()) {
-            $this->markTestSkipped('Requires Linux.');
-        }
-
         $this->expectException(ProcessFailedException::class);
 
         $factory = new Factory;
@@ -596,12 +579,9 @@ class ProcessTest extends TestCase
         $result->throwIf(true);
     }
 
+    #[RequiresOperatingSystem('Linux|DAR')]
     public function testRealProcessesDoesntThrowIfFalse()
     {
-        if (windows_os()) {
-            $this->markTestSkipped('Requires Linux.');
-        }
-
         $factory = new Factory;
         $result = $factory->path(__DIR__)->run('echo "Hello World" >&2; exit 1;');
 
@@ -610,24 +590,18 @@ class ProcessTest extends TestCase
         $this->assertTrue(true);
     }
 
+    #[RequiresOperatingSystem('Linux|DAR')]
     public function testRealProcessesCanUseStandardInput()
     {
-        if (windows_os()) {
-            $this->markTestSkipped('Requires Linux.');
-        }
-
         $factory = new Factory();
         $result = $factory->input('foobar')->run('cat');
 
         $this->assertSame('foobar', $result->output());
     }
 
+    #[RequiresOperatingSystem('Linux|DAR')]
     public function testProcessPipe()
     {
-        if (windows_os()) {
-            $this->markTestSkipped('Requires Linux.');
-        }
-
         $factory = new Factory;
         $factory->fake([
             'cat *' => "Hello, world\nfoo\nbar",
@@ -641,12 +615,9 @@ class ProcessTest extends TestCase
         $this->assertSame("foo\n", $pipe->output());
     }
 
+    #[RequiresOperatingSystem('Linux|DAR')]
     public function testProcessPipeFailed()
     {
-        if (windows_os()) {
-            $this->markTestSkipped('Requires Linux.');
-        }
-
         $factory = new Factory;
         $factory->fake([
             'cat *' => $factory->result(exitCode: 1),
@@ -660,12 +631,9 @@ class ProcessTest extends TestCase
         $this->assertTrue($pipe->failed());
     }
 
+    #[RequiresOperatingSystem('Linux|DAR')]
     public function testProcessSimplePipe()
     {
-        if (windows_os()) {
-            $this->markTestSkipped('Requires Linux.');
-        }
-
         $factory = new Factory;
         $factory->fake([
             'cat *' => "Hello, world\nfoo\nbar",
@@ -679,12 +647,9 @@ class ProcessTest extends TestCase
         $this->assertSame("foo\n", $pipe->output());
     }
 
+    #[RequiresOperatingSystem('Linux|DAR')]
     public function testProcessSimplePipeFailed()
     {
-        if (windows_os()) {
-            $this->markTestSkipped('Requires Linux.');
-        }
-
         $factory = new Factory;
         $factory->fake([
             'cat *' => $factory->result(exitCode: 1),

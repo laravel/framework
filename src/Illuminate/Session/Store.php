@@ -283,7 +283,7 @@ class Store implements Session
     }
 
     /**
-     * Checks if a key is present and not null.
+     * Determine if a key is present and not null.
      *
      * @param  string|array  $key
      * @return bool
@@ -293,6 +293,19 @@ class Store implements Session
         return ! collect(is_array($key) ? $key : func_get_args())->contains(function ($key) {
             return is_null($this->get($key));
         });
+    }
+
+    /**
+     * Determine if any of the given keys are present and not null.
+     *
+     * @param  string|array  $key
+     * @return bool
+     */
+    public function hasAny($key)
+    {
+        return collect(is_array($key) ? $key : func_get_args())->filter(function ($key) {
+            return ! is_null($this->get($key));
+        })->count() >= 1;
     }
 
     /**

@@ -68,7 +68,7 @@ interface ProcessResult
      * @param  callable|null  $callback
      * @return $this
      */
-    public function throw(callable $callback = null);
+    public function throw(?callable $callback = null);
 
     /**
      * Throw an exception if the process failed and the given condition is true.
@@ -77,5 +77,5 @@ interface ProcessResult
      * @param  callable|null  $callback
      * @return $this
      */
-    public function throwIf(bool $condition, callable $callback = null);
+    public function throwIf(bool $condition, ?callable $callback = null);
 }

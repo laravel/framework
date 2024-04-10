@@ -38,7 +38,7 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
      * @param  callable|null  $callback
      * @return static
      */
-    public static function times($number, callable $callback = null);
+    public static function times($number, ?callable $callback = null);
 
     /**
      * Create a collection with the given range.
@@ -297,7 +297,7 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
      * @param  (callable(TValue): bool)|null  $callback
      * @return static
      */
-    public function filter(callable $callback = null);
+    public function filter(?callable $callback = null);
 
     /**
      * Apply the callback if the given "value" is (or resolves to) truthy.
@@ -309,7 +309,7 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
      * @param  (callable($this): TWhenReturnType)|null  $default
      * @return $this|TWhenReturnType
      */
-    public function when($value, callable $callback = null, callable $default = null);
+    public function when($value, ?callable $callback = null, ?callable $default = null);
 
     /**
      * Apply the callback if the collection is empty.
@@ -320,7 +320,7 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
      * @param  (callable($this): TWhenEmptyReturnType)|null  $default
      * @return $this|TWhenEmptyReturnType
      */
-    public function whenEmpty(callable $callback, callable $default = null);
+    public function whenEmpty(callable $callback, ?callable $default = null);
 
     /**
      * Apply the callback if the collection is not empty.
@@ -331,7 +331,7 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
      * @param  (callable($this): TWhenNotEmptyReturnType)|null  $default
      * @return $this|TWhenNotEmptyReturnType
      */
-    public function whenNotEmpty(callable $callback, callable $default = null);
+    public function whenNotEmpty(callable $callback, ?callable $default = null);
 
     /**
      * Apply the callback if the given "value" is (or resolves to) truthy.
@@ -343,7 +343,7 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
      * @param  (callable($this): TUnlessReturnType)|null  $default
      * @return $this|TUnlessReturnType
      */
-    public function unless($value, callable $callback, callable $default = null);
+    public function unless($value, callable $callback, ?callable $default = null);
 
     /**
      * Apply the callback unless the collection is empty.
@@ -354,7 +354,7 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
      * @param  (callable($this): TUnlessEmptyReturnType)|null  $default
      * @return $this|TUnlessEmptyReturnType
      */
-    public function unlessEmpty(callable $callback, callable $default = null);
+    public function unlessEmpty(callable $callback, ?callable $default = null);
 
     /**
      * Apply the callback unless the collection is not empty.
@@ -365,7 +365,7 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
      * @param  (callable($this): TUnlessNotEmptyReturnType)|null  $default
      * @return $this|TUnlessNotEmptyReturnType
      */
-    public function unlessNotEmpty(callable $callback, callable $default = null);
+    public function unlessNotEmpty(callable $callback, ?callable $default = null);
 
     /**
      * Filter items by the given key value pair.
@@ -477,7 +477,7 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
      * @param  TFirstDefault|(\Closure(): TFirstDefault)  $default
      * @return TValue|TFirstDefault
      */
-    public function first(callable $callback = null, $default = null);
+    public function first(?callable $callback = null, $default = null);
 
     /**
      * Get the first item by the given key value pair.
@@ -645,7 +645,7 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
      * @param  TLastDefault|(\Closure(): TLastDefault)  $default
      * @return TValue|TLastDefault
      */
-    public function last(callable $callback = null, $default = null);
+    public function last(?callable $callback = null, $default = null);
 
     /**
      * Run a map over each of the items.

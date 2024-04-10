@@ -34,6 +34,7 @@ use Illuminate\Support\Testing\Fakes\EventFake;
  * @method static void assertNothingDispatched()
  * @method static \Illuminate\Support\Collection dispatched(string $event, callable|null $callback = null)
  * @method static bool hasDispatched(string $event)
+ * @method static array dispatchedEvents()
  *
  * @see \Illuminate\Events\Dispatcher
  * @see \Illuminate\Support\Testing\Fakes\EventFake
