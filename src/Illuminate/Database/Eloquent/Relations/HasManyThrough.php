@@ -693,6 +693,23 @@ class HasManyThrough extends Relation
     }
 
     /**
+     * Query lazily, by chunking the results of a query by comparing IDs in descending order.
+     *
+     * @param  int  $chunkSize
+     * @param  string|null  $column
+     * @param  string|null  $alias
+     * @return \Illuminate\Support\LazyCollection
+     */
+    public function lazyByIdDesc($chunkSize = 1000, $column = null, $alias = null)
+    {
+        $column ??= $this->getRelated()->getQualifiedKeyName();
+
+        $alias ??= $this->getRelated()->getKeyName();
+
+        return $this->prepareQueryBuilder()->lazyByIdDesc($chunkSize, $column, $alias);
+    }
+
+    /**
      * Prepare the query builder for query execution.
      *
      * @param  array  $columns
