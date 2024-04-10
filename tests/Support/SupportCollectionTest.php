@@ -21,6 +21,9 @@ use JsonSerializable;
 use Mockery as m;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Random\Engine\Mt19937;
+use Random\Engine\PcgOneseq128XslRr64;
+use Random\Engine\Xoshiro256StarStar;
 use ReflectionClass;
 use stdClass;
 use Symfony\Component\VarDumper\VarDumper;
@@ -2325,6 +2328,24 @@ class SupportCollectionTest extends TestCase
         $this->assertInstanceOf($collection, $random);
         $this->assertCount(5, $random);
         $this->assertCount(5, array_intersect_assoc($random->all(), $data->all()));
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testRandomWithEngine($collection)
+    {
+        $engines = [
+            'null' => null, // Secure Engine will be used
+            'Mt19937' => new Mt19937(),
+            'PcgOneseq128XslRr64' => new PcgOneseq128XslRr64(),
+            'Xoshiro256StarStar' => new Xoshiro256StarStar(),
+        ];
+
+        $data = new $collection([1, 2, 3, 4, 5, 6]);
+        foreach ($engines as $name => $engine) {
+            $random = $data->random(2, engine: $engine);
+            $this->assertInstanceOf($collection, $random, "with $name Random Engine.");
+            $this->assertCount(2, $random, "with $name Random Engine.");
+        }
     }
 
     #[DataProvider('collectionClassProvider')]
