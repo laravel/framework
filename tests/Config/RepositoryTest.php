@@ -56,6 +56,9 @@ class RepositoryTest extends TestCase
         $this->assertNull(
             $this->repository->get('a.b.c')
         );
+
+        $this->assertNull($this->repository->get('x.y.z'));
+        $this->assertNull($this->repository->get('.'));
     }
 
     public function testGetBooleanValue()
@@ -178,10 +181,13 @@ class RepositoryTest extends TestCase
     {
         $this->assertSame('aaa', $this->repository->get('array.0'));
         $this->assertSame('zzz', $this->repository->get('array.1'));
+
         $this->repository->prepend('array', 'xxx');
         $this->assertSame('xxx', $this->repository->get('array.0'));
         $this->assertSame('aaa', $this->repository->get('array.1'));
         $this->assertSame('zzz', $this->repository->get('array.2'));
+        $this->assertNull($this->repository->get('array.3'));
+        $this->assertCount(3, $this->repository->get('array'));
     }
 
     public function testPush()
@@ -192,6 +198,8 @@ class RepositoryTest extends TestCase
         $this->assertSame('aaa', $this->repository->get('array.0'));
         $this->assertSame('zzz', $this->repository->get('array.1'));
         $this->assertSame('xxx', $this->repository->get('array.2'));
+
+        $this->assertCount(3, $this->repository->get('array'));
     }
 
     public function testPrependWithNewKey()
