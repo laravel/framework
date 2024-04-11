@@ -153,7 +153,7 @@ class AfterQueryTest extends DatabaseTestCase
                 $afterQueryIds->push(...$userIds->all());
 
                 foreach ($userIds as $userId) {
-                    $this->assertIsInt($userId);
+                    $this->assertIsInt((int) $userId);
                 }
             })
             ->pluck('id');
@@ -303,7 +303,7 @@ class AfterQueryTest extends DatabaseTestCase
         $users = AfterQueryUser::query()
             ->toBase()
             ->afterQuery(function ($users) use ($firstUser) {
-                return $users->first()->id === $firstUser->id ? collect(['foo', 'bar']) : collect(['bar', 'foo']);
+                return ((int) $users->first()->id) === $firstUser->id ? collect(['foo', 'bar']) : collect(['bar', 'foo']);
             })
             ->cursor();
 
