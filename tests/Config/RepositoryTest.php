@@ -186,8 +186,8 @@ class RepositoryTest extends TestCase
         $this->assertSame('xxx', $this->repository->get('array.0'));
         $this->assertSame('aaa', $this->repository->get('array.1'));
         $this->assertSame('zzz', $this->repository->get('array.2'));
-        $this->assertNull($this->repository->get('array.3'), 'There should be no item after the third item');
-        $this->assertCount(3, $this->repository->get('array'), 'The count of array should be 3 after prepending');
+        $this->assertNull($this->repository->get('array.3'));
+        $this->assertCount(3, $this->repository->get('array'));
     }
 
     public function testPush()
