@@ -2,7 +2,6 @@
 
 namespace Illuminate\Support\Traits;
 
-use BackedEnum;
 use CachingIterator;
 use Closure;
 use Exception;
