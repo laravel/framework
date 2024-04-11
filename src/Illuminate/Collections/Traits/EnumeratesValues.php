@@ -2,6 +2,7 @@
 
 namespace Illuminate\Support\Traits;
 
+use BackedEnum;
 use CachingIterator;
 use Closure;
 use Exception;
@@ -410,7 +411,7 @@ trait EnumeratesValues
      */
     public function mapInto($class)
     {
-        if (enum_exists($class)) {
+        if (is_subclass_of($class, BackedEnum::class)) {
             return $this->map(fn ($value, $key) => $class::from($value));
         }
 
