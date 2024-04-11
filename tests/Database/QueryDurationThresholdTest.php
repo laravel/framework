@@ -17,6 +17,13 @@ class QueryDurationThresholdTest extends TestCase
      */
     protected $now;
 
+    protected function tearDown(): void
+    {
+        Carbon::setTestNow(null);
+
+        parent::tearDown();
+    }
+
     public function testItCanHandleReachingADurationThresholdInTheDb()
     {
         $connection = new Connection(new PDO('sqlite::memory:'));
@@ -66,8 +73,6 @@ class QueryDurationThresholdTest extends TestCase
         $connection->logQuery('xxxx', [], 1);
 
         $this->assertSame(1, $called);
-
-        Carbon::setTestNow(null);
     }
 
     public function testItCanSpecifyMultipleHandlersWithTheSameIntervals()
