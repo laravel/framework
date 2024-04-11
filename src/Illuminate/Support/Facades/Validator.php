@@ -12,6 +12,8 @@ namespace Illuminate\Support\Facades;
  * @method static void includeUnvalidatedArrayKeys()
  * @method static void excludeUnvalidatedArrayKeys()
  * @method static void resolver(\Closure $resolver)
+ * @method static void displayableAttributeWithUnderscore()
+ * @method static void displayableAttributeWithoutUnderscore()
  * @method static \Illuminate\Contracts\Translation\Translator getTranslator()
  * @method static \Illuminate\Validation\PresenceVerifierInterface getPresenceVerifier()
  * @method static void setPresenceVerifier(\Illuminate\Validation\PresenceVerifierInterface $presenceVerifier)

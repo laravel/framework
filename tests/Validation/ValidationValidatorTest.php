@@ -705,6 +705,35 @@ class ValidationValidatorTest extends TestCase
         new Validator($trans, ['firstname' => 'Bob', 'lastname' => 'Smith'], ['lastname' => 'alliteration:firstname']);
     }
 
+    public function testDisplayableAttributesReplaceWithOrWithoutUnderscore()
+    {
+        // Default behavior: The underscore in the attribute name is replaced with a space
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.required' => 'The :attribute field is required.'], 'en');
+        $v = new Validator($trans, ['bar' => ''], ['tax_rate' => 'Required']);
+        $this->assertFalse($v->passes());
+        $v->messages()->setFormat(':message');
+        $this->assertSame('The tax rate field is required.', $v->messages()->first('tax_rate'));
+
+        // Replace with underscore in the attribute's name in error message
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.required' => 'The :attribute field is required.'], 'en');
+        $v = new Validator($trans, ['bar' => ''], ['tax_rate' => 'Required']);
+        $v->displayableAttributeWithoutUnderscore = false;
+        $this->assertFalse($v->passes());
+        $v->messages()->setFormat(':message');
+        $this->assertSame('The tax_rate field is required.', $v->messages()->first('tax_rate'));
+
+        // Replace with underscore in the attribute's name in error message
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.required' => 'The :attribute field is required.'], 'en');
+        $v = new Validator($trans, ['bar' => ''], ['tax_rate' => 'Required']);
+        $v->displayableAttributeWithoutUnderscore = true;
+        $this->assertFalse($v->passes());
+        $v->messages()->setFormat(':message');
+        $this->assertSame('The tax rate field is required.', $v->messages()->first('tax_rate'));
+    }
+
     public function testIndexValuesAreReplaced()
     {
         $trans = $this->getIlluminateArrayTranslator();

@@ -45,16 +45,19 @@ class ValidationFactoryTest extends TestCase
         $this->assertEquals(['foo' => $noop1, 'implicit' => $noop2, 'dependent' => $noop3], $validator->extensions);
         $this->assertEquals(['replacer' => $noop3], $validator->replacers);
         $this->assertEquals($presence, $validator->getPresenceVerifier());
+        $this->assertTrue($validator->displayableAttributeWithoutUnderscore);
 
         $presence = m::mock(PresenceVerifierInterface::class);
         $factory->extend('foo', $noop1, 'foo!');
         $factory->extendImplicit('implicit', $noop2, 'implicit!');
         $factory->extendImplicit('dependent', $noop3, 'dependent!');
         $factory->setPresenceVerifier($presence);
+        $factory->displayableAttributeWithUnderscore();
         $validator = $factory->make([], []);
         $this->assertEquals(['foo' => $noop1, 'implicit' => $noop2, 'dependent' => $noop3], $validator->extensions);
         $this->assertEquals(['foo' => 'foo!', 'implicit' => 'implicit!', 'dependent' => 'dependent!'], $validator->fallbackMessages);
         $this->assertEquals($presence, $validator->getPresenceVerifier());
+        $this->assertFalse($validator->displayableAttributeWithoutUnderscore);
     }
 
     public function testValidateCallsValidateOnTheValidator()

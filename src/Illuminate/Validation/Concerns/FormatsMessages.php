@@ -294,7 +294,12 @@ trait FormatsMessages
                             : $attribute;
         }
 
-        return str_replace('_', ' ', Str::snake($attribute));
+        // For better readability the attribute is snake cased. Depending on the
+        // developers preference, the dashes are replaced with spaces. This
+        // makes "user_id" to "user id", what can increase readability.
+        return $this->displayableAttributeWithoutUnderscore
+            ? str_replace('_', ' ', Str::snake($attribute))
+            : Str::snake($attribute);
     }
 
     /**

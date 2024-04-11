@@ -60,6 +60,13 @@ class Factory implements FactoryContract
     protected $replacers = [];
 
     /**
+     * Indicates if an attribute is replaced with or without underscore in the error message.
+     *
+     * @var bool
+     */
+    public $displayableAttributeWithoutUnderscore = true;
+
+    /**
      * All of the fallback messages for custom rules.
      *
      * @var array<string, string>
@@ -123,6 +130,8 @@ class Factory implements FactoryContract
         }
 
         $validator->excludeUnvalidatedArrayKeys = $this->excludeUnvalidatedArrayKeys;
+
+        $validator->displayableAttributeWithoutUnderscore = $this->displayableAttributeWithoutUnderscore;
 
         $this->addExtensions($validator);
 
@@ -246,6 +255,26 @@ class Factory implements FactoryContract
     public function replacer($rule, $replacer)
     {
         $this->replacers[$rule] = $replacer;
+    }
+
+    /**
+     * Indicate if the displayable attribute should be without underscore in the error message.
+     *
+     * @return void
+     */
+    public function displayableAttributeWithoutUnderscore()
+    {
+        $this->displayableAttributeWithoutUnderscore = true;
+    }
+
+    /**
+     * Indicate if the displayable attribute should be with underscore in the error message.
+     *
+     * @return void
+     */
+    public function displayableAttributeWithUnderscore()
+    {
+        $this->displayableAttributeWithoutUnderscore = false;
     }
 
     /**

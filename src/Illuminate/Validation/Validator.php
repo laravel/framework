@@ -180,6 +180,13 @@ class Validator implements ValidatorContract
     public $replacers = [];
 
     /**
+     * Indicates if the displayable attribute should be with or without underscore.
+     *
+     * @var bool
+     */
+    public $displayableAttributeWithoutUnderscore = true;
+
+    /**
      * The validation rules that may be applied to files.
      *
      * @var string[]
