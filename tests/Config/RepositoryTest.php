@@ -56,6 +56,9 @@ class RepositoryTest extends TestCase
         $this->assertNull(
             $this->repository->get('a.b.c')
         );
+
+        $this->assertNull($this->repository->get('x.y.z'));
+        $this->assertNull($this->repository->get('.'));
     }
 
     public function testGetBooleanValue()
