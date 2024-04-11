@@ -36,7 +36,7 @@ class ViewController extends Controller
             return ! in_array($key, ['view', 'data', 'status', 'headers']);
         }, ARRAY_FILTER_USE_KEY);
 
-        $args['data'] = array_merge($args['data'], $routeParameters);
+        $args['data'] = [...$args['data'], ...$routeParameters];
 
         return $this->response->view(
             $args['view'],
