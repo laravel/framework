@@ -697,6 +697,28 @@ class AuthGuardTest extends TestCase
         $mock->unpersonate();
     }
 
+    public function testUnpersonateLogsOutWhenImpersonatorIsNotAuthenticated()
+    {
+        [$session, $provider, $request] = $this->getMocks();
+
+        $mock = $this->getMockBuilder(SessionGuard::class)->onlyMethods(['clearUserDataFromStorage'])->setConstructorArgs(['default', $provider, $session, $request])->getMock();
+        $mock->expects($this->once())->method('clearUserDataFromStorage');
+
+        $mock->setDispatcher($events = m::mock(Dispatcher::class));
+        $events->shouldReceive('dispatch')->once()->with(m::type(Authenticated::class));
+
+        $session->shouldReceive('pull')->with($mock->getImpersonationName())->once()->andReturn('foo');
+        $provider->shouldReceive('retrieveById')->once()->with('foo')->andReturn(null);
+
+        $user = m::mock(Authenticatable::class);
+        $user->shouldReceive('getRememberToken')->andReturn(null);
+        $mock->setUser($user);
+
+        $events->shouldReceive('dispatch')->once()->with(m::type(Logout::class));
+
+        $mock->unpersonate();
+    }
+
     public function testImpersonator()
     {
         $mock = $this->getGuard();
