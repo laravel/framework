@@ -198,6 +198,8 @@ class RepositoryTest extends TestCase
         $this->assertSame('aaa', $this->repository->get('array.0'));
         $this->assertSame('zzz', $this->repository->get('array.1'));
         $this->assertSame('xxx', $this->repository->get('array.2'));
+
+        $this->assertCount(3, $this->repository->get('array'));
     }
 
     public function testPrependWithNewKey()
