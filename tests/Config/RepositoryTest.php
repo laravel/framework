@@ -221,8 +221,21 @@ class RepositoryTest extends TestCase
 
     public function testOffsetExists()
     {
+        $data = [
+            'foo' => 'bar',
+            'null_value' => null,
+            'empty_string' => '',
+            'numeric_value' => 123,
+        ];
+        $this->repository->set($data);
+
         $this->assertTrue(isset($this->repository['foo']));
         $this->assertFalse(isset($this->repository['not-exist']));
+        $this->assertTrue(isset($this->repository['null_value']));
+        $this->assertTrue(isset($this->repository['empty_string']));
+        $this->assertTrue(isset($this->repository['numeric_value']));
+        $this->assertFalse(isset($this->repository[-1]));
+        $this->assertFalse(isset($this->repository['non_numeric']));
     }
 
     public function testOffsetGet()
