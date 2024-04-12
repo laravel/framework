@@ -287,7 +287,7 @@ class CacheManagerTest extends TestCase
                     ],
                     'my_store_without_events' => [
                         'driver' => 'array',
-                        'with_events' => false,
+                        'events' => false,
                     ],
                 ],
             ],
