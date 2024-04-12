@@ -13,6 +13,14 @@ use Throwable;
 class SyncQueue extends Queue implements QueueContract
 {
     /**
+     * @param bool $dispatchAfterCommit
+     */
+    public function __construct($dispatchAfterCommit = false)
+    {
+        $this->dispatchAfterCommit = $dispatchAfterCommit;
+    }
+
+    /**
      * Get the size of the queue.
      *
      * @param  string|null  $queue
