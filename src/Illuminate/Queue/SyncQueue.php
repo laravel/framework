@@ -13,7 +13,7 @@ use Throwable;
 class SyncQueue extends Queue implements QueueContract
 {
     /**
-     * @param bool $dispatchAfterCommit
+     * @param  bool  $dispatchAfterCommit
      */
     public function __construct($dispatchAfterCommit = false)
     {
