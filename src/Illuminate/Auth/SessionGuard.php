@@ -220,6 +220,10 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      */
     public function impersonate(AuthenticatableContract $user)
     {
+        if ($this->impersonating()) {
+            throw new AuthenticationException('Cannot impersonate while already impersonating.');
+        }
+
         if (! $authenticated = $this->user()) {
             throw new AuthenticationException('Cannot impersonate without a currently authenticated user.');
         }

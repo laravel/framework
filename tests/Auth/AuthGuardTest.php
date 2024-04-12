@@ -661,6 +661,7 @@ class AuthGuardTest extends TestCase
         $impersonated = m::mock(Authenticatable::class);
         $impersonated->shouldReceive('getAuthIdentifier')->once()->andReturn('bar');
 
+        $mock->getSession()->shouldReceive('has')->with($mock->getImpersonationName())->once()->andReturn(false);
         $mock->getSession()->shouldReceive('get')->with($mock->getName())->once()->andReturn('foo');
         $mock->getProvider()->shouldReceive('retrieveById')->once()->with('foo')->andReturn($impersonator);
         $mock->getSession()->shouldReceive('put')->with($mock->getImpersonationName(), 'foo')->once();
@@ -670,6 +671,18 @@ class AuthGuardTest extends TestCase
         $mock->impersonate($impersonated);
     }
 
+    public function testImpersonateThrowsWhenAlreadyImpersonating()
+    {
+        $this->expectException(AuthenticationException::class);
+        $this->expectExceptionMessage('Cannot impersonate while already impersonating.');
+
+        $mock = $this->getGuard();
+
+        $mock->getSession()->shouldReceive('has')->with($mock->getImpersonationName())->once()->andReturn(true);
+
+        $mock->impersonate(m::mock(Authenticatable::class));
+    }
+
     public function testImpersonateThrowsWhenUserIsNotAuthenticated()
     {
         $this->expectException(AuthenticationException::class);
@@ -677,6 +690,7 @@ class AuthGuardTest extends TestCase
 
         $mock = $this->getGuard();
 
+        $mock->getSession()->shouldReceive('has')->with($mock->getImpersonationName())->once()->andReturn(false);
         $mock->getSession()->shouldReceive('get')->with($mock->getName())->once()->andReturn(null);
 
         $mock->impersonate(m::mock(Authenticatable::class));
