@@ -305,7 +305,7 @@ class ThrottleRequestsTest extends TestCase
 
     public function testItFallbacksToUserAccessorWhenThereIsNoNamedLimiterWhenAuthenticated()
     {
-        $user = UserWithAcessor::make();
+        $user = UserWithAccessor::make();
 
         Carbon::setTestNow(Carbon::create(2018, 1, 1, 0, 0, 0));
 
@@ -333,7 +333,7 @@ class ThrottleRequestsTest extends TestCase
     }
 }
 
-class UserWithAcessor extends User
+class UserWithAccessor extends User
 {
     public function getRateLimitingAttribute(): int
     {
