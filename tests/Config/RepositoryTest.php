@@ -255,6 +255,18 @@ class RepositoryTest extends TestCase
         $this->repository['key'] = 'value';
 
         $this->assertSame('value', $this->repository['key']);
+
+        $this->repository['key'] = 'new_value';
+        $this->assertSame('new_value', $this->repository['key']);
+
+        $this->repository['new_key'] = null;
+        $this->assertNull($this->repository['new_key']);
+
+        $this->repository[''] = 'value';
+        $this->assertSame('value', $this->repository['']);
+
+        $this->repository[123] = '123';
+        $this->assertSame('123', $this->repository[123]);
     }
 
     public function testOffsetUnset()
