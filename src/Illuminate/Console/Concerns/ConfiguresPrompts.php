@@ -167,7 +167,7 @@ trait ConfiguresPrompts
     /**
      * Get the validator instance that should be used to validate prompts.
      *
-     * @param  string  $value
+     * @param  mixed  $field
      * @param  mixed  $value
      * @param  mixed  $rules
      * @param  array  $messages
