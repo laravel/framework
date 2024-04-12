@@ -292,7 +292,7 @@ class RepositoryTest extends TestCase
     public function testItGetsAsString(): void
     {
         $this->assertSame(
-            $this->repository->string('a.b'), 'c'
+            'c', $this->repository->string('a.b')
         );
     }
 
