@@ -2962,6 +2962,32 @@ class SupportCollectionTest extends TestCase
     }
 
     #[DataProvider('collectionClassProvider')]
+    public function testMapIntoWithIntBackedEnums($collection)
+    {
+        $data = new $collection([
+            1, 2,
+        ]);
+
+        $data = $data->mapInto(TestBackedEnum::class);
+
+        $this->assertSame(TestBackedEnum::A, $data->get(0));
+        $this->assertSame(TestBackedEnum::B, $data->get(1));
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testMapIntoWithStringBackedEnums($collection)
+    {
+        $data = new $collection([
+            'A', 'B',
+        ]);
+
+        $data = $data->mapInto(TestStringBackedEnum::class);
+
+        $this->assertSame(TestStringBackedEnum::A, $data->get(0));
+        $this->assertSame(TestStringBackedEnum::B, $data->get(1));
+    }
+
+    #[DataProvider('collectionClassProvider')]
     public function testNth($collection)
     {
         $data = new $collection([
