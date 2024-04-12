@@ -230,6 +230,8 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
 
         $this->session->put($this->getImpersonationName(), $authenticated->getAuthIdentifier());
 
+        $this->session->regenerate();
+
         $this->login($user);
     }
 
@@ -246,6 +248,8 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
 
         if ($user = $this->provider->retrieveById($id)) {
             $this->login($user);
+
+            $this->session->regenerate();
 
             return;
         }

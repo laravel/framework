@@ -666,6 +666,7 @@ class AuthGuardTest extends TestCase
         $mock->getProvider()->shouldReceive('retrieveById')->once()->with('foo')->andReturn($impersonator);
         $mock->getSession()->shouldReceive('put')->with($mock->getImpersonationName(), 'foo')->once();
         $mock->getSession()->shouldReceive('put')->with($mock->getName(), 'bar')->once();
+        $mock->getSession()->shouldReceive('regenerate')->once();
         $mock->getSession()->shouldReceive('migrate')->once();
 
         $mock->impersonate($impersonated);
@@ -706,6 +707,7 @@ class AuthGuardTest extends TestCase
         $mock->getSession()->shouldReceive('pull')->with($mock->getImpersonationName())->once()->andReturn('foo');
         $mock->getProvider()->shouldReceive('retrieveById')->once()->with('foo')->andReturn($impersonator);
         $mock->getSession()->shouldReceive('put')->with($mock->getName(), 'foo')->once();
+        $mock->getSession()->shouldReceive('regenerate')->once();
         $mock->getSession()->shouldReceive('migrate')->once();
 
         $mock->unpersonate();
