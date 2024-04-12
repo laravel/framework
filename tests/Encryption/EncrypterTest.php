@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Encryption;
 
 use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Encryption\Encrypter;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 
@@ -23,6 +24,18 @@ class EncrypterTest extends TestCase
         $encrypted = $e->encryptString('foo');
         $this->assertNotSame('foo', $encrypted);
         $this->assertSame('foo', $e->decryptString($encrypted));
+    }
+
+    public function testRawStringEncryptionWithPreviousKeys()
+    {
+        $previous = new Encrypter(str_repeat('b', 16));
+        $previousValue = $previous->encryptString('foo');
+
+        $new = new Encrypter(str_repeat('a', 16));
+        $new->previousKeys([str_repeat('b', 16)]);
+
+        $decrypted = $new->decryptString($previousValue);
+        $this->assertSame('foo', $decrypted);
     }
 
     public function testEncryptionUsingBase64EncodedKey()
@@ -221,9 +234,7 @@ class EncrypterTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider provideTamperedData
-     */
+    #[DataProvider('provideTamperedData')]
     public function testTamperedPayloadWillGetRejected($payload)
     {
         $this->expectException(DecryptException::class);

@@ -266,15 +266,17 @@ trait ConditionallyLoadsAttributes
             return value($default);
         }
 
+        $loadedValue = $this->resource->{$relationship};
+
         if (func_num_args() === 1) {
-            return $this->resource->{$relationship};
+            return $loadedValue;
         }
 
-        if ($this->resource->{$relationship} === null) {
+        if ($loadedValue === null) {
             return;
         }
 
-        return value($value);
+        return value($value, $loadedValue);
     }
 
     /**
@@ -293,7 +295,7 @@ trait ConditionallyLoadsAttributes
 
         $attribute = (string) Str::of($relationship)->snake()->finish('_count');
 
-        if (! isset($this->resource->getAttributes()[$attribute])) {
+        if (! array_key_exists($attribute, $this->resource->getAttributes())) {
             return value($default);
         }
 
@@ -326,7 +328,7 @@ trait ConditionallyLoadsAttributes
 
         $attribute = (string) Str::of($relationship)->snake()->append('_')->append($aggregate)->append('_')->finish($column);
 
-        if (! isset($this->resource->getAttributes()[$attribute])) {
+        if (! array_key_exists($attribute, $this->resource->getAttributes())) {
             return value($default);
         }
 

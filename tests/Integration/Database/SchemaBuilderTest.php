@@ -2,12 +2,10 @@
 
 namespace Illuminate\Tests\Integration\Database;
 
-use Doctrine\DBAL\Types\Type;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\Grammars\SQLiteGrammar;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Tests\Integration\Database\Fixtures\TinyInteger;
 
 class SchemaBuilderTest extends DatabaseTestCase
 {
@@ -44,13 +42,11 @@ class SchemaBuilderTest extends DatabaseTestCase
         DB::statement('create view foo (id) as select 1');
     }
 
-    public function testRegisterCustomDoctrineType()
+    public function testChangeToTinyInteger()
     {
         if ($this->driver !== 'sqlite') {
             $this->markTestSkipped('Test requires a SQLite connection.');
         }
-
-        Schema::getConnection()->registerDoctrineType(TinyInteger::class, TinyInteger::NAME, 'TINYINT');
 
         Schema::create('test', function (Blueprint $table) {
             $table->string('test_column');
@@ -62,36 +58,13 @@ class SchemaBuilderTest extends DatabaseTestCase
 
         $blueprint->build($this->getConnection(), new SQLiteGrammar);
 
-        $this->assertArrayHasKey(TinyInteger::NAME, Type::getTypesMap());
-        $this->assertSame('tinyinteger', Schema::getColumnType('test', 'test_column'));
-    }
-
-    public function testRegisterCustomDoctrineTypeASecondTime()
-    {
-        if ($this->driver !== 'sqlite') {
-            $this->markTestSkipped('Test requires a SQLite connection.');
-        }
-
-        Schema::getConnection()->registerDoctrineType(TinyInteger::class, TinyInteger::NAME, 'TINYINT');
-
-        Schema::create('test', function (Blueprint $table) {
-            $table->string('test_column');
-        });
-
-        $blueprint = new Blueprint('test', function (Blueprint $table) {
-            $table->tinyInteger('test_column')->change();
-        });
-
-        $blueprint->build($this->getConnection(), new SQLiteGrammar);
-
-        $this->assertArrayHasKey(TinyInteger::NAME, Type::getTypesMap());
-        $this->assertSame('tinyinteger', Schema::getColumnType('test', 'test_column'));
+        $this->assertSame('integer', Schema::getColumnType('test', 'test_column'));
     }
 
     public function testChangeToTextColumn()
     {
-        if ($this->driver !== 'mysql') {
-            $this->markTestSkipped('Test requires a MySQL connection.');
+        if (! in_array($this->driver, ['mysql', 'mariadb'])) {
+            $this->markTestSkipped('Test requires a MySQL or a MariaDB connection.');
         }
 
         Schema::create('test', function (Blueprint $table) {
@@ -105,9 +78,9 @@ class SchemaBuilderTest extends DatabaseTestCase
 
             $queries = $blueprint->toSql($this->getConnection(), $this->getConnection()->getSchemaGrammar());
 
-            $uppercase = strtoupper($type);
+            $uppercase = strtolower($type);
 
-            $expected = ["ALTER TABLE test CHANGE test_column test_column $uppercase NOT NULL"];
+            $expected = ["alter table `test` modify `test_column` $uppercase not null"];
 
             $this->assertEquals($expected, $queries);
         }
@@ -115,8 +88,8 @@ class SchemaBuilderTest extends DatabaseTestCase
 
     public function testChangeTextColumnToTextColumn()
     {
-        if ($this->driver !== 'mysql') {
-            $this->markTestSkipped('Test requires a MySQL connection.');
+        if (! in_array($this->driver, ['mysql', 'mariadb'])) {
+            $this->markTestSkipped('Test requires a MySQL or a MariaDB connection.');
         }
 
         Schema::create('test', static function (Blueprint $table) {
@@ -130,12 +103,173 @@ class SchemaBuilderTest extends DatabaseTestCase
 
             $queries = $blueprint->toSql($this->getConnection(), $this->getConnection()->getSchemaGrammar());
 
-            $uppercase = strtoupper($type);
+            $lowercase = strtolower($type);
 
-            $expected = ["ALTER TABLE test CHANGE test_column test_column $uppercase NOT NULL"];
+            $expected = ["alter table `test` modify `test_column` $lowercase not null"];
 
             $this->assertEquals($expected, $queries);
         }
+    }
+
+    public function testModifyNullableColumn()
+    {
+        if (! in_array($this->driver, ['mysql', 'mariadb'])) {
+            $this->markTestSkipped('Test requires a MySQL or a MariaDB connection.');
+        }
+
+        Schema::create('test', static function (Blueprint $table) {
+            $table->string('not_null_column_to_not_null');
+            $table->string('not_null_column_to_nullable');
+            $table->string('nullable_column_to_nullable')->nullable();
+            $table->string('nullable_column_to_not_null')->nullable();
+        });
+
+        $blueprint = new Blueprint('test', function ($table) {
+            $table->text('not_null_column_to_not_null')->change();
+            $table->text('not_null_column_to_nullable')->nullable()->change();
+            $table->text('nullable_column_to_nullable')->nullable()->change();
+            $table->text('nullable_column_to_not_null')->change();
+        });
+
+        $queries = $blueprint->toSql($this->getConnection(), $this->getConnection()->getSchemaGrammar());
+
+        $expected = [
+            'alter table `test` '
+            .'modify `not_null_column_to_not_null` text not null, '
+            .'modify `not_null_column_to_nullable` text null, '
+            .'modify `nullable_column_to_nullable` text null, '
+            .'modify `nullable_column_to_not_null` text not null',
+        ];
+
+        $this->assertEquals($expected, $queries);
+    }
+
+    public function testChangeNullableColumn()
+    {
+        Schema::create('test', function (Blueprint $table) {
+            $table->string('not_null_column_to_not_null');
+            $table->string('not_null_column_to_nullable');
+            $table->string('nullable_column_to_nullable')->nullable();
+            $table->string('nullable_column_to_not_null')->nullable();
+        });
+
+        $columns = collect(Schema::getColumns('test'));
+
+        $this->assertFalse($columns->firstWhere('name', 'not_null_column_to_not_null')['nullable']);
+        $this->assertFalse($columns->firstWhere('name', 'not_null_column_to_nullable')['nullable']);
+        $this->assertTrue($columns->firstWhere('name', 'nullable_column_to_nullable')['nullable']);
+        $this->assertTrue($columns->firstWhere('name', 'nullable_column_to_not_null')['nullable']);
+
+        Schema::table('test', function (Blueprint $table) {
+            $table->text('not_null_column_to_not_null')->change();
+            $table->text('not_null_column_to_nullable')->nullable()->change();
+            $table->text('nullable_column_to_nullable')->nullable()->change();
+            $table->text('nullable_column_to_not_null')->change();
+        });
+
+        $columns = collect(Schema::getColumns('test'));
+
+        $this->assertFalse($columns->firstWhere('name', 'not_null_column_to_not_null')['nullable']);
+        $this->assertTrue($columns->firstWhere('name', 'not_null_column_to_nullable')['nullable']);
+        $this->assertTrue($columns->firstWhere('name', 'nullable_column_to_nullable')['nullable']);
+        $this->assertFalse($columns->firstWhere('name', 'nullable_column_to_not_null')['nullable']);
+    }
+
+    public function testRenameColumnWithDefault()
+    {
+        Schema::create('test', static function (Blueprint $table) {
+            $table->timestamp('foo')->useCurrent();
+            $table->string('bar')->default('value');
+        });
+
+        $columns = Schema::getColumns('test');
+        $defaultFoo = collect($columns)->firstWhere('name', 'foo')['default'];
+        $defaultBar = collect($columns)->firstWhere('name', 'bar')['default'];
+
+        Schema::table('test', static function (Blueprint $table) {
+            $table->renameColumn('foo', 'new_foo');
+            $table->renameColumn('bar', 'new_bar');
+        });
+
+        $this->assertEquals(collect(Schema::getColumns('test'))->firstWhere('name', 'new_foo')['default'], $defaultFoo);
+        $this->assertEquals(collect(Schema::getColumns('test'))->firstWhere('name', 'new_bar')['default'], $defaultBar);
+    }
+
+    public function testCompoundPrimaryWithAutoIncrement()
+    {
+        if ($this->driver === 'sqlite') {
+            $this->markTestSkipped('Compound primary key with an auto increment column is not supported on SQLite.');
+        }
+
+        Schema::create('test', function (Blueprint $table) {
+            $table->id();
+            $table->uuid();
+
+            $table->primary(['id', 'uuid']);
+        });
+
+        $this->assertTrue(collect(Schema::getColumns('test'))->firstWhere('name', 'id')['auto_increment']);
+        $this->assertTrue(Schema::hasIndex('test', ['id', 'uuid'], 'primary'));
+    }
+
+    public function testModifyingAutoIncrementColumn()
+    {
+        if ($this->driver === 'sqlsrv') {
+            $this->markTestSkipped('Changing a primary column is not supported on SQL Server.');
+        }
+
+        Schema::create('test', function (Blueprint $table) {
+            $table->increments('id');
+        });
+
+        $this->assertTrue(collect(Schema::getColumns('test'))->firstWhere('name', 'id')['auto_increment']);
+        $this->assertTrue(Schema::hasIndex('test', ['id'], 'primary'));
+
+        Schema::table('test', function (Blueprint $table) {
+            $table->bigIncrements('id')->change();
+        });
+
+        $this->assertTrue(collect(Schema::getColumns('test'))->firstWhere('name', 'id')['auto_increment']);
+        $this->assertTrue(Schema::hasIndex('test', ['id'], 'primary'));
+    }
+
+    public function testModifyingColumnToAutoIncrementColumn()
+    {
+        if (in_array($this->driver, ['pgsql', 'sqlsrv'])) {
+            $this->markTestSkipped('Changing a column to auto increment is not supported on PostgreSQL and SQL Server.');
+        }
+
+        Schema::create('test', function (Blueprint $table) {
+            $table->unsignedBigInteger('id');
+        });
+
+        $this->assertFalse(collect(Schema::getColumns('test'))->firstWhere('name', 'id')['auto_increment']);
+        $this->assertFalse(Schema::hasIndex('test', ['id'], 'primary'));
+
+        Schema::table('test', function (Blueprint $table) {
+            $table->bigIncrements('id')->primary()->change();
+        });
+
+        $this->assertTrue(collect(Schema::getColumns('test'))->firstWhere('name', 'id')['auto_increment']);
+        $this->assertTrue(Schema::hasIndex('test', ['id'], 'primary'));
+    }
+
+    public function testAddingAutoIncrementColumn()
+    {
+        if ($this->driver === 'sqlite') {
+            $this->markTestSkipped('Adding a primary column is not supported on SQLite.');
+        }
+
+        Schema::create('test', function (Blueprint $table) {
+            $table->string('name');
+        });
+
+        Schema::table('test', function (Blueprint $table) {
+            $table->bigIncrements('id')->primary;
+        });
+
+        $this->assertTrue(collect(Schema::getColumns('test'))->firstWhere('name', 'id')['auto_increment']);
+        $this->assertTrue(Schema::hasIndex('test', ['id'], 'primary'));
     }
 
     public function testGetTables()
@@ -157,7 +291,7 @@ class SchemaBuilderTest extends DatabaseTestCase
 
         $this->assertEmpty(array_diff(['foo', 'bar', 'baz'], array_column($tables, 'name')));
 
-        if (in_array($this->driver, ['mysql', 'pgsql'])) {
+        if (in_array($this->driver, ['mysql', 'mariadb', 'pgsql'])) {
             $this->assertNotEmpty(array_filter($tables, function ($table) {
                 return $table['name'] === 'foo' && $table['comment'] === 'This is a comment';
             }));
@@ -193,15 +327,20 @@ class SchemaBuilderTest extends DatabaseTestCase
         DB::statement("create type enum_foo as enum ('new', 'open', 'closed')");
         DB::statement('create type range_foo as range (subtype = float8)');
         DB::statement('create domain domain_foo as text');
+        DB::statement('create type base_foo');
+        DB::statement("create function foo_in(cstring) returns base_foo language internal immutable strict parallel safe as 'int2in'");
+        DB::statement("create function foo_out(base_foo) returns cstring language internal immutable strict parallel safe as 'int2out'");
+        DB::statement('create type base_foo (input = foo_in, output = foo_out)');
 
         $types = Schema::getTypes();
 
-        $this->assertCount(11, $types);
+        $this->assertCount(13, $types);
         $this->assertTrue(collect($types)->contains(fn ($type) => $type['name'] === 'pseudo_foo' && $type['type'] === 'pseudo' && ! $type['implicit']));
         $this->assertTrue(collect($types)->contains(fn ($type) => $type['name'] === 'comp_foo' && $type['type'] === 'composite' && ! $type['implicit']));
         $this->assertTrue(collect($types)->contains(fn ($type) => $type['name'] === 'enum_foo' && $type['type'] === 'enum' && ! $type['implicit']));
         $this->assertTrue(collect($types)->contains(fn ($type) => $type['name'] === 'range_foo' && $type['type'] === 'range' && ! $type['implicit']));
         $this->assertTrue(collect($types)->contains(fn ($type) => $type['name'] === 'domain_foo' && $type['type'] === 'domain' && ! $type['implicit']));
+        $this->assertTrue(collect($types)->contains(fn ($type) => $type['name'] === 'base_foo' && $type['type'] === 'base' && ! $type['implicit']));
 
         Schema::dropAllTypes();
         $types = Schema::getTypes();
@@ -256,6 +395,10 @@ class SchemaBuilderTest extends DatabaseTestCase
             && ! $indexes[0]['unique']
             && ! $indexes[0]['primary']
         );
+        $this->assertTrue(Schema::hasIndex('foo', 'my_index'));
+        $this->assertTrue(Schema::hasIndex('foo', ['bar']));
+        $this->assertFalse(Schema::hasIndex('foo', 'my_index', 'primary'));
+        $this->assertFalse(Schema::hasIndex('foo', ['bar'], 'unique'));
     }
 
     public function testGetUniqueIndexes()
@@ -277,6 +420,11 @@ class SchemaBuilderTest extends DatabaseTestCase
         $this->assertTrue(collect($indexes)->contains(
             fn ($index) => $index['name'] === 'foo_baz_bar_unique' && $index['columns'] === ['baz', 'bar'] && $index['unique']
         ));
+        $this->assertTrue(Schema::hasIndex('foo', 'foo_baz_bar_unique'));
+        $this->assertTrue(Schema::hasIndex('foo', 'foo_baz_bar_unique', 'unique'));
+        $this->assertTrue(Schema::hasIndex('foo', ['baz', 'bar']));
+        $this->assertTrue(Schema::hasIndex('foo', ['baz', 'bar'], 'unique'));
+        $this->assertFalse(Schema::hasIndex('foo', ['baz', 'bar'], 'primary'));
     }
 
     public function testGetIndexesWithCompositeKeys()
@@ -302,8 +450,8 @@ class SchemaBuilderTest extends DatabaseTestCase
 
     public function testGetFullTextIndexes()
     {
-        if (! in_array($this->driver, ['pgsql', 'mysql'])) {
-            $this->markTestSkipped('Test requires a MySQL or a PostgreSQL connection.');
+        if (! in_array($this->driver, ['mysql', 'mariadb', 'pgsql'])) {
+            $this->markTestSkipped('Test requires a MySQL, a MariaDB, or a PostgreSQL connection.');
         }
 
         Schema::create('articles', function (Blueprint $table) {
@@ -319,6 +467,26 @@ class SchemaBuilderTest extends DatabaseTestCase
         $this->assertCount(2, $indexes);
         $this->assertTrue(collect($indexes)->contains(fn ($index) => $index['columns'] === ['id'] && $index['primary']));
         $this->assertTrue(collect($indexes)->contains('name', 'articles_body_title_fulltext'));
+    }
+
+    public function testHasIndexOrder()
+    {
+        Schema::create('foo', function (Blueprint $table) {
+            $table->integer('bar');
+            $table->integer('baz');
+            $table->integer('qux');
+
+            $table->unique(['bar', 'baz']);
+            $table->index(['baz', 'bar']);
+            $table->index(['baz', 'qux']);
+        });
+
+        $this->assertTrue(Schema::hasIndex('foo', ['bar', 'baz']));
+        $this->assertTrue(Schema::hasIndex('foo', ['bar', 'baz'], 'unique'));
+        $this->assertTrue(Schema::hasIndex('foo', ['baz', 'bar']));
+        $this->assertFalse(Schema::hasIndex('foo', ['baz', 'bar'], 'unique'));
+        $this->assertTrue(Schema::hasIndex('foo', ['baz', 'qux']));
+        $this->assertFalse(Schema::hasIndex('foo', ['qux', 'baz']));
     }
 
     public function testGetForeignKeys()
@@ -368,9 +536,38 @@ class SchemaBuilderTest extends DatabaseTestCase
         ));
     }
 
+    public function testAlteringTableWithForeignKeyConstraintsEnabled()
+    {
+        Schema::enableForeignKeyConstraints();
+
+        Schema::create('parents', function (Blueprint $table) {
+            $table->id();
+            $table->text('name');
+        });
+
+        Schema::create('children', function (Blueprint $table) {
+            $table->foreignId('parent_id')->constrained();
+        });
+
+        $id = DB::table('parents')->insertGetId(['name' => 'foo']);
+        DB::table('children')->insert(['parent_id' => $id]);
+
+        Schema::table('parents', function (Blueprint $table) {
+            $table->string('name')->change();
+        });
+
+        $foreignKeys = Schema::getForeignKeys('children');
+
+        $this->assertCount(1, $foreignKeys);
+        $this->assertTrue(collect($foreignKeys)->contains(
+            fn ($foreign) => $foreign['columns'] === ['parent_id']
+                && $foreign['foreign_table'] === 'parents' && $foreign['foreign_columns'] === ['id']
+        ));
+    }
+
     public function testSystemVersionedTables()
     {
-        if ($this->driver !== 'mysql' || ! $this->getConnection()->isMaria()) {
+        if ($this->driver !== 'mariadb') {
             $this->markTestSkipped('Test requires a MariaDB connection.');
         }
 
@@ -383,6 +580,116 @@ class SchemaBuilderTest extends DatabaseTestCase
         $this->artisan('migrate:install');
 
         DB::statement('create table `test` (`foo` int) WITH system versioning;');
+    }
+
+    public function testAddingStoredColumnOnSqlite()
+    {
+        if ($this->driver !== 'sqlite') {
+            $this->markTestSkipped('Test requires a SQLite connection.');
+        }
+
+        Schema::create('test', function (Blueprint $table) {
+            $table->integer('price');
+        });
+
+        Schema::table('test', function (Blueprint $table) {
+            $table->integer('virtual_column')->virtualAs('"price" - 5');
+            $table->integer('stored_column')->storedAs('"price" - 5');
+        });
+
+        $this->assertTrue(Schema::hasColumns('test', ['virtual_column', 'stored_column']));
+    }
+
+    public function testModifyingStoredColumnOnSqlite()
+    {
+        if ($this->driver !== 'sqlite') {
+            $this->markTestSkipped('Test requires a SQLite connection.');
+        }
+
+        Schema::create('test', function (Blueprint $table) {
+            $table->integer('price');
+            $table->integer('virtual_price')->virtualAs('price - 2');
+            $table->integer('stored_price')->storedAs('price - 4');
+            $table->integer('virtual_price_changed')->virtualAs('price - 6');
+            $table->integer('stored_price_changed')->storedAs('price - 8');
+        });
+
+        DB::table('test')->insert(['price' => 100]);
+
+        Schema::table('test', function (Blueprint $table) {
+            $table->integer('virtual_price_changed')->virtualAs('price - 5')->change();
+            $table->integer('stored_price_changed')->storedAs('price - 7')->change();
+        });
+
+        $this->assertEquals(
+            ['price' => 100, 'virtual_price' => 98, 'stored_price' => 96, 'virtual_price_changed' => 95, 'stored_price_changed' => 93],
+            (array) DB::table('test')->first()
+        );
+
+        $columns = Schema::getColumns('test');
+
+        $this->assertTrue(collect($columns)->contains(
+            fn ($column) => $column['name'] === 'virtual_price' && $column['generation']['type'] === 'virtual'
+                && $column['generation']['expression'] === 'price - 2'
+        ));
+        $this->assertTrue(collect($columns)->contains(
+            fn ($column) => $column['name'] === 'stored_price' && $column['generation']['type'] === 'stored'
+                && $column['generation']['expression'] === 'price - 4'
+        ));
+        $this->assertTrue(collect($columns)->contains(
+            fn ($column) => $column['name'] === 'virtual_price_changed' && $column['generation']['type'] === 'virtual'
+                && $column['generation']['expression'] === 'price - 5'
+        ));
+        $this->assertTrue(collect($columns)->contains(
+            fn ($column) => $column['name'] === 'stored_price_changed' && $column['generation']['type'] === 'stored'
+                && $column['generation']['expression'] === 'price - 7'
+        ));
+    }
+
+    public function testGettingGeneratedColumns()
+    {
+        Schema::create('test', function (Blueprint $table) {
+            $table->integer('price');
+
+            if ($this->driver === 'sqlsrv') {
+                $table->computed('virtual_price', 'price - 5');
+                $table->computed('stored_price', 'price - 10')->persisted();
+            } else {
+                if ($this->driver !== 'pgsql') {
+                    $table->integer('virtual_price')->virtualAs('price - 5');
+                }
+                $table->integer('stored_price')->storedAs('price - 10');
+            }
+        });
+
+        $columns = Schema::getColumns('test');
+
+        $this->assertTrue(collect($columns)->contains(
+            fn ($column) => $column['name'] === 'price' && is_null($column['generation'])
+        ));
+        if ($this->driver !== 'pgsql') {
+            $this->assertTrue(collect($columns)->contains(
+                fn ($column) => $column['name'] === 'virtual_price'
+                    && $column['generation']['type'] === 'virtual'
+                    && match ($this->driver) {
+                        'mysql' => $column['generation']['expression'] === '(`price` - 5)',
+                        'mariadb' => $column['generation']['expression'] === '`price` - 5',
+                        'sqlsrv' => $column['generation']['expression'] === '([price]-(5))',
+                        default => $column['generation']['expression'] === 'price - 5',
+                    }
+            ));
+        }
+        $this->assertTrue(collect($columns)->contains(
+            fn ($column) => $column['name'] === 'stored_price'
+                && $column['generation']['type'] === 'stored'
+                && match ($this->driver) {
+                    'mysql' => $column['generation']['expression'] === '(`price` - 10)',
+                    'mariadb' => $column['generation']['expression'] === '`price` - 10',
+                    'sqlsrv' => $column['generation']['expression'] === '([price]-(10))',
+                    'pgsql' => $column['generation']['expression'] === '(price - 10)',
+                    default => $column['generation']['expression'] === 'price - 10',
+                }
+        ));
     }
 
     public function testAddingMacros()

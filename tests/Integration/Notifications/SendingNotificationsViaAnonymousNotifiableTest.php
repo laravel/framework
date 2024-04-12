@@ -10,8 +10,6 @@ use Orchestra\Testbench\TestCase;
 
 class SendingNotificationsViaAnonymousNotifiableTest extends TestCase
 {
-    public $mailer;
-
     public function testMailIsSent()
     {
         $notifiable = (new AnonymousNotifiable)
@@ -22,6 +20,20 @@ class SendingNotificationsViaAnonymousNotifiableTest extends TestCase
             $notifiable,
             new TestMailNotificationForAnonymousNotifiable
         );
+
+        $this->assertEquals([
+            'enzo', 'enzo@deepblue.com',
+        ], $_SERVER['__notifiable.route']);
+    }
+
+    public function testAnonymousNotifiableWithMultipleRoutes()
+    {
+        $_SERVER['__notifiable.route'] = [];
+
+        NotificationFacade::routes([
+            'testchannel' => 'enzo',
+            'anothertestchannel' => 'enzo@deepblue.com',
+        ])->notify(new TestMailNotificationForAnonymousNotifiable());
 
         $this->assertEquals([
             'enzo', 'enzo@deepblue.com',

@@ -2,6 +2,7 @@
 
 namespace Illuminate\Console\Concerns;
 
+use Illuminate\Console\PromptOption;
 use Illuminate\Console\PromptValidationException;
 use Laravel\Prompts\ConfirmPrompt;
 use Laravel\Prompts\MultiSearchPrompt;
@@ -12,6 +13,7 @@ use Laravel\Prompts\SearchPrompt;
 use Laravel\Prompts\SelectPrompt;
 use Laravel\Prompts\SuggestPrompt;
 use Laravel\Prompts\TextPrompt;
+use stdClass;
 use Symfony\Component\Console\Input\InputInterface;
 
 trait ConfiguresPrompts
@@ -27,6 +29,8 @@ trait ConfiguresPrompts
         Prompt::setOutput($this->output);
 
         Prompt::interactive(($input->isInteractive() && defined('STDIN') && stream_isatty(STDIN)) || $this->laravel->runningUnitTests());
+
+        Prompt::validateUsing(fn (Prompt $prompt) => $this->validatePrompt($prompt->value(), $prompt->validate));
 
         Prompt::fallbackWhen(windows_os() || $this->laravel->runningUnitTests());
 
@@ -49,28 +53,16 @@ trait ConfiguresPrompts
         ));
 
         SelectPrompt::fallbackUsing(fn (SelectPrompt $prompt) => $this->promptUntilValid(
-            fn () => $this->components->choice($prompt->label, $prompt->options, $prompt->default),
+            fn () => $this->selectFallback($prompt->label, $prompt->options, $prompt->default),
             false,
             $prompt->validate
         ));
 
-        MultiSelectPrompt::fallbackUsing(function (MultiSelectPrompt $prompt) {
-            if ($prompt->default !== []) {
-                return $this->promptUntilValid(
-                    fn () => $this->components->choice($prompt->label, $prompt->options, implode(',', $prompt->default), multiple: true),
-                    $prompt->required,
-                    $prompt->validate
-                );
-            }
-
-            return $this->promptUntilValid(
-                fn () => collect($this->components->choice($prompt->label, ['' => 'None', ...$prompt->options], 'None', multiple: true))
-                    ->reject('')
-                    ->all(),
-                $prompt->required,
-                $prompt->validate
-            );
-        });
+        MultiSelectPrompt::fallbackUsing(fn (MultiSelectPrompt $prompt) => $this->promptUntilValid(
+            fn () => $this->multiselectFallback($prompt->label, $prompt->options, $prompt->default, $prompt->required),
+            $prompt->required,
+            $prompt->validate
+        ));
 
         SuggestPrompt::fallbackUsing(fn (SuggestPrompt $prompt) => $this->promptUntilValid(
             fn () => $this->components->askWithCompletion($prompt->label, $prompt->options, $prompt->default ?: null) ?? '',
@@ -84,7 +76,7 @@ trait ConfiguresPrompts
 
                 $options = ($prompt->options)($query);
 
-                return $this->components->choice($prompt->label, $options);
+                return $this->selectFallback($prompt->label, $options);
             },
             false,
             $prompt->validate
@@ -96,21 +88,7 @@ trait ConfiguresPrompts
 
                 $options = ($prompt->options)($query);
 
-                if ($prompt->required === false) {
-                    if (array_is_list($options)) {
-                        return collect($this->components->choice($prompt->label, ['None', ...$options], 'None', multiple: true))
-                            ->reject('None')
-                            ->values()
-                            ->all();
-                    }
-
-                    return collect($this->components->choice($prompt->label, ['' => 'None', ...$options], '', multiple: true))
-                        ->reject('')
-                        ->values()
-                        ->all();
-                }
-
-                return $this->components->choice($prompt->label, $options, multiple: true);
+                return $this->multiselectFallback($prompt->label, $options, required: $prompt->required);
             },
             $prompt->required,
             $prompt->validate
@@ -140,22 +118,90 @@ trait ConfiguresPrompts
                 }
             }
 
-            if ($validate) {
-                $error = $validate($result);
+            $error = is_callable($validate) ? $validate($result) : $this->validatePrompt($result, $validate);
 
-                if (is_string($error) && strlen($error) > 0) {
-                    $this->components->error($error);
+            if (is_string($error) && strlen($error) > 0) {
+                $this->components->error($error);
 
-                    if ($this->laravel->runningUnitTests()) {
-                        throw new PromptValidationException;
-                    } else {
-                        continue;
-                    }
+                if ($this->laravel->runningUnitTests()) {
+                    throw new PromptValidationException;
+                } else {
+                    continue;
                 }
             }
 
             return $result;
         }
+    }
+
+    /**
+     * Validate the given prompt value using the validator.
+     *
+     * @param  mixed  $value
+     * @param  mixed  $rules
+     * @return ?string
+     */
+    protected function validatePrompt($value, $rules)
+    {
+        if ($rules instanceof stdClass) {
+            $messages = $rules->messages ?? [];
+            $attributes = $rules->attributes ?? [];
+            $rules = $rules->rules ?? null;
+        }
+
+        if (! $rules) {
+            return;
+        }
+
+        $field = 'answer';
+
+        if (is_array($rules) && ! array_is_list($rules)) {
+            [$field, $rules] = [key($rules), current($rules)];
+        }
+
+        return $this->getPromptValidatorInstance(
+            $field, $value, $rules, $messages ?? [], $attributes ?? []
+        )->errors()->first();
+    }
+
+    /**
+     * Get the validator instance that should be used to validate prompts.
+     *
+     * @param  string  $value
+     * @param  mixed  $value
+     * @param  mixed  $rules
+     * @param  array  $messages
+     * @param  array  $attributes
+     * @return \Illuminate\Validation\Validator
+     */
+    protected function getPromptValidatorInstance($field, $value, $rules, array $messages = [], array $attributes = [])
+    {
+        return $this->laravel['validator']->make(
+            [$field => $value],
+            [$field => $rules],
+            empty($messages) ? $this->validationMessages() : $messages,
+            empty($attributes) ? $this->validationAttributes() : $attributes,
+        );
+    }
+
+    /**
+     * Get the validation messages that should be used during prompt validation.
+     *
+     * @return array
+     */
+    protected function validationMessages()
+    {
+        return [];
+    }
+
+    /**
+     * Get the validation attributes that should be used during prompt validation.
+     *
+     * @return array
+     */
+    protected function validationAttributes()
+    {
+        return [];
     }
 
     /**
@@ -166,5 +212,56 @@ trait ConfiguresPrompts
     protected function restorePrompts()
     {
         Prompt::setOutput($this->output);
+    }
+
+    /**
+     * Select fallback.
+     *
+     * @param  string  $label
+     * @param  array  $options
+     * @param  string|int|null  $default
+     * @return string|int
+     */
+    private function selectFallback($label, $options, $default = null)
+    {
+        if ($default !== null) {
+            $default = array_search($default, array_is_list($options) ? $options : array_keys($options));
+        }
+
+        return PromptOption::unwrap($this->components->choice($label, PromptOption::wrap($options), $default));
+    }
+
+    /**
+     * Multi-select fallback.
+     *
+     * @param  string  $label
+     * @param  array  $options
+     * @param  array  $default
+     * @param  bool|string  $required
+     * @return array
+     */
+    private function multiselectFallback($label, $options, $default = [], $required = false)
+    {
+        $options = PromptOption::wrap($options);
+
+        if ($required === false) {
+            $options = [new PromptOption(null, 'None'), ...$options];
+
+            if ($default === []) {
+                $default = [null];
+            }
+        }
+
+        $default = $default !== []
+            ? implode(',', array_keys(array_filter($options, fn ($option) => in_array($option->value, $default))))
+            : null;
+
+        $answers = PromptOption::unwrap($this->components->choice($label, $options, $default, multiple: true));
+
+        if ($required === false) {
+            return array_values(array_filter($answers, fn ($value) => $value !== null));
+        }
+
+        return $answers;
     }
 }

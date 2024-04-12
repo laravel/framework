@@ -22,8 +22,9 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ForwardsCalls;
 use JsonSerializable;
 use LogicException;
+use Stringable;
 
-abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToString, HasBroadcastChannel, Jsonable, JsonSerializable, QueueableEntity, UrlRoutable
+abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToString, HasBroadcastChannel, Jsonable, JsonSerializable, QueueableEntity, Stringable, UrlRoutable
 {
     use Concerns\HasAttributes,
         Concerns\HasEvents,
@@ -965,6 +966,10 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
             return false;
         }
 
+        if ($this->isClassDeviable($column)) {
+            $amount = (clone $this)->setAttribute($column, $amount)->getAttributeFromArray($column);
+        }
+
         return tap($this->setKeysForSaveQuery($this->newQueryWithoutScopes())->{$method}($column, $amount, $extra), function () use ($column) {
             $this->syncChanges();
 
@@ -1717,7 +1722,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      * @param  array|null  $except
      * @return static
      */
-    public function replicate(array $except = null)
+    public function replicate(?array $except = null)
     {
         $defaults = array_values(array_filter([
             $this->getKeyName(),
@@ -1745,7 +1750,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      * @param  array|null  $except
      * @return static
      */
-    public function replicateQuietly(array $except = null)
+    public function replicateQuietly(?array $except = null)
     {
         return static::withoutEvents(fn () => $this->replicate($except));
     }

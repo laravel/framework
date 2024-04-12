@@ -2,6 +2,7 @@
 
 namespace Illuminate\View\Engines;
 
+use Illuminate\Database\RecordsNotFoundException;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\View\Compilers\CompilerInterface;
@@ -39,7 +40,7 @@ class CompilerEngine extends PhpEngine
      * @param  \Illuminate\Filesystem\Filesystem|null  $files
      * @return void
      */
-    public function __construct(CompilerInterface $compiler, Filesystem $files = null)
+    public function __construct(CompilerInterface $compiler, ?Filesystem $files = null)
     {
         parent::__construct($files ?: new Filesystem);
 
@@ -102,7 +103,9 @@ class CompilerEngine extends PhpEngine
      */
     protected function handleViewException(Throwable $e, $obLevel)
     {
-        if ($e instanceof HttpException || $e instanceof HttpResponseException) {
+        if ($e instanceof HttpException ||
+            $e instanceof HttpResponseException ||
+            $e instanceof RecordsNotFoundException) {
             parent::handleViewException($e, $obLevel);
         }
 

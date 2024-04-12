@@ -5,7 +5,9 @@ namespace Illuminate\Queue\Console;
 use Illuminate\Console\MigrationGeneratorCommand;
 use Symfony\Component\Console\Attribute\AsCommand;
 
-#[AsCommand(name: 'queue:failed-table')]
+use function Illuminate\Filesystem\join_paths;
+
+#[AsCommand(name: 'make:queue-failed-table', aliases: ['queue:failed-table'])]
 class FailedTableCommand extends MigrationGeneratorCommand
 {
     /**
@@ -13,7 +15,14 @@ class FailedTableCommand extends MigrationGeneratorCommand
      *
      * @var string
      */
-    protected $name = 'queue:failed-table';
+    protected $name = 'make:queue-failed-table';
+
+    /**
+     * The console command name aliases.
+     *
+     * @var array
+     */
+    protected $aliases = ['queue:failed-table'];
 
     /**
      * The console command description.
@@ -40,5 +49,29 @@ class FailedTableCommand extends MigrationGeneratorCommand
     protected function migrationStubFile()
     {
         return __DIR__.'/stubs/failed_jobs.stub';
+    }
+
+    /**
+     * Determine whether a migration for the table already exists.
+     *
+     * @param  string  $table
+     * @return bool
+     */
+    protected function migrationExists($table)
+    {
+        if ($table !== 'failed_jobs') {
+            return parent::migrationExists($table);
+        }
+
+        foreach ([
+            join_paths($this->laravel->databasePath('migrations'), '*_*_*_*_create_'.$table.'_table.php'),
+            join_paths($this->laravel->databasePath('migrations'), '0001_01_01_000002_create_jobs_table.php'),
+        ] as $path) {
+            if (count($this->files->glob($path)) !== 0) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

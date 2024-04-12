@@ -16,6 +16,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Conditionable;
+use Illuminate\Support\Traits\Dumpable;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Support\Traits\Tappable;
 use Illuminate\Support\ViewErrorBag;
@@ -26,6 +27,7 @@ use LogicException;
 use PHPUnit\Framework\ExpectationFailedException;
 use ReflectionProperty;
 use Symfony\Component\HttpFoundation\Cookie;
+use Symfony\Component\HttpFoundation\StreamedJsonResponse;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
@@ -33,9 +35,16 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
  */
 class TestResponse implements ArrayAccess
 {
-    use Concerns\AssertsStatusCodes, Conditionable, Tappable, Macroable {
+    use Concerns\AssertsStatusCodes, Conditionable, Dumpable, Tappable, Macroable {
         __call as macroCall;
     }
+
+    /**
+     * The original request.
+     *
+     * @var \Illuminate\Http\Request|null
+     */
+    public $baseRequest;
 
     /**
      * The response to delegate to.
@@ -62,11 +71,13 @@ class TestResponse implements ArrayAccess
      * Create a new test response instance.
      *
      * @param  \Illuminate\Http\Response  $response
+     * @param  \Illuminate\Http\Request|null  $request
      * @return void
      */
-    public function __construct($response)
+    public function __construct($response, $request = null)
     {
         $this->baseResponse = $response;
+        $this->baseRequest = $request;
         $this->exceptions = new Collection;
     }
 
@@ -74,11 +85,12 @@ class TestResponse implements ArrayAccess
      * Create a new TestResponse from another response.
      *
      * @param  \Illuminate\Http\Response  $response
+     * @param  \Illuminate\Http\Request|null  $request
      * @return static
      */
-    public static function fromBaseResponse($response)
+    public static function fromBaseResponse($response, $request = null)
     {
-        return new static($response);
+        return new static($response, $request);
     }
 
     /**
@@ -420,7 +432,7 @@ class TestResponse implements ArrayAccess
             "Cookie [{$cookieName}] not present on response."
         );
 
-        $expiresAt = Carbon::createFromTimestamp($cookie->getExpiresTime());
+        $expiresAt = Carbon::createFromTimestamp($cookie->getExpiresTime(), date_default_timezone_get());
 
         PHPUnit::assertTrue(
             $cookie->getExpiresTime() !== 0 && $expiresAt->lessThan(Carbon::now()),
@@ -443,7 +455,7 @@ class TestResponse implements ArrayAccess
             "Cookie [{$cookieName}] not present on response."
         );
 
-        $expiresAt = Carbon::createFromTimestamp($cookie->getExpiresTime());
+        $expiresAt = Carbon::createFromTimestamp($cookie->getExpiresTime(), date_default_timezone_get());
 
         PHPUnit::assertTrue(
             $cookie->getExpiresTime() === 0 || $expiresAt->greaterThan(Carbon::now()),
@@ -529,6 +541,17 @@ class TestResponse implements ArrayAccess
         PHPUnit::assertSame($value, $this->streamedContent());
 
         return $this;
+    }
+
+    /**
+     * Assert that the given array matches the streamed JSON response content.
+     *
+     * @param  array  $value
+     * @return $this
+     */
+    public function assertStreamedJsonContent($value)
+    {
+        return $this->assertStreamedContent(json_encode($value, JSON_THROW_ON_ERROR));
     }
 
     /**
@@ -787,7 +810,7 @@ class TestResponse implements ArrayAccess
      * @param  array|null  $responseData
      * @return $this
      */
-    public function assertJsonStructure(array $structure = null, $responseData = null)
+    public function assertJsonStructure(?array $structure = null, $responseData = null)
     {
         $this->decodeResponseJson()->assertStructure($structure, $responseData);
 
@@ -1461,18 +1484,6 @@ class TestResponse implements ArrayAccess
     }
 
     /**
-     * Dump the content from the response and end the script.
-     *
-     * @return never
-     */
-    public function dd()
-    {
-        $this->dump();
-
-        exit(1);
-    }
-
-    /**
      * Dump the headers from the response and end the script.
      *
      * @return never
@@ -1564,7 +1575,8 @@ class TestResponse implements ArrayAccess
             return $this->streamedContent;
         }
 
-        if (! $this->baseResponse instanceof StreamedResponse) {
+        if (! $this->baseResponse instanceof StreamedResponse
+            && ! $this->baseResponse instanceof StreamedJsonResponse) {
             PHPUnit::fail('The response is not a streamed response.');
         }
 
@@ -1638,7 +1650,7 @@ class TestResponse implements ArrayAccess
      */
     protected function appendExceptionToException($exceptionToAppend, $exception)
     {
-        $exceptionMessage = $exceptionToAppend->getMessage();
+        $exceptionMessage = is_string($exceptionToAppend) ? $exceptionToAppend : $exceptionToAppend->getMessage();
 
         $exceptionToAppend = (string) $exceptionToAppend;
 

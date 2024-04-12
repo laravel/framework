@@ -30,6 +30,17 @@ class PendingMailFake extends PendingMail
     }
 
     /**
+     * Send a new mailable message instance synchronously.
+     *
+     * @param  \Illuminate\Contracts\Mail\Mailable  $mailable
+     * @return void
+     */
+    public function sendNow(Mailable $mailable)
+    {
+        $this->mailer->sendNow($this->fill($mailable));
+    }
+
+    /**
      * Push the given mailable onto the queue.
      *
      * @param  \Illuminate\Contracts\Mail\Mailable  $mailable

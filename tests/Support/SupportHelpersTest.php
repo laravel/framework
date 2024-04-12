@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Support;
 use ArrayAccess;
 use ArrayIterator;
 use Countable;
+use Error;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Env;
 use Illuminate\Support\Optional;
@@ -15,6 +16,7 @@ use Illuminate\Tests\Support\Fixtures\StringBackedEnum;
 use IteratorAggregate;
 use LogicException;
 use Mockery as m;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use RuntimeException;
@@ -249,6 +251,122 @@ class SupportHelpersTest extends TestCase
         $this->assertEquals([4, 3, 2, null, null, 1], data_get($array, 'posts.*.comments.*.likes'));
         $this->assertEquals([], data_get($array, 'posts.*.users.*.name', 'irrelevant'));
         $this->assertEquals([], data_get($array, 'posts.*.users.*.name'));
+    }
+
+    public function testDataGetFirstLastDirectives()
+    {
+        $array = [
+            'flights' => [
+                [
+                    'segments' => [
+                        ['from' => 'LHR', 'departure' => '9:00', 'to' => 'IST', 'arrival' => '15:00'],
+                        ['from' => 'IST', 'departure' => '16:00', 'to' => 'PKX', 'arrival' => '20:00'],
+                    ],
+                ],
+                [
+                    'segments' => [
+                        ['from' => 'LGW', 'departure' => '8:00', 'to' => 'SAW', 'arrival' => '14:00'],
+                        ['from' => 'SAW', 'departure' => '15:00', 'to' => 'PEK', 'arrival' => '19:00'],
+                    ],
+                ],
+            ],
+            'empty' => [],
+        ];
+
+        $this->assertEquals('LHR', data_get($array, 'flights.0.segments.{first}.from'));
+        $this->assertEquals('PKX', data_get($array, 'flights.0.segments.{last}.to'));
+
+        $this->assertEquals('LHR', data_get($array, 'flights.{first}.segments.{first}.from'));
+        $this->assertEquals('PEK', data_get($array, 'flights.{last}.segments.{last}.to'));
+        $this->assertEquals('PKX', data_get($array, 'flights.{first}.segments.{last}.to'));
+        $this->assertEquals('LGW', data_get($array, 'flights.{last}.segments.{first}.from'));
+
+        $this->assertEquals(['LHR', 'IST'], data_get($array, 'flights.{first}.segments.*.from'));
+        $this->assertEquals(['SAW', 'PEK'], data_get($array, 'flights.{last}.segments.*.to'));
+
+        $this->assertEquals(['LHR', 'LGW'], data_get($array, 'flights.*.segments.{first}.from'));
+        $this->assertEquals(['PKX', 'PEK'], data_get($array, 'flights.*.segments.{last}.to'));
+
+        $this->assertEquals('Not found', data_get($array, 'empty.{first}', 'Not found'));
+        $this->assertEquals('Not found', data_get($array, 'empty.{last}', 'Not found'));
+    }
+
+    public function testDataGetFirstLastDirectivesOnArrayAccessIterable()
+    {
+        $arrayAccessIterable = [
+            'flights' => new SupportTestArrayAccessIterable([
+                [
+                    'segments' => new SupportTestArrayAccessIterable([
+                        ['from' => 'LHR', 'departure' => '9:00', 'to' => 'IST', 'arrival' => '15:00'],
+                        ['from' => 'IST', 'departure' => '16:00', 'to' => 'PKX', 'arrival' => '20:00'],
+                    ]),
+                ],
+                [
+                    'segments' => new SupportTestArrayAccessIterable([
+                        ['from' => 'LGW', 'departure' => '8:00', 'to' => 'SAW', 'arrival' => '14:00'],
+                        ['from' => 'SAW', 'departure' => '15:00', 'to' => 'PEK', 'arrival' => '19:00'],
+                    ]),
+                ],
+            ]),
+            'empty' => new SupportTestArrayAccessIterable([]),
+        ];
+
+        $this->assertEquals('LHR', data_get($arrayAccessIterable, 'flights.0.segments.{first}.from'));
+        $this->assertEquals('PKX', data_get($arrayAccessIterable, 'flights.0.segments.{last}.to'));
+
+        $this->assertEquals('LHR', data_get($arrayAccessIterable, 'flights.{first}.segments.{first}.from'));
+        $this->assertEquals('PEK', data_get($arrayAccessIterable, 'flights.{last}.segments.{last}.to'));
+        $this->assertEquals('PKX', data_get($arrayAccessIterable, 'flights.{first}.segments.{last}.to'));
+        $this->assertEquals('LGW', data_get($arrayAccessIterable, 'flights.{last}.segments.{first}.from'));
+
+        $this->assertEquals(['LHR', 'IST'], data_get($arrayAccessIterable, 'flights.{first}.segments.*.from'));
+        $this->assertEquals(['SAW', 'PEK'], data_get($arrayAccessIterable, 'flights.{last}.segments.*.to'));
+
+        $this->assertEquals(['LHR', 'LGW'], data_get($arrayAccessIterable, 'flights.*.segments.{first}.from'));
+        $this->assertEquals(['PKX', 'PEK'], data_get($arrayAccessIterable, 'flights.*.segments.{last}.to'));
+
+        $this->assertEquals('Not found', data_get($arrayAccessIterable, 'empty.{first}', 'Not found'));
+        $this->assertEquals('Not found', data_get($arrayAccessIterable, 'empty.{last}', 'Not found'));
+    }
+
+    public function testDataGetFirstLastDirectivesOnKeyedArrays()
+    {
+        $array = [
+            'numericKeys' => [
+                2 => 'first',
+                0 => 'second',
+                1 => 'last',
+            ],
+            'stringKeys' => [
+                'one' => 'first',
+                'two' => 'second',
+                'three' => 'last',
+            ],
+        ];
+
+        $this->assertEquals('second', data_get($array, 'numericKeys.0'));
+        $this->assertEquals('first', data_get($array, 'numericKeys.{first}'));
+        $this->assertEquals('last', data_get($array, 'numericKeys.{last}'));
+        $this->assertEquals('first', data_get($array, 'stringKeys.{first}'));
+        $this->assertEquals('last', data_get($array, 'stringKeys.{last}'));
+    }
+
+    public function testDataGetEscapedSegmentKeys()
+    {
+        $array = [
+            'symbols' => [
+                '{last}' => ['description' => 'dollar'],
+                '*' => ['description' => 'asterisk'],
+                '{first}' => ['description' => 'caret'],
+            ],
+        ];
+
+        $this->assertEquals('caret', data_get($array, 'symbols.\{first}.description'));
+        $this->assertEquals('dollar', data_get($array, 'symbols.{first}.description'));
+        $this->assertEquals('asterisk', data_get($array, 'symbols.\*.description'));
+        $this->assertEquals(['dollar', 'asterisk', 'caret'], data_get($array, 'symbols.*.description'));
+        $this->assertEquals('dollar', data_get($array, 'symbols.\{last}.description'));
+        $this->assertEquals('caret', data_get($array, 'symbols.{last}.description'));
     }
 
     public function testDataFill()
@@ -891,6 +1009,29 @@ class SupportHelpersTest extends TestCase
         ]);
     }
 
+    public function testRetryWithAThrowableBase()
+    {
+        Sleep::fake();
+
+        $attempts = retry(2, function ($attempts) {
+            if ($attempts > 1) {
+                return $attempts;
+            }
+
+            throw new Error('This is an error');
+        }, 100);
+
+        // Make sure we made two attempts
+        $this->assertEquals(2, $attempts);
+
+        // Make sure we waited 100ms for the first attempt
+        Sleep::assertSleptTimes(1);
+
+        Sleep::assertSequence([
+            Sleep::usleep(100_000),
+        ]);
+    }
+
     public function testTransform()
     {
         $this->assertEquals(10, transform(5, function ($value) {
@@ -1026,6 +1167,13 @@ class SupportHelpersTest extends TestCase
         $this->assertSame('some-value', Env::getOrFail('required-exists'));
     }
 
+    public function testLiteral(): void
+    {
+        $this->assertEquals(1, literal(1));
+        $this->assertEquals('taylor', literal('taylor'));
+        $this->assertEquals((object) ['name' => 'Taylor', 'role' => 'Developer'], literal(name: 'Taylor', role: 'Developer'));
+    }
+
     public static function providesPregReplaceArrayData()
     {
         $pointerArray = ['Taylor', 'Otwell'];
@@ -1045,9 +1193,7 @@ class SupportHelpersTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider providesPregReplaceArrayData
-     */
+    #[DataProvider('providesPregReplaceArrayData')]
     public function testPregReplaceArray($pattern, $replacements, $subject, $expectedOutput)
     {
         $this->assertSame(
@@ -1087,48 +1233,59 @@ class SupportTestClassThree extends SupportTestClassTwo
     use SupportTestTraitThree;
 }
 
-class SupportTestArrayAccess implements ArrayAccess
+trait SupportTestTraitArrayAccess
 {
-    protected $attributes = [];
-
-    public function __construct($attributes = [])
+    public function __construct(protected array $items = [])
     {
-        $this->attributes = $attributes;
     }
 
     public function offsetExists($offset): bool
     {
-        return array_key_exists($offset, $this->attributes);
+        return array_key_exists($offset, $this->items);
     }
 
     public function offsetGet($offset): mixed
     {
-        return $this->attributes[$offset];
+        return $this->items[$offset];
     }
 
     public function offsetSet($offset, $value): void
     {
-        $this->attributes[$offset] = $value;
+        $this->items[$offset] = $value;
     }
 
     public function offsetUnset($offset): void
     {
-        unset($this->attributes[$offset]);
+        unset($this->items[$offset]);
     }
 }
 
-class SupportTestArrayIterable implements IteratorAggregate
+trait SupportTestTraitArrayIterable
 {
-    protected $items = [];
-
-    public function __construct($items = [])
+    public function __construct(protected array $items = [])
     {
-        $this->items = $items;
     }
 
     public function getIterator(): Traversable
     {
         return new ArrayIterator($this->items);
+    }
+}
+
+class SupportTestArrayAccess implements ArrayAccess
+{
+    use SupportTestTraitArrayAccess;
+}
+
+class SupportTestArrayIterable implements IteratorAggregate
+{
+    use SupportTestTraitArrayIterable;
+}
+
+class SupportTestArrayAccessIterable implements ArrayAccess, IteratorAggregate
+{
+    use SupportTestTraitArrayAccess, SupportTestTraitArrayIterable {
+        SupportTestTraitArrayAccess::__construct insteadof SupportTestTraitArrayIterable;
     }
 }
 

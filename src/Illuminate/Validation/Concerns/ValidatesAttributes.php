@@ -422,6 +422,18 @@ trait ValidatesAttributes
     }
 
     /**
+     * Validate that an attribute is a list.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @return bool
+     */
+    public function validateList($attribute, $value)
+    {
+        return is_array($value) && array_is_list($value);
+    }
+
+    /**
      * Validate that an array has all of the given keys.
      *
      * @param  string  $attribute
@@ -1943,6 +1955,25 @@ trait ValidatesAttributes
         $this->requireParameterCount(1, $parameters, 'required_if_accepted');
 
         if ($this->validateAccepted($parameters[0], $this->getValue($parameters[0]))) {
+            return $this->validateRequired($attribute, $value);
+        }
+
+        return true;
+    }
+
+    /**
+     * Validate that an attribute exists when another attribute was "declined".
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  mixed  $parameters
+     * @return bool
+     */
+    public function validateRequiredIfDeclined($attribute, $value, $parameters)
+    {
+        $this->requireParameterCount(1, $parameters, 'required_if_declined');
+
+        if ($this->validateDeclined($parameters[0], $this->getValue($parameters[0]))) {
             return $this->validateRequired($attribute, $value);
         }
 

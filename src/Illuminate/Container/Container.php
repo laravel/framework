@@ -676,20 +676,12 @@ class Container implements ArrayAccess, ContainerContract
      */
     protected function getClassForCallable($callback)
     {
-        if (PHP_VERSION_ID >= 80200) {
-            if (is_callable($callback) &&
-                ! ($reflector = new ReflectionFunction($callback(...)))->isAnonymous()) {
-                return $reflector->getClosureScopeClass()->name ?? false;
-            }
-
-            return false;
+        if (is_callable($callback) &&
+            ! ($reflector = new ReflectionFunction($callback(...)))->isAnonymous()) {
+            return $reflector->getClosureScopeClass()->name ?? false;
         }
 
-        if (! is_array($callback)) {
-            return false;
-        }
-
-        return is_string($callback[0]) ? $callback[0] : get_class($callback[0]);
+        return false;
     }
 
     /**
@@ -1148,7 +1140,7 @@ class Container implements ArrayAccess, ContainerContract
      * @param  \Closure|null  $callback
      * @return void
      */
-    public function beforeResolving($abstract, Closure $callback = null)
+    public function beforeResolving($abstract, ?Closure $callback = null)
     {
         if (is_string($abstract)) {
             $abstract = $this->getAlias($abstract);
@@ -1168,7 +1160,7 @@ class Container implements ArrayAccess, ContainerContract
      * @param  \Closure|null  $callback
      * @return void
      */
-    public function resolving($abstract, Closure $callback = null)
+    public function resolving($abstract, ?Closure $callback = null)
     {
         if (is_string($abstract)) {
             $abstract = $this->getAlias($abstract);
@@ -1188,7 +1180,7 @@ class Container implements ArrayAccess, ContainerContract
      * @param  \Closure|null  $callback
      * @return void
      */
-    public function afterResolving($abstract, Closure $callback = null)
+    public function afterResolving($abstract, ?Closure $callback = null)
     {
         if (is_string($abstract)) {
             $abstract = $this->getAlias($abstract);
@@ -1427,7 +1419,7 @@ class Container implements ArrayAccess, ContainerContract
      * @param  \Illuminate\Contracts\Container\Container|null  $container
      * @return \Illuminate\Contracts\Container\Container|static
      */
-    public static function setInstance(ContainerContract $container = null)
+    public static function setInstance(?ContainerContract $container = null)
     {
         return static::$instance = $container;
     }

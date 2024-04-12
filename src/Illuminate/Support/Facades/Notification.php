@@ -31,6 +31,7 @@ use Illuminate\Support\Testing\Fakes\NotificationFake;
  * @method static void assertCount(int $expectedCount)
  * @method static \Illuminate\Support\Collection sent(mixed $notifiable, string $notification, callable|null $callback = null)
  * @method static bool hasSent(mixed $notifiable, string $notification)
+ * @method static \Illuminate\Support\Testing\Fakes\NotificationFake serializeAndRestore(bool $serializeAndRestore = true)
  * @method static array sentNotifications()
  * @method static void macro(string $name, object|callable $macro)
  * @method static void mixin(object $mixin, bool $replace = true)
@@ -52,6 +53,23 @@ class Notification extends Facade
         return tap(new NotificationFake, function ($fake) {
             static::swap($fake);
         });
+    }
+
+    /**
+     * Begin sending a notification to an anonymous notifiable on the given channels.
+     *
+     * @param  array  $channels
+     * @return \Illuminate\Notifications\AnonymousNotifiable
+     */
+    public static function routes(array $channels)
+    {
+        $notifiable = new AnonymousNotifiable;
+
+        foreach ($channels as $channel => $route) {
+            $notifiable->route($channel, $route);
+        }
+
+        return $notifiable;
     }
 
     /**

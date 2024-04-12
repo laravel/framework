@@ -44,7 +44,7 @@ class TestMakeCommand extends GeneratorCommand
     {
         $suffix = $this->option('unit') ? '.unit.stub' : '.stub';
 
-        return $this->option('pest')
+        return $this->usingPest()
             ? $this->resolveStubPath('/stubs/pest'.$suffix)
             : $this->resolveStubPath('/stubs/test'.$suffix);
     }
@@ -108,9 +108,10 @@ class TestMakeCommand extends GeneratorCommand
     protected function getOptions()
     {
         return [
-            ['force', 'f', InputOption::VALUE_NONE, 'Create the class even if the test already exists'],
+            ['force', 'f', InputOption::VALUE_NONE, 'Create the test even if the test already exists'],
             ['unit', 'u', InputOption::VALUE_NONE, 'Create a unit test'],
-            ['pest', 'p', InputOption::VALUE_NONE, 'Create a Pest test'],
+            ['pest', null, InputOption::VALUE_NONE, 'Create a Pest test'],
+            ['phpunit', null, InputOption::VALUE_NONE, 'Create a PHPUnit test'],
         ];
     }
 
@@ -128,17 +129,29 @@ class TestMakeCommand extends GeneratorCommand
         }
 
         $type = select('Which type of test would you like?', [
-            'feature' => 'Feature (PHPUnit)',
-            'unit' => 'Unit (PHPUnit)',
-            'pest-feature' => 'Feature (Pest)',
-            'pest-unit' => 'Unit (Pest)',
+            'feature' => 'Feature',
+            'unit' => 'Unit',
         ]);
 
         match ($type) {
             'feature' => null,
             'unit' => $input->setOption('unit', true),
-            'pest-feature' => $input->setOption('pest', true),
-            'pest-unit' => tap($input)->setOption('pest', true)->setOption('unit', true),
         };
+    }
+
+    /**
+     * Determine if Pest is being used by the application.
+     *
+     * @return bool
+     */
+    protected function usingPest()
+    {
+        if ($this->option('phpunit')) {
+            return false;
+        }
+
+        return $this->option('pest') ||
+            (function_exists('\Pest\\version') &&
+             file_exists(base_path('tests').'/Pest.php'));
     }
 }

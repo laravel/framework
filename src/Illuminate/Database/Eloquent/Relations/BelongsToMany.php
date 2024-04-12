@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Eloquent\Relations\Concerns\AsPivot;
 use Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithDictionary;
 use Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithPivotTable;
+use Illuminate\Database\Query\Grammars\MySqlGrammar;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
@@ -64,7 +65,7 @@ class BelongsToMany extends Relation
     /**
      * The pivot table columns to retrieve.
      *
-     * @var array
+     * @var array<string|\Illuminate\Contracts\Database\Query\Expression>
      */
     protected $pivotColumns = [];
 
@@ -355,7 +356,7 @@ class BelongsToMany extends Relation
     /**
      * Set a where clause for a pivot table column.
      *
-     * @param  string  $column
+     * @param  string|\Illuminate\Contracts\Database\Query\Expression  $column
      * @param  mixed  $operator
      * @param  mixed  $value
      * @param  string  $boolean
@@ -371,7 +372,7 @@ class BelongsToMany extends Relation
     /**
      * Set a "where between" clause for a pivot table column.
      *
-     * @param  string  $column
+     * @param  string|\Illuminate\Contracts\Database\Query\Expression  $column
      * @param  array  $values
      * @param  string  $boolean
      * @param  bool  $not
@@ -385,7 +386,7 @@ class BelongsToMany extends Relation
     /**
      * Set a "or where between" clause for a pivot table column.
      *
-     * @param  string  $column
+     * @param  string|\Illuminate\Contracts\Database\Query\Expression  $column
      * @param  array  $values
      * @return $this
      */
@@ -397,7 +398,7 @@ class BelongsToMany extends Relation
     /**
      * Set a "where pivot not between" clause for a pivot table column.
      *
-     * @param  string  $column
+     * @param  string|\Illuminate\Contracts\Database\Query\Expression  $column
      * @param  array  $values
      * @param  string  $boolean
      * @return $this
@@ -410,7 +411,7 @@ class BelongsToMany extends Relation
     /**
      * Set a "or where not between" clause for a pivot table column.
      *
-     * @param  string  $column
+     * @param  string|\Illuminate\Contracts\Database\Query\Expression  $column
      * @param  array  $values
      * @return $this
      */
@@ -422,7 +423,7 @@ class BelongsToMany extends Relation
     /**
      * Set a "where in" clause for a pivot table column.
      *
-     * @param  string  $column
+     * @param  string|\Illuminate\Contracts\Database\Query\Expression  $column
      * @param  mixed  $values
      * @param  string  $boolean
      * @param  bool  $not
@@ -438,7 +439,7 @@ class BelongsToMany extends Relation
     /**
      * Set an "or where" clause for a pivot table column.
      *
-     * @param  string  $column
+     * @param  string|\Illuminate\Contracts\Database\Query\Expression  $column
      * @param  mixed  $operator
      * @param  mixed  $value
      * @return $this
@@ -453,7 +454,7 @@ class BelongsToMany extends Relation
      *
      * In addition, new pivot records will receive this value.
      *
-     * @param  string|array  $column
+     * @param  string|\Illuminate\Contracts\Database\Query\Expression|array<string, string>  $column
      * @param  mixed  $value
      * @return $this
      *
@@ -493,7 +494,7 @@ class BelongsToMany extends Relation
     /**
      * Set a "where not in" clause for a pivot table column.
      *
-     * @param  string  $column
+     * @param  string|\Illuminate\Contracts\Database\Query\Expression  $column
      * @param  mixed  $values
      * @param  string  $boolean
      * @return $this
@@ -518,7 +519,7 @@ class BelongsToMany extends Relation
     /**
      * Set a "where null" clause for a pivot table column.
      *
-     * @param  string  $column
+     * @param  string|\Illuminate\Contracts\Database\Query\Expression  $column
      * @param  string  $boolean
      * @param  bool  $not
      * @return $this
@@ -533,7 +534,7 @@ class BelongsToMany extends Relation
     /**
      * Set a "where not null" clause for a pivot table column.
      *
-     * @param  string  $column
+     * @param  string|\Illuminate\Contracts\Database\Query\Expression  $column
      * @param  string  $boolean
      * @return $this
      */
@@ -545,7 +546,7 @@ class BelongsToMany extends Relation
     /**
      * Set a "or where null" clause for a pivot table column.
      *
-     * @param  string  $column
+     * @param  string|\Illuminate\Contracts\Database\Query\Expression  $column
      * @param  bool  $not
      * @return $this
      */
@@ -557,7 +558,7 @@ class BelongsToMany extends Relation
     /**
      * Set a "or where not null" clause for a pivot table column.
      *
-     * @param  string  $column
+     * @param  string|\Illuminate\Contracts\Database\Query\Expression  $column
      * @return $this
      */
     public function orWherePivotNotNull($column)
@@ -568,7 +569,7 @@ class BelongsToMany extends Relation
     /**
      * Add an "order by" clause for a pivot table column.
      *
-     * @param  string  $column
+     * @param  string|\Illuminate\Contracts\Database\Query\Expression  $column
      * @param  string  $direction
      * @return $this
      */
@@ -753,7 +754,7 @@ class BelongsToMany extends Relation
      * @param  \Closure|null  $callback
      * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection|mixed
      */
-    public function findOr($id, $columns = ['*'], Closure $callback = null)
+    public function findOr($id, $columns = ['*'], ?Closure $callback = null)
     {
         if ($columns instanceof Closure) {
             $callback = $columns;
@@ -827,7 +828,7 @@ class BelongsToMany extends Relation
      * @param  \Closure|null  $callback
      * @return \Illuminate\Database\Eloquent\Model|static|mixed
      */
-    public function firstOr($columns = ['*'], Closure $callback = null)
+    public function firstOr($columns = ['*'], ?Closure $callback = null)
     {
         if ($columns instanceof Closure) {
             $callback = $columns;
@@ -882,7 +883,9 @@ class BelongsToMany extends Relation
             $models = $builder->eagerLoadRelations($models);
         }
 
-        return $this->related->newCollection($models);
+        return $this->query->applyAfterQueryCallbacks(
+            $this->related->newCollection($models)
+        );
     }
 
     /**
@@ -997,19 +1000,66 @@ class BelongsToMany extends Relation
      */
     public function chunkById($count, callable $callback, $column = null, $alias = null)
     {
-        $this->prepareQueryBuilder();
+        return $this->orderedChunkById($count, $callback, $column, $alias);
+    }
 
+    /**
+     * Chunk the results of a query by comparing IDs in descending order.
+     *
+     * @param  int  $count
+     * @param  callable  $callback
+     * @param  string|null  $column
+     * @param  string|null  $alias
+     * @return bool
+     */
+    public function chunkByIdDesc($count, callable $callback, $column = null, $alias = null)
+    {
+        return $this->orderedChunkById($count, $callback, $column, $alias, descending: true);
+    }
+
+    /**
+     * Execute a callback over each item while chunking by ID.
+     *
+     * @param  callable  $callback
+     * @param  int  $count
+     * @param  string|null  $column
+     * @param  string|null  $alias
+     * @return bool
+     */
+    public function eachById(callable $callback, $count = 1000, $column = null, $alias = null)
+    {
+        return $this->chunkById($count, function ($results, $page) use ($callback, $count) {
+            foreach ($results as $key => $value) {
+                if ($callback($value, (($page - 1) * $count) + $key) === false) {
+                    return false;
+                }
+            }
+        }, $column, $alias);
+    }
+
+    /**
+     * Chunk the results of a query by comparing IDs in a given order.
+     *
+     * @param  int  $count
+     * @param  callable  $callback
+     * @param  string|null  $column
+     * @param  string|null  $alias
+     * @param  bool  $descending
+     * @return bool
+     */
+    public function orderedChunkById($count, callable $callback, $column = null, $alias = null, $descending = false)
+    {
         $column ??= $this->getRelated()->qualifyColumn(
             $this->getRelatedKeyName()
         );
 
         $alias ??= $this->getRelatedKeyName();
 
-        return $this->query->chunkById($count, function ($results) use ($callback) {
+        return $this->prepareQueryBuilder()->orderedChunkById($count, function ($results, $page) use ($callback) {
             $this->hydratePivotRelation($results->all());
 
-            return $callback($results);
-        }, $column, $alias);
+            return $callback($results, $page);
+        }, $column, $alias, $descending);
     }
 
     /**
@@ -1062,6 +1112,29 @@ class BelongsToMany extends Relation
         $alias ??= $this->getRelatedKeyName();
 
         return $this->prepareQueryBuilder()->lazyById($chunkSize, $column, $alias)->map(function ($model) {
+            $this->hydratePivotRelation([$model]);
+
+            return $model;
+        });
+    }
+
+    /**
+     * Query lazily, by chunking the results of a query by comparing IDs in descending order.
+     *
+     * @param  int  $chunkSize
+     * @param  string|null  $column
+     * @param  string|null  $alias
+     * @return \Illuminate\Support\LazyCollection
+     */
+    public function lazyByIdDesc($chunkSize = 1000, $column = null, $alias = null)
+    {
+        $column ??= $this->getRelated()->qualifyColumn(
+            $this->getRelatedKeyName()
+        );
+
+        $alias ??= $this->getRelatedKeyName();
+
+        return $this->prepareQueryBuilder()->lazyByIdDesc($chunkSize, $column, $alias)->map(function ($model) {
             $this->hydratePivotRelation([$model]);
 
             return $model;
@@ -1179,6 +1252,10 @@ class BelongsToMany extends Relation
      */
     public function touch()
     {
+        if ($this->related->isIgnoringTouch()) {
+            return;
+        }
+
         $columns = [
             $this->related->getUpdatedAtColumn() => $this->related->freshTimestampString(),
         ];
@@ -1345,6 +1422,42 @@ class BelongsToMany extends Relation
         $this->performJoin($query);
 
         return parent::getRelationExistenceQuery($query, $parentQuery, $columns);
+    }
+
+    /**
+     * Alias to set the "limit" value of the query.
+     *
+     * @param  int  $value
+     * @return $this
+     */
+    public function take($value)
+    {
+        return $this->limit($value);
+    }
+
+    /**
+     * Set the "limit" value of the query.
+     *
+     * @param  int  $value
+     * @return $this
+     */
+    public function limit($value)
+    {
+        if ($this->parent->exists) {
+            $this->query->limit($value);
+        } else {
+            $column = $this->getExistenceCompareKey();
+
+            $grammar = $this->query->getQuery()->getGrammar();
+
+            if ($grammar instanceof MySqlGrammar && $grammar->useLegacyGroupLimit($this->query->getQuery())) {
+                $column = 'pivot_'.last(explode('.', $column));
+            }
+
+            $this->query->groupLimit($value, $column);
+        }
+
+        return $this;
     }
 
     /**
@@ -1517,11 +1630,15 @@ class BelongsToMany extends Relation
     /**
      * Qualify the given column name by the pivot table.
      *
-     * @param  string  $column
-     * @return string
+     * @param  string|\Illuminate\Contracts\Database\Query\Expression  $column
+     * @return string|\Illuminate\Contracts\Database\Query\Expression
      */
     public function qualifyPivotColumn($column)
     {
+        if ($this->query->getQuery()->getGrammar()->isExpression($column)) {
+            return $column;
+        }
+
         return str_contains($column, '.')
                     ? $column
                     : $this->table.'.'.$column;

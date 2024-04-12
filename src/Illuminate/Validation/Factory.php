@@ -87,7 +87,7 @@ class Factory implements FactoryContract
      * @param  \Illuminate\Contracts\Container\Container|null  $container
      * @return void
      */
-    public function __construct(Translator $translator, Container $container = null)
+    public function __construct(Translator $translator, ?Container $container = null)
     {
         $this->container = $container;
         $this->translator = $translator;

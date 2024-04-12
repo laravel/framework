@@ -3,24 +3,35 @@
 namespace Illuminate\Foundation\Http\Middleware;
 
 use Closure;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 
 class TrimStrings extends TransformsRequest
 {
-    /**
-     * All of the registered skip callbacks.
-     *
-     * @var array
-     */
-    protected static $skipCallbacks = [];
-
     /**
      * The attributes that should not be trimmed.
      *
      * @var array<int, string>
      */
     protected $except = [
-        //
+        'current_password',
+        'password',
+        'password_confirmation',
     ];
+
+    /**
+     * The globally ignored attributes that should not be trimmed.
+     *
+     * @var array
+     */
+    protected static $neverTrim = [];
+
+    /**
+     * All of the registered skip callbacks.
+     *
+     * @var array
+     */
+    protected static $skipCallbacks = [];
 
     /**
      * Handle an incoming request.
@@ -49,11 +60,38 @@ class TrimStrings extends TransformsRequest
      */
     protected function transform($key, $value)
     {
-        if (in_array($key, $this->except, true) || ! is_string($value)) {
+        $except = array_merge($this->except, static::$neverTrim);
+
+        if ($this->shouldSkip($key, $except) || ! is_string($value)) {
             return $value;
         }
 
-        return preg_replace('~^[\s\x{FEFF}\x{200B}]+|[\s\x{FEFF}\x{200B}]+$~u', '', $value) ?? trim($value);
+        return Str::trim($value);
+    }
+
+    /**
+     * Determine if the given key should be skipped.
+     *
+     * @param  string  $key
+     * @param  array  $except
+     * @return bool
+     */
+    protected function shouldSkip($key, $except)
+    {
+        return in_array($key, $except, true);
+    }
+
+    /**
+     * Indicate that the given attributes should never be trimmed.
+     *
+     * @param  array|string  $attributes
+     * @return void
+     */
+    public static function except($attributes)
+    {
+        static::$neverTrim = array_values(array_unique(
+            array_merge(static::$neverTrim, Arr::wrap($attributes))
+        ));
     }
 
     /**
@@ -74,6 +112,8 @@ class TrimStrings extends TransformsRequest
      */
     public static function flushState()
     {
+        static::$neverTrim = [];
+
         static::$skipCallbacks = [];
     }
 }

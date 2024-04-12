@@ -123,4 +123,15 @@ class ApcStore extends TaggableStore
     {
         return $this->prefix;
     }
+
+    /**
+     * Set the cache key prefix.
+     *
+     * @param  string  $prefix
+     * @return void
+     */
+    public function setPrefix($prefix)
+    {
+        $this->prefix = $prefix;
+    }
 }

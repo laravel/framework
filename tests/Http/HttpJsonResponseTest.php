@@ -7,14 +7,13 @@ use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Http\JsonResponse;
 use InvalidArgumentException;
 use JsonSerializable;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
 class HttpJsonResponseTest extends TestCase
 {
-    /**
-     * @dataProvider setAndRetrieveDataProvider
-     */
+    #[DataProvider('setAndRetrieveDataProvider')]
     public function testSetAndRetrieveData($data)
     {
         $response = new JsonResponse($data);
@@ -67,9 +66,7 @@ class HttpJsonResponseTest extends TestCase
         $this->assertSame(404, $response->getStatusCode());
     }
 
-    /**
-     * @dataProvider jsonErrorDataProvider
-     */
+    #[DataProvider('jsonErrorDataProvider')]
     public function testInvalidArgumentExceptionOnJsonError($data)
     {
         $this->expectException(InvalidArgumentException::class);
@@ -77,9 +74,7 @@ class HttpJsonResponseTest extends TestCase
         new JsonResponse(['data' => $data]);
     }
 
-    /**
-     * @dataProvider jsonErrorDataProvider
-     */
+    #[DataProvider('jsonErrorDataProvider')]
     public function testGracefullyHandledSomeJsonErrorsWithPartialOutputOnError($data)
     {
         new JsonResponse(['data' => $data], 200, [], JSON_PARTIAL_OUTPUT_ON_ERROR);

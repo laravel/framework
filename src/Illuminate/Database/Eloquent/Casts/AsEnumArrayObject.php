@@ -30,7 +30,7 @@ class AsEnumArrayObject implements Castable
 
             public function get($model, $key, $value, $attributes)
             {
-                if (! isset($attributes[$key]) || is_null($attributes[$key])) {
+                if (! isset($attributes[$key])) {
                     return;
                 }
 
@@ -80,5 +80,16 @@ class AsEnumArrayObject implements Castable
                 return $enum instanceof BackedEnum ? $enum->value : $enum->name;
             }
         };
+    }
+
+    /**
+     * Specify the Enum for the cast.
+     *
+     * @param  class-string  $class
+     * @return string
+     */
+    public static function of($class)
+    {
+        return static::class.':'.$class;
     }
 }

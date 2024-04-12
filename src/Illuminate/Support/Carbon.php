@@ -5,17 +5,18 @@ namespace Illuminate\Support;
 use Carbon\Carbon as BaseCarbon;
 use Carbon\CarbonImmutable as BaseCarbonImmutable;
 use Illuminate\Support\Traits\Conditionable;
+use Illuminate\Support\Traits\Dumpable;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\Uid\Ulid;
 
 class Carbon extends BaseCarbon
 {
-    use Conditionable;
+    use Conditionable, Dumpable;
 
     /**
      * {@inheritdoc}
      */
-    public static function setTestNow($testNow = null)
+    public static function setTestNow(mixed $testNow = null): void
     {
         BaseCarbon::setTestNow($testNow);
         BaseCarbonImmutable::setTestNow($testNow);
@@ -23,37 +24,13 @@ class Carbon extends BaseCarbon
 
     /**
      * Create a Carbon instance from a given ordered UUID or ULID.
-     *
-     * @param  \Ramsey\Uuid\Uuid|\Symfony\Component\Uid\Ulid|string  $id
-     * @return \Illuminate\Support\Carbon
      */
-    public static function createFromId($id)
+    public static function createFromId(Uuid|Ulid|string $id): static
     {
-        return Ulid::isValid($id)
-            ? static::createFromInterface(Ulid::fromString($id)->getDateTime())
-            : static::createFromInterface(Uuid::fromString($id)->getDateTime());
-    }
+        if (is_string($id)) {
+            $id = Ulid::isValid($id) ? Ulid::fromString($id) : Uuid::fromString($id);
+        }
 
-    /**
-     * Dump the instance and end the script.
-     *
-     * @param  mixed  ...$args
-     * @return never
-     */
-    public function dd(...$args)
-    {
-        dd($this, ...$args);
-    }
-
-    /**
-     * Dump the instance.
-     *
-     * @return $this
-     */
-    public function dump()
-    {
-        dump($this);
-
-        return $this;
+        return static::createFromInterface($id->getDateTime());
     }
 }

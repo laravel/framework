@@ -6,7 +6,6 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
-use stdClass;
 
 class DatabaseSqliteSchemaBuilderTest extends DatabaseTestCase
 {
@@ -40,18 +39,12 @@ class DatabaseSqliteSchemaBuilderTest extends DatabaseTestCase
         Schema::drop('users');
     }
 
-    public function testGetAllTablesAndColumnListing()
+    public function testGetTablesAndColumnListing()
     {
-        $tables = Schema::getAllTables();
+        $tables = Schema::getTables();
 
         $this->assertCount(2, $tables);
-        $tableProperties = array_values((array) $tables[0]);
-        $this->assertEquals(['table', 'migrations'], $tableProperties);
-
-        $this->assertInstanceOf(stdClass::class, $tables[1]);
-
-        $tableProperties = array_values((array) $tables[1]);
-        $this->assertEquals(['table', 'users'], $tableProperties);
+        $this->assertEquals(['migrations', 'users'], array_column($tables, 'name'));
 
         $columns = Schema::getColumnListing('users');
 
@@ -63,12 +56,12 @@ class DatabaseSqliteSchemaBuilderTest extends DatabaseTestCase
             $table->integer('id');
             $table->string('title');
         });
-        $tables = Schema::getAllTables();
+        $tables = Schema::getTables();
         $this->assertCount(3, $tables);
         Schema::drop('posts');
     }
 
-    public function testGetAllViews()
+    public function testGetViews()
     {
         DB::connection('conn1')->statement(<<<'SQL'
 CREATE VIEW users_view
@@ -76,17 +69,15 @@ AS
 SELECT name,age from users;
 SQL);
 
-        $tableView = Schema::getAllViews();
+        $tableView = Schema::getViews();
 
         $this->assertCount(1, $tableView);
-        $this->assertInstanceOf(stdClass::class, $obj = array_values($tableView)[0]);
-        $this->assertEquals('users_view', $obj->name);
-        $this->assertEquals('view', $obj->type);
+        $this->assertEquals('users_view', $tableView[0]['name']);
 
         DB::connection('conn1')->statement(<<<'SQL'
 DROP VIEW IF EXISTS users_view;
 SQL);
 
-        $this->assertEmpty(Schema::getAllViews());
+        $this->assertEmpty(Schema::getViews());
     }
 }

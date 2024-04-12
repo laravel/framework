@@ -69,6 +69,13 @@ class CallQueuedListener implements ShouldQueue
     public $timeout;
 
     /**
+     * Indicates if the job should fail if the timeout is exceeded.
+     *
+     * @var bool
+     */
+    public $failOnTimeout = false;
+
+    /**
      * Indicates if the job should be encrypted.
      *
      * @var bool

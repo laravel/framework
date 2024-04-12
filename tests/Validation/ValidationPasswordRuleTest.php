@@ -42,6 +42,15 @@ class ValidationPasswordRuleTest extends TestCase
         $this->passes(new Password(8), ['88888888']);
     }
 
+    public function testMax()
+    {
+        $this->fails(Password::min(2)->max(4), ['aaaaa', '11111111'], [
+            'validation.max.string',
+        ]);
+
+        $this->passes(Password::min(2)->max(3), ['aa', '111']);
+    }
+
     public function testConditional()
     {
         $is_privileged_user = true;

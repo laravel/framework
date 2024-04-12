@@ -2,13 +2,12 @@
 
 namespace Illuminate\Database\Schema;
 
-use BadMethodCallException;
 use Closure;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Schema\Grammars\Grammar;
-use Illuminate\Database\SQLiteConnection;
+use Illuminate\Database\Schema\Grammars\MySqlGrammar;
 use Illuminate\Support\Fluent;
 use Illuminate\Support\Traits\Macroable;
 
@@ -87,7 +86,7 @@ class Blueprint
      * @param  string  $prefix
      * @return void
      */
-    public function __construct($table, Closure $callback = null, $prefix = '')
+    public function __construct($table, ?Closure $callback = null, $prefix = '')
     {
         $this->table = $table;
         $this->prefix = $prefix;
@@ -156,20 +155,7 @@ class Blueprint
      */
     protected function ensureCommandsAreValid(Connection $connection)
     {
-        if ($connection instanceof SQLiteConnection) {
-            if ($this->commandsNamed(['dropColumn', 'renameColumn'])->count() > 1
-                && ! $connection->usingNativeSchemaOperations()) {
-                throw new BadMethodCallException(
-                    "SQLite doesn't support multiple calls to dropColumn / renameColumn in a single modification."
-                );
-            }
-
-            if ($this->commandsNamed(['dropForeign'])->count() > 0) {
-                throw new BadMethodCallException(
-                    "SQLite doesn't support dropping foreign keys (you would need to re-create the table)."
-                );
-            }
-        }
+        //
     }
 
     /**
@@ -202,7 +188,7 @@ class Blueprint
             array_unshift($this->commands, $this->createCommand('change'));
         }
 
-        $this->addFluentIndexes();
+        $this->addFluentIndexes($connection, $grammar);
 
         $this->addFluentCommands($connection, $grammar);
     }
@@ -210,12 +196,21 @@ class Blueprint
     /**
      * Add the index commands fluently specified on columns.
      *
+     * @param  \Illuminate\Database\Connection  $connection
+     * @param  \Illuminate\Database\Schema\Grammars\Grammar  $grammar
      * @return void
      */
-    protected function addFluentIndexes()
+    protected function addFluentIndexes(Connection $connection, Grammar $grammar)
     {
         foreach ($this->columns as $column) {
             foreach (['primary', 'unique', 'index', 'fulltext', 'fullText', 'spatialIndex'] as $index) {
+                // If the column is supposed to be changed to an auto increment column and
+                // the specified index is primary, there is no need to add a command on
+                // MySQL, as it will be handled during the column definition instead.
+                if ($index === 'primary' && $column->autoIncrement && $column->change && $grammar instanceof MySqlGrammar) {
+                    continue 2;
+                }
+
                 // If the index has been specified on the given column, but is simply equal
                 // to "true" (boolean), no name has been specified for this index so the
                 // index method can be called without a name and it will generate one.
@@ -259,10 +254,6 @@ class Blueprint
     public function addFluentCommands(Connection $connection, Grammar $grammar)
     {
         foreach ($this->columns as $column) {
-            if ($column->change && ! $connection->usingNativeSchemaOperations()) {
-                continue;
-            }
-
             foreach ($grammar->getFluentCommands() as $commandName) {
                 $this->addCommand($commandName, compact('column'));
             }
@@ -305,7 +296,6 @@ class Blueprint
     /**
      * Specify that the InnoDB storage engine should be used for the table (MySQL only).
      *
-     * @param  string  $engine
      * @return void
      */
     public function innoDb()
@@ -1006,28 +996,23 @@ class Blueprint
      * Create a new float column on the table.
      *
      * @param  string  $column
-     * @param  int  $total
-     * @param  int  $places
-     * @param  bool  $unsigned
+     * @param  int  $precision
      * @return \Illuminate\Database\Schema\ColumnDefinition
      */
-    public function float($column, $total = 8, $places = 2, $unsigned = false)
+    public function float($column, $precision = 53)
     {
-        return $this->addColumn('float', $column, compact('total', 'places', 'unsigned'));
+        return $this->addColumn('float', $column, compact('precision'));
     }
 
     /**
      * Create a new double column on the table.
      *
      * @param  string  $column
-     * @param  int|null  $total
-     * @param  int|null  $places
-     * @param  bool  $unsigned
      * @return \Illuminate\Database\Schema\ColumnDefinition
      */
-    public function double($column, $total = null, $places = null, $unsigned = false)
+    public function double($column)
     {
-        return $this->addColumn('double', $column, compact('total', 'places', 'unsigned'));
+        return $this->addColumn('double', $column);
     }
 
     /**
@@ -1036,51 +1021,11 @@ class Blueprint
      * @param  string  $column
      * @param  int  $total
      * @param  int  $places
-     * @param  bool  $unsigned
      * @return \Illuminate\Database\Schema\ColumnDefinition
      */
-    public function decimal($column, $total = 8, $places = 2, $unsigned = false)
+    public function decimal($column, $total = 8, $places = 2)
     {
-        return $this->addColumn('decimal', $column, compact('total', 'places', 'unsigned'));
-    }
-
-    /**
-     * Create a new unsigned float column on the table.
-     *
-     * @param  string  $column
-     * @param  int  $total
-     * @param  int  $places
-     * @return \Illuminate\Database\Schema\ColumnDefinition
-     */
-    public function unsignedFloat($column, $total = 8, $places = 2)
-    {
-        return $this->float($column, $total, $places, true);
-    }
-
-    /**
-     * Create a new unsigned double column on the table.
-     *
-     * @param  string  $column
-     * @param  int  $total
-     * @param  int  $places
-     * @return \Illuminate\Database\Schema\ColumnDefinition
-     */
-    public function unsignedDouble($column, $total = null, $places = null)
-    {
-        return $this->double($column, $total, $places, true);
-    }
-
-    /**
-     * Create a new unsigned decimal column on the table.
-     *
-     * @param  string  $column
-     * @param  int  $total
-     * @param  int  $places
-     * @return \Illuminate\Database\Schema\ColumnDefinition
-     */
-    public function unsignedDecimal($column, $total = 8, $places = 2)
-    {
-        return $this->decimal($column, $total, $places, true);
+        return $this->addColumn('decimal', $column, compact('total', 'places'));
     }
 
     /**
@@ -1326,11 +1271,13 @@ class Blueprint
      * Create a new binary column on the table.
      *
      * @param  string  $column
+     * @param  int|null  $length
+     * @param  bool  $fixed
      * @return \Illuminate\Database\Schema\ColumnDefinition
      */
-    public function binary($column)
+    public function binary($column, $length = null, $fixed = false)
     {
-        return $this->addColumn('binary', $column);
+        return $this->addColumn('binary', $column, compact('length', 'fixed'));
     }
 
     /**
@@ -1412,100 +1359,26 @@ class Blueprint
      * Create a new geometry column on the table.
      *
      * @param  string  $column
+     * @param  string|null  $subtype
+     * @param  int  $srid
      * @return \Illuminate\Database\Schema\ColumnDefinition
      */
-    public function geometry($column)
+    public function geometry($column, $subtype = null, $srid = 0)
     {
-        return $this->addColumn('geometry', $column);
+        return $this->addColumn('geometry', $column, compact('subtype', 'srid'));
     }
 
     /**
-     * Create a new point column on the table.
+     * Create a new geography column on the table.
      *
      * @param  string  $column
-     * @param  int|null  $srid
+     * @param  string|null  $subtype
+     * @param  int  $srid
      * @return \Illuminate\Database\Schema\ColumnDefinition
      */
-    public function point($column, $srid = null)
+    public function geography($column, $subtype = null, $srid = 4326)
     {
-        return $this->addColumn('point', $column, compact('srid'));
-    }
-
-    /**
-     * Create a new linestring column on the table.
-     *
-     * @param  string  $column
-     * @return \Illuminate\Database\Schema\ColumnDefinition
-     */
-    public function lineString($column)
-    {
-        return $this->addColumn('linestring', $column);
-    }
-
-    /**
-     * Create a new polygon column on the table.
-     *
-     * @param  string  $column
-     * @return \Illuminate\Database\Schema\ColumnDefinition
-     */
-    public function polygon($column)
-    {
-        return $this->addColumn('polygon', $column);
-    }
-
-    /**
-     * Create a new geometrycollection column on the table.
-     *
-     * @param  string  $column
-     * @return \Illuminate\Database\Schema\ColumnDefinition
-     */
-    public function geometryCollection($column)
-    {
-        return $this->addColumn('geometrycollection', $column);
-    }
-
-    /**
-     * Create a new multipoint column on the table.
-     *
-     * @param  string  $column
-     * @return \Illuminate\Database\Schema\ColumnDefinition
-     */
-    public function multiPoint($column)
-    {
-        return $this->addColumn('multipoint', $column);
-    }
-
-    /**
-     * Create a new multilinestring column on the table.
-     *
-     * @param  string  $column
-     * @return \Illuminate\Database\Schema\ColumnDefinition
-     */
-    public function multiLineString($column)
-    {
-        return $this->addColumn('multilinestring', $column);
-    }
-
-    /**
-     * Create a new multipolygon column on the table.
-     *
-     * @param  string  $column
-     * @return \Illuminate\Database\Schema\ColumnDefinition
-     */
-    public function multiPolygon($column)
-    {
-        return $this->addColumn('multipolygon', $column);
-    }
-
-    /**
-     * Create a new multipolygon column on the table.
-     *
-     * @param  string  $column
-     * @return \Illuminate\Database\Schema\ColumnDefinition
-     */
-    public function multiPolygonZ($column)
-    {
-        return $this->addColumn('multipolygonz', $column);
+        return $this->addColumn('geography', $column, compact('subtype', 'srid'));
     }
 
     /**
@@ -1727,7 +1600,11 @@ class Blueprint
      */
     protected function createIndexName($type, array $columns)
     {
-        $index = strtolower($this->prefix.$this->table.'_'.implode('_', $columns).'_'.$type);
+        $table = str_contains($this->table, '.')
+            ? substr_replace($this->table, '.'.$this->prefix, strrpos($this->table, '.'), 1)
+            : $this->prefix.$this->table;
+
+        $index = strtolower($table.'_'.implode('_', $columns).'_'.$type);
 
         return str_replace(['-', '.'], '_', $index);
     }

@@ -17,6 +17,7 @@ use Illuminate\Database\RecordsNotFoundException;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ForwardsCalls;
 use ReflectionClass;
@@ -113,6 +114,7 @@ class Builder implements BuilderContract
         'insertgetid',
         'insertorignore',
         'insertusing',
+        'insertorignoreusing',
         'max',
         'min',
         'raw',
@@ -135,6 +137,13 @@ class Builder implements BuilderContract
      * @var array
      */
     protected $removedScopes = [];
+
+    /**
+     * The callbacks that should be invoked after retrieving data from the database.
+     *
+     * @var array
+     */
+    protected $afterQueryCallbacks = [];
 
     /**
      * Create a new Eloquent query builder instance.
@@ -201,7 +210,7 @@ class Builder implements BuilderContract
      * @param  array|null  $scopes
      * @return $this
      */
-    public function withoutGlobalScopes(array $scopes = null)
+    public function withoutGlobalScopes(?array $scopes = null)
     {
         if (! is_array($scopes)) {
             $scopes = array_keys($this->scopes);
@@ -523,7 +532,7 @@ class Builder implements BuilderContract
      * @param  \Closure|null  $callback
      * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection|static[]|static|mixed
      */
-    public function findOr($id, $columns = ['*'], Closure $callback = null)
+    public function findOr($id, $columns = ['*'], ?Closure $callback = null)
     {
         if ($columns instanceof Closure) {
             $callback = $columns;
@@ -626,7 +635,7 @@ class Builder implements BuilderContract
      * @param  \Closure|null  $callback
      * @return \Illuminate\Database\Eloquent\Model|static|mixed
      */
-    public function firstOr($columns = ['*'], Closure $callback = null)
+    public function firstOr($columns = ['*'], ?Closure $callback = null)
     {
         if ($columns instanceof Closure) {
             $callback = $columns;
@@ -722,7 +731,9 @@ class Builder implements BuilderContract
             $models = $builder->eagerLoadRelations($models);
         }
 
-        return $builder->getModel()->newCollection($models);
+        return $this->applyAfterQueryCallbacks(
+            $builder->getModel()->newCollection($models)
+        );
     }
 
     /**
@@ -852,6 +863,34 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Register a closure to be invoked after the query is executed.
+     *
+     * @param  \Closure  $callback
+     * @return $this
+     */
+    public function afterQuery(Closure $callback)
+    {
+        $this->afterQueryCallbacks[] = $callback;
+
+        return $this;
+    }
+
+    /**
+     * Invoke the "after query" modification callbacks.
+     *
+     * @param  mixed  $result
+     * @return mixed
+     */
+    public function applyAfterQueryCallbacks($result)
+    {
+        foreach ($this->afterQueryCallbacks as $afterQueryCallback) {
+            $result = $afterQueryCallback($result) ?: $result;
+        }
+
+        return $result;
+    }
+
+    /**
      * Get a lazy collection for the given query.
      *
      * @return \Illuminate\Support\LazyCollection
@@ -859,8 +898,10 @@ class Builder implements BuilderContract
     public function cursor()
     {
         return $this->applyScopes()->query->cursor()->map(function ($record) {
-            return $this->newModelInstance()->newFromBuilder($record);
-        });
+            $model = $this->newModelInstance()->newFromBuilder($record);
+
+            return $this->applyAfterQueryCallbacks($this->newModelInstance()->newCollection([$model]))->first();
+        })->reject(fn ($model) => is_null($model));
     }
 
     /**
@@ -888,6 +929,8 @@ class Builder implements BuilderContract
 
         $column = $column instanceof Expression ? $column->getValue($this->getGrammar()) : $column;
 
+        $column = Str::after($column, "{$this->model->getTable()}.");
+
         // If the model has a mutator for the requested column, we will spin through
         // the results and mutate the values so that the mutated version of these
         // columns are returned as you would expect from these Eloquent models.
@@ -897,9 +940,11 @@ class Builder implements BuilderContract
             return $results;
         }
 
-        return $results->map(function ($value) use ($column) {
-            return $this->model->newFromBuilder([$column => $value])->{$column};
-        });
+        return $this->applyAfterQueryCallbacks(
+            $results->map(function ($value) use ($column) {
+                return $this->model->newFromBuilder([$column => $value])->{$column};
+            })
+        );
     }
 
     /**
@@ -914,11 +959,11 @@ class Builder implements BuilderContract
      *
      * @throws \InvalidArgumentException
      */
-    public function paginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null)
+    public function paginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null, $total = null)
     {
         $page = $page ?: Paginator::resolveCurrentPage($pageName);
 
-        $total = func_num_args() === 5 ? value(func_get_arg(4)) : $this->toBase()->getCountForPagination();
+        $total = value($total) ?? $this->toBase()->getCountForPagination();
 
         $perPage = ($perPage instanceof Closure
             ? $perPage($total)
@@ -1453,9 +1498,9 @@ class Builder implements BuilderContract
         // Here we'll check if the given subset of where clauses contains any "or"
         // booleans and in this case create a nested where expression. That way
         // we don't add any unnecessary nesting thus keeping the query clean.
-        if ($whereBooleans->contains('or')) {
+        if ($whereBooleans->contains(fn ($logicalOperator) => str_contains($logicalOperator, 'or'))) {
             $query->wheres[] = $this->createNestedWhere(
-                $whereSlice, $whereBooleans->first()
+                $whereSlice, str_replace(' not', '', $whereBooleans->first())
             );
         } else {
             $query->wheres = array_merge($query->wheres, $whereSlice);

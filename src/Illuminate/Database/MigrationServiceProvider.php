@@ -59,7 +59,9 @@ class MigrationServiceProvider extends ServiceProvider implements DeferrableProv
     protected function registerRepository()
     {
         $this->app->singleton('migration.repository', function ($app) {
-            $table = $app['config']['database.migrations'];
+            $migrations = $app['config']['database.migrations'];
+
+            $table = is_array($migrations) ? ($migrations['table'] ?? null) : $migrations;
 
             return new DatabaseMigrationRepository($app['db'], $table);
         });
@@ -128,7 +130,9 @@ class MigrationServiceProvider extends ServiceProvider implements DeferrableProv
      */
     protected function registerMigrateFreshCommand()
     {
-        $this->app->singleton(FreshCommand::class);
+        $this->app->singleton(FreshCommand::class, function ($app) {
+            return new FreshCommand($app['migrator']);
+        });
     }
 
     /**

@@ -50,13 +50,17 @@ class SetCacheHeaders
             $options = $this->parseOptions($options);
         }
 
+        if (! $response->isSuccessful()) {
+            return $response;
+        }
+
         if (isset($options['etag']) && $options['etag'] === true) {
             $options['etag'] = $response->getEtag() ?? md5($response->getContent());
         }
 
         if (isset($options['last_modified'])) {
             if (is_numeric($options['last_modified'])) {
-                $options['last_modified'] = Carbon::createFromTimestamp($options['last_modified']);
+                $options['last_modified'] = Carbon::createFromTimestamp($options['last_modified'], date_default_timezone_get());
             } else {
                 $options['last_modified'] = Carbon::parse($options['last_modified']);
             }

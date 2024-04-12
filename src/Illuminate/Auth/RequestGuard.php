@@ -33,7 +33,7 @@ class RequestGuard implements Guard
      * @param  \Illuminate\Contracts\Auth\UserProvider|null  $provider
      * @return void
      */
-    public function __construct(callable $callback, Request $request, UserProvider $provider = null)
+    public function __construct(callable $callback, Request $request, ?UserProvider $provider = null)
     {
         $this->request = $request;
         $this->callback = $callback;

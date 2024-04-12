@@ -417,6 +417,69 @@ class SupportTestingQueueFakeTest extends TestCase
         $fake->assertPushed('JobStub', 1);
         $fake->assertPushed('JobStub', fn ($job, $queue, $payload) => $payload === ['job' => 'payload']);
     }
+
+    public function testAssertChainUsingClassesOrObjectsArray()
+    {
+        $job = new JobWithChainStub([
+            new JobStub,
+        ]);
+
+        $job->assertHasChain([
+            JobStub::class,
+        ]);
+
+        $job->assertHasChain([
+            new JobStub(),
+        ]);
+    }
+
+    public function testAssertNoChain()
+    {
+        $job = new JobWithChainStub([]);
+
+        $job->assertDoesntHaveChain();
+    }
+
+    public function testAssertChainErrorHandling()
+    {
+        $job = new JobWithChainStub([
+            new JobStub,
+        ]);
+
+        try {
+            $job->assertHasChain([]);
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertStringContainsString('The expected chain can not be empty.', $e->getMessage());
+        }
+
+        try {
+            $job->assertHasChain([
+                new JobStub,
+                new JobStub,
+            ]);
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertStringContainsString('The job does not have the expected chain.', $e->getMessage());
+        }
+
+        try {
+            $job->assertHasChain([
+                JobStub::class,
+                JobStub::class,
+            ]);
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertStringContainsString('The job does not have the expected chain.', $e->getMessage());
+        }
+
+        try {
+            $job->assertDoesntHaveChain();
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertStringContainsString('The job has chained jobs.', $e->getMessage());
+        }
+    }
 }
 
 class JobStub

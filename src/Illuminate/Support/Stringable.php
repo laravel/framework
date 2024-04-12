@@ -6,14 +6,15 @@ use ArrayAccess;
 use Closure;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Traits\Conditionable;
+use Illuminate\Support\Traits\Dumpable;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Support\Traits\Tappable;
 use JsonSerializable;
-use Symfony\Component\VarDumper\VarDumper;
+use Stringable as BaseStringable;
 
-class Stringable implements JsonSerializable, ArrayAccess
+class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
 {
-    use Conditionable, Macroable, Tappable;
+    use Conditionable, Dumpable, Macroable, Tappable;
 
     /**
      * The underlying string value.
@@ -204,7 +205,7 @@ class Stringable implements JsonSerializable, ArrayAccess
      * Convert the case of a string.
      *
      * @param  int  $mode
-     * @param  string  $encoding
+     * @param  string|null  $encoding
      * @return static
      */
     public function convertCase(int $mode = MB_CASE_FOLD, ?string $encoding = 'UTF-8')
@@ -508,6 +509,16 @@ class Stringable implements JsonSerializable, ArrayAccess
     }
 
     /**
+     * Remove all non-numeric characters from a string.
+     *
+     * @return static
+     */
+    public function numbers()
+    {
+        return new static(Str::numbers($this->value));
+    }
+
+    /**
      * Pad both sides of the string with another.
      *
      * @param  int  $length
@@ -720,7 +731,7 @@ class Stringable implements JsonSerializable, ArrayAccess
     /**
      * Replace the patterns matching the given regular expression.
      *
-     * @param  string  $pattern
+     * @param  array|string  $pattern
      * @param  \Closure|string  $replace
      * @param  int  $limit
      * @return static
@@ -769,7 +780,7 @@ class Stringable implements JsonSerializable, ArrayAccess
     /**
      * Strip HTML and PHP tags from the given string.
      *
-     * @param  string  $allowedTags
+     * @param  string[]|string|null  $allowedTags
      * @return static
      */
     public function stripTags($allowedTags = null)
@@ -957,7 +968,7 @@ class Stringable implements JsonSerializable, ArrayAccess
      */
     public function trim($characters = null)
     {
-        return new static(trim(...array_merge([$this->value], func_get_args())));
+        return new static(Str::trim(...array_merge([$this->value], func_get_args())));
     }
 
     /**
@@ -968,7 +979,7 @@ class Stringable implements JsonSerializable, ArrayAccess
      */
     public function ltrim($characters = null)
     {
-        return new static(ltrim(...array_merge([$this->value], func_get_args())));
+        return new static(Str::ltrim(...array_merge([$this->value], func_get_args())));
     }
 
     /**
@@ -979,7 +990,7 @@ class Stringable implements JsonSerializable, ArrayAccess
      */
     public function rtrim($characters = null)
     {
-        return new static(rtrim(...array_merge([$this->value], func_get_args())));
+        return new static(Str::rtrim(...array_merge([$this->value], func_get_args())));
     }
 
     /**
@@ -1225,6 +1236,18 @@ class Stringable implements JsonSerializable, ArrayAccess
     }
 
     /**
+     * Unwrap the string with the given strings.
+     *
+     * @param  string  $before
+     * @param  string|null  $after
+     * @return static
+     */
+    public function unwrap($before, $after = null)
+    {
+        return new static(Str::unwrap($this->value, $before, $after));
+    }
+
+    /**
      * Convert the string into a `HtmlString` instance.
      *
      * @return \Illuminate\Support\HtmlString
@@ -1235,27 +1258,37 @@ class Stringable implements JsonSerializable, ArrayAccess
     }
 
     /**
-     * Dump the string.
+     * Convert the string to Base64 encoding.
      *
-     * @return $this
+     * @return static
      */
-    public function dump()
+    public function toBase64()
     {
-        VarDumper::dump($this->value);
-
-        return $this;
+        return new static(base64_encode($this->value));
     }
 
     /**
-     * Dump the string and end the script.
+     * Decode the Base64 encoded string.
      *
-     * @return never
+     * @param  bool  $strict
+     * @return static
      */
-    public function dd()
+    public function fromBase64($strict = false)
     {
-        $this->dump();
+        return new static(base64_decode($this->value, $strict));
+    }
 
-        exit(1);
+    /**
+     * Dump the string.
+     *
+     * @param  mixed  ...$args
+     * @return $this
+     */
+    public function dump(...$args)
+    {
+        dump($this->value, ...$args);
+
+        return $this;
     }
 
     /**
@@ -1281,11 +1314,12 @@ class Stringable implements JsonSerializable, ArrayAccess
     /**
      * Get the underlying string value as an integer.
      *
+     * @param  int  $base
      * @return int
      */
-    public function toInteger()
+    public function toInteger($base = 10)
     {
-        return intval($this->value);
+        return intval($this->value, $base);
     }
 
     /**

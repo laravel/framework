@@ -381,6 +381,19 @@ class FileStore implements Store, LockProvider
     }
 
     /**
+     * Set the working directory of the cache.
+     *
+     * @param  string  $directory
+     * @return $this
+     */
+    public function setDirectory($directory)
+    {
+        $this->directory = $directory;
+
+        return $this;
+    }
+
+    /**
      * Set the cache directory where locks should be stored.
      *
      * @param  string|null  $lockDirectory

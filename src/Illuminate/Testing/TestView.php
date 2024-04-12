@@ -10,8 +10,9 @@ use Illuminate\Support\Traits\Macroable;
 use Illuminate\Testing\Assert as PHPUnit;
 use Illuminate\Testing\Constraints\SeeInOrder;
 use Illuminate\View\View;
+use Stringable;
 
-class TestView
+class TestView implements Stringable
 {
     use Macroable;
 
@@ -108,12 +109,14 @@ class TestView
 
     /**
      * Assert that the view's rendered content is empty.
+     *
+     * @return $this
      */
     public function assertViewEmpty()
     {
         PHPUnit::assertEmpty($this->rendered);
 
-        return true;
+        return $this;
     }
 
     /**

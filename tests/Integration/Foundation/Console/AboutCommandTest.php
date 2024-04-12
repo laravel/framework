@@ -11,13 +11,13 @@ class AboutCommandTest extends TestCase
 {
     public function testItCanDisplayAboutCommandAsJson()
     {
-        $process = remote('about --json')->mustRun();
+        $process = remote('about --json', ['APP_ENV' => 'local'])->mustRun();
 
         tap(json_decode($process->getOutput(), true), function ($output) {
             Assert::assertArraySubset([
                 'application_name' => 'Laravel',
                 'php_version' => PHP_VERSION,
-                'environment' => 'testing',
+                'environment' => 'local',
                 'debug_mode' => true,
                 'url' => 'localhost',
                 'maintenance_mode' => false,
@@ -31,12 +31,12 @@ class AboutCommandTest extends TestCase
 
             Assert::assertArraySubset([
                 'broadcasting' => 'log',
-                'cache' => 'file',
+                'cache' => 'database',
                 'database' => 'testing',
                 'logs' => ['single'],
-                'mail' => 'smtp',
-                'queue' => 'sync',
-                'session' => 'file',
+                'mail' => 'log',
+                'queue' => 'database',
+                'session' => 'cookie',
             ], $output['drivers']);
         });
     }

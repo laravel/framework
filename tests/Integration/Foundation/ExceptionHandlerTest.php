@@ -8,6 +8,7 @@ use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Route;
 use Orchestra\Testbench\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Process\PhpProcess;
 use Throwable;
 
@@ -123,9 +124,22 @@ class ExceptionHandlerTest extends TestCase
             ]);
     }
 
-    /**
-     * @dataProvider exitCodesProvider
-     */
+    public function testItReturns400CodeOnMalformedRequests()
+    {
+        // HTTP request...
+        $this->post('test-route', ['_method' => '__construct'])
+            ->assertStatus(400)
+            ->assertSeeText('Bad Request'); // see https://github.com/symfony/symfony/blob/1d439995eb6d780531b97094ff5fa43e345fc42e/src/Symfony/Component/ErrorHandler/Resources/views/error.html.php#L12
+
+        // JSON request...
+        $this->postJson('test-route', ['_method' => '__construct'])
+            ->assertStatus(400)
+            ->assertExactJson([
+                'message' => 'Bad request.',
+            ]);
+    }
+
+    #[DataProvider('exitCodesProvider')]
     public function testItReturnsNonZeroExitCodesForUncaughtExceptions($providers, $successful)
     {
         $basePath = static::applicationBasePath();

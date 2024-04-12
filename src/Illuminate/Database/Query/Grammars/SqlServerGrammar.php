@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Query\Grammars;
 
 use Illuminate\Database\Query\Builder;
+use Illuminate\Database\Query\JoinLateralClause;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 
@@ -313,6 +314,22 @@ class SqlServerGrammar extends Grammar
     }
 
     /**
+     * Compile a row number clause.
+     *
+     * @param  string  $partition
+     * @param  string  $orders
+     * @return string
+     */
+    protected function compileRowNumber($partition, $orders)
+    {
+        if (empty($orders)) {
+            $orders = 'order by (select 0)';
+        }
+
+        return parent::compileRowNumber($partition, $orders);
+    }
+
+    /**
      * Compile the "offset" portions of the query.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
@@ -442,6 +459,20 @@ class SqlServerGrammar extends Grammar
         return array_values(
             array_merge($values, Arr::flatten($cleanBindings))
         );
+    }
+
+    /**
+     * Compile a "lateral join" clause.
+     *
+     * @param  \Illuminate\Database\Query\JoinLateralClause  $join
+     * @param  string  $expression
+     * @return string
+     */
+    public function compileJoinLateral(JoinLateralClause $join, string $expression): string
+    {
+        $type = $join->type == 'left' ? 'outer' : 'cross';
+
+        return trim("{$type} apply {$expression}");
     }
 
     /**

@@ -4,9 +4,11 @@ namespace Illuminate\Tests\Support;
 
 use Exception;
 use Illuminate\Support\Str;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\UuidInterface;
 use ReflectionClass;
+use ValueError;
 
 class SupportStrTest extends TestCase
 {
@@ -35,6 +37,17 @@ class SupportStrTest extends TestCase
     {
         $this->assertSame('Jefferson Costella', Str::title('jefferson costella'));
         $this->assertSame('Jefferson Costella', Str::title('jefFErson coSTella'));
+
+        $this->assertSame('', Str::title(''));
+        $this->assertSame('123 Laravel', Str::title('123 laravel'));
+        $this->assertSame('❤Laravel', Str::title('❤laravel'));
+        $this->assertSame('Laravel ❤', Str::title('laravel ❤'));
+        $this->assertSame('Laravel123', Str::title('laravel123'));
+        $this->assertSame('Laravel123', Str::title('Laravel123'));
+
+        $longString = 'lorem ipsum '.str_repeat('dolor sit amet ', 1000);
+        $expectedResult = 'Lorem Ipsum Dolor Sit Amet '.str_repeat('Dolor Sit Amet ', 999);
+        $this->assertSame($expectedResult, Str::title($longString));
     }
 
     public function testStringHeadline()
@@ -96,6 +109,9 @@ class SupportStrTest extends TestCase
         $this->assertSame('To Kill a Mockingbird', Str::apa('to kill a mockingbird'));
         $this->assertSame('To Kill a Mockingbird', Str::apa('TO KILL A MOCKINGBIRD'));
         $this->assertSame('To Kill a Mockingbird', Str::apa('To Kill A Mockingbird'));
+
+        $this->assertSame('', Str::apa(''));
+        $this->assertSame('   ', Str::apa('   '));
     }
 
     public function testStringWithoutWordsDoesntProduceError()
@@ -318,17 +334,13 @@ class SupportStrTest extends TestCase
         $this->assertSame('foo', Str::afterLast('----foo', '---'));
     }
 
-    /**
-     * @dataProvider strContainsProvider
-     */
+    #[DataProvider('strContainsProvider')]
     public function testStrContains($haystack, $needles, $expected, $ignoreCase = false)
     {
         $this->assertEquals($expected, Str::contains($haystack, $needles, $ignoreCase));
     }
 
-    /**
-     * @dataProvider strContainsAllProvider
-     */
+    #[DataProvider('strContainsAllProvider')]
     public function testStrContainsAll($haystack, $needles, $expected, $ignoreCase = false)
     {
         $this->assertEquals($expected, Str::containsAll($haystack, $needles, $ignoreCase));
@@ -425,6 +437,15 @@ class SupportStrTest extends TestCase
         $this->assertEquals('foo-bar-baz', Str::wrap('-bar-', 'foo', 'baz'));
     }
 
+    public function testUnwrap()
+    {
+        $this->assertEquals('value', Str::unwrap('"value"', '"'));
+        $this->assertEquals('value', Str::unwrap('"value', '"'));
+        $this->assertEquals('value', Str::unwrap('value"', '"'));
+        $this->assertEquals('bar', Str::unwrap('foo-bar-baz', 'foo-', '-baz'));
+        $this->assertEquals('some: "json"', Str::unwrap('{some: "json"}', '{', '}'));
+    }
+
     public function testIs()
     {
         $this->assertTrue(Str::is('/', '/'));
@@ -472,17 +493,13 @@ class SupportStrTest extends TestCase
         $this->assertFalse(Str::isUrl('invalid url'));
     }
 
-    /**
-     * @dataProvider validUuidList
-     */
+    #[DataProvider('validUuidList')]
     public function testIsUuidWithValidUuid($uuid)
     {
         $this->assertTrue(Str::isUuid($uuid));
     }
 
-    /**
-     * @dataProvider invalidUuidList
-     */
+    #[DataProvider('invalidUuidList')]
     public function testIsUuidWithInvalidUuid($uuid)
     {
         $this->assertFalse(Str::isUuid($uuid));
@@ -527,6 +544,9 @@ class SupportStrTest extends TestCase
     public function testKebab()
     {
         $this->assertSame('laravel-php-framework', Str::kebab('LaravelPhpFramework'));
+        $this->assertSame('laravel-php-framework', Str::kebab('Laravel Php Framework'));
+        $this->assertSame('laravel❤-php-framework', Str::kebab('Laravel ❤ Php Framework'));
+        $this->assertSame('', Str::kebab(''));
     }
 
     public function testLower()
@@ -560,6 +580,17 @@ class SupportStrTest extends TestCase
     {
         $this->assertEquals(11, Str::length('foo bar baz'));
         $this->assertEquals(11, Str::length('foo bar baz', 'UTF-8'));
+    }
+
+    public function testNumbers()
+    {
+        $this->assertSame('5551234567', Str::numbers('(555) 123-4567'));
+        $this->assertSame('443', Str::numbers('L4r4v3l!'));
+        $this->assertSame('', Str::numbers('Laravel!'));
+
+        $arrayValue = ['(555) 123-4567', 'L4r4v3l', 'Laravel!'];
+        $arrayExpected = ['5551234567', '443', ''];
+        $this->assertSame($arrayExpected, Str::numbers($arrayValue));
     }
 
     public function testRandom()
@@ -748,6 +779,83 @@ class SupportStrTest extends TestCase
         $this->assertSame('foo-_bar', Str::snake('Foo-Bar'));
         $this->assertSame('foo__bar', Str::snake('Foo_Bar'));
         $this->assertSame('żółtałódka', Str::snake('ŻółtaŁódka'));
+    }
+
+    public function testTrim()
+    {
+        $this->assertSame('foo bar', Str::trim('   foo bar   '));
+        $this->assertSame('foo bar', Str::trim('foo bar   '));
+        $this->assertSame('foo bar', Str::trim('   foo bar'));
+        $this->assertSame('foo bar', Str::trim('foo bar'));
+        $this->assertSame(' foo bar ', Str::trim(' foo bar ', ''));
+        $this->assertSame('foo bar', Str::trim(' foo bar ', ' '));
+        $this->assertSame('foo  bar', Str::trim('-foo  bar_', '-_'));
+
+        $this->assertSame('foo    bar', Str::trim(' foo    bar '));
+
+        $this->assertSame('123', Str::trim('   123    '));
+        $this->assertSame('だ', Str::trim('だ'));
+        $this->assertSame('ム', Str::trim('ム'));
+        $this->assertSame('だ', Str::trim('   だ    '));
+        $this->assertSame('ム', Str::trim('   ム    '));
+
+        $this->assertSame(
+            'foo bar',
+            Str::trim('
+                foo bar
+            ')
+        );
+        $this->assertSame(
+            'foo
+                bar',
+            Str::trim('
+                foo
+                bar
+            ')
+        );
+
+        $this->assertSame("\xE9", Str::trim(" \xE9 "));
+    }
+
+    public function testLtrim()
+    {
+        $this->assertSame('foo    bar ', Str::ltrim(' foo    bar '));
+
+        $this->assertSame('123    ', Str::ltrim('   123    '));
+        $this->assertSame('だ', Str::ltrim('だ'));
+        $this->assertSame('ム', Str::ltrim('ム'));
+        $this->assertSame('だ    ', Str::ltrim('   だ    '));
+        $this->assertSame('ム    ', Str::ltrim('   ム    '));
+
+        $this->assertSame(
+            'foo bar
+            ',
+            Str::ltrim('
+                foo bar
+            ')
+        );
+        $this->assertSame("\xE9 ", Str::ltrim(" \xE9 "));
+    }
+
+    public function testRtrim()
+    {
+        $this->assertSame(' foo    bar', Str::rtrim(' foo    bar '));
+
+        $this->assertSame('   123', Str::rtrim('   123    '));
+        $this->assertSame('だ', Str::rtrim('だ'));
+        $this->assertSame('ム', Str::rtrim('ム'));
+        $this->assertSame('   だ', Str::rtrim('   だ    '));
+        $this->assertSame('   ム', Str::rtrim('   ム    '));
+
+        $this->assertSame(
+            '
+                foo bar',
+            Str::rtrim('
+                foo bar
+            ')
+        );
+
+        $this->assertSame(" \xE9", Str::rtrim(" \xE9 "));
     }
 
     public function testSquish()
@@ -1103,13 +1211,19 @@ class SupportStrTest extends TestCase
 
     public function testRepeat()
     {
+        $this->assertSame('', Str::repeat('Hello', 0));
+        $this->assertSame('Hello', Str::repeat('Hello', 1));
         $this->assertSame('aaaaa', Str::repeat('a', 5));
         $this->assertSame('', Str::repeat('', 5));
     }
 
-    /**
-     * @dataProvider specialCharacterProvider
-     */
+    public function testRepeatWhenTimesIsNegative()
+    {
+        $this->expectException(ValueError::class);
+        Str::repeat('Hello', -2);
+    }
+
+    #[DataProvider('specialCharacterProvider')]
     public function testTransliterate(string $value, string $expected): void
     {
         $this->assertSame($expected, Str::transliterate($value));
@@ -1135,9 +1249,7 @@ class SupportStrTest extends TestCase
         $this->assertSame('Hello', Str::transliterate('🎂', 'Hello'));
     }
 
-    /**
-     * @dataProvider specialCharacterProvider
-     */
+    #[DataProvider('specialCharacterProvider')]
     public function testTransliterateStrict(string $value, string $expected): void
     {
         $this->assertSame($expected, Str::transliterate($value, '?', true));
@@ -1360,6 +1472,18 @@ class SupportStrTest extends TestCase
         $this->assertTrue(
             Str::of(Str::password())->contains(['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'])
         );
+    }
+
+    public function testToBase64()
+    {
+        $this->assertSame(base64_encode('foo'), Str::toBase64('foo'));
+        $this->assertSame(base64_encode('foobar'), Str::toBase64('foobar'));
+    }
+
+    public function testFromBase64()
+    {
+        $this->assertSame('foo', Str::fromBase64(base64_encode('foo')));
+        $this->assertSame('foobar', Str::fromBase64(base64_encode('foobar'), true));
     }
 }
 

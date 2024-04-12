@@ -6,7 +6,9 @@ use Illuminate\Contracts\Console\PromptsForMissingInput;
 use Illuminate\Database\Migrations\MigrationCreator;
 use Illuminate\Support\Composer;
 use Illuminate\Support\Str;
+use Symfony\Component\Console\Attribute\AsCommand;
 
+#[AsCommand(name: 'make:migration')]
 class MigrateMakeCommand extends BaseCommand implements PromptsForMissingInput
 {
     /**

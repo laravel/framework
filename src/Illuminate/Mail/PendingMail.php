@@ -125,6 +125,17 @@ class PendingMail
     }
 
     /**
+     * Send a new mailable message instance synchronously.
+     *
+     * @param  \Illuminate\Contracts\Mail\Mailable  $mailable
+     * @return \Illuminate\Mail\SentMessage|null
+     */
+    public function sendNow(MailableContract $mailable)
+    {
+        return $this->mailer->sendNow($this->fill($mailable));
+    }
+
+    /**
      * Push the given mailable onto the queue.
      *
      * @param  \Illuminate\Contracts\Mail\Mailable  $mailable

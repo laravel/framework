@@ -132,7 +132,7 @@ class PendingChain
     }
 
     /**
-     * Dispatch the job with the given arguments.
+     * Dispatch the job chain.
      *
      * @return \Illuminate\Foundation\Bus\PendingDispatch
      */
@@ -164,5 +164,27 @@ class PendingChain
         $firstJob->chainCatchCallbacks = $this->catchCallbacks();
 
         return app(Dispatcher::class)->dispatch($firstJob);
+    }
+
+    /**
+     * Dispatch the job chain if the given truth test passes.
+     *
+     * @param  bool|\Closure  $boolean
+     * @return \Illuminate\Foundation\Bus\PendingDispatch|null
+     */
+    public function dispatchIf($boolean)
+    {
+        return value($boolean) ? $this->dispatch() : null;
+    }
+
+    /**
+     * Dispatch the job chain unless the given truth test passes.
+     *
+     * @param  bool|\Closure  $boolean
+     * @return \Illuminate\Foundation\Bus\PendingDispatch|null
+     */
+    public function dispatchUnless($boolean)
+    {
+        return ! value($boolean) ? $this->dispatch() : null;
     }
 }

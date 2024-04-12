@@ -7,6 +7,7 @@ use Illuminate\Database\Concerns\CompilesJsonPaths;
 use Illuminate\Database\Grammar as BaseGrammar;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\JoinClause;
+use Illuminate\Database\Query\JoinLateralClause;
 use Illuminate\Support\Arr;
 use RuntimeException;
 
@@ -58,6 +59,17 @@ class Grammar extends BaseGrammar
     {
         if (($query->unions || $query->havings) && $query->aggregate) {
             return $this->compileUnionAggregate($query);
+        }
+
+        // If a "group limit" is in place, we will need to compile the SQL to use a
+        // different syntax. This primarily supports limits on eager loads using
+        // Eloquent. We'll also set the columns if they have not been defined.
+        if (isset($query->groupLimit)) {
+            if (is_null($query->columns)) {
+                $query->columns = ['*'];
+            }
+
+            return $this->compileGroupLimit($query);
         }
 
         // If the query does not have any columns set, we'll set the columns to the
@@ -182,8 +194,26 @@ class Grammar extends BaseGrammar
 
             $tableAndNestedJoins = is_null($join->joins) ? $table : '('.$table.$nestedJoins.')';
 
+            if ($join instanceof JoinLateralClause) {
+                return $this->compileJoinLateral($join, $tableAndNestedJoins);
+            }
+
             return trim("{$join->type} join {$tableAndNestedJoins} {$this->compileWheres($join)}");
         })->implode(' ');
+    }
+
+    /**
+     * Compile a "lateral join" clause.
+     *
+     * @param  \Illuminate\Database\Query\JoinLateralClause  $join
+     * @param  string  $expression
+     * @return string
+     *
+     * @throws \RuntimeException
+     */
+    public function compileJoinLateral(JoinLateralClause $join, string $expression): string
+    {
+        throw new RuntimeException('This database engine does not support lateral joins.');
     }
 
     /**
@@ -918,6 +948,66 @@ class Grammar extends BaseGrammar
     }
 
     /**
+     * Compile a group limit clause.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @return string
+     */
+    protected function compileGroupLimit(Builder $query)
+    {
+        $selectBindings = array_merge($query->getRawBindings()['select'], $query->getRawBindings()['order']);
+
+        $query->setBindings($selectBindings, 'select');
+        $query->setBindings([], 'order');
+
+        $limit = (int) $query->groupLimit['value'];
+        $offset = $query->offset;
+
+        if (isset($offset)) {
+            $offset = (int) $offset;
+            $limit += $offset;
+
+            $query->offset = null;
+        }
+
+        $components = $this->compileComponents($query);
+
+        $components['columns'] .= $this->compileRowNumber(
+            $query->groupLimit['column'],
+            $components['orders'] ?? ''
+        );
+
+        unset($components['orders']);
+
+        $table = $this->wrap('laravel_table');
+        $row = $this->wrap('laravel_row');
+
+        $sql = $this->concatenate($components);
+
+        $sql = 'select * from ('.$sql.') as '.$table.' where '.$row.' <= '.$limit;
+
+        if (isset($offset)) {
+            $sql .= ' and '.$row.' > '.$offset;
+        }
+
+        return $sql.' order by '.$row;
+    }
+
+    /**
+     * Compile a row number clause.
+     *
+     * @param  string  $partition
+     * @param  string  $orders
+     * @return string
+     */
+    protected function compileRowNumber($partition, $orders)
+    {
+        $over = trim('partition by '.$this->wrap($partition).' '.$orders);
+
+        return ', row_number() over ('.$over.') as '.$this->wrap('laravel_row');
+    }
+
+    /**
      * Compile the "offset" portions of the query.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
@@ -1091,6 +1181,21 @@ class Grammar extends BaseGrammar
     }
 
     /**
+     * Compile an insert ignore statement using a subquery into SQL.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $columns
+     * @param  string  $sql
+     * @return string
+     *
+     * @throws \RuntimeException
+     */
+    public function compileInsertOrIgnoreUsing(Builder $query, array $columns, string $sql)
+    {
+        throw new RuntimeException('This database engine does not support inserting while ignoring errors.');
+    }
+
+    /**
      * Compile an update statement into SQL.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
@@ -1182,6 +1287,8 @@ class Grammar extends BaseGrammar
     public function prepareBindingsForUpdate(array $bindings, array $values)
     {
         $cleanBindings = Arr::except($bindings, ['select', 'join']);
+
+        $values = Arr::flatten(array_map(fn ($value) => value($value), $values));
 
         return array_values(
             array_merge($bindings['join'], $values, Arr::flatten($cleanBindings))

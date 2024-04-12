@@ -8,7 +8,10 @@ use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Jobs\BeanstalkdJob;
 use Mockery as m;
-use Pheanstalk\Job;
+use Pheanstalk\Contract\JobIdInterface;
+use Pheanstalk\Contract\PheanstalkManagerInterface;
+use Pheanstalk\Contract\PheanstalkPublisherInterface;
+use Pheanstalk\Contract\PheanstalkSubscriberInterface;
 use Pheanstalk\Pheanstalk;
 use PHPUnit\Framework\TestCase;
 use stdClass;
@@ -71,8 +74,8 @@ class QueueBeanstalkdJobTest extends TestCase
     {
         return new BeanstalkdJob(
             m::mock(Container::class),
-            m::mock(Pheanstalk::class),
-            m::mock(Job::class),
+            m::mock(implode(',', [PheanstalkManagerInterface::class, PheanstalkPublisherInterface::class, PheanstalkSubscriberInterface::class])),
+            m::mock(JobIdInterface::class),
             'connection-name',
             'default'
         );

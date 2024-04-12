@@ -391,6 +391,27 @@ class Str
     }
 
     /**
+     * Unwrap the string with the given strings.
+     *
+     * @param  string  $value
+     * @param  string  $before
+     * @param  string|null  $after
+     * @return string
+     */
+    public static function unwrap($value, $before, $after = null)
+    {
+        if (static::startsWith($value, $before)) {
+            $value = static::substr($value, static::length($before));
+        }
+
+        if (static::endsWith($value, $after ??= $before)) {
+            $value = static::substr($value, 0, -static::length($after));
+        }
+
+        return $value;
+    }
+
+    /**
      * Determine if a given string matches a given pattern.
      *
      * @param  string|iterable<string>  $pattern
@@ -521,7 +542,7 @@ class Str
             return false;
         }
 
-        return preg_match('/^[\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12}$/iD', $value) > 0;
+        return preg_match('/^[\da-fA-F]{8}-[\da-fA-F]{4}-[\da-fA-F]{4}-[\da-fA-F]{4}-[\da-fA-F]{12}$/D', $value) > 0;
     }
 
     /**
@@ -741,6 +762,17 @@ class Str
     }
 
     /**
+     * Remove all non-numeric characters from a string.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    public static function numbers($value)
+    {
+        return preg_replace('/[^0-9]/', '', $value);
+    }
+
+    /**
      * Pad both sides of a string with another.
      *
      * @param  string  $value
@@ -938,7 +970,7 @@ class Str
      * @param  callable|null  $factory
      * @return void
      */
-    public static function createRandomStringsUsing(callable $factory = null)
+    public static function createRandomStringsUsing(?callable $factory = null)
     {
         static::$randomStringFactory = $factory;
     }
@@ -1167,7 +1199,7 @@ class Str
     /**
      * Replace the patterns matching the given regular expression.
      *
-     * @param  string  $pattern
+     * @param  array|string  $pattern
      * @param  \Closure|string  $replace
      * @param  array|string  $subject
      * @param  int  $limit
@@ -1277,6 +1309,10 @@ class Str
      */
     public static function apa($value)
     {
+        if (trim($value) === '') {
+            return $value;
+        }
+
         $minorWords = [
             'and', 'as', 'but', 'for', 'if', 'nor', 'or', 'so', 'yet', 'a', 'an',
             'the', 'at', 'by', 'for', 'in', 'of', 'off', 'on', 'per', 'to', 'up', 'via',
@@ -1383,6 +1419,54 @@ class Str
     }
 
     /**
+     * Remove all whitespace from both ends of a string.
+     *
+     * @param  string  $value
+     * @param  string|null  $charlist
+     * @return string
+     */
+    public static function trim($value, $charlist = null)
+    {
+        if ($charlist === null) {
+            return preg_replace('~^[\s\x{FEFF}\x{200B}\x{200E}]+|[\s\x{FEFF}\x{200B}\x{200E}]+$~u', '', $value) ?? trim($value);
+        }
+
+        return trim($value, $charlist);
+    }
+
+    /**
+     * Remove all whitespace from the beginning of a string.
+     *
+     * @param  string  $value
+     * @param  string|null  $charlist
+     * @return string
+     */
+    public static function ltrim($value, $charlist = null)
+    {
+        if ($charlist === null) {
+            return preg_replace('~^[\s\x{FEFF}\x{200B}\x{200E}]+~u', '', $value) ?? ltrim($value);
+        }
+
+        return ltrim($value, $charlist);
+    }
+
+    /**
+     * Remove all whitespace from the end of a string.
+     *
+     * @param  string  $value
+     * @param  string|null  $charlist
+     * @return string
+     */
+    public static function rtrim($value, $charlist = null)
+    {
+        if ($charlist === null) {
+            return preg_replace('~[\s\x{FEFF}\x{200B}\x{200E}]+$~u', '', $value) ?? rtrim($value);
+        }
+
+        return rtrim($value, $charlist);
+    }
+
+    /**
      * Remove all "extra" blank space from the given string.
      *
      * @param  string  $value
@@ -1390,7 +1474,7 @@ class Str
      */
     public static function squish($value)
     {
-        return preg_replace('~(\s|\x{3164}|\x{1160})+~u', ' ', preg_replace('~^[\s\x{FEFF}]+|[\s\x{FEFF}]+$~u', '', $value));
+        return preg_replace('~(\s|\x{3164}|\x{1160})+~u', ' ', static::trim($value));
     }
 
     /**
@@ -1515,6 +1599,29 @@ class Str
     }
 
     /**
+     * Convert the given string to Base64 encoding.
+     *
+     * @param  string  $string
+     * @return string
+     */
+    public static function toBase64($string): string
+    {
+        return base64_encode($string);
+    }
+
+    /**
+     * Decode the given Base64 encoded string.
+     *
+     * @param  string  $string
+     * @param  bool  $strict
+     * @return string|false
+     */
+    public static function fromBase64($string, $strict = false)
+    {
+        return base64_decode($string, $strict);
+    }
+
+    /**
      * Make a string's first character lowercase.
      *
      * @param  string  $string
@@ -1586,7 +1693,7 @@ class Str
     }
 
     /**
-     * Generate a time-ordered UUID (version 4).
+     * Generate a time-ordered UUID.
      *
      * @return \Ramsey\Uuid\UuidInterface
      */
@@ -1616,7 +1723,7 @@ class Str
      * @param  callable|null  $factory
      * @return void
      */
-    public static function createUuidsUsing(callable $factory = null)
+    public static function createUuidsUsing(?callable $factory = null)
     {
         static::$uuidFactory = $factory;
     }
@@ -1661,7 +1768,7 @@ class Str
      * @param  \Closure|null  $callback
      * @return \Ramsey\Uuid\UuidInterface
      */
-    public static function freezeUuids(Closure $callback = null)
+    public static function freezeUuids(?Closure $callback = null)
     {
         $uuid = Str::uuid();
 
@@ -1723,7 +1830,7 @@ class Str
      * @param  callable|null  $factory
      * @return void
      */
-    public static function createUlidsUsing(callable $factory = null)
+    public static function createUlidsUsing(?callable $factory = null)
     {
         static::$ulidFactory = $factory;
     }
@@ -1768,7 +1875,7 @@ class Str
      * @param  Closure|null  $callback
      * @return Ulid
      */
-    public static function freezeUlids(Closure $callback = null)
+    public static function freezeUlids(?Closure $callback = null)
     {
         $ulid = Str::ulid();
 

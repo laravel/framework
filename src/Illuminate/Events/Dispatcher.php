@@ -72,7 +72,7 @@ class Dispatcher implements DispatcherContract
      * @param  \Illuminate\Contracts\Container\Container|null  $container
      * @return void
      */
-    public function __construct(ContainerContract $container = null)
+    public function __construct(?ContainerContract $container = null)
     {
         $this->container = $container ?: new Container;
     }
@@ -674,6 +674,7 @@ class Dispatcher implements DispatcherContract
             $job->retryUntil = method_exists($listener, 'retryUntil') ? $listener->retryUntil(...$data) : null;
             $job->shouldBeEncrypted = $listener instanceof ShouldBeEncrypted;
             $job->timeout = $listener->timeout ?? null;
+            $job->failOnTimeout = $listener->failOnTimeout ?? false;
             $job->tries = $listener->tries ?? null;
 
             $job->through(array_merge(

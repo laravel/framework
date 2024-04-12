@@ -77,10 +77,10 @@ class Envelope
      * Create a new message envelope instance.
      *
      * @param  \Illuminate\Mail\Mailables\Address|string|null  $from
-     * @param  array  $to
-     * @param  array  $cc
-     * @param  array  $bcc
-     * @param  array  $replyTo
+     * @param  array<int, \Illuminate\Mail\Mailables\Address|string>  $to
+     * @param  array<int, \Illuminate\Mail\Mailables\Address|string>  $cc
+     * @param  array<int, \Illuminate\Mail\Mailables\Address|string>  $bcc
+     * @param  array<int, \Illuminate\Mail\Mailables\Address|string>  $replyTo
      * @param  string|null  $subject
      * @param  array  $tags
      * @param  array  $metadata
@@ -89,7 +89,7 @@ class Envelope
      *
      * @named-arguments-supported
      */
-    public function __construct(Address|string $from = null, $to = [], $cc = [], $bcc = [], $replyTo = [], string $subject = null, array $tags = [], array $metadata = [], Closure|array $using = [])
+    public function __construct(Address|string|null $from = null, $to = [], $cc = [], $bcc = [], $replyTo = [], ?string $subject = null, array $tags = [], array $metadata = [], Closure|array $using = [])
     {
         $this->from = is_string($from) ? new Address($from) : $from;
         $this->to = $this->normalizeAddresses($to);
@@ -105,8 +105,8 @@ class Envelope
     /**
      * Normalize the given array of addresses.
      *
-     * @param  array  $addresses
-     * @return array
+     * @param  array<int, \Illuminate\Mail\Mailables\Address|string>  $addresses
+     * @return array<int, \Illuminate\Mail\Mailables\Address>
      */
     protected function normalizeAddresses($addresses)
     {
@@ -132,7 +132,7 @@ class Envelope
     /**
      * Add a "to" recipient to the message envelope.
      *
-     * @param  \Illuminate\Mail\Mailables\Address|array|string  $address
+     * @param  \Illuminate\Mail\Mailables\Address|array<int, \Illuminate\Mail\Mailables\Address|string>|string  $address
      * @param  string|null  $name
      * @return $this
      */
@@ -148,7 +148,7 @@ class Envelope
     /**
      * Add a "cc" recipient to the message envelope.
      *
-     * @param  \Illuminate\Mail\Mailables\Address|array|string  $address
+     * @param  \Illuminate\Mail\Mailables\Address|array<int, \Illuminate\Mail\Mailables\Address|string>|string  $address
      * @param  string|null  $name
      * @return $this
      */
@@ -164,7 +164,7 @@ class Envelope
     /**
      * Add a "bcc" recipient to the message envelope.
      *
-     * @param  \Illuminate\Mail\Mailables\Address|array|string  $address
+     * @param  \Illuminate\Mail\Mailables\Address|array<int, \Illuminate\Mail\Mailables\Address|string>|string  $address
      * @param  string|null  $name
      * @return $this
      */
@@ -180,7 +180,7 @@ class Envelope
     /**
      * Add a "reply to" recipient to the message envelope.
      *
-     * @param  \Illuminate\Mail\Mailables\Address|array|string  $address
+     * @param  \Illuminate\Mail\Mailables\Address|array<int, \Illuminate\Mail\Mailables\Address|string>|string  $address
      * @param  string|null  $name
      * @return $this
      */
@@ -266,7 +266,7 @@ class Envelope
      * @param  string|null  $name
      * @return bool
      */
-    public function isFrom(string $address, string $name = null)
+    public function isFrom(string $address, ?string $name = null)
     {
         if (is_null($name)) {
             return $this->from->address === $address;
@@ -283,7 +283,7 @@ class Envelope
      * @param  string|null  $name
      * @return bool
      */
-    public function hasTo(string $address, string $name = null)
+    public function hasTo(string $address, ?string $name = null)
     {
         return $this->hasRecipient($this->to, $address, $name);
     }
@@ -295,7 +295,7 @@ class Envelope
      * @param  string|null  $name
      * @return bool
      */
-    public function hasCc(string $address, string $name = null)
+    public function hasCc(string $address, ?string $name = null)
     {
         return $this->hasRecipient($this->cc, $address, $name);
     }
@@ -307,7 +307,7 @@ class Envelope
      * @param  string|null  $name
      * @return bool
      */
-    public function hasBcc(string $address, string $name = null)
+    public function hasBcc(string $address, ?string $name = null)
     {
         return $this->hasRecipient($this->bcc, $address, $name);
     }
@@ -319,7 +319,7 @@ class Envelope
      * @param  string|null  $name
      * @return bool
      */
-    public function hasReplyTo(string $address, string $name = null)
+    public function hasReplyTo(string $address, ?string $name = null)
     {
         return $this->hasRecipient($this->replyTo, $address, $name);
     }

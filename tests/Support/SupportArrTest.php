@@ -38,11 +38,26 @@ class SupportArrTest extends TestCase
 
     public function testCollapse()
     {
+        // Normal case: a two-dimensional array with different elements
         $data = [['foo', 'bar'], ['baz']];
         $this->assertEquals(['foo', 'bar', 'baz'], Arr::collapse($data));
 
+        // Case including numeric and string elements
         $array = [[1], [2], [3], ['foo', 'bar'], collect(['baz', 'boom'])];
         $this->assertEquals([1, 2, 3, 'foo', 'bar', 'baz', 'boom'], Arr::collapse($array));
+
+        // Case with empty two-dimensional arrays
+        $emptyArray = [[], [], []];
+        $this->assertEquals([], Arr::collapse($emptyArray));
+
+        // Case with both empty arrays and arrays with elements
+        $mixedArray = [[], [1, 2], [], ['foo', 'bar']];
+        $this->assertEquals([1, 2, 'foo', 'bar'], Arr::collapse($mixedArray));
+
+        // Case including collections and arrays
+        $collection = collect(['baz', 'boom']);
+        $mixedArray = [[1], [2], [3], ['foo', 'bar'], $collection];
+        $this->assertEquals([1, 2, 3, 'foo', 'bar', 'baz', 'boom'], Arr::collapse($mixedArray));
     }
 
     public function testCrossJoin()
@@ -706,6 +721,23 @@ class SupportArrTest extends TestCase
         $this->assertEquals(['first' => 'taylor', 'last' => 'otwell'], $data);
     }
 
+    public function testMapWithEmptyArray()
+    {
+        $mapped = Arr::map([], static function ($value, $key) {
+            return $key.'-'.$value;
+        });
+        $this->assertEquals([], $mapped);
+    }
+
+    public function testMapNullValues()
+    {
+        $data = ['first' => 'taylor', 'last' => null];
+        $mapped = Arr::map($data, static function ($value, $key) {
+            return $key.'-'.$value;
+        });
+        $this->assertEquals(['first' => 'first-taylor', 'last' => 'last-'], $mapped);
+    }
+
     public function testMapWithKeys()
     {
         $data = [
@@ -733,6 +765,21 @@ class SupportArrTest extends TestCase
         $this->assertEquals(['first' => 'taylor', 'last' => 'otwell'], $data);
     }
 
+    public function testMapSpread()
+    {
+        $c = [[1, 'a'], [2, 'b']];
+
+        $result = Arr::mapSpread($c, function ($number, $character) {
+            return "{$number}-{$character}";
+        });
+        $this->assertEquals(['1-a', '2-b'], $result);
+
+        $result = Arr::mapSpread($c, function ($number, $character, $key) {
+            return "{$number}-{$character}-{$key}";
+        });
+        $this->assertEquals(['1-a-0', '2-b-1'], $result);
+    }
+
     public function testPrepend()
     {
         $array = Arr::prepend(['one', 'two', 'three', 'four'], 'zero');
@@ -743,6 +790,21 @@ class SupportArrTest extends TestCase
 
         $array = Arr::prepend(['one' => 1, 'two' => 2], 0, null);
         $this->assertEquals([null => 0, 'one' => 1, 'two' => 2], $array);
+
+        $array = Arr::prepend(['one', 'two'], null, '');
+        $this->assertEquals(['' => null, 'one', 'two'], $array);
+
+        $array = Arr::prepend([], 'zero');
+        $this->assertEquals(['zero'], $array);
+
+        $array = Arr::prepend([''], 'zero');
+        $this->assertEquals(['zero', ''], $array);
+
+        $array = Arr::prepend(['one', 'two'], ['zero']);
+        $this->assertEquals([['zero'], 'one', 'two'], $array);
+
+        $array = Arr::prepend(['one', 'two'], ['zero'], 'key');
+        $this->assertEquals(['key' => ['zero'], 'one', 'two'], $array);
     }
 
     public function testPull()
@@ -907,12 +969,33 @@ class SupportArrTest extends TestCase
         $this->assertEquals([1 => 'hAz'], Arr::set($array, 1, 'hAz'));
     }
 
-    public function testShuffleWithSeed()
+    public function testShuffleProducesDifferentShuffles()
     {
-        $this->assertEquals(
-            Arr::shuffle(range(0, 100, 10), 1234),
-            Arr::shuffle(range(0, 100, 10), 1234)
+        $input = range('a', 'z');
+
+        $this->assertFalse(
+            Arr::shuffle($input) === Arr::shuffle($input) && Arr::shuffle($input) === Arr::shuffle($input),
+            "The shuffles produced the same output each time, which shouldn't happen."
         );
+    }
+
+    public function testShuffleActuallyShuffles()
+    {
+        $input = range('a', 'z');
+
+        $this->assertFalse(
+            Arr::shuffle($input) === $input && Arr::shuffle($input) === $input,
+            "The shuffles were unshuffled each time, which shouldn't happen."
+        );
+    }
+
+    public function testShuffleKeepsSameValues()
+    {
+        $input = range('a', 'z');
+        $shuffled = Arr::shuffle($input);
+        sort($shuffled);
+
+        $this->assertEquals($input, $shuffled);
     }
 
     public function testEmptyShuffle()
@@ -1259,5 +1342,54 @@ class SupportArrTest extends TestCase
                 'key' => 1,
             ],
         ], Arr::prependKeysWith($array, 'test.'));
+    }
+
+    public function testTake()
+    {
+        $array = [1, 2, 3, 4, 5, 6];
+
+        $this->assertEquals([
+            1, 2, 3,
+        ], Arr::take($array, 3));
+
+        $this->assertEquals([
+            4, 5, 6,
+        ], Arr::take($array, -3));
+    }
+
+    public function testSelect()
+    {
+        $array = [
+            [
+                'name' => 'Taylor',
+                'role' => 'Developer',
+                'age' => 1,
+            ],
+            [
+                'name' => 'Abigail',
+                'role' => 'Infrastructure',
+                'age' => 2,
+            ],
+        ];
+
+        $this->assertEquals([
+            [
+                'name' => 'Taylor',
+                'age' => 1,
+            ],
+            [
+                'name' => 'Abigail',
+                'age' => 2,
+            ],
+        ], Arr::select($array, ['name', 'age']));
+
+        $this->assertEquals([
+            [
+                'name' => 'Taylor',
+            ],
+            [
+                'name' => 'Abigail',
+            ],
+        ], Arr::select($array, 'name'));
     }
 }

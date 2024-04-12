@@ -13,23 +13,8 @@ class HandleCorsTest extends TestCase
 {
     use ValidatesRequests;
 
-    protected function getEnvironmentSetUp($app)
+    protected function defineEnvironment($app)
     {
-        $kernel = $app->make(Kernel::class);
-        $kernel->prependMiddleware(HandleCors::class);
-
-        $router = $app['router'];
-
-        $this->addWebRoutes($router);
-        $this->addApiRoutes($router);
-
-        parent::getEnvironmentSetUp($app);
-    }
-
-    protected function resolveApplicationConfiguration($app)
-    {
-        parent::resolveApplicationConfiguration($app);
-
         $app['config']['cors'] = [
             'paths' => ['api/*'],
             'supports_credentials' => false,
@@ -39,6 +24,15 @@ class HandleCorsTest extends TestCase
             'exposed_headers' => [],
             'max_age' => 0,
         ];
+
+        $kernel = $app->make(Kernel::class);
+        $kernel->prependMiddleware(HandleCors::class);
+    }
+
+    protected function defineRoutes($router)
+    {
+        $this->addWebRoutes($router);
+        $this->addApiRoutes($router);
     }
 
     public function testShouldReturnHeaderAssessControlAllowOriginWhenDontHaveHttpOriginOnRequest()
