@@ -289,7 +289,7 @@ class CacheManager implements FactoryContract
     public function repository(Store $store, array $config = [])
     {
         return tap(new Repository($store, Arr::only($config, ['store'])), function ($repository) use ($config) {
-            if ($config['with_events'] ?? true) {
+            if ($config['events'] ?? true) {
                 $this->setEventDispatcher($repository);
             }
         });
