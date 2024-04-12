@@ -240,9 +240,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      */
     public function unpersonate()
     {
-        $id = $this->session->pull($this->getImpersonationName());
-
-        if (is_null($id)) {
+        if (! $id = $this->session->pull($this->getImpersonationName())) {
             return;
         }
 
