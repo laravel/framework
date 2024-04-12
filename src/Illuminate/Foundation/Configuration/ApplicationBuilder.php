@@ -108,7 +108,7 @@ class ApplicationBuilder
     }
 
     /**
-     * Register the braodcasting services for the application.
+     * Register the broadcasting services for the application.
      *
      * @param  string  $channels
      * @param  array  $attributes
