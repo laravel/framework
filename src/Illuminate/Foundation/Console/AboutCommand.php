@@ -232,7 +232,7 @@ class AboutCommand extends Command
      * @param  string|null  $value
      * @return void
      */
-    public static function add(string $section, $data, string $value = null)
+    public static function add(string $section, $data, ?string $value = null)
     {
         static::$customDataResolvers[] = fn () => static::addToSection($section, $data, $value);
     }
@@ -245,7 +245,7 @@ class AboutCommand extends Command
      * @param  string|null  $value
      * @return void
      */
-    protected static function addToSection(string $section, $data, string $value = null)
+    protected static function addToSection(string $section, $data, ?string $value = null)
     {
         if (is_array($data)) {
             foreach ($data as $key => $value) {
@@ -279,7 +279,7 @@ class AboutCommand extends Command
      * @param  (\Closure(mixed):(mixed))|null  $json
      * @return \Closure(bool):mixed
      */
-    public static function format($value, Closure $console = null, Closure $json = null)
+    public static function format($value, ?Closure $console = null, ?Closure $json = null)
     {
         return function ($isJson) use ($value, $console, $json) {
             if ($isJson === true && $json instanceof Closure) {

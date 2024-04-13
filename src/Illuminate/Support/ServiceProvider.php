@@ -485,12 +485,16 @@ abstract class ServiceProvider
      * @param  string  $path
      * @return bool
      */
-    public static function addProviderToBootstrapFile(string $provider, string $path = null)
+    public static function addProviderToBootstrapFile(string $provider, ?string $path = null)
     {
         $path ??= app()->getBootstrapProvidersPath();
 
         if (! file_exists($path)) {
             return false;
+        }
+
+        if (function_exists('opcache_invalidate')) {
+            opcache_invalidate($path, true);
         }
 
         $providers = collect(require $path)

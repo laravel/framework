@@ -37,18 +37,20 @@ class TraitMakeCommand extends GeneratorCommand
      */
     protected function getStub()
     {
-        return __DIR__.'/stubs/trait.stub';
+        return $this->resolveStubPath('/stubs/trait.stub');
     }
 
     /**
-     * Get the default namespace for the class.
+     * Resolve the fully-qualified path to the stub.
      *
-     * @param  string  $rootNamespace
+     * @param  string  $stub
      * @return string
      */
-    protected function getDefaultNamespace($rootNamespace)
+    protected function resolveStubPath($stub)
     {
-        return $rootNamespace;
+        return file_exists($customPath = $this->laravel->basePath(trim($stub, '/')))
+            ? $customPath
+            : __DIR__.$stub;
     }
 
     /**

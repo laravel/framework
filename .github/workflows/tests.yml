@@ -48,8 +48,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -62,6 +60,9 @@ jobs:
         env:
           REDIS_CONFIGURE_OPTS: --enable-redis --enable-redis-igbinary --enable-redis-msgpack --enable-redis-lzf --with-liblzf --enable-redis-zstd --with-libzstd --enable-redis-lz4 --with-liblz4
           REDIS_LIBS: liblz4-dev, liblzf-dev, libzstd-dev
+
+      - name: Set Framework version
+        run: composer config version "11.x-dev"
 
       - name: Set minimum PHP 8.2 versions
         uses: nick-fields/retry@v3
@@ -122,8 +123,6 @@ jobs:
 
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -132,6 +131,9 @@ jobs:
           extensions: dom, curl, libxml, mbstring, zip, pdo, sqlite, pdo_sqlite, gd, pdo_mysql, fileinfo, ftp, redis, memcached, gmp, intl, :php-psr
           tools: composer:v2
           coverage: none
+
+      - name: Set Framework version
+        run: composer config version "11.x-dev"
 
       - name: Set Minimum PHP 8.2 Versions
         uses: nick-fields/retry@v3

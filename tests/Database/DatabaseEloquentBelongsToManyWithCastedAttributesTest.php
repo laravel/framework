@@ -6,8 +6,10 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Query\Grammars\Grammar;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use stdClass;
 
 class DatabaseEloquentBelongsToManyWithCastedAttributesTest extends TestCase
 {
@@ -20,6 +22,7 @@ class DatabaseEloquentBelongsToManyWithCastedAttributesTest extends TestCase
     {
         $relation = $this->getRelation();
         $model1 = m::mock(Model::class);
+        $model1->shouldReceive('hasAttribute')->passthru();
         $model1->shouldReceive('getAttribute')->with('parent_key')->andReturn(1);
         $model1->shouldReceive('getAttribute')->with('foo')->passthru();
         $model1->shouldReceive('hasGetMutator')->andReturn(false);
@@ -28,6 +31,7 @@ class DatabaseEloquentBelongsToManyWithCastedAttributesTest extends TestCase
         $model1->shouldReceive('getRelationValue', 'relationLoaded', 'relationResolver', 'setRelation', 'isRelation')->passthru();
 
         $model2 = m::mock(Model::class);
+        $model2->shouldReceive('hasAttribute')->passthru();
         $model2->shouldReceive('getAttribute')->with('parent_key')->andReturn(2);
         $model2->shouldReceive('getAttribute')->with('foo')->passthru();
         $model2->shouldReceive('hasGetMutator')->andReturn(false);
@@ -61,6 +65,9 @@ class DatabaseEloquentBelongsToManyWithCastedAttributesTest extends TestCase
         $builder->shouldReceive('getModel')->andReturn($related);
         $related->shouldReceive('qualifyColumn');
         $builder->shouldReceive('join', 'where');
+        $builder->shouldReceive('getQuery')->andReturn(
+            m::mock(stdClass::class, ['getGrammar' => m::mock(Grammar::class, ['isExpression' => false])])
+        );
 
         return new BelongsToMany(
             $builder,

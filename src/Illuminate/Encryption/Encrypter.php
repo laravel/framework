@@ -335,7 +335,7 @@ class Encrypter implements EncrypterContract, StringEncrypter
     /**
      * Set the previous / legacy encryption keys that should be utilized if decryption fails.
      *
-     * @param  array  $key
+     * @param  array  $keys
      * @return $this
      */
     public function previousKeys(array $keys)
