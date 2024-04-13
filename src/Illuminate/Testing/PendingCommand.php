@@ -370,7 +370,7 @@ class PendingCommand
      */
     protected function mockConsoleOutput()
     {
-        $mock = Mockery::mock(OutputStyle::class.'[askQuestion]', [
+        $mock = Mockery::mock(OutputStyle::class.'[askQuestion, writeln]', [
             new ArrayInput($this->parameters), $this->createABufferedOutputMock(),
         ]);
 
@@ -391,6 +391,25 @@ class PendingCommand
                     return $question[1];
                 });
         }
+
+	    $mock->shouldReceive('writeln')
+            ->andReturnUsing(function ($text) {
+                $this->test->expectedOutput = array_filter($this->test->expectedOutput, function ($expectedText) use ($text) {
+                    return strpos($text, $expectedText) === false;
+                });
+
+                $this->test->expectedOutputSubstrings = array_filter($this->test->expectedOutputSubstrings, function ($expectedSubstring) use ($text) {
+                    return strpos($text, $expectedSubstring) === false;
+                });
+
+                foreach (array_keys($this->test->unexpectedOutput) as $unexpectedText) {
+                    if (strpos($text, $unexpectedText) !== false) {
+                        $this->test->unexpectedOutput[$unexpectedText] = true;
+                    }
+                }
+
+                return $text;
+            });
 
         $this->app->bind(OutputStyle::class, function () use ($mock) {
             return $mock;
