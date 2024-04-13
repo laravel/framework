@@ -525,6 +525,31 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Find a model by its primary key or throw a custom exception.
+     *
+     * @param  mixed  $id
+     * @param  \Closure|array|string  $columns
+     * @param  string|\Throwable  $exception
+     * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection|static[]|static|mixed
+     */
+    public function findOrThrow($id, $columns = ['*'], string|\Throwable $exception = RecordsNotFoundException::class)
+    {
+        if (is_string($columns) || is_object($columns)) {
+            $exception = $columns;
+
+            $columns = ['*'];
+        }
+
+        return $this->findOr($id, $columns, function () use ($exception) {
+            if (is_string($exception) && class_exists($exception)) {
+                throw new $exception();
+            }
+
+            throw is_string($exception) ? new RecordsNotFoundException($exception) : $exception;
+        });
+    }
+
+    /**
      * Find a model by its primary key or call a callback.
      *
      * @param  mixed  $id

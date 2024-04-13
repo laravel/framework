@@ -17,8 +17,10 @@ use Illuminate\Database\Query\Builder as BaseBuilder;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\Query\Processors\Processor;
+use Illuminate\Database\RecordsNotFoundException;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection as BaseCollection;
+use Illuminate\Validation\ValidationException;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use stdClass;
@@ -115,6 +117,46 @@ class DatabaseEloquentBuilderTest extends TestCase
         $findResult = $builder->find('bar', ['column']);
         $this->assertNull($findResult);
         $this->assertInstanceOf(Model::class, $result);
+    }
+
+    public function testFindOrThrowMethodThrowsRecordsNotFoundException()
+    {
+        $this->expectException(RecordsNotFoundException::class);
+
+        $builder = m::mock(Builder::class.'[first]', [$this->getMockQueryBuilder()]);
+        $model = $this->getMockModel();
+        $model->shouldReceive('getKeyType')->once()->andReturn('int');
+        $builder->setModel($model);
+        $builder->getQuery()->shouldReceive('where')->once()->with('foo_table.foo', '=', 'bar');
+        $builder->shouldReceive('first')->with(['column'])->andReturn(null);
+        $builder->findOrThrow('bar');
+    }
+
+    public function testFindOrThrowMethodThrowsRecordsNotFoundExceptionWithMessage()
+    {
+        $this->expectException(RecordsNotFoundException::class);
+        $this->expectExceptionMessage('Some error message');
+
+        $builder = m::mock(Builder::class.'[first]', [$this->getMockQueryBuilder()]);
+        $model = $this->getMockModel();
+        $model->shouldReceive('getKeyType')->once()->andReturn('int');
+        $builder->setModel($model);
+        $builder->getQuery()->shouldReceive('where')->once()->with('foo_table.foo', '=', 'bar');
+        $builder->shouldReceive('first')->with(['column'])->andReturn(null);
+        $builder->findOrThrow('bar', 'Some error message');
+    }
+
+    public function testFindOrThrowMethodThrowsCustomException()
+    {
+        $this->expectException(ValidationException::class);
+
+        $builder = m::mock(Builder::class.'[first]', [$this->getMockQueryBuilder()]);
+        $model = $this->getMockModel();
+        $model->shouldReceive('getKeyType')->once()->andReturn('int');
+        $builder->setModel($model);
+        $builder->getQuery()->shouldReceive('where')->once()->with('foo_table.foo', '=', 'bar');
+        $builder->shouldReceive('first')->with(['column'])->andReturn(null);
+        $builder->findOrThrow('bar', ValidationException::withMessages(['Some error message']));
     }
 
     public function testFindOrFailMethodThrowsModelNotFoundException()
