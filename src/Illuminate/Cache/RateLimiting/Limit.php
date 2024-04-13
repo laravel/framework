@@ -51,22 +51,24 @@ class Limit
      * Create a new rate limit.
      *
      * @param  int  $maxAttempts
+     * @param  int  $decaySeconds
      * @return static
      */
-    public static function perSecond($maxAttempts)
+    public static function perSecond($maxAttempts, $decaySeconds = 1)
     {
-        return new static('', $maxAttempts, 1);
+        return new static('', $maxAttempts, $decaySeconds);
     }
 
     /**
      * Create a new rate limit.
      *
      * @param  int  $maxAttempts
+     * @param  int  $decayMinutes
      * @return static
      */
-    public static function perMinute($maxAttempts)
+    public static function perMinute($maxAttempts, $decayMinutes = 1)
     {
-        return new static('', $maxAttempts, 60);
+        return new static('', $maxAttempts, 60 * $decayMinutes);
     }
 
     /**
