@@ -94,6 +94,7 @@ abstract class MultipleInstanceManager
      * @return mixed
      *
      * @throws \InvalidArgumentException
+     * @throws \RuntimeException
      */
     protected function resolve($name)
     {

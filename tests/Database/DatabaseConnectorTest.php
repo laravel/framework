@@ -62,7 +62,8 @@ class DatabaseConnectorTest extends TestCase
         $connector->expects($this->once())->method('getOptions')->with($this->equalTo($config))->willReturn(['options']);
         $connector->expects($this->once())->method('createConnection')->with($this->equalTo($dsn), $this->equalTo($config), $this->equalTo(['options']))->willReturn($connection);
         $connection->shouldReceive('exec')->once()->with('use `bar`;')->andReturn(true);
-        $connection->shouldReceive('exec')->once()->with("SET SESSION TRANSACTION ISOLATION LEVEL REPEATABLE READ, NAMES 'utf8' COLLATE 'utf8_unicode_ci';")->andReturn(true);
+        $connection->shouldReceive('exec')->once()->with('SET SESSION TRANSACTION ISOLATION LEVEL REPEATABLE READ;')->andReturn(true);
+        $connection->shouldReceive('exec')->once()->with("SET NAMES 'utf8' COLLATE 'utf8_unicode_ci';")->andReturn(true);
         $result = $connector->connect($config);
 
         $this->assertSame($result, $connection);

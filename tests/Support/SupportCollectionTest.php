@@ -1858,6 +1858,8 @@ class SupportCollectionTest extends TestCase
     #[DataProvider('collectionClassProvider')]
     public function testSortByMany($collection)
     {
+        $defaultLocale = setlocale(LC_ALL, 0);
+
         $data = new $collection([['item' => '1'], ['item' => '10'], ['item' => 5], ['item' => 20]]);
         $expected = $data->pluck('item')->toArray();
 
@@ -1935,6 +1937,8 @@ class SupportCollectionTest extends TestCase
         sort($expected, SORT_LOCALE_STRING);
         $data = $data->sortBy(['item'], SORT_LOCALE_STRING);
         $this->assertEquals($data->pluck('item')->toArray(), $expected);
+
+        setlocale(LC_ALL, $defaultLocale);
     }
 
     #[DataProvider('collectionClassProvider')]
@@ -2955,6 +2959,32 @@ class SupportCollectionTest extends TestCase
 
         $this->assertSame('first', $data->get(0)->value);
         $this->assertSame('second', $data->get(1)->value);
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testMapIntoWithIntBackedEnums($collection)
+    {
+        $data = new $collection([
+            1, 2,
+        ]);
+
+        $data = $data->mapInto(TestBackedEnum::class);
+
+        $this->assertSame(TestBackedEnum::A, $data->get(0));
+        $this->assertSame(TestBackedEnum::B, $data->get(1));
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testMapIntoWithStringBackedEnums($collection)
+    {
+        $data = new $collection([
+            'A', 'B',
+        ]);
+
+        $data = $data->mapInto(TestStringBackedEnum::class);
+
+        $this->assertSame(TestStringBackedEnum::A, $data->get(0));
+        $this->assertSame(TestStringBackedEnum::B, $data->get(1));
     }
 
     #[DataProvider('collectionClassProvider')]

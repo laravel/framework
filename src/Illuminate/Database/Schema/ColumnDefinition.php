@@ -15,7 +15,7 @@ use Illuminate\Support\Fluent;
  * @method $this default(mixed $value) Specify a "default" value for the column
  * @method $this first() Place the column "first" in the table (MySQL)
  * @method $this from(int $startingValue) Set the starting value of an auto-incrementing field (MySQL / PostgreSQL)
- * @method $this generatedAs(string|\Illuminate\Database\Query\Expression $expression = null) Create a SQL compliant identity column (PostgreSQL)
+ * @method $this generatedAs(string|\Illuminate\Contracts\Database\Query\Expression $expression = null) Create a SQL compliant identity column (PostgreSQL)
  * @method $this index(bool|string $indexName = null) Add an index
  * @method $this invisible() Specify that the column should be invisible to "SELECT *" (MySQL)
  * @method $this nullable(bool $value = true) Allow NULL values to be inserted into the column
@@ -24,13 +24,13 @@ use Illuminate\Support\Fluent;
  * @method $this fulltext(bool|string $indexName = null) Add a fulltext index
  * @method $this spatialIndex(bool|string $indexName = null) Add a spatial index
  * @method $this startingValue(int $startingValue) Set the starting value of an auto-incrementing field (MySQL/PostgreSQL)
- * @method $this storedAs(string $expression) Create a stored generated column (MySQL/PostgreSQL/SQLite)
+ * @method $this storedAs(string|\Illuminate\Contracts\Database\Query\Expression $expression) Create a stored generated column (MySQL/PostgreSQL/SQLite)
  * @method $this type(string $type) Specify a type for the column
  * @method $this unique(bool|string $indexName = null) Add a unique index
  * @method $this unsigned() Set the INTEGER column as UNSIGNED (MySQL)
  * @method $this useCurrent() Set the TIMESTAMP column to use CURRENT_TIMESTAMP as default value
  * @method $this useCurrentOnUpdate() Set the TIMESTAMP column to use CURRENT_TIMESTAMP when updating (MySQL)
- * @method $this virtualAs(string $expression) Create a virtual generated column (MySQL/PostgreSQL/SQLite)
+ * @method $this virtualAs(string|\Illuminate\Contracts\Database\Query\Expression $expression) Create a virtual generated column (MySQL/PostgreSQL/SQLite)
  */
 class ColumnDefinition extends Fluent
 {

@@ -7,7 +7,6 @@ use Illuminate\Mail\SendQueuedMailable;
 use Illuminate\Queue\Middleware\RateLimited;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Queue;
-use Illuminate\Support\Facades\View;
 use Orchestra\Testbench\TestCase;
 
 class SendingQueuedMailTest extends TestCase
@@ -16,7 +15,7 @@ class SendingQueuedMailTest extends TestCase
     {
         $app['config']->set('mail.driver', 'array');
 
-        View::addLocation(__DIR__.'/Fixtures');
+        $app['view']->addLocation(__DIR__.'/Fixtures');
     }
 
     public function testMailIsSentWithDefaultLocale()

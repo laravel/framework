@@ -98,7 +98,7 @@ class FakeRedisConnector implements Connector
      *
      * @param  array  $config
      * @param  array  $options
-     * @return \Illuminate\Contracts\Redis\Connection
+     * @return string
      */
     public function connect(array $config, array $options)
     {
@@ -111,7 +111,7 @@ class FakeRedisConnector implements Connector
      * @param  array  $config
      * @param  array  $clusterOptions
      * @param  array  $options
-     * @return \Illuminate\Contracts\Redis\Connection
+     * @return string
      */
     public function connectToCluster(array $config, array $clusterOptions, array $options)
     {

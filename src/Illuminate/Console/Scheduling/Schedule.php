@@ -154,6 +154,14 @@ class Schedule
      */
     public function job($job, $queue = null, $connection = null)
     {
+        $jobName = $job;
+
+        if (! is_string($job)) {
+            $jobName = method_exists($job, 'displayName')
+                ? $job->displayName()
+                : $job::class;
+        }
+
         return $this->call(function () use ($job, $queue, $connection) {
             $job = is_string($job) ? Container::getInstance()->make($job) : $job;
 
@@ -162,7 +170,7 @@ class Schedule
             } else {
                 $this->dispatchNow($job);
             }
-        })->name(is_string($job) ? $job : get_class($job));
+        })->name($jobName);
     }
 
     /**

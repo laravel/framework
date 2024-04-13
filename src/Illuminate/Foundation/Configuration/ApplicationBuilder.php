@@ -3,6 +3,8 @@
 namespace Illuminate\Foundation\Configuration;
 
 use Closure;
+use Illuminate\Console\Application as Artisan;
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Contracts\Console\Kernel as ConsoleKernel;
 use Illuminate\Contracts\Http\Kernel as HttpKernel;
 use Illuminate\Foundation\Application;
@@ -81,13 +83,17 @@ class ApplicationBuilder
     /**
      * Register the core event service provider for the application.
      *
-     * @param  array  $discover
+     * @param  array|bool  $discover
      * @return $this
      */
-    public function withEvents(array $discover = [])
+    public function withEvents(array|bool $discover = [])
     {
-        if (count($discover) > 0) {
+        if (is_array($discover) && count($discover) > 0) {
             AppEventServiceProvider::setEventDiscoveryPaths($discover);
+        }
+
+        if ($discover === false) {
+            AppEventServiceProvider::disableEventDiscovery();
         }
 
         if (! isset($this->pendingProviders[AppEventServiceProvider::class])) {
@@ -102,7 +108,7 @@ class ApplicationBuilder
     }
 
     /**
-     * Register the braodcasting services for the application.
+     * Register the broadcasting services for the application.
      *
      * @param  string  $channels
      * @param  array  $attributes
@@ -257,9 +263,11 @@ class ApplicationBuilder
             [$commands, $paths] = collect($commands)->partition(fn ($command) => class_exists($command));
             [$routes, $paths] = $paths->partition(fn ($path) => is_file($path));
 
-            $kernel->addCommands($commands->all());
-            $kernel->addCommandPaths($paths->all());
-            $kernel->addCommandRoutePaths($routes->all());
+            $this->app->booted(static function () use ($kernel, $commands, $paths, $routes) {
+                $kernel->addCommands($commands->all());
+                $kernel->addCommandPaths($paths->all());
+                $kernel->addCommandRoutePaths($routes->all());
+            });
         });
 
         return $this;
@@ -274,8 +282,21 @@ class ApplicationBuilder
     protected function withCommandRouting(array $paths)
     {
         $this->app->afterResolving(ConsoleKernel::class, function ($kernel) use ($paths) {
-            $kernel->setCommandRoutePaths($paths);
+            $this->app->booted(fn () => $kernel->addCommandRoutePaths($paths));
         });
+    }
+
+    /**
+     * Register the scheduled tasks for the application.
+     *
+     * @param  callable(\Illuminate\Console\Scheduling\Schedule $schedule): void  $callback
+     * @return $this
+     */
+    public function withSchedule(callable $callback)
+    {
+        Artisan::starting(fn () => $callback($this->app->make(Schedule::class)));
+
+        return $this;
     }
 
     /**

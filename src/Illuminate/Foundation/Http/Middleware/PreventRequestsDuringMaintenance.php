@@ -22,6 +22,13 @@ class PreventRequestsDuringMaintenance
     protected $app;
 
     /**
+     * The URIs that should be excluded.
+     *
+     * @var array<int, string>
+     */
+    protected $except = [];
+
+    /**
      * The URIs that should be accessible during maintenance.
      *
      * @var array

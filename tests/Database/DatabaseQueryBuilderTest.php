@@ -30,6 +30,8 @@ use PHPUnit\Framework\TestCase;
 use RuntimeException;
 use stdClass;
 
+include_once 'Enums.php';
+
 class DatabaseQueryBuilderTest extends TestCase
 {
     protected $called;
@@ -769,17 +771,17 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([], $builder->getBindings());
 
         $builder = $this->getBuilder();
-        $period = now()->toPeriod(now()->addDay());
+        $period = now()->startOfDay()->toPeriod(now()->addDay()->startOfDay());
         $builder->select('*')->from('users')->whereBetween('created_at', $period);
         $this->assertSame('select * from "users" where "created_at" between ? and ?', $builder->toSql());
-        $this->assertEquals([$period->start, $period->end], $builder->getBindings());
+        $this->assertEquals([now()->startOfDay(), now()->addDay()->startOfDay()], $builder->getBindings());
 
         // custom long carbon period date
         $builder = $this->getBuilder();
-        $period = now()->toPeriod(now()->addMonth());
+        $period = now()->startOfDay()->toPeriod(now()->addMonth()->startOfDay());
         $builder->select('*')->from('users')->whereBetween('created_at', $period);
         $this->assertSame('select * from "users" where "created_at" between ? and ?', $builder->toSql());
-        $this->assertEquals([$period->start, $period->end], $builder->getBindings());
+        $this->assertEquals([now()->startOfDay(), now()->addMonth()->startOfDay()], $builder->getBindings());
 
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->whereBetween('id', collect([1, 2]));
@@ -2477,19 +2479,19 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testJoinsWithMultipleNestedJoins()
     {
         $builder = $this->getBuilder();
-        $builder->select('users.id', 'contacts.id', 'contact_types.id', 'countrys.id', 'planets.id')->from('users')->leftJoin('contacts', function ($j) {
+        $builder->select('users.id', 'contacts.id', 'contact_types.id', 'countries.id', 'planets.id')->from('users')->leftJoin('contacts', function ($j) {
             $j->on('users.id', 'contacts.id')
                 ->join('contact_types', 'contacts.contact_type_id', '=', 'contact_types.id')
-                ->leftJoin('countrys', function ($q) {
-                    $q->on('contacts.country', '=', 'countrys.country')
+                ->leftJoin('countries', function ($q) {
+                    $q->on('contacts.country', '=', 'countries.country')
                         ->join('planets', function ($q) {
-                            $q->on('countrys.planet_id', '=', 'planet.id')
+                            $q->on('countries.planet_id', '=', 'planet.id')
                                 ->where('planet.is_settled', '=', 1)
                                 ->where('planet.population', '>=', 10000);
                         });
                 });
         });
-        $this->assertSame('select "users"."id", "contacts"."id", "contact_types"."id", "countrys"."id", "planets"."id" from "users" left join ("contacts" inner join "contact_types" on "contacts"."contact_type_id" = "contact_types"."id" left join ("countrys" inner join "planets" on "countrys"."planet_id" = "planet"."id" and "planet"."is_settled" = ? and "planet"."population" >= ?) on "contacts"."country" = "countrys"."country") on "users"."id" = "contacts"."id"', $builder->toSql());
+        $this->assertSame('select "users"."id", "contacts"."id", "contact_types"."id", "countries"."id", "planets"."id" from "users" left join ("contacts" inner join "contact_types" on "contacts"."contact_type_id" = "contact_types"."id" left join ("countries" inner join "planets" on "countries"."planet_id" = "planet"."id" and "planet"."is_settled" = ? and "planet"."population" >= ?) on "contacts"."country" = "countries"."country") on "users"."id" = "contacts"."id"', $builder->toSql());
         $this->assertEquals(['1', 10000], $builder->getBindings());
     }
 
@@ -2500,16 +2502,16 @@ class DatabaseQueryBuilderTest extends TestCase
             $j->on('users.id', 'contacts.id')
                 ->join('contact_types', 'contacts.contact_type_id', '=', 'contact_types.id')
                 ->whereExists(function ($q) {
-                    $q->select('*')->from('countrys')
-                        ->whereColumn('contacts.country', '=', 'countrys.country')
+                    $q->select('*')->from('countries')
+                        ->whereColumn('contacts.country', '=', 'countries.country')
                         ->join('planets', function ($q) {
-                            $q->on('countrys.planet_id', '=', 'planet.id')
+                            $q->on('countries.planet_id', '=', 'planet.id')
                                 ->where('planet.is_settled', '=', 1);
                         })
                         ->where('planet.population', '>=', 10000);
                 });
         });
-        $this->assertSame('select "users"."id", "contacts"."id", "contact_types"."id" from "users" left join ("contacts" inner join "contact_types" on "contacts"."contact_type_id" = "contact_types"."id") on "users"."id" = "contacts"."id" and exists (select * from "countrys" inner join "planets" on "countrys"."planet_id" = "planet"."id" and "planet"."is_settled" = ? where "contacts"."country" = "countrys"."country" and "planet"."population" >= ?)', $builder->toSql());
+        $this->assertSame('select "users"."id", "contacts"."id", "contact_types"."id" from "users" left join ("contacts" inner join "contact_types" on "contacts"."contact_type_id" = "contact_types"."id") on "users"."id" = "contacts"."id" and exists (select * from "countries" inner join "planets" on "countries"."planet_id" = "planet"."id" and "planet"."is_settled" = ? where "contacts"."country" = "countries"."country" and "planet"."population" >= ?)', $builder->toSql());
         $this->assertEquals(['1', 10000], $builder->getBindings());
     }
 
@@ -4472,6 +4474,14 @@ SQL;
         $builder->addBinding(['bar', 'baz'], 'having');
         $builder->addBinding(['foo'], 'where');
         $this->assertEquals(['foo', 'bar', 'baz'], $builder->getBindings());
+    }
+
+    public function testAddBindingWithEnum()
+    {
+        $builder = $this->getBuilder();
+        $builder->addBinding(IntegerStatus::done);
+        $builder->addBinding([NonBackedStatus::done]);
+        $this->assertEquals([2, 'done'], $builder->getBindings());
     }
 
     public function testMergeBuilders()

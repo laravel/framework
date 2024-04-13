@@ -86,7 +86,7 @@ class Blueprint
      * @param  string  $prefix
      * @return void
      */
-    public function __construct($table, Closure $callback = null, $prefix = '')
+    public function __construct($table, ?Closure $callback = null, $prefix = '')
     {
         $this->table = $table;
         $this->prefix = $prefix;
@@ -296,7 +296,6 @@ class Blueprint
     /**
      * Specify that the InnoDB storage engine should be used for the table (MySQL only).
      *
-     * @param  string  $engine
      * @return void
      */
     public function innoDb()

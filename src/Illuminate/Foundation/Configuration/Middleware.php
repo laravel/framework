@@ -303,7 +303,6 @@ class Middleware
     /**
      * Modify the middleware in the "web" group.
      *
-     * @param  string  $group
      * @param  array|string  $append
      * @param  array|string  $prepend
      * @param  array|string  $remove
@@ -318,7 +317,6 @@ class Middleware
     /**
      * Modify the middleware in the "api" group.
      *
-     * @param  string  $group
      * @param  array|string  $append
      * @param  array|string  $prepend
      * @param  array|string  $remove
@@ -518,7 +516,7 @@ class Middleware
      * @param  callable|string  $users
      * @return $this
      */
-    public function redirectTo(callable|string $guests = null, callable|string $users = null)
+    public function redirectTo(callable|string|null $guests = null, callable|string|null $users = null)
     {
         $guests = is_string($guests) ? fn () => $guests : $guests;
         $users = is_string($users) ? fn () => $users : $users;
@@ -608,15 +606,15 @@ class Middleware
     /**
      * Indicate that the trusted host middleware should be enabled.
      *
-     * @param  array<int, string>|null  $at
+     * @param  array<int, string>|(callable(): array<int, string>)|null  $at
      * @param  bool  $subdomains
      * @return $this
      */
-    public function trustHosts(array $at = null, bool $subdomains = true)
+    public function trustHosts(array|callable|null $at = null, bool $subdomains = true)
     {
         $this->trustHosts = true;
 
-        if (is_array($at)) {
+        if (! is_null($at)) {
             TrustHosts::at($at, $subdomains);
         }
 
@@ -630,7 +628,7 @@ class Middleware
      * @param  int|null  $headers
      * @return $this
      */
-    public function trustProxies(array|string $at = null, int $headers = null)
+    public function trustProxies(array|string|null $at = null, ?int $headers = null)
     {
         if (! is_null($at)) {
             TrustProxies::at($at);

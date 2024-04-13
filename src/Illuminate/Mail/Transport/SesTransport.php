@@ -50,6 +50,10 @@ class SesTransport extends AbstractTransport implements Stringable
         $options = $this->options;
 
         if ($message->getOriginalMessage() instanceof Message) {
+            if ($listManagementOptions = $this->listManagementOptions($message)) {
+                $options['ListManagementOptions'] = $listManagementOptions;
+            }
+
             foreach ($message->getOriginalMessage()->getHeaders()->all() as $header) {
                 if ($header instanceof MetadataHeader) {
                     $options['Tags'][] = ['Name' => $header->getKey(), 'Value' => $header->getValue()];
@@ -87,6 +91,21 @@ class SesTransport extends AbstractTransport implements Stringable
 
         $message->getOriginalMessage()->getHeaders()->addHeader('X-Message-ID', $messageId);
         $message->getOriginalMessage()->getHeaders()->addHeader('X-SES-Message-ID', $messageId);
+    }
+
+    /**
+     * Extract the SES list managenent options, if applicable.
+     *
+     * @param  \Illuminate\Mail\SentMessage  $message
+     * @return array|null
+     */
+    protected function listManagementOptions(SentMessage $message)
+    {
+        if ($header = $message->getOriginalMessage()->getHeaders()->get('X-SES-LIST-MANAGEMENT-OPTIONS')) {
+            if (preg_match("/^(contactListName=)*(?<ContactListName>[^;]+)(;\s?topicName=(?<TopicName>.+))?$/ix", $header->getBodyAsString(), $listManagementOptions)) {
+                return array_filter($listManagementOptions, fn ($e) => in_array($e, ['ContactListName', 'TopicName']), ARRAY_FILTER_USE_KEY);
+            }
+        }
     }
 
     /**

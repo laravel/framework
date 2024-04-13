@@ -10,8 +10,6 @@ use Orchestra\Testbench\TestCase;
 
 class SendingNotificationsViaAnonymousNotifiableTest extends TestCase
 {
-    public $mailer;
-
     public function testMailIsSent()
     {
         $notifiable = (new AnonymousNotifiable)

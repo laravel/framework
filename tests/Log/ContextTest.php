@@ -114,7 +114,7 @@ class ContextTest extends TestCase
         $this->assertTrue($called);
     }
 
-    public function test_it_can_serilize_values()
+    public function test_it_can_serialize_values()
     {
         Context::add([
             'string' => 'string',
@@ -352,6 +352,19 @@ class ContextTest extends TestCase
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Unable to push value onto hidden context stack for key [foo].');
         Context::pushHidden('foo', 2);
+    }
+
+    public function test_it_can_pull()
+    {
+        Context::add('foo', 'data');
+
+        $this->assertSame('data', Context::pull('foo'));
+        $this->assertNull(Context::get('foo'));
+
+        Context::addHidden('foo', 'data');
+
+        $this->assertSame('data', Context::pullHidden('foo'));
+        $this->assertNull(Context::getHidden('foo'));
     }
 
     public function test_it_adds_context_to_logged_exceptions()

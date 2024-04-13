@@ -226,7 +226,7 @@ class FormRequest extends Request implements ValidatesWhenResolved
      * @param  array|null  $keys
      * @return \Illuminate\Support\ValidatedInput|array
      */
-    public function safe(array $keys = null)
+    public function safe(?array $keys = null)
     {
         return is_array($keys)
                     ? $this->validator->safe()->only($keys)

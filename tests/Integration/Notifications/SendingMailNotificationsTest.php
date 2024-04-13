@@ -14,7 +14,6 @@ use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Facades\View;
 use Illuminate\Support\Str;
 use Mockery as m;
 use Orchestra\Testbench\TestCase;
@@ -25,14 +24,7 @@ class SendingMailNotificationsTest extends TestCase
     public $mailer;
     public $markdown;
 
-    protected function tearDown(): void
-    {
-        parent::tearDown();
-
-        m::close();
-    }
-
-    protected function getEnvironmentSetUp($app)
+    protected function defineEnvironment($app)
     {
         $this->mailFactory = m::mock(MailFactory::class);
         $this->mailer = m::mock(Mailer::class);
@@ -51,7 +43,7 @@ class SendingMailNotificationsTest extends TestCase
             return $this->mailFactory;
         });
 
-        View::addLocation(__DIR__.'/Fixtures');
+        $app['view']->addLocation(__DIR__.'/Fixtures');
     }
 
     protected function setUp(): void

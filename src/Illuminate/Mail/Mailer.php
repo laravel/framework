@@ -97,7 +97,7 @@ class Mailer implements MailerContract, MailQueueContract
      * @param  \Illuminate\Contracts\Events\Dispatcher|null  $events
      * @return void
      */
-    public function __construct(string $name, Factory $views, TransportInterface $transport, Dispatcher $events = null)
+    public function __construct(string $name, Factory $views, TransportInterface $transport, ?Dispatcher $events = null)
     {
         $this->name = $name;
         $this->views = $views;
@@ -360,7 +360,7 @@ class Mailer implements MailerContract, MailQueueContract
     /**
      * Send a new message synchronously using a view.
      *
-     * @param  \Illuminate\Contracts\Mail\Mailable|string|array  $view
+     * @param  \Illuminate\Contracts\Mail\Mailable|string|array  $mailable
      * @param  array  $data
      * @param  \Closure|string|null  $callback
      * @return \Illuminate\Mail\SentMessage|null

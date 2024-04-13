@@ -45,7 +45,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      *
      * @var string
      */
-    const VERSION = '11.0.7';
+    const VERSION = '11.3.1';
 
     /**
      * The base path for the Laravel installation.
@@ -224,7 +224,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      * @param  string|null  $basePath
      * @return \Illuminate\Foundation\Configuration\ApplicationBuilder
      */
-    public static function configure(string $basePath = null)
+    public static function configure(?string $basePath = null)
     {
         $basePath = match (true) {
             is_string($basePath) => $basePath,
