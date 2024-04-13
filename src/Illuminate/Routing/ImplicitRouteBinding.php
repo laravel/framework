@@ -90,9 +90,9 @@ class ImplicitRouteBinding
 
             $reflectionEnum = new ReflectionEnum($backedEnumClass);
 
-            match ($reflectionEnum->getBackingType()->getName()) {
-                'int' => $backedEnum = collect($backedEnumClass::cases())->first(fn ($case) => (string) $case->value === (string) $parameterValue),
-                'string' => $backedEnum = $backedEnumClass::tryFrom((string) $parameterValue),
+            $backedEnum = match ($reflectionEnum->getBackingType()->getName()) {
+                'int' => collect($backedEnumClass::cases())->first(fn ($case) => (string) $case->value === (string) $parameterValue),
+                'string' => $backedEnumClass::tryFrom((string) $parameterValue),
             };
 
             if (is_null($backedEnum)) {
