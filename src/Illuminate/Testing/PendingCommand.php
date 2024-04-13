@@ -392,7 +392,7 @@ class PendingCommand
                 });
         }
 
-	    $mock->shouldReceive('writeln')
+	     $mock->shouldReceive('writeln')
             ->andReturnUsing(function ($text) {
                 $this->test->expectedOutput = array_filter($this->test->expectedOutput, function ($expectedText) use ($text) {
                     return strpos($text, $expectedText) === false;
