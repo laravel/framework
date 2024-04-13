@@ -140,7 +140,7 @@ if (! function_exists('data_set')) {
 
             if ($segments) {
                 data_set($target[$segment], $segments, $value, $overwrite);
-            } elseif ($overwrite) {
+            } else {
                 $target[$segment] = $value;
             }
         }

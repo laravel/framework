@@ -328,6 +328,40 @@ class SupportHelpersTest extends TestCase
         ], $data);
     }
 
+    public function testDataFillWhileNotArrayOrObject()
+    {
+        $data = null;
+
+        $this->assertEquals(
+            ['baz' => 'boom'],
+            data_fill($data, 'baz', 'boom')
+        );
+
+        $this->assertEquals(
+            ['baz' => 'boom'],
+            data_fill($data, 'baz', 'noop')
+        );
+
+        $this->assertEquals(
+            ['foo' => 'bar', 'baz' => 'boom'],
+            data_fill($data, 'foo', 'bar')
+        );
+
+        $this->assertEquals(
+            ['foo' => ['bar' => 'noop'], 'baz' => 'boom'],
+            data_fill($data, 'foo.bar', 'noop')
+        );
+
+        $data = null;
+
+        $this->assertEquals(['foo' => []], data_fill($data, 'foo.*', 'noop'));
+
+        $this->assertEquals(
+            ['foo' => ['bar' => 'kaboom']],
+            data_fill($data, 'foo.bar', 'kaboom')
+        );
+    }
+
     public function testDataSet()
     {
         $data = ['foo' => 'bar'];
