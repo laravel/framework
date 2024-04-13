@@ -243,6 +243,19 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     }
 
     /**
+     * Get all the items that are not present in the collection nor the given items.
+     *
+     * @param  \Illuminate\Contracts\Support\Arrayable<array-key, TValue>|iterable<array-key, TValue>  $items
+     * @return static
+     */
+    public function diffAll($items)
+    {
+        $items = $this->getArrayableItems($items);
+
+        return new static(array_merge(array_diff($this->items, $items), array_diff($items, $this->items)));
+    }
+
+    /**
      * Get the items in the collection that are not present in the given items, using the callback.
      *
      * @param  \Illuminate\Contracts\Support\Arrayable<array-key, TValue>|iterable<array-key, TValue>  $items
