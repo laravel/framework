@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Routing\Exceptions\BackedEnumCaseNotFoundException;
 use Illuminate\Support\Reflector;
 use Illuminate\Support\Str;
+use ReflectionEnum;
 
 class ImplicitRouteBinding
 {
@@ -74,6 +75,7 @@ class ImplicitRouteBinding
      * @return \Illuminate\Routing\Route
      *
      * @throws \Illuminate\Routing\Exceptions\BackedEnumCaseNotFoundException
+     * @throws \ReflectionException
      */
     protected static function resolveBackedEnumsForRoute($route, $parameters)
     {
@@ -86,7 +88,12 @@ class ImplicitRouteBinding
 
             $backedEnumClass = $parameter->getType()?->getName();
 
-            $backedEnum = $backedEnumClass::tryFrom((string) $parameterValue);
+            $reflectionEnum = new ReflectionEnum($backedEnumClass);
+
+            match ($reflectionEnum->getBackingType()->getName()) {
+                'int' => $backedEnum = collect($backedEnumClass::cases())->first(fn ($case) => (string) $case->value === (string) $parameterValue),
+                'string' => $backedEnum = $backedEnumClass::tryFrom((string) $parameterValue),
+            };
 
             if (is_null($backedEnum)) {
                 throw new BackedEnumCaseNotFoundException($backedEnumClass, $parameterValue);

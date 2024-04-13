@@ -2447,6 +2447,22 @@ class ValidationValidatorTest extends TestCase
         $this->assertSame('The foo field must be accepted when bar is true.', $v->messages()->first('foo'));
     }
 
+    public function testValidateRequiredIfDeclined()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => 'yes', 'bar' => 'baz'], ['bar' => 'required_if_declined:foo']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => 'no', 'bar' => 'baz'], ['bar' => 'required_if_declined:foo']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => 'yes', 'bar' => ''], ['bar' => 'required_if_declined:foo']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => 'no', 'bar' => ''], ['bar' => 'required_if_declined:foo']);
+        $this->assertFalse($v->passes());
+    }
+
     public function testValidateDeclined()
     {
         $trans = $this->getIlluminateArrayTranslator();

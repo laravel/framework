@@ -8,7 +8,4 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 
 final class JobToTestWithSchedule implements ShouldQueue
 {
-    public function __invoke(): void
-    {
-    }
 }

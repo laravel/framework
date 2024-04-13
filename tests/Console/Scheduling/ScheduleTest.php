@@ -36,11 +36,12 @@ final class ScheduleTest extends TestCase
     }
 
     #[DataProvider('jobHonoursDisplayNameIfMethodExistsProvider')]
-    public function testJobHonoursDisplayNameIfMethodExists(string|object $job, string $jobName): void
+    public function testJobHonoursDisplayNameIfMethodExists(object $job, string $jobName): void
     {
         $schedule = new Schedule();
         $scheduledJob = $schedule->job($job);
         self::assertSame($jobName, $scheduledJob->description);
+        self::assertFalse($this->container->resolved(JobToTestWithSchedule::class));
     }
 
     public static function jobHonoursDisplayNameIfMethodExistsProvider(): array
@@ -54,9 +55,16 @@ final class ScheduleTest extends TestCase
         };
 
         return [
-            [JobToTestWithSchedule::class, JobToTestWithSchedule::class],
             [new JobToTestWithSchedule, JobToTestWithSchedule::class],
             [$job, 'testJob-123'],
         ];
+    }
+
+    public function testJobIsNotInstantiatedIfSuppliedAsClassname(): void
+    {
+        $schedule = new Schedule();
+        $scheduledJob = $schedule->job(JobToTestWithSchedule::class);
+        self::assertSame(JobToTestWithSchedule::class, $scheduledJob->description);
+        self::assertFalse($this->container->resolved(JobToTestWithSchedule::class));
     }
 }
