@@ -37,7 +37,10 @@ class DynamicComponent extends Component
      */
     public function __construct(string $component)
     {
-        $this->component = $component;
+        $this->component = match (true) {
+            class_exists($component) => $this->compiler()->findComponentByClassName($component),
+            default => $component
+        };
     }
 
     /**

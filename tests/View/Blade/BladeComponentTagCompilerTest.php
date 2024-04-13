@@ -357,6 +357,48 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         Container::setInstance(null);
     }
 
+    public function testComponentNamesCanBeFoundByClassNames()
+    {
+        $container = new Container;
+        $container->instance(Application::class, m::mock(Application::class));
+
+        Container::setInstance($container);
+
+        $result = $this->compiler()->findComponentByClassName('App\\View\\Components\\Alert');
+
+        $this->assertSame('alert', trim($result));
+
+        Container::setInstance(null);
+    }
+
+    public function testAliasedComponentNamesCanBeFoundByClassNames()
+    {
+        $container = new Container;
+        $container->instance(Application::class, m::mock(Application::class));
+
+        Container::setInstance($container);
+
+        $result = $this->compiler(['core' => 'App\\View\\Components\\Core'])->findComponentByClassName('App\\View\\Components\\Core');
+
+        $this->assertSame('core', trim($result));
+
+        Container::setInstance(null);
+    }
+
+    public function testNamespacedComponentNamesCanBeFoundByClassNames()
+    {
+        $container = new Container;
+        $container->instance(Application::class, m::mock(Application::class));
+
+        Container::setInstance($container);
+
+        $result = $this->compiler(namespaces: ['core' => 'App\\View\\Components'])->findComponentByClassName('App\\View\\Components\\Alert\\Test');
+
+        $this->assertSame('core::alert.test', trim($result));
+
+        Container::setInstance(null);
+    }
+
     public function testComponentsCanBeCompiledWithHyphenAttributes()
     {
         $this->mockViewFactory();

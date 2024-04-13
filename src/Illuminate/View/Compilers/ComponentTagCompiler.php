@@ -401,6 +401,38 @@ class ComponentTagCompiler
     }
 
     /**
+     * Find the component for the given class using the registered namespaces and aliases.
+     *
+     * @param  string  $class
+     * @return string|null
+     */
+    public function findComponentByClassName(string $class)
+    {
+        $component = array_search($class, $this->aliases);
+
+        if ($component !== false) {
+            return $component;
+        }
+
+        [$componentClass, $componentNamespace] = collect($this->namespaces)
+            ->where(fn ($namespace) => Str::startsWith($class, $namespace))
+            ->map(fn ($class, $namespace) => [$class.'\\', $namespace.'::'])
+            ->first();
+
+        $componentClass = $componentClass ?? 'App\\View\\Components\\';
+        $componentNamespace = $componentNamespace ?? '';
+
+        return Str::of($componentNamespace)
+            ->append(
+                Str::of($class)
+                    ->remove($componentClass)
+                    ->explode('\\')
+                    ->map(fn ($path) => Str::kebab($path))
+                    ->implode('.')
+            )->toString();
+    }
+
+    /**
      * Guess the class name for the given component.
      *
      * @param  string  $component
