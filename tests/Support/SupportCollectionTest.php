@@ -22,11 +22,11 @@ use Mockery as m;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
-use stdClass;
 use Symfony\Component\VarDumper\VarDumper;
 use Traversable;
 use UnexpectedValueException;
 use WeakMap;
+use stdClass;
 
 include_once 'Enums.php';
 
@@ -1326,6 +1326,13 @@ class SupportCollectionTest extends TestCase
     {
         $c = new $collection(['id' => 1, 'first_word' => 'Hello']);
         $this->assertEquals(['id' => 1], $c->diff(new $collection(['first_word' => 'Hello', 'last_word' => 'World']))->all());
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testDiffAllCollection($collection)
+    {
+        $c = new $collection(['blue', 'green', 'red']);
+        $this->assertEquals(['green', 'yellow'], $c->diffAll(new $collection(['blue', 'yellow', 'red']))->all());
     }
 
     #[DataProvider('collectionClassProvider')]
