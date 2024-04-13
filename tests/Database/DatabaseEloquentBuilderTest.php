@@ -20,7 +20,6 @@ use Illuminate\Database\Query\Processors\Processor;
 use Illuminate\Database\RecordsNotFoundException;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection as BaseCollection;
-use Illuminate\Validation\ValidationException;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use stdClass;
@@ -129,7 +128,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->setModel($model);
         $builder->getQuery()->shouldReceive('where')->once()->with('foo_table.foo', '=', 'bar');
         $builder->shouldReceive('first')->with(['column'])->andReturn(null);
-        $builder->findOrThrow('bar');
+        $builder->findOrThrow('bar', ['column']);
     }
 
     public function testFindOrThrowMethodThrowsRecordsNotFoundExceptionWithMessage()
@@ -143,12 +142,12 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->setModel($model);
         $builder->getQuery()->shouldReceive('where')->once()->with('foo_table.foo', '=', 'bar');
         $builder->shouldReceive('first')->with(['column'])->andReturn(null);
-        $builder->findOrThrow('bar', 'Some error message');
+        $builder->findOrThrow('bar', ['column'], 'Some error message');
     }
 
     public function testFindOrThrowMethodThrowsCustomException()
     {
-        $this->expectException(ValidationException::class);
+        $this->expectException(\Exception::class);
 
         $builder = m::mock(Builder::class.'[first]', [$this->getMockQueryBuilder()]);
         $model = $this->getMockModel();
@@ -156,7 +155,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->setModel($model);
         $builder->getQuery()->shouldReceive('where')->once()->with('foo_table.foo', '=', 'bar');
         $builder->shouldReceive('first')->with(['column'])->andReturn(null);
-        $builder->findOrThrow('bar', ValidationException::withMessages(['Some error message']));
+        $builder->findOrThrow('bar', ['column'], new \Exception('Some error message'));
     }
 
     public function testFindOrFailMethodThrowsModelNotFoundException()
