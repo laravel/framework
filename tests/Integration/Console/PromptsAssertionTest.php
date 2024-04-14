@@ -8,6 +8,7 @@ use Orchestra\Testbench\TestCase;
 
 use function Laravel\Prompts\confirm;
 use function Laravel\Prompts\password;
+use function Laravel\Prompts\select;
 use function Laravel\Prompts\text;
 use function Laravel\Prompts\textarea;
 
@@ -19,6 +20,7 @@ class PromptsAssertionTest extends TestCase
         $app[Kernel::class]->registerCommand(new DummyPromptsTextAssertionCommand());
         $app[Kernel::class]->registerCommand(new DummyPromptsPasswordAssertionCommand());
         $app[Kernel::class]->registerCommand(new DummyPromptsConfirmAssertionCommand());
+        $app[Kernel::class]->registerCommand(new DummyPromptsSelectAssertionCommand());
     }
 
     public function testAssertionForTextPrompt()
@@ -49,13 +51,26 @@ class PromptsAssertionTest extends TestCase
     {
         $this
             ->artisan(DummyPromptsConfirmAssertionCommand::class)
-            ->expectsQuestion('Is your name John?', false)
+            ->expectsConfirmation('Is your name John?', 'no')
             ->expectsOutput('Your name is not John.');
 
         $this
             ->artisan(DummyPromptsConfirmAssertionCommand::class)
-            ->expectsQuestion('Is your name John?', true)
+            ->expectsConfirmation('Is your name John?', 'yes')
             ->expectsOutput('Your name is John.');
+    }
+
+    public function testAssertionForSelectPrompt()
+    {
+        $this
+            ->artisan(DummyPromptsSelectAssertionCommand::class)
+            ->expectsChoice('What is your name?', 'John', ['John', 'Jane'])
+            ->expectsOutput('Your name is John.');
+
+        $this
+            ->artisan(DummyPromptsSelectAssertionCommand::class)
+            ->expectsChoice('What is your name?', 'Jane', ['John', 'Jane'])
+            ->expectsOutput('Your name is Jane.');
     }
 }
 
@@ -108,5 +123,20 @@ class DummyPromptsConfirmAssertionCommand extends Command
         } else {
             $this->line('Your name is not John.');
         }
+    }
+}
+
+class DummyPromptsSelectAssertionCommand extends Command
+{
+    protected $signature = 'ask:name-from-list';
+
+    public function handle()
+    {
+        $name = select(
+            label: 'What is your name?',
+            options: ['John', 'Jane']
+        );
+
+        $this->line("Your name is $name.");
     }
 }
