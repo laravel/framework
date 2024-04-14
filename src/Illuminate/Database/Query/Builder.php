@@ -1307,7 +1307,7 @@ class Builder implements BuilderContract
         return $this->whereNull($columns, $boolean, true);
     }
     /**
-     * Add a "where null or" clause to the query.
+     * Add a "where or null" clause to the query.
      *
      * @param  string|array|\Illuminate\Contracts\Database\Query\Expression  $columns
      * @param  \Closure|string  $operator
@@ -1315,27 +1315,26 @@ class Builder implements BuilderContract
      * @param  string  $boolean
      * @return $this
      */
-    public function whereNullOr($columns, $operator = null, $value = null, $boolean = 'and', $not = false)
+    public function whereOrNull($columns, $operator = null, $value = null, $boolean = 'and', $not = false)
     {
         if ($operator instanceof Closure) {
             if (!is_null($value)) {
                 throw new InvalidArgumentException("A value is prohibited when subquery is used.");
             }
             return $this->whereNested(function (self $query) use ($not, $operator, $columns) {
-                return $query->whereNull($columns, 'and', $not)
-                    ->orWhere($operator);
+                return $query->whereNested($operator)
+                    ->whereNull($columns, 'or', $not);
             }, $boolean);
         }
 
         foreach (Arr::wrap($columns) as $column) {
             $this->whereNested(function (self $query) use ($value, $columns, $not, $operator, $column) {
-                $query->whereNull($column, 'and', $not)
-                    ->orWhere($column, $operator, $value);
+                $query->where($column, $operator, $value)
+                    ->whereNull($column, 'or', $not);
             }, $boolean);
         }
         return $this;
     }
-
     /**
      * Add a where between statement to the query.
      *

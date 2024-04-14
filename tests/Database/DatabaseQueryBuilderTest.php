@@ -1255,8 +1255,8 @@ class DatabaseQueryBuilderTest extends TestCase
     {
         $builder = $this->getBuilder();
         $builder->select('*')->from('table');
-        $query = $builder->whereNullOr('name', 'test');
-        $expected = 'select * from "table" where ("name" is null or "name" = ?)';
+        $query = $builder->whereOrNull('name', 'test');
+        $expected = 'select * from "table" where ("name" = ? or "name" is null)';
         $this->assertEquals($expected, $query->toSql());
     }
 
@@ -1264,8 +1264,8 @@ class DatabaseQueryBuilderTest extends TestCase
     {
         $builder = $this->getBuilder();
         $builder->select('*')->from('table');
-        $query = $builder->whereNullOr('name', 'like', '%test%');
-        $expected = 'select * from "table" where ("name" is null or "name" like ?)';
+        $query = $builder->whereOrNull('name', 'like', '%test%');
+        $expected = 'select * from "table" where ("name" like ? or "name" is null)';
         $this->assertEquals($expected, $query->toSql());
     }
 
@@ -1273,8 +1273,8 @@ class DatabaseQueryBuilderTest extends TestCase
     {
         $builder = $this->getBuilder();
         $builder->select('*')->from('table');
-        $query = $builder->whereNullOr(['name', 'name2'], 'test');
-        $expected = 'select * from "table" where ("name" is null or "name" = ?) and ("name2" is null or "name2" = ?)';
+        $query = $builder->whereOrNull(['name', 'name2'], 'test');
+        $expected = 'select * from "table" where ("name" = ? or "name" is null) and ("name2" = ? or "name2" is null)';
         $this->assertEquals($expected, $query->toSql());
     }
 
@@ -1282,8 +1282,8 @@ class DatabaseQueryBuilderTest extends TestCase
     {
         $builder = $this->getBuilder();
         $builder->select('*')->from('table');
-        $query = $builder->whereNullOr(['name', 'name2'], '>=', 'test');
-        $expected = 'select * from "table" where ("name" is null or "name" >= ?) and ("name2" is null or "name2" >= ?)';
+        $query = $builder->whereOrNull(['name', 'name2'], '>=', 'test');
+        $expected = 'select * from "table" where ("name" >= ? or "name" is null) and ("name2" >= ? or "name2" is null)';
         $this->assertEquals($expected, $query->toSql());
     }
 
@@ -1291,8 +1291,8 @@ class DatabaseQueryBuilderTest extends TestCase
     {
         $builder = $this->getBuilder();
         $builder->select('*')->from('table');
-        $query = $builder->whereNullOr(new Expression('GREATEST(from, to)'), '>', 2);
-        $expected = 'select * from "table" where (GREATEST(from, to) is null or GREATEST(from, to) > ?)';
+        $query = $builder->whereOrNull(new Expression('GREATEST(from, to)'), '>', 2);
+        $expected = 'select * from "table" where (GREATEST(from, to) > ? or GREATEST(from, to) is null)';
         $this->assertEquals($expected, $query->toSql());
         $this->assertEquals([2], $query->getBindings());
     }
@@ -1301,10 +1301,10 @@ class DatabaseQueryBuilderTest extends TestCase
     {
         $builder = $this->getBuilder();
         $builder->select('*')->from('table');
-        $query = $builder->whereNullOr('first_name', function ($query) {
+        $query = $builder->whereOrNull('first_name', function ($query) {
             $query->where('last_name', 'test');
         });
-        $expected = 'select * from "table" where ("first_name" is null or ("last_name" = ?))';
+        $expected = 'select * from "table" where (("last_name" = ?) or "first_name" is null)';
         $this->assertEquals($expected, $query->toSql());
         $this->assertEquals(['test'], $query->getBindings());
     }
@@ -1313,10 +1313,10 @@ class DatabaseQueryBuilderTest extends TestCase
     {
         $builder = $this->getBuilder();
         $builder->select('*')->from('table');
-        $query = $builder->whereNullOr(['first_name','last_name'], function ($query) {
+        $query = $builder->whereOrNull(['first_name','last_name'], function ($query) {
             $query->where('name', 'test');
         });
-        $expected = 'select * from "table" where ("first_name" is null and "last_name" is null or ("name" = ?))';
+        $expected = 'select * from "table" where (("name" = ?) or "first_name" is null or "last_name" is null)';
         $this->assertEquals($expected, $query->toSql());
         $this->assertEquals(['test'], $query->getBindings());
     }
@@ -1328,7 +1328,7 @@ class DatabaseQueryBuilderTest extends TestCase
 
         $builder = $this->getBuilder();
         $builder->select('*')->from('table');
-        $builder->whereNullOr('first_name', function ($query) {
+        $builder->whereOrNull('first_name', function ($query) {
             $query->where('last_name', 'test');
         }, 'test');
     }
