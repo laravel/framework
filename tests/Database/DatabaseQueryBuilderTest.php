@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Database;
 use BadMethodCallException;
 use Closure;
 use DateTime;
+use Illuminate\Database\Query\Expression;
 use Illuminate\Contracts\Database\Query\ConditionExpression;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
@@ -1250,6 +1251,75 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals(['%Taylor%', '%Otwell%', '%Otwell%'], $builder->getBindings());
     }
 
+    public function testWhereNullOr()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('table');
+        $query = $builder->whereNullOr('name', 'test');
+        $expected = 'select * from "table" where ("name" is null or "name" = ?)';
+        $this->assertEquals($expected, $query->toSql());
+    }
+
+    public function testWhereNullOrSimpleWithOperator()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('table');
+        $query = $builder->whereNullOr('name', 'like', '%test%');
+        $expected = 'select * from "table" where ("name" is null or "name" like ?)';
+        $this->assertEquals($expected, $query->toSql());
+    }
+
+    public function testWhereNullOrArray()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('table');
+        $query = $builder->whereNullOr(['name', 'name2'], 'test');
+        $expected = 'select * from "table" where ("name" is null or "name" = ?) and ("name2" is null or "name2" = ?)';
+        $this->assertEquals($expected, $query->toSql());
+    }
+
+    public function testWhereNullOrArrayWithOperator()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('table');
+        $query = $builder->whereNullOr(['name', 'name2'], '>=', 'test');
+        $expected = 'select * from "table" where ("name" is null or "name" >= ?) and ("name2" is null or "name2" >= ?)';
+        $this->assertEquals($expected, $query->toSql());
+    }
+
+    public function testWhereNullOrExpression()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('table');
+        $query = $builder->whereNullOr(new Expression('price - discount'), '>', 2);
+        $expected = 'select * from "table" where (price - discount is null or price - discount > ?)';
+        $this->assertEquals($expected, $query->toSql());
+        $this->assertEquals([2], $query->getBindings());
+    }
+
+    public function testWhereNullOrCallback()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('table');
+        $query = $builder->whereNullOr('first_name', function ($query) {
+            $query->where('last_name', 'test');
+        });
+        $expected = 'select * from "table" where ("first_name" is null or ("last_name" = ?))';
+        $this->assertEquals($expected, $query->toSql());
+        $this->assertEquals(['test'], $query->getBindings());
+    }
+
+    public function testWhereNullOrCallbackInvalid()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('A value is prohibited when subquery is used.');
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('table');
+        $builder->whereNullOr('first_name', function ($query) {
+            $query->where('last_name', 'test');
+        }, 'test');
+    }
     public function testUnions()
     {
         $builder = $this->getBuilder();
