@@ -1118,7 +1118,7 @@ class Route
      */
     protected function staticallyProvidedControllerMiddleware(string $class, string $method)
     {
-        return collect($class::middleware())->map(function ($middleware) {
+        return collect($class::seedMiddleware())->map(function ($middleware) {
             return $middleware instanceof Middleware
                 ? $middleware
                 : new Middleware($middleware);

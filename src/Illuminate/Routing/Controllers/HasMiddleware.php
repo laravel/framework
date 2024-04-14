@@ -9,5 +9,5 @@ interface HasMiddleware
      *
      * @return \Illuminate\Routing\Controllers\Middleware[]
      */
-    public static function middleware();
+    public static function seedMiddleware();
 }
