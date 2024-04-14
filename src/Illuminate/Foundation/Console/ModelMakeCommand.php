@@ -178,6 +178,10 @@ class ModelMakeCommand extends GeneratorCommand
             return $this->resolveStubPath('/stubs/model.morph-pivot.stub');
         }
 
+        if ($this->option('uuid')) {
+            return $this->resolveStubPath('/stubs/model.uuid.stub');
+        }
+
         return $this->resolveStubPath('/stubs/model.stub');
     }
 
@@ -219,6 +223,7 @@ class ModelMakeCommand extends GeneratorCommand
             ['force', null, InputOption::VALUE_NONE, 'Create the class even if the model already exists'],
             ['migration', 'm', InputOption::VALUE_NONE, 'Create a new migration file for the model'],
             ['morph-pivot', null, InputOption::VALUE_NONE, 'Indicates if the generated model should be a custom polymorphic intermediate table model'],
+            ['uuid', null, InputOption::VALUE_NONE, 'Indicates if the generated model should use UUID as a primary key'],
             ['policy', null, InputOption::VALUE_NONE, 'Create a new policy for the model'],
             ['seed', 's', InputOption::VALUE_NONE, 'Create a new seeder for the model'],
             ['pivot', 'p', InputOption::VALUE_NONE, 'Indicates if the generated model should be a custom intermediate table model'],
