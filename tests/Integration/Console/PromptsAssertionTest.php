@@ -75,15 +75,15 @@ class PromptsAssertionTest extends TestCase
             ->expectsOutput('Your name is Jane.');
     }
 
-    public function testAssertionForMultiselectPrompt()
+    public function testAssertionForRequiredMultiselectPrompt()
     {
         $this
-            ->artisan(DummyPromptsMultiSelectAssertionCommand::class)
+            ->artisan(DummyPromptsMultiSelectAssertionCommand::class, ['--required' => true])
             ->expectsChoice('Which names do you like?', ['John'], ['John', 'Jane', 'Sally', 'Jack'])
             ->expectsOutput('You like John.');
 
         $this
-            ->artisan(DummyPromptsMultiSelectAssertionCommand::class)
+            ->artisan(DummyPromptsMultiSelectAssertionCommand::class, ['--required' => true])
             ->expectsChoice('Which names do you like?', ['John', 'Jack', 'Sally'], ['John', 'Jane', 'Sally', 'Jack'])
             ->expectsOutput('You like John, Jack, Sally.');
     }
@@ -158,16 +158,20 @@ class DummyPromptsSelectAssertionCommand extends Command
 
 class DummyPromptsMultiSelectAssertionCommand extends Command
 {
-    protected $signature = 'ask:names-from-list';
+    protected $signature = 'ask:names-from-list {--required}';
 
     public function handle()
     {
         $names = multiselect(
             label: 'Which names do you like?',
             options: ['John', 'Jane', 'Sally', 'Jack'],
-            required: true
+            required: $this->option('required')
         );
 
-        $this->line(sprintf('You like %s.', implode(', ', $names)));
+        if (!empty($names)) {
+            $this->line(sprintf('You like %s.', implode(', ', $names)));
+        } else {
+            $this->line('You do not like any names.');
+        }
     }
 }
