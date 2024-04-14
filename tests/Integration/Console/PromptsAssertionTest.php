@@ -168,7 +168,7 @@ class DummyPromptsMultiSelectAssertionCommand extends Command
             required: $this->option('required')
         );
 
-        if (!empty($names)) {
+        if (! empty($names)) {
             $this->line(sprintf('You like %s.', implode(', ', $names)));
         } else {
             $this->line('You do not like any names.');
