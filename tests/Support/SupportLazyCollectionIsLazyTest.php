@@ -7,6 +7,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\ItemNotFoundException;
 use Illuminate\Support\LazyCollection;
 use Illuminate\Support\MultipleItemsFoundException;
+use Illuminate\Support\Sleep;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use stdClass;
@@ -1368,6 +1369,25 @@ class SupportLazyCollectionIsLazyTest extends TestCase
                 // Silence is golden!
             })->all();
         });
+    }
+
+    public function testThrottleIsLazy()
+    {
+        Sleep::fake();
+
+        $this->assertDoesNotEnumerate(function ($collection) {
+            $collection->throttle(10);
+        });
+
+        $this->assertEnumerates(5, function ($collection) {
+            $collection->throttle(10)->take(5)->all();
+        });
+
+        $this->assertEnumeratesOnce(function ($collection) {
+            $collection->throttle(10)->all();
+        });
+
+        Sleep::fake(false);
     }
 
     public function testTimesIsLazy()
