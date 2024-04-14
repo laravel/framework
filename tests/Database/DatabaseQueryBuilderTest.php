@@ -5,11 +5,11 @@ namespace Illuminate\Tests\Database;
 use BadMethodCallException;
 use Closure;
 use DateTime;
-use Illuminate\Database\Query\Expression;
 use Illuminate\Contracts\Database\Query\ConditionExpression;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Query\Builder;
+use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Query\Expression as Raw;
 use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\Query\Grammars\MariaDbGrammar;
@@ -1313,7 +1313,7 @@ class DatabaseQueryBuilderTest extends TestCase
     {
         $builder = $this->getBuilder();
         $builder->select('*')->from('table');
-        $query = $builder->whereOrNull(['first_name','last_name'], function ($query) {
+        $query = $builder->whereOrNull(['first_name', 'last_name'], function ($query) {
             $query->where('name', 'test');
         });
         $expected = 'select * from "table" where (("name" = ?) or "first_name" is null or "last_name" is null)';
@@ -1332,6 +1332,7 @@ class DatabaseQueryBuilderTest extends TestCase
             $query->where('last_name', 'test');
         }, 'test');
     }
+
     public function testUnions()
     {
         $builder = $this->getBuilder();

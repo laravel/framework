@@ -1285,6 +1285,7 @@ class Builder implements BuilderContract
 
         return $this;
     }
+
     /**
      * Add an "or where null" clause to the query.
      *
@@ -1295,6 +1296,7 @@ class Builder implements BuilderContract
     {
         return $this->whereNull($column, 'or');
     }
+
     /**
      * Add a "where not null" clause to the query.
      *
@@ -1306,6 +1308,7 @@ class Builder implements BuilderContract
     {
         return $this->whereNull($columns, $boolean, true);
     }
+
     /**
      * Add a "where or null" clause to the query.
      *
@@ -1318,9 +1321,10 @@ class Builder implements BuilderContract
     public function whereOrNull($columns, $operator = null, $value = null, $boolean = 'and', $not = false)
     {
         if ($operator instanceof Closure) {
-            if (!is_null($value)) {
-                throw new InvalidArgumentException("A value is prohibited when subquery is used.");
+            if (! is_null($value)) {
+                throw new InvalidArgumentException('A value is prohibited when subquery is used.');
             }
+
             return $this->whereNested(function (self $query) use ($not, $operator, $columns) {
                 return $query->whereNested($operator)
                     ->whereNull($columns, 'or', $not);
@@ -1328,13 +1332,15 @@ class Builder implements BuilderContract
         }
 
         foreach (Arr::wrap($columns) as $column) {
-            $this->whereNested(function (self $query) use ($value, $columns, $not, $operator, $column) {
+            $this->whereNested(function (self $query) use ($value, $not, $operator, $column) {
                 $query->where($column, $operator, $value)
                     ->whereNull($column, 'or', $not);
             }, $boolean);
         }
+
         return $this;
     }
+
     /**
      * Add a where between statement to the query.
      *
