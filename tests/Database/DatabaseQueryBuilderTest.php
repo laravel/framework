@@ -1291,8 +1291,8 @@ class DatabaseQueryBuilderTest extends TestCase
     {
         $builder = $this->getBuilder();
         $builder->select('*')->from('table');
-        $query = $builder->whereNullOr(new Expression('price - discount'), '>', 2);
-        $expected = 'select * from "table" where (price - discount is null or price - discount > ?)';
+        $query = $builder->whereNullOr(new Expression('GREATEST(from, to)'), '>', 2);
+        $expected = 'select * from "table" where (GREATEST(from, to) is null or GREATEST(from, to) > ?)';
         $this->assertEquals($expected, $query->toSql());
         $this->assertEquals([2], $query->getBindings());
     }
@@ -1305,6 +1305,18 @@ class DatabaseQueryBuilderTest extends TestCase
             $query->where('last_name', 'test');
         });
         $expected = 'select * from "table" where ("first_name" is null or ("last_name" = ?))';
+        $this->assertEquals($expected, $query->toSql());
+        $this->assertEquals(['test'], $query->getBindings());
+    }
+
+    public function testWhereNullOrCallbackWithArray()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('table');
+        $query = $builder->whereNullOr(['first_name','last_name'], function ($query) {
+            $query->where('name', 'test');
+        });
+        $expected = 'select * from "table" where ("first_name" is null and "last_name" is null or ("name" = ?))';
         $this->assertEquals($expected, $query->toSql());
         $this->assertEquals(['test'], $query->getBindings());
     }
