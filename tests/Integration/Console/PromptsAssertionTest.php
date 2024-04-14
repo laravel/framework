@@ -86,6 +86,18 @@ class PromptsAssertionTest extends TestCase
             ->artisan(DummyPromptsMultiSelectAssertionCommand::class, ['--required' => true])
             ->expectsChoice('Which names do you like?', ['John', 'Jack', 'Sally'], ['John', 'Jane', 'Sally', 'Jack'])
             ->expectsOutput('You like John, Jack, Sally.');
+
+        $this
+            ->artisan(DummyPromptsMultiSelectAssertionCommand::class, ['--required' => true])
+            ->expectsChoice('Which names do you like?', [], ['John', 'Jane', 'Sally', 'Jack']);
+    }
+
+    public function testAssertionForOptionalRequiredMultiselectPrompt()
+    {
+        $this
+            ->artisan(DummyPromptsMultiSelectAssertionCommand::class, ['--required' => false])
+            ->expectsChoice('Which names do you like?', [], ['John', 'Jane', 'Sally', 'Jack'])
+            ->expectsOutput('You do not like any names.');
     }
 }
 
