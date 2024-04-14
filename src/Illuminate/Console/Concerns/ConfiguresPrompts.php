@@ -12,6 +12,7 @@ use Laravel\Prompts\Prompt;
 use Laravel\Prompts\SearchPrompt;
 use Laravel\Prompts\SelectPrompt;
 use Laravel\Prompts\SuggestPrompt;
+use Laravel\Prompts\TextareaPrompt;
 use Laravel\Prompts\TextPrompt;
 use stdClass;
 use Symfony\Component\Console\Input\InputInterface;
@@ -35,6 +36,12 @@ trait ConfiguresPrompts
         Prompt::fallbackWhen(windows_os() || $this->laravel->runningUnitTests());
 
         TextPrompt::fallbackUsing(fn (TextPrompt $prompt) => $this->promptUntilValid(
+            fn () => $this->components->ask($prompt->label, $prompt->default ?: null) ?? '',
+            $prompt->required,
+            $prompt->validate
+        ));
+
+        TextareaPrompt::fallbackUsing(fn (TextareaPrompt $prompt) => $this->promptUntilValid(
             fn () => $this->components->ask($prompt->label, $prompt->default ?: null) ?? '',
             $prompt->required,
             $prompt->validate
