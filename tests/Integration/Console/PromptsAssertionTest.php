@@ -7,6 +7,7 @@ use Illuminate\Contracts\Console\Kernel;
 use Orchestra\Testbench\TestCase;
 
 use function Laravel\Prompts\confirm;
+use function Laravel\Prompts\multiselect;
 use function Laravel\Prompts\password;
 use function Laravel\Prompts\select;
 use function Laravel\Prompts\text;
@@ -21,6 +22,7 @@ class PromptsAssertionTest extends TestCase
         $app[Kernel::class]->registerCommand(new DummyPromptsPasswordAssertionCommand());
         $app[Kernel::class]->registerCommand(new DummyPromptsConfirmAssertionCommand());
         $app[Kernel::class]->registerCommand(new DummyPromptsSelectAssertionCommand());
+        $app[Kernel::class]->registerCommand(new DummyPromptsMultiSelectAssertionCommand());
     }
 
     public function testAssertionForTextPrompt()
@@ -71,6 +73,19 @@ class PromptsAssertionTest extends TestCase
             ->artisan(DummyPromptsSelectAssertionCommand::class)
             ->expectsChoice('What is your name?', 'Jane', ['John', 'Jane'])
             ->expectsOutput('Your name is Jane.');
+    }
+
+    public function testAssertionForMultiselectPrompt()
+    {
+        $this
+            ->artisan(DummyPromptsMultiSelectAssertionCommand::class)
+            ->expectsChoice('Which names do you like?', ['John'], ['John', 'Jane', 'Sally', 'Jack'])
+            ->expectsOutput('You like John.');
+
+        $this
+            ->artisan(DummyPromptsMultiSelectAssertionCommand::class)
+            ->expectsChoice('Which names do you like?', ['John', 'Jack', 'Sally'], ['John', 'Jane', 'Sally', 'Jack'])
+            ->expectsOutput('You like John, Jack, Sally.');
     }
 }
 
@@ -138,5 +153,21 @@ class DummyPromptsSelectAssertionCommand extends Command
         );
 
         $this->line("Your name is $name.");
+    }
+}
+
+class DummyPromptsMultiSelectAssertionCommand extends Command
+{
+    protected $signature = 'ask:names-from-list';
+
+    public function handle()
+    {
+        $names = multiselect(
+            label: 'Which names do you like?',
+            options: ['John', 'Jane', 'Sally', 'Jack'],
+            required: true
+        );
+
+        $this->line(sprintf('You like %s.', implode(', ', $names)));
     }
 }
