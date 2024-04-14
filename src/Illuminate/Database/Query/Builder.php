@@ -1285,6 +1285,31 @@ class Builder implements BuilderContract
 
         return $this;
     }
+    /**
+     * Add a "where null or" clause to the query.
+     *
+     * @param  string|array|\Illuminate\Contracts\Database\Query\Expression  $columns
+     * @param  \Closure|string  $operator
+     * @param  mixed  $value
+     * @param  string  $boolean
+     * @return $this
+     */
+    public function whereNullOr($columns, $operator = null, $value = null, $boolean = 'and', $not = false)
+    {
+        foreach (Arr::wrap($columns) as $column) {
+            $this->where(function (self $query) use ($value, $columns, $not, $operator, $column) {
+                $query->whereNull($column, 'and', $not);
+                if ($operator instanceof Closure) {
+                    if (!is_null($value)) {
+                        throw new InvalidArgumentException("A value is prohibited when subquery is used.");
+                    }
+                    return $query->orWhere($operator);
+                }
+                return $query->orWhere($column, $operator, $value);
+            }, null, null, $boolean);
+        }
+        return $this;
+    }
 
     /**
      * Add an "or where null" clause to the query.
