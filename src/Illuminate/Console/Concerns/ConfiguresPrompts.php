@@ -249,10 +249,10 @@ trait ConfiguresPrompts
      */
     private function multiselectFallback($label, $options, $default = [], $required = false)
     {
-        $options = PromptOption::wrap($options);
+        $promptOptions = PromptOption::wrap($options);
 
         if ($required === false) {
-            $options = [new PromptOption(null, 'None'), ...$options];
+            $promptOptions = [new PromptOption(null, 'None'), ...$promptOptions];
 
             if ($default === []) {
                 $default = [null];
@@ -260,10 +260,10 @@ trait ConfiguresPrompts
         }
 
         $default = $default !== []
-            ? implode(',', array_keys(array_filter($options, fn ($option) => in_array($option->value, $default))))
+            ? implode(',', array_keys(array_filter($promptOptions, fn ($option) => in_array($option->value, $default))))
             : null;
 
-        $answers = PromptOption::unwrap($this->components->choice($label, $options, $default, multiple: true));
+        $answers = PromptOption::unwrap($this->components->choice($label, PromptOption::wrap($options), $default, multiple: true));
 
         if ($required === false) {
             return array_values(array_filter($answers, fn ($value) => $value !== null));

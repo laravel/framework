@@ -353,6 +353,8 @@ class PendingCommand
             foreach ($this->test->expectedChoices as $question => $answers) {
                 $assertion = $answers['strict'] ? 'assertEquals' : 'assertEqualsCanonicalizing';
 
+                dump($answers['actual']);
+                dump($answers['expected']);
                 $this->test->{$assertion}(
                     $answers['expected'],
                     $answers['actual'],
