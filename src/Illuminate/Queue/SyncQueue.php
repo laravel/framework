@@ -16,6 +16,7 @@ class SyncQueue extends Queue implements QueueContract
      * Create a new sync queue instance.
      *
      * @param  bool  $dispatchAfterCommit
+     * @return void
      */
     public function __construct($dispatchAfterCommit = false)
     {
