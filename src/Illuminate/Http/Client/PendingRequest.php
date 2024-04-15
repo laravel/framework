@@ -765,7 +765,7 @@ class PendingRequest
      * @param  array|string|null  $query
      * @return \Illuminate\Http\Client\Response
      *
-     * @throws ConnectionException|\Throwable
+     * @throws ConnectionException
      */
     public function get(string $url, $query = null)
     {
@@ -781,7 +781,7 @@ class PendingRequest
      * @param  array|string|null  $query
      * @return \Illuminate\Http\Client\Response
      *
-     * @throws ConnectionException|\Throwable
+     * @throws ConnectionException
      */
     public function head(string $url, $query = null)
     {
@@ -797,7 +797,7 @@ class PendingRequest
      * @param  array  $data
      * @return \Illuminate\Http\Client\Response
      *
-     * @throws ConnectionException|\Throwable
+     * @throws ConnectionException
      */
     public function post(string $url, $data = [])
     {
@@ -813,7 +813,7 @@ class PendingRequest
      * @param  array  $data
      * @return \Illuminate\Http\Client\Response
      *
-     * @throws ConnectionException|\Throwable
+     * @throws ConnectionException
      */
     public function patch(string $url, $data = [])
     {
@@ -829,7 +829,7 @@ class PendingRequest
      * @param  array  $data
      * @return \Illuminate\Http\Client\Response
      *
-     * @throws ConnectionException|\Throwable
+     * @throws ConnectionException
      */
     public function put(string $url, $data = [])
     {
@@ -845,7 +845,7 @@ class PendingRequest
      * @param  array  $data
      * @return \Illuminate\Http\Client\Response
      *
-     * @throws ConnectionException|\Throwable
+     * @throws ConnectionException
      */
     public function delete(string $url, $data = [])
     {
@@ -881,7 +881,8 @@ class PendingRequest
      * @param  array  $options
      * @return \Illuminate\Http\Client\Response
      *
-     * @throws ConnectionException|\Exception|\Throwable
+     * @throws Exception
+     * @throws ConnectionException
      */
     public function send(string $method, string $url, array $options = [])
     {
@@ -1100,7 +1101,7 @@ class PendingRequest
      * @param  array  $options
      * @return \Psr\Http\Message\MessageInterface|\GuzzleHttp\Promise\PromiseInterface
      *
-     * @throws \Exception
+     * @throws Exception
      */
     protected function sendRequest(string $method, string $url, array $options = [])
     {
