@@ -120,9 +120,14 @@ class ApiInstallCommand extends Command
      */
     protected function installSanctum()
     {
-        $this->requireComposerPackages($this->option('composer'), [
+        $installed = $this->requireComposerPackages($this->option('composer'), [
             'laravel/sanctum:^4.0',
         ]);
+
+        if(!$installed){
+            $this->components->warn("Unable to install composer package.");
+            exit;
+        }
 
         $migrationPublished = collect(scandir($this->laravel->databasePath('migrations')))->contains(function ($migration) {
             return preg_match('/\d{4}_\d{2}_\d{2}_\d{6}_create_personal_access_tokens_table.php/', $migration);
@@ -146,8 +151,13 @@ class ApiInstallCommand extends Command
      */
     protected function installPassport()
     {
-        $this->requireComposerPackages($this->option('composer'), [
+        $installed = $this->requireComposerPackages($this->option('composer'), [
             'laravel/passport:^12.0',
         ]);
+
+        if(!$installed){
+            $this->components->warn("Unable to install composer package.");
+            exit;
+        }
     }
 }
