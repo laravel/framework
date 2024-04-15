@@ -50,7 +50,6 @@ class EncrypterTest extends TestCase
         $this->assertSame('foo', $new->decryptString($encrypted));
     }
 
-
     public function testEncryptionUsingBase64EncodedKey()
     {
         $e = new Encrypter(random_bytes(16));
