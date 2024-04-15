@@ -34,28 +34,12 @@ class QuestionHelper extends SymfonyQuestionHelper
                 : '<comment>Ctrl+D</comment>');
         }
 
-        switch (true) {
-            case null === $default:
-                $text = sprintf('<info>%s</info>', $text);
-
-                break;
-
-            case $question instanceof ConfirmationQuestion:
-                $text = sprintf('<info>%s (yes/no)</info> [<comment>%s</comment>]', $text, $default ? 'yes' : 'no');
-
-                break;
-
-            case $question instanceof ChoiceQuestion:
-                $choices = $question->getChoices();
-                $text = sprintf('<info>%s</info> [<comment>%s</comment>]', $text, OutputFormatter::escape($choices[$default] ?? $default));
-
-                break;
-
-            default:
-                $text = sprintf('<info>%s</info> [<comment>%s</comment>]', $text, OutputFormatter::escape($default));
-
-                break;
-        }
+        $text = match (true) {
+            is_null($default) => sprintf('<info>%s</info>', $text),
+            $question instanceof ConfirmationQuestion => $text = sprintf('<info>%s (yes/no)</info> [<comment>%s</comment>]', $text, $default ? 'yes' : 'no'),
+            $question instanceof ChoiceQuestion => sprintf('<info>%s</info> [<comment>%s</comment>]', $text, OutputFormatter::escape($question->getChoices()[$default] ?? $default)),
+            default => sprintf('<info>%s</info> [<comment>%s</comment>]', $text, OutputFormatter::escape($default)),
+        };
 
         $output->writeln($text);
 
