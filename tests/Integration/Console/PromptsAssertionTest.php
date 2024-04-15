@@ -15,163 +15,151 @@ use function Laravel\Prompts\textarea;
 
 class PromptsAssertionTest extends TestCase
 {
-    protected function defineEnvironment($app)
-    {
-        $app[Kernel::class]->registerCommand(new DummyPromptsTextareaAssertionCommand());
-        $app[Kernel::class]->registerCommand(new DummyPromptsTextAssertionCommand());
-        $app[Kernel::class]->registerCommand(new DummyPromptsPasswordAssertionCommand());
-        $app[Kernel::class]->registerCommand(new DummyPromptsConfirmAssertionCommand());
-        $app[Kernel::class]->registerCommand(new DummyPromptsSelectAssertionCommand());
-        $app[Kernel::class]->registerCommand(new DummyPromptsMultiSelectAssertionCommand());
-    }
-
     public function testAssertionForTextPrompt()
     {
+        $this->app[Kernel::class]->registerCommand(
+            new class extends Command
+            {
+                protected $signature = 'test:text';
+
+                public function handle()
+                {
+                    $name = text('What is your name?', 'John');
+
+                    $this->line($name);
+                }
+            }
+        );
+
         $this
-            ->artisan(DummyPromptsTextareaAssertionCommand::class)
-            ->expectsQuestion('What is your name?', 'John')
-            ->expectsOutput('John');
+            ->artisan('test:text')
+            ->expectsQuestion('What is your name?', 'Jane')
+            ->expectsOutput('Jane');
     }
 
     public function testAssertionForTextareaPrompt()
     {
+        $this->app[Kernel::class]->registerCommand(
+            new class extends Command
+            {
+                protected $signature = 'test:textarea';
+
+                public function handle()
+                {
+                    $name = textarea('What is your name?', 'John');
+
+                    $this->line($name);
+                }
+            }
+        );
+
         $this
-            ->artisan(DummyPromptsTextareaAssertionCommand::class)
-            ->expectsQuestion('What is your name?', 'John')
-            ->expectsOutput('John');
+            ->artisan('test:textarea')
+            ->expectsQuestion('What is your name?', 'Jane')
+            ->expectsOutput('Jane');
     }
 
     public function testAssertionForPasswordPrompt()
     {
+        $this->app[Kernel::class]->registerCommand(
+            new class extends Command
+            {
+                protected $signature = 'test:password';
+
+                public function handle()
+                {
+                    $name = password('What is your password?');
+
+                    $this->line($name);
+                }
+            }
+        );
+
         $this
-            ->artisan(DummyPromptsPasswordAssertionCommand::class)
+            ->artisan('test:password')
             ->expectsQuestion('What is your password?', 'secret')
             ->expectsOutput('secret');
     }
 
     public function testAssertionForConfirmPrompt()
     {
+        $this->app[Kernel::class]->registerCommand(
+            new class extends Command
+            {
+                protected $signature = 'test:confirm';
+
+                public function handle()
+                {
+                    $confirmed = confirm('Is your name John?');
+
+                    if ($confirmed) {
+                        $this->line('Your name is John.');
+                    } else {
+                        $this->line('Your name is not John.');
+                    }
+                }
+            }
+        );
+
         $this
-            ->artisan(DummyPromptsConfirmAssertionCommand::class)
+            ->artisan('test:confirm')
             ->expectsConfirmation('Is your name John?', 'no')
             ->expectsOutput('Your name is not John.');
 
         $this
-            ->artisan(DummyPromptsConfirmAssertionCommand::class)
+            ->artisan('test:confirm')
             ->expectsConfirmation('Is your name John?', 'yes')
             ->expectsOutput('Your name is John.');
     }
 
     public function testAssertionForSelectPrompt()
     {
-        $this
-            ->artisan(DummyPromptsSelectAssertionCommand::class)
-            ->expectsChoice('What is your name?', 'John', ['John', 'Jane'])
-            ->expectsOutput('Your name is John.');
+        $this->app[Kernel::class]->registerCommand(
+            new class extends Command
+            {
+                protected $signature = 'test:select';
+
+                public function handle()
+                {
+                    $name = select(
+                        label: 'What is your name?',
+                        options: ['John', 'Jane']
+                    );
+
+                    $this->line("Your name is $name.");
+                }
+            }
+        );
 
         $this
-            ->artisan(DummyPromptsSelectAssertionCommand::class)
+            ->artisan('test:select')
             ->expectsChoice('What is your name?', 'Jane', ['John', 'Jane'])
             ->expectsOutput('Your name is Jane.');
     }
 
     public function testAssertionForRequiredMultiselectPrompt()
     {
-        $this
-            ->artisan(DummyPromptsMultiSelectAssertionCommand::class, ['--required' => true])
-            ->expectsChoice('Which names do you like?', ['John'], ['John', 'Jane', 'Sally', 'Jack'])
-            ->expectsOutput('You like John.');
+        $this->app[Kernel::class]->registerCommand(
+            new class extends Command
+            {
+                protected $signature = 'test:multiselect';
 
-        $this
-            ->artisan(DummyPromptsMultiSelectAssertionCommand::class, ['--required' => true])
-            ->expectsChoice('Which names do you like?', ['John', 'Jack', 'Sally'], ['John', 'Jane', 'Sally', 'Jack'])
-            ->expectsOutput('You like John, Jack, Sally.');
-    }
-}
+                public function handle()
+                {
+                    $names = multiselect(
+                        label: 'Which names do you like?',
+                        options: ['John', 'Jane', 'Sally', 'Jack'],
+                        required: true
+                    );
 
-class DummyPromptsTextAssertionCommand extends Command
-{
-    protected $signature = 'ask:text';
-
-    public function handle()
-    {
-        $name = text('What is your name?', 'John');
-
-        $this->line($name);
-    }
-}
-
-class DummyPromptsTextareaAssertionCommand extends Command
-{
-    protected $signature = 'ask:textarea';
-
-    public function handle()
-    {
-        $name = textarea('What is your name?', 'John');
-
-        $this->line($name);
-    }
-}
-
-class DummyPromptsPasswordAssertionCommand extends Command
-{
-    protected $signature = 'ask:password';
-
-    public function handle()
-    {
-        $name = password('What is your password?', 'secret');
-
-        $this->line($name);
-    }
-}
-
-class DummyPromptsConfirmAssertionCommand extends Command
-{
-    protected $signature = 'ask:confirm';
-
-    public function handle()
-    {
-        $confirmed = confirm('Is your name John?');
-
-        if ($confirmed) {
-            $this->line('Your name is John.');
-        } else {
-            $this->line('Your name is not John.');
-        }
-    }
-}
-
-class DummyPromptsSelectAssertionCommand extends Command
-{
-    protected $signature = 'ask:name-from-list';
-
-    public function handle()
-    {
-        $name = select(
-            label: 'What is your name?',
-            options: ['John', 'Jane']
+                    $this->line(sprintf('You like %s.', implode(', ', $names)));
+                }
+            }
         );
 
-        $this->line("Your name is $name.");
-    }
-}
-
-class DummyPromptsMultiSelectAssertionCommand extends Command
-{
-    protected $signature = 'ask:names-from-list {--required}';
-
-    public function handle()
-    {
-        $names = multiselect(
-            label: 'Which names do you like?',
-            options: ['John', 'Jane', 'Sally', 'Jack'],
-            required: $this->option('required')
-        );
-
-        if (! empty($names)) {
-            $this->line(sprintf('You like %s.', implode(', ', $names)));
-        } else {
-            $this->line('You do not like any names.');
-        }
+        $this
+            ->artisan('test:multiselect')
+            ->expectsChoice('Which names do you like?', ['John', 'Jane'], ['John', 'Jane', 'Sally', 'Jack'])
+            ->expectsOutput('You like John, Jane.');
     }
 }
