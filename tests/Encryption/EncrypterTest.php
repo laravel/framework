@@ -38,6 +38,18 @@ class EncrypterTest extends TestCase
         $this->assertSame('foo', $decrypted);
     }
 
+    public function testItValidatesMacOnPerKeyBasis()
+    {
+        // Payload created with (key: str_repeat('b', 16)) but will
+        // "successfully" decrypt with (key: str_repeat('a', 16)), however it
+        // outputs a random binary string as it is not the correct key.
+        $encrypted = 'eyJpdiI6Ilg0dFM5TVRibEFqZW54c3lQdWJoVVE9PSIsInZhbHVlIjoiRGJpa2p2ZHI3eUs0dUtRakJneUhUUT09IiwibWFjIjoiMjBjZWYxODdhNThhOTk4MTk1NTc0YTE1MDgzODU1OWE0ZmQ4MDc5ZjMxYThkOGM1ZmM1MzlmYzBkYTBjMWI1ZiIsInRhZyI6IiJ9';
+
+        $new = new Encrypter(str_repeat('a', 16));
+        $new->previousKeys([str_repeat('b', 16)]);
+        $this->assertSame('foo', $new->decryptString($encrypted));
+    }
+
     public function testEncryptionUsingBase64EncodedKey()
     {
         $e = new Encrypter(random_bytes(16));
