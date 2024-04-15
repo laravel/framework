@@ -42,7 +42,7 @@ trait ConfiguresPrompts
         ));
 
         TextareaPrompt::fallbackUsing(fn (TextareaPrompt $prompt) => $this->promptUntilValid(
-            fn () => $this->components->ask($prompt->label, $prompt->default ?: null) ?? '',
+            fn () => $this->components->ask($prompt->label, $prompt->default ?: null, multiline: true) ?? '',
             $prompt->required,
             $prompt->validate
         ));
