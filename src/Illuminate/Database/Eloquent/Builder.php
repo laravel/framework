@@ -1340,6 +1340,34 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Combine where and delete method.
+     *
+     * @param  \Closure|string|array|\Illuminate\Contracts\Database\Query\Expression  $column
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @param  string  $boolean
+     * @return mixed
+     */
+    public function deleteWhere($column, $operator = null, $value = null, $boolean = 'and')
+    {
+        return $this->where($column, $operator, $value, $boolean)->delete();
+    }
+
+    /**
+     * Combine where and force delete method.
+     *
+     * @param  \Closure|string|array|\Illuminate\Contracts\Database\Query\Expression  $column
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @param  string  $boolean
+     * @return mixed
+     */
+    public function forceDeleteWhere($column, $operator = null, $value = null, $boolean = 'and')
+    {
+        return $this->where($column, $operator, $value, $boolean)->forceDelete();
+    }
+
+    /**
      * Determine if the given model has a scope.
      *
      * @param  string  $scope
