@@ -1101,7 +1101,7 @@ class PendingRequest
      * @param  array  $options
      * @return \Psr\Http\Message\MessageInterface|\GuzzleHttp\Promise\PromiseInterface
      *
-     * @throws Exception
+     * @throws \Exception
      */
     protected function sendRequest(string $method, string $url, array $options = [])
     {
