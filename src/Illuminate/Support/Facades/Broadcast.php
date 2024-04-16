@@ -2,7 +2,6 @@
 
 namespace Illuminate\Support\Facades;
 
-use Illuminate\Broadcasting\Channel;
 use Illuminate\Contracts\Broadcasting\Factory as BroadcastingFactoryContract;
 
 /**
