@@ -6,11 +6,24 @@ use Carbon\CarbonInterval;
 use Illuminate\Database\Connection;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Carbon;
 use PDO;
 use PHPUnit\Framework\TestCase;
 
 class QueryDurationThresholdTest extends TestCase
 {
+    /**
+     * @var \Illuminate\Support\Carbon
+     */
+    protected $now;
+
+    protected function tearDown(): void
+    {
+        Carbon::setTestNow(null);
+
+        parent::tearDown();
+    }
+
     public function testItCanHandleReachingADurationThresholdInTheDb()
     {
         $connection = new Connection(new PDO('sqlite::memory:'));
@@ -46,10 +59,12 @@ class QueryDurationThresholdTest extends TestCase
 
     public function testItIsOnlyCalledOnceWhenGivenDateTime()
     {
+        Carbon::setTestNow($this->now = Carbon::create(2017, 6, 27, 13, 14, 15, 'UTC'));
+
         $connection = new Connection(new PDO('sqlite::memory:'));
         $connection->setEventDispatcher(new Dispatcher());
         $called = 0;
-        $connection->whenQueryingForLongerThan(now()->addMilliseconds(1), function () use (&$called) {
+        $connection->whenQueryingForLongerThan($this->now->addMilliseconds(1), function () use (&$called) {
             $called++;
         });
 

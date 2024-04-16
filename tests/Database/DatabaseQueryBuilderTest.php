@@ -24,6 +24,7 @@ use Illuminate\Pagination\AbstractPaginator as Paginator;
 use Illuminate\Pagination\Cursor;
 use Illuminate\Pagination\CursorPaginator;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Tests\Database\Fixtures\Enums\Bar;
 use InvalidArgumentException;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -1042,8 +1043,10 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testWhereIntegerInRaw()
     {
         $builder = $this->getBuilder();
-        $builder->select('*')->from('users')->whereIntegerInRaw('id', ['1a', 2]);
-        $this->assertSame('select * from "users" where "id" in (1, 2)', $builder->toSql());
+        $builder->select('*')->from('users')->whereIntegerInRaw('id', [
+            '1a', 2, Bar::FOO,
+        ]);
+        $this->assertSame('select * from "users" where "id" in (1, 2, 5)', $builder->toSql());
         $this->assertEquals([], $builder->getBindings());
 
         $builder = $this->getBuilder();
@@ -1051,8 +1054,9 @@ class DatabaseQueryBuilderTest extends TestCase
             ['id' => '1a'],
             ['id' => 2],
             ['any' => '3'],
+            ['id' => Bar::FOO],
         ]);
-        $this->assertSame('select * from "users" where "id" in (1, 2, 3)', $builder->toSql());
+        $this->assertSame('select * from "users" where "id" in (1, 2, 3, 5)', $builder->toSql());
         $this->assertEquals([], $builder->getBindings());
     }
 
