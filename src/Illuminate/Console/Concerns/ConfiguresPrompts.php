@@ -252,7 +252,7 @@ trait ConfiguresPrompts
     {
         $default = $default !== [] ? implode(',', $default) : null;
 
-        if ($required === false) {
+        if ($required === false && ! $this->laravel->runningUnitTests()) {
             $options = array_is_list($options)
                 ? ['None', ...$options]
                 : ['' => 'None'] + $options;
