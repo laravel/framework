@@ -54,6 +54,21 @@ class TraitMakeCommand extends GeneratorCommand
     }
 
     /**
+     * Get the default namespace for the class.
+     *
+     * @param  string  $rootNamespace
+     * @return string
+     */
+    protected function getDefaultNamespace($rootNamespace)
+    {
+        return match (true) {
+            is_dir(app_path('Concerns')) => $rootNamespace.'\\Concerns',
+            is_dir(app_path('Traits')) => $rootNamespace.'\\Traits',
+            default => $rootNamespace,
+        };
+    }
+
+    /**
      * Get the console command arguments.
      *
      * @return array
