@@ -52,6 +52,6 @@ class Broadcast extends Facade
      */
     public static function on(string|array $channels): AnonymousBroadcastable
     {
-        return new AnonymousBroadcastable(Arr::wrap($channels));
+        return new AnonymousBroadcastable($channels);
     }
 }

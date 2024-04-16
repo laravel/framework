@@ -5,6 +5,7 @@ namespace Illuminate\Broadcasting;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Foundation\Events\Dispatchable;
+use Illuminate\Support\Arr;
 
 class AnonymousBroadcastable implements ShouldBroadcast
 {
@@ -13,7 +14,7 @@ class AnonymousBroadcastable implements ShouldBroadcast
     /**
      * The name the event should be broadcast as.
      */
-    protected string $name;
+    protected ?string $name = null;
 
     /**
      * The payload the event should be broadcast with.
@@ -30,9 +31,9 @@ class AnonymousBroadcastable implements ShouldBroadcast
      *
      * @return void
      */
-    public function __construct(protected array $channels)
+    public function __construct(protected string|array $channels)
     {
-        //
+        $this->channels = Arr::wrap($channels);
     }
 
     /**
@@ -78,7 +79,7 @@ class AnonymousBroadcastable implements ShouldBroadcast
      */
     public function broadcastAs(): string
     {
-        return $this->name;
+        return $this->name ?: class_basename($this);
 
         return $this;
     }
