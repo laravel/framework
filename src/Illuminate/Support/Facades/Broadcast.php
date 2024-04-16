@@ -3,8 +3,10 @@
 namespace Illuminate\Support\Facades;
 
 use Illuminate\Broadcasting\AnonymousBroadcastable;
+use Illuminate\Broadcasting\Channel;
+use Illuminate\Broadcasting\PresenceChannel;
+use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\Factory as BroadcastingFactoryContract;
-use Illuminate\Support\Arr;
 
 /**
  * @method static void routes(array|null $attributes = null)
@@ -50,8 +52,24 @@ class Broadcast extends Facade
     /**
      * Begin sending a broadcast to the given channels.
      */
-    public static function on(string|array $channels): AnonymousBroadcastable
+    public static function on(Channel|string|array $channels): AnonymousBroadcastable
     {
         return new AnonymousBroadcastable($channels);
+    }
+
+    /**
+     * Begin sending a broadcast to the given private channel.
+     */
+    public static function private(string $channel): AnonymousBroadcastable
+    {
+        return static::on(new PrivateChannel($channel));
+    }
+
+    /**
+     * Begin sending a broadcast to the given presence channel.
+     */
+    public static function presence(string $channel): AnonymousBroadcastable
+    {
+        return static::on(new PresenceChannel($channel));
     }
 }

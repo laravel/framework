@@ -36,7 +36,7 @@ class AnonymousBroadcastable implements ShouldBroadcast
      *
      * @return void
      */
-    public function __construct(protected string|array $channels)
+    public function __construct(protected Channel|string|array $channels)
     {
         $this->channels = Arr::wrap($channels);
     }

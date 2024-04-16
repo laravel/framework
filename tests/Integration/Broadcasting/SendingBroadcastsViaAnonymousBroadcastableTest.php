@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Integration\Broadcasting;
 
 use Illuminate\Broadcasting\AnonymousBroadcastable;
+use Illuminate\Broadcasting\PresenceChannel;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Support\Facades\Broadcast as BroadcastFacade;
 use Illuminate\Support\Facades\Event as EventFacade;
@@ -103,6 +104,32 @@ class SendingBroadcastsViaAnonymousBroadcastableTest extends TestCase
 
         EventFacade::assertDispatched(AnonymousBroadcastable::class, function ($event) {
             return $event->socket = '12345';
+        });
+    }
+
+    public function testSendToPrivateChannel()
+    {
+        EventFacade::fake();
+
+        BroadcastFacade::private('test-channel')->send();
+
+        EventFacade::assertDispatched(AnonymousBroadcastable::class, function ($event) {
+            $channel = $event->broadcastOn()[0];
+
+            return $channel instanceof PrivateChannel && $channel->name === 'private-test-channel';
+        });
+    }
+
+    public function testSendToPresenceChannel()
+    {
+        EventFacade::fake();
+
+        BroadcastFacade::presence('test-channel')->send();
+
+        EventFacade::assertDispatched(AnonymousBroadcastable::class, function ($event) {
+            $channel = $event->broadcastOn()[0];
+
+            return $channel instanceof PresenceChannel && $channel->name === 'presence-test-channel';
         });
     }
 }
