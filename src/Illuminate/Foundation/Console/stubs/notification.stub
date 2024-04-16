@@ -2,14 +2,11 @@
 
 namespace {{ namespace }};
 
-use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
 class {{ class }} extends Notification
 {
-    use Queueable;
-
     /**
      * Create a new notification instance.
      */
