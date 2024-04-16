@@ -1,6 +1,37 @@
 # Release Notes for 11.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v11.3.1...11.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v11.4.0...11.x)
+
+## [v11.4.0](https://github.com/laravel/framework/compare/v11.3.1...v11.4.0) - 2024-04-16
+
+* [11.x] Apc Cache - Remove long-time gone apc_* functions by [@serpentblade](https://github.com/serpentblade) in https://github.com/laravel/framework/pull/51010
+* [11.x] Allowing Usage of Livewire Wire Boolean Style Directives by [@devajmeireles](https://github.com/devajmeireles) in https://github.com/laravel/framework/pull/51007
+* [11.x] Introduces `Exceptions` facade by [@nunomaduro](https://github.com/nunomaduro) in https://github.com/laravel/framework/pull/50704
+* [11.x] `afterQuery` hook by [@gdebrauwer](https://github.com/gdebrauwer) in https://github.com/laravel/framework/pull/50587
+* Fix computed columns mapping to wrong tables by [@maddhatter](https://github.com/maddhatter) in https://github.com/laravel/framework/pull/51009
+* [11.x] improvement test for string title by [@saMahmoudzadeh](https://github.com/saMahmoudzadeh) in https://github.com/laravel/framework/pull/51015
+* [11.x] Fix failing `afterQuery` method tests when using sql server by [@gdebrauwer](https://github.com/gdebrauwer) in https://github.com/laravel/framework/pull/51016
+* [11.x] Fix: Apply database connection  before checking if the repository exist by [@sjspereira](https://github.com/sjspereira) in https://github.com/laravel/framework/pull/51021
+* [10.x] Fix error when using `orderByRaw()` in query before using `cursorPaginate()` by [@axlon](https://github.com/axlon) in https://github.com/laravel/framework/pull/51023
+* [11.x] Add RequiredIfDeclined validation rule by [@timmydhooghe](https://github.com/timmydhooghe) in https://github.com/laravel/framework/pull/51030
+* [11.x] Adds support for enums on `mapInto` collection method by [@lukeraymonddowning](https://github.com/lukeraymonddowning) in https://github.com/laravel/framework/pull/51027
+* [11.x] Fix prompt fallback return value when using numeric keys by [@jessarcher](https://github.com/jessarcher) in https://github.com/laravel/framework/pull/50995
+* [11.x] Adds support for `int` backed enums to implicit `Enum` route binding by [@monurakkaya](https://github.com/monurakkaya) in https://github.com/laravel/framework/pull/51029
+* [11.x] Configuration to disable events on Cache Repository by [@serpentblade](https://github.com/serpentblade) in https://github.com/laravel/framework/pull/51032
+* Revert "[11.x] Name of job set by displayName() must be honoured by S… by [@RobertBoes](https://github.com/RobertBoes) in https://github.com/laravel/framework/pull/51034
+* chore: fix some typos in comments by [@laterlaugh](https://github.com/laterlaugh) in https://github.com/laravel/framework/pull/51037
+* Name of job set by displayName() must be honoured by Schedule by [@SCIF](https://github.com/SCIF) in https://github.com/laravel/framework/pull/51038
+* Fix more typos by [@szepeviktor](https://github.com/szepeviktor) in https://github.com/laravel/framework/pull/51039
+* [11.x] Fix some doc blocks by [@saMahmoudzadeh](https://github.com/saMahmoudzadeh) in https://github.com/laravel/framework/pull/51043
+* [11.x] Add [@throws](https://github.com/throws) ConnectionException tag on Http methods for IDE support by [@masoudtajer](https://github.com/masoudtajer) in https://github.com/laravel/framework/pull/51066
+* [11.x] Add Prompts `textarea` fallback for tests and add assertion tests by [@lioneaglesolutions](https://github.com/lioneaglesolutions) in https://github.com/laravel/framework/pull/51055
+* Validate MAC per key by [@timacdonald](https://github.com/timacdonald) in https://github.com/laravel/framework/pull/51063
+* [11.x] Add `throttle` method to `LazyCollection` by [@JosephSilber](https://github.com/JosephSilber) in https://github.com/laravel/framework/pull/51060
+* [11.x] Pass decay seconds or minutes like hour and day by [@jimmypuckett](https://github.com/jimmypuckett) in https://github.com/laravel/framework/pull/51054
+* [11.x] Consider after_commit config in SyncQueue by [@hansnn](https://github.com/hansnn) in https://github.com/laravel/framework/pull/51071
+* [10.x] Database layer fixes by [@saadsidqui](https://github.com/saadsidqui) in https://github.com/laravel/framework/pull/49787
+* [11.x] Fix context helper always requiring `$key` value by [@nikspyratos](https://github.com/nikspyratos) in https://github.com/laravel/framework/pull/51080
+* [11.x] Fix `expectsChoice` assertion with optional `multiselect` prompts. by [@jessarcher](https://github.com/jessarcher) in https://github.com/laravel/framework/pull/51078
 
 ## [v11.3.1](https://github.com/laravel/framework/compare/v11.3.0...v11.3.1) - 2024-04-10
 
