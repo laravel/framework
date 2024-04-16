@@ -2,7 +2,9 @@
 
 namespace Illuminate\Support\Facades;
 
+use Illuminate\Broadcasting\AnonymousBroadcastable;
 use Illuminate\Contracts\Broadcasting\Factory as BroadcastingFactoryContract;
+use Illuminate\Support\Arr;
 
 /**
  * @method static void routes(array|null $attributes = null)
@@ -43,5 +45,13 @@ class Broadcast extends Facade
     protected static function getFacadeAccessor()
     {
         return BroadcastingFactoryContract::class;
+    }
+
+    /**
+     * Begin sending a broadcast to the given channels.
+     */
+    public static function on(string|array $channels): AnonymousBroadcastable
+    {
+        return new AnonymousBroadcastable(Arr::wrap($channels));
     }
 }
