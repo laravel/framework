@@ -28,7 +28,7 @@ class Choice extends Component
     }
 
     /**
-     * Returns a ChoiceQuestion that handles array keys like Prompts.
+     * Get a ChoiceQuestion instance that handles array keys like Prompts.
      *
      * @param  string  $question
      * @param  array  $choices
