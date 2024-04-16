@@ -6,6 +6,7 @@ use Illuminate\Console\Application;
 use Illuminate\Console\Command;
 use Illuminate\Console\OutputStyle;
 use Illuminate\Console\View\Components\Factory;
+use Laravel\Prompts\Prompt;
 use Mockery as m;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -25,6 +26,8 @@ class ConfiguresPromptsTest extends TestCase
     #[DataProvider('selectDataProvider')]
     public function testSelectFallback($prompt, $expectedOptions, $expectedDefault, $return, $expectedReturn)
     {
+        Prompt::fallbackWhen(true);
+
         $command = new class($prompt) extends Command
         {
             public $answer;
@@ -64,6 +67,8 @@ class ConfiguresPromptsTest extends TestCase
     #[DataProvider('multiselectDataProvider')]
     public function testMultiselectFallback($prompt, $expectedOptions, $expectedDefault, $return, $expectedReturn)
     {
+        Prompt::fallbackWhen(true);
+
         $command = new class($prompt) extends Command
         {
             public $answer;
@@ -112,7 +117,7 @@ class ConfiguresPromptsTest extends TestCase
 
         $application->shouldReceive('make')->withArgs(fn ($abstract) => $abstract === OutputStyle::class)->andReturn($outputStyle = m::mock(OutputStyle::class));
         $application->shouldReceive('make')->withArgs(fn ($abstract) => $abstract === Factory::class)->andReturn($factory = m::mock(Factory::class));
-        $application->shouldReceive('runningUnitTests')->andReturn(true);
+        $application->shouldReceive('runningUnitTests')->andReturn(false);
         $application->shouldReceive('call')->with([$command, 'handle'])->andReturnUsing(fn ($callback) => call_user_func($callback));
         $outputStyle->shouldReceive('newLinesWritten')->andReturn(1);
 
