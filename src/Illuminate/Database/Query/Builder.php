@@ -2973,16 +2973,6 @@ class Builder implements BuilderContract
     }
 
     /**
-     * Get the Query Builders that are used in the union of the query.
-     *
-     * @return \Illuminate\Support\Collection
-     */
-    protected function getUnionBuilders()
-    {
-        return isset($this->unions) ? collect($this->unions)->pluck('query') : collect();
-    }
-
-    /**
      * Get the count of the total records for the paginator.
      *
      * @param  array  $columns
@@ -3823,6 +3813,18 @@ class Builder implements BuilderContract
     public function raw($value)
     {
         return $this->connection->raw($value);
+    }
+
+    /**
+     * Get the query builder instances that are used in the union of the query.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    protected function getUnionBuilders()
+    {
+        return isset($this->unions)
+            ? collect($this->unions)->pluck('query')
+            : collect();
     }
 
     /**

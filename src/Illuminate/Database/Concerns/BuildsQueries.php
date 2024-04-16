@@ -379,7 +379,7 @@ trait BuildsQueries
         $orders = $this->ensureOrderForCursorPagination(! is_null($cursor) && $cursor->pointsToPreviousItems());
 
         if (! is_null($cursor)) {
-            // Reset the union bindings so we can add the cursor where in the correct position.
+            // Reset the union bindings so we can add the cursor where in the correct position...
             $this->setBindings([], 'union');
 
             $addCursorConditions = function (self $builder, $previousColumn, $i) use (&$addCursorConditions, $cursor, $orders) {
@@ -394,10 +394,6 @@ trait BuildsQueries
                         $cursor->parameter($previousColumn)
                     );
 
-                    // It looks like there is no scenario where both
-                    //  - previousColumn is set
-                    //  - and the $builder has unions
-                    //  when previousColumn is set, the builder is a fresh instance in a where clause.
                     $unionBuilders->each(function ($unionBuilder) use ($previousColumn, $cursor) {
                         $unionBuilder->where(
                             $this->getOriginalColumnNameForCursorPagination($this, $previousColumn),
@@ -428,6 +424,7 @@ trait BuildsQueries
 
                     $unionBuilders->each(function ($unionBuilder) use ($column, $direction, $cursor, $i, $orders, $addCursorConditions) {
                         $unionWheres = $unionBuilder->getRawBindings()['where'];
+
                         $unionBuilder->where(function ($unionBuilder) use ($column, $direction, $cursor, $i, $orders, $addCursorConditions, $unionWheres) {
                             $unionBuilder->where(
                                 $this->getOriginalColumnNameForCursorPagination($this, $column),

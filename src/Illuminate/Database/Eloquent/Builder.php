@@ -1014,16 +1014,6 @@ class Builder implements BuilderContract
     }
 
     /**
-     * Get the Eloquent Builders that are used in the union of the query.
-     *
-     * @return \Illuminate\Support\Collection
-     */
-    protected function getUnionBuilders()
-    {
-        return isset($this->query->unions) ? collect($this->query->unions)->pluck('query') : collect();
-    }
-
-    /**
      * Save a new model and return the instance.
      *
      * @param  array  $attributes
@@ -1708,6 +1698,18 @@ class Builder implements BuilderContract
         }
 
         return $results;
+    }
+
+    /**
+     * Get the Eloquent builder instances that are used in the union of the query.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    protected function getUnionBuilders()
+    {
+        return isset($this->query->unions)
+            ? collect($this->query->unions)->pluck('query')
+            : collect();
     }
 
     /**
