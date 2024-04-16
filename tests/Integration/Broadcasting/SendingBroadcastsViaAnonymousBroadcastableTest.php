@@ -84,4 +84,25 @@ class SendingBroadcastsViaAnonymousBroadcastableTest extends TestCase
             return (new ReflectionClass($event))->getProperty('connection')->getValue($event) === 'pusher';
         });
     }
+
+    public function testSendToOthersOnly()
+    {
+        $this->app['request']->headers->add(['X-Socket-ID' => '12345']);
+        
+        EventFacade::fake();
+
+        BroadcastFacade::on('test-channel')->send();
+
+        EventFacade::assertDispatched(AnonymousBroadcastable::class, function ($event) {
+            return $event->socket === null;
+        });
+
+        BroadcastFacade::on('test-channel')
+            ->toOthers()
+            ->send();
+
+        EventFacade::assertDispatched(AnonymousBroadcastable::class, function ($event) {
+            return $event->socket = '12345';
+        });
+    }
 }

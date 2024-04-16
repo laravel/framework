@@ -19,7 +19,12 @@ class AnonymousBroadcastable implements ShouldBroadcast
     /**
      * The payload the event should be broadcast with.
      */
-    protected $payload = [];
+    protected array $payload = [];
+
+    /**
+     * Should the broadcast include the current user.
+     */
+    protected bool $includeCurrentUser = true;
 
     /**
      * The connection the event should be broadcast on.
@@ -67,11 +72,25 @@ class AnonymousBroadcastable implements ShouldBroadcast
     }
 
     /**
+     * Broadcast the event to everyone except the current user.
+     */
+    public function toOthers(): static
+    {
+        $this->includeCurrentUser = false;
+
+        return $this;
+    }
+
+    /**
      * Broadcast the event.
      */
     public function send(): void
     {
-        broadcast($this)->via($this->connection);
+        $broadcast = broadcast($this)->via($this->connection);
+
+        if (! $this->includeCurrentUser) {
+            $broadcast->toOthers();
+        }
     }
 
     /**
