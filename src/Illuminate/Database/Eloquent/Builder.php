@@ -1016,7 +1016,7 @@ class Builder implements BuilderContract
     /**
      * Get the Eloquent Builders that are used in the union of the query.
      *
-     * @return Collection
+     * @return \Illuminate\Support\Collection
      */
     protected function getUnionBuilders()
     {
