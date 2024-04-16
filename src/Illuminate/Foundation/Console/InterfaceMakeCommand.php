@@ -41,6 +41,21 @@ class InterfaceMakeCommand extends GeneratorCommand
     }
 
     /**
+     * Get the default namespace for the class.
+     *
+     * @param  string  $rootNamespace
+     * @return string
+     */
+    protected function getDefaultNamespace($rootNamespace)
+    {
+        return match (true) {
+            is_dir(app_path('Contracts')) => $rootNamespace.'\\Contracts',
+            is_dir(app_path('Interfaces')) => $rootNamespace.'\\Interfaces',
+            default => $rootNamespace,
+        };
+    }
+
+    /**
      * Get the console command arguments.
      *
      * @return array
