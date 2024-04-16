@@ -29,6 +29,21 @@ class SendingBroadcastsViaAnonymousEventTest extends TestCase
         });
     }
 
+    public function testBroadcastIsSentNow()
+    {
+        EventFacade::fake();
+
+        BroadcastFacade::on('test-channel')
+            ->with(['some' => 'data'])
+            ->as('test-event')
+            ->sendNow();
+
+        EventFacade::assertDispatched(AnonymousEvent::class, function ($event) {
+            return (new ReflectionClass($event))->getProperty('connection')->getValue($event) === null &&
+                $event->shouldBroadcastNow();
+        });
+    }
+
     public function testDefaultNameIsSet()
     {
         EventFacade::fake();

@@ -32,6 +32,11 @@ class AnonymousEvent implements ShouldBroadcast
     protected bool $includeCurrentUser = true;
 
     /**
+     * Indicates if the event should be broadcast synchronously.
+     */
+    protected bool $shouldBroadcastNow = false;
+
+    /**
      * Create a new anonymous broadcastable event instance.
      *
      * @return void
@@ -88,6 +93,16 @@ class AnonymousEvent implements ShouldBroadcast
     /**
      * Broadcast the event.
      */
+    public function sendNow(): void
+    {
+        $this->shouldBroadcastNow = true;
+
+        $this->send();
+    }
+
+    /**
+     * Broadcast the event.
+     */
     public function send(): void
     {
         $broadcast = broadcast($this)->via($this->connection);
@@ -125,5 +140,13 @@ class AnonymousEvent implements ShouldBroadcast
     public function broadcastOn(): Channel|array
     {
         return $this->channels;
+    }
+
+    /**
+     * Determine if the event should be broadcast synchronously.
+     */
+    public function shouldBroadcastNow(): bool
+    {
+        return $this->shouldBroadcastNow;
     }
 }
