@@ -87,9 +87,9 @@ class SendingBroadcastsViaAnonymousBroadcastableTest extends TestCase
 
     public function testSendToOthersOnly()
     {
-        $this->app['request']->headers->add(['X-Socket-ID' => '12345']);
-        
         EventFacade::fake();
+
+        $this->app['request']->headers->add(['X-Socket-ID' => '12345']);
 
         BroadcastFacade::on('test-channel')->send();
 
