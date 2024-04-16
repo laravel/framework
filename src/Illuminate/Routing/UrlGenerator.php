@@ -233,10 +233,10 @@ class UrlGenerator implements UrlGeneratorContract
     /**
      * Generate an absolute URL with query parameters to the given path.
      *
-     * @param string $path
-     * @param array $params
-     * @param mixed $extra
-     * @param bool|null $secure
+     * @param  string  $path
+     * @param  array  $params
+     * @param  mixed  $extra
+     * @param  bool|null  $secure
      * @return string
      */
     public function query($path, $params = [], $extra = [], $secure = null)
@@ -249,7 +249,7 @@ class UrlGenerator implements UrlGeneratorContract
             array_merge($pairs, $params)
         );
 
-        return $this->to($path . '?' . $query, $extra, $secure);
+        return $this->to($path.'?'.$query, $extra, $secure);
     }
 
     /**
