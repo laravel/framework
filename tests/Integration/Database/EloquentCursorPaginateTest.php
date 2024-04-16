@@ -167,6 +167,37 @@ class EloquentCursorPaginateTest extends DatabaseTestCase
         );
     }
 
+    public function testPaginationWithMultipleUnionAndMultipleWhereClauses()
+    {
+        TestPost::create(['title' => 'Post A', 'user_id' => 100]);
+        TestPost::create(['title' => 'Post B', 'user_id' => 101]);
+
+        $table1 = TestPost::select(['id', 'title', 'user_id'])->where('user_id', 100);
+        $table2 = TestPost::select(['id', 'title', 'user_id'])->where('user_id', 101);
+        $table3 = TestPost::select(['id', 'title', 'user_id'])->where('user_id', 101);
+
+        $columns = ['id'];
+        $cursorName = 'cursor-name';
+        $cursor = new Cursor(['id' => 1]);
+
+        $result = $table1->toBase()
+            ->union($table2->toBase())
+            ->union($table3->toBase())
+            ->orderBy('id', 'asc')
+            ->cursorPaginate(1, $columns, $cursorName, $cursor);
+
+        $this->assertSame(['id'], $result->getOptions()['parameters']);
+
+        // Post B is the result of the second query.
+        $postB = $table2->where('id', '>', 1)->first();
+        $this->assertEquals('Post B', $postB->title);
+
+        // So the cursor paginated query should at least have 1 result
+        $this->assertCount(1, $result->items());
+        // And it should be Post B
+        $this->assertEquals('Post B', current($result->items())->title);
+    }
+
     public function testPaginationWithAliasedOrderBy()
     {
         for ($i = 1; $i <= 6; $i++) {
