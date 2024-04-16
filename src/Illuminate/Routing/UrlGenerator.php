@@ -231,6 +231,26 @@ class UrlGenerator implements UrlGeneratorContract
     }
 
     /**
+     * Generate an absolute URL with the given query parameters.
+     *
+     * @param  string  $path
+     * @param  array  $query
+     * @param  mixed  $extra
+     * @param  bool|null  $secure
+     * @return string
+     */
+    public function query($path, $query = [], $extra = [], $secure = null)
+    {
+        [$path, $existingQueryString] = $this->extractQueryString($path);
+
+        parse_str(Str::after($existingQueryString, '?'), $existingQueryArray);
+
+        return $this->to($path.'?'.Arr::query(
+            array_merge($existingQueryArray, $query)
+        ), $extra, $secure);
+    }
+
+    /**
      * Generate a secure, absolute URL to the given path.
      *
      * @param  string  $path
