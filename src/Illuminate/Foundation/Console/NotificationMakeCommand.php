@@ -91,11 +91,11 @@ class NotificationMakeCommand extends GeneratorCommand
      */
     protected function getStub()
     {
-        if ($this->option('markdown')) {
-            $this->resolveStubPath('/stubs/markdown-notification.stub');
+        if ($this->hasOption('markdown')) {
+            return $this->resolveStubPath('/stubs/markdown-notification.stub');
         }
-        if ($this->option('queueable')) {
-            $this->resolveStubPath('/stubs/queueable-notification.stub');
+        if ($this->hasOption('queueable')) {
+            return $this->resolveStubPath('/stubs/queueable-notification.stub');
         }
 
         return $this->resolveStubPath('/stubs/notification.stub');
@@ -135,7 +135,7 @@ class NotificationMakeCommand extends GeneratorCommand
         return [
             ['force', 'f', InputOption::VALUE_NONE, 'Create the class even if the notification already exists'],
             ['markdown', 'm', InputOption::VALUE_OPTIONAL, 'Create a new Markdown template for the notification'],
-            ['queueable', 'q', InputOption::VALUE_OPTIONAL, 'Create a new queueable notification'],
+            ['queueable', 'qu', InputOption::VALUE_OPTIONAL, 'Create a new queueable notification'],
         ];
     }
 }
