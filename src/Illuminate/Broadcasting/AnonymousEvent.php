@@ -7,9 +7,14 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Support\Arr;
 
-class AnonymousBroadcastable implements ShouldBroadcast
+class AnonymousEvent implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithBroadcasting, InteractsWithSockets;
+
+    /**
+     * The connection the event should be broadcast on.
+     */
+    protected ?string $connection = null;
 
     /**
      * The name the event should be broadcast as.
@@ -27,18 +32,23 @@ class AnonymousBroadcastable implements ShouldBroadcast
     protected bool $includeCurrentUser = true;
 
     /**
-     * The connection the event should be broadcast on.
-     */
-    protected ?string $connection = null;
-
-    /**
-     * Create a new anonymous broadcast.
+     * Create a new anonymous broadcastable event instance.
      *
      * @return void
      */
-    public function __construct(protected Channel|string|array $channels)
+    public function __construct(protected Channel|array|string $channels)
     {
         $this->channels = Arr::wrap($channels);
+    }
+
+    /**
+     * Set the connection the event should be broadcast on.
+     */
+    public function via(string $connection): static
+    {
+        $this->connection = $connection;
+
+        return $this;
     }
 
     /**
@@ -56,17 +66,11 @@ class AnonymousBroadcastable implements ShouldBroadcast
      */
     public function with(Arrayable|array $payload): static
     {
-        $this->payload = $payload instanceof Arrayable ? $payload->toArray() : $payload;
-
-        return $this;
-    }
-
-    /**
-     * Set the connection the event should be broadcast on.
-     */
-    public function via(string $connection): static
-    {
-        $this->connection = $connection;
+        $this->payload = $payload instanceof Arrayable
+            ? $payload->toArray()
+            : collect($payload)->map(
+                fn ($p) => $p instanceof Arrayable ? $p->toArray() : $p
+            )->all();
 
         return $this;
     }

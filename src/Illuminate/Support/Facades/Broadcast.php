@@ -2,7 +2,6 @@
 
 namespace Illuminate\Support\Facades;
 
-use Illuminate\Broadcasting\AnonymousBroadcastable;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\PresenceChannel;
 use Illuminate\Broadcasting\PrivateChannel;
@@ -47,29 +46,5 @@ class Broadcast extends Facade
     protected static function getFacadeAccessor()
     {
         return BroadcastingFactoryContract::class;
-    }
-
-    /**
-     * Begin sending a broadcast to the given channels.
-     */
-    public static function on(Channel|string|array $channels): AnonymousBroadcastable
-    {
-        return new AnonymousBroadcastable($channels);
-    }
-
-    /**
-     * Begin sending a broadcast to the given private channel.
-     */
-    public static function private(string $channel): AnonymousBroadcastable
-    {
-        return static::on(new PrivateChannel($channel));
-    }
-
-    /**
-     * Begin sending a broadcast to the given presence channel.
-     */
-    public static function presence(string $channel): AnonymousBroadcastable
-    {
-        return static::on(new PresenceChannel($channel));
     }
 }

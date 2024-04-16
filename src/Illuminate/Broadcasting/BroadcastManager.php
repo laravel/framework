@@ -133,6 +133,30 @@ class BroadcastManager implements FactoryContract
     }
 
     /**
+     * Begin sending an anonymous broadcast to the given channels.
+     */
+    public function on(Channel|string|array $channels): AnonymousEvent
+    {
+        return new AnonymousEvent($channels);
+    }
+
+    /**
+     * Begin sending an anonymous broadcast to the given private channels.
+     */
+    public function private(string $channel): AnonymousEvent
+    {
+        return $this->on(new PrivateChannel($channel));
+    }
+
+    /**
+     * Begin sending an anonymous broadcast to the given presence channels.
+     */
+    public function presence(string $channel): AnonymousEvent
+    {
+        return $this->on(new PresenceChannel($channel));
+    }
+
+    /**
      * Begin broadcasting an event.
      *
      * @param  mixed|null  $event
