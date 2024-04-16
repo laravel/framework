@@ -2,7 +2,6 @@
 
 namespace Illuminate\Console\Concerns;
 
-use Illuminate\Console\PromptOption;
 use Illuminate\Console\PromptValidationException;
 use Laravel\Prompts\ConfirmPrompt;
 use Laravel\Prompts\MultiSearchPrompt;
@@ -231,11 +230,13 @@ trait ConfiguresPrompts
      */
     private function selectFallback($label, $options, $default = null)
     {
-        if ($default !== null) {
-            $default = array_search($default, array_is_list($options) ? $options : array_keys($options));
+        $answer = $this->components->choice($label, $options, $default);
+
+        if (! array_is_list($options) && $answer === (string) (int) $answer) {
+            return (int) $answer;
         }
 
-        return PromptOption::unwrap($this->components->choice($label, PromptOption::wrap($options), $default));
+        return $answer;
     }
 
     /**
@@ -249,24 +250,28 @@ trait ConfiguresPrompts
      */
     private function multiselectFallback($label, $options, $default = [], $required = false)
     {
-        $options = PromptOption::wrap($options);
+        $default = $default !== [] ? implode(',', $default) : null;
 
-        if ($required === false) {
-            $options = [new PromptOption(null, 'None'), ...$options];
+        if ($required === false && ! $this->laravel->runningUnitTests()) {
+            $options = array_is_list($options)
+                ? ['None', ...$options]
+                : ['' => 'None'] + $options;
 
-            if ($default === []) {
-                $default = [null];
+            if ($default === null) {
+                $default = 'None';
             }
         }
 
-        $default = $default !== []
-            ? implode(',', array_keys(array_filter($options, fn ($option) => in_array($option->value, $default))))
-            : null;
+        $answers = $this->components->choice($label, $options, $default, null, true);
 
-        $answers = PromptOption::unwrap($this->components->choice($label, $options, $default, multiple: true));
+        if (! array_is_list($options)) {
+            $answers = array_map(fn ($value) => $value === (string) (int) $value ? (int) $value : $value, $answers);
+        }
 
         if ($required === false) {
-            return array_values(array_filter($answers, fn ($value) => $value !== null));
+            return array_is_list($options)
+                ? array_values(array_filter($answers, fn ($value) => $value !== 'None'))
+                : array_filter($answers, fn ($value) => $value !== '');
         }
 
         return $answers;

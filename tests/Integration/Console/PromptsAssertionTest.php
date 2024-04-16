@@ -162,4 +162,38 @@ class PromptsAssertionTest extends TestCase
             ->expectsChoice('Which names do you like?', ['John', 'Jane'], ['John', 'Jane', 'Sally', 'Jack'])
             ->expectsOutput('You like John, Jane.');
     }
+
+    public function testAssertionForOptionalMultiselectPrompt()
+    {
+        $this->app[Kernel::class]->registerCommand(
+            new class extends Command
+            {
+                protected $signature = 'test:multiselect';
+
+                public function handle()
+                {
+                    $names = multiselect(
+                        label: 'Which names do you like?',
+                        options: ['John', 'Jane', 'Sally', 'Jack'],
+                    );
+
+                    if (empty($names)) {
+                        $this->line('You like nobody.');
+                    } else {
+                        $this->line(sprintf('You like %s.', implode(', ', $names)));
+                    }
+                }
+            }
+        );
+
+        $this
+            ->artisan('test:multiselect')
+            ->expectsChoice('Which names do you like?', ['John', 'Jane'], ['John', 'Jane', 'Sally', 'Jack'])
+            ->expectsOutput('You like John, Jane.');
+
+        $this
+            ->artisan('test:multiselect')
+            ->expectsChoice('Which names do you like?', ['None'], ['John', 'Jane', 'Sally', 'Jack'])
+            ->expectsOutput('You like nobody.');
+    }
 }
