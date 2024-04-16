@@ -3816,6 +3816,18 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Get the query builder instances that are used in the union of the query.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    protected function getUnionBuilders()
+    {
+        return isset($this->unions)
+            ? collect($this->unions)->pluck('query')
+            : collect();
+    }
+
+    /**
      * Get the current query value bindings in a flattened array.
      *
      * @return array
