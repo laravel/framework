@@ -1013,6 +1013,11 @@ class Builder implements BuilderContract
             ->values();
     }
 
+    /**
+     * Get the Eloquent Builders that are used in the union of the query.
+     *
+     * @return Collection
+     */
     protected function getUnionBuilders()
     {
         return isset($this->query->unions) ? collect($this->query->unions)->pluck('query') : collect();

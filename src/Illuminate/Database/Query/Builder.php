@@ -2972,6 +2972,11 @@ class Builder implements BuilderContract
             ->values();
     }
 
+    /**
+     * Get the Query Builders that are used in the union of the query.
+     *
+     * @return Collection
+     */
     protected function getUnionBuilders()
     {
         return isset($this->unions) ? collect($this->unions)->pluck('query') : collect();
