@@ -10,12 +10,24 @@ use RuntimeException;
 
 class EncrypterTest extends TestCase
 {
-    public function testEncryption()
+    public function testEncryption(): void
     {
         $e = new Encrypter(str_repeat('a', 16));
         $encrypted = $e->encrypt('foo');
         $this->assertNotSame('foo', $encrypted);
         $this->assertSame('foo', $e->decrypt($encrypted));
+
+        $encrypted = $e->encrypt('');
+        $this->assertSame('', $e->decrypt($encrypted));
+
+        $longString = str_repeat('a', 1000);
+        $encrypted = $e->encrypt($longString);
+        $this->assertSame($longString, $e->decrypt($encrypted));
+
+        $data = ['foo' => 'bar', 'baz' => 'qux'];
+        $encryptedArray = $e->encrypt($data);
+        $this->assertNotSame($data, $encryptedArray);
+        $this->assertSame($data, $e->decrypt($encryptedArray));
     }
 
     public function testRawStringEncryption()
