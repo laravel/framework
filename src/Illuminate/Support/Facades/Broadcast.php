@@ -3,8 +3,6 @@
 namespace Illuminate\Support\Facades;
 
 use Illuminate\Broadcasting\Channel;
-use Illuminate\Broadcasting\PresenceChannel;
-use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\Factory as BroadcastingFactoryContract;
 
 /**
