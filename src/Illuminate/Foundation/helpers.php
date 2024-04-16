@@ -298,7 +298,7 @@ if (! function_exists('context')) {
      * @param  mixed  $default
      * @return mixed|\Illuminate\Log\Context\Repository
      */
-    function context($key, $default = null)
+    function context($key = null, $default = null)
     {
         return match (true) {
             is_null($key) => app(ContextRepository::class),

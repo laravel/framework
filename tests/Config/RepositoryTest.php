@@ -56,6 +56,9 @@ class RepositoryTest extends TestCase
         $this->assertNull(
             $this->repository->get('a.b.c')
         );
+
+        $this->assertNull($this->repository->get('x.y.z'));
+        $this->assertNull($this->repository->get('.'));
     }
 
     public function testGetBooleanValue()
@@ -178,10 +181,13 @@ class RepositoryTest extends TestCase
     {
         $this->assertSame('aaa', $this->repository->get('array.0'));
         $this->assertSame('zzz', $this->repository->get('array.1'));
+
         $this->repository->prepend('array', 'xxx');
         $this->assertSame('xxx', $this->repository->get('array.0'));
         $this->assertSame('aaa', $this->repository->get('array.1'));
         $this->assertSame('zzz', $this->repository->get('array.2'));
+        $this->assertNull($this->repository->get('array.3'));
+        $this->assertCount(3, $this->repository->get('array'));
     }
 
     public function testPush()
@@ -192,6 +198,8 @@ class RepositoryTest extends TestCase
         $this->assertSame('aaa', $this->repository->get('array.0'));
         $this->assertSame('zzz', $this->repository->get('array.1'));
         $this->assertSame('xxx', $this->repository->get('array.2'));
+
+        $this->assertCount(3, $this->repository->get('array'));
     }
 
     public function testPrependWithNewKey()
@@ -213,8 +221,21 @@ class RepositoryTest extends TestCase
 
     public function testOffsetExists()
     {
+        $data = [
+            'foo' => 'bar',
+            'null_value' => null,
+            'empty_string' => '',
+            'numeric_value' => 123,
+        ];
+        $this->repository->set($data);
+
         $this->assertTrue(isset($this->repository['foo']));
         $this->assertFalse(isset($this->repository['not-exist']));
+        $this->assertTrue(isset($this->repository['null_value']));
+        $this->assertTrue(isset($this->repository['empty_string']));
+        $this->assertTrue(isset($this->repository['numeric_value']));
+        $this->assertFalse(isset($this->repository[-1]));
+        $this->assertFalse(isset($this->repository['non_numeric']));
     }
 
     public function testOffsetGet()
@@ -234,6 +255,18 @@ class RepositoryTest extends TestCase
         $this->repository['key'] = 'value';
 
         $this->assertSame('value', $this->repository['key']);
+
+        $this->repository['key'] = 'new_value';
+        $this->assertSame('new_value', $this->repository['key']);
+
+        $this->repository['new_key'] = null;
+        $this->assertNull($this->repository['new_key']);
+
+        $this->repository[''] = 'value';
+        $this->assertSame('value', $this->repository['']);
+
+        $this->repository[123] = '123';
+        $this->assertSame('123', $this->repository[123]);
     }
 
     public function testOffsetUnset()
@@ -259,7 +292,7 @@ class RepositoryTest extends TestCase
     public function testItGetsAsString(): void
     {
         $this->assertSame(
-            $this->repository->string('a.b'), 'c'
+            'c', $this->repository->string('a.b')
         );
     }
 
