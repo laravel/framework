@@ -2975,7 +2975,7 @@ class Builder implements BuilderContract
     /**
      * Get the Query Builders that are used in the union of the query.
      *
-     * @return Collection
+     * @return \Illuminate\Support\Collection
      */
     protected function getUnionBuilders()
     {
