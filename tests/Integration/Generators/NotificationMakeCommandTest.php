@@ -51,4 +51,19 @@ class NotificationMakeCommandTest extends TestCase
         $this->assertFilenameNotExists('resources/views/foo-notification.blade.php');
         $this->assertFilenameExists('tests/Feature/Notifications/FooNotificationTest.php');
     }
+
+    public function testItCanGenerateNotificationFileWithQueueableOption()
+    {
+        $this->artisan('make:notification', ['name' => 'FooNotification', '--queueable' => true, '--markdown' => false])
+            ->assertExitCode(0);
+
+        $this->assertFilenameExists('app/Notifications/FooNotification.php');
+        $this->assertFileContains([
+            'namespace App\Notifications;',
+            'use Illuminate\Bus\Queueable;',
+            'use Illuminate\Contracts\Queue\ShouldQueue;',
+            'class FooNotification extends Notification implements ShouldQueue',
+            'use Queueable;',
+        ], 'app/Notifications/FooNotification.php');
+    }
 }
