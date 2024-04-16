@@ -334,6 +334,18 @@ class SupportStrTest extends TestCase
         $this->assertSame('foo', Str::afterLast('----foo', '---'));
     }
 
+    public function testStrFirstAndLast()
+    {
+        $this->assertSame('', Str::firstAndLast(''));
+        $this->assertSame('a', Str::firstAndLast('a'));
+        $this->assertSame('cy', Str::firstAndLast('city'));
+        $this->assertSame('€$', Str::firstAndLast('€uro$'));
+        $this->assertSame('!y', Str::firstAndLast('!1nfinity'));
+        $this->assertSame('x ', Str::firstAndLast('x0 . '));
+        $this->assertSame('fo', Str::firstAndLast('foo'));
+        $this->assertSame(' ', Str::firstAndLast(' '));
+    }
+
     #[DataProvider('strContainsProvider')]
     public function testStrContains($haystack, $needles, $expected, $ignoreCase = false)
     {

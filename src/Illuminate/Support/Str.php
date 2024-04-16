@@ -111,6 +111,26 @@ class Str
     }
 
     /**
+     * Extracts the first and last character from a string.
+     *
+     * This function handles multibyte characters and allows specifying
+     * the string encoding for better accuracy.
+     *
+     * @param string $string The input string.
+     * @param string $encoding
+     * @return string The first and last character of the string concatenated.
+     */
+    public static function firstAndLast(string $string, $encoding = 'UTF-8')
+    {
+
+        if (mb_strlen($string, $encoding) <= 2) {
+            return $string;
+        }
+
+        return mb_substr($string, 0, 1, $encoding) . mb_substr($string, -1, 1, $encoding);
+    }
+
+    /**
      * Transliterate a UTF-8 value to ASCII.
      *
      * @param  string  $value
