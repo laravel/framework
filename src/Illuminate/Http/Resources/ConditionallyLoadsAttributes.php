@@ -26,6 +26,11 @@ trait ConditionallyLoadsAttributes
                 continue;
             }
 
+            if(is_numeric($key) && is_string($value)){
+                $data[$value] = $this->resource->{$value};
+                unset($data[$key]);
+            }
+
             if (is_numeric($key) && $value instanceof MergeValue) {
                 return $this->mergeData(
                     $data, $index, $this->filter($value->data),
