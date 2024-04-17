@@ -43,7 +43,6 @@ class InterfaceMakeCommandTest extends TestCase
         $files->deleteDirectory($interfacesFolderPath);
     }
 
-
     public function testItCanGenerateInterfaceFileWhenInterfacesFolderExists()
     {
         $interfacesFolderPath = app_path('Interfaces');
