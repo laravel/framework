@@ -732,7 +732,7 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
      * Replace the patterns matching the given regular expression.
      *
      * @param  array|string  $pattern
-     * @param  \Closure|string  $replace
+     * @param  \Closure|string[]|string  $replace
      * @param  int  $limit
      * @return static
      */
