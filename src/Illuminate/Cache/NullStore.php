@@ -37,7 +37,7 @@ class NullStore extends TaggableStore implements LockProvider
      *
      * @param  string  $key
      * @param  mixed  $value
-     * @return bool
+     * @return false
      */
     public function increment($key, $value = 1)
     {
@@ -49,7 +49,7 @@ class NullStore extends TaggableStore implements LockProvider
      *
      * @param  string  $key
      * @param  mixed  $value
-     * @return bool
+     * @return false
      */
     public function decrement($key, $value = 1)
     {
