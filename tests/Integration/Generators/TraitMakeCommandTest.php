@@ -36,4 +36,24 @@ class TraitMakeCommandTest extends TestCase
 
         $files->deleteDirectory($traitsFolderPath);
     }
+
+    public function testItCanGenerateTraitFileWhenConcernsFolderExists()
+    {
+        $traitsFolderPath = app_path('Concerns');
+
+        /** @var \Illuminate\Filesystem\Filesystem $files */
+        $files = $this->app['files'];
+
+        $files->ensureDirectoryExists($traitsFolderPath);
+
+        $this->artisan('make:trait', ['name' => 'FooTrait'])
+            ->assertExitCode(0);
+
+        $this->assertFileContains([
+            'namespace App\Concerns;',
+            'trait FooTrait',
+        ], 'app/Concerns/FooTrait.php');
+
+        $files->deleteDirectory($traitsFolderPath);
+    }
 }
