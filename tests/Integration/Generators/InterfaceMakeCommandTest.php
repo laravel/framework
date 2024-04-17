@@ -6,7 +6,7 @@ use Illuminate\Tests\Integration\Generators\TestCase;
 
 class InterfaceMakeCommandTest extends TestCase
 {
-    public function testItCanGenerateEnumFile()
+    public function testItCanGenerateInterfaceFile()
     {
         $this->artisan('make:interface', ['name' => 'Gateway'])
             ->assertExitCode(0);
