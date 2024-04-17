@@ -8,9 +8,12 @@ use Illuminate\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
+use InvalidArgumentException;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Stringable;
+
+include_once 'Enums.php';
 
 class RouteRegistrarTest extends TestCase
 {
@@ -940,6 +943,22 @@ class RouteRegistrarTest extends TestCase
         foreach ($this->router->getRoutes() as $route) {
             $this->assertEquals($wheres, $route->wheres);
         }
+    }
+
+    public function testWhereEnumRegistration()
+    {
+        $this->router->get('/posts/{category}')->whereEnum('category', CategoryBackedEnum::class);
+
+        $invalidRequest = Request::create('/posts/invalid-value', 'GET');
+        $this->assertFalse($this->getRoute()->matches($invalidRequest));
+
+        foreach (CategoryBackedEnum::cases() as $case) {
+            $request = Request::create('/posts/'.$case->value, 'GET');
+            $this->assertTrue($this->getRoute()->matches($request));
+        }
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->router->get('/posts/{category}')->whereEnum('category', CategoryEnum::class);
     }
 
     public function testGroupWhereNumberRegistrationOnRouteRegistrar()
