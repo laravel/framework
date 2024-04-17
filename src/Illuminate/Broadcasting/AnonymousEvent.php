@@ -118,8 +118,6 @@ class AnonymousEvent implements ShouldBroadcast
     public function broadcastAs(): string
     {
         return $this->name ?: class_basename($this);
-
-        return $this;
     }
 
     /**
