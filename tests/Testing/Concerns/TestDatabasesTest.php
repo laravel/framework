@@ -20,12 +20,7 @@ class TestDatabasesTest extends TestCase
         Container::setInstance($container = new Container);
 
         $container->singleton('config', function () {
-            return m::mock(Config::class)
-                ->shouldReceive('get')
-                ->once()
-                ->with('database.default', null)
-                ->andReturn('mysql')
-                ->getMock();
+            return m::mock(Config::class);
         });
 
         $_SERVER['LARAVEL_PARALLEL_TESTING'] = 1;
@@ -33,7 +28,7 @@ class TestDatabasesTest extends TestCase
 
     public function testSwitchToDatabaseWithoutUrl()
     {
-        DB::shouldReceive('purge')->once();
+        DB::shouldReceive('purge')->with('mysql')->once();
 
         config()->shouldReceive('get')
             ->once()
@@ -44,13 +39,15 @@ class TestDatabasesTest extends TestCase
             ->once()
             ->with('database.connections.mysql.database', 'my_database_test_1');
 
-        $this->switchToDatabase('my_database_test_1');
+        $this->switchToDatabase('my_database_test_1', 'mysql');
     }
 
     #[DataProvider('databaseUrls')]
     public function testSwitchToDatabaseWithUrl($testDatabase, $url, $testUrl)
     {
-        DB::shouldReceive('purge')->once();
+        DB::shouldReceive('purge')
+            ->with('mysql')
+            ->once();
 
         config()->shouldReceive('get')
             ->once()
@@ -61,10 +58,10 @@ class TestDatabasesTest extends TestCase
             ->once()
             ->with('database.connections.mysql.url', $testUrl);
 
-        $this->switchToDatabase($testDatabase);
+        $this->switchToDatabase($testDatabase, 'mysql');
     }
 
-    public function switchToDatabase($database)
+    public function switchToDatabase($database, $connection)
     {
         $instance = new class
         {
@@ -72,7 +69,7 @@ class TestDatabasesTest extends TestCase
         };
 
         $method = new ReflectionMethod($instance, 'switchToDatabase');
-        $method->invoke($instance, $database);
+        $method->invoke($instance, $database, $connection);
     }
 
     public static function databaseUrls()
