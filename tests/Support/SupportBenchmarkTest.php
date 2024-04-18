@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Illuminate\Tests\Support;
 
@@ -32,7 +34,7 @@ class SupportBenchmarkTest extends TestCase
                 // Another operation to benchmark
                 $arr = range(1, 1000);
                 array_product($arr);
-            }
+            },
         ];
 
         $result = Benchmark::measure($callbacks, 10);
@@ -45,14 +47,8 @@ class SupportBenchmarkTest extends TestCase
     {
         $this->expectException(\Exception::class);
 
-        /**
-         * @throws \Exception
-         */
-        $callback = static function () {
-            throw new \Exception("Test exception");
-        };
-
-        Benchmark::measure($callback,1);
+        $callback = fn () => throw new \Exception('Test exception');
+        Benchmark::measure($callback, 2);
     }
 
     public function testValueWithClosure(): void
@@ -73,13 +69,7 @@ class SupportBenchmarkTest extends TestCase
     {
         $this->expectException(\Exception::class);
 
-        /**
-         * @throws \Exception
-         */
-        $callback = static function () {
-            throw new \Exception("Test exception");
-        };
-
+        $callback = fn () => throw new \Exception('Test exception');
         Benchmark::value($callback);
     }
 
@@ -95,7 +85,7 @@ class SupportBenchmarkTest extends TestCase
     {
         $this->expectException(\Exception::class);
 
-        $callback = fn() => throw new \Exception('Test exception');
+        $callback = fn () => throw new \Exception('Test exception');
         Benchmark::dd($callback);
     }
 }
