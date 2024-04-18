@@ -2,6 +2,7 @@
 
 namespace Illuminate\Routing;
 
+use BackedEnum;
 use Illuminate\Support\Arr;
 
 trait CreatesRegularExpressionRouteConstraints
@@ -71,7 +72,7 @@ trait CreatesRegularExpressionRouteConstraints
     public function whereIn($parameters, array $values)
     {
         return $this->assignExpressionToParameters($parameters, collect($values)
-            ->map(fn ($value) => $value instanceof \BackedEnum ? $value->value : $value)
+            ->map(fn ($value) => $value instanceof BackedEnum ? $value->value : $value)
             ->implode('|')
         );
     }
