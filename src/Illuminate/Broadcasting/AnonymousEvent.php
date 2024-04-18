@@ -13,32 +13,43 @@ class AnonymousEvent implements ShouldBroadcast
 
     /**
      * The connection the event should be broadcast on.
+     *
+     * @var string|null
      */
     protected ?string $connection = null;
 
     /**
      * The name the event should be broadcast as.
+     *
+     * @var string|null
      */
     protected ?string $name = null;
 
     /**
      * The payload the event should be broadcast with.
+     *
+     * @var array<string, mixed>
      */
     protected array $payload = [];
 
     /**
      * Should the broadcast include the current user.
+     *
+     * @var bool
      */
     protected bool $includeCurrentUser = true;
 
     /**
      * Indicates if the event should be broadcast synchronously.
+     *
+     * @var bool
      */
     protected bool $shouldBroadcastNow = false;
 
     /**
      * Create a new anonymous broadcastable event instance.
      *
+     * @param  \Illuminate\Broadcasting\Channel|array|string  $channels
      * @return void
      */
     public function __construct(protected Channel|array|string $channels)
@@ -48,6 +59,9 @@ class AnonymousEvent implements ShouldBroadcast
 
     /**
      * Set the connection the event should be broadcast on.
+     *
+     * @param  string  $connection
+     * @return $this
      */
     public function via(string $connection): static
     {
@@ -58,6 +72,9 @@ class AnonymousEvent implements ShouldBroadcast
 
     /**
      * Set the name the event should be broadcast as.
+     *
+     * @param  string  $name
+     * @return $this
      */
     public function as(string $name): static
     {
@@ -68,6 +85,9 @@ class AnonymousEvent implements ShouldBroadcast
 
     /**
      * Set the payload the event should be broadcast with.
+     *
+     * @param  \Illuminate\Contracts\Support\Arrayable|array  $payload
+     * @return $this
      */
     public function with(Arrayable|array $payload): static
     {
@@ -82,6 +102,8 @@ class AnonymousEvent implements ShouldBroadcast
 
     /**
      * Broadcast the event to everyone except the current user.
+     *
+     * @return $this
      */
     public function toOthers(): static
     {
@@ -92,6 +114,8 @@ class AnonymousEvent implements ShouldBroadcast
 
     /**
      * Broadcast the event.
+     *
+     * @return void
      */
     public function sendNow(): void
     {
@@ -102,6 +126,8 @@ class AnonymousEvent implements ShouldBroadcast
 
     /**
      * Broadcast the event.
+     *
+     * @return void
      */
     public function send(): void
     {
@@ -114,6 +140,8 @@ class AnonymousEvent implements ShouldBroadcast
 
     /**
      * Get the name the event should broadcast as.
+     *
+     * @return string
      */
     public function broadcastAs(): string
     {
@@ -142,6 +170,8 @@ class AnonymousEvent implements ShouldBroadcast
 
     /**
      * Determine if the event should be broadcast synchronously.
+     *
+     * @return bool
      */
     public function shouldBroadcastNow(): bool
     {

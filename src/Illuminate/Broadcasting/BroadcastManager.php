@@ -134,6 +134,9 @@ class BroadcastManager implements FactoryContract
 
     /**
      * Begin sending an anonymous broadcast to the given channels.
+     *
+     * @param  \Illuminate\Support\Channel|string|array  $channels
+     * @return \Illuminate\Broadcasting\AnonymousEvent
      */
     public function on(Channel|string|array $channels): AnonymousEvent
     {
@@ -142,6 +145,9 @@ class BroadcastManager implements FactoryContract
 
     /**
      * Begin sending an anonymous broadcast to the given private channels.
+     *
+     * @param  string  $channel
+     * @return \Illuminate\Broadcasting\AnonymousEvent
      */
     public function private(string $channel): AnonymousEvent
     {
@@ -150,6 +156,9 @@ class BroadcastManager implements FactoryContract
 
     /**
      * Begin sending an anonymous broadcast to the given presence channels.
+     *
+     * @param  string  $channel
+     * @return \Illuminate\Broadcasting\AnonymousEvent
      */
     public function presence(string $channel): AnonymousEvent
     {
