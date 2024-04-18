@@ -285,7 +285,7 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, ['x' => ''], ['x' => 'size:10|array|integer|min:5']);
         $this->assertTrue($v->passes());
-        
+
         $v = new Validator($trans, ['x' => ''], ['x' => 'array']);
         $this->assertTrue($v->passes());
 
