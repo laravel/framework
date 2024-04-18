@@ -285,18 +285,15 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, ['x' => ''], ['x' => 'size:10|array|integer|min:5']);
         $this->assertTrue($v->passes());
-
-        // Test validation with empty string for array
+        
         $v = new Validator($trans, ['x' => ''], ['x' => 'array']);
-        $this->assertTrue($v->passes(), 'Validation should pass for empty string with "array" rule.');
+        $this->assertTrue($v->passes());
 
-        // Test validation with empty string for integer
         $v = new Validator($trans, ['x' => ''], ['x' => 'integer']);
-        $this->assertTrue($v->passes(), 'Validation should pass for empty string with "integer" rule.');
+        $this->assertTrue($v->passes());
 
-        // Test validation with empty string for min
         $v = new Validator($trans, ['x' => ''], ['x' => 'min:5']);
-        $this->assertTrue($v->passes(), 'Validation should pass for empty string with "min" rule.');
+        $this->assertTrue($v->passes());
     }
 
     public function testEmptyExistingAttributesAreValidated()
