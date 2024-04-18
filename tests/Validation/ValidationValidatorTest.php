@@ -188,12 +188,18 @@ class ValidationValidatorTest extends TestCase
         $v->validated();
     }
 
-    public function testValidatedDoesntThrowOnPass()
+    public function testValidatedDoesntThrowOnPass(): void
     {
         $trans = $this->getIlluminateArrayTranslator();
-        $v = new Validator($trans, ['foo' => 'bar'], ['foo' => 'required']);
 
+        $v = new Validator($trans, ['foo' => 'bar'], ['foo' => 'required']);
         $this->assertSame(['foo' => 'bar'], $v->validated());
+
+        $v = new Validator($trans, [], []);
+        $this->assertSame([], $v->validated());
+
+        $v = new Validator($trans, ['foo' => 'bar', 'baz' => 'qux'], ['foo' => 'required', 'baz' => 'required']);
+        $this->assertSame(['foo' => 'bar', 'baz' => 'qux'], $v->validated());
     }
 
     public function testHasFailedValidationRules()
@@ -202,6 +208,10 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['foo' => 'bar', 'baz' => 'boom'], ['foo' => 'Same:baz']);
         $this->assertFalse($v->passes());
         $this->assertEquals(['foo' => ['Same' => ['baz']]], $v->failed());
+
+        $v = new Validator($trans, ['foo' => 'bar', 'baz' => 'boom'], ['foo' => 'Same:baz', 'baz' => 'Required']);
+        $this->assertFalse($v->passes());
+        $this->assertEquals(['foo' => ['Same' => ['baz']], 'baz' => ['Required' => []]], $v->failed());
     }
 
     public function testFailingOnce()
@@ -275,6 +285,18 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, ['x' => ''], ['x' => 'size:10|array|integer|min:5']);
         $this->assertTrue($v->passes());
+
+        // Test validation with empty string for array
+        $v = new Validator($trans, ['x' => ''], ['x' => 'array']);
+        $this->assertTrue($v->passes(), 'Validation should pass for empty string with "array" rule.');
+
+        // Test validation with empty string for integer
+        $v = new Validator($trans, ['x' => ''], ['x' => 'integer']);
+        $this->assertTrue($v->passes(), 'Validation should pass for empty string with "integer" rule.');
+
+        // Test validation with empty string for min
+        $v = new Validator($trans, ['x' => ''], ['x' => 'min:5']);
+        $this->assertTrue($v->passes(), 'Validation should pass for empty string with "min" rule.');
     }
 
     public function testEmptyExistingAttributesAreValidated()
