@@ -72,7 +72,7 @@ trait CreatesRegularExpressionRouteConstraints
     public function whereIn($parameters, array $values)
     {
         return $this->assignExpressionToParameters(
-            $parameters, 
+            $parameters,
             collect($values)
                 ->map(fn ($value) => $value instanceof BackedEnum ? $value->value : $value)
                 ->implode('|')
