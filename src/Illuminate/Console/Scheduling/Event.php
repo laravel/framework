@@ -704,6 +704,21 @@ class Event
     }
 
     /**
+     * Register a callback to further filter the schedule based on the environment
+     *
+     * @param  \Closure|bool  $callback
+     * @return $this
+     */
+    public function environmentSchedule($callback)
+    {
+        // Retrieve the current application environment
+        $environment = config('app.env');
+
+        // Execute the closure with the schedule instance and environment
+        return $callback($this, $environment);
+    }
+
+    /**
      * State that the command should run even in maintenance mode.
      *
      * @return $this
