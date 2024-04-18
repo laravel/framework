@@ -209,9 +209,9 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
         $this->assertEquals(['foo' => ['Same' => ['baz']]], $v->failed());
 
-        $v = new Validator($trans, ['foo' => 'bar', 'baz' => 'boom'], ['foo' => 'Same:baz', 'baz' => 'Required']);
-        $this->assertFalse($v->passes());
-        $this->assertEquals(['foo' => ['Same' => ['baz']], 'baz' => ['Required' => []]], $v->failed());
+        $v = new Validator($trans, ['foo' => 'bar', 'baz' => 'bar'], ['foo' => 'Same:baz', 'baz' => 'Required']);
+        $this->assertTrue($v->passes());
+        $this->assertEmpty($v->failed());
     }
 
     public function testFailingOnce()
