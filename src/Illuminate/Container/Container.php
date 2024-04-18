@@ -8,6 +8,7 @@ use Exception;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Container\CircularDependencyException;
 use Illuminate\Contracts\Container\Container as ContainerContract;
+use Illuminate\Contracts\Container\ContextualAttribute;
 use LogicException;
 use ReflectionClass;
 use ReflectionException;
@@ -109,6 +110,13 @@ class Container implements ArrayAccess, ContainerContract
     public $contextual = [];
 
     /**
+     * The contextual attribute handlers.
+     *
+     * @var array[]
+     */
+    public $contextualAttributes = [];
+
+    /**
      * All of the registered rebound callbacks.
      *
      * @var array[]
@@ -172,6 +180,19 @@ class Container implements ArrayAccess, ContainerContract
         }
 
         return new ContextualBindingBuilder($this, $aliases);
+    }
+
+    /**
+     * Define a contextual binding based on an attribute
+     *
+     * @param string    $attribute
+     * @param \Closure  $handler
+     *
+     * @return void
+     */
+    public function whenHas(string $attribute, Closure $handler)
+    {
+        $this->contextualAttributes[$attribute] = $handler;
     }
 
     /**
@@ -966,6 +987,12 @@ class Container implements ArrayAccess, ContainerContract
                 continue;
             }
 
+            $attribute = $this->getContextualAttributeFromDependency($dependency);
+
+            if ($attribute !== null) {
+                $results[] = $this->resolveFromAttribute($attribute);
+            }
+
             // If the class is null, it means the dependency is a string or some other
             // primitive type which we can not resolve since it is not a class and
             // we will just bomb out with an error since we have no-where to go.
@@ -1015,6 +1042,18 @@ class Container implements ArrayAccess, ContainerContract
     protected function getLastParameterOverride()
     {
         return count($this->with) ? end($this->with) : [];
+    }
+
+    /**
+     * Get a contextual attribute from a dependency
+     *
+     * @param ReflectionParameter  $dependency
+     *
+     * @return \ReflectionAttribute|null
+     */
+    protected function getContextualAttributeFromDependency($dependency)
+    {
+        return $dependency->getAttributes(ContextualAttribute::class, \ReflectionAttribute::IS_INSTANCEOF)[0] ?? null;
     }
 
     /**
@@ -1095,6 +1134,24 @@ class Container implements ArrayAccess, ContainerContract
         }
 
         return array_map(fn ($abstract) => $this->resolve($abstract), $concrete);
+    }
+
+    /**
+     * Resolve a dependency based on an attribute
+     *
+     * @param \ReflectionAttribute $attribute
+     *
+     * @return mixed
+     */
+    protected function resolveFromAttribute(\ReflectionAttribute $attribute)
+    {
+        $handler = $this->contextualAttributes[$attribute->getName()] ?? null;
+
+        if ($handler === null) {
+            throw new BindingResolutionException("Contextual binding attribute [{$attribute->getName()}] has no registered handler.");
+        }
+
+        return $this->resolve($handler, [$attribute->newInstance()]);
     }
 
     /**
