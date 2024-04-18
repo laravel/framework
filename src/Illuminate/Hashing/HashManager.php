@@ -96,7 +96,7 @@ class HashManager extends Manager implements Hasher
      */
     public function isHashed($value)
     {
-        return password_get_info($value)['algo'] !== null;
+        return $this->driver()->info($value)['algo'] !== null;
     }
 
     /**
