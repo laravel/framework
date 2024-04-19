@@ -58,6 +58,14 @@ class View implements ArrayAccess, Htmlable, Stringable, ViewContract
      */
     protected $path;
 
+
+    /**
+     * Cache of $view/$data sets.
+     *
+     * @var array
+     */
+    static array $cache = [];
+
     /**
      * Create a new view instance.
      *
@@ -205,7 +213,26 @@ class View implements ArrayAccess, Htmlable, Stringable, ViewContract
      */
     protected function getContents()
     {
-        return $this->engine->get($this->path, $this->gatherData());
+        $hash = hash('xxh3', join(',', $this->fingerprint($data = $this->gatherData())));
+
+        if ($cache = static::$cache[($path = $this->path).$hash] ?? null) {
+            return $cache;
+        }
+
+        static::$cache[$path.$hash] = $this->engine->get($path, $data);
+
+        return static::$cache[$path.$hash];
+    }
+
+    /**
+     * Fingerprint the data so that we can find identical renders.
+     */
+    private function fingerprint(array $data): array
+    {
+        return array_map(
+            fn($item) => is_object($item) ? spl_object_hash($item) : serialize($item),
+            $data,
+        );
     }
 
     /**
