@@ -344,6 +344,17 @@ class FilesystemTest extends TestCase
         $files->getRequire(self::$tempDir.'/file.php');
     }
 
+    public function testGetRequireCachedReturnsProperly()
+    {
+        file_put_contents(self::$tempDir.'/file.php', '<?php return "Howdy?"; ?>');
+        $files = new Filesystem;
+        $files->getRequire(self::$tempDir.'/file.php', cache: true);
+        file_put_contents(self::$tempDir.'/file.php', '<?php return "Hey!"; ?>');
+
+        $this->assertSame('Hey!', $files->getRequire(self::$tempDir.'/file.php'));
+        $this->assertSame('Howdy?', $files->getRequire(self::$tempDir.'/file.php', cache: true));
+    }
+
     public function testJsonReturnsDecodedJsonData()
     {
         file_put_contents(self::$tempDir.'/file.json', '{"foo": "bar"}');

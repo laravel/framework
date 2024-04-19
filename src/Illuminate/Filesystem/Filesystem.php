@@ -2,6 +2,7 @@
 
 namespace Illuminate\Filesystem;
 
+use Closure;
 use ErrorException;
 use FilesystemIterator;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
@@ -17,6 +18,13 @@ use Symfony\Component\Mime\MimeTypes;
 class Filesystem
 {
     use Conditionable, Macroable;
+
+    /**
+     * Array of cached require values.
+     *
+     * @var array
+     */
+    protected array $cachedRequirements = [];
 
     /**
      * Determine if a file or directory exists.
@@ -107,21 +115,32 @@ class Filesystem
      *
      * @param  string  $path
      * @param  array  $data
+     * @param  bool|Closure  $cache
      * @return mixed
      *
      * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
      */
-    public function getRequire($path, array $data = [])
+    public function getRequire($path, array $data = [], bool|Closure $cache = false)
     {
+        if ($cache && isset($this->cachedRequirements[$path])) {
+            return $this->cachedRequirements[$path];
+        }
+
         if ($this->isFile($path)) {
             $__path = $path;
             $__data = $data;
 
-            return (static function () use ($__path, $__data) {
+            $require = (static function () use ($__path, $__data) {
                 extract($__data, EXTR_SKIP);
 
                 return require $__path;
             })();
+
+            if (is_callable($cache) ? call_user_func($cache, $require) : $cache) {
+                $this->cachedRequirements[$path] = $require;
+            }
+
+            return $require;
         }
 
         throw new FileNotFoundException("File does not exist at path {$path}.");
