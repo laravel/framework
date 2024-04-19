@@ -94,19 +94,19 @@ class ViewCompilerEngineTest extends TestCase
 
         $files->shouldReceive('getRequire')
             ->once()
-            ->with($compiled, [])
+            ->with($compiled, [], m::on(fn ($c) => $c(1) == false && $c(fn() => 'test') == true))
             ->andReturn('compiled-content');
 
         $files->shouldReceive('getRequire')
             ->once()
-            ->with($compiled, [])
+            ->with($compiled, [], m::on(fn ($c) => $c(1) == false && $c(fn() => 'test') == true))
             ->andThrow(new FileNotFoundException(
                 "File does not exist at path {$path}."
             ));
 
         $files->shouldReceive('getRequire')
             ->once()
-            ->with($compiled, [])
+            ->with($compiled, [], m::on(fn ($c) => $c(1) == false && $c(fn() => 'test') == true))
             ->andReturn('compiled-content');
 
         $engine->getCompiler()
@@ -139,19 +139,19 @@ class ViewCompilerEngineTest extends TestCase
 
         $files->shouldReceive('getRequire')
             ->once()
-            ->with($compiled, [])
+            ->with($compiled, [], m::on(fn ($c) => $c(1) == false && $c(fn() => 'test') == true))
             ->andReturn('compiled-content');
 
         $files->shouldReceive('getRequire')
             ->once()
-            ->with($compiled, [])
+            ->with($compiled, [], m::on(fn ($c) => $c(1) == false && $c(fn() => 'test') == true))
             ->andThrow(new ErrorException(
                 "require({$path}): Failed to open stream: No such file or directory",
             ));
 
         $files->shouldReceive('getRequire')
             ->once()
-            ->with($compiled, [])
+            ->with($compiled, [], m::on(fn ($c) => $c(1) == false && $c(fn() => 'test') == true))
             ->andReturn('compiled-content');
 
         $engine->getCompiler()
@@ -184,19 +184,19 @@ class ViewCompilerEngineTest extends TestCase
 
         $files->shouldReceive('getRequire')
             ->once()
-            ->with($compiled, [])
+            ->with($compiled, [], m::on(fn ($c) => $c(1) == false && $c(fn() => 'test') == true))
             ->andReturn('compiled-content');
 
         $files->shouldReceive('getRequire')
             ->once()
-            ->with($compiled, [])
+            ->with($compiled, [], m::on(fn ($c) => $c(1) == false && $c(fn() => 'test') == true))
             ->andThrow(new FileNotFoundException(
                 "File does not exist at path {$path}."
             ));
 
         $files->shouldReceive('getRequire')
             ->once()
-            ->with($compiled, [])
+            ->with($compiled, [], m::on(fn ($c) => $c(1) == false && $c(fn() => 'test') == true))
             ->andThrow(new FileNotFoundException(
                 "File does not exist at path {$path}."
             ));
@@ -234,7 +234,7 @@ class ViewCompilerEngineTest extends TestCase
 
         $files->shouldReceive('getRequire')
             ->once()
-            ->with($compiled, [])
+            ->with($compiled, [], m::on(fn ($c) => $c(1) == false && $c(fn() => 'test') == true))
             ->andThrow(new Exception(
                 'Just an regular error...'
             ));
@@ -269,7 +269,7 @@ class ViewCompilerEngineTest extends TestCase
 
         $files->shouldReceive('getRequire')
             ->once()
-            ->with($compiled, [])
+            ->with($compiled, [], m::on(fn ($c) => $c(1) == false && $c(fn() => 'test') == true))
             ->andThrow(new FileNotFoundException(
                 "File does not exist at path {$path}."
             ));

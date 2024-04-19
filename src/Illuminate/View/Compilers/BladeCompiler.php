@@ -181,7 +181,9 @@ class BladeCompiler extends Compiler implements CompilerInterface
         }
 
         if (! is_null($this->cachePath)) {
-            $contents = $this->compileString($this->files->get($this->getPath()));
+            $contents =  $this->wrapInCallback(
+                $this->compileString($this->files->get($this->getPath()))
+            );
 
             if (! empty($this->getPath())) {
                 $contents = $this->appendFilePath($contents);
@@ -193,6 +195,23 @@ class BladeCompiler extends Compiler implements CompilerInterface
 
             $this->files->put($compiledPath, $contents);
         }
+    }
+
+    /**
+     * Wrap the compiled string by a function.
+     *
+     * @param  string  $contents
+     * @return string
+     */
+    protected function wrapInCallback($contents)
+    {
+        $tokens = $this->getOpenAndClosingPhpTokens($contents);
+
+        if ($tokens->isNotEmpty() && $tokens->last() !== T_CLOSE_TAG) {
+            $contents .= ' ?>';
+        }
+
+        return "<?php return function (\$__laravel_data) { extract(\$__laravel_data, EXTR_SKIP); ?>$contents<?php } ?>";
     }
 
     /**

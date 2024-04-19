@@ -66,7 +66,7 @@ class ViewBladeCompilerTest extends TestCase
         $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);
         $files->shouldReceive('get')->once()->with('foo')->andReturn('Hello World');
         $files->shouldReceive('exists')->once()->with(__DIR__)->andReturn(true);
-        $files->shouldReceive('put')->once()->with(__DIR__.'/'.hash('xxh128', 'v2foo').'.php', 'Hello World<?php /**PATH foo ENDPATH**/ ?>');
+        $files->shouldReceive('put')->once()->with(__DIR__.'/'.hash('xxh128', 'v2foo').'.php', '<?php return function ($__laravel_data) { extract($__laravel_data, EXTR_SKIP); ?>Hello World<?php } ?><?php /**PATH foo ENDPATH**/ ?>');
         $compiler->compile('foo');
     }
 
@@ -76,7 +76,7 @@ class ViewBladeCompilerTest extends TestCase
         $files->shouldReceive('get')->once()->with('foo')->andReturn('Hello World');
         $files->shouldReceive('exists')->once()->with(__DIR__)->andReturn(false);
         $files->shouldReceive('makeDirectory')->once()->with(__DIR__, 0777, true, true);
-        $files->shouldReceive('put')->once()->with(__DIR__.'/'.hash('xxh128', 'v2foo').'.php', 'Hello World<?php /**PATH foo ENDPATH**/ ?>');
+        $files->shouldReceive('put')->once()->with(__DIR__.'/'.hash('xxh128', 'v2foo').'.php', '<?php return function ($__laravel_data) { extract($__laravel_data, EXTR_SKIP); ?>Hello World<?php } ?><?php /**PATH foo ENDPATH**/ ?>');
         $compiler->compile('foo');
     }
 
@@ -85,7 +85,7 @@ class ViewBladeCompilerTest extends TestCase
         $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);
         $files->shouldReceive('get')->once()->with('foo')->andReturn('Hello World');
         $files->shouldReceive('exists')->once()->with(__DIR__)->andReturn(true);
-        $files->shouldReceive('put')->once()->with(__DIR__.'/'.hash('xxh128', 'v2foo').'.php', 'Hello World<?php /**PATH foo ENDPATH**/ ?>');
+        $files->shouldReceive('put')->once()->with(__DIR__.'/'.hash('xxh128', 'v2foo').'.php', '<?php return function ($__laravel_data) { extract($__laravel_data, EXTR_SKIP); ?>Hello World<?php } ?><?php /**PATH foo ENDPATH**/ ?>');
         $compiler->compile('foo');
         $this->assertSame('foo', $compiler->getPath());
     }
@@ -102,7 +102,7 @@ class ViewBladeCompilerTest extends TestCase
         $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);
         $files->shouldReceive('get')->once()->with('foo')->andReturn('Hello World');
         $files->shouldReceive('exists')->once()->with(__DIR__)->andReturn(true);
-        $files->shouldReceive('put')->once()->with(__DIR__.'/'.hash('xxh128', 'v2foo').'.php', 'Hello World<?php /**PATH foo ENDPATH**/ ?>');
+        $files->shouldReceive('put')->once()->with(__DIR__.'/'.hash('xxh128', 'v2foo').'.php', '<?php return function ($__laravel_data) { extract($__laravel_data, EXTR_SKIP); ?>Hello World<?php } ?><?php /**PATH foo ENDPATH**/ ?>');
         // set path before compilation
         $compiler->setPath('foo');
         // trigger compilation with $path
@@ -145,39 +145,39 @@ class ViewBladeCompilerTest extends TestCase
         return [
             'No PHP blocks' => [
                 'Hello World',
-                'Hello World<?php /**PATH foo ENDPATH**/ ?>',
+                '<?php return function ($__laravel_data) { extract($__laravel_data, EXTR_SKIP); ?>Hello World<?php } ?><?php /**PATH foo ENDPATH**/ ?>',
             ],
             'Single PHP block without closing ?>' => [
                 '<?php echo $path',
-                '<?php echo $path ?><?php /**PATH foo ENDPATH**/ ?>',
+                '<?php return function ($__laravel_data) { extract($__laravel_data, EXTR_SKIP); ?><?php echo $path ?><?php } ?><?php /**PATH foo ENDPATH**/ ?>',
             ],
             'Ending PHP block.' => [
                 'Hello world<?php echo $path ?>',
-                'Hello world<?php echo $path ?><?php /**PATH foo ENDPATH**/ ?>',
+                '<?php return function ($__laravel_data) { extract($__laravel_data, EXTR_SKIP); ?>Hello world<?php echo $path ?><?php } ?><?php /**PATH foo ENDPATH**/ ?>',
             ],
             'Ending PHP block without closing ?>' => [
                 'Hello world<?php echo $path',
-                'Hello world<?php echo $path ?><?php /**PATH foo ENDPATH**/ ?>',
+                '<?php return function ($__laravel_data) { extract($__laravel_data, EXTR_SKIP); ?>Hello world<?php echo $path ?><?php } ?><?php /**PATH foo ENDPATH**/ ?>',
             ],
             'PHP block between content.' => [
                 'Hello world<?php echo $path ?>Hi There',
-                'Hello world<?php echo $path ?>Hi There<?php /**PATH foo ENDPATH**/ ?>',
+                '<?php return function ($__laravel_data) { extract($__laravel_data, EXTR_SKIP); ?>Hello world<?php echo $path ?>Hi There<?php } ?><?php /**PATH foo ENDPATH**/ ?>',
             ],
             'Multiple PHP blocks.' => [
                 'Hello world<?php echo $path ?>Hi There<?php echo $path ?>Hello Again',
-                'Hello world<?php echo $path ?>Hi There<?php echo $path ?>Hello Again<?php /**PATH foo ENDPATH**/ ?>',
+                '<?php return function ($__laravel_data) { extract($__laravel_data, EXTR_SKIP); ?>Hello world<?php echo $path ?>Hi There<?php echo $path ?>Hello Again<?php } ?><?php /**PATH foo ENDPATH**/ ?>',
             ],
             'Multiple PHP blocks without closing ?>' => [
                 'Hello world<?php echo $path ?>Hi There<?php echo $path',
-                'Hello world<?php echo $path ?>Hi There<?php echo $path ?><?php /**PATH foo ENDPATH**/ ?>',
+                '<?php return function ($__laravel_data) { extract($__laravel_data, EXTR_SKIP); ?>Hello world<?php echo $path ?>Hi There<?php echo $path ?><?php } ?><?php /**PATH foo ENDPATH**/ ?>',
             ],
             'Short open echo tag' => [
                 'Hello world<?= echo $path',
-                'Hello world<?= echo $path ?><?php /**PATH foo ENDPATH**/ ?>',
+                '<?php return function ($__laravel_data) { extract($__laravel_data, EXTR_SKIP); ?>Hello world<?= echo $path ?><?php } ?><?php /**PATH foo ENDPATH**/ ?>',
             ],
             'Echo XML declaration' => [
                 '<?php echo \'<?xml version="1.0" encoding="UTF-8"?>\';',
-                '<?php echo \'<?xml version="1.0" encoding="UTF-8"?>\'; ?><?php /**PATH foo ENDPATH**/ ?>',
+                '<?php return function ($__laravel_data) { extract($__laravel_data, EXTR_SKIP); ?><?php echo \'<?xml version="1.0" encoding="UTF-8"?>\'; ?><?php } ?><?php /**PATH foo ENDPATH**/ ?>',
             ],
         ];
     }
@@ -187,7 +187,7 @@ class ViewBladeCompilerTest extends TestCase
         $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);
         $files->shouldReceive('get')->once()->with('')->andReturn('Hello World');
         $files->shouldReceive('exists')->once()->with(__DIR__)->andReturn(true);
-        $files->shouldReceive('put')->once()->with(__DIR__.'/'.hash('xxh128', 'v2').'.php', 'Hello World');
+        $files->shouldReceive('put')->once()->with(__DIR__.'/'.hash('xxh128', 'v2').'.php', '<?php return function ($__laravel_data) { extract($__laravel_data, EXTR_SKIP); ?>Hello World<?php } ?>');
         $compiler->setPath('');
         $compiler->compile();
     }
@@ -197,7 +197,7 @@ class ViewBladeCompilerTest extends TestCase
         $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);
         $files->shouldReceive('get')->once()->with(null)->andReturn('Hello World');
         $files->shouldReceive('exists')->once()->with(__DIR__)->andReturn(true);
-        $files->shouldReceive('put')->once()->with(__DIR__.'/'.hash('xxh128', 'v2').'.php', 'Hello World');
+        $files->shouldReceive('put')->once()->with(__DIR__.'/'.hash('xxh128', 'v2').'.php', '<?php return function ($__laravel_data) { extract($__laravel_data, EXTR_SKIP); ?>Hello World<?php } ?>');
         $compiler->setPath(null);
         $compiler->compile();
     }
