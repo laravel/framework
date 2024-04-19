@@ -13,6 +13,23 @@ class Arr
     use Macroable;
 
     /**
+     * Extract prop names from given keys.
+     */
+    public static function extractPropNames(array $keys): array
+    {
+        $props = [];
+
+        foreach ($keys as $key => $defaultValue) {
+            $key = is_numeric($key) ? $defaultValue : $key;
+
+            $props[] = $key;
+            $props[] = Str::kebab($key);
+        }
+
+        return $props;
+    }
+
+    /**
      * Determine whether the given value is array accessible.
      *
      * @param  mixed  $value

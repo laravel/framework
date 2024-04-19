@@ -27,6 +27,14 @@ class ComponentAttributeBag implements ArrayAccess, IteratorAggregate, JsonSeria
     protected $attributes = [];
 
     /**
+     * Get all values to save time converting from iterator to array.
+     */
+    public function all(): array
+    {
+        return $this->attributes;
+    }
+
+    /**
      * Create a new component attribute bag instance.
      *
      * @param  array  $attributes
@@ -207,7 +215,7 @@ class ComponentAttributeBag implements ArrayAccess, IteratorAggregate, JsonSeria
      */
     public function onlyProps($keys)
     {
-        return $this->only($this->extractPropNames($keys));
+        return $this->only(Arr::extractPropNames($keys));
     }
 
     /**
@@ -218,27 +226,7 @@ class ComponentAttributeBag implements ArrayAccess, IteratorAggregate, JsonSeria
      */
     public function exceptProps($keys)
     {
-        return $this->except($this->extractPropNames($keys));
-    }
-
-    /**
-     * Extract prop names from given keys.
-     *
-     * @param  mixed|array  $keys
-     * @return array
-     */
-    protected function extractPropNames($keys)
-    {
-        $props = [];
-
-        foreach ($keys as $key => $defaultValue) {
-            $key = is_numeric($key) ? $defaultValue : $key;
-
-            $props[] = $key;
-            $props[] = Str::kebab($key);
-        }
-
-        return $props;
+        return $this->except(Arr::extractPropNames($keys));
     }
 
     /**
