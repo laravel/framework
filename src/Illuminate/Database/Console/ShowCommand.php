@@ -78,7 +78,7 @@ class ShowCommand extends DatabaseInspectionCommand
             'table' => $table['name'],
             'schema' => $table['schema'],
             'size' => $table['size'],
-            'rows' => $this->option('counts') ? $connection->table($table->getName())->count() : null,
+            'rows' => $this->option('counts') ? $connection->table($table['name'])->count() : null,
             'engine' => $table['engine'],
             'collation' => $table['collation'],
             'comment' => $table['comment'],
