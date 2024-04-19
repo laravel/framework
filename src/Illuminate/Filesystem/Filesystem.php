@@ -123,7 +123,8 @@ class Filesystem
             $code = file_get_contents($path);
             $this->cachedCallables[$path] = function ($data) use ($code) {
                 extract($data, EXTR_SKIP);
-                return eval("?>" . $code);
+
+                return eval('?>'.$code);
             };
 
             return $this->cachedCallables[$path]($data);
