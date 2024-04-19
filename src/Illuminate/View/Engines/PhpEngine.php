@@ -55,7 +55,7 @@ class PhpEngine implements Engine
         // flush out any stray output that might get out before an error occurs or
         // an exception is thrown. This prevents any partial views from leaking.
         try {
-            $this->files->getRequire($path, $data);
+            $this->files->getRequireCallable($path, $data);
         } catch (Throwable $e) {
             $this->handleViewException($e, $obLevel);
         }

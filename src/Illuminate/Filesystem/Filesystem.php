@@ -18,6 +18,8 @@ class Filesystem
 {
     use Conditionable, Macroable;
 
+    private array $cachedCallables = [];
+
     /**
      * Determine if a file or directory exists.
      *
@@ -100,6 +102,31 @@ class Filesystem
         }
 
         return $contents;
+    }
+
+    /**
+     * Get the returned callable of a file.
+     *
+     * @param  string  $path
+     * @param  array  $data
+     * @return mixed
+     *
+     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
+     */
+    public function getRequireCallable($path, array $data = [])
+    {
+        if ($this->isFile($path)) {
+            $__path = $path;
+            $__data = $data;
+
+            if (! isset($this->cachedCallables[$__path])) {
+                $this->cachedCallables[$__path] = require_once $__path;
+            }
+
+            return $this->cachedCallables[$__path]($__data);
+        }
+
+        throw new FileNotFoundException("File does not exist at path {$path}.");
     }
 
     /**
