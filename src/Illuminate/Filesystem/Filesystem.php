@@ -120,7 +120,11 @@ class Filesystem
             $__data = $data;
 
             if (! isset($this->cachedCallables[$__path])) {
-                $this->cachedCallables[$__path] = require_once $__path;
+                $code = file_get_contents($__path);
+                $this->cachedCallables[$__path] = function ($data) use ($code) {
+                    extract($data, EXTR_SKIP);
+                    return eval("?>" . $code);
+                };
             }
 
             return $this->cachedCallables[$__path]($__data);
