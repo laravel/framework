@@ -73,6 +73,29 @@ trait CompilesConditionals
     }
 
     /**
+     * Compile the unverified statements into valid PHP.
+     *
+     * @param  string|null  $guard
+     * @return string
+     */
+    protected function compileUnverified($guard = null)
+    {
+        $guard = is_null($guard) ? '()' : $guard;
+
+        return "<?php if(!auth()->guard{$guard}->user()->hasVerifiedEmail()): ?>";
+    }
+
+    /**
+     * Compile the end-unverified statements into valid PHP.
+     *
+     * @return string
+     */
+    protected function compileEndUnverified()
+    {
+        return '<?php endif; ?>';
+    }
+
+    /**
      * Compile the env statements into valid PHP.
      *
      * @param  string  $environments

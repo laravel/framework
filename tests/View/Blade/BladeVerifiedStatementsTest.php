@@ -16,4 +16,17 @@ class BladeVerifiedStatementsTest extends AbstractBladeTestCase
 
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
+
+    public function testBladeUnverifiedAreCompiled()
+    {
+        $string = '@unverified
+        Foo bar baz
+@endunverified';
+
+        $expected = '<?php if(!auth()->guard()->user()->hasVerifiedEmail()): ?>
+        Foo bar baz
+<?php endif; ?>';
+
+        $this->assertEquals($expected, $this->compiler->compileString($string));
+    }
 }
