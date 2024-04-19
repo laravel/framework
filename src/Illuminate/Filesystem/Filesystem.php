@@ -115,19 +115,18 @@ class Filesystem
      */
     public function getRequireCallable($path, array $data = [])
     {
+        if (isset($this->cachedCallables[$path])) {
+            return $this->cachedCallables[$path]($data);
+        }
+
         if ($this->isFile($path)) {
-            $__path = $path;
-            $__data = $data;
+            $code = file_get_contents($path);
+            $this->cachedCallables[$path] = function ($data) use ($code) {
+                extract($data, EXTR_SKIP);
+                return eval("?>" . $code);
+            };
 
-            if (! isset($this->cachedCallables[$__path])) {
-                $code = file_get_contents($__path);
-                $this->cachedCallables[$__path] = function ($data) use ($code) {
-                    extract($data, EXTR_SKIP);
-                    return eval("?>" . $code);
-                };
-            }
-
-            return $this->cachedCallables[$__path]($__data);
+            return $this->cachedCallables[$path]($data);
         }
 
         throw new FileNotFoundException("File does not exist at path {$path}.");
