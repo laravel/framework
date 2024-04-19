@@ -8,6 +8,7 @@ namespace Illuminate\Support\Facades;
  * @method static string get(string $path, bool $lock = false)
  * @method static array json(string $path, int $flags = 0, bool $lock = false)
  * @method static string sharedGet(string $path)
+ * @method static mixed getRequireCallable(string $path, array $data = [])
  * @method static mixed getRequire(string $path, array $data = [])
  * @method static mixed requireOnce(string $path, array $data = [])
  * @method static \Illuminate\Support\LazyCollection lines(string $path)
