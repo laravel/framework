@@ -5,13 +5,14 @@ namespace Illuminate\Support;
 use Closure;
 use InvalidArgumentException;
 use RuntimeException;
+use Illuminate\Contracts\Foundation\Application;
 
 abstract class MultipleInstanceManager
 {
     /**
      * The application instance.
      *
-     * @var \Illuminate\Contracts\Foundation\Application
+     * @var Application
      */
     protected $app;
 
@@ -35,7 +36,7 @@ abstract class MultipleInstanceManager
      * @param  \Illuminate\Contracts\Foundation\Application  $app
      * @return void
      */
-    public function __construct($app)
+    public function __construct(Application $app)
     {
         $this->app = $app;
     }
