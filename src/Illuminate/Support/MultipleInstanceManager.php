@@ -3,16 +3,16 @@
 namespace Illuminate\Support;
 
 use Closure;
+use Illuminate\Contracts\Foundation\Application;
 use InvalidArgumentException;
 use RuntimeException;
-use Illuminate\Contracts\Foundation\Application;
 
 abstract class MultipleInstanceManager
 {
     /**
      * The application instance.
      *
-     * @var Application
+     * @var \Illuminate\Contracts\Foundation\Application
      */
     protected $app;
 
