@@ -39,6 +39,13 @@ class Dispatcher implements DispatcherContract
     protected $listeners = [];
 
     /**
+     * Cached event listeners.
+     *
+     * @var array
+     */
+    protected $listenersCache = [];
+
+    /**
      * The wildcard listeners.
      *
      * @var array
@@ -105,6 +112,7 @@ class Dispatcher implements DispatcherContract
                 $this->setupWildcardListen($event, $listener);
             } else {
                 $this->listeners[$event][] = $listener;
+                unset($this->listenersCache[$event]);
             }
         }
     }
@@ -133,6 +141,7 @@ class Dispatcher implements DispatcherContract
     {
         return isset($this->listeners[$eventName]) ||
                isset($this->wildcards[$eventName]) ||
+               isset($this->listenersCache[$eventName]) ||
                $this->hasWildcardListeners($eventName);
     }
 
@@ -242,19 +251,20 @@ class Dispatcher implements DispatcherContract
      */
     public function dispatch($event, $payload = [], $halt = false)
     {
-        // When the given "event" is actually an object we will assume it is an event
-        // object and use the class as the event name and this event itself as the
-        // payload to the handler, which makes object based events quite simple.
-        [$isEventObject, $event, $payload] = [
-            is_object($event),
-            ...$this->parseEventAndPayload($event, $payload),
-        ];
+        $isEventObject = is_object($event);
+
+        // When a non-object event is dispatched, we can quickly check to see if any listeners
+        // are defined and return.  This does not work for event objects as they can be broadcasted
+        // or may have interface listeners associated with the event.
+        if (! $isEventObject && ! $this->hasListeners($event)) {
+            return $halt ? null : [];
+        }
 
         // If the event is not intended to be dispatched unless the current database
         // transaction is successful, we'll register a callback which will handle
         // dispatching this event on the next successful DB transaction commit.
         if ($isEventObject &&
-            $payload[0] instanceof ShouldDispatchAfterCommit &&
+            $event instanceof ShouldDispatchAfterCommit &&
             ! is_null($transactions = $this->resolveTransactionManager())) {
             $transactions->addCallback(
                 fn () => $this->invokeListeners($event, $payload, $halt)
@@ -276,9 +286,14 @@ class Dispatcher implements DispatcherContract
      */
     protected function invokeListeners($event, $payload, $halt = false)
     {
-        if ($this->shouldBroadcast($payload)) {
-            $this->broadcastEvent($payload[0]);
+        if (is_object($event) && $this->shouldBroadcast([$event])) {
+            $this->broadcastEvent($event);
         }
+
+        // When the given "event" is actually an object we will assume it is an event
+        // object and use the class as the event name and this event itself as the
+        // payload to the handler, which makes object based events quite simple.
+        [$event, $payload] = $this->parseEventAndPayload($event, $payload);
 
         $responses = [];
 
@@ -315,7 +330,7 @@ class Dispatcher implements DispatcherContract
     protected function parseEventAndPayload($event, $payload)
     {
         if (is_object($event)) {
-            [$payload, $event] = [[$event], get_class($event)];
+            return [get_class($event), [$event]];
         }
 
         return [$event, Arr::wrap($payload)];
@@ -365,14 +380,20 @@ class Dispatcher implements DispatcherContract
      */
     public function getListeners($eventName)
     {
-        $listeners = array_merge(
-            $this->prepareListeners($eventName),
-            $this->wildcardsCache[$eventName] ?? $this->getWildcardListeners($eventName)
-        );
+        if (! array_key_exists($eventName, $this->listenersCache)) {
+            $listeners = $this->prepareListeners($eventName);
 
-        return class_exists($eventName, false)
-                    ? $this->addInterfaceListeners($eventName, $listeners)
-                    : $listeners;
+            if (class_exists($eventName, false)) {
+                $listeners = $this->addInterfaceListeners($eventName, $listeners);
+            }
+
+            $this->listenersCache[$eventName] = $listeners;
+        }
+
+        return array_merge(
+            $this->listenersCache[$eventName],
+            $this->getWildcardListeners($eventName)
+        );
     }
 
     /**
@@ -383,17 +404,21 @@ class Dispatcher implements DispatcherContract
      */
     protected function getWildcardListeners($eventName)
     {
-        $wildcards = [];
+        if (! array_key_exists($eventName, $this->wildcardsCache)) {
+            $wildcards = [];
 
-        foreach ($this->wildcards as $key => $listeners) {
-            if (Str::is($key, $eventName)) {
-                foreach ($listeners as $listener) {
-                    $wildcards[] = $this->makeListener($listener, true);
+            foreach ($this->wildcards as $key => $listeners) {
+                if (Str::is($key, $eventName)) {
+                    foreach ($listeners as $listener) {
+                        $wildcards[] = $this->makeListener($listener, true);
+                    }
                 }
             }
+
+            $this->wildcardsCache[$eventName] = $wildcards;
         }
 
-        return $this->wildcardsCache[$eventName] = $wildcards;
+        return $this->wildcardsCache[$eventName];
     }
 
     /**
@@ -696,6 +721,7 @@ class Dispatcher implements DispatcherContract
             unset($this->wildcards[$event]);
         } else {
             unset($this->listeners[$event]);
+            unset($this->listenersCache[$event]);
         }
 
         foreach ($this->wildcardsCache as $key => $listeners) {
