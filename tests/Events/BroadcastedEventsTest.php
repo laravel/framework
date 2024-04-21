@@ -24,11 +24,11 @@ class BroadcastedEventsTest extends TestCase
 
         $event = new BroadcastEvent;
 
-        $this->assertTrue($d->shouldBroadcast([$event]));
+        $this->assertTrue($d->shouldBroadcast($event));
 
         $event = new AlwaysBroadcastEvent;
 
-        $this->assertTrue($d->shouldBroadcast([$event]));
+        $this->assertTrue($d->shouldBroadcast($event));
     }
 
     public function testShouldBroadcastAsQueuedAndCallNormalListeners()
@@ -56,11 +56,11 @@ class BroadcastedEventsTest extends TestCase
 
         $event = new BroadcastFalseCondition;
 
-        $this->assertFalse($d->shouldBroadcast([$event]));
+        $this->assertFalse($d->shouldBroadcast($event));
 
         $event = new ExampleEvent;
 
-        $this->assertFalse($d->shouldBroadcast([$event]));
+        $this->assertFalse($d->shouldBroadcast($event));
     }
 }
 
