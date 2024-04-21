@@ -567,7 +567,7 @@ class UrlGenerator implements UrlGeneratorContract
      */
     protected function extractQueryString($path)
     {
-        if (($queryPosition = strpos($path ?? '', '?')) !== false) {
+        if (($queryPosition = strpos($path, '?')) !== false) {
             return [
                 substr($path, 0, $queryPosition),
                 substr($path, $queryPosition),
@@ -630,7 +630,7 @@ class UrlGenerator implements UrlGeneratorContract
      */
     public function isValidUrl($path)
     {
-        if (! preg_match('~^(#|//|https?://|(mailto|tel|sms):)~', $path ?? '')) {
+        if (! preg_match('~^(#|//|https?://|(mailto|tel|sms):)~', $path)) {
             return filter_var($path, FILTER_VALIDATE_URL) !== false;
         }
 
