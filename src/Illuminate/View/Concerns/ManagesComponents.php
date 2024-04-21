@@ -245,5 +245,7 @@ trait ManagesComponents
         $this->componentStack = [];
         $this->componentData = [];
         $this->currentComponentData = [];
+        $this->componentViews = [];
+        $this->componentViewsDepths = [];
     }
 }
