@@ -35,13 +35,13 @@
                     </div>
 
                     <div class="ml-6">
-                        <h2 class="text-xl font-semibold text-gray-900">Application up</h2>
+                        <h2 class="text-xl font-semibold text-gray-900">{{ __('Application up') }}</h2>
 
                         <p class="mt-2 text-gray-500 dark:text-gray-400 text-sm leading-relaxed">
-                            HTTP request received.
+                            {{ __('HTTP request received.') }}
 
                             @if (defined('LARAVEL_START'))
-                                Response successfully rendered in {{ round((microtime(true) - LARAVEL_START) * 1000) }}ms.
+                                {{ __('Response successfully rendered in :time ms.', ['time' => round((microtime(true) - LARAVEL_START) * 1000)]) }}
                             @endif
                         </p>
                     </div>
