@@ -149,6 +149,24 @@ class BladeTest extends TestCase
 <div>Slot: F, Color: yellow, Default: foo</div>', trim($view));
     }
 
+    public function test_rendering_a_nested_component()
+    {
+        $content = Blade::render('@foreach(range(1, 2) as $count) <x-nested :$count /> @endforeach');
+
+        $this->assertSame('<div>
+        1
+                    <small>1</small>
+                    <small>2</small>
+                    <small>3</small>
+            </div>
+  <div>
+        2
+                    <small>1</small>
+                    <small>2</small>
+                    <small>3</small>
+            </div>', trim($content));
+    }
+
     public function test_name_attribute_can_be_used_if_using_short_slot_names()
     {
         $content = Blade::render('<x-input-with-slot>

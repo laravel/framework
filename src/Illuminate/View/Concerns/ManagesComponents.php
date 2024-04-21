@@ -17,6 +17,20 @@ trait ManagesComponents
     protected $componentStack = [];
 
     /**
+     * The View instances of components being rendered.
+     *
+     * @var array
+     */
+    protected $componentViews = [];
+
+    /**
+     * Keeping depth of a component's view being rendered.
+     *
+     * @var array
+     */
+    protected $componentViewsDepths = [];
+
+    /**
      * The original data passed to the component.
      *
      * @var array
@@ -100,7 +114,21 @@ trait ManagesComponents
             } elseif ($view instanceof Htmlable) {
                 return $view->toHtml();
             } else {
-                return $this->make($view, $data)->render();
+                $componentViewDepth = $this->componentViewsDepths[$view] = ($this->componentViewsDepths[$view] ?? -1) + 1;
+
+                try {
+                    if (! isset($this->componentViews[$view])) {
+                        $this->componentViews[$view] = [];
+                    }
+
+                    if (! isset($this->componentViews[$view][$componentViewDepth])) {
+                        $this->componentViews[$view][$componentViewDepth] = $this->make($view);
+                    }
+
+                    return $this->componentViews[$view][$componentViewDepth]->with($data)->render();
+                } finally {
+                    $this->componentViewsDepths[$view]--;
+                }
             }
         } finally {
             $this->currentComponentData = $previousComponentData;
