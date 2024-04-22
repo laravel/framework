@@ -233,6 +233,21 @@ class Number
     }
 
     /**
+     * Map the given number from one range to another.
+     *
+     * @param  int|float  $number
+     * @param  int|float  $inMin
+     * @param  int|float  $inMax
+     * @param  int|float  $outMin
+     * @param  int|float  $outMax
+     * @return int|float
+     */
+    public static function mapRange(int|float $number, int|float $inMin, int|float $inMax, int|float $outMin, int|float $outMax)
+    {
+        return ($number - $inMin) * ($outMax - $outMin) / ($inMax - $inMin) + $outMin;
+    }
+
+    /**
      * Execute the given callback using the given locale.
      *
      * @param  string  $locale

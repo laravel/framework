@@ -175,6 +175,16 @@ class SupportNumberTest extends TestCase
         $this->assertSame(1, Number::clamp(-10, 1, 5));
     }
 
+    public function testMapRange()
+    {
+        $this->assertSame(0, Number::mapRange(0, 0, 10, 0, 100));
+        $this->assertSame(50, Number::mapRange(5, 0, 10, 0, 100));
+        $this->assertSame(100, Number::mapRange(10, 0, 10, 0, 100));
+        $this->assertSame(1.5, Number::mapRange(0.5, 0, 1, 1, 2));
+        $this->assertSame(42.42, Number::mapRange(0.42, 0, 1, 42, 43));
+        $this->assertSame(1.1666666666666667, Number::mapRange(2, 1, 7, 1, 2));
+    }
+
     public function testToHuman()
     {
         $this->assertSame('1', Number::forHumans(1));
