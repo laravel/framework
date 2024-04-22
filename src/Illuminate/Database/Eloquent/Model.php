@@ -86,6 +86,13 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     protected $withCount = [];
 
     /**
+     * The attributes to reload on save.
+     *
+     * @var array<int, string>
+     */
+    protected $attributesToReloadOnSave = [];
+
+    /**
      * Indicates whether lazy loading will be prevented on this model.
      *
      * @var bool
@@ -1178,6 +1185,16 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     protected function finishSave(array $options)
     {
+        if (! empty($this->attributesToReloadOnSave)) {
+            $this->setRawAttributes(array_merge(
+                $this->attributes,
+                $this->setKeysForSelectQuery($this->newQueryWithoutScopes())
+                    ->useWritePdo()
+                    ->firstOrFail($this->attributesToReloadOnSave)
+                    ->attributes
+            ));
+        }
+
         $this->fireModelEvent('saved', false);
 
         if ($this->isDirty() && ($options['touch'] ?? true)) {
@@ -1699,7 +1716,12 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
             return $this;
         }
 
-        $this->refreshRawAttributes();
+        $this->setRawAttributes(
+            $this->setKeysForSelectQuery($this->newQueryWithoutScopes())
+                ->useWritePdo()
+                ->firstOrFail()
+                ->attributes
+        );
 
         $this->load(collect($this->relations)->reject(function ($relation) {
             return $relation instanceof Pivot
@@ -1709,21 +1731,6 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         $this->syncOriginal();
 
         return $this;
-    }
-
-    /**
-     * Reload the current model instance with fresh attributes from the database.
-     *
-     * @return void
-     */
-    protected function refreshRawAttributes()
-    {
-        $this->setRawAttributes(
-            $this->setKeysForSelectQuery($this->newQueryWithoutScopes())
-                ->useWritePdo()
-                ->firstOrFail()
-                ->attributes
-        );
     }
 
     /**
