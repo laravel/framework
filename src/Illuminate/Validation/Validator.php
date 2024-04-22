@@ -1217,9 +1217,9 @@ class Validator implements ValidatorContract
     }
 
     /**
-     * Transform nested validation keys to dot notation (single level array of validations)
+     * Transform nested validation keys to dot notation (single level array of validations).
      *
-     * @param array $rules
+     * @param  array  $rules
      * @return array
      */
     private function dotifyNestedRules(array $rules)
@@ -1228,14 +1228,14 @@ class Validator implements ValidatorContract
 
         $dotify = static function (array $rules, string $prefix = '') use (&$dotify, &$dotifiedRules) {
             foreach ($rules as $attribute => $rule) {
-                if (!is_string($attribute)) {
+                if (! is_string($attribute)) {
                     $dotifiedRules[$prefix][] = $rule;
                     continue;
                 }
 
-                $preparedPrefix = Str::ltrim($prefix . '.' . $attribute, '.');
+                $preparedPrefix = Str::ltrim($prefix.'.'.$attribute, '.');
 
-                if (!is_array($rule)) {
+                if (! is_array($rule)) {
                     $dotifiedRules[$preparedPrefix] = $rule;
                     continue;
                 }

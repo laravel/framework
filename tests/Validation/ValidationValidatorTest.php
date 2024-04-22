@@ -9413,7 +9413,7 @@ class ValidationValidatorTest extends TestCase
         $this->assertSame(['required', 'array'], $rules['data']);
         $this->assertSame(['required_array_keys:string_rules,object_rules,nested'], $rules['data.0']);
         $this->assertSame(['required', 'integer'], $rules['data.0.string_rules']);
-        $this->assertSame([(string)$objectRule], $rules['data.0.object_rules']);
+        $this->assertSame([(string) $objectRule], $rules['data.0.object_rules']);
         $this->assertSame(['array'], $rules['data.0.nested']);
         $this->assertSame(['string'], $rules['data.0.nested.nested_array']);
     }
