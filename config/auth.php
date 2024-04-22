@@ -68,6 +68,9 @@ return [
         // 'users' => [
         //     'driver' => 'database',
         //     'table' => 'users',
+        //     'id' => 'id',
+        //     'password' => 'password',
+        //     'remember_token' => 'remember_token',
         // ],
     ],
 

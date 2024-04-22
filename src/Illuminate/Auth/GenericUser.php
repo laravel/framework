@@ -31,7 +31,7 @@ class GenericUser implements UserContract
      */
     public function getAuthIdentifierName()
     {
-        return 'id';
+        return config('auth.providers.users.id', 'id') ;
     }
 
     /**
@@ -51,7 +51,7 @@ class GenericUser implements UserContract
      */
     public function getAuthPasswordName()
     {
-        return 'password';
+        return config('auth.providers.users.password', 'password') ;
     }
 
     /**
@@ -92,7 +92,7 @@ class GenericUser implements UserContract
      */
     public function getRememberTokenName()
     {
-        return 'remember_token';
+        return config('auth.providers.users.remember_token', 'remember_token') ;
     }
 
     /**
