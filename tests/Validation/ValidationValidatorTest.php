@@ -9362,6 +9362,62 @@ class ValidationValidatorTest extends TestCase
         $validator->passes();
     }
 
+    public function testItProperlyResolvesNestedValidationKeys()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+
+        $objectRule = new ProhibitedIf(true);
+
+        $v = new Validator($trans, [
+            'data' => [
+                [
+                    'string_rules' => 1,
+                    'object_rules' => 2,
+                    'nested' => [
+                        'nested_array' => 3,
+                    ],
+                ],
+            ],
+        ], [
+            'data' => [
+                'required',
+                'array',
+
+                '*' => [
+                    'required_array_keys:string_rules,object_rules,nested',
+
+                    'string_rules' => 'required|integer',
+                    'object_rules' => $objectRule,
+                    'nested' => [
+                        'array',
+
+                        'nested_array' => [
+                            'string',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        $rules = $v->getRules();
+
+        $this->assertSame([
+            'data',
+            'data.0',
+            'data.0.string_rules',
+            'data.0.object_rules',
+            'data.0.nested',
+            'data.0.nested.nested_array',
+        ], array_keys($rules));
+
+        $this->assertSame(['required', 'array'], $rules['data']);
+        $this->assertSame(['required_array_keys:string_rules,object_rules,nested'], $rules['data.0']);
+        $this->assertSame(['required', 'integer'], $rules['data.0.string_rules']);
+        $this->assertSame([(string)$objectRule], $rules['data.0.object_rules']);
+        $this->assertSame(['array'], $rules['data.0.nested']);
+        $this->assertSame(['string'], $rules['data.0.nested.nested_array']);
+    }
+
     protected function getTranslator()
     {
         return m::mock(TranslatorContract::class);
