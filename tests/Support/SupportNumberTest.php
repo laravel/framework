@@ -181,7 +181,7 @@ class SupportNumberTest extends TestCase
         $this->assertSame(50, Number::mapRange(5, 0, 10, 0, 100));
         $this->assertSame(100, Number::mapRange(10, 0, 10, 0, 100));
         $this->assertSame(1.5, Number::mapRange(0.5, 0, 1, 1, 2));
-        $this->assertSame(42.42, Number::mapRange(0.42, 0, 1, 42, 43));
+        $this->assertSame(4.727272727272727, Number::mapRange(42, 1, 100, 1, 10));
         $this->assertSame(1.1666666666666667, Number::mapRange(2, 1, 7, 1, 2));
     }
 
