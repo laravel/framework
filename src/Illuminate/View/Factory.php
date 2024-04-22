@@ -323,7 +323,7 @@ class Factory implements FactoryContract
     public function getEngineFromPath($path)
     {
         if ($this->hasPathEngine($path)) {
-            return $this->pathEngines[$path];
+            return $this->getPathEngine($path);
         }
 
         if (! $extension = $this->getExtension($path)) {
@@ -334,7 +334,7 @@ class Factory implements FactoryContract
 
         $this->setPathEngine($path, $this->engines->resolve($engine));
 
-        return $this->pathEngines[$path];
+        return $this->getPathEngine($path);
     }
 
     /**
@@ -501,6 +501,11 @@ class Factory implements FactoryContract
     public function setPathEngine($path, $engine)
     {
         $this->pathEngines[$path] = $engine;
+    }
+
+    public function getPathEngine($path)
+    {
+        return $this->pathEngines[$path];
     }
 
     public function hasPathEngine($path)
