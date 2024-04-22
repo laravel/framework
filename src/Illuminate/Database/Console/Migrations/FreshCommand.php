@@ -62,7 +62,7 @@ class FreshCommand extends Command
 
         $database = $this->input->getOption('database');
 
-        $this->migrator->usingConnection($database, function () {
+        $this->migrator->usingConnection($database, function () use ($database) {
             if ($this->migrator->repositoryExists()) {
                 $this->newLine();
 
