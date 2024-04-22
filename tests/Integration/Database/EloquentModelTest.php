@@ -151,7 +151,7 @@ class EloquentModelTest extends DatabaseTestCase
             $this->assertSame([
                 'tax' => 12,
                 'total' => 32,
-                'in_stock' => 1
+                'in_stock' => 1,
             ], $product->getAttributes());
         });
         Product::saved(function ($product) {
@@ -174,7 +174,7 @@ class EloquentModelTest extends DatabaseTestCase
             $this->assertSame([
                 'tax' => 6,
                 'total' => 16,
-                'in_stock' => 1
+                'in_stock' => 1,
             ], $product->getAttributes());
         });
         Product::saved(function ($product) {
