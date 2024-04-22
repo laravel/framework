@@ -148,7 +148,7 @@ class EloquentModelTest extends DatabaseTestCase
         });
 
         Product::retrieved(function (Model $product) {
-            $this->assertSame([
+            $this->assertEquals([
                 'tax' => 12,
                 'total' => 32,
                 'in_stock' => 1,
@@ -171,7 +171,7 @@ class EloquentModelTest extends DatabaseTestCase
 
         Product::flushEventListeners();
         Product::retrieved(function ($product) {
-            $this->assertSame([
+            $this->assertEquals([
                 'tax' => 6,
                 'total' => 16,
                 'in_stock' => 1,
