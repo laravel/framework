@@ -92,7 +92,7 @@ class Factory implements FactoryContract
 
     /**
      * The cached array of engines for paths.
-     * 
+     *
      * @var array
      */
     protected $pathEngineCache = [];
@@ -485,7 +485,7 @@ class Factory implements FactoryContract
         unset($this->extensions[$extension]);
 
         $this->extensions = array_merge([$extension => $engine], $this->extensions);
-    
+
         $this->pathEngineCache = [];
     }
 
