@@ -18,6 +18,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Support\Traits\ReflectsClosures;
+use Illuminate\Support\WildcardPattern;
 use ReflectionClass;
 
 class Dispatcher implements DispatcherContract
@@ -51,6 +52,13 @@ class Dispatcher implements DispatcherContract
      * @var array
      */
     protected $wildcards = [];
+
+    /**
+     * The pre-calculated wildcard patterns.
+     *
+     * @var WildcardPattern[]
+     */
+    protected $wildcardPatterns = [];
 
     /**
      * The cached wildcard listeners.
@@ -127,6 +135,7 @@ class Dispatcher implements DispatcherContract
     protected function setupWildcardListen($event, $listener)
     {
         $this->wildcards[$event][] = $listener;
+        $this->wildcardPatterns[$event] = new WildcardPattern($event);
 
         $this->wildcardsCache = [];
     }
@@ -154,7 +163,7 @@ class Dispatcher implements DispatcherContract
     public function hasWildcardListeners($eventName)
     {
         foreach ($this->wildcards as $key => $listeners) {
-            if (Str::is($key, $eventName)) {
+            if ($this->wildcardPatterns[$key]->matches($eventName)) {
                 return true;
             }
         }
@@ -408,7 +417,7 @@ class Dispatcher implements DispatcherContract
             $wildcards = [];
 
             foreach ($this->wildcards as $key => $listeners) {
-                if (Str::is($key, $eventName)) {
+                if ($this->wildcardPatterns[$key]->matches($eventName)) {
                     foreach ($listeners as $listener) {
                         $wildcards[] = $this->makeListener($listener, true);
                     }
@@ -719,6 +728,7 @@ class Dispatcher implements DispatcherContract
     {
         if (str_contains($event, '*')) {
             unset($this->wildcards[$event]);
+            unset($this->wildcardPatterns[$event]);
         } else {
             unset($this->listeners[$event]);
             unset($this->listenersCache[$event]);
