@@ -14,7 +14,7 @@ class GenericUser implements UserContract
     protected $attributes;
 
     /**
-     * The columns used for authentication
+     * The columns used for authentication.
      *
      * @var array
      */
@@ -32,7 +32,7 @@ class GenericUser implements UserContract
         $this->columns = $columns ?? [
             'primary_key' => 'id',
             'password' => 'password',
-            'remember_token' => 'remember_token'
+            'remember_token' => 'remember_token',
         ];
     }
 

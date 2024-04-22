@@ -65,15 +65,15 @@ return [
             'model' => env('AUTH_MODEL', App\Models\User::class),
         ],
 
-//         'users' => [
-//             'driver' => 'database',
-//             'table' => 'users',
-//             'columns' => [
-//                  'primary_key' => 'id',
-//                  'password' => 'password',
-//                  'remember_token' => 'remember_token',
-//             ],
-//         ],
+        // 'users' => [
+        //     'driver' => 'database',
+        //     'table' => 'users',
+        //     'columns' => [
+        //         'primary_key' => 'id',
+        //         'password' => 'password',
+        //         'remember_token' => 'remember_token',
+        //     ],
+        // ],
     ],
 
     /*
