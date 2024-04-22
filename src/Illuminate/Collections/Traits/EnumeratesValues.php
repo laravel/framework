@@ -952,6 +952,16 @@ trait EnumeratesValues
     }
 
     /**
+     * Get the collection of items as Object.
+     *
+     * @return object|null
+     */
+    public function toObject()
+    {
+        return json_decode($this->toJson(), false);
+    }
+
+    /**
      * Get a CachingIterator instance.
      *
      * @param  int  $flags
