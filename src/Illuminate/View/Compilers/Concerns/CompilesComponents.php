@@ -157,11 +157,9 @@ trait CompilesComponents
      */
     protected function compileProps($expression)
     {
-        return "<?php
-\$attributes ??= new \\Illuminate\\View\\ComponentAttributeBag;
+        return "<?php \$attributes ??= new \\Illuminate\\View\\ComponentAttributeBag;
 
 \$__newAttributes = [];
-
 \$__propNames = \Illuminate\Support\Arr::extractPropNames({$expression});
 
 foreach (\$attributes->all() as \$__key => \$__value) {

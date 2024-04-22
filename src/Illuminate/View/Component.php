@@ -76,6 +76,33 @@ abstract class Component
     protected static $constructorParametersCache = [];
 
     /**
+     * Cache of ignored parameter names.
+     */
+    protected static array $ignoredParameterNames = [];
+
+    /**
+     * Fetch a cached set of anonymous component constructor parameter names to exclude.
+     */
+    public static function ignoredParameterNames(): array
+    {
+        if (! isset(static::$ignoredParameterNames[static::class])) {
+            $constructor = (new ReflectionClass(
+                static::class
+            ))->getConstructor();
+
+            if (! $constructor) {
+                return static::$ignoredParameterNames[static::class] = [];
+            }
+
+            static::$ignoredParameterNames[static::class] = collect($constructor->getParameters())
+                ->map->getName()
+                ->all();
+        }
+
+        return static::$ignoredParameterNames[static::class];
+    }
+
+    /**
      * Get the view / view contents that represent the component.
      *
      * @return \Illuminate\Contracts\View\View|\Illuminate\Contracts\Support\Htmlable|\Closure|string

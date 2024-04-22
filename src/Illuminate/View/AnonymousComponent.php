@@ -2,8 +2,6 @@
 
 namespace Illuminate\View;
 
-use ReflectionClass;
-
 class AnonymousComponent extends Component
 {
     /**
@@ -19,26 +17,6 @@ class AnonymousComponent extends Component
      * @var array
      */
     protected $data = [];
-
-    protected static array $ignoredParameterNames = [];
-
-    /**
-     * Fetch a cached set of anonymous component constructor parameter names to exclude.
-     */
-    public static function ignoredParameterNames(): array
-    {
-        if (!isset(static::$ignoredParameterNames)) {
-            $constructor = (new ReflectionClass(
-                static::class
-            ))->getConstructor();
-
-            static::$ignoredParameterNames = collect($constructor->getParameters())
-                ->map->getName()
-                ->all();
-        }
-
-        return static::$ignoredParameterNames;
-    }
 
     /**
      * Create a new anonymous component instance.
