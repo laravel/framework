@@ -1072,6 +1072,18 @@ class ViewFactoryTest extends TestCase
         $this->assertNull($factory->getLoopStack()[0]['last']);
     }
 
+    public function testPathEngines()
+    {
+        $factory = $this->getFactory();
+
+        $this->assertFalse($factory->hasPathEngine('foo'));
+        $factory->setPathEngine('foo', 'bar');
+        $this->assertTrue($factory->hasPathEngine('foo'));
+        $this->assertSame('bar', $factory->getPathEngine('foo'));
+        $factory->resetPathEngines();
+        $this->assertFalse($factory->hasPathEngine('foo'));
+    }
+
     public function testMacro()
     {
         $factory = $this->getFactory();

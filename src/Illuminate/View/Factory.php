@@ -91,6 +91,20 @@ class Factory implements FactoryContract
     protected $renderedOnce = [];
 
     /**
+     * The name of the engine for a specific path
+     * 
+     * @var array
+     */
+    protected $pathEngines = [];
+
+    /**
+     * The normalized names of the views.
+     *
+     * @var array
+     */
+    protected $normalizedNames = [];
+
+    /**
      * Create a new view factory instance.
      *
      * @param  \Illuminate\View\Engines\EngineResolver  $engines
@@ -247,7 +261,14 @@ class Factory implements FactoryContract
      */
     protected function normalizeName($name)
     {
-        return ViewName::normalize($name);
+        if (isset($this->normalizedNames[$name])) {
+            return $this->normalizedNames[$name];
+        }
+
+
+        $this->normalizedNames[$name] = ViewName::normalize($name);
+
+        return $this->normalizedNames[$name];
     }
 
     /**
@@ -301,13 +322,19 @@ class Factory implements FactoryContract
      */
     public function getEngineFromPath($path)
     {
+        if ($this->hasPathEngine($path)) {
+            return $this->pathEngines[$path];
+        }
+
         if (! $extension = $this->getExtension($path)) {
             throw new InvalidArgumentException("Unrecognized extension in file: {$path}.");
         }
 
         $engine = $this->extensions[$extension];
 
-        return $this->engines->resolve($engine);
+        $this->setPathEngine($path, $this->engines->resolve($engine));
+
+        return $this->pathEngines[$path];
     }
 
     /**
@@ -467,6 +494,23 @@ class Factory implements FactoryContract
         unset($this->extensions[$extension]);
 
         $this->extensions = array_merge([$extension => $engine], $this->extensions);
+    
+        $this->resetPathEngines();
+    }
+
+    public function setPathEngine($path, $engine)
+    {
+        $this->pathEngines[$path] = $engine;
+    }
+
+    public function hasPathEngine($path)
+    {
+        return isset($this->pathEngines[$path]);
+    }
+
+    public function resetPathEngines()
+    {
+        $this->pathEngines = [];
     }
 
     /**
