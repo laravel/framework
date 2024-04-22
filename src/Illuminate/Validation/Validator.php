@@ -1199,6 +1199,8 @@ class Validator implements ValidatorContract
      */
     public function addRules($rules)
     {
+        $rules = $this->dotifyNestedRules($rules);
+
         // The primary purpose of this parser is to expand any "*" rules to the all
         // of the explicit rules needed for the given data. For example the rule
         // names.* would get expanded to names.0, names.1, etc. for this data.
@@ -1212,6 +1214,39 @@ class Validator implements ValidatorContract
         $this->implicitAttributes = array_merge(
             $this->implicitAttributes, $response->implicitAttributes
         );
+    }
+
+    /**
+     * Transform nested validation keys to dot notation (single level array of validations)
+     *
+     * @param array $rules
+     * @return array
+     */
+    private function dotifyNestedRules(array $rules)
+    {
+        $dotifiedRules = [];
+
+        $dotify = static function (array $rules, string $prefix = '') use (&$dotify, &$dotifiedRules) {
+            foreach ($rules as $attribute => $rule) {
+                if (!is_string($attribute)) {
+                    $dotifiedRules[$prefix][] = $rule;
+                    continue;
+                }
+
+                $preparedPrefix = Str::ltrim($prefix . '.' . $attribute, '.');
+
+                if (!is_array($rule)) {
+                    $dotifiedRules[$preparedPrefix] = $rule;
+                    continue;
+                }
+
+                $dotify($rule, $preparedPrefix);
+            }
+        };
+
+        $dotify($rules);
+
+        return $dotifiedRules;
     }
 
     /**
