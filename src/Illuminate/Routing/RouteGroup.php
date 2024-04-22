@@ -66,7 +66,9 @@ class RouteGroup
         $old = $old['prefix'] ?? '';
 
         if ($prependExistingPrefix) {
-            return isset($new['prefix']) ? ($old ? trim($old, '/') . '/' . trim($new['prefix'], '/') : trim($new['prefix'], '/')) : $old;
+            return isset($new['prefix']) 
+                ? ($old ? trim($old, '/').'/'.trim($new['prefix'], '/') : trim($new['prefix'], '/')) 
+                : $old;
         }
 
         return isset($new['prefix']) ? trim($new['prefix'], '/').'/'.trim($old, '/') : $old;
