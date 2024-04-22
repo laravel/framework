@@ -3,6 +3,7 @@
 namespace Illuminate\Notifications;
 
 use Illuminate\Bus\Queueable;
+use Illuminate\Container\Container;
 use Illuminate\Contracts\Queue\ShouldBeEncrypted;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Contracts\Queue\ShouldQueueAfterCommit;
@@ -10,6 +11,7 @@ use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Routing\Pipeline;
 use Illuminate\Support\Collection;
 
 class SendQueuedNotifications implements ShouldQueue
@@ -116,7 +118,14 @@ class SendQueuedNotifications implements ShouldQueue
      */
     public function handle(ChannelManager $manager)
     {
-        $manager->sendNow($this->notifiables, $this->notification, $this->channels);
+        (new Pipeline(Container::getInstance()))
+            ->send($this->notification)
+            ->when(method_exists($this->notification, 'middleware'), function (Pipeline $pipeline) {
+                return $pipeline->through($this->notification->middleware());
+            })
+            ->then(function () use ($manager) {
+                $manager->sendNow($this->notifiables, $this->notification, $this->channels);
+            });
     }
 
     /**
