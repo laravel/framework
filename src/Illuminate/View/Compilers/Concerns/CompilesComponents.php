@@ -160,7 +160,7 @@ trait CompilesComponents
         return "<?php \$attributes ??= new \\Illuminate\\View\\ComponentAttributeBag;
 
 \$__newAttributes = [];
-\$__propNames = \Illuminate\Support\Arr::extractPropNames({$expression});
+\$__propNames = \Illuminate\View\ComponentAttributeBag::extractPropNames({$expression});
 
 foreach (\$attributes->all() as \$__key => \$__value) {
     if (in_array(\$__key, \$__propNames)) {

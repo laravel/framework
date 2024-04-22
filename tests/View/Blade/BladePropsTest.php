@@ -11,7 +11,7 @@ class BladePropsTest extends AbstractBladeTestCase
         $this->assertSame('<?php $attributes ??= new \Illuminate\View\ComponentAttributeBag;
 
 $__newAttributes = [];
-$__propNames = \Illuminate\Support\Arr::extractPropNames(([\'one\' => true, \'two\' => \'string\']));
+$__propNames = \Illuminate\View\ComponentAttributeBag::extractPropNames(([\'one\' => true, \'two\' => \'string\']));
 
 foreach ($attributes->all() as $__key => $__value) {
     if (in_array($__key, $__propNames)) {

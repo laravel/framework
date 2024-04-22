@@ -76,31 +76,11 @@ abstract class Component
     protected static $constructorParametersCache = [];
 
     /**
-     * Cache of ignored parameter names.
+     * The cache of ignored parameter names.
+     *
+     * @var array
      */
-    protected static array $ignoredParameterNames = [];
-
-    /**
-     * Fetch a cached set of anonymous component constructor parameter names to exclude.
-     */
-    public static function ignoredParameterNames(): array
-    {
-        if (! isset(static::$ignoredParameterNames[static::class])) {
-            $constructor = (new ReflectionClass(
-                static::class
-            ))->getConstructor();
-
-            if (! $constructor) {
-                return static::$ignoredParameterNames[static::class] = [];
-            }
-
-            static::$ignoredParameterNames[static::class] = collect($constructor->getParameters())
-                ->map->getName()
-                ->all();
-        }
-
-        return static::$ignoredParameterNames[static::class];
-    }
+    protected static $ignoredParameterNames = [];
 
     /**
      * Get the view / view contents that represent the component.
@@ -442,6 +422,30 @@ abstract class Component
         }
 
         return static::$factory;
+    }
+
+    /**
+     * Get the cached set of anonymous component constructor parameter names to exclude.
+     *
+     * @return array
+     */
+    public static function ignoredParameterNames()
+    {
+        if (! isset(static::$ignoredParameterNames[static::class])) {
+            $constructor = (new ReflectionClass(
+                static::class
+            ))->getConstructor();
+
+            if (! $constructor) {
+                return static::$ignoredParameterNames[static::class] = [];
+            }
+
+            static::$ignoredParameterNames[static::class] = collect($constructor->getParameters())
+                ->map->getName()
+                ->all();
+        }
+
+        return static::$ignoredParameterNames[static::class];
     }
 
     /**
