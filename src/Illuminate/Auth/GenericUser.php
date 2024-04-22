@@ -14,14 +14,26 @@ class GenericUser implements UserContract
     protected $attributes;
 
     /**
+     * The columns used for authentication
+     *
+     * @var array
+     */
+    protected $columns;
+
+    /**
      * Create a new generic User object.
      *
      * @param  array  $attributes
      * @return void
      */
-    public function __construct(array $attributes)
+    public function __construct(array $attributes, $columns = null)
     {
         $this->attributes = $attributes;
+        $this->columns = $columns ?? [
+            'primary_key' => 'id',
+            'password' => 'password',
+            'remember_token' => 'remember_token'
+        ];
     }
 
     /**
@@ -31,7 +43,7 @@ class GenericUser implements UserContract
      */
     public function getAuthIdentifierName()
     {
-        return config('auth.providers.users.id', 'id');
+        return $this->columns['primary_key'];
     }
 
     /**
@@ -51,7 +63,7 @@ class GenericUser implements UserContract
      */
     public function getAuthPasswordName()
     {
-        return config('auth.providers.users.password', 'password');
+        return $this->columns['password'];
     }
 
     /**
@@ -92,7 +104,7 @@ class GenericUser implements UserContract
      */
     public function getRememberTokenName()
     {
-        return config('auth.providers.users.remember_token', 'remember_token');
+        return $this->columns['remember_token'];
     }
 
     /**

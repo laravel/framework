@@ -65,7 +65,14 @@ trait CreatesUserProviders
     {
         $connection = $this->app['db']->connection($config['connection'] ?? null);
 
-        return new DatabaseUserProvider($connection, $this->app['hash'], $config['table']);
+        $columns = $config['columns'] ?? null;
+
+        return new DatabaseUserProvider(
+            $connection,
+            $this->app['hash'],
+            $config['table'],
+            $columns,
+        );
     }
 
     /**

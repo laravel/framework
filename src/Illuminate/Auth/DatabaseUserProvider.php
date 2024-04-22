@@ -33,6 +33,13 @@ class DatabaseUserProvider implements UserProvider
     protected $table;
 
     /**
+     * The columns used for authentication.
+     *
+     * @var array
+     */
+    protected $columns;
+
+    /**
      * Create a new database user provider.
      *
      * @param  \Illuminate\Database\ConnectionInterface  $connection
@@ -40,11 +47,12 @@ class DatabaseUserProvider implements UserProvider
      * @param  string  $table
      * @return void
      */
-    public function __construct(ConnectionInterface $connection, HasherContract $hasher, $table)
+    public function __construct(ConnectionInterface $connection, HasherContract $hasher, $table, $columns = null)
     {
         $this->connection = $connection;
-        $this->table = $table;
         $this->hasher = $hasher;
+        $this->table = $table;
+        $this->columns = $columns;
     }
 
     /**
@@ -141,7 +149,7 @@ class DatabaseUserProvider implements UserProvider
     protected function getGenericUser($user)
     {
         if (! is_null($user)) {
-            return new GenericUser((array) $user);
+            return new GenericUser((array) $user, $this->columns);
         }
     }
 
