@@ -842,7 +842,7 @@ class ViewFactoryTest extends TestCase
     {
         $factory = $this->getFactory();
         $factory->getFinder()->shouldReceive('find')->twice()->with('foo.bar')->andReturn('path.php');
-        $factory->getEngineResolver()->shouldReceive('resolve')->once()->with('php')->andReturn(m::mock(Engine::class));
+        $factory->getEngineResolver()->shouldReceive('resolve')->twice()->with('php')->andReturn(m::mock(Engine::class));
         $factory->getDispatcher()->shouldReceive('hasListeners')->andReturn(false);
         $factory->make('foo/bar');
         $factory->make('foo.bar');
@@ -852,7 +852,7 @@ class ViewFactoryTest extends TestCase
     {
         $factory = $this->getFactory();
         $factory->getFinder()->shouldReceive('find')->twice()->with('vendor/package::foo.bar')->andReturn('path.php');
-        $factory->getEngineResolver()->shouldReceive('resolve')->once()->with('php')->andReturn(m::mock(Engine::class));
+        $factory->getEngineResolver()->shouldReceive('resolve')->twice()->with('php')->andReturn(m::mock(Engine::class));
         $factory->getDispatcher()->shouldReceive('hasListeners')->andReturn(false);
         $factory->make('vendor/package::foo/bar');
         $factory->make('vendor/package::foo.bar');
