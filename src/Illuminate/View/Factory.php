@@ -91,18 +91,18 @@ class Factory implements FactoryContract
     protected $renderedOnce = [];
 
     /**
-     * The name of the engine for a specific path
+     * The cached array of engines for paths.
      * 
      * @var array
      */
-    protected $pathEngines = [];
+    protected $pathEngineCache = [];
 
     /**
-     * The normalized names of the views.
+     * The cache of normalized names for views.
      *
      * @var array
      */
-    protected $normalizedNames = [];
+    protected $normalizedNameCache = [];
 
     /**
      * Create a new view factory instance.
@@ -261,14 +261,7 @@ class Factory implements FactoryContract
      */
     protected function normalizeName($name)
     {
-        if (isset($this->normalizedNames[$name])) {
-            return $this->normalizedNames[$name];
-        }
-
-
-        $this->normalizedNames[$name] = ViewName::normalize($name);
-
-        return $this->normalizedNames[$name];
+        return $this->normalizedNames[$name] ??= ViewName::normalize($name);
     }
 
     /**
@@ -322,19 +315,17 @@ class Factory implements FactoryContract
      */
     public function getEngineFromPath($path)
     {
-        if ($this->hasPathEngine($path)) {
-            return $this->getPathEngine($path);
+        if (isset($this->pathEngineCache[$path])) {
+            return $this->engines->resolve($this->pathEngineCache[$path]);
         }
 
         if (! $extension = $this->getExtension($path)) {
             throw new InvalidArgumentException("Unrecognized extension in file: {$path}.");
         }
 
-        $engine = $this->extensions[$extension];
-
-        $this->setPathEngine($path, $this->engines->resolve($engine));
-
-        return $this->getPathEngine($path);
+        return $this->engines->resolve(
+            $this->pathEngineCache[$path] = $this->extensions[$extension]
+        );
     }
 
     /**
@@ -495,27 +486,7 @@ class Factory implements FactoryContract
 
         $this->extensions = array_merge([$extension => $engine], $this->extensions);
     
-        $this->resetPathEngines();
-    }
-
-    public function setPathEngine($path, $engine)
-    {
-        $this->pathEngines[$path] = $engine;
-    }
-
-    public function getPathEngine($path)
-    {
-        return $this->pathEngines[$path];
-    }
-
-    public function hasPathEngine($path)
-    {
-        return isset($this->pathEngines[$path]);
-    }
-
-    public function resetPathEngines()
-    {
-        $this->pathEngines = [];
+        $this->pathEngineCache = [];
     }
 
     /**
