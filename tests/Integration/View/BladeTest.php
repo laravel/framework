@@ -149,6 +149,43 @@ class BladeTest extends TestCase
 <div>Slot: F, Color: yellow, Default: foo</div>', trim($view));
     }
 
+    public function test_reuse_component_views_data()
+    {
+        $content = Blade::render('
+            <x-isset-check param1="1" />
+            <x-isset-check param1="2" param2="Hello" />
+            <x-isset-check param1="3" />
+        ');
+
+        View::composer('*', fn ($view) => $view->with('globalParam', 'Test'));
+
+        $contentWithGlobal = Blade::render('
+            <x-isset-check param1="1" />
+            <x-isset-check param1="2" param2="Hello" />
+            <x-isset-check param1="3" />
+        ');
+
+        $this->assertSame('<p>Global Param is not set</p>
+    <p>Param 1: 1</p>
+    <p>Param 2 is not set</p>
+            <p>Global Param is not set</p>
+    <p>Param 1: 2</p>
+    <p>Param 2: Hello</p>
+            <p>Global Param is not set</p>
+    <p>Param 1: 3</p>
+    <p>Param 2 is not set</p>', trim($content));
+
+        $this->assertSame('<p>Global Param: Test</p>
+    <p>Param 1: 1</p>
+    <p>Param 2 is not set</p>
+            <p>Global Param: Test</p>
+    <p>Param 1: 2</p>
+    <p>Param 2: Hello</p>
+            <p>Global Param: Test</p>
+    <p>Param 1: 3</p>
+    <p>Param 2 is not set</p>', trim($contentWithGlobal));
+    }
+
     public function test_rendering_a_nested_component()
     {
         $content = Blade::render('@foreach(range(1, 2) as $count) <x-nested :$count /> @endforeach');

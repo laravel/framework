@@ -125,7 +125,7 @@ trait ManagesComponents
                         $this->componentViews[$view][$componentViewDepth] = $this->make($view);
                     }
 
-                    return $this->componentViews[$view][$componentViewDepth]->with($data)->render();
+                    return (clone $this->componentViews[$view][$componentViewDepth])->with($data)->render();
                 } finally {
                     $this->componentViewsDepths[$view]--;
                 }
