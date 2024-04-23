@@ -1,6 +1,11 @@
 # Release Notes for 10.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v10.48.7...10.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v10.48.8...10.x)
+
+## [v10.48.8](https://github.com/laravel/framework/compare/v10.48.7...v10.48.8) - 2024-04-17
+
+* [10.x] Fix error when using `orderByRaw()` in query before using `cursorPaginate()` by @axlon in https://github.com/laravel/framework/pull/51023
+* [10.x] Database layer fixes by @saadsidqui in https://github.com/laravel/framework/pull/49787
 
 ## [v10.48.7](https://github.com/laravel/framework/compare/v10.48.6...v10.48.7) - 2024-04-10
 
