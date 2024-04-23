@@ -178,6 +178,37 @@ class TranslationTranslatorTest extends TestCase
         $this->assertSame('Hello baz:bar!', $t->get('Hello :foo!', ['foo' => 'baz:bar', 'bar' => 'abcdef']));
     }
 
+    public function testReplacementsLinked()
+    {
+        $t = new Translator($this->getLoader(), 'en');
+        $t->getLoader()->shouldReceive('load')->once()->with('en', '*', '*')->andReturn([]);
+        $t->getLoader()->shouldReceive('load')->once()->with('en', 'foo', '*')->andReturn([
+            'link_many' => 'This is a link to @{many} @{locale} @{messages}',
+            'many' => 'Many',
+            'locale' => 'Locale',
+            'messages' => 'Messages',
+        ]);
+        $this->assertSame('This is a link to Many Locale Messages', $t->get('foo.link_many'));
+    }
+
+    public function testNestedReplacementsLinked()
+    {
+        $t = new Translator($this->getLoader(), 'en');
+        $t->getLoader()->shouldReceive('load')->once()->with('en', '*', '*')->andReturn([]);
+        $t->getLoader()->shouldReceive('load')->once()->with('en', 'foo', '*')->andReturn([
+            'link_many' => 'This is a nested link to @{foo.nested.bar} @{foo.nested.foo.many.text}',
+            'nested' => [
+                'bar' => 'Bar',
+                'foo' => [
+                    'many' => [
+                        'text' => 'Many'
+                    ],
+                ],
+            ],
+        ]);
+        $this->assertSame('This is a nested link to Bar Many', $t->get('foo.link_many'));
+    }
+
     public function testGetJsonReplacesForAssociativeInput()
     {
         $t = new Translator($this->getLoader(), 'en');
