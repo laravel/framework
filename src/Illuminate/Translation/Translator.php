@@ -262,6 +262,15 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
         $shouldReplace = [];
 
         foreach ($replace as $key => $value) {
+            if (is_callable($value)) {
+                $line = preg_replace_callback(
+                    '/<' . $key . '>(.*?)<\/' . $key . '>/',
+                    fn ($args) => $value($args[1]),
+                    $line
+                );
+                continue;
+            }
+
             if (is_object($value) && isset($this->stringableHandlers[get_class($value)])) {
                 $value = call_user_func($this->stringableHandlers[get_class($value)], $value);
             }
