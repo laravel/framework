@@ -292,16 +292,16 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
 
         foreach (last($matches) as $placeholder) {
             if (str($placeholder)->contains('.')) {
-                $prefix = $placeholder;
+                $key = $placeholder;
             } else {
-                $prefix = str($parentKey)
+                $key = str($parentKey)
                     ->beforeLast('.')
                     ->append('.')
                     ->append($placeholder)
                     ->toString();
             }
 
-            $shouldReplace['@{'.$placeholder.'}'] = $this->get($prefix, $replace, $locale, $fallback);
+            $shouldReplace['@{'.$placeholder.'}'] = $this->get($key, $replace, $locale, $fallback);
         }
 
         return strtr($line, $shouldReplace);
