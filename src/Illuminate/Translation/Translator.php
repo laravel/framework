@@ -164,7 +164,7 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
                 if (! is_null($line = $this->getLine(
                     $namespace, $group, $languageLineLocale, $item, $replace
                 ))) {
-                    return $line;
+                    return $this->makeReplacementsLinked($key, $line, $replace, $locale, $fallback);
                 }
             }
 
@@ -269,6 +269,39 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
             $shouldReplace[':'.Str::ucfirst($key ?? '')] = Str::ucfirst($value ?? '');
             $shouldReplace[':'.Str::upper($key ?? '')] = Str::upper($value ?? '');
             $shouldReplace[':'.$key] = $value;
+        }
+
+        return strtr($line, $shouldReplace);
+    }
+
+    /**
+     * Make the place-holder replacements linked on a line.
+     *
+     * @param  string  $parentKey
+     * @param  string  $line
+     * @param  array  $replace
+     * @param  string|null  $locale
+     * @param  bool  $fallback
+     * @return string
+     */
+    protected function makeReplacementsLinked(string $parentKey, string $line, array $replace = [], $locale = null, $fallback = true): string
+    {
+        preg_match_all('/@{(.*?)}/', $line, $matches);
+
+        $shouldReplace = [];
+
+        foreach (last($matches) as $placeholder) {
+            if (str($placeholder)->contains('.')) {
+                $prefix = $placeholder;
+            } else {
+                $prefix = str($parentKey)
+                    ->beforeLast('.')
+                    ->append('.')
+                    ->append($placeholder)
+                    ->toString();
+            }
+
+            $shouldReplace['@{'.$placeholder.'}'] = $this->get($prefix, $replace, $locale, $fallback);
         }
 
         return strtr($line, $shouldReplace);
