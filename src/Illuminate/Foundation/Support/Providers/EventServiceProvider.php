@@ -33,6 +33,13 @@ class EventServiceProvider extends ServiceProvider
     protected $observers = [];
 
     /**
+     * Indicates if the email verification listener should be configured.
+     *
+     * @var bool
+     */
+    protected $shouldConfigureEmailVerificationListener = true;
+
+    /**
      * Indicates if events should be discovered.
      *
      * @var bool
@@ -72,7 +79,9 @@ class EventServiceProvider extends ServiceProvider
         });
 
         $this->booted(function () {
-            $this->configureEmailVerification();
+            if ($this->shouldConfigureEmailVerificationListener) {
+                $this->configureEmailVerification();
+            }
         });
     }
 
