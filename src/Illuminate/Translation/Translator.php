@@ -164,6 +164,12 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
                 if (! is_null($line = $this->getLine(
                     $namespace, $group, $languageLineLocale, $item, $replace
                 ))) {
+                    if (is_array($line)) {
+                        return Arr::map($line, function ($line) use ($key, $replace, $locale, $fallback) {
+                            return $this->makeReplacementsLinked($key, $line, $replace, $locale, $fallback);
+                        });
+                    }
+
                     return $this->makeReplacementsLinked($key, $line, $replace, $locale, $fallback);
                 }
             }
@@ -284,7 +290,7 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
      * @param  bool  $fallback
      * @return string
      */
-    protected function makeReplacementsLinked(string $parentKey, string $line, array $replace = [], $locale = null, $fallback = true): string
+    protected function makeReplacementsLinked($parentKey, $line, $replace = [], $locale = null, $fallback = true): string
     {
         preg_match_all('/@{(.*?)}/', $line, $matches);
 
