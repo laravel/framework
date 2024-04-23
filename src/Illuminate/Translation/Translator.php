@@ -153,13 +153,25 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
         // using the typical translation file. This way developers can always just use a
         // helper such as __ instead of having to pick between trans or __ with views.
         if (! isset($line)) {
+            [$namespace, $group, $item] = $this->parseKey($key);
+
             // Here we will get the locale that should be used for the language line. If one
             // was not passed, we will use the default locales which was given to us when
             // the translator was instantiated. Then, we can load the lines and return.
             $locales = $fallback ? $this->localeArray($locale) : [$locale];
 
             foreach ($locales as $languageLineLocale) {
-                if (! is_null($line = $this->getLine($key, $languageLineLocale, $replace, $fallback))) {
+                $line = $this->getLine(
+                    $key,
+                    $namespace,
+                    $group,
+                    $languageLineLocale,
+                    $item,
+                    $replace,
+                    $fallback,
+                );
+
+                if (! is_null($line)) {
                     return $line;
                 }
             }
@@ -172,7 +184,9 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
         // If the line doesn't exist, we will return back the key which was requested as
         // that will be quick to spot in the UI if language keys are wrong or missing
         // from the application's language files. Otherwise we can return the line.
-        return $this->makeReplacements($line ?: $key, $replace);
+        $line = $this->makeReplacements($line ?: $key, $replace);
+
+        return $this->makeReplacementsLinked($key, $line, $replace, $locale, $fallback);
     }
 
     /**
@@ -219,15 +233,16 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
      * Retrieve a language line out the loaded array.
      *
      * @param  string  $key
+     * @param  string  $namespace
+     * @param  string  $group
      * @param  string  $locale
+     * @param  string  $item
      * @param  array  $replace
      * @param  bool  $fallback
      * @return string|array|null
      */
-    protected function getLine($key, $locale, array $replace, $fallback)
+    protected function getLine($key, $namespace, $group, $locale, $item, array $replace, $fallback)
     {
-        [$namespace, $group, $item] = $this->parseKey($key);
-
         $this->load($namespace, $group, $locale);
 
         $line = Arr::get($this->loaded[$namespace][$group][$locale], $item);
