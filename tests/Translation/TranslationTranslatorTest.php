@@ -201,7 +201,7 @@ class TranslationTranslatorTest extends TestCase
                 'bar' => 'Bar',
                 'foo' => [
                     'many' => [
-                        'text' => 'Many'
+                        'text' => 'Many',
                     ],
                 ],
             ],
