@@ -153,24 +153,14 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
         // using the typical translation file. This way developers can always just use a
         // helper such as __ instead of having to pick between trans or __ with views.
         if (! isset($line)) {
-            [$namespace, $group, $item] = $this->parseKey($key);
-
             // Here we will get the locale that should be used for the language line. If one
             // was not passed, we will use the default locales which was given to us when
             // the translator was instantiated. Then, we can load the lines and return.
             $locales = $fallback ? $this->localeArray($locale) : [$locale];
 
             foreach ($locales as $languageLineLocale) {
-                if (! is_null($line = $this->getLine(
-                    $namespace, $group, $languageLineLocale, $item, $replace
-                ))) {
-                    if (is_array($line)) {
-                        return Arr::map($line, function ($line) use ($key, $replace, $locale, $fallback) {
-                            return $this->makeReplacementsLinked($key, $line, $replace, $locale, $fallback);
-                        });
-                    }
-
-                    return $this->makeReplacementsLinked($key, $line, $replace, $locale, $fallback);
+                if (! is_null($line = $this->getLine($key, $languageLineLocale, $replace, $fallback))) {
+                    return $line;
                 }
             }
 
@@ -228,24 +218,29 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
     /**
      * Retrieve a language line out the loaded array.
      *
-     * @param  string  $namespace
-     * @param  string  $group
+     * @param  string  $key
      * @param  string  $locale
-     * @param  string  $item
      * @param  array  $replace
+     * @param  bool  $fallback
      * @return string|array|null
      */
-    protected function getLine($namespace, $group, $locale, $item, array $replace)
+    protected function getLine($key, $locale, array $replace, $fallback)
     {
+        [$namespace, $group, $item] = $this->parseKey($key);
+
         $this->load($namespace, $group, $locale);
 
         $line = Arr::get($this->loaded[$namespace][$group][$locale], $item);
 
         if (is_string($line)) {
-            return $this->makeReplacements($line, $replace);
+            $line = $this->makeReplacements($line, $replace);
+
+            return $this->makeReplacementsLinked($key, $line, $replace, $locale, $fallback);
         } elseif (is_array($line) && count($line) > 0) {
-            array_walk_recursive($line, function (&$value, $key) use ($replace) {
-                $value = $this->makeReplacements($value, $replace);
+            array_walk_recursive($line, function (&$value, $_) use ($key, $replace, $locale, $fallback) {
+                $line = $this->makeReplacements($value, $replace);
+
+                $value = $this->makeReplacementsLinked($key, $line, $replace, $locale, $fallback);
             });
 
             return $line;
