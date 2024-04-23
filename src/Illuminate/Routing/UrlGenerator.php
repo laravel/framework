@@ -245,9 +245,9 @@ class UrlGenerator implements UrlGeneratorContract
 
         parse_str(Str::after($existingQueryString, '?'), $existingQueryArray);
 
-        return $this->to($path.'?'.Arr::query(
+        return rtrim($this->to($path.'?'.Arr::query(
             array_merge($existingQueryArray, $query)
-        ), $extra, $secure);
+        ), $extra, $secure), '?');
     }
 
     /**
