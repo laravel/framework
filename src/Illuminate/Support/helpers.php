@@ -527,4 +527,5 @@ if (! function_exists('benchmark_value')) {
     {
         return Benchmark::value($callback);
     }
+    
 }
