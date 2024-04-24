@@ -517,6 +517,20 @@ class SupportStrTest extends TestCase
         $this->assertFalse(Str::is("use Exception;", $multilineValue));
         $this->assertFalse(Str::is("use Exception;*", $multilineValue));
         $this->assertTrue(Str::is("*use Exception;", $multilineValue));
+
+        $this->assertTrue(Str::is("<?php\n\nnamespace Illuminate\Tests\*", $multilineValue));
+
+        $this->assertTrue(Str::is(<<<'PATTERN'
+        <?php
+        *
+        namespace Illuminate\Tests\*
+        PATTERN, $multilineValue));
+
+        $this->assertTrue(Str::is(<<<'PATTERN'
+        <?php
+
+        namespace Illuminate\Tests\*
+        PATTERN, $multilineValue));
     }
 
     public function testIsUrl()
