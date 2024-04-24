@@ -699,6 +699,16 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     }
 
     /**
+     * Determine if the collection contains multiple items.
+     *
+     * @return bool
+     */
+    public function containsMultipleItems()
+    {
+        return $this->count() > 1;
+    }
+
+    /**
      * Join all items from the collection using a string. The final items can use a separate glue string.
      *
      * @param  string  $glue

@@ -796,6 +796,15 @@ class SupportCollectionTest extends TestCase
         $this->assertFalse((new $collection([1, 2]))->containsOneItem());
     }
 
+    #[DataProvider('collectionClassProvider')]
+    public function testContainsMultipleItems($collection)
+    {
+        $this->assertFalse((new $collection([]))->containsMultipleItems());
+        $this->assertFalse((new $collection([1]))->containsMultipleItems());
+        $this->assertTrue((new $collection([1, 2]))->containsMultipleItems());
+        $this->assertTrue((new $collection([1, 2, 3]))->containsMultipleItems());
+    }
+
     public function testIterable()
     {
         $c = new Collection(['foo']);
