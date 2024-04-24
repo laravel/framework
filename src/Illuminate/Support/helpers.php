@@ -486,7 +486,7 @@ if (! function_exists('with')) {
     }
 }
 
-if (!function_exists('benchmark_measure')) {
+if (! function_exists('benchmark_measure')) {
     /**
      * Measure a callable or array of callables over the given number of iterations.
      *
@@ -500,7 +500,7 @@ if (!function_exists('benchmark_measure')) {
     }
 }
 
-if (!function_exists('benchmark_dd')) {
+if (! function_exists('benchmark_dd')) {
     /**
      * Measure a callable or array of callables over the given number of iterations, then dump and die.
      *
@@ -514,7 +514,7 @@ if (!function_exists('benchmark_dd')) {
     }
 }
 
-if (!function_exists('benchmark_value')) {
+if (! function_exists('benchmark_value')) {
     /**
      * Measure a callable once and return the duration and result.
      *
