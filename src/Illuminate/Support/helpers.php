@@ -3,6 +3,7 @@
 use Illuminate\Contracts\Support\DeferringDisplayableValue;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Benchmark;
 use Illuminate\Support\Env;
 use Illuminate\Support\Fluent;
 use Illuminate\Support\HigherOrderTapProxy;
@@ -482,5 +483,48 @@ if (! function_exists('with')) {
     function with($value, ?callable $callback = null)
     {
         return is_null($callback) ? $value : $callback($value);
+    }
+}
+
+if (!function_exists('benchmark_measure')) {
+    /**
+     * Measure a callable or array of callables over the given number of iterations.
+     *
+     * @param  \Closure|array  $benchmarkables
+     * @param  int  $iterations
+     * @return array|float
+     */
+    function benchmark_measure(Closure|array $benchmarkables, int $iterations = 1)
+    {
+        return Benchmark::measure($benchmarkables, $iterations);
+    }
+}
+
+if (!function_exists('benchmark_dd')) {
+    /**
+     * Measure a callable or array of callables over the given number of iterations, then dump and die.
+     *
+     * @param  \Closure|array  $benchmarkables
+     * @param  int  $iterations
+     * @return never
+     */
+    function benchmark_dd(Closure|array $benchmarkables, int $iterations = 1)
+    {
+        return Benchmark::dd($benchmarkables, $iterations);
+    }
+}
+
+if (!function_exists('benchmark_value')) {
+    /**
+     * Measure a callable once and return the duration and result.
+     *
+     * @template TReturn of mixed
+     *
+     * @param  (callable(): TReturn)  $callback
+     * @return array{0: TReturn, 1: float}
+     */
+    function benchmark_value(callable $callback)
+    {
+        return Benchmark::value($callback);
     }
 }
