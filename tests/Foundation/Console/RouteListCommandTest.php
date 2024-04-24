@@ -99,6 +99,16 @@ class RouteListCommandTest extends TestCase
         $this->assertJsonStringEqualsJsonString($expectedOrder, $output);
     }
 
+    public function testSortRouteListAscAndDesc()
+    {
+        $this->app->call('route:list', ['--json' => true, '--sort' => 'domain,uri:DESC']);
+        $output = $this->app->output();
+
+        $expectedOrder = '[{"domain":null,"method":"GET|HEAD","uri":"example-group","name":null,"action":"Closure","middleware":["web","auth"]},{"domain":null,"method":"GET|HEAD","uri":"example","name":null,"action":"Closure","middleware":["exampleMiddleware"]},{"domain":"sub","method":"GET|HEAD","uri":"sub-example","name":null,"action":"Closure","middleware":["exampleMiddleware"]}]';
+
+        $this->assertJsonStringEqualsJsonString($expectedOrder, $output);
+    }
+
     public function testMiddlewareGroupsAssignmentInCli()
     {
         $this->app->call('route:list', ['-v' => true]);

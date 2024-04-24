@@ -160,6 +160,14 @@ class RouteListCommand extends Command
         if (Str::contains($sort, ',')) {
             $sort = explode(',', $sort);
         }
+        $sort = collect($sort)
+        ->map(function ($item) {
+            if (Str::endsWith($item, ':DESC')) {
+                return explode(':', $item);
+            }
+
+            return $item;
+        })->toArray();
 
         return collect($routes)
             ->sortBy($sort)
