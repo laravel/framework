@@ -156,7 +156,7 @@ class ProcessTest extends TestCase
         $factory->preventStrayProcesses();
 
         $factory->fake([
-            '*' => 'The output',
+            '*' => $expectedOutput = 'The output',
         ]);
 
         $result = $factory->run(<<<'COMMAND'
@@ -167,6 +167,29 @@ class ProcessTest extends TestCase
         COMMAND);
 
         $this->assertSame(0, $result->exitCode());
+        $this->assertSame("$expectedOutput\n", $result->output());
+    }
+
+    public function testProcessFakeWithMultiLineCommand()
+    {
+        $factory = new Factory;
+
+        $factory->preventStrayProcesses();
+
+        $factory->fake([
+            '*--branch main*' => 'not this one',
+            '*--branch develop*' => $expectedOutput = 'yes thank you',
+        ]);
+
+        $result = $factory->run(<<<'COMMAND'
+        git clone --depth 1 \
+              --single-branch \
+              --branch develop \
+              git://some-url .
+        COMMAND);
+
+        $this->assertSame(0, $result->exitCode());
+        $this->assertSame("$expectedOutput\n", $result->output());
     }
 
     public function testProcessFakeExitCodes()

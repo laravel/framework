@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Support;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\HtmlString;
+use Illuminate\Support\Str;
 use Illuminate\Support\Stringable;
 use PHPUnit\Framework\TestCase;
 
@@ -798,6 +799,38 @@ class SupportStringableTest extends TestCase
 
         // empty patterns
         $this->assertFalse($this->stringable('test')->is([]));
+    }
+
+    public function testIsWithMultilineStrings()
+    {
+        $this->assertFalse($this->stringable("/\n")->is("/"));
+        $this->assertTrue($this->stringable("/\n")->is("/*"));
+        $this->assertTrue($this->stringable("/\n")->is("*/*"));
+        $this->assertTrue($this->stringable("\n/\n")->is("*/*"));
+
+        $this->assertTrue($this->stringable("\n")->is("*"));
+        $this->assertTrue($this->stringable("\n\n")->is("*"));
+        $this->assertFalse($this->stringable("\n")->is(""));
+        $this->assertFalse($this->stringable("\n\n")->is(""));
+
+        $multilineValue = <<<'VALUE'
+        <?php
+
+        namespace Illuminate\Tests\Support;
+
+        use Exception;
+        VALUE;
+
+        $this->assertTrue($this->stringable($multilineValue)->is($multilineValue));
+        $this->assertTrue($this->stringable($multilineValue)->is("*"));
+        $this->assertTrue($this->stringable($multilineValue)->is("*namespace Illuminate\Tests\*"));
+        $this->assertFalse($this->stringable($multilineValue)->is("namespace Illuminate\Tests\*"));
+        $this->assertFalse($this->stringable($multilineValue)->is("*namespace Illuminate\Tests"));
+        $this->assertTrue($this->stringable($multilineValue)->is("<?php*"));
+        $this->assertTrue($this->stringable($multilineValue)->is("<?php*namespace Illuminate\Tests\*"));
+        $this->assertFalse($this->stringable($multilineValue)->is("use Exception;"));
+        $this->assertFalse($this->stringable($multilineValue)->is("use Exception;*"));
+        $this->assertTrue($this->stringable($multilineValue)->is("*use Exception;"));
     }
 
     public function testKebab()
