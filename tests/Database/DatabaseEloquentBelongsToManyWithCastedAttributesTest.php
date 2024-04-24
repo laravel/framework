@@ -39,17 +39,16 @@ class DatabaseEloquentBelongsToManyWithCastedAttributesTest extends TestCase
         $model2->shouldReceive('getCasts')->andReturn([]);
         $model2->shouldReceive('getRelationValue', 'relationLoaded', 'relationResolver', 'setRelation', 'isRelation')->passthru();
 
-        $result1 = (object) [
-            'pivot' => (object) [
-                'foreign_key' => new class
+        $result1 = m::mock(Model::class);
+        $result1->shouldReceive('getAttribute')->with('pivot')->andReturn((object) [
+            'foreign_key' => new class
+            {
+                public function __toString()
                 {
-                    public function __toString()
-                    {
-                        return '1';
-                    }
-                },
-            ],
-        ];
+                    return '1';
+                }
+            },
+        ]);
 
         $models = $relation->match([$model1, $model2], Collection::wrap($result1), 'foo');
         $this->assertNull($models[1]->foo);

@@ -22,10 +22,10 @@ class DatabaseEloquentMorphToTest extends TestCase
 
     public function testLookupDictionaryIsProperlyConstructedForEnums()
     {
+        $modelOne = m::mock(Model::class)->makePartial();
+        $modelOne->forceFill(['morph_type' => 'morph_type_2', 'foreign_key' => TestEnum::test]);
         $relation = $this->getRelation();
-        $relation->addEagerConstraints([
-            $one = (object) ['morph_type' => 'morph_type_2', 'foreign_key' => TestEnum::test],
-        ]);
+        $relation->addEagerConstraints([$modelOne]);
         $dictionary = $relation->getDictionary();
         $relation->getDictionary();
         $enumKey = TestEnum::test;
@@ -47,12 +47,21 @@ class DatabaseEloquentMorphToTest extends TestCase
             }
         };
 
+        $modelOne = m::mock(Model::class)->makePartial();
+        $modelOne->forceFill(['morph_type' => 'morph_type_1', 'foreign_key' => 'foreign_key_1']);
+        $modelTwo = m::mock(Model::class)->makePartial();
+        $modelTwo->forceFill(['morph_type' => 'morph_type_1', 'foreign_key' => 'foreign_key_1']);
+        $modelThree = m::mock(Model::class)->makePartial();
+        $modelThree->forceFill(['morph_type' => 'morph_type_2', 'foreign_key' => 'foreign_key_2']);
+        $modelFour = m::mock(Model::class)->makePartial();
+        $modelFour->forceFill(['morph_type' => 'morph_type_2', 'foreign_key' => $stringish]);
+
         $relation = $this->getRelation();
         $relation->addEagerConstraints([
-            $one = (object) ['morph_type' => 'morph_type_1', 'foreign_key' => 'foreign_key_1'],
-            $two = (object) ['morph_type' => 'morph_type_1', 'foreign_key' => 'foreign_key_1'],
-            $three = (object) ['morph_type' => 'morph_type_2', 'foreign_key' => 'foreign_key_2'],
-            $four = (object) ['morph_type' => 'morph_type_2', 'foreign_key' => $stringish],
+            $modelOne,
+            $modelTwo,
+            $modelThree,
+            $modelFour,
         ]);
 
         $dictionary = $relation->getDictionary();
@@ -60,14 +69,14 @@ class DatabaseEloquentMorphToTest extends TestCase
         $this->assertEquals([
             'morph_type_1' => [
                 'foreign_key_1' => [
-                    $one,
-                    $two,
+                    $modelOne,
+                    $modelTwo,
                 ],
             ],
             'morph_type_2' => [
                 'foreign_key_2' => [
-                    $three,
-                    $four,
+                    $modelThree,
+                    $modelFour,
                 ],
             ],
         ], $dictionary);

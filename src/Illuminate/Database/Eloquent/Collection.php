@@ -21,6 +21,45 @@ class Collection extends BaseCollection implements QueueableCollection
     use InteractsWithDictionary;
 
     /**
+     * Create a new collection instance if the value isn't one already.
+     *
+     * @template TMakeKey of array-key
+     * @template TMakeValue
+     *
+     * @param  \Illuminate\Contracts\Support\Arrayable<TMakeKey, TMakeValue>|iterable<TMakeKey, TMakeValue>|null  $items
+     * @return \Illuminate\Support\Collection<TMakeKey, TMakeValue>|static<TMakeKey, TMakeValue>
+     */
+    public static function make($items = [])
+    {
+        return parent::make($items)->toBaseUnlessOnlyModels();
+    }
+
+    /**
+     * Create a Support collection with the given range.
+     *
+     * @param  int  $from
+     * @param  int  $to
+     * @return \Illuminate\Support\Collection<int, int>
+     */
+    public static function range($from, $to)
+    {
+        return parent::range($from, $to)->toBase();
+    }
+
+    /**
+     * Wrap the given value in a collection if applicable.
+     *
+     * @template TWrapValue
+     *
+     * @param  iterable<array-key, TWrapValue>|TWrapValue  $value
+     * @return \Illuminate\Support\Collection<array-key, TWrapValue>|static<array-key, TWrapValue>
+     */
+    public static function wrap($value)
+    {
+        return parent::wrap($value)->toBaseUnlessOnlyModels();
+    }
+
+    /**
      * Find a model in the collection by key.
      *
      * @template TFindDefault
@@ -341,9 +380,23 @@ class Collection extends BaseCollection implements QueueableCollection
      */
     public function map(callable $callback)
     {
-        $result = parent::map($callback);
+        return parent::map($callback)->toBaseUnlessOnlyModels();
+    }
 
-        return $result->contains(fn ($item) => ! $item instanceof Model) ? $result->toBase() : $result;
+    /**
+     * Run a dictionary map over the items.
+     *
+     * The callback should return an associative array with a single key/value pair.
+     *
+     * @template TMapToDictionaryKey of array-key
+     * @template TMapToDictionaryValue
+     *
+     * @param  callable(TModel, TKey): array<TMapToDictionaryKey, TMapToDictionaryValue>  $callback
+     * @return \Illuminate\Support\Collection<TMapToDictionaryKey, array<int, TMapToDictionaryValue>>
+     */
+    public function mapToDictionary(callable $callback)
+    {
+        return parent::mapToDictionary($callback)->toBase();
     }
 
     /**
@@ -359,16 +412,14 @@ class Collection extends BaseCollection implements QueueableCollection
      */
     public function mapWithKeys(callable $callback)
     {
-        $result = parent::mapWithKeys($callback);
-
-        return $result->contains(fn ($item) => ! $item instanceof Model) ? $result->toBase() : $result;
+        return parent::mapWithKeys($callback)->toBaseUnlessOnlyModels();
     }
 
     /**
      * Reload a fresh model instance from the database for all the entities.
      *
      * @param  array<array-key, string>|string  $with
-     * @return static
+     * @return static<int, TModel>
      */
     public function fresh($with = [])
     {
@@ -392,7 +443,7 @@ class Collection extends BaseCollection implements QueueableCollection
      * Diff the collection with the given items.
      *
      * @param  iterable<array-key, TModel>  $items
-     * @return static
+     * @return static<int, TModel>
      */
     public function diff($items)
     {
@@ -413,7 +464,7 @@ class Collection extends BaseCollection implements QueueableCollection
      * Intersect the collection with the given items.
      *
      * @param  iterable<array-key, TModel>  $items
-     * @return static
+     * @return static<int, TModel>
      */
     public function intersect($items)
     {
@@ -563,6 +614,42 @@ class Collection extends BaseCollection implements QueueableCollection
      */
 
     /**
+     * Chunk the collection into chunks of the given size.
+     *
+     * @param  int  $size
+     * @return \Illuminate\Support\Collection<int, static<int, TModel>>
+     */
+    public function chunk($size)
+    {
+        return parent::chunk($size)->toBase();
+    }
+
+    /**
+     * Chunk the collection into chunks with a callback.
+     *
+     * @param  callable(TModel, TKey, static<int, TModel>): bool  $callback
+     * @return \Illuminate\Support\Collection<int, static<int, TModel>>
+     */
+    public function chunkWhile(callable $callback)
+    {
+        return parent::chunkWhile($callback)->toBase();
+    }
+
+    /**
+     * Push all of the given items onto the collection.
+     *
+     * @template TConcatKey of array-key
+     * @template TConcatValue
+     *
+     * @param  iterable<TConcatKey, TConcatValue>  $source
+     * @return \Illuminate\Support\Collection<TKey|TConcatKey, TModel|TConcatValue>|static<TKey|TConcatKey, TModel|TConcatValue>
+     */
+    public function concat($source)
+    {
+        return parent::concat($source)->toBaseUnlessOnlyModels();
+    }
+
+    /**
      * Count the number of items in the collection by a field or using a callback.
      *
      * @param  (callable(TModel, TKey): array-key)|string|null  $countBy
@@ -584,6 +671,20 @@ class Collection extends BaseCollection implements QueueableCollection
     }
 
     /**
+     * Cross join with the given lists, returning all possible permutations.
+     *
+     * @template TCrossJoinKey
+     * @template TCrossJoinValue
+     *
+     * @param  \Illuminate\Contracts\Support\Arrayable<TCrossJoinKey, TCrossJoinValue>|iterable<TCrossJoinKey, TCrossJoinValue>  ...$lists
+     * @return \Illuminate\Support\Collection<int, array<int, TModel|TCrossJoinValue>>
+     */
+    public function crossJoin(...$lists)
+    {
+        return $this->toBase()->crossJoin(...$lists);
+    }
+
+    /**
      * Get a flattened array of the items in the collection.
      *
      * @param  int  $depth
@@ -597,11 +698,23 @@ class Collection extends BaseCollection implements QueueableCollection
     /**
      * Flip the items in the collection.
      *
-     * @return \Illuminate\Support\Collection<TModel, TKey>
+     * @return \Illuminate\Support\Collection<array-key, TKey>
      */
     public function flip()
     {
-        return $this->toBase()->flip();
+        return $this->map(fn ($v) => $v->getKey())->flip();
+    }
+
+    /**
+     * Group an associative array by a field or using a callback.
+     *
+     * @param  (callable(TModel, TKey): array-key)|array|string  $groupBy
+     * @param  bool  $preserveKeys
+     * @return \Illuminate\Support\Collection<array-key, static<array-key, TModel>>
+     */
+    public function groupBy($groupBy, $preserveKeys = false)
+    {
+        return parent::groupBy($groupBy, $preserveKeys)->toBase();
     }
 
     /**
@@ -612,6 +725,19 @@ class Collection extends BaseCollection implements QueueableCollection
     public function keys()
     {
         return $this->toBase()->keys();
+    }
+
+    /**
+     * Recursively merge the collection with the given items.
+     *
+     * @template TMergeRecursiveValue
+     *
+     * @param  \Illuminate\Contracts\Support\Arrayable<TKey, TMergeRecursiveValue>|iterable<TKey, TMergeRecursiveValue>  $items
+     * @return \Illuminate\Support\Collection<TKey, TModel|TMergeRecursiveValue>|static<TKey, TModel|TMergeRecursiveValue>
+     */
+    public function mergeRecursive($items)
+    {
+        return parent::mergeRecursive($items)->toBaseUnlessOnlyModels();
     }
 
     /**
@@ -638,6 +764,121 @@ class Collection extends BaseCollection implements QueueableCollection
     public function pluck($value, $key = null)
     {
         return $this->toBase()->pluck($value, $key);
+    }
+
+    /**
+     * Push an item onto the beginning of the collection.
+     *
+     * @template TValue
+     *
+     * @param  TModel|TValue  $value
+     * @param  TKey  $key
+     * @return \Illuminate\Support\Collection<TKey, TModel|TValue>|$this
+     */
+    public function prepend($value, $key = null)
+    {
+        return parent::prepend($value, $key)->toBaseUnlessOnlyModels();
+    }
+
+    /**
+     * Push one or more items onto the end of the collection.
+     *
+     * @template TValue
+     *
+     * @param  TModel|TValue  ...$values
+     * @return \Illuminate\Support\Collection<TKey, TModel|TValue>|$this
+     */
+    public function push(...$values)
+    {
+        parent::push(...$values);
+
+        // Not using toBaseUnlessOnlyModels here to only check new values
+        foreach ($values as $value) {
+            if (! $value instanceof Model) {
+                return $this->toBase();
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Put an item in the collection by key.
+     *
+     * @template TValue
+     *
+     * @param  TKey  $key
+     * @param  TModel|TValue  $value
+     * @return \Illuminate\Support\Collection<TKey, TModel|TValue>|$this
+     */
+    public function put($key, $value)
+    {
+        $this->offsetSet($key, $value);
+
+        return $value instanceof Model ? $this : $this->toBase();
+    }
+
+    /**
+     * Replace the collection items with the given items.
+     *
+     * @template TValue
+     *
+     * @param  \Illuminate\Contracts\Support\Arrayable<TKey, TModel|TValue>|iterable<TKey, TModel|TValue>  $items
+     * @return \Illuminate\Support\Collection<TKey, TModel|TValue>|static<TKey, TModel|TValue>
+     */
+    public function replace($items)
+    {
+        return parent::replace($items)->toBaseUnlessOnlyModels();
+    }
+
+    /**
+     * Recursively replace the collection items with the given items.
+     *
+     * @template TValue
+     *
+     * @param  \Illuminate\Contracts\Support\Arrayable<TKey, TModel|TValue>|iterable<TKey, TModel|TValue>  $items
+     * @return \Illuminate\Support\Collection<TKey, TModel|TValue>|static<TKey, TModel|TValue>
+     */
+    public function replaceRecursive($items)
+    {
+        return parent::replaceRecursive($items)->toBaseUnlessOnlyModels();
+    }
+
+    /**
+     * Split a collection into a certain number of groups.
+     *
+     * @param  int  $numberOfGroups
+     * @return \Illuminate\Support\Collection<int, static<Tkey, TModel>>
+     */
+    public function split($numberOfGroups)
+    {
+        return parent::split($numberOfGroups)->toBase();
+    }
+
+    /**
+     * Transform each item in the collection using a callback.
+     *
+     * @template TValue
+     *
+     * @param  callable(TModel, TKey): TValue  $callback
+     * @return \Illuminate\Support\Collection<TKey, TValue>|$this
+     */
+    public function transform(callable $callback)
+    {
+        return parent::transform($callback)->toBaseUnlessOnlyModels();
+    }
+
+    /**
+     * Union the collection with the given items.
+     *
+     * @template TValue
+     *
+     * @param  \Illuminate\Contracts\Support\Arrayable<TKey, TModel|TValue>|iterable<TKey, TModel|TValue>  $items
+     * @return \Illuminate\Support\Collection<TKey, TModel|TValue>|static<TKey, TModel|TValue>
+     */
+    public function union($items)
+    {
+        return parent::union($items)->toBaseUnlessOnlyModels();
     }
 
     /**
@@ -785,5 +1026,23 @@ class Collection extends BaseCollection implements QueueableCollection
         }
 
         return $model->newModelQuery()->whereKey($this->modelKeys());
+    }
+
+    /**
+     * Get a base Support collection from this instance
+     * if it contains anything that is not a Model.
+     *
+     * @return \Illuminate\Support\Collection<TKey, TModel>|$this
+     */
+    public function toBaseUnlessOnlyModels()
+    {
+        // using foreach instead of contains to return early
+        foreach ($this->items as $item) {
+            if (! $item instanceof Model) {
+                return $this->toBase();
+            }
+        }
+
+        return $this;
     }
 }

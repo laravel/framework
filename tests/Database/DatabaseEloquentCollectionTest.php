@@ -263,18 +263,6 @@ class DatabaseEloquentCollectionTest extends TestCase
         $this->assertInstanceOf(Collection::class, $cAfterMap);
     }
 
-    public function testMappingToNonModelsReturnsABaseCollection()
-    {
-        $one = m::mock(Model::class);
-        $two = m::mock(Model::class);
-
-        $c = (new Collection([$one, $two]))->map(function ($item) {
-            return 'not-a-model';
-        });
-
-        $this->assertEquals(BaseCollection::class, get_class($c));
-    }
-
     public function testMapWithKeys()
     {
         $one = m::mock(Model::class);
@@ -289,19 +277,6 @@ class DatabaseEloquentCollectionTest extends TestCase
 
         $this->assertEquals($c->all(), $cAfterMap->all());
         $this->assertInstanceOf(Collection::class, $cAfterMap);
-    }
-
-    public function testMapWithKeysToNonModelsReturnsABaseCollection()
-    {
-        $one = m::mock(Model::class);
-        $two = m::mock(Model::class);
-
-        $key = 0;
-        $c = (new Collection([$one, $two]))->mapWithKeys(function ($item) use (&$key) {
-            return [$key++ => 'not-a-model'];
-        });
-
-        $this->assertEquals(BaseCollection::class, get_class($c));
     }
 
     public function testCollectionDiffsWithGivenCollection()
@@ -488,19 +463,6 @@ class DatabaseEloquentCollectionTest extends TestCase
         $this->assertEquals(['test' => 'test'], $c[0]->toArray());
     }
 
-    public function testNonModelRelatedMethods()
-    {
-        $a = new Collection([['foo' => 'bar'], ['foo' => 'baz']]);
-        $b = new Collection(['a', 'b', 'c']);
-        $this->assertEquals(BaseCollection::class, get_class($a->pluck('foo')));
-        $this->assertEquals(BaseCollection::class, get_class($a->keys()));
-        $this->assertEquals(BaseCollection::class, get_class($a->collapse()));
-        $this->assertEquals(BaseCollection::class, get_class($a->flatten()));
-        $this->assertEquals(BaseCollection::class, get_class($a->zip(['a', 'b'], ['c', 'd'])));
-        $this->assertEquals(BaseCollection::class, get_class($a->countBy('foo')));
-        $this->assertEquals(BaseCollection::class, get_class($b->flip()));
-    }
-
     public function testMakeVisibleRemovesHiddenAndIncludesVisible()
     {
         $c = new Collection([new TestEloquentCollectionModel]);
@@ -626,6 +588,70 @@ class DatabaseEloquentCollectionTest extends TestCase
 
         $this->assertCount(1, $collection->except([$fooKey]));
         $this->assertSame($bar, $collection->except($fooKey)->first());
+    }
+
+    public function testEloquentCollectionConvertsToBaseCollectionWhenContainsNonModels()
+    {
+        $this->seedData();
+        $a = EloquentTestArticleModel::all();
+
+        $b = $a->chunk(2);
+        $this->assertEquals(BaseCollection::class, get_class($b));
+        $this->assertEquals(Collection::class, get_class($b->first()));
+        $b = $a->chunkWhile(fn ($v) => false);
+        $this->assertEquals(BaseCollection::class, get_class($b));
+        $this->assertEquals(Collection::class, get_class($b->first()));
+        $this->assertEquals(BaseCollection::class, get_class($a->collapse()));
+        $this->assertEquals(BaseCollection::class, get_class($a->concat(['foo'])));
+        $this->assertEquals(BaseCollection::class, get_class($a->countBy('foo')));
+        $this->assertEquals(BaseCollection::class, get_class($a->crossJoin(['a', 'b'])));
+        $this->assertEquals(BaseCollection::class, get_class($a->flatMap(fn ($v) => ['foo'])));
+        $this->assertEquals(BaseCollection::class, get_class($a->flatten()));
+        $this->assertEquals(BaseCollection::class, get_class($a->flip()));
+        $b = $a->groupBy('foo');
+        $this->assertEquals(BaseCollection::class, get_class($b));
+        $this->assertEquals(Collection::class, get_class($b->first()));
+        $this->assertEquals(BaseCollection::class, get_class($a->keys()));
+        $this->assertEquals(BaseCollection::class, get_class($a->map(fn ($v) => 'foo')));
+        $this->assertEquals(BaseCollection::class, get_class($a->mapInto(stdClass::class)));
+        $this->assertEquals(BaseCollection::class, get_class($a->chunk(2)->mapSpread(fn ($a, $b) => 'foo')));
+        $b = $a->mapToGroups(fn ($v) => ['foo' => $v]);
+        $this->assertEquals(BaseCollection::class, get_class($b));
+        $this->assertEquals(Collection::class, get_class($b->first()));
+        $this->assertEquals(BaseCollection::class, get_class($a->mapWithKeys(fn ($v) => [$v->id => 'foo'])));
+        $this->assertEquals(BaseCollection::class, get_class($a->mapToDictionary(fn ($v) => [$v->id => 'foo'])));
+        $this->assertEquals(BaseCollection::class, get_class($a->mergeRecursive(['foo'])));
+        $this->assertEquals(BaseCollection::class, get_class($a->pad(5, 0)));
+        $this->assertEquals(BaseCollection::class, get_class($a->pluck('foo')));
+        $b = (clone $a)->prepend('foo');
+        $this->assertEquals(BaseCollection::class, get_class($b));
+        $b = (clone $a)->push('foo');
+        $this->assertEquals(BaseCollection::class, get_class($b));
+        $b = (clone $a)->put('foo', 'bar');
+        $this->assertEquals(BaseCollection::class, get_class($b));
+        $this->assertEquals(BaseCollection::class, get_class($a->range(1, 5)));
+        $b = (clone $a)->replace([0 => 'foo']);
+        $this->assertEquals(BaseCollection::class, get_class($b));
+        $b = (clone $a)->replaceRecursive(['foo']);
+        $this->assertEquals(BaseCollection::class, get_class($b));
+        $b = $a->sliding(2);
+        $this->assertEquals(BaseCollection::class, get_class($b));
+        $this->assertEquals(Collection::class, get_class($b->first()));
+        $b = $a->split(2);
+        $this->assertEquals(BaseCollection::class, get_class($b));
+        $this->assertEquals(Collection::class, get_class($b->first()));
+        $b = $a->splitIn(3);
+        $this->assertEquals(BaseCollection::class, get_class($b));
+        $this->assertEquals(Collection::class, get_class($b->first()));
+        $b = (clone $a)->transform(fn ($v) => 'foo');
+        $this->assertEquals(BaseCollection::class, get_class($b));
+        $this->assertEquals(BaseCollection::class, get_class($a->union([10 => 'a'])));
+        $this->assertEquals(BaseCollection::class, get_class($a->zip(['a', 'b'], ['c', 'd'])));
+
+        $this->assertEquals(BaseCollection::class, get_class(Collection::make([1, 2, 3])));
+        $this->assertEquals(BaseCollection::class, get_class(Collection::range(1, 5)));
+        $this->assertEquals(BaseCollection::class, get_class(Collection::times(2, fn ($v) => 'foo')));
+        $this->assertEquals(BaseCollection::class, get_class(Collection::wrap([1, 2, 3])));
     }
 
     /**
