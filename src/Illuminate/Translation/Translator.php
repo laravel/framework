@@ -264,10 +264,11 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
         foreach ($replace as $key => $value) {
             if (is_callable($value)) {
                 $line = preg_replace_callback(
-                    '/<' . $key . '>(.*?)<\/' . $key . '>/',
+                    '/<'.$key.'>(.*?)<\/'.$key.'>/',
                     fn ($args) => $value($args[1]),
                     $line
                 );
+
                 continue;
             }
 
