@@ -693,11 +693,6 @@ class ContainerTest extends TestCase
         $this->assertFalse($container->isShared(IContainerContractStub::class));
     }
 
-    public function testPrivateDependency()
-    {
-
-    }
-
     // public function testContainerCanCatchCircularDependency()
     // {
     //     $this->expectException(\Illuminate\Contracts\Container\CircularDependencyException::class);
