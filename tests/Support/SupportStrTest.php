@@ -487,6 +487,52 @@ class SupportStrTest extends TestCase
         $this->assertTrue(Str::is([null], null));
     }
 
+    public function testIsWithMultilineStrings()
+    {
+        $this->assertFalse(Str::is('/', "/\n"));
+        $this->assertTrue(Str::is('/*', "/\n"));
+        $this->assertTrue(Str::is('*/*', "/\n"));
+        $this->assertTrue(Str::is('*/*', "\n/\n"));
+
+        $this->assertTrue(Str::is('*', "\n"));
+        $this->assertTrue(Str::is('*', "\n\n"));
+        $this->assertFalse(Str::is('', "\n"));
+        $this->assertFalse(Str::is('', "\n\n"));
+
+        $multilineValue = <<<'VALUE'
+        <?php
+
+        namespace Illuminate\Tests\Support;
+
+        use Exception;
+        VALUE;
+
+        $this->assertTrue(Str::is($multilineValue, $multilineValue));
+        $this->assertTrue(Str::is('*', $multilineValue));
+        $this->assertTrue(Str::is("*namespace Illuminate\Tests\*", $multilineValue));
+        $this->assertFalse(Str::is("namespace Illuminate\Tests\*", $multilineValue));
+        $this->assertFalse(Str::is("*namespace Illuminate\Tests", $multilineValue));
+        $this->assertTrue(Str::is('<?php*', $multilineValue));
+        $this->assertTrue(Str::is("<?php*namespace Illuminate\Tests\*", $multilineValue));
+        $this->assertFalse(Str::is('use Exception;', $multilineValue));
+        $this->assertFalse(Str::is('use Exception;*', $multilineValue));
+        $this->assertTrue(Str::is('*use Exception;', $multilineValue));
+
+        $this->assertTrue(Str::is("<?php\n\nnamespace Illuminate\Tests\*", $multilineValue));
+
+        $this->assertTrue(Str::is(<<<'PATTERN'
+        <?php
+        *
+        namespace Illuminate\Tests\*
+        PATTERN, $multilineValue));
+
+        $this->assertTrue(Str::is(<<<'PATTERN'
+        <?php
+
+        namespace Illuminate\Tests\*
+        PATTERN, $multilineValue));
+    }
+
     public function testIsUrl()
     {
         $this->assertTrue(Str::isUrl('https://laravel.com'));
