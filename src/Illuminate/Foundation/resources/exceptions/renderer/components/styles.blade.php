@@ -1,5 +1,4 @@
 <link href="//fonts.bunny.net/css?family=figtree:400,600&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css" />
 
 <style>
     .hljs {
@@ -7,9 +6,15 @@
         width: 100%;
     }
 
-    .hljs-ln td {
+    pre code.hljs {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+        overflow-x: scroll;
+        padding: 0em;
+    }
+
+    .hljs-ln .hljs-ln-numbers {
         padding: 5px;
-        color: #2d3748;
         border-right-color: transparent;
         margin-right: 5px;
     }
@@ -27,7 +32,6 @@
         user-select: none;
 
         text-align: center;
-        color: #ccc;
         border-right: 1px solid #ccc;
         vertical-align: top;
         padding-right: 5px;
@@ -47,15 +51,7 @@
 @foreach ($exception->frames() as $frame)
     <style>
         #frame-{{ $loop->index }} .hljs-ln-line[data-line-number='{{ $frame->line() }}'] {
-            background-color: rgba(239, 68, 68, 0.4);
-        }
-
-        #frame-{{ $loop->index }} .hljs-ln-numbers[data-line-number='{{ $frame->line() }}'] {
-            color: rgba(239, 68, 68, 0.4);
-        }
-
-        #frame-{{ $loop->index }} .hljs-ln-code[data-line-number='{{ $frame->line() }}'] {
-            color: rgba(239, 68, 68, 0.4);
+            background-color: rgba(242, 95, 95, 0.4);
         }
     </style>
 @endforeach

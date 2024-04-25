@@ -1,9 +1,9 @@
-<div class="overflow-x-auto border-r border-gray-200 dark:border-gray-800 sm:col-span-1">
-    <div class="text-xs text-gray-500 dark:text-gray-400">
-        <div class="mb-2 sm:col-span-1">
+<div class="overflow-x-auto sm:col-span-1">
+    <div class="text-xs text-gray-400 dark:text-gray-300">
+        <div class="mb-2 sm:col-span-1 inline-block rounded-full px-3 py-2 bg-red-500/20 dark:bg-red-500/20">
             <button
                 @click="includeVendorFrames = !includeVendorFrames"
-                class="inline-flex items-center rounded-md bg-red-100 px-3 py-1.5 text-xs font-medium leading-4 text-red-800 dark:bg-red-900 dark:text-red-100"
+                class="inline-flex items-center font-bold leading-5 text-red-500"
             >
                 <span x-show="includeVendorFrames">Collapse</span>
                 <span x-cloak x-show="!includeVendorFrames">Expand</span>
@@ -47,7 +47,7 @@
 
                     <div x-show="! includeVendorFrames">
                         @if ($vendorFramesCollapsed->isNotEmpty())
-                            <div>
+                            <div class="text-gray-500">
                                 {{ $vendorFramesCollapsed->count() }} vendor frame{{ $vendorFramesCollapsed->count() > 1 ? 's' : '' }} collapsed
                             </div>
                         @endif
@@ -55,21 +55,20 @@
                 @endif
 
                 <button
-                    class="w-full border-b border-gray-200 text-left dark:border-gray-900"
+                    class="w-full text-left dark:border-gray-900"
                     x-show="{{ $frame->isFromVendor() ? 'includeVendorFrames' : 'true' }}"
                     @click="index = {{ $loop->index }}"
                 >
                     <div
                         x-bind:class="
                             index === {{ $loop->index }}
-                                ? 'bg-gray-100 dark:bg-gray-800 border-l-2 border-red-500 dark:border-red-300'
+                                ? 'rounded-r-md bg-gray-100 dark:bg-gray-800 border-l dark:border dark:border-gray-700 border-l-red-500 dark:border-l-red-500'
                                 : ''
                         "
                     >
-                        <div class="border-l-2 border-transparent pl-2">
+                        <div class="border-l-2 border-transparent p-2">
                             <div class="align-middle text-gray-900 dark:text-gray-300">
-                                <span>{{ $frame->source() }}</span>
-                                <span class="italic text-gray-500 dark:text-gray-400">:{{ $frame->line() }}</span>
+                                <span>{{ $frame->source() }} :{{ $frame->line() }}</span>
                             </div>
                             <div class="text-gray-500 dark:text-gray-400">
                                 {{ $exception->frames()->get($loop->index + 1)?->callable() }}
@@ -80,7 +79,7 @@
 
                 @if (! $frame->isFromVendor() && $exception->frames()->slice($loop->index + 1)->filter(fn ($frame) => ! $frame->isFromVendor())->isEmpty())
                     <div x-show="! includeVendorFrames">
-                        <div>
+                        <div class="text-gray-500">
                             {{ $exception->frames()->slice($loop->index + 1)->count() }} vendor
                             frame{{ $exception->frames()->slice($loop->index + 1)->count() > 1 ? 's' : '' }} collapsed
                         </div>

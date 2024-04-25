@@ -3,6 +3,19 @@
         localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)
             ? document.documentElement.classList.add('dark')
             : document.documentElement.classList.remove('dark')
+
+        let link = document.getElementById('exceptions-renderer-highlightjs-theme');
+        link && link.remove();
+
+        link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.id = 'exceptions-renderer-highlightjs-theme';
+        link.href = '//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/';
+        link.href += localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)
+            ? 'atom-one-dark.min.css'
+            : 'github.min.css';
+
+        document.head.prepend(link);
     }
 
     setDarkClass()

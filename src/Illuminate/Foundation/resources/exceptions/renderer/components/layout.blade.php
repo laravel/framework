@@ -9,7 +9,7 @@
     <x-laravel-exceptions-renderer::scripts :$exception />
     <x-laravel-exceptions-renderer::styles :$exception />
 </head>
-<body class="font-sans antialiased">
+<body class="font-sans antialiased bg-gray-200/80 dark:bg-gray-950/95">
     {{ $slot }}
 </body>
 </html>

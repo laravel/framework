@@ -107,7 +107,9 @@ class Exception
             return (string) realpath($path);
         }, array_values(ClassLoader::getRegisteredLoaders())[0]->getClassMap()));
 
-        $trace = $this->exception->getTrace();
+        $trace = array_values(array_filter(
+            $this->exception->getTrace(), fn ($trace) => isset($trace['file']),
+        ));
 
         if (($trace[1]['class'] ?? '') === HandleExceptions::class) {
             array_shift($trace);
