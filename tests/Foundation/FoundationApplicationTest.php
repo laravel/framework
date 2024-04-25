@@ -578,6 +578,32 @@ class FoundationApplicationTest extends TestCase
         $this->assertSame(['overwrite' => true], $config->get('queue.connections.database'));
         $this->assertSame(['merge' => true], $config->get('queue.connections.new'));
     }
+
+    public function testSharedAsDefault(): void
+    {
+        $app = new Application;
+        $app['config'] = new Repository(['app' => ['sharedDependenciesByDefault' => true]]);
+        $app->bootstrapWith([]);
+
+        $app->scoped(NonContractBackedClass::class);
+        $instance1 = $app->make(NonContractBackedClass::class);
+        $instance2 = $app->make(NonContractBackedClass::class);
+
+        $this->assertSame($instance1, $instance2);
+    }
+
+    public function testPrivateDependencyIsNotSharedEvenWhenOptionSharedDependenciesByDefaultIsEnabled(): void
+    {
+        $app = new Application;
+        $app['config'] = new Repository(['app' => ['sharedDependenciesByDefault' => true]]);
+        $app->bootstrapWith([]);
+
+        $app->private(NonContractBackedClass::class);
+        $instance1 = $app->make(NonContractBackedClass::class);
+        $instance2 = $app->make(NonContractBackedClass::class);
+
+        $this->assertNotSame($instance1, $instance2);
+    }
 }
 
 class ApplicationBasicServiceProviderStub extends ServiceProvider

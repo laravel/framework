@@ -201,6 +201,8 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     protected $absoluteCachePathPrefixes = ['/', '\\'];
 
+    protected $sharedDependenciesByDefault = false;
+
     /**
      * Create a new Illuminate application instance.
      *
@@ -310,6 +312,8 @@ class Application extends Container implements ApplicationContract, CachesConfig
 
             $this['events']->dispatch('bootstrapped: '.$bootstrapper, [$this]);
         }
+
+        $this->sharedDependenciesByDefault = (bool) $this['config']->get('app.sharedDependenciesByDefault');
     }
 
     /**
@@ -1009,6 +1013,19 @@ class Application extends Container implements ApplicationContract, CachesConfig
         $this->loadDeferredProviderIfNeeded($abstract = $this->getAlias($abstract));
 
         return parent::make($abstract, $parameters);
+    }
+
+    public function isShared($abstract)
+    {
+        if (isset($this->privateInstances[$abstract])) {
+            return false;
+        }
+
+        if ($this->sharedDependenciesByDefault) {
+            return true;
+        }
+
+        return parent::isShared($abstract);
     }
 
     /**

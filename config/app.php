@@ -187,4 +187,5 @@ return [
         // 'Example' => App\Facades\Example::class,
     ])->toArray(),
 
+    'sharedDependenciesByDefault' => false,
 ];
