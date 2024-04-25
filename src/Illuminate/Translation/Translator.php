@@ -262,7 +262,7 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
         $shouldReplace = [];
 
         foreach ($replace as $key => $value) {
-            if (is_callable($value)) {
+            if ($value instanceof Closure) {
                 $line = preg_replace_callback(
                     '/<'.$key.'>(.*?)<\/'.$key.'>/',
                     fn ($args) => $value($args[1]),
