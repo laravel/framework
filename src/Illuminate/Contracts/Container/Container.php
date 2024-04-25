@@ -216,4 +216,13 @@ interface Container extends ContainerInterface
      * @return void
      */
     public function afterResolving($abstract, ?Closure $callback = null);
+
+    /**
+     * Register a private binding in the container.
+     *
+     * @param  string  $abstract
+     * @param  \Closure|string|null  $concrete
+     * @return void
+     */
+    public function private($abstract, $concrete = null);
 }

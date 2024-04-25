@@ -158,6 +158,13 @@ class Container implements ArrayAccess, ContainerContract
     protected $afterResolvingCallbacks = [];
 
     /**
+     * The container's private instances.
+     *
+     * @var array
+     */
+    protected $privateInstances = [];
+
+    /**
      * Define a contextual binding.
      *
      * @param  array|string  $concrete
@@ -1194,6 +1201,20 @@ class Container implements ArrayAccess, ContainerContract
     }
 
     /**
+     * Register a private binding in the container.
+     *
+     * @param  string  $abstract
+     * @param  \Closure|string|null  $concrete
+     * @return void
+     */
+    public function private($abstract, $concrete = null)
+    {
+        $this->privateInstances[$abstract] = true;
+
+        $this->bind($abstract, $concrete, false);
+    }
+
+    /**
      * Fire all of the before resolving callbacks.
      *
      * @param  string  $abstract
@@ -1397,6 +1418,7 @@ class Container implements ArrayAccess, ContainerContract
         $this->instances = [];
         $this->abstractAliases = [];
         $this->scopedInstances = [];
+        $this->privateInstances = [];
     }
 
     /**

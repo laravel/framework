@@ -680,6 +680,24 @@ class ContainerTest extends TestCase
         $this->assertInstanceOf(ContainerImplementationStub::class, $result);
     }
 
+    public function testPrivateDependencyIsResolvableAndNotShared(): void
+    {
+        $container = new Container;
+
+        $container->private(IContainerContractStub::class, ContainerImplementationStub::class);
+
+        $instance1 = $container->make(IContainerContractStub::class);
+        $instance2 = $container->make(IContainerContractStub::class);
+
+        $this->assertNotSame($instance1, $instance2);
+        $this->assertFalse($container->isShared(IContainerContractStub::class));
+    }
+
+    public function testPrivateDependency()
+    {
+
+    }
+
     // public function testContainerCanCatchCircularDependency()
     // {
     //     $this->expectException(\Illuminate\Contracts\Container\CircularDependencyException::class);
