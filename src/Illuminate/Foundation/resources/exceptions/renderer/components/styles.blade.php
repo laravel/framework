@@ -1,4 +1,6 @@
 <link href="//fonts.bunny.net/css?family=figtree:400,600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://unpkg.com/tippy.js@6/animations/scale.css"></script>
+<link rel="stylesheet" href="https://unpkg.com/tippy.js@6/themes/material.css"></script>
 
 <style>
     .hljs {
