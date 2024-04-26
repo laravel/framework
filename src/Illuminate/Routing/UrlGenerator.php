@@ -369,7 +369,7 @@ class UrlGenerator implements UrlGeneratorContract
 
         $key = call_user_func($this->keyResolver);
 
-        // If previous app keys are added for key rotation, pick the first one which is the current app key
+        // If previous app keys are added for key rotation, pick the first one which is the current app key.
         $key = is_array($key) ? $key[0] : $key;
 
         return $this->route($name, $parameters + [
@@ -458,7 +458,7 @@ class UrlGenerator implements UrlGeneratorContract
 
         $original = rtrim($url.'?'.$queryString, '?');
 
-        // For app key rotation, $keys may be an array of keys. Wrap a single key in an array 
+        // For app key rotation, $keys may be an array of keys. Wrap a single key in an array
         // to simplify  logic and preserve backwards compatility with previous keyResolvers.
         $keys = call_user_func($this->keyResolver);
         $keys = is_array($keys) ? $keys : [$keys];
