@@ -6,10 +6,13 @@
 
     <title>{{ config('app.name', 'Laravel') }}</title>
 
-    <x-laravel-exceptions-renderer::scripts :$exception />
+    <script src="//cdn.tailwindcss.com"></script>
+
     <x-laravel-exceptions-renderer::styles :$exception />
 </head>
 <body class="font-sans antialiased bg-gray-200/80 dark:bg-gray-950/95">
     {{ $slot }}
+
+    <x-laravel-exceptions-renderer::scripts :$exception />
 </body>
 </html>
