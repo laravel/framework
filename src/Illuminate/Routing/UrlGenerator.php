@@ -459,7 +459,7 @@ class UrlGenerator implements UrlGeneratorContract
         $original = rtrim($url.'?'.$queryString, '?');
 
         // For app key rotation, $keys may be an array of keys. Wrap a single key in an array
-        // to simplify  logic and preserve backwards compatility with previous keyResolvers.
+        // to simplify logic and preserve backwards compatility with previous keyResolvers.
         $keys = call_user_func($this->keyResolver);
         $keys = is_array($keys) ? $keys : [$keys];
 
