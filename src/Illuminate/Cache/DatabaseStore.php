@@ -93,7 +93,7 @@ class DatabaseStore implements LockProvider, Store
     /**
      * Retrieve an item from the cache by key.
      *
-     * @param  string|array  $key
+     * @param  string  $key
      * @return mixed
      */
     public function get($key)
@@ -177,8 +177,8 @@ class DatabaseStore implements LockProvider, Store
      * Increment the value of an item in the cache.
      *
      * @param  string  $key
-     * @param  mixed  $value
-     * @return int|bool
+     * @param  int  $value
+     * @return int|false
      */
     public function increment($key, $value = 1)
     {
@@ -191,8 +191,8 @@ class DatabaseStore implements LockProvider, Store
      * Decrement the value of an item in the cache.
      *
      * @param  string  $key
-     * @param  mixed  $value
-     * @return int|bool
+     * @param  int  $value
+     * @return int|false
      */
     public function decrement($key, $value = 1)
     {
@@ -205,9 +205,9 @@ class DatabaseStore implements LockProvider, Store
      * Increment or decrement an item in the cache.
      *
      * @param  string  $key
-     * @param  mixed  $value
+     * @param  int|float  $value
      * @param  \Closure  $callback
-     * @return int|bool
+     * @return int|false
      */
     protected function incrementOrDecrement($key, $value, Closure $callback)
     {

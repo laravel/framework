@@ -109,6 +109,7 @@ class Builder implements BuilderContract
         'getbindings',
         'getconnection',
         'getgrammar',
+        'getrawbindings',
         'implode',
         'insert',
         'insertgetid',
@@ -1769,6 +1770,18 @@ class Builder implements BuilderContract
         return $this->getQuery()->getConnection()->transactionLevel() > 0
             ? $this->getQuery()->getConnection()->transaction($scope)
             : $scope();
+    }
+
+    /**
+     * Get the Eloquent builder instances that are used in the union of the query.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    protected function getUnionBuilders()
+    {
+        return isset($this->query->unions)
+            ? collect($this->query->unions)->pluck('query')
+            : collect();
     }
 
     /**

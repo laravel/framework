@@ -1200,7 +1200,7 @@ class Str
      * Replace the patterns matching the given regular expression.
      *
      * @param  array|string  $pattern
-     * @param  \Closure|string  $replace
+     * @param  \Closure|string[]|string  $replace
      * @param  array|string  $subject
      * @param  int  $limit
      * @return string|string[]|null

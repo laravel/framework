@@ -8,6 +8,7 @@ namespace Illuminate\Support\Facades;
  * @method static string previous(mixed $fallback = false)
  * @method static string previousPath(mixed $fallback = false)
  * @method static string to(string $path, mixed $extra = [], bool|null $secure = null)
+ * @method static string query(string $path, array $query = [], mixed $extra = [], bool|null $secure = null)
  * @method static string secure(string $path, array $parameters = [])
  * @method static string asset(string $path, bool|null $secure = null)
  * @method static string secureAsset(string $path)
