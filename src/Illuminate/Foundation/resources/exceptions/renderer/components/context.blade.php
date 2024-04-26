@@ -55,9 +55,9 @@
         <span class="font-semibold text-gray-900 dark:text-white">
             Queries
         </span>
-        <span class="text-gray-500 dark:text-gray-400">
+        <span class="text-xs text-gray-500 dark:text-gray-400">
             @if (count($exception->listener()->queries()) === 100)
-                — only the first 100 queries are displayed
+                only the first 100 queries are displayed
             @endif
         </span>
 
