@@ -74,7 +74,7 @@ class AuthPasswordBrokerTest extends TestCase
 
     public function testBrokerTriggersPasswordResetLinkEvent()
     {
-        Event::mock();
+        Event::fake();
 
         $mocks = $this->getMocks();
         $broker = m::mock(PasswordBroker::class, array_values($mocks))->makePartial();
