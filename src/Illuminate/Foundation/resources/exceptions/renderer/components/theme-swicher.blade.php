@@ -1,6 +1,6 @@
 <script>
     setDarkClass = () => {
-        localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)
+        localStorage.theme === 'dark' || (!('theme' in localStorage))
             ? document.documentElement.classList.add('dark')
             : document.documentElement.classList.remove('dark')
 
@@ -11,7 +11,7 @@
         link.rel = 'stylesheet';
         link.id = 'exceptions-renderer-highlightjs-theme';
         link.href = '//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/';
-        link.href += localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)
+        link.href += localStorage.theme === 'dark' || (!('theme' in localStorage))
             ? 'atom-one-dark.min.css'
             : 'github.min.css';
 

@@ -9,25 +9,26 @@
     document.addEventListener('DOMContentLoaded', (event) => {
         document.querySelectorAll('#frame-{{ $exception->defaultFrame() }}' + ' code').forEach((el) => {
             hljs.highlightElement(el)
+            hljs.highlightAll()
 
             hljs.initLineNumbersOnLoad()
         })
+
+        tailwind.config = {
+            darkMode: 'class',
+
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Figtree', 'ui-sans-serif', 'system-ui', 'sans-serif', 'Apple Color Emoji', 'Segoe UI Emoji'],
+                    },
+                },
+            },
+        }
 
         tippy('[data-tippy-content]', {
             trigger: 'click',
             theme: 'material',
         })
     })
-
-    tailwind.config = {
-        darkMode: 'class',
-
-        theme: {
-            extend: {
-                fontFamily: {
-                    sans: ['Figtree', 'ui-sans-serif', 'system-ui', 'sans-serif', 'Apple Color Emoji', 'Segoe UI Emoji'],
-                },
-            },
-        },
-    }
 </script>
