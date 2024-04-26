@@ -3,6 +3,7 @@
 namespace Illuminate\Auth\Passwords;
 
 use Closure;
+use Illuminate\Auth\Events\PasswordResetLinkSent;
 use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
 use Illuminate\Contracts\Auth\PasswordBroker as PasswordBrokerContract;
 use Illuminate\Contracts\Auth\UserProvider;
@@ -70,6 +71,8 @@ class PasswordBroker implements PasswordBrokerContract
         // user with a link to reset their password. We will then redirect back to
         // the current URI having nothing set in the session to indicate errors.
         $user->sendPasswordResetNotification($token);
+
+        event(new PasswordResetLinkSent($user));
 
         return static::RESET_LINK_SENT;
     }
