@@ -368,6 +368,9 @@ class UrlGenerator implements UrlGeneratorContract
         ksort($parameters);
 
         $key = call_user_func($this->keyResolver);
+        if (is_array($key)) {
+            $key = $key[0];
+        }
 
         return $this->route($name, $parameters + [
             'signature' => hash_hmac('sha256', $this->route($name, $parameters, $absolute), $key),
@@ -455,9 +458,21 @@ class UrlGenerator implements UrlGeneratorContract
 
         $original = rtrim($url.'?'.$queryString, '?');
 
-        $signature = hash_hmac('sha256', $original, call_user_func($this->keyResolver));
+        $keys = call_user_func($this->keyResolver);
+        if (!is_array($keys)) {
+            $keys = [$keys];
+        }
 
-        return hash_equals($signature, (string) $request->query('signature', ''));
+        foreach ($keys as $key) {
+            $signature = hash_hmac('sha256', $original, $key);
+            $validSignature = hash_equals($signature, (string) $request->query('signature', ''));
+
+            if ($validSignature) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
