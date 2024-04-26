@@ -1,5 +1,5 @@
-<div class="overflow-x-auto sm:col-span-1">
-    <div class="text-xs text-gray-400 dark:text-gray-300">
+<div class="overflow-x-auto sm:col-span-1 lg:block hidden">
+    <div class="text-sm text-gray-400 dark:text-gray-300 scrollbar-hidden trace" style="height: 565px">
         <div class="mb-2 sm:col-span-1 inline-block rounded-full px-3 py-2 bg-red-500/20 dark:bg-red-500/20">
             <button
                 @click="includeVendorFrames = !includeVendorFrames"
@@ -34,7 +34,7 @@
             </button>
         </div>
 
-        <div class="space-y-2">
+        <div class="space-y-2 mb-12">
             @foreach ($exception->frames() as $frame)
                 @php
                     /** @var \Illuminate\Foundation\Exceptions\Renderer\Frame $frame */
@@ -68,7 +68,8 @@
                     >
                         <div class="border-l-2 border-transparent p-2">
                             <div class="align-middle text-gray-900 dark:text-gray-300">
-                                <span>{{ $frame->source() }} :{{ $frame->line() }}</span>
+                                <span class="text-gray-900 dark:text-gray-300 truncate">{{ $frame->source() }}</span>
+                                <span class="font-mono text-xs">:{{ $frame->line() }}</span>
                             </div>
                             <div class="text-gray-500 dark:text-gray-400">
                                 {{ $exception->frames()->get($loop->index + 1)?->callable() }}

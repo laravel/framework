@@ -118,9 +118,9 @@ class Frame
     {
         $contents = file($this->frame['file']) ?: [];
 
-        $start = max($this->frame['line'] - 12, 0);
+        $start = max($this->frame['line'] - 6, 0);
 
-        $length = 12 * 2 + 1;
+        $length = 8 * 2 + 1;
 
         return implode('', array_slice($contents, $start, $length));
     }

@@ -7,10 +7,24 @@
     }
 
     pre code.hljs {
+        padding: 0em;
+        padding-top: 0.5em;
+    }
+
+    .trace {
+        -webkit-mask-image: linear-gradient(180deg,#000 calc(100% - 4rem),transparent);
+    }
+
+    .scrollbar-hidden {
         -ms-overflow-style: none;
         scrollbar-width: none;
         overflow-x: scroll;
-        padding: 0em;
+    }
+
+    .scrollbar-hidden::-webkit-scrollbar {
+        -webkit-appearance: none;
+        width: 0;
+        height: 0;
     }
 
     .hljs-ln .hljs-ln-numbers {
