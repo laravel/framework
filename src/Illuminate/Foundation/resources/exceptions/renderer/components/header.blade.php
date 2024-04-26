@@ -2,11 +2,11 @@
     <div class="flex items-center justify-between gap-2">
         <div>
             <div class="inline-block rounded-full px-3 py-2 bg-red-500/20 dark:bg-red-500/20">
-                <span class="font-bold leading-5 text-red-500">
+                <span class="text-sm lg:text-base font-bold leading-5 text-red-500">
                     {{ $exception->class() }}
                 </span>
             </div>
-            <h1 class="mt-4 text-2xl font-semibold text-gray-900 dark:text-white">{{ $exception->message() }}</h1>
+            <div class="text-lg lg:text-2xl mt-4 text-2xl font-semibold text-gray-900 dark:text-white">{{ $exception->message() }}</div>
         </div>
         <div class="lg:block hidden text-right">
             <div>

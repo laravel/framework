@@ -63,7 +63,7 @@
                         x-bind:class="
                             index === {{ $loop->index }}
                                 ? 'rounded-r-md bg-gray-100 dark:bg-gray-800 border-l dark:border dark:border-gray-700 border-l-red-500 dark:border-l-red-500'
-                                : ''
+                                : 'hover:bg-gray-100/75 dark:hover:bg-gray-800/75'
                         "
                     >
                         <div class="border-l-2 border-transparent p-2">
