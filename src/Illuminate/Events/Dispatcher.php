@@ -67,6 +67,13 @@ class Dispatcher implements DispatcherContract
     protected $transactionManagerResolver;
 
     /**
+     * The cache of events that have listeners.
+     *
+     * @var array
+     */
+    protected $listenerCache = [];
+
+    /**
      * Create a new event dispatcher instance.
      *
      * @param  \Illuminate\Contracts\Container\Container|null  $container
@@ -107,6 +114,8 @@ class Dispatcher implements DispatcherContract
                 $this->listeners[$event][] = $listener;
             }
         }
+
+        $this->listenerCache = [];
     }
 
     /**
@@ -131,9 +140,15 @@ class Dispatcher implements DispatcherContract
      */
     public function hasListeners($eventName)
     {
-        return isset($this->listeners[$eventName]) ||
+        if (isset($this->listenerCache[$eventName])) {
+            return $this->listenerCache[$eventName];
+        }
+
+        $this->listenerCache[$eventName] = isset($this->listeners[$eventName]) ||
                isset($this->wildcards[$eventName]) ||
                $this->hasWildcardListeners($eventName);
+
+        return $this->listenerCache[$eventName];
     }
 
     /**
@@ -703,6 +718,8 @@ class Dispatcher implements DispatcherContract
                 unset($this->wildcardsCache[$key]);
             }
         }
+
+        $this->listenerCache = [];
     }
 
     /**

@@ -25,10 +25,11 @@ class AnonymousComponent extends Component
      * @param  array  $data
      * @return void
      */
-    public function __construct($view, $data)
+    public function __construct($view, $data, Factory $factory)
     {
         $this->view = $view;
         $this->data = $data;
+        self::$factory = $factory;
     }
 
     /**
@@ -39,6 +40,29 @@ class AnonymousComponent extends Component
     public function render()
     {
         return $this->view;
+    }
+
+    /**
+     * Resolve the component instance with the given data.
+     *
+     * @param  array  $data
+     * @return static
+     */
+    public static function resolve($data)
+    {
+        return new static(...$data);
+    }
+
+    /**
+     * Resolve the Blade view or view file that should be used when rendering the component.
+     *
+     * @return string
+     */
+    public function resolveView()
+    {
+        $view = $this->render();
+
+        return $this->extractBladeViewFromString($view);
     }
 
     /**

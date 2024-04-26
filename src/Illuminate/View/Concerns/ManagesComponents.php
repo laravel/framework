@@ -56,9 +56,11 @@ trait ManagesComponents
         if (ob_start()) {
             $this->componentStack[] = $view;
 
-            $this->componentData[$this->currentComponent()] = $data;
+            $currentComponent = $this->currentComponent();
 
-            $this->slots[$this->currentComponent()] = [];
+            $this->componentData[$currentComponent] = $data;
+
+            $this->slots[$currentComponent] = [];
         }
     }
 

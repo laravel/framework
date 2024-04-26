@@ -251,6 +251,7 @@ class ComponentTagCompiler
             $parameters = [
                 'view' => $view,
                 'data' => '['.$this->attributesToString($data->all(), $escapeBound = false).']',
+                'factory' => '$__env',
             ];
 
             $class = AnonymousComponent::class;
@@ -776,9 +777,17 @@ class ComponentTagCompiler
     {
         return collect($attributes)
                 ->map(function (string $value, string $attribute) use ($escapeBound) {
-                    return $escapeBound && isset($this->boundAttributes[$attribute]) && $value !== 'true' && ! is_numeric($value)
-                                ? "'{$attribute}' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute({$value})"
-                                : "'{$attribute}' => {$value}";
+                    $shouldSanitize = $escapeBound && isset($this->boundAttributes[$attribute]) && $value !== 'true' && ! is_numeric($value);
+
+                    if ($shouldSanitize) {
+                        $value = \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($value);
+
+                        if (is_string($value)) {
+                            return "'{$attribute}' => '{$value}'";
+                        }
+                    }
+
+                    return "'{$attribute}' => {$value}";
                 })
                 ->implode(',');
     }
