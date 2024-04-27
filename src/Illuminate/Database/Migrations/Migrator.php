@@ -116,6 +116,15 @@ class Migrator
             $files, $this->repository->getRan()
         ));
 
+        // We might want to skip certain migration files, in case we don't want to run
+        // them right now. We will check the options array to see if this should be
+        // done. If so, we will filter them out so they won't get run this time.
+        if ($options['skip']) {
+            $migrations = array_filter($migrations, fn($file) => !in_array(
+                basename($file), $options['skip']
+            ));
+        }
+
         // Once we have all these migrations that are outstanding we are ready to run
         // we will go ahead and run them "up". This will execute each migration as
         // an operation against a database. Then we'll return this list of them.

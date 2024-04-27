@@ -65,6 +65,7 @@ class RefreshCommand extends Command
             '--path' => $path,
             '--realpath' => $this->input->getOption('realpath'),
             '--force' => true,
+            '--skip' => $this->input->getOption('skip'),
         ]));
 
         if ($this->laravel->bound(Dispatcher::class)) {
@@ -96,6 +97,7 @@ class RefreshCommand extends Command
             '--realpath' => $this->input->getOption('realpath'),
             '--step' => $step,
             '--force' => true,
+            '--skip' => $this->input->getOption('skip'),
         ]));
     }
 
@@ -113,6 +115,7 @@ class RefreshCommand extends Command
             '--path' => $path,
             '--realpath' => $this->input->getOption('realpath'),
             '--force' => true,
+            '--skip' => $this->input->getOption('skip'),
         ]));
     }
 
