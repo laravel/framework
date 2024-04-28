@@ -42,7 +42,7 @@
                     <pre class="overflow-y-hidden scrollbar-hidden"><code
                         data-highlighted="yes"
                         class="px-5 py-3 overflow-y-hidden scrollbar-hidden max-h-32 overflow-x-scroll scrollbar-hidden-x"
-                    >{{ implode(', ', $value) }}</code></pre>
+                    >{{ var_export($value, true) }}</code></pre>
             </div>
         @empty
             <div class="flex items-center gap-2">
