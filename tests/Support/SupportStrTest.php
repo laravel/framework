@@ -12,11 +12,13 @@ use ValueError;
 
 class SupportStrTest extends TestCase
 {
-    public function testStringCanBeLimitedByWords()
+    public function testStringCanBeLimitedByWords(): void
     {
         $this->assertSame('Taylor...', Str::words('Taylor Otwell', 1));
         $this->assertSame('Taylor___', Str::words('Taylor Otwell', 1, '___'));
         $this->assertSame('Taylor Otwell', Str::words('Taylor Otwell', 3));
+        $this->assertSame('Taylor Otwell', Str::words('Taylor Otwell', -1, '...'));
+        $this->assertSame('', Str::words('', 3, '...'));
     }
 
     public function testStringCanBeLimitedByWordsNonAscii()
@@ -114,11 +116,13 @@ class SupportStrTest extends TestCase
         $this->assertSame('   ', Str::apa('   '));
     }
 
-    public function testStringWithoutWordsDoesntProduceError()
+    public function testStringWithoutWordsDoesntProduceError(): void
     {
         $nbsp = chr(0xC2).chr(0xA0);
         $this->assertSame(' ', Str::words(' '));
         $this->assertEquals($nbsp, Str::words($nbsp));
+        $this->assertSame('   ', Str::words('   '));
+        $this->assertSame("\t\t\t", Str::words("\t\t\t"));
     }
 
     public function testStringAscii()
