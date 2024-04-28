@@ -265,7 +265,7 @@ class SupportStrTest extends TestCase
         $this->assertSame('han', Str::before('han2nah', 2));
     }
 
-    public function testStrBeforeLast()
+    public function testStrBeforeLast(): void
     {
         $this->assertSame('yve', Str::beforeLast('yvette', 'tte'));
         $this->assertSame('yvet', Str::beforeLast('yvette', 't'));
@@ -276,6 +276,10 @@ class SupportStrTest extends TestCase
         $this->assertSame('yv0et', Str::beforeLast('yv0et0te', '0'));
         $this->assertSame('yv0et', Str::beforeLast('yv0et0te', 0));
         $this->assertSame('yv2et', Str::beforeLast('yv2et2te', 2));
+        $this->assertSame('', Str::beforeLast('', 'test'));
+        $this->assertSame('', Str::beforeLast('yvette', 'yvette'));
+        $this->assertSame('laravel', Str::beforeLast("laravel framework", ' '));
+        $this->assertSame('yvette', Str::beforeLast("yvette\t", "\t"));
     }
 
     public function testStrBetween()
