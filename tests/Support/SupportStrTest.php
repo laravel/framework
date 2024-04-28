@@ -283,7 +283,7 @@ class SupportStrTest extends TestCase
         $this->assertSame('', Str::beforeLast('', 'test'));
         $this->assertSame('', Str::beforeLast('yvette', 'yvette'));
         $this->assertSame('laravel', Str::beforeLast("laravel framework", ' '));
-        $this->assertSame('yvette', Str::beforeLast("yvette\t", "\t"));
+        $this->assertSame('yvette', Str::beforeLast("yvette\tyv0et0te", "\t"));
     }
 
     public function testStrBetween()
