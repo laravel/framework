@@ -282,7 +282,7 @@ class SupportStrTest extends TestCase
         $this->assertSame('yv2et', Str::beforeLast('yv2et2te', 2));
         $this->assertSame('', Str::beforeLast('', 'test'));
         $this->assertSame('', Str::beforeLast('yvette', 'yvette'));
-        $this->assertSame('laravel', Str::beforeLast("laravel framework", ' '));
+        $this->assertSame('laravel', Str::beforeLast('laravel framework', ' '));
         $this->assertSame('yvette', Str::beforeLast("yvette\tyv0et0te", "\t"));
     }
 
