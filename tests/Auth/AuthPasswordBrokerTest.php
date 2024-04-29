@@ -7,6 +7,9 @@ use Illuminate\Auth\Passwords\TokenRepositoryInterface;
 use Illuminate\Contracts\Auth\CanResetPassword;
 use Illuminate\Contracts\Auth\PasswordBroker as PasswordBrokerContract;
 use Illuminate\Contracts\Auth\UserProvider;
+use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
+use Illuminate\Events\Dispatcher;
+use Illuminate\Foundation\Application;
 use Illuminate\Support\Arr;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -14,6 +17,19 @@ use UnexpectedValueException;
 
 class AuthPasswordBrokerTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        Application::setInstance($container = new Application);
+
+        $container->singleton(DispatcherContract::class, function () {
+            return new Dispatcher();
+        });
+
+        $container->alias(DispatcherContract::class, 'events');
+    }
+
     protected function tearDown(): void
     {
         m::close();
