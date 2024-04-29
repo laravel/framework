@@ -6,9 +6,6 @@ use Composer\Autoload\ClassLoader;
 use Illuminate\Foundation\Bootstrap\HandleExceptions;
 use Illuminate\Http\Request;
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
-use Symfony\Component\VarDumper\Caster\ReflectionCaster;
-use Symfony\Component\VarDumper\Cloner\VarCloner;
-use Symfony\Component\VarDumper\Dumper\HtmlDumper;
 
 class Exception
 {
