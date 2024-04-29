@@ -1,9 +1,12 @@
 @foreach ($exception->frames() as $frame)
-    <div class="sm:col-span-2" x-show="index === {{ $loop->index }}">
+    <div
+        class="sm:col-span-2"
+        x-show="index === {{ $loop->index }}"
+    >
         <div class="mb-3">
             <div class="text-md text-gray-500 dark:text-gray-400">
                 <div class="mb-2">
-                    <span class="text-gray-900 dark:text-gray-300 wrap">{{ $frame->file() }}</span>
+                    <span class="wrap text-gray-900 dark:text-gray-300">{{ $frame->file() }}</span>
                     <span class="font-mono text-xs">:{{ $frame->line() }}</span>
                 </div>
             </div>

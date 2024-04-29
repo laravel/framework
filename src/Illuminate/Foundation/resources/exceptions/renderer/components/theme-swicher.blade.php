@@ -1,27 +1,25 @@
 <script>
-    const darkStyles = document.querySelector('style[data-theme="dark"]')?.textContent;
-    const lightStyles = document.querySelector('style[data-theme="light"]')?.textContent;
+    const darkStyles = document.querySelector('style[data-theme="dark"]')?.textContent
+    const lightStyles = document.querySelector('style[data-theme="light"]')?.textContent
 
     const removeStyles = () => {
-        document.querySelector('style[data-theme="dark"]')?.remove();
-        document.querySelector('style[data-theme="light"]')?.remove();
+        document.querySelector('style[data-theme="dark"]')?.remove()
+        document.querySelector('style[data-theme="light"]')?.remove()
     }
 
-    removeStyles();
+    removeStyles()
 
     setDarkClass = () => {
-        removeStyles();
+        removeStyles()
 
-        const isDark = localStorage.theme !== 'light' || (!('theme' in localStorage));
+        const isDark = localStorage.theme !== 'light' || !('theme' in localStorage)
 
-        isDark
-            ? document.documentElement.classList.add('dark')
-            : document.documentElement.classList.remove('dark');
+        isDark ? document.documentElement.classList.add('dark') : document.documentElement.classList.remove('dark')
 
         if (isDark) {
-            document.head.insertAdjacentHTML('beforeend', `<style data-theme="dark">${darkStyles}</style>`);
+            document.head.insertAdjacentHTML('beforeend', `<style data-theme="dark">${darkStyles}</style>`)
         } else {
-            document.head.insertAdjacentHTML('beforeend', `<style data-theme="light">${lightStyles}</style>`);
+            document.head.insertAdjacentHTML('beforeend', `<style data-theme="light">${lightStyles}</style>`)
         }
     }
 
@@ -44,7 +42,7 @@
             this.theme = 'light'
             localStorage.theme = 'light'
             setDarkClass()
-        }
+        },
     }"
     @click.outside="menu = false"
 >

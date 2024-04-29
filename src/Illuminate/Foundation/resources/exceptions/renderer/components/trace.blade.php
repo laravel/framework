@@ -1,12 +1,19 @@
-<div class="overflow-x-auto sm:col-span-1 lg:block hidden">
-    <div class="text-sm text-gray-400 dark:text-gray-300 scrollbar-hidden trace" style="height: 35.5rem">
-        <div class="mb-2 sm:col-span-1 inline-block rounded-full px-3 py-2 bg-red-500/20 dark:bg-red-500/20">
+<div class="hidden overflow-x-auto sm:col-span-1 lg:block">
+    <div
+        class="scrollbar-hidden trace text-sm text-gray-400 dark:text-gray-300"
+        style="height: 35.5rem"
+    >
+        <div class="mb-2 inline-block rounded-full bg-red-500/20 px-3 py-2 dark:bg-red-500/20 sm:col-span-1">
             <button
                 @click="includeVendorFrames = !includeVendorFrames"
                 class="inline-flex items-center font-bold leading-5 text-red-500"
             >
                 <span x-show="includeVendorFrames">Collapse</span>
-                <span x-cloak x-show="!includeVendorFrames">Expand</span>
+                <span
+                    x-cloak
+                    x-show="!includeVendorFrames"
+                    >Expand</span
+                >
                 <span class="ml-1">vendor frames</span>
                 <!-- icons -->
                 <svg
@@ -34,7 +41,7 @@
             </button>
         </div>
 
-        <div class="space-y-2 mb-12">
+        <div class="mb-12 space-y-2">
             @foreach ($exception->frames() as $frame)
                 @php
                     /** @var \Illuminate\Foundation\Exceptions\Renderer\Frame $frame */
@@ -68,7 +75,7 @@
                     >
                         <div class="border-l-2 border-transparent p-2">
                             <div class="align-middle text-gray-900 dark:text-gray-300">
-                                <span class="text-gray-900 dark:text-gray-300 truncate">{{ $frame->source() }}</span>
+                                <span class="truncate text-gray-900 dark:text-gray-300">{{ $frame->source() }}</span>
                                 <span class="font-mono text-xs">:{{ $frame->line() }}</span>
                             </div>
                             <div class="text-gray-500 dark:text-gray-400">

@@ -2,7 +2,7 @@
     <div class="container mx-auto lg:px-8">
         <x-laravel-exceptions-renderer::navigation :$exception />
 
-        <main class="px-6 pt-6 pb-12">
+        <main class="px-6 pb-12 pt-6">
             <div class="container mx-auto">
                 <x-laravel-exceptions-renderer::header :$exception />
 
