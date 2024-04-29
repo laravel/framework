@@ -12,11 +12,13 @@ use ValueError;
 
 class SupportStrTest extends TestCase
 {
-    public function testStringCanBeLimitedByWords()
+    public function testStringCanBeLimitedByWords(): void
     {
         $this->assertSame('Taylor...', Str::words('Taylor Otwell', 1));
         $this->assertSame('Taylor___', Str::words('Taylor Otwell', 1, '___'));
         $this->assertSame('Taylor Otwell', Str::words('Taylor Otwell', 3));
+        $this->assertSame('Taylor Otwell', Str::words('Taylor Otwell', -1, '...'));
+        $this->assertSame('', Str::words('', 3, '...'));
     }
 
     public function testStringCanBeLimitedByWordsNonAscii()
@@ -114,11 +116,13 @@ class SupportStrTest extends TestCase
         $this->assertSame('   ', Str::apa('   '));
     }
 
-    public function testStringWithoutWordsDoesntProduceError()
+    public function testStringWithoutWordsDoesntProduceError(): void
     {
         $nbsp = chr(0xC2).chr(0xA0);
         $this->assertSame(' ', Str::words(' '));
         $this->assertEquals($nbsp, Str::words($nbsp));
+        $this->assertSame('   ', Str::words('   '));
+        $this->assertSame("\t\t\t", Str::words("\t\t\t"));
     }
 
     public function testStringAscii()
@@ -265,7 +269,7 @@ class SupportStrTest extends TestCase
         $this->assertSame('han', Str::before('han2nah', 2));
     }
 
-    public function testStrBeforeLast()
+    public function testStrBeforeLast(): void
     {
         $this->assertSame('yve', Str::beforeLast('yvette', 'tte'));
         $this->assertSame('yvet', Str::beforeLast('yvette', 't'));
@@ -276,6 +280,10 @@ class SupportStrTest extends TestCase
         $this->assertSame('yv0et', Str::beforeLast('yv0et0te', '0'));
         $this->assertSame('yv0et', Str::beforeLast('yv0et0te', 0));
         $this->assertSame('yv2et', Str::beforeLast('yv2et2te', 2));
+        $this->assertSame('', Str::beforeLast('', 'test'));
+        $this->assertSame('', Str::beforeLast('yvette', 'yvette'));
+        $this->assertSame('laravel', Str::beforeLast('laravel framework', ' '));
+        $this->assertSame('yvette', Str::beforeLast("yvette\tyv0et0te", "\t"));
     }
 
     public function testStrBetween()
