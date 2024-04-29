@@ -269,7 +269,7 @@ class TranslationTranslatorTest extends TestCase
             $t->get(
                 'We have some nice <docs-link>documentation</docs-link>',
                 [
-                    "docs-link" => fn ($children) => "<a href=\"https://laravel.com/docs\">$children</a>"
+                    'docs-link' => fn ($children) => "<a href=\"https://laravel.com/docs\">$children</a>",
                 ]
             )
         );
@@ -287,7 +287,7 @@ class TranslationTranslatorTest extends TestCase
             $t->get(
                 '<bold-this>bold</bold-this> something else <bold-this>also bold</bold-this>',
                 [
-                    "bold-this" => fn ($children) => "<b>$children</b>"
+                    'bold-this' => fn ($children) => "<b>$children</b>",
                 ]
             )
         );
