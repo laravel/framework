@@ -16,7 +16,7 @@
     <dl class="mt-1 grid grid-cols-1 border rounded dark:border-gray-800">
         @forelse ($exception->requestHeaders() as $key => $value)
             <div class="flex items-center gap-2 {{ $loop->first ? '' : 'border-t' }} dark:border-gray-800">
-                <span data-tippy-content="{{ $key }}" class="flex-none w-[8rem] lg:w-[12rem] truncate px-5 py-3 border-r dark:border-gray-800 text-sm lg:text-md">{{ $key }}</span>
+                <span data-tippy-content="{{ $key }}" class="flex-none w-[8rem] lg:w-[12rem] truncate px-5 py-3 border-r dark:border-gray-800 text-sm lg:text-md cursor-pointer">{{ $key }}</span>
                 <span class="flex-grow min-w-0" style="-webkit-mask-image: linear-gradient(90deg,transparent 0,#000 1rem,#000 calc(100% - 3rem),transparent calc(100% - 1rem))">
                     <pre class="overflow-y-hidden scrollbar-hidden text-xs lg:text-sm"><code
                         data-highlighted="yes"

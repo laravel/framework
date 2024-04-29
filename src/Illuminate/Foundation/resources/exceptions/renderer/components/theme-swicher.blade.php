@@ -1,21 +1,26 @@
 <script>
+    const darkStyles = document.querySelector('style[data-theme="dark"]')?.textContent;
+    const lightStyles = document.querySelector('style[data-theme="light"]')?.textContent;
+
+    const removeStyles = () => {
+        document.querySelector('style[data-theme="dark"]')?.remove();
+        document.querySelector('style[data-theme="light"]')?.remove();
+    }
+
+    removeStyles();
+
     setDarkClass = () => {
+        removeStyles();
+
         localStorage.theme === 'dark' || (!('theme' in localStorage))
             ? document.documentElement.classList.add('dark')
-            : document.documentElement.classList.remove('dark')
+            : document.documentElement.classList.remove('dark');
 
-        let link = document.getElementById('exceptions-renderer-highlightjs-theme');
-        link && link.remove();
-
-        link = document.createElement('link');
-        link.rel = 'stylesheet';
-        link.id = 'exceptions-renderer-highlightjs-theme';
-        link.href = '//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/';
-        link.href += localStorage.theme === 'dark' || (!('theme' in localStorage))
-            ? 'atom-one-dark.min.css'
-            : 'github.min.css';
-
-        document.head.prepend(link);
+        if (localStorage.theme === 'dark') {
+            document.head.insertAdjacentHTML('beforeend', `<style data-theme="dark">${darkStyles}</style>`);
+        } else {
+            document.head.insertAdjacentHTML('beforeend', `<style data-theme="light">${lightStyles}</style>`);
+        }
     }
 
     setDarkClass()

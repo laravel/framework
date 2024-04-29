@@ -11,6 +11,13 @@ use Throwable;
 class Renderer
 {
     /**
+     * The path to the renderer's CSS and JavaScript files.
+     *
+     * @var string
+     */
+    public const DIST = __DIR__.'/../../resources/exceptions/renderer/dist/';
+
+    /**
      * The view factory instance.
      *
      * @var \Illuminate\Contracts\View\Factory
@@ -85,5 +92,39 @@ class Renderer
         return $this->viewFactory->make('laravel-exceptions-renderer::show', [
             'exception' => new Exception($flattenException, $request, $this->listener, $this->basePath),
         ])->render();
+    }
+
+    /**
+     * Get the renderer's CSS content.
+     *
+     * @return string
+     */
+    public static function css()
+    {
+        return collect([
+            ['styles.css', []],
+            ['light-mode.css', ['data-theme' => 'light']],
+            ['dark-mode.css', ['data-theme' => 'dark']],
+        ])->map(function ($fileAndAttributes) {
+            [$filename, $attributes] = $fileAndAttributes;
+
+            return '<style ' . collect($attributes)->map(function ($value, $attribute) {
+                return $attribute . '="' . $value . '"';
+            })->implode(' ') . '>'
+                . file_get_contents(static::DIST . $filename)
+                . '</style>';
+        })->implode('');
+    }
+
+    /**
+     * Get the renderer's JavaScript content.
+     *
+     * @return string
+     */
+    public static function js()
+    {
+        return '<script type="text/javascript">'
+            . file_get_contents(static::DIST . 'scripts.js')
+            . '</script>';
     }
 }
