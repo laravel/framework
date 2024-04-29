@@ -837,7 +837,7 @@ class Handler implements ExceptionHandlerContract
                         : $this->renderException($e);
         } catch (Throwable $e) {
             return rescue(fn () => $this->renderException($e), function () use ($e) {
-                return $this->renderExceptionWithSymfony($e);
+                return $this->renderExceptionWithSymfony($e, config('app.debug'));
             });
         }
     }
@@ -854,14 +854,15 @@ class Handler implements ExceptionHandlerContract
     }
 
     /**
-     * Render an exception to a string using Symfony's HTML error renderer.
+     * Render an exception to a string using Symfony.
      *
      * @param  \Throwable  $e
+     * @param  bool  $debug
      * @return string
      */
-    protected function renderExceptionWithSymfony(Throwable $e)
+    protected function renderExceptionWithSymfony(Throwable $e, $debug)
     {
-        $renderer = new HtmlErrorRenderer(config('app.debug'));
+        $renderer = new HtmlErrorRenderer($debug);
 
         return $renderer->render($e)->getAsString();
     }
