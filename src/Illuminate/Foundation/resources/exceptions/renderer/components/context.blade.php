@@ -68,7 +68,7 @@
             <div class="flex items-center gap-2 {{ $loop->first ? '' : 'border-t' }} dark:border-gray-800">
                 <div class="flex-none w-[8rem] lg:w-[12rem] truncate px-5 py-3 border-r dark:border-gray-800 text-sm lg:text-md">
                     <span>{{ $connectionName }}</span>
-                    <span class="text-gray-500 hidden lg:inline-block">({{ $time }} ms)</span>
+                    <span class="text-gray-500 hidden lg:inline-block text-xs">({{ $time }} ms)</span>
                 </div>
                 <span class="flex-grow min-w-0" style="-webkit-mask-image: linear-gradient(90deg,transparent 0,#000 1rem,#000 calc(100% - 3rem),transparent calc(100% - 1rem))">
                     <pre class="overflow-y-hidden scrollbar-hidden text-xs lg:text-sm"><code
