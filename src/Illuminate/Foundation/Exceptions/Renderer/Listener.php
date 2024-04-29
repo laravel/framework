@@ -10,14 +10,14 @@ class Listener
     /**
      * The queries that have been executed.
      *
-     * @var array<int, {connectionName: string, time: float, sql: string}>
+     * @var array<int, array{connectionName: string, time: float, sql: string}>
      */
     protected $queries = [];
 
     /**
      * Registers the exception renderer listener so that it can listen for events.
      *
-     * @param  \Illuminate\Contracts\Events\Dispatcher
+     * @param  \Illuminate\Contracts\Events\Dispatcher  $events
      * @return void
      */
     public function register(Dispatcher $events)
@@ -28,7 +28,7 @@ class Listener
     /**
      * Returns the queries that have been executed.
      *
-     * @return array<int, {sql: string, time: float}
+     * @return array<int, array{sql: string, time: float}>
      */
     public function queries()
     {
