@@ -72,7 +72,6 @@
                 </div>
                 <span class="flex-grow min-w-0" style="-webkit-mask-image: linear-gradient(90deg,transparent 0,#000 1rem,#000 calc(100% - 3rem),transparent calc(100% - 1rem))">
                     <pre class="overflow-y-hidden scrollbar-hidden text-xs lg:text-sm"><code
-                        data-highlighted="yes"
                         class="px-5 py-3 overflow-y-hidden scrollbar-hidden max-h-32 overflow-x-scroll scrollbar-hidden-x"
                     >{{ $sql }}</code></pre>
                 </span>

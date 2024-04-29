@@ -12,11 +12,13 @@
     setDarkClass = () => {
         removeStyles();
 
-        localStorage.theme === 'dark' || (!('theme' in localStorage))
+        const isDark = localStorage.theme !== 'light' || (!('theme' in localStorage));
+
+        isDark
             ? document.documentElement.classList.add('dark')
             : document.documentElement.classList.remove('dark');
 
-        if (localStorage.theme === 'dark') {
+        if (isDark) {
             document.head.insertAdjacentHTML('beforeend', `<style data-theme="dark">${darkStyles}</style>`);
         } else {
             document.head.insertAdjacentHTML('beforeend', `<style data-theme="light">${lightStyles}</style>`);
@@ -42,12 +44,7 @@
             this.theme = 'light'
             localStorage.theme = 'light'
             setDarkClass()
-        },
-        systemMode() {
-            this.theme = undefined
-            localStorage.removeItem('theme')
-            setDarkClass()
-        },
+        }
     }"
     @click.outside="menu = false"
 >
@@ -82,14 +79,6 @@
         >
             <x-laravel-exceptions-renderer::icons.moon class="h-5 w-5" />
             Dark
-        </button>
-        <button
-            class="flex items-center gap-3 px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700"
-            :class="theme === undefined ? 'text-gray-900 dark:text-gray-100' : 'text-gray-500 dark:text-gray-400'"
-            @click="systemMode()"
-        >
-            <x-laravel-exceptions-renderer::icons.computer-desktop class="h-5 w-5" />
-            System
         </button>
     </div>
 </div>
