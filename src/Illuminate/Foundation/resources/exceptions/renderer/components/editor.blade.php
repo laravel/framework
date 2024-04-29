@@ -10,8 +10,8 @@
         </div>
         <div class="pt-4 text-sm text-gray-500 dark:text-gray-400">
             <pre id="frame-{{ $loop->index }}"><code
-                    class="language-php scrollbar-hidden rounded-md dark:bg-gray-800 border dark:border-gray-700 overflow-y-none"
-                    style="height: 525px"
+                    class="language-php scrollbar-hidden rounded-md dark:bg-gray-800 border dark:border-gray-700 overflow-y-hidden"
+                    style="height: 32.5rem;"
                     data-line-number="{{ $frame->line() }}"
                     data-ln-start-from="{{ max($frame->line() - 5, 1) }}"
                 >{{ $frame->snippet() }}</code></pre>

@@ -1,5 +1,5 @@
 <div class="overflow-x-auto sm:col-span-1 lg:block hidden">
-    <div class="text-sm text-gray-400 dark:text-gray-300 scrollbar-hidden trace" style="height: 565px">
+    <div class="text-sm text-gray-400 dark:text-gray-300 scrollbar-hidden trace" style="height: 38rem">
         <div class="mb-2 sm:col-span-1 inline-block rounded-full px-3 py-2 bg-red-500/20 dark:bg-red-500/20">
             <button
                 @click="includeVendorFrames = !includeVendorFrames"

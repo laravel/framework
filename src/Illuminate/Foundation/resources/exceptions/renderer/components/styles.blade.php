@@ -2,7 +2,17 @@
 <link rel="stylesheet" href="https://unpkg.com/tippy.js@6/animations/scale.css"></script>
 <link rel="stylesheet" href="https://unpkg.com/tippy.js@6/themes/material.css"></script>
 
-<style>
+<style type="text/css">
+    html {
+        tab-size: 4;
+    }
+
+    table.hljs-ln {
+        color: inherit;
+        font-size: inherit;
+        border-spacing: 2px;
+    }
+
     .hljs {
         background: none;
         width: 100%;
@@ -11,6 +21,11 @@
     pre code.hljs {
         padding: 0em;
         padding-top: 0.5em;
+    }
+
+    .hljs-ln-line {
+        white-space-collapse: preserve;
+        text-wrap: nowrap;
     }
 
     .trace {
@@ -65,7 +80,7 @@
 </style>
 
 @foreach ($exception->frames() as $frame)
-    <style>
+    <style type="text/css">
         #frame-{{ $loop->index }} .hljs-ln-line[data-line-number='{{ $frame->line() }}'] {
             background-color: rgba(242, 95, 95, 0.4);
         }
