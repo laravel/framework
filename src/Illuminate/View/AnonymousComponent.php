@@ -50,7 +50,7 @@ class AnonymousComponent extends Component
      */
     public static function resolve($data)
     {
-        return new static(...$data);
+        return new static($data['view'], $data['data'], $data['factory']);
     }
 
     /**
