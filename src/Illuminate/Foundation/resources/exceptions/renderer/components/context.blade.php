@@ -14,18 +14,18 @@
     </div>
 
     <dl class="mt-1 grid grid-cols-1 border rounded dark:border-gray-800">
-        @forelse ($exception->request()->headers->all() as $key => $value)
+        @forelse ($exception->requestHeaders() as $key => $value)
             <div class="flex items-center gap-2 {{ $loop->first ? '' : 'border-t' }} dark:border-gray-800">
-                <span data-tippy-content="{{ $key }}" class="flex-none w-[8rem] lg:w-[12rem] truncate px-5 py-3 border-r dark:border-gray-800">{{ $key }}</span>
+                <span data-tippy-content="{{ $key }}" class="flex-none w-[8rem] lg:w-[12rem] truncate px-5 py-3 border-r dark:border-gray-800 text-sm lg:text-md">{{ $key }}</span>
                 <span class="flex-grow min-w-0" style="-webkit-mask-image: linear-gradient(90deg,transparent 0,#000 1rem,#000 calc(100% - 3rem),transparent calc(100% - 1rem))">
-                    <pre class="overflow-y-hidden scrollbar-hidden"><code
+                    <pre class="overflow-y-hidden scrollbar-hidden text-xs lg:text-sm"><code
                         data-highlighted="yes"
                         class="px-5 py-3 overflow-y-hidden scrollbar-hidden max-h-32 overflow-x-scroll scrollbar-hidden-x"
-                    >{{ implode(', ', $value) }}</code></pre>
+                    >{{ $value }}</code></pre>
             </div>
         @empty
             <div class="flex items-center gap-2">
-                <span class="px-5 py-3">No headers data</span>
+                <span class="px-5 py-3 text-sm lg:text-md">No headers data</span>
             </div>
         @endforelse
     </dl>
@@ -35,20 +35,20 @@
     </div>
 
     <dl class="mt-1 grid grid-cols-1 border rounded dark:border-gray-800">
-        @forelse ($exception->request()->all() as $key => $value)
-            <div class="flex items-center gap-2 {{ $loop->first ? '' : 'border-t' }} dark:border-gray-800">
-                <span data-tippy-content="{{ $key }}" class="flex-none w-[8rem] lg:w-[12rem] truncate px-5 py-3 border-r dark:border-gray-800">{{ $key }}</span>
+        @if ($payload = $exception->requestBody())
+            <div class="flex items-center>
                 <span class="flex-grow min-w-0" style="-webkit-mask-image: linear-gradient(90deg,transparent 0,#000 1rem,#000 calc(100% - 3rem),transparent calc(100% - 1rem))">
-                    <pre class="overflow-y-hidden scrollbar-hidden"><code
-                        data-highlighted="yes"
-                        class="px-5 py-3 overflow-y-hidden scrollbar-hidden max-h-32 overflow-x-scroll scrollbar-hidden-x"
-                    >{{ var_export($value, true) }}</code></pre>
+                    <pre class="mx-5 my-3 overflow-y-hidden scrollbar-hidden text-xs lg:text-sm"><code
+                            data-highlighted="yes"
+                            class="overflow-y-hidden scrollbar-hidden overflow-x-scroll scrollbar-hidden-x"
+                        >{!! $payload !!}</code></pre>
+                </span>
             </div>
-        @empty
+        @else
             <div class="flex items-center gap-2">
-                <span class="px-5 py-3">No body data</span>
+                <span class="px-5 py-3 text-sm lg:text-md">No body data</span>
             </div>
-        @endforelse
+        @endif
     </dl>
 
     <div class="mt-4">
@@ -66,12 +66,12 @@
     <dl class="mt-1 grid grid-cols-1 border rounded dark:border-gray-800">
         @forelse ($exception->listener()->queries() as ['connectionName' => $connectionName, 'sql' => $sql, 'time' => $time])
             <div class="flex items-center gap-2 {{ $loop->first ? '' : 'border-t' }} dark:border-gray-800">
-                <div class="flex-none w-[8rem] lg:w-[12rem] truncate px-5 py-3 border-r dark:border-gray-800">
+                <div class="flex-none w-[8rem] lg:w-[12rem] truncate px-5 py-3 border-r dark:border-gray-800 text-sm lg:text-md">
                     <span>{{ $connectionName }}</span>
                     <span class="text-gray-500 hidden lg:inline-block">({{ $time }} ms)</span>
                 </div>
                 <span class="flex-grow min-w-0" style="-webkit-mask-image: linear-gradient(90deg,transparent 0,#000 1rem,#000 calc(100% - 3rem),transparent calc(100% - 1rem))">
-                    <pre class="overflow-y-hidden scrollbar-hidden"><code
+                    <pre class="overflow-y-hidden scrollbar-hidden text-xs lg:text-sm"><code
                         data-highlighted="yes"
                         class="px-5 py-3 overflow-y-hidden scrollbar-hidden max-h-32 overflow-x-scroll scrollbar-hidden-x"
                     >{{ $sql }}</code></pre>

@@ -6,9 +6,9 @@
                     {{ $exception->class() }}
                 </span>
             </div>
-            <div class="text-lg lg:text-2xl mt-4 text-2xl font-semibold text-gray-900 dark:text-white">{{ $exception->message() }}</div>
+            <div class="text-lg lg:text-2xl mt-4 font-semibold text-gray-900 dark:text-white">{{ $exception->message() }}</div>
         </div>
-        <div class="lg:block hidden text-right">
+        <div class="lg:block lg:min-w-64 hidden text-right">
             <div>
                 <span class="rounded-full bg-gray-200 px-3 py-2 dark:bg-gray-800 text-sm leading-5 text-gray-900 dark:text-white">
                     {{ $exception->request()->method() }} {{ $exception->request()->httpHost() }}

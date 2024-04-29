@@ -6,6 +6,9 @@ use Composer\Autoload\ClassLoader;
 use Illuminate\Foundation\Bootstrap\HandleExceptions;
 use Illuminate\Http\Request;
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
+use Symfony\Component\VarDumper\Caster\ReflectionCaster;
+use Symfony\Component\VarDumper\Cloner\VarCloner;
+use Symfony\Component\VarDumper\Dumper\HtmlDumper;
 
 class Exception
 {
@@ -129,6 +132,34 @@ class Exception
     public function request()
     {
         return $this->request;
+    }
+
+    /**
+     * Get the request's body parameters.
+     *
+     * @return string|null
+     */
+    public function requestBody()
+    {
+        if (empty($payload = $this->request()->all())) {
+            return null;
+        }
+
+        $json = json_encode($payload, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+
+        return str_replace('\\', '', $json);
+    }
+
+    /**
+     * Get the exception's headers.
+     *
+     * @return array<string, string>
+     */
+    public function requestHeaders()
+    {
+        return array_map(function (array $header) {
+            return implode(', ', $header);
+        }, $this->request()->headers->all());
     }
 
     /**
