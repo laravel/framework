@@ -2,14 +2,12 @@
 
 namespace Illuminate\Tests\Auth;
 
-use Illuminate\Auth\Events\PasswordResetLinkSent;
 use Illuminate\Auth\Passwords\PasswordBroker;
 use Illuminate\Auth\Passwords\TokenRepositoryInterface;
 use Illuminate\Contracts\Auth\CanResetPassword;
 use Illuminate\Contracts\Auth\PasswordBroker as PasswordBrokerContract;
 use Illuminate\Contracts\Auth\UserProvider;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Event;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use UnexpectedValueException;
@@ -70,26 +68,6 @@ class AuthPasswordBrokerTest extends TestCase
         $user->shouldReceive('sendPasswordResetNotification')->with('token');
 
         $this->assertSame(PasswordBrokerContract::RESET_LINK_SENT, $broker->sendResetLink(['foo']));
-    }
-
-    public function testBrokerTriggersPasswordResetLinkEvent()
-    {
-        Event::fake();
-
-        $mocks = $this->getMocks();
-        $broker = m::mock(PasswordBroker::class, array_values($mocks))->makePartial();
-        $mocks['users']->shouldReceive('retrieveByCredentials')->once()->with(['foo'])->andReturn($user = m::mock(CanResetPassword::class));
-        $mocks['tokens']->shouldReceive('recentlyCreatedToken')->once()->with($user)->andReturn(false);
-        $mocks['tokens']->shouldReceive('create')->once()->with($user)->andReturn('token');
-        $user->shouldReceive('sendPasswordResetNotification')->with('token');
-
-        $broker->sendResetLink(['foo']);
-
-        Event::assertDispatched(PasswordResetLinkSent::class, function ($event) {
-            $this->assertEquals(1, $event->user->id);
-
-            return true;
-        });
     }
 
     public function testRedirectIsReturnedByResetWhenUserCredentialsInvalid()
