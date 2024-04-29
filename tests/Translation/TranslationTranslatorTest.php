@@ -257,6 +257,42 @@ class TranslationTranslatorTest extends TestCase
         );
     }
 
+    public function testTagReplacements()
+    {
+        $t = new Translator($this->getLoader(), 'en');
+
+        $t->getLoader()->shouldReceive('load')->once()->with('en', '*', '*')->andReturn([]);
+        $t->getLoader()->shouldReceive('load')->once()->with('en', 'We have some nice <docs-link>documentation</docs-link>', '*')->andReturn([]);
+
+        $this->assertSame(
+            'We have some nice <a href="https://laravel.com/docs">documentation</a>',
+            $t->get(
+                'We have some nice <docs-link>documentation</docs-link>',
+                [
+                    "docs-link" => fn ($children) => "<a href=\"https://laravel.com/docs\">$children</a>"
+                ]
+            )
+        );
+    }
+
+    public function testTagReplacementsHandleMultipleOfSameTag()
+    {
+        $t = new Translator($this->getLoader(), 'en');
+
+        $t->getLoader()->shouldReceive('load')->once()->with('en', '*', '*')->andReturn([]);
+        $t->getLoader()->shouldReceive('load')->once()->with('en', '<bold-this>bold</bold-this> something else <bold-this>also bold</bold-this>', '*')->andReturn([]);
+
+        $this->assertSame(
+            '<b>bold</b> something else <b>also bold</b>',
+            $t->get(
+                '<bold-this>bold</bold-this> something else <bold-this>also bold</bold-this>',
+                [
+                    "bold-this" => fn ($children) => "<b>$children</b>"
+                ]
+            )
+        );
+    }
+
     public function testDetermineLocalesUsingMethod()
     {
         $t = new Translator($this->getLoader(), 'en');
