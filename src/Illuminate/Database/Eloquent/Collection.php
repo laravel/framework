@@ -597,11 +597,11 @@ class Collection extends BaseCollection implements QueueableCollection
     /**
      * Flip the items in the collection.
      *
-     * @return \Illuminate\Support\Collection<TModel, TKey>
+     * @return \Illuminate\Support\Collection<array-key, TKey>
      */
     public function flip()
     {
-        return $this->toBase()->flip();
+        return $this->toBase()->map(fn ($v) => $v->getKey())->flip();
     }
 
     /**

@@ -491,14 +491,22 @@ class DatabaseEloquentCollectionTest extends TestCase
     public function testNonModelRelatedMethods()
     {
         $a = new Collection([['foo' => 'bar'], ['foo' => 'baz']]);
-        $b = new Collection(['a', 'b', 'c']);
         $this->assertEquals(BaseCollection::class, get_class($a->pluck('foo')));
         $this->assertEquals(BaseCollection::class, get_class($a->keys()));
         $this->assertEquals(BaseCollection::class, get_class($a->collapse()));
         $this->assertEquals(BaseCollection::class, get_class($a->flatten()));
         $this->assertEquals(BaseCollection::class, get_class($a->zip(['a', 'b'], ['c', 'd'])));
         $this->assertEquals(BaseCollection::class, get_class($a->countBy('foo')));
-        $this->assertEquals(BaseCollection::class, get_class($b->flip()));
+    }
+
+    public function testEloquentCollectionsCanBeFlipped()
+    {
+        $this->seedData();
+        $c = EloquentTestArticleModel::all()->flip();
+
+        $this->assertSame(BaseCollection::class, get_class($c));
+        $this->assertSame(3, $c->count());
+        $this->assertSame([1 => 0, 2 => 1, 3 => 2], $c->all());
     }
 
     public function testMakeVisibleRemovesHiddenAndIncludesVisible()
