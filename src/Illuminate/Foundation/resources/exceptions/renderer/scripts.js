@@ -1,5 +1,5 @@
 import tippy from 'tippy.js';
-import alpine from 'alpinejs'
+import alpine from 'alpinejs';
 import hljs from 'highlight.js/lib/core';
 import php from 'highlight.js/lib/languages/php';
 
@@ -22,5 +22,5 @@ tippy('[data-tippy-content]', {
     trigger: 'click',
     arrow: true,
     theme: 'material',
-    animation: 'scale'
-})
+    animation: 'scale',
+});

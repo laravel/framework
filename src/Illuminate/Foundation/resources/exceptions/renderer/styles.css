@@ -36,7 +36,7 @@ pre code.hljs {
 }
 
 .trace {
-    -webkit-mask-image: linear-gradient(180deg,#000 calc(100% - 4rem),transparent);
+    -webkit-mask-image: linear-gradient(180deg, #000 calc(100% - 4rem), transparent);
 }
 
 .scrollbar-hidden {

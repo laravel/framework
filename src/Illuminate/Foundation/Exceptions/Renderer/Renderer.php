@@ -108,11 +108,11 @@ class Renderer
         ])->map(function ($fileAndAttributes) {
             [$filename, $attributes] = $fileAndAttributes;
 
-            return '<style ' . collect($attributes)->map(function ($value, $attribute) {
-                return $attribute . '="' . $value . '"';
-            })->implode(' ') . '>'
-                . file_get_contents(static::DIST . $filename)
-                . '</style>';
+            return '<style '.collect($attributes)->map(function ($value, $attribute) {
+                return $attribute.'="'.$value.'"';
+            })->implode(' ').'>'
+                .file_get_contents(static::DIST.$filename)
+                .'</style>';
         })->implode('');
     }
 
@@ -124,7 +124,7 @@ class Renderer
     public static function js()
     {
         return '<script type="text/javascript">'
-            . file_get_contents(static::DIST . 'scripts.js')
-            . '</script>';
+            .file_get_contents(static::DIST.'scripts.js')
+            .'</script>';
     }
 }
