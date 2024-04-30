@@ -157,7 +157,7 @@ class ApplicationBuilder
 
         $provider::loadRoutesUsing($using);
 
-        $this->app->booting(function ()use($provider) {
+        $this->app->booting(function () use ($provider) {
             $this->app->register($provider, force: true);
         });
 
