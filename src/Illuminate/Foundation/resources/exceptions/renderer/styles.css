@@ -20,14 +20,11 @@ table.hljs-ln {
     border-spacing: 2px;
 }
 
-.hljs {
-    background: none;
-    width: 100%;
-}
-
 pre code.hljs {
+    background: none;
     padding: 0em;
     padding-top: 0.5em;
+    width: 100%;
 }
 
 .hljs-ln-line {
