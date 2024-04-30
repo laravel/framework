@@ -207,7 +207,7 @@ class FoundationServiceProvider extends AggregateServiceProvider
     }
 
     /**
-     * Register the exceptions renderer service.
+     * Register the exceptions renderer.
      *
      * @return void
      */
