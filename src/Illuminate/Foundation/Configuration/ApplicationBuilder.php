@@ -148,16 +148,17 @@ class ApplicationBuilder
         ?string $pages = null,
         ?string $health = null,
         string $apiPrefix = 'api',
+        string $provider = AppRouteServiceProvider::class,
         ?callable $then = null)
     {
         if (is_null($using) && (is_string($web) || is_string($api) || is_string($pages) || is_string($health)) || is_callable($then)) {
             $using = $this->buildRoutingCallback($web, $api, $pages, $health, $apiPrefix, $then);
         }
 
-        AppRouteServiceProvider::loadRoutesUsing($using);
+        $provider::loadRoutesUsing($using);
 
-        $this->app->booting(function () {
-            $this->app->register(AppRouteServiceProvider::class, force: true);
+        $this->app->booting(function ()use($provider) {
+            $this->app->register($provider, force: true);
         });
 
         if (is_string($commands) && realpath($commands) !== false) {
