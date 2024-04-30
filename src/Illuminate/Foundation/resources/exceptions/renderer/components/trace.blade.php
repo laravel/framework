@@ -15,7 +15,6 @@
                     >Expand</span
                 >
                 <span class="ml-1">vendor frames</span>
-                <!-- icons -->
                 <svg
                     x-show="includeVendorFrames"
                     x-cloak
@@ -73,10 +72,12 @@
                                 : 'hover:bg-gray-100/75 dark:hover:bg-gray-800/75'
                         "
                     >
-                        <div class="border-l-2 border-transparent p-2">
-                            <div class="align-middle text-gray-900 dark:text-gray-300">
-                                <span class="truncate text-gray-900 dark:text-gray-300">{{ $frame->source() }}</span>
-                                <span class="font-mono text-xs">:{{ $frame->line() }}</span>
+                        <div class="border-l-2 border-transparent p-2 overflow-x-auto scrollbar-hidden">
+                            <div class="text-gray-900 dark:text-gray-300 nowrap">
+                                <span class="inline-flex items-baseline">
+                                    <span class="text-gray-900 dark:text-gray-300">{{ $frame->source() }}</span>
+                                    <span class="font-mono text-xs">:{{ $frame->line() }}</span>
+                                </span>
                             </div>
                             <div class="text-gray-500 dark:text-gray-400">
                                 {{ $exception->frames()->get($loop->index + 1)?->callable() }}
