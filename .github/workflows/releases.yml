@@ -18,7 +18,7 @@ jobs:
 
     outputs:
       version: ${{ steps.version.outputs.version }}
-      notes: ${{ steps.cleaned-notes.outputs.release-notes }}
+      notes: ${{ steps.cleaned-notes.outputs.notes }}
 
     steps:
       - name: Checkout repository
@@ -90,11 +90,11 @@ jobs:
       - name: Cleanup release notes
         id: cleaned-notes
         run: |
-          NOTES=$(echo $NOTES | sed '/## What/d')
-          NOTES=$(echo $NOTES | sed '/## New Contributors/,$d')
-          echo "release-notes=${NOTES}" >> "$GITHUB_OUTPUT"
+          RELEASE_NOTES=$(echo $RELEASE_NOTES | sed '/## What/d')
+          RELEASE_NOTES=$(echo $RELEASE_NOTES | sed '/## New Contributors/,$d')
+          echo "notes=${RELEASE_NOTES}" >> "$GITHUB_OUTPUT"
         env:
-          NOTES: ${{ steps.generated-notes.outputs.release-notes }}
+          RELEASE_NOTES: ${{ steps.generated-notes.outputs.release-notes }}
 
       - name: Create release
         uses: softprops/action-gh-release@v2
@@ -103,7 +103,7 @@ jobs:
         with:
           tag_name: v${{ steps.version.outputs.version }}
           name: v${{ steps.version.outputs.version }}
-          body: ${{ steps.cleaned-notes.outputs.release-notes }}
+          body: ${{ steps.cleaned-notes.outputs.notes }}
           target_commitish: ${{ github.ref_name }}
           make_latest: 'legacy'
 
