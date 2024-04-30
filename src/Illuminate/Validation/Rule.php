@@ -4,6 +4,7 @@ namespace Illuminate\Validation;
 
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Traits\Macroable;
+use Illuminate\Validation\Rules\ArrayRule;
 use Illuminate\Validation\Rules\Can;
 use Illuminate\Validation\Rules\Dimensions;
 use Illuminate\Validation\Rules\Enum;
@@ -197,5 +198,16 @@ class Rule
     public static function dimensions(array $constraints = [])
     {
         return new Dimensions($constraints);
+    }
+
+    /**
+     * Get an array constraint builder instance
+     *
+     * @param  array|null  $parameters
+     * @return \Illuminate\Contracts\Support\Arrayable|\BackedEnum|\UnitEnum|array|string|null
+     */
+    public static function array($keys = null)
+    {
+        return new ArrayRule(...func_get_args());
     }
 }
