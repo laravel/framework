@@ -15,12 +15,12 @@ class Listener
     protected $queries = [];
 
     /**
-     * Registers the exception renderer listener so that it can listen for events.
+     * Register the listener on the given events dispatcher.
      *
      * @param  \Illuminate\Contracts\Events\Dispatcher  $events
      * @return void
      */
-    public function register(Dispatcher $events)
+    public function registerListeners(Dispatcher $events)
     {
         $events->listen(QueryExecuted::class, [$this, 'onQueryExecuted']);
     }

@@ -66,7 +66,7 @@ class FoundationServiceProvider extends AggregateServiceProvider
             ], 'laravel-errors');
         }
 
-        $this->app->make(Listener::class)->register($this->app->make(Dispatcher::class));
+        $this->app->make(Listener::class)->registerListeners($this->app->make(Dispatcher::class));
     }
 
     /**
