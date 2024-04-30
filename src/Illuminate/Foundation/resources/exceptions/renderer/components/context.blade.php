@@ -35,20 +35,14 @@
     </div>
 
     <dl class="mt-1 grid grid-cols-1 border rounded dark:border-gray-800">
-        @if ($payload = $exception->requestBody())
-            <div class="flex items-center>
-                <span class="flex-grow min-w-0" style="-webkit-mask-image: linear-gradient(90deg,transparent 0,#000 1rem,#000 calc(100% - 3rem),transparent calc(100% - 1rem))">
-                    <pre class="mx-5 my-3 overflow-y-hidden scrollbar-hidden text-xs lg:text-sm"><code
-                            data-highlighted="yes"
-                            class="overflow-y-hidden scrollbar-hidden overflow-x-scroll scrollbar-hidden-x"
-                        >{!! $payload !!}</code></pre>
-                </span>
-            </div>
-        @else
-            <div class="flex items-center gap-2">
-                <span class="px-5 py-3 text-sm lg:text-md">No body data</span>
-            </div>
-        @endif
+        <div class="flex items-center>
+            <span class="flex-grow min-w-0" style="-webkit-mask-image: linear-gradient(90deg,transparent 0,#000 1rem,#000 calc(100% - 3rem),transparent calc(100% - 1rem))">
+                <pre class="mx-5 my-3 overflow-y-hidden scrollbar-hidden text-xs lg:text-sm"><code
+                        data-highlighted="yes"
+                        class="overflow-y-hidden scrollbar-hidden overflow-x-scroll scrollbar-hidden-x"
+                    >{!! $exception->requestBody() ?: 'No body data' !!}</code></pre>
+            </span>
+        </div>
     </dl>
 
     <div class="mt-4">
