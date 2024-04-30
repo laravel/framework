@@ -4,6 +4,10 @@ namespace Illuminate\Foundation\Exceptions\Renderer;
 
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Events\QueryExecuted;
+use Laravel\Octane\Events\RequestReceived;
+use Laravel\Octane\Events\RequestTerminated;
+use Laravel\Octane\Events\TaskReceived;
+use Laravel\Octane\Events\TickReceived;
 
 class Listener
 {
@@ -23,6 +27,12 @@ class Listener
     public function registerListeners(Dispatcher $events)
     {
         $events->listen(QueryExecuted::class, [$this, 'onQueryExecuted']);
+
+        if (isset($_SERVER['LARAVEL_OCTANE'])) {
+            $events->listen([RequestReceived::class, TaskReceived::class, TickReceived::class, RequestTerminated::class], function () {
+                $this->queries = [];
+            });
+        }
     }
 
     /**
