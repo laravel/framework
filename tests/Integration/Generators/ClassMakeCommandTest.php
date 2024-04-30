@@ -1,8 +1,6 @@
 <?php
 
-namespace Integration\Generators;
-
-use Illuminate\Tests\Integration\Generators\TestCase;
+namespace Illuminate\Tests\Integration\Generators;
 
 class ClassMakeCommandTest extends TestCase
 {
