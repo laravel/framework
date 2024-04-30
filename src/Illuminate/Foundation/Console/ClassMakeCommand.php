@@ -56,6 +56,39 @@ class ClassMakeCommand extends GeneratorCommand
     }
 
     /**
+     * Build the class with the given name.
+     *
+     * @param  string  $name
+     * @return string
+     *
+     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
+     */
+    public function buildClass($name)
+    {
+        $stub = parent::buildClass($name);
+
+        return $this->replaceStrict($stub, (bool) $this->option('strict'));
+    }
+
+    /**
+     * @param  string  $stub
+     * @param  bool  $isStrict
+     * @return string
+     */
+    protected function replaceStrict($stub, bool $isStrict)
+    {
+        $replace = $isStrict ? 'declare(strict_types=1);' : '';
+
+        $stub = str_replace(['{{ strict_types }}', '{{strict_types}}'], $replace, $stub);
+
+        if ($isStrict === false) {
+            $stub = str_replace("\n\n\n", "\n", $stub);
+        }
+
+        return $stub;
+    }
+
+    /**
      * Get the console command arguments.
      *
      * @return array
@@ -65,6 +98,7 @@ class ClassMakeCommand extends GeneratorCommand
         return [
             ['invokable', 'i', InputOption::VALUE_NONE, 'Generate a single method, invokable class'],
             ['force', 'f', InputOption::VALUE_NONE, 'Create the class even if the class already exists'],
+            ['strict', 's', InputOption::VALUE_NONE, 'Add strict mode to the class']
         ];
     }
 }
