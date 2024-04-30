@@ -201,7 +201,7 @@ class Rule
     }
 
     /**
-     * Get an array constraint builder instance
+     * Get an array constraint builder instance.
      *
      * @param  array|null  $parameters
      * @return \Illuminate\Contracts\Support\Arrayable|\BackedEnum|\UnitEnum|array|string|null

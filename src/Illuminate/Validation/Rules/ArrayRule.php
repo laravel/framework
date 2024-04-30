@@ -53,6 +53,6 @@ class ArrayRule implements Stringable
             $this->keys,
         );
 
-        return 'array:' . implode(',', $keys);
+        return 'array:'.implode(',', $keys);
     }
 }
