@@ -27,7 +27,6 @@
                     "
                 >
                     <pre class="scrollbar-hidden overflow-y-hidden text-xs lg:text-sm"><code
-                        data-highlighted="yes"
                         class="px-5 py-3 overflow-y-hidden scrollbar-hidden max-h-32 overflow-x-scroll scrollbar-hidden-x"
                     >{{ $value }}</code></pre>
                 </span>
@@ -38,7 +37,6 @@
                 style="-webkit-mask-image: linear-gradient(90deg, transparent 0, #000 1rem, #000 calc(100% - 3rem), transparent calc(100% - 1rem))"
             >
                 <pre class="scrollbar-hidden mx-5 my-3 overflow-y-hidden text-xs lg:text-sm"><code
-                        data-highlighted="yes"
                         class="overflow-y-hidden scrollbar-hidden overflow-x-scroll scrollbar-hidden-x"
                     >No headers data</code></pre>
             </span>
@@ -56,7 +54,6 @@
                 style="-webkit-mask-image: linear-gradient(90deg, transparent 0, #000 1rem, #000 calc(100% - 3rem), transparent calc(100% - 1rem))"
             >
                 <pre class="scrollbar-hidden mx-5 my-3 overflow-y-hidden text-xs lg:text-sm"><code
-                        data-highlighted="yes"
                         class="overflow-y-hidden scrollbar-hidden overflow-x-scroll scrollbar-hidden-x"
                     >{!! $exception->requestBody() ?: 'No body data' !!}</code></pre>
             </span>
@@ -96,7 +93,6 @@
                 style="-webkit-mask-image: linear-gradient(90deg, transparent 0, #000 1rem, #000 calc(100% - 3rem), transparent calc(100% - 1rem))"
             >
                 <pre class="scrollbar-hidden mx-5 my-3 overflow-y-hidden text-xs lg:text-sm"><code
-                        data-highlighted="yes"
                         class="overflow-y-hidden scrollbar-hidden overflow-x-scroll scrollbar-hidden-x"
                     >No query data</code></pre>
             </span>
