@@ -836,9 +836,7 @@ class Handler implements ExceptionHandlerContract
                         ? $this->renderExceptionWithCustomRenderer($e)
                         : $this->renderException($e);
         } catch (Throwable $e) {
-            return rescue(fn () => $this->renderException($e), function () use ($e) {
-                return $this->renderExceptionWithSymfony($e, config('app.debug'));
-            });
+            return $this->renderExceptionWithSymfony($e, config('app.debug'));
         }
     }
 
