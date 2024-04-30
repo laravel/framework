@@ -35,7 +35,7 @@ class Frame
     protected $basePath;
 
     /**
-     * Create a new trace frame instance.
+     * Create a new frame instance.
      *
      * @param  \Symfony\Component\ErrorHandler\Exception\FlattenException  $exception
      * @param  array<string, string>  $classMap
@@ -52,7 +52,7 @@ class Frame
     }
 
     /**
-     * Get the frame's source.
+     * Get the frame's source / origin.
      *
      * @return string
      */
@@ -65,7 +65,7 @@ class Frame
     }
 
     /**
-     * Get the frame class.
+     * Get the frame class, if any.
      *
      * @return string|null
      */
@@ -87,7 +87,7 @@ class Frame
     }
 
     /**
-     * Get the frame line.
+     * Get the frame line number.
      *
      * @return int
      */
@@ -97,7 +97,7 @@ class Frame
     }
 
     /**
-     * Get the frame function.
+     * Get the frame function or method.
      *
      * @return string
      */
@@ -110,7 +110,7 @@ class Frame
     }
 
     /**
-     * Get the frame snippet.
+     * Get the frame code snippet.
      *
      * @return string
      */
@@ -126,7 +126,7 @@ class Frame
     }
 
     /**
-     * Determine if the frame is from a vendor package.
+     * Determine if the frame is from the vendor directory.
      *
      * @return bool
      */
