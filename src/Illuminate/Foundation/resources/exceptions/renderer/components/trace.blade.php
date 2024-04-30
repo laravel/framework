@@ -41,10 +41,6 @@
 
         <div class="mb-12 space-y-2">
             @foreach ($exception->frames() as $frame)
-                @php
-                    /** @var \Illuminate\Foundation\Exceptions\Renderer\Frame $frame */
-                @endphp
-
                 @if (! $frame->isFromVendor())
                     @php
                         $vendorFramesCollapsed = $exception->frames()->take($loop->index)->reverse()->takeUntil(fn ($frame) => ! $frame->isFromVendor());
