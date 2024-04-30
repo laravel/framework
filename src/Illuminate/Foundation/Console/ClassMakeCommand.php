@@ -37,9 +37,14 @@ class ClassMakeCommand extends GeneratorCommand
      */
     protected function getStub()
     {
-        return $this->option('invokable')
-            ? $this->resolveStubPath('/stubs/class.invokable.stub')
-            : $this->resolveStubPath('/stubs/class.stub');
+        if ($this->option('invokable')) {
+            return $this->resolveStubPath('/stubs/class.invokable.stub');
+        }
+        if ($this->option('abstract')) {
+            return $this->resolveStubPath('/stubs/class.abstract.stub');
+        }
+
+        return $this->resolveStubPath('/stubs/class.stub');
     }
 
     /**
