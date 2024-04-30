@@ -1,7 +1,6 @@
 <div class="hidden overflow-x-auto sm:col-span-1 lg:block">
     <div
-        class="scrollbar-hidden trace text-sm text-gray-400 dark:text-gray-300"
-        style="height: 35.5rem"
+        class="h-[35.5rem] scrollbar-hidden trace text-sm text-gray-400 dark:text-gray-300"
     >
         <div class="mb-2 inline-block rounded-full bg-red-500/20 px-3 py-2 dark:bg-red-500/20 sm:col-span-1">
             <button
