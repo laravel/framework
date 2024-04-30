@@ -72,8 +72,8 @@
                                 : 'hover:bg-gray-100/75 dark:hover:bg-gray-800/75'
                         "
                     >
-                        <div class="border-l-2 border-transparent p-2 overflow-x-auto scrollbar-hidden">
-                            <div class="text-gray-900 dark:text-gray-300 nowrap">
+                        <div class="scrollbar-hidden overflow-x-auto border-l-2 border-transparent p-2">
+                            <div class="nowrap text-gray-900 dark:text-gray-300">
                                 <span class="inline-flex items-baseline">
                                     <span class="text-gray-900 dark:text-gray-300">{{ $frame->source() }}</span>
                                     <span class="font-mono text-xs">:{{ $frame->line() }}</span>
