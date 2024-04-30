@@ -11,11 +11,11 @@ use Throwable;
 class Renderer
 {
     /**
-     * The path to the renderer's CSS and JavaScript files.
+     * The path to the renderer's distribution files.
      *
      * @var string
      */
-    public const DIST = __DIR__.'/../../resources/exceptions/renderer/dist/';
+    protected const DIST = __DIR__.'/../../resources/exceptions/renderer/dist/';
 
     /**
      * The view factory instance.
@@ -77,7 +77,7 @@ class Renderer
     }
 
     /**
-     * Renders the given exception as HTML.
+     * Renders the given exception as HTML string.
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \Throwable  $throwable
