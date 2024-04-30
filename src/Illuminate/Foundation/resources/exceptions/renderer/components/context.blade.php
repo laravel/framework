@@ -24,9 +24,12 @@
                     >{{ $value }}</code></pre>
             </div>
         @empty
-            <div class="flex items-center gap-2">
-                <span class="px-5 py-3 text-sm lg:text-md">No headers data</span>
-            </div>
+            <span class="flex-grow min-w-0" style="-webkit-mask-image: linear-gradient(90deg,transparent 0,#000 1rem,#000 calc(100% - 3rem),transparent calc(100% - 1rem))">
+                <pre class="mx-5 my-3 overflow-y-hidden scrollbar-hidden text-xs lg:text-sm"><code
+                        data-highlighted="yes"
+                        class="overflow-y-hidden scrollbar-hidden overflow-x-scroll scrollbar-hidden-x"
+                    >No headers data</code></pre>
+            </span>
         @endforelse
     </dl>
 
@@ -34,7 +37,7 @@
         <span class="font-semibold text-gray-900 dark:text-white">Body</span>
     </div>
 
-    <dl class="mt-1 grid grid-cols-1 border rounded dark:border-gray-800">
+    <div class="mt-1 border rounded dark:border-gray-800">
         <div class="flex items-center>
             <span class="flex-grow min-w-0" style="-webkit-mask-image: linear-gradient(90deg,transparent 0,#000 1rem,#000 calc(100% - 3rem),transparent calc(100% - 1rem))">
                 <pre class="mx-5 my-3 overflow-y-hidden scrollbar-hidden text-xs lg:text-sm"><code
@@ -43,7 +46,7 @@
                     >{!! $exception->requestBody() ?: 'No body data' !!}</code></pre>
             </span>
         </div>
-    </dl>
+    </div>
 
     <div class="mt-4">
         <span class="font-semibold text-gray-900 dark:text-white">
@@ -54,7 +57,6 @@
                 only the first 100 queries are displayed
             @endif
         </span>
-
     </div>
 
     <dl class="mt-1 grid grid-cols-1 border rounded dark:border-gray-800">
@@ -71,9 +73,12 @@
                 </span>
             </div>
         @empty
-            <div class="flex items-center gap-2">
-                <span class="px-5 py-3">No query data</span>
-            </div>
+            <span class="flex-grow min-w-0" style="-webkit-mask-image: linear-gradient(90deg,transparent 0,#000 1rem,#000 calc(100% - 3rem),transparent calc(100% - 1rem))">
+                <pre class="mx-5 my-3 overflow-y-hidden scrollbar-hidden text-xs lg:text-sm"><code
+                        data-highlighted="yes"
+                        class="overflow-y-hidden scrollbar-hidden overflow-x-scroll scrollbar-hidden-x"
+                    >No query data</code></pre>
+            </span>
         @endforelse
     </dl>
 </x-laravel-exceptions-renderer::card>
