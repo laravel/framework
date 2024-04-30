@@ -63,6 +63,7 @@ class ClassMakeCommand extends GeneratorCommand
     protected function getOptions()
     {
         return [
+            ['abstract', 'a', InputOption::VALUE_NONE, 'Generate a abstract class'],
             ['invokable', 'i', InputOption::VALUE_NONE, 'Generate a single method, invokable class'],
             ['force', 'f', InputOption::VALUE_NONE, 'Create the class even if the class already exists'],
         ];
