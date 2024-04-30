@@ -41,6 +41,8 @@ class Exception
      * Creates a new exception renderer instance.
      *
      * @param  \Symfony\Component\ErrorHandler\Exception\FlattenException  $exception
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Illuminate\Foundation\Exceptions\Renderer\Listener  $listener
      * @param  string  $basePath
      * @return void
      */
@@ -97,7 +99,7 @@ class Exception
     }
 
     /**
-     * Get the exception message trace.
+     * Get the exception's frames.
      *
      * @return \Illuminate\Support\Collection<int, Frame>
      */
@@ -132,7 +134,7 @@ class Exception
     }
 
     /**
-     * Get the request's body parameters.
+     * Get the request's body parameters that caused the exception.
      *
      * @return string|null
      */
@@ -148,7 +150,7 @@ class Exception
     }
 
     /**
-     * Get the exception's headers.
+     * Get the request's headers that caused the exception.
      *
      * @return array<string, string>
      */
@@ -160,12 +162,12 @@ class Exception
     }
 
     /**
-     * Get the exception listener instance.
+     * Get the SQL queries that caused the exception.
      *
-     * @return \Illuminate\Foundation\Exceptions\Renderer\Listener
+     * @return array<int, array{sql: string, time: float}>
      */
-    public function listener()
+    public function queries()
     {
-        return $this->listener;
+        return $this->listener->queries();
     }
 }

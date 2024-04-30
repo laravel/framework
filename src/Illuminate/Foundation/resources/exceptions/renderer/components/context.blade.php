@@ -66,14 +66,14 @@
     <div class="mt-4">
         <span class="font-semibold text-gray-900 dark:text-white"> Queries </span>
         <span class="text-xs text-gray-500 dark:text-gray-400">
-            @if (count($exception->listener()->queries()) === 100)
+            @if (count($exception->queries()) === 100)
                 only the first 100 queries are displayed
             @endif
         </span>
     </div>
 
     <dl class="mt-1 grid grid-cols-1 rounded border dark:border-gray-800">
-        @forelse ($exception->listener()->queries() as ['connectionName' => $connectionName, 'sql' => $sql, 'time' => $time])
+        @forelse ($exception->queries() as ['connectionName' => $connectionName, 'sql' => $sql, 'time' => $time])
             <div class="flex items-center gap-2 {{ $loop->first ? '' : 'border-t' }} dark:border-gray-800">
                 <div class="lg:text-md w-[8rem] flex-none truncate border-r px-5 py-3 text-sm dark:border-gray-800 lg:w-[12rem]">
                     <span>{{ $connectionName }}</span>
