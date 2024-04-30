@@ -7,5 +7,9 @@ php:
 js:
   finder:
     not-name:
+      - src/Illuminate/Foundation/resources/exceptions/renderer/dist
       - webpack.mix.js
-css: true
+css:
+  finder:
+    not-name:
+      - src/Illuminate/Foundation/resources/exceptions/renderer/dist
