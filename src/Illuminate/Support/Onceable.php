@@ -65,11 +65,13 @@ class Onceable
             fn (mixed $argument) => is_object($argument) ? spl_object_hash($argument) : $argument,
             $callable instanceof Closure ? (new ReflectionClosure($callable))->getClosureUsedVariables() : [],
         );
+        $class = $callable instanceof Closure ? (new ReflectionClosure($callable))->getClosureCalledClass()?->getName() : null;
+        $class ??= isset($trace[1]['class']) ? $trace[1]['class'] : null;
 
         return md5(sprintf(
             '%s@%s%s:%s (%s)',
             $trace[0]['file'],
-            isset($trace[1]['class']) ? ($trace[1]['class'].'@') : '',
+            $class ? $class.'@' : '',
             $trace[1]['function'],
             $trace[0]['line'],
             serialize($uses),
