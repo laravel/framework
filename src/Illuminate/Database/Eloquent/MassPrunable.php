@@ -15,14 +15,21 @@ trait MassPrunable
      */
     public function pruneAll(int $chunkSize = 1000)
     {
-        $query = $this->prunable();
         $total = 0;
         $isSoftDeletes = in_array(SoftDeletes::class, class_uses_recursive(get_class($this)));
 
-        $query->chunk($chunkSize, function ($models) use (&$total, $isSoftDeletes) {
-            $count = $isSoftDeletes ? $models->forceDelete() : $models->delete();
+        $query = $this->prunable()->limit($chunkSize);
+
+        do {
+            $count = $isSoftDeletes ? $query->forceDelete() : $query->delete();
             $total += $count;
-        });
+
+            // To handle the next chunk if needed
+            if ($count == $chunkSize) {
+                $query = $this->prunable()->limit($chunkSize);
+            }
+
+        } while ($count > 0);
 
         if ($total > 0) {
             event(new ModelsPruned(static::class, $total));
