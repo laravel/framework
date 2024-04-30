@@ -30,4 +30,15 @@ class ClassMakeCommandTest extends TestCase
             'public function __invoke()',
         ], 'app/Notification.php');
     }
+
+    public function testItCanGenerateAbstractClassFile()
+    {
+        $this->artisan('make:class', ['name' => 'Controller', '--abstract' => true])
+            ->assertExitCode(0);
+
+        $this->assertFileContains([
+            'namespace App;',
+            'abstract class Controller',
+        ], 'app/Controller.php');
+    }
 }
