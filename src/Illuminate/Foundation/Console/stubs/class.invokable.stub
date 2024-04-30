@@ -1,5 +1,7 @@
 <?php
 
+{{ strict_types }}
+
 namespace {{ namespace }};
 
 class {{ class }}
