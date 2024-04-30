@@ -90,10 +90,11 @@ jobs:
       - name: Cleanup release notes
         id: cleaned-notes
         run: |
-          NOTES="${{ steps.generated-notes.outputs.release-notes }}"
           NOTES=$(echo $NOTES | sed '/## What/d')
           NOTES=$(echo $NOTES | sed '/## New Contributors/,$d')
           echo "release-notes=${NOTES}" >> "$GITHUB_OUTPUT"
+        env:
+          NOTES: ${{ steps.generated-notes.outputs.release-notes }}
 
       - name: Create release
         uses: softprops/action-gh-release@v2
