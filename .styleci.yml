@@ -6,10 +6,11 @@ php:
       - bad-syntax-strategy.php
 js:
   finder:
-    not-name:
+    exclude:
       - src/Illuminate/Foundation/resources/exceptions/renderer/dist
+    not-name:
       - webpack.mix.js
 css:
   finder:
-    not-name:
+    exclude:
       - src/Illuminate/Foundation/resources/exceptions/renderer/dist
