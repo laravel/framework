@@ -74,7 +74,7 @@ class Frame
      */
     public function editorHref()
     {
-        return $this->resolveSourceHref($this->frame['file'], $this->frame['line']);
+        return $this->resolveSourceHref($this->frame['file'], $this->line());
     }
 
     /**
@@ -106,7 +106,9 @@ class Frame
      */
     public function line()
     {
-        return $this->frame['line'];
+        $maxLines = count(file($this->frame['file']) ?: []);
+
+        return $this->frame['line'] > $maxLines ? 1 : $this->frame['line'];
     }
 
     /**
@@ -131,7 +133,7 @@ class Frame
     {
         $contents = file($this->frame['file']) ?: [];
 
-        $start = max($this->frame['line'] - 6, 0);
+        $start = max($this->line() - 6, 0);
 
         $length = 8 * 2 + 1;
 
