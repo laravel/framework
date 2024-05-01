@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace Illuminate\Validation\Rules;
 
 use BackedEnum;
@@ -19,9 +17,9 @@ class ArrayRule implements Stringable
     protected $keys;
 
     /**
-     * Create a new in rule instance.
+     * Create a new array rule instance.
      *
-     * @param  \Illuminate\Contracts\Support\Arrayable|\BackedEnum|\UnitEnum|array|string|null  $values
+     * @param  array|null  $keys
      * @return void
      */
     public function __construct($keys = null)
@@ -40,7 +38,7 @@ class ArrayRule implements Stringable
      */
     public function __toString()
     {
-        if (! $this->keys) {
+        if (empty($this->keys)) {
             return 'array';
         }
 
