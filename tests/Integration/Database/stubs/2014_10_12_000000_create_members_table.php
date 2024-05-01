@@ -11,7 +11,7 @@ class CreateMembersTable extends Migration
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::create('members', function (Blueprint $table) {
             $table->increments('id');
@@ -28,7 +28,7 @@ class CreateMembersTable extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::drop('members');
     }
