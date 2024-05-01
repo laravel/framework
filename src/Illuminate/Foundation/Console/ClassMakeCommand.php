@@ -98,7 +98,7 @@ class ClassMakeCommand extends GeneratorCommand
         return [
             ['invokable', 'i', InputOption::VALUE_NONE, 'Generate a single method, invokable class'],
             ['force', 'f', InputOption::VALUE_NONE, 'Create the class even if the class already exists'],
-            ['strict', 's', InputOption::VALUE_NONE, 'Add strict mode to the class']
+            ['strict', 's', InputOption::VALUE_NONE, 'Add strict mode to the class'],
         ];
     }
 }

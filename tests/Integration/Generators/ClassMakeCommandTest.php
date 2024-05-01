@@ -6,7 +6,7 @@ class ClassMakeCommandTest extends TestCase
 {
     protected array $files = [
         'app/Reverb.php',
-        'app/Notification.php'
+        'app/Notification.php',
     ];
 
     public function testItCanGenerateClassFile(): void
