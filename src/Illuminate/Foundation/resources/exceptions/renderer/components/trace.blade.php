@@ -14,28 +14,14 @@
                     >Expand</span
                 >
                 <span class="ml-1">vendor frames</span>
-                <svg
-                    x-show="includeVendorFrames"
-                    x-cloak
-                    xmlns="http://www.w3.org/2000/svg"
-                    class="ml-1 h-4 w-4"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                >
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                </svg>
-                <svg
-                    x-cloak
-                    x-show="!includeVendorFrames"
-                    xmlns="http://www.w3.org/2000/svg"
-                    class="ml-1 h-4 w-4"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                >
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
-                </svg>
+
+                <span x-cloak x-show="includeVendorFrames">
+                    <x-laravel-exceptions-renderer::icons.chevron-up x-cloak x-show="!includeVendorFrames" class="ml-1 h-4 w-4" />
+                </span>
+
+                <span x-cloak x-show="!includeVendorFrames">
+                    <x-laravel-exceptions-renderer::icons.chevron-down class="ml-1 h-4 w-4" />
+                </span>
             </button>
         </div>
 
