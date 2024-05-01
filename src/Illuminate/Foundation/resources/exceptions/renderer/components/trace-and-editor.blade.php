@@ -5,7 +5,7 @@
             index: {{ $exception->defaultFrame() }},
         }"
     >
-        <div class="grid grid-cols-1 gap-6 lg:grid-cols-3" x-clock x-if="true">
+        <div class="grid grid-cols-1 gap-6 lg:grid-cols-3" x-clock>
             <x-laravel-exceptions-renderer::trace :$exception />
             <x-laravel-exceptions-renderer::editor :$exception />
         </div>
