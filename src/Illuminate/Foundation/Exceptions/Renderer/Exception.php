@@ -162,11 +162,42 @@ class Exception
     }
 
     /**
-     * Get the SQL queries that caused the exception.
+     * Get the application route context that caused the exception.
+     *
+     * @return array<string, string>|null
+     */
+    public function applicationRouteContext()
+    {
+        $route = $this->request()->route();
+
+        return $route ? array_filter([
+            'controller' => $route->getActionName(),
+            'route name' => $route->getName() ?: null,
+            'middleware' => implode(', ', $route->gatherMiddleware()),
+        ]) : null;
+    }
+
+    /**
+     * Get the application route parameters context that caused the exception.
+     *
+     * @return array<string, mixed>|null
+     */
+    public function applicationRouteParametersContext()
+    {
+        $parameters = $this->request()->route()->parameters();
+
+        return $parameters ? json_encode(array_map(
+            fn ($value) => $value instanceof Model ? $value->withoutRelations() : $value,
+            $parameters
+        ), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT) : null;
+    }
+
+    /**
+     * Get the application SQL queries that caused the exception.
      *
      * @return array<int, array{connectionName: string, time: float, sql: string}>
      */
-    public function queries()
+    public function applicationQueries()
     {
         return array_map(function (array $query) {
             $sql = $query['sql'];
