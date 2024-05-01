@@ -20,9 +20,10 @@
             </div>
         </div>
         <div class="pt-4 text-sm text-gray-500 dark:text-gray-400">
-            <pre x-data="{}"><template x-if="true"><code
+            <pre class="h-[32.5rem]"><template x-if="true"><code
+                    style="display: none;"
                     id="frame-{{ $loop->index }}"
-                    class="h-[32.5rem] language-php highlightable-code @if($loop->index === $exception->defaultFrame()) default-highlightable-code @endif scrollbar-hidden rounded-md dark:bg-gray-800 border dark:border-gray-700 overflow-y-hidden"
+                    class=" language-php highlightable-code @if($loop->index === $exception->defaultFrame()) default-highlightable-code @endif scrollbar-hidden rounded-md dark:bg-gray-800 border dark:border-gray-700 overflow-y-hidden"
                     data-line-number="{{ $frame->line() }}"
                     data-ln-start-from="{{ max($frame->line() - 5, 1) }}"
                 >{{ $frame->snippet() }}</code></template></pre>
