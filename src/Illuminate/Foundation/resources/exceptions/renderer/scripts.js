@@ -9,15 +9,11 @@ hljs.registerLanguage('php', php);
 
 window.hljs = hljs;
 
-hljs.highlightElement(document.querySelector('.default-highlightable-code'), {
-    language: 'php',
-});
+hljs.highlightElement(document.querySelector('.default-highlightable-code'));
 
 document.querySelectorAll('.highlightable-code').forEach((block) => {
     if (block.dataset.highlighted !== 'yes') {
-        hljs.highlightElement(block, {
-            language: 'php',
-        });
+        hljs.highlightElement(block);
     }
 });
 
