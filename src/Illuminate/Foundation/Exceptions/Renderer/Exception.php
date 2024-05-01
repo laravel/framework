@@ -173,10 +173,9 @@ class Exception
 
             foreach ($query['bindings'] as $binding) {
                 $sql = match (gettype($binding)) {
-                    'string' => preg_replace('/\?/', "'$binding'", $sql, 1),
                     'integer', 'double' => preg_replace('/\?/', $binding, $sql, 1),
                     'NULL' => preg_replace('/\?/', 'NULL', $sql, 1),
-                    default => $sql,
+                    default => preg_replace('/\?/', "'$binding'", $sql, 1),
                 };
             }
 
