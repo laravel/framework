@@ -164,10 +164,27 @@ class Exception
     /**
      * Get the SQL queries that caused the exception.
      *
-     * @return array<int, array{sql: string, time: float}>
+     * @return array<int, array{connectionName: string, time: float, sql: string}>
      */
     public function queries()
     {
-        return $this->listener->queries();
+        return array_map(function (array $query) {
+            $sql = $query['sql'];
+
+            foreach ($query['bindings'] as $binding) {
+                $sql = match (gettype($binding)) {
+                    'string' => preg_replace('/\?/', "'$binding'", $sql, 1),
+                    'integer', 'double' => preg_replace('/\?/', $binding, $sql, 1),
+                    'NULL' => preg_replace('/\?/', 'NULL', $sql, 1),
+                    default => $sql,
+                };
+            }
+
+            return [
+                'connectionName' => $query['connectionName'],
+                'time' => $query['time'],
+                'sql' => $sql,
+            ];
+        }, $this->listener->queries());
     }
 }

@@ -14,7 +14,7 @@ class Listener
     /**
      * The queries that have been executed.
      *
-     * @var array<int, array{connectionName: string, time: float, sql: string}>
+     * @var array<int, array{connectionName: string, time: float, sql: string, bindings: array}>
      */
     protected $queries = [];
 
@@ -61,6 +61,7 @@ class Listener
             'connectionName' => $event->connectionName,
             'time' => $event->time,
             'sql' => $event->sql,
+            'bindings' => $event->bindings,
         ];
     }
 }
