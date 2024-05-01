@@ -23,4 +23,3 @@ tippy('[data-tippy-content]', {
     theme: 'material',
     animation: 'scale',
 });
-
