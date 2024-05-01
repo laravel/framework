@@ -70,12 +70,14 @@
                 </button>
 
                 @if (! $frame->isFromVendor() && $exception->frames()->slice($loop->index + 1)->filter(fn ($frame) => ! $frame->isFromVendor())->isEmpty())
-                    <div x-show="! includeVendorFrames">
-                        <div class="text-gray-500">
-                            {{ $exception->frames()->slice($loop->index + 1)->count() }} vendor
-                            frame{{ $exception->frames()->slice($loop->index + 1)->count() > 1 ? 's' : '' }} collapsed
+                    @if ($exception->frames()->slice($loop->index + 1)->count())
+                        <div x-show="! includeVendorFrames">
+                            <div class="text-gray-500">
+                                {{ $exception->frames()->slice($loop->index + 1)->count() }} vendor
+                                frame{{ $exception->frames()->slice($loop->index + 1)->count() > 1 ? 's' : '' }} collapsed
+                            </div>
                         </div>
-                    </div>
+                    @endif
                 @endif
             @endforeach
         </div>
