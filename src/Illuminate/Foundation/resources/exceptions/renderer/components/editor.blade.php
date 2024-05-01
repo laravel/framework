@@ -6,7 +6,15 @@
         <div class="mb-3">
             <div class="text-md text-gray-500 dark:text-gray-400">
                 <div class="mb-2">
-                    <span class="wrap text-gray-900 dark:text-gray-300">{{ $frame->file() }}</span>
+
+                    @if (config('app.editor'))
+                        <a href="{{ $frame->editorHref() }}" class="text-blue-500 hover:underline">
+                            <span class="wrap text-gray-900 dark:text-gray-300">{{ $frame->file() }}</span>
+                        </a>
+                    @else
+                        <span class="wrap text-gray-900 dark:text-gray-300">{{ $frame->file() }}</span>
+                    @endif
+
                     <span class="font-mono text-xs">:{{ $frame->line() }}</span>
                 </div>
             </div>

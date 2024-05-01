@@ -2,10 +2,13 @@
 
 namespace Illuminate\Foundation\Exceptions\Renderer;
 
+use Illuminate\Foundation\Concerns\ResolvesDumpSource;
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
 
 class Frame
 {
+    use ResolvesDumpSource;
+
     /**
      * The "flatten" exception instance.
      *
@@ -62,6 +65,16 @@ class Frame
             is_string($this->class()) => $this->class(),
             default => $this->file(),
         };
+    }
+
+    /**
+     * Get the frame's editor link.
+     *
+     * @return string
+     */
+    public function editorHref()
+    {
+        return $this->resolveSourceHref($this->frame['file'], $this->frame['line']);
     }
 
     /**
