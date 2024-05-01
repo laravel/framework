@@ -66,7 +66,9 @@ class FoundationServiceProvider extends AggregateServiceProvider
             ], 'laravel-errors');
         }
 
-        $this->app->make(Listener::class)->registerListeners($this->app->make(Dispatcher::class));
+        if ($this->app->hasDebugModeEnabled()) {
+            $this->app->make(Listener::class)->registerListeners($this->app->make(Dispatcher::class));
+        }
     }
 
     /**
@@ -213,6 +215,10 @@ class FoundationServiceProvider extends AggregateServiceProvider
      */
     protected function registerExceptionsRenderer()
     {
+        if (! $this->app->hasDebugModeEnabled()) {
+            return;
+        }
+
         $this->loadViewsFrom(__DIR__.'/../resources/exceptions/renderer', 'laravel-exceptions-renderer');
 
         $this->app->singleton(Renderer::class, function (Application $app) {
