@@ -23,7 +23,7 @@
             <pre class="h-[32.5rem] rounded-md dark:bg-gray-800 border dark:border-gray-700"><template x-if="true"><code
                     style="display: none;"
                     id="frame-{{ $loop->index }}"
-                    class=" language-php highlightable-code @if($loop->index === $exception->defaultFrame()) default-highlightable-code @endif scrollbar-hidden overflow-y-hidden"
+                    class="language-php highlightable-code @if($loop->index === $exception->defaultFrame()) default-highlightable-code @endif scrollbar-hidden overflow-y-hidden"
                     data-line-number="{{ $frame->line() }}"
                     data-ln-start-from="{{ max($frame->line() - 5, 1) }}"
                 >{{ $frame->snippet() }}</code></template></pre>
