@@ -115,7 +115,6 @@ class RefreshCommand extends Command
             '--path' => $path,
             '--realpath' => $this->input->getOption('realpath'),
             '--force' => true,
-            '--skip' => $this->input->getOption('skip'),
         ]));
     }
 
