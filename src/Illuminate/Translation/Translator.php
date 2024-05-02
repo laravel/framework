@@ -238,6 +238,10 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
     {
         foreach ($lines as $key => $value) {
             [$group, $item] = explode('.', $key, 2);
+            
+            if (!$this->isLoaded($namespace, $group, $locale)) {
+                $this->load($namespace, $group, $locale);
+            }
 
             Arr::set($this->loaded, "$namespace.$group.$locale.$item", $value);
         }
