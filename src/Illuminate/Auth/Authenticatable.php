@@ -9,14 +9,14 @@ trait Authenticatable
      *
      * @var string
      */
-    protected $authNameKey = 'name';
+    protected $authNameKey = 'Name';
 
     /**
      * The column name of the "email" field.
      *
      * @var string
      */
-    protected $authEmailName = 'email';
+    protected $authEmailName = 'Email';
     
     /**
      * The column name of the password field using during authentication.
@@ -62,7 +62,7 @@ trait Authenticatable
         return $this->getAuthIdentifier();
     }
 
-    /**
+        /**
      * Get the name of the "name" attribute for the user.
      *
      * @return string
@@ -83,7 +83,7 @@ trait Authenticatable
     }
 
     /**
-     * Get the name of the email attribute for the user.
+     * Get the name of the "email" attribute for the user.
      *
      * @return string
      */
@@ -101,7 +101,7 @@ trait Authenticatable
     {
         return $this->{$this->getAuthEmailName()};
     }
-
+    
     /**
      * Get the name of the password attribute for the user.
      *
