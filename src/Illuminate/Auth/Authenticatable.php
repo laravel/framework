@@ -99,7 +99,7 @@ trait Authenticatable
      */
     public function getAuthEmail()
     {
-        return $this->{$this->getAuthEmail()};
+        return $this->{$this->getAuthEmailName()};
     }
 
     /**
