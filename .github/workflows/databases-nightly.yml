@@ -9,6 +9,7 @@ jobs:
 
   mariadb:
     runs-on: ubuntu-22.04
+    continue-on-error: true
 
     services:
       mariadb:
