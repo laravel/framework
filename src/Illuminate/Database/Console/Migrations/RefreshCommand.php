@@ -159,6 +159,7 @@ class RefreshCommand extends Command
             ['seed', null, InputOption::VALUE_NONE, 'Indicates if the seed task should be re-run'],
             ['seeder', null, InputOption::VALUE_OPTIONAL, 'The class name of the root seeder'],
             ['step', null, InputOption::VALUE_OPTIONAL, 'The number of migrations to be reverted & re-run'],
+            ['skip', null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, 'The file name(s) of the migrations to skip'],
         ];
     }
 }
