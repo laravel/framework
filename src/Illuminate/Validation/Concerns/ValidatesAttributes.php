@@ -1153,10 +1153,6 @@ trait ValidatesAttributes
 
         $this->shouldBeNumeric($attribute, 'Gt');
 
-        if (is_null($comparedToValue) && (is_numeric($value) && is_numeric($parameters[0]))) {
-            return BigNumber::of($this->getSize($attribute, $value))->isGreaterThan($this->trim($parameters[0]));
-        }
-
         if (is_numeric($parameters[0])) {
             return false;
         }
@@ -1187,10 +1183,6 @@ trait ValidatesAttributes
         $comparedToValue = $this->getValue($parameters[0]);
 
         $this->shouldBeNumeric($attribute, 'Lt');
-
-        if (is_null($comparedToValue) && (is_numeric($value) && is_numeric($parameters[0]))) {
-            return BigNumber::of($this->getSize($attribute, $value))->isLessThan($this->trim($parameters[0]));
-        }
 
         if (is_numeric($parameters[0])) {
             return false;
@@ -1223,10 +1215,6 @@ trait ValidatesAttributes
 
         $this->shouldBeNumeric($attribute, 'Gte');
 
-        if (is_null($comparedToValue) && (is_numeric($value) && is_numeric($parameters[0]))) {
-            return BigNumber::of($this->getSize($attribute, $value))->isGreaterThanOrEqualTo($this->trim($parameters[0]));
-        }
-
         if (is_numeric($parameters[0])) {
             return false;
         }
@@ -1257,10 +1245,6 @@ trait ValidatesAttributes
         $comparedToValue = $this->getValue($parameters[0]);
 
         $this->shouldBeNumeric($attribute, 'Lte');
-
-        if (is_null($comparedToValue) && (is_numeric($value) && is_numeric($parameters[0]))) {
-            return BigNumber::of($this->getSize($attribute, $value))->isLessThanOrEqualTo($this->trim($parameters[0]));
-        }
 
         if (is_numeric($parameters[0])) {
             return false;
