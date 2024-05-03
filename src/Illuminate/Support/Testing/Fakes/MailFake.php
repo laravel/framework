@@ -177,6 +177,27 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
     }
 
     /**
+     * Assert if a mailable was queued on desired queue based on truth-test callaback.
+     *
+     * @param  string $mailable
+     * @param  string $queue
+     * @param callable|int|null $callback
+     * @return void
+     */
+    public function assertQueuedOn($mailable, $queue, $callback = null)
+    {
+        $message = "The expected [{$mailable}] mailable was not queued on {$queue}";
+
+        $message .= ($actualQueue = $this->queued($mailable, $callback)->first()?->queue) ?
+            " but actual queue was {$actualQueue}." : ".";
+
+        PHPUnit::assertTrue(
+            $this->queuedOn($mailable, $queue)->count() > 0,
+            $message
+        );
+    }
+
+    /**
      * Assert if a mailable was queued a number of times.
      *
      * @param  string  $mailable
@@ -323,6 +344,18 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
         $callback = $callback ?: fn () => true;
 
         return $this->queuedMailablesOf($mailable)->filter(fn ($mailable) => $callback($mailable));
+    }
+
+    /**
+     * Determine if the given mailable has been queued on the given queue
+     *
+     * @param string $mailable
+     * @param string $queue
+     * @return \Illuminate\Support\Collection
+     */
+    public function queuedOn($mailable, $queue)
+    {
+        return $this->queued($mailable)->filter(fn($mailable) => $mailable->queue == $queue);
     }
 
     /**
@@ -481,9 +514,37 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
 
         $view->mailer($this->currentMailer);
 
+        if (is_string($queue)) {
+            $view->onQueue($queue);
+        }
+
         $this->currentMailer = null;
 
         $this->queuedMailables[] = $view;
+    }
+
+    /**
+     * Queue a new mail message for sending on the given queue.
+     *
+     * @param string|null $queue
+     * @param  \Illuminate\Contracts\Mail\Mailable|string|array  $view
+     * @return mixed
+     */
+    public function onQueue($queue, $view)
+    {
+        return $this->queue($view, $queue);
+    }
+
+    /**
+     * Queue a new mail message for sending on the given queue.
+     *
+     * @param string|null $queue
+     * @param  \Illuminate\Contracts\Mail\Mailable|string|array  $view
+     * @return mixed
+     */
+    public function queueOn($queue, $view)
+    {
+        return $this->queue($view, $queue);
     }
 
     /**

@@ -162,6 +162,29 @@ class SupportTestingMailFakeTest extends TestCase
         $this->fake->assertQueued(MailableStub::class);
     }
 
+    public function testAssertQueuedOn()
+    {
+        $mailable = new QueueableMailableStub();
+        try {
+            $this->fake->to('taylor@laravel.com')->queue($mailable);
+            $this->fake->assertQueuedOn(QueueableMailableStub::class,'default');
+        } catch (ExpectationFailedException $e) {
+            $this->assertStringContainsString('The expected [Illuminate\Tests\Support\QueueableMailableStub] mailable was not queued on default.', $e->getMessage());
+        }
+
+        try {
+            $this->fake->to('taylor@laravel.com')->queue($mailable->onQueue('foo'));
+            $this->fake->assertQueuedOn(QueueableMailableStub::class,'baa');
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertStringContainsString('The expected [Illuminate\Tests\Support\QueueableMailableStub] mailable was not queued on baa but actual queue was foo.', $e->getMessage());
+        }
+
+        $this->fake->onQueue('default', $mailable);
+
+        $this->fake->assertQueuedOn(QueueableMailableStub::class,'default');
+    }
+
     public function testAssertQueuedTimes()
     {
         $this->fake->to('taylor@laravel.com')->queue($this->mailable);
@@ -302,6 +325,8 @@ class QueueableMailableStub extends Mailable implements ShouldQueue
 
     protected $version = '6.0';
 
+    public $queue;
+
     /**
      * Build the message.
      *
@@ -311,6 +336,19 @@ class QueueableMailableStub extends Mailable implements ShouldQueue
     {
         $this->with('first_name', 'Taylor')
              ->withLastName('Otwell');
+    }
+
+    /**
+     * Set the desired queue for the mail.
+     *
+     * @param $queue
+     * @return $this
+     */
+    public function onQueue($queue)
+    {
+        $this->queue = $queue;
+
+        return $this;
     }
 }
 
