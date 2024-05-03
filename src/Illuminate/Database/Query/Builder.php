@@ -2564,7 +2564,7 @@ class Builder implements BuilderContract
     /**
      * Set the "limit" value of the query.
      *
-     * @param  int  $value
+     * @param  int|null  $value
      * @return $this
      */
     public function limit($value)

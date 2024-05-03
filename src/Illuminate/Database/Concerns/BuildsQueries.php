@@ -451,7 +451,7 @@ trait BuildsQueries
             $addCursorConditions($this, null, null, 0);
         }
 
-        $this->limit($perPage + 1);
+        $this->limit($perPage < 0 ? null : $perPage + 1);
 
         return $this->cursorPaginator($this->get($columns), $perPage, $cursor, [
             'path' => Paginator::resolveCurrentPath(),
