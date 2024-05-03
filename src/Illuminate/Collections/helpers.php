@@ -96,6 +96,32 @@ if (! function_exists('data_get')) {
     }
 }
 
+if (! function_exists('data_first')) {
+    /**
+     * Get an item from an array or object using first match array of "dot" notation.
+     *
+     * @param  mixed  $target
+     * @param  string|array|int|null  $keys
+     * @param  mixed  $default
+     * @return mixed
+     */
+    function data_first($target, $keys, $default = null)
+    {
+        if (!is_array($keys)) {
+            return data_get($target, $keys, $default);
+        }
+
+        foreach ($keys as $key) {
+            $result = data_get($target, $key);
+            if($result !== null){
+                return $result;
+            }
+        }
+
+        return $default;
+    }
+}
+
 if (! function_exists('data_set')) {
     /**
      * Set an item on an array or object using dot notation.

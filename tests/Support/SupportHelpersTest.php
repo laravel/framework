@@ -188,6 +188,16 @@ class SupportHelpersTest extends TestCase
         $this->assertNull(data_get($arrayAccess, 'email', 'Not found'));
     }
 
+    public function testDataFirst()
+    {
+        $object = (object) ['users' => ['name' => ['Taylor', 'Otwell']], 'framework' => 'Laravel'];
+
+        $this->assertSame('Taylor', data_first($object, 'users.name.0'));
+        $this->assertSame('Taylor', data_first($object, ['users.name.0']));
+        $this->assertSame('Taylor', data_first($object, ['book.name','users.name.0']));
+        $this->assertSame('Laravel', data_first($object, ['framework','users.name.0']));
+    }
+
     public function testDataGetWithNestedArrays()
     {
         $array = [
