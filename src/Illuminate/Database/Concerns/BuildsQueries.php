@@ -523,7 +523,7 @@ trait BuildsQueries
      * Create a new cursor paginator instance.
      *
      * @param  \Illuminate\Support\Collection  $items
-     * @param  int  $perPage
+     * @param  int|null  $perPage
      * @param  \Illuminate\Pagination\Cursor  $cursor
      * @param  array  $options
      * @return \Illuminate\Pagination\CursorPaginator
