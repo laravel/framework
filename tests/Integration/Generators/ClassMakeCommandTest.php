@@ -1,11 +1,14 @@
 <?php
 
-namespace Integration\Generators;
-
-use Illuminate\Tests\Integration\Generators\TestCase;
+namespace Illuminate\Tests\Integration\Generators;
 
 class ClassMakeCommandTest extends TestCase
 {
+    protected array $files = [
+        'app/Reverb.php',
+        'app/Notification.php',
+    ];
+
     public function testItCanGenerateClassFile()
     {
         $this->artisan('make:class', ['name' => 'Reverb'])
