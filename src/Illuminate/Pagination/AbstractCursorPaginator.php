@@ -33,7 +33,7 @@ abstract class AbstractCursorPaginator implements Htmlable
     /**
      * The number of items to be shown per page.
      *
-     * @var int
+     * @var int|null
      */
     protected $perPage;
 
@@ -410,7 +410,7 @@ abstract class AbstractCursorPaginator implements Htmlable
     /**
      * Get the number of items shown per page.
      *
-     * @return int
+     * @return ?int
      */
     public function perPage()
     {

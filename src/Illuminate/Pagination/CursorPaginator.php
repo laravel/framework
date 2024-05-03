@@ -24,7 +24,7 @@ class CursorPaginator extends AbstractCursorPaginator implements Arrayable, Arra
      * Create a new paginator instance.
      *
      * @param  mixed  $items
-     * @param  int  $perPage
+     * @param  int|null  $perPage
      * @param  \Illuminate\Pagination\Cursor|null  $cursor
      * @param  array  $options  (path, query, fragment, pageName)
      * @return void
@@ -37,7 +37,7 @@ class CursorPaginator extends AbstractCursorPaginator implements Arrayable, Arra
             $this->{$key} = $value;
         }
 
-        $this->perPage = (int) $perPage;
+        $this->perPage = $perPage;
         $this->cursor = $cursor;
         $this->path = $this->path !== '/' ? rtrim($this->path, '/') : $this->path;
 
@@ -54,7 +54,7 @@ class CursorPaginator extends AbstractCursorPaginator implements Arrayable, Arra
     {
         $this->items = $items instanceof Collection ? $items : Collection::make($items);
 
-        $this->hasMore = $this->items->count() > $this->perPage;
+        $this->hasMore = $this->items->count() > (int) $this->perPage;
 
         $this->items = $this->items->slice(0, $this->perPage);
 
