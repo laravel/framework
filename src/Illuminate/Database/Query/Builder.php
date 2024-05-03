@@ -2571,7 +2571,7 @@ class Builder implements BuilderContract
     {
         $property = $this->unions ? 'unionLimit' : 'limit';
 
-        if ($value >= 0) {
+        if ((int) $value >= 0) {
             $this->$property = ! is_null($value) ? (int) $value : null;
         }
 
