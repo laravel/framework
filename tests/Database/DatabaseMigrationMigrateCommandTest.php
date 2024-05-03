@@ -28,6 +28,7 @@ class DatabaseMigrationMigrateCommandTest extends TestCase
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
         $migrator->shouldReceive('paths')->once()->andReturn([]);
+        $migrator->shouldReceive('skip')->once()->andReturn([]);
         $migrator->shouldReceive('hasRunAnyMigrations')->andReturn(true);
         $migrator->shouldReceive('usingConnection')->once()->andReturnUsing(function ($name, $callback) {
             return $callback();
@@ -47,6 +48,7 @@ class DatabaseMigrationMigrateCommandTest extends TestCase
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
         $migrator->shouldReceive('paths')->once()->andReturn([]);
+        $migrator->shouldReceive('skip')->once()->andReturn([]);
         $migrator->shouldReceive('hasRunAnyMigrations')->andReturn(false);
         $migrator->shouldReceive('resolveConnection')->andReturn($connection = m::mock(stdClass::class));
         $connection->shouldReceive('getName')->andReturn('mysql');
@@ -74,6 +76,7 @@ class DatabaseMigrationMigrateCommandTest extends TestCase
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
         $migrator->shouldReceive('paths')->once()->andReturn([]);
+        $migrator->shouldReceive('skip')->once()->andReturn([]);
         $migrator->shouldReceive('hasRunAnyMigrations')->andReturn(true);
         $migrator->shouldReceive('usingConnection')->once()->andReturnUsing(function ($name, $callback) {
             return $callback();
@@ -93,6 +96,7 @@ class DatabaseMigrationMigrateCommandTest extends TestCase
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
         $migrator->shouldReceive('paths')->once()->andReturn([]);
+        $migrator->shouldReceive('skip')->once()->andReturn([]);
         $migrator->shouldReceive('hasRunAnyMigrations')->andReturn(true);
         $migrator->shouldReceive('usingConnection')->once()->andReturnUsing(function ($name, $callback) {
             return $callback();
@@ -111,6 +115,7 @@ class DatabaseMigrationMigrateCommandTest extends TestCase
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
         $migrator->shouldReceive('paths')->once()->andReturn([]);
+        $migrator->shouldReceive('skip')->once()->andReturn([]);
         $migrator->shouldReceive('hasRunAnyMigrations')->andReturn(true);
         $migrator->shouldReceive('usingConnection')->once()->andReturnUsing(function ($name, $callback) {
             return $callback();
@@ -129,6 +134,7 @@ class DatabaseMigrationMigrateCommandTest extends TestCase
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
         $migrator->shouldReceive('paths')->once()->andReturn([]);
+        $migrator->shouldReceive('skip')->once()->andReturn([]);
         $migrator->shouldReceive('hasRunAnyMigrations')->andReturn(true);
         $migrator->shouldReceive('usingConnection')->once()->andReturnUsing(function ($name, $callback) {
             return $callback();
