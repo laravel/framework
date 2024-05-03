@@ -762,6 +762,7 @@ class HttpRequestTest extends TestCase
         $request = Request::create('/', 'GET', [
             'valid_enum_value' => 'test',
             'invalid_enum_value' => 'invalid',
+            'enum_empty_string_value' => '',
         ]);
 
         $this->assertNull($request->enum('doesnt_exists', TestEnum::class));
@@ -769,6 +770,8 @@ class HttpRequestTest extends TestCase
         $this->assertEquals(TestEnum::test, $request->enum('valid_enum_value', TestEnum::class));
 
         $this->assertNull($request->enum('invalid_enum_value', TestEnum::class));
+
+        $this->assertNull($request->enum('enum_empty_string_value', TestEnum::class));
     }
 
     public function testArrayAccess()

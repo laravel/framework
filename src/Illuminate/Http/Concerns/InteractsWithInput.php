@@ -403,13 +403,11 @@ trait InteractsWithInput
      */
     public function enum($key, $enumClass)
     {
-        if ($this->isNotFilled($key) ||
-            ! enum_exists($enumClass) ||
-            ! method_exists($enumClass, 'tryFrom')) {
-            return null;
+        if ($this->filled($key) && enum_exists($enumClass)) {
+            return $enumClass::tryFrom($this->input($key));
         }
 
-        return $enumClass::tryFrom($this->input($key));
+        return null;
     }
 
     /**
