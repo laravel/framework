@@ -107,13 +107,13 @@ if (! function_exists('data_first')) {
      */
     function data_first($target, $keys, $default = null)
     {
-        if (!is_array($keys)) {
+        if (! is_array($keys)) {
             return data_get($target, $keys, $default);
         }
 
         foreach ($keys as $key) {
             $result = data_get($target, $key);
-            if($result !== null){
+            if ($result !== null){
                 return $result;
             }
         }

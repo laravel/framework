@@ -194,8 +194,8 @@ class SupportHelpersTest extends TestCase
 
         $this->assertSame('Taylor', data_first($object, 'users.name.0'));
         $this->assertSame('Taylor', data_first($object, ['users.name.0']));
-        $this->assertSame('Taylor', data_first($object, ['book.name','users.name.0']));
-        $this->assertSame('Laravel', data_first($object, ['framework','users.name.0']));
+        $this->assertSame('Taylor', data_first($object, ['book.name', 'users.name.0']));
+        $this->assertSame('Laravel', data_first($object, ['framework', 'users.name.0']));
     }
 
     public function testDataGetWithNestedArrays()
