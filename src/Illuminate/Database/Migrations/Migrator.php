@@ -119,7 +119,7 @@ class Migrator
         // We might want to skip certain migration files, in case we don't want to run
         // them right now. We will check the options array to see if this should be
         // done. If so, we will filter them out so they won't get run this time.
-        if ($options['skip']) {
+        if ($options['skip'] ?? false) {
             $migrations = array_filter($migrations, fn ($file) => ! in_array(
                 basename($file), $options['skip']
             ));
