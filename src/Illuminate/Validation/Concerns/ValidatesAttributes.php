@@ -1460,7 +1460,7 @@ trait ValidatesAttributes
     }
 
     /**
-     * Validate the size of an attribute is less than a maximum value.
+     * Validate the size of an attribute is less than or equal to a maximum value.
      *
      * @param  string  $attribute
      * @param  mixed  $value
@@ -1566,7 +1566,7 @@ trait ValidatesAttributes
     }
 
     /**
-     * Validate the size of an attribute is greater than a minimum value.
+     * Validate the size of an attribute is greater than or equal to a minimum value.
      *
      * @param  string  $attribute
      * @param  mixed  $value
