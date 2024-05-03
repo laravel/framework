@@ -113,7 +113,7 @@ if (! function_exists('data_first')) {
 
         foreach ($keys as $key) {
             $result = data_get($target, $key);
-            if ($result !== null){
+            if ($result !== null) {
                 return $result;
             }
         }
