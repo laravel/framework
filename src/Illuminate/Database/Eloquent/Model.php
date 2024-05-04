@@ -34,6 +34,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         Concerns\HasUniqueIds,
         Concerns\HidesAttributes,
         Concerns\GuardsAttributes,
+        Concerns\HasCustomizations,
         ForwardsCalls;
 
     /**
@@ -236,6 +237,8 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         $this->bootIfNotBooted();
 
         $this->initializeTraits();
+
+        $this->applyCustomizations();
 
         $this->syncOriginal();
 

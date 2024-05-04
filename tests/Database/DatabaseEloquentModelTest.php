@@ -16,6 +16,7 @@ use Illuminate\Database\Connection;
 use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use Illuminate\Database\Eloquent\Attributes\PrimaryKey;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\ArrayObject;
 use Illuminate\Database\Eloquent\Casts\AsArrayObject;
@@ -2854,6 +2855,24 @@ class DatabaseEloquentModelTest extends TestCase
         }
     }
 
+    public function testModelHasCustomPrimaryKeyWithAttribute()
+    {
+        $model = new EloquentModelWithCustomPrimaryKey();
+
+        $this->assertEquals('uuid', $model->getKeyName());
+        $this->assertEquals('string', $model->getKeyType());
+        $this->assertFalse($model->getIncrementing());
+    }
+
+    public function testModelHasPartialCustomPrimaryKeyWithAttribute()
+    {
+        $model = new EloquentModelWithPartialCustomPrimaryKey();
+
+        $this->assertEquals('custom_id', $model->getKeyName());
+        $this->assertEquals('int', $model->getKeyType());
+        $this->assertTrue($model->getIncrementing());
+    }
+
     protected function addMockConnection($model)
     {
         $model->setConnectionResolver($resolver = m::mock(ConnectionResolverInterface::class));
@@ -3580,6 +3599,18 @@ class EloquentModelWithUpdatedAtNull extends Model
 {
     protected $table = 'stub';
     const UPDATED_AT = null;
+}
+
+#[PrimaryKey(name: 'uuid', type: 'string', incrementing: false)]
+class EloquentModelWithCustomPrimaryKey extends Model
+{
+
+}
+
+#[PrimaryKey(name: 'custom_id')]
+class EloquentModelWithPartialCustomPrimaryKey extends Model
+{
+
 }
 
 class UnsavedModel extends Model
