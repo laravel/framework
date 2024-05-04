@@ -131,8 +131,8 @@ class ApplicationBuilder
      * Register the routing services for the application.
      *
      * @param  \Closure|null  $using
-     * @param  string|null  $web
-     * @param  string|null  $api
+     * @param  string|array|null  $web
+     * @param  string|array|null  $api
      * @param  string|null  $commands
      * @param  string|null  $channels
      * @param  string|null  $pages
@@ -143,7 +143,7 @@ class ApplicationBuilder
     public function withRouting(
         ?Closure $using = null,
         string|array $web = null,
-        ?string $api = null,
+        string|array $api = null,
         ?string $commands = null,
         ?string $channels = null,
         ?string $pages = null,
@@ -175,8 +175,8 @@ class ApplicationBuilder
     /**
      * Create the routing callback for the application.
      *
-     * @param  string|null  $web
-     * @param  string|null  $api
+     * @param  string|array|null  $web
+     * @param  string|array|null  $api
      * @param  string|null  $pages
      * @param  string|null  $health
      * @param  string  $apiPrefix
@@ -184,8 +184,8 @@ class ApplicationBuilder
      * @return \Closure
      */
     protected function buildRoutingCallback(
-        string|array $web,
-        string|array $api,
+        string|array $web = null,
+        string|array $api = null,
         ?string $pages,
         ?string $health,
         string $apiPrefix,
