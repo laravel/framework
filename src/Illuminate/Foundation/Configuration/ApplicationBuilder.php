@@ -219,6 +219,19 @@ class ApplicationBuilder
     }
 
     /**
+     * Register loading cached routes for the application.
+     *
+     * @param  \Closure  $using
+     * @return $this
+     */
+    public function loadCachedRoutesUsing(Closure $using)
+    {
+        AppRouteServiceProvider::loadCachedRoutesUsing($using);
+
+        return $this;
+    }
+
+    /**
      * Register the global middleware, middleware groups, and middleware aliases for the application.
      *
      * @param  callable|null  $callback
