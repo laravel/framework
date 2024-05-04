@@ -250,7 +250,7 @@ class ApplicationBuilder
             $middleware = (new Middleware)
                 ->redirectGuestsTo(fn () => route('login'));
 
-            if (!is_null($callback)) {
+            if (! is_null($callback)) {
                 $callback($middleware);
             }
 
