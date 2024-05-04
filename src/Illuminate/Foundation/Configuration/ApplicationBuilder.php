@@ -96,7 +96,7 @@ class ApplicationBuilder
             AppEventServiceProvider::disableEventDiscovery();
         }
 
-        if (! isset($this->pendingProviders[AppEventServiceProvider::class])) {
+        if (!isset($this->pendingProviders[AppEventServiceProvider::class])) {
             $this->app->booting(function () {
                 $this->app->register(AppEventServiceProvider::class);
             });
@@ -117,7 +117,7 @@ class ApplicationBuilder
     public function withBroadcasting(string $channels, array $attributes = [])
     {
         $this->app->booted(function () use ($channels, $attributes) {
-            Broadcast::routes(! empty($attributes) ? $attributes : null);
+            Broadcast::routes(!empty($attributes) ? $attributes : null);
 
             if (file_exists($channels)) {
                 require $channels;
@@ -140,17 +140,18 @@ class ApplicationBuilder
      * @param  callable|null  $then
      * @return $this
      */
-    public function withRouting(?Closure $using = null,
-        ?string $web = null,
+    public function withRouting(
+        ?Closure $using = null,
+        string|array $web = null,
         ?string $api = null,
         ?string $commands = null,
         ?string $channels = null,
         ?string $pages = null,
         ?string $health = null,
         string $apiPrefix = 'api',
-        ?callable $then = null)
-    {
-        if (is_null($using) && (is_string($web) || is_string($api) || is_string($pages) || is_string($health)) || is_callable($then)) {
+        ?callable $then = null
+    ) {
+        if (is_null($using) && (is_string($web) || is_array($web) || is_string($api) || is_array($api) || is_string($pages) || is_string($health)) || is_callable($then)) {
             $using = $this->buildRoutingCallback($web, $api, $pages, $health, $apiPrefix, $then);
         }
 
@@ -182,33 +183,52 @@ class ApplicationBuilder
      * @param  callable|null  $then
      * @return \Closure
      */
-    protected function buildRoutingCallback(?string $web,
-        ?string $api,
+    protected function buildRoutingCallback(
+        string|array $web,
+        string|array $api,
         ?string $pages,
         ?string $health,
         string $apiPrefix,
-        ?callable $then)
-    {
+        ?callable $then
+    ) {
         return function () use ($web, $api, $pages, $health, $apiPrefix, $then) {
-            if (is_string($api) && realpath($api) !== false) {
-                Route::middleware('api')->prefix($apiPrefix)->group($api);
+            if ((is_string($api) || is_array($api)) !== false) {
+                if (is_array($api)) {
+                    foreach ($api as $apiRoute) {
+                        if (realpath($apiRoute) !== false) {
+                            Route::middleware('api')->prefix($apiPrefix)->group($apiRoute);
+                        }
+                    }
+                } else {
+                    Route::middleware('api')->prefix($apiPrefix)->group($api);
+                }
             }
 
             if (is_string($health)) {
                 Route::middleware('web')->get($health, function () {
                     Event::dispatch(new DiagnosingHealth);
 
-                    return View::file(__DIR__.'/../resources/health-up.blade.php');
+                    return View::file(__DIR__ . '/../resources/health-up.blade.php');
                 });
             }
 
-            if (is_string($web) && realpath($web) !== false) {
-                Route::middleware('web')->group($web);
+            if ((is_string($web) || is_array($web)) !== false) {
+                if (is_array($web)) {
+                    foreach ($web as $webRoute) {
+                        if (realpath($webRoute) !== false) {
+                            Route::middleware('web')->group($webRoute);
+                        }
+                    }
+                } else {
+                    Route::middleware('web')->group($web);
+                }
             }
 
-            if (is_string($pages) &&
+            if (
+                is_string($pages) &&
                 realpath($pages) !== false &&
-                class_exists(Folio::class)) {
+                class_exists(Folio::class)
+            ) {
                 Folio::route($pages, middleware: $this->pageMiddleware);
             }
 
@@ -230,7 +250,7 @@ class ApplicationBuilder
             $middleware = (new Middleware)
                 ->redirectGuestsTo(fn () => route('login'));
 
-            if (! is_null($callback)) {
+            if (!is_null($callback)) {
                 $callback($middleware);
             }
 
