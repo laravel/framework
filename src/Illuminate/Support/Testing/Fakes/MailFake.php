@@ -179,9 +179,9 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
     /**
      * Assert if a mailable was queued on desired queue based on truth-test callaback.
      *
-     * @param  string $mailable
-     * @param  string $queue
-     * @param callable|int|null $callback
+     * @param  string  $mailable
+     * @param  string  $queue
+     * @param  callable|int|null  $callback
      * @return void
      */
     public function assertQueuedOn($mailable, $queue, $callback = null)
@@ -189,7 +189,7 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
         $message = "The expected [{$mailable}] mailable was not queued on {$queue}";
 
         $message .= ($actualQueue = $this->queued($mailable, $callback)->first()?->queue) ?
-            " but actual queue was {$actualQueue}." : ".";
+            " but actual queue was {$actualQueue}." : '.';
 
         PHPUnit::assertTrue(
             $this->queuedOn($mailable, $queue)->count() > 0,
@@ -347,15 +347,15 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
     }
 
     /**
-     * Determine if the given mailable has been queued on the given queue
+     * Determine if the given mailable has been queued on the given queue.
      *
-     * @param string $mailable
-     * @param string $queue
+     * @param  string  $mailable
+     * @param  string  $queue
      * @return \Illuminate\Support\Collection
      */
     public function queuedOn($mailable, $queue)
     {
-        return $this->queued($mailable)->filter(fn($mailable) => $mailable->queue == $queue);
+        return $this->queued($mailable)->filter(fn ($mailable) => $mailable->queue == $queue);
     }
 
     /**
@@ -526,7 +526,7 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
     /**
      * Queue a new mail message for sending on the given queue.
      *
-     * @param string|null $queue
+     * @param  string  $queue
      * @param  \Illuminate\Contracts\Mail\Mailable|string|array  $view
      * @return mixed
      */
@@ -538,7 +538,7 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
     /**
      * Queue a new mail message for sending on the given queue.
      *
-     * @param string|null $queue
+     * @param  string  $queue
      * @param  \Illuminate\Contracts\Mail\Mailable|string|array  $view
      * @return mixed
      */
