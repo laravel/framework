@@ -657,7 +657,7 @@ class Grammar extends BaseGrammar
      */
     protected function compileJsonOverlaps($column, $value)
     {
-        throw new RuntimeException('This database engine does not support JSON contains operations.');
+        throw new RuntimeException('This database engine does not support JSON overlaps operations.');
     }
 
     /**
