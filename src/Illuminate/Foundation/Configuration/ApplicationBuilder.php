@@ -96,7 +96,7 @@ class ApplicationBuilder
             AppEventServiceProvider::disableEventDiscovery();
         }
 
-        if (!isset($this->pendingProviders[AppEventServiceProvider::class])) {
+        if (! isset($this->pendingProviders[AppEventServiceProvider::class])) {
             $this->app->booting(function () {
                 $this->app->register(AppEventServiceProvider::class);
             });
@@ -117,7 +117,7 @@ class ApplicationBuilder
     public function withBroadcasting(string $channels, array $attributes = [])
     {
         $this->app->booted(function () use ($channels, $attributes) {
-            Broadcast::routes(!empty($attributes) ? $attributes : null);
+            Broadcast::routes(! empty($attributes) ? $attributes : null);
 
             if (file_exists($channels)) {
                 require $channels;
@@ -208,7 +208,7 @@ class ApplicationBuilder
                 Route::middleware('web')->get($health, function () {
                     Event::dispatch(new DiagnosingHealth);
 
-                    return View::file(__DIR__ . '/../resources/health-up.blade.php');
+                    return View::file(__DIR__.'/../resources/health-up.blade.php');
                 });
             }
 
