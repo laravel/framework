@@ -3604,13 +3604,11 @@ class EloquentModelWithUpdatedAtNull extends Model
 #[PrimaryKey(name: 'uuid', type: 'string', incrementing: false)]
 class EloquentModelWithCustomPrimaryKey extends Model
 {
-
 }
 
 #[PrimaryKey(name: 'custom_id')]
 class EloquentModelWithPartialCustomPrimaryKey extends Model
 {
-
 }
 
 class UnsavedModel extends Model

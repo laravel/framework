@@ -8,7 +8,7 @@ use ReflectionClass;
 trait HasCustomizations
 {
     /**
-     * Apply customizations from attributes
+     * Apply customizations from attributes.
      *
      * @return void
      */
@@ -32,7 +32,7 @@ trait HasCustomizations
     protected function resolveCustomPrimaryKey()
     {
         $reflectionClass = new ReflectionClass(static::class);
-        /** @var  $primaryKeyAttribute \ReflectionAttribute|null */
+        /** @var $primaryKeyAttribute \ReflectionAttribute|null */
         $primaryKeyAttribute = collect($reflectionClass->getAttributes(PrimaryKey::class))
             ->first();
 
