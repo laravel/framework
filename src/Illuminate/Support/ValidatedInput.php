@@ -6,6 +6,7 @@ use ArrayIterator;
 use Illuminate\Contracts\Support\ValidatedData;
 use Illuminate\Support\Facades\Date;
 use stdClass;
+use Symfony\Component\VarDumper\VarDumper;
 use Traversable;
 
 class ValidatedInput implements ValidatedData
@@ -530,6 +531,21 @@ class ValidatedInput implements ValidatedData
         }
 
         return $enumClass::tryFrom($this->input($key));
+    }
+
+    /**
+     * Dump the items.
+     *
+     * @param  mixed  $keys
+     * @return $this
+     */
+    public function dump($keys = [])
+    {
+        $keys = is_array($keys) ? $keys : func_get_args();
+
+        VarDumper::dump(count($keys) > 0 ? $this->only($keys) : $this->all());
+
+        return $this;
     }
 
 }
