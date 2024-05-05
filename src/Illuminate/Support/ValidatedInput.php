@@ -173,7 +173,7 @@ class ValidatedInput implements ValidatedData
      */
     public function __isset($name)
     {
-        return isset($this->input[$name]);
+        return $this->exists($name);
     }
 
     /**
@@ -195,7 +195,7 @@ class ValidatedInput implements ValidatedData
      */
     public function offsetExists($key): bool
     {
-        return isset($this->input[$key]);
+        return $this->exists($key);
     }
 
     /**
