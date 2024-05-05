@@ -60,6 +60,10 @@ if (! function_exists('blank')) {
             return count($value) === 0;
         }
 
+        if ($value instanceof Stringable) {
+            return $value->trim()->toString() === '';
+        }
+
         return empty($value);
     }
 }
