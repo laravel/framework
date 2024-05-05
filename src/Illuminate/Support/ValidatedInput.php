@@ -40,7 +40,7 @@ class ValidatedInput implements ValidatedData
         $keys = is_array($keys) ? $keys : func_get_args();
 
         foreach ($keys as $key) {
-            if (! Arr::has($this->input, $key)) {
+            if (! Arr::has($this->all(), $key)) {
                 return false;
             }
         }
@@ -69,7 +69,7 @@ class ValidatedInput implements ValidatedData
     {
         $results = [];
 
-        $input = $this->input;
+        $input = $this->all();
 
         $placeholder = new stdClass;
 
@@ -94,7 +94,7 @@ class ValidatedInput implements ValidatedData
     {
         $keys = is_array($keys) ? $keys : func_get_args();
 
-        $results = $this->input;
+        $results = $this->all();
 
         Arr::forget($results, $keys);
 
@@ -109,7 +109,7 @@ class ValidatedInput implements ValidatedData
      */
     public function merge(array $items)
     {
-        return new static(array_merge($this->input, $items));
+        return new static(array_merge($this->all(), $items));
     }
 
     /**
