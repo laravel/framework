@@ -1897,7 +1897,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     * Add a "where JSON not contoverlapsains" clause to the query.
+     * Add a "where JSON not overlap" clause to the query.
      *
      * @param  string  $column
      * @param  mixed  $value
@@ -1910,7 +1910,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     * Add an "or where JSON not overlaps" clause to the query.
+     * Add an "or where JSON not overlap" clause to the query.
      *
      * @param  string  $column
      * @param  mixed  $value
