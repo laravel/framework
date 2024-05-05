@@ -254,4 +254,19 @@ class ValidatedInput implements ValidatedData
         return $this->has($key);
     }
 
+    /**
+     * Determine if the validated inputs contains any of the given inputs.
+     *
+     * @param  string|array  $keys
+     * @return bool
+     */
+    public function hasAny($keys)
+    {
+        $keys = is_array($keys) ? $keys : func_get_args();
+
+        $input = $this->all();
+
+        return Arr::hasAny($input, $keys);
+    }
+
 }
