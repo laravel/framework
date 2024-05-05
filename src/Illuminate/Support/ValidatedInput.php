@@ -242,4 +242,16 @@ class ValidatedInput implements ValidatedData
     {
         return new ArrayIterator($this->input);
     }
+
+    /**
+     * Determine if the validated inputs contains a given input item key.
+     *
+     * @param  string|array  $key
+     * @return bool
+     */
+    public function exists($key)
+    {
+        return $this->has($key);
+    }
+
 }
