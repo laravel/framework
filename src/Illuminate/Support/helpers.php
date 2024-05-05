@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\DeferringDisplayableValue;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Arr;
@@ -58,6 +59,10 @@ if (! function_exists('blank')) {
 
         if ($value instanceof Countable) {
             return count($value) === 0;
+        }
+
+        if ($value instanceof Stringable) {
+            return $value->trim()->toString() === '';
         }
 
         return empty($value);
