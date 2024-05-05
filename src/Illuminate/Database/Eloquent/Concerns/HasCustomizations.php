@@ -12,7 +12,7 @@ trait HasCustomizations
      *
      * @return void
      */
-    protected function applyCustomizations()
+    protected function initializeHasCustomizations()
     {
         $primaryKeyAttribute = $this->resolveCustomPrimaryKey();
         if (! $primaryKeyAttribute) {
@@ -32,10 +32,10 @@ trait HasCustomizations
     protected function resolveCustomPrimaryKey()
     {
         $reflectionClass = new ReflectionClass(static::class);
-        /** @var $primaryKeyAttribute \ReflectionAttribute|null */
-        $primaryKeyAttribute = collect($reflectionClass->getAttributes(PrimaryKey::class))
-            ->first();
+        $primaryKeyAttribute = $reflectionClass->getAttributes(PrimaryKey::class);
 
-        return $primaryKeyAttribute?->newInstance();
+        return $primaryKeyAttribute === []
+            ? null
+            : $primaryKeyAttribute[0]->newInstance();
     }
 }

@@ -238,8 +238,6 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
 
         $this->initializeTraits();
 
-        $this->applyCustomizations();
-
         $this->syncOriginal();
 
         $this->fill($attributes);
