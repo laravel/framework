@@ -476,4 +476,16 @@ class ValidatedInput implements ValidatedData
         return intval($this->input($key, $default));
     }
 
+    /**
+     * Retrieve input as a float value.
+     *
+     * @param  string  $key
+     * @param  float  $default
+     * @return float
+     */
+    public function float($key, $default = 0.0)
+    {
+        return floatval($this->input($key, $default));
+    }
+
 }
