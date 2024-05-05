@@ -232,6 +232,19 @@ class Router implements BindingRegistrar, RegistrarContract
     }
 
     /**
+     * Register a new alias.
+     *
+     * @param  string  $alias
+     * @param  string  $name
+     *
+     * @return void
+     */
+    public function alias($alias, $name)
+    {
+        $this->routes->setRouteAlias($alias, $name);
+    }
+
+    /**
      * Register a new fallback route with the router.
      *
      * @param  array|string|callable|null  $action

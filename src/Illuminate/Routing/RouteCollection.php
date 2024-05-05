@@ -37,6 +37,13 @@ class RouteCollection extends AbstractRouteCollection
     protected $actionList = [];
 
     /**
+     * A look-up table to aliases and it's corresponding named routes.
+     *
+     * @var array
+     */
+    protected $routesAliasesList = [];
+
+    /**
      * Add a Route instance to the collection.
      *
      * @param  \Illuminate\Routing\Route  $route
@@ -124,6 +131,19 @@ class RouteCollection extends AbstractRouteCollection
     }
 
     /**
+     * Push a new alias to the aliases map to map it with it's corresponding route name.
+     *
+     * @param  string  $alias
+     * @param  string  $name
+     *
+     * @return void
+     */
+    public function setRouteAlias($alias, $name)
+    {
+        $this->routesAliasesList[$alias] = $name;
+    }
+
+    /**
      * Refresh the action look-up table.
      *
      * This is done in case any actions are overwritten with new controllers.
@@ -192,7 +212,22 @@ class RouteCollection extends AbstractRouteCollection
      */
     public function getByName($name)
     {
-        return $this->nameList[$name] ?? null;
+        return $this->nameList[
+            $this->checkAliasedRoute($name)
+        ] ?? null;
+    }
+
+    /**
+     * Check if a given alias is already exists and return it's resolved route name.
+     *
+     * @param  string  $name
+     * @return string
+     *
+     * @return void
+     */
+    public function checkAliasedRoute($name)
+    {
+        return $this->routesAliasesList[$name] ?? $name;
     }
 
     /**
