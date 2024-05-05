@@ -402,4 +402,14 @@ class ValidatedInput implements ValidatedData
         return ! is_bool($value) && ! is_array($value) && trim((string) $value) === '';
     }
 
+    /**
+     * Get the keys for all of the input.
+     *
+     * @return array
+     */
+    public function keys()
+    {
+        return array_keys($this->input());
+    }
+
 }
