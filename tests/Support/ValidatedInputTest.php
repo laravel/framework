@@ -2,12 +2,12 @@
 
 namespace Illuminate\Tests\Support;
 
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Stringable;
 use Illuminate\Support\ValidatedInput;
 use Illuminate\Tests\Support\Fixtures\StringBackedEnum;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Support\Carbon;
 
 class ValidatedInputTest extends TestCase
 {
@@ -120,7 +120,6 @@ class ValidatedInputTest extends TestCase
             $foo = $value;
         });
 
-
         $input->whenHas('foo.bar', function ($value) use (&$bar) {
             $bar = $value;
         });
@@ -212,7 +211,6 @@ class ValidatedInputTest extends TestCase
             $foo = $value;
         });
 
-
         $input->whenFilled('foo.bar', function ($value) use (&$bar) {
             $bar = $value;
         });
@@ -247,7 +245,6 @@ class ValidatedInputTest extends TestCase
         $this->assertTrue($input->missing(['name', 'votes']));
         $this->assertTrue($input->missing(['votes', 'foo.bar']));
     }
-
 
     public function test_when_missing_method()
     {
@@ -303,7 +300,6 @@ class ValidatedInputTest extends TestCase
         $this->assertEquals(['name' => 'Fatih', 'surname' => 'AYDIN', 'foo' => ['bar' => null, 'baz' => '']], $input->all());
     }
 
-
     public function test_input_method()
     {
         $input = new ValidatedInput(['name' => 'Fatih', 'surname' => 'AYDIN', 'foo' => ['bar' => null, 'baz' => '']]);
@@ -341,7 +337,6 @@ class ValidatedInputTest extends TestCase
         $this->assertSame('', $input->str('unknown_key')->value());
     }
 
-
     public function test_string_method()
     {
         $input = new ValidatedInput([
@@ -370,7 +365,6 @@ class ValidatedInputTest extends TestCase
         $this->assertSame('', $input->string('unknown_key')->value());
     }
 
-
     public function test_boolean_method()
     {
         $input = new ValidatedInput([
@@ -379,7 +373,7 @@ class ValidatedInputTest extends TestCase
             'checked' => 1,
             'unchecked' => '0',
             'with_on' => 'on',
-            'with_yes' => 'yes'
+            'with_yes' => 'yes',
         ]);
 
         $this->assertTrue($input->boolean('checked'));
@@ -390,7 +384,6 @@ class ValidatedInputTest extends TestCase
         $this->assertTrue($input->boolean('with_on'));
         $this->assertTrue($input->boolean('with_yes'));
     }
-
 
     public function test_integer_method()
     {
@@ -416,7 +409,6 @@ class ValidatedInputTest extends TestCase
         $this->assertSame(0, $input->integer('null'));
         $this->assertSame(0, $input->integer('null', 123456));
     }
-
 
     public function test_float_method()
     {
@@ -444,7 +436,6 @@ class ValidatedInputTest extends TestCase
         $this->assertSame(0.0, $input->float('null'));
         $this->assertSame(0.0, $input->float('null', 123.456));
     }
-
 
     public function test_date_method()
     {
@@ -515,7 +506,6 @@ class ValidatedInputTest extends TestCase
         $this->assertEquals(collect(['roles' => [4, 5, 6], 'foo' => ['bar', 'baz']]), $input->collect(['roles', 'foo']));
         $this->assertEquals(['users' => [1, 2, 3], 'roles' => [4, 5, 6], 'foo' => ['bar', 'baz'], 'email' => 'test@example.com'], $input->collect()->all());
     }
-
 
     public function test_only_method()
     {
