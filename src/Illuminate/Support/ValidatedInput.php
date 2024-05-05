@@ -4,6 +4,7 @@ namespace Illuminate\Support;
 
 use ArrayIterator;
 use Illuminate\Contracts\Support\ValidatedData;
+use Illuminate\Support\Facades\Date;
 use stdClass;
 use Traversable;
 
@@ -486,6 +487,29 @@ class ValidatedInput implements ValidatedData
     public function float($key, $default = 0.0)
     {
         return floatval($this->input($key, $default));
+    }
+
+    /**
+     * Retrieve input from the validated inputs as a Carbon instance.
+     *
+     * @param  string  $key
+     * @param  string|null  $format
+     * @param  string|null  $tz
+     * @return \Illuminate\Support\Carbon|null
+     *
+     * @throws \Carbon\Exceptions\InvalidFormatException
+     */
+    public function date($key, $format = null, $tz = null)
+    {
+        if ($this->isNotFilled($key)) {
+            return null;
+        }
+
+        if (is_null($format)) {
+            return Date::parse($this->input($key), $tz);
+        }
+
+        return Date::createFromFormat($format, $this->input($key), $tz);
     }
 
 }
