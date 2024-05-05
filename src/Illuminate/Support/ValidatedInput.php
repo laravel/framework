@@ -115,11 +115,12 @@ class ValidatedInput implements ValidatedData
     /**
      * Get the input as a collection.
      *
+     * @param  array|string|null  $key
      * @return \Illuminate\Support\Collection
      */
-    public function collect()
+    public function collect($key = null)
     {
-        return new Collection($this->input);
+        return collect(is_array($key) ? $this->only($key) : $this->input($key));
     }
 
     /**
