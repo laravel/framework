@@ -24,7 +24,7 @@ class SyncJob extends Job implements JobContract
     /**
      * Create a new job instance.
      *
-     * @param  Container  $container
+     * @param  \Illuminate\Contracts\Container\Container  $container
      * @param  string  $payload
      * @param  string  $connectionName
      * @param  string  $queue
