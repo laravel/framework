@@ -561,5 +561,4 @@ class ValidatedInput implements ValidatedData
 
         return $this;
     }
-
 }
