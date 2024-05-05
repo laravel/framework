@@ -10,15 +10,15 @@ class PrimaryKey
     /**
      * Create a new attribute instance.
      *
-     * @param  string  $name
-     * @param  string  $type
-     * @param  bool  $incrementing
+     * @param  string|null  $name
+     * @param  string|null  $type
+     * @param  bool|null  $incrementing
      * @return void
      */
     public function __construct(
-        public string $name = 'id',
-        public string $type = 'int',
-        public bool $incrementing = true,
+        public ?string $name = null,
+        public ?string $type = null,
+        public ?bool $incrementing = null,
     ) {
     }
 }

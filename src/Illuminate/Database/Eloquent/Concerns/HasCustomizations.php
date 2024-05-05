@@ -19,9 +19,15 @@ trait HasCustomizations
             return;
         }
 
-        $this->setKeyName($primaryKeyAttribute->name);
-        $this->setKeyType($primaryKeyAttribute->type);
-        $this->setIncrementing($primaryKeyAttribute->incrementing);
+        if (! is_null($primaryKeyAttribute->name)) {
+            $this->setKeyName($primaryKeyAttribute->name);
+        }
+        if (! is_null($primaryKeyAttribute->type)) {
+            $this->setKeyType($primaryKeyAttribute->type);
+        }
+        if (! is_null($primaryKeyAttribute->incrementing)) {
+            $this->setIncrementing($primaryKeyAttribute->incrementing);
+        }
     }
 
     /**
