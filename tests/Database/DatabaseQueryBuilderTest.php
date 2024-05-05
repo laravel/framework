@@ -2758,6 +2758,17 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals(['foo' => 'bar'], $results);
     }
 
+    public function testFirstWhere()
+    {
+        $builder = $this->getBuilder();
+        $builder->getConnection()->shouldReceive('select')->once()->with('select * from "users" where "id" = ? limit 1', [1], true)->andReturn([['foo' => 'bar']]);
+        $builder->getProcessor()->shouldReceive('processSelect')->once()->with($builder, [['foo' => 'bar']])->andReturnUsing(function ($query, $results) {
+            return $results;
+        });
+        $results = $builder->from('users')->firstWhere('id', '=', 1);
+        $this->assertEquals(['foo' => 'bar'], $results);
+    }
+
     public function testPluckMethodGetsCollectionOfColumnValues()
     {
         $builder = $this->getBuilder();

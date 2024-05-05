@@ -911,6 +911,20 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Add a basic where clause to the query.
+     *
+     * @param  \Closure|string|array|\Illuminate\Contracts\Database\Query\Expression  $column
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @param  string  $boolean
+     * @return $this
+     */
+    public function firstWhere($column, $operator = null, $value = null, $boolean = 'and')
+    {
+        return $this->where(...func_get_args())->first();
+    }
+
+    /**
      * Add an array of where clauses to the query.
      *
      * @param  array  $column
