@@ -30,6 +30,17 @@ class Exceptions
     }
 
     /**
+     * Register error view paths callback.
+     *
+     * @param  callable  $using
+     * @return void
+     */
+    public function registerErrorViewPathsUsing(callable $using)
+    {
+        $this->handler->registerErrorViewPathsUsing($using);
+    }
+
+    /**
      * Register a reportable callback.
      *
      * @param  callable  $reportUsing

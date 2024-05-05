@@ -117,6 +117,13 @@ class Handler implements ExceptionHandlerContract
     protected $finalizeResponseCallback;
 
     /**
+     * The callback that should be used to register the application's error view paths.
+     *
+     * @var callable|null
+     */
+    protected $registerErrorViewPathsUsing;
+
+    /**
      * The registered exception mappings.
      *
      * @var array<string, \Closure>
@@ -231,6 +238,17 @@ class Handler implements ExceptionHandlerContract
         $this->renderCallbacks[] = $renderUsing;
 
         return $this;
+    }
+
+    /**
+     * Register error view paths callback.
+     *
+     * @param  callable  $using
+     * @return void
+     */
+    public function registerErrorViewPathsUsing(callable $using)
+    {
+        $this->registerErrorViewPathsUsing = $using;
     }
 
     /**
@@ -897,6 +915,11 @@ class Handler implements ExceptionHandlerContract
      */
     protected function registerErrorViewPaths()
     {
+        if (! is_null($this->registerErrorViewPathsUsing)) {
+            call_user_func($this->registerErrorViewPathsUsing);
+
+            return;
+        }
         (new RegisterErrorViewPaths)();
     }
 
