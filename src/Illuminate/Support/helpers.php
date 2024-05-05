@@ -1,6 +1,5 @@
 <?php
 
-use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\DeferringDisplayableValue;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Arr;
