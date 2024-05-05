@@ -328,7 +328,7 @@ trait InteractsWithInput
      */
     public function string($key, $default = null)
     {
-        return str($this->input($key, $default));
+        return $this->typeable->string($key, $default);
     }
 
     /**
@@ -342,7 +342,7 @@ trait InteractsWithInput
      */
     public function boolean($key = null, $default = false)
     {
-        return filter_var($this->input($key, $default), FILTER_VALIDATE_BOOLEAN);
+        return $this->typeable->boolean($key, $default);
     }
 
     /**
@@ -354,7 +354,7 @@ trait InteractsWithInput
      */
     public function integer($key, $default = 0)
     {
-        return intval($this->input($key, $default));
+        return $this->typeable->integer($key, $default);
     }
 
     /**
@@ -366,7 +366,7 @@ trait InteractsWithInput
      */
     public function float($key, $default = 0.0)
     {
-        return floatval($this->input($key, $default));
+        return $this->typeable->float($key, $default);
     }
 
     /**

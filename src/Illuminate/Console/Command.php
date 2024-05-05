@@ -5,6 +5,7 @@ namespace Illuminate\Console;
 use Illuminate\Console\View\Components\Factory;
 use Illuminate\Contracts\Console\Isolatable;
 use Illuminate\Support\Traits\Macroable;
+use Illuminate\Support\Typeable;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -84,6 +85,20 @@ class Command extends SymfonyCommand
     protected $aliases;
 
     /**
+     * The typeable instance for retrieving command arguments.
+     *
+     * @var Typeable<Command>
+     */
+    public Typeable $argument;
+
+    /**
+     * The typeable instance for retrieving command options.
+     *
+     * @var Typeable<Command>
+     */
+    public Typeable $option;
+
+    /**
      * Create a new console command instance.
      *
      * @return void
@@ -123,6 +138,9 @@ class Command extends SymfonyCommand
         if ($this instanceof Isolatable) {
             $this->configureIsolation();
         }
+
+        $this->argument = new Typeable($this, 'argument');
+        $this->option = new Typeable($this, 'option');
     }
 
     /**

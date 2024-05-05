@@ -9,6 +9,7 @@ use Illuminate\Session\SymfonySessionDecorator;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
+use Illuminate\Support\Typeable;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\Exception\SessionNotFoundException;
 use Symfony\Component\HttpFoundation\InputBag;
@@ -27,6 +28,11 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
         Concerns\InteractsWithFlashData,
         Concerns\InteractsWithInput,
         Macroable;
+
+    /**
+     * @var Typeable<Request>
+     */
+    public Typeable $typeable;
 
     /**
      * The decoded JSON content for the request.
@@ -55,6 +61,13 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      * @var \Closure
      */
     protected $routeResolver;
+
+    public function __construct(array $query = [], array $request = [], array $attributes = [], array $cookies = [], array $files = [], array $server = [], $content = null)
+    {
+        parent::__construct($query, $request, $attributes, $cookies, $files, $server, $content);
+
+        $this->typeable = $this->typeable();
+    }
 
     /**
      * Create a new Illuminate HTTP request from server variables.
@@ -772,6 +785,16 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     }
 
     /**
+     * Get the typeable proxy instance.
+     *
+     * @return Typeable<$this>
+     */
+    protected function typeable(string $method = 'input'): Typeable
+    {
+        return new Typeable($this, $method);
+    }
+
+    /**
      * Check if an input element is set on the request.
      *
      * @param  string  $key
@@ -787,6 +810,8 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      *
      * @param  string  $key
      * @return mixed
+     *
+     * @deprecated Use the "all" or "route" method instead.
      */
     public function __get($key)
     {

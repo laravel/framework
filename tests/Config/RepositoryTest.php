@@ -299,7 +299,7 @@ class RepositoryTest extends TestCase
     public function testItThrowsAnExceptionWhenTryingToGetNonStringValueAsString(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessageMatches('#^Configuration value for key \[a\] must be a string, (.*) given.#');
+        $this->expectExceptionMessageMatches('#Typed property \[a\] must be a string, (.*) given.#');
 
         $this->repository->string('a');
     }
@@ -314,7 +314,7 @@ class RepositoryTest extends TestCase
     public function testItThrowsAnExceptionWhenTryingToGetNonArrayValueAsArray(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessageMatches('#Configuration value for key \[a.b\] must be an array, (.*) given.#');
+        $this->expectExceptionMessageMatches('#Typed property \[a.b\] must be an array, (.*) given.#');
 
         $this->repository->array('a.b');
     }
@@ -329,7 +329,7 @@ class RepositoryTest extends TestCase
     public function testItThrowsAnExceptionWhenTryingToGetNonBooleanValueAsBoolean(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessageMatches('#Configuration value for key \[a.b\] must be a boolean, (.*) given.#');
+        $this->expectExceptionMessageMatches('#Typed property \[a.b\] must be a boolean, (.*) given.#');
 
         $this->repository->boolean('a.b');
     }
@@ -344,7 +344,7 @@ class RepositoryTest extends TestCase
     public function testItThrowsAnExceptionWhenTryingToGetNonIntegerValueAsInteger(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessageMatches('#Configuration value for key \[a.b\] must be an integer, (.*) given.#');
+        $this->expectExceptionMessageMatches('#Typed property \[a.b\] must be an integer, (.*) given.#');
 
         $this->repository->integer('a.b');
     }
@@ -359,7 +359,7 @@ class RepositoryTest extends TestCase
     public function testItThrowsAnExceptionWhenTryingToGetNonFloatValueAsFloat(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessageMatches('#^Configuration value for key \[a.b\] must be a float, (.*) given.#');
+        $this->expectExceptionMessageMatches('#Typed property \[a.b\] must be a float, (.*) given.#');
 
         $this->repository->float('a.b');
     }

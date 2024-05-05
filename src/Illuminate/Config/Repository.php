@@ -5,8 +5,8 @@ namespace Illuminate\Config;
 use ArrayAccess;
 use Illuminate\Contracts\Config\Repository as ConfigContract;
 use Illuminate\Support\Arr;
+use Illuminate\Support\StrongTypeable;
 use Illuminate\Support\Traits\Macroable;
-use InvalidArgumentException;
 
 class Repository implements ArrayAccess, ConfigContract
 {
@@ -20,6 +20,13 @@ class Repository implements ArrayAccess, ConfigContract
     protected $items = [];
 
     /**
+     * The strong typeable instance for retrieving configuration values.
+     *
+     * @var StrongTypeable
+     */
+    protected StrongTypeable $typeable;
+
+    /**
      * Create a new configuration repository.
      *
      * @param  array  $items
@@ -28,6 +35,8 @@ class Repository implements ArrayAccess, ConfigContract
     public function __construct(array $items = [])
     {
         $this->items = $items;
+
+        $this->typeable = new StrongTypeable($this, 'get');
     }
 
     /**
@@ -87,15 +96,7 @@ class Repository implements ArrayAccess, ConfigContract
      */
     public function string(string $key, $default = null): string
     {
-        $value = $this->get($key, $default);
-
-        if (! is_string($value)) {
-            throw new InvalidArgumentException(
-                sprintf('Configuration value for key [%s] must be a string, %s given.', $key, gettype($value))
-            );
-        }
-
-        return $value;
+        return $this->typeable->string($key, $default);
     }
 
     /**
@@ -107,15 +108,7 @@ class Repository implements ArrayAccess, ConfigContract
      */
     public function integer(string $key, $default = null): int
     {
-        $value = $this->get($key, $default);
-
-        if (! is_int($value)) {
-            throw new InvalidArgumentException(
-                sprintf('Configuration value for key [%s] must be an integer, %s given.', $key, gettype($value))
-            );
-        }
-
-        return $value;
+        return $this->typeable->integer($key, $default);
     }
 
     /**
@@ -127,15 +120,7 @@ class Repository implements ArrayAccess, ConfigContract
      */
     public function float(string $key, $default = null): float
     {
-        $value = $this->get($key, $default);
-
-        if (! is_float($value)) {
-            throw new InvalidArgumentException(
-                sprintf('Configuration value for key [%s] must be a float, %s given.', $key, gettype($value))
-            );
-        }
-
-        return $value;
+        return $this->typeable->float($key, $default);
     }
 
     /**
@@ -147,15 +132,7 @@ class Repository implements ArrayAccess, ConfigContract
      */
     public function boolean(string $key, $default = null): bool
     {
-        $value = $this->get($key, $default);
-
-        if (! is_bool($value)) {
-            throw new InvalidArgumentException(
-                sprintf('Configuration value for key [%s] must be a boolean, %s given.', $key, gettype($value))
-            );
-        }
-
-        return $value;
+        return $this->typeable->boolean($key, $default);
     }
 
     /**
@@ -167,15 +144,7 @@ class Repository implements ArrayAccess, ConfigContract
      */
     public function array(string $key, $default = null): array
     {
-        $value = $this->get($key, $default);
-
-        if (! is_array($value)) {
-            throw new InvalidArgumentException(
-                sprintf('Configuration value for key [%s] must be an array, %s given.', $key, gettype($value))
-            );
-        }
-
-        return $value;
+        return $this->typeable->array($key, $default);
     }
 
     /**
