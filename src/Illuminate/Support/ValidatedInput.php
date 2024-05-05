@@ -412,4 +412,18 @@ class ValidatedInput implements ValidatedData
         return array_keys($this->input());
     }
 
+    /**
+     * Retrieve an input item from the validated inputs.
+     *
+     * @param  string|null  $key
+     * @param  mixed  $default
+     * @return mixed
+     */
+    public function input($key = null, $default = null)
+    {
+        return data_get(
+            $this->all(), $key, $default
+        );
+    }
+
 }
