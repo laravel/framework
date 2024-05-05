@@ -347,4 +347,25 @@ class ValidatedInput implements ValidatedData
         return false;
     }
 
+    /**
+     * Apply the callback if the validated inputs contains a non-empty value for the given input item key.
+     *
+     * @param  string  $key
+     * @param  callable  $callback
+     * @param  callable|null  $default
+     * @return $this|mixed
+     */
+    public function whenFilled($key, callable $callback, callable $default = null)
+    {
+        if ($this->filled($key)) {
+            return $callback(data_get($this->all(), $key)) ?: $this;
+        }
+
+        if ($default) {
+            return $default();
+        }
+
+        return $this;
+    }
+
 }
