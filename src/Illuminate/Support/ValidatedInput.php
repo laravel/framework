@@ -389,4 +389,17 @@ class ValidatedInput implements ValidatedData
         return $this;
     }
 
+    /**
+     * Determine if the given input key is an empty string for "filled".
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    protected function isEmptyString($key)
+    {
+        $value = $this->input($key);
+
+        return ! is_bool($value) && ! is_array($value) && trim((string) $value) === '';
+    }
+
 }
