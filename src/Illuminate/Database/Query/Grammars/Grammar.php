@@ -630,6 +630,20 @@ class Grammar extends BaseGrammar
     }
 
     /**
+     * Compile a "JSON contains" statement into SQL.
+     *
+     * @param  string  $column
+     * @param  string  $value
+     * @return string
+     *
+     * @throws \RuntimeException
+     */
+    protected function compileJsonContains($column, $value)
+    {
+        throw new RuntimeException('This database engine does not support JSON contains operations.');
+    }
+
+    /**
      * Compile a "where JSON overlaps" clause.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
@@ -658,20 +672,6 @@ class Grammar extends BaseGrammar
     protected function compileJsonOverlaps($column, $value)
     {
         throw new RuntimeException('This database engine does not support JSON overlaps operations.');
-    }
-
-    /**
-     * Compile a "JSON contains" statement into SQL.
-     *
-     * @param  string  $column
-     * @param  string  $value
-     * @return string
-     *
-     * @throws \RuntimeException
-     */
-    protected function compileJsonContains($column, $value)
-    {
-        throw new RuntimeException('This database engine does not support JSON contains operations.');
     }
 
     /**
