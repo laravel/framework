@@ -4922,6 +4922,13 @@ class ValidationValidatorTest extends TestCase
         // Ensure validation doesn't erroneously fail when ratio doesn't matches
         $v = new Validator($trans, ['x' => $uploadedFile], ['x' => 'dimensions:ratio=1']);
         $this->assertFalse($v->passes());
+
+        // Knowing that demo image5.png has width = 1366 and height = 768
+        $uploadedFile = new UploadedFile(__DIR__.'/fixtures/image5.png', '', null, null, true);
+        $trans = $this->getIlluminateArrayTranslator();
+
+        $v = new Validator($trans, ['x' => $uploadedFile], ['x' => 'dimensions:ratio=16/9']);
+        $this->assertTrue($v->passes());
     }
 
     public function testValidateMimetypes()
