@@ -9,7 +9,7 @@ class PasswordResetLinkSent
     use SerializesModels;
 
     /**
-     * The user.
+     * The user instance.
      *
      * @var \Illuminate\Contracts\Auth\CanResetPassword
      */
