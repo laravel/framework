@@ -41,7 +41,7 @@ class RouteServiceProvider extends ServiceProvider
      *
      * @var \Closure|null
      */
-    protected static $loadCachedRoutesUsing;
+    protected static $alwaysLoadCachedRoutesUsing;
 
     /**
      * Register any application services.
@@ -103,12 +103,12 @@ class RouteServiceProvider extends ServiceProvider
     /**
      * Register the callback that will be used to load the application's cached routes.
      *
-     * @param  \Closure|null  $loadCachedRoutesCallback
+     * @param  \Closure|null  $routesCallback
      * @return void
      */
-    public static function loadCachedRoutesUsing(?Closure $loadCachedRoutesCallback)
+    public static function loadCachedRoutesUsing(?Closure $routesCallback)
     {
-        self::$loadCachedRoutesUsing = $loadCachedRoutesCallback;
+        self::$alwaysLoadCachedRoutesUsing = $routesCallback;
     }
 
     /**
@@ -140,11 +140,12 @@ class RouteServiceProvider extends ServiceProvider
      */
     protected function loadCachedRoutes()
     {
-        if (! is_null(self::$loadCachedRoutesUsing)) {
-            $this->app->call(self::$loadCachedRoutesUsing);
+        if (! is_null(self::$alwaysLoadCachedRoutesUsing)) {
+            $this->app->call(self::$alwaysLoadCachedRoutesUsing);
 
             return;
         }
+
         $this->app->booted(function () {
             require $this->app->getCachedRoutesPath();
         });
