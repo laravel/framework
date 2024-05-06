@@ -512,4 +512,24 @@ class ValidatedInput implements ValidatedData
         return Date::createFromFormat($format, $this->input($key), $tz);
     }
 
+    /**
+     * Retrieve input from the validated inputs as an enum.
+     *
+     * @template TEnum
+     *
+     * @param  string  $key
+     * @param  class-string<TEnum>  $enumClass
+     * @return TEnum|null
+     */
+    public function enum($key, $enumClass)
+    {
+        if ($this->isNotFilled($key) ||
+            ! enum_exists($enumClass) ||
+            ! method_exists($enumClass, 'tryFrom')) {
+            return null;
+        }
+
+        return $enumClass::tryFrom($this->input($key));
+    }
+
 }
