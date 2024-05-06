@@ -174,6 +174,19 @@ class ValidatedInput implements ValidatedData
     }
 
     /**
+     * Determine if the given input key is an empty string.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    protected function isEmptyString($key)
+    {
+        $value = $this->input($key);
+
+        return ! is_bool($value) && ! is_array($value) && trim((string) $value) === '';
+    }
+
+    /**
      * Determine if the validated input is missing one or more keys.
      *
      * @param  mixed  $keys
@@ -203,19 +216,6 @@ class ValidatedInput implements ValidatedData
         }
 
         return $this;
-    }
-
-    /**
-     * Determine if the given input key is an empty string for "filled".
-     *
-     * @param  string  $key
-     * @return bool
-     */
-    protected function isEmptyString($key)
-    {
-        $value = $this->input($key);
-
-        return ! is_bool($value) && ! is_array($value) && trim((string) $value) === '';
     }
 
     /**
