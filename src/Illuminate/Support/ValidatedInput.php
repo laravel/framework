@@ -309,4 +309,23 @@ class ValidatedInput implements ValidatedData
         return true;
     }
 
+    /**
+     * Determine if the validated inputs contains an empty value for an input item.
+     *
+     * @param  string|array  $key
+     * @return bool
+     */
+    public function isNotFilled($key)
+    {
+        $keys = is_array($key) ? $key : func_get_args();
+
+        foreach ($keys as $value) {
+            if (! $this->isEmptyString($value)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
 }
