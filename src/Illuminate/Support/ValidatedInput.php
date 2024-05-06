@@ -534,6 +534,19 @@ class ValidatedInput implements ValidatedData
     }
 
     /**
+     * Dump the validated inputs items and end the script.
+     *
+     * @param  mixed  ...$keys
+     * @return never
+     */
+    public function dd(...$keys)
+    {
+        $this->dump(...$keys);
+
+        exit(1);
+    }
+
+    /**
      * Dump the items.
      *
      * @param  mixed  $keys
