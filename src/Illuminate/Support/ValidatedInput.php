@@ -464,4 +464,16 @@ class ValidatedInput implements ValidatedData
         return filter_var($this->input($key, $default), FILTER_VALIDATE_BOOLEAN);
     }
 
+    /**
+     * Retrieve input as an integer value.
+     *
+     * @param  string  $key
+     * @param  int  $default
+     * @return int
+     */
+    public function integer($key, $default = 0)
+    {
+        return intval($this->input($key, $default));
+    }
+
 }
