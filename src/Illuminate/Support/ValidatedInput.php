@@ -426,4 +426,16 @@ class ValidatedInput implements ValidatedData
         );
     }
 
+    /**
+     * Retrieve input from the validated inputs as a Stringable instance.
+     *
+     * @param  string  $key
+     * @param  mixed  $default
+     * @return \Illuminate\Support\Stringable
+     */
+    public function string($key, $default = null)
+    {
+        return str($this->input($key, $default));
+    }
+
 }
