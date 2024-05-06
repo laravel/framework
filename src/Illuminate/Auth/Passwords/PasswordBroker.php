@@ -86,8 +86,6 @@ class PasswordBroker implements PasswordBrokerContract
             $this->events->dispatch(new PasswordResetLinkSent($user));
         }
 
-        $this->firePasswordResetSentEvent($user);
-
         return static::RESET_LINK_SENT;
     }
 
