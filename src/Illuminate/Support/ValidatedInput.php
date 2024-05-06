@@ -96,7 +96,7 @@ class ValidatedInput implements ValidatedData
     }
 
     /**
-     * Determine if the validated input contains a non-empty value for an input key.
+     * Determine if the validated input contains a non-empty value for an input item.
      *
      * @param  string|array  $key
      * @return bool
@@ -115,7 +115,7 @@ class ValidatedInput implements ValidatedData
     }
 
     /**
-     * Determine if the validated input contains an empty value for an input key.
+     * Determine if the validated input contains an empty value for an input item.
      *
      * @param  string|array  $key
      * @return bool
@@ -134,7 +134,7 @@ class ValidatedInput implements ValidatedData
     }
 
     /**
-     * Determine if the validated input contains a non-empty value for any of the given input keys.
+     * Determine if the validated input contains a non-empty value for any of the given input items.
      *
      * @param  string|array  $keys
      * @return bool
@@ -174,7 +174,7 @@ class ValidatedInput implements ValidatedData
     }
 
     /**
-     * Determine if the given input key is an empty string.
+     * Determine if the given input item is an empty string.
      *
      * @param  string  $key
      * @return bool
@@ -483,7 +483,7 @@ class ValidatedInput implements ValidatedData
     }
 
     /**
-     * Determine if an input key is set.
+     * Determine if an input item is set.
      *
      * @return bool
      */
@@ -493,7 +493,7 @@ class ValidatedInput implements ValidatedData
     }
 
     /**
-     * Remove an input key.
+     * Remove an input item.
      *
      * @param  string  $name
      * @return void
