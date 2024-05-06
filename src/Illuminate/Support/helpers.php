@@ -128,10 +128,6 @@ if (! function_exists('e')) {
             $value = $value->value;
         }
 
-        if (is_int($value) || is_float($value)) {
-            return (string) $value;
-        }
-
         return htmlspecialchars($value ?? '', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8', $doubleEncode);
     }
 }
