@@ -11,6 +11,7 @@ use Illuminate\Support\Onceable;
 use Illuminate\Support\Optional;
 use Illuminate\Support\Sleep;
 use Illuminate\Support\Str;
+use Illuminate\Support\Stringable;
 
 if (! function_exists('append_config')) {
     /**
