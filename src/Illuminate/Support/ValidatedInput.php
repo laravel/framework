@@ -151,7 +151,7 @@ class ValidatedInput implements ValidatedData
      */
     public function __get($name)
     {
-        return $this->input[$name];
+        return $this->input($name);
     }
 
     /**
@@ -206,7 +206,7 @@ class ValidatedInput implements ValidatedData
      */
     public function offsetGet($key): mixed
     {
-        return $this->input[$key];
+        return $this->input($key);
     }
 
     /**
