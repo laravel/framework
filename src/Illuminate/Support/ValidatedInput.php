@@ -269,4 +269,25 @@ class ValidatedInput implements ValidatedData
         return Arr::hasAny($input, $keys);
     }
 
+    /**
+     * Apply the callback if the validated inputs contains the given input item key.
+     *
+     * @param  string  $key
+     * @param  callable  $callback
+     * @param  callable|null  $default
+     * @return $this|mixed
+     */
+    public function whenHas($key, callable $callback, callable $default = null)
+    {
+        if ($this->has($key)) {
+            return $callback(data_get($this->all(), $key)) ?: $this;
+        }
+
+        if ($default) {
+            return $default();
+        }
+
+        return $this;
+    }
+
 }
