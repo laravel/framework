@@ -3,9 +3,11 @@
 namespace Illuminate\Auth\Passwords;
 
 use Closure;
+use Illuminate\Auth\Events\PasswordResetLinkSent;
 use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
 use Illuminate\Contracts\Auth\PasswordBroker as PasswordBrokerContract;
 use Illuminate\Contracts\Auth\UserProvider;
+use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\Arr;
 use UnexpectedValueException;
 
@@ -26,16 +28,25 @@ class PasswordBroker implements PasswordBrokerContract
     protected $users;
 
     /**
+     * The event dispatcher instance.
+     *
+     * @var \Illuminate\Contracts\Events\Dispatcher
+     */
+    protected $events;
+
+    /**
      * Create a new password broker instance.
      *
      * @param  \Illuminate\Auth\Passwords\TokenRepositoryInterface  $tokens
      * @param  \Illuminate\Contracts\Auth\UserProvider  $users
+     * @param  \Illuminate\Contracts\Events\Dispatcher  $users
      * @return void
      */
-    public function __construct(TokenRepositoryInterface $tokens, UserProvider $users)
+    public function __construct(TokenRepositoryInterface $tokens, UserProvider $users, ?Dispatcher $dispatcher = null)
     {
         $this->users = $users;
         $this->tokens = $tokens;
+        $this->events = $dispatcher;
     }
 
     /**
@@ -70,6 +81,10 @@ class PasswordBroker implements PasswordBrokerContract
         // user with a link to reset their password. We will then redirect back to
         // the current URI having nothing set in the session to indicate errors.
         $user->sendPasswordResetNotification($token);
+
+        if ($this->events) {
+            $this->events->dispatch(new PasswordResetLinkSent($user));
+        }
 
         return static::RESET_LINK_SENT;
     }
