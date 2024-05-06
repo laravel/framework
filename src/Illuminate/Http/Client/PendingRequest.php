@@ -1199,7 +1199,7 @@ class PendingRequest
      *
      * @return \GuzzleHttp\Client
      */
-    public function buildClient()
+    protected function buildClient()
     {
         return $this->client ?? $this->createClient($this->buildHandlerStack());
     }
@@ -1230,7 +1230,7 @@ class PendingRequest
      * @param  \GuzzleHttp\HandlerStack  $handlerStack
      * @return \GuzzleHttp\Client
      */
-    public function createClient($handlerStack)
+    protected function createClient($handlerStack)
     {
         return new Client([
             'handler' => $handlerStack,
