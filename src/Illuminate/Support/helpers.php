@@ -127,7 +127,7 @@ if (! function_exists('e')) {
         if ($value instanceof BackedEnum) {
             $value = $value->value;
         }
-        
+
         if (is_int($value) || is_float($value)) {
             return (string) $value;
         }
