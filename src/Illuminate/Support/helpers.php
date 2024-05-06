@@ -61,7 +61,7 @@ if (! function_exists('blank')) {
         }
 
         if ($value instanceof Stringable) {
-            return $value->trim()->toString() === '';
+            return trim((string) $value) === '';
         }
 
         return empty($value);
