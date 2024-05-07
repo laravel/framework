@@ -282,7 +282,7 @@ trait ConditionallyLoadsAttributes
     /**
      * Retrieve a nested relationships if it has been loaded.
      *
-     * @param  string $relationship
+     * @param  string  $relationship
      * @param  mixed  $value
      * @param  mixed  $default
      * @return \Illuminate\Http\Resources\MissingValue|mixed
@@ -296,17 +296,15 @@ trait ConditionallyLoadsAttributes
         $relationInstance = $this->resource;
         $relationArray = explode('.', $relationship);
 
-        foreach($relationArray as $currentRelation) {
-
-            if(! $relationInstance?->relationLoaded($currentRelation)) {
+        foreach ($relationArray as $currentRelation) {
+            if (! $relationInstance?->relationLoaded($currentRelation)) {
                 return value($default);
             }
 
             $relationInstance = $relationInstance->{$currentRelation};
-            if($relationInstance instanceof \Illuminate\Database\Eloquent\Collection) {
+            if ($relationInstance instanceof \Illuminate\Database\Eloquent\Collection) {
                 $relationInstance = $relationInstance->first();
             }
-
         }
 
         if (func_num_args() === 1) {
