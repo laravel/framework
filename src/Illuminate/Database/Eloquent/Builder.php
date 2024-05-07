@@ -765,7 +765,7 @@ class Builder implements BuilderContract
             $columns = ['*'];
         }
 
-        if(count($models = $this->get($columns)) > 0) {
+        if (count($models = $this->get($columns)) > 0) {
             return $models;
         }
 
