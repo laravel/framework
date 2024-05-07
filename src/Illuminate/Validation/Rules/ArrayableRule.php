@@ -48,7 +48,7 @@ trait ArrayableRule
     /**
      * Append kays to the values.
      *
-     * @param  array|string  $values
+     * @param  \Illuminate\Contracts\Support\Arrayable|\BackedEnum|\UnitEnum|array|string  $values
      * @return $this
      */
     public function append($values)
@@ -65,7 +65,7 @@ trait ArrayableRule
     /**
      * Remove kays from the values.
      *
-     * @param  array|string  $values
+     * @param  \Illuminate\Contracts\Support\Arrayable|\BackedEnum|\UnitEnum|array|string  $values
      * @return $this
      */
     public function remove($values)
