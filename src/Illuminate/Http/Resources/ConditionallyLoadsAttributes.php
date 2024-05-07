@@ -280,6 +280,43 @@ trait ConditionallyLoadsAttributes
     }
 
     /**
+     * Retrieve a nested relationships if it has been loaded.
+     *
+     * @param  string $relationship
+     * @param  mixed  $value
+     * @param  mixed  $default
+     * @return \Illuminate\Http\Resources\MissingValue|mixed
+     */
+    protected function whenNestedLoaded($relationship, $value = null, $default = null)
+    {
+        if (func_num_args() < 3) {
+            $default = new MissingValue;
+        }
+
+        $relationInstance = $this->resource;
+        $relationArray = explode('.', $relationship);
+
+        foreach($relationArray as $currentRelation) {
+
+            if(! $relationInstance?->relationLoaded($currentRelation)) {
+                return value($default);
+            }
+
+            $relationInstance = $relationInstance->{$currentRelation};
+            if($relationInstance instanceof \Illuminate\Database\Eloquent\Collection) {
+                $relationInstance = $relationInstance->first();
+            }
+
+        }
+
+        if (func_num_args() === 1) {
+            return $this->resource->{$relationArray[0]};
+        }
+
+        return value($value);
+    }
+
+    /**
      * Retrieve a relationship count if it exists.
      *
      * @param  string  $relationship
