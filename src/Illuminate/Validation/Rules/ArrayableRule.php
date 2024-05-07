@@ -72,7 +72,7 @@ trait ArrayableRule
 
     /**
      * Format the array values.
-     * 
+     *
      * @param  array  $values
      * @return array
      */
@@ -85,7 +85,7 @@ trait ArrayableRule
                 default => $value,
             };
 
-            return '"' . str_replace('"', '""', $value) . '"';
+            return '"'.str_replace('"', '""', $value).'"';
         }, $values);
     }
 

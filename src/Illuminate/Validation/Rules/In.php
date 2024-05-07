@@ -16,6 +16,6 @@ class In implements Stringable
      */
     public function __toString()
     {
-        return 'in:' . implode(',', $this->formatValues());
+        return 'in:'.implode(',', $this->formatValues());
     }
 }
