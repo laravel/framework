@@ -68,5 +68,17 @@ class ValidationInRuleTest extends TestCase
         $rule = Rule::in([PureEnum::one]);
 
         $this->assertSame('in:"one"', (string) $rule);
+
+        $rule = Rule::in([PureEnum::one])->when(true, function ($rule) {
+            return $rule->append(PureEnum::two);
+        });
+
+        $this->assertSame('in:"one","two"', (string) $rule);
+
+        $rule = Rule::in([PureEnum::one, PureEnum::two])->when(true, function ($rule) {
+            return $rule->remove(PureEnum::two);
+        });
+
+        $this->assertSame('in:"one"', (string) $rule);
     }
 }

@@ -64,5 +64,17 @@ class ValidationNotInRuleTest extends TestCase
         $rule = Rule::notIn([PureEnum::one]);
 
         $this->assertSame('not_in:"one"', (string) $rule);
+
+        $rule = Rule::notIn([PureEnum::one])->when(true, function ($rule) {
+            return $rule->append(PureEnum::two);
+        });
+
+        $this->assertSame('not_in:"one","two"', (string) $rule);
+
+        $rule = Rule::notIn([PureEnum::one, PureEnum::two])->when(true, function ($rule) {
+            return $rule->remove(PureEnum::two);
+        });
+
+        $this->assertSame('not_in:"one"', (string) $rule);
     }
 }
