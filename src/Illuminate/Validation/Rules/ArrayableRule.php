@@ -4,7 +4,6 @@ namespace Illuminate\Validation\Rules;
 
 use BackedEnum;
 use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Support\Arr;
 use UnitEnum;
 
 trait ArrayableRule
