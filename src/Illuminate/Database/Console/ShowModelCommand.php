@@ -234,15 +234,11 @@ class ShowModelCommand extends DatabaseInspectionCommand
      */
     protected function getEvents($model)
     {
-        $formatted = [];
-        foreach ($model->dispatchesEvents() as $event => $class) {
-            $formatted[] = [
+        return collect($model->dispatchesEvents())
+            ->map(fn (string $class, string $event) => [
                 'event' => $event,
-                'class' => $class,
-            ];
-        }
-
-        return collect($formatted);
+                'class' => $class
+            ])->values();
     }
 
     /**
