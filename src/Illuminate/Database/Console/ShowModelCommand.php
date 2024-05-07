@@ -238,7 +238,7 @@ class ShowModelCommand extends DatabaseInspectionCommand
         foreach ($model->dispatchesEvents() as $event => $class) {
             $formatted[] = [
                 'event' => $event,
-                'class' => $class
+                'class' => $class,
             ];
         }
 
