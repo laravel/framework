@@ -297,7 +297,7 @@ class Route
      *
      * @return string
      */
-    protected function getControllerMethod()
+    public function getControllerMethod()
     {
         return $this->parseControllerCallback()[1];
     }
