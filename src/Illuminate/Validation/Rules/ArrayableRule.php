@@ -4,6 +4,7 @@ namespace Illuminate\Validation\Rules;
 
 use BackedEnum;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Support\Arr;
 use UnitEnum;
 
 trait ArrayableRule
@@ -52,6 +53,10 @@ trait ArrayableRule
      */
     public function append($values)
     {
+        if ($values instanceof Arrayable) {
+            $values = $values->toArray();
+        }
+
         $this->appends = is_array($values) ? $values : func_get_args();
 
         return $this;
@@ -65,6 +70,10 @@ trait ArrayableRule
      */
     public function remove($values)
     {
+        if ($values instanceof Arrayable) {
+            $values = $values->toArray();
+        }
+
         $this->removals = is_array($values) ? $values : func_get_args();
 
         return $this;
