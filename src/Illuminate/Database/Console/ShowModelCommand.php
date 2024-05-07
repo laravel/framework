@@ -237,7 +237,7 @@ class ShowModelCommand extends DatabaseInspectionCommand
         return collect($model->dispatchesEvents())
             ->map(fn (string $class, string $event) => [
                 'event' => $event,
-                'class' => $class
+                'class' => $class,
             ])->values();
     }
 
