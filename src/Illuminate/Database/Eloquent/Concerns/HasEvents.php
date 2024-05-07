@@ -171,6 +171,16 @@ trait HasEvents
     }
 
     /**
+     * Returns the event map for the model
+     *
+     * @return array
+     */
+    public function dispatchesEvents()
+    {
+        return $this->dispatchesEvents;
+    }
+
+    /**
      * Register a model event with the dispatcher.
      *
      * @param  string  $event
