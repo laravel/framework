@@ -227,7 +227,7 @@ class ShowModelCommand extends DatabaseInspectionCommand
     }
 
     /**
-     * Get the Events that the model dispatches
+     * Get the Events that the model dispatches.
      *
      * @param  \Illuminate\Database\Eloquent\Model  $model
      * @return \Illuminate\Support\Collection

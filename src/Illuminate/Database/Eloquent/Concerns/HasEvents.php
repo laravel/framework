@@ -171,7 +171,7 @@ trait HasEvents
     }
 
     /**
-     * Returns the event map for the model
+     * Returns the event map for the model.
      *
      * @return array
      */
