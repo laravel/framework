@@ -751,6 +751,28 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Execute the query as a "select" statement or call a callback.
+     *
+     * @param  array|string  $columns
+     * @param  \Closure|null  $callback
+     * @return \Illuminate\Database\Eloquent\Collection|static[]|mixed
+     */
+    public function getOr($columns = ['*'], Closure $callback = null)
+    {
+        if ($columns instanceof Closure) {
+            $callback = $columns;
+
+            $columns = ['*'];
+        }
+
+        if(count($models = $this->get($columns)) > 0) {
+            return $models;
+        }
+
+        return $callback();
+    }
+
+    /**
      * Eager load the relationships for the models.
      *
      * @param  array  $models
