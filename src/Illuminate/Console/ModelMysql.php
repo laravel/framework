@@ -46,7 +46,6 @@ class ModelMysql extends Command
         } catch (QueryException $e) {
             return $stub;
         }
-
     }
 
     protected function clearStructureTable()
@@ -118,7 +117,6 @@ class ModelMysql extends Command
 
         $createdFunctions = [];
         foreach ($relationship as $value) {
-
             $nameFunction = lcfirst(str_replace(' ', '', mb_convert_case(str_replace('_', ' ', $value->REFERENCED_TABLE_NAME), MB_CASE_TITLE, 'UTF-8')));
             $tableReference = str_replace(' ', '', mb_convert_case(str_replace('_', ' ', $value->REFERENCED_TABLE_NAME), MB_CASE_TITLE, 'UTF-8'));
 
@@ -127,7 +125,6 @@ class ModelMysql extends Command
             $body .= "\t".'}'.PHP_EOL.PHP_EOL;
 
             $createdFunctions[] = $nameFunction;
-
         }
 
         $sqlRefrenceQuery = DB::table('information_schema.table_constraints as i')
@@ -195,5 +192,4 @@ class ModelMysql extends Command
                 return "\t\tself::FIELD_".strtoupper($field).','.PHP_EOL;
         }
     }
-
 }
