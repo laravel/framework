@@ -6,6 +6,7 @@ use ArrayAccess;
 use Closure;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Session\SymfonySessionDecorator;
+use Illuminate\Support;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
@@ -27,12 +28,8 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
         Concerns\InteractsWithContentTypes,
         Concerns\InteractsWithFlashData,
         Concerns\InteractsWithInput,
+        Support\Traits\Typeable,
         Macroable;
-
-    /**
-     * @var Typeable<Request>
-     */
-    public Typeable $typeable;
 
     /**
      * The decoded JSON content for the request.
@@ -61,13 +58,6 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      * @var \Closure
      */
     protected $routeResolver;
-
-    public function __construct(array $query = [], array $request = [], array $attributes = [], array $cookies = [], array $files = [], array $server = [], $content = null)
-    {
-        parent::__construct($query, $request, $attributes, $cookies, $files, $server, $content);
-
-        $this->typeable = $this->typeable();
-    }
 
     /**
      * Create a new Illuminate HTTP request from server variables.

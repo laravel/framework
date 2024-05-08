@@ -5,12 +5,13 @@ namespace Illuminate\Config;
 use ArrayAccess;
 use Illuminate\Contracts\Config\Repository as ConfigContract;
 use Illuminate\Support\Arr;
-use Illuminate\Support\StrongTypeable;
 use Illuminate\Support\Traits\Macroable;
+use Illuminate\Support\Traits\StrongTypeable;
 
 class Repository implements ArrayAccess, ConfigContract
 {
-    use Macroable;
+    use Macroable,
+        StrongTypeable;
 
     /**
      * All of the configuration items.
@@ -18,13 +19,6 @@ class Repository implements ArrayAccess, ConfigContract
      * @var array
      */
     protected $items = [];
-
-    /**
-     * The strong typeable instance for retrieving configuration values.
-     *
-     * @var StrongTypeable
-     */
-    protected StrongTypeable $typeable;
 
     /**
      * Create a new configuration repository.
@@ -35,8 +29,6 @@ class Repository implements ArrayAccess, ConfigContract
     public function __construct(array $items = [])
     {
         $this->items = $items;
-
-        $this->typeable = new StrongTypeable($this, 'get');
     }
 
     /**
@@ -96,7 +88,7 @@ class Repository implements ArrayAccess, ConfigContract
      */
     public function string(string $key, $default = null): string
     {
-        return $this->typeable->string($key, $default);
+        return $this->typed()->get->string($key, $default);
     }
 
     /**
@@ -108,7 +100,7 @@ class Repository implements ArrayAccess, ConfigContract
      */
     public function integer(string $key, $default = null): int
     {
-        return $this->typeable->integer($key, $default);
+        return $this->typed()->get->integer($key, $default);
     }
 
     /**
@@ -120,7 +112,7 @@ class Repository implements ArrayAccess, ConfigContract
      */
     public function float(string $key, $default = null): float
     {
-        return $this->typeable->float($key, $default);
+        return $this->typed()->get->float($key, $default);
     }
 
     /**
@@ -132,7 +124,7 @@ class Repository implements ArrayAccess, ConfigContract
      */
     public function boolean(string $key, $default = null): bool
     {
-        return $this->typeable->boolean($key, $default);
+        return $this->typed()->get->boolean($key, $default);
     }
 
     /**
@@ -144,7 +136,7 @@ class Repository implements ArrayAccess, ConfigContract
      */
     public function array(string $key, $default = null): array
     {
-        return $this->typeable->array($key, $default);
+        return $this->typed()->get->array($key, $default);
     }
 
     /**

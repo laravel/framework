@@ -2,10 +2,8 @@
 
 namespace Illuminate\Tests\Support;
 
-use Illuminate\Config\Repository as Config;
 use Illuminate\Console\Application;
 use Illuminate\Console\Command;
-use Illuminate\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Route;
@@ -45,16 +43,16 @@ class SupportTypeableTest extends TestCase
 
         $route->bind($request);
 
-        $this->assertInstanceOf(Stringable::class, $route->typeable->string('userid'));
-        $this->assertEquals('1234', $route->typeable->string('userid'));
+        $this->assertInstanceOf(Stringable::class, $route->typed()->parameter->string('userid'));
+        $this->assertEquals('1234', $route->typed()->parameter->string('userid'));
 
-        $this->assertIsBool($boolean = $route->typeable->boolean('unexisting'));
+        $this->assertIsBool($boolean = $route->typed()->parameter->boolean('unexisting'));
         $this->assertFalse($boolean);
 
-        $this->assertIsInt($integer = $route->typeable->integer('userid'));
+        $this->assertIsInt($integer = $route->typed()->parameter->integer('userid'));
         $this->assertEquals(1234, $integer);
 
-        $this->assertIsFloat($float = $route->typeable->float('userid'));
+        $this->assertIsFloat($float = $route->typed()->parameter->float('userid'));
         $this->assertEquals(1234.0, $float);
     }
 
@@ -75,19 +73,19 @@ class SupportTypeableTest extends TestCase
 
         $command->run($input, $output);
 
-        $this->assertInstanceOf(Stringable::class, $string = $command->option->string('userid'));
+        $this->assertInstanceOf(Stringable::class, $string = $command->typed()->option->string('userid'));
         $this->assertEquals('4', $string);
 
-        $this->assertIsBool($boolean = $command->option->boolean('all'));
+        $this->assertIsBool($boolean = $command->typed()->option->boolean('all'));
         $this->assertTrue($boolean);
 
-        $this->assertIsInt($integer = $command->option->integer('userid'));
+        $this->assertIsInt($integer = $command->typed()->option->integer('userid'));
         $this->assertEquals(4, $integer);
 
-        $this->assertIsFloat($float = $command->option->float('userid'));
+        $this->assertIsFloat($float = $command->typed()->option->float('userid'));
         $this->assertEquals(4.0, $float);
 
-        $this->assertIsArray($array = $command->argument->array('theargument'));
+        $this->assertIsArray($array = $command->typed()->argument->array('theargument'));
         $this->assertSame(['first', 'second'], $array);
     }
 }

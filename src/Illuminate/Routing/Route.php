@@ -17,14 +17,18 @@ use Illuminate\Routing\Matching\UriValidator;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
-use Illuminate\Support\Typeable;
+use Illuminate\Support\Traits\Typeable;
 use Laravel\SerializableClosure\SerializableClosure;
 use LogicException;
 use Symfony\Component\Routing\Route as SymfonyRoute;
 
 class Route
 {
-    use CreatesRegularExpressionRouteConstraints, FiltersControllerMiddleware, Macroable, ResolvesRouteDependencies;
+    use CreatesRegularExpressionRouteConstraints,
+        FiltersControllerMiddleware,
+        Macroable,
+        ResolvesRouteDependencies,
+        Typeable;
 
     /**
      * The URI pattern the route responds to.
@@ -131,8 +135,6 @@ class Route
      */
     public $compiled;
 
-    public Typeable $typeable;
-
     /**
      * The router instance used by the route.
      *
@@ -174,7 +176,6 @@ class Route
         $this->uri = $uri;
         $this->methods = (array) $methods;
         $this->action = Arr::except($this->parseAction($action), ['prefix']);
-        $this->typeable = new Typeable($this, 'parameter');
 
         if (in_array('GET', $this->methods) && ! in_array('HEAD', $this->methods)) {
             $this->methods[] = 'HEAD';
