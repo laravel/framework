@@ -16,15 +16,19 @@ class Benchmark
     public static function measure(Closure|array $benchmarkables, int $iterations = 1): array|float
     {
         return collect(Arr::wrap($benchmarkables))->map(function ($callback) use ($iterations) {
-            return collect(range(1, $iterations))->map(function () use ($callback) {
+            $sum = 0;
+
+            LazyCollection::range(1, $iterations)->each(function () use ($callback, &$sum) {
                 gc_collect_cycles();
 
                 $start = hrtime(true);
 
                 $callback();
 
-                return (hrtime(true) - $start) / 1000000;
-            })->average();
+                $sum += (hrtime(true) - $start) / 1000000;
+            });
+
+            return $sum / $iterations;
         })->when(
             $benchmarkables instanceof Closure,
             fn ($c) => $c->first(),
