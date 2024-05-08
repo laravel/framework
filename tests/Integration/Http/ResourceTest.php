@@ -37,6 +37,7 @@ use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalPivotRela
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalRelationship;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalRelationshipAggregates;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalRelationshipCounts;
+use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalRelationshipUsingNamedParameters;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithoutWrap;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithUnlessOptionalData;
 use Illuminate\Tests\Integration\Http\Fixtures\ReallyEmptyPostResource;
@@ -606,6 +607,54 @@ class ResourceTest extends TestCase
         $response->assertExactJson([
             'data' => [
                 'id' => 5,
+            ],
+        ]);
+    }
+
+    public function testWhenLoadedUsingNamedDefaultParameterOnMissingRelation()
+    {
+        Route::get('/', function () {
+            $post = new Post(['id' => 1]);
+
+            return new PostResourceWithOptionalRelationshipUsingNamedParameters($post);
+        });
+
+        $response = $this->withoutExceptionHandling()->get(
+            '/', ['Accept' => 'application/json']
+        );
+
+        $response->assertStatus(200);
+
+        $response->assertExactJson([
+            'data' => [
+                'id' => 1,
+                'author_defaulting_to_null' => null,
+                'author_name' => 'Anonymous',
+            ],
+        ]);
+    }
+
+    public function testWhenLoadedUsingNamedDefaultParameterOnLoadedRelation()
+    {
+        Route::get('/', function () {
+            $post = new Post(['id' => 1]);
+            $post->setRelation('author', new Author(['name' => 'jrrmartin']));
+
+            return new PostResourceWithOptionalRelationshipUsingNamedParameters($post);
+        });
+
+        $response = $this->withoutExceptionHandling()->get(
+            '/', ['Accept' => 'application/json']
+        );
+
+        $response->assertStatus(200);
+
+        $response->assertExactJson([
+            'data' => [
+                'id' => 1,
+                'author' => ['name' => 'jrrmartin'],
+                'author_defaulting_to_null' => ['name' => 'jrrmartin'],
+                'author_name' => 'jrrmartin',
             ],
         ]);
     }
