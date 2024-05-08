@@ -38,7 +38,7 @@ class ModelMysql extends Command
             $body = $this->casts($body);
             $body = $this->relationshipModel($body);
 
-            $arrStub = array_slice(explode(PHP_EOL,$stub), 0, 9);
+            $arrStub = array_slice(explode(PHP_EOL, $stub), 0, 9);
             foreach ($arrStub as &$item) {
                 $item .= PHP_EOL;
             }
@@ -65,7 +65,7 @@ class ModelMysql extends Command
 
         foreach ($arrColumnDrop as $item) {
             $index = array_search($item, $arrColumns);
-            if($index !== false) {
+            if ($index !== false) {
                 unset($this->structureTable[$index]);
             }
         }
@@ -92,7 +92,7 @@ class ModelMysql extends Command
         $body .= PHP_EOL."\tprotected \$fillable = [".PHP_EOL;
 
         foreach ($this->structureTable as $column) {
-            $body .= $this->setText('fillable', $column->Field,null);
+            $body .= $this->setText('fillable', $column->Field, null);
         }
 
         $body .= "\t];".PHP_EOL;
@@ -135,8 +135,8 @@ class ModelMysql extends Command
         $createdFunctions = [];
         foreach ($relationship as $value) {
 
-            $nameFunction   = lcfirst(str_replace(' ', '', mb_convert_case(str_replace('_', ' ', $value->REFERENCED_TABLE_NAME), MB_CASE_TITLE, "UTF-8")));
-            $tableReference = str_replace(' ', '', mb_convert_case(str_replace('_', ' ', $value->REFERENCED_TABLE_NAME), MB_CASE_TITLE, "UTF-8"));
+            $nameFunction = lcfirst(str_replace(' ', '', mb_convert_case(str_replace('_', ' ', $value->REFERENCED_TABLE_NAME), MB_CASE_TITLE, 'UTF-8')));
+            $tableReference = str_replace(' ', '', mb_convert_case(str_replace('_', ' ', $value->REFERENCED_TABLE_NAME), MB_CASE_TITLE, 'UTF-8'));
 
             $body .= "\t".'public function '.$nameFunction.'(){'.PHP_EOL;
             $body .= "\t\t".'$this->belongsTo('.$tableReference.'::class, \''.$value->COLUMN_NAME.'\', \''.$value->REFERENCED_COLUMN_NAME.'\');'.PHP_EOL;
@@ -161,10 +161,10 @@ class ModelMysql extends Command
 
         foreach ($sqlRefrenceQuery as $reference) {
 
-            $nameFunction   = lcfirst(str_replace(' ', '', mb_convert_case(str_replace('_', ' ', $reference->nome_tabela), MB_CASE_TITLE, "UTF-8")));
-            $tableReference = str_replace(' ', '', mb_convert_case(str_replace('_', ' ', $reference->nome_tabela), MB_CASE_TITLE, "UTF-8"));
+            $nameFunction = lcfirst(str_replace(' ', '', mb_convert_case(str_replace('_', ' ', $reference->nome_tabela), MB_CASE_TITLE, 'UTF-8')));
+            $tableReference = str_replace(' ', '', mb_convert_case(str_replace('_', ' ', $reference->nome_tabela), MB_CASE_TITLE, 'UTF-8'));
 
-            if(in_array($nameFunction,$createdFunctions)) {
+            if (in_array($nameFunction,$createdFunctions)) {
                 continue;
             }
 
@@ -182,13 +182,13 @@ class ModelMysql extends Command
     {
 
         $delimiter = '';
-        if(str_contains($text,  '(')) {
+        if (str_contains($text,  '(')) {
             $delimiter = '(';
-        }elseif (str_contains($text,  ' ')) {
+        } elseif (str_contains($text,  ' ')) {
             $delimiter = ' ';
         }
 
-        if($delimiter == '') {
+        if ($delimiter == '') {
             return $text;
         }
 
@@ -203,7 +203,7 @@ class ModelMysql extends Command
 
     }
 
-    protected function setText($type,$field,$typeData)
+    protected function setText($type, $field, $typeData)
     {
 
         switch ($type) {
