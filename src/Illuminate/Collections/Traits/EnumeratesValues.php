@@ -527,6 +527,28 @@ trait EnumeratesValues
     }
 
     /**
+     * Get the average value of a given key.
+     *
+     * @param  (callable(TValue): float|int)|string|null  $callback
+     * @return float|int|null
+     */
+    public function avg($callback = null)
+    {
+        $callback = $this->valueRetriever($callback);
+
+        // Reduce the array to the sum and the count of non-null values.
+        $reduced = $this
+            ->reduce(
+                fn (array $reduce, mixed $value): array => ! is_null($retrieved = $callback($value))
+                    ? [$reduce[0] + $retrieved, $reduce[1] + 1]
+                    : $reduce,
+                [0, 0]
+            );
+
+        return $reduced[1] ? $reduced[0] / $reduced[1] : null;
+    }
+
+    /**
      * Apply the callback if the collection is empty.
      *
      * @template TWhenEmptyReturnType
