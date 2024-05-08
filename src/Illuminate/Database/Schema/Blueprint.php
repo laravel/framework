@@ -119,7 +119,7 @@ class Blueprint
      */
     public function toSql(Connection $connection, Grammar $grammar)
     {
-        $this->addImpliedCommands($connection, $grammar);
+        $this->addImpliedCommands($grammar);
 
         $statements = [];
 
@@ -174,11 +174,10 @@ class Blueprint
     /**
      * Add the commands that are implied by the blueprint's state.
      *
-     * @param  \Illuminate\Database\Connection  $connection
      * @param  \Illuminate\Database\Schema\Grammars\Grammar  $grammar
      * @return void
      */
-    protected function addImpliedCommands(Connection $connection, Grammar $grammar)
+    protected function addImpliedCommands(Grammar $grammar)
     {
         if (count($this->getAddedColumns()) > 0 && ! $this->creating()) {
             array_unshift($this->commands, $this->createCommand('add'));
@@ -188,19 +187,18 @@ class Blueprint
             array_unshift($this->commands, $this->createCommand('change'));
         }
 
-        $this->addFluentIndexes($connection, $grammar);
+        $this->addFluentIndexes($grammar);
 
-        $this->addFluentCommands($connection, $grammar);
+        $this->addFluentCommands($grammar);
     }
 
     /**
      * Add the index commands fluently specified on columns.
      *
-     * @param  \Illuminate\Database\Connection  $connection
      * @param  \Illuminate\Database\Schema\Grammars\Grammar  $grammar
      * @return void
      */
-    protected function addFluentIndexes(Connection $connection, Grammar $grammar)
+    protected function addFluentIndexes(Grammar $grammar)
     {
         foreach ($this->columns as $column) {
             foreach (['primary', 'unique', 'index', 'fulltext', 'fullText', 'spatialIndex'] as $index) {
@@ -247,11 +245,10 @@ class Blueprint
     /**
      * Add the fluent commands specified on any columns.
      *
-     * @param  \Illuminate\Database\Connection  $connection
      * @param  \Illuminate\Database\Schema\Grammars\Grammar  $grammar
      * @return void
      */
-    public function addFluentCommands(Connection $connection, Grammar $grammar)
+    public function addFluentCommands(Grammar $grammar)
     {
         foreach ($this->columns as $column) {
             foreach ($grammar->getFluentCommands() as $commandName) {
