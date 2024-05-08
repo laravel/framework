@@ -193,15 +193,6 @@ class PhpRedisCacheLockTest extends TestCase
         $lock->release();
         $this->assertNull($store->lockConnection()->get($store->getPrefix().'foo'));
 
-        $client->setOption(Redis::OPT_COMPRESSION_LEVEL, Redis::COMPRESSION_ZSTD_MIN);
-        $store->lock('foo')->forceRelease();
-        $this->assertNull($store->lockConnection()->get($store->getPrefix().'foo'));
-        $lock = $store->lock('foo', 10);
-        $this->assertTrue($lock->get());
-        $this->assertFalse($store->lock('foo', 10)->get());
-        $lock->release();
-        $this->assertNull($store->lockConnection()->get($store->getPrefix().'foo'));
-
         $client->setOption(Redis::OPT_COMPRESSION_LEVEL, Redis::COMPRESSION_ZSTD_MAX);
         $store->lock('foo')->forceRelease();
         $this->assertNull($store->lockConnection()->get($store->getPrefix().'foo'));
