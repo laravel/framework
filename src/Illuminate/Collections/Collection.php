@@ -996,6 +996,19 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     }
 
     /**
+     * Prepend one or more items to the beginning of the collection.
+     *
+     * @param  TValue  ...$values
+     * @return $this
+     */
+    public function unshift(...$values)
+    {
+        array_unshift($this->items, ...$values);
+
+        return $this;
+    }
+
+    /**
      * Push all of the given items onto the collection.
      *
      * @template TConcatKey of array-key

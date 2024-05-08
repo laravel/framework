@@ -3788,6 +3788,51 @@ class SupportCollectionTest extends TestCase
         $this->assertSame($expected, $actual);
     }
 
+    public function testUnshiftWithOneItem()
+    {
+        $expected = [
+            0 => 'Jonny from Laroe',
+            1 => ['who' => 'Jonny', 'preposition' => 'from', 'where' => 'Laroe'],
+            2 => ['a', 'b', 'c'],
+            3 => 4,
+            4 => 5,
+            5 => 6,
+        ];
+
+        $data = new Collection([4, 5, 6]);
+        $data->unshift(['a', 'b', 'c']);
+        $data->unshift(['who' => 'Jonny', 'preposition' => 'from', 'where' => 'Laroe']);
+        $actual = $data->unshift('Jonny from Laroe')->toArray();
+
+        $this->assertSame($expected, $actual);
+    }
+
+    public function testUnshiftWithMultipleItems()
+    {
+        $expected = [
+            0 => 'a',
+            1 => 'b',
+            2 => 'c',
+            3 => 'Jonny',
+            4 => 'from',
+            5 => 'Laroe',
+            6 => 'Jonny',
+            7 => 'from',
+            8 => 'Laroe',
+            9 => 4,
+            10 => 5,
+            11 => 6,
+        ];
+
+        $data = new Collection([4, 5, 6]);
+        $data->unshift('Jonny', 'from', 'Laroe');
+        $data->unshift(...[11 => 'Jonny', 12 => 'from', 13 => 'Laroe']);
+        $data->unshift(...collect(['a', 'b', 'c']));
+        $actual = $data->unshift(...[])->toArray();
+
+        $this->assertSame($expected, $actual);
+    }
+
     #[DataProvider('collectionClassProvider')]
     public function testZip($collection)
     {
