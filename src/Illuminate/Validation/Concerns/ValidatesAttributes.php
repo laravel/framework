@@ -1313,12 +1313,12 @@ trait ValidatesAttributes
      */
     public function validateHas($attribute, $value, $parameters)
     {
-        if (!is_array($value)) {
+        if (! is_array($value)) {
             return false;
         }
 
         foreach ($parameters as $parameter) {
-            if (!in_array($parameter, $value)) {
+            if (! in_array($parameter, $value)) {
                 return false;
             }
         }
