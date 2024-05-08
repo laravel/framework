@@ -800,8 +800,6 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      *
      * @param  string  $key
      * @return mixed
-     *
-     * @deprecated Use the "all" or "route" method instead.
      */
     public function __get($key)
     {

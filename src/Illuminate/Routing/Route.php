@@ -1375,8 +1375,6 @@ class Route
      *
      * @param  string  $key
      * @return mixed
-     *
-     * @deprecated Use the "parameter" method instead.
      */
     public function __get($key)
     {
