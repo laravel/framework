@@ -171,16 +171,6 @@ trait HasEvents
     }
 
     /**
-     * Returns the event map for the model.
-     *
-     * @return array
-     */
-    public function dispatchesEvents()
-    {
-        return $this->dispatchesEvents;
-    }
-
-    /**
      * Register a model event with the dispatcher.
      *
      * @param  string  $event
@@ -394,6 +384,16 @@ trait HasEvents
         foreach (array_values($instance->dispatchesEvents) as $event) {
             static::$dispatcher->forget($event);
         }
+    }
+
+    /**
+     * Get the event map for the model.
+     *
+     * @return array
+     */
+    public function dispatchesEvents()
+    {
+        return $this->dispatchesEvents;
     }
 
     /**
