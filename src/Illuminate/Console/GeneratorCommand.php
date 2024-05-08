@@ -343,15 +343,16 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
         return $this->replaceNamespace($stub, $name)->replaceClass($stub, $name);
     }
 
-    protected function insertModel(){
+    protected function insertModel()
+    {
 
         $stub = $this->files->get($this->getStub());
 
-        if($this->input->getArgument('command') != 'make:model'){
+        if($this->input->getArgument('command') != 'make:model') {
             return $stub;
         }
 
-        switch (DB::connection()->getConfig('driver')){
+        switch (DB::connection()->getConfig('driver')) {
 
             case 'mysql':
                 $class = new ModelMysql($this);
