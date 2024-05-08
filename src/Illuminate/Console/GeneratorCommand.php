@@ -4,6 +4,7 @@ namespace Illuminate\Console;
 
 use Illuminate\Console\Concerns\CreatesMatchingTest;
 use Illuminate\Contracts\Console\PromptsForMissingInput;
+use Illuminate\Database\QueryException;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Str;
 use Symfony\Component\Console\Input\InputArgument;
@@ -350,13 +351,15 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
             return $stub;
         }
 
-        switch (\DB::connection()->getConfig('driver')){
+        try {
+            switch (\DB::connection()->getConfig('driver')){
 
-            case 'mysql':
-                $class = new ModelMysql($this);
-                return $class->insertModelMysql($stub);
+                case 'mysql':
+                    $class = new ModelMysql($this);
+                    return $class->insertModelMysql($stub);
 
-        }
+            }
+        }catch (QueryException){}
 
         return $stub;
 
