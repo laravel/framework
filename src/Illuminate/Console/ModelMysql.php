@@ -164,7 +164,7 @@ class ModelMysql extends Command
             $nameFunction = lcfirst(str_replace(' ', '', mb_convert_case(str_replace('_', ' ', $reference->nome_tabela), MB_CASE_TITLE, 'UTF-8')));
             $tableReference = str_replace(' ', '', mb_convert_case(str_replace('_', ' ', $reference->nome_tabela), MB_CASE_TITLE, 'UTF-8'));
 
-            if (in_array($nameFunction,$createdFunctions)) {
+            if (in_array($nameFunction, $createdFunctions)) {
                 continue;
             }
 
@@ -182,9 +182,9 @@ class ModelMysql extends Command
     {
 
         $delimiter = '';
-        if (str_contains($text,  '(')) {
+        if (str_contains($text, '(')) {
             $delimiter = '(';
-        } elseif (str_contains($text,  ' ')) {
+        } elseif (str_contains($text, ' ')) {
             $delimiter = ' ';
         }
 

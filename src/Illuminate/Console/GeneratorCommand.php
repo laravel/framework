@@ -356,8 +356,10 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
 
             case 'mysql':
                 $class = new ModelMysql($this);
-                
-                return $class->insertModelMysql($stub);
+                $stub = $class->insertModelMysql($stub);
+                break;
+            default:
+                $stub .= '';
 
         }
 
