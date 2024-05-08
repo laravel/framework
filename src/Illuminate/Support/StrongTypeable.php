@@ -2,7 +2,6 @@
 
 namespace Illuminate\Support;
 
-use Closure;
 use InvalidArgumentException;
 
 /**
@@ -126,7 +125,7 @@ class StrongTypeable
      */
     public function object(mixed ...$args): object
     {
-        if (!is_object($value = $this->value(...$args))) {
+        if (! is_object($value = $this->value(...$args))) {
             throw new InvalidArgumentException(
                 sprintf('Typed property [%s] must be an object, %s given.', $args[0], gettype($value))
             );

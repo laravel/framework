@@ -15,7 +15,7 @@ class Typeable
      * @return void
      */
     public function __construct(
-        protected mixed           $target,
+        protected mixed $target,
         protected string $typeable)
     {
         //
@@ -24,7 +24,7 @@ class Typeable
     /**
      * Retrieve the value for the given typeable.
      *
-     * @param mixed ...$args
+     * @param  mixed  ...$args
      * @return mixed
      */
     protected function value(mixed ...$args): mixed
@@ -62,7 +62,7 @@ class Typeable
      */
     public function integer(mixed ...$args): int
     {
-        return (int)$this->value(...$args);
+        return (int) $this->value(...$args);
     }
 
     /**
@@ -73,7 +73,7 @@ class Typeable
      */
     public function float(mixed ...$args): float
     {
-        return (float)$this->value(...$args);
+        return (float) $this->value(...$args);
     }
 
     /**
@@ -84,7 +84,7 @@ class Typeable
      */
     public function array(mixed ...$args): array
     {
-        return (array)$this->value(...$args);
+        return (array) $this->value(...$args);
     }
 
     /**
@@ -95,6 +95,6 @@ class Typeable
      */
     public function object(mixed ...$args): object
     {
-        return (object)$this->value(...$args);
+        return (object) $this->value(...$args);
     }
 }
