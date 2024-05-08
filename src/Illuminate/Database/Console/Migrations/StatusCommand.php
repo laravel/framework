@@ -84,7 +84,7 @@ class StatusCommand extends BaseCommand
                 $this->components->info('No migrations found');
             }
 
-            if($this->option('pending') && $migrations->some(fn ($m) => str($m[1])->contains('Pending'))) {
+            if ($this->option('pending') && $migrations->some(fn ($m) => str($m[1])->contains('Pending'))) {
                 return $this->option('pending');
             }
         });
