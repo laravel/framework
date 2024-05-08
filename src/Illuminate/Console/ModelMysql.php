@@ -2,6 +2,9 @@
 
 namespace Illuminate\Console;
 
+use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\DB;
+
 class ModelMysql extends Command
 {
 
@@ -27,7 +30,7 @@ class ModelMysql extends Command
         try {
 
             $body = '';
-            $this->structureTable = \DB::select('describe `'.$this->tableName.'`');
+            $this->structureTable = DB::select('describe `'.$this->tableName.'`');
             $this->clearStructureTable();
 
             $body = $this->constFields($body);
@@ -45,7 +48,7 @@ class ModelMysql extends Command
 
             return implode($arrStub);
 
-        } catch (\Exception $e) {
+        } catch (QueryException $e) {
 
             return $stub;
 
@@ -113,7 +116,7 @@ class ModelMysql extends Command
     public function relationshipModel($body)
     {
 
-        $relationship = \DB::table('INFORMATION_SCHEMA.KEY_COLUMN_USAGE')
+        $relationship = DB::table('INFORMATION_SCHEMA.KEY_COLUMN_USAGE')
             ->whereNotNull('REFERENCED_TABLE_NAME')
             ->where([
                 'TABLE_SCHEMA' => getenv('DB_DATABASE'),
@@ -141,7 +144,7 @@ class ModelMysql extends Command
 
         }
 
-        $sqlRefrenceQuery = \DB::table('information_schema.table_constraints as i')
+        $sqlRefrenceQuery = DB::table('information_schema.table_constraints as i')
             ->select(
                 'i.table_name as nome_tabela','i.constraint_name as nome_fk','k.referenced_table_name as tabela_referencia',
                 'k.referenced_column_name as coluna_tabela_referencia','k.column_name as column_fk'
