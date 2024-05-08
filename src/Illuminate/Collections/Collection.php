@@ -85,13 +85,16 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     {
         $callback = $this->valueRetriever($callback);
 
-        $items = $this
-            ->map(fn ($value) => $callback($value))
-            ->filter(fn ($value) => ! is_null($value));
+        // Reduce the array to the sum and the count of non-null values.
+        $reduced = $this
+            ->reduce(
+                fn (array $reduce, mixed $value): array => ! is_null($retrieved = $callback($value))
+                    ? [$reduce[0] + $retrieved, $reduce[1] + 1]
+                    : $reduce,
+                [0, 0]
+            );
 
-        if ($count = $items->count()) {
-            return $items->sum() / $count;
-        }
+        return $reduced[1] ? $reduced[0] / $reduced[1] : null;
     }
 
     /**

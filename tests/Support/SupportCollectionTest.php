@@ -4060,6 +4060,9 @@ class SupportCollectionTest extends TestCase
         $c = new $collection([1, 2, 3, 4, 5]);
         $this->assertEquals(3, $c->avg());
 
+        $c = new $collection([1, 2, 3, 4, null]);
+        $this->assertEquals(2.5, $c->avg());
+
         $c = new $collection;
         $this->assertNull($c->avg());
 
