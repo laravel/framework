@@ -45,7 +45,7 @@ trait ArrayableRule
     }
 
     /**
-     * Append kays to the values.
+     * Append keys to the values.
      *
      * @param  \Illuminate\Contracts\Support\Arrayable|\BackedEnum|\UnitEnum|array|string  $values
      * @return $this
@@ -62,7 +62,7 @@ trait ArrayableRule
     }
 
     /**
-     * Remove kays from the values.
+     * Remove keys from the values.
      *
      * @param  \Illuminate\Contracts\Support\Arrayable|\BackedEnum|\UnitEnum|array|string  $values
      * @return $this
