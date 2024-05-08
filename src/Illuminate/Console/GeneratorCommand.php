@@ -345,7 +345,6 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
 
     protected function insertModel()
     {
-
         $stub = $this->files->get($this->getStub());
 
         if ($this->input->getArgument('command') != 'make:model') {
@@ -353,18 +352,15 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
         }
 
         switch (DB::connection()->getConfig('driver')) {
-
             case 'mysql':
                 $class = new ModelMysql($this);
                 $stub = $class->insertModelMysql($stub);
                 break;
             default:
                 $stub .= '';
-
         }
 
         return $stub;
-
     }
 
     /**
