@@ -1857,6 +1857,20 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     }
 
     /**
+     * Execute a Closure within a transaction.
+     *
+     * @param  \Closure  $callback
+     * @param  int  $attempts
+     * @return mixed
+     *
+     * @throws \Throwable
+     */
+    public static function transaction($callback, $attempts = 1)
+    {
+        return (new static)->getConnection()->transaction($callback, $attempts);
+    }
+
+    /**
      * Get the table associated with the model.
      *
      * @return string
