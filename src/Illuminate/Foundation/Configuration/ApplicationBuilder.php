@@ -186,7 +186,8 @@ class ApplicationBuilder
         ?string $pages,
         ?string $health,
         string $apiPrefix,
-        ?callable $then) {
+        ?callable $then)
+        {
         return function () use ($web, $api, $pages, $health, $apiPrefix, $then) {
             if ((is_string($api) || is_array($api)) !== false) {
                 if (is_array($api)) {
