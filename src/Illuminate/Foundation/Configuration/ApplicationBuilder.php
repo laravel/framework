@@ -149,7 +149,7 @@ class ApplicationBuilder
         ?string $health = null,
         string $apiPrefix = 'api',
         ?callable $then = null)
-        {
+    {
         if (is_null($using) && (is_string($web) || is_array($web) || is_string($api) || is_array($api) || is_string($pages) || is_string($health)) || is_callable($then)) {
             $using = $this->buildRoutingCallback($web, $api, $pages, $health, $apiPrefix, $then);
         }
@@ -188,7 +188,7 @@ class ApplicationBuilder
         ?string $health,
         string $apiPrefix,
         ?callable $then)
-        {
+    {
         return function () use ($web, $api, $pages, $health, $apiPrefix, $then) {
             if ((is_string($api) || is_array($api)) !== false) {
                 if (is_array($api)) {
