@@ -140,8 +140,7 @@ class ApplicationBuilder
      * @param  callable|null  $then
      * @return $this
      */
-    public function withRouting(
-        ?Closure $using = null,
+    public function withRouting(?Closure $using = null,
         string|array $web = null,
         string|array $api = null,
         ?string $commands = null,
@@ -149,8 +148,7 @@ class ApplicationBuilder
         ?string $pages = null,
         ?string $health = null,
         string $apiPrefix = 'api',
-        ?callable $then = null
-    ) {
+        ?callable $then = null) {
         if (is_null($using) && (is_string($web) || is_array($web) || is_string($api) || is_array($api) || is_string($pages) || is_string($health)) || is_callable($then)) {
             $using = $this->buildRoutingCallback($web, $api, $pages, $health, $apiPrefix, $then);
         }
@@ -183,14 +181,12 @@ class ApplicationBuilder
      * @param  callable|null  $then
      * @return \Closure
      */
-    protected function buildRoutingCallback(
-        string|array $web = null,
+    protected function buildRoutingCallback(string|array $web = null,
         string|array $api = null,
         ?string $pages,
         ?string $health,
         string $apiPrefix,
-        ?callable $then
-    ) {
+        ?callable $then) {
         return function () use ($web, $api, $pages, $health, $apiPrefix, $then) {
             if ((is_string($api) || is_array($api)) !== false) {
                 if (is_array($api)) {
@@ -224,11 +220,9 @@ class ApplicationBuilder
                 }
             }
 
-            if (
-                is_string($pages) &&
+            if (is_string($pages) &&
                 realpath($pages) !== false &&
-                class_exists(Folio::class)
-            ) {
+                class_exists(Folio::class)) {
                 Folio::route($pages, middleware: $this->pageMiddleware);
             }
 
