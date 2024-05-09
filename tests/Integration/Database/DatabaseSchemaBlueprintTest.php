@@ -10,7 +10,6 @@ use Illuminate\Database\Schema\Grammars\SqlServerGrammar;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Orchestra\Testbench\TestCase;
-use RuntimeException;
 
 class DatabaseSchemaBlueprintTest extends TestCase
 {
@@ -586,13 +585,50 @@ class DatabaseSchemaBlueprintTest extends TestCase
         }
     }
 
-    public function testItEnsuresDroppingForeignKeyIsAvailable()
+    public function testItEnsuresDroppingForeignKeyWork()
     {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('This database driver does not support dropping foreign keys.');
+        $connection = DB::connection();
 
-        Schema::table('users', function (Blueprint $table) {
-            $table->dropForeign('something');
+        DB::connection()->getSchemaBuilder()->create('users', function ($table) {
+            $table->id();
         });
+
+        DB::connection()->getSchemaBuilder()->create('sessions', function ($table) {
+            $table->id();
+            $table->foreignId('user_id')->nullable()->index()
+                ->constrained('users', 'id', 'sessions_user_id_foreign')
+                ->onUpdate('CASCADE')
+                ->onDelete('CASCADE');
+        });
+
+        $blueprint = new Blueprint('sessions', function ($table) {
+            $table->dropForeign(['user_id']);
+        });
+
+        $this->assertEqualsCanonicalizing(
+            [
+                'create table "__temp__sessions" ("id" integer primary key autoincrement not null, "user_id" integer)',
+                'insert into "__temp__sessions" ("id", "user_id") select "id", "user_id" from "sessions"',
+                'drop table "sessions"',
+                'alter table "__temp__sessions" rename to "sessions"',
+                'create index "sessions_user_id_index" on "sessions" ("user_id")',
+            ],
+            $blueprint->toSql($connection, new SQLiteGrammar)
+        );
+
+        $this->assertContains(
+            'alter table `sessions` drop foreign key `sessions_user_id_foreign`',
+            $blueprint->toSql($connection, new MySqlGrammar)
+        );
+
+        $this->assertContains(
+            'alter table "sessions" drop constraint "sessions_user_id_foreign"',
+            $blueprint->toSql($connection, new PostgresGrammar)
+        );
+
+        $this->assertContains(
+            'alter table "sessions" drop constraint "sessions_user_id_foreign"',
+            $blueprint->toSql($connection, new SqlServerGrammar)
+        );
     }
 }

@@ -171,7 +171,7 @@ abstract class Grammar extends BaseGrammar
      * @param  \Illuminate\Support\Fluent  $command
      * @return string
      */
-    public function compileDropForeign(Blueprint $blueprint, Fluent $command)
+    public function compileDropForeign(Blueprint $blueprint, Fluent $command, Connection $connection)
     {
         throw new RuntimeException('This database driver does not support dropping foreign keys.');
     }

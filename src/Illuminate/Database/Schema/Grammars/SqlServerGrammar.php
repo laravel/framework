@@ -487,7 +487,7 @@ class SqlServerGrammar extends Grammar
      * @param  \Illuminate\Support\Fluent  $command
      * @return string
      */
-    public function compileDropForeign(Blueprint $blueprint, Fluent $command)
+    public function compileDropForeign(Blueprint $blueprint, Fluent $command, Connection $connection)
     {
         $index = $this->wrap($command->index);
 

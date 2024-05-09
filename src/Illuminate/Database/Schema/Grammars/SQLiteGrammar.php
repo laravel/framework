@@ -293,6 +293,12 @@ class SQLiteGrammar extends Grammar
             'onDelete' => $foreignKey['on_delete'],
         ]))->all();
 
+        if ($command->dropForeign ?? false) {
+            $foreignKeys = collect($foreignKeys)->reject(function ($foreignKey) use ($command) {
+                return $foreignKey->columns === $command->columns;
+            })->all();
+        }
+
         [$primary, $indexes] = collect($schema->getIndexes($table))->map(fn ($index) => new IndexDefinition([
             'name' => match (true) {
                 $index['primary'] => 'primary',
@@ -496,6 +502,20 @@ class SQLiteGrammar extends Grammar
     public function compileDropSpatialIndex(Blueprint $blueprint, Fluent $command)
     {
         throw new RuntimeException('The database driver in use does not support spatial indexes.');
+    }
+
+    /**
+     * Compile a drop foreign key command.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $command
+     * @return string
+     */
+    public function compileDropForeign(Blueprint $blueprint, Fluent $command, Connection $connection)
+    {
+        $command->dropForeign = true;
+
+        return $this->compileChange($blueprint, $command, $connection);
     }
 
     /**
