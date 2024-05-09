@@ -894,7 +894,7 @@ class RoutingUrlGeneratorTest extends TestCase
             $request = Request::create('http://www.foo.com/')
         );
         $url->setKeyResolver(function () {
-            return 'secret';
+            return 'first-secret';
         });
 
         $route = new Route(['GET'], 'foo', ['as' => 'foo', function () {
@@ -902,24 +902,32 @@ class RoutingUrlGeneratorTest extends TestCase
         }]);
         $routes->add($route);
 
-        $request = Request::create($url->signedRoute('foo'));
+        $firstRequest = Request::create($url->signedRoute('foo'));
 
-        $this->assertTrue($url->hasValidSignature($request));
+        $this->assertTrue($url->hasValidSignature($firstRequest));
 
         $request = Request::create($url->signedRoute('foo').'?tampered=true');
 
         $this->assertFalse($url->hasValidSignature($request));
 
         $url2 = $url->withKeyResolver(function () {
-            return 'other-secret';
+            return 'second-secret';
         });
 
-        $this->assertFalse($url2->hasValidSignature($request));
+        $this->assertFalse($url2->hasValidSignature($firstRequest));
 
-        $request = Request::create($url2->signedRoute('foo'));
+        $secondRequest = Request::create($url2->signedRoute('foo'));
 
-        $this->assertTrue($url2->hasValidSignature($request));
-        $this->assertFalse($url->hasValidSignature($request));
+        $this->assertTrue($url2->hasValidSignature($secondRequest));
+        $this->assertFalse($url->hasValidSignature($secondRequest));
+
+        // Key resolver also supports multiple keys, for app key rotation via the config "app.previous_keys"
+        $url3 = $url->withKeyResolver(function () {
+            return ['first-secret', 'second-secret'];
+        });
+
+        $this->assertTrue($url3->hasValidSignature($firstRequest));
+        $this->assertTrue($url3->hasValidSignature($secondRequest));
     }
 
     public function testMissingNamedRouteResolution()
