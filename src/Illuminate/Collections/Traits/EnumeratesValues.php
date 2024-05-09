@@ -540,7 +540,7 @@ trait EnumeratesValues
         $reduced = $this
             ->reduce(
                 static function (array &$reduce, mixed $value) use ($callback): array {
-                    if ( !is_null($retrieved = $callback($value))) {
+                    if (! is_null($retrieved = $callback($value))) {
                         $reduce[0] += $retrieved;
                         $reduce[1]++;
                     }
