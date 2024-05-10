@@ -42,7 +42,7 @@ class RateLimitedWithRedisTest extends TestCase
      *
      * @throws Throwable
      */
-    protected function onNotSuccessfulTest(Throwable $t): never
+    protected function onNotSuccessfulTest(\Throwable $t): never
     {
         Testbench::flushState($this);
 
