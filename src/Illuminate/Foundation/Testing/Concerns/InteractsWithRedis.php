@@ -83,6 +83,7 @@ trait InteractsWithRedis
         foreach (static::redisDriverProvider() as $driver) {
             if (isset($this->redis[$driver[0]])) {
                 $this->redis[$driver[0]]->connection()->disconnect();
+                unset($this->redis[$driver[0]]);
             }
         }
     }
