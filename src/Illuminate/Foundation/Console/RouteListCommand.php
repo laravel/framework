@@ -5,6 +5,7 @@ namespace Illuminate\Foundation\Console;
 use Closure;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Routing\UrlGenerator;
+use Illuminate\Routing\RedirectController;
 use Illuminate\Routing\Route;
 use Illuminate\Routing\Router;
 use Illuminate\Routing\ViewController;
@@ -15,7 +16,6 @@ use ReflectionFunction;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Terminal;
-use Illuminate\Routing\RedirectController;
 
 #[AsCommand(name: 'route:list')]
 class RouteListCommand extends Command
