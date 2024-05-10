@@ -64,7 +64,7 @@ class Rule
      * Get an array rule builder instance.
      *
      * @param  array|null  $keys
-     * @return \Illuminate\Validation\ArrayRule
+     * @return \Illuminate\Validation\Rules\ArrayRule
      */
     public static function array($keys = null)
     {
