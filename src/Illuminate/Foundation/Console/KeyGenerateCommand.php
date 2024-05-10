@@ -19,6 +19,7 @@ class KeyGenerateCommand extends Command
      */
     protected $signature = 'key:generate
                     {--show : Display the key instead of modifying files}
+                    {--previous : Save previous app keys}
                     {--force : Force the operation to run when in production}';
 
     /**
@@ -46,6 +47,12 @@ class KeyGenerateCommand extends Command
         // secure random byte generator and is later base64 encoded for storage.
         if (! $this->setKeyInEnvironmentFile($key)) {
             return;
+        }
+
+        if ($this->option("previous")) {
+            if (!$this->setPreviousKeyInEnvironmentFile()) {
+                return;
+            }
         }
 
         $this->laravel['config']['app.key'] = $key;
@@ -76,6 +83,27 @@ class KeyGenerateCommand extends Command
         $currentKey = $this->laravel['config']['app.key'];
 
         if (strlen($currentKey) !== 0 && (! $this->confirmToProceed())) {
+            return false;
+        }
+        if (!$this->writeNewEnvironmentFileWith($key)) {
+            return false;
+        }
+        
+        return true;
+    }
+
+    /**
+     * Set the application previous key in the environment file.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    protected function setPreviousKeyInEnvironmentFile()
+    {
+        $currentKey = $this->laravel["config"]["app.key"];
+        $previousKeys = implode("," , $this->laravel["config"]["app.previous_keys"]);
+        
+        if (strlen($previousKeys) !== 0 && !$this->confirmToProceed()) {
             return false;
         }
 
@@ -112,6 +140,33 @@ class KeyGenerateCommand extends Command
     }
 
     /**
+     * Write a new environment file with the previous key.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    protected function writeNewEnvironmentFileWithPreviousKey($currentKey ,  $previousKeys)
+    {
+        $replacedKey = preg_replace(
+            $this->previousKeyReplacementPattern($previousKeys),
+            'APP_PREVIOUS_KEYS=' . ($previousKeys ? '"' . $previousKeys . ',' : '"') . $currentKey . '"',
+            $input = file_get_contents($this->laravel->environmentFilePath())
+        );
+        
+        if ($replacedKey === $input || $replacedKey === null) {
+            $this->error(
+                "Unable to set application previous key. No APP_PREVIOUS_KEYS variable was found in the .env file."
+            );
+
+            return false;
+        }
+
+        file_put_contents($this->laravel->environmentFilePath(), $replacedKey);
+
+        return true;
+    }
+
+    /**
      * Get a regex pattern that will match env APP_KEY with any random key.
      *
      * @return string
@@ -121,5 +176,12 @@ class KeyGenerateCommand extends Command
         $escaped = preg_quote('='.$this->laravel['config']['app.key'], '/');
 
         return "/^APP_KEY{$escaped}/m";
+    }
+
+    protected function previousKeyReplacementPattern($previousKeys = "")
+    {
+        $escaped = preg_quote('=' . ($previousKeys ? '"' . $previousKeys . '"' : ''), '/');
+
+        return "/^APP_PREVIOUS_KEYS{$escaped}/m";
     }
 }
