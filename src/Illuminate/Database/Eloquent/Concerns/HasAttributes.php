@@ -2160,8 +2160,8 @@ trait HasAttributes
     /**
      * Checks to see if the value given is equal to the current attribute value.
      *
-     * @param   $key
-     * @param   $value
+     * @param  $key
+     * @param  $value
      * @return bool
      */
     public function hasEquivalent($key, $value)
