@@ -2154,41 +2154,50 @@ trait HasAttributes
         $attribute = Arr::get($this->attributes, $key);
         $original = Arr::get($this->original, $key);
 
-        if ($attribute === $original) {
+        return $this->hasEquivalent($key, $original);
+    }
+
+    /**
+     * Checks to see if the value given is equal to the current attribute value.
+     *
+     * @param $key
+     * @param $value
+     *
+     * @return bool
+     */
+    public function hasEquivalent($key, $value)
+    {
+        $attribute = Arr::get($this->attributes, $key);
+
+        if ($attribute === $value) {
             return true;
         } elseif (is_null($attribute)) {
             return false;
         } elseif ($this->isDateAttribute($key) || $this->isDateCastableWithCustomFormat($key)) {
             return $this->fromDateTime($attribute) ===
-                $this->fromDateTime($original);
+                $this->fromDateTime($value);
         } elseif ($this->hasCast($key, ['object', 'collection'])) {
             return $this->fromJson($attribute) ===
-                $this->fromJson($original);
+                $this->fromJson($value);
         } elseif ($this->hasCast($key, ['real', 'float', 'double'])) {
-            if ($original === null) {
+            if ($value === null) {
                 return false;
             }
 
-            return abs($this->castAttribute($key, $attribute) - $this->castAttribute($key, $original)) < PHP_FLOAT_EPSILON * 4;
-        } elseif ($this->isEncryptedCastable($key) && ! empty(static::currentEncrypter()->getPreviousKeys())) {
-            return false;
+            return abs($this->castAttribute($key, $attribute) - $this->castAttribute($key, $value)) < PHP_FLOAT_EPSILON * 4;
         } elseif ($this->hasCast($key, static::$primitiveCastTypes)) {
             return $this->castAttribute($key, $attribute) ===
-                $this->castAttribute($key, $original);
+                $this->castAttribute($key, $value);
         } elseif ($this->isClassCastable($key) && Str::startsWith($this->getCasts()[$key], [AsArrayObject::class, AsCollection::class])) {
-            return $this->fromJson($attribute) === $this->fromJson($original);
+            return $this->fromJson($attribute) === $this->fromJson($value);
         } elseif ($this->isClassCastable($key) && Str::startsWith($this->getCasts()[$key], [AsEnumArrayObject::class, AsEnumCollection::class])) {
-            return $this->fromJson($attribute) === $this->fromJson($original);
-        } elseif ($this->isClassCastable($key) && $original !== null && Str::startsWith($this->getCasts()[$key], [AsEncryptedArrayObject::class, AsEncryptedCollection::class])) {
-            if (empty(static::currentEncrypter()->getPreviousKeys())) {
-                return $this->fromEncryptedString($attribute) === $this->fromEncryptedString($original);
-            }
-
-            return false;
+            return $this->fromJson($attribute) === $this->fromJson($value);
+        } elseif ($this->isClassCastable($key) && $value !== null && Str::startsWith($this->getCasts()[$key], [AsEncryptedArrayObject::class, AsEncryptedCollection::class])) {
+            return $this->fromEncryptedString($attribute) === $this->fromEncryptedString($value);
         }
 
-        return is_numeric($attribute) && is_numeric($original)
-            && strcmp((string) $attribute, (string) $original) === 0;
+        return is_numeric($attribute) && is_numeric($value)
+            && strcmp((string) $attribute, (string) $value) === 0;
     }
 
     /**
