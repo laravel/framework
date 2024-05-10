@@ -15,8 +15,9 @@ use Illuminate\Queue\Middleware\RateLimitedWithRedis;
 use Illuminate\Support\Str;
 use Mockery as m;
 use Orchestra\Testbench\TestCase;
-use PHPUnit\Framework\Attributes\WithoutErrorHandler;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 
+#[RequiresPhpExtension('redis')]
 class RateLimitedWithRedisTest extends TestCase
 {
     use InteractsWithRedis;
@@ -35,7 +36,6 @@ class RateLimitedWithRedisTest extends TestCase
         parent::tearDown();
     }
 
-    #[WithoutErrorHandler]
     public function testUnlimitedJobsAreExecuted()
     {
         $rateLimiter = $this->app->make(RateLimiter::class);
