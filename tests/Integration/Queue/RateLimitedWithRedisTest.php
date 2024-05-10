@@ -49,7 +49,6 @@ class RateLimitedWithRedisTest extends TestCase
         throw $t;
     }
 
-
     public function testUnlimitedJobsAreExecuted()
     {
         $rateLimiter = $this->app->make(RateLimiter::class);
