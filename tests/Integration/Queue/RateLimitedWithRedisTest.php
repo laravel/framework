@@ -14,6 +14,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\Middleware\RateLimitedWithRedis;
 use Illuminate\Support\Str;
 use Mockery as m;
+use Orchestra\Testbench\Foundation\Application as Testbench;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 
@@ -35,6 +36,19 @@ class RateLimitedWithRedisTest extends TestCase
 
         parent::tearDown();
     }
+
+    /**
+     * This method is called when a test method did not execute successfully.
+     *
+     * @throws Throwable
+     */
+    protected function onNotSuccessfulTest(Throwable $t): never
+    {
+        Testbench::flushState($this);
+
+        throw $t;
+    }
+
 
     public function testUnlimitedJobsAreExecuted()
     {
