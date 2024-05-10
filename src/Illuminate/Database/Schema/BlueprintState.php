@@ -61,7 +61,7 @@ class BlueprintState
     /**
      * Create a new blueprint state instance.
      *
-     * @param  \Illuminate\Database\Schema\Blueprint $blueprint
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Illuminate\Database\Connection  $connection
      * @param  \Illuminate\Database\Schema\Grammars\Grammar  $grammar
      * @return void
@@ -75,7 +75,7 @@ class BlueprintState
         $schema = $connection->getSchemaBuilder();
         $table = $blueprint->getTable();
 
-        $this->columns = collect($schema->getColumns($table))->map(fn($column) => new ColumnDefinition([
+        $this->columns = collect($schema->getColumns($table))->map(fn ($column) => new ColumnDefinition([
             'name' => $column['name'],
             'type' => $column['type_name'],
             'full_type_definition' => $column['type'],

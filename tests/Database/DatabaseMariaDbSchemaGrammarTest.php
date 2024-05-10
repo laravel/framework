@@ -573,7 +573,7 @@ class DatabaseMariaDbSchemaGrammarTest extends TestCase
             'alter table `users` add `one` varchar(255) not null after `foo`',
             'alter table `users` add `two` varchar(255) not null after `one`',
             'alter table `users` add `three` varchar(255) not null',
-        ] , $statements);
+        ], $statements);
     }
 
     public function testAddingGeneratedColumn()

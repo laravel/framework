@@ -732,7 +732,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $this->assertSame([
             'alter table "users" add "created_at" datetimeoffset null',
             'alter table "users" add "updated_at" datetimeoffset null',
-        ] , $statements);
+        ], $statements);
     }
 
     public function testAddingRememberToken()

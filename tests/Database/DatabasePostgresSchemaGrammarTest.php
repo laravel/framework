@@ -39,7 +39,7 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $this->assertSame([
             'alter table "users" add column "id" serial not null primary key',
             'alter table "users" add column "email" varchar(255) not null',
-        ] , $statements);
+        ], $statements);
     }
 
     public function testCreateTableWithAutoIncrementStartingValue()
@@ -872,7 +872,7 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $this->assertSame([
             'alter table "users" add column "created_at" timestamp(0) without time zone null',
             'alter table "users" add column "updated_at" timestamp(0) without time zone null',
-        ] , $statements);
+        ], $statements);
     }
 
     public function testAddingTimestampsTz()
