@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\MultipleRecordsFoundException;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\RecordsNotFoundException;
+use Illuminate\Database\RecordNotFoundException;
 use Illuminate\Pagination\Cursor;
 use Illuminate\Pagination\CursorPaginator;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -333,6 +334,22 @@ trait BuildsQueries
     public function first($columns = ['*'])
     {
         return $this->take(1)->get($columns)->first();
+    }
+
+     /**
+     * Execute the query and get the first result or throw an exception.
+     *
+     * @param  array|string  $columns
+     * @return \Illuminate\Database\Eloquent\Model|object|static|null
+     * @throws \Illuminate\Database\RecordNotFoundException
+     */
+    public function firstOrFail($columns = ['*'], $message = null)
+    {
+        if (! is_null($result = $this->first($columns))) {
+            return $result;
+        }
+
+        throw new RecordNotFoundException($message ?: "No record found for the given query.");
     }
 
     /**
