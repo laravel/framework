@@ -157,7 +157,6 @@ class FindCommand extends Command
      * Search for command and return the result prioritized.
      *
      * @param  string  $value
-     *
      * @return array
      */
     protected function search(string $value): array
