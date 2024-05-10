@@ -141,8 +141,8 @@ class ApplicationBuilder
      * @return $this
      */
     public function withRouting(?Closure $using = null,
-        string|array $web = null,
-        string|array $api = null,
+        string|array|null $web = null,
+        string|array|null $api = null,
         ?string $commands = null,
         ?string $channels = null,
         ?string $pages = null,
@@ -182,8 +182,8 @@ class ApplicationBuilder
      * @param  callable|null  $then
      * @return \Closure
      */
-    protected function buildRoutingCallback(string|array $web = null,
-        string|array $api = null,
+    protected function buildRoutingCallback(string|array|null $web = null,
+        string|array|null $api = null,
         ?string $pages,
         ?string $health,
         string $apiPrefix,
