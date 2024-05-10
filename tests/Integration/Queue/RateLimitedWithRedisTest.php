@@ -18,7 +18,6 @@ use Orchestra\Testbench\Foundation\Application as Testbench;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 
-#[RequiresPhpExtension('redis')]
 class RateLimitedWithRedisTest extends TestCase
 {
     use InteractsWithRedis;
@@ -35,18 +34,6 @@ class RateLimitedWithRedisTest extends TestCase
         $this->tearDownRedis();
 
         parent::tearDown();
-    }
-
-    /**
-     * This method is called when a test method did not execute successfully.
-     *
-     * @throws Throwable
-     */
-    protected function onNotSuccessfulTest(\Throwable $t): never
-    {
-        Testbench::flushState($this);
-
-        throw $t;
     }
 
     public function testUnlimitedJobsAreExecuted()
