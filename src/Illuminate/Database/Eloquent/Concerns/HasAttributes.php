@@ -2162,7 +2162,6 @@ trait HasAttributes
      *
      * @param $key
      * @param $value
-     *
      * @return bool
      */
     public function hasEquivalent($key, $value)
