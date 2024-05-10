@@ -91,7 +91,7 @@ class ImplicitRouteBinding
     /**
      * Handle a missing parameter for a route binding.
      *
-     * @param  \ReflectionParameter $parameter
+     * @param  \ReflectionParameter  $parameter
      */
     protected static function handleMissingParameter($parameter)
     {
