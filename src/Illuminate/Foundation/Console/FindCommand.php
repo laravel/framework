@@ -95,7 +95,7 @@ class FindCommand extends Command
     /**
      * Execute the found command.
      *
-     * @param \Symfony\Component\Console\Command\Command  $command
+     * @param  \Symfony\Component\Console\Command\Command  $command
      */
     protected function executeFoundCommand(SymfonyCommand $command): void
     {
@@ -156,7 +156,7 @@ class FindCommand extends Command
     /**
      * Search for command and return the result prioritized.
      *
-     * @param string  $value
+     * @param  string  $value
      *
      * @return array
      */
@@ -204,10 +204,10 @@ class FindCommand extends Command
                 $definition = $command->getDefinition();
                 $arguments = $definition->getArguments();
                 $options = $definition->getOptions();
-                $deep = implode(PHP_EOL, (array_merge(
+                $deep = implode(PHP_EOL, array_merge(
                     Arr::map($arguments, fn (InputArgument $argument) => $argument->getDescription()),
                     Arr::map($options, fn (InputOption $option) => $option->getDescription()),
-                )));
+                ));
 
                 return [
                     'object' => $command,
