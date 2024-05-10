@@ -15,6 +15,7 @@ use ReflectionFunction;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Terminal;
+use Illuminate\Routing\RedirectController;
 
 #[AsCommand(name: 'route:list')]
 class RouteListCommand extends Command
@@ -244,8 +245,8 @@ class RouteListCommand extends Command
     protected function isFrameworkController(Route $route)
     {
         return in_array($route->getControllerClass(), [
-            '\Illuminate\Routing\RedirectController',
-            '\Illuminate\Routing\ViewController',
+            RedirectController::class,
+            ViewController::class,
         ], true);
     }
 
