@@ -72,6 +72,27 @@ class DatabaseMigrationRefreshCommandTest extends TestCase
         $this->runCommand($command, ['--step' => 2]);
     }
 
+    public function testRefreshCommandExitsWhenPrevented()
+    {
+        $command = new RefreshCommand;
+
+        $app = new ApplicationDatabaseRefreshStub(['path.database' => __DIR__]);
+        $dispatcher = $app->instance(Dispatcher::class, $events = m::mock());
+        $console = m::mock(ConsoleApplication::class)->makePartial();
+        $console->__construct();
+        $command->setLaravel($app);
+        $command->setApplication($console);
+
+        RefreshCommand::preventFromRunning();
+
+        $code = $this->runCommand($command);
+
+        $this->assertSame(1, $code);
+
+        $console->shouldNotHaveBeenCalled();
+        $dispatcher->shouldNotReceive('dispatch');
+    }
+
     protected function runCommand($command, $input = [])
     {
         return $command->run(new ArrayInput($input), new NullOutput);

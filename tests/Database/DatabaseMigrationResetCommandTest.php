@@ -52,6 +52,23 @@ class DatabaseMigrationResetCommandTest extends TestCase
         $this->runCommand($command, ['--pretend' => true, '--database' => 'foo']);
     }
 
+    public function testRefreshCommandExitsWhenPrevented()
+    {
+        $command = new ResetCommand($migrator = m::mock(Migrator::class));
+
+        $app = new ApplicationDatabaseResetStub(['path.database' => __DIR__]);
+        $app->useDatabasePath(__DIR__);
+        $command->setLaravel($app);
+
+        ResetCommand::preventFromRunning();
+
+        $code = $this->runCommand($command);
+
+        $this->assertSame(1, $code);
+
+        $migrator->shouldNotHaveBeenCalled();
+    }
+
     protected function runCommand($command, $input = [])
     {
         return $command->run(new ArrayInput($input), new NullOutput);
