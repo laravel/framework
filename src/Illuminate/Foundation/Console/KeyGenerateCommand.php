@@ -49,7 +49,7 @@ class KeyGenerateCommand extends Command
             return;
         }
 
-        if ($this->option("previous")) {
+        if ($this->option('previous')) {
             if (!$this->setPreviousKeyInEnvironmentFile()) {
                 return;
             }
@@ -100,14 +100,14 @@ class KeyGenerateCommand extends Command
      */
     protected function setPreviousKeyInEnvironmentFile()
     {
-        $currentKey = $this->laravel["config"]["app.key"];
-        $previousKeys = implode("," , $this->laravel["config"]["app.previous_keys"]);
+        $currentKey = $this->laravel['config']['app.key'];
+        $previousKeys = implode(',' , $this->laravel['config']['app.previous_keys']);
         
         if (strlen($previousKeys) !== 0 && !$this->confirmToProceed()) {
             return false;
         }
 
-        if (! $this->writeNewEnvironmentFileWith($key)) {
+        if (!$this->writeNewEnvironmentFileWithPreviousKey($currentKey , $previousKeys)) {
             return false;
         }
 
@@ -178,7 +178,7 @@ class KeyGenerateCommand extends Command
         return "/^APP_KEY{$escaped}/m";
     }
 
-    protected function previousKeyReplacementPattern($previousKeys = "")
+    protected function previousKeyReplacementPattern($previousKeys = '')
     {
         $escaped = preg_quote('=' . ($previousKeys ? '"' . $previousKeys . '"' : ''), '/');
 
