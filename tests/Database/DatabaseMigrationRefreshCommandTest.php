@@ -19,6 +19,7 @@ class DatabaseMigrationRefreshCommandTest extends TestCase
 {
     protected function tearDown(): void
     {
+        RefreshCommand::preventFromRunning(false);
         m::close();
     }
 

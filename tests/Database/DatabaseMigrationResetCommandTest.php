@@ -15,6 +15,7 @@ class DatabaseMigrationResetCommandTest extends TestCase
 {
     protected function tearDown(): void
     {
+        ResetCommand::preventFromRunning(false);
         m::close();
     }
 
