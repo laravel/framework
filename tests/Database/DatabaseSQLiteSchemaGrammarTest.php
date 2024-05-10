@@ -4,10 +4,13 @@ namespace Illuminate\Tests\Database;
 
 use Illuminate\Database\Capsule\Manager;
 use Illuminate\Database\Connection;
+use Illuminate\Database\DatabaseManager;
 use Illuminate\Database\Query\Expression;
+use Illuminate\Database\Query\Processors\SQLiteProcessor;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\ForeignIdColumnDefinition;
 use Illuminate\Database\Schema\Grammars\SQLiteGrammar;
+use Illuminate\Database\Schema\SQLiteBuilder;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
@@ -309,15 +312,39 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $blueprint->foreignId('team_id')->references('id')->on('teams');
         $blueprint->foreignId('team_column_id')->constrained('teams');
 
-        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $grammar = $this->getGrammar();
+        $connection = $this->getConnection();
+        $connection->shouldReceive('getSchemaGrammar')->andReturn($grammar);
+        $connection->shouldReceive('getSchemaBuilder')->andReturn(new SQLiteBuilder($connection));
+        $connection->shouldReceive('getTablePrefix')->andReturn('');
+        $connection->shouldReceive('getPostProcessor')->andReturn(new SQliteProcessor);
+        $connection->shouldReceive('selectFromWriteConnection')->andReturn([]);
+        $connection->shouldReceive('scalar')->andReturn('');
+        $statements = $blueprint->toSql($connection, $grammar);
 
         $this->assertInstanceOf(ForeignIdColumnDefinition::class, $foreignId);
         $this->assertSame([
             'alter table "users" add column "foo" integer not null',
             'alter table "users" add column "company_id" integer not null',
+            'create table "__temp__users" ("foo" integer not null, "company_id" integer not null, foreign key("company_id") references "companies"("id"))',
+            'insert into "__temp__users" ("foo", "company_id") select "foo", "company_id" from "users"',
+            'drop table "users"',
+            'alter table "__temp__users" rename to "users"',
             'alter table "users" add column "laravel_idea_id" integer not null',
+            'create table "__temp__users" ("foo" integer not null, "company_id" integer not null, "laravel_idea_id" integer not null, foreign key("company_id") references "companies"("id"), foreign key("laravel_idea_id") references "laravel_ideas"("id"))',
+            'insert into "__temp__users" ("foo", "company_id", "laravel_idea_id") select "foo", "company_id", "laravel_idea_id" from "users"',
+            'drop table "users"',
+            'alter table "__temp__users" rename to "users"',
             'alter table "users" add column "team_id" integer not null',
+            'create table "__temp__users" ("foo" integer not null, "company_id" integer not null, "laravel_idea_id" integer not null, "team_id" integer not null, foreign key("company_id") references "companies"("id"), foreign key("laravel_idea_id") references "laravel_ideas"("id"), foreign key("team_id") references "teams"("id"))',
+            'insert into "__temp__users" ("foo", "company_id", "laravel_idea_id", "team_id") select "foo", "company_id", "laravel_idea_id", "team_id" from "users"',
+            'drop table "users"',
+            'alter table "__temp__users" rename to "users"',
             'alter table "users" add column "team_column_id" integer not null',
+            'create table "__temp__users" ("foo" integer not null, "company_id" integer not null, "laravel_idea_id" integer not null, "team_id" integer not null, "team_column_id" integer not null, foreign key("company_id") references "companies"("id"), foreign key("laravel_idea_id") references "laravel_ideas"("id"), foreign key("team_id") references "teams"("id"), foreign key("team_column_id") references "teams"("id"))',
+            'insert into "__temp__users" ("foo", "company_id", "laravel_idea_id", "team_id", "team_column_id") select "foo", "company_id", "laravel_idea_id", "team_id", "team_column_id" from "users"',
+            'drop table "users"',
+            'alter table "__temp__users" rename to "users"',
         ], $statements);
     }
 
@@ -325,9 +352,23 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
     {
         $blueprint = new Blueprint('users');
         $blueprint->foreignId('company_id')->constrained(indexName: 'my_index');
-        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $grammar = $this->getGrammar();
+        $connection = $this->getConnection();
+        $connection->shouldReceive('getSchemaGrammar')->andReturn($grammar);
+        $connection->shouldReceive('getSchemaBuilder')->andReturn(new SQLiteBuilder($connection));
+        $connection->shouldReceive('getTablePrefix')->andReturn('');
+        $connection->shouldReceive('getPostProcessor')->andReturn(new SQliteProcessor);
+        $connection->shouldReceive('selectFromWriteConnection')->andReturn([]);
+        $connection->shouldReceive('scalar')->andReturn('');
+        $statements = $blueprint->toSql($connection, $grammar);
+
         $this->assertSame([
             'alter table "users" add column "company_id" integer not null',
+            'create table "__temp__users" ("company_id" integer not null, foreign key("company_id") references "companies"("id"))',
+            'insert into "__temp__users" ("company_id") select "company_id" from "users"',
+            'drop table "users"',
+            'alter table "__temp__users" rename to "users"',
         ], $statements);
     }
 
@@ -730,15 +771,39 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $blueprint->foreignUuid('team_id')->references('id')->on('teams');
         $blueprint->foreignUuid('team_column_id')->constrained('teams');
 
-        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $grammar = $this->getGrammar();
+        $connection = $this->getConnection();
+        $connection->shouldReceive('getSchemaGrammar')->andReturn($grammar);
+        $connection->shouldReceive('getSchemaBuilder')->andReturn(new SQLiteBuilder($connection));
+        $connection->shouldReceive('getTablePrefix')->andReturn('');
+        $connection->shouldReceive('getPostProcessor')->andReturn(new SQliteProcessor);
+        $connection->shouldReceive('selectFromWriteConnection')->andReturn([]);
+        $connection->shouldReceive('scalar')->andReturn('');
+        $statements = $blueprint->toSql($connection, $grammar);
 
         $this->assertInstanceOf(ForeignIdColumnDefinition::class, $foreignUuid);
         $this->assertSame([
             'alter table "users" add column "foo" varchar not null',
             'alter table "users" add column "company_id" varchar not null',
+            'create table "__temp__users" ("foo" varchar not null, "company_id" varchar not null, foreign key("company_id") references "companies"("id"))',
+            'insert into "__temp__users" ("foo", "company_id") select "foo", "company_id" from "users"',
+            'drop table "users"',
+            'alter table "__temp__users" rename to "users"',
             'alter table "users" add column "laravel_idea_id" varchar not null',
+            'create table "__temp__users" ("foo" varchar not null, "company_id" varchar not null, "laravel_idea_id" varchar not null, foreign key("company_id") references "companies"("id"), foreign key("laravel_idea_id") references "laravel_ideas"("id"))',
+            'insert into "__temp__users" ("foo", "company_id", "laravel_idea_id") select "foo", "company_id", "laravel_idea_id" from "users"',
+            'drop table "users"',
+            'alter table "__temp__users" rename to "users"',
             'alter table "users" add column "team_id" varchar not null',
+            'create table "__temp__users" ("foo" varchar not null, "company_id" varchar not null, "laravel_idea_id" varchar not null, "team_id" varchar not null, foreign key("company_id") references "companies"("id"), foreign key("laravel_idea_id") references "laravel_ideas"("id"), foreign key("team_id") references "teams"("id"))',
+            'insert into "__temp__users" ("foo", "company_id", "laravel_idea_id", "team_id") select "foo", "company_id", "laravel_idea_id", "team_id" from "users"',
+            'drop table "users"',
+            'alter table "__temp__users" rename to "users"',
             'alter table "users" add column "team_column_id" varchar not null',
+            'create table "__temp__users" ("foo" varchar not null, "company_id" varchar not null, "laravel_idea_id" varchar not null, "team_id" varchar not null, "team_column_id" varchar not null, foreign key("company_id") references "companies"("id"), foreign key("laravel_idea_id") references "laravel_ideas"("id"), foreign key("team_id") references "teams"("id"), foreign key("team_column_id") references "teams"("id"))',
+            'insert into "__temp__users" ("foo", "company_id", "laravel_idea_id", "team_id", "team_column_id") select "foo", "company_id", "laravel_idea_id", "team_id", "team_column_id" from "users"',
+            'drop table "users"',
+            'alter table "__temp__users" rename to "users"',
         ], $statements);
     }
 

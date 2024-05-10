@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Schema\Grammars\Grammar;
 use Illuminate\Database\Schema\Grammars\MySqlGrammar;
+use Illuminate\Database\Schema\Grammars\SQLiteGrammar;
 use Illuminate\Support\Fluent;
 use Illuminate\Support\Traits\Macroable;
 
@@ -79,6 +80,13 @@ class Blueprint
     public $after;
 
     /**
+     * The blueprint state instance.
+     *
+     * @var \Illuminate\Database\Schema\BlueprintState
+     */
+    private $state;
+
+    /**
      * Create a new schema blueprint.
      *
      * @param  string  $table
@@ -136,6 +144,10 @@ class Blueprint
             $method = 'compile'.ucfirst($command->name);
 
             if (method_exists($grammar, $method) || $grammar::hasMacro($method)) {
+                if ($this->hasState()) {
+                    $this->state->update($command);
+                }
+
                 if (! is_null($sql = $grammar->$method($this, $command, $connection))) {
                     $statements = array_merge($statements, (array) $sql);
                 }
@@ -161,6 +173,8 @@ class Blueprint
     /**
      * Get all of the commands matching the given names.
      *
+     * @deprecated Will be removed in a future Laravel version.
+     *
      * @param  array  $names
      * @return \Illuminate\Support\Collection
      */
@@ -180,17 +194,20 @@ class Blueprint
      */
     protected function addImpliedCommands(Connection $connection, Grammar $grammar)
     {
-        if (count($this->getAddedColumns()) > 0 && ! $this->creating()) {
-            array_unshift($this->commands, $this->createCommand('add'));
-        }
-
-        if (count($this->getChangedColumns()) > 0 && ! $this->creating()) {
-            array_unshift($this->commands, $this->createCommand('change'));
+        if (! $this->creating()) {
+            $this->commands = array_map(
+                fn ($command) => $command instanceof ColumnDefinition
+                    ? $this->createCommand($command->change ? 'change' : 'add', ['column' => $command])
+                    : $command,
+                $this->commands
+            );
         }
 
         $this->addFluentIndexes($connection, $grammar);
 
         $this->addFluentCommands($connection, $grammar);
+
+        $this->addAlterCommands($connection, $grammar);
     }
 
     /**
@@ -257,6 +274,47 @@ class Blueprint
             foreach ($grammar->getFluentCommands() as $commandName) {
                 $this->addCommand($commandName, compact('column'));
             }
+        }
+    }
+
+    /**
+     * Add the alter commands if whenever needed.
+     *
+     * @param  \Illuminate\Database\Connection  $connection
+     * @param  \Illuminate\Database\Schema\Grammars\Grammar  $grammar
+     * @return void
+     */
+    public function addAlterCommands(Connection $connection, Grammar $grammar)
+    {
+        if (! $this->creating() && $grammar instanceof SQLiteGrammar) {
+            $commands = [];
+            $lastCommandWasAlter = false;
+            $hasAlterCommand = false;
+
+            foreach ($this->commands as $command) {
+                if (in_array($command->name, $grammar->alterCommands)) {
+                    $lastCommandWasAlter = true;
+                    $hasAlterCommand = true;
+                } else {
+                    if ($lastCommandWasAlter) {
+                        $commands[] = $this->createCommand('alter');
+                        $lastCommandWasAlter = false;
+                    }
+                }
+
+                $commands[] = $command;
+            }
+
+            if ($lastCommandWasAlter) {
+                $commands[] = $this->createCommand('alter');
+                $lastCommandWasAlter = false;
+            }
+
+            if ($hasAlterCommand) {
+                $this->state = new BlueprintState($this, $connection, $grammar);
+            }
+
+            $this->commands = $commands;
         }
     }
 
@@ -1634,6 +1692,10 @@ class Blueprint
     {
         $this->columns[] = $definition;
 
+        if (! $this->creating()) {
+            $this->commands[] = $definition;
+        }
+
         if ($this->after) {
             $definition->after($this->after);
 
@@ -1669,6 +1731,10 @@ class Blueprint
     {
         $this->columns = array_values(array_filter($this->columns, function ($c) use ($name) {
             return $c['name'] != $name;
+        }));
+
+        $this->commands = array_values(array_filter($this->commands, function ($c) use ($name) {
+            return ! $c instanceof ColumnDefinition || $c['name'] != $name;
         }));
 
         return $this;
@@ -1741,6 +1807,27 @@ class Blueprint
     }
 
     /**
+     * Get the state of the blueprint.
+     *
+     * @return \Illuminate\Database\Schema\BlueprintState
+     */
+    public function getState()
+    {
+        return $this->state;
+    }
+
+    /*
+     * Determine if the blueprint has state.
+     *
+     * @param  mixed  $name
+     * @return bool
+     */
+    private function hasState(): bool
+    {
+        return ! is_null($this->state);
+    }
+
+    /**
      * Get the columns on the blueprint that should be added.
      *
      * @return \Illuminate\Database\Schema\ColumnDefinition[]
@@ -1754,6 +1841,8 @@ class Blueprint
 
     /**
      * Get the columns on the blueprint that should be changed.
+     *
+     * @deprecated Will be removed in a future Laravel version.
      *
      * @return \Illuminate\Database\Schema\ColumnDefinition[]
      */

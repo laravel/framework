@@ -287,7 +287,8 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $blueprint = clone $base;
 
         $this->assertEquals([
-            'alter table `comments` add `commentable_type` varchar(255) not null, add `commentable_id` bigint unsigned not null',
+            'alter table `comments` add `commentable_type` varchar(255) not null',
+            'alter table `comments` add `commentable_id` bigint unsigned not null',
             'alter table `comments` add index `comments_commentable_type_commentable_id_index`(`commentable_type`, `commentable_id`)',
         ], $blueprint->toSql($connection, new MySqlGrammar));
     }
@@ -303,7 +304,8 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $blueprint = clone $base;
 
         $this->assertEquals([
-            'alter table `comments` add `commentable_type` varchar(255) null, add `commentable_id` bigint unsigned null',
+            'alter table `comments` add `commentable_type` varchar(255) null',
+            'alter table `comments` add `commentable_id` bigint unsigned null',
             'alter table `comments` add index `comments_commentable_type_commentable_id_index`(`commentable_type`, `commentable_id`)',
         ], $blueprint->toSql($connection, new MySqlGrammar));
     }
@@ -321,7 +323,8 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $blueprint = clone $base;
 
         $this->assertEquals([
-            'alter table `comments` add `commentable_type` varchar(255) not null, add `commentable_id` char(36) not null',
+            'alter table `comments` add `commentable_type` varchar(255) not null',
+            'alter table `comments` add `commentable_id` char(36) not null',
             'alter table `comments` add index `comments_commentable_type_commentable_id_index`(`commentable_type`, `commentable_id`)',
         ], $blueprint->toSql($connection, new MySqlGrammar));
     }
@@ -339,7 +342,8 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $blueprint = clone $base;
 
         $this->assertEquals([
-            'alter table `comments` add `commentable_type` varchar(255) null, add `commentable_id` char(36) null',
+            'alter table `comments` add `commentable_type` varchar(255) null',
+            'alter table `comments` add `commentable_id` char(36) null',
             'alter table `comments` add index `comments_commentable_type_commentable_id_index`(`commentable_type`, `commentable_id`)',
         ], $blueprint->toSql($connection, new MySqlGrammar));
     }
@@ -357,7 +361,8 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $blueprint = clone $base;
 
         $this->assertEquals([
-            'alter table `comments` add `commentable_type` varchar(255) not null, add `commentable_id` char(26) not null',
+            'alter table `comments` add `commentable_type` varchar(255) not null',
+            'alter table `comments` add `commentable_id` char(26) not null',
             'alter table `comments` add index `comments_commentable_type_commentable_id_index`(`commentable_type`, `commentable_id`)',
         ], $blueprint->toSql($connection, new MySqlGrammar));
     }
@@ -375,7 +380,8 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $blueprint = clone $base;
 
         $this->assertEquals([
-            'alter table `comments` add `commentable_type` varchar(255) null, add `commentable_id` char(26) null',
+            'alter table `comments` add `commentable_type` varchar(255) null',
+            'alter table `comments` add `commentable_id` char(26) null',
             'alter table `comments` add index `comments_commentable_type_commentable_id_index`(`commentable_type`, `commentable_id`)',
         ], $blueprint->toSql($connection, new MySqlGrammar));
     }
