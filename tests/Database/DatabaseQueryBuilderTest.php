@@ -2775,6 +2775,8 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getBuilder();
         $builder->getConnection()->shouldReceive('select')->once()->with('select * from "users" where "id" = ? limit 1', [1], true)->andReturn([]);
 
+        $builder->getProcessor()->shouldReceive('processSelect')->once()->with($builder, [])->andReturn([]);
+
         $this->expectException(RecordNotFoundException::class);
         $this->expectExceptionMessage("No record found for the given query.");
 
