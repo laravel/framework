@@ -341,11 +341,12 @@ trait BuildsQueries
      *
      * @param  array|string  $columns
      * @return \Illuminate\Database\Eloquent\Model|object|static
+     *
      * @throws \Illuminate\Database\RecordNotFoundException
      */
     public function firstOrFail($columns = ['*'], $message = null)
     {
-        if (! is_null($result = $this->first($columns))) {
+        if (!is_null($result = $this->first($columns))) {
             return $result;
         }
 
@@ -389,22 +390,22 @@ trait BuildsQueries
      */
     protected function paginateUsingCursor($perPage, $columns = ['*'], $cursorName = 'cursor', $cursor = null)
     {
-        if (! $cursor instanceof Cursor) {
+        if (!$cursor instanceof Cursor) {
             $cursor = is_string($cursor)
                 ? Cursor::fromEncoded($cursor)
                 : CursorPaginator::resolveCurrentCursor($cursorName, $cursor);
         }
 
-        $orders = $this->ensureOrderForCursorPagination(! is_null($cursor) && $cursor->pointsToPreviousItems());
+        $orders = $this->ensureOrderForCursorPagination(!is_null($cursor) && $cursor->pointsToPreviousItems());
 
-        if (! is_null($cursor)) {
+        if (!is_null($cursor)) {
             // Reset the union bindings so we can add the cursor where in the correct position...
             $this->setBindings([], 'union');
 
             $addCursorConditions = function (self $builder, $previousColumn, $originalColumn, $i) use (&$addCursorConditions, $cursor, $orders) {
                 $unionBuilders = $builder->getUnionBuilders();
 
-                if (! is_null($previousColumn)) {
+                if (!is_null($previousColumn)) {
                     $originalColumn ??= $this->getOriginalColumnNameForCursorPagination($this, $previousColumn);
 
                     $builder->where(
@@ -488,7 +489,7 @@ trait BuildsQueries
     {
         $columns = $builder instanceof Builder ? $builder->getQuery()->getColumns() : $builder->getColumns();
 
-        if (! is_null($columns)) {
+        if (!is_null($columns)) {
             foreach ($columns as $column) {
                 if (($position = strripos($column, ' as ')) !== false) {
                     $original = substr($column, 0, $position);
@@ -518,7 +519,11 @@ trait BuildsQueries
     protected function paginator($items, $total, $perPage, $currentPage, $options)
     {
         return Container::getInstance()->makeWith(LengthAwarePaginator::class, compact(
-            'items', 'total', 'perPage', 'currentPage', 'options'
+            'items',
+            'total',
+            'perPage',
+            'currentPage',
+            'options'
         ));
     }
 
@@ -534,7 +539,10 @@ trait BuildsQueries
     protected function simplePaginator($items, $perPage, $currentPage, $options)
     {
         return Container::getInstance()->makeWith(Paginator::class, compact(
-            'items', 'perPage', 'currentPage', 'options'
+            'items',
+            'perPage',
+            'currentPage',
+            'options'
         ));
     }
 
@@ -550,7 +558,10 @@ trait BuildsQueries
     protected function cursorPaginator($items, $perPage, $cursor, $options)
     {
         return Container::getInstance()->makeWith(CursorPaginator::class, compact(
-            'items', 'perPage', 'cursor', 'options'
+            'items',
+            'perPage',
+            'cursor',
+            'options'
         ));
     }
 
