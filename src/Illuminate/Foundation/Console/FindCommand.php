@@ -175,14 +175,16 @@ class FindCommand extends Command
             Arr::where($this->commands, fn (SymfonyCommand $command) => Str::containsAll($command->getDescription(), $value, true)),
             $this->when(
                 $this->option('deep'),
-                function (SymfonyCommand $command) use ($value) {
-                    $definition = $command->getDefinition();
-                    $deep = implode(PHP_EOL, array_merge(
-                        Arr::map($definition->getArguments(), fn (InputArgument $argument) => $argument->getDescription()),
-                        Arr::map($definition->getOptions(), fn (InputOption $option) => $option->getDescription()),
-                    ));
+                function () use ($value) {
+                    return Arr::where($this->commands, function (SymfonyCommand $command) use ($value) {
+                        $definition = $command->getDefinition();
+                        $deep = implode(PHP_EOL, array_merge(
+                            Arr::map($definition->getArguments(), fn (InputArgument $argument) => $argument->getDescription()),
+                            Arr::map($definition->getOptions(), fn (InputOption $option) => $option->getDescription()),
+                        ));
 
-                    return Str::containsAll($deep, $value, true);
+                        return Str::containsAll($deep, $value, true);
+                    });
                 },
                 fn () => []
             ),
