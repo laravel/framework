@@ -53,7 +53,9 @@ class FindCommand extends Command
      */
     public function handle(): void
     {
-        $this->collectCommands();
+        $description = new ApplicationDescription($this->getApplication());
+        $this->commands = Arr::where($description->getCommands(), fn (SymfonyCommand $command) => ! $command instanceof $this);
+
         $this->searchCommand();
     }
 
@@ -70,7 +72,7 @@ class FindCommand extends Command
             required: true
         );
 
-        (new DescriptorHelper())->describe($this->output, $this->commands[$command]['object']);
+        (new DescriptorHelper())->describe($this->output, $this->commands[$command]);
 
         $action = select(
             label: 'Choose a action',
@@ -82,7 +84,7 @@ class FindCommand extends Command
         );
 
         if ($action == 'Execute the command') {
-            $this->executeFoundCommand($this->commands[$command]['object']);
+            $this->executeFoundCommand($this->commands[$command]);
 
             return;
         }
@@ -168,55 +170,34 @@ class FindCommand extends Command
         $value = preg_split('/\s+/', $value, flags: PREG_SPLIT_NO_EMPTY);
 
         $result = array_merge(
-            Arr::where($this->commands, fn (array $command) => $command['name'] == $value),
-            Arr::where($this->commands, fn (array $command) => Str::containsAll($command['name'], $value, true)),
-            Arr::where($this->commands, fn (array $command) => Str::containsAll($command['description'], $value, true)),
+            Arr::where($this->commands, fn (SymfonyCommand $command) => $command->getName() == $value),
+            Arr::where($this->commands, fn (SymfonyCommand $command) => Str::containsAll($command->getName(), $value, true)),
+            Arr::where($this->commands, fn (SymfonyCommand $command) => Str::containsAll($command->getDescription(), $value, true)),
             $this->when(
                 $this->option('deep'),
-                fn () => Arr::where($this->commands, fn (array $command) => Str::containsAll($command['deep'], $value, true)),
+                function (SymfonyCommand $command) use ($value) {
+                    $definition = $command->getDefinition();
+                    $deep = implode(PHP_EOL, array_merge(
+                        Arr::map($definition->getArguments(), fn (InputArgument $argument) => $argument->getDescription()),
+                        Arr::map($definition->getOptions(), fn (InputOption $option) => $option->getDescription()),
+                    ));
+
+                    return Str::containsAll($deep, $value, true);
+                },
                 fn () => []
             ),
         );
 
+        $result = Arr::mapWithKeys($result, function (SymfonyCommand $command) {
+            $label = windows_os() ? $command->getDescription() : sprintf('[%s] %s', $command->getName(), $command->getDescription());
+
+            return [$command->getName() => $label];
+        });
+
         if (windows_os()) {
-            $result[] = [
-                'name' => $this->getName(),
-                'label' => $this->getDescription(),
-            ];
+            $result[$this->getName()] = $this->getDescription();
         }
 
-        return Arr::pluck($result, 'label', 'name');
-    }
-
-    /**
-     * Collect available commands.
-     *
-     * @return void
-     */
-    protected function collectCommands(): void
-    {
-        $description = new ApplicationDescription($this->getApplication());
-
-        $this->commands = collect($description->getCommands())
-            ->filter(fn (SymfonyCommand $command, string $key) => ! $command instanceof $this)
-            ->map(function (SymfonyCommand $command) {
-                $definition = $command->getDefinition();
-                $arguments = $definition->getArguments();
-                $options = $definition->getOptions();
-                $deep = implode(PHP_EOL, array_merge(
-                    Arr::map($arguments, fn (InputArgument $argument) => $argument->getDescription()),
-                    Arr::map($options, fn (InputOption $option) => $option->getDescription()),
-                ));
-
-                return [
-                    'object' => $command,
-                    'name' => $command->getName(),
-                    'description' => $command->getDescription(),
-                    'label' => windows_os() ? $command->getDescription() :
-                        sprintf('[%s] %s', $command->getName(), $command->getDescription()),
-                    'deep' => $deep,
-                ];
-            })
-            ->toArray();
+        return $result;
     }
 }
