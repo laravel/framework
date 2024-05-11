@@ -340,7 +340,7 @@ trait BuildsQueries
      * Execute the query and get the first result or throw an exception.
      *
      * @param  array|string  $columns
-     * @return \Illuminate\Database\Eloquent\Model|object|static|null
+     * @return \Illuminate\Database\Eloquent\Model|object|static
      * @throws \Illuminate\Database\RecordNotFoundException
      */
     public function firstOrFail($columns = ['*'], $message = null)
