@@ -354,6 +354,12 @@ class SupportStrTest extends TestCase
         $this->assertEquals($expected, Str::containsAll($haystack, $needles, $ignoreCase));
     }
 
+    #[DataProvider('strContainsNoneProvider')]
+    public function testStrContainsNone($haystack, $needles, $expected, $ignoreCase = false)
+    {
+        $this->assertEquals($expected, Str::containsNone($haystack, $needles, $ignoreCase));
+    }
+
     public function testConvertCase()
     {
         // Upper Case Conversion
@@ -1211,6 +1217,18 @@ class SupportStrTest extends TestCase
             ['Taylor Otwell', ['taylor'], false, false],
             ['Taylor Otwell', ['taylor'], true, true],
             ['Taylor Otwell', ['taylor', 'xxx'], false, false],
+            ['Taylor Otwell', ['taylor', 'xxx'], false, true],
+        ];
+    }
+
+    public static function strContainsNoneProvider()
+    {
+        return [
+            ['Taylor Otwell', ['taylor', 'otwell'], true, false],
+            ['Taylor Otwell', ['taylor', 'otwell'], false, true],
+            ['Taylor Otwell', ['taylor'], true, false],
+            ['Taylor Otwell', ['taylor'], false, true],
+            ['Taylor Otwell', ['taylor', 'xxx'], true, false],
             ['Taylor Otwell', ['taylor', 'xxx'], false, true],
         ];
     }

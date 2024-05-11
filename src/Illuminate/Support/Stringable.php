@@ -202,6 +202,18 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     }
 
     /**
+     * Determine if a given string contains none of the array values.
+     *
+     * @param  iterable<string>  $needles
+     * @param  bool  $ignoreCase
+     * @return bool
+     */
+    public function containsNone($needles, $ignoreCase = false)
+    {
+        return Str::containsNone($this->value, $needles, $ignoreCase);
+    }
+
+    /**
      * Convert the case of a string.
      *
      * @param  int  $mode

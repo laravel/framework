@@ -293,6 +293,25 @@ class Str
     }
 
     /**
+     * Determine if a given string contains none of the array values.
+     *
+     * @param  string  $haystack
+     * @param  iterable<string>  $needles
+     * @param  bool  $ignoreCase
+     * @return bool
+     */
+    public static function containsNone($haystack, $needles, $ignoreCase = false)
+    {
+        foreach ($needles as $needle) {
+            if (static::contains($haystack, $needle, $ignoreCase)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
      * Convert the case of a string.
      *
      * @param  string  $string

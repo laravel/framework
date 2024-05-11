@@ -711,6 +711,18 @@ class SupportStringableTest extends TestCase
         $this->assertFalse($this->stringable('taylor otwell')->containsAll(['taylor', 'xxx']));
     }
 
+    public function testContainsNone()
+    {
+        $this->assertTrue($this->stringable('taylor otwell')->containsNone(['laravel']));
+        $this->assertTrue($this->stringable('taylor otwell')->containsNone(['laravel', 'framework']));
+        $this->assertTrue($this->stringable('taylor otwell')->containsNone(['Taylor', 'Otwell']));
+        $this->assertFalse($this->stringable('taylor otwell')->containsNone(['taylor', 'laravel', 'framework']));
+        $this->assertTrue($this->stringable('taylor otwell')->containsNone(['laravel'], true));
+        $this->assertTrue($this->stringable('taylor otwell')->containsNone(['laravel', 'framework'], true));
+        $this->assertFalse($this->stringable('taylor otwell')->containsNone(['Taylor', 'Otwell'], true));
+        $this->assertFalse($this->stringable('taylor otwell')->containsNone(['TAYLOR', 'laravel', 'framework'], true));
+    }
+
     public function testParseCallback()
     {
         $this->assertEquals(['Class', 'method'], $this->stringable('Class@method')->parseCallback('foo'));
