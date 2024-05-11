@@ -341,7 +341,7 @@ trait BuildsQueries
      *
      * @param  array|string  $columns
      * @return \Illuminate\Database\Eloquent\Model|object|static
-     * 
+     *
      * @throws \Illuminate\Database\RecordNotFoundException
      */
     public function firstOrFail($columns = ['*'], $message = null)
