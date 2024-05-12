@@ -72,6 +72,11 @@ class FindCommand extends Command
             required: true
         );
 
+        if (windows_os() && $command == $this->getName()) {
+            $this->searchCommand();
+            return;
+        }
+
         (new DescriptorHelper())->describe($this->output, $this->commands[$command]);
 
         $action = select(
