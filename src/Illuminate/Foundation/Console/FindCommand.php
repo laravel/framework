@@ -74,6 +74,7 @@ class FindCommand extends Command
 
         if (windows_os() && $command == $this->getName()) {
             $this->searchCommand();
+
             return;
         }
 
