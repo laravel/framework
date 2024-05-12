@@ -70,18 +70,6 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $this->assertTrue($schema->hasColumns('test', ['bar', 'qux']));
     }
 
-    public function testDroppingColumnsWorks()
-    {
-        $connection = DB::connection();
-        $schema = $connection->getSchemaBuilder();
-
-        $blueprint = new Blueprint('users', function ($table) {
-            $table->dropColumn('name');
-        });
-
-        $this->assertEquals(['alter table "users" drop column "name"'], $blueprint->toSql($connection, new SQLiteGrammar));
-    }
-
     public function testNativeColumnModifyingOnMySql()
     {
         $connection = DB::connection();

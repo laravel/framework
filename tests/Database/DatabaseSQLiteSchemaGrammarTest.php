@@ -989,6 +989,15 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $this->assertSame('create table "users" ("my_json_column" varchar not null, "my_other_column" varchar as (json_extract("my_json_column", \'$."some_attribute"."nested"\')) stored)', $statements[0]);
     }
 
+    public function testDroppingColumnsWorks()
+    {
+        $blueprint = new Blueprint('users', function ($table) {
+            $table->dropColumn('name');
+        });
+
+        $this->assertEquals(['alter table "users" drop column "name"'], $blueprint->toSql($this->getConnection(), $this->getGrammar()));
+    }
+
     protected function getConnection()
     {
         $connection = m::mock(Connection::class);
