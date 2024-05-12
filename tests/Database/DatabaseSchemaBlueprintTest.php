@@ -120,6 +120,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $this->assertEquals(['alter table "users" add column "created" timestamp(0) without time zone not null default CURRENT_TIMESTAMP'], $blueprint->toSql($connection, new PostgresGrammar));
 
         $blueprint = clone $base;
+        $connection->shouldReceive('getServerVersion')->andReturn('3.35');
         $this->assertEquals(['alter table "users" add column "created" datetime not null default CURRENT_TIMESTAMP'], $blueprint->toSql($connection, new SQLiteGrammar));
 
         $blueprint = clone $base;
@@ -141,6 +142,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $this->assertEquals(['alter table "users" add column "created" timestamp(0) without time zone not null default CURRENT_TIMESTAMP'], $blueprint->toSql($connection, new PostgresGrammar));
 
         $blueprint = clone $base;
+        $connection->shouldReceive('getServerVersion')->andReturn('3.35');
         $this->assertEquals(['alter table "users" add column "created" datetime not null default CURRENT_TIMESTAMP'], $blueprint->toSql($connection, new SQLiteGrammar));
 
         $blueprint = clone $base;
@@ -251,6 +253,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $this->assertEquals(['alter table "users" drop column "foo"'], $blueprint->toSql($connection, new PostgresGrammar));
 
         $blueprint = clone $base;
+        $connection->shouldReceive('getServerVersion')->andReturn('3.35');
         $this->assertEquals(['alter table "users" drop column "foo"'], $blueprint->toSql($connection, new SQLiteGrammar));
 
         $blueprint = clone $base;
@@ -521,6 +524,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
         ], $blueprint->toSql($connection, new MySqlGrammar));
 
         $blueprint = clone $base;
+        $connection->shouldReceive('getServerVersion')->andReturn('3.35');
         $this->assertEquals([
             'alter table "posts" add column "note" text not null',
         ], $blueprint->toSql($connection, new SQLiteGrammar));
@@ -550,6 +554,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
         ], $blueprint->toSql($connection, new MySqlGrammar));
 
         $blueprint = clone $base;
+        $connection->shouldReceive('getServerVersion')->andReturn('3.35');
         $this->assertEquals([
             'alter table "posts" add column "note" text',
         ], $blueprint->toSql($connection, new SQLiteGrammar));

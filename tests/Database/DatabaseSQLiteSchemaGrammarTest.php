@@ -991,7 +991,10 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
 
     protected function getConnection()
     {
-        return m::mock(Connection::class);
+        $connection =  m::mock(Connection::class);
+        $connection->shouldReceive('getServerVersion')->andReturn('3.35');
+
+        return $connection;
     }
 
     public function getGrammar()

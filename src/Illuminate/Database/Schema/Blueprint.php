@@ -287,12 +287,13 @@ class Blueprint
     public function addAlterCommands(Connection $connection, Grammar $grammar)
     {
         if (! $this->creating() && $grammar instanceof SQLiteGrammar) {
+            $alterCommands = $grammar->getAlterCommands($connection);
             $commands = [];
             $lastCommandWasAlter = false;
             $hasAlterCommand = false;
 
             foreach ($this->commands as $command) {
-                if (in_array($command->name, $grammar->alterCommands)) {
+                if (in_array($command->name, $alterCommands)) {
                     $lastCommandWasAlter = true;
                     $hasAlterCommand = true;
                 } else {

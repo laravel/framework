@@ -27,11 +27,21 @@ class SQLiteGrammar extends Grammar
     protected $serials = ['bigInteger', 'integer', 'mediumInteger', 'smallInteger', 'tinyInteger'];
 
     /**
-     * The commands to be compiled on the alter command.
+     * Get the commands to be compiled on the alter command.
      *
-     * @var string[]
+     * @param  \Illuminate\Database\Connection  $connection
+     * @return array
      */
-    public $alterCommands = ['change', 'primary', 'dropPrimary', 'foreign', 'dropForeign'];
+    public function getAlterCommands(Connection $connection)
+    {
+        $alterCommands = ['change', 'primary', 'dropPrimary', 'foreign', 'dropForeign'];
+
+        if (version_compare($connection->getServerVersion(), '3.35', '<')) {
+            $alterCommands[] = 'dropColumn';
+        }
+
+        return $alterCommands;
+    }
 
     /**
      * Compile the query to determine the SQL text that describes the given object.
@@ -431,10 +441,16 @@ class SQLiteGrammar extends Grammar
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Illuminate\Support\Fluent  $command
      * @param  \Illuminate\Database\Connection  $connection
-     * @return array
+     * @return array|null
      */
     public function compileDropColumn(Blueprint $blueprint, Fluent $command, Connection $connection)
     {
+        if (version_compare($connection->getServerVersion(), '3.35', '<')) {
+            // Handled on table alteration...
+
+            return null;
+        }
+
         $table = $this->wrapTable($blueprint);
 
         $columns = $this->prefixArray('drop column', $this->wrapArray($command->columns));
