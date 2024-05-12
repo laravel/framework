@@ -192,7 +192,7 @@ class FindCommand extends Command
     /**
      * Get the deep search items.
      *
-     * @param array  $value
+     * @param  array  $value
      * @return array
      */
     protected function deepSearchItems(array $value): array
