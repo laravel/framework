@@ -173,21 +173,7 @@ class FindCommand extends Command
             Arr::where($this->commands, fn (SymfonyCommand $command) => $command->getName() == $value),
             Arr::where($this->commands, fn (SymfonyCommand $command) => Str::containsAll($command->getName(), $value, true)),
             Arr::where($this->commands, fn (SymfonyCommand $command) => Str::containsAll($command->getDescription(), $value, true)),
-            $this->when(
-                $this->option('deep'),
-                function () use ($value) {
-                    return Arr::where($this->commands, function (SymfonyCommand $command) use ($value) {
-                        $definition = $command->getDefinition();
-                        $deep = implode(PHP_EOL, array_merge(
-                            Arr::map($definition->getArguments(), fn (InputArgument $argument) => $argument->getDescription()),
-                            Arr::map($definition->getOptions(), fn (InputOption $option) => $option->getDescription()),
-                        ));
-
-                        return Str::containsAll($deep, $value, true);
-                    });
-                },
-                fn () => []
-            ),
+            $this->when($this->option('deep'), fn () => $this->deepSearchItems($value), fn () => []),
         );
 
         $result = Arr::mapWithKeys($result, function (SymfonyCommand $command) {
@@ -201,5 +187,24 @@ class FindCommand extends Command
         }
 
         return $result;
+    }
+
+    /**
+     * Get the deep search items.
+     *
+     * @param array  $value
+     * @return array
+     */
+    protected function deepSearchItems(array $value): array
+    {
+        return Arr::where($this->commands, function (SymfonyCommand $command) use ($value) {
+            $definition = $command->getDefinition();
+            $deep = implode(PHP_EOL, array_merge(
+                Arr::map($definition->getArguments(), fn (InputArgument $argument) => $argument->getDescription()),
+                Arr::map($definition->getOptions(), fn (InputOption $option) => $option->getDescription()),
+            ));
+
+            return Str::containsAll($deep, $value, true);
+        });
     }
 }
