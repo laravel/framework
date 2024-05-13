@@ -716,6 +716,26 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Get options data to use in select box.
+     *
+     * @param  string  $label
+     * @param  string  $value
+     * @param  string  $labelKey
+     * @param  string  $valueKey
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function getOptions($label = 'name', $value = 'id', $labelKey = 'label', $valueKey = 'value')
+    {
+        return $this->applyScopes()
+        ->pluck($label, $value)
+        ->map(fn($labelItem, $valueItem) => [
+            $labelKey => $labelItem,
+            $valueKey => $valueItem,
+        ])
+        ->values();
+    }
+
+    /**
      * Execute the query as a "select" statement.
      *
      * @param  array|string  $columns
