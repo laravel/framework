@@ -194,6 +194,10 @@ class Blueprint
      */
     protected function addImpliedCommands(Connection $connection, Grammar $grammar)
     {
+        $this->addFluentIndexes($connection, $grammar);
+
+        $this->addFluentCommands($connection, $grammar);
+
         if (! $this->creating()) {
             $this->commands = array_map(
                 fn ($command) => $command instanceof ColumnDefinition
@@ -201,13 +205,9 @@ class Blueprint
                     : $command,
                 $this->commands
             );
+
+            $this->addAlterCommands($connection, $grammar);
         }
-
-        $this->addFluentIndexes($connection, $grammar);
-
-        $this->addFluentCommands($connection, $grammar);
-
-        $this->addAlterCommands($connection, $grammar);
     }
 
     /**
@@ -286,7 +286,7 @@ class Blueprint
      */
     public function addAlterCommands(Connection $connection, Grammar $grammar)
     {
-        if (! $this->creating() && $grammar instanceof SQLiteGrammar) {
+        if ($grammar instanceof SQLiteGrammar) {
             $alterCommands = $grammar->getAlterCommands($connection);
             $commands = [];
             $lastCommandWasAlter = false;
