@@ -358,6 +358,23 @@ PHP);
 
         ImplicitRouteBinding::preventModelParameterMismatch(false);
     }
+
+    public function testMismatchedRouteBindingDoesNotThrowExceptionWhenEnabledAndParameterIsSnakeOrCamelCase()
+    {
+        ImplicitRouteBinding::preventModelParameterMismatch();
+
+        $user = ImplicitBindingUser::create(['name' => 'Dries']);
+
+        Route::middleware(['web'])->group(function () {
+            Route::get('/user/{privateUser}/bar', fn (ImplicitBindingUser $privateUser) => null);
+            Route::get('/user/{private_user}/foo', fn (ImplicitBindingUser $privateUser) => null);
+        });
+
+        $this->getJson("/user/{$user->id}/foo")->assertOk();
+        $this->getJson("/user/{$user->id}/bar")->assertOk();
+
+        ImplicitRouteBinding::preventModelParameterMismatch(false);
+    }
 }
 
 class ImplicitBindingUser extends Model
