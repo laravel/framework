@@ -728,7 +728,7 @@ class Builder implements BuilderContract
     {
         return $this->applyScopes()
         ->pluck($label, $value)
-        ->map(fn($labelItem, $valueItem) => [
+        ->map(fn ($labelItem, $valueItem) => [
             $labelKey => $labelItem,
             $valueKey => $valueItem,
         ])
