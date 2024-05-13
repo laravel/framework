@@ -174,8 +174,8 @@ class ApplicationBuilder
     /**
      * Create the routing callback for the application.
      *
-     * @param  string|array|null  $web
-     * @param  string|array|null  $api
+     * @param  array|string|null  $web
+     * @param  array|string|null  $api
      * @param  string|null  $pages
      * @param  string|null  $health
      * @param  string  $apiPrefix
@@ -183,14 +183,14 @@ class ApplicationBuilder
      * @return \Closure
      */
     protected function buildRoutingCallback(string|array|null $web = null,
-        string|array|null $api = null,
+        array|string|null $api = null,
         ?string $pages,
         ?string $health,
         string $apiPrefix,
         ?callable $then)
     {
         return function () use ($web, $api, $pages, $health, $apiPrefix, $then) {
-            if ((is_string($api) || is_array($api)) !== false) {
+            if (is_string($api) || is_array($api)) {
                 if (is_array($api)) {
                     foreach ($api as $apiRoute) {
                         if (realpath($apiRoute) !== false) {
@@ -210,7 +210,7 @@ class ApplicationBuilder
                 });
             }
 
-            if ((is_string($web) || is_array($web)) !== false) {
+            if (is_string($web) || is_array($web)) {
                 if (is_array($web)) {
                     foreach ($web as $webRoute) {
                         if (realpath($webRoute) !== false) {
