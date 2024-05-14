@@ -283,6 +283,17 @@ class Blueprint
     }
 
     /**
+     * Indicate that the table should be created in strict mode.
+     * This only affects SQLite v3.37.0 and later.
+     *
+     * @return \Illuminate\Support\Fluent
+     */
+    public function strict()
+    {
+        return $this->addCommand('strict');
+    }
+
+    /**
      * Specify the storage engine that should be used for the table.
      *
      * @param  string  $engine
