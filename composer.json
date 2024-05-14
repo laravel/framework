@@ -163,7 +163,7 @@
         "ext-pcntl": "Required to use all features of the queue worker and console signal trapping.",
         "ext-pdo": "Required to use all database features.",
         "ext-posix": "Required to use all features of the queue worker.",
-        "ext-redis": "Required to use the Redis cache and queue drivers (^4.0|^5.0).",
+        "ext-redis": "Required to use the Redis cache and queue drivers (^4.0|^5.0|^6.0).",
         "ably/ably-php": "Required to use the Ably broadcast driver (^1.0).",
         "aws/aws-sdk-php": "Required to use the SQS queue driver, DynamoDb failed job storage, and SES mail driver (^3.235.5).",
         "brianium/paratest": "Required to run tests in parallel (^7.0|^8.0).",

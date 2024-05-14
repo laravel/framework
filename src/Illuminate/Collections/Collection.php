@@ -755,7 +755,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     /**
      * Get the values of a given key.
      *
-     * @param  string|int|array<array-key, string>  $value
+     * @param  string|int|array<array-key, string>|null  $value
      * @param  string|null  $key
      * @return static<array-key, mixed>
      */
@@ -991,6 +991,19 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
         foreach ($values as $value) {
             $this->items[] = $value;
         }
+
+        return $this;
+    }
+
+    /**
+     * Prepend one or more items to the beginning of the collection.
+     *
+     * @param  TValue  ...$values
+     * @return $this
+     */
+    public function unshift(...$values)
+    {
+        array_unshift($this->items, ...$values);
 
         return $this;
     }

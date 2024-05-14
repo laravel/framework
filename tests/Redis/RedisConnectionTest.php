@@ -899,21 +899,6 @@ class RedisConnectionTest extends TestCase
                 ],
             ]))->connection();
 
-            $connections['compression_zstd_min'] = (new RedisManager(new Application, 'phpredis', [
-                'cluster' => false,
-                'default' => [
-                    'host' => $host,
-                    'port' => $port,
-                    'database' => 12,
-                    'options' => [
-                        'compression' => Redis::COMPRESSION_ZSTD,
-                        'compression_level' => Redis::COMPRESSION_ZSTD_MIN,
-                        'name' => 'compression_zstd_min',
-                    ],
-                    'timeout' => 0.5,
-                ],
-            ]))->connection();
-
             $connections['compression_zstd_max'] = (new RedisManager(new Application, 'phpredis', [
                 'cluster' => false,
                 'default' => [

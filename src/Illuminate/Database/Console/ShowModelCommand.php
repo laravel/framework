@@ -90,6 +90,7 @@ class ShowModelCommand extends DatabaseInspectionCommand
             $this->getPolicy($model),
             $this->getAttributes($model),
             $this->getRelations($model),
+            $this->getEvents($model),
             $this->getObservers($model),
         );
 
@@ -226,6 +227,21 @@ class ShowModelCommand extends DatabaseInspectionCommand
     }
 
     /**
+     * Get the Events that the model dispatches.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @return \Illuminate\Support\Collection
+     */
+    protected function getEvents($model)
+    {
+        return collect($model->dispatchesEvents())
+            ->map(fn (string $class, string $event) => [
+                'event' => $event,
+                'class' => $class,
+            ])->values();
+    }
+
+    /**
      * Get the Observers watching this model.
      *
      * @param  \Illuminate\Database\Eloquent\Model  $model
@@ -268,14 +284,15 @@ class ShowModelCommand extends DatabaseInspectionCommand
      * @param  string  $policy
      * @param  \Illuminate\Support\Collection  $attributes
      * @param  \Illuminate\Support\Collection  $relations
+     * @param  \Illuminate\Support\Collection  $events
      * @param  \Illuminate\Support\Collection  $observers
      * @return void
      */
-    protected function display($class, $database, $table, $policy, $attributes, $relations, $observers)
+    protected function display($class, $database, $table, $policy, $attributes, $relations, $events, $observers)
     {
         $this->option('json')
-            ? $this->displayJson($class, $database, $table, $policy, $attributes, $relations, $observers)
-            : $this->displayCli($class, $database, $table, $policy, $attributes, $relations, $observers);
+            ? $this->displayJson($class, $database, $table, $policy, $attributes, $relations, $events, $observers)
+            : $this->displayCli($class, $database, $table, $policy, $attributes, $relations, $events, $observers);
     }
 
     /**
@@ -287,10 +304,11 @@ class ShowModelCommand extends DatabaseInspectionCommand
      * @param  string  $policy
      * @param  \Illuminate\Support\Collection  $attributes
      * @param  \Illuminate\Support\Collection  $relations
+     * @param  \Illuminate\Support\Collection  $events
      * @param  \Illuminate\Support\Collection  $observers
      * @return void
      */
-    protected function displayJson($class, $database, $table, $policy, $attributes, $relations, $observers)
+    protected function displayJson($class, $database, $table, $policy, $attributes, $relations, $events, $observers)
     {
         $this->output->writeln(
             collect([
@@ -300,6 +318,7 @@ class ShowModelCommand extends DatabaseInspectionCommand
                 'policy' => $policy,
                 'attributes' => $attributes,
                 'relations' => $relations,
+                'events' => $events,
                 'observers' => $observers,
             ])->toJson()
         );
@@ -314,10 +333,11 @@ class ShowModelCommand extends DatabaseInspectionCommand
      * @param  string  $policy
      * @param  \Illuminate\Support\Collection  $attributes
      * @param  \Illuminate\Support\Collection  $relations
+     * @param  \Illuminate\Support\Collection  $events
      * @param  \Illuminate\Support\Collection  $observers
      * @return void
      */
-    protected function displayCli($class, $database, $table, $policy, $attributes, $relations, $observers)
+    protected function displayCli($class, $database, $table, $policy, $attributes, $relations, $events, $observers)
     {
         $this->newLine();
 
@@ -370,6 +390,19 @@ class ShowModelCommand extends DatabaseInspectionCommand
                 sprintf('%s <fg=gray>%s</>', $relation['name'], $relation['type']),
                 $relation['related']
             );
+        }
+
+        $this->newLine();
+
+        $this->components->twoColumnDetail('<fg=green;options=bold>Events</>');
+
+        if ($events->count()) {
+            foreach ($events as $event) {
+                $this->components->twoColumnDetail(
+                    sprintf('%s', $event['event']),
+                    sprintf('%s', $event['class']),
+                );
+            }
         }
 
         $this->newLine();

@@ -354,6 +354,32 @@ class UrlSigningTest extends TestCase
         $this->assertSame('Illuminate\Routing\Middleware\ValidateSignature:foo,bar', $signature);
     }
 
+    public function testUrlsSignedByPreviousAppKeysAreValidWhenAddedAsPreviousKeys()
+    {
+        Route::get('/foo/{id}', function (Request $request, $id) {
+            return $request->hasValidSignature() ? 'valid' : 'invalid';
+        })->name('foo');
+
+        config(['app.key' => 'oldest-key']);
+        $oldestURL = URL::signedRoute('foo', ['id' => 1]);
+
+        config(['app.key' => 'old-key']);
+        $oldURL = URL::signedRoute('foo', ['id' => 1]);
+
+        config(['app.key' => 'new-key']);
+        $newUrl = URL::signedRoute('foo', ['id' => 1]);
+
+        tap($this->get($oldestURL), fn ($response) => $this->assertSame('invalid', $response->original));
+        tap($this->get($oldURL), fn ($response) => $this->assertSame('invalid', $response->original));
+        tap($this->get($newUrl), fn ($response) => $this->assertSame('valid', $response->original));
+
+        config(['app.previous_keys' => ['old-key', 'oldest-key']]);
+
+        tap($this->get($oldestURL), fn ($response) => $this->assertSame('valid', $response->original));
+        tap($this->get($oldURL), fn ($response) => $this->assertSame('valid', $response->original));
+        tap($this->get($newUrl), fn ($response) => $this->assertSame('valid', $response->original));
+    }
+
     protected function createValidateSignatureMiddleware(array $ignore)
     {
         return new class($ignore) extends ValidateSignature

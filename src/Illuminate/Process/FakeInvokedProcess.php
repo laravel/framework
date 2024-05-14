@@ -226,7 +226,7 @@ class FakeInvokedProcess implements InvokedProcessContract
             $this->nextOutputIndex = $i + 1;
         }
 
-        return isset($output) ? $output : '';
+        return $output ?? '';
     }
 
     /**
@@ -249,7 +249,7 @@ class FakeInvokedProcess implements InvokedProcessContract
             $this->nextErrorOutputIndex = $i + 1;
         }
 
-        return isset($output) ? $output : '';
+        return $output ?? '';
     }
 
     /**

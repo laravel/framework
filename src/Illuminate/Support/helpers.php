@@ -60,6 +60,10 @@ if (! function_exists('blank')) {
             return count($value) === 0;
         }
 
+        if ($value instanceof Stringable) {
+            return trim((string) $value) === '';
+        }
+
         return empty($value);
     }
 }
@@ -106,7 +110,7 @@ if (! function_exists('e')) {
     /**
      * Encode HTML special characters in a string.
      *
-     * @param  \Illuminate\Contracts\Support\DeferringDisplayableValue|\Illuminate\Contracts\Support\Htmlable|\BackedEnum|string|null  $value
+     * @param  \Illuminate\Contracts\Support\DeferringDisplayableValue|\Illuminate\Contracts\Support\Htmlable|\BackedEnum|string|int|float|null  $value
      * @param  bool  $doubleEncode
      * @return string
      */

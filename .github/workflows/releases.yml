@@ -79,41 +79,41 @@ jobs:
             bash ./bin/release.sh v${{ steps.version.outputs.version }}
           script_stop: true
 
-      - name: Generate release notes
-        id: generated-notes
-        uses: RedCrafter07/release-notes-action@main
-        with:
-          tag-name: v${{ steps.version.outputs.version }}
-          token: ${{ secrets.GITHUB_TOKEN }}
-          branch: ${{ github.ref_name }}
+  #     - name: Generate release notes
+  #       id: generated-notes
+  #       uses: RedCrafter07/release-notes-action@main
+  #       with:
+  #         tag-name: v${{ steps.version.outputs.version }}
+  #         token: ${{ secrets.GITHUB_TOKEN }}
+  #         branch: ${{ github.ref_name }}
 
-      - name: Cleanup release notes
-        id: cleaned-notes
-        run: |
-          RELEASE_NOTES=$(echo $RELEASE_NOTES | sed '/## What/d')
-          RELEASE_NOTES=$(echo $RELEASE_NOTES | sed '/## New Contributors/,$d')
-          echo "notes=${RELEASE_NOTES}" >> "$GITHUB_OUTPUT"
-        env:
-          RELEASE_NOTES: ${{ steps.generated-notes.outputs.release-notes }}
+  #     - name: Cleanup release notes
+  #       id: cleaned-notes
+  #       run: |
+  #         RELEASE_NOTES=$(echo $RELEASE_NOTES | sed '/## What/d')
+  #         RELEASE_NOTES=$(echo $RELEASE_NOTES | sed '/## New Contributors/,$d')
+  #         echo "notes=${RELEASE_NOTES}" >> "$GITHUB_OUTPUT"
+  #       env:
+  #         RELEASE_NOTES: ${{ steps.generated-notes.outputs.release-notes }}
 
-      - name: Create release
-        uses: softprops/action-gh-release@v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: v${{ steps.version.outputs.version }}
-          name: v${{ steps.version.outputs.version }}
-          body: ${{ steps.cleaned-notes.outputs.notes }}
-          target_commitish: ${{ github.ref_name }}
-          make_latest: 'legacy'
+  #     - name: Create release
+  #       uses: softprops/action-gh-release@v2
+  #       env:
+  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  #       with:
+  #         tag_name: v${{ steps.version.outputs.version }}
+  #         name: v${{ steps.version.outputs.version }}
+  #         body: ${{ steps.cleaned-notes.outputs.notes }}
+  #         target_commitish: ${{ github.ref_name }}
+  #         make_latest: 'legacy'
 
-  update-changelog:
-    needs: release
+  # update-changelog:
+  #   needs: release
 
-    name: Update changelog
+  #   name: Update changelog
 
-    uses: laravel/.github/.github/workflows/update-changelog.yml@main
-    with:
-      branch: ${{ github.ref_name }}
-      version: "v${{ needs.release.outputs.version }}"
-      notes: ${{ needs.release.outputs.notes }}
+  #   uses: laravel/.github/.github/workflows/update-changelog.yml@main
+  #   with:
+  #     branch: ${{ github.ref_name }}
+  #     version: "v${{ needs.release.outputs.version }}"
+  #     notes: ${{ needs.release.outputs.notes }}

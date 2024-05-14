@@ -16,6 +16,7 @@ use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 
+#[RequiresPhpExtension('redis')]
 class RedisQueueTest extends TestCase
 {
     use InteractsWithRedis, InteractsWithTime;
