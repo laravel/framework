@@ -46,6 +46,22 @@ class MailMakeCommandTest extends TestCase
         ], 'resources/views/foo-mail.blade.php');
     }
 
+    public function testItCanGenerateMailFileWithViewOption()
+    {
+        $this->artisan('make:mail', ['name' => 'FooMail', '--view' => 'foo-mail'])
+            ->assertExitCode(0);
+
+        $this->assertFileContains([
+            'namespace App\Mail;',
+            'use Illuminate\Mail\Mailable;',
+            'class FooMail extends Mailable',
+            'return new Content(',
+            "view: 'foo-mail',",
+        ], 'app/Mail/FooMail.php');
+
+        $this->assertFilenameExists('resources/views/foo-mail.blade.php');
+    }
+
     public function testItCanGenerateMailFileWithTest()
     {
         $this->artisan('make:mail', ['name' => 'FooMail', '--test' => true])
