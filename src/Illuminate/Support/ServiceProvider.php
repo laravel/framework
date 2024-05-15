@@ -501,13 +501,14 @@ abstract class ServiceProvider
             ->map(fn ($p) => '    '.$p.'::class,')
             ->implode(PHP_EOL);
 
-        $content = '<?php
+        $original = file_get_contents($path);
 
-return [
+        $replacement = 'return [
 '.$providers.'
 ];';
+        $content = preg_replace('/return\s\[[\s\S]+\];/m', $replacement, $original);
 
-        file_put_contents($path, $content.PHP_EOL);
+        file_put_contents($path, $content);
 
         return true;
     }
