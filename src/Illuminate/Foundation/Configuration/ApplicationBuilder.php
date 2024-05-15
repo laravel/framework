@@ -182,8 +182,8 @@ class ApplicationBuilder
      * @param  callable|null  $then
      * @return \Closure
      */
-    protected function buildRoutingCallback(array|string|null $web = null,
-        array|string|null $api = null,
+    protected function buildRoutingCallback(array|string|null $web,
+        array|string|null $api,
         ?string $pages,
         ?string $health,
         string $apiPrefix,
