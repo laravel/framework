@@ -506,7 +506,7 @@ abstract class ServiceProvider
         $replacement = 'return [
 '.$providers.'
 ];';
-        $content = preg_replace('/return\s\[[\s\S]+\];/m', $replacement, $original);
+        $content = preg_replace('/return\s\[[\s\S]*\];/m', $replacement, $original);
 
         file_put_contents($path, $content);
 
