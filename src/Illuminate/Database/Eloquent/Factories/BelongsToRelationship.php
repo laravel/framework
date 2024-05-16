@@ -54,7 +54,8 @@ class BelongsToRelationship
         if (method_exists($model, $this->relationship)) {
             $relationship = $model->{$this->relationship}();
         } else {
-            $relationship = $model->belongsTo($this->factory->modelName(), relation: $this->relationship);
+            $related = $this->factory instanceof Factory ? $this->factory->modelName() : $this->factory::class;
+            $relationship = $model->belongsTo($related, relation: $this->relationship);
         }
 
         return $relationship instanceof MorphTo ? [

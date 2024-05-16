@@ -331,6 +331,21 @@ class DatabaseEloquentFactoryTest extends TestCase
         $this->assertCount(3, FactoryTestPost::all());
     }
 
+    public function test_belongs_to_relationship_with_existing_model_instance_and_relation_method_not_exist()
+    {
+        $user = FactoryTestUserFactory::new(['name' => 'Taylor Otwell'])->create();
+        $posts = FactoryTestPostFactoryWithModelWithoutDefinedRelationship::times(3)
+            ->for($user, 'user')
+            ->create();
+
+        $this->assertCount(3, $posts->filter(function ($post) use ($user) {
+            return $post->belongsTo(FactoryTestUser::class, 'user_id')->is($user);
+        }));
+
+        $this->assertCount(1, FactoryTestUser::all());
+        $this->assertCount(3, FactoryTestPost::all());
+    }
+
     public function test_morph_to_relationship()
     {
         $posts = FactoryTestCommentFactory::times(3)
@@ -914,6 +929,16 @@ class FactoryTestPost extends Eloquent
     {
         return $this->morphMany(FactoryTestComment::class, 'commentable');
     }
+}
+
+class FactoryTestPostFactoryWithModelWithoutDefinedRelationship extends FactoryTestPostFactory
+{
+    protected $model = FactoryTestPostWithoutDefinedRelationship::class;
+}
+
+class FactoryTestPostWithoutDefinedRelationship extends Eloquent
+{
+    protected $table = 'posts';
 }
 
 class FactoryTestCommentFactory extends Factory
