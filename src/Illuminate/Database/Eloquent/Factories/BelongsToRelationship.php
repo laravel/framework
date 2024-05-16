@@ -49,7 +49,13 @@ class BelongsToRelationship
      */
     public function attributesFor(Model $model)
     {
-        $relationship = $model->{$this->relationship}();
+
+        // Auto handle a 'belongsTo' relationship when no relation method found in the model linked to factory
+        if (method_exists($model, $this->relationship)) {
+            $relationship = $model->{$this->relationship}();
+        } else {
+            $relationship = $model->belongsTo($this->factory->modelName(), relation: $this->relationship);
+        }
 
         return $relationship instanceof MorphTo ? [
             $relationship->getMorphType() => $this->factory instanceof Factory ? $this->factory->newModel()->getMorphClass() : $this->factory->getMorphClass(),
