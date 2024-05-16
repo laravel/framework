@@ -1321,7 +1321,7 @@ class Str
                 $hyphenatedWords = array_map(function ($part) use ($minorWords) {
                     return (in_array($part, $minorWords) && mb_strlen($part) <= 3)
                         ? $part
-                        : mb_strtoupper( mb_substr( $part, 0, 1 )) . mb_substr( $part, 1 );
+                        : mb_strtoupper(mb_substr($part, 0, 1)).mb_substr($part, 1);
                 }, $hyphenatedWords);
 
                 $words[$i] = implode('-', $hyphenatedWords);
@@ -1331,7 +1331,7 @@ class Str
                     ! ($i === 0 || in_array(mb_substr($words[$i - 1], -1), $endPunctuation))) {
                     $words[$i] = $lowercaseWord;
                 } else {
-                    $words[$i] = mb_strtoupper( mb_substr( $lowercaseWord, 0, 1 )) . mb_substr( $lowercaseWord, 1 );
+                    $words[$i] = mb_strtoupper(mb_substr($lowercaseWord, 0, 1)).mb_substr($lowercaseWord, 1);
                 }
             }
         }
