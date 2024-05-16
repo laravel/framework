@@ -104,6 +104,10 @@ class SupportStrTest extends TestCase
         $this->assertSame("C'est-à-Dire.", Str::apa("c'est-à-dire."));
         $this->assertSame("C'est-à-Dire.", Str::apa("C'est-à-Dire."));
         $this->assertSame("C'est-à-Dire.", Str::apa("C'EsT-À-DIRE."));
+    
+        $this->assertSame("Устное Слово – Не Воробей. Как Только Он Вылетит, Его Не Поймаешь.", Str::apa("устное слово – не воробей. как только он вылетит, его не поймаешь."));
+        $this->assertSame("Устное Слово – Не Воробей. Как Только Он Вылетит, Его Не Поймаешь.", Str::apa("Устное Слово – Не Воробей. Как Только Он Вылетит, Его Не Поймаешь."));
+        $this->assertSame("Устное Слово – Не Воробей. Как Только Он Вылетит, Его Не Поймаешь.", Str::apa("УСТНОЕ СЛОВО – НЕ ВОРОБЕЙ. КАК ТОЛЬКО ОН ВЫЛЕТИТ, ЕГО НЕ ПОЙМАЕШЬ."));
 
         $this->assertSame('', Str::apa(''));
         $this->assertSame('   ', Str::apa('   '));
