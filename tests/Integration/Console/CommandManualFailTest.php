@@ -24,14 +24,14 @@ class CommandManualFailTest extends TestCase
     {
         $this->artisan('app:fail')->assertFailed();
     }
-    
+
     public function testCreatesAnExceptionFromString()
     {
         $this->expectException(ManuallyFailedException::class);
         $command = new Command;
         $command->fail('Whoops!');
     }
-    
+
     public function testCreatesAnExceptionFromNull()
     {
         $this->expectException(ManuallyFailedException::class);
