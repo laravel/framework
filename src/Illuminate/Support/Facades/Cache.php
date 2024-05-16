@@ -43,7 +43,7 @@ namespace Illuminate\Support\Facades;
  * @method static \Illuminate\Cache\Repository setStore(\Illuminate\Contracts\Cache\Store $store)
  * @method static \Illuminate\Contracts\Events\Dispatcher getEventDispatcher()
  * @method static void setEventDispatcher(\Illuminate\Contracts\Events\Dispatcher $events)
- * @method static void macro(string $name, object|callable $macro)
+ * @method static void macro(string $name, object|callable $macro, object|callable $macro = null)
  * @method static void mixin(object $mixin, bool $replace = true)
  * @method static bool hasMacro(string $name)
  * @method static void flushMacros()

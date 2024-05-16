@@ -37,7 +37,7 @@ use Illuminate\Support\Testing\Fakes\MailFake;
  * @method static \Illuminate\Contracts\View\Factory getViewFactory()
  * @method static void setSymfonyTransport(\Symfony\Component\Mailer\Transport\TransportInterface $transport)
  * @method static \Illuminate\Mail\Mailer setQueue(\Illuminate\Contracts\Queue\Factory $queue)
- * @method static void macro(string $name, object|callable $macro)
+ * @method static void macro(string $name, object|callable $macro, object|callable $macro = null)
  * @method static void mixin(object $mixin, bool $replace = true)
  * @method static bool hasMacro(string $name)
  * @method static void flushMacros()

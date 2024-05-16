@@ -33,7 +33,7 @@ use Illuminate\Support\Testing\Fakes\NotificationFake;
  * @method static bool hasSent(mixed $notifiable, string $notification)
  * @method static \Illuminate\Support\Testing\Fakes\NotificationFake serializeAndRestore(bool $serializeAndRestore = true)
  * @method static array sentNotifications()
- * @method static void macro(string $name, object|callable $macro)
+ * @method static void macro(string $name, object|callable $macro, object|callable $macro = null)
  * @method static void mixin(object $mixin, bool $replace = true)
  * @method static bool hasMacro(string $name)
  * @method static void flushMacros()
