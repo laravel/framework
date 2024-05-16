@@ -293,7 +293,7 @@ class Mailer implements MailerContract, MailQueueContract
      * @param  \Illuminate\Contracts\Mail\Mailable|string|array  $view
      * @param  array  $data
      * @param  \Closure|string|null  $callback
-     * @return \Illuminate\Mail\SentMessage|null
+     * @return \Illuminate\Mail\SentMessage|null|mixed
      */
     public function send($view, array $data = [], $callback = null)
     {
@@ -348,7 +348,7 @@ class Mailer implements MailerContract, MailQueueContract
      * Send the given mailable.
      *
      * @param  \Illuminate\Contracts\Mail\Mailable  $mailable
-     * @return \Illuminate\Mail\SentMessage|null
+     * @return \Illuminate\Mail\SentMessage|null|mixed
      */
     protected function sendMailable(MailableContract $mailable)
     {
