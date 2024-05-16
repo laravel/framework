@@ -97,6 +97,14 @@ class SupportStrTest extends TestCase
         $this->assertSame('To Kill a Mockingbird', Str::apa('TO KILL A MOCKINGBIRD'));
         $this->assertSame('To Kill a Mockingbird', Str::apa('To Kill A Mockingbird'));
 
+        $this->assertSame('Être Écrivain Commence par Être un Lecteur.', Str::apa('Être écrivain commence par être un lecteur.'));
+        $this->assertSame('Être Écrivain Commence par Être un Lecteur.', Str::apa('Être Écrivain Commence par Être un Lecteur.'));
+        $this->assertSame('Être Écrivain Commence par Être un Lecteur.', Str::apa('ÊTRE ÉCRIVAIN COMMENCE PAR ÊTRE UN LECTEUR.'));
+
+        $this->assertSame("C'est-à-Dire.", Str::apa("c'est-à-dire."));
+        $this->assertSame("C'est-à-Dire.", Str::apa("C'est-à-Dire."));
+        $this->assertSame("C'est-à-Dire.", Str::apa("C'EsT-À-DIRE."));
+
         $this->assertSame('', Str::apa(''));
         $this->assertSame('   ', Str::apa('   '));
     }
