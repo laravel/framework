@@ -73,8 +73,11 @@ class DumpCommand extends Command
 
         $migrationTable = is_array($migrations) ? ($migrations['table'] ?? 'migrations') : $migrations;
 
+        $dataDumpTables = Config::get('database.dump.data_from_tables', []);
+
         return $connection->getSchemaState()
                 ->withMigrationTable($connection->getTablePrefix().$migrationTable)
+                ->withDataDumpTables(array_map(fn ($table) => $connection->getTablePrefix().$table, $dataDumpTables))
                 ->handleOutputUsing(function ($type, $buffer) {
                     $this->output->write($buffer);
                 });

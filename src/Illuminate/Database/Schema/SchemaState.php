@@ -30,6 +30,13 @@ abstract class SchemaState
     protected $migrationTable = 'migrations';
 
     /**
+     * The name of the tables we want to dump the data.
+     *
+     * @var string
+     */
+    protected $dataDumpTables = [];
+
+    /**
      * The process factory callback.
      *
      * @var callable
@@ -103,6 +110,19 @@ abstract class SchemaState
     public function withMigrationTable(string $table)
     {
         $this->migrationTable = $table;
+
+        return $this;
+    }
+
+    /**
+     * Specify the name of the tables we want to dump the data.
+     *
+     * @param  array  $tables
+     * @return $this
+     */
+    public function withDataDumpTables(array $tables)
+    {
+        $this->dataDumpTables = $tables;
 
         return $this;
     }

@@ -28,19 +28,24 @@ class SqliteSchemaState extends SchemaState
 
         $this->files->put($path, implode(PHP_EOL, $migrations).PHP_EOL);
 
-        $this->appendMigrationData($path);
+        $this->appendTableData($path, $this->migrationTable);
+
+        foreach ($this->dataDumpTables as $table) {
+            $this->appendTableData($path, $table);
+        }
     }
 
     /**
-     * Append the migration data to the schema dump.
+     * Append the table data to the schema dump.
      *
      * @param  string  $path
+     * @param  string  $table
      * @return void
      */
-    protected function appendMigrationData(string $path)
+    protected function appendTableData(string $path, string $table)
     {
         with($process = $this->makeProcess(
-            $this->baseCommand().' ".dump \''.$this->migrationTable.'\'"'
+            $this->baseCommand().' ".dump \''.$table.'\'"'
         ))->mustRun(null, array_merge($this->baseVariables($this->connection->getConfig()), [
             //
         ]));

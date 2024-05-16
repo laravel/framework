@@ -26,7 +26,11 @@ class MySqlSchemaState extends SchemaState
 
         $this->removeAutoIncrementingState($path);
 
-        $this->appendMigrationData($path);
+        $this->appendTableData($path, $this->migrationTable);
+
+        foreach ($this->dataDumpTables as $table) {
+            $this->appendTableData($path, $table);
+        }
     }
 
     /**
@@ -45,15 +49,16 @@ class MySqlSchemaState extends SchemaState
     }
 
     /**
-     * Append the migration data to the schema dump.
+     * Append the table data to the schema dump.
      *
      * @param  string  $path
+     * @param  string  $table
      * @return void
      */
-    protected function appendMigrationData(string $path)
+    protected function appendTableData(string $path, string $table)
     {
         $process = $this->executeDumpProcess($this->makeProcess(
-            $this->baseDumpCommand().' '.$this->migrationTable.' --no-create-info --skip-extended-insert --skip-routines --compact --complete-insert'
+            $this->baseDumpCommand().' '.$table.' --no-create-info --skip-extended-insert --skip-routines --compact --complete-insert'
         ), null, array_merge($this->baseVariables($this->connection->getConfig()), [
             //
         ]));
