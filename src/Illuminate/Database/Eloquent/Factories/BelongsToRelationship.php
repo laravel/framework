@@ -49,7 +49,6 @@ class BelongsToRelationship
      */
     public function attributesFor(Model $model)
     {
-
         // Auto handle a 'belongsTo' relationship when no relation method found in the model linked to factory
         if (method_exists($model, $this->relationship)) {
             $relationship = $model->{$this->relationship}();
