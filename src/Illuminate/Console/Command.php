@@ -210,11 +210,39 @@ class Command extends SymfonyCommand
 
         try {
             return (int) $this->laravel->call([$this, $method]);
+        } catch (ManuallyFailedException $e) {
+            $this->error($e->getMessage());
+
+            return static::FAILURE;
         } finally {
             if ($this instanceof Isolatable && $this->option('isolated') !== false) {
                 $this->commandIsolationMutex()->forget($this);
             }
         }
+    }
+
+    /**
+     * Fail the command manually.
+     *
+     * @param  \Throwable|string|null  $exception
+     * @return void
+     */
+    public function fail($exception = null)
+    {
+        if (is_null($exception)) {
+            $exception = 'Command Failed Manually.';
+        }
+
+        if (is_string($exception)) {
+            $exception = new ManuallyFailedException($exception);
+        }
+
+        if ($exception instanceof \Throwable) {
+            throw $exception;
+        }
+
+        $msg = 'The command was failed manually, but the Command::fail method expects a string or an instance of Throwable.';
+        throw new \InvalidArgumentException($msg);
     }
 
     /**
