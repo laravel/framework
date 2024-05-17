@@ -2002,6 +2002,27 @@ trait ValidatesAttributes
 
         return true;
     }
+    
+    /**
+     * Validate that an attribute is required if the request method matches.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  array  $parameters
+     * @return bool
+     */
+    public function validateRequiredIfMethod($attribute, $value, $parameters)
+    {
+        $this->requireParameterCount(1, $parameters, 'required_if_method');
+
+        $method = strtoupper($parameters[0]);
+
+        if (request()->isMethod($method)) {
+            return $this->validateRequired($attribute, $value);
+        }
+
+        return true;
+    }
 
     /**
      * Validate that an attribute does not exist or is an empty string.

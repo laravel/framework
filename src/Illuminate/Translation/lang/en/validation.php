@@ -139,6 +139,7 @@ return [
     'required_if' => 'The :attribute field is required when :other is :value.',
     'required_if_accepted' => 'The :attribute field is required when :other is accepted.',
     'required_if_declined' => 'The :attribute field is required when :other is declined.',
+    'required_if_method' => 'The :attribute field is required.',
     'required_unless' => 'The :attribute field is required unless :other is in :values.',
     'required_with' => 'The :attribute field is required when :values is present.',
     'required_with_all' => 'The :attribute field is required when :values are present.',
