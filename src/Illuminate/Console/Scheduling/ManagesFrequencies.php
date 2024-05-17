@@ -29,7 +29,14 @@ trait ManagesFrequencies
      */
     public function between($startTime, $endTime)
     {
-        return $this->when($this->inTimeInterval($startTime, $endTime));
+        [$startTimeCarbon, $endTimeCarbon] = [
+            Carbon::parse($startTime, $this->timezone),
+            Carbon::parse($endTime, $this->timezone),
+        ];
+        $hourExpression = $startTimeCarbon->hour.'-'.$endTimeCarbon->hour;
+
+        return $this->when($this->inTimeInterval($startTime, $endTime))
+            ->spliceIntoPosition(2, $hourExpression);
     }
 
     /**
@@ -41,7 +48,14 @@ trait ManagesFrequencies
      */
     public function unlessBetween($startTime, $endTime)
     {
-        return $this->skip($this->inTimeInterval($startTime, $endTime));
+        [$startTimeCarbon, $endTimeCarbon] = [
+            Carbon::parse($startTime, $this->timezone),
+            Carbon::parse($endTime, $this->timezone),
+        ];
+        $hourExpression = '0-'.$startTimeCarbon->hour - 1 .','.$endTimeCarbon->hour + 1 .'-23';
+
+        return $this->skip($this->inTimeInterval($startTime, $endTime))
+            ->spliceIntoPosition(2, $hourExpression);
     }
 
     /**
