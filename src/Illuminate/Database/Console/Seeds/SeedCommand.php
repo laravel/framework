@@ -85,6 +85,7 @@ class SeedCommand extends Command
     protected function getSeeder()
     {
         $class = $this->input->getArgument('class') ?? $this->input->getOption('class');
+        $class = str_replace('.php', '', $class);
 
         if (! str_contains($class, '\\')) {
             $class = 'Database\\Seeders\\'.$class;
