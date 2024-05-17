@@ -125,10 +125,12 @@ class SupportStrTest extends TestCase
         $this->assertSame("\t\t\t", Str::words("\t\t\t"));
     }
 
-    public function testStringAscii()
+    public function testStringAscii(): void
     {
         $this->assertSame('@', Str::ascii('@'));
         $this->assertSame('u', Str::ascii('ü'));
+        $this->assertSame('', Str::ascii(''));
+        $this->assertSame('a!2e', Str::ascii('a!2ë'));
     }
 
     public function testStringAsciiWithSpecificLocale()
@@ -257,7 +259,7 @@ class SupportStrTest extends TestCase
         $this->assertNull(Str::excerpt('', '/'));
     }
 
-    public function testStrBefore()
+    public function testStrBefore(): void
     {
         $this->assertSame('han', Str::before('hannah', 'nah'));
         $this->assertSame('ha', Str::before('hannah', 'n'));
@@ -267,6 +269,12 @@ class SupportStrTest extends TestCase
         $this->assertSame('han', Str::before('han0nah', '0'));
         $this->assertSame('han', Str::before('han0nah', 0));
         $this->assertSame('han', Str::before('han2nah', 2));
+        $this->assertSame('', Str::before('', ''));
+        $this->assertSame('', Str::before('', 'a'));
+        $this->assertSame('', Str::before('a', 'a'));
+        $this->assertSame('foo', Str::before('foo@bar.com', '@'));
+        $this->assertSame('foo', Str::before('foo@@bar.com', '@'));
+        $this->assertSame('', Str::before('@foo@bar.com', '@'));
     }
 
     public function testStrBeforeLast(): void
@@ -286,7 +294,7 @@ class SupportStrTest extends TestCase
         $this->assertSame('yvette', Str::beforeLast("yvette\tyv0et0te", "\t"));
     }
 
-    public function testStrBetween()
+    public function testStrBetween(): void
     {
         $this->assertSame('abc', Str::between('abc', '', 'c'));
         $this->assertSame('abc', Str::between('abc', 'a', ''));
@@ -299,6 +307,9 @@ class SupportStrTest extends TestCase
         $this->assertSame('a]ab[b', Str::between('[a]ab[b]', '[', ']'));
         $this->assertSame('foo', Str::between('foofoobar', 'foo', 'bar'));
         $this->assertSame('bar', Str::between('foobarbar', 'foo', 'bar'));
+        $this->assertSame('234', Str::between('12345', 1, 5));
+        $this->assertSame('45', Str::between('123456789', '123', '6789'));
+        $this->assertSame('nothing', Str::between('nothing', 'foo', 'bar'));
     }
 
     public function testStrBetweenFirst()
