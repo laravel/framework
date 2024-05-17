@@ -4,7 +4,6 @@ namespace Illuminate\Redis\Connections;
 
 use Closure;
 use Illuminate\Contracts\Redis\Connection as ConnectionContract;
-use Redis;
 use RedisException;
 
 /**
