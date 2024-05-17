@@ -169,6 +169,16 @@ trait AsPivot
     }
 
     /**
+     * Determine if the pivot model has a custom table filled as property.
+     *
+     * @return bool
+     */
+    public function hasTableProperty()
+    {
+        return isset($this->table);
+    }
+
+    /**
      * Get the foreign key column name.
      *
      * @return string

@@ -15,6 +15,8 @@ use Illuminate\Database\Query\Grammars\MySqlGrammar;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
+use function class_uses_recursive;
+use function in_array;
 
 class BelongsToMany extends Relation
 {
@@ -336,6 +338,12 @@ class BelongsToMany extends Relation
     public function using($class)
     {
         $this->using = $class;
+
+        if (in_array(AsPivot::class, class_uses_recursive($class))) {
+            if ((new $class())->hasTableProperty()) {
+                $this->table = (new $class())->getTable();
+            }
+        }
 
         return $this;
     }
