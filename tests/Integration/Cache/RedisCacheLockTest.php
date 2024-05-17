@@ -126,12 +126,12 @@ class RedisCacheLockTest extends TestCase
         Cache::store('redis')->lock('foo')->forceRelease();
 
         $firstLock = Cache::store('redis')->lock('foo', 10);
-        $this->assertTrue($firstLock->isCurrentlyOwnedBy(null));
+        $this->assertTrue($firstLock->isOwnedBy(null));
         $this->assertTrue($firstLock->get());
-        $this->assertTrue($firstLock->isCurrentlyOwnedBy($firstLock->owner()));
+        $this->assertTrue($firstLock->isOwnedBy($firstLock->owner()));
 
         $secondLock = Cache::store('redis')->restoreLock('foo', 'other_owner');
-        $this->assertTrue($secondLock->isCurrentlyOwnedBy($firstLock->owner()));
+        $this->assertTrue($secondLock->isOwnedBy($firstLock->owner()));
         $this->assertFalse($secondLock->isOwnedByCurrentProcess());
     }
 }

@@ -97,12 +97,12 @@ class MemcachedCacheLockTestCase extends MemcachedIntegrationTestCase
         Cache::store('memcached')->lock('foo')->forceRelease();
 
         $firstLock = Cache::store('memcached')->lock('foo', 10);
-        $this->assertTrue($firstLock->isCurrentlyOwnedBy(null));
+        $this->assertTrue($firstLock->isOwnedBy(null));
         $this->assertTrue($firstLock->get());
-        $this->assertTrue($firstLock->isCurrentlyOwnedBy($firstLock->owner()));
+        $this->assertTrue($firstLock->isOwnedBy($firstLock->owner()));
 
         $secondLock = Cache::store('memcached')->restoreLock('foo', 'other_owner');
-        $this->assertTrue($secondLock->isCurrentlyOwnedBy($firstLock->owner()));
+        $this->assertTrue($secondLock->isOwnedBy($firstLock->owner()));
         $this->assertFalse($secondLock->isOwnedByCurrentProcess());
     }
 }

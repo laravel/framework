@@ -144,23 +144,24 @@ abstract class Lock implements LockContract
     }
 
     /**
-     * Determines whether this lock is owned by the given identifier.
-     *
-     * @return bool
-     */
-    public function isCurrentlyOwnedBy($owner = null)
-    {
-        return $this->getCurrentOwner() === $owner;
-    }
-
-    /**
      * Determines whether this lock is allowed to release the lock in the driver.
      *
      * @return bool
      */
     public function isOwnedByCurrentProcess()
     {
-        return $this->getCurrentOwner() === $this->owner;
+        return $this->isOwnedBy($this->owner);
+    }
+
+    /**
+     * Determine whether this lock is owned by the given identifier.
+     *
+     * @param  string|null  $owner
+     * @return bool
+     */
+    public function isOwnedBy($owner)
+    {
+        return $this->getCurrentOwner() === $owner;
     }
 
     /**
