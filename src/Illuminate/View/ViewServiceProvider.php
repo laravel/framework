@@ -170,4 +170,15 @@ class ViewServiceProvider extends ServiceProvider
             return $compiler;
         });
     }
+
+    /**
+     * Set the application instance used by the service provider.
+     *
+     * @param  \Illuminate\Contracts\Foundation\Application  $app
+     * @return void
+     */
+    public function setApplication($app)
+    {
+        $this->app = $app;
+    }
 }
