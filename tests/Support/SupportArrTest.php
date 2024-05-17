@@ -1392,4 +1392,35 @@ class SupportArrTest extends TestCase
             ],
         ], Arr::select($array, 'name'));
     }
+
+    public function testWithout()
+    {
+        $this->assertEquals(
+            [1 => 2, 2 => 3],
+            Arr::without([1, 2, 3], 1)
+        );
+
+        $this->assertEquals(
+            [0 => 'foo', 2 => 'baz'],
+            Arr::without(['foo', 'bar', 'baz'], 'bar')
+        );
+
+        $this->assertEquals([
+            (object) ['name' => 'John'],
+            (object) ['name' => 'Mike'],
+        ], Arr::without([
+            (object) ['name' => 'John'],
+            (object) ['name' => 'Mike'],
+            (object) ['name' => 'Peter'],
+        ], (object) ['name' => 'Peter']));
+
+        $this->assertEquals([
+            'firstKey' => 'firstValue',
+            'thirdKey' => 'thirdValue',
+        ], Arr::without([
+            'firstKey' => 'firstValue',
+            'secondKey' => 'secondValue',
+            'thirdKey' => 'thirdValue',
+        ], 'secondValue'));
+    }
 }

@@ -937,6 +937,18 @@ class Arr
     }
 
     /**
+     * Filter items where the value is not equal to the parameter
+     *
+     * @param  array  $array
+     * @param  mixed  $without
+     * @return array
+     */
+    public static function without($array, $without)
+    {
+        return static::where($array, fn ($value) => $value != $without);
+    }
+
+    /**
      * If the given value is not an array and not null, wrap it in one.
      *
      * @param  mixed  $value
