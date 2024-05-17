@@ -309,7 +309,7 @@ class SupportStrTest extends TestCase
         $this->assertSame('bar', Str::between('foobarbar', 'foo', 'bar'));
         $this->assertSame('234', Str::between('12345', 1, 5));
         $this->assertSame('45', Str::between('123456789', '123', '6789'));
-        $this->assertSame('', Str::between('nothing', 'foo', 'bar'));
+        $this->assertSame('nothing', Str::between('nothing', 'foo', 'bar'));
     }
 
     public function testStrBetweenFirst()
