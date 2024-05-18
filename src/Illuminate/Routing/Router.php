@@ -1448,7 +1448,7 @@ class Router implements BindingRegistrar, RegistrarContract
      */
     public function setCompiledRoutes(array $routes)
     {
-        $this->routes = (new CompiledRouteCollection($routes['compiled'], $routes['attributes']))
+        $this->routes = (new CompiledRouteCollection($routes['compiled'], $routes['attributes'], $routes['aliases'] ?? []))
             ->setRouter($this)
             ->setContainer($this->container);
 

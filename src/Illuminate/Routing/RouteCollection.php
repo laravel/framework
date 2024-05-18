@@ -2,6 +2,7 @@
 
 namespace Illuminate\Routing;
 
+use UnexpectedValueException;
 use Illuminate\Container\Container;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
@@ -124,23 +125,18 @@ class RouteCollection extends AbstractRouteCollection
         $this->nameList = [];
 
         foreach ($this->allRoutes as $route) {
+
+            if (isset($this->routesAliasesList[$route->getName()])) {
+                throw new UnexpectedValueException(sprintf(
+                    'The alias %s is already defined as a route and can not be defined as an alias.',
+                    $route->getName()
+                ));
+            }
+
             if ($route->getName()) {
                 $this->nameList[$route->getName()] = $route;
             }
         }
-    }
-
-    /**
-     * Push a new alias to the aliases map to map it with it's corresponding route name.
-     *
-     * @param  string  $alias
-     * @param  string  $name
-     *
-     * @return void
-     */
-    public function setRouteAlias($alias, $name)
-    {
-        $this->routesAliasesList[$alias] = $name;
     }
 
     /**
@@ -159,6 +155,19 @@ class RouteCollection extends AbstractRouteCollection
                 $this->addToActionList($route->getAction(), $route);
             }
         }
+    }
+
+    /**
+     * Push a new alias to the aliases map to map it with it's corresponding route name.
+     *
+     * @param  string  $alias
+     * @param  string  $name
+     *
+     * @return void
+     */
+    public function setRouteAlias($alias, $name)
+    {
+        $this->routesAliasesList[$alias] = $name;
     }
 
     /**

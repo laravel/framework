@@ -29,7 +29,14 @@ class CompiledRouteCollection extends AbstractRouteCollection
     protected $attributes = [];
 
     /**
-     * The dynamically added routes that were added after loading the cached, compiled routes.
+     * An array of the route aliases.
+     *
+     * @var array
+     */
+    protected $aliases = [];
+
+    /**
+     * The dynamic  ly added routes that were added after loading the cached, compiled routes.
      *
      * @var \Illuminate\Routing\RouteCollection|null
      */
@@ -56,10 +63,11 @@ class CompiledRouteCollection extends AbstractRouteCollection
      * @param  array  $attributes
      * @return void
      */
-    public function __construct(array $compiled, array $attributes)
+    public function __construct(array $compiled, array $attributes, array $aliases = [])
     {
         $this->compiled = $compiled;
         $this->attributes = $attributes;
+        $this->aliases = $aliases;
         $this->routes = new RouteCollection;
     }
 
@@ -193,6 +201,10 @@ class CompiledRouteCollection extends AbstractRouteCollection
      */
     public function getByName($name)
     {
+        if (isset($this->aliases[$name])) {
+            $name = $this->aliases[$name];
+        }
+
         if (isset($this->attributes[$name])) {
             return $this->newRoute($this->attributes[$name]);
         }
