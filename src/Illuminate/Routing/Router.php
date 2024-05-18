@@ -236,7 +236,6 @@ class Router implements BindingRegistrar, RegistrarContract
      *
      * @param  string  $alias
      * @param  string  $name
-     *
      * @return void
      */
     public function alias($alias, $name)

@@ -2,10 +2,10 @@
 
 namespace Illuminate\Routing;
 
-use UnexpectedValueException;
 use Illuminate\Container\Container;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
+use UnexpectedValueException;
 
 class RouteCollection extends AbstractRouteCollection
 {
@@ -125,7 +125,6 @@ class RouteCollection extends AbstractRouteCollection
         $this->nameList = [];
 
         foreach ($this->allRoutes as $route) {
-
             if (isset($this->routesAliasesList[$route->getName()])) {
                 throw new UnexpectedValueException(sprintf(
                     'The alias %s is already defined as a route and can not be defined as an alias.',
@@ -162,7 +161,6 @@ class RouteCollection extends AbstractRouteCollection
      *
      * @param  string  $alias
      * @param  string  $name
-     *
      * @return void
      */
     public function setRouteAlias($alias, $name)
@@ -231,7 +229,6 @@ class RouteCollection extends AbstractRouteCollection
      *
      * @param  string  $name
      * @return string
-     *
      * @return void
      */
     public function checkAliasedRoute($name)
