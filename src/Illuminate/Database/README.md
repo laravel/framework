@@ -7,6 +7,10 @@ The Illuminate Database component is a full database toolkit for PHP, providing 
 First, create a new "Capsule" manager instance. Capsule aims to make configuring the library for usage outside of the Laravel framework as easy as possible.
 
 ```PHP
+<?php
+
+require __DIR__.'/vendor/autoload.php';
+
 use Illuminate\Database\Capsule\Manager as Capsule;
 
 $capsule = new Capsule;
