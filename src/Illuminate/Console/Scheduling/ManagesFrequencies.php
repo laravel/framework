@@ -52,7 +52,34 @@ trait ManagesFrequencies
             Carbon::parse($startTime, $this->timezone),
             Carbon::parse($endTime, $this->timezone),
         ];
-        $hourExpression = '0-'.$startTimeCarbon->hour - 1 .','.$endTimeCarbon->hour + 1 .'-23';
+
+        $startHour = $startTimeCarbon->hour;
+        $endHour = $endTimeCarbon->hour;
+        if($startHour === 0) {
+            $hourExpressionLeft = '';
+        } elseif ($startHour === 1) {
+            $hourExpressionLeft = '0';
+        } else {
+            $hourExpressionLeft = '0-'.$startTimeCarbon->hour - 1;
+        }
+
+        if($endHour === 23) {
+            $hourExpressionRight = '';
+        } elseif ($endHour === 22) {
+            $hourExpressionRight = '23';
+        } else {
+            $hourExpressionRight = $endTimeCarbon->hour + 1 . '-23';
+        }
+
+        if($hourExpressionLeft === '' && $hourExpressionRight === '') {
+            $hourExpression = '*';
+        } elseif($hourExpressionLeft === '') {
+            $hourExpression = $hourExpressionRight;
+        } elseif($hourExpressionRight === '') {
+            $hourExpression = $hourExpressionLeft;
+        } else {
+            $hourExpression = $hourExpressionLeft . ',' . $hourExpressionRight;
+        }
 
         return $this->skip($this->inTimeInterval($startTime, $endTime))
             ->spliceIntoPosition(2, $hourExpression);
