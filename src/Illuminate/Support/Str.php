@@ -1310,6 +1310,12 @@ class Str
 
         $endPunctuation = ['.', '!', '?', ':', '—', ','];
 
+        foreach ($endPunctuation as $punctuation) {
+            $value = static::replace($punctuation, "$punctuation ", $value);
+        }
+
+        $value = trim($value);
+
         $words = preg_split('/\s+/', $value, -1, PREG_SPLIT_NO_EMPTY);
 
         for ($i = 0; $i < count($words); $i++) {

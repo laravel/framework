@@ -84,6 +84,7 @@ class SupportStrTest extends TestCase
         $this->assertSame('Bond. James Bond.', Str::apa('bond. james bond.'));
         $this->assertSame('Bond. James Bond.', Str::apa('BOND. JAMES BOND.'));
         $this->assertSame('Bond. James Bond.', Str::apa('Bond. James Bond.'));
+        $this->assertSame('Bond. James Bond.', Str::apa('Bond.James Bond.'));
 
         $this->assertSame('Self-Report', Str::apa('self-report'));
         $this->assertSame('Self-Report', Str::apa('Self-report'));
@@ -108,6 +109,11 @@ class SupportStrTest extends TestCase
         $this->assertSame('Устное Слово – Не Воробей. Как Только Он Вылетит, Его Не Поймаешь.', Str::apa('устное слово – не воробей. как только он вылетит, его не поймаешь.'));
         $this->assertSame('Устное Слово – Не Воробей. Как Только Он Вылетит, Его Не Поймаешь.', Str::apa('Устное Слово – Не Воробей. Как Только Он Вылетит, Его Не Поймаешь.'));
         $this->assertSame('Устное Слово – Не Воробей. Как Только Он Вылетит, Его Не Поймаешь.', Str::apa('УСТНОЕ СЛОВО – НЕ ВОРОБЕЙ. КАК ТОЛЬКО ОН ВЫЛЕТИТ, ЕГО НЕ ПОЙМАЕШЬ.'));
+        $this->assertSame('Устное Слово – Не Воробей. Как Только Он Вылетит, Его Не Поймаешь.', Str::apa('УСТНОЕ СЛОВО – НЕ ВОРОБЕЙ.КАК ТОЛЬКО ОН ВЫЛЕТИТ,ЕГО НЕ ПОЙМАЕШЬ.'));
+
+        $this->assertSame('Real Change, Enduring Change! Happens One Step at a Time.', Str::apa('Real change,enduring change!happens one step at a time.'));
+        $this->assertSame('Real Change, Enduring Change! Happens One Step at a Time.', Str::apa('Real change,enduring change!happens one step at a time.  '));
+        $this->assertSame('Real Change, Enduring Change! Happens One Step at a Time.', Str::apa('rEaL cHaNgE,eNdUrInG cHaNgE!hApPenS oNe StEp At A tImE.  '));
 
         $this->assertSame('', Str::apa(''));
         $this->assertSame('   ', Str::apa('   '));
