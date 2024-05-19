@@ -213,7 +213,7 @@ class QueueManager implements FactoryContract, MonitorContract
      */
     protected function getConfig($name)
     {
-        if (! is_null($name) && $name !== 'null') {
+        if (! is_null($name) && (! empty(trim($name)) && $name !== 'null' && $name !== 'default')) {
             return $this->app['config']["queue.connections.{$name}"];
         }
 
