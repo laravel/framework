@@ -39,20 +39,26 @@ class WipeCommand extends Command
 
         $database = $this->input->getOption('database');
 
-        if ($this->option('drop-views')) {
-            $this->dropAllViews($database);
+        $wipes = $this->laravel['config']['database.wipes'];
 
-            $this->components->info('Dropped all views successfully.');
-        }
+        $databases = $database || empty($wipes) ? [ $database ] : $wipes;
 
-        $this->dropAllTables($database);
+        foreach( $databases as $database) {
+            if ($this->option('drop-views')) {
+                $this->dropAllViews($database);
 
-        $this->components->info('Dropped all tables successfully.');
+                $this->components->info('Dropped all views successfully.');
+            }
 
-        if ($this->option('drop-types')) {
-            $this->dropAllTypes($database);
+            $this->dropAllTables($database);
 
-            $this->components->info('Dropped all types successfully.');
+            $this->components->info('Dropped all tables successfully.');
+
+            if ($this->option('drop-types')) {
+                $this->dropAllTypes($database);
+
+                $this->components->info('Dropped all types successfully.');
+            }
         }
 
         return 0;

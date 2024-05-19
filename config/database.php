@@ -167,4 +167,17 @@ return [
 
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Default Wipeable Database Connection Names
+    |--------------------------------------------------------------------------
+    |
+    | Here you may specify which of the database connections you wish to wipe
+    | by default. These are the database connections which will be utilized
+    | unless another database connection is explicitly specified when you
+    | execute the wipe command.
+    |
+    */
+
+    'wipes' => [],
 ];
