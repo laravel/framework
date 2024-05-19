@@ -130,17 +130,37 @@ class ScheduleListCommandTest extends TestCase
             ->expectsOutput('  * * * * * 30s  php artisan inspire ........... Next Due: 30 seconds from now');
     }
 
+    public function testScheduleBetweenExpression()
+    {
+        $this->schedule->command('inspire')->hourly()->between('6:00', '18:00');
+        $this->schedule->command('inspire')->everyMinute()->between('6:00', '18:00');
+        $this->schedule->command('inspire')->hourly()->unlessBetween('6:00', '18:00');
+        $this->schedule->command('inspire')->everyMinute()->unlessBetween('6:00', '18:00');
+
+        $this->assertEquals('0 6-18 * * *', $this->schedule->events()[0]->expression);
+        $this->assertEquals('* 6-18 * * *', $this->schedule->events()[1]->expression);
+        $this->assertEquals('0 0-5,19-23 * * *', $this->schedule->events()[2]->expression);
+        $this->assertEquals('* 0-5,19-23 * * *', $this->schedule->events()[3]->expression);
+    }
+
     public function testDisplayScheduleBetween()
     {
         $this->schedule->command('inspire')->hourly()->between('6:00', '18:00');
         $this->schedule->command('inspire')->everyMinute()->between('6:00', '18:00');
+
+        $this->artisan(ScheduleListCommand::class)
+            ->assertSuccessful()
+            ->expectsOutput('  0 6-18 * * *  php artisan inspire ............... Next Due: 6 hours from now')
+            ->expectsOutput('  * 6-18 * * *  php artisan inspire ............... Next Due: 6 hours from now');
+    }
+
+    public function testDisplayScheduleUnlessBetween()
+    {
         $this->schedule->command('inspire')->hourly()->UnlessBetween('2:00', '4:00');
         $this->schedule->command('inspire')->everyMinute()->UnlessBetween('2:00', '4:00');
 
         $this->artisan(ScheduleListCommand::class)
             ->assertSuccessful()
-            ->expectsOutput('  0 6-18     * * *  php artisan inspire ........... Next Due: 6 hours from now')
-            ->expectsOutput('  * 6-18     * * *  php artisan inspire ........... Next Due: 6 hours from now')
             ->expectsOutput('  0 0-1,5-23 * * *  php artisan inspire ............ Next Due: 1 hour from now')
             ->expectsOutput('  * 0-1,5-23 * * *  php artisan inspire .......... Next Due: 1 minute from now');
     }
