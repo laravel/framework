@@ -84,9 +84,7 @@ class MailMakeCommand extends GeneratorCommand
             str_replace('.', '/', $this->getView()) . '.blade.php'
         );
 
-        if (!$this->files->isDirectory(dirname($path))) {
-            $this->files->makeDirectory(dirname($path), 0755, true);
-        }
+        $this->files->ensureDirectoryExists(dirname($path));
 
         $stub = str_replace(
             '{{ quote }}',
