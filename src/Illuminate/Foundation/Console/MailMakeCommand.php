@@ -66,9 +66,7 @@ class MailMakeCommand extends GeneratorCommand
             str_replace('.', '/', $this->getView()).'.blade.php'
         );
 
-        if (! $this->files->isDirectory(dirname($path))) {
-            $this->files->makeDirectory(dirname($path), 0755, true);
-        }
+        $this->files->ensureDirectoryExists(dirname($path));
 
         $this->files->put($path, file_get_contents(__DIR__.'/stubs/markdown.stub'));
     }
