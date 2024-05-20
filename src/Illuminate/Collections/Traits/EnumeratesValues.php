@@ -185,19 +185,14 @@ trait EnumeratesValues
     {
         $callback = $this->valueRetriever($callback);
 
-        // Reduce the array to the sum and the count of non-null values.
-        $reduced = $this
-            ->reduce(
-                static function (array &$reduce, mixed $value) use ($callback): array {
-                    if (! is_null($retrieved = $callback($value))) {
-                        $reduce[0] += $retrieved;
-                        $reduce[1]++;
-                    }
+        $reduced = $this->reduce(static function (&$reduce, $value) use ($callback) {
+            if (! is_null($resolved = $callback($value))) {
+                $reduce[0] += $resolved;
+                $reduce[1]++;
+            }
 
-                    return $reduce;
-                },
-                [0, 0],
-            );
+            return $reduce;
+        }, [0, 0]);
 
         return $reduced[1] ? $reduced[0] / $reduced[1] : null;
     }
