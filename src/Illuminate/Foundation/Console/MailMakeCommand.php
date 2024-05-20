@@ -79,7 +79,7 @@ class MailMakeCommand extends GeneratorCommand
     protected function writeView()
     {
         $path = $this->viewPath(
-            str_replace('.', '/', $this->getView()) . '.blade.php'
+            str_replace('.', '/', $this->getView()).'.blade.php'
         );
 
         $this->files->ensureDirectoryExists(dirname($path));
@@ -87,7 +87,7 @@ class MailMakeCommand extends GeneratorCommand
         $stub = str_replace(
             '{{ quote }}',
             Inspiring::quotes()->random(),
-            file_get_contents(__DIR__ . '/stubs/view.stub')
+            file_get_contents(__DIR__.'/stubs/view.stub')
         );
 
         $this->files->put($path, $stub);
