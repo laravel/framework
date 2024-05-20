@@ -67,7 +67,9 @@ class FoundationServiceProvider extends AggregateServiceProvider
         }
 
         if ($this->app->hasDebugModeEnabled()) {
-            $this->app->make(Listener::class)->registerListeners($this->app->make(Dispatcher::class));
+            $this->app->make(Listener::class)->registerListeners(
+                $this->app->make(Dispatcher::class)
+            );
         }
     }
 
@@ -85,7 +87,7 @@ class FoundationServiceProvider extends AggregateServiceProvider
         $this->registerRequestValidation();
         $this->registerRequestSignatureValidation();
         $this->registerExceptionTracking();
-        $this->registerExceptionsRenderer();
+        $this->regsiterExceptionRenderer();
         $this->registerMaintenanceModeManager();
     }
 
@@ -213,7 +215,7 @@ class FoundationServiceProvider extends AggregateServiceProvider
      *
      * @return void
      */
-    protected function registerExceptionsRenderer()
+    protected function regsiterExceptionRenderer()
     {
         if (! $this->app->hasDebugModeEnabled()) {
             return;

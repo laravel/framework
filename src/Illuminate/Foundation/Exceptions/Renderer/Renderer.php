@@ -39,7 +39,7 @@ class Renderer
     protected $htmlErrorRenderer;
 
     /**
-     * The blade mapper instance.
+     * The Blade mapper instance.
      *
      * @var \Illuminate\Foundation\Exceptions\Renderer\Mappers\BladeMapper
      */
@@ -77,7 +77,7 @@ class Renderer
     }
 
     /**
-     * Renders the given exception as HTML string.
+     * Render the given exception as an HTML string.
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \Throwable  $throwable
