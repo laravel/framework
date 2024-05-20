@@ -5090,6 +5090,29 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->passes());
     }
 
+    public function testNumericKeys()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['3' => 'aslsdlks'], [3 => 'required']);
+        $this->assertTrue($v->passes());
+    }
+
+    public function testMergeRules()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['x' => 'asl', 'a' => [1, 4]], ['x' => ['alpha', ['min', 3]], 'a.*' => 'integer']);
+        $v->addRules(['x' => ['required', ['max', 10]], 'a.1' => 'digits:1']);
+        $this->assertEquals(
+            [
+                'x' => ['alpha', ['min', 3], 'required', ['max', 10]],
+                'a.0' => ['integer'],
+                'a.1' => ['integer', 'digits:1'],
+            ],
+            $v->getRules()
+        );
+        $this->assertTrue($v->passes());
+    }
+
     public function testValidateAlpha()
     {
         $trans = $this->getIlluminateArrayTranslator();
