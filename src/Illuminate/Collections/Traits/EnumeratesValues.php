@@ -181,7 +181,8 @@ trait EnumeratesValues
      * @param  (callable(TValue): float|int)|string|null  $callback
      * @return float|int|null
      */
-    public function avg($callback = null) {
+    public function avg($callback = null)
+    {
         $callback = $this->valueRetriever($callback);
 
         // Reduce the array to the sum and the count of non-null values.
