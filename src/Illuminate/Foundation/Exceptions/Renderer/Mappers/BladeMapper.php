@@ -52,14 +52,14 @@ class BladeMapper
     protected $factory;
 
     /**
-     * The blade compiler instance.
+     * The Blade compiler instance.
      *
      * @var \Illuminate\View\Compilers\BladeCompiler
      */
     protected $bladeCompiler;
 
     /**
-     * Create a new blade mapper instance.
+     * Create a new Blade mapper instance.
      *
      * @param  \Illuminate\Contracts\View\Factory  $factory
      * @param  \Illuminate\View\Compilers\BladeCompiler  $bladeCompiler
@@ -72,7 +72,7 @@ class BladeMapper
     }
 
     /**
-     * Maps view cached paths to their original paths.
+     * Map cached view paths to their original paths.
      *
      * @param  \Symfony\Component\ErrorHandler\Exception\FlattenException  $exception
      * @return \Symfony\Component\ErrorHandler\Exception\FlattenException
@@ -101,7 +101,7 @@ class BladeMapper
     }
 
     /**
-     * Finds the compiled view file for the given compiled path.
+     * Find the compiled view file for the given compiled path.
      *
      * @param  string  $compiledPath
      * @return string|null
@@ -146,7 +146,7 @@ class BladeMapper
     }
 
     /**
-     * Filters out the view data that should not be shown in the exception report.
+     * Filter out the view data that should not be shown in the exception report.
      *
      * @param  array<string, mixed>  $data
      * @return array<string, mixed>
@@ -163,7 +163,7 @@ class BladeMapper
     }
 
     /**
-     * Detects the line number in the original blade file.
+     * Detect the line number in the original blade file.
      *
      * @param  string  $filename
      * @param  int  $compiledLineNumber
@@ -177,7 +177,7 @@ class BladeMapper
     }
 
     /**
-     * Compiles the source map for the given blade file.
+     * Compile the source map for the given blade file.
      *
      * @param  string  $value
      * @return string
@@ -186,9 +186,7 @@ class BladeMapper
     {
         try {
             $value = $this->addEchoLineNumbers($value);
-
             $value = $this->addStatementLineNumbers($value);
-
             $value = $this->addBladeComponentLineNumbers($value);
 
             $value = $this->bladeCompiler->compileString($value);
@@ -202,7 +200,7 @@ class BladeMapper
     }
 
     /**
-     * Adds line numbers to echo statements.
+     * Add line numbers to echo statements.
      *
      * @param  string  $value
      * @return string
@@ -228,7 +226,7 @@ class BladeMapper
     }
 
     /**
-     * Adds line numbers to blade statements.
+     * Add line numbers to blade statements.
      *
      * @param  string  $value
      * @return string
@@ -254,7 +252,7 @@ class BladeMapper
     }
 
     /**
-     * Adds line numbers to blade components.
+     * Add line numbers to blade components.
      *
      * @param  string  $value
      * @return string
@@ -280,7 +278,7 @@ class BladeMapper
     }
 
     /**
-     * Inserts a line number at the given position.
+     * Insert a line number at the given position.
      *
      * @param  int  $position
      * @param  string  $value
@@ -289,13 +287,14 @@ class BladeMapper
     protected function insertLineNumberAtPosition(int $position, string $value)
     {
         $before = mb_substr($value, 0, $position);
+
         $lineNumber = count(explode("\n", $before));
 
         return mb_substr($value, 0, $position)."|---LINE:{$lineNumber}---|".mb_substr($value, $position);
     }
 
     /**
-     * Trims empty lines from the given value.
+     * Trim empty lines from the given value.
      *
      * @param  string  $value
      * @return string
@@ -308,7 +307,7 @@ class BladeMapper
     }
 
     /**
-     * Finds the closest line number mapping in the source map.
+     * Find the closest line number mapping in the given source map.
      *
      * @param  string  $map
      * @param  int  $compiledLineNumber
@@ -321,6 +320,7 @@ class BladeMapper
         $maxDistance = 20;
 
         $pattern = '/\|---LINE:(?P<line>[0-9]+)---\|/m';
+
         $lineNumberToCheck = $compiledLineNumber - 1;
 
         while (true) {
