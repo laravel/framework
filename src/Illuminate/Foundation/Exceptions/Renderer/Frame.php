@@ -10,7 +10,7 @@ class Frame
     use ResolvesDumpSource;
 
     /**
-     * The "flatten" exception instance.
+     * The "flattened" exception instance.
      *
      * @var \Symfony\Component\ErrorHandler\Exception\FlattenException
      */
@@ -24,7 +24,7 @@ class Frame
     protected $classMap;
 
     /**
-     * The frame's raw data from the "flatten" exception.
+     * The frame's raw data from the "flattened" exception.
      *
      * @var array{file: string, line: int, class?: string, type?: string, function?: string}
      */
@@ -78,7 +78,7 @@ class Frame
     }
 
     /**
-     * Get the frame class, if any.
+     * Get the frame's class, if any.
      *
      * @return string|null
      */
@@ -90,7 +90,7 @@ class Frame
     }
 
     /**
-     * Get the frame file.
+     * Get the frame's file.
      *
      * @return string
      */
@@ -100,7 +100,7 @@ class Frame
     }
 
     /**
-     * Get the frame line number.
+     * Get the frame's line number.
      *
      * @return int
      */
@@ -112,7 +112,7 @@ class Frame
     }
 
     /**
-     * Get the frame function or method.
+     * Get the frame's function or method.
      *
      * @return string
      */
@@ -125,7 +125,7 @@ class Frame
     }
 
     /**
-     * Get the frame code snippet.
+     * Get the frame's code snippet.
      *
      * @return string
      */

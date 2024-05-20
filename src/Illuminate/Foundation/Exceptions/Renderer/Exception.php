@@ -10,7 +10,7 @@ use Symfony\Component\ErrorHandler\Exception\FlattenException;
 class Exception
 {
     /**
-     * The "flatten" exception instance.
+     * The "flattened" exception instance.
      *
      * @var \Symfony\Component\ErrorHandler\Exception\FlattenException
      */
@@ -134,7 +134,19 @@ class Exception
     }
 
     /**
-     * Get the request's body parameters that caused the exception.
+     * Get the request's headers.
+     *
+     * @return array<string, string>
+     */
+    public function requestHeaders()
+    {
+        return array_map(function (array $header) {
+            return implode(', ', $header);
+        }, $this->request()->headers->all());
+    }
+
+    /**
+     * Get the request's body parameters.
      *
      * @return string|null
      */
@@ -150,19 +162,7 @@ class Exception
     }
 
     /**
-     * Get the request's headers that caused the exception.
-     *
-     * @return array<string, string>
-     */
-    public function requestHeaders()
-    {
-        return array_map(function (array $header) {
-            return implode(', ', $header);
-        }, $this->request()->headers->all());
-    }
-
-    /**
-     * Get the application route context that caused the exception.
+     * Get the application's route context.
      *
      * @return array<string, string>|null
      */
@@ -178,7 +178,7 @@ class Exception
     }
 
     /**
-     * Get the application route parameters context that caused the exception.
+     * Get the application's route parameters context.
      *
      * @return array<string, mixed>|null
      */
@@ -193,7 +193,7 @@ class Exception
     }
 
     /**
-     * Get the application SQL queries that caused the exception.
+     * Get the application's SQL queries.
      *
      * @return array<int, array{connectionName: string, time: float, sql: string}>
      */

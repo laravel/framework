@@ -19,7 +19,7 @@ class Listener
     protected $queries = [];
 
     /**
-     * Register the listener on the given events dispatcher.
+     * Register the appropriate listeners on the given event dispatcher.
      *
      * @param  \Illuminate\Contracts\Events\Dispatcher  $events
      * @return void
