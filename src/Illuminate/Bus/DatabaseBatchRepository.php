@@ -309,7 +309,7 @@ class DatabaseBatchRepository implements PrunableBatchRepository
      */
     public function transaction(Closure $callback)
     {
-        return $this->connection->transaction(fn () => $callback());
+        return $this->connection->transaction($callback);
     }
 
     /**
