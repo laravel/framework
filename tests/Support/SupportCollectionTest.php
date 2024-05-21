@@ -9,6 +9,8 @@ use CachingIterator;
 use Exception;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\ItemNotFoundException;
@@ -2988,6 +2990,32 @@ class SupportCollectionTest extends TestCase
     }
 
     #[DataProvider('collectionClassProvider')]
+    public function testMapIntoModelReturnsEloquentCollection($collection)
+    {
+        $data = new $collection([
+            ['foo' => 'bar'],
+            ['fizz' => 'buzz'],
+        ]);
+
+        $data = $data->mapInto(TestModel::class);
+
+        $this->assertInstanceOf(EloquentCollection::class, $data);
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testMapIntoModelReturnsCustomCollection($collection)
+    {
+        $data = new $collection([
+            ['foo' => 'bar'],
+            ['fizz' => 'buzz'],
+        ]);
+
+        $data = $data->mapInto(TestModelWithCustomCollection::class);
+
+        $this->assertInstanceOf(TestEloquentCollectionSubclass::class, $data);
+    }
+
+    #[DataProvider('collectionClassProvider')]
     public function testNth($collection)
     {
         $data = new $collection([
@@ -5534,4 +5562,24 @@ class TestCollectionMapIntoObject
 class TestCollectionSubclass extends Collection
 {
     //
+}
+
+class TestModel extends Model
+{
+    protected $guarded = [];
+}
+
+class TestEloquentCollectionSubclass extends EloquentCollection
+{
+    //
+}
+
+class TestModelWithCustomCollection extends Model
+{
+    protected $guarded = [];
+
+    public function newCollection(array $models = [])
+    {
+        return new TestEloquentCollectionSubclass($models);
+    }
 }

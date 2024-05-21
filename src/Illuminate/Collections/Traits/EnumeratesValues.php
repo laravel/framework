@@ -8,6 +8,7 @@ use Closure;
 use Exception;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Enumerable;
@@ -435,6 +436,11 @@ trait EnumeratesValues
     {
         if (is_subclass_of($class, BackedEnum::class)) {
             return $this->map(fn ($value, $key) => $class::from($value));
+        }
+
+        if (is_subclass_of($class, Model::class)) {
+            return (new $class())
+                ->newCollection($this->map(fn ($value) => new $class($value))->all());
         }
 
         return $this->map(fn ($value, $key) => new $class($value, $key));
