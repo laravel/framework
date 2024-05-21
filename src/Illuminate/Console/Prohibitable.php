@@ -14,12 +14,12 @@ trait Prohibitable
     /**
      * Indicate whether the command should be prohibited from running.
      *
-     * @param  bool  $prevent
+     * @param  bool  $prohibit
      * @return bool
      */
-    public static function prohibit($prevent = true)
+    public static function prohibit($prohibit = true)
     {
-        static::$prohibitedFromRunning = $prevent;
+        static::$prohibitedFromRunning = $prohibit;
     }
 
     /**
