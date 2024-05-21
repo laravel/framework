@@ -658,6 +658,48 @@ class Arr
     }
 
     /**
+     * Merge arrays deeply
+     *
+     * @param  array|true  $array `true` to preserve the numeric keys
+     * @param  array[]  $arrays
+     */
+    public static function merge(array|bool $array, array ...$arrays): array
+    {
+        $preserveNumericKeys = false;
+        if ($array === true) {
+            $preserveNumericKeys = true;
+        } elseif ($array !== false) {
+            $arrays = [$array, ...$arrays];
+        }
+
+        $result = array_shift($arrays);
+        while (! empty($arrays)) {
+            $array = array_shift($arrays);
+            foreach ($array as $key => $value) {
+                // key does not present in the previous array, just set it
+                if (! array_key_exists($key, $result)) {
+                    $result[$key] = $value;
+                } elseif (! $preserveNumericKeys && is_int($key)) {
+                    // does not preserve numeric keys
+                    $result[] = $value;
+                } elseif (is_array($value) && is_array($result[$key])) {
+                    // merge two arrays deeply
+                    $result[$key] = static::merge(
+                        $preserveNumericKeys,
+                        $result[$key],
+                        $value
+                    );
+                } else {
+                    // override the key value
+                    $result[$key] = $value;
+                }
+            }
+        }
+
+        return $result;
+    }
+
+    /**
      * Push an item onto the beginning of an array.
      *
      * @param  array  $array

@@ -780,6 +780,59 @@ class SupportArrTest extends TestCase
         $this->assertEquals(['1-a-0', '2-b-1'], $result);
     }
 
+    public function testMerge()
+    {
+        $a = [
+            'db' => [
+                'connections' => [
+                    'default' => [
+                        'host' => 'localhost',
+                        'username' => 'root',
+                        'password' => '',
+                    ],
+                ],
+            ],
+            1 => [
+                'one',
+                'two',
+            ],
+        ];
+
+        $b = [
+            'db' => [
+                'connections' => [
+                    'default' => [
+                        'host' => '127.0.0.1',
+                        'password' => 'root',
+                    ],
+                    'slave' => [
+                        'host' => 'slave host',
+                    ],
+                ],
+            ],
+            1 => [
+                'three',
+            ],
+        ];
+        // simple
+        $array = Arr::merge([], $a);
+        $this->assertSame($a, $array);
+
+        $array = Arr::merge($a, $b, ['more' => 'more']);
+        $this->assertSame('127.0.0.1', $array['db']['connections']['default']['host']);
+        $this->assertSame('root', $array['db']['connections']['default']['password']);
+        $this->assertSame('slave host', $array['db']['connections']['slave']['host']);
+        $this->assertSame('more', $array['more']);
+
+        // numeric key
+        $this->assertSame('three', $array[2][0]);
+
+        // preserve numeric keys
+        $array = Arr::merge(true, $a, $b);
+        $this->assertSame('three', $array[1][0]);
+        $this->assertFalse(isset($array[2]));
+    }
+
     public function testPrepend()
     {
         $array = Arr::prepend(['one', 'two', 'three', 'four'], 'zero');
