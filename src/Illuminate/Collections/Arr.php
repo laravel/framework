@@ -247,6 +247,25 @@ class Arr
     }
 
     /**
+     * Transpose a multi-dimensional array.
+     *
+     * @param  array  $array
+     * @return array
+     */
+    public static function transpose($array)
+    {
+        $transposed = [];
+
+        foreach ($array as $subArray) {
+            foreach (array_values($subArray) as $key => $value) {
+                $transposed[$key][] = $value;
+            }
+        }
+
+        return $transposed;
+    }
+
+    /**
      * Flatten a multi-dimensional array into a single level.
      *
      * @param  iterable  $array

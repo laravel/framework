@@ -1151,6 +1151,21 @@ class SupportArrTest extends TestCase
         $this->assertSame('font-weight: bold; margin-top: 4px; margin-left: 2px;', $styles);
     }
 
+    public function testTranspose()
+    {
+        $transposed = Arr::transpose([
+            ['John', 'Jane', 'Joe'],
+            ['Admin', 'Support', 'Customer'],
+            [true, false, null],
+        ]);
+
+        $this->assertSame([
+            ['John', 'Admin', true],
+            ['Jane', 'Support', false],
+            ['Joe', 'Customer', null],
+        ], $transposed);
+    }
+
     public function testWhere()
     {
         $array = [100, '200', 300, '400', 500];
