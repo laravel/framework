@@ -3,7 +3,7 @@
 namespace Illuminate\Database\Console\Migrations;
 
 use Illuminate\Console\ConfirmableTrait;
-use Illuminate\Console\Preventable;
+use Illuminate\Console\Prohibitable;
 use Illuminate\Database\Migrations\Migrator;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputOption;
@@ -11,7 +11,7 @@ use Symfony\Component\Console\Input\InputOption;
 #[AsCommand(name: 'migrate:reset')]
 class ResetCommand extends BaseCommand
 {
-    use ConfirmableTrait, Preventable;
+    use ConfirmableTrait, Prohibitable;
 
     /**
      * The console command name.
@@ -54,11 +54,8 @@ class ResetCommand extends BaseCommand
      */
     public function handle()
     {
-        if ($this->preventedFromRunning()) {
-            return 1;
-        }
-
-        if (! $this->confirmToProceed()) {
+        if ($this->isProhibited() ||
+            ! $this->confirmToProceed()) {
             return 1;
         }
 

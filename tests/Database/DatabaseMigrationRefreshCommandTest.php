@@ -19,7 +19,7 @@ class DatabaseMigrationRefreshCommandTest extends TestCase
 {
     protected function tearDown(): void
     {
-        RefreshCommand::preventFromRunning(false);
+        RefreshCommand::prohibit(false);
         m::close();
     }
 
@@ -84,7 +84,7 @@ class DatabaseMigrationRefreshCommandTest extends TestCase
         $command->setLaravel($app);
         $command->setApplication($console);
 
-        RefreshCommand::preventFromRunning();
+        RefreshCommand::prohibit();
 
         $code = $this->runCommand($command);
 

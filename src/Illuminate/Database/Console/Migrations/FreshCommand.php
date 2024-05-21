@@ -4,7 +4,7 @@ namespace Illuminate\Database\Console\Migrations;
 
 use Illuminate\Console\Command;
 use Illuminate\Console\ConfirmableTrait;
-use Illuminate\Console\Preventable;
+use Illuminate\Console\Prohibitable;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Events\DatabaseRefreshed;
 use Illuminate\Database\Migrations\Migrator;
@@ -14,7 +14,7 @@ use Symfony\Component\Console\Input\InputOption;
 #[AsCommand(name: 'migrate:fresh')]
 class FreshCommand extends Command
 {
-    use ConfirmableTrait, Preventable;
+    use ConfirmableTrait, Prohibitable;
 
     /**
      * The console command name.
@@ -57,11 +57,8 @@ class FreshCommand extends Command
      */
     public function handle()
     {
-        if ($this->preventedFromRunning()) {
-            return 1;
-        }
-
-        if (! $this->confirmToProceed()) {
+        if ($this->isProhibited() ||
+            ! $this->confirmToProceed()) {
             return 1;
         }
 

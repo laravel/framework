@@ -15,7 +15,7 @@ class DatabaseMigrationResetCommandTest extends TestCase
 {
     protected function tearDown(): void
     {
-        ResetCommand::preventFromRunning(false);
+        ResetCommand::prohibit(false);
         m::close();
     }
 
@@ -61,7 +61,7 @@ class DatabaseMigrationResetCommandTest extends TestCase
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
 
-        ResetCommand::preventFromRunning();
+        ResetCommand::prohibit();
 
         $code = $this->runCommand($command);
 
