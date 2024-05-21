@@ -1153,7 +1153,7 @@ class SupportArrTest extends TestCase
 
     public function testTranspose()
     {
-        $transposed = Arr::transpose([
+        $transposedBalanced = Arr::transpose([
             ['John', 'Jane', 'Joe'],
             ['Admin', 'Support', 'Customer'],
             [true, false, null],
@@ -1163,7 +1163,19 @@ class SupportArrTest extends TestCase
             ['John', 'Admin', true],
             ['Jane', 'Support', false],
             ['Joe', 'Customer', null],
-        ], $transposed);
+        ], $transposedBalanced);
+
+        $transposedImbalanced = Arr::transpose([
+            ['John', 'Jane', 'Joe'],
+            ['laravel', 'laravel', 'laravel'],
+            ['livewire', 'inertiajs']
+        ]);
+
+        $this->assertSame([
+            ['John', 'laravel', 'livewire'],
+            ['Jane', 'laravel', 'inertiajs'],
+            ['Joe', 'laravel'],
+        ], $transposedImbalanced);
     }
 
     public function testWhere()
