@@ -530,7 +530,6 @@ class UrlGenerator implements UrlGeneratorContract
                     : $value;
         })->all();
 
-        // Recursively replace backed enums with their values
         array_walk_recursive($parameters, function (&$item) {
             if ($item instanceof BackedEnum) {
                 $item = $item->value;
