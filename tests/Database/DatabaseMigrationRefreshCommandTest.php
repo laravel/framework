@@ -19,6 +19,7 @@ class DatabaseMigrationRefreshCommandTest extends TestCase
 {
     protected function tearDown(): void
     {
+        RefreshCommand::prohibit(false);
         m::close();
     }
 
@@ -70,6 +71,27 @@ class DatabaseMigrationRefreshCommandTest extends TestCase
         $migrateCommand->shouldReceive('run')->with(new InputMatcher('--force=1 migrate'), m::any());
 
         $this->runCommand($command, ['--step' => 2]);
+    }
+
+    public function testRefreshCommandExitsWhenPrevented()
+    {
+        $command = new RefreshCommand;
+
+        $app = new ApplicationDatabaseRefreshStub(['path.database' => __DIR__]);
+        $dispatcher = $app->instance(Dispatcher::class, $events = m::mock());
+        $console = m::mock(ConsoleApplication::class)->makePartial();
+        $console->__construct();
+        $command->setLaravel($app);
+        $command->setApplication($console);
+
+        RefreshCommand::prohibit();
+
+        $code = $this->runCommand($command);
+
+        $this->assertSame(1, $code);
+
+        $console->shouldNotHaveBeenCalled();
+        $dispatcher->shouldNotReceive('dispatch');
     }
 
     protected function runCommand($command, $input = [])

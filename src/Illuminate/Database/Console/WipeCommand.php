@@ -4,13 +4,14 @@ namespace Illuminate\Database\Console;
 
 use Illuminate\Console\Command;
 use Illuminate\Console\ConfirmableTrait;
+use Illuminate\Console\Prohibitable;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputOption;
 
 #[AsCommand(name: 'db:wipe')]
 class WipeCommand extends Command
 {
-    use ConfirmableTrait;
+    use ConfirmableTrait, Prohibitable;
 
     /**
      * The console command name.
@@ -33,7 +34,8 @@ class WipeCommand extends Command
      */
     public function handle()
     {
-        if (! $this->confirmToProceed()) {
+        if ($this->isProhibited() ||
+            ! $this->confirmToProceed()) {
             return 1;
         }
 

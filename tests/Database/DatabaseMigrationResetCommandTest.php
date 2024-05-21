@@ -15,6 +15,7 @@ class DatabaseMigrationResetCommandTest extends TestCase
 {
     protected function tearDown(): void
     {
+        ResetCommand::prohibit(false);
         m::close();
     }
 
@@ -50,6 +51,23 @@ class DatabaseMigrationResetCommandTest extends TestCase
         $migrator->shouldReceive('reset')->once()->with([__DIR__.DIRECTORY_SEPARATOR.'migrations'], true);
 
         $this->runCommand($command, ['--pretend' => true, '--database' => 'foo']);
+    }
+
+    public function testRefreshCommandExitsWhenPrevented()
+    {
+        $command = new ResetCommand($migrator = m::mock(Migrator::class));
+
+        $app = new ApplicationDatabaseResetStub(['path.database' => __DIR__]);
+        $app->useDatabasePath(__DIR__);
+        $command->setLaravel($app);
+
+        ResetCommand::prohibit();
+
+        $code = $this->runCommand($command);
+
+        $this->assertSame(1, $code);
+
+        $migrator->shouldNotHaveBeenCalled();
     }
 
     protected function runCommand($command, $input = [])
