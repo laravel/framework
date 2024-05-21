@@ -658,7 +658,7 @@ class Arr
     }
 
     /**
-     * Merge arrays deeply
+     * Merge arrays deeply.
      *
      * @param  array|true  $array  `true` to preserve the numeric keys
      * @param  array[]  $arrays
