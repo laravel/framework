@@ -56,4 +56,16 @@ class DatabaseLockTest extends DatabaseTestCase
 
         $otherLock->release();
     }
+
+    public function testOtherOwnerDoesNotOwnLockAfterRestore()
+    {
+        $firstLock = Cache::store('database')->lock('foo');
+        $this->assertTrue($firstLock->isOwnedBy(null));
+        $this->assertTrue($firstLock->get());
+        $this->assertTrue($firstLock->isOwnedBy($firstLock->owner()));
+
+        $secondLock = Cache::store('database')->restoreLock('foo', 'other_owner');
+        $this->assertTrue($secondLock->isOwnedBy($firstLock->owner()));
+        $this->assertFalse($secondLock->isOwnedByCurrentProcess());
+    }
 }

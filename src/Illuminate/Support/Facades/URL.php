@@ -43,7 +43,7 @@ namespace Illuminate\Support\Facades;
  * @method static \Illuminate\Routing\UrlGenerator resolveMissingNamedRoutesUsing(callable $missingNamedRouteResolver)
  * @method static string getRootControllerNamespace()
  * @method static \Illuminate\Routing\UrlGenerator setRootControllerNamespace(string $rootNamespace)
- * @method static void macro(string $name, object|callable $macro)
+ * @method static void macro(string $name, object|callable $macro, object|callable $macro = null)
  * @method static void mixin(object $mixin, bool $replace = true)
  * @method static bool hasMacro(string $name)
  * @method static void flushMacros()

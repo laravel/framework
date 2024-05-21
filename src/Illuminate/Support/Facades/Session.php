@@ -63,7 +63,7 @@ namespace Illuminate\Support\Facades;
  * @method static \SessionHandlerInterface setHandler(\SessionHandlerInterface $handler)
  * @method static bool handlerNeedsRequest()
  * @method static void setRequestOnHandler(\Illuminate\Http\Request $request)
- * @method static void macro(string $name, object|callable $macro)
+ * @method static void macro(string $name, object|callable $macro, object|callable $macro = null)
  * @method static void mixin(object $mixin, bool $replace = true)
  * @method static bool hasMacro(string $name)
  * @method static void flushMacros()
