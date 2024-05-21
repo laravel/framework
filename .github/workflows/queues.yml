@@ -19,8 +19,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -30,8 +28,11 @@ jobs:
           tools: composer:v2
           coverage: none
 
+      - name: Set Framework version
+        run: composer config version "10.x-dev"
+
       - name: Install dependencies
-        uses: nick-fields/retry@v2
+        uses: nick-fields/retry@v3
         with:
           timeout_minutes: 5
           max_attempts: 5
@@ -53,8 +54,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -64,8 +63,11 @@ jobs:
           tools: composer:v2
           coverage: none
 
+      - name: Set Framework version
+        run: composer config version "10.x-dev"
+
       - name: Install dependencies
-        uses: nick-fields/retry@v2
+        uses: nick-fields/retry@v3
         with:
           timeout_minutes: 5
           max_attempts: 5
@@ -95,8 +97,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -106,8 +106,11 @@ jobs:
           tools: composer:v2
           coverage: none
 
+      - name: Set Framework version
+        run: composer config version "10.x-dev"
+
       - name: Install dependencies
-        uses: nick-fields/retry@v2
+        uses: nick-fields/retry@v3
         with:
           timeout_minutes: 5
           max_attempts: 5
@@ -126,12 +129,10 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - uses: actions/checkout@v3
+      
       - name: Download & Extract beanstalkd
         run: curl -L https://github.com/beanstalkd/beanstalkd/archive/refs/tags/v1.13.tar.gz | tar xz
+      
       - name: Make beanstalkd
         run: make
         working-directory: beanstalkd-1.13
@@ -144,8 +145,11 @@ jobs:
           tools: composer:v2
           coverage: none
 
+      - name: Set Framework version
+        run: composer config version "10.x-dev"
+
       - name: Install dependencies
-        uses: nick-fields/retry@v2
+        uses: nick-fields/retry@v3
         with:
           timeout_minutes: 5
           max_attempts: 5

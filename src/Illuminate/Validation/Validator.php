@@ -584,13 +584,14 @@ class Validator implements ValidatorContract
         $missingValue = new stdClass;
 
         foreach ($this->getRules() as $key => $rules) {
+            $value = data_get($this->getData(), $key, $missingValue);
+
             if ($this->excludeUnvalidatedArrayKeys &&
                 in_array('array', $rules) &&
+                $value !== null &&
                 ! empty(preg_grep('/^'.preg_quote($key, '/').'\.+/', array_keys($this->getRules())))) {
                 continue;
             }
-
-            $value = data_get($this->getData(), $key, $missingValue);
 
             if ($value !== $missingValue) {
                 Arr::set($results, $key, $value);

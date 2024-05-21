@@ -344,6 +344,21 @@ class ValidationFileRuleTest extends TestCase
         );
     }
 
+    public function testItUsesTheCorrectValidationMessageForFile(): void
+    {
+        file_put_contents($path = __DIR__.'/test.json', 'this-is-a-test');
+
+        $file = new \Illuminate\Http\File($path);
+
+        $this->fails(
+            ['max:0'],
+            $file,
+            ['validation.max.file']
+        );
+
+        unlink($path);
+    }
+
     public function testItCanSetDefaultUsing()
     {
         $this->assertInstanceOf(File::class, File::default());

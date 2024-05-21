@@ -17,7 +17,9 @@ trait InteractsWithSignals
     /**
      * Define a callback to be run when the given signal(s) occurs.
      *
-     * @param  iterable<array-key, int>|int  $signals
+     * @template TSignals of iterable<array-key, int>|int
+     *
+     * @param  (\Closure():(TSignals))|TSignals  $signals
      * @param  callable(int $signal): void  $callback
      * @return void
      */
@@ -28,7 +30,7 @@ trait InteractsWithSignals
                 $this->getApplication()->getSignalRegistry(),
             );
 
-            collect(Arr::wrap($signals))
+            collect(Arr::wrap(value($signals)))
                 ->each(fn ($signal) => $this->signals->register($signal, $callback));
         });
     }

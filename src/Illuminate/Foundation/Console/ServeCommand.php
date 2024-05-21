@@ -57,6 +57,9 @@ class ServeCommand extends Command
      */
     public static $passthroughVariables = [
         'APP_ENV',
+        'HERD_PHP_81_INI_SCAN_DIR',
+        'HERD_PHP_82_INI_SCAN_DIR',
+        'HERD_PHP_83_INI_SCAN_DIR',
         'IGNITION_LOCAL_SITES_PATH',
         'LARAVEL_SAIL',
         'PATH',
@@ -139,6 +142,14 @@ class ServeCommand extends Command
 
             return in_array($key, static::$passthroughVariables) ? [$key => $value] : [$key => false];
         })->all());
+
+        $this->trap(fn () => [SIGTERM, SIGINT, SIGHUP, SIGUSR1, SIGUSR2, SIGQUIT], function ($signal) use ($process) {
+            if ($process->isRunning()) {
+                $process->stop(10, $signal);
+            }
+
+            exit;
+        });
 
         $process->start($this->handleProcessOutput());
 

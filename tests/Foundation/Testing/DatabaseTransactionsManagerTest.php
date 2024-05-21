@@ -31,6 +31,23 @@ class DatabaseTransactionsManagerTest extends TestCase
         $this->assertEquals(2, $manager->callbackApplicableTransactions()[0]->level);
     }
 
+    public function testCommittingDoesNotRemoveTheBasePendingTransaction()
+    {
+        $manager = new DatabaseTransactionsManager;
+
+        $manager->begin('foo', 1);
+
+        $manager->begin('foo', 2);
+        $manager->commit('foo', 2, 1);
+
+        $this->assertCount(0, $manager->callbackApplicableTransactions());
+
+        $manager->begin('foo', 2);
+
+        $this->assertCount(1, $manager->callbackApplicableTransactions());
+        $this->assertEquals(2, $manager->callbackApplicableTransactions()[0]->level);
+    }
+
     public function testItExecutesCallbacksForTheSecondTransaction()
     {
         $testObject = new TestingDatabaseTransactionsManagerTestObject();

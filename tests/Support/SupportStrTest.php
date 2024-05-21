@@ -96,6 +96,21 @@ class SupportStrTest extends TestCase
         $this->assertSame('To Kill a Mockingbird', Str::apa('to kill a mockingbird'));
         $this->assertSame('To Kill a Mockingbird', Str::apa('TO KILL A MOCKINGBIRD'));
         $this->assertSame('To Kill a Mockingbird', Str::apa('To Kill A Mockingbird'));
+
+        $this->assertSame('Être Écrivain Commence par Être un Lecteur.', Str::apa('Être écrivain commence par être un lecteur.'));
+        $this->assertSame('Être Écrivain Commence par Être un Lecteur.', Str::apa('Être Écrivain Commence par Être un Lecteur.'));
+        $this->assertSame('Être Écrivain Commence par Être un Lecteur.', Str::apa('ÊTRE ÉCRIVAIN COMMENCE PAR ÊTRE UN LECTEUR.'));
+
+        $this->assertSame("C'est-à-Dire.", Str::apa("c'est-à-dire."));
+        $this->assertSame("C'est-à-Dire.", Str::apa("C'est-à-Dire."));
+        $this->assertSame("C'est-à-Dire.", Str::apa("C'EsT-À-DIRE."));
+
+        $this->assertSame('Устное Слово – Не Воробей. Как Только Он Вылетит, Его Не Поймаешь.', Str::apa('устное слово – не воробей. как только он вылетит, его не поймаешь.'));
+        $this->assertSame('Устное Слово – Не Воробей. Как Только Он Вылетит, Его Не Поймаешь.', Str::apa('Устное Слово – Не Воробей. Как Только Он Вылетит, Его Не Поймаешь.'));
+        $this->assertSame('Устное Слово – Не Воробей. Как Только Он Вылетит, Его Не Поймаешь.', Str::apa('УСТНОЕ СЛОВО – НЕ ВОРОБЕЙ. КАК ТОЛЬКО ОН ВЫЛЕТИТ, ЕГО НЕ ПОЙМАЕШЬ.'));
+
+        $this->assertSame('', Str::apa(''));
+        $this->assertSame('   ', Str::apa('   '));
     }
 
     public function testStringWithoutWordsDoesntProduceError()
@@ -423,6 +438,15 @@ class SupportStrTest extends TestCase
     {
         $this->assertEquals('"value"', Str::wrap('value', '"'));
         $this->assertEquals('foo-bar-baz', Str::wrap('-bar-', 'foo', 'baz'));
+    }
+
+    public function testUnwrap()
+    {
+        $this->assertEquals('value', Str::unwrap('"value"', '"'));
+        $this->assertEquals('value', Str::unwrap('"value', '"'));
+        $this->assertEquals('value', Str::unwrap('value"', '"'));
+        $this->assertEquals('bar', Str::unwrap('foo-bar-baz', 'foo-', '-baz'));
+        $this->assertEquals('some: "json"', Str::unwrap('{some: "json"}', '{', '}'));
     }
 
     public function testIs()
@@ -1360,6 +1384,18 @@ class SupportStrTest extends TestCase
         $this->assertTrue(
             Str::of(Str::password())->contains(['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'])
         );
+    }
+
+    public function testToBase64()
+    {
+        $this->assertSame(base64_encode('foo'), Str::toBase64('foo'));
+        $this->assertSame(base64_encode('foobar'), Str::toBase64('foobar'));
+    }
+
+    public function testFromBase64()
+    {
+        $this->assertSame('foo', Str::fromBase64(base64_encode('foo')));
+        $this->assertSame('foobar', Str::fromBase64(base64_encode('foobar'), true));
     }
 }
 

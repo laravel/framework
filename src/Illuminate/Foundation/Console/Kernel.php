@@ -340,7 +340,7 @@ class Kernel implements KernelContract
 
         $namespace = $this->app->getNamespace();
 
-        foreach ((new Finder)->in($paths)->files() as $file) {
+        foreach (Finder::create()->in($paths)->files() as $file) {
             $command = $this->commandClassFromFile($file, $namespace);
 
             if (is_subclass_of($command, Command::class) &&

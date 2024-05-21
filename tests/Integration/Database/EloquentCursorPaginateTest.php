@@ -21,6 +21,7 @@ class EloquentCursorPaginateTest extends DatabaseTestCase
 
         Schema::create('test_users', function ($table) {
             $table->increments('id');
+            $table->string('name')->nullable();
             $table->timestamps();
         });
     }
@@ -165,6 +166,60 @@ class EloquentCursorPaginateTest extends DatabaseTestCase
             $anotherQuery->cursorPaginate(5, ['*'], 'cursor', new Cursor(['id' => 3]))
                         ->items()
         );
+    }
+
+    public function testPaginationWithMultipleUnionAndMultipleWhereClauses()
+    {
+        TestPost::create(['title' => 'Post A', 'user_id' => 100]);
+        TestPost::create(['title' => 'Post B', 'user_id' => 101]);
+
+        $table1 = TestPost::select(['id', 'title', 'user_id'])->where('user_id', 100);
+        $table2 = TestPost::select(['id', 'title', 'user_id'])->where('user_id', 101);
+        $table3 = TestPost::select(['id', 'title', 'user_id'])->where('user_id', 101);
+
+        $columns = ['id'];
+        $cursorName = 'cursor-name';
+        $cursor = new Cursor(['id' => 1]);
+
+        $result = $table1->toBase()
+            ->union($table2->toBase())
+            ->union($table3->toBase())
+            ->orderBy('id', 'asc')
+            ->cursorPaginate(1, $columns, $cursorName, $cursor);
+
+        $this->assertSame(['id'], $result->getOptions()['parameters']);
+
+        $postB = $table2->where('id', '>', 1)->first();
+        $this->assertEquals('Post B', $postB->title, 'Expect `Post B` is the result of the second query');
+
+        $this->assertCount(1, $result->items(), 'Expect cursor paginated query should have 1 result');
+        $this->assertEquals('Post B', current($result->items())->title, 'Expect the paginated query would return `Post B`');
+    }
+
+    public function testPaginationWithMultipleAliases()
+    {
+        TestUser::create(['name' => 'A (user)']);
+        TestUser::create(['name' => 'C (user)']);
+
+        TestPost::create(['title' => 'B (post)']);
+        TestPost::create(['title' => 'D (post)']);
+
+        $table1 = TestPost::select(['title as alias']);
+        $table2 = TestUser::select(['name as alias']);
+
+        $columns = ['alias'];
+        $cursorName = 'cursor-name';
+        $cursor = new Cursor(['alias' => 'A (user)']);
+
+        $result = $table1->toBase()
+            ->union($table2->toBase())
+            ->orderBy('alias', 'asc')
+            ->cursorPaginate(1, $columns, $cursorName, $cursor);
+
+        $this->assertSame(['alias'], $result->getOptions()['parameters']);
+
+        $this->assertCount(1, $result->items(), 'Expect cursor paginated query should have 1 result');
+        $this->assertEquals('B (post)', current($result->items())->alias, 'Expect the paginated query would return `B (post)`');
     }
 
     public function testPaginationWithAliasedOrderBy()

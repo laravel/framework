@@ -126,7 +126,7 @@ class PruneCommand extends Command
             throw new InvalidArgumentException('The --models and --except options cannot be combined.');
         }
 
-        return collect((new Finder)->in($this->getPath())->files()->name('*.php'))
+        return collect(Finder::create()->in($this->getPath())->files()->name('*.php'))
             ->map(function ($model) {
                 $namespace = $this->laravel->getNamespace();
 

@@ -14,7 +14,7 @@ class ListenerTest extends TestCase
         ListenerTestListener::$ran = false;
         ListenerTestListenerAfterCommit::$ran = false;
 
-        m::close();
+        parent::tearDown();
     }
 
     public function testClassListenerRunsNormallyIfNoTransactions()

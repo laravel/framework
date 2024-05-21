@@ -1260,4 +1260,53 @@ class SupportArrTest extends TestCase
             ],
         ], Arr::prependKeysWith($array, 'test.'));
     }
+
+    public function testTake()
+    {
+        $array = [1, 2, 3, 4, 5, 6];
+
+        $this->assertEquals([
+            1, 2, 3,
+        ], Arr::take($array, 3));
+
+        $this->assertEquals([
+            4, 5, 6,
+        ], Arr::take($array, -3));
+    }
+
+    public function testSelect()
+    {
+        $array = [
+            [
+                'name' => 'Taylor',
+                'role' => 'Developer',
+                'age' => 1,
+            ],
+            [
+                'name' => 'Abigail',
+                'role' => 'Infrastructure',
+                'age' => 2,
+            ],
+        ];
+
+        $this->assertEquals([
+            [
+                'name' => 'Taylor',
+                'age' => 1,
+            ],
+            [
+                'name' => 'Abigail',
+                'age' => 2,
+            ],
+        ], Arr::select($array, ['name', 'age']));
+
+        $this->assertEquals([
+            [
+                'name' => 'Taylor',
+            ],
+            [
+                'name' => 'Abigail',
+            ],
+        ], Arr::select($array, 'name'));
+    }
 }

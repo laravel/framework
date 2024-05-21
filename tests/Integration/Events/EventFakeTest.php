@@ -7,6 +7,7 @@ use Exception;
 use Illuminate\Contracts\Events\ShouldDispatchAfterCommit;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
@@ -16,10 +17,10 @@ use PHPUnit\Framework\ExpectationFailedException;
 
 class EventFakeTest extends TestCase
 {
-    protected function setUp(): void
-    {
-        parent::setUp();
+    use LazilyRefreshDatabase;
 
+    protected function afterRefreshingDatabase()
+    {
         Schema::create('posts', function (Blueprint $table) {
             $table->increments('id');
             $table->string('title');
@@ -28,11 +29,9 @@ class EventFakeTest extends TestCase
         });
     }
 
-    protected function tearDown(): void
+    protected function beforeRefreshingDatabase()
     {
         Schema::dropIfExists('posts');
-
-        parent::tearDown();
     }
 
     public function testNonFakedEventGetsProperlyDispatched()

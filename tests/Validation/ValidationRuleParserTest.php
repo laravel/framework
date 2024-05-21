@@ -28,6 +28,10 @@ class ValidationRuleParserTest extends TestCase
             'zip' => ['required', Rule::when($isAdmin, function (Fluent $input) {
                 return ['min:2'];
             })],
+            'when_cb_true' => Rule::when(fn () => true, ['required'], ['nullable']),
+            'when_cb_false' => Rule::when(fn () => false, ['required'], ['nullable']),
+            'unless_cb_true' => Rule::unless(fn () => true, ['required'], ['nullable']),
+            'unless_cb_false' => Rule::unless(fn () => false, ['required'], ['nullable']),
         ]);
 
         $this->assertEquals([
@@ -39,6 +43,10 @@ class ValidationRuleParserTest extends TestCase
             'city' => ['required', 'min:2'],
             'state' => ['required', 'min:2'],
             'zip' => ['required', 'min:2'],
+            'when_cb_true' => ['required'],
+            'when_cb_false' => ['nullable'],
+            'unless_cb_true' => ['nullable'],
+            'unless_cb_false' => ['required'],
         ], $rules);
     }
 

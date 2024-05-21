@@ -6,6 +6,7 @@ use Exception;
 use GuzzleHttp\Middleware;
 use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\Psr7\Response as Psr7Response;
+use GuzzleHttp\Psr7\Utils;
 use GuzzleHttp\TransferStats;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Support\Arrayable;
@@ -347,6 +348,26 @@ class HttpClientTest extends TestCase
 
         $fakeRequest = function (Request $request) use ($body) {
             self::assertSame($body, $request->body());
+            self::assertContains('text/plain', $request->header('Content-Type'));
+
+            return ['my' => 'response'];
+        };
+
+        $this->factory->fake($fakeRequest);
+
+        $this->factory->withBody($body, 'text/plain')->send('post', 'http://foo.com/api');
+    }
+
+    public function testSendStreamRequestBody()
+    {
+        $string = 'Look at me, i am a stream!!';
+        $resource = fopen('php://temp', 'w');
+        fwrite($resource, $string);
+        rewind($resource);
+        $body = Utils::streamFor($resource);
+
+        $fakeRequest = function (Request $request) use ($string) {
+            self::assertSame($string, $request->body());
             self::assertContains('text/plain', $request->header('Content-Type'));
 
             return ['my' => 'response'];
@@ -1837,6 +1858,34 @@ class HttpClientTest extends TestCase
         ]);
     }
 
+    public function testRequestsWillBeWaitingSleepMillisecondsReceivedInBackoffArray()
+    {
+        Sleep::fake();
+
+        $this->factory->fake([
+            '*' => $this->factory->sequence()
+                ->push(['error'], 500)
+                ->push(['error'], 500)
+                ->push(['error'], 500)
+                ->push(['ok'], 200),
+        ]);
+
+        $this->factory
+            ->retry([50, 100, 200], 0, null, true)
+            ->get('http://foo.com/get');
+
+        $this->factory->assertSentCount(4);
+
+        // Make sure we waited 300ms for the first two attempts
+        Sleep::assertSleptTimes(3);
+
+        Sleep::assertSequence([
+            Sleep::usleep(50_000),
+            Sleep::usleep(100_000),
+            Sleep::usleep(200_000),
+        ]);
+    }
+
     public function testMiddlewareRunsWhenFaked()
     {
         $this->factory->fake(function (Request $request) {
@@ -2658,6 +2707,53 @@ class HttpClientTest extends TestCase
 
         $this->assertInstanceOf(TestResponse::class, $response);
         $this->assertSame('expected content', $response->body());
+    }
+
+    public function testItCanHaveGlobalDefaultValues()
+    {
+        $factory = new Factory;
+        $timeout = null;
+        $allowRedirects = null;
+        $headers = null;
+        $factory->fake(function ($request, $options) use (&$timeout, &$allowRedirects, &$headers, $factory) {
+            $timeout = $options['timeout'];
+            $allowRedirects = $options['allow_redirects'];
+            $headers = $request->headers();
+
+            return $factory->response('');
+        });
+
+        $factory->get('https://laravel.com');
+        $this->assertSame(30, $timeout);
+        $this->assertSame(['max' => 5, 'protocols' => ['http', 'https'], 'strict' => false, 'referer' => false, 'track_redirects' => false], $allowRedirects);
+        $this->assertNull($headers['X-Foo'] ?? null);
+
+        $factory->globalOptions([
+            'timeout' => 5,
+            'allow_redirects' => false,
+            'headers' => [
+                'X-Foo' => 'true',
+            ],
+        ]);
+
+        $factory->get('https://laravel.com');
+        $this->assertSame(5, $timeout);
+        $this->assertFalse($allowRedirects);
+        $this->assertSame(['true'], $headers['X-Foo']);
+
+        $factory->globalOptions([
+            'timeout' => 10,
+            'headers' => [
+                'X-Foo' => 'false',
+                'X-Bar' => 'true',
+            ],
+        ]);
+
+        $factory->get('https://laravel.com');
+        $this->assertSame(10, $timeout);
+        $this->assertSame(['max' => 5, 'protocols' => ['http', 'https'], 'strict' => false, 'referer' => false, 'track_redirects' => false], $allowRedirects);
+        $this->assertSame(['false'], $headers['X-Foo']);
+        $this->assertSame(['true'], $headers['X-Bar']);
     }
 }
 

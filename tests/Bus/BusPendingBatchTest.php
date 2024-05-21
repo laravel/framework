@@ -37,7 +37,9 @@ class BusPendingBatchTest extends TestCase
 
         $pendingBatch = new PendingBatch($container, new Collection([$job]));
 
-        $pendingBatch = $pendingBatch->progress(function () {
+        $pendingBatch = $pendingBatch->before(function () {
+            //
+        })->progress(function () {
             //
         })->then(function () {
             //
@@ -47,6 +49,7 @@ class BusPendingBatchTest extends TestCase
 
         $this->assertSame('test-connection', $pendingBatch->connection());
         $this->assertSame('test-queue', $pendingBatch->queue());
+        $this->assertCount(1, $pendingBatch->beforeCallbacks());
         $this->assertCount(1, $pendingBatch->progressCallbacks());
         $this->assertCount(1, $pendingBatch->thenCallbacks());
         $this->assertCount(1, $pendingBatch->catchCallbacks());
@@ -87,5 +90,136 @@ class BusPendingBatchTest extends TestCase
         $container->instance(BatchRepository::class, $repository);
 
         $pendingBatch->dispatch();
+    }
+
+    public function test_batch_is_dispatched_when_dispatchif_is_true()
+    {
+        $container = new Container;
+
+        $eventDispatcher = m::mock(Dispatcher::class);
+        $eventDispatcher->shouldReceive('dispatch')->once();
+        $container->instance(Dispatcher::class, $eventDispatcher);
+
+        $job = new class
+        {
+            use Batchable;
+        };
+
+        $pendingBatch = new PendingBatch($container, new Collection([$job]));
+
+        $repository = m::mock(BatchRepository::class);
+        $repository->shouldReceive('store')->once()->andReturn($batch = m::mock(stdClass::class));
+        $batch->shouldReceive('add')->once()->andReturn($batch = m::mock(Batch::class));
+
+        $container->instance(BatchRepository::class, $repository);
+
+        $result = $pendingBatch->dispatchIf(true);
+
+        $this->assertInstanceOf(Batch::class, $result);
+    }
+
+    public function test_batch_is_not_dispatched_when_dispatchif_is_false()
+    {
+        $container = new Container;
+
+        $eventDispatcher = m::mock(Dispatcher::class);
+        $eventDispatcher->shouldNotReceive('dispatch');
+        $container->instance(Dispatcher::class, $eventDispatcher);
+
+        $job = new class
+        {
+            use Batchable;
+        };
+
+        $pendingBatch = new PendingBatch($container, new Collection([$job]));
+
+        $repository = m::mock(BatchRepository::class);
+        $container->instance(BatchRepository::class, $repository);
+
+        $result = $pendingBatch->dispatchIf(false);
+
+        $this->assertNull($result);
+    }
+
+    public function test_batch_is_dispatched_when_dispatchunless_is_false()
+    {
+        $container = new Container;
+
+        $eventDispatcher = m::mock(Dispatcher::class);
+        $eventDispatcher->shouldReceive('dispatch')->once();
+        $container->instance(Dispatcher::class, $eventDispatcher);
+
+        $job = new class
+        {
+            use Batchable;
+        };
+
+        $pendingBatch = new PendingBatch($container, new Collection([$job]));
+
+        $repository = m::mock(BatchRepository::class);
+        $repository->shouldReceive('store')->once()->andReturn($batch = m::mock(stdClass::class));
+        $batch->shouldReceive('add')->once()->andReturn($batch = m::mock(Batch::class));
+
+        $container->instance(BatchRepository::class, $repository);
+
+        $result = $pendingBatch->dispatchUnless(false);
+
+        $this->assertInstanceOf(Batch::class, $result);
+    }
+
+    public function test_batch_is_not_dispatched_when_dispatchunless_is_true()
+    {
+        $container = new Container;
+
+        $eventDispatcher = m::mock(Dispatcher::class);
+        $eventDispatcher->shouldNotReceive('dispatch');
+        $container->instance(Dispatcher::class, $eventDispatcher);
+
+        $job = new class
+        {
+            use Batchable;
+        };
+
+        $pendingBatch = new PendingBatch($container, new Collection([$job]));
+
+        $repository = m::mock(BatchRepository::class);
+        $container->instance(BatchRepository::class, $repository);
+
+        $result = $pendingBatch->dispatchUnless(true);
+
+        $this->assertNull($result);
+    }
+
+    public function test_batch_before_event_is_called()
+    {
+        $container = new Container;
+
+        $eventDispatcher = m::mock(Dispatcher::class);
+        $eventDispatcher->shouldReceive('dispatch')->once();
+
+        $container->instance(Dispatcher::class, $eventDispatcher);
+
+        $job = new class
+        {
+            use Batchable;
+        };
+
+        $beforeCalled = false;
+
+        $pendingBatch = new PendingBatch($container, new Collection([$job]));
+
+        $pendingBatch = $pendingBatch->before(function () use (&$beforeCalled) {
+            $beforeCalled = true;
+        })->onConnection('test-connection')->onQueue('test-queue');
+
+        $repository = m::mock(BatchRepository::class);
+        $repository->shouldReceive('store')->once()->with($pendingBatch)->andReturn($batch = m::mock(stdClass::class));
+        $batch->shouldReceive('add')->once()->with(m::type(Collection::class))->andReturn($batch = m::mock(Batch::class));
+
+        $container->instance(BatchRepository::class, $repository);
+
+        $pendingBatch->dispatch();
+
+        $this->assertTrue($beforeCalled);
     }
 }

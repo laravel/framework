@@ -347,7 +347,7 @@ class Mailable implements MailableContract, Renderable
         }
 
         foreach ((new ReflectionClass($this))->getProperties(ReflectionProperty::IS_PUBLIC) as $property) {
-            if ($property->getDeclaringClass()->getName() !== self::class) {
+            if ($property->isInitialized($this) && $property->getDeclaringClass()->getName() !== self::class) {
                 $data[$property->getName()] = $property->getValue($this);
             }
         }
@@ -1231,7 +1231,7 @@ class Mailable implements MailableContract, Renderable
 
         PHPUnit::assertTrue(
             $this->hasTo($address, $name),
-            "Did not see expected recipient [{$recipient}] in email recipients."
+            "Did not see expected recipient [{$recipient}] in email 'to' recipients."
         );
 
         return $this;
@@ -1264,7 +1264,7 @@ class Mailable implements MailableContract, Renderable
 
         PHPUnit::assertTrue(
             $this->hasCc($address, $name),
-            "Did not see expected recipient [{$recipient}] in email recipients."
+            "Did not see expected recipient [{$recipient}] in email 'cc' recipients."
         );
 
         return $this;
@@ -1285,7 +1285,7 @@ class Mailable implements MailableContract, Renderable
 
         PHPUnit::assertTrue(
             $this->hasBcc($address, $name),
-            "Did not see expected recipient [{$recipient}] in email recipients."
+            "Did not see expected recipient [{$recipient}] in email 'bcc' recipients."
         );
 
         return $this;

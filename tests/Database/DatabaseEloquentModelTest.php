@@ -15,6 +15,7 @@ use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Connection;
 use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\ArrayObject;
 use Illuminate\Database\Eloquent\Casts\AsArrayObject;
@@ -1893,6 +1894,26 @@ class DatabaseEloquentModelTest extends TestCase
         EloquentModelStub::flushEventListeners();
     }
 
+    public function testModelObserversCanBeAttachedToModelsWithStringUsingAttribute()
+    {
+        EloquentModelWithObserveAttributeStub::setEventDispatcher($events = m::mock(Dispatcher::class));
+        $events->shouldReceive('dispatch');
+        $events->shouldReceive('listen')->once()->with('eloquent.creating: Illuminate\Tests\Database\EloquentModelWithObserveAttributeStub', EloquentTestObserverStub::class.'@creating');
+        $events->shouldReceive('listen')->once()->with('eloquent.saved: Illuminate\Tests\Database\EloquentModelWithObserveAttributeStub', EloquentTestObserverStub::class.'@saved');
+        $events->shouldReceive('forget');
+        EloquentModelWithObserveAttributeStub::flushEventListeners();
+    }
+
+    public function testModelObserversCanBeAttachedToModelsThroughAnArrayUsingAttribute()
+    {
+        EloquentModelWithObserveAttributeUsingArrayStub::setEventDispatcher($events = m::mock(Dispatcher::class));
+        $events->shouldReceive('dispatch');
+        $events->shouldReceive('listen')->once()->with('eloquent.creating: Illuminate\Tests\Database\EloquentModelWithObserveAttributeUsingArrayStub', EloquentTestObserverStub::class.'@creating');
+        $events->shouldReceive('listen')->once()->with('eloquent.saved: Illuminate\Tests\Database\EloquentModelWithObserveAttributeUsingArrayStub', EloquentTestObserverStub::class.'@saved');
+        $events->shouldReceive('forget');
+        EloquentModelWithObserveAttributeUsingArrayStub::flushEventListeners();
+    }
+
     public function testThrowExceptionOnAttachingNotExistsModelObserverWithString()
     {
         $this->expectException(InvalidArgumentException::class);
@@ -3332,6 +3353,18 @@ class EloquentNonPrimaryUlidModelStub extends EloquentModelStub
     {
         return ['ulid'];
     }
+}
+
+#[ObservedBy(EloquentTestObserverStub::class)]
+class EloquentModelWithObserveAttributeStub extends EloquentModelStub
+{
+    //
+}
+
+#[ObservedBy([EloquentTestObserverStub::class])]
+class EloquentModelWithObserveAttributeUsingArrayStub extends EloquentModelStub
+{
+    //
 }
 
 class EloquentModelSavingEventStub
