@@ -249,6 +249,67 @@ class ValidationEnumRuleTest extends TestCase
         $this->assertEquals(['The selected status is invalid.'], $v->messages()->get('status'));
     }
 
+    public function testValidationSupportVaridicFunction()
+    {
+        $v = new Validator(
+            resolve('translator'),
+            [
+                'status' => IntegerStatus::done,
+            ],
+            [
+                'status' => (new Enum(IntegerStatus::class))
+                    ->only(IntegerStatus::pending, IntegerStatus::done),
+            ],
+        );
+
+        $this->assertTrue($v->passes());
+
+        $v1 = new Validator(
+            resolve('translator'),
+            [
+                'status' => IntegerStatus::done,
+            ],
+            [
+                'status' => (new Enum(IntegerStatus::class))
+                    ->except(IntegerStatus::pending, IntegerStatus::done),
+            ],
+        );
+
+        $this->assertFalse($v1->passes());
+    }
+
+    public function testValidationWithConditionProvided()
+    {
+        $expected = (bool) random_int(0, 1);
+        $v = new Validator(
+            resolve('translator'),
+            [
+                'status' => IntegerStatus::done,
+            ],
+            [
+                'status' => (new Enum(IntegerStatus::class))
+                    ->only(IntegerStatus::pending)
+                    ->when($expected, fn ($validator) => $validator->only(IntegerStatus::done)),
+            ],
+        );
+
+        $this->{$expected ? 'assertTrue' : 'assertFalse'}($v->passes());
+
+        $v1 = new Validator(
+            resolve('translator'),
+            [
+                'status' => IntegerStatus::done,
+            ],
+            [
+                'status' => (new Enum(IntegerStatus::class))
+                    ->except(IntegerStatus::pending)
+                    ->when($expected, fn ($validator) => $validator->except(IntegerStatus::done)),
+            ],
+        );
+
+        $this->{$expected ? 'assertFalse' : 'assertTrue'}($v1->passes());
+    }
+
     public static function conditionalCasesDataProvider(): array
     {
         return [
