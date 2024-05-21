@@ -1176,6 +1176,13 @@ class SupportArrTest extends TestCase
             ['Jane', 'laravel', 'inertiajs'],
             ['Joe', 'laravel'],
         ], $transposedImbalanced);
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The array must be a multi-dimensional array.');
+
+        Arr::transpose([
+            "not an array inside an array",
+        ]);
     }
 
     public function testWhere()
