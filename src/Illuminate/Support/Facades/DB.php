@@ -122,12 +122,10 @@ class DB extends Facade
      */
     public static function prohibitDestructiveCommands(bool $prohibit = true)
     {
-        if ($prohibit) {
-            FreshCommand::prohibit();
-            RefreshCommand::prohibit();
-            ResetCommand::prohibit();
-            WipeCommand::prohibit();
-        }
+        FreshCommand::prohibit($prohibit);
+        RefreshCommand::prohibit($prohibit);
+        ResetCommand::prohibit($prohibit);
+        WipeCommand::prohibit($prohibit);
     }
 
     /**
