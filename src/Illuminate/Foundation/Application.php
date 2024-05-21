@@ -931,7 +931,9 @@ class Application extends Container implements ApplicationContract, CachesConfig
     protected function markAsRegistered($provider)
     {
         $class = get_class($provider);
+
         $this->serviceProviders[$class] = $provider;
+
         $this->loadedProviders[$class] = true;
     }
 
