@@ -11,7 +11,6 @@ use Illuminate\Translation\Translator;
 use Illuminate\Validation\Rules\File;
 use Illuminate\Validation\ValidationServiceProvider;
 use Illuminate\Validation\Validator;
-use Mockery\MockInterface;
 use PHPUnit\Framework\TestCase;
 
 class ValidationFileRuleTest extends TestCase
