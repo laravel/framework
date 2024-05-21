@@ -11,6 +11,7 @@ use Illuminate\Translation\Translator;
 use Illuminate\Validation\Rules\File;
 use Illuminate\Validation\ValidationServiceProvider;
 use Illuminate\Validation\Validator;
+use Mockery\MockInterface;
 use PHPUnit\Framework\TestCase;
 
 class ValidationFileRuleTest extends TestCase
@@ -280,6 +281,85 @@ class ValidationFileRuleTest extends TestCase
         $this->passes(
             File::default()->max(1024),
             [
+                UploadedFile::fake()->create('foo.txt', 1024),
+                UploadedFile::fake()->create('foo.txt', 1023),
+                UploadedFile::fake()->create('foo.txt', 512),
+            ]
+        );
+    }
+
+    public function testMaxServerSizeWithUploadMaxFileSizeLimit()
+    {
+        $mockFile = $this->createPartialMock(File::class, ['getPhpIniValue']);
+        $mockFile
+            ->expects($this->any())
+            ->method('getPhpIniValue')
+            ->willReturn(1024);
+
+        File::$defaultCallback = fn () => $mockFile;
+
+        $this->fails(
+            File::default()->maxServerSize(),
+            UploadedFile::fake()->create('foo.txt', 1025),
+            ['validation.max.file']
+        );
+
+        $this->passes(
+            File::default()->maxServerSize(),
+            [
+                UploadedFile::fake()->create('foo.txt', 1024),
+                UploadedFile::fake()->create('foo.txt', 1023),
+                UploadedFile::fake()->create('foo.txt', 512),
+            ]
+        );
+    }
+
+    public function testMaxServerSizeWithPostMaxSize()
+    {
+        $mockFile = $this->createPartialMock(File::class, ['getPhpIniValue']);
+        $mockFile
+            ->expects($this->any())
+            ->method('getPhpIniValue')
+            ->willReturnMap([
+                ['upload_max_filesize', -1],
+                ['post_max_size', 1024],
+            ]);
+
+        File::$defaultCallback = fn () => $mockFile;
+
+        $this->fails(
+            File::default()->maxServerSize(),
+            UploadedFile::fake()->create('foo.txt', 1025),
+            ['validation.max.file']
+        );
+
+        $this->passes(
+            File::default()->maxServerSize(),
+            [
+                UploadedFile::fake()->create('foo.txt', 1024),
+                UploadedFile::fake()->create('foo.txt', 1023),
+                UploadedFile::fake()->create('foo.txt', 512),
+            ]
+        );
+    }
+
+    public function testMaxServerSizeWithoutLimit()
+    {
+        $mockFile = $this->createPartialMock(File::class, ['getPhpIniValue']);
+        $mockFile
+            ->expects($this->any())
+            ->method('getPhpIniValue')
+            ->willReturnMap([
+                ['upload_max_filesize', -1],
+                ['post_max_size', -1],
+            ]);
+
+        File::$defaultCallback = fn () => $mockFile;
+
+        $this->passes(
+            File::default()->maxServerSize(),
+            [
+                UploadedFile::fake()->create('foo.txt', 1025),
                 UploadedFile::fake()->create('foo.txt', 1024),
                 UploadedFile::fake()->create('foo.txt', 1023),
                 UploadedFile::fake()->create('foo.txt', 512),

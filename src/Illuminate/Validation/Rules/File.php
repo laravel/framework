@@ -204,6 +204,37 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
     }
 
     /**
+     * Indicate that the uploaded file should be no more than value specified by php.ini.
+     *
+     * @return $this
+     */
+    public function maxServerSize()
+    {
+        $uploadMaxSize = ini_parse_quantity($this->getPhpIniValue('upload_max_filesize'));
+        if ($uploadMaxSize > 0) {
+            return $this->max($uploadMaxSize);
+        }
+
+        $postMaxSize = ini_parse_quantity($this->getPhpIniValue('post_max_size'));
+        if ($postMaxSize > 0) {
+            return $this->max($postMaxSize);
+        }
+
+        return $this;
+    }
+
+    /**
+     * This method is here in order to mock calls to `ini_get` when testing.
+     *
+     * @param  string  $key
+     * @return mixed
+     */
+    protected function getPhpIniValue(string $key)
+    {
+        return ini_get($key);
+    }
+
+    /**
      * Convert a potentially human-friendly file size to kilobytes.
      *
      * @param  string|int  $size
