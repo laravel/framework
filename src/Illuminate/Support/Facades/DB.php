@@ -2,6 +2,11 @@
 
 namespace Illuminate\Support\Facades;
 
+use Illuminate\Database\Console\Migrations\FreshCommand;
+use Illuminate\Database\Console\Migrations\RefreshCommand;
+use Illuminate\Database\Console\Migrations\ResetCommand;
+use Illuminate\Database\Console\WipeCommand;
+
 /**
  * @method static \Illuminate\Database\Connection connection(string|null $name = null)
  * @method static \Illuminate\Database\ConnectionInterface connectUsing(string $name, array $config, bool $force = false)
@@ -109,6 +114,22 @@ namespace Illuminate\Support\Facades;
  */
 class DB extends Facade
 {
+    /**
+     * Indicate if destructive Artisan commands should be prohibited.
+     *
+     * @param  bool  $prohibit
+     * @return void
+     */
+    public static function prohibitDestructiveCommands(bool $prohibit = true)
+    {
+        if ($prohibit) {
+            FreshCommand::prohibit();
+            RefreshCommand::prohibit();
+            ResetCommand::prohibit();
+            WipeCommand::prohibit();
+        }
+    }
+
     /**
      * Get the registered name of the component.
      *
