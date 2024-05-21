@@ -257,7 +257,7 @@ class Arr
         $transposed = [];
 
         foreach ($array as $subArray) {
-            if(! is_array($subArray)) {
+            if (! is_array($subArray)) {
                 throw new InvalidArgumentException('The array must be a multi-dimensional array.');
             }
 

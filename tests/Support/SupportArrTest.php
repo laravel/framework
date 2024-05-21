@@ -1181,7 +1181,7 @@ class SupportArrTest extends TestCase
         $this->expectExceptionMessage('The array must be a multi-dimensional array.');
 
         Arr::transpose([
-            "not an array inside an array",
+            'not an array inside an array',
         ]);
     }
 
