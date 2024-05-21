@@ -1168,7 +1168,7 @@ class SupportArrTest extends TestCase
         $transposedImbalanced = Arr::transpose([
             ['John', 'Jane', 'Joe'],
             ['laravel', 'laravel', 'laravel'],
-            ['livewire', 'inertiajs']
+            ['livewire', 'inertiajs'],
         ]);
 
         $this->assertSame([
