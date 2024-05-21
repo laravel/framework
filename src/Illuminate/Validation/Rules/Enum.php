@@ -4,7 +4,6 @@ namespace Illuminate\Validation\Rules;
 
 use Illuminate\Contracts\Validation\Rule;
 use Illuminate\Contracts\Validation\ValidatorAwareRule;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Traits\Conditionable;
 use TypeError;
 
@@ -85,7 +84,10 @@ class Enum implements Rule, ValidatorAwareRule
      */
     public function only($values)
     {
-        $this->only = Arr::wrap($values);
+        $this->only = [
+            ...$this->only,
+            ...(is_array($values) ? $values : func_get_args()),
+        ];
 
         return $this;
     }
@@ -98,7 +100,10 @@ class Enum implements Rule, ValidatorAwareRule
      */
     public function except($values)
     {
-        $this->except = Arr::wrap($values);
+        $this->except = [
+            ...$this->except,
+            ...(is_array($values) ? $values : func_get_args()),
+        ];
 
         return $this;
     }
