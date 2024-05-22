@@ -24,7 +24,7 @@ trait LazilyRefreshDatabase
 
             RefreshDatabaseState::$lazilyRefreshed = true;
 
-            if (property_exists($this, 'mockConsoleOutput')){
+            if (property_exists($this, 'mockConsoleOutput')) {
                 $shouldMockOutput = $this->mockConsoleOutput;
     
                 $this->mockConsoleOutput = false;
@@ -32,7 +32,7 @@ trait LazilyRefreshDatabase
 
             $this->baseRefreshDatabase();
 
-            if (property_exists($this, 'mockConsoleOutput')){
+            if (property_exists($this, 'mockConsoleOutput')) {
                 $this->mockConsoleOutput = $shouldMockOutput;
             }
         };
