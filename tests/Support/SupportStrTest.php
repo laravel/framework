@@ -1526,6 +1526,11 @@ class SupportStrTest extends TestCase
         $this->assertSame('foo', Str::fromBase64(base64_encode('foo')));
         $this->assertSame('foobar', Str::fromBase64(base64_encode('foobar'), true));
     }
+
+    public function testStrExtension(): void
+    {
+        $this->assertSame('.png', Str::extension('test.png'));
+    }
 }
 
 class StringableObjectStub
