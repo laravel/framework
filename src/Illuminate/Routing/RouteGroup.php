@@ -61,16 +61,23 @@ class RouteGroup
      * @param  bool  $prependExistingPrefix
      * @return string|null
      */
-    protected static function formatPrefix($new, $old, $prependExistingPrefix = true)
-    {
-        $old = $old['prefix'] ?? '';
+     protected static function formatPrefix($new, $old, $prependExistingPrefix = true)
+     {
+         $old = $old['prefix'] ?? '';
+ 
+         if ($prependExistingPrefix) {
+            
+             if(mb_substr($new['prefix'] , 0 , 1) == '/')
+             {
+        
+                return isset($new['prefix']) ? trim($old, '/').$new['prefix'] : $old;
+             } 
 
-        if ($prependExistingPrefix) {
-            return isset($new['prefix']) ? trim($old, '/').$new['prefix'] : $old;
-        }
-
-        return isset($new['prefix']) ? trim($new['prefix'], '/').'/'.trim($old, '/') : $old;
-    }
+                return isset($new['prefix']) ? trim($old, '/').'/'.trim($new['prefix'], '/') : $old;
+         }
+ 
+         return isset($new['prefix']) ? trim($new['prefix'], '/').'/'.trim($old, '/') : $old;
+     }
 
     /**
      * Format the "wheres" for the new group attributes.

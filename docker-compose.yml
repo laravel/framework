@@ -18,7 +18,7 @@ services:
       MYSQL_DATABASE: "forge"
       MYSQL_ROOT_HOST: "%"
     ports:
-      - "3306:3306"
+      - "3307:3306"
     restart: always
   # postgres:
   #   image: postgres:15
@@ -49,5 +49,5 @@ services:
   redis:
     image: redis:7.0-alpine
     ports:
-      - "6379:6379"
+      - "6380:6379"
     restart: always
