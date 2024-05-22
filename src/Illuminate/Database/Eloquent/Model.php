@@ -678,19 +678,6 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     }
 
     /**
-     * Begin querying a model with eager loading.
-     *
-     * @param  array|string  $relations
-     * @return \Illuminate\Database\Eloquent\Builder
-     */
-    public static function with($relations)
-    {
-        return static::query()->with(
-            is_string($relations) ? func_get_args() : $relations
-        );
-    }
-
-    /**
      * Eager load relations on the model.
      *
      * @param  array|string  $relations

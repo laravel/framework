@@ -668,10 +668,16 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertSame(0, $count);
     }
 
-    public function testWithMethodCallsQueryBuilderCorrectly()
+    public function testStaticWithCallsQueryBuilderCorrectly()
     {
-        $result = EloquentModelWithStub::with('foo', 'bar');
-        $this->assertSame('foo', $result);
+        $this->addMockConnection(EloquentModelStub::class);
+        $query = EloquentModelStub::with('foo:bar,baz', 'qwex');
+        $builder = m::mock(Builder::class);
+        $builder->shouldReceive('select')->once()->with(['bar', 'baz']);
+        $this->assertNotNull($query->getEagerLoads()['foo']);
+        $this->assertNotNull($query->getEagerLoads()['qwex']);
+        $closure = $query->getEagerLoads()['foo'];
+        $closure($builder);
     }
 
     public function testWithoutMethodRemovesEagerLoadedRelationshipCorrectly()
@@ -714,10 +720,27 @@ class DatabaseEloquentModelTest extends TestCase
         $closure($builder);
     }
 
-    public function testWithMethodCallsQueryBuilderCorrectlyWithArray()
+    public function testStaticWithCallsQueryBuilderCorrectlyWithArray()
     {
-        $result = EloquentModelWithStub::with(['foo', 'bar']);
-        $this->assertSame('foo', $result);
+        $this->addMockConnection(EloquentModelStub::class);
+        $query = EloquentModelStub::with(['foo:bar,baz', 'qwex']);
+        $builder = m::mock(Builder::class);
+        $builder->shouldReceive('select')->once()->with(['bar', 'baz']);
+        $this->assertNotNull($query->getEagerLoads()['foo']);
+        $this->assertNotNull($query->getEagerLoads()['qwex']);
+        $closure = $query->getEagerLoads()['foo'];
+        $closure($builder);
+    }
+
+    public function testStaticWithCallsQueryBuilderCorrectlyWithClosure()
+    {
+        $this->addMockConnection(EloquentModelStub::class);
+        $query = EloquentModelStub::with('foo', fn ($foo) => $foo->select('bar', 'baz'));
+        $builder = m::mock(Builder::class);
+        $builder->shouldReceive('select')->once()->with('bar', 'baz');
+        $this->assertNotNull($query->getEagerLoads()['foo']);
+        $closure = $query->getEagerLoads()['foo'];
+        $closure($builder);
     }
 
     public function testUpdateProcess()
@@ -2854,9 +2877,16 @@ class DatabaseEloquentModelTest extends TestCase
         }
     }
 
+    /**
+     * @param  class-string<Model>|Model  $model
+     */
     protected function addMockConnection($model)
     {
-        $model->setConnectionResolver($resolver = m::mock(ConnectionResolverInterface::class));
+        if (is_string($model)) {
+            $model::setConnectionResolver($resolver = m::mock(ConnectionResolverInterface::class));
+        } else {
+            $model->setConnectionResolver($resolver = m::mock(ConnectionResolverInterface::class));
+        }
         $resolver->shouldReceive('connection')->andReturn($connection = m::mock(Connection::class));
         $connection->shouldReceive('getQueryGrammar')->andReturn($grammar = m::mock(Grammar::class));
         $grammar->shouldReceive('getBitwiseOperators')->andReturn([]);
@@ -3279,17 +3309,6 @@ class EloquentModelEmptyDestroyStub extends Model
     {
         $mock = m::mock(Builder::class);
         $mock->shouldReceive('whereIn')->never();
-
-        return $mock;
-    }
-}
-
-class EloquentModelWithStub extends Model
-{
-    public function newQuery()
-    {
-        $mock = m::mock(Builder::class);
-        $mock->shouldReceive('with')->once()->with(['foo', 'bar'])->andReturn('foo');
 
         return $mock;
     }
