@@ -159,6 +159,21 @@ class SupportMacroableTest extends TestCase
 
         $this->assertSame('newMethod', $this->macroable::existingMethod());
     }
+
+    public function testOverride()
+    {
+        $this->assertFalse((new TestMacroable())->override());
+
+        TestMacroable::macro('override', fn () => 'override');
+        $this->assertSame('override', (new TestMacroable())->override());
+
+        // static
+        $this->assertFalse(TestMacroable::overrideStatic());
+
+        TestMacroable::macro('overrideStatic', fn () => 'static');
+        $this->assertSame('static', TestMacroable::overrideStatic());
+
+    }
 }
 
 class EmptyMacroable
@@ -175,6 +190,16 @@ class TestMacroable
     protected static function getProtectedStatic()
     {
         return 'static';
+    }
+
+    protected function __override()
+    {
+        return false;
+    }
+
+    protected static function __overrideStatic()
+    {
+        return false;
     }
 }
 

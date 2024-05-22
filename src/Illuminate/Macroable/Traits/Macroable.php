@@ -86,6 +86,10 @@ trait Macroable
     public static function __callStatic($method, $parameters)
     {
         if (! static::hasMacro($method)) {
+            if (method_exists(static::class, '__'.$method)) {
+                return static::{'__'.$method}(...$parameters);
+            }
+
             throw new BadMethodCallException(sprintf(
                 'Method %s::%s does not exist.', static::class, $method
             ));
@@ -112,6 +116,10 @@ trait Macroable
     public function __call($method, $parameters)
     {
         if (! static::hasMacro($method)) {
+            if (method_exists($this, '__'.$method)) {
+                return $this->{'__'.$method}(...$parameters);
+            }
+            
             throw new BadMethodCallException(sprintf(
                 'Method %s::%s does not exist.', static::class, $method
             ));
