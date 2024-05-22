@@ -73,7 +73,7 @@ class DatabaseMigrationRefreshCommandTest extends TestCase
         $this->runCommand($command, ['--step' => 2]);
     }
 
-    public function testRefreshCommandExitsWhenPrevented()
+    public function testRefreshCommandExitsWhenProhibited()
     {
         $command = new RefreshCommand;
 

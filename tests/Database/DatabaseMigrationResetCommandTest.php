@@ -53,7 +53,7 @@ class DatabaseMigrationResetCommandTest extends TestCase
         $this->runCommand($command, ['--pretend' => true, '--database' => 'foo']);
     }
 
-    public function testRefreshCommandExitsWhenPrevented()
+    public function testRefreshCommandExitsWhenProhibited()
     {
         $command = new ResetCommand($migrator = m::mock(Migrator::class));
 
