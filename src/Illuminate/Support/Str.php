@@ -364,6 +364,18 @@ class Str
     }
 
     /**
+     * Extracts the extension from a file name string including the '.'.
+     *
+     * @param  string  $fileName
+     * @return string
+     */
+    public static function extension(string $fileName): string
+    {
+        $fileNameParts = explode('.', $fileName);
+        return '.' . end($fileNameParts);
+    }
+
+    /**
      * Cap a string with a single instance of a given value.
      *
      * @param  string  $value
