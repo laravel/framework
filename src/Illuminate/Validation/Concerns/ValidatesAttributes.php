@@ -501,7 +501,7 @@ trait ValidatesAttributes
     }
 
     /**
-     * Validate an attribute has a list of values.
+     * Validate an attribute contains a list of values.
      *
      * @param  string  $attribute
      * @param  mixed  $value
