@@ -9,7 +9,7 @@ use PHPUnit\Framework\TestCase;
 
 class ValidationRequiredIfTest extends TestCase
 {
-    public function testItClousureReturnsFormatsAStringVersionOfTheRule()
+    public function testItClosureReturnsFormatsAStringVersionOfTheRule()
     {
         $rule = new RequiredIf(function () {
             return true;
