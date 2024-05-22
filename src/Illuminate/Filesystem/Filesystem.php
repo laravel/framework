@@ -30,6 +30,19 @@ class Filesystem
     }
 
     /**
+     * Extracts the extension from a file name string including the '.'.
+     *
+     * @param  string  $fileName
+     * @return string
+     */
+    public static function extension(string $fileName): string
+    {
+        $fileNameParts = explode('.', $fileName);
+
+        return '.'.end($fileNameParts);
+    }
+
+    /**
      * Determine if a file or directory is missing.
      *
      * @param  string  $path

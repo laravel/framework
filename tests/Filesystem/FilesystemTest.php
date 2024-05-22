@@ -644,4 +644,9 @@ class FilesystemTest extends TestCase
 
         return (int) base_convert($filePerms, 8, 10);
     }
+
+    public function testFileExtension(): void
+    {
+        $this->assertSame('.png', Filesystem::extension('test.png'));
+    }
 }

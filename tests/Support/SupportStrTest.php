@@ -271,11 +271,6 @@ class SupportStrTest extends TestCase
         $this->assertNull(Str::excerpt('', '/'));
     }
 
-    public function testStrExtension(): void
-    {
-        $this->assertSame('.png', Str::extension('test.png'));
-    }
-
     public function testStrBefore(): void
     {
         $this->assertSame('han', Str::before('hannah', 'nah'));
