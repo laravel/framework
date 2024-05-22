@@ -172,7 +172,6 @@ class SupportMacroableTest extends TestCase
 
         TestMacroable::macro('overrideStatic', fn () => 'static');
         $this->assertSame('static', TestMacroable::overrideStatic());
-
     }
 }
 
