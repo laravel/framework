@@ -372,7 +372,7 @@ class Str
     public static function extension(string $fileName): string
     {
         $fileNameParts = explode('.', $fileName);
-        return '.' . end($fileNameParts);
+        return '.'.end($fileNameParts);
     }
 
     /**
