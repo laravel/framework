@@ -1340,6 +1340,24 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Delete or create a record matching the attributes.
+     *
+     * @param  array  $attributes
+     * @param  array  $values
+     * @return \Illuminate\Database\Eloquent\Model|null
+     */
+    public function deleteOrCreate(array $attributes, array $values = [])
+    {
+        return tap($this->firstOrNew($attributes), function ($instance) use ($attributes, $values) {
+            if ($instance->exists) {
+                $instance->delete();
+            } else {
+                $instance->fill(array_merge($attributes, $values))->save();
+            }
+        });
+    }
+
+    /**
      * Determine if the given model has a scope.
      *
      * @param  string  $scope
