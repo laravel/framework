@@ -105,6 +105,31 @@ class MakesHttpRequestsTest extends TestCase
         );
     }
 
+    public function testWithoutAndWithMiddlewareAliasWithParameter()
+    {
+        $next = function ($request) {
+            return $request;
+        };
+
+        $router = $this->app->make(Registrar::class);
+
+        $router->aliasMiddleware('my-middleware', MyMiddleware::class);
+
+        $this->withoutMiddleware('my-middleware');
+        $this->assertTrue($this->app->has(MyMiddleware::class));
+        $this->assertSame(
+            'foo',
+            $this->app->make(MyMiddleware::class)->handle('foo', $next)
+        );
+
+        $this->withMiddleware('my-middleware');
+        $this->assertFalse($this->app->has(MyMiddleware::class));
+        $this->assertSame(
+            'fooWithMiddleware',
+            $this->app->make(MyMiddleware::class)->handle('foo', $next)
+        );
+    }
+
     public function testWithCookieSetCookie()
     {
         $this->withCookie('foo', 'bar');

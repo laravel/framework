@@ -5,6 +5,7 @@ namespace Illuminate\Foundation\Testing\Concerns;
 use Illuminate\Contracts\Http\Kernel as HttpKernel;
 use Illuminate\Cookie\CookieValuePrefix;
 use Illuminate\Http\Request;
+use Illuminate\Routing\MiddlewareNameResolver;
 use Illuminate\Testing\LoggedExceptionCollection;
 use Illuminate\Testing\TestResponse;
 use Symfony\Component\HttpFoundation\File\UploadedFile as SymfonyUploadedFile;
@@ -172,7 +173,15 @@ trait MakesHttpRequests
             return $this;
         }
 
-        foreach ((array) $middleware as $abstract) {
+        $router = $this->app->make('router');
+
+        foreach ((array) $middleware as $resolvableMiddleware) {
+            $abstract = MiddlewareNameResolver::resolve(
+                $resolvableMiddleware,
+                $router->getMiddleware(),
+                $router->getMiddlewareGroups()
+            );
+
             $this->app->instance($abstract, new class
             {
                 public function handle($request, $next)
@@ -199,7 +208,15 @@ trait MakesHttpRequests
             return $this;
         }
 
-        foreach ((array) $middleware as $abstract) {
+        $router = $this->app->make('router');
+
+        foreach ((array) $middleware as $resolvableMiddleware) {
+            $abstract = MiddlewareNameResolver::resolve(
+                $resolvableMiddleware,
+                $router->getMiddleware(),
+                $router->getMiddlewareGroups()
+            );
+
             unset($this->app[$abstract]);
         }
 
