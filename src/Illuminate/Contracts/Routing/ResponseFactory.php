@@ -67,7 +67,6 @@ interface ResponseFactory
      */
     public function stream($callback, $status = 200, array $headers = []);
 
-
     /**
      * Create a new streamed JSON response instance.
      *
