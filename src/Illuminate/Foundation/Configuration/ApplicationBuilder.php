@@ -210,6 +210,10 @@ class ApplicationBuilder
                 });
             }
 
+            if (is_callable($then)) {
+                $then($this->app);
+            }
+
             if (is_string($web) || is_array($web)) {
                 if (is_array($web)) {
                     foreach ($web as $webRoute) {
@@ -228,9 +232,6 @@ class ApplicationBuilder
                 Folio::route($pages, middleware: $this->pageMiddleware);
             }
 
-            if (is_callable($then)) {
-                $then($this->app);
-            }
         };
     }
 
