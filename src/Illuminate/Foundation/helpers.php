@@ -8,7 +8,6 @@ use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Contracts\Cookie\Factory as CookieFactory;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Routing\ResponseFactory;
-use Illuminate\Contracts\Routing\UrlGenerator;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Contracts\Validation\Factory as ValidationFactory;
 use Illuminate\Contracts\View\Factory as ViewFactory;
@@ -971,10 +970,10 @@ if (! function_exists('url')) {
     function url($path = null, $parameters = [], $secure = null)
     {
         if (is_null($path)) {
-            return app(UrlGenerator::class);
+            return app('url');
         }
 
-        return app(UrlGenerator::class)->to($path, $parameters, $secure);
+        return app('url')->to($path, $parameters, $secure);
     }
 }
 
