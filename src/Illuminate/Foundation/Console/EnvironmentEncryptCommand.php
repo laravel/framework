@@ -21,7 +21,7 @@ class EnvironmentEncryptCommand extends Command
                     {--key= : The encryption key}
                     {--cipher= : The encryption cipher}
                     {--env= : The environment to be encrypted}
-                    {--remove= : Remove the original file}
+                    {--prune= : Delete the original environment file}
                     {--force : Overwrite the existing encrypted environment file}';
 
     /**
@@ -99,7 +99,7 @@ class EnvironmentEncryptCommand extends Command
             return Command::FAILURE;
         }
 
-        if ($this->option('remove')) {
+        if ($this->option('prune')) {
             $this->files->delete($environmentFile);
         }
 
