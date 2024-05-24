@@ -141,7 +141,7 @@ trait Queueable
     }
 
     /**
-     * Set the delay for the job to zero, meaning no delay.
+     * Set the delay for the job to zero seconds.
      *
      * @return $this
      */
