@@ -991,10 +991,10 @@ if (! function_exists('url')) {
     function url($path = null, $parameters = [], $secure = null)
     {
         if (is_null($path)) {
-            return app(UrlGenerator::class);
+            return app('url');
         }
 
-        return app(UrlGenerator::class)->to($path, $parameters, $secure);
+        return app('url')->to($path, $parameters, $secure);
     }
 }
 
