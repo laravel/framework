@@ -75,7 +75,7 @@ trait DetectsLostConnections
             'went away',
             'No such file or directory',
             'server is shutting down',
-            'failed to connect to'
+            'failed to connect to',
         ]);
     }
 }
