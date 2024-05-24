@@ -8,7 +8,6 @@ use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Contracts\Cookie\Factory as CookieFactory;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Routing\ResponseFactory;
-use Illuminate\Contracts\Routing\UrlGenerator;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Contracts\Validation\Factory as ValidationFactory;
 use Illuminate\Contracts\View\Factory as ViewFactory;
