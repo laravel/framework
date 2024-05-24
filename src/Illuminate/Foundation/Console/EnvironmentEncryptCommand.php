@@ -21,6 +21,7 @@ class EnvironmentEncryptCommand extends Command
                     {--key= : The encryption key}
                     {--cipher= : The encryption cipher}
                     {--env= : The environment to be encrypted}
+                    {--remove= : Remove the original file}
                     {--force : Overwrite the existing encrypted environment file}';
 
     /**
@@ -96,6 +97,10 @@ class EnvironmentEncryptCommand extends Command
             $this->components->error($e->getMessage());
 
             return Command::FAILURE;
+        }
+
+        if ($this->option('remove')) {
+            $this->files->delete($environmentFile);
         }
 
         $this->components->info('Environment successfully encrypted.');
