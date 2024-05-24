@@ -3760,7 +3760,7 @@ class Builder implements BuilderContract
             $values = $values($exists);
         }
 
-        if (!$exists) {
+        if (! $exists) {
             return $this->insert(array_merge($attributes, $values));
         }
 
