@@ -45,7 +45,7 @@ class DownCommand extends Command
             if ($this->laravel->maintenanceMode()->active()) {
                 $this->components->info('Application is already down.');
 
-                return 0;
+                return Command::SUCCESS;
             }
 
             $downFilePayload = $this->getDownFilePayload();
@@ -70,8 +70,10 @@ class DownCommand extends Command
                 $e->getMessage(),
             ));
 
-            return 1;
+            return Command::FAILURE;
         }
+
+        return Command::SUCCESS;
     }
 
     /**
