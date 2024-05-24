@@ -49,11 +49,7 @@ trait HasUuids
      */
     public function resolveRouteBindingQuery($query, $value, $field = null)
     {
-        if ($field && in_array($field, $this->uniqueIds()) && ! Str::isUuid($value)) {
-            throw (new ModelNotFoundException)->setModel(get_class($this), $value);
-        }
-
-        if (! $field && in_array($this->getRouteKeyName(), $this->uniqueIds()) && ! Str::isUuid($value)) {
+        if (in_array($field ?? $this->getRouteKeyName(), $this->uniqueIds()) && ! Str::isUuid($value)) {
             throw (new ModelNotFoundException)->setModel(get_class($this), $value);
         }
 
