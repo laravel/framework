@@ -165,7 +165,7 @@ class EnvironmentEncryptCommandTest extends TestCase
             ->once()
             ->andReturn(false);
 
-        $this->artisan('env:encrypt', ['--remove' => true])
+        $this->artisan('env:encrypt', ['--prune' => true])
             ->expectsOutputToContain('.env.encrypted')
             ->assertExitCode(0);
 
