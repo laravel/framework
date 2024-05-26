@@ -1043,7 +1043,7 @@ if (! function_exists('view')) {
 
 if (! function_exists('dd_if')) {
     /**
-     * Die and dump if the given condition is true.
+     * Dump and die if the given condition is true.
      *
      * @param  bool  $boolean
      * @param  mixed  $vars
