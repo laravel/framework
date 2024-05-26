@@ -1049,7 +1049,7 @@ if (! function_exists('dd_if')) {
      * @param  mixed  $vars
      * @return void
      */
-    function dd_if($boolean, ...$vars)
+    function dd_if(bool $boolean, mixed ...$vars): void
     {
         if ($boolean) {
             dd($vars);
