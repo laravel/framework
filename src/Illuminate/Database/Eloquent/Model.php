@@ -18,6 +18,7 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection as BaseCollection;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ForwardsCalls;
 use JsonSerializable;
@@ -688,6 +689,55 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         return static::query()->with(
             is_string($relations) ? func_get_args() : $relations
         );
+    }
+
+    /**
+     * Eager loading all the relations once
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public static function withAll()
+    {
+        $instance = new static;
+        $relations = $instance->getRelations();
+        return static::with($relations);
+    }
+
+    /**
+     * Eager loading all the relations except
+     * @param array|string relations
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public static function except($except)
+    {
+        $instance = new static;
+        $relations = $instance->getRelations();
+        $except = is_array($except) ? $except : [$except];
+        $relations = array_diff($relations, $except);
+        return static::with($relations);
+    }
+
+    /**
+     * Return all relations
+     * @return array
+     */
+    protected function getRelations()
+    {
+        $methods = get_class_methods($this);
+        $relations = [];
+        foreach ($methods as $method) {
+            try {
+                $reflection = new \ReflectionMethod($this, $method);
+                if ($reflection->getNumberOfParameters() == 0) {
+                    $returnType = $reflection->getReturnType();
+                    if ($returnType && is_subclass_of($returnType->getName(), \Illuminate\Database\Eloquent\Relations\Relation::class)) {
+                        $relations[] = $method;
+                    }
+                }
+            } catch (\Exception $e) {
+                Log::info("Cannot load all relations");
+            }
+        }
+        return $relations;
     }
 
     /**
