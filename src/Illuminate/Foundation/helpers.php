@@ -1040,3 +1040,19 @@ if (! function_exists('view')) {
         return $factory->make($view, $data, $mergeData);
     }
 }
+
+if (! function_exists('dd_if')) {
+    /**
+     * Die and dump if the given condition is true.
+     *
+     * @param  bool  $boolean
+     * @param  mixed  $vars
+     * @return void
+     */
+    function dd_if($boolean, ...$vars)
+    {
+        if ($boolean) {
+            dd($vars);
+        }
+    }
+}
