@@ -1056,3 +1056,19 @@ if (! function_exists('dd_if')) {
         }
     }
 }
+
+if (! function_exists('dd_unless')) {
+    /**
+     * Dump and die unless the given condition is true.
+     *
+     * @param  bool  $boolean
+     * @param  mixed  $vars
+     * @return void
+     */
+    function dd_unless(bool $boolean, mixed ...$vars): void
+    {
+        if (! $boolean) {
+            dd($vars);
+        }
+    }
+}
