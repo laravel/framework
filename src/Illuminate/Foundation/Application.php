@@ -1220,6 +1220,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
     public function dontMergeBaseConfiguration()
     {
         $this->mergeBaseConfiguration = false;
+
         return $this;
     }
 
