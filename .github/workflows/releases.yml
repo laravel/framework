@@ -65,17 +65,17 @@ jobs:
         with:
           commit_message: "Update version to v${{ steps.version.outputs.version }}"
 
-    #   - name: SSH into splitter server
-    #     uses: appleboy/ssh-action@master
-    #     with:
-    #       host: 104.248.56.26
-    #       username: forge
-    #       key: ${{ secrets.SSH_PRIVATE_KEY_SPLITTER }}
-    #       script: |
-    #         cd laravel-${{ github.ref_name }}
-    #         git pull origin ${{ github.ref_name }}
-    #         bash ./bin/release.sh v${{ steps.version.outputs.version }}
-    #       script_stop: true
+      - name: SSH into splitter server
+        uses: appleboy/ssh-action@master
+        with:
+          host: 104.248.56.26
+          username: forge
+          key: ${{ secrets.SSH_PRIVATE_KEY_SPLITTER }}
+          script: |
+            cd laravel-${{ github.ref_name }}
+            git pull origin ${{ github.ref_name }}
+            bash ./bin/release.sh v${{ steps.version.outputs.version }}
+          script_stop: true
 
       - name: Generate release notes
         id: generated-notes
