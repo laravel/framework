@@ -51,22 +51,21 @@ class EloquentModelTest extends TestCase
 
     public function testItCanEagerLoadAllRelationsUsingWithAll()
     {
-    $item = Item::create();
-    ItemDetail::create(['item_id' => $item->id]);
-    ItemDetail::create(['item_id' => $item->id]);
+        $item = Item::create();
+        ItemDetail::create(['item_id' => $item->id]);
+        ItemDetail::create(['item_id' => $item->id]);
 
-    ItemSpec::create(['item_id' => $item->id]);
-    ItemSpec::create(['item_id' => $item->id]);
-    ItemSpec::create(['item_id' => $item->id]);
+        ItemSpec::create(['item_id' => $item->id]);
+        ItemSpec::create(['item_id' => $item->id]);
+        ItemSpec::create(['item_id' => $item->id]);
 
-    $itemWithRelations = Item::withAll()->find($item->id);
+        $itemWithRelations = Item::withAll()->find($item->id);
 
-    $this->assertTrue($itemWithRelations->relationLoaded('itemDetails'), 'The itemDetails relation should be loaded');
-    $this->assertTrue($itemWithRelations->relationLoaded('itemSpecs'), 'The itemSpecs relation should be loaded');
+        $this->assertTrue($itemWithRelations->relationLoaded('itemDetails'), 'The itemDetails relation should be loaded');
+        $this->assertTrue($itemWithRelations->relationLoaded('itemSpecs'), 'The itemSpecs relation should be loaded');
 
-    $this->assertCount(2, $itemWithRelations->itemDetails, 'There should be exactly 2 item details loaded');
-    $this->assertCount(3, $itemWithRelations->itemSpecs, 'There should be exactly 3 item specs loaded');
-
+        $this->assertCount(2, $itemWithRelations->itemDetails, 'There should be exactly 2 item details loaded');
+        $this->assertCount(3, $itemWithRelations->itemSpecs, 'There should be exactly 3 item specs loaded');
     }
     
 
