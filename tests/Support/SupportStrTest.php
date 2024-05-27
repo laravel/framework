@@ -1526,6 +1526,15 @@ class SupportStrTest extends TestCase
         $this->assertSame('foo', Str::fromBase64(base64_encode('foo')));
         $this->assertSame('foobar', Str::fromBase64(base64_encode('foobar'), true));
     }
+
+    public function testKebabConversion()
+    {
+        $this->assertEquals("test-snake-case", Str::kebab("test_snake_case"));
+        $this->assertEquals("test-camel-case", Str::kebab("testCamelCase"));
+        $this->assertEquals("test-with-spaces", Str::kebab("test with spaces"));
+        $this->assertEquals("test-kebab-case", Str::kebab("test-kebab-case"));
+        $this->assertEquals("", Str::kebab(""));
+    }
 }
 
 class StringableObjectStub
