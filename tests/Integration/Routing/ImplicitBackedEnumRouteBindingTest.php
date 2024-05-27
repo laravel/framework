@@ -5,8 +5,6 @@ namespace Illuminate\Tests\Integration\Routing;
 use Illuminate\Support\Facades\Route;
 use Orchestra\Testbench\TestCase;
 
-include_once 'Enums.php';
-
 class ImplicitBackedEnumRouteBindingTest extends TestCase
 {
     protected function defineEnvironment($app): void
@@ -61,6 +59,12 @@ PHP);
             return $category->value;
         })->middleware('web');
 
+        Route::bind('categoryCode', fn (string $categoryCode) => CategoryBackedEnum::fromCode($categoryCode) ?? abort(404));
+
+        Route::post('/categories-code/{categoryCode}', function (CategoryBackedEnum $categoryCode) {
+            return $categoryCode->value;
+        })->middleware(['web']);
+
         $response = $this->post('/categories/fruits');
         $response->assertSee('fruits');
 
@@ -68,7 +72,7 @@ PHP);
         $response->assertSee('people');
 
         $response = $this->post('/categories/cars');
-        $response->assertNotFound(404);
+        $response->assertNotFound();
 
         $response = $this->post('/categories-default/');
         $response->assertSee('fruits');
@@ -78,5 +82,14 @@ PHP);
 
         $response = $this->post('/categories-default/fruits');
         $response->assertSee('fruits');
+
+        $response = $this->post('/categories-code/c01');
+        $response->assertSee('people');
+
+        $response = $this->post('/categories-code/c02');
+        $response->assertSee('fruits');
+
+        $response = $this->post('/categories-code/00');
+        $response->assertNotFound();
     }
 }
