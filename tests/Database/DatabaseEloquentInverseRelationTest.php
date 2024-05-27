@@ -5,6 +5,8 @@ namespace Illuminate\Tests\Database;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\RelationNotFoundException;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\Concerns\SupportsInverseRelations;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Mockery as m;
@@ -23,16 +25,46 @@ class DatabaseEloquentInverseRelationTest extends TestCase
         $builder->shouldReceive('getModel')->andReturn(new HasInverseRelationRelatedStub());
         $builder->shouldReceive('afterQuery')->never();
 
-        new HasInverseRelationStub($builder, new HasInverseRelationParentStub(['id' => 1]));
+        new HasInverseRelationStub($builder, new HasInverseRelationParentStub());
     }
 
     public function testInverseRelationCallbackIsNotSetIfInverseRelationIsEmpty()
     {
         $builder = m::mock(Builder::class);
+
+        $this->expectException(RelationNotFoundException::class);
         $builder->shouldReceive('getModel')->andReturn(new HasInverseRelationRelatedStub());
         $builder->shouldReceive('afterQuery')->never();
 
         (new HasInverseRelationStub($builder, new HasInverseRelationParentStub()))->inverse('');
+    }
+
+    public function testInverseRelationCallbackIsNotSetIfInverseRelationshipDoesNotExist()
+    {
+        $builder = m::mock(Builder::class);
+
+        $this->expectException(RelationNotFoundException::class);
+        $builder->shouldReceive('getModel')->andReturn(new HasInverseRelationRelatedStub());
+        $builder->shouldReceive('afterQuery')->never();
+
+        (new HasInverseRelationStub($builder, new HasInverseRelationParentStub()))->inverse('foo');
+    }
+
+    public function testWithoutInverseMethodRemovesInverseRelation()
+    {
+        $builder = m::mock(Builder::class);
+
+        $builder->shouldReceive('getModel')->andReturn(new HasInverseRelationRelatedStub());
+        $builder->shouldReceive('afterQuery')->once()->andReturnSelf();
+
+        $relation = (new HasInverseRelationStub($builder, new HasInverseRelationParentStub()));
+        $this->assertNull($relation->getInverseRelationship());
+
+        $relation->inverse('test');
+        $this->assertSame('test', $relation->getInverseRelationship());
+
+        $relation->withoutInverse();
+        $this->assertNull($relation->getInverseRelationship());
     }
 
     public function testBuilderCallbackIsAppliedWhenInverseRelationIsSet()
@@ -80,7 +112,7 @@ class DatabaseEloquentInverseRelationTest extends TestCase
         }
     }
 
-    public function testInverseRelationIsNotSetIfInverseRelationNameIsEmpty()
+    public function testInverseRelationIsNotSetIfInverseRelationIsUnset()
     {
         $builder = m::mock(Builder::class);
         $builder->shouldReceive('getModel')->andReturn(new HasInverseRelationRelatedStub());
@@ -93,10 +125,7 @@ class DatabaseEloquentInverseRelationTest extends TestCase
 
         $parent = new HasInverseRelationParentStub();
         $relation = (new HasInverseRelationStub($builder, $parent));
-        // Set the callback
         $relation->inverse('test');
-        // Override the relation name to be blank
-        $relation->inverse('');
 
         $results = new Collection(array_fill(0, 5, new HasInverseRelationRelatedStub()));
         foreach ($results as $model) {
@@ -104,17 +133,36 @@ class DatabaseEloquentInverseRelationTest extends TestCase
         }
         $results = $afterQuery($results);
         foreach ($results as $model) {
+            $this->assertNotEmpty($model->getRelations());
+            $this->assertSame($parent, $model->getRelation('test'));
+        }
+
+        // Reset the inverse relation
+        $relation->withoutInverse();
+
+        $results = new Collection(array_fill(0, 5, new HasInverseRelationRelatedStub()));
+        foreach ($results as $model) {
+            $this->assertEmpty($model->getRelations());
+        }
+        foreach ($results as $model) {
             $this->assertEmpty($model->getRelations());
         }
     }
 }
 
-class HasInverseRelationParentStub extends Model {
+class HasInverseRelationParentStub extends Model
+{
     protected static $unguarded = true;
 }
 
-class HasInverseRelationRelatedStub extends Model {
+class HasInverseRelationRelatedStub extends Model
+{
     protected static $unguarded = true;
+
+    public function test(): BelongsTo
+    {
+        return $this->belongsTo(HasInverseRelationParentStub::class);
+    }
 }
 
 class HasInverseRelationStub extends Relation
@@ -122,9 +170,28 @@ class HasInverseRelationStub extends Relation
     use SupportsInverseRelations;
 
     // None of these methods will actually be called - they're just needed to fill out `Relation`
-    public function match(array $models, Collection $results, $relation) {return $models;}
-    public function initRelation(array $models, $relation) {return $models;}
-    public function getResults(){return $this->query->get();}
-    public function addConstraints() {}
-    public function addEagerConstraints(array $models) {}
+    public function match(array $models, Collection $results, $relation)
+    {
+        return $models;
+    }
+
+    public function initRelation(array $models, $relation)
+    {
+        return $models;
+    }
+
+    public function getResults()
+    {
+        return $this->query->get();
+    }
+
+    public function addConstraints()
+    {
+        //
+    }
+
+    public function addEagerConstraints(array $models)
+    {
+        //
+    }
 }
