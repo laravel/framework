@@ -568,7 +568,21 @@ class Str
      */
     public static function kebab($value)
     {
+        if(static::isSnakeCase($value)){
+            $value = str_replace('_', '-', $value);
+        }
         return static::snake($value, '-');
+    }
+
+     /**
+     * Check if a string to is snake case.
+     *
+     * @param  string  $value
+     * @return bool
+     */
+    public static function isSnakeCase($value)
+    {
+    return strpos($value, '_') > 0;
     }
 
     /**
