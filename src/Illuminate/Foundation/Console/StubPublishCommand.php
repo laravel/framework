@@ -18,7 +18,7 @@ class StubPublishCommand extends Command
     protected $signature = 'stub:publish
                     {--existing : Publish and overwrite only the files that have already been published}
                     {--force : Overwrite any existing files}
-                    {--only=* : Stub categories to publish (e.g. migration,controller)}';
+                    {--only= : Stub categories to publish (e.g. migration,controller)}';
 
     /**
      * The console command description.
@@ -147,11 +147,9 @@ class StubPublishCommand extends Command
 
         $stubs = collect($stubCategories);
         if (! is_null($only)) {
-            $stubs = $stubs->filter(function ($value, $key) use ($only) {
-                return in_array($key, $only);
-            });
+            $stubs = $stubs->filter(fn ($value, $key) => in_array($key, $only));
         }
-        $stubs = $stubs->flatten(1)->toArray();
+        $stubs = $stubs->flatMap(fn ($value) => $value)->toArray();
 
         $this->laravel['events']->dispatch($event = new PublishingStubs($stubs));
 
