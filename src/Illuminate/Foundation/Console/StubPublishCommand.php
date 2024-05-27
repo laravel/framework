@@ -149,7 +149,7 @@ class StubPublishCommand extends Command
         if (! is_null($only)) {
             $stubs = $stubs->filter(function ($value, $key) use ($only) {
                 return in_array($key, $only);
-            })
+            });
         }
         $stubs = $stubs->flatten(1)->toArray();
 
