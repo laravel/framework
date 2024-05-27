@@ -66,7 +66,9 @@ class LoadConfiguration
         //     throw new Exception('Unable to load the "app" configuration file.');
         // }
 
-        $base = $this->getBaseConfiguration();
+        $base = $app->shouldMergeBaseConfiguration()
+            ? $this->getBaseConfiguration()
+            : [];
 
         foreach ($files as $name => $path) {
             $base = $this->loadConfigurationFile($repository, $name, $path, $base);

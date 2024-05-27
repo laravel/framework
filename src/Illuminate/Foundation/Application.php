@@ -202,6 +202,11 @@ class Application extends Container implements ApplicationContract, CachesConfig
     protected $absoluteCachePathPrefixes = ['/', '\\'];
 
     /**
+     * @var bool
+     */
+    protected $mergeBaseConfiguration = true;
+
+    /**
      * Create a new Illuminate application instance.
      *
      * @param  string|null  $basePath
@@ -1207,6 +1212,23 @@ class Application extends Container implements ApplicationContract, CachesConfig
     {
         return $this->bound('middleware.disable') &&
                $this->make('middleware.disable') === true;
+    }
+
+    /**
+     * @return $this
+     */
+    public function dontMergeBaseConfiguration()
+    {
+        $this->mergeBaseConfiguration = false;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function shouldMergeBaseConfiguration()
+    {
+        return $this->mergeBaseConfiguration;
     }
 
     /**

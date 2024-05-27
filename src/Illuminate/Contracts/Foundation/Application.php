@@ -238,6 +238,11 @@ interface Application extends Container
     public function shouldSkipMiddleware();
 
     /**
+     * @return bool
+     */
+    public function shouldMergeBaseConfiguration();
+
+    /**
      * Register a terminating callback with the application.
      *
      * @param  callable|string  $callback
