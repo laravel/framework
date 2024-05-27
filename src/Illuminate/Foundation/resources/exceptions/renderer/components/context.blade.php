@@ -18,17 +18,16 @@
                 <span
                     data-tippy-content="{{ $key }}"
                     class="lg:text-md w-[8rem] flex-none cursor-pointer truncate border-r px-5 py-3 text-sm dark:border-gray-800 lg:w-[12rem]"
-                    >{{ $key }}</span
                 >
+                    {{ $key }}
+                </span>
                 <span
                     class="min-w-0 flex-grow"
                     style="
                         -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 1rem, #000 calc(100% - 3rem), transparent calc(100% - 1rem));
                     "
                 >
-                    <pre class="scrollbar-hidden overflow-y-hidden text-xs lg:text-sm"><code
-                        class="px-5 py-3 overflow-y-hidden scrollbar-hidden max-h-32 overflow-x-scroll scrollbar-hidden-x"
-                    >{{ $value }}</code></pre>
+                    <pre class="scrollbar-hidden overflow-y-hidden text-xs lg:text-sm"><code class="px-5 py-3 overflow-y-hidden scrollbar-hidden max-h-32 overflow-x-scroll scrollbar-hidden-x">{{ $value }}</code></pre>
                 </span>
             </div>
         @empty
@@ -36,9 +35,7 @@
                 class="min-w-0 flex-grow"
                 style="-webkit-mask-image: linear-gradient(90deg, transparent 0, #000 1rem, #000 calc(100% - 3rem), transparent calc(100% - 1rem))"
             >
-                <pre class="scrollbar-hidden mx-5 my-3 overflow-y-hidden text-xs lg:text-sm"><code
-                        class="overflow-y-hidden scrollbar-hidden overflow-x-scroll scrollbar-hidden-x"
-                    >No headers data</code></pre>
+                <pre class="scrollbar-hidden mx-5 my-3 overflow-y-hidden text-xs lg:text-sm"><code class="overflow-y-hidden scrollbar-hidden overflow-x-scroll scrollbar-hidden-x">No headers data</code></pre>
             </span>
         @endforelse
     </dl>
@@ -53,9 +50,7 @@
                 class="min-w-0 flex-grow"
                 style="-webkit-mask-image: linear-gradient(90deg, transparent 0, #000 1rem, #000 calc(100% - 3rem), transparent calc(100% - 1rem))"
             >
-                <pre class="scrollbar-hidden mx-5 my-3 overflow-y-hidden text-xs lg:text-sm"><code
-                        class="overflow-y-hidden scrollbar-hidden overflow-x-scroll scrollbar-hidden-x"
-                    >{!! $exception->requestBody() ?: 'No body data' !!}</code></pre>
+                <pre class="scrollbar-hidden mx-5 my-3 overflow-y-hidden text-xs lg:text-sm"><code class="overflow-y-hidden scrollbar-hidden overflow-x-scroll scrollbar-hidden-x">{!! $exception->requestBody() ?: 'No body data' !!}</code></pre>
             </span>
         </div>
     </div>
@@ -85,9 +80,7 @@
                         -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 1rem, #000 calc(100% - 3rem), transparent calc(100% - 1rem));
                     "
                 >
-                    <pre class="scrollbar-hidden overflow-y-hidden text-xs lg:text-sm"><code
-                        class="px-5 py-3 overflow-y-hidden scrollbar-hidden max-h-32 overflow-x-scroll scrollbar-hidden-x"
-                    >{{ $value }}</code></pre>
+                    <pre class="scrollbar-hidden overflow-y-hidden text-xs lg:text-sm"><code class="px-5 py-3 overflow-y-hidden scrollbar-hidden max-h-32 overflow-x-scroll scrollbar-hidden-x">{{ $value }}</code></pre>
                 </span>
             </div>
         @empty
@@ -95,9 +88,7 @@
                 class="min-w-0 flex-grow"
                 style="-webkit-mask-image: linear-gradient(90deg, transparent 0, #000 1rem, #000 calc(100% - 3rem), transparent calc(100% - 1rem))"
             >
-                <pre class="scrollbar-hidden mx-5 my-3 overflow-y-hidden text-xs lg:text-sm"><code
-                        class="overflow-y-hidden scrollbar-hidden overflow-x-scroll scrollbar-hidden-x"
-                    >No routing data</code></pre>
+                <pre class="scrollbar-hidden mx-5 my-3 overflow-y-hidden text-xs lg:text-sm"><code class="overflow-y-hidden scrollbar-hidden overflow-x-scroll scrollbar-hidden-x">No routing data</code></pre>
             </span>
         @endforelse
     </dl>
@@ -113,9 +104,7 @@
                     class="min-w-0 flex-grow"
                     style="-webkit-mask-image: linear-gradient(90deg, transparent 0, #000 1rem, #000 calc(100% - 3rem), transparent calc(100% - 1rem))"
                 >
-                    <pre class="scrollbar-hidden mx-5 my-3 overflow-y-hidden text-xs lg:text-sm"><code
-                            class="overflow-y-hidden scrollbar-hidden overflow-x-scroll scrollbar-hidden-x"
-                        >{!! $routeParametersContext !!}</code></pre>
+                    <pre class="scrollbar-hidden mx-5 my-3 overflow-y-hidden text-xs lg:text-sm"><code class="overflow-y-hidden scrollbar-hidden overflow-x-scroll scrollbar-hidden-x">{!! $routeParametersContext !!}</code></pre>
                 </span>
             </div>
         </div>
@@ -143,9 +132,7 @@
                         -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 1rem, #000 calc(100% - 3rem), transparent calc(100% - 1rem));
                     "
                 >
-                    <pre class="scrollbar-hidden overflow-y-hidden text-xs lg:text-sm"><code
-                        class="px-5 py-3 overflow-y-hidden scrollbar-hidden max-h-32 overflow-x-scroll scrollbar-hidden-x"
-                    >{{ $sql }}</code></pre>
+                    <pre class="scrollbar-hidden overflow-y-hidden text-xs lg:text-sm"><code class="px-5 py-3 overflow-y-hidden scrollbar-hidden max-h-32 overflow-x-scroll scrollbar-hidden-x">{{ $sql }}</code></pre>
                 </span>
             </div>
         @empty
@@ -153,9 +140,7 @@
                 class="min-w-0 flex-grow"
                 style="-webkit-mask-image: linear-gradient(90deg, transparent 0, #000 1rem, #000 calc(100% - 3rem), transparent calc(100% - 1rem))"
             >
-                <pre class="scrollbar-hidden mx-5 my-3 overflow-y-hidden text-xs lg:text-sm"><code
-                        class="overflow-y-hidden scrollbar-hidden overflow-x-scroll scrollbar-hidden-x"
-                    >No query data</code></pre>
+                <pre class="scrollbar-hidden mx-5 my-3 overflow-y-hidden text-xs lg:text-sm"><code class="overflow-y-hidden scrollbar-hidden overflow-x-scroll scrollbar-hidden-x">No query data</code></pre>
             </span>
         @endforelse
     </dl>
