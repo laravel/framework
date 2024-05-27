@@ -1277,6 +1277,48 @@ class RoutingRouteTest extends TestCase
         );
     }
 
+    public function testRouteStubCacheFileGenerator()
+    {  
+       $router = $this->getRouter();
+
+       $router->group(['prefix' => 'foo', 'as' => 'Foo::'], function () use ($router) {
+            $router->group(['prefix' => 'bar', 'as' => 'Bar::'], function () use ($router) {
+                $router->get('baz', ['as' => 'baz', function () {
+                    return 'hello';
+                }]);
+            });
+        });
+
+        $routeCollection = new RouteCollection;
+
+        foreach ($router->getRoutes() as $route) {
+
+            $route->prepareForSerialization();
+
+            $routeCollection->add($route);
+        }
+
+        $stub = file_get_contents(__DIR__.'/routes.stub');
+
+        $result =str_replace('{{routes}}', var_export( $routeCollection->compile(), true), $stub);
+
+        $string = str_replace('\Closure::__set_state', '', $result);
+
+        file_put_contents(__DIR__.'/RoutesCached.php', $string);
+
+        $routesCached = new  RoutesCached();
+
+        $cachedRoute = $routesCached->cachedRoute();
+
+        $routeCachedUri = $cachedRoute['attributes']['Foo::Bar::baz']['uri'];
+
+        $routes = $router->getRoutes();
+
+        $noneCachedRoute = $routes->getByName('Foo::Bar::baz'); 
+
+        $this->assertSame($noneCachedRoute->uri(),$routeCachedUri);
+    }
+
     public function testRoutePrefixing()
     {
         /*

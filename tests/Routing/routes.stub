@@ -1,0 +1,10 @@
+<?php 
+
+namespace Illuminate\Tests\Routing;
+
+class RoutesCached
+{
+    function cachedRoute() {
+        return {{routes}};
+    }
+}
