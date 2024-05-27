@@ -692,18 +692,18 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     }
 
     /**
-     * Eager loading all the relations once
+     * Eager load all relations
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public static function withAll()
     {
         $instance = new static;
         $relations = $instance->getRelations();
-        return static::with($relations);
+        return (new static)->with($relations);
     }
 
     /**
-     * Eager loading all the relations except
+     * Eager loading all relations except specified once
      * @param array|string relations
      * @return \Illuminate\Database\Eloquent\Builder
      */
@@ -713,7 +713,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         $relations = $instance->getRelations();
         $except = is_array($except) ? $except : [$except];
         $relations = array_diff($relations, $except);
-        return static::with($relations);
+        return (new static)->with($relations);
     }
 
     /**
@@ -725,7 +725,6 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         $methods = get_class_methods($this);
         $relations = [];
         foreach ($methods as $method) {
-            try {
                 $reflection = new \ReflectionMethod($this, $method);
                 if ($reflection->getNumberOfParameters() == 0) {
                     $returnType = $reflection->getReturnType();
@@ -733,9 +732,6 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
                         $relations[] = $method;
                     }
                 }
-            } catch (\Exception $e) {
-                Log::info("Cannot load all relations");
-            }
         }
         return $relations;
     }
