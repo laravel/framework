@@ -87,7 +87,7 @@ class FoundationServiceProvider extends AggregateServiceProvider
         $this->registerRequestValidation();
         $this->registerRequestSignatureValidation();
         $this->registerExceptionTracking();
-        $this->regsiterExceptionRenderer();
+        $this->registerExceptionRenderer();
         $this->registerMaintenanceModeManager();
     }
 
@@ -215,7 +215,7 @@ class FoundationServiceProvider extends AggregateServiceProvider
      *
      * @return void
      */
-    protected function regsiterExceptionRenderer()
+    protected function registerExceptionRenderer()
     {
         if (! $this->app->hasDebugModeEnabled()) {
             return;
