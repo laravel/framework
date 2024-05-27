@@ -30,7 +30,7 @@ class Listener
     {
         $events->listen(QueryExecuted::class, [$this, 'onQueryExecuted']);
 
-        $events->listen([JobProcessing::class, JobProcessed::class], function ($event) {
+        $events->listen([JobProcessing::class, JobProcessed::class], function () {
             $this->queries = [];
         });
 
