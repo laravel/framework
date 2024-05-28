@@ -544,7 +544,9 @@ trait HasAttributes
         if (method_exists($this, $key)) {
             $relation = $this->$key();
 
-            return $relation instanceof Relation;
+            if ($relation instanceof Relation) {
+                return true;
+            }
         }
 
         return $this->relationResolver(static::class, $key);
