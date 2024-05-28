@@ -1,6 +1,10 @@
 # Release Notes for 11.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v11.9.0...11.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v11.9.1...11.x)
+
+## [v11.9.1](https://github.com/laravel/framework/compare/v11.9.0...v11.9.1) - 2024-05-28
+
+* [11.x] Fixes missing route context by [@nunomaduro](https://github.com/nunomaduro) in https://github.com/laravel/framework/pull/51602
 
 ## [v11.9.0](https://github.com/laravel/framework/compare/v11.8.0...v11.9.0) - 2024-05-28
 
