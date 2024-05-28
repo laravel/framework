@@ -3749,10 +3749,10 @@ class Builder implements BuilderContract
      * Insert or update a record matching the attributes, and fill it with values.
      *
      * @param  array  $attributes
-     * @param  \Closure|array  $values
+     * @param  array|callable  $values
      * @return bool
      */
-    public function updateOrInsert(array $attributes, $values = [])
+    public function updateOrInsert(array $attributes, array|callable $values = [])
     {
         $exists = $this->where($attributes)->exists();
 
