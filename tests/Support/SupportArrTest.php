@@ -729,6 +729,18 @@ class SupportArrTest extends TestCase
         $this->assertEquals([], $mapped);
     }
 
+    public function testMergeIfTrue()
+    {
+        $merged = Arr::mergeIf(true, ['first' => 'Taylor'], ['last' => 'Otwell']);
+        $this->assertEquals(['first' => 'Taylor', 'last' => 'Otwell'], $merged);
+    }
+
+    public function testMergeIfFalse()
+    {
+        $first = Arr::mergeIf(false, ['first' => 'Taylor'], ['last' => 'Otwell']);
+        $this->assertEquals(['first' => 'Taylor'], $first);
+    }
+
     public function testMapNullValues()
     {
         $data = ['first' => 'taylor', 'last' => null];
