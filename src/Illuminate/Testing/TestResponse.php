@@ -331,9 +331,10 @@ class TestResponse implements ArrayAccess
      * Assert that the response offers a file download.
      *
      * @param  string|null  $filename
+     * @param  string  $matchType
      * @return $this
      */
-    public function assertDownload($filename = null)
+    public function assertDownload($filename = null, $matchType = 'exact')
     {
         $contentDisposition = explode(';', $this->headers->get('content-disposition', ''));
 
@@ -358,13 +359,23 @@ class TestResponse implements ArrayAccess
             if (! isset($contentDisposition[1])) {
                 PHPUnit::fail($message);
             } else {
-                PHPUnit::assertSame(
-                    $filename,
-                    isset(explode('=', $contentDisposition[1])[1])
-                        ? trim(explode('=', $contentDisposition[1])[1], " \"'")
-                        : '',
-                    $message
-                );
+                $actual = isset(explode('=', $contentDisposition[1])[1])
+                    ? trim(explode('=', $contentDisposition[1])[1], " \"'")
+                    : '';
+
+                switch($matchType) {
+                    case 'exact':
+                        PHPUnit::assertSame($filename, $actual, $message);
+                        break;
+                    case 'startsWith':
+                        PHPUnit::assertStringStartsWith($filename, $actual, $message);
+                        break;
+                    case 'endsWith':
+                        PHPUnit::assertStringEndsWith($filename, $actual, $message);
+                        break;
+                    default:
+                        throw new \InvalidArgumentException('Invalid match type: ' . $matchType);
+                }
 
                 return $this;
             }
