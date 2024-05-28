@@ -1,6 +1,13 @@
 # Release Notes for 10.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v10.48.11...10.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v10.48.12...10.x)
+
+## [v10.48.12](https://github.com/laravel/framework/compare/v10.48.11...v10.48.12) - 2024-05-28
+
+* [10.x] Fix typo by [@Issei0804-ie](https://github.com/Issei0804-ie) in https://github.com/laravel/framework/pull/51535
+* [10.x] Fix SQL Server detection in database store by [@staudenmeir](https://github.com/staudenmeir) in https://github.com/laravel/framework/pull/51547
+* [10.x] - Fix batch list loading in Horizon when serialization error by [@jeffortegad](https://github.com/jeffortegad) in https://github.com/laravel/framework/pull/51551
+* [10.x] Fixes explicit route binding with `BackedEnum` by [@CAAHS](https://github.com/CAAHS) in https://github.com/laravel/framework/pull/51586
 
 ## [v10.48.11](https://github.com/laravel/framework/compare/v10.48.10...v10.48.11) - 2024-05-21
 
