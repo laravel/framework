@@ -2055,6 +2055,36 @@ class TestResponseTest extends TestCase
         $files->deleteDirectory($tempDir);
     }
 
+    public function testAssertDownloadOfferedWithAFileNamePrefix()
+    {
+        $files = new Filesystem;
+        $tempDir = __DIR__.'/tmp';
+        $files->makeDirectory($tempDir, 0755, false, true);
+        $files->put($tempDir.'/file_example.txt', 'Hello World');
+        $testResponse = TestResponse::fromBaseResponse(new Response(
+            $files->get($tempDir.'/file_example.txt'), 200, [
+                'Content-Disposition' => 'attachment; filename = file_example.txt',
+            ]
+        ));
+        $testResponse->assertDownload('file_', 'startsWith');
+        $files->deleteDirectory($tempDir);
+    }
+
+    public function testAssertDownloadOfferedWithAFileNameSuffix()
+    {
+        $files = new Filesystem;
+        $tempDir = __DIR__.'/tmp';
+        $files->makeDirectory($tempDir, 0755, false, true);
+        $files->put($tempDir.'/file_example.txt', 'Hello World');
+        $testResponse = TestResponse::fromBaseResponse(new Response(
+            $files->get($tempDir.'/file_example.txt'), 200, [
+                'Content-Disposition' => 'attachment; filename = file_example.txt',
+            ]
+        ));
+        $testResponse->assertDownload('.txt', 'endsWith');
+        $files->deleteDirectory($tempDir);
+    }
+
     public function testAssertDownloadOfferedWorksWithBinaryFileResponse()
     {
         $files = new Filesystem;
