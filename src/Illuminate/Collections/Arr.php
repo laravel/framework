@@ -640,6 +640,20 @@ class Arr
     }
 
     /**
+     * Conditionally merges several arrays into a single array
+     *
+     * Returns the first array if condition is false
+     *
+     * @param  bool  $condition
+     * @param  array  $array
+     * @return array
+     */
+    public static function mergeIf(bool $condition, array ...$array)
+    {
+        return ($condition) ? array_merge(...$array) : $array[0];
+    }
+
+    /**
      * Run a map over each nested chunk of items.
      *
      * @template TMapSpreadValue
