@@ -66,11 +66,11 @@ class LoadConfiguration
         //     throw new Exception('Unable to load the "app" configuration file.');
         // }
 
-        $shouldMergeBase = method_exists($app, 'shouldMergeBaseConfiguration')
-            ? $app->shouldMergeBaseConfiguration()
+        $shouldMerge = method_exists($app, 'shouldMergeFrameworkConfiguration')
+            ? $app->shouldMergeFrameworkConfiguration()
             : true;
 
-        $base = $shouldMergeBase
+        $base = $shouldMerge
             ? $this->getBaseConfiguration()
             : [];
 

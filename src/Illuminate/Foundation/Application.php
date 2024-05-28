@@ -195,16 +195,18 @@ class Application extends Container implements ApplicationContract, CachesConfig
     protected $namespace;
 
     /**
+     * Indicates if the framework's base configuration should be merged.
+     *
+     * @var bool
+     */
+    protected $mergeFrameworkConfiguration = true;
+
+    /**
      * The prefixes of absolute cache paths for use during normalization.
      *
      * @var string[]
      */
     protected $absoluteCachePathPrefixes = ['/', '\\'];
-
-    /**
-     * @var bool
-     */
-    protected $mergeBaseConfiguration = true;
 
     /**
      * Create a new Illuminate application instance.
@@ -1204,6 +1206,28 @@ class Application extends Container implements ApplicationContract, CachesConfig
     }
 
     /**
+     * Determine if the framework's base configuration should be merged.
+     *
+     * @return bool
+     */
+    public function shouldMergeFrameworkConfiguration()
+    {
+        return $this->mergeFrameworkConfiguration;
+    }
+
+    /**
+     * Indicate that the framework's base configuration should not be merged.
+     *
+     * @return $this
+     */
+    public function dontMergeFrameworkConfiguration()
+    {
+        $this->mergeFrameworkConfiguration = false;
+
+        return $this;
+    }
+
+    /**
      * Determine if middleware has been disabled for the application.
      *
      * @return bool
@@ -1212,24 +1236,6 @@ class Application extends Container implements ApplicationContract, CachesConfig
     {
         return $this->bound('middleware.disable') &&
                $this->make('middleware.disable') === true;
-    }
-
-    /**
-     * @return $this
-     */
-    public function dontMergeBaseConfiguration()
-    {
-        $this->mergeBaseConfiguration = false;
-
-        return $this;
-    }
-
-    /**
-     * @return bool
-     */
-    public function shouldMergeBaseConfiguration()
-    {
-        return $this->mergeBaseConfiguration;
     }
 
     /**

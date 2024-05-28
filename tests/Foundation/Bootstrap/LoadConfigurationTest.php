@@ -20,7 +20,7 @@ class LoadConfigurationTest extends TestCase
     public function testDontLoadBaseConfiguration()
     {
         $app = new Application();
-        $app->dontMergeBaseConfiguration();
+        $app->dontMergeFrameworkConfiguration();
 
         (new LoadConfiguration())->bootstrap($app);
 
