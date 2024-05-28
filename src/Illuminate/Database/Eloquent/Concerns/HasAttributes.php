@@ -541,8 +541,13 @@ trait HasAttributes
             return false;
         }
 
-        return method_exists($this, $key) ||
-               $this->relationResolver(static::class, $key);
+        if (method_exists($this, $key)) {
+            $relation = $this->$key();
+
+            return $relation instanceof Relation;
+        }
+
+        return $this->relationResolver(static::class, $key);
     }
 
     /**
