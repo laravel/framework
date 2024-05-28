@@ -374,7 +374,7 @@ class TestResponse implements ArrayAccess
                         PHPUnit::assertStringEndsWith($filename, $actual, $message);
                         break;
                     default:
-                        throw new \InvalidArgumentException('Invalid match type: ' . $matchType);
+                        throw new \InvalidArgumentException('Invalid match type: '.$matchType);
                 }
 
                 return $this;
