@@ -164,7 +164,7 @@ class Exception
     /**
      * Get the application's route context.
      *
-     * @return array<string, string>|null
+     * @return array<string, string>
      */
     public function applicationRouteContext()
     {
@@ -174,7 +174,7 @@ class Exception
             'controller' => $route->getActionName(),
             'route name' => $route->getName() ?: null,
             'middleware' => implode(', ', $route->gatherMiddleware()),
-        ]) : null;
+        ]) : [];
     }
 
     /**
@@ -184,7 +184,7 @@ class Exception
      */
     public function applicationRouteParametersContext()
     {
-        $parameters = $this->request()->route()->parameters();
+        $parameters = $this->request()->route()?->parameters();
 
         return $parameters ? json_encode(array_map(
             fn ($value) => $value instanceof Model ? $value->withoutRelations() : $value,
