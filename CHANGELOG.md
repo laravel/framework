@@ -1,6 +1,28 @@
 # Release Notes for 11.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v11.8.0...11.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v11.9.0...11.x)
+
+## [v11.9.0](https://github.com/laravel/framework/compare/v11.8.0...v11.9.0) - 2024-05-28
+
+* [11.x] Optimize boostrap time by using hashtable to store providers by [@sarven](https://github.com/sarven) in https://github.com/laravel/framework/pull/51343
+* [11.x] Prevent destructive commands from running by [@jasonmccreary](https://github.com/jasonmccreary) in https://github.com/laravel/framework/pull/51376
+* [11.x] renamed left `has` to `contains` by [@MrPunyapal](https://github.com/MrPunyapal) in https://github.com/laravel/framework/pull/51532
+* [10.x] Fix typo by [@Issei0804-ie](https://github.com/Issei0804-ie) in https://github.com/laravel/framework/pull/51535
+* [11.x] Fixes doc block in Timebox.php by [@saMahmoudzadeh](https://github.com/saMahmoudzadeh) in https://github.com/laravel/framework/pull/51537
+* [11.x] Rename test function to match prohibit action by [@faissaloux](https://github.com/faissaloux) in https://github.com/laravel/framework/pull/51534
+* [11.x] Fix LazilyRefreshDatabase when using Laravel BrowserKit Testing by [@MaxGiting](https://github.com/MaxGiting) in https://github.com/laravel/framework/pull/51538
+* [10.x] Fix SQL Server detection in database store by [@staudenmeir](https://github.com/staudenmeir) in https://github.com/laravel/framework/pull/51547
+* [11.x] Display test creation messages by [@nshiro](https://github.com/nshiro) in https://github.com/laravel/framework/pull/51546
+* [11.x] Detect Cockroach DB connection loss by [@saschaglo](https://github.com/saschaglo) in https://github.com/laravel/framework/pull/51559
+* [11.x] Fix type tests by [@stayallive](https://github.com/stayallive) in https://github.com/laravel/framework/pull/51558
+* [11.x] Add `withoutDelay()` to the `Queueable` trait by [@KennedyTedesco](https://github.com/KennedyTedesco) in https://github.com/laravel/framework/pull/51555
+* [11.x] Add an option to remove the original environment file after encrypting by [@riasvdv](https://github.com/riasvdv) in https://github.com/laravel/framework/pull/51556
+* [10.x] - Fix batch list loading in Horizon when serialization error by [@jeffortegad](https://github.com/jeffortegad) in https://github.com/laravel/framework/pull/51551
+* [10.x] Fixes explicit route binding with `BackedEnum` by [@CAAHS](https://github.com/CAAHS) in https://github.com/laravel/framework/pull/51586
+* [11.x] Add `Macroable` to `PendingCommand` by [@PerryvanderMeer](https://github.com/PerryvanderMeer) in https://github.com/laravel/framework/pull/51572
+* [11.x] Improves errors by [@nunomaduro](https://github.com/nunomaduro) in https://github.com/laravel/framework/pull/51261
+* [11.x] Add RELEASE.md to .gitattributes by [@Jubeki](https://github.com/Jubeki) in https://github.com/laravel/framework/pull/51598
+* [11.x] Fixes exception rendering by [@nunomaduro](https://github.com/nunomaduro) in https://github.com/laravel/framework/pull/51587
 
 ## [v11.8.0](https://github.com/laravel/framework/compare/v11.7.0...v11.8.0) - 2024-05-21
 
