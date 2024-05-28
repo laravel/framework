@@ -1,31 +1,34 @@
 <script>
-    const darkStyles = document.querySelector('style[data-theme="dark"]')?.textContent
-    const lightStyles = document.querySelector('style[data-theme="light"]')?.textContent
 
-    const removeStyles = () => {
-        document.querySelector('style[data-theme="dark"]')?.remove()
-        document.querySelector('style[data-theme="light"]')?.remove()
-    }
+    (function () {
+        const darkStyles = document.querySelector('style[data-theme="dark"]')?.textContent
+        const lightStyles = document.querySelector('style[data-theme="light"]')?.textContent
 
-    removeStyles()
+        const removeStyles = () => {
+            document.querySelector('style[data-theme="dark"]')?.remove()
+            document.querySelector('style[data-theme="light"]')?.remove()
+        }
 
-    setDarkClass = () => {
         removeStyles()
 
-        const isDark = localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)
+        setDarkClass = () => {
+            removeStyles()
 
-        isDark ? document.documentElement.classList.add('dark') : document.documentElement.classList.remove('dark')
+            const isDark = localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)
 
-        if (isDark) {
-            document.head.insertAdjacentHTML('beforeend', `<style data-theme="dark">${darkStyles}</style>`)
-        } else {
-            document.head.insertAdjacentHTML('beforeend', `<style data-theme="light">${lightStyles}</style>`)
+            isDark ? document.documentElement.classList.add('dark') : document.documentElement.classList.remove('dark')
+
+            if (isDark) {
+                document.head.insertAdjacentHTML('beforeend', `<style data-theme="dark">${darkStyles}</style>`)
+            } else {
+                document.head.insertAdjacentHTML('beforeend', `<style data-theme="light">${lightStyles}</style>`)
+            }
         }
-    }
 
-    setDarkClass()
+        setDarkClass()
 
-    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', setDarkClass)
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', setDarkClass)
+    })();
 </script>
 
 <div

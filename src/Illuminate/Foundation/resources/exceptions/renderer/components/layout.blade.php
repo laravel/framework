@@ -38,6 +38,12 @@
         hljs.initLineNumbersOnLoad()
 
         window.addEventListener('load', function() {
+            document.querySelectorAll('.renderer').forEach(function(element, index) {
+                if (index > 0) {
+                    element.remove();
+                }
+            });
+
             document.querySelector('.default-highlightable-code').style.display = 'block';
 
             document.querySelectorAll('.highlightable-code').forEach(function(element) {
