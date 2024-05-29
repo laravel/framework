@@ -63,6 +63,10 @@ class LoadConfiguration
 
         $base = $this->getBaseConfiguration();
 
+        foreach (array_diff(array_keys($base), array_keys($files)) as $name => $config) {
+            $repository->set($name, $config);
+        }
+
         foreach ($files as $name => $path) {
             $base = $this->loadConfigurationFile($repository, $name, $path, $base);
         }
