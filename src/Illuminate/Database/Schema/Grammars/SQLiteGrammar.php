@@ -38,8 +38,8 @@ class SQLiteGrammar extends Grammar
     public function compileSqlCreateStatement($name, $type = 'table')
     {
         return sprintf('select "sql" from sqlite_master where type = %s and name = %s',
-            $this->wrap($type),
-            $this->wrap(str_replace('.', '__', $name))
+            $this->quoteString($type),
+            $this->quoteString(str_replace('.', '__', $name))
         );
     }
 
@@ -91,7 +91,7 @@ class SQLiteGrammar extends Grammar
         return sprintf(
             'select name, type, not "notnull" as "nullable", dflt_value as "default", pk as "primary", hidden as "extra" '
             .'from pragma_table_xinfo(%s) order by cid asc',
-            $this->wrap(str_replace('.', '__', $table))
+            $this->quoteString(str_replace('.', '__', $table))
         );
     }
 
@@ -109,7 +109,7 @@ class SQLiteGrammar extends Grammar
             .'union select name, group_concat(col) as columns, "unique", origin = "pk" as "primary" '
             .'from (select il.*, ii.name as col from pragma_index_list(%s) il, pragma_index_info(il.name) ii order by il.seq, ii.seqno) '
             .'group by name, "unique", "primary"',
-            $table = $this->wrap(str_replace('.', '__', $table)),
+            $table = $this->quoteString(str_replace('.', '__', $table)),
             $table
         );
     }
@@ -127,7 +127,7 @@ class SQLiteGrammar extends Grammar
             .'group_concat("to") as foreign_columns, on_update, on_delete '
             .'from (select * from pragma_foreign_key_list(%s) order by id desc, seq) '
             .'group by id, "table", on_update, on_delete',
-            $this->wrap(str_replace('.', '__', $table))
+            $this->quoteString(str_replace('.', '__', $table))
         );
     }
 
