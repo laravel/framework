@@ -32,6 +32,34 @@ if (! function_exists('append_config')) {
     }
 }
 
+if (! function_exists('arr')) {
+    /**
+     * Get a new arrayable object from the given value.
+     *
+     * @param  mixed|null  $value
+     * @return \Illuminate\Support\Arrayable|mixed
+     */
+    function arr($value = null)
+    {
+        if (func_num_args() === 0) {
+            return new class
+            {
+                public function __call($method, $parameters)
+                {
+                    return Arr::$method(...$parameters);
+                }
+
+                public function __toString()
+                {
+                    return '';
+                }
+            };
+        }
+
+        return Arr::of($value);
+    }
+}
+
 if (! function_exists('blank')) {
     /**
      * Determine if the given value is "blank".

@@ -593,6 +593,26 @@ class SupportHelpersTest extends TestCase
         $this->assertSame((string) $strAccessor, '');
     }
 
+    public function testArr()
+    {
+        $arrayable = arr(['foo' => 'bar']);
+
+        $this->assertInstanceOf(ArrayAccess::class, $arrayable);
+        $this->assertSame('bar', $arrayable['foo']);
+
+        $arrayable = arr(null);
+        $this->assertInstanceOf(ArrayAccess::class, $arrayable);
+        $this->assertTrue($arrayable->isEmpty());
+
+        $arrAccessor = arr();
+        $this->assertTrue((new ReflectionClass($arrAccessor))->isAnonymous());
+        $this->assertSame($arrAccessor->get(['foo' => 'bar'], 'foo'), 'bar');
+
+        $arrAccessor = arr();
+        $this->assertTrue((new ReflectionClass($arrAccessor))->isAnonymous());
+        $this->assertSame($arrAccessor->get(['foo' => 'bar'], 'baz', 'default'), 'default');
+    }
+
     public function testTap()
     {
         $object = (object) ['id' => 1];
