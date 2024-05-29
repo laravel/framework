@@ -184,6 +184,13 @@ trait HasAttributes
     public static $encrypter;
 
     /**
+     * The cache of casted attribute values.
+     *
+     * @var array
+     */
+    protected $castedAttributeCache = [];
+
+    /**
      * Initialize the trait.
      *
      * @return void
@@ -1007,6 +1014,8 @@ trait HasAttributes
      */
     public function setAttribute($key, $value)
     {
+        unset($this->castedAttributeCache[$key]);
+
         // First we will check for the presence of a mutator for the set operation
         // which simply lets the developers tweak the attribute as it is set on
         // this model, such as "json_encoding" a listing of data for storage.
@@ -1170,6 +1179,8 @@ trait HasAttributes
             ? $this->castAttributeAsEncryptedString($key, $value)
             : $value;
 
+        unset($this->castedAttributeCache[$key]);
+
         if ($this->isClassCastable($key)) {
             unset($this->classCastCache[$key]);
         }
@@ -1186,6 +1197,7 @@ trait HasAttributes
      */
     protected function setClassCastableAttribute($key, $value)
     {
+        unset($this->castedAttributeCache[$key]);
         $caster = $this->resolveCasterClass($key);
 
         $this->attributes = array_replace(
@@ -1224,6 +1236,8 @@ trait HasAttributes
                 $enumClass, $this->getEnumCaseFromValue($enumClass, $value)
             );
         }
+
+        unset($this->castedAttributeCache[$key]);
     }
 
     /**
@@ -1903,6 +1917,7 @@ trait HasAttributes
 
         $this->classCastCache = [];
         $this->attributeCastCache = [];
+        $this->castedAttributeCache = [];
 
         return $this;
     }
@@ -2055,7 +2070,7 @@ trait HasAttributes
      */
     public function discardChanges()
     {
-        [$this->attributes, $this->changes] = [$this->original, []];
+        [$this->attributes, $this->changes, $this->castedAttributeCache] = [$this->original, [], []];
 
         return $this;
     }
@@ -2209,6 +2224,10 @@ trait HasAttributes
             return $this->mutateAttributeMarkedAttribute($key, $value);
         }
 
+        if (isset($this->castedAttributeCache[$key])) {
+            return $this->castedAttributeCache[$key];
+        }
+
         // If the attribute exists within the cast array, we will convert it to
         // an appropriate native PHP type dependent upon the associated value
         // given with the key in the pair. Dayle made this comment line up.
@@ -2220,7 +2239,7 @@ trait HasAttributes
                 $this->throwMissingAttributeExceptionIfApplicable($key);
             }
 
-            return $this->castAttribute($key, $value);
+            return $this->castedAttributeCache[$key] = $this->castAttribute($key, $value);
         }
 
         // If the attribute is listed as a date, we will convert it to a DateTime
@@ -2228,10 +2247,10 @@ trait HasAttributes
         // date fields without having to create a mutator for each property.
         if ($value !== null
             && \in_array($key, $this->getDates(), false)) {
-            return $this->asDateTime($value);
+            return $this->castedAttributeCache[$key] = $this->asDateTime($value);
         }
 
-        return $value;
+        return $this->castedAttributeCache[$key] = $value;
     }
 
     /**
