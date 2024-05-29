@@ -622,7 +622,7 @@ class SupportStrTest extends TestCase
     {
         $this->assertSame('laravel-php-framework', Str::kebab('LaravelPhpFramework'));
         $this->assertSame('laravel-php-framework', Str::kebab('Laravel Php Framework'));
-        $this->assertSame('laravel❤-php-framework', Str::kebab('Laravel ❤ Php Framework'));
+        $this->assertSame('laravel-❤-php-framework', Str::kebab('Laravel ❤ Php Framework'));
         $this->assertSame('', Str::kebab(''));
     }
 
@@ -855,7 +855,9 @@ class SupportStrTest extends TestCase
         $this->assertSame('foo-bar', Str::snake('foo-bar'));
         $this->assertSame('foo-_bar', Str::snake('Foo-Bar'));
         $this->assertSame('foo__bar', Str::snake('Foo_Bar'));
-        $this->assertSame('żółtałódka', Str::snake('ŻółtaŁódka'));
+
+        $this->assertSame('żółta_łódka', Str::snake('ŻółtaŁódka'));
+        $this->assertSame('öffentliche_überraschungen', Str::snake('ÖffentlicheÜberraschungen'));
     }
 
     public function testTrim()

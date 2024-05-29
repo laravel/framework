@@ -1410,11 +1410,8 @@ class Str
             return static::$snakeCache[$key][$delimiter];
         }
 
-        if (! ctype_lower($value)) {
-            $value = preg_replace('/\s+/u', '', ucwords($value));
-
-            $value = static::lower(preg_replace('/(.)(?=[A-Z])/u', '$1'.$delimiter, $value));
-        }
+        $lowered = static::lower(implode(' ', static::ucsplit($value)));
+        $value = implode($delimiter, array_filter(explode(' ', $lowered)));
 
         return static::$snakeCache[$key][$delimiter] = $value;
     }

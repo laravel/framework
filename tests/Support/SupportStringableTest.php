@@ -984,7 +984,9 @@ class SupportStringableTest extends TestCase
         $this->assertSame('foo-bar', (string) $this->stringable('foo-bar')->snake());
         $this->assertSame('foo-_bar', (string) $this->stringable('Foo-Bar')->snake());
         $this->assertSame('foo__bar', (string) $this->stringable('Foo_Bar')->snake());
-        $this->assertSame('żółtałódka', (string) $this->stringable('ŻółtaŁódka')->snake());
+
+        $this->assertSame('żółta_łódka', (string) $this->stringable('ŻółtaŁódka')->snake());
+        $this->assertSame('öffentliche_überraschungen', (string) $this->stringable('ÖffentlicheÜberraschungen')->snake());
     }
 
     public function testStudly()
