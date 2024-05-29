@@ -4,6 +4,7 @@ namespace Illuminate\Database\Eloquent\Relations\Concerns;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\RelationNotFoundException;
+use Illuminate\Support\Str;
 
 trait SupportsInverseRelations
 {
@@ -22,13 +23,15 @@ trait SupportsInverseRelations
     /**
      * Links the related models back to the parent after the query has run.
      *
-     * @param  string  $relation
+     * @param  string|null  $relation
      * @return $this
      */
-    public function inverse(string $relation)
+    public function inverse(?string $relation = null)
     {
-        if (! $this->getModel()->isRelation($relation)) {
-            throw RelationNotFoundException::make($this->getModel(), $relation);
+        $relation ??= $this->guessInverseRelation();
+
+        if (! $relation || ! $this->getModel()->isRelation($relation)) {
+            throw RelationNotFoundException::make($this->getModel(), $relation ?: 'null');
         }
 
         if ($this->inverseRelationship === null && $relation) {
@@ -57,6 +60,37 @@ trait SupportsInverseRelations
     }
 
     /**
+     * Gets possible inverse relations for the parent model.
+     *
+     * @return array<non-empty-string>
+     */
+    protected function getPossibleInverseRelations(): array
+    {
+        return collect([
+            method_exists($this, 'getMorphType') ? Str::beforeLast($this->getMorphType(), '_type') : null,
+            Str::camel(Str::beforeLast($this->getForeignKeyName(), $this->getParent()->getKeyName())),
+            Str::camel(Str::beforeLast($this->getParent()->getForeignKey(), $this->getParent()->getKeyName())),
+            Str::camel(class_basename($this->getParent())),
+            'owner',
+            get_class($this->getParent()) === get_class($this->getModel()) ? 'parent' : null,
+        ])->filter()->unique()->values()->all();
+    }
+
+    /**
+     * Guesses the name of the inverse relationship.
+     *
+     * @return string|null
+     */
+    protected function guessInverseRelation(): string|null
+    {
+        return collect($this->getPossibleInverseRelations())
+            ->filter()
+            ->firstWhere(fn ($relation) => $this->getModel()->isRelation($relation));
+    }
+
+    /**
+     * Sets the inverse relation on all models in a collection.
+     *
      * @param  \Illuminate\Database\Eloquent\Collection  $models
      * @param  \Illuminate\Database\Eloquent\Model|null  $parent
      * @return \Illuminate\Database\Eloquent\Collection
@@ -73,6 +107,8 @@ trait SupportsInverseRelations
     }
 
     /**
+     * Sets the inverse relation on a model.
+     *
      * @param  \Illuminate\Database\Eloquent\Model  $model
      * @param  \Illuminate\Database\Eloquent\Model|null  $parent
      * @return \Illuminate\Database\Eloquent\Model
