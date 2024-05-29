@@ -1604,9 +1604,15 @@ class Blueprint
             ? substr_replace($this->table, '.'.$this->prefix, strrpos($this->table, '.'), 1)
             : $this->prefix.$this->table;
 
-        $index = strtolower($table.'_'.implode('_', $columns).'_'.$type);
+        $indexSegment = str_replace(
+            ['-', '.'], '_', strtolower($table.'_'.implode('_', $columns))
+        );
 
-        return str_replace(['-', '.'], '_', $index);
+        $type = strtolower($type);
+
+        return Builder::$useHashedDefaultIndexNames
+            ? $type.'_'.md5($indexSegment)
+            : $indexSegment.'_'.$type;
     }
 
     /**

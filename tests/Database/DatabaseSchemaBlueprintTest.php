@@ -19,6 +19,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
     {
         m::close();
         Builder::$defaultMorphKeyType = 'int';
+        Builder::$useHashedDefaultIndexNames = false;
     }
 
     public function testToSqlRunsCommandsFromBlueprint()
@@ -69,6 +70,46 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $this->assertSame('prefix_geo_coordinates_spatialindex', $commands[0]->index);
     }
 
+    public function testHashedIndexDefaultNames()
+    {
+        Builder::useHashedDefaultIndexNames();
+
+        $blueprint = new Blueprint('users');
+        $blueprint->unique(['foo', 'bar']);
+        $commands = $blueprint->getCommands();
+        $this->assertSame('unique_73b4eae4eaf368bb4273fe6a72781ec0', $commands[0]->index);
+
+        $blueprint = new Blueprint('users');
+        $blueprint->index('foo');
+        $commands = $blueprint->getCommands();
+        $this->assertSame('index_fe4dc6f046ca6fdb056baf72b1daf3f6', $commands[0]->index);
+
+        $blueprint = new Blueprint('geo');
+        $blueprint->spatialIndex('coordinates');
+        $commands = $blueprint->getCommands();
+        $this->assertSame('spatialindex_5d3776dbc01157dca4ed6396e9e3d140', $commands[0]->index);
+    }
+
+    public function testHashedIndexDefaultNamesWhenPrefixSupplied()
+    {
+        Builder::useHashedDefaultIndexNames();
+
+        $blueprint = new Blueprint('users', null, 'prefix_');
+        $blueprint->unique(['foo', 'bar']);
+        $commands = $blueprint->getCommands();
+        $this->assertSame('unique_ef725794d0b5afca65529e90099367e8', $commands[0]->index);
+
+        $blueprint = new Blueprint('users', null, 'prefix_');
+        $blueprint->index('foo');
+        $commands = $blueprint->getCommands();
+        $this->assertSame('index_07653c2433f97f90795907969ba0bc90', $commands[0]->index);
+
+        $blueprint = new Blueprint('geo', null, 'prefix_');
+        $blueprint->spatialIndex('coordinates');
+        $commands = $blueprint->getCommands();
+        $this->assertSame('spatialindex_1a38d6f13d00a4abed526c1cb8d370bb', $commands[0]->index);
+    }
+
     public function testDropIndexDefaultNames()
     {
         $blueprint = new Blueprint('users');
@@ -103,6 +144,46 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $blueprint->dropSpatialIndex(['coordinates']);
         $commands = $blueprint->getCommands();
         $this->assertSame('prefix_geo_coordinates_spatialindex', $commands[0]->index);
+    }
+
+    public function testDropHashedIndexDefaultNames()
+    {
+        Builder::useHashedDefaultIndexNames();
+
+        $blueprint = new Blueprint('users');
+        $blueprint->dropUnique(['foo', 'bar']);
+        $commands = $blueprint->getCommands();
+        $this->assertSame('unique_73b4eae4eaf368bb4273fe6a72781ec0', $commands[0]->index);
+
+        $blueprint = new Blueprint('users');
+        $blueprint->dropIndex(['foo']);
+        $commands = $blueprint->getCommands();
+        $this->assertSame('index_fe4dc6f046ca6fdb056baf72b1daf3f6', $commands[0]->index);
+
+        $blueprint = new Blueprint('geo');
+        $blueprint->dropSpatialIndex(['coordinates']);
+        $commands = $blueprint->getCommands();
+        $this->assertSame('spatialindex_5d3776dbc01157dca4ed6396e9e3d140', $commands[0]->index);
+    }
+
+    public function testDropHashedIndexDefaultNamesWhenPrefixSupplied()
+    {
+        Builder::useHashedDefaultIndexNames();
+
+        $blueprint = new Blueprint('users', null, 'prefix_');
+        $blueprint->dropUnique(['foo', 'bar']);
+        $commands = $blueprint->getCommands();
+        $this->assertSame('unique_ef725794d0b5afca65529e90099367e8', $commands[0]->index);
+
+        $blueprint = new Blueprint('users', null, 'prefix_');
+        $blueprint->dropIndex(['foo']);
+        $commands = $blueprint->getCommands();
+        $this->assertSame('index_07653c2433f97f90795907969ba0bc90', $commands[0]->index);
+
+        $blueprint = new Blueprint('geo', null, 'prefix_');
+        $blueprint->dropSpatialIndex(['coordinates']);
+        $commands = $blueprint->getCommands();
+        $this->assertSame('spatialindex_1a38d6f13d00a4abed526c1cb8d370bb', $commands[0]->index);
     }
 
     public function testDefaultCurrentDateTime()

@@ -49,6 +49,13 @@ class Builder
     public static $defaultMorphKeyType = 'int';
 
     /**
+     * The flag to indicate that generated indexes should be hashed.
+     *
+     * @var bool
+     */
+    public static $useHashedDefaultIndexNames = false;
+
+    /**
      * Create a new database Schema manager.
      *
      * @param  \Illuminate\Database\Connection  $connection
@@ -106,6 +113,26 @@ class Builder
     public static function morphUsingUlids()
     {
         return static::defaultMorphKeyType('ulid');
+    }
+
+    /**
+     * Indicate that hash should be used for generated indexes.
+     *
+     * @return void
+     */
+    public static function useHashedDefaultIndexNames()
+    {
+        static::$useHashedDefaultIndexNames = true;
+    }
+
+    /**
+     * Indicates that plain names should be used for generated indexes.
+     *
+     * @return void
+     */
+    public static function usePlainDefaultIndexNames()
+    {
+        static::$useHashedDefaultIndexNames = false;
     }
 
     /**
