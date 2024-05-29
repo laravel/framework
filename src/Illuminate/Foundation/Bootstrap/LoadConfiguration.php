@@ -2,7 +2,6 @@
 
 namespace Illuminate\Foundation\Bootstrap;
 
-use Exception;
 use Illuminate\Config\Repository;
 use Illuminate\Contracts\Config\Repository as RepositoryContract;
 use Illuminate\Contracts\Foundation\Application;
@@ -61,10 +60,6 @@ class LoadConfiguration
     protected function loadConfigurationFiles(Application $app, RepositoryContract $repository)
     {
         $files = $this->getConfigurationFiles($app);
-
-        // if (! isset($files['app'])) {
-        //     throw new Exception('Unable to load the "app" configuration file.');
-        // }
 
         $base = $this->getBaseConfiguration();
 
