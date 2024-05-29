@@ -19,8 +19,19 @@ class JoinPathsHelperTest extends TestCase
 
     public static function unixDataProvider()
     {
-        yield ['app/Http/Kernel.php', join_paths('app', 'Http', 'Kernel.php')];
-        yield ['app/Http/Kernel.php', join_paths('app', '', 'Http', 'Kernel.php')];
+        yield ['very/Basic/Functionality.php', join_paths('very', 'Basic', 'Functionality.php')];
+        yield ['segments/get/ltrimed/by_directory/separator.php', join_paths('segments', '/get/ltrimed', '/by_directory/separator.php')];
+        yield ['only/\\os_separator\\/\\get_ltrimmed.php', join_paths('only', '\\os_separator\\', '\\get_ltrimmed.php')];
+        yield ['/base_path//does_not/get_trimmed.php', join_paths('/base_path/', '/does_not', '/get_trimmed.php')];
+        yield ['Empty/1/Segments/00/Get_removed.php', join_paths('Empty', '', '0', null, 0, false, [], '1', 'Segments', '00', 'Get_removed.php')];
+        yield ['', join_paths(null, null, '')];
+        yield ['app/objecty', join_paths('app', new class()
+        {
+            public function __toString()
+            {
+                return 'objecty';
+            }
+        })];
     }
 
     #[RequiresOperatingSystem('Windows')]
@@ -32,7 +43,18 @@ class JoinPathsHelperTest extends TestCase
 
     public static function windowsDataProvider()
     {
-        yield ['app\Http\Kernel.php', join_paths('app', 'Http', 'Kernel.php')];
-        yield ['app\Http\Kernel.php', join_paths('app', '', 'Http', 'Kernel.php')];
+        yield ['app\Basic\Functionality.php', join_paths('app', 'Basic', 'Functionality.php')];
+        yield ['segments\get\ltrimed\by_directory\separator.php', join_paths('segments', '\get\ltrimed', '\by_directory\separator.php')];
+        yield ['only\\/os_separator/\\/get_ltrimmed.php', join_paths('only', '/os_separator/', '/get_ltrimmed.php')];
+        yield ['\base_path\\\\does_not\get_trimmed.php', join_paths('\\base_path\\', '\does_not', '\get_trimmed.php')];
+        yield ['Empty\1\Segments\00\Get_removed.php', join_paths('Empty', '', '0', null, 0, false, [], '1', 'Segments', '00', 'Get_removed.php')];
+        yield ['', join_paths(null, null, '')];
+        yield ['app\\objecty', join_paths('app', new class()
+        {
+            public function __toString()
+            {
+                return 'objecty';
+            }
+        })];
     }
 }
