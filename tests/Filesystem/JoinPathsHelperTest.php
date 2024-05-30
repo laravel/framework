@@ -23,13 +23,21 @@ class JoinPathsHelperTest extends TestCase
         yield ['segments/get/ltrimed/by_directory/separator.php', join_paths('segments', '/get/ltrimed', '/by_directory/separator.php')];
         yield ['only/\\os_separator\\/\\get_ltrimmed.php', join_paths('only', '\\os_separator\\', '\\get_ltrimmed.php')];
         yield ['/base_path//does_not/get_trimmed.php', join_paths('/base_path/', '/does_not', '/get_trimmed.php')];
-        yield ['Empty/1/Segments/00/Get_removed.php', join_paths('Empty', '', '0', null, 0, false, [], '1', 'Segments', '00', 'Get_removed.php')];
+        yield ['Empty/0/1/Segments/00/Get_removed.php', join_paths('Empty', '', '0', null, 0, false, [], '1', 'Segments', '00', 'Get_removed.php')];
         yield ['', join_paths(null, null, '')];
+        yield ['1/2/3', join_paths(1, 0, 2, 3)];
         yield ['app/objecty', join_paths('app', new class()
         {
             public function __toString()
             {
                 return 'objecty';
+            }
+        })];
+        yield ['app/0', join_paths('app', new class()
+        {
+            public function __toString()
+            {
+                return '0';
             }
         })];
     }
@@ -47,13 +55,21 @@ class JoinPathsHelperTest extends TestCase
         yield ['segments\get\ltrimed\by_directory\separator.php', join_paths('segments', '\get\ltrimed', '\by_directory\separator.php')];
         yield ['only\\/os_separator/\\/get_ltrimmed.php', join_paths('only', '/os_separator/', '/get_ltrimmed.php')];
         yield ['\base_path\\\\does_not\get_trimmed.php', join_paths('\\base_path\\', '\does_not', '\get_trimmed.php')];
-        yield ['Empty\1\Segments\00\Get_removed.php', join_paths('Empty', '', '0', null, 0, false, [], '1', 'Segments', '00', 'Get_removed.php')];
+        yield ['Empty\0\1\Segments\00\Get_removed.php', join_paths('Empty', '', '0', null, 0, false, [], '1', 'Segments', '00', 'Get_removed.php')];
         yield ['', join_paths(null, null, '')];
+        yield ['1\2\3', join_paths(1, 2, 3)];
         yield ['app\\objecty', join_paths('app', new class()
         {
             public function __toString()
             {
                 return 'objecty';
+            }
+        })];
+        yield ['app\\0', join_paths('app', new class()
+        {
+            public function __toString()
+            {
+                return '0';
             }
         })];
     }
