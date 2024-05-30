@@ -133,6 +133,6 @@ class Renderer
 
         return '<script type="text/javascript">'
             .file_get_contents(static::DIST.'scripts.js')
-            .'</script>' . $viteJsAutoRefresh;
+            .'</script>'.$viteJsAutoRefresh;
     }
 }
