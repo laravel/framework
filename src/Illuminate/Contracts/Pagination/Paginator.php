@@ -65,6 +65,14 @@ interface Paginator
     public function lastItem();
 
     /**
+     * Transform each item in the slice of items using a callback.
+     *
+     * @param  callable  $callback
+     * @return $this
+     */
+    public function through(callable $callback);
+
+    /**
      * Determine how many items are being shown per page.
      *
      * @return int
