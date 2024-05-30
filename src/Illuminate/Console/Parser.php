@@ -112,7 +112,6 @@ class Parser
             $token = $matches[1];
         }
 
-
         switch (true) {
             case str_ends_with($token, '='):
                 return new InputOption(trim($token, '='), $shortcut, InputOption::VALUE_OPTIONAL, $description);
@@ -122,6 +121,8 @@ class Parser
                 return new InputOption(trim($token, '=~'), null, InputOption::VALUE_NEGATABLE, $description);
             case preg_match('/(.+)\=\*(.+)/', $token, $matches):
                 return new InputOption($matches[1], $shortcut, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, $description, preg_split('/,\s?/', $matches[2]));
+            case preg_match('/(.+)\=\~(.+)/', $token, $matches):
+                return new InputOption($matches[1], null, InputOption::VALUE_NEGATABLE, $description, filter_var($matches[2], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE));
             case preg_match('/(.+)\=(.+)/', $token, $matches):
                 return new InputOption($matches[1], $shortcut, InputOption::VALUE_OPTIONAL, $description, $matches[2]);
             default:

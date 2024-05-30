@@ -126,6 +126,59 @@ class ConsoleParserTest extends TestCase
         $this->assertTrue($results[2][0]->isArray());
     }
 
+    public function testNegatableDefaultValue()
+    {
+        $results = Parser::parse('command:name {--option=~}');
+        $this->assertSame('command:name', $results[0]);
+        $this->assertSame('option', $results[2][0]->getName());
+        $this->assertNull($results[2][0]->getDefault());
+        $this->assertTrue($results[2][0]->isNegatable());
+
+        $results = Parser::parse('command:name {--option=~true}');
+
+        $this->assertSame('command:name', $results[0]);
+        $this->assertSame('option', $results[2][0]->getName());
+        $this->assertTrue($results[2][0]->getDefault());
+        $this->assertTrue($results[2][0]->isNegatable());
+
+        $results = Parser::parse('command:name {--option=~false}');
+
+        $this->assertSame('command:name', $results[0]);
+        $this->assertSame('option', $results[2][0]->getName());
+        $this->assertFalse($results[2][0]->getDefault());
+        $this->assertTrue($results[2][0]->isNegatable());
+
+        $results = Parser::parse('command:name {--option=~true : Enable/disable option.}');
+
+        $this->assertSame('command:name', $results[0]);
+        $this->assertSame('option', $results[2][0]->getName());
+        $this->assertSame('Enable/disable option.', $results[2][0]->getDescription());
+        $this->assertTrue($results[2][0]->getDefault());
+        $this->assertTrue($results[2][0]->isNegatable());
+
+        $results = Parser::parse('command:name {--option=~invalid}');
+
+        $this->assertSame('command:name', $results[0]);
+        $this->assertSame('option', $results[2][0]->getName());
+        $this->assertNull($results[2][0]->getDefault());
+        $this->assertTrue($results[2][0]->isNegatable());
+
+        $results = Parser::parse('command:name {--option=~FALSE}');
+
+        $this->assertSame('command:name', $results[0]);
+        $this->assertSame('option', $results[2][0]->getName());
+        $this->assertFalse($results[2][0]->getDefault());
+        $this->assertTrue($results[2][0]->isNegatable());
+
+        $results = Parser::parse('command:name {--option=~TRUE}');
+        $this->assertTrue($results[2][0]->getDefault());
+        $this->assertTrue($results[2][0]->isNegatable());
+
+        $results = Parser::parse('command:name {--option=~tRuE}');
+        $this->assertTrue($results[2][0]->getDefault());
+        $this->assertTrue($results[2][0]->isNegatable());
+    }
+
     public function testShortcutsAreIgnoredWithNegatableOptions()
     {
         $results = Parser::parse('command:name {--o|option=~}');
