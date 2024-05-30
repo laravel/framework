@@ -1468,6 +1468,37 @@ class TestResponse implements ArrayAccess
     }
 
     /**
+     * Assert that the CSV content has the rows in given order.
+     * Each row should be an array of values in order as expected in the CSV.
+     * The number of asserted rows must match the CSV content row count.
+     *
+     * @param string $content
+     * @param array<array<int,string>> $rows
+     * @param bool $withHeaderRow
+     * @param string $csvDelimiter
+     * @return $this
+     */
+    public function assertCsvContentHasRowsInOrder($content, $rows, $withHeaderRow = false, $csvDelimiter = ';')
+    {
+        $temp = tmpfile();
+        fwrite($temp, $content);
+        rewind($temp);
+        if(!$withHeaderRow) fgetcsv($temp, 0, $csvDelimiter); // skip header row
+        foreach ($rows as $expectedRow) {
+            $csvRow = fgetcsv($temp, 0, $csvDelimiter);
+            PHPUnit::assertTrue($csvRow !== FALSE, 'CSV content has less lines then expected');
+            $colIdx = 0;
+            foreach ($expectedRow as $expectedValue) {
+                PHPUnit::assertEquals($expectedValue, $csvRow[$colIdx]);
+                $colIdx++;
+            }
+        }
+        PHPUnit::assertFalse(fgetcsv($temp, 0, $csvDelimiter) !== FALSE, 'CSV content has more lines then expected');
+        fclose($temp);
+        return $this;
+    }
+
+    /**
      * Get the current session store.
      *
      * @return \Illuminate\Session\Store

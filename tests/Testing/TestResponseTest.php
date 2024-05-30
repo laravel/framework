@@ -2435,6 +2435,50 @@ class TestResponseTest extends TestCase
         });
     }
 
+    public function testAssertCsvContentHasRowsInOrder()
+    {
+        $this->expectException(AssertionFailedError::class);
+
+        $response = TestResponse::fromBaseResponse(new Response());
+        $response->assertCsvContentHasRowsInOrder('id;name\n1;test1\n2;test2', [
+            [1, 'test1'],
+            [2, 'test2'],
+        ]);
+    }
+
+    public function testAssertCsvContentHasRowsInOrderHasNotMatchingRows()
+    {
+        $this->expectException(AssertionFailedError::class);
+
+        $response = TestResponse::fromBaseResponse(new Response());
+        $response->assertCsvContentHasRowsInOrder('id;name\n1;test1\n2;test2', [
+            [1, 'test3'],
+            [2, 'test3'],
+        ]);
+    }
+
+    public function testAssertCsvContentHasRowsInOrderHasLessRows()
+    {
+        $this->expectException(AssertionFailedError::class);
+
+        $response = TestResponse::fromBaseResponse(new Response());
+        $response->assertCsvContentHasRowsInOrder('id;name\n1;test1\n2;test2', [
+            [1, 'test1'],
+        ]);
+    }
+
+    public function testAssertCsvContentHasRowsInOrderHasTooManyRows()
+    {
+        $this->expectException(AssertionFailedError::class);
+
+        $response = TestResponse::fromBaseResponse(new Response());
+        $response->assertCsvContentHasRowsInOrder('id;name\n1;test1\n2;test2', [
+            [1, 'test1'],
+            [1, 'test1'],
+            [1, 'test1'],
+        ]);
+    }
+
     public function testGetEncryptedCookie()
     {
         $container = Container::getInstance();
