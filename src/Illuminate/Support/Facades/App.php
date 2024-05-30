@@ -62,6 +62,8 @@ namespace Illuminate\Support\Facades;
  * @method static \Symfony\Component\HttpFoundation\Response handle(\Symfony\Component\HttpFoundation\Request $request, int $type = 1, bool $catch = true)
  * @method static void handleRequest(\Illuminate\Http\Request $request)
  * @method static int handleCommand(\Symfony\Component\Console\Input\InputInterface $input)
+ * @method static bool shouldMergeFrameworkConfiguration()
+ * @method static \Illuminate\Foundation\Application dontMergeFrameworkConfiguration()
  * @method static bool shouldSkipMiddleware()
  * @method static string getCachedServicesPath()
  * @method static string getCachedPackagesPath()
