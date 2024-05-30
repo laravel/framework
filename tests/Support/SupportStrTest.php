@@ -1526,6 +1526,31 @@ class SupportStrTest extends TestCase
         $this->assertSame('foo', Str::fromBase64(base64_encode('foo')));
         $this->assertSame('foobar', Str::fromBase64(base64_encode('foobar'), true));
     }
+
+    public function testIsCase()
+    {
+        $this->assertTrue(Str::isCase("HELLOWORLD", "upper"));
+        $this->assertFalse(Str::isCase("HelloWorld", "upper"));
+        $this->assertFalse(Str::isCase("HelloWorld", "UPPER"));
+
+        $this->assertTrue(Str::isCase("helloworld", "lower"));
+        $this->assertFalse(Str::isCase("HelloWorld", "lower"));
+
+        $this->assertTrue(Str::isCase("hello-world", "kebab"));
+        $this->assertFalse(Str::isCase("helloWorld", "kebab"));
+
+        $this->assertTrue(Str::isCase("hello_world", "snake"));
+        $this->assertFalse(Str::isCase("helloWorld", "snake"));
+
+        $this->assertTrue(Str::isCase("Hello World", "title"));
+        $this->assertFalse(Str::isCase("hello world", "title"));
+
+        $this->assertTrue(Str::isCase("helloWorld", "camel"));
+        $this->assertFalse(Str::isCase("hello_world", "camel"));
+
+        $this->assertTrue(Str::isCase("HelloWorld", "studly"));
+        $this->assertFalse(Str::isCase("hello_world", "studly"));
+    }
 }
 
 class StringableObjectStub
