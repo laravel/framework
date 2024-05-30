@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Support;
 
 use Exception;
 use Illuminate\Support\Str;
+use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\UuidInterface;
@@ -1550,6 +1551,11 @@ class SupportStrTest extends TestCase
 
         $this->assertTrue(Str::isCase("HelloWorld", "studly"));
         $this->assertFalse(Str::isCase("hello_world", "studly"));
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage("Invalid case type: camell");
+
+        Str::isCase("HelloWorld", "camell");
     }
 }
 
