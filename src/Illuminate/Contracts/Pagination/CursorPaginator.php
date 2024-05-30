@@ -58,6 +58,14 @@ interface CursorPaginator
     public function items();
 
     /**
+     * Transform each item in the slice of items using a callback.
+     *
+     * @param  callable  $callback
+     * @return $this
+     */
+    public function through(callable $callback);
+
+    /**
      * Get the "cursor" of the previous set of items.
      *
      * @return \Illuminate\Pagination\Cursor|null
