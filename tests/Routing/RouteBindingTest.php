@@ -6,8 +6,8 @@ use Illuminate\Container\Container;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Routing\RouteBinding;
 use Illuminate\Routing\Route;
+use Illuminate\Routing\RouteBinding;
 use PHPUnit\Framework\TestCase;
 
 class RouteBindingTest extends TestCase
