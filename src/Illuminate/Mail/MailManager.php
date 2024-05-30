@@ -303,7 +303,7 @@ class MailManager implements FactoryContract
     protected function createResendTransport(array $config)
     {
         return new ResendTransport(
-            Resend::client($this->app['config']->get('services.resend.key')),
+            Resend::client($config['key'] ?? $this->app['config']->get('services.resend.key')),
         );
     }
 

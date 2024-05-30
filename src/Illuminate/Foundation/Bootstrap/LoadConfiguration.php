@@ -2,7 +2,6 @@
 
 namespace Illuminate\Foundation\Bootstrap;
 
-use Exception;
 use Illuminate\Config\Repository;
 use Illuminate\Contracts\Config\Repository as RepositoryContract;
 use Illuminate\Contracts\Foundation\Application;
@@ -62,10 +61,6 @@ class LoadConfiguration
     {
         $files = $this->getConfigurationFiles($app);
 
-        // if (! isset($files['app'])) {
-        //     throw new Exception('Unable to load the "app" configuration file.');
-        // }
-
         $shouldMerge = method_exists($app, 'shouldMergeFrameworkConfiguration')
             ? $app->shouldMergeFrameworkConfiguration()
             : true;
@@ -73,6 +68,10 @@ class LoadConfiguration
         $base = $shouldMerge
             ? $this->getBaseConfiguration()
             : [];
+
+        foreach (array_diff(array_keys($base), array_keys($files)) as $name => $config) {
+            $repository->set($name, $config);
+        }
 
         foreach ($files as $name => $path) {
             $base = $this->loadConfigurationFile($repository, $name, $path, $base);
