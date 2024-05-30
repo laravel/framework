@@ -61,7 +61,13 @@ class LoadConfiguration
     {
         $files = $this->getConfigurationFiles($app);
 
-        $base = $this->getBaseConfiguration();
+        $shouldMerge = method_exists($app, 'shouldMergeFrameworkConfiguration')
+            ? $app->shouldMergeFrameworkConfiguration()
+            : true;
+
+        $base = $shouldMerge
+            ? $this->getBaseConfiguration()
+            : [];
 
         foreach (array_diff(array_keys($base), array_keys($files)) as $name => $config) {
             $repository->set($name, $config);
