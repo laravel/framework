@@ -1907,8 +1907,8 @@ class Str
     }
 
     /**
-     * @param string $value
-     * @param string $case
+     * @param  string  $value
+     * @param  string  $case
      * @return bool
      */
     public static function isCase($value, $case){
