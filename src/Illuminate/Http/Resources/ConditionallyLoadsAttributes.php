@@ -266,7 +266,7 @@ trait ConditionallyLoadsAttributes
             return value($default);
         }
 
-        $loadedValue = data_get($this->resource, $relationship, $default);
+        $loadedValue = data_get($this->resource, $relationship);
 
         if (func_num_args() === 1) {
             return $loadedValue;
