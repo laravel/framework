@@ -4,6 +4,7 @@ namespace Illuminate\Support;
 
 use Closure;
 use Illuminate\Support\Traits\Macroable;
+use InvalidArgumentException;
 use JsonException;
 use League\CommonMark\Environment\Environment;
 use League\CommonMark\Extension\GithubFlavoredMarkdownExtension;
@@ -1903,5 +1904,31 @@ class Str
         static::$snakeCache = [];
         static::$camelCache = [];
         static::$studlyCache = [];
+    }
+
+    /**
+     * @param string $value
+     * @param string $case
+     * @return bool
+     */
+    public static function isCase($value, $case){
+        $caseToMethodMap = [
+            'upper' => 'upper',
+            'lower' => 'lower',
+            'title' => 'title',
+            'kebab' => 'kebab',
+            'snake' => 'snake',
+            'camel' => 'camel',
+            'studly' => 'studly',
+        ];
+        
+        $case = static::lower($case);
+
+        if (!array_key_exists($case, $caseToMethodMap)){
+            throw new InvalidArgumentException("Invalid case type: $case");
+        }
+
+        $toCaseValue = call_user_func([self::class, $caseToMethodMap[$case]], $value);
+        return $toCaseValue === $value;
     }
 }
