@@ -159,6 +159,10 @@ class VerifyCsrfToken
             }
         }
 
+        if (! $token && $request->cookie('XSRF-TOKEN')) {
+            $token = $request->cookie('XSRF-TOKEN');
+        }
+
         return $token;
     }
 
