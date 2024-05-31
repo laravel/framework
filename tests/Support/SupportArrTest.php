@@ -109,8 +109,8 @@ class SupportArrTest extends TestCase
     {
         // Test dividing an empty array
         [$keys, $values] = Arr::divide([]);
-        $this->assertEquals([],$keys);
-        $this->assertEquals([],$values);
+        $this->assertEquals([], $keys);
+        $this->assertEquals([], $values);
 
         // Test dividing an array with a single key-value pair
         [$keys, $values] = Arr::divide(['name' => 'Desk']);
