@@ -40,7 +40,7 @@ class ConsoleParserTest extends TestCase
         $this->assertTrue($results[2][0]->acceptValue());
         $this->assertTrue($results[2][0]->isArray());
 
-        $results = Parser::parse('command:name {argument?*} {--option=~}');
+        $results = Parser::parse('command:name {argument?*} {--option=!}');
 
         $this->assertSame('command:name', $results[0]);
         $this->assertSame('argument', $results[1][0]->getName());
@@ -78,7 +78,7 @@ class ConsoleParserTest extends TestCase
 
         $results = Parser::parse('command:name
             {argument?* : The argument description.}
-            {--option=~ : Enable/Disable description.}');
+            {--option=! : Enable/Disable description.}');
 
         $this->assertSame('option', $results[2][0]->getName());
         $this->assertSame('Enable/Disable description.', $results[2][0]->getDescription());
@@ -128,27 +128,27 @@ class ConsoleParserTest extends TestCase
 
     public function testNegatableDefaultValue()
     {
-        $results = Parser::parse('command:name {--option=~}');
+        $results = Parser::parse('command:name {--option=!}');
         $this->assertSame('command:name', $results[0]);
         $this->assertSame('option', $results[2][0]->getName());
         $this->assertNull($results[2][0]->getDefault());
         $this->assertTrue($results[2][0]->isNegatable());
 
-        $results = Parser::parse('command:name {--option=~true}');
+        $results = Parser::parse('command:name {--option=!true}');
 
         $this->assertSame('command:name', $results[0]);
         $this->assertSame('option', $results[2][0]->getName());
         $this->assertTrue($results[2][0]->getDefault());
         $this->assertTrue($results[2][0]->isNegatable());
 
-        $results = Parser::parse('command:name {--option=~false}');
+        $results = Parser::parse('command:name {--option=!false}');
 
         $this->assertSame('command:name', $results[0]);
         $this->assertSame('option', $results[2][0]->getName());
         $this->assertFalse($results[2][0]->getDefault());
         $this->assertTrue($results[2][0]->isNegatable());
 
-        $results = Parser::parse('command:name {--option=~true : Enable/disable option.}');
+        $results = Parser::parse('command:name {--option=!true : Enable/disable option.}');
 
         $this->assertSame('command:name', $results[0]);
         $this->assertSame('option', $results[2][0]->getName());
@@ -156,39 +156,39 @@ class ConsoleParserTest extends TestCase
         $this->assertTrue($results[2][0]->getDefault());
         $this->assertTrue($results[2][0]->isNegatable());
 
-        $results = Parser::parse('command:name {--option=~invalid}');
+        $results = Parser::parse('command:name {--option=!invalid}');
 
         $this->assertSame('command:name', $results[0]);
         $this->assertSame('option', $results[2][0]->getName());
         $this->assertNull($results[2][0]->getDefault());
         $this->assertTrue($results[2][0]->isNegatable());
 
-        $results = Parser::parse('command:name {--option=~FALSE}');
+        $results = Parser::parse('command:name {--option=!FALSE}');
 
         $this->assertSame('command:name', $results[0]);
         $this->assertSame('option', $results[2][0]->getName());
         $this->assertFalse($results[2][0]->getDefault());
         $this->assertTrue($results[2][0]->isNegatable());
 
-        $results = Parser::parse('command:name {--option=~TRUE}');
+        $results = Parser::parse('command:name {--option=!TRUE}');
         $this->assertTrue($results[2][0]->getDefault());
         $this->assertTrue($results[2][0]->isNegatable());
 
-        $results = Parser::parse('command:name {--option=~tRuE}');
+        $results = Parser::parse('command:name {--option=!tRuE}');
         $this->assertTrue($results[2][0]->getDefault());
         $this->assertTrue($results[2][0]->isNegatable());
     }
 
     public function testShortcutsAreIgnoredWithNegatableOptions()
     {
-        $results = Parser::parse('command:name {--o|option=~}');
+        $results = Parser::parse('command:name {--o|option=!}');
 
         $this->assertSame('command:name', $results[0]);
         $this->assertSame('option', $results[2][0]->getName());
         $this->assertNull($results[2][0]->getShortcut(), 'Shortcuts are ignored with negatable options.');
         $this->assertTrue($results[2][0]->isNegatable());
 
-        $results = Parser::parse('command:name {--o|option=~ : Enable/Disable description.}');
+        $results = Parser::parse('command:name {--o|option=! : Enable/Disable description.}');
         $this->assertSame('command:name', $results[0]);
         $this->assertSame('option', $results[2][0]->getName());
         $this->assertSame('Enable/Disable description.', $results[2][0]->getDescription());
