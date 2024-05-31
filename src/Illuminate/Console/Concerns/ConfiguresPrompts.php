@@ -3,6 +3,7 @@
 namespace Illuminate\Console\Concerns;
 
 use Illuminate\Console\PromptValidationException;
+use Illuminate\Support\Arr;
 use Laravel\Prompts\ConfirmPrompt;
 use Laravel\Prompts\MultiSearchPrompt;
 use Laravel\Prompts\MultiSelectPrompt;
@@ -269,6 +270,7 @@ trait ConfiguresPrompts
         }
 
         if ($required === false) {
+            $answers = Arr::wrap($answers);
             return array_is_list($options)
                 ? array_values(array_filter($answers, fn ($value) => $value !== 'None'))
                 : array_filter($answers, fn ($value) => $value !== '');
