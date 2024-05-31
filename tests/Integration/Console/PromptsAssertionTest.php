@@ -7,6 +7,7 @@ use Illuminate\Contracts\Console\Kernel;
 use Orchestra\Testbench\TestCase;
 
 use function Laravel\Prompts\confirm;
+use function Laravel\Prompts\multisearch;
 use function Laravel\Prompts\multiselect;
 use function Laravel\Prompts\password;
 use function Laravel\Prompts\select;
