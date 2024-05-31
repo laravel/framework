@@ -606,6 +606,16 @@ class PostgresGrammar extends Grammar
     }
 
     /**
+     * Get the format for database stored dates.
+     *
+     * @return string
+     */
+    public function getDateFormat()
+    {
+        return 'Y-m-d H:i:s.uP';
+    }
+
+    /**
      * Compile a delete statement with joins or limit into SQL.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
