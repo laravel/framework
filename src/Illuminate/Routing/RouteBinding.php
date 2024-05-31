@@ -83,7 +83,7 @@ class RouteBinding
                 return $callback($value);
             }
 
-            throw (new ModelNotFoundException())->setModel($class);
+            throw (new ModelNotFoundException)->setModel($class);
         };
     }
 }
