@@ -132,12 +132,12 @@ class SupportArrTest extends TestCase
         $this->assertEquals([null, 1], $keys);
         $this->assertEquals(['Null', 'one'], $values);
 
-        // Test dividing an array with array key
+        // Test dividing an array where the keys are arrays
         [$keys, $values] = Arr::divide([['one' => 1, 2 => 'second'], 1 => 'one']);
         $this->assertEquals([0, 1], $keys);
         $this->assertEquals([['one' => 1, 2 => 'second'], 'one'], $values);
 
-        // Test dividing an array with array value
+        // Test dividing an array where the values are arrays
         [$keys, $values] = Arr::divide([null => ['one' => 1, 2 => 'second'], 1 => 'one']);
         $this->assertEquals([null, 1], $keys);
         $this->assertEquals([['one' => 1, 2 => 'second'], 'one'], $values);
