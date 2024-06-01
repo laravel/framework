@@ -1907,9 +1907,12 @@ class Str
     }
 
     /**
+     * Check if the given string matches the specified case type.
+     * 
      * @param  string  $value
      * @param  string  $case
      * @return bool
+     * @throws \InvalidArgumentException if an unsupported case type is provided.
      */
     public static function isCase($value, $case){
         $cases = ['upper', 'lower', 'title', 'kebab', 'snake', 'camel', 'studly'];
