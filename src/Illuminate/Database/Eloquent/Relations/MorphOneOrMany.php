@@ -4,6 +4,7 @@ namespace Illuminate\Database\Eloquent\Relations;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 abstract class MorphOneOrMany extends HasOneOrMany
 {
@@ -139,5 +140,18 @@ abstract class MorphOneOrMany extends HasOneOrMany
     public function getMorphClass()
     {
         return $this->morphClass;
+    }
+
+    /**
+     * Gets possible inverse relations for the parent model.
+     *
+     * @return array<non-empty-string>
+     */
+    protected function getPossibleInverseRelations(): array
+    {
+        return array_unique([
+            Str::beforeLast($this->getMorphType(), '_type'),
+            ...parent::getPossibleInverseRelations(),
+        ]);
     }
 }

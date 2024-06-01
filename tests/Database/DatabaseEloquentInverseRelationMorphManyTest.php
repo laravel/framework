@@ -88,6 +88,36 @@ class DatabaseEloquentInverseRelationMorphManyTest extends TestCase
         }
     }
 
+    public function testMorphManyGuessedInverseRelationIsProperlySetToParentWhenLazyLoaded()
+    {
+        MorphManyInversePostModel::factory()->withComments()->count(3)->create();
+        $posts = MorphManyInversePostModel::all();
+
+        foreach ($posts as $post) {
+            $this->assertFalse($post->relationLoaded('guessedComments'));
+            $comments = $post->guessedComments;
+            foreach ($comments as $comment) {
+                $this->assertTrue($comment->relationLoaded('commentable'));
+                $this->assertSame($post, $comment->commentable);
+            }
+        }
+    }
+
+    public function testMorphManyGuessedInverseRelationIsProperlySetToParentWhenEagerLoaded()
+    {
+        MorphManyInversePostModel::factory()->withComments()->count(3)->create();
+        $posts = MorphManyInversePostModel::with('guessedComments')->get();
+
+        foreach ($posts as $post) {
+            $comments = $post->getRelation('guessedComments');
+
+            foreach ($comments as $comment) {
+                $this->assertTrue($comment->relationLoaded('commentable'));
+                $this->assertSame($post, $comment->commentable);
+            }
+        }
+    }
+
     public function testMorphLatestOfManyInverseRelationIsProperlySetToParentWhenLazyLoaded()
     {
         MorphManyInversePostModel::factory()->count(3)->withComments()->create();
@@ -109,6 +139,33 @@ class DatabaseEloquentInverseRelationMorphManyTest extends TestCase
 
         foreach ($posts as $post) {
             $comment = $post->getRelation('lastComment');
+
+            $this->assertTrue($comment->relationLoaded('commentable'));
+            $this->assertSame($post, $comment->commentable);
+        }
+    }
+
+    public function testMorphLatestOfManyGuessedInverseRelationIsProperlySetToParentWhenLazyLoaded()
+    {
+        MorphManyInversePostModel::factory()->count(3)->withComments()->create();
+        $posts = MorphManyInversePostModel::all();
+
+        foreach ($posts as $post) {
+            $this->assertFalse($post->relationLoaded('guessedLastComment'));
+            $comment = $post->guessedLastComment;
+
+            $this->assertTrue($comment->relationLoaded('commentable'));
+            $this->assertSame($post, $comment->commentable);
+        }
+    }
+
+    public function testMorphLatestOfManyGuessedInverseRelationIsProperlySetToParentWhenEagerLoaded()
+    {
+        MorphManyInversePostModel::factory()->count(3)->withComments()->create();
+        $posts = MorphManyInversePostModel::with('guessedLastComment')->get();
+
+        foreach ($posts as $post) {
+            $comment = $post->getRelation('guessedLastComment');
 
             $this->assertTrue($comment->relationLoaded('commentable'));
             $this->assertSame($post, $comment->commentable);
@@ -249,9 +306,19 @@ class MorphManyInversePostModel extends Model
         return $this->morphMany(MorphManyInverseCommentModel::class, 'commentable')->inverse('commentable');
     }
 
+    public function guessedComments(): MorphMany
+    {
+        return $this->morphMany(MorphManyInverseCommentModel::class, 'commentable')->inverse();
+    }
+
     public function lastComment(): MorphOne
     {
         return $this->morphOne(MorphManyInverseCommentModel::class, 'commentable')->latestOfMany()->inverse('commentable');
+    }
+
+    public function guessedLastComment(): MorphOne
+    {
+        return $this->morphOne(MorphManyInverseCommentModel::class, 'commentable')->latestOfMany()->inverse();
     }
 
     public function firstComment(): MorphOne

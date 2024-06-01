@@ -4,6 +4,7 @@ namespace Illuminate\Database\Eloquent\Relations\Concerns;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\RelationNotFoundException;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 
 trait SupportsInverseRelations
@@ -66,14 +67,13 @@ trait SupportsInverseRelations
      */
     protected function getPossibleInverseRelations(): array
     {
-        return collect([
-            method_exists($this, 'getMorphType') ? Str::beforeLast($this->getMorphType(), '_type') : null,
+        return array_filter(array_unique([
             Str::camel(Str::beforeLast($this->getForeignKeyName(), $this->getParent()->getKeyName())),
             Str::camel(Str::beforeLast($this->getParent()->getForeignKey(), $this->getParent()->getKeyName())),
             Str::camel(class_basename($this->getParent())),
             'owner',
             get_class($this->getParent()) === get_class($this->getModel()) ? 'parent' : null,
-        ])->filter()->unique()->values()->all();
+        ]));
     }
 
     /**
@@ -83,9 +83,10 @@ trait SupportsInverseRelations
      */
     protected function guessInverseRelation(): string|null
     {
-        return collect($this->getPossibleInverseRelations())
-            ->filter()
-            ->firstWhere(fn ($relation) => $this->getModel()->isRelation($relation));
+        return Arr::first(
+            $this->getPossibleInverseRelations(),
+            fn ($relation) => $relation && $this->getModel()->isRelation($relation)
+        );
     }
 
     /**

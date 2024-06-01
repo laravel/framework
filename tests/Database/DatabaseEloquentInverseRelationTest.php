@@ -158,7 +158,7 @@ class DatabaseEloquentInverseRelationTest extends TestCase
         $relation = (new HasInverseRelationStub($builder, new HasInverseRelationParentStub));
 
         $possibleRelations = ['hasInverseRelationParentStub', 'parentStub', 'owner'];
-        $this->assertSame($possibleRelations, $relation->exposeGetPossibleInverseRelations());
+        $this->assertSame($possibleRelations, array_values($relation->exposeGetPossibleInverseRelations()));
     }
 
     public function testProvidesPossibleInverseRelationBasedOnForeignKey()
@@ -171,16 +171,6 @@ class DatabaseEloquentInverseRelationTest extends TestCase
         $this->assertTrue(in_array('test', $relation->exposeGetPossibleInverseRelations()));
     }
 
-    public function testProvidesPossiblePolymorphicRelationsIfRelationHasGetMorphType()
-    {
-        $builder = m::mock(Builder::class);
-        $builder->shouldReceive('getModel')->andReturn(new HasOneInverseChildModel);
-
-        $relation = new HasInversePolymorphicRelationStub($builder, new HasInverseRelationParentStub, 'fooable_type');
-
-        $this->assertTrue(in_array('fooable', $relation->exposeGetPossibleInverseRelations()));
-    }
-
     public function testProvidesPossibleRecursiveRelationsIfRelatedIsTheSameClassAsParent()
     {
         $builder = m::mock(Builder::class);
@@ -189,17 +179,6 @@ class DatabaseEloquentInverseRelationTest extends TestCase
         $relation = (new HasInverseRelationStub($builder, new HasInverseRelationParentStub));
 
         $this->assertTrue(in_array('parent', $relation->exposeGetPossibleInverseRelations()));
-    }
-
-    public function testProvidesAllPossibleRelationsIfRelationHasGetMorphTypeForeignKeyAndRelatedIsTheSameClassAsParent()
-    {
-        $builder = m::mock(Builder::class);
-        $builder->shouldReceive('getModel')->andReturn(new HasInverseRelationParentStub);
-
-        $relation = new HasInversePolymorphicRelationStub($builder, new HasInverseRelationParentStub, 'barable_type', 'test_id');
-
-        $possibleRelations = ['barable', 'test', 'parentStub', 'hasInverseRelationParentStub', 'owner', 'parent'];
-        $this->assertSame($possibleRelations, $relation->exposeGetPossibleInverseRelations());
     }
 
     #[DataProvider('guessedParentRelationsDataProvider')]
@@ -246,19 +225,6 @@ class DatabaseEloquentInverseRelationTest extends TestCase
         $this->assertSame('parent', $relation->exposeGuessInverseRelation());
     }
 
-    public function testGuessesPolymorphicInverseRelationsIfRelationHasGetMorphType()
-    {
-        $related = m::mock(Model::class);
-        $related->shouldReceive('isRelation')->andReturnUsing(fn ($relation) => $relation === 'bazable');
-
-        $builder = m::mock(Builder::class);
-        $builder->shouldReceive('getModel')->andReturn($related);
-
-        $relation = new HasInversePolymorphicRelationStub($builder, new HasInverseRelationParentStub, 'bazable_type');
-
-        $this->assertSame('bazable', $relation->exposeGuessInverseRelation());
-    }
-
     #[DataProvider('guessedParentRelationsDataProvider')]
     public function testSetsGuessedInverseRelationBasedOnParent($guessedRelation)
     {
@@ -290,20 +256,6 @@ class DatabaseEloquentInverseRelationTest extends TestCase
         $relation = (new HasInverseRelationStub($builder, $parent))->inverse();
 
         $this->assertSame('parent', $relation->getInverseRelationship());
-    }
-
-    public function testSetsPolymorphicInverseRelationsIfRelationHasGetMorphType()
-    {
-        $related = m::mock(Model::class);
-        $related->shouldReceive('isRelation')->andReturnUsing(fn ($relation) => $relation === 'bingable');
-
-        $builder = m::mock(Builder::class);
-        $builder->shouldReceive('getModel')->andReturn($related);
-        $builder->shouldReceive('afterQuery')->once()->andReturnSelf();
-
-        $relation = (new HasInversePolymorphicRelationStub($builder, new HasInverseRelationParentStub, 'bingable_type'))->inverse();
-
-        $this->assertSame('bingable', $relation->getInverseRelationship());
     }
 
     public function testSetsGuessedInverseRelationBasedOnForeignKey()
@@ -408,23 +360,5 @@ class HasInverseRelationStub extends Relation
     public function exposeGuessInverseRelation(): string|null
     {
         return $this->guessInverseRelation();
-    }
-}
-
-class HasInversePolymorphicRelationStub extends HasInverseRelationStub
-{
-    public function __construct(
-        Builder $query,
-        Model $parent,
-        protected string $morphType,
-        ?string $foreignKey = null,
-    ) {
-        parent::__construct($query, $parent, $foreignKey);
-        $this->morphType = Str::of($morphType)->snake()->finish('_type')->toString();
-    }
-
-    protected function getMorphType()
-    {
-        return $this->morphType;
     }
 }

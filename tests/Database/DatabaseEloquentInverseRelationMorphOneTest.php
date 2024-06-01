@@ -83,6 +83,32 @@ class DatabaseEloquentInverseRelationMorphOneTest extends TestCase
         }
     }
 
+    public function testMorphOneGuessedInverseRelationIsProperlySetToParentWhenLazyLoaded()
+    {
+        MorphOneInverseImageModel::factory(6)->create();
+        $posts = MorphOneInversePostModel::all();
+
+        foreach ($posts as $post) {
+            $this->assertFalse($post->relationLoaded('guessedImage'));
+            $image = $post->guessedImage;
+            $this->assertTrue($image->relationLoaded('imageable'));
+            $this->assertSame($post, $image->imageable);
+        }
+    }
+
+    public function testMorphOneGuessedInverseRelationIsProperlySetToParentWhenEagerLoaded()
+    {
+        MorphOneInverseImageModel::factory(6)->create();
+        $posts = MorphOneInversePostModel::with('guessedImage')->get();
+
+        foreach ($posts as $post) {
+            $image = $post->getRelation('guessedImage');
+
+            $this->assertTrue($image->relationLoaded('imageable'));
+            $this->assertSame($post, $image->imageable);
+        }
+    }
+
     public function testMorphOneInverseRelationIsProperlySetToParentWhenMaking()
     {
         $post = MorphOneInversePostModel::create();
@@ -200,6 +226,11 @@ class MorphOneInversePostModel extends Model
     public function image(): MorphOne
     {
         return $this->morphOne(MorphOneInverseImageModel::class, 'imageable')->inverse('imageable');
+    }
+
+    public function guessedImage(): MorphOne
+    {
+        return $this->morphOne(MorphOneInverseImageModel::class, 'imageable')->inverse();
     }
 }
 
