@@ -1912,23 +1912,15 @@ class Str
      * @return bool
      */
     public static function isCase($value, $case){
-        $caseToMethodMap = [
-            'upper' => 'upper',
-            'lower' => 'lower',
-            'title' => 'title',
-            'kebab' => 'kebab',
-            'snake' => 'snake',
-            'camel' => 'camel',
-            'studly' => 'studly',
-        ];
+        $cases = ['upper', 'lower', 'title', 'kebab', 'snake', 'camel', 'studly'];
         
         $case = static::lower($case);
 
-        if (!array_key_exists($case, $caseToMethodMap)){
+        if (!in_array($case, $cases)){
             throw new InvalidArgumentException("Invalid case type: $case");
         }
 
-        $toCaseValue = call_user_func([self::class, $caseToMethodMap[$case]], $value);
+        $toCaseValue = call_user_func([self::class, $case], $value);
         return $toCaseValue === $value;
     }
 }
