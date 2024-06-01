@@ -123,8 +123,16 @@ class Renderer
      */
     public static function js()
     {
+        $viteJsAutoRefresh = '';
+
+        $vite = app(\Illuminate\Foundation\Vite::class);
+
+        if (is_file($vite->hotFile())) {
+            $viteJsAutoRefresh = $vite->__invoke([]);
+        }
+
         return '<script type="text/javascript">'
             .file_get_contents(static::DIST.'scripts.js')
-            .'</script>';
+            .'</script>'.$viteJsAutoRefresh;
     }
 }
