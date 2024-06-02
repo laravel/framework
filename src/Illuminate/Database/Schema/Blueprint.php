@@ -1070,7 +1070,7 @@ class Blueprint
     }
 
     /**
-     * Create a foreign ID column for the given model.
+     * Create a new foreign ID column for the given model.
      *
      * @param  \Illuminate\Database\Eloquent\Model|string  $model
      * @param  string|null  $column
@@ -1095,6 +1095,66 @@ class Blueprint
         }
 
         return $this->foreignUuid($column);
+    }
+
+    /**
+     * Create a new unsigned integer (4-byte) foreign ID column for the given model.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model|string  $model
+     * @param  string|null  $column
+     * @return \Illuminate\Database\Schema\ForeignIdColumnDefinition
+     */
+    public function integerForeignIdFor($model, $column = null)
+    {
+        return $this->addForeignIdColumnFor($model, 'integer', $column);
+    }
+
+    /**
+     * Create a new unsigned tiny integer (1-byte) foreign ID column for the given model.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model|string  $model
+     * @param  string|null  $column
+     * @return \Illuminate\Database\Schema\ForeignIdColumnDefinition
+     */
+    public function tinyForeignIdFor($model, $column = null)
+    {
+        return $this->addForeignIdColumnFor($model, 'tiny', $column);
+    }
+
+    /**
+     * Create a new unsigned small integer (2-byte) foreign ID column for the given model.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model|string  $model
+     * @param  string|null  $column
+     * @return \Illuminate\Database\Schema\ForeignIdColumnDefinition
+     */
+    public function smallForeignIdFor($model, $column = null)
+    {
+        return $this->addForeignIdColumnFor($model, 'small', $column);
+    }
+
+    /**
+     * Create a new unsigned medium integer (3-byte) foreign ID column for the given model.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model|string  $model
+     * @param  string|null  $column
+     * @return \Illuminate\Database\Schema\ForeignIdColumnDefinition
+     */
+    public function mediumForeignIdFor($model, $column = null)
+    {
+        return $this->addForeignIdColumnFor($model, 'medium', $column);
+    }
+
+    /**
+     * Create a new unsigned big integer (8-byte) foreign ID column for the given model.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model|string  $model
+     * @param  string|null  $column
+     * @return \Illuminate\Database\Schema\ForeignIdColumnDefinition
+     */
+    public function bigForeignIdFor($model, $column = null)
+    {
+        return $this->addForeignIdColumnFor($model, 'big', $column);
     }
 
     /**
@@ -1750,6 +1810,27 @@ class Blueprint
         return $this->addForeignColumn($type, $name,
             array_merge(['autoIncrement' => false, 'unsigned' => true], $parameters)
         );
+    }
+
+    /**
+     * Add a new foreign ID column to the blueprint for the given model.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model|string  $model
+     * @param  string  $type
+     * @param  string|null  $column
+     * @return \Illuminate\Database\Schema\ForeignIdColumnDefinition
+     */
+    public function addForeignIdColumnFor($model, $type, $column = null)
+    {
+        if (! $column) {
+            if (is_string($model)) {
+                $model = new $model;
+            }
+
+            $column = $model->getForeignKey();
+        }
+
+        return $this->addForeignIdColumn($type, $column);
     }
 
     /**
