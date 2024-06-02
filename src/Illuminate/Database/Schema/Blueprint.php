@@ -691,9 +691,64 @@ class Blueprint
      * @param  string  $column
      * @return \Illuminate\Database\Schema\ColumnDefinition
      */
+    public function integerId($column = 'id')
+    {
+        return $this->integerIncrements($column);
+    }
+
+    /**
+     * Create a new auto-incrementing tiny integer (1-byte) column on the table.
+     *
+     * @param  string  $column
+     * @return \Illuminate\Database\Schema\ColumnDefinition
+     */
+    public function tinyId($column = 'id')
+    {
+        return $this->tinyIncrements($column);
+    }
+
+    /**
+     * Create a new auto-incrementing small integer (2-byte) column on the table.
+     *
+     * @param  string  $column
+     * @return \Illuminate\Database\Schema\ColumnDefinition
+     */
+    public function smallId($column = 'id')
+    {
+        return $this->smallIncrements($column);
+    }
+
+    /**
+     * Create a new auto-incrementing medium integer (3-byte) column on the table.
+     *
+     * @param  string  $column
+     * @return \Illuminate\Database\Schema\ColumnDefinition
+     */
+    public function mediumId($column = 'id')
+    {
+        return $this->mediumIncrements($column);
+    }
+
+    /**
+     * Create a new auto-incrementing big integer (8-byte) column on the table.
+     *
+     * @param  string  $column
+     * @return \Illuminate\Database\Schema\ColumnDefinition
+     */
+    public function bigId($column = 'id')
+    {
+        return $this->bigIncrements($column);
+    }
+
+    /**
+     * Create a new auto-incrementing integer (4-byte) column on the table.
+     *
+     * @param  string  $column
+     * @return \Illuminate\Database\Schema\ColumnDefinition
+     */
     public function increments($column)
     {
-        return $this->unsignedInteger($column, true);
+        return $this->integerIncrements($column);
     }
 
     /**
