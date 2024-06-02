@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Collection;
 
 /**
  * @template T
+ *
  * @extends HasOneOrMany<T>
  */
 class HasMany extends HasOneOrMany

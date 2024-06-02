@@ -13,6 +13,7 @@ use Illuminate\Database\Query\JoinClause;
 
 /**
  * @template T of \Illuminate\Database\Eloquent\Model
+ *
  * @extends MorphOneOrMany<T>
  */
 class MorphOne extends MorphOneOrMany implements SupportsPartialRelations

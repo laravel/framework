@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Relations\Concerns\SupportsDefaultModels;
 
 /**
  * @template T of \Illuminate\Database\Eloquent\Model
+ *
  * @extends Relation<T>
  */
 class BelongsTo extends Relation

@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * @template T of \Illuminate\Database\Eloquent\Model
+ *
  * @extends MorphOneOrMany<T>
  */
 class MorphMany extends MorphOneOrMany

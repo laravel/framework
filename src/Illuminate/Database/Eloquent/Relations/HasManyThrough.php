@@ -15,6 +15,7 @@ use Illuminate\Database\UniqueConstraintViolationException;
 
 /**
  * @template T of \Illuminate\Database\Eloquent\Model
+ *
  * @extends Relation<T>
  */
 class HasManyThrough extends Relation

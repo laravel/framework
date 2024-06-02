@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\Concerns\SupportsDefaultModels;
 
 /**
  * @template T of \Illuminate\Database\Eloquent\Model
+ *
  * @extends HasManyThrough<T>
  */
 class HasOneThrough extends HasManyThrough

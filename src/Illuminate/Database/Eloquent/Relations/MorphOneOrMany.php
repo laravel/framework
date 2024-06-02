@@ -7,7 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * @template T of \Illuminate\Database\Eloquent\Model
- * @extends MorphOneOrMany<T>
+ *
+ * @extends HasOneOrMany<T>
  */
 abstract class MorphOneOrMany extends HasOneOrMany
 {

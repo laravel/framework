@@ -8,6 +8,7 @@ use Illuminate\Support\Arr;
 
 /**
  * @template T of \Illuminate\Database\Eloquent\Model
+ *
  * @extends BelongsToMany<T>
  */
 class MorphToMany extends BelongsToMany

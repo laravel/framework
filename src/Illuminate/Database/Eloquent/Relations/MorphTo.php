@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithDictionary;
 
 /**
  * @template T of \Illuminate\Database\Eloquent\Model
+ *
  * @extends BelongsTo<T>
  */
 class MorphTo extends BelongsTo

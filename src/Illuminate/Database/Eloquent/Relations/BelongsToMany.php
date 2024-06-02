@@ -18,6 +18,7 @@ use InvalidArgumentException;
 
 /**
  * @template T of \Illuminate\Database\Eloquent\Model
+ *
  * @extends Relation<T>
  */
 class BelongsToMany extends Relation
