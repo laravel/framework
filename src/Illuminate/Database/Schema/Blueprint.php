@@ -1385,7 +1385,6 @@ class Blueprint
         $this->timestampTz('updated_at', $precision)->nullable();
     }
 
-
     /**
      * Add nullable creation and update timestampTz columns to the table.
      *
