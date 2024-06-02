@@ -949,19 +949,69 @@ class Blueprint
     }
 
     /**
-     * Create a new unsigned big integer (8-byte) column on the table.
+     * Create a new unsigned big integer (8-byte) foreign ID column on the table.
      *
      * @param  string  $column
      * @return \Illuminate\Database\Schema\ForeignIdColumnDefinition
      */
     public function foreignId($column)
     {
-        return $this->addColumnDefinition(new ForeignIdColumnDefinition($this, [
-            'type' => 'bigInteger',
-            'name' => $column,
-            'autoIncrement' => false,
-            'unsigned' => true,
-        ]));
+        return $this->bigForeignId($column);
+    }
+
+    /**
+     * Create a new unsigned integer (4-byte) foreign ID column on the table.
+     *
+     * @param  string  $column
+     * @return \Illuminate\Database\Schema\ForeignIdColumnDefinition
+     */
+    public function integerForeignId($column)
+    {
+        return $this->addForeignIdColumn('integer', $column);
+    }
+
+    /**
+     * Create a new unsigned tiny integer (1-byte) foreign ID column on the table.
+     *
+     * @param  string  $column
+     * @return \Illuminate\Database\Schema\ForeignIdColumnDefinition
+     */
+    public function tinyForeignId($column)
+    {
+        return $this->addForeignIdColumn('tinyInteger', $column);
+    }
+
+    /**
+     * Create a new unsigned small integer (2-byte) foreign ID column on the table.
+     *
+     * @param  string  $column
+     * @return \Illuminate\Database\Schema\ForeignIdColumnDefinition
+     */
+    public function smallForeignId($column)
+    {
+        return $this->addForeignIdColumn('smallInteger', $column);
+    }
+
+    /**
+     * Create a new unsigned medium integer (3-byte) foreign ID column on the table.
+     *
+     * @param  string  $column
+     * @return \Illuminate\Database\Schema\ForeignIdColumnDefinition
+     */
+    public function mediumForeignId($column)
+    {
+        return $this->addForeignIdColumn('mediumInteger', $column);
+    }
+
+    /**
+     * Create a new unsigned big integer (8-byte) foreign ID column on the table.
+     *
+     * @param  string  $column
+     * @return \Illuminate\Database\Schema\ForeignIdColumnDefinition
+     */
+    public function bigForeignId($column)
+    {
+        return $this->addForeignIdColumn('bigInteger', $column);
     }
 
     /**
@@ -1299,10 +1349,7 @@ class Blueprint
      */
     public function foreignUuid($column)
     {
-        return $this->addColumnDefinition(new ForeignIdColumnDefinition($this, [
-            'type' => 'uuid',
-            'name' => $column,
-        ]));
+        return $this->addForeignColumn('uuid', $column);
     }
 
     /**
@@ -1326,11 +1373,7 @@ class Blueprint
      */
     public function foreignUlid($column, $length = 26)
     {
-        return $this->addColumnDefinition(new ForeignIdColumnDefinition($this, [
-            'type' => 'char',
-            'name' => $column,
-            'length' => $length,
-        ]));
+        return $this->addForeignColumn('char', $column, compact('length'));
     }
 
     /**
@@ -1622,6 +1665,36 @@ class Blueprint
         return $this->addColumnDefinition(new ColumnDefinition(
             array_merge(compact('type', 'name'), $parameters)
         ));
+    }
+
+    /**
+     * Add a new foreign column to the blueprint.
+     *
+     * @param  string  $type
+     * @param  string  $name
+     * @param  array  $parameters
+     * @return \Illuminate\Database\Schema\ForeignIdColumnDefinition
+     */
+    public function addForeignColumn($type, $name, array $parameters = [])
+    {
+        return $this->addColumnDefinition(new ForeignIdColumnDefinition($this,
+            array_merge(compact('type', 'name'), $parameters)
+        ));
+    }
+
+    /**
+     * Add a new foreign ID column to the blueprint.
+     *
+     * @param  string  $type
+     * @param  string  $name
+     * @param  array  $parameters
+     * @return \Illuminate\Database\Schema\ForeignIdColumnDefinition
+     */
+    public function addForeignIdColumn($type, $name, array $parameters = [])
+    {
+        return $this->addForeignColumn($type, $name,
+            array_merge(['autoIncrement' => false, 'unsigned' => true], $parameters)
+        );
     }
 
     /**
