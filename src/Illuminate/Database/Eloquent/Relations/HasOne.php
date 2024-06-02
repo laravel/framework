@@ -11,6 +11,10 @@ use Illuminate\Database\Eloquent\Relations\Concerns\ComparesRelatedModels;
 use Illuminate\Database\Eloquent\Relations\Concerns\SupportsDefaultModels;
 use Illuminate\Database\Query\JoinClause;
 
+/**
+ * @template T
+ * @extends HasOneOrMany<T>
+ */
 class HasOne extends HasOneOrMany implements SupportsPartialRelations
 {
     use ComparesRelatedModels, CanBeOneOfMany, SupportsDefaultModels;

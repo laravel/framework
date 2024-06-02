@@ -5,6 +5,10 @@ namespace Illuminate\Database\Eloquent\Relations;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @template T of \Illuminate\Database\Eloquent\Model
+ * @extends MorphOneOrMany<T>
+ */
 abstract class MorphOneOrMany extends HasOneOrMany
 {
     /**
@@ -71,7 +75,7 @@ abstract class MorphOneOrMany extends HasOneOrMany
      * Create a new instance of the related model. Allow mass-assignment.
      *
      * @param  array  $attributes
-     * @return \Illuminate\Database\Eloquent\Model
+     * @return T
      */
     public function forceCreate(array $attributes = [])
     {

@@ -4,12 +4,16 @@ namespace Illuminate\Database\Eloquent\Relations;
 
 use Illuminate\Database\Eloquent\Collection;
 
+/**
+ * @template T
+ * @extends HasOneOrMany<T>
+ */
 class HasMany extends HasOneOrMany
 {
     /**
      * Convert the relationship to a "has one" relationship.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne<T>
      */
     public function one()
     {

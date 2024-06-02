@@ -13,6 +13,10 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Query\Grammars\MySqlGrammar;
 use Illuminate\Database\UniqueConstraintViolationException;
 
+/**
+ * @template T of \Illuminate\Database\Eloquent\Model
+ * @extends Relation<T>
+ */
 class HasManyThrough extends Relation
 {
     use InteractsWithDictionary;
@@ -254,7 +258,7 @@ class HasManyThrough extends Relation
      *
      * @param  array  $attributes
      * @param  array  $values
-     * @return \Illuminate\Database\Eloquent\Model
+     * @return T
      */
     public function firstOrNew(array $attributes = [], array $values = [])
     {
@@ -270,7 +274,7 @@ class HasManyThrough extends Relation
      *
      * @param  array  $attributes
      * @param  array  $values
-     * @return \Illuminate\Database\Eloquent\Model
+     * @return T
      */
     public function firstOrCreate(array $attributes = [], array $values = [])
     {
@@ -286,7 +290,7 @@ class HasManyThrough extends Relation
      *
      * @param  array  $attributes
      * @param  array  $values
-     * @return \Illuminate\Database\Eloquent\Model
+     * @return T
      */
     public function createOrFirst(array $attributes = [], array $values = [])
     {
@@ -302,7 +306,7 @@ class HasManyThrough extends Relation
      *
      * @param  array  $attributes
      * @param  array  $values
-     * @return \Illuminate\Database\Eloquent\Model
+     * @return T
      */
     public function updateOrCreate(array $attributes, array $values = [])
     {
@@ -320,7 +324,7 @@ class HasManyThrough extends Relation
      * @param  mixed  $operator
      * @param  mixed  $value
      * @param  string  $boolean
-     * @return \Illuminate\Database\Eloquent\Model|static|null
+     * @return T|static|null
      */
     public function firstWhere($column, $operator = null, $value = null, $boolean = 'and')
     {
@@ -331,7 +335,7 @@ class HasManyThrough extends Relation
      * Execute the query and get the first related model.
      *
      * @param  array  $columns
-     * @return \Illuminate\Database\Eloquent\Model|static|null
+     * @return T|static|null
      */
     public function first($columns = ['*'])
     {
@@ -344,9 +348,9 @@ class HasManyThrough extends Relation
      * Execute the query and get the first result or throw an exception.
      *
      * @param  array  $columns
-     * @return \Illuminate\Database\Eloquent\Model|static
+     * @return T|static
      *
-     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException<\Illuminate\Database\Eloquent\Model>
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException<T>
      */
     public function firstOrFail($columns = ['*'])
     {
@@ -362,7 +366,7 @@ class HasManyThrough extends Relation
      *
      * @param  \Closure|array  $columns
      * @param  \Closure|null  $callback
-     * @return \Illuminate\Database\Eloquent\Model|static|mixed
+     * @return T|static|mixed
      */
     public function firstOr($columns = ['*'], ?Closure $callback = null)
     {
@@ -384,7 +388,7 @@ class HasManyThrough extends Relation
      *
      * @param  mixed  $id
      * @param  array  $columns
-     * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection|null
+     * @return T|\Illuminate\Database\Eloquent\Collection<mixed, T>|null
      */
     public function find($id, $columns = ['*'])
     {
@@ -402,7 +406,7 @@ class HasManyThrough extends Relation
      *
      * @param  \Illuminate\Contracts\Support\Arrayable|array  $ids
      * @param  array  $columns
-     * @return \Illuminate\Database\Eloquent\Collection
+     * @return \Illuminate\Database\Eloquent\Collection<mixed, T>
      */
     public function findMany($ids, $columns = ['*'])
     {
@@ -422,9 +426,9 @@ class HasManyThrough extends Relation
      *
      * @param  mixed  $id
      * @param  array  $columns
-     * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection
+     * @return T|\Illuminate\Database\Eloquent\Collection<mixed, T>
      *
-     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException<\Illuminate\Database\Eloquent\Model>
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException<T>
      */
     public function findOrFail($id, $columns = ['*'])
     {
@@ -449,7 +453,7 @@ class HasManyThrough extends Relation
      * @param  mixed  $id
      * @param  \Closure|array  $columns
      * @param  \Closure|null  $callback
-     * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection|mixed
+     * @return T|\Illuminate\Database\Eloquent\Collection<mixed, T>|mixed
      */
     public function findOr($id, $columns = ['*'], ?Closure $callback = null)
     {
@@ -490,7 +494,7 @@ class HasManyThrough extends Relation
      * Execute the query as a "select" statement.
      *
      * @param  array  $columns
-     * @return \Illuminate\Database\Eloquent\Collection
+     * @return \Illuminate\Database\Eloquent\Collection<mixed, T>
      */
     public function get($columns = ['*'])
     {

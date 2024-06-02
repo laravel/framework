@@ -7,6 +7,10 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithDictionary;
 use Illuminate\Database\Eloquent\Relations\Concerns\SupportsDefaultModels;
 
+/**
+ * @template T of \Illuminate\Database\Eloquent\Model
+ * @extends HasManyThrough<T>
+ */
 class HasOneThrough extends HasManyThrough
 {
     use InteractsWithDictionary, SupportsDefaultModels;

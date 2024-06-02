@@ -11,6 +11,10 @@ use Illuminate\Database\Eloquent\Relations\Concerns\ComparesRelatedModels;
 use Illuminate\Database\Eloquent\Relations\Concerns\SupportsDefaultModels;
 use Illuminate\Database\Query\JoinClause;
 
+/**
+ * @template T of \Illuminate\Database\Eloquent\Model
+ * @extends MorphOneOrMany<T>
+ */
 class MorphOne extends MorphOneOrMany implements SupportsPartialRelations
 {
     use CanBeOneOfMany, ComparesRelatedModels, SupportsDefaultModels;
@@ -115,7 +119,7 @@ class MorphOne extends MorphOneOrMany implements SupportsPartialRelations
      * Make a new related instance for the given model.
      *
      * @param  \Illuminate\Database\Eloquent\Model  $parent
-     * @return \Illuminate\Database\Eloquent\Model
+     * @return T
      */
     public function newRelatedInstanceFor(Model $parent)
     {
