@@ -391,6 +391,17 @@ class SupportCollectionTest extends TestCase
         $this->assertSame('baz', $data->first());
 
         $this->assertEquals(new Collection(['foo', 'bar', 'baz']), (new Collection(['foo', 'bar', 'baz']))->shift(6));
+
+        $data = new Collection(['foo', 'bar', 'baz']);
+
+        $this->assertEquals(new Collection([]), $data->shift(0));
+        $this->assertEquals(collect(['foo', 'bar', 'baz']), $data);
+
+        $this->expectException('InvalidArgumentException');
+        (new Collection(['foo', 'bar', 'baz']))->shift(-1);
+
+        $this->expectException('InvalidArgumentException');
+        (new Collection(['foo', 'bar', 'baz']))->shift(-2);
     }
 
     /**
