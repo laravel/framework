@@ -1360,6 +1360,19 @@ class Blueprint
     }
 
     /**
+     * Add current creation and update timestamps to the table.
+     *
+     * @param  int|null  $precision
+     * @return void
+     */
+    public function currentTimestamps($precision = 0)
+    {
+        $this->timestamp('created_at', $precision)->useCurrent();
+
+        $this->timestamp('updated_at', $precision)->nullable()->useCurrentOnUpdate();
+    }
+
+    /**
      * Add creation and update timestampTz columns to the table.
      *
      * @param  int|null  $precision
@@ -1370,6 +1383,33 @@ class Blueprint
         $this->timestampTz('created_at', $precision)->nullable();
 
         $this->timestampTz('updated_at', $precision)->nullable();
+    }
+
+
+    /**
+     * Add nullable creation and update timestampTz columns to the table.
+     *
+     * Alias for self::timestampsTz().
+     *
+     * @param  int|null  $precision
+     * @return void
+     */
+    public function nullableTimestampsTz($precision = 0)
+    {
+        $this->timestampsTz($precision);
+    }
+
+    /**
+     * Add current creation and update timestampTz columns to the table.
+     *
+     * @param  int|null  $precision
+     * @return void
+     */
+    public function currentTimestampsTz($precision = 0)
+    {
+        $this->timestampTz('created_at', $precision)->useCurrent();
+
+        $this->timestampTz('updated_at', $precision)->nullable()->useCurrentOnUpdate();
     }
 
     /**
