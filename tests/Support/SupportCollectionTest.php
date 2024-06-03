@@ -371,6 +371,17 @@ class SupportCollectionTest extends TestCase
         $this->assertSame('foo', $c->first());
 
         $this->assertEquals(new Collection(['baz', 'bar', 'foo']), (new Collection(['foo', 'bar', 'baz']))->pop(6));
+
+        $c = new Collection(['foo', 'bar', 'baz']);
+
+        $this->assertEquals(new Collection([]), $c->pop(0));
+        $this->assertEquals(collect(['foo', 'bar', 'baz']), $c);
+
+        $this->expectException('InvalidArgumentException');
+        (new Collection(['foo', 'bar', 'baz']))->pop(-1);
+
+        $this->expectException('InvalidArgumentException');
+        (new Collection(['foo', 'bar', 'baz']))->pop(-2);
     }
 
     public function testShiftReturnsAndRemovesFirstItemInCollection()

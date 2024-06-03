@@ -945,15 +945,21 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      *
      * @param  int  $count
      * @return static<int, TValue>|TValue|null
+     *
+     * @throws \InvalidArgumentException
      */
     public function pop($count = 1)
     {
-        if ($count === 1) {
-            return array_pop($this->items);
+        if ($count < 0) {
+            throw new InvalidArgumentException('Number of popped items may not be less than zero.');
         }
 
-        if ($this->isEmpty()) {
+        if ($count === 0 || $this->isEmpty()) {
             return new static;
+        }
+
+        if ($count === 1) {
+            return array_pop($this->items);
         }
 
         $results = [];
