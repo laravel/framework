@@ -954,7 +954,11 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
             throw new InvalidArgumentException('Number of popped items may not be less than zero.');
         }
 
-        if ($count === 0 || $this->isEmpty()) {
+        if ($count === 0) {
+            return new static($this->items);
+        }
+
+        if ($this->isEmpty()) {
             return new static;
         }
 

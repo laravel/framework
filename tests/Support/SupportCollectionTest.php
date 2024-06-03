@@ -374,8 +374,7 @@ class SupportCollectionTest extends TestCase
 
         $c = new Collection(['foo', 'bar', 'baz']);
 
-        $this->assertEquals(new Collection([]), $c->pop(0));
-        $this->assertEquals(collect(['foo', 'bar', 'baz']), $c);
+        $this->assertEquals(new Collection(['foo', 'bar', 'baz']), $c->pop(0));
 
         $this->expectException('InvalidArgumentException');
         (new Collection(['foo', 'bar', 'baz']))->pop(-1);
