@@ -1130,12 +1130,12 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      */
     public function shift($count = 1)
     {
-        if ($count === 0 || $this->isEmpty()) {
-            return new static;
-        }
-
         if ($count < 0) {
             throw new InvalidArgumentException('can not shift less than 0.');
+        }
+
+        if ($count === 0 || $this->isEmpty()) {
+            return new static;
         }
 
         if ($count === 1) {
