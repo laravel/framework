@@ -9,9 +9,10 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithDictionary;
 
 /**
- * @template T of \Illuminate\Database\Eloquent\Model
+ * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
+ * @template TChildModel of \Illuminate\Database\Eloquent\Model
  *
- * @extends BelongsTo<T>
+ * @extends BelongsTo<TRelatedModel, TChildModel>
  */
 class MorphTo extends BelongsTo
 {
@@ -133,7 +134,7 @@ class MorphTo extends BelongsTo
      * Get all of the relation results for a type.
      *
      * @param  string  $type
-     * @return \Illuminate\Database\Eloquent\Collection<mixed, T>
+     * @return \Illuminate\Database\Eloquent\Collection<mixed, TRelatedModel>
      */
     protected function getResultsByType($type)
     {
@@ -182,7 +183,7 @@ class MorphTo extends BelongsTo
      * Create a new model instance by type.
      *
      * @param  string  $type
-     * @return T
+     * @return TRelatedModel
      */
     public function createModelByType($type)
     {
@@ -232,7 +233,7 @@ class MorphTo extends BelongsTo
      * Associate the model instance to the given parent.
      *
      * @param  \Illuminate\Database\Eloquent\Model|null  $model
-     * @return T
+     * @return TRelatedModel
      */
     public function associate($model)
     {
@@ -256,7 +257,7 @@ class MorphTo extends BelongsTo
     /**
      * Dissociate previously associated model from the given parent.
      *
-     * @return T
+     * @return TRelatedModel
      */
     public function dissociate()
     {
@@ -283,7 +284,7 @@ class MorphTo extends BelongsTo
      * Make a new related instance for the given model.
      *
      * @param  \Illuminate\Database\Eloquent\Model  $parent
-     * @return T
+     * @return TRelatedModel
      */
     protected function newRelatedInstanceFor(Model $parent)
     {
@@ -314,7 +315,7 @@ class MorphTo extends BelongsTo
      * Specify which relations to load for a given morph type.
      *
      * @param  array  $with
-     * @return \Illuminate\Database\Eloquent\Relations\MorphTo<T>
+     * @return \Illuminate\Database\Eloquent\Relations\MorphTo<TRelatedModel>
      */
     public function morphWith(array $with)
     {
@@ -329,7 +330,7 @@ class MorphTo extends BelongsTo
      * Specify which relationship counts to load for a given morph type.
      *
      * @param  array  $withCount
-     * @return \Illuminate\Database\Eloquent\Relations\MorphTo<T>
+     * @return \Illuminate\Database\Eloquent\Relations\MorphTo<TRelatedModel>
      */
     public function morphWithCount(array $withCount)
     {
@@ -344,7 +345,7 @@ class MorphTo extends BelongsTo
      * Specify constraints on the query for a given morph type.
      *
      * @param  array  $callbacks
-     * @return \Illuminate\Database\Eloquent\Relations\MorphTo<T>
+     * @return \Illuminate\Database\Eloquent\Relations\MorphTo<TRelatedModel>
      */
     public function constrain(array $callbacks)
     {

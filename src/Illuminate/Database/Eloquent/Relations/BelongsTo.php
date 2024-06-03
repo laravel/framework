@@ -11,9 +11,10 @@ use Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithDictionary;
 use Illuminate\Database\Eloquent\Relations\Concerns\SupportsDefaultModels;
 
 /**
- * @template T of \Illuminate\Database\Eloquent\Model
+ * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
+ * @template TChildModel of \Illuminate\Database\Eloquent\Model
  *
- * @extends Relation<T>
+ * @extends Relation<TRelatedModel>
  */
 class BelongsTo extends Relation
 {
@@ -24,7 +25,7 @@ class BelongsTo extends Relation
     /**
      * The child model instance of the relation.
      *
-     * @var T
+     * @var TChildModel
      */
     protected $child;
 
@@ -200,8 +201,8 @@ class BelongsTo extends Relation
     /**
      * Associate the model instance to the given parent.
      *
-     * @param  T|int|string|null  $model
-     * @return T
+     * @param  TRelatedModel|int|string|null  $model
+     * @return TChildModel
      */
     public function associate($model)
     {
@@ -221,7 +222,7 @@ class BelongsTo extends Relation
     /**
      * Dissociate previously associated model from the given parent.
      *
-     * @return T
+     * @return TChildModel
      */
     public function dissociate()
     {
@@ -233,7 +234,7 @@ class BelongsTo extends Relation
     /**
      * Alias of "dissociate" method.
      *
-     * @return T
+     * @return TChildModel
      */
     public function disassociate()
     {
@@ -295,7 +296,7 @@ class BelongsTo extends Relation
      * Make a new related instance for the given model.
      *
      * @param  \Illuminate\Database\Eloquent\Model  $parent
-     * @return T
+     * @return TRelatedModel
      */
     protected function newRelatedInstanceFor(Model $parent)
     {
@@ -305,7 +306,7 @@ class BelongsTo extends Relation
     /**
      * Get the child of the relationship.
      *
-     * @return T
+     * @return TChildModel
      */
     public function getChild()
     {
