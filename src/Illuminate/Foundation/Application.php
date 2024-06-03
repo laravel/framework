@@ -867,22 +867,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
 
         $provider->register();
 
-        // If there are bindings / singletons set as properties on the provider we
-        // will spin through them and register them with the application, which
-        // serves as a convenience layer while registering a lot of bindings.
-        if (property_exists($provider, 'bindings')) {
-            foreach ($provider->bindings as $key => $value) {
-                $this->bind($key, $value);
-            }
-        }
-
-        if (property_exists($provider, 'singletons')) {
-            foreach ($provider->singletons as $key => $value) {
-                $key = is_int($key) ? $value : $key;
-
-                $this->singleton($key, $value);
-            }
-        }
+        $this->registerProviderProperties($provider);
 
         $this->markAsRegistered($provider);
 
@@ -931,6 +916,32 @@ class Application extends Container implements ApplicationContract, CachesConfig
     public function resolveProvider($provider)
     {
         return new $provider($this);
+    }
+
+    /**
+     * Register the given provider properties.
+     *
+     * @param  \Illuminate\Support\ServiceProvider  $provider
+     * @return void
+     */
+    protected function registerProviderProperties($provider)
+    {
+        // If there are bindings / singletons set as properties on the provider we
+        // will spin through them and register them with the application, which
+        // serves as a convenience layer while registering a lot of bindings.
+        if (property_exists($provider, 'bindings')) {
+            foreach ($provider->bindings as $key => $value) {
+                $this->bind($key, $value);
+            }
+        }
+
+        if (property_exists($provider, 'singletons')) {
+            foreach ($provider->singletons as $key => $value) {
+                $key = is_int($key) ? $value : $key;
+
+                $this->singleton($key, $value);
+            }
+        }
     }
 
     /**
