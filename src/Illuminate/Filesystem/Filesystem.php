@@ -162,19 +162,34 @@ class Filesystem
      */
     public function lines($path)
     {
+        return $this->linesChunk($path);
+    }
+
+    /**
+     * Get a portion of a file one line at a time.
+     *
+     * @param  string  $path
+     * @param  int  $startFrom
+     * @return \Illuminate\Support\LazyCollection
+     *
+     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
+     */
+    public function linesChunk($path, $startFrom = 0)
+    {
         if (! $this->isFile($path)) {
             throw new FileNotFoundException(
                 "File does not exist at path {$path}."
             );
         }
 
-        return LazyCollection::make(function () use ($path) {
+        return LazyCollection::make(function () use ($path, $startFrom) {
             $file = new SplFileObject($path);
 
             $file->setFlags(SplFileObject::DROP_NEW_LINE);
+            $file->seek($startFrom);
 
             while (! $file->eof()) {
-                yield $file->fgets();
+                yield $file->key() => $file->fgets();
             }
         });
     }

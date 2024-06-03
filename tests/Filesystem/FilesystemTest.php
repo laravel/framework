@@ -75,6 +75,40 @@ class FilesystemTest extends TestCase
         $this->assertSame([''], $files->lines($path)->all());
     }
 
+    public function testLinesChunk()
+    {
+        $path = self::$tempDir.'/file.txt';
+
+        $contents = ' '.PHP_EOL
+        .' spaces around '.PHP_EOL
+        .''.PHP_EOL
+        .'Line 2'.PHP_EOL
+        .'trailing empty line ->'.PHP_EOL
+        .''.PHP_EOL;
+
+        file_put_contents($path, $contents);
+
+        $files = new Filesystem;
+        $this->assertInstanceOf(LazyCollection::class, $files->linesChunk($path));
+
+        // using default value for $start, reads the entire file.
+        $this->assertSame(
+            [' ', ' spaces around ', '', 'Line 2', 'trailing empty line ->', '', ''],
+            $files->linesChunk($path)->all()
+        );
+
+        $this->assertSame(
+            [4 => 'trailing empty line ->', 5 => '', 6 => ''],
+            $files->linesChunk($path, 4)->all()
+        );
+
+        $this->assertSame([], $files->linesChunk($path, 40)->all());
+
+        // an empty file:
+        ftruncate(fopen($path, 'w'), 0);
+        $this->assertSame([''], $files->linesChunk($path)->all());
+    }
+
     public function testLinesThrowsExceptionNonexisitingFile()
     {
         $this->expectException(FileNotFoundException::class);
