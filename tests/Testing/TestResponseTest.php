@@ -2460,6 +2460,21 @@ class TestResponseTest extends TestCase
         $this->assertEquals($cookieValue, $cookie->getValue());
     }
 
+    public function testErrorMessageFromResponseIsVisibleInErrorMessageFromStatusAssertion()
+    {
+        $response = TestResponse::fromBaseResponse(
+            new Response('', 500)
+        );
+        $exceptionMessage = "This error was thrown during the request";
+        $response->withExceptions(collect([new \Exception($exceptionMessage)]));
+
+        $this->expectException(AssertionFailedError::class);
+
+        $this->expectExceptionMessageMatches("*$exceptionMessage*");
+
+        $response->assertOk();
+    }
+
     private function makeMockResponse($content)
     {
         $baseResponse = tap(new Response, function ($response) use ($content) {
