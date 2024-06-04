@@ -3,8 +3,8 @@
 namespace Illuminate\Tests\Support;
 
 use Illuminate\Cache\CacheManager;
-use Illuminate\Cache\Events\RetrievingKey;
 use Illuminate\Cache\Events\CacheMissed;
+use Illuminate\Cache\Events\RetrievingKey;
 use Illuminate\Config\Repository as ConfigRepository;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
