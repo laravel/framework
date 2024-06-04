@@ -17,25 +17,23 @@ class WithScheduleTest extends TestCase
         ScheduleListCommand::resolveTerminalWidthUsing(fn () => 80);
     }
 
-    protected function tearDown(): void
-    {
-        ScheduleListCommand::resolveTerminalWidthUsing(null);
-
-        parent::tearDown();
-    }
-
     protected function resolveApplication()
     {
         return Application::configure(static::applicationBasePath())
             ->withSchedule(function ($schedule) {
                 $schedule->command('schedule:clear-cache')->everyMinute();
-            })->create();
+            })
+            ->withRouting(
+                commands: __DIR__.'/routes/console.php',
+                web: __DIR__.'/routes/web.php',
+            )->create();
     }
 
     public function testDisplaySchedule()
     {
         $this->artisan(ScheduleListCommand::class)
             ->assertSuccessful()
-            ->expectsOutputToContain('  * * * * *  php artisan schedule:clear-cache');
+            ->expectsOutputToContain('  0 * * * *  php artisan test:inspire .............. Next Due: 1 hour from now')
+            ->expectsOutputToContain('  * * * * *  php artisan schedule:clear-cache .... Next Due: 1 minute from now');
     }
 }

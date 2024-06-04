@@ -312,6 +312,10 @@ class ApplicationBuilder
     {
         Artisan::starting(function () use ($callback) {
             $this->app->afterResolving(Schedule::class, fn ($schedule) => $callback($schedule));
+
+            if ($this->app->resolved(Schedule::class)) {
+                $callback($this->app->make(Schedule::class));
+            }
         });
 
         return $this;
