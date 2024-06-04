@@ -5,7 +5,7 @@ namespace Illuminate\Cache\Events;
 class RetrievingManyKeys extends CacheEvent
 {
     /**
-     * The keys that are retrieved.
+     * The keys that are being retrieved.
      *
      * @var array
      */

@@ -5,14 +5,14 @@ namespace Illuminate\Cache\Events;
 class WritingManyKeys extends CacheEvent
 {
     /**
-     * The keys that are writing.
+     * The keys that are being written.
      *
      * @var mixed
      */
     public $keys;
 
     /**
-     * The value that are writing.
+     * The value that is being written.
      *
      * @var mixed
      */
