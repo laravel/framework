@@ -108,6 +108,7 @@ class ConsoleParserTest extends TestCase
         $this->assertTrue($results[2][0]->isArray());
 
         $results = Parser::parse('command:name {--o|option=* : The option description.}');
+
         $this->assertSame('command:name', $results[0]);
         $this->assertSame('o', $results[2][0]->getShortcut());
         $this->assertSame('option', $results[2][0]->getName());
