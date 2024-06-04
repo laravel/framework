@@ -5,14 +5,14 @@ namespace Illuminate\Cache\Events;
 class KeyWriteFailed extends CacheEvent
 {
     /**
-     * The value that was written.
+     * The value that would have been written.
      *
      * @var mixed
      */
     public $value;
 
     /**
-     * The number of seconds the key should be valid.
+     * The number of seconds the key should have been valid.
      *
      * @var int|null
      */

@@ -5,7 +5,7 @@ namespace Illuminate\Cache\Events;
 class WritingKey extends CacheEvent
 {
     /**
-     * The value that was written.
+     * The value that will be written.
      *
      * @var mixed
      */
