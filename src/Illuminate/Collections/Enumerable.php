@@ -342,7 +342,7 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
      * @param  (callable($this): TUnlessReturnType)|null  $default
      * @return $this|TUnlessReturnType
      */
-    public function unless($value, callable $callback = null, callable $default = null);
+    public function unless($value, ?callable $callback = null, ?callable $default = null);
 
     /**
      * Apply the callback unless the collection is empty.
