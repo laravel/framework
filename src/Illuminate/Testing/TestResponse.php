@@ -182,6 +182,7 @@ class TestResponse implements ArrayAccess
             {$lastException->getMessage()}
             EOF;
         }
+
         return $message;
     }
 

@@ -2465,7 +2465,7 @@ class TestResponseTest extends TestCase
         $response = TestResponse::fromBaseResponse(
             new Response('', 500)
         );
-        $exceptionMessage = "This error was thrown during the request";
+        $exceptionMessage = 'This error was thrown during the request';
         $response->withExceptions(collect([new \Exception($exceptionMessage)]));
 
         $this->expectException(AssertionFailedError::class);
