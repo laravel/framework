@@ -462,6 +462,16 @@ class DatabaseMariaDbSchemaGrammarTest extends TestCase
         $this->assertSame('alter table `users` add `id` int unsigned not null auto_increment primary key', $statements[0]);
     }
 
+    public function testAddingTinyIncrementingID()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->tinyIncrements('id');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table `users` add `id` tinyint unsigned not null auto_increment primary key', $statements[0]);
+    }
+
     public function testAddingSmallIncrementingID()
     {
         $blueprint = new Blueprint('users');
@@ -470,6 +480,26 @@ class DatabaseMariaDbSchemaGrammarTest extends TestCase
 
         $this->assertCount(1, $statements);
         $this->assertSame('alter table `users` add `id` smallint unsigned not null auto_increment primary key', $statements[0]);
+    }
+
+    public function testAddingMediumIncrementingID()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->mediumIncrements('id');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table `users` add `id` mediumint unsigned not null auto_increment primary key', $statements[0]);
+    }
+
+    public function testAddingBigIncrementingID()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->bigIncrements('id');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table `users` add `id` bigint unsigned not null auto_increment primary key', $statements[0]);
     }
 
     public function testAddingID()
@@ -519,16 +549,6 @@ class DatabaseMariaDbSchemaGrammarTest extends TestCase
             'alter table `users` add `company_id` bigint unsigned not null',
             'alter table `users` add constraint `my_index` foreign key (`company_id`) references `companies` (`id`)',
         ], $statements);
-    }
-
-    public function testAddingBigIncrementingID()
-    {
-        $blueprint = new Blueprint('users');
-        $blueprint->bigIncrements('id');
-        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
-
-        $this->assertCount(1, $statements);
-        $this->assertSame('alter table `users` add `id` bigint unsigned not null auto_increment primary key', $statements[0]);
     }
 
     public function testAddingColumnInTableFirst()

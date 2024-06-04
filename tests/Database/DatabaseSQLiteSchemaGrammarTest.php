@@ -283,6 +283,16 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $this->assertSame('alter table "users" add column "id" integer primary key autoincrement not null', $statements[0]);
     }
 
+    public function testAddingBigIncrementingID()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->bigIncrements('id');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table "users" add column "id" integer primary key autoincrement not null', $statements[0]);
+    }
+
     public function testAddingID()
     {
         $blueprint = new Blueprint('users');
@@ -329,16 +339,6 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $this->assertSame([
             'alter table "users" add column "company_id" integer not null',
         ], $statements);
-    }
-
-    public function testAddingBigIncrementingID()
-    {
-        $blueprint = new Blueprint('users');
-        $blueprint->bigIncrements('id');
-        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
-
-        $this->assertCount(1, $statements);
-        $this->assertSame('alter table "users" add column "id" integer primary key autoincrement not null', $statements[0]);
     }
 
     public function testAddingString()
