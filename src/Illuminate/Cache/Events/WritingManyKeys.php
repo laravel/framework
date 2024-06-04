@@ -2,7 +2,7 @@
 
 namespace Illuminate\Cache\Events;
 
-class KeyWriteMany extends CacheEvent
+class WritingManyKeys extends CacheEvent
 {
     /**
      * The keys that are writing.

@@ -2,7 +2,7 @@
 
 namespace Illuminate\Cache\Events;
 
-class KeyForget extends CacheEvent
+class ForgettingKey extends CacheEvent
 {
     //
 }

@@ -6,17 +6,17 @@ use ArrayAccess;
 use BadMethodCallException;
 use Closure;
 use DateTimeInterface;
-use Illuminate\Cache\Events\CacheGet;
-use Illuminate\Cache\Events\CacheGetMany;
 use Illuminate\Cache\Events\CacheHit;
 use Illuminate\Cache\Events\CacheMissed;
-use Illuminate\Cache\Events\KeyForget;
+use Illuminate\Cache\Events\ForgettingKey;
 use Illuminate\Cache\Events\KeyForgetFailed;
 use Illuminate\Cache\Events\KeyForgotten;
-use Illuminate\Cache\Events\KeyWrite;
 use Illuminate\Cache\Events\KeyWriteFailed;
-use Illuminate\Cache\Events\KeyWriteMany;
 use Illuminate\Cache\Events\KeyWritten;
+use Illuminate\Cache\Events\RetrievingKey;
+use Illuminate\Cache\Events\RetrievingManyKeys;
+use Illuminate\Cache\Events\WritingKey;
+use Illuminate\Cache\Events\WritingManyKeys;
 use Illuminate\Contracts\Cache\Repository as CacheContract;
 use Illuminate\Contracts\Cache\Store;
 use Illuminate\Contracts\Events\Dispatcher;
@@ -111,7 +111,7 @@ class Repository implements ArrayAccess, CacheContract
             return $this->many($key);
         }
 
-        $this->event(new CacheGet($this->getName(), $key));
+        $this->event(new RetrievingKey($this->getName(), $key));
 
         $value = $this->store->get($this->itemKey($key));
 
@@ -139,7 +139,7 @@ class Repository implements ArrayAccess, CacheContract
      */
     public function many(array $keys)
     {
-        $this->event(new CacheGetMany($this->getName(), $keys));
+        $this->event(new RetrievingManyKeys($this->getName(), $keys));
 
         $values = $this->store->many(collect($keys)->map(function ($value, $key) {
             return is_string($key) ? $key : $value;
@@ -233,7 +233,7 @@ class Repository implements ArrayAccess, CacheContract
             return $this->forget($key);
         }
 
-        $this->event(new KeyWrite($this->getName(), $key, $value, $seconds));
+        $this->event(new WritingKey($this->getName(), $key, $value, $seconds));
 
         $result = $this->store->put($this->itemKey($key), $value, $seconds);
 
@@ -275,7 +275,7 @@ class Repository implements ArrayAccess, CacheContract
             return $this->deleteMultiple(array_keys($values));
         }
 
-        $this->event(new KeyWriteMany($this->getName(), array_keys($values), array_values($values), $seconds));
+        $this->event(new WritingManyKeys($this->getName(), array_keys($values), array_values($values), $seconds));
 
         $result = $this->store->putMany($values, $seconds);
 
@@ -391,7 +391,7 @@ class Repository implements ArrayAccess, CacheContract
      */
     public function forever($key, $value)
     {
-        $this->event(new KeyWrite($this->getName(), $key, $value));
+        $this->event(new WritingKey($this->getName(), $key, $value));
 
         $result = $this->store->forever($this->itemKey($key), $value);
 
@@ -479,7 +479,7 @@ class Repository implements ArrayAccess, CacheContract
      */
     public function forget($key)
     {
-        $this->event(new KeyForget($this->getName(), $key));
+        $this->event(new ForgettingKey($this->getName(), $key));
 
         return tap($this->store->forget($this->itemKey($key)), function ($result) use ($key) {
             if ($result) {

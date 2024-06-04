@@ -2,7 +2,7 @@
 
 namespace Illuminate\Cache\Events;
 
-class CacheGetMany extends CacheEvent
+class RetrievingManyKeys extends CacheEvent
 {
     /**
      * The keys that are retrieved.
