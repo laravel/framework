@@ -25,6 +25,7 @@ class RendererTest extends TestCase
             ->assertSee('Bad route!');
     }
 
+    #[WithConfig('app.debug', false)]
     public function testItCanRenderExceptionPageUsingSymfonyIfRendererIsNotDefined()
     {
         config(['app.debug' => true]);
