@@ -23,10 +23,8 @@ class WithScheduleTest extends TestCase
             ->withSchedule(function ($schedule) {
                 $schedule->command('schedule:clear-cache')->everyMinute();
             })
-            ->withRouting(
-                commands: __DIR__.'/routes/console.php',
-                web: __DIR__.'/routes/web.php',
-            )->create();
+            ->withCommands([__DIR__.'/stubs/console.php'])
+            ->create();
     }
 
     public function testDisplaySchedule()
