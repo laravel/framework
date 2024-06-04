@@ -66,6 +66,17 @@ class TranslationTranslatorTest extends TestCase
         $this->assertSame('foo', $t->get('foo::bar.foo'));
     }
 
+    public function testGetMethodProperlyRetrievesItemWithFalsyStringKey()
+    {
+        $t = new Translator($this->getLoader(), 'en');
+        $t->getLoader()->shouldReceive('load')->once()->with('en', '*', '*')->andReturn(['empty' => '', 'zero' => '0']);
+        $t->getLoader()->shouldReceive('load')->once()->with('en', 'bar', 'foo')->andReturn(['empty' => '', 'zero' => '0']);
+        $this->assertSame('', $t->get('foo::bar.empty'));
+        $this->assertSame('0', $t->get('foo::bar.zero'));
+        $this->assertSame('', $t->get('empty'));
+        $this->assertSame('0', $t->get('zero'));
+    }
+
     public function testGetMethodForNonExistingReturnsSameKey()
     {
         $t = new Translator($this->getLoader(), 'en');
