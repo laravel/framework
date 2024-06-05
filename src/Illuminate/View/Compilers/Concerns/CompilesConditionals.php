@@ -233,6 +233,27 @@ trait CompilesConditionals
     }
 
     /**
+     * Compile the if-not-empty statements into valid PHP.
+     *
+     * @param  string  $expression
+     * @return string
+     */
+    protected function compileNotEmpty($expression)
+    {
+        return "<?php if(!empty{$expression}): ?>";
+    }
+
+    /**
+     * Compile the end-not-empty statements into valid PHP.
+     *
+     * @return string
+     */
+    protected function compileEndNotEmpty()
+    {
+        return '<?php endif; ?>';
+    }
+
+    /**
      * Compile the switch statements into valid PHP.
      *
      * @param  string  $expression
