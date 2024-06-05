@@ -171,6 +171,7 @@ class TestResponse implements ArrayAccess
     protected function statusMessageWithDetails($expected, $actual)
     {
         $message = "Expected response status code [{$expected}] but received {$actual}.";
+
         if ($actual === 500 && $lastException = $this->exceptions->last()) {
             $message .= <<<"EOF"
             The following exception occurred during the last request:
