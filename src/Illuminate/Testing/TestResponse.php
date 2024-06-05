@@ -174,6 +174,8 @@ class TestResponse implements ArrayAccess
 
         if ($actual === 500 && $lastException = $this->exceptions->last()) {
             $message .= <<<"EOF"
+
+
             The following exception occurred during the last request:
 
             $lastException
@@ -181,6 +183,7 @@ class TestResponse implements ArrayAccess
             ----------------------------------------------------------------------------------
 
             {$lastException->getMessage()}
+
             EOF;
         }
 
