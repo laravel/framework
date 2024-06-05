@@ -173,17 +173,17 @@ class TestResponse implements ArrayAccess
         $message = "Expected response status code [{$expected}] but received {$actual}.";
 
         if ($actual === 500 && $lastException = $this->exceptions->last()) {
-            $message .= <<<"EOF"
+            $exception = ThrowableBuilder::from($lastException);
 
+            $message .= <<<"EOF"
 
             The following exception occurred during the last request:
 
-            $lastException
+            {$exception->asString()}
 
             ----------------------------------------------------------------------------------
 
             {$lastException->getMessage()}
-
             EOF;
         }
 
