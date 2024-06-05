@@ -117,7 +117,7 @@ class BroadcastingInstallCommand extends Command
     {
         $filesystem = new Filesystem;
 
-        if (! $filesystem->exists(app()->configPath('app.php')) || 
+        if (! $filesystem->exists(app()->configPath('app.php')) ||
             ! $filesystem->exists('app/Providers/BroadcastServiceProvider.php')) {
             return;
         }
