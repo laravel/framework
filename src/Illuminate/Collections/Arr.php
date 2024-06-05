@@ -856,18 +856,6 @@ class Arr
     }
 
     /**
-     * Recursively sort an array by keys and values in descending order.
-     *
-     * @param  array  $array
-     * @param  int  $options
-     * @return array
-     */
-    public static function sortRecursiveDesc($array, $options = SORT_REGULAR)
-    {
-        return static::sortRecursive($array, $options, true);
-    }
-
-    /**
      * Conditionally compile classes from an array into a CSS class list.
      *
      * @param  array  $array
