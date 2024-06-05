@@ -1163,9 +1163,9 @@ class SupportArrTest extends TestCase
             'nested' => [
                 'level1' => [
                     'level2' => [
-                        'level3' => [2,3,1],
+                        'level3' => [2, 3, 1],
                     ],
-                    'values' => [4,5,6],
+                    'values' => [4, 5, 6],
                 ],
             ],
             'mixed' => [
