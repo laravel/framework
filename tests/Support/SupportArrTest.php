@@ -1397,7 +1397,7 @@ class SupportArrTest extends TestCase
         $array = [1, 2, 3, 4, 5, 6];
 
         // Test with a positive limit, should return the first 'limit' elements.
-        $this->assertEquals([ 1, 2, 3], Arr::take($array, 3));
+        $this->assertEquals([1, 2, 3], Arr::take($array, 3));
 
         // Test with a negative limit, should return the last 'abs(limit)' elements.
         $this->assertEquals([4, 5, 6], Arr::take($array, -3));
