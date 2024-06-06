@@ -260,7 +260,7 @@ class CallQueuedHandler
         $this->ensureChainCatchCallbacksAreInvoked($uuid, $command, $e);
 
         if (method_exists($command, 'failed')) {
-            $command->failed($e);
+            $command->failed($uuid, $e);
         }
     }
 
