@@ -47,6 +47,24 @@ class EloquentModelLoadSumTest extends DatabaseTestCase
         $this->assertEquals(21, $model->related1_sum_number);
     }
 
+    public function testLoadSumDoesNotFireEvent()
+    {
+        $model = BaseModel::first();
+
+        $_SERVER['-'] = [];
+        $listener = function ($model) {
+            $_SERVER['-'][] = $model;
+        };
+        BaseModel::getEventDispatcher()->listen('eloquent.*: '.BaseModel::class, $listener);
+
+        // act:
+        $model->loadSum('related1', 'number');
+
+        // assert:
+        $this->assertEquals([], $_SERVER['-']);
+        unset($_SERVER['-']);
+    }
+
     public function testLoadSumMultipleRelations()
     {
         $model = BaseModel::first();

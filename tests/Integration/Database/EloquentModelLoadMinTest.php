@@ -48,6 +48,24 @@ class EloquentModelLoadMinTest extends DatabaseTestCase
         $this->assertEquals(10, $model->related1_min_number);
     }
 
+    public function testLoadMinDoesNotFireEvent()
+    {
+        $model = BaseModel::first();
+
+        $_SERVER['-'] = [];
+        $listener = function ($model) {
+            $_SERVER['-'][] = $model;
+        };
+        BaseModel::getEventDispatcher()->listen('eloquent.*: '.BaseModel::class, $listener);
+
+        // act:
+        $model->loadMin('related1', 'number');
+
+        // assert:
+        $this->assertEquals([], $_SERVER['-']);
+        unset($_SERVER['-']);
+    }
+
     public function testLoadMinMultipleRelations()
     {
         $model = BaseModel::first();

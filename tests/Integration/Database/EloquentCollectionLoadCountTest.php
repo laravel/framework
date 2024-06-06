@@ -66,6 +66,26 @@ class EloquentCollectionLoadCountTest extends DatabaseTestCase
         $this->assertSame('2', (string) $posts[2]->comments_count);
     }
 
+    public function testLoadCountDoesNotFireAnyModelRelatedEvents()
+    {
+        // arrange:
+        $posts = Post::all()->push(Post::first());
+
+        $_SERVER['-'] = [];
+
+        $listener = function ($model) {
+            $_SERVER['-'][] = $model;
+        };
+
+        Post::getEventDispatcher()->listen('eloquent.*: '.Post::class, $listener);
+        // act:
+        $posts->loadCount('comments');
+
+        // assert:
+        $this->assertEquals([], $_SERVER['-']);
+        unset($_SERVER['-']);
+    }
+
     public function testLoadCountOnDeletedModels()
     {
         $posts = Post::all()->each->delete();

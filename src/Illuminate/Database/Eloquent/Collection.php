@@ -88,8 +88,8 @@ class Collection extends BaseCollection implements QueueableCollection
         $models = $this->first()->newModelQuery()
             ->whereKey($this->modelKeys())
             ->select($this->first()->getKeyName())
-            ->withAggregate($relations, $column, $function)
-            ->get()
+            ->withAggregate($relations, $column, $function);
+        $models = Model::withoutEvents(fn () => $models->get())
             ->keyBy($this->first()->getKeyName());
 
         $attributes = Arr::except(

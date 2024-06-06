@@ -48,6 +48,24 @@ class EloquentModelLoadMaxTest extends DatabaseTestCase
         $this->assertEquals(11, $model->related1_max_number);
     }
 
+    public function testLoadMaxDoesNotFireEvent()
+    {
+        $model = BaseModel::first();
+
+        $_SERVER['-'] = [];
+        $listener = function ($model) {
+            $_SERVER['-'][] = $model;
+        };
+        BaseModel::getEventDispatcher()->listen('eloquent.*: '.BaseModel::class, $listener);
+
+        // act:
+        $model->loadMax('related1', 'number');
+
+        // assert:
+        $this->assertEquals([], $_SERVER['-']);
+        unset($_SERVER['-']);
+    }
+
     public function testLoadMaxMultipleRelations()
     {
         $model = BaseModel::first();
