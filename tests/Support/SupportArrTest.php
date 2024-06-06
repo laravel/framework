@@ -27,7 +27,7 @@ class SupportArrTest extends TestCase
         $this->assertFalse(Arr::accessible(12.34));
         $this->assertFalse(Arr::accessible(true));
         $this->assertFalse(Arr::accessible(new \DateTime));
-        $this->assertFalse(Arr::accessible(static fn() => null));
+        $this->assertFalse(Arr::accessible(static fn () => null));
     }
 
     public function testAdd()
