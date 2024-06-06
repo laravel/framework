@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Testing;
 
+use Exception;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\View\View;
 use Illuminate\Cookie\CookieValuePrefix;
@@ -9,12 +10,14 @@ use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Encryption\Encrypter;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\RouteCollection;
 use Illuminate\Routing\UrlGenerator;
 use Illuminate\Session\ArraySessionHandler;
+use Illuminate\Session\NullSessionHandler;
 use Illuminate\Session\Store;
 use Illuminate\Support\Collection;
 use Illuminate\Support\MessageBag;
@@ -2458,6 +2461,110 @@ class TestResponseTest extends TestCase
         $this->assertInstanceOf(Cookie::class, $cookie);
         $this->assertEquals($cookieName, $cookie->getName());
         $this->assertEquals($cookieValue, $cookie->getValue());
+    }
+
+    public function testHandledExceptionIsIncludedInAssertionFailure()
+    {
+        $response = TestResponse::fromBaseResponse(new Response('', 500))
+            ->withExceptions(collect([new Exception('Unexpected exception.')]));
+
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage(<<<'EOF'
+            Expected response status code [200] but received 500.
+            Failed asserting that 500 is identical to 200.
+
+            The following exception occurred during the last request:
+
+            Exception: Unexpected exception.
+            EOF);
+
+        $response->assertStatus(200);
+    }
+
+    public function testValidationErrorsAreIncludedInAssertionFailure()
+    {
+        $response = TestResponse::fromBaseResponse(
+            tap(new RedirectResponse('/'))
+                ->setSession(new Store('test-session', new NullSessionHandler()))
+                ->withErrors([
+                    'first_name' => 'The first name field is required.',
+                    'last_name' => 'The last name field is required.',
+                ])
+        );
+
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage(<<<'EOF'
+            Expected response status code [200] but received 302.
+            Failed asserting that 302 is identical to 200.
+
+            The following errors occurred during the last request:
+
+            The first name field is required.
+            The last name field is required.
+            EOF);
+
+        $response->assertStatus(200);
+    }
+
+    public function testJsonErrorsAreIncludedInAssertionFailure()
+    {
+        $response = TestResponse::fromBaseResponse(new JsonResponse([
+            'errors' => [
+                'first_name' => ['The first name field is required.'],
+                'last_name' => ['The last name field is required.'],
+            ],
+        ], 422));
+
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage(<<<'EOF'
+            Expected response status code [200] but received 422.
+            Failed asserting that 422 is identical to 200.
+
+            The following errors occurred during the last request:
+
+            {
+                "errors": {
+                    "first_name": [
+                        "The first name field is required."
+                    ],
+                    "last_name": [
+                        "The last name field is required."
+                    ]
+                }
+            }
+            EOF);
+
+        $response->assertStatus(200);
+    }
+
+    public function testItHandlesFalseJson()
+    {
+        $response = TestResponse::fromBaseResponse(
+            new Response(false, 422, ['Content-Type' => 'application/json'])
+        );
+
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage(<<<'EOF'
+            Expected response status code [200] but received 422.
+            Failed asserting that 422 is identical to 200.
+            EOF);
+
+        $response->assertStatus(200);
+    }
+
+    public function testItHandlesEncodedJson()
+    {
+        $response = TestResponse::fromBaseResponse(
+            new Response('b"x£½V*.I,)-V▓R╩¤V¬\x05\x00+ü\x059"', 422, ['Content-Type' => 'application/json', 'Content-Encoding' => 'gzip'])
+        );
+
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage(<<<'EOF'
+            Expected response status code [200] but received 422.
+            Failed asserting that 422 is identical to 200.
+            EOF);
+
+        $response->assertStatus(200);
     }
 
     private function makeMockResponse($content)
