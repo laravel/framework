@@ -90,6 +90,10 @@ abstract class Component
      */
     public static function resolve($data)
     {
+        $data = collect($data)->mapWithKeys(function ($item, $key) {
+            return [\Illuminate\Support\Str::camel($key) => $item];
+        })->toArray();
+
         if (static::$componentsResolver) {
             return call_user_func(static::$componentsResolver, static::class, $data);
         }
