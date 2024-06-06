@@ -29,6 +29,8 @@ class OnceHelperTest extends TestCase
         $verifiedUsers = User::verified();
         $unverifiedUsers = User::unverified();
 
+        $this->assertCount(3, $verifiedUsers);
+        $this->assertCount(2, $unverifiedUsers);
         $this->assertCount(2, DB::getQueryLog());
 
         $verifiedUsers2 = User::verified();
@@ -48,6 +50,8 @@ class OnceHelperTest extends TestCase
         $verifiedUsers = User::getByType('verified');
         $unverifiedUsers = User::getByType('unverified');
 
+        $this->assertCount(3, $verifiedUsers);
+        $this->assertCount(2, $unverifiedUsers);
         $this->assertCount(2, DB::getQueryLog());
 
         $verifiedUsers2 = User::getByType('verified');
