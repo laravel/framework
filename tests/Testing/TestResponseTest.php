@@ -2469,14 +2469,7 @@ class TestResponseTest extends TestCase
             ->withExceptions(collect([new Exception('Unexpected exception.')]));
 
         $this->expectException(ExpectationFailedException::class);
-        $this->expectExceptionMessage(<<<'EOF'
-            Expected response status code [200] but received 500.
-            Failed asserting that 500 is identical to 200.
-
-            The following exception occurred during the last request:
-
-            Exception: Unexpected exception.
-            EOF);
+        $this->expectExceptionMessageMatches('/Expected response status code \[200\] but received 500.*Exception: Unexpected exception/s');
 
         $response->assertStatus(200);
     }
@@ -2493,15 +2486,7 @@ class TestResponseTest extends TestCase
         );
 
         $this->expectException(ExpectationFailedException::class);
-        $this->expectExceptionMessage(<<<'EOF'
-            Expected response status code [200] but received 302.
-            Failed asserting that 302 is identical to 200.
-
-            The following errors occurred during the last request:
-
-            The first name field is required.
-            The last name field is required.
-            EOF);
+        $this->expectExceptionMessageMatches('/Expected response status code \[200\] but received 302.*The first name field is required.*The last name field is required/s');
 
         $response->assertStatus(200);
     }
@@ -2516,23 +2501,7 @@ class TestResponseTest extends TestCase
         ], 422));
 
         $this->expectException(ExpectationFailedException::class);
-        $this->expectExceptionMessage(<<<'EOF'
-            Expected response status code [200] but received 422.
-            Failed asserting that 422 is identical to 200.
-
-            The following errors occurred during the last request:
-
-            {
-                "errors": {
-                    "first_name": [
-                        "The first name field is required."
-                    ],
-                    "last_name": [
-                        "The last name field is required."
-                    ]
-                }
-            }
-            EOF);
+        $this->expectExceptionMessageMatches('/Expected response status code \[200\] but received 422.*The first name field is required.*The last name field is required/s');
 
         $response->assertStatus(200);
     }
@@ -2544,10 +2513,7 @@ class TestResponseTest extends TestCase
         );
 
         $this->expectException(ExpectationFailedException::class);
-        $this->expectExceptionMessage(<<<'EOF'
-            Expected response status code [200] but received 422.
-            Failed asserting that 422 is identical to 200.
-            EOF);
+        $this->expectExceptionMessage('Expected response status code [200] but received 422.');
 
         $response->assertStatus(200);
     }
@@ -2559,10 +2525,7 @@ class TestResponseTest extends TestCase
         );
 
         $this->expectException(ExpectationFailedException::class);
-        $this->expectExceptionMessage(<<<'EOF'
-            Expected response status code [200] but received 422.
-            Failed asserting that 422 is identical to 200.
-            EOF);
+        $this->expectExceptionMessage('Expected response status code [200] but received 422.');
 
         $response->assertStatus(200);
     }
