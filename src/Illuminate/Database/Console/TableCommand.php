@@ -49,7 +49,7 @@ class TableCommand extends DatabaseInspectionCommand
         $table = Arr::first($tables, fn ($table) => $table['name'] === $tableName);
 
         if (! $table) {
-            $this->components->warn("Table [{$table}] doesn't exist.");
+            $this->components->warn("Table [{$tableName}] doesn't exist.");
 
             return 1;
         }

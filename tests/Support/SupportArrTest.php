@@ -12,7 +12,7 @@ use stdClass;
 
 class SupportArrTest extends TestCase
 {
-    public function testAccessible()
+    public function testAccessible(): void
     {
         $this->assertTrue(Arr::accessible([]));
         $this->assertTrue(Arr::accessible([1, 2]));
@@ -23,6 +23,11 @@ class SupportArrTest extends TestCase
         $this->assertFalse(Arr::accessible('abc'));
         $this->assertFalse(Arr::accessible(new stdClass));
         $this->assertFalse(Arr::accessible((object) ['a' => 1, 'b' => 2]));
+        $this->assertFalse(Arr::accessible(123));
+        $this->assertFalse(Arr::accessible(12.34));
+        $this->assertFalse(Arr::accessible(true));
+        $this->assertFalse(Arr::accessible(new \DateTime));
+        $this->assertFalse(Arr::accessible(static fn () => null));
     }
 
     public function testAdd()
@@ -1156,6 +1161,61 @@ class SupportArrTest extends TestCase
         $this->assertEquals($expect, Arr::sortRecursive($array));
     }
 
+    public function testSortRecursiveDesc()
+    {
+        $array = [
+            'empty' => [],
+            'nested' => [
+                'level1' => [
+                    'level2' => [
+                        'level3' => [2, 3, 1],
+                    ],
+                    'values' => [4, 5, 6],
+                ],
+            ],
+            'mixed' => [
+                'a' => 1,
+                2 => 'b',
+                'c' => 3,
+                1 => 'd',
+            ],
+            'numbered_index' => [
+                1 => 'e',
+                3 => 'c',
+                4 => 'b',
+                5 => 'a',
+                2 => 'd',
+            ],
+        ];
+
+        $expect = [
+            'empty' => [],
+            'mixed' => [
+                'c' => 3,
+                'a' => 1,
+                2 => 'b',
+                1 => 'd',
+            ],
+            'nested' => [
+                'level1' => [
+                    'values' => [6, 5, 4],
+                    'level2' => [
+                        'level3' => [3, 2, 1],
+                    ],
+                ],
+            ],
+            'numbered_index' => [
+                5 => 'a',
+                4 => 'b',
+                3 => 'c',
+                2 => 'd',
+                1 => 'e',
+            ],
+        ];
+
+        $this->assertEquals($expect, Arr::sortRecursiveDesc($array));
+    }
+
     public function testToCssClasses()
     {
         $classes = Arr::toCssClasses([
@@ -1387,17 +1447,24 @@ class SupportArrTest extends TestCase
         ], Arr::prependKeysWith($array, 'test.'));
     }
 
-    public function testTake()
+    public function testTake(): void
     {
         $array = [1, 2, 3, 4, 5, 6];
 
-        $this->assertEquals([
-            1, 2, 3,
-        ], Arr::take($array, 3));
+        // Test with a positive limit, should return the first 'limit' elements.
+        $this->assertEquals([1, 2, 3], Arr::take($array, 3));
 
-        $this->assertEquals([
-            4, 5, 6,
-        ], Arr::take($array, -3));
+        // Test with a negative limit, should return the last 'abs(limit)' elements.
+        $this->assertEquals([4, 5, 6], Arr::take($array, -3));
+
+        // Test with zero limit, should return an empty array.
+        $this->assertEquals([], Arr::take($array, 0));
+
+        // Test with a limit greater than the array size, should return the entire array.
+        $this->assertEquals([1, 2, 3, 4, 5, 6], Arr::take($array, 10));
+
+        // Test with a negative limit greater than the array size, should return the entire array.
+        $this->assertEquals([1, 2, 3, 4, 5, 6], Arr::take($array, -10));
     }
 
     public function testSelect()
