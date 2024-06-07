@@ -351,11 +351,12 @@ class UrlGenerator implements UrlGeneratorContract
      * @param  mixed  $parameters
      * @param  \DateTimeInterface|\DateInterval|int|null  $expiration
      * @param  bool  $absolute
+     * @param  array  $ignoredParameters
      * @return string
      *
      * @throws \InvalidArgumentException
      */
-    public function signedRoute($name, $parameters = [], $expiration = null, $absolute = true)
+    public function signedRoute($name, $parameters = [], $expiration = null, $absolute = true, $ignoredParameters = [])
     {
         $this->ensureSignedRouteParametersAreNotReserved(
             $parameters = Arr::wrap($parameters)
@@ -375,7 +376,7 @@ class UrlGenerator implements UrlGeneratorContract
                 $this->route($name, $parameters, $absolute),
                 is_array($key) ? $key[0] : $key
             ),
-        ], $absolute);
+        ] + $ignoredParameters, $absolute);
     }
 
     /**
@@ -406,11 +407,12 @@ class UrlGenerator implements UrlGeneratorContract
      * @param  \DateTimeInterface|\DateInterval|int  $expiration
      * @param  array  $parameters
      * @param  bool  $absolute
+     * @param  array  $ignoredParameters
      * @return string
      */
-    public function temporarySignedRoute($name, $expiration, $parameters = [], $absolute = true)
+    public function temporarySignedRoute($name, $expiration, $parameters = [], $absolute = true, $ignoredParameters = [])
     {
-        return $this->signedRoute($name, $parameters, $expiration, $absolute);
+        return $this->signedRoute($name, $parameters, $expiration, $absolute, $ignoredParameters);
     }
 
     /**

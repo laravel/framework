@@ -69,11 +69,12 @@ interface UrlGenerator
      * @param  mixed  $parameters
      * @param  \DateTimeInterface|\DateInterval|int|null  $expiration
      * @param  bool  $absolute
+     * @param  array  $ignoredParameters
      * @return string
      *
      * @throws \InvalidArgumentException
      */
-    public function signedRoute($name, $parameters = [], $expiration = null, $absolute = true);
+    public function signedRoute($name, $parameters = [], $expiration = null, $absolute = true, $ignoredParameters = []);
 
     /**
      * Create a temporary signed route URL for a named route.
@@ -82,9 +83,10 @@ interface UrlGenerator
      * @param  \DateTimeInterface|\DateInterval|int  $expiration
      * @param  array  $parameters
      * @param  bool  $absolute
+     * @param  array  $ignoredParameters
      * @return string
      */
-    public function temporarySignedRoute($name, $expiration, $parameters = [], $absolute = true);
+    public function temporarySignedRoute($name, $expiration, $parameters = [], $absolute = true, $ignoredParameters = []);
 
     /**
      * Get the URL to a controller action.

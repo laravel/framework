@@ -86,6 +86,23 @@ class UrlSigningTest extends TestCase
         URL::temporarySignedRoute('foo', now()->addMinutes(5), ['id' => 1, 'expires' => 253402300799]);
     }
 
+    public function testTemporarySignedUrlsWithIgnoredParameters()
+    {
+        ValidateSignature::except(['ignore']);
+
+        Route::get('/foo/{id}', function (Request $request, $id) {
+            return $request->hasValidSignatureWhileIgnoring(['ignore']) ? 'valid' : 'invalid';
+        })->name('foo');
+
+        Carbon::setTestNow(Carbon::create(2018, 1, 1));
+        $this->assertIsString($url = URL::temporarySignedRoute('foo', now()->addMinutes(5), ['id' => 1], true, ['ignore' => 'me']));
+        $this->assertStringContainsString('ignore=me', $url);
+        $this->assertSame('valid', $this->get($url)->original);
+
+        Carbon::setTestNow(Carbon::create(2018, 1, 1)->addMinutes(10));
+        $this->assertSame('invalid', $this->get($url)->original);
+    }
+
     public function testSignedUrlWithUrlWithoutSignatureParameter()
     {
         Route::get('/foo/{id}', function (Request $request, $id) {
@@ -276,6 +293,26 @@ class UrlSigningTest extends TestCase
         $this->assertIsString($url = URL::signedRoute('foo', ['id' => 1]).'&ignore=me');
         $request = Request::create($url);
         $middleware = $this->createValidateSignatureMiddleware(['ignore']);
+
+        try {
+            $middleware->handle($request, function ($request) {
+                $this->assertTrue($request->hasValidSignatureWhileIgnoring(['ignore']));
+            });
+        } catch (InvalidSignatureException $exception) {
+            $this->fail($exception->getMessage());
+        }
+    }
+
+    public function testSignedMiddlewareIgnoringParameterUsingMethodParameters()
+    {
+        Route::get('/foo/{id}', function (Request $request, $id) {
+        })->name('foo')->middleware('signed:relative');
+
+        $this->assertIsString($url = URL::signedRoute('foo', ['id' => 1], null, true, ['ignore' => 'me']));
+        $request = Request::create($url);
+        $middleware = $this->createValidateSignatureMiddleware(['ignore']);
+
+        $this->assertStringContainsString('ignore=me', $url);
 
         try {
             $middleware->handle($request, function ($request) {
