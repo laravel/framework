@@ -136,7 +136,8 @@ class MySqlConnector extends Connector implements ConnectorInterface
      */
     protected function getSocketDsn(array $config)
     {
-        return "mysql:unix_socket={$config['unix_socket']};dbname={$config['database']}";
+        // PDO for Mysql, on Windows requires "host=." to enable connection through Named Pipes
+        return "mysql:host=.;unix_socket={$config['unix_socket']};dbname={$config['database']}";
     }
 
     /**
