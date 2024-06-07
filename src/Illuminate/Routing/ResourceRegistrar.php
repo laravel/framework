@@ -79,7 +79,8 @@ class ResourceRegistrar
      */
     public function register($name, $controller, array $options = [])
     {
-        if (isset($options['parameters']) && ! isset($this->parameters)) {
+        $this->parameters = null;
+        if (isset($options['parameters'])) {
             $this->parameters = $options['parameters'];
         }
 
