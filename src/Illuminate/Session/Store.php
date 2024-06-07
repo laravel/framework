@@ -648,6 +648,16 @@ class Store implements Session
      *
      * @return string
      */
+    public function id()
+    {
+        return $this->getId();
+    }
+
+    /**
+     * Get the current session ID.
+     *
+     * @return string
+     */
     public function getId()
     {
         return $this->id;
