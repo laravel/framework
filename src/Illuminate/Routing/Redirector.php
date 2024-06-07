@@ -162,11 +162,12 @@ class Redirector
      * @param  \DateTimeInterface|\DateInterval|int|null  $expiration
      * @param  int  $status
      * @param  array  $headers
+     * @param  array  $ignoredParameters
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function signedRoute($route, $parameters = [], $expiration = null, $status = 302, $headers = [])
+    public function signedRoute($route, $parameters = [], $expiration = null, $status = 302, $headers = [], $ignoredParameters = [])
     {
-        return $this->to($this->generator->signedRoute($route, $parameters, $expiration), $status, $headers);
+        return $this->to($this->generator->signedRoute($route, $parameters, $expiration, true, $ignoredParameters), $status, $headers);
     }
 
     /**
@@ -177,11 +178,12 @@ class Redirector
      * @param  mixed  $parameters
      * @param  int  $status
      * @param  array  $headers
+     * @param  array  $ignoredParameters
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function temporarySignedRoute($route, $expiration, $parameters = [], $status = 302, $headers = [])
+    public function temporarySignedRoute($route, $expiration, $parameters = [], $status = 302, $headers = [], $ignoredParameters = [])
     {
-        return $this->to($this->generator->temporarySignedRoute($route, $expiration, $parameters), $status, $headers);
+        return $this->to($this->generator->temporarySignedRoute($route, $expiration, $parameters, true, $ignoredParameters), $status, $headers);
     }
 
     /**

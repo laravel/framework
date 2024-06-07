@@ -39,6 +39,7 @@ class RoutingRedirectorTest extends TestCase
         $this->url->shouldReceive('to')->with('http://foo.com/bar', [], null)->andReturn('http://foo.com/bar');
         $this->url->shouldReceive('to')->with('/', [], null)->andReturn('http://foo.com/');
         $this->url->shouldReceive('to')->with('http://foo.com/bar?signature=secret', [], null)->andReturn('http://foo.com/bar?signature=secret');
+        $this->url->shouldReceive('to')->with('http://foo.com/bar?signature=secret&ignore=me', [], null)->andReturn('http://foo.com/bar?signature=secret&ignore=me');
 
         $this->session = m::mock(Store::class);
 
@@ -161,18 +162,34 @@ class RoutingRedirectorTest extends TestCase
 
     public function testSignedRoute()
     {
-        $this->url->shouldReceive('signedRoute')->with('home', [], null)->andReturn('http://foo.com/bar?signature=secret');
+        $this->url->shouldReceive('signedRoute')->with('home', [], null, true, [])->andReturn('http://foo.com/bar?signature=secret');
 
         $response = $this->redirect->signedRoute('home');
         $this->assertSame('http://foo.com/bar?signature=secret', $response->getTargetUrl());
     }
 
+    public function testSignedRouteWithIgnoredParameters()
+    {
+        $this->url->shouldReceive('signedRoute')->with('home', [], null, true, ['ignore' => 'me'])->andReturn('http://foo.com/bar?signature=secret&ignore=me');
+
+        $response = $this->redirect->signedRoute('home', [], null, 302, [], ['ignore' => 'me']);
+        $this->assertSame('http://foo.com/bar?signature=secret&ignore=me', $response->getTargetUrl());
+    }
+
     public function testTemporarySignedRoute()
     {
-        $this->url->shouldReceive('temporarySignedRoute')->with('home', 10, [])->andReturn('http://foo.com/bar?signature=secret');
+        $this->url->shouldReceive('temporarySignedRoute')->with('home', 10, [], true, [])->andReturn('http://foo.com/bar?signature=secret');
 
         $response = $this->redirect->temporarySignedRoute('home', 10);
         $this->assertSame('http://foo.com/bar?signature=secret', $response->getTargetUrl());
+    }
+
+    public function testTemporarySignedRouteWithIgnoredParameters()
+    {
+        $this->url->shouldReceive('temporarySignedRoute')->with('home', 10, [], true, ['ignore' => 'me'])->andReturn('http://foo.com/bar?signature=secret&ignore=me');
+
+        $response = $this->redirect->temporarySignedRoute('home', 10, [], 302, [], ['ignore' => 'me']);
+        $this->assertSame('http://foo.com/bar?signature=secret&ignore=me', $response->getTargetUrl());
     }
 
     public function testItSetsAndGetsValidIntendedUrl()
