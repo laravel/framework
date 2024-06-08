@@ -1113,6 +1113,28 @@ class RouteRegistrarTest extends TestCase
         $this->assertSame('users.index', $this->getRoute()->getName());
     }
 
+    public function testCanNotOverrideRouteName()
+    {
+        $this->router->group([ 'as' => 'users.' ],function ($router) {
+            $this->router->get('users', function () {
+                return 'all-users';
+            })->name('index');
+        });
+
+        $this->assertSame('users.index', $this->getRoute()->getName());
+    }
+
+    public function testCanOverrideRouteName()
+    {
+        $this->router->group([ 'as' => 'users.' ],function ($router) {
+            $this->router->get('users', function () {
+                return 'all-users';
+            })->name('override', true);
+        });
+
+        $this->assertSame('override', $this->getRoute()->getName());
+    }
+
     public function testPushMiddlewareToGroup()
     {
         $this->router->middlewareGroup('web', []);

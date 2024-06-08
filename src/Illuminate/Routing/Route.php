@@ -875,10 +875,17 @@ class Route
      * Add or change the route name.
      *
      * @param  string  $name
+     * @param  bool  $override
      * @return $this
      */
-    public function name($name)
+    public function name($name, $override = false)
     {
+        if($override){
+            $this->action['as'] = $name;
+
+            return $this;
+        }
+
         $this->action['as'] = isset($this->action['as']) ? $this->action['as'].$name : $name;
 
         return $this;
