@@ -1117,7 +1117,7 @@ class Route
      */
     protected function staticallyProvidedControllerMiddleware(string $class, string $method)
     {
-        return collect($class::middleware())->reject(function ($middleware) use ($method) {
+        return collect($class::seedMiddleware())->reject(function ($middleware) use ($method) {
             return static::methodExcludedByOptions(
                 $method, ['only' => $middleware->only, 'except' => $middleware->except]
             );

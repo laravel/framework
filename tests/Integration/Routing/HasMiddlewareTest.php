@@ -21,7 +21,7 @@ class HasMiddlewareTest extends TestCase
 
 class HasMiddlewareTestController implements HasMiddleware
 {
-    public static function middleware()
+    public static function seedMiddleware()
     {
         return [
             new Middleware('all'),
