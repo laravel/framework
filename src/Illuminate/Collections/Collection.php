@@ -1114,6 +1114,34 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     }
 
     /**
+     * Get the item before the given item.
+     *
+     * @param  TValue|(callable(TValue,TKey): bool)  $value
+     * @param  bool  $strict
+     * @return TValue|null
+     */
+    public function before($value, $strict = false)
+    {
+        // $key can be an array index or an associative array key which is a string.
+        $key = $this->search($value, $strict);
+
+        if ($key === false) {
+            return null;
+        }
+
+        // Find the key position to cater for the case when the collection is an associative array.
+        $position = $this->keys()->search($key);
+
+        if ($position === false || $position === 0) {
+            return null;
+        }
+
+        $previousKey = $this->keys()->get($position - 1);
+
+        return $this->get($previousKey);
+    }
+
+    /**
      * Get and remove the first N items from the collection.
      *
      * @param  int  $count
