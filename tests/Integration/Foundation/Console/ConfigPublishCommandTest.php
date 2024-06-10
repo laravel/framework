@@ -45,6 +45,8 @@ class ConfigPublishCommandTest extends TestCase
     {
         $app->instance(LoadConfiguration::class, new LoadConfiguration());
 
+        $app->dontMergeFrameworkConfiguration();
+
         parent::resolveApplicationConfiguration($app);
     }
 
