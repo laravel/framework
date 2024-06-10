@@ -113,6 +113,7 @@ class PrecognitionTest extends TestCase
         ]);
 
         $response->assertStatus(422);
+        $response->assertHeader('Precognition', 'true');
         $response->assertHeaderMissing('Precognition-Success');
         $response->assertJsonPath('errors', [
             'required_integer' => [
@@ -132,6 +133,7 @@ class PrecognitionTest extends TestCase
         ]);
 
         $response->assertStatus(422);
+        $response->assertHeaderMissing('Precognition');
         $response->assertHeaderMissing('Precognition-Success');
         $response->assertJsonPath('errors', [
             'required_integer' => [
@@ -158,6 +160,7 @@ class PrecognitionTest extends TestCase
         ]);
 
         $response->assertStatus(422);
+        $response->assertHeader('Precognition', 'true');
         $response->assertHeaderMissing('Precognition-Success');
         $response->assertJsonPath('errors', [
             'optional_integer_1' => [
@@ -185,6 +188,7 @@ class PrecognitionTest extends TestCase
         ]);
 
         $response->assertNoContent();
+        $response->assertHeader('Precognition', 'true');
         $response->assertHeader('Precognition-Success', 'true');
     }
 
@@ -249,6 +253,7 @@ class PrecognitionTest extends TestCase
 
         $response->assertOk();
         $response->assertHeaderMissing('Precognition-Success');
+        $response->assertHeaderMissing('Precognition');
         $response->assertExactJson([
             'first' => 'expected',
             'second' => 'values',
