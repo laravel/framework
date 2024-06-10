@@ -1131,7 +1131,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
         // Find the key position to cater for the case when the collection is an associative array.
         $position = $this->keys()->search($key);
 
-        if ($position === false || $position === 0) {
+        if ($position === 0) {
             return null;
         }
 
@@ -1158,7 +1158,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
         // Find the key position to cater for the case when the collection is an associative array.
         $position = $this->keys()->search($key);
 
-        if ($position === false || $position === $this->keys()->count() - 1) {
+        if ($position === $this->keys()->count() - 1) {
             return null;
         }
 
