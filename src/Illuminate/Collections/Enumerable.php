@@ -899,6 +899,15 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     public function before($value, $strict = false);
 
     /**
+     * Get the item after the given item.
+     *
+     * @param  TValue|(callable(TValue,TKey): bool)  $value
+     * @param  bool  $strict
+     * @return TValue|null
+     */
+    public function after($value, $strict = false);
+
+    /**
      * Shuffle the items in the collection.
      *
      * @return static

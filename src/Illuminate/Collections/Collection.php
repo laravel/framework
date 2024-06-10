@@ -1122,7 +1122,6 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      */
     public function before($value, $strict = false)
     {
-        // $key can be an array index or an associative array key which is a string.
         $key = $this->search($value, $strict);
 
         if ($key === false) {
@@ -1139,6 +1138,33 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
         $previousKey = $this->keys()->get($position - 1);
 
         return $this->get($previousKey);
+    }
+
+    /**
+     * Get the item after the given item.
+     *
+     * @param  TValue|(callable(TValue,TKey): bool)  $value
+     * @param  bool  $strict
+     * @return TValue|null
+     */
+    public function after($value, $strict = false)
+    {
+        $key = $this->search($value, $strict);
+
+        if ($key === false) {
+            return null;
+        }
+
+        // Find the key position to cater for the case when the collection is an associative array.
+        $position = $this->keys()->search($key);
+
+        if ($position === false || $position === $this->keys()->count() - 1) {
+            return null;
+        }
+
+        $nextKey = $this->keys()->get($position + 1);
+
+        return $this->get($nextKey);
     }
 
     /**
