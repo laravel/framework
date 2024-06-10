@@ -54,8 +54,6 @@ class ConfigPublishCommandTest extends TestCase
 
     public function testItCanPublishConfigFilesWhenConfiguredWithDontMergeFrameworkConfiguration()
     {
-        // $this->app->useConfigPath(base_path('config-stubs'));
-
         $this->app->dontMergeFrameworkConfiguration();
 
         $this->artisan('config:publish', ['--all' => true])->assertOk();
