@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Integration\Foundation\Console;
 
-use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Bootstrap\LoadConfiguration;
 use Illuminate\Support\ServiceProvider;
 use Orchestra\Testbench\Concerns\InteractsWithPublishedFiles;
@@ -39,10 +38,6 @@ class ConfigPublishCommandTest extends TestCase
     #[\Override]
     protected function resolveApplicationConfiguration($app)
     {
-        $app->instance('files', $files = new Filesystem());
-
-        $files->ensureDirectoryExists($app->basePath('config-stubs'));
-
         $app->instance(LoadConfiguration::class, new LoadConfiguration());
 
         parent::resolveApplicationConfiguration($app);
