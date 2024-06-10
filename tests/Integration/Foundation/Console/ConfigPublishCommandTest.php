@@ -7,6 +7,7 @@ use Illuminate\Foundation\Bootstrap\LoadConfiguration;
 use Illuminate\Support\ServiceProvider;
 use Orchestra\Testbench\Concerns\InteractsWithPublishedFiles;
 use Orchestra\Testbench\TestCase;
+
 use function Orchestra\Testbench\package_path;
 
 class ConfigPublishCommandTest extends TestCase
