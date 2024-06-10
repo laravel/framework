@@ -35,12 +35,6 @@ class ConfigPublishCommandTest extends TestCase
     }
 
     #[\Override]
-    protected function getApplicationProviders($app)
-    {
-        return ServiceProvider::defaultProviders()->toArray();
-    }
-
-    #[\Override]
     protected function resolveApplicationConfiguration($app)
     {
         $app->instance(LoadConfiguration::class, new LoadConfiguration());
