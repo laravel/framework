@@ -24,13 +24,17 @@ trait LazilyRefreshDatabase
 
             RefreshDatabaseState::$lazilyRefreshed = true;
 
-            $shouldMockOutput = $this->mockConsoleOutput;
+            if (property_exists($this, 'mockConsoleOutput')) {
+                $shouldMockOutput = $this->mockConsoleOutput;
 
-            $this->mockConsoleOutput = false;
+                $this->mockConsoleOutput = false;
+            }
 
             $this->baseRefreshDatabase();
 
-            $this->mockConsoleOutput = $shouldMockOutput;
+            if (property_exists($this, 'mockConsoleOutput')) {
+                $this->mockConsoleOutput = $shouldMockOutput;
+            }
         };
 
         $database->beforeStartingTransaction($callback);

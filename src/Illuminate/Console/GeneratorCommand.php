@@ -183,9 +183,7 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
         $info = $this->type;
 
         if (in_array(CreatesMatchingTest::class, class_uses_recursive($this))) {
-            if ($this->handleTestCreation($path)) {
-                $info .= ' and test';
-            }
+            $this->handleTestCreation($path);
         }
 
         if (windows_os()) {

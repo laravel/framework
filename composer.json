@@ -106,7 +106,7 @@
         "league/flysystem-sftp-v3": "^3.0",
         "mockery/mockery": "^1.6",
         "nyholm/psr7": "^1.2",
-        "orchestra/testbench-core": "^9.0.15",
+        "orchestra/testbench-core": "^9.1.5",
         "pda/pheanstalk": "^5.0",
         "phpstan/phpstan": "^1.4.7",
         "phpunit/phpunit": "^10.5|^11.0",

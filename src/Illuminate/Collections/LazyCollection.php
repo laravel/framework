@@ -155,17 +155,6 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     }
 
     /**
-     * Get the average value of a given key.
-     *
-     * @param  (callable(TValue): float|int)|string|null  $callback
-     * @return float|int|null
-     */
-    public function avg($callback = null)
-    {
-        return $this->collect()->avg($callback);
-    }
-
-    /**
      * Get the median of a given key.
      *
      * @param  string|array<array-key, string>|null  $key
@@ -1328,7 +1317,7 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
      */
     public function splitIn($numberOfGroups)
     {
-        return $this->chunk(ceil($this->count() / $numberOfGroups));
+        return $this->chunk((int) ceil($this->count() / $numberOfGroups));
     }
 
     /**
