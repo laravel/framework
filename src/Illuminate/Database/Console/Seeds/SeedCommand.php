@@ -4,11 +4,16 @@ namespace Illuminate\Database\Console\Seeds;
 
 use Illuminate\Console\Command;
 use Illuminate\Console\ConfirmableTrait;
+use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
+use Illuminate\Database\Console\Events\SeedingFailed;
+use Illuminate\Database\Console\Events\SeedingFinished;
+use Illuminate\Database\Console\Events\SeedingStarted;
 use Illuminate\Database\Eloquent\Model;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
+use Throwable;
 
 #[AsCommand(name: 'db:seed')]
 class SeedCommand extends Command
@@ -37,22 +42,34 @@ class SeedCommand extends Command
     protected $resolver;
 
     /**
+     * The event dispatcher instance.
+     *
+     * @var \Illuminate\Contracts\Events\Dispatcher
+     */
+    protected $dispatcher;
+
+    /**
      * Create a new database seed command instance.
      *
      * @param  \Illuminate\Database\ConnectionResolverInterface  $resolver
+     * @param  \Illuminate\Contracts\Events\Dispatcher  $dispatcher
      * @return void
      */
-    public function __construct(Resolver $resolver)
-    {
+    public function __construct(
+        Resolver $resolver,
+        Dispatcher $dispatcher,
+    ) {
         parent::__construct();
 
         $this->resolver = $resolver;
+        $this->dispatcher = $dispatcher;
     }
 
     /**
      * Execute the console command.
      *
      * @return int
+     * @throws Throwable
      */
     public function handle()
     {
@@ -66,9 +83,19 @@ class SeedCommand extends Command
 
         $this->resolver->setDefaultConnection($this->getDatabase());
 
-        Model::unguarded(function () {
-            $this->getSeeder()->__invoke();
-        });
+        $this->dispatcher->dispatch(new SeedingStarted());
+
+        try {
+            Model::unguarded(function () {
+                $this->getSeeder()->__invoke();
+            });
+        } catch (Throwable $e) {
+            $this->dispatcher->dispatch(new SeedingFailed($e));
+
+            throw $e;
+        }
+
+        $this->dispatcher->dispatch(new SeedingFinished());
 
         if ($previousConnection) {
             $this->resolver->setDefaultConnection($previousConnection);
@@ -87,7 +114,7 @@ class SeedCommand extends Command
         $class = $this->input->getArgument('class') ?? $this->input->getOption('class');
 
         if (! str_contains($class, '\\')) {
-            $class = 'Database\\Seeders\\'.$class;
+            $class = 'Database\\Seeders\\' . $class;
         }
 
         if ($class === 'Database\\Seeders\\DatabaseSeeder' &&
@@ -96,8 +123,8 @@ class SeedCommand extends Command
         }
 
         return $this->laravel->make($class)
-                        ->setContainer($this->laravel)
-                        ->setCommand($this);
+            ->setContainer($this->laravel)
+            ->setCommand($this);
     }
 
     /**
@@ -132,7 +159,10 @@ class SeedCommand extends Command
     protected function getOptions()
     {
         return [
-            ['class', null, InputOption::VALUE_OPTIONAL, 'The class name of the root seeder', 'Database\\Seeders\\DatabaseSeeder'],
+            [
+                'class', null, InputOption::VALUE_OPTIONAL, 'The class name of the root seeder',
+                'Database\\Seeders\\DatabaseSeeder'
+            ],
             ['database', null, InputOption::VALUE_OPTIONAL, 'The database connection to seed'],
             ['force', null, InputOption::VALUE_NONE, 'Force the operation to run when in production'],
         ];
