@@ -3709,12 +3709,12 @@ class SupportCollectionTest extends TestCase
 
         $this->assertEquals(1, $c->before(2));
         $this->assertEquals(1, $c->before('2'));
-        $this->assertSame(5, $c->before('taylor'));
+        $this->assertEquals(5, $c->before('taylor'));
         $this->assertSame('taylor', $c->before('laravel'));
         $this->assertEquals(4, $c->before(function ($value) {
             return $value > 4;
         }));
-        $this->assertSame(5, $c->before(function ($value) {
+        $this->assertEquals(5, $c->before(function ($value) {
             return ! is_numeric($value);
         }));
     }
@@ -3759,6 +3759,68 @@ class SupportCollectionTest extends TestCase
 
         $c = new $collection(['foo' => 'bar', 1, 2, 3, 4, 5]);
         $this->assertNull($c->before('bar'));
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testAfterReturnsItemAfterTheGivenItem($collection)
+    {
+        $c = new $collection([1, 2, 3, 4, 2, 5, 'name' => 'taylor', 'framework' => 'laravel']);
+
+        $this->assertEquals(2, $c->after(1));
+        $this->assertEquals(3, $c->after(2));
+        $this->assertEquals(4, $c->after(3));
+        $this->assertEquals(2, $c->after(4));
+        $this->assertEquals('taylor', $c->after(5));
+        $this->assertEquals('laravel', $c->after('taylor'));
+
+        $this->assertEquals(4, $c->after(function ($value) {
+            return $value > 2;
+        }));
+        $this->assertEquals('laravel', $c->after(function ($value) {
+            return ! is_numeric($value);
+        }));
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testAfterInStrictMode($collection)
+    {
+        $c = new $collection([false, 0, 1, [], '']);
+
+        $this->assertNull($c->after('false', true));
+        $this->assertNull($c->after('1', true));
+        $this->assertNull($c->after('', true));
+        $this->assertEquals(0, $c->after(false, true));
+        $this->assertEquals([], $c->after(1, true));
+        $this->assertEquals('', $c->after([], true));
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testAfterReturnsNullWhenItemIsNotFound($collection)
+    {
+        $c = new $collection([1, 2, 3, 4, 5, 'foo' => 'bar']);
+
+        $this->assertNull($c->after(6));
+        $this->assertNull($c->after('foo'));
+        $this->assertNull($c->after(function ($value) {
+            return $value < 1 && is_numeric($value);
+        }));
+        $this->assertNull($c->after(function ($value) {
+            return $value === 'nope';
+        }));
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testAfterReturnsNullWhenItemOnTheLastItem($collection)
+    {
+        $c = new $collection([1, 2, 3, 4, 5, 'foo' => 'bar']);
+
+        $this->assertNull($c->after('bar'));
+        $this->assertNull($c->after(function ($value) {
+            return $value > 4 && !is_numeric($value);
+        }));
+
+        $c = new $collection(['foo' => 'bar', 1, 2, 3, 4, 5]);
+        $this->assertNull($c->after(5));
     }
 
     #[DataProvider('collectionClassProvider')]
