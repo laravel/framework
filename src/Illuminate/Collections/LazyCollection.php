@@ -1083,6 +1083,35 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     }
 
     /**
+     * Get the item before the given item.
+     *
+     * @param TValue|(callable(TValue,TKey): bool) $value
+     * @param bool $strict
+     * @return TValue|null
+     */
+    public function before($value, $strict = false)
+    {
+        $previous = null;
+
+        /** @var (callable(TValue,TKey): bool) $predicate */
+        $predicate = $this->useAsCallable($value)
+            ? $value
+            : function ($item) use ($value, $strict) {
+                return $strict ? $item === $value : $item == $value;
+            };
+
+        foreach ($this as $key => $item) {
+            if ($predicate($item, $key)) {
+                return $previous;
+            }
+
+            $previous = $item;
+        }
+
+        return null;
+    }
+
+    /**
      * Shuffle the items in the collection.
      *
      * @return static
