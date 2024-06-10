@@ -9,27 +9,27 @@ use Orchestra\Testbench\TestCase;
 
 class WipeCommandTest extends TestCase
 {
-    protected function defineEnvironment($app): void
-    {
-        $app['config']->set([
-            'database.default' => 'first_connection',
-            'database.connections.first_connection' => [
-                'driver' => 'sqlite',
-                'database' => realpath(__DIR__.'/stubs/multiple_databases/databases/first.sqlite'),
-            ],
-            'database.connections.second_connection' => [
-                'driver' => 'sqlite',
-                'database' => realpath(__DIR__.'/stubs/multiple_databases/databases/second.sqlite'),
-            ],
-        ]);
-    }
-
     protected function tearDown(): void
     {
         $this->artisan('db:wipe', ['--database' => 'first_connection']);
         $this->artisan('db:wipe', ['--database' => 'second_connection']);
 
         parent::tearDown();
+    }
+
+    protected function defineEnvironment($app): void
+    {
+        $app['config']->set([
+            'database.default' => 'first_connection',
+            'database.connections.first_connection' => [
+                'driver' => 'sqlite',
+                'database' => ':memory:'
+            ],
+            'database.connections.second_connection' => [
+                'driver' => 'sqlite',
+                'database' => ':memory:'
+            ],
+        ]);
     }
 
     protected function migrate(): array
