@@ -3,7 +3,6 @@
 namespace Illuminate\Foundation\Bootstrap;
 
 use Illuminate\Contracts\Foundation\Application;
-use Illuminate\Support\DefaultProviders;
 
 class RegisterProviders
 {
@@ -54,7 +53,6 @@ class RegisterProviders
                 }
             }
         }
-
 
         $app->make('config')->set(
             'app.providers',
