@@ -91,12 +91,12 @@ class ConfigPublishCommand extends Command
     {
         $config = [];
 
-        $dontMergeFrameworkConfiguration = $this->laravel->dontMergeFrameworkConfiguration();
+        $dontMergeConfiguration = $this->laravel->dontMergeFrameworkConfiguration();
 
         foreach (Finder::create()->files()->name('*.php')->in(__DIR__.'/../../../../config') as $file) {
             $name = basename($file->getRealPath(), '.php');
 
-            $config[$name] = ($dontMergeFrameworkConfiguration === true && file_exists($stubPath = (__DIR__.'/../../../../config-stubs/'.$name.'.php')))
+            $config[$name] = ($dontMergeConfiguration === true && file_exists($stubPath = (__DIR__.'/../../../../config-stubs/'.$name.'.php')))
                 ? $stubPath
                 : $file->getRealPath();
         }
