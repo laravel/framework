@@ -650,6 +650,19 @@ trait ManagesFrequencies
     }
 
     /**
+     * A shorthand to set the timezone the date should be evaluated on.
+     *
+     * @param  \DateTimeZone|string  $timezone
+     * @return $this
+     */
+    public function tz($timezone)
+    {
+        $this->timezone($timezone);
+
+        return $this;
+    }
+
+    /**
      * Splice the given value into the given position of the expression.
      *
      * @param  int  $position
