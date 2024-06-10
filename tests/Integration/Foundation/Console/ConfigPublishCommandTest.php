@@ -50,17 +50,16 @@ class ConfigPublishCommandTest extends TestCase
 
     public function testItCanPublishConfigFilesWhenConfiguredWithDontMergeFrameworkConfiguration()
     {
-
         $this->app->useConfigPath(base_path('config-stubs'));
 
         $this->app->dontMergeFrameworkConfiguration();
 
         $this->artisan('config:publish', ['--all' => true])->assertOk();
 
-        foreach([
+        foreach ([
             'app', 'auth', 'broadcasting', 'cache', 'cors',
             'database', 'filesystems', 'hashing', 'logging',
-            'mail', 'queue', 'services', 'session', 'view'
+            'mail', 'queue', 'services', 'session', 'view',
         ] as $file) {
             $this->assertFilenameExists("config-stubs/{$file}.php");
             $this->assertStringContainsString(
