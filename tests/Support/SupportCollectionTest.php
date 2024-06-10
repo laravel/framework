@@ -3816,7 +3816,7 @@ class SupportCollectionTest extends TestCase
 
         $this->assertNull($c->after('bar'));
         $this->assertNull($c->after(function ($value) {
-            return $value > 4 && !is_numeric($value);
+            return $value > 4 && ! is_numeric($value);
         }));
 
         $c = new $collection(['foo' => 'bar', 1, 2, 3, 4, 5]);

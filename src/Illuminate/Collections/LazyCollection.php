@@ -1085,8 +1085,8 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     /**
      * Get the item before the given item.
      *
-     * @param TValue|(callable(TValue,TKey): bool) $value
-     * @param bool $strict
+     * @param  TValue|(callable(TValue,TKey): bool)  $value
+     * @param  bool  $strict
      * @return TValue|null
      */
     public function before($value, $strict = false)
@@ -1114,8 +1114,8 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     /**
      * Get the item after the given item.
      *
-     * @param TValue|(callable(TValue,TKey): bool) $value
-     * @param bool $strict
+     * @param  TValue|(callable(TValue,TKey): bool)  $value
+     * @param  bool  $strict
      * @return TValue|null
      */
     public function after($value, $strict = false)
