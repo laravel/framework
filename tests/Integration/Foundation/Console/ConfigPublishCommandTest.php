@@ -45,6 +45,8 @@ class ConfigPublishCommandTest extends TestCase
     {
         $app->instance(LoadConfiguration::class, new LoadConfiguration());
 
+        $app->useConfigPath($app->basePath('config-stubs'));
+
         $app->dontMergeFrameworkConfiguration();
 
         parent::resolveApplicationConfiguration($app);
@@ -52,7 +54,7 @@ class ConfigPublishCommandTest extends TestCase
 
     public function testItCanPublishConfigFilesWhenConfiguredWithDontMergeFrameworkConfiguration()
     {
-        $this->app->useConfigPath(base_path('config-stubs'));
+        // $this->app->useConfigPath(base_path('config-stubs'));
 
         $this->app->dontMergeFrameworkConfiguration();
 
