@@ -9,17 +9,17 @@ trait CanBePrecognitive
     /**
      * Filter the given array of rules into an array of rules that are included in precognitive headers.
      *
-     * @param  array  $rules
+     * @param array $rules
      * @return array
      */
-    public function filterPrecognitiveRules($rules)
+    public function filterPrecognitiveRules(array $rules): array
     {
         if (! $this->headers->has('Precognition-Validate-Only')) {
             return $rules;
         }
 
         return Collection::make($rules)
-            ->only(explode(',', $this->header('Precognition-Validate-Only')))
+            ->only($this->getPrecognitionValidate())
             ->all();
     }
 
@@ -28,7 +28,7 @@ trait CanBePrecognitive
      *
      * @return bool
      */
-    public function isAttemptingPrecognition()
+    public function isAttemptingPrecognition(): bool
     {
         return $this->header('Precognition') === 'true';
     }
@@ -41,5 +41,15 @@ trait CanBePrecognitive
     public function isPrecognitive()
     {
         return $this->attributes->get('precognitive', false);
+    }
+
+    /**
+     * Return Precognition-Validate-Only header data as an array.
+     *
+     * @return array
+     */
+    public function getPrecognitionValidate(): array
+    {
+        return explode(',', $this->header('Precognition-Validate-Only'));
     }
 }
