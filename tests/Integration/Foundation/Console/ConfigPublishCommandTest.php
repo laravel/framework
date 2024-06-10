@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Integration\Foundation\Console;
 
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Bootstrap\LoadConfiguration;
+use Illuminate\Support\ServiceProvider;
 use Orchestra\Testbench\Concerns\InteractsWithPublishedFiles;
 use Orchestra\Testbench\TestCase;
 
@@ -59,5 +60,7 @@ class ConfigPublishCommandTest extends TestCase
                 file_get_contents(package_path(['config', "{$file}.php"])), file_get_contents(config_path("{$file}.php"))
             );
         }
+
+        $this->assertSame(config('app.providers'), ServiceProvider::defaultProviders()->toArray());
     }
 }
