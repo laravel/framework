@@ -2,11 +2,11 @@
 
 namespace Illuminate\Tests\Integration\Foundation\Console;
 
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Bootstrap\LoadConfiguration;
 use Illuminate\Support\ServiceProvider;
 use Orchestra\Testbench\Concerns\InteractsWithPublishedFiles;
 use Orchestra\Testbench\TestCase;
-
 use function Orchestra\Testbench\package_path;
 
 class ConfigPublishCommandTest extends TestCase
@@ -17,24 +17,28 @@ class ConfigPublishCommandTest extends TestCase
         'config-stubs/*.php',
     ];
 
-    /**
-     * Get application providers.
-     *
-     * @param  \Illuminate\Foundation\Application  $app
-     * @return array<int, class-string>
-     */
+    #[\Override]
+    protected function setUp(): void
+    {
+        $files = new Filesystem();
+
+        $this->afterApplicationCreated(function () use ($files) {
+            $files->ensureDirectoryExists($this->app->basePath('config-stubs'));
+        });
+
+        $this->beforeApplicationDestroyed(function () use ($files) {
+            $files->deleteDirectory($this->app->basePath('config-stubs'));
+        });
+
+        parent::setUp();
+    }
+
     #[\Override]
     protected function getApplicationProviders($app)
     {
         return ServiceProvider::defaultProviders()->toArray();
     }
 
-    /**
-     * Resolve application core configuration implementation.
-     *
-     * @param  \Illuminate\Foundation\Application  $app
-     * @return void
-     */
     #[\Override]
     protected function resolveApplicationConfiguration($app)
     {
