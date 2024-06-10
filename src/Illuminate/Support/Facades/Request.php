@@ -121,6 +121,7 @@ namespace Illuminate\Support\Facades;
  * @method static array filterPrecognitiveRules(array $rules)
  * @method static bool isAttemptingPrecognition()
  * @method static bool isPrecognitive()
+ * @method static array getPrecognitionValidate()
  * @method static bool isJson()
  * @method static bool expectsJson()
  * @method static bool wantsJson()
