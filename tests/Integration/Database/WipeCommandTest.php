@@ -23,11 +23,11 @@ class WipeCommandTest extends TestCase
             'database.default' => 'first_connection',
             'database.connections.first_connection' => [
                 'driver' => 'sqlite',
-                'database' => ':memory:'
+                'database' => ':memory:',
             ],
             'database.connections.second_connection' => [
                 'driver' => 'sqlite',
-                'database' => ':memory:'
+                'database' => ':memory:',
             ],
         ]);
     }
