@@ -846,7 +846,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
     protected function registerSeedCommand()
     {
         $this->app->singleton(SeedCommand::class, function ($app) {
-            return new SeedCommand($app['db']);
+            return new SeedCommand($app['db'], $app['events']);
         });
     }
 
