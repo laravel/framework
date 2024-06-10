@@ -3705,11 +3705,12 @@ class SupportCollectionTest extends TestCase
     #[DataProvider('collectionClassProvider')]
     public function testBeforeReturnsItemBeforeTheGivenItem($collection)
     {
-        $c = new $collection([1, 2, 3, 4, 5, 2, 5, 'foo' => 'bar']);
+        $c = new $collection([1, 2, 3, 4, 5, 2, 5, 'name' => 'taylor', 'framework' => 'laravel']);
 
         $this->assertEquals(1, $c->before(2));
         $this->assertEquals(1, $c->before('2'));
-        $this->assertSame(5, $c->before('bar'));
+        $this->assertSame(5, $c->before('taylor'));
+        $this->assertSame('taylor', $c->before('laravel'));
         $this->assertEquals(4, $c->before(function ($value) {
             return $value > 4;
         }));
@@ -3757,7 +3758,7 @@ class SupportCollectionTest extends TestCase
         }));
 
         $c = new $collection(['foo' => 'bar', 1, 2, 3, 4, 5]);
-        $this->assertNull($c->before('foo'));
+        $this->assertNull($c->before('bar'));
     }
 
     #[DataProvider('collectionClassProvider')]
