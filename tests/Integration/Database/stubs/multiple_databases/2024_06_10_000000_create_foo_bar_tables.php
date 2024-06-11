@@ -13,7 +13,7 @@ class CreateFooBarTables extends Migration
      */
     public function up()
     {
-        Schema::connection('first_connection')->create('foo', function (Blueprint $table) {
+        Schema::create('foo', function (Blueprint $table) {
             $table->increments('id');
             $table->string('foo');
         });
@@ -21,6 +21,12 @@ class CreateFooBarTables extends Migration
         Schema::connection('second_connection')->create('bar', function (Blueprint $table) {
             $table->increments('id');
             $table->string('bar');
+        });
+
+        Schema::connection('second_connection')->create('migrations', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('migration');
+            $table->integer('batch');
         });
     }
 
@@ -31,7 +37,8 @@ class CreateFooBarTables extends Migration
      */
     public function down()
     {
-        Schema::connection('first_connection')->drop('foo');
+        Schema::drop('foo');
         Schema::connection('second_connection')->drop('bar');
+        Schema::connection('second_connection')->drop('migrations');
     }
 }
