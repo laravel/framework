@@ -869,6 +869,21 @@ class Str
     }
 
     /**
+     * Detect count and get plural form (if needed) of an English word.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    public static function pluralSmart($value)
+    {
+        if (! preg_match('/[\d]/', $value, $matches)) {
+            return $value;
+        }
+
+        return self::plural($value, $matches[0]);
+    }
+
+    /**
      * Pluralize the last word of an English, studly caps case string.
      *
      * @param  string  $value

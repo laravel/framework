@@ -54,6 +54,12 @@ class SupportPluralizerTest extends TestCase
         $this->assertSame('tests', Str::plural('test', -2));
     }
 
+    public function testPluralSmart()
+    {
+        $this->assertSame('1 test', Str::pluralSmart('1 test'));
+        $this->assertSame('2 tests', Str::pluralSmart('2 test'));
+    }
+
     public function testPluralStudly()
     {
         $this->assertPluralStudly('RealHumans', 'RealHuman');

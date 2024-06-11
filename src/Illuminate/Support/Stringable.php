@@ -588,6 +588,16 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     }
 
     /**
+     * Detect count and get plural form (if needed) of an English word.
+     *
+     * @return static
+     */
+    public static function pluralSmart()
+    {
+        return new static(Str::pluralSmart($this->value));
+    }
+
+    /**
      * Pluralize the last word of an English, studly caps case string.
      *
      * @param  int|array|\Countable  $count
