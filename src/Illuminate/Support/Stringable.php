@@ -592,7 +592,7 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
      *
      * @return static
      */
-    public static function pluralSmart()
+    public function pluralSmart()
     {
         return new static(Str::pluralSmart($this->value));
     }
