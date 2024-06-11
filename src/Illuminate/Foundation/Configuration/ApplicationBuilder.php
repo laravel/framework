@@ -206,7 +206,13 @@ class ApplicationBuilder
                 Route::middleware('web')->get($health, function () {
                     Event::dispatch(new DiagnosingHealth);
 
-                    return View::file(__DIR__.'/../resources/health-up.blade.php');
+                    return request()->wantsJson()
+                        ? response()->json([
+                                'app' => config('app.name', 'Laravel'),
+                                'status' => 'up',
+                                'response_time' => defined('LARAVEL_START') ? round((microtime(true) - LARAVEL_START) * 1000) : null,
+                            ])
+                        : View::file(__DIR__ . '/../resources/health-up.blade.php');
                 });
             }
 
