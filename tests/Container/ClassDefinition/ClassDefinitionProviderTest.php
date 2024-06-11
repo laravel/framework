@@ -78,7 +78,8 @@ final class ClassDefinitionProviderTest extends TestCase
     }
 }
 
-class Service {
+class Service
+{
     public function __construct(
         private Service1 $service1,
         private Service2 $service2,
@@ -87,10 +88,12 @@ class Service {
     }
 }
 
-class Service1 {
+class Service1
+{
 }
 
-class Service2 {
+class Service2
+{
 }
 
 class ServiceVariadicParameters
@@ -101,4 +104,6 @@ class ServiceVariadicParameters
     }
 }
 
-class Param {}
+class Param
+{
+}

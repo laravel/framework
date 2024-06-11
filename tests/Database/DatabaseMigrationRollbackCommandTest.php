@@ -91,6 +91,8 @@ class ApplicationDatabaseRollbackStub extends Application
 {
     public function __construct(array $data = [])
     {
+        parent::__construct();
+
         foreach ($data as $abstract => $instance) {
             $this->instance($abstract, $instance);
         }

@@ -216,6 +216,8 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function __construct($basePath = null)
     {
+        parent::__construct();
+
         if ($basePath) {
             $this->setBasePath($basePath);
         }

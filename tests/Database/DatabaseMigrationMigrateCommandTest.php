@@ -150,6 +150,8 @@ class ApplicationDatabaseMigrationStub extends Application
 {
     public function __construct(array $data = [])
     {
+        parent::__construct();
+
         $mutex = m::mock(CommandMutex::class);
         $mutex->shouldReceive('create')->andReturn(true);
         $mutex->shouldReceive('release')->andReturn(true);

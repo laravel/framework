@@ -6,6 +6,7 @@ namespace Illuminate\Container\ClassDefinition;
 
 use Illuminate\Container\Util;
 use ReflectionClass;
+use ReflectionException;
 use ReflectionParameter;
 
 final class ClassDefinitionProvider
@@ -15,6 +16,9 @@ final class ClassDefinitionProvider
      */
     private array $definitions = [];
 
+    /**
+     * @throws ReflectionException
+     */
     public function get(string $className): ClassDefinition
     {
         if (isset($this->definitions[$className])) {
@@ -25,7 +29,7 @@ final class ClassDefinitionProvider
         $definition = new ClassDefinition(
             class: $className,
             isInstantiable: $reflection->isInstantiable(),
-            isConstructorDefined: !is_null($reflection->getConstructor()),
+            isConstructorDefined: ! is_null($reflection->getConstructor()),
             parameters: array_map(
                 fn (ReflectionParameter $parameter) => new Parameter(
                     name: $parameter->getName(),

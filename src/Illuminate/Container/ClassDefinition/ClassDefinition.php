@@ -7,7 +7,7 @@ namespace Illuminate\Container\ClassDefinition;
 final readonly class ClassDefinition
 {
     /**
-     * @param Parameter[] $parameters
+     * @param  Parameter[]  $parameters
      */
     public function __construct(
         public string $class,
