@@ -481,10 +481,11 @@ trait InteractsWithPivotTable
         $results = 0;
 
         foreach ($this->parseIds($ids) as $id) {
-            $results += $this->newPivot([
-                $this->foreignPivotKey => $this->parent->{$this->parentKey},
-                $this->relatedPivotKey => $id,
-            ], true)->delete();
+            $results += $this->getCurrentlyAttachedPivots()
+                ->where($this->foreignPivotKey, $this->parent->{$this->parentKey})
+                ->where($this->relatedPivotKey, $this->parseId($id))
+                ->first()
+                ?->delete() ?? 0;
         }
 
         return $results;
