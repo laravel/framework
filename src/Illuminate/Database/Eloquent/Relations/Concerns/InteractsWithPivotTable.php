@@ -207,10 +207,7 @@ trait InteractsWithPivotTable
      */
     public function updateExistingPivot($id, array $attributes, $touch = true)
     {
-        if ($this->using &&
-            empty($this->pivotWheres) &&
-            empty($this->pivotWhereIns) &&
-            empty($this->pivotWhereNulls)) {
+        if ($this->using) {
             return $this->updateExistingPivotUsingCustomClass($id, $attributes, $touch);
         }
 
@@ -239,10 +236,7 @@ trait InteractsWithPivotTable
      */
     protected function updateExistingPivotUsingCustomClass($id, array $attributes, $touch)
     {
-        $pivot = $this->getCurrentlyAttachedPivots()
-                    ->where($this->foreignPivotKey, $this->parent->{$this->parentKey})
-                    ->where($this->relatedPivotKey, $this->parseId($id))
-                    ->first();
+        $pivot = $this->getCurrentlyAttachedPivot($id);
 
         $updated = $pivot ? $pivot->fill($attributes)->isDirty() : false;
 
@@ -435,11 +429,8 @@ trait InteractsWithPivotTable
      */
     public function detach($ids = null, $touch = true)
     {
-        if ($this->using &&
-            ! empty($ids) &&
-            empty($this->pivotWheres) &&
-            empty($this->pivotWhereIns) &&
-            empty($this->pivotWhereNulls)) {
+        if ($this->using && ! empty($ids)) {
+
             $results = $this->detachUsingCustomClass($ids);
         } else {
             $query = $this->newPivotQuery();
@@ -480,11 +471,8 @@ trait InteractsWithPivotTable
     {
         $results = 0;
 
-        foreach ($this->parseIds($ids) as $id) {
-            $results += $this->newPivot([
-                $this->foreignPivotKey => $this->parent->{$this->parentKey},
-                $this->relatedPivotKey => $id,
-            ], true)->delete();
+        foreach ($ids as $id) {
+            $results += $this->getCurrentlyAttachedPivot($id)?->delete() ?? 0;
         }
 
         return $results;
@@ -498,12 +486,38 @@ trait InteractsWithPivotTable
     protected function getCurrentlyAttachedPivots()
     {
         return $this->newPivotQuery()->get()->map(function ($record) {
-            $class = $this->using ?: Pivot::class;
-
-            $pivot = $class::fromRawAttributes($this->parent, (array) $record, $this->getTable(), true);
-
-            return $pivot->setPivotKeys($this->foreignPivotKey, $this->relatedPivotKey);
+            return $this->hydrateRecordAsPivotModel($record);
         });
+    }
+
+    /**
+     * Get the current pivot model instance for a given related pivot key
+     *
+     * @param mixed $id
+     * @return \Illuminate\Database\Eloquent\Relations\Pivot|null
+     */
+    protected function getCurrentlyAttachedPivot($id)
+    {
+        $record = $this->newPivotQuery()
+            ->where($this->foreignPivotKey, $this->parent->{$this->parentKey})
+            ->where($this->relatedPivotKey, $this->parseId($id))
+            ->first();
+
+        return $record ? $this->hydrateRecordAsPivotModel($record) : null;
+    }
+
+    /**
+     * Hydrate the raw pivot record to a pivot model instance
+     * @param object $record
+     * @return \Illuminate\Database\Eloquent\Relations\Pivot
+     */
+    protected function hydrateRecordAsPivotModel($record)
+    {
+        $class = $this->using ?: Pivot::class;
+
+        $pivot = $class::fromRawAttributes($this->parent, (array) $record, $this->getTable(), true);
+
+        return $pivot->setPivotKeys($this->foreignPivotKey, $this->relatedPivotKey);
     }
 
     /**
