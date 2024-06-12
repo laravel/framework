@@ -5,7 +5,6 @@ namespace Illuminate\Tests\Integration\Queue;
 use Exception;
 use Illuminate\Bus\Dispatcher;
 use Illuminate\Contracts\Queue\Job;
-use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\CallQueuedHandler;
 use Illuminate\Queue\Middleware\Transactional;
 use Illuminate\Support\Facades\DB;
@@ -43,8 +42,6 @@ class TransactionalTest extends QueueTestCase
 
 class SomeJobThatHasDatabaseOperationsAndThrows
 {
-    use Dispatchable;
-
     public function handle()
     {
         DB::table('users')->insert(['name' => 'Taylor Otwell']);
