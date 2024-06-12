@@ -491,9 +491,9 @@ trait InteractsWithPivotTable
     }
 
     /**
-     * Get the current pivot model instance for a given related pivot key
+     * Get the current pivot model instance for a given related pivot key.
      *
-     * @param mixed $id
+     * @param  mixed  $id
      * @return \Illuminate\Database\Eloquent\Relations\Pivot|null
      */
     protected function getCurrentlyAttachedPivot($id)
@@ -507,8 +507,9 @@ trait InteractsWithPivotTable
     }
 
     /**
-     * Hydrate the raw pivot record to a pivot model instance
-     * @param object $record
+     * Hydrate the raw pivot record to a pivot model instance.
+     * 
+     * @param  object  $record
      * @return \Illuminate\Database\Eloquent\Relations\Pivot
      */
     protected function hydrateRecordAsPivotModel($record)
