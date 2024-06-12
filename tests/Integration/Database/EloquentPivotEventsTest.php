@@ -42,6 +42,8 @@ class EloquentPivotEventsTest extends DatabaseTestCase
             $table->increments('id');
             $table->morphs('equipmentable');
             $table->foreignId('equipment_id');
+            $table->boolean('urgent')->default(false);
+            $table->string('notes')->nullable();
         });
 
         Schema::create('project_users', function (Blueprint $table) {
@@ -152,6 +154,27 @@ class EloquentPivotEventsTest extends DatabaseTestCase
         $project->equipments()->save($equipment);
         $equipment->projects()->sync([]);
     }
+
+    public function testPivotWithConstraintWillTriggerEventsToBeFired()
+    {
+        $project = PivotEventsTestProject::forceCreate(['name' => 'Test Project']);
+        $equipment = PivotEventsTestEquipment::forceCreate(['name' => 'Test Equipment']);
+
+        $project->equipments()->attach($equipment, ['urgent' => false]);
+        $this->assertEquals(['saving', 'creating', 'created', 'saved'], PivotEventsTestCollaborator::$eventsCalled);
+
+        PivotEventsTestCollaborator::$eventsCalled = [];
+        $project->equipments()->updateExistingPivot($equipment, ['urgent' => true]);
+        $this->assertEquals(['saving', 'updating', 'updated', 'saved'], PivotEventsTestCollaborator::$eventsCalled);
+
+        PivotEventsTestCollaborator::$eventsCalled = [];
+        $project->urgentEquipments()->updateExistingPivot($equipment, ['notes' => 'important']);
+        $this->assertEquals(['saving', 'updating', 'updated', 'saved'], PivotEventsTestCollaborator::$eventsCalled);
+
+        PivotEventsTestCollaborator::$eventsCalled = [];
+        $project->urgentEquipments()->detach($equipment);
+        $this->assertEquals(['deleting', 'deleted'], PivotEventsTestCollaborator::$eventsCalled);
+    }
 }
 
 class PivotEventsTestUser extends Model
@@ -171,6 +194,11 @@ class PivotEventsTestEquipment extends Model
     public function projects()
     {
         return $this->morphedByMany(PivotEventsTestProject::class, 'equipmentable')->using(PivotEventsTestModelEquipment::class);
+    }
+
+    public function urgentProjects()
+    {
+        $this->projects()->wherePivot('urgent', true);
     }
 }
 
@@ -195,6 +223,11 @@ class PivotEventsTestProject extends Model
     public function equipments()
     {
         return $this->morphToMany(PivotEventsTestEquipment::class, 'equipmentable')->using(PivotEventsTestModelEquipment::class);
+    }
+
+    public function urgentEquipments()
+    {
+        return $this->equipments()->wherePivot('urgent', true);
     }
 }
 
