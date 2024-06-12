@@ -508,7 +508,7 @@ trait InteractsWithPivotTable
 
     /**
      * Hydrate the raw pivot record to a pivot model instance.
-     * 
+     *
      * @param  object  $record
      * @return \Illuminate\Database\Eloquent\Relations\Pivot
      */
