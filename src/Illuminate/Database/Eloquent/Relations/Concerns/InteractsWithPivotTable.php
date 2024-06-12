@@ -430,7 +430,6 @@ trait InteractsWithPivotTable
     public function detach($ids = null, $touch = true)
     {
         if ($this->using && ! empty($ids)) {
-
             $results = $this->detachUsingCustomClass($ids);
         } else {
             $query = $this->newPivotQuery();
