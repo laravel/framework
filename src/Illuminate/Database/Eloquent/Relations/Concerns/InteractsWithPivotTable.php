@@ -471,7 +471,7 @@ trait InteractsWithPivotTable
     {
         $results = 0;
 
-        foreach ($ids as $id) {
+        foreach ($this->parseIds($ids) as $id) {
             $results += $this->getCurrentlyAttachedPivot($id)?->delete() ?? 0;
         }
 
