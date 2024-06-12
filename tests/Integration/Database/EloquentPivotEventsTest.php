@@ -161,19 +161,19 @@ class EloquentPivotEventsTest extends DatabaseTestCase
         $project = PivotEventsTestProject::forceCreate(['name' => 'Test Project']);
 
         $user->projects()->attach($project, ['urgent' => false]);
-        $this->assertEquals(['saving', 'creating', 'created', 'saved'], PivotEventsTestModelEquipment::$eventsCalled);
+        $this->assertEquals(['saving', 'creating', 'created', 'saved'], PivotEventsTestCollaborator::$eventsCalled);
 
-        PivotEventsTestModelEquipment::$eventsCalled = [];
+        PivotEventsTestCollaborator::$eventsCalled = [];
         $user->projects()->updateExistingPivot($project, ['urgent' => true]);
-        $this->assertEquals(['saving', 'updating', 'updated', 'saved'], PivotEventsTestModelEquipment::$eventsCalled);
+        $this->assertEquals(['saving', 'updating', 'updated', 'saved'], PivotEventsTestCollaborator::$eventsCalled);
 
-        PivotEventsTestModelEquipment::$eventsCalled = [];
+        PivotEventsTestCollaborator::$eventsCalled = [];
         $user->urgentProjects()->updateExistingPivot($project, ['role' => 'High Priority']);
-        $this->assertEquals(['saving', 'updating', 'updated', 'saved'], PivotEventsTestModelEquipment::$eventsCalled);
+        $this->assertEquals(['saving', 'updating', 'updated', 'saved'], PivotEventsTestCollaborator::$eventsCalled);
 
-        PivotEventsTestModelEquipment::$eventsCalled = [];
+        PivotEventsTestCollaborator::$eventsCalled = [];
         $user->urgentProjects()->detach($project);
-        $this->assertEquals(['deleting', 'deleted'], PivotEventsTestModelEquipment::$eventsCalled);
+        $this->assertEquals(['deleting', 'deleted'], PivotEventsTestCollaborator::$eventsCalled);
     }
 }
 
