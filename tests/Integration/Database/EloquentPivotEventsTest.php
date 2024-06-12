@@ -111,6 +111,7 @@ class EloquentPivotEventsTest extends DatabaseTestCase
                 'project_id' => '1',
                 'permissions' => '["foo","bar"]',
                 'role' => 'Lead Developer',
+                'urgent' => 0,
             ],
             $_SERVER['pivot_attributes']
         );
@@ -188,9 +189,7 @@ class PivotEventsTestUser extends Model
 
     public function urgentProjects()
     {
-        return $this->belongsToMany(PivotEventsTestProject::class, 'project_users', 'user_id', 'project_id')
-            ->using(PivotEventsTestCollaborator::class)
-            ->wherePivot('urgent', true);
+        return $this->projects()->wherePivot('urgent', true);
     }
 }
 
