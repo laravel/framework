@@ -285,9 +285,9 @@ trait FormatsMessages
             }
         }
 
-        // If no attribute is found using the expected attributes, loop through the
-        // list of custom attributes and look for attributes with wildcards. Return
-        // the first value that matches the custom attribute's pattern.
+        // If no custom attribute is found using the expected attributes, loop through the
+        // list of custom attributes and look for attribute keys with wildcards. Return
+        // the first value that matches the custom attribute key's pattern.
         foreach ($this->customAttributes as $key => $value) {
             if (Str::contains($key, '*') && Str::is($key, $attribute)) {
                 return $value;
