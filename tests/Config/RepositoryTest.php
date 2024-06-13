@@ -37,7 +37,7 @@ class RepositoryTest extends TestCase
                 'zzz',
             ],
             'multidimensional_array' => [
-                'a' => ['a', 'b']
+                'a' => ['a', 'b'],
             ],
             'x' => [
                 'z' => 'zoo',
@@ -182,7 +182,7 @@ class RepositoryTest extends TestCase
         $this->assertSame('bar', $this->repository->get('key4.bar.foo'));
         $this->assertNull($this->repository->get('key5'));
 
-        $this->repository->set(['key' => 'value'] , 'second_value');
+        $this->repository->set(['key' => 'value'], 'second_value');
         $this->assertNotSame('second_value', $this->repository->get('key'));
 
         $this->repository->set('key.key2', 'value');
@@ -207,7 +207,6 @@ class RepositoryTest extends TestCase
         $this->assertSame('b', $this->repository->get('multidimensional_array.a.2'));
         $this->assertNull($this->repository->get('multidimensional_array.a.3'));
         $this->assertCount(3, $this->repository->get('multidimensional_array.a'));
-
     }
 
     public function testPush()
