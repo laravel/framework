@@ -257,7 +257,7 @@ class Worker
      */
     protected function timeoutForJob($job, WorkerOptions $options)
     {
-        return $job && ! is_null($job->timeout()) ? $job->timeout() : $options->timeout;
+        return $job?->timeout() ?? $options->timeout;
     }
 
     /**
@@ -504,7 +504,7 @@ class Worker
      */
     protected function markJobAsFailedIfAlreadyExceedsMaxAttempts($connectionName, $job, $maxTries)
     {
-        $maxTries = ! is_null($job->maxTries()) ? $job->maxTries() : $maxTries;
+        $maxTries = $job->maxTries() ?? $maxTries;
 
         $retryUntil = $job->retryUntil();
 
@@ -532,7 +532,7 @@ class Worker
      */
     protected function markJobAsFailedIfWillExceedMaxAttempts($connectionName, $job, $maxTries, Throwable $e)
     {
-        $maxTries = ! is_null($job->maxTries()) ? $job->maxTries() : $maxTries;
+        $maxTries = $job->maxTries() ?? $maxTries;
 
         if ($job->retryUntil() && $job->retryUntil() <= Carbon::now()->getTimestamp()) {
             $this->failJob($job, $e);
@@ -607,8 +607,8 @@ class Worker
     {
         $backoff = explode(
             ',',
-            method_exists($job, 'backoff') && ! is_null($job->backoff())
-                        ? $job->backoff()
+            method_exists($job, 'backoff') && ! is_null($jobBackoff = $job->backoff())
+                        ? $jobBackoff
                         : $options->backoff
         );
 
