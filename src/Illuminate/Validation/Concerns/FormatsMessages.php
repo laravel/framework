@@ -285,7 +285,7 @@ trait FormatsMessages
             }
         }
 
-        // If no attribute is found using the expected attributes, loop through the 
+        // If no attribute is found using the expected attributes, loop through the
         // list of custom attributes and look for attributes with wildcards. Return
         // the first value that matches the custom attribute's pattern.
         foreach ($this->customAttributes as $key => $value) {
