@@ -77,6 +77,27 @@ class Str
     }
 
     /**
+     * Abbreviates a given string using the delimiter and glue
+     * 
+     * @param  string  $subject
+     * @param  string  $delimiter
+     * @param  string  $glue
+     * @return string
+     */
+    public static function abbreviate($subject, $delimiter = ' ', $glue = ''): string
+    {
+        $subject = (string) $subject;
+
+        $subject = static::upper($subject);
+
+        $parts = explode($delimiter, $subject);
+
+        $parts = array_map(fn ($word) => static::substr($word, 0, 1), $parts);
+
+        return implode($glue, $parts);
+    }
+
+    /**
      * Return the remainder of a string after the first occurrence of a given value.
      *
      * @param  string  $subject

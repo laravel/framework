@@ -1526,6 +1526,13 @@ class SupportStrTest extends TestCase
         $this->assertSame('foo', Str::fromBase64(base64_encode('foo')));
         $this->assertSame('foobar', Str::fromBase64(base64_encode('foobar'), true));
     }
+
+    public function testItCanAbbreviate()
+    {
+        $this->assertSame('FBM', Str::abbreviate('Foo Bar Moo'));
+        $this->assertSame('FBM', Str::abbreviate('Foo-Bar-Moo', '-'));
+        $this->assertSame('F-B-M', Str::abbreviate('Foo Bar Moo',' ', '-'));
+    }
 }
 
 class StringableObjectStub
