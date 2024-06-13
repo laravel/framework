@@ -30,6 +30,7 @@ use JsonSerializable;
 use Mockery as m;
 use OutOfBoundsException;
 use PHPUnit\Framework\AssertionFailedError;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -985,23 +986,60 @@ class HttpClientTest extends TestCase
         });
     }
 
-    public function testWithBaseUrl()
+    #[DataProvider('baseUriWithRefProvider')]
+    public function testWithBaseUrl(string $baseUri, string $ref, string $expectedResolvedUri)
     {
         $this->factory->fake();
 
-        $this->factory->baseUrl('http://foo.com/')->get('get');
+        $this->factory->baseUrl($baseUri)->get($ref);
 
-        $this->factory->assertSent(function (Request $request) {
-            return $request->url() === 'http://foo.com/get';
+        $this->factory->assertSent(function (Request $request) use ($expectedResolvedUri) {
+            return $request->url() === $expectedResolvedUri;
         });
+    }
 
-        $this->factory->fake();
-
-        $this->factory->baseUrl('http://foo.com/')->get('http://bar.com/get');
-
-        $this->factory->assertSent(function (Request $request) {
-            return $request->url() === 'http://bar.com/get';
-        });
+    /**
+     * @return array
+     */
+    public static function baseUriWithRefProvider()
+    {
+        return [
+            [
+                '',
+                'bar',
+                'bar',
+            ],
+            [
+                'http://foo.com',
+                '/bar',
+                'http://foo.com/bar',
+            ],
+            [
+                'http://foo.com/foo',
+                '/bar',
+                'http://foo.com/bar',
+            ],
+            [
+                'http://foo.com/foo',
+                'bar',
+                'http://foo.com/bar',
+            ],
+            [
+                'http://foo.com/foo/',
+                'bar',
+                'http://foo.com/foo/bar',
+            ],
+            [
+                'http://foo.com',
+                'http://baz.com',
+                'http://baz.com',
+            ],
+            [
+                'http://foo.com/?bar',
+                'bar',
+                'http://foo.com/bar',
+            ],
+        ];
     }
 
     public function testCanConfirmManyHeaders()

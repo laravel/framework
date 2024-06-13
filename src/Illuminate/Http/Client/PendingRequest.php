@@ -886,10 +886,6 @@ class PendingRequest
      */
     public function send(string $method, string $url, array $options = [])
     {
-        if (! Str::startsWith($url, ['http://', 'https://'])) {
-            $url = ltrim(rtrim($this->baseUrl, '/').'/'.ltrim($url, '/'), '/');
-        }
-
         $url = $this->expandUrlParameters($url);
 
         $options = $this->parseHttpOptions($options);
@@ -966,6 +962,10 @@ class PendingRequest
      */
     protected function parseHttpOptions(array $options)
     {
+        if ($this->baseUrl && ! isset($options['base_uri'])) {
+            $options['base_uri'] = $this->baseUrl;
+        }
+
         if (isset($options[$this->bodyFormat])) {
             if ($this->bodyFormat === 'multipart') {
                 $options[$this->bodyFormat] = $this->parseMultipartBodyFormat($options[$this->bodyFormat]);
