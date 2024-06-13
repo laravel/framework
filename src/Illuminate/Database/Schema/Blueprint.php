@@ -119,6 +119,7 @@ class Blueprint
      */
     public function toSql(Connection $connection, Grammar $grammar)
     {
+        $this->normalizeDatetimePrecision($connection, $grammar);
         $this->addImpliedCommands($connection, $grammar);
 
         $statements = [];
@@ -257,6 +258,22 @@ class Blueprint
             foreach ($grammar->getFluentCommands() as $commandName) {
                 $this->addCommand($commandName, compact('column'));
             }
+        }
+    }
+
+    /**
+     * Normalizes any `null` datetime precision to the grammar's default.
+     */
+    protected function normalizeDatetimePrecision(Connection $connection, Grammar $grammar): void
+    {
+        $types = ['dateTime', 'dateTimeTz', 'time', 'timeTz', 'timestamp', 'timestampTz'];
+
+        foreach ($this->columns as $column) {
+            if (! in_array($column->type, $types, strict: true)) {
+                continue;
+            }
+
+            $column->precision ??= $grammar->getDatetimePrecision();
         }
     }
 
@@ -1103,7 +1120,7 @@ class Blueprint
      * @param  int|null  $precision
      * @return \Illuminate\Database\Schema\ColumnDefinition
      */
-    public function dateTime($column, $precision = 0)
+    public function dateTime($column, $precision = null)
     {
         return $this->addColumn('dateTime', $column, compact('precision'));
     }
@@ -1115,7 +1132,7 @@ class Blueprint
      * @param  int|null  $precision
      * @return \Illuminate\Database\Schema\ColumnDefinition
      */
-    public function dateTimeTz($column, $precision = 0)
+    public function dateTimeTz($column, $precision = null)
     {
         return $this->addColumn('dateTimeTz', $column, compact('precision'));
     }
@@ -1127,7 +1144,7 @@ class Blueprint
      * @param  int|null  $precision
      * @return \Illuminate\Database\Schema\ColumnDefinition
      */
-    public function time($column, $precision = 0)
+    public function time($column, $precision = null)
     {
         return $this->addColumn('time', $column, compact('precision'));
     }
@@ -1139,7 +1156,7 @@ class Blueprint
      * @param  int|null  $precision
      * @return \Illuminate\Database\Schema\ColumnDefinition
      */
-    public function timeTz($column, $precision = 0)
+    public function timeTz($column, $precision = null)
     {
         return $this->addColumn('timeTz', $column, compact('precision'));
     }
@@ -1151,7 +1168,7 @@ class Blueprint
      * @param  int|null  $precision
      * @return \Illuminate\Database\Schema\ColumnDefinition
      */
-    public function timestamp($column, $precision = 0)
+    public function timestamp($column, $precision = null)
     {
         return $this->addColumn('timestamp', $column, compact('precision'));
     }
@@ -1163,7 +1180,7 @@ class Blueprint
      * @param  int|null  $precision
      * @return \Illuminate\Database\Schema\ColumnDefinition
      */
-    public function timestampTz($column, $precision = 0)
+    public function timestampTz($column, $precision = null)
     {
         return $this->addColumn('timestampTz', $column, compact('precision'));
     }
@@ -1174,7 +1191,7 @@ class Blueprint
      * @param  int|null  $precision
      * @return void
      */
-    public function timestamps($precision = 0)
+    public function timestamps($precision = null)
     {
         $this->timestamp('created_at', $precision)->nullable();
 
@@ -1189,7 +1206,7 @@ class Blueprint
      * @param  int|null  $precision
      * @return void
      */
-    public function nullableTimestamps($precision = 0)
+    public function nullableTimestamps($precision = null)
     {
         $this->timestamps($precision);
     }
@@ -1200,7 +1217,7 @@ class Blueprint
      * @param  int|null  $precision
      * @return void
      */
-    public function timestampsTz($precision = 0)
+    public function timestampsTz($precision = null)
     {
         $this->timestampTz('created_at', $precision)->nullable();
 
@@ -1213,7 +1230,7 @@ class Blueprint
      * @param  int|null  $precision
      * @return void
      */
-    public function datetimes($precision = 0)
+    public function datetimes($precision = null)
     {
         $this->datetime('created_at', $precision)->nullable();
 
@@ -1227,7 +1244,7 @@ class Blueprint
      * @param  int|null  $precision
      * @return \Illuminate\Database\Schema\ColumnDefinition
      */
-    public function softDeletes($column = 'deleted_at', $precision = 0)
+    public function softDeletes($column = 'deleted_at', $precision = null)
     {
         return $this->timestamp($column, $precision)->nullable();
     }
@@ -1239,7 +1256,7 @@ class Blueprint
      * @param  int|null  $precision
      * @return \Illuminate\Database\Schema\ColumnDefinition
      */
-    public function softDeletesTz($column = 'deleted_at', $precision = 0)
+    public function softDeletesTz($column = 'deleted_at', $precision = null)
     {
         return $this->timestampTz($column, $precision)->nullable();
     }
@@ -1251,7 +1268,7 @@ class Blueprint
      * @param  int|null  $precision
      * @return \Illuminate\Database\Schema\ColumnDefinition
      */
-    public function softDeletesDatetime($column = 'deleted_at', $precision = 0)
+    public function softDeletesDatetime($column = 'deleted_at', $precision = null)
     {
         return $this->datetime($column, $precision)->nullable();
     }

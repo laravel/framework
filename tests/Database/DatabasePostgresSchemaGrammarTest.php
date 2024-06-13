@@ -9,6 +9,8 @@ use Illuminate\Database\Schema\Builder;
 use Illuminate\Database\Schema\ForeignIdColumnDefinition;
 use Illuminate\Database\Schema\Grammars\PostgresGrammar;
 use Mockery as m;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 
 class DatabasePostgresSchemaGrammarTest extends TestCase
@@ -692,184 +694,28 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $this->assertSame('alter table "users" add column "foo" jsonb not null', $statements[0]);
     }
 
-    public function testAddingDateTime()
+    #[DataProvider('datetimeAndPrecisionProvider')]
+    public function testAddingDatetimeMethods(string $method, string $type, ?int $user, false|int|null $grammar, ?int $expected)
     {
         $blueprint = new Blueprint('users');
-        $blueprint->dateTime('created_at');
-        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $blueprint->{$method}('created_at', $user);
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar($grammar));
+        $type = is_null($expected) ? $type : "{$type}({$expected})";
+        $with = str_contains($method, 'Tz') ? 'with' : 'without';
         $this->assertCount(1, $statements);
-        $this->assertSame('alter table "users" add column "created_at" timestamp(0) without time zone not null', $statements[0]);
+        $this->assertSame("alter table \"users\" add column \"created_at\" {$type} {$with} time zone not null", $statements[0]);
     }
 
-    public function testAddingDateTimeWithPrecision()
+    #[TestWith(['timestamps'])]
+    #[TestWith(['timestampsTz'])]
+    public function testAddingTimestamps(string $method)
     {
         $blueprint = new Blueprint('users');
-        $blueprint->dateTime('created_at', 1);
+        $blueprint->{$method}();
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $with = str_contains($method, 'Tz') ? 'with' : 'without';
         $this->assertCount(1, $statements);
-        $this->assertSame('alter table "users" add column "created_at" timestamp(1) without time zone not null', $statements[0]);
-    }
-
-    public function testAddingDateTimeWithNullPrecision()
-    {
-        $blueprint = new Blueprint('users');
-        $blueprint->dateTime('created_at', null);
-        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
-        $this->assertCount(1, $statements);
-        $this->assertSame('alter table "users" add column "created_at" timestamp without time zone not null', $statements[0]);
-    }
-
-    public function testAddingDateTimeTz()
-    {
-        $blueprint = new Blueprint('users');
-        $blueprint->dateTimeTz('created_at');
-        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
-        $this->assertCount(1, $statements);
-        $this->assertSame('alter table "users" add column "created_at" timestamp(0) with time zone not null', $statements[0]);
-    }
-
-    public function testAddingDateTimeTzWithPrecision()
-    {
-        $blueprint = new Blueprint('users');
-        $blueprint->dateTimeTz('created_at', 1);
-        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
-        $this->assertCount(1, $statements);
-        $this->assertSame('alter table "users" add column "created_at" timestamp(1) with time zone not null', $statements[0]);
-    }
-
-    public function testAddingDateTimeTzWithNullPrecision()
-    {
-        $blueprint = new Blueprint('users');
-        $blueprint->dateTimeTz('created_at', null);
-        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
-        $this->assertCount(1, $statements);
-        $this->assertSame('alter table "users" add column "created_at" timestamp with time zone not null', $statements[0]);
-    }
-
-    public function testAddingTime()
-    {
-        $blueprint = new Blueprint('users');
-        $blueprint->time('created_at');
-        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
-        $this->assertCount(1, $statements);
-        $this->assertSame('alter table "users" add column "created_at" time(0) without time zone not null', $statements[0]);
-    }
-
-    public function testAddingTimeWithPrecision()
-    {
-        $blueprint = new Blueprint('users');
-        $blueprint->time('created_at', 1);
-        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
-        $this->assertCount(1, $statements);
-        $this->assertSame('alter table "users" add column "created_at" time(1) without time zone not null', $statements[0]);
-    }
-
-    public function testAddingTimeWithNullPrecision()
-    {
-        $blueprint = new Blueprint('users');
-        $blueprint->time('created_at', null);
-        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
-        $this->assertCount(1, $statements);
-        $this->assertSame('alter table "users" add column "created_at" time without time zone not null', $statements[0]);
-    }
-
-    public function testAddingTimeTz()
-    {
-        $blueprint = new Blueprint('users');
-        $blueprint->timeTz('created_at');
-        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
-        $this->assertCount(1, $statements);
-        $this->assertSame('alter table "users" add column "created_at" time(0) with time zone not null', $statements[0]);
-    }
-
-    public function testAddingTimeTzWithPrecision()
-    {
-        $blueprint = new Blueprint('users');
-        $blueprint->timeTz('created_at', 1);
-        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
-        $this->assertCount(1, $statements);
-        $this->assertSame('alter table "users" add column "created_at" time(1) with time zone not null', $statements[0]);
-    }
-
-    public function testAddingTimeTzWithNullPrecision()
-    {
-        $blueprint = new Blueprint('users');
-        $blueprint->timeTz('created_at', null);
-        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
-        $this->assertCount(1, $statements);
-        $this->assertSame('alter table "users" add column "created_at" time with time zone not null', $statements[0]);
-    }
-
-    public function testAddingTimestamp()
-    {
-        $blueprint = new Blueprint('users');
-        $blueprint->timestamp('created_at');
-        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
-        $this->assertCount(1, $statements);
-        $this->assertSame('alter table "users" add column "created_at" timestamp(0) without time zone not null', $statements[0]);
-    }
-
-    public function testAddingTimestampWithPrecision()
-    {
-        $blueprint = new Blueprint('users');
-        $blueprint->timestamp('created_at', 1);
-        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
-        $this->assertCount(1, $statements);
-        $this->assertSame('alter table "users" add column "created_at" timestamp(1) without time zone not null', $statements[0]);
-    }
-
-    public function testAddingTimestampWithNullPrecision()
-    {
-        $blueprint = new Blueprint('users');
-        $blueprint->timestamp('created_at', null);
-        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
-        $this->assertCount(1, $statements);
-        $this->assertSame('alter table "users" add column "created_at" timestamp without time zone not null', $statements[0]);
-    }
-
-    public function testAddingTimestampTz()
-    {
-        $blueprint = new Blueprint('users');
-        $blueprint->timestampTz('created_at');
-        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
-        $this->assertCount(1, $statements);
-        $this->assertSame('alter table "users" add column "created_at" timestamp(0) with time zone not null', $statements[0]);
-    }
-
-    public function testAddingTimestampTzWithPrecision()
-    {
-        $blueprint = new Blueprint('users');
-        $blueprint->timestampTz('created_at', 1);
-        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
-        $this->assertCount(1, $statements);
-        $this->assertSame('alter table "users" add column "created_at" timestamp(1) with time zone not null', $statements[0]);
-    }
-
-    public function testAddingTimestampTzWithNullPrecision()
-    {
-        $blueprint = new Blueprint('users');
-        $blueprint->timestampTz('created_at', null);
-        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
-        $this->assertCount(1, $statements);
-        $this->assertSame('alter table "users" add column "created_at" timestamp with time zone not null', $statements[0]);
-    }
-
-    public function testAddingTimestamps()
-    {
-        $blueprint = new Blueprint('users');
-        $blueprint->timestamps();
-        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
-        $this->assertCount(1, $statements);
-        $this->assertSame('alter table "users" add column "created_at" timestamp(0) without time zone null, add column "updated_at" timestamp(0) without time zone null', $statements[0]);
-    }
-
-    public function testAddingTimestampsTz()
-    {
-        $blueprint = new Blueprint('users');
-        $blueprint->timestampsTz();
-        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
-        $this->assertCount(1, $statements);
-        $this->assertSame('alter table "users" add column "created_at" timestamp(0) with time zone null, add column "updated_at" timestamp(0) with time zone null', $statements[0]);
+        $this->assertSame("alter table \"users\" add column \"created_at\" timestamp(0) {$with} time zone null, add column \"updated_at\" timestamp(0) {$with} time zone null", $statements[0]);
     }
 
     public function testAddingBinary()
@@ -1232,9 +1078,45 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         return m::mock(Connection::class);
     }
 
-    public function getGrammar()
+    public function getGrammar(false|int|null $precision = false)
     {
-        return new PostgresGrammar;
+        if ($precision === false) {
+            return new PostgresGrammar;
+        }
+
+        return m::mock(PostgresGrammar::class)
+            ->makePartial()
+            ->shouldReceive('getDatetimePrecision')
+            ->andReturn($precision)
+            ->getMock();
+    }
+
+    /** @return list<array{method: string, type: string, user: int|null, grammar: false|int|null, expected: int|null}> */
+    public static function datetimeAndPrecisionProvider(): array
+    {
+        $methods = [
+            ['method' => 'datetime', 'type' => 'timestamp'],
+            ['method' => 'datetimeTz', 'type' => 'timestamp'],
+            ['method' => 'timestamp', 'type' => 'timestamp'],
+            ['method' => 'timestampTz', 'type' => 'timestamp'],
+            ['method' => 'time', 'type' => 'time'],
+            ['method' => 'timeTz', 'type' => 'time'],
+        ];
+        $precisions = [
+            'user can override grammar default' => ['user' => 1, 'grammar' => null, 'expected' => 1],
+            'fallback to grammar default' => ['user' => null, 'grammar' => 5, 'expected' => 5],
+            'fallback to database default' => ['user' => null, 'grammar' => null, 'expected' => null],
+        ];
+
+        $result = [];
+
+        foreach ($methods as $datetime) {
+            foreach ($precisions as $precision) {
+                $result[] = array_merge($datetime, $precision);
+            }
+        }
+
+        return $result;
     }
 
     public function testGrammarsAreMacroable()
