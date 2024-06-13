@@ -1324,8 +1324,8 @@ class SupportStringableTest extends TestCase
 
     public function testItCanAbbreviate()
     {
-        $this->assertSame('FBM', $this->stringable('Foo Bar Moo')->abbreviate());
-        $this->assertSame('FBM', $this->stringable('Foo-Bar-Moo')->abbreviate('-'));
-        $this->assertSame('F-B-M', $this->stringable('Foo Bar Moo')->abbreviate(' ', '-'));
+        $this->assertSame('FBM', (string) $this->stringable('Foo Bar Moo')->abbreviate());
+        $this->assertSame('FBM', (string) $this->stringable('Foo-Bar-Moo')->abbreviate('-'));
+        $this->assertSame('F-B-M', (string) $this->stringable('Foo Bar Moo')->abbreviate(' ', '-'));
     }
 }
