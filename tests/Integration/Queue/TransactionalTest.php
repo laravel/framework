@@ -5,8 +5,8 @@ namespace Illuminate\Tests\Integration\Queue;
 use Exception;
 use Illuminate\Bus\Dispatcher;
 use Illuminate\Contracts\Queue\Job;
+use Illuminate\Database\Middleware\Transactional;
 use Illuminate\Queue\CallQueuedHandler;
-use Illuminate\Queue\Middleware\Transactional;
 use Illuminate\Support\Facades\DB;
 use Mockery as m;
 
