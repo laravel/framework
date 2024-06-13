@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 
 namespace Illuminate\Tests\Integration\Bus;
 
@@ -39,7 +39,9 @@ class TransactionalTest extends TestCase
 
 class Transact
 {
-    public function __construct(public $name) {}
+    public function __construct(public $name)
+    {
+    }
 }
 
 class TransactHandler
