@@ -498,8 +498,7 @@ trait InteractsWithPivotTable
     protected function getCurrentlyAttachedPivot($id)
     {
         $record = $this->newPivotQuery()
-            ->where($this->foreignPivotKey, $this->parent->{$this->parentKey})
-            ->where($this->relatedPivotKey, $this->parseId($id))
+            ->where($this->getQualifiedRelatedPivotKeyName(), $this->parseId($id))
             ->first();
 
         return $record ? $this->hydrateRecordAsPivotModel($record) : null;
