@@ -35,8 +35,8 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     }
 
     /**
-     * Abbreviates a given string using the delimiter and glue
-     *
+     * Abbreviates a given string using the delimiter and glue.
++    *
      * @param  string  $delimiter
      * @param  string  $glue
      * @return static

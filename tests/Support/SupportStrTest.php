@@ -1531,7 +1531,7 @@ class SupportStrTest extends TestCase
     {
         $this->assertSame('FBM', Str::abbreviate('Foo Bar Moo'));
         $this->assertSame('FBM', Str::abbreviate('Foo-Bar-Moo', '-'));
-        $this->assertSame('F-B-M', Str::abbreviate('Foo Bar Moo',' ', '-'));
+        $this->assertSame('F-B-M', Str::abbreviate('Foo Bar Moo', ' ', '-'));
     }
 }
 
