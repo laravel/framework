@@ -36,6 +36,9 @@ class RepositoryTest extends TestCase
                 'aaa',
                 'zzz',
             ],
+            'multidimensional_array' => [
+                'a' => ['a', 'b']
+            ],
             'x' => [
                 'z' => 'zoo',
             ],
@@ -154,6 +157,9 @@ class RepositoryTest extends TestCase
     {
         $this->repository->set('key', 'value');
         $this->assertSame('value', $this->repository->get('key'));
+
+        $this->repository->set('key');
+        $this->assertSame(null, $this->repository->get('key'));
     }
 
     public function testSetArray()
@@ -175,6 +181,12 @@ class RepositoryTest extends TestCase
         $this->assertSame('bar', $this->repository->get('key4.foo'));
         $this->assertSame('bar', $this->repository->get('key4.bar.foo'));
         $this->assertNull($this->repository->get('key5'));
+
+        $this->repository->set(['key' => 'value'] , 'second_value');
+        $this->assertNotSame('second_value', $this->repository->get('key'));
+
+        $this->repository->set('key.key2', 'value');
+        $this->assertSame('value', $this->repository->get('key.key2'));
     }
 
     public function testPrepend()
@@ -188,6 +200,14 @@ class RepositoryTest extends TestCase
         $this->assertSame('zzz', $this->repository->get('array.2'));
         $this->assertNull($this->repository->get('array.3'));
         $this->assertCount(3, $this->repository->get('array'));
+
+        $this->repository->prepend('multidimensional_array.a', 'z');
+        $this->assertSame('z', $this->repository->get('multidimensional_array.a.0'));
+        $this->assertSame('a', $this->repository->get('multidimensional_array.a.1'));
+        $this->assertSame('b', $this->repository->get('multidimensional_array.a.2'));
+        $this->assertNull($this->repository->get('multidimensional_array.a.3'));
+        $this->assertCount(3, $this->repository->get('multidimensional_array.a'));
+
     }
 
     public function testPush()
