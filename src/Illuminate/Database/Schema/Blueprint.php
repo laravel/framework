@@ -17,6 +17,16 @@ class Blueprint
     use Macroable;
 
     /**
+     * The database connection instance.
+     */
+    protected Connection $connection;
+
+    /**
+     * The schema grammar instance.
+     */
+    protected Grammar $grammar;
+
+    /**
      * The table the blueprint describes.
      *
      * @var string
@@ -94,8 +104,10 @@ class Blueprint
      * @param  string  $prefix
      * @return void
      */
-    public function __construct($table, ?Closure $callback = null, $prefix = '')
+    public function __construct(Connection $connection, $table, ?Closure $callback = null, $prefix = '')
     {
+        $this->connection = $connection;
+        $this->grammar = $connection->getSchemaGrammar();
         $this->table = $table;
         $this->prefix = $prefix;
 
@@ -107,34 +119,30 @@ class Blueprint
     /**
      * Execute the blueprint against the database.
      *
-     * @param  \Illuminate\Database\Connection  $connection
-     * @param  \Illuminate\Database\Schema\Grammars\Grammar  $grammar
      * @return void
      */
-    public function build(Connection $connection, Grammar $grammar)
+    public function build()
     {
-        foreach ($this->toSql($connection, $grammar) as $statement) {
-            $connection->statement($statement);
+        foreach ($this->toSql() as $statement) {
+            $this->connection->statement($statement);
         }
     }
 
     /**
      * Get the raw SQL statements for the blueprint.
      *
-     * @param  \Illuminate\Database\Connection  $connection
-     * @param  \Illuminate\Database\Schema\Grammars\Grammar  $grammar
      * @return array
      */
-    public function toSql(Connection $connection, Grammar $grammar)
+    public function toSql()
     {
-        $this->addImpliedCommands($connection, $grammar);
+        $this->addImpliedCommands();
 
         $statements = [];
 
         // Each type of command has a corresponding compiler function on the schema
         // grammar which is used to build the necessary SQL statements to build
         // the blueprint element, so we'll just call that compilers function.
-        $this->ensureCommandsAreValid($connection);
+        $this->ensureCommandsAreValid();
 
         foreach ($this->commands as $command) {
             if ($command->shouldBeSkipped) {
@@ -143,12 +151,12 @@ class Blueprint
 
             $method = 'compile'.ucfirst($command->name);
 
-            if (method_exists($grammar, $method) || $grammar::hasMacro($method)) {
+            if (method_exists($this->grammar, $method) || $this->grammar::hasMacro($method)) {
                 if ($this->hasState()) {
                     $this->state->update($command);
                 }
 
-                if (! is_null($sql = $grammar->$method($this, $command, $connection))) {
+                if (! is_null($sql = $this->grammar->$method($this, $command, $this->connection))) {
                     $statements = array_merge($statements, (array) $sql);
                 }
             }
@@ -160,12 +168,11 @@ class Blueprint
     /**
      * Ensure the commands on the blueprint are valid for the connection type.
      *
-     * @param  \Illuminate\Database\Connection  $connection
      * @return void
      *
      * @throws \BadMethodCallException
      */
-    protected function ensureCommandsAreValid(Connection $connection)
+    protected function ensureCommandsAreValid()
     {
         //
     }
@@ -188,15 +195,12 @@ class Blueprint
     /**
      * Add the commands that are implied by the blueprint's state.
      *
-     * @param  \Illuminate\Database\Connection  $connection
-     * @param  \Illuminate\Database\Schema\Grammars\Grammar  $grammar
      * @return void
      */
-    protected function addImpliedCommands(Connection $connection, Grammar $grammar)
+    protected function addImpliedCommands()
     {
-        $this->addFluentIndexes($connection, $grammar);
-
-        $this->addFluentCommands($connection, $grammar);
+        $this->addFluentIndexes();
+        $this->addFluentCommands();
 
         if (! $this->creating()) {
             $this->commands = array_map(
@@ -206,25 +210,23 @@ class Blueprint
                 $this->commands
             );
 
-            $this->addAlterCommands($connection, $grammar);
+            $this->addAlterCommands();
         }
     }
 
     /**
      * Add the index commands fluently specified on columns.
      *
-     * @param  \Illuminate\Database\Connection  $connection
-     * @param  \Illuminate\Database\Schema\Grammars\Grammar  $grammar
      * @return void
      */
-    protected function addFluentIndexes(Connection $connection, Grammar $grammar)
+    protected function addFluentIndexes()
     {
         foreach ($this->columns as $column) {
             foreach (['primary', 'unique', 'index', 'fulltext', 'fullText', 'spatialIndex'] as $index) {
                 // If the column is supposed to be changed to an auto increment column and
                 // the specified index is primary, there is no need to add a command on
                 // MySQL, as it will be handled during the column definition instead.
-                if ($index === 'primary' && $column->autoIncrement && $column->change && $grammar instanceof MySqlGrammar) {
+                if ($index === 'primary' && $column->autoIncrement && $column->change && $this->grammar instanceof MySqlGrammar) {
                     continue 2;
                 }
 
@@ -264,14 +266,12 @@ class Blueprint
     /**
      * Add the fluent commands specified on any columns.
      *
-     * @param  \Illuminate\Database\Connection  $connection
-     * @param  \Illuminate\Database\Schema\Grammars\Grammar  $grammar
      * @return void
      */
-    public function addFluentCommands(Connection $connection, Grammar $grammar)
+    public function addFluentCommands()
     {
         foreach ($this->columns as $column) {
-            foreach ($grammar->getFluentCommands() as $commandName) {
+            foreach ($this->grammar->getFluentCommands() as $commandName) {
                 $this->addCommand($commandName, compact('column'));
             }
         }
@@ -280,17 +280,15 @@ class Blueprint
     /**
      * Add the alter commands if whenever needed.
      *
-     * @param  \Illuminate\Database\Connection  $connection
-     * @param  \Illuminate\Database\Schema\Grammars\Grammar  $grammar
      * @return void
      */
-    public function addAlterCommands(Connection $connection, Grammar $grammar)
+    public function addAlterCommands()
     {
-        if (! $grammar instanceof SQLiteGrammar) {
+        if (! $this->grammar instanceof SQLiteGrammar) {
             return;
         }
 
-        $alterCommands = $grammar->getAlterCommands($connection);
+        $alterCommands = $this->grammar->getAlterCommands($this->connection);
 
         [$commands, $lastCommandWasAlter, $hasAlterCommand] = [
             [], false, false,
@@ -313,7 +311,7 @@ class Blueprint
         }
 
         if ($hasAlterCommand) {
-            $this->state = new BlueprintState($this, $connection, $grammar);
+            $this->state = new BlueprintState($this, $this->connection, $this->grammar);
         }
 
         $this->commands = $commands;
@@ -1162,8 +1160,10 @@ class Blueprint
      * @param  int|null  $precision
      * @return \Illuminate\Database\Schema\ColumnDefinition
      */
-    public function dateTime($column, $precision = 0)
+    public function dateTime($column, $precision = null)
     {
+        $precision ??= $this->defaultTimePrecision();
+
         return $this->addColumn('dateTime', $column, compact('precision'));
     }
 
@@ -1174,8 +1174,10 @@ class Blueprint
      * @param  int|null  $precision
      * @return \Illuminate\Database\Schema\ColumnDefinition
      */
-    public function dateTimeTz($column, $precision = 0)
+    public function dateTimeTz($column, $precision = null)
     {
+        $precision ??= $this->defaultTimePrecision();
+
         return $this->addColumn('dateTimeTz', $column, compact('precision'));
     }
 
@@ -1186,8 +1188,10 @@ class Blueprint
      * @param  int|null  $precision
      * @return \Illuminate\Database\Schema\ColumnDefinition
      */
-    public function time($column, $precision = 0)
+    public function time($column, $precision = null)
     {
+        $precision ??= $this->defaultTimePrecision();
+
         return $this->addColumn('time', $column, compact('precision'));
     }
 
@@ -1198,8 +1202,10 @@ class Blueprint
      * @param  int|null  $precision
      * @return \Illuminate\Database\Schema\ColumnDefinition
      */
-    public function timeTz($column, $precision = 0)
+    public function timeTz($column, $precision = null)
     {
+        $precision ??= $this->defaultTimePrecision();
+
         return $this->addColumn('timeTz', $column, compact('precision'));
     }
 
@@ -1210,8 +1216,10 @@ class Blueprint
      * @param  int|null  $precision
      * @return \Illuminate\Database\Schema\ColumnDefinition
      */
-    public function timestamp($column, $precision = 0)
+    public function timestamp($column, $precision = null)
     {
+        $precision ??= $this->defaultTimePrecision();
+
         return $this->addColumn('timestamp', $column, compact('precision'));
     }
 
@@ -1222,8 +1230,10 @@ class Blueprint
      * @param  int|null  $precision
      * @return \Illuminate\Database\Schema\ColumnDefinition
      */
-    public function timestampTz($column, $precision = 0)
+    public function timestampTz($column, $precision = null)
     {
+        $precision ??= $this->defaultTimePrecision();
+
         return $this->addColumn('timestampTz', $column, compact('precision'));
     }
 
@@ -1233,7 +1243,7 @@ class Blueprint
      * @param  int|null  $precision
      * @return void
      */
-    public function timestamps($precision = 0)
+    public function timestamps($precision = null)
     {
         $this->timestamp('created_at', $precision)->nullable();
 
@@ -1248,7 +1258,7 @@ class Blueprint
      * @param  int|null  $precision
      * @return void
      */
-    public function nullableTimestamps($precision = 0)
+    public function nullableTimestamps($precision = null)
     {
         $this->timestamps($precision);
     }
@@ -1259,7 +1269,7 @@ class Blueprint
      * @param  int|null  $precision
      * @return void
      */
-    public function timestampsTz($precision = 0)
+    public function timestampsTz($precision = null)
     {
         $this->timestampTz('created_at', $precision)->nullable();
 
@@ -1272,7 +1282,7 @@ class Blueprint
      * @param  int|null  $precision
      * @return void
      */
-    public function datetimes($precision = 0)
+    public function datetimes($precision = null)
     {
         $this->datetime('created_at', $precision)->nullable();
 
@@ -1286,7 +1296,7 @@ class Blueprint
      * @param  int|null  $precision
      * @return \Illuminate\Database\Schema\ColumnDefinition
      */
-    public function softDeletes($column = 'deleted_at', $precision = 0)
+    public function softDeletes($column = 'deleted_at', $precision = null)
     {
         return $this->timestamp($column, $precision)->nullable();
     }
@@ -1298,7 +1308,7 @@ class Blueprint
      * @param  int|null  $precision
      * @return \Illuminate\Database\Schema\ColumnDefinition
      */
-    public function softDeletesTz($column = 'deleted_at', $precision = 0)
+    public function softDeletesTz($column = 'deleted_at', $precision = null)
     {
         return $this->timestampTz($column, $precision)->nullable();
     }
@@ -1310,7 +1320,7 @@ class Blueprint
      * @param  int|null  $precision
      * @return \Illuminate\Database\Schema\ColumnDefinition
      */
-    public function softDeletesDatetime($column = 'deleted_at', $precision = 0)
+    public function softDeletesDatetime($column = 'deleted_at', $precision = null)
     {
         return $this->datetime($column, $precision)->nullable();
     }
@@ -1852,5 +1862,13 @@ class Blueprint
         return array_filter($this->columns, function ($column) {
             return (bool) $column->change;
         });
+    }
+
+    /**
+     * Get the default time precision.
+     */
+    protected function defaultTimePrecision(): ?int
+    {
+        return $this->connection->getSchemaBuilder()::$defaultTimePrecision;
     }
 }

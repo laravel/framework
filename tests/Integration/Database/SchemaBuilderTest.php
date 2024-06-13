@@ -4,7 +4,6 @@ namespace Illuminate\Tests\Integration\Database;
 
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Database\Schema\Grammars\SQLiteGrammar;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
@@ -53,11 +52,11 @@ class SchemaBuilderTest extends DatabaseTestCase
             $table->string('test_column');
         });
 
-        $blueprint = new Blueprint('test', function (Blueprint $table) {
+        $blueprint = new Blueprint($this->getConnection(), 'test', function (Blueprint $table) {
             $table->tinyInteger('test_column')->change();
         });
 
-        $blueprint->build($this->getConnection(), new SQLiteGrammar);
+        $blueprint->build();
 
         $this->assertSame('integer', Schema::getColumnType('test', 'test_column'));
     }
@@ -73,17 +72,15 @@ class SchemaBuilderTest extends DatabaseTestCase
         });
 
         foreach (['tinyText', 'text', 'mediumText', 'longText'] as $type) {
-            $blueprint = new Blueprint('test', function ($table) use ($type) {
+            $blueprint = new Blueprint($this->getConnection(), 'test', function ($table) use ($type) {
                 $table->$type('test_column')->change();
             });
-
-            $queries = $blueprint->toSql($this->getConnection(), $this->getConnection()->getSchemaGrammar());
 
             $uppercase = strtolower($type);
 
             $expected = ["alter table `test` modify `test_column` $uppercase not null"];
 
-            $this->assertEquals($expected, $queries);
+            $this->assertEquals($expected, $blueprint->toSql());
         }
     }
 
@@ -98,17 +95,15 @@ class SchemaBuilderTest extends DatabaseTestCase
         });
 
         foreach (['tinyText', 'mediumText', 'longText'] as $type) {
-            $blueprint = new Blueprint('test', function ($table) use ($type) {
+            $blueprint = new Blueprint($this->getConnection(), 'test', function ($table) use ($type) {
                 $table->$type('test_column')->change();
             });
-
-            $queries = $blueprint->toSql($this->getConnection(), $this->getConnection()->getSchemaGrammar());
 
             $lowercase = strtolower($type);
 
             $expected = ["alter table `test` modify `test_column` $lowercase not null"];
 
-            $this->assertEquals($expected, $queries);
+            $this->assertEquals($expected, $blueprint->toSql());
         }
     }
 
@@ -125,14 +120,12 @@ class SchemaBuilderTest extends DatabaseTestCase
             $table->string('nullable_column_to_not_null')->nullable();
         });
 
-        $blueprint = new Blueprint('test', function ($table) {
+        $blueprint = new Blueprint($this->getConnection(), 'test', function ($table) {
             $table->text('not_null_column_to_not_null')->change();
             $table->text('not_null_column_to_nullable')->nullable()->change();
             $table->text('nullable_column_to_nullable')->nullable()->change();
             $table->text('nullable_column_to_not_null')->change();
         });
-
-        $queries = $blueprint->toSql($this->getConnection(), $this->getConnection()->getSchemaGrammar());
 
         $expected = [
             'alter table `test` modify `not_null_column_to_not_null` text not null',
@@ -141,7 +134,7 @@ class SchemaBuilderTest extends DatabaseTestCase
             'alter table `test` modify `nullable_column_to_not_null` text not null',
         ];
 
-        $this->assertEquals($expected, $queries);
+        $this->assertEquals($expected, $blueprint->toSql());
     }
 
     public function testChangeNullableColumn()
