@@ -264,7 +264,8 @@ class FoundationHelpersTest extends TestCase
         app()->instance('request', $request = Request::create('/'));
 
         try {
-            abort($code = new class implements Responsable {
+            abort($code = new class implements Responsable
+            {
                 public $request;
 
                 public function toResponse($request)
