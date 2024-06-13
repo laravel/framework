@@ -174,6 +174,7 @@ class AboutCommand extends Command
             'URL' => Str::of(config('app.url'))->replace(['http://', 'https://'], ''),
             'Maintenance Mode' => static::format($this->laravel->isDownForMaintenance(), console: $formatEnabledStatus),
             'Timezone' => config('app.timezone'),
+            'Locale' => config('app.locale'),
         ]);
 
         static::addToSection('Cache', fn () => [
