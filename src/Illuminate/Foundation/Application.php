@@ -1151,13 +1151,9 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     protected function fireAppCallbacks(array &$callbacks)
     {
-        $index = 0;
-
-        while ($index < count($callbacks)) {
-            $callbacks[$index]($this);
-
-            $index++;
-        }
+        array_walk(
+            $callbacks, fn($callback) => $callback($this)
+        );
     }
 
     /**
@@ -1409,13 +1405,9 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function terminate()
     {
-        $index = 0;
-
-        while ($index < count($this->terminatingCallbacks)) {
-            $this->call($this->terminatingCallbacks[$index]);
-
-            $index++;
-        }
+        array_walk(
+            $this->terminatingCallbacks, fn ($callback) => $this->call($callback)
+        );
     }
 
     /**
