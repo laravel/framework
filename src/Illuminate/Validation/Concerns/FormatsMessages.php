@@ -332,6 +332,7 @@ trait FormatsMessages
     protected function getAttributeFromTranslations($name)
     {
         $translations = Arr::dot((array) $this->translator->get('validation.attributes'));
+        
         return $this->getAttributeFromLocalArray($name, $translations);
     }
 
