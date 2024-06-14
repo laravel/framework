@@ -82,7 +82,7 @@ class Blueprint
     /**
      * The blueprint state instance.
      *
-     * @var \Illuminate\Database\Schema\BlueprintState
+     * @var null|\Illuminate\Database\Schema\BlueprintState
      */
     private $state;
 
@@ -296,11 +296,9 @@ class Blueprint
                 if (in_array($command->name, $alterCommands)) {
                     $lastCommandWasAlter = true;
                     $hasAlterCommand = true;
-                } else {
-                    if ($lastCommandWasAlter) {
-                        $commands[] = $this->createCommand('alter');
-                        $lastCommandWasAlter = false;
-                    }
+                } elseif ($lastCommandWasAlter) {
+                    $commands[] = $this->createCommand('alter');
+                    $lastCommandWasAlter = false;
                 }
 
                 $commands[] = $command;
