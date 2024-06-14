@@ -564,11 +564,11 @@ class ValidationValidatorTest extends TestCase
         $trans = $this->getIlluminateArrayTranslator();
         $trans->addLines(['validation.required' => ':attribute is required!'], 'en');
         $v = new Validator($trans, [
-            'users' => [['name' => 'Taylor']]
+            'users' => [['name' => 'Taylor']],
         ], [
-            'users.*' => ValidationRule::forEach(fn () => ['id' => 'required'])
+            'users.*' => ValidationRule::forEach(fn () => ['id' => 'required']),
         ], [], [
-            'users.*.id' => 'User ID'
+            'users.*.id' => 'User ID',
         ]);
         $this->assertFalse($v->passes());
         $v->messages()->setFormat(':message');
@@ -583,9 +583,9 @@ class ValidationValidatorTest extends TestCase
             'validation.attributes' => ['users.*.id' => 'User ID'],
         ], 'en');
         $v = new Validator($trans, [
-            'users' => [['name' => 'Taylor']]
+            'users' => [['name' => 'Taylor']],
         ], [
-            'users.*' => ValidationRule::forEach(fn () => ['id' => 'required'])
+            'users.*' => ValidationRule::forEach(fn () => ['id' => 'required']),
         ]);
         $this->assertFalse($v->passes());
         $v->messages()->setFormat(':message');

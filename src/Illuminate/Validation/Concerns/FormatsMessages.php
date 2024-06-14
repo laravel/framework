@@ -273,7 +273,7 @@ trait FormatsMessages
             // The developer may dynamically specify the array of custom attributes on this
             // validator instance. If the attribute exists in this array it is used over
             // the other ways of pulling the attribute name for this given attributes.
-            if($inlineAttribute = $this->getAttributeFromLocalArray($name)) {
+            if ($inlineAttribute = $this->getAttributeFromLocalArray($name)) {
                 return $inlineAttribute;
             }
 
