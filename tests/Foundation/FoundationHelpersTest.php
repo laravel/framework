@@ -3,13 +3,18 @@
 namespace Illuminate\Tests\Foundation;
 
 use Exception;
+use Illuminate\Container\Container;
 use Illuminate\Contracts\Config\Repository;
+use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Mix;
+use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use stdClass;
+use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 class FoundationHelpersTest extends TestCase
 {
@@ -239,5 +244,55 @@ class FoundationHelpersTest extends TestCase
         });
 
         $this->assertSame('expected', mix('asset.png'));
+    }
+
+    public function testAbortReceivesCodeAsSymfonyResponseInstance()
+    {
+        try {
+            abort($code = new SymfonyResponse());
+
+            $this->fail(
+                sprintf('abort function must throw %s when receiving code as Symfony Response instance.', HttpResponseException::class)
+            );
+        } catch (HttpResponseException $ex) {
+            $this->assertSame($code, $ex->getResponse());
+        }
+    }
+
+    public function testAbortReceivesCodeAsResponableImplementation()
+    {
+        app()->instance('request', $request = Request::create('/'));
+
+        try {
+            abort($code = new class implements Responsable
+            {
+                public $request;
+
+                public function toResponse($request)
+                {
+                    $this->request = $request;
+
+                    return new SymfonyResponse();
+                }
+            });
+
+            $this->fail(
+                sprintf('abort function must throw %s when receiving code as Responable implementation.', HttpResponseException::class)
+            );
+        } catch (HttpResponseException $ex) {
+            $this->assertSame($request, $code->request);
+        }
+    }
+
+    public function testAbortReceivesCodeAsInteger()
+    {
+        $app = m::mock(Application::class);
+        $app->shouldReceive('abort')
+            ->with($code = 400, $message = 'Bad request', $headers = ['X-FOO' => 'BAR'])
+            ->once();
+
+        Container::setInstance($app);
+
+        abort($code, $message, $headers);
     }
 }
