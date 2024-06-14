@@ -117,7 +117,7 @@ abstract class ServiceProvider
     public function callBootedCallbacks()
     {
         array_walk(
-            $this->bootedCallbacks, fn($callback) => $this->app->call($callback)
+            $this->bootedCallbacks, fn ($callback) => $this->app->call($callback)
         );
     }
 

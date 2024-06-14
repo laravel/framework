@@ -1152,7 +1152,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
     protected function fireAppCallbacks(array &$callbacks)
     {
         array_walk(
-            $callbacks, fn($callback) => $callback($this)
+            $callbacks, fn ($callback) => $callback($this)
         );
     }
 

@@ -8,7 +8,7 @@ use PHPUnit\Framework\TestCase;
 
 class ServiceProviderTest extends TestCase
 {
-    public function testItFiresBootingCallbacksSequentially ()
+    public function testItFiresBootingCallbacksSequentially()
     {
         $provider = new StuffServiceProvider(
             new Application()
@@ -33,7 +33,7 @@ class ServiceProviderTest extends TestCase
         $this->assertSame([1, 2, 3], $values);
     }
 
-    public function testItFiresBootedCallbacksSequentially ()
+    public function testItFiresBootedCallbacksSequentially()
     {
         $provider = new StuffServiceProvider(
             new Application()
