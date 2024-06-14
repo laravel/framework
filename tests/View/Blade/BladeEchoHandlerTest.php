@@ -60,9 +60,7 @@ class BladeEchoHandlerTest extends AbstractBladeTestCase
             throw new Exception('The fluent object has been successfully handled!');
         });
 
-        app()->singleton('blade.compiler', function () {
-            return $this->compiler;
-        });
+        app()->instance('blade.compiler', $this->compiler);
 
         $exampleObject = new Fluent();
 
@@ -84,9 +82,7 @@ class BladeEchoHandlerTest extends AbstractBladeTestCase
     {
         $this->compiler->stringable('iterable', $closure);
 
-        app()->singleton('blade.compiler', function () {
-            return $this->compiler;
-        });
+        app()->instance('blade.compiler', $this->compiler);
 
         ob_start();
         eval(Str::of($this->compiler->compileString($blade))->remove(['<?php', '?>']));
@@ -108,9 +104,7 @@ class BladeEchoHandlerTest extends AbstractBladeTestCase
     #[DataProvider('nonStringableDataProvider')]
     public function testHandlerWorksWithNonStringables($blade, $expectedOutput)
     {
-        app()->singleton('blade.compiler', function () {
-            return $this->compiler;
-        });
+        app()->instance('blade.compiler', $this->compiler);
 
         ob_start();
         eval(Str::of($this->compiler->compileString($blade))->remove(['<?php', '?>']));
