@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Database;
 
+use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\Grammars\SQLiteGrammar;
 use Illuminate\Support\Facades\DB;
@@ -193,6 +194,27 @@ class SchemaBuilderTest extends DatabaseTestCase
 
         $this->assertEquals(collect(Schema::getColumns('test'))->firstWhere('name', 'new_foo')['default'], $defaultFoo);
         $this->assertEquals(collect(Schema::getColumns('test'))->firstWhere('name', 'new_bar')['default'], $defaultBar);
+    }
+
+    public function testModifyColumnWithZeroDefaultOnSqlite()
+    {
+        if ($this->driver !== 'sqlite') {
+            $this->markTestSkipped('Test requires a SQLite connection.');
+        }
+
+        Schema::create('test', static function (Blueprint $table) {
+            $table->integer('column_default_zero')->default(new Expression('0'));
+            $table->integer('column_to_change');
+        });
+
+        Schema::table('test', function (Blueprint $table) {
+            $table->smallInteger('column_to_change')->default(new Expression('0'))->change();
+        });
+
+        $columns = collect(Schema::getColumns('test'));
+
+        $this->assertSame('0', $columns->firstWhere('name', 'column_default_zero')['default']);
+        $this->assertSame('0', $columns->firstWhere('name', 'column_to_change')['default']);
     }
 
     public function testCompoundPrimaryWithAutoIncrement()
