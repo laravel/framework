@@ -9,6 +9,7 @@ use Mockery as m;
 use Mockery\Mock;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\OutputInterface;
+use InvalidArgumentException;
 
 class TestSeeder extends Seeder
 {
@@ -24,6 +25,10 @@ class TestDepsSeeder extends Seeder
     {
         //
     }
+}
+
+class TestDepsWithoutRunSeeder extends Seeder
+{
 }
 
 class DatabaseSeederTest extends TestCase
@@ -88,5 +93,16 @@ class DatabaseSeederTest extends TestCase
         $seeder->__invoke(['test1', 'test2']);
 
         $container->shouldHaveReceived('call')->once()->with([$seeder, 'run'], ['test1', 'test2']);
+    }
+
+    public function testInvalidArgumentException()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $container = m::mock(Container::class);
+        $container->shouldReceive('call');
+
+        $seeder = new TestDepsWithoutRunSeeder;
+        $seeder->setContainer($container);
+        $seeder->__invoke(['test1', 'test2']);
     }
 }
