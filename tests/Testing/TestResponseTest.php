@@ -2199,9 +2199,7 @@ class TestResponseTest extends TestCase
     {
         $container = Container::getInstance();
         $encrypter = new Encrypter(str_repeat('a', 16));
-        $container->singleton('encrypter', function () use ($encrypter) {
-            return $encrypter;
-        });
+        $container->instance('encrypter', $encrypter);
 
         $cookieName = 'cookie-name';
         $cookieValue = 'cookie-value';
@@ -2442,9 +2440,7 @@ class TestResponseTest extends TestCase
     {
         $container = Container::getInstance();
         $encrypter = new Encrypter(str_repeat('a', 16));
-        $container->singleton('encrypter', function () use ($encrypter) {
-            return $encrypter;
-        });
+        $container->instance('encrypter', $encrypter);
 
         $cookieName = 'cookie-name';
         $cookieValue = 'cookie-value';

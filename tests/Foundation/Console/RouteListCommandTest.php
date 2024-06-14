@@ -48,9 +48,7 @@ class RouteListCommandTest extends TestCase
 
         $kernel->prependToMiddlewarePriority('Middleware 5');
 
-        $laravel->singleton(Kernel::class, function () use ($kernel) {
-            return $kernel;
-        });
+        $laravel->instance(Kernel::class, $kernel);
 
         $router->get('/example', function () {
             return 'Hello World';
