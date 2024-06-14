@@ -273,24 +273,15 @@ trait FormatsMessages
             // The developer may dynamically specify the array of custom attributes on this
             // validator instance. If the attribute exists in this array it is used over
             // the other ways of pulling the attribute name for this given attributes.
-            if (isset($this->customAttributes[$name])) {
-                return $this->customAttributes[$name];
+            if($inlineAttribute = $this->getAttributeFromLocalArray($name)) {
+                return $inlineAttribute;
             }
 
             // We allow for a developer to specify language lines for any attribute in this
             // application, which allows flexibility for displaying a unique displayable
             // version of the attribute name instead of the name used in an HTTP POST.
-            if ($line = $this->getAttributeFromTranslations($name)) {
-                return $line;
-            }
-        }
-
-        // If no custom attribute is found using the expected attributes, loop through the
-        // list of custom attributes and look for attribute keys with wildcards. Return
-        // the first value that matches the custom attribute key's pattern.
-        foreach ($this->customAttributes as $key => $value) {
-            if (Str::contains($key, '*') && Str::is($key, $attribute)) {
-                return $value;
+            if ($translatedAttribute = $this->getAttributeFromTranslations($name)) {
+                return $translatedAttribute;
             }
         }
 
@@ -307,14 +298,41 @@ trait FormatsMessages
     }
 
     /**
+     * Get the custom name for an attribute if it exists in the given array.
+     *
+     * @param  string  $attribute
+     * @param  array|null  $source
+     * @return string|null
+     */
+    protected function getAttributeFromLocalArray($attribute, $source = null)
+    {
+        $source = $source ?: $this->customAttributes;
+
+        if (isset($source[$attribute])) {
+            return $source[$attribute];
+        }
+
+        foreach (array_keys($source) as $sourceKey) {
+            if (str_contains($sourceKey, '*')) {
+                $pattern = str_replace('\*', '([^.]*)', preg_quote($sourceKey, '#'));
+
+                if (preg_match('#^'.$pattern.'\z#u', $attribute) === 1) {
+                    return $source[$sourceKey];
+                }
+            }
+        }
+    }
+
+    /**
      * Get the given attribute from the attribute translations.
      *
      * @param  string  $name
-     * @return string
+     * @return string|null
      */
     protected function getAttributeFromTranslations($name)
     {
-        return Arr::get($this->translator->get('validation.attributes'), $name);
+        $translations = Arr::dot((array) $this->translator->get('validation.attributes'));
+        return $this->getAttributeFromLocalArray($name, $translations);
     }
 
     /**
