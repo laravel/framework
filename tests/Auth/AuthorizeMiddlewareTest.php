@@ -316,8 +316,12 @@ class AuthorizeMiddlewareTest extends TestCase
 
         $request = m::mock(Request::class);
 
+        $next = function () {
+            //
+        };
+
         (new Authorize($this->gate()))
-            ->handle($request, function () {}, 'success', $instance);
+            ->handle($request, $next, 'success', $instance);
     }
 
     /**
