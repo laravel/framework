@@ -5,11 +5,11 @@ namespace Illuminate\Tests\Database;
 use Illuminate\Console\Command;
 use Illuminate\Container\Container;
 use Illuminate\Database\Seeder;
+use InvalidArgumentException;
 use Mockery as m;
 use Mockery\Mock;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\OutputInterface;
-use InvalidArgumentException;
 
 class TestSeeder extends Seeder
 {
