@@ -48,7 +48,7 @@ class DatabaseNotification extends Model
     /**
      * Get the notifiable entity that the notification belongs to.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\MorphTo
+     * @return \Illuminate\Database\Eloquent\Relations\MorphTo<\Illuminate\Database\Eloquent\Model, $this>
      */
     public function notifiable()
     {
@@ -102,8 +102,8 @@ class DatabaseNotification extends Model
     /**
      * Scope a query to only include read notifications.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @return \Illuminate\Database\Eloquent\Builder
+     * @param  \Illuminate\Database\Eloquent\Builder<static>  $query
+     * @return \Illuminate\Database\Eloquent\Builder<static>
      */
     public function scopeRead(Builder $query)
     {
@@ -113,8 +113,8 @@ class DatabaseNotification extends Model
     /**
      * Scope a query to only include unread notifications.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @return \Illuminate\Database\Eloquent\Builder
+     * @param  \Illuminate\Database\Eloquent\Builder<static>  $query
+     * @return \Illuminate\Database\Eloquent\Builder<static>
      */
     public function scopeUnread(Builder $query)
     {

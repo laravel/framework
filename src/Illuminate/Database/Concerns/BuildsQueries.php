@@ -18,6 +18,12 @@ use Illuminate\Support\Traits\Conditionable;
 use InvalidArgumentException;
 use RuntimeException;
 
+/**
+ * @template TValue
+ *
+ * @mixin \Illuminate\Database\Eloquent\Builder
+ * @mixin \Illuminate\Database\Query\Builder
+ */
 trait BuildsQueries
 {
     use Conditionable;
@@ -328,7 +334,7 @@ trait BuildsQueries
      * Execute the query and get the first result.
      *
      * @param  array|string  $columns
-     * @return \Illuminate\Database\Eloquent\Model|object|static|null
+     * @return TValue|null
      */
     public function first($columns = ['*'])
     {
@@ -339,7 +345,7 @@ trait BuildsQueries
      * Execute the query and get the first result if it's the sole matching record.
      *
      * @param  array|string  $columns
-     * @return \Illuminate\Database\Eloquent\Model|object|static|null
+     * @return TValue
      *
      * @throws \Illuminate\Database\RecordsNotFoundException
      * @throws \Illuminate\Database\MultipleRecordsFoundException
@@ -463,7 +469,7 @@ trait BuildsQueries
     /**
      * Get the original column name of the given column, without any aliasing.
      *
-     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
+     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<*>  $builder
      * @param  string  $parameter
      * @return string
      */

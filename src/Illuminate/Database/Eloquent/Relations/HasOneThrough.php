@@ -7,27 +7,24 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithDictionary;
 use Illuminate\Database\Eloquent\Relations\Concerns\SupportsDefaultModels;
 
-class HasOneThrough extends HasManyThrough
+/**
+ * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
+ * @template TIntermediateModel of \Illuminate\Database\Eloquent\Model
+ * @template TDeclaringModel of \Illuminate\Database\Eloquent\Model
+ *
+ * @extends \Illuminate\Database\Eloquent\Relations\HasOneOrManyThrough<TRelatedModel, TIntermediateModel, TDeclaringModel, ?TRelatedModel>
+ */
+class HasOneThrough extends HasOneOrManyThrough
 {
     use InteractsWithDictionary, SupportsDefaultModels;
 
-    /**
-     * Get the results of the relationship.
-     *
-     * @return mixed
-     */
+    /** @inheritDoc */
     public function getResults()
     {
         return $this->first() ?: $this->getDefaultFor($this->farParent);
     }
 
-    /**
-     * Initialize the relation on a set of models.
-     *
-     * @param  array  $models
-     * @param  string  $relation
-     * @return array
-     */
+    /** @inheritDoc */
     public function initRelation(array $models, $relation)
     {
         foreach ($models as $model) {
@@ -37,14 +34,7 @@ class HasOneThrough extends HasManyThrough
         return $models;
     }
 
-    /**
-     * Match the eagerly loaded results to their parents.
-     *
-     * @param  array  $models
-     * @param  \Illuminate\Database\Eloquent\Collection  $results
-     * @param  string  $relation
-     * @return array
-     */
+    /** @inheritDoc */
     public function match(array $models, Collection $results, $relation)
     {
         $dictionary = $this->buildDictionary($results);
@@ -67,8 +57,8 @@ class HasOneThrough extends HasManyThrough
     /**
      * Make a new related instance for the given model.
      *
-     * @param  \Illuminate\Database\Eloquent\Model  $parent
-     * @return \Illuminate\Database\Eloquent\Model
+     * @param  TDeclaringModel  $parent
+     * @return TRelatedModel
      */
     public function newRelatedInstanceFor(Model $parent)
     {

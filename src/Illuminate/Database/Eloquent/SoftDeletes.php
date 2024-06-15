@@ -3,9 +3,11 @@
 namespace Illuminate\Database\Eloquent;
 
 /**
- * @method static \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder withTrashed(bool $withTrashed = true)
- * @method static \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder onlyTrashed()
- * @method static \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder withoutTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static> withTrashed(bool $withTrashed = true)
+ * @method static \Illuminate\Database\Eloquent\Builder<static> onlyTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static> withoutTrashed()
+ *
+ * @mixin \Illuminate\Database\Eloquent\Model
  */
 trait SoftDeletes
 {
