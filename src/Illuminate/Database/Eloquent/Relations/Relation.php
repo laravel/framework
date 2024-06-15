@@ -502,6 +502,23 @@ abstract class Relation implements BuilderContract
     }
 
     /**
+     * Get the alias associated with a custom polymorphic class.
+     *
+     * @param  string  $className
+     * @return int|string|null
+     */
+    public static function getMorphAlias(string $className)
+    {
+        foreach (static::$morphMap as $alias => $morphedClass) {
+            if ($morphedClass === $className) {
+                return $alias;
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Handle dynamic method calls to the relationship.
      *
      * @param  string  $method
