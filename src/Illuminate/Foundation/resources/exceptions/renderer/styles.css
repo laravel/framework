@@ -1,0 +1,83 @@
+@import 'tippy.js/dist/tippy.css';
+@import 'tippy.js/themes/material.css';
+@import 'tippy.js/animations/scale.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+[x-cloak] {
+    display: none;
+}
+
+html {
+    tab-size: 4;
+}
+
+table.hljs-ln {
+    color: inherit;
+    font-size: inherit;
+    border-spacing: 2px;
+}
+
+pre code.hljs {
+    background: none;
+    padding: 0em;
+    padding-top: 0.5em;
+    width: 100%;
+}
+
+.hljs-ln-line {
+    white-space-collapse: preserve;
+    text-wrap: nowrap;
+}
+
+.trace {
+    -webkit-mask-image: linear-gradient(180deg, #000 calc(100% - 4rem), transparent);
+}
+
+.scrollbar-hidden {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    overflow-x: scroll;
+}
+
+.scrollbar-hidden::-webkit-scrollbar {
+    -webkit-appearance: none;
+    width: 0;
+    height: 0;
+}
+
+.hljs-ln .hljs-ln-numbers {
+    padding: 5px;
+    border-right-color: transparent;
+    margin-right: 5px;
+}
+
+.hljs-ln-n {
+    width: 50px;
+}
+
+.hljs-ln-numbers {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+
+    text-align: center;
+    border-right: 1px solid #ccc;
+    vertical-align: top;
+    padding-right: 5px;
+}
+
+.hljs-ln-code {
+    width: 100%;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.hljs-ln-code:hover {
+    background-color: rgba(239, 68, 68, 0.2);
+}
