@@ -303,7 +303,7 @@ class QueueFake extends QueueManager implements Fake, Queue
     {
         $pushedJobs = implode("\n- ", array_keys($this->jobs));
 
-        PHPUnit::assertEmpty($this->jobs, "The following jobs were pushed unexpectedly:\n- $pushedJobs\n");
+        PHPUnit::assertEmpty($this->jobs, "The following jobs were pushed unexpectedly:\n\n- $pushedJobs\n");
     }
 
     /**
