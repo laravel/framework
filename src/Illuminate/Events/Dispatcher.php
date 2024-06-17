@@ -267,7 +267,6 @@ class Dispatcher implements DispatcherContract
         return $this->invokeListeners($event, $payload, $halt, $sync);
     }
 
-
     public function dispatchSync($event, $payload = [], $halt = false)
     {
         return $this->dispatch($event, $payload, $halt, true);
