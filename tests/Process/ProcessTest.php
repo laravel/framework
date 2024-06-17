@@ -716,7 +716,7 @@ class ProcessTest extends TestCase
         });
     }
 
-    public function testAsssertingThatNothingRan()
+    public function testAssertingThatNothingRan()
     {
         $factory = new Factory;
 
