@@ -298,6 +298,19 @@ trait FormatsMessages
     }
 
     /**
+     * Get the given attribute from the attribute translations.
+     *
+     * @param  string  $name
+     * @return string|null
+     */
+    protected function getAttributeFromTranslations($name)
+    {
+        return $this->getAttributeFromLocalArray(
+            $name, Arr::dot((array) $this->translator->get('validation.attributes'))
+        );
+    }
+
+    /**
      * Get the custom name for an attribute if it exists in the given array.
      *
      * @param  string  $attribute
@@ -321,19 +334,6 @@ trait FormatsMessages
                 }
             }
         }
-    }
-
-    /**
-     * Get the given attribute from the attribute translations.
-     *
-     * @param  string  $name
-     * @return string|null
-     */
-    protected function getAttributeFromTranslations($name)
-    {
-        $translations = Arr::dot((array) $this->translator->get('validation.attributes'));
-
-        return $this->getAttributeFromLocalArray($name, $translations);
     }
 
     /**
