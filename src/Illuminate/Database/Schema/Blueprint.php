@@ -82,7 +82,7 @@ class Blueprint
     /**
      * The blueprint state instance.
      *
-     * @var null|\Illuminate\Database\Schema\BlueprintState
+     * @var \Illuminate\Database\Schema\BlueprintState|null
      */
     private $state;
 
