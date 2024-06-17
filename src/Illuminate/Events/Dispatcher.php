@@ -238,9 +238,10 @@ class Dispatcher implements DispatcherContract
      * @param  string|object  $event
      * @param  mixed  $payload
      * @param  bool  $halt
+     * @param  bool  $sync
      * @return array|null
      */
-    public function dispatch($event, $payload = [], $halt = false)
+    public function dispatch($event, $payload = [], $halt = false, $sync = false)
     {
         // When the given "event" is actually an object we will assume it is an event
         // object and use the class as the event name and this event itself as the
@@ -257,13 +258,26 @@ class Dispatcher implements DispatcherContract
             $payload[0] instanceof ShouldDispatchAfterCommit &&
             ! is_null($transactions = $this->resolveTransactionManager())) {
             $transactions->addCallback(
-                fn () => $this->invokeListeners($event, $payload, $halt)
+                fn () => $this->invokeListeners($event, $payload, $halt, $sync)
             );
 
             return null;
         }
 
-        return $this->invokeListeners($event, $payload, $halt);
+        return $this->invokeListeners($event, $payload, $halt, $sync);
+    }
+
+    /**
+     * Fire an event and call the listeners synchronously.
+     *
+     * @param  string|object  $event
+     * @param  mixed  $payload
+     * @param  bool  $halt
+     * @return array|null
+     */
+    public function dispatchSync($event, $payload = [], $halt = false)
+    {
+        return $this->dispatch($event, $payload, $halt, true);
     }
 
     /**
@@ -272,9 +286,10 @@ class Dispatcher implements DispatcherContract
      * @param  string|object  $event
      * @param  mixed  $payload
      * @param  bool  $halt
+     * @param  bool  $sync
      * @return array|null
      */
-    protected function invokeListeners($event, $payload, $halt = false)
+    protected function invokeListeners($event, $payload, $halt = false, $sync = false)
     {
         if ($this->shouldBroadcast($payload)) {
             $this->broadcastEvent($payload[0]);
@@ -283,7 +298,7 @@ class Dispatcher implements DispatcherContract
         $responses = [];
 
         foreach ($this->getListeners($event) as $listener) {
-            $response = $listener($event, $payload);
+            $response = $listener($event, $payload, $sync);
 
             // If a response is returned from the listener and event halting is enabled
             // we will just return this response, and not call the rest of the event
@@ -468,12 +483,12 @@ class Dispatcher implements DispatcherContract
      */
     public function createClassListener($listener, $wildcard = false)
     {
-        return function ($event, $payload) use ($listener, $wildcard) {
+        return function ($event, $payload, $sync = false) use ($listener, $wildcard) {
             if ($wildcard) {
-                return call_user_func($this->createClassCallable($listener), $event, $payload);
+                return call_user_func($this->createClassCallable($listener, $sync), $event, $payload);
             }
 
-            $callable = $this->createClassCallable($listener);
+            $callable = $this->createClassCallable($listener, $sync);
 
             return $callable(...array_values($payload));
         };
@@ -483,9 +498,10 @@ class Dispatcher implements DispatcherContract
      * Create the class based event callable.
      *
      * @param  array|string  $listener
+     * @param  bool  $sync
      * @return callable
      */
-    protected function createClassCallable($listener)
+    protected function createClassCallable($listener, $sync)
     {
         [$class, $method] = is_array($listener)
                             ? $listener
@@ -495,7 +511,7 @@ class Dispatcher implements DispatcherContract
             $method = '__invoke';
         }
 
-        if ($this->handlerShouldBeQueued($class)) {
+        if (! $sync && $this->handlerShouldBeQueued($class)) {
             return $this->createQueuedHandlerCallable($class, $method);
         }
 
