@@ -36,6 +36,22 @@ class QueuedEventsTest extends TestCase
         $d->dispatch('some.event', ['foo', 'bar']);
     }
 
+    public function testQueuedEventHandlersAreNotQueuedWhenDispatchingSync()
+    {
+        $d = new Dispatcher;
+
+        $fakeQueue = new QueueFake(new Container);
+
+        $d->setQueueResolver(function () use ($fakeQueue) {
+            return $fakeQueue;
+        });
+
+        $d->listen('some.event', TestDispatcherQueuedHandler::class.'@handle');
+        $d->dispatchSync('some.event', ['foo', 'bar']);
+
+        $fakeQueue->assertNothingPushed();
+    }
+
     public function testCustomizedQueuedEventHandlersAreQueued()
     {
         $d = new Dispatcher;

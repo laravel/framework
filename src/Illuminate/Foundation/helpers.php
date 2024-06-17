@@ -454,6 +454,21 @@ if (! function_exists('event')) {
     }
 }
 
+if (! function_exists('eventSync')) {
+    /**
+     * Dispatch an event and call the listeners synchronously.
+     *
+     * @param  string|object  $event
+     * @param  mixed  $payload
+     * @param  bool  $halt
+     * @return array|null
+     */
+    function eventSync(...$args)
+    {
+        return app('events')->dispatchSync(...$args);
+    }
+}
+
 if (! function_exists('fake') && class_exists(\Faker\Factory::class)) {
     /**
      * Get a faker instance.
