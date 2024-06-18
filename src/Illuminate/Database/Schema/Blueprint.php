@@ -306,7 +306,6 @@ class Blueprint
 
             if ($lastCommandWasAlter) {
                 $commands[] = $this->createCommand('alter');
-                $lastCommandWasAlter = false;
             }
 
             if ($hasAlterCommand) {
