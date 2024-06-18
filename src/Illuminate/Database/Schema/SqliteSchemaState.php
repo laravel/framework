@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Schema;
 
 use Illuminate\Database\Connection;
+use Illuminate\Support\Facades\Config;
 
 class SqliteSchemaState extends SchemaState
 {
@@ -28,7 +29,9 @@ class SqliteSchemaState extends SchemaState
 
         $this->files->put($path, implode(PHP_EOL, $migrations).PHP_EOL);
 
-        $this->appendMigrationData($path);
+        if ($this->connection->getConfig()['name'] === Config::get('database.default')) {
+            $this->appendMigrationData($path);
+        }
     }
 
     /**
