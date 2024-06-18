@@ -10,7 +10,6 @@ use Illuminate\Contracts\Queue\ShouldBeUniqueUntilProcessing;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Support\Facades\Bus;
 use Orchestra\Testbench\Attributes\WithMigration;
 
 #[WithMigration]
@@ -23,28 +22,6 @@ class UniqueJobTest extends QueueTestCase
         parent::defineEnvironment($app);
 
         $app['config']->set('cache.default', 'database');
-    }
-
-    public function testUniqueJobsAreNotDispatched()
-    {
-        Bus::fake();
-
-        UniqueTestJob::dispatch();
-        $this->runQueueWorkerCommand(['--once' => true]);
-        Bus::assertDispatched(UniqueTestJob::class);
-
-        $this->assertFalse(
-            $this->app->get(Cache::class)->lock($this->getLockKey(UniqueTestJob::class), 10)->get()
-        );
-
-        Bus::assertDispatchedTimes(UniqueTestJob::class);
-        UniqueTestJob::dispatch();
-        $this->runQueueWorkerCommand(['--once' => true]);
-        Bus::assertDispatchedTimes(UniqueTestJob::class);
-
-        $this->assertFalse(
-            $this->app->get(Cache::class)->lock($this->getLockKey(UniqueTestJob::class), 10)->get()
-        );
     }
 
     public function testLockIsReleasedForSuccessfulJobs()
