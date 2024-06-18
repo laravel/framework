@@ -21,7 +21,7 @@ class PostgresSchemaState extends SchemaState
         ]);
 
         if ($this->connection->getConfig()['name'] === Config::get('database.default')) {
-            $commands->push($this->baseDumpCommand().' -t '.$this->migrationTable.' --data-only >> '.$path,);
+            $commands->push($this->baseDumpCommand().' -t '.$this->migrationTable.' --data-only >> '.$path);
         }
 
         $commands->map(function ($command, $path) {
