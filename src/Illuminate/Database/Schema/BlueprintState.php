@@ -35,12 +35,12 @@ class BlueprintState
      *
      * @var \Illuminate\Database\Schema\ColumnDefinition[]
      */
-    private $columns = [];
+    private $columns;
 
     /**
      * The primary key.
      *
-     * @var null|\Illuminate\Database\Schema\IndexDefinition
+     * @var \Illuminate\Database\Schema\IndexDefinition|null
      */
     private $primaryKey;
 
@@ -49,14 +49,14 @@ class BlueprintState
      *
      * @var \Illuminate\Database\Schema\IndexDefinition[]
      */
-    private $indexes = [];
+    private $indexes;
 
     /**
      * The foreign keys.
      *
      * @var \Illuminate\Database\Schema\ForeignKeyDefinition[]
      */
-    private $foreignKeys = [];
+    private $foreignKeys;
 
     /**
      * Create a new blueprint state instance.
@@ -125,7 +125,7 @@ class BlueprintState
     /**
      * Get the primary key.
      *
-     * @return null|\Illuminate\Database\Schema\IndexDefinition
+     * @return \Illuminate\Database\Schema\IndexDefinition|null
      */
     public function getPrimaryKey()
     {
