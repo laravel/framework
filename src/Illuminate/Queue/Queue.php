@@ -4,9 +4,12 @@ namespace Illuminate\Queue;
 
 use Closure;
 use DateTimeInterface;
+use Illuminate\Bus\UniqueLock;
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Contracts\Encryption\Encrypter;
 use Illuminate\Contracts\Queue\ShouldBeEncrypted;
+use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueueAfterCommit;
 use Illuminate\Queue\Events\JobQueued;
 use Illuminate\Queue\Events\JobQueueing;
@@ -328,20 +331,54 @@ abstract class Queue
             $this->container->bound('db.transactions')) {
             return $this->container->make('db.transactions')->addCallback(
                 function () use ($queue, $job, $payload, $delay, $callback) {
-                    $this->raiseJobQueueingEvent($queue, $job, $payload, $delay);
-
-                    return tap($callback($payload, $queue, $delay), function ($jobId) use ($queue, $job, $payload, $delay) {
-                        $this->raiseJobQueuedEvent($queue, $jobId, $job, $payload, $delay);
-                    });
+                    if (!$this->shouldDispatch($job)) {
+                        return;
+                    }
+            
+                    return $this->enqueue($job, $payload, $queue, $delay, $callback);
                 }
             );
         }
 
+        if (!$this->shouldDispatch($job)) {
+            return;
+        }
+
+        return $this->enqueue($job, $payload, $queue, $delay, $callback);
+    }
+
+    /**
+     * Enqueue the job and dispatch queue events
+     *
+     * @param  \Closure|string|object  $job
+     * @param  string  $payload
+     * @param  string  $queue
+     * @param  \DateTimeInterface|\DateInterval|int|null  $delay
+     * @param  callable  $callback
+     * @return mixed
+     */
+    protected function enqueue($job, $payload, $queue, $delay, $callback)
+    {
         $this->raiseJobQueueingEvent($queue, $job, $payload, $delay);
 
         return tap($callback($payload, $queue, $delay), function ($jobId) use ($queue, $job, $payload, $delay) {
             $this->raiseJobQueuedEvent($queue, $jobId, $job, $payload, $delay);
         });
+    }
+
+    /**
+     * Determine if the job should be dispatched.
+     *
+     * @param  \Closure|string|object  $job
+     */
+    protected function shouldDispatch($job): bool
+    {
+        if (! $job instanceof ShouldBeUnique) {
+            return true;
+        }
+
+        return (new UniqueLock($this->container->make(Repository::class)))
+            ->acquire($job);
     }
 
     /**
