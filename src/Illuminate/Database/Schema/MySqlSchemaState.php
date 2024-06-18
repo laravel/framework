@@ -4,6 +4,7 @@ namespace Illuminate\Database\Schema;
 
 use Exception;
 use Illuminate\Database\Connection;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Str;
 use Symfony\Component\Process\Process;
 
@@ -26,7 +27,9 @@ class MySqlSchemaState extends SchemaState
 
         $this->removeAutoIncrementingState($path);
 
-        $this->appendMigrationData($path);
+        if ($this->connection->getConfig()['name'] === Config::get('database.default')) {
+            $this->appendMigrationData($path);
+        }
     }
 
     /**
