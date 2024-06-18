@@ -331,7 +331,7 @@ abstract class Queue
             $this->container->bound('db.transactions')) {
             return $this->container->make('db.transactions')->addCallback(
                 function () use ($queue, $job, $payload, $delay, $callback) {
-                    if (!$this->shouldDispatch($job)) {
+                    if (! $this->shouldDispatch($job)) {
                         return;
                     }
             
@@ -340,7 +340,7 @@ abstract class Queue
             );
         }
 
-        if (!$this->shouldDispatch($job)) {
+        if (! $this->shouldDispatch($job)) {
             return;
         }
 
@@ -348,7 +348,7 @@ abstract class Queue
     }
 
     /**
-     * Enqueue the job and dispatch queue events
+     * Enqueue the job and dispatch queue events.
      *
      * @param  \Closure|string|object  $job
      * @param  string  $payload
