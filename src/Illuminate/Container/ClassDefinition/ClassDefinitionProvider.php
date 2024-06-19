@@ -9,20 +9,20 @@ use ReflectionClass;
 use ReflectionException;
 use ReflectionParameter;
 
-final class ClassDefinitionProvider
+class ClassDefinitionProvider
 {
     /**
      * @var array<string, ClassDefinition>
      */
-    private array $definitions = [];
+    private static array $definitions = [];
 
     /**
      * @throws ReflectionException
      */
     public function get(string $className): ClassDefinition
     {
-        if (isset($this->definitions[$className])) {
-            return $this->definitions[$className];
+        if (isset(self::$definitions[$className])) {
+            return self::$definitions[$className];
         }
 
         $reflection = new ReflectionClass($className);
@@ -44,7 +44,7 @@ final class ClassDefinitionProvider
             ),
         );
 
-        $this->definitions[$className] = $definition;
+        self::$definitions[$className] = $definition;
 
         return $definition;
     }
