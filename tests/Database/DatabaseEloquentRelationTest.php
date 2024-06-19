@@ -239,8 +239,8 @@ class DatabaseEloquentRelationTest extends TestCase
     {
         Relation::morphMap(['user' => 'App\User']);
 
-        $this->assertEquals('user', Relation::getMorphAlias('App\User'));
-        $this->assertNull(Relation::getMorphAlias('Does\Not\Exist'));
+        $this->assertSame('user', Relation::getMorphAlias('App\User'));
+        $this->assertSame('Does\Not\Exist', Relation::getMorphAlias('Does\Not\Exist'));
     }
 
     public function testWithoutRelations()
