@@ -406,20 +406,19 @@ class SupportCollectionTest extends TestCase
 
     public function testShiftReturnsNullOnEmptyCollection()
     {
-        $english = new \stdClass();
-        $english->text = 'f';
-        $dutch = new \stdClass();
-        $dutch->text = 'x';
+        $itemFoo = new \stdClass();
+        $itemFoo->text = 'f';
+        $itemBar = new \stdClass();
+        $itemBar->text = 'x';
 
-        $translations = collect([$english, $dutch]);
+        $items = collect([$itemFoo, $itemBar]);
 
-        $englishTranslation = $translations->shift();
-        $dutchTranslation = $translations->shift();
-        $danish = $translations->shift();
+        $foo = $items->shift();
+        $bar = $items->shift();
 
-        $englishTranslation?->text;
-        $dutchTranslation?->text;
-        $this->assertNull($danish);
+        $this->assertSame('f', $foo?->text);
+        $this->assertSame('x', $bar?->text);
+        $this->assertNull($items->shift());
     }
 
     /**
