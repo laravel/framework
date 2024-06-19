@@ -404,6 +404,24 @@ class SupportCollectionTest extends TestCase
         (new Collection(['foo', 'bar', 'baz']))->shift(-2);
     }
 
+    public function testShiftReturnsNullOnEmptyCollection()
+    {
+        $english = new \stdClass();
+        $english->text = 'f';
+        $dutch = new \stdClass();
+        $dutch->text = 'x';
+
+        $translations = collect([$english, $dutch]);
+
+        $englishTranslation = $translations->shift();
+        $dutchTranslation = $translations->shift();
+        $danish = $translations->shift();
+
+        $englishTranslation?->text;
+        $dutchTranslation?->text;
+        $this->assertNull($danish);
+    }
+
     /**
      * @dataProvider collectionClassProvider
      */
