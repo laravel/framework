@@ -496,7 +496,12 @@ class BusFake implements Fake, QueueingDispatcher
      */
     public function assertNothingBatched()
     {
-        PHPUnit::assertEmpty($this->batches, 'Batched jobs were dispatched unexpectedly.');
+        $jobNames = collect($this->batches)
+            ->map(fn ($batch) => $batch->jobs->map(fn ($job) => get_class($job)))
+            ->flatten()
+            ->join("\n- ");
+
+        PHPUnit::assertEmpty($this->batches, "The following batched jobs were dispatched unexpectedly:\n\n- $jobNames\n");
     }
 
     /**
