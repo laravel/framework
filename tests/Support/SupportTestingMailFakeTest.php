@@ -216,7 +216,7 @@ class SupportTestingMailFakeTest extends TestCase
             $this->fake->assertNothingSent();
             $this->fail();
         } catch (ExpectationFailedException $e) {
-            $this->assertStringContainsString('The following mailables were sent unexpectedly: Illuminate\Tests\Support\MailableStub', $e->getMessage());
+            $this->assertStringContainsString('The following mailables were sent unexpectedly:'.PHP_EOL.PHP_EOL.'- Illuminate\Tests\Support\MailableStub', $e->getMessage());
         }
     }
 

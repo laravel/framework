@@ -186,7 +186,9 @@ class BusFake implements Fake, QueueingDispatcher
      */
     public function assertNothingDispatched()
     {
-        PHPUnit::assertEmpty($this->commands, 'Jobs were dispatched unexpectedly.');
+        $commandNames = implode("\n- ", array_keys($this->commands));
+
+        PHPUnit::assertEmpty($this->commands, "The following jobs were dispatched unexpectedly:\n\n- $commandNames\n");
     }
 
     /**

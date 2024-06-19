@@ -150,9 +150,9 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
     {
         $mailableNames = collect($this->mailables)->map(
             fn ($mailable) => get_class($mailable)
-        )->join(', ');
+        )->join(PHP_EOL.'- ');
 
-        PHPUnit::assertEmpty($this->mailables, 'The following mailables were sent unexpectedly: '.$mailableNames);
+        PHPUnit::assertEmpty($this->mailables, 'The following mailables were sent unexpectedly:'.PHP_EOL.PHP_EOL.'- '.$mailableNames.PHP_EOL);
     }
 
     /**

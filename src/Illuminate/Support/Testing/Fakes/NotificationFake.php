@@ -163,7 +163,13 @@ class NotificationFake implements Fake, NotificationDispatcher, NotificationFact
      */
     public function assertNothingSent()
     {
-        PHPUnit::assertEmpty($this->notifications, 'Notifications were sent unexpectedly.');
+        $notificationNames = collect($this->notifications)
+            ->map(fn ($notifiableModels) => collect($notifiableModels)
+                ->map(fn ($notifiables) => collect($notifiables)->keys())
+            )
+            ->flatten()->join(PHP_EOL.'- ');
+
+        PHPUnit::assertEmpty($this->notifications, "The following notifications were sent unexpectedly:\n\n- $notificationNames\n");
     }
 
     /**
@@ -293,7 +299,6 @@ class NotificationFake implements Fake, NotificationDispatcher, NotificationFact
      *
      * @param  \Illuminate\Support\Collection|array|mixed  $notifiables
      * @param  mixed  $notification
-     * @param  array|null  $channels
      * @return void
      */
     public function sendNow($notifiables, $notification, ?array $channels = null)
@@ -362,7 +367,6 @@ class NotificationFake implements Fake, NotificationDispatcher, NotificationFact
     /**
      * Specify if notification should be serialized and restored when being "pushed" to the queue.
      *
-     * @param  bool  $serializeAndRestore
      * @return $this
      */
     public function serializeAndRestore(bool $serializeAndRestore = true)
