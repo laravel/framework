@@ -561,7 +561,7 @@ class Builder
      */
     protected function build(Blueprint $blueprint)
     {
-        $blueprint->build($this->connection, $this->grammar);
+        $blueprint->build();
     }
 
     /**
@@ -573,15 +573,15 @@ class Builder
      */
     protected function createBlueprint($table, ?Closure $callback = null)
     {
-        $prefix = $this->connection->getConfig('prefix_indexes')
-                    ? $this->connection->getConfig('prefix')
-                    : '';
+        $connection = $this->connection;
+
+        $prefix = $connection->getConfig('prefix_indexes') ? $connection->getConfig('prefix') : '';
 
         if (isset($this->resolver)) {
-            return call_user_func($this->resolver, $table, $callback, $prefix);
+            return call_user_func($this->resolver, $connection, $table, $callback, $prefix);
         }
 
-        return Container::getInstance()->make(Blueprint::class, compact('table', 'callback', 'prefix'));
+        return Container::getInstance()->make(Blueprint::class, compact('connection', 'table', 'callback', 'prefix'));
     }
 
     /**
