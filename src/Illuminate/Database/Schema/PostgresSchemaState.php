@@ -3,7 +3,6 @@
 namespace Illuminate\Database\Schema;
 
 use Illuminate\Database\Connection;
-use Illuminate\Support\Facades\Config;
 
 class PostgresSchemaState extends SchemaState
 {
@@ -20,7 +19,7 @@ class PostgresSchemaState extends SchemaState
             $this->baseDumpCommand().' --schema-only > '.$path,
         ]);
 
-        if ($this->connection->getConfig()['name'] === Config::get('database.default')) {
+        if ($this->hasMigrationTable()) {
             $commands->push($this->baseDumpCommand().' -t '.$this->migrationTable.' --data-only >> '.$path);
         }
 

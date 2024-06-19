@@ -119,4 +119,14 @@ abstract class SchemaState
 
         return $this;
     }
+
+    /**
+     * Check if the current connection has a migration table.
+     *
+     * @return bool
+     */
+    public function hasMigrationTable(): bool
+    {
+        return $this->connection->getSchemaBuilder()->hasTable($this->migrationTable);
+    }
 }
