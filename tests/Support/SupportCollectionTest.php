@@ -404,6 +404,23 @@ class SupportCollectionTest extends TestCase
         (new Collection(['foo', 'bar', 'baz']))->shift(-2);
     }
 
+    public function testShiftReturnsNullOnEmptyCollection()
+    {
+        $itemFoo = new \stdClass();
+        $itemFoo->text = 'f';
+        $itemBar = new \stdClass();
+        $itemBar->text = 'x';
+
+        $items = collect([$itemFoo, $itemBar]);
+
+        $foo = $items->shift();
+        $bar = $items->shift();
+
+        $this->assertSame('f', $foo?->text);
+        $this->assertSame('x', $bar?->text);
+        $this->assertNull($items->shift());
+    }
+
     /**
      * @dataProvider collectionClassProvider
      */

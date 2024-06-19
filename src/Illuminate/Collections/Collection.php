@@ -1134,7 +1134,11 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
             throw new InvalidArgumentException('Number of shifted items may not be less than zero.');
         }
 
-        if ($count === 0 || $this->isEmpty()) {
+        if ($this->isEmpty()) {
+            return null;
+        }
+
+        if ($count === 0) {
             return new static;
         }
 
