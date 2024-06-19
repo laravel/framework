@@ -182,6 +182,10 @@ class Application extends SymfonyApplication implements ApplicationContract
         if (! isset($callingClass) && empty($parameters)) {
             $command = $this->getCommandName($input = new StringInput($command));
         } else {
+            $parameters = array_map(static function ($parameter) {
+                return is_array($parameter) ? array_map(strval(...), $parameter) : (string) $parameter;
+            }, $parameters);
+
             array_unshift($parameters, $command);
 
             $input = new ArrayInput($parameters);

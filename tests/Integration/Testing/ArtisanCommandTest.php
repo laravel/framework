@@ -55,11 +55,28 @@ class ArtisanCommandTest extends TestCase
         Artisan::command('contains', function () {
             $this->line('My name is Taylor Otwell');
         });
+
+        Artisan::command('type {args*}', function () {
+            $args = (array) $this->argument('args');
+
+            foreach ($args as $arg) {
+                $this->line(gettype($arg));
+            }
+        });
     }
 
     public function test_console_command_that_passes()
     {
         $this->artisan('exit', ['code' => 0])->assertOk();
+    }
+
+    public function test_console_arguments_are_strings()
+    {
+        $this->artisan('type', ['args' => [1, 'test', false]])
+            ->expectsOutput('string')
+            ->expectsOutput('string')
+            ->expectsOutput('string')
+            ->assertOk();
     }
 
     public function test_console_command_that_fails()
