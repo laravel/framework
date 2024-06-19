@@ -299,6 +299,7 @@ class NotificationFake implements Fake, NotificationDispatcher, NotificationFact
      *
      * @param  \Illuminate\Support\Collection|array|mixed  $notifiables
      * @param  mixed  $notification
+     * @param  array|null  $channels
      * @return void
      */
     public function sendNow($notifiables, $notification, ?array $channels = null)
@@ -367,6 +368,7 @@ class NotificationFake implements Fake, NotificationDispatcher, NotificationFact
     /**
      * Specify if notification should be serialized and restored when being "pushed" to the queue.
      *
+     * @param  bool  $serializeAndRestore
      * @return $this
      */
     public function serializeAndRestore(bool $serializeAndRestore = true)
