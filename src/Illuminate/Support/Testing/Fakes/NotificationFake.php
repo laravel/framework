@@ -167,7 +167,7 @@ class NotificationFake implements Fake, NotificationDispatcher, NotificationFact
             ->map(fn ($notifiableModels) => collect($notifiableModels)
                 ->map(fn ($notifiables) => collect($notifiables)->keys())
             )
-            ->flatten()->join(PHP_EOL.'- ');
+            ->flatten()->join("\n- ");
 
         PHPUnit::assertEmpty($this->notifications, "The following notifications were sent unexpectedly:\n\n- $notificationNames\n");
     }
