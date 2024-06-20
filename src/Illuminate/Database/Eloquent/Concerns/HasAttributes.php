@@ -142,11 +142,11 @@ trait HasAttributes
     public static $snakeAttributes = true;
 
     /**
-     * The cache of the mutated attributes for each class.
+     * The cache of the gettable mutated attributes for each class.
      *
      * @var array
      */
-    protected static $mutatorCache = [];
+    protected static $getMutatorCache = [];
 
     /**
      * The cache of the "Attribute" return type marked mutated attributes for each class.
@@ -2290,11 +2290,11 @@ trait HasAttributes
      */
     public function getMutatedAttributes()
     {
-        if (! isset(static::$mutatorCache[static::class])) {
+        if (! isset(static::$getMutatorCache[static::class])) {
             static::cacheMutatedAttributes($this);
         }
 
-        return static::$mutatorCache[static::class];
+        return static::$getMutatorCache[static::class];
     }
 
     /**
@@ -2310,12 +2310,12 @@ trait HasAttributes
         $class = $reflection->getName();
 
         static::$getAttributeMutatorCache[$class] =
-            collect($attributeMutatorMethods = static::getAttributeMarkedMutatorMethods($classOrInstance))
+            collect($attributeMutatorMethods = static::getAllGetAttributeMutatorMethods($classOrInstance))
                     ->mapWithKeys(function ($match) {
                         return [lcfirst(static::$snakeAttributes ? Str::snake($match) : $match) => true];
                     })->all();
 
-        static::$mutatorCache[$class] = collect(static::getMutatorMethods($class))
+        static::$getMutatorCache[$class] = collect(static::getAllGetMutatorMethods($class))
                 ->merge($attributeMutatorMethods)
                 ->map(function ($match) {
                     return lcfirst(static::$snakeAttributes ? Str::snake($match) : $match);
@@ -2323,12 +2323,12 @@ trait HasAttributes
     }
 
     /**
-     * Get all of the attribute mutator methods.
+     * Get all the gettable attribute mutator methods.
      *
      * @param  mixed  $class
      * @return array
      */
-    protected static function getMutatorMethods($class)
+    protected static function getAllGetMutatorMethods($class)
     {
         preg_match_all('/(?<=^|;)get([^;]+?)Attribute(;|$)/', implode(';', get_class_methods($class)), $matches);
 
@@ -2336,12 +2336,12 @@ trait HasAttributes
     }
 
     /**
-     * Get all of the "Attribute" return typed attribute mutator methods.
+     * Get all the gettable "Attribute" return typed attribute mutator methods.
      *
      * @param  mixed  $class
      * @return array
      */
-    protected static function getAttributeMarkedMutatorMethods($class)
+    protected static function getAllGetAttributeMutatorMethods($class)
     {
         $instance = is_object($class) ? $class : new $class;
 
