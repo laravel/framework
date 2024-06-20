@@ -3,7 +3,6 @@
 namespace Illuminate\Console\Concerns;
 
 use Illuminate\Console\PromptValidationException;
-use Illuminate\Support\Arr;
 use Laravel\Prompts\ConfirmPrompt;
 use Laravel\Prompts\MultiSearchPrompt;
 use Laravel\Prompts\MultiSelectPrompt;
