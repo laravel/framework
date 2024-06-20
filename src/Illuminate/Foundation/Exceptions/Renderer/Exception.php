@@ -7,7 +7,6 @@ use Composer\Autoload\ClassLoader;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Bootstrap\HandleExceptions;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
 
 class Exception
@@ -162,16 +161,6 @@ class Exception
         $json = (string) json_encode($payload, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
 
         return str_replace('\\', '', $json);
-    }
-
-    /**
-     * Get the request's path without query string.
-     *
-     * @return string
-     */
-    public function requestPath()
-    {
-        return Str::start($this->request()->path(), '/');
     }
 
     /**
