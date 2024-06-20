@@ -14,6 +14,8 @@ class FoundationApplicationBuilderTest extends TestCase
 
         unset($_ENV['APP_BASE_PATH']);
 
+        unset($_ENV['LARAVEL_STORAGE_PATH'], $_SERVER['LARAVEL_STORAGE_PATH']);
+
         parent::tearDown();
     }
 
@@ -40,5 +42,49 @@ class FoundationApplicationBuilderTest extends TestCase
         $app = Application::configure()->create();
 
         $this->assertSame(dirname(__DIR__, 2), $app->basePath());
+    }
+
+    public function testStoragePathWithGlobalEnvVariable()
+    {
+        $_ENV['LARAVEL_STORAGE_PATH'] = __DIR__.'/env-storage';
+
+        $app = Application::configure()->create();
+
+        $this->assertSame(__DIR__.'/env-storage', $app->storagePath());
+    }
+
+    public function testStoragePathWithGlobalServerVariable()
+    {
+        $_SERVER['LARAVEL_STORAGE_PATH'] = __DIR__.'/server-storage';
+
+        $app = Application::configure()->create();
+
+        $this->assertSame(__DIR__.'/server-storage', $app->storagePath());
+    }
+
+    public function testStoragePathPrefersEnvVariable()
+    {
+        $_ENV['LARAVEL_STORAGE_PATH'] = __DIR__.'/env-storage';
+        $_SERVER['LARAVEL_STORAGE_PATH'] = __DIR__.'/server-storage';
+
+        $app = Application::configure()->create();
+
+        $this->assertSame(__DIR__.'/env-storage', $app->storagePath());
+    }
+
+    public function testStoragePathBasedOnBasePath()
+    {
+        $app = Application::configure()->create();
+        $this->assertSame($app->basePath().DIRECTORY_SEPARATOR.'storage', $app->storagePath());
+    }
+
+    public function testStoragePathCanBeCustomized()
+    {
+        $_ENV['LARAVEL_STORAGE_PATH'] = __DIR__.'/env-storage';
+
+        $app = Application::configure()->create();
+        $app->useStoragePath(__DIR__.'/custom-storage');
+
+        $this->assertSame(__DIR__.'/custom-storage', $app->storagePath());
     }
 }
