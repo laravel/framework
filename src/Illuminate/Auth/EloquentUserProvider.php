@@ -254,7 +254,7 @@ class EloquentUserProvider implements UserProvider
     /**
      * Get the callback that modifies the query before retrieving users.
      *
-     * @param (\Closure(\Illuminate\Database\Eloquent\Builder<*>):mixed)|null
+     * @return (\Closure(\Illuminate\Database\Eloquent\Builder<*>):mixed)|null
      */
     public function getQueryCallback()
     {
