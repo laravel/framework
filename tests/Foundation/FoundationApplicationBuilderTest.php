@@ -75,13 +75,12 @@ class FoundationApplicationBuilderTest extends TestCase
     public function testStoragePathBasedOnBasePath()
     {
         $app = Application::configure()->create();
-        $this->assertSame($app->basePath() . DIRECTORY_SEPARATOR . 'storage', $app->storagePath());
+        $this->assertSame($app->basePath().DIRECTORY_SEPARATOR.'storage', $app->storagePath());
     }
 
     public function testStoragePathCanBeCustomized()
     {
         $_ENV['LARAVEL_STORAGE_PATH'] = __DIR__.'/env-storage';
-        $_SERVER['LARAVEL_STORAGE_PATH'] = __DIR__.'/server-storage';
 
         $app = Application::configure()->create();
         $app->useStoragePath(__DIR__.'/custom-storage');
