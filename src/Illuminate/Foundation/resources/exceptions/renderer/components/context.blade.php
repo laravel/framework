@@ -5,7 +5,7 @@
 
     <div class="mt-2">
         <span>{{ $exception->request()->method() }}</span>
-        <span class="text-gray-500">{{ $exception->request()->httpHost() }}</span>
+        <span class="text-gray-500">{{ Illuminate\Support\Str::start($exception->request()->path(), '/') }}</span>
     </div>
 
     <div class="mt-4">
