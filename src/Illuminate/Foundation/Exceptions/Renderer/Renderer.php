@@ -131,7 +131,7 @@ class Renderer
             $viteJsAutoRefresh = $vite->__invoke([]);
         }
 
-        return '<script type="text/javascript">'
+        return '<script>'
             .file_get_contents(static::DIST.'scripts.js')
             .'</script>'.$viteJsAutoRefresh;
     }
