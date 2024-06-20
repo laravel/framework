@@ -57,6 +57,8 @@ class FoundationServiceProvider extends AggregateServiceProvider
      * Boot the service provider.
      *
      * @return void
+     *
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     public function boot()
     {
@@ -77,6 +79,8 @@ class FoundationServiceProvider extends AggregateServiceProvider
      * Register the service provider.
      *
      * @return void
+     *
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     public function register()
     {
@@ -190,6 +194,8 @@ class FoundationServiceProvider extends AggregateServiceProvider
      * Register an event listener to track logged exceptions.
      *
      * @return void
+     *
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     protected function registerExceptionTracking()
     {
