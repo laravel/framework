@@ -130,7 +130,7 @@ class FileViewFinder implements ViewFinderInterface
             foreach ($this->getPossibleViewFiles($name) as $file) {
                 $viewPath = $path.'/'.$file;
 
-                if (strlen($viewPath) <= PHP_MAXPATHLEN && $this->files->exists($viewPath)) {
+                if (strlen($viewPath) < (PHP_MAXPATHLEN - 1) && $this->files->exists($viewPath)) {
                     return $viewPath;
                 }
             }
