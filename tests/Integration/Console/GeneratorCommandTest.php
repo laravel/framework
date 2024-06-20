@@ -20,6 +20,10 @@ class GeneratorCommandTest extends TestCase
             ->assertExitCode(0);
 
         $this->assertFilenameExists('app/Console/Commands/FooCommand.php');
+
+        $this->assertFileContains([
+            'class FooCommand extends Command',
+        ], 'app/Console/Commands/FooCommand.php');
     }
 
     #[DataProvider('reservedNamesDataProvider')]
