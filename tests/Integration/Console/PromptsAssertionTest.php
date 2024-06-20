@@ -139,41 +139,6 @@ class PromptsAssertionTest extends TestCase
             ->expectsOutput('Your name is Jane.');
     }
 
-    public function testAssertionForSelectPromptFollowedByMultisearchPrompt()
-    {
-        $this->app[Kernel::class]->registerCommand(
-            new class extends Command
-            {
-                protected $signature = 'test:select';
-
-                public function handle()
-                {
-                    $name = select(
-                        label: 'What is your name?',
-                        options: ['John', 'Jane']
-                    );
-
-                    $titles = collect(['Mr', 'Mrs', 'Ms', 'Dr']);
-                    $title = multisearch(
-                        label: 'What is your title?',
-                        options: fn (string $value) => strlen($value) > 0
-                            ? $titles->filter(fn ($title) => str_contains($title, $value))->values()->toArray()
-                            : []
-                    );
-
-                    $this->line('I will refer to you '.$title[0].' '.$name.'.');
-                }
-            }
-        );
-
-        $this
-            ->artisan('test:select')
-            ->expectsChoice('What is your name?', 'Jane', ['John', 'Jane'])
-            ->expectsQuestion('What is your title?', 'D')
-            ->expectsChoice('What is your title?', ['Dr'], ['Dr'])
-            ->expectsOutput('I will refer to you Dr Jane.');
-    }
-
     public function testAssertionForRequiredMultiselectPrompt()
     {
         $this->app[Kernel::class]->registerCommand(
@@ -302,5 +267,40 @@ class PromptsAssertionTest extends TestCase
             ->expectsQuestion('Which names do you like?', 'J')
             ->expectsChoice('Which names do you like?', ['None'], ['John', 'Jane', 'Jack'])
             ->expectsOutput('You like nobody.');
+    }
+
+    public function testAssertionForSelectPromptFollowedByMultisearchPrompt()
+    {
+        $this->app[Kernel::class]->registerCommand(
+            new class extends Command
+            {
+                protected $signature = 'test:select';
+
+                public function handle()
+                {
+                    $name = select(
+                        label: 'What is your name?',
+                        options: ['John', 'Jane']
+                    );
+
+                    $titles = collect(['Mr', 'Mrs', 'Ms', 'Dr']);
+                    $title = multisearch(
+                        label: 'What is your title?',
+                        options: fn (string $value) => strlen($value) > 0
+                            ? $titles->filter(fn ($title) => str_contains($title, $value))->values()->toArray()
+                            : []
+                    );
+
+                    $this->line('I will refer to you '.$title[0].' '.$name.'.');
+                }
+            }
+        );
+
+        $this
+            ->artisan('test:select')
+            ->expectsChoice('What is your name?', 'Jane', ['John', 'Jane'])
+            ->expectsQuestion('What is your title?', 'D')
+            ->expectsChoice('What is your title?', ['Dr'], ['Dr'])
+            ->expectsOutput('I will refer to you Dr Jane.');
     }
 }
