@@ -163,7 +163,13 @@ class NotificationFake implements Fake, NotificationDispatcher, NotificationFact
      */
     public function assertNothingSent()
     {
-        PHPUnit::assertEmpty($this->notifications, 'Notifications were sent unexpectedly.');
+        $notificationNames = collect($this->notifications)
+            ->map(fn ($notifiableModels) => collect($notifiableModels)
+                ->map(fn ($notifiables) => collect($notifiables)->keys())
+            )
+            ->flatten()->join("\n- ");
+
+        PHPUnit::assertEmpty($this->notifications, "The following notifications were sent unexpectedly:\n\n- $notificationNames\n");
     }
 
     /**

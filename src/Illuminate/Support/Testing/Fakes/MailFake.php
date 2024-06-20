@@ -150,9 +150,9 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
     {
         $mailableNames = collect($this->mailables)->map(
             fn ($mailable) => get_class($mailable)
-        )->join(', ');
+        )->join("\n- ");
 
-        PHPUnit::assertEmpty($this->mailables, 'The following mailables were sent unexpectedly: '.$mailableNames);
+        PHPUnit::assertEmpty($this->mailables, "The following mailables were sent unexpectedly:\n\n- $mailableNames\n");
     }
 
     /**
@@ -219,9 +219,9 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
     {
         $mailableNames = collect($this->queuedMailables)->map(
             fn ($mailable) => get_class($mailable)
-        )->join(', ');
+        )->join("\n- ");
 
-        PHPUnit::assertEmpty($this->queuedMailables, 'The following mailables were queued unexpectedly: '.$mailableNames);
+        PHPUnit::assertEmpty($this->queuedMailables, "The following mailables were queued unexpectedly:\n\n- $mailableNames\n");
     }
 
     /**
