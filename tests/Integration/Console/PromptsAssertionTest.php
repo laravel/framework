@@ -10,6 +10,7 @@ use function Laravel\Prompts\confirm;
 use function Laravel\Prompts\multisearch;
 use function Laravel\Prompts\multiselect;
 use function Laravel\Prompts\password;
+use function Laravel\Prompts\search;
 use function Laravel\Prompts\select;
 use function Laravel\Prompts\text;
 use function Laravel\Prompts\textarea;
@@ -168,7 +169,8 @@ class PromptsAssertionTest extends TestCase
         $this
             ->artisan('test:select')
             ->expectsChoice('What is your name?', 'Jane', ['John', 'Jane'])
-            ->expectsChoice('What is your title?', 'Dr', ['Dr'])
+            ->expectsQuestion('What is your title?', 'D')
+            ->expectsChoice('What is your title?', ['Dr'], ['Dr'])
             ->expectsOutput('I will refer to you Dr Jane.');
     }
 
@@ -229,6 +231,76 @@ class PromptsAssertionTest extends TestCase
         $this
             ->artisan('test:multiselect')
             ->expectsChoice('Which names do you like?', ['None'], ['John', 'Jane', 'Sally', 'Jack'])
+            ->expectsOutput('You like nobody.');
+    }
+
+    public function testAssertionForSearchPrompt()
+    {
+        $this->app[Kernel::class]->registerCommand(
+            new class extends Command
+            {
+                protected $signature = 'test:search';
+
+                public function handle()
+                {
+                    $options = collect(['John', 'Jane', 'Sally', 'Jack']);
+
+                    $name = search(
+                        label: 'What is your name?',
+                        options: fn (string $value) => strlen($value) > 0
+                            ? $options->filter(fn ($title) => str_contains($title, $value))->values()->toArray()
+                            : []
+                    );
+
+                    $this->line("Your name is $name.");
+                }
+            }
+        );
+
+        $this
+            ->artisan('test:search')
+            ->expectsQuestion('What is your name?', 'J')
+            ->expectsChoice('What is your name?', 'Jane', ['John', 'Jane', 'Jack'])
+            ->expectsOutput('Your name is Jane.');
+    }
+
+    public function testAssertionForMultisearchPrompt()
+    {
+        $this->app[Kernel::class]->registerCommand(
+            new class extends Command
+            {
+                protected $signature = 'test:multisearch';
+
+                public function handle()
+                {
+                    $options = collect(['John', 'Jane', 'Sally', 'Jack']);
+
+                    $names = multisearch(
+                        label: 'Which names do you like?',
+                        options: fn (string $value) => strlen($value) > 0
+                            ? $options->filter(fn ($title) => str_contains($title, $value))->values()->toArray()
+                            : []
+                    );
+
+                    if (empty($names)) {
+                        $this->line('You like nobody.');
+                    } else {
+                        $this->line(sprintf('You like %s.', implode(', ', $names)));
+                    }
+                }
+            }
+        );
+
+        $this
+            ->artisan('test:multisearch')
+            ->expectsQuestion('Which names do you like?', 'J')
+            ->expectsChoice('Which names do you like?', ['John', 'Jane'], ['John', 'Jane', 'Jack'])
+            ->expectsOutput('You like John, Jane.');
+
+        $this
+            ->artisan('test:multisearch')
+            ->expectsQuestion('Which names do you like?', 'J')
+            ->expectsChoice('Which names do you like?', ['None'], ['John', 'Jane', 'Jack'])
             ->expectsOutput('You like nobody.');
     }
 }

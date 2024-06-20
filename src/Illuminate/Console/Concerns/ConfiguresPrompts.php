@@ -270,7 +270,6 @@ trait ConfiguresPrompts
         }
 
         if ($required === false) {
-            $answers = Arr::wrap($answers);
             return array_is_list($options)
                 ? array_values(array_filter($answers, fn ($value) => $value !== 'None'))
                 : array_filter($answers, fn ($value) => $value !== '');
