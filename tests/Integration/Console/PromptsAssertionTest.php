@@ -224,8 +224,7 @@ class PromptsAssertionTest extends TestCase
 
         $this
             ->artisan('test:search')
-            ->expectsQuestion('What is your name?', 'J')
-            ->expectsChoice('What is your name?', 'Jane', ['John', 'Jane', 'Jack'])
+            ->expectsSearch('What is your name?', 'Jane', 'J', ['John', 'Jane', 'Jack'])
             ->expectsOutput('Your name is Jane.');
     }
 
@@ -258,14 +257,12 @@ class PromptsAssertionTest extends TestCase
 
         $this
             ->artisan('test:multisearch')
-            ->expectsQuestion('Which names do you like?', 'J')
-            ->expectsChoice('Which names do you like?', ['John', 'Jane'], ['John', 'Jane', 'Jack'])
+            ->expectsSearch('Which names do you like?', ['John', 'Jane'], 'J', ['John', 'Jane', 'Jack'])
             ->expectsOutput('You like John, Jane.');
 
         $this
             ->artisan('test:multisearch')
-            ->expectsQuestion('Which names do you like?', 'J')
-            ->expectsChoice('Which names do you like?', ['None'], ['John', 'Jane', 'Jack'])
+            ->expectsSearch('Which names do you like?', [], 'J', ['John', 'Jane', 'Jack'])
             ->expectsOutput('You like nobody.');
     }
 
@@ -299,8 +296,7 @@ class PromptsAssertionTest extends TestCase
         $this
             ->artisan('test:select')
             ->expectsChoice('What is your name?', 'Jane', ['John', 'Jane'])
-            ->expectsQuestion('What is your title?', 'D')
-            ->expectsChoice('What is your title?', ['Dr'], ['Dr'])
+            ->expectsSearch('What is your title?', ['Dr'], 'D', ['Dr'])
             ->expectsOutput('I will refer to you Dr Jane.');
     }
 }
