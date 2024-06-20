@@ -950,4 +950,15 @@ class Arr
 
         return is_array($value) ? $value : [$value];
     }
+    
+    /**
+     * Get all of the unique items in the array.
+     *
+     * @param  array  $array
+     * @return array
+     */
+    public static function unique($array)
+    {
+        return array_unique($array);
+    }
 }
