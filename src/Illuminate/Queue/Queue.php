@@ -334,7 +334,7 @@ abstract class Queue
                     if (! $this->shouldDispatch($job)) {
                         return;
                     }
-            
+
                     return $this->enqueue($job, $payload, $queue, $delay, $callback);
                 }
             );
