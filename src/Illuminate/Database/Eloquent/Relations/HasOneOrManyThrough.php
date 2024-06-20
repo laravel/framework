@@ -303,9 +303,11 @@ abstract class HasOneOrManyThrough extends Relation
     /**
      * Execute the query and get the first result or call a callback.
      *
+     * @template TFirstOrValue
+     *
      * @param  \Closure|array  $columns
-     * @param  \Closure|null  $callback
-     * @return TRelatedModel|mixed
+     * @param  (\Closure(): TFirstOrValue)|null  $callback
+     * @return ($callback is null ? TRelatedModel|null : TRelatedModel|TFirstOrValue)
      */
     public function firstOr($columns = ['*'], ?Closure $callback = null)
     {
@@ -327,7 +329,7 @@ abstract class HasOneOrManyThrough extends Relation
      *
      * @param  mixed  $id
      * @param  array  $columns
-     * @return TRelatedModel|\Illuminate\Database\Eloquent\Collection<int, TRelatedModel>|null
+     * @return ($id is (\Illuminate\Contracts\Support\Arrayable<array-key, mixed>|array<mixed>) ? \Illuminate\Database\Eloquent\Collection<int, TRelatedModel> : TRelatedModel|null)
      */
     public function find($id, $columns = ['*'])
     {
@@ -365,7 +367,7 @@ abstract class HasOneOrManyThrough extends Relation
      *
      * @param  mixed  $id
      * @param  array  $columns
-     * @return TRelatedModel|\Illuminate\Database\Eloquent\Collection<int, TRelatedModel>
+     * @return ($id is (\Illuminate\Contracts\Support\Arrayable<array-key, mixed>|array<mixed>) ? \Illuminate\Database\Eloquent\Collection<int, TRelatedModel> : TRelatedModel)
      *
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException<TRelatedModel>
      */
@@ -389,10 +391,16 @@ abstract class HasOneOrManyThrough extends Relation
     /**
      * Find a related model by its primary key or call a callback.
      *
+     * @template TFindOrValue
+     *
      * @param  mixed  $id
      * @param  \Closure|array  $columns
-     * @param  \Closure|null  $callback
-     * @return TRelatedModel|\Illuminate\Database\Eloquent\Collection<int, TRelatedModel>|mixed
+     * @param  (\Closure(): TFindOrValue)|null  $callback
+     * @return (
+     *     $id is (\Illuminate\Contracts\Support\Arrayable<array-key, mixed>|array<mixed>)
+     *     ? \Illuminate\Database\Eloquent\Collection<int, TRelatedModel>
+     *     : ($callback is null ? TRelatedModel|null : TRelatedModel|TFindOrValue)
+     * )
      */
     public function findOr($id, $columns = ['*'], ?Closure $callback = null)
     {

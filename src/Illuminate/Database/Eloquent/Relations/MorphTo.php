@@ -245,7 +245,7 @@ class MorphTo extends BelongsTo
     /**
      * Dissociate previously associated model from the given parent.
      *
-     * @return TDDeclaringModel
+     * @return TDeclaringModel
      */
     public function dissociate()
     {

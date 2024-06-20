@@ -32,7 +32,7 @@ trait BuildsQueries
      * Chunk the results of the query.
      *
      * @param  int  $count
-     * @param  callable  $callback
+     * @param  callable(\Illuminate\Support\Collection<int, TValue>, int): mixed  $callback
      * @return bool
      */
     public function chunk($count, callable $callback)
@@ -71,9 +71,11 @@ trait BuildsQueries
     /**
      * Run a map over each item while chunking.
      *
-     * @param  callable  $callback
+     * @template TReturn
+     *
+     * @param  callable(TValue): TReturn  $callback
      * @param  int  $count
-     * @return \Illuminate\Support\Collection
+     * @return \Illuminate\Support\Collection<int, TReturn>
      */
     public function chunkMap(callable $callback, $count = 1000)
     {
@@ -91,7 +93,7 @@ trait BuildsQueries
     /**
      * Execute a callback over each item while chunking.
      *
-     * @param  callable  $callback
+     * @param  callable(TValue, int): mixed  $callback
      * @param  int  $count
      * @return bool
      *
@@ -112,7 +114,7 @@ trait BuildsQueries
      * Chunk the results of a query by comparing IDs.
      *
      * @param  int  $count
-     * @param  callable  $callback
+     * @param  callable(\Illuminate\Support\Collection<int, TValue>, int): mixed  $callback
      * @param  string|null  $column
      * @param  string|null  $alias
      * @return bool
@@ -126,7 +128,7 @@ trait BuildsQueries
      * Chunk the results of a query by comparing IDs in descending order.
      *
      * @param  int  $count
-     * @param  callable  $callback
+     * @param  callable(\Illuminate\Support\Collection<int, TValue>, int): mixed  $callback
      * @param  string|null  $column
      * @param  string|null  $alias
      * @return bool
@@ -140,7 +142,7 @@ trait BuildsQueries
      * Chunk the results of a query by comparing IDs in a given order.
      *
      * @param  int  $count
-     * @param  callable  $callback
+     * @param  callable(\Illuminate\Support\Collection<int, TValue>, int): mixed  $callback
      * @param  string|null  $column
      * @param  string|null  $alias
      * @param  bool  $descending
@@ -200,7 +202,7 @@ trait BuildsQueries
     /**
      * Execute a callback over each item while chunking by ID.
      *
-     * @param  callable  $callback
+     * @param  callable(TValue, int): mixed  $callback
      * @param  int  $count
      * @param  string|null  $column
      * @param  string|null  $alias

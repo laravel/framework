@@ -47,7 +47,7 @@ class PendingHasThroughRelationship
      * @param  string|(callable(TIntermediateModel): (\Illuminate\Database\Eloquent\Relations\HasOne<TRelatedModel, TIntermediateModel>|\Illuminate\Database\Eloquent\Relations\HasMany<TRelatedModel, TIntermediateModel>))  $callback
      * @return (
      *     $callback is string
-     *     ? \Illuminate\Database\Eloquent\Relations\HasManyThrough<TRelatedModel, TIntermediateModel, TDeclaringModel>|\Illuminate\Database\Eloquent\Relations\HasOneThrough<TRelatedModel, TIntermediateModel, TDeclaringModel>
+     *     ? \Illuminate\Database\Eloquent\Relations\HasManyThrough<\Illuminate\Database\Eloquent\Model, TIntermediateModel, TDeclaringModel>|\Illuminate\Database\Eloquent\Relations\HasOneThrough<\Illuminate\Database\Eloquent\Model, TIntermediateModel, TDeclaringModel>
      *     : (
      *         $callback is callable(TIntermediateModel): \Illuminate\Database\Eloquent\Relations\HasOne<TRelatedModel, TIntermediateModel>
      *         ? \Illuminate\Database\Eloquent\Relations\HasOneThrough<TRelatedModel, TIntermediateModel, TDeclaringModel>

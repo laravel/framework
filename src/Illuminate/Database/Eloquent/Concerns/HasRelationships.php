@@ -391,7 +391,11 @@ trait HasRelationships
      * @template TIntermediateModel of \Illuminate\Database\Eloquent\Model
      *
      * @param  string|\Illuminate\Database\Eloquent\Relations\HasMany<TIntermediateModel, covariant $this>|\Illuminate\Database\Eloquent\Relations\HasOne<TIntermediateModel, covariant $this>  $relationship
-     * @return \Illuminate\Database\Eloquent\PendingHasThroughRelationship<TIntermediateModel, $this>
+     * @return (
+     *     $relationship is string
+     *     ? \Illuminate\Database\Eloquent\PendingHasThroughRelationship<\Illuminate\Database\Eloquent\Model, $this>
+     *     : \Illuminate\Database\Eloquent\PendingHasThroughRelationship<TIntermediateModel, $this>
+     * )
      */
     public function through($relationship)
     {

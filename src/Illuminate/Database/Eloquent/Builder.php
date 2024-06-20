@@ -297,7 +297,7 @@ class Builder implements BuilderContract
     /**
      * Add a basic where clause to the query.
      *
-     * @param  \Closure|string|array|\Illuminate\Contracts\Database\Query\Expression  $column
+     * @param  (\Closure(static): mixed)|string|array|\Illuminate\Contracts\Database\Query\Expression  $column
      * @param  mixed  $operator
      * @param  mixed  $value
      * @param  string  $boolean
@@ -319,7 +319,7 @@ class Builder implements BuilderContract
     /**
      * Add a basic where clause to the query, and return the first result.
      *
-     * @param  \Closure|string|array|\Illuminate\Contracts\Database\Query\Expression  $column
+     * @param  (\Closure(static): mixed)|string|array|\Illuminate\Contracts\Database\Query\Expression  $column
      * @param  mixed  $operator
      * @param  mixed  $value
      * @param  string  $boolean
@@ -333,7 +333,7 @@ class Builder implements BuilderContract
     /**
      * Add an "or where" clause to the query.
      *
-     * @param  \Closure|array|string|\Illuminate\Contracts\Database\Query\Expression  $column
+     * @param  (\Closure(static): mixed)|array|string|\Illuminate\Contracts\Database\Query\Expression  $column
      * @param  mixed  $operator
      * @param  mixed  $value
      * @return $this
@@ -350,7 +350,7 @@ class Builder implements BuilderContract
     /**
      * Add a basic "where not" clause to the query.
      *
-     * @param  \Closure|string|array|\Illuminate\Contracts\Database\Query\Expression  $column
+     * @param  (\Closure(static): mixed)|string|array|\Illuminate\Contracts\Database\Query\Expression  $column
      * @param  mixed  $operator
      * @param  mixed  $value
      * @param  string  $boolean
@@ -364,7 +364,7 @@ class Builder implements BuilderContract
     /**
      * Add an "or where not" clause to the query.
      *
-     * @param  \Closure|array|string|\Illuminate\Contracts\Database\Query\Expression  $column
+     * @param  (\Closure(static): mixed)|array|string|\Illuminate\Contracts\Database\Query\Expression  $column
      * @param  mixed  $operator
      * @param  mixed  $value
      * @return $this
@@ -448,7 +448,7 @@ class Builder implements BuilderContract
      *
      * @param  mixed  $id
      * @param  array|string  $columns
-     * @return TModel|\Illuminate\Database\Eloquent\Collection<int, TModel>|null
+     * @return ($id is (\Illuminate\Contracts\Support\Arrayable<array-key, mixed>|array<mixed>) ? \Illuminate\Database\Eloquent\Collection<int, TModel> : TModel|null)
      */
     public function find($id, $columns = ['*'])
     {
@@ -482,7 +482,7 @@ class Builder implements BuilderContract
      *
      * @param  mixed  $id
      * @param  array|string  $columns
-     * @return TModel|\Illuminate\Database\Eloquent\Collection<int, TModel>
+     * @return ($id is (\Illuminate\Contracts\Support\Arrayable<array-key, mixed>|array<mixed>) ? \Illuminate\Database\Eloquent\Collection<int, TModel> : TModel)
      *
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException<TModel>
      */
@@ -516,7 +516,7 @@ class Builder implements BuilderContract
      *
      * @param  mixed  $id
      * @param  array|string  $columns
-     * @return TModel
+     * @return ($id is (\Illuminate\Contracts\Support\Arrayable<array-key, mixed>|array<mixed>) ? \Illuminate\Database\Eloquent\Collection<int, TModel> : TModel)
      */
     public function findOrNew($id, $columns = ['*'])
     {
@@ -530,10 +530,16 @@ class Builder implements BuilderContract
     /**
      * Find a model by its primary key or call a callback.
      *
+     * @template TFindOrValue
+     *
      * @param  mixed  $id
      * @param  \Closure|array|string  $columns
-     * @param  \Closure|null  $callback
-     * @return TModel|\Illuminate\Database\Eloquent\Collection<int, TModel>|mixed
+     * @param  (\Closure(): TFindOrValue)|null  $callback
+     * @return (
+     *     $id is (\Illuminate\Contracts\Support\Arrayable<array-key, mixed>|array<mixed>)
+     *     ? \Illuminate\Database\Eloquent\Collection<int, TModel>
+     *     : ($callback is null ? TModel|null : TModel|TFindOrValue)
+     * )
      */
     public function findOr($id, $columns = ['*'], ?Closure $callback = null)
     {
@@ -634,9 +640,11 @@ class Builder implements BuilderContract
     /**
      * Execute the query and get the first result or call a callback.
      *
+     * @template TFirstOrValue
+     *
      * @param  \Closure|array|string  $columns
-     * @param  \Closure|null  $callback
-     * @return TModel|mixed
+     * @param  (\Closure(): TFirstOrValue)|null  $callback
+     * @return ($callback is null ? TModel|null : TModel|TFirstOrValue)
      */
     public function firstOr($columns = ['*'], ?Closure $callback = null)
     {

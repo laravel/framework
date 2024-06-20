@@ -105,7 +105,7 @@ trait QueriesRelationships
     /**
      * Add a relationship count / exists condition to the query with an "or".
      *
-     * @param  string  $relation
+     * @param  \Illuminate\Database\Eloquent\Relations\Relation<*, *, *>|string  $relation
      * @param  string  $operator
      * @param  int  $count
      * @return $this
@@ -118,7 +118,7 @@ trait QueriesRelationships
     /**
      * Add a relationship count / exists condition to the query.
      *
-     * @param  string  $relation
+     * @param  \Illuminate\Database\Eloquent\Relations\Relation<*, *, *>|string  $relation
      * @param  string  $boolean
      * @param  \Closure|null  $callback
      * @return $this
@@ -131,7 +131,7 @@ trait QueriesRelationships
     /**
      * Add a relationship count / exists condition to the query with an "or".
      *
-     * @param  string  $relation
+     * @param  \Illuminate\Database\Eloquent\Relations\Relation<*, *, *>|string  $relation
      * @return $this
      */
     public function orDoesntHave($relation)
@@ -142,7 +142,7 @@ trait QueriesRelationships
     /**
      * Add a relationship count / exists condition to the query with where clauses.
      *
-     * @param  string  $relation
+     * @param  \Illuminate\Database\Eloquent\Relations\Relation<*, *, *>|string  $relation
      * @param  \Closure|null  $callback
      * @param  string  $operator
      * @param  int  $count
@@ -158,7 +158,7 @@ trait QueriesRelationships
      *
      * Also load the relationship with same condition.
      *
-     * @param  string  $relation
+     * @param  \Illuminate\Database\Eloquent\Relations\Relation<*, *, *>|string  $relation
      * @param  \Closure|null  $callback
      * @param  string  $operator
      * @param  int  $count
@@ -173,7 +173,7 @@ trait QueriesRelationships
     /**
      * Add a relationship count / exists condition to the query with where clauses and an "or".
      *
-     * @param  string  $relation
+     * @param  \Illuminate\Database\Eloquent\Relations\Relation<*, *, *>|string  $relation
      * @param  \Closure|null  $callback
      * @param  string  $operator
      * @param  int  $count
@@ -187,7 +187,7 @@ trait QueriesRelationships
     /**
      * Add a relationship count / exists condition to the query with where clauses.
      *
-     * @param  string  $relation
+     * @param  \Illuminate\Database\Eloquent\Relations\Relation<*, *, *>|string  $relation
      * @param  \Closure|null  $callback
      * @return $this
      */
@@ -199,7 +199,7 @@ trait QueriesRelationships
     /**
      * Add a relationship count / exists condition to the query with where clauses and an "or".
      *
-     * @param  string  $relation
+     * @param  \Illuminate\Database\Eloquent\Relations\Relation<*, *, *>|string  $relation
      * @param  \Closure|null  $callback
      * @return $this
      */
@@ -381,7 +381,7 @@ trait QueriesRelationships
     /**
      * Add a basic where clause to a relationship query.
      *
-     * @param  string  $relation
+     * @param  \Illuminate\Database\Eloquent\Relations\Relation<*, *, *>|string  $relation
      * @param  \Closure|string|array|\Illuminate\Contracts\Database\Query\Expression  $column
      * @param  mixed  $operator
      * @param  mixed  $value
@@ -401,7 +401,7 @@ trait QueriesRelationships
     /**
      * Add an "or where" clause to a relationship query.
      *
-     * @param  string  $relation
+     * @param  \Illuminate\Database\Eloquent\Relations\Relation<*, *, *>|string  $relation
      * @param  \Closure|string|array|\Illuminate\Contracts\Database\Query\Expression  $column
      * @param  mixed  $operator
      * @param  mixed  $value

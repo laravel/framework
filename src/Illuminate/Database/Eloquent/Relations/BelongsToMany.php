@@ -287,7 +287,7 @@ class BelongsToMany extends Relation
      * Build model dictionary keyed by the relation's foreign key.
      *
      * @param  \Illuminate\Database\Eloquent\Collection<int, TRelatedModel>  $results
-     * @return array<string, TRelatedModel>
+     * @return array<array<string, TRelatedModel>>
      */
     protected function buildDictionary(Collection $results)
     {
@@ -571,7 +571,7 @@ class BelongsToMany extends Relation
      *
      * @param  mixed  $id
      * @param  array  $columns
-     * @return \Illuminate\Support\Collection<int, TRelatedModel>|TRelatedModel
+     * @return ($id is (\Illuminate\Contracts\Support\Arrayable<array-key, mixed>|array<mixed>) ? \Illuminate\Database\Eloquent\Collection<int, TRelatedModel> : TRelatedModel)
      */
     public function findOrNew($id, $columns = ['*'])
     {
@@ -675,7 +675,7 @@ class BelongsToMany extends Relation
      *
      * @param  mixed  $id
      * @param  array  $columns
-     * @return TRelatedModel|\Illuminate\Database\Eloquent\Collection<int, TRelatedModel>|null
+     * @return ($id is (\Illuminate\Contracts\Support\Arrayable<array-key, mixed>|array<mixed>) ? \Illuminate\Database\Eloquent\Collection<int, TRelatedModel> : TRelatedModel|null)
      */
     public function find($id, $columns = ['*'])
     {
@@ -713,7 +713,7 @@ class BelongsToMany extends Relation
      *
      * @param  mixed  $id
      * @param  array  $columns
-     * @return TRelatedModel|\Illuminate\Database\Eloquent\Collection<int, TRelatedModel>
+     * @return ($id is (\Illuminate\Contracts\Support\Arrayable<array-key, mixed>|array<mixed>) ? \Illuminate\Database\Eloquent\Collection<int, TRelatedModel> : TRelatedModel)
      *
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException<TRelatedModel>
      */
@@ -737,10 +737,16 @@ class BelongsToMany extends Relation
     /**
      * Find a related model by its primary key or call a callback.
      *
+     * @template TFindOrValue
+     *
      * @param  mixed  $id
      * @param  \Closure|array  $columns
-     * @param  \Closure|null  $callback
-     * @return TRelatedModel|\Illuminate\Database\Eloquent\Collection<int, TRelatedModel>|mixed
+     * @param  (\Closure(): TFindOrValue)|null  $callback
+     * @return (
+     *     $id is (\Illuminate\Contracts\Support\Arrayable<array-key, mixed>|array<mixed>)
+     *     ? \Illuminate\Database\Eloquent\Collection<int, TRelatedModel>
+     *     : ($callback is null ? TRelatedModel|null : TRelatedModel|TFindOrValue)
+     * )
      */
     public function findOr($id, $columns = ['*'], ?Closure $callback = null)
     {
@@ -812,9 +818,11 @@ class BelongsToMany extends Relation
     /**
      * Execute the query and get the first result or call a callback.
      *
+     * @template TFirstOrValue
+     *
      * @param  \Closure|array  $columns
-     * @param  \Closure|null  $callback
-     * @return TRelatedModel|mixed
+     * @param  (\Closure(): TFirstOrValue)|null  $callback
+     * @return ($callback is null ? TRelatedModel|null : TRelatedModel|TFirstOrValue)
      */
     public function firstOr($columns = ['*'], ?Closure $callback = null)
     {
@@ -1292,10 +1300,11 @@ class BelongsToMany extends Relation
     /**
      * Save an array of new models and attach them to the parent model.
      *
-     * @param  \Illuminate\Support\Collection<int, TRelatedModel>|array<int, TRelatedModel>  $models
+     * @template TContainer of \Illuminate\Support\Collection<array-key, TRelatedModel>|array<array-key, TRelatedModel>
+     *
+     * @param  TContainer  $models
      * @param  array  $pivotAttributes
-     * @return array<
-     * @return \Illuminate\Support\Collection<int, TRelatedModel>|array<int, TRelatedModel>
+     * @return TContainer
      */
     public function saveMany($models, array $pivotAttributes = [])
     {
@@ -1311,9 +1320,11 @@ class BelongsToMany extends Relation
     /**
      * Save an array of new models without raising any events and attach them to the parent model.
      *
-     * @param  \Illuminate\Support\Collection<int, TRelatedModel>|array<int, TRelatedModel>  $models
+     * @template TContainer of \Illuminate\Support\Collection<array-key, TRelatedModel>|array<array-key, TRelatedModel>
+     *
+     * @param  TContainer  $models
      * @param  array  $pivotAttributes
-     * @return \Illuminate\Support\Collection<int, TRelatedModel>|array<int, TRelatedModel>
+     * @return TContainer
      */
     public function saveManyQuietly($models, array $pivotAttributes = [])
     {

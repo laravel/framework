@@ -19,19 +19,74 @@ use function PHPStan\Testing\assertType;
 function test(User $user, Post $post, Comment $comment, ChildUser $child): void
 {
     assertType('Illuminate\Database\Eloquent\Relations\HasOne<Illuminate\Types\Relations\Address, Illuminate\Types\Relations\User>', $user->address());
-    assertType('Illuminate\Database\Eloquent\Relations\HasOne<Illuminate\Types\Relations\Address, Illuminate\Types\Relations\ChildUser>', $child->address());
     assertType('Illuminate\Types\Relations\Address|null', $user->address()->getResults());
     assertType('Illuminate\Database\Eloquent\Collection<int, Illuminate\Types\Relations\Address>', $user->address()->get());
+    assertType('Illuminate\Types\Relations\Address', $user->address()->make());
+    assertType('Illuminate\Types\Relations\Address', $user->address()->create());
+    assertType('Illuminate\Database\Eloquent\Relations\HasOne<Illuminate\Types\Relations\Address, Illuminate\Types\Relations\ChildUser>', $child->address());
+    assertType('Illuminate\Types\Relations\Address', $child->address()->make());
+    assertType('Illuminate\Types\Relations\Address', $child->address()->create([]));
+    assertType('Illuminate\Types\Relations\Address', $child->address()->getRelated());
+    assertType('Illuminate\Types\Relations\ChildUser', $child->address()->getParent());
 
     assertType('Illuminate\Database\Eloquent\Relations\HasMany<Illuminate\Types\Relations\Post, Illuminate\Types\Relations\User>', $user->posts());
     assertType('Illuminate\Database\Eloquent\Collection<int, Illuminate\Types\Relations\Post>', $user->posts()->getResults());
+    assertType('Illuminate\Database\Eloquent\Collection<int, Illuminate\Types\Relations\Post>', $user->posts()->makeMany([]));
+    assertType('Illuminate\Database\Eloquent\Collection<int, Illuminate\Types\Relations\Post>', $user->posts()->createMany([]));
+    assertType('Illuminate\Database\Eloquent\Collection<int, Illuminate\Types\Relations\Post>', $user->posts()->createManyQuietly([]));
     assertType('Illuminate\Database\Eloquent\Relations\HasOne<Illuminate\Types\Relations\Post, Illuminate\Types\Relations\User>', $user->latestPost());
+    assertType('Illuminate\Types\Relations\Post', $user->posts()->make());
+    assertType('Illuminate\Types\Relations\Post', $user->posts()->create());
+    assertType('Illuminate\Types\Relations\Post|false', $user->posts()->save(new Post()));
+    assertType('Illuminate\Types\Relations\Post|false', $user->posts()->saveQuietly(new Post()));
 
     assertType('Illuminate\Database\Eloquent\Relations\BelongsToMany<Illuminate\Types\Relations\Role, Illuminate\Types\Relations\User>', $user->roles());
     assertType('Illuminate\Database\Eloquent\Collection<int, Illuminate\Types\Relations\Role>', $user->roles()->getResults());
+    assertType('Illuminate\Database\Eloquent\Collection<int, Illuminate\Types\Relations\Role>', $user->roles()->find([1]));
+    assertType('Illuminate\Database\Eloquent\Collection<int, Illuminate\Types\Relations\Role>', $user->roles()->findMany([1, 2, 3]));
+    assertType('Illuminate\Database\Eloquent\Collection<int, Illuminate\Types\Relations\Role>', $user->roles()->findOrNew([1]));
+    assertType('Illuminate\Database\Eloquent\Collection<int, Illuminate\Types\Relations\Role>', $user->roles()->findOrFail([1]));
+    assertType('Illuminate\Database\Eloquent\Collection<int, Illuminate\Types\Relations\Role>', $user->roles()->findOr([1], callback: fn () => 42));
+    assertType('Illuminate\Types\Relations\Role', $user->roles()->findOrNew(1));
+    assertType('Illuminate\Types\Relations\Role', $user->roles()->findOrFail(1));
+    assertType('Illuminate\Types\Relations\Role|null', $user->roles()->find(1));
+    assertType('Illuminate\Types\Relations\Role|null', $user->roles()->findOr(1));
+    assertType('Illuminate\Types\Relations\Role|int', $user->roles()->findOr(1, callback: fn () => 42));
+    assertType('Illuminate\Types\Relations\Role|null', $user->roles()->first());
+    assertType('Illuminate\Types\Relations\Role|null', $user->roles()->firstOr());
+    assertType('Illuminate\Types\Relations\Role|int', $user->roles()->firstOr(callback: fn () => 42));
+    assertType('Illuminate\Types\Relations\Role|null', $user->roles()->firstWhere('foo'));
+    assertType('Illuminate\Types\Relations\Role', $user->roles()->firstOrNew());
+    assertType('Illuminate\Types\Relations\Role', $user->roles()->firstOrFail());
+    assertType('Illuminate\Types\Relations\Role', $user->roles()->firstOrCreate());
+    assertType('Illuminate\Types\Relations\Role', $user->roles()->create());
+    assertType('Illuminate\Types\Relations\Role', $user->roles()->createOrFirst());
+    assertType('Illuminate\Types\Relations\Role', $user->roles()->updateOrCreate([]));
+    assertType('Illuminate\Types\Relations\Role', $user->roles()->save(new Role()));
+    assertType('Illuminate\Types\Relations\Role', $user->roles()->saveQuietly(new Role()));
+    $roles = $user->roles()->getResults();
+    assertType('Illuminate\Database\Eloquent\Collection<int, Illuminate\Types\Relations\Role>', $user->roles()->saveMany($roles));
+    assertType('array<int, Illuminate\Types\Relations\Role>', $user->roles()->saveMany($roles->all()));
+    assertType('Illuminate\Database\Eloquent\Collection<int, Illuminate\Types\Relations\Role>', $user->roles()->saveManyQuietly($roles));
+    assertType('array<int, Illuminate\Types\Relations\Role>', $user->roles()->saveManyQuietly($roles->all()));
+    assertType('array<int, Illuminate\Types\Relations\Role>', $user->roles()->createMany($roles));
+    assertType('Illuminate\Support\LazyCollection<int, Illuminate\Types\Relations\Role>', $user->roles()->lazy());
+    assertType('Illuminate\Support\LazyCollection<int, Illuminate\Types\Relations\Role>', $user->roles()->lazyById());
+    assertType('Illuminate\Support\LazyCollection<int, Illuminate\Types\Relations\Role>', $user->roles()->cursor());
 
     assertType('Illuminate\Database\Eloquent\Relations\HasOneThrough<Illuminate\Types\Relations\Car, Illuminate\Types\Relations\Mechanic, Illuminate\Types\Relations\User>', $user->car());
     assertType('Illuminate\Types\Relations\Car|null', $user->car()->getResults());
+    assertType('Illuminate\Database\Eloquent\Collection<int, Illuminate\Types\Relations\Car>', $user->car()->find([1]));
+    assertType('Illuminate\Database\Eloquent\Collection<int, Illuminate\Types\Relations\Car>', $user->car()->findOr([1], callback: fn () => 42));
+    assertType('Illuminate\Types\Relations\Car|null', $user->car()->find(1));
+    assertType('Illuminate\Types\Relations\Car|null', $user->car()->findOr(1));
+    assertType('Illuminate\Types\Relations\Car|int', $user->car()->findOr(1, callback: fn () => 42));
+    assertType('Illuminate\Types\Relations\Car|null', $user->car()->first());
+    assertType('Illuminate\Types\Relations\Car|null', $user->car()->firstOr());
+    assertType('Illuminate\Types\Relations\Car|int', $user->car()->firstOr(callback: fn () => 42));
+    assertType('Illuminate\Support\LazyCollection<int, Illuminate\Types\Relations\Car>', $user->car()->lazy());
+    assertType('Illuminate\Support\LazyCollection<int, Illuminate\Types\Relations\Car>', $user->car()->lazyById());
+    assertType('Illuminate\Support\LazyCollection<int, Illuminate\Types\Relations\Car>', $user->car()->cursor());
 
     assertType('Illuminate\Database\Eloquent\Relations\HasManyThrough<Illuminate\Types\Relations\Part, Illuminate\Types\Relations\Mechanic, Illuminate\Types\Relations\User>', $user->parts());
     assertType('Illuminate\Database\Eloquent\Collection<int, Illuminate\Types\Relations\Part>', $user->parts()->getResults());
@@ -39,9 +94,16 @@ function test(User $user, Post $post, Comment $comment, ChildUser $child): void
 
     assertType('Illuminate\Database\Eloquent\Relations\BelongsTo<Illuminate\Types\Relations\User, Illuminate\Types\Relations\Post>', $post->user());
     assertType('Illuminate\Types\Relations\User|null', $post->user()->getResults());
+    assertType('Illuminate\Types\Relations\User', $post->user()->make());
+    assertType('Illuminate\Types\Relations\User', $post->user()->create());
+    assertType('Illuminate\Types\Relations\Post', $post->user()->associate(new User()));
+    assertType('Illuminate\Types\Relations\Post', $post->user()->dissociate());
+    assertType('Illuminate\Types\Relations\Post', $post->user()->disassociate());
+    assertType('Illuminate\Types\Relations\Post', $post->user()->getChild());
 
     assertType('Illuminate\Database\Eloquent\Relations\MorphOne<Illuminate\Types\Relations\Image, Illuminate\Types\Relations\Post>', $post->image());
     assertType('Illuminate\Types\Relations\Image|null', $post->image()->getResults());
+    assertType('Illuminate\Types\Relations\Image', $post->image()->forceCreate([]));
 
     assertType('Illuminate\Database\Eloquent\Relations\MorphMany<Illuminate\Types\Relations\Comment, Illuminate\Types\Relations\Post>', $post->comments());
     assertType('Illuminate\Database\Eloquent\Collection<int, Illuminate\Types\Relations\Comment>', $post->comments()->getResults());
@@ -49,6 +111,10 @@ function test(User $user, Post $post, Comment $comment, ChildUser $child): void
 
     assertType('Illuminate\Database\Eloquent\Relations\MorphTo<Illuminate\Database\Eloquent\Model, Illuminate\Types\Relations\Comment>', $comment->commentable());
     assertType('Illuminate\Database\Eloquent\Model|null', $comment->commentable()->getResults());
+    assertType('Illuminate\Database\Eloquent\Collection<int, Illuminate\Types\Relations\Comment>', $comment->commentable()->getEager());
+    assertType('Illuminate\Database\Eloquent\Model', $comment->commentable()->createModelByType('foo'));
+    assertType('Illuminate\Types\Relations\Comment', $comment->commentable()->associate(new Post()));
+    assertType('Illuminate\Types\Relations\Comment', $comment->commentable()->dissociate());
 
     assertType('Illuminate\Database\Eloquent\Relations\MorphToMany<Illuminate\Types\Relations\Tag, Illuminate\Types\Relations\Post>', $post->tags());
     assertType('Illuminate\Database\Eloquent\Collection<int, Illuminate\Types\Relations\Tag>', $post->tags()->getResults());
@@ -104,7 +170,6 @@ class User extends Model
         $hasOneThrough = $this->hasOneThrough(Car::class, Mechanic::class);
         assertType('Illuminate\Database\Eloquent\Relations\HasOneThrough<Illuminate\Types\Relations\Car, Illuminate\Types\Relations\Mechanic, $this(Illuminate\Types\Relations\User)>', $hasOneThrough);
 
-        /** @phpstan-ignore argument.templateType (unable to resolve template type from string) */
         $through = $this->through('mechanic');
         assertType(
             'Illuminate\Database\Eloquent\PendingHasThroughRelationship<Illuminate\Database\Eloquent\Model, $this(Illuminate\Types\Relations\User)>',
@@ -112,7 +177,6 @@ class User extends Model
         );
         assertType(
             'Illuminate\Database\Eloquent\Relations\HasManyThrough<Illuminate\Database\Eloquent\Model, Illuminate\Database\Eloquent\Model, $this(Illuminate\Types\Relations\User)>|Illuminate\Database\Eloquent\Relations\HasOneThrough<Illuminate\Database\Eloquent\Model, Illuminate\Database\Eloquent\Model, $this(Illuminate\Types\Relations\User)>',
-            /** @phpstan-ignore argument.templateType (unable to resolve template type from string) */
             $through->has('car'),
         );
 
