@@ -212,6 +212,13 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     protected static $isBroadcasting = true;
 
     /**
+     * The Eloquent query builder class to use for the model.
+     *
+     * @var class-string<\Illuminate\Database\Eloquent\Builder<*>>
+     */
+    protected static string $builder = Builder::class;
+
+    /**
      * The name of the "created at" column.
      *
      * @var string|null
@@ -1568,7 +1575,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function newEloquentBuilder($query)
     {
-        return new Builder($query);
+        return new static::$builder($query);
     }
 
     /**

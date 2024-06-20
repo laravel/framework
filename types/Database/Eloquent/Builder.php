@@ -3,16 +3,23 @@
 namespace Illuminate\Types\Builder;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\HasBuilder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Database\Query\Builder as QueryBuilder;
 use User;
 
 use function PHPStan\Testing\assertType;
 
 /** @param \Illuminate\Database\Eloquent\Builder<\User> $query */
-function test(Builder $query, Post $post, ChildPost $childPost, Comment $comment): void
-{
+function test(
+    Builder $query,
+    Post $post,
+    ChildPost $childPost,
+    Comment $comment,
+    QueryBuilder $queryBuilder
+): void {
     assertType('Illuminate\Database\Eloquent\Builder<User>', $query->where('id', 1));
     assertType('Illuminate\Database\Eloquent\Builder<User>', $query->orWhere('name', 'John'));
     assertType('Illuminate\Database\Eloquent\Builder<User>', $query->whereNot('status', 'active'));
@@ -103,22 +110,59 @@ function test(Builder $query, Post $post, ChildPost $childPost, Comment $comment
         assertType('int', $page);
     });
 
-    assertType('Illuminate\Types\Builder\CommonBuilder<Illuminate\Types\Builder\Post>', $post->query());
-    assertType('Illuminate\Types\Builder\CommonBuilder<Illuminate\Types\Builder\Post>', $post->query()->where('foo', 'bar'));
-    assertType('Illuminate\Types\Builder\CommonBuilder<Illuminate\Types\Builder\Post>', $post->query()->foo());
-    assertType('Illuminate\Types\Builder\Post', $post->query()->create(['name' => 'John']));
-    assertType('Illuminate\Types\Builder\CommonBuilder<Illuminate\Types\Builder\ChildPost>', $childPost->query());
-    assertType('Illuminate\Types\Builder\CommonBuilder<Illuminate\Types\Builder\ChildPost>', $childPost->query()->where('foo', 'bar'));
-    assertType('Illuminate\Types\Builder\CommonBuilder<Illuminate\Types\Builder\ChildPost>', $childPost->query()->foo());
-    assertType('Illuminate\Types\Builder\ChildPost', $childPost->query()->create(['name' => 'John']));
-    assertType('Illuminate\Types\Builder\CommentBuilder', $comment->query());
-    assertType('Illuminate\Types\Builder\CommentBuilder', $comment->query()->where('foo', 'bar'));
-    assertType('Illuminate\Types\Builder\CommentBuilder', $comment->query()->foo());
-    assertType('Illuminate\Types\Builder\Comment', $comment->query()->create(['name' => 'John']));
+    assertType('Illuminate\Types\Builder\CommonBuilder<Illuminate\Types\Builder\Post>', Post::query());
+    assertType('Illuminate\Types\Builder\CommonBuilder<Illuminate\Types\Builder\Post>', Post::on());
+    assertType('Illuminate\Types\Builder\CommonBuilder<Illuminate\Types\Builder\Post>', Post::onWriteConnection());
+    assertType('Illuminate\Types\Builder\CommonBuilder<Illuminate\Types\Builder\Post>', Post::with([]));
+    assertType('Illuminate\Types\Builder\CommonBuilder<Illuminate\Types\Builder\Post>', $post->newQuery());
+    assertType('Illuminate\Types\Builder\CommonBuilder<Illuminate\Types\Builder\Post>', $post->newEloquentBuilder($queryBuilder));
+    assertType('Illuminate\Types\Builder\CommonBuilder<Illuminate\Types\Builder\Post>', $post->newModelQuery());
+    assertType('Illuminate\Types\Builder\CommonBuilder<Illuminate\Types\Builder\Post>', $post->newQueryWithoutRelationships());
+    assertType('Illuminate\Types\Builder\CommonBuilder<Illuminate\Types\Builder\Post>', $post->newQueryWithoutScopes());
+    assertType('Illuminate\Types\Builder\CommonBuilder<Illuminate\Types\Builder\Post>', $post->newQueryWithoutScope('foo'));
+    assertType('Illuminate\Types\Builder\CommonBuilder<Illuminate\Types\Builder\Post>', $post->newQueryForRestoration(1));
+    assertType('Illuminate\Types\Builder\CommonBuilder<Illuminate\Types\Builder\Post>', $post->newQuery()->where('foo', 'bar'));
+    assertType('Illuminate\Types\Builder\CommonBuilder<Illuminate\Types\Builder\Post>', $post->newQuery()->foo());
+    assertType('Illuminate\Types\Builder\Post', $post->newQuery()->create(['name' => 'John']));
+
+    assertType('Illuminate\Types\Builder\CommonBuilder<Illuminate\Types\Builder\ChildPost>', ChildPost::query());
+    assertType('Illuminate\Types\Builder\CommonBuilder<Illuminate\Types\Builder\ChildPost>', ChildPost::on());
+    assertType('Illuminate\Types\Builder\CommonBuilder<Illuminate\Types\Builder\ChildPost>', ChildPost::onWriteConnection());
+    assertType('Illuminate\Types\Builder\CommonBuilder<Illuminate\Types\Builder\ChildPost>', ChildPost::with([]));
+    assertType('Illuminate\Types\Builder\CommonBuilder<Illuminate\Types\Builder\ChildPost>', $childPost->newQuery());
+    assertType('Illuminate\Types\Builder\CommonBuilder<Illuminate\Types\Builder\ChildPost>', $childPost->newEloquentBuilder($queryBuilder));
+    assertType('Illuminate\Types\Builder\CommonBuilder<Illuminate\Types\Builder\ChildPost>', $childPost->newModelQuery());
+    assertType('Illuminate\Types\Builder\CommonBuilder<Illuminate\Types\Builder\ChildPost>', $childPost->newQueryWithoutRelationships());
+    assertType('Illuminate\Types\Builder\CommonBuilder<Illuminate\Types\Builder\ChildPost>', $childPost->newQueryWithoutScopes());
+    assertType('Illuminate\Types\Builder\CommonBuilder<Illuminate\Types\Builder\ChildPost>', $childPost->newQueryWithoutScope('foo'));
+    assertType('Illuminate\Types\Builder\CommonBuilder<Illuminate\Types\Builder\ChildPost>', $childPost->newQueryForRestoration(1));
+    assertType('Illuminate\Types\Builder\CommonBuilder<Illuminate\Types\Builder\ChildPost>', $childPost->newQuery()->where('foo', 'bar'));
+    assertType('Illuminate\Types\Builder\CommonBuilder<Illuminate\Types\Builder\ChildPost>', $childPost->newQuery()->foo());
+    assertType('Illuminate\Types\Builder\ChildPost', $childPost->newQuery()->create(['name' => 'John']));
+
+    assertType('Illuminate\Types\Builder\CommentBuilder', Comment::query());
+    assertType('Illuminate\Types\Builder\CommentBuilder', Comment::on());
+    assertType('Illuminate\Types\Builder\CommentBuilder', Comment::onWriteConnection());
+    assertType('Illuminate\Types\Builder\CommentBuilder', Comment::with([]));
+    assertType('Illuminate\Types\Builder\CommentBuilder', $comment->newQuery());
+    assertType('Illuminate\Types\Builder\CommentBuilder', $comment->newEloquentBuilder($queryBuilder));
+    assertType('Illuminate\Types\Builder\CommentBuilder', $comment->newModelQuery());
+    assertType('Illuminate\Types\Builder\CommentBuilder', $comment->newQueryWithoutRelationships());
+    assertType('Illuminate\Types\Builder\CommentBuilder', $comment->newQueryWithoutScopes());
+    assertType('Illuminate\Types\Builder\CommentBuilder', $comment->newQueryWithoutScope('foo'));
+    assertType('Illuminate\Types\Builder\CommentBuilder', $comment->newQueryForRestoration(1));
+    assertType('Illuminate\Types\Builder\CommentBuilder', $comment->newQuery()->where('foo', 'bar'));
+    assertType('Illuminate\Types\Builder\CommentBuilder', $comment->newQuery()->foo());
+    assertType('Illuminate\Types\Builder\Comment', $comment->newQuery()->create(['name' => 'John']));
 }
 
 class Post extends Model
 {
+    /** @use HasBuilder<CommonBuilder<static>> */
+    use HasBuilder;
+
+    protected static string $builder = CommonBuilder::class;
+
     /** @return HasMany<User, $this> */
     public function users(): HasMany
     {
@@ -130,22 +174,6 @@ class Post extends Model
     {
         return $this->morphTo();
     }
-
-    /** @return CommonBuilder<static> */
-    public static function query(): CommonBuilder
-    {
-        /** @var CommonBuilder<static> */
-        return parent::query();
-    }
-
-    /**
-     * @param  \Illuminate\Database\Query\Builder  $query
-     * @return CommonBuilder<*>
-     */
-    public function newEloquentBuilder($query): CommonBuilder
-    {
-        return new CommonBuilder($query);
-    }
 }
 
 class ChildPost extends Post
@@ -154,17 +182,10 @@ class ChildPost extends Post
 
 class Comment extends Model
 {
-    public static function query(): CommentBuilder
-    {
-        /** @var CommentBuilder */
-        return parent::query();
-    }
+    /** @use HasBuilder<CommentBuilder> */
+    use HasBuilder;
 
-    /** @param  \Illuminate\Database\Query\Builder  $query */
-    public function newEloquentBuilder($query): CommentBuilder
-    {
-        return new CommentBuilder($query);
-    }
+    protected static string $builder = CommentBuilder::class;
 }
 
 /**
