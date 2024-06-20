@@ -618,6 +618,22 @@ trait EnumeratesValues
     }
 
     /**
+     * Filter items where key isn't the value.
+     *
+     * @param  callable|string  $key
+     * @param  mixed  $value
+     * @return static
+     */
+    public function whereNot($key, $value = null)
+    {
+        if ($value === null) {
+            return $this->whereNotNull($key);
+        }
+
+        return $this->where($key, '!=', $value);
+    }
+
+    /**
      * Filter items where the value for the given key is null.
      *
      * @param  string|null  $key
