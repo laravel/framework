@@ -131,7 +131,7 @@ class WorkCommandTest extends QueueTestCase
             '--max-jobs' => 1,
         ]);
 
-        // Memory limit isn't checked until after the first job is attempted.
+        // Processing stops after max jobs are exceeded.
         $this->assertSame(1, Queue::size());
         $this->assertTrue(FirstJob::$ran);
         $this->assertFalse(SecondJob::$ran);
@@ -151,7 +151,7 @@ class WorkCommandTest extends QueueTestCase
             '--max-time' => 1,
         ]);
 
-        // Memory limit isn't checked until after the first job is attempted.
+        // ThirdJob sleeps for 1 second, thus no further jobs are processed.
         $this->assertSame(2, Queue::size());
         $this->assertTrue(ThirdJob::$ran);
         $this->assertFalse(FirstJob::$ran);
