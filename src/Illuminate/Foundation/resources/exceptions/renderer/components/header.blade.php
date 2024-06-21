@@ -14,7 +14,7 @@
             </div>
         </div>
 
-        <div class="hidden text-right md:block md:min-w-64">
+        <div class="hidden text-right shrink-0 md:block md:min-w-64">
             <div>
                 <span class="rounded-full bg-gray-200 px-3 py-2 text-sm leading-5 text-gray-900 dark:bg-gray-800 dark:text-white">
                     {{ $exception->request()->method() }} {{ $exception->request()->httpHost() }}
