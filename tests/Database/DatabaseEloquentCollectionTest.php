@@ -510,6 +510,21 @@ class DatabaseEloquentCollectionTest extends TestCase
         $this->assertEquals(['visible', 'hidden'], $c[0]->getVisible());
     }
 
+    public function testMultiply()
+    {
+        $a = new TestEloquentCollectionModel();
+        $b = new TestEloquentCollectionModel();
+
+        $c = new Collection([$a, $b]);
+
+        $this->assertEquals([], $c->multiply(-1)->all());
+        $this->assertEquals([], $c->multiply(0)->all());
+
+        $this->assertEquals([$a, $b], $c->multiply(1)->all());
+
+        $this->assertEquals([$a, $b, $a, $b, $a, $b], $c->multiply(3)->all());
+    }
+
     public function testQueueableCollectionImplementation()
     {
         $c = new Collection([new TestEloquentCollectionModel, new TestEloquentCollectionModel]);

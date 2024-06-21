@@ -1260,6 +1260,25 @@ class SupportCollectionTest extends TestCase
     }
 
     #[DataProvider('collectionClassProvider')]
+    public function testMultiplyCollection($collection)
+    {
+        $c = new $collection(['Hello', 1, ['tags' => ['a', 'b'], 'admin']]);
+
+        $this->assertEquals([], $c->multiply(-1)->all());
+        $this->assertEquals([], $c->multiply(0)->all());
+
+        $this->assertEquals(
+            ['Hello', 1, ['tags' => ['a', 'b'], 'admin']],
+            $c->multiply(1)->all()
+        );
+
+        $this->assertEquals(
+            ['Hello', 1, ['tags' => ['a', 'b'], 'admin'], 'Hello', 1, ['tags' => ['a', 'b'], 'admin'], 'Hello', 1, ['tags' => ['a', 'b'], 'admin']],
+            $c->multiply(3)->all()
+        );
+    }
+
+    #[DataProvider('collectionClassProvider')]
     public function testReplaceNull($collection)
     {
         $c = new $collection(['a', 'b', 'c']);
