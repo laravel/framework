@@ -1129,13 +1129,13 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
             return null;
         }
 
-        $position = $this->keys()->search($key);
+        $position = ($keys = $this->keys())->search($key);
 
         if ($position === 0) {
             return null;
         }
 
-        return $this->get($this->keys()->get($position - 1));
+        return $this->get($keys->get($position - 1));
     }
 
     /**
@@ -1153,13 +1153,13 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
             return null;
         }
 
-        $position = $this->keys()->search($key);
+        $position = ($keys = $this->keys())->search($key);
 
-        if ($position === $this->keys()->count() - 1) {
+        if ($position === $keys->count() - 1) {
             return null;
         }
 
-        return $this->get($this->keys()->get($position + 1));
+        return $this->get($keys->get($position + 1));
     }
 
     /**
