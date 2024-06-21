@@ -1,11 +1,11 @@
 <x-laravel-exceptions-renderer::card>
     <div class="md:flex md:items-center md:justify-between md:gap-2">
         <div class="min-w-0">
-            <div class="inline-block rounded-full bg-red-500/20 px-3 py-2 dark:bg-red-500/20">
-                <span class="hidden text-sm font-bold leading-5 text-red-500 md:inline-block lg:text-base">
+            <div class="inline-block rounded-full bg-red-500/20 px-3 py-2 max-w-full text-sm font-bold leading-5 text-red-500 truncate lg:text-base dark:bg-red-500/20">
+                <span class="hidden md:inline">
                     {{ $exception->class() }}
                 </span>
-                <span class="text-sm font-bold leading-5 text-red-500 md:hidden lg:text-base">
+                <span class="md:hidden">
                     {{ implode(' ', array_slice(explode('\\', $exception->class()), -1)) }}
                 </span>
             </div>
