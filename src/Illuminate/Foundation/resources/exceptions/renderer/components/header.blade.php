@@ -1,6 +1,6 @@
 <x-laravel-exceptions-renderer::card>
     <div class="md:flex md:items-center md:justify-between md:gap-2">
-        <div>
+        <div class="min-w-0">
             <div class="inline-block rounded-full bg-red-500/20 px-3 py-2 dark:bg-red-500/20">
                 <span class="hidden text-sm font-bold leading-5 text-red-500 md:inline-block lg:text-base">
                     {{ $exception->class() }}
@@ -9,7 +9,9 @@
                     {{ implode(' ', array_slice(explode('\\', $exception->class()), -1)) }}
                 </span>
             </div>
-            <div class="mt-4 text-lg font-semibold text-gray-900 dark:text-white lg:text-2xl">{{ $exception->message() }}</div>
+            <div class="mt-4 text-lg font-semibold text-gray-900 break-words dark:text-white lg:text-2xl">
+                {{ $exception->message() }}
+            </div>
         </div>
 
         <div class="hidden text-right md:block md:min-w-64">
