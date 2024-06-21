@@ -1,6 +1,12 @@
 # Release Notes for 10.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v10.48.13...10.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v10.48.14...10.x)
+
+## [v10.48.14](https://github.com/laravel/framework/compare/v10.48.13...v10.48.14) - 2024-06-21
+
+* [10.x] Fixes unable to call another command as a initialized instance of `Command` class by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/51824
+* [10.x] fix handle `shift()` on an empty collection by [@Treggats](https://github.com/Treggats) in https://github.com/laravel/framework/pull/51841
+* [10.x] Ensure`schema:dump` will dump the migrations table only if it exists by [@NickSdot](https://github.com/NickSdot) in https://github.com/laravel/framework/pull/51827
 
 ## [v10.48.13](https://github.com/laravel/framework/compare/v10.48.12...v10.48.13) - 2024-06-18
 
