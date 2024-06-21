@@ -831,6 +831,23 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     }
 
     /**
+     * Multiply the items in the collection by the multiplier.
+     *
+     * @param  $multiplier
+     * @return static
+     */
+    public function multiply($multiplier)
+    {
+        $new = new static();
+
+        for ($i = 0; $i < $multiplier; $i++) {
+            $new->push(...$this->items);
+        }
+
+        return $new;
+    }
+
+    /**
      * Create a collection by using this collection for keys and another for its values.
      *
      * @template TCombineValue

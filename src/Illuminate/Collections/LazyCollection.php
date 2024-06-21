@@ -842,6 +842,17 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     }
 
     /**
+     * Multiply the items in the collection by the multiplier.
+     *
+     * @param  $multiplier
+     * @return static
+     */
+    public function multiply($multiplier)
+    {
+        return $this->passthru('multiply', func_get_args());
+    }
+
+    /**
      * Create a collection by using this collection for keys and another for its values.
      *
      * @template TCombineValue
