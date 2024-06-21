@@ -833,12 +833,12 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     /**
      * Multiply the items in the collection by the multiplier.
      *
-     * @param  $multiplier
+     * @param  int  $multiplier
      * @return static
      */
-    public function multiply($multiplier)
+    public function multiply(int $multiplier)
     {
-        $new = new static();
+        $new = new static;
 
         for ($i = 0; $i < $multiplier; $i++) {
             $new->push(...$this->items);
