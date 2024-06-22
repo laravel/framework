@@ -305,13 +305,11 @@ trait FormatsMessages
      */
     protected function getAttributeFromTranslations($name)
     {
-        if (($attributes = $this->translator->get('validation.attributes')) === 'validation.attributes') {
+        if (!is_array($attributes = $this->translator->get('validation.attributes'))) {
             return null;
         }
-        
-        return $this->getAttributeFromLocalArray(
-            $name, Arr::dot((array) $attributes)
-        );
+
+        return $this->getAttributeFromLocalArray($name, Arr::dot($attributes));
     }
 
     /**
