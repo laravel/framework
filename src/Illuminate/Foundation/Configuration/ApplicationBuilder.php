@@ -210,15 +210,10 @@ class ApplicationBuilder
                 });
             }
 
-            if (is_string($web) || is_array($web)) {
-                if (is_array($web)) {
-                    foreach ($web as $webRoute) {
-                        if (realpath($webRoute) !== false) {
-                            Route::middleware('web')->group($webRoute);
-                        }
-                    }
-                } else {
-                    Route::middleware('web')->group($web);
+            if ($web) {
+                $web = (array) $web;
+                foreach ($web as $webRoute) {
+                    Route::middleware('web')->group($webRoute);
                 }
             }
 
