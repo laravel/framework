@@ -21,13 +21,13 @@ class RouteServiceProviderLoadFromFileTest extends TestCase
             )->create();
     }
 
-	protected function defineEnvironment($app)
+    protected function defineEnvironment($app)
     {
         $app['config']->set('app.key', Str::random(32));
     }
 
-	public function test_it_can_uses_routes_registered_using_route_file()
-	{
-		$this->get(route('user', [1]))->assertOk();
-	}
+    public function test_it_can_uses_routes_registered_using_route_file()
+    {
+        $this->get(route('user', [1]))->assertOk();
+    }
 }
