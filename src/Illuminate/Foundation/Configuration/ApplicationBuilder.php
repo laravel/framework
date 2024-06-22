@@ -266,13 +266,15 @@ class ApplicationBuilder
     /**
      * Register additional Artisan commands with the application.
      *
-     * @param  array  $commands
+     * @param  array|string  $commands
      * @return $this
      */
-    public function withCommands(array $commands = [])
+    public function withCommands(array|string $commands = [])
     {
         if (empty($commands)) {
             $commands = [$this->app->path('Console/Commands')];
+        } elseif (is_string($commands)) {
+            $commands = [$this->app->path($commands)];
         }
 
         $this->app->afterResolving(ConsoleKernel::class, function ($kernel) use ($commands) {
