@@ -43,9 +43,29 @@ class RepositoryTest extends TestCase
             'a' => [
                 'b.c' => 'd',
             ],
+            'azibom-car' => 'a',
+            'azibom_car' => 'b',
+            'azibom' => [
+                'car-a' => 'c',
+                'car_b' => 'd',
+            ],
         ]);
 
         parent::setUp();
+    }
+
+    public function testGetValueWhenKeyContainDash()
+    {
+        $this->assertSame($this->repository->get('azibom-car'), 'a');
+        $this->assertNull($this->repository->get('azibom-car-a'));
+        $this->assertNull($this->repository->get('-'));
+    }
+
+    public function testGetValueWhenKeyContainUnderline()
+    {
+        $this->assertSame($this->repository->get('azibom_car'), 'b');
+        $this->assertNull($this->repository->get('azibom_car_b'));
+        $this->assertNull($this->repository->get('_'));
     }
 
     public function testGetValueWhenKeyContainDot()
