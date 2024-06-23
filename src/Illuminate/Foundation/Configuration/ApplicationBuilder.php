@@ -211,7 +211,7 @@ class ApplicationBuilder
             }
 
             if ($web) {
-                $web = (array) $web;
+                $web = \Illuminate\Support\Arr::wrap($web);
                 foreach ($web as $webRoute) {
                     Route::middleware('web')->group($webRoute);
                 }
