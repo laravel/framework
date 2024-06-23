@@ -263,9 +263,7 @@ class Dispatcher implements QueueingDispatcher
      */
     public function dispatchAfterResponse($command, $handler = null)
     {
-        $this->container->terminating(function () use ($command, $handler) {
-            $this->dispatchSync($command, $handler);
-        });
+        $this->container->terminating(fn () => $this->dispatchSync($command, $handler));
     }
 
     /**
