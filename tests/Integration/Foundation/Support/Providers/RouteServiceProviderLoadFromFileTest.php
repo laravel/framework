@@ -18,6 +18,7 @@ class RouteServiceProviderLoadFromFileTest extends TestCase
         return Application::configure(static::applicationBasePath())
             ->withRouting(
                 web: __DIR__.'/fixtures/web.php',
+                api: __DIR__.'/fixtures/api.php',
             )->create();
     }
 
@@ -30,4 +31,10 @@ class RouteServiceProviderLoadFromFileTest extends TestCase
     {
         $this->get(route('user', [1]))->assertOk();
     }
+
+    public function test_it_can_uses_api_routes_registered_using_route_file()
+    {
+        $this->get(route('api.user', [1]))->assertOk();
+    }
+
 }

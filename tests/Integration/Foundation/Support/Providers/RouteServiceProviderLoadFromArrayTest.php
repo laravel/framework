@@ -21,6 +21,10 @@ class RouteServiceProviderLoadFromArrayTest extends TestCase
                     __DIR__.'/fixtures/web.php',
                     __DIR__.'/fixtures/admin.php',
                 ],
+                api: [
+                    __DIR__.'/fixtures/api.php',
+                    __DIR__.'/fixtures/apiAdmin.php',
+                ],
             )->create();
     }
 
@@ -34,4 +38,11 @@ class RouteServiceProviderLoadFromArrayTest extends TestCase
         $this->get(route('user', [1]))->assertOk();
         $this->get(route('admin.user', [1]))->assertOk();
     }
+
+    public function test_it_can_uses_api_routes_registered_using_route_files_array()
+    {
+        $this->get(route('api.user', [1]))->assertOk();
+        $this->get(route('api.admin.user', [1]))->assertOk();
+    }
+
 }

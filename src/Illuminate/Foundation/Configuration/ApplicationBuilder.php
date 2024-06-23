@@ -12,6 +12,7 @@ use Illuminate\Foundation\Bootstrap\RegisterProviders;
 use Illuminate\Foundation\Events\DiagnosingHealth;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as AppEventServiceProvider;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as AppRouteServiceProvider;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Route;
@@ -190,15 +191,10 @@ class ApplicationBuilder
         ?callable $then)
     {
         return function () use ($web, $api, $pages, $health, $apiPrefix, $then) {
-            if (is_string($api) || is_array($api)) {
-                if (is_array($api)) {
-                    foreach ($api as $apiRoute) {
-                        if (realpath($apiRoute) !== false) {
-                            Route::middleware('api')->prefix($apiPrefix)->group($apiRoute);
-                        }
-                    }
-                } else {
-                    Route::middleware('api')->prefix($apiPrefix)->group($api);
+            if ($api) {
+                $api = Arr::wrap($api);
+                foreach ($api as $apiRoute) {
+                    Route::middleware('api')->prefix($apiPrefix)->group($apiRoute);
                 }
             }
 
@@ -211,7 +207,7 @@ class ApplicationBuilder
             }
 
             if ($web) {
-                $web = \Illuminate\Support\Arr::wrap($web);
+                $web = Arr::wrap($web);
                 foreach ($web as $webRoute) {
                     Route::middleware('web')->group($webRoute);
                 }
