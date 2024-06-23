@@ -44,5 +44,4 @@ class RouteServiceProviderLoadFromArrayTest extends TestCase
         $this->get(route('api.user', [1]))->assertOk();
         $this->get(route('api.admin.user', [1]))->assertOk();
     }
-
 }

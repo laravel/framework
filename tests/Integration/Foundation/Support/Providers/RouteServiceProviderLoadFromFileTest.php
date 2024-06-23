@@ -36,5 +36,4 @@ class RouteServiceProviderLoadFromFileTest extends TestCase
     {
         $this->get(route('api.user', [1]))->assertOk();
     }
-
 }
