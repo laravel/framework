@@ -305,7 +305,7 @@ trait FormatsMessages
      */
     protected function getAttributeFromTranslations($name)
     {
-        if (!is_array($attributes = $this->translator->get('validation.attributes'))) {
+        if (! is_array($attributes = $this->translator->get('validation.attributes'))) {
             return null;
         }
 

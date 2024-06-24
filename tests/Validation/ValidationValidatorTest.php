@@ -598,12 +598,12 @@ class ValidationValidatorTest extends TestCase
         $trans->addLines(['validation.gt.numeric' => ':attribute must be greater than :value.'], 'en');
         $trans->addLines(['validation.attributes' => []], 'en');
         $v = new Validator($trans, ['total' => 0], ['total' => 'gt:0']);
-        $this->assertSame("total must be greater than 0.", $v->messages()->first('total'));
+        $this->assertSame('total must be greater than 0.', $v->messages()->first('total'));
 
         $trans = $this->getIlluminateArrayTranslator();
         $trans->addLines(['validation.gt.numeric' => ':attribute must be greater than :value.'], 'en');
         $v = new Validator($trans, ['total' => 0], ['total' => 'gt:0']);
-        $this->assertSame("total must be greater than 0.", $v->messages()->first('total'));
+        $this->assertSame('total must be greater than 0.', $v->messages()->first('total'));
     }
 
     public function testInputIsReplaced()
