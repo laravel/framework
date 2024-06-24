@@ -180,6 +180,17 @@ class EventServiceProvider extends ServiceProvider
     }
 
     /**
+     * Add the given event discovery paths to the application's event discovery paths.
+     *
+     * @param  string|array  $paths
+     * @return void
+     */
+    public static function addEventDiscoveryPaths(string|array $paths)
+    {
+        static::$eventDiscoveryPaths = array_merge(static::$eventDiscoveryPaths, Arr::wrap($paths));
+    }
+
+    /**
      * Get the base path to be used during event discovery.
      *
      * @return string
