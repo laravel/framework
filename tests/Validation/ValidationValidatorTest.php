@@ -592,6 +592,20 @@ class ValidationValidatorTest extends TestCase
         $this->assertSame('User ID is required!', $v->messages()->first('users.0.id'));
     }
 
+    public function testTranslatedAttributesCanBeMissing()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.gt.numeric' => ':attribute must be greater than :value.'], 'en');
+        $trans->addLines(['validation.attributes' => []], 'en');
+        $v = new Validator($trans, ['total' => 0], ['total' => 'gt:0']);
+        $this->assertSame('total must be greater than 0.', $v->messages()->first('total'));
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.gt.numeric' => ':attribute must be greater than :value.'], 'en');
+        $v = new Validator($trans, ['total' => 0], ['total' => 'gt:0']);
+        $this->assertSame('total must be greater than 0.', $v->messages()->first('total'));
+    }
+
     public function testInputIsReplaced()
     {
         $trans = $this->getIlluminateArrayTranslator();
