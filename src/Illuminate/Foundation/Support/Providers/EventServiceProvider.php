@@ -169,6 +169,17 @@ class EventServiceProvider extends ServiceProvider
     }
 
     /**
+     * Add the given event discovery paths to the application's event discovery paths.
+     *
+     * @param  string|array  $paths
+     * @return void
+     */
+    public static function addEventDiscoveryPaths(array|string $paths)
+    {
+        static::$eventDiscoveryPaths = array_merge(static::$eventDiscoveryPaths, Arr::wrap($paths));
+    }
+
+    /**
      * Set the globally configured event discovery paths.
      *
      * @param  array  $paths
@@ -177,17 +188,6 @@ class EventServiceProvider extends ServiceProvider
     public static function setEventDiscoveryPaths(array $paths)
     {
         static::$eventDiscoveryPaths = $paths;
-    }
-
-    /**
-     * Add the given event discovery paths to the application's event discovery paths.
-     *
-     * @param  string|array  $paths
-     * @return void
-     */
-    public static function addEventDiscoveryPaths(string|array $paths)
-    {
-        static::$eventDiscoveryPaths = array_merge(static::$eventDiscoveryPaths, Arr::wrap($paths));
     }
 
     /**
