@@ -176,7 +176,9 @@ class EventServiceProvider extends ServiceProvider
      */
     public static function addEventDiscoveryPaths(array|string $paths)
     {
-        static::$eventDiscoveryPaths = array_merge(static::$eventDiscoveryPaths, Arr::wrap($paths));
+        static::$eventDiscoveryPaths = array_values(array_unique(
+            array_merge(static::$eventDiscoveryPaths, Arr::wrap($paths))
+        ));
     }
 
     /**
