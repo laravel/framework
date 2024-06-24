@@ -187,4 +187,21 @@ return [
         // 'Example' => App\Facades\Example::class,
     ])->toArray(),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Editor
+    |--------------------------------------------------------------------------
+    |
+    | The editor can be customized and will be used by the error page
+    | in debug mode or the dump() and dd()functions to link directly
+    | into your editor at the right file and line 
+    |
+    | Supported editors: "atom", "emacs", "idea", "macvim",
+    |                    "netbeans", "nova", "phpstorm", "sublime",
+    |                    "textmate", "vscode", "vscode-insiders",
+    |                    "vscode-insiders-remote", "vscode-remote", "vscodium", "xdebug"
+    |
+    */
+    'editor' => env('APP_EDITOR'),
+
 ];
