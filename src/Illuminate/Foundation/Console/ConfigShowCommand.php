@@ -14,14 +14,14 @@ class ConfigShowCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'config:show {config : The configuration file or key (using "dot" annotation) to show}';
+    protected $signature = 'config:show {config : The configuration file or key to show}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Display all of the values for a given configuration file or key (using "dot" annotation)';
+    protected $description = 'Display all of the values for a given configuration file or key';
 
     /**
      * Execute the console command.
