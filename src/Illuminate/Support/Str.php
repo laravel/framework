@@ -641,11 +641,11 @@ class Str
     {
         $converter = new GithubFlavoredMarkdownConverter($options);
 
-		$environment = $converter->getEnvironment();
+        $environment = $converter->getEnvironment();
 
-		foreach ($extensions as $extension) {
-			$environment->addExtension($extension);
-		}
+        foreach ($extensions as $extension) {
+            $environment->addExtension($extension);
+        }
 
         return (string) $converter->convert($string);
     }
