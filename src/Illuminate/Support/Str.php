@@ -635,6 +635,7 @@ class Str
      *
      * @param  string  $string
      * @param  array  $options
+     * @param  array  $extensions
      * @return string
      */
     public static function markdown($string, array $options = [], array $extensions = [])
