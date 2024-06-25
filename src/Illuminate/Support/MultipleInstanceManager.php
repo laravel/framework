@@ -35,6 +35,14 @@ abstract class MultipleInstanceManager
      * @param  \Illuminate\Contracts\Foundation\Application  $app
      * @return void
      */
+
+    /**
+     * The field name of the driver.
+     *
+     * @var string
+     */
+    protected $driverField = 'driver';
+
     public function __construct($app)
     {
         $this->app = $app;
@@ -104,19 +112,19 @@ abstract class MultipleInstanceManager
             throw new InvalidArgumentException("Instance [{$name}] is not defined.");
         }
 
-        if (! array_key_exists('driver', $config)) {
-            throw new RuntimeException("Instance [{$name}] does not specify a driver.");
+        if (! array_key_exists($this->driverField, $config)) {
+            throw new RuntimeException("Instance [{$name}] does not specify a {$this->driverField}.");
         }
 
-        if (isset($this->customCreators[$config['driver']])) {
+        if (isset($this->customCreators[$config[$this->driverField]])) {
             return $this->callCustomCreator($config);
         } else {
-            $driverMethod = 'create'.ucfirst($config['driver']).'Driver';
+            $createMethod = 'create'.ucfirst($config[$this->driverField]).ucfirst($this->driverField);
 
-            if (method_exists($this, $driverMethod)) {
-                return $this->{$driverMethod}($config);
+            if (method_exists($this, $createMethod)) {
+                return $this->{$createMethod}($config);
             } else {
-                throw new InvalidArgumentException("Instance driver [{$config['driver']}] is not supported.");
+                throw new InvalidArgumentException("Instance {$this->driverField} [{$config[$this->driverField]}] is not supported.");
             }
         }
     }
@@ -129,7 +137,7 @@ abstract class MultipleInstanceManager
      */
     protected function callCustomCreator(array $config)
     {
-        return $this->customCreators[$config['driver']]($this->app, $config);
+        return $this->customCreators[$config[$this->driverField]]($this->app, $config);
     }
 
     /**
