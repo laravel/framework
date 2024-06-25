@@ -635,11 +635,18 @@ class Str
      *
      * @param  string  $string
      * @param  array  $options
+     * @param  array  $extensions
      * @return string
      */
-    public static function markdown($string, array $options = [])
+    public static function markdown($string, array $options = [], array $extensions = [])
     {
         $converter = new GithubFlavoredMarkdownConverter($options);
+
+        $environment = $converter->getEnvironment();
+
+        foreach ($extensions as $extension) {
+            $environment->addExtension($extension);
+        }
 
         return (string) $converter->convert($string);
     }
