@@ -47,7 +47,8 @@ trait Macroable
         );
 
         foreach ($methods as $method) {
-            if ($replace || ! static::hasMacro($method->name)) {
+            if (!$method->isConstructor() &&
+                ($replace || ! static::hasMacro($method->name))) {
                 static::macro($method->name, $method->invoke($mixin));
             }
         }

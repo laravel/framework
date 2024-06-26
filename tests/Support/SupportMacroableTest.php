@@ -85,6 +85,31 @@ class SupportMacroableTest extends TestCase
         $this->assertSame('foo', $instance->methodThree());
     }
 
+    public function testMixinWithConstructorParameters()
+    {
+        $foo = 'foo';
+        $mixin = new class ($foo) {
+            public function __construct(
+                private $foo
+            ) {
+            }
+
+            public function getFoo()
+            {
+                $foo = $this->foo;
+
+                return function () use ($foo) {
+                    return $foo;
+                };
+            }
+        };
+
+        TestMacroable::mixin($mixin);
+        $instance = new TestMacroable();
+
+        $this->assertSame('foo', $instance->getFoo());
+    }
+
     public function testFlushMacros()
     {
         TestMacroable::macro('flushMethod', function () {
