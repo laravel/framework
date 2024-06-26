@@ -13,6 +13,7 @@ class GeneratorCommandTest extends TestCase
     protected $files = [
         'app/Console/Commands/FooCommand.php',
         'resources/views/foo/php.blade.php',
+        'tests/Feature/fixtures.php/SomeTest.php',
     ];
 
     public function testItChopsPhpExtension()
@@ -33,6 +34,18 @@ class GeneratorCommandTest extends TestCase
             ->assertExitCode(0);
 
         $this->assertFilenameExists('resources/views/foo/php.blade.php');
+    }
+
+    public function testItOnlyChopsPhpExtensionFromFilename()
+    {
+        $this->artisan('make:test', ['name' => 'fixtures.php/SomeTest'])
+            ->assertExitCode(0);
+
+        $this->assertFilenameExists('tests/Feature/fixtures.php/SomeTest.php');
+
+        $this->assertFileContains([
+            'class SomeTest extends TestCase',
+        ], 'tests/Feature/fixtures.php/SomeTest.php');
     }
 
     #[DataProvider('reservedNamesDataProvider')]
