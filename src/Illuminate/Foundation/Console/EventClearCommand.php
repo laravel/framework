@@ -52,8 +52,16 @@ class EventClearCommand extends Command
      */
     public function handle()
     {
-        $this->files->delete($this->laravel->getCachedEventsPath());
+        $cachedEventsPath = $this->laravel->getCachedEventsPath();
 
-        $this->components->info('Cached events cleared successfully.');
+        if ($this->files->exists($cachedEventsPath)) {
+            if ($this->files->delete($cachedEventsPath)) {
+                $this->components->info('Cached events cleared successfully.');
+            } else {
+                $this->components->error('Failed to clear events cache.');
+            }
+        } else {
+            $this->components->info('Events cache is not present.');
+        }
     }
 }

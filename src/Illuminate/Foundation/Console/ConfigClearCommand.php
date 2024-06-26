@@ -50,8 +50,16 @@ class ConfigClearCommand extends Command
      */
     public function handle()
     {
-        $this->files->delete($this->laravel->getCachedConfigPath());
+        $cachedConfigPath = $this->laravel->getCachedConfigPath();
 
-        $this->components->info('Configuration cache cleared successfully.');
+        if ($this->files->exists($cachedConfigPath)) {
+            if ($this->files->delete($cachedConfigPath)) {
+                $this->components->info('Configuration cache cleared successfully.');
+            } else {
+                $this->components->error('Failed to clear configuration cache.');
+            }
+        } else {
+            $this->components->info('Configuration cache is not present.');
+        }
     }
 }
