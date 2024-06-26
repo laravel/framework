@@ -5,10 +5,11 @@ namespace Illuminate\Auth;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Contracts\Auth\UserProvider;
 use Illuminate\Http\Request;
+use Illuminate\Support\Traits\Macroable;
 
 class TokenGuard implements Guard
 {
-    use GuardHelpers;
+    use GuardHelpers, Macroable;
 
     /**
      * The request instance.
