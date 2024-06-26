@@ -266,6 +266,8 @@ class Command extends SymfonyCommand
      *
      * @param  \Throwable|string|null  $exception
      * @return void
+     *
+     * @throws \Illuminate\Console\ManuallyFailedException|\Throwable
      */
     public function fail(Throwable|string|null $exception = null)
     {
