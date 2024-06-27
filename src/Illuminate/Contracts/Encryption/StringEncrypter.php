@@ -2,6 +2,8 @@
 
 namespace Illuminate\Contracts\Encryption;
 
+use SensitiveParameter;
+
 interface StringEncrypter
 {
     /**
@@ -12,7 +14,7 @@ interface StringEncrypter
      *
      * @throws \Illuminate\Contracts\Encryption\EncryptException
      */
-    public function encryptString($value);
+    public function encryptString(#[SensitiveParameter] $value);
 
     /**
      * Decrypt the given string without unserialization.

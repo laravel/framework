@@ -1354,7 +1354,7 @@ trait HasAttributes
      * @param  mixed  $value
      * @return string
      */
-    protected function castAttributeAsEncryptedString($key, $value)
+    protected function castAttributeAsEncryptedString($key, #[SensitiveParameter] $value)
     {
         return static::currentEncrypter()->encrypt($value, false);
     }
