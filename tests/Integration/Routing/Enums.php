@@ -1,18 +1,6 @@
 <?php
 
-namespace Illuminate\Tests\Routing;
-
-enum CategoryEnum
-{
-    case People;
-    case Fruits;
-}
-
-enum CategoryBackedEnum: string
-{
-    case People = 'people';
-    case Fruits = 'fruits';
-}
+namespace Illuminate\Tests\Integration\Routing;
 
 enum RouteNameEnum: string {
     case UserIndex = 'users.index';

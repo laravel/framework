@@ -11,6 +11,8 @@ use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\HeaderBag;
 
+include_once 'Enums.php';
+
 class RoutingRedirectorTest extends TestCase
 {
     protected $headers;
@@ -156,6 +158,15 @@ class RoutingRedirectorTest extends TestCase
         $this->url->shouldReceive('route')->with('home', [])->andReturn('http://foo.com/bar');
 
         $response = $this->redirect->route('home');
+        $this->assertSame('http://foo.com/bar', $response->getTargetUrl());
+    }
+
+    public function testRouteWithStringBackedEnum()
+    {
+        $this->url->shouldReceive('route')->with(RouteNameEnum::UserIndex)->andReturn('http://foo.com/bar');
+        $this->url->shouldReceive('route')->with(RouteNameEnum::UserIndex, [])->andReturn('http://foo.com/bar');
+
+        $response = $this->redirect->route(RouteNameEnum::UserIndex);
         $this->assertSame('http://foo.com/bar', $response->getTargetUrl());
     }
 

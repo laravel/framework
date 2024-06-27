@@ -395,6 +395,18 @@ class RoutingRouteTest extends TestCase
         $this->assertSame('foo.bar', $router->currentRouteName());
     }
 
+    public function testFluentRouteNamingWithinAGroupWithStringBackedEnum()
+    {
+        $router = $this->getRouter();
+        $router->group(['as' => 'foo.'], function () use ($router) {
+            $router->get('bar', function () {
+                return 'bar';
+            })->name(RouteNameEnum::UserIndex);
+        });
+        $this->assertSame('bar', $router->dispatch(Request::create('bar', 'GET'))->getContent());
+        $this->assertSame('foo.users.index', $router->currentRouteName());
+    }
+
     public function testRouteGetAction()
     {
         $router = $this->getRouter();

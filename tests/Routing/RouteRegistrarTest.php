@@ -1113,6 +1113,44 @@ class RouteRegistrarTest extends TestCase
         $this->assertSame('users.index', $this->getRoute()->getName());
     }
 
+    public function testCanSetRouteNameUsingStringBackedEnum()
+    {
+        $this->router->name(RouteNameEnum::UserIndex)->get('users', function () {
+            return 'all-users';
+        });
+
+        $this->assertSame('users.index', $this->getRoute()->getName());
+    }
+
+    public function testCannotSetRouteNameUsingIntegerBackedEnum()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage("Attribute [name] expects a string backed enum.");
+
+        $this->router->name(IntegerEnum::One)->get('users', function () {
+            return 'all-users';
+        });
+    }
+
+    public function testCanSetRouteDomainUsingStringBackedEnum()
+    {
+        $this->router->domain(RouteDomainEnum::DashboardDomain)->get('users', function () {
+            return 'all-users';
+        });
+
+        $this->assertSame('dashboard.myapp.com', $this->getRoute()->getDomain());
+    }
+
+    public function testCannotSetRouteDomainUsingIntegerBackedEnum()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage("Attribute [domain] expects a string backed enum.");
+
+        $this->router->domain(IntegerEnum::One)->get('users', function () {
+            return 'all-users';
+        });
+    }
+
     public function testPushMiddlewareToGroup()
     {
         $this->router->middlewareGroup('web', []);
