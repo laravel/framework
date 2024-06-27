@@ -108,7 +108,7 @@ class Container implements ArrayAccess, ContainerContract
      * @var array[]
      */
     public $contextual = [];
-    
+
     /**
      * The contextual attribute handlers.
      *
@@ -192,9 +192,8 @@ class Container implements ArrayAccess, ContainerContract
     /**
      * Define a contextual binding based on an attribute.
      *
-     * @param string    $attribute
-     * @param \Closure  $handler
-     *
+     * @param  string  $attribute
+     * @param  \Closure  $handler
      * @return void
      */
     public function whenHas(string $attribute, Closure $handler)
@@ -994,7 +993,7 @@ class Container implements ArrayAccess, ContainerContract
                 continue;
             }
 
-            if (!is_null($attribute = $this->getContextualAttributeFromDependency($dependency))) {
+            if (! is_null($attribute = $this->getContextualAttributeFromDependency($dependency))) {
                 $results[] = $this->resolveFromAttribute($attribute);
             }
 
@@ -1054,8 +1053,7 @@ class Container implements ArrayAccess, ContainerContract
     /**
      * Get a contextual attribute from a dependency.
      *
-     * @param ReflectionParameter  $dependency
-     *
+     * @param  ReflectionParameter  $dependency
      * @return \ReflectionAttribute|null
      */
     protected function getContextualAttributeFromDependency($dependency)
@@ -1146,8 +1144,7 @@ class Container implements ArrayAccess, ContainerContract
     /**
      * Resolve a dependency based on an attribute.
      *
-     * @param \ReflectionAttribute $attribute
-     *
+     * @param  \ReflectionAttribute  $attribute
      * @return mixed
      */
     protected function resolveFromAttribute(\ReflectionAttribute $attribute)
