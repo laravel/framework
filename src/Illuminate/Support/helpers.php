@@ -39,6 +39,10 @@ if (! function_exists('blank')) {
     /**
      * Determine if the given value is "blank".
      *
+     * @phpstan-assert-if-false !=null|'' $value
+     *
+     * @phpstan-assert-if-true !=numeric|bool $value
+     *
      * @param  mixed  $value
      * @return bool
      */
@@ -149,6 +153,10 @@ if (! function_exists('env')) {
 if (! function_exists('filled')) {
     /**
      * Determine if a value is "filled".
+     *
+     * @phpstan-assert-if-true !=null|'' $value
+     *
+     * @phpstan-assert-if-false !=numeric|bool $value
      *
      * @param  mixed  $value
      * @return bool

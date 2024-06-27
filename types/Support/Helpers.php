@@ -2,6 +2,19 @@
 
 use function PHPStan\Testing\assertType;
 
+/** @var bool|float|int|string|null $value */
+if (filled($value)) {
+    assertType('bool|float|int|non-empty-string', $value);
+} else {
+    assertType('string|null', $value);
+}
+
+if (blank($value)) {
+    assertType('string|null', $value);
+} else {
+    assertType('bool|float|int|non-empty-string', $value);
+}
+
 assertType('User', object_get(new User(), null));
 assertType('User', object_get(new User(), ''));
 assertType('mixed', object_get(new User(), 'name'));
