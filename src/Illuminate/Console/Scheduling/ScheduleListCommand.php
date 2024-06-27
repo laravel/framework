@@ -75,6 +75,33 @@ class ScheduleListCommand extends Command
         $this->line(
             $events->flatten()->filter()->prepend('')->push('')->toArray()
         );
+
+        $this->table(
+            ['Expression', 'Command', 'Next Due'],
+            $this->getScheduleList()
+        );
+    }
+
+    protected function getScheduleList()
+    {
+        $events = $this->laravel->make(Schedule::class)->events();
+        $list = [];
+
+        foreach ($events as $event) {
+            $expression = $event->expression;
+            $command = $event->command ?? $event->description;
+            $nextDue = $event->nextRunDate()->diffForHumans();
+
+            // Handle the 'between' constraint manually
+            if ($event->filters && isset($event->filters['between'])) {
+                $between = $event->filters['between'];
+                $expression .= " between " . implode(' and ', $between);
+            }
+
+            $list[] = [$expression, $command, $nextDue];
+        }
+
+        return $list;
     }
 
     /**
