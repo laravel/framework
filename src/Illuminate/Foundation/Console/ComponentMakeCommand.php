@@ -43,9 +43,7 @@ class ComponentMakeCommand extends GeneratorCommand
     public function handle()
     {
         if ($this->option('view')) {
-            $this->writeView();
-
-            return;
+            return $this->writeView();
         }
 
         if (parent::handle() === false && ! $this->option('force')) {
