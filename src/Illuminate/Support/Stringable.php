@@ -112,17 +112,6 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     }
 
     /**
-     * Remove the given string if it exists at the end of the current string.
-     *
-     * @param  string|array  $needle
-     * @return static
-     */
-    public function chopEnd($needle)
-    {
-        return new static(Str::chopEnd($this->value, $needle));
-    }
-
-    /**
      * Remove the given string if it exists at the start of the current string.
      *
      * @param  string|array  $needle
@@ -131,6 +120,17 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     public function chopStart($needle)
     {
         return new static(Str::chopStart($this->value, $needle));
+    }
+
+    /**
+     * Remove the given string if it exists at the end of the current string.
+     *
+     * @param  string|array  $needle
+     * @return static
+     */
+    public function chopEnd($needle)
+    {
+        return new static(Str::chopEnd($this->value, $needle));
     }
 
     /**
