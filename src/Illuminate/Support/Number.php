@@ -235,20 +235,20 @@ class Number
     /**
      * Split the given number into pairs of min/max values.
      *
-     * @param int|float $number
-     * @param int|float $split
+     * @param int|float $to
+     * @param int|float $by
      * @param int|float $offset
      * @return array
      */
-    public static function pairs(int|float $number, int|float $split, int|float $offset = 1)
+    public static function pairs(int|float $to, int|float $by, int|float $offset = 1)
     {
         $output = [];
 
-        for ($lower = 0; $lower < $number; $lower += $split) {
-            $upper = $lower + $split;
+        for ($lower = 0; $lower < $to; $lower += $by) {
+            $upper = $lower + $by;
 
-            if ($upper > $number) {
-                $upper = $number;
+            if ($upper > $to) {
+                $upper = $to;
             }
 
             $output[] = [$lower + $offset, $upper];
