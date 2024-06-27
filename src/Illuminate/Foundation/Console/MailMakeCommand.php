@@ -69,6 +69,8 @@ class MailMakeCommand extends GeneratorCommand
         $this->files->ensureDirectoryExists(dirname($path));
 
         $this->files->put($path, file_get_contents(__DIR__.'/stubs/markdown.stub'));
+
+        $this->components->info(sprintf('%s [%s] created successfully.', 'Markdown view', $path));
     }
 
     /**
@@ -91,6 +93,8 @@ class MailMakeCommand extends GeneratorCommand
         );
 
         $this->files->put($path, $stub);
+
+        $this->components->info(sprintf('%s [%s] created successfully.', 'View', $path));
     }
 
     /**
