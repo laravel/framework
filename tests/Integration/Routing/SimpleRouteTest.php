@@ -36,7 +36,7 @@ class SimpleRouteTest extends TestCase
 
         $this->assertSame('Hello World', $response->content());
 
-        $response = $this->get(\route(RouteNameEnum::UserIndex, ['foo' =>'bar']));
+        $response = $this->get(\route(RouteNameEnum::UserIndex, ['foo' => 'bar']));
 
         $this->assertSame('Hello World', $response->content());
 

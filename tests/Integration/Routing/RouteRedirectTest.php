@@ -75,6 +75,7 @@ class RouteRedirectTest extends TestCase
             ->assertStatus(302)
             ->assertSee('Redirecting to');
     }
+
     public function testToRouteHelperWithStringBackedEnum()
     {
         Route::get('to-enum', function () {

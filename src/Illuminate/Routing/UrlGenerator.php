@@ -501,8 +501,8 @@ class UrlGenerator implements UrlGeneratorContract
     public function route($name, $parameters = [], $absolute = true)
     {
         if ($name instanceof BackedEnum) {
-            if (!is_string($name = $name->value)) {
-                throw new \InvalidArgumentException("Attribute [name] expects a string backed enum.");
+            if (! is_string($name = $name->value)) {
+                throw new \InvalidArgumentException('Attribute [name] expects a string backed enum.');
             }
         }
 

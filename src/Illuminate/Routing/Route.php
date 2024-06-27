@@ -1376,7 +1376,7 @@ class Route
         }
 
         if ($value instanceof \BackedEnum) {
-            if (!is_string($value = $value->value)) {
+            if (! is_string($value = $value->value)) {
                 throw new \InvalidArgumentException('Enum must be string-backed.');
             }
         }
