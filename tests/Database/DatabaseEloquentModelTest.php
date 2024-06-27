@@ -15,6 +15,7 @@ use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Connection;
 use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
+use Illuminate\Database\Eloquent\Attributes\Cast;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\ArrayObject;
@@ -3037,6 +3038,72 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertFalse($user->hasAttribute('nonexistent'));
         $this->assertFalse($user->hasAttribute('belongsToStub'));
     }
+
+    public function testModelAttributesAreCastedWhenCastedByAttribute()
+    {
+        $model = new EloquentModelWithAttributeCasts;
+        $model->setDateFormat('Y-m-d H:i:s');
+        $model->intAttribute = '3';
+        $model->floatAttribute = '4.0';
+        $model->stringAttribute = 2.5;
+        $model->boolAttribute = 1;
+        $model->booleanAttribute = 0;
+        $model->objectAttribute = ['foo' => 'bar'];
+        $obj = new stdClass;
+        $obj->foo = 'bar';
+        $model->arrayAttribute = $obj;
+        $model->jsonAttribute = ['foo' => 'bar'];
+        $model->dateAttribute = '1969-07-20';
+        $model->datetimeAttribute = '1969-07-20 22:56:00';
+        $model->timestampAttribute = '1969-07-20 22:56:00';
+        $model->collectionAttribute = new BaseCollection;
+        $model->asCustomCollectionAttribute = new CustomCollection;
+        $model->duplicateIntAttribute = '5.0';
+
+        $this->assertIsInt($model->intAttribute);
+        $this->assertIsFloat($model->floatAttribute);
+        $this->assertIsString($model->stringAttribute);
+        $this->assertIsBool($model->boolAttribute);
+        $this->assertIsBool($model->booleanAttribute);
+        $this->assertIsObject($model->objectAttribute);
+        $this->assertIsArray($model->arrayAttribute);
+        $this->assertIsArray($model->jsonAttribute);
+        $this->assertTrue($model->boolAttribute);
+        $this->assertFalse($model->booleanAttribute);
+        $this->assertEquals($obj, $model->objectAttribute);
+        $this->assertEquals(['foo' => 'bar'], $model->arrayAttribute);
+        $this->assertEquals(['foo' => 'bar'], $model->jsonAttribute);
+        $this->assertSame('{"foo":"bar"}', $model->jsonAttributeValue());
+        $this->assertInstanceOf(Carbon::class, $model->dateAttribute);
+        $this->assertInstanceOf(Carbon::class, $model->datetimeAttribute);
+        $this->assertInstanceOf(BaseCollection::class, $model->collectionAttribute);
+        $this->assertInstanceOf(CustomCollection::class, $model->asCustomCollectionAttribute);
+        $this->assertSame('1969-07-20', $model->dateAttribute->toDateString());
+        $this->assertSame('1969-07-20 22:56:00', $model->datetimeAttribute->toDateTimeString());
+        $this->assertEquals(-14173440, $model->timestampAttribute);
+        $this->assertEquals(5, $model->duplicateIntAttribute);
+
+        $arr = $model->toArray();
+
+        $this->assertIsInt($arr['intAttribute']);
+        $this->assertIsFloat($arr['floatAttribute']);
+        $this->assertIsString($arr['stringAttribute']);
+        $this->assertIsBool($arr['boolAttribute']);
+        $this->assertIsBool($arr['booleanAttribute']);
+        $this->assertIsObject($arr['objectAttribute']);
+        $this->assertIsArray($arr['arrayAttribute']);
+        $this->assertIsArray($arr['jsonAttribute']);
+        $this->assertIsArray($arr['collectionAttribute']);
+        $this->assertTrue($arr['boolAttribute']);
+        $this->assertFalse($arr['booleanAttribute']);
+        $this->assertEquals($obj, $arr['objectAttribute']);
+        $this->assertEquals(['foo' => 'bar'], $arr['arrayAttribute']);
+        $this->assertEquals(['foo' => 'bar'], $arr['jsonAttribute']);
+        $this->assertSame('1969-07-20 00:00:00', $arr['dateAttribute']);
+        $this->assertSame('1969-07-20 22:56:00', $arr['datetimeAttribute']);
+        $this->assertEquals(-14173440, $arr['timestampAttribute']);
+        $this->assertEquals(5, $arr['duplicateIntAttribute']);
+    }
 }
 
 class EloquentTestObserverStub
@@ -3670,5 +3737,44 @@ class Address implements Castable
                 ];
             }
         };
+    }
+}
+
+#[Cast('floatAttribute', 'float')]
+#[Cast('boolAttribute', 'bool')]
+#[Cast('booleanAttribute', 'boolean')]
+#[Cast('objectAttribute', 'object')]
+#[Cast('jsonAttribute', 'json')]
+#[Cast('dateAttribute', 'date')]
+#[Cast('timestampAttribute', 'timestamp')]
+#[Cast('collectionAttribute', AsCollection::class)]
+#[Cast('customCollectionAsArrayAttribute', [AsCollection::class, CustomCollection::class])]
+#[Cast('encryptedCollectionAttribute', AsEncryptedCollection::class)]
+#[Cast('enumCollectionAttribute', AsEnumCollection::class.':'.StringStatus::class)]
+#[Cast('enumArrayObjectAttribute', AsEnumArrayObject::class.':'.StringStatus::class)]
+#[Cast('intAttribute', 'int')]
+#[Cast('stringAttribute', 'string')]
+#[Cast('arrayAttribute', 'array')]
+class EloquentModelWithAttributeCasts extends Model
+{
+    protected $casts = [
+        'datetimeAttribute' => 'datetime',
+    ];
+    
+    protected function casts()
+    {
+        return [
+            'duplicateIntAttribute' => 'int',
+        ];
+    }
+
+    public function jsonAttributeValue()
+    {
+        return $this->attributes['jsonAttribute'];
+    }
+
+    protected function serializeDate(DateTimeInterface $date)
+    {
+        return $date->format('Y-m-d H:i:s');
     }
 }
