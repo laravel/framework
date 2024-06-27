@@ -26,10 +26,10 @@ class ContextualAttributeBindingTest extends TestCase
         $this->assertInstanceOf(ContainerTestHasAttributeThatResolvesToImplA::class, $classA);
         $this->assertInstanceOf(ContainerTestImplA::class, $classA->property);
 
-        $classB = $container->make(ContainerTestHasAttributeThatResolvesToImplA::class);
+        $classB = $container->make(ContainerTestHasAttributeThatResolvesToImplB::class);
 
-        $this->assertInstanceOf(ContainerTestHasAttributeThatResolvesToImplA::class, $classB);
-        $this->assertInstanceOf(ContainerTestImplA::class, $classB->property);
+        $this->assertInstanceOf(ContainerTestHasAttributeThatResolvesToImplB::class, $classB);
+        $this->assertInstanceOf(ContainerTestImplB::class, $classB->property);
     }
 }
 
@@ -58,6 +58,15 @@ final class ContainerTestHasAttributeThatResolvesToImplA
 {
     public function __construct(
         #[ContainerTestAttributeThatResolvesContractImpl('A')]
+        public readonly ContainerTestContract $property
+    ) {
+    }
+}
+
+final class ContainerTestHasAttributeThatResolvesToImplB
+{
+    public function __construct(
+        #[ContainerTestAttributeThatResolvesContractImpl('B')]
         public readonly ContainerTestContract $property
     ) {
     }
