@@ -286,4 +286,11 @@ class SupportNumberTest extends TestCase
         $this->assertSame('-1Q', Number::abbreviate(-1000000000000000));
         $this->assertSame('-1KQ', Number::abbreviate(-1000000000000000000));
     }
+
+    public function testPairs()
+    {
+        $this->assertSame([[1,10],[11,20],[21,25]], Number::pairs(25, 10));
+        $this->assertSame([[0,10],[10,20],[20,25]], Number::pairs(25, 10, 0));
+        $this->assertSame([[0,2.5],[2.5,5.0],[5.0,7.5],[7.5,10.0]], Number::pairs(10, 2.5, 0));
+    }
 }
