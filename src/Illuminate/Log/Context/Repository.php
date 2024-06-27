@@ -11,6 +11,7 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\Macroable;
 use RuntimeException;
+use SensitiveParameter;
 use Throwable;
 
 class Repository
@@ -193,7 +194,7 @@ class Repository
      * @param  mixed  $value
      * @return $this
      */
-    public function addHidden($key, $value = null)
+    public function addHidden($key, #[SensitiveParameter] $value = null)
     {
         $this->hidden = array_merge(
             $this->hidden,
@@ -256,7 +257,7 @@ class Repository
      * @param  mixed  $value
      * @return $this
      */
-    public function addHiddenIf($key, $value)
+    public function addHiddenIf($key, #[SensitiveParameter] $value)
     {
         if (! $this->hasHidden($key)) {
             $this->addHidden($key, $value);
