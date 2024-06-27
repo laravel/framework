@@ -1133,7 +1133,8 @@ class SupportStringableTest extends TestCase
         $this->assertEquals("<p><em>hello world</em></p>\n", $this->stringable('*hello world*')->markdown());
         $this->assertEquals("<h1>hello world</h1>\n", $this->stringable('# hello world')->markdown());
 
-        $extension = new class implements ExtensionInterface {
+        $extension = new class implements ExtensionInterface
+        {
             public bool $configured = false;
 
             public function register(EnvironmentBuilderInterface $environment): void
