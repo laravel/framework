@@ -2,6 +2,8 @@
 
 namespace Illuminate\Hashing;
 
+use SensitiveParameter;
+
 abstract class AbstractHasher
 {
     /**
@@ -23,7 +25,7 @@ abstract class AbstractHasher
      * @param  array  $options
      * @return bool
      */
-    public function check($value, $hashedValue, array $options = [])
+    public function check(#[SensitiveParameter] $value, $hashedValue, array $options = [])
     {
         if (is_null($hashedValue) || strlen($hashedValue) === 0) {
             return false;

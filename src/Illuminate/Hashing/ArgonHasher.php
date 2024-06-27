@@ -4,6 +4,7 @@ namespace Illuminate\Hashing;
 
 use Illuminate\Contracts\Hashing\Hasher as HasherContract;
 use RuntimeException;
+use SensitiveParameter;
 
 class ArgonHasher extends AbstractHasher implements HasherContract
 {
@@ -58,7 +59,7 @@ class ArgonHasher extends AbstractHasher implements HasherContract
      *
      * @throws \RuntimeException
      */
-    public function make($value, array $options = [])
+    public function make(#[SensitiveParameter] $value, array $options = [])
     {
         $hash = @password_hash($value, $this->algorithm(), [
             'memory_cost' => $this->memory($options),
@@ -93,7 +94,7 @@ class ArgonHasher extends AbstractHasher implements HasherContract
      *
      * @throws \RuntimeException
      */
-    public function check($value, $hashedValue, array $options = [])
+    public function check(#[SensitiveParameter] $value, $hashedValue, array $options = [])
     {
         if ($this->verifyAlgorithm && ! $this->isUsingCorrectAlgorithm($hashedValue)) {
             throw new RuntimeException('This password does not use the Argon2i algorithm.');
