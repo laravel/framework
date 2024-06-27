@@ -224,9 +224,12 @@ if (! function_exists('value')) {
     /**
      * Return the default value of the given value.
      *
-     * @param  mixed  $value
-     * @param  mixed  ...$args
-     * @return mixed
+     * @template TValue
+     * @template TArgs
+     *
+     * @param  TValue|\Closure(TArgs): TValue  $value
+     * @param  TArgs  ...$args
+     * @return TValue
      */
     function value($value, ...$args)
     {

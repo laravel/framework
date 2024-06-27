@@ -10,7 +10,6 @@ parameters:
     - "#Caught class [a-zA-Z0-9\\\\_]+ not found.#"
     - "#Class [a-zA-Z0-9\\\\_]+ not found.#"
     - "#has invalid type#"
-    - "#should always throw an exception or terminate script execution#"
     - "#Instantiated class [a-zA-Z0-9\\\\_]+ not found.#"
     - "#Unsafe usage of new static#"
   excludePaths:

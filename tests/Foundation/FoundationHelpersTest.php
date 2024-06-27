@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Foundation;
 
 use Exception;
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Cache\Repository as CacheRepository;
 use Illuminate\Contracts\Config\Repository;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Foundation\Application;
@@ -13,7 +14,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use stdClass;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 class FoundationHelpersTest extends TestCase
@@ -26,17 +26,17 @@ class FoundationHelpersTest extends TestCase
     public function testCache()
     {
         $app = new Application;
-        $app['cache'] = $cache = m::mock(stdClass::class);
+        $app['cache'] = $cache = m::mock(CacheRepository::class);
 
         // 1. cache()
-        $this->assertInstanceOf(stdClass::class, cache());
+        $this->assertInstanceOf(CacheRepository::class, cache());
 
         // 2. cache(['foo' => 'bar'], 1);
         $cache->shouldReceive('put')->once()->with('foo', 'bar', 1);
         cache(['foo' => 'bar'], 1);
 
         // 3. cache('foo');
-        $cache->shouldReceive('get')->once()->with('foo')->andReturn('bar');
+        $cache->shouldReceive('get')->once()->with('foo', null)->andReturn('bar');
         $this->assertSame('bar', cache('foo'));
 
         // 4. cache('foo', null);
