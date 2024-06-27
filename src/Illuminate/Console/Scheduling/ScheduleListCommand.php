@@ -95,7 +95,7 @@ class ScheduleListCommand extends Command
             // Handle the 'between' constraint manually
             if ($event->filters && isset($event->filters['between'])) {
                 $between = $event->filters['between'];
-                $expression .= " between " . implode(' and ', $between);
+                $expression .= ' between '.implode(' and ', $between);
             }
 
             $list[] = [$expression, $command, $nextDue];
@@ -103,7 +103,6 @@ class ScheduleListCommand extends Command
 
         return $list;
     }
-
     /**
      * Get the spacing to be used on each event row.
      *
