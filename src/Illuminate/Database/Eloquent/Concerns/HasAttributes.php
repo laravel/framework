@@ -13,6 +13,7 @@ use DateTimeInterface;
 use Illuminate\Contracts\Database\Eloquent\Castable;
 use Illuminate\Contracts\Database\Eloquent\CastsInboundAttributes;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Database\Eloquent\Attributes\Cast;
 use Illuminate\Database\Eloquent\Casts\AsArrayObject;
 use Illuminate\Database\Eloquent\Casts\AsCollection;
 use Illuminate\Database\Eloquent\Casts\AsEncryptedArrayObject;
@@ -191,7 +192,7 @@ trait HasAttributes
     protected function initializeHasAttributes()
     {
         $this->casts = $this->ensureCastsAreStringValues(
-            array_merge($this->casts, $this->casts()),
+            array_merge($this->casts, $this->casts(), $this->castsFromCastAttribute()),
         );
     }
 
@@ -1620,6 +1621,18 @@ trait HasAttributes
     protected function casts()
     {
         return [];
+    }
+
+    /**
+     * Get the attributes that should be cast defined by the Cast attribute.
+     */
+    protected function castsFromCastAttribute(): array
+    {
+        return collect((new ReflectionClass($this))->getAttributes(Cast::class))
+            ->mapWithKeys(fn ($attribute) => [
+                $attribute->getArguments()[0] => $attribute->getArguments()[1]
+            ])
+            ->toArray();
     }
 
     /**
