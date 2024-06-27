@@ -30,19 +30,18 @@ abstract class MultipleInstanceManager
     protected $customCreators = [];
 
     /**
+     * The key name of the "driver" equivalent configuration option.
+     *
+     * @var string
+     */
+    protected $driverKey = 'driver';
+
+    /**
      * Create a new manager instance.
      *
      * @param  \Illuminate\Contracts\Foundation\Application  $app
      * @return void
      */
-
-    /**
-     * The field name of the driver.
-     *
-     * @var string
-     */
-    protected $driverField = 'driver';
-
     public function __construct($app)
     {
         $this->app = $app;
@@ -112,19 +111,19 @@ abstract class MultipleInstanceManager
             throw new InvalidArgumentException("Instance [{$name}] is not defined.");
         }
 
-        if (! array_key_exists($this->driverField, $config)) {
-            throw new RuntimeException("Instance [{$name}] does not specify a {$this->driverField}.");
+        if (! array_key_exists($this->driverKey, $config)) {
+            throw new RuntimeException("Instance [{$name}] does not specify a {$this->driverKey}.");
         }
 
-        if (isset($this->customCreators[$config[$this->driverField]])) {
+        if (isset($this->customCreators[$config[$this->driverKey]])) {
             return $this->callCustomCreator($config);
         } else {
-            $createMethod = 'create'.ucfirst($config[$this->driverField]).ucfirst($this->driverField);
+            $createMethod = 'create'.ucfirst($config[$this->driverKey]).ucfirst($this->driverKey);
 
             if (method_exists($this, $createMethod)) {
                 return $this->{$createMethod}($config);
             } else {
-                throw new InvalidArgumentException("Instance {$this->driverField} [{$config[$this->driverField]}] is not supported.");
+                throw new InvalidArgumentException("Instance {$this->driverKey} [{$config[$this->driverKey]}] is not supported.");
             }
         }
     }
@@ -137,7 +136,7 @@ abstract class MultipleInstanceManager
      */
     protected function callCustomCreator(array $config)
     {
-        return $this->customCreators[$config[$this->driverField]]($this->app, $config);
+        return $this->customCreators[$config[$this->driverKey]]($this->app, $config);
     }
 
     /**
