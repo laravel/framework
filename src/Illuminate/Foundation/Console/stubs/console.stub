@@ -3,7 +3,12 @@
 namespace {{ namespace }};
 
 use Illuminate\Console\Command;
+use Symfony\Component\Console\Attribute\AsCommand;
 
+#[AsCommand(
+    name: '{{ command }}',
+    description: 'Command description',
+)]
 class {{ class }} extends Command
 {
     /**
