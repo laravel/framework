@@ -11,9 +11,10 @@ trait MassPrunable
      * Prune all prunable models in the database.
      *
      * @param  int  $chunkSize
+     * @param  int|null  $thresholdPerRun
      * @return int
      */
-    public function pruneAll(int $chunkSize = 1000)
+    public function pruneAll(int $chunkSize = 1000, ?int $thresholdPerRun = null)
     {
         $query = tap($this->prunable(), function ($query) use ($chunkSize) {
             $query->when(! $query->getQuery()->limit, function ($query) use ($chunkSize) {
@@ -30,6 +31,10 @@ trait MassPrunable
 
             if ($count > 0) {
                 event(new ModelsPruned(static::class, $total));
+            }
+
+            if ($thresholdPerRun && $total >= $thresholdPerRun) {
+                break;
             }
         } while ($count > 0);
 

@@ -94,6 +94,44 @@ class EloquentMassPrunableTest extends DatabaseTestCase
         $this->assertEquals(2000, MassPrunableSoftDeleteTestModel::withTrashed()->count());
     }
 
+    public function testPrunesRecordsWithThresholdLessThanChunk()
+    {
+        app('events')
+            ->shouldReceive('dispatch')
+            ->times(1)
+            ->with(m::type(ModelsPruned::class));
+
+        collect(range(1, 5000))->map(function ($id) {
+            return ['name' => 'foo'];
+        })->chunk(200)->each(function ($chunk) {
+            MassPrunableTestModel::insert($chunk->all());
+        });
+
+        $count = (new MassPrunableTestModel)->pruneAll(600, 500);
+
+        $this->assertEquals(600, $count);
+        $this->assertEquals(4400, MassPrunableTestModel::count());
+    }
+
+    public function testPrunesRecordsWithThresholdBiggerThanChunk()
+    {
+        app('events')
+            ->shouldReceive('dispatch')
+            ->times(2)
+            ->with(m::type(ModelsPruned::class));
+
+        collect(range(1, 5000))->map(function ($id) {
+            return ['name' => 'foo'];
+        })->chunk(200)->each(function ($chunk) {
+            MassPrunableTestModel::insert($chunk->all());
+        });
+
+        $count = (new MassPrunableTestModel)->pruneAll(500, 1000);
+
+        $this->assertEquals(1000, $count);
+        $this->assertEquals(4000, MassPrunableTestModel::count());
+    }
+
     protected function tearDown(): void
     {
         parent::tearDown();
