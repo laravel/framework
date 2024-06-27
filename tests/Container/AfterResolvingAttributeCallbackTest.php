@@ -29,14 +29,15 @@ class AfterResolvingAttributeCallbackTest extends TestCase
     {
         $container = new Container();
 
-        $container->afterResolvingAttribute(ContainerTestConfiguresClass::class, function (ContainerTestConfiguresClass $attribute, $class) {
-            $class->value = $attribute->value;
-        });
+        $container->afterResolvingAttribute(
+            ContainerTestBootable::class,
+            fn ($_, $instance, Container $container) => method_exists($instance, 'booting') && $container->call([$instance, 'booting'])
+        );
 
-        $instance = $container->make(ContainerTestHasSelfConfiguringAttribute::class);
+        $instance = $container->make(ContainerTestHasBootable::class);
 
-        $this->assertInstanceOf(ContainerTestHasSelfConfiguringAttribute::class, $instance);
-        $this->assertEquals('foo', $instance->value);
+        $this->assertInstanceOf(ContainerTestHasBootable::class, $instance);
+        $this->assertTrue($instance->hasBooted);
     }
 
     public function testCallbackIsCalledAfterClassWithConstructorAndAttributeIsResolved()
@@ -110,17 +111,27 @@ final class ContainerTestConfiguresClass
     }
 }
 
-#[ContainerTestConfiguresClass(value: 'foo')]
-final class ContainerTestHasSelfConfiguringAttribute
-{
-    public ?string $value = null;
-}
-
 #[ContainerTestConfiguresClass(value: 'the-right-value')]
 final class ContainerTestHasSelfConfiguringAttributeAndConstructor
 {
     public function __construct(
         public string $value
     ) {
+    }
+}
+
+#[Attribute(Attribute::TARGET_CLASS)]
+final class ContainerTestBootable
+{
+}
+
+#[ContainerTestBootable]
+final class ContainerTestHasBootable
+{
+    public bool $hasBooted = false;
+
+    public function booting(): void
+    {
+        $this->hasBooted = true;
     }
 }
