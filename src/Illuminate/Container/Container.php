@@ -166,6 +166,13 @@ class Container implements ArrayAccess, ContainerContract
     protected $afterResolvingCallbacks = [];
 
     /**
+     * All of the after resolving attribute callbacks by class type.
+     *
+     * @var array[]
+     */
+    protected $afterResolvingAttributeCallbacks = [];
+
+    /**
      * Define a contextual binding.
      *
      * @param  array|string  $concrete
@@ -944,7 +951,7 @@ class Container implements ArrayAccess, ContainerContract
         if (is_null($constructor)) {
             array_pop($this->buildStack);
 
-            return new $concrete;
+            return tap(new $concrete, fn ($instance) => $this->fireAfterResolvingAttributeCallbacks($reflector->getAttributes(), $instance));
         }
 
         $dependencies = $constructor->getParameters();
@@ -962,7 +969,7 @@ class Container implements ArrayAccess, ContainerContract
 
         array_pop($this->buildStack);
 
-        return $reflector->newInstanceArgs($instances);
+        return tap($reflector->newInstanceArgs($instances), fn ($instance) => $this->fireAfterResolvingAttributeCallbacks($reflector->getAttributes(), $instance));
     }
 
     /**
@@ -997,6 +1004,8 @@ class Container implements ArrayAccess, ContainerContract
             $result = is_null(Util::getParameterClassName($dependency))
                             ? $this->resolvePrimitive($dependency)
                             : $this->resolveClass($dependency);
+
+            $this->fireAfterResolvingAttributeCallbacks($dependency->getAttributes(), $result);
 
             if ($dependency->isVariadic()) {
                 $results = array_merge($results, $result);
@@ -1249,6 +1258,18 @@ class Container implements ArrayAccess, ContainerContract
     }
 
     /**
+     * Register a new after resolving attribute callback for all types.
+     *
+     * @param  string  $attribute
+     * @param  \Closure  $callback
+     * @return void
+     */
+    public function afterResolvingAttribute(string $attribute, \Closure $callback)
+    {
+        $this->afterResolvingAttributeCallbacks[$attribute][] = $callback;
+    }
+
+    /**
      * Fire all of the before resolving callbacks.
      *
      * @param  string  $abstract
@@ -1313,6 +1334,22 @@ class Container implements ArrayAccess, ContainerContract
         $this->fireCallbackArray(
             $object, $this->getCallbacksForType($abstract, $object, $this->afterResolvingCallbacks)
         );
+    }
+
+    /**
+     * Fire all of the after resolving attribute callbacks.
+     *
+     * @param  \ReflectionAttribute[]  $abstract
+     * @param  mixed  $object
+     * @return void
+     */
+    protected function fireAfterResolvingAttributeCallbacks(array $attributes, $object)
+    {
+        foreach ($attributes as $attribute) {
+            foreach ($this->getCallbacksForType($attribute->getName(), $object, $this->afterResolvingAttributeCallbacks) as $callback) {
+                $callback($attribute->newInstance(), $object, $this);
+            }
+        }
     }
 
     /**
