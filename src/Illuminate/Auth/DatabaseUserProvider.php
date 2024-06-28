@@ -8,7 +8,6 @@ use Illuminate\Contracts\Auth\UserProvider;
 use Illuminate\Contracts\Hashing\Hasher as HasherContract;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\ConnectionInterface;
-use SensitiveParameter;
 
 class DatabaseUserProvider implements UserProvider
 {
@@ -68,7 +67,7 @@ class DatabaseUserProvider implements UserProvider
      * @param  string  $token
      * @return \Illuminate\Contracts\Auth\Authenticatable|null
      */
-    public function retrieveByToken($identifier, #[SensitiveParameter] $token)
+    public function retrieveByToken($identifier, #[\SensitiveParameter] $token)
     {
         $user = $this->getGenericUser(
             $this->connection->table($this->table)->find($identifier)
@@ -85,7 +84,7 @@ class DatabaseUserProvider implements UserProvider
      * @param  string  $token
      * @return void
      */
-    public function updateRememberToken(UserContract $user, #[SensitiveParameter] $token)
+    public function updateRememberToken(UserContract $user, #[\SensitiveParameter] $token)
     {
         $this->connection->table($this->table)
                 ->where($user->getAuthIdentifierName(), $user->getAuthIdentifier())
@@ -98,7 +97,7 @@ class DatabaseUserProvider implements UserProvider
      * @param  array  $credentials
      * @return \Illuminate\Contracts\Auth\Authenticatable|null
      */
-    public function retrieveByCredentials(#[SensitiveParameter] array $credentials)
+    public function retrieveByCredentials(#[\SensitiveParameter] array $credentials)
     {
         $credentials = array_filter(
             $credentials,
@@ -153,7 +152,7 @@ class DatabaseUserProvider implements UserProvider
      * @param  array  $credentials
      * @return bool
      */
-    public function validateCredentials(UserContract $user, #[SensitiveParameter] array $credentials)
+    public function validateCredentials(UserContract $user, #[\SensitiveParameter] array $credentials)
     {
         return $this->hasher->check(
             $credentials['password'], $user->getAuthPassword()
@@ -168,7 +167,7 @@ class DatabaseUserProvider implements UserProvider
      * @param  bool  $force
      * @return void
      */
-    public function rehashPasswordIfRequired(UserContract $user, #[SensitiveParameter] array $credentials, bool $force = false)
+    public function rehashPasswordIfRequired(UserContract $user, #[\SensitiveParameter] array $credentials, bool $force = false)
     {
         if (! $this->hasher->needsRehash($user->getAuthPassword()) && ! $force) {
             return;

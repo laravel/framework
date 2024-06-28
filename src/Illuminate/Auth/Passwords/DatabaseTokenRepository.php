@@ -7,7 +7,6 @@ use Illuminate\Contracts\Hashing\Hasher as HasherContract;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
-use SensitiveParameter;
 
 class DatabaseTokenRepository implements TokenRepositoryInterface
 {
@@ -116,7 +115,7 @@ class DatabaseTokenRepository implements TokenRepositoryInterface
      * @param  string  $token
      * @return array
      */
-    protected function getPayload($email, #[SensitiveParameter] $token)
+    protected function getPayload($email, #[\SensitiveParameter] $token)
     {
         return ['email' => $email, 'token' => $this->hasher->make($token), 'created_at' => new Carbon];
     }
@@ -128,7 +127,7 @@ class DatabaseTokenRepository implements TokenRepositoryInterface
      * @param  string  $token
      * @return bool
      */
-    public function exists(CanResetPasswordContract $user, #[SensitiveParameter] $token)
+    public function exists(CanResetPasswordContract $user, #[\SensitiveParameter] $token)
     {
         $record = (array) $this->getTable()->where(
             'email', $user->getEmailForPasswordReset()

@@ -7,7 +7,6 @@ use Illuminate\Contracts\Encryption\Encrypter as EncrypterContract;
 use Illuminate\Contracts\Encryption\EncryptException;
 use Illuminate\Contracts\Encryption\StringEncrypter;
 use RuntimeException;
-use SensitiveParameter;
 
 class Encrypter implements EncrypterContract, StringEncrypter
 {
@@ -103,7 +102,7 @@ class Encrypter implements EncrypterContract, StringEncrypter
      *
      * @throws \Illuminate\Contracts\Encryption\EncryptException
      */
-    public function encrypt(#[SensitiveParameter] $value, $serialize = true)
+    public function encrypt(#[\SensitiveParameter] $value, $serialize = true)
     {
         $iv = random_bytes(openssl_cipher_iv_length(strtolower($this->cipher)));
 
@@ -140,7 +139,7 @@ class Encrypter implements EncrypterContract, StringEncrypter
      *
      * @throws \Illuminate\Contracts\Encryption\EncryptException
      */
-    public function encryptString(#[SensitiveParameter] $value)
+    public function encryptString(#[\SensitiveParameter] $value)
     {
         return $this->encrypt($value, false);
     }
@@ -218,7 +217,7 @@ class Encrypter implements EncrypterContract, StringEncrypter
      * @param  string  $key
      * @return string
      */
-    protected function hash(#[SensitiveParameter] $iv, #[SensitiveParameter] $value, #[SensitiveParameter] $key)
+    protected function hash(#[\SensitiveParameter] $iv, #[\SensitiveParameter] $value, #[\SensitiveParameter] $key)
     {
         return hash_hmac('sha256', $iv.$value, $key);
     }
@@ -292,7 +291,7 @@ class Encrypter implements EncrypterContract, StringEncrypter
      * @param  string  $key
      * @return bool
      */
-    protected function validMacForKey(#[SensitiveParameter] $payload, $key)
+    protected function validMacForKey(#[\SensitiveParameter] $payload, $key)
     {
         return hash_equals(
             $this->hash($payload['iv'], $payload['value'], $key), $payload['mac']

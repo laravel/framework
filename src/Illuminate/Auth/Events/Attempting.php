@@ -2,8 +2,6 @@
 
 namespace Illuminate\Auth\Events;
 
-use SensitiveParameter;
-
 class Attempting
 {
     /**
@@ -35,7 +33,7 @@ class Attempting
      * @param  bool  $remember
      * @return void
      */
-    public function __construct($guard, #[SensitiveParameter] $credentials, $remember)
+    public function __construct($guard, #[\SensitiveParameter] $credentials, $remember)
     {
         $this->guard = $guard;
         $this->remember = $remember;

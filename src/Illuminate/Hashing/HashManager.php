@@ -4,7 +4,6 @@ namespace Illuminate\Hashing;
 
 use Illuminate\Contracts\Hashing\Hasher;
 use Illuminate\Support\Manager;
-use SensitiveParameter;
 
 /**
  * @mixin \Illuminate\Contracts\Hashing\Hasher
@@ -59,7 +58,7 @@ class HashManager extends Manager implements Hasher
      * @param  array  $options
      * @return string
      */
-    public function make(#[SensitiveParameter] $value, array $options = [])
+    public function make(#[\SensitiveParameter] $value, array $options = [])
     {
         return $this->driver()->make($value, $options);
     }
@@ -72,7 +71,7 @@ class HashManager extends Manager implements Hasher
      * @param  array  $options
      * @return bool
      */
-    public function check(#[SensitiveParameter] $value, $hashedValue, array $options = [])
+    public function check(#[\SensitiveParameter] $value, $hashedValue, array $options = [])
     {
         return $this->driver()->check($value, $hashedValue, $options);
     }
@@ -95,7 +94,7 @@ class HashManager extends Manager implements Hasher
      * @param  string  $value
      * @return bool
      */
-    public function isHashed(#[SensitiveParameter] $value)
+    public function isHashed(#[\SensitiveParameter] $value)
     {
         return $this->driver()->info($value)['algo'] !== null;
     }
