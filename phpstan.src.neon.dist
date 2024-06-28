@@ -1,9 +1,10 @@
 parameters:
-    level: 0
+    level: 1
     paths:
         - src
     excludePaths:
         - src/Illuminate/Testing/ParallelRunner.php
+        - src/*/views/*
     ignoreErrors:
         - "#\\(void\\) is used#"
         - "#Access to an undefined property#"

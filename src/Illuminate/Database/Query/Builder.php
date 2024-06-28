@@ -163,7 +163,7 @@ class Builder implements BuilderContract
     /**
      * The number of records to skip.
      *
-     * @var int
+     * @var int|null
      */
     public $offset;
 

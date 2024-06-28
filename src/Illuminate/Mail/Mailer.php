@@ -408,9 +408,9 @@ class Mailer implements MailerContract, MailQueueContract
      * Add the content to a given message.
      *
      * @param  \Illuminate\Mail\Message  $message
-     * @param  string  $view
-     * @param  string  $plain
-     * @param  string  $raw
+     * @param  string|null  $view
+     * @param  string|null  $plain
+     * @param  string|null  $raw
      * @param  array  $data
      * @return void
      */
