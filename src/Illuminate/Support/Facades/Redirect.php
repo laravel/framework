@@ -23,7 +23,7 @@ namespace Illuminate\Support\Facades;
  * @method static bool hasMacro(string $name)
  * @method static void flushMacros()
  *
- * @see \Illuminate\Routing\Redirector
+ * @mixin \Illuminate\Routing\Redirector
  */
 class Redirect extends Facade
 {

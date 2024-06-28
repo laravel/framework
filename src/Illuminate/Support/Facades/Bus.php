@@ -48,8 +48,8 @@ use Illuminate\Support\Testing\Fakes\BusFake;
  * @method static \Illuminate\Bus\Batch recordPendingBatch(\Illuminate\Bus\PendingBatch $pendingBatch)
  * @method static \Illuminate\Support\Testing\Fakes\BusFake serializeAndRestore(bool $serializeAndRestore = true)
  *
- * @see \Illuminate\Bus\Dispatcher
- * @see \Illuminate\Support\Testing\Fakes\BusFake
+ * @mixin \Illuminate\Bus\Dispatcher
+ * @mixin \Illuminate\Support\Testing\Fakes\BusFake
  */
 class Bus extends Facade
 {

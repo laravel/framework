@@ -5,7 +5,7 @@ namespace DummyNamespace;
 use Illuminate\Support\Facades\Facade;
 
 /**
- * @see \DummyTarget
+ * @mixin \DummyTarget
  */
 class DummyClass extends Facade
 {

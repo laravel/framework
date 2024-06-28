@@ -180,7 +180,7 @@ namespace Illuminate\Support\Facades;
  * @method static array validateWithBag(string $errorBag, array $rules, ...$params)
  * @method static bool hasValidSignature(bool $absolute = true)
  *
- * @see \Illuminate\Http\Request
+ * @mixin \Illuminate\Http\Request
  */
 class Request extends Facade
 {

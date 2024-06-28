@@ -64,8 +64,8 @@ use RuntimeException;
  * @method static bool hasMacro(string $name)
  * @method static void flushMacros()
  *
- * @see \Illuminate\Auth\AuthManager
- * @see \Illuminate\Auth\SessionGuard
+ * @mixin \Illuminate\Auth\AuthManager
+ * @mixin \Illuminate\Auth\SessionGuard
  */
 class Auth extends Facade
 {

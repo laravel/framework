@@ -138,7 +138,7 @@ namespace Illuminate\Support\Facades;
  * @method static bool hasMacro(string $name)
  * @method static void flushMacros()
  *
- * @see \Illuminate\Foundation\Application
+ * @mixin \Illuminate\Foundation\Application
  */
 class App extends Facade
 {

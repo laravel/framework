@@ -56,7 +56,7 @@ namespace Illuminate\Support\Facades;
  * @method static bool hasMacro(string $name)
  * @method static void flushMacros()
  *
- * @see \Illuminate\Filesystem\Filesystem
+ * @mixin \Illuminate\Filesystem\Filesystem
  */
 class File extends Facade
 {
