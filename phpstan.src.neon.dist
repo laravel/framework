@@ -1,7 +1,7 @@
 parameters:
   paths:
     - src
-  level: 0
+  level: 1
   ignoreErrors:
     - "#\\(void\\) is used#"
     - "#Access to an undefined property#"
@@ -14,3 +14,4 @@ parameters:
     - "#Unsafe usage of new static#"
   excludePaths:
     - "src/Illuminate/Testing/ParallelRunner.php"
+    - src/*/views/*

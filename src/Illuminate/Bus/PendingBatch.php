@@ -358,9 +358,7 @@ class PendingBatch
         try {
             $batch = $batch->add($this->jobs);
         } catch (Throwable $e) {
-            if (isset($batch)) {
-                $batch->delete();
-            }
+            $batch->delete();
 
             throw $e;
         }

@@ -575,7 +575,7 @@ class Gate implements GateContract
      * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
      * @param  string  $ability
      * @param  array  $arguments
-     * @param  bool  $result
+     * @param  bool|null  $result
      * @return bool|null
      */
     protected function callAfterCallbacks($user, $ability, array $arguments, $result)
