@@ -646,8 +646,8 @@ class Arr
      * @template TValue
      *
      * @param  array<TKey, array>  $array
-     * @param  callable(mixed...): TMapSpreadValue  $callback
-     * @return array<TKey, TMapSpreadValue>
+     * @param  callable(mixed...): TValue  $callback
+     * @return array<TKey, TValue>
      */
     public static function mapSpread(array $array, callable $callback)
     {
