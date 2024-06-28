@@ -33,14 +33,16 @@ class TestResponseAssert
     /**
      * Pass method calls to the Assert class and decorate the exception message.
      *
-     * @param  string  $method
-     * @param  array  $args
-     * @return mixed
+     * @param  string  $name
+     * @param  array  $arguments
+     * @return void
+     *
+     * @throws \PHPUnit\Framework\ExpectationFailedException
      */
     public function __call($name, $arguments)
     {
         try {
-            return Assert::$name(...$arguments);
+            Assert::$name(...$arguments);
         } catch (ExpectationFailedException $e) {
             throw $this->injectResponseContext($e);
         }
@@ -49,20 +51,22 @@ class TestResponseAssert
     /**
      * Pass static method calls to the Assert class.
      *
-     * @param  string  $method
-     * @param  array  $args
-     * @return mixed
+     * @param  string  $name
+     * @param  array  $arguments
+     * @return void
+     *
+     * @throws \PHPUnit\Framework\ExpectationFailedException
      */
     public static function __callStatic($name, $arguments)
     {
-        return Assert::$name(...$arguments);
+        Assert::$name(...$arguments);
     }
 
     /**
      * Inject additional context from the response into the exception message.
      *
-     * @param  \ExpectationFailedException  $exception
-     * @return \ExpectationFailedException
+     * @param  \PHPUnit\Framework\ExpectationFailedException  $exception
+     * @return \PHPUnit\Framework\ExpectationFailedException
      */
     protected function injectResponseContext($exception)
     {
@@ -93,8 +97,8 @@ class TestResponseAssert
      * Append an exception to the message of another exception.
      *
      * @param  \Throwable  $exceptionToAppend
-     * @param  \Throwable  $exception
-     * @return \Throwable
+     * @param  \PHPUnit\Framework\ExpectationFailedException  $exception
+     * @return \PHPUnit\Framework\ExpectationFailedException
      */
     protected function appendExceptionToException($exceptionToAppend, $exception)
     {
@@ -119,9 +123,9 @@ class TestResponseAssert
      * Append errors to an exception message.
      *
      * @param  array  $errors
-     * @param  \Throwable  $exception
+     * @param  \PHPUnit\Framework\ExpectationFailedException  $exception
      * @param  bool  $json
-     * @return \Throwable
+     * @return \PHPUnit\Framework\ExpectationFailedException
      */
     protected function appendErrorsToException($errors, $exception, $json = false)
     {
@@ -147,8 +151,8 @@ class TestResponseAssert
      * Append a message to an exception.
      *
      * @param  string  $message
-     * @param  \Throwable  $exception
-     * @return \Throwable
+     * @param  \PHPUnit\Framework\ExpectationFailedException  $exception
+     * @return \PHPUnit\Framework\ExpectationFailedException
      */
     protected function appendMessageToException($message, $exception)
     {
