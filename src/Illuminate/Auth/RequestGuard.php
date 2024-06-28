@@ -65,7 +65,7 @@ class RequestGuard implements Guard
      * @param  array  $credentials
      * @return bool
      */
-    public function validate(array $credentials = [])
+    public function validate(#[\SensitiveParameter] array $credentials = [])
     {
         return ! is_null((new static(
             $this->callback, $credentials['request'], $this->getProvider()
