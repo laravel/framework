@@ -33,7 +33,7 @@ trait MassPrunable
                 event(new ModelsPruned(static::class, $total));
             }
 
-            if ($thresholdPerRun && $total >= $thresholdPerRun) {
+            if (!is_null($thresholdPerRun) && $total >= $thresholdPerRun) {
                 break;
             }
         } while ($count > 0);

@@ -28,6 +28,7 @@ class PruneCommand extends Command
                                 {--except=* : Class names of the models to be excluded from pruning}
                                 {--path=* : Absolute path(s) to directories where models are located}
                                 {--chunk=1000 : The number of models to retrieve per chunk of models to be deleted}
+                                {--threshold= : The threshold for each run }
                                 {--pretend : Display the number of prunable records found instead of deleting them}';
 
     /**
@@ -100,9 +101,14 @@ class PruneCommand extends Command
             ? $instance->prunableChunkSize
             : $this->option('chunk');
 
-        $total = $this->isPrunable($model)
-            ? $instance->pruneAll($chunkSize)
-            : 0;
+        $thresholdPerRun = $this->option('threshold') ?: null;
+
+        $total = match ($this->isPrunable($model)) {
+            true => $this->isMassPrunable($model)
+                ? $instance->pruneAll($chunkSize, $thresholdPerRun)
+                : $instance->pruneAll($chunkSize),
+            false => 0,
+        };
 
         if ($total == 0) {
             $this->components->info("No prunable [$model] records found.");
@@ -174,7 +180,20 @@ class PruneCommand extends Command
     {
         $uses = class_uses_recursive($model);
 
-        return in_array(Prunable::class, $uses) || in_array(MassPrunable::class, $uses);
+        return in_array(Prunable::class, $uses) || $this->isMassPrunable($model);
+    }
+
+    /**
+     * Determine if the given model class is using MassPrunable.
+     *
+     * @param  string  $model
+     * @return bool
+     */
+    protected function isMassPrunable($model)
+    {
+        $uses = class_uses_recursive($model);
+
+        return in_array(MassPrunable::class, $uses);
     }
 
     /**
