@@ -1,4 +1,5 @@
 <?php
+
 namespace Illuminate\Database\Eloquent\Attributes;
 
 use Attribute;

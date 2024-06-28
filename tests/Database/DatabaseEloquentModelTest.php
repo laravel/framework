@@ -3059,7 +3059,7 @@ class DatabaseEloquentModelTest extends TestCase
         $model->collectionAttribute = new BaseCollection;
         $model->asCustomCollectionAttribute = new CustomCollection;
         $model->duplicateIntAttribute = '5.0';
-        
+
         // From trait
         $model->price = new Price(100.5, 'USD');
 
@@ -3764,11 +3764,11 @@ class Address implements Castable
 class EloquentModelWithAttributeCasts extends Model
 {
     use HasPrice;
-    
+
     protected $casts = [
         'datetimeAttribute' => 'datetime',
     ];
-    
+
     protected function casts()
     {
         return [
@@ -3788,7 +3788,8 @@ class EloquentModelWithAttributeCasts extends Model
 }
 
 #[Cast('price', Price::class)]
-trait HasPrice {
+trait HasPrice
+{
     public function priceEquals(Price $other): bool
     {
         return $this->amount === $other->amount && $this->currency === $other->currency;

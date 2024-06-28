@@ -1629,7 +1629,7 @@ trait HasAttributes
     protected function castsFromCastAttribute(): array
     {
         $reflected = new ReflectionClass($this);
-        
+
         return collect($reflected->getAttributes(Cast::class))
             ->merge(collect($reflected->getTraits())
                 ->map(fn ($trait) => $trait->getAttributes(Cast::class))
