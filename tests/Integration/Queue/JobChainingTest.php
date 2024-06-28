@@ -396,6 +396,33 @@ class JobChainingTest extends QueueTestCase
         $this->assertCount(6, JobRunRecorder::$results);
     }
 
+    public function testDynamicBatchWithAnotherReadonlyPromotedProperties()
+    {
+        Bus::chain([
+            Bus::batch([
+                new ReadonlyMoneyTestJob('1.1', new MyMoney(100, 'EUR')),
+                new ReadonlyMoneyTestJob('1.2', new MyMoney(100, 'USD')),
+            ]),
+            Bus::batch([
+                new ReadonlyMoneyTestJob('2.1', new MyMoney(100, 'EUR')),
+                new ReadonlyMoneyTestJob('2.2', new MyMoney(100, 'EUR')),
+            ]),
+            new ReadonlyMoneyTestJob('3.1', new MyMoney(100, 'EUR')),
+            new ReadonlyMoneyTestJob('3.2', new MyMoney(100, 'EUR')),
+        ])->dispatch();
+
+        $this->runQueueWorkerCommand(['--stop-when-empty' => true]);
+
+        if ($this->getQueueDriver() === 'sync') {
+            $this->assertEquals(
+                ['1.1', '1.2', '2.1', '2.2', '3.1', '3.2'],
+                JobRunRecorder::$results
+            );
+        }
+
+        $this->assertCount(6, JobRunRecorder::$results);
+    }
+
     public function testChainBatchChain()
     {
         Bus::chain([
@@ -830,6 +857,30 @@ class ReadonlyEnumTestJob implements ShouldQueue
     use Batchable, Dispatchable, InteractsWithQueue, Queueable;
 
     public function __construct(public string $name, public readonly MyBackedEnum $enum)
+    {
+    }
+
+    public function __invoke(): void
+    {
+        JobRunRecorder::record($this->name);
+    }
+}
+
+
+class MyMoney
+{
+    public function __construct(
+        public int $minor,
+        public string $currency,
+    ) {
+    }
+}
+
+class ReadonlyMoneyTestJob implements ShouldQueue
+{
+    use Batchable, Dispatchable, InteractsWithQueue, Queueable;
+
+    public function __construct(public string $name, public readonly MyMoney $money)
     {
     }
 
