@@ -32,7 +32,7 @@ trait CreatesMatchingTest
      */
     protected function handleTestCreation($path)
     {
-        if (! $this->option('test') && ! $this->option('pest') && ! $this->option('phpunit')) {
+        if (! $this->option('test') && ! $this->option('pest') && ! $this->option('phpunit') && ! ($this->type === 'Model' && $this->option('all'))) {
             return false;
         }
 

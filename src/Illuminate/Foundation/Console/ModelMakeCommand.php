@@ -56,6 +56,7 @@ class ModelMakeCommand extends GeneratorCommand
             $this->input->setOption('controller', true);
             $this->input->setOption('policy', true);
             $this->input->setOption('resource', true);
+            $this->input->setOption('test', true);
         }
 
         if ($this->option('factory')) {
@@ -143,7 +144,7 @@ class ModelMakeCommand extends GeneratorCommand
             '--model' => $this->option('resource') || $this->option('api') ? $modelName : null,
             '--api' => $this->option('api'),
             '--requests' => $this->option('requests') || $this->option('all'),
-            '--test' => $this->option('test'),
+            '--test' => $this->option('test') || $this->option('all'),
             '--pest' => $this->option('pest'),
         ]));
     }
