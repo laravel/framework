@@ -14,18 +14,18 @@ class FakeJob extends Job
     public $releaseDelay;
 
     /**
-     * The exception the job failed with.
-     *
-     * @var \Throwable
-     */
-    public $failedWith;
-
-    /**
      * The number of attempts made to process the job.
      *
      * @var int
      */
     public $attempts = 1;
+
+    /**
+     * The exception the job failed with.
+     *
+     * @var \Throwable
+     */
+    public $failedWith;
 
     /**
      * Get the job identifier.
