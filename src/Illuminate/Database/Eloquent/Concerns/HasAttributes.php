@@ -1624,14 +1624,19 @@ trait HasAttributes
     }
 
     /**
-     * Get the attributes that should be cast defined by the Cast attribute.
+     * Get the class and its traits Cast attributes.
      */
     protected function castsFromCastAttribute(): array
     {
-        return collect((new ReflectionClass($this))->getAttributes(Cast::class))
-            ->mapWithKeys(fn ($attribute) => [
-                $attribute->getArguments()[0] => $attribute->getArguments()[1]
-            ])
+        $reflected = new ReflectionClass($this);
+        
+        return collect($reflected->getAttributes(Cast::class))
+            ->merge(collect($reflected->getTraits())
+                ->map(fn ($trait) => $trait->getAttributes(Cast::class))
+                ->filter()
+                ->flatten()
+            )
+            ->mapWithKeys(fn ($attribute) => [$attribute->getArguments()[0] => $attribute->getArguments()[1]])
             ->toArray();
     }
 

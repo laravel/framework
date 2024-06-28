@@ -3059,6 +3059,9 @@ class DatabaseEloquentModelTest extends TestCase
         $model->collectionAttribute = new BaseCollection;
         $model->asCustomCollectionAttribute = new CustomCollection;
         $model->duplicateIntAttribute = '5.0';
+        
+        // From trait
+        $model->price = new Price(100.5, 'USD');
 
         $this->assertIsInt($model->intAttribute);
         $this->assertIsFloat($model->floatAttribute);
@@ -3082,6 +3085,7 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertSame('1969-07-20 22:56:00', $model->datetimeAttribute->toDateTimeString());
         $this->assertEquals(-14173440, $model->timestampAttribute);
         $this->assertEquals(5, $model->duplicateIntAttribute);
+        $this->assertInstanceOf(Price::class, $model->price);
 
         $arr = $model->toArray();
 
@@ -3103,6 +3107,8 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertSame('1969-07-20 22:56:00', $arr['datetimeAttribute']);
         $this->assertEquals(-14173440, $arr['timestampAttribute']);
         $this->assertEquals(5, $arr['duplicateIntAttribute']);
+        $this->assertEquals(100.5, $arr['amount']);
+        $this->assertEquals('USD', $arr['currency']);
     }
 }
 
@@ -3757,6 +3763,8 @@ class Address implements Castable
 #[Cast('arrayAttribute', 'array')]
 class EloquentModelWithAttributeCasts extends Model
 {
+    use HasPrice;
+    
     protected $casts = [
         'datetimeAttribute' => 'datetime',
     ];
@@ -3776,5 +3784,39 @@ class EloquentModelWithAttributeCasts extends Model
     protected function serializeDate(DateTimeInterface $date)
     {
         return $date->format('Y-m-d H:i:s');
+    }
+}
+
+#[Cast('price', Price::class)]
+trait HasPrice {
+    public function priceEquals(Price $other): bool
+    {
+        return $this->amount === $other->amount && $this->currency === $other->currency;
+    }
+}
+
+class Price implements Castable
+{
+    public function __construct(public float $amount, public string $currency)
+    {
+    }
+
+    public static function castUsing(array $arguments): CastsAttributes
+    {
+        return new class implements CastsAttributes
+        {
+            public function get(Model $model, string $key, mixed $value, array $attributes): Price
+            {
+                return new Price($attributes['amount'], $attributes['currency']);
+            }
+
+            public function set(Model $model, string $key, mixed $value, array $attributes): array
+            {
+                return [
+                    'amount' => $value->amount,
+                    'currency' => $value->currency,
+                ];
+            }
+        };
     }
 }
