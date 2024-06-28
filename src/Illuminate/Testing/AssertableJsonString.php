@@ -188,7 +188,7 @@ class AssertableJsonString implements ArrayAccess, Countable
      * Assert that the response does not contain the exact JSON fragment.
      *
      * @param  array  $data
-     * @return $this
+     * @return void
      */
     public function assertMissingExact(array $data)
     {
