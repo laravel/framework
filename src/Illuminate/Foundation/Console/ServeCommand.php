@@ -5,6 +5,7 @@ namespace Illuminate\Foundation\Console;
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Env;
+use Illuminate\Support\InteractsWithTime;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Process\PhpExecutableFinder;
@@ -15,6 +16,8 @@ use function Termwind\terminal;
 #[AsCommand(name: 'serve')]
 class ServeCommand extends Command
 {
+    use InteractsWithTime;
+
     /**
      * The console command name.
      *
@@ -318,7 +321,10 @@ class ServeCommand extends Command
 
                     $this->output->write("  <fg=gray>$date</> $time");
 
-                    $runTime = $this->getDateFromLine($line)->diffInSeconds($startDate);
+                    $runTime = $this->runTimeForHumans(
+                        $startDate,
+                        $this->getDateFromLine($line)
+                    );
 
                     if ($file) {
                         $this->output->write($file = " $file");
