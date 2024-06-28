@@ -21,6 +21,13 @@ class FakeJob extends Job
     public $failedWith;
 
     /**
+     * The number of attempts made to process the job.
+     *
+     * @var int
+     */
+    public $attempts = 1;
+
+    /**
      * Get the job identifier.
      *
      * @return string
@@ -50,6 +57,16 @@ class FakeJob extends Job
     {
         $this->released = true;
         $this->releaseDelay = $delay;
+    }
+
+    /**
+     * Get the number of times the job has been attempted.
+     *
+     * @return int
+     */
+    public function attempts()
+    {
+        return $this->attempts;
     }
 
     /**
