@@ -642,9 +642,10 @@ class Arr
     /**
      * Run a map over each nested chunk of items.
      *
+     * @template TKey
      * @template TMapSpreadValue
      *
-     * @param  array  $array
+     * @param  array<TKey, array>  $array
      * @param  callable(mixed...): TMapSpreadValue  $callback
      * @return array<TKey, TMapSpreadValue>
      */
