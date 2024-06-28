@@ -14,7 +14,7 @@ namespace Illuminate\Support\Facades;
  * @method static array getPreviousKeys()
  * @method static \Illuminate\Encryption\Encrypter previousKeys(array $keys)
  *
- * @see \Illuminate\Encryption\Encrypter
+ * @mixin \Illuminate\Encryption\Encrypter
  */
 class Crypt extends Facade
 {

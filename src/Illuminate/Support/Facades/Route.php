@@ -101,7 +101,7 @@ namespace Illuminate\Support\Facades;
  * @method static \Illuminate\Routing\RouteRegistrar withoutMiddleware(array|string $middleware)
  * @method static \Illuminate\Routing\RouteRegistrar withoutScopedBindings()
  *
- * @see \Illuminate\Routing\Router
+ * @mixin \Illuminate\Routing\Router
  */
 class Route extends Facade
 {

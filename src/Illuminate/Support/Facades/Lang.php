@@ -31,7 +31,7 @@ namespace Illuminate\Support\Facades;
  * @method static bool hasMacro(string $name)
  * @method static void flushMacros()
  *
- * @see \Illuminate\Translation\Translator
+ * @mixin \Illuminate\Translation\Translator
  */
 class Lang extends Facade
 {

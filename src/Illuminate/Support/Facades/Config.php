@@ -20,7 +20,7 @@ namespace Illuminate\Support\Facades;
  * @method static bool hasMacro(string $name)
  * @method static void flushMacros()
  *
- * @see \Illuminate\Config\Repository
+ * @mixin \Illuminate\Config\Repository
  */
 class Config extends Facade
 {

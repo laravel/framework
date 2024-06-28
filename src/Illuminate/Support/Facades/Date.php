@@ -85,7 +85,7 @@ use Illuminate\Support\DateFactory;
  * @method static void useYearsOverflow($yearsOverflow = true)
  * @method static \Illuminate\Support\Carbon yesterday($tz = null)
  *
- * @see \Illuminate\Support\DateFactory
+ * @mixin \Illuminate\Support\DateFactory
  */
 class Date extends Facade
 {

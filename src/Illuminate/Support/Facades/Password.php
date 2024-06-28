@@ -16,8 +16,8 @@ use Illuminate\Contracts\Auth\PasswordBroker;
  * @method static bool tokenExists(\Illuminate\Contracts\Auth\CanResetPassword $user, string $token)
  * @method static \Illuminate\Auth\Passwords\TokenRepositoryInterface getRepository()
  *
- * @see \Illuminate\Auth\Passwords\PasswordBrokerManager
- * @see \Illuminate\Auth\Passwords\PasswordBroker
+ * @mixin \Illuminate\Auth\Passwords\PasswordBrokerManager
+ * @mixin \Illuminate\Auth\Passwords\PasswordBroker
  */
 class Password extends Facade
 {

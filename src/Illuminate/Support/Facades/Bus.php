@@ -49,8 +49,8 @@ use Illuminate\Support\Testing\Fakes\BusFake;
  * @method static \Illuminate\Support\Testing\Fakes\BusFake serializeAndRestore(bool $serializeAndRestore = true)
  * @method static array dispatchedBatches()
  *
- * @see \Illuminate\Bus\Dispatcher
- * @see \Illuminate\Support\Testing\Fakes\BusFake
+ * @mixin \Illuminate\Bus\Dispatcher
+ * @mixin \Illuminate\Support\Testing\Fakes\BusFake
  */
 class Bus extends Facade
 {

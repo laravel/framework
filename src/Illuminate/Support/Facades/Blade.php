@@ -45,7 +45,7 @@ namespace Illuminate\Support\Facades;
  * @method static string compileEchos(string $value)
  * @method static string applyEchoHandler(string $value)
  *
- * @see \Illuminate\View\Compilers\BladeCompiler
+ * @mixin \Illuminate\View\Compilers\BladeCompiler
  */
 class Blade extends Facade
 {

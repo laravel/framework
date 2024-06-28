@@ -81,7 +81,7 @@ namespace Illuminate\Support\Facades;
  * @method static void startTranslation(array $replacements = [])
  * @method static string renderTranslation()
  *
- * @see \Illuminate\View\Factory
+ * @mixin \Illuminate\View\Factory
  */
 class View extends Facade
 {

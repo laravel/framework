@@ -110,7 +110,7 @@ use Illuminate\Database\Console\WipeCommand;
  * @method static int transactionLevel()
  * @method static void afterCommit(callable $callback)
  *
- * @see \Illuminate\Database\DatabaseManager
+ * @mixin \Illuminate\Database\DatabaseManager
  */
 class DB extends Facade
 {

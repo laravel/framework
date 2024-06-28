@@ -57,8 +57,8 @@ use Illuminate\Support\Testing\Fakes\MailFake;
  * @method static \Illuminate\Support\Collection queued(string|\Closure $mailable, callable|null $callback = null)
  * @method static bool hasQueued(string $mailable)
  *
- * @see \Illuminate\Mail\MailManager
- * @see \Illuminate\Support\Testing\Fakes\MailFake
+ * @mixin \Illuminate\Mail\MailManager
+ * @mixin \Illuminate\Support\Testing\Fakes\MailFake
  */
 class Mail extends Facade
 {

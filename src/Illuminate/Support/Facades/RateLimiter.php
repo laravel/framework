@@ -18,7 +18,7 @@ namespace Illuminate\Support\Facades;
  * @method static int availableIn(string $key)
  * @method static string cleanRateLimiterKey(string $key)
  *
- * @see \Illuminate\Cache\RateLimiter
+ * @mixin \Illuminate\Cache\RateLimiter
  */
 class RateLimiter extends Facade
 {
