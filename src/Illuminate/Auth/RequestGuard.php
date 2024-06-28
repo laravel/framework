@@ -6,6 +6,7 @@ use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Contracts\Auth\UserProvider;
 use Illuminate\Http\Request;
 use Illuminate\Support\Traits\Macroable;
+use SensitiveParameter;
 
 class RequestGuard implements Guard
 {
@@ -65,7 +66,7 @@ class RequestGuard implements Guard
      * @param  array  $credentials
      * @return bool
      */
-    public function validate(array $credentials = [])
+    public function validate(#[SensitiveParameter] array $credentials = [])
     {
         return ! is_null((new static(
             $this->callback, $credentials['request'], $this->getProvider()

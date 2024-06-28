@@ -218,7 +218,7 @@ class Encrypter implements EncrypterContract, StringEncrypter
      * @param  string  $key
      * @return string
      */
-    protected function hash($iv, #[SensitiveParameter] $value, $key)
+    protected function hash(#[SensitiveParameter] $iv, #[SensitiveParameter] $value, #[SensitiveParameter] $key)
     {
         return hash_hmac('sha256', $iv.$value, $key);
     }
