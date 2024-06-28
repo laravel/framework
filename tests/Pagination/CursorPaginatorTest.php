@@ -79,7 +79,7 @@ class CursorPaginatorTest extends TestCase
         $this->assertSame([['id' => 6], ['id' => 7]], $p->items());
     }
 
-    public function testLengthAwarePaginatorisOnFirstAndLastPage()
+    public function testCursorPaginatorOnFirstAndLastPage()
     {
         $paginator = new CursorPaginator([['id' => 1], ['id' => 2], ['id' => 3], ['id' => 4]], 2, null, [
             'parameters' => ['id'],

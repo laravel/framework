@@ -540,7 +540,7 @@ trait BuildsQueries
     /**
      * Pass the query to a given callback.
      *
-     * @param  callable  $callback
+     * @param  callable($this): mixed  $callback
      * @return $this
      */
     public function tap($callback)

@@ -60,6 +60,10 @@ if (! function_exists('blank')) {
             return count($value) === 0;
         }
 
+        if ($value instanceof Stringable) {
+            return trim((string) $value) === '';
+        }
+
         return empty($value);
     }
 }
@@ -106,7 +110,7 @@ if (! function_exists('e')) {
     /**
      * Encode HTML special characters in a string.
      *
-     * @param  \Illuminate\Contracts\Support\DeferringDisplayableValue|\Illuminate\Contracts\Support\Htmlable|\BackedEnum|string|null  $value
+     * @param  \Illuminate\Contracts\Support\DeferringDisplayableValue|\Illuminate\Contracts\Support\Htmlable|\BackedEnum|string|int|float|null  $value
      * @param  bool  $doubleEncode
      * @return string
      */
@@ -346,9 +350,11 @@ if (! function_exists('tap')) {
     /**
      * Call the given Closure with the given value then return the value.
      *
-     * @param  mixed  $value
-     * @param  callable|null  $callback
-     * @return mixed
+     * @template TValue
+     *
+     * @param  TValue  $value
+     * @param  (callable(TValue): mixed)|null  $callback
+     * @return ($callback is null ? \Illuminate\Support\HigherOrderTapProxy : TValue)
      */
     function tap($value, $callback = null)
     {

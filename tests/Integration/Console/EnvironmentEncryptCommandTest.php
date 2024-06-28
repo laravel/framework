@@ -155,4 +155,24 @@ class EnvironmentEncryptCommandTest extends TestCase
             ->expectsOutputToContain('.env.encrypted')
             ->assertExitCode(0);
     }
+
+    public function testItCanRemoveTheOriginalFile()
+    {
+        $this->filesystem->shouldReceive('exists')
+            ->once()
+            ->andReturn(true)
+            ->shouldReceive('exists')
+            ->once()
+            ->andReturn(false);
+
+        $this->artisan('env:encrypt', ['--prune' => true])
+            ->expectsOutputToContain('.env.encrypted')
+            ->assertExitCode(0);
+
+        $this->filesystem->shouldHaveReceived('put')
+            ->with(base_path('.env.encrypted'), m::any());
+
+        $this->filesystem->shouldHaveReceived('delete')
+            ->with(base_path('.env'));
+    }
 }

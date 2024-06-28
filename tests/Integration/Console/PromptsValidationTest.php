@@ -15,7 +15,7 @@ class PromptsValidationTest extends TestCase
         $app[Kernel::class]->registerCommand(new DummyPromptsValidationCommand());
         $app[Kernel::class]->registerCommand(new DummyPromptsWithLaravelRulesCommand());
         $app[Kernel::class]->registerCommand(new DummyPromptsWithLaravelRulesMessagesAndAttributesCommand());
-        $app[Kernel::class]->registerCommand(new DummyPromptsWithLaravelRulesCommandWithInlineMessagesAndAttibutesCommand());
+        $app[Kernel::class]->registerCommand(new DummyPromptsWithLaravelRulesCommandWithInlineMessagesAndAttributesCommand());
     }
 
     public function testValidationForPrompts()
@@ -37,7 +37,7 @@ class PromptsValidationTest extends TestCase
     public function testValidationWithLaravelRulesInlineMessagesAndAttributes()
     {
         $this
-            ->artisan(DummyPromptsWithLaravelRulesCommandWithInlineMessagesAndAttibutesCommand::class)
+            ->artisan(DummyPromptsWithLaravelRulesCommandWithInlineMessagesAndAttributesCommand::class)
             ->expectsQuestion('What is your name?', '')
             ->expectsOutputToContain('Your full name is mandatory.');
     }
@@ -71,7 +71,7 @@ class DummyPromptsWithLaravelRulesCommand extends Command
     }
 }
 
-class DummyPromptsWithLaravelRulesCommandWithInlineMessagesAndAttibutesCommand extends Command
+class DummyPromptsWithLaravelRulesCommandWithInlineMessagesAndAttributesCommand extends Command
 {
     protected $signature = 'prompts-laravel-rules-inline-test';
 

@@ -1216,7 +1216,13 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
 
     public function testCompileColumns()
     {
-        $statement = $this->getGrammar()->compileColumns('public', 'table');
+        $connection = $this->getConnection();
+        $grammar = $this->getGrammar();
+
+        $connection->shouldReceive('getServerVersion')->once()->andReturn('12.0.0');
+        $grammar->setConnection($connection);
+
+        $statement = $grammar->compileColumns('public', 'table');
 
         $this->assertStringContainsString("where c.relname = 'table' and n.nspname = 'public'", $statement);
     }

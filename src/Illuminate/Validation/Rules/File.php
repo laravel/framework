@@ -219,9 +219,9 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
 
         return round(match (true) {
             Str::endsWith($size, 'kb') => $value * 1,
-            Str::endsWith($size, 'mb') => $value * 1000,
-            Str::endsWith($size, 'gb') => $value * 1000000,
-            Str::endsWith($size, 'tb') => $value * 1000000000,
+            Str::endsWith($size, 'mb') => $value * 1_000,
+            Str::endsWith($size, 'gb') => $value * 1_000_000,
+            Str::endsWith($size, 'tb') => $value * 1_000_000_000,
             default => throw new InvalidArgumentException('Invalid file size suffix.'),
         });
     }

@@ -42,7 +42,7 @@ assertType('int', with(new User(), function ($user): int {
     return 10;
 }));
 
-assertType('mixed', with(new User(), function ($user) {
+assertType('User', with(new User(), function ($user) {
     return $user;
 }));
 assertType('User', with(new User(), function ($user): User {
@@ -67,3 +67,8 @@ assertType('null', transform([], fn () => 1));
 assertType('int|null', rescue(fn () => 123));
 assertType('int', rescue(fn () => 123, 345));
 assertType('int', rescue(fn () => 123, fn () => 345));
+
+assertType('User', tap(new User(), function ($user) {
+    assertType('User', $user);
+}));
+assertType('Illuminate\Support\HigherOrderTapProxy', tap(new User()));

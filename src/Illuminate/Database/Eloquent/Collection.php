@@ -631,7 +631,7 @@ class Collection extends BaseCollection implements QueueableCollection
     /**
      * Get an array with the values of a given key.
      *
-     * @param  string|array<array-key, string>  $value
+     * @param  string|array<array-key, string>|null  $value
      * @param  string|null  $key
      * @return \Illuminate\Support\Collection<array-key, mixed>
      */

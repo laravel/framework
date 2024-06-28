@@ -74,6 +74,8 @@ trait DetectsLostConnections
             'SQLSTATE[HY000]: General error: 3989',
             'went away',
             'No such file or directory',
+            'server is shutting down',
+            'failed to connect to',
         ]);
     }
 }

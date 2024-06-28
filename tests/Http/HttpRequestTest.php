@@ -762,13 +762,16 @@ class HttpRequestTest extends TestCase
         $request = Request::create('/', 'GET', [
             'valid_enum_value' => 'test',
             'invalid_enum_value' => 'invalid',
+            'empty_value_request' => '',
         ]);
 
-        $this->assertNull($request->enum('doesnt_exists', TestEnum::class));
+        $this->assertNull($request->enum('doesnt_exists', TestEnumBacked::class));
 
-        $this->assertEquals(TestEnum::test, $request->enum('valid_enum_value', TestEnum::class));
+        $this->assertEquals(TestEnumBacked::test, $request->enum('valid_enum_value', TestEnumBacked::class));
 
-        $this->assertNull($request->enum('invalid_enum_value', TestEnum::class));
+        $this->assertNull($request->enum('invalid_enum_value', TestEnumBacked::class));
+        $this->assertNull($request->enum('empty_value_request', TestEnumBacked::class));
+        $this->assertNull($request->enum('valid_enum_value', TestEnum::class));
     }
 
     public function testArrayAccess()

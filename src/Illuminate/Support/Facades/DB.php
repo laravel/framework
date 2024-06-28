@@ -2,6 +2,11 @@
 
 namespace Illuminate\Support\Facades;
 
+use Illuminate\Database\Console\Migrations\FreshCommand;
+use Illuminate\Database\Console\Migrations\RefreshCommand;
+use Illuminate\Database\Console\Migrations\ResetCommand;
+use Illuminate\Database\Console\WipeCommand;
+
 /**
  * @method static \Illuminate\Database\Connection connection(string|null $name = null)
  * @method static \Illuminate\Database\ConnectionInterface connectUsing(string $name, array $config, bool $force = false)
@@ -18,7 +23,7 @@ namespace Illuminate\Support\Facades;
  * @method static array getConnections()
  * @method static void setReconnector(callable $reconnector)
  * @method static \Illuminate\Database\DatabaseManager setApplication(\Illuminate\Contracts\Foundation\Application $app)
- * @method static void macro(string $name, object|callable $macro)
+ * @method static void macro(string $name, object|callable $macro, object|callable $macro = null)
  * @method static void mixin(object $mixin, bool $replace = true)
  * @method static bool hasMacro(string $name)
  * @method static void flushMacros()
@@ -109,6 +114,22 @@ namespace Illuminate\Support\Facades;
  */
 class DB extends Facade
 {
+    /**
+     * Indicate if destructive Artisan commands should be prohibited.
+     *
+     * Prohibits: db:wipe, migrate:fresh, migrate:refresh, and migrate:reset
+     *
+     * @param  bool  $prohibit
+     * @return void
+     */
+    public static function prohibitDestructiveCommands(bool $prohibit = true)
+    {
+        FreshCommand::prohibit($prohibit);
+        RefreshCommand::prohibit($prohibit);
+        ResetCommand::prohibit($prohibit);
+        WipeCommand::prohibit($prohibit);
+    }
+
     /**
      * Get the registered name of the component.
      *

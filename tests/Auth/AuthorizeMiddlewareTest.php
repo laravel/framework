@@ -43,9 +43,7 @@ class AuthorizeMiddlewareTest extends TestCase
 
         $this->container->bind(CallableDispatcherContract::class, fn ($app) => new CallableDispatcher($app));
 
-        $this->container->singleton(Registrar::class, function () {
-            return $this->router;
-        });
+        $this->container->instance(Registrar::class, $this->router);
     }
 
     protected function tearDown(): void
@@ -318,10 +316,8 @@ class AuthorizeMiddlewareTest extends TestCase
 
         $request = m::mock(Request::class);
 
-        $nextParam = null;
-
-        $next = function ($param) use (&$nextParam) {
-            $nextParam = $param;
+        $next = function () {
+            //
         };
 
         (new Authorize($this->gate()))

@@ -233,6 +233,31 @@ class Number
     }
 
     /**
+     * Split the given number into pairs of min/max values.
+     *
+     * @param  int|float  $to
+     * @param  int|float  $by
+     * @param  int|float  $offset
+     * @return array
+     */
+    public static function pairs(int|float $to, int|float $by, int|float $offset = 1)
+    {
+        $output = [];
+
+        for ($lower = 0; $lower < $to; $lower += $by) {
+            $upper = $lower + $by;
+
+            if ($upper > $to) {
+                $upper = $to;
+            }
+
+            $output[] = [$lower + $offset, $upper];
+        }
+
+        return $output;
+    }
+
+    /**
      * Execute the given callback using the given locale.
      *
      * @param  string  $locale
