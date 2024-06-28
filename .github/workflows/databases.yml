@@ -9,7 +9,7 @@ on:
 
 jobs:
   mysql_57:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
 
     services:
       mysql:
@@ -55,7 +55,7 @@ jobs:
           DB_COLLATION: utf8mb4_unicode_ci
 
   mysql_8:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
 
     services:
       mysql:
@@ -100,7 +100,7 @@ jobs:
           DB_CONNECTION: mysql
 
   mariadb:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
 
     services:
       mariadb:
@@ -145,7 +145,7 @@ jobs:
           DB_CONNECTION: mariadb
 
   pgsql:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
 
     services:
       postgresql:
