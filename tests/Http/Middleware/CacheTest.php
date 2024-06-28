@@ -15,20 +15,20 @@ class CacheTest extends TestCase
 {
     public function testItCanGenerateDefinitionViaStaticMethod()
     {
-        $signature = (string) Cache::using('max_age=120;no-transform;s_maxage=60;');
+        $signature = Cache::using('max_age=120;no-transform;s_maxage=60;');
         $this->assertSame('Illuminate\Http\Middleware\SetCacheHeaders:max_age=120;no-transform;s_maxage=60;', $signature);
 
-        $signature = (string) Cache::using('max_age=120;no-transform;s_maxage=60');
+        $signature = Cache::using('max_age=120;no-transform;s_maxage=60');
         $this->assertSame('Illuminate\Http\Middleware\SetCacheHeaders:max_age=120;no-transform;s_maxage=60', $signature);
 
-        $signature = (string) Cache::using([
+        $signature = Cache::using([
             'max_age=120',
             'no-transform',
             's_maxage=60',
         ]);
         $this->assertSame('Illuminate\Http\Middleware\SetCacheHeaders:max_age=120;no-transform;s_maxage=60', $signature);
 
-        $signature = (string) Cache::using([
+        $signature = Cache::using([
             'max_age' => 120,
             'no-transform',
             's_maxage' => '60',

@@ -14,13 +14,13 @@ class RequirePasswordTest extends TestCase
 {
     public function testItCanGenerateDefinitionViaStaticMethod()
     {
-        $signature = (string) RequirePassword::using('route.name');
+        $signature = RequirePassword::using('route.name');
         $this->assertSame('Illuminate\Auth\Middleware\RequirePassword:route.name', $signature);
 
-        $signature = (string) RequirePassword::using('route.name', 100);
+        $signature = RequirePassword::using('route.name', 100);
         $this->assertSame('Illuminate\Auth\Middleware\RequirePassword:route.name,100', $signature);
 
-        $signature = (string) RequirePassword::using(passwordTimeoutSeconds: 100);
+        $signature = RequirePassword::using(passwordTimeoutSeconds: 100);
         $this->assertSame('Illuminate\Auth\Middleware\RequirePassword:,100', $signature);
     }
 

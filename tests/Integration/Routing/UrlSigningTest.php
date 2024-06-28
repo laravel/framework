@@ -341,16 +341,16 @@ class UrlSigningTest extends TestCase
 
     public function testItCanGenerateMiddlewareDefinitionViaStaticMethod()
     {
-        $signature = (string) ValidateSignature::relative();
+        $signature = ValidateSignature::relative();
         $this->assertSame('Illuminate\Routing\Middleware\ValidateSignature:relative', $signature);
 
-        $signature = (string) ValidateSignature::absolute();
+        $signature = ValidateSignature::absolute();
         $this->assertSame('Illuminate\Routing\Middleware\ValidateSignature', $signature);
 
-        $signature = (string) ValidateSignature::relative(['foo', 'bar']);
+        $signature = ValidateSignature::relative(['foo', 'bar']);
         $this->assertSame('Illuminate\Routing\Middleware\ValidateSignature:relative,foo,bar', $signature);
 
-        $signature = (string) ValidateSignature::absolute(['foo', 'bar']);
+        $signature = ValidateSignature::absolute(['foo', 'bar']);
         $this->assertSame('Illuminate\Routing\Middleware\ValidateSignature:foo,bar', $signature);
     }
 
