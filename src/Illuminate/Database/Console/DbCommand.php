@@ -8,7 +8,7 @@ use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Process\Process;
 use UnexpectedValueException;
 
-#[AsCommand(name: 'db')]
+#[AsCommand(name: 'db:connect', aliases: ['db'])]
 class DbCommand extends Command
 {
     /**
@@ -16,7 +16,7 @@ class DbCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'db {connection? : The database connection that should be used}
+    protected $signature = 'db:connect {connection? : The database connection that should be used}
                {--read : Connect to the read connection}
                {--write : Connect to the write connection}';
 
@@ -26,6 +26,13 @@ class DbCommand extends Command
      * @var string
      */
     protected $description = 'Start a new database CLI session';
+
+    /**
+     * The console command name aliases.
+     *
+     * @var array
+     */
+    protected $aliases = ['db'];
 
     /**
      * Execute the console command.

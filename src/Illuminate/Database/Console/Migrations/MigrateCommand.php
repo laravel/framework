@@ -16,7 +16,7 @@ use Throwable;
 
 use function Laravel\Prompts\confirm;
 
-#[AsCommand(name: 'migrate')]
+#[AsCommand(name: 'migrate:run', aliases: ['migrate'])]
 class MigrateCommand extends BaseCommand implements Isolatable
 {
     use ConfirmableTrait;
@@ -26,7 +26,7 @@ class MigrateCommand extends BaseCommand implements Isolatable
      *
      * @var string
      */
-    protected $signature = 'migrate {--database= : The database connection to use}
+    protected $signature = 'migrate:run {--database= : The database connection to use}
                 {--force : Force the operation to run when in production}
                 {--path=* : The path(s) to the migrations files to be executed}
                 {--realpath : Indicate any provided migration file paths are pre-resolved absolute paths}
@@ -43,6 +43,13 @@ class MigrateCommand extends BaseCommand implements Isolatable
      * @var string
      */
     protected $description = 'Run the database migrations';
+
+    /**
+     * The console command name aliases.
+     *
+     * @var array
+     */
+    protected $aliases = ['migrate'];
 
     /**
      * The migrator instance.
