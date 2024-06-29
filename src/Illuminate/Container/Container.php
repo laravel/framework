@@ -10,6 +10,7 @@ use Illuminate\Contracts\Container\CircularDependencyException;
 use Illuminate\Contracts\Container\Container as ContainerContract;
 use Illuminate\Contracts\Container\ContextualAttribute;
 use LogicException;
+use ReflectionAttribute;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionFunction;
@@ -950,7 +951,11 @@ class Container implements ArrayAccess, ContainerContract
         if (is_null($constructor)) {
             array_pop($this->buildStack);
 
-            return tap(new $concrete, fn ($instance) => $this->fireAfterResolvingAttributeCallbacks($reflector->getAttributes(), $instance));
+            $this->fireAfterResolvingAttributeCallbacks(
+                $reflector->getAttributes(), $instance = new $concrete
+            );
+
+            return $instance;
         }
 
         $dependencies = $constructor->getParameters();
@@ -968,7 +973,11 @@ class Container implements ArrayAccess, ContainerContract
 
         array_pop($this->buildStack);
 
-        return tap($reflector->newInstanceArgs($instances), fn ($instance) => $this->fireAfterResolvingAttributeCallbacks($reflector->getAttributes(), $instance));
+        $this->fireAfterResolvingAttributeCallbacks(
+            $reflector->getAttributes(), $instance = $reflector->newInstanceArgs($instances)
+        );
+
+        return $instance;
     }
 
     /**
@@ -1058,7 +1067,7 @@ class Container implements ArrayAccess, ContainerContract
      */
     protected function getContextualAttributeFromDependency($dependency)
     {
-        return $dependency->getAttributes(ContextualAttribute::class, \ReflectionAttribute::IS_INSTANCEOF)[0] ?? null;
+        return $dependency->getAttributes(ContextualAttribute::class, ReflectionAttribute::IS_INSTANCEOF)[0] ?? null;
     }
 
     /**
@@ -1147,7 +1156,7 @@ class Container implements ArrayAccess, ContainerContract
      * @param  \ReflectionAttribute  $attribute
      * @return mixed
      */
-    protected function resolveFromAttribute(\ReflectionAttribute $attribute)
+    protected function resolveFromAttribute(ReflectionAttribute $attribute)
     {
         $handler = $this->contextualAttributes[$attribute->getName()] ?? null;
 
