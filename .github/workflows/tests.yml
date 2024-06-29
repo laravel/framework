@@ -141,7 +141,7 @@ jobs:
           timeout_minutes: 5
           max_attempts: 5
           command: composer require guzzlehttp/psr7:^2.4 --no-interaction --no-update
-          shell: powershell
+          shell: bash
 
       - name: Set PHPUnit
         uses: nick-fields/retry@v3
@@ -149,7 +149,7 @@ jobs:
           timeout_minutes: 5
           max_attempts: 5
           command: composer require phpunit/phpunit:^${{ matrix.phpunit }} --dev --no-interaction --no-update
-          shell: powershell
+          shell: bash
 
       - name: Install dependencies
         uses: nick-fields/retry@v3
