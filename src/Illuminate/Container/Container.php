@@ -1161,12 +1161,17 @@ class Container implements ArrayAccess, ContainerContract
     protected function resolveFromAttribute(ReflectionAttribute $attribute)
     {
         $handler = $this->contextualAttributes[$attribute->getName()] ?? null;
+        $instance = $attribute->newInstance();
 
-        if ($handler === null) {
+        if (is_null($handler) && method_exists($instance, 'resolve')) {
+            $handler = $instance->resolve(...);
+        }
+
+        if (is_null($handler)) {
             throw new BindingResolutionException("Contextual binding attribute [{$attribute->getName()}] has no registered handler.");
         }
 
-        return $handler($attribute->newInstance(), $this);
+        return $handler($instance, $this);
     }
 
     /**

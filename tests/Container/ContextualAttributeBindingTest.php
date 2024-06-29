@@ -32,6 +32,7 @@ class ContextualAttributeBindingTest extends TestCase
         $this->assertInstanceOf(ContainerTestHasAttributeThatResolvesToImplB::class, $classB);
         $this->assertInstanceOf(ContainerTestImplB::class, $classB->property);
     }
+
     public function testScalarDependencyCanBeResolvedFromAttributeBinding()
     {
         $container = new Container;
@@ -49,6 +50,21 @@ class ContextualAttributeBindingTest extends TestCase
 
         $this->assertInstanceOf(ContainerTestHasConfigValueProperty::class, $class);
         $this->assertEquals('Europe/Paris', $class->timezone);
+    }
+
+    public function testScalarDependencyCanBeResolvedFromAttributeResolveMethod()
+    {
+        $container = new Container;
+        $container->singleton('config', fn () => new Repository([
+            'app' => [
+                'env' => 'production'
+            ]
+        ]));
+
+        $class = $container->make(ContainerTestHasConfigValueWithResolveProperty::class);
+
+        $this->assertInstanceOf(ContainerTestHasConfigValueWithResolveProperty::class, $class);
+        $this->assertEquals('production', $class->env);
     }
 }
 
@@ -105,6 +121,30 @@ final class ContainerTestHasConfigValueProperty
     public function __construct(
         #[ContainerTestConfigValue('app.timezone')]
         public string $timezone
+    ) {
+    }
+}
+
+
+#[Attribute(Attribute::TARGET_PARAMETER)]
+final class ContainerTestConfigValueWithResolve implements ContextualAttribute
+{
+    public function __construct(
+        public readonly string $key
+    ) {
+    }
+    
+    public function resolve(self $attribute, Container $container): string
+    {
+        return $container->make('config')->get($attribute->key);
+    }
+}
+
+final class ContainerTestHasConfigValueWithResolveProperty
+{
+    public function __construct(
+        #[ContainerTestConfigValueWithResolve('app.env')]
+        public string $env
     ) {
     }
 }
