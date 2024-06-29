@@ -104,7 +104,7 @@ jobs:
             !vendor/**/.gitignore
 
   windows_tests:
-    runs-on: windows-2019
+    runs-on: windows-2022
 
     strategy:
       fail-fast: true
@@ -140,14 +140,16 @@ jobs:
         with:
           timeout_minutes: 5
           max_attempts: 5
-          command: composer require guzzlehttp/psr7:~2.4 --no-interaction --no-update
+          command: composer require guzzlehttp/psr7:^2.4 --no-interaction --no-update
+          shell: bash
 
       - name: Set PHPUnit
         uses: nick-fields/retry@v3
         with:
           timeout_minutes: 5
           max_attempts: 5
-          command: composer require phpunit/phpunit:~${{ matrix.phpunit }} --dev --no-interaction --no-update
+          command: composer require phpunit/phpunit:^${{ matrix.phpunit }} --dev --no-interaction --no-update
+          shell: bash
 
       - name: Install dependencies
         uses: nick-fields/retry@v3
