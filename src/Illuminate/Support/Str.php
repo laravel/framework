@@ -85,7 +85,14 @@ class Str
      */
     public static function after($subject, $search)
     {
-        return $search === '' ? $subject : array_reverse(explode($search, $subject, 2))[0];
+        if ($search === '') {
+            return $subject;
+        }
+
+        $explodedSubject = explode($search, $subject, 2);
+
+        // if it was exploded in less than one part so search string was not found in it
+        return count($explodedSubject) > 1 ? array_reverse($explodedSubject)[0] : '';
     }
 
     /**
@@ -104,7 +111,7 @@ class Str
         $position = strrpos($subject, (string) $search);
 
         if ($position === false) {
-            return $subject;
+            return '';
         }
 
         return substr($subject, $position + strlen($search));
@@ -150,7 +157,7 @@ class Str
 
         $result = strstr($subject, (string) $search, true);
 
-        return $result === false ? $subject : $result;
+        return $result === false ? '' : $result;
     }
 
     /**
@@ -169,7 +176,7 @@ class Str
         $pos = mb_strrpos($subject, $search);
 
         if ($pos === false) {
-            return $subject;
+            return '';
         }
 
         return static::substr($subject, 0, $pos);
