@@ -38,8 +38,8 @@ class ContextualAttributeBindingTest extends TestCase
         $container = new Container;
         $container->singleton('config', fn () => new Repository([
             'app' => [
-                'timezone' => 'Europe/Paris'
-            ]
+                'timezone' => 'Europe/Paris',
+            ],
         ]));
 
         $container->whenHas(ContainerTestConfigValue::class, function (ContainerTestConfigValue $attribute, Container $container) {
@@ -57,8 +57,8 @@ class ContextualAttributeBindingTest extends TestCase
         $container = new Container;
         $container->singleton('config', fn () => new Repository([
             'app' => [
-                'env' => 'production'
-            ]
+                'env' => 'production',
+            ],
         ]));
 
         $class = $container->make(ContainerTestHasConfigValueWithResolveProperty::class);
@@ -125,7 +125,6 @@ final class ContainerTestHasConfigValueProperty
     }
 }
 
-
 #[Attribute(Attribute::TARGET_PARAMETER)]
 final class ContainerTestConfigValueWithResolve implements ContextualAttribute
 {
@@ -133,7 +132,7 @@ final class ContainerTestConfigValueWithResolve implements ContextualAttribute
         public readonly string $key
     ) {
     }
-    
+
     public function resolve(self $attribute, Container $container): string
     {
         return $container->make('config')->get($attribute->key);
