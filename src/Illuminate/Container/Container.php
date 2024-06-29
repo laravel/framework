@@ -1002,14 +1002,16 @@ class Container implements ArrayAccess, ContainerContract
                 continue;
             }
 
+            $result = null;
+
             if (! is_null($attribute = $this->getContextualAttributeFromDependency($dependency))) {
-                $results[] = $this->resolveFromAttribute($attribute);
+                $result = $this->resolveFromAttribute($attribute);
             }
 
             // If the class is null, it means the dependency is a string or some other
             // primitive type which we can not resolve since it is not a class and
             // we will just bomb out with an error since we have no-where to go.
-            $result = is_null(Util::getParameterClassName($dependency))
+            $result ??= is_null(Util::getParameterClassName($dependency))
                             ? $this->resolvePrimitive($dependency)
                             : $this->resolveClass($dependency);
 
@@ -1164,7 +1166,7 @@ class Container implements ArrayAccess, ContainerContract
             throw new BindingResolutionException("Contextual binding attribute [{$attribute->getName()}] has no registered handler.");
         }
 
-        return $handler($attribute->newInstance());
+        return $handler($attribute->newInstance(), $this);
     }
 
     /**

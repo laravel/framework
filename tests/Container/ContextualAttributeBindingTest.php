@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Container;
 
 use Attribute;
+use Illuminate\Config\Repository;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Container\ContextualAttribute;
 use PHPUnit\Framework\TestCase;
@@ -30,6 +31,24 @@ class ContextualAttributeBindingTest extends TestCase
 
         $this->assertInstanceOf(ContainerTestHasAttributeThatResolvesToImplB::class, $classB);
         $this->assertInstanceOf(ContainerTestImplB::class, $classB->property);
+    }
+    public function testScalarDependencyCanBeResolvedFromAttributeBinding()
+    {
+        $container = new Container;
+        $container->singleton('config', fn () => new Repository([
+            'app' => [
+                'timezone' => 'Europe/Paris'
+            ]
+        ]));
+
+        $container->whenHas(ContainerTestConfigValue::class, function (ContainerTestConfigValue $attribute, Container $container) {
+            return $container->make('config')->get($attribute->key);
+        });
+
+        $class = $container->make(ContainerTestHasConfigValueProperty::class);
+
+        $this->assertInstanceOf(ContainerTestHasConfigValueProperty::class, $class);
+        $this->assertEquals('Europe/Paris', $class->timezone);
     }
 }
 
@@ -68,6 +87,24 @@ final class ContainerTestHasAttributeThatResolvesToImplB
     public function __construct(
         #[ContainerTestAttributeThatResolvesContractImpl('B')]
         public readonly ContainerTestContract $property
+    ) {
+    }
+}
+
+#[Attribute(Attribute::TARGET_PARAMETER)]
+final class ContainerTestConfigValue implements ContextualAttribute
+{
+    public function __construct(
+        public readonly string $key
+    ) {
+    }
+}
+
+final class ContainerTestHasConfigValueProperty
+{
+    public function __construct(
+        #[ContainerTestConfigValue('app.timezone')]
+        public string $timezone
     ) {
     }
 }
