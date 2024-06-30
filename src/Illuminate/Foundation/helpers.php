@@ -299,7 +299,6 @@ if (! function_exists('context')) {
      *
      * @param  array|string|null  $key
      * @param  mixed  $default
-     * @return mixed|\Illuminate\Log\Context\Repository
      * @return ($key is string ? mixed : \Illuminate\Log\Context\Repository)
      */
     function context($key = null, $default = null)
@@ -405,7 +404,6 @@ if (! function_exists('dispatch')) {
      * Dispatch a job to its appropriate handler.
      *
      * @param  mixed  $job
-     * @return \Illuminate\Foundation\Bus\PendingDispatch
      * @return ($job is \Closure ? \Illuminate\Foundation\Bus\PendingClosureDispatch : \Illuminate\Foundation\Bus\PendingDispatch)
      */
     function dispatch($job)
