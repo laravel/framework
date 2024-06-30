@@ -276,7 +276,7 @@ class SupportStrTest extends TestCase
         $this->assertSame('han', Str::before('hannah', 'nah'));
         $this->assertSame('ha', Str::before('hannah', 'n'));
         $this->assertSame('ééé ', Str::before('ééé hannah', 'han'));
-        $this->assertSame('hannah', Str::before('hannah', 'xxxx'));
+        $this->assertSame('', Str::before('hannah', 'xxxx'));
         $this->assertSame('hannah', Str::before('hannah', ''));
         $this->assertSame('han', Str::before('han0nah', '0'));
         $this->assertSame('han', Str::before('han0nah', 0));
@@ -295,7 +295,7 @@ class SupportStrTest extends TestCase
         $this->assertSame('yvet', Str::beforeLast('yvette', 't'));
         $this->assertSame('ééé ', Str::beforeLast('ééé yvette', 'yve'));
         $this->assertSame('', Str::beforeLast('yvette', 'yve'));
-        $this->assertSame('yvette', Str::beforeLast('yvette', 'xxxx'));
+        $this->assertSame('', Str::beforeLast('yvette', 'xxxx'));
         $this->assertSame('yvette', Str::beforeLast('yvette', ''));
         $this->assertSame('yv0et', Str::beforeLast('yv0et0te', '0'));
         $this->assertSame('yv0et', Str::beforeLast('yv0et0te', 0));
@@ -344,7 +344,7 @@ class SupportStrTest extends TestCase
         $this->assertSame('nah', Str::after('hannah', 'han'));
         $this->assertSame('nah', Str::after('hannah', 'n'));
         $this->assertSame('nah', Str::after('ééé hannah', 'han'));
-        $this->assertSame('hannah', Str::after('hannah', 'xxxx'));
+        $this->assertSame('', Str::after('hannah', 'xxxx'));
         $this->assertSame('hannah', Str::after('hannah', ''));
         $this->assertSame('nah', Str::after('han0nah', '0'));
         $this->assertSame('nah', Str::after('han0nah', 0));
@@ -357,7 +357,7 @@ class SupportStrTest extends TestCase
         $this->assertSame('e', Str::afterLast('yvette', 't'));
         $this->assertSame('e', Str::afterLast('ééé yvette', 't'));
         $this->assertSame('', Str::afterLast('yvette', 'tte'));
-        $this->assertSame('yvette', Str::afterLast('yvette', 'xxxx'));
+        $this->assertSame('', Str::afterLast('yvette', 'xxxx'));
         $this->assertSame('yvette', Str::afterLast('yvette', ''));
         $this->assertSame('te', Str::afterLast('yv0et0te', '0'));
         $this->assertSame('te', Str::afterLast('yv0et0te', 0));
