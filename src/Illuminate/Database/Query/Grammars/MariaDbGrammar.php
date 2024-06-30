@@ -32,4 +32,15 @@ class MariaDbGrammar extends MySqlGrammar
     {
         return false;
     }
+
+    /**
+     * Compile a "JSON value cast" statement into SQL.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    public function compileJsonValueCast($value)
+    {
+        return "json_query($value, '$')";
+    }
 }
