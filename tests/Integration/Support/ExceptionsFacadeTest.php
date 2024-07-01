@@ -144,7 +144,7 @@ class ExceptionsFacadeTest extends TestCase
     public function testFakeAssertNotReportedMayFail()
     {
         $this->expectException(ExpectationFailedException::class);
-        $this->expectExceptionMessage('The expected [RuntimeException] exception was not reported.');
+        $this->expectExceptionMessage('The expected [RuntimeException] exception was reported.');
 
         Exceptions::fake();
 
@@ -156,7 +156,7 @@ class ExceptionsFacadeTest extends TestCase
     public function testFakeAssertNotReportedAsClosureMayFail()
     {
         $this->expectException(ExpectationFailedException::class);
-        $this->expectExceptionMessage('The expected [RuntimeException] exception was not reported.');
+        $this->expectExceptionMessage('The expected [RuntimeException] exception was reported.');
 
         Exceptions::fake();
 
