@@ -66,6 +66,15 @@ class ContextualAttributeBindingTest extends TestCase
         $this->assertInstanceOf(ContainerTestHasConfigValueWithResolveProperty::class, $class);
         $this->assertEquals('production', $class->env);
     }
+
+    public function testDependencyWithAfterCallbackAttributeCanBeResolved()
+    {
+        $container = new Container;
+
+        $class = $container->make(ContainerTestHasConfigValueWithResolvePropertyAndAfterCallback::class);
+
+        $this->assertEquals('Developer', $class->person->role);
+    }
 }
 
 #[Attribute(Attribute::TARGET_PARAMETER)]
@@ -144,6 +153,29 @@ final class ContainerTestHasConfigValueWithResolveProperty
     public function __construct(
         #[ContainerTestConfigValueWithResolve('app.env')]
         public string $env
+    ) {
+    }
+}
+
+#[Attribute(Attribute::TARGET_PARAMETER)]
+final class ContainerTestConfigValueWithResolveAndAfter implements ContextualAttribute
+{
+    public function resolve(self $attribute, Container $container): object
+    {
+        return (object) ['name' => 'Taylor'];
+    }
+
+    public function after(self $attribute, object $value, Container $container): void
+    {
+        $value->role = 'Developer';
+    }
+}
+
+final class ContainerTestHasConfigValueWithResolvePropertyAndAfterCallback
+{
+    public function __construct(
+        #[ContainerTestConfigValueWithResolveAndAfter]
+        public object $person
     ) {
     }
 }

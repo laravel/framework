@@ -1360,7 +1360,19 @@ class Container implements ArrayAccess, ContainerContract
     protected function fireAfterResolvingAttributeCallbacks(array $attributes, $object)
     {
         foreach ($attributes as $attribute) {
-            foreach ($this->getCallbacksForType($attribute->getName(), $object, $this->afterResolvingAttributeCallbacks) as $callback) {
+            if (is_a($attribute->getName(), ContextualAttribute::class, true)) {
+                $instance = $attribute->newInstance();
+
+                if (method_exists($instance, 'after')) {
+                    $instance->after($instance, $object, $this);
+                }
+            }
+
+            $callbacks = $this->getCallbacksForType(
+                $attribute->getName(), $object, $this->afterResolvingAttributeCallbacks
+            );
+
+            foreach ($callbacks as $callback) {
                 $callback($attribute->newInstance(), $object, $this);
             }
         }
