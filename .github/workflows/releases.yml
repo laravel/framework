@@ -27,17 +27,15 @@ jobs:
       - name: Remove optional "v" prefix
         id: version
         run: |
-          VERSION=${{ inputs.version }}
           echo "version=${VERSION#v}" >> "$GITHUB_OUTPUT"
+        env:
+          VERSION: ${{ inputs.version }}
 
       - name: Check if branch and version match
         id: guard
         run: |
           MAJOR_VERSION="${NUMERIC_VERSION%%.*}"
           BRANCH_MAJOR_VERSION="${BRANCH%%.*}"
-
-          echo "MAJOR_VERSION=$(echo $MAJOR_VERSION)" >> $GITHUB_OUTPUT;
-          echo "BRANCH_MAJOR_VERSION=$(echo $BRANCH_MAJOR_VERSION)" >> $GITHUB_OUTPUT;
 
           if [ "$MAJOR_VERSION" != "$BRANCH_MAJOR_VERSION" ]; then
             echo "Mismatched versions! Aborting."
@@ -47,7 +45,7 @@ jobs:
             VERSION_MISMATCH='false';
           fi
 
-          echo "VERSION_MISMATCH=$(echo $VERSION_MISMATCH)" >> $GITHUB_OUTPUT;
+          echo "VERSION_MISMATCH=$(echo $VERSION_MISMATCH)" >> "$GITHUB_OUTPUT";
         env:
           BRANCH: ${{ github.ref_name }}
           NUMERIC_VERSION: ${{ steps.version.outputs.version }}
@@ -90,9 +88,30 @@ jobs:
       - name: Cleanup release notes
         id: cleaned-notes
         run: |
-          RELEASE_NOTES=$(echo $RELEASE_NOTES | sed '/## What/d')
-          RELEASE_NOTES=$(echo $RELEASE_NOTES | sed '/## New Contributors/,$d')
-          echo "notes=${RELEASE_NOTES}" >> "$GITHUB_OUTPUT"
+          START_FROM=$(echo -n "$RELEASE_NOTES" | awk "/What's Changed/{ print NR; exit }" -)
+          DROP_FROM_CONTRIBUTORS=$(echo -n "$RELEASE_NOTES" | awk "/New Contributors/{ print NR; exit }" -)
+          DROP_FROM_FULL_CHANGELOG=$(echo -n "$RELEASE_NOTES" | awk "/Full Changelog/{ print NR; exit }" -)
+
+          # Drop everything starting from "Full Changelog"
+          if [ ! -z "$DROP_FROM_FULL_CHANGELOG" ]; then
+              RELEASE_NOTES=$(echo -n "$RELEASE_NOTES" | sed "${DROP_FROM_FULL_CHANGELOG},$ d")
+          fi
+
+          # Drop everything starting from "New Contributors"
+          if [ ! -z "$DROP_FROM_CONTRIBUTORS" ]; then
+              RELEASE_NOTES=$(echo -n "$RELEASE_NOTES" | sed "${DROP_FROM_CONTRIBUTORS},$ d")
+          fi
+
+          # Drop the line "What's Changed"
+          if [ ! -z "$START_FROM" ]; then
+              RELEASE_NOTES=$(echo -n "$RELEASE_NOTES" | sed "${START_FROM}d")
+          fi
+
+          {
+            echo 'notes<<EOF'
+            echo "$RELEASE_NOTES"
+            echo EOF
+          } >> "$GITHUB_OUTPUT";
         env:
           RELEASE_NOTES: ${{ steps.generated-notes.outputs.release-notes }}
 
@@ -105,7 +124,7 @@ jobs:
           name: v${{ steps.version.outputs.version }}
           body: ${{ steps.cleaned-notes.outputs.notes }}
           target_commitish: ${{ github.ref_name }}
-          make_latest: 'legacy'
+          make_latest: "${{ github.ref_name == github.event.repository.default_branch }}"
 
   update-changelog:
     needs: release
