@@ -99,6 +99,25 @@ if (! function_exists('class_uses_recursive')) {
     }
 }
 
+if (! function_exists('coalesce')) {
+    /**
+     * Returns the first non-null value from the given arguments.
+     *
+     * @param mixed ...$values
+     * @return mixed|null
+     */
+    function coalesce(...$values)
+    {
+        foreach ($values as $value) {
+            if ($value !== null) {
+                return $value;
+            }
+        }
+
+        return null;
+    }
+}
+
 if (! function_exists('e')) {
     /**
      * Encode HTML special characters in a string.
