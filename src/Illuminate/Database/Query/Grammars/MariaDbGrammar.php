@@ -23,6 +23,17 @@ class MariaDbGrammar extends MySqlGrammar
     }
 
     /**
+     * Compile a "JSON value cast" statement into SQL.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    public function compileJsonValueCast($value)
+    {
+        return "json_query({$value}, '$')";
+    }
+
+    /**
      * Determine whether to use a legacy group limit clause for MySQL < 8.0.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
