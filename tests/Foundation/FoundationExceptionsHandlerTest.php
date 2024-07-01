@@ -22,9 +22,12 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
 use Illuminate\Routing\ResponseFactory;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Validator as FacadesValidator;
 use Illuminate\Support\Lottery;
 use Illuminate\Support\MessageBag;
 use Illuminate\Testing\Assert;
+use Illuminate\Translation\ArrayLoader;
+use Illuminate\Translation\Translator;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Validator;
 use InvalidArgumentException;
@@ -535,6 +538,63 @@ class FoundationExceptionsHandlerTest extends TestCase
         }
     }
 
+    public function testItAssertsValidationKeys()
+    {
+        $this->mockValidatorFacadeMake();
+        
+        $this->expectValidationErrors(function () {
+            throw ValidationException::withMessages([
+                'some_key' => 'Some error message',
+            ]);
+        }, ['some_key']);
+
+        $this->expectValidationErrors(function () {
+            throw ValidationException::withMessages([
+                'some_key' => 'Some error message',
+                'another_key' => 'Another error message',
+            ]);
+        }, ['some_key', 'another_key']);
+
+        $this->expectValidationErrors(function () {
+            throw ValidationException::withMessages([
+                'some_key' => 'Some error message',
+                'another_key' => 'Another error message',
+            ]);
+        }, ['another_key']);
+    }
+
+    public function testItFailsToAssertGenericException()
+    {
+        $this->mockValidatorFacadeMake();
+        $this->expectException(AssertionFailedError::class);
+
+        $this->expectValidationErrors(function () {
+            throw new Exception;
+        }, ['some_key']);
+    }
+
+    public function testItFailsToAssertIncorrectKey()
+    {
+        $this->mockValidatorFacadeMake();
+        $this->expectException(AssertionFailedError::class);
+
+        $this->expectValidationErrors(function () {
+            throw ValidationException::withMessages([
+                'some_key' => 'Some error message',
+            ]);
+        }, ['some_other_key']);
+    }
+
+    public function testItFailsToAssertIfNoExceptionIsThrown()
+    {
+        $this->mockValidatorFacadeMake();
+        $this->expectException(AssertionFailedError::class);
+
+        $this->expectValidationErrors(function () {
+            // Do nothing
+        }, ['some_key']);
+    }
+
     public function testItReportsDuplicateExceptions()
     {
         $reported = [];
@@ -840,6 +900,17 @@ class FoundationExceptionsHandlerTest extends TestCase
         $this->assertSame(4, $limiter->attempted);
         $this->assertCount(2, $reported);
         $this->assertSame('Something in the app went wrong 2.', $reported[1]->getMessage());
+    }
+
+    protected function mockValidatorFacadeMake(): void
+    {
+        FacadesValidator::shouldReceive('make')->andReturn(
+            new Validator(
+                new Translator(new ArrayLoader, 'en'),
+                [],
+                [],
+            ),
+        );
     }
 }
 

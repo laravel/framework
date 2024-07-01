@@ -206,4 +206,48 @@ trait InteractsWithExceptionHandling
 
         return $this;
     }
+
+    /**
+     * Assert that the given callback throws a ValidationException with the given error keys.
+     *
+     * @param  Closure  $test
+     * @param  array<string>  $keys
+     * @throws \PHPUnit\Framework\AssertionFailedError
+     * @return $this
+     */
+    protected function expectValidationErrors(Closure $test, array $keys)
+    {
+        $thrown = true;
+
+        try {
+            $test();
+
+            $thrown = false;
+        } catch (ValidationException $exception) {
+            $errors = $exception->errors();
+
+            foreach ($keys as $key) {
+                Assert::assertArrayHasKey(
+                    $key,
+                    $errors,
+                    sprintf('Failed asserting that key "%s" was invalid', $key),
+                );
+            }
+        } catch (Throwable $exception) {
+            Assert::fail(
+                sprintf(
+                    'Failed asserting that exception of type "%s" is an instance of "%s".',
+                    get_class($exception),
+                    ValidationException::class,
+                ),
+            );
+        }
+
+        Assert::assertTrue(
+            $thrown,
+            sprintf('Failed asserting that exception of type "%s" is thrown.', ValidationException::class),
+        );
+
+        return $this;
+    }
 }
