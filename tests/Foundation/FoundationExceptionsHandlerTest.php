@@ -541,7 +541,7 @@ class FoundationExceptionsHandlerTest extends TestCase
     public function testItAssertsValidationKeys()
     {
         $this->mockValidatorFacadeMake();
-        
+
         $this->expectValidationErrors(function () {
             throw ValidationException::withMessages([
                 'some_key' => 'Some error message',

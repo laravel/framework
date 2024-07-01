@@ -212,8 +212,9 @@ trait InteractsWithExceptionHandling
      *
      * @param  Closure  $test
      * @param  array<string>  $keys
-     * @throws \PHPUnit\Framework\AssertionFailedError
      * @return $this
+     *
+     * @throws \PHPUnit\Framework\AssertionFailedError
      */
     protected function expectValidationErrors(Closure $test, array $keys)
     {
