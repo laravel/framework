@@ -197,7 +197,7 @@ class Container implements ArrayAccess, ContainerContract
      * @param  \Closure  $handler
      * @return void
      */
-    public function whenHas(string $attribute, Closure $handler)
+    public function whenHasAttribute(string $attribute, Closure $handler)
     {
         $this->contextualAttributes[$attribute] = $handler;
     }

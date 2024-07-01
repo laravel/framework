@@ -15,7 +15,7 @@ class ContextualAttributeBindingTest extends TestCase
         $container = new Container;
 
         $container->bind(ContainerTestContract::class, fn () => new ContainerTestImplB);
-        $container->whenHas(ContainerTestAttributeThatResolvesContractImpl::class, function (ContainerTestAttributeThatResolvesContractImpl $attribute) {
+        $container->whenHasAttribute(ContainerTestAttributeThatResolvesContractImpl::class, function (ContainerTestAttributeThatResolvesContractImpl $attribute) {
             return match ($attribute->name) {
                 'A' => new ContainerTestImplA,
                 'B' => new ContainerTestImplB
@@ -42,7 +42,7 @@ class ContextualAttributeBindingTest extends TestCase
             ],
         ]));
 
-        $container->whenHas(ContainerTestConfigValue::class, function (ContainerTestConfigValue $attribute, Container $container) {
+        $container->whenHasAttribute(ContainerTestConfigValue::class, function (ContainerTestConfigValue $attribute, Container $container) {
             return $container->make('config')->get($attribute->key);
         });
 
