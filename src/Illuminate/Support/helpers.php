@@ -103,7 +103,7 @@ if (! function_exists('coalesce')) {
     /**
      * Returns the first non-null value from the given arguments.
      *
-     * @param mixed ...$values
+     * @param  mixed  ...$values
      * @return mixed|null
      */
     function coalesce(...$values)
