@@ -1161,6 +1161,7 @@ class Container implements ArrayAccess, ContainerContract
     protected function resolveFromAttribute(ReflectionAttribute $attribute)
     {
         $handler = $this->contextualAttributes[$attribute->getName()] ?? null;
+
         $instance = $attribute->newInstance();
 
         if (is_null($handler) && method_exists($instance, 'resolve')) {
