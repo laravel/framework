@@ -13,6 +13,9 @@ use Illuminate\Database\Query\Expression;
 use Illuminate\Support\Traits\ForwardsCalls;
 use Illuminate\Support\Traits\Macroable;
 
+/**
+ * @template T of \Illuminate\Database\Eloquent\Model
+ */
 abstract class Relation implements BuilderContract
 {
     use ForwardsCalls, Macroable {
@@ -157,7 +160,7 @@ abstract class Relation implements BuilderContract
     /**
      * Get the relationship for eager loading.
      *
-     * @return \Illuminate\Database\Eloquent\Collection
+     * @return \Illuminate\Database\Eloquent\Collection<mixed, T>
      */
     public function getEager()
     {
@@ -170,7 +173,7 @@ abstract class Relation implements BuilderContract
      * Execute the query and get the first result if it's the sole matching record.
      *
      * @param  array|string  $columns
-     * @return \Illuminate\Database\Eloquent\Model
+     * @return T
      *
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException<\Illuminate\Database\Eloquent\Model>
      * @throws \Illuminate\Database\MultipleRecordsFoundException
@@ -196,7 +199,7 @@ abstract class Relation implements BuilderContract
      * Execute the query as a "select" statement.
      *
      * @param  array  $columns
-     * @return \Illuminate\Database\Eloquent\Collection
+     * @return \Illuminate\Database\Eloquent\Collection<mixed, T>
      */
     public function get($columns = ['*'])
     {
@@ -349,7 +352,7 @@ abstract class Relation implements BuilderContract
     /**
      * Get the related model of the relation.
      *
-     * @return \Illuminate\Database\Eloquent\Model
+     * @return T
      */
     public function getRelated()
     {

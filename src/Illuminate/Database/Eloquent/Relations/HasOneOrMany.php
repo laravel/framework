@@ -8,6 +8,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithDictionary;
 use Illuminate\Database\UniqueConstraintViolationException;
 
+/**
+ * @template T of \Illuminate\Database\Eloquent\Model
+ *
+ * @extends Relation<T>
+ */
 abstract class HasOneOrMany extends Relation
 {
     use InteractsWithDictionary;
@@ -47,7 +52,7 @@ abstract class HasOneOrMany extends Relation
      * Create and return an un-saved instance of the related model.
      *
      * @param  array  $attributes
-     * @return \Illuminate\Database\Eloquent\Model
+     * @return T
      */
     public function make(array $attributes = [])
     {
@@ -60,7 +65,7 @@ abstract class HasOneOrMany extends Relation
      * Create and return an un-saved instance of the related models.
      *
      * @param  iterable  $records
-     * @return \Illuminate\Database\Eloquent\Collection
+     * @return \Illuminate\Database\Eloquent\Collection<mixed, T>
      */
     public function makeMany($records)
     {
@@ -195,7 +200,7 @@ abstract class HasOneOrMany extends Relation
      *
      * @param  mixed  $id
      * @param  array  $columns
-     * @return \Illuminate\Support\Collection|\Illuminate\Database\Eloquent\Model
+     * @return \Illuminate\Support\Collection<mixed, T>|T
      */
     public function findOrNew($id, $columns = ['*'])
     {
@@ -213,7 +218,7 @@ abstract class HasOneOrMany extends Relation
      *
      * @param  array  $attributes
      * @param  array  $values
-     * @return \Illuminate\Database\Eloquent\Model
+     * @return T
      */
     public function firstOrNew(array $attributes = [], array $values = [])
     {
@@ -231,7 +236,7 @@ abstract class HasOneOrMany extends Relation
      *
      * @param  array  $attributes
      * @param  array  $values
-     * @return \Illuminate\Database\Eloquent\Model
+     * @return T
      */
     public function firstOrCreate(array $attributes = [], array $values = [])
     {
@@ -247,7 +252,7 @@ abstract class HasOneOrMany extends Relation
      *
      * @param  array  $attributes
      * @param  array  $values
-     * @return \Illuminate\Database\Eloquent\Model
+     * @return T
      */
     public function createOrFirst(array $attributes = [], array $values = [])
     {
@@ -263,7 +268,7 @@ abstract class HasOneOrMany extends Relation
      *
      * @param  array  $attributes
      * @param  array  $values
-     * @return \Illuminate\Database\Eloquent\Model
+     * @return T
      */
     public function updateOrCreate(array $attributes, array $values = [])
     {
@@ -278,7 +283,7 @@ abstract class HasOneOrMany extends Relation
      * Attach a model instance to the parent model.
      *
      * @param  \Illuminate\Database\Eloquent\Model  $model
-     * @return \Illuminate\Database\Eloquent\Model|false
+     * @return T|false
      */
     public function save(Model $model)
     {
@@ -291,7 +296,7 @@ abstract class HasOneOrMany extends Relation
      * Attach a model instance without raising any events to the parent model.
      *
      * @param  \Illuminate\Database\Eloquent\Model  $model
-     * @return \Illuminate\Database\Eloquent\Model|false
+     * @return T|false
      */
     public function saveQuietly(Model $model)
     {
@@ -332,7 +337,7 @@ abstract class HasOneOrMany extends Relation
      * Create a new instance of the related model.
      *
      * @param  array  $attributes
-     * @return \Illuminate\Database\Eloquent\Model
+     * @return T
      */
     public function create(array $attributes = [])
     {
@@ -347,7 +352,7 @@ abstract class HasOneOrMany extends Relation
      * Create a new instance of the related model without raising any events to the parent model.
      *
      * @param  array  $attributes
-     * @return \Illuminate\Database\Eloquent\Model
+     * @return T
      */
     public function createQuietly(array $attributes = [])
     {
@@ -358,7 +363,7 @@ abstract class HasOneOrMany extends Relation
      * Create a new instance of the related model. Allow mass-assignment.
      *
      * @param  array  $attributes
-     * @return \Illuminate\Database\Eloquent\Model
+     * @return T
      */
     public function forceCreate(array $attributes = [])
     {
@@ -371,7 +376,7 @@ abstract class HasOneOrMany extends Relation
      * Create a new instance of the related model with mass assignment without raising model events.
      *
      * @param  array  $attributes
-     * @return \Illuminate\Database\Eloquent\Model
+     * @return T
      */
     public function forceCreateQuietly(array $attributes = [])
     {
@@ -382,7 +387,7 @@ abstract class HasOneOrMany extends Relation
      * Create a Collection of new instances of the related model.
      *
      * @param  iterable  $records
-     * @return \Illuminate\Database\Eloquent\Collection
+     * @return \Illuminate\Database\Eloquent\Collection<mixed, T>
      */
     public function createMany(iterable $records)
     {
@@ -399,7 +404,7 @@ abstract class HasOneOrMany extends Relation
      * Create a Collection of new instances of the related model without raising any events to the parent model.
      *
      * @param  iterable  $records
-     * @return \Illuminate\Database\Eloquent\Collection
+     * @return \Illuminate\Database\Eloquent\Collection<mixed, T>
      */
     public function createManyQuietly(iterable $records)
     {
