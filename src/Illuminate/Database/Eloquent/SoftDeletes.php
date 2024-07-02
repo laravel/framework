@@ -71,6 +71,17 @@ trait SoftDeletes
     }
 
     /**
+     * Force a hard delete on a soft-deleted model instance if given truth test passes.
+     *
+     * @param  bool|\Closure  $boolean
+     * @return bool|null
+     */
+    public function forceDeleteIf($boolean)
+    {
+        return value($boolean) ? $this->forceDelete() : null;
+    }
+
+    /**
      * Perform the actual delete query on this model instance.
      *
      * @return mixed
@@ -150,6 +161,17 @@ trait SoftDeletes
     public function restoreQuietly()
     {
         return static::withoutEvents(fn () => $this->restore());
+    }
+
+    /**
+     * Restore a soft-deleted model instance if given truth test passes.
+     *
+     * @param  bool|\Closure  $boolean
+     * @return bool|null
+     */
+    public function restoreIf($boolean)
+    {
+        return value($boolean) ? $this->restore() : null;
     }
 
     /**

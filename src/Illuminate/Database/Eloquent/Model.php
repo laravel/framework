@@ -1430,6 +1430,17 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     }
 
     /**
+     * Delete the model from the database if given truth test passes.
+     *
+     * @param  bool|\Closure  $boolean
+     * @return bool|null
+     */
+    public function deleteIf($boolean)
+    {
+        return value($boolean) ? $this->delete() : null;
+    }
+
+    /**
      * Delete the model from the database within a transaction.
      *
      * @return bool|null
