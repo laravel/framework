@@ -1429,7 +1429,7 @@ trait HasAttributes
     protected function asDecimal($value, $decimals)
     {
         try {
-            return (string) BigDecimal::of($value)->toScale($decimals, RoundingMode::HALF_UP);
+            return (string) BigDecimal::of(blank($value) ? 0 : $value)->toScale($decimals, RoundingMode::HALF_UP);
         } catch (BrickMathException $e) {
             throw new MathException('Unable to cast value to a decimal.', previous: $e);
         }
@@ -2164,7 +2164,7 @@ trait HasAttributes
         } elseif ($this->hasCast($key, ['object', 'collection'])) {
             return $this->fromJson($attribute) ===
                 $this->fromJson($original);
-        } elseif ($this->hasCast($key, ['real', 'float', 'double'])) {
+        } elseif ($this->hasCast($key, ['real', 'float', 'double', 'decimal'])) {
             if ($original === null) {
                 return false;
             }

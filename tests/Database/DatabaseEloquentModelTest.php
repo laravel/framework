@@ -3037,6 +3037,26 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertFalse($user->hasAttribute('nonexistent'));
         $this->assertFalse($user->hasAttribute('belongsToStub'));
     }
+
+    public function testCleanWhenDecimalUpdateAttribute()
+    {
+        // test is equivalent
+        $model = new EloquentModelStub(['castedDecimal' => " "]);
+        $model->syncOriginal();
+        $model->castedDecimal = 0;
+        $this->assertTrue($model->originalIsEquivalent('castedDecimal'));
+
+        $model = new EloquentModelStub(['castedDecimal' => 0]);
+        $model->syncOriginal();
+        $model->castedDecimal = 0;
+        $this->assertTrue($model->originalIsEquivalent('castedDecimal'));
+
+        $model = new EloquentModelStub(['castedDecimal' => null]);
+        $model->syncOriginal();
+        $model->castedDecimal = null;
+        $this->assertTrue($model->originalIsEquivalent('castedDecimal'));
+    }
+
 }
 
 class EloquentTestObserverStub
@@ -3071,7 +3091,10 @@ class EloquentModelStub extends Model
     public $scopesCalled = [];
     protected $table = 'stub';
     protected $guarded = [];
-    protected $casts = ['castedFloat' => 'float'];
+    protected $casts = [
+        'castedFloat' => 'float',
+        'castedDecimal' => 'decimal:10',
+    ];
 
     public function getListItemsAttribute($value)
     {
