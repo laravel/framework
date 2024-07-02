@@ -18,7 +18,8 @@
         "illuminate/collections": "^11.0",
         "illuminate/contracts": "^11.0",
         "illuminate/macroable": "^11.0",
-        "illuminate/support": "^11.0"
+        "illuminate/support": "^11.0",
+        "psr/simple-cache": "^1.0|^2.0|^3.0"
     },
     "provide": {
         "psr/simple-cache-implementation": "1.0|2.0|3.0"
