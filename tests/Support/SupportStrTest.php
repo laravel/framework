@@ -1511,6 +1511,14 @@ class SupportStrTest extends TestCase
         $this->assertStringContainsString(' ', Str::password(spaces: true));
 
         $this->assertTrue(
+            Str::of(Str::password(letters: false, upperLetters: true))->contains(['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'])
+        );
+        
+        $this->assertTrue(
+            Str::of(Str::password(letters: false, lowerLetters: true))->contains(['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'])
+        );
+
+        $this->assertTrue(
             Str::of(Str::password())->contains(['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'])
         );
     }

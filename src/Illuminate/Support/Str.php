@@ -935,9 +935,11 @@ class Str
      * @param  bool  $numbers
      * @param  bool  $symbols
      * @param  bool  $spaces
+     * @param  bool  $upperLetters
+     * @param  bool  $lowerLetters
      * @return string
      */
-    public static function password($length = 32, $letters = true, $numbers = true, $symbols = true, $spaces = false)
+    public static function password($length = 32, $letters = true, $numbers = true, $symbols = true, $spaces = false, $upperLetters = false, $lowerLetters = false)
     {
         $password = new Collection();
 
@@ -948,6 +950,16 @@ class Str
                 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G',
                 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R',
                 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
+            ] : null,
+            'upperLetters' => $upperLetters === true ? [
+                'A', 'B', 'C', 'D', 'E', 'F', 'G',
+                'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R',
+                'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
+            ] : null,
+            'lowerLetters' => $lowerLetters === true ? [
+                'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k',
+                'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v',
+                'w', 'x', 'y', 'z',
             ] : null,
             'numbers' => $numbers === true ? [
                 '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
