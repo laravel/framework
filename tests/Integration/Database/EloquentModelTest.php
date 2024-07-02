@@ -126,6 +126,76 @@ class EloquentModelTest extends DatabaseTestCase
             'analyze' => true,
         ]);
     }
+
+    public function testHasGeneratedColumns()
+    {
+        Schema::create('products', function (Blueprint $table) {
+            $table->id();
+            $table->integer('price');
+            $table->boolean('in_stock')->default(true);
+
+            if ($this->driver === 'sqlsrv') {
+                $table->computed('tax', 'price * 0.6');
+                $table->computed('total', 'price * 1.6')->persisted();
+            } else {
+                if ($this->driver === 'pgsql') {
+                    $table->integer('tax')->storedAs('price * 0.6');
+                } else {
+                    $table->integer('tax')->virtualAs('price * 0.6');
+                }
+                $table->integer('total')->storedAs('price * 1.6');
+            }
+        });
+
+        Product::retrieved(function (Model $product) {
+            $this->assertEquals([
+                'tax' => 12,
+                'total' => 32,
+                'in_stock' => 1,
+            ], $product->getAttributes());
+        });
+        Product::saved(function ($product) {
+            $this->assertEquals(20, $product->price);
+            $this->assertEquals(12, $product->tax);
+            $this->assertEquals(32, $product->total);
+            $this->assertTrue($product->in_stock);
+        });
+
+        $instance = Product::create(['price' => 20]);
+
+        $this->assertEquals(20, $instance->price);
+        $this->assertEquals(12, $instance->tax);
+        $this->assertEquals(32, $instance->total);
+        $this->assertTrue($instance->in_stock);
+        $this->assertFalse($instance->isDirty());
+
+        Product::flushEventListeners();
+        Product::retrieved(function ($product) {
+            $this->assertEquals([
+                'tax' => 6,
+                'total' => 16,
+                'in_stock' => 1,
+            ], $product->getAttributes());
+        });
+        Product::saved(function ($product) {
+            $this->assertTrue($product->isDirty('price'));
+            $this->assertTrue($product->isDirty('tax'));
+            $this->assertTrue($product->isDirty('total'));
+            $this->assertFalse($product->isDirty('in_stock'));
+            $this->assertEquals(10, $product->price);
+            $this->assertEquals(6, $product->tax);
+            $this->assertEquals(16, $product->total);
+            $this->assertTrue($product->in_stock);
+        });
+
+        $instance->update(['price' => 10]);
+
+        $this->assertEquals(10, $instance->price);
+        $this->assertEquals(6, $instance->tax);
+        $this->assertEquals(16, $instance->total);
+        $this->assertTrue($instance->in_stock);
+        $this->assertFalse($instance->isDirty());
+    }
 }
 
 class TestModel1 extends Model
@@ -141,4 +211,12 @@ class TestModel2 extends Model
     public $table = 'test_model2';
     public $timestamps = false;
     protected $guarded = [];
+}
+
+class Product extends Model
+{
+    protected $fillable = ['price', 'in_stock'];
+    protected $casts = ['in_stock' => 'boolean'];
+    public $timestamps = false;
+    protected $attributesToReloadOnSave = ['tax', 'total', 'in_stock'];
 }

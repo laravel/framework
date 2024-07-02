@@ -86,6 +86,13 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     protected $withCount = [];
 
     /**
+     * The attributes to reload on save.
+     *
+     * @var array<int, string>
+     */
+    protected $attributesToReloadOnSave = [];
+
+    /**
      * Indicates whether lazy loading will be prevented on this model.
      *
      * @var bool
@@ -1178,6 +1185,16 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     protected function finishSave(array $options)
     {
+        if (! empty($this->attributesToReloadOnSave)) {
+            $this->setRawAttributes(array_merge(
+                $this->attributes,
+                $this->setKeysForSelectQuery($this->newQueryWithoutScopes())
+                    ->useWritePdo()
+                    ->firstOrFail($this->attributesToReloadOnSave)
+                    ->attributes
+            ));
+        }
+
         $this->fireModelEvent('saved', false);
 
         if ($this->isDirty() && ($options['touch'] ?? true)) {
@@ -1689,7 +1706,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     }
 
     /**
-     * Reload the current model instance with fresh attributes from the database.
+     * Reload the current model instance with fresh attributes and relationships from the database.
      *
      * @return $this
      */
