@@ -40,6 +40,21 @@ class ContextualBindingTest extends TestCase
 
         $this->assertInstanceOf(ContainerContextImplementationStub::class, $one->impl);
         $this->assertInstanceOf(ContainerContextImplementationStubTwo::class, $two->impl);
+
+        /*
+         * Test nesting to make the same 'abstract' in different context
+         */
+        $container = new Container;
+
+        $container->bind(IContainerContextContractStub::class, ContainerContextImplementationStub::class);
+
+        $container->when(ContainerTestContextInjectOne::class)->needs(IContainerContextContractStub::class)->give(function ($container) {
+            return $container->make(IContainerContextContractStub::class);
+        });
+
+        $one = $container->make(ContainerTestContextInjectOne::class);
+
+        $this->assertInstanceOf(ContainerContextImplementationStub::class, $one->impl);
     }
 
     public function testContextualBindingWorksForExistingInstancedBindings()
