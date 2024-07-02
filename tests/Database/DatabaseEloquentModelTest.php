@@ -3056,7 +3056,6 @@ class DatabaseEloquentModelTest extends TestCase
         $model->castedDecimal = null;
         $this->assertTrue($model->originalIsEquivalent('castedDecimal'));
     }
-
 }
 
 class EloquentTestObserverStub
