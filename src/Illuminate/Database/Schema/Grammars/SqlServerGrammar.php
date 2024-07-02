@@ -213,7 +213,7 @@ class SqlServerGrammar extends Grammar
     {
         return sprintf('alter table %s add %s',
             $this->wrapTable($blueprint),
-            implode(', ', $this->getColumns($blueprint))
+            $this->getColumn($blueprint, $command->column)
         );
     }
 
@@ -245,25 +245,13 @@ class SqlServerGrammar extends Grammar
      */
     public function compileChange(Blueprint $blueprint, Fluent $command, Connection $connection)
     {
-        $changes = [$this->compileDropDefaultConstraint($blueprint, $command)];
-
-        foreach ($blueprint->getChangedColumns() as $column) {
-            $sql = sprintf('alter table %s alter column %s %s',
+        return [
+            $this->compileDropDefaultConstraint($blueprint, $command),
+            sprintf('alter table %s alter column %s',
                 $this->wrapTable($blueprint),
-                $this->wrap($column),
-                $this->getType($column)
-            );
-
-            foreach ($this->modifiers as $modifier) {
-                if (method_exists($this, $method = "modify{$modifier}")) {
-                    $sql .= $this->{$method}($blueprint, $column);
-                }
-            }
-
-            $changes[] = $sql;
-        }
-
-        return $changes;
+                $this->getColumn($blueprint, $command->column),
+            ),
+        ];
     }
 
     /**
@@ -411,7 +399,7 @@ class SqlServerGrammar extends Grammar
     public function compileDropDefaultConstraint(Blueprint $blueprint, Fluent $command)
     {
         $columns = $command->name === 'change'
-            ? "'".collect($blueprint->getChangedColumns())->pluck('name')->implode("','")."'"
+            ? "'".$command->column->name."'"
             : "'".implode("','", $command->columns)."'";
 
         $table = $this->wrapTable($blueprint);

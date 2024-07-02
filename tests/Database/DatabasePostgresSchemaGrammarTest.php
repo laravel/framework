@@ -35,8 +35,11 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $blueprint->string('email');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertCount(1, $statements);
-        $this->assertSame('alter table "users" add column "id" serial not null primary key, add column "email" varchar(255) not null', $statements[0]);
+        $this->assertCount(2, $statements);
+        $this->assertSame([
+            'alter table "users" add column "id" serial not null primary key',
+            'alter table "users" add column "email" varchar(255) not null',
+        ], $statements);
     }
 
     public function testCreateTableWithAutoIncrementStartingValue()
@@ -62,7 +65,9 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertEquals([
-            'alter table "users" add column "id" bigserial not null primary key, add column "code" serial not null primary key, add column "name" varchar(255) not null',
+            'alter table "users" add column "id" bigserial not null primary key',
+            'alter table "users" add column "code" serial not null primary key',
+            'alter table "users" add column "name" varchar(255) not null',
             'alter sequence users_id_seq restart with 100',
             'alter sequence users_code_seq restart with 200',
         ], $statements);
@@ -409,10 +414,14 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
 
         $this->assertInstanceOf(ForeignIdColumnDefinition::class, $foreignId);
         $this->assertSame([
-            'alter table "users" add column "foo" bigint not null, add column "company_id" bigint not null, add column "laravel_idea_id" bigint not null, add column "team_id" bigint not null, add column "team_column_id" bigint not null',
+            'alter table "users" add column "foo" bigint not null',
+            'alter table "users" add column "company_id" bigint not null',
             'alter table "users" add constraint "users_company_id_foreign" foreign key ("company_id") references "companies" ("id")',
+            'alter table "users" add column "laravel_idea_id" bigint not null',
             'alter table "users" add constraint "users_laravel_idea_id_foreign" foreign key ("laravel_idea_id") references "laravel_ideas" ("id")',
+            'alter table "users" add column "team_id" bigint not null',
             'alter table "users" add constraint "users_team_id_foreign" foreign key ("team_id") references "teams" ("id")',
+            'alter table "users" add column "team_column_id" bigint not null',
             'alter table "users" add constraint "users_team_column_id_foreign" foreign key ("team_column_id") references "teams" ("id")',
         ], $statements);
     }
@@ -859,8 +868,11 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $blueprint = new Blueprint('users');
         $blueprint->timestamps();
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
-        $this->assertCount(1, $statements);
-        $this->assertSame('alter table "users" add column "created_at" timestamp(0) without time zone null, add column "updated_at" timestamp(0) without time zone null', $statements[0]);
+        $this->assertCount(2, $statements);
+        $this->assertSame([
+            'alter table "users" add column "created_at" timestamp(0) without time zone null',
+            'alter table "users" add column "updated_at" timestamp(0) without time zone null',
+        ], $statements);
     }
 
     public function testAddingTimestampsTz()
@@ -868,8 +880,11 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $blueprint = new Blueprint('users');
         $blueprint->timestampsTz();
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
-        $this->assertCount(1, $statements);
-        $this->assertSame('alter table "users" add column "created_at" timestamp(0) with time zone null, add column "updated_at" timestamp(0) with time zone null', $statements[0]);
+        $this->assertCount(2, $statements);
+        $this->assertSame([
+            'alter table "users" add column "created_at" timestamp(0) with time zone null',
+            'alter table "users" add column "updated_at" timestamp(0) with time zone null',
+        ], $statements);
     }
 
     public function testAddingBinary()
@@ -915,10 +930,14 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
 
         $this->assertInstanceOf(ForeignIdColumnDefinition::class, $foreignUuid);
         $this->assertSame([
-            'alter table "users" add column "foo" uuid not null, add column "company_id" uuid not null, add column "laravel_idea_id" uuid not null, add column "team_id" uuid not null, add column "team_column_id" uuid not null',
+            'alter table "users" add column "foo" uuid not null',
+            'alter table "users" add column "company_id" uuid not null',
             'alter table "users" add constraint "users_company_id_foreign" foreign key ("company_id") references "companies" ("id")',
+            'alter table "users" add column "laravel_idea_id" uuid not null',
             'alter table "users" add constraint "users_laravel_idea_id_foreign" foreign key ("laravel_idea_id") references "laravel_ideas" ("id")',
+            'alter table "users" add column "team_id" uuid not null',
             'alter table "users" add constraint "users_team_id_foreign" foreign key ("team_id") references "teams" ("id")',
+            'alter table "users" add column "team_column_id" uuid not null',
             'alter table "users" add constraint "users_team_column_id_foreign" foreign key ("team_column_id") references "teams" ("id")',
         ], $statements);
     }
@@ -956,15 +975,21 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $blueprint->integer('foo')->nullable();
         $blueprint->boolean('bar')->virtualAs('foo is not null');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
-        $this->assertCount(1, $statements);
-        $this->assertSame('alter table "users" add column "foo" integer null, add column "bar" boolean not null generated always as (foo is not null)', $statements[0]);
+        $this->assertCount(2, $statements);
+        $this->assertSame([
+            'alter table "users" add column "foo" integer null',
+            'alter table "users" add column "bar" boolean not null generated always as (foo is not null)',
+        ], $statements);
 
         $blueprint = new Blueprint('users');
         $blueprint->integer('foo')->nullable();
         $blueprint->boolean('bar')->virtualAs(new Expression('foo is not null'));
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
-        $this->assertCount(1, $statements);
-        $this->assertSame('alter table "users" add column "foo" integer null, add column "bar" boolean not null generated always as (foo is not null)', $statements[0]);
+        $this->assertCount(2, $statements);
+        $this->assertSame([
+            'alter table "users" add column "foo" integer null',
+            'alter table "users" add column "bar" boolean not null generated always as (foo is not null)',
+        ], $statements);
     }
 
     public function testAddingStoredAs()
@@ -973,15 +998,21 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $blueprint->integer('foo')->nullable();
         $blueprint->boolean('bar')->storedAs('foo is not null');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
-        $this->assertCount(1, $statements);
-        $this->assertSame('alter table "users" add column "foo" integer null, add column "bar" boolean not null generated always as (foo is not null) stored', $statements[0]);
+        $this->assertCount(2, $statements);
+        $this->assertSame([
+            'alter table "users" add column "foo" integer null',
+            'alter table "users" add column "bar" boolean not null generated always as (foo is not null) stored',
+        ], $statements);
 
         $blueprint = new Blueprint('users');
         $blueprint->integer('foo')->nullable();
         $blueprint->boolean('bar')->storedAs(new Expression('foo is not null'));
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
-        $this->assertCount(1, $statements);
-        $this->assertSame('alter table "users" add column "foo" integer null, add column "bar" boolean not null generated always as (foo is not null) stored', $statements[0]);
+        $this->assertCount(2, $statements);
+        $this->assertSame([
+            'alter table "users" add column "foo" integer null',
+            'alter table "users" add column "bar" boolean not null generated always as (foo is not null) stored',
+        ], $statements);
     }
 
     public function testAddingIpAddress()

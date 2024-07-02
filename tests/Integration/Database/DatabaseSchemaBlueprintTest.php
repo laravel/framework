@@ -41,11 +41,11 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $queries = $blueprint->toSql(DB::connection(), new SQLiteGrammar);
 
         $expected = [
-            'create table "__temp__users" ("name" varchar not null, "age" integer not null)',
-            'insert into "__temp__users" ("name", "age") select "name", "age" from "users"',
+            'alter table "users" rename column "name" to "first_name"',
+            'create table "__temp__users" ("first_name" varchar not null, "age" integer not null)',
+            'insert into "__temp__users" ("first_name", "age") select "first_name", "age" from "users"',
             'drop table "users"',
             'alter table "__temp__users" rename to "users"',
-            'alter table "users" rename column "name" to "first_name"',
         ];
 
         $this->assertEquals($expected, $queries);
@@ -70,18 +70,6 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $this->assertTrue($schema->hasColumns('test', ['bar', 'qux']));
     }
 
-    public function testDroppingColumnsWorks()
-    {
-        $connection = DB::connection();
-        $schema = $connection->getSchemaBuilder();
-
-        $blueprint = new Blueprint('users', function ($table) {
-            $table->dropColumn('name');
-        });
-
-        $this->assertEquals(['alter table "users" drop column "name"'], $blueprint->toSql($connection, new SQLiteGrammar));
-    }
-
     public function testNativeColumnModifyingOnMySql()
     {
         $connection = DB::connection();
@@ -97,13 +85,12 @@ class DatabaseSchemaBlueprintTest extends TestCase
         });
 
         $this->assertEquals([
-            'alter table `users` '
-            .'modify `amount` double null invisible after `name`, '
-            .'modify `added_at` timestamp(4) not null default CURRENT_TIMESTAMP(4) on update CURRENT_TIMESTAMP(4), '
-            ."modify `difficulty` enum('easy', 'hard') character set utf8mb4 collate 'unicode' not null default 'easy', "
-            .'modify `positions` multipolygon srid 1234 as (expression) stored, '
-            .'change `old_name` `new_name` varchar(50) not null, '
-            ."modify `id` bigint unsigned not null auto_increment comment 'my comment' first",
+            'alter table `users` modify `amount` double null invisible after `name`',
+            'alter table `users` modify `added_at` timestamp(4) not null default CURRENT_TIMESTAMP(4) on update CURRENT_TIMESTAMP(4)',
+            "alter table `users` modify `difficulty` enum('easy', 'hard') character set utf8mb4 collate 'unicode' not null default 'easy'",
+            'alter table `users` modify `positions` multipolygon srid 1234 as (expression) stored',
+            'alter table `users` change `old_name` `new_name` varchar(50) not null',
+            "alter table `users` modify `id` bigint unsigned not null auto_increment comment 'my comment' first",
             'alter table `users` auto_increment = 10',
         ], $blueprint->toSql($connection, new MySqlGrammar));
     }
@@ -589,7 +576,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
     public function testItEnsuresDroppingForeignKeyIsAvailable()
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('This database driver does not support dropping foreign keys.');
+        $this->expectExceptionMessage('This database driver does not support dropping foreign keys by name.');
 
         Schema::table('users', function (Blueprint $table) {
             $table->dropForeign('something');

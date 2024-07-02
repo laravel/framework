@@ -44,8 +44,11 @@ class DatabaseMariaDbSchemaGrammarTest extends TestCase
 
         $statements = $blueprint->toSql($conn, $this->getGrammar());
 
-        $this->assertCount(1, $statements);
-        $this->assertSame('alter table `users` add `id` int unsigned not null auto_increment primary key, add `email` varchar(255) not null', $statements[0]);
+        $this->assertCount(2, $statements);
+        $this->assertSame([
+            'alter table `users` add `id` int unsigned not null auto_increment primary key',
+            'alter table `users` add `email` varchar(255) not null',
+        ], $statements);
 
         $blueprint = new Blueprint('users');
         $blueprint->create();
@@ -87,7 +90,8 @@ class DatabaseMariaDbSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertEquals([
-            'alter table `users` add `id` bigint unsigned not null auto_increment primary key, add `name` varchar(255) not null',
+            'alter table `users` add `id` bigint unsigned not null auto_increment primary key',
+            'alter table `users` add `name` varchar(255) not null',
             'alter table `users` auto_increment = 100',
         ], $statements);
     }
@@ -502,10 +506,14 @@ class DatabaseMariaDbSchemaGrammarTest extends TestCase
 
         $this->assertInstanceOf(ForeignIdColumnDefinition::class, $foreignId);
         $this->assertSame([
-            'alter table `users` add `foo` bigint unsigned not null, add `company_id` bigint unsigned not null, add `laravel_idea_id` bigint unsigned not null, add `team_id` bigint unsigned not null, add `team_column_id` bigint unsigned not null',
+            'alter table `users` add `foo` bigint unsigned not null',
+            'alter table `users` add `company_id` bigint unsigned not null',
             'alter table `users` add constraint `users_company_id_foreign` foreign key (`company_id`) references `companies` (`id`)',
+            'alter table `users` add `laravel_idea_id` bigint unsigned not null',
             'alter table `users` add constraint `users_laravel_idea_id_foreign` foreign key (`laravel_idea_id`) references `laravel_ideas` (`id`)',
+            'alter table `users` add `team_id` bigint unsigned not null',
             'alter table `users` add constraint `users_team_id_foreign` foreign key (`team_id`) references `teams` (`id`)',
+            'alter table `users` add `team_column_id` bigint unsigned not null',
             'alter table `users` add constraint `users_team_column_id_foreign` foreign key (`team_column_id`) references `teams` (`id`)',
         ], $statements);
     }
@@ -560,8 +568,12 @@ class DatabaseMariaDbSchemaGrammarTest extends TestCase
         });
         $blueprint->string('three');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
-        $this->assertCount(1, $statements);
-        $this->assertSame('alter table `users` add `one` varchar(255) not null after `foo`, add `two` varchar(255) not null after `one`, add `three` varchar(255) not null', $statements[0]);
+        $this->assertCount(3, $statements);
+        $this->assertSame([
+            'alter table `users` add `one` varchar(255) not null after `foo`',
+            'alter table `users` add `two` varchar(255) not null after `one`',
+            'alter table `users` add `three` varchar(255) not null',
+        ], $statements);
     }
 
     public function testAddingGeneratedColumn()
@@ -572,8 +584,12 @@ class DatabaseMariaDbSchemaGrammarTest extends TestCase
         $blueprint->integer('discounted_stored')->storedAs('price - 5');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertCount(1, $statements);
-        $this->assertSame('alter table `products` add `price` int not null, add `discounted_virtual` int as (price - 5), add `discounted_stored` int as (price - 5) stored', $statements[0]);
+        $this->assertCount(3, $statements);
+        $this->assertSame([
+            'alter table `products` add `price` int not null',
+            'alter table `products` add `discounted_virtual` int as (price - 5)',
+            'alter table `products` add `discounted_stored` int as (price - 5) stored',
+        ], $statements);
 
         $blueprint = new Blueprint('products');
         $blueprint->integer('price');
@@ -581,8 +597,12 @@ class DatabaseMariaDbSchemaGrammarTest extends TestCase
         $blueprint->integer('discounted_stored')->storedAs('price - 5')->nullable(false);
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertCount(1, $statements);
-        $this->assertSame('alter table `products` add `price` int not null, add `discounted_virtual` int as (price - 5) not null, add `discounted_stored` int as (price - 5) stored not null', $statements[0]);
+        $this->assertCount(3, $statements);
+        $this->assertSame([
+            'alter table `products` add `price` int not null',
+            'alter table `products` add `discounted_virtual` int as (price - 5) not null',
+            'alter table `products` add `discounted_stored` int as (price - 5) stored not null',
+        ], $statements);
     }
 
     public function testAddingGeneratedColumnWithCharset()
@@ -593,8 +613,12 @@ class DatabaseMariaDbSchemaGrammarTest extends TestCase
         $blueprint->string('url_hash_stored', 64)->storedAs('sha2(url, 256)')->charset('ascii');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertCount(1, $statements);
-        $this->assertSame('alter table `links` add `url` varchar(2083) character set ascii not null, add `url_hash_virtual` varchar(64) character set ascii as (sha2(url, 256)), add `url_hash_stored` varchar(64) character set ascii as (sha2(url, 256)) stored', $statements[0]);
+        $this->assertCount(3, $statements);
+        $this->assertSame([
+            'alter table `links` add `url` varchar(2083) character set ascii not null',
+            'alter table `links` add `url_hash_virtual` varchar(64) character set ascii as (sha2(url, 256))',
+            'alter table `links` add `url_hash_stored` varchar(64) character set ascii as (sha2(url, 256)) stored',
+        ], $statements);
     }
 
     public function testAddingGeneratedColumnByExpression()
@@ -605,8 +629,12 @@ class DatabaseMariaDbSchemaGrammarTest extends TestCase
         $blueprint->integer('discounted_stored')->storedAs(new Expression('price - 5'));
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertCount(1, $statements);
-        $this->assertSame('alter table `products` add `price` int not null, add `discounted_virtual` int as (price - 5), add `discounted_stored` int as (price - 5) stored', $statements[0]);
+        $this->assertCount(3, $statements);
+        $this->assertSame([
+            'alter table `products` add `price` int not null',
+            'alter table `products` add `discounted_virtual` int as (price - 5)',
+            'alter table `products` add `discounted_stored` int as (price - 5) stored',
+        ], $statements);
     }
 
     public function testAddingInvisibleColumn()
@@ -1050,8 +1078,11 @@ class DatabaseMariaDbSchemaGrammarTest extends TestCase
         $blueprint = new Blueprint('users');
         $blueprint->timestamps();
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
-        $this->assertCount(1, $statements);
-        $this->assertSame('alter table `users` add `created_at` timestamp null, add `updated_at` timestamp null', $statements[0]);
+        $this->assertCount(2, $statements);
+        $this->assertSame([
+            'alter table `users` add `created_at` timestamp null',
+            'alter table `users` add `updated_at` timestamp null',
+        ], $statements);
     }
 
     public function testAddingTimestampsTz()
@@ -1059,8 +1090,11 @@ class DatabaseMariaDbSchemaGrammarTest extends TestCase
         $blueprint = new Blueprint('users');
         $blueprint->timestampsTz();
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
-        $this->assertCount(1, $statements);
-        $this->assertSame('alter table `users` add `created_at` timestamp null, add `updated_at` timestamp null', $statements[0]);
+        $this->assertCount(2, $statements);
+        $this->assertSame([
+            'alter table `users` add `created_at` timestamp null',
+            'alter table `users` add `updated_at` timestamp null',
+        ], $statements);
     }
 
     public function testAddingRememberToken()
@@ -1116,10 +1150,14 @@ class DatabaseMariaDbSchemaGrammarTest extends TestCase
 
         $this->assertInstanceOf(ForeignIdColumnDefinition::class, $foreignUuid);
         $this->assertSame([
-            'alter table `users` add `foo` uuid not null, add `company_id` uuid not null, add `laravel_idea_id` uuid not null, add `team_id` uuid not null, add `team_column_id` uuid not null',
+            'alter table `users` add `foo` uuid not null',
+            'alter table `users` add `company_id` uuid not null',
             'alter table `users` add constraint `users_company_id_foreign` foreign key (`company_id`) references `companies` (`id`)',
+            'alter table `users` add `laravel_idea_id` uuid not null',
             'alter table `users` add constraint `users_laravel_idea_id_foreign` foreign key (`laravel_idea_id`) references `laravel_ideas` (`id`)',
+            'alter table `users` add `team_id` uuid not null',
             'alter table `users` add constraint `users_team_id_foreign` foreign key (`team_id`) references `teams` (`id`)',
+            'alter table `users` add `team_column_id` uuid not null',
             'alter table `users` add constraint `users_team_column_id_foreign` foreign key (`team_column_id`) references `teams` (`id`)',
         ], $statements);
     }
