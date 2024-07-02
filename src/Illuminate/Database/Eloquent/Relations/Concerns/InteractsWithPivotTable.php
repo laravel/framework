@@ -102,7 +102,8 @@ trait InteractsWithPivotTable
             $detach = array_diff($current, array_keys($records));
 
             if (count($detach) > 0) {
-                $this->detach($detach);
+                // Detach record without touching, as this is done a bit latter
+                $this->detach($detach, false);
 
                 $changes['detached'] = $this->castKeys($detach);
             }
