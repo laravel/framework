@@ -310,14 +310,17 @@ class Mailer implements MailerContract, MailQueueContract
 
         $data['message'] = $message = $this->createMessage();
 
+        // Next we need to generate the view content, allowing pass-through callbacks
+        // following content generation to utilise said content in header generation.
+        // For example Symfony's DKIM signing which requires html and plain content.
+        $this->addContent($message, $view, $plain, $raw, $data);
+
         // Once we have retrieved the view content for the e-mail we will set the body
         // of this message using the HTML type, which will provide a simple wrapper
         // to creating view based emails that are able to receive arrays of data.
         if (! is_null($callback)) {
             $callback($message);
         }
-
-        $this->addContent($message, $view, $plain, $raw, $data);
 
         // If a global "to" address has been set, we will set that address on the mail
         // message. This is primarily useful during local development in which each
