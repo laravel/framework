@@ -7,6 +7,7 @@ use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\ForeignIdColumnDefinition;
 use Illuminate\Database\Schema\Grammars\SqlServerGrammar;
+use Illuminate\Database\Schema\SqlServerBuilder;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
@@ -923,17 +924,26 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         );
     }
 
-    protected function getConnection(SqlServerGrammar $grammar = null)
-    {
+    protected function getConnection(
+        ?SqlServerGrammar $grammar = null,
+        ?SqlServerBuilder $builder = null
+    ) {
         $grammar ??= $this->getGrammar();
+        $builder ??= $this->getBuilder();
 
         return m::mock(Connection::class)
             ->shouldReceive('getSchemaGrammar')->andReturn($grammar)
+            ->shouldReceive('getSchemaBuilder')->andReturn($builder)
             ->getMock();
     }
 
     public function getGrammar()
     {
         return new SqlServerGrammar;
+    }
+
+    public function getBuilder()
+    {
+        return mock(SqlServerBuilder::class);
     }
 }

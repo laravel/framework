@@ -278,14 +278,6 @@ abstract class Grammar
     }
 
     /**
-     * Get the precision for storing datetimes (null uses the database default).
-     */
-    public function getDatetimePrecision(): ?int
-    {
-        return 0;
-    }
-
-    /**
      * Get the grammar's table prefix.
      *
      * @return string

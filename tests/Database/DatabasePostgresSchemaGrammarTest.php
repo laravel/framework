@@ -8,6 +8,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\Builder;
 use Illuminate\Database\Schema\ForeignIdColumnDefinition;
 use Illuminate\Database\Schema\Grammars\PostgresGrammar;
+use Illuminate\Database\Schema\PostgresBuilder;
 use Mockery as m;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\TestWith;
@@ -697,8 +698,8 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
     #[DataProvider('datetimeAndPrecisionProvider')]
     public function testAddingDatetimeMethods(string $method, string $type, ?int $userPrecision, false|int|null $grammarPrecision, ?int $expected)
     {
-        $grammar = $this->getGrammar($grammarPrecision);
-        $blueprint = new Blueprint($this->getConnection($grammar), 'users');
+        PostgresBuilder::defaultTimePrecision($grammarPrecision);
+        $blueprint = new Blueprint($this->getConnection(), 'users');
         $blueprint->{$method}('created_at', $userPrecision);
         $statements = $blueprint->toSql();
         $type = is_null($expected) ? $type : "{$type}({$expected})";
@@ -711,6 +712,7 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
     #[TestWith(['timestampsTz'])]
     public function testAddingTimestamps(string $method)
     {
+        PostgresBuilder::defaultTimePrecision(0);
         $blueprint = new Blueprint($this->getConnection(), 'users');
         $blueprint->{$method}();
         $statements = $blueprint->toSql();
@@ -1074,26 +1076,27 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $this->assertStringContainsString("where c.relname = 'table' and n.nspname = 'public'", $statement);
     }
 
-    protected function getConnection(PostgresGrammar $grammar = null)
-    {
+    protected function getConnection(
+        ?PostgresGrammar $grammar = null,
+        ?PostgresBuilder $builder = null
+    ) {
         $grammar ??= $this->getGrammar();
+        $builder ??= $this->getBuilder();
 
         return m::mock(Connection::class)
             ->shouldReceive('getSchemaGrammar')->andReturn($grammar)
+            ->shouldReceive('getSchemaBuilder')->andReturn($builder)
             ->getMock();
     }
 
-    public function getGrammar(false|int|null $precision = false)
+    public function getGrammar()
     {
-        if ($precision === false) {
-            return new PostgresGrammar;
-        }
+        return new PostgresGrammar;
+    }
 
-        return m::mock(PostgresGrammar::class)
-            ->makePartial()
-            ->shouldReceive('getDatetimePrecision')
-            ->andReturn($precision)
-            ->getMock();
+    public function getBuilder()
+    {
+        return mock(PostgresBuilder::class);
     }
 
     /** @return list<array{method: string, type: string, user: int|null, grammar: false|int|null, expected: int|null}> */

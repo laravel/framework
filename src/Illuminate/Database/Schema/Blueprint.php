@@ -1106,7 +1106,7 @@ class Blueprint
      */
     public function dateTime($column, $precision = null)
     {
-        $precision ??= $this->defaultDatetimePrecision();
+        $precision ??= $this->defaultTimePrecision();
 
         return $this->addColumn('dateTime', $column, compact('precision'));
     }
@@ -1120,7 +1120,7 @@ class Blueprint
      */
     public function dateTimeTz($column, $precision = null)
     {
-        $precision ??= $this->defaultDatetimePrecision();
+        $precision ??= $this->defaultTimePrecision();
 
         return $this->addColumn('dateTimeTz', $column, compact('precision'));
     }
@@ -1134,7 +1134,7 @@ class Blueprint
      */
     public function time($column, $precision = null)
     {
-        $precision ??= $this->defaultDatetimePrecision();
+        $precision ??= $this->defaultTimePrecision();
 
         return $this->addColumn('time', $column, compact('precision'));
     }
@@ -1148,7 +1148,7 @@ class Blueprint
      */
     public function timeTz($column, $precision = null)
     {
-        $precision ??= $this->defaultDatetimePrecision();
+        $precision ??= $this->defaultTimePrecision();
 
         return $this->addColumn('timeTz', $column, compact('precision'));
     }
@@ -1162,7 +1162,7 @@ class Blueprint
      */
     public function timestamp($column, $precision = null)
     {
-        $precision ??= $this->defaultDatetimePrecision();
+        $precision ??= $this->defaultTimePrecision();
 
         return $this->addColumn('timestamp', $column, compact('precision'));
     }
@@ -1176,7 +1176,7 @@ class Blueprint
      */
     public function timestampTz($column, $precision = null)
     {
-        $precision ??= $this->defaultDatetimePrecision();
+        $precision ??= $this->defaultTimePrecision();
 
         return $this->addColumn('timestampTz', $column, compact('precision'));
     }
@@ -1778,10 +1778,10 @@ class Blueprint
     }
 
     /**
-     * Get the default datetime precision.
+     * Get the default time precision.
      */
-    protected function defaultDatetimePrecision(): ?int
+    protected function defaultTimePrecision(): ?int
     {
-        return $this->grammar->getDatetimePrecision();
+        return $this->connection->getSchemaBuilder()::$defaultTimePrecision;
     }
 }
