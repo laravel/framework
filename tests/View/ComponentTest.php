@@ -130,7 +130,7 @@ class ComponentTest extends TestCase
         $this->assertSame('alert', $component->resolveView());
     }
 
-    public function testHtmlablesGetReturned()
+    public function testHtmlableGetReturned()
     {
         $component = new TestHtmlableReturningViewComponent;
 
@@ -187,9 +187,14 @@ class ComponentTest extends TestCase
     {
         $component = new TestInlineViewComponent;
 
-        Component::resolveComponentsUsing(fn () => $component);
+        Component::resolveComponentsUsing(function ($class, $data) use ($component) {
+            $this->assertSame(Component::class, $class, 'It takes the component class name as the first parameter.');
+            $this->assertSame(['foo' => 'bar'], $data, 'It takes the given data as the second parameter.');
 
-        $this->assertSame($component, Component::resolve('bar'));
+            return $component;
+        });
+
+        $this->assertSame($component, Component::resolve(['foo' => 'bar']));
     }
 
     public function testBladeViewCacheWithRegularViewNameViewComponent()
