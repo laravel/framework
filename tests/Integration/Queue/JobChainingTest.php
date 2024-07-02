@@ -342,6 +342,87 @@ class JobChainingTest extends QueueTestCase
         $this->assertCount(11, JobRunRecorder::$results);
     }
 
+    public function testDynamicBatchWithoutReadonlyPromotedProperties()
+    {
+        Bus::chain([
+            Bus::batch([
+                new EnumTestJob('1.1', MyBackedEnum::One),
+                new EnumTestJob('1.2', MyBackedEnum::One),
+            ]),
+            Bus::batch([
+                new EnumTestJob('2.1', MyBackedEnum::One),
+                new EnumTestJob('2.2', MyBackedEnum::One),
+            ]),
+            new EnumTestJob('3.1', MyBackedEnum::One),
+            new EnumTestJob('3.2', MyBackedEnum::One),
+        ])->dispatch();
+
+        $this->runQueueWorkerCommand(['--stop-when-empty' => true]);
+
+        if ($this->getQueueDriver() === 'sync') {
+            $this->assertEquals(
+                ['1.1', '1.2', '2.1', '2.2', '3.1', '3.2'],
+                JobRunRecorder::$results
+            );
+        }
+
+        $this->assertCount(6, JobRunRecorder::$results);
+    }
+
+    public function testDynamicBatchWithReadonlyPromotedProperties()
+    {
+        Bus::chain([
+            Bus::batch([
+                new ReadonlyEnumTestJob('1.1', MyBackedEnum::One),
+                new ReadonlyEnumTestJob('1.2', MyBackedEnum::One),
+            ]),
+            Bus::batch([
+                new ReadonlyEnumTestJob('2.1', MyBackedEnum::One),
+                new ReadonlyEnumTestJob('2.2', MyBackedEnum::One),
+            ]),
+            new ReadonlyEnumTestJob('3.1', MyBackedEnum::One),
+            new ReadonlyEnumTestJob('3.2', MyBackedEnum::One),
+        ])->dispatch();
+
+        $this->runQueueWorkerCommand(['--stop-when-empty' => true]);
+
+        if ($this->getQueueDriver() === 'sync') {
+            $this->assertEquals(
+                ['1.1', '1.2', '2.1', '2.2', '3.1', '3.2'],
+                JobRunRecorder::$results
+            );
+        }
+
+        $this->assertCount(6, JobRunRecorder::$results);
+    }
+
+    public function testDynamicBatchWithAnotherReadonlyPromotedProperties()
+    {
+        Bus::chain([
+            Bus::batch([
+                new ReadonlyMoneyTestJob('1.1', new MyMoney(100, 'EUR')),
+                new ReadonlyMoneyTestJob('1.2', new MyMoney(100, 'USD')),
+            ]),
+            Bus::batch([
+                new ReadonlyMoneyTestJob('2.1', new MyMoney(100, 'EUR')),
+                new ReadonlyMoneyTestJob('2.2', new MyMoney(100, 'EUR')),
+            ]),
+            new ReadonlyMoneyTestJob('3.1', new MyMoney(100, 'EUR')),
+            new ReadonlyMoneyTestJob('3.2', new MyMoney(100, 'EUR')),
+        ])->dispatch();
+
+        $this->runQueueWorkerCommand(['--stop-when-empty' => true]);
+
+        if ($this->getQueueDriver() === 'sync') {
+            $this->assertEquals(
+                ['1.1', '1.2', '2.1', '2.2', '3.1', '3.2'],
+                JobRunRecorder::$results
+            );
+        }
+
+        $this->assertCount(6, JobRunRecorder::$results);
+    }
+
     public function testChainBatchChain()
     {
         Bus::chain([
@@ -763,5 +844,62 @@ class JobRunRecorder
     {
         self::$results = [];
         self::$failures = [];
+    }
+}
+
+enum MyBackedEnum: string
+{
+    case One = 'one';
+}
+
+class ReadonlyEnumTestJob implements ShouldQueue
+{
+    use Batchable, Dispatchable, InteractsWithQueue, Queueable;
+
+    public function __construct(public string $name, public readonly MyBackedEnum $enum)
+    {
+    }
+
+    public function __invoke(): void
+    {
+        JobRunRecorder::record($this->name);
+    }
+}
+
+
+class MyMoney
+{
+    public function __construct(
+        public int $minor,
+        public string $currency,
+    ) {
+    }
+}
+
+class ReadonlyMoneyTestJob implements ShouldQueue
+{
+    use Batchable, Dispatchable, InteractsWithQueue, Queueable;
+
+    public function __construct(public string $name, public readonly MyMoney $money)
+    {
+    }
+
+    public function __invoke(): void
+    {
+        JobRunRecorder::record($this->name);
+    }
+}
+
+class EnumTestJob implements ShouldQueue
+{
+    use Batchable, Dispatchable, InteractsWithQueue, Queueable;
+
+    public function __construct(public string $name, public MyBackedEnum $enum)
+    {
+    }
+
+    public function __invoke(): void
+    {
+        JobRunRecorder::record($this->name);
     }
 }
