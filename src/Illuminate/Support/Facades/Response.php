@@ -25,7 +25,7 @@ use Illuminate\Contracts\Routing\ResponseFactory as ResponseFactoryContract;
  * @method static bool hasMacro(string $name)
  * @method static void flushMacros()
  *
- * @see \Illuminate\Routing\ResponseFactory
+ * @mixin \Illuminate\Routing\ResponseFactory
  */
 class Response extends Facade
 {

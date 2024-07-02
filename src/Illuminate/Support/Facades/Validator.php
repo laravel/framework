@@ -18,7 +18,7 @@ namespace Illuminate\Support\Facades;
  * @method static \Illuminate\Contracts\Container\Container|null getContainer()
  * @method static \Illuminate\Validation\Factory setContainer(\Illuminate\Contracts\Container\Container $container)
  *
- * @see \Illuminate\Validation\Factory
+ * @mixin \Illuminate\Validation\Factory
  */
 class Validator extends Facade
 {

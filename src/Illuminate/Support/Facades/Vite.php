@@ -27,7 +27,7 @@ namespace Illuminate\Support\Facades;
  * @method static bool hasMacro(string $name)
  * @method static void flushMacros()
  *
- * @see \Illuminate\Foundation\Vite
+ * @mixin \Illuminate\Foundation\Vite
  */
 class Vite extends Facade
 {

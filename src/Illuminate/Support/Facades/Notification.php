@@ -38,8 +38,8 @@ use Illuminate\Support\Testing\Fakes\NotificationFake;
  * @method static bool hasMacro(string $name)
  * @method static void flushMacros()
  *
- * @see \Illuminate\Notifications\ChannelManager
- * @see \Illuminate\Support\Testing\Fakes\NotificationFake
+ * @mixin \Illuminate\Notifications\ChannelManager
+ * @mixin \Illuminate\Support\Testing\Fakes\NotificationFake
  */
 class Notification extends Facade
 {

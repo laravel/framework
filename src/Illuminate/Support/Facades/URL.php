@@ -48,7 +48,7 @@ namespace Illuminate\Support\Facades;
  * @method static bool hasMacro(string $name)
  * @method static void flushMacros()
  *
- * @see \Illuminate\Routing\UrlGenerator
+ * @mixin \Illuminate\Routing\UrlGenerator
  */
 class URL extends Facade
 {

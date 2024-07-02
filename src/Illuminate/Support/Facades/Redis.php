@@ -30,7 +30,7 @@ namespace Illuminate\Support\Facades;
  * @method static void flushMacros()
  * @method static mixed macroCall(string $method, array $parameters)
  *
- * @see \Illuminate\Redis\RedisManager
+ * @mixin \Illuminate\Redis\RedisManager
  */
 class Redis extends Facade
 {

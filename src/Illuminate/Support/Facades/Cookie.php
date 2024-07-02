@@ -19,7 +19,7 @@ namespace Illuminate\Support\Facades;
  * @method static bool hasMacro(string $name)
  * @method static void flushMacros()
  *
- * @see \Illuminate\Cookie\CookieJar
+ * @mixin \Illuminate\Cookie\CookieJar
  */
 class Cookie extends Facade
 {

@@ -13,7 +13,7 @@ namespace Illuminate\Support\Facades;
  * @method static \Illuminate\Pipeline\Pipeline|mixed when(\Closure|mixed|null $value = null, callable|null $callback = null, callable|null $default = null)
  * @method static \Illuminate\Pipeline\Pipeline|mixed unless(\Closure|mixed|null $value = null, callable|null $callback = null, callable|null $default = null)
  *
- * @see \Illuminate\Pipeline\Pipeline
+ * @mixin \Illuminate\Pipeline\Pipeline
  */
 class Pipeline extends Facade
 {

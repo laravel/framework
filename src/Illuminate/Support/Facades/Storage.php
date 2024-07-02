@@ -80,7 +80,7 @@ use Illuminate\Filesystem\Filesystem;
  * @method static void write(string $location, string $contents, array $config = [])
  * @method static void createDirectory(string $location, array $config = [])
  *
- * @see \Illuminate\Filesystem\FilesystemManager
+ * @mixin \Illuminate\Filesystem\FilesystemManager
  */
 class Storage extends Facade
 {
