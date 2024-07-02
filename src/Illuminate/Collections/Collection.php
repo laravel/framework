@@ -663,6 +663,10 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     /**
      * Determine if the collection is empty or not.
      *
+     * @phpstan-assert-if-true null $this->first()
+     *
+     * @phpstan-assert-if-false !null $this->first()
+     *
      * @return bool
      */
     public function isEmpty()
