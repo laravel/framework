@@ -3041,7 +3041,7 @@ class DatabaseEloquentModelTest extends TestCase
     public function testCleanWhenDecimalUpdateAttribute()
     {
         // test is equivalent
-        $model = new EloquentModelStub(['castedDecimal' => " "]);
+        $model = new EloquentModelStub(['castedDecimal' => ' ']);
         $model->syncOriginal();
         $model->castedDecimal = 0;
         $this->assertTrue($model->originalIsEquivalent('castedDecimal'));
