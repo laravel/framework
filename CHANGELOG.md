@@ -1,6 +1,10 @@
 # Release Notes for 10.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v10.48.14...10.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v10.48.15...10.x)
+
+## [v10.48.15](https://github.com/laravel/framework/compare/v10.48.14...v10.48.15) - 2024-07-02
+
+* [10.x] Set previous exception on `HttpResponseException` by [@hafezdivandari](https://github.com/hafezdivandari) in https://github.com/laravel/framework/pull/51986
 
 ## [v10.48.14](https://github.com/laravel/framework/compare/v10.48.13...v10.48.14) - 2024-06-21
 
