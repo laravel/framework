@@ -234,14 +234,6 @@ trait InteractsWithExceptionHandling
                     sprintf('Failed asserting that key "%s" was invalid', $key),
                 );
             }
-        } catch (Throwable $exception) {
-            Assert::fail(
-                sprintf(
-                    'Failed asserting that exception of type "%s" is an instance of "%s".',
-                    get_class($exception),
-                    ValidationException::class,
-                ),
-            );
         }
 
         Assert::assertTrue(

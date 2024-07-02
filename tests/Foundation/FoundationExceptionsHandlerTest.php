@@ -21,8 +21,8 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
 use Illuminate\Routing\ResponseFactory;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Validator as FacadesValidator;
 use Illuminate\Support\Lottery;
 use Illuminate\Support\MessageBag;
 use Illuminate\Testing\Assert;
@@ -540,33 +540,30 @@ class FoundationExceptionsHandlerTest extends TestCase
 
     public function testItAssertsValidationKeys()
     {
-        $this->mockValidatorFacadeMake();
-
         $this->expectValidationErrors(function () {
-            throw ValidationException::withMessages([
+            throw $this->createValidationException([
                 'some_key' => 'Some error message',
             ]);
         }, ['some_key']);
 
         $this->expectValidationErrors(function () {
-            throw ValidationException::withMessages([
+            throw $this->createValidationException([
                 'some_key' => 'Some error message',
                 'another_key' => 'Another error message',
             ]);
         }, ['some_key', 'another_key']);
 
         $this->expectValidationErrors(function () {
-            throw ValidationException::withMessages([
+            throw $this->createValidationException([
                 'some_key' => 'Some error message',
                 'another_key' => 'Another error message',
             ]);
         }, ['another_key']);
     }
 
-    public function testItFailsToAssertGenericException()
+    public function testItPassesThroughGenericException()
     {
-        $this->mockValidatorFacadeMake();
-        $this->expectException(AssertionFailedError::class);
+        $this->expectException(Exception::class);
 
         $this->expectValidationErrors(function () {
             throw new Exception;
@@ -575,11 +572,10 @@ class FoundationExceptionsHandlerTest extends TestCase
 
     public function testItFailsToAssertIncorrectKey()
     {
-        $this->mockValidatorFacadeMake();
         $this->expectException(AssertionFailedError::class);
 
         $this->expectValidationErrors(function () {
-            throw ValidationException::withMessages([
+            throw $this->createValidationException([
                 'some_key' => 'Some error message',
             ]);
         }, ['some_other_key']);
@@ -587,7 +583,6 @@ class FoundationExceptionsHandlerTest extends TestCase
 
     public function testItFailsToAssertIfNoExceptionIsThrown()
     {
-        $this->mockValidatorFacadeMake();
         $this->expectException(AssertionFailedError::class);
 
         $this->expectValidationErrors(function () {
@@ -902,15 +897,19 @@ class FoundationExceptionsHandlerTest extends TestCase
         $this->assertSame('Something in the app went wrong 2.', $reported[1]->getMessage());
     }
 
-    protected function mockValidatorFacadeMake(): void
+    protected function createValidationException(array $messages): ValidationException
     {
-        FacadesValidator::shouldReceive('make')->andReturn(
-            new Validator(
-                new Translator(new ArrayLoader, 'en'),
-                [],
-                [],
-            ),
-        );
+        return new ValidationException(tap(new Validator(
+            new Translator(new ArrayLoader, 'en'),
+            [],
+            [],
+        ), function ($validator) use ($messages) {
+            foreach ($messages as $key => $value) {
+                foreach (Arr::wrap($value) as $message) {
+                    $validator->errors()->add($key, $message);
+                }
+            }
+        }));
     }
 }
 
