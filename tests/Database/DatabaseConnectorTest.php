@@ -75,15 +75,15 @@ class DatabaseConnectorTest extends TestCase
 
     public function testPostgresConnectCallsCreateConnectionWithProperArguments()
     {
-        $dsn = 'pgsql:host=foo;dbname=\'bar\';port=111';
+        $dsn = 'pgsql:host=foo;dbname=\'bar\';port=111;client_encoding=\'utf8\'';
         $config = ['host' => 'foo', 'database' => 'bar', 'port' => 111, 'charset' => 'utf8'];
         $connector = $this->getMockBuilder(PostgresConnector::class)->onlyMethods(['createConnection', 'getOptions'])->getMock();
         $connection = m::mock(stdClass::class);
         $connector->expects($this->once())->method('getOptions')->with($this->equalTo($config))->willReturn(['options']);
         $connector->expects($this->once())->method('createConnection')->with($this->equalTo($dsn), $this->equalTo($config), $this->equalTo(['options']))->willReturn($connection);
         $statement = m::mock(PDOStatement::class);
-        $connection->shouldReceive('prepare')->once()->with('set names \'utf8\'')->andReturn($statement);
-        $statement->shouldReceive('execute')->once();
+        $connection->shouldReceive('prepare')->zeroOrMoreTimes()->andReturn($statement);
+        $statement->shouldReceive('execute')->zeroOrMoreTimes();
         $result = $connector->connect($config);
 
         $this->assertSame($result, $connection);
@@ -97,16 +97,15 @@ class DatabaseConnectorTest extends TestCase
      */
     public function testPostgresSearchPathIsSet($searchPath, $expectedSql)
     {
-        $dsn = 'pgsql:host=foo;dbname=\'bar\'';
+        $dsn = 'pgsql:host=foo;dbname=\'bar\';client_encoding=\'utf8\'';
         $config = ['host' => 'foo', 'database' => 'bar', 'search_path' => $searchPath, 'charset' => 'utf8'];
         $connector = $this->getMockBuilder(PostgresConnector::class)->onlyMethods(['createConnection', 'getOptions'])->getMock();
         $connection = m::mock(stdClass::class);
         $connector->expects($this->once())->method('getOptions')->with($this->equalTo($config))->willReturn(['options']);
         $connector->expects($this->once())->method('createConnection')->with($this->equalTo($dsn), $this->equalTo($config), $this->equalTo(['options']))->willReturn($connection);
         $statement = m::mock(PDOStatement::class);
-        $connection->shouldReceive('prepare')->once()->with('set names \'utf8\'')->andReturn($statement);
         $connection->shouldReceive('prepare')->once()->with($expectedSql)->andReturn($statement);
-        $statement->shouldReceive('execute')->twice();
+        $statement->shouldReceive('execute')->once();
         $result = $connector->connect($config);
 
         $this->assertSame($result, $connection);
@@ -184,16 +183,15 @@ class DatabaseConnectorTest extends TestCase
 
     public function testPostgresSearchPathFallbackToConfigKeySchema()
     {
-        $dsn = 'pgsql:host=foo;dbname=\'bar\'';
+        $dsn = 'pgsql:host=foo;dbname=\'bar\';client_encoding=\'utf8\'';
         $config = ['host' => 'foo', 'database' => 'bar', 'schema' => ['public', '"user"'], 'charset' => 'utf8'];
         $connector = $this->getMockBuilder(PostgresConnector::class)->onlyMethods(['createConnection', 'getOptions'])->getMock();
         $connection = m::mock(stdClass::class);
         $connector->expects($this->once())->method('getOptions')->with($this->equalTo($config))->willReturn(['options']);
         $connector->expects($this->once())->method('createConnection')->with($this->equalTo($dsn), $this->equalTo($config), $this->equalTo(['options']))->willReturn($connection);
         $statement = m::mock(PDOStatement::class);
-        $connection->shouldReceive('prepare')->once()->with('set names \'utf8\'')->andReturn($statement);
         $connection->shouldReceive('prepare')->once()->with('set search_path to "public", "user"')->andReturn($statement);
-        $statement->shouldReceive('execute')->twice();
+        $statement->shouldReceive('execute')->once();
         $result = $connector->connect($config);
 
         $this->assertSame($result, $connection);
@@ -201,16 +199,15 @@ class DatabaseConnectorTest extends TestCase
 
     public function testPostgresApplicationNameIsSet()
     {
-        $dsn = 'pgsql:host=foo;dbname=\'bar\'';
+        $dsn = 'pgsql:host=foo;dbname=\'bar\';client_encoding=\'utf8\';application_name=\'Laravel App\'';
         $config = ['host' => 'foo', 'database' => 'bar', 'charset' => 'utf8', 'application_name' => 'Laravel App'];
         $connector = $this->getMockBuilder(PostgresConnector::class)->onlyMethods(['createConnection', 'getOptions'])->getMock();
         $connection = m::mock(stdClass::class);
         $connector->expects($this->once())->method('getOptions')->with($this->equalTo($config))->willReturn(['options']);
         $connector->expects($this->once())->method('createConnection')->with($this->equalTo($dsn), $this->equalTo($config), $this->equalTo(['options']))->willReturn($connection);
         $statement = m::mock(PDOStatement::class);
-        $connection->shouldReceive('prepare')->once()->with('set names \'utf8\'')->andReturn($statement);
-        $connection->shouldReceive('prepare')->once()->with('set application_name to \'Laravel App\'')->andReturn($statement);
-        $statement->shouldReceive('execute')->twice();
+        $connection->shouldReceive('prepare')->zeroOrMoreTimes()->andReturn($statement);
+        $statement->shouldReceive('execute')->zeroOrMoreTimes();
         $result = $connector->connect($config);
 
         $this->assertSame($result, $connection);
