@@ -20,6 +20,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ForwardsCalls;
+use Illuminate\Support\ValidatedInput;
 use JsonSerializable;
 use LogicException;
 use Stringable;
@@ -228,10 +229,10 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     /**
      * Create a new Eloquent model instance.
      *
-     * @param  array  $attributes
+     * @param  array|ValidatedInput  $attributes
      * @return void
      */
-    public function __construct(array $attributes = [])
+    public function __construct(array|ValidatedInput $attributes = [])
     {
         $this->bootIfNotBooted();
 
@@ -501,14 +502,18 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     /**
      * Fill the model with an array of attributes.
      *
-     * @param  array  $attributes
+     * @param  array|ValidatedInput  $attributes
      * @return $this
      *
      * @throws \Illuminate\Database\Eloquent\MassAssignmentException
      */
-    public function fill(array $attributes)
+    public function fill(array|ValidatedInput $attributes)
     {
         $totallyGuarded = $this->totallyGuarded();
+
+        if ($attributes instanceof ValidatedInput) {
+            $attributes = $attributes->all();
+        }
 
         $fillable = $this->fillableFromArray($attributes);
 
@@ -551,10 +556,10 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     /**
      * Fill the model with an array of attributes. Force mass assignment.
      *
-     * @param  array  $attributes
+     * @param  array|ValidatedInput  $attributes
      * @return $this
      */
-    public function forceFill(array $attributes)
+    public function forceFill(array|ValidatedInput $attributes)
     {
         return static::unguarded(fn () => $this->fill($attributes));
     }
@@ -590,11 +595,11 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     /**
      * Create a new instance of the given model.
      *
-     * @param  array  $attributes
+     * @param  array|ValidatedInput  $attributes
      * @param  bool  $exists
      * @return static
      */
-    public function newInstance($attributes = [], $exists = false)
+    public function newInstance(array|ValidatedInput $attributes = [], $exists = false)
     {
         // This method just provides a convenient way for us to generate fresh model
         // instances of this current model. It is particularly useful during the
@@ -611,7 +616,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
 
         $model->mergeCasts($this->casts);
 
-        $model->fill((array) $attributes);
+        $model->fill($attributes);
 
         return $model;
     }
@@ -982,11 +987,11 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     /**
      * Update the model in the database.
      *
-     * @param  array  $attributes
+     * @param  array|ValidatedInput  $attributes
      * @param  array  $options
      * @return bool
      */
-    public function update(array $attributes = [], array $options = [])
+    public function update(array|ValidatedInput $attributes = [], array $options = [])
     {
         if (! $this->exists) {
             return false;
@@ -998,13 +1003,13 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     /**
      * Update the model in the database within a transaction.
      *
-     * @param  array  $attributes
+     * @param  array|ValidatedInput  $attributes
      * @param  array  $options
      * @return bool
      *
      * @throws \Throwable
      */
-    public function updateOrFail(array $attributes = [], array $options = [])
+    public function updateOrFail(array|ValidatedInput $attributes = [], array $options = [])
     {
         if (! $this->exists) {
             return false;
@@ -1016,11 +1021,11 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     /**
      * Update the model in the database without raising any events.
      *
-     * @param  array  $attributes
+     * @param  array|ValidatedInput  $attributes
      * @param  array  $options
      * @return bool
      */
-    public function updateQuietly(array $attributes = [], array $options = [])
+    public function updateQuietly(array|ValidatedInput $attributes = [], array $options = [])
     {
         if (! $this->exists) {
             return false;
