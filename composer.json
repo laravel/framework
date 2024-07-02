@@ -108,7 +108,7 @@
         "nyholm/psr7": "^1.2",
         "orchestra/testbench-core": "^9.1.5",
         "pda/pheanstalk": "^5.0",
-        "phpstan/phpstan": "^1.4.7",
+        "phpstan/phpstan": "^1.11.5",
         "phpunit/phpunit": "^10.5|^11.0",
         "predis/predis": "^2.0.2",
         "resend/resend-php": "^0.10.0",

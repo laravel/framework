@@ -11,66 +11,66 @@ assertType('Illuminate\Database\Eloquent\Collection<int, User>|string|User', $co
 assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->load('string'));
 assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->load(['string']));
 assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->load(['string' => function ($query) {
-    // assertType('\Illuminate\Database\Query\Builder', $query);
+    // assertType('Illuminate\Database\Eloquent\Builder<User>', $query);
 }]));
 
 assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->loadAggregate('string', 'string'));
 assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->loadAggregate(['string'], 'string'));
 assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->loadAggregate(['string'], 'string', 'string'));
 assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->loadAggregate(['string' => function ($query) {
-    // assertType('\Illuminate\Database\Query\Builder', $query);
+    // assertType('Illuminate\Database\Eloquent\Builder<User>', $query);
 }], 'string', 'string'));
 
 assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->loadCount('string'));
 assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->loadCount(['string']));
 assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->loadCount(['string' => function ($query) {
-    // assertType('\Illuminate\Database\Query\Builder', $query);
+    // assertType('Illuminate\Database\Eloquent\Builder<User>', $query);
 }]));
 
 assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->loadMax('string', 'string'));
 assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->loadMax(['string'], 'string'));
 assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->loadMax(['string' => function ($query) {
-    // assertType('\Illuminate\Database\Query\Builder', $query);
+    // assertType('Illuminate\Database\Eloquent\Builder<User>', $query);
 }], 'string'));
 
 assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->loadMin('string', 'string'));
 assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->loadMin(['string'], 'string'));
 assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->loadMin(['string' => function ($query) {
-    // assertType('\Illuminate\Database\Query\Builder', $query);
+    // assertType('Illuminate\Database\Eloquent\Builder<User>', $query);
 }], 'string'));
 
 assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->loadSum('string', 'string'));
 assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->loadSum(['string'], 'string'));
 assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->loadSum(['string' => function ($query) {
-    // assertType('\Illuminate\Database\Query\Builder', $query);
+    // assertType('Illuminate\Database\Eloquent\Builder<User>', $query);
 }], 'string'));
 
 assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->loadAvg('string', 'string'));
 assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->loadAvg(['string'], 'string'));
 assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->loadAvg(['string' => function ($query) {
-    // assertType('\Illuminate\Database\Query\Builder', $query);
+    // assertType('Illuminate\Database\Eloquent\Builder<User>', $query);
 }], 'string'));
 
 assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->loadExists('string'));
 assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->loadExists(['string']));
 assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->loadExists(['string' => function ($query) {
-    // assertType('\Illuminate\Database\Query\Builder', $query);
+    // assertType('Illuminate\Database\Eloquent\Builder<User>', $query);
 }]));
 
 assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->loadMissing('string'));
 assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->loadMissing(['string']));
 assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->loadMissing(['string' => function ($query) {
-    // assertType('\Illuminate\Database\Query\Builder', $query);
+    // assertType('Illuminate\Database\Eloquent\Builder<User>', $query);
 }]));
 
 assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->loadMorph('string', ['string']));
 assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->loadMorph('string', ['string' => function ($query) {
-    // assertType('\Illuminate\Database\Query\Builder', $query);
+    // assertType('Illuminate\Database\Eloquent\Builder<User>', $query);
 }]));
 
 assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->loadMorphCount('string', ['string']));
 assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->loadMorphCount('string', ['string' => function ($query) {
-    // assertType('\Illuminate\Database\Query\Builder', $query);
+    // assertType('Illuminate\Database\Eloquent\Builder<User>', $query);
 }]));
 
 assertType('bool', $collection->contains(function ($user) {
@@ -179,3 +179,5 @@ assertType('Illuminate\Support\Collection<int, string|User>', $collection->pad(2
 assertType('array<int, mixed>', $collection->getQueueableIds());
 
 assertType('array<int, string>', $collection->getQueueableRelations());
+
+assertType('Illuminate\Database\Eloquent\Builder<User>', $collection->toQuery());

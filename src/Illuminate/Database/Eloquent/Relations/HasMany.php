@@ -4,12 +4,18 @@ namespace Illuminate\Database\Eloquent\Relations;
 
 use Illuminate\Database\Eloquent\Collection;
 
+/**
+ * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
+ * @template TDeclaringModel of \Illuminate\Database\Eloquent\Model
+ *
+ * @extends \Illuminate\Database\Eloquent\Relations\HasOneOrMany<TRelatedModel, TDeclaringModel, \Illuminate\Database\Eloquent\Collection<int, TRelatedModel>>
+ */
 class HasMany extends HasOneOrMany
 {
     /**
      * Convert the relationship to a "has one" relationship.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne<TRelatedModel, TDeclaringModel>
      */
     public function one()
     {
@@ -21,11 +27,7 @@ class HasMany extends HasOneOrMany
         ));
     }
 
-    /**
-     * Get the results of the relationship.
-     *
-     * @return mixed
-     */
+    /** @inheritDoc */
     public function getResults()
     {
         return ! is_null($this->getParentKey())
@@ -33,13 +35,7 @@ class HasMany extends HasOneOrMany
                 : $this->related->newCollection();
     }
 
-    /**
-     * Initialize the relation on a set of models.
-     *
-     * @param  array  $models
-     * @param  string  $relation
-     * @return array
-     */
+    /** @inheritDoc */
     public function initRelation(array $models, $relation)
     {
         foreach ($models as $model) {
@@ -49,14 +45,7 @@ class HasMany extends HasOneOrMany
         return $models;
     }
 
-    /**
-     * Match the eagerly loaded results to their parents.
-     *
-     * @param  array  $models
-     * @param  \Illuminate\Database\Eloquent\Collection  $results
-     * @param  string  $relation
-     * @return array
-     */
+    /** @inheritDoc */
     public function match(array $models, Collection $results, $relation)
     {
         return $this->matchMany($models, $results, $relation);
