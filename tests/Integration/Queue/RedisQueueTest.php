@@ -2,8 +2,15 @@
 
 namespace Illuminate\Tests\Queue;
 
+use Illuminate\Bus\Dispatcher as BusDispatcher;
+use Illuminate\Bus\Queueable;
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Cache\Lock;
+use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Contracts\Queue\ShouldBeUnique;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
 use Illuminate\Queue\Events\JobQueued;
 use Illuminate\Queue\Events\JobQueueing;
@@ -516,6 +523,60 @@ class RedisQueueTest extends TestCase
             new RedisQueueIntegrationTestJob(15),
         ]);
     }
+
+    /**
+     * @param  string  $driver
+     */
+    #[DataProvider('redisDriverProvider')]
+    public function testUniqueJobOnlyQueuesOnceOnRedisQueue($driver)
+    {
+        $lock = m::spy(Lock::class);
+        $lock->shouldReceive('get')->andReturn(true, false, false);
+
+        $cache = m::spy(Repository::class);
+        $cache->shouldReceive('lock')->andReturn($lock);
+
+        $container = m::spy(Container::class);
+        $container->shouldReceive('make')->with(Repository::class)->andReturn($cache)->times(3);
+
+        $queue = new RedisQueue($this->redis[$driver]);
+        $queue->setContainer($container);
+
+        $queue->push(new UniqueJob('uniqueId'));
+        $queue->push(new UniqueJob('uniqueId'));
+        $queue->push(new UniqueJob('uniqueId'));
+
+        $this->assertEquals(1, $queue->size());
+    }
+
+    /**
+     * @param  string  $driver
+     */
+    #[DataProvider('redisDriverProvider')]
+    public function testUniqueJobOnlyQueuesOnceBusDispatcher($driver)
+    {
+        $lock = m::spy(Lock::class);
+        $lock->shouldReceive('get')->andReturn(true, false, false);
+
+        $cache = m::spy(Repository::class);
+        $cache->shouldReceive('lock')->andReturn($lock);
+
+        $container = m::spy(Container::class);
+        $container->shouldReceive('make')->with(Repository::class)->andReturn($cache)->times(3);
+
+        $queue = new RedisQueue($this->redis[$driver]);
+        $queue->setContainer($container);
+
+        $dispatcher = new BusDispatcher($container, function () use ($queue) {
+            return $queue;
+        });
+
+        $dispatcher->dispatch(new UniqueJob('uniqueId'));
+        $dispatcher->dispatch(new UniqueJob('uniqueId'));
+        $dispatcher->dispatch(new UniqueJob('uniqueId'));
+
+        $this->assertEquals(1, $queue->size());
+    }
 }
 
 class RedisQueueIntegrationTestJob
@@ -530,5 +591,15 @@ class RedisQueueIntegrationTestJob
     public function handle()
     {
         //
+    }
+}
+
+class UniqueJob extends RedisQueueIntegrationTestJob implements ShouldBeUnique, ShouldQueue
+{
+    use Dispatchable, Queueable;
+
+    public function uniqueId()
+    {
+        return $this->i;
     }
 }
