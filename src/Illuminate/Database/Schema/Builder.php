@@ -42,6 +42,11 @@ class Builder
     public static $defaultStringLength = 255;
 
     /**
+     * The default time precision for migrations.
+     */
+    public static ?int $defaultTimePrecision = 0;
+
+    /**
      * The default relationship morph key type.
      *
      * @var string
@@ -69,6 +74,14 @@ class Builder
     public static function defaultStringLength($length)
     {
         static::$defaultStringLength = $length;
+    }
+
+    /**
+     * Set the default time precision for migrations.
+     */
+    public static function defaultTimePrecision(?int $precision): void
+    {
+        static::$defaultTimePrecision = $precision;
     }
 
     /**

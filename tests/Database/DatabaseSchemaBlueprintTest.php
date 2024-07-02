@@ -12,6 +12,11 @@ use Illuminate\Database\Schema\Grammars\MySqlGrammar;
 use Illuminate\Database\Schema\Grammars\PostgresGrammar;
 use Illuminate\Database\Schema\Grammars\SQLiteGrammar;
 use Illuminate\Database\Schema\Grammars\SqlServerGrammar;
+use Illuminate\Database\Schema\MariaDbBuilder;
+use Illuminate\Database\Schema\MySqlBuilder;
+use Illuminate\Database\Schema\PostgresBuilder;
+use Illuminate\Database\Schema\SQLiteBuilder;
+use Illuminate\Database\Schema\SqlServerBuilder;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
@@ -170,7 +175,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $connection = $this->getConnection(new MySqlGrammar);
         $connection->shouldReceive('isMaria')->andReturn(false);
         $connection->shouldReceive('getServerVersion')->andReturn('5.7');
-        $connection->shouldReceive('getSchemaBuilder->getColumns')->andReturn([
+        $connection->getSchemaBuilder()->shouldReceive('getColumns')->andReturn([
             ['name' => 'name', 'type' => 'varchar(255)', 'type_name' => 'varchar', 'nullable' => true, 'collation' => 'utf8mb4_unicode_ci', 'default' => 'foo', 'comment' => null, 'auto_increment' => false, 'generation' => null],
             ['name' => 'id', 'type' => 'bigint unsigned', 'type_name' => 'bigint', 'nullable' => false, 'collation' => null, 'default' => null, 'comment' => 'lorem ipsum', 'auto_increment' => true, 'generation' => null],
             ['name' => 'generated', 'type' => 'int', 'type_name' => 'int', 'nullable' => false, 'collation' => null, 'default' => null, 'comment' => null, 'auto_increment' => false, 'generation' => ['type' => 'stored', 'expression' => 'expression']],
@@ -194,7 +199,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $connection = $this->getConnection(new MariaDbGrammar);
         $connection->shouldReceive('isMaria')->andReturn(true);
         $connection->shouldReceive('getServerVersion')->andReturn('10.1.35');
-        $connection->shouldReceive('getSchemaBuilder->getColumns')->andReturn([
+        $connection->getSchemaBuilder()->shouldReceive('getColumns')->andReturn([
             ['name' => 'name', 'type' => 'varchar(255)', 'type_name' => 'varchar', 'nullable' => true, 'collation' => 'utf8mb4_unicode_ci', 'default' => 'foo', 'comment' => null, 'auto_increment' => false, 'generation' => null],
             ['name' => 'id', 'type' => 'bigint unsigned', 'type_name' => 'bigint', 'nullable' => false, 'collation' => null, 'default' => null, 'comment' => 'lorem ipsum', 'auto_increment' => true, 'generation' => null],
             ['name' => 'generated', 'type' => 'int', 'type_name' => 'int', 'nullable' => false, 'collation' => null, 'default' => null, 'comment' => null, 'auto_increment' => false, 'generation' => ['type' => 'stored', 'expression' => 'expression']],
@@ -484,12 +489,22 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $this->assertEquals(['comment on table "posts" is \'Look at my comment, it is amazing\''], $getSql(new PostgresGrammar));
     }
 
-    protected function getConnection(Grammar $grammar = null)
+    protected function getConnection(?Grammar $grammar = null)
     {
         $grammar ??= new MySqlGrammar;
 
+        $builder = mock(match ($grammar::class) {
+            MySqlGrammar::class => MySqlBuilder::class,
+            PostgresGrammar::class => PostgresBuilder::class,
+            SQLiteGrammar::class => SQLiteBuilder::class,
+            SqlServerGrammar::class => SqlServerBuilder::class,
+            MariaDbGrammar::class => MariaDbBuilder::class,
+            default => Builder::class,
+        });
+
         return m::mock(Connection::class)
             ->shouldReceive('getSchemaGrammar')->andReturn($grammar)
+            ->shouldReceive('getSchemaBuilder')->andReturn($builder)
             ->getMock();
     }
 

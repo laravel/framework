@@ -7,6 +7,7 @@ use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\ForeignIdColumnDefinition;
 use Illuminate\Database\Schema\Grammars\MariaDbGrammar;
+use Illuminate\Database\Schema\MariaDbBuilder;
 use Illuminate\Tests\Database\Fixtures\Enums\Foo;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -1456,17 +1457,26 @@ class DatabaseMariaDbSchemaGrammarTest extends TestCase
         $this->assertTrue($c);
     }
 
-    protected function getConnection(MariaDbGrammar $grammar = null)
-    {
+    protected function getConnection(
+        ?MariaDbGrammar $grammar = null,
+        ?MariaDbBuilder $builder = null,
+    ) {
         $grammar ??= $this->getGrammar();
+        $builder ??= $this->getBuilder();
 
         return m::mock(Connection::class)
             ->shouldReceive('getSchemaGrammar')->andReturn($grammar)
+            ->shouldReceive('getSchemaBuilder')->andReturn($builder)
             ->getMock();
     }
 
     public function getGrammar()
     {
         return new MariaDbGrammar;
+    }
+
+    public function getBuilder()
+    {
+        return mock(MariaDbBuilder::class);
     }
 }
