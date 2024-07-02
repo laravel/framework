@@ -2,6 +2,8 @@
 
 namespace Illuminate\Contracts\Filesystem;
 
+use Closure;
+
 interface Filesystem
 {
     /**
@@ -17,6 +19,31 @@ interface Filesystem
      * @var string
      */
     const VISIBILITY_PRIVATE = 'private';
+
+    /**
+     * Assert that the given file or directory exists.
+     *
+     * @param  string|array  $path
+     * @param  string|null  $content
+     * @return $this
+     */
+    public function assertExists($path, $content = null);
+
+    /**
+     * Assert that the given file or directory does not exist.
+     *
+     * @param  string|array  $path
+     * @return $this
+     */
+    public function assertMissing($path);
+
+    /**
+     * Assert that the given directory is empty.
+     *
+     * @param  string  $path
+     * @return $this
+     */
+    public function assertDirectoryEmpty($path);
 
     /**
      * Get the full path to the file that exists at the given relative path.
@@ -35,6 +62,46 @@ interface Filesystem
     public function exists($path);
 
     /**
+     * Determine if a file or directory is missing.
+     *
+     * @param  string  $path
+     * @return bool
+     */
+    public function missing($path);
+
+    /**
+     * Determine if a file exists.
+     *
+     * @param  string  $path
+     * @return bool
+     */
+    public function fileExists($path);
+
+    /**
+     * Determine if a file is missing.
+     *
+     * @param  string  $path
+     * @return bool
+     */
+    public function fileMissing($path);
+
+    /**
+     * Determine if a directory exists.
+     *
+     * @param  string  $path
+     * @return bool
+     */
+    public function directoryExists($path);
+
+    /**
+     * Determine if a directory is missing.
+     *
+     * @param  string  $path
+     * @return bool
+     */
+    public function directoryMissing($path);
+
+    /**
      * Get the contents of a file.
      *
      * @param  string  $path
@@ -51,12 +118,41 @@ interface Filesystem
     public function readStream($path);
 
     /**
+     * Get the contents of a file as decoded JSON.
+     *
+     * @param  string  $path
+     * @param  int  $flags
+     * @return array|null
+     */
+    public function json($path, $flags = 0);
+
+    /**
+     * Create a streamed response for a given file.
+     *
+     * @param  string  $path
+     * @param  string|null  $name
+     * @param  array  $headers
+     * @param  string|null  $disposition
+     * @return \Symfony\Component\HttpFoundation\StreamedResponse
+     */
+    public function response($path, $name = null, array $headers = [], $disposition = 'inline');
+
+    /**
+     * Create a streamed download response for a given file.
+     *
+     * @param  string  $path
+     * @param  string|null  $name
+     * @return \Symfony\Component\HttpFoundation\StreamedResponse
+     */
+    public function download($path, $name = null, array $headers = []);
+
+    /**
      * Write the contents of a file.
      *
      * @param  string  $path
      * @param  \Psr\Http\Message\StreamInterface|\Illuminate\Http\File|\Illuminate\Http\UploadedFile|string|resource  $contents
      * @param  mixed  $options
-     * @return bool
+     * @return string|bool
      */
     public function put($path, $contents, $options = []);
 
@@ -113,18 +209,20 @@ interface Filesystem
      *
      * @param  string  $path
      * @param  string  $data
+     * @param  string  $separator
      * @return bool
      */
-    public function prepend($path, $data);
+    public function prepend($path, $data, $separator = PHP_EOL);
 
     /**
      * Append to a file.
      *
      * @param  string  $path
      * @param  string  $data
+     * @param  string  $separator
      * @return bool
      */
-    public function append($path, $data);
+    public function append($path, $data, $separator = PHP_EOL);
 
     /**
      * Delete the file at a given path.
@@ -161,12 +259,60 @@ interface Filesystem
     public function size($path);
 
     /**
+     * Get the checksum for a file.
+     *
+     * @return string|false
+     *
+     * @throws \League\Flysystem\UnableToProvideChecksum
+     */
+    public function checksum(string $path, array $options = []);
+
+    /**
+     * Get the mime-type of a given file.
+     *
+     * @param  string  $path
+     * @return string|false
+     */
+    public function mimeType($path);
+
+    /**
      * Get the file's last modification time.
      *
      * @param  string  $path
      * @return int
      */
     public function lastModified($path);
+
+    /**
+     * Determine if temporary URLs can be generated.
+     *
+     * @return bool
+     */
+    public function providesTemporaryUrls();
+
+    /**
+     * Get a temporary URL for the file at the given path.
+     *
+     * @param  string  $path
+     * @param  \DateTimeInterface  $expiration
+     * @param  array  $options
+     * @return string
+     *
+     * @throws \RuntimeException
+     */
+    public function temporaryUrl($path, $expiration, array $options = []);
+
+    /**
+     * Get a temporary upload URL for the file at the given path.
+     *
+     * @param  string  $path
+     * @param  \DateTimeInterface  $expiration
+     * @param  array  $options
+     * @return array
+     *
+     * @throws \RuntimeException
+     */
+    public function temporaryUploadUrl($path, $expiration, array $options = []);
 
     /**
      * Get an array of all files in a directory.
@@ -195,7 +341,7 @@ interface Filesystem
     public function directories($directory = null, $recursive = false);
 
     /**
-     * Get all (recursive) of the directories within a given directory.
+     * Get all the directories within a given directory (recursive).
      *
      * @param  string|null  $directory
      * @return array
@@ -217,4 +363,33 @@ interface Filesystem
      * @return bool
      */
     public function deleteDirectory($directory);
+
+    /**
+     * Get the Flysystem driver.
+     *
+     * @return \League\Flysystem\FilesystemOperator
+     */
+    public function getDriver();
+
+    /**
+     * Get the Flysystem adapter.
+     *
+     * @return \League\Flysystem\FilesystemAdapter
+     */
+    public function getAdapter();
+
+    /**
+     * Get the configuration values.
+     *
+     * @return array
+     */
+    public function getConfig();
+
+    /**
+     * Define a custom temporary URL builder callback.
+     *
+     * @param  \Closure  $callback
+     * @return void
+     */
+    public function buildTemporaryUrlsUsing(Closure $callback);
 }
