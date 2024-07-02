@@ -2,14 +2,15 @@
 
 namespace Illuminate\View;
 
-use Illuminate\Contracts\Container\Container;
+use Illuminate\Support\Arr;
+use InvalidArgumentException;
+use Illuminate\Support\Traits\Macroable;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Contracts\View\Factory as FactoryContract;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Traits\Macroable;
 use Illuminate\View\Engines\EngineResolver;
-use InvalidArgumentException;
+use Illuminate\Contracts\Support\Renderable;
+use Illuminate\Contracts\Container\Container;
+use Illuminate\Contracts\View\Factory as FactoryContract;
 
 class Factory implements FactoryContract
 {
@@ -103,6 +104,20 @@ class Factory implements FactoryContract
      * @var array
      */
     protected $normalizedNameCache = [];
+
+    /**
+     * Flag to determine if renderable shared data cache is set.
+     *
+     * @var boolean
+     */
+    protected $renderableSharedCacheIsSet = false;
+
+    /**
+     * The cache of shared data with objects cast to strings.
+     *
+     * @var array
+     */
+    protected $renderableSharedCache = [];
 
     /**
      * Create a new view factory instance.
@@ -357,6 +372,8 @@ class Factory implements FactoryContract
         foreach ($keys as $key => $value) {
             $this->shared[$key] = $value;
         }
+
+        $this->renderableSharedCacheIsSet = false;
 
         return $value;
     }
@@ -630,5 +647,23 @@ class Factory implements FactoryContract
     public function getShared()
     {
         return $this->shared;
+    }
+
+    public function getRenderableShared()
+    {
+        if ($this->renderableSharedCacheIsSet) {
+            return $this->renderableSharedCache;
+        }
+
+        $this->renderableSharedCache = $this->getShared();
+        foreach ($this->renderableSharedCache as $key => $value) {
+            if ($value instanceof Renderable) {
+                $this->renderableSharedCache[$key] = $value->render();
+            }
+        }
+
+        $this->renderableSharedCacheIsSet = true;
+
+        return $this->renderableSharedCache;
     }
 }

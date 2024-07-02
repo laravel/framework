@@ -474,7 +474,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 
         $result = $this->compiler()->compileTags('<x-anonymous-component :name="\'Taylor\'" :age="31" wire:model="foo" />');
 
-        $this->assertSame("##BEGIN-COMPONENT-CLASS##@component('Illuminate\View\AnonymousComponent', 'anonymous-component', ['view' => 'components.anonymous-component','data' => ['name' => 'Taylor','age' => 31,'wire:model' => 'foo']])
+        $this->assertSame("##BEGIN-COMPONENT-CLASS##@component('Illuminate\View\AnonymousComponent', 'anonymous-component', ['view' => 'components.anonymous-component','data' => ['name' => 'Taylor','age' => 31,'wire:model' => 'foo'],'factory' => \$__env])
 <?php if (isset(\$attributes) && \$attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
 <?php \$attributes = \$attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
 <?php endif; ?>
@@ -493,7 +493,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 
         $result = $this->compiler()->compileTags('<x-anonymous-component :name="\'Taylor\'" :age="31" wire:model="foo" />');
 
-        $this->assertSame("##BEGIN-COMPONENT-CLASS##@component('Illuminate\View\AnonymousComponent', 'anonymous-component', ['view' => 'components.anonymous-component.index','data' => ['name' => 'Taylor','age' => 31,'wire:model' => 'foo']])
+        $this->assertSame("##BEGIN-COMPONENT-CLASS##@component('Illuminate\View\AnonymousComponent', 'anonymous-component', ['view' => 'components.anonymous-component.index','data' => ['name' => 'Taylor','age' => 31,'wire:model' => 'foo'],'factory' => \$__env])
 <?php if (isset(\$attributes) && \$attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
 <?php \$attributes = \$attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
 <?php endif; ?>
@@ -512,7 +512,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 
         $result = $this->compiler()->compileTags('<x-package::anonymous-component :name="\'Taylor\'" :age="31" wire:model="foo" />');
 
-        $this->assertSame("##BEGIN-COMPONENT-CLASS##@component('Illuminate\View\AnonymousComponent', 'package::anonymous-component', ['view' => 'package::components.anonymous-component','data' => ['name' => 'Taylor','age' => 31,'wire:model' => 'foo']])
+        $this->assertSame("##BEGIN-COMPONENT-CLASS##@component('Illuminate\View\AnonymousComponent', 'package::anonymous-component', ['view' => 'package::components.anonymous-component','data' => ['name' => 'Taylor','age' => 31,'wire:model' => 'foo'],'factory' => \$__env])
 <?php if (isset(\$attributes) && \$attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
 <?php \$attributes = \$attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
 <?php endif; ?>
@@ -546,7 +546,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 
         $result = $compiler->compileTags('<x-frontend::anonymous-component :name="\'Taylor\'" :age="31" wire:model="foo" />');
 
-        $this->assertSame("##BEGIN-COMPONENT-CLASS##@component('Illuminate\View\AnonymousComponent', 'frontend::anonymous-component', ['view' => 'public.frontend.anonymous-component','data' => ['name' => 'Taylor','age' => 31,'wire:model' => 'foo']])
+        $this->assertSame("##BEGIN-COMPONENT-CLASS##@component('Illuminate\View\AnonymousComponent', 'frontend::anonymous-component', ['view' => 'public.frontend.anonymous-component','data' => ['name' => 'Taylor','age' => 31,'wire:model' => 'foo'],'factory' => \$__env])
 <?php if (isset(\$attributes) && \$attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
 <?php \$attributes = \$attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
 <?php endif; ?>
@@ -580,7 +580,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 
         $result = $compiler->compileTags('<x-admin.auth::anonymous-component :name="\'Taylor\'" :age="31" wire:model="foo" />');
 
-        $this->assertSame("##BEGIN-COMPONENT-CLASS##@component('Illuminate\View\AnonymousComponent', 'admin.auth::anonymous-component', ['view' => 'admin.auth.components.anonymous-component.index','data' => ['name' => 'Taylor','age' => 31,'wire:model' => 'foo']])
+        $this->assertSame("##BEGIN-COMPONENT-CLASS##@component('Illuminate\View\AnonymousComponent', 'admin.auth::anonymous-component', ['view' => 'admin.auth.components.anonymous-component.index','data' => ['name' => 'Taylor','age' => 31,'wire:model' => 'foo'],'factory' => \$__env])
 <?php if (isset(\$attributes) && \$attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
 <?php \$attributes = \$attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
 <?php endif; ?>
@@ -613,7 +613,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 
         $result = $compiler->compileTags('<x-panel />');
 
-        $this->assertSame("##BEGIN-COMPONENT-CLASS##@component('Illuminate\View\AnonymousComponent', 'panel', ['view' => '".md5('test-directory')."::panel.index','data' => []])
+        $this->assertSame("##BEGIN-COMPONENT-CLASS##@component('Illuminate\View\AnonymousComponent', 'panel', ['view' => '".md5('test-directory')."::panel.index','data' => [],'factory' => \$__env])
 <?php if (isset(\$attributes) && \$attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
 <?php \$attributes = \$attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
 <?php endif; ?>
@@ -646,7 +646,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 
         $result = $compiler->compileTags('<x-panel />');
 
-        $this->assertSame("##BEGIN-COMPONENT-CLASS##@component('Illuminate\View\AnonymousComponent', 'panel', ['view' => '".md5('test-directory')."::panel','data' => []])
+        $this->assertSame("##BEGIN-COMPONENT-CLASS##@component('Illuminate\View\AnonymousComponent', 'panel', ['view' => '".md5('test-directory')."::panel','data' => [],'factory' => \$__env])
 <?php if (isset(\$attributes) && \$attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
 <?php \$attributes = \$attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
 <?php endif; ?>

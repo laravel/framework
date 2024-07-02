@@ -45,6 +45,13 @@ abstract class Compiler
     protected $compiledExtension = 'php';
 
     /**
+     * The cache of compiled paths.
+     *
+     * @var array
+     */
+    protected $compiledPathCache = [];
+
+    /**
      * Create a new compiler instance.
      *
      * @param  \Illuminate\Filesystem\Filesystem  $files
@@ -82,7 +89,7 @@ abstract class Compiler
      */
     public function getCompiledPath($path)
     {
-        return $this->cachePath.'/'.hash('xxh128', 'v2'.Str::after($path, $this->basePath)).'.'.$this->compiledExtension;
+        return $this->compiledPathCache[$path] ??= $this->cachePath.'/'.hash('xxh128', 'v2'.Str::after($path, $this->basePath)).'.'.$this->compiledExtension;
     }
 
     /**

@@ -215,7 +215,7 @@ class View implements ArrayAccess, Htmlable, Stringable, ViewContract
      */
     public function gatherData()
     {
-        $data = array_merge($this->factory->getShared(), $this->data);
+        $data = $this->data;
 
         foreach ($data as $key => $value) {
             if ($value instanceof Renderable) {
@@ -223,7 +223,7 @@ class View implements ArrayAccess, Htmlable, Stringable, ViewContract
             }
         }
 
-        return $data;
+        return array_merge($this->factory->getRenderableShared(), $data);
     }
 
     /**
@@ -305,7 +305,7 @@ class View implements ArrayAccess, Htmlable, Stringable, ViewContract
      */
     public function name()
     {
-        return $this->getName();
+        return $this->view;
     }
 
     /**
