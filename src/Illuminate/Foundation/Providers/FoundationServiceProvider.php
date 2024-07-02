@@ -22,7 +22,9 @@ use Illuminate\Foundation\Vite;
 use Illuminate\Http\Client\Factory as HttpFactory;
 use Illuminate\Http\Request;
 use Illuminate\Log\Events\MessageLogged;
+use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Support\AggregateServiceProvider;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Testing\LoggedExceptionCollection;
 use Illuminate\Testing\ParallelTestingServiceProvider;
@@ -86,6 +88,7 @@ class FoundationServiceProvider extends AggregateServiceProvider
         $this->registerDumper();
         $this->registerRequestValidation();
         $this->registerRequestSignatureValidation();
+        $this->registerDeferHandler();
         $this->registerExceptionTracking();
         $this->registerExceptionRenderer();
         $this->registerMaintenanceModeManager();
@@ -181,6 +184,33 @@ class FoundationServiceProvider extends AggregateServiceProvider
 
         Request::macro('hasValidRelativeSignatureWhileIgnoring', function ($ignoreQuery = []) {
             return URL::hasValidSignature($this, $absolute = false, $ignoreQuery);
+        });
+    }
+
+    /**
+     * Register the "defer" function termination handler.
+     *
+     * @return void
+     */
+    protected function registerDeferHandler()
+    {
+        $this->app->scoped('illuminate:foundation:deferred', Collection::class);
+
+        $this->callAfterResolving('illuminate:foundation:deferred', function (Collection $defers) {
+            $run = function () use ($defers) {
+                while ($callback = $defers->shift()) {
+                    rescue($callback);
+                }
+            };
+
+            // TODO: This should also listen for other events, e.g., `JobFailed`...
+            app('events')->listen(function (JobProcessed $event) use ($run) {
+                if ($event->connectionName !== 'sync') {
+                    $run();
+                }
+            });
+
+            app()->terminating($run);
         });
     }
 

@@ -399,6 +399,24 @@ if (! function_exists('decrypt')) {
     }
 }
 
+if (! function_exists('defer')) {
+    /**
+     * Defer execution of the given callback.
+     *
+     * @param  callable|null  $callback
+     * @param  string|null  $name
+     * @return mixed
+     */
+    function defer(?callable $callback = null, ?string $name = null)
+    {
+        if ($callback === null) {
+            return app('illuminate:foundation:deferred');
+        }
+
+        app('illuminate:foundation:deferred')[$name] = $callback;
+    }
+}
+
 if (! function_exists('dispatch')) {
     /**
      * Dispatch a job to its appropriate handler.
