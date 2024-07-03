@@ -123,7 +123,6 @@ class BusDispatcherTest extends TestCase
                 ->with('foo', $job)
                 ->once();
 
-
             return $mock;
         });
 
