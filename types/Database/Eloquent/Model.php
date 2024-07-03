@@ -20,6 +20,10 @@ function test(User $user): void
 
     assertType('Illuminate\Database\Eloquent\Collection<int, User>', $user->newCollection([new User()]));
     assertType('Illuminate\Database\Eloquent\Collection<string, Illuminate\Types\Model\Post>', $user->newCollection(['foo' => new Post()]));
+
+    assertType('bool', $user->restore());
+    assertType('User', $user->restoreOrCreate());
+    assertType('User', $user->createOrRestore());
 }
 
 class Post extends Model

@@ -6,6 +6,8 @@ namespace Illuminate\Database\Eloquent;
  * @method static \Illuminate\Database\Eloquent\Builder<static> withTrashed(bool $withTrashed = true)
  * @method static \Illuminate\Database\Eloquent\Builder<static> onlyTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder<static> withoutTrashed()
+ * @method static static restoreOrCreate(array<string, mixed> $attributes = [], array<string, mixed> $values = [])
+ * @method static static createOrRestore(array<string, mixed> $attributes = [], array<string, mixed> $values = [])
  *
  * @mixin \Illuminate\Database\Eloquent\Model
  */
