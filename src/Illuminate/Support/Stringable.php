@@ -984,6 +984,16 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     }
 
     /**
+     * Translate the value.
+     *
+     * @return static
+     */
+    public function trans()
+    {
+        return new static(trans($this->value));
+    }
+
+    /**
      * Trim the string of the given characters.
      *
      * @param  string  $characters
