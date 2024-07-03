@@ -8,6 +8,7 @@ use Illuminate\Contracts\Support\CanBeEscapedWhenCastToString;
 use Illuminate\Support\Traits\EnumeratesValues;
 use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
+use ReflectionFunction;
 use stdClass;
 use Traversable;
 
@@ -370,6 +371,35 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
         }
 
         return new static(array_filter($this->items));
+    }
+
+    /**
+     * Run a map and filter over each of the items.
+     *
+     * @template TMapValue
+     *
+     * @param  callable(TValue, TKey): TMapValue  $callback
+     * @param  (callable(TValue, TKey): bool)|null  $reject
+     * @return static<TKey, TMapValue>
+     */
+    public function filterMap($callable, $filter = null)
+    {
+        $filter = $filter === null
+            ? fn ($value) => (bool) $value
+            : match((new ReflectionFunction($filter))->getNumberOfParameters()) {
+                1 => fn ($value) => $filter($value),
+                default => $filter,
+            };
+
+        $result = [];
+
+        foreach ($this->items as $key => $value) {
+            if ($filter($v = $callable($value, $key), $key)) {
+                $result[$key] = $v;
+            }
+        }
+
+        return new static($result);
     }
 
     /**
@@ -919,6 +949,35 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
         $keys = is_array($keys) ? $keys : func_get_args();
 
         return new static(Arr::only($this->items, $keys));
+    }
+
+    /**
+     * Run a map and reject over each of the items.
+     *
+     * @template TMapValue
+     *
+     * @param  callable(TValue, TKey): TMapValue  $callback
+     * @param  (callable(TValue, TKey): bool)|null  $reject
+     * @return static<TKey, TMapValue>
+     */
+    public function rejectMap($callable, $reject = null)
+    {
+        $reject = $reject === null
+            ? fn ($value) => (bool) $value
+            : match((new ReflectionFunction($reject))->getNumberOfParameters()) {
+                1 => fn ($value) => $reject($value),
+                default => $reject,
+            };
+
+        $result = [];
+
+        foreach ($this->items as $key => $value) {
+            if (! $reject($v = $callable($value, $key), $key)) {
+                $result[$key] = $v;
+            }
+        }
+
+        return new static($result);
     }
 
     /**

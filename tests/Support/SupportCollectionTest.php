@@ -5529,6 +5529,186 @@ class SupportCollectionTest extends TestCase
         $this->assertNull($collection->percentage(fn ($value) => $value === 1));
     }
 
+    public function testItCanFilterMap()
+    {
+        $collection = new Collection(['foo' => '1', 'bar' => '2', 'baz' => '3']);
+
+        // null...
+        $result = $collection->filterMap(function ($value, $key) {
+            if ($value === '2' && $key === 'bar') {
+                return null;
+            }
+
+            return $value * 2;
+        });
+        $this->assertNotSame($result, $collection);
+        $this->assertSame(['foo' => 2, 'baz' => 6], $result->all());
+
+        // false...
+        $result = $collection->filterMap(function ($value, $key) {
+            if ($value === '2' && $key === 'bar') {
+                return false;
+            }
+
+            return $value * 2;
+        });
+        $this->assertNotSame($result, $collection);
+        $this->assertSame(['foo' => 2, 'baz' => 6], $result->all());
+
+        // falsey...
+        $result = $collection->filterMap(function ($value, $key) {
+            if ($value === '2' && $key === 'bar') {
+                return '';
+            }
+
+            return $value * 2;
+        });
+        $this->assertNotSame($result, $collection);
+        $this->assertSame(['foo' => 2, 'baz' => 6], $result->all());
+
+        // specify values to filter...
+        $result = $collection->filterMap(function ($value, $key) {
+            if ($value === '2' && $key === 'bar') {
+                return null;
+            }
+
+            return $value * 2;
+        }, fn ($v) => ! is_null($v));
+        $this->assertNotSame($result, $collection);
+        $this->assertSame(['foo' => 2, 'baz' => 6], $result->all());
+
+        $result = $collection->filterMap(function ($value, $key) {
+            if ($value === '2' && $key === 'bar') {
+                return false;
+            }
+
+            return $value * 2;
+        }, fn ($v) => ! is_null($v));
+        $this->assertNotSame($result, $collection);
+        $this->assertSame(['foo' => 2, 'bar' => false, 'baz' => 6], $result->all());
+
+        $result = $collection->filterMap(function ($value, $key) {
+            if ($value === '2' && $key === 'bar') {
+                return '';
+            }
+
+            return $value * 2;
+        }, fn ($v, $k) => ! is_null($v));
+        $this->assertNotSame($result, $collection);
+        $this->assertSame(['foo' => 2, 'bar' => '', 'baz' => 6], $result->all());
+
+        // builtins with single argument
+        $result = $collection->filterMap(function ($value, $key) {
+            if ($value === '2' && $key === 'bar') {
+                return null;
+            }
+
+            return $value * 2;
+        }, is_null(...));
+        $this->assertNotSame($result, $collection);
+        $this->assertSame(['bar' => null], $result->all());
+
+        $result = $collection->filterMap(function ($value, $key) {
+            if ($value === '2' && $key === 'bar') {
+                return '';
+            }
+
+            return $value * 2;
+        }, is_null(...));
+        $this->assertNotSame($result, $collection);
+        $this->assertSame([], $result->all());
+    }
+
+    public function testItCanRejectMap()
+    {
+        $collection = new Collection(['foo' => '1', 'bar' => '2', 'baz' => '3']);
+
+        // null...
+        $result = $collection->rejectMap(function ($value, $key) {
+            if ($value === '2' && $key === 'bar') {
+                return null;
+            }
+
+            return $value * 2;
+        });
+        $this->assertNotSame($result, $collection);
+        $this->assertSame(['bar' => null], $result->all());
+
+        // false...
+        $result = $collection->rejectMap(function ($value, $key) {
+            if ($value === '2' && $key === 'bar') {
+                return false;
+            }
+
+            return $value * 2;
+        });
+        $this->assertNotSame($result, $collection);
+        $this->assertSame(['bar' => false], $result->all());
+
+        // falsey...
+        $result = $collection->rejectMap(function ($value, $key) {
+            if ($value === '2' && $key === 'bar') {
+                return '';
+            }
+
+            return $value * 2;
+        });
+        $this->assertNotSame($result, $collection);
+        $this->assertSame(['bar' => ''], $result->all());
+
+        // specify values to filter...
+        $result = $collection->rejectMap(function ($value, $key) {
+            if ($value === '2' && $key === 'bar') {
+                return null;
+            }
+
+            return $value * 2;
+        }, null);
+        $this->assertNotSame($result, $collection);
+        $this->assertSame(['bar' => null], $result->all());
+
+        $result = $collection->rejectMap(function ($value, $key) {
+            if ($value === '2' && $key === 'bar') {
+                return null;
+            }
+
+            return $value * 2;
+        }, fn ($v, $k) => is_null($v) && $k === 'bar');
+        $this->assertNotSame($result, $collection);
+        $this->assertSame(['foo' => 2, 'baz' => 6], $result->all());
+
+        $result = $collection->rejectMap(function ($value, $key) {
+            if ($value === '2' && $key === 'bar') {
+                return '';
+            }
+
+            return $value * 2;
+        }, fn ($v, $k) => is_string($v) && $k === 'bar');
+        $this->assertNotSame($result, $collection);
+        $this->assertSame(['foo' => 2, 'baz' => 6], $result->all());
+
+        // builtins with single argument
+        $result = $collection->rejectMap(function ($value, $key) {
+            if ($value === '2' && $key === 'bar') {
+                return null;
+            }
+
+            return $value * 2;
+        }, is_null(...));
+        $this->assertNotSame($result, $collection);
+        $this->assertSame(['foo' => 2, 'baz' => 6], $result->all());
+
+        $result = $collection->rejectMap(function ($value, $key) {
+            if ($value === '2' && $key === 'bar') {
+                return '';
+            }
+
+            return $value * 2;
+        }, is_null(...));
+        $this->assertNotSame($result, $collection);
+        $this->assertSame(['foo' => 2, 'bar' => '', 'baz' => 6], $result->all());
+    }
+
     /**
      * Provides each collection class, respectively.
      *
