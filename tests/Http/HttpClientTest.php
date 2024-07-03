@@ -1773,7 +1773,7 @@ class HttpClientTest extends TestCase
 
         try {
             $this->factory
-                ->retry([1000,1000], 1000, function ($exception) use (&$whenAttempts) {
+                ->retry([1000, 1000], 1000, function ($exception) use (&$whenAttempts) {
                     $whenAttempts++;
 
                     return $exception->response->status() === 403;
@@ -1813,7 +1813,7 @@ class HttpClientTest extends TestCase
         ]);
 
         $response = $this->factory
-            ->retry([1,2], throw: false)
+            ->retry([1, 2], throw: false)
             ->get('http://foo.com/get');
 
         $this->assertTrue($response->failed());
@@ -1853,7 +1853,7 @@ class HttpClientTest extends TestCase
         $whenAttempts = 0;
 
         $response = $this->factory
-            ->retry([1,2], 0, function ($exception) use (&$whenAttempts) {
+            ->retry([1, 2], 0, function ($exception) use (&$whenAttempts) {
                 $whenAttempts++;
 
                 return $exception->response->status() === 403;
@@ -1952,7 +1952,7 @@ class HttpClientTest extends TestCase
 
         try {
             $this->factory
-                ->retry([1,2,3], when: function ($exception) use (&$whenAttempts) {
+                ->retry([1, 2, 3], when: function ($exception) use (&$whenAttempts) {
                     throw new Exception('Foo bar');
                 }, throw: false)
                 ->get('http://foo.com/get');
