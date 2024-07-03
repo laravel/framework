@@ -250,6 +250,7 @@ class PostgresGrammar extends Grammar
     public function compileChange(Blueprint $blueprint, Fluent $command, Connection $connection)
     {
         $column = $command->column;
+
         $changes = ['type '.$this->getType($column).$this->modifyCollate($blueprint, $column)];
 
         foreach ($this->modifiers as $modifier) {

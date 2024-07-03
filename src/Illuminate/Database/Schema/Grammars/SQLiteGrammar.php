@@ -257,6 +257,7 @@ class SQLiteGrammar extends Grammar
         $columns = collect($blueprint->getState()->getColumns())
             ->map(function ($column) use ($blueprint, &$columnNames, &$autoIncrementColumn) {
                 $name = $this->wrap($column);
+
                 $autoIncrementColumn = $column->autoIncrement ? $column->name : $autoIncrementColumn;
 
                 if (is_null($column->virtualAs) && is_null($column->virtualAsJson) &&

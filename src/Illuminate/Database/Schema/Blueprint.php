@@ -84,7 +84,7 @@ class Blueprint
      *
      * @var \Illuminate\Database\Schema\BlueprintState|null
      */
-    private $state;
+    protected $state;
 
     /**
      * Create a new schema blueprint.
@@ -286,34 +286,37 @@ class Blueprint
      */
     public function addAlterCommands(Connection $connection, Grammar $grammar)
     {
-        if ($grammar instanceof SQLiteGrammar) {
-            $alterCommands = $grammar->getAlterCommands($connection);
-            $commands = [];
-            $lastCommandWasAlter = false;
-            $hasAlterCommand = false;
-
-            foreach ($this->commands as $command) {
-                if (in_array($command->name, $alterCommands)) {
-                    $lastCommandWasAlter = true;
-                    $hasAlterCommand = true;
-                } elseif ($lastCommandWasAlter) {
-                    $commands[] = $this->createCommand('alter');
-                    $lastCommandWasAlter = false;
-                }
-
-                $commands[] = $command;
-            }
-
-            if ($lastCommandWasAlter) {
-                $commands[] = $this->createCommand('alter');
-            }
-
-            if ($hasAlterCommand) {
-                $this->state = new BlueprintState($this, $connection, $grammar);
-            }
-
-            $this->commands = $commands;
+        if (! $grammar instanceof SQLiteGrammar) {
+            return;
         }
+
+        $alterCommands = $grammar->getAlterCommands($connection);
+
+        [$commands, $lastCommandWasAlter, $hasAlterCommand] = [
+            [], false, false,
+        ];
+
+        foreach ($this->commands as $command) {
+            if (in_array($command->name, $alterCommands)) {
+                $hasAlterCommand = true;
+                $lastCommandWasAlter = true;
+            } elseif ($lastCommandWasAlter) {
+                $commands[] = $this->createCommand('alter');
+                $lastCommandWasAlter = false;
+            }
+
+            $commands[] = $command;
+        }
+
+        if ($lastCommandWasAlter) {
+            $commands[] = $this->createCommand('alter');
+        }
+
+        if ($hasAlterCommand) {
+            $this->state = new BlueprintState($this, $connection, $grammar);
+        }
+
+        $this->commands = $commands;
     }
 
     /**
@@ -1804,16 +1807,6 @@ class Blueprint
         return $this->commands;
     }
 
-    /**
-     * Get the state of the blueprint.
-     *
-     * @return \Illuminate\Database\Schema\BlueprintState
-     */
-    public function getState()
-    {
-        return $this->state;
-    }
-
     /*
      * Determine if the blueprint has state.
      *
@@ -1823,6 +1816,16 @@ class Blueprint
     private function hasState(): bool
     {
         return ! is_null($this->state);
+    }
+
+    /**
+     * Get the state of the blueprint.
+     *
+     * @return \Illuminate\Database\Schema\BlueprintState
+     */
+    public function getState()
+    {
+        return $this->state;
     }
 
     /**

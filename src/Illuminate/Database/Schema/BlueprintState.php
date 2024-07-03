@@ -113,16 +113,6 @@ class BlueprintState
     }
 
     /**
-     * Get columns.
-     *
-     * @return \Illuminate\Database\Schema\ColumnDefinition[]
-     */
-    public function getColumns()
-    {
-        return $this->columns;
-    }
-
-    /**
      * Get the primary key.
      *
      * @return \Illuminate\Database\Schema\IndexDefinition|null
@@ -133,7 +123,17 @@ class BlueprintState
     }
 
     /**
-     * Get indexes.
+     * Get the columns.
+     *
+     * @return \Illuminate\Database\Schema\ColumnDefinition[]
+     */
+    public function getColumns()
+    {
+        return $this->columns;
+    }
+
+    /**
+     * Get the indexes.
      *
      * @return \Illuminate\Database\Schema\IndexDefinition[]
      */
@@ -143,7 +143,7 @@ class BlueprintState
     }
 
     /**
-     * Get foreign keys.
+     * Get the foreign keys.
      *
      * @return \Illuminate\Database\Schema\ForeignKeyDefinition[]
      */
@@ -162,13 +162,13 @@ class BlueprintState
     {
         switch ($command->name) {
             case 'alter':
-                // Already Handled...
-
+                // Already handled...
                 break;
+
             case 'add':
                 $this->columns[] = $command->column;
-
                 break;
+
             case 'change':
                 foreach ($this->columns as &$column) {
                     if ($column->name === $command->column->name) {
@@ -178,6 +178,7 @@ class BlueprintState
                 }
 
                 break;
+
             case 'renameColumn':
                 foreach ($this->columns as $column) {
                     if ($column->name === $command->from) {
@@ -199,15 +200,23 @@ class BlueprintState
                 }
 
                 break;
-            case 'primary':
-                $this->primaryKey = $command;
+
+            case 'dropColumn':
+                $this->columns = array_values(
+                    array_filter($this->columns, fn ($column) => ! in_array($column->name, $command->columns))
+                );
 
                 break;
+
+            case 'primary':
+                $this->primaryKey = $command;
+                break;
+
             case 'unique':
             case 'index':
                 $this->indexes[] = $command;
-
                 break;
+
             case 'renameIndex':
                 foreach ($this->indexes as $index) {
                     if ($index->index === $command->from) {
@@ -217,27 +226,23 @@ class BlueprintState
                 }
 
                 break;
+
             case 'foreign':
                 $this->foreignKeys[] = $command;
-
                 break;
-            case 'dropColumn':
-                $this->columns = array_values(
-                    array_filter($this->columns, fn ($column) => ! in_array($column->name, $command->columns))
-                );
 
-                break;
             case 'dropPrimary':
                 $this->primaryKey = null;
-
                 break;
-            case 'dropUnique':
+
             case 'dropIndex':
+            case 'dropUnique':
                 $this->indexes = array_values(
                     array_filter($this->indexes, fn ($index) => $index->index !== $command->index)
                 );
 
                 break;
+
             case 'dropForeign':
                 $this->foreignKeys = array_values(
                     array_filter($this->foreignKeys, fn ($fk) => $fk->columns !== $command->columns)
