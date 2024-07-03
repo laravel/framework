@@ -1018,6 +1018,8 @@ class Application extends Container implements ApplicationContract, CachesConfig
      * @param  string  $abstract
      * @param  array  $parameters
      * @return mixed
+     *
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     public function make($abstract, array $parameters = [])
     {
@@ -1033,6 +1035,9 @@ class Application extends Container implements ApplicationContract, CachesConfig
      * @param  array  $parameters
      * @param  bool  $raiseEvents
      * @return mixed
+     *
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     * @throws \Illuminate\Contracts\Container\CircularDependencyException
      */
     protected function resolve($abstract, $parameters = [], $raiseEvents = true)
     {
