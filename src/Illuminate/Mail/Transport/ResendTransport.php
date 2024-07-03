@@ -75,9 +75,9 @@ class ResendTransport extends AbstractTransport
                 $filename = $headers->getHeaderParameter('Content-Disposition', 'filename');
 
                 $item = [
+                    'content_type' => $headers->get('Content-Type')->getBody(),
                     'content' => str_replace("\r\n", '', $attachment->bodyToString()),
                     'filename' => $filename,
-                    'content_type' => $headers->get('Content-Type')->getBody(),
                 ];
 
                 $attachments[] = $item;
