@@ -740,7 +740,7 @@ class Container implements ArrayAccess, ContainerContract
     /**
      * Resolve the given type from the container.
      *
-     * @param  string|callable  $abstract
+     * @param  string  $abstract
      * @param  array  $parameters
      * @return mixed
      *
