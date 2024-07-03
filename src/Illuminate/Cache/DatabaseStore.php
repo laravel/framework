@@ -158,9 +158,7 @@ class DatabaseStore implements LockProvider, Store
         $value = $this->serialize($value);
         $expiration = $this->getTime() + $seconds;
 
-        $doesntSupportInsertOrIgnore = [SqlServerConnection::class];
-
-        if (! in_array(get_class($this->getConnection()), $doesntSupportInsertOrIgnore)) {
+        if (! $this->getConnection() instanceof SqlServerConnection) {
             return $this->table()->insertOrIgnore(compact('key', 'value', 'expiration')) > 0;
         }
 
