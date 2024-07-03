@@ -994,6 +994,17 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     }
 
     /**
+     * Translate the value with inflection.
+     *
+     * @param  int  $number
+     * @return static
+     */
+    public function transChoice($number)
+    {
+        return new static(trans_choice($this->value, $number));
+    }
+
+    /**
      * Trim the string of the given characters.
      *
      * @param  string  $characters
