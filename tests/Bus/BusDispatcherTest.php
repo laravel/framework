@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Bus;
 
+use Illuminate\Bus\Attributes\OnQueue;
 use Illuminate\Bus\Dispatcher;
 use Illuminate\Bus\Queueable;
 use Illuminate\Config\Repository as Config;
@@ -111,6 +112,25 @@ class BusDispatcherTest extends TestCase
 
         $dispatcher->dispatch($job);
     }
+
+    public function testOnQueueAttributeAffectsQueue()
+    {
+        $container = new Container;
+        $job = new HasOnQueueAttribute();
+        $dispatcher = new Dispatcher($container, function () use ($job) {
+            $mock = m::mock(Queue::class);
+            $mock->shouldReceive('pushOn')
+                ->with('foo', $job)
+                ->once();
+
+
+            return $mock;
+        });
+
+        $dispatcher->dispatch($job);
+
+        $this->assertEquals('foo', $job->queue);
+    }
 }
 
 class BusInjectionStub
@@ -161,6 +181,17 @@ class StandAloneHandler
 }
 
 class ShouldNotBeDispatched implements ShouldQueue
+{
+    use InteractsWithQueue, Queueable;
+
+    public function handle()
+    {
+        throw new RuntimeException('This should not be run');
+    }
+}
+
+#[OnQueue('foo')]
+class HasOnQueueAttribute implements ShouldQueue
 {
     use InteractsWithQueue, Queueable;
 

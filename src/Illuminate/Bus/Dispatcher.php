@@ -3,6 +3,7 @@
 namespace Illuminate\Bus;
 
 use Closure;
+use Illuminate\Bus\Attributes\OnQueue;
 use Illuminate\Contracts\Bus\QueueingDispatcher;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Queue\Queue;
@@ -12,6 +13,7 @@ use Illuminate\Pipeline\Pipeline;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\Jobs\SyncJob;
 use Illuminate\Support\Collection;
+use ReflectionClass;
 use RuntimeException;
 
 class Dispatcher implements QueueingDispatcher
@@ -239,6 +241,12 @@ class Dispatcher implements QueueingDispatcher
      */
     protected function pushCommandToQueue($queue, $command)
     {
+        $reflection = new ReflectionClass($command);
+
+        if ($attribute = $reflection->getAttributes(OnQueue::class)[0] ?? null) {
+            $command->onQueue($attribute->newInstance()->queue);
+        }
+
         if (isset($command->queue, $command->delay)) {
             return $queue->laterOn($command->queue, $command->delay, $command);
         }
