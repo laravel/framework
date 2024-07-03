@@ -386,7 +386,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     {
         $filter = $filter === null
             ? fn ($value) => (bool) $value
-            : match((new ReflectionFunction($filter))->getNumberOfParameters()) {
+            : match ((new ReflectionFunction($filter))->getNumberOfParameters()) {
                 1 => fn ($value) => $filter($value),
                 default => $filter,
             };
@@ -964,7 +964,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     {
         $reject = $reject === null
             ? fn ($value) => (bool) $value
-            : match((new ReflectionFunction($reject))->getNumberOfParameters()) {
+            : match ((new ReflectionFunction($reject))->getNumberOfParameters()) {
                 1 => fn ($value) => $reject($value),
                 default => $reject,
             };
