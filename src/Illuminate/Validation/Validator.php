@@ -341,7 +341,7 @@ class Validator implements ValidatorContract
 
         $this->initialRules = $rules;
         $this->translator = $translator;
-        $this->customMessages = $messages;
+        $this->customMessages = Arr::dot($messages);
         $this->data = $this->parseData($data);
         $this->customAttributes = $attributes;
 
@@ -1397,7 +1397,7 @@ class Validator implements ValidatorContract
      */
     public function setCustomMessages(array $messages)
     {
-        $this->customMessages = array_merge($this->customMessages, $messages);
+        $this->customMessages = array_merge($this->customMessages, Arr::dot($messages));
 
         return $this;
     }
