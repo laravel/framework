@@ -172,6 +172,13 @@ class DatabaseStore implements LockProvider, Store
         return false;
     }
 
+    /**
+     * Get the cache key's expiration time.
+     *
+     * @param  string  $key
+     * @param  bool  $format
+     * @return string|null
+     */
     public function remaining($key, $format = true) {
         $prefixed = $this->prefix.$key;
 

@@ -282,7 +282,7 @@ class FileStore implements Store, LockProvider
      *
      * @param  string  $key
      * @param  bool  $format
-     * @return int|string|null
+     * @return string|null
      */
     public function remaining($key, $format = true)
     {
