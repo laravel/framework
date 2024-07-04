@@ -42,6 +42,15 @@ interface Store
     public function putMany(array $values, $seconds);
 
     /**
+     * Get the cache key's expiration time.
+     *
+     * @param  string  $key
+     * @param  bool  $format
+     * @return string|null
+     */
+    public function remaining($key, $format = true);
+
+    /**
      * Increment the value of an item in the cache.
      *
      * @param  string  $key
