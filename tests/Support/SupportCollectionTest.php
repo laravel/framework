@@ -5623,50 +5623,6 @@ class SupportCollectionTest extends TestCase
     {
         $collection = new Collection(['foo' => '1', 'bar' => '2', 'baz' => '3']);
 
-        // null...
-        $result = $collection->rejectMap(function ($value, $key) {
-            if ($value === '2' && $key === 'bar') {
-                return null;
-            }
-
-            return $value * 2;
-        });
-        $this->assertNotSame($result, $collection);
-        $this->assertSame(['bar' => null], $result->all());
-
-        // false...
-        $result = $collection->rejectMap(function ($value, $key) {
-            if ($value === '2' && $key === 'bar') {
-                return false;
-            }
-
-            return $value * 2;
-        });
-        $this->assertNotSame($result, $collection);
-        $this->assertSame(['bar' => false], $result->all());
-
-        // falsey...
-        $result = $collection->rejectMap(function ($value, $key) {
-            if ($value === '2' && $key === 'bar') {
-                return '';
-            }
-
-            return $value * 2;
-        });
-        $this->assertNotSame($result, $collection);
-        $this->assertSame(['bar' => ''], $result->all());
-
-        // specify values to filter...
-        $result = $collection->rejectMap(function ($value, $key) {
-            if ($value === '2' && $key === 'bar') {
-                return null;
-            }
-
-            return $value * 2;
-        }, null);
-        $this->assertNotSame($result, $collection);
-        $this->assertSame(['bar' => null], $result->all());
-
         $result = $collection->rejectMap(function ($value, $key) {
             if ($value === '2' && $key === 'bar') {
                 return null;

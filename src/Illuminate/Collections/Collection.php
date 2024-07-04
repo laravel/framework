@@ -957,17 +957,14 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      * @template TMapValue
      *
      * @param  callable(TValue, TKey): TMapValue  $callback
-     * @param  (callable(TValue, TKey): bool)|null  $reject
+     * @param  (callable(TValue, TKey): bool)  $reject
      * @return static<TKey, TMapValue>
      */
-    public function rejectMap($callable, $reject = null)
+    public function rejectMap($callable, $reject)
     {
-        $reject = $reject === null
-            ? fn ($value) => (bool) $value
-            : match ((new ReflectionFunction($reject))->getNumberOfParameters()) {
-                1 => fn ($value) => $reject($value),
-                default => $reject,
-            };
+        if ((new ReflectionFunction($reject))->getNumberOfParameters() === 1) {
+            $reject = fn ($value) => $reject($value);
+        }
 
         $result = [];
 
