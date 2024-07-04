@@ -60,7 +60,7 @@ class Migrator
     /**
      * The paths to all of the migration files.
      *
-     * @var array
+     * @var string[]
      */
     protected $paths = [];
 
@@ -101,9 +101,9 @@ class Migrator
     /**
      * Run the pending migrations at a given path.
      *
-     * @param  array|string  $paths
-     * @param  array  $options
-     * @return array
+     * @param  string[]|string  $paths
+     * @param  array<string, mixed>  $options
+     * @return string[]
      */
     public function run($paths = [], array $options = [])
     {
@@ -127,9 +127,9 @@ class Migrator
     /**
      * Get the migration files that have not yet run.
      *
-     * @param  array  $files
-     * @param  array  $ran
-     * @return array
+     * @param  string[]  $files
+     * @param  string[]  $ran
+     * @return string[]
      */
     protected function pendingMigrations($files, $ran)
     {
@@ -142,8 +142,8 @@ class Migrator
     /**
      * Run an array of migrations.
      *
-     * @param  array  $migrations
-     * @param  array  $options
+     * @param  string[]  $migrations
+     * @param  array<string, mixed>  $options
      * @return void
      */
     public function runPending(array $migrations, array $options = [])
@@ -220,9 +220,9 @@ class Migrator
     /**
      * Rollback the last migration operation.
      *
-     * @param  array|string  $paths
-     * @param  array  $options
-     * @return array
+     * @param  string[]|string  $paths
+     * @param  array<string, mixed>  $options
+     * @return string[]
      */
     public function rollback($paths = [], array $options = [])
     {
@@ -247,7 +247,7 @@ class Migrator
     /**
      * Get the migrations for a rollback operation.
      *
-     * @param  array  $options
+     * @param  array<string, mixed>  $options
      * @return array
      */
     protected function getMigrationsForRollback(array $options)
@@ -267,9 +267,9 @@ class Migrator
      * Rollback the given migrations.
      *
      * @param  array  $migrations
-     * @param  array|string  $paths
-     * @param  array  $options
-     * @return array
+     * @param  string[]|string  $paths
+     * @param  array<string, mixed>  $options
+     * @return string[]
      */
     protected function rollbackMigrations(array $migrations, $paths, array $options)
     {
@@ -309,7 +309,7 @@ class Migrator
     /**
      * Rolls all of the currently applied migrations back.
      *
-     * @param  array|string  $paths
+     * @param  string[]|string  $paths
      * @param  bool  $pretend
      * @return array
      */
@@ -334,8 +334,8 @@ class Migrator
     /**
      * Reset the given migrations.
      *
-     * @param  array  $migrations
-     * @param  array  $paths
+     * @param  string[]  $migrations
+     * @param  string[]  $paths
      * @param  bool  $pretend
      * @return array
      */
@@ -532,7 +532,7 @@ class Migrator
      * Get all of the migration files in a given path.
      *
      * @param  string|array  $paths
-     * @return array
+     * @return array<string, string>
      */
     public function getMigrationFiles($paths)
     {
@@ -548,7 +548,7 @@ class Migrator
     /**
      * Require in all the migration files in a given path.
      *
-     * @param  array  $files
+     * @param  string[]  $files
      * @return void
      */
     public function requireFiles(array $files)
@@ -583,7 +583,7 @@ class Migrator
     /**
      * Get all of the custom migration paths.
      *
-     * @return array
+     * @return string[]
      */
     public function paths()
     {
