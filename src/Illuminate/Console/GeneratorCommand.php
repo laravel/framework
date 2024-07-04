@@ -117,7 +117,7 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
     ];
 
     /**
-     * Create a new controller creator command instance.
+     * Create a new generator command instance.
      *
      * @param  \Illuminate\Filesystem\Filesystem  $files
      * @return void
