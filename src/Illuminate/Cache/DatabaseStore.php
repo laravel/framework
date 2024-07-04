@@ -179,7 +179,8 @@ class DatabaseStore implements LockProvider, Store
      * @param  bool  $format
      * @return string|int|null
      */
-    public function remaining($key, $format = true) {
+    public function remaining($key, $format = true)
+    {
         $prefixed = $this->prefix.$key;
 
         $cache = $this->table()->where('key', '=', $prefixed)->first();
