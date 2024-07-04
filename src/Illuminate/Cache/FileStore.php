@@ -173,7 +173,7 @@ class FileStore implements Store, LockProvider
      *
      * @param  string  $key
      * @param  bool  $format
-     * @return string|null
+     * @return string|int|null
      */
     public function remaining($key, $format = true)
     {
@@ -190,7 +190,7 @@ class FileStore implements Store, LockProvider
                 return Carbon::createFromTimestamp($expire)->diffForHumans();
             }
 
-            return $expire;
+            return (int) $expire;
         } catch (Exception $e) {
             // Do nothing...
         }

@@ -177,7 +177,7 @@ class DatabaseStore implements LockProvider, Store
      *
      * @param  string  $key
      * @param  bool  $format
-     * @return string|null
+     * @return string|int|null
      */
     public function remaining($key, $format = true) {
         $prefixed = $this->prefix.$key;
@@ -197,7 +197,7 @@ class DatabaseStore implements LockProvider, Store
             return Carbon::createFromTimestamp($cache->expiration)->diffForHumans();
         }
 
-        return $cache->expiration;
+        return (int) $cache->expiration;
     }
 
     /**

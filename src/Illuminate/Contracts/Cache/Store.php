@@ -46,7 +46,7 @@ interface Store
      *
      * @param  string  $key
      * @param  bool  $format
-     * @return string|null
+     * @return string|int|null
      */
     public function remaining($key, $format = true);
 
