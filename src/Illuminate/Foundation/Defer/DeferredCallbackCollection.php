@@ -45,6 +45,20 @@ class DeferredCallbackCollection implements ArrayAccess
     }
 
     /**
+     * Remove any deferred callbacks with the given name.
+     *
+     * @param  string  $name
+     * @return void
+     */
+    public function forget(string $name): void
+    {
+        $this->callbacks = collect($this->callbacks)
+            ->reject(fn ($callback) => $callback->name === $name)
+            ->values()
+            ->all();
+    }
+
+    /**
      * Determine if the collection has a callback with the given key.
      *
      * @param  mixed  $offset
