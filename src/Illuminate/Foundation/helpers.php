@@ -407,17 +407,18 @@ if (! function_exists('defer')) {
      *
      * @param  callable|null  $callback
      * @param  string|null  $name
+     * @param  bool  $always
      * @return \Illuminate\Foundation\Defer\DeferredCallback
      */
-    function defer(?callable $callback = null, ?string $name = null)
+    function defer(?callable $callback = null, ?string $name = null, bool $always = false)
     {
         if ($callback === null) {
             return app(DeferredCallbackCollection::class);
         }
 
         return tap(
-            new DeferredCallback($callback),
-            fn ($deferred) => app(DeferredCallbackCollection::class)[$name] = $deferred
+            new DeferredCallback($callback, $name, $always),
+            fn ($deferred) => app(DeferredCallbackCollection::class)[] = $deferred
         );
     }
 }
