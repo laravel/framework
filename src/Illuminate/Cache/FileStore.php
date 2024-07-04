@@ -284,7 +284,7 @@ class FileStore implements Store, LockProvider
      * @param  bool  $format
      * @return int|string|null
      */
-    public function remaining($key, $format = false)
+    public function remaining($key, $format = true)
     {
         $path = $this->path($key);
 
