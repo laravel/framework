@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Providers;
 
+use Illuminate\Console\Events\CommandFinished;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Contracts\Console\Kernel as ConsoleKernel;
 use Illuminate\Contracts\Container\Container;
@@ -12,6 +13,7 @@ use Illuminate\Contracts\View\Factory;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\Grammar;
 use Illuminate\Foundation\Console\CliDumper;
+use Illuminate\Foundation\Defer\DeferredCallbackCollection;
 use Illuminate\Foundation\Exceptions\Renderer\Listener;
 use Illuminate\Foundation\Exceptions\Renderer\Mappers\BladeMapper;
 use Illuminate\Foundation\Exceptions\Renderer\Renderer;
@@ -22,6 +24,7 @@ use Illuminate\Foundation\Vite;
 use Illuminate\Http\Client\Factory as HttpFactory;
 use Illuminate\Http\Request;
 use Illuminate\Log\Events\MessageLogged;
+use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Support\AggregateServiceProvider;
 use Illuminate\Support\Collection;
@@ -194,23 +197,30 @@ class FoundationServiceProvider extends AggregateServiceProvider
      */
     protected function registerDeferHandler()
     {
-        $this->app->scoped('illuminate:foundation:deferred', Collection::class);
+        $this->app->scoped(DeferredCallbackCollection::class);
 
-        $this->callAfterResolving('illuminate:foundation:deferred', function (Collection $defers) {
-            $run = function () use ($defers) {
-                while ($callback = $defers->shift()) {
+        $this->app['events']->listen(function (CommandFinished $event) {
+            $deferred = app(DeferredCallbackCollection::class);
+
+            while ($callback = $deferred->shift()) {
+                if (app()->runningInConsole() && ($event->exitCode === 0 || $callback->always)) {
                     rescue($callback);
                 }
-            };
+            }
+        });
 
-            // TODO: This should also listen for other events, e.g., `JobFailed`...
-            app('events')->listen(function (JobProcessed $event) use ($run) {
-                if ($event->connectionName !== 'sync') {
-                    $run();
+        $this->app['events']->listen(function (JobProcessed|JobFailed $event) {
+            $deferred = app(DeferredCallbackCollection::class);
+
+            if ($event->connectionName === 'sync') {
+                return;
+            }
+
+            while ($callback = $deferred->shift()) {
+                if ($event instanceof JobProcessed || $callback->always) {
+                    rescue($callback);
                 }
-            });
-
-            app()->terminating($run);
+            }
         });
     }
 

@@ -14,6 +14,8 @@ use Illuminate\Contracts\Validation\Factory as ValidationFactory;
 use Illuminate\Contracts\View\Factory as ViewFactory;
 use Illuminate\Foundation\Bus\PendingClosureDispatch;
 use Illuminate\Foundation\Bus\PendingDispatch;
+use Illuminate\Foundation\Defer\DeferredCallback;
+use Illuminate\Foundation\Defer\DeferredCallbackCollection;
 use Illuminate\Foundation\Mix;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Log\Context\Repository as ContextRepository;
@@ -405,15 +407,18 @@ if (! function_exists('defer')) {
      *
      * @param  callable|null  $callback
      * @param  string|null  $name
-     * @return mixed
+     * @return \Illuminate\Foundation\Defer\DeferredCallback
      */
     function defer(?callable $callback = null, ?string $name = null)
     {
         if ($callback === null) {
-            return app('illuminate:foundation:deferred');
+            return app(DeferredCallbackCollection::class);
         }
 
-        app('illuminate:foundation:deferred')[$name] = $callback;
+        return tap(
+            new DeferredCallback($callback),
+            fn ($deferred) => app(DeferredCallbackCollection::class)[$name] = $deferred
+        );
     }
 }
 
