@@ -131,29 +131,6 @@ abstract class AbstractRouteCollection implements Countable, IteratorAggregate, 
     }
 
     /**
-     * Throw a method not allowed HTTP exception.
-     *
-     * @param  array  $others
-     * @param  string  $method
-     * @return void
-     *
-     * @deprecated use requestMethodNotAllowed
-     *
-     * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
-     */
-    protected function methodNotAllowed(array $others, $method)
-    {
-        throw new MethodNotAllowedHttpException(
-            $others,
-            sprintf(
-                'The %s method is not supported for this route. Supported methods: %s.',
-                $method,
-                implode(', ', $others)
-            )
-        );
-    }
-
-    /**
      * Compile the routes for caching.
      *
      * @return array
