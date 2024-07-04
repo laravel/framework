@@ -144,7 +144,7 @@ class SupportLazyCollectionIsLazyTest extends TestCase
         });
 
         $this->assertEnumeratesCollectionOnce(
-            $this->make([1, 2,3]),
+            $this->make([1, 2, 3]),
             function ($collection) {
                 return $collection->multiply(3)->all();
             }
