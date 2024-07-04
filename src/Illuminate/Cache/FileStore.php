@@ -169,6 +169,36 @@ class FileStore implements Store, LockProvider
     }
 
     /**
+     * Get the cache key's expiration time.
+     *
+     * @param  string  $key
+     * @param  bool  $format
+     * @return string|null
+     */
+    public function remaining($key, $format = true)
+    {
+        $path = $this->path($key);
+
+        try {
+            if (is_null($contents = $this->files->get($path, true))) {
+                return null;
+            }
+
+            $expire = substr($contents, 0, 10);
+
+            if ($format) {
+                return Carbon::createFromTimestamp($expire)->diffForHumans();
+            }
+
+            return $expire;
+        } catch (Exception $e) {
+            // Do nothing...
+        }
+
+        return null;
+    }
+
+    /**
      * Increment the value of an item in the cache.
      *
      * @param  string  $key
@@ -275,36 +305,6 @@ class FileStore implements Store, LockProvider
         }
 
         return true;
-    }
-
-    /**
-     * Get the cache key's expiration time.
-     *
-     * @param  string  $key
-     * @param  bool  $format
-     * @return string|null
-     */
-    public function remaining($key, $format = true)
-    {
-        $path = $this->path($key);
-
-        try {
-            if (is_null($contents = $this->files->get($path, true))) {
-                return null;
-            }
-
-            $expire = substr($contents, 0, 10);
-
-            if ($format) {
-                return Carbon::createFromTimestamp($expire)->diffForHumans();
-            }
-
-            return $expire;
-        } catch (Exception $e) {
-            // Do nothing...
-        }
-
-        return null;
     }
 
     /**
