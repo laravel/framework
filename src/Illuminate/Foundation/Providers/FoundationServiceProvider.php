@@ -200,27 +200,15 @@ class FoundationServiceProvider extends AggregateServiceProvider
         $this->app->scoped(DeferredCallbackCollection::class);
 
         $this->app['events']->listen(function (CommandFinished $event) {
-            $deferred = app(DeferredCallbackCollection::class);
-
-            while ($callback = $deferred->shift()) {
-                if (app()->runningInConsole() && ($event->exitCode === 0 || $callback->always)) {
-                    rescue($callback);
-                }
-            }
+            app(DeferredCallbackCollection::class)->invokeWhen(fn ($callback) =>
+                app()->runningInConsole() && ($event->exitCode === 0 || $callback->always)
+            );
         });
 
         $this->app['events']->listen(function (JobProcessed|JobFailed $event) {
-            $deferred = app(DeferredCallbackCollection::class);
-
-            if ($event->connectionName === 'sync') {
-                return;
-            }
-
-            while ($callback = $deferred->shift()) {
-                if ($event instanceof JobProcessed || $callback->always) {
-                    rescue($callback);
-                }
-            }
+            app(DeferredCallbackCollection::class)->invokeWhen(fn ($callback) =>
+                $event->connectionName !== 'sync' && ($event instanceof JobProcessed || $callback->always)
+            );
         });
     }
 

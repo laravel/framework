@@ -5,18 +5,26 @@ namespace Illuminate\Foundation\Defer;
 class DeferredCallback
 {
     /**
-     * Indicates if the deferred callback should run even on unsuccessful requests and jobs.
-     */
-    public bool $always = false;
-
-    /**
      * Create a new deferred callback instance.
      *
      * @param  callable  $callback
      * @return void
      */
-    public function __construct(protected $callback)
+    public function __construct(public $callback, public ?string $name = null, public bool $always = false)
     {
+    }
+
+    /**
+     * Specify the name of the deferred callback so it can be cancelled later.
+     *
+     * @param  string  $name
+     * @return $this
+     */
+    public function name(string $name): self
+    {
+        $this->name = $name;
+
+        return $this;
     }
 
     /**

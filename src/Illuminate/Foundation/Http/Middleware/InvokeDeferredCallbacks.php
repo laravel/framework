@@ -33,10 +33,6 @@ class InvokeDeferredCallbacks
     {
         $deferred = Container::getInstance()->make(DeferredCallbackCollection::class);
 
-        while ($callback = $deferred->shift()) {
-            if ($response->isSuccessful() || $callback->always) {
-                rescue($callback);
-            }
-        }
+        $deferred->invokeWhen(fn ($callback) => $response->isSuccessful() || $callback->always);
     }
 }
