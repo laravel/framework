@@ -48,7 +48,7 @@ interface Store
      * @param  bool  $format
      * @return string|int|null
      */
-    public function remaining($key, $format = true);
+    // public function remaining($key, $format = true);
 
     /**
      * Increment the value of an item in the cache.
