@@ -779,7 +779,7 @@ class Grammar extends BaseGrammar
             'between' => $this->compileHavingBetween($having),
             'Null' => $this->compileHavingNull($having),
             'NotNull' => $this->compileHavingNotNull($having),
-            'bit' => $this->compileHavingBit($having),
+            'Bitwise' => $this->compileHavingBitwise($having),
             'Expression' => $this->compileHavingExpression($having),
             'Nested' => $this->compileNestedHavings($having),
             default => $this->compileBasicHaving($having),
@@ -852,7 +852,7 @@ class Grammar extends BaseGrammar
      * @param  array  $having
      * @return string
      */
-    protected function compileHavingBit($having)
+    protected function compileHavingBitwise($having)
     {
         $column = $this->wrap($having['column']);
 

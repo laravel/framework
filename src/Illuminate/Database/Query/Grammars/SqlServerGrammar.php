@@ -238,36 +238,6 @@ class SqlServerGrammar extends Grammar
     }
 
     /**
-     * Compile a single having clause.
-     *
-     * @param  array  $having
-     * @return string
-     */
-    protected function compileHaving(array $having)
-    {
-        if ($having['type'] === 'Bitwise') {
-            return $this->compileHavingBitwise($having);
-        }
-
-        return parent::compileHaving($having);
-    }
-
-    /**
-     * Compile a having clause involving a bitwise operator.
-     *
-     * @param  array  $having
-     * @return string
-     */
-    protected function compileHavingBitwise($having)
-    {
-        $column = $this->wrap($having['column']);
-
-        $parameter = $this->parameter($having['value']);
-
-        return '('.$column.' '.$having['operator'].' '.$parameter.') != 0';
-    }
-
-    /**
      * Compile a delete statement without joins into SQL.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
