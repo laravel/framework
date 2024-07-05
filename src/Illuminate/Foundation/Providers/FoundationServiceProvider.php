@@ -24,11 +24,8 @@ use Illuminate\Foundation\Vite;
 use Illuminate\Http\Client\Factory as HttpFactory;
 use Illuminate\Http\Request;
 use Illuminate\Log\Events\MessageLogged;
-use Illuminate\Queue\Events\JobFailed;
-use Illuminate\Queue\Events\JobProcessed;
-use Illuminate\Queue\Events\JobReleasedAfterException;
+use Illuminate\Queue\Events\JobAttempted;
 use Illuminate\Support\AggregateServiceProvider;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Testing\LoggedExceptionCollection;
 use Illuminate\Testing\ParallelTestingServiceProvider;
@@ -206,9 +203,9 @@ class FoundationServiceProvider extends AggregateServiceProvider
             );
         });
 
-        $this->app['events']->listen(function (JobProcessed|JobReleasedAfterException|JobFailed $event) {
+        $this->app['events']->listen(function (JobAttempted $event) {
             app(DeferredCallbackCollection::class)->invokeWhen(fn ($callback) =>
-                $event->connectionName !== 'sync' && ($event instanceof JobProcessed || $callback->always)
+                $event->connectionName !== 'sync' && ($event->successful() || $callback->always)
             );
         });
     }
