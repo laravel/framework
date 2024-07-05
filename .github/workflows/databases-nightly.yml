@@ -1,7 +1,6 @@
 name: databases-nightly
 
 on:
-  pull_request:
   schedule:
     - cron: '0 0 * * *'
 
