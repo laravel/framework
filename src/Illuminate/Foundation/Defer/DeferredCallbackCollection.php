@@ -35,6 +35,13 @@ class DeferredCallbackCollection implements ArrayAccess
     {
         $when ??= fn () => true;
 
+        $this->callbacks = collect($this->callbacks)
+            ->reverse()
+            ->unique(fn ($c) => $c->name)
+            ->reverse()
+            ->values()
+            ->all();
+
         foreach ($this->callbacks as $index => $callback) {
             if ($when($callback)) {
                 rescue($callback);
@@ -89,7 +96,11 @@ class DeferredCallbackCollection implements ArrayAccess
      */
     public function offsetSet(mixed $offset, mixed $value): void
     {
-        $this->callbacks[$offset] = $value;
+        if (is_null($offset)) {
+            $this->callbacks[] = $value;
+        } else {
+            $this->callbacks[$offset] = $value;
+        }
     }
 
     /**

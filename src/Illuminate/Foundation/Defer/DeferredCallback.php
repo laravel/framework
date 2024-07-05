@@ -2,6 +2,8 @@
 
 namespace Illuminate\Foundation\Defer;
 
+use Illuminate\Support\Str;
+
 class DeferredCallback
 {
     /**
@@ -12,6 +14,7 @@ class DeferredCallback
      */
     public function __construct(public $callback, public ?string $name = null, public bool $always = false)
     {
+        $this->name = $name ?? (string) Str::uuid();
     }
 
     /**
