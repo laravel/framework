@@ -52,6 +52,13 @@ class Str
     protected static $uuidFactory;
 
     /**
+     * The callback that should be used to generate UUID7s.
+     *
+     * @var callable|null
+     */
+    protected static $uuid7Factory;
+
+    /**
      * The callback that should be used to generate ULIDs.
      *
      * @var callable|null
@@ -1737,18 +1744,6 @@ class Str
     }
 
     /**
-     * Generate a UUID (version 7).
-     *
-     * @return \Ramsey\Uuid\UuidInterface
-     */
-    public static function uuid7()
-    {
-        return static::$uuidFactory
-                    ? call_user_func(static::$uuidFactory)
-                    : Uuid::uuid7();
-    }
-
-    /**
      * Generate a time-ordered UUID.
      *
      * @return \Ramsey\Uuid\UuidInterface
@@ -1849,6 +1844,97 @@ class Str
     public static function createUuidsNormally()
     {
         static::$uuidFactory = null;
+    }
+
+    /**
+     * Generate a UUID (version 7).
+     *
+     * @param  \DateTimeInterface|null  $time
+     * @return \Ramsey\Uuid\UuidInterface
+     */
+    public static function uuid7($time = null)
+    {
+        return static::$uuid7Factory
+                    ? call_user_func(static::$uuid7Factory)
+                    : Uuid::uuid7($time);
+    }
+
+    /**
+     * Set the callable that will be used to generate UUID7s.
+     *
+     * @param  callable|null  $factory
+     * @return void
+     */
+    public static function createUuid7sUsing(?callable $factory = null)
+    {
+        static::$uuid7Factory = $factory;
+    }
+
+    /**
+     * Set the sequence that will be used to generate UUID7s.
+     *
+     * @param  array  $sequence
+     * @param  callable|null  $whenMissing
+     * @return void
+     */
+    public static function createUuid7sUsingSequence(array $sequence, $whenMissing = null)
+    {
+        $next = 0;
+
+        $whenMissing ??= function () use (&$next) {
+            $factoryCache = static::$uuid7Factory;
+
+            static::$uuid7Factory = null;
+
+            $uuid7 = static::uuid7();
+
+            static::$uuid7Factory = $factoryCache;
+
+            $next++;
+
+            return $uuid7;
+        };
+
+        static::createUuid7sUsing(function () use (&$next, $sequence, $whenMissing) {
+            if (array_key_exists($next, $sequence)) {
+                return $sequence[$next++];
+            }
+
+            return $whenMissing();
+        });
+    }
+
+    /**
+     * Always return the same UUID7 when generating new UUID7s.
+     *
+     * @param  \Closure|null  $callback
+     * @return \Ramsey\Uuid\UuidInterface
+     */
+    public static function freezeUuid7s(?Closure $callback = null)
+    {
+        $uuid7 = Str::uuid7();
+
+        Str::createUuid7sUsing(fn () => $uuid7);
+
+        if ($callback !== null) {
+            try {
+                $callback($uuid7);
+            } finally {
+                Str::createUuid7sNormally();
+            }
+        }
+
+        return $uuid7;
+    }
+
+    /**
+     * Indicate that UUID7s should be created normally and not using a custom factory.
+     *
+     * @return void
+     */
+    public static function createUuid7sNormally()
+    {
+        static::$uuid7Factory = null;
     }
 
     /**
