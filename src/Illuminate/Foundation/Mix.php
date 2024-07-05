@@ -21,11 +21,11 @@ class Mix
     {
         static $manifests = [];
 
-        if (!str_starts_with($path, '/') && !str_starts_with($path, '\\')) {
+        if (! str_starts_with($path, '/') && ! str_starts_with($path, '\\')) {
             $path = DIRECTORY_SEPARATOR."{$path}";
         }
 
-        if ($manifestDirectory && !str_starts_with($manifestDirectory, '/') && !str_starts_with($manifestDirectory, '\\')) {
+        if ($manifestDirectory && ! str_starts_with($manifestDirectory, '/') && ! str_starts_with($manifestDirectory, '\\')) {
             $manifestDirectory = DIRECTORY_SEPARATOR."{$manifestDirectory}";
         }
 
@@ -34,7 +34,7 @@ class Mix
 
             $customUrl = app('config')->get('app.mix_hot_proxy_url');
 
-            if (!empty($customUrl)) {
+            if (! empty($customUrl)) {
                 return new HtmlString("{$customUrl}{$path}");
             }
 
@@ -49,8 +49,8 @@ class Mix
 
         $manifestPath = str_replace(['\\', '/'], DIRECTORY_SEPARATOR, $manifestPath);
 
-        if (!isset($manifests[$manifestPath])) {
-            if (!is_file($manifestPath)) {
+        if (! isset($manifests[$manifestPath])) {
+            if (! is_file($manifestPath)) {
                 throw new MixManifestNotFoundException("Mix manifest not found at: {$manifestPath}");
             }
 
@@ -61,10 +61,10 @@ class Mix
 
         $path = str_replace(['\\', '/'], DIRECTORY_SEPARATOR, $path);
 
-        if (!isset($manifest[$path])) {
+        if (! isset($manifest[$path])) {
             $exception = new Exception("Unable to locate Mix file: {$path}.");
 
-            if (!app('config')->get('app.debug')) {
+            if (! app('config')->get('app.debug')) {
                 report($exception);
 
                 return $path;
