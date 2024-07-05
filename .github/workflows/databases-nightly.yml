@@ -6,7 +6,6 @@ on:
     - cron: '0 0 * * *'
 
 jobs:
-
   mysql_9:
     runs-on: ubuntu-24.04
 
