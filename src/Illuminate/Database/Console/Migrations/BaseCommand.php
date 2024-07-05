@@ -9,7 +9,7 @@ class BaseCommand extends Command
     /**
      * Get all of the migration paths.
      *
-     * @return array
+     * @return string[]
      */
     protected function getMigrationPaths()
     {
