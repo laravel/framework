@@ -21,20 +21,20 @@ class Mix
     {
         static $manifests = [];
 
-        if (! str_starts_with($path, '/')) {
-            $path = "/{$path}";
+        if (!str_starts_with($path, '/') && !str_starts_with($path, '\\')) {
+            $path = DIRECTORY_SEPARATOR."{$path}";
         }
 
-        if ($manifestDirectory && ! str_starts_with($manifestDirectory, '/')) {
-            $manifestDirectory = "/{$manifestDirectory}";
+        if ($manifestDirectory && !str_starts_with($manifestDirectory, '/') && !str_starts_with($manifestDirectory, '\\')) {
+            $manifestDirectory = DIRECTORY_SEPARATOR."{$manifestDirectory}";
         }
 
-        if (is_file(public_path($manifestDirectory.'/hot'))) {
-            $url = rtrim(file_get_contents(public_path($manifestDirectory.'/hot')));
+        if (is_file(public_path($manifestDirectory.DIRECTORY_SEPARATOR.'hot'))) {
+            $url = rtrim(file_get_contents(public_path($manifestDirectory.DIRECTORY_SEPARATOR.'hot')));
 
             $customUrl = app('config')->get('app.mix_hot_proxy_url');
 
-            if (! empty($customUrl)) {
+            if (!empty($customUrl)) {
                 return new HtmlString("{$customUrl}{$path}");
             }
 
@@ -45,22 +45,26 @@ class Mix
             return new HtmlString("//localhost:8080{$path}");
         }
 
-        $manifestPath = public_path($manifestDirectory.'/mix-manifest.json');
+        $manifestPath = public_path($manifestDirectory.DIRECTORY_SEPARATOR.'mix-manifest.json');
 
-        if (! isset($manifests[$manifestPath])) {
-            if (! is_file($manifestPath)) {
+        $manifestPath = str_replace(['\\', '/'], DIRECTORY_SEPARATOR, $manifestPath);
+
+        if (!isset($manifests[$manifestPath])) {
+            if (!is_file($manifestPath)) {
                 throw new MixManifestNotFoundException("Mix manifest not found at: {$manifestPath}");
             }
 
-            $manifests[$manifestPath] = json_decode(file_get_contents($manifestPath), true);
+            $manifests[$manifestPath] = json_decode(str_replace(['\\', '/'], '\\'.DIRECTORY_SEPARATOR, file_get_contents($manifestPath)), true);
         }
 
         $manifest = $manifests[$manifestPath];
 
-        if (! isset($manifest[$path])) {
+        $path = str_replace(['\\', '/'], DIRECTORY_SEPARATOR, $path);
+
+        if (!isset($manifest[$path])) {
             $exception = new Exception("Unable to locate Mix file: {$path}.");
 
-            if (! app('config')->get('app.debug')) {
+            if (!app('config')->get('app.debug')) {
                 report($exception);
 
                 return $path;
