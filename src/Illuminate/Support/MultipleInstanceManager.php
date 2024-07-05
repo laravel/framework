@@ -119,21 +119,21 @@ abstract class MultipleInstanceManager
 
         if (isset($this->customCreators[$driverName])) {
             return $this->callCustomCreator($config);
-        } else {
-            $createMethod = 'create'.ucfirst($driverName).ucfirst($this->driverKey);
-
-            if (method_exists($this, $createMethod)) {
-                return $this->{$createMethod}($config);
-            }
-
-            $createMethod = 'create'.Str::studly($driverName).ucfirst($this->driverKey);
-
-            if (method_exists($this, $createMethod)) {
-                return $this->{$createMethod}($config);
-            }
-
-            throw new InvalidArgumentException("Instance {$this->driverKey} [{$config[$this->driverKey]}] is not supported.");
         }
+
+        $createMethod = 'create'.ucfirst($driverName).ucfirst($this->driverKey);
+
+        if (method_exists($this, $createMethod)) {
+            return $this->{$createMethod}($config);
+        }
+
+        $createMethod = 'create'.Str::studly($driverName).ucfirst($this->driverKey);
+
+        if (method_exists($this, $createMethod)) {
+            return $this->{$createMethod}($config);
+        }
+
+        throw new InvalidArgumentException("Instance {$this->driverKey} [{$config[$this->driverKey]}] is not supported.");
     }
 
     /**
