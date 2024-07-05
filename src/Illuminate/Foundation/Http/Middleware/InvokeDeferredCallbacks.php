@@ -31,8 +31,8 @@ class InvokeDeferredCallbacks
      */
     public function terminate(Request $request, Response $response)
     {
-        $deferred = Container::getInstance()->make(DeferredCallbackCollection::class);
-
-        $deferred->invokeWhen(fn ($callback) => $response->getStatusCode() < 400 || $callback->always);
+        Container::getInstance()
+            ->make(DeferredCallbackCollection::class)
+            ->invokeWhen(fn ($callback) => $response->getStatusCode() < 400 || $callback->always);
     }
 }
