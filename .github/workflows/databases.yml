@@ -70,7 +70,7 @@ jobs:
     strategy:
       fail-fast: true
 
-    name: MySQL 8.0
+    name: MySQL 8
 
     steps:
       - name: Checkout code
