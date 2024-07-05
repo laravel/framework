@@ -530,15 +530,15 @@ class Builder implements BuilderContract
     /**
      * Find a model by its primary key or call a callback.
      *
-     * @template TFindOrValue
+     * @template TValue
      *
      * @param  mixed  $id
-     * @param  \Closure|array|string  $columns
-     * @param  (\Closure(): TFindOrValue)|null  $callback
+     * @param  (\Closure(): TValue)|list<string>|string  $columns
+     * @param  (\Closure(): TValue)|null  $callback
      * @return (
      *     $id is (\Illuminate\Contracts\Support\Arrayable<array-key, mixed>|array<mixed>)
      *     ? \Illuminate\Database\Eloquent\Collection<int, TModel>
-     *     : ($callback is null ? TModel|null : TModel|TFindOrValue)
+     *     : TModel|TValue
      * )
      */
     public function findOr($id, $columns = ['*'], ?Closure $callback = null)
@@ -640,11 +640,11 @@ class Builder implements BuilderContract
     /**
      * Execute the query and get the first result or call a callback.
      *
-     * @template TFirstOrValue
+     * @template TValue
      *
-     * @param  \Closure|array|string  $columns
-     * @param  (\Closure(): TFirstOrValue)|null  $callback
-     * @return ($callback is null ? TModel|null : TModel|TFirstOrValue)
+     * @param  (\Closure(): TValue)|list<string>  $columns
+     * @param  (\Closure(): TValue)|null  $callback
+     * @return TModel|TValue
      */
     public function firstOr($columns = ['*'], ?Closure $callback = null)
     {

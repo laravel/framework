@@ -737,15 +737,15 @@ class BelongsToMany extends Relation
     /**
      * Find a related model by its primary key or call a callback.
      *
-     * @template TFindOrValue
+     * @template TValue
      *
      * @param  mixed  $id
-     * @param  \Closure|array  $columns
-     * @param  (\Closure(): TFindOrValue)|null  $callback
+     * @param  (\Closure(): TValue)|list<string>|string  $columns
+     * @param  (\Closure(): TValue)|null  $callback
      * @return (
      *     $id is (\Illuminate\Contracts\Support\Arrayable<array-key, mixed>|array<mixed>)
-     *     ? \Illuminate\Database\Eloquent\Collection<int, TRelatedModel>
-     *     : ($callback is null ? TRelatedModel|null : TRelatedModel|TFindOrValue)
+     *     ? \Illuminate\Database\Eloquent\Collection<int, TRelatedModel>|TValue
+     *     : TRelatedModel|TValue
      * )
      */
     public function findOr($id, $columns = ['*'], ?Closure $callback = null)
@@ -818,11 +818,11 @@ class BelongsToMany extends Relation
     /**
      * Execute the query and get the first result or call a callback.
      *
-     * @template TFirstOrValue
+     * @template TValue
      *
-     * @param  \Closure|array  $columns
-     * @param  (\Closure(): TFirstOrValue)|null  $callback
-     * @return ($callback is null ? TRelatedModel|null : TRelatedModel|TFirstOrValue)
+     * @param  (\Closure(): TValue)|list<string>  $columns
+     * @param  (\Closure(): TValue)|null  $callback
+     * @return TRelatedModel|TValue
      */
     public function firstOr($columns = ['*'], ?Closure $callback = null)
     {

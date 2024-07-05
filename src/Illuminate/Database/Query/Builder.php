@@ -2894,7 +2894,7 @@ class Builder implements BuilderContract
      *
      * @param  int|string  $id
      * @param  array|string  $columns
-     * @return mixed|static
+     * @return object|null
      */
     public function find($id, $columns = ['*'])
     {
@@ -2904,10 +2904,12 @@ class Builder implements BuilderContract
     /**
      * Execute a query for a single record by ID or call a callback.
      *
+     * @template TValue
+     *
      * @param  mixed  $id
-     * @param  \Closure|array|string  $columns
-     * @param  \Closure|null  $callback
-     * @return mixed|static
+     * @param  (\Closure(): TValue)|list<string>|string  $columns
+     * @param  (\Closure(): TValue)|null  $callback
+     * @return object|TValue
      */
     public function findOr($id, $columns = ['*'], ?Closure $callback = null)
     {
