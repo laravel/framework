@@ -26,6 +26,7 @@ use Illuminate\Http\Request;
 use Illuminate\Log\Events\MessageLogged;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Events\JobProcessed;
+use Illuminate\Queue\Events\JobReleasedAfterException;
 use Illuminate\Support\AggregateServiceProvider;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\URL;
@@ -205,7 +206,7 @@ class FoundationServiceProvider extends AggregateServiceProvider
             );
         });
 
-        $this->app['events']->listen(function (JobProcessed|JobFailed $event) {
+        $this->app['events']->listen(function (JobProcessed|JobReleasedAfterException|JobFailed $event) {
             app(DeferredCallbackCollection::class)->invokeWhen(fn ($callback) =>
                 $event->connectionName !== 'sync' && ($event instanceof JobProcessed || $callback->always)
             );
