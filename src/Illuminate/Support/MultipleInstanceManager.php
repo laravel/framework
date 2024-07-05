@@ -128,6 +128,7 @@ abstract class MultipleInstanceManager
             }
 
             $createMethod = 'create'.Str::studly($driverName).ucfirst($this->driverKey);
+
             if (method_exists($this, $createMethod)) {
                 return $this->{$createMethod}($config);
             }
