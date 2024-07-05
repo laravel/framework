@@ -82,9 +82,7 @@ class PasswordBroker implements PasswordBrokerContract
         // the current URI having nothing set in the session to indicate errors.
         $user->sendPasswordResetNotification($token);
 
-        if ($this->events) {
-            $this->events->dispatch(new PasswordResetLinkSent($user));
-        }
+        $this->events?->dispatch(new PasswordResetLinkSent($user));
 
         return static::RESET_LINK_SENT;
     }
