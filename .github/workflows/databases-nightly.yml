@@ -23,7 +23,7 @@ jobs:
     strategy:
       fail-fast: true
 
-    name: MySQL 9.0
+    name: MySQL 9
 
     steps:
       - name: Checkout code
