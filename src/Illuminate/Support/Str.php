@@ -1737,6 +1737,18 @@ class Str
     }
 
     /**
+     * Generate a UUID (version 7).
+     *
+     * @return \Ramsey\Uuid\UuidInterface
+     */
+    public static function uuid7()
+    {
+        return static::$uuidFactory
+                    ? call_user_func(static::$uuidFactory)
+                    : Uuid::uuid7();
+    }
+
+    /**
      * Generate a time-ordered UUID.
      *
      * @return \Ramsey\Uuid\UuidInterface
