@@ -16,6 +16,13 @@ abstract class MultipleInstanceManager
     protected $app;
 
     /**
+     * The configuration repository instance.
+     *
+     * @var \Illuminate\Contracts\Config\Repository
+     */
+    protected $config;
+
+    /**
      * The array of resolved instances.
      *
      * @var array
@@ -45,6 +52,7 @@ abstract class MultipleInstanceManager
     public function __construct($app)
     {
         $this->app = $app;
+        $this->config = $app->make('config');
     }
 
     /**
