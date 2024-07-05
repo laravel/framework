@@ -34,7 +34,8 @@ class MultipleInstanceManager extends BaseMultipleInstanceManager
         };
     }
 
-    protected function createMysqlDatabaseConnectionDriver(array $config) {
+    protected function createMysqlDatabaseConnectionDriver(array $config)
+    {
         return new class($config)
         {
             public function __construct(public $config)
@@ -86,7 +87,7 @@ class MultipleInstanceManager extends BaseMultipleInstanceManager
             case 'mysql_database-connection':
                 return [
                     'driver' => 'mysql_database-connection',
-                    'mysql_database-connection-option' => 'option-value'
+                    'mysql_database-connection-option' => 'option-value',
                 ];
             default:
                 return [];
