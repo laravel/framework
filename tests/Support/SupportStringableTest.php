@@ -719,7 +719,7 @@ class SupportStringableTest extends TestCase
         $exampleInput = $this->stringable(json_encode(["message" => $this->stringable("Laravel Framework")->repeat(2000)]));
 
         // Compress the input
-        $valueCompressed = $exampleInput->compress($exampleInput);
+        $valueCompressed = $exampleInput->compress();
 
         // Ensure the compressed value is not empty
         $this->assertNotEmpty($valueCompressed, 'The compressed value should not be empty');
@@ -734,10 +734,10 @@ class SupportStringableTest extends TestCase
         $exampleInput = $this->stringable(json_encode(["message" => $this->stringable("Laravel Framework")->repeat(2000)]));
 
         // Compress the input to prepare for decompression test
-        $valueCompressed = $exampleInput->compress($exampleInput);
+        $valueCompressed = $exampleInput->compress();
 
         // Decompress the output
-        $valueUncompressed = $exampleInput->decompress($valueCompressed);
+        $valueUncompressed = $exampleInput->decompress();
 
         // Ensure the decompressed input matches the original
         $this->assertEquals($exampleInput, $valueUncompressed, 'The decompressed value should match the original input');
