@@ -53,7 +53,7 @@ class LogManager implements LoggerInterface
     /**
      * The registered custom driver creators.
      *
-     * @var array
+     * @var array<string, \Closure>
      */
     protected $customCreators = [];
 
@@ -65,13 +65,22 @@ class LogManager implements LoggerInterface
     protected $dateFormat = 'Y-m-d H:i:s';
 
     /**
+     * The configuration to use for managing the logs.
+     *
+     * @var \Illuminate\Config\Repository
+     */
+    protected $config;
+
+    /**
      * Create a new Log manager instance.
      *
      * @param  \Illuminate\Contracts\Foundation\Application  $app
+     * @param  \Illuminate\Config\Repository  $config
      * @return void
      */
-    public function __construct($app)
+    public function __construct($app, $config = null)
     {
+        $this->config = ($config ?: $app['config']);
         $this->app = $app;
     }
 
@@ -360,7 +369,7 @@ class LogManager implements LoggerInterface
     {
         return new Monolog($this->parseChannel($config), [
             $this->prepareHandler(new SyslogHandler(
-                Str::snake($this->app['config']['app.name'], '-'),
+                Str::snake($this->config['app.name'], '-'),
                 $config['facility'] ?? LOG_USER, $this->level($config)
             ), $config),
         ], $config['replace_placeholders'] ?? false ? [new PsrLogMessageProcessor()] : []);
@@ -559,7 +568,7 @@ class LogManager implements LoggerInterface
      */
     protected function configurationFor($name)
     {
-        return $this->app['config']["logging.channels.{$name}"];
+        return $this->config["logging.channels.{$name}"];
     }
 
     /**
@@ -569,7 +578,7 @@ class LogManager implements LoggerInterface
      */
     public function getDefaultDriver()
     {
-        return $this->app['config']['logging.default'];
+        return $this->config['logging.default'];
     }
 
     /**
@@ -580,7 +589,7 @@ class LogManager implements LoggerInterface
      */
     public function setDefaultDriver($name)
     {
-        $this->app['config']['logging.default'] = $name;
+        $this->config['logging.default'] = $name;
     }
 
     /**
