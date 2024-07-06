@@ -1281,10 +1281,13 @@ class Builder implements BuilderContract
             $this->model->getUpdatedAtColumn(),
         ]);
 
+        $timestamps = [];
         foreach ($columns as $column) {
-            foreach ($values as &$row) {
-                $row = array_merge([$column => $timestamp], $row);
-            }
+            $timestamps += [$column => $timestamp];
+        }
+
+        foreach ($values as &$row) {
+            $row = array_merge($timestamps, $row);
         }
 
         return $values;
