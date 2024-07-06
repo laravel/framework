@@ -243,11 +243,7 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
      */
     public function compress(int $mode = 5)
     {
-        if ($mode < 1 || $mode > 9) {
-            throw new \OutOfBoundsException('Compression mode must be between 1 and 9, default 5.');
-        }
-
-        return gzcompress($this->value, $mode);
+       return new static(Str::compress($this->value, $mode));
     }
 
     /**
