@@ -243,7 +243,7 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
      */
     public function compress(int $mode = 5)
     {
-       return new static(Str::compress($this->value, $mode));
+        return new static(Str::compress($this->value, $mode));
     }
 
     /**
