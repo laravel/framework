@@ -253,13 +253,7 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
      */
     public function decompress()
     {
-        $decompressed = gzuncompress($this->value);
-
-        if ($decompressed === false) {
-            throw new \RuntimeException('Failed to decompress the string.');
-        }
-
-        return new static($decompressed);
+        return new static(Str::decompress($this->value));
     }
 
     /**
