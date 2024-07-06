@@ -344,8 +344,8 @@ class Str
     /**
      * Compresses a string using gzip compression.
      *
-     * @param  string $string The string to compress.
-     * @param  int $mode Compression level (1 to 9, defaults to 5).
+     * @param  string  $string  The string to compress.
+     * @param  int  $mode  Compression level (1 to 9, defaults to 5).
      * @return string|false The compressed string, or false on failure.
      */
     public static function compress(string $string, int $mode = 5)
@@ -364,7 +364,7 @@ class Str
     /**
      * Decompresses a gzip compressed string.
      *
-     * @param  string $compressedString The compressed string.
+     * @param  string  $compressedString  The compressed string.
      * @return string|false The decompressed string, or false on failure.
      */
     public static function decompress(string $compressedString)
