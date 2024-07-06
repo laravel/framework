@@ -342,6 +342,38 @@ class Str
     }
 
     /**
+     * Compresses a string using gzip compression.
+     *
+     * @param  string $string The string to compress.
+     * @param  int $mode Compression level (1 to 9, defaults to 5).
+     * @return string|false The compressed string, or false on failure.
+     */
+    public static function compress(string $string, int $mode = 5)
+    {
+        // Ensure compression mode is within valid range
+        if ($mode < 1) {
+            $mode = 1;
+        } elseif ($mode > 9) {
+            $mode = 9;
+        }
+
+        // Compress the string using gzip
+        return gzcompress($string, $mode);
+    }
+
+    /**
+     * Decompresses a gzip compressed string.
+     *
+     * @param  string $compressedString The compressed string.
+     * @return string|false The decompressed string, or false on failure.
+     */
+    public static function decompress(string $compressedString)
+    {
+        // Decompress the gzip compressed string
+        return gzuncompress($compressedString);
+    }
+
+    /**
      * Determine if a given string ends with a given substring.
      *
      * @param  string  $haystack

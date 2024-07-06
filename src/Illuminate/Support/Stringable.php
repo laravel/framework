@@ -236,6 +236,36 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     }
 
     /**
+     * Compresses a string using gzip compression.
+     *
+     * @param  int $mode Compression level (1 to 9, defaults to 5).
+     * @return string|false The compressed string, or false on failure.
+     */
+    public function compress(int $mode = 5)
+    {
+        // Ensure compression mode is within valid range
+        if ($mode < 1) {
+            $mode = 1;
+        } elseif ($mode > 9) {
+            $mode = 9;
+        }
+
+        // Compress the string using gzip
+        return gzcompress($this->value, $mode);
+    }
+
+    /**
+     * Decompresses a gzip compressed string.
+     *
+     * @return string|false The decompressed string, or false on failure.
+     */
+    public function decompress()
+    {
+        // Decompress the gzip compressed string
+        return new static(gzuncompress($this->value));
+    }
+
+    /**
      * Get the parent directory's path.
      *
      * @param  int  $levels
