@@ -1281,6 +1281,10 @@ class Builder implements BuilderContract
             $this->model->getUpdatedAtColumn(),
         ]);
 
+        if (empty($columns)) {
+            return $values;
+        }
+
         $timestamps = [];
         foreach ($columns as $column) {
             $timestamps += [$column => $timestamp];
