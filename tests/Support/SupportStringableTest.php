@@ -713,6 +713,39 @@ class SupportStringableTest extends TestCase
         $this->assertFalse($this->stringable('taylor otwell')->containsAll(['taylor', 'xxx']));
     }
 
+    public function testCompress()
+    {
+        // Example input: a JSON message repeated many times
+        $exampleInput = $this->stringable(json_encode(["message" => $this->stringable("Laravel Framework")->repeat(2000)]));
+
+        // Compress the input
+        $valueCompressed = $exampleInput->compress($exampleInput);
+
+        // Ensure the compressed value is not empty
+        $this->assertNotEmpty($valueCompressed, 'The compressed value should not be empty');
+
+        // Validate that the size of the compressed data is smaller than the original
+        $this->assertTrue($this->stringable($valueCompressed)->length() < $this->stringable($exampleInput)->length(), 'The compressed size should be smaller than the original size');
+    }
+
+    public function testDecompress()
+    {
+        // Example input: a JSON message repeated many times
+        $exampleInput = $this->stringable(json_encode(["message" => $this->stringable("Laravel Framework")->repeat(2000)]));
+
+        // Compress the input to prepare for decompression test
+        $valueCompressed = $exampleInput->compress($exampleInput);
+
+        // Decompress the output
+        $valueUncompressed = $exampleInput->decompress($valueCompressed);
+
+        // Ensure the decompressed input matches the original
+        $this->assertEquals($exampleInput, $valueUncompressed, 'The decompressed value should match the original input');
+
+        // Ensure the decompressed value is not empty
+        $this->assertNotEmpty($valueUncompressed, 'The decompressed value should not be empty');
+    }
+
     public function testParseCallback()
     {
         $this->assertEquals(['Class', 'method'], $this->stringable('Class@method')->parseCallback('foo'));

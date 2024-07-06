@@ -243,14 +243,10 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
      */
     public function compress(int $mode = 5)
     {
-        // Ensure compression mode is within valid range
-        if ($mode < 1) {
-            $mode = 1;
-        } elseif ($mode > 9) {
-            $mode = 9;
+        if ($mode < 1 || $mode > 9) {
+            throw new \OutOfBoundsException('Compression mode must be between 1 and 9, default 5.');
         }
 
-        // Compress the string using gzip
         return gzcompress($this->value, $mode);
     }
 
@@ -261,8 +257,13 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
      */
     public function decompress()
     {
-        // Decompress the gzip compressed string
-        return new static(gzuncompress($this->value));
+        $decompressed = gzuncompress($this->value);
+
+        if ($decompressed === false) {
+            throw new \RuntimeException('Failed to decompress the string.');
+        }
+
+        return new static($decompressed);
     }
 
     /**

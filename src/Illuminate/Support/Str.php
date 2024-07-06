@@ -350,14 +350,10 @@ class Str
      */
     public static function compress(string $string, int $mode = 5)
     {
-        // Ensure compression mode is within valid range
-        if ($mode < 1) {
-            $mode = 1;
-        } elseif ($mode > 9) {
-            $mode = 9;
+        if ($mode < 1 || $mode > 9) {
+            throw new \OutOfBoundsException('Compression mode must be between 1 and 9, default 5.');
         }
 
-        // Compress the string using gzip
         return gzcompress($string, $mode);
     }
 
@@ -369,8 +365,13 @@ class Str
      */
     public static function decompress(string $compressedString)
     {
-        // Decompress the gzip compressed string
-        return gzuncompress($compressedString);
+        $decompressed = gzuncompress($compressedString);
+
+        if ($decompressed === false) {
+            throw new \RuntimeException('Failed to decompress the string.');
+        }
+
+        return $decompressed;
     }
 
     /**

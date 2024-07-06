@@ -400,6 +400,39 @@ class SupportStrTest extends TestCase
         Str::convertCase('Hello', -1);
     }
 
+    public function testCompress()
+    {
+        // Example input: a JSON message repeated many times
+        $exampleInput = json_encode(["message" => Str::repeat("Laravel Framework", 2000)]);
+
+        // Compress the input
+        $valueCompressed = Str::compress($exampleInput);
+
+        // Ensure the compressed value is not empty
+        $this->assertNotEmpty($valueCompressed, 'The compressed value should not be empty');
+
+        // Validate that the size of the compressed data is smaller than the original
+        $this->assertTrue(Str::length($valueCompressed) < Str::length($exampleInput), 'The compressed size should be smaller than the original size');
+    }
+
+    public function testDecompress()
+    {
+        // Example input: a JSON message repeated many times
+        $exampleInput = json_encode(["message" => Str::repeat("Laravel Framework", 2000)]);
+
+        // Compress the input to prepare for decompression test
+        $valueCompressed = Str::compress($exampleInput);
+
+        // Decompress the output
+        $valueUncompressed = Str::decompress($valueCompressed);
+
+        // Ensure the decompressed input matches the original
+        $this->assertEquals($exampleInput, $valueUncompressed, 'The decompressed value should match the original input');
+
+        // Ensure the decompressed value is not empty
+        $this->assertNotEmpty($valueUncompressed, 'The decompressed value should not be empty');
+    }
+
     public function testParseCallback()
     {
         $this->assertEquals(['Class', 'method'], Str::parseCallback('Class@method'));
