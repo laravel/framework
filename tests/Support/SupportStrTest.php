@@ -403,7 +403,7 @@ class SupportStrTest extends TestCase
     public function testCompress()
     {
         // Example input: a JSON message repeated many times
-        $exampleInput = json_encode(["message" => Str::repeat("Laravel Framework", 2000)]);
+        $exampleInput = json_encode(['message' => Str::repeat('Laravel Framework', 2000)]);
 
         // Compress the input
         $valueCompressed = Str::compress($exampleInput);
@@ -418,7 +418,7 @@ class SupportStrTest extends TestCase
     public function testDecompress()
     {
         // Example input: a JSON message repeated many times
-        $exampleInput = json_encode(["message" => Str::repeat("Laravel Framework", 2000)]);
+        $exampleInput = json_encode(['message' => Str::repeat('Laravel Framework', 2000)]);
 
         // Compress the input to prepare for decompression test
         $valueCompressed = Str::compress($exampleInput);

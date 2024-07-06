@@ -716,7 +716,7 @@ class SupportStringableTest extends TestCase
     public function testCompress()
     {
         // Example input: a JSON message repeated many times
-        $exampleInput = $this->stringable(json_encode(["message" => $this->stringable("Laravel Framework")->repeat(2000)]));
+        $exampleInput = $this->stringable(json_encode(['message' => $this->stringable('Laravel Framework')->repeat(2000)]));
 
         // Compress the input
         $valueCompressed = $exampleInput->compress();
@@ -731,7 +731,7 @@ class SupportStringableTest extends TestCase
     public function testDecompress()
     {
         // Example input: a JSON message repeated many times
-        $exampleInput = $this->stringable(json_encode(["message" => $this->stringable("Laravel Framework")->repeat(2000)]));
+        $exampleInput = $this->stringable(json_encode(['message' => $this->stringable('Laravel Framework')->repeat(2000)]));
 
         // Compress the input to prepare for decompression test
         $valueCompressed = $exampleInput->compress();
