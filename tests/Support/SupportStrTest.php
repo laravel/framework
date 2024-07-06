@@ -412,7 +412,7 @@ class SupportStrTest extends TestCase
         $this->assertNotEmpty($valueCompressed, 'The compressed value should not be empty');
 
         // Validate that the size of the compressed data is smaller than the original
-        $this->assertTrue(Str::length($valueCompressed) < Str::length($exampleInput), 'The compressed size should be smaller than the original size');
+        $this->assertTrue(strlen($valueCompressed) < strlen($exampleInput), 'The compressed size should be smaller than the original size');
     }
 
     public function testDecompress()

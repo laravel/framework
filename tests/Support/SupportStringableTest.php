@@ -716,28 +716,34 @@ class SupportStringableTest extends TestCase
     public function testCompress()
     {
         // Example input: a JSON message repeated many times
-        $exampleInput = $this->stringable(json_encode(['message' => str_repeat('Laravel Framework', 20)]));
+        $exampleInput = json_encode(['message' => str_repeat('Laravel Framework', 20)]);
+
+        // Create a new instance of Stringable with the example input
+        $stringable = new Stringable($exampleInput);
 
         // Compress the input
-        $valueCompressed = $exampleInput->compress();
+        $valueCompressed = $stringable->compress();
 
         // Ensure the compressed value is not empty
         $this->assertNotEmpty($valueCompressed, 'The compressed value should not be empty');
 
         // Validate that the size of the compressed data is smaller than the original
-        $this->assertTrue($this->stringable($valueCompressed)->length() < $this->stringable($exampleInput)->length(), 'The compressed size should be smaller than the original size');
+        $this->assertTrue(strlen($valueCompressed) < strlen($exampleInput), 'The compressed size should be smaller than the original size');
     }
 
     public function testDecompress()
     {
         // Example input: a JSON message repeated many times
-        $exampleInput = $this->stringable(json_encode(['message' => str_repeat('Laravel Framework', 20)]));
+        $exampleInput = json_encode(['message' => str_repeat('Laravel Framework', 20)]);
+
+        // Create a new instance of Stringable with the example input
+        $stringable = new Stringable($exampleInput);
 
         // Compress the input to prepare for decompression test
-        $valueCompressed = $exampleInput->compress();
+        $valueCompressed = $stringable->compress();
 
         // Decompress the output
-        $valueUncompressed = $exampleInput->decompress();
+        $valueUncompressed = (new Stringable($valueCompressed))->decompress();
 
         // Ensure the decompressed input matches the original
         $this->assertEquals($exampleInput, $valueUncompressed, 'The decompressed value should match the original input');
