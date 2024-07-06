@@ -3,15 +3,46 @@
 namespace Illuminate\Tests\Support;
 
 use ArrayObject;
+use BadMethodCallException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
 class SupportArrTest extends TestCase
 {
+    public function testChangeKeyCase()
+    {
+        $testArray = ['MyKey' => 1];
+
+        // Built-in array_change_key_case function
+        $this->assertSame(['mykey' => 1], Arr::changeKeyCase($testArray, CASE_LOWER));
+        $this->assertSame(['MYKEY' => 1], Arr::changeKeyCase($testArray, CASE_UPPER));
+
+        // Str helper methods
+        $this->assertSame(['my_key' => 1], Arr::changeKeyCase($testArray, 'snake'));
+        $this->assertSame(['myKey' => 1], Arr::changeKeyCase($testArray, 'camel'));
+        $this->assertSame(['myKey' => 1], Arr::changeKeyCase($testArray, [Str::class, 'camel']));
+
+        // Str helper macros
+        Str::macro('MyCustomCaseMacro', fn ($value) => $value[0].'...');
+        $this->assertSame(['M...' => 1], Arr::changeKeyCase($testArray, 'MyCustomCaseMacro'));
+        Str::flushMacros();
+
+        // Custom callback
+        $this->assertSame(['prefix_MyKey' => 1], Arr::changeKeyCase($testArray, fn ($key) => "prefix_$key"));
+
+        // Pass additional parameters
+        $this->assertSame(['5-M' => 1], Arr::changeKeyCase($testArray, fn ($key, $i) => "$i-$key[0]", 5));
+
+        // Non-existing method
+        $this->expectException(BadMethodCallException::class);
+        Arr::changeKeyCase($testArray, 'NonExistedStrHelperMethod');
+    }
+
     public function testAccessible(): void
     {
         $this->assertTrue(Arr::accessible([]));
