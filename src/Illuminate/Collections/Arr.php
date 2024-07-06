@@ -247,6 +247,30 @@ class Arr
     }
 
     /**
+     * Change array keys to provided {$case}
+     *
+     * @param array $array
+     * @param $case
+     * @param mixed ...$parameters
+     * @return array
+     */
+    public static function changeKeyCase($array, $case, ...$parameters)
+    {
+        if (in_array($case, [CASE_LOWER, CASE_UPPER], true)) {
+            return array_change_key_case($array, $case);
+        }
+
+        $case = is_callable($case)
+            ? fn ($key) => $case($key, ...$parameters)
+            : fn ($key) => Str::{$case}($key, ...$parameters);
+
+        return self::mapWithKeys(
+            $array,
+            fn ($value, $key) => [$case($key) => $value],
+        );
+    }
+
+    /**
      * Flatten a multi-dimensional array into a single level.
      *
      * @param  iterable  $array
