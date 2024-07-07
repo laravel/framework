@@ -265,6 +265,22 @@ class ConfigurationUrlParserTest extends TestCase
                     'busy_timeout' => 5000,
                 ],
             ],
+            'Sqlite with journal_mode' => [
+                'sqlite:////absolute/path/to/database.sqlite?journal_mode=WAL',
+                [
+                    'driver' => 'sqlite',
+                    'database' => '/absolute/path/to/database.sqlite',
+                    'journal_mode' => 'WAL',
+                ],
+            ],
+            'Sqlite with synchronous' => [
+                'sqlite:////absolute/path/to/database.sqlite?synchronous=NORMAL',
+                [
+                    'driver' => 'sqlite',
+                    'database' => '/absolute/path/to/database.sqlite',
+                    'synchronous' => 'NORMAL',
+                ],
+            ],
 
             'Most complex example with read and write subarrays all in string' => [
                 'mysql://root:@null/database?read[host][]=192.168.1.1&write[host][]=196.168.1.2&sticky=true&charset=utf8mb4&collation=utf8mb4_unicode_ci&prefix=',

@@ -831,6 +831,21 @@ class SchemaBuilderTest extends DatabaseTestCase
         $this->assertTrue(Schema::hasIndex('posts', ['user_name'], 'unique'));
     }
 
+    public function testSetJournalModeOnSqlite()
+    {
+        if ($this->driver !== 'sqlite') {
+            $this->markTestSkipped('Test requires a SQLite connection.');
+        }
+
+        file_put_contents(DB::connection('sqlite')->getConfig('database'), '');
+
+        $this->assertSame('delete', DB::connection('sqlite')->select('PRAGMA journal_mode')[0]->journal_mode);
+
+        Schema::connection('sqlite')->setJournalMode('WAL');
+
+        $this->assertSame('wal', DB::connection('sqlite')->select('PRAGMA journal_mode')[0]->journal_mode);
+    }
+
     public function testAddingMacros()
     {
         Schema::macro('foo', fn () => 'foo');
