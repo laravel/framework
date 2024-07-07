@@ -591,7 +591,7 @@ class SQLiteGrammar extends Grammar
      */
     public function compileEnableForeignKeyConstraints()
     {
-        return 'PRAGMA foreign_keys = ON;';
+        return $this->pragma('foreign_keys', 'ON');
     }
 
     /**
@@ -601,7 +601,7 @@ class SQLiteGrammar extends Grammar
      */
     public function compileDisableForeignKeyConstraints()
     {
-        return 'PRAGMA foreign_keys = OFF;';
+        return $this->pragma('foreign_keys', 'OFF');
     }
 
     /**
@@ -644,7 +644,7 @@ class SQLiteGrammar extends Grammar
      */
     public function compileEnableWriteableSchema()
     {
-        return 'PRAGMA writable_schema = 1;';
+        return $this->pragma('writable_schema', 1);
     }
 
     /**
@@ -654,7 +654,7 @@ class SQLiteGrammar extends Grammar
      */
     public function compileDisableWriteableSchema()
     {
-        return 'PRAGMA writable_schema = 0;';
+        return $this->pragma('writable_schema', 0);
     }
 
     /**
