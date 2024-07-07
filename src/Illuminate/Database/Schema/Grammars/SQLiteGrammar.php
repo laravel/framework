@@ -612,7 +612,29 @@ class SQLiteGrammar extends Grammar
      */
     public function compileSetBusyTimeout($milliseconds)
     {
-        return sprintf('PRAGMA busy_timeout = %s;', $milliseconds);
+        return $this->pragma('busy_timeout', $milliseconds);
+    }
+
+    /**
+     * Compile the command to set the journal mode.
+     *
+     * @param  string  $mode
+     * @return string
+     */
+    public function compileSetJournalMode($mode)
+    {
+        return $this->pragma('journal_mode', $mode);
+    }
+
+    /**
+     * Compile the command to set the synchronous mode.
+     *
+     * @param  string  $mode
+     * @return string
+     */
+    public function compileSetSynchronous($mode)
+    {
+        return $this->pragma('synchronous', $mode);
     }
 
     /**
@@ -633,6 +655,18 @@ class SQLiteGrammar extends Grammar
     public function compileDisableWriteableSchema()
     {
         return 'PRAGMA writable_schema = 0;';
+    }
+
+    /**
+     * Get the SQL to set a PRAGMA value.
+     *
+     * @param  string  $name
+     * @param  mixed  $value
+     * @return string
+     */
+    protected function pragma(string $name, mixed $value): string
+    {
+        return sprintf('PRAGMA %s = %s;', $name, $value);
     }
 
     /**

@@ -28,6 +28,10 @@ class SQLiteConnection extends Connection
         $this->configureForeignKeyConstraints();
 
         $this->configureBusyTimeout();
+
+        $this->configureJournalMode();
+
+        $this->configureSynchronous();
     }
 
     /**
@@ -156,6 +160,50 @@ class SQLiteConnection extends Connection
 
         try {
             $this->getSchemaBuilder()->setBusyTimeout($milliseconds);
+        } catch (QueryException $e) {
+            if (! $e->getPrevious() instanceof SQLiteDatabaseDoesNotExistException) {
+                throw $e;
+            }
+        }
+    }
+
+    /**
+     * Set the journal mode if configured.
+     *
+     * @return void
+     */
+    protected function configureJournalMode(): void
+    {
+        $mode = $this->getConfig('journal_mode');
+
+        if ($mode === null) {
+            return;
+        }
+
+        try {
+            $this->getSchemaBuilder()->setJournalMode($mode);
+        } catch (QueryException $e) {
+            if (! $e->getPrevious() instanceof SQLiteDatabaseDoesNotExistException) {
+                throw $e;
+            }
+        }
+    }
+
+    /**
+     * Set the synchronous mode if configured.
+     *
+     * @return void
+     */
+    protected function configureSynchronous(): void
+    {
+        $mode = $this->getConfig('synchronous');
+
+        if ($mode === null) {
+            return;
+        }
+
+        try {
+            $this->getSchemaBuilder()->setSynchronous($mode);
         } catch (QueryException $e) {
             if (! $e->getPrevious() instanceof SQLiteDatabaseDoesNotExistException) {
                 throw $e;
