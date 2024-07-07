@@ -605,6 +605,17 @@ class SQLiteGrammar extends Grammar
     }
 
     /**
+     * Compile the command to set the busy timeout.
+     *
+     * @param  int  $milliseconds
+     * @return string
+     */
+    public function compileSetBusyTimeout($milliseconds)
+    {
+        return sprintf('PRAGMA busy_timeout = %s;', $milliseconds);
+    }
+
+    /**
      * Compile the SQL needed to enable a writable schema.
      *
      * @return string

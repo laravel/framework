@@ -105,6 +105,19 @@ class SQLiteBuilder extends Builder
     }
 
     /**
+     * Set the busy timeout.
+     *
+     * @param  int  $milliseconds
+     * @return bool
+     */
+    public function setBusyTimeout($milliseconds)
+    {
+        return $this->connection->statement(
+            $this->grammar->compileSetBusyTimeout($milliseconds)
+        );
+    }
+
+    /**
      * Empty the database file.
      *
      * @return void

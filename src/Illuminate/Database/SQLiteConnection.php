@@ -25,23 +25,9 @@ class SQLiteConnection extends Connection
     {
         parent::__construct($pdo, $database, $tablePrefix, $config);
 
-        $enableForeignKeyConstraints = $this->getForeignKeyConstraintsConfigurationValue();
+        $this->configureForeignKeyConstraints();
 
-        if ($enableForeignKeyConstraints === null) {
-            return;
-        }
-
-        $schemaBuilder = $this->getSchemaBuilder();
-
-        try {
-            $enableForeignKeyConstraints
-                ? $schemaBuilder->enableForeignKeyConstraints()
-                : $schemaBuilder->disableForeignKeyConstraints();
-        } catch (QueryException $e) {
-            if (! $e->getPrevious() instanceof SQLiteDatabaseDoesNotExistException) {
-                throw $e;
-            }
-        }
+        $this->configureBusyTimeout();
     }
 
     /**
@@ -130,12 +116,50 @@ class SQLiteConnection extends Connection
     }
 
     /**
-     * Get the database connection foreign key constraints configuration option.
+     * Enable or disable foreign key constraints if configured.
      *
-     * @return bool|null
+     * @return void
      */
-    protected function getForeignKeyConstraintsConfigurationValue()
+    protected function configureForeignKeyConstraints(): void
     {
-        return $this->getConfig('foreign_key_constraints');
+        $enableForeignKeyConstraints = $this->getConfig('foreign_key_constraints');
+
+        if ($enableForeignKeyConstraints === null) {
+            return;
+        }
+
+        $schemaBuilder = $this->getSchemaBuilder();
+
+        try {
+            $enableForeignKeyConstraints
+                ? $schemaBuilder->enableForeignKeyConstraints()
+                : $schemaBuilder->disableForeignKeyConstraints();
+        } catch (QueryException $e) {
+            if (! $e->getPrevious() instanceof SQLiteDatabaseDoesNotExistException) {
+                throw $e;
+            }
+        }
+    }
+
+    /**
+     * Set the busy timeout if configured.
+     *
+     * @return void
+     */
+    protected function configureBusyTimeout(): void
+    {
+        $milliseconds = $this->getConfig('busy_timeout');
+
+        if ($milliseconds === null) {
+            return;
+        }
+
+        try {
+            $this->getSchemaBuilder()->setBusyTimeout($milliseconds);
+        } catch (QueryException $e) {
+            if (! $e->getPrevious() instanceof SQLiteDatabaseDoesNotExistException) {
+                throw $e;
+            }
+        }
     }
 }
