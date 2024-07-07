@@ -144,4 +144,16 @@ class DatabaseConnectionFactoryTest extends TestCase
 
         $this->assertEquals(1, $this->db->getConnection('constraints_set')->select('PRAGMA foreign_keys')[0]->foreign_keys);
     }
+
+    public function testSqliteBusyTimeout()
+    {
+        $this->db->addConnection([
+            'url' => 'sqlite:///:memory:?busy_timeout=1234',
+        ], 'busy_timeout_set');
+
+        // Can't compare to 0, default value may be something else
+        $this->assertNotSame(1234, $this->db->getConnection()->select('PRAGMA busy_timeout')[0]->timeout);
+
+        $this->assertSame(1234, $this->db->getConnection('busy_timeout_set')->select('PRAGMA busy_timeout')[0]->timeout);
+    }
 }
