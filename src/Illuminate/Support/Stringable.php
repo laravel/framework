@@ -241,6 +241,7 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
      * @param  string  $string  The string to compress.
      * @param  int  $level  Compression level (1 to 9, defaults to 5).
      * @return string The compressed string.
+     *
      * @throws \OutOfBoundsException If the compression level is out of bounds.
      * @throws \RuntimeException If the compression fails.
      */
@@ -254,6 +255,7 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
      *
      * @param  string  $compressedString  The compressed string.
      * @return string The decompressed string.
+     *
      * @throws \RuntimeException If the decompression fails.
      */
     public function decompress()
