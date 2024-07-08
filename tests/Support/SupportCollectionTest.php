@@ -5619,6 +5619,102 @@ class SupportCollectionTest extends TestCase
         $this->assertSame([], $result->all());
     }
 
+    public function testItCanFilterTransform()
+    {
+        // null...
+        $collection = new Collection(['foo' => '1', 'bar' => '2', 'baz' => '3']);
+        $result = $collection->filterTransform(function ($value, $key) {
+            if ($value === '2' && $key === 'bar') {
+                return null;
+            }
+
+            return $value * 2;
+        });
+        $this->assertSame($result, $collection);
+        $this->assertSame(['foo' => 2, 'baz' => 6], $result->all());
+
+        // false...
+        $collection = new Collection(['foo' => '1', 'bar' => '2', 'baz' => '3']);
+        $result = $collection->filterTransform(function ($value, $key) {
+            if ($value === '2' && $key === 'bar') {
+                return false;
+            }
+
+            return $value * 2;
+        });
+        $this->assertSame($result, $collection);
+        $this->assertSame(['foo' => 2, 'baz' => 6], $result->all());
+
+        // falsey...
+        $collection = new Collection(['foo' => '1', 'bar' => '2', 'baz' => '3']);
+        $result = $collection->filterTransform(function ($value, $key) {
+            if ($value === '2' && $key === 'bar') {
+                return '';
+            }
+
+            return $value * 2;
+        });
+        $this->assertSame($result, $collection);
+        $this->assertSame(['foo' => 2, 'baz' => 6], $result->all());
+
+        // specify values to filter...
+        $collection = new Collection(['foo' => '1', 'bar' => '2', 'baz' => '3']);
+        $result = $collection->filterTransform(function ($value, $key) {
+            if ($value === '2' && $key === 'bar') {
+                return null;
+            }
+
+            return $value * 2;
+        }, fn ($v) => ! is_null($v));
+        $this->assertSame($result, $collection);
+        $this->assertSame(['foo' => 2, 'baz' => 6], $result->all());
+
+        $collection = new Collection(['foo' => '1', 'bar' => '2', 'baz' => '3']);
+        $result = $collection->filterTransform(function ($value, $key) {
+            if ($value === '2' && $key === 'bar') {
+                return false;
+            }
+
+            return $value * 2;
+        }, fn ($v) => ! is_null($v));
+        $this->assertSame($result, $collection);
+        $this->assertSame(['foo' => 2, 'bar' => false, 'baz' => 6], $result->all());
+
+        $collection = new Collection(['foo' => '1', 'bar' => '2', 'baz' => '3']);
+        $result = $collection->filterTransform(function ($value, $key) {
+            if ($value === '2' && $key === 'bar') {
+                return '';
+            }
+
+            return $value * 2;
+        }, fn ($v, $k) => ! is_null($v));
+        $this->assertSame($result, $collection);
+        $this->assertSame(['foo' => 2, 'bar' => '', 'baz' => 6], $result->all());
+
+        // builtins with single argument
+        $collection = new Collection(['foo' => '1', 'bar' => '2', 'baz' => '3']);
+        $result = $collection->filterTransform(function ($value, $key) {
+            if ($value === '2' && $key === 'bar') {
+                return null;
+            }
+
+            return $value * 2;
+        }, is_null(...));
+        $this->assertSame($result, $collection);
+        $this->assertSame(['bar' => null], $result->all());
+
+        $collection = new Collection(['foo' => '1', 'bar' => '2', 'baz' => '3']);
+        $result = $collection->filterTransform(function ($value, $key) {
+            if ($value === '2' && $key === 'bar') {
+                return '';
+            }
+
+            return $value * 2;
+        }, is_null(...));
+        $this->assertSame($result, $collection);
+        $this->assertSame([], $result->all());
+    }
+
     public function testItCanRejectMap()
     {
         $collection = new Collection(['foo' => '1', 'bar' => '2', 'baz' => '3']);
@@ -5662,6 +5758,54 @@ class SupportCollectionTest extends TestCase
             return $value * 2;
         }, is_null(...));
         $this->assertNotSame($result, $collection);
+        $this->assertSame(['foo' => 2, 'bar' => '', 'baz' => 6], $result->all());
+    }
+
+    public function testItCanRejectTransform()
+    {
+        $collection = new Collection(['foo' => '1', 'bar' => '2', 'baz' => '3']);
+        $result = $collection->rejectTransform(function ($value, $key) {
+            if ($value === '2' && $key === 'bar') {
+                return null;
+            }
+
+            return $value * 2;
+        }, fn ($v, $k) => is_null($v) && $k === 'bar');
+        $this->assertSame($result, $collection);
+        $this->assertSame(['foo' => 2, 'baz' => 6], $result->all());
+
+        $collection = new Collection(['foo' => '1', 'bar' => '2', 'baz' => '3']);
+        $result = $collection->rejectTransform(function ($value, $key) {
+            if ($value === '2' && $key === 'bar') {
+                return '';
+            }
+
+            return $value * 2;
+        }, fn ($v, $k) => is_string($v) && $k === 'bar');
+        $this->assertSame($result, $collection);
+        $this->assertSame(['foo' => 2, 'baz' => 6], $result->all());
+
+        // builtins with single argument
+        $collection = new Collection(['foo' => '1', 'bar' => '2', 'baz' => '3']);
+        $result = $collection->rejectTransform(function ($value, $key) {
+            if ($value === '2' && $key === 'bar') {
+                return null;
+            }
+
+            return $value * 2;
+        }, is_null(...));
+        $this->assertSame($result, $collection);
+        $this->assertSame(['foo' => 2, 'baz' => 6], $result->all());
+
+        $collection = new Collection(['foo' => '1', 'bar' => '2', 'baz' => '3']);
+        $result = $collection->rejectTransform(function ($value, $key) {
+            if ($value === '2' && $key === 'bar') {
+                return '';
+            }
+
+            return $value * 2;
+        }, is_null(...));
+        $this->assertSame($result, $collection);
         $this->assertSame(['foo' => 2, 'bar' => '', 'baz' => 6], $result->all());
     }
 

@@ -403,6 +403,22 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     }
 
     /**
+     * Run a transform and filter over each of the items.
+     *
+     * @template TMapValue
+     *
+     * @param  (callable(TValue, TKey): TMapValue)  $callback
+     * @param  (callable(TValue, TKey): bool)|null  $reject
+     * @return $this
+     */
+    public function filterTransform($callable, $filter = null)
+    {
+        $this->items = $this->filterMap($callable, $filter)->all();
+
+        return $this;
+    }
+
+    /**
      * Get the first item from the collection passing the given truth test.
      *
      * @template TFirstDefault
@@ -975,6 +991,22 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
         }
 
         return new static($result);
+    }
+
+    /**
+     * Run a transform and reject over each of the items.
+     *
+     * @template TMapValue
+     *
+     * @param  (callable(TValue, TKey): TMapValue)  $callback
+     * @param  (callable(TValue, TKey): bool)  $reject
+     * @return $this
+     */
+    public function rejectTransform($callable, $reject)
+    {
+        $this->items = $this->rejectMap($callable, $reject)->all();
+
+        return $this;
     }
 
     /**
