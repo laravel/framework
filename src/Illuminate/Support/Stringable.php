@@ -238,7 +238,6 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     /**
      * Compresses a string using gzip compression.
      *
-     * @param  string  $string  The string to compress.
      * @param  int  $level  Compression level (1 to 9, defaults to 5).
      * @return string The compressed string.
      *
