@@ -346,7 +346,9 @@ class Str
      *
      * @param  string  $string  The string to compress.
      * @param  int  $level  Compression level (1 to 9, defaults to 5).
-     * @return string|false The compressed string, or false on failure.
+     * @return string The compressed string.
+     * @throws \OutOfBoundsException If the compression level is out of bounds.
+     * @throws \RuntimeException If the compression fails.
      */
     public static function compress(string $string, int $level = 5)
     {
@@ -354,30 +356,31 @@ class Str
             throw new \OutOfBoundsException('Compression level must be between 1 and 9.');
         }
 
-        $compressed = gzencode($string, $level);
+        $compressedString = gzencode($string, $level);
 
-        if ($compressed === false) {
+        if ($compressedString === false) {
             throw new \RuntimeException('Failed to compress the string.');
         }
 
-        return $compressed;
+        return $compressedString;
     }
 
     /**
      * Decompresses a gzip compressed string.
      *
      * @param  string  $compressedString  The compressed string.
-     * @return string|false The decompressed string, or false on failure.
+     * @return string The decompressed string.
+     * @throws \RuntimeException If the decompression fails.
      */
     public static function decompress(string $compressedString)
     {
-        $decompressed = gzdecode($compressedString);
+        $decompressedString = gzdecode($compressedString);
 
-        if ($decompressed === false) {
+        if ($decompressedString === false) {
             throw new \RuntimeException('Failed to decompress the string.');
         }
 
-        return $decompressed;
+        return $decompressedString;
     }
 
     /**

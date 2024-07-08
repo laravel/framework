@@ -238,8 +238,11 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     /**
      * Compresses a string using gzip compression.
      *
+     * @param  string  $string  The string to compress.
      * @param  int  $level  Compression level (1 to 9, defaults to 5).
-     * @return string|false The compressed string, or false on failure.
+     * @return string The compressed string.
+     * @throws \OutOfBoundsException If the compression level is out of bounds.
+     * @throws \RuntimeException If the compression fails.
      */
     public function compress(int $level = 5)
     {
@@ -249,7 +252,9 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     /**
      * Decompresses a gzip compressed string.
      *
-     * @return string|false The decompressed string, or false on failure.
+     * @param  string  $compressedString  The compressed string.
+     * @return string The decompressed string.
+     * @throws \RuntimeException If the decompression fails.
      */
     public function decompress()
     {
