@@ -965,9 +965,19 @@ class Validator implements ValidatorContract
             $this->passes();
         }
 
-        return array_diff_key(
-            $this->data, $this->attributesThatHaveMessages()
+        $valid = array_diff_key(
+            Arr::dot($this->data), $this->attributesThatHaveMessages()
         );
+
+        $result = [];
+
+        $succeeded = Arr::except(Arr::dot($valid), array_keys($this->failed()));
+
+        foreach ($succeeded as $key => $success) {
+            Arr::set($result, $key, $success);
+        }
+
+        return $result;
     }
 
     /**

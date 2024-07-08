@@ -7800,6 +7800,37 @@ class ValidationValidatorTest extends TestCase
         );
     }
 
+    public function testNestedValidMethod()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, [
+            'testvalid' => 'filled',
+            'testinvalid' => '',
+            'records' => [
+                'ABCE13',
+                'ABCF12',
+                'ABBD13',
+                'ADC123',
+            ],
+        ], [
+            'testvalid' => 'filled',
+            'testinvalid' => 'filled',
+            'records.*' => [
+                'required',
+                'regex:/[A-F]{3}[0-9]{3}/',
+            ],
+        ]);
+        $this->assertEquals(
+            [
+                'testvalid' => 'filled',
+                'records' => [
+                    3 => 'ADC123',
+                ],
+            ],
+            $v->valid()
+        );
+    }
+
     public function testMultipleFileUploads()
     {
         $trans = $this->getIlluminateArrayTranslator();
