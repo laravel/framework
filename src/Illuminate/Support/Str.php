@@ -350,11 +350,17 @@ class Str
      */
     public static function compress(string $string, int $mode = 5)
     {
-        if ($mode < 1 || $mode > 9) {
-            throw new \OutOfBoundsException('Compression mode must be between 1 and 9, default 5.');
+        if ($level < 1 || $level > 9) {
+            throw new \OutOfBoundsException('Compression level must be between 1 and 9.');
         }
 
-        return gzcompress($string, $mode);
+        $compressed = gzencode($string, $level);
+
+        if ($compressed === false) {
+            throw new \RuntimeException('Failed to compress the string.');
+        }
+
+        return $compressed;
     }
 
     /**
@@ -365,7 +371,7 @@ class Str
      */
     public static function decompress(string $compressedString)
     {
-        $decompressed = gzuncompress($compressedString);
+        $decompressed = gzdecode($compressedString);
 
         if ($decompressed === false) {
             throw new \RuntimeException('Failed to decompress the string.');
