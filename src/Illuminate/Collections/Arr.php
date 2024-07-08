@@ -247,11 +247,11 @@ class Arr
     }
 
     /**
-     * Change array keys to provided {$case}
+     * Change array keys to provided {$case}.
      *
-     * @param array $array
-     * @param $case
-     * @param mixed ...$parameters
+     * @param  array  $array
+     * @param  $case
+     * @param  mixed  ...$parameters
      * @return array
      */
     public static function changeKeyCase($array, $case, ...$parameters)
