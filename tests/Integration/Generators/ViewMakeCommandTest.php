@@ -31,7 +31,7 @@ class ViewMakeCommandTest extends TestCase
     {
         $this->artisan('make:mail')
             ->expectsQuestion('What should the mailable be named?','FooMail')
-            ->expectsQuestion('Would you like to create a view for you mailable?','none')
+            ->expectsQuestion('Would you like to create a view?','none')
             ->assertExitCode(0);
 
         $this->assertFilenameExists('app/Mail/FooMail.php');
@@ -42,7 +42,7 @@ class ViewMakeCommandTest extends TestCase
     {
         $this->artisan('make:mail')
             ->expectsQuestion('What should the mailable be named?','MyFooMail')
-            ->expectsQuestion('Would you like to create a view for you mailable?','view')
+            ->expectsQuestion('Would you like to create a view?','view')
             ->assertExitCode(0);
 
         $this->assertFilenameExists('app/Mail/MyFooMail.php');
@@ -54,7 +54,7 @@ class ViewMakeCommandTest extends TestCase
         $this->artisan('make:mail')
 
             ->expectsQuestion('What should the mailable be named?','FooMail')
-            ->expectsQuestion('Would you like to create a view for you mailable?','markdown')
+            ->expectsQuestion('Would you like to create a view?','markdown')
             ->assertExitCode(0);
 
         $this->assertFilenameExists('app/Mail/MyFooMail.php');
