@@ -378,7 +378,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      *
      * @template TMapValue
      *
-     * @param  callable(TValue, TKey): TMapValue  $callback
+     * @param  (callable(TValue, TKey): TMapValue)  $callback
      * @param  (callable(TValue, TKey): bool)|null  $reject
      * @return static<TKey, TMapValue>
      */
@@ -956,7 +956,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      *
      * @template TMapValue
      *
-     * @param  callable(TValue, TKey): TMapValue  $callback
+     * @param  (callable(TValue, TKey): TMapValue)  $callback
      * @param  (callable(TValue, TKey): bool)  $reject
      * @return static<TKey, TMapValue>
      */
