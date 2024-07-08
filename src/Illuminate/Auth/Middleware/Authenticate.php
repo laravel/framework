@@ -102,7 +102,7 @@ class Authenticate implements AuthenticatesRequests
         throw new AuthenticationException(
             'Unauthenticated.',
             $guards,
-            $request->expectsJson() ? null : $this->redirectTo($request),
+            $request->expectsJson() ? null : $this->redirectTo($request, $guards),
         );
     }
 
@@ -110,12 +110,13 @@ class Authenticate implements AuthenticatesRequests
      * Get the path the user should be redirected to when they are not authenticated.
      *
      * @param  \Illuminate\Http\Request  $request
+     * @param  array  $guards
      * @return string|null
      */
-    protected function redirectTo(Request $request)
+    protected function redirectTo(Request $request, array $guards)
     {
         if (static::$redirectToCallback) {
-            return call_user_func(static::$redirectToCallback, $request);
+            return call_user_func(static::$redirectToCallback, $request, $guards);
         }
     }
 
