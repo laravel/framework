@@ -197,13 +197,20 @@ class MailMakeCommand extends GeneratorCommand
         ];
     }
 
+    /**
+     * Interact further with the user if they were prompted for missing arguments.
+     *
+     * @param  \Symfony\Component\Console\Input\InputInterface  $input
+     * @param  \Symfony\Component\Console\Output\OutputInterface  $output
+     * @return void
+     */
     protected function afterPromptingForMissingArguments(InputInterface $input, OutputInterface $output)
     {
         if ($this->didReceiveOptions($input)) {
             return;
         }
 
-        $type = select('Would you like to create a view for you mailable?', [
+        $type = select('Would you like to create a view?', [
             'markdown' => 'Markdown View',
             'view' => 'Empty View',
             'none' => 'No View',
