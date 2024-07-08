@@ -345,10 +345,10 @@ class Str
      * Compresses a string using gzip compression.
      *
      * @param  string  $string  The string to compress.
-     * @param  int  $mode  Compression level (1 to 9, defaults to 5).
+     * @param  int  $level  Compression level (1 to 9, defaults to 5).
      * @return string|false The compressed string, or false on failure.
      */
-    public static function compress(string $string, int $mode = 5)
+    public static function compress(string $string, int $level = 5)
     {
         if ($level < 1 || $level > 9) {
             throw new \OutOfBoundsException('Compression level must be between 1 and 9.');

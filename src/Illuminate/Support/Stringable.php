@@ -238,12 +238,12 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     /**
      * Compresses a string using gzip compression.
      *
-     * @param  int  $mode  Compression level (1 to 9, defaults to 5).
+     * @param  int  $level  Compression level (1 to 9, defaults to 5).
      * @return string|false The compressed string, or false on failure.
      */
-    public function compress(int $mode = 5)
+    public function compress(int $level = 5)
     {
-        return new static(Str::compress($this->value, $mode));
+        return new static(Str::compress($this->value, $level));
     }
 
     /**
