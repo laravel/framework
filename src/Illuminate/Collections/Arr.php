@@ -250,7 +250,7 @@ class Arr
      * Change array keys to provided {$case}.
      *
      * @param  array  $array
-     * @param  $case
+     * @param  int|string|callable  $case
      * @param  mixed  ...$parameters
      * @return array
      */
