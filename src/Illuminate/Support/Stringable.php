@@ -253,7 +253,6 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     /**
      * Decompresses a gzip compressed string.
      *
-     * @param  string  $compressedString  The compressed string.
      * @return string The decompressed string.
      *
      * @throws \RuntimeException If the decompression fails.
