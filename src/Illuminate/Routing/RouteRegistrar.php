@@ -268,6 +268,8 @@ class RouteRegistrar
      */
     public function __call($method, $parameters)
     {
+        $parameters = array_values($parameters);
+
         if (in_array($method, $this->passthru)) {
             return $this->registerRoute($method, ...$parameters);
         }

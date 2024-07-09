@@ -1487,6 +1487,8 @@ class Router implements BindingRegistrar, RegistrarContract
      */
     public function __call($method, $parameters)
     {
+        $parameters = array_values($parameters);
+
         if (static::hasMacro($method)) {
             return $this->macroCall($method, $parameters);
         }
