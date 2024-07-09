@@ -71,6 +71,9 @@ function test(User $user, Post $post, Comment $comment, ChildUser $child): void
     assertType('Illuminate\Database\Eloquent\Collection<int, Illuminate\Types\Relations\Role>', $user->roles()->saveManyQuietly($roles));
     assertType('array<int, Illuminate\Types\Relations\Role>', $user->roles()->saveManyQuietly($roles->all()));
     assertType('array<int, Illuminate\Types\Relations\Role>', $user->roles()->createMany($roles));
+    assertType('array{attached: array, detached: array, updated: array}', $user->roles()->sync($roles));
+    assertType('array{attached: array, detached: array, updated: array}', $user->roles()->syncWithoutDetaching($roles));
+    assertType('array{attached: array, detached: array, updated: array}', $user->roles()->syncWithPivotValues($roles, []));
     assertType('Illuminate\Support\LazyCollection<int, Illuminate\Types\Relations\Role>', $user->roles()->lazy());
     assertType('Illuminate\Support\LazyCollection<int, Illuminate\Types\Relations\Role>', $user->roles()->lazyById());
     assertType('Illuminate\Support\LazyCollection<int, Illuminate\Types\Relations\Role>', $user->roles()->cursor());
