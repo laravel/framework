@@ -3010,6 +3010,7 @@ class Builder implements BuilderContract
 
         if (isset($this->groupLimit['column'])) {
             foreach ((array) $this->groupLimit['column'] as $i => $column) {
+                $column = last(explode('.', $column));
                 $keysToRemove[] = '@laravel_group'.$i.' := '.$this->grammar->wrap($column);
                 $keysToRemove[] = '@laravel_group'.$i.' := '.$this->grammar->wrap('pivot_'.$column);
             }
