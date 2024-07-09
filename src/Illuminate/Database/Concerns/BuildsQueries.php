@@ -39,15 +39,29 @@ trait BuildsQueries
     {
         $this->enforceOrderBy();
 
+        // Taking into account user-defined limits and offsets (if any) for more precise control over chunks...
+        $skip = $this->query->unions ? $this->query->unionOffset : $this->query->offset;
         $remaining = $this->query->unions ? $this->query->unionLimit : $this->query->limit;
 
         $page = 1;
 
         do {
-            // We'll execute the query for the given page and get the results. If there are
-            // no results we can just break and return from here. When there are results
-            // we will call the callback with the current chunk of these results here.
-            $results = $this->forPage($page, is_null($remaining) ? $count : min($count, $remaining))->get();
+            // Calculating the offset while considering any existing query offset
+            // ensures user-defined offsets stay independent of the chunk size
+            // and page numbers, providing precise control over the dataset.
+            $offset = (($page - 1) * $count) + (is_null($skip) ? 0 : intval($skip));
+
+            // If a limit is defined, it will serve as the upper bound for chunks.
+            // We'll decrement from the remaining limit with each result chunk,
+            // until it reaches the limit. Otherwise, chunk size is the limit.
+            $limit = is_null($remaining) ? $count : min($count, intval($remaining));
+
+            // Saves a useless database query when the limit is already zero...
+            if ($limit == 0) {
+                break;
+            }
+
+            $results = $this->offset($offset)->limit($limit)->get();
 
             $countResults = $results->count();
 
@@ -55,8 +69,9 @@ trait BuildsQueries
                 break;
             }
 
+            // Decrements from the remainder (user-defined limits, if any) on each chunked iteration...
             if (!is_null($remaining)) {
-                $remaining = max($remaining - $countResults, 0);
+                $remaining = max(intval($remaining) - $countResults, 0);
             }
 
             // On each chunk result set, we will pass them to the callback and then let the
