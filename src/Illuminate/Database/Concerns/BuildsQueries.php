@@ -49,12 +49,12 @@ trait BuildsQueries
             // Calculating the offset while considering any existing query offset
             // ensures user-defined offsets stay independent of the chunk size
             // and page numbers, providing precise control over the dataset.
-            $offset = (($page - 1) * $count) + intval($skip);
+            $offset = (($page - 1) * $count) + $skip;
 
             // If a limit was defined, we'll use that as the upper bound for chunks.
             // We'll decrement from the remainder limit on every iteration, until
             // the limit is reached. Otherwise, we use the chunk size as limit.
-            $limit = is_null($remaining) ? $count : min($count, intval($remaining));
+            $limit = is_null($remaining) ? $count : min($count, $remaining);
 
             // Saves an unnecessary database query when the limit is already zero...
             if ($limit == 0) {
@@ -71,7 +71,7 @@ trait BuildsQueries
 
             // Decrements from the remainder (user-defined limits, if any) on each chunked iteration...
             if (!is_null($remaining)) {
-                $remaining = max(intval($remaining) - $countResults, 0);
+                $remaining = max($remaining - $countResults, 0);
             }
 
             // On each chunk result set, we will pass them to the callback and then let the
@@ -196,7 +196,7 @@ trait BuildsQueries
             // If a limit was defined, we'll use that as the upper bound for chunks.
             // We'll decrement from the remainder limit on every iteration, until
             // the limit is reached. Otherwise, we use the chunk size as limit.
-            $limit = is_null($remaining) ? $count : min($count, intval($remaining));
+            $limit = is_null($remaining) ? $count : min($count, $remaining);
 
             // Saves an unnecessary database query when the limit is already zero...
             if ($limit == 0) {
@@ -220,7 +220,7 @@ trait BuildsQueries
 
             // Decrements from the remainder (user-defined limits, if any) on each chunked iteration...
             if (!is_null($remaining)) {
-                $remaining = max(intval($remaining) - $countResults, 0);
+                $remaining = max($remaining - $countResults, 0);
             }
 
             // On each chunk result set, we will pass them to the callback and then let the
