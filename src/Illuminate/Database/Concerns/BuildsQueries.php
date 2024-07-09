@@ -49,7 +49,7 @@ trait BuildsQueries
             // Calculating the offset while considering any existing query offset
             // ensures user-defined offsets stay independent of the chunk size
             // and page numbers, providing precise control over the dataset.
-            $offset = (($page - 1) * $count) + $skip;
+            $offset = (($page - 1) * $count) + intval($skip);
 
             // If a limit was defined, we'll use that as the upper bound for chunks.
             // We'll decrement from the remainder limit on every iteration, until
