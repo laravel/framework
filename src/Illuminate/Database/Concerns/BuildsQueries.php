@@ -43,7 +43,7 @@ trait BuildsQueries
             // Calculating the offset while considering any existing query offset
             // ensures user-defined offsets stay independent of the chunk size
             // and page numbers, providing precise control over the dataset.
-            $offset = (($page - 1) * $count) + (is_null($skip) ? 0 : intval($skip));
+            $offset = (($page - 1) * $count) + intval($skip);
 
             // If a limit was defined, we'll use that as the upper bound for chunks.
             // We'll decrement from the remainder limit on every iteration, until
@@ -172,6 +172,7 @@ trait BuildsQueries
         $lastId = null;
 
         // Taking into account user-defined limits and offsets (if any) for more precise control over chunks...
+        $skip = $this->query->unions ? $this->query->unionOffset : $this->query->offset;
         $remaining = $this->query->unions ? $this->query->unionLimit : $this->query->limit;
 
         $page = 1;
@@ -180,7 +181,7 @@ trait BuildsQueries
             $clone = clone $this;
 
             // Any pre-existing offset should be reset after the first page, since we'll use the $lastId from there...
-            if ($page > 1) {
+            if ($skip && $page > 1) {
                 $clone->offset(0);
             }
 
