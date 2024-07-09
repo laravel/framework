@@ -85,8 +85,6 @@ trait AuthorizesRequests
     {
         $model = is_array($model) ? implode(',', $model) : $model;
 
-        $parameter = is_array($parameter) ? implode(',', $parameter) : $parameter;
-
         $parameter = $parameter ?: Str::snake(class_basename($model));
 
         $request = $request ?: request();
@@ -106,9 +104,10 @@ trait AuthorizesRequests
         // Get the ability corresponding to the current method
         $ability = $this->resourceAbilityMap()[$currentMethod] ?? null;
 
+        // Check if there is an ability defined for the current method
         if ($ability) {
             // Decide the model or parameter to authorize against
-            $modelName = in_array($currentMethod, $this->resourceMethodsWithoutModels()) ? $model : app($model)->resolveRouteBinding($request->route($parameter));
+            $modelName = in_array($currentMethod, $this->resourceMethodsWithoutModels()) ? $model : array_values(array_intersect_key($request->route()->parameters, array_flip((array) $parameter)));
 
             // Perform the authorization check
            app(Gate::class)->authorize($ability, $modelName);
