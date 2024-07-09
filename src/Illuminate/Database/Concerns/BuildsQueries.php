@@ -33,18 +33,24 @@ trait BuildsQueries
     {
         $this->enforceOrderBy();
 
+        $remaining = $this->query->unions ? $this->query->unionLimit : $this->query->limit;
+
         $page = 1;
 
         do {
             // We'll execute the query for the given page and get the results. If there are
             // no results we can just break and return from here. When there are results
             // we will call the callback with the current chunk of these results here.
-            $results = $this->forPage($page, $count)->get();
+            $results = $this->forPage($page, is_null($remaining) ? $count : min($count, $remaining))->get();
 
             $countResults = $results->count();
 
             if ($countResults == 0) {
                 break;
+            }
+
+            if (!is_null($remaining)) {
+                $remaining = max($remaining - $countResults, 0);
             }
 
             // On each chunk result set, we will pass them to the callback and then let the

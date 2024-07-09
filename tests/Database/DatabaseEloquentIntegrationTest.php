@@ -669,6 +669,74 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertFalse($model->wasRecentlyCreated);
     }
 
+    public function testChunk()
+    {
+        EloquentTestUser::create(['name' => 'First', 'email' => 'first@example.com']);
+        EloquentTestUser::create(['name' => 'Second', 'email' => 'second@example.com']);
+        EloquentTestUser::create(['name' => 'Third', 'email' => 'third@example.com']);
+
+        $chunks = 0;
+
+        EloquentTestUser::query()->orderBy('id', 'asc')->chunk(2, function (Collection $users, $page) use (&$chunks) {
+            if ($page == 1) {
+                $this->assertSame('First', $users[0]->name);
+                $this->assertSame('Second', $users[1]->name);
+            } else {
+                $this->assertSame('Third', $users[0]->name);
+            }
+
+            $chunks++;
+        });
+
+        $this->assertEquals(2, $chunks);
+    }
+
+    public function testChunksWithLimitsWhereLimitIsLessThanTotal()
+    {
+        EloquentTestUser::create(['name' => 'First', 'email' => 'first@example.com']);
+        EloquentTestUser::create(['name' => 'Second', 'email' => 'second@example.com']);
+        EloquentTestUser::create(['name' => 'Third', 'email' => 'third@example.com']);
+
+        $chunks = 0;
+
+        EloquentTestUser::query()->orderBy('id', 'asc')->limit(2)->chunk(2, function (Collection $users, $page) use (&$chunks) {
+            if ($page == 1) {
+                $this->assertSame('First', $users[0]->name);
+                $this->assertSame('Second', $users[1]->name);
+            } else {
+                $this->fail('Should only have had one page.');
+            }
+
+            $chunks++;
+        });
+
+        $this->assertEquals(1, $chunks);
+    }
+
+    public function testChunksWithLimitsWhereLimitIsMoreThanTotal()
+    {
+        EloquentTestUser::create(['name' => 'First', 'email' => 'first@example.com']);
+        EloquentTestUser::create(['name' => 'Second', 'email' => 'second@example.com']);
+        EloquentTestUser::create(['name' => 'Third', 'email' => 'third@example.com']);
+
+        $chunks = 0;
+
+        EloquentTestUser::query()->orderBy('id', 'asc')->limit(10)->chunk(2, function (Collection $users, $page) use (&$chunks) {
+            if ($page == 1) {
+                $this->assertSame('First', $users[0]->name);
+                $this->assertSame('Second', $users[1]->name);
+            } elseif ($page === 2) {
+                $this->assertSame('Third', $users[0]->name);
+            } else {
+                $this->fail('Should have had two pages.');
+            }
+
+            $chunks++;
+        });
+
+        $this->assertEquals(2, $chunks);
+    }
+
     public function testChunkByIdWithNonIncrementingKey()
     {
         EloquentTestNonIncrementingSecond::create(['name' => ' First']);
