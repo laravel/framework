@@ -56,7 +56,7 @@ trait BuildsQueries
             // the limit is reached. Otherwise, we use the chunk size as limit.
             $limit = is_null($remaining) ? $count : min($count, intval($remaining));
 
-            // Saves a useless database query when the limit is already zero...
+            // Saves an unnecessary database query when the limit is already zero...
             if ($limit == 0) {
                 break;
             }
