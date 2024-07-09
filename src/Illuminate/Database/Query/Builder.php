@@ -2611,6 +2611,18 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Get the "offset" value from the query or null if it's not set.
+     *
+     * @return mixed
+     */
+    public function getOffset()
+    {
+        $value = $this->unions ? $this->unionOffset : $this->offset;
+
+        return !is_null($value) ? (int) $value : null;
+    }
+
+    /**
      * Alias to set the "limit" value of the query.
      *
      * @param  int  $value
@@ -2636,6 +2648,18 @@ class Builder implements BuilderContract
         }
 
         return $this;
+    }
+
+    /**
+     * Get the current "limit" value from the query or null if not set.
+     *
+     * @return mixed
+     */
+    public function getLimit()
+    {
+        $value = $this->unions ? $this->unionLimit : $this->limit;
+
+        return !is_null($value) ? (int) $value : null;
     }
 
     /**
