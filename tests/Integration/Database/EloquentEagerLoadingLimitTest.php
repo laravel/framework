@@ -85,7 +85,7 @@ class EloquentEagerLoadingLimitTest extends DatabaseTestCase
         $this->assertEquals([3, 2], $users[0]->roles->pluck('id')->all());
         $this->assertEquals([6, 5], $users[1]->roles->pluck('id')->all());
         $this->assertArrayNotHasKey('laravel_row', $users[0]->roles[0]);
-        $this->assertArrayNotHasKey('@laravel_group := `user_id`', $users[0]->roles[0]);
+        $this->assertArrayNotHasKey('@laravel_group0 := `user_id`', $users[0]->roles[0]);
     }
 
     public function testBelongsToManyWithOffset(): void
@@ -107,7 +107,7 @@ class EloquentEagerLoadingLimitTest extends DatabaseTestCase
         $this->assertEquals([3, 2], $users[0]->posts->pluck('id')->all());
         $this->assertEquals([6, 5], $users[1]->posts->pluck('id')->all());
         $this->assertArrayNotHasKey('laravel_row', $users[0]->posts[0]);
-        $this->assertArrayNotHasKey('@laravel_group := `user_id`', $users[0]->posts[0]);
+        $this->assertArrayNotHasKey('@laravel_group0 := `user_id`', $users[0]->posts[0]);
     }
 
     public function testHasManyWithOffset(): void
@@ -129,7 +129,7 @@ class EloquentEagerLoadingLimitTest extends DatabaseTestCase
         $this->assertEquals([3, 2], $users[0]->comments->pluck('id')->all());
         $this->assertEquals([6, 5], $users[1]->comments->pluck('id')->all());
         $this->assertArrayNotHasKey('laravel_row', $users[0]->comments[0]);
-        $this->assertArrayNotHasKey('@laravel_group := `user_id`', $users[0]->comments[0]);
+        $this->assertArrayNotHasKey('@laravel_group0 := `user_id`', $users[0]->comments[0]);
     }
 
     public function testHasManyThroughWithOffset(): void

@@ -149,16 +149,18 @@ class MySqlGrammar extends Grammar
         $groupOrders = [];
 
         foreach ($groupColumns as $i => $column) {
-            $groupPartitions[] = '@laravel_group'.$i.' = '.$this->wrap($column);
-
-            $groupSelects[] = '@laravel_group'.$i.' := '.$this->wrap($column);
-
             $groupInitialValues[] = '@laravel_group'.$i.' := 0';
 
             $groupOrders[] = [
                 'column' => $column,
                 'direction' => 'asc',
             ];
+
+            $column = $this->wrap(last(explode('.', $column)));
+
+            $groupPartitions[] = '@laravel_group'.$i.' = '.$column;
+
+            $groupSelects[] = '@laravel_group'.$i.' := '.$column;
         }
 
         $partition = ', @laravel_row := if('.implode(' and ', $groupPartitions).', @laravel_row + 1, 1) as `laravel_row`';
