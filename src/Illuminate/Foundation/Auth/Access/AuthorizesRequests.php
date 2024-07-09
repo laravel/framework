@@ -80,6 +80,7 @@ trait AuthorizesRequests
      * @param  \Illuminate\Http\Request|null  $request
      * @return void
      */
+
     public function authorizeResource($model, $parameter = null, array $options = [], $request = null)
     {
         $model = is_array($model) ? implode(',', $model) : $model;
@@ -88,16 +89,29 @@ trait AuthorizesRequests
 
         $parameter = $parameter ?: Str::snake(class_basename($model));
 
-        $middleware = [];
+        $request = $request ?: request();
 
-        foreach ($this->resourceAbilityMap() as $method => $ability) {
-            $modelName = in_array($method, $this->resourceMethodsWithoutModels()) ? $model : $parameter;
+        // Getting the current action method from the request
+        $currentMethod = $request->route()->getActionMethod();
 
-            $middleware["can:{$ability},{$modelName}"][] = $method;
+        // Determine if the current method should be processed based on 'only' or 'except' options
+        if (isset($options['only']) && !in_array($currentMethod, (array) $options['only'])) {
+            return; // Skip authorization if not in 'only' list
         }
 
-        foreach ($middleware as $middlewareName => $methods) {
-            $this->middleware($middlewareName, $options)->only($methods);
+        if (isset($options['except']) && in_array($currentMethod, (array) $options['except'])) {
+            return; // Skip authorization if in 'except' list
+        }
+
+        // Get the ability corresponding to the current method
+        $ability = $this->resourceAbilityMap()[$currentMethod] ?? null;
+
+        if ($ability) {
+            // Decide the model or parameter to authorize against
+            $modelName = in_array($currentMethod, $this->resourceMethodsWithoutModels()) ? $model : app($model)->resolveRouteBinding($request->route($parameter));
+
+            // Perform the authorization check
+           app(Gate::class)->authorize($ability, $modelName);
         }
     }
 
