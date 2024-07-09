@@ -70,7 +70,7 @@ trait BuildsQueries
             }
 
             // Decrements from the remainder (user-defined limits, if any) on each chunked iteration...
-            if (!is_null($remaining)) {
+            if (! is_null($remaining)) {
                 $remaining = max($remaining - $countResults, 0);
             }
 
@@ -219,7 +219,7 @@ trait BuildsQueries
             }
 
             // Decrements from the remainder (user-defined limits, if any) on each chunked iteration...
-            if (!is_null($remaining)) {
+            if (! is_null($remaining)) {
                 $remaining = max($remaining - $countResults, 0);
             }
 
