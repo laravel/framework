@@ -6243,6 +6243,68 @@ SQL;
         $this->assertSame('select * from "users" where "email" = \'foo\'', $builder->toRawSql());
     }
 
+    public function testGroupLimit()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->orderBy('foo')->groupLimit(1, 'bar');
+        $this->assertSame('select * from (select *, row_number() over (partition by "bar" order by "foo" asc) as "laravel_row" from "users") as "laravel_table" where "laravel_row" <= 1 order by "laravel_row"', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->orderBy('foo')->groupLimit(1, ['bar', 'baz']);
+        $this->assertSame('select * from (select *, row_number() over (partition by "bar", "baz" order by "foo" asc) as "laravel_row" from "users") as "laravel_table" where "laravel_row" <= 1 order by "laravel_row"', $builder->toSql());
+    }
+
+    public function testGroupLimitMySql()
+    {
+        $connection = m::mock(ConnectionInterface::class);
+        $connection->shouldReceive('getServerVersion')->andReturn('8.0.11');
+        $connection->shouldReceive('isMaria')->andReturn(false);
+
+        $grammar = new MySqlGrammar;
+        $processor = m::mock(Processor::class);
+
+        $builder = new Builder($connection, $grammar, $processor);
+
+        $builder->select('*')->from('users')->orderBy('foo')->groupLimit(1, 'bar');
+        $this->assertSame('select * from (select *, row_number() over (partition by `bar` order by `foo` asc) as `laravel_row` from `users`) as `laravel_table` where `laravel_row` <= 1 order by `laravel_row`', $builder->toSql());
+
+        $builder = new Builder($connection, $grammar, $processor);
+
+        $builder->select('*')->from('users')->orderBy('foo')->groupLimit(1, ['bar', 'baz']);
+        $this->assertSame('select * from (select *, row_number() over (partition by `bar`, `baz` order by `foo` asc) as `laravel_row` from `users`) as `laravel_table` where `laravel_row` <= 1 order by `laravel_row`', $builder->toSql());
+    }
+
+    public function testGroupLimitMySqlLegacy()
+    {
+        $connection = m::mock(ConnectionInterface::class);
+        $connection->shouldReceive('getServerVersion')->andReturn('8.0.10');
+        $connection->shouldReceive('isMaria')->andReturn(false);
+
+        $grammar = new MySqlGrammar;
+        $processor = m::mock(Processor::class);
+
+        $builder = new Builder($connection, $grammar, $processor);
+
+        $builder->select('*')->from('users')->orderBy('foo')->groupLimit(1, 'bar');
+        $this->assertSame('select `laravel_table`.*, @laravel_row := if(@laravel_group0 = `bar`, @laravel_row + 1, 1) as `laravel_row`, @laravel_group0 := `bar` from (select @laravel_row := 0, @laravel_group0 := 0) as `laravel_vars`, (select * from `users` order by `bar` asc, `foo` asc) as `laravel_table` having `laravel_row` <= 1 order by `laravel_row`', $builder->toSql());
+
+        $builder = new Builder($connection, $grammar, $processor);
+
+        $builder->select('*')->from('users')->orderBy('foo')->groupLimit(1, ['bar', 'baz']);
+        $this->assertSame('select `laravel_table`.*, @laravel_row := if(@laravel_group0 = `bar` and @laravel_group1 = `baz`, @laravel_row + 1, 1) as `laravel_row`, @laravel_group0 := `bar`, @laravel_group1 := `baz` from (select @laravel_row := 0, @laravel_group0 := 0, @laravel_group1 := 0) as `laravel_vars`, (select * from `users` order by `bar` asc, `baz` asc, `foo` asc) as `laravel_table` having `laravel_row` <= 1 order by `laravel_row`', $builder->toSql());
+    }
+
+    public function testGroupLimitSqlServer()
+    {
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('users')->orderBy('foo')->groupLimit(1, 'bar');
+        $this->assertSame('select * from (select *, row_number() over (partition by [bar] order by [foo] asc) as [laravel_row] from [users]) as [laravel_table] where [laravel_row] <= 1 order by [laravel_row]', $builder->toSql());
+
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('users')->groupLimit(1, 'bar');
+        $this->assertSame('select * from (select *, row_number() over (partition by [bar] order by (select 0)) as [laravel_row] from [users]) as [laravel_table] where [laravel_row] <= 1 order by [laravel_row]', $builder->toSql());
+    }
+
     protected function getConnection()
     {
         $connection = m::mock(ConnectionInterface::class);

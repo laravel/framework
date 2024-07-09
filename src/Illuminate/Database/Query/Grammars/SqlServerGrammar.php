@@ -316,7 +316,7 @@ class SqlServerGrammar extends Grammar
     /**
      * Compile a row number clause.
      *
-     * @param  string  $partition
+     * @param  string|array  $partition
      * @param  string  $orders
      * @return string
      */

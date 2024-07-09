@@ -2642,7 +2642,7 @@ class Builder implements BuilderContract
      * Add a "group limit" clause to the query.
      *
      * @param  int  $value
-     * @param  string  $column
+     * @param  string|array  $column
      * @return $this
      */
     public function groupLimit($value, $column)
@@ -3008,11 +3008,11 @@ class Builder implements BuilderContract
     {
         $keysToRemove = ['laravel_row'];
 
-        if (is_string($this->groupLimit['column'])) {
-            $column = last(explode('.', $this->groupLimit['column']));
-
-            $keysToRemove[] = '@laravel_group := '.$this->grammar->wrap($column);
-            $keysToRemove[] = '@laravel_group := '.$this->grammar->wrap('pivot_'.$column);
+        if (isset($this->groupLimit['column'])) {
+            foreach ((array) $this->groupLimit['column'] as $i => $column) {
+                $keysToRemove[] = '@laravel_group'.$i.' := '.$this->grammar->wrap($column);
+                $keysToRemove[] = '@laravel_group'.$i.' := '.$this->grammar->wrap('pivot_'.$column);
+            }
         }
 
         $items->each(function ($item) use ($keysToRemove) {

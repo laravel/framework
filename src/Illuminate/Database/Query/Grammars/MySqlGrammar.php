@@ -141,18 +141,32 @@ class MySqlGrammar extends Grammar
             $query->offset = null;
         }
 
-        $column = last(explode('.', $query->groupLimit['column']));
-        $column = $this->wrap($column);
+        $groupColumns = (array) $query->groupLimit['column'];
 
-        $partition = ', @laravel_row := if(@laravel_group = '.$column.', @laravel_row + 1, 1) as `laravel_row`';
-        $partition .= ', @laravel_group := '.$column;
+        $groupPartitions = [];
+        $groupSelects = [];
+        $groupInitialValues = [];
+        $groupOrders = [];
+
+        foreach ($groupColumns as $i => $column) {
+            $groupPartitions[] = '@laravel_group'.$i.' = '.$this->wrap($column);
+
+            $groupSelects[] = '@laravel_group'.$i.' := '.$this->wrap($column);
+
+            $groupInitialValues[] = '@laravel_group'.$i.' := 0';
+
+            $groupOrders[] = [
+                'column' => $column,
+                'direction' => 'asc',
+            ];
+        }
+
+        $partition = ', @laravel_row := if('.implode(' and ', $groupPartitions).', @laravel_row + 1, 1) as `laravel_row`';
+        $partition .= ', '.implode(', ', $groupSelects);
 
         $orders = (array) $query->orders;
 
-        array_unshift($orders, [
-            'column' => $query->groupLimit['column'],
-            'direction' => 'asc',
-        ]);
+        array_unshift($orders, ...$groupOrders);
 
         $query->orders = $orders;
 
@@ -160,7 +174,7 @@ class MySqlGrammar extends Grammar
 
         $sql = $this->concatenate($components);
 
-        $from = '(select @laravel_row := 0, @laravel_group := 0) as `laravel_vars`, ('.$sql.') as `laravel_table`';
+        $from = '(select @laravel_row := 0, '.implode(', ', $groupInitialValues).') as `laravel_vars`, ('.$sql.') as `laravel_table`';
 
         $sql = 'select `laravel_table`.*'.$partition.' from '.$from.' having `laravel_row` <= '.$limit;
 

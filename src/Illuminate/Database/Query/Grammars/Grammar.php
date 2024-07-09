@@ -1027,13 +1027,13 @@ class Grammar extends BaseGrammar
     /**
      * Compile a row number clause.
      *
-     * @param  string  $partition
+     * @param  string|array  $partition
      * @param  string  $orders
      * @return string
      */
     protected function compileRowNumber($partition, $orders)
     {
-        $over = trim('partition by '.$this->wrap($partition).' '.$orders);
+        $over = trim('partition by '.$this->columnize((array) $partition).' '.$orders);
 
         return ', row_number() over ('.$over.') as '.$this->wrap('laravel_row');
     }
