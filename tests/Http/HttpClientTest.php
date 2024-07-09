@@ -1725,6 +1725,28 @@ class HttpClientTest extends TestCase
         $this->factory->assertSentCount(2);
     }
 
+    public function testRequestExceptionIsThrownWhenRetriesExhaustedWithBackoffArray()
+    {
+        $this->factory->fake([
+            '*' => $this->factory->response(['error'], 403),
+        ]);
+
+        $exception = null;
+
+        try {
+            $this->factory
+                ->retry([1], 0, null, true)
+                ->get('http://foo.com/get');
+        } catch (RequestException $e) {
+            $exception = $e;
+        }
+
+        $this->assertNotNull($exception);
+        $this->assertInstanceOf(RequestException::class, $exception);
+
+        $this->factory->assertSentCount(2);
+    }
+
     public function testRequestExceptionIsThrownWithoutRetriesIfRetryNotNecessary()
     {
         $this->factory->fake([
@@ -1737,6 +1759,35 @@ class HttpClientTest extends TestCase
         try {
             $this->factory
                 ->retry(2, 1000, function ($exception) use (&$whenAttempts) {
+                    $whenAttempts++;
+
+                    return $exception->response->status() === 403;
+                }, true)
+                ->get('http://foo.com/get');
+        } catch (RequestException $e) {
+            $exception = $e;
+        }
+
+        $this->assertNotNull($exception);
+        $this->assertInstanceOf(RequestException::class, $exception);
+
+        $this->assertSame(1, $whenAttempts);
+
+        $this->factory->assertSentCount(1);
+    }
+
+    public function testRequestExceptionIsThrownWithoutRetriesIfRetryNotNecessaryWithBackoffArray()
+    {
+        $this->factory->fake([
+            '*' => $this->factory->response(['error'], 500),
+        ]);
+
+        $exception = null;
+        $whenAttempts = 0;
+
+        try {
+            $this->factory
+                ->retry([1000, 1000], 1000, function ($exception) use (&$whenAttempts) {
                     $whenAttempts++;
 
                     return $exception->response->status() === 403;
@@ -1769,6 +1820,21 @@ class HttpClientTest extends TestCase
         $this->factory->assertSentCount(2);
     }
 
+    public function testRequestExceptionIsNotThrownWhenDisabledAndRetriesExhaustedWithBackoffArray()
+    {
+        $this->factory->fake([
+            '*' => $this->factory->response(['error'], 403),
+        ]);
+
+        $response = $this->factory
+            ->retry([1, 2], throw: false)
+            ->get('http://foo.com/get');
+
+        $this->assertTrue($response->failed());
+
+        $this->factory->assertSentCount(3);
+    }
+
     public function testRequestExceptionIsNotThrownWithoutRetriesIfRetryNotNecessary()
     {
         $this->factory->fake([
@@ -1779,6 +1845,29 @@ class HttpClientTest extends TestCase
 
         $response = $this->factory
             ->retry(2, 1000, function ($exception) use (&$whenAttempts) {
+                $whenAttempts++;
+
+                return $exception->response->status() === 403;
+            }, false)
+            ->get('http://foo.com/get');
+
+        $this->assertTrue($response->failed());
+
+        $this->assertSame(1, $whenAttempts);
+
+        $this->factory->assertSentCount(1);
+    }
+
+    public function testRequestExceptionIsNotThrownWithoutRetriesIfRetryNotNecessaryWithBackoffArray()
+    {
+        $this->factory->fake([
+            '*' => $this->factory->response(['error'], 500),
+        ]);
+
+        $whenAttempts = 0;
+
+        $response = $this->factory
+            ->retry([1, 2], 0, function ($exception) use (&$whenAttempts) {
                 $whenAttempts++;
 
                 return $exception->response->status() === 403;
@@ -1817,6 +1906,31 @@ class HttpClientTest extends TestCase
         });
     }
 
+    public function testRequestCanBeModifiedInRetryCallbackWithBackoffArray()
+    {
+        $this->factory->fake([
+            '*' => $this->factory->sequence()
+                ->push(['error'], 500)
+                ->push(['ok'], 200),
+        ]);
+
+        $response = $this->factory
+            ->retry([2], when: function ($exception, $request) {
+                $this->assertInstanceOf(PendingRequest::class, $request);
+
+                $request->withHeaders(['Foo' => 'Bar']);
+
+                return true;
+            }, throw: false)
+            ->get('http://foo.com/get');
+
+        $this->assertTrue($response->successful());
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->hasHeader('Foo') && $request->header('Foo') === ['Bar'];
+        });
+    }
+
     public function testExceptionThrownInRetryCallbackWithoutRetrying()
     {
         $this->factory->fake([
@@ -1830,6 +1944,31 @@ class HttpClientTest extends TestCase
                 ->retry(2, 1000, function ($exception) use (&$whenAttempts) {
                     throw new Exception('Foo bar');
                 }, false)
+                ->get('http://foo.com/get');
+        } catch (Exception $e) {
+            $exception = $e;
+        }
+
+        $this->assertNotNull($exception);
+        $this->assertInstanceOf(Exception::class, $exception);
+        $this->assertEquals('Foo bar', $exception->getMessage());
+
+        $this->factory->assertSentCount(1);
+    }
+
+    public function testExceptionThrownInRetryCallbackWithoutRetryingWithBackoffArray()
+    {
+        $this->factory->fake([
+            '*' => $this->factory->response(['error'], 500),
+        ]);
+
+        $exception = null;
+
+        try {
+            $this->factory
+                ->retry([1, 2, 3], when: function ($exception) use (&$whenAttempts) {
+                    throw new Exception('Foo bar');
+                }, throw: false)
                 ->get('http://foo.com/get');
         } catch (Exception $e) {
             $exception = $e;
