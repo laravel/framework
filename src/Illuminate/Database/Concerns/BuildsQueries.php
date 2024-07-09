@@ -45,9 +45,9 @@ trait BuildsQueries
             // and page numbers, providing precise control over the dataset.
             $offset = (($page - 1) * $count) + (is_null($skip) ? 0 : intval($skip));
 
-            // If a limit is defined, it will serve as the upper bound for chunks.
-            // We'll decrement from the remaining limit with each result chunk,
-            // until it reaches the limit. Otherwise, chunk size is the limit.
+            // If a limit was defined, we'll use that as the upper bound for chunks.
+            // We'll decrement from the remainder limit on every iteration, until
+            // the limit is reached. Otherwise, we use the chunk size as limit.
             $limit = is_null($remaining) ? $count : min($count, intval($remaining));
 
             // Saves a useless database query when the limit is already zero...
