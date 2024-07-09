@@ -34,8 +34,8 @@ trait BuildsQueries
         $this->enforceOrderBy();
 
         // Taking into account user-defined limits and offsets (if any) for more precise control over chunks...
-        $skip = $this->query->getOffset();
-        $remaining = $this->query->getLimit();
+        $skip = $this->getOffset();
+        $remaining = $this->getLimit();
 
         $page = 1;
 
@@ -172,8 +172,8 @@ trait BuildsQueries
         $lastId = null;
 
         // Taking into account user-defined limits and offsets (if any) for more precise control over chunks...
-        $skip = $this->query->getOffset();
-        $remaining = $this->query->getLimit();
+        $skip = $this->getOffset();
+        $remaining = $this->getLimit();
 
         $page = 1;
 
