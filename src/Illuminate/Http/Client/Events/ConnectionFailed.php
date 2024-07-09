@@ -15,7 +15,7 @@ class ConnectionFailed
     public $request;
 
     /**
-     * The ConnectionException instance
+     * The ConnectionException instance.
      *
      * @var \Illuminate\Http\Client\ConnectionException
      */
