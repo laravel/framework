@@ -2618,7 +2618,7 @@ class Builder implements BuilderContract
     {
         $value = $this->unions ? $this->unionOffset : $this->offset;
 
-        return !is_null($value) ? (int) $value : null;
+        return ! is_null($value) ? (int) $value : null;
     }
 
     /**
@@ -2658,7 +2658,7 @@ class Builder implements BuilderContract
     {
         $value = $this->unions ? $this->unionLimit : $this->limit;
 
-        return !is_null($value) ? (int) $value : null;
+        return ! is_null($value) ? (int) $value : null;
     }
 
     /**
