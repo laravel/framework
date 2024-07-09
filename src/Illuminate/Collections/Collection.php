@@ -376,11 +376,9 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     /**
      * Run a map and filter over each of the items.
      *
-     * @template TMapValue
-     *
-     * @param  (callable(TValue, TKey): TMapValue)  $callback
-     * @param  (callable(TValue, TKey): bool)|null  $reject
-     * @return static<TKey, TMapValue>
+     * @param  callable  $callback
+     * @param  callable|null  $reject
+     * @return static
      */
     public function filterMap($callable, $filter = null)
     {
@@ -405,10 +403,8 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     /**
      * Run a transform and filter over each of the items.
      *
-     * @template TMapValue
-     *
-     * @param  (callable(TValue, TKey): TMapValue)  $callback
-     * @param  (callable(TValue, TKey): bool)|null  $reject
+     * @param  callable  $callback
+     * @param  callable|null  $reject
      * @return $this
      */
     public function filterTransform($callable, $filter = null)
@@ -970,11 +966,9 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     /**
      * Run a map and reject over each of the items.
      *
-     * @template TMapValue
-     *
-     * @param  (callable(TValue, TKey): TMapValue)  $callback
-     * @param  (callable(TValue, TKey): bool)  $reject
-     * @return static<TKey, TMapValue>
+     * @param  callable  $callback
+     * @param  callable  $reject
+     * @return static
      */
     public function rejectMap($callable, $reject)
     {
@@ -998,8 +992,8 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      *
      * @template TMapValue
      *
-     * @param  (callable(TValue, TKey): TMapValue)  $callback
-     * @param  (callable(TValue, TKey): bool)  $reject
+     * @param  callable  $callback
+     * @param  callable  $reject
      * @return $this
      */
     public function rejectTransform($callable, $reject)
