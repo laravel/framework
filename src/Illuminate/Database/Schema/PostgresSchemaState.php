@@ -20,7 +20,14 @@ class PostgresSchemaState extends SchemaState
         ]);
 
         if ($this->hasMigrationTable()) {
-            $commands->push($this->baseDumpCommand().' -t '.$this->migrationTable.' --data-only >> '.$path);
+            $table = $this->migrationTable;
+
+            if (!str_contains($table, '.')) {
+                $searchPath = $connection->getConfig('search_path');
+                $table = (str_contains($searchPath, ',') ? '*' : $searchPath).'.'.$table;
+            }
+
+            $commands->push($this->baseDumpCommand().' -t "'.$table.'" --data-only >> '.$path);
         }
 
         $commands->map(function ($command, $path) {
