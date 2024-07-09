@@ -990,8 +990,6 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     /**
      * Run a transform and reject over each of the items.
      *
-     * @template TMapValue
-     *
      * @param  callable  $callback
      * @param  callable  $reject
      * @return $this
