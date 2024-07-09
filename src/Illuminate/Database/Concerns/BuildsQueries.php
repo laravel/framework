@@ -179,24 +179,47 @@ trait BuildsQueries
 
         $lastId = null;
 
+        // Taking into account user-defined limits and offsets (if any) for more precise control over chunks...
+        $remaining = $this->query->unions ? $this->query->unionLimit : $this->query->limit;
+
         $page = 1;
 
         do {
             $clone = clone $this;
 
+            // Any pre-existing offset should be reset after the first page, since we'll use the $lastId from there...
+            if ($page > 1) {
+                $clone->offset(0);
+            }
+
+            // If a limit was defined, we'll use that as the upper bound for chunks.
+            // We'll decrement from the remainder limit on every iteration, until
+            // the limit is reached. Otherwise, we use the chunk size as limit.
+            $limit = is_null($remaining) ? $count : min($count, intval($remaining));
+
+            // Saves an unnecessary database query when the limit is already zero...
+            if ($limit == 0) {
+                break;
+            }
+
             // We'll execute the query for the given page and get the results. If there are
             // no results we can just break and return from here. When there are results
             // we will call the callback with the current chunk of these results here.
             if ($descending) {
-                $results = $clone->forPageBeforeId($count, $lastId, $column)->get();
+                $results = $clone->forPageBeforeId($limit, $lastId, $column)->get();
             } else {
-                $results = $clone->forPageAfterId($count, $lastId, $column)->get();
+                $results = $clone->forPageAfterId($limit, $lastId, $column)->get();
             }
 
             $countResults = $results->count();
 
             if ($countResults == 0) {
                 break;
+            }
+
+            // Decrements from the remainder (user-defined limits, if any) on each chunked iteration...
+            if (!is_null($remaining)) {
+                $remaining = max(intval($remaining) - $countResults, 0);
             }
 
             // On each chunk result set, we will pass them to the callback and then let the
