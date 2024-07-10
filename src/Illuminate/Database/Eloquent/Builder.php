@@ -33,7 +33,10 @@ use ReflectionMethod;
  */
 class Builder implements BuilderContract
 {
-    /** @use \Illuminate\Database\Concerns\BuildsQueries<TModel> */
+    /**
+     * @use \Illuminate\Database\Concerns\BuildsQueries<TModel>
+     * @use \Illuminate\Database\Eloquent\Concerns\QueriesRelationships<TModel>
+     */
     use BuildsQueries, ForwardsCalls, QueriesRelationships {
         BuildsQueries::sole as baseSole;
     }
