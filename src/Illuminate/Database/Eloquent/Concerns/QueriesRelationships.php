@@ -15,13 +15,16 @@ use Illuminate\Database\Query\Expression;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
 
-/** @mixin \Illuminate\Database\Eloquent\Builder */
+/**
+ * @template TModel of \Illuminate\Database\Eloquent\Model
+ * @mixin \Illuminate\Database\Eloquent\Builder<TModel>
+ */
 trait QueriesRelationships
 {
     /**
      * Add a relationship count / exists condition to the query.
      *
-     * @param  \Illuminate\Database\Eloquent\Relations\Relation<*, *, *>|string  $relation
+     * @param  \Illuminate\Database\Eloquent\Relations\Relation<*, *, *>|\Closure(TModel): \Illuminate\Database\Eloquent\Relations|string  $relation
      * @param  string  $operator
      * @param  int  $count
      * @param  string  $boolean
@@ -38,6 +41,10 @@ trait QueriesRelationships
             }
 
             $relation = $this->getRelationWithoutConstraints($relation);
+        } else if ($relation instanceof Closure) {
+            $relation = Relation::noConstraints(function () use ($relation) {
+                return $relation($this->getModel());
+            });
         }
 
         if ($relation instanceof MorphTo) {
@@ -105,7 +112,7 @@ trait QueriesRelationships
     /**
      * Add a relationship count / exists condition to the query with an "or".
      *
-     * @param  \Illuminate\Database\Eloquent\Relations\Relation<*, *, *>|string  $relation
+     * @param  \Illuminate\Database\Eloquent\Relations\Relation<*, *, *>|\Closure(TModel): \Illuminate\Database\Eloquent\Relation|string  $relation
      * @param  string  $operator
      * @param  int  $count
      * @return $this
@@ -118,7 +125,7 @@ trait QueriesRelationships
     /**
      * Add a relationship count / exists condition to the query.
      *
-     * @param  \Illuminate\Database\Eloquent\Relations\Relation<*, *, *>|string  $relation
+     * @param  \Illuminate\Database\Eloquent\Relations\Relation<*, *, *>|\Closure(TModel): \Illuminate\Database\Eloquent\Relation|string  $relation
      * @param  string  $boolean
      * @param  \Closure|null  $callback
      * @return $this
@@ -131,7 +138,7 @@ trait QueriesRelationships
     /**
      * Add a relationship count / exists condition to the query with an "or".
      *
-     * @param  \Illuminate\Database\Eloquent\Relations\Relation<*, *, *>|string  $relation
+     * @param  \Illuminate\Database\Eloquent\Relations\Relation<*, *, *>|\Closure(TModel): \Illuminate\Database\Eloquent\Relation|string  $relation
      * @return $this
      */
     public function orDoesntHave($relation)
@@ -142,7 +149,7 @@ trait QueriesRelationships
     /**
      * Add a relationship count / exists condition to the query with where clauses.
      *
-     * @param  \Illuminate\Database\Eloquent\Relations\Relation<*, *, *>|string  $relation
+     * @param  \Illuminate\Database\Eloquent\Relations\Relation<*, *, *>|\Closure(TModel): \Illuminate\Database\Eloquent\Relation|string  $relation
      * @param  \Closure|null  $callback
      * @param  string  $operator
      * @param  int  $count
@@ -173,7 +180,7 @@ trait QueriesRelationships
     /**
      * Add a relationship count / exists condition to the query with where clauses and an "or".
      *
-     * @param  \Illuminate\Database\Eloquent\Relations\Relation<*, *, *>|string  $relation
+     * @param  \Illuminate\Database\Eloquent\Relations\Relation<*, *, *>|\Closure(TModel): \Illuminate\Database\Eloquent\Relation|string  $relation
      * @param  \Closure|null  $callback
      * @param  string  $operator
      * @param  int  $count
@@ -187,7 +194,7 @@ trait QueriesRelationships
     /**
      * Add a relationship count / exists condition to the query with where clauses.
      *
-     * @param  \Illuminate\Database\Eloquent\Relations\Relation<*, *, *>|string  $relation
+     * @param  \Illuminate\Database\Eloquent\Relations\Relation<*, *, *>|\Closure(TModel): \Illuminate\Database\Eloquent\Relation|string  $relation
      * @param  \Closure|null  $callback
      * @return $this
      */
@@ -199,7 +206,7 @@ trait QueriesRelationships
     /**
      * Add a relationship count / exists condition to the query with where clauses and an "or".
      *
-     * @param  \Illuminate\Database\Eloquent\Relations\Relation<*, *, *>|string  $relation
+     * @param  \Illuminate\Database\Eloquent\Relations\Relation<*, *, *>|\Closure(TModel): \Illuminate\Database\Eloquent\Relation|string  $relation
      * @param  \Closure|null  $callback
      * @return $this
      */
