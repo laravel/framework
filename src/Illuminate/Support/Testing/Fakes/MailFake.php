@@ -94,7 +94,7 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
     public function assertSentTo($mailable, $addresses)
     {
         foreach (Arr::wrap($addresses) as $address) {
-            $callback = fn (Mailable $mail) => $mail->hasTo($address);
+            $callback = fn ($mail) => $mail->hasTo($address);
 
             $message = "The expected [{$mailable}] mailable was not sent to address [{$address}].";
 
@@ -212,7 +212,7 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
     public function assertQueuedTo($mailable, $addresses)
     {
         foreach (Arr::wrap($addresses) as $address) {
-            $callback = fn (Mailable $mail) => $mail->hasTo($address);
+            $callback = fn ($mail) => $mail->hasTo($address);
 
             PHPUnit::assertTrue(
                 $this->queued($mailable, $callback)->count() > 0,

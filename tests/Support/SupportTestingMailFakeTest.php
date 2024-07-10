@@ -69,7 +69,13 @@ class SupportTestingMailFakeTest extends TestCase
         $this->fake->to('dries@laravel.com')->send($this->mailable);
         $this->fake->to('taylor@laravel.com')->send($this->mailable);
 
-        $this->fake->assertSentTo(MailableStub::class, ['taylor@laravel.com', 'dries@laravel.com']);
+        $this->fake->to(['nuno@laravel.com', 'jess@laravel.com'])->send($this->mailable);
+
+        $this->fake->assertSent(MailableStub::class, 3);
+        $this->fake->assertSentTo(
+            MailableStub::class,
+            ['taylor@laravel.com', 'dries@laravel.com', 'nuno@laravel.com', 'jess@laravel.com']
+        );
     }
 
     public function testAssertSentWhenRecipientHasPreferredLocale()
@@ -203,7 +209,13 @@ class SupportTestingMailFakeTest extends TestCase
         $this->fake->to('dries@laravel.com')->queue($this->mailable);
         $this->fake->to('taylor@laravel.com')->queue($this->mailable);
 
-        $this->fake->assertQueuedTo(MailableStub::class, ['taylor@laravel.com', 'dries@laravel.com']);
+        $this->fake->to(['nuno@laravel.com', 'jess@laravel.com'])->queue($this->mailable);
+
+        $this->fake->assertQueued(MailableStub::class, 3);
+        $this->fake->assertQueuedTo(
+            MailableStub::class,
+            ['taylor@laravel.com', 'dries@laravel.com', 'nuno@laravel.com', 'jess@laravel.com']
+        );
     }
 
     public function testAssertQueuedTimes()
