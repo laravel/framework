@@ -309,7 +309,7 @@ class VendorPublishCommand extends Command
      */
     protected function moveManagedFiles($from, $manager)
     {
-        foreach ($manager->listContents('from://', true) as $file) {
+        foreach ($manager->listContents('from://', true)->sortByPath() as $file) {
             $path = Str::after($file['path'], 'from://');
 
             if (
