@@ -9,6 +9,7 @@ use Illuminate\Contracts\Mail\Mailer;
 use Illuminate\Contracts\Mail\MailQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\MailManager;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Traits\ForwardsCalls;
 use Illuminate\Support\Traits\ReflectsClosures;
 use PHPUnit\Framework\Assert as PHPUnit;
@@ -81,6 +82,31 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
             $this->sent($mailable, $callback)->count() > 0,
             $message
         );
+    }
+
+    /**
+     * Assert if a mailable was sent to an address.
+     *
+     * @param  string  $mailable
+     * @param  string|array  $address
+     * @return void
+     */
+    public function assertSentTo($mailable, $addresses)
+    {
+        foreach (Arr::wrap($addresses) as $address) {
+            $callback = fn (Mailable $mail) => $mail->hasTo($address);
+
+            $message = "The expected [{$mailable}] mailable was not sent to address [{$address}].";
+
+            if (count($this->queuedMailables) > 0) {
+                $message .= ' Did you mean to use assertQueuedTo() instead?';
+            }
+
+            PHPUnit::assertTrue(
+                $this->sent($mailable, $callback)->count() > 0,
+                $message
+            );
+        }
     }
 
     /**
@@ -174,6 +200,25 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
             $this->queued($mailable, $callback)->count() > 0,
             "The expected [{$mailable}] mailable was not queued."
         );
+    }
+
+    /**
+     * Assert if a mailable was queued to an address.
+     *
+     * @param  string  $mailable
+     * @param  string|array  $address
+     * @return void
+     */
+    public function assertQueuedTo($mailable, $addresses)
+    {
+        foreach (Arr::wrap($addresses) as $address) {
+            $callback = fn (Mailable $mail) => $mail->hasTo($address);
+
+            PHPUnit::assertTrue(
+                $this->queued($mailable, $callback)->count() > 0,
+                "The expected [{$mailable}] mailable was not queued to address [{$address}]."
+            );
+        }
     }
 
     /**
