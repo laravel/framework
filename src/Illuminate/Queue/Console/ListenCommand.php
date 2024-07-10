@@ -6,6 +6,7 @@ use Illuminate\Console\Command;
 use Illuminate\Queue\Listener;
 use Illuminate\Queue\ListenerOptions;
 use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Process\Process;
 
 #[AsCommand(name: 'queue:listen')]
 class ListenCommand extends Command
@@ -124,7 +125,11 @@ class ListenCommand extends Command
     protected function setOutputHandler(Listener $listener)
     {
         $listener->setOutputHandler(function ($type, $line) {
-            $this->output->write($line);
+            if ($type === Process::ERR) {
+                $this->error($line);
+            } else {
+                $this->output->write($line);
+            }
         });
     }
 }
