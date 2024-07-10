@@ -392,7 +392,7 @@ class FoundationInteractsWithDatabaseTest extends TestCase
             $case->tearDown();
             $this->fail();
         } catch (ExpectationFailedException $e) {
-            $this->assertSame("Expected 3 database queries on the [testing] connection. 0 occurred.\nFailed asserting that 3 is identical to 0.", $e->getMessage());
+            $this->assertSame("Expected 3 database queries on the [testing] connection. 0 occurred.\nFailed asserting that 0 is identical to 3.", $e->getMessage());
         }
 
         $case = new class('foo') extends TestingTestCase
