@@ -1500,7 +1500,7 @@ class PendingRequest
      * Dispatch the ConnectionFailed event if a dispatcher is available.
      *
      * @param  \Illuminate\Http\Client\Request  $request
-     * @param  \Illuminate\Http\Client\ConnectionException $exception
+     * @param  \Illuminate\Http\Client\ConnectionException  $exception
      * @return void
      */
     protected function dispatchConnectionFailedEvent(Request $request, ConnectionException $exception)
