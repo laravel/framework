@@ -179,7 +179,7 @@ class Batch implements Arrayable, JsonSerializable
     /**
      * Add jobs to a batch using a lazy collection or generator.
      *
-     * @param LazyCollection|(Closure(): \Generator) $jobs
+     * @param  LazyCollection|(Closure(): \Generator)  $jobs
      * @return self
      */
     public function addLazy($jobs, $chunkSize = 1000)
@@ -196,7 +196,7 @@ class Batch implements Arrayable, JsonSerializable
         [$prepared] = $this->prepareJobs($jobs);
 
         $this->repository->transaction(function () use ($chunkSize, $prepared) {
-            $prepared->chunk($chunkSize)->each(function($chunk) {
+            $prepared->chunk($chunkSize)->each(function ($chunk) {
                 $jobsForChunk = $chunk->all();
 
                 // Calculate the total number of jobs in the chunk, counting chains correctly
@@ -225,13 +225,14 @@ class Batch implements Arrayable, JsonSerializable
      * until the jobs are added to the batch.
      *
      * @template TCollectionType of LazyCollection|Collection
-     * @param TCollectionType $jobs
+     *
+     * @param  TCollectionType  $jobs
      * @return array{0: TCollectionType, 1: int}
      */
     protected function prepareJobs($jobs)
     {
         $count = 0;
-        $prepared = $jobs->map(function($job) use (&$count){
+        $prepared = $jobs->map(function ($job) use (&$count){
             $job = $job instanceof Closure ? CallQueuedClosure::create($job) : $job;
             if (is_array($job)) {
                 $count += count($job);

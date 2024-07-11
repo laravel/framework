@@ -121,7 +121,8 @@ class BusBatchTest extends TestCase
         $this->assertInstanceOf(CarbonImmutable::class, $batch->createdAt);
     }
 
-    public function test_jobs_can_be_added_lazily_to_the_batch(){
+    public function test_jobs_can_be_added_lazily_to_the_batch()
+    {
         $queue = m::mock(Factory::class);
 
         $batch = $this->createTestBatch($queue);
@@ -151,7 +152,7 @@ class BusBatchTest extends TestCase
                 && is_string($args[2]->batchId);
         }), '', 'test-queue');
 
-        $batch = $batch->addLazy(LazyCollection::make(function() use ($job, $secondJob, $thirdJob) {
+        $batch = $batch->addLazy(LazyCollection::make(function () use ($job, $secondJob, $thirdJob) {
             yield $job;
             yield $secondJob;
             yield $thirdJob;
@@ -163,7 +164,8 @@ class BusBatchTest extends TestCase
         $this->assertInstanceOf(CarbonImmutable::class, $batch->createdAt);
     }
 
-    public function test_jobs_can_be_added_lazily_to_the_batch_using_custom_chunk_size(){
+    public function test_jobs_can_be_added_lazily_to_the_batch_using_custom_chunk_size()
+    {
         $queue = m::mock(Factory::class);
 
         $batch = $this->createTestBatch($queue);
@@ -199,7 +201,7 @@ class BusBatchTest extends TestCase
                     && is_string($args[2]->batchId);
             }), '', 'test-queue');
 
-        $batch = $batch->addLazy(LazyCollection::make(function() use ($job, $secondJob, $thirdJob) {
+        $batch = $batch->addLazy(LazyCollection::make(function () use ($job, $secondJob, $thirdJob) {
             yield $job;
             yield $secondJob;
             yield $thirdJob;
