@@ -7,6 +7,7 @@ use Closure;
 use DateTimeInterface;
 use Exception;
 use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Database\Events\QueryBeforeExecution;
 use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Database\Events\StatementPrepared;
 use Illuminate\Database\Events\TransactionBeginning;
@@ -395,6 +396,8 @@ class Connection implements ConnectionInterface
      */
     public function select($query, $bindings = [], $useReadPdo = true)
     {
+      $this->event(new QueryBeforeExecution($query, QueryBeforeExecution::SELECT, $bindings, $this));
+
         return $this->run($query, $bindings, function ($query, $bindings) use ($useReadPdo) {
             if ($this->pretending()) {
                 return [];
@@ -521,6 +524,8 @@ class Connection implements ConnectionInterface
      */
     public function insert($query, $bindings = [])
     {
+       $this->event(new QueryBeforeExecution($query, QueryBeforeExecution::INSERT, $bindings, $this));
+
         return $this->statement($query, $bindings);
     }
 
@@ -533,6 +538,8 @@ class Connection implements ConnectionInterface
      */
     public function update($query, $bindings = [])
     {
+        $this->event(new QueryBeforeExecution($query, QueryBeforeExecution::UPDATE, $bindings, $this));
+
         return $this->affectingStatement($query, $bindings);
     }
 
@@ -545,6 +552,8 @@ class Connection implements ConnectionInterface
      */
     public function delete($query, $bindings = [])
     {
+        $this->event(new QueryBeforeExecution($query, QueryBeforeExecution::DELETE, $bindings, $this));
+
         return $this->affectingStatement($query, $bindings);
     }
 
