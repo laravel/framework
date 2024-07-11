@@ -396,7 +396,7 @@ class Connection implements ConnectionInterface
      */
     public function select($query, $bindings = [], $useReadPdo = true)
     {
-      $this->event(new QueryBeforeExecution($query, QueryBeforeExecution::SELECT, $bindings, $this));
+        $this->event(new QueryBeforeExecution($query, QueryBeforeExecution::SELECT, $bindings, $this));
 
         return $this->run($query, $bindings, function ($query, $bindings) use ($useReadPdo) {
             if ($this->pretending()) {
@@ -524,7 +524,7 @@ class Connection implements ConnectionInterface
      */
     public function insert($query, $bindings = [])
     {
-       $this->event(new QueryBeforeExecution($query, QueryBeforeExecution::INSERT, $bindings, $this));
+        $this->event(new QueryBeforeExecution($query, QueryBeforeExecution::INSERT, $bindings, $this));
 
         return $this->statement($query, $bindings);
     }

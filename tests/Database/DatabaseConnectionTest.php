@@ -7,6 +7,7 @@ use ErrorException;
 use Exception;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Connection;
+use Illuminate\Database\Events\QueryBeforeExecution;
 use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Database\Events\TransactionBeginning;
 use Illuminate\Database\Events\TransactionCommitted;
@@ -155,6 +156,31 @@ class DatabaseConnectionTest extends TestCase
         $connection->expects($this->once())->method('affectingStatement')->with($this->equalTo('foo'), $this->equalTo(['bar']))->willReturn(true);
         $results = $connection->delete('foo', ['bar']);
         $this->assertTrue($results);
+    }
+
+    public function testInsertCallFireEventQueryBeforeExecution()
+    {
+        $connection = $this->getMockConnection(['statement']);
+        $connection->setEventDispatcher($events = m::mock(Dispatcher::class));
+        $events->shouldReceive('dispatch')->once()->with(m::type(QueryBeforeExecution::class));
+
+        $connection->insert('foo', ['bar']);
+    }
+
+    public function testUpdateCallFireEventQueryBeforeExecution()
+    {
+        $connection = $this->getMockConnection(['affectingStatement']);
+        $connection->setEventDispatcher($events = m::mock(Dispatcher::class));
+        $events->shouldReceive('dispatch')->once()->with(m::type(QueryBeforeExecution::class));
+        $connection->update('foo', ['bar']);
+    }
+
+    public function testDeleteCallFireEventQueryBeforeExecution()
+    {
+        $connection = $this->getMockConnection(['affectingStatement']);
+        $connection->setEventDispatcher($events = m::mock(Dispatcher::class));
+        $events->shouldReceive('dispatch')->once()->with(m::type(QueryBeforeExecution::class));
+        $connection->delete('foo', ['bar']);
     }
 
     public function testStatementProperlyCallsPDO()

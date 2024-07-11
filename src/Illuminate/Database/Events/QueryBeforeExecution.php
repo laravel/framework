@@ -44,7 +44,6 @@ class QueryBeforeExecution
     const UPDATE = 'UPDATE';
     const DELETE = 'DELETE';
 
-
     /**
      * Create a new event instance.
      *
