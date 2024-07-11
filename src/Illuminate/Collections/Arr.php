@@ -41,6 +41,17 @@ class Arr
     }
 
     /**
+     * Create an array whose keys are equal to its values.
+     *
+     * @param  iterable  $array
+     * @return array
+     */
+    public static function combine($array)
+    {
+        return array_combine($array, $array);
+    }
+
+    /**
      * Collapse an array of arrays into a single array.
      *
      * @param  iterable  $array
