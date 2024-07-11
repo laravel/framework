@@ -176,23 +176,36 @@ class Batch implements Arrayable, JsonSerializable
         return $this->fresh();
     }
 
-    /** @param LazyCollection|(Closure(): \Generator) $jobs */
-    public function addLazy($jobs, $chunkSize = 1000) {
-        if($jobs instanceof \Generator){
+    /**
+     * Add jobs to a batch using a lazy collection or generator.
+     *
+     * @param LazyCollection|(Closure(): \Generator) $jobs
+     * @return self
+     */
+    public function addLazy($jobs, $chunkSize = 1000)
+    {
+        if ($jobs instanceof \Generator) {
             throw new InvalidArgumentException(
                 'Generators should not be passed directly. Instead, pass a generator function.'
             );
         }
-        if($jobs instanceof \Closure){
+        if ($jobs instanceof \Closure) {
             $jobs = LazyCollection::make($jobs);
         }
 
         [$prepared] = $this->prepareJobs($jobs);
 
         $this->repository->transaction(function () use ($chunkSize, $prepared) {
-            $prepared->chunk($chunkSize)->each(function($chunk){
+            $prepared->chunk($chunkSize)->each(function($chunk) {
                 $jobsForChunk = $chunk->all();
-                $this->repository->incrementTotalJobs($this->id, count($jobsForChunk));
+
+                // Calculate the total number of jobs in the chunk, counting chains correctly
+                // which have been converted into a collection at this point.
+                $count = array_reduce($jobsForChunk, function($carry, $item) {
+                    return $carry + ($item instanceof Collection ? $item->count() : 1);
+                }, 0);
+
+                $this->repository->incrementTotalJobs($this->id, $count);
 
                 $this->queue->connection($this->options['connection'] ?? null)->bulk(
                     $jobsForChunk,
@@ -200,13 +213,23 @@ class Batch implements Arrayable, JsonSerializable
                     $this->options['queue'] ?? null
                 );
             });
-
         });
 
         return $this->fresh();
     }
 
-    protected function prepareJobs($jobs){
+    /**
+     * Prepare jobs for storage into a batch, while maintaining a count of the total jobs.
+     * In the case of a lazy collection, the count returned will always be zero,
+     * since the generator function will not be executed
+     * until the jobs are added to the batch.
+     *
+     * @template TCollectionType of LazyCollection|Collection
+     * @param TCollectionType $jobs
+     * @return array{0: TCollectionType, 1: int}
+     */
+    protected function prepareJobs($jobs)
+    {
         $count = 0;
         $prepared = $jobs->map(function($job) use (&$count){
             $job = $job instanceof Closure ? CallQueuedClosure::create($job) : $job;
