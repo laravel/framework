@@ -203,7 +203,7 @@ class ApplicationBuilder
             }
 
             if (is_string($health)) {
-                Route::middleware('web')->get($health, function () {
+                Route::get($health, function () {
                     Event::dispatch(new DiagnosingHealth);
 
                     return View::file(__DIR__.'/../resources/health-up.blade.php');
