@@ -201,7 +201,7 @@ class Batch implements Arrayable, JsonSerializable
 
                 // Calculate the total number of jobs in the chunk, counting chains correctly
                 // which have been converted into a collection at this point.
-                $count = array_reduce($jobsForChunk, function($carry, $item) {
+                $count = array_reduce($jobsForChunk, function ($carry, $item) {
                     return $carry + ($item instanceof Collection ? $item->count() : 1);
                 }, 0);
 
@@ -232,7 +232,7 @@ class Batch implements Arrayable, JsonSerializable
     protected function prepareJobs($jobs)
     {
         $count = 0;
-        $prepared = $jobs->map(function ($job) use (&$count){
+        $prepared = $jobs->map(function ($job) use (&$count) {
             $job = $job instanceof Closure ? CallQueuedClosure::create($job) : $job;
             if (is_array($job)) {
                 $count += count($job);
