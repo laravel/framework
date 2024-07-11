@@ -9,6 +9,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Queue\CallQueuedClosure;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Illuminate\Support\LazyCollection;
 use JsonSerializable;
 use Throwable;
 
@@ -160,28 +161,7 @@ class Batch implements Arrayable, JsonSerializable
      */
     public function add($jobs)
     {
-        $count = 0;
-
-        $jobs = Collection::wrap($jobs)->map(function ($job) use (&$count) {
-            $job = $job instanceof Closure ? CallQueuedClosure::create($job) : $job;
-
-            if (is_array($job)) {
-                $count += count($job);
-
-                return with($this->prepareBatchedChain($job), function ($chain) {
-                    return $chain->first()
-                            ->allOnQueue($this->options['queue'] ?? null)
-                            ->allOnConnection($this->options['connection'] ?? null)
-                            ->chain($chain->slice(1)->values()->all());
-                });
-            } else {
-                $job->withBatchId($this->id);
-
-                $count++;
-            }
-
-            return $job;
-        });
+        [$jobs, $count] = $this->prepareJobs(Collection::wrap($jobs));
 
         $this->repository->transaction(function () use ($jobs, $count) {
             $this->repository->incrementTotalJobs($this->id, $count);
@@ -194,6 +174,61 @@ class Batch implements Arrayable, JsonSerializable
         });
 
         return $this->fresh();
+    }
+
+    /** @param LazyCollection|(Closure(): \Generator) $jobs */
+    public function addLazy($jobs, $chunkSize = 1000) {
+        if($jobs instanceof \Generator){
+            throw new InvalidArgumentException(
+                'Generators should not be passed directly. Instead, pass a generator function.'
+            );
+        }
+        if($jobs instanceof \Closure){
+            $jobs = LazyCollection::make($jobs);
+        }
+
+        [$prepared] = $this->prepareJobs($jobs);
+
+        $this->repository->transaction(function () use ($chunkSize, $prepared) {
+            $prepared->chunk($chunkSize)->each(function($chunk){
+                $jobsForChunk = $chunk->all();
+                $this->repository->incrementTotalJobs($this->id, count($jobsForChunk));
+
+                $this->queue->connection($this->options['connection'] ?? null)->bulk(
+                    $jobsForChunk,
+                    $data = '',
+                    $this->options['queue'] ?? null
+                );
+            });
+
+        });
+
+        return $this->fresh();
+    }
+
+    protected function prepareJobs($jobs){
+        $count = 0;
+        $prepared = $jobs->map(function($job) use (&$count){
+            $job = $job instanceof Closure ? CallQueuedClosure::create($job) : $job;
+            if (is_array($job)) {
+                $count += count($job);
+
+                return with($this->prepareBatchedChain($job), function ($chain) {
+                    return $chain->first()
+                        ->allOnQueue($this->options['queue'] ?? null)
+                        ->allOnConnection($this->options['connection'] ?? null)
+                        ->chain($chain->slice(1)->values()->all());
+                });
+            } else {
+                $job->withBatchId($this->id);
+
+                $count++;
+            }
+
+            return $job;
+        });
+
+        return [$prepared, $count];
     }
 
     /**

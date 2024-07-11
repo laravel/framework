@@ -18,6 +18,7 @@ use Illuminate\Database\PostgresConnection;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\CallQueuedClosure;
+use Illuminate\Support\LazyCollection;
 use Mockery as m;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -113,6 +114,96 @@ class BusBatchTest extends TestCase
         }), '', 'test-queue');
 
         $batch = $batch->add([$job, $secondJob, $thirdJob]);
+
+        $this->assertEquals(3, $batch->totalJobs);
+        $this->assertEquals(3, $batch->pendingJobs);
+        $this->assertIsString($job->batchId);
+        $this->assertInstanceOf(CarbonImmutable::class, $batch->createdAt);
+    }
+
+    public function test_jobs_can_be_added_lazily_to_the_batch(){
+        $queue = m::mock(Factory::class);
+
+        $batch = $this->createTestBatch($queue);
+
+        $job = new class
+        {
+            use Batchable;
+        };
+
+        $secondJob = new class
+        {
+            use Batchable;
+        };
+
+        $thirdJob = function () {
+        };
+
+        $queue->shouldReceive('connection')->once()
+                        ->with('test-connection')
+                        ->andReturn($connection = m::mock(stdClass::class));
+
+        $connection->shouldReceive('bulk')->once()->with(m::on(function ($args) use ($job, $secondJob) {
+            return
+                $args[0] == $job &&
+                $args[1] == $secondJob &&
+                $args[2] instanceof CallQueuedClosure
+                && is_string($args[2]->batchId);
+        }), '', 'test-queue');
+
+        $batch = $batch->addLazy(LazyCollection::make(function() use ($job, $secondJob, $thirdJob) {
+            yield $job;
+            yield $secondJob;
+            yield $thirdJob;
+        }));
+
+        $this->assertEquals(3, $batch->totalJobs);
+        $this->assertEquals(3, $batch->pendingJobs);
+        $this->assertIsString($job->batchId);
+        $this->assertInstanceOf(CarbonImmutable::class, $batch->createdAt);
+    }
+
+    public function test_jobs_can_be_added_lazily_to_the_batch_using_custom_chunk_size(){
+        $queue = m::mock(Factory::class);
+
+        $batch = $this->createTestBatch($queue);
+
+        $job = new class
+        {
+            use Batchable;
+        };
+
+        $secondJob = new class
+        {
+            use Batchable;
+        };
+
+        $thirdJob = function () {
+        };
+
+        $queue->shouldReceive('connection')->twice()
+            ->with('test-connection')
+            ->andReturn($connection = m::mock(stdClass::class));
+
+        $connection->shouldReceive('bulk')
+            ->with(m::on(function ($args) use ($job, $secondJob) {
+                return
+                    $args[0] == $job &&
+                    $args[1] == $secondJob;
+            }), '', 'test-queue');
+
+        $connection->shouldReceive('bulk')
+            ->with(m::on(function ($args) {
+                return
+                    $args[2] instanceof CallQueuedClosure
+                    && is_string($args[2]->batchId);
+            }), '', 'test-queue');
+
+        $batch = $batch->addLazy(LazyCollection::make(function() use ($job, $secondJob, $thirdJob) {
+            yield $job;
+            yield $secondJob;
+            yield $thirdJob;
+        }), 2);
 
         $this->assertEquals(3, $batch->totalJobs);
         $this->assertEquals(3, $batch->pendingJobs);
