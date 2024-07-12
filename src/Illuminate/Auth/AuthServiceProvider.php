@@ -99,12 +99,9 @@ class AuthServiceProvider extends ServiceProvider
     protected function registerEventRebindHandler()
     {
         $this->app->rebinding('events', function ($app, $dispatcher) {
-            if (! $app->resolved('auth') ||
-                $app['auth']->hasResolvedGuards() === false) {
-                return;
-            }
-
-            if (method_exists($guard = $app['auth']->guard(), 'setDispatcher')) {
+            if ($app->resolved('auth') &&
+                $app['auth']->hasResolvedGuards() === true &&
+                method_exists($guard = $app['auth']->guard(), 'setDispatcher')) {
                 $guard->setDispatcher($dispatcher);
             }
         });
