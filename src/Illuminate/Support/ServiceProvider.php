@@ -154,7 +154,7 @@ abstract class ServiceProvider
      * @param  string  $key
      * @return void
      */
-    protected function replaceConfigRecursiveFrom($path, $key)
+    protected function replaceConfigRecursivelyFrom($path, $key)
     {
         if (! ($this->app instanceof CachesConfiguration && $this->app->configurationIsCached())) {
             $config = $this->app->make('config');
