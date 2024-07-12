@@ -4337,7 +4337,8 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->fails());
     }
 
-    public function testValidateCidr(){
+    public function testValidateCidr()
+    {
         $trans = $this->getIlluminateArrayTranslator();
 
         $v = new Validator($trans, ['cidr' => '192.168.1.1/32'], ['cidr' => 'Cidr']);

@@ -1455,27 +1455,27 @@ trait ValidatesAttributes
     {
         $parts = explode('/', $value);
 
-        if(count($parts) !== 2){
+        if (count($parts) !== 2) {
             return false;
         }
 
         [$ip, $mask] = $parts;
 
-        if(filter_var($mask, FILTER_VALIDATE_INT) === false){
+        if (filter_var($mask, FILTER_VALIDATE_INT) === false) {
             return false;
         }
 
         $maskMax = 32; // IPV4 max
 
-        if(filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) === false){
-            if(filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) === false){
+        if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) === false) {
+            if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) === false) {
                 return false;
-            }else{
+            } else {
                 $maskMax = 64; // IPV6 max
             }
         }
 
-        if($mask < 0 || $mask > $maskMax){
+        if ($mask < 0 || $mask > $maskMax) {
             return false;
         }
 
