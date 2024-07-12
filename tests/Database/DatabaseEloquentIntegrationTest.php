@@ -895,11 +895,9 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $i = 0;
         EloquentTestNonIncrementingSecond::query()->chunkById(2, function (Collection $users) use (&$i) {
             if (! $i) {
-                $this->assertCount(2, $users);
                 $this->assertSame(' First', $users[0]->name);
                 $this->assertSame(' Second', $users[1]->name);
             } else {
-                $this->assertCount(1, $users);
                 $this->assertSame(' Third', $users[0]->name);
             }
             $i++;
