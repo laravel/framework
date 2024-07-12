@@ -156,11 +156,15 @@ class Batch implements Arrayable, JsonSerializable
     /**
      * Add additional jobs to the batch.
      *
-     * @param  \Illuminate\Support\Enumerable|object|array  $jobs
+     * @param  \Illuminate\Support\Enumerable|(Closure(): \Generator)|object|array  $jobs
      * @return self
      */
     public function add($jobs)
     {
+        if ($jobs instanceof LazyCollection || $jobs instanceof \Closure) {
+            return $this->addLazy($jobs);
+        }
+
         [$jobs, $count] = $this->prepareJobs(Collection::wrap($jobs));
 
         $this->repository->transaction(function () use ($jobs, $count) {

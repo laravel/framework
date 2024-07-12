@@ -152,7 +152,7 @@ class BusBatchTest extends TestCase
                 && is_string($args[2]->batchId);
         }), '', 'test-queue');
 
-        $batch = $batch->addLazy(LazyCollection::make(function () use ($job, $secondJob, $thirdJob) {
+        $batch = $batch->add(LazyCollection::make(function () use ($job, $secondJob, $thirdJob) {
             yield $job;
             yield $secondJob;
             yield $thirdJob;
