@@ -20,7 +20,7 @@ class PostgresSchemaState extends SchemaState
         ]);
 
         if ($this->hasMigrationTable()) {
-            $commands->push($this->baseDumpCommand().' -t '.$this->migrationTable.' --data-only >> '.$path);
+            $commands->push($this->baseDumpCommand().' -t '.$this->getMigrationTable().' --data-only >> '.$path);
         }
 
         $commands->map(function ($command, $path) {
@@ -78,5 +78,17 @@ class PostgresSchemaState extends SchemaState
             'PGPASSWORD' => $config['password'],
             'LARAVEL_LOAD_DATABASE' => $config['database'],
         ];
+    }
+
+    /**
+     * Get the name of the application's migration table.
+     *
+     * @return string
+     */
+    protected function getMigrationTable(): string
+    {
+        [$schema, $table] = $this->connection->getSchemaBuilder()->parseSchemaAndTable($this->migrationTable);
+
+        return $schema.'.'.$this->connection->getTablePrefix().$table;
     }
 }
