@@ -1461,25 +1461,15 @@ trait ValidatesAttributes
 
         [$ip, $mask] = $parts;
 
-        if (filter_var($mask, FILTER_VALIDATE_INT) === false) {
-            return false;
+        if ($this->validateIpv4($attribute, $ip)) {
+            return filter_var($mask, FILTER_VALIDATE_INT, ['options' => ['min_range' => 0, 'max_range' => 32]]) !== false;
         }
 
-        $maskMax = 32; // IPV4 max
-
-        if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) === false) {
-            if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) === false) {
-                return false;
-            } else {
-                $maskMax = 64; // IPV6 max
-            }
+        if ($this->validateIpv6($attribute, $ip)) {
+            return filter_var($mask, FILTER_VALIDATE_INT, ['options' => ['min_range' => 0, 'max_range' => 64]]) !== false;
         }
 
-        if ($mask < 0 || $mask > $maskMax) {
-            return false;
-        }
-
-        return true;
+        return false;
     }
 
     /**
