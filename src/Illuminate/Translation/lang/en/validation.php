@@ -76,6 +76,7 @@ return [
     'ip' => 'The :attribute field must be a valid IP address.',
     'ipv4' => 'The :attribute field must be a valid IPv4 address.',
     'ipv6' => 'The :attribute field must be a valid IPv6 address.',
+    'cidr' => 'The :attribute field must be a valid CIDR notation.',
     'json' => 'The :attribute field must be a valid JSON string.',
     'list' => 'The :attribute field must be a list.',
     'lowercase' => 'The :attribute field must be lowercase.',
