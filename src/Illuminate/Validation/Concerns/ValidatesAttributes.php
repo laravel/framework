@@ -1445,6 +1445,44 @@ trait ValidatesAttributes
     }
 
     /**
+     * Validate that an attribute is a valid CIDR.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @return bool
+     */
+    public function validateCidr($attribute, $value)
+    {
+        $parts = explode('/', $value);
+
+        if(count($parts) !== 2){
+            return false;
+        }
+
+        [$ip, $mask] = $parts;
+
+        if(filter_var($mask, FILTER_VALIDATE_INT) === false){
+            return false;
+        }
+
+        $maskMax = 32; // IPV4 max
+
+        if(filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) === false){
+            if(filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) === false){
+                return false;
+            }else{
+                $maskMax = 64; // IPV6 max
+            }
+        }
+
+        if($mask < 0 || $mask > $maskMax){
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
      * Validate that an attribute is a valid MAC address.
      *
      * @param  string  $attribute

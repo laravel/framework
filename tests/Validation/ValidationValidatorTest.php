@@ -4337,6 +4337,43 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->fails());
     }
 
+    public function testValidateCidr(){
+        $trans = $this->getIlluminateArrayTranslator();
+
+        $v = new Validator($trans, ['cidr' => '192.168.1.1/32'], ['cidr' => 'Cidr']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['cidr' => '10.0.0.0/24'], ['cidr' => 'Cidr']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['cidr' => '127.0.0.1/35'], ['cidr' => 'Cidr']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['cidr' => '300.0.0.1/32'], ['cidr' => 'Cidr']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['cidr' => '300.0.0.1/xx'], ['cidr' => 'Cidr']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['cidr' => '127.0.0.zz/12'], ['cidr' => 'Cidr']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['cidr' => '127.0.0.1'], ['cidr' => 'Cidr']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['cidr' => '0:0:0:0:0:0:0:1/64'], ['cidr' => 'Cidr']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['cidr' => '2001:db8:3333:4444:5555:6666:7777:8888/32'], ['cidr' => 'Cidr']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['cidr' => '2001:db8:3333:4444:CCCC:DDDD:EEEE:FFFF/128'], ['cidr' => 'Cidr']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['cidr' => '2001:0db8:0001:0000:0000:0ab9:C0A8:XXZZ/32'], ['cidr' => 'Cidr']);
+        $this->assertTrue($v->fails());
+    }
+
     public function testValidateMacAddress()
     {
         $trans = $this->getIlluminateArrayTranslator();
