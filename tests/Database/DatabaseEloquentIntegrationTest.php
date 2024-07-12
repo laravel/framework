@@ -679,9 +679,11 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         EloquentTestUser::query()->orderBy('id', 'asc')->chunk(2, function (Collection $users, $page) use (&$chunks) {
             if ($page == 1) {
+                $this->assertCount(2, $users);
                 $this->assertSame('First', $users[0]->name);
                 $this->assertSame('Second', $users[1]->name);
             } else {
+                $this->assertCount(1, $users);
                 $this->assertSame('Third', $users[0]->name);
             }
 
@@ -701,6 +703,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         EloquentTestUser::query()->orderBy('id', 'asc')->limit(2)->chunk(2, function (Collection $users, $page) use (&$chunks) {
             if ($page == 1) {
+                $this->assertCount(2, $users);
                 $this->assertSame('First', $users[0]->name);
                 $this->assertSame('Second', $users[1]->name);
             } else {
@@ -723,9 +726,11 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         EloquentTestUser::query()->orderBy('id', 'asc')->limit(10)->chunk(2, function (Collection $users, $page) use (&$chunks) {
             if ($page == 1) {
+                $this->assertCount(2, $users);
                 $this->assertSame('First', $users[0]->name);
                 $this->assertSame('Second', $users[1]->name);
             } elseif ($page === 2) {
+                $this->assertCount(1, $users);
                 $this->assertSame('Third', $users[0]->name);
             } else {
                 $this->fail('Should have had two pages.');
@@ -747,6 +752,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         EloquentTestUser::query()->orderBy('id', 'asc')->offset(1)->chunk(2, function (Collection $users, $page) use (&$chunks) {
             if ($page == 1) {
+                $this->assertCount(2, $users);
                 $this->assertSame('Second', $users[0]->name);
                 $this->assertSame('Third', $users[1]->name);
             } else {
@@ -814,6 +820,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         EloquentTestUser::query()->limit(2)->chunkById(2, function (Collection $users, $page) use (&$chunks) {
             if ($page == 1) {
+                $this->assertCount(2, $users);
                 $this->assertSame('First', $users[0]->name);
                 $this->assertSame('Second', $users[1]->name);
             } else {
@@ -836,6 +843,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         EloquentTestUser::query()->offset(1)->chunkById(2, function (Collection $users, $page) use (&$chunks) {
             if ($page == 1) {
+                $this->assertCount(2, $users);
                 $this->assertSame('Second', $users[0]->name);
                 $this->assertSame('Third', $users[1]->name);
             } else {
@@ -887,9 +895,11 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $i = 0;
         EloquentTestNonIncrementingSecond::query()->chunkById(2, function (Collection $users) use (&$i) {
             if (! $i) {
+                $this->assertCount(2, $users);
                 $this->assertSame(' First', $users[0]->name);
                 $this->assertSame(' Second', $users[1]->name);
             } else {
+                $this->assertCount(1, $users);
                 $this->assertSame(' Third', $users[0]->name);
             }
             $i++;
