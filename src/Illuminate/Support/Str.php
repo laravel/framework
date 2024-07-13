@@ -637,6 +637,27 @@ class Str
     }
 
     /**
+     * Limit the number of characters in a string but to the closest word.
+     *
+     * @param string $value
+     * @param int $limit
+     * @param string $end
+     * @return string
+     */
+    public static function limitTillWord($value, $limit = 100, $end = '...')
+    {
+        if (mb_strwidth($value, 'UTF-8') <= $limit) {
+            return $value;
+        }
+
+        $str = trim(preg_replace('/[\n\r]+/', ' ', strip_tags($value)));
+        $wordWrap = wordwrap($str, $limit);
+        $sentences = explode("\n", $wordWrap);
+
+        return trim($sentences[0], ".,- \n\r") . $end;
+    }
+
+    /**
      * Convert the given string to lower-case.
      *
      * @param  string  $value

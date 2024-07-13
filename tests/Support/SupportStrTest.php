@@ -607,6 +607,16 @@ class SupportStrTest extends TestCase
         $this->assertSame('这是一', Str::limit($nonAsciiString, 6, ''));
     }
 
+    public function testLimitTillWord()
+    {
+        $this->assertSame('Laravel is a...', Str::limitTillWord('Laravel is a free, open source PHP web application framework.', 15));
+
+        $string = 'The PHP framework for web artisans.';
+        $this->assertSame('The PHP...', Str::limitTillWord($string, 15));
+        $this->assertSame('The PHP', Str::limitTillWord($string, 15, ''));
+        $this->assertSame('The PHP framework for web artisans.', Str::limitTillWord($string, 100));
+    }
+
     public function testLength()
     {
         $this->assertEquals(11, Str::length('foo bar baz'));
