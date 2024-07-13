@@ -515,9 +515,9 @@ if (! function_exists('when')) {
      * @template TTruthy of mixed
      * @template TFalsy of mixed
      *
-     * @param bool|(callable(): (bool)) $condition
-     * @param TTruthy|(callable(): (TTruthy)) $truthy
-     * @param TFalsy|(callable(): (TFalsy)) $falsy
+     * @param  bool|(callable(): (bool))  $condition
+     * @param  TTruthy|(callable(): (TTruthy))  $truthy
+     * @param  TFalsy|(callable(): (TFalsy))  $falsy
      * @return TTruthy|TFalsy
      */
     function when($condition, $truthy = null, $falsy = false)
