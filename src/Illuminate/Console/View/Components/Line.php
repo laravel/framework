@@ -28,6 +28,11 @@ class Line extends Component
             'fgColor' => 'white',
             'title' => 'error',
         ],
+        'success' => [
+            'bgColor' => 'green',
+            'fgColor' => 'white',
+            'title' => 'success',
+        ],
     ];
 
     /**
