@@ -729,6 +729,14 @@ class SupportHelpersTest extends TestCase
         $this->assertEquals($mock, tap($mock)->foo());
     }
 
+    #[DataProvider('providesWhenData')]
+    public function testWhen($tests, $commonParameters)
+    {
+        foreach ($tests as [$condition, $expected]) {
+            $this->assertSame($expected, when($condition, ...$commonParameters));
+        }
+    }
+
     public function testThrow()
     {
         $this->expectException(LogicException::class);
@@ -1196,6 +1204,15 @@ class SupportHelpersTest extends TestCase
             ['/%s/', ['a'], '', ''],
             // The internal pointer of this array is not at the beginning
             ['/%s/', $pointerArray, 'Hi, %s %s', 'Hi, Taylor Otwell'],
+        ];
+    }
+
+    public static function providesWhenData()
+    {
+        return [
+            [[[true, null], [false, false]], []], // Default truthy and falsy values
+            [[[true, 1], [false, 2]], [1, 2]],    // Custom truthy and falsy values
+            [[[fn () => true, 3], [fn () => false, 4]], [fn () => 3, fn () => 4]], // Callables as a parameters
         ];
     }
 
