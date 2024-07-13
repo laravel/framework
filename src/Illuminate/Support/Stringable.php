@@ -441,6 +441,18 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     }
 
     /**
+     * Limit the number of characters in a string but to the closest word.
+     *
+     * @param  int  $limit
+     * @param  string  $end
+     * @return static
+     */
+    public function limitTillWord($limit = 100, $end = '...')
+    {
+        return new static(Str::limitTillWord($this->value, $limit, $end));
+    }
+
+    /**
      * Convert the given string to lower-case.
      *
      * @return static
