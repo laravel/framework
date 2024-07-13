@@ -510,7 +510,7 @@ if (! function_exists('with')) {
 
 if (! function_exists('when')) {
     /**
-     * Return the given either truthy or falsy value depending on condition
+     * Return the given either truthy or falsy value depending on condition.
      *
      * @template TTruthy of mixed
      * @template TFalsy of mixed
