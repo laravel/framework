@@ -654,7 +654,7 @@ class Str
         $wordWrap = wordwrap($str, $limit);
         $sentences = explode("\n", $wordWrap);
 
-        return trim($sentences[0], ".,- \n\r") . $end;
+        return preg_replace('/\W$/', '', $sentences[0]) . $end;
     }
 
     /**
