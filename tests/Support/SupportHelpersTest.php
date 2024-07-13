@@ -1210,7 +1210,7 @@ class SupportHelpersTest extends TestCase
     public static function providesWhenData()
     {
         return [
-            [[[true, null], [false, false]], []], // Default truthy and falsy values
+            [[[true, true], [false, null]], []], // Default truthy and falsy values
             [[[true, 1], [false, 2]], [1, 2]],    // Custom truthy and falsy values
             [[[fn () => true, 3], [fn () => false, 4]], [fn () => 3, fn () => 4]], // Callables as a parameters
         ];
