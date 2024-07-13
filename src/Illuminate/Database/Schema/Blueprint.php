@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Schema;
 
+use BackedEnum;
 use Closure;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
@@ -1108,7 +1109,12 @@ class Blueprint
     public function enum($column, string|array $allowed)
     {
         if (is_string($allowed) && enum_exists($allowed)) {
-            $allowed = array_column($allowed::cases(), 'value');
+            $allowed = array_column(
+                $allowed::cases(),
+                is_subclass_of($allowed, BackedEnum::class)
+                    ? 'value'
+                    : 'name'
+            );
         }
 
         return $this->addColumn('enum', $column, compact('allowed'));
