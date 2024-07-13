@@ -507,3 +507,21 @@ if (! function_exists('with')) {
         return is_null($callback) ? $value : $callback($value);
     }
 }
+
+if (! function_exists('when')) {
+    /**
+     * Return the given either truthy or falsy value depending on condition
+     *
+     * @template TTruthy of mixed
+     * @template TFalsy of mixed
+     *
+     * @param bool|(callable(): (bool)) $condition
+     * @param TTruthy|(callable(): (TTruthy)) $truthy
+     * @param TFalsy|(callable(): (TFalsy)) $falsy
+     * @return TTruthy|TFalsy
+     */
+    function when($condition, $truthy = null, $falsy = false)
+    {
+        return value(value($condition) ? $truthy : $falsy);
+    }
+}
