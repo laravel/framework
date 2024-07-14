@@ -3839,6 +3839,18 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Toggle a column's value.
+     *
+     * @param  string  $column
+     * @param  array  $extra
+     * @return bool
+     */
+    public function toggle($column, array $extra = [])
+    {
+        return $this->update(array_merge([$column => !$this->value($column)], $extra));
+    }
+
+    /**
      * Increment the given column's values by the given amounts.
      *
      * @param  array<string, float|int|numeric-string>  $columns

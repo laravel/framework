@@ -1183,6 +1183,20 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Toggle a column's value.
+     *
+     * @param  string|\Illuminate\Contracts\Database\Query\Expression  $column
+     * @param  array  $extra
+     * @return bool
+     */
+    public function toggle($column, array $extra = [])
+    {
+        return $this->toBase()->toggle(
+            $column, $this->addUpdatedAtColumn($extra)
+        );
+    }
+
+    /**
      * Decrement a column's value by a given amount.
      *
      * @param  string|\Illuminate\Contracts\Database\Query\Expression  $column
