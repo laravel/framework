@@ -1097,6 +1097,18 @@ class DatabaseMariaDbSchemaGrammarTest extends TestCase
         ], $statements);
     }
 
+    public function testAddingTimestampsWithCurrent()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->timestampsWithCurrent();
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertCount(2, $statements);
+        $this->assertSame([
+            'alter table `users` add `created_at` timestamp not null default CURRENT_TIMESTAMP',
+            'alter table `users` add `updated_at` timestamp not null default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP',
+        ], $statements);
+    }
+
     public function testAddingRememberToken()
     {
         $blueprint = new Blueprint('users');

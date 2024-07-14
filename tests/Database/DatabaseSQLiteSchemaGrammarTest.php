@@ -721,6 +721,18 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         ], $statements);
     }
 
+    public function testAddingTimestampsWithCurrent()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->timestampsWithCurrent();
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertCount(2, $statements);
+        $this->assertEquals([
+            'alter table "users" add column "created_at" datetime not null default CURRENT_TIMESTAMP',
+            'alter table "users" add column "updated_at" datetime not null default CURRENT_TIMESTAMP',
+        ], $statements);
+    }
+
     public function testAddingRememberToken()
     {
         $blueprint = new Blueprint('users');

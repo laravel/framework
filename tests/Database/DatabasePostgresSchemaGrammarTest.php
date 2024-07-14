@@ -887,6 +887,18 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         ], $statements);
     }
 
+    public function testAddingTimestampsWithCurrent()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->timestampsWithCurrent();
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertCount(2, $statements);
+        $this->assertSame([
+            'alter table "users" add column "created_at" timestamp(0) without time zone not null default CURRENT_TIMESTAMP',
+            'alter table "users" add column "updated_at" timestamp(0) without time zone not null default CURRENT_TIMESTAMP',
+        ], $statements);
+    }
+
     public function testAddingBinary()
     {
         $blueprint = new Blueprint('users');
