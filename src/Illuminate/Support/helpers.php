@@ -509,7 +509,7 @@ if (! function_exists('with')) {
     }
 }
 
-if (! function_exists('when')) {
+if (! function_exists('condition')) {
     /**
      * Return the given either truthy or falsy value depending on condition.
      *
@@ -522,7 +522,7 @@ if (! function_exists('when')) {
      * @param  TFalsy|(callable(TValue): (TFalsy))  $falsy
      * @return TTruthy|TFalsy
      */
-    function when($value, $truthy = null, $falsy = null)
+    function condition($value, $truthy = null, $falsy = null)
     {
         $value = value($value);
 
