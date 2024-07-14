@@ -729,12 +729,38 @@ class SupportHelpersTest extends TestCase
         $this->assertEquals($mock, tap($mock)->foo());
     }
 
-    #[DataProvider('providesWhenData')]
-    public function testWhen($tests, $commonParameters)
+    public function testCondition()
     {
-        foreach ($tests as [$condition, $expected]) {
-            $this->assertSame($expected, when($condition, ...$commonParameters));
-        }
+        $foo = new class {
+            public string $foo = 'foo';
+            public function bar()
+            {
+                return $this->foo.'_bar';
+            }
+        };
+
+        // Proxy
+        $this->assertSame('foo', condition($foo)->foo);
+        $this->assertSame('foo_bar', condition($foo)->bar());
+        $this->assertSame(false, condition(false)->bar());
+        $this->assertSame([], condition([])->bar());
+
+        // Simple truthy and falsy values
+        $this->assertSame('true', condition(true, truthy: 'true'));
+        $this->assertSame(null, condition(true, falsy: 'false'));
+        $this->assertSame(null, condition(false, truthy: 'true'));
+        $this->assertSame('false', condition(false, falsy: 'false'));
+        $this->assertSame('true', condition($foo, 'true', 'false'));
+
+        // Callbacks
+        $this->assertSame('true', condition(fn() => $foo, truthy: function ($fooParam) use ($foo) {
+            $this->assertSame($foo, $fooParam);
+            return 'true';
+        }));
+        $this->assertSame('false', condition(fn() => [], falsy: function ($falsy) use ($foo) {
+            $this->assertSame([], $falsy);
+            return 'false';
+        }));
     }
 
     public function testThrow()
@@ -1204,15 +1230,6 @@ class SupportHelpersTest extends TestCase
             ['/%s/', ['a'], '', ''],
             // The internal pointer of this array is not at the beginning
             ['/%s/', $pointerArray, 'Hi, %s %s', 'Hi, Taylor Otwell'],
-        ];
-    }
-
-    public static function providesWhenData()
-    {
-        return [
-            [[[true, true], [false, null]], []], // Default truthy and falsy values
-            [[[true, 1], [false, 2]], [1, 2]],    // Custom truthy and falsy values
-            [[[fn () => true, 3], [fn () => false, 4]], [fn () => 3, fn () => 4]], // Callables as a parameters
         ];
     }
 
