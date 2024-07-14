@@ -127,11 +127,24 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
      * Determine if a mailable was not sent based on a truth-test callback.
      *
      * @param  string|\Closure  $mailable
-     * @param  callable|null  $callback
+     * @param  callable|string|array|null  $callback
      * @return void
      */
     public function assertNotSent($mailable, $callback = null)
     {
+        if (is_string($callback) || is_array($callback)) {
+            foreach (Arr::wrap($callback) as $address) {
+                $callback = fn ($mail) => $mail->hasTo($address);
+
+                PHPUnit::assertCount(
+                    0, $this->sent($mailable, $callback),
+                    "The unexpected [{$mailable}] mailable was sent to address [{$address}]."
+                );
+            }
+
+            return;
+        }
+
         [$mailable, $callback] = $this->prepareMailableAndCallback($mailable, $callback);
 
         PHPUnit::assertCount(
@@ -220,11 +233,24 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
      * Determine if a mailable was not queued based on a truth-test callback.
      *
      * @param  string|\Closure  $mailable
-     * @param  callable|null  $callback
+     * @param  callable|string|array|null  $callback
      * @return void
      */
     public function assertNotQueued($mailable, $callback = null)
     {
+        if (is_string($callback) || is_array($callback)) {
+            foreach (Arr::wrap($callback) as $address) {
+                $callback = fn ($mail) => $mail->hasTo($address);
+
+                PHPUnit::assertCount(
+                    0, $this->queued($mailable, $callback),
+                    "The unexpected [{$mailable}] mailable was queued to address [{$address}]."
+                );
+            }
+
+            return;
+        }
+
         [$mailable, $callback] = $this->prepareMailableAndCallback($mailable, $callback);
 
         PHPUnit::assertCount(

@@ -146,6 +146,30 @@ class SupportTestingMailFakeTest extends TestCase
         $this->fake->assertNotSent($callback);
     }
 
+    public function testAssertNotSentWithString()
+    {
+        $this->fake->assertNotSent(MailableStub::class, 'taylor@laravel.com');
+
+        $this->fake->to('taylor@laravel.com')->send($this->mailable);
+
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage('The unexpected ['.MailableStub::class.'] mailable was sent to address [taylor@laravel.com].');
+
+        $this->fake->assertNotSent(MailableStub::class, 'taylor@laravel.com');
+    }
+
+    public function testAssertNotSentWithArray()
+    {
+        $this->fake->assertNotSent(MailableStub::class, ['taylor@laravel.com', 'dries@laravel.com']);
+
+        $this->fake->to('dries@laravel.com')->send($this->mailable);
+
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage('The unexpected ['.MailableStub::class.'] mailable was sent to address [dries@laravel.com].');
+
+        $this->fake->assertNotSent(MailableStub::class, ['taylor@laravel.com', 'dries@laravel.com']);
+    }
+
     public function testAssertSentTimes()
     {
         $this->fake->to('taylor@laravel.com')->send($this->mailable);
@@ -231,6 +255,30 @@ class SupportTestingMailFakeTest extends TestCase
         }
 
         $this->fake->assertQueued(MailableStub::class, 2);
+    }
+
+    public function testAssertNotQueuedWithString()
+    {
+        $this->fake->assertNotQueued(MailableStub::class, 'taylor@laravel.com');
+
+        $this->fake->to('taylor@laravel.com')->queue($this->mailable);
+
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage('The unexpected ['.MailableStub::class.'] mailable was queued to address [taylor@laravel.com].');
+
+        $this->fake->assertNotQueued(MailableStub::class, 'taylor@laravel.com');
+    }
+
+    public function testAssertNotQueuedWithArray()
+    {
+        $this->fake->assertNotQueued(MailableStub::class, ['taylor@laravel.com', 'dries@laravel.com']);
+
+        $this->fake->to('dries@laravel.com')->queue($this->mailable);
+
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage('The unexpected ['.MailableStub::class.'] mailable was queued to address [dries@laravel.com].');
+
+        $this->fake->assertNotQueued(MailableStub::class, ['taylor@laravel.com', 'dries@laravel.com']);
     }
 
     public function testAssertQueuedCount()
