@@ -520,7 +520,7 @@ if (! function_exists('when')) {
      * @param  TFalsy|(callable(): (TFalsy))  $falsy
      * @return TTruthy|TFalsy
      */
-    function when($condition, $truthy = true, $falsy = null)
+    function when($condition, $truthy = null, $falsy = null)
     {
         return value(value($condition) ? $truthy : $falsy);
     }
