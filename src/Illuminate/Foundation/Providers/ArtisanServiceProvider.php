@@ -26,6 +26,7 @@ use Illuminate\Database\Console\Seeds\SeederMakeCommand;
 use Illuminate\Database\Console\ShowCommand;
 use Illuminate\Database\Console\ShowModelCommand;
 use Illuminate\Database\Console\TableCommand as DatabaseTableCommand;
+use Illuminate\Database\Console\TouchCommand;
 use Illuminate\Database\Console\WipeCommand;
 use Illuminate\Foundation\Console\AboutCommand;
 use Illuminate\Foundation\Console\ApiInstallCommand;
@@ -127,6 +128,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         'DbPrune' => PruneCommand::class,
         'DbShow' => ShowCommand::class,
         'DbTable' => DatabaseTableCommand::class,
+        'DbTouch' => TouchCommand::class,
         'DbWipe' => WipeCommand::class,
         'Down' => DownCommand::class,
         'Environment' => EnvironmentCommand::class,

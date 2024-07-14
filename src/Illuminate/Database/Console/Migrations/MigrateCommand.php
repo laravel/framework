@@ -194,7 +194,10 @@ class MigrateCommand extends BaseCommand implements Isolatable
     protected function createMissingSqliteDatabase($path)
     {
         if ($this->option('force')) {
-            return touch($path);
+            return (bool) $this->call('db:touch', [
+                'connection' => $this->option('database'),
+                '--force' => true
+            ]);
         }
 
         if ($this->option('no-interaction')) {
