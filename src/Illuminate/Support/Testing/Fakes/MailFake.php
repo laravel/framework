@@ -61,7 +61,7 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
      * Assert if a mailable was sent based on a truth-test callback.
      *
      * @param  string|\Closure  $mailable
-     * @param  callable|int|null  $callback
+     * @param  callable|int|string|array|null  $callback
      * @return void
      */
     public function assertSent($mailable, $callback = null)
@@ -72,41 +72,25 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
             return $this->assertSentTimes($mailable, $callback);
         }
 
-        $message = "The expected [{$mailable}] mailable was not sent.";
+        $suggestion = count($this->queuedMailables) ? ' Did you mean to use assertQueued() instead?' : '';
 
-        if (count($this->queuedMailables) > 0) {
-            $message .= ' Did you mean to use assertQueued() instead?';
+        if (is_array($callback) || is_string($callback)) {
+            foreach (Arr::wrap($callback) as $address) {
+                $callback = fn ($mail) => $mail->hasTo($address);
+
+                PHPUnit::assertTrue(
+                    $this->sent($mailable, $callback)->count() > 0,
+                    "The expected [{$mailable}] mailable was not sent to address [{$address}].".$suggestion
+                );
+            }
+
+            return;
         }
 
         PHPUnit::assertTrue(
             $this->sent($mailable, $callback)->count() > 0,
-            $message
+            "The expected [{$mailable}] mailable was not sent.".$suggestion
         );
-    }
-
-    /**
-     * Assert if a mailable was sent to an address.
-     *
-     * @param  string  $mailable
-     * @param  string|array  $address
-     * @return void
-     */
-    public function assertSentTo($mailable, $addresses)
-    {
-        foreach (Arr::wrap($addresses) as $address) {
-            $callback = fn ($mail) => $mail->hasTo($address);
-
-            $message = "The expected [{$mailable}] mailable was not sent to address [{$address}].";
-
-            if (count($this->queuedMailables) > 0) {
-                $message .= ' Did you mean to use assertQueuedTo() instead?';
-            }
-
-            PHPUnit::assertTrue(
-                $this->sent($mailable, $callback)->count() > 0,
-                $message
-            );
-        }
     }
 
     /**
@@ -185,7 +169,7 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
      * Assert if a mailable was queued based on a truth-test callback.
      *
      * @param  string|\Closure  $mailable
-     * @param  callable|int|null  $callback
+     * @param  callable|int|string|array|null  $callback
      * @return void
      */
     public function assertQueued($mailable, $callback = null)
@@ -196,29 +180,23 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
             return $this->assertQueuedTimes($mailable, $callback);
         }
 
+        if (is_string($callback) || is_array($callback)) {
+            foreach (Arr::wrap($callback) as $address) {
+                $callback = fn ($mail) => $mail->hasTo($address);
+
+                PHPUnit::assertTrue(
+                    $this->queued($mailable, $callback)->count() > 0,
+                    "The expected [{$mailable}] mailable was not queued to address [{$address}]."
+                );
+            }
+
+            return;
+        }
+
         PHPUnit::assertTrue(
             $this->queued($mailable, $callback)->count() > 0,
             "The expected [{$mailable}] mailable was not queued."
         );
-    }
-
-    /**
-     * Assert if a mailable was queued to an address.
-     *
-     * @param  string  $mailable
-     * @param  string|array  $address
-     * @return void
-     */
-    public function assertQueuedTo($mailable, $addresses)
-    {
-        foreach (Arr::wrap($addresses) as $address) {
-            $callback = fn ($mail) => $mail->hasTo($address);
-
-            PHPUnit::assertTrue(
-                $this->queued($mailable, $callback)->count() > 0,
-                "The expected [{$mailable}] mailable was not queued to address [{$address}]."
-            );
-        }
     }
 
     /**

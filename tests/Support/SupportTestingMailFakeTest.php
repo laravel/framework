@@ -53,7 +53,7 @@ class SupportTestingMailFakeTest extends TestCase
     public function testAssertSentTo()
     {
         try {
-            $this->fake->assertSentTo(MailableStub::class, 'taylor@laravel.com');
+            $this->fake->assertSent(MailableStub::class, 'taylor@laravel.com');
             $this->fail();
         } catch (ExpectationFailedException $e) {
             $this->assertStringContainsString('The expected [Illuminate\Tests\Support\MailableStub] mailable was not sent to address [taylor@laravel.com].', $e->getMessage());
@@ -61,7 +61,7 @@ class SupportTestingMailFakeTest extends TestCase
 
         $this->fake->to('taylor@laravel.com')->send($this->mailable);
 
-        $this->fake->assertSentTo(MailableStub::class, 'taylor@laravel.com');
+        $this->fake->assertSent(MailableStub::class, 'taylor@laravel.com');
     }
 
     public function testAssertSentToMultiple()
@@ -72,7 +72,7 @@ class SupportTestingMailFakeTest extends TestCase
         $this->fake->to(['nuno@laravel.com', 'jess@laravel.com'])->send($this->mailable);
 
         $this->fake->assertSent(MailableStub::class, 3);
-        $this->fake->assertSentTo(
+        $this->fake->assertSent(
             MailableStub::class,
             ['taylor@laravel.com', 'dries@laravel.com', 'nuno@laravel.com', 'jess@laravel.com']
         );
@@ -193,7 +193,7 @@ class SupportTestingMailFakeTest extends TestCase
     public function testAssertQueuedTo()
     {
         try {
-            $this->fake->assertQueuedTo(MailableStub::class, 'taylor@laravel.com');
+            $this->fake->assertQueued(MailableStub::class, 'taylor@laravel.com');
             $this->fail();
         } catch (ExpectationFailedException $e) {
             $this->assertStringContainsString('The expected [Illuminate\Tests\Support\MailableStub] mailable was not queued to address [taylor@laravel.com].', $e->getMessage());
@@ -201,7 +201,7 @@ class SupportTestingMailFakeTest extends TestCase
 
         $this->fake->to('taylor@laravel.com')->queue($this->mailable);
 
-        $this->fake->assertQueuedTo(MailableStub::class, 'taylor@laravel.com');
+        $this->fake->assertQueued(MailableStub::class, 'taylor@laravel.com');
     }
 
     public function testAssertQueuedToMultiple()
@@ -212,7 +212,7 @@ class SupportTestingMailFakeTest extends TestCase
         $this->fake->to(['nuno@laravel.com', 'jess@laravel.com'])->queue($this->mailable);
 
         $this->fake->assertQueued(MailableStub::class, 3);
-        $this->fake->assertQueuedTo(
+        $this->fake->assertQueued(
             MailableStub::class,
             ['taylor@laravel.com', 'dries@laravel.com', 'nuno@laravel.com', 'jess@laravel.com']
         );
