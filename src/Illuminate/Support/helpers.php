@@ -531,9 +531,3 @@ if (! function_exists('condition')) {
             : value($value ? $truthy : $falsy, $value);
     }
 }
-
-
-//return bool_to($user->isAdmin());
-//return condition_to($user->isAdmin());
-//return replace_bool($user->isAdmin());
-//return when($user->isAdmin());
