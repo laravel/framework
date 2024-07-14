@@ -8,6 +8,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Log\Events\MessageLogged;
 use Illuminate\Support\Traits\Conditionable;
+use Monolog\Handler\HandlerInterface;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 
@@ -224,7 +225,7 @@ class Logger implements LoggerInterface
      */
     public function listen(Closure $callback)
     {
-        if (! isset($this->dispatcher)) {
+        if (!isset($this->dispatcher)) {
             throw new RuntimeException('Events dispatcher has not been set.');
         }
 
@@ -274,6 +275,21 @@ class Logger implements LoggerInterface
     public function getLogger()
     {
         return $this->logger;
+    }
+
+    /**
+     * Adds a processor to the stack if the logger is a Monolog logger.
+     *
+     * @param  callable  $processor
+     * @return HandlerInterface|self
+     */
+    public function pushProcessor(callable $processor)
+    {
+        if (method_exists($this->logger, 'pushProcessor')) {
+            return $this->logger->pushProcessor($processor);
+        }
+
+        return $this;
     }
 
     /**
