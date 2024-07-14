@@ -1267,6 +1267,19 @@ class Blueprint
     }
 
     /**
+     * Add timestamps with `CURRENT_TIMESTAMP` for `created_at` and updates to `updated_at` (MySQL).
+     *
+     * @param  int|null  $precision
+     * @return void
+     */
+    public function timestampsWithCurrent($precision = 0)
+    {
+        $this->timestamp('created_at', $precision)->useCurrent();
+
+        $this->timestamp('updated_at', $precision)->useCurrent()->useCurrentOnUpdate();
+    }
+
+    /**
      * Add creation and update datetime columns to the table.
      *
      * @param  int|null  $precision
