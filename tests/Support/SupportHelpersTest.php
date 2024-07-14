@@ -757,10 +757,12 @@ class SupportHelpersTest extends TestCase
         // Callbacks
         $this->assertSame('true', condition(fn () => $foo, truthy: function ($fooParam) use ($foo) {
             $this->assertSame($foo, $fooParam);
+
             return 'true';
         }));
         $this->assertSame('false', condition(fn () => [], falsy: function ($falsy) {
             $this->assertSame([], $falsy);
+
             return 'false';
         }));
     }
