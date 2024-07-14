@@ -517,10 +517,10 @@ if (! function_exists('condition')) {
      * @template TTruthy of mixed
      * @template TFalsy of mixed
      *
-     * @param  TValue  $value
+     * @param  TValue|(callable(): (TValue))  $value
      * @param  TTruthy|(callable(TValue): (TTruthy))  $truthy
      * @param  TFalsy|(callable(TValue): (TFalsy))  $falsy
-     * @return TTruthy|TFalsy
+     * @return TTruthy|TFalsy|HigherOrderWhenProxy
      */
     function condition($value, $truthy = null, $falsy = null)
     {
