@@ -731,8 +731,10 @@ class SupportHelpersTest extends TestCase
 
     public function testCondition()
     {
-        $foo = new class {
+        $foo = new class
+        {
             public string $foo = 'foo';
+
             public function bar()
             {
                 return $this->foo.'_bar';
@@ -753,11 +755,11 @@ class SupportHelpersTest extends TestCase
         $this->assertSame('true', condition($foo, 'true', 'false'));
 
         // Callbacks
-        $this->assertSame('true', condition(fn() => $foo, truthy: function ($fooParam) use ($foo) {
+        $this->assertSame('true', condition(fn () => $foo, truthy: function ($fooParam) use ($foo) {
             $this->assertSame($foo, $fooParam);
             return 'true';
         }));
-        $this->assertSame('false', condition(fn() => [], falsy: function ($falsy) use ($foo) {
+        $this->assertSame('false', condition(fn () => [], falsy: function ($falsy) {
             $this->assertSame([], $falsy);
             return 'false';
         }));
