@@ -6,6 +6,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Env;
 use Illuminate\Support\Fluent;
 use Illuminate\Support\HigherOrderTapProxy;
+use Illuminate\Support\HigherOrderWhenProxy;
 use Illuminate\Support\Once;
 use Illuminate\Support\Onceable;
 use Illuminate\Support\Optional;
@@ -512,16 +513,27 @@ if (! function_exists('when')) {
     /**
      * Return the given either truthy or falsy value depending on condition.
      *
+     * @template TValue of mixed
      * @template TTruthy of mixed
      * @template TFalsy of mixed
      *
-     * @param  bool|(callable(): (bool))  $condition
-     * @param  TTruthy|(callable(): (TTruthy))  $truthy
-     * @param  TFalsy|(callable(): (TFalsy))  $falsy
+     * @param  TValue  $value
+     * @param  TTruthy|(callable(TValue): (TTruthy))  $truthy
+     * @param  TFalsy|(callable(TValue): (TFalsy))  $falsy
      * @return TTruthy|TFalsy
      */
-    function when($condition, $truthy = null, $falsy = null)
+    function when($value, $truthy = null, $falsy = null)
     {
-        return value(value($condition) ? $truthy : $falsy);
+        $value = value($value);
+
+        return func_num_args() === 1
+            ? (new HigherOrderWhenProxy($value))->condition($value)
+            : value($value ? $truthy : $falsy, $value);
     }
 }
+
+
+//return bool_to($user->isAdmin());
+//return condition_to($user->isAdmin());
+//return replace_bool($user->isAdmin());
+//return when($user->isAdmin());
