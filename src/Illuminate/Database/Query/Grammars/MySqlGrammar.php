@@ -80,6 +80,21 @@ class MySqlGrammar extends Grammar
     }
 
     /**
+     * Compile a "where like" clause.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
+     * @return string
+     */
+    protected function whereLike(Builder $query, $where)
+    {
+        $where['operator'] = $where['not'] ? 'not ' : '';
+        $where['operator'] .= $where['caseSensitive'] ? 'like binary' : 'like';
+
+        return $this->whereBasic($query, $where);
+    }
+
+    /**
      * Compile the index hints for the query.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
