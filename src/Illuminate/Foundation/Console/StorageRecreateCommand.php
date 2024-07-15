@@ -5,7 +5,7 @@ namespace Illuminate\Foundation\Console;
 use Illuminate\Console\Command;
 use Symfony\Component\Console\Attribute\AsCommand;
 
-#[AsCommand(name: 'storage:framework')]
+#[AsCommand(name: 'storage:recreate')]
 class StorageRecreateCommand extends Command
 {
     /**
@@ -13,7 +13,7 @@ class StorageRecreateCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'storage:framework';
+    protected $signature = 'storage:recreate';
 
     /**
      * The console command description.
