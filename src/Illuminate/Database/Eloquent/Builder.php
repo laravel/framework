@@ -1198,6 +1198,20 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Toggle a column's value.
+     *
+     * @param  string|\Illuminate\Contracts\Database\Query\Expression  $column
+     * @param  array  $extra
+     * @return bool
+     */
+    public function toggle($column, array $extra = [])
+    {
+        return $this->toBase()->toggle(
+            $column, $this->addUpdatedAtColumn($extra)
+        );
+    }
+
+    /**
      * Add the "updated at" column to an array of values.
      *
      * @param  array  $values

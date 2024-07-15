@@ -3906,6 +3906,20 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Toggle a column's value.
+     *
+     * @param  string  $column
+     * @param  array  $extra
+     * @return bool
+     */
+    public function toggle($column, array $extra = [])
+    {
+        $columns[$column] = $this->raw("!{$this->grammar->wrap($column)}");
+
+        return $this->update(array_merge($columns, $extra));
+    }
+
+    /**
      * Delete records from the database.
      *
      * @param  mixed  $id

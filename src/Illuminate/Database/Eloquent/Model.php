@@ -987,6 +987,18 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     }
 
     /**
+     * Toggle a column's value.
+     *
+     * @param  string  $column
+     * @param  array  $extra
+     * @return bool
+     */
+    public function toggle($column, array $extra = [])
+    {
+        return $this->setKeysForSaveQuery($this->newModelQuery())->toggle($column, $extra);
+    }
+
+    /**
      * Update the model in the database.
      *
      * @param  array  $attributes
