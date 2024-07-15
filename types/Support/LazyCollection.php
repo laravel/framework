@@ -744,8 +744,8 @@ assertType('int', $collection->make([1])->pipe(function ($collection) {
 
 assertType('User', $collection->pipeInto(User::class));
 
-assertType('Illuminate\Support\LazyCollection<int, mixed>', $collection->make(['string' => 'string'])->pluck('string'));
-assertType('Illuminate\Support\LazyCollection<int, mixed>', $collection->make(['string' => 'string'])->pluck('string', 'string'));
+assertType('Illuminate\Support\LazyCollection<(int|string), mixed>', $collection->make(['string' => 'string'])->pluck('string'));
+assertType('Illuminate\Support\LazyCollection<(int|string), mixed>', $collection->make(['string' => 'string'])->pluck('string', 'string'));
 
 assertType('Illuminate\Support\LazyCollection<int, User>', $collection->reject());
 assertType('Illuminate\Support\LazyCollection<int, User>', $collection->reject(function ($user) {
