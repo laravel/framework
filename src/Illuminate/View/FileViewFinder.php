@@ -149,12 +149,10 @@ class FileViewFinder implements ViewFinderInterface
     {
         $viewPath = str_replace('.', '/', $name);
 
-        return array_merge([], ...
-            array_map(fn ($extension) => [
-                $viewPath.'.'.$extension,
-                $viewPath.'/index.'.$extension,
-            ], $this->extensions)
-        );
+        return array_merge([], ...array_map(fn ($extension) => [
+            $viewPath.'.'.$extension,
+            $viewPath.'/index.'.$extension,
+        ], $this->extensions));
     }
 
     /**
