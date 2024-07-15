@@ -278,21 +278,6 @@ class Logger implements LoggerInterface
     }
 
     /**
-     * Adds a processor to the stack if the logger is a Monolog logger.
-     *
-     * @param  callable  $processor
-     * @return HandlerInterface|self
-     */
-    public function pushProcessor(callable $processor)
-    {
-        if (method_exists($this->logger, 'pushProcessor')) {
-            return $this->logger->pushProcessor($processor);
-        }
-
-        return $this;
-    }
-
-    /**
      * Get the event dispatcher instance.
      *
      * @return \Illuminate\Contracts\Events\Dispatcher
