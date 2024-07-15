@@ -8,7 +8,6 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Log\Events\MessageLogged;
 use Illuminate\Support\Traits\Conditionable;
-use Monolog\Handler\HandlerInterface;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 
