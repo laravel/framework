@@ -7,7 +7,7 @@ use Illuminate\Support\ConfigurationUrlParser;
 use Symfony\Component\Console\Attribute\AsCommand;
 use UnexpectedValueException;
 
-#[AsCommand(name: 'db:sqlite-touch')]
+#[AsCommand(name: 'db:touch')]
 class TouchCommand extends Command
 {
     /**
@@ -15,7 +15,7 @@ class TouchCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'db:sqlite-touch {database? : The SQLite database connection that should be used
+    protected $signature = 'db:touch {database? : The SQLite database connection that should be used
                {--force : Create the directory paths forcefully}
                {--safe : Do not fail if the connection is not SQLite}';
 
