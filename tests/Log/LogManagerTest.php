@@ -723,15 +723,15 @@ class LogManagerTest extends TestCase
         $manager = new LogManager($this->app);
 
         $loggerSpy = new LoggerSpy();
-        $manager->extend('spy', fn() => $loggerSpy);
+        $manager->extend('spy', fn () => $loggerSpy);
 
         // When
         $logger = $manager->channel('spy');
-        $logger->alert("some alert");
+        $logger->alert('some alert');
 
         // Then
         $this->assertCount(1, $loggerSpy->logs);
-        $this->assertEquals("some alert", $loggerSpy->logs[0]['message']);
+        $this->assertEquals('some alert', $loggerSpy->logs[0]['message']);
     }
 }
 
@@ -752,6 +752,7 @@ class LoggerSpy implements LoggerInterface
     use LoggerTrait;
 
     public array $logs = [];
+
     public function log($level, \Stringable|string $message, array $context = []): void
     {
         $this->logs[] = [
