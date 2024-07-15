@@ -3,7 +3,9 @@
 namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Command;
+use Illuminate\Filesystem\Filesystem;
 use Symfony\Component\Console\Attribute\AsCommand;
+use function implode;
 
 #[AsCommand(name: 'storage:recreate')]
 class StorageRecreateCommand extends Command
@@ -13,7 +15,7 @@ class StorageRecreateCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'storage:recreate';
+    protected $signature = 'storage:recreate {--git-ignore: Should add default .gitignore if missing}';
 
     /**
      * The console command description.
@@ -27,17 +29,24 @@ class StorageRecreateCommand extends Command
      *
      * @return void
      */
-    public function handle()
+    public function handle(Filesystem $files)
     {
-        foreach ($this->directories() as $directory) {
-            if (file_exists($directory)) {
+        // In this loop we will traverse for all the default storage directories and
+        // "upsert" them. If the "--git-ignore" option is true, we will also create
+        // the default ".gitignore" file that each of the directories should have.
+        foreach ($this->directories() as $directory => $ignore) {
+            $directory = $this->laravel->storagePath($directory);
+
+            if (! $files->isDirectory($directory)) {
+                $files->ensureDirectoryExists($directory);
+                $this->components->info("The storage path [$directory] has been created.");
+            } else {
                 $this->components->warn("The storage path [$directory] already exists.");
-                continue;
             }
 
-            $this->laravel->make('files')->ensureDirectoryExists($directory);
-
-            $this->components->info("The storage path [$directory] has been created.");
+            if ($this->option('git-ignore') && ! $files->isFile("$directory/.gitignore")) {
+                $files->put("$directory/.gitignore", implode("\n", $ignore));
+            }
         }
     }
 
@@ -48,11 +57,30 @@ class StorageRecreateCommand extends Command
      */
     protected function directories()
     {
+        $ignore = [
+            '*',
+            '!.gitignore',
+        ];
+
         return [
-            $this->laravel->storagePath('framework/cache/data'),
-            $this->laravel->storagePath('framework/sessions'),
-            $this->laravel->storagePath('framework/testings'),
-            $this->laravel->storagePath('framework/views'),
+            'app' => $ignore,
+            'app/public' => array_merge($ignore, ['!public/']),
+            'framework' => [
+                'config.php',
+                'routes.php',
+                'schedule-*',
+                'compiled.php',
+                'services.json',
+                'events.scanned.php',
+                'routes.scanned.php',
+                'down',
+            ],
+            'framework/cache' => $ignore,
+            'framework/cache/data' => $ignore,
+            'framework/sessions' => $ignore,
+            'framework/testings' => $ignore,
+            'framework/views' => $ignore,
+            'logs',
         ];
     }
 }
