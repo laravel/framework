@@ -143,7 +143,7 @@ class LogManager implements LoggerInterface
 
                 if (method_exists($loggerWithContext->getLogger(), 'pushProcessor')) {
                     $loggerWithContext->pushProcessor(function ($record) {
-                        if (!$this->app->bound(ContextRepository::class)) {
+                        if (! $this->app->bound(ContextRepository::class)) {
                             return $record;
                         }
 
