@@ -195,7 +195,7 @@ class MigrateCommand extends BaseCommand implements Isolatable
     {
         if ($this->option('force')) {
             return (bool) $this->call('db:touch', [
-                'connection' => $this->option('database'),
+                'database' => $this->option('database'),
                 '--force' => true
             ]);
         }
