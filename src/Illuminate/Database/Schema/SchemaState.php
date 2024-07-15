@@ -105,6 +105,16 @@ abstract class SchemaState
     }
 
     /**
+     * Get the name of the application's migration table.
+     *
+     * @return string
+     */
+    protected function getMigrationTable(): string
+    {
+        return $this->connection->getTablePrefix().$this->migrationTable;
+    }
+
+    /**
      * Specify the name of the application's migration table.
      *
      * @param  string  $table
