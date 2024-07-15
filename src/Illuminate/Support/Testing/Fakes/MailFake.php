@@ -61,7 +61,7 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
      * Assert if a mailable was sent based on a truth-test callback.
      *
      * @param  string|\Closure  $mailable
-     * @param  callable|int|string|array|null  $callback
+     * @param  callable|array|string|int|null  $callback
      * @return void
      */
     public function assertSent($mailable, $callback = null)
@@ -127,7 +127,7 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
      * Determine if a mailable was not sent based on a truth-test callback.
      *
      * @param  string|\Closure  $mailable
-     * @param  callable|string|array|null  $callback
+     * @param  callable|array|string|null  $callback
      * @return void
      */
     public function assertNotSent($mailable, $callback = null)
@@ -182,7 +182,7 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
      * Assert if a mailable was queued based on a truth-test callback.
      *
      * @param  string|\Closure  $mailable
-     * @param  callable|int|string|array|null  $callback
+     * @param  callable|array|string|int|null  $callback
      * @return void
      */
     public function assertQueued($mailable, $callback = null)
@@ -233,7 +233,7 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
      * Determine if a mailable was not queued based on a truth-test callback.
      *
      * @param  string|\Closure  $mailable
-     * @param  callable|string|array|null  $callback
+     * @param  callable|array|string|null  $callback
      * @return void
      */
     public function assertNotQueued($mailable, $callback = null)
