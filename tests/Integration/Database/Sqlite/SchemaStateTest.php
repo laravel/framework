@@ -17,6 +17,7 @@ class SchemaStateTest extends DatabaseTestCase
         'database/schema',
     ];
 
+    #[RequiresOperatingSystem('Linux|Darwin')]
     public function testSchemaDumpOnSqlite()
     {
         if ($this->driver !== 'sqlite') {
