@@ -48,11 +48,11 @@ trait ManagesLoops
      */
     private function countProperties($data)
     {
-        if (is_countable($data) && !$data instanceof LazyCollection) {
+        if (is_countable($data) && ! $data instanceof LazyCollection) {
             return count($data);
         }
 
-        if (is_object($data) && !$data instanceof LazyCollection) {
+        if (is_object($data) && ! $data instanceof LazyCollection) {
             return count(get_object_vars($data));
         }
 
