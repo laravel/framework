@@ -153,8 +153,8 @@ class FormRequest extends Request implements ValidatesWhenResolved
     /**
      * Set extra rules.
      *
-     * @param  array $newRules
-     * @param  bool $override
+     * @param  array  $newRules
+     * @param  bool  $override
      * @return void
      */
     public static function setExtraRules(array $newRules, bool $override = true)
