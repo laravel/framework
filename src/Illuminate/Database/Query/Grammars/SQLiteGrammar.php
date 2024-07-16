@@ -126,7 +126,7 @@ class SQLiteGrammar extends Grammar
      */
     protected function whereLike(Builder $query, $where)
     {
-        if($where['caseSensitive'] == false){
+        if ($where['caseSensitive'] == false) {
             return parent::whereLike($query, $where);
         }
         $where['operator'] = $where['not'] ? 'not glob' : 'glob';
@@ -137,13 +137,13 @@ class SQLiteGrammar extends Grammar
     /**
      * Convert LIKE pattern to GLOB pattern using simple string replacement.
      *
-     * @param string $value The LIKE pattern
-     * @param bool $caseSensitive Whether the pattern should be case-sensitive
+     * @param  string  $value  The LIKE pattern
+     * @param  bool  $caseSensitive  Whether the pattern should be case-sensitive
      * @return string The equivalent GLOB pattern
      */
     public function prepareWhereLikeBinding($value, $caseSensitive)
     {
-        if($caseSensitive == false){
+        if ($caseSensitive == false) {
             return $value;
         }
 

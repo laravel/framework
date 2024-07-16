@@ -777,7 +777,7 @@ class Grammar extends BaseGrammar
      */
     protected function whereLike(Builder $query, $where)
     {
-        if($where['caseSensitive']){
+        if ($where['caseSensitive']) {
             throw new RuntimeException('This database engine does not support case sensitive like operations.');
         }
 

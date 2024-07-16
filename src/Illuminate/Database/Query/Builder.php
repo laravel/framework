@@ -2170,7 +2170,7 @@ class Builder implements BuilderContract
         return $this->whereFulltext($columns, $value, $options, 'or');
     }
 
-     /**
+    /**
      * Add a "where like" clause to the query.
      *
      * @param  string  $column
@@ -2201,7 +2201,6 @@ class Builder implements BuilderContract
      * @param  string  $column
      * @param  string  $value
      * @param  bool  $caseSensitive
-     *
      * @return $this
      */
     public function orWhereLike($column, $value, $caseSensitive = false)
@@ -2229,7 +2228,6 @@ class Builder implements BuilderContract
      * @param  string  $columns
      * @param  string  $value
      * @param  bool  $caseSensitive
-     *
      * @return $this
      */
     public function orWhereNotLike($column, $value, $caseSensitive = false)
