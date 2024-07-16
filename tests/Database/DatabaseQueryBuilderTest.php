@@ -760,6 +760,24 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([0 => 'John%', 1 => 'Jane*'], $builder->getBindings());
     }
 
+    public function testWhereLikeClauseSqlServer()
+    {
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('users')->whereLike('id', '1');
+        $this->assertSame('select * from [users] where [id] like ?', $builder->toSql());
+        $this->assertEquals([0 => '1'], $builder->getBindings());
+
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('users')->whereLike('id', '1')->orWhereLike('id', '2');
+        $this->assertSame('select * from [users] where [id] like ? or [id] like ?', $builder->toSql());
+        $this->assertEquals([0 => '1', 1 => '2'], $builder->getBindings());
+
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('users')->whereNotLike('id', '1');
+        $this->assertSame('select * from [users] where [id] not like ?', $builder->toSql());
+        $this->assertEquals([0 => '1'], $builder->getBindings());
+    }
+
     public function testWhereDateSqlite()
     {
         $builder = $this->getSQLiteBuilder();
