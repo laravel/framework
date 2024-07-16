@@ -229,6 +229,25 @@ class FoundationFormRequestTest extends TestCase
         $request->validateResolved();
     }
 
+    public function testExtraRules()
+    {
+        $request = $this->createRequest([], FoundationTestFormRequestExtraRules::class);
+
+        $this->assertEquals($request->validationRules(), ['foo' => 'required']);
+
+        FoundationTestFormRequestExtraRules::setExtraRules(['bar' => 'required']);
+
+        $this->assertEquals($request->validationRules(), ['foo' => 'required', 'bar' => 'required']);
+
+        $this->assertEquals(['bar' => 'required'], FoundationTestFormRequestExtraRules::getExtraRules());
+
+        FoundationTestFormRequestExtraRules::setExtraRules(['baz' => 'required']);
+        $this->assertEquals(['baz' => 'required'], FoundationTestFormRequestExtraRules::getExtraRules());
+
+        FoundationTestFormRequestExtraRules::setExtraRules(['qux' => 'required'], override: false);
+        $this->assertEquals(['baz' => 'required', 'qux' => 'required'], FoundationTestFormRequestExtraRules::getExtraRules());
+    }
+
     /**
      * Catch the given exception thrown from the executor, and return it.
      *
@@ -514,5 +533,20 @@ class FoundationTestFormRequestWithGetRules extends FormRequest
                 'a' => ['required', 'int', 'min:2'],
             ];
         }
+    }
+}
+
+class FoundationTestFormRequestExtraRules extends FormRequest
+{
+    public function rules()
+    {
+        return [
+            'foo' => 'required'
+        ];
+    }
+
+    public function validationRules(): array
+    {
+        return parent::validationRules();
     }
 }
