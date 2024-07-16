@@ -12,6 +12,7 @@ use InvalidArgumentException;
  * @method mixed choice(string $question, array $choices, $default = null, int $attempts = null, bool $multiple = false)
  * @method bool confirm(string $question, bool $default = false)
  * @method void error(string $string, int $verbosity = \Symfony\Component\Console\Output\OutputInterface::VERBOSITY_NORMAL)
+ * @method void success(string $string, int $verbosity = \Symfony\Component\Console\Output\OutputInterface::VERBOSITY_NORMAL)
  * @method void info(string $string, int $verbosity = \Symfony\Component\Console\Output\OutputInterface::VERBOSITY_NORMAL)
  * @method void line(string $style, string $string, int $verbosity = \Symfony\Component\Console\Output\OutputInterface::VERBOSITY_NORMAL)
  * @method void secret(string $question, bool $fallback = true)

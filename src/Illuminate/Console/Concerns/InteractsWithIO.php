@@ -343,6 +343,18 @@ trait InteractsWithIO
     }
 
     /**
+     * Write a string as success output.
+     *
+     * @param  string  $string
+     * @param  int|string|null  $verbosity
+     * @return void
+     */
+    public function success($string, $verbosity = null)
+    {
+        $this->line($string, 'success', $verbosity);
+    }
+
+    /**
      * Write a string as warning output.
      *
      * @param  string  $string
