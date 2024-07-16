@@ -36,6 +36,23 @@ class CacheTest extends TestCase
         $this->assertSame('Illuminate\Http\Middleware\SetCacheHeaders:max_age=120;no-transform;s_maxage=60', $signature);
     }
 
+    public function testItCanGenerateDefinitionViaStaticMethodWithBooleans()
+    {
+        $signature = (string) Cache::using(['etag']);
+        // original behaviour
+        $this->assertSame('Illuminate\Http\Middleware\SetCacheHeaders:etag', $signature);
+
+        $signature = (string) Cache::using([
+            'etag' => true,
+        ]);
+        $this->assertSame('Illuminate\Http\Middleware\SetCacheHeaders:etag', $signature);
+
+        $signature = (string) Cache::using([
+            'etag' => false
+        ]);
+        $this->assertSame('Illuminate\Http\Middleware\SetCacheHeaders:what should happen here?', $signature);
+    }
+
     public function testDoNotSetHeaderWhenMethodNotCacheable()
     {
         $request = new Request;
