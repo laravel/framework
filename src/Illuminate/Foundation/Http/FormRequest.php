@@ -59,7 +59,7 @@ class FormRequest extends Request implements ValidatesWhenResolved
     protected $errorBag = 'default';
 
     /**
-     * The rules that can be added during the process
+     * The rules that can be added during the process.
      *
      * @var array
      */
