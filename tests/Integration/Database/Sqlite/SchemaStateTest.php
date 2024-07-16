@@ -7,6 +7,7 @@ use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 use Orchestra\Testbench\Attributes\WithMigration;
 use Orchestra\Testbench\Concerns\InteractsWithPublishedFiles;
 use Orchestra\Testbench\Factories\UserFactory;
+use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
 
 #[WithMigration]
 class SchemaStateTest extends DatabaseTestCase
