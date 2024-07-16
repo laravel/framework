@@ -59,6 +59,13 @@ class FormRequest extends Request implements ValidatesWhenResolved
     protected $errorBag = 'default';
 
     /**
+     * The rules that can be added during the process
+     *
+     * @var array
+     */
+    public static array $extraRules = [];
+
+    /**
      * Indicates whether validation should stop after the first rule failure.
      *
      * @var bool
@@ -150,7 +157,8 @@ class FormRequest extends Request implements ValidatesWhenResolved
      */
     protected function validationRules()
     {
-        return method_exists($this, 'rules') ? $this->container->call([$this, 'rules']) : [];
+        $rules = method_exists($this, 'rules') ? $this->container->call([$this, 'rules']) : [];
+        return array_merge($rules, self::$extraRules);
     }
 
     /**
