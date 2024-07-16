@@ -2186,6 +2186,10 @@ class Builder implements BuilderContract
 
         $this->wheres[] = compact('type', 'column', 'value', 'caseSensitive', 'boolean', 'not');
 
+        if (method_exists($this->grammar, 'prepareWhereLikeBinding')) {
+            $value = $this->grammar->prepareWhereLikeBinding($value, $caseSensitive);
+        }
+
         $this->addBinding($value);
 
         return $this;
