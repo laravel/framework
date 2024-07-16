@@ -158,6 +158,7 @@ class FormRequest extends Request implements ValidatesWhenResolved
     protected function validationRules()
     {
         $rules = method_exists($this, 'rules') ? $this->container->call([$this, 'rules']) : [];
+
         return array_merge($rules, self::$extraRules);
     }
 
