@@ -30,7 +30,7 @@ class FileFailedJobProvider implements CountableFailedJobProvider, FailedJobProv
     protected $lockProviderResolver;
 
     /**
-     * Create a new database failed job provider.
+     * Create a new file failed job provider.
      *
      * @param  string  $path
      * @param  int  $limit
