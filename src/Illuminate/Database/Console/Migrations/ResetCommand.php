@@ -56,7 +56,7 @@ class ResetCommand extends BaseCommand
     {
         if ($this->isProhibited() ||
             ! $this->confirmToProceed()) {
-            return 1;
+            return Command::FAILURE;
         }
 
         return $this->migrator->usingConnection($this->option('database'), function () {
