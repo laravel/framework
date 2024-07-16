@@ -17,14 +17,12 @@ trait ManagesLoops
     /**
      * Add new loop to the stack.
      *
-     * @param  \Countable|array  $data
+     * @param  \Countable|array|object  $data
      * @return void
      */
     public function addLoop($data)
     {
-        $length = is_countable($data) && ! $data instanceof LazyCollection
-                            ? count($data)
-                            : null;
+        $length = $this->countProperties($data);
 
         $parent = Arr::last($this->loopsStack);
 
@@ -40,6 +38,25 @@ trait ManagesLoops
             'depth' => count($this->loopsStack) + 1,
             'parent' => $parent ? (object) $parent : null,
         ];
+    }
+
+    /**
+     * Count properties of the data.
+     *
+     * @param  \Countable|array|object  $data
+     * @return int|null
+     */
+    private function countProperties($data)
+    {
+        if (is_countable($data) && ! $data instanceof LazyCollection) {
+            return count($data);
+        }
+
+        if (is_object($data) && ! $data instanceof LazyCollection) {
+            return count(get_object_vars($data));
+        }
+
+        return null;
     }
 
     /**
