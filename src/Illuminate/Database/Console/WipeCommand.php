@@ -36,7 +36,7 @@ class WipeCommand extends Command
     {
         if ($this->isProhibited() ||
             ! $this->confirmToProceed()) {
-            return 1;
+            return Command::FAILURE;
         }
 
         $database = $this->input->getOption('database');
