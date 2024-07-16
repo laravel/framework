@@ -63,7 +63,7 @@ class FormRequest extends Request implements ValidatesWhenResolved
      *
      * @var array
      */
-    public static array $extraRules = [];
+    protected static array $extraRules = [];
 
     /**
      * Indicates whether validation should stop after the first rule failure.
@@ -151,6 +151,28 @@ class FormRequest extends Request implements ValidatesWhenResolved
     }
 
     /**
+     * Set extra rules.
+     *
+     * @param  array $newRules
+     * @param  bool $override
+     * @return void
+     */
+    public static function setExtraRules(array $newRules, bool $override = true)
+    {
+        self::$extraRules[static::class] = $override ? $newRules : array_merge(self::getExtraRules(), $newRules);
+    }
+
+    /**
+     * Get extra rules.
+     *
+     * @return array
+     */
+    public static function getExtraRules(): array
+    {
+        return self::$extraRules[static::class] ?? [];
+    }
+
+    /**
      * Get the validation rules for this form request.
      *
      * @return array
@@ -159,7 +181,7 @@ class FormRequest extends Request implements ValidatesWhenResolved
     {
         $rules = method_exists($this, 'rules') ? $this->container->call([$this, 'rules']) : [];
 
-        return array_merge($rules, self::$extraRules);
+        return array_merge($rules, self::getExtraRules());
     }
 
     /**
