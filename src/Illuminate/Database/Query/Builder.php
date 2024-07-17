@@ -2271,9 +2271,9 @@ class Builder implements BuilderContract
     /**
      * Add an "or whereNull" and "orWhere" clause to the query.
      *
-     * @param string  $column
-     * @param string  $operator
-     * @param mixed  $value
+     * @param  string  $column
+     * @param  string  $operator
+     * @param  mixed  $value
      * @return $this
      */
     public function orWhereNullOr($column, $operator = null, $value = null)
