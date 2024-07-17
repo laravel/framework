@@ -31,6 +31,8 @@ class SchemaStateTest extends DatabaseTestCase
 
         $connection->statement('PRAGMA optimize;');
 
+        $this->assertTrue($connection->table('sqlite_stat1')->exists());
+
         $this->app['files']->ensureDirectoryExists(database_path('schema'));
 
         $connection->getSchemaState()->dump($connection, database_path('schema/sqlite-schema.sql'));
