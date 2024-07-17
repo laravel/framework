@@ -682,7 +682,7 @@ class Vite implements Htmlable
      * @param  string|null  $buildDirectory
      * @return string
      *
-     * @throws \Exception
+     * @throws \Illuminate\Foundation\ViteFileFromManifestNotFoundException
      */
     public function content($asset, $buildDirectory = null)
     {
@@ -693,7 +693,7 @@ class Vite implements Htmlable
         $path = public_path($buildDirectory.'/'.$chunk['file']);
 
         if (! is_file($path) || ! file_exists($path)) {
-            throw new Exception("Unable to locate file from Vite manifest: {$path}.");
+            throw new ViteFileFromManifestNotFoundException("Unable to locate file from Vite manifest: {$path}.");
         }
 
         return file_get_contents($path);
@@ -773,12 +773,12 @@ class Vite implements Htmlable
      * @param  string  $file
      * @return array
      *
-     * @throws \Exception
+     * @throws \Illuminate\Foundation\ViteFileInManifestNotFoundException
      */
     protected function chunk($manifest, $file)
     {
         if (! isset($manifest[$file])) {
-            throw new Exception("Unable to locate file in Vite manifest: {$file}.");
+            throw new ViteFileInManifestNotFoundException("Unable to locate file in Vite manifest: {$file}.");
         }
 
         return $manifest[$file];
