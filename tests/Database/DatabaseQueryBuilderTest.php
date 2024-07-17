@@ -1254,6 +1254,22 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals(['%Taylor%', '%Otwell%', '%Otwell%'], $builder->getBindings());
     }
 
+    public function testWhereNullOr()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('posts')->whereNullOr('category_id', '=', 1);
+        $this->assertSame('select * from "posts" where ("category_id" is null or "category_id" = ?)', $builder->toSql());
+        $this->assertEquals([1], $builder->getBindings());
+    }
+
+    public function testOrWhereNullOr()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('posts')->where('title', 'like', '%Laravel%')->whereNullOr('category_id', '=', 1);
+        $this->assertSame('select * from "posts" where "title" like ? and ("category_id" is null or "category_id" = ?)', $builder->toSql());
+        $this->assertEquals(['%Laravel%', 1], $builder->getBindings());
+    }
+
     public function testUnions()
     {
         $builder = $this->getBuilder();
