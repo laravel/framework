@@ -541,7 +541,7 @@ class FoundationTestFormRequestExtraRules extends FormRequest
     public function rules()
     {
         return [
-            'foo' => 'required'
+            'foo' => 'required',
         ];
     }
 
