@@ -1592,10 +1592,9 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      * Create a new Eloquent Collection instance.
      *
      * @template TKey of array-key
-     * @template TModel of \Illuminate\Database\Eloquent\Model
      *
-     * @param  array<TKey, TModel>  $models
-     * @return \Illuminate\Database\Eloquent\Collection<TKey, TModel>
+     * @param  array<TKey, static>  $models
+     * @return \Illuminate\Database\Eloquent\Collection<TKey, static>
      */
     public function newCollection(array $models = [])
     {
