@@ -4,12 +4,9 @@ namespace Illuminate\Tests\Integration\Database\Sqlite;
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
-use Orchestra\Testbench\Attributes\WithMigration;
 use Orchestra\Testbench\Concerns\InteractsWithPublishedFiles;
-use Orchestra\Testbench\Factories\UserFactory;
 use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
 
-#[WithMigration]
 class SchemaStateTest extends DatabaseTestCase
 {
     use InteractsWithPublishedFiles;
@@ -25,15 +22,22 @@ class SchemaStateTest extends DatabaseTestCase
             $this->markTestSkipped('Test requires a SQLite connection.');
         }
 
-        UserFactory::new()->create();
+        $connection = DB::connection('sqlite');
+        $connection->getSchemaBuilder()->createDatabase($connection->getConfig('database'));
 
-        $connection = DB::connection();
+        $connection->statement('CREATE TABLE users(id integer primary key autoincrement not null, email varchar not null, name varchar not null);');
+        $connection->statement('CREATE UNIQUE INDEX users_email_unique on users (email);');
+        $connection->statement('INSERT INTO users (email, name) VALUES ("taylor@laravel.com", "Taylor Otwell");');
+
         $connection->statement('PRAGMA optimize;');
 
         $this->app['files']->ensureDirectoryExists(database_path('schema'));
 
         $connection->getSchemaState()->dump($connection, database_path('schema/sqlite-schema.sql'));
 
+        $this->assertFileContains([
+            'CREATE TABLE users',
+        ], 'database/schema/sqlite-schema.sql');
         $this->assertFileDoesNotContains([
             'sqlite_sequence',
             'sqlite_stat1',
