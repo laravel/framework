@@ -138,6 +138,27 @@ class EnvironmentEncryptCommandTest extends TestCase
             ->assertExitCode(0);
     }
 
+    public function testItEncryptsWithGivenFromEnvironmentAndDisplaysIt()
+    {
+        $key = 'ponmlkjihgfedcbaponmlkjihgfedcba';
+        $_SERVER['LARAVEL_ENV_ENCRYPTION_KEY'] = 'base64:'.base64_encode($key);
+
+        $this->filesystem->shouldReceive('exists')
+            ->once()
+            ->andReturn(true)
+            ->shouldReceive('exists')
+            ->once()
+            ->andReturn(false);
+
+        $this->artisan('env:encrypt')
+            ->expectsOutputToContain('Environment successfully encrypted')
+            ->expectsOutputToContain('base64:'.base64_encode($key))
+            ->expectsOutputToContain('.env.encrypted')
+            ->assertExitCode(0);
+
+        unset($_SERVER['LARAVEL_ENV_ENCRYPTION_KEY']);
+    }
+
     public function testItEncryptsWithGivenGeneratedBase64KeyAndDisplaysIt()
     {
         $this->filesystem->shouldReceive('exists')
