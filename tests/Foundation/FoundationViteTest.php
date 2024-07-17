@@ -2,14 +2,13 @@
 
 namespace Illuminate\Tests\Foundation;
 
-use Exception;
 use Illuminate\Foundation\Vite;
+use Illuminate\Foundation\ViteFileFromManifestNotFoundException;
+use Illuminate\Foundation\ViteFileInManifestNotFoundException;
+use Illuminate\Foundation\ViteManifestNotFoundException;
 use Illuminate\Support\Facades\Vite as ViteFacade;
 use Illuminate\Support\Str;
 use Orchestra\Testbench\TestCase;
-use \Illuminate\Foundation\ViteManifestNotFoundException;
-use \Illuminate\Foundation\ViteFileFromManifestNotFoundException;
-use \Illuminate\Foundation\ViteFileInManifestNotFoundException;
 
 class FoundationViteTest extends TestCase
 {
