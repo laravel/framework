@@ -52,13 +52,6 @@ class Str
     protected static $uuidFactory;
 
     /**
-     * The callback that should be used to generate UUID7s.
-     *
-     * @var callable|null
-     */
-    protected static $uuid7Factory;
-
-    /**
      * The callback that should be used to generate ULIDs.
      *
      * @var callable|null
