@@ -31,7 +31,7 @@ class SchemaStateTest extends DatabaseTestCase
             $this->markTestSkipped('Test cannot be run using :in-memory: database connection');
         }
 
-        $connection = DB::connection('sqlite');
+        $connection = DB::connection();
         $connection->getSchemaBuilder()->createDatabase($connection->getConfig('database'));
 
         $connection->statement('CREATE TABLE users(id integer primary key autoincrement not null, email varchar not null, name varchar not null);');
