@@ -4,7 +4,7 @@ namespace Illuminate\Database\Eloquent\Concerns;
 
 use Illuminate\Support\Str;
 
-trait HasV7Uuids
+trait HasVersion7Uuids
 {
     use HasUuids;
 
