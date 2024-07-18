@@ -1122,6 +1122,71 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Add a "where like" clause to the query.
+     *
+     * @param  string  $column
+     * @param  string  $value
+     * @param  bool  $caseSensitive
+     * @param  string  $boolean
+     * @param  bool  $not
+     * @return $this
+     */
+    public function whereLike($column, $value, $caseSensitive = false, $boolean = 'and', $not = false)
+    {
+        $type = 'Like';
+
+        $this->wheres[] = compact('type', 'column', 'value', 'caseSensitive', 'boolean', 'not');
+
+        if (method_exists($this->grammar, 'prepareWhereLikeBinding')) {
+            $value = $this->grammar->prepareWhereLikeBinding($value, $caseSensitive);
+        }
+
+        $this->addBinding($value);
+
+        return $this;
+    }
+
+    /**
+     * Add an "or where like" clause to the query.
+     *
+     * @param  string  $column
+     * @param  string  $value
+     * @param  bool  $caseSensitive
+     * @return $this
+     */
+    public function orWhereLike($column, $value, $caseSensitive = false)
+    {
+        return $this->whereLike($column, $value, $caseSensitive, 'or', false);
+    }
+
+    /**
+     * Add a "where not like" clause to the query.
+     *
+     * @param  string  $column
+     * @param  string  $value
+     * @param  bool  $caseSensitive
+     * @param  string  $boolean
+     * @return $this
+     */
+    public function whereNotLike($column, $value, $caseSensitive = false, $boolean = 'and')
+    {
+        return $this->whereLike($column, $value, $caseSensitive, $boolean, true);
+    }
+
+    /**
+     * Add an "or where not like" clause to the query.
+     *
+     * @param  string  $columns
+     * @param  string  $value
+     * @param  bool  $caseSensitive
+     * @return $this
+     */
+    public function orWhereNotLike($column, $value, $caseSensitive = false)
+    {
+        return $this->whereNotLike($column, $value, $caseSensitive, 'or');
+    }
+
+    /**
      * Add a "where in" clause to the query.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
