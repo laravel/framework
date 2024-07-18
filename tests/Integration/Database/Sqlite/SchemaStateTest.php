@@ -21,7 +21,7 @@ class SchemaStateTest extends TestCase
     {
         parent::setUp();
 
-        $this->artisan('migrate:install')->run();
+        remote('migrate:install')->mustRun();
     }
 
     protected function tearDown(): void
