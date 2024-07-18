@@ -482,7 +482,7 @@ class Repository implements ArrayAccess, CacheContract
      * @param  array{ seconds?: int, owner?: string }|null  $lock
      * @return TCacheValue
      */
-    public function staleWhileRevalidate($key, $ttl, $callback, $lock = null)
+    public function flexible($key, $ttl, $callback, $lock = null)
     {
         [
             $key => $value,
