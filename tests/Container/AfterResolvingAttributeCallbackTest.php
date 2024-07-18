@@ -11,18 +11,22 @@ class AfterResolvingAttributeCallbackTest extends TestCase
     public function testCallbackIsCalledAfterDependencyResolutionWithAttribute()
     {
         $container = new Container();
+        $stack = [];
 
-        $container->afterResolvingAttribute(ContainerTestOnTenant::class, function (ContainerTestOnTenant $attribute, HasTenantImpl $hasTenantImpl, Container $container) {
+        $container->afterResolvingAttribute(ContainerTestOnTenant::class, function (ContainerTestOnTenant $attribute, HasTenantImpl $hasTenantImpl, Container $container) use (&$stack) {
             $hasTenantImpl->onTenant($attribute->tenant);
+            $stack[] = $attribute->tenant;
         });
 
         $hasTenantA = $container->make(ContainerTestHasTenantImplPropertyWithTenantA::class);
         $this->assertInstanceOf(HasTenantImpl::class, $hasTenantA->property);
         $this->assertEquals(Tenant::TenantA, $hasTenantA->property->tenant);
+        $this->assertContains(Tenant::TenantA, $stack);
 
         $hasTenantB = $container->make(ContainerTestHasTenantImplPropertyWithTenantB::class);
         $this->assertInstanceOf(HasTenantImpl::class, $hasTenantB->property);
         $this->assertEquals(Tenant::TenantB, $hasTenantB->property->tenant);
+        $this->assertContains(Tenant::TenantB, $stack);
     }
 
     public function testCallbackIsCalledAfterClassWithAttributeIsResolved()
@@ -57,6 +61,19 @@ class AfterResolvingAttributeCallbackTest extends TestCase
         $this->assertInstanceOf(ContainerTestHasSelfConfiguringAttributeAndConstructor::class, $instance);
         $this->assertEquals('the-right-value', $instance->value);
     }
+
+    public function testAfterCallbackIsCalled()
+    {
+        $container = new Container();
+
+        $hasTenantA = $container->make(ContainerTestHasTenantImplPropertyWithTenantA::class);
+        $this->assertInstanceOf(HasTenantImpl::class, $hasTenantA->property);
+        $this->assertEquals(Tenant::TenantA, $hasTenantA->property->tenant);
+
+        $hasTenantB = $container->make(ContainerTestHasTenantImplPropertyWithTenantB::class);
+        $this->assertInstanceOf(HasTenantImpl::class, $hasTenantB->property);
+        $this->assertEquals(Tenant::TenantB, $hasTenantB->property->tenant);
+    }
 }
 
 #[Attribute(Attribute::TARGET_PARAMETER)]
@@ -65,6 +82,11 @@ final class ContainerTestOnTenant
     public function __construct(
         public readonly Tenant $tenant
     ) {
+    }
+
+    public function after(self $attribute, HasTenantImpl $class, Container $container): void
+    {
+        $class->onTenant($attribute->tenant);
     }
 }
 
