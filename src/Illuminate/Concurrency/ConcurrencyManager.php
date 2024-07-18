@@ -42,6 +42,10 @@ class ConcurrencyManager extends MultipleInstanceManager
      */
     public function createForkDriver(array $config)
     {
+        if (! $this->app->runningInConsole()) {
+            throw new RuntimeException('Due to PHP limitations, the fork driver may not be used within web requests.');
+        }
+
         if (! class_exists(Fork::class)) {
             throw new RuntimeException('Please install the "spatie/fork" Composer package in order to utilize the "fork" driver.');
         }
