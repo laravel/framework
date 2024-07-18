@@ -300,6 +300,8 @@ class ApplicationBuilder
         $this->app->afterResolving(ConsoleKernel::class, function ($kernel) use ($paths) {
             $this->app->booted(fn () => $kernel->addCommandRoutePaths($paths));
         });
+
+        return $this;
     }
 
     /**
