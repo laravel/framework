@@ -273,6 +273,6 @@ jobs:
         run: php vendor/bin/testbench package:create-sqlite-db
 
       - name: Execute tests
-        run: vendor/bin/phpunit tests/Integration/Database
+        run: vendor/bin/phpunit tests/Integration/Database/Sqlite
         env:
           DB_CONNECTION: sqlite
