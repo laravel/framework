@@ -327,7 +327,7 @@ class Blueprint
     public function creating()
     {
         return collect($this->commands)->contains(function ($command) {
-            return $command->name === 'create';
+            return ! $command instanceof ColumnDefinition && $command->name === 'create';
         });
     }
 

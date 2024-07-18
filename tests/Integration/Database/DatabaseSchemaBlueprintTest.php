@@ -507,6 +507,19 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $this->assertEquals($expected, $queries);
     }
 
+    public function testAddColumnNamedCreateWorks()
+    {
+        Schema::create('users', function (Blueprint $table) {
+            $table->string('name');
+        });
+
+        Schema::table('users', function (Blueprint $table) {
+            $table->string('create');
+        });
+
+        $this->assertTrue(Schema::hasColumn('users', 'create'));
+    }
+
     public function testDropIndexOnColumnChangeWorks()
     {
         $connection = DB::connection();
