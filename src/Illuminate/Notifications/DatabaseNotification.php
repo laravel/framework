@@ -49,6 +49,9 @@ class DatabaseNotification extends Model
         'read_at' => 'datetime',
     ];
 
+    /**
+     * The type of collection that should be used for the model.
+     */
     protected static string $collection = DatabaseNotificationCollection::class;
 
     /**
