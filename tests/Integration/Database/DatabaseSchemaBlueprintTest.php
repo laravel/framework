@@ -507,6 +507,61 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $this->assertEquals($expected, $queries);
     }
 
+    public function testAddColumnNamedCreateWorks()
+    {
+        DB::connection()->getSchemaBuilder()->create('users', function ($table) {
+            $table->string('name')->nullable();
+        });
+
+        $blueprintMySql = new Blueprint('users', function ($table) {
+            $table->string('create')->nullable(false);
+        });
+
+        $queries = $blueprintMySql->toSql(DB::connection(), new MySqlGrammar);
+
+        $expected = [
+            'alter table `users` add `create` varchar(255) not null',
+        ];
+
+        $this->assertEquals($expected, $queries);
+
+        $blueprintPostgres = new Blueprint('users', function ($table) {
+            $table->string('create')->nullable(false);
+        });
+
+        $queries = $blueprintPostgres->toSql(DB::connection(), new PostgresGrammar);
+
+        $expected = [
+            'alter table "users" add column "create" varchar(255) not null',
+        ];
+
+        $this->assertEquals($expected, $queries);
+
+        $blueprintSQLite = new Blueprint('users', function ($table) {
+            $table->string('create')->nullable(false);
+        });
+
+        $queries = $blueprintSQLite->toSql(DB::connection(), new SQLiteGrammar);
+
+        $expected = [
+            'alter table "users" add column "create" varchar not null',
+        ];
+
+        $this->assertEquals($expected, $queries);
+
+        $blueprintSqlServer = new Blueprint('users', function ($table) {
+            $table->string('create')->nullable(false);
+        });
+
+        $queries = $blueprintSqlServer->toSql(DB::connection(), new SqlServerGrammar);
+
+        $expected = [
+            'alter table "users" add "create" nvarchar(255) not null',
+        ];
+
+        $this->assertEquals($expected, $queries);
+    }
+
     public function testDropIndexOnColumnChangeWorks()
     {
         $connection = DB::connection();
