@@ -35,6 +35,8 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         Concerns\HidesAttributes,
         Concerns\GuardsAttributes,
         ForwardsCalls;
+    /** @use HasCollection<\Illuminate\Database\Eloquent\Collection<array-key, static>> */
+    use HasCollection;
 
     /**
      * The connection name for the model.
@@ -217,6 +219,13 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      * @var class-string<\Illuminate\Database\Eloquent\Builder<*>>
      */
     protected static string $builder = Builder::class;
+
+    /**
+     * The Eloquent collection class to use for the model.
+     *
+     * @var class-string<\Illuminate\Database\Eloquent\Collection<*, *>>
+     */
+    protected static string $collection = Collection::class;
 
     /**
      * The name of the "created at" column.
@@ -1586,20 +1595,6 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     protected function newBaseQueryBuilder()
     {
         return $this->getConnection()->query();
-    }
-
-    /**
-     * Create a new Eloquent Collection instance.
-     *
-     * @template TKey of array-key
-     * @template TModel of \Illuminate\Database\Eloquent\Model
-     *
-     * @param  array<TKey, TModel>  $models
-     * @return \Illuminate\Database\Eloquent\Collection<TKey, TModel>
-     */
-    public function newCollection(array $models = [])
-    {
-        return new Collection($models);
     }
 
     /**

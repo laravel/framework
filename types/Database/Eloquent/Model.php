@@ -2,12 +2,14 @@
 
 namespace Illuminate\Types\Model;
 
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\HasCollection;
 use Illuminate\Database\Eloquent\Model;
 use User;
 
 use function PHPStan\Testing\assertType;
 
-function test(User $user): void
+function test(User $user, Post $post, Comment $comment): void
 {
     assertType('UserFactory', User::factory(function ($attributes, $model) {
         assertType('array<string, mixed>', $attributes);
@@ -30,8 +32,9 @@ function test(User $user): void
     assertType('Illuminate\Database\Eloquent\Builder<User>', $user->prunable());
     assertType('Illuminate\Database\Eloquent\Relations\MorphMany<Illuminate\Notifications\DatabaseNotification, User>', $user->notifications());
 
-    assertType('Illuminate\Database\Eloquent\Collection<int, User>', $user->newCollection([new User()]));
-    assertType('Illuminate\Database\Eloquent\Collection<string, Illuminate\Types\Model\Post>', $user->newCollection(['foo' => new Post()]));
+    assertType('Illuminate\Database\Eloquent\Collection<(int|string), User>', $user->newCollection([new User()]));
+    assertType('Illuminate\Types\Model\Posts<(int|string), Illuminate\Types\Model\Post>', $post->newCollection(['foo' => new Post()]));
+    assertType('Illuminate\Types\Model\Comments', $comment->newCollection([new Comment()]));
 
     assertType('bool', $user->restore());
     assertType('User', $user->restoreOrCreate());
@@ -39,5 +42,35 @@ function test(User $user): void
 }
 
 class Post extends Model
+{
+    /** @use HasCollection<Posts<array-key, static>> */
+    use HasCollection;
+
+    protected static string $collection = Posts::class;
+}
+
+/**
+ * @template TKey of array-key
+ * @template TModel of Post
+ *
+ * @extends Collection<TKey, TModel> */
+class Posts extends Collection
+{
+}
+
+final class Comment extends Model
+{
+    /** @use HasCollection<Comments> */
+    use HasCollection;
+
+    /** @param  array<array-key, Comment>  $models */
+    public function newCollection(array $models = []): Comments
+    {
+        return new Comments($models);
+    }
+}
+
+/** @extends Collection<array-key, Comment> */
+final class Comments extends Collection
 {
 }
