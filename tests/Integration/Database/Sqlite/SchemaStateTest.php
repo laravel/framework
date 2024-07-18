@@ -3,10 +3,10 @@
 namespace Illuminate\Tests\Integration\Database\Sqlite;
 
 use Illuminate\Support\Facades\DB;
-use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 use Orchestra\Testbench\Concerns\InteractsWithPublishedFiles;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
+
 use function Orchestra\Testbench\remote;
 
 class SchemaStateTest extends TestCase
