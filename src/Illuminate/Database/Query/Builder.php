@@ -1311,6 +1311,43 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Add a "whereNull" and "orWhere" clause to the query.
+     *
+     * @param  string  $column
+     * @param  string  $operator
+     * @param  mixed  $value
+     * @param  string  $boolean
+     * @return $this
+     */
+    public function whereNullOr($column, $operator = null, $value = null, $boolean = 'and')
+    {
+        [$value, $operator] = $this->prepareValueAndOperator(
+            $value, $operator, func_num_args() === 2
+        );
+
+        $this->whereNested(function ($query) use ($column, $operator, $value) {
+            $query
+                ->whereNull($column)
+                ->orWhere($column, $operator, $value);
+        }, $boolean);
+
+        return $this;
+    }
+
+    /**
+     * Add an "or whereNull" and "orWhere" clause to the query.
+     *
+     * @param  string  $column
+     * @param  string  $operator
+     * @param  mixed  $value
+     * @return $this
+     */
+    public function orWhereNullOr($column, $operator = null, $value = null)
+    {
+        return $this->whereNullOr($column, $operator, $value, 'or');
+    }
+
+    /**
      * Add a where between statement to the query.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
@@ -2242,43 +2279,6 @@ class Builder implements BuilderContract
     public function orWhereAny($columns, $operator = null, $value = null)
     {
         return $this->whereAny($columns, $operator, $value, 'or');
-    }
-
-    /**
-     * Add a "whereNull" and "orWhere" clause to the query.
-     *
-     * @param  string  $column
-     * @param  string  $operator
-     * @param  mixed  $value
-     * @param  string  $boolean
-     * @return $this
-     */
-    public function whereNullOr($column, $operator = null, $value = null, $boolean = 'and')
-    {
-        [$value, $operator] = $this->prepareValueAndOperator(
-            $value, $operator, func_num_args() === 2
-        );
-
-        $this->whereNested(function ($query) use ($column, $operator, $value) {
-            $query
-                ->whereNull($column)
-                ->orWhere($column, $operator, $value);
-        }, $boolean);
-
-        return $this;
-    }
-
-    /**
-     * Add an "or whereNull" and "orWhere" clause to the query.
-     *
-     * @param  string  $column
-     * @param  string  $operator
-     * @param  mixed  $value
-     * @return $this
-     */
-    public function orWhereNullOr($column, $operator = null, $value = null)
-    {
-        return $this->whereNullOr($column, $operator, $value, 'or');
     }
 
     /**
