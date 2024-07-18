@@ -3,8 +3,7 @@
 namespace Illuminate\Tests\Foundation;
 
 use Illuminate\Foundation\Vite;
-use Illuminate\Foundation\ViteFileFromManifestNotFoundException;
-use Illuminate\Foundation\ViteFileInManifestNotFoundException;
+use Illuminate\Foundation\ViteException;
 use Illuminate\Foundation\ViteManifestNotFoundException;
 use Illuminate\Support\Facades\Vite as ViteFacade;
 use Illuminate\Support\Str;
@@ -566,6 +565,14 @@ class FoundationViteTest extends TestCase
 
     public function testItThrowsWhenUnableToFindAssetManifestInBuildMode()
     {
+        $this->expectException(ViteException::class);
+        $this->expectExceptionMessage('Vite manifest not found at: '.public_path('build/manifest.json'));
+
+        ViteFacade::asset('resources/js/app.js');
+    }
+
+    public function testItThrowsDeprecatedExecptionWhenUnableToFindAssetManifestInBuildMode()
+    {
         $this->expectException(ViteManifestNotFoundException::class);
         $this->expectExceptionMessage('Vite manifest not found at: '.public_path('build/manifest.json'));
 
@@ -576,7 +583,7 @@ class FoundationViteTest extends TestCase
     {
         $this->makeViteManifest();
 
-        $this->expectException(ViteFileInManifestNotFoundException::class);
+        $this->expectException(ViteException::class);
         $this->expectExceptionMessage('Unable to locate file in Vite manifest: resources/js/missing.js');
 
         ViteFacade::asset('resources/js/missing.js');
@@ -1234,7 +1241,7 @@ class FoundationViteTest extends TestCase
     {
         $this->makeViteManifest();
 
-        $this->expectException(ViteFileFromManifestNotFoundException::class);
+        $this->expectException(ViteException::class);
         $this->expectExceptionMessage('Unable to locate file from Vite manifest: '.public_path('build/assets/app.versioned.js'));
 
         ViteFacade::content('resources/js/app.js');
