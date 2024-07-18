@@ -46,7 +46,7 @@ class Post extends Model
     /** @use HasCollection<Posts<array-key, static>> */
     use HasCollection;
 
-    protected static string $collection = Posts::class;
+    protected static string $collectionClass = Posts::class;
 }
 
 /**

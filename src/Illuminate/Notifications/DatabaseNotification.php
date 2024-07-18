@@ -52,7 +52,7 @@ class DatabaseNotification extends Model
     /**
      * The type of collection that should be used for the model.
      */
-    protected static string $collection = DatabaseNotificationCollection::class;
+    protected static string $collectionClass = DatabaseNotificationCollection::class;
 
     /**
      * Get the notifiable entity that the notification belongs to.
