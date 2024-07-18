@@ -225,7 +225,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      *
      * @var class-string<\Illuminate\Database\Eloquent\Collection<*, *>>
      */
-    protected static string $collection = Collection::class;
+    protected static string $collectionClass = Collection::class;
 
     /**
      * The name of the "created at" column.
