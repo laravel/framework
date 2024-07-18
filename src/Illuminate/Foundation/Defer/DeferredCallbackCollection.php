@@ -4,9 +4,10 @@ namespace Illuminate\Foundation\Defer;
 
 use ArrayAccess;
 use Closure;
+use Countable;
 use Illuminate\Support\Collection;
 
-class DeferredCallbackCollection implements ArrayAccess
+class DeferredCallbackCollection implements ArrayAccess, Countable
 {
     /**
      * All of the deferred callbacks.
@@ -14,6 +15,16 @@ class DeferredCallbackCollection implements ArrayAccess
      * @var array
      */
     protected array $callbacks = [];
+
+    /**
+     * Get the first callback in the collection.
+     *
+     * @return callable
+     */
+    public function first()
+    {
+        return array_values($this->callbacks)[0];
+    }
 
     /**
      * Invoke the deferred callbacks.
@@ -35,12 +46,7 @@ class DeferredCallbackCollection implements ArrayAccess
     {
         $when ??= fn () => true;
 
-        $this->callbacks = collect($this->callbacks)
-            ->reverse()
-            ->unique(fn ($c) => $c->name)
-            ->reverse()
-            ->values()
-            ->all();
+        $this->forgetDuplicates();
 
         foreach ($this->callbacks as $index => $callback) {
             if ($when($callback)) {
@@ -66,6 +72,23 @@ class DeferredCallbackCollection implements ArrayAccess
     }
 
     /**
+     * Remove any duplicate callbacks.
+     *
+     * @return $this
+     */
+    protected function forgetDuplicates(): self
+    {
+        $this->callbacks = collect($this->callbacks)
+            ->reverse()
+            ->unique(fn ($c) => $c->name)
+            ->reverse()
+            ->values()
+            ->all();
+
+        return $this;
+    }
+
+    /**
      * Determine if the collection has a callback with the given key.
      *
      * @param  mixed  $offset
@@ -73,6 +96,8 @@ class DeferredCallbackCollection implements ArrayAccess
      */
     public function offsetExists(mixed $offset): bool
     {
+        $this->forgetDuplicates();
+
         return isset($this->callbacks[$offset]);
     }
 
@@ -84,6 +109,8 @@ class DeferredCallbackCollection implements ArrayAccess
      */
     public function offsetGet(mixed $offset): mixed
     {
+        $this->forgetDuplicates();
+
         return $this->callbacks[$offset];
     }
 
@@ -111,6 +138,20 @@ class DeferredCallbackCollection implements ArrayAccess
      */
     public function offsetUnset(mixed $offset): void
     {
+        $this->forgetDuplicates();
+
         unset($this->callbacks[$offset]);
+    }
+
+    /**
+     * Determine how many callbacks are in the collection.
+     *
+     * @return int
+     */
+    public function count(): int
+    {
+        $this->forgetDuplicates();
+
+        return count($this->callbacks);
     }
 }

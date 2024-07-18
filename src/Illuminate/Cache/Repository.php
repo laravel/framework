@@ -518,7 +518,7 @@ class Repository implements ArrayAccess, CacheContract
         };
 
         if (function_exists('defer')) {
-            defer($refresh);
+            defer($refresh, "illuminate:cache:refresh:{$key}");
         } else {
             $refresh();
         }
