@@ -15,11 +15,20 @@ class SchemaStateTest extends DatabaseTestCase
         'database/schema',
     ];
 
+    protected function defineEnvironment($app)
+    {
+        parent::defineEnvironment($app);
+
+        if ($this->driver !== 'sqlite') {
+            $this->markTestSkipped('Test requires a Sqlite connection.');
+        }
+    }
+
     #[RequiresOperatingSystem('Linux|Darwin')]
     public function testSchemaDumpOnSqlite()
     {
-        if ($this->driver !== 'sqlite') {
-            $this->markTestSkipped('Test requires a SQLite connection.');
+        if ($this->usesSqliteInMemoryDatabaseConnection()) {
+            $this->markTestSkipped('Test cannot be run using :in-memory: database connection');
         }
 
         $connection = DB::connection('sqlite');
