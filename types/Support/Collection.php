@@ -487,6 +487,20 @@ assertType('string|User', $collection->first(function ($user) {
 assertType('string|User', $collection->first(null, function () {
     return 'string';
 }));
+if ($collection->isNotEmpty()) {
+    assertType('User', $collection->first());
+    assertType('string|User', $collection->first(null, 'foo'));
+} else {
+    assertType('null', $collection->first());
+    assertType('string|User', $collection->first(null, 'foo'));
+}
+if ($collection->isEmpty()) {
+    assertType('null', $collection->first());
+    assertType('string|User', $collection->first(null, 'foo'));
+} else {
+    assertType('User', $collection->first());
+    assertType('string|User', $collection->first(null, 'foo'));
+}
 
 assertType('Illuminate\Support\Collection<int, mixed>', $collection->flatten());
 assertType('Illuminate\Support\Collection<int, mixed>', $collection::make(['string' => 'string'])->flatten(4));

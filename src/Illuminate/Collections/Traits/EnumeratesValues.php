@@ -367,7 +367,7 @@ trait EnumeratesValues
     /**
      * Determine if the collection is not empty.
      *
-     * @phpstan-assert-if-true !null $this->first()
+     * @phpstan-assert-if-true TValue $this->first()
      *
      * @phpstan-assert-if-false null $this->first()
      *
