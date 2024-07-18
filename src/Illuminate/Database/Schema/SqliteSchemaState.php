@@ -16,16 +16,14 @@ class SqliteSchemaState extends SchemaState
     public function dump(Connection $connection, $path)
     {
         with($process = $this->makeProcess(
-            $this->baseCommand().' .schema'
+            $this->baseCommand().' ".schema --indent"'
         ))->setTimeout(null)->mustRun(null, array_merge($this->baseVariables($this->connection->getConfig()), [
             //
         ]));
 
-        $migrations = collect(preg_split("/\r\n|\n|\r/", $process->getOutput()))->reject(function ($line) {
-            return str_starts_with($line, 'CREATE TABLE sqlite_');
-        })->all();
+        $migrations = preg_replace('/CREATE TABLE sqlite_.+\);[\r\n]+/is', '', $process->getOutput());
 
-        $this->files->put($path, implode(PHP_EOL, $migrations).PHP_EOL);
+        $this->files->put($path, $migrations.PHP_EOL);
 
         if ($this->hasMigrationTable()) {
             $this->appendMigrationData($path);

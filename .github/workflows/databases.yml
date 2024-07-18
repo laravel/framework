@@ -238,3 +238,41 @@ jobs:
           DB_DATABASE: master
           DB_USERNAME: SA
           DB_PASSWORD: Forge123
+
+  sqlite:
+    runs-on: ubuntu-20.04
+
+    strategy:
+      fail-fast: true
+
+    name: SQLite
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.2
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, sqlsrv, pdo, pdo_sqlsrv, odbc, pdo_odbc, :php-psr
+          tools: composer:v2
+          coverage: none
+
+      - name: Set Framework version
+        run: composer config version "11.x-dev"
+
+      - name: Install dependencies
+        uses: nick-fields/retry@v3
+        with:
+          timeout_minutes: 5
+          max_attempts: 5
+          command: composer update --prefer-stable --prefer-dist --no-interaction --no-progress
+
+      - name: Setup SQLite Database
+        run: php vendor/bin/testbench package:create-sqlite-db
+
+      - name: Execute tests
+        run: vendor/bin/phpunit tests/Integration/Database/Sqlite
+        env:
+          DB_CONNECTION: sqlite
