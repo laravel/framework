@@ -15,8 +15,10 @@ use Illuminate\Foundation\Support\Providers\RouteServiceProvider as AppRouteServ
 use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\View;
 use Laravel\Folio\Folio;
+use League\Flysystem\PathTraversalDetected;
 
 class ApplicationBuilder
 {
@@ -26,6 +28,13 @@ class ApplicationBuilder
      * @var array
      */
     protected array $pendingProviders = [];
+
+    /**
+     * Any additional routing callbacks that should be invoked while registering routes.
+     *
+     * @var array
+     */
+    protected array $additionalRoutingCallbacks = [];
 
     /**
      * The Folio / page middleware that have been defined by the user.
@@ -220,6 +229,10 @@ class ApplicationBuilder
                 } else {
                     Route::middleware('web')->group($web);
                 }
+            }
+
+            foreach ($this->additionalRoutingCallbacks as $callback) {
+                $callback();
             }
 
             if (is_string($pages) &&

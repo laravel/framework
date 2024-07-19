@@ -2,7 +2,11 @@
 
 namespace Illuminate\Filesystem;
 
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\ServiceProvider;
+use League\Flysystem\PathTraversalDetected;
 
 class FilesystemServiceProvider extends ServiceProvider
 {
@@ -14,8 +18,8 @@ class FilesystemServiceProvider extends ServiceProvider
     public function register()
     {
         $this->registerNativeFilesystem();
-
         $this->registerFlysystem();
+        $this->registerFileServing();
     }
 
     /**
@@ -58,6 +62,40 @@ class FilesystemServiceProvider extends ServiceProvider
         $this->app->singleton('filesystem', function ($app) {
             return new FilesystemManager($app);
         });
+    }
+
+    /**
+     * Register protected file serving.
+     *
+     * @return void
+     */
+    protected function registerFileServing()
+    {
+        foreach ($this->app['config']['filesystems.disks'] ?? [] as $disk => $config) {
+            if ($config['driver'] !== 'local' || ! ($config['serve'] ?? false)) {
+                continue;
+            }
+
+            $this->app->booted(function () use ($disk, $config) {
+                $path = isset($config['url'])
+                    ? rtrim(parse_url($config['url'])['path'], '/')
+                    : '/storage';
+
+                Route::get($path.'/{file}', function (Request $request, $file) use ($disk, $config) {
+                    if (! $request->hasValidRelativeSignature()) {
+                        abort(403);
+                    }
+
+                    try {
+                        return Storage::disk($disk)->exists($file)
+                            ? Storage::disk($disk)->download($file)
+                            : abort(404);
+                    } catch (PathTraversalDetected $e) {
+                        abort(404);
+                    }
+                })->where('file', '.*')->name('storage.'.$disk);
+            });
+        }
     }
 
     /**
