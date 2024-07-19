@@ -46,4 +46,18 @@ class WormholeTest extends TestCase
         // Restore the default Date Factory...
         Date::useDefault();
     }
+
+    public function testItCanTravelByMicroseconds()
+    {
+        Date::use(CarbonImmutable::class);
+        Date::setTestNow(Date::parse('2000-01-01 00:00:00')->startOfSecond());
+
+        (new Wormhole(1))->microsecond();
+        $this->assertSame('2000-01-01 00:00:00.000001', Date::now()->format('Y-m-d H:i:s.u'));
+
+        (new Wormhole(5))->microseconds();
+        $this->assertSame('2000-01-01 00:00:00.000006', Date::now()->format('Y-m-d H:i:s.u'));
+
+        Date::useDefault();
+    }
 }
