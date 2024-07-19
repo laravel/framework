@@ -208,7 +208,8 @@ class UrlGenerator implements UrlGeneratorContract
 
         $url = $referrer ? $this->to($referrer) : $this->getPreviousUrlFromSession();
 
-        return !empty($url);
+        return !empty($url)
+            && $url !== $this->full();
     }
 
     /**
