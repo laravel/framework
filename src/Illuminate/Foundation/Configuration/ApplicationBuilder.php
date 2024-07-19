@@ -15,10 +15,8 @@ use Illuminate\Foundation\Support\Providers\RouteServiceProvider as AppRouteServ
 use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\View;
 use Laravel\Folio\Folio;
-use League\Flysystem\PathTraversalDetected;
 
 class ApplicationBuilder
 {
