@@ -198,7 +198,7 @@ class UrlGenerator implements UrlGeneratorContract
     }
 
     /**
-     * Check if has a previous url from header or session
+     * Check if has a previous url from header or session.
      *
      * @return bool
      */
@@ -208,8 +208,8 @@ class UrlGenerator implements UrlGeneratorContract
 
         $url = $referrer ? $this->to($referrer) : $this->getPreviousUrlFromSession();
 
-        return !empty($url)
-            && $url !== $this->full();
+        return ! empty($url)
+            && $this->previous() !== $this->full();
     }
 
     /**
