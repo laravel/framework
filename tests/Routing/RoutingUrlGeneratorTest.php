@@ -759,6 +759,12 @@ class RoutingUrlGeneratorTest extends TestCase
 
         $url->getRequest()->headers->remove('referer');
         $this->assertFalse($url->hasPrevious());
+
+        $url->getRequest()->session->put('_previous.url', 'http://www.bar.com/');
+        $this->assertTrue($url->hasPrevious());
+
+        $url->getRequest()->session->remove('_previous.url');
+        $this->assertFalse($url->hasPrevious());
     }
 
     public function testRouteNotDefinedException()
