@@ -28,12 +28,32 @@ class LengthAwarePaginatorTest extends TestCase
         unset($this->p);
     }
 
+    public function testLengthAwarePaginatorSetDefaultPageName()
+    {
+        LengthAwarePaginator::setDefaultPageName('p');
+
+        $this->assertSame('p', $this->p->getPageName());
+
+        // Reset
+        LengthAwarePaginator::setDefaultPageName('page');
+    }
+
     public function testLengthAwarePaginatorGetAndSetPageName()
     {
         $this->assertSame('page', $this->p->getPageName());
 
         $this->p->setPageName('p');
         $this->assertSame('p', $this->p->getPageName());
+    }
+
+    public function testLengthAwarePaginatorOverrideDefaultPageName()
+    {
+        LengthAwarePaginator::setDefaultPageName('p');
+        $this->p->setPageName('foo');
+        $this->assertSame('foo', $this->p->getPageName());
+
+        // Reset
+        LengthAwarePaginator::setDefaultPageName('page');
     }
 
     public function testLengthAwarePaginatorCanGiveMeRelevantPageInformation()

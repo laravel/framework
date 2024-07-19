@@ -61,11 +61,11 @@ abstract class AbstractPaginator implements Htmlable, Stringable
     protected $fragment;
 
     /**
-     * The query string variable used to store the page.
+     * The custom query string variable used to store the page.
      *
-     * @var string
+     * @var string|null
      */
-    protected $pageName = 'page';
+    protected $pageName;
 
     /**
      * The number of links to display on each side of current page link.
@@ -124,6 +124,13 @@ abstract class AbstractPaginator implements Htmlable, Stringable
     public static $defaultSimpleView = 'pagination::simple-tailwind';
 
     /**
+     * The default query string variable used to store the page.
+     *
+     * @var string
+     */
+    protected static $defaultPageName = 'page';
+
+    /**
      * Determine if the given value is a valid page number.
      *
      * @param  int  $page
@@ -175,7 +182,7 @@ abstract class AbstractPaginator implements Htmlable, Stringable
         // If we have any extra query string key / value pairs that need to be added
         // onto the URL, we will put them in query string form and then attach it
         // to the URL. This allows for extra information like sortings storage.
-        $parameters = [$this->pageName => $page];
+        $parameters = [$this->getPageName() => $page];
 
         if (count($this->query) > 0) {
             $parameters = array_merge($this->query, $parameters);
@@ -262,7 +269,7 @@ abstract class AbstractPaginator implements Htmlable, Stringable
      */
     protected function addQuery($key, $value)
     {
-        if ($key !== $this->pageName) {
+        if ($key !== $this->getPageName()) {
             $this->query[$key] = $value;
         }
 
@@ -407,7 +414,7 @@ abstract class AbstractPaginator implements Htmlable, Stringable
      */
     public function getPageName()
     {
-        return $this->pageName;
+        return $this->pageName ?: static::$defaultPageName;
     }
 
     /**
@@ -499,12 +506,14 @@ abstract class AbstractPaginator implements Htmlable, Stringable
     /**
      * Resolve the current page or return the default value.
      *
-     * @param  string  $pageName
+     * @param  string|null  $pageName
      * @param  int  $default
      * @return int
      */
-    public static function resolveCurrentPage($pageName = 'page', $default = 1)
+    public static function resolveCurrentPage($pageName = null, $default = 1)
     {
+        $pageName = $pageName ?? static::$defaultPageName;
+
         if (isset(static::$currentPageResolver)) {
             return (int) call_user_func(static::$currentPageResolver, $pageName);
         }
@@ -644,6 +653,17 @@ abstract class AbstractPaginator implements Htmlable, Stringable
     {
         static::defaultView('pagination::bootstrap-5');
         static::defaultSimpleView('pagination::simple-bootstrap-5');
+    }
+
+    /**
+     * Set the default query string variable used to store the page.
+     *
+     * @param  string  $name
+     * @return void
+     */
+    public static function setDefaultPageName($name)
+    {
+        static::$defaultPageName = $name;
     }
 
     /**
