@@ -198,6 +198,20 @@ class UrlGenerator implements UrlGeneratorContract
     }
 
     /**
+     * Check if has a previous url from header or session
+     *
+     * @return bool
+     */
+    public function hasPrevious()
+    {
+        $referrer = $this->request->headers->get('referer');
+
+        $url = $referrer ? $this->to($referrer) : $this->getPreviousUrlFromSession();
+
+        return !empty($url);
+    }
+
+    /**
      * Generate an absolute URL to the given path.
      *
      * @param  string  $path
