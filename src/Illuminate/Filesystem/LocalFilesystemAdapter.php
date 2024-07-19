@@ -39,7 +39,9 @@ class LocalFilesystemAdapter extends FilesystemAdapter
      */
     public function providesTemporaryUrls()
     {
-        return $this->shouldServeSignedUrls && $this->urlGeneratorResolver instanceof Closure;
+        return $this->temporaryUrlCallback || (
+            $this->shouldServeSignedUrls && $this->urlGeneratorResolver instanceof Closure
+        );
     }
 
     /**
@@ -52,6 +54,12 @@ class LocalFilesystemAdapter extends FilesystemAdapter
      */
     public function temporaryUrl($path, $expiration, array $options = [])
     {
+        if ($this->temporaryUrlCallback) {
+            return $this->temporaryUrlCallback->bindTo($this, static::class)(
+                $path, $expiration, $options
+            );
+        }
+
         if (! $this->providesTemporaryUrls()) {
             throw new RuntimeException('This driver does not support creating temporary URLs.');
         }
@@ -83,7 +91,7 @@ class LocalFilesystemAdapter extends FilesystemAdapter
      * Indiate that signed URLs should serve the corresponding files.
      *
      * @param  bool  $serve
-     * @param  \Closure  $urlGeneratorResolver
+     * @param  \Closure|null  $urlGeneratorResolver
      * @return $this
      */
     public function shouldServeSignedUrls(bool $serve = true, ?Closure $urlGeneratorResolver = null)
