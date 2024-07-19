@@ -60,11 +60,11 @@ abstract class AbstractCursorPaginator implements Htmlable, Stringable
     protected $fragment;
 
     /**
-     * The cursor string variable used to store the page.
+     * The custom cursor string variable used to store the page.
      *
-     * @var string
+     * @var string|null
      */
-    protected $cursorName = 'cursor';
+    protected $cursorName;
 
     /**
      * The current cursor.
@@ -95,6 +95,13 @@ abstract class AbstractCursorPaginator implements Htmlable, Stringable
     protected static $currentCursorResolver;
 
     /**
+     * The default cursor string variable used to store the page.
+     *
+     * @var string
+     */
+    protected static $defaultCursorName = 'cursor';
+
+    /**
      * Get the URL for a given cursor.
      *
      * @param  \Illuminate\Pagination\Cursor|null  $cursor
@@ -105,7 +112,7 @@ abstract class AbstractCursorPaginator implements Htmlable, Stringable
         // If we have any extra query string key / value pairs that need to be added
         // onto the URL, we will put them in query string form and then attach it
         // to the URL. This allows for extra information like sortings storage.
-        $parameters = is_null($cursor) ? [] : [$this->cursorName => $cursor->encode()];
+        $parameters = is_null($cursor) ? [] : [$this->getCursorName() => $cursor->encode()];
 
         if (count($this->query) > 0) {
             $parameters = array_merge($this->query, $parameters);
@@ -340,7 +347,7 @@ abstract class AbstractCursorPaginator implements Htmlable, Stringable
      */
     protected function addQuery($key, $value)
     {
-        if ($key !== $this->cursorName) {
+        if ($key !== $this->getCursorName()) {
             $this->query[$key] = $value;
         }
 
@@ -435,7 +442,7 @@ abstract class AbstractCursorPaginator implements Htmlable, Stringable
      */
     public function getCursorName()
     {
-        return $this->cursorName;
+        return $this->cursorName ?: static::$defaultCursorName;
     }
 
     /**
@@ -488,11 +495,13 @@ abstract class AbstractCursorPaginator implements Htmlable, Stringable
     /**
      * Resolve the current cursor or return the default value.
      *
-     * @param  string  $cursorName
+     * @param  string|null  $cursorName
      * @return \Illuminate\Pagination\Cursor|null
      */
-    public static function resolveCurrentCursor($cursorName = 'cursor', $default = null)
+    public static function resolveCurrentCursor($cursorName = null, $default = null)
     {
+        $cursorName = $cursorName ?? static::$defaultCursorName;
+
         if (isset(static::$currentCursorResolver)) {
             return call_user_func(static::$currentCursorResolver, $cursorName);
         }
@@ -519,6 +528,17 @@ abstract class AbstractCursorPaginator implements Htmlable, Stringable
     public static function viewFactory()
     {
         return Paginator::viewFactory();
+    }
+
+    /**
+     * Set the default query string variable used to store the cursor.
+     *
+     * @param  string  $name
+     * @return void
+     */
+    public static function setDefaultCursorName($name)
+    {
+        static::$defaultCursorName = $name;
     }
 
     /**

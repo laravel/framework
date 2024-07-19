@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Pagination;
 
 use Illuminate\Pagination\Cursor;
 use Illuminate\Pagination\CursorPaginator;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use PHPUnit\Framework\TestCase;
 
@@ -123,5 +124,49 @@ class CursorPaginatorTest extends TestCase
     protected function getCursor($params, $isNext = true)
     {
         return (new Cursor($params, $isNext))->encode();
+    }
+
+    public function testCursorPaginatorSetDefaultCursorName()
+    {
+        CursorPaginator::setDefaultCursorName('c');
+
+        $cursor = new Cursor(['id' => 3]);
+        $paginator = new CursorPaginator([['id' => 3], ['id' => 4]], 2, $cursor, [
+            'parameters' => ['id'],
+        ]);
+
+        $this->assertSame('c', $paginator->getCursorName());
+
+        // Reset
+        CursorPaginator::setDefaultCursorName('cursor');
+    }
+
+    public function testCursorPaginatorGetAndSetCursorName()
+    {
+        $cursor = new Cursor(['id' => 3]);
+        $paginator = new CursorPaginator([['id' => 3], ['id' => 4]], 2, $cursor, [
+            'parameters' => ['id'],
+        ]);
+
+        $this->assertSame('cursor', $paginator->getCursorName());
+
+        $paginator->setCursorName('c');
+        $this->assertSame('c', $paginator->getCursorName());
+    }
+
+    public function testCursorPaginatorOverrideDefaultCursorName()
+    {
+        CursorPaginator::setDefaultCursorName('c');
+
+        $cursor = new Cursor(['id' => 3]);
+        $paginator = new CursorPaginator([['id' => 3], ['id' => 4]], 2, $cursor, [
+            'parameters' => ['id'],
+        ]);
+
+        $paginator->setCursorName('foo');
+        $this->assertSame('foo', $paginator->getCursorName());
+
+        // Reset
+        LengthAwarePaginator::setDefaultPageName('cursor');
     }
 }
