@@ -760,6 +760,13 @@ class RoutingUrlGeneratorTest extends TestCase
         $url->getRequest()->headers->remove('referer');
         $this->assertFalse($url->hasPrevious());
 
+        // Same url will return false
+        $url->getRequest()->headers->set('referer', 'http://www.foo.com/');
+        $this->assertFalse($url->hasPrevious());
+
+        $url->getRequest()->headers->remove('referer');
+        $this->assertFalse($url->hasPrevious());
+
         $url->getRequest()->session->put('_previous.url', 'http://www.bar.com/');
         $this->assertTrue($url->hasPrevious());
 
