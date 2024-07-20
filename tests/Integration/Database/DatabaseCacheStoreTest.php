@@ -188,7 +188,7 @@ class DatabaseCacheStoreTest extends DatabaseTestCase
 
     public function testManyWithExpiredKeys()
     {
-        $this->insertToCacheTable('first', 'a', -10);
+        $this->insertToCacheTable('first', 'a', 0);
         $this->insertToCacheTable('second', 'b', 60);
 
         $this->assertEquals([
