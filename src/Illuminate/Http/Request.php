@@ -349,7 +349,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      */
     public function merge(array $input)
     {
-        $this->getInputSource()->add($input);
+        $this->getInputSource()->replace(array_merge_recursive($this->all(), $input ));
 
         return $this;
     }
@@ -362,9 +362,11 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      */
     public function mergeIfMissing(array $input)
     {
-        return $this->merge(collect($input)->filter(function ($value, $key) {
-            return $this->missing($key);
-        })->toArray());
+        return $this->merge(collect($input)
+            ->filter(fn ($value, $key) => $this->missing($key))
+            ->reduce(function ($carry, $value, $key) {
+                return data_set($carry, $key, $value);
+            }, []));
     }
 
     /**
@@ -547,8 +549,8 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     public function getSession(): SessionInterface
     {
         return $this->hasSession()
-                    ? $this->session
-                    : throw new SessionNotFoundException;
+            ? $this->session
+            : throw new SessionNotFoundException;
     }
 
     /**
