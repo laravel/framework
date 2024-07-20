@@ -173,13 +173,17 @@ class DatabaseCacheStoreTest extends DatabaseTestCase
         $store->add('first', 'a', 60);
         $store->add('second', 'b', 60);
 
-        $cache = $store->get(['first', 'second', 'third']);
+        $this->assertEquals([
+            'first' => 'a',
+            'second' => 'b',
+            'third' => null,
+        ], $store->get(['first', 'second', 'third']));
 
         $this->assertEquals([
             'first' => 'a',
             'second' => 'b',
             'third' => null,
-        ], $cache);
+        ], $store->many(['first', 'second', 'third']));
     }
 
     public function testResolvingSQLiteConnectionDoesNotThrowExceptions()
