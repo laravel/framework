@@ -200,6 +200,26 @@ class DatabaseCacheStoreTest extends DatabaseTestCase
         $this->assertDatabaseMissing($this->getCacheTableName(), ['key' => $this->withCachePrefix('first')]);
     }
 
+    public function testPutMany()
+    {
+        $store = $this->getStore();
+
+        $store->putMany($data = [
+            'first' => 'a',
+            'second' => 'b',
+        ], 60);
+
+        $this->assertEquals($data, $store->many(['first', 'second']));
+        $this->assertDatabaseHas($this->getCacheTableName(), [
+            'key' => $this->withCachePrefix('first'),
+            'value' => serialize('a'),
+        ]);
+        $this->assertDatabaseHas($this->getCacheTableName(), [
+            'key' => $this->withCachePrefix('second'),
+            'value' => serialize('b'),
+        ]);
+    }
+
     public function testResolvingSQLiteConnectionDoesNotThrowExceptions()
     {
         $originalConfiguration = config('database');
