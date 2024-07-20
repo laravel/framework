@@ -99,29 +99,7 @@ class DatabaseStore implements LockProvider, Store
      */
     public function get($key)
     {
-        $prefixed = $this->prefix.$key;
-
-        $cache = $this->table()->where('key', '=', $prefixed)->first();
-
-        // If we have a cache record we will check the expiration time against current
-        // time on the system and see if the record has expired. If it has, we will
-        // remove the records from the database table so it isn't returned again.
-        if (is_null($cache)) {
-            return;
-        }
-
-        $cache = is_array($cache) ? (object) $cache : $cache;
-
-        // If this cache expiration date is past the current time, we will remove this
-        // item from the cache. Then we will return a null value since the cache is
-        // expired. We will use "Carbon" to make this comparison with the column.
-        if ($this->currentTime() >= $cache->expiration) {
-            $this->forgetIfExpired($key);
-
-            return;
-        }
-
-        return $this->unserialize($cache->value);
+        return $this->many([$key])[$key];
     }
 
     /**
@@ -150,6 +128,9 @@ class DatabaseStore implements LockProvider, Store
 
         $currentTime = $this->currentTime();
 
+        // If this cache expiration date is past the current time, we will remove this
+        // item from the cache. Then we will return a null value since the cache is
+        // expired. We will use "Carbon" to make this comparison with the column.
         [$values, $expired] = $values->partition(function ($cache) use ($currentTime) {
             return $cache->expiration > $currentTime;
         });
@@ -177,11 +158,7 @@ class DatabaseStore implements LockProvider, Store
      */
     public function put($key, $value, $seconds)
     {
-        $key = $this->prefix.$key;
-        $value = $this->serialize($value);
-        $expiration = $this->getTime() + $seconds;
-
-        return $this->table()->upsert(compact('key', 'value', 'expiration'), 'key') > 0;
+        return $this->putMany([$key => $value], $seconds);
     }
 
     /**
