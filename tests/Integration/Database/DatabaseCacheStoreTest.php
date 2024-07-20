@@ -166,6 +166,22 @@ class DatabaseCacheStoreTest extends DatabaseTestCase
         $this->assertDatabaseHas($this->getCacheTableName(), ['key' => $this->withCachePrefix('foo')]);
     }
 
+    public function testMultiGet()
+    {
+        $store = $this->getStore();
+
+        $store->add('first', 'a', 60);
+        $store->add('second', 'b', 60);
+
+        $cache = $store->get(['first', 'second', 'third']);
+
+        $this->assertEquals([
+            'first' => 'a',
+            'second' => 'b',
+            'third' => null,
+        ], $cache);
+    }
+
     public function testResolvingSQLiteConnectionDoesNotThrowExceptions()
     {
         $originalConfiguration = config('database');
