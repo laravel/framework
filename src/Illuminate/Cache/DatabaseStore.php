@@ -9,12 +9,13 @@ use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\PostgresConnection;
 use Illuminate\Database\QueryException;
 use Illuminate\Database\SqlServerConnection;
+use Illuminate\Support\Arr;
 use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Str;
 
 class DatabaseStore implements LockProvider, Store
 {
-    use InteractsWithTime, RetrievesMultipleKeys;
+    use InteractsWithTime;
 
     /**
      * The database connection instance.
@@ -124,6 +125,49 @@ class DatabaseStore implements LockProvider, Store
     }
 
     /**
+     * Retrieve multiple items from the cache by key.
+     *
+     * Items not found in the cache will have a null value.
+     *
+     * @return array
+     */
+    public function many(array $keys)
+    {
+        if (count($keys) === 0) {
+            return [];
+        }
+
+        $results = array_fill_keys($keys, null);
+
+        $values = $this->table()
+            ->whereIn('key', array_map(function ($key) {
+                return $this->prefix.$key;
+            }, $keys))
+            ->get()
+            ->map(function ($value) {
+                return is_array($value) ? (object) $value : $value;
+            });
+
+        $currentTime = $this->currentTime();
+
+        [$values, $expired] = $values->partition(function ($cache) use ($currentTime) {
+            return $cache->expiration > $currentTime;
+        });
+
+        if ($expired->isNotEmpty()) {
+            $this->forgetManyIfExpired($expired->pluck('key')->all(), prefixed: true);
+        }
+
+        return Arr::map($results, function ($value, $key) use ($values) {
+            if ($cache = $values->firstWhere('key', $this->prefix.$key)) {
+                return $this->unserialize($cache->value);
+            }
+
+            return $value;
+        });
+    }
+
+    /**
      * Store an item in the cache for a given number of seconds.
      *
      * @param  string  $key
@@ -138,6 +182,28 @@ class DatabaseStore implements LockProvider, Store
         $expiration = $this->getTime() + $seconds;
 
         return $this->table()->upsert(compact('key', 'value', 'expiration'), 'key') > 0;
+    }
+
+    /**
+     * Store multiple items in the cache for a given number of seconds.
+     *
+     * @param  int  $seconds
+     * @return bool
+     */
+    public function putMany(array $values, $seconds)
+    {
+        $serializedValues = [];
+        $expiration = $this->getTime() + $seconds;
+
+        foreach ($values as $key => $value) {
+            $serializedValues[] = [
+                'key' => $this->prefix.$key,
+                'value' => $this->serialize($value),
+                'expiration' => $expiration,
+            ];
+        }
+
+        return $this->table()->upsert($serializedValues, 'key') > 0;
     }
 
     /**
@@ -309,9 +375,7 @@ class DatabaseStore implements LockProvider, Store
      */
     public function forget($key)
     {
-        $this->table()->where('key', '=', $this->prefix.$key)->delete();
-
-        return true;
+        return $this->forgetMany([$key]);
     }
 
     /**
@@ -322,12 +386,7 @@ class DatabaseStore implements LockProvider, Store
      */
     public function forgetIfExpired($key)
     {
-        $this->table()
-            ->where('key', '=', $this->prefix.$key)
-            ->where('expiration', '<=', $this->getTime())
-            ->delete();
-
-        return true;
+        return $this->forgetManyIfExpired([$key]);
     }
 
     /**
@@ -338,6 +397,38 @@ class DatabaseStore implements LockProvider, Store
     public function flush()
     {
         $this->table()->delete();
+
+        return true;
+    }
+
+    /**
+     * Remove all items from the cache.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    protected function forgetMany(array $keys)
+    {
+        $this->table()->whereIn('key', array_map(function ($key) {
+            return $this->prefix.$key;
+        }, $keys))->delete();
+
+        return true;
+    }
+
+    /**
+     * Remove all expired items from the given set from the cache.
+     *
+     * @return bool
+     */
+    protected function forgetManyIfExpired(array $keys, bool $prefixed = false)
+    {
+        $this->table()
+            ->whereIn('key', $prefixed ? $keys : array_map(function ($key) {
+                return $this->prefix.$key;
+            }, $keys))
+            ->where('expiration', '<=', $this->getTime())
+            ->delete();
 
         return true;
     }
