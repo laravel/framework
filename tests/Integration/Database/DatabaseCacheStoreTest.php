@@ -200,6 +200,23 @@ class DatabaseCacheStoreTest extends DatabaseTestCase
         $this->assertDatabaseMissing($this->getCacheTableName(), ['key' => $this->withCachePrefix('first')]);
     }
 
+    public function testManyAsAssociativeArray()
+    {
+        $this->insertToCacheTable('first', 'cached', 60);
+
+        $result = $this->getStore()->many([
+            'first' => 'aa',
+            'second' => 'bb',
+            'third',
+        ]);
+
+        $this->assertEquals([
+            'first' => 'cached',
+            'second' => 'bb',
+            'third' => null,
+        ], $result);
+    }
+
     public function testPutMany()
     {
         $store = $this->getStore();
