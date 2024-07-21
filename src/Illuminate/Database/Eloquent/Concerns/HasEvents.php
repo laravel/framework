@@ -123,7 +123,7 @@ trait HasEvents
     {
         return array_merge(
             [
-                'retrieved', 'creating', 'created', 'updating', 'updated',
+                'loaded', 'retrieved', 'creating', 'created', 'updating', 'updated',
                 'saving', 'saved', 'restoring', 'restored', 'replicating',
                 'deleting', 'deleted', 'forceDeleting', 'forceDeleted',
             ],
@@ -252,6 +252,17 @@ trait HasEvents
         }
 
         return $result;
+    }
+
+    /**
+     * Register a loaded model event with the dispatcher.
+     *
+     * @param  \Illuminate\Events\QueuedClosure|\Closure|string|array  $callback
+     * @return void
+     */
+    public static function loaded($callback)
+    {
+        static::registerModelEvent('loaded', $callback);
     }
 
     /**

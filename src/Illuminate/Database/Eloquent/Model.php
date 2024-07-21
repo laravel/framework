@@ -721,6 +721,8 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
 
         $query->eagerLoadRelations([$this]);
 
+        $this->fireModelEvent('loaded', false);
+
         return $this;
     }
 
