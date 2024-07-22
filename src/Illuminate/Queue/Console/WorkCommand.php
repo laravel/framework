@@ -111,7 +111,7 @@ class WorkCommand extends Command
         // connection being run for the queue operation currently being executed.
         $queue = $this->getQueue($connection);
 
-        if (Terminal::hasSttyAvailable() && !self::isChildProcess()) {
+        if (Terminal::hasSttyAvailable() && ! self::isChildProcess()) {
             $this->components->info(
                 sprintf('Processing jobs from the [%s] %s.', $queue, str('queue')->plural(explode(',', $queue)))
             );
@@ -311,7 +311,7 @@ class WorkCommand extends Command
      */
     private static function isChildProcess()
     {
-        if (PHP_OS_FAMILY === "Windows") {
+        if (PHP_OS_FAMILY === 'Windows') {
             $pid = getmypid();
             $parentPid = shell_exec("wmic process where (processid=$pid) get parentprocessid");
             $parentPid = explode("\n", $parentPid);
