@@ -117,6 +117,9 @@ class DatabaseStore implements LockProvider, Store
 
         $results = array_fill_keys($keys, null);
 
+        // First we will retrieve all of the items from the cache using their keys and
+        // the prefix value. Then we will need to iterate through each of the items
+        // and convert them to an object when they are currently in array format.
         $values = $this->table()
             ->whereIn('key', array_map(function ($key) {
                 return $this->prefix.$key;
@@ -170,6 +173,7 @@ class DatabaseStore implements LockProvider, Store
     public function putMany(array $values, $seconds)
     {
         $serializedValues = [];
+
         $expiration = $this->getTime() + $seconds;
 
         foreach ($values as $key => $value) {
@@ -369,19 +373,10 @@ class DatabaseStore implements LockProvider, Store
     /**
      * Remove all items from the cache.
      *
+     * @param  array  $keys
      * @return bool
      */
-    public function flush()
-    {
-        $this->table()->delete();
-
-        return true;
-    }
-
-    /**
-     * Remove all items from the cache.
-     */
-    protected function forgetMany(array $keys): bool
+    protected function forgetMany(array $keys)
     {
         $this->table()->whereIn('key', array_map(function ($key) {
             return $this->prefix.$key;
@@ -392,8 +387,12 @@ class DatabaseStore implements LockProvider, Store
 
     /**
      * Remove all expired items from the given set from the cache.
+     *
+     * @param  array  $keys
+     * @param  bool  $prefixed
+     * @return bool
      */
-    protected function forgetManyIfExpired(array $keys, bool $prefixed = false): bool
+    protected function forgetManyIfExpired(array $keys, bool $prefixed = false)
     {
         $this->table()
             ->whereIn('key', $prefixed ? $keys : array_map(function ($key) {
@@ -401,6 +400,18 @@ class DatabaseStore implements LockProvider, Store
             }, $keys))
             ->where('expiration', '<=', $this->getTime())
             ->delete();
+
+        return true;
+    }
+
+    /**
+     * Remove all items from the cache.
+     *
+     * @return bool
+     */
+    public function flush()
+    {
+        $this->table()->delete();
 
         return true;
     }
