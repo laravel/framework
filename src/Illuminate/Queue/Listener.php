@@ -118,13 +118,22 @@ class Listener
             $command = $this->addEnvironment($command, $options);
         }
 
-        return new Process(
+        $process = new Process(
             $command,
             $this->commandPath,
             null,
             null,
             $options->timeout
         );
+
+        // Enable TTY mode to propagate colored output if supported by the terminal
+        try {
+            $process->setPty(true);
+        } catch (\Throwable $th) {
+            // TTY mode might not be supported; handle any exceptions silently
+        }
+
+        return $process;
     }
 
     /**

@@ -111,7 +111,7 @@ class WorkCommand extends Command
         // connection being run for the queue operation currently being executed.
         $queue = $this->getQueue($connection);
 
-        if (Terminal::hasSttyAvailable()) {
+        if (Terminal::hasSttyAvailable() && !self::isChildProcess()) {
             $this->components->info(
                 sprintf('Processing jobs from the [%s] %s.', $queue, str('queue')->plural(explode(',', $queue)))
             );
@@ -302,5 +302,31 @@ class WorkCommand extends Command
     protected function downForMaintenance()
     {
         return $this->option('force') ? false : $this->laravel->isDownForMaintenance();
+    }
+
+    /**
+     * Determine if the the current process was created by php.
+     * We cannot use posix_getppid since symfony spawns the process with proc_open
+     * making posix_getppid return the pid of the shell instead of the parent process.
+     */
+    private static function isChildProcess()
+    {
+        if (PHP_OS_FAMILY === "Windows") {
+            $pid = getmypid();
+            $parentPid = shell_exec("wmic process where (processid=$pid) get parentprocessid");
+            $parentPid = explode("\n", $parentPid);
+            $parentPid = intval($parentPid[1]);
+            $parentProcessName = shell_exec("wmic process where (processid=$parentPid) get name");
+            $parentProcessName = explode("\n", $parentProcessName);
+            $parentProcessName = trim($parentProcessName[1]);
+        } else {
+            $pid = getmypid();
+            $parentPid = shell_exec("ps -o ppid= -p $pid");
+            $parentPid = intval(trim($parentPid));
+            $parentProcessName = shell_exec("ps -o comm= -p $parentPid");
+            $parentProcessName = trim($parentProcessName);
+        }
+
+        return $parentProcessName === 'php';
     }
 }
