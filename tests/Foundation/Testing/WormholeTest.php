@@ -10,6 +10,13 @@ use PHPUnit\Framework\TestCase;
 
 class WormholeTest extends TestCase
 {
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        Date::useDefault();
+    }
+
     public function testCanTravelBackToPresent()
     {
         // Preserve the timelines we want to compare the reality with...
@@ -43,9 +50,6 @@ class WormholeTest extends TestCase
 
         // Assert the time travel was successful...
         $this->assertEquals($future->format('Y-m-d'), now()->format('Y-m-d'));
-
-        // Restore the default Date Factory...
-        Date::useDefault();
     }
 
     public function testItCanTravelByMicroseconds()
