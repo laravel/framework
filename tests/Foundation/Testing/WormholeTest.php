@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Foundation\Testing;
 
 use Carbon\CarbonImmutable;
 use Illuminate\Foundation\Testing\Wormhole;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Date;
 use PHPUnit\Framework\TestCase;
 
@@ -53,13 +54,14 @@ class WormholeTest extends TestCase
 
     public function testItCanTravelByMicroseconds()
     {
-        Date::use(CarbonImmutable::class);
-        Date::setTestNow(Date::parse('2000-01-01 00:00:00')->startOfSecond());
+        Carbon::setTestNow(Carbon::parse('2000-01-01 00:00:00')->startOfSecond());
 
         (new Wormhole(1))->microsecond();
         $this->assertSame('2000-01-01 00:00:00.000001', Date::now()->format('Y-m-d H:i:s.u'));
 
         (new Wormhole(5))->microseconds();
         $this->assertSame('2000-01-01 00:00:00.000006', Date::now()->format('Y-m-d H:i:s.u'));
+
+        Carbon::setTestnow();
     }
 }
