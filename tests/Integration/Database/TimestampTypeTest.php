@@ -59,14 +59,12 @@ class TimestampTypeTest extends DatabaseTestCase
             $table->string('string_to_timestamp');
         });
 
-        $blueprint = new Blueprint('test', function ($table) {
+        $blueprint = new Blueprint($this->getConnection(), 'test', function ($table) {
             $table->timestamp('string_to_timestamp')->nullable()->change();
         });
 
-        $queries = $blueprint->toSql($this->getConnection(), $this->getConnection()->getSchemaGrammar());
-
         $expected = ['alter table `test` modify `string_to_timestamp` timestamp null'];
 
-        $this->assertEquals($expected, $queries);
+        $this->assertEquals($expected, $blueprint->toSql());
     }
 }
