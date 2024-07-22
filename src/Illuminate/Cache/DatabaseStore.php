@@ -380,11 +380,8 @@ class DatabaseStore implements LockProvider, Store
 
     /**
      * Remove all items from the cache.
-     *
-     * @param  string  $key
-     * @return bool
      */
-    protected function forgetMany(array $keys)
+    protected function forgetMany(array $keys): bool
     {
         $this->table()->whereIn('key', array_map(function ($key) {
             return $this->prefix.$key;
@@ -395,10 +392,8 @@ class DatabaseStore implements LockProvider, Store
 
     /**
      * Remove all expired items from the given set from the cache.
-     *
-     * @return bool
      */
-    protected function forgetManyIfExpired(array $keys, bool $prefixed = false)
+    protected function forgetManyIfExpired(array $keys, bool $prefixed = false): bool
     {
         $this->table()
             ->whereIn('key', $prefixed ? $keys : array_map(function ($key) {
