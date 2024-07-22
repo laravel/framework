@@ -90,6 +90,22 @@ class SqlServerConnection extends Connection
         return $this->withTablePrefix($grammar);
     }
 
+    public function getConnectionName(): string
+    {
+        return $this->getName() . ' (SQL Server)';
+    }
+
+    public function getConnectionCount(): ?int
+    {
+        $result = $this->selectOne('select count(*) Value from sys.dm_exec_sessions where status = ?', ['running']);
+
+        if (! $result) {
+            return null;
+        }
+
+        return (int) $result['Value'];
+    }
+
     /**
      * Get a schema builder instance for the connection.
      *

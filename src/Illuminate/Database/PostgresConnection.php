@@ -12,6 +12,22 @@ use Illuminate\Filesystem\Filesystem;
 
 class PostgresConnection extends Connection
 {
+    public function getConnectionName(): string
+    {
+        return $this->getName() . ' (PostgreSQL)';
+    }
+
+    public function getConnectionCount(): ?int
+    {
+        $result = $this->selectOne('select count(*) as "Value" from pg_stat_activity');
+
+        if (! $result) {
+            return null;
+        }
+
+        return (int) $result['Value'];
+    }
+
     /**
      * Escape a binary value for safe SQL embedding.
      *

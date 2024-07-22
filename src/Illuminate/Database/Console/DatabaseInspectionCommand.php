@@ -22,15 +22,7 @@ abstract class DatabaseInspectionCommand extends Command
      */
     protected function getConnectionName(ConnectionInterface $connection, $database)
     {
-        return match (true) {
-            $connection instanceof MySqlConnection && $connection->isMaria() => 'MariaDB',
-            $connection instanceof MySqlConnection => 'MySQL',
-            $connection instanceof MariaDbConnection => 'MariaDB',
-            $connection instanceof PostgresConnection => 'PostgreSQL',
-            $connection instanceof SQLiteConnection => 'SQLite',
-            $connection instanceof SqlServerConnection => 'SQL Server',
-            default => $database,
-        };
+        return method_exists($connection, 'getConnectionName') ? $connection->getConnectionName() : $database;
     }
 
     /**
@@ -41,18 +33,7 @@ abstract class DatabaseInspectionCommand extends Command
      */
     protected function getConnectionCount(ConnectionInterface $connection)
     {
-        $result = match (true) {
-            $connection instanceof MySqlConnection => $connection->selectOne('show status where variable_name = "threads_connected"'),
-            $connection instanceof PostgresConnection => $connection->selectOne('select count(*) as "Value" from pg_stat_activity'),
-            $connection instanceof SqlServerConnection => $connection->selectOne('select count(*) Value from sys.dm_exec_sessions where status = ?', ['running']),
-            default => null,
-        };
-
-        if (! $result) {
-            return null;
-        }
-
-        return Arr::wrap((array) $result)['Value'];
+        return method_exists($connection, 'getConnectionCount') ? $connection->getConnectionCount() : null;
     }
 
     /**

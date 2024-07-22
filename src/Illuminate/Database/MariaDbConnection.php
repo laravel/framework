@@ -32,6 +32,11 @@ class MariaDbConnection extends MySqlConnection
         return Str::between(parent::getServerVersion(), '5.5.5-', '-MariaDB');
     }
 
+    public function getConnectionName(): string
+    {
+        return $this->getName() . ' (MariaDB)';
+    }
+
     /**
      * Get the default query grammar instance.
      *
