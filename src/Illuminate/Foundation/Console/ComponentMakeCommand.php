@@ -63,7 +63,7 @@ class ComponentMakeCommand extends GeneratorCommand
     protected function writeView()
     {
         $path = $this->viewPath(
-            str_replace('.', '/', 'components.'.$this->getView()).'.blade.php'
+            str_replace('.', '/', $this->getView()).'.blade.php'
         );
 
         if (! $this->files->isDirectory(dirname($path))) {
@@ -104,21 +104,31 @@ class ComponentMakeCommand extends GeneratorCommand
 
         return str_replace(
             ['DummyView', '{{ view }}'],
-            'view(\'components.'.$this->getView().'\')',
+            'view(\''.$this->getView().'\')',
             parent::buildClass($name)
         );
     }
 
     /**
-     * Get the view name relative to the components directory.
+     * Get the view name relative to the view path.
      *
      * @return string view
      */
     protected function getView()
     {
-        $name = str_replace('\\', '/', $this->argument('name'));
+        $segments = explode('/', str_replace('\\', '/', $this->argument('name')));
+        $name = array_pop($segments);
 
-        return collect(explode('/', $name))
+        $path = is_string($this->option('path'))
+            ? explode('/', trim($this->option('path'), '/'))
+            : [
+                'components',
+                ...$segments,
+            ];
+
+        $path[] = $name;
+
+        return collect($path)
             ->map(function ($part) {
                 return Str::kebab($part);
             })
@@ -170,6 +180,7 @@ class ComponentMakeCommand extends GeneratorCommand
             ['force', 'f', InputOption::VALUE_NONE, 'Create the class even if the component already exists'],
             ['inline', null, InputOption::VALUE_NONE, 'Create a component that renders an inline view'],
             ['view', null, InputOption::VALUE_NONE, 'Create an anonymous component with only a view'],
+            ['path', null, InputOption::VALUE_REQUIRED, 'Specify the view path'],
         ];
     }
 }
