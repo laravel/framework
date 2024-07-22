@@ -22,4 +22,11 @@ class Pivot extends Model
      * @var array<string>|bool
      */
     protected $guarded = [];
+
+    /**
+     * Included pivot columns
+     *
+     * @var array<string>
+     */
+    public $withPivot = [];
 }

@@ -588,8 +588,15 @@ trait InteractsWithPivotTable
      */
     public function withPivot($columns)
     {
+        $columns = is_array($columns) ? $columns : func_get_args();
+
+        if($this->using){
+            $instance = $this->newPivot();
+            $columns = array_merge($columns, $instance->withPivot);
+        }
+
         $this->pivotColumns = array_merge(
-            $this->pivotColumns, is_array($columns) ? $columns : func_get_args()
+            $this->pivotColumns, $columns
         );
 
         return $this;
