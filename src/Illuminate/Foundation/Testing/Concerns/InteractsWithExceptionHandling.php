@@ -172,7 +172,7 @@ trait InteractsWithExceptionHandling
      * Assert that the given callback throws an exception with the given message when invoked.
      *
      * @param  \Closure  $test
-     * @param  class-string<\Throwable>|\Closure  $expectedClass
+     * @param  \Closure|class-string<\Throwable>  $expectedClass
      * @param  string|null  $expectedMessage
      * @return $this
      */
