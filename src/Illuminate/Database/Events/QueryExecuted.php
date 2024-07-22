@@ -62,7 +62,7 @@ class QueryExecuted
      *
      * @return string
      */
-    public function toRawSql(): string
+    public function toRawSql()
     {
         return $this->connection
             ->query()
