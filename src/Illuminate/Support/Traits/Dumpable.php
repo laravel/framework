@@ -12,9 +12,7 @@ trait Dumpable
      */
     public function dd(...$args)
     {
-        $this->dump(...$args);
-
-        dd();
+        dd($this, ...$args);
     }
 
     /**
