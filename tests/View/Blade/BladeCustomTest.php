@@ -24,6 +24,27 @@ class BladeCustomTest extends AbstractBladeTestCase
         $this->assertSame('bar', $this->compiler->compileString('foo'));
     }
 
+    public function testCustomNamedExtensionsAreCompiled()
+    {
+        $this->compiler->extend(function ($value) {
+            return str_replace('foo', 'bar', $value);
+        }, 'replace');
+        $this->assertSame('bar', $this->compiler->compileString('foo'));
+    }
+
+    public function testHasCustomNamedExtension()
+    {
+        $this->compiler->extend(function ($value) {
+            return str_replace('foo', 'bar', $value);
+        }, 'replace');
+        $this->assertTrue($this->compiler->hasExtension('replace'));
+    }
+
+    public function testDoesNotHaveCustomNamedExtension()
+    {
+        $this->assertFalse($this->compiler->hasExtension('replace'));
+    }
+
     public function testCustomStatements()
     {
         $this->assertCount(0, $this->compiler->getCustomDirectives());

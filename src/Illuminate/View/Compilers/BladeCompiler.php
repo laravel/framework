@@ -679,13 +679,22 @@ class BladeCompiler extends Compiler implements CompilerInterface
 
     /**
      * Register a custom Blade compiler.
-     *
-     * @param  callable  $compiler
-     * @return void
      */
-    public function extend(callable $compiler)
+    public function extend(callable $compiler, ?string $name = null): void
     {
-        $this->extensions[] = $compiler;
+        if (! empty($name)) {
+            $this->extensions[$name] = $compiler;
+        } else {
+            $this->extensions[] = $compiler;
+        }
+    }
+
+    /**
+     * Determine if a named extension is registered.
+     */
+    public function hasExtension(string $name): bool
+    {
+        return array_key_exists($name, $this->getExtensions());
     }
 
     /**
