@@ -4,6 +4,11 @@ namespace Illuminate\Database\Console;
 
 use Illuminate\Console\Command;
 use Illuminate\Database\ConnectionInterface;
+use Illuminate\Database\MariaDbConnection;
+use Illuminate\Database\MySqlConnection;
+use Illuminate\Database\PostgresConnection;
+use Illuminate\Database\SQLiteConnection;
+use Illuminate\Database\SqlServerConnection;
 use Illuminate\Support\Arr;
 
 abstract class DatabaseInspectionCommand extends Command
@@ -14,10 +19,20 @@ abstract class DatabaseInspectionCommand extends Command
      * @param  \Illuminate\Database\ConnectionInterface  $connection
      * @param  string  $database
      * @return string
+     *
+     * @deprecated Use $connection->getName() instead.
      */
     protected function getConnectionName(ConnectionInterface $connection, $database)
     {
-        return method_exists($connection, 'getConnectionName') ? $connection->getConnectionName() : $database;
+        return match (true) {
+            $connection instanceof MariaDbConnection => 'MariaDB',
+            $connection instanceof MySqlConnection && $connection->isMaria() => 'MariaDB',
+            $connection instanceof MySqlConnection => 'MySQL',
+            $connection instanceof PostgresConnection => 'PostgreSQL',
+            $connection instanceof SQLiteConnection => 'SQLite',
+            $connection instanceof SqlServerConnection => 'SQL Server',
+            default => $database,
+        };
     }
 
     /**
@@ -28,7 +43,7 @@ abstract class DatabaseInspectionCommand extends Command
      */
     protected function getConnectionCount(ConnectionInterface $connection)
     {
-        return method_exists($connection, 'getConnectionCount') ? $connection->getConnectionCount() : null;
+        return $connection->getQueryGrammar()->getConnectionCount();
     }
 
     /**

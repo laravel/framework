@@ -514,4 +514,15 @@ class MySqlGrammar extends Grammar
 
         return 'json_extract('.$field.$path.')';
     }
+
+    public function getConnectionCount(): ?int
+    {
+        $result = $this->connection->selectOne('show status where variable_name = "threads_connected"');
+
+        if (! $result) {
+            return null;
+        }
+
+        return (int) $result['Value'];
+    }
 }

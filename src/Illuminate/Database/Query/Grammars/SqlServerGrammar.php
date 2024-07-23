@@ -571,4 +571,15 @@ class SqlServerGrammar extends Grammar
 
         return $table;
     }
+
+    public function getConnectionCount(): ?int
+    {
+        $result = $this->connection->selectOne('select count(*) Value from sys.dm_exec_sessions where status = ?', ['running']);
+
+        if (! $result) {
+            return null;
+        }
+
+        return (int) $result['Value'];
+    }
 }

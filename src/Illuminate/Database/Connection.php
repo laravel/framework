@@ -1348,24 +1348,6 @@ class Connection implements ConnectionInterface
     }
 
     /**
-     * Get a human-readable name for the given connection.
-     */
-    public function getConnectionName(): string
-    {
-        return $this->getName().'('.$this->getDriverName().')';
-    }
-
-    /**
-     * Get the number of open connections for a database.
-     *
-     * @return int|null
-     */
-    public function getConnectionCount(): ?int
-    {
-        return null;
-    }
-
-    /**
      * Get the query grammar used by the connection.
      *
      * @return \Illuminate\Database\Query\Grammars\Grammar

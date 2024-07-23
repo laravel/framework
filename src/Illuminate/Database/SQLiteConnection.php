@@ -31,11 +31,6 @@ class SQLiteConnection extends Connection
         $this->configureSynchronous();
     }
 
-    public function getConnectionName(): string
-    {
-        return $this->getName().' (SQLite)';
-    }
-
     /**
      * Enable or disable foreign key constraints if configured.
      *

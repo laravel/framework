@@ -45,7 +45,8 @@ class ShowCommand extends DatabaseInspectionCommand
         $data = [
             'platform' => [
                 'config' => $this->getConfigFromDatabase($database),
-                'name' => $this->getConnectionName($connection, $database),
+                'name' => $connection->getName(),
+                'driver' => $connection->getDriverName(),
                 'version' => $connection->getServerVersion(),
                 'open_connections' => $this->getConnectionCount($connection),
             ],
@@ -159,6 +160,7 @@ class ShowCommand extends DatabaseInspectionCommand
         $this->newLine();
 
         $this->components->twoColumnDetail('<fg=green;options=bold>'.$platform['name'].'</>', $platform['version']);
+        $this->components->twoColumnDetail('Driver', Arr::get($platform['config'], 'driver'));
         $this->components->twoColumnDetail('Database', Arr::get($platform['config'], 'database'));
         $this->components->twoColumnDetail('Host', Arr::get($platform['config'], 'host'));
         $this->components->twoColumnDetail('Port', Arr::get($platform['config'], 'port'));

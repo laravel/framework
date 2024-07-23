@@ -48,22 +48,6 @@ class MySqlConnection extends Connection
         return str_contains($this->getPdo()->getAttribute(PDO::ATTR_SERVER_VERSION), 'MariaDB');
     }
 
-    public function getConnectionName(): string
-    {
-        return $this->getName().' ('.($this->isMaria() ? 'MariaDB' : 'MySQL').')';
-    }
-
-    public function getConnectionCount(): ?int
-    {
-        $result = $this->selectOne('show status where variable_name = "threads_connected"');
-
-        if (! $result) {
-            return null;
-        }
-
-        return (int) $result['Value'];
-    }
-
     /**
      * Get the server version for the connection.
      *
