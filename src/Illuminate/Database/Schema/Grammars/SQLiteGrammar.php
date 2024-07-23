@@ -104,8 +104,8 @@ class SQLiteGrammar extends Grammar
     public function compileColumns($table)
     {
         return sprintf(
-            'select name, type, not "notnull" as "nullable", dflt_value as "default", pk as "primary" '
-            .'from pragma_table_info(%s) order by cid asc',
+            'select name, type, not "notnull" as "nullable", dflt_value as "default", pk as "primary"'
+            .'from pragma_table_xinfo(%s) order by cid asc',
             $this->quoteString(str_replace('.', '__', $table))
         );
     }
