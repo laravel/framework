@@ -17,7 +17,7 @@ class MariaDbConnection extends MySqlConnection
      */
     public function getDriverTitle()
     {
-        return 'SQLite';
+        return 'MariaDB';
     }
 
     /**
