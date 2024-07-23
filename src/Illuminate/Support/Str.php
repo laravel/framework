@@ -625,20 +625,21 @@ class Str
      * @param  string  $value
      * @param  int  $limit
      * @param  string  $end
-     * @param  bool  $completeWords
+     * @param  bool  $preserveWords
      * @return string
      */
-    public static function limit($value, $limit = 100, $end = '...', $completeWords = false)
+    public static function limit($value, $limit = 100, $end = '...', $preserveWords = false)
     {
         if (mb_strwidth($value, 'UTF-8') <= $limit) {
             return $value;
         }
 
-        if (! $completeWords) {
+        if (! $preserveWords) {
             return rtrim(mb_strimwidth($value, 0, $limit, '', 'UTF-8')).$end;
         }
 
         $value = trim(preg_replace('/[\n\r]+/', ' ', strip_tags($value)));
+
         $trimmed = rtrim(mb_strimwidth($value, 0, $limit, '', 'UTF-8'));
 
         if (mb_substr($value, $limit, 1, 'UTF-8') === ' ') {
