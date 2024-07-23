@@ -533,6 +533,42 @@ class FoundationExceptionsHandlerTest extends TestCase
         if ($testFailed) {
             Assert::fail('assertThrows failed: non matching message are thrown.');
         }
+
+        $this->assertThrows(function () {
+            throw new CustomException('Some message.');
+        }, function (CustomException $exception) {
+            return $exception->getMessage() === 'Some message.';
+        });
+
+        try {
+            $this->assertThrows(function () {
+                throw new CustomException('Some message.');
+            }, function (CustomException $exception) {
+                return false;
+            });
+            $testFailed = true;
+        } catch (AssertionFailedError) {
+            $testFailed = false;
+        }
+
+        if ($testFailed) {
+            Assert::fail('assertThrows failed: exception callback succeeded.');
+        }
+
+        try {
+            $this->assertThrows(function () {
+                throw new Exception('Some message.');
+            }, function (CustomException $exception) {
+                return true;
+            });
+            $testFailed = true;
+        } catch (AssertionFailedError) {
+            $testFailed = false;
+        }
+
+        if ($testFailed) {
+            Assert::fail('assertThrows failed: non matching exceptions are thrown.');
+        }
     }
 
     public function testItReportsDuplicateExceptions()
