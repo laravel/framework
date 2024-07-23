@@ -623,6 +623,254 @@ class ValidationValidatorTest extends TestCase
         $this->assertSame('empty is not a valid email', $v->messages()->first('email'));
     }
 
+    #[DataProvider('caseSensitiveValidationMessagesProvider')]
+    public function testCaseSensitiveValuesAreReplaced(array $translation, string $field, array $data, array $rules, string $expected)
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines($translation, 'en');
+        $v = new Validator($trans, $data, $rules);
+        $this->assertFalse($v->passes());
+        $v->messages()->setFormat(':message');
+        $this->assertSame($expected, $v->messages()->first($field));
+    }
+
+    public static function caseSensitiveValidationMessagesProvider(): array
+    {
+        return [
+            'present_if, lowercase' => [
+                'translation' => ['validation.present_if' => 'The :attribute field must be present when :other is :value.'],
+                'field' => 'email',
+                'data' => ['title' => 'foo'],
+                'rules' => ['email' => 'present_if:title,foo'],
+                'expected' => 'The email field must be present when title is foo.',
+            ],
+            'present_if, ucfirst' => [
+                'translation' => ['validation.present_if' => 'The :Attribute field must be present when :Other is :Value.'],
+                'field' => 'email',
+                'data' => ['title' => 'foo'],
+                'rules' => ['email' => 'present_if:title,foo'],
+                'expected' => 'The Email field must be present when Title is Foo.',
+            ],
+            'present_if, uppercase' => [
+                'translation' => ['validation.present_if' => 'The :ATTRIBUTE field must be present when :OTHER is :VALUE.'],
+                'field' => 'email',
+                'data' => ['title' => 'foo'],
+                'rules' => ['email' => 'present_if:title,foo'],
+                'expected' => 'The EMAIL field must be present when TITLE is FOO.',
+            ],
+            'present_unless, lowercase' => [
+                'translation' => ['validation.present_unless' => 'The :attribute field must be present unless :other is :value.'],
+                'field' => 'email',
+                'data' => ['title' => 'bar'],
+                'rules' => ['email' => 'present_unless:title,foo'],
+                'expected' => 'The email field must be present unless title is foo.',
+            ],
+            'present_unless, ucfirst' => [
+                'translation' => ['validation.present_unless' => 'The :Attribute field must be present unless :Other is :Value.'],
+                'field' => 'email',
+                'data' => ['title' => 'bar'],
+                'rules' => ['email' => 'present_unless:title,foo'],
+                'expected' => 'The Email field must be present unless Title is Foo.',
+            ],
+            'present_unless, uppercase' => [
+                'translation' => ['validation.present_unless' => 'The :ATTRIBUTE field must be present unless :OTHER is :VALUE.'],
+                'field' => 'email',
+                'data' => ['title' => 'bar'],
+                'rules' => ['email' => 'present_unless:title,foo'],
+                'expected' => 'The EMAIL field must be present unless TITLE is FOO.',
+            ],
+            'present_with, lowercase' => [
+                'translation' => ['validation.present_with' => 'The :attribute field must be present when :values is present.'],
+                'field' => 'email',
+                'data' => ['title' => 'bar', 'description' => 'foo'],
+                'rules' => ['email' => 'present_with:title,description'],
+                'expected' => 'The email field must be present when title / description is present.',
+            ],
+            'present_with, ucfirst' => [
+                'translation' => ['validation.present_with' => 'The :Attribute field must be present when :Values is present.'],
+                'field' => 'email',
+                'data' => ['title' => 'bar', 'description' => 'foo'],
+                'rules' => ['email' => 'present_with:title,description'],
+                'expected' => 'The Email field must be present when Title / Description is present.',
+            ],
+            'present_with, uppercase' => [
+                'translation' => ['validation.present_with' => 'The :ATTRIBUTE field must be present when :VALUES is present.'],
+                'field' => 'email',
+                'data' => ['title' => 'bar', 'description' => 'foo'],
+                'rules' => ['email' => 'present_with:title,description'],
+                'expected' => 'The EMAIL field must be present when TITLE / DESCRIPTION is present.',
+            ],
+            'required_with, lowercase' => [
+                'translation' => ['validation.required_with' => 'The :attribute field is required when :values is present.'],
+                'field' => 'email',
+                'data' => ['title' => 'bar', 'description' => 'foo'],
+                'rules' => ['email' => 'required_with:title,description'],
+                'expected' => 'The email field is required when title / description is present.',
+            ],
+            'required_with, ucfirst' => [
+                'translation' => ['validation.required_with' => 'The :Attribute field is required when :Values is present.'],
+                'field' => 'email',
+                'data' => ['title' => 'bar', 'description' => 'foo'],
+                'rules' => ['email' => 'required_with:title,description'],
+                'expected' => 'The Email field is required when Title / Description is present.',
+            ],
+            'required_with, uppercase' => [
+                'translation' => ['validation.required_with' => 'The :ATTRIBUTE field is required when :VALUES is present.'],
+                'field' => 'email',
+                'data' => ['title' => 'bar', 'description' => 'foo'],
+                'rules' => ['email' => 'required_with:title,description'],
+                'expected' => 'The EMAIL field is required when TITLE / DESCRIPTION is present.',
+            ],
+            'required_if, lowercase' => [
+                'translation' => ['validation.required_if' => 'The :attribute field is required when :other is :value.'],
+                'field' => 'email',
+                'data' => ['title' => 'foo'],
+                'rules' => ['email' => 'required_if:title,foo'],
+                'expected' => 'The email field is required when title is foo.',
+            ],
+            'required_if, ucfirst' => [
+                'translation' => ['validation.required_if' => 'The :Attribute field is required when :Other is :Value.'],
+                'field' => 'email',
+                'data' => ['title' => 'foo'],
+                'rules' => ['email' => 'required_if:title,foo'],
+                'expected' => 'The Email field is required when Title is Foo.',
+            ],
+            'required_if, uppercase' => [
+                'translation' => ['validation.required_if' => 'The :ATTRIBUTE field is required when :OTHER is :VALUE.'],
+                'field' => 'email',
+                'data' => ['title' => 'foo'],
+                'rules' => ['email' => 'required_if:title,foo'],
+                'expected' => 'The EMAIL field is required when TITLE is FOO.',
+            ],
+            'required_if_accepted, lowercase' => [
+                'translation' => ['validation.required_if_accepted' => 'The :attribute field is required when :other is accepted.'],
+                'field' => 'email',
+                'data' => ['confirmed' => 1],
+                'rules' => ['email' => 'required_if_accepted:confirmed'],
+                'expected' => 'The email field is required when confirmed is accepted.',
+            ],
+            'required_if_accepted, ucfirst' => [
+                'translation' => ['validation.required_if_accepted' => 'The :Attribute field is required when :Other is accepted.'],
+                'field' => 'email',
+                'data' => ['confirmed' => 1],
+                'rules' => ['email' => 'required_if_accepted:confirmed'],
+                'expected' => 'The Email field is required when Confirmed is accepted.',
+            ],
+            'required_if_accepted, uppercase' => [
+                'translation' => ['validation.required_if_accepted' => 'The :ATTRIBUTE field is required when :OTHER is accepted.'],
+                'field' => 'email',
+                'data' => ['confirmed' => 1],
+                'rules' => ['email' => 'required_if_accepted:confirmed'],
+                'expected' => 'The EMAIL field is required when CONFIRMED is accepted.',
+            ],
+            'required_if_declined, lowercase' => [
+                'translation' => ['validation.required_if_declined' => 'The :attribute field is required when :other is declined.'],
+                'field' => 'email',
+                'data' => ['confirmed' => 0],
+                'rules' => ['email' => 'required_if_declined:confirmed'],
+                'expected' => 'The email field is required when confirmed is declined.',
+            ],
+            'required_if_declined, ucfirst' => [
+                'translation' => ['validation.required_if_declined' => 'The :Attribute field is required when :Other is declined.'],
+                'field' => 'email',
+                'data' => ['confirmed' => 0],
+                'rules' => ['email' => 'required_if_declined:confirmed'],
+                'expected' => 'The Email field is required when Confirmed is declined.',
+            ],
+            'required_if_declined, uppercase' => [
+                'translation' => ['validation.required_if_declined' => 'The :ATTRIBUTE field is required when :OTHER is declined.'],
+                'field' => 'email',
+                'data' => ['confirmed' => 0],
+                'rules' => ['email' => 'required_if_declined:confirmed'],
+                'expected' => 'The EMAIL field is required when CONFIRMED is declined.',
+            ],
+            'required_unless, lowercase' => [
+                'translation' => ['validation.required_unless' => 'The :attribute field is required unless :other is in :values.'],
+                'field' => 'email',
+                'data' => ['title' => 'baz'],
+                'rules' => ['email' => 'required_unless:title,foo,bar'],
+                'expected' => 'The email field is required unless title is in foo, bar.',
+            ],
+            'required_unless, ucfirst' => [
+                'translation' => ['validation.required_unless' => 'The :Attribute field is required unless :Other is in :Values.'],
+                'field' => 'email',
+                'data' => ['title' => 'baz'],
+                'rules' => ['email' => 'required_unless:title,foo,bar'],
+                'expected' => 'The Email field is required unless Title is in Foo, Bar.',
+            ],
+            'required_unless, uppercase' => [
+                'translation' => ['validation.required_unless' => 'The :ATTRIBUTE field is required unless :OTHER is in :VALUES.'],
+                'field' => 'email',
+                'data' => ['title' => 'baz'],
+                'rules' => ['email' => 'required_unless:title,foo,bar'],
+                'expected' => 'The EMAIL field is required unless TITLE is in FOO, BAR.',
+            ],
+            'prohibited_if, lowercase' => [
+                'translation' => ['validation.prohibited_if' => 'The :attribute field is prohibited when :other is :value.'],
+                'field' => 'email',
+                'data' => ['title' => 'foo', 'email' => 'email@test.it'],
+                'rules' => ['email' => 'prohibited_if:title,foo'],
+                'expected' => 'The email field is prohibited when title is foo.',
+            ],
+            'prohibited_if, ucfirst' => [
+                'translation' => ['validation.prohibited_if' => 'The :Attribute field is prohibited when :Other is :Value.'],
+                'field' => 'email',
+                'data' => ['title' => 'foo', 'email' => 'email@test.it'],
+                'rules' => ['email' => 'prohibited_if:title,foo'],
+                'expected' => 'The Email field is prohibited when Title is Foo.',
+            ],
+            'prohibited_if, uppercase' => [
+                'translation' => ['validation.prohibited_if' => 'The :ATTRIBUTE field is prohibited when :OTHER is :VALUE.'],
+                'field' => 'email',
+                'data' => ['title' => 'foo', 'email' => 'email@test.it'],
+                'rules' => ['email' => 'prohibited_if:title,foo'],
+                'expected' => 'The EMAIL field is prohibited when TITLE is FOO.',
+            ],
+            'prohibited_unless, lowercase' => [
+                'translation' => ['validation.prohibited_unless' => 'The :attribute field is prohibited unless :other is in :values.'],
+                'field' => 'email',
+                'data' => ['title' => 'baz', 'email' => 'email@test.it'],
+                'rules' => ['email' => 'prohibited_unless:title,foo,bar'],
+                'expected' => 'The email field is prohibited unless title is in foo, bar.',
+            ],
+            'prohibited_unless, ucfirst' => [
+                'translation' => ['validation.prohibited_unless' => 'The :Attribute field is prohibited unless :Other is in :Values.'],
+                'field' => 'email',
+                'data' => ['title' => 'baz', 'email' => 'email@test.it'],
+                'rules' => ['email' => 'prohibited_unless:title,foo,bar'],
+                'expected' => 'The Email field is prohibited unless Title is in Foo, Bar.',
+            ],
+            'prohibited_unless, uppercase' => [
+                'translation' => ['validation.prohibited_unless' => 'The :ATTRIBUTE field is prohibited unless :OTHER is in :VALUES.'],
+                'field' => 'email',
+                'data' => ['title' => 'baz', 'email' => 'email@test.it'],
+                'rules' => ['email' => 'prohibited_unless:title,foo,bar'],
+                'expected' => 'The EMAIL field is prohibited unless TITLE is in FOO, BAR.',
+            ],
+            'prohibits, lowercase' => [
+                'translation' => ['validation.prohibits' => 'The :attribute field prohibits :other from being present.'],
+                'field' => 'email',
+                'data' => ['title' => 'foo', 'email' => 'email@test.it'],
+                'rules' => ['email' => 'prohibits:title'],
+                'expected' => 'The email field prohibits title from being present.',
+            ],
+            'prohibits, ucfirst' => [
+                'translation' => ['validation.prohibits' => 'The :Attribute field prohibits :Other from being present.'],
+                'field' => 'email',
+                'data' => ['title' => 'foo', 'email' => 'email@test.it'],
+                'rules' => ['email' => 'prohibits:title'],
+                'expected' => 'The Email field prohibits Title from being present.',
+            ],
+            'prohibits, uppercase' => [
+                'translation' => ['validation.prohibits' => 'The :ATTRIBUTE field prohibits :OTHER from being present.'],
+                'field' => 'email',
+                'data' => ['title' => 'foo', 'email' => 'email@test.it'],
+                'rules' => ['email' => 'prohibits:title'],
+                'expected' => 'The EMAIL field prohibits TITLE from being present.',
+            ],
+        ];
+    }
+
     public function testInputIsReplacedByItsDisplayableValue()
     {
         $frameworks = [

@@ -3,6 +3,7 @@
 namespace Illuminate\Validation\Concerns;
 
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 
 trait ReplacesAttributes
 {
@@ -371,6 +372,27 @@ trait ReplacesAttributes
         return str_replace(':values', implode(', ', $parameters), $message);
     }
 
+    protected function caseSensitiveReplace(string $message, string $key, string|array $replacement, string $separator = ' / '): string
+    {
+        $prefix = '';
+
+        if (str_starts_with($key, ':')) {
+            $prefix = ':';
+            $key = Str::replaceFirst(':', '', $key);
+        }
+
+        $upperKey = Str::upper($key);
+        $ucfirstKey = Str::ucfirst($key);
+
+        $replacements = Arr::wrap($replacement);
+
+        return str_replace(["$prefix$key", "$prefix$upperKey", "$prefix$ucfirstKey"], [
+            implode($separator, Arr::wrap($replacement)),
+            implode($separator, array_map(fn ($value) => Str::upper($value), $replacements)),
+            implode($separator, array_map(fn ($value) => Str::ucfirst($value), $replacements)),
+        ], $message);
+    }
+
     /**
      * Replace all place-holders for the present_if rule.
      *
@@ -382,10 +404,10 @@ trait ReplacesAttributes
      */
     protected function replacePresentIf($message, $attribute, $rule, $parameters)
     {
-        $parameters[1] = $this->getDisplayableValue($parameters[0], Arr::get($this->data, $parameters[0]));
-        $parameters[0] = $this->getDisplayableAttribute($parameters[0]);
+        $message = $this->caseSensitiveReplace($message, ':other', $this->getDisplayableAttribute($parameters[0]));
+        $message = $this->caseSensitiveReplace($message, ':value', $this->getDisplayableValue($parameters[0], Arr::get($this->data, $parameters[0])));
 
-        return str_replace([':other', ':value'], $parameters, $message);
+        return $message;
     }
 
     /**
@@ -399,10 +421,10 @@ trait ReplacesAttributes
      */
     protected function replacePresentUnless($message, $attribute, $rule, $parameters)
     {
-        return str_replace([':other', ':value'], [
-            $this->getDisplayableAttribute($parameters[0]),
-            $this->getDisplayableValue($parameters[0], $parameters[1]),
-        ], $message);
+        $message = $this->caseSensitiveReplace($message, ':other', $this->getDisplayableAttribute($parameters[0]));
+        $message = $this->caseSensitiveReplace($message, ':value', $this->getDisplayableValue($parameters[0], $parameters[1]));
+
+        return $message;
     }
 
     /**
@@ -416,7 +438,7 @@ trait ReplacesAttributes
      */
     protected function replacePresentWith($message, $attribute, $rule, $parameters)
     {
-        return str_replace(':values', implode(' / ', $this->getAttributeList($parameters)), $message);
+        return $this->caseSensitiveReplace($message, ':values', $this->getAttributeList($parameters));
     }
 
     /**
@@ -444,7 +466,7 @@ trait ReplacesAttributes
      */
     protected function replaceRequiredWith($message, $attribute, $rule, $parameters)
     {
-        return str_replace(':values', implode(' / ', $this->getAttributeList($parameters)), $message);
+        return $this->caseSensitiveReplace($message, ':values', $this->getAttributeList($parameters));
     }
 
     /**
@@ -586,11 +608,10 @@ trait ReplacesAttributes
      */
     protected function replaceRequiredIf($message, $attribute, $rule, $parameters)
     {
-        $parameters[1] = $this->getDisplayableValue($parameters[0], Arr::get($this->data, $parameters[0]));
+        $message = $this->caseSensitiveReplace($message, ':other', $this->getDisplayableAttribute($parameters[0]));
+        $message = $this->caseSensitiveReplace($message, ':value', $this->getDisplayableValue($parameters[0], Arr::get($this->data, $parameters[0])));
 
-        $parameters[0] = $this->getDisplayableAttribute($parameters[0]);
-
-        return str_replace([':other', ':value'], $parameters, $message);
+        return $message;
     }
 
     /**
@@ -604,9 +625,7 @@ trait ReplacesAttributes
      */
     protected function replaceRequiredIfAccepted($message, $attribute, $rule, $parameters)
     {
-        $parameters[0] = $this->getDisplayableAttribute($parameters[0]);
-
-        return str_replace([':other'], $parameters, $message);
+        return $this->caseSensitiveReplace($message, ':other', $this->getDisplayableAttribute($parameters[0]));
     }
 
     /**
@@ -620,9 +639,7 @@ trait ReplacesAttributes
      */
     public function replaceRequiredIfDeclined($message, $attribute, $rule, $parameters)
     {
-        $parameters[0] = $this->getDisplayableAttribute($parameters[0]);
-
-        return str_replace([':other'], $parameters, $message);
+        return $this->caseSensitiveReplace($message, ':other', $this->getDisplayableAttribute($parameters[0]));
     }
 
     /**
@@ -644,7 +661,10 @@ trait ReplacesAttributes
             $values[] = $this->getDisplayableValue($parameters[0], $value);
         }
 
-        return str_replace([':other', ':values'], [$other, implode(', ', $values)], $message);
+        $message = $this->caseSensitiveReplace($message, ':other', $other);
+        $message = $this->caseSensitiveReplace($message, ':values', $values, ', ');
+
+        return $message;
     }
 
     /**
@@ -658,11 +678,10 @@ trait ReplacesAttributes
      */
     protected function replaceProhibitedIf($message, $attribute, $rule, $parameters)
     {
-        $parameters[1] = $this->getDisplayableValue($parameters[0], Arr::get($this->data, $parameters[0]));
+        $message = $this->caseSensitiveReplace($message, ':other', $this->getDisplayableAttribute($parameters[0]));
+        $message = $this->caseSensitiveReplace($message, ':value', $this->getDisplayableValue($parameters[0], Arr::get($this->data, $parameters[0])));
 
-        $parameters[0] = $this->getDisplayableAttribute($parameters[0]);
-
-        return str_replace([':other', ':value'], $parameters, $message);
+        return $message;
     }
 
     /**
@@ -684,7 +703,10 @@ trait ReplacesAttributes
             $values[] = $this->getDisplayableValue($parameters[0], $value);
         }
 
-        return str_replace([':other', ':values'], [$other, implode(', ', $values)], $message);
+        $message = $this->caseSensitiveReplace($message, ':other', $other);
+        $message = $this->caseSensitiveReplace($message, ':values', $values, ', ');
+
+        return $message;
     }
 
     /**
@@ -698,7 +720,7 @@ trait ReplacesAttributes
      */
     protected function replaceProhibits($message, $attribute, $rule, $parameters)
     {
-        return str_replace(':other', implode(' / ', $this->getAttributeList($parameters)), $message);
+        return $this->caseSensitiveReplace($message, ':other', $this->getAttributeList($parameters));
     }
 
     /**
