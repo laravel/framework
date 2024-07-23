@@ -14,7 +14,7 @@ class PostgresConnection extends Connection
 {
     public function getConnectionName(): string
     {
-        return $this->getName() . ' (PostgreSQL)';
+        return $this->getName().' (PostgreSQL)';
     }
 
     public function getConnectionCount(): ?int

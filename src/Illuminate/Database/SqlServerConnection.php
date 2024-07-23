@@ -92,7 +92,7 @@ class SqlServerConnection extends Connection
 
     public function getConnectionName(): string
     {
-        return $this->getName() . ' (SQL Server)';
+        return $this->getName().' (SQL Server)';
     }
 
     public function getConnectionCount(): ?int

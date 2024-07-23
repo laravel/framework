@@ -34,7 +34,7 @@ class MariaDbConnection extends MySqlConnection
 
     public function getConnectionName(): string
     {
-        return $this->getName() . ' (MariaDB)';
+        return $this->getName().' (MariaDB)';
     }
 
     /**

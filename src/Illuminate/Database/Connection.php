@@ -1352,7 +1352,7 @@ class Connection implements ConnectionInterface
      */
     public function getConnectionName(): string
     {
-        return $this->getName() . '(' . $this->getDriverName() . ')';
+        return $this->getName().'('.$this->getDriverName().')';
     }
 
     /**

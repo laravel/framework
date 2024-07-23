@@ -33,7 +33,7 @@ class SQLiteConnection extends Connection
 
     public function getConnectionName(): string
     {
-        return $this->getName() . ' (SQLite)';
+        return $this->getName().' (SQLite)';
     }
 
     /**

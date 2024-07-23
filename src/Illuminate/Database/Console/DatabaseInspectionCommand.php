@@ -4,11 +4,6 @@ namespace Illuminate\Database\Console;
 
 use Illuminate\Console\Command;
 use Illuminate\Database\ConnectionInterface;
-use Illuminate\Database\MariaDbConnection;
-use Illuminate\Database\MySqlConnection;
-use Illuminate\Database\PostgresConnection;
-use Illuminate\Database\SQLiteConnection;
-use Illuminate\Database\SqlServerConnection;
 use Illuminate\Support\Arr;
 
 abstract class DatabaseInspectionCommand extends Command

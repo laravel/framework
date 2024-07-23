@@ -50,7 +50,7 @@ class MySqlConnection extends Connection
 
     public function getConnectionName(): string
     {
-        return $this->getName() . ' (' . ($this->isMaria() ? 'MariaDB' : 'MySQL') . ')';
+        return $this->getName().' ('.($this->isMaria() ? 'MariaDB' : 'MySQL').')';
     }
 
     public function getConnectionCount(): ?int
