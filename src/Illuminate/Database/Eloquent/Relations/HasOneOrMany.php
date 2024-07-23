@@ -290,7 +290,7 @@ abstract class HasOneOrMany extends Relation
             $values[$key][$this->getForeignKeyName()] = $this->getParentKey();
         }
 
-        return $this->related->upsert($values, $uniqueBy, $update);
+        return $this->getQuery()->upsert($values, $uniqueBy, $update);
     }
 
     /**
