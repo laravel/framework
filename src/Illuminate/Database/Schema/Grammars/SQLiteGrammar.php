@@ -105,7 +105,7 @@ class SQLiteGrammar extends Grammar
     {
         return sprintf(
             'select name, type, not "notnull" as "nullable", dflt_value as "default", pk as "primary", hidden as "extra" '
-            .'from pragma_table_xinfo(%s) order by cid asc',
+            .'from pragma_table_info(%s) order by cid asc',
             $this->quoteString(str_replace('.', '__', $table))
         );
     }
