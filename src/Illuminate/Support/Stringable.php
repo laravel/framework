@@ -433,12 +433,12 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
      *
      * @param  int  $limit
      * @param  string  $end
-     * @param  bool  $completeWords
+     * @param  bool  $preserveWords
      * @return static
      */
-    public function limit($limit = 100, $end = '...', $completeWords = false)
+    public function limit($limit = 100, $end = '...', $preserveWords = false)
     {
-        return new static(Str::limit($this->value, $limit, $end, $completeWords));
+        return new static(Str::limit($this->value, $limit, $end, $preserveWords));
     }
 
     /**
