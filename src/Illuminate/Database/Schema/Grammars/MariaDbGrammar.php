@@ -56,8 +56,8 @@ class MariaDbGrammar extends MySqlGrammar
         );
     }
 
-    public function compileConnectionCount()
+    public function compileConnectionsCount()
     {
-        return 'select variable_value as `Value` from information_schema.global_status where variable_name = \'Threads_connected\'';
+        return 'select variable_value as `Value` from information_schema.global_status where variable_name = \'THREADS_CONNECTED\'';
     }
 }

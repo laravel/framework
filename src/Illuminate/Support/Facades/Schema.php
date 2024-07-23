@@ -45,7 +45,7 @@ namespace Illuminate\Support\Facades;
  * @method static void mixin(object $mixin, bool $replace = true)
  * @method static bool hasMacro(string $name)
  * @method static void flushMacros()
- * @method static int|null getConnectionCount()
+ * @method static int|null getConnectionsCount()
  *
  * @see \Illuminate\Database\Schema\Builder
  */

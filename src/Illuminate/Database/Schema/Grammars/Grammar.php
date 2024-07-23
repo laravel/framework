@@ -388,7 +388,7 @@ abstract class Grammar extends BaseGrammar
      *
      * @return string|null
      */
-    public function compileConnectionCount()
+    public function compileConnectionsCount()
     {
         return null;
     }

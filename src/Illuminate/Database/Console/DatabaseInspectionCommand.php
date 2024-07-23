@@ -28,11 +28,11 @@ abstract class DatabaseInspectionCommand extends Command
      * @param  \Illuminate\Database\ConnectionInterface  $connection
      * @return int|null
      *
-     * @deprecated Use Schema\Builder::getConnectionCount() instead.
+     * @deprecated Use Schema\Builder::getConnectionsCount() instead.
      */
     protected function getConnectionCount(ConnectionInterface $connection)
     {
-        return $connection->getSchemaBuilder()->getConnectionCount();
+        return $connection->getSchemaBuilder()->getConnectionsCount();
     }
 
     /**

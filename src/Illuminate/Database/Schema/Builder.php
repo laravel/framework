@@ -612,9 +612,9 @@ class Builder
      *
      * @return int|null
      */
-    public function getConnectionCount()
+    public function getConnectionsCount()
     {
-        $query = $this->grammar->compileConnectionCount();
+        $query = $this->grammar->compileConnectionsCount();
 
         return $query ? $this->connection->scalar($query) : null;
     }

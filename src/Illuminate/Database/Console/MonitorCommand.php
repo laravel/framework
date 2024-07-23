@@ -84,7 +84,7 @@ class MonitorCommand extends DatabaseInspectionCommand
             }
 
             $maxConnections = $this->option('max');
-            $connections = $this->connection->connection($database)->getSchemaBuilder()->getConnectionCount();
+            $connections = $this->connection->connection($database)->getSchemaBuilder()->getConnectionsCount();
 
             return [
                 'database' => $database,
