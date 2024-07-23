@@ -1079,6 +1079,16 @@ class Route
     }
 
     /**
+     * Specify that route only can be access when the user not "Authenticated".
+     * 
+     * @return $this
+     */
+    public function guest()
+    {
+        return $this->middleware('guest');
+    }
+
+    /**
      * Get the middleware for the route's controller.
      *
      * @return array
