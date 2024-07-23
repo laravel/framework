@@ -195,6 +195,13 @@ class Application extends Container implements ApplicationContract, CachesConfig
     protected $namespace;
 
     /**
+     * Indicates if the framework's base configuration should be merged.
+     *
+     * @var bool
+     */
+    protected $mergeFrameworkConfiguration = true;
+
+    /**
      * The prefixes of absolute cache paths for use during normalization.
      *
      * @var string[]
@@ -1011,6 +1018,8 @@ class Application extends Container implements ApplicationContract, CachesConfig
      * @param  string  $abstract
      * @param  array  $parameters
      * @return mixed
+     *
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     public function make($abstract, array $parameters = [])
     {
@@ -1026,6 +1035,9 @@ class Application extends Container implements ApplicationContract, CachesConfig
      * @param  array  $parameters
      * @param  bool  $raiseEvents
      * @return mixed
+     *
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     * @throws \Illuminate\Contracts\Container\CircularDependencyException
      */
     protected function resolve($abstract, $parameters = [], $raiseEvents = true)
     {
@@ -1196,6 +1208,28 @@ class Application extends Container implements ApplicationContract, CachesConfig
         $kernel->terminate($input, $status);
 
         return $status;
+    }
+
+    /**
+     * Determine if the framework's base configuration should be merged.
+     *
+     * @return bool
+     */
+    public function shouldMergeFrameworkConfiguration()
+    {
+        return $this->mergeFrameworkConfiguration;
+    }
+
+    /**
+     * Indicate that the framework's base configuration should not be merged.
+     *
+     * @return $this
+     */
+    public function dontMergeFrameworkConfiguration()
+    {
+        $this->mergeFrameworkConfiguration = false;
+
+        return $this;
     }
 
     /**

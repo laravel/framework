@@ -23,11 +23,7 @@ class HandleExceptionsTest extends TestCase
     {
         $this->app = m::mock(Application::setInstance(new Application));
 
-        $this->config = new Config();
-
-        $this->app->singleton('config', function () {
-            return $this->config;
-        });
+        $this->app->instance('config', $this->config = new Config());
     }
 
     protected function handleExceptions()

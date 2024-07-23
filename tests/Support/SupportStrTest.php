@@ -1147,6 +1147,7 @@ class SupportStrTest extends TestCase
     {
         $this->assertInstanceOf(UuidInterface::class, Str::uuid());
         $this->assertInstanceOf(UuidInterface::class, Str::orderedUuid());
+        $this->assertInstanceOf(UuidInterface::class, Str::uuid7());
     }
 
     public function testAsciiNull()
@@ -1400,7 +1401,7 @@ class SupportStrTest extends TestCase
     {
         Str::createUuidsUsingSequence([
             0 => ($zeroth = Str::uuid()),
-            1 => ($first = Str::uuid()),
+            1 => ($first = Str::uuid7()),
             // just generate a random one here...
             3 => ($third = Str::uuid()),
             // continue to generate random uuids...
@@ -1571,6 +1572,46 @@ class SupportStrTest extends TestCase
     {
         $this->assertSame('foo', Str::fromBase64(base64_encode('foo')));
         $this->assertSame('foobar', Str::fromBase64(base64_encode('foobar'), true));
+    }
+
+    public function testChopStart()
+    {
+        foreach ([
+            'http://laravel.com' => ['http://', 'laravel.com'],
+            'http://-http://' => ['http://', '-http://'],
+            'http://laravel.com' => ['htp:/', 'http://laravel.com'],
+            'http://laravel.com' => ['http://www.', 'http://laravel.com'],
+            'http://laravel.com' => ['-http://', 'http://laravel.com'],
+            'http://laravel.com' => [['https://', 'http://'], 'laravel.com'],
+            'http://www.laravel.com' => [['http://', 'www.'], 'www.laravel.com'],
+            'http://http-is-fun.test' => ['http://', 'http-is-fun.test'],
+            '🌊✋' => ['🌊', '✋'],
+            '🌊✋' => ['✋', '🌊✋'],
+        ] as $subject => $value) {
+            [$needle, $expected] = $value;
+
+            $this->assertSame($expected, Str::chopStart($subject, $needle));
+        }
+    }
+
+    public function testChopEnd()
+    {
+        foreach ([
+            'path/to/file.php' => ['.php', 'path/to/file'],
+            '.php-.php' => ['.php', '.php-'],
+            'path/to/file.php' => ['.ph', 'path/to/file.php'],
+            'path/to/file.php' => ['foo.php', 'path/to/file.php'],
+            'path/to/file.php' => ['.php-', 'path/to/file.php'],
+            'path/to/file.php' => [['.html', '.php'], 'path/to/file'],
+            'path/to/file.php' => [['.php', 'file'], 'path/to/file'],
+            'path/to/php.php' => ['.php', 'path/to/php'],
+            '✋🌊' => ['🌊', '✋'],
+            '✋🌊' => ['✋', '✋🌊'],
+        ] as $subject => $value) {
+            [$needle, $expected] = $value;
+
+            $this->assertSame($expected, Str::chopEnd($subject, $needle));
+        }
     }
 }
 

@@ -23,6 +23,7 @@ use Illuminate\Support\Stringable;
 use Illuminate\Translation\ArrayLoader;
 use Illuminate\Translation\Translator;
 use Illuminate\Validation\DatabasePresenceVerifierInterface;
+use Illuminate\Validation\Rule as ValidationRule;
 use Illuminate\Validation\Rules\Exists;
 use Illuminate\Validation\Rules\ProhibitedIf;
 use Illuminate\Validation\Rules\Unique;
@@ -556,6 +557,53 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['names' => [null, 'name']], ['names.*' => 'Required']);
         $v->messages()->setFormat(':message');
         $this->assertSame('First name is required!', $v->messages()->first('names.0'));
+    }
+
+    public function testInlineAttributeNamesAreReplacedInArraysFromNestedRules()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.required' => ':attribute is required!'], 'en');
+        $v = new Validator($trans, [
+            'users' => [['name' => 'Taylor']],
+        ], [
+            'users.*' => ValidationRule::forEach(fn () => ['id' => 'required']),
+        ], [], [
+            'users.*.id' => 'User ID',
+        ]);
+        $this->assertFalse($v->passes());
+        $v->messages()->setFormat(':message');
+        $this->assertSame('User ID is required!', $v->messages()->first('users.0.id'));
+    }
+
+    public function testTranslatedAttributeNamesAreReplacedInArraysFromNestedRules()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines([
+            'validation.required' => ':attribute is required!',
+            'validation.attributes' => ['users.*.id' => 'User ID'],
+        ], 'en');
+        $v = new Validator($trans, [
+            'users' => [['name' => 'Taylor']],
+        ], [
+            'users.*' => ValidationRule::forEach(fn () => ['id' => 'required']),
+        ]);
+        $this->assertFalse($v->passes());
+        $v->messages()->setFormat(':message');
+        $this->assertSame('User ID is required!', $v->messages()->first('users.0.id'));
+    }
+
+    public function testTranslatedAttributesCanBeMissing()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.gt.numeric' => ':attribute must be greater than :value.'], 'en');
+        $trans->addLines(['validation.attributes' => []], 'en');
+        $v = new Validator($trans, ['total' => 0], ['total' => 'gt:0']);
+        $this->assertSame('total must be greater than 0.', $v->messages()->first('total'));
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.gt.numeric' => ':attribute must be greater than :value.'], 'en');
+        $v = new Validator($trans, ['total' => 0], ['total' => 'gt:0']);
+        $this->assertSame('total must be greater than 0.', $v->messages()->first('total'));
     }
 
     public function testInputIsReplaced()

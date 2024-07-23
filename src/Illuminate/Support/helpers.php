@@ -39,6 +39,10 @@ if (! function_exists('blank')) {
     /**
      * Determine if the given value is "blank".
      *
+     * @phpstan-assert-if-false !=null|'' $value
+     *
+     * @phpstan-assert-if-true !=numeric|bool $value
+     *
      * @param  mixed  $value
      * @return bool
      */
@@ -150,6 +154,10 @@ if (! function_exists('filled')) {
     /**
      * Determine if a value is "filled".
      *
+     * @phpstan-assert-if-true !=null|'' $value
+     *
+     * @phpstan-assert-if-false !=numeric|bool $value
+     *
      * @param  mixed  $value
      * @return bool
      */
@@ -192,10 +200,12 @@ if (! function_exists('object_get')) {
     /**
      * Get an item from an object using "dot" notation.
      *
-     * @param  object  $object
+     * @template TValue of object
+     *
+     * @param  TValue  $object
      * @param  string|null  $key
      * @param  mixed  $default
-     * @return mixed
+     * @return ($key is empty ? TValue : mixed)
      */
     function object_get($object, $key, $default = null)
     {
@@ -239,9 +249,12 @@ if (! function_exists('optional')) {
     /**
      * Provide access to optional objects.
      *
-     * @param  mixed  $value
-     * @param  callable|null  $callback
-     * @return mixed
+     * @template TValue
+     * @template TReturn
+     *
+     * @param  TValue  $value
+     * @param  (callable(TValue): TReturn)|null  $callback
+     * @return ($callback is null ? \Illuminate\Support\Optional : ($value is null ? null : TReturn))
      */
     function optional($value = null, ?callable $callback = null)
     {
@@ -276,11 +289,13 @@ if (! function_exists('retry')) {
     /**
      * Retry an operation a given number of times.
      *
-     * @param  int|array  $times
-     * @param  callable  $callback
-     * @param  int|\Closure  $sleepMilliseconds
-     * @param  callable|null  $when
-     * @return mixed
+     * @template TValue
+     *
+     * @param  int|array<int, int>  $times
+     * @param  callable(int): TValue  $callback
+     * @param  int|\Closure(int, \Throwable): int  $sleepMilliseconds
+     * @param  (callable(\Throwable): bool)|null  $when
+     * @return TValue
      *
      * @throws \Throwable
      */
@@ -323,7 +338,7 @@ if (! function_exists('str')) {
      * Get a new stringable object from the given string.
      *
      * @param  string|null  $string
-     * @return \Illuminate\Support\Stringable|mixed
+     * @return ($string is null ? object : \Illuminate\Support\Stringable)
      */
     function str($string = null)
     {
@@ -350,9 +365,11 @@ if (! function_exists('tap')) {
     /**
      * Call the given Closure with the given value then return the value.
      *
-     * @param  mixed  $value
-     * @param  callable|null  $callback
-     * @return mixed
+     * @template TValue
+     *
+     * @param  TValue  $value
+     * @param  (callable(TValue): mixed)|null  $callback
+     * @return ($callback is null ? \Illuminate\Support\HigherOrderTapProxy : TValue)
      */
     function tap($value, $callback = null)
     {
@@ -370,12 +387,13 @@ if (! function_exists('throw_if')) {
     /**
      * Throw the given exception if the given condition is true.
      *
+     * @template TValue
      * @template TException of \Throwable
      *
-     * @param  mixed  $condition
+     * @param  TValue  $condition
      * @param  TException|class-string<TException>|string  $exception
      * @param  mixed  ...$parameters
-     * @return mixed
+     * @return TValue
      *
      * @throws TException
      */
@@ -397,12 +415,13 @@ if (! function_exists('throw_unless')) {
     /**
      * Throw the given exception unless the given condition is true.
      *
+     * @template TValue
      * @template TException of \Throwable
      *
-     * @param  mixed  $condition
+     * @param  TValue  $condition
      * @param  TException|class-string<TException>|string  $exception
      * @param  mixed  ...$parameters
-     * @return mixed
+     * @return TValue
      *
      * @throws TException
      */
@@ -437,14 +456,14 @@ if (! function_exists('transform')) {
     /**
      * Transform the given value if it is present.
      *
-     * @template TValue of mixed
-     * @template TReturn of mixed
-     * @template TDefault of mixed
+     * @template TValue
+     * @template TReturn
+     * @template TDefault
      *
      * @param  TValue  $value
      * @param  callable(TValue): TReturn  $callback
-     * @param  TDefault|callable(TValue): TDefault|null  $default
-     * @return ($value is empty ? ($default is null ? null : TDefault) : TReturn)
+     * @param  TDefault|callable(TValue): TDefault  $default
+     * @return ($value is empty ? TDefault : TReturn)
      */
     function transform($value, callable $callback, $default = null)
     {

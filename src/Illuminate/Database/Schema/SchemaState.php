@@ -95,6 +95,26 @@ abstract class SchemaState
     }
 
     /**
+     * Determine if the current connection has a migration table.
+     *
+     * @return bool
+     */
+    public function hasMigrationTable(): bool
+    {
+        return $this->connection->getSchemaBuilder()->hasTable($this->migrationTable);
+    }
+
+    /**
+     * Get the name of the application's migration table.
+     *
+     * @return string
+     */
+    protected function getMigrationTable(): string
+    {
+        return $this->connection->getTablePrefix().$this->migrationTable;
+    }
+
+    /**
      * Specify the name of the application's migration table.
      *
      * @param  string  $table

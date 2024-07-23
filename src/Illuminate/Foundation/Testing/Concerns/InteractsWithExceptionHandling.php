@@ -5,6 +5,7 @@ namespace Illuminate\Foundation\Testing\Concerns;
 use Closure;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Support\Testing\Fakes\ExceptionHandlerFake;
+use Illuminate\Support\Traits\ReflectsClosures;
 use Illuminate\Testing\Assert;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\Console\Application as ConsoleApplication;
@@ -13,6 +14,8 @@ use Throwable;
 
 trait InteractsWithExceptionHandling
 {
+    use ReflectsClosures;
+
     /**
      * The original exception handler.
      *
@@ -169,18 +172,22 @@ trait InteractsWithExceptionHandling
      * Assert that the given callback throws an exception with the given message when invoked.
      *
      * @param  \Closure  $test
-     * @param  class-string<\Throwable>  $expectedClass
+     * @param  \Closure|class-string<\Throwable>  $expectedClass
      * @param  string|null  $expectedMessage
      * @return $this
      */
-    protected function assertThrows(Closure $test, string $expectedClass = Throwable::class, ?string $expectedMessage = null)
+    protected function assertThrows(Closure $test, string|Closure $expectedClass = Throwable::class, ?string $expectedMessage = null)
     {
+        [$expectedClass, $expectedClassCallback] = $expectedClass instanceof Closure
+            ? [$this->firstClosureParameterType($expectedClass), $expectedClass]
+            : [$expectedClass, null];
+
         try {
             $test();
 
             $thrown = false;
         } catch (Throwable $exception) {
-            $thrown = $exception instanceof $expectedClass;
+            $thrown = $exception instanceof $expectedClass && ($expectedClassCallback === null || $expectedClassCallback($exception));
 
             $actualMessage = $exception->getMessage();
         }

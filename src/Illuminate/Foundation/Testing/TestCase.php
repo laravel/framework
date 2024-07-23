@@ -5,7 +5,6 @@ namespace Illuminate\Foundation\Testing;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Foundation\Application;
 use PHPUnit\Framework\TestCase as BaseTestCase;
-use Throwable;
 
 abstract class TestCase extends BaseTestCase
 {
@@ -42,8 +41,6 @@ abstract class TestCase extends BaseTestCase
      */
     protected function setUp(): void
     {
-        static::$latestResponse = null;
-
         $this->setUpTheTestEnvironment();
     }
 
@@ -55,20 +52,6 @@ abstract class TestCase extends BaseTestCase
     protected function refreshApplication()
     {
         $this->app = $this->createApplication();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function transformException(Throwable $error): Throwable
-    {
-        $response = static::$latestResponse ?? null;
-
-        if (! is_null($response)) {
-            $response->transformNotSuccessfulException($error);
-        }
-
-        return $error;
     }
 
     /**
@@ -90,8 +73,6 @@ abstract class TestCase extends BaseTestCase
      */
     public static function tearDownAfterClass(): void
     {
-        static::$latestResponse = null;
-
         static::tearDownAfterClassUsingTestCase();
     }
 }

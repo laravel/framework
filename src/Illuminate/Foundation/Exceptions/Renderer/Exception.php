@@ -2,7 +2,9 @@
 
 namespace Illuminate\Foundation\Exceptions\Renderer;
 
+use Closure;
 use Composer\Autoload\ClassLoader;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Bootstrap\HandleExceptions;
 use Illuminate\Http\Request;
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
@@ -164,7 +166,7 @@ class Exception
     /**
      * Get the application's route context.
      *
-     * @return array<string, string>|null
+     * @return array<string, string>
      */
     public function applicationRouteContext()
     {
@@ -173,8 +175,10 @@ class Exception
         return $route ? array_filter([
             'controller' => $route->getActionName(),
             'route name' => $route->getName() ?: null,
-            'middleware' => implode(', ', $route->gatherMiddleware()),
-        ]) : null;
+            'middleware' => implode(', ', array_map(function ($middleware) {
+                return $middleware instanceof Closure ? 'Closure' : $middleware;
+            }, $route->gatherMiddleware())),
+        ]) : [];
     }
 
     /**
@@ -184,7 +188,7 @@ class Exception
      */
     public function applicationRouteParametersContext()
     {
-        $parameters = $this->request()->route()->parameters();
+        $parameters = $this->request()->route()?->parameters();
 
         return $parameters ? json_encode(array_map(
             fn ($value) => $value instanceof Model ? $value->withoutRelations() : $value,

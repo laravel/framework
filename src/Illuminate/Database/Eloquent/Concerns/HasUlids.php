@@ -40,7 +40,7 @@ trait HasUlids
     /**
      * Retrieve the model for a bound value.
      *
-     * @param  \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Relations\Relation  $query
+     * @param  \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Relations\Relation<*, *, *>  $query
      * @param  mixed  $value
      * @param  string|null  $field
      * @return \Illuminate\Contracts\Database\Eloquent\Builder

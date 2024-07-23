@@ -67,7 +67,7 @@ class DatabaseUserProvider implements UserProvider
      * @param  string  $token
      * @return \Illuminate\Contracts\Auth\Authenticatable|null
      */
-    public function retrieveByToken($identifier, $token)
+    public function retrieveByToken($identifier, #[\SensitiveParameter] $token)
     {
         $user = $this->getGenericUser(
             $this->connection->table($this->table)->find($identifier)
@@ -84,7 +84,7 @@ class DatabaseUserProvider implements UserProvider
      * @param  string  $token
      * @return void
      */
-    public function updateRememberToken(UserContract $user, $token)
+    public function updateRememberToken(UserContract $user, #[\SensitiveParameter] $token)
     {
         $this->connection->table($this->table)
                 ->where($user->getAuthIdentifierName(), $user->getAuthIdentifier())
@@ -97,7 +97,7 @@ class DatabaseUserProvider implements UserProvider
      * @param  array  $credentials
      * @return \Illuminate\Contracts\Auth\Authenticatable|null
      */
-    public function retrieveByCredentials(array $credentials)
+    public function retrieveByCredentials(#[\SensitiveParameter] array $credentials)
     {
         $credentials = array_filter(
             $credentials,
@@ -152,7 +152,7 @@ class DatabaseUserProvider implements UserProvider
      * @param  array  $credentials
      * @return bool
      */
-    public function validateCredentials(UserContract $user, array $credentials)
+    public function validateCredentials(UserContract $user, #[\SensitiveParameter] array $credentials)
     {
         return $this->hasher->check(
             $credentials['password'], $user->getAuthPassword()
@@ -167,7 +167,7 @@ class DatabaseUserProvider implements UserProvider
      * @param  bool  $force
      * @return void
      */
-    public function rehashPasswordIfRequired(UserContract $user, array $credentials, bool $force = false)
+    public function rehashPasswordIfRequired(UserContract $user, #[\SensitiveParameter] array $credentials, bool $force = false)
     {
         if (! $this->hasher->needsRehash($user->getAuthPassword()) && ! $force) {
             return;

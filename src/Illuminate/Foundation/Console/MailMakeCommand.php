@@ -7,7 +7,11 @@ use Illuminate\Console\GeneratorCommand;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Str;
 use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
+
+use function Laravel\Prompts\select;
 
 #[AsCommand(name: 'make:mail')]
 class MailMakeCommand extends GeneratorCommand
@@ -69,6 +73,8 @@ class MailMakeCommand extends GeneratorCommand
         $this->files->ensureDirectoryExists(dirname($path));
 
         $this->files->put($path, file_get_contents(__DIR__.'/stubs/markdown.stub'));
+
+        $this->components->info(sprintf('%s [%s] created successfully.', 'Markdown view', $path));
     }
 
     /**
@@ -91,6 +97,8 @@ class MailMakeCommand extends GeneratorCommand
         );
 
         $this->files->put($path, $stub);
+
+        $this->components->info(sprintf('%s [%s] created successfully.', 'View', $path));
     }
 
     /**
@@ -188,5 +196,29 @@ class MailMakeCommand extends GeneratorCommand
             ['markdown', 'm', InputOption::VALUE_OPTIONAL, 'Create a new Markdown template for the mailable', false],
             ['view', null, InputOption::VALUE_OPTIONAL, 'Create a new Blade template for the mailable', false],
         ];
+    }
+
+    /**
+     * Interact further with the user if they were prompted for missing arguments.
+     *
+     * @param  \Symfony\Component\Console\Input\InputInterface  $input
+     * @param  \Symfony\Component\Console\Output\OutputInterface  $output
+     * @return void
+     */
+    protected function afterPromptingForMissingArguments(InputInterface $input, OutputInterface $output)
+    {
+        if ($this->didReceiveOptions($input)) {
+            return;
+        }
+
+        $type = select('Would you like to create a view?', [
+            'markdown' => 'Markdown View',
+            'view' => 'Empty View',
+            'none' => 'No View',
+        ]);
+
+        if ($type !== 'none') {
+            $input->setOption($type, null);
+        }
     }
 }

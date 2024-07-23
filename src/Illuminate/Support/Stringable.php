@@ -112,6 +112,28 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     }
 
     /**
+     * Remove the given string if it exists at the start of the current string.
+     *
+     * @param  string|array  $needle
+     * @return static
+     */
+    public function chopStart($needle)
+    {
+        return new static(Str::chopStart($this->value, $needle));
+    }
+
+    /**
+     * Remove the given string if it exists at the end of the current string.
+     *
+     * @param  string|array  $needle
+     * @return static
+     */
+    public function chopEnd($needle)
+    {
+        return new static(Str::chopEnd($this->value, $needle));
+    }
+
+    /**
      * Get the basename of the class path.
      *
      * @return static
@@ -263,7 +285,7 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     }
 
     /**
-     * Explode the string into an array.
+     * Explode the string into a collection.
      *
      * @param  string  $delimiter
      * @param  int  $limit
@@ -432,11 +454,12 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
      * Convert GitHub flavored Markdown into HTML.
      *
      * @param  array  $options
+     * @param  array  $extensions
      * @return static
      */
-    public function markdown(array $options = [])
+    public function markdown(array $options = [], array $extensions = [])
     {
-        return new static(Str::markdown($this->value, $options));
+        return new static(Str::markdown($this->value, $options, $extensions));
     }
 
     /**

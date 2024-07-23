@@ -890,6 +890,24 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     public function search($value, $strict = false);
 
     /**
+     * Get the item before the given item.
+     *
+     * @param  TValue|(callable(TValue,TKey): bool)  $value
+     * @param  bool  $strict
+     * @return TValue|null
+     */
+    public function before($value, $strict = false);
+
+    /**
+     * Get the item after the given item.
+     *
+     * @param  TValue|(callable(TValue,TKey): bool)  $value
+     * @param  bool  $strict
+     * @return TValue|null
+     */
+    public function after($value, $strict = false);
+
+    /**
      * Shuffle the items in the collection.
      *
      * @return static
@@ -1128,7 +1146,7 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
      *
      * @param  string|array<array-key, string>  $value
      * @param  string|null  $key
-     * @return static<int, mixed>
+     * @return static<array-key, mixed>
      */
     public function pluck($value, $key = null);
 

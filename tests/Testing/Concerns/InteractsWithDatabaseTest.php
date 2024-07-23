@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Testing\Concerns;
 
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\Query\Expression;
+use Illuminate\Database\Query\Grammars\MariaDbGrammar;
 use Illuminate\Database\Query\Grammars\MySqlGrammar;
 use Illuminate\Database\Query\Grammars\PostgresGrammar;
 use Illuminate\Database\Query\Grammars\SQLiteGrammar;
@@ -114,6 +115,29 @@ class InteractsWithDatabaseTest extends TestCase
 
         $this->assertEquals(<<<'TEXT'
         cast('{"foo":"bar"}' as json)
+        TEXT,
+            $this->castAsJson((object) ['foo' => 'bar'], $grammar)
+        );
+    }
+
+    public function testCastToJsonMariaDb()
+    {
+        $grammar = new MariaDbGrammar();
+
+        $this->assertEquals(<<<'TEXT'
+        json_query('["foo","bar"]', '$')
+        TEXT,
+            $this->castAsJson(['foo', 'bar'], $grammar)
+        );
+
+        $this->assertEquals(<<<'TEXT'
+        json_query('["foo","bar"]', '$')
+        TEXT,
+            $this->castAsJson(collect(['foo', 'bar']), $grammar)
+        );
+
+        $this->assertEquals(<<<'TEXT'
+        json_query('{"foo":"bar"}', '$')
         TEXT,
             $this->castAsJson((object) ['foo' => 'bar'], $grammar)
         );

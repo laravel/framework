@@ -4,6 +4,7 @@ namespace Illuminate\Http\Exceptions;
 
 use RuntimeException;
 use Symfony\Component\HttpFoundation\Response;
+use Throwable;
 
 class HttpResponseException extends RuntimeException
 {
@@ -18,10 +19,13 @@ class HttpResponseException extends RuntimeException
      * Create a new HTTP response exception instance.
      *
      * @param  \Symfony\Component\HttpFoundation\Response  $response
+     * @param  \Throwable  $previous
      * @return void
      */
-    public function __construct(Response $response)
+    public function __construct(Response $response, ?Throwable $previous = null)
     {
+        parent::__construct($previous?->getMessage() ?? '', $previous?->getCode() ?? 0, $previous);
+
         $this->response = $response;
     }
 

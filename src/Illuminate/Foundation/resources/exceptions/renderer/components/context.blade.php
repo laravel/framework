@@ -1,3 +1,4 @@
+@use('Illuminate\Support\Str')
 <x-laravel-exceptions-renderer::card class="mt-6 overflow-x-auto">
     <div>
         <span class="text-xl font-bold lg:text-2xl">Request</span>
@@ -5,7 +6,7 @@
 
     <div class="mt-2">
         <span>{{ $exception->request()->method() }}</span>
-        <span class="text-gray-500">{{ $exception->request()->httpHost() }}</span>
+        <span class="text-gray-500">{{ Str::start($exception->request()->path(), '/') }}</span>
     </div>
 
     <div class="mt-4">

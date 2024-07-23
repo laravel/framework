@@ -3037,6 +3037,17 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertFalse($user->hasAttribute('nonexistent'));
         $this->assertFalse($user->hasAttribute('belongsToStub'));
     }
+
+    public function testModelToJsonSucceedsWithPriorErrors(): void
+    {
+        $user = new EloquentModelStub(['name' => 'Mateus']);
+
+        // Simulate a JSON error
+        json_decode('{');
+        $this->assertTrue(json_last_error() !== JSON_ERROR_NONE);
+
+        $this->assertSame('{"name":"Mateus"}', $user->toJson(JSON_THROW_ON_ERROR));
+    }
 }
 
 class EloquentTestObserverStub

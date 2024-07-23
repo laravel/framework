@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Database;
 
+use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\Grammars\SQLiteGrammar;
 use Illuminate\Support\Facades\DB;
@@ -134,11 +135,10 @@ class SchemaBuilderTest extends DatabaseTestCase
         $queries = $blueprint->toSql($this->getConnection(), $this->getConnection()->getSchemaGrammar());
 
         $expected = [
-            'alter table `test` '
-            .'modify `not_null_column_to_not_null` text not null, '
-            .'modify `not_null_column_to_nullable` text null, '
-            .'modify `nullable_column_to_nullable` text null, '
-            .'modify `nullable_column_to_not_null` text not null',
+            'alter table `test` modify `not_null_column_to_not_null` text not null',
+            'alter table `test` modify `not_null_column_to_nullable` text null',
+            'alter table `test` modify `nullable_column_to_nullable` text null',
+            'alter table `test` modify `nullable_column_to_not_null` text not null',
         ];
 
         $this->assertEquals($expected, $queries);
@@ -193,6 +193,27 @@ class SchemaBuilderTest extends DatabaseTestCase
 
         $this->assertEquals(collect(Schema::getColumns('test'))->firstWhere('name', 'new_foo')['default'], $defaultFoo);
         $this->assertEquals(collect(Schema::getColumns('test'))->firstWhere('name', 'new_bar')['default'], $defaultBar);
+    }
+
+    public function testModifyColumnWithZeroDefaultOnSqlite()
+    {
+        if ($this->driver !== 'sqlite') {
+            $this->markTestSkipped('Test requires a SQLite connection.');
+        }
+
+        Schema::create('test', static function (Blueprint $table) {
+            $table->integer('column_default_zero')->default(new Expression('0'));
+            $table->integer('column_to_change');
+        });
+
+        Schema::table('test', function (Blueprint $table) {
+            $table->smallInteger('column_to_change')->default(new Expression('0'))->change();
+        });
+
+        $columns = collect(Schema::getColumns('test'));
+
+        $this->assertSame('0', $columns->firstWhere('name', 'column_default_zero')['default']);
+        $this->assertSame('0', $columns->firstWhere('name', 'column_to_change')['default']);
     }
 
     public function testCompoundPrimaryWithAutoIncrement()
@@ -265,7 +286,7 @@ class SchemaBuilderTest extends DatabaseTestCase
         });
 
         Schema::table('test', function (Blueprint $table) {
-            $table->bigIncrements('id')->primary;
+            $table->bigIncrements('id');
         });
 
         $this->assertTrue(collect(Schema::getColumns('test'))->firstWhere('name', 'id')['auto_increment']);
@@ -690,6 +711,139 @@ class SchemaBuilderTest extends DatabaseTestCase
                     default => $column['generation']['expression'] === 'price - 10',
                 }
         ));
+    }
+
+    public function testAddForeignKeysOnSqlite()
+    {
+        if ($this->driver !== 'sqlite') {
+            $this->markTestSkipped('Test requires a SQLite connection.');
+        }
+
+        Schema::create('users', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+        });
+
+        Schema::create('posts', function (Blueprint $table) {
+            $table->string('title')->unique();
+        });
+
+        Schema::table('posts', function (Blueprint $table) {
+            $table->foreignId('user_id')->nullable()->index()->constrained();
+            $table->string('user_name');
+            $table->foreign('user_name')->references('name')->on('users');
+        });
+
+        $foreignKeys = Schema::getForeignKeys('posts');
+        $this->assertCount(2, $foreignKeys);
+        $this->assertTrue(collect($foreignKeys)->contains(fn ($foreign) => $foreign['columns'] === ['user_id'] && $foreign['foreign_table'] === 'users' && $foreign['foreign_columns'] === ['id']));
+        $this->assertTrue(collect($foreignKeys)->contains(fn ($foreign) => $foreign['columns'] === ['user_name'] && $foreign['foreign_table'] === 'users' && $foreign['foreign_columns'] === ['name']));
+        $this->assertTrue(Schema::hasColumns('posts', ['title', 'user_id', 'user_name']));
+        $this->assertTrue(Schema::hasIndex('posts', ['user_id']));
+        $this->assertTrue(Schema::hasIndex('posts', ['title'], 'unique'));
+    }
+
+    public function testDropForeignKeysOnSqlite()
+    {
+        if ($this->driver !== 'sqlite') {
+            $this->markTestSkipped('Test requires a SQLite connection.');
+        }
+
+        Schema::create('users', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+        });
+
+        Schema::create('posts', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('user_id')->nullable()->index()->constrained();
+            $table->string('user_name')->unique();
+            $table->foreign('user_name')->references('name')->on('users');
+        });
+
+        $foreignKeys = Schema::getForeignKeys('posts');
+        $this->assertCount(2, $foreignKeys);
+        $this->assertTrue(collect($foreignKeys)->contains(fn ($foreign) => $foreign['columns'] === ['user_id'] && $foreign['foreign_table'] === 'users' && $foreign['foreign_columns'] === ['id']));
+        $this->assertTrue(collect($foreignKeys)->contains(fn ($foreign) => $foreign['columns'] === ['user_name'] && $foreign['foreign_table'] === 'users' && $foreign['foreign_columns'] === ['name']));
+        $this->assertTrue(Schema::hasIndex('posts', ['id'], 'primary'));
+
+        Schema::table('posts', function (Blueprint $table) {
+            $table->string('title')->unique();
+            $table->dropIndex(['user_id']);
+            $table->dropForeign(['user_id']);
+            $table->dropColumn('user_id');
+        });
+
+        $foreignKeys = Schema::getForeignKeys('posts');
+        $this->assertCount(1, $foreignKeys);
+        $this->assertTrue(collect($foreignKeys)->contains(fn ($foreign) => $foreign['columns'] === ['user_name'] && $foreign['foreign_table'] === 'users' && $foreign['foreign_columns'] === ['name']));
+        $this->assertTrue(Schema::hasColumns('posts', ['user_name', 'title']));
+        $this->assertTrue(Schema::hasIndex('posts', ['id'], 'primary'));
+        $this->assertTrue(Schema::hasIndex('posts', ['title'], 'unique'));
+        $this->assertTrue(Schema::hasIndex('posts', ['user_name'], 'unique'));
+        $this->assertFalse(Schema::hasColumn('posts', 'user_id'));
+        $this->assertFalse(Schema::hasIndex('posts', ['user_id']));
+    }
+
+    public function testAddAndDropPrimaryOnSqlite()
+    {
+        if ($this->driver !== 'sqlite') {
+            $this->markTestSkipped('Test requires a SQLite connection.');
+        }
+
+        Schema::create('users', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+        });
+
+        Schema::create('posts', function (Blueprint $table) {
+            $table->foreignId('user_id')->nullable()->index()->constrained();
+            $table->string('user_name')->unique();
+            $table->foreign('user_name')->references('name')->on('users');
+        });
+
+        Schema::table('posts', function (Blueprint $table) {
+            $table->string('title')->primary();
+            $table->dropIndex(['user_id']);
+            $table->dropForeign(['user_id']);
+            $table->dropColumn('user_id');
+        });
+
+        $foreignKeys = Schema::getForeignKeys('posts');
+        $this->assertCount(1, $foreignKeys);
+        $this->assertTrue(collect($foreignKeys)->contains(fn ($foreign) => $foreign['columns'] === ['user_name'] && $foreign['foreign_table'] === 'users' && $foreign['foreign_columns'] === ['name']));
+        $this->assertTrue(Schema::hasColumns('posts', ['user_name', 'title']));
+        $this->assertTrue(Schema::hasIndex('posts', ['title'], 'primary'));
+        $this->assertTrue(Schema::hasIndex('posts', ['user_name'], 'unique'));
+        $this->assertFalse(Schema::hasColumn('posts', 'user_id'));
+        $this->assertFalse(Schema::hasIndex('posts', ['user_id']));
+
+        Schema::table('posts', function (Blueprint $table) {
+            $table->dropPrimary();
+            $table->integer('votes');
+        });
+
+        $foreignKeys = Schema::getForeignKeys('posts');
+        $this->assertCount(1, $foreignKeys);
+        $this->assertTrue(collect($foreignKeys)->contains(fn ($foreign) => $foreign['columns'] === ['user_name'] && $foreign['foreign_table'] === 'users' && $foreign['foreign_columns'] === ['name']));
+        $this->assertTrue(Schema::hasColumns('posts', ['user_name', 'title', 'votes']));
+        $this->assertFalse(Schema::hasIndex('posts', ['title'], 'primary'));
+        $this->assertTrue(Schema::hasIndex('posts', ['user_name'], 'unique'));
+    }
+
+    public function testSetJournalModeOnSqlite()
+    {
+        if ($this->driver !== 'sqlite') {
+            $this->markTestSkipped('Test requires a SQLite connection.');
+        }
+
+        file_put_contents(DB::connection('sqlite')->getConfig('database'), '');
+
+        $this->assertSame('delete', DB::connection('sqlite')->select('PRAGMA journal_mode')[0]->journal_mode);
+
+        Schema::connection('sqlite')->setJournalMode('WAL');
+
+        $this->assertSame('wal', DB::connection('sqlite')->select('PRAGMA journal_mode')[0]->journal_mode);
     }
 
     public function testAddingMacros()

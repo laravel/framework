@@ -211,8 +211,6 @@ class AssertableJsonString implements ArrayAccess, Countable
             'within'.PHP_EOL.PHP_EOL.
             "[{$actual}]."
         );
-
-        return $this;
     }
 
     /**
