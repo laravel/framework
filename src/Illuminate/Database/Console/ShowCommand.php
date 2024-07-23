@@ -45,7 +45,7 @@ class ShowCommand extends DatabaseInspectionCommand
         $data = [
             'platform' => [
                 'config' => $this->getConfigFromDatabase($database),
-                'name' => $connection->getName(),
+                'name' => $connection->getDriverTitle(),
                 'driver' => $connection->getDriverName(),
                 'version' => $connection->getServerVersion(),
                 'open_connections' => $this->getConnectionCount($connection),

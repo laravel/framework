@@ -1564,14 +1564,4 @@ class Grammar extends BaseGrammar
     {
         return $this->bitwiseOperators;
     }
-
-    /**
-     * Get the number of open connections for a database.
-     *
-     * @return string|null
-     */
-    public function compileConnectionCount()
-    {
-        return null;
-    }
 }

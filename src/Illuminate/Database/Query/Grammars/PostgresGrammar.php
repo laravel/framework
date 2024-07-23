@@ -762,9 +762,4 @@ class PostgresGrammar extends Grammar
 
         return $query;
     }
-
-    public function compileConnectionCount()
-    {
-        return 'select count(*) as "Value" from pg_stat_activity';
-    }
 }

@@ -571,9 +571,4 @@ class SqlServerGrammar extends Grammar
 
         return $table;
     }
-
-    public function compileConnectionCount()
-    {
-        return 'select count(*) Value from sys.dm_exec_sessions where status = "running"';
-    }
 }

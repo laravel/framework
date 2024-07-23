@@ -1348,6 +1348,16 @@ class Connection implements ConnectionInterface
     }
 
     /**
+     * Get a human-readable name for the given connection driver.
+     *
+     * @return string
+     */
+    public function getDriverTitle()
+    {
+        return $this->getDriverName();
+    }
+
+    /**
      * Get the query grammar used by the connection.
      *
      * @return \Illuminate\Database\Query\Grammars\Grammar

@@ -32,6 +32,14 @@ class SQLiteConnection extends Connection
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getDriverTitle()
+    {
+        return 'SQLite';
+    }
+
+    /**
      * Enable or disable foreign key constraints if configured.
      *
      * @return void

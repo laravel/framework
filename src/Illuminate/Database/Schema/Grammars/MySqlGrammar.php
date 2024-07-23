@@ -1337,4 +1337,9 @@ class MySqlGrammar extends Grammar
 
         return 'json_unquote(json_extract('.$field.$path.'))';
     }
+
+    public function compileConnectionCount()
+    {
+        return 'show status where variable_name = "threads_connected"';
+    }
 }

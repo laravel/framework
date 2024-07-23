@@ -20,19 +20,11 @@ abstract class DatabaseInspectionCommand extends Command
      * @param  string  $database
      * @return string
      *
-     * @deprecated Use $connection->getName() instead.
+     * @deprecated Use $connection->getDriverTitle() instead.
      */
     protected function getConnectionName(ConnectionInterface $connection, $database)
     {
-        return match (true) {
-            $connection instanceof MariaDbConnection => 'MariaDB',
-            $connection instanceof MySqlConnection && $connection->isMaria() => 'MariaDB',
-            $connection instanceof MySqlConnection => 'MySQL',
-            $connection instanceof PostgresConnection => 'PostgreSQL',
-            $connection instanceof SQLiteConnection => 'SQLite',
-            $connection instanceof SqlServerConnection => 'SQL Server',
-            default => $database,
-        };
+        return $connection->getDriverTitle();
     }
 
     /**
