@@ -43,7 +43,9 @@ abstract class DatabaseInspectionCommand extends Command
      */
     protected function getConnectionCount(ConnectionInterface $connection)
     {
-        return $connection->getQueryGrammar()->getConnectionCount();
+        $query = $connection->getSchemaGrammar()->compileConnectionCount();
+
+        return $query ? $connection->scalar($query) : null;
     }
 
     /**

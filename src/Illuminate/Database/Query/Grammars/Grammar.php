@@ -1568,9 +1568,9 @@ class Grammar extends BaseGrammar
     /**
      * Get the number of open connections for a database.
      *
-     * @return int|null
+     * @return string|null
      */
-    public function getConnectionCount(): ?int
+    public function compileConnectionCount()
     {
         return null;
     }
