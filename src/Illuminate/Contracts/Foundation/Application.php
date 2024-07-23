@@ -123,9 +123,10 @@ interface Application extends Container
     /**
      * Register all of the configured providers.
      *
+     * @param  \Illuminate\Foundation\ProviderRepository|null  $providerRepository
      * @return void
      */
-    public function registerConfiguredProviders();
+    public function registerConfiguredProviders($providerRepository);
 
     /**
      * Register a service provider with the application.
