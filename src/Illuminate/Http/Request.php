@@ -349,10 +349,10 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      */
     public function merge(array $input)
     {
-        return tap($this, function(Request $request) use ($input){
+        return tap($this, function (Request $request) use ($input) {
             $request->getInputSource()
                     ->replace(collect($input)->reduce(
-                        fn($requestInput, $value, $key) => data_set($requestInput, $key, $value),
+                        fn ($requestInput, $value, $key) => data_set($requestInput, $key, $value),
                         $this->getInputSource()->all()
                     ));
         });
