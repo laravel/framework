@@ -1057,6 +1057,6 @@ class SqlServerGrammar extends Grammar
 
     public function compileConnectionCount()
     {
-        return 'select count(*) Value from sys.dm_exec_sessions where status = "running"';
+        return 'select count(*) Value from sys.dm_exec_sessions where status = N\'running\'';
     }
 }
