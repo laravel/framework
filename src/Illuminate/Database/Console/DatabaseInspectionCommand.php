@@ -27,12 +27,12 @@ abstract class DatabaseInspectionCommand extends Command
      *
      * @param  \Illuminate\Database\ConnectionInterface  $connection
      * @return int|null
+     *
+     * @deprecated Use Schema\Builder::getConnectionCount() instead.
      */
     protected function getConnectionCount(ConnectionInterface $connection)
     {
-        $query = $connection->getSchemaGrammar()->compileConnectionCount();
-
-        return $query ? $connection->scalar($query) : null;
+        return $connection->getSchemaBuilder()->getConnectionCount();
     }
 
     /**
