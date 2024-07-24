@@ -21,9 +21,11 @@ class SqliteSchemaState extends SchemaState
             //
         ]));
 
-        $migrations = preg_replace('/CREATE TABLE sqlite_.+\);[\r\n]+/is', '', $process->getOutput());
+        $migrations = collect(preg_split("/\r\n|\n|\r/", $process->getOutput()))->reject(function ($line) {
+            return str_starts_with($line, 'CREATE TABLE sqlite_');
+        })->all();
 
-        $this->files->put($path, $migrations.PHP_EOL);
+        $this->files->put($path, implode(PHP_EOL, $migrations).PHP_EOL);
 
         if ($this->hasMigrationTable()) {
             $this->appendMigrationData($path);
