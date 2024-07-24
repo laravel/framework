@@ -82,7 +82,8 @@ class FilesystemServiceProvider extends ServiceProvider
                     : '/storage';
 
                 Route::get($path.'/{file}', function (Request $request, $file) use ($disk, $config) {
-                    if (! $request->hasValidRelativeSignature()) {
+                    if (($config['visibility'] ?? 'private') !== 'public' &&
+                        ! $request->hasValidRelativeSignature()) {
                         abort(403);
                     }
 
