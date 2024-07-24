@@ -2273,7 +2273,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     * Add an "where" clause to the query for multiple columns with "or" conditions between them.
+     * Add a "where" clause to the query for multiple columns with "or" conditions between them.
      *
      * @param  string[]  $columns
      * @param  string  $operator
