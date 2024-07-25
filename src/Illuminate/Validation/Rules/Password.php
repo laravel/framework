@@ -218,6 +218,9 @@ class Password implements Rule, DataAwareRule, ValidatorAwareRule
      */
     public function max($size)
     {
+        if ($size > 72 && config('hashing.driver') === 'bcrypt') {
+            $size = 72;
+        }
         $this->max = $size;
 
         return $this;
