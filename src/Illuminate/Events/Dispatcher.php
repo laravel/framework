@@ -371,7 +371,7 @@ class Dispatcher implements DispatcherContract
         );
 
         return class_exists($eventName, false)
-                    ? $this->addInterfaceListeners($eventName, $listeners)
+                    ? $this->addInterfaceAndParentListeners($eventName, $listeners)
                     : $listeners;
     }
 
@@ -397,17 +397,19 @@ class Dispatcher implements DispatcherContract
     }
 
     /**
-     * Add the listeners for the event's interfaces to the given array.
+     * Add the listeners for the event's interfaces and parents to the given array.
      *
      * @param  string  $eventName
      * @param  array  $listeners
      * @return array
      */
-    protected function addInterfaceListeners($eventName, array $listeners = [])
+    protected function addInterfaceAndParentListeners($eventName, array $listeners = [])
     {
-        foreach (class_implements($eventName) as $interface) {
-            if (isset($this->listeners[$interface])) {
-                foreach ($this->prepareListeners($interface) as $names) {
+        $types = [...class_implements($eventName), ...class_parents($eventName)];
+
+        foreach ($types as $type) {
+            if (isset($this->listeners[$type])) {
+                foreach ($this->prepareListeners($type) as $names) {
                     $listeners = array_merge($listeners, (array) $names);
                 }
             }

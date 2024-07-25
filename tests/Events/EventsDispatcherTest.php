@@ -393,6 +393,18 @@ class EventsDispatcherTest extends TestCase
         $this->assertSame('bar', $_SERVER['__event.test']);
     }
 
+    public function testParentsWork()
+    {
+        unset($_SERVER['__event.test']);
+        $d = new Dispatcher;
+        $d->listen(ParentEvent::class, function () {
+            $_SERVER['__event.test'] = 'bar';
+        });
+        $d->dispatch(new EventWithParent);
+
+        $this->assertSame('bar', $_SERVER['__event.test']);
+    }
+
     public function testBothClassesAndInterfacesWork()
     {
         unset($_SERVER['__event.test']);
@@ -628,12 +640,22 @@ class ExampleEvent
     //
 }
 
+class ParentEvent
+{
+    //
+}
+
 interface SomeEventInterface
 {
     //
 }
 
 class AnotherEvent implements SomeEventInterface
+{
+    //
+}
+
+class EventWithParent extends ParentEvent
 {
     //
 }
