@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Container;
 
 use Attribute;
 use Illuminate\Config\Repository;
+use Illuminate\Container\Attributes\Config;
 use Illuminate\Container\Attributes\Storage;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Container\ContextualAttribute;
@@ -83,6 +84,20 @@ class ContextualAttributeBindingTest extends TestCase
         $class = $container->make(ContainerTestHasConfigValueWithResolvePropertyAndAfterCallback::class);
 
         $this->assertEquals('Developer', $class->person->role);
+    }
+
+    public function testConfigAttribute()
+    {
+        $container = new Container;
+        $container->singleton('config', function () {
+            $mockConfig = m::mock(Repository::class);
+            $mockConfig->shouldReceive('get')->with('foo', null)->andReturn('foo');
+            $mockConfig->shouldReceive('get')->with('bar', null)->andReturn('bar');
+
+            return $mockConfig;
+        });
+
+        $container->make(ConfigTest::class);
     }
 
     public function testStorageAttribute()
@@ -200,6 +215,13 @@ final class ContainerTestHasConfigValueWithResolvePropertyAndAfterCallback
         #[ContainerTestConfigValueWithResolveAndAfter]
         public object $person
     ) {
+    }
+}
+
+final class ConfigTest
+{
+    public function __construct(#[Config('foo')] string $foo, #[Config('bar')] string $bar)
+    {
     }
 }
 
