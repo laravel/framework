@@ -1383,7 +1383,6 @@ class Application extends Container implements ApplicationContract, CachesConfig
      * @return never
      *
      * @throws \Symfony\Component\HttpKernel\Exception\HttpException
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     public function abort($code, $message = '', array $headers = [])
     {
