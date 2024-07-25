@@ -453,6 +453,127 @@ trait QueriesRelationships
     }
 
     /**
+     * Add a "where in" clause to a relationship query.
+     *
+     * @param  \Illuminate\Database\Eloquent\Relations\Relation<*, *, *>|string  $relation
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
+     * @param  mixed  $values
+     * @param  bool  $not
+     * @return $this
+     */
+    public function whereInRelation($relation, $column, $values, $not = false)
+    {
+        return $this->whereHas($relation, function ($query) use ($column, $values, $not) {
+            $query->whereIn($column, $values, not: $not);
+        });
+    }
+
+    /**
+     * Add an "or where in" clause to a relationship query.
+     *
+     * @param  \Illuminate\Database\Eloquent\Relations\Relation<*, *, *>|string  $relation
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
+     * @param  mixed  $values
+     * @param  bool  $not
+     * @return $this
+     */
+    public function orWhereInRelation($relation, $column, $values, $not = false)
+    {
+        return $this->orWhereHas($relation, function ($query) use ($column, $values, $not) {
+            $query->whereIn($column, $values, not: $not);
+        });
+    }
+
+    /**
+     * Add a "where not in" clause to a relationship query.
+     *
+     * @param  \Illuminate\Database\Eloquent\Relations\Relation<*, *, *>|string  $relation
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
+     * @param  mixed  $values
+     * @param  bool  $not
+     * @return $this
+     */
+    public function whereNotInRelation($relation, $column, $values)
+    {
+        return $this->whereInRelation($relation, $column, $values, true);
+    }
+
+    /**
+     * Add an "or where not in" clause to a relationship query.
+     *
+     * @param  \Illuminate\Database\Eloquent\Relations\Relation<*, *, *>|string  $relation
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
+     * @param  mixed  $values
+     * @return $this
+     */
+    public function orWhereNotInRelation($relation, $column, $values)
+    {
+        return $this->orWhereInRelation($relation, $column, $values, true);
+    }
+
+    /**
+     * Add a polymorphic relationship condition to the query with a "where in" clause.
+     *
+     * @param  \Illuminate\Database\Eloquent\Relations\MorphTo<*, *>|string  $relation
+     * @param  string|array  $types
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
+     * @param  mixed  $values
+     * @param  bool  $not
+     * @return $this
+     */
+    public function whereInMorphRelation($relation, $types, $column, $values, $not = false)
+    {
+        return $this->whereHasMorph($relation, $types, function ($query) use ($column, $values, $not) {
+            $query->whereIn($column, $values, not: $not);
+        });
+    }
+
+    /**
+     * Add a polymorphic relationship condition to the query with an "or where in" clause.
+     *
+     * @param  \Illuminate\Database\Eloquent\Relations\MorphTo<*, *>|string  $relation
+     * @param  string|array  $types
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
+     * @param  mixed  $values
+     * @param  bool  $not
+     * @return $this
+     */
+    public function orWhereInMorphRelation($relation, $types, $column, $values, $not = false)
+    {
+        return $this->orWhereHasMorph($relation, $types, function ($query) use ($column, $values, $not) {
+            $query->whereIn($column, $values, not: $not);
+        });
+    }
+
+    /**
+     * Add a polymorphic relationship condition to the query with a "where not in" clause.
+     *
+     * @param  \Illuminate\Database\Eloquent\Relations\MorphTo<*, *>|string  $relation
+     * @param  string|array  $types
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
+     * @param  mixed  $values
+     * @return $this
+     */
+    public function whereNotInMorphRelation($relation, $types, $column, $values)
+    {
+        return $this->whereInMorphRelation($relation, $types, $column, $values, true);
+    }
+
+    /**
+     * Add a polymorphic relationship condition to the query with an "or where not in" clause.
+     *
+     * @param  \Illuminate\Database\Eloquent\Relations\MorphTo<*, *>|string  $relation
+     * @param  string|array  $types
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
+     * @param  mixed  $values
+     * @return $this
+     */
+    public function orWhereNotInMorphRelation($relation, $types, $column, $values)
+    {
+        return $this->orWhereInMorphRelation($relation, $types, $column, $values, true);
+    }
+
+    /**
      * Add a morph-to relationship condition to the query.
      *
      * @param  \Illuminate\Database\Eloquent\Relations\MorphTo<*, *>|string  $relation

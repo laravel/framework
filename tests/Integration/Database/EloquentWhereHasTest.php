@@ -23,6 +23,7 @@ class EloquentWhereHasTest extends DatabaseTestCase
             $table->increments('id');
             $table->unsignedInteger('user_id');
             $table->boolean('public');
+            $table->string('category');
         });
 
         Schema::create('texts', function (Blueprint $table) {
@@ -38,12 +39,12 @@ class EloquentWhereHasTest extends DatabaseTestCase
         });
 
         $user = User::create();
-        $post = tap((new Post(['public' => true]))->user()->associate($user))->save();
+        $post = tap((new Post(['public' => true, 'category' => 'foo']))->user()->associate($user))->save();
         (new Comment)->commentable()->associate($post)->save();
         (new Text(['content' => 'test']))->post()->associate($post)->save();
 
         $user = User::create();
-        $post = tap((new Post(['public' => false]))->user()->associate($user))->save();
+        $post = tap((new Post(['public' => false, 'category' => 'bar']))->user()->associate($user))->save();
         (new Comment)->commentable()->associate($post)->save();
         (new Text(['content' => 'test2']))->post()->associate($post)->save();
     }
@@ -156,6 +157,96 @@ class EloquentWhereHasTest extends DatabaseTestCase
             ->get();
 
         $this->assertEquals([1, 2], $comments->pluck('id')->all());
+    }
+
+    public function testWhereInRelation()
+    {
+        $users = User::whereInRelation('posts', 'category', ['foo', 'test'])->get();
+        $users2 = User::whereInRelation('posts', 'category', ['foo', 'bar'])->get();
+
+        $this->assertEquals([1], $users->pluck('id')->all());
+        $this->assertEquals([1, 2], $users2->pluck('id')->all());
+    }
+
+    public function testOrWhereInRelation()
+    {
+        $users = User::whereInRelation('posts', 'category', ['baz', 'test'])->orWhereInRelation('posts', 'category', ['foo', 'random'])->get();
+        $users2 = User::whereInRelation('posts', 'category', ['baz'])->orWhereInRelation('posts', 'category', ['foo', 'bar'])->get();
+
+        $this->assertEquals([1], $users->pluck('id')->all());
+        $this->assertEquals([1, 2], $users2->pluck('id')->all());
+    }
+
+    public function testNestedWhereInRelation()
+    {
+        $texts = User::whereInRelation('posts.texts', 'content', ['test', 'random'])->get();
+        $texts2 = User::whereInRelation('posts.texts', 'content', ['test', 'test2'])->get();
+
+        $this->assertEquals([1], $texts->pluck('id')->all());
+        $this->assertEquals([1, 2], $texts2->pluck('id')->all());
+    }
+
+    public function testNestedOrWhereInRelation()
+    {
+        $texts = User::whereInRelation('posts.texts', 'content', ['random', 'text'])->orWhereInRelation('posts.texts', 'content', ['test', 'something'])->get();
+        $texts2 = User::whereInRelation('posts.texts', 'content', ['random', 'text'])->orWhereInRelation('posts.texts', 'content', ['test', 'test2'])->get();
+
+        $this->assertEquals([1], $texts->pluck('id')->all());
+        $this->assertEquals([1, 2], $texts2->pluck('id')->all());
+    }
+
+    public function testWhereNotInRelation()
+    {
+        $users = User::whereNotInRelation('posts', 'category', ['random', 'category'])->get();
+        $users2 = User::whereNotInRelation('posts', 'category', ['bar'])->get();
+        $users3 = User::whereNotInRelation('posts', 'category', ['foo', 'bar'])->get();
+
+        $this->assertEquals([1, 2], $users->pluck('id')->all());
+        $this->assertEquals([1], $users2->pluck('id')->all());
+        $this->assertEquals([], $users3->pluck('id')->all());
+    }
+
+    public function testOrWhereNotInRelation()
+    {
+        $users = User::whereRelation('posts', 'public', true)->orWhereNotInRelation('posts', 'category', ['bar'])->get();
+
+        $this->assertEquals([1], $users->pluck('id')->all());
+    }
+
+    public function testWhereInMorphRelation()
+    {
+        $comments = Comment::whereInMorphRelation('commentable', '*', 'category', ['foo', 'random'])->get();
+        $comments2 = Comment::whereInMorphRelation('commentable', Post::class, 'category', ['foo', 'bar'])->get();
+
+        $this->assertEquals([1], $comments->pluck('id')->all());
+        $this->assertEquals([1, 2], $comments2->pluck('id')->all());
+    }
+
+    public function testOrWhereInMorphRelation()
+    {
+        $comments = Comment::whereInMorphRelation('commentable', '*', 'category', ['baz', 'random'])->orWhereInMorphRelation('commentable', '*', 'category', ['foo', 'test'])->get();
+        $comments2 = Comment::whereInMorphRelation('commentable', Post::class, 'category', ['baz'])->orWhereInMorphRelation('commentable', Post::class, 'category', ['foo', 'bar'])->get();
+
+        $this->assertEquals([1], $comments->pluck('id')->all());
+        $this->assertEquals([1, 2], $comments2->pluck('id')->all());
+    }
+
+    public function testWhereNotInMorphRelation()
+    {
+        $comments = Comment::whereNotInMorphRelation('commentable', '*', 'category', ['random', 'category'])->get();
+        $comments2 = Comment::whereNotInMorphRelation('commentable', '*', 'category', ['bar'])->get();
+        $comments3 = Comment::whereNotInMorphRelation('commentable', Post::class, 'category', ['foo', 'bar'])->get();
+
+        $this->assertEquals([1, 2], $comments->pluck('id')->all());
+        $this->assertEquals([1], $comments2->pluck('id')->all());
+        $this->assertEquals([], $comments3->pluck('id')->all());
+    }
+
+    public function testOrWhereNotInMorphRelation()
+    {
+        $comments = Comment::whereMorphRelation('commentable', '*', 'public', true)->orWhereNotInMorphRelation('commentable', '*', 'category', ['bar'])->get();
+
+        $this->assertEquals([1], $comments->pluck('id')->all());
     }
 
     public function testWithCount()
