@@ -21,7 +21,7 @@ class Storage implements ContextualAttribute
      *
      * @param  self  $attribute
      * @param  \Illuminate\Contracts\Container\Container  $container
-     * @return mixed
+     * @return \Illuminate\Contracts\Filesystem\Filesystem
      */
     public static function resolve(self $attribute, Container $container)
     {
