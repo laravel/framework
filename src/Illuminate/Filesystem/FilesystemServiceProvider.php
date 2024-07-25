@@ -74,7 +74,7 @@ class FilesystemServiceProvider extends ServiceProvider
         }
 
         foreach ($this->app['config']['filesystems.disks'] ?? [] as $disk => $config) {
-            if (! $this->serveable($config)) {
+            if (! $this->shouldServeFiles($config)) {
                 continue;
             }
 
@@ -96,7 +96,7 @@ class FilesystemServiceProvider extends ServiceProvider
      * @param  array  $config
      * @return bool
      */
-    protected function serveable(array $config)
+    protected function shouldServeFiles(array $config)
     {
         return $config['driver'] === 'local' && ($config['serve'] ?? false);
     }
