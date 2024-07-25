@@ -774,7 +774,10 @@ class Validator implements ValidatorContract
      */
     protected function presentOrRuleIsImplicit($rule, $attribute, $value)
     {
-        if (is_string($value) && trim($value) === '') {
+        if (
+            (is_null($value) || (is_string($value) && trim($value) === '')) &&
+            !$this->hasRule($attribute, ['Present', 'Nullable'])
+        ) {
             return $this->isImplicit($rule);
         }
 
