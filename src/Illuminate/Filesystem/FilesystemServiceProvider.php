@@ -84,13 +84,23 @@ class FilesystemServiceProvider extends ServiceProvider
                 Route::get($path.'/{file}', function (Request $request, $file) use ($disk, $config) {
                     if (($config['visibility'] ?? 'private') === 'private' &&
                         ! $request->hasValidRelativeSignature()) {
-                        abort(403);
+                        abort($this->app->isProduction() ? 404 : 403);
                     }
 
                     try {
-                        return Storage::disk($disk)->exists($file)
-                            ? Storage::disk($disk)->serve($request, $file)
-                            : abort(404);
+                        abort_unless(Storage::disk($disk)->exists($file), 404);
+
+                        $headers = [
+                            'Content-Security-Policy' => "default-src 'none'; style-src 'unsafe-inline'; sandbox",
+                        ];
+
+                        $response = Storage::disk($disk)->serve($request, $file, headers: $headers);
+
+                        if (! $response->headers->has('Content-Security-Policy')) {
+                            $response->headers->replace($headers);
+                        }
+
+                        return $response;
                     } catch (PathTraversalDetected $e) {
                         abort(404);
                     }

@@ -326,13 +326,15 @@ class FilesystemAdapter implements CloudFilesystemContract
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  string  $path
+     * @param  string|null  $name
+     * @param  array  $headers
      * @return \Symfony\Component\HttpFoundation\StreamedResponse
      */
-    public function serve(Request $request, $path)
+    public function serve(Request $request, $path, $name = null, array $headers = [])
     {
         return isset($this->serveCallback)
-            ? call_user_func($this->serveCallback, $request, $path)
-            : $this->download($path);
+            ? call_user_func($this->serveCallback, $request, $path, $headers)
+            : $this->response($path, $name, $headers);
     }
 
     /**
@@ -340,6 +342,7 @@ class FilesystemAdapter implements CloudFilesystemContract
      *
      * @param  string  $path
      * @param  string|null  $name
+     * @param  array  $headers
      * @return \Symfony\Component\HttpFoundation\StreamedResponse
      */
     public function download($path, $name = null, array $headers = [])
