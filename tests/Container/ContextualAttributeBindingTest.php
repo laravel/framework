@@ -4,12 +4,21 @@ namespace Illuminate\Tests\Container;
 
 use Attribute;
 use Illuminate\Config\Repository;
+use Illuminate\Container\Attributes\Storage;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Container\ContextualAttribute;
+use Illuminate\Contracts\Filesystem\Filesystem;
+use Illuminate\Filesystem\FilesystemManager;
+use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
 class ContextualAttributeBindingTest extends TestCase
 {
+    protected function tearDown(): void
+    {
+        m::close();
+    }
+
     public function testDependencyCanBeResolvedFromAttributeBinding()
     {
         $container = new Container;
@@ -74,6 +83,20 @@ class ContextualAttributeBindingTest extends TestCase
         $class = $container->make(ContainerTestHasConfigValueWithResolvePropertyAndAfterCallback::class);
 
         $this->assertEquals('Developer', $class->person->role);
+    }
+
+    public function testStorageAttribute()
+    {
+        $container = new Container;
+        $container->singleton('filesystem', function () {
+            $mockFilesystemManager = m::mock(FilesystemManager::class);
+            $mockFilesystemManager->shouldReceive('disk')->with('foo')->andReturn(m::mock(Filesystem::class));
+            $mockFilesystemManager->shouldReceive('disk')->with('bar')->andReturn(m::mock(Filesystem::class));
+
+            return $mockFilesystemManager;
+        });
+
+        $container->make(StorageTest::class);
     }
 }
 
@@ -177,5 +200,12 @@ final class ContainerTestHasConfigValueWithResolvePropertyAndAfterCallback
         #[ContainerTestConfigValueWithResolveAndAfter]
         public object $person
     ) {
+    }
+}
+
+final class StorageTest
+{
+    public function __construct(#[Storage('foo')] Filesystem $foo, #[Storage('bar')] Filesystem $bar)
+    {
     }
 }
