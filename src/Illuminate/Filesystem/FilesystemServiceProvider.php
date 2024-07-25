@@ -4,9 +4,7 @@ namespace Illuminate\Filesystem;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\ServiceProvider;
-use League\Flysystem\PathTraversalDetected;
 
 class FilesystemServiceProvider extends ServiceProvider
 {
@@ -76,41 +74,31 @@ class FilesystemServiceProvider extends ServiceProvider
         }
 
         foreach ($this->app['config']['filesystems.disks'] ?? [] as $disk => $config) {
-            if ($config['driver'] !== 'local' || ! ($config['serve'] ?? false)) {
+            if (! $this->serveable($config)) {
                 continue;
             }
 
             $this->app->booted(function () use ($disk, $config) {
-                $path = isset($config['url'])
+                $uri = isset($config['url'])
                     ? rtrim(parse_url($config['url'])['path'], '/')
                     : '/storage';
 
-                Route::get($path.'/{file}', function (Request $request, $file) use ($disk, $config) {
-                    if (($config['visibility'] ?? 'private') === 'private' &&
-                        ! $request->hasValidRelativeSignature()) {
-                        abort($this->app->isProduction() ? 404 : 403);
-                    }
-
-                    try {
-                        abort_unless(Storage::disk($disk)->exists($file), 404);
-
-                        $headers = [
-                            'Content-Security-Policy' => "default-src 'none'; style-src 'unsafe-inline'; sandbox",
-                        ];
-
-                        $response = Storage::disk($disk)->serve($request, $file, headers: $headers);
-
-                        if (! $response->headers->has('Content-Security-Policy')) {
-                            $response->headers->replace($headers);
-                        }
-
-                        return $response;
-                    } catch (PathTraversalDetected $e) {
-                        abort(404);
-                    }
-                })->where('file', '.*')->name('storage.'.$disk);
+                Route::get($uri.'/{path}', function (Request $request, $path) use ($disk, $config) {
+                    return (new ServeFile($disk, $config, $this->app->isProduction()))($request, $path);
+                })->where('path', '.*')->name('storage.'.$disk);
             });
         }
+    }
+
+    /**
+     * Determine if the disk is serveable.
+     *
+     * @param  array  $config
+     * @return bool
+     */
+    protected function serveable(array $config)
+    {
+        return $config['driver'] === 'local' && ($config['serve'] ?? false);
     }
 
     /**
