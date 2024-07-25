@@ -4,8 +4,10 @@ namespace Illuminate\Auth\Middleware;
 
 use Closure;
 use Illuminate\Contracts\Auth\Factory as Auth;
+use Illuminate\Contracts\Routing\ResponseFactory;
+use Illuminate\Contracts\Routing\UrlGenerator;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Route;
+use Illuminate\Routing\Router;
 use Symfony\Component\HttpFoundation\Response;
 
 class RedirectIfAuthenticated
@@ -18,6 +20,27 @@ class RedirectIfAuthenticated
     protected $auth;
 
     /**
+     * The response factory instance.
+     *
+     * @var \Illuminate\Contracts\Routing\ResponseFactory
+     */
+    protected $responseFactory;
+
+    /**
+     * The URL generator instance.
+     *
+     * @var \Illuminate\Contracts\Routing\UrlGenerator
+     */
+    protected $urlGenerator;
+
+    /**
+     * The router instance.
+     *
+     * @var \Illuminate\Routing\Router
+     */
+    protected $router;
+
+    /**
      * The callback that should be used to generate the authentication redirect path.
      *
      * @var callable|null
@@ -28,11 +51,17 @@ class RedirectIfAuthenticated
      * Create a new middleware instance.
      *
      * @param  \Illuminate\Contracts\Auth\Factory  $auth
+     * @param  \Illuminate\Contracts\Routing\ResponseFactory  $responseFactory
+     * @param  \Illuminate\Contracts\Routing\UrlGenerator  $urlGenerator
+     * @param  \Illuminate\Routing\Router  $router
      * @return void
      */
-    public function __construct(Auth $auth)
+    public function __construct(Auth $auth, ResponseFactory $responseFactory, UrlGenerator $urlGenerator, Router $router)
     {
         $this->auth = $auth;
+        $this->responseFactory = $responseFactory;
+        $this->urlGenerator = $urlGenerator;
+        $this->router = $router;
     }
 
     /**
@@ -46,7 +75,7 @@ class RedirectIfAuthenticated
 
         foreach ($guards as $guard) {
             if ($this->auth->guard($guard)->check()) {
-                return redirect($this->redirectTo($request));
+                return $this->responseFactory->redirectTo($this->redirectTo($request));
             }
         }
 
@@ -68,17 +97,17 @@ class RedirectIfAuthenticated
      */
     protected function defaultRedirectUri(): string
     {
-        foreach (['dashboard', 'home'] as $uri) {
-            if (Route::has($uri)) {
-                return route($uri);
+        foreach (['dashboard', 'home'] as $routeName) {
+            if ($this->router->has($routeName)) {
+                return $this->urlGenerator->route($routeName);
             }
         }
 
-        $routes = Route::getRoutes()->get('GET');
+        $routes = $this->router->getRoutes()->get('GET');
 
         foreach (['dashboard', 'home'] as $uri) {
             if (isset($routes[$uri])) {
-                return '/'.$uri;
+                return $this->urlGenerator->to('/'.$uri);
             }
         }
 

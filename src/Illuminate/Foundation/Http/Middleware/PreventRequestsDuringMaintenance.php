@@ -5,6 +5,7 @@ namespace Illuminate\Foundation\Http\Middleware;
 use Closure;
 use ErrorException;
 use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Foundation\Http\MaintenanceModeBypassCookie;
 use Illuminate\Foundation\Http\Middleware\Concerns\ExcludesPaths;
 use Illuminate\Support\Arr;
@@ -20,6 +21,13 @@ class PreventRequestsDuringMaintenance
      * @var \Illuminate\Contracts\Foundation\Application
      */
     protected $app;
+
+    /**
+     * The response factory instance.
+     *
+     * @var \Illuminate\Contracts\Routing\ResponseFactory
+     */
+    protected $responseFactory;
 
     /**
      * The URIs that should be excluded.
@@ -39,11 +47,13 @@ class PreventRequestsDuringMaintenance
      * Create a new middleware instance.
      *
      * @param  \Illuminate\Contracts\Foundation\Application  $app
+     * @param  \Illuminate\Contracts\Routing\ResponseFactory  $responseFactory
      * @return void
      */
-    public function __construct(Application $app)
+    public function __construct(Application $app, ResponseFactory $responseFactory)
     {
         $this->app = $app;
+        $this->responseFactory = $responseFactory;
     }
 
     /**
@@ -87,12 +97,12 @@ class PreventRequestsDuringMaintenance
                             : trim($data['redirect'], '/');
 
                 if ($request->path() !== $path) {
-                    return redirect($path);
+                    return $this->responseFactory->redirectTo($path);
                 }
             }
 
             if (isset($data['template'])) {
-                return response(
+                return $this->responseFactory->make(
                     $data['template'],
                     $data['status'] ?? 503,
                     $this->getHeaders($data)
@@ -135,7 +145,7 @@ class PreventRequestsDuringMaintenance
      */
     protected function bypassResponse(string $secret)
     {
-        return redirect('/')->withCookie(
+        return $this->responseFactory->redirectTo('/')->withCookie(
             MaintenanceModeBypassCookie::create($secret)
         );
     }

@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Foundation;
 
+use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Foundation\Console\DownCommand;
 use Illuminate\Foundation\Console\UpCommand;
 use Illuminate\Foundation\Events\MaintenanceModeDisabled;
@@ -122,7 +123,7 @@ class MaintenanceModeTest extends TestCase
 
     public function testMaintenanceModeCanBeBypassedOnExcludedUrls()
     {
-        $this->app->instance(PreventRequestsDuringMaintenance::class, new class($this->app) extends PreventRequestsDuringMaintenance
+        $this->app->instance(PreventRequestsDuringMaintenance::class, new class($this->app, $this->app->make(ResponseFactory::class)) extends PreventRequestsDuringMaintenance
         {
             protected $except = ['/test'];
         });

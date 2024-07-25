@@ -181,7 +181,7 @@ class VerifyCsrfToken
      */
     protected function addCookieToResponse($request, $response)
     {
-        $config = config('session');
+        $config = $this->app['config']->get('session');
 
         if ($response instanceof Responsable) {
             $response = $response->toResponse($request);
