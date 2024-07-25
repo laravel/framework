@@ -12,7 +12,25 @@ use Illuminate\Support\Optional;
 use Illuminate\Support\Sleep;
 use Illuminate\Support\Str;
 
-if (! function_exists('append_config')) {
+if (! function_exists('app_locale')) {
+    /**
+     * Get the current application locale with replace value.
+     *
+     * @param string $search
+     * @param string $replace
+     * @param true $isReplace
+     * @return string
+     */
+    function app_locale(string $search = '_', string $replace = '-', bool $isReplace = true): string
+    {
+        if ($isReplace){
+            return str_replace($search, $replace, app()->getLocale());
+        }
+        return app()->getLocale();
+    }
+}
+
+    if (! function_exists('append_config')) {
     /**
      * Assign high numeric IDs to a config item to force appending.
      *
