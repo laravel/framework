@@ -71,16 +71,16 @@ class FilesystemServiceProvider extends ServiceProvider
      */
     protected function registerFileServing()
     {
+        if ($this->app->routesAreCached()) {
+            return;
+        }
+
         foreach ($this->app['config']['filesystems.disks'] ?? [] as $disk => $config) {
             if ($config['driver'] !== 'local' || ! ($config['serve'] ?? false)) {
                 continue;
             }
 
             $this->app->booted(function () use ($disk, $config) {
-                if ($this->app->routesAreCached()) {
-                    return;
-                }
-
                 $path = isset($config['url'])
                     ? rtrim(parse_url($config['url'])['path'], '/')
                     : '/storage';
