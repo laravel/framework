@@ -3,19 +3,37 @@
 namespace Illuminate\Auth\Middleware;
 
 use Closure;
+use Illuminate\Contracts\Auth\Factory as Auth;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Symfony\Component\HttpFoundation\Response;
 
 class RedirectIfAuthenticated
 {
     /**
+     * The authentication factory instance.
+     *
+     * @var \Illuminate\Contracts\Auth\Factory
+     */
+    protected $auth;
+
+    /**
      * The callback that should be used to generate the authentication redirect path.
      *
      * @var callable|null
      */
     protected static $redirectToCallback;
+
+    /**
+     * Create a new middleware instance.
+     *
+     * @param  \Illuminate\Contracts\Auth\Factory  $auth
+     * @return void
+     */
+    public function __construct(Auth $auth)
+    {
+        $this->auth = $auth;
+    }
 
     /**
      * Handle an incoming request.
@@ -27,7 +45,7 @@ class RedirectIfAuthenticated
         $guards = empty($guards) ? [null] : $guards;
 
         foreach ($guards as $guard) {
-            if (Auth::guard($guard)->check()) {
+            if ($this->auth->guard($guard)->check()) {
                 return redirect($this->redirectTo($request));
             }
         }
