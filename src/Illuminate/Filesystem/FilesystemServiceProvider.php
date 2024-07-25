@@ -77,6 +77,10 @@ class FilesystemServiceProvider extends ServiceProvider
             }
 
             $this->app->booted(function () use ($disk, $config) {
+                if ($this->app->routesAreCached()) {
+                    return;
+                }
+
                 $path = isset($config['url'])
                     ? rtrim(parse_url($config['url'])['path'], '/')
                     : '/storage';
