@@ -82,14 +82,14 @@ class FilesystemServiceProvider extends ServiceProvider
                     : '/storage';
 
                 Route::get($path.'/{file}', function (Request $request, $file) use ($disk, $config) {
-                    if (($config['visibility'] ?? 'private') !== 'public' &&
+                    if (($config['visibility'] ?? 'private') === 'private' &&
                         ! $request->hasValidRelativeSignature()) {
                         abort(403);
                     }
 
                     try {
                         return Storage::disk($disk)->exists($file)
-                            ? Storage::disk($disk)->download($file)
+                            ? Storage::disk($disk)->serve($request, $file)
                             : abort(404);
                     } catch (PathTraversalDetected $e) {
                         abort(404);
