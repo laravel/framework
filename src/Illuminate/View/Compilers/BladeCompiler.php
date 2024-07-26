@@ -682,7 +682,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     public function extend(callable $compiler, ?string $name = null): void
     {
-        if (! empty($name)) {
+        if (filled($name)) {
             $this->extensions[$name] = $compiler;
         } else {
             $this->extensions[] = $compiler;
