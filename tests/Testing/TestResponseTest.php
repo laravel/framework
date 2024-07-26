@@ -376,6 +376,28 @@ class TestResponseTest extends TestCase
         $response->assertSee(['bar & baz', 'baz & qux']);
     }
 
+    public function testAssertSeeHtml()
+    {
+        $response = $this->makeMockResponse([
+            'render' => '<ul><li>foo</li><li>bar</li><li>baz</li><li>foo</li></ul>',
+        ]);
+
+        $response->assertSeeHtml('<li>foo</li>');
+        $response->assertSeeHtml(['<li>baz</li>', '<li>bar</li>']);
+    }
+
+    public function testAssertSeeHtmlCanFail()
+    {
+        $this->expectException(AssertionFailedError::class);
+
+        $response = $this->makeMockResponse([
+            'render' => '<ul><li>foo</li><li>bar</li><li>baz</li><li>foo</li></ul>',
+        ]);
+
+        $response->assertSeeHtml('<li>item</li>');
+        $response->assertSeeHtml(['<li>not</li>', '<li>found</li>']);
+    }
+
     public function testAssertSeeInOrder()
     {
         $response = $this->makeMockResponse([
@@ -407,6 +429,39 @@ class TestResponseTest extends TestCase
         ]);
 
         $response->assertSeeInOrder(['foo', 'qux', 'bar', 'baz']);
+    }
+
+    public function testAssertSeeHtmlInOrder()
+    {
+        $response = $this->makeMockResponse([
+            'render' => '<ul><li>foo</li><li>bar</li><li>baz</li><li>foo</li></ul>',
+        ]);
+
+        $response->assertSeeHtmlInOrder(['<li>foo</li>', '<li>bar</li>', '<li>baz</li>']);
+
+        $response->assertSeeHtmlInOrder(['<li>foo</li>', '<li>bar</li>', '<li>baz</li>', '<li>foo</li>']);
+    }
+
+    public function testAssertSeeHtmlInOrderCanFail()
+    {
+        $this->expectException(AssertionFailedError::class);
+
+        $response = $this->makeMockResponse([
+            'render' => '<ul><li>foo</li><li>bar</li><li>baz</li><li>foo</li></ul>',
+        ]);
+
+        $response->assertSeeHtmlInOrder(['<li>baz</li>', '<li>bar</li>', '<li>foo</li>']);
+    }
+
+    public function testAssertSeeHtmlInOrderCanFail2()
+    {
+        $this->expectException(AssertionFailedError::class);
+
+        $response = $this->makeMockResponse([
+            'render' => '<ul><li>foo</li><li>bar</li><li>baz</li><li>foo</li></ul>',
+        ]);
+
+        $response->assertSeeHtmlInOrder(['<li>foo</li>', '<li>qux</li>', '<li>bar</li>', '<li>baz</li>']);
     }
 
     public function testAssertSeeText()
