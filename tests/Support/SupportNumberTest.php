@@ -293,4 +293,12 @@ class SupportNumberTest extends TestCase
         $this->assertSame([[0, 10], [10, 20], [20, 25]], Number::pairs(25, 10, 0));
         $this->assertSame([[0, 2.5], [2.5, 5.0], [5.0, 7.5], [7.5, 10.0]], Number::pairs(10, 2.5, 0));
     }
+
+    public function testJson()
+    {
+        $this->assertSame(12, Number::json(12));
+        $this->assertSame(12, Number::json(12.0));
+        $this->assertSame(12.3, Number::json(12.3));
+        $this->assertSame(12.3456789, Number::json(12.3456789));
+    }
 }

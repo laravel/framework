@@ -258,6 +258,17 @@ class Number
     }
 
     /**
+     * Convert the number to how it will be represented in JSON.
+     *
+     * @param  int|float  $number
+     * @return int|float
+     */
+    public static function json(int|float $number)
+    {
+        return json_decode(json_encode($number));
+    }
+
+    /**
      * Execute the given callback using the given locale.
      *
      * @param  string  $locale
