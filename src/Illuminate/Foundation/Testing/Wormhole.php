@@ -25,6 +25,30 @@ class Wormhole
     }
 
     /**
+     * Travel forward the given number of microseconds.
+     *
+     * @param  callable|null  $callback
+     * @return mixed
+     */
+    public function microsecond($callback = null)
+    {
+        return $this->microseconds($callback);
+    }
+
+    /**
+     * Travel forward the given number of microseconds.
+     *
+     * @param  callable|null  $callback
+     * @return mixed
+     */
+    public function microseconds($callback = null)
+    {
+        Carbon::setTestNow(Carbon::now()->addMicroseconds($this->value));
+
+        return $this->handleCallback($callback);
+    }
+
+    /**
      * Travel forward the given number of milliseconds.
      *
      * @param  callable|null  $callback

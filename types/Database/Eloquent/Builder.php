@@ -38,10 +38,10 @@ function test(
     assertType('Illuminate\Database\Eloquent\Collection<int, User>', $query->findOr([1], callback: fn () => 42));
     assertType('User', $query->findOrFail(1));
     assertType('User|null', $query->find(1));
-    assertType('User|null', $query->findOr(1));
+    assertType('int|User', $query->findOr(1, fn () => 42));
     assertType('int|User', $query->findOr(1, callback: fn () => 42));
     assertType('User|null', $query->first());
-    assertType('User|null', $query->firstOr());
+    assertType('int|User', $query->firstOr(fn () => 42));
     assertType('int|User', $query->firstOr(callback: fn () => 42));
     assertType('User', $query->firstOrNew(['id' => 1]));
     assertType('User', $query->findOrNew(1));
@@ -56,7 +56,7 @@ function test(
     assertType('User', $query->firstOrFail());
     assertType('User', $query->sole());
     assertType('Illuminate\Support\LazyCollection<int, User>', $query->cursor());
-    assertType('Illuminate\Support\Collection<int|string, mixed>', $query->pluck('foo'));
+    assertType('Illuminate\Support\Collection<(int|string), mixed>', $query->pluck('foo'));
     assertType('Illuminate\Database\Eloquent\Relations\Relation<Illuminate\Database\Eloquent\Model, User, *>', $query->getRelation('foo'));
     assertType('Illuminate\Database\Eloquent\Builder<Illuminate\Types\Builder\Post>', $query->setModel(new Post()));
 

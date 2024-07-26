@@ -67,6 +67,29 @@ class DatabaseEloquentMorphTest extends TestCase
         $relation->addEagerConstraints([$model1, $model2]);
     }
 
+    public function testMorphRelationUpsertFillsForeignKey()
+    {
+        $relation = $this->getManyRelation();
+
+        $relation->getQuery()->shouldReceive('upsert')->with(
+            [
+                ['email' => 'foo3', 'name' => 'bar', $relation->getForeignKeyName() => $relation->getParentKey(), $relation->getMorphType() => $relation->getMorphClass()],
+                ['name' => 'bar2', 'email' => 'foo2', $relation->getForeignKeyName() => $relation->getParentKey(), $relation->getMorphType() => $relation->getMorphClass()],
+            ],
+            ['email'],
+            ['name']
+        );
+
+        $relation->upsert(
+            [
+                ['email' => 'foo3', 'name' => 'bar'],
+                ['name' => 'bar2', 'email' => 'foo2'],
+            ],
+            ['email'],
+            ['name']
+        );
+    }
+
     public function testMakeFunctionOnMorph()
     {
         $_SERVER['__eloquent.saved'] = false;

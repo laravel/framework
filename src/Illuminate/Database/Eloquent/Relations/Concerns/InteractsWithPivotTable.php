@@ -67,7 +67,7 @@ trait InteractsWithPivotTable
      * Sync the intermediate tables with a list of IDs without detaching.
      *
      * @param  \Illuminate\Support\Collection|\Illuminate\Database\Eloquent\Model|array  $ids
-     * @return array
+     * @return array{attached: array, detached: array, updated: array}
      */
     public function syncWithoutDetaching($ids)
     {
@@ -79,7 +79,7 @@ trait InteractsWithPivotTable
      *
      * @param  \Illuminate\Support\Collection|\Illuminate\Database\Eloquent\Model|array  $ids
      * @param  bool  $detaching
-     * @return array
+     * @return array{attached: array, detached: array, updated: array}
      */
     public function sync($ids, $detaching = true)
     {
@@ -133,7 +133,7 @@ trait InteractsWithPivotTable
      * @param  \Illuminate\Support\Collection|\Illuminate\Database\Eloquent\Model|array  $ids
      * @param  array  $values
      * @param  bool  $detaching
-     * @return array
+     * @return array{attached: array, detached: array, updated: array}
      */
     public function syncWithPivotValues($ids, array $values, bool $detaching = true)
     {

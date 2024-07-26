@@ -20,6 +20,20 @@ abstract class ServiceProvider
     protected $app;
 
     /**
+     * All of the container bindings that should be registered.
+     *
+     * @var array
+     */
+    public $bindings = [];
+
+    /**
+     * All of the singletons that should be registered.
+     *
+     * @var array
+     */
+    public $singletons = [];
+
+    /**
      * All of the registered booting callbacks.
      *
      * @var array
@@ -142,6 +156,24 @@ abstract class ServiceProvider
             $config = $this->app->make('config');
 
             $config->set($key, array_merge(
+                require $path, $config->get($key, [])
+            ));
+        }
+    }
+
+    /**
+     * Replace the given configuration with the existing configuration recursively.
+     *
+     * @param  string  $path
+     * @param  string  $key
+     * @return void
+     */
+    protected function replaceConfigRecursivelyFrom($path, $key)
+    {
+        if (! ($this->app instanceof CachesConfiguration && $this->app->configurationIsCached())) {
+            $config = $this->app->make('config');
+
+            $config->set($key, array_replace_recursive(
                 require $path, $config->get($key, [])
             ));
         }

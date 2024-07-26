@@ -596,15 +596,22 @@ class SupportStrTest extends TestCase
     {
         $this->assertSame('Laravel is...', Str::limit('Laravel is a free, open source PHP web application framework.', 10));
         $this->assertSame('这是一...', Str::limit('这是一段中文', 6));
+        $this->assertSame('Laravel is a...', Str::limit('Laravel is a free, open source PHP web application framework.', 15, preserveWords: true));
 
         $string = 'The PHP framework for web artisans.';
         $this->assertSame('The PHP...', Str::limit($string, 7));
+        $this->assertSame('The PHP...', Str::limit($string, 10, preserveWords: true));
         $this->assertSame('The PHP', Str::limit($string, 7, ''));
+        $this->assertSame('The PHP', Str::limit($string, 10, '', true));
         $this->assertSame('The PHP framework for web artisans.', Str::limit($string, 100));
+        $this->assertSame('The PHP framework for web artisans.', Str::limit($string, 100, preserveWords: true));
+        $this->assertSame('The PHP framework...', Str::limit($string, 20, preserveWords: true));
 
         $nonAsciiString = '这是一段中文';
         $this->assertSame('这是一...', Str::limit($nonAsciiString, 6));
+        $this->assertSame('这是一...', Str::limit($nonAsciiString, 6, preserveWords: true));
         $this->assertSame('这是一', Str::limit($nonAsciiString, 6, ''));
+        $this->assertSame('这是一', Str::limit($nonAsciiString, 6, '', true));
     }
 
     public function testLength()
@@ -1101,6 +1108,7 @@ class SupportStrTest extends TestCase
     {
         $this->assertInstanceOf(UuidInterface::class, Str::uuid());
         $this->assertInstanceOf(UuidInterface::class, Str::orderedUuid());
+        $this->assertInstanceOf(UuidInterface::class, Str::uuid7());
     }
 
     public function testAsciiNull()
@@ -1354,7 +1362,7 @@ class SupportStrTest extends TestCase
     {
         Str::createUuidsUsingSequence([
             0 => ($zeroth = Str::uuid()),
-            1 => ($first = Str::uuid()),
+            1 => ($first = Str::uuid7()),
             // just generate a random one here...
             3 => ($third = Str::uuid()),
             // continue to generate random uuids...

@@ -80,6 +80,7 @@ namespace Illuminate\Support\Facades;
  * @method static bool hasMacro(string $name)
  * @method static void flushMacros()
  * @method static mixed macroCall(string $method, array $parameters)
+ * @method static void tap(callable|null $callback = null)
  * @method static \Illuminate\Routing\RouteRegistrar attribute(string $key, mixed $value)
  * @method static \Illuminate\Routing\RouteRegistrar whereAlpha(array|string $parameters)
  * @method static \Illuminate\Routing\RouteRegistrar whereAlphaNumeric(array|string $parameters)

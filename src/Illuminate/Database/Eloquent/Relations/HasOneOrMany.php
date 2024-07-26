@@ -277,6 +277,23 @@ abstract class HasOneOrMany extends Relation
     }
 
     /**
+     * Insert new records or update the existing ones.
+     *
+     * @param  array  $values
+     * @param  array|string  $uniqueBy
+     * @param  array|null  $update
+     * @return int
+     */
+    public function upsert(array $values, $uniqueBy, $update = null)
+    {
+        foreach ($values as $key => $value) {
+            $values[$key][$this->getForeignKeyName()] = $this->getParentKey();
+        }
+
+        return $this->getQuery()->upsert($values, $uniqueBy, $update);
+    }
+
+    /**
      * Attach a model instance to the parent model.
      *
      * @param  TRelatedModel  $model

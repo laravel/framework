@@ -3,10 +3,14 @@
 namespace Illuminate\Notifications;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\HasCollection;
 use Illuminate\Database\Eloquent\Model;
 
 class DatabaseNotification extends Model
 {
+    /** @use HasCollection<DatabaseNotificationCollection> */
+    use HasCollection;
+
     /**
      * The "type" of the primary key ID.
      *
@@ -44,6 +48,11 @@ class DatabaseNotification extends Model
         'data' => 'array',
         'read_at' => 'datetime',
     ];
+
+    /**
+     * The type of collection that should be used for the model.
+     */
+    protected static string $collectionClass = DatabaseNotificationCollection::class;
 
     /**
      * Get the notifiable entity that the notification belongs to.
@@ -119,16 +128,5 @@ class DatabaseNotification extends Model
     public function scopeUnread(Builder $query)
     {
         return $query->whereNull('read_at');
-    }
-
-    /**
-     * Create a new database notification collection instance.
-     *
-     * @param  array  $models
-     * @return \Illuminate\Notifications\DatabaseNotificationCollection
-     */
-    public function newCollection(array $models = [])
-    {
-        return new DatabaseNotificationCollection($models);
     }
 }

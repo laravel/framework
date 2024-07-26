@@ -24,6 +24,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Stringable;
 use Illuminate\Support\Traits\Macroable;
+use Illuminate\Support\Traits\Tappable;
 use JsonSerializable;
 use Psr\Http\Message\ResponseInterface as PsrResponseInterface;
 use ReflectionClass;
@@ -39,6 +40,7 @@ class Router implements BindingRegistrar, RegistrarContract
     use Macroable {
         __call as macroCall;
     }
+    use Tappable;
 
     /**
      * The event dispatcher instance.

@@ -16,6 +16,13 @@ abstract class MultipleInstanceManager
     protected $app;
 
     /**
+     * The configuration repository instance.
+     *
+     * @var \Illuminate\Contracts\Config\Repository
+     */
+    protected $config;
+
+    /**
      * The array of resolved instances.
      *
      * @var array
@@ -45,6 +52,7 @@ abstract class MultipleInstanceManager
     public function __construct($app)
     {
         $this->app = $app;
+        $this->config = $app->make('config');
     }
 
     /**
@@ -115,16 +123,24 @@ abstract class MultipleInstanceManager
             throw new RuntimeException("Instance [{$name}] does not specify a {$this->driverKey}.");
         }
 
-        if (isset($this->customCreators[$config[$this->driverKey]])) {
+        $driverName = $config[$this->driverKey];
+
+        if (isset($this->customCreators[$driverName])) {
             return $this->callCustomCreator($config);
         } else {
-            $createMethod = 'create'.ucfirst($config[$this->driverKey]).ucfirst($this->driverKey);
+            $createMethod = 'create'.ucfirst($driverName).ucfirst($this->driverKey);
 
             if (method_exists($this, $createMethod)) {
                 return $this->{$createMethod}($config);
-            } else {
-                throw new InvalidArgumentException("Instance {$this->driverKey} [{$config[$this->driverKey]}] is not supported.");
             }
+
+            $createMethod = 'create'.Str::studly($driverName).ucfirst($this->driverKey);
+
+            if (method_exists($this, $createMethod)) {
+                return $this->{$createMethod}($config);
+            }
+
+            throw new InvalidArgumentException("Instance {$this->driverKey} [{$config[$this->driverKey]}] is not supported.");
         }
     }
 

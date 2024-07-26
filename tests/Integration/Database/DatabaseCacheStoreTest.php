@@ -166,6 +166,77 @@ class DatabaseCacheStoreTest extends DatabaseTestCase
         $this->assertDatabaseHas($this->getCacheTableName(), ['key' => $this->withCachePrefix('foo')]);
     }
 
+    public function testMany()
+    {
+        $this->insertToCacheTable('first', 'a', 60);
+        $this->insertToCacheTable('second', 'b', 60);
+
+        $store = $this->getStore();
+
+        $this->assertEquals([
+            'first' => 'a',
+            'second' => 'b',
+            'third' => null,
+        ], $store->get(['first', 'second', 'third']));
+
+        $this->assertEquals([
+            'first' => 'a',
+            'second' => 'b',
+            'third' => null,
+        ], $store->many(['first', 'second', 'third']));
+    }
+
+    public function testManyWithExpiredKeys()
+    {
+        $this->insertToCacheTable('first', 'a', 0);
+        $this->insertToCacheTable('second', 'b', 60);
+
+        $this->assertEquals([
+            'first' => null,
+            'second' => 'b',
+            'third' => null,
+        ], $this->getStore()->many(['first', 'second', 'third']));
+
+        $this->assertDatabaseMissing($this->getCacheTableName(), ['key' => $this->withCachePrefix('first')]);
+    }
+
+    public function testManyAsAssociativeArray()
+    {
+        $this->insertToCacheTable('first', 'cached', 60);
+
+        $result = $this->getStore()->many([
+            'first' => 'aa',
+            'second' => 'bb',
+            'third',
+        ]);
+
+        $this->assertEquals([
+            'first' => 'cached',
+            'second' => 'bb',
+            'third' => null,
+        ], $result);
+    }
+
+    public function testPutMany()
+    {
+        $store = $this->getStore();
+
+        $store->putMany($data = [
+            'first' => 'a',
+            'second' => 'b',
+        ], 60);
+
+        $this->assertEquals($data, $store->many(['first', 'second']));
+        $this->assertDatabaseHas($this->getCacheTableName(), [
+            'key' => $this->withCachePrefix('first'),
+            'value' => serialize('a'),
+        ]);
+        $this->assertDatabaseHas($this->getCacheTableName(), [
+            'key' => $this->withCachePrefix('second'),
+            'value' => serialize('b'),
+        ]);
+    }
+
     public function testResolvingSQLiteConnectionDoesNotThrowExceptions()
     {
         $originalConfiguration = config('database');
@@ -203,7 +274,7 @@ class DatabaseCacheStoreTest extends DatabaseTestCase
             ->insert(
                 [
                     'key' => $this->withCachePrefix($key),
-                    'value' => $value,
+                    'value' => serialize($value),
                     'expiration' => Carbon::now()->addSeconds($ttl)->getTimestamp(),
                 ]
             );

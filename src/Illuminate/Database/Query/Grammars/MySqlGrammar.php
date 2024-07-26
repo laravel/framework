@@ -16,6 +16,22 @@ class MySqlGrammar extends Grammar
     protected $operators = ['sounds like'];
 
     /**
+     * Compile a "where like" clause.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
+     * @return string
+     */
+    protected function whereLike(Builder $query, $where)
+    {
+        $where['operator'] = $where['not'] ? 'not ' : '';
+
+        $where['operator'] .= $where['caseSensitive'] ? 'like binary' : 'like';
+
+        return $this->whereBasic($query, $where);
+    }
+
+    /**
      * Add a "where null" clause to the query.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
