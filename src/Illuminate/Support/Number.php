@@ -258,12 +258,12 @@ class Number
     }
 
     /**
-     * Convert the number to how it will be represented in JSON.
+     * Remove zero digits after decimal point of the given number.
      *
      * @param  int|float  $number
      * @return int|float
      */
-    public static function json(int|float $number)
+    public static function trim(int|float $number)
     {
         return json_decode(json_encode($number));
     }
