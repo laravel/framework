@@ -91,7 +91,7 @@ class BroadcasterTest extends TestCase
         Container::setInstance($container);
         $binder = m::mock(BindingRegistrar::class);
         $callback = RouteBinding::forModel($container, BroadcasterTestEloquentModelStub::class);
-        
+
         $binder->shouldReceive('getBindingCallback')->times(2)->with('model')->andReturn($callback);
         $container->instance(BindingRegistrar::class, $binder);
         $callback = function ($user, $model) {
@@ -99,7 +99,7 @@ class BroadcasterTest extends TestCase
         };
         $parameters = $this->broadcaster->extractAuthParameters('something.{model}', 'something.1', $callback);
         $this->assertEquals(['model.1.instance'], $parameters);
-        Container::setInstance(new Container);   
+        Container::setInstance(new Container);
     }
 
     public function testUnknownChannelAuthHandlerTypeThrowsException()
