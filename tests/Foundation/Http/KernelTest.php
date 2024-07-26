@@ -62,7 +62,7 @@ class KernelTest extends TestCase
 
             public function handle($request, $next)
             {
-                return $next($response);
+                return $next($request);
             }
 
             public function terminate($request, $response)
