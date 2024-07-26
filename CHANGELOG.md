@@ -1,6 +1,11 @@
 # Release Notes for 11.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v11.18.0...11.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v11.18.1...11.x)
+
+## [v11.18.1](https://github.com/laravel/framework/compare/v11.18.0...v11.18.1) - 2024-07-26
+
+* [11.x] Fix variable typo at Terminating Event test by [@chu121su12](https://github.com/chu121su12) in https://github.com/laravel/framework/pull/52282
+* Revert "[11.x] Declare bindings and singletons properties in Service Provider" by [@driesvints](https://github.com/driesvints) in https://github.com/laravel/framework/pull/52288
 
 ## [v11.18.0](https://github.com/laravel/framework/compare/v11.17.0...v11.18.0) - 2024-07-26
 
