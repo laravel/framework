@@ -668,6 +668,17 @@ class TestResponse implements ArrayAccess
     }
 
     /**
+     * Assert that the given HTML string or array of HTML strings are not contained within the response.
+     *
+     * @param  string|array  $value
+     * @return $this
+     */
+    public function assertDontSeeHtml($value)
+    {
+        return $this->assertDontSee($value, false);
+    }
+
+    /**
      * Assert that the given string or array of strings are not contained within the response text.
      *
      * @param  string|array  $value
