@@ -23,7 +23,11 @@ class DatabaseSoftDeletingScopeTest extends TestCase
     public function testApplyingScopeToABuilder()
     {
         $scope = m::mock(SoftDeletingScope::class.'[extend]');
-        $builder = m::mock(EloquentBuilder::class);
+        $builder = m::mock(new EloquentBuilder(new BaseBuilder(
+            m::mock(ConnectionInterface::class),
+            m::mock(Grammar::class),
+            m::mock(Processor::class)
+        )));
         $model = m::mock(Model::class);
         $model->shouldReceive('getQualifiedDeletedAtColumn')->once()->andReturn('table.deleted_at');
         $builder->shouldReceive('whereNull')->once()->with('table.deleted_at');

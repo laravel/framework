@@ -2387,6 +2387,47 @@ class DatabaseEloquentBuilderTest extends TestCase
         }
     }
 
+    public function testSoftDeleteWithCustomTableAliasName()
+    {
+        $model = new EloquentBuilderTestSoftDeleteStub;
+        $this->mockConnectionForModel($model, '');
+        $query = $model->newQuery()->from('table', 'my_custom_alias');
+        $this->assertSame('select * from "table" as "my_custom_alias" where "my_custom_alias"."deleted_at" is null', $query->toSql());
+    }
+
+    public function testSoftDeleteWithCustomTableAliasNameButDefinedInTableNameAttribute()
+    {
+        $model = new EloquentBuilderTestSoftDeleteStub;
+        $this->mockConnectionForModel($model, '');
+        $query = $model->newQuery()->from('table AS my_custom_alias');
+        $this->assertSame('select * from "table" as "my_custom_alias" where "my_custom_alias"."deleted_at" is null', $query->toSql());
+    }
+
+    public function testSoftDeleteWithCustomTableAliasNameButDefinedInTableNameAttributeWithExtraCharacters()
+    {
+        $model = new EloquentBuilderTestSoftDeleteStub;
+        $this->mockConnectionForModel($model, '');
+        $query = $model->newQuery()->from('table AS       my_custom_alias');
+        $this->assertSame('select * from "table" as "my_custom_alias" where "my_custom_alias"."deleted_at" is null', $query->toSql());
+    }
+
+    public function testSoftDeleteWithCustomTableAliasNameAsSubQuery()
+    {
+        $model = new EloquentBuilderTestSoftDeleteStub;
+        $this->mockConnectionForModel($model, '');
+        $query = $model->newQuery()->fromSub('select * from table', 'sub_query_alias');
+        $this->assertSame('select * from (select * from table) as "sub_query_alias" where "sub_query_alias"."deleted_at" is null', $query->toSql());
+    }
+
+    public function testSoftDeleteWithCustomTableAliasNameAsSubQueryFromRaw()
+    {
+        $model = new EloquentBuilderTestSoftDeleteStub;
+        $this->mockConnectionForModel($model, '');
+        $query = $model->newQuery()->fromRaw('(select * from table) As my_sub_query_raw_alias');
+        $this->assertSame('select * from (select * from table) As my_sub_query_raw_alias where "my_sub_query_raw_alias"."deleted_at" is null', $query->toSql());
+    }
+
+
     protected function mockConnectionForModel($model, $database)
     {
         $grammarClass = 'Illuminate\Database\Query\Grammars\\'.$database.'Grammar';
@@ -2477,6 +2518,12 @@ class EloquentBuilderTestNestedStub extends Model
     {
         return $query;
     }
+}
+
+class EloquentBuilderTestSoftDeleteStub extends Model
+{
+    protected  $table = 'table';
+    use SoftDeletes;
 }
 
 class EloquentBuilderTestPluckStub

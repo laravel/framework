@@ -2,6 +2,8 @@
 
 namespace Illuminate\Database\Eloquent;
 
+use Illuminate\Support\Str;
+
 class SoftDeletingScope implements Scope
 {
     /**
@@ -9,7 +11,9 @@ class SoftDeletingScope implements Scope
      *
      * @var string[]
      */
-    protected $extensions = ['Restore', 'RestoreOrCreate', 'CreateOrRestore', 'WithTrashed', 'WithoutTrashed', 'OnlyTrashed'];
+    protected $extensions = [
+        'Restore', 'RestoreOrCreate', 'CreateOrRestore', 'WithTrashed', 'WithoutTrashed', 'OnlyTrashed',
+    ];
 
     /**
      * Apply the scope to a given Eloquent query builder.
@@ -22,7 +26,9 @@ class SoftDeletingScope implements Scope
      */
     public function apply(Builder $builder, Model $model)
     {
-        $builder->whereNull($model->getQualifiedDeletedAtColumn());
+        $builder->whereNull(
+            $this->getQualifiedDeletedAtColumn($builder, $model)
+        );
     }
 
     /**
@@ -163,5 +169,35 @@ class SoftDeletingScope implements Scope
 
             return $builder;
         });
+    }
+
+    /**
+     * @template TModel of \Illuminate\Database\Eloquent\Model
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder<*>  $builder
+     * @param  TModel  $model
+     * @return string
+     */
+    private function getQualifiedDeletedAtColumn(Builder $builder, Model $model): string
+    {
+        $fromPart = $builder->getQuery()->from;
+
+        if (is_string($fromPart)) {
+            $fromParts = array_filter(explode(' ', Str::trim($fromPart)), fn(string $part) => $part !== '');
+
+            return count($fromParts) === 3
+                ? end($fromParts) . '.' . $model->getDeletedAtColumn()
+                : $model->getQualifiedDeletedAtColumn();
+        }
+
+        if ($fromPart !== null) {
+            $subQueryFrom = $fromPart->getValue($builder->getQuery()->getGrammar());
+            $aliasSubquery = explode(' ', Str::trim(Str::afterLast($subQueryFrom, ') ')));
+            $aliasSubquery = Str::trim(end($aliasSubquery), '"');
+
+            return $aliasSubquery . '.' . $model->getDeletedAtColumn();
+        }
+
+        return $model->getQualifiedDeletedAtColumn();
     }
 }
