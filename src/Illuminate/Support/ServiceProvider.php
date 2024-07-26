@@ -20,6 +20,20 @@ abstract class ServiceProvider
     protected $app;
 
     /**
+     * All of the container bindings that should be registered.
+     *
+     * @var array
+     */
+    public $bindings = [];
+
+    /**
+     * All of the singletons that should be registered.
+     *
+     * @var array
+     */
+    public $singletons = [];
+
+    /**
      * All of the registered booting callbacks.
      *
      * @var array
