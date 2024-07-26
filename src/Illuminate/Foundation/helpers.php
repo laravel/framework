@@ -232,18 +232,19 @@ if (! function_exists('cache')) {
      *
      * @param  string|array<string, mixed>|null  $key  key|data
      * @param  mixed  $default  default|expiration|null
+     * @param  bool  $ttl
      * @return ($key is null ? \Illuminate\Cache\CacheManager : ($key is string ? mixed : bool))
      *
      * @throws \InvalidArgumentException
      */
-    function cache($key = null, $default = null)
+    function cache($key = null, $default = null, $ttl = false)
     {
         if (is_null($key)) {
             return app('cache');
         }
 
         if (is_string($key)) {
-            return app('cache')->get($key, $default);
+            return app('cache')->get($key, $default, $ttl);
         }
 
         if (! is_array($key)) {
