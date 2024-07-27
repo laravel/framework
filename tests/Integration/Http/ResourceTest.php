@@ -37,6 +37,7 @@ use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalPivotRela
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalRelationship;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalRelationshipAggregates;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalRelationshipCounts;
+use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalRelationshipExists;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithoutWrap;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithUnlessOptionalData;
 use Illuminate\Tests\Integration\Http\Fixtures\ReallyEmptyPostResource;
@@ -88,7 +89,7 @@ class ResourceTest extends TestCase
     {
         Route::get('/', function () {
             return ObjectResource::make(
-                (object) ['first_name' => 'Bob', 'age' => 40]
+                (object)['first_name' => 'Bob', 'age' => 40]
             );
         });
 
@@ -107,8 +108,8 @@ class ResourceTest extends TestCase
     {
         Route::get('/', function () {
             $objects = [
-                (object) ['first_name' => 'Bob', 'age' => 40],
-                (object) ['first_name' => 'Jack', 'age' => 25],
+                (object)['first_name' => 'Bob', 'age' => 40],
+                (object)['first_name' => 'Jack', 'age' => 25],
             ];
 
             return ObjectResource::collection($objects);
@@ -421,6 +422,60 @@ class ResourceTest extends TestCase
             ],
         ]);
     }
+
+    public function testResourcesMayHaveOptionalRelationshipExists()
+    {
+        Route::get('/', function () {
+            return new PostResourceWithOptionalRelationshipExists(new Post([
+                'id' => 5,
+                'title' => 'Test Title',
+            ]));
+        });
+
+        $response = $this->withoutExceptionHandling()->get(
+            '/', ['Accept' => 'application/json']
+        );
+
+        $response->assertStatus(200);
+
+        $response->assertExactJson([
+            'data' => [
+                'id' => 5,
+                'has_favourited_posts' => 'No',
+            ],
+        ]);
+    }
+
+    public function testResourcesMayLoadOptionalRelationshipExists()
+    {
+        Route::get('/', function () {
+            $post = new Post([
+                'id' => 5,
+                'title' => 'Test Title',
+                'authors_exists' => true,
+                'favourited_posts_exists' => true,
+                'comments_exists' => false,
+            ]);
+
+            return new PostResourceWithOptionalRelationshipExists($post);
+        });
+
+        $response = $this->withoutExceptionHandling()->get(
+            '/', ['Accept' => 'application/json']
+        );
+
+        $response->assertStatus(200);
+
+        $response->assertExactJson([
+            'data' => [
+                'id' => 5,
+                'has_authors' => true,
+                'has_favourited_posts' => 'Yes',
+                'comment_exists' => false,
+            ],
+        ]);
+    }
+
 
     public function testResourcesMayLoadOptionalRelationships()
     {
@@ -1040,7 +1095,7 @@ class ResourceTest extends TestCase
                 'first' => null,
                 'last' => null,
                 'prev' => null,
-                'next' => '/?cursor='.(new Cursor(['id' => 5]))->encode(),
+                'next' => '/?cursor=' . (new Cursor(['id' => 5]))->encode(),
             ],
             'meta' => [
                 'path' => '/',
@@ -1079,7 +1134,7 @@ class ResourceTest extends TestCase
                 'first' => null,
                 'last' => null,
                 'prev' => null,
-                'next' => '/?framework=laravel&author=Otwell&cursor='.(new Cursor(['id' => 5]))->encode(),
+                'next' => '/?framework=laravel&author=Otwell&cursor=' . (new Cursor(['id' => 5]))->encode(),
             ],
             'meta' => [
                 'path' => '/',
@@ -1116,7 +1171,7 @@ class ResourceTest extends TestCase
                 'first' => null,
                 'last' => null,
                 'prev' => null,
-                'next' => '/?author=Taylor&cursor='.(new Cursor(['id' => 5]))->encode(),
+                'next' => '/?author=Taylor&cursor=' . (new Cursor(['id' => 5]))->encode(),
             ],
             'meta' => [
                 'path' => '/',
@@ -1379,8 +1434,7 @@ class ResourceTest extends TestCase
 
     public function testLeadingMergeKeyedValueIsMergedCorrectly()
     {
-        $filter = new class
-        {
+        $filter = new class {
             use ConditionallyLoadsAttributes;
 
             public function work()
@@ -1410,8 +1464,7 @@ class ResourceTest extends TestCase
 
     public function testLeadingMergeKeyedValueIsMergedCorrectlyWhenFirstValueIsMissing()
     {
-        $filter = new class
-        {
+        $filter = new class {
             use ConditionallyLoadsAttributes;
 
             public function work()
@@ -1435,8 +1488,7 @@ class ResourceTest extends TestCase
 
     public function testLeadingMergeValueIsMergedCorrectly()
     {
-        $filter = new class
-        {
+        $filter = new class {
             use ConditionallyLoadsAttributes;
 
             public function work()
@@ -1461,8 +1513,7 @@ class ResourceTest extends TestCase
 
     public function testMergeValuesMayBeMissing()
     {
-        $filter = new class
-        {
+        $filter = new class {
             use ConditionallyLoadsAttributes;
 
             public function work()
@@ -1487,8 +1538,7 @@ class ResourceTest extends TestCase
 
     public function testInitialMergeValuesMayBeMissing()
     {
-        $filter = new class
-        {
+        $filter = new class {
             use ConditionallyLoadsAttributes;
 
             public function work()
@@ -1513,8 +1563,7 @@ class ResourceTest extends TestCase
 
     public function testMergeValueCanMergeJsonSerializable()
     {
-        $filter = new class
-        {
+        $filter = new class {
             use ConditionallyLoadsAttributes;
 
             public function work()
@@ -1545,8 +1594,7 @@ class ResourceTest extends TestCase
 
     public function testMergeValueCanMergeCollectionOfJsonSerializable()
     {
-        $filter = new class
-        {
+        $filter = new class {
             use ConditionallyLoadsAttributes;
 
             public function work()
@@ -1572,8 +1620,7 @@ class ResourceTest extends TestCase
 
     public function testAllMergeValuesMayBeMissing()
     {
-        $filter = new class
-        {
+        $filter = new class {
             use ConditionallyLoadsAttributes;
 
             public function work()
@@ -1598,8 +1645,7 @@ class ResourceTest extends TestCase
 
     public function testMergeValuesMayFallbackToDefaults()
     {
-        $filter = new class
-        {
+        $filter = new class {
             use ConditionallyLoadsAttributes;
 
             public function work()
@@ -1621,8 +1667,7 @@ class ResourceTest extends TestCase
 
     public function testNestedMerges()
     {
-        $filter = new class
-        {
+        $filter = new class {
             use ConditionallyLoadsAttributes;
 
             public function work()
