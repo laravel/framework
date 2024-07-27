@@ -183,10 +183,10 @@ class SoftDeletingScope implements Scope
         $fromPart = $builder->getQuery()->from;
 
         if (is_string($fromPart)) {
-            $fromParts = array_filter(explode(' ', Str::trim($fromPart)), fn(string $part) => $part !== '');
+            $fromParts = array_filter(explode(' ', Str::trim($fromPart)), fn (string $part) => $part !== '');
 
             return count($fromParts) === 3
-                ? end($fromParts) . '.' . $model->getDeletedAtColumn()
+                ? end($fromParts).'.'.$model->getDeletedAtColumn()
                 : $model->getQualifiedDeletedAtColumn();
         }
 
@@ -195,7 +195,7 @@ class SoftDeletingScope implements Scope
             $aliasSubquery = explode(' ', Str::trim(Str::afterLast($subQueryFrom, ') ')));
             $aliasSubquery = Str::trim(end($aliasSubquery), '"');
 
-            return $aliasSubquery . '.' . $model->getDeletedAtColumn();
+            return $aliasSubquery.'.'.$model->getDeletedAtColumn();
         }
 
         return $model->getQualifiedDeletedAtColumn();

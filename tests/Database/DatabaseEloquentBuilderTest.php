@@ -2522,7 +2522,7 @@ class EloquentBuilderTestNestedStub extends Model
 
 class EloquentBuilderTestSoftDeleteStub extends Model
 {
-    protected  $table = 'table';
+    protected $table = 'table';
     use SoftDeletes;
 }
 
