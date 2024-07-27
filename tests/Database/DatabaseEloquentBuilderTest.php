@@ -2427,7 +2427,6 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertSame('select * from (select * from table) As my_sub_query_raw_alias where "my_sub_query_raw_alias"."deleted_at" is null', $query->toSql());
     }
 
-
     protected function mockConnectionForModel($model, $database)
     {
         $grammarClass = 'Illuminate\Database\Query\Grammars\\'.$database.'Grammar';
