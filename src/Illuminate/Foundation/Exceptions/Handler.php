@@ -417,7 +417,7 @@ class Handler implements ExceptionHandlerContract
             }
 
             return ! $this->container->make(RateLimiter::class)->attempt(
-                with($throttle->key ?: 'illuminate:foundation:exceptions:'.$e::class, fn ($key) => $this->hashThrottleKeys ? md5($key) : $key),
+                with($throttle->key ?: 'illuminate:foundation:exceptions:'.$e::class, fn ($key) => $this->hashThrottleKeys ? hash('xxh128', $key) : $key),
                 $throttle->maxAttempts,
                 fn () => true,
                 $throttle->decaySeconds

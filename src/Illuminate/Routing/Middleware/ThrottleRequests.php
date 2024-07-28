@@ -129,7 +129,7 @@ class ThrottleRequests
             $next,
             collect(Arr::wrap($limiterResponse))->map(function ($limit) use ($limiterName) {
                 return (object) [
-                    'key' => self::$shouldHashKeys ? md5($limiterName.$limit->key) : $limiterName.':'.$limit->key,
+                    'key' => self::$shouldHashKeys ? hash('xxh128', $limiterName.$limit->key) : $limiterName.':'.$limit->key,
                     'maxAttempts' => $limit->maxAttempts,
                     'decaySeconds' => $limit->decaySeconds,
                     'responseCallback' => $limit->responseCallback,

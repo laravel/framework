@@ -66,7 +66,7 @@ class Onceable
             $callable instanceof Closure ? (new ReflectionClosure($callable))->getClosureUsedVariables() : [],
         );
 
-        return md5(sprintf(
+        return hash('xxh128', sprintf(
             '%s@%s%s:%s (%s)',
             $trace[0]['file'],
             isset($trace[1]['class']) ? ($trace[1]['class'].'@') : '',

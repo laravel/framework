@@ -67,7 +67,7 @@ class RateLimited
             $next,
             collect(Arr::wrap($limiterResponse))->map(function ($limit) {
                 return (object) [
-                    'key' => md5($this->limiterName.$limit->key),
+                    'key' => hash('xxh128', $this->limiterName.$limit->key),
                     'maxAttempts' => $limit->maxAttempts,
                     'decaySeconds' => $limit->decaySeconds,
                 ];
