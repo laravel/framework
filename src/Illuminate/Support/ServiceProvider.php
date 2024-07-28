@@ -10,6 +10,10 @@ use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Database\Eloquent\Factory as ModelFactory;
 use Illuminate\View\Compilers\BladeCompiler;
 
+/**
+ * @property array<class-string, class-string> $bindings
+ * @property array<class-string, class-string> $singletons
+ */
 abstract class ServiceProvider
 {
     /**
