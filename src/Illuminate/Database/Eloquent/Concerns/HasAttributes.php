@@ -33,6 +33,7 @@ use Illuminate\Support\Exceptions\MathException;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Fluent;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
 use LogicException;
@@ -104,9 +105,11 @@ trait HasAttributes
         'encrypted',
         'encrypted:array',
         'encrypted:collection',
+        'encrypted:fluent',
         'encrypted:json',
         'encrypted:object',
         'float',
+        'fluent',
         'hashed',
         'immutable_date',
         'immutable_datetime',
@@ -826,6 +829,8 @@ trait HasAttributes
                 return $this->fromJson($value);
             case 'collection':
                 return new BaseCollection($this->fromJson($value));
+            case 'fluent':
+                return new Fluent($this->fromJson($value));
             case 'date':
                 return $this->asDate($value);
             case 'datetime':
@@ -1652,7 +1657,7 @@ trait HasAttributes
      */
     protected function isJsonCastable($key)
     {
-        return $this->hasCast($key, ['array', 'json', 'object', 'collection', 'encrypted:array', 'encrypted:collection', 'encrypted:json', 'encrypted:object']);
+        return $this->hasCast($key, ['array', 'fluent', 'json', 'object', 'collection', 'encrypted:array', 'encrypted:collection', 'encrypted:fluent', 'encrypted:json', 'encrypted:object']);
     }
 
     /**
@@ -1663,7 +1668,7 @@ trait HasAttributes
      */
     protected function isEncryptedCastable($key)
     {
-        return $this->hasCast($key, ['encrypted', 'encrypted:array', 'encrypted:collection', 'encrypted:json', 'encrypted:object']);
+        return $this->hasCast($key, ['encrypted', 'encrypted:array', 'encrypted:collection', 'encrypted:fluent', 'encrypted:json', 'encrypted:object']);
     }
 
     /**
