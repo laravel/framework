@@ -16,6 +16,7 @@ use Illuminate\Foundation\Http\Middleware\ValidateCsrfToken;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Foundation\Testing\DatabaseTruncation;
+use Illuminate\Foundation\Testing\DatabaseUnseed;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\WithoutMiddleware;
@@ -203,6 +204,10 @@ trait InteractsWithTestCaseLifecycle
 
         if (isset($uses[DatabaseTruncation::class])) {
             $this->truncateDatabaseTables();
+        }
+
+        if (isset($uses[DatabaseUnseed::class])) {
+            $this->startWatchingQueries();
         }
 
         if (isset($uses[DatabaseTransactions::class])) {
