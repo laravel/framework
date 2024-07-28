@@ -1124,7 +1124,7 @@ class Builder implements BuilderContract
     /**
      * Add a "where like" clause to the query.
      *
-     * @param  string  $column
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
      * @param  string  $value
      * @param  bool  $caseSensitive
      * @param  string  $boolean
@@ -1149,7 +1149,7 @@ class Builder implements BuilderContract
     /**
      * Add an "or where like" clause to the query.
      *
-     * @param  string  $column
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
      * @param  string  $value
      * @param  bool  $caseSensitive
      * @return $this
@@ -1162,7 +1162,7 @@ class Builder implements BuilderContract
     /**
      * Add a "where not like" clause to the query.
      *
-     * @param  string  $column
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
      * @param  string  $value
      * @param  bool  $caseSensitive
      * @param  string  $boolean
@@ -1176,7 +1176,7 @@ class Builder implements BuilderContract
     /**
      * Add an "or where not like" clause to the query.
      *
-     * @param  string  $columns
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
      * @param  string  $value
      * @param  bool  $caseSensitive
      * @return $this
