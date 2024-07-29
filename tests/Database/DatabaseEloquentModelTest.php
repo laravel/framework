@@ -2860,6 +2860,17 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertNull($user->getOriginal('name'));
         $this->assertNull($user->getAttribute('name'));
     }
+
+    public function testModelToJsonSucceedsWithPriorErrors(): void
+    {
+        $user = new EloquentModelStub(['name' => 'Mateus']);
+
+        // Simulate a JSON error
+        json_decode('{');
+        $this->assertTrue(json_last_error() !== JSON_ERROR_NONE);
+
+        $this->assertSame('{"name":"Mateus"}', $user->toJson(JSON_THROW_ON_ERROR));
+    }
 }
 
 class EloquentTestObserverStub

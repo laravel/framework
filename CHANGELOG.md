@@ -1,6 +1,11 @@
 # Release Notes for 10.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v10.48.16...10.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v10.48.17...10.x)
+
+## [v10.48.17](https://github.com/laravel/framework/compare/v10.48.16...v10.48.17) - 2024-07-23
+
+* [10.x] Fix PHP_CLI_SERVER_WORKERS warning by suppressing it by [@pelomedusa](https://github.com/pelomedusa) in https://github.com/laravel/framework/pull/52094
+* [10.x]  Backport #51615  by [@GrahamCampbell](https://github.com/GrahamCampbell) in https://github.com/laravel/framework/pull/52215
 
 ## [v10.48.16](https://github.com/laravel/framework/compare/v10.48.15...v10.48.16) - 2024-07-09
 
