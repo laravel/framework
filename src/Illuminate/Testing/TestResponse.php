@@ -848,6 +848,20 @@ class TestResponse implements ArrayAccess
     }
 
     /**
+     * Assert that the response has the exact JSON structure.
+     *
+     * @param  array|null  $structure
+     * @param  array|null  $responseData
+     * @return $this
+     */
+    public function assertExactJsonStructure(?array $structure = null, $responseData = null)
+    {
+        $this->decodeResponseJson()->assertStructure($structure, $responseData, true);
+
+        return $this;
+    }
+
+    /**
      * Assert that the response JSON has the expected count of items at the given key.
      *
      * @param  int  $count
