@@ -277,8 +277,12 @@ class Builder implements BuilderContract
         $columns = is_array($columns) ? $columns : func_get_args();
 
         foreach ($columns as $as => $column) {
-            if (is_string($as) && $this->isQueryable($column)) {
-                $this->selectSub($column, $as);
+            if (is_string($as)) {
+                if ($this->isQueryable($column)) {
+                    $this->selectSub($column, $as);
+                } elseif (is_string($column)) {
+                    $this->columns[] = $column . ' as ' . $as;
+                }
             } else {
                 $this->columns[] = $column;
             }
@@ -429,12 +433,15 @@ class Builder implements BuilderContract
         $columns = is_array($column) ? $column : func_get_args();
 
         foreach ($columns as $as => $column) {
-            if (is_string($as) && $this->isQueryable($column)) {
-                if (is_null($this->columns)) {
-                    $this->select($this->from.'.*');
+            if (is_string($as)) {
+                if ($this->isQueryable($column)) {
+                    if (\is_null($this->columns)) {
+                        $this->select($this->from . '.*');
+                    }
+                    $this->selectSub($column, $as);
+                } elseif (is_string($column)) {
+                    $this->columns[] = $column . ' as ' . $as;
                 }
-
-                $this->selectSub($column, $as);
             } else {
                 if (is_array($this->columns) && in_array($column, $this->columns, true)) {
                     continue;
