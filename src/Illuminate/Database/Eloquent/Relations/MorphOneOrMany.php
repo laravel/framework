@@ -106,6 +106,10 @@ abstract class MorphOneOrMany extends HasOneOrMany
      */
     public function upsert(array $values, $uniqueBy, $update = null)
     {
+        if (! empty($values) && ! is_array(reset($values))) {
+            $values = [$values];
+        }
+
         foreach ($values as $key => $value) {
             $values[$key][$this->getMorphType()] = $this->getMorphClass();
         }

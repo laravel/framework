@@ -71,7 +71,21 @@ class DatabaseEloquentMorphTest extends TestCase
     {
         $relation = $this->getManyRelation();
 
-        $relation->getQuery()->shouldReceive('upsert')->with(
+        $relation->getQuery()->shouldReceive('upsert')->once()->with(
+            [
+                ['email' => 'foo3', 'name' => 'bar', $relation->getForeignKeyName() => $relation->getParentKey(), $relation->getMorphType() => $relation->getMorphClass()],
+            ],
+            ['email'],
+            ['name']
+        );
+
+        $relation->upsert(
+            ['email' => 'foo3', 'name' => 'bar'],
+            ['email'],
+            ['name']
+        );
+
+        $relation->getQuery()->shouldReceive('upsert')->once()->with(
             [
                 ['email' => 'foo3', 'name' => 'bar', $relation->getForeignKeyName() => $relation->getParentKey(), $relation->getMorphType() => $relation->getMorphClass()],
                 ['name' => 'bar2', 'email' => 'foo2', $relation->getForeignKeyName() => $relation->getParentKey(), $relation->getMorphType() => $relation->getMorphClass()],
