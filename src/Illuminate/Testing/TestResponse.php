@@ -574,7 +574,7 @@ class TestResponse implements ArrayAccess
     /**
      * Assert that the given HTML string or array of HTML strings are contained within the response.
      *
-     * @param  string|array  $value
+     * @param  array|string  $value
      * @return $this
      */
     public function assertSeeHtml($value)
@@ -670,7 +670,7 @@ class TestResponse implements ArrayAccess
     /**
      * Assert that the given HTML string or array of HTML strings are not contained within the response.
      *
-     * @param  string|array  $value
+     * @param  array|string  $value
      * @return $this
      */
     public function assertDontSeeHtml($value)
