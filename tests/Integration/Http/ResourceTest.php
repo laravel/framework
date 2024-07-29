@@ -476,7 +476,6 @@ class ResourceTest extends TestCase
         ]);
     }
 
-
     public function testResourcesMayLoadOptionalRelationships()
     {
         Route::get('/', function () {
