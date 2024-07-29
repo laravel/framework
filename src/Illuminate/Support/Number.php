@@ -258,6 +258,17 @@ class Number
     }
 
     /**
+     * Remove any trailing zero digits after the decimal point of the given number.
+     *
+     * @param  int|float  $number
+     * @return int|float
+     */
+    public static function trim(int|float $number)
+    {
+        return json_decode(json_encode($number));
+    }
+
+    /**
      * Execute the given callback using the given locale.
      *
      * @param  string  $locale
