@@ -281,7 +281,7 @@ class Builder implements BuilderContract
                 if ($this->isQueryable($column)) {
                     $this->selectSub($column, $as);
                 } elseif (is_string($column)) {
-                    $this->columns[] = $column . ' as ' . $as;
+                    $this->columns[] = $column.' as '.$as;
                 }
             } else {
                 $this->columns[] = $column;
@@ -436,11 +436,11 @@ class Builder implements BuilderContract
             if (is_string($as)) {
                 if ($this->isQueryable($column)) {
                     if (\is_null($this->columns)) {
-                        $this->select($this->from . '.*');
+                        $this->select($this->from.'.*');
                     }
                     $this->selectSub($column, $as);
                 } elseif (is_string($column)) {
-                    $this->columns[] = $column . ' as ' . $as;
+                    $this->columns[] = $column.' as '.$as;
                 }
             } else {
                 if (is_array($this->columns) && in_array($column, $this->columns, true)) {
