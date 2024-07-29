@@ -258,7 +258,7 @@ class Number
     }
 
     /**
-     * Remove zero digits after decimal point of the given number.
+     * Remove any trailing zero digits after the decimal point of the given number.
      *
      * @param  int|float  $number
      * @return int|float
