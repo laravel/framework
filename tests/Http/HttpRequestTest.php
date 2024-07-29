@@ -983,6 +983,16 @@ class HttpRequestTest extends TestCase
         $request->mergeIfMissing($merge);
         $this->assertSame('Taylor', $request->input('name'));
         $this->assertSame(1, $request->input('boolean_setting'));
+
+        $request = Request::create('/', 'GET', ['user' => ['first_name' => 'Taylor', 'email' => 'taylor@laravel.com']]);
+        $merge = ['user.last_name' => 'Otwell'];
+        $request->mergeIfMissing($merge);
+        $this->assertSame('Otwell', $request->input('user.last_name'));
+
+        $request = Request::create('/', 'GET', ['user' => ['first_name' => 'Taylor', 'email' => 'taylor@laravel.com']]);
+        $merge = ['user.first_name' => 'John'];
+        $request->mergeIfMissing($merge);
+        $this->assertSame('Taylor', $request->input('user.first_name'));
     }
 
     public function testReplaceMethod()
