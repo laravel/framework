@@ -89,7 +89,7 @@ class ResourceTest extends TestCase
     {
         Route::get('/', function () {
             return ObjectResource::make(
-                (object)['first_name' => 'Bob', 'age' => 40]
+                (object) ['first_name' => 'Bob', 'age' => 40]
             );
         });
 
@@ -108,8 +108,8 @@ class ResourceTest extends TestCase
     {
         Route::get('/', function () {
             $objects = [
-                (object)['first_name' => 'Bob', 'age' => 40],
-                (object)['first_name' => 'Jack', 'age' => 25],
+                (object) ['first_name' => 'Bob', 'age' => 40],
+                (object) ['first_name' => 'Jack', 'age' => 25],
             ];
 
             return ObjectResource::collection($objects);
@@ -1095,7 +1095,7 @@ class ResourceTest extends TestCase
                 'first' => null,
                 'last' => null,
                 'prev' => null,
-                'next' => '/?cursor=' . (new Cursor(['id' => 5]))->encode(),
+                'next' => '/?cursor='.(new Cursor(['id' => 5]))->encode(),
             ],
             'meta' => [
                 'path' => '/',
@@ -1134,7 +1134,7 @@ class ResourceTest extends TestCase
                 'first' => null,
                 'last' => null,
                 'prev' => null,
-                'next' => '/?framework=laravel&author=Otwell&cursor=' . (new Cursor(['id' => 5]))->encode(),
+                'next' => '/?framework=laravel&author=Otwell&cursor='.(new Cursor(['id' => 5]))->encode(),
             ],
             'meta' => [
                 'path' => '/',
@@ -1171,7 +1171,7 @@ class ResourceTest extends TestCase
                 'first' => null,
                 'last' => null,
                 'prev' => null,
-                'next' => '/?author=Taylor&cursor=' . (new Cursor(['id' => 5]))->encode(),
+                'next' => '/?author=Taylor&cursor='.(new Cursor(['id' => 5]))->encode(),
             ],
             'meta' => [
                 'path' => '/',
@@ -1434,7 +1434,8 @@ class ResourceTest extends TestCase
 
     public function testLeadingMergeKeyedValueIsMergedCorrectly()
     {
-        $filter = new class {
+        $filter = new class
+        {
             use ConditionallyLoadsAttributes;
 
             public function work()
@@ -1464,7 +1465,8 @@ class ResourceTest extends TestCase
 
     public function testLeadingMergeKeyedValueIsMergedCorrectlyWhenFirstValueIsMissing()
     {
-        $filter = new class {
+        $filter = new class
+        {
             use ConditionallyLoadsAttributes;
 
             public function work()
@@ -1488,7 +1490,8 @@ class ResourceTest extends TestCase
 
     public function testLeadingMergeValueIsMergedCorrectly()
     {
-        $filter = new class {
+        $filter = new class
+        {
             use ConditionallyLoadsAttributes;
 
             public function work()
@@ -1513,7 +1516,8 @@ class ResourceTest extends TestCase
 
     public function testMergeValuesMayBeMissing()
     {
-        $filter = new class {
+        $filter = new class
+        {
             use ConditionallyLoadsAttributes;
 
             public function work()
@@ -1538,7 +1542,8 @@ class ResourceTest extends TestCase
 
     public function testInitialMergeValuesMayBeMissing()
     {
-        $filter = new class {
+        $filter = new class
+        {
             use ConditionallyLoadsAttributes;
 
             public function work()
@@ -1563,7 +1568,8 @@ class ResourceTest extends TestCase
 
     public function testMergeValueCanMergeJsonSerializable()
     {
-        $filter = new class {
+        $filter = new class
+        {
             use ConditionallyLoadsAttributes;
 
             public function work()
@@ -1594,7 +1600,8 @@ class ResourceTest extends TestCase
 
     public function testMergeValueCanMergeCollectionOfJsonSerializable()
     {
-        $filter = new class {
+        $filter = new class
+        {
             use ConditionallyLoadsAttributes;
 
             public function work()
@@ -1620,7 +1627,8 @@ class ResourceTest extends TestCase
 
     public function testAllMergeValuesMayBeMissing()
     {
-        $filter = new class {
+        $filter = new class
+        {
             use ConditionallyLoadsAttributes;
 
             public function work()
@@ -1645,7 +1653,8 @@ class ResourceTest extends TestCase
 
     public function testMergeValuesMayFallbackToDefaults()
     {
-        $filter = new class {
+        $filter = new class
+        {
             use ConditionallyLoadsAttributes;
 
             public function work()
@@ -1667,7 +1676,8 @@ class ResourceTest extends TestCase
 
     public function testNestedMerges()
     {
-        $filter = new class {
+        $filter = new class
+        {
             use ConditionallyLoadsAttributes;
 
             public function work()

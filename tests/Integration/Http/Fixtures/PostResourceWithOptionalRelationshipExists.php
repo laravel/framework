@@ -12,7 +12,7 @@ class PostResourceWithOptionalRelationshipExists extends PostResource
         return [
             'id' => $this->id,
             'has_authors' => $this->whenExistsLoaded('authors'),
-            'has_favourited_posts' => $this->whenExistsLoaded('favouritedPosts', fn($exists) => $exists ? 'Yes' : 'No', 'No'),
+            'has_favourited_posts' => $this->whenExistsLoaded('favouritedPosts', fn ($exists) => $exists ? 'Yes' : 'No', 'No'),
             'comment_exists' => $this->whenExistsLoaded('comments'),
         ];
     }
