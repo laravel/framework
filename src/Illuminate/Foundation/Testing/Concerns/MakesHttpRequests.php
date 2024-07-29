@@ -91,7 +91,7 @@ trait MakesHttpRequests
     }
 
     /**
-     * Remove a header from being sent with the request.
+     * Remove a header from the request.
      *
      * @param  string  $name
      * @return $this
