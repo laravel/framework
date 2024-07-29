@@ -2126,7 +2126,11 @@ trait HasAttributes
      */
     protected function getDirtyForUpdate()
     {
-        return $this->getDirty();
+        return array_filter(
+            $this->getDirty(),
+            fn ($key) => !($this->incrementing && $key === $this->getKeyName()),
+            ARRAY_FILTER_USE_KEY
+        );
     }
 
     /**
