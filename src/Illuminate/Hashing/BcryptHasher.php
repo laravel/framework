@@ -70,7 +70,7 @@ class BcryptHasher extends AbstractHasher implements HasherContract
         if (is_null($hashedValue) || strlen($hashedValue) === 0) {
             return false;
         }
-        
+
         if ($this->verifyAlgorithm && ! $this->isUsingCorrectAlgorithm($hashedValue)) {
             throw new RuntimeException('This password does not use the Bcrypt algorithm.');
         }
