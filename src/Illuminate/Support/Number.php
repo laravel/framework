@@ -18,6 +18,13 @@ class Number
     protected static $locale = 'en';
 
     /**
+     * The callback that should be used to set the locale.
+     *
+     * @var callable|null
+     */
+    protected static $setLocale = null;
+
+    /**
      * Format the given number according to the current locale.
      *
      * @param  int|float  $number
@@ -296,12 +303,27 @@ class Number
     }
 
     /**
+     * Set the locale using the given callback.
+     *
+     * @param  callable  $locale
+     * @return void
+     */
+    public static function setLocale(callable $setLocale)
+    {
+        static::$setLocale = $setLocale;
+    }
+
+    /**
      * Ensure the "intl" PHP extension is installed.
      *
      * @return void
      */
     protected static function ensureIntlExtensionIsInstalled()
     {
+        if (! is_null(static::$setLocale)) {
+            static::$locale = call_user_func(static::$setLocale);
+        }
+
         if (! extension_loaded('intl')) {
             $method = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1]['function'];
 

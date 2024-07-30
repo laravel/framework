@@ -147,6 +147,25 @@ class SupportNumberTest extends TestCase
         $this->assertSame('1 234,56 $US', Number::currency(1234.56, 'USD', 'fr'));
     }
 
+    #[RequiresPhpExtension('intl')]
+    public function testFormatWithDifferentLocaleUsingCallback()
+    {
+        Number::setLocale(fn () => 'en');
+        $this->assertSame('123,456,789', Number::format(123456789));
+
+        Number::setLocale(fn () => 'de');
+        $this->assertSame('123.456.789', Number::format(123456789));
+
+        Number::setLocale(fn () => 'fr');
+        $this->assertSame('123 456 789', Number::format(123456789));
+
+        Number::setLocale(fn () => 'ru');
+        $this->assertSame('123 456 789', Number::format(123456789));
+
+        Number::setLocale(fn () => 'sv');
+        $this->assertSame('123 456 789', Number::format(123456789));
+    }
+
     public function testBytesToHuman()
     {
         $this->assertSame('0 B', Number::fileSize(0));
