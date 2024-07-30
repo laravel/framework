@@ -2,8 +2,6 @@
 
 namespace Illuminate\Tests\Database;
 
-use BadMethodCallException;
-use Exception;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use PHPUnit\Framework\TestCase;
@@ -78,7 +76,6 @@ class DatabaseEloquentGeneratedAsFillTest extends TestCase
  */
 class TestUserWithIdendityId extends Eloquent
 {
-
     protected $table = 'users';
     protected $guarded = [];
 
@@ -95,6 +92,7 @@ class TestUserWithIdendityId extends Eloquent
             $user->forceFill([
                 'trials_end_at' => now()->addDays(7),
             ])->save();
+            
             return $user;
         });
     }

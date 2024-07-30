@@ -2128,7 +2128,7 @@ trait HasAttributes
     {
         return array_filter(
             $this->getDirty(),
-            fn ($key) => !($this->incrementing && $key === $this->getKeyName()),
+            fn ($key) => ! ($this->incrementing && $key === $this->getKeyName()),
             ARRAY_FILTER_USE_KEY
         );
     }
