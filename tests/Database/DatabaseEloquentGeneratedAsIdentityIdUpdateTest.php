@@ -34,6 +34,7 @@ class DatabaseEloquentGeneratedAsFillTest extends TestCase
     {
         $this->schema()->create('users', function ($table) {
             $table->id()->generatedAs()->always();
+            $table->string('name');
             $table->string('email')->unique();
             $table->timestamp('trial_ends_at')->nullable();
             $table->timestamps();
