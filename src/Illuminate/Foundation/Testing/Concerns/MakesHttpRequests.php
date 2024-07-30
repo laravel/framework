@@ -104,6 +104,19 @@ trait MakesHttpRequests
     }
 
     /**
+     * Remove headers from the request.
+     *
+     * @param  array  $headers
+     * @return $this
+     */
+    public function withoutHeaders(array $headers)
+    {
+        $this->defaultHeaders = array_diff($this->defaultHeaders, $headers);
+
+        return $this;
+    }
+
+    /**
      * Add an authorization token for the request.
      *
      * @param  string  $token
