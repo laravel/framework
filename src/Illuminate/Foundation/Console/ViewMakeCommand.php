@@ -89,9 +89,7 @@ class ViewMakeCommand extends GeneratorCommand
      */
     protected function getStub()
     {
-        return $this->resolveStubPath(
-            '/stubs/view.stub',
-        );
+        return $this->resolveStubPath('/stubs/view.stub');
     }
 
     /**
