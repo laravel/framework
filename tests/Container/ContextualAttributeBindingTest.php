@@ -3,15 +3,18 @@
 namespace Illuminate\Tests\Container;
 
 use Attribute;
+use Illuminate\Auth\AuthManager;
 use Illuminate\Cache\CacheManager;
 use Illuminate\Cache\Repository as CacheRepository;
 use Illuminate\Config\Repository;
 use Illuminate\Container\Attributes\Cache;
 use Illuminate\Container\Attributes\Config;
 use Illuminate\Container\Attributes\Database;
+use Illuminate\Container\Attributes\Guard;
 use Illuminate\Container\Attributes\Log;
 use Illuminate\Container\Attributes\Storage;
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Auth\Guard as GuardContract;
 use Illuminate\Contracts\Container\ContextualAttribute;
 use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Database\Connection;
@@ -135,6 +138,20 @@ class ContextualAttributeBindingTest extends TestCase
         });
 
         $container->make(DatabaseTest::class);
+    }
+
+    public function testGuardAttribute()
+    {
+        $container = new Container;
+        $container->singleton('auth', function () {
+            $manager = m::mock(AuthManager::class);
+            $manager->shouldReceive('guard')->with('foo')->andReturn(m::mock(GuardContract::class));
+            $manager->shouldReceive('guard')->with('bar')->andReturn(m::mock(GuardContract::class));
+
+            return $manager;
+        });
+
+        $container->make(GuardTest::class);
     }
 
     public function testLogAttribute()
@@ -286,6 +303,13 @@ final class ConfigTest
 final class DatabaseTest
 {
     public function __construct(#[Database('foo')] Connection $foo, #[Database('bar')] Connection $bar)
+    {
+    }
+}
+
+final class GuardTest
+{
+    public function __construct(#[Guard('foo')] GuardContract $foo, #[Guard('bar')] GuardContract $bar)
     {
     }
 }
