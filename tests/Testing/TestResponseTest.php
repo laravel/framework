@@ -1462,6 +1462,88 @@ class TestResponseTest extends TestCase
         $response->assertJsonStructure(['*' => ['foo', 'bar', 'foobar']]);
     }
 
+    public function testAssertExactJsonStructure()
+    {
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub));
+
+        // Without structure
+        $response->assertExactJsonStructure();
+
+        // At root
+        try {
+            $response->assertExactJsonStructure(['foo']);
+            $failed = false;
+        } catch (AssertionFailedError $e) {
+            $failed = true;
+        }
+
+        $this->assertTrue($failed);
+
+        $response->assertExactJsonStructure(['foo', 'foobar', 0, 'bars', 'baz', 'barfoo', 'numeric_keys']);
+
+        // Nested
+        try {
+            $response->assertExactJsonStructure(['foobar' => ['foobar_foo'], 'foo', 0, 'bars', 'baz', 'barfoo', 'numeric_keys']);
+            $failed = false;
+        } catch (AssertionFailedError $e) {
+            $failed = true;
+        }
+
+        $this->assertTrue($failed);
+
+        $response->assertExactJsonStructure(['foobar' => ['foobar_foo', 'foobar_bar'], 'foo', 0, 'bars', 'baz', 'barfoo', 'numeric_keys']);
+
+        // Wildcard (repeating structure)
+        try {
+            $response->assertExactJsonStructure(['bars' => ['*' => ['bar']], 'foo', 'foobar', 0, 'baz', 'barfoo', 'numeric_keys']);
+            $failed = false;
+        } catch (AssertionFailedError $e) {
+            $failed = true;
+        }
+
+        $this->assertTrue($failed);
+
+        $response->assertExactJsonStructure(['bars' => ['*' => ['bar', 'foo']], 'foo', 'foobar', 0, 'baz', 'barfoo', 'numeric_keys']);
+
+        // Wildcard (numeric keys)
+        try {
+            $response->assertExactJsonStructure(['numeric_keys' => ['*' => ['bar']], 'foo', 'foobar', 0, 'bars', 'baz', 'barfoo']);
+            $failed = false;
+        } catch (AssertionFailedError $e) {
+            $failed = true;
+        }
+
+        $this->assertTrue($failed);
+
+        $response->assertExactJsonStructure(['numeric_keys' => ['*' => ['bar', 'foo']], 'foo', 'foobar', 0, 'bars', 'baz', 'barfoo']);
+
+        // Nested after wildcard
+        try {
+            $response->assertExactJsonStructure(['baz' => ['*' => ['foo', 'bar' => ['foo']]], 'foo', 'foobar', 0, 'bars', 'barfoo', 'numeric_keys']);
+            $failed = false;
+        } catch (AssertionFailedError $e) {
+            $failed = true;
+        }
+
+        $this->assertTrue($failed);
+
+        $response->assertExactJsonStructure(['baz' => ['*' => ['foo', 'bar' => ['foo', 'bar']]], 'foo', 'foobar', 0, 'bars', 'barfoo', 'numeric_keys']);
+
+        // Wildcard (repeating structure) at root
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceStub));
+
+        try {
+            $response->assertExactJsonStructure(['*' => ['foo', 'bar']]);
+            $failed = false;
+        } catch (AssertionFailedError $e) {
+            $failed = true;
+        }
+
+        $this->assertTrue($failed);
+
+        $response->assertExactJsonStructure(['*' => ['foo', 'bar', 'foobar']]);
+    }
+
     public function testAssertJsonCount()
     {
         $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub));
