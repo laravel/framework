@@ -3,15 +3,24 @@
 namespace Illuminate\Tests\Container;
 
 use Attribute;
+use Illuminate\Cache\CacheManager;
+use Illuminate\Cache\Repository as CacheRepository;
 use Illuminate\Config\Repository;
+use Illuminate\Container\Attributes\Cache;
 use Illuminate\Container\Attributes\Config;
+use Illuminate\Container\Attributes\Database;
+use Illuminate\Container\Attributes\Log;
 use Illuminate\Container\Attributes\Storage;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Container\ContextualAttribute;
 use Illuminate\Contracts\Filesystem\Filesystem;
+use Illuminate\Database\Connection;
+use Illuminate\Database\DatabaseManager;
 use Illuminate\Filesystem\FilesystemManager;
+use Illuminate\Log\LogManager;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 
 class ContextualAttributeBindingTest extends TestCase
 {
@@ -86,29 +95,71 @@ class ContextualAttributeBindingTest extends TestCase
         $this->assertEquals('Developer', $class->person->role);
     }
 
+    public function testCacheAttribute()
+    {
+        $container = new Container;
+        $container->singleton('cache', function () {
+            $manager = m::mock(CacheManager::class);
+            $manager->shouldReceive('driver')->with('foo')->andReturn(m::mock(CacheRepository::class));
+            $manager->shouldReceive('driver')->with('bar')->andReturn(m::mock(CacheRepository::class));
+
+            return $manager;
+        });
+
+        $container->make(CacheTest::class);
+    }
+
     public function testConfigAttribute()
     {
         $container = new Container;
         $container->singleton('config', function () {
-            $mockConfig = m::mock(Repository::class);
-            $mockConfig->shouldReceive('get')->with('foo', null)->andReturn('foo');
-            $mockConfig->shouldReceive('get')->with('bar', null)->andReturn('bar');
+            $repository = m::mock(Repository::class);
+            $repository->shouldReceive('get')->with('foo', null)->andReturn('foo');
+            $repository->shouldReceive('get')->with('bar', null)->andReturn('bar');
 
-            return $mockConfig;
+            return $repository;
         });
 
         $container->make(ConfigTest::class);
+    }
+
+    public function testDatabaseAttribute()
+    {
+        $container = new Container;
+        $container->singleton('db', function () {
+            $manager = m::mock(DatabaseManager::class);
+            $manager->shouldReceive('connection')->with('foo')->andReturn(m::mock(Connection::class));
+            $manager->shouldReceive('connection')->with('bar')->andReturn(m::mock(Connection::class));
+
+            return $manager;
+        });
+
+        $container->make(DatabaseTest::class);
+    }
+
+    public function testLogAttribute()
+    {
+        $container = new Container;
+        $container->singleton('log', function () {
+            $manager = m::mock(LogManager::class);
+            $manager->shouldReceive('driver')->with('foo')->andReturn(m::mock(LoggerInterface::class));
+            $manager->shouldReceive('driver')->with('bar')->andReturn(m::mock(LoggerInterface::class));
+
+            return $manager;
+        });
+
+        $container->make(LogTest::class);
     }
 
     public function testStorageAttribute()
     {
         $container = new Container;
         $container->singleton('filesystem', function () {
-            $mockFilesystemManager = m::mock(FilesystemManager::class);
-            $mockFilesystemManager->shouldReceive('disk')->with('foo')->andReturn(m::mock(Filesystem::class));
-            $mockFilesystemManager->shouldReceive('disk')->with('bar')->andReturn(m::mock(Filesystem::class));
+            $manager = m::mock(FilesystemManager::class);
+            $manager->shouldReceive('disk')->with('foo')->andReturn(m::mock(Filesystem::class));
+            $manager->shouldReceive('disk')->with('bar')->andReturn(m::mock(Filesystem::class));
 
-            return $mockFilesystemManager;
+            return $manager;
         });
 
         $container->make(StorageTest::class);
@@ -218,9 +269,30 @@ final class ContainerTestHasConfigValueWithResolvePropertyAndAfterCallback
     }
 }
 
+final class CacheTest
+{
+    public function __construct(#[Cache('foo')] CacheRepository $foo, #[Cache('bar')] CacheRepository $bar)
+    {
+    }
+}
+
 final class ConfigTest
 {
     public function __construct(#[Config('foo')] string $foo, #[Config('bar')] string $bar)
+    {
+    }
+}
+
+final class DatabaseTest
+{
+    public function __construct(#[Database('foo')] Connection $foo, #[Database('bar')] Connection $bar)
+    {
+    }
+}
+
+final class LogTest
+{
+    public function __construct(#[Log('foo')] LoggerInterface $foo, #[Log('bar')] LoggerInterface $bar)
     {
     }
 }

@@ -7,24 +7,24 @@ use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Container\ContextualAttribute;
 
 #[Attribute(Attribute::TARGET_PARAMETER)]
-class Storage implements ContextualAttribute
+class Database implements ContextualAttribute
 {
     /**
      * Create a new class instance.
      */
-    public function __construct(public ?string $disk = null)
+    public function __construct(public ?string $connection = null)
     {
     }
 
     /**
-     * Resolve the storage disk.
+     * Resolve the database connection.
      *
      * @param  self  $attribute
      * @param  \Illuminate\Contracts\Container\Container  $container
-     * @return \Illuminate\Contracts\Filesystem\Filesystem
+     * @return \Illuminate\Database\Connection
      */
     public static function resolve(self $attribute, Container $container)
     {
-        return $container->make('filesystem')->disk($attribute->disk);
+        return $container->make('db')->connection($attribute->connection);
     }
 }
