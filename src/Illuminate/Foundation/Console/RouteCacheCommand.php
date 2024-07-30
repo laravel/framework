@@ -104,8 +104,21 @@ class RouteCacheCommand extends Command
      */
     protected function buildRouteCacheFile(RouteCollection $routes)
     {
-        $stub = $this->files->get(__DIR__.'/stubs/routes.stub');
+        $stub = $this->files->get($this->resolveStubPath('/stubs/routes.stub'));
 
         return str_replace('{{routes}}', var_export($routes->compile(), true), $stub);
+    }
+
+    /**
+     * Resolve the fully-qualified path to the stub.
+     *
+     * @param  string  $stub
+     * @return string
+     */
+    protected function resolveStubPath($stub)
+    {
+        return file_exists($customPath = $this->laravel->basePath(trim($stub, '/')))
+            ? $customPath
+            : __DIR__.$stub;
     }
 }

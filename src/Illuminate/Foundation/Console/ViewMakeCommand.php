@@ -201,11 +201,9 @@ class ViewMakeCommand extends GeneratorCommand
      */
     protected function getTestStub()
     {
-        $stubName = 'view.'.($this->option('pest') ? 'pest' : 'test').'.stub';
-
-        return file_exists($customPath = $this->laravel->basePath("stubs/$stubName"))
-            ? $customPath
-            : __DIR__.'/stubs/'.$stubName;
+        return $this->option('pest')
+            ? $this->resolveStubPath('/stubs/view.pest.stub')
+            : $this->resolveStubPath('/stubs/view.test.stub');
     }
 
     /**

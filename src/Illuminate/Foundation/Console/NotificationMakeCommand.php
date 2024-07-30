@@ -64,7 +64,7 @@ class NotificationMakeCommand extends GeneratorCommand
             $this->files->makeDirectory(dirname($path), 0755, true);
         }
 
-        $this->files->put($path, file_get_contents(__DIR__.'/stubs/markdown.stub'));
+        $this->files->put($path, file_get_contents($this->resolveStubPath('/stubs/markdown.stub')));
     }
 
     /**

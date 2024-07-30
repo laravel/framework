@@ -54,7 +54,7 @@ class DownCommand extends Command
 
             file_put_contents(
                 storage_path('framework/maintenance.php'),
-                file_get_contents(__DIR__.'/stubs/maintenance-mode.stub')
+                file_get_contents($this->resolveStubPath('/stubs/maintenance-mode.stub'))
             );
 
             $this->laravel->get('events')->dispatch(new MaintenanceModeEnabled());
@@ -72,6 +72,19 @@ class DownCommand extends Command
 
             return 1;
         }
+    }
+
+    /**
+     * Resolve the fully-qualified path to the stub.
+     *
+     * @param  string  $stub
+     * @return string
+     */
+    protected function resolveStubPath($stub)
+    {
+        return file_exists($customPath = $this->laravel->basePath(trim($stub, '/')))
+            ? $customPath
+            : __DIR__.$stub;
     }
 
     /**
