@@ -15,7 +15,6 @@ use Illuminate\Container\Attributes\Guard;
 use Illuminate\Container\Attributes\Log;
 use Illuminate\Container\Attributes\Storage;
 use Illuminate\Container\Container;
-use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Contracts\Auth\Guard as GuardContract;
 use Illuminate\Contracts\Container\ContextualAttribute;
