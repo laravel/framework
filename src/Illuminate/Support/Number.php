@@ -13,16 +13,9 @@ class Number
     /**
      * The current default locale.
      *
-     * @var string
+     * @var callback|string
      */
     protected static $locale = 'en';
-
-    /**
-     * The callback that should be used to set the locale.
-     *
-     * @var callable|null
-     */
-    protected static $setLocale = null;
 
     /**
      * Format the given number according to the current locale.
@@ -35,11 +28,11 @@ class Number
      */
     public static function format(int|float $number, ?int $precision = null, ?int $maxPrecision = null, ?string $locale = null)
     {
-        static::checkLocale();
+        $locale ??= static::checkLocale();
 
         static::ensureIntlExtensionIsInstalled();
 
-        $formatter = new NumberFormatter($locale ?? static::$locale, NumberFormatter::DECIMAL);
+        $formatter = new NumberFormatter($locale, NumberFormatter::DECIMAL);
 
         if (! is_null($maxPrecision)) {
             $formatter->setAttribute(NumberFormatter::MAX_FRACTION_DIGITS, $maxPrecision);
@@ -61,7 +54,7 @@ class Number
      */
     public static function spell(int|float $number, ?string $locale = null, ?int $after = null, ?int $until = null)
     {
-        static::checkLocale();
+        $locale ??= static::checkLocale();
 
         static::ensureIntlExtensionIsInstalled();
 
@@ -73,7 +66,7 @@ class Number
             return static::format($number, locale: $locale);
         }
 
-        $formatter = new NumberFormatter($locale ?? static::$locale, NumberFormatter::SPELLOUT);
+        $formatter = new NumberFormatter($locale, NumberFormatter::SPELLOUT);
 
         return $formatter->format($number);
     }
@@ -87,11 +80,11 @@ class Number
      */
     public static function ordinal(int|float $number, ?string $locale = null)
     {
-        static::checkLocale();
+        $locale ??= static::checkLocale();
 
         static::ensureIntlExtensionIsInstalled();
 
-        $formatter = new NumberFormatter($locale ?? static::$locale, NumberFormatter::ORDINAL);
+        $formatter = new NumberFormatter($locale, NumberFormatter::ORDINAL);
 
         return $formatter->format($number);
     }
@@ -107,11 +100,11 @@ class Number
      */
     public static function percentage(int|float $number, int $precision = 0, ?int $maxPrecision = null, ?string $locale = null)
     {
-        static::checkLocale();
+        $locale ??= static::checkLocale();
 
         static::ensureIntlExtensionIsInstalled();
 
-        $formatter = new NumberFormatter($locale ?? static::$locale, NumberFormatter::PERCENT);
+        $formatter = new NumberFormatter($locale, NumberFormatter::PERCENT);
 
         if (! is_null($maxPrecision)) {
             $formatter->setAttribute(NumberFormatter::MAX_FRACTION_DIGITS, $maxPrecision);
@@ -132,11 +125,11 @@ class Number
      */
     public static function currency(int|float $number, string $in = 'USD', ?string $locale = null)
     {
-        static::checkLocale();
+        $locale ??= static::checkLocale();
 
         static::ensureIntlExtensionIsInstalled();
 
-        $formatter = new NumberFormatter($locale ?? static::$locale, NumberFormatter::CURRENCY);
+        $formatter = new NumberFormatter($locale, NumberFormatter::CURRENCY);
 
         return $formatter->formatCurrency($number, $in);
     }
@@ -288,11 +281,11 @@ class Number
     /**
      * Execute the given callback using the given locale.
      *
-     * @param  string  $locale
-     * @param  callable  $callback
+     * @param  callable|string  $locale
+     * @param  callable         $callback
      * @return mixed
      */
-    public static function withLocale(string $locale, callable $callback)
+    public static function withLocale(callable|string $locale, callable $callback)
     {
         $previousLocale = static::$locale;
 
@@ -304,35 +297,24 @@ class Number
     /**
      * Set the default locale.
      *
-     * @param  string  $locale
+     * @param  callable|string  $locale
      * @return void
      */
-    public static function useLocale(string $locale)
+    public static function useLocale(callable|string $locale)
     {
         static::$locale = $locale;
     }
 
     /**
-     * Set the locale using the given callback.
-     *
-     * @param  callable  $locale
-     * @return void
-     */
-    public static function setLocale(callable $setLocale)
-    {
-        static::$setLocale = $setLocale;
-    }
-
-    /**
      * Check $setLocale and set the locale if it is not null.
      *
-     * @return void
+     * @return string
      */
     protected static function checkLocale()
     {
-        if (! is_null(static::$setLocale)) {
-            static::$locale = call_user_func(static::$setLocale);
-        }
+        $check = ! is_string(static::$locale) && is_callable(static::$locale);
+
+        return $check ? call_user_func(static::$locale) : static::$locale;
     }
 
     /**
