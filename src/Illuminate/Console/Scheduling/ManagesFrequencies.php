@@ -2,11 +2,20 @@
 
 namespace Illuminate\Console\Scheduling;
 
+use DateInterval;
+use DateTime;
 use Illuminate\Support\Carbon;
 use InvalidArgumentException;
 
 trait ManagesFrequencies
 {
+    /**
+     * The next timestamp to use in sometimeDaily().
+     *
+     * @var string
+     */
+    protected static string $nextSometimeDaily = '00:05';
+
     /**
      * The Cron expression representing the event's frequency.
      *
@@ -348,6 +357,21 @@ trait ManagesFrequencies
             count($segments) === 2 ? (int) $segments[1] : '0',
             (int) $segments[0]
         );
+    }
+
+    /**
+     * Schedule the event to at some time during the day. Each call picks a different time.
+     *
+     * @return $this
+     */
+    public function sometimeDaily()
+    {
+        $at = static::$nextSometimeDaily;
+        $next = DateTime::createFromFormat('H:i', $at)->add(new DateInterval('PT5M'));
+
+        static::$nextSometimeDaily = $next->format('H:i');
+
+        return $this->dailyAt($at);
     }
 
     /**

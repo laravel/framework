@@ -8,6 +8,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Carbon;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use ReflectionClass;
 
 class ConsoleScheduledEventTest extends TestCase
 {
@@ -143,5 +144,28 @@ class ConsoleScheduledEventTest extends TestCase
 
         $event = new Event(m::mock(EventMutex::class), 'php foo', 'UTC');
         $this->assertTrue($event->unlessBetween('10:00', '8:00')->filtersPass($app));
+    }
+
+    public function testSometimeDaily()
+    {
+        $app = m::mock(Application::class.'[isDownForMaintenance,environment]');
+        $app->shouldReceive('isDownForMaintenance')->andReturn(false);
+        $app->shouldReceive('environment')->andReturn('production');
+
+        $event = new Event(m::mock(EventMutex::class), 'php foo');
+        $reflection = new ReflectionClass($event);
+
+        $this->assertEquals('5 0 * * *', $event->sometimeDaily()->getExpression());
+        $this->assertEquals('10 0 * * *', $event->sometimeDaily()->getExpression());
+
+        $reflection->setStaticPropertyValue('nextSometimeDaily', '12:55');
+
+        $this->assertEquals('55 12 * * *', $event->sometimeDaily()->getExpression());
+        $this->assertEquals('0 13 * * *', $event->sometimeDaily()->getExpression());
+
+        $reflection->setStaticPropertyValue('nextSometimeDaily', '23:55');
+
+        $this->assertEquals('55 23 * * *', $event->sometimeDaily()->getExpression());
+        $this->assertEquals('0 0 * * *', $event->sometimeDaily()->getExpression());
     }
 }
