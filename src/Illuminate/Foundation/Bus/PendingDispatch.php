@@ -25,6 +25,13 @@ class PendingDispatch
     protected $afterResponse = false;
 
     /**
+     * A callback to run when throwing if a job should not be dispatched.
+     *
+     * @var \Closure
+     */
+    protected $throwCallback;
+
+    /**
      * Create a new pending job dispatch.
      *
      * @param  mixed  $job
@@ -179,6 +186,19 @@ class PendingDispatch
     }
 
     /**
+     * Throw an exception if a job should not be dispatched.
+     *
+     * @param  callable|null  $callback
+     * @return $this
+     */
+    public function throw(?callable $callback = null)
+    {
+        $this->throwCallback = $callback ?: fn () => null;
+
+        return $this;
+    }
+
+    /**
      * Handle the object's destruction.
      *
      * @return void
@@ -186,6 +206,11 @@ class PendingDispatch
     public function __destruct()
     {
         if (! $this->shouldDispatch()) {
+            throw tap(new Exceptions\JobDispatchedException($this->job), function ($exception) {
+                if ($this->throwCallback && is_callable($this->throwCallback)) {
+                    $this->throwCallback($this, $exception);
+                }
+            });
             return;
         } elseif ($this->afterResponse) {
             app(Dispatcher::class)->dispatchAfterResponse($this->job);
