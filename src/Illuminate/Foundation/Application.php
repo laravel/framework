@@ -854,9 +854,10 @@ class Application extends Container implements ApplicationContract, CachesConfig
      *
      * @param  \Illuminate\Support\ServiceProvider|string  $provider
      * @param  bool  $force
+     * @param  bool  $boot
      * @return \Illuminate\Support\ServiceProvider
      */
-    public function register($provider, $force = false)
+    public function register($provider, $force = false, $boot = true)
     {
         if (($registered = $this->getProvider($provider)) && ! $force) {
             return $registered;
@@ -893,7 +894,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
         // If the application has already booted, we will call this boot method on
         // the provider class so it has an opportunity to do its boot logic and
         // will be ready for any usage by this developer's application logic.
-        if ($this->isBooted()) {
+        if ($this->isBooted() && $boot) {
             $this->bootProvider($provider);
         }
 
@@ -1115,7 +1116,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      * @param  \Illuminate\Support\ServiceProvider  $provider
      * @return void
      */
-    protected function bootProvider(ServiceProvider $provider)
+    public function bootProvider($provider)
     {
         $provider->callBootingCallbacks();
 

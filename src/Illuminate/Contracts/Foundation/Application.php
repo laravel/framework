@@ -133,9 +133,10 @@ interface Application extends Container
      *
      * @param  \Illuminate\Support\ServiceProvider|string  $provider
      * @param  bool  $force
+     * @param  bool  $boot
      * @return \Illuminate\Support\ServiceProvider
      */
-    public function register($provider, $force = false);
+    public function register($provider, $force = false, $boot = true);
 
     /**
      * Register a deferred provider and service.
@@ -160,6 +161,14 @@ interface Application extends Container
      * @return void
      */
     public function boot();
+
+    /**
+     * Boot the given service provider.
+     *
+     * @param  \Illuminate\Support\ServiceProvider  $provider
+     * @return void
+     */
+    public function bootProvider($provider);
 
     /**
      * Register a new boot listener.
