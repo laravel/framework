@@ -1723,6 +1723,30 @@ class ResourceTest extends TestCase
         ], ['data' => [0 => 10, 1 => 20, 'total' => 30]]);
     }
 
+    public function testItThrowsNoErrorInStrictModeWhenResourceIsPaginated()
+    {
+        $originalMode = Model::preventsAccessingMissingAttributes();
+        Model::preventAccessingMissingAttributes();
+        try {
+            Route::get('/', function () {
+                $paginator = new LengthAwarePaginator(
+                    collect([new Post(['id' => 5, 'title' => 'Test Title', 'reading_time' => 3.0])]),
+                    10, 15, 1
+                );
+
+                return PostResourceWithJsonOptions::collection($paginator);
+            });
+
+            $response = $this->withoutExceptionHandling()->get(
+                '/', ['Accept' => 'application/json']
+            );
+
+            $response->assertStatus(200);
+        } finally {
+            Model::preventAccessingMissingAttributes($originalMode);
+        }
+    }
+
     private function assertJsonResourceResponse($data, $expectedJson)
     {
         Route::get('/', function () use ($data) {
