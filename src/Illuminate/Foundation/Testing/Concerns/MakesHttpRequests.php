@@ -91,6 +91,19 @@ trait MakesHttpRequests
     }
 
     /**
+     * Remove a header from the request.
+     *
+     * @param  string  $name
+     * @return $this
+     */
+    public function withoutHeader(string $name)
+    {
+        unset($this->defaultHeaders[$name]);
+
+        return $this;
+    }
+
+    /**
      * Add an authorization token for the request.
      *
      * @param  string  $token
@@ -121,9 +134,7 @@ trait MakesHttpRequests
      */
     public function withoutToken()
     {
-        unset($this->defaultHeaders['Authorization']);
-
-        return $this;
+        return $this->withoutHeader('Authorization');
     }
 
     /**
