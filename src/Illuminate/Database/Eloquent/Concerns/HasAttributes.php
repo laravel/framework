@@ -184,6 +184,13 @@ trait HasAttributes
     public static $encrypter;
 
     /**
+     * The hasher instance that is used to hash attributes.
+     *
+     * @var \Illuminate\Contracts\Hashing\Hasher|null
+     */
+    public static $hasher;
+
+    /**
      * Initialize the trait.
      *
      * @return void
@@ -1392,15 +1399,37 @@ trait HasAttributes
             return null;
         }
 
-        if (! Hash::isHashed($value)) {
-            return Hash::make($value);
+        if (! static::currentHasher()->isHashed($value)) {
+            return static::currentHasher()->make($value);
         }
 
-        if (! Hash::verifyConfiguration($value)) {
+        if (method_exists(static::currentHasher(), 'verifyConfiguration') &&
+            ! static::currentHasher()->verifyConfiguration($value)) {
             throw new RuntimeException("Could not verify the hashed value's configuration.");
         }
 
         return $value;
+    }
+
+    /**
+     * Set the hasher instance that will be used to hash attributes.
+     *
+     * @param  \Illuminate\Contracts\Hashing\Hasher|null  $hasher
+     * @return void
+     */
+    public static function hashUsing($hasher)
+    {
+        static::$hasher = $hasher;
+    }
+
+    /**
+     * Get the current hasher being used by the model.
+     *
+     * @return \Illuminate\Contracts\Hashing\Hasher
+     */
+    protected static function currentHasher()
+    {
+        return static::$hasher ?? Hash::getFacadeRoot()->driver();
     }
 
     /**

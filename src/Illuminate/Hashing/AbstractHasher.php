@@ -31,4 +31,15 @@ abstract class AbstractHasher
 
         return password_verify($value, $hashedValue);
     }
+
+    /**
+     * Determine if a given string is already hashed.
+     *
+     * @param  string  $value
+     * @return bool
+     */
+    public function isHashed(#[\SensitiveParameter] $value)
+    {
+        return $this->info($value)['algo'] !== null;
+    }
 }

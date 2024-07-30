@@ -39,4 +39,12 @@ interface Hasher
      * @return bool
      */
     public function needsRehash($hashedValue, array $options = []);
+
+    /**
+     * Determine if a given string is already hashed.
+     *
+     * @param  string  $value
+     * @return bool
+     */
+    public function isHashed(#[\SensitiveParameter] $value);
 }

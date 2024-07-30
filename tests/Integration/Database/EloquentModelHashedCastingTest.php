@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Database;
 
+use Illuminate\Contracts\Hashing\Hasher;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Config;
@@ -305,6 +306,40 @@ class EloquentModelHashedCastingTest extends DatabaseTestCase
         $subject = HashedCast::create([
             // "password"; 2345 memory; 2 threads; 7 time; argon2i;
             'password' => '$argon2i$v=19$m=2345,t=7,p=2$MWVVZnpiZHl5RkcveHovcA$QECQzuQ2aAKvUpD25cTUJaAyPFxlOIsCRu+5nbDsU3k',
+        ]);
+    }
+
+    public function testCustomHasherCanBeSpecified()
+    {
+        $customHasher = $this->mock(Hasher::class);
+
+        $this->assertNull(Model::$hasher);
+
+        Model::hashUsing($customHasher);
+
+        $this->assertSame($customHasher, Model::$hasher);
+
+        $customHasher->expects('isHashed')->with('password')->andReturnFalse();
+        $customHasher->expects('make')->with('password')->andReturn('this is a hashed string');
+
+        $subject = HashedCast::create([
+            'password' => 'password',
+        ]);
+
+        $this->assertDatabaseHas('hashed_casts', [
+            'id' => $subject->id,
+            'password' => 'this is a hashed string',
+        ]);
+
+        $customHasher->expects('isHashed')->with('hashed-password')->andReturnTrue();
+
+        $subject = HashedCast::create([
+            'password' => 'hashed-password',
+        ]);
+
+        $this->assertDatabaseHas('hashed_casts', [
+            'id' => $subject->id,
+            'password' => 'hashed-password',
         ]);
     }
 }
