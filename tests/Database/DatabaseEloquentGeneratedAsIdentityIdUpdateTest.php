@@ -92,7 +92,7 @@ class TestUserWithIdendityId extends Eloquent
             $user->forceFill([
                 'trials_end_at' => now()->addDays(7),
             ])->save();
-            
+
             return $user;
         });
     }
