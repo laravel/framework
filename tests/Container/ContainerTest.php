@@ -5,6 +5,8 @@ namespace Illuminate\Tests\Container;
 use Illuminate\Container\Container;
 use Illuminate\Container\EntryNotFoundException;
 use Illuminate\Contracts\Container\BindingResolutionException;
+use Illuminate\Contracts\Container\ShouldBeSingleton;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerExceptionInterface;
 use stdClass;
@@ -15,6 +17,7 @@ class ContainerTest extends TestCase
     protected function tearDown(): void
     {
         Container::setInstance(null);
+        ShouldBindAsASingleton::$timesCalled = 0;
     }
 
     public function testContainerSingleton()
@@ -687,6 +690,44 @@ class ContainerTest extends TestCase
     //     $container = new Container;
     //     $container->get(CircularAStub::class);
     // }
+
+    #[DataProvider('shouldBindAsSingletonClasses')]
+    public function test_make_classImplementsShouldBeSingleton_onlyIsBuiltOnce(string $class)
+    {
+        // Given
+        $container = new Container;
+        $container->make($class);
+
+        // When
+        $container->make($class);
+
+        // Then
+        $this->assertEquals(1, $class::$timesCalled);
+    }
+
+    #[DataProvider('shouldBindAsSingletonClasses')]
+    public function test_singleton_classExtendsShouldBeSingleton_boundAsSingleton(string $class)
+    {
+        // Given
+        $container = new Container;
+
+        // When
+        $container->singleton($class);
+
+        // Then
+        $this->assertTrue($container->bound($class));
+    }
+
+    /**
+     * @return class-string<ShouldBindAsASingleton>[]
+     */
+    public static function shouldBindAsSingletonClasses(): array
+    {
+        return [
+            [ShouldBindAsASingleton::class],
+            [ShouldBindAsASingletonChild::class],
+        ];
+    }
 }
 
 class CircularAStub
@@ -809,4 +850,18 @@ class ContainerContextualBindingCallTarget
     {
         return $stub;
     }
+}
+
+class ShouldBindAsASingleton implements ShouldBeSingleton
+{
+    public static int $timesCalled = 0;
+
+    public function __construct()
+    {
+        self::$timesCalled++;
+    }
+}
+
+class ShouldBindAsASingletonChild extends ShouldBindAsASingleton
+{
 }

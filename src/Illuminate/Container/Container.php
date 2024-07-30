@@ -9,6 +9,7 @@ use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Container\CircularDependencyException;
 use Illuminate\Contracts\Container\Container as ContainerContract;
 use Illuminate\Contracts\Container\ContextualAttribute;
+use Illuminate\Contracts\Container\ShouldBeSingleton;
 use LogicException;
 use ReflectionAttribute;
 use ReflectionClass;
@@ -825,7 +826,7 @@ class Container implements ArrayAccess, ContainerContract
         // If the requested type is registered as a singleton we'll want to cache off
         // the instances in "memory" so we can return it later without creating an
         // entirely new instance of an object on each subsequent request for it.
-        if ($this->isShared($abstract) && ! $needsContextualBuild) {
+        if (($this->isShared($abstract) || $object instanceof ShouldBeSingleton) && ! $needsContextualBuild) {
             $this->instances[$abstract] = $object;
         }
 
