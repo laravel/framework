@@ -7,6 +7,7 @@ use Illuminate\Auth\AuthManager;
 use Illuminate\Cache\CacheManager;
 use Illuminate\Cache\Repository as CacheRepository;
 use Illuminate\Config\Repository;
+use Illuminate\Container\Attributes\Authed;
 use Illuminate\Container\Attributes\Cache;
 use Illuminate\Container\Attributes\Config;
 use Illuminate\Container\Attributes\Database;
@@ -14,6 +15,8 @@ use Illuminate\Container\Attributes\Guard;
 use Illuminate\Container\Attributes\Log;
 use Illuminate\Container\Attributes\Storage;
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Contracts\Auth\Guard as GuardContract;
 use Illuminate\Contracts\Container\ContextualAttribute;
 use Illuminate\Contracts\Filesystem\Filesystem;
@@ -96,6 +99,30 @@ class ContextualAttributeBindingTest extends TestCase
         $class = $container->make(ContainerTestHasConfigValueWithResolvePropertyAndAfterCallback::class);
 
         $this->assertEquals('Developer', $class->person->role);
+    }
+
+    public function testAuthedAttribute()
+    {
+        $container = new Container;
+        $container->singleton('auth', function () {
+            $manager = m::mock(AuthManager::class);
+            $manager->shouldReceive('guard')->with('foo')->andReturnUsing(function () {
+                $guard = m::mock(GuardContract::class);
+                $guard->shouldReceive('user')->andReturn(m:mock(AuthenticatableContract::class));
+
+                return $guard;
+            });
+            $manager->shouldReceive('guard')->with('bar')->andReturnUsing(function () {
+                $guard = m::mock(GuardContract::class);
+                $guard->shouldReceive('user')->andReturn(m:mock(AuthenticatableContract::class));
+
+                return $guard;
+            });
+
+            return $manager;
+        });
+
+        $container->make(GuardTest::class);
     }
 
     public function testCacheAttribute()
@@ -283,6 +310,13 @@ final class ContainerTestHasConfigValueWithResolvePropertyAndAfterCallback
         #[ContainerTestConfigValueWithResolveAndAfter]
         public object $person
     ) {
+    }
+}
+
+final class AuthedTest
+{
+    public function __construct(#[Authed('foo')] AuthenticatableContract $foo, #[Cache('bar')] AuthenticatableContract $bar)
+    {
     }
 }
 
