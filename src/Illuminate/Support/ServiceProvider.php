@@ -11,8 +11,8 @@ use Illuminate\Database\Eloquent\Factory as ModelFactory;
 use Illuminate\View\Compilers\BladeCompiler;
 
 /**
- * @property array<class-string, class-string> $bindings All of the container bindings that should be registered.
- * @property array<class-string, class-string> $singletons All of the singletons that should be registered.
+ * @property array<string, string> $bindings All of the container bindings that should be registered.
+ * @property array<array-key, string> $singletons All of the singletons that should be registered.
  */
 abstract class ServiceProvider
 {
