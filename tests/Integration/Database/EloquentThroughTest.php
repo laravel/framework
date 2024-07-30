@@ -31,7 +31,6 @@ class EloquentThroughTest extends DatabaseTestCase
             $table->unsignedInteger('comment_id');
         });
 
-
         $post = tap(new Post(['public' => true]))->save();
         $comment = tap((new Comment)->commentable()->associate($post))->save();
         (new Like())->comment()->associate($comment)->save();

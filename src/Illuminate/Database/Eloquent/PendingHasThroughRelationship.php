@@ -4,7 +4,6 @@ namespace Illuminate\Database\Eloquent;
 
 use BadMethodCallException;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOneOrMany;
 use Illuminate\Support\Str;
 
@@ -66,7 +65,7 @@ class PendingHasThroughRelationship
         $distantRelation = $callback($this->localRelationship->getRelated());
 
         if ($distantRelation instanceof HasMany) {
-            $returnedRelation =  $this->rootModel->hasManyThrough(
+            $returnedRelation = $this->rootModel->hasManyThrough(
                 $distantRelation->getRelated()::class,
                 $this->localRelationship->getRelated()::class,
                 $this->localRelationship->getForeignKeyName(),
