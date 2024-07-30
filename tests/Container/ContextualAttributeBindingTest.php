@@ -121,7 +121,7 @@ class ContextualAttributeBindingTest extends TestCase
             return $manager;
         });
 
-        $container->make(GuardTest::class);
+        $container->make(AuthedTest::class);
     }
 
     public function testCacheAttribute()
@@ -314,7 +314,7 @@ final class ContainerTestHasConfigValueWithResolvePropertyAndAfterCallback
 
 final class AuthedTest
 {
-    public function __construct(#[Authed('foo')] AuthenticatableContract $foo, #[Cache('bar')] AuthenticatableContract $bar)
+    public function __construct(#[Authed('foo')] AuthenticatableContract $foo, #[Authed('bar')] AuthenticatableContract $bar)
     {
     }
 }
