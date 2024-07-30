@@ -103,6 +103,13 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertSame('select "x"."y" as "foo.bar" from "baz"', $builder->toSql());
     }
 
+    public function testAliasInArrayKey()
+    {
+        $builder = $this->getBuilder();
+        $builder->select(['foo.bar' => 'x.y'])->from('baz');
+        $this->assertSame('select "x"."y" as "foo.bar" from "baz"', $builder->toSql());
+    }
+
     public function testAliasWrappingWithSpacesInDatabaseName()
     {
         $builder = $this->getBuilder();
@@ -115,6 +122,13 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getBuilder();
         $builder->select('foo')->addSelect('bar')->addSelect(['baz', 'boom'])->addSelect('bar')->from('users');
         $this->assertSame('select "foo", "bar", "baz", "boom" from "users"', $builder->toSql());
+    }
+
+    public function testAddingSelectsWithAlias()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('foo')->addSelect(['baz' => 'bar'])->addSelect(['bust' => 'boom'])->from('users');
+        $this->assertSame('select "foo", "bar" as "baz", "boom" as "bust" from "users"', $builder->toSql());
     }
 
     public function testBasicSelectWithPrefix()
