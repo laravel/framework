@@ -13,7 +13,7 @@ class Number
     /**
      * The current default locale.
      *
-     * @var callback|string
+     * @var callable|string
      */
     protected static $locale = 'en';
 
@@ -282,7 +282,7 @@ class Number
      * Execute the given callback using the given locale.
      *
      * @param  callable|string  $locale
-     * @param  callable         $callback
+     * @param  callable  $callback
      * @return mixed
      */
     public static function withLocale(callable|string $locale, callable $callback)
