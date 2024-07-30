@@ -35,6 +35,8 @@ class Number
      */
     public static function format(int|float $number, ?int $precision = null, ?int $maxPrecision = null, ?string $locale = null)
     {
+        static::checkLocale();
+
         static::ensureIntlExtensionIsInstalled();
 
         $formatter = new NumberFormatter($locale ?? static::$locale, NumberFormatter::DECIMAL);
@@ -59,6 +61,8 @@ class Number
      */
     public static function spell(int|float $number, ?string $locale = null, ?int $after = null, ?int $until = null)
     {
+        static::checkLocale();
+
         static::ensureIntlExtensionIsInstalled();
 
         if (! is_null($after) && $number <= $after) {
@@ -83,6 +87,8 @@ class Number
      */
     public static function ordinal(int|float $number, ?string $locale = null)
     {
+        static::checkLocale();
+
         static::ensureIntlExtensionIsInstalled();
 
         $formatter = new NumberFormatter($locale ?? static::$locale, NumberFormatter::ORDINAL);
@@ -101,6 +107,8 @@ class Number
      */
     public static function percentage(int|float $number, int $precision = 0, ?int $maxPrecision = null, ?string $locale = null)
     {
+        static::checkLocale();
+
         static::ensureIntlExtensionIsInstalled();
 
         $formatter = new NumberFormatter($locale ?? static::$locale, NumberFormatter::PERCENT);
@@ -124,6 +132,8 @@ class Number
      */
     public static function currency(int|float $number, string $in = 'USD', ?string $locale = null)
     {
+        static::checkLocale();
+
         static::ensureIntlExtensionIsInstalled();
 
         $formatter = new NumberFormatter($locale ?? static::$locale, NumberFormatter::CURRENCY);
@@ -314,16 +324,24 @@ class Number
     }
 
     /**
+     * Check $setLocale and set the locale if it is not null.
+     *
+     * @return void
+     */
+    protected static function checkLocale()
+    {
+        if (! is_null(static::$setLocale)) {
+            static::$locale = call_user_func(static::$setLocale);
+        }
+    }
+
+    /**
      * Ensure the "intl" PHP extension is installed.
      *
      * @return void
      */
     protected static function ensureIntlExtensionIsInstalled()
     {
-        if (! is_null(static::$setLocale)) {
-            static::$locale = call_user_func(static::$setLocale);
-        }
-
         if (! extension_loaded('intl')) {
             $method = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1]['function'];
 
