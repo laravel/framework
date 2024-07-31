@@ -18,6 +18,7 @@ use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\MultipleRecordsFoundException;
 use Illuminate\Database\RecordsNotFoundException;
+use Illuminate\Foundation\Exceptions\Contracts\ShouldntReport;
 use Illuminate\Foundation\Exceptions\Renderer\Renderer;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\JsonResponse;
@@ -398,6 +399,10 @@ class Handler implements ExceptionHandlerContract
     protected function shouldntReport(Throwable $e)
     {
         if ($this->withoutDuplicates && ($this->reportedExceptionMap[$e] ?? false)) {
+            return true;
+        }
+
+        if ($e instanceof ShouldntReport) {
             return true;
         }
 
