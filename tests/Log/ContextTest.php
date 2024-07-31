@@ -136,7 +136,6 @@ class ContextTest extends TestCase
             'data' => [
                 'string' => 's:6:"string";',
                 'bool' => 'b:0;',
-                'bool' => 'b:0;',
                 'int' => 'i:5;',
                 'float' => 'd:5.5;',
                 'null' => 'N;',
@@ -213,6 +212,16 @@ class ContextTest extends TestCase
         $this->assertTrue(Context::in('foo', 'bar'));
         $this->assertTrue(Context::in('foo', 'lorem'));
         $this->assertFalse(Context::in('foo', 'doesNotExist'));
+    }
+
+    public function test_it_can_check_if_value_is_in_context_stack_with_strict()
+    {
+        Context::push('foo', 'bar', ['lorem'], 123);
+
+        $this->assertTrue(Context::in('foo', 'bar', true));
+        $this->assertTrue(Context::in('foo', ['lorem'], true));
+        $this->assertTrue(Context::in('foo', 123, true));
+        $this->assertFalse(Context::in('foo', '123', true));
     }
 
     public function test_it_can_check_if_value_is_in_hidden_context_stack()

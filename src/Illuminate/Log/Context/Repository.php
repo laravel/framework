@@ -316,11 +316,12 @@ class Repository
      *
      * @param  string  $key
      * @param  mixed  $value
+     * @param  bool  $strict
      * @return bool
      *
      * @throws \RuntimeException
      */
-    public function in(string $key, mixed $value): bool
+    public function in(string $key, mixed $value, bool $strict = false): bool
     {
         if (! $this->isStackable($key)) {
             throw new RuntimeException("Given value is not a stack for key [{$key}].");
@@ -330,7 +331,7 @@ class Repository
             return false;
         }
 
-        return in_array($value, $this->data[$key], true);
+        return in_array($value, $this->data[$key], $strict);
     }
 
     /**
@@ -338,11 +339,12 @@ class Repository
      *
      * @param  string  $key
      * @param  mixed  $value
+     * @param  bool  $strict
      * @return bool
      *
      * @throws \RuntimeException
      */
-    public function inHidden(string $key, mixed $value): bool
+    public function inHidden(string $key, mixed $value, bool $strict = false): bool
     {
         if (! $this->isHiddenStackable($key)) {
             throw new RuntimeException("Given value is not a hidden stack for key [{$key}].");
@@ -352,7 +354,7 @@ class Repository
             return false;
         }
 
-        return in_array($value, $this->hidden[$key], true);
+        return in_array($value, $this->hidden[$key], $strict);
     }
 
     /**
