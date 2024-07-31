@@ -217,15 +217,9 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
      */
     protected function localeForChoice($key, $locale)
     {
-        if ($locale && $this->hasForLocale($key, $locale)) {
-            return $locale;
-        }
+        $locale = $locale ?: $this->locale;
 
-        if ($this->hasForLocale($key, $this->locale)) {
-            return $this->locale;
-        }
-
-        return $this->fallback;
+        return $this->hasForLocale($key, $locale) ? $locale : $this->fallback;
     }
 
     /**
