@@ -9,6 +9,16 @@ use Illuminate\Support\ServiceProvider;
 class FilesystemServiceProvider extends ServiceProvider
 {
     /**
+     * Bootstrap the filesystem.
+     *
+     * @return void
+     */
+    public function boot()
+    {
+        $this->registerFileServing();
+    }
+
+    /**
      * Register the service provider.
      *
      * @return void
@@ -17,7 +27,6 @@ class FilesystemServiceProvider extends ServiceProvider
     {
         $this->registerNativeFilesystem();
         $this->registerFlysystem();
-        $this->registerFileServing();
     }
 
     /**
