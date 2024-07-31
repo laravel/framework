@@ -217,7 +217,7 @@ class ContextTest extends TestCase
 
     public function test_it_can_check_if_value_is_in_hidden_context_stack()
     {
-        Context::pushHidden('foo','bar', 'lorem');
+        Context::pushHidden('foo', 'bar', 'lorem');
 
         $this->assertTrue(Context::inHidden('foo', 'bar'));
         $this->assertTrue(Context::inHidden('foo', 'lorem'));
