@@ -28,7 +28,7 @@ class Number
      */
     public static function format(int|float $number, ?int $precision = null, ?int $maxPrecision = null, ?string $locale = null)
     {
-        $locale ??= static::checkLocale();
+        $locale ??= static::locale();
 
         static::ensureIntlExtensionIsInstalled();
 
@@ -54,7 +54,7 @@ class Number
      */
     public static function spell(int|float $number, ?string $locale = null, ?int $after = null, ?int $until = null)
     {
-        $locale ??= static::checkLocale();
+        $locale ??= static::locale();
 
         static::ensureIntlExtensionIsInstalled();
 
@@ -80,7 +80,7 @@ class Number
      */
     public static function ordinal(int|float $number, ?string $locale = null)
     {
-        $locale ??= static::checkLocale();
+        $locale ??= static::locale();
 
         static::ensureIntlExtensionIsInstalled();
 
@@ -100,7 +100,7 @@ class Number
      */
     public static function percentage(int|float $number, int $precision = 0, ?int $maxPrecision = null, ?string $locale = null)
     {
-        $locale ??= static::checkLocale();
+        $locale ??= static::locale();
 
         static::ensureIntlExtensionIsInstalled();
 
@@ -125,7 +125,7 @@ class Number
      */
     public static function currency(int|float $number, string $in = 'USD', ?string $locale = null)
     {
-        $locale ??= static::checkLocale();
+        $locale ??= static::locale();
 
         static::ensureIntlExtensionIsInstalled();
 
@@ -295,6 +295,16 @@ class Number
     }
 
     /**
+     * Get the current default locale.
+     *
+     * @return string
+     */
+    protected static function locale()
+    {
+        return value(static::$locale);
+    }
+
+    /**
      * Set the default locale.
      *
      * @param  callable|string  $locale
@@ -303,18 +313,6 @@ class Number
     public static function useLocale(callable|string $locale)
     {
         static::$locale = $locale;
-    }
-
-    /**
-     * Check $setLocale and set the locale if it is not null.
-     *
-     * @return string
-     */
-    protected static function checkLocale()
-    {
-        $check = ! is_string(static::$locale) && is_callable(static::$locale);
-
-        return $check ? call_user_func(static::$locale) : static::$locale;
     }
 
     /**
