@@ -514,4 +514,9 @@ class MySqlGrammar extends Grammar
 
         return 'json_extract('.$field.$path.')';
     }
+
+    public function compileThreadsCount()
+    {
+        return 'select variable_value as `Value` from performance_schema.session_status where variable_name = \'threads_connected\'';
+    }
 }

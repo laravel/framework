@@ -608,18 +608,6 @@ class Builder
     }
 
     /**
-     * Get the number of open connections for a database.
-     *
-     * @return int|null
-     */
-    public function getConnectionsCount()
-    {
-        $query = $this->grammar->compileConnectionsCount();
-
-        return $query ? $this->connection->scalar($query) : null;
-    }
-
-    /**
      * Set the Schema Blueprint resolver callback.
      *
      * @param  \Closure  $resolver

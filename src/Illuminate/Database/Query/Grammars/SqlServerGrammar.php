@@ -497,6 +497,11 @@ class SqlServerGrammar extends Grammar
         return 'ROLLBACK TRANSACTION '.$name;
     }
 
+    public function compileThreadsCount()
+    {
+        return 'select count(*) Value from sys.dm_exec_sessions where status = N\'running\'';
+    }
+
     /**
      * Get the format for database stored dates.
      *

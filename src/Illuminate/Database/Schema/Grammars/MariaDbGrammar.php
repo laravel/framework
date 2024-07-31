@@ -55,9 +55,4 @@ class MariaDbGrammar extends MySqlGrammar
             $column->srid ? ' ref_system_id='.$column->srid : ''
         );
     }
-
-    public function compileConnectionsCount()
-    {
-        return 'select variable_value as `Value` from information_schema.global_status where variable_name = \'THREADS_CONNECTED\'';
-    }
 }

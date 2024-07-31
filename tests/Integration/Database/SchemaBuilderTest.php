@@ -874,14 +874,4 @@ class SchemaBuilderTest extends DatabaseTestCase
         $this->assertTrue(Schema::hasForeignKeyForColumn('question_id', 'answers', 'questions'));
         $this->assertFalse(Schema::hasForeignKeyForColumn('body', 'answers', 'questions'));
     }
-
-    public function testGetConnectionsCount()
-    {
-        $count = Schema::getConnectionsCount();
-        if ($this->driver === 'sqlite') {
-            $this->assertNull($count, 'SQLite does not support connection count');
-        } else {
-            $this->assertGreaterThanOrEqual(1, $count);
-        }
-    }
 }

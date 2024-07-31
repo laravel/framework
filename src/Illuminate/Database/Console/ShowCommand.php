@@ -48,7 +48,7 @@ class ShowCommand extends DatabaseInspectionCommand
                 'name' => $connection->getDriverTitle(),
                 'connection' => $connection->getName(),
                 'version' => $connection->getServerVersion(),
-                'open_connections' => $schema->getConnectionsCount(),
+                'open_connections' => $connection->getThreadsCount(),
             ],
             'tables' => $this->tables($connection, $schema),
         ];

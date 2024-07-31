@@ -1085,6 +1085,18 @@ class Connection implements ConnectionInterface
     }
 
     /**
+     * Get the number of open connections for a database.
+     *
+     * @return int|null
+     */
+    public function getThreadsCount()
+    {
+        $query = $this->getQueryGrammar()->compileThreadsCount();
+
+        return $query ? $this->scalar($query) : null;
+    }
+
+    /**
      * Escape a value for safe SQL embedding.
      *
      * @param  string|float|int|bool|null  $value

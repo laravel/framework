@@ -43,4 +43,9 @@ class MariaDbGrammar extends MySqlGrammar
     {
         return false;
     }
+
+    public function compileThreadsCount()
+    {
+        return 'select variable_value as `Value` from information_schema.global_status where variable_name = \'THREADS_CONNECTED\'';
+    }
 }

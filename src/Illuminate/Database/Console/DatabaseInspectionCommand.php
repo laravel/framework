@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Console;
 
 use Illuminate\Console\Command;
+use Illuminate\Database\Connection;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Support\Arr;
 
@@ -15,7 +16,7 @@ abstract class DatabaseInspectionCommand extends Command
      * @param  string  $database
      * @return string
      *
-     * @deprecated Use $connection->getDriverTitle() instead.
+     * @deprecated
      */
     protected function getConnectionName(ConnectionInterface $connection, $database)
     {
@@ -28,11 +29,11 @@ abstract class DatabaseInspectionCommand extends Command
      * @param  \Illuminate\Database\ConnectionInterface  $connection
      * @return int|null
      *
-     * @deprecated Use Schema\Builder::getConnectionsCount() instead.
+     * @deprecated
      */
     protected function getConnectionCount(ConnectionInterface $connection)
     {
-        return $connection->getSchemaBuilder()->getConnectionsCount();
+        return $connection->getThreadsCount();
     }
 
     /**
