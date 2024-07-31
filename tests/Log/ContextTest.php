@@ -206,6 +206,31 @@ class ContextTest extends TestCase
         $this->assertFalse(Context::has('unset'));
     }
 
+    public function test_it_can_check_if_value_is_in_context_stack()
+    {
+        Context::push('foo', 'bar', 'lorem');
+
+        $this->assertTrue(Context::in('foo', 'bar'));
+        $this->assertTrue(Context::in('foo', 'lorem'));
+        $this->assertFalse(Context::in('foo', 'doesNotExist'));
+    }
+
+    public function test_it_can_check_if_value_is_in_hidden_context_stack()
+    {
+        Context::pushHidden('foo','bar', 'lorem');
+
+        $this->assertTrue(Context::inHidden('foo', 'bar'));
+        $this->assertTrue(Context::inHidden('foo', 'lorem'));
+        $this->assertFalse(Context::inHidden('foo', 'doesNotExist'));
+    }
+
+    public function test_it_cannot_check_if_hidden_value_is_in_non_hidden_context_stack()
+    {
+        Context::pushHidden('foo', 'bar', 'lorem');
+
+        $this->assertFalse(Context::in('foo', 'bar'));
+    }
+
     public function test_it_can_get_all_values()
     {
         Context::add('foo', 'bar');
