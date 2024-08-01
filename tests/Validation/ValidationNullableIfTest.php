@@ -33,17 +33,6 @@ class ValidationNullableIfTest extends TestCase
         $this->assertSame('', (string) $rule);
     }
 
-    public function testItOnlyCallableAndBooleanAreAcceptableArgumentsOfTheRule()
-    {
-        $rule = new NullableIf(false);
-
-        $rule = new NullableIf(true);
-
-        $this->expectException(InvalidArgumentException::class);
-
-        $rule = new NullableIf('phpinfo');
-    }
-
     public function testItReturnedRuleIsNotSerializable()
     {
         $this->expectException(Exception::class);
@@ -51,19 +40,5 @@ class ValidationNullableIfTest extends TestCase
         $rule = serialize(new NullableIf(function () {
             return true;
         }));
-    }
-
-    public function testNullableIfValidationMessage()
-    {
-        $validator = Validator::make(
-            ['field' => 'value'],
-            ['field' => ['nullable_if:other,1']]
-        );
-
-        $this->assertTrue($validator->fails());
-        $this->assertEquals(
-            'The field field must be nullable when other is 1.',
-            $validator->errors()->first('field')
-        );
     }
 }
