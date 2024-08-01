@@ -58,7 +58,7 @@ abstract class DatabaseInspectionCommand extends Command
     /**
      * Get the connection configuration details for the given connection.
      *
-     * @param  string  $database
+     * @param  string|null  $database
      * @return array
      */
     protected function getConfigFromDatabase($database)

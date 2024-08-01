@@ -69,7 +69,7 @@ namespace Illuminate\Support\Facades;
  * @method static bool hasMacro(string $name)
  * @method static void flushMacros()
  *
- * @see \Illuminate\Session\SessionManager
+ * @mixin \Illuminate\Session\SessionManager
  */
 class Session extends Facade
 {

@@ -34,7 +34,7 @@ namespace Illuminate\Support\Facades;
  * @method static void flushMacros()
  * @method static \Illuminate\Database\Eloquent\Model restoreModel(\Illuminate\Contracts\Database\ModelIdentifier $value)
  *
- * @see \Illuminate\Log\Context\Repository
+ * @mixin \Illuminate\Log\Context\Repository
  */
 class Context extends Facade
 {

@@ -33,8 +33,8 @@ use Illuminate\Contracts\Broadcasting\Factory as BroadcastingFactoryContract;
  * @method static \Illuminate\Broadcasting\Broadcasters\Broadcaster channel(\Illuminate\Contracts\Broadcasting\HasBroadcastChannel|string $channel, callable|string $callback, array $options = [])
  * @method static \Illuminate\Support\Collection getChannels()
  *
- * @see \Illuminate\Broadcasting\BroadcastManager
- * @see \Illuminate\Broadcasting\Broadcasters\Broadcaster
+ * @mixin \Illuminate\Broadcasting\BroadcastManager
+ * @mixin \Illuminate\Broadcasting\Broadcasters\Broadcaster
  */
 class Broadcast extends Facade
 {

@@ -19,8 +19,8 @@ namespace Illuminate\Support\Facades;
  * @method static \Illuminate\Hashing\HashManager setContainer(\Illuminate\Contracts\Container\Container $container)
  * @method static \Illuminate\Hashing\HashManager forgetDrivers()
  *
- * @see \Illuminate\Hashing\HashManager
- * @see \Illuminate\Hashing\AbstractHasher
+ * @mixin \Illuminate\Hashing\HashManager
+ * @mixin \Illuminate\Hashing\AbstractHasher
  */
 class Hash extends Facade
 {

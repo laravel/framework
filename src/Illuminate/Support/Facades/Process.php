@@ -44,8 +44,8 @@ use Illuminate\Process\Factory;
  * @method static void flushMacros()
  * @method static mixed macroCall(string $method, array $parameters)
  *
- * @see \Illuminate\Process\PendingProcess
- * @see \Illuminate\Process\Factory
+ * @mixin \Illuminate\Process\PendingProcess
+ * @mixin \Illuminate\Process\Factory
  */
 class Process extends Facade
 {

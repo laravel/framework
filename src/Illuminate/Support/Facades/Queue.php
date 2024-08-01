@@ -53,9 +53,9 @@ use Illuminate\Support\Testing\Fakes\QueueFake;
  * @method static array pushedJobs()
  * @method static \Illuminate\Support\Testing\Fakes\QueueFake serializeAndRestore(bool $serializeAndRestore = true)
  *
- * @see \Illuminate\Queue\QueueManager
- * @see \Illuminate\Queue\Queue
- * @see \Illuminate\Support\Testing\Fakes\QueueFake
+ * @mixin \Illuminate\Queue\QueueManager
+ * @mixin \Illuminate\Queue\Queue
+ * @mixin \Illuminate\Support\Testing\Fakes\QueueFake
  */
 class Queue extends Facade
 {

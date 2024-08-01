@@ -18,7 +18,7 @@ namespace Illuminate\Support\Facades;
  * @method static mixed option(string $option)
  * @method static string|false token()
  *
- * @see \Illuminate\Testing\ParallelTesting
+ * @mixin \Illuminate\Testing\ParallelTesting
  */
 class ParallelTesting extends Facade
 {

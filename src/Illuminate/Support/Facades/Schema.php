@@ -46,7 +46,7 @@ namespace Illuminate\Support\Facades;
  * @method static bool hasMacro(string $name)
  * @method static void flushMacros()
  *
- * @see \Illuminate\Database\Schema\Builder
+ * @mixin \Illuminate\Database\Schema\Builder
  */
 class Schema extends Facade
 {

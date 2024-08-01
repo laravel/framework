@@ -279,8 +279,8 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
                 $value = call_user_func($this->stringableHandlers[get_class($value)], $value);
             }
 
-            $shouldReplace[':'.Str::ucfirst($key ?? '')] = Str::ucfirst($value ?? '');
-            $shouldReplace[':'.Str::upper($key ?? '')] = Str::upper($value ?? '');
+            $shouldReplace[':'.Str::ucfirst($key)] = Str::ucfirst($value ?? '');
+            $shouldReplace[':'.Str::upper($key)] = Str::upper($value ?? '');
             $shouldReplace[':'.$key] = $value;
         }
 

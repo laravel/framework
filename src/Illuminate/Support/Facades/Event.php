@@ -36,8 +36,8 @@ use Illuminate\Support\Testing\Fakes\EventFake;
  * @method static bool hasDispatched(string $event)
  * @method static array dispatchedEvents()
  *
- * @see \Illuminate\Events\Dispatcher
- * @see \Illuminate\Support\Testing\Fakes\EventFake
+ * @mixin \Illuminate\Events\Dispatcher
+ * @mixin \Illuminate\Support\Testing\Fakes\EventFake
  */
 class Event extends Facade
 {

@@ -23,7 +23,7 @@ use Illuminate\Contracts\Console\Kernel as ConsoleKernelContract;
  * @method static \Illuminate\Foundation\Console\Kernel addCommandPaths(array $paths)
  * @method static \Illuminate\Foundation\Console\Kernel addCommandRoutePaths(array $paths)
  *
- * @see \Illuminate\Foundation\Console\Kernel
+ * @mixin \Illuminate\Foundation\Console\Kernel
  */
 class Artisan extends Facade
 {

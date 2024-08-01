@@ -914,12 +914,12 @@ class TestResponse implements ArrayAccess
                         break;
                     }
                 }
-            }
 
-            if ($errorMissing) {
-                PHPUnit::withResponse($this)->fail(
-                    "Failed to find a validation error in the response for key and message: '$key' => '$expectedMessage'".PHP_EOL.PHP_EOL.$errorMessage
-                );
+                if ($errorMissing) {
+                    PHPUnit::withResponse($this)->fail(
+                        "Failed to find a validation error in the response for key and message: '$key' => '$expectedMessage'".PHP_EOL.PHP_EOL.$errorMessage
+                    );
+                }
             }
         }
 
