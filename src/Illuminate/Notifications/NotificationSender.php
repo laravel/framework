@@ -2,6 +2,7 @@
 
 namespace Illuminate\Notifications;
 
+use Throwable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Contracts\Translation\HasLocalePreference;
 use Illuminate\Database\Eloquent\Collection as ModelCollection;
@@ -12,7 +13,6 @@ use Illuminate\Notifications\Events\NotificationSent;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Localizable;
-use Throwable;
 
 class NotificationSender
 {
@@ -147,7 +147,7 @@ class NotificationSender
             return;
         }
 
-        try{
+        try {
             $response = $this->manager->driver($channel)->send($notifiable, $notification);
 
             $this->events->dispatch(
