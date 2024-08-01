@@ -8,6 +8,8 @@ use Illuminate\Database\Console\Migrations\ResetCommand;
 use Illuminate\Database\Console\WipeCommand;
 
 /**
+
+ *
  * @mixin \Illuminate\Database\DatabaseManager
  */
 class DB extends Facade
