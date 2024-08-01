@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Testing\Fakes\EventFake;
 
 /**
+
+ *
  * @mixin \Illuminate\Events\Dispatcher
  * @mixin \Illuminate\Support\Testing\Fakes\EventFake
  */
