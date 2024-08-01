@@ -5,6 +5,8 @@ namespace Illuminate\Support\Facades;
 use Illuminate\Contracts\Console\Kernel as ConsoleKernelContract;
 
 /**
+
+ *
  * @mixin \Illuminate\Foundation\Console\Kernel
  */
 class Artisan extends Facade
