@@ -1427,7 +1427,7 @@ trait HasAttributes
      *
      * @return \Illuminate\Contracts\Hashing\Hasher
      */
-    protected static function currentHasher()
+    public static function currentHasher()
     {
         return static::$hasher ?? Hash::getFacadeRoot()->driver();
     }

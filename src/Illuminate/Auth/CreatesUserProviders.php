@@ -76,7 +76,7 @@ trait CreatesUserProviders
      */
     protected function createEloquentProvider($config)
     {
-        return new EloquentUserProvider($this->app['hash'], $config['model']);
+        return new EloquentUserProvider($config['model']);
     }
 
     /**

@@ -11,13 +11,6 @@ use Illuminate\Contracts\Support\Arrayable;
 class EloquentUserProvider implements UserProvider
 {
     /**
-     * The hasher implementation.
-     *
-     * @var \Illuminate\Contracts\Hashing\Hasher
-     */
-    protected $hasher;
-
-    /**
      * The Eloquent user model.
      *
      * @var string
@@ -34,14 +27,12 @@ class EloquentUserProvider implements UserProvider
     /**
      * Create a new database user provider.
      *
-     * @param  \Illuminate\Contracts\Hashing\Hasher  $hasher
      * @param  string  $model
      * @return void
      */
-    public function __construct(HasherContract $hasher, $model)
+    public function __construct($model)
     {
         $this->model = $model;
-        $this->hasher = $hasher;
     }
 
     /**
@@ -152,7 +143,7 @@ class EloquentUserProvider implements UserProvider
             return false;
         }
 
-        return $this->hasher->check($plain, $user->getAuthPassword());
+        return $this->getHasher()->check($plain, $user->getAuthPassword());
     }
 
     /**
@@ -165,12 +156,12 @@ class EloquentUserProvider implements UserProvider
      */
     public function rehashPasswordIfRequired(UserContract $user, #[\SensitiveParameter] array $credentials, bool $force = false)
     {
-        if (! $this->hasher->needsRehash($user->getAuthPassword()) && ! $force) {
+        if (! $this->getHasher()->needsRehash($user->getAuthPassword()) && ! $force) {
             return;
         }
 
         $user->forceFill([
-            $user->getAuthPasswordName() => $this->hasher->make($credentials['password']),
+            $user->getAuthPasswordName() => $this->getHasher()->make($credentials['password']),
         ])->save();
     }
 
@@ -212,7 +203,7 @@ class EloquentUserProvider implements UserProvider
      */
     public function getHasher()
     {
-        return $this->hasher;
+        return $this->model::currentHasher();
     }
 
     /**
@@ -223,7 +214,7 @@ class EloquentUserProvider implements UserProvider
      */
     public function setHasher(HasherContract $hasher)
     {
-        $this->hasher = $hasher;
+        $this->model::hashUsing($hasher);
 
         return $this;
     }

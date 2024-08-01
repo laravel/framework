@@ -132,7 +132,8 @@ class AuthEloquentUserProviderTest extends TestCase
     {
         $hasher = m::mock(Hasher::class);
         $hasher->shouldReceive('check')->once()->with('plain', 'hash')->andReturn(true);
-        $provider = new EloquentUserProvider($hasher, 'foo');
+        EloquentProviderUserStub::$hasher = $hasher;
+        $provider = new EloquentUserProvider(EloquentProviderUserStub::class);
         $user = m::mock(Authenticatable::class);
         $user->shouldReceive('getAuthPassword')->once()->andReturn('hash');
         $result = $provider->validateCredentials($user, ['password' => 'plain']);
@@ -144,7 +145,8 @@ class AuthEloquentUserProviderTest extends TestCase
     {
         $hasher = m::mock(Hasher::class);
         $hasher->shouldReceive('check')->once()->with('plain', 'hash')->andReturn(false);
-        $provider = new EloquentUserProvider($hasher, 'foo');
+        EloquentProviderUserStub::$hasher = $hasher;
+        $provider = new EloquentUserProvider(EloquentProviderUserStub::class);
         $user = m::mock(Authenticatable::class);
         $user->shouldReceive('getAuthPassword')->once()->andReturn('hash');
         $result = $provider->validateCredentials($user, ['password' => 'plain']);
@@ -164,7 +166,9 @@ class AuthEloquentUserProviderTest extends TestCase
         $user->shouldReceive('forceFill')->once()->with(['password_attribute' => 'rehashed'])->andReturnSelf();
         $user->shouldReceive('save')->once();
 
-        $provider = new EloquentUserProvider($hasher, 'foo');
+        EloquentProviderUserStub::$hasher = $hasher;
+
+        $provider = new EloquentUserProvider(EloquentProviderUserStub::class);
         $provider->rehashPasswordIfRequired($user, ['password' => 'plain']);
     }
 
@@ -180,14 +184,15 @@ class AuthEloquentUserProviderTest extends TestCase
         $user->shouldNotReceive('forceFill');
         $user->shouldNotReceive('save');
 
-        $provider = new EloquentUserProvider($hasher, 'foo');
+        EloquentProviderUserStub::$hasher = $hasher;
+
+        $provider = new EloquentUserProvider(EloquentProviderUserStub::class);
         $provider->rehashPasswordIfRequired($user, ['password' => 'plain']);
     }
 
     public function testModelsCanBeCreated()
     {
-        $hasher = m::mock(Hasher::class);
-        $provider = new EloquentUserProvider($hasher, EloquentProviderUserStub::class);
+        $provider = new EloquentUserProvider(EloquentProviderUserStub::class);
         $model = $provider->createModel();
 
         $this->assertInstanceOf(EloquentProviderUserStub::class, $model);
@@ -217,13 +222,16 @@ class AuthEloquentUserProviderTest extends TestCase
 
     protected function getProviderMock()
     {
-        $hasher = m::mock(Hasher::class);
-
-        return $this->getMockBuilder(EloquentUserProvider::class)->onlyMethods(['createModel'])->setConstructorArgs([$hasher, 'foo'])->getMock();
+        return $this->getMockBuilder(EloquentUserProvider::class)->onlyMethods(['createModel'])->setConstructorArgs(['foo'])->getMock();
     }
 }
 
 class EloquentProviderUserStub
 {
-    //
+    public static $hasher;
+
+    public static function currentHasher()
+    {
+        return static::$hasher;
+    }
 }

@@ -270,7 +270,7 @@ class AuthenticationTest extends TestCase
 
     public function testAuthViaAttemptRemembering()
     {
-        $provider = new EloquentUserProvider(app('hash'), AuthenticationTestUser::class);
+        $provider = new EloquentUserProvider(AuthenticationTestUser::class);
 
         $user = AuthenticationTestUser::create([
             'username' => 'username2',
