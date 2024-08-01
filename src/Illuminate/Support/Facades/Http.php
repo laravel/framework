@@ -5,8 +5,6 @@ namespace Illuminate\Support\Facades;
 use Illuminate\Http\Client\Factory;
 
 /**
-
- *
  * @mixin \Illuminate\Http\Client\Factory
  */
 class Http extends Facade
