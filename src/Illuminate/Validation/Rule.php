@@ -17,6 +17,7 @@ use Illuminate\Validation\Rules\NotIn;
 use Illuminate\Validation\Rules\ProhibitedIf;
 use Illuminate\Validation\Rules\RequiredIf;
 use Illuminate\Validation\Rules\Unique;
+use Illuminate\Validation\Rules\NullableIf;
 
 class Rule
 {
