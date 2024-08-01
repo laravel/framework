@@ -3,6 +3,8 @@
 namespace Illuminate\Support\Facades;
 
 /**
+
+ *
  * @mixin \Illuminate\Testing\ParallelTesting
  */
 class ParallelTesting extends Facade
