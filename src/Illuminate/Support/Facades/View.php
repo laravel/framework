@@ -3,8 +3,6 @@
 namespace Illuminate\Support\Facades;
 
 /**
-
- *
  * @mixin \Illuminate\View\Factory
  */
 class View extends Facade
