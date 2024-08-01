@@ -37,6 +37,7 @@ use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalPivotRela
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalRelationship;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalRelationshipAggregates;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalRelationshipCounts;
+use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalRelationshipExists;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalRelationshipUsingNamedParameters;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithoutWrap;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithUnlessOptionalData;
@@ -419,6 +420,59 @@ class ResourceTest extends TestCase
                 'authors' => 2,
                 'favourite_posts' => 1,
                 'comments' => '5 comments',
+            ],
+        ]);
+    }
+
+    public function testResourcesMayHaveOptionalRelationshipExists()
+    {
+        Route::get('/', function () {
+            return new PostResourceWithOptionalRelationshipExists(new Post([
+                'id' => 5,
+                'title' => 'Test Title',
+            ]));
+        });
+
+        $response = $this->withoutExceptionHandling()->get(
+            '/', ['Accept' => 'application/json']
+        );
+
+        $response->assertStatus(200);
+
+        $response->assertExactJson([
+            'data' => [
+                'id' => 5,
+                'has_favourited_posts' => 'No',
+            ],
+        ]);
+    }
+
+    public function testResourcesMayLoadOptionalRelationshipExists()
+    {
+        Route::get('/', function () {
+            $post = new Post([
+                'id' => 5,
+                'title' => 'Test Title',
+                'authors_exists' => true,
+                'favourited_posts_exists' => true,
+                'comments_exists' => false,
+            ]);
+
+            return new PostResourceWithOptionalRelationshipExists($post);
+        });
+
+        $response = $this->withoutExceptionHandling()->get(
+            '/', ['Accept' => 'application/json']
+        );
+
+        $response->assertStatus(200);
+
+        $response->assertExactJson([
+            'data' => [
+                'id' => 5,
+                'has_authors' => true,
+                'has_favourited_posts' => 'Yes',
+                'comment_exists' => false,
             ],
         ]);
     }

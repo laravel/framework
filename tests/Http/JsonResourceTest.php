@@ -16,14 +16,17 @@ class JsonResourceTest extends TestCase
 
         $model->setAttribute('relation_sum_column', null);
         $model->setAttribute('relation_count', null);
+        $model->setAttribute('relation_exists', null);
 
         $resource = new JsonResource($model);
 
         $this->assertNotInstanceOf(MissingValue::class, $resource->whenAggregated('relation', 'column', 'sum'));
         $this->assertNotInstanceOf(MissingValue::class, $resource->whenCounted('relation'));
+        $this->assertNotInstanceOf(MissingValue::class, $resource->whenExistsLoaded('relation'));
 
         $this->assertNull($resource->whenAggregated('relation', 'column', 'sum'));
         $this->assertNull($resource->whenCounted('relation'));
+        $this->assertNull($resource->whenExistsLoaded('relation'));
     }
 
     public function testJsonResourceToJsonSucceedsWithPriorErrors(): void
