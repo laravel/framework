@@ -342,6 +342,18 @@ class Str
     }
 
     /**
+     * Replace consecutive characters with character in the given string.
+     *
+     * @param  string  $string
+     * @param  string  $character
+     * @return string
+     */
+    public static function dedup(string $string, string $character = ' ')
+    {
+        return preg_replace('/'.preg_quote($character, '/').'+/u', $character, $string);
+    }
+
+    /**
      * Determine if a given string ends with a given substring.
      *
      * @param  string  $haystack

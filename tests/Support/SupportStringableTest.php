@@ -212,6 +212,14 @@ class SupportStringableTest extends TestCase
         }));
     }
 
+    public function testDedup()
+    {
+        $this->assertSame(' laravel php framework ', (string) $this->stringable(' laravel   php  framework ')->dedup());
+        $this->assertSame('what', (string) $this->stringable('whaaat')->dedup('a'));
+        $this->assertSame('/some/odd/path/', (string) $this->stringable('/some//odd//path/')->dedup('/'));
+        $this->assertSame('ムだム', (string) $this->stringable('ムだだム')->dedup('だ'));
+    }
+
     public function testDirname()
     {
         $this->assertSame('/framework/tests', (string) $this->stringable('/framework/tests/Support')->dirname());

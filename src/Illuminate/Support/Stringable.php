@@ -236,6 +236,17 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     }
 
     /**
+     * Replace consecutive characters with character in a string.
+     *
+     * @param  string  $character
+     * @return static
+     */
+    public function dedup(string $character = ' ')
+    {
+        return new static(Str::dedup($this->value, $character));
+    }
+
+    /**
      * Get the parent directory's path.
      *
      * @param  int  $levels
