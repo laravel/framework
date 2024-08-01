@@ -1384,9 +1384,9 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals(['%Otwell%', '%Otwell%'], $builder->getBindings());
 
         $builder = $this->getBuilder();
-        $builder->select('*')->from('users')->whereNone(['last_name', 'email'], '%Otwell%');
+        $builder->select('*')->from('users')->whereNone(['last_name', 'email'], 'Otwell');
         $this->assertSame('select * from "users" where not ("last_name" = ? or "email" = ?)', $builder->toSql());
-        $this->assertEquals(['%Otwell%', '%Otwell%'], $builder->getBindings());
+        $this->assertEquals(['Otwell', 'Otwell'], $builder->getBindings());
 
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->where('first_name', 'like', '%Taylor%')->whereNone(['last_name', 'email'], 'like', '%Otwell%');
