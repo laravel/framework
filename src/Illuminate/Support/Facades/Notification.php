@@ -7,8 +7,6 @@ use Illuminate\Notifications\ChannelManager;
 use Illuminate\Support\Testing\Fakes\NotificationFake;
 
 /**
-
- *
  * @mixin \Illuminate\Notifications\ChannelManager
  * @mixin \Illuminate\Support\Testing\Fakes\NotificationFake
  */
