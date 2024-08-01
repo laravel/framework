@@ -5,8 +5,6 @@ namespace Illuminate\Support\Facades;
 use Illuminate\Filesystem\Filesystem;
 
 /**
-
- *
  * @mixin \Illuminate\Filesystem\FilesystemManager
  */
 class Storage extends Facade
