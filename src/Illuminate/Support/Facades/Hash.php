@@ -3,6 +3,8 @@
 namespace Illuminate\Support\Facades;
 
 /**
+
+ *
  * @mixin \Illuminate\Hashing\HashManager
  * @mixin \Illuminate\Hashing\AbstractHasher
  */
