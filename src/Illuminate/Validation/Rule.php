@@ -14,10 +14,10 @@ use Illuminate\Validation\Rules\File;
 use Illuminate\Validation\Rules\ImageFile;
 use Illuminate\Validation\Rules\In;
 use Illuminate\Validation\Rules\NotIn;
+use Illuminate\Validation\Rules\NullableIf;
 use Illuminate\Validation\Rules\ProhibitedIf;
 use Illuminate\Validation\Rules\RequiredIf;
 use Illuminate\Validation\Rules\Unique;
-use Illuminate\Validation\Rules\NullableIf;
 
 class Rule
 {
@@ -26,8 +26,8 @@ class Rule
     /**
      * Get a can constraint builder instance.
      *
-     * @param  string  $ability
-     * @param  mixed  ...$arguments
+     * @param string $ability
+     * @param mixed ...$arguments
      * @return \Illuminate\Validation\Rules\Can
      */
     public static function can($ability, ...$arguments)
@@ -38,9 +38,9 @@ class Rule
     /**
      * Apply the given rules if the given condition is truthy.
      *
-     * @param  callable|bool  $condition
-     * @param  \Illuminate\Contracts\Validation\ValidationRule|\Illuminate\Contracts\Validation\InvokableRule|\Illuminate\Contracts\Validation\Rule|\Closure|array|string  $rules
-     * @param  \Illuminate\Contracts\Validation\ValidationRule|\Illuminate\Contracts\Validation\InvokableRule|\Illuminate\Contracts\Validation\Rule|\Closure|array|string  $defaultRules
+     * @param callable|bool $condition
+     * @param \Illuminate\Contracts\Validation\ValidationRule|\Illuminate\Contracts\Validation\InvokableRule|\Illuminate\Contracts\Validation\Rule|\Closure|array|string $rules
+     * @param \Illuminate\Contracts\Validation\ValidationRule|\Illuminate\Contracts\Validation\InvokableRule|\Illuminate\Contracts\Validation\Rule|\Closure|array|string $defaultRules
      * @return \Illuminate\Validation\ConditionalRules
      */
     public static function when($condition, $rules, $defaultRules = [])
@@ -51,9 +51,9 @@ class Rule
     /**
      * Apply the given rules if the given condition is falsy.
      *
-     * @param  callable|bool  $condition
-     * @param  \Illuminate\Contracts\Validation\ValidationRule|\Illuminate\Contracts\Validation\InvokableRule|\Illuminate\Contracts\Validation\Rule|\Closure|array|string  $rules
-     * @param  \Illuminate\Contracts\Validation\ValidationRule|\Illuminate\Contracts\Validation\InvokableRule|\Illuminate\Contracts\Validation\Rule|\Closure|array|string  $defaultRules
+     * @param callable|bool $condition
+     * @param \Illuminate\Contracts\Validation\ValidationRule|\Illuminate\Contracts\Validation\InvokableRule|\Illuminate\Contracts\Validation\Rule|\Closure|array|string $rules
+     * @param \Illuminate\Contracts\Validation\ValidationRule|\Illuminate\Contracts\Validation\InvokableRule|\Illuminate\Contracts\Validation\Rule|\Closure|array|string $defaultRules
      * @return \Illuminate\Validation\ConditionalRules
      */
     public static function unless($condition, $rules, $defaultRules = [])
@@ -64,7 +64,7 @@ class Rule
     /**
      * Get an array rule builder instance.
      *
-     * @param  array|null  $keys
+     * @param array|null $keys
      * @return \Illuminate\Validation\Rules\ArrayRule
      */
     public static function array($keys = null)
@@ -75,7 +75,7 @@ class Rule
     /**
      * Create a new nested rule set.
      *
-     * @param  callable  $callback
+     * @param callable $callback
      * @return \Illuminate\Validation\NestedRules
      */
     public static function forEach($callback)
@@ -86,8 +86,8 @@ class Rule
     /**
      * Get a unique constraint builder instance.
      *
-     * @param  string  $table
-     * @param  string  $column
+     * @param string $table
+     * @param string $column
      * @return \Illuminate\Validation\Rules\Unique
      */
     public static function unique($table, $column = 'NULL')
@@ -98,8 +98,8 @@ class Rule
     /**
      * Get an exists constraint builder instance.
      *
-     * @param  string  $table
-     * @param  string  $column
+     * @param string $table
+     * @param string $column
      * @return \Illuminate\Validation\Rules\Exists
      */
     public static function exists($table, $column = 'NULL')
@@ -110,7 +110,7 @@ class Rule
     /**
      * Get an in rule builder instance.
      *
-     * @param  \Illuminate\Contracts\Support\Arrayable|\BackedEnum|\UnitEnum|array|string  $values
+     * @param \Illuminate\Contracts\Support\Arrayable|\BackedEnum|\UnitEnum|array|string $values
      * @return \Illuminate\Validation\Rules\In
      */
     public static function in($values)
@@ -125,7 +125,7 @@ class Rule
     /**
      * Get a not_in rule builder instance.
      *
-     * @param  \Illuminate\Contracts\Support\Arrayable|\BackedEnum|\UnitEnum|array|string  $values
+     * @param \Illuminate\Contracts\Support\Arrayable|\BackedEnum|\UnitEnum|array|string $values
      * @return \Illuminate\Validation\Rules\NotIn
      */
     public static function notIn($values)
@@ -140,7 +140,7 @@ class Rule
     /**
      * Get a required_if rule builder instance.
      *
-     * @param  callable|bool  $callback
+     * @param callable|bool $callback
      * @return \Illuminate\Validation\Rules\RequiredIf
      */
     public static function requiredIf($callback)
@@ -151,7 +151,7 @@ class Rule
     /**
      * Get a nullable_if rule builder instance.
      *
-     * @param  callable|bool  $callback
+     * @param callable|bool $callback
      * @return \Illuminate\Validation\Rules\NullableIf
      */
     public static function nullableIf($callback)
@@ -162,7 +162,7 @@ class Rule
     /**
      * Get a exclude_if rule builder instance.
      *
-     * @param  callable|bool  $callback
+     * @param callable|bool $callback
      * @return \Illuminate\Validation\Rules\ExcludeIf
      */
     public static function excludeIf($callback)
@@ -173,7 +173,7 @@ class Rule
     /**
      * Get a prohibited_if rule builder instance.
      *
-     * @param  callable|bool  $callback
+     * @param callable|bool $callback
      * @return \Illuminate\Validation\Rules\ProhibitedIf
      */
     public static function prohibitedIf($callback)
@@ -184,7 +184,7 @@ class Rule
     /**
      * Get an enum rule builder instance.
      *
-     * @param  class-string  $type
+     * @param class-string $type
      * @return \Illuminate\Validation\Rules\Enum
      */
     public static function enum($type)
@@ -215,7 +215,7 @@ class Rule
     /**
      * Get a dimensions rule builder instance.
      *
-     * @param  array  $constraints
+     * @param array $constraints
      * @return \Illuminate\Validation\Rules\Dimensions
      */
     public static function dimensions(array $constraints = [])
