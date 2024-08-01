@@ -157,6 +157,7 @@ class NotificationSender
             $this->events->dispatch(
                 new NotificationFailed($notifiable, $notification, $channel, $e)
             );
+            throw $e;
         }
     }
 

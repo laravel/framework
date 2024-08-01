@@ -114,10 +114,15 @@ class NotificationChannelManagerTest extends TestCase
         $manager = m::mock(ChannelManager::class.'[driver]', [$container]);
         $events->shouldReceive('until')->with(m::type(NotificationSending::class))->andReturn(true);
         $manager->shouldReceive('driver')->once()->andReturn($driver = m::mock());
-        $driver->shouldReceive('send')->once()->andThrow(new Exception());
+        $driver->shouldReceive('send')->once()->andThrow(new Exception('Mail exception'));
         $events->shouldReceive('dispatch')->once()->with(m::type(NotificationFailed::class));
 
-        $manager->send([new NotificationChannelManagerTestNotifiable], new NotificationChannelManagerTestNotCancelledNotification);
+        try {
+            $manager->send([new NotificationChannelManagerTestNotifiable], new NotificationChannelManagerTestNotCancelledNotification);
+            $this->fail('Should fail');
+        } catch(Exception $e) {
+            $this->assertEquals('Mail exception', $e->getMessage());
+        }
     }
 }
 
