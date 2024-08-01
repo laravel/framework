@@ -37,6 +37,6 @@ class NullableIf implements Stringable
     public function __toString()
     {
         $result = is_callable($this->condition) ? call_user_func($this->condition) : $this->condition;
-        return $result ? 'nullable' : 'required';
+        return $result ? 'nullable' : '';
     }
 }
