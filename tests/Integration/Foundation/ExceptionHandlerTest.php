@@ -5,8 +5,8 @@ namespace Illuminate\Tests\Integration\Foundation;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\Access\Response;
 use Illuminate\Contracts\Debug\ExceptionHandler;
+use Illuminate\Contracts\Debug\ShouldntReport;
 use Illuminate\Contracts\Support\Responsable;
-use Illuminate\Foundation\Exceptions\Contracts\ShouldntReport;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Route;
 use Orchestra\Testbench\TestCase;
@@ -52,8 +52,7 @@ class ExceptionHandlerTest extends TestCase
             $reported[] = $e;
         });
 
-        $exception = new class extends \Exception implements ShouldntReport, Responsable
-        {
+        $exception = new class extends \Exception implements ShouldntReport, Responsable {
             public function toResponse($request)
             {
                 return response('shouldnt report', 500);
