@@ -22,11 +22,11 @@ class NullableIf implements Stringable
      */
     public function __construct($condition)
     {
-        if (! is_string($condition)) {
-            $this->condition = $condition;
-        } else {
+        if (! is_callable($condition) && ! is_bool($condition)) {
             throw new InvalidArgumentException('The provided condition must be a callable or boolean.');
         }
+
+        $this->condition = $condition;
     }
 
     /**
