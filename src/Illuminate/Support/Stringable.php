@@ -236,14 +236,14 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     }
 
     /**
-     * Replace consecutive characters with character in a string.
+     * Replace consecutive instances of a given character with a single character.
      *
      * @param  string  $character
      * @return static
      */
-    public function dedup(string $character = ' ')
+    public function deduplicate(string $character = ' ')
     {
-        return new static(Str::dedup($this->value, $character));
+        return new static(Str::deduplicate($this->value, $character));
     }
 
     /**

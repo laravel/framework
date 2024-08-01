@@ -342,13 +342,13 @@ class Str
     }
 
     /**
-     * Replace consecutive characters with character in the given string.
+     * Replace consecutive instances of a given character with a single character in the given string.
      *
      * @param  string  $string
      * @param  string  $character
      * @return string
      */
-    public static function dedup(string $string, string $character = ' ')
+    public static function deduplicate(string $string, string $character = ' ')
     {
         return preg_replace('/'.preg_quote($character, '/').'+/u', $character, $string);
     }

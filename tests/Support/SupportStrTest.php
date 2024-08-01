@@ -402,10 +402,10 @@ class SupportStrTest extends TestCase
 
     public function testDedup()
     {
-        $this->assertSame(' laravel php framework ', Str::dedup(' laravel   php  framework '));
-        $this->assertSame('what', Str::dedup('whaaat', 'a'));
-        $this->assertSame('/some/odd/path/', Str::dedup('/some//odd//path/', '/'));
-        $this->assertSame('ムだム', Str::dedup('ムだだム', 'だ'));
+        $this->assertSame(' laravel php framework ', Str::deduplicate(' laravel   php  framework '));
+        $this->assertSame('what', Str::deduplicate('whaaat', 'a'));
+        $this->assertSame('/some/odd/path/', Str::deduplicate('/some//odd//path/', '/'));
+        $this->assertSame('ムだム', Str::deduplicate('ムだだム', 'だ'));
     }
 
     public function testParseCallback()
