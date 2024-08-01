@@ -5,6 +5,8 @@ namespace Illuminate\Support\Facades;
 use Illuminate\Contracts\Broadcasting\Factory as BroadcastingFactoryContract;
 
 /**
+
+ *
  * @mixin \Illuminate\Broadcasting\BroadcastManager
  * @mixin \Illuminate\Broadcasting\Broadcasters\Broadcaster
  */
