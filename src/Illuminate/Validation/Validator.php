@@ -227,6 +227,7 @@ class Validator implements ValidatorContract
         'RequiredWithAll',
         'RequiredWithout',
         'RequiredWithoutAll',
+        'NullableIf',
     ];
 
     /**
@@ -273,6 +274,7 @@ class Validator implements ValidatorContract
         'MissingWithAll',
         'Same',
         'Unique',
+        'NullableIf',
     ];
 
     /**

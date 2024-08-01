@@ -1764,6 +1764,31 @@ trait ValidatesAttributes
     }
 
     /**
+     * Validate that an attribute is nullable based on a condition.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  mixed  $parameters
+     * @return bool
+     */
+    public function validateNullableIf($attribute, $value, $parameters)
+    {
+        $this->requireParameterCount(1, $parameters, 'nullable_if');
+
+        if (! Arr::has($this->data, $parameters[0])) {
+            return true;
+        }
+
+        [$values, $other] = $this->parseDependentRuleParameters($parameters);
+
+        if (in_array($other, $values, is_bool($other) || is_null($other))) {
+            return true; // The attribute is nullable
+        }
+
+        return false; // The attribute is not nullable
+    }
+
+    /**
      * Validate an attribute is not contained within a list of values.
      *
      * @param  string  $attribute

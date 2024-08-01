@@ -148,6 +148,17 @@ class Rule
     }
 
     /**
+     * Get a nullable_if rule builder instance.
+     *
+     * @param  callable|bool  $callback
+     * @return \Illuminate\Validation\Rules\NullableIf
+     */
+    public static function nullableIf($callback)
+    {
+        return new NullableIf($callback);
+    }
+
+    /**
      * Get a exclude_if rule builder instance.
      *
      * @param  callable|bool  $callback
