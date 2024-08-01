@@ -3,6 +3,7 @@
 namespace Illuminate\Log\Context;
 
 use __PHP_Incomplete_Class;
+use Closure;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Log\Context\Events\ContextDehydrating as Dehydrating;
@@ -312,49 +313,55 @@ class Repository
     }
 
     /**
-     * Checks if the given value is in the stack.
+     * Determine if the given value is in the given stack.
      *
      * @param  string  $key
      * @param  mixed  $value
-     * @param  bool  $strict
      * @return bool
      *
      * @throws \RuntimeException
      */
-    public function in(string $key, mixed $value, bool $strict = false): bool
+    public function stackContains(string $key, mixed $value): bool
     {
         if (! $this->isStackable($key)) {
-            throw new RuntimeException("Given value is not a stack for key [{$key}].");
+            throw new RuntimeException("Given key [{$key}] is not a stack.");
         }
 
         if (! array_key_exists($key, $this->data)) {
             return false;
         }
 
-        return in_array($value, $this->data[$key], $strict);
+        if ($value instanceof Closure) {
+            return $value($this->data[$key]);
+        }
+
+        return in_array($value, $this->data[$key]);
     }
 
     /**
-     * Checks if the given value is in the hidden stack.
+     * Determine if the given value is in the given hidden stack.
      *
      * @param  string  $key
      * @param  mixed  $value
-     * @param  bool  $strict
      * @return bool
      *
      * @throws \RuntimeException
      */
-    public function inHidden(string $key, mixed $value, bool $strict = false): bool
+    public function hiddenStackContains(string $key, mixed $value): bool
     {
         if (! $this->isHiddenStackable($key)) {
-            throw new RuntimeException("Given value is not a hidden stack for key [{$key}].");
+            throw new RuntimeException("Given key [{$key}] is not a stack.");
         }
 
         if (! array_key_exists($key, $this->hidden)) {
             return false;
         }
 
-        return in_array($value, $this->hidden[$key], $strict);
+        if ($value instanceof Closure) {
+            return $value($this->data[$key]);
+        }
+
+        return in_array($value, $this->hidden[$key]);
     }
 
     /**

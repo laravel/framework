@@ -209,35 +209,32 @@ class ContextTest extends TestCase
     {
         Context::push('foo', 'bar', 'lorem');
 
-        $this->assertTrue(Context::in('foo', 'bar'));
-        $this->assertTrue(Context::in('foo', 'lorem'));
-        $this->assertFalse(Context::in('foo', 'doesNotExist'));
+        $this->assertTrue(Context::stackContains('foo', 'bar'));
+        $this->assertTrue(Context::stackContains('foo', 'lorem'));
+        $this->assertFalse(Context::stackContains('foo', 'doesNotExist'));
     }
 
-    public function test_it_can_check_if_value_is_in_context_stack_with_strict()
+    public function test_it_can_check_if_value_is_in_context_stack_with_closures()
     {
         Context::push('foo', 'bar', ['lorem'], 123);
 
-        $this->assertTrue(Context::in('foo', 'bar', true));
-        $this->assertTrue(Context::in('foo', ['lorem'], true));
-        $this->assertTrue(Context::in('foo', 123, true));
-        $this->assertFalse(Context::in('foo', '123', true));
+        $this->assertTrue(Context::stackContains('foo', fn ($stack) => in_array('bar', $stack, true)));
     }
 
     public function test_it_can_check_if_value_is_in_hidden_context_stack()
     {
         Context::pushHidden('foo', 'bar', 'lorem');
 
-        $this->assertTrue(Context::inHidden('foo', 'bar'));
-        $this->assertTrue(Context::inHidden('foo', 'lorem'));
-        $this->assertFalse(Context::inHidden('foo', 'doesNotExist'));
+        $this->assertTrue(Context::hiddenStackContains('foo', 'bar'));
+        $this->assertTrue(Context::hiddenStackContains('foo', 'lorem'));
+        $this->assertFalse(Context::hiddenStackContains('foo', 'doesNotExist'));
     }
 
     public function test_it_cannot_check_if_hidden_value_is_in_non_hidden_context_stack()
     {
         Context::pushHidden('foo', 'bar', 'lorem');
 
-        $this->assertFalse(Context::in('foo', 'bar'));
+        $this->assertFalse(Context::stackContains('foo', 'bar'));
     }
 
     public function test_it_can_get_all_values()
