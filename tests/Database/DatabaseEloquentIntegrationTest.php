@@ -669,6 +669,223 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertFalse($model->wasRecentlyCreated);
     }
 
+    public function testChunk()
+    {
+        EloquentTestUser::create(['name' => 'First', 'email' => 'first@example.com']);
+        EloquentTestUser::create(['name' => 'Second', 'email' => 'second@example.com']);
+        EloquentTestUser::create(['name' => 'Third', 'email' => 'third@example.com']);
+
+        $chunks = 0;
+
+        EloquentTestUser::query()->orderBy('id', 'asc')->chunk(2, function (Collection $users, $page) use (&$chunks) {
+            if ($page == 1) {
+                $this->assertCount(2, $users);
+                $this->assertSame('First', $users[0]->name);
+                $this->assertSame('Second', $users[1]->name);
+            } else {
+                $this->assertCount(1, $users);
+                $this->assertSame('Third', $users[0]->name);
+            }
+
+            $chunks++;
+        });
+
+        $this->assertEquals(2, $chunks);
+    }
+
+    public function testChunksWithLimitsWhereLimitIsLessThanTotal()
+    {
+        EloquentTestUser::create(['name' => 'First', 'email' => 'first@example.com']);
+        EloquentTestUser::create(['name' => 'Second', 'email' => 'second@example.com']);
+        EloquentTestUser::create(['name' => 'Third', 'email' => 'third@example.com']);
+
+        $chunks = 0;
+
+        EloquentTestUser::query()->orderBy('id', 'asc')->limit(2)->chunk(2, function (Collection $users, $page) use (&$chunks) {
+            if ($page == 1) {
+                $this->assertCount(2, $users);
+                $this->assertSame('First', $users[0]->name);
+                $this->assertSame('Second', $users[1]->name);
+            } else {
+                $this->fail('Should only have had one page.');
+            }
+
+            $chunks++;
+        });
+
+        $this->assertEquals(1, $chunks);
+    }
+
+    public function testChunksWithLimitsWhereLimitIsMoreThanTotal()
+    {
+        EloquentTestUser::create(['name' => 'First', 'email' => 'first@example.com']);
+        EloquentTestUser::create(['name' => 'Second', 'email' => 'second@example.com']);
+        EloquentTestUser::create(['name' => 'Third', 'email' => 'third@example.com']);
+
+        $chunks = 0;
+
+        EloquentTestUser::query()->orderBy('id', 'asc')->limit(10)->chunk(2, function (Collection $users, $page) use (&$chunks) {
+            if ($page == 1) {
+                $this->assertCount(2, $users);
+                $this->assertSame('First', $users[0]->name);
+                $this->assertSame('Second', $users[1]->name);
+            } elseif ($page === 2) {
+                $this->assertCount(1, $users);
+                $this->assertSame('Third', $users[0]->name);
+            } else {
+                $this->fail('Should have had two pages.');
+            }
+
+            $chunks++;
+        });
+
+        $this->assertEquals(2, $chunks);
+    }
+
+    public function testChunksWithOffset()
+    {
+        EloquentTestUser::create(['name' => 'First', 'email' => 'first@example.com']);
+        EloquentTestUser::create(['name' => 'Second', 'email' => 'second@example.com']);
+        EloquentTestUser::create(['name' => 'Third', 'email' => 'third@example.com']);
+
+        $chunks = 0;
+
+        EloquentTestUser::query()->orderBy('id', 'asc')->offset(1)->chunk(2, function (Collection $users, $page) use (&$chunks) {
+            if ($page == 1) {
+                $this->assertCount(2, $users);
+                $this->assertSame('Second', $users[0]->name);
+                $this->assertSame('Third', $users[1]->name);
+            } else {
+                $this->fail('Should only have had one page.');
+            }
+
+            $chunks++;
+        });
+
+        $this->assertEquals(1, $chunks);
+    }
+
+    public function testChunksWithOffsetWhereMoreThanTotal()
+    {
+        EloquentTestUser::create(['name' => 'First', 'email' => 'first@example.com']);
+        EloquentTestUser::create(['name' => 'Second', 'email' => 'second@example.com']);
+        EloquentTestUser::create(['name' => 'Third', 'email' => 'third@example.com']);
+
+        $chunks = 0;
+
+        EloquentTestUser::query()->orderBy('id', 'asc')->offset(3)->chunk(2, function () use (&$chunks) {
+            $chunks++;
+        });
+
+        $this->assertEquals(0, $chunks);
+    }
+
+    public function testChunksWithLimitsAndOffsets()
+    {
+        EloquentTestUser::create(['name' => 'First', 'email' => 'first@example.com']);
+        EloquentTestUser::create(['name' => 'Second', 'email' => 'second@example.com']);
+        EloquentTestUser::create(['name' => 'Third', 'email' => 'third@example.com']);
+        EloquentTestUser::create(['name' => 'Fourth', 'email' => 'fourth@example.com']);
+        EloquentTestUser::create(['name' => 'Fifth', 'email' => 'fifth@example.com']);
+        EloquentTestUser::create(['name' => 'Sixth', 'email' => 'sixth@example.com']);
+        EloquentTestUser::create(['name' => 'Seventh', 'email' => 'seventh@example.com']);
+
+        $chunks = 0;
+
+        EloquentTestUser::query()->orderBy('id', 'asc')->offset(2)->limit(3)->chunk(2, function (Collection $users, $page) use (&$chunks) {
+            if ($page == 1) {
+                $this->assertCount(2, $users);
+                $this->assertSame('Third', $users[0]->name);
+                $this->assertSame('Fourth', $users[1]->name);
+            } elseif ($page == 2) {
+                $this->assertCount(1, $users);
+                $this->assertSame('Fifth', $users[0]->name);
+            } else {
+                $this->fail('Should only have had two pages.');
+            }
+
+            $chunks++;
+        });
+
+        $this->assertEquals(2, $chunks);
+    }
+
+    public function testChunkByIdWithLimits()
+    {
+        EloquentTestUser::create(['name' => 'First', 'email' => 'first@example.com']);
+        EloquentTestUser::create(['name' => 'Second', 'email' => 'second@example.com']);
+        EloquentTestUser::create(['name' => 'Third', 'email' => 'third@example.com']);
+
+        $chunks = 0;
+
+        EloquentTestUser::query()->limit(2)->chunkById(2, function (Collection $users, $page) use (&$chunks) {
+            if ($page == 1) {
+                $this->assertCount(2, $users);
+                $this->assertSame('First', $users[0]->name);
+                $this->assertSame('Second', $users[1]->name);
+            } else {
+                $this->fail('Should only have had one page.');
+            }
+
+            $chunks++;
+        });
+
+        $this->assertEquals(1, $chunks);
+    }
+
+    public function testChunkByIdWithOffsets()
+    {
+        EloquentTestUser::create(['name' => 'First', 'email' => 'first@example.com']);
+        EloquentTestUser::create(['name' => 'Second', 'email' => 'second@example.com']);
+        EloquentTestUser::create(['name' => 'Third', 'email' => 'third@example.com']);
+
+        $chunks = 0;
+
+        EloquentTestUser::query()->offset(1)->chunkById(2, function (Collection $users, $page) use (&$chunks) {
+            if ($page == 1) {
+                $this->assertCount(2, $users);
+                $this->assertSame('Second', $users[0]->name);
+                $this->assertSame('Third', $users[1]->name);
+            } else {
+                $this->fail('Should only have had one page.');
+            }
+
+            $chunks++;
+        });
+
+        $this->assertEquals(1, $chunks);
+    }
+
+    public function testChunkByIdWithLimitsAndOffsets()
+    {
+        EloquentTestUser::create(['name' => 'First', 'email' => 'first@example.com']);
+        EloquentTestUser::create(['name' => 'Second', 'email' => 'second@example.com']);
+        EloquentTestUser::create(['name' => 'Third', 'email' => 'third@example.com']);
+        EloquentTestUser::create(['name' => 'Fourth', 'email' => 'fourth@example.com']);
+        EloquentTestUser::create(['name' => 'Fifth', 'email' => 'fifth@example.com']);
+        EloquentTestUser::create(['name' => 'Sixth', 'email' => 'sixth@example.com']);
+        EloquentTestUser::create(['name' => 'Seventh', 'email' => 'seventh@example.com']);
+
+        $chunks = 0;
+
+        EloquentTestUser::query()->offset(2)->limit(3)->chunkById(2, function (Collection $users, $page) use (&$chunks) {
+            if ($page == 1) {
+                $this->assertCount(2, $users);
+                $this->assertSame('Third', $users[0]->name);
+                $this->assertSame('Fourth', $users[1]->name);
+            } elseif ($page == 2) {
+                $this->assertCount(1, $users);
+                $this->assertSame('Fifth', $users[0]->name);
+            } else {
+                $this->fail('Should only have had two pages.');
+            }
+
+            $chunks++;
+        });
+
+        $this->assertEquals(2, $chunks);
+    }
+
     public function testChunkByIdWithNonIncrementingKey()
     {
         EloquentTestNonIncrementingSecond::create(['name' => ' First']);

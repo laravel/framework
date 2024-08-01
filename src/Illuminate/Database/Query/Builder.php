@@ -4064,6 +4064,30 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Get the "limit" value for the query or null if it's not set.
+     *
+     * @return mixed
+     */
+    public function getLimit()
+    {
+        $value = $this->unions ? $this->unionLimit : $this->limit;
+
+        return ! is_null($value) ? (int) $value : null;
+    }
+
+    /**
+     * Get the "offset" value for the query or null if it's not set.
+     *
+     * @return mixed
+     */
+    public function getOffset()
+    {
+        $value = $this->unions ? $this->unionOffset : $this->offset;
+
+        return ! is_null($value) ? (int) $value : null;
+    }
+
+    /**
      * Get the current query value bindings in a flattened array.
      *
      * @return array

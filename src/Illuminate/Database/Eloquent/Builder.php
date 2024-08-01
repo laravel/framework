@@ -1874,6 +1874,26 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Get the "limit" value from the query or null if it's not set.
+     *
+     * @return mixed
+     */
+    public function getLimit()
+    {
+        return $this->query->getLimit();
+    }
+
+    /**
+     * Get the "offset" value from the query or null if it's not set.
+     *
+     * @return mixed
+     */
+    public function getOffset()
+    {
+        return $this->query->getOffset();
+    }
+
+    /**
      * Get the default key name of the table.
      *
      * @return string
