@@ -7,7 +7,6 @@ use Illuminate\Support\DateFactory;
 /**
  * @see https://carbon.nesbot.com/docs/
  * @see https://github.com/briannesbitt/Carbon/blob/master/src/Carbon/Factory.php
- *
  * @see \Illuminate\Support\DateFactory
  */
 class Date extends Facade
