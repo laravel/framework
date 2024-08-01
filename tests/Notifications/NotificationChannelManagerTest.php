@@ -8,6 +8,7 @@ use Illuminate\Contracts\Bus\Dispatcher as Bus;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\ChannelManager;
+use Illuminate\Notifications\Events\NotificationFailed;
 use Illuminate\Notifications\Events\NotificationSending;
 use Illuminate\Notifications\Events\NotificationSent;
 use Illuminate\Notifications\Notifiable;
@@ -15,6 +16,7 @@ use Illuminate\Notifications\Notification;
 use Illuminate\Notifications\SendQueuedNotifications;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use Exception;
 
 class NotificationChannelManagerTest extends TestCase
 {
@@ -100,6 +102,22 @@ class NotificationChannelManagerTest extends TestCase
         $manager = m::mock(ChannelManager::class.'[driver]', [$container]);
 
         $manager->send([new NotificationChannelManagerTestNotifiable], new NotificationChannelManagerTestQueuedNotification);
+    }
+
+    public function testNotificationDispatchFaildEvent()
+    {
+        $container = new Container;
+        $container->instance('config', ['app.name' => 'Name', 'app.logo' => 'Logo']);
+        $container->instance(Bus::class, $bus = m::mock());
+        $container->instance(Dispatcher::class, $events = m::mock());
+        Container::setInstance($container);
+        $manager = m::mock(ChannelManager::class.'[driver]', [$container]);
+        $events->shouldReceive('until')->with(m::type(NotificationSending::class))->andReturn(true);
+        $manager->shouldReceive('driver')->once()->andReturn($driver = m::mock());
+        $driver->shouldReceive('send')->once()->andThrow(new Exception());
+        $events->shouldReceive('dispatch')->once()->with(m::type(NotificationFailed::class));
+
+        $manager->send([new NotificationChannelManagerTestNotifiable], new NotificationChannelManagerTestNotCancelledNotification);
     }
 }
 

@@ -31,11 +31,11 @@ class NotificationFailed
     public $channel;
 
     /**
-     * The data needed to process this failure.
+     * The exception that caused the failure.
      *
-     * @var array
+     * @var \Throwable
      */
-    public $data = [];
+    public $throwable;
 
     /**
      * Create a new event instance.
@@ -43,12 +43,12 @@ class NotificationFailed
      * @param  mixed  $notifiable
      * @param  \Illuminate\Notifications\Notification  $notification
      * @param  string  $channel
-     * @param  array  $data
+     * @param  \Throwable  $throwable
      * @return void
      */
-    public function __construct($notifiable, $notification, $channel, $data = [])
+    public function __construct($notifiable, $notification, $channel, $throwable)
     {
-        $this->data = $data;
+        $this->throwable = $throwable;
         $this->channel = $channel;
         $this->notifiable = $notifiable;
         $this->notification = $notification;
