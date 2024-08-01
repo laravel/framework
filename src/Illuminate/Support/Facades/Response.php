@@ -5,6 +5,8 @@ namespace Illuminate\Support\Facades;
 use Illuminate\Contracts\Routing\ResponseFactory as ResponseFactoryContract;
 
 /**
+
+ *
  * @mixin \Illuminate\Routing\ResponseFactory
  */
 class Response extends Facade
