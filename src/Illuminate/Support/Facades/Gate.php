@@ -5,6 +5,8 @@ namespace Illuminate\Support\Facades;
 use Illuminate\Contracts\Auth\Access\Gate as GateContract;
 
 /**
+
+ *
  * @mixin \Illuminate\Auth\Access\Gate
  */
 class Gate extends Facade
