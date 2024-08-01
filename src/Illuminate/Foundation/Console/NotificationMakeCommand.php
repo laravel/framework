@@ -147,10 +147,9 @@ class NotificationMakeCommand extends GeneratorCommand
 
         $wantsMarkdownView = confirm('Would you like to create a markdown view?');
 
-        if($wantsMarkdownView) {
+        if ($wantsMarkdownView) {
             $markdownView = text('What should the markdown view be named?', 'E.g. invoice-paid');
             $input->setOption('markdown', $markdownView);
         }
     }
-
 }
