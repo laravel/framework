@@ -127,18 +127,12 @@ class NotificationMakeCommand extends GeneratorCommand
     }
 
     /**
-     * Get the console command options.
+     * Perform actions after the user was prompted for missing arguments.
      *
-     * @return array
+     * @param  \Symfony\Component\Console\Input\InputInterface  $input
+     * @param  \Symfony\Component\Console\Output\OutputInterface  $output
+     * @return void
      */
-    protected function getOptions()
-    {
-        return [
-            ['force', 'f', InputOption::VALUE_NONE, 'Create the class even if the notification already exists'],
-            ['markdown', 'm', InputOption::VALUE_OPTIONAL, 'Create a new Markdown template for the notification'],
-        ];
-    }
-
     protected function afterPromptingForMissingArguments(InputInterface $input, OutputInterface $output)
     {
         if ($this->didReceiveOptions($input)) {
@@ -151,5 +145,18 @@ class NotificationMakeCommand extends GeneratorCommand
             $markdownView = text('What should the markdown view be named?', 'E.g. invoice-paid');
             $input->setOption('markdown', $markdownView);
         }
+    }
+
+    /**
+     * Get the console command options.
+     *
+     * @return array
+     */
+    protected function getOptions()
+    {
+        return [
+            ['force', 'f', InputOption::VALUE_NONE, 'Create the class even if the notification already exists'],
+            ['markdown', 'm', InputOption::VALUE_OPTIONAL, 'Create a new Markdown template for the notification'],
+        ];
     }
 }
