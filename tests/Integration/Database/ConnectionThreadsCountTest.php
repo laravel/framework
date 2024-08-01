@@ -8,7 +8,8 @@ class ConnectionThreadsCountTest extends DatabaseTestCase
 {
     public function testGetThreadsCount()
     {
-        $count = DB::connection()->getThreadsCount();
+        $count = DB::connection()->threadCount();
+
         if ($this->driver === 'sqlite') {
             $this->assertNull($count, 'SQLite does not support connection count');
         } else {

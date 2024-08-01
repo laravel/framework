@@ -33,7 +33,7 @@ abstract class DatabaseInspectionCommand extends Command
      */
     protected function getConnectionCount(ConnectionInterface $connection)
     {
-        return $connection->getThreadsCount();
+        return $connection->threadCount();
     }
 
     /**

@@ -625,6 +625,18 @@ class Connection implements ConnectionInterface
     }
 
     /**
+     * Get the number of open connections for the database.
+     *
+     * @return int|null
+     */
+    public function threadCount()
+    {
+        $query = $this->getQueryGrammar()->compileThreadCount();
+
+        return $query ? $this->scalar($query) : null;
+    }
+
+    /**
      * Execute the given callback in "dry run" mode.
      *
      * @param  \Closure  $callback
@@ -1082,18 +1094,6 @@ class Connection implements ConnectionInterface
     public function raw($value)
     {
         return new Expression($value);
-    }
-
-    /**
-     * Get the number of open connections for a database.
-     *
-     * @return int|null
-     */
-    public function getThreadsCount()
-    {
-        $query = $this->getQueryGrammar()->compileThreadsCount();
-
-        return $query ? $this->scalar($query) : null;
     }
 
     /**

@@ -85,7 +85,7 @@ class MonitorCommand extends DatabaseInspectionCommand
 
             $maxConnections = $this->option('max');
 
-            $connections = $this->connection->connection($database)->getThreadsCount();
+            $connections = $this->connection->connection($database)->threadCount();
 
             return [
                 'database' => $database,

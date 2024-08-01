@@ -650,6 +650,16 @@ class PostgresGrammar extends Grammar
     }
 
     /**
+     * Compile a query to get the number of open connections for a database.
+     *
+     * @return string
+     */
+    public function compileThreadCount()
+    {
+        return 'select count(*) as "Value" from pg_stat_activity';
+    }
+
+    /**
      * Wrap the given JSON selector.
      *
      * @param  string  $value
@@ -761,10 +771,5 @@ class PostgresGrammar extends Grammar
         }
 
         return $query;
-    }
-
-    public function compileThreadsCount()
-    {
-        return 'select count(*) as "Value" from pg_stat_activity';
     }
 }
