@@ -3,8 +3,6 @@
 namespace Illuminate\Support\Facades;
 
 /**
-
- *
  * @mixin \Illuminate\Pipeline\Pipeline
  */
 class Pipeline extends Facade
