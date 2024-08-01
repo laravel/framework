@@ -6,6 +6,8 @@ use Illuminate\Queue\Worker;
 use Illuminate\Support\Testing\Fakes\QueueFake;
 
 /**
+
+ *
  * @mixin \Illuminate\Queue\QueueManager
  * @mixin \Illuminate\Queue\Queue
  * @mixin \Illuminate\Support\Testing\Fakes\QueueFake
