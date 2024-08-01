@@ -52,7 +52,8 @@ class ExceptionHandlerTest extends TestCase
             $reported[] = $e;
         });
 
-        $exception = new class extends \Exception implements ShouldntReport, Responsable {
+        $exception = new class extends \Exception implements ShouldntReport, Responsable
+        {
             public function toResponse($request)
             {
                 return response('shouldnt report', 500);
