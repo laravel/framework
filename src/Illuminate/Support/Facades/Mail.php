@@ -5,8 +5,6 @@ namespace Illuminate\Support\Facades;
 use Illuminate\Support\Testing\Fakes\MailFake;
 
 /**
-
- *
  * @mixin \Illuminate\Mail\MailManager
  * @mixin \Illuminate\Support\Testing\Fakes\MailFake
  */
