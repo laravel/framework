@@ -14,21 +14,21 @@ class ValidationNullableIfTest extends TestCase
             return true;
         });
 
-        $this->assertSame('nullable', (string)$rule);
+        $this->assertSame('nullable', (string) $rule);
 
         $rule = new NullableIf(function () {
             return false;
         });
 
-        $this->assertSame('', (string)$rule);
+        $this->assertSame('', (string) $rule);
 
         $rule = new NullableIf(true);
 
-        $this->assertSame('nullable', (string)$rule);
+        $this->assertSame('nullable', (string) $rule);
 
         $rule = new NullableIf(false);
 
-        $this->assertSame('', (string)$rule);
+        $this->assertSame('', (string) $rule);
     }
 
     public function testItReturnedRuleIsNotSerializable()
