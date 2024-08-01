@@ -6,8 +6,8 @@ use Closure;
 use Illuminate\Process\Factory;
 
 /**
- * @mixin \Illuminate\Process\PendingProcess
- * @mixin \Illuminate\Process\Factory
+ * @see \Illuminate\Process\PendingProcess
+ * @see \Illuminate\Process\Factory
  */
 class Process extends Facade
 {

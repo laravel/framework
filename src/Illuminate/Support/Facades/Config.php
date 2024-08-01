@@ -3,7 +3,7 @@
 namespace Illuminate\Support\Facades;
 
 /**
- * @mixin \Illuminate\Config\Repository
+ * @see \Illuminate\Config\Repository
  */
 class Config extends Facade
 {

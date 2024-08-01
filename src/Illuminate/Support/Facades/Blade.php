@@ -3,7 +3,7 @@
 namespace Illuminate\Support\Facades;
 
 /**
- * @mixin \Illuminate\View\Compilers\BladeCompiler
+ * @see \Illuminate\View\Compilers\BladeCompiler
  */
 class Blade extends Facade
 {

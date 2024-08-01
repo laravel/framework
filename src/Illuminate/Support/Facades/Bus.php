@@ -8,8 +8,8 @@ use Illuminate\Foundation\Bus\PendingChain;
 use Illuminate\Support\Testing\Fakes\BusFake;
 
 /**
- * @mixin \Illuminate\Bus\Dispatcher
- * @mixin \Illuminate\Support\Testing\Fakes\BusFake
+ * @see \Illuminate\Bus\Dispatcher
+ * @see \Illuminate\Support\Testing\Fakes\BusFake
  */
 class Bus extends Facade
 {

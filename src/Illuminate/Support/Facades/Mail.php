@@ -5,8 +5,8 @@ namespace Illuminate\Support\Facades;
 use Illuminate\Support\Testing\Fakes\MailFake;
 
 /**
- * @mixin \Illuminate\Mail\MailManager
- * @mixin \Illuminate\Support\Testing\Fakes\MailFake
+ * @see \Illuminate\Mail\MailManager
+ * @see \Illuminate\Support\Testing\Fakes\MailFake
  */
 class Mail extends Facade
 {

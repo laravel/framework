@@ -3,7 +3,7 @@
 namespace Illuminate\Support\Facades;
 
 /**
- * @mixin \Illuminate\Filesystem\Filesystem
+ * @see \Illuminate\Filesystem\Filesystem
  */
 class File extends Facade
 {

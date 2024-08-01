@@ -3,7 +3,7 @@
 namespace Illuminate\Support\Facades;
 
 /**
- * @mixin \Illuminate\Http\Request
+ * @see \Illuminate\Http\Request
  */
 class Request extends Facade
 {

@@ -3,7 +3,7 @@
 namespace Illuminate\Support\Facades;
 
 /**
- * @mixin \Illuminate\Session\SessionManager
+ * @see \Illuminate\Session\SessionManager
  */
 class Session extends Facade
 {

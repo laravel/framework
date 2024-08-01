@@ -19,7 +19,7 @@ use Illuminate\Console\Scheduling\Schedule as ConsoleSchedule;
  * @method static bool hasMacro(string $name)
  * @method static void flushMacros()
  *
- * @mixin \Illuminate\Console\Scheduling\Schedule
+ * @see \Illuminate\Console\Scheduling\Schedule
  */
 class Schedule extends Facade
 {

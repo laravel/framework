@@ -3,7 +3,7 @@
 namespace Illuminate\Support\Facades;
 
 /**
- * @mixin \Illuminate\Cookie\CookieJar
+ * @see \Illuminate\Cookie\CookieJar
  */
 class Cookie extends Facade
 {

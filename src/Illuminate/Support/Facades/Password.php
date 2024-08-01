@@ -5,8 +5,8 @@ namespace Illuminate\Support\Facades;
 use Illuminate\Contracts\Auth\PasswordBroker;
 
 /**
- * @mixin \Illuminate\Auth\Passwords\PasswordBrokerManager
- * @mixin \Illuminate\Auth\Passwords\PasswordBroker
+ * @see \Illuminate\Auth\Passwords\PasswordBrokerManager
+ * @see \Illuminate\Auth\Passwords\PasswordBroker
  */
 class Password extends Facade
 {

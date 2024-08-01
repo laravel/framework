@@ -6,8 +6,8 @@ use Laravel\Ui\UiServiceProvider;
 use RuntimeException;
 
 /**
- * @mixin \Illuminate\Auth\AuthManager
- * @mixin \Illuminate\Auth\SessionGuard
+ * @see \Illuminate\Auth\AuthManager
+ * @see \Illuminate\Auth\SessionGuard
  */
 class Auth extends Facade
 {

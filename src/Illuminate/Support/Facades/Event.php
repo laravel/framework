@@ -6,8 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Testing\Fakes\EventFake;
 
 /**
- * @mixin \Illuminate\Events\Dispatcher
- * @mixin \Illuminate\Support\Testing\Fakes\EventFake
+ * @see \Illuminate\Events\Dispatcher
+ * @see \Illuminate\Support\Testing\Fakes\EventFake
  */
 class Event extends Facade
 {

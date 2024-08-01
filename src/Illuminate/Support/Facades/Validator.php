@@ -3,7 +3,7 @@
 namespace Illuminate\Support\Facades;
 
 /**
- * @mixin \Illuminate\Validation\Factory
+ * @see \Illuminate\Validation\Factory
  */
 class Validator extends Facade
 {

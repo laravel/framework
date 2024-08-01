@@ -7,8 +7,8 @@ use Illuminate\Notifications\ChannelManager;
 use Illuminate\Support\Testing\Fakes\NotificationFake;
 
 /**
- * @mixin \Illuminate\Notifications\ChannelManager
- * @mixin \Illuminate\Support\Testing\Fakes\NotificationFake
+ * @see \Illuminate\Notifications\ChannelManager
+ * @see \Illuminate\Support\Testing\Fakes\NotificationFake
  */
 class Notification extends Facade
 {

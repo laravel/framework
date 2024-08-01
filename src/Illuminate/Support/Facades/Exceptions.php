@@ -33,9 +33,9 @@ use Illuminate\Support\Testing\Fakes\ExceptionHandlerFake;
  * @method static \Illuminate\Support\Testing\Fakes\ExceptionHandlerFake throwFirstReported()
  * @method static \Illuminate\Support\Testing\Fakes\ExceptionHandlerFake setHandler(\Illuminate\Contracts\Debug\ExceptionHandler $handler)
  *
- * @mixin \Illuminate\Foundation\Exceptions\Handler
- * @mixin \Illuminate\Contracts\Debug\ExceptionHandler
- * @mixin \Illuminate\Support\Testing\Fakes\ExceptionHandlerFake
+ * @see \Illuminate\Foundation\Exceptions\Handler
+ * @see \Illuminate\Contracts\Debug\ExceptionHandler
+ * @see \Illuminate\Support\Testing\Fakes\ExceptionHandlerFake
  */
 class Exceptions extends Facade
 {

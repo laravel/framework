@@ -3,7 +3,7 @@
 namespace Illuminate\Support\Facades;
 
 /**
- * @mixin \Illuminate\Routing\Redirector
+ * @see \Illuminate\Routing\Redirector
  */
 class Redirect extends Facade
 {

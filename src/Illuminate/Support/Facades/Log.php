@@ -3,7 +3,7 @@
 namespace Illuminate\Support\Facades;
 
 /**
- * @mixin \Illuminate\Log\LogManager
+ * @see \Illuminate\Log\LogManager
  */
 class Log extends Facade
 {

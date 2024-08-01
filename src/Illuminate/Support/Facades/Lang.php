@@ -3,7 +3,7 @@
 namespace Illuminate\Support\Facades;
 
 /**
- * @mixin \Illuminate\Translation\Translator
+ * @see \Illuminate\Translation\Translator
  */
 class Lang extends Facade
 {

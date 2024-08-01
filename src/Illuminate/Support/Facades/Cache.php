@@ -3,8 +3,8 @@
 namespace Illuminate\Support\Facades;
 
 /**
- * @mixin \Illuminate\Cache\CacheManager
- * @mixin \Illuminate\Cache\Repository
+ * @see \Illuminate\Cache\CacheManager
+ * @see \Illuminate\Cache\Repository
  */
 class Cache extends Facade
 {

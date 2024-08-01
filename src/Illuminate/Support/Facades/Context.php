@@ -3,7 +3,7 @@
 namespace Illuminate\Support\Facades;
 
 /**
- * @mixin \Illuminate\Log\Context\Repository
+ * @see \Illuminate\Log\Context\Repository
  */
 class Context extends Facade
 {
