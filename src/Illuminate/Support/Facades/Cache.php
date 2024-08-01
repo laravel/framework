@@ -3,8 +3,6 @@
 namespace Illuminate\Support\Facades;
 
 /**
-
- *
  * @mixin \Illuminate\Cache\CacheManager
  * @mixin \Illuminate\Cache\Repository
  */
