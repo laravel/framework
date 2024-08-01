@@ -55,23 +55,23 @@ class NotificationMakeCommandTest extends TestCase
     public function testItCanGenerateNotificationFileWithNotInitialInput()
     {
         $this->artisan('make:notification')
-            ->expectsQuestion('What should the notification be named?', 'ExportFinishedNotification')
+            ->expectsQuestion('What should the notification be named?', 'FooNotification')
             ->expectsQuestion('Would you like to create a markdown view?', false)
             ->assertExitCode(0);
 
-        $this->assertFilenameExists('app/Notifications/ExportFinishedNotification.php');
-        $this->assertFileDoesNotExist('resources/views/export.blade.php');
+        $this->assertFilenameExists('app/Notifications/FooNotification.php');
+        $this->assertFileDoesNotExist('resources/views/foo-notification.blade.php');
     }
 
     public function testItCanGenerateNotificationFileWithMarkdownTemplateWithNotInitialInput()
     {
         $this->artisan('make:notification')
-            ->expectsQuestion('What should the notification be named?', 'ExportFinishedNotification')
+            ->expectsQuestion('What should the notification be named?', 'FooNotification')
             ->expectsQuestion('Would you like to create a markdown view?', true)
-            ->expectsQuestion('What should the markdown view be named?', 'export')
+            ->expectsQuestion('What should the markdown view be named?', 'foo-notification')
             ->assertExitCode(0);
 
-        $this->assertFilenameExists('app/Notifications/ExportFinishedNotification.php');
-        $this->assertFilenameExists('resources/views/export.blade.php');
+        $this->assertFilenameExists('app/Notifications/FooNotification.php');
+        $this->assertFilenameExists('resources/views/foo-notification.blade.php');
     }
 }
