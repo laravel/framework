@@ -33,24 +33,16 @@ trait BuildsQueries
     {
         $this->enforceOrderBy();
 
-        // Taking into account user-defined limits and offsets (if any) for more precise control over chunks...
         $skip = $this->getOffset();
         $remaining = $this->getLimit();
 
         $page = 1;
 
         do {
-            // Calculating the offset while considering any existing query offset
-            // ensures user-defined offsets stay independent of the chunk size
-            // and page numbers, providing precise control over the dataset.
             $offset = (($page - 1) * $count) + intval($skip);
 
-            // If a limit was defined, we'll use that as the upper bound for chunks.
-            // We'll decrement from the remainder limit on every iteration, until
-            // the limit is reached. Otherwise, we use the chunk size as limit.
             $limit = is_null($remaining) ? $count : min($count, $remaining);
 
-            // Saves an unnecessary database query when the limit is already zero...
             if ($limit == 0) {
                 break;
             }
@@ -63,14 +55,10 @@ trait BuildsQueries
                 break;
             }
 
-            // Decrements from the remainder (user-defined limits, if any) on each chunked iteration...
             if (! is_null($remaining)) {
                 $remaining = max($remaining - $countResults, 0);
             }
 
-            // On each chunk result set, we will pass them to the callback and then let the
-            // developer take care of everything within the callback, which allows us to
-            // keep the memory low for spinning through large result sets for working.
             if ($callback($results, $page) === false) {
                 return false;
             }
@@ -166,12 +154,8 @@ trait BuildsQueries
     public function orderedChunkById($count, callable $callback, $column = null, $alias = null, $descending = false)
     {
         $column ??= $this->defaultKeyName();
-
         $alias ??= $column;
-
         $lastId = null;
-
-        // Taking into account user-defined limits and offsets (if any) for more precise control over chunks...
         $skip = $this->getOffset();
         $remaining = $this->getLimit();
 
@@ -180,17 +164,12 @@ trait BuildsQueries
         do {
             $clone = clone $this;
 
-            // Any pre-existing offset should be reset after the first page, since we'll use the $lastId from there...
             if ($skip && $page > 1) {
                 $clone->offset(0);
             }
 
-            // If a limit was defined, we'll use that as the upper bound for chunks.
-            // We'll decrement from the remainder limit on every iteration, until
-            // the limit is reached. Otherwise, we use the chunk size as limit.
             $limit = is_null($remaining) ? $count : min($count, $remaining);
 
-            // Saves an unnecessary database query when the limit is already zero...
             if ($limit == 0) {
                 break;
             }
@@ -210,7 +189,6 @@ trait BuildsQueries
                 break;
             }
 
-            // Decrements from the remainder (user-defined limits, if any) on each chunked iteration...
             if (! is_null($remaining)) {
                 $remaining = max($remaining - $countResults, 0);
             }

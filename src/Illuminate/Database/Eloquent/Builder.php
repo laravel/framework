@@ -1023,26 +1023,6 @@ class Builder implements BuilderContract
     }
 
     /**
-     * Get the "offset" value from the query or null if it's not set.
-     *
-     * @return mixed
-     */
-    public function getOffset()
-    {
-        return $this->query->getOffset();
-    }
-
-    /**
-     * Get the current "limit" value from the query or null if not set.
-     *
-     * @return mixed
-     */
-    public function getLimit()
-    {
-        return $this->query->getLimit();
-    }
-
-    /**
      * Ensure the proper order by required for cursor pagination.
      *
      * @param  bool  $shouldReverse
@@ -1880,6 +1860,26 @@ class Builder implements BuilderContract
     public function withoutEagerLoads()
     {
         return $this->setEagerLoads([]);
+    }
+
+    /**
+     * Get the "limit" value from the query or null if it's not set.
+     *
+     * @return mixed
+     */
+    public function getLimit()
+    {
+        return $this->query->getLimit();
+    }
+
+    /**
+     * Get the "offset" value from the query or null if it's not set.
+     *
+     * @return mixed
+     */
+    public function getOffset()
+    {
+        return $this->query->getOffset();
     }
 
     /**
