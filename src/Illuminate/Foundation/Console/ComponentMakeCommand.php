@@ -117,6 +117,7 @@ class ComponentMakeCommand extends GeneratorCommand
     protected function getView()
     {
         $segments = explode('/', str_replace('\\', '/', $this->argument('name')));
+
         $name = array_pop($segments);
 
         $path = is_string($this->option('path'))
@@ -129,9 +130,7 @@ class ComponentMakeCommand extends GeneratorCommand
         $path[] = $name;
 
         return collect($path)
-            ->map(function ($part) {
-                return Str::kebab($part);
-            })
+            ->map(fn ($segment) => Str::kebab($segment))
             ->implode('.');
     }
 
@@ -177,10 +176,10 @@ class ComponentMakeCommand extends GeneratorCommand
     protected function getOptions()
     {
         return [
-            ['force', 'f', InputOption::VALUE_NONE, 'Create the class even if the component already exists'],
             ['inline', null, InputOption::VALUE_NONE, 'Create a component that renders an inline view'],
             ['view', null, InputOption::VALUE_NONE, 'Create an anonymous component with only a view'],
-            ['path', null, InputOption::VALUE_REQUIRED, 'Specify the view path'],
+            ['path', null, InputOption::VALUE_REQUIRED, 'The location where the component view should be created'],
+            ['force', 'f', InputOption::VALUE_NONE, 'Create the class even if the component already exists'],
         ];
     }
 }
