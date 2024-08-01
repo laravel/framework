@@ -3,8 +3,6 @@
 namespace Illuminate\Support\Facades;
 
 /**
-
- *
  * @mixin \Illuminate\Cache\RateLimiter
  */
 class RateLimiter extends Facade
