@@ -6,8 +6,6 @@ use Laravel\Ui\UiServiceProvider;
 use RuntimeException;
 
 /**
-
- *
  * @mixin \Illuminate\Auth\AuthManager
  * @mixin \Illuminate\Auth\SessionGuard
  */
