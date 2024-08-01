@@ -6,6 +6,8 @@ use Closure;
 use Illuminate\Process\Factory;
 
 /**
+
+ *
  * @mixin \Illuminate\Process\PendingProcess
  * @mixin \Illuminate\Process\Factory
  */
