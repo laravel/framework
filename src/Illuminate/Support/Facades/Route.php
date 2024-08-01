@@ -3,8 +3,6 @@
 namespace Illuminate\Support\Facades;
 
 /**
-
- *
  * @mixin \Illuminate\Routing\Router
  */
 class Route extends Facade
