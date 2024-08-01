@@ -13,6 +13,14 @@ use Illuminate\Filesystem\Filesystem;
 class PostgresConnection extends Connection
 {
     /**
+     * {@inheritdoc}
+     */
+    public function getDriverTitle()
+    {
+        return 'PostgreSQL';
+    }
+
+    /**
      * Escape a binary value for safe SQL embedding.
      *
      * @param  string  $value

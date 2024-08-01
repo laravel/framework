@@ -15,6 +15,14 @@ use Throwable;
 class SqlServerConnection extends Connection
 {
     /**
+     * {@inheritdoc}
+     */
+    public function getDriverTitle()
+    {
+        return 'SQL Server';
+    }
+
+    /**
      * Execute a Closure within a transaction.
      *
      * @param  \Closure  $callback

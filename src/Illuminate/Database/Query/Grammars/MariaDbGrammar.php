@@ -34,6 +34,16 @@ class MariaDbGrammar extends MySqlGrammar
     }
 
     /**
+     * Compile a query to get the number of open connections for a database.
+     *
+     * @return string
+     */
+    public function compileThreadCount()
+    {
+        return 'select variable_value as `Value` from information_schema.global_status where variable_name = \'THREADS_CONNECTED\'';
+    }
+
+    /**
      * Determine whether to use a legacy group limit clause for MySQL < 8.0.
      *
      * @param  \Illuminate\Database\Query\Builder  $query

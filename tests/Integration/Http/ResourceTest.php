@@ -38,6 +38,7 @@ use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalRelations
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalRelationshipAggregates;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalRelationshipCounts;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalRelationshipExists;
+use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalRelationshipUsingNamedParameters;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithoutWrap;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithUnlessOptionalData;
 use Illuminate\Tests\Integration\Http\Fixtures\ReallyEmptyPostResource;
@@ -660,6 +661,54 @@ class ResourceTest extends TestCase
         $response->assertExactJson([
             'data' => [
                 'id' => 5,
+            ],
+        ]);
+    }
+
+    public function testWhenLoadedUsingNamedDefaultParameterOnMissingRelation()
+    {
+        Route::get('/', function () {
+            $post = new Post(['id' => 1]);
+
+            return new PostResourceWithOptionalRelationshipUsingNamedParameters($post);
+        });
+
+        $response = $this->withoutExceptionHandling()->get(
+            '/', ['Accept' => 'application/json']
+        );
+
+        $response->assertStatus(200);
+
+        $response->assertExactJson([
+            'data' => [
+                'id' => 1,
+                'author_defaulting_to_null' => null,
+                'author_name' => 'Anonymous',
+            ],
+        ]);
+    }
+
+    public function testWhenLoadedUsingNamedDefaultParameterOnLoadedRelation()
+    {
+        Route::get('/', function () {
+            $post = new Post(['id' => 1]);
+            $post->setRelation('author', new Author(['name' => 'jrrmartin']));
+
+            return new PostResourceWithOptionalRelationshipUsingNamedParameters($post);
+        });
+
+        $response = $this->withoutExceptionHandling()->get(
+            '/', ['Accept' => 'application/json']
+        );
+
+        $response->assertStatus(200);
+
+        $response->assertExactJson([
+            'data' => [
+                'id' => 1,
+                'author' => ['name' => 'jrrmartin'],
+                'author_defaulting_to_null' => ['name' => 'jrrmartin'],
+                'author_name' => 'jrrmartin',
             ],
         ]);
     }
@@ -1775,6 +1824,30 @@ class ResourceTest extends TestCase
             1 => 20,
             'total' => 30,
         ], ['data' => [0 => 10, 1 => 20, 'total' => 30]]);
+    }
+
+    public function testItThrowsNoErrorInStrictModeWhenResourceIsPaginated()
+    {
+        $originalMode = Model::preventsAccessingMissingAttributes();
+        Model::preventAccessingMissingAttributes();
+        try {
+            Route::get('/', function () {
+                $paginator = new LengthAwarePaginator(
+                    collect([new Post(['id' => 5, 'title' => 'Test Title', 'reading_time' => 3.0])]),
+                    10, 15, 1
+                );
+
+                return PostResourceWithJsonOptions::collection($paginator);
+            });
+
+            $response = $this->withoutExceptionHandling()->get(
+                '/', ['Accept' => 'application/json']
+            );
+
+            $response->assertStatus(200);
+        } finally {
+            Model::preventAccessingMissingAttributes($originalMode);
+        }
     }
 
     private function assertJsonResourceResponse($data, $expectedJson)

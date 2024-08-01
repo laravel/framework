@@ -572,6 +572,17 @@ class TestResponse implements ArrayAccess
     }
 
     /**
+     * Assert that the given HTML string or array of HTML strings are contained within the response.
+     *
+     * @param  array|string  $value
+     * @return $this
+     */
+    public function assertSeeHtml($value)
+    {
+        return $this->assertSee($value, false);
+    }
+
+    /**
      * Assert that the given strings are contained in order within the response.
      *
      * @param  array  $values
@@ -585,6 +596,17 @@ class TestResponse implements ArrayAccess
         PHPUnit::withResponse($this)->assertThat($values, new SeeInOrder($this->getContent()));
 
         return $this;
+    }
+
+    /**
+     * Assert that the given HTML strings are contained in order within the response.
+     *
+     * @param  array  $values
+     * @return $this
+     */
+    public function assertSeeHtmlInOrder(array $values)
+    {
+        return $this->assertSeeInOrder($values, false);
     }
 
     /**
@@ -643,6 +665,17 @@ class TestResponse implements ArrayAccess
         }
 
         return $this;
+    }
+
+    /**
+     * Assert that the given HTML string or array of HTML strings are not contained within the response.
+     *
+     * @param  array|string  $value
+     * @return $this
+     */
+    public function assertDontSeeHtml($value)
+    {
+        return $this->assertDontSee($value, false);
     }
 
     /**
@@ -815,6 +848,20 @@ class TestResponse implements ArrayAccess
     }
 
     /**
+     * Assert that the response has the exact JSON structure.
+     *
+     * @param  array|null  $structure
+     * @param  array|null  $responseData
+     * @return $this
+     */
+    public function assertExactJsonStructure(?array $structure = null, $responseData = null)
+    {
+        $this->decodeResponseJson()->assertStructure($structure, $responseData, true);
+
+        return $this;
+    }
+
+    /**
      * Assert that the response JSON has the expected count of items at the given key.
      *
      * @param  int  $count
@@ -867,12 +914,12 @@ class TestResponse implements ArrayAccess
                         break;
                     }
                 }
-            }
 
-            if ($errorMissing) {
-                PHPUnit::withResponse($this)->fail(
-                    "Failed to find a validation error in the response for key and message: '$key' => '$expectedMessage'".PHP_EOL.PHP_EOL.$errorMessage
-                );
+                if ($errorMissing) {
+                    PHPUnit::withResponse($this)->fail(
+                        "Failed to find a validation error in the response for key and message: '$key' => '$expectedMessage'".PHP_EOL.PHP_EOL.$errorMessage
+                    );
+                }
             }
         }
 

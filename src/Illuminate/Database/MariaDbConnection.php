@@ -13,6 +13,14 @@ use Illuminate\Support\Str;
 class MariaDbConnection extends MySqlConnection
 {
     /**
+     * {@inheritdoc}
+     */
+    public function getDriverTitle()
+    {
+        return 'MariaDB';
+    }
+
+    /**
      * Determine if the connected database is a MariaDB database.
      *
      * @return bool

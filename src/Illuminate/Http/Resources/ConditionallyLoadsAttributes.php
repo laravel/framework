@@ -276,6 +276,10 @@ trait ConditionallyLoadsAttributes
             return;
         }
 
+        if ($value === null) {
+            $value = value(...);
+        }
+
         return value($value, $loadedValue);
     }
 
@@ -305,6 +309,10 @@ trait ConditionallyLoadsAttributes
 
         if ($this->resource->{$attribute} === null) {
             return;
+        }
+
+        if ($value === null) {
+            $value = value(...);
         }
 
         return value($value, $this->resource->{$attribute});
@@ -338,6 +346,10 @@ trait ConditionallyLoadsAttributes
 
         if ($this->resource->{$attribute} === null) {
             return;
+        }
+
+        if ($value === null) {
+            $value = value(...);
         }
 
         return value($value, $this->resource->{$attribute});

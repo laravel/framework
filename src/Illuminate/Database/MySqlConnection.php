@@ -15,6 +15,14 @@ use PDO;
 class MySqlConnection extends Connection
 {
     /**
+     * {@inheritdoc}
+     */
+    public function getDriverTitle()
+    {
+        return $this->isMaria() ? 'MariaDB' : 'MySQL';
+    }
+
+    /**
      * Escape a binary value for safe SQL embedding.
      *
      * @param  string  $value

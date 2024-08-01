@@ -144,6 +144,7 @@ class Builder
     {
         $table = $this->connection->getTablePrefix().$table;
 
+        /** @phpstan-ignore arguments.count (SQLite accepts a withSize argument) */
         foreach ($this->getTables(false) as $value) {
             if (strtolower($table) === strtolower($value['name'])) {
                 return true;

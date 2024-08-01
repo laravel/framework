@@ -286,6 +286,10 @@ abstract class HasOneOrMany extends Relation
      */
     public function upsert(array $values, $uniqueBy, $update = null)
     {
+        if (! empty($values) && ! is_array(reset($values))) {
+            $values = [$values];
+        }
+
         foreach ($values as $key => $value) {
             $values[$key][$this->getForeignKeyName()] = $this->getParentKey();
         }
