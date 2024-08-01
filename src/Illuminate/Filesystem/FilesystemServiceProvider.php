@@ -15,7 +15,7 @@ class FilesystemServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $this->registerFileServing();
+        $this->serveFiles();
     }
 
     /**
@@ -76,7 +76,7 @@ class FilesystemServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    protected function registerFileServing()
+    protected function serveFiles()
     {
         if ($this->app->routesAreCached()) {
             return;
