@@ -400,6 +400,14 @@ class SupportStrTest extends TestCase
         Str::convertCase('Hello', -1);
     }
 
+    public function testDedup()
+    {
+        $this->assertSame(' laravel php framework ', Str::deduplicate(' laravel   php  framework '));
+        $this->assertSame('what', Str::deduplicate('whaaat', 'a'));
+        $this->assertSame('/some/odd/path/', Str::deduplicate('/some//odd//path/', '/'));
+        $this->assertSame('ムだム', Str::deduplicate('ムだだム', 'だ'));
+    }
+
     public function testParseCallback()
     {
         $this->assertEquals(['Class', 'method'], Str::parseCallback('Class@method'));
