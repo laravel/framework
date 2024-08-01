@@ -17,12 +17,12 @@ class NullableIf implements Stringable
     /**
      * Create a new required validation rule based on a condition.
      *
-     * @param  callable|bool  $condition
+     * @param callable|bool $condition
      * @return void
      */
     public function __construct($condition)
     {
-        if (! is_callable($condition) && ! is_bool($condition)) {
+        if (!is_callable($condition) && !is_bool($condition)) {
             throw new InvalidArgumentException('The provided condition must be a callable or boolean.');
         }
 
@@ -36,10 +36,7 @@ class NullableIf implements Stringable
      */
     public function __toString()
     {
-        if (is_callable($this->condition)) {
-            return call_user_func($this->condition) ? 'nullable' : '';
-        }
-
-        return $this->condition ? 'nullable' : '';
+        $result = is_callable($this->condition) ? call_user_func($this->condition) : $this->condition;
+        return $result ? 'nullable' : 'required';
     }
 }
