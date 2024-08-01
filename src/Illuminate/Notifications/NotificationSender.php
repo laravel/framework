@@ -2,7 +2,6 @@
 
 namespace Illuminate\Notifications;
 
-use Throwable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Contracts\Translation\HasLocalePreference;
 use Illuminate\Database\Eloquent\Collection as ModelCollection;
@@ -13,6 +12,7 @@ use Illuminate\Notifications\Events\NotificationSent;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Localizable;
+use Throwable;
 
 class NotificationSender
 {
