@@ -112,6 +112,9 @@ class HashManager extends Manager implements Hasher
     /**
      * Verifies that the configuration is less than or equal to what is configured.
      *
+     * @param  array  $value
+     * @return bool
+     *
      * @internal
      */
     public function verifyConfiguration($value)
