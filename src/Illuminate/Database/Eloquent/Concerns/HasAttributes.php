@@ -1396,6 +1396,7 @@ trait HasAttributes
             return Hash::make($value);
         }
 
+         /** @phpstan-ignore-next-line */
         if (! Hash::verifyConfiguration($value)) {
             throw new RuntimeException("Could not verify the hashed value's configuration.");
         }
