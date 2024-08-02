@@ -5,6 +5,7 @@ on:
     branches:
       - master
       - '*.x'
+      - 'facades-styleci'
   workflow_dispatch:
 
 jobs:
@@ -38,7 +39,7 @@ jobs:
           max_attempts: 5
           command: |
             composer config repositories.facade-documenter vcs git@github.com:laravel/facade-documenter.git
-            composer require --dev laravel/facade-documenter:dev-main --prefer-stable --prefer-dist --no-interaction --no-progress
+            composer require --dev laravel/facade-documenter:dev-main styleci/cli:^1.5 --prefer-stable --prefer-dist --no-interaction --no-progress
 
       - name: Update facade docblocks
         run: |
@@ -82,6 +83,10 @@ jobs:
             Illuminate\\Support\\Facades\\Validator \
             Illuminate\\Support\\Facades\\View \
             Illuminate\\Support\\Facades\\Vite
+
+      - name: Analyse using StyleCI
+        run: |
+          STYLECI_GITHUB_API_KEY="${{ secrets.STYLECI_GITHUB_API_KEY }}" php vendor/bin/styleci analyze --dry-run
 
       - name: Commit facade docblocks
         uses: stefanzweifel/git-auto-commit-action@v5
