@@ -86,7 +86,7 @@ jobs:
 
       - name: Analyse using StyleCI
         run: |
-          STYLECI_GITHUB_API_KEY="${{ secrets.STYLECI_GITHUB_API_KEY }}" php vendor/bin/styleci analyze --dry-run
+          STYLECI_GITHUB_API_KEY="${{ secrets.STYLECI_GITHUB_API_KEY }}" php vendor/bin/styleci analyze --dry-run --only-changed
 
       - name: Commit facade docblocks
         uses: stefanzweifel/git-auto-commit-action@v5
