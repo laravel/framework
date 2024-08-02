@@ -64,12 +64,11 @@ class ApiInstallCommand extends Command
         }
 
         if ($this->option('passport')) {
-            Process::run(array_filter([
+            Process::run([
                 (new PhpExecutableFinder())->find(false) ?: 'php',
                 defined('ARTISAN_BINARY') ? ARTISAN_BINARY : 'artisan',
                 'passport:install',
-                $this->confirm('Would you like to use UUIDs for all client IDs?') ? '--uuids' : null,
-            ]));
+            ]);
 
             $this->components->info('API scaffolding installed. Please add the [Laravel\Passport\HasApiTokens] trait to your User model.');
         } else {
@@ -147,7 +146,7 @@ class ApiInstallCommand extends Command
     protected function installPassport()
     {
         $this->requireComposerPackages($this->option('composer'), [
-            'laravel/passport:^12.0',
+            'laravel/passport:^13.0',
         ]);
     }
 }
