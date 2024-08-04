@@ -259,10 +259,13 @@ class RedisBatchRepository implements PrunableBatchRepository
      *
      * @return void
      */
-    public function rollBack() {}
+    public function rollBack()
+    {
+    }
 
     /**
      * Convert the given raw batch to a Batch object.
+     *
      * @throws \RedisException
      */
     protected function toBatch(object $batch): Batch
