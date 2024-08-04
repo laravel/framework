@@ -3951,6 +3951,21 @@ class SupportCollectionTest extends TestCase
         }));
     }
 
+    public function testGettingProductFromCollection()
+    {
+        $numbers = collect([1, 2, 3, 4, 5]);
+        $this->assertEquals(120, $numbers->prod());
+
+        $numbers = collect([-1, 2, -3, 4]);
+        $this->assertEquals(24, $numbers->prod());
+
+        $numbers = collect([['value' => 2], ['value' => 3], ['value' => 4]]);
+        $callback = function ($item) {
+            return $item['value'];
+        };
+        $this->assertEquals(24, $numbers->prod($callback));
+    }
+
     /**
      * @dataProvider collectionClassProvider
      */
