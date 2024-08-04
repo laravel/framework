@@ -353,7 +353,7 @@ class RedisBatchRepository implements PrunableBatchRepository
     /**
      * A key for storing the batch data.
      *
-     * @param string $batchId
+     * @param  string  $batchId
      * @return string
      */
     protected function batchKey(string $batchId): string
@@ -384,7 +384,7 @@ class RedisBatchRepository implements PrunableBatchRepository
     /**
      * A key for storing the failed jobs of the batch.
      *
-     * @param string $batchId
+     * @param  string  $batchId
      * @return string
      */
     protected function failedJobsKey(string $batchId): string
