@@ -134,4 +134,17 @@ class RedisCacheLockTest extends TestCase
         $this->assertTrue($secondLock->isOwnedBy($firstLock->owner()));
         $this->assertFalse($secondLock->isOwnedByCurrentProcess());
     }
+
+    public function testRedisCacheLockCanBeReleasedAfterFlush()
+    {
+        Cache::store('redis')->lock('foo')->forceRelease();
+
+        $lock = Cache::store('redis')->lock('foo');
+        $this->assertTrue($lock->get());
+        $this->assertFalse($lock->get());
+
+        Cache::store('redis')->flush();
+
+        $this->assertTrue($lock->get());
+    }
 }

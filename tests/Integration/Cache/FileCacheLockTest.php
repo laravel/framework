@@ -112,4 +112,17 @@ class FileCacheLockTest extends TestCase
         $this->assertTrue($secondLock->isOwnedBy($firstLock->owner()));
         $this->assertFalse($secondLock->isOwnedByCurrentProcess());
     }
+
+    public function testFileCacheLockCanBeReleasedAfterFlush()
+    {
+        Cache::lock('foo')->forceRelease();
+
+        $lock = Cache::lock('foo');
+        $this->assertTrue($lock->get());
+        $this->assertFalse($lock->get());
+
+        Cache::flush();
+
+        $this->assertTrue($lock->get());
+    }
 }
