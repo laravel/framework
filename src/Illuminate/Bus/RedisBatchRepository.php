@@ -340,26 +340,53 @@ class RedisBatchRepository implements PrunableBatchRepository
         return unserialize($serialized);
     }
 
+    /**
+     * A key for storing the sorted IDs of the batches.
+     *
+     * @return string
+     */
     protected function sortedIDsKey(): string
     {
         return "{$this->redisKey}:ids";
     }
 
+    /**
+     * A key for storing the batch data.
+     *
+     * @param string $batchId
+     * @return string
+     */
     protected function batchKey(string $batchId): string
     {
         return "{$this->redisKey}:{$batchId}";
     }
 
+    /**
+     * A key for storing the timestamps of the created batches.
+     *
+     * @return string
+     */
     protected function createdAtKey(): string
     {
         return "{$this->redisKey}:timestamps:created";
     }
 
+    /**
+     * A key for storing the timestamps of the finished batches.
+     *
+     * @return string
+     */
     protected function finishedAtKey(): string
     {
         return "{$this->redisKey}:timestamps:finished";
     }
 
+    /**
+     * A key for storing the failed jobs of the batch.
+     *
+     * @param string $batchId
+     * @return string
+     */
     protected function failedJobsKey(string $batchId): string
     {
         return "{$this->redisKey}:{$batchId}:failed_jobs";
