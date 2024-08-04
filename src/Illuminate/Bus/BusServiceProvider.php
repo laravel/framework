@@ -46,9 +46,11 @@ class BusServiceProvider extends ServiceProvider implements DeferrableProvider
         $this->app->singleton(BatchRepository::class, function ($app) {
             $driver = $app->config->get('queue.batching.driver', 'database');
 
-            return $driver === 'dynamodb'
-                ? $app->make(DynamoBatchRepository::class)
-                : $app->make(DatabaseBatchRepository::class);
+            return match($driver) {
+                'dynamodb' => $app->make(DynamoBatchRepository::class),
+                'redis' => $app->make(RedisBatchRepository::class),
+                default => $app->make(DatabaseBatchRepository::class),
+            };
         });
 
         $this->app->singleton(DatabaseBatchRepository::class, function ($app) {
@@ -84,6 +86,14 @@ class BusServiceProvider extends ServiceProvider implements DeferrableProvider
                 ttlAttribute: $app->config->get('queue.batching.ttl_attribute', 'ttl'),
             );
         });
+
+        $this->app->singleton(RedisBatchRepository::class, function ($app) {
+              return new RedisBatchRepository(
+                $app->make(BatchFactory::class),
+                $app->make('redis')->connection($app->config->get('queue.batching.database', 'default')),
+                $app->config->get('queue.batching.table', 'job_batches'),
+              );
+        });
     }
 
     /**
@@ -99,6 +109,8 @@ class BusServiceProvider extends ServiceProvider implements DeferrableProvider
             QueueingDispatcherContract::class,
             BatchRepository::class,
             DatabaseBatchRepository::class,
+            DynamoBatchRepository::class,
+            RedisBatchRepository::class,
         ];
     }
 }
