@@ -551,6 +551,22 @@ trait EnumeratesValues
     }
 
     /**
+     * Get the product of the given values.
+     *
+     * @param  (callable(TValue): mixed)|string|null  $callback
+     * @return mixed
+     */
+    public function prod($callback = null)
+    {
+        $callback = is_null($callback)
+            ? $this->identity()
+            : $this->valueRetriever($callback);
+
+        // Initial value is 1 since we are multiplying
+        return $this->reduce(fn ($carry, $item) => $carry * $callback($item), 1);
+    }
+
+    /**
      * Apply the callback if the collection is empty.
      *
      * @template TWhenEmptyReturnType
