@@ -3423,6 +3423,36 @@ class SupportCollectionTest extends TestCase
     }
 
     #[DataProvider('collectionClassProvider')]
+    public function testContainsAny($collection)
+    {
+        $c = new $collection([1, 3, 5]);
+
+        $this->assertTrue($c->containsAny([1, 3]));
+        $this->assertTrue($c->containsAny([5, 7]));
+        $this->assertFalse($c->containsAny([7, 9]));
+
+        $this->assertTrue($c->containsAny(['1', '3']));
+        $this->assertTrue($c->containsAny(['5', '7']));
+        $this->assertFalse($c->containsAny(['7', '9']));
+
+        $c = new $collection([null]);
+
+        $this->assertTrue($c->containsAny([false, 1]));
+        $this->assertTrue($c->containsAny([null, 1]));
+        $this->assertTrue($c->containsAny([[], 1]));
+        $this->assertTrue($c->containsAny([0, 1]));
+        $this->assertTrue($c->containsAny(['', 1]));
+
+        $c = new $collection([]);
+
+        $this->assertFalse($c->containsAny([false, 1]));
+        $this->assertFalse($c->containsAny([null, 1]));
+        $this->assertFalse($c->containsAny([[], 1]));
+        $this->assertFalse($c->containsAny([0, 1]));
+        $this->assertFalse($c->containsAny(['', 1]));
+    }
+
+    #[DataProvider('collectionClassProvider')]
     public function testDoesntContain($collection)
     {
         $c = new $collection([1, 3, 5]);
