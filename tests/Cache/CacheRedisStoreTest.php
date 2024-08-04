@@ -132,8 +132,8 @@ class CacheRedisStoreTest extends TestCase
     public function testFlushesCached()
     {
         $redis = $this->getRedis();
-        $redis->getRedis()->shouldReceive('connection')->once()->with('default')->andReturn($redis->getRedis());
-        $redis->getRedis()->shouldReceive('flushdb')->once()->andReturn('ok');
+        $redis->getRedis()->shouldReceive('connection')->twice()->with('default')->andReturn($redis->getRedis());
+        $redis->getRedis()->shouldReceive('flushdb')->twice()->andReturn('ok');
         $result = $redis->flush();
         $this->assertTrue($result);
     }
